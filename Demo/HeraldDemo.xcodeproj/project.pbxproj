@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -13,6 +13,8 @@
 		0C6BA8DC23F570350068D4A8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C6BA8DB23F570350068D4A8 /* Assets.xcassets */; };
 		0C6BA8DF23F570350068D4A8 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C6BA8DE23F570350068D4A8 /* Preview Assets.xcassets */; };
 		0C6BA8E223F570360068D4A8 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0C6BA8E023F570360068D4A8 /* LaunchScreen.storyboard */; };
+		0C6BA8EA23F570740068D4A8 /* ConsoleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C6BA8E923F570740068D4A8 /* ConsoleView.swift */; };
+		0C9F697823F5715F0014503F /* Herald in Frameworks */ = {isa = PBXBuildFile; productRef = 0C9F697723F5715F0014503F /* Herald */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +26,7 @@
 		0C6BA8DE23F570350068D4A8 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		0C6BA8E123F570360068D4A8 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		0C6BA8E323F570360068D4A8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		0C6BA8E923F570740068D4A8 /* ConsoleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -31,6 +34,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0C9F697823F5715F0014503F /* Herald in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -42,6 +46,7 @@
 			children = (
 				0C6BA8D423F570340068D4A8 /* HeraldDemo */,
 				0C6BA8D323F570340068D4A8 /* Products */,
+				0C9F697623F5715F0014503F /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -59,6 +64,7 @@
 				0C6BA8D523F570340068D4A8 /* AppDelegate.swift */,
 				0C6BA8D723F570340068D4A8 /* SceneDelegate.swift */,
 				0C6BA8D923F570340068D4A8 /* ContentView.swift */,
+				0C6BA8E923F570740068D4A8 /* ConsoleView.swift */,
 				0C6BA8DB23F570350068D4A8 /* Assets.xcassets */,
 				0C6BA8E023F570360068D4A8 /* LaunchScreen.storyboard */,
 				0C6BA8E323F570360068D4A8 /* Info.plist */,
@@ -73,6 +79,13 @@
 				0C6BA8DE23F570350068D4A8 /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		0C9F697623F5715F0014503F /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -91,6 +104,9 @@
 			dependencies = (
 			);
 			name = HeraldDemo;
+			packageProductDependencies = (
+				0C9F697723F5715F0014503F /* Herald */,
+			);
 			productName = HeraldDemo;
 			productReference = 0C6BA8D223F570340068D4A8 /* HeraldDemo.app */;
 			productType = "com.apple.product-type.application";
@@ -148,6 +164,7 @@
 			files = (
 				0C6BA8D623F570340068D4A8 /* AppDelegate.swift in Sources */,
 				0C6BA8D823F570340068D4A8 /* SceneDelegate.swift in Sources */,
+				0C6BA8EA23F570740068D4A8 /* ConsoleView.swift in Sources */,
 				0C6BA8DA23F570340068D4A8 /* ContentView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -288,6 +305,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"HeraldDemo/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = HeraldDemo/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -307,6 +325,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"HeraldDemo/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = HeraldDemo/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -340,6 +359,13 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		0C9F697723F5715F0014503F /* Herald */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Herald;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 0C6BA8CA23F570340068D4A8 /* Project object */;
 }
