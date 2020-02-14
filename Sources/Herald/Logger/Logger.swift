@@ -19,7 +19,7 @@ public final class Logger {
         case fatal
     }
 
-    public struct System: ExpressibleByStringLiteral {
+    public struct System: Hashable, ExpressibleByStringLiteral {
         public let rawValue: String
         public init(stringLiteral value: String) { self.rawValue = value }
         public init(_ value: String) { self.rawValue = value }
@@ -27,7 +27,7 @@ public final class Logger {
         public static let `default` = System("default")
     }
 
-    public struct Category: ExpressibleByStringLiteral {
+    public struct Category: Hashable, ExpressibleByStringLiteral {
         public let rawValue: String
         public init(stringLiteral value: String) { self.rawValue = value }
         public init(_ value: String) { self.rawValue = value }
@@ -42,6 +42,15 @@ public final class Logger {
         public let category: Category
         public let session: UUID
         public let text: String
+
+        public init(created: Date, level: Level, system: System, category: Category, session: UUID, text: String) {
+            self.created = created
+            self.level = level
+            self.system = system
+            self.category = category
+            self.session = session
+            self.text = text
+        }
     }
 
     /// Set `isEnabled` to `false` to disable all of the logging.
