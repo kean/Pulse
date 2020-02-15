@@ -7,21 +7,19 @@ import CoreData
 import Herald
 
 struct ConsoleView: View {
-    private var request: FetchRequest<MessageEntity>!
-
-    @FetchRequest<MessageEntity>(entity: MessageEntity.entity(), sortDescriptors: [NSSortDescriptor(keyPath: \MessageEntity.created, ascending: false)]) var messages: FetchedResults<MessageEntity>
+    @ObservedObject var messages: FetchedEntities<MessageEntity>
 
     var body: some View {
         List(messages, id: \.self) { message in
-            ConsoleMessageView(model: .init(message: message))
-        }.listRowInsets(nil)
+            Text(message.text)
+        }
     }
 }
 
 struct ConsoleView_Previews: PreviewProvider {
     static var previews: some View {
         let store = mockMessagesStore
-        return ConsoleView()
-            .environment(\.managedObjectContext, store.viewContext)
+        let messages = FetchedEntities<MessageEntity>(context: store.viewContext, sortedBy: \.created)
+        return ConsoleView(messages: messages)
     }
 }

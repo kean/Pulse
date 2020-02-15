@@ -103,5 +103,9 @@ private func populateStore(_ container: NSPersistentContainer) {
         $0.text = "💥 0xDEADBEAF"
     }
 
+//    DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(3)) {
+//        populateStore(container)
+//    }
+
     try! moc.save()
 }

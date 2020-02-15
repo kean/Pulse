@@ -25,8 +25,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         // Create the SwiftUI view that provides the window contents.
         let store = mockMessagesStore
-        let contentView = ConsoleView()
-            .environment(\.managedObjectContext, store.viewContext)
+        let messages = FetchedEntities<MessageEntity>(context: store.viewContext, sortedBy: \.created)
+        let contentView = ConsoleView(messages: messages)
 
         // Use a UIHostingController as window root view controller.
         if let windowScene = scene as? UIWindowScene {
