@@ -6,19 +6,20 @@ import CoreData
 
 #warning("TODO: extract somewhere")
 public let coreDataModel: NSManagedObjectModel = {
+    let model = NSManagedObjectModel()
+
     let message = NSEntityDescription()
     message.name = "MessageEntity"
-    message.managedObjectClassName = "MessageEntity"
+    message.managedObjectClassName = MessageEntity.self.description()
     message.properties = [
         NSAttributeDescription(name: "created", type: .dateAttributeType),
-        NSAttributeDescription(name: "level", type: .stringAttributeType),
+        NSAttributeDescription(name: "level", type: .integer16AttributeType),
         NSAttributeDescription(name: "system", type: .stringAttributeType),
         NSAttributeDescription(name: "category", type: .stringAttributeType),
         NSAttributeDescription(name: "session", type: .stringAttributeType),
-        NSAttributeDescription(name: "message", type: .stringAttributeType)
+        NSAttributeDescription(name: "text", type: .stringAttributeType)
     ]
 
-    let model = NSManagedObjectModel()
     model.entities = [message]
     return model
 }()

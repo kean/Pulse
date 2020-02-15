@@ -10,5 +10,5 @@ public final class MessageEntity: NSManagedObject {
     @NSManaged public var system: String
     @NSManaged public var category: String
     @NSManaged public var session: String
-    @NSManaged public var message: String
+    @NSManaged public var text: String
 }

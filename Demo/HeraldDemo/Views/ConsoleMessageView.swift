@@ -10,7 +10,6 @@ struct ConsoleMessageView: View {
     @Environment(\.colorScheme) var colorScheme: ColorScheme
 
     var body: some View {
-        Group {
         VStack(alignment: .leading, spacing: 8) {
             Text(model.title)
                 .font(.caption)
@@ -21,7 +20,6 @@ struct ConsoleMessageView: View {
                 .lineLimit(4)
         }.padding()
             .background(model.style.backgroundColor.opacity(colorScheme == .dark ? 0.1 : 0.05))
-        }.background(Color(.systemBackground))
     }
 }
 
@@ -44,11 +42,11 @@ struct ConsoleMessageViewModel {
         self.style = style
     }
 
-    init(message: Logger.Message) {
+    init(message: MessageEntity) {
         let time = ConsoleMessageViewModel.timeFormatter
             .string(from: message.created)
         let prefix = message.level.icon.map { $0 + " "} ?? ""
-        let category = message.category == .default ? "" : ":\(message.category)"
+        let category = message.category == "default" ? "" : ":\(message.category)"
         self.title = "\(prefix)\(time) | \(message.system)\(category)"
         self.text = message.text
         self.style = ConsoleMessageStyle.make(level: message.level)

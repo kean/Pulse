@@ -35,24 +35,6 @@ public final class Logger {
         public static let `default` = Category("default")
     }
 
-    public struct Message {
-        public let created: Date
-        public let level: Level
-        public let system: System
-        public let category: Category
-        public let session: UUID
-        public let text: String
-
-        public init(created: Date, level: Level, system: System, category: Category, session: UUID, text: String) {
-            self.created = created
-            self.level = level
-            self.system = system
-            self.category = category
-            self.session = session
-            self.text = text
-        }
-    }
-
     /// Set `isEnabled` to `false` to disable all of the logging.
     public var isEnabled = true
 
@@ -73,15 +55,6 @@ public final class Logger {
     /// - parameter message: The actual message to log.
     public func log(level: Level = .debug, system: System = .default, category: Category = .default, _ text: @autoclosure () -> String) {
         guard isEnabled else { return }
-
-        let message = Message(
-            created: Date(),
-            level: level,
-            system: system,
-            category: category,
-            session: logSessionId,
-            text: text()
-        )
 
         #warning("TODO: implement logging + saving logs, should I use os_log for this?")
     }

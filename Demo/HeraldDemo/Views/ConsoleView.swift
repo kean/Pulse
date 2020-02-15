@@ -3,21 +3,26 @@
 // Copyright (c) 2020 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
+import CoreData
 import Herald
 
 struct ConsoleView: View {
-    var messages: [Logger.Message]
+    private var request: FetchRequest<MessageEntity>!
+
+    @FetchRequest<MessageEntity>(entity: MessageEntity.entity(), sortDescriptors: [NSSortDescriptor(keyPath: \MessageEntity.created, ascending: false)]) var messages: FetchedResults<MessageEntity>
 
     var body: some View {
-        Text("Placeholder")
-//        List(messages) {
-//            ConsoleMessageView(model: .init(message: $0))
-//        }
+        List(messages, id: \.self) { message in
+            ConsoleMessageView(model: .init(message: message))
+                .listRowInsets(nil)
+        }
     }
 }
 
 struct ConsoleView_Previews: PreviewProvider {
     static var previews: some View {
-        ConsoleView(messages: [])
+        let store = mockMessagesStore
+        return ConsoleView()
+            .environment(\.managedObjectContext, store.viewContext)
     }
 }

@@ -20,10 +20,21 @@ func makeMockMessagesStore() -> NSPersistentContainer {
     container.persistentStoreDescriptions = [store]
 
     var isCompleted = false
-    container.loadPersistentStores { _, _ in isCompleted = true }
+    container.loadPersistentStores { _, error in
+        assert(error == nil, "Failed to load persistent store: \(String(describing: error))")
+        isCompleted = true
+    }
     precondition(isCompleted)
 
     return container
+}
+
+private extension NSManagedObject {
+    convenience init(using usedContext: NSManagedObjectContext) {
+        let name = String(describing: type(of: self))
+        let entity = NSEntityDescription.entity(forEntityName: name, in: usedContext)!
+        self.init(entity: entity, insertInto: usedContext)
+    }
 }
 
 private func populateStore(_ container: NSPersistentContainer) {
@@ -32,8 +43,10 @@ private func populateStore(_ container: NSPersistentContainer) {
     let moc = container.viewContext
 
     func addMessage(_ closure: (MessageEntity) -> Void) {
-        let message = MessageEntity(context: moc)
+        let message = MessageEntity(using: moc)
+//        let message = MessageEntity(context: moc)
         closure(message)
+        moc.insert(message)
     }
 
     addMessage {
@@ -42,7 +55,7 @@ private func populateStore(_ container: NSPersistentContainer) {
         $0.system = "application"
         $0.category = "default"
         $0.session = "1"
-        $0.message = "UIApplication.didFinishLaunching"
+        $0.text = "UIApplication.didFinishLaunching"
     }
 
     addMessage {
@@ -51,7 +64,7 @@ private func populateStore(_ container: NSPersistentContainer) {
         $0.system = "application"
         $0.category = "default"
         $0.session = "1"
-        $0.message = "UIApplication.willEnterForeground"
+        $0.text = "UIApplication.willEnterForeground"
     }
 
     addMessage {
@@ -60,7 +73,7 @@ private func populateStore(_ container: NSPersistentContainer) {
         $0.system = "auth"
         $0.category = "default"
         $0.session = "1"
-        $0.message = "🌐 Will authorize user with name \"kean@github.com\""
+        $0.text = "🌐 Will authorize user with name \"kean@github.com\""
     }
 
     addMessage {
@@ -69,7 +82,7 @@ private func populateStore(_ container: NSPersistentContainer) {
         $0.system = "auth"
         $0.category = "default"
         $0.session = "1"
-        $0.message = "🌐 Authorization request failed with error 500"
+        $0.text = "🌐 Authorization request failed with error 500"
     }
 
     addMessage {
@@ -78,7 +91,7 @@ private func populateStore(_ container: NSPersistentContainer) {
         $0.system = "auth"
         $0.category = "default"
         $0.session = "1"
-        $0.message = "Replace this implementation with code to handle the error appropriately. fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development."
+        $0.text = "Replace this implementation with code to handle the error appropriately. fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development."
     }
 
     addMessage {
@@ -87,7 +100,7 @@ private func populateStore(_ container: NSPersistentContainer) {
         $0.system = "default"
         $0.category = "default"
         $0.session = "1"
-        $0.message = "💥 0xDEADBEAF"
+        $0.text = "💥 0xDEADBEAF"
     }
 
     try! moc.save()
