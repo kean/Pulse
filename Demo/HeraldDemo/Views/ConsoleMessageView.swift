@@ -45,22 +45,10 @@ struct ConsoleMessageViewModel {
     init(message: MessageEntity) {
         let time = ConsoleMessageViewModel.timeFormatter
             .string(from: message.created)
-        let prefix = message.level.icon.map { $0 + " "} ?? ""
         let category = message.category == "default" ? "" : ":\(message.category)"
-        self.title = "\(prefix)\(time) | \(message.system)\(category)"
+        self.title = "\(time) | \(message.system)\(category)"
         self.text = message.text
         self.style = ConsoleMessageStyle.make(level: message.level)
-    }
-}
-
-extension Logger.Level {
-    var icon: String? {
-        switch self {
-        case .debug: return nil
-        case .info: return nil
-        case .error: return "⚠️"
-        case .fatal: return "🆘"
-        }
     }
 }
 

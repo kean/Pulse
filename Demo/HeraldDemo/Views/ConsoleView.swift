@@ -14,8 +14,7 @@ struct ConsoleView: View {
     var body: some View {
         List(messages, id: \.self) { message in
             ConsoleMessageView(model: .init(message: message))
-                .listRowInsets(nil)
-        }
+        }.listRowInsets(nil)
     }
 }
 
