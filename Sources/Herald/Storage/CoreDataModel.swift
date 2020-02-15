@@ -4,7 +4,8 @@
 
 import CoreData
 
-let coreDataModel: NSManagedObjectModel = {
+#warning("TODO: extract somewhere")
+public let coreDataModel: NSManagedObjectModel = {
     let message = NSEntityDescription()
     message.name = "MessageEntity"
     message.managedObjectClassName = "MessageEntity"

@@ -7,7 +7,7 @@ import Foundation
 import os
 
 public final class Logger {
-    public enum Level {
+    @objc public enum Level: Int16 {
         /// Verbose, fine-grained events.
         case debug
         /// Highlight the progress of the application at coarse-grained level.

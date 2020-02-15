@@ -22,7 +22,6 @@ struct ConsoleMessageView: View {
         }.padding()
             .background(model.style.backgroundColor.opacity(colorScheme == .dark ? 0.1 : 0.05))
         }.background(Color(.systemBackground))
-
     }
 }
 

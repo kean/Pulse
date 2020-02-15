@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0C1DBDE023F83C040056C42A /* MockMessageStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C1DBDDF23F83C040056C42A /* MockMessageStorage.swift */; };
 		0C6BA8D623F570340068D4A8 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C6BA8D523F570340068D4A8 /* AppDelegate.swift */; };
 		0C6BA8D823F570340068D4A8 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C6BA8D723F570340068D4A8 /* SceneDelegate.swift */; };
 		0C6BA8DA23F570340068D4A8 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C6BA8D923F570340068D4A8 /* ContentView.swift */; };
@@ -19,6 +20,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0C1DBDDF23F83C040056C42A /* MockMessageStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockMessageStorage.swift; sourceTree = "<group>"; };
 		0C6BA8D223F570340068D4A8 /* HeraldDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HeraldDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C6BA8D523F570340068D4A8 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		0C6BA8D723F570340068D4A8 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -43,6 +45,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0C1DBDDE23F83BF60056C42A /* Mocks */ = {
+			isa = PBXGroup;
+			children = (
+				0C1DBDDF23F83C040056C42A /* MockMessageStorage.swift */,
+			);
+			path = Mocks;
+			sourceTree = "<group>";
+		};
 		0C6BA8C923F570340068D4A8 = {
 			isa = PBXGroup;
 			children = (
@@ -70,6 +80,7 @@
 				0C6BA8E023F570360068D4A8 /* LaunchScreen.storyboard */,
 				0C6BA8E323F570360068D4A8 /* Info.plist */,
 				0C8B117C23F61C1600427B04 /* Views */,
+				0C1DBDDE23F83BF60056C42A /* Mocks */,
 				0C6BA8DD23F570350068D4A8 /* Preview Content */,
 			);
 			path = HeraldDemo;
@@ -174,6 +185,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0C6BA8D623F570340068D4A8 /* AppDelegate.swift in Sources */,
+				0C1DBDE023F83C040056C42A /* MockMessageStorage.swift in Sources */,
 				0C8B118023F61C2500427B04 /* ConsoleMessageView.swift in Sources */,
 				0C6BA8D823F570340068D4A8 /* SceneDelegate.swift in Sources */,
 				0C8B118223F61C2800427B04 /* ConsoleView.swift in Sources */,

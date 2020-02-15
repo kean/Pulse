@@ -1,14 +1,14 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020 Alexander Grebenyuk (github.com/kean).s
+// Copyright (c) 2020 Alexander Grebenyuk (github.com/kean).
 
 import CoreData
 
-final class MessageEntity: NSManagedObject {
-    @NSManaged var created: Date
-    @NSManaged var level: String
-    @NSManaged var system: String
-    @NSManaged var category: String
-    @NSManaged var session: String
-    @NSManaged var message: String
+public final class MessageEntity: NSManagedObject {
+    @NSManaged public var created: Date
+    @NSManaged public var level: Logger.Level
+    @NSManaged public var system: String
+    @NSManaged public var category: String
+    @NSManaged public var session: String
+    @NSManaged public var message: String
 }
