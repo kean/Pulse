@@ -1,7 +1,7 @@
 import XCTest
-@testable import Herald
+@testable import Pulse
 
-final class HeraldTests: XCTestCase {
+final class PulseTests: XCTestCase {
     func testExample() {
     
     }

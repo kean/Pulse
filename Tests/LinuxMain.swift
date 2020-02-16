@@ -1,7 +1,7 @@
 import XCTest
 
-import HeraldTests
+import PulseTests
 
 var tests = [XCTestCaseEntry]()
-tests += HeraldTests.allTests()
+tests += PulseTests.allTests()
 XCTMain(tests)
