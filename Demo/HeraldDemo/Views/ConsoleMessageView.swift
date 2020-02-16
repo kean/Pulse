@@ -8,7 +8,7 @@ import Herald
 struct ConsoleMessageView: View {
     let model: ConsoleMessageViewModel
     @Environment(\.colorScheme) var colorScheme: ColorScheme
-
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(model.title)
@@ -18,8 +18,7 @@ struct ConsoleMessageView: View {
                 .font(.body)
                 .foregroundColor(model.style.textColor)
                 .lineLimit(4)
-        }.padding()
-            .background(model.style.backgroundColor.opacity(colorScheme == .dark ? 0.1 : 0.05))
+        }.listRowBackground(model.style.backgroundColor.opacity(colorScheme == .dark ? 0.1 : 0.05))
     }
 }
 

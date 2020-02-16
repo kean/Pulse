@@ -12,8 +12,13 @@ struct ConsoleView: View {
     var messages: FetchedResults<MessageEntity>
 
     var body: some View {
-        List(messages, id: \.self) { message in
-            ConsoleMessageView(model: .init(message: message))
+        NavigationView {
+            List {
+                ForEach(messages, id: \.objectID) {
+                    ConsoleMessageView(model: .init(message: $0))
+                }
+            }
+            .navigationBarTitle(Text("Console"))
         }
     }
 }
@@ -21,7 +26,10 @@ struct ConsoleView: View {
 struct ConsoleView_Previews: PreviewProvider {
     static var previews: some View {
         let store = mockMessagesStore
-        return ConsoleView()
-            .environment(\.managedObjectContext, store.viewContext)
+        return Group {
+            ConsoleView()
+            ConsoleView()
+                .environment(\.colorScheme, .dark)
+        }.environment(\.managedObjectContext, store.viewContext)
     }
 }
