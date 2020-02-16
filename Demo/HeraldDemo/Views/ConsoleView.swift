@@ -5,13 +5,15 @@
 import SwiftUI
 import CoreData
 import Herald
+import Combine
 
 struct ConsoleView: View {
-    @ObservedObject var messages: FetchedEntities<MessageEntity>
+    @FetchRequest<MessageEntity>(sortDescriptors: [NSSortDescriptor(keyPath: \MessageEntity.created, ascending: false)], predicate: nil)
+    var messages: FetchedResults<MessageEntity>
 
     var body: some View {
         List(messages, id: \.self) { message in
-            Text(message.text)
+            ConsoleMessageView(model: .init(message: message))
         }
     }
 }
@@ -19,7 +21,7 @@ struct ConsoleView: View {
 struct ConsoleView_Previews: PreviewProvider {
     static var previews: some View {
         let store = mockMessagesStore
-        let messages = FetchedEntities<MessageEntity>(context: store.viewContext, sortedBy: \.created)
-        return ConsoleView(messages: messages)
+        return ConsoleView()
+            .environment(\.managedObjectContext, store.viewContext)
     }
 }

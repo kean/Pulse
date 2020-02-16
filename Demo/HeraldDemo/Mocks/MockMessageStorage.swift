@@ -44,13 +44,12 @@ private func populateStore(_ container: NSPersistentContainer) {
 
     func addMessage(_ closure: (MessageEntity) -> Void) {
         let message = MessageEntity(using: moc)
-//        let message = MessageEntity(context: moc)
         closure(message)
         moc.insert(message)
     }
 
     addMessage {
-        $0.created = Date() - 10.1
+        $0.created = Date() - 0.11
         $0.level = .info
         $0.system = "application"
         $0.category = "default"
@@ -59,7 +58,7 @@ private func populateStore(_ container: NSPersistentContainer) {
     }
 
     addMessage {
-        $0.created = Date() - 10
+        $0.created = Date() - 0.1
         $0.level = .info
         $0.system = "application"
         $0.category = "default"
@@ -68,7 +67,7 @@ private func populateStore(_ container: NSPersistentContainer) {
     }
 
     addMessage {
-        $0.created = Date() - 8
+        $0.created = Date() - 0.07
         $0.level = .debug
         $0.system = "auth"
         $0.category = "default"
@@ -77,7 +76,7 @@ private func populateStore(_ container: NSPersistentContainer) {
     }
 
     addMessage {
-        $0.created = Date() - 6
+        $0.created = Date() - 0.05
         $0.level = .error
         $0.system = "auth"
         $0.category = "default"
@@ -86,7 +85,7 @@ private func populateStore(_ container: NSPersistentContainer) {
     }
 
     addMessage {
-        $0.created = Date() - 4
+        $0.created = Date() - 0.04
         $0.level = .debug
         $0.system = "auth"
         $0.category = "default"
@@ -95,7 +94,7 @@ private func populateStore(_ container: NSPersistentContainer) {
     }
 
     addMessage {
-        $0.created = Date() - 3
+        $0.created = Date() - 0.03
         $0.level = .fatal
         $0.system = "default"
         $0.category = "default"
@@ -103,7 +102,7 @@ private func populateStore(_ container: NSPersistentContainer) {
         $0.text = "💥 0xDEADBEAF"
     }
 
-//    DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(3)) {
+//    DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1)) {
 //        populateStore(container)
 //    }
 
