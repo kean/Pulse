@@ -11,11 +11,17 @@ struct ConsoleView: View {
     @FetchRequest<MessageEntity>(sortDescriptors: [NSSortDescriptor(keyPath: \MessageEntity.created, ascending: false)], predicate: nil)
     var messages: FetchedResults<MessageEntity>
 
+    @State private var searchText: String = ""
+
     var body: some View {
         NavigationView {
-            List {
-                ForEach(messages, id: \.objectID) {
-                    ConsoleMessageView(model: .init(message: $0))
+            VStack {
+                SearchBar(title: "Search", text: $searchText)
+                    .padding()
+                List {
+                    ForEach(messages, id: \.objectID) {
+                        ConsoleMessageView(model: .init(message: $0))
+                    }
                 }
             }
             .navigationBarTitle(Text("Console"))

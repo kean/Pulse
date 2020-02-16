@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0C1DBDE023F83C040056C42A /* MockMessageStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C1DBDDF23F83C040056C42A /* MockMessageStorage.swift */; };
+		0C4A6F6523F8D1F8007949E2 /* SearchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C4A6F6423F8D1F8007949E2 /* SearchBar.swift */; };
 		0C6BA8D623F570340068D4A8 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C6BA8D523F570340068D4A8 /* AppDelegate.swift */; };
 		0C6BA8D823F570340068D4A8 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C6BA8D723F570340068D4A8 /* SceneDelegate.swift */; };
 		0C6BA8DA23F570340068D4A8 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C6BA8D923F570340068D4A8 /* ContentView.swift */; };
@@ -21,6 +22,7 @@
 
 /* Begin PBXFileReference section */
 		0C1DBDDF23F83C040056C42A /* MockMessageStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockMessageStorage.swift; sourceTree = "<group>"; };
+		0C4A6F6423F8D1F8007949E2 /* SearchBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBar.swift; sourceTree = "<group>"; };
 		0C6BA8D223F570340068D4A8 /* HeraldDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HeraldDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C6BA8D523F570340068D4A8 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		0C6BA8D723F570340068D4A8 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -99,6 +101,7 @@
 			children = (
 				0C8B117E23F61C1600427B04 /* ConsoleView.swift */,
 				0C8B117F23F61C1600427B04 /* ConsoleMessageView.swift */,
+				0C4A6F6423F8D1F8007949E2 /* SearchBar.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -184,6 +187,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0C4A6F6523F8D1F8007949E2 /* SearchBar.swift in Sources */,
 				0C6BA8D623F570340068D4A8 /* AppDelegate.swift in Sources */,
 				0C1DBDE023F83C040056C42A /* MockMessageStorage.swift in Sources */,
 				0C8B118023F61C2500427B04 /* ConsoleMessageView.swift in Sources */,
