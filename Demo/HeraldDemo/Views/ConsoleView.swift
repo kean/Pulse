@@ -11,16 +11,17 @@ struct ConsoleView: View {
     @FetchRequest<MessageEntity>(sortDescriptors: [NSSortDescriptor(keyPath: \MessageEntity.created, ascending: false)], predicate: nil)
     var messages: FetchedResults<MessageEntity>
 
-    @State private var searchText: String = ""
+    @ObservedObject var model: ConsoleMessagesListViewModel
 
     var body: some View {
         NavigationView {
             VStack {
-                SearchBar(title: "Search", text: $searchText)
+                SearchBar(title: "Search", text: $model.searchText)
                     .padding()
                 List {
-                    ForEach(messages, id: \.objectID) {
-                        ConsoleMessageView(model: .init(message: $0))
+                    ForEach(model.messages, id: \.objectID) { messsage -> ConsoleMessageView in
+                        print("render \(messsage)")
+                        return ConsoleMessageView(model: .init(message: messsage))
                     }
                 }
             }
@@ -33,9 +34,9 @@ struct ConsoleView_Previews: PreviewProvider {
     static var previews: some View {
         let store = mockMessagesStore
         return Group {
-            ConsoleView()
-            ConsoleView()
+            ConsoleView(model: ConsoleMessagesListViewModel(context: store.viewContext))
+            ConsoleView(model: ConsoleMessagesListViewModel(context: store.viewContext))
                 .environment(\.colorScheme, .dark)
-        }.environment(\.managedObjectContext, store.viewContext)
+        }
     }
 }

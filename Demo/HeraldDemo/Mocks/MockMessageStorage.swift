@@ -17,6 +17,9 @@ func makeMockMessagesStore() -> NSPersistentContainer {
 
     let store = NSPersistentStoreDescription()
     store.type = NSInMemoryStoreType
+
+//    let store = NSPersistentStoreDescription(url: FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString))
+
     container.persistentStoreDescriptions = [store]
 
     var isCompleted = false
@@ -47,6 +50,8 @@ private func populateStore(_ container: NSPersistentContainer) {
         closure(message)
         moc.insert(message)
     }
+
+    for _ in 0...80 {
 
     addMessage {
         $0.created = Date() - 0.11
@@ -102,6 +107,7 @@ private func populateStore(_ container: NSPersistentContainer) {
         $0.text = "💥 0xDEADBEAF"
     }
 
+    }
 //    DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1)) {
 //        populateStore(container)
 //    }
