@@ -3,8 +3,7 @@
 // Copyright (c) 2020 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
-
-import os
+import CoreData
 
 public final class Logger {
     @objc public enum Level: Int16 {
@@ -47,7 +46,19 @@ public final class Logger {
     }
 
     /// A default logger.
-    public static let `default` = Logger()
+    public static let `default` = Logger(name: "com.github.kean.logger")
+
+    public let container: NSPersistentContainer
+
+    #warning("TODO: add options")
+    public init(name: String) {
+        container = NSPersistentContainer(name: name, managedObjectModel: LoggerStorage.coreDataModel)
+        container.loadPersistentStores { _, error in
+            if let error = error {
+                debugPrint("\(name): failed to load persistent store with error: \(error)")
+            }
+        }
+    }
 
     /// - parameter level: Log level, `.debug` by default.
     /// - parameter system: System, `.default` by default.
