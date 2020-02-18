@@ -6,7 +6,7 @@ import Foundation
 import CoreData
 
 public final class Logger {
-    @objc public enum Level: Int16 {
+    @objc public enum Level: Int16, CustomStringConvertible {
         /// Verbose, fine-grained events.
         case debug
         /// Highlight the progress of the application at coarse-grained level.
@@ -16,6 +16,15 @@ public final class Logger {
         /// Sever errors which prevent that prevent either parts of the application
         /// or the entire application from functioning.
         case fatal
+
+        public var description: String {
+            switch self {
+            case .debug: return "debug"
+            case .info: return "info"
+            case .error: return "error"
+            case .fatal: return "fatal"
+            }
+        }
     }
 
     public struct System: Hashable, ExpressibleByStringLiteral {
