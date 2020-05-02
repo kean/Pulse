@@ -51,11 +51,16 @@ public final class Logger {
     public let container: NSPersistentContainer
 
     #warning("TODO: add options")
-    public init(name: String) {
-        container = NSPersistentContainer(name: name, managedObjectModel: LoggerStorage.coreDataModel)
+    public convenience init(name: String) {
+        let container = NSPersistentContainer(name: name, managedObjectModel: LoggerStorage.coreDataModel)
+        self.init(container: container)
+    }
+
+    public init(container: NSPersistentContainer) {
+        self.container = container
         container.loadPersistentStores { _, error in
             if let error = error {
-                debugPrint("\(name): failed to load persistent store with error: \(error)")
+                debugPrint("Failed to load persistent store with error: \(error)")
             }
         }
     }
