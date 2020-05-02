@@ -53,6 +53,8 @@ public final class Logger {
     #warning("TODO: add options")
     public convenience init(name: String) {
         let container = NSPersistentContainer(name: name, managedObjectModel: LoggerStorage.coreDataModel)
+        container.viewContext.automaticallyMergesChangesFromParent = true
+        container.viewContext.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
         self.init(container: container)
     }
 
