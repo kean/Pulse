@@ -6,7 +6,7 @@ import CoreData
 
 public final class MessageEntity: NSManagedObject {
     @NSManaged public var created: Date
-    @NSManaged public var level: Logger.Level
+    @NSManaged public var level: String
     @NSManaged public var system: String
     @NSManaged public var category: String
     @NSManaged public var session: String
