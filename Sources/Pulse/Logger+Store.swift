@@ -11,7 +11,11 @@ public extension Logger {
     }
 
     struct Store {
-        let container: NSPersistentContainer
+        public let container: NSPersistentContainer
+
+        public init(container: NSPersistentContainer) {
+            self.container = container
+        }
 
         /// Removes all of the previously recorded messages.
         public func removeAllMessages() throws {
