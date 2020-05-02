@@ -21,7 +21,7 @@ public extension Logger {
         public func removeAllMessages() throws {
             let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "MessageEntity")
             let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
-            try container.persistentStoreCoordinator.execute(deleteRequest, with: container.viewContext)
+            try container.persistentStoreCoordinator.execute(deleteRequest, with: container.viewContext) as? NSBatchDeleteResult
         }
     }
 }
