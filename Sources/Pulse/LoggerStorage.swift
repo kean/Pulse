@@ -12,7 +12,7 @@ public struct LoggerStorage {
         message.name = "MessageEntity"
         message.managedObjectClassName = MessageEntity.self.description()
         message.properties = [
-            NSAttributeDescription(name: "created", type: .dateAttributeType),
+            NSAttributeDescription(name: "createdAt", type: .dateAttributeType),
             NSAttributeDescription(name: "level", type: .stringAttributeType),
             NSAttributeDescription(name: "system", type: .stringAttributeType),
             NSAttributeDescription(name: "category", type: .stringAttributeType),
