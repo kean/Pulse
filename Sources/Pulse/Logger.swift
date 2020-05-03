@@ -74,6 +74,8 @@ public final class Logger {
         self.backgroundContext = container.newBackgroundContext()
     }
 
+    /// Logs the message in the console (if enabled) and saves it persistently.
+    ///
     /// - parameter level: Log level, `.debug` by default.
     /// - parameter system: System, `.default` by default.
     /// - parameter category: Category, `.default` by default.
@@ -106,4 +108,15 @@ public final class Logger {
             try? self.backgroundContext.save()
         }
     }
+}
+
+/// Logs the message in the console (if enabled) and saves it persistently.
+///
+/// - parameter level: Log level, `.debug` by default.
+/// - parameter system: System, `.default` by default.
+/// - parameter category: Category, `.default` by default.
+/// - parameter message: The actual message to log.
+public func log(level: Logger.Level = .debug, system: Logger.System = .default, category: Logger.Category = .default, _ text: @autoclosure () -> String) {
+    guard Logger.default.isEnabled else { return }
+    Logger.default.log(level: level, system: system, category: category, text())
 }
