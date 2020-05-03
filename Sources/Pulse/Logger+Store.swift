@@ -32,7 +32,7 @@ public extension Logger {
                 else { return }
 
             let changes = [NSDeletedObjectsKey: ids]
-            NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [context])
+            NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [context, container.viewContext])
         }
     }
 }
