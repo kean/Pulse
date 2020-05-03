@@ -4,7 +4,6 @@
 
 import Foundation
 import CoreData
-import OSLog
 
 public final class Logger {
     public enum Level: String {
@@ -86,14 +85,16 @@ public final class Logger {
         let text = text()
 
         if isConsoleEnabled {
-            let type: OSLogType
-            switch level {
-            case .debug: type = .debug
-            case .error: type = .error
-            case .fatal: type = .fault
-            case .info: type = .info
-            }
-            os_log(type, "[%{PUBLIC}@:%{PUBLIC}@] %{PUBLIC}@", system.rawValue, category.rawValue, text)
+            debugPrint("[\(level.rawValue)][\(system.rawValue):\(category.rawValue)] \(text)")
+            // For some reason, Swift Package Manager can't build a framework OSLog.
+            // let type: OSLogType
+            // switch level {
+            // case .debug: type = .debug
+            // case .error: type = .error
+            // case .fatal: type = .fault
+            // case .info: type = .info
+            // }
+            // os_log(type, "[%{PUBLIC}@:%{PUBLIC}@] %{PUBLIC}@", system.rawValue, category.rawValue, text)
         }
 
         backgroundContext.perform {
