@@ -19,6 +19,13 @@ public extension Logger {
             self.context = context
         }
 
+        /// Returns all recorded messages, most recent messages come first.
+        public func allMessage() throws -> [MessageEntity] {
+            let request = NSFetchRequest<MessageEntity>(entityName: "MessageEntity")
+            request.sortDescriptors = [NSSortDescriptor(keyPath: \MessageEntity.createdAt, ascending: true)]
+            return try context.fetch(request)
+        }
+
         /// Removes all of the previously recorded messages.
         public func removeAllMessages() throws {
             let fetchRequest: NSFetchRequest<NSFetchRequestResult> = MessageEntity.fetchRequest()
