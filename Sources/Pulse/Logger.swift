@@ -77,7 +77,7 @@ public final class Logger {
         }
 
         backgroundContext.perform {
-            let message = MessageEntity(context: self.backgroundContext)
+            let message = LoggerMessage(context: self.backgroundContext)
             message.createdAt = Date()
             message.level = level.rawValue
             message.system = system.rawValue

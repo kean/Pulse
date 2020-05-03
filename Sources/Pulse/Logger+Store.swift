@@ -31,8 +31,8 @@ public extension Logger.Store {
         let model = NSManagedObjectModel()
 
         let message = NSEntityDescription()
-        message.name = "MessageEntity"
-        message.managedObjectClassName = MessageEntity.self.description()
+        message.name = "LoggerMessage"
+        message.managedObjectClassName = LoggerMessage.self.description()
         message.properties = [
             NSAttributeDescription(name: "createdAt", type: .dateAttributeType),
             NSAttributeDescription(name: "level", type: .stringAttributeType),
@@ -65,15 +65,15 @@ private extension NSAttributeDescription {
 public extension Logger.Store {
 
     /// Returns all recorded messages, most recent messages come first.
-    func allMessage() throws -> [MessageEntity] {
-        let request = NSFetchRequest<MessageEntity>(entityName: "MessageEntity")
-        request.sortDescriptors = [NSSortDescriptor(keyPath: \MessageEntity.createdAt, ascending: true)]
+    func allMessage() throws -> [LoggerMessage] {
+        let request = NSFetchRequest<LoggerMessage>(entityName: "LoggerMessage")
+        request.sortDescriptors = [NSSortDescriptor(keyPath: \LoggerMessage.createdAt, ascending: true)]
         return try context.fetch(request)
     }
 
     /// Removes all of the previously recorded messages.
     func removeAllMessages() throws {
-        let fetchRequest: NSFetchRequest<NSFetchRequestResult> = MessageEntity.fetchRequest()
+        let fetchRequest: NSFetchRequest<NSFetchRequestResult> = LoggerMessage.fetchRequest()
         let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
         deleteRequest.resultType = .resultTypeObjectIDs
 
@@ -86,4 +86,15 @@ public extension Logger.Store {
         let changes = [NSDeletedObjectsKey: ids]
         NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [context, container.viewContext])
     }
+}
+
+// MARK: - LoggerMessage
+
+public final class LoggerMessage: NSManagedObject {
+    @NSManaged public var createdAt: Date
+    @NSManaged public var level: String
+    @NSManaged public var system: String
+    @NSManaged public var category: String
+    @NSManaged public var session: String
+    @NSManaged public var text: String
 }
