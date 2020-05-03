@@ -50,21 +50,26 @@ public final class Logger {
 
     public let container: NSPersistentContainer
 
-    #warning("TODO: add options")
+    let backgroundContext: NSManagedObjectContext
+
     public convenience init(name: String) {
         let container = NSPersistentContainer(name: name, managedObjectModel: LoggerStorage.coreDataModel)
         container.viewContext.automaticallyMergesChangesFromParent = true
         container.viewContext.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
+
         self.init(container: container)
     }
 
     public init(container: NSPersistentContainer) {
         self.container = container
+
         container.loadPersistentStores { _, error in
             if let error = error {
                 debugPrint("Failed to load persistent store with error: \(error)")
             }
         }
+
+        self.backgroundContext = container.newBackgroundContext()
     }
 
     /// - parameter level: Log level, `.debug` by default.
