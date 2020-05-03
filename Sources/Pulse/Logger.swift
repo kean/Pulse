@@ -54,6 +54,11 @@ public final class Logger {
 
     public convenience init(name: String) {
         let container = NSPersistentContainer(name: name, managedObjectModel: LoggerStorage.coreDataModel)
+        container.loadPersistentStores { _, error in
+            if let error = error {
+                debugPrint("Failed to load persistent store with error: \(error)")
+            }
+        }
         container.viewContext.automaticallyMergesChangesFromParent = true
         container.viewContext.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
 
@@ -62,13 +67,6 @@ public final class Logger {
 
     public init(container: NSPersistentContainer) {
         self.container = container
-
-        container.loadPersistentStores { _, error in
-            if let error = error {
-                debugPrint("Failed to load persistent store with error: \(error)")
-            }
-        }
-
         self.backgroundContext = container.newBackgroundContext()
     }
 
