@@ -1,7 +1,5 @@
 
-# Pulse
-
-Structured Logging System
+![Untitled](https://user-images.githubusercontent.com/1567433/80898038-a9e81e00-8ccc-11ea-869b-2ea6ccf4e60a.jpg)
 
 <br/>
 
