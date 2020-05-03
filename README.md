@@ -20,15 +20,21 @@ public func log(level: Logger.Level = .debug,
 
 The messages are stored in a structured manner using Core Data. You get full access to all of the recoreded messages at any time either using `Logger.Store` or using `NSPersistentStoreCoordinator` directly.
 
+<br/>
+
 ## PulseUI
 
 To view messages, use `PulseUI` package. The package is only available for [GitHub sponsors](https://github.com/sponsors/kean).
+
+<br/>
 
 ### iOS Console
 
 Build a console right into your iOS apps.
 
 <img width="320" alt="Screen Shot 2020-05-02 at 21 15 32" src="https://user-images.githubusercontent.com/1567433/80896282-d85cfd80-8cba-11ea-83f7-323cdf844bc9.png"> <img width="320" alt="Screen Shot 2020-05-02 at 21 16 00" src="https://user-images.githubusercontent.com/1567433/80896284-d98e2a80-8cba-11ea-8bd0-8c5500483766.png">
+
+<br/>
 
 ### macOS Console
 
