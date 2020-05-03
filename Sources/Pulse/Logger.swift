@@ -28,7 +28,7 @@ public final class Logger {
     let backgroundContext: NSManagedObjectContext
 
     public convenience init(name: String) {
-        let container = NSPersistentContainer(name: name, managedObjectModel: LoggerStorage.coreDataModel)
+        let container = NSPersistentContainer(name: name, managedObjectModel: Logger.Store.model)
         container.loadPersistentStores { _, error in
             if let error = error {
                 debugPrint("Failed to load persistent store with error: \(error)")
