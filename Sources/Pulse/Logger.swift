@@ -23,26 +23,15 @@ public final class Logger {
     /// A default logger.
     public static let `default` = Logger(name: "com.github.kean.logger")
 
-    public let container: NSPersistentContainer
+    public let store: Store
 
-    let backgroundContext: NSManagedObjectContext
-
+    /// Initializes logger with the given name.
     public convenience init(name: String) {
-        let container = NSPersistentContainer(name: name, managedObjectModel: Logger.Store.model)
-        container.loadPersistentStores { _, error in
-            if let error = error {
-                debugPrint("Failed to load persistent store with error: \(error)")
-            }
-        }
-        container.viewContext.automaticallyMergesChangesFromParent = true
-        container.viewContext.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
-
-        self.init(container: container)
+        self.init(store: Store(name: name))
     }
 
-    public init(container: NSPersistentContainer) {
-        self.container = container
-        self.backgroundContext = container.newBackgroundContext()
+    public init(store: Store) {
+        self.store = store
     }
 
     /// Logs the message in the console (if enabled) and saves it persistently.
@@ -76,16 +65,18 @@ public final class Logger {
             // os_log(type, "[%{PUBLIC}@:%{PUBLIC}@] %{PUBLIC}@", system.rawValue, category.rawValue, text)
         }
 
-        backgroundContext.perform {
-            let message = LoggerMessage(context: self.backgroundContext)
+        let context = self.store.backgroundContext
+        let sessionId = self.logSessionId.uuidString
+        context.perform {
+            let message = LoggerMessage(context: context)
             message.createdAt = Date()
             message.level = level.rawValue
             message.system = system.rawValue
             message.category = category.rawValue
-            message.session = self.logSessionId.uuidString
+            message.session = sessionId
             message.text = text
 
-            try? self.backgroundContext.save()
+            try? context.save()
         }
     }
 }
