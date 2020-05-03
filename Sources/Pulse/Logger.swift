@@ -36,6 +36,8 @@ public final class Logger {
 
     /// Logs the message in the console (if enabled) and saves it persistently.
     ///
+    /// - note: Logger automatically captures stack traces for .fatal logs.
+    ///
     /// - parameter level: Log level, `.debug` by default.
     /// - parameter system: System, `.default` by default.
     /// - parameter category: Category, `.default` by default.
@@ -43,7 +45,16 @@ public final class Logger {
     public func log(level: Level = .debug, system: System = .default, category: Category = .default, _ text: @autoclosure () -> String) {
         guard isEnabled else { return }
 
-        let text = text()
+        var text = text()
+
+        if level == .fatal {
+            text += """
+            \n
+            Stack Trace
+            ===========
+            \(Thread.callStackSymbols)
+            """
+        }
 
         if isConsoleEnabled {
             let components = [

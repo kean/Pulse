@@ -23,6 +23,8 @@ log(level: .fatal, system: .auth, "Configuration is missing")
 ```swift
 /// Logs the message in the console (if enabled) and saves it persistently.
 ///
+/// - note: Logger automatically captures stack traces for .fatal logs.
+///
 public func log(level: Logger.Level = .debug,
                 system: Logger.System = .default,
                 category: Logger.Category = .default,
