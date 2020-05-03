@@ -4,6 +4,7 @@
 
 import Foundation
 import CoreData
+import OSLog
 
 public final class Logger {
     public enum Level: String {
@@ -37,11 +38,14 @@ public final class Logger {
     /// Set `isEnabled` to `false` to disable all of the logging.
     public var isEnabled = true
 
+    /// Set to `false` to disable printing into console.
+    public var isConsoleEnabled = true
+
     /// An id of the current log sesion.
     public private(set) var logSessionId = UUID()
 
     /// Starts a new log session.
-    public func startNewLogSession() {
+    public func startSession() {
         logSessionId = UUID()
     }
 
@@ -77,6 +81,29 @@ public final class Logger {
     public func log(level: Level = .debug, system: System = .default, category: Category = .default, _ text: @autoclosure () -> String) {
         guard isEnabled else { return }
 
-        #warning("TODO: implement logging + saving logs, should I use os_log for this?")
+        let text = text()
+
+        if isConsoleEnabled {
+            let type: OSLogType
+            switch level {
+            case .debug: type = .debug
+            case .error: type = .error
+            case .fatal: type = .fault
+            case .info: type = .info
+            }
+            os_log(type, "[%{PUBLIC}@:%{PUBLIC}@] %{PUBLIC}@", system.rawValue, category.rawValue, text)
+        }
+
+        backgroundContext.perform {
+            let message = MessageEntity(context: self.backgroundContext)
+            message.createdAt = Date()
+            message.level = level.rawValue
+            message.system = system.rawValue
+            message.category = category.rawValue
+            message.session = self.logSessionId.uuidString
+            message.text = text
+
+            try? self.backgroundContext.save()
+        }
     }
 }
