@@ -64,7 +64,7 @@ public final class Logger {
             .compactMap { $0 }
             let prefix = components.isEmpty ? "" : "[\(components.joined(separator: ":"))]"
 
-            debugPrint("\(dateFormatter.string(from: Date())) [\(level.rawValue)]\(prefix) \(text)")
+            NSLog("[\(level.rawValue)]\(prefix) \(text)")
             // For some reason, Swift Package Manager can't build a framework OSLog.
             // let type: OSLogType
             // switch level {
@@ -89,12 +89,6 @@ public final class Logger {
         }
     }
 }
-
-private let dateFormatter: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSSS"
-    return formatter
-}()
 
 /// Logs the message in the console (if enabled) and saves it persistently.
 ///
