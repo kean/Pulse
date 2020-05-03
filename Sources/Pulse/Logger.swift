@@ -6,34 +6,6 @@ import Foundation
 import CoreData
 
 public final class Logger {
-    public enum Level: String {
-        /// Verbose, fine-grained events.
-        case debug
-        /// Highlight the progress of the application at coarse-grained level.
-        case info
-        /// Errors which still allow the application to continue.
-        case error
-        /// Sever errors which prevent that prevent either parts of the application
-        /// or the entire application from functioning.
-        case fatal
-    }
-
-    public struct System: Hashable, ExpressibleByStringLiteral {
-        public let rawValue: String
-        public init(stringLiteral value: String) { self.rawValue = value }
-        public init(_ value: String) { self.rawValue = value }
-
-        public static let `default` = System("default")
-    }
-
-    public struct Category: Hashable, ExpressibleByStringLiteral {
-        public let rawValue: String
-        public init(stringLiteral value: String) { self.rawValue = value }
-        public init(_ value: String) { self.rawValue = value }
-
-        public static let `default` = Category("default")
-    }
-
     /// Set `isEnabled` to `false` to disable all of the logging.
     public var isEnabled = true
 
@@ -133,4 +105,34 @@ private let dateFormatter: DateFormatter = {
 public func log(level: Logger.Level = .debug, system: Logger.System = .default, category: Logger.Category = .default, _ text: @autoclosure () -> String) {
     guard Logger.default.isEnabled else { return }
     Logger.default.log(level: level, system: system, category: category, text())
+}
+
+public extension Logger {
+    enum Level: String {
+        /// Verbose, fine-grained events.
+        case debug
+        /// Highlight the progress of the application at coarse-grained level.
+        case info
+        /// Errors which still allow the application to continue.
+        case error
+        /// Sever errors which prevent that prevent either parts of the application
+        /// or the entire application from functioning.
+        case fatal
+    }
+
+    struct System: Hashable, ExpressibleByStringLiteral {
+        public let rawValue: String
+        public init(stringLiteral value: String) { self.rawValue = value }
+        public init(_ value: String) { self.rawValue = value }
+
+        public static let `default` = System("default")
+    }
+
+    struct Category: Hashable, ExpressibleByStringLiteral {
+        public let rawValue: String
+        public init(stringLiteral value: String) { self.rawValue = value }
+        public init(_ value: String) { self.rawValue = value }
+
+        public static let `default` = Category("default")
+    }
 }
