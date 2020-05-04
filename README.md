@@ -52,7 +52,7 @@ let container = logger.store.container
 
 Build a console right into your iOS apps.
 
-<img width="320" alt="Screen Shot 2020-05-03 at 09 58 50" src="https://user-images.githubusercontent.com/1567433/80921120-54e6ef00-8d42-11ea-918d-8d27ea54ae98.png"> <img width="320" alt="Screen Shot 2020-05-04 at 10 43 28" src="https://user-images.githubusercontent.com/1567433/80979399-49083500-8df5-11ea-8313-54841b86777c.png">
+<img width="320" alt="Screen Shot 2020-05-04 at 13 50 26" src="https://user-images.githubusercontent.com/1567433/80996719-4960fa00-8e0e-11ea-909a-9ff80f49382e.png"> <img width="320" alt="Screen Shot 2020-05-04 at 10 43 28" src="https://user-images.githubusercontent.com/1567433/80979399-49083500-8df5-11ea-8313-54841b86777c.png">
 
 <br/>
 
