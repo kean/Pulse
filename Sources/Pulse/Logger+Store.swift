@@ -101,14 +101,17 @@ public extension Logger.Store {
     }
 
     /// Removes all of the previously recorded messages.
-    func removeAllMessages() throws {
-        try deleteMessages(fetchRequest: LoggerMessage.fetchRequest())
+    func removeAllMessages() {
+        backgroundContext.perform {
+            try? self.deleteMessages(fetchRequest: LoggerMessage.fetchRequest())
+        }
     }
 }
 
 // MARK: - Logger.Store (Helpers)
 
 private extension Logger.Store {
+    /// - WARNING: Must be called on `backgroundContext` queue.
     func deleteMessages(fetchRequest: NSFetchRequest<NSFetchRequestResult>) throws {
         let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
         deleteRequest.resultType = .resultTypeObjectIDs
@@ -120,7 +123,11 @@ private extension Logger.Store {
             else { return }
 
         let changes = [NSDeletedObjectsKey: ids]
-        NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [backgroundContext, container.viewContext])
+        NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [backgroundContext])
+
+        container.viewContext.perform {
+            NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [self.container.viewContext])
+        }
     }
 }
 

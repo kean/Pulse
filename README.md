@@ -1,4 +1,4 @@
-![pulse](https://user-images.githubusercontent.com/1567433/80919453-f0269700-8d37-11ea-8099-c1f91161d771.jpg)
+![pulse-small](https://user-images.githubusercontent.com/1567433/80981674-4b1fc300-8df8-11ea-9732-94388f0473ae.jpg)
 
 <p align="left">
 <img src="https://img.shields.io/badge/platforms-iOS%2C%20macOS%2C%20watchOS%2C%20tvOS-lightgrey.svg">
@@ -52,7 +52,7 @@ let container = logger.store.container
 
 Build a console right into your iOS apps.
 
-<img width="320" alt="Screen Shot 2020-05-03 at 09 58 50" src="https://user-images.githubusercontent.com/1567433/80921120-54e6ef00-8d42-11ea-918d-8d27ea54ae98.png"> <img width="320" alt="Screen Shot 2020-05-02 at 21 16 00" src="https://user-images.githubusercontent.com/1567433/80896284-d98e2a80-8cba-11ea-8bd0-8c5500483766.png">
+<img width="320" alt="Screen Shot 2020-05-03 at 09 58 50" src="https://user-images.githubusercontent.com/1567433/80921120-54e6ef00-8d42-11ea-918d-8d27ea54ae98.png"> <img width="320" alt="Screen Shot 2020-05-04 at 10 43 28" src="https://user-images.githubusercontent.com/1567433/80979399-49083500-8df5-11ea-8313-54841b86777c.png">
 
 <br/>
 
