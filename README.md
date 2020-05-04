@@ -1,4 +1,4 @@
-![pulse](https://user-images.githubusercontent.com/1567433/80919453-f0269700-8d37-11ea-8099-c1f91161d771.jpg)
+![pulse-small](https://user-images.githubusercontent.com/1567433/80981674-4b1fc300-8df8-11ea-9732-94388f0473ae.jpg)
 
 <p align="left">
 <img src="https://img.shields.io/badge/platforms-iOS%2C%20macOS%2C%20watchOS%2C%20tvOS-lightgrey.svg">
