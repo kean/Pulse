@@ -74,18 +74,12 @@ private extension NSAttributeDescription {
 
 extension Logger.Store {
     func sweep(expirationInterval: TimeInterval) {
-        backgroundContext.perform {
-            try? self._sweep(expirationInterval: expirationInterval)
+        container.performBackgroundTask { context in
+            let request = NSFetchRequest<NSFetchRequestResult>(entityName: "LoggerMessage")
+            let dateTo = Date().addingTimeInterval(-expirationInterval)
+            request.predicate = NSPredicate(format: "createdAt < %@", dateTo as NSDate)
+            try? self.deleteMessages(fetchRequest: request, context: context)
         }
-    }
-
-    private func _sweep(expirationInterval: TimeInterval) throws {
-        let request = NSFetchRequest<NSFetchRequestResult>(entityName: "LoggerMessage")
-
-        let dateTo = Date().addingTimeInterval(-expirationInterval)
-        request.predicate = NSPredicate(format: "createdAt < %@", dateTo as NSDate)
-
-        try deleteMessages(fetchRequest: request)
     }
 }
 
@@ -102,8 +96,8 @@ public extension Logger.Store {
 
     /// Removes all of the previously recorded messages.
     func removeAllMessages() {
-        backgroundContext.perform {
-            try? self.deleteMessages(fetchRequest: LoggerMessage.fetchRequest())
+        container.performBackgroundTask { context in
+            try? self.deleteMessages(fetchRequest: LoggerMessage.fetchRequest(), context: context)
         }
     }
 }
@@ -111,23 +105,17 @@ public extension Logger.Store {
 // MARK: - Logger.Store (Helpers)
 
 private extension Logger.Store {
-    /// - WARNING: Must be called on `backgroundContext` queue.
-    func deleteMessages(fetchRequest: NSFetchRequest<NSFetchRequestResult>) throws {
+    func deleteMessages(fetchRequest: NSFetchRequest<NSFetchRequestResult>, context: NSManagedObjectContext) throws {
         let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
         deleteRequest.resultType = .resultTypeObjectIDs
 
-        let result = try backgroundContext.execute(deleteRequest)
+        let result = try context.execute(deleteRequest) as? NSBatchDeleteResult
+        guard let ids = result?.result as? [NSManagedObjectID] else { return }
 
-        guard let deleteResult = result as? NSBatchDeleteResult,
-            let ids = deleteResult.result as? [NSManagedObjectID]
-            else { return }
-
-        let changes = [NSDeletedObjectsKey: ids]
-        NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [backgroundContext])
-
-        container.viewContext.perform {
-            NSManagedObjectContext.mergeChanges(fromRemoteContextSave: changes, into: [self.container.viewContext])
-        }
+        NSManagedObjectContext.mergeChanges(
+            fromRemoteContextSave: [NSDeletedObjectsKey: ids],
+            into: [container.viewContext]
+        )
     }
 }
 
