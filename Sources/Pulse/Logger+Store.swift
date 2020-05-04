@@ -70,11 +70,30 @@ private extension NSAttributeDescription {
     }
 }
 
+// MARK: - Sweep (Sweep)
+
+extension Logger.Store {
+    func sweep(expirationInterval: TimeInterval) {
+        backgroundContext.perform {
+            try? self._sweep(expirationInterval: expirationInterval)
+        }
+    }
+
+    private func _sweep(expirationInterval: TimeInterval) throws {
+        let request = NSFetchRequest<NSFetchRequestResult>(entityName: "LoggerMessage")
+
+        let dateTo = Date().addingTimeInterval(-expirationInterval)
+        request.predicate = NSPredicate(format: "createdAt < %@", dateTo as NSDate)
+
+        try deleteMessages(fetchRequest: request)
+    }
+}
+
 // MARK: - Logger.Store (Accessing Messages)
 
 public extension Logger.Store {
 
-    /// Returns all recorded messages, most recent messages come first.
+    /// Returns all recorded messages, least recent messages come first.
     func allMessage() throws -> [LoggerMessage] {
         let request = NSFetchRequest<LoggerMessage>(entityName: "LoggerMessage")
         request.sortDescriptors = [NSSortDescriptor(keyPath: \LoggerMessage.createdAt, ascending: true)]
@@ -83,7 +102,14 @@ public extension Logger.Store {
 
     /// Removes all of the previously recorded messages.
     func removeAllMessages() throws {
-        let fetchRequest: NSFetchRequest<NSFetchRequestResult> = LoggerMessage.fetchRequest()
+        try deleteMessages(fetchRequest: LoggerMessage.fetchRequest())
+    }
+}
+
+// MARK: - Logger.Store (Helpers)
+
+private extension Logger.Store {
+    func deleteMessages(fetchRequest: NSFetchRequest<NSFetchRequestResult>) throws {
         let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
         deleteRequest.resultType = .resultTypeObjectIDs
 

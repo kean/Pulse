@@ -25,6 +25,9 @@ public final class Logger {
 
     public let store: Store
 
+    /// Logs expiration interval, 7 days by default.
+    public var logsExpirationInterval: TimeInterval = 60 * 60 * 24 * 7
+
     /// Initializes logger with the given name.
     public convenience init(name: String) {
         self.init(store: Store(name: name))
@@ -32,6 +35,15 @@ public final class Logger {
 
     public init(store: Store) {
         self.store = store
+
+        scheduleSweep()
+    }
+
+    private func scheduleSweep() {
+        DispatchQueue.global().asyncAfter(deadline: .now() + .seconds(10)) { [weak self] in
+            guard let self = self, self.isEnabled else { return }
+            self.store.sweep(expirationInterval: self.logsExpirationInterval)
+        }
     }
 
     /// Logs the message in the console (if enabled) and saves it persistently.
