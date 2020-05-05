@@ -70,15 +70,15 @@ private extension NSAttributeDescription {
     }
 }
 
-// MARK: - Sweep (Sweep)
+// MARK: - Logger.Store (Sweep)
 
 extension Logger.Store {
     func sweep(expirationInterval: TimeInterval) {
-        container.performBackgroundTask { context in
+        backgroundContext.perform {
             let request = NSFetchRequest<NSFetchRequestResult>(entityName: "LoggerMessage")
             let dateTo = Date().addingTimeInterval(-expirationInterval)
             request.predicate = NSPredicate(format: "createdAt < %@", dateTo as NSDate)
-            try? self.deleteMessages(fetchRequest: request, context: context)
+            try? self.deleteMessages(fetchRequest: request)
         }
     }
 }
@@ -96,8 +96,8 @@ public extension Logger.Store {
 
     /// Removes all of the previously recorded messages.
     func removeAllMessages() {
-        container.performBackgroundTask { context in
-            try? self.deleteMessages(fetchRequest: LoggerMessage.fetchRequest(), context: context)
+        backgroundContext.perform {
+            try? self.deleteMessages(fetchRequest: LoggerMessage.fetchRequest())
         }
     }
 }
@@ -105,16 +105,16 @@ public extension Logger.Store {
 // MARK: - Logger.Store (Helpers)
 
 private extension Logger.Store {
-    func deleteMessages(fetchRequest: NSFetchRequest<NSFetchRequestResult>, context: NSManagedObjectContext) throws {
+    func deleteMessages(fetchRequest: NSFetchRequest<NSFetchRequestResult>) throws {
         let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
         deleteRequest.resultType = .resultTypeObjectIDs
 
-        let result = try context.execute(deleteRequest) as? NSBatchDeleteResult
+        let result = try backgroundContext.execute(deleteRequest) as? NSBatchDeleteResult
         guard let ids = result?.result as? [NSManagedObjectID] else { return }
 
         NSManagedObjectContext.mergeChanges(
             fromRemoteContextSave: [NSDeletedObjectsKey: ids],
-            into: [container.viewContext]
+            into: [backgroundContext, container.viewContext]
         )
     }
 }
