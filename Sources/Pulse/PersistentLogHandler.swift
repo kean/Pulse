@@ -48,16 +48,14 @@ extension PersistentLogHandler: LogHandler {
     public func log(level: Logger.Level, message: Logger.Message, metadata: Logger.Metadata?, file: String, function: String, line: UInt) {
         let context = store.backgroundContext
         let date = makeCurrentDate()
+        let label = self.label
         let session = logSessionId.uuidString
 
         context.perform {
             let persistedMessage = LoggerMessage(context: context)
             persistedMessage.createdAt = date
             persistedMessage.level = level.rawValue
-            #warning("Question: Use the Logger's label as system?")
-            persistedMessage.system = "default"
-            #warning("Question: What would be the equivalent in swift-log?")
-            persistedMessage.category = "default"
+            persistedMessage.label = label
             persistedMessage.session = session
             persistedMessage.text = String(describing: message)
             try? context.save()

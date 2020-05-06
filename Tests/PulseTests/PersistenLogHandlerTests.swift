@@ -40,7 +40,7 @@ final class PersistentLogHandlerTests: XCTestCase {
         logger1[metadataKey: "test-uuid"] = "\(UUID())"
         logger1.log(level: level1, "\(message1)")
 
-        let logger2 = Logger(label: "test.loggger.2")
+        let logger2 = Logger(label: "test.logger.2")
         logger2.log(level: level2, "\(message2)", metadata: ["foo": "bar"])
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
@@ -56,10 +56,12 @@ final class PersistentLogHandlerTests: XCTestCase {
         XCTAssertEqual(persistedMessage1.level, level1.rawValue)
         XCTAssertEqual(persistedMessage1.text, message1)
         XCTAssertEqual(persistedMessage1.createdAt, date)
+        XCTAssertEqual(persistedMessage1.label, "test.logger.1")
 
         let persistedMessage2 = persistedMessages[1]
         XCTAssertEqual(persistedMessage2.level, level2.rawValue)
         XCTAssertEqual(persistedMessage2.text, message2)
         XCTAssertEqual(persistedMessage2.createdAt, date)
+        XCTAssertEqual(persistedMessage2.label, "test.logger.2")
     }
 }

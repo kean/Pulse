@@ -41,8 +41,7 @@ public extension LoggerMessageStore {
         message.properties = [
             NSAttributeDescription(name: "createdAt", type: .dateAttributeType),
             NSAttributeDescription(name: "level", type: .stringAttributeType),
-            NSAttributeDescription(name: "system", type: .stringAttributeType),
-            NSAttributeDescription(name: "category", type: .stringAttributeType),
+            NSAttributeDescription(name: "label", type: .stringAttributeType),
             NSAttributeDescription(name: "session", type: .stringAttributeType),
             NSAttributeDescription(name: "text", type: .stringAttributeType)
         ]
@@ -112,8 +111,7 @@ private extension LoggerMessageStore {
 public final class LoggerMessage: NSManagedObject {
     @NSManaged public var createdAt: Date
     @NSManaged public var level: String
-    @NSManaged public var system: String
-    @NSManaged public var category: String
+    @NSManaged public var label: String
     @NSManaged public var session: String
     @NSManaged public var text: String
     #warning("Question: Store metadata as well? https://github.com/apple/swift-log#logging-metadata")
