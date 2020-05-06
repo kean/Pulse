@@ -2,40 +2,54 @@
 //
 // Copyright (c) 2020 Alexander Grebenyuk (github.com/kean).
 
-import Foundation
 import CoreData
 
-// MARK: - Logger.Store
+public final class LoggerMessageStore {
+    public let container: NSPersistentContainer
+    public let backgroundContext: NSManagedObjectContext
 
-public extension Logger {
-    final class Store {
-        public let container: NSPersistentContainer
-        /// Background context which can be used for writing.
-        public let backgroundContext: NSManagedObjectContext
+    /// Logs expiration interval
+    public var logsExpirationInterval: TimeInterval
 
-        public init(container: NSPersistentContainer) {
-            self.container = container
-            self.backgroundContext = container.newBackgroundContext()
-        }
+    public static let `default` = LoggerMessageStore(name: "com.github.kean.logger")
 
-        public convenience init(name: String) {
-            let container = NSPersistentContainer(name: name, managedObjectModel: Logger.Store.model)
-            container.loadPersistentStores { _, error in
-                if let error = error {
-                    debugPrint("Failed to load persistent store with error: \(error)")
-                }
+    /// Creates a `LoggerMessageStore` persisting using the given `NSPersistentContainer`.
+    /// - Parameters:
+    ///   - container: The `NSPersistentContainer` to be used for persistency.
+    ///   - logsExpirationInterval: All logged messages older than the specified `TimeInterval` will be removed. Defaults to 7 days.
+    public init(container: NSPersistentContainer, logsExpirationInterval: TimeInterval = 604800) {
+        self.container = container
+        self.backgroundContext = container.newBackgroundContext()
+        self.logsExpirationInterval = logsExpirationInterval
+        scheduleSweep()
+    }
+
+    /// Creates a `LoggerMessageStore` persisting to an `NSPersistentContainer` with the given name.
+    /// - Parameters:
+    ///   - name: The name of the `NSPersistentContainer` to be used for persistency.
+    ///   - logsExpirationInterval: All logged messages older than the specified `TimeInterval` will be removed. Defaults to 7 days.
+    public convenience init(name: String, logsExpirationInterval: TimeInterval = 604800) {
+        let container = NSPersistentContainer(name: name, managedObjectModel: Self.model)
+        container.loadPersistentStores { _, error in
+            if let error = error {
+                debugPrint("Failed to load persistent store with error: \(error)")
             }
-            container.viewContext.automaticallyMergesChangesFromParent = true
-            container.viewContext.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
+        }
+        container.viewContext.automaticallyMergesChangesFromParent = true
+        container.viewContext.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
 
-            self.init(container: container)
+        self.init(container: container, logsExpirationInterval: logsExpirationInterval)
+    }
+
+    private func scheduleSweep() {
+        DispatchQueue.global().asyncAfter(deadline: .now() + .seconds(10)) { [weak self] in
+            self?.sweep()
         }
     }
 }
 
-// MARK: - Logger.Store (NSManagedObjectModel)
-
-public extension Logger.Store {
+// MARK: - LoggerMessageStore (NSManagedObjectModel)
+public extension LoggerMessageStore {
     /// Returns Core Data model used by the store.
     static let model: NSManagedObjectModel = {
         let model = NSManagedObjectModel()
@@ -46,8 +60,7 @@ public extension Logger.Store {
         message.properties = [
             NSAttributeDescription(name: "createdAt", type: .dateAttributeType),
             NSAttributeDescription(name: "level", type: .stringAttributeType),
-            NSAttributeDescription(name: "system", type: .stringAttributeType),
-            NSAttributeDescription(name: "category", type: .stringAttributeType),
+            NSAttributeDescription(name: "label", type: .stringAttributeType),
             NSAttributeDescription(name: "session", type: .stringAttributeType),
             NSAttributeDescription(name: "text", type: .stringAttributeType)
         ]
@@ -63,17 +76,12 @@ private extension NSAttributeDescription {
         self.name = name
         self.attributeType = type
     }
-
-    convenience init(_ closure: (NSAttributeDescription) -> Void) {
-        self.init()
-        closure(self)
-    }
 }
 
-// MARK: - Logger.Store (Sweep)
-
-extension Logger.Store {
-    func sweep(expirationInterval: TimeInterval) {
+// MARK: - LoggerMessageStore (Sweep)
+extension LoggerMessageStore {
+    func sweep() {
+        let expirationInterval = logsExpirationInterval
         backgroundContext.perform {
             let request = NSFetchRequest<NSFetchRequestResult>(entityName: "LoggerMessage")
             let dateTo = Date().addingTimeInterval(-expirationInterval)
@@ -83,12 +91,11 @@ extension Logger.Store {
     }
 }
 
-// MARK: - Logger.Store (Accessing Messages)
+// MARK: - LoggerMessageStore (Accessing Messages)
 
-public extension Logger.Store {
-
+public extension LoggerMessageStore {
     /// Returns all recorded messages, least recent messages come first.
-    func allMessage() throws -> [LoggerMessage] {
+    func allMessages() throws -> [LoggerMessage] {
         let request = NSFetchRequest<LoggerMessage>(entityName: "LoggerMessage")
         request.sortDescriptors = [NSSortDescriptor(keyPath: \LoggerMessage.createdAt, ascending: true)]
         return try container.viewContext.fetch(request)
@@ -102,9 +109,9 @@ public extension Logger.Store {
     }
 }
 
-// MARK: - Logger.Store (Helpers)
+// MARK: - LoggerMessageStore (Helpers)
 
-private extension Logger.Store {
+private extension LoggerMessageStore {
     func deleteMessages(fetchRequest: NSFetchRequest<NSFetchRequestResult>) throws {
         let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
         deleteRequest.resultType = .resultTypeObjectIDs
@@ -124,8 +131,7 @@ private extension Logger.Store {
 public final class LoggerMessage: NSManagedObject {
     @NSManaged public var createdAt: Date
     @NSManaged public var level: String
-    @NSManaged public var system: String
-    @NSManaged public var category: String
+    @NSManaged public var label: String
     @NSManaged public var session: String
     @NSManaged public var text: String
 }
