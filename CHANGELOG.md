@@ -1,6 +1,7 @@
 # Pulse 0.x
 
-- Reimplement Pulse from the ground up to be based on [swift-log](https://github.com/apple/swift-log) - [#2](https://github.com/kean/Pulse/pull/2), by [Moritz Lang](https://github.com/slashmo) 
+- Reimplement Pulse from the ground up to be based on [swift-log](https://github.com/apple/swift-log) - [#2](https://github.com/kean/Pulse/pull/2), by [Moritz Lang](https://github.com/slashmo)
+- Lower minimum platform requirements to iOS 11.0 / watchOS 4.0 / macOS 10.13 / tvOS 11.0
 
 ## Pulse 0.2.0
 
