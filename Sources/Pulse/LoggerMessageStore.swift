@@ -8,14 +8,27 @@ public final class LoggerMessageStore {
     public let container: NSPersistentContainer
     public let backgroundContext: NSManagedObjectContext
 
+    /// Logs expiration interval
+    public var logsExpirationInterval: TimeInterval
+
     public static let `default` = LoggerMessageStore(name: "com.github.kean.logger")
 
-    public init(container: NSPersistentContainer) {
+    /// Creates a `LoggerMessageStore` persisting using the given `NSPersistentContainer`.
+    /// - Parameters:
+    ///   - container: The `NSPersistentContainer` to be used for persistency.
+    ///   - logsExpirationInterval: All logged messages older than the specified `TimeInterval` will be removed. Defaults to 7 days.
+    public init(container: NSPersistentContainer, logsExpirationInterval: TimeInterval = 604800) {
         self.container = container
         self.backgroundContext = container.newBackgroundContext()
+        self.logsExpirationInterval = logsExpirationInterval
+        scheduleSweep()
     }
 
-    public convenience init(name: String) {
+    /// Creates a `LoggerMessageStore` persisting to an `NSPersistentContainer` with the given name.
+    /// - Parameters:
+    ///   - name: The name of the `NSPersistentContainer` to be used for persistency.
+    ///   - logsExpirationInterval: All logged messages older than the specified `TimeInterval` will be removed. Defaults to 7 days.
+    public convenience init(name: String, logsExpirationInterval: TimeInterval = 604800) {
         let container = NSPersistentContainer(name: name, managedObjectModel: Self.model)
         container.loadPersistentStores { _, error in
             if let error = error {
@@ -25,7 +38,13 @@ public final class LoggerMessageStore {
         container.viewContext.automaticallyMergesChangesFromParent = true
         container.viewContext.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
 
-        self.init(container: container)
+        self.init(container: container, logsExpirationInterval: logsExpirationInterval)
+    }
+
+    private func scheduleSweep() {
+        DispatchQueue.global().asyncAfter(deadline: .now() + .seconds(10)) { [weak self] in
+            self?.sweep()
+        }
     }
 }
 
@@ -61,7 +80,8 @@ private extension NSAttributeDescription {
 
 // MARK: - LoggerMessageStore (Sweep)
 extension LoggerMessageStore {
-    func sweep(expirationInterval: TimeInterval) {
+    func sweep() {
+        let expirationInterval = logsExpirationInterval
         backgroundContext.perform {
             let request = NSFetchRequest<NSFetchRequestResult>(entityName: "LoggerMessage")
             let dateTo = Date().addingTimeInterval(-expirationInterval)
