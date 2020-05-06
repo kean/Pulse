@@ -2,7 +2,7 @@
 
 <p align="left">
 <img src="https://img.shields.io/badge/platforms-iOS%2C%20macOS%2C%20watchOS%2C%20tvOS-lightgrey.svg">
-<!-- <a href="https://travis-ci.org/kean/Pulse"><img src="https://img.shields.io/travis/kean/Pulse/master.svg"></a> -->
+<img src="https://github.com/kean/Pulse/workflows/CI/badge.svg">
 </p>
 
 **Pulse** is a logging system with structured persistent storage.
