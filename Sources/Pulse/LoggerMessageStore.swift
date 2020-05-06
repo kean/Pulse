@@ -114,5 +114,4 @@ public final class LoggerMessage: NSManagedObject {
     @NSManaged public var label: String
     @NSManaged public var session: String
     @NSManaged public var text: String
-    #warning("Question: Store metadata as well? https://github.com/apple/swift-log#logging-metadata")
 }

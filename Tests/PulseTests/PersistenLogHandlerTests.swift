@@ -28,6 +28,7 @@ final class PersistentLogHandlerTests: XCTestCase {
         let level2 = Logger.Level.critical
 
         let date = Date()
+        let sessionID = PersistentLogHandler.startSession()
 
         LoggingSystem.bootstrap {
             MultiplexLogHandler([
@@ -57,11 +58,13 @@ final class PersistentLogHandlerTests: XCTestCase {
         XCTAssertEqual(persistedMessage1.text, message1)
         XCTAssertEqual(persistedMessage1.createdAt, date)
         XCTAssertEqual(persistedMessage1.label, "test.logger.1")
+        XCTAssertEqual(persistedMessage1.session, sessionID.uuidString)
 
         let persistedMessage2 = persistedMessages[1]
         XCTAssertEqual(persistedMessage2.level, level2.rawValue)
         XCTAssertEqual(persistedMessage2.text, message2)
         XCTAssertEqual(persistedMessage2.createdAt, date)
         XCTAssertEqual(persistedMessage2.label, "test.logger.2")
+        XCTAssertEqual(persistedMessage2.session, sessionID.uuidString)
     }
 }
