@@ -81,19 +81,22 @@ public extension LoggerMessageStore {
         let message = NSEntityDescription(name: "MessageEntity", class: MessageEntity.self)
         let metadata = NSEntityDescription(name: "MetadataEntity", class: MetadataEntity.self)
 
-        metadata.properties = [
-            NSAttributeDescription(name: "key", type: .stringAttributeType),
-            NSAttributeDescription(name: "value", type: .stringAttributeType),
-        ]
+        do {
+            let key = NSAttributeDescription(name: "key", type: .stringAttributeType)
+            let value = NSAttributeDescription(name: "value", type: .stringAttributeType)
+            metadata.properties = [key, value]
+        }
 
-        message.properties = [
-            NSAttributeDescription(name: "createdAt", type: .dateAttributeType),
-            NSAttributeDescription(name: "level", type: .stringAttributeType),
-            NSAttributeDescription(name: "label", type: .stringAttributeType),
-            NSAttributeDescription(name: "session", type: .stringAttributeType),
-            NSAttributeDescription(name: "text", type: .stringAttributeType),
-            NSRelationshipDescription.oneToMany(name: "metadata", entity: metadata)
-        ]
+        do {
+            let createdAt = NSAttributeDescription(name: "createdAt", type: .dateAttributeType)
+            let level = NSAttributeDescription(name: "level", type: .stringAttributeType)
+            let label = NSAttributeDescription(name: "label", type: .stringAttributeType)
+            let session = NSAttributeDescription(name: "session", type: .stringAttributeType)
+            let text = NSAttributeDescription(name: "text", type: .stringAttributeType)
+            let metadata = NSRelationshipDescription.oneToMany(name: "metadata", entity: metadata)
+
+            message.properties = [createdAt, level, label, session, text, metadata]
+        }
 
         model.entities = [message, metadata]
         return model

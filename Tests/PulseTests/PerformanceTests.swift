@@ -28,7 +28,7 @@ final class PerformanceTests: XCTestCase {
         try? FileManager.default.removeItem(at: tempDirectoryURL)
     }
 
-    func testQueryByLevel() {
+    func xtestQueryByLevel() {
         let request = NSFetchRequest<MessageEntity>(entityName: "MessageEntity")
         request.predicate = NSPredicate(format: "level == %@", Logger.Level.info.rawValue)
 
@@ -37,6 +37,18 @@ final class PerformanceTests: XCTestCase {
         measure {
             let messages = (try? moc.fetch(request)) ?? []
             XCTAssertEqual(messages.count, 20000)
+        }
+    }
+
+    func xtestQueryByMetadata() {
+        let request = NSFetchRequest<MessageEntity>(entityName: "MessageEntity")
+        request.predicate = NSPredicate(format: "SUBQUERY(metadata, $entry, $entry.key == %@ AND $entry.value == %@).@count > 0", "system", "auth")
+
+        let moc = store.container.viewContext
+
+        measure {
+            let messages = (try? moc.fetch(request)) ?? []
+            XCTAssertEqual(messages.count, 10000)
         }
     }
 
@@ -58,6 +70,14 @@ final class PerformanceTests: XCTestCase {
                 $0.label = "application"
                 $0.session = PersistentLogHandler.logSessionId.uuidString
                 $0.text = "UIApplication.didFinishLaunching"
+                $0.metadata = [
+                    {
+                        let entity = MetadataEntity(context: moc)
+                        entity.key = "system"
+                        entity.value = "application"
+                        return entity
+                    }()
+                ]
             }
 
             addMessage {
@@ -74,6 +94,14 @@ final class PerformanceTests: XCTestCase {
                 $0.label = "auth"
                 $0.session = PersistentLogHandler.logSessionId.uuidString
                 $0.text = "🌐 Will authorize user with name \"kean@github.com\""
+                $0.metadata = [
+                    {
+                        let entity = MetadataEntity(context: moc)
+                        entity.key = "system"
+                        entity.value = "auth"
+                        return entity
+                    }()
+                ]
             }
 
             addMessage {
@@ -121,5 +149,6 @@ final class PerformanceTests: XCTestCase {
         }
 
         try! moc.save()
+        moc.reset()
     }
 }
