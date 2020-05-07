@@ -18,9 +18,9 @@ public final class LoggerMessageStore {
     ///   - container: The `NSPersistentContainer` to be used for persistency.
     public init(container: NSPersistentContainer) {
         self.container = container
-        container.loadPersistentStores { _, error in
+        container.loadPersistentStores { description, error in
             if let error = error {
-                debugPrint("Failed to load persistent store with error: \(error)")
+                debugPrint("Failed to load persistent store \(description) with error: \(error)")
             }
         }
         container.viewContext.automaticallyMergesChangesFromParent = true
@@ -57,7 +57,8 @@ public final class LoggerMessageStore {
     /// - warning: Make sure the directory used in storeURL exists.
     convenience init(storeURL: URL) {
         let container = NSPersistentContainer(name: storeURL.lastPathComponent, managedObjectModel: Self.model)
-        container.persistentStoreDescriptions = [NSPersistentStoreDescription(url: storeURL)]
+        let store = NSPersistentStoreDescription(url: storeURL)
+        container.persistentStoreDescriptions = [store]
         self.init(container: container)
     }
 
