@@ -18,7 +18,11 @@ public struct PersistentLogHandler {
 
     private let label: String
 
-    public init(label: String, store: LoggerMessageStore = .default) {
+    public init(label: String) {
+        self.init(label: label, store: .default)
+    }
+
+    public init(label: String, store: LoggerMessageStore) {
         self.label = label
         self.store = store
         self.makeCurrentDate = Date.init

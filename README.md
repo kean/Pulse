@@ -13,28 +13,34 @@
 
 # Usage
 
-Use `log()` function to send logs.
+The primary class in Pulse is `PersistentLogHandler` which is a logging backend for [SwiftLog](https://github.com/apple/swift-log).
+
+#### Bootstrapping
 
 ```swift
-log("Your message")
-log(level: .fatal, system: .auth, "Configuration is missing")
+LoggingSystem.bootstrap(PersistentLogHandler.init)
 ```
 
+> Use `SwiftLog.MultiplexLogHandler` to configure multiple logger handler. See [SwiftLog](https://github.com/apple/swift-log) for more info.
+
+#### Logging
+
+Use SwiftLog [as usual](https://github.com/apple/swift-log#lets-log) to start logging messages.
+
 ```swift
-/// Logs the message in the console (if enabled) and saves it persistently.
-///
-/// - note: Logger automatically captures stack traces for .fatal logs.
-///
-public func log(level: Logger.Level = .debug,
-                system: Logger.System = .default,
-                category: Logger.Category = .default,
-                _ text: @autoclosure () -> String)
+let logger = Logger(label: "com.yourcompany.yourapp")
+
+/// ...
+
+logger.info("This message will be stored persistently")
 ```
 
-All of the logged messages are stored persistently using Core Data. You get full access to all of the recorded messages at any time using `Logger.Store`.
+#### Storage
+
+All logged messages are stored persistently using Core Data. You get full access to all of the recorded messages at any time using `LoggerMessageStore`.
 
 ```swift
-let message = try logger.store.allMessage()
+let message = try LoggerMessageStore.default.allMessage()
 
 // NSPersistentStoreContainer
 let container = logger.store.container
