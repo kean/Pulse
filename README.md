@@ -13,7 +13,7 @@
 
 # Usage
 
-The primary class in Pulse is `PersistentLogHandler` which is a logging backend for [SwiftLog](https://github.com/apple/swift-log).
+The primary class in Pulse is `PersistentLogHandler` which can be used as a logging backend for [SwiftLog](https://github.com/apple/swift-log).
 
 #### Bootstrapping
 
@@ -21,7 +21,7 @@ The primary class in Pulse is `PersistentLogHandler` which is a logging backend 
 LoggingSystem.bootstrap(PersistentLogHandler.init)
 ```
 
-> Use `SwiftLog.MultiplexLogHandler` to configure multiple logger handler. See [SwiftLog](https://github.com/apple/swift-log) for more info.
+If you are not using [SwiftLog](https://github.com/apple/swift-log) in your project, you can use `Pulse.PersistentLogHandler` directly without the need for bootstrapping.
 
 #### Logging
 
