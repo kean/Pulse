@@ -54,7 +54,7 @@ final class LoggerMessageStoreTests: XCTestCase {
         let context = store.container.viewContext
 
         do {
-            let message = LoggerMessage(context: context)
+            let message = MessageEntity(context: context)
             message.createdAt = date.addingTimeInterval(-20)
             message.level = "debug"
             message.label = "default"
@@ -62,7 +62,7 @@ final class LoggerMessageStoreTests: XCTestCase {
             message.text = "message-01"
         }
         do {
-            let message = LoggerMessage(context: context)
+            let message = MessageEntity(context: context)
             message.createdAt = date.addingTimeInterval(-5)
             message.level = "debug"
             message.label = "default"
@@ -74,11 +74,7 @@ final class LoggerMessageStoreTests: XCTestCase {
 
         // WHEN
         store.sweep()
-        let sweepCompleted = expectation(description: "Sweep Completed")
-        store.backgroundContext.perform {
-            sweepCompleted.fulfill()
-        }
-        wait(for: [sweepCompleted], timeout: 5)
+        flush(store: store)
 
         // THEN expired message was removed
         let messages = try store.allMessages()
@@ -99,9 +95,7 @@ final class LoggerMessageStoreTests: XCTestCase {
         // THEN automatic migration is performed and new field are populated with
         // empty values
         let messages = try store.allMessages()
-        XCTAssertEqual(messages.count, 6, "Expected all previously recorded messasges to persist")
-        XCTAssertEqual(messages.first?.text, "UIApplication.didFinishLaunching", "Expected text to be preserved")
-        XCTAssertEqual(messages.first?.label, "", "Expected new label field to be populated with an empty value")
+        XCTAssertEqual(messages.count, 0, "Previously recoreded messages are going to be lost")
 
         store.destroyStores()
     }
@@ -111,28 +105,12 @@ private extension LoggerMessageStore {
     func populate() throws {
         let context = container.viewContext
 
-        let message = LoggerMessage(context: context)
+        let message = MessageEntity(context: context)
         message.createdAt = Date()
         message.level = "debug"
         message.label = "default"
         message.session = "1"
         message.text = "Some message"
         try context.save()
-    }
-}
-
-private extension LoggerMessageStore {
-    func removeStores() {
-        let coordinator = container.persistentStoreCoordinator
-        for store in coordinator.persistentStores {
-            try? coordinator.remove(store)
-        }
-    }
-
-    func destroyStores() {
-        let coordinator = container.persistentStoreCoordinator
-        for store in coordinator.persistentStores {
-            try? coordinator.destroyPersistentStore(at: store.url!, ofType: NSSQLiteStoreType, options: [:])
-        }
     }
 }

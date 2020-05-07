@@ -37,7 +37,7 @@ logger.info("This message will be stored persistently")
 
 #### Storage
 
-All logged messages are stored persistently using Core Data. You get full access to all of the recorded messages at any time using `LoggerMessageStore`.
+All logged messages are stored persistently using Core Data, including metadata and other information. You get full access to all of the recorded messages at any time using `LoggerMessageStore`.
 
 ```swift
 let message = try LoggerMessageStore.default.allMessage()

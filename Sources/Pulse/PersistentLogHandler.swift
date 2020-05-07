@@ -57,13 +57,38 @@ extension PersistentLogHandler: LogHandler {
         let label = self.label
 
         context.perform {
-            let persistedMessage = LoggerMessage(context: context)
-            persistedMessage.createdAt = date
-            persistedMessage.level = level.rawValue
-            persistedMessage.label = label
-            persistedMessage.session = Self.logSessionId.uuidString
-            persistedMessage.text = String(describing: message)
+            let entity = MessageEntity(context: context)
+            entity.createdAt = date
+            entity.level = level.rawValue
+            entity.label = label
+            entity.session = Self.logSessionId.uuidString
+            entity.text = String(describing: message)
+            if let entries = metadata?.unpack(), !entries.isEmpty {
+                entity.metadata = Set(entries.map { key, value in
+                    let entity = MetadataEntity(context: context)
+                    entity.key = key
+                    entity.value = value
+                    return entity
+                })
+            }
             try? context.save()
         }
+    }
+}
+
+private extension Logger.Metadata {
+    func unpack() -> [(String, String)] {
+        var entries = [(String, String)]()
+        for (key, value) in self {
+            switch value {
+            case let .string(string):
+                entries.append((key, string))
+            case let .stringConvertible(string):
+                entries.append((key, string.description))
+            default:
+                break // Skip other types
+            }
+        }
+        return entries
     }
 }

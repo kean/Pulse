@@ -72,13 +72,14 @@ public final class LoggerMessageStore {
 }
 
 // MARK: - LoggerMessageStore (NSManagedObjectModel)
+
 public extension LoggerMessageStore {
     /// Returns Core Data model used by the store.
     static let model: NSManagedObjectModel = {
         let model = NSManagedObjectModel()
 
-        let message = NSEntityDescription(name: "LoggerMessage", class: LoggerMessage.self)
-        let metadata = NSEntityDescription(name: "LoggerMetadata", class: LoggerMetadata.self)
+        let message = NSEntityDescription(name: "MessageEntity", class: MessageEntity.self)
+        let metadata = NSEntityDescription(name: "MetadataEntity", class: MetadataEntity.self)
 
         metadata.properties = [
             NSAttributeDescription(name: "key", type: .stringAttributeType),
@@ -91,7 +92,7 @@ public extension LoggerMessageStore {
             NSAttributeDescription(name: "label", type: .stringAttributeType),
             NSAttributeDescription(name: "session", type: .stringAttributeType),
             NSAttributeDescription(name: "text", type: .stringAttributeType),
-            NSRelationshipDescription.oneToMany(name: "metadat", entity: metadata)
+            NSRelationshipDescription.oneToMany(name: "metadata", entity: metadata)
         ]
 
         model.entities = [message, metadata]
@@ -118,6 +119,7 @@ private extension NSAttributeDescription {
 private extension NSRelationshipDescription {
     static func oneToMany(name: String, deleteRule: NSDeleteRule = .cascadeDeleteRule, entity: NSEntityDescription) -> NSRelationshipDescription {
         let relationship =  NSRelationshipDescription()
+        relationship.name = name
         relationship.deleteRule = deleteRule
         relationship.destinationEntity = entity
         relationship.maxCount = 0
@@ -126,11 +128,12 @@ private extension NSRelationshipDescription {
     }
 }
 // MARK: - LoggerMessageStore (Sweep)
+
 extension LoggerMessageStore {
     func sweep() {
         let expirationInterval = logsExpirationInterval
         backgroundContext.perform {
-            let request = NSFetchRequest<NSFetchRequestResult>(entityName: "LoggerMessage")
+            let request = NSFetchRequest<NSFetchRequestResult>(entityName: "MessageEntity")
             let dateTo = self.makeCurrentDate().addingTimeInterval(-expirationInterval)
             request.predicate = NSPredicate(format: "createdAt < %@", dateTo as NSDate)
             try? self.deleteMessages(fetchRequest: request)
@@ -142,16 +145,16 @@ extension LoggerMessageStore {
 
 public extension LoggerMessageStore {
     /// Returns all recorded messages, least recent messages come first.
-    func allMessages() throws -> [LoggerMessage] {
-        let request = NSFetchRequest<LoggerMessage>(entityName: "LoggerMessage")
-        request.sortDescriptors = [NSSortDescriptor(keyPath: \LoggerMessage.createdAt, ascending: true)]
+    func allMessages() throws -> [MessageEntity] {
+        let request = NSFetchRequest<MessageEntity>(entityName: "MessageEntity")
+        request.sortDescriptors = [NSSortDescriptor(keyPath: \MessageEntity.createdAt, ascending: true)]
         return try container.viewContext.fetch(request)
     }
 
     /// Removes all of the previously recorded messages.
     func removeAllMessages() {
         backgroundContext.perform {
-            try? self.deleteMessages(fetchRequest: LoggerMessage.fetchRequest())
+            try? self.deleteMessages(fetchRequest: MessageEntity.fetchRequest())
         }
     }
 }
@@ -175,15 +178,16 @@ private extension LoggerMessageStore {
 
 // MARK: - NSManagedObjects
 
-public final class LoggerMessage: NSManagedObject {
+public final class MessageEntity: NSManagedObject {
     @NSManaged public var createdAt: Date
     @NSManaged public var level: String
     @NSManaged public var label: String
     @NSManaged public var session: String
     @NSManaged public var text: String
+    @NSManaged public var metadata: Set<MetadataEntity>
 }
 
-public final class LoggerMetadata: NSManagedObject {
+public final class MetadataEntity: NSManagedObject {
     @NSManaged public var key: String
     @NSManaged public var value: String
 }

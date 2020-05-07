@@ -1,5 +1,12 @@
 # Pulse 0.x
 
+## Pulse 0.4.0
+
+*May 7, 2020*
+
+- Store `.string` and `.stringConvertible` metadata using new `MetadataEntity` entities
+- Rename `LoggerMessage` to `MessageEntity` to avoid confusing with `SwiftLog` types
+
 ## Pulse 0.3.0
 
 *May 6, 2020*
