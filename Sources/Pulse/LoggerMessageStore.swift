@@ -32,7 +32,7 @@ public final class LoggerMessageStore {
     /// Creates a `LoggerMessageStore` persisting to an `NSPersistentContainer` with the given name.
     /// - Parameters:
     ///   - name: The name of the `NSPersistentContainer` to be used for persistency.
-    /// By default, the logger create a store in Library/Logs directory which is
+    /// By default, the logger stores logs in Library/Logs directory which is
     /// excluded from the backup.
     public convenience init(name: String) {
         var logsUrl = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask)
