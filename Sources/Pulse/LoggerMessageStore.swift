@@ -77,20 +77,34 @@ public extension LoggerMessageStore {
     static let model: NSManagedObjectModel = {
         let model = NSManagedObjectModel()
 
-        let message = NSEntityDescription()
-        message.name = "LoggerMessage"
-        message.managedObjectClassName = LoggerMessage.self.description()
+        let message = NSEntityDescription(name: "LoggerMessage", class: LoggerMessage.self)
+        let metadata = NSEntityDescription(name: "LoggerMetadata", class: LoggerMetadata.self)
+
+        metadata.properties = [
+            NSAttributeDescription(name: "key", type: .stringAttributeType),
+            NSAttributeDescription(name: "value", type: .stringAttributeType),
+        ]
+
         message.properties = [
             NSAttributeDescription(name: "createdAt", type: .dateAttributeType),
             NSAttributeDescription(name: "level", type: .stringAttributeType),
             NSAttributeDescription(name: "label", type: .stringAttributeType),
             NSAttributeDescription(name: "session", type: .stringAttributeType),
-            NSAttributeDescription(name: "text", type: .stringAttributeType)
+            NSAttributeDescription(name: "text", type: .stringAttributeType),
+            NSRelationshipDescription.oneToMany(name: "metadat", entity: metadata)
         ]
 
-        model.entities = [message]
+        model.entities = [message, metadata]
         return model
     }()
+}
+
+private extension NSEntityDescription {
+    convenience init<T>(name: String, class: T.Type) where T: NSManagedObject {
+        self.init()
+        self.name = name
+        self.managedObjectClassName = T.self.description()
+    }
 }
 
 private extension NSAttributeDescription {
@@ -101,6 +115,16 @@ private extension NSAttributeDescription {
     }
 }
 
+private extension NSRelationshipDescription {
+    static func oneToMany(name: String, deleteRule: NSDeleteRule = .cascadeDeleteRule, entity: NSEntityDescription) -> NSRelationshipDescription {
+        let relationship =  NSRelationshipDescription()
+        relationship.deleteRule = deleteRule
+        relationship.destinationEntity = entity
+        relationship.maxCount = 0
+        relationship.minCount = 0
+        return relationship
+    }
+}
 // MARK: - LoggerMessageStore (Sweep)
 extension LoggerMessageStore {
     func sweep() {
@@ -149,7 +173,7 @@ private extension LoggerMessageStore {
     }
 }
 
-// MARK: - LoggerMessage
+// MARK: - NSManagedObjects
 
 public final class LoggerMessage: NSManagedObject {
     @NSManaged public var createdAt: Date
@@ -157,4 +181,9 @@ public final class LoggerMessage: NSManagedObject {
     @NSManaged public var label: String
     @NSManaged public var session: String
     @NSManaged public var text: String
+}
+
+public final class LoggerMetadata: NSManagedObject {
+    @NSManaged public var key: String
+    @NSManaged public var value: String
 }

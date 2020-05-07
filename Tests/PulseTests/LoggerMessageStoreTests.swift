@@ -4,6 +4,8 @@
 
 import Logging
 import XCTest
+import Foundation
+import CoreData
 @testable import Pulse
 
 final class LoggerMessageStoreTests: XCTestCase {
