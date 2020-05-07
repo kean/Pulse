@@ -57,7 +57,7 @@ public final class LoggerMessageStore {
     /// - storeURL: The storeURL.
     ///
     /// - warning: Make sure the directory used in storeURL exists.
-    convenience init(storeURL: URL) {
+    public convenience init(storeURL: URL) {
         let container = NSPersistentContainer(name: storeURL.lastPathComponent, managedObjectModel: Self.model)
         let store = NSPersistentStoreDescription(url: storeURL)
         container.persistentStoreDescriptions = [store]
