@@ -10,6 +10,11 @@ import Logging
 final class PersistentLogHandlerTests: XCTestCase {
     override func setUp() {
         super.setUp()
+    }
+
+    override func tearDown() {
+        super.tearDown()
+
         LoggerMessageStore.default.removeAllMessages()
     }
 

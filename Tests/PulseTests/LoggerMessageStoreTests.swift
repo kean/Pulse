@@ -11,7 +11,8 @@ final class LoggerMessageStoreTests: XCTestCase {
         let deadlineExpectation = expectation(description: "Expected the deadline to be met.")
         let deletionExpectation = expectation(description: "Expected the deletion deadline to be met.")
 
-        let shortLivedStore = LoggerMessageStore(name: "test", logsExpirationInterval: 0.1)
+        let shortLivedStore = LoggerMessageStore(name: "test")
+        shortLivedStore.logsExpirationInterval = 0.1
         shortLivedStore.removeAllMessages()
 
         let logger = Logger(label: "test", factory: { PersistentLogHandler(label: $0, store: shortLivedStore) })

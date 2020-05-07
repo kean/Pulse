@@ -8,28 +8,16 @@ public final class LoggerMessageStore {
     public let container: NSPersistentContainer
     public let backgroundContext: NSManagedObjectContext
 
-    /// Logs expiration interval
-    public var logsExpirationInterval: TimeInterval
+    /// All logged messages older than the specified `TimeInterval` will be removed. Defaults to 7 days.
+    public var logsExpirationInterval: TimeInterval = 604800
 
     public static let `default` = LoggerMessageStore(name: "com.github.kean.logger")
 
     /// Creates a `LoggerMessageStore` persisting using the given `NSPersistentContainer`.
     /// - Parameters:
     ///   - container: The `NSPersistentContainer` to be used for persistency.
-    ///   - logsExpirationInterval: All logged messages older than the specified `TimeInterval` will be removed. Defaults to 7 days.
-    public init(container: NSPersistentContainer, logsExpirationInterval: TimeInterval = 604800) {
+    public init(container: NSPersistentContainer) {
         self.container = container
-        self.backgroundContext = container.newBackgroundContext()
-        self.logsExpirationInterval = logsExpirationInterval
-        scheduleSweep()
-    }
-
-    /// Creates a `LoggerMessageStore` persisting to an `NSPersistentContainer` with the given name.
-    /// - Parameters:
-    ///   - name: The name of the `NSPersistentContainer` to be used for persistency.
-    ///   - logsExpirationInterval: All logged messages older than the specified `TimeInterval` will be removed. Defaults to 7 days.
-    public convenience init(name: String, logsExpirationInterval: TimeInterval = 604800) {
-        let container = NSPersistentContainer(name: name, managedObjectModel: Self.model)
         container.loadPersistentStores { _, error in
             if let error = error {
                 debugPrint("Failed to load persistent store with error: \(error)")
@@ -37,8 +25,40 @@ public final class LoggerMessageStore {
         }
         container.viewContext.automaticallyMergesChangesFromParent = true
         container.viewContext.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
+        self.backgroundContext = container.newBackgroundContext()
+        scheduleSweep()
+    }
 
-        self.init(container: container, logsExpirationInterval: logsExpirationInterval)
+    /// Creates a `LoggerMessageStore` persisting to an `NSPersistentContainer` with the given name.
+    /// - Parameters:
+    ///   - name: The name of the `NSPersistentContainer` to be used for persistency.
+    /// By default, the logger create a store in Library/Logs directory which is
+    /// excluded from the backup.
+    public convenience init(name: String) {
+        var logsUrl = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask)
+            .first?
+            .appendingPathComponent("Logs", isDirectory: true) ?? URL(fileURLWithPath: "/dev/null")
+
+        let logsPath = logsUrl.absoluteString
+
+        if !FileManager.default.fileExists(atPath: logsPath) {
+            try? FileManager.default.createDirectory(at: logsUrl, withIntermediateDirectories: true, attributes: [:])
+            var resourceValues = URLResourceValues()
+            resourceValues.isExcludedFromBackup = true
+            try? logsUrl.setResourceValues(resourceValues)
+        }
+
+        let storeURL = logsUrl.appendingPathComponent("\(name).sqlite", isDirectory: false)
+        self.init(storeURL: storeURL)
+    }
+
+    /// - storeURL: The storeURL.
+    ///
+    /// - warning: Make sure the directory used in storeURL exists.
+    convenience init(storeURL: URL) {
+        let container = NSPersistentContainer(name: storeURL.lastPathComponent, managedObjectModel: Self.model)
+        container.persistentStoreDescriptions = [NSPersistentStoreDescription(url: storeURL)]
+        self.init(container: container)
     }
 
     private func scheduleSweep() {
