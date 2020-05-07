@@ -13,6 +13,8 @@ public final class LoggerMessageStore {
 
     public static let `default` = LoggerMessageStore(name: "com.github.kean.logger")
 
+    var makeCurrentDate: () -> Date = { Date() }
+
     /// Creates a `LoggerMessageStore` persisting using the given `NSPersistentContainer`.
     /// - Parameters:
     ///   - container: The `NSPersistentContainer` to be used for persistency.
@@ -105,7 +107,7 @@ extension LoggerMessageStore {
         let expirationInterval = logsExpirationInterval
         backgroundContext.perform {
             let request = NSFetchRequest<NSFetchRequestResult>(entityName: "LoggerMessage")
-            let dateTo = Date().addingTimeInterval(-expirationInterval)
+            let dateTo = self.makeCurrentDate().addingTimeInterval(-expirationInterval)
             request.predicate = NSPredicate(format: "createdAt < %@", dateTo as NSDate)
             try? self.deleteMessages(fetchRequest: request)
         }

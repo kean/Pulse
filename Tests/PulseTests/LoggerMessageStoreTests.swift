@@ -7,96 +7,88 @@ import XCTest
 @testable import Pulse
 
 final class LoggerMessageStoreTests: XCTestCase {
+    var tempDirectoryURL: URL!
+    var storeURL: URL!
+
+    var store: LoggerMessageStore!
+
+    override func setUp() {
+        tempDirectoryURL = FileManager().temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try? FileManager.default.createDirectory(at: tempDirectoryURL, withIntermediateDirectories: true, attributes: [:])
+        storeURL = tempDirectoryURL.appendingPathComponent("test-store")
+
+        store = LoggerMessageStore(storeURL: storeURL)
+    }
+
+    override func tearDown() {
+        store.destroyStores()
+        try? FileManager.default.removeItem(at: tempDirectoryURL)
+    }
+
     // MARK: - Init
 
     func testInitStoreWithURL() throws {
         // GIVEN
-        let storeURL = FileManager().temporaryDirectory.appendingPathComponent(UUID().uuidString)
-        let store = LoggerMessageStore(storeURL: storeURL)
+        try store.populate()
+        XCTAssertEqual(try store.allMessages().count, 1)
+
+        store.removeStores()
+
+        // WHEN loading the store with the same url
+        store = LoggerMessageStore(storeURL: storeURL)
+
+        // THEN data is persisted
+        XCTAssertEqual(try store.allMessages().count, 1)
+    }
+
+    // MARK: - Expiration
+
+    func testExpiredMessagesAreRemoved() throws {
+        // GIVEN
+        store.logsExpirationInterval = 10
+        let date = Date()
+        store.makeCurrentDate = { date }
 
         let context = store.container.viewContext
 
-        let message = LoggerMessage(context: context)
-        message.createdAt = Date()
-        message.level = "debug"
-        message.label = "default"
-        message.session = "1"
-        message.text = "Some message"
+        do {
+            let message = LoggerMessage(context: context)
+            message.createdAt = date.addingTimeInterval(-20)
+            message.level = "debug"
+            message.label = "default"
+            message.session = "1"
+            message.text = "message-01"
+        }
+        do {
+            let message = LoggerMessage(context: context)
+            message.createdAt = date.addingTimeInterval(-5)
+            message.level = "debug"
+            message.label = "default"
+            message.session = "1"
+            message.text = "message-02"
+        }
+
         try context.save()
 
-        XCTAssertEqual(try store.allMessages().count, 1)
-
-        // WHEN loading the store with the same url
-        let newStore = LoggerMessageStore(storeURL: storeURL)
-
-        // THEN data is persisted
-        XCTAssertEqual(try newStore.allMessages().count, 1)
-    }
-
-    func testShortLivedMessages() throws {
-        let deadlineExpectation = expectation(description: "Expected the deadline to be met.")
-        let deletionExpectation = expectation(description: "Expected the deletion deadline to be met.")
-
-        let shortLivedStore = LoggerMessageStore(name: "test")
-        shortLivedStore.logsExpirationInterval = 0.1
-        shortLivedStore.removeAllMessages()
-
-        let logger = Logger(label: "test", factory: { PersistentLogHandler(label: $0, store: shortLivedStore) })
-        logger.warning("warning")
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-            deadlineExpectation.fulfill()
+        // WHEN
+        store.sweep()
+        let sweepCompleted = expectation(description: "Sweep Completed")
+        store.backgroundContext.perform {
+            sweepCompleted.fulfill()
         }
+        wait(for: [sweepCompleted], timeout: 5)
 
-        wait(for: [deadlineExpectation], timeout: 0.5)
-
-        XCTAssertEqual(try shortLivedStore.allMessages().count, 1)
-
-        shortLivedStore.sweep()
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-            deletionExpectation.fulfill()
-        }
-
-        wait(for: [deletionExpectation], timeout: 0.5)
-
-        XCTAssert(try shortLivedStore.allMessages().isEmpty)
-    }
-
-    func testLongLivedMessages() throws {
-        let deadlineExpectation = expectation(description: "Expected the deadline to be met.")
-        let deletionExpectation = expectation(description: "Expected the deletion deadline to be met.")
-
-        let longLivedStore = LoggerMessageStore(name: "test")
-        longLivedStore.removeAllMessages()
-
-        let logger = Logger(label: "test", factory: { PersistentLogHandler(label: $0, store: longLivedStore) })
-        logger.warning("warning")
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-            deadlineExpectation.fulfill()
-        }
-
-        wait(for: [deadlineExpectation], timeout: 0.5)
-
-        XCTAssertEqual(try longLivedStore.allMessages().count, 1)
-
-        longLivedStore.sweep()
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-            deletionExpectation.fulfill()
-        }
-
-        wait(for: [deletionExpectation], timeout: 0.5)
-
-        XCTAssertEqual(try longLivedStore.allMessages().count, 1)
+        // THEN expired message was removed
+        let messages = try store.allMessages()
+        XCTAssertEqual(messages.count, 1)
+        XCTAssertEqual(messages.first?.text, "message-02")
     }
 
     // MARK: - Migration
 
     func testMigrationFromVersion0_2ToLatest() throws {
         // GIVEN store created with the model from Pulse 0.2
-        let storeURL = FileManager().temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let storeURL = tempDirectoryURL.appendingPathComponent("test-migration-from-0-2")
         try Resources.outdatedDatabase.write(to: storeURL)
 
         // WHEN migrating to the store with the latest model
@@ -109,6 +101,36 @@ final class LoggerMessageStoreTests: XCTestCase {
         XCTAssertEqual(messages.first?.text, "UIApplication.didFinishLaunching", "Expected text to be preserved")
         XCTAssertEqual(messages.first?.label, "", "Expected new label field to be populated with an empty value")
 
-        try? FileManager.default.removeItem(at: storeURL)
+        store.destroyStores()
+    }
+}
+
+private extension LoggerMessageStore {
+    func populate() throws {
+        let context = container.viewContext
+
+        let message = LoggerMessage(context: context)
+        message.createdAt = Date()
+        message.level = "debug"
+        message.label = "default"
+        message.session = "1"
+        message.text = "Some message"
+        try context.save()
+    }
+}
+
+private extension LoggerMessageStore {
+    func removeStores() {
+        let coordinator = container.persistentStoreCoordinator
+        for store in coordinator.persistentStores {
+            try? coordinator.remove(store)
+        }
+    }
+
+    func destroyStores() {
+        let coordinator = container.persistentStoreCoordinator
+        for store in coordinator.persistentStores {
+            try? coordinator.destroyPersistentStore(at: store.url!, ofType: NSSQLiteStoreType, options: [:])
+        }
     }
 }
