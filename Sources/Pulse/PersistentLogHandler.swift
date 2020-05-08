@@ -71,6 +71,9 @@ extension PersistentLogHandler: LogHandler {
                     return entity
                 })
             }
+            entity.file = file
+            entity.function = function
+            entity.line = Int32(line)
             try? context.save()
         }
     }

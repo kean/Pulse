@@ -94,8 +94,10 @@ public extension LoggerMessageStore {
             let session = NSAttributeDescription(name: "session", type: .stringAttributeType)
             let text = NSAttributeDescription(name: "text", type: .stringAttributeType)
             let metadata = NSRelationshipDescription.oneToMany(name: "metadata", entity: metadata)
-
-            message.properties = [createdAt, level, label, session, text, metadata]
+            let file = NSAttributeDescription(name: "file", type: .stringAttributeType)
+            let function = NSAttributeDescription(name: "function", type: .stringAttributeType)
+            let line = NSAttributeDescription(name: "line", type: .integer32AttributeType)
+            message.properties = [createdAt, level, label, session, text, metadata, file, function, line]
         }
 
         model.entities = [message, metadata]
@@ -188,6 +190,9 @@ public final class MessageEntity: NSManagedObject {
     @NSManaged public var session: String
     @NSManaged public var text: String
     @NSManaged public var metadata: Set<MetadataEntity>
+    @NSManaged public var file: String
+    @NSManaged public var function: String
+    @NSManaged public var line: Int32
 }
 
 public final class MetadataEntity: NSManagedObject {

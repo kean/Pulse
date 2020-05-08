@@ -6,6 +6,7 @@
 
 - Store `.string` and `.stringConvertible` metadata using new `MetadataEntity` entities
 - Rename `LoggerMessage` to `MessageEntity` to avoid confusing with `SwiftLog` types
+- Store `file`, `function`, and `line` information
 
 ## Pulse 0.3.0
 

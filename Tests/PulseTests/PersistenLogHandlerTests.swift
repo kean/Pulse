@@ -81,6 +81,18 @@ final class PersistentLogHandlerTests: XCTestCase {
         }
     }
 
+    func testStoresFileInformation() throws {
+        // WHEN
+        sut.log(level: .debug, message: "a", metadata: nil, file: "PersistenLogHandlerTests.swift", function: "testStoresFileInformation()", line: 86)
+        flush(store: store)
+
+        // THEN
+        let message = try XCTUnwrap(store.allMessages().first)
+        XCTAssertEqual(message.file, "PersistenLogHandlerTests.swift")
+        XCTAssertEqual(message.function, "testStoresFileInformation()")
+        XCTAssertEqual(message.line, 86)
+    }
+
     // MARK: Metadata
 
     func testStoringStringMetadata() throws {
