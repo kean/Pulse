@@ -99,6 +99,24 @@ final class LoggerMessageStoreTests: XCTestCase {
 
         store.destroyStores()
     }
+
+    // MARK: - Remove Messages
+
+    func testRemoveAllMessages() throws {
+        // GIVEN
+        try store.populate()
+        let context = store.container.viewContext
+        XCTAssertEqual(try context.fetch(MessageEntity.fetchRequest()).count, 1)
+        XCTAssertEqual(try context.fetch(MetadataEntity.fetchRequest()).count, 1)
+
+        // WHEN
+        store.removeAllMessages()
+        flush(store: store)
+
+        // THEN both message and metadata are removed
+        XCTAssertTrue(try context.fetch(MessageEntity.fetchRequest()).isEmpty)
+        XCTAssertTrue(try context.fetch(MetadataEntity.fetchRequest()).isEmpty)
+    }
 }
 
 private extension LoggerMessageStore {
@@ -111,6 +129,14 @@ private extension LoggerMessageStore {
         message.label = "default"
         message.session = "1"
         message.text = "Some message"
+        message.metadata = [
+            {
+                let entity = MetadataEntity(context: context)
+                entity.key = "system"
+                entity.value = "application"
+                return entity
+            }()
+        ]
         try context.save()
     }
 }
