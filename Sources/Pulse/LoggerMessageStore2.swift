@@ -14,7 +14,7 @@ public final class LoggerMessageStore2 {
     var makeCurrentDate: () -> Date = { Date() }
 
     private let queue = DispatchQueue(label: "com.github.pulse.logger-message-store")
-    private let db: Database?
+    private var db: Database?
 
     /// Creates a `LoggerMessageStore` persisting to an `NSPersistentContainer` with the given name.
     /// - Parameters:
@@ -45,12 +45,40 @@ public final class LoggerMessageStore2 {
     public init(storeURL: URL) {
         do {
             self.db = try Database(url: storeURL)
+            try createTables()
         } catch {
-            self.db = nil
             debugPrint("Failed to open a database at \(storeURL) with \(error)")
         }
-
         scheduleSweep()
+    }
+
+    private func createTables() throws {
+        // TODO: replace Session VARCHAR with primary key
+        try db?.create("""
+        CREATE TABLE Messages
+        (
+            Id INTEGER PRIMARY KEY NOT NULL,
+            CreatedAt TIMESTAMP,
+            Level CHAR(8),
+            Label VARCHAR,
+            Session VARCHAR,
+            Text VARCHAR,
+            File VARCHAR,
+            Function VARCHAR,
+            Line INTEGER
+        )
+        """)
+
+        try db?.create("""
+        CREATE TABLE Metadata
+        (
+            Id INTEGER PRIMARY KEY NOT NULL,
+            Key VARCHAR,
+            Value VARCHAR,
+            MessageId INTEGER,
+            FOREIGN KEY(MessageId) REFERENCES Messages(Id)
+        )
+        """)
     }
 
     private func scheduleSweep() {

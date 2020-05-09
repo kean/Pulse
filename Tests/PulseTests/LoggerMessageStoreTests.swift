@@ -23,4 +23,7 @@ final class LoggerMessageStoreTests: XCTestCase {
         try! tempDir.destroy()
     }
 
+    func testInit() {
+        let store = LoggerMessageStore2(storeURL: tempDir.file(named: "test-store"))
+    }
 }
