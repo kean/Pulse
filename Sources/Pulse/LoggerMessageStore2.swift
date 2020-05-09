@@ -13,8 +13,11 @@ public final class LoggerMessageStore2 {
 
     var makeCurrentDate: () -> Date = { Date() }
 
-    private let queue = DispatchQueue(label: "com.github.pulse.logger-message-store")
-    private var db: Database?
+    let queue = DispatchQueue(label: "com.github.pulse.logger-message-store")
+    private var impl: LoggerMessageStoreImpl?
+    private var isInsertErrorReported = false
+
+    private var buffer = [MessageItem]()
 
     /// Creates a `LoggerMessageStore` persisting to an `NSPersistentContainer` with the given name.
     /// - Parameters:
@@ -44,22 +47,75 @@ public final class LoggerMessageStore2 {
     /// - warning: Make sure the directory used in storeURL exists.
     public init(storeURL: URL) {
         do {
-            self.db = try Database(url: storeURL)
-            try createTables()
+            self.impl = try LoggerMessageStoreImpl(storeURL: storeURL)
         } catch {
             debugPrint("Failed to open a database at \(storeURL) with \(error)")
         }
         scheduleSweep()
     }
 
+    private func scheduleSweep() {
+        DispatchQueue.global().asyncAfter(deadline: .now() + .seconds(10)) { [weak self] in
+            #warning("TODO: implement")
+//            self?.sweep()
+        }
+    }
+
+    func insert(message: MessageItem) {
+        #warning("TEMP")
+//        queue.async {
+            do {
+                #warning("TODO: dump every 1 second")
+                self.buffer.append(message)
+//                if self.buffer.count == 1000 {
+                    try self.impl?.insert(messages: self.buffer)
+                    self.buffer = []
+//                }
+            } catch {
+                guard !self.isInsertErrorReported else { return }
+                self.isInsertErrorReported = true
+                debugPrint("Failed to log message with error \(error)")
+            }
+//        }
+    }
+
+    func allMessages() throws -> [MessageItem] {
+        guard let impl = impl else { return [] }
+        do {
+            return try impl.allMessages()
+        } catch {
+            return []
+        }
+    }
+}
+
+private final class LoggerMessageStoreImpl {
+    var makeCurrentDate: () -> Date = { Date() }
+
+    private var db: Database
+
+    // Compiled statements.
+    private var insertMessage: Statement!
+    private var insertMetadata: Statement!
+
+    public init(storeURL: URL) throws {
+        // Prefer speed over data integrity
+        self.db = try Database(url: storeURL, pragmas: [
+            "synchronous": "OFF",
+            "journal_mode": "OFF",
+            "locking_mode": "EXCLUSIVE"
+        ])
+        try createTables()
+    }
+
     private func createTables() throws {
         // TODO: replace Session VARCHAR with primary key
-        try db?.create("""
+        try db.execute("""
         CREATE TABLE Messages
         (
             Id INTEGER PRIMARY KEY NOT NULL,
-            CreatedAt TIMESTAMP,
-            Level CHAR(8),
+            CreatedAt DOUBLE,
+            Level VARCHAR,
             Label VARCHAR,
             Session VARCHAR,
             Text VARCHAR,
@@ -69,7 +125,7 @@ public final class LoggerMessageStore2 {
         )
         """)
 
-        try db?.create("""
+        try db.execute("""
         CREATE TABLE Metadata
         (
             Id INTEGER PRIMARY KEY NOT NULL,
@@ -81,77 +137,69 @@ public final class LoggerMessageStore2 {
         """)
     }
 
-    private func scheduleSweep() {
-        DispatchQueue.global().asyncAfter(deadline: .now() + .seconds(10)) { [weak self] in
-            #warning("TODO: implement")
-//            self?.sweep()
+    func insert(messages: [MessageItem]) throws {
+//        try db.beginTransaction()
+
+        for message in messages {
+            let messageId = try db.insert("""
+            INSERT INTO Messages
+            (
+                CreatedAt, Level, Label, Session, Text, File, Function, Line
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """, [
+                .timestamp(message.createdAt),
+                .string(message.level),
+                .string(message.label),
+                .string(message.session),
+                .string(message.text),
+                .string(message.file),
+                .string(message.function),
+                .int(message.line)
+            ])
+
+            for metadata in message.metadata {
+                try db.insert("""
+                INSERT INTO Metadata
+                (
+                    Key, Value, MessageId
+                )
+                VALUES (?, ?, ?)
+                """, [
+                    .string(metadata.key),
+                    .string(metadata.value),
+                    .int(Int32(messageId))
+                ])
+            }
         }
+
+//        try db.endTransaction()
+    }
+
+    /// Returns all recorded messages, least recently added messages come first.
+    func allMessages() throws -> [MessageItem] {
+        let messages = try db.select("""
+        SELECT Id, CreatedAt, Level, Label, Session, Text, File, Function, Line
+        FROM Messages
+        ORDER BY CreatedAt ASC
+        """) {
+            MessageItem(id: $0[0], createdAt: $0[1], level: $0[2], label: $0[3], session: $0[4], text: $0[5], metadata: [], file: $0[6], function: $0[7], line: Int32($0[8]))
+        }
+
+        #warning("TODO: optimize by indexing CreatedAt")
+
+        #warning("TODO: fill metadata")
+//
+//        let messages = try statement.select {
+//            MessageItem(id: $0[0], createdAt: $0[1], level: $0[2], label: $0[3], session: $0[4], text: $0[5], metadata: [], file: $0[6], function: $0[7], line: Int32($0[8]))
+//        }
+
+        return messages
     }
 }
 
-//
-//// MARK: - LoggerMessageStore (NSManagedObjectModel)
-//
-//public extension LoggerMessageStore2 {
-//    /// Returns Core Data model used by the store.
-//    static let model: NSManagedObjectModel = {
-//        let model = NSManagedObjectModel()
-//
-//        let message = NSEntityDescription(name: "MessageEntity", class: MessageEntity.self)
-//        let metadata = NSEntityDescription(name: "MetadataEntity", class: MetadataEntity.self)
-//
-//        do {
-//            let key = NSAttributeDescription(name: "key", type: .stringAttributeType)
-//            let value = NSAttributeDescription(name: "value", type: .stringAttributeType)
-//            metadata.properties = [key, value]
-//        }
-//
-//        do {
-//            let createdAt = NSAttributeDescription(name: "createdAt", type: .dateAttributeType)
-//            let level = NSAttributeDescription(name: "level", type: .stringAttributeType)
-//            let label = NSAttributeDescription(name: "label", type: .stringAttributeType)
-//            let session = NSAttributeDescription(name: "session", type: .stringAttributeType)
-//            let text = NSAttributeDescription(name: "text", type: .stringAttributeType)
-//            let metadata = NSRelationshipDescription.oneToMany(name: "metadata", entity: metadata)
-//            let file = NSAttributeDescription(name: "file", type: .stringAttributeType)
-//            let function = NSAttributeDescription(name: "function", type: .stringAttributeType)
-//            let line = NSAttributeDescription(name: "line", type: .integer32AttributeType)
-//            message.properties = [createdAt, level, label, session, text, metadata, file, function, line]
-//        }
-//
-//        model.entities = [message, metadata]
-//        return model
-//    }()
-//}
-//
-//private extension NSEntityDescription {
-//    convenience init<T>(name: String, class: T.Type) where T: NSManagedObject {
-//        self.init()
-//        self.name = name
-//        self.managedObjectClassName = T.self.description()
-//    }
-//}
-//
-//private extension NSAttributeDescription {
-//    convenience init(name: String, type: NSAttributeType) {
-//        self.init()
-//        self.name = name
-//        self.attributeType = type
-//    }
-//}
-//
-//private extension NSRelationshipDescription {
-//    static func oneToMany(name: String, deleteRule: NSDeleteRule = .cascadeDeleteRule, entity: NSEntityDescription) -> NSRelationshipDescription {
-//        let relationship =  NSRelationshipDescription()
-//        relationship.name = name
-//        relationship.deleteRule = deleteRule
-//        relationship.destinationEntity = entity
-//        relationship.maxCount = 0
-//        relationship.minCount = 0
-//        return relationship
-//    }
-//}
 //// MARK: - LoggerMessageStore (Sweep)
+#warning("TODO: reimplement")
 //
 //extension LoggerMessageStore2 {
 //    func sweep() {
@@ -164,7 +212,7 @@ public final class LoggerMessageStore2 {
 //        }
 //    }
 //}
-//
+
 //// MARK: - LoggerMessageStore (Accessing Messages)
 //
 //public extension LoggerMessageStore2 {
@@ -182,7 +230,7 @@ public final class LoggerMessageStore2 {
 //        }
 //    }
 //}
-//
+
 //// MARK: - LoggerMessageStore (Helpers)
 //
 //private extension LoggerMessageStore2 {
@@ -199,3 +247,22 @@ public final class LoggerMessageStore2 {
 //        )
 //    }
 //}
+
+
+public struct MessageItem {
+    public var id: Int
+    public var createdAt: Date
+    public var level: String
+    public var label: String
+    public var session: String
+    public var text: String
+    public var metadata: [MetadataItem]
+    public var file: String
+    public var function: String
+    public var line: Int32
+}
+
+public struct MetadataItem {
+    public var key: String
+    public var value: String
+}

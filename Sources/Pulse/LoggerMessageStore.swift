@@ -152,6 +152,7 @@ public extension LoggerMessageStore {
     /// Returns all recorded messages, least recent messages come first.
     func allMessages() throws -> [MessageEntity] {
         let request = NSFetchRequest<MessageEntity>(entityName: "MessageEntity")
+        request.relationshipKeyPathsForPrefetching = ["metadata"]
         request.sortDescriptors = [NSSortDescriptor(keyPath: \MessageEntity.createdAt, ascending: true)]
         return try container.viewContext.fetch(request)
     }

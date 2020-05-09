@@ -68,7 +68,7 @@
       <CommandLineArguments>
          <CommandLineArgument
             argument = "-com.apple.CoreData.SQLDebug 4"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
       </CommandLineArguments>
    </LaunchAction>

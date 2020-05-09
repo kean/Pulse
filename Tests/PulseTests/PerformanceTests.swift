@@ -26,11 +26,11 @@ final class PerformanceTests: XCTestCase {
         try? FileManager.default.removeItem(at: tempDirectoryURL)
     }
 
-    func xtestWriteMessages() {
+    func testWriteMessages() {
         let handler = PersistentLogHandler(label: "test-hanlder", store: store, makeCurrentDate: { Date() })
 
         measure {
-            for _ in 0..<1_000 {
+            for _ in 0..<1000 {
                 handler.log(level: .debug, message: "message", metadata: nil, file: "a", function: "b", line: 10)
             }
             flush(store: store)

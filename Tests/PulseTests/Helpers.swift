@@ -34,6 +34,17 @@ extension LoggerMessageStore {
     }
 }
 
+extension XCTestCase {
+    func flush(store: LoggerMessageStore2) {
+        #warning("TODO: reimplement")
+        let flushCompleted = expectation(description: "Flush Completed")
+        store.queue.async {
+            flushCompleted.fulfill()
+        }
+        wait(for: [flushCompleted], timeout: 10)
+    }
+}
+
 final class TempDirectory {
     let url: URL
 
