@@ -8,7 +8,7 @@ import Foundation
 import CoreData
 @testable import Pulse
 
-final class LoggerMessageStoreTests: XCTestCase {
+final class DatabaseTests: XCTestCase {
     var tempDir: TempDirectory!
 
     override func setUp() {
@@ -23,4 +23,9 @@ final class LoggerMessageStoreTests: XCTestCase {
         try! tempDir.destroy()
     }
 
+    func testInit() {
+        // WHEN/THEN
+        let url = tempDir.file(named: "temp-db")
+        XCTAssertNoThrow(try Database(url: url))
+    }
 }

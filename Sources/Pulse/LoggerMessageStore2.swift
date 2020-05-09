@@ -13,12 +13,8 @@ public final class LoggerMessageStore2 {
 
     var makeCurrentDate: () -> Date = { Date() }
 
-    private var handle: OpaquePointer { return _handle! }
-    private var _handle: OpaquePointer? = nil
-
     private let queue = DispatchQueue(label: "com.github.pulse.logger-message-store")
-
-    var error: Error?
+    private let db: Database?
 
     /// Creates a `LoggerMessageStore` persisting to an `NSPersistentContainer` with the given name.
     /// - Parameters:
@@ -47,19 +43,14 @@ public final class LoggerMessageStore2 {
     ///
     /// - warning: Make sure the directory used in storeURL exists.
     public init(storeURL: URL) {
-        #warning("TODO: connect to database")
-        let flags = SQLITE_OPEN_CREATE | SQLITE_OPEN_READWRITE | SQLITE_OPEN_FULLMUTEX
-        let status = sqlite3_open_v2(storeURL.absoluteString, &_handle, flags, nil)
-        if status != SQLITE_OK {
-            let error = Error(code: status, handle: handle)
-            self.error = error
-            debugPrint("Failed to open connection with error: \(error)")
+        do {
+            self.db = try Database(url: storeURL)
+        } catch {
+            self.db = nil
+            debugPrint("Failed to open a database at \(storeURL) with \(error)")
         }
-        scheduleSweep()
-    }
 
-    deinit {
-        sqlite3_close(handle)
+        scheduleSweep()
     }
 
     private func scheduleSweep() {
@@ -69,31 +60,6 @@ public final class LoggerMessageStore2 {
         }
     }
 }
-
-extension LoggerMessageStore2 {
-    struct Error: Swift.Error {
-        let code: Int32
-        let message: String
-
-        var localizedDescription: String {
-            return message
-        }
-
-        init(code: Int32, handle: OpaquePointer) {
-            self.code = code
-            self.message = String(cString: sqlite3_errmsg(handle))
-        }
-    }
-}
-
-// MARK: - LoggerMessageStore (Scheme)
-
-private extension LoggerMessageStore {
-    func create() {
-
-    }
-}
-
 
 //
 //// MARK: - LoggerMessageStore (NSManagedObjectModel)
