@@ -19,8 +19,6 @@ final class PerformanceTests: XCTestCase {
         storeURL = tempDirectoryURL.appendingPathComponent("performance-tests")
 
         store = LoggerMessageStore(storeURL: storeURL)
-
-        populateStore()
     }
 
     override func tearDown() {
@@ -28,15 +26,27 @@ final class PerformanceTests: XCTestCase {
         try? FileManager.default.removeItem(at: tempDirectoryURL)
     }
 
+    func xtestWriteMessages() {
+        let handler = PersistentLogHandler(label: "test-hanlder", store: store, makeCurrentDate: { Date() })
+
+        measure {
+            for _ in 0..<1_000 {
+                handler.log(level: .debug, message: "message", metadata: nil, file: "a", function: "b", line: 10)
+            }
+            flush(store: store)
+        }
+    }
+
     func xtestQueryByLevel() {
         let request = NSFetchRequest<MessageEntity>(entityName: "MessageEntity")
         request.predicate = NSPredicate(format: "level == %@", Logger.Level.info.rawValue)
 
         let moc = store.container.viewContext
+        populateStore()
 
         measure {
             let messages = (try? moc.fetch(request)) ?? []
-            XCTAssertEqual(messages.count, 20000)
+            XCTAssertEqual(messages.count, 20_000)
         }
     }
 
@@ -45,10 +55,11 @@ final class PerformanceTests: XCTestCase {
         request.predicate = NSPredicate(format: "SUBQUERY(metadata, $entry, $entry.key == %@ AND $entry.value == %@).@count > 0", "system", "auth")
 
         let moc = store.container.viewContext
+        populateStore()
 
         measure {
             let messages = (try? moc.fetch(request)) ?? []
-            XCTAssertEqual(messages.count, 10000)
+            XCTAssertEqual(messages.count, 10_000)
         }
     }
 
@@ -62,7 +73,7 @@ final class PerformanceTests: XCTestCase {
         }
 
         /// Create 60000 messages
-        for _ in 0..<10000 {
+        for _ in 0..<10_000 {
 
             addMessage {
                 $0.createdAt = Date() - 0.11

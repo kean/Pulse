@@ -14,7 +14,7 @@ extension XCTestCase {
         store.backgroundContext.perform {
             flushCompleted.fulfill()
         }
-        wait(for: [flushCompleted], timeout: 2)
+        wait(for: [flushCompleted], timeout: 10)
     }
 }
 
