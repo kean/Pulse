@@ -26,6 +26,6 @@ final class DatabaseTests: XCTestCase {
     func testInit() {
         // WHEN/THEN
         let url = tempDir.file(named: "temp-db")
-        XCTAssertNoThrow(try Database(url: url))
+        XCTAssertNoThrow(try SQLConnection(url: url))
     }
 }

@@ -92,7 +92,7 @@ public final class LoggerMessageStore2 {
 private final class LoggerMessageStoreImpl {
     var makeCurrentDate: () -> Date = { Date() }
 
-    private var db: Database
+    private var db: SQLConnection
 
     // Compiled statements.
     private var insertMessage: Statement!
@@ -100,11 +100,13 @@ private final class LoggerMessageStoreImpl {
 
     public init(storeURL: URL) throws {
         // Prefer speed over data integrity
-        self.db = try Database(url: storeURL, pragmas: [
-            "synchronous": "OFF",
-            "journal_mode": "OFF",
-            "locking_mode": "EXCLUSIVE"
-        ])
+        var options = SQLConnection.Options()
+        options.threadingMode = .multiThreaded
+
+        self.db = try SQLConnection(location: .disk(url: storeURL), options: options)
+        try db.execute("PRAGMA synchronous = OFF")
+        try db.execute("PRAGMA journal_mode = OFF")
+        try db.execute("PRAGMA locking_mode = EXCLUSIVE")
         try createTables()
     }
 
