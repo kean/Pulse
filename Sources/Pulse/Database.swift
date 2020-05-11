@@ -25,15 +25,14 @@ final class Database {
 
     // MARK: Select
 
-    func select<Output>(_ sql: String, _ parameters: [Statement.Parameter] = [], _ map: (DataRow) -> Output) throws -> [Output] {
+    func select<T>(_ sql: String, _ map: (DataRow) -> T) throws -> [T] {
         let statement = try self.statement(sql)
-        statement.bind(parameters)
-        var rows = [Output]()
-        #warning("TODO: implement error handling")
-        while sqlite3_step(statement.ref) == SQLITE_ROW {
-            rows.append(map(DataRow(ref: statement.ref)))
+        var items = [T]()
+        while try check(sqlite3_step(statement.ref)) == SQLITE_ROW {
+            let row = DataRow(ref: statement.ref)
+            items.append(map(row))
         }
-        return rows
+        return items
     }
 
     // MARK: Insert
