@@ -71,7 +71,7 @@ Share your Pulse database and view it on your Mac. Use advanced search to filter
 
 # Minimum Requirements
 
-| Nuke          | Swift           | Xcode           | Platforms                                         |
+| Pulse          | Swift           | Xcode           | Platforms                                         |
 |---------------|-----------------|-----------------|---------------------------------------------------|
 | Pulse 0.3      | Swift 5.2       | Xcode 11.3      | iOS 11.0 / watchOS 4.0 / macOS 10.13 / tvOS 11.0  |
 
