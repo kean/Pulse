@@ -94,14 +94,12 @@ private final class LoggerMessageStoreImpl {
 
     private var db: SQLConnection
 
-    // Compiled statements.
-    private var insertMessage: Statement!
-    private var insertMetadata: Statement!
+    #warning("TODO: cache SQL statements")
 
     public init(storeURL: URL) throws {
         // Prefer speed over data integrity
         var options = SQLConnection.Options()
-        options.threadingMode = .multiThreaded
+        options.threadingMode = .multithreaded
 
         self.db = try SQLConnection(location: .disk(url: storeURL), options: options)
         try db.execute("PRAGMA synchronous = OFF")
@@ -143,35 +141,28 @@ private final class LoggerMessageStoreImpl {
 //        try db.beginTransaction()
 
         for message in messages {
-            let messageId = try db.insert("""
+            try db.prepare("""
             INSERT INTO Messages
             (
                 CreatedAt, Level, Label, Session, Text, File, Function, Line
             )
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            """, [
-                .timestamp(message.createdAt),
-                .string(message.level),
-                .string(message.label),
-                .string(message.session),
-                .string(message.text),
-                .string(message.file),
-                .string(message.function),
-                .int(message.line)
-            ])
+            """)
+                .bind(message.createdAt, message.level, message.label, message.session, message.text, message.file, message.function, message.line)
+                .execute()
+
+            let messageId = db.lastInsertRowID
 
             for metadata in message.metadata {
-                try db.insert("""
+                try db.prepare("""
                 INSERT INTO Metadata
                 (
                     Key, Value, MessageId
                 )
                 VALUES (?, ?, ?)
-                """, [
-                    .string(metadata.key),
-                    .string(metadata.value),
-                    .int(Int32(messageId))
-                ])
+                """)
+                    .bind(metadata.key, metadata.value, messageId)
+                    .execute()
             }
         }
 
@@ -180,13 +171,11 @@ private final class LoggerMessageStoreImpl {
 
     /// Returns all recorded messages, least recently added messages come first.
     func allMessages() throws -> [MessageItem] {
-        let messages = try db.select("""
+        let messages = try db.prepare("""
         SELECT Id, CreatedAt, Level, Label, Session, Text, File, Function, Line
         FROM Messages
         ORDER BY CreatedAt ASC
-        """) {
-            MessageItem(id: $0[0], createdAt: $0[1], level: $0[2], label: $0[3], session: $0[4], text: $0[5], metadata: [], file: $0[6], function: $0[7], line: Int32($0[8]))
-        }
+        """).rows(MessageItem.self)
 
         #warning("TODO: optimize by indexing CreatedAt")
 
@@ -197,6 +186,21 @@ private final class LoggerMessageStoreImpl {
 //        }
 
         return messages
+    }
+}
+
+extension MessageItem: SQLRowDecodable {
+    init(row: SQLRow) throws {
+        self.id = row[0]
+        self.createdAt = row[1]
+        self.level = row[2]
+        self.label = row[3]
+        self.session = row[4]
+        self.text = row[5]
+        self.metadata = []
+        self.file = row[6]
+        self.function = row[7]
+        self.line = row[8]
     }
 }
 
