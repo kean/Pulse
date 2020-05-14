@@ -105,13 +105,11 @@ final class PersistentLogHandler2Tests: XCTestCase {
         flush(store: store)
 
         // THEN key-value metadata is stored
-
-        #warning("TODO: reimplement")
-//        let message = try XCTUnwrap(store.allMessages().first)
-//        XCTAssertEqual(message.metadata.count, 1)
-//        let entry = try XCTUnwrap(message.metadata.first)
-//        XCTAssertEqual(entry.key, "system")
-//        XCTAssertEqual(entry.value, "auth")
+        let message = try XCTUnwrap(store.allMessages().first)
+        XCTAssertEqual(message.metadata.count, 1)
+        let entry = try XCTUnwrap(message.metadata.first)
+        XCTAssertEqual(entry.key, "system")
+        XCTAssertEqual(entry.value, "auth")
     }
 
     func testStoringStringConvertibleMetadata() throws {

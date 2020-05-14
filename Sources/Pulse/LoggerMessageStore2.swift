@@ -171,19 +171,29 @@ private final class LoggerMessageStoreImpl {
 
     /// Returns all recorded messages, least recently added messages come first.
     func allMessages() throws -> [MessageItem] {
-        let messages = try db.prepare("""
+        var messages = try db.prepare("""
         SELECT Id, CreatedAt, Level, Label, Session, Text, File, Function, Line
         FROM Messages
         ORDER BY CreatedAt ASC
         """).rows(MessageItem.self)
 
-        #warning("TODO: optimize by indexing CreatedAt")
+        #warning("TODO: add indexes")
 
-        #warning("TODO: fill metadata")
-//
-//        let messages = try statement.select {
-//            MessageItem(id: $0[0], createdAt: $0[1], level: $0[2], label: $0[3], session: $0[4], text: $0[5], metadata: [], file: $0[6], function: $0[7], line: Int32($0[8]))
-//        }
+        let getMetadata = try db.prepare("""
+        SELECT Key, Value
+        FROM Metadata
+        WHERE MessageId = (?)
+        """)
+
+        for index in messages.indices {
+            messages[index].metadata = try getMetadata
+                .bind(messages[index].id)
+                .rows(MetadataItem.self)
+            try getMetadata.reset()
+        }
+
+
+        #warning("TODO: optimize by indexing CreatedAt")
 
         return messages
     }
@@ -201,6 +211,13 @@ extension MessageItem: SQLRowDecodable {
         self.file = row[6]
         self.function = row[7]
         self.line = row[8]
+    }
+}
+
+extension MetadataItem: SQLRowDecodable {
+    init(row: SQLRow) throws {
+        self.key = row[0]
+        self.value = row[1]
     }
 }
 
