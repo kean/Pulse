@@ -45,67 +45,55 @@ final class LoggerMessageStore2Tests: XCTestCase {
     // MARK: - Expiration
 
     #warning("TODO: reimplement")
-//    func testExpiredMessagesAreRemoved() throws {
-//        // GIVEN
-//        store.logsExpirationInterval = 10
-//        let date = Date()
-//        store.makeCurrentDate = { date }
-//
-//        let context = store.container.viewContext
-//
-//        do {
-//            let message = MessageEntity(context: context)
-//            message.createdAt = date.addingTimeInterval(-20)
-//            message.level = "debug"
-//            message.label = "default"
-//            message.session = "1"
-//            message.text = "message-01"
-//        }
-//        do {
-//            let message = MessageEntity(context: context)
-//            message.createdAt = date.addingTimeInterval(-5)
-//            message.level = "debug"
-//            message.label = "default"
-//            message.session = "1"
-//            message.text = "message-02"
-//        }
-//
-//        try context.save()
-//
-//        // WHEN
-//        store.sweep()
-//        flush(store: store)
-//
-//        // THEN expired message was removed
-//        let messages = try store.allMessages()
-//        XCTAssertEqual(messages.count, 1)
-//        XCTAssertEqual(messages.first?.text, "message-02")
-//    }
-//
-//    // MARK: - Migration
-//
-//    func testMigrationFromVersion0_2ToLatest() throws {
-//        // GIVEN store created with the model from Pulse 0.2
-//        let storeURL = tempDirectoryURL.appendingPathComponent("test-migration-from-0-2")
-//        try Resources.outdatedDatabase.write(to: storeURL)
-//
-//        // WHEN migrating to the store with the latest model
-//        let store = LoggerMessageStore(storeURL: storeURL)
-//
-//        // THEN automatic migration is performed and new field are populated with
-//        // empty values
-//        let messages = try store.allMessages()
-//        XCTAssertEqual(messages.count, 0, "Previously recoreded messages are going to be lost")
-//
-//        store.destroyStores()
-//    }
-//
-//    // MARK: - Remove Messages
-//
+    func testExpiredMessagesAreRemoved() throws {
+        // GIVEN
+        store.logsExpirationInterval = 10
+        let date = Date()
+        store.makeCurrentDate = { date }
+
+        try store.insert(messages: [
+            MessageItem(
+                id: 1,
+                createdAt: date.addingTimeInterval(-20),
+                level: "debug",
+                label: "default",
+                session: "1",
+                text: "message-01",
+                metadata: [],
+                file: "File",
+                function: "Function",
+                line: 10
+            ),
+            MessageItem(
+                 id: 2,
+                 createdAt: date.addingTimeInterval(-5),
+                 level: "debug",
+                 label: "default",
+                 session: "1",
+                 text: "message-02",
+                 metadata: [],
+                 file: "File",
+                 function: "Function",
+                 line: 10
+             )
+        ])
+
+
+        // WHEN
+        try store.sweep()
+
+        // THEN expired message was removed
+        let messages = try store.allMessages()
+        XCTAssertEqual(messages.count, 1)
+        XCTAssertEqual(messages.first?.id, 2)
+        XCTAssertEqual(messages.first?.text, "message-02")
+    }
+
+    // MARK: - Remove Messages
+
 //    func testRemoveAllMessages() throws {
 //        // GIVEN
 //        try store.populate()
-//        let context = store.container.viewContext
 //        XCTAssertEqual(try context.fetch(MessageEntity.fetchRequest()).count, 1)
 //        XCTAssertEqual(try context.fetch(MetadataEntity.fetchRequest()).count, 1)
 //

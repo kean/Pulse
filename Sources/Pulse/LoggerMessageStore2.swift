@@ -55,7 +55,7 @@ public final class LoggerMessageStore2 {
     }
 
     private func scheduleSweep() {
-        DispatchQueue.global().asyncAfter(deadline: .now() + .seconds(10)) { [weak self] in
+        queue.asyncAfter(deadline: .now() + .seconds(10)) { [weak self] in
             try? self?.sweep()
         }
     }
@@ -67,11 +67,11 @@ public final class LoggerMessageStore2 {
 
     func store(message: MessageItem) {
         #warning("TEMP")
-//        queue.async {
+        queue.async {
             do {
                 #warning("TODO: dump every 1 second")
                 self.buffer.append(message)
-//                if self.buffer.count == 1000 {
+                //                if self.buffer.count == 1000 {
                 try self.impl?.insert(messages: self.buffer)
                 self.buffer = []
                 //                }
@@ -80,7 +80,7 @@ public final class LoggerMessageStore2 {
                 self.isInsertErrorReported = true
                 debugPrint("Failed to log message with error \(error)")
             }
-//        }
+        }
     }
 
     func insert(messages: [MessageItem]) throws {
