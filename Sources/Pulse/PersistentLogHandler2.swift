@@ -73,7 +73,7 @@ extension PersistentLogHandler2: LogHandler {
             line: Int32(line)
         )
         
-        self.store.insert(message: item)
+        self.store.store(message: item)
     }
 }
 

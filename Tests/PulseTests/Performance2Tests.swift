@@ -38,7 +38,7 @@ final class Performance2Tests: XCTestCase {
     }
 
     func testReadAllMessages() throws {
-        
+
     }
 
     #warning("TODO: reimplement")

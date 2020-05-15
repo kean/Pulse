@@ -56,27 +56,35 @@ public final class LoggerMessageStore2 {
 
     private func scheduleSweep() {
         DispatchQueue.global().asyncAfter(deadline: .now() + .seconds(10)) { [weak self] in
-            #warning("TODO: implement")
-//            self?.sweep()
+            try? self?.sweep()
         }
     }
 
-    func insert(message: MessageItem) {
+    func sweep() throws {
+        let dateTo = makeCurrentDate().addingTimeInterval(-logsExpirationInterval)
+        try impl?.sweep(dateTo: dateTo)
+    }
+
+    func store(message: MessageItem) {
         #warning("TEMP")
 //        queue.async {
             do {
                 #warning("TODO: dump every 1 second")
                 self.buffer.append(message)
 //                if self.buffer.count == 1000 {
-                    try self.impl?.insert(messages: self.buffer)
-                    self.buffer = []
-//                }
+                try self.impl?.insert(messages: self.buffer)
+                self.buffer = []
+                //                }
             } catch {
                 guard !self.isInsertErrorReported else { return }
                 self.isInsertErrorReported = true
                 debugPrint("Failed to log message with error \(error)")
             }
 //        }
+    }
+
+    func insert(messages: [MessageItem]) throws {
+        try impl?.insert(messages: messages)
     }
 
     func allMessages() throws -> [MessageItem] {
@@ -87,12 +95,17 @@ public final class LoggerMessageStore2 {
             return []
         }
     }
+
+    #warning("TODO: make public?")
+    func close() {
+        try? impl?.db.close()
+    }
 }
 
 private final class LoggerMessageStoreImpl {
     var makeCurrentDate: () -> Date = { Date() }
 
-    private var db: SQLConnection
+    var db: SQLConnection
 
     #warning("TODO: cache SQL statements")
 
@@ -111,7 +124,7 @@ private final class LoggerMessageStoreImpl {
     private func createTables() throws {
         // TODO: replace Session VARCHAR with primary key
         try db.execute("""
-        CREATE TABLE Messages
+        CREATE TABLE IF NOT EXISTS Messages
         (
             Id INTEGER PRIMARY KEY NOT NULL,
             CreatedAt DOUBLE,
@@ -126,7 +139,7 @@ private final class LoggerMessageStoreImpl {
         """)
 
         try db.execute("""
-        CREATE TABLE Metadata
+        CREATE TABLE IF NOT EXISTS Metadata
         (
             Id INTEGER PRIMARY KEY NOT NULL,
             Key VARCHAR,
@@ -192,12 +205,31 @@ private final class LoggerMessageStoreImpl {
             try getMetadata.reset()
         }
 
-
-        #warning("TODO: optimize by indexing CreatedAt")
-
         return messages
     }
+
+    #warning("TODO: move to a background queue")
+    func sweep(dateTo: Date) throws {
+        try db.prepare("""
+        DELETE FROM Messages
+        WHERE createdAt < (?)
+        """)
+            .bind(dateTo)
+            .execute()
+    }
+
+    #warning("TODO: reimplement")
+    /// Returns all recorded messages, least recent messages come first.
+
+    /// Removes all of the previously recorded messages.
+//    func removeAllMessages() {
+//        backgroundContext.perform {
+//            try? self.deleteMessages(fetchRequest: MessageEntity.fetchRequest())
+//        }
+//    }
 }
+
+// MARK: - Rows
 
 extension MessageItem: SQLRowDecodable {
     init(row: SQLRow) throws {
@@ -220,57 +252,6 @@ extension MetadataItem: SQLRowDecodable {
         self.value = row[1]
     }
 }
-
-//// MARK: - LoggerMessageStore (Sweep)
-#warning("TODO: reimplement")
-//
-//extension LoggerMessageStore2 {
-//    func sweep() {
-//        let expirationInterval = logsExpirationInterval
-//        backgroundContext.perform {
-//            let request = NSFetchRequest<NSFetchRequestResult>(entityName: "MessageEntity")
-//            let dateTo = self.makeCurrentDate().addingTimeInterval(-expirationInterval)
-//            request.predicate = NSPredicate(format: "createdAt < %@", dateTo as NSDate)
-//            try? self.deleteMessages(fetchRequest: request)
-//        }
-//    }
-//}
-
-//// MARK: - LoggerMessageStore (Accessing Messages)
-//
-//public extension LoggerMessageStore2 {
-//    /// Returns all recorded messages, least recent messages come first.
-//    func allMessages() throws -> [MessageEntity] {
-//        let request = NSFetchRequest<MessageEntity>(entityName: "MessageEntity")
-//        request.sortDescriptors = [NSSortDescriptor(keyPath: \MessageEntity.createdAt, ascending: true)]
-//        return try container.viewContext.fetch(request)
-//    }
-//
-//    /// Removes all of the previously recorded messages.
-//    func removeAllMessages() {
-//        backgroundContext.perform {
-//            try? self.deleteMessages(fetchRequest: MessageEntity.fetchRequest())
-//        }
-//    }
-//}
-
-//// MARK: - LoggerMessageStore (Helpers)
-//
-//private extension LoggerMessageStore2 {
-//    func deleteMessages(fetchRequest: NSFetchRequest<NSFetchRequestResult>) throws {
-//        let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
-//        deleteRequest.resultType = .resultTypeObjectIDs
-//
-//        let result = try backgroundContext.execute(deleteRequest) as? NSBatchDeleteResult
-//        guard let ids = result?.result as? [NSManagedObjectID] else { return }
-//
-//        NSManagedObjectContext.mergeChanges(
-//            fromRemoteContextSave: [NSDeletedObjectsKey: ids],
-//            into: [backgroundContext, container.viewContext]
-//        )
-//    }
-//}
-
 
 public struct MessageItem {
     public var id: Int

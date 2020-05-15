@@ -5,13 +5,6 @@
 import CoreData
 import SQLite3
 
-// The MIT License (MIT)
-//
-// Copyright (c) 2020 Alexander Grebenyuk (github.com/kean).
-
-import Foundation
-import SQLite3
-
 /// A database connection.
 ///
 /// When deallocated, the connection gets closed automatically.
