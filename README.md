@@ -50,7 +50,7 @@ let container = logger.store.container
 
 <br/>
 
-# PulseUI
+# [PulseUI](https://github.com/kean/PulseUI)
 
 **PulseUI** allows you to quickly preview logs in your iOS or tvOS apps. Share logs, and use Pulse macOS app to search and filter them. **PulseUI** is available for [**GitHub sponsors**](https://github.com/sponsors/kean).
 
