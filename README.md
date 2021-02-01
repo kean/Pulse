@@ -1,4 +1,4 @@
-![pulse-small](https://user-images.githubusercontent.com/1567433/80981674-4b1fc300-8df8-11ea-9732-94388f0473ae.jpg)
+![pulse-small](https://user-images.githubusercontent.com/1567433/106415109-46864a80-641c-11eb-9a1f-10f06a35eb1e.png)
 
 <p align="left">
 <img src="https://img.shields.io/badge/platforms-iOS%2C%20macOS%2C%20watchOS%2C%20tvOS-lightgrey.svg">
@@ -7,7 +7,9 @@
 
 **Pulse** is a logging system with structured persistent storage.
 
-**PulseUI** allows you to quickly preview logs in your iOS or tvOS apps. Share logs, and use Pulse macOS app to search and filter them. **PulseUI** is available for [**GitHub sponsors**](https://github.com/sponsors/kean).
+**PulseUI** allows you to quickly preview logs in your iOS or tvOS apps. Share logs, and use Pulse macOS app to search and filter them. Inspect all of your app's network traffic. **PulseUI** is available for [**GitHub sponsors**](https://github.com/sponsors/kean).
+
+### To learn more about Pulse, see the [introductory post](https://kean.blog/post/pulse).
 
 <br/>
 
@@ -58,7 +60,7 @@ let container = logger.store.container
 
 Build a console right into your iOS apps.
 
-<img width="320" alt="Screen Shot 2020-05-04 at 13 50 26" src="https://user-images.githubusercontent.com/1567433/80996719-4960fa00-8e0e-11ea-909a-9ff80f49382e.png"> <img width="320" alt="Screen Shot 2020-05-04 at 10 43 28" src="https://user-images.githubusercontent.com/1567433/80979399-49083500-8df5-11ea-8313-54841b86777c.png">
+<img width="320" alt="Screen Shot 2020-05-04 at 13 50 26" src="https://user-images.githubusercontent.com/1567433/80996719-4960fa00-8e0e-11ea-909a-9ff80f49382e.png"> <img width="320" alt="Screen Shot 2020-05-04 at 10 43 28" src="https://user-images.githubusercontent.com/1567433/106415190-703f7180-641c-11eb-8f0a-2cc2ec189f79.png">
 
 <br/>
 
@@ -66,7 +68,7 @@ Build a console right into your iOS apps.
 
 Share your Pulse database and view it on your Mac. Use advanced search to filter your messages.
 
-<img width="706" alt="Screen Shot 2020-05-05 at 10 47 53" src="https://user-images.githubusercontent.com/1567433/81079719-e4fd7380-8ebd-11ea-89f6-4913528c1738.png">
+<img width="706" alt="Screen Shot 2020-05-05 at 10 47 53" src="https://user-images.githubusercontent.com/1567433/106415161-63bb1900-641c-11eb-9eb4-61949f8c2038.png">
 
 
 # Minimum Requirements
