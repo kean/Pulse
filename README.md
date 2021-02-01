@@ -7,7 +7,7 @@
 
 **Pulse** is a logging system with structured persistent storage.
 
-**PulseUI** allows you to quickly preview logs in your iOS or tvOS apps. Share logs, and use Pulse macOS app to search and filter them. Inspect all of your app's network traffic. **PulseUI** is available for [**GitHub sponsors**](https://github.com/sponsors/kean).
+**PulseUI** allows you to quickly preview logs in your iOS or tvOS apps. Share logs, and use Pulse macOS app to search and filter them. Inspect all of your app's network traffic. **PulseUI** is available for [**GitHub sponsors**](https://github.com/sponsors/kean) and will be open sourced when there are enough sponsors behind it.
 
 ### To learn more about Pulse, see the [introductory post](https://kean.blog/post/pulse) and see [a demo](https://www.youtube.com/watch?v=17oQ9MF8Pq8).
 
