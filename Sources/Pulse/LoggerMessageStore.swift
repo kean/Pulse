@@ -123,7 +123,7 @@ private extension NSAttributeDescription {
 
 private extension NSRelationshipDescription {
     static func oneToMany(name: String, deleteRule: NSDeleteRule = .cascadeDeleteRule, entity: NSEntityDescription) -> NSRelationshipDescription {
-        let relationship =  NSRelationshipDescription()
+        let relationship = NSRelationshipDescription()
         relationship.name = name
         relationship.deleteRule = deleteRule
         relationship.destinationEntity = entity
