@@ -1,5 +1,11 @@
 # Pulse 0.x
 
+## Pulse 0.5.0
+
+*Feb 4, 2021*
+
+- Add support for "networkEventCreatedAt" metadata values (network logger specific)
+
 ## Pulse 0.4.0
 
 *May 7, 2020*
