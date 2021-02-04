@@ -146,6 +146,25 @@ final class PersistentLogHandlerTests: XCTestCase {
         XCTAssertEqual(entry.key, "system")
         XCTAssertEqual(entry.value, "auth")
     }
+
+
+    func testOverridingCreatedAtDateFromNetworkLogger() throws {
+        // GIVEN
+        let eventDate = Date()
+        let sut = PersistentLogHandler(label: "network-logger", store: self.store, makeCurrentDate: { eventDate + 60 })
+
+        // WHEN
+        sut.log(level: .debug, message: "request failed", metadata: ["networkEventCreatedAt": .stringConvertible(eventDate)])
+        flush(store: store)
+
+        // THEN "networkEventCreatedAt" is used as "createdAt"
+        let message = try XCTUnwrap(store.allMessages().first)
+        XCTAssertEqual(message.createdAt, eventDate)
+        XCTAssertNotEqual(message.createdAt, eventDate + 60)
+
+        // THEN metadata is not stored
+        XCTAssertTrue(message.metadata.isEmpty)
+    }
 }
 
 extension LogHandler {
