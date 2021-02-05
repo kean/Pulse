@@ -11,6 +11,8 @@
 
 ### To learn more about Pulse, see the [introductory post](https://kean.blog/post/pulse) and see [a demo](https://www.youtube.com/watch?v=17oQ9MF8Pq8).
 
+> Please note that this is *not* a network debugging tool like Proxyman, Charles, or Wireshark. It *won't* automatically intercept all network traffic coming from your app or device. It *will* allow you to log and inspect requests that your app makes using `URLSession`, `Alamofire`.
+
 <br/>
 
 # Usage
