@@ -68,7 +68,7 @@ Build a console right into your iOS apps.
 
 Share your Pulse database and view it on your Mac. Use advanced search to filter your messages.
 
-<img width="706" alt="Screen Shot 2020-05-05 at 10 47 53" src="https://user-images.githubusercontent.com/1567433/106981977-13e89480-6731-11eb-9687-5454958d5230.png">
+<img width="706" alt="Screen Shot 2020-05-05 at 10 47 53" src="https://user-images.githubusercontent.com/1567433/106982302-d0daf100-6731-11eb-83f7-8e483c65745d.png">
 
 
 # Minimum Requirements
