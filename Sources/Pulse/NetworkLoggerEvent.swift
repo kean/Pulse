@@ -72,7 +72,7 @@ public struct NetworkLoggerRequest: Codable {
         self.cachePolicy = urlRequest.cachePolicy.rawValue
         self.timeoutInterval = urlRequest.timeoutInterval
         self.allowsCellularAccess = urlRequest.allowsCellularAccess
-        if #available(iOS 13.0, *) {
+        if #available(iOS 13.0, OSX 10.15, tvOS 13.0, watchOS 6.0, *) {
             self.allowsExpensiveNetworkAccess = urlRequest.allowsExpensiveNetworkAccess
             self.allowsConstrainedNetworkAccess = urlRequest.allowsConstrainedNetworkAccess
         } else {
@@ -184,7 +184,7 @@ public struct NetworkLoggerTransactionDetailedMetrics: Codable {
     public let negotiatedTLSCipherSuite: UInt16?
 
     public init?(metrics: URLSessionTaskTransactionMetrics) {
-        if #available(iOS 13.0, *) {
+        if #available(iOS 13.0, OSX 10.15, tvOS 13.0, watchOS 6.0, *) {
             self.countOfRequestHeaderBytesSent = metrics.countOfRequestHeaderBytesSent
             self.countOfRequestBodyBytesSent = metrics.countOfRequestBodyBytesSent
             self.countOfRequestBodyBytesBeforeEncoding = metrics.countOfRequestBodyBytesBeforeEncoding
@@ -215,7 +215,7 @@ public enum NetworkLoggerTaskType: String, Codable {
     case webSocketTask
 
     public init(task: URLSessionTask) {
-        if #available(iOS 13.0, *) {
+        if #available(iOS 13.0, OSX 10.15, tvOS 13.0, watchOS 6.0, *) {
             if task is URLSessionWebSocketTask {
                 self = .webSocketTask
                 return
