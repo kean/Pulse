@@ -1,5 +1,9 @@
 # Pulse 0.x
 
+## Pulse 0.6.0
+
+- Add `NetworkLogger` along with the related types (`NetworkLoggerEvent`, `BlobStore`, etc)
+
 ## Pulse 0.5.0
 
 *Feb 4, 2021*
