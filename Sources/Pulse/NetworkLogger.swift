@@ -126,12 +126,11 @@ public final class NetworkLogger: NSObject {
     }
 
     public func logTask(_ task: URLSessionTask, didFinishCollecting metrics: URLSessionTaskMetrics) {
-        queue.async { self._logTask(task, didFinishCollecting: metrics) }
+        queue.async { self.tasks[task]?.metrics = NetworkLoggerMetrics(metrics: metrics) }
     }
 
-    private func _logTask(_ task: URLSessionTask, didFinishCollecting metrics: URLSessionTaskMetrics) {
-        guard let context = tasks[task] else { return }
-        context.metrics = NetworkLoggerMetrics(metrics: metrics)
+    public func logTask(_ task: URLSessionTask, didFinishCollecting metrics: NetworkLoggerMetrics) {
+        queue.async { self.tasks[task]?.metrics = metrics }
     }
 
     // MARK: - Private
@@ -162,12 +161,6 @@ public final class NetworkLogger: NSObject {
             NetworkLoggerMetadataKey.payload.rawValue: .string(encode(payload) ?? ""),
             NetworkLoggerMetadataKey.createdAt: .stringConvertible(date)
         ]
-    }
-
-    func testInjectMetrics(_ metrics: NetworkLoggerMetrics, for task: URLSessionTask) {
-        queue.async {
-            self.tasks[task]?.metrics = metrics
-        }
     }
 }
 
