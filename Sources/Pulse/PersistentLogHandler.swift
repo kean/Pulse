@@ -54,7 +54,7 @@ extension PersistentLogHandler: LogHandler {
     public func log(level: Logger.Level, message: Logger.Message, metadata: Logger.Metadata?, file: String, function: String, line: UInt) {
         let context = store.backgroundContext
         let date: Date
-        if let metadata = metadata, case let .stringConvertible(value)? = metadata["networkEventCreatedAt"], let customDate = value as? Date {
+        if let metadata = metadata, case let .stringConvertible(value)? = metadata[NetworkLoggerMetadataKey.createdAt], let customDate = value as? Date {
             date = customDate
         } else {
             date = makeCurrentDate()
@@ -70,7 +70,7 @@ extension PersistentLogHandler: LogHandler {
             entity.text = String(describing: message)
             if let entries = metadata?.unpack(), !entries.isEmpty {
                 entity.metadata = Set(entries.compactMap { key, value in
-                    guard key != "networkEventCreatedAt" else { return nil }
+                    guard key != NetworkLoggerMetadataKey.createdAt else { return nil }
                     let entity = MetadataEntity(context: context)
                     entity.key = key
                     entity.value = value
