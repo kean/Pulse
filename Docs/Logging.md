@@ -11,11 +11,10 @@ Pulse is designed to be as least intrusive as possible. It doesn't use swizzling
 
 ## 1. Logging System Bootstrap
 
-The primary component that you will use to log network requests is `NetworkLogger` which is part of `PulseUI` framework. It's easy to setup.
+The primary component that you will use to log network requests is `NetworkLogger`. It's easy to setup.
 
 ```swift
 import Pulse
-import PulseUI
 import Logging
 
 // 1. Setup the logging system to use Pulse.PersistentLogHandler
@@ -47,7 +46,7 @@ let urlSession = URLSession(configuration: .default, delegate: URLSessionProxyDe
 
 ### 2.2. Alamofire Integration
 
-While you can use `PulseUI.URLSessionProxyDelegate`, the recommended approach is to use `Alamofire.EventMonitor`.
+While you can use `URLSessionProxyDelegate`, the recommended approach is to use `Alamofire.EventMonitor`.
 
 ```swift
 import Alamofire
