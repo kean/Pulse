@@ -184,25 +184,26 @@ public struct NetworkLoggerTransactionDetailedMetrics: Codable {
     public let negotiatedTLSCipherSuite: UInt16?
 
     public init?(metrics: URLSessionTaskTransactionMetrics) {
-        guard #available(iOS 13.0, *) else {
+        if #available(iOS 13.0, *) {
+            self.countOfRequestHeaderBytesSent = metrics.countOfRequestHeaderBytesSent
+            self.countOfRequestBodyBytesSent = metrics.countOfRequestBodyBytesSent
+            self.countOfRequestBodyBytesBeforeEncoding = metrics.countOfRequestBodyBytesBeforeEncoding
+            self.countOfResponseHeaderBytesReceived = metrics.countOfResponseHeaderBytesReceived
+            self.countOfResponseBodyBytesReceived = metrics.countOfResponseBodyBytesReceived
+            self.countOfResponseBodyBytesAfterDecoding = metrics.countOfResponseBodyBytesAfterDecoding
+            self.localAddress = metrics.localAddress
+            self.remoteAddress = metrics.remoteAddress
+            self.isCellular = metrics.isCellular
+            self.isExpensive = metrics.isExpensive
+            self.isConstrained = metrics.isConstrained
+            self.isMultipath = metrics.isMultipath
+            self.localPort = metrics.localPort
+            self.remotePort = metrics.remotePort
+            self.negotiatedTLSProtocolVersion = metrics.negotiatedTLSProtocolVersion?.rawValue
+            self.negotiatedTLSCipherSuite = metrics.negotiatedTLSCipherSuite?.rawValue
+        } else {
             return nil
         }
-        self.countOfRequestHeaderBytesSent = metrics.countOfRequestHeaderBytesSent
-        self.countOfRequestBodyBytesSent = metrics.countOfRequestBodyBytesSent
-        self.countOfRequestBodyBytesBeforeEncoding = metrics.countOfRequestBodyBytesBeforeEncoding
-        self.countOfResponseHeaderBytesReceived = metrics.countOfResponseHeaderBytesReceived
-        self.countOfResponseBodyBytesReceived = metrics.countOfResponseBodyBytesReceived
-        self.countOfResponseBodyBytesAfterDecoding = metrics.countOfResponseBodyBytesAfterDecoding
-        self.localAddress = metrics.localAddress
-        self.remoteAddress = metrics.remoteAddress
-        self.isCellular = metrics.isCellular
-        self.isExpensive = metrics.isExpensive
-        self.isConstrained = metrics.isConstrained
-        self.isMultipath = metrics.isMultipath
-        self.localPort = metrics.localPort
-        self.remotePort = metrics.remotePort
-        self.negotiatedTLSProtocolVersion = metrics.negotiatedTLSProtocolVersion?.rawValue
-        self.negotiatedTLSCipherSuite = metrics.negotiatedTLSCipherSuite?.rawValue
     }
 }
 
