@@ -65,7 +65,7 @@ public struct NetworkLoggerRequest: Codable {
     public let httpShouldHandleCookies: Bool
     public let httpShouldUsePipelining: Bool
 
-    init(urlRequest: URLRequest) {
+    public init(urlRequest: URLRequest) {
         self.url = urlRequest.url
         self.httpMethod = urlRequest.httpMethod
         self.headers = urlRequest.allHTTPHeaderFields ?? [:]
@@ -88,7 +88,7 @@ public struct NetworkLoggerResponse: Codable {
     public let statusCode: Int?
     public let headers: [String: String]
 
-    init(urlResponse: URLResponse) {
+    public init(urlResponse: URLResponse) {
         let httpResponse = urlResponse as? HTTPURLResponse
         self.statusCode = httpResponse?.statusCode
         self.headers = httpResponse?.allHeaderFields as? [String: String] ?? [:]
@@ -100,7 +100,7 @@ public struct NetworkLoggerError: Codable {
     public let domain: String
     public let localizedDescription: String
 
-    init(error: Error) {
+    public init(error: Error) {
         let error = error as NSError
         self.code = error.code
         self.domain = error.domain
@@ -113,7 +113,7 @@ public struct NetworkLoggerMetrics: Codable {
     public let redirectCount: Int
     public let transactions: [NetworkLoggerTransactionMetrics]
 
-    init(metrics: URLSessionTaskMetrics) {
+    public init(metrics: URLSessionTaskMetrics) {
         self.taskInterval = metrics.taskInterval
         self.redirectCount = metrics.redirectCount
         self.transactions = metrics.transactionMetrics.map(NetworkLoggerTransactionMetrics.init)
@@ -213,7 +213,7 @@ public enum NetworkLoggerTaskType: String, Codable {
     case streamTask
     case webSocketTask
 
-    init(task: URLSessionTask) {
+    public init(task: URLSessionTask) {
         if #available(iOS 13.0, *) {
             if task is URLSessionWebSocketTask {
                 self = .webSocketTask
