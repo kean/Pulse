@@ -39,6 +39,11 @@ let logger = Logger(label: "com.yourcompany.yourapp")
 logger.info("This message will be stored persistently")
 ```
 
+## Logging Network Request
+
+Pulse supports logging [`URLSession`](https://developer.apple.com/documentation/foundation/urlsession) tasks and offers a simple [Alamofire](https://github.com/Alamofire/Alamofire) integration. For more information, please follow the [dedicated guide](https://github.com/kean/Pulse/blob/0.6.0/Docs/Logging.md).  
+
+
 #### Storage
 
 All logged messages are stored persistently using Core Data, including metadata and other information. You get full access to all of the recorded messages at any time using `LoggerMessageStore`.
