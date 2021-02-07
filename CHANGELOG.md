@@ -2,9 +2,13 @@
 
 ## Pulse 0.6.1
 
+*Feb 7, 2021*
+
 - `NetworkLogger` no longer saves `.trace` events by default 
 
 ## Pulse 0.6.0
+
+*Feb 5, 2021*
 
 - Add `NetworkLogger` along with the related types (`NetworkLoggerEvent`, `BlobStore`, etc)
 
