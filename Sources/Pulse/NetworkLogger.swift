@@ -23,7 +23,7 @@ public final class NetworkLogger: NSObject {
 
     public static func makeDefaultLogger() -> Logger {
         var logger = Logger(label: "network")
-        logger.logLevel = .trace
+        logger.logLevel = .debug
         return logger
     }
 
@@ -43,8 +43,8 @@ public final class NetworkLogger: NSObject {
         let event = NetworkLoggerEvent.TaskDidStart(request: request)
 
         logger.log(
-            level: .trace,
-            "Did start request \(task.originalRequest?.url?.absoluteString ?? "null")",
+            level: .debug,
+            "Send \(urlRequest.httpMethod ?? "–") \(task.originalRequest?.url?.absoluteString ?? "–")",
             metadata: makeMetadata(context, task, .taskDidStart, event, date)
         )
     }
