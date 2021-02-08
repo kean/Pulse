@@ -1,4 +1,4 @@
-![pulse-small](https://user-images.githubusercontent.com/1567433/106982746-a6d5fe80-6732-11eb-8202-796d8e62db13.png)
+# Pulse
 
 <p align="left">
 <img src="https://img.shields.io/badge/platforms-iOS%2C%20macOS%2C%20watchOS%2C%20tvOS-lightgrey.svg">
@@ -9,11 +9,14 @@
 
 **PulseUI** allows you to quickly preview logs in your iOS or tvOS apps. Share logs, and use Pulse macOS app to search and filter them. Inspect your app's network traffic. **PulseUI** is available for [**GitHub sponsors**](https://github.com/sponsors/kean) and will be open sourced when there are enough sponsors behind it.
 
-### To learn more about Pulse, see the [introductory post](https://kean.blog/post/pulse) and see [a demo](https://www.youtube.com/watch?v=17oQ9MF8Pq8).
-
-> Please note that this is *not* a network debugging tool like Proxyman, Charles, or Wireshark. It *won't* automatically intercept all network traffic coming from your app or device. It *will* allow you to log and inspect requests that your app makes using `URLSession`, `Alamofire`.
+> Please note that this is *not* a network debugging tool like Proxyman, Charles, or Wireshark. It *won't* automatically intercept all network traffic coming from your app or device. It *will* allow you to log and inspect requests that your app makes using `URLSession`, `Alamofire`. To learn more about Pulse, see the [introductory post](https://kean.blog/post/pulse).
 
 <br/>
+
+![pulse-01-console](https://user-images.githubusercontent.com/1567433/107172232-cec39d00-6992-11eb-8011-9053d0891ab8.png)
+![pulse-02-inspector](https://user-images.githubusercontent.com/1567433/107172234-cf5c3380-6992-11eb-89a5-b77a78c09ec4.png)
+![pulse-03-share](https://user-images.githubusercontent.com/1567433/107172237-cf5c3380-6992-11eb-8459-83be62c16be0.png)
+![pulse-04-platforms](https://user-images.githubusercontent.com/1567433/107172238-cff4ca00-6992-11eb-81d9-0546814f5636.png)
 
 # Usage
 
