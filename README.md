@@ -65,21 +65,13 @@ let container = logger.store.container
 
 **PulseUI** allows you to quickly preview logs in your iOS or tvOS apps. Share logs, and use Pulse macOS app to search and filter them. **PulseUI** is available for [**GitHub sponsors**](https://github.com/sponsors/kean).
 
-<br/>
-
 ### iOS Console
 
 Build a console right into your iOS apps.
 
-<img width="320" alt="Screen Shot 2020-05-04 at 13 50 26" src="https://user-images.githubusercontent.com/1567433/106993151-19050e00-6748-11eb-8135-cfd505f9625d.png"> <img width="320" alt="Screen Shot 2020-05-04 at 10 43 28" src="https://user-images.githubusercontent.com/1567433/106415190-703f7180-641c-11eb-8f0a-2cc2ec189f79.png">
-
-<br/>
-
 ### macOS App
 
 Share your Pulse database and view it on your Mac. Use advanced search to filter your messages.
-
-<img width="706" alt="Screen Shot 2020-05-05 at 10 47 53" src="https://user-images.githubusercontent.com/1567433/106982302-d0daf100-6731-11eb-83f7-8e483c65745d.png">
 
 
 # Minimum Requirements
