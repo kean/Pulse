@@ -13,7 +13,7 @@
 
 <br/>
 
-![pulse-01-console](https://user-images.githubusercontent.com/1567433/107172232-cec39d00-6992-11eb-8011-9053d0891ab8.png)
+![pulse-01-console](https://user-images.githubusercontent.com/1567433/107236825-129abe80-69f4-11eb-976a-4b5bc9dc383d.png)
 
 <br/>
 
