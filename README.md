@@ -7,7 +7,7 @@
 
 <hr/>
 
-**Pulse** is a structured logging system. Record and inspect network requests and other logs right from your iOS app using Pulse Console. Share logs and view them on Pulse macOS app.
+**Pulse** is a structured logging system. Record and inspect network requests and other logs right from your iOS app using Pulse Console. Share logs and view them in the Pulse macOS app. Logs are recoded locally and never leave your device.
 
 > **PulseUI** is available for [**GitHub sponsors**](https://github.com/sponsors/kean) and will be available for free when the target number of sponsors is reached.
 
