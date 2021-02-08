@@ -25,7 +25,7 @@
 
 <br/>
 
-![pulse-04-platforms](https://user-images.githubusercontent.com/1567433/107172238-cff4ca00-6992-11eb-81d9-0546814f5636.png)
+![pulse-04-platforms](https://user-images.githubusercontent.com/1567433/107236017-475a4600-69f3-11eb-82d2-a0e11b760dd6.png)
 
 # About
 
