@@ -7,11 +7,9 @@
 
 <hr/>
 
-**Pulse** is a logging system with structured persistent storage.
+**Pulse** is a structured logging system. Record and inspect network requests and other logs right from your iOS app using Pulse Console. Share logs and view them on Pulse macOS app.
 
-**PulseUI** allows you to quickly preview logs in your iOS or tvOS apps. Share logs, and use Pulse macOS app to search and filter them. Inspect your app's network traffic. **PulseUI** is available for [**GitHub sponsors**](https://github.com/sponsors/kean) and will be open sourced when there are enough sponsors behind it.
-
-> Please note that this is *not* a network debugging tool like Proxyman, Charles, or Wireshark. It *won't* automatically intercept all network traffic coming from your app or device. It *will* allow you to log and inspect requests that your app makes using `URLSession`, `Alamofire`. To learn more about Pulse, see the [introductory post](https://kean.blog/post/pulse).
+> **PulseUI** is available for [**GitHub sponsors**](https://github.com/sponsors/kean) and will be available for free when the target number of sponsors is reached.
 
 <br/>
 
@@ -28,6 +26,14 @@
 <br/>
 
 ![pulse-04-platforms](https://user-images.githubusercontent.com/1567433/107172238-cff4ca00-6992-11eb-81d9-0546814f5636.png)
+
+# About
+
+Pulse **is not** a network debugging proxy tool like Proxyman, Charles, or Wireshark. It *won't* automatically intercept all network traffic coming from your app or device. 
+
+Pulse **is** an iOS-first framework you integrate it into your app. It can record events from `URLSession` or from frameworks that use it, such as `Alamofire` You can either record the events manually or by using convenience `URLSessionProxyDelegate`.
+
+The main advantages of Pulse it is integrated directly into your app and is always recording (when your code tells it to) and is available for everyone who uses the build. You or your QA team can view the logs on the device and easily share them and attach to your tickets. The logs never leave the device.
 
 # Usage
 
