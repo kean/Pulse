@@ -1,9 +1,11 @@
-# Pulse
+<img width="309" alt="Untitled-3" src="https://user-images.githubusercontent.com/1567433/107172577-b1430300-6993-11eb-939c-18620c00e2a1.png">
 
 <p align="left">
 <img src="https://img.shields.io/badge/platforms-iOS%2C%20macOS%2C%20watchOS%2C%20tvOS-lightgrey.svg">
 <img src="https://github.com/kean/Pulse/workflows/CI/badge.svg">
 </p>
+
+<hr/>
 
 **Pulse** is a logging system with structured persistent storage.
 
