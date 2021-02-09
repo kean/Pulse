@@ -6,6 +6,7 @@ import CoreData
 import XCTest
 import Logging
 @testable import Pulse
+@testable import PulseCore
 
 final class PerformanceTests: XCTestCase {
     var tempDirectoryURL: URL!
@@ -68,7 +69,7 @@ final class PerformanceTests: XCTestCase {
                 $0.createdAt = Date() - 0.11
                 $0.level = Logger.Level.info.rawValue
                 $0.label = "application"
-                $0.session = PersistentLogHandler.logSessionId.uuidString
+                $0.session = LoggerSession.current.id.uuidString
                 $0.text = "UIApplication.didFinishLaunching"
                 $0.metadata = [
                     {
@@ -84,7 +85,7 @@ final class PerformanceTests: XCTestCase {
                 $0.createdAt = Date() - 0.1
                 $0.level = Logger.Level.info.rawValue
                 $0.label = "application"
-                $0.session = PersistentLogHandler.logSessionId.uuidString
+                $0.session = LoggerSession.current.id.uuidString
                 $0.text = "UIApplication.willEnterForeground"
             }
 
@@ -92,7 +93,7 @@ final class PerformanceTests: XCTestCase {
                 $0.createdAt = Date() - 0.07
                 $0.level = Logger.Level.debug.rawValue
                 $0.label = "auth"
-                $0.session = PersistentLogHandler.logSessionId.uuidString
+                $0.session = LoggerSession.current.id.uuidString
                 $0.text = "🌐 Will authorize user with name \"kean@github.com\""
                 $0.metadata = [
                     {
@@ -108,7 +109,7 @@ final class PerformanceTests: XCTestCase {
                 $0.createdAt = Date() - 0.05
                 $0.level = Logger.Level.warning.rawValue
                 $0.label = "auth"
-                $0.session = PersistentLogHandler.logSessionId.uuidString
+                $0.session = LoggerSession.current.id.uuidString
                 $0.text = "🌐 Authorization request failed with error 500"
             }
 
@@ -116,7 +117,7 @@ final class PerformanceTests: XCTestCase {
                 $0.createdAt = Date() - 0.04
                 $0.level = Logger.Level.debug.rawValue
                 $0.label = "auth"
-                $0.session = PersistentLogHandler.logSessionId.uuidString
+                $0.session = LoggerSession.current.id.uuidString
                 $0.text = """
                 Replace this implementation with code to handle the error appropriately. fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
 
@@ -143,7 +144,7 @@ final class PerformanceTests: XCTestCase {
                 $0.createdAt = Date() - 0.03
                 $0.level = Logger.Level.critical.rawValue
                 $0.label = "default"
-                $0.session = PersistentLogHandler.logSessionId.uuidString
+                $0.session = LoggerSession.current.id.uuidString
                 $0.text = "💥 0xDEADBEEF"
             }
         }

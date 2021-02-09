@@ -3,7 +3,6 @@
 // Copyright (c) 2020 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
-import Logging
 
 public final class URLSessionProxyDelegate: NSObject, URLSessionTaskDelegate, URLSessionDataDelegate {
     private weak var actualDelegate: URLSessionTaskDelegate?

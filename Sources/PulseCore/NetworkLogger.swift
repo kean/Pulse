@@ -3,30 +3,17 @@
 // Copyright (c) 2020 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
-import Logging
 
 public final class NetworkLogger: NSObject {
-    private let logger: Logger
+    private let store: LoggerMessageStoring
     private let blobStore: BlobStore
     private let queue = DispatchQueue(label: "com.github.kean.pulse.network-logger", target: .global(qos: .utility))
 
-    /// - parameter logger: By default, create a Logger with "network" label and
-    /// `logLevel` set `.trace`. Assumes that the `LoggingSystem.bootstrap` is used.
-    /// - parameter blobs: By default, uses `BlobStore.default`. If you want to use
-    /// a custom blob store, make sure to pass the same store to `ConsoleView` when
-    /// instantiating it.
-    public init(logger: Logger = NetworkLogger.makeDefaultLogger(),
-                blobStore: BlobStore = .default) {
-        self.logger = logger
+    /// Please use SwiftLog-based initializer.
+    public init(store: LoggerMessageStoring, blobStore: BlobStore = .default) {
+        self.store = store
         self.blobStore = blobStore
     }
-
-    public static func makeDefaultLogger() -> Logger {
-        var logger = Logger(label: "network")
-        logger.logLevel = .debug
-        return logger
-    }
-
     // MARK: Logging
 
     public func logTaskCreated(_ task: URLSessionTask) {
@@ -42,7 +29,7 @@ public final class NetworkLogger: NSObject {
         let request = NetworkLoggerRequest(urlRequest: urlRequest)
         let event = NetworkLoggerEvent.TaskDidStart(request: request)
 
-        logger.log(
+        storeMessage(
             level: .debug,
             "Send \(urlRequest.httpMethod ?? "–") \(task.originalRequest?.url?.absoluteString ?? "–")",
             metadata: makeMetadata(context, task, .taskDidStart, event, date)
@@ -62,7 +49,7 @@ public final class NetworkLogger: NSObject {
         let event = NetworkLoggerEvent.DataTaskDidReceieveResponse(response: response)
         let statusCode = response.statusCode
 
-        logger.log(
+        storeMessage(
             level: .trace,
             "Did receive response with status code: \(statusCode.map(descriptionForStatusCode) ?? "–") for \(dataTask.url ?? "null")",
             metadata: makeMetadata(context, dataTask, .dataTaskDidReceieveResponse, event, date)
@@ -80,7 +67,7 @@ public final class NetworkLogger: NSObject {
 
         let event = NetworkLoggerEvent.DataTaskDidReceiveData(dataCount: data.count)
 
-        logger.log(
+        storeMessage(
             level: .trace,
             "Did receive data: \(ByteCountFormatter.string(fromByteCount: Int64(data.count), countStyle: .file)) for \(dataTask.url ?? "null")",
             metadata: makeMetadata(context, dataTask, .dataTaskDidReceiveData, event, date)
@@ -105,7 +92,7 @@ public final class NetworkLogger: NSObject {
             metrics: context.metrics
         )
 
-        let level: Logger.Level
+        let level: LoggerMessageStore.Level
         let message: String
         if let error = error {
             level = .error
@@ -120,7 +107,7 @@ public final class NetworkLogger: NSObject {
             message = "🌐 \(statusCode.map(descriptionForStatusCode) ?? "–") \(urlRequest.httpMethod ?? "–") \(task.url ?? "–")"
         }
 
-        logger.log(level: level, .init(stringLiteral: message), metadata: makeMetadata(context, task, .taskDidComplete, event, date))
+        storeMessage(level: level, message, metadata: makeMetadata(context, task, .taskDidComplete, event, date))
 
         tasks[task] = nil
     }
@@ -153,7 +140,7 @@ public final class NetworkLogger: NSObject {
         return context
     }
 
-    private func makeMetadata<T: Encodable>(_ context: TaskContext, _ task: URLSessionTask, _ eventType: NetworkLoggerEventType, _ payload: T, _ date: Date) -> Logger.Metadata {
+    private func makeMetadata<T: Encodable>(_ context: TaskContext, _ task: URLSessionTask, _ eventType: NetworkLoggerEventType, _ payload: T, _ date: Date) -> [String: LoggerMessageStore.MetadataValue] {
         [
             NetworkLoggerMetadataKey.taskId.rawValue: .string(context.uuid.uuidString),
             NetworkLoggerMetadataKey.eventType.rawValue: .string(eventType.rawValue),
@@ -161,6 +148,10 @@ public final class NetworkLogger: NSObject {
             NetworkLoggerMetadataKey.payload.rawValue: .string(encode(payload) ?? ""),
             NetworkLoggerMetadataKey.createdAt: .stringConvertible(date)
         ]
+    }
+
+    private func storeMessage(level: LoggerMessageStore.Level, _ message: String, metadata: [String: LoggerMessageStore.MetadataValue]?, file: String = #file, function: String = #function, line: UInt = #line) {
+        store.storeMessage(label: "network", level: level, message: message, metadata: metadata, file: file, function: function, line: line)
     }
 }
 

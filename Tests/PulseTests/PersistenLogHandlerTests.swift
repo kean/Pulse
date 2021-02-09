@@ -6,6 +6,7 @@ import CoreData
 import XCTest
 import Logging
 @testable import Pulse
+@testable import PulseCore
 
 final class PersistentLogHandlerTests: XCTestCase {
     var tempDirectoryURL: URL!
@@ -39,7 +40,8 @@ final class PersistentLogHandlerTests: XCTestCase {
         let level2 = Logger.Level.critical
 
         let date = Date()
-        let sessionID = PersistentLogHandler.startSession()
+        LoggerSession.startSession()
+        let sessionID = LoggerSession.current.id
 
         LoggingSystem.bootstrap {
             MultiplexLogHandler([
