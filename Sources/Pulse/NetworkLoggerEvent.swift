@@ -3,7 +3,6 @@
 // Copyright (c) 2020 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
-import Logging
 
 public enum NetworkLoggerMetadataKey: String {
     case taskId = "networkEventTaskId"
