@@ -113,6 +113,8 @@ public extension LoggerMessageStore {
         case stringConvertible(CustomStringConvertible)
     }
 
+    typealias Metadata = [String: MetadataValue]
+
     // Compatible with SwiftLog.Logger.Level
     enum Level: String {
         case trace

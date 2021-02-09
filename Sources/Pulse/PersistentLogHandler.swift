@@ -34,7 +34,6 @@ public struct PersistentLogHandler {
     public var logLevel = Logger.Level.info
 
     private let store: LoggerMessageStore
-    private let makeCurrentDate: () -> Date
 
     private let label: String
 
@@ -45,13 +44,6 @@ public struct PersistentLogHandler {
     public init(label: String, store: LoggerMessageStore) {
         self.label = label
         self.store = store
-        self.makeCurrentDate = Date.init
-    }
-
-    init(label: String, store: LoggerMessageStore, makeCurrentDate: @escaping () -> Date) {
-        self.label = label
-        self.store = store
-        self.makeCurrentDate = makeCurrentDate
     }
 }
 
@@ -88,6 +80,8 @@ private struct LoggerAdapter: LoggerMessageStoring {
     }
 }
 
+// MARK: - Private (Logger.Level <-> LoggerMessageStore.Level)
+
 private extension Logger.Level {
     init(_ level: LoggerMessageStore.Level) {
         switch level {
@@ -116,14 +110,16 @@ private extension LoggerMessageStore.Level {
     }
 }
 
+// MARK: - Private (Logger.Metadata <-> LoggerMessageStore.Metadata)
+
 private extension Logger.Metadata {
-    init(_ metadata: [String: LoggerMessageStore.MetadataValue]) {
+    init(_ metadata: LoggerMessageStore.Metadata) {
         self = metadata.mapValues(Logger.MetadataValue.init)
     }
 }
 
-private extension Dictionary where Key == String, Value == LoggerMessageStore.MetadataValue {
-    init(_ metadata: [String: Logger.MetadataValue]) {
+private extension LoggerMessageStore.Metadata {
+    init(_ metadata: Logger.Metadata) {
         self = metadata.compactMapValues(LoggerMessageStore.MetadataValue.init)
     }
 }
