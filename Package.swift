@@ -25,7 +25,7 @@ let package = Package(
         .target(
             name: "Pulse",
             dependencies: [.product(name: "Logging", package: "swift-log"), "PulseCore"],
-            path: "Packages/Sources/Pulse"
+            path: "Sources/Sources/Pulse"
         ),
         .binaryTarget(
             name: "PulseCore",
