@@ -13,7 +13,7 @@ let package = Package(
     ],
     products: [
         // Products define the executables and libraries produced by a package, and make them visible to other packages.
-        .library(name: "Pulse", type: .dynamic, targets: ["Pulse"]),
+        .library(name: "Pulse", targets: ["Pulse"]),
         .library(name: "PulseCore", type: .dynamic, targets: ["PulseCore"]),
     ],
     dependencies: [
