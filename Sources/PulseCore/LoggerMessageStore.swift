@@ -116,7 +116,7 @@ public extension LoggerMessageStore {
     typealias Metadata = [String: MetadataValue]
 
     // Compatible with SwiftLog.Logger.Level
-    enum Level: String {
+    enum Level: String, CaseIterable, Codable {
         case trace
         case debug
         case info
