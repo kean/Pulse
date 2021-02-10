@@ -4,7 +4,11 @@
 
 import CoreData
 
-public final class LoggerMessageStore {
+public protocol LoggerMessageStoring {
+    func storeMessage(label: String, level: LoggerMessageStore.Level, message: String, metadata: [String: LoggerMessageStore.MetadataValue]?, file: String, function: String, line: UInt)
+}
+
+public final class LoggerMessageStore: LoggerMessageStoring {
     public let container: NSPersistentContainer
     public let backgroundContext: NSManagedObjectContext
 
@@ -64,10 +68,62 @@ public final class LoggerMessageStore {
         self.init(container: container)
     }
 
+    public func storeMessage(label: String, level: Level, message: String, metadata: [String: MetadataValue]?, file: String, function: String, line: UInt) {
+        let context = backgroundContext
+        let date: Date
+        if let metadata = metadata, case let .stringConvertible(value)? = metadata[NetworkLoggerMetadataKey.createdAt], let customDate = value as? Date {
+            date = customDate
+        } else {
+            date = makeCurrentDate()
+        }
+
+        context.perform {
+            let entity = MessageEntity(context: context)
+            entity.createdAt = date
+            entity.level = level.rawValue
+            entity.label = label
+            entity.session = LoggerSession.current.id.uuidString
+            entity.text = String(describing: message)
+            if let entries = metadata?.unpack(), !entries.isEmpty {
+                entity.metadata = Set(entries.compactMap { key, value in
+                    guard key != NetworkLoggerMetadataKey.createdAt else { return nil }
+                    let entity = MetadataEntity(context: context)
+                    entity.key = key
+                    entity.value = value
+                    return entity
+                })
+            }
+            entity.file = file
+            entity.function = function
+            entity.line = Int32(line)
+            try? context.save()
+        }
+    }
+
     private func scheduleSweep() {
         DispatchQueue.global().asyncAfter(deadline: .now() + .seconds(10)) { [weak self] in
             self?.sweep()
         }
+    }
+}
+
+public extension LoggerMessageStore {
+    enum MetadataValue {
+        case string(String)
+        case stringConvertible(CustomStringConvertible)
+    }
+
+    typealias Metadata = [String: MetadataValue]
+
+    // Compatible with SwiftLog.Logger.Level
+    enum Level: String, CaseIterable, Codable, Hashable {
+        case trace
+        case debug
+        case info
+        case notice
+        case warning
+        case error
+        case critical
     }
 }
 
@@ -198,4 +254,19 @@ public final class MessageEntity: NSManagedObject {
 public final class MetadataEntity: NSManagedObject {
     @NSManaged public var key: String
     @NSManaged public var value: String
+}
+
+// MARK: - Private
+
+private extension Dictionary where Key == String, Value == LoggerMessageStore.MetadataValue {
+    func unpack() -> [(String, String)] {
+        var entries = [(String, String)]()
+        for (key, value) in self {
+            switch value {
+            case let .string(string): entries.append((key, string))
+            case let .stringConvertible(string): entries.append((key, string.description))
+            }
+        }
+        return entries
+    }
 }

@@ -7,6 +7,7 @@ import XCTest
 import Foundation
 import CoreData
 @testable import Pulse
+@testable import PulseCore
 
 final class LoggerMessageStoreTests: XCTestCase {
     var tempDirectoryURL: URL!

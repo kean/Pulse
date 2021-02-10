@@ -1,5 +1,12 @@
 # Pulse 0.x
 
+## Pulse 0.7.0
+
+*Feb 8, 2021*
+
+- Split the project into `PulseCore` (no dependencies) and `Pulse` (depends on `Apple/SwiftLog`). `PulseCore` requires dynamic linkage. All these changes are required to make `PulseUI` XCFramework to work: it should be able to link to `PulseCore` dynamically.
+- `PersistentLogHandler` now respects default metadata set for `Logger` 
+
 ## Pulse 0.6.1
 
 *Feb 7, 2021*

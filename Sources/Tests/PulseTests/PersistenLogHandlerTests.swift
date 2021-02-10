@@ -6,6 +6,7 @@ import CoreData
 import XCTest
 import Logging
 @testable import Pulse
+@testable import PulseCore
 
 final class PersistentLogHandlerTests: XCTestCase {
     var tempDirectoryURL: URL!
@@ -14,14 +15,17 @@ final class PersistentLogHandlerTests: XCTestCase {
     var store: LoggerMessageStore!
     var sut: PersistentLogHandler!
 
+    var currentDate: Date = Date()
+
     override func setUp() {
         tempDirectoryURL = FileManager().temporaryDirectory.appendingPathComponent(UUID().uuidString)
         try? FileManager.default.createDirectory(at: tempDirectoryURL, withIntermediateDirectories: true, attributes: [:])
         storeURL = tempDirectoryURL.appendingPathComponent("test-store")
 
         store = LoggerMessageStore(storeURL: storeURL)
+        store.makeCurrentDate = { [unowned self] in currentDate }
 
-        sut = PersistentLogHandler(label: "test-hanlder", store: store, makeCurrentDate: { Date() })
+        sut = PersistentLogHandler(label: "test-hanlder", store: store)
     }
 
     override func tearDown() {
@@ -38,12 +42,15 @@ final class PersistentLogHandlerTests: XCTestCase {
         let message2 = "A second test message"
         let level2 = Logger.Level.critical
 
-        let date = Date()
-        let sessionID = PersistentLogHandler.startSession()
+        let date = Date() - 200
+        currentDate = date
+
+        LoggerSession.startSession()
+        let sessionID = LoggerSession.current.id
 
         LoggingSystem.bootstrap {
             MultiplexLogHandler([
-                PersistentLogHandler(label: $0, store: self.store, makeCurrentDate: { date }),
+                PersistentLogHandler(label: $0, store: self.store),
                 StreamLogHandler.standardOutput(label: $0)
             ])
         }
@@ -151,7 +158,8 @@ final class PersistentLogHandlerTests: XCTestCase {
     func testOverridingCreatedAtDateFromNetworkLogger() throws {
         // GIVEN
         let eventDate = Date()
-        let sut = PersistentLogHandler(label: "network-logger", store: self.store, makeCurrentDate: { eventDate + 60 })
+        currentDate = eventDate + 60
+        let sut = PersistentLogHandler(label: "network-logger", store: self.store)
 
         // WHEN
         sut.log(level: .debug, message: "request failed", metadata: ["networkEventCreatedAt": .stringConvertible(eventDate)])
