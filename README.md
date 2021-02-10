@@ -4,7 +4,7 @@
 
 **Pulse** is a structured logging system built with SwiftUI. Record and inspect network requests and logs right from your iOS app using Pulse Console. Share and view logs in Pulse macOS app. Logs are recoded locally and never leave your device.
 
-> **Pulse** is available only for [**GitHub sponsors**](https://github.com/sponsors/kean) and will become free once enough sponsors are reached.
+> **Pulse** is available only for [**GitHub sponsors**](https://github.com/sponsors/kean) and will become free once it reaches enough sponsors.
 
 <br/>
 
