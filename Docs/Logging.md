@@ -34,12 +34,18 @@ There are multiple options for logging network requests using Pulse.
 
 ### 2.1. Automatic Logging
 
-Use `URLSessionProxyDelegate` to automatically store all of the requried events.
+Use `URLSessionProxyDelegate` to automatically store all of the requried events. This is a preferred approach as it also captures task metrics.
+
+> **WARNING** This requires `URLSession` to be used with a [delegate-based](https://developer.apple.com/documentation/foundation/urlsessiondelegate) approach and won't work if you are using [completion-based](https://developer.apple.com/documentation/foundation/urlsession/1410330-datatask) APIs. For completion-based APIs you will have to use `NetworkLogger` APIs manually to log the events, but this is discouraged because there is no way to capture metrics and some other information this way.
 
 ```swift
-let urlSession = URLSession(configuration: .default, delegate: URLSessionProxyDelegate(logger: logger, delegate: self), delegateQueue: nil)
+let urlSession = URLSession(
+    configuration: .default,
+    delegate: URLSessionProxyDelegate(logger: logger, delegate: self),
+    delegateQueue: nil
+)
 
-// Use `URLSession` as usual.
+// Use `URLSession` with non-completion based APIs.
 ```
 
 > `URLSessionProxyDelegate` is extremely small and simply uses `responds(to:)` and `forwardingTarget(for:)` methods to forward selectors to the actual session delegate when needed.
