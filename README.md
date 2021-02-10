@@ -28,9 +28,9 @@
 
 Pulse is distributed using Swift Package Manager as a binary framework. It is built using SwiftUI and includes no resources to ensure its tiny size. The thinned `.ipa` with Pulse included takes **<640 KB**. You can simply leave it in your app store builds. And because it's a binary framework, it doesn't increase your compile time.
 
-> Pulse **is not** a network debugging proxy tool like Proxyman, Charles, or Wireshark. It *won't* automatically intercept all network traffic coming from your app or device. 
-
 <img src="https://user-images.githubusercontent.com/1567433/107464501-70cbbc80-6b2e-11eb-9404-2176287d85ac.png">
+
+> Pulse **is not** a network debugging proxy tool like Proxyman, Charles, or Wireshark. It *won't* automatically intercept all network traffic coming from your app or device. 
 
 The main advantage of Pulse it is integrated directly into your app and is always recording (when your code tells it to). Pulse console is available for everyone who has your test builds. You or your QA team can view the logs on the device and easily share them to attach to bug reports.
 
