@@ -38,7 +38,7 @@ The main advantage of Pulse it is integrated directly into your app and is alway
 
 # Installation
 
-**Pulse** is available only for [**GitHub sponsors**](https://github.com/sponsors/kean) and will become free once it reaches enough sponsors.
+**Pulse** is available only for [**GitHub sponsors**](https://github.com/sponsors/kean) and will become free once it reaches enough sponsors. The access is provided manually, there might be a bit of a delay before you get access after sponsoring.
 
 Please follow the [Installation Guide](https://github.com/kean/Pulse/blob/0.9.1/Docs/Installation.md).
 
