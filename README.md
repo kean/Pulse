@@ -1,9 +1,5 @@
 <img width="309" alt="Untitled-3" src="https://user-images.githubusercontent.com/1567433/107172577-b1430300-6993-11eb-939c-18620c00e2a1.png">
 
-<p align="left">
-<img src="https://img.shields.io/badge/platforms-iOS%2C%20macOS%2C%20watchOS%2C%20tvOS-lightgrey.svg">
-</p>
-
 <hr/>
 
 **Pulse** is a structured logging system built with SwiftUI. Record and inspect network requests and logs right from your iOS app using Pulse Console. Share and view logs in Pulse macOS app. Logs are recoded locally and never leave your device.
