@@ -22,6 +22,8 @@
 
 ![pulse-04-platforms](https://user-images.githubusercontent.com/1567433/107236017-475a4600-69f3-11eb-82d2-a0e11b760dd6.png)
 
+<br/>
+
 # About
 
 `Pulse` is not a tool, it's a framework. It records events from `URLSession` or from frameworks that use it, such as `Alamofire`, and displays them using `PulseUI` views that you integrate directly into your app.
@@ -34,10 +36,14 @@ Pulse is distributed using Swift Package Manager as a binary framework. It is bu
 
 The main advantage of Pulse it is integrated directly into your app and is always recording (when your code tells it to). Pulse console is available for everyone who has your test builds. You or your QA team can view the logs on the device and easily share them to attach to bug reports.
 
+<br/>
+
 # Installation
 
 Please follow the [Installation Guide](https://github.com/kean/Pulse/blob/0.9.1/Docs/Installation.md).
- 
+
+<br/>
+
 # Usage: Pulse
 
 The primary class in Pulse is `PersistentLogHandler` which can be used as a logging backend for [SwiftLog](https://github.com/apple/swift-log).
@@ -93,9 +99,13 @@ let view = LoggerView()
 
 > PulseUI is built using SwiftUI. To use it in UIKit, wrap `ConsoleView` in a `UIHostingController`.
 
+<br/>
+
 # Pulse macOS App
 
 **Upcoming**
+
+<br/>
 
 # Minimum Requirements
 
