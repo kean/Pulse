@@ -111,7 +111,7 @@ let view = LoggerView()
 
 | Pulse          | Swift           | Xcode           | Platforms                                         |
 |---------------|-----------------|-----------------|---------------------------------------------------|
-| Pulse 0.9.0      | Swift 5.3       | Xcode 12.0      | iOS 13.0  |
+| Pulse 0.9.0      | Swift 5.3       | Xcode 12.0      | iOS 13.0  (Upcoming conditional iOS 11+ and other platforms) | 
 | Pulse 0.3      | Swift 5.2       | Xcode 11.3      | iOS 11.0 / watchOS 4.0 / macOS 10.13 / tvOS 11.0  |
 
 # License
