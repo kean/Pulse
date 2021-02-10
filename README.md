@@ -4,7 +4,7 @@
 
 **Pulse** is a structured logging system built with SwiftUI. Record and inspect network requests and logs right from your iOS app using Pulse Console. Share and view logs in Pulse macOS app. Logs are recoded locally and never leave your device.
 
-> **PulseUI** is available for [**GitHub sponsors**](https://github.com/sponsors/kean) and will be available for free when the target number of sponsors is reached.
+> **Pulse** is available only for [**GitHub sponsors**](https://github.com/sponsors/kean) and will become free once enough sponsors are reached.
 
 <br/>
 
@@ -24,13 +24,21 @@
 
 # About
 
-Pulse **is not** a network debugging proxy tool like Proxyman, Charles, or Wireshark. It *won't* automatically intercept all network traffic coming from your app or device. 
+`Pulse` is not a tool, it's a framework. It records events from `URLSession` or from frameworks that use it, such as `Alamofire`, and displays them using `PulseUI` views that you integrate directly into your app.
 
-Pulse **is** an iOS-first framework you integrate it into your app. It can record events from `URLSession` or from frameworks that use it, such as `Alamofire` You can either record the events manually or by using convenience `URLSessionProxyDelegate`.
+Pulse is distributed using Swift Package Manager as a binary framework. It is built using SwiftUI and includes no resources to ensure its tiny size. You can simply leave it in your app store builds. And because it's a binary framework, it doesn't increase your compile time.
 
-The main advantages of Pulse it is integrated directly into your app and is always recording (when your code tells it to) and is available for everyone who uses the build. You or your QA team can view the logs on the device and easily share them and attach to your tickets. The logs never leave the device.
+<img src="https://user-images.githubusercontent.com/1567433/107454448-0a896e80-6b1b-11eb-8e9e-7be0be1e5515.png">
 
-# Usage
+> Pulse **is not** a network debugging proxy tool like Proxyman, Charles, or Wireshark. It *won't* automatically intercept all network traffic coming from your app or device. 
+
+The main advantage of Pulse it is integrated directly into your app and is always recording (when your code tells it to). Pulse console is available for everyone who has your test builds. You or your QA team can view the logs on the device and easily share them to attach to bug reports.
+
+# Installation
+
+Please follow the [Installation Guide](https://github.com/kean/Pulse/blob/0.9.1/Docs/Installation.md).
+ 
+# Usage: Pulse
 
 The primary class in Pulse is `PersistentLogHandler` which can be used as a logging backend for [SwiftLog](https://github.com/apple/swift-log).
 
@@ -58,7 +66,7 @@ logger.info("This message will be stored persistently")
 
 Pulse supports logging [`URLSession`](https://developer.apple.com/documentation/foundation/urlsession) tasks and offers a simple [Alamofire](https://github.com/Alamofire/Alamofire) integration.
 
-> For more information, please follow the [dedicated guide](https://github.com/kean/Pulse/blob/0.6.0/Docs/Logging.md).
+> For more information, please follow the [dedicated guide](https://github.com/kean/Pulse/blob/0.9.1/Docs/Logging.md).
 
 #### Storage
 
@@ -73,23 +81,27 @@ let container = logger.store.container
 
 <br/>
 
-# [PulseUI](https://github.com/kean/PulseUI)
+# Usage: PulseUI
 
-**PulseUI** allows you to quickly preview logs in your iOS or tvOS apps. Share logs, and use Pulse macOS app to search and filter them. **PulseUI** is available for [**GitHub sponsors**](https://github.com/sponsors/kean).
+**PulseUI** framework provides all of the views that you saw on the screenshots.
 
-### iOS Console
+Use `LoggerView` to display the root view with tabs. Use `ConsoleView`, `NetworkView`, and `PinView` to display individual tabs.
 
-Build a console right into your iOS apps.
+```swift
+let view = LoggerView()
+```
 
-### macOS App
+> PulseUI is built using SwiftUI. To use it in UIKit, wrap `ConsoleView` in a `UIHostingController`.
 
-Share your Pulse database and view it on your Mac. Use advanced search to filter your messages.
+# Pulse macOS App
 
+**Upcoming**
 
 # Minimum Requirements
 
 | Pulse          | Swift           | Xcode           | Platforms                                         |
 |---------------|-----------------|-----------------|---------------------------------------------------|
+| Pulse 0.9.0      | Swift 5.3       | Xcode 12.0      | iOS 13.0  |
 | Pulse 0.3      | Swift 5.2       | Xcode 11.3      | iOS 11.0 / watchOS 4.0 / macOS 10.13 / tvOS 11.0  |
 
 # License
