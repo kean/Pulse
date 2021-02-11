@@ -4,6 +4,8 @@
 
 import CoreData
 
+// This is here just so that this repo appears to be a Swift repo.
+
 public protocol LoggerMessageStoring {
     func storeMessage(label: String, level: LoggerMessageStore.Level, message: String, metadata: [String: LoggerMessageStore.MetadataValue]?, file: String, function: String, line: UInt)
 }
