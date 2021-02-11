@@ -1,5 +1,15 @@
 # Pulse 0.x
 
+## Pulse 0.9.2
+
+*Feb 10, 2021*
+
+- Add default initializers for PulseUI views
+- Add `MainViewController` for easier UIKit integration
+- Pulse now be installed on as low as iOS 11. Console will only work on iOS 13, but `MainViewController` is available on iOS 11 and will show "Console is only available in iOS 13 and higher" when running on iOS 12 or lower
+- Rename `LoggerView` to `MainView`
+- Fix an issue with mock store creation
+
 ## Pulse 0.9.1
 
 *Feb 9, 2021*
