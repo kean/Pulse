@@ -4,6 +4,11 @@
 
 **Pulse** is a structured logging system built with SwiftUI. Record and inspect network requests and logs right from your iOS app using Pulse Console. Share and view logs in Pulse macOS app. Logs are recoded locally and never leave your device.
 
+<a href="https://testflight.apple.com/join/B2p3vcwl">
+<img height=50 src="https://user-images.githubusercontent.com/1567433/107673449-02891600-6c64-11eb-8c83-fcdfc794cf91.png">
+</a>
+
+<br/>
 <br/>
 
 ![pulse-01-console](https://user-images.githubusercontent.com/1567433/107236825-129abe80-69f4-11eb-976a-4b5bc9dc383d.png)
@@ -91,13 +96,13 @@ let container = logger.store.container
 
 **PulseUI** framework provides all of the views that you saw on the screenshots.
 
-Use `LoggerView` to display the root view with tabs. Use `ConsoleView`, `NetworkView`, and `PinView` to display individual tabs.
+Use `MainView` (or `MainViewController` for convenient UIKit integration) to display the root view with tabs. Use `ConsoleView`, `NetworkView`, and `PinView` to display individual tabs.
 
 ```swift
-let view = LoggerView()
+let view = MainView()
 ```
 
-> PulseUI is built using SwiftUI. To use it in UIKit, wrap `ConsoleView` in a `UIHostingController`.
+Pulse views are built using SwiftUI and require iOS 13. But even if your app requires iOS 11, no need to worry. Pulse can be easily integrated into projects that require iOS versions as low as iOS 11 and used conditionally. In fact, `MainViewController` *is* available on iOS 11 and simply shows an error message on iOS 12 and lower.
 
 <br/>
 
@@ -111,6 +116,7 @@ let view = LoggerView()
 
 | Pulse          | Swift           | Xcode           | Platforms                                         |
 |---------------|-----------------|-----------------|---------------------------------------------------|
+| Pulse 0.9.2      | Swift 5.3       | Xcode 12.0      | iOS 13.0 (conditionally iOS 11+) | 
 | Pulse 0.9.0      | Swift 5.3       | Xcode 12.0      | iOS 13.0  (Upcoming conditional iOS 11+ and other platforms) | 
 | Pulse 0.3      | Swift 5.2       | Xcode 11.3      | iOS 11.0 / watchOS 4.0 / macOS 10.13 / tvOS 11.0  |
 
