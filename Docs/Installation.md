@@ -2,7 +2,7 @@
 
 Pulse is distributed as a binary framework using [Swift Package Manager](https://swift.org/package-manager/).
 
-If you are using Xcode 11 or higher, go to **File / Swift Packages / Add Package Dependency...** and enter package repository URL **https://github.com/kean/PulseUI** (requires access), then follow the instructions.
+Go to **File / Swift Packages / Add Package Dependency...** and enter package repository URL **https://github.com/kean/PulseUI** (requires access), then follow the instructions.
 
 To remove the dependency, select the project and open **Swift Packages** (which is next to **Build Settings**). You can add and remove packages from this tab.
 
