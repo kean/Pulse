@@ -1,13 +1,15 @@
-<img width="309" alt="Untitled-3" src="https://user-images.githubusercontent.com/1567433/107172577-b1430300-6993-11eb-939c-18620c00e2a1.png">
+<img src="https://user-images.githubusercontent.com/1567433/107710795-04b79880-6c95-11eb-8c72-926fa706f563.png">
 
 <hr/>
 
-**Pulse** is a structured logging system built with SwiftUI. Record and inspect network requests and logs right from your iOS app using Pulse Console. Share and view logs in Pulse macOS app. Logs are recoded locally and never leave your device.
+**Pulse** is a powerful structured logging system. Record and inspect network requests and logs right from your iOS app using Pulse Console. Share and view logs in Pulse macOS app. Logs are recoded locally and never leave your device.
 
 <a href="https://testflight.apple.com/join/B2p3vcwl">
 <img height=50 src="https://user-images.githubusercontent.com/1567433/107673449-02891600-6c64-11eb-8c83-fcdfc794cf91.png">
 </a>
 
+<br/>
+<br/>
 <br/>
 <br/>
 
@@ -37,13 +39,15 @@ Pulse is distributed using Swift Package Manager as a binary framework. It is bu
 
 > Pulse **is not** a network debugging proxy tool like Proxyman, Charles, or Wireshark. It *won't* automatically intercept all network traffic coming from your app or device. 
 
-The main advantage of Pulse it is integrated directly into your app and is always recording (when your code tells it to). Pulse console is available for everyone who has your test builds. You or your QA team can view the logs on the device and easily share them to attach to bug reports.
+Pulse is integrated directly into your app and is always recording (when your code tells it to). Pulse console is available for everyone who has your test builds. You or your QA team can view the logs on the device and easily share them to attach to bug reports. That's powerful.
 
 <br/>
 
 # Installation
 
-**Pulse** is available only for [**GitHub sponsors**](https://github.com/sponsors/kean) and will become free once it reaches enough sponsors. The access is provided manually, there might be a bit of a delay before you get access after sponsoring.
+**Pulse** is available only for [**GitHub sponsors**](https://github.com/sponsors/kean). Once the number of sponsors reaches a certain level, the project will become available to everyone.
+
+> The access to the private project manifest is provided manually, there might be a bit of a delay before you get access after sponsoring.
 
 Please follow the [Installation Guide](https://github.com/kean/Pulse/blob/0.9.1/Docs/Installation.md).
 
@@ -102,7 +106,7 @@ Use `MainView` (or `MainViewController` for convenient UIKit integration) to dis
 let view = MainView()
 ```
 
-Pulse views are built using SwiftUI and require iOS 13. But even if your app requires iOS 11, no need to worry. Pulse can be easily integrated into projects that require iOS versions as low as iOS 11 and used conditionally. In fact, `MainViewController` *is* available on iOS 11 and simply shows an error message on iOS 12 and lower.
+Pulse views are built using SwiftUI and require iOS 13. But even if your app requires iOS 11, no need to worry. Pulse can still be easily integrated into your project. The framework itself requires iOS 11 and Pulse views can be easily added conditionally on iOS 13+. To show Pulse from UIKit, use convenience `MainViewController` class.
 
 <br/>
 
@@ -116,7 +120,7 @@ Pulse views are built using SwiftUI and require iOS 13. But even if your app req
 
 | Pulse          | Swift           | Xcode           | Platforms                                         |
 |---------------|-----------------|-----------------|---------------------------------------------------|
-| Pulse 0.9.2      | Swift 5.3       | Xcode 12.0      | iOS 13.0 (conditionally iOS 11+) | 
+| Pulse 0.9.2      | Swift 5.3       | Xcode 12.0      | iOS 11.0 (views requires iOS 13) | 
 | Pulse 0.9.0      | Swift 5.3       | Xcode 12.0      | iOS 13.0  (Upcoming conditional iOS 11+ and other platforms) | 
 | Pulse 0.3      | Swift 5.2       | Xcode 11.3      | iOS 11.0 / watchOS 4.0 / macOS 10.13 / tvOS 11.0  |
 
