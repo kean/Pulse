@@ -1,5 +1,18 @@
 # Pulse 0.x
 
+## Pulse 0.9.3
+
+*Feb 11, 2021*
+
+- Display image pixel size in image response viewer
+- Fix layout issues in response viewer on smaller devices
+- Add more network request examples in the demo: image response, big JSON response (2500 lines)
+- Optimize response text view, now interactive search is able to handle 2000+ lines of text
+- Hide keyboard when moving between matches in response text view
+- `NetworkLogger` to send "start request" events with `.trace` level
+- Disable autocapitalization and autocorrection in search bars
+- Fix cell highlighting when search bar clear button is tapped
+
 ## Pulse 0.9.2
 
 *Feb 10, 2021*
