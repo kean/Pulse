@@ -1,5 +1,20 @@
 # Pulse 0.x
 
+## Pulse 0.9.4
+
+*Feb 13, 2021*
+
+- Fix Settings navigation on iPad (use stacked style)
+- Add placeholders on iPad for when no navigation item is selected
+- Move search toolbar in response viewer to the bottom, this way the fingers don't cover the screen when iterating between matches
+- Add search to regular message details view
+- Add haptic feedback
+- Add "View Raw" buttons to response and request headers
+- Fix foreground color for raw text views
+- Remove "Response" and "Request" tabs and instead add "View Raw" buttons directly to the "Summary" page. This way viewer has more vertical space and can have its own dedicated navigation bar items. It's also easier to reach, especially after tapping on one of the messages.
+- Add "Share" button to response viewer, works both for text and images
+- UI improvements
+
 ## Pulse 0.9.3
 
 *Feb 11, 2021*
