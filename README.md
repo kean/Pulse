@@ -6,7 +6,7 @@
 **Pulse** is a powerful logging system. Record and inspect network requests and logs right from your iOS app using Pulse Console. Share and view logs in Pulse macOS app. Logs are recoded locally and never leave your device.
 
 <a href="https://testflight.apple.com/join/B2p3vcwl">
-<img height=50 src="https://user-images.githubusercontent.com/1567433/107673449-02891600-6c64-11eb-8c83-fcdfc794cf91.png">
+<img height=56 src="https://user-images.githubusercontent.com/1567433/108600990-2b965e80-7368-11eb-90e3-5e788bd49783.png">
 </a>
 
 <br/>
