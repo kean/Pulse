@@ -1,5 +1,5 @@
 <br/>
-<img alt="Pulse Logo" src="https://user-images.githubusercontent.com/1567433/108600923-ca6e8b00-7367-11eb-9385-09261f1c5b55.png">
+<img alt="Pulse Logo" src="https://user-images.githubusercontent.com/1567433/108644089-92586c80-747b-11eb-9319-901bfbeae57a.png">
 
 <hr/>
 
@@ -14,6 +14,13 @@
 <br/>
 <br/>
 
+![promo-4](https://user-images.githubusercontent.com/1567433/108644059-5fae7400-747b-11eb-8cac-0973898a4fb7.png)
+
+<br/>
+
+![promo-5](https://user-images.githubusercontent.com/1567433/108644060-60dfa100-747b-11eb-8b14-bf94d609c4e5.png)
+
+<br/>
 
 ![promo-1](https://user-images.githubusercontent.com/1567433/107718771-ab576580-6ca4-11eb-83d9-ab1176f4e1c4.png)
 
@@ -24,10 +31,6 @@
 <br/>
 
 ![promo-3](https://user-images.githubusercontent.com/1567433/107718773-abeffc00-6ca4-11eb-963a-04855e7304f4.png)
-
-<br/>
-
-![promo-4](https://user-images.githubusercontent.com/1567433/107718775-abeffc00-6ca4-11eb-81d2-194c2ceee375.png)
 
 <br/>
 
