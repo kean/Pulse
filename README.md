@@ -1,5 +1,5 @@
 <br/>
-<img alt="Pulse Logo" src="https://user-images.githubusercontent.com/1567433/108644428-e4e65880-747c-11eb-95ac-2ba1d30b099e.png">
+<img alt="Pulse Logo" src="https://user-images.githubusercontent.com/1567433/108731851-f9693600-74fa-11eb-8a04-b9da6b937305.png">
 
 <hr/>
 
