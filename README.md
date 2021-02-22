@@ -14,7 +14,7 @@
 <br/>
 <br/>
 
-![promo-4](https://user-images.githubusercontent.com/1567433/108644059-5fae7400-747b-11eb-8cac-0973898a4fb7.png)
+![promo-4](https://user-images.githubusercontent.com/1567433/108644405-c718f380-747c-11eb-87f3-1d12f418c00a.png)
 
 <br/>
 
