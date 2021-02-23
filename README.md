@@ -1,12 +1,12 @@
 <br/>
-<img width="245" alt="Untitled-2" src="https://user-images.githubusercontent.com/1567433/107718703-8662f280-6ca4-11eb-849e-97a06ebac204.png">
+<img alt="Pulse Logo" src="https://user-images.githubusercontent.com/1567433/108731851-f9693600-74fa-11eb-8a04-b9da6b937305.png">
 
 <hr/>
 
-**Pulse** is a powerful logging system. Record and inspect network requests and logs right from your iOS app using Pulse Console. Share and view logs in Pulse macOS app. Logs are recoded locally and never leave your device.
+**Pulse** is a powerful logging system. Record and inspect network requests and logs right from your iOS app using Pulse Console. Share and view logs in Pulse macOS app. Logs are recorded locally and never leave your device.
 
 <a href="https://testflight.apple.com/join/B2p3vcwl">
-<img height=50 src="https://user-images.githubusercontent.com/1567433/107673449-02891600-6c64-11eb-8c83-fcdfc794cf91.png">
+<img height=60 src="https://user-images.githubusercontent.com/1567433/108601031-66989200-7368-11eb-92dd-f5da70a3c4f6.png">
 </a>
 
 <br/>
@@ -14,6 +14,13 @@
 <br/>
 <br/>
 
+![promo-4](https://user-images.githubusercontent.com/1567433/108644405-c718f380-747c-11eb-87f3-1d12f418c00a.png)
+
+<br/>
+
+![promo-5](https://user-images.githubusercontent.com/1567433/108644060-60dfa100-747b-11eb-8b14-bf94d609c4e5.png)
+
+<br/>
 
 ![promo-1](https://user-images.githubusercontent.com/1567433/107718771-ab576580-6ca4-11eb-83d9-ab1176f4e1c4.png)
 
@@ -24,10 +31,6 @@
 <br/>
 
 ![promo-3](https://user-images.githubusercontent.com/1567433/107718773-abeffc00-6ca4-11eb-963a-04855e7304f4.png)
-
-<br/>
-
-![promo-4](https://user-images.githubusercontent.com/1567433/107718775-abeffc00-6ca4-11eb-81d2-194c2ceee375.png)
 
 <br/>
 
@@ -114,7 +117,7 @@ Pulse views are built using SwiftUI and require iOS 13. But even if your app req
 
 # Pulse macOS App
 
-**Upcoming**
+Pulse macOS Alpha is now available as early access. Requires Big Sur.
 
 <br/>
 
