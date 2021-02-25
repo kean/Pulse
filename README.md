@@ -93,10 +93,10 @@ Pulse supports logging [`URLSession`](https://developer.apple.com/documentation/
 All logged messages are stored persistently using Core Data, including metadata and other information. You get full access to all of the recorded messages at any time using `LoggerMessageStore`.
 
 ```swift
-let message = try LoggerMessageStore.default.allMessage()
+let messages = try LoggerMessageStore.default.allMessages()
 
-// NSPersistentStoreContainer
-let container = logger.store.container
+// NSPersistentContainer
+let container = LoggerMessageStore.default.container
 ```
 
 <br/>
