@@ -4,11 +4,7 @@
 
 import CoreData
 
-public protocol LoggerMessageStoring {
-    func storeMessage(label: String, level: LoggerMessageStore.Level, message: String, metadata: [String: LoggerMessageStore.MetadataValue]?, file: String, function: String, line: UInt)
-}
-
-public final class LoggerMessageStore: LoggerMessageStoring {
+public final class LoggerMessageStore {
     public let container: NSPersistentContainer
     public let backgroundContext: NSManagedObjectContext
 
@@ -68,34 +64,22 @@ public final class LoggerMessageStore: LoggerMessageStoring {
         self.init(container: container)
     }
 
-    public func storeMessage(label: String, level: Level, message: String, metadata: [String: MetadataValue]?, file: String, function: String, line: UInt) {
+    public func storeMessage(date: Date? = nil, label: String, level: Level, message: String, metadata: [String: MetadataValue]?, file: String, function: String, line: UInt) {
         let context = backgroundContext
-        let date: Date
-        if let metadata = metadata, case let .stringConvertible(value)? = metadata[NetworkLoggerMetadataKey.createdAt], let customDate = value as? Date {
-            date = customDate
-        } else {
-            date = makeCurrentDate()
-        }
-
+        let date = date ?? makeCurrentDate()
         context.perform {
-            let entity = MessageEntity(context: context)
-            entity.createdAt = date
-            entity.level = level.rawValue
-            entity.label = label
-            entity.session = LoggerSession.current.id.uuidString
-            entity.text = String(describing: message)
-            if let entries = metadata?.unpack(), !entries.isEmpty {
-                entity.metadata = Set(entries.compactMap { key, value in
-                    guard key != NetworkLoggerMetadataKey.createdAt else { return nil }
-                    let entity = MetadataEntity(context: context)
-                    entity.key = key
-                    entity.value = value
-                    return entity
-                })
-            }
-            entity.file = file
-            entity.function = function
-            entity.line = Int32(line)
+            self.makeMessageEntity(createdAt: date, label: label, level: level, message: message, metadata: metadata, file: file, function: function, line: line)
+            try? context.save()
+        }
+    }
+
+    func storeNetworkRequest(_ request: NetworkLoggerRequestSummary, createdAt: Date, level: Level, message: String) {
+        let context = backgroundContext
+        context.perform {
+            let messageEntity =  self.makeMessageEntity(createdAt: createdAt, label: "network", level: level, message: message, metadata: nil, file: "", function: "", line: 0)
+            let requestEntity = self.makeRequest(request, createdAt: createdAt)
+            messageEntity.request = requestEntity
+            requestEntity.message = messageEntity
             try? context.save()
         }
     }
@@ -104,6 +88,61 @@ public final class LoggerMessageStore: LoggerMessageStoring {
         DispatchQueue.global().asyncAfter(deadline: .now() + .seconds(10)) { [weak self] in
             self?.sweep()
         }
+    }
+}
+
+private extension LoggerMessageStore {
+    @discardableResult
+    func makeMessageEntity(createdAt: Date, label: String, level: Level, message: String, metadata: [String: MetadataValue]?, file: String, function: String, line: UInt) -> LoggerMessageEntity {
+        let entity = LoggerMessageEntity(context: backgroundContext)
+        entity.createdAt = createdAt
+        entity.level = level.rawValue
+        entity.label = label
+        entity.session = LoggerSession.current.id.uuidString
+        entity.text = String(describing: message)
+        if let entries = metadata?.unpack(), !entries.isEmpty {
+            entity.metadata = Set(entries.map { key, value in
+                let entity = LoggerMetadataEntity(context: backgroundContext)
+                entity.key = key
+                entity.value = value
+                return entity
+            })
+        }
+        entity.file = file
+        entity.function = function
+        entity.line = Int32(line)
+        return entity
+    }
+
+    @discardableResult
+    func makeRequest(_ event: NetworkLoggerRequestSummary, createdAt: Date) -> LoggerNetworkRequestEntity {
+        let entity = LoggerNetworkRequestEntity(context: backgroundContext)
+        // Primary
+        entity.createdAt = createdAt
+        entity.session = LoggerSession.current.id.uuidString
+        // Denormalized
+        entity.url = event.request.url?.absoluteString
+        entity.host = event.request.url?.host
+        entity.httpMethod = event.request.httpMethod
+        entity.errorDomain = event.error?.domain
+        entity.errorCode = Int32(event.error?.code ?? 0)
+        entity.statusCode = Int32(event.response?.statusCode ?? 0)
+        // Details
+        entity.details = makeRequestDetails(event)
+        entity.requestBodyKey = event.requestBodyKey
+        entity.responseBodyKey = event.responseBodyKey
+        return entity
+    }
+
+    @discardableResult
+    func makeRequestDetails(_ event: NetworkLoggerRequestSummary) -> LoggerNetworkRequestDetailsEntity {
+        let entity = LoggerNetworkRequestDetailsEntity(context: backgroundContext)
+        let encoder = JSONEncoder()
+        entity.request = try? encoder.encode(event.request)
+        entity.response = try? encoder.encode(event.response)
+        entity.error = try? encoder.encode(event.error)
+        entity.metrics = try? encoder.encode(event.metrics)
+        return entity
     }
 }
 
@@ -127,74 +166,13 @@ public extension LoggerMessageStore {
     }
 }
 
-// MARK: - LoggerMessageStore (NSManagedObjectModel)
-
-public extension LoggerMessageStore {
-    /// Returns Core Data model used by the store.
-    static let model: NSManagedObjectModel = {
-        let model = NSManagedObjectModel()
-
-        let message = NSEntityDescription(name: "MessageEntity", class: MessageEntity.self)
-        let metadata = NSEntityDescription(name: "MetadataEntity", class: MetadataEntity.self)
-
-        do {
-            let key = NSAttributeDescription(name: "key", type: .stringAttributeType)
-            let value = NSAttributeDescription(name: "value", type: .stringAttributeType)
-            metadata.properties = [key, value]
-        }
-
-        do {
-            let createdAt = NSAttributeDescription(name: "createdAt", type: .dateAttributeType)
-            let level = NSAttributeDescription(name: "level", type: .stringAttributeType)
-            let label = NSAttributeDescription(name: "label", type: .stringAttributeType)
-            let session = NSAttributeDescription(name: "session", type: .stringAttributeType)
-            let text = NSAttributeDescription(name: "text", type: .stringAttributeType)
-            let metadata = NSRelationshipDescription.oneToMany(name: "metadata", entity: metadata)
-            let file = NSAttributeDescription(name: "file", type: .stringAttributeType)
-            let function = NSAttributeDescription(name: "function", type: .stringAttributeType)
-            let line = NSAttributeDescription(name: "line", type: .integer32AttributeType)
-            message.properties = [createdAt, level, label, session, text, metadata, file, function, line]
-        }
-
-        model.entities = [message, metadata]
-        return model
-    }()
-}
-
-private extension NSEntityDescription {
-    convenience init<T>(name: String, class: T.Type) where T: NSManagedObject {
-        self.init()
-        self.name = name
-        self.managedObjectClassName = T.self.description()
-    }
-}
-
-private extension NSAttributeDescription {
-    convenience init(name: String, type: NSAttributeType) {
-        self.init()
-        self.name = name
-        self.attributeType = type
-    }
-}
-
-private extension NSRelationshipDescription {
-    static func oneToMany(name: String, deleteRule: NSDeleteRule = .cascadeDeleteRule, entity: NSEntityDescription) -> NSRelationshipDescription {
-        let relationship = NSRelationshipDescription()
-        relationship.name = name
-        relationship.deleteRule = deleteRule
-        relationship.destinationEntity = entity
-        relationship.maxCount = 0
-        relationship.minCount = 0
-        return relationship
-    }
-}
 // MARK: - LoggerMessageStore (Sweep)
 
 extension LoggerMessageStore {
     func sweep() {
         let expirationInterval = logsExpirationInterval
         backgroundContext.perform {
-            let request = NSFetchRequest<NSFetchRequestResult>(entityName: "MessageEntity")
+            let request = NSFetchRequest<NSFetchRequestResult>(entityName: "LoggerMessageEntity")
             let dateTo = self.makeCurrentDate().addingTimeInterval(-expirationInterval)
             request.predicate = NSPredicate(format: "createdAt < %@", dateTo as NSDate)
             try? self.deleteMessages(fetchRequest: request)
@@ -206,16 +184,16 @@ extension LoggerMessageStore {
 
 public extension LoggerMessageStore {
     /// Returns all recorded messages, least recent messages come first.
-    func allMessages() throws -> [MessageEntity] {
-        let request = NSFetchRequest<MessageEntity>(entityName: "MessageEntity")
-        request.sortDescriptors = [NSSortDescriptor(keyPath: \MessageEntity.createdAt, ascending: true)]
+    func allMessages() throws -> [LoggerMessageEntity] {
+        let request = NSFetchRequest<LoggerMessageEntity>(entityName: "LoggerMessageEntity")
+        request.sortDescriptors = [NSSortDescriptor(keyPath: \LoggerMessageEntity.createdAt, ascending: true)]
         return try container.viewContext.fetch(request)
     }
 
     /// Removes all of the previously recorded messages.
     func removeAllMessages() {
         backgroundContext.perform {
-            try? self.deleteMessages(fetchRequest: MessageEntity.fetchRequest())
+            try? self.deleteMessages(fetchRequest: LoggerMessageEntity.fetchRequest())
         }
     }
 }
@@ -235,25 +213,6 @@ private extension LoggerMessageStore {
             into: [backgroundContext, container.viewContext]
         )
     }
-}
-
-// MARK: - NSManagedObjects
-
-public final class MessageEntity: NSManagedObject {
-    @NSManaged public var createdAt: Date
-    @NSManaged public var level: String
-    @NSManaged public var label: String
-    @NSManaged public var session: String
-    @NSManaged public var text: String
-    @NSManaged public var metadata: Set<MetadataEntity>
-    @NSManaged public var file: String
-    @NSManaged public var function: String
-    @NSManaged public var line: Int32
-}
-
-public final class MetadataEntity: NSManagedObject {
-    @NSManaged public var key: String
-    @NSManaged public var value: String
 }
 
 // MARK: - Private

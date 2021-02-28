@@ -4,53 +4,6 @@
 
 import Foundation
 
-public enum NetworkLoggerMetadataKey: String {
-    case taskId = "networkEventTaskId"
-    case eventType = "networkEventType"
-    case taskType = "networkEventTaskType"
-    case payload = "networkEventPayload"
-}
-
-extension NetworkLoggerMetadataKey {
-    static let createdAt = "networkEventCreatedAt"
-}
-
-public enum NetworkLoggerEventType: String, Codable {
-    case taskDidStart
-    case taskDidComplete
-
-    case dataTaskDidReceieveResponse
-    case dataTaskDidReceiveData
-}
-
-public enum NetworkLoggerEvent {
-    case taskDidStart(TaskDidStart)
-    case taskDidComplete(TaskDidComplete)
-    case dataTaskDidReceieveResponse(DataTaskDidReceieveResponse)
-    case dataTaskDidReceiveData(DataTaskDidReceiveData)
-
-    public struct TaskDidStart: Codable {
-        public let request: NetworkLoggerRequest
-    }
-
-    public struct TaskDidComplete: Codable {
-        public let request: NetworkLoggerRequest
-        public let response: NetworkLoggerResponse?
-        public let error: NetworkLoggerError?
-        public let requestBodyKey: String?
-        public let responseBodyKey: String?
-        public let metrics: NetworkLoggerMetrics?
-    }
-
-    public struct DataTaskDidReceieveResponse: Codable {
-        public let response: NetworkLoggerResponse
-    }
-
-    public struct DataTaskDidReceiveData: Codable {
-        public let dataCount: Int
-    }
-}
-
 public struct NetworkLoggerRequest: Codable {
     public let url: URL?
     public let httpMethod: String?

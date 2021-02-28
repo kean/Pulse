@@ -12,24 +12,6 @@ public typealias LoggerSession = PulseCore.LoggerSession
 public typealias BlobStore = PulseCore.BlobStore
 public typealias URLSessionProxyDelegate = PulseCore.URLSessionProxyDelegate
 
-public extension NetworkLogger {
-    /// - parameter logger: By default, create a Logger with "network" label and
-    /// `logLevel` set `.trace`. Assumes that the `LoggingSystem.bootstrap` is used.
-    /// - parameter blobs: By default, uses `BlobStore.default`. If you want to use
-    /// a custom blob store, make sure to pass the same store to `ConsoleView` when
-    /// instantiating it.
-    convenience init(logger: Logger = NetworkLogger.makeDefaultLogger(),
-                     blobStore: BlobStore = .default) {
-        self.init(store: LoggerAdapter(logger: logger), blobStore: blobStore)
-    }
-
-    static func makeDefaultLogger() -> Logger {
-        var logger = Logger(label: "network")
-        logger.logLevel = .debug
-        return logger
-    }
-}
-
 public struct PersistentLogHandler {
     public var metadata = Logger.Metadata()
     public var logLevel = Logger.Level.info
@@ -63,21 +45,6 @@ extension PersistentLogHandler: LogHandler {
             mergedMetadata[key] = value // Override keys if necessary
         }
         store.storeMessage(label: label, level: .init(level), message: message.description, metadata: .init(mergedMetadata), file: file, function: function, line: line)
-    }
-}
-
-// MARK: - Private (Adapters)
-
-private struct LoggerAdapter: LoggerMessageStoring {
-    private let logger: Logger
-
-    init(logger: Logger) {
-        self.logger = logger
-    }
-
-    // Ignores the label and uses the level set by Logger.
-    func storeMessage(label: String, level: LoggerMessageStore.Level, message: String, metadata: [String : LoggerMessageStore.MetadataValue]?, file: String, function: String, line: UInt) {
-        logger.log(level: .init(level), .init(stringLiteral: message), metadata: metadata.map(Logger.Metadata.init))
     }
 }
 
