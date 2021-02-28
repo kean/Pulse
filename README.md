@@ -1,5 +1,5 @@
 <br/>
-<img alt="Pulse Logo" src="https://user-images.githubusercontent.com/1567433/108731851-f9693600-74fa-11eb-8a04-b9da6b937305.png">
+<img alt="Pulse Logo" src="https://user-images.githubusercontent.com/1567433/109099548-47478f00-76f1-11eb-8ee7-652859514ab0.png">
 
 <hr/>
 
@@ -38,10 +38,6 @@
 
 `Pulse` is not a tool, it's a framework. It records events from `URLSession` or from frameworks that use it, such as `Alamofire`, and displays them using `PulseUI` views that you integrate directly into your app.
 
-Pulse is distributed using Swift Package Manager as a binary framework. It is built using SwiftUI and includes no resources to ensure its tiny size. The thinned `.ipa` with Pulse included takes **<640 KB**. You can simply leave it in your app store builds. And because it's a binary framework, it doesn't increase your compile time.
-
-<img src="https://user-images.githubusercontent.com/1567433/107464501-70cbbc80-6b2e-11eb-9404-2176287d85ac.png">
-
 > Pulse **is not** a network debugging proxy tool like Proxyman, Charles, or Wireshark. It *won't* automatically intercept all network traffic coming from your app or device. 
 
 Pulse is integrated directly into your app and is always recording (when your code tells it to). Pulse console is available for everyone who has your test builds. You or your QA team can view the logs on the device and easily share them to attach to bug reports. That's powerful.
@@ -53,6 +49,10 @@ Pulse is integrated directly into your app and is always recording (when your co
 **Pulse** is available only for [**GitHub sponsors**](https://github.com/sponsors/kean). Once the number of sponsors reaches a certain level, the project will become available to everyone.
 
 > The access to the private project manifest is provided manually, there might be a bit of a delay before you get access after sponsoring.
+
+Pulse is distributed using Swift Package Manager as a binary framework. It is built using SwiftUI and includes no resources to ensure its tiny size. The thinned `.ipa` with Pulse included takes **<640 KB**. You can simply leave it in your app store builds. And because it's a binary framework, it doesn't increase your compile time.
+
+<img src="https://user-images.githubusercontent.com/1567433/107464501-70cbbc80-6b2e-11eb-9404-2176287d85ac.png">
 
 Please follow the [Installation Guide](https://github.com/kean/Pulse/blob/0.9.1/Docs/Installation.md).
 
@@ -93,10 +93,10 @@ Pulse supports logging [`URLSession`](https://developer.apple.com/documentation/
 All logged messages are stored persistently using Core Data, including metadata and other information. You get full access to all of the recorded messages at any time using `LoggerMessageStore`.
 
 ```swift
-let message = try LoggerMessageStore.default.allMessage()
+let messages = try LoggerMessageStore.default.allMessages()
 
-// NSPersistentStoreContainer
-let container = logger.store.container
+// NSPersistentContainer
+let container = LoggerMessageStore.default.container
 ```
 
 <br/>
@@ -117,9 +117,18 @@ Pulse views are built using SwiftUI and require iOS 13. But even if your app req
 
 # Pulse macOS App
 
-Pulse macOS Alpha is now available as early access. Requires Big Sur.
+Pulse macOS pre-Alpha is now available as early access. Requires Big Sur. No optimizations have been done yet.
 
 <br/>
+
+# Status
+
+|  Project         | Status          |
+|---------------|-----------------|
+| Pulse    | Beta       |
+| PulseUI (iOS framework)      | Beta       |
+| Pulse (macOS app)      | Experimental |
+| tvOS, watchOS support      | Upcoming |
 
 # Minimum Requirements
 
