@@ -117,7 +117,9 @@ Pulse views are built using SwiftUI and require iOS 13. But even if your app req
 
 # Pulse macOS App
 
-Pulse macOS pre-Alpha is now available as early access. Requires Big Sur. No optimizations have been done yet.
+Pulse macOS Alpha is now available as early access. Requires Big Sur.
+
+> Demo store is attached to the latest release.
 
 <br/>
 
@@ -127,7 +129,7 @@ Pulse macOS pre-Alpha is now available as early access. Requires Big Sur. No opt
 |---------------|-----------------|
 | Pulse    | Beta       |
 | PulseUI (iOS framework)      | Beta       |
-| Pulse (macOS app)      | Experimental |
+| Pulse (macOS app)      | Alpha |
 | tvOS, watchOS support      | Upcoming |
 
 # Minimum Requirements
