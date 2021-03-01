@@ -117,6 +117,8 @@ Pulse views are built using SwiftUI and require iOS 13. But even if your app req
 
 # Pulse macOS App
 
+<img width=128 src="https://user-images.githubusercontent.com/1567433/109444557-82a4cf00-7a0b-11eb-9262-83ee6fb26b1a.png">
+
 Pulse macOS Alpha is now available as early access. Requires Big Sur.
 
 > Demo store is attached to the latest release.
