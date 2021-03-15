@@ -5,17 +5,17 @@
 *Mar 14, 2021*
 
 - [watchOS] Initial watchOS version.
-- [Pulse] Add custom document type with ".pulse" extension. The file is a deflated zip archive that contains blobs, database, and store manifest
+- [iOS] Add a separate option to share a store as text
 - [iOS] Fix sharing to Dropbox, Outlook
+- [macOS] Fix an issue when sometimes outdated logs will get deleted when viewing archived store
+- [macOS] More performance improvements
+- [macOS] Fix pin management when multiple stores are open
+- [Pulse] Add custom document type with ".pulse" extension. The file is a deflated zip archive that contains blobs, database, and store manifest
 - [Pulse] Add new APIs for `LoggerMessageStore`:
 	- `archive()` creates a store archive (.pulse file)
 	- `copyStore(at:)`
 	- `allNetworkRequests()`
 - [Pulse] Remove `BlobStore` and all associated APIs, it's now managed automatically by `LoggerMessageStore`
-- [macOS] Fix an issue when sometimes outdated logs will get deleted when viewing archived store
-- [macOS] More performance optimizations
-- [iOS] Add a separate option to share a store as text
-- [macOS] Fix pin management when multiple stores are open
 
 ## Pulse 0.9.9
 
