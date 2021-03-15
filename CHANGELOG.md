@@ -1,5 +1,60 @@
 # Pulse 0.x
 
+## Pulse 0.10.0
+
+*Mar 14, 2021*
+
+- [watchOS] Initial watchOS version.
+- [Pulse] Add custom document type with ".pulse" extension. The file is a deflated zip archive that contains blobs, database, and store manifest
+- [iOS] Fix sharing to Dropbox, Outlook
+- [Pulse] Add new APIs for `LoggerMessageStore`:
+	- `archive()` creates a store archive (.pulse file)
+	- `copyStore(at:)`
+	- `allNetworkRequests()`
+- [Pulse] Remove `BlobStore` and all associated APIs, it's now managed automatically by `LoggerMessageStore`
+- [macOS] Fix an issue when sometimes outdated logs will get deleted when viewing archived store
+- [macOS] More performance optimizations
+- [iOS] Add a separate option to share a store as text
+- [macOS] Fix pin management when multiple stores are open
+
+## Pulse 0.9.9
+
+*Mar 7, 2021*
+
+- Display request duration right in the list
+- Add Catalyst support
+
+## Pulse 0.9.7
+
+*Mar 2, 2021*
+
+macOS-only release
+
+- Add more performance improvements on macOS
+- Fix a couple of search-related issues
+
+## Pulse 0.9.6
+
+*Mar 1, 2021*
+
+- Multiple performance optimizations across the board. Pulse now effortlessly support 50.000+ logs. More optimizations to come in the future versions.
+
+## Fixes
+
+- Fix an issue with sharing network messages from the list on iOS
+- Fix case-sensitive text search
+- Fix search when log levels are all disabled
+- Fix an issue where a Mac app would sometimes remove messages (add new readonly LoggerMessageStore option)
+
+## Pulse 0.9.5
+
+*Feb 20, 2021*
+
+- Initial macOS version is now available
+- Fix an issue where text disappears during search (iOS)
+
+> macOS demo attached to the release as .pkg (see private repo)
+
 ## Pulse 0.9.4
 
 *Feb 13, 2021*
