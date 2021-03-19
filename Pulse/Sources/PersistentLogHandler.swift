@@ -1,22 +1,21 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2021 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
 import PulseCore
 import Logging
 
 public typealias NetworkLogger = PulseCore.NetworkLogger
-public typealias LoggerMessageStore = PulseCore.LoggerMessageStore
+public typealias LoggerStore = PulseCore.LoggerStore
 public typealias LoggerSession = PulseCore.LoggerSession
-public typealias BlobStore = PulseCore.BlobStore
 public typealias URLSessionProxyDelegate = PulseCore.URLSessionProxyDelegate
 
 public struct PersistentLogHandler {
     public var metadata = Logger.Metadata()
     public var logLevel = Logger.Level.info
 
-    private let store: LoggerMessageStore
+    private let store: LoggerStore
 
     private let label: String
 
@@ -24,7 +23,7 @@ public struct PersistentLogHandler {
         self.init(label: label, store: .default)
     }
 
-    public init(label: String, store: LoggerMessageStore) {
+    public init(label: String, store: LoggerStore) {
         self.label = label
         self.store = store
     }
@@ -48,23 +47,9 @@ extension PersistentLogHandler: LogHandler {
     }
 }
 
-// MARK: - Private (Logger.Level <-> LoggerMessageStore.Level)
+// MARK: - Private (Logger.Level <-> LoggerStore.Level)
 
-private extension Logger.Level {
-    init(_ level: LoggerMessageStore.Level) {
-        switch level {
-        case .trace: self = .trace
-        case .debug: self = .debug
-        case .info: self = .info
-        case .notice: self = .notice
-        case .warning: self = .warning
-        case .error: self = .error
-        case .critical: self = .critical
-        }
-    }
-}
-
-private extension LoggerMessageStore.Level {
+private extension LoggerStore.Level {
     init(_ level: Logger.Level) {
         switch level {
         case .trace: self = .trace
@@ -78,30 +63,15 @@ private extension LoggerMessageStore.Level {
     }
 }
 
-// MARK: - Private (Logger.Metadata <-> LoggerMessageStore.Metadata)
+// MARK: - Private (Logger.Metadata <-> LoggerStore.Metadata)
 
-private extension Logger.Metadata {
-    init(_ metadata: LoggerMessageStore.Metadata) {
-        self = metadata.mapValues(Logger.MetadataValue.init)
-    }
-}
-
-private extension LoggerMessageStore.Metadata {
+private extension LoggerStore.Metadata {
     init(_ metadata: Logger.Metadata) {
-        self = metadata.compactMapValues(LoggerMessageStore.MetadataValue.init)
+        self = metadata.compactMapValues(LoggerStore.MetadataValue.init)
     }
 }
 
-private extension Logger.MetadataValue {
-    init(_ value: LoggerMessageStore.MetadataValue) {
-        switch value {
-        case .string(let value): self = .string(value)
-        case .stringConvertible(let value): self = .stringConvertible(value)
-        }
-    }
-}
-
-private extension LoggerMessageStore.MetadataValue {
+private extension LoggerStore.MetadataValue {
     init?(_ value: Logger.MetadataValue) {
         switch value {
         case .string(let value): self = .string(value)
