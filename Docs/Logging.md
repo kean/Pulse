@@ -32,7 +32,7 @@ The logs are stored in a database. The request and response bodies are deduplica
 
 There are multiple options for logging network requests using Pulse.
 
-### 2.1. Automatic Logging
+### 2.1. Assisted Logging (Recommended)
 
 Use `URLSessionProxyDelegate` to automatically store all of the requried events. This is a preferred approach as it also captures task metrics.
 
@@ -50,7 +50,17 @@ let urlSession = URLSession(
 
 > `URLSessionProxyDelegate` is extremely small and simply uses `responds(to:)` and `forwardingTarget(for:)` methods to forward selectors to the actual session delegate when needed.
 
-### 2.2. Alamofire Integration
+### 2.2. Automatic Logging (Experimental)
+
+For fully automated logging, try `Experimental.URLSessionProxy`.
+
+```swift
+Experimental.URLSessionProxy.shared.isEnabled = true
+```
+
+> **WARNING** The way it works is by registering a custom [URLProtocol](https://developer.apple.com/documentation/foundation/urlprotocol) and using a secondary `URLSession` instance in it. This **will affect** your networking and should only be used for evaluating Pulse.
+
+### 2.3. Alamofire Integration
 
 While you can use `URLSessionProxyDelegate`, the recommended approach is to use `Alamofire.EventMonitor`.
 
@@ -82,7 +92,7 @@ struct NetworkLoggerEventMonitor: EventMonitor {
 }
 ```
 
-### 2.3. Manual Integration
+### 2.4. Manual Integration
 
 If none of the previous options work for you, you can use `NetworkLogger` directly to log the network events. While technically none of the logs are required, you want to the very least log data, metrics, and completion events.
 
