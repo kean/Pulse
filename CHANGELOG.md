@@ -9,10 +9,10 @@
 - Remove `LoggerStore(name:)` initializer
 - Rework and document `LoggerStore` initializer
 - Add `LoggerStore.empty` (can be used as a fallback to throwing init), `LoggerStore.archiveURL`
-- [Pulse] Add experimental `URLSessionProxy`
-- [Pulse] Add public API to control blob size limit (`LoggerStore.blobsSizeLimit`)
-- [Pulse] Add `LoggerStore.sweep` API and instead of logs expiration interval use size limit (`LoggerStore.databaseSizeLimit`)
-- [Pulse] Add `Experimental.URLSessionProxy`
+- Add experimental `URLSessionProxy`
+- Add public API to control blob size limit (`LoggerStore.blobsSizeLimit`)
+- Add `LoggerStore.sweep` API and instead of logs expiration interval use size limit (`LoggerStore.databaseSizeLimit`)
+- Add `Experimental.URLSessionProxy`
 
 ### iOS
 - Introduce a document-based "Pulse" iOS app to view logs (in addition to an SDK that you can integrate into your app). Beta coming soon.
@@ -22,6 +22,7 @@
 - Performance improvements 
 - Fix "Copy cURL" context action
 - Add "Copy response" context action
+- Fix an issue with search in text viewer when multple windows are open
 
 ### watchOS
 - Improve quick filters screen, now automatically dismissed after selecting a filter
