@@ -1,5 +1,31 @@
 # Pulse 0.x
 
+## Pulse 0.11.0
+
+*Mar 21, 2021*
+
+### Pulse
+- Add Pulse document type. It can be either a readonly archive (for sharing) for a package (for editing). [Read here](https://kean.blog/post/pulse-store).
+- Remove `LoggerStore(name:)` initializer
+- Rework and document `LoggerStore` initializer
+- Add `LoggerStore.empty` (can be used as a fallback to throwing init), `LoggerStore.archiveURL`
+- [Pulse] Add experimental `URLSessionProxy`
+- [Pulse] Add public API to control blob size limit (`LoggerStore.blobsSizeLimit`)
+- [Pulse] Add `LoggerStore.sweep` API and instead of logs expiration interval use size limit (`LoggerStore.databaseSizeLimit`)
+- [Pulse] Add `Experimental.URLSessionProxy`
+
+### iOS
+- Introduce a document-based "Pulse" iOS app to view logs (in addition to an SDK that you can integrate into your app). Beta coming soon.
+- Integrate a document browser to view stored files (replaces ad-hoc "Archive" introduce in Pulse 0.10)
+
+### macOS
+- Performance improvements 
+- Fix "Copy cURL" context action
+- Add "Copy response" context action
+
+### watchOS
+- Improve quick filters screen, now automatically dismissed after selecting a filter
+
 ## Pulse 0.10.0
 
 *Mar 14, 2021*
