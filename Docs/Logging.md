@@ -1,11 +1,11 @@
 # Network Requests Logging
 
-- [Network Requests Logging](#network-requests-logging)
-  * [1. Logging System Bootstrap](#1-logging-system-bootstrap)
-  * [2. Recording Network Logs](#2-recording-network-logs)
-  * [2.1. Automatic Logging](#21-automatic-logging)
-  * [2.2. Alamofire Integration](#22-alamofire-integration)
-  * [2.3. Manual Integration](#23-manual-integration)
+- [1. Logging System Bootstrap](#1-logging-system-bootstrap)
+- [2. Recording Network Logs](#2-recording-network-logs)
+  * [2.1. Assisted Logging](#21-assisted-logging)
+  * [2.2. Experimental Automatic Logging](#22-experimental-automatic-logging)
+  * [2.3. Alamofire Integration](#23-alamofire-integration)
+  * [2.4. Manual Integration](#24-manual-integration)
 
 Pulse is designed to be as least intrusive as possible. It doesn't use swizzling, it doesn't create custom URL protocols. It does only what you ask it to without the risk of interfering with your network communications.
 
@@ -32,7 +32,7 @@ The logs are stored in a database. The request and response bodies are deduplica
 
 There are multiple options for logging network requests using Pulse.
 
-### 2.1. Assisted Logging (Recommended)
+### 2.1. Assisted Logging
 
 Use `URLSessionProxyDelegate` to automatically store all of the requried events. This is a preferred approach as it also captures task metrics.
 
@@ -50,7 +50,7 @@ let urlSession = URLSession(
 
 > `URLSessionProxyDelegate` is extremely small and simply uses `responds(to:)` and `forwardingTarget(for:)` methods to forward selectors to the actual session delegate when needed.
 
-### 2.2. Automatic Logging (Experimental)
+### 2.2. Experimental Automatic Logging 
 
 For fully automated logging, try `Experimental.URLSessionProxy`.
 
