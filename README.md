@@ -19,8 +19,7 @@ Record and inspect network requests and logs right from your iOS app using Pulse
 ![promo-4-2](https://user-images.githubusercontent.com/1567433/111088123-0d052c80-84fc-11eb-921c-af8de5c8032b.png)
 
 <br/>
-
-![promo-5](https://user-images.githubusercontent.com/1567433/108644060-60dfa100-747b-11eb-8b14-bf94d609c4e5.png)
+![promo-5-02](https://user-images.githubusercontent.com/1567433/112767628-df34e300-8fe5-11eb-92ec-5dfa204acca5.png)
 
 <br/>
 
