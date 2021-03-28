@@ -127,6 +127,10 @@ Pulse macOS Alpha is now available as early access. Requires Big Sur.
 
 <br/>
 
+# Pulse iOS App
+
+Pulse is also available as an iOS app, which is a document-based app for viewing logs on iOS devices.
+
 # Status
 
 |  Project         | Status          |
