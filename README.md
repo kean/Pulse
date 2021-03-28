@@ -131,20 +131,23 @@ Pulse macOS Alpha is now available as early access. Requires Big Sur.
 
 Pulse is also available as an iOS app, which is a document-based app for viewing logs on iOS devices.
 
+<br/>
+
 # Status
 
 |  Project         | Status          |
 |---------------|-----------------|
 | Pulse    | Beta       |
 | PulseUI (iOS)      | Beta       |
-| PulseUI (watchOS)      | Alpha       |
-| Pulse (macOS app)      | Alpha |
-| tvOS support      | Upcoming |
+| PulseUI (watchOS)      | Beta       |
+| Pulse (macOS app)      | Beta |
+| tvOS support      | Beta |
 
 # Minimum Requirements
 
 | Pulse          | Swift           | Xcode           | Platforms                                         |
 |---------------|-----------------|-----------------|---------------------------------------------------|
+| Pulse 0.12.0      | Swift 5.3       | Xcode 12.0      | iOS 11.0 (views iOS 13.0) / watchOS 6.0 (views watchOS 7.0) / tvOS 11.0 (no views) / macOS 11.0 |
 | Pulse 0.10.0      | Swift 5.3       | Xcode 12.0      | iOS 11.0 (views iOS 13.0) / watchOS 6.0 (views watchOS 7.0) / macOS 11.0 |
 | Pulse 0.9.2      | Swift 5.3       | Xcode 12.0      | iOS 11.0 (views requires iOS 13) | 
 | Pulse 0.9.0      | Swift 5.3       | Xcode 12.0      | iOS 13.0  (Upcoming conditional iOS 11+ and other platforms) | 
