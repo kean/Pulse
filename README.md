@@ -36,6 +36,14 @@ Record and inspect network requests and logs right from your iOS app using Pulse
 
 <br/>
 
+![promo-6](https://user-images.githubusercontent.com/1567433/112777284-d0fbbc80-900f-11eb-9b89-9a31d2cda7cc.png)
+
+<br/>
+
+![promo-7](https://user-images.githubusercontent.com/1567433/112777285-d1945300-900f-11eb-8aaa-45d6ed392f3d.png)
+
+<br/>
+
 # About
 
 `Pulse` is not a tool, it's a framework. It records events from `URLSession` or from frameworks that use it, such as `Alamofire`, and displays them using `PulseUI` views that you integrate directly into your app.
