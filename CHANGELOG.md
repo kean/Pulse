@@ -1,5 +1,11 @@
 # Pulse 0.x
 
+## Pulse 0.14.1
+
+*Mar 30, 2021*
+
+Performance improvements on iOS, tvOS, watchOS
+
 ## Pulse 0.14.0
 
 *Mar 29, 2021*
