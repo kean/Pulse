@@ -153,13 +153,12 @@ Pulse is also available as an iOS app, which is a document-based app for viewing
 
 # Minimum Requirements
 
+**PulseUI** views are available only on indicated platforms, but the framework can be installed in the app targeting the **PulseCore** platforms – you just won't be able to use the views.
+
 | Pulse          | Swift           | Xcode           | Platforms                                         |
 |---------------|-----------------|-----------------|---------------------------------------------------|
-| Pulse 0.12.0      | Swift 5.3       | Xcode 12.0      | iOS 11.0 (views iOS 13.0) / watchOS 6.0 (views watchOS 7.0) / tvOS 11.0 (no views) / macOS 11.0 |
-| Pulse 0.10.0      | Swift 5.3       | Xcode 12.0      | iOS 11.0 (views iOS 13.0) / watchOS 6.0 (views watchOS 7.0) / macOS 11.0 |
-| Pulse 0.9.2      | Swift 5.3       | Xcode 12.0      | iOS 11.0 (views requires iOS 13) | 
-| Pulse 0.9.0      | Swift 5.3       | Xcode 12.0      | iOS 13.0  (Upcoming conditional iOS 11+ and other platforms) | 
-| Pulse 0.3      | Swift 5.2       | Xcode 11.3      | iOS 11.0 / watchOS 4.0 / macOS 10.13 / tvOS 11.0  |
+| PulseCore 0.14.0      | Swift 5.3       | Xcode 12.0      | iOS 11.0  / watchOS 6.0 / tvOS 11.0 / macOS 11.0 |
+| PulseUI 0.14.0      | Swift 5.3       | Xcode 12.0      | iOS 13.0 / watchOS 7.0 / tvOS 13.0 / macOS 11.0 |
 
 # License
 
