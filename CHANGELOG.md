@@ -1,5 +1,41 @@
 # Pulse 0.x
 
+## Pulse 0.14.0
+
+*Mar 29, 2021*
+
+### macOS
+- Fix an issue when dispay errors for store issues 
+
+### tvOS
+- Initial release of UI components
+
+### iOS
+- Fix disclosure indicators in horizontal mode
+
+### Internal
+- Remove @EnvironmentObject usage (still has defects)
+
+## Pulse 0.12.0
+
+*Mar 27, 2021*
+
+### Pulse
+- Add new `LoggerStoreOptions.sweep` that automatically reduces store size when needed by removing the least recently added messages and blobs
+- Make `LoggerStore.Options` a nested type
+
+### macOS
+- Improve window management on macOS
+- Add commands: Open, Open Recent
+- Display recent documents on the welcome screen (replaces onDrop which became useless after Pulse document type addition)
+
+### iOS
+- Remove link detection when viewing headers
+- Add formatting when viewing raw headers (bold header names)
+
+### tvOS
+- Initial release (no UI, just logger)
+
 ## Pulse 0.11.0
 
 *Mar 21, 2021*
