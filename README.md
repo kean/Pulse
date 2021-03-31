@@ -155,7 +155,7 @@ Pulse is also available as an iOS app, which is a document-based app for viewing
 
 # Dependencies
 
-- [ZIPFoundation](https://github.com/weichsel/ZIPFoundation/) for archiving Pulse documents
+- [ZIPFoundation](https://github.com/weichsel/ZIPFoundation/) for archiving Pulse documents (currently sponsoring it on GitHub)
 
 <br/>
 
