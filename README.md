@@ -151,6 +151,14 @@ Pulse is also available as an iOS app, which is a document-based app for viewing
 | Pulse (macOS app)      | Beta |
 | tvOS support      | Beta |
 
+<br/>
+
+# Dependencies
+
+- [ZIPFoundation](https://github.com/weichsel/ZIPFoundation/) for archiving Pulse documents
+
+<br/>
+
 # Minimum Requirements
 
 **PulseUI** views are available only on indicated platforms, but the framework can be installed in the app targeting the **PulseCore** platforms – you just won't be able to use the views.
@@ -159,6 +167,8 @@ Pulse is also available as an iOS app, which is a document-based app for viewing
 |---------------|-----------------|-----------------|---------------------------------------------------|
 | PulseCore 0.14.0      | Swift 5.3       | Xcode 12.0      | iOS 11.0  / watchOS 6.0 / tvOS 11.0 / macOS 11.0 |
 | PulseUI 0.14.0      | Swift 5.3       | Xcode 12.0      | iOS 13.0 / watchOS 7.0 / tvOS 13.0 / macOS 11.0 |
+
+<br/>
 
 # License
 
