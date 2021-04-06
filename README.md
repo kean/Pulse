@@ -58,7 +58,7 @@ Pulse is integrated directly into your app and is always recording (when your co
 
 **Pulse** is available only for [**GitHub sponsors**](https://github.com/sponsors/kean). Once the number of sponsors reaches a certain level, the project will become available to everyone.
 
-> The access to the private project manifest is provided manually, there might be a bit of a delay before you get access after sponsoring.
+> The access to the private project manifest is provided manually, there might be a bit of a delay before you get access after sponsoring. If you are sponsoring as an organization, please [reach out](https://twitter.com/home) to me.
 
 Pulse is distributed using Swift Package Manager as a binary framework. It is built using SwiftUI and includes no resources to ensure its tiny size. The thinned `.ipa` with Pulse included takes **<640 KB**. You can simply leave it in your app store builds. And because it's a binary framework, it doesn't increase your compile time.
 
