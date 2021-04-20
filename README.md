@@ -46,6 +46,10 @@ Record and inspect network requests and logs right from your iOS app using Pulse
 
 `Pulse` is not a tool, it's a framework. It records events from `URLSession` or from frameworks that use it, such as `Alamofire`, and displays them using `PulseUI` views that you integrate directly into your app. This way Pulse console is available for everyone who has your test builds. You or your QA team can view the logs on the device and easily share them to attach to bug reports.
 
+**Free**
+
+Pulse is currently available for free. I thought it wouldn't make sense to try to make it paid as it's primarily a framework. But I hope that teams that use it would sponsor it. Think of it as "pay as much as you want."
+
 **What Pulse is Not**
 
 Pulse **is not** a network debugging proxy tool like Proxyman, Charles, or Wireshark. It *won't* automatically intercept all network traffic coming from your app or device. And to view logs in realtime, you need to use `PulseUI.framework` that you integrate into your app. The dedicated Pulse iOS and macOS also use `PulseUI.framework` and are there to view logs manually shared from other devices.
