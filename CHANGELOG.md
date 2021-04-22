@@ -1,5 +1,27 @@
 # Pulse 0.x
 
+## Pulse 0.15.0
+
+*21 Apr, 2021*
+
+### PulseUI
+
+- Add HTML export for network requests
+- When using a Markdown export, add `.markdown` file extension
+
+### PulseCore
+- Add `URLSessionProxyDelegate.enableAutomaticRegistration()` for more convenient proxy registration
+
+## Pulse 0.14.2
+
+*19 Apr, 2021*
+
+Initial public release. See [**Pulse Docs**](https://kean.blog/pulse/home) for more info.
+
+- Frameworks are distributed as SPM packages (using XCFramework) and are also attached to this release
+- iOS app is currently available as an open beta at https://testflight.apple.com/join/1jcanE3q
+- macOS app attached to the release https://github.com/kean/Pulse/releases/download/0.14.2/Pulse.app.zip
+
 ## Pulse 0.14.1
 
 *Mar 30, 2021*
