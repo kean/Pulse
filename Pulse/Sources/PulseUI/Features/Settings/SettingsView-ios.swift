@@ -13,6 +13,8 @@ struct SettingsView: View {
     @ObservedObject var model: SettingsViewModel
     @ObservedObject var console: ConsoleViewModel
 
+    @State private var isDocumentBrowserPresented = false
+
     var body: some View {
         NavigationView {
             Form {
@@ -33,11 +35,7 @@ struct SettingsView: View {
                     Section {
                         if #available(iOS 14.0, *) {
                             Button(action: {
-                                UIViewController.present { dismiss in
-                                    let vc = DocumentBrowserViewController(forOpeningContentTypes: [UTType(filenameExtension: "pulse")].compactMap { $0 })
-                                    vc.modalPresentationStyle = .fullScreen
-                                    return vc
-                                }
+                                isDocumentBrowserPresented = true
                             }) {
                                 HStack {
                                     Image(systemName: "doc")
@@ -45,6 +43,9 @@ struct SettingsView: View {
                                     Text("Browse Files")
                                         .foregroundColor(Color.primary)
                                 }
+                            }
+                            .fullScreenCover(isPresented: $isDocumentBrowserPresented) {
+                                DocumentBrowser()
                             }
                         }
 
@@ -74,6 +75,17 @@ struct SettingsView: View {
             .navigationBarTitle("Settings")
             .navigationBarItems(leading: model.onDismiss.map { Button("Close", action: $0) })
         }.navigationViewStyle(StackNavigationViewStyle())
+    }
+}
+
+@available(iOS 14.0, *)
+private struct DocumentBrowser: UIViewControllerRepresentable {
+    func makeUIViewController(context: Context) -> DocumentBrowserViewController {
+        DocumentBrowserViewController(forOpeningContentTypes: [UTType(filenameExtension: "pulse")].compactMap { $0 })
+    }
+
+    func updateUIViewController(_ uiViewController: DocumentBrowserViewController, context: Context) {
+
     }
 }
 
