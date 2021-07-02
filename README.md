@@ -65,7 +65,7 @@ Pulse is easy to learn and use thanks to beautiful [**Pulse Docs**](https://kean
 
 ## Dependencies
 
-- [ZIPFoundation](https://github.com/weichsel/ZIPFoundation/) for archiving Pulse documents (currently sponsoring it on GitHub)
+- [ZIPFoundation](https://github.com/weichsel/ZIPFoundation/) for archiving Pulse documents (currently sponsoring it on GitHub). It's included directly in the binary.
 
 ## Minimum Requirements
 
