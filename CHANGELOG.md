@@ -1,5 +1,9 @@
 # Pulse 0.x
 
+## Pulse 0.15.2
+
+*2 Jul, 2021*
+
 - Fix [#19](https://github.com/kean/Pulse/issues/19) – fails to present a file browser
 
 ## Pulse 0.15.1
