@@ -181,14 +181,17 @@ extension UIViewController {
 
     @discardableResult
     static func present(_ closure: (_ dismiss: @escaping () -> Void) -> UIViewController) -> UIViewController? {
-        guard let window = UIApplication.shared.windows.filter({ $0.isKeyWindow }).first,
-              let rootVC = window.rootViewController else {
+        guard let keyWindow = UIApplication.shared.windows.filter({ $0.isKeyWindow }).first,
+              var topController = keyWindow.rootViewController else {
             return nil
         }
-        let vc = closure({ [weak rootVC] in
-            rootVC?.dismiss(animated: true, completion: nil)
+        while let presentedViewController = topController.presentedViewController {
+            topController = presentedViewController
+        }
+        let vc = closure({ [weak topController] in
+            topController?.dismiss(animated: true, completion: nil)
         })
-        rootVC.present(vc, animated: true, completion: nil)
+        topController.present(vc, animated: true, completion: nil)
         return vc
     }
 }
