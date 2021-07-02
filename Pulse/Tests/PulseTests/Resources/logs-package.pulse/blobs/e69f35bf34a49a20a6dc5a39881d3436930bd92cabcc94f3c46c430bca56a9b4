@@ -1,0 +1,11 @@
+{
+    "access-token": "a1",
+    "refresh-token": "m1",
+    "profile": {
+        "id": 1,
+        "name": "kean",
+        "repos": ["Nuke", "Pulse", "Align"],
+        "hireable": false,
+        "email": null
+    }
+}

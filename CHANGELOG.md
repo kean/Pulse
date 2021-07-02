@@ -1,5 +1,11 @@
 # Pulse 0.x
 
+## Pulse 0.15.1
+
+*27 Apr, 2021*
+
+- Add a missing `CFBundleVersion`.
+
 ## Pulse 0.15.0
 
 *21 Apr, 2021*
