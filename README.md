@@ -5,7 +5,7 @@
 
 Record and inspect network requests and logs right from your iOS app using Pulse Console. Share and view logs in Pulse macOS app. Logs are recorded locally and never leave your device. Learn more at [**kean.blog/pulse**](https://kean.blog/pulse/home) 🔗.
 
-**Pulse** is free to use, but it's strongly encouraged to sponsor it (pay as much as you want).
+**Pulse** is free to use, but it's encouraged to sponsor it (pay as much as you want)
 
 <br/>
 <br/>
