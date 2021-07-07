@@ -121,6 +121,7 @@ struct ConsoleFiltersView: View {
     }
 }
 
+#if DEBUG
 struct ConsoleFiltersView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
@@ -128,5 +129,6 @@ struct ConsoleFiltersView_Previews: PreviewProvider {
         }
     }
 }
+#endif
 
 #endif

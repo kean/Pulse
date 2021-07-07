@@ -66,6 +66,7 @@ public struct NetworkView: View {
     #endif
 }
 
+#if DEBUG
 @available(iOS 13.0, tvOS 14.0, *)
 struct NetworkView_Previews: PreviewProvider {
     static var previews: some View {
@@ -76,5 +77,6 @@ struct NetworkView_Previews: PreviewProvider {
         }
     }
 }
+#endif
 
 #endif

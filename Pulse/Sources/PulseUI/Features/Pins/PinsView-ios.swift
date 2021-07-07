@@ -55,6 +55,7 @@ public struct PinsView: View {
     }
 }
 
+#if DEBUG
 @available(iOS 13.0, *)
 struct PinsView_Previews: PreviewProvider {
     static var previews: some View {
@@ -65,5 +66,6 @@ struct PinsView_Previews: PreviewProvider {
         }
     }
 }
+#endif
 
 #endif

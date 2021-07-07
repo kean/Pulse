@@ -57,6 +57,7 @@ struct PinsView: View {
     }
 }
 
+#if DEBUG
 struct PinsView_Previews: PreviewProvider {
     static var previews: some View {
         return Group {
@@ -66,5 +67,6 @@ struct PinsView_Previews: PreviewProvider {
         }
     }
 }
+#endif
 
 #endif
