@@ -1,5 +1,11 @@
 # Pulse 0.x
 
+## Pulse 0.15.3
+
+*7 Jul, 2021*
+
+- Fix archive actions for a macOS app
+
 ## Pulse 0.15.2
 
 *2 Jul, 2021*
