@@ -28,7 +28,7 @@ final class NotListViewModel<Element: NotListIdentifiable>: ObservableObject {
     }
 }
 
-// Becuase SwiftUI List is pretty broken on macOS https://kean.blog/post/not-list
+// Because SwiftUI List is pretty broken on macOS https://kean.blog/post/not-list
 struct NotList<Element: NotListIdentifiable>: NSViewRepresentable {
     @ObservedObject var model: NotListViewModel<Element>
 

@@ -24,7 +24,7 @@ func prettifyJSON(_ data: Data) -> String {
 }
 
 extension String {
-    /// Finds all occurences of the given string
+    /// Finds all occurrences of the given string
     func ranges(of substring: String, options: String.CompareOptions = []) -> [Range<String.Index>] {
         var index = startIndex
         var ranges = [Range<String.Index>]()

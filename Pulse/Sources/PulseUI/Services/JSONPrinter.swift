@@ -53,7 +53,7 @@ private func getClass(for element: JSONElement) -> String {
 @available(iOS 13, tvOS 14.0, *)
 final class JSONPrinter {
     private let renderer: JSONRenderer
-    private var indention = 0
+    private var indentation = 0
 
     init(renderer: JSONRenderer) {
         self.renderer = renderer
@@ -76,9 +76,9 @@ final class JSONPrinter {
                 indent()
                 append("  \"\(key)\"", .key)
                 append(": ", .punctuation)
-                indention += 2
+                indentation += 2
                 print(json: object[key]!, isFree: false)
-                indention -= 2
+                indentation -= 2
                 if key != keys.last {
                     append(",", .punctuation)
                 }
@@ -91,7 +91,7 @@ final class JSONPrinter {
         case let array as Array<Any>:
             if array.contains(where: { $0 is [String: Any] }) {
                 append("[\n", .punctuation)
-                indention += 2
+                indentation += 2
                 for index in array.indices {
                     print(json: array[index], isFree: true)
                     if index < array.endIndex - 1 {
@@ -99,7 +99,7 @@ final class JSONPrinter {
                     }
                     newline()
                 }
-                indention -= 2
+                indentation -= 2
                 indent()
                 append("]", .punctuation)
             } else {
@@ -128,7 +128,7 @@ final class JSONPrinter {
     }
 
     func indent() {
-        renderer.indent(count: indention)
+        renderer.indent(count: indentation)
     }
 
     func newline() {

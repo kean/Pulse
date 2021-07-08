@@ -115,7 +115,7 @@ final class Archive: Sequence {
 
     /// Initializes a new ZIP `Archive`.
     ///
-    /// You can use this initalizer to create new archive files or to read and update existing ones.
+    /// You can use this initializer to create new archive files or to read and update existing ones.
     /// The `mode` parameter indicates the intended usage of the archive: `.read`, `.create` or `.update`.
     /// - Parameters:
     ///   - url: File URL to the receivers backing file.

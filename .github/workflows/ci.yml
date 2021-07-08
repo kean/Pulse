@@ -27,6 +27,11 @@ jobs:
       - uses: actions/checkout@v2
       - name: Run Tests
         run: cd Pulse && swift build
+      - name: Discover typos
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install codespell
+          codespell --ignore-words-list="hart,inout,msdos,sur" --skip="./Pulse/.build/*"
 #  tvos-latest:
 #    name: Unit Tests (tvOS 14.2, Xcode 12.2)
 #    runs-on: macOS-latest
