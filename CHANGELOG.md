@@ -51,7 +51,7 @@ Performance improvements on iOS, tvOS, watchOS
 *Mar 29, 2021*
 
 ### macOS
-- Fix an issue when dispay errors for store issues 
+- Fix an issue when displaying errors for store issues 
 
 ### tvOS
 - Initial release of UI components
@@ -104,7 +104,7 @@ Performance improvements on iOS, tvOS, watchOS
 - Performance improvements 
 - Fix "Copy cURL" context action
 - Add "Copy response" context action
-- Fix an issue with search in text viewer when multple windows are open
+- Fix an issue with search in text viewer when multiple windows are open
 
 ### watchOS
 - Improve quick filters screen, now automatically dismissed after selecting a filter
@@ -219,8 +219,8 @@ macOS-only release
 
 - Refined message list UI
 - Add quick filters for easy access to commonly used filters
-- Add an easy way to reset fitlers
-- Network viwer (using tabs)
+- Add an easy way to reset filters
+- Network viewer (using tabs)
 - Add "Pins" tab. Pin messages by either using a context menu or by going to the details screen.
 - Add new filters: select any combinations of log levels to display, or set cuastom date interval
 - Dedicated share sheet for network messages:
@@ -231,7 +231,7 @@ macOS-only release
 - In addition to JSON, response body viewer now supports more content types: plain text, images
 - You can now copy HTTP header keys and values
 - Copy or share respones/request in Network Inspector
-- In case of a URLError, display both thte code and the short descrition in the list
+- In case of a URLError, display both the code and the short description in the list
 - Network tab. Search based on method, path, parameters - anything
 - Add powerful search to Response view
 
@@ -269,7 +269,7 @@ macOS-only release
 *Feb 4, 2021*
 
 - Remove UserDefaults sharing from share service
-- Response and Request blobs are now stored in a dedicated BlobStore, essentially filesystem. The store has a size limit and uses LRU algorithm for cleanup. BlobStore also deduplicates the blobs, so if the app recieves the same response multiple times, only one blob is stored.
+- Response and Request blobs are now stored in a dedicated BlobStore, essentially filesystem. The store has a size limit and uses LRU algorithm for cleanup. BlobStore also deduplicates the blobs, so if the app receives the same response multiple times, only one blob is stored.
 - You can open a Pulse store on macOS be selecting a directory with a store, not just the store itself
 - Refined view for message list on iOS
 - Special messages list cells for network requests
@@ -299,7 +299,7 @@ macOS-only release
 
 *May 4, 2020*
 
-- Update package depenency to no longer use local dependencies
+- Update package dependency to no longer use local dependencies
 
 ## Pulse 0.2.0
 
