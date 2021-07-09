@@ -6,9 +6,7 @@ import Foundation
 import PulseUI
 import PulseCore
 
-// If you want to avoid using swizzling and proxies, just implement the following
-// URLSession delegate methods.
-
+// Uses `URLSessionProxyDelegate` to automatically log the requests.
 final class URLSessionAutomatedIntegration {
     private let logger: NetworkLogger
     private let delegate: SessionDelegate
