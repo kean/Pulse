@@ -51,7 +51,7 @@ private final class SessionDelegate: NSObject, WCSessionDelegate {
     }
 
     func sessionDidDeactivate(_ session: WCSession) {
-        debugPrint("WCSession did deactive")
+        debugPrint("WCSession did deactivate")
     }
     #endif
 
