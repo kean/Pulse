@@ -13,7 +13,7 @@ public final class URLSessionProxyDelegate: NSObject, URLSessionTaskDelegate, UR
 
     /// - parameter logger: By default, creates a logger with `LoggerStore.default`.
     /// - parameter delegate: The "actual" session delegate.
-    public init(logger: NetworkLogger = .init(), delegate: URLSessionDelegate) {
+    public init(logger: NetworkLogger = .init(), delegate: URLSessionDelegate?) {
         self.actualDelegate = delegate
         self.taskDelegate = delegate as? URLSessionTaskDelegate
         self.interceptedSelectors = [
@@ -70,7 +70,7 @@ public final class URLSessionProxyDelegate: NSObject, URLSessionTaskDelegate, UR
 // MARK: - Automatic Registration
 
 private extension URLSession {
-    @objc class func pulse_init(configuration: URLSessionConfiguration, delegate: URLSessionDelegate, delegateQueue: OperationQueue?) -> URLSession {
+    @objc class func pulse_init(configuration: URLSessionConfiguration, delegate: URLSessionDelegate?, delegateQueue: OperationQueue?) -> URLSession {
         let delegate = URLSessionProxyDelegate(logger: sharedLogger, delegate: delegate)
         return self.pulse_init(configuration: configuration, delegate: delegate, delegateQueue: delegateQueue)
     }
