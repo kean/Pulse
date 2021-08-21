@@ -54,6 +54,10 @@
 		0CEAB42A25FE86ED00F09B0F /* MockDataTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD2A4AC25D4A2E70087E9E3 /* MockDataTask.swift */; };
 		0CEAB42F25FE86FB00F09B0F /* PulseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 0CEAB42E25FE86FB00F09B0F /* PulseCore */; };
 		0CEAB43125FE86FC00F09B0F /* PulseUI in Frameworks */ = {isa = PBXBuildFile; productRef = 0CEAB43025FE86FC00F09B0F /* PulseUI */; };
+		49E82A8626D107A00070244F /* AlamofireIntegration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49E82A8526D107A00070244F /* AlamofireIntegration.swift */; };
+		49E82A8726D107A00070244F /* AlamofireIntegration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49E82A8526D107A00070244F /* AlamofireIntegration.swift */; };
+		49E82A8926D1083D0070244F /* MoyaIntegration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49E82A8826D1083D0070244F /* MoyaIntegration.swift */; };
+		49E82A8A26D1083D0070244F /* MoyaIntegration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49E82A8826D1083D0070244F /* MoyaIntegration.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -163,6 +167,8 @@
 		0CEAB40E25FE867300F09B0F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0CEAB40F25FE867300F09B0F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0CFF9BD825D6199A0069DB6A /* repos.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = repos.json; sourceTree = "<group>"; };
+		49E82A8526D107A00070244F /* AlamofireIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlamofireIntegration.swift; sourceTree = "<group>"; };
+		49E82A8826D1083D0070244F /* MoyaIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoyaIntegration.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -219,6 +225,8 @@
 			children = (
 				0C25FB6E25CDDCAB00A895C2 /* URLSessionManualIntegration.swift */,
 				0C1221E525CE09C100B81D7A /* URLSessionAutomatedIntegration.swift */,
+				49E82A8526D107A00070244F /* AlamofireIntegration.swift */,
+				49E82A8826D1083D0070244F /* MoyaIntegration.swift */,
 			);
 			path = IntegrationsExamples;
 			sourceTree = "<group>";
@@ -668,8 +676,10 @@
 				0C57AD85245F0F38005B3400 /* AppDelegate.swift in Sources */,
 				0C57AD87245F0F38005B3400 /* SceneDelegate.swift in Sources */,
 				0C1221E625CE09C100B81D7A /* URLSessionAutomatedIntegration.swift in Sources */,
+				49E82A8926D1083D0070244F /* MoyaIntegration.swift in Sources */,
 				0C25FB6F25CDDCAB00A895C2 /* URLSessionManualIntegration.swift in Sources */,
 				0C516FF026016392004813B4 /* DocumentBrowser.swift in Sources */,
+				49E82A8626D107A00070244F /* AlamofireIntegration.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -680,8 +690,10 @@
 				0C2464A625D9D6C40057A577 /* AppCommands.swift in Sources */,
 				0C1221E725CE09C100B81D7A /* URLSessionAutomatedIntegration.swift in Sources */,
 				0C57ADC2245F1441005B3400 /* AppWelcomeView.swift in Sources */,
+				49E82A8A26D1083D0070244F /* MoyaIntegration.swift in Sources */,
 				0C25FB7F25CDFB1000A895C2 /* URLSessionManualIntegration.swift in Sources */,
 				0C57ADA4245F0F91005B3400 /* App.swift in Sources */,
+				49E82A8726D107A00070244F /* AlamofireIntegration.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
