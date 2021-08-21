@@ -7,6 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0C0B31ED26D179A20045C9E1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0B31EC26D179A20045C9E1 /* AppDelegate.swift */; };
+		0C0B31EF26D179A20045C9E1 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0B31EE26D179A20045C9E1 /* SceneDelegate.swift */; };
+		0C0B31F126D179A20045C9E1 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0B31F026D179A20045C9E1 /* ViewController.swift */; };
+		0C0B31F426D179A20045C9E1 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0C0B31F226D179A20045C9E1 /* Main.storyboard */; };
+		0C0B31F626D179A70045C9E1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C0B31F526D179A70045C9E1 /* Assets.xcassets */; };
+		0C0B31F926D179A70045C9E1 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0C0B31F726D179A70045C9E1 /* LaunchScreen.storyboard */; };
+		0C0B321526D17D2A0045C9E1 /* PulseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 0C0B321426D17D2A0045C9E1 /* PulseCore */; };
+		0C0B321726D17D2A0045C9E1 /* PulseUI in Frameworks */ = {isa = PBXBuildFile; productRef = 0C0B321626D17D2A0045C9E1 /* PulseUI */; };
 		0C0E6318260186C700A0DF40 /* Pulse Demo watchOS.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 0CEAB3DA25FE862D00F09B0F /* Pulse Demo watchOS.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		0C1221E625CE09C100B81D7A /* URLSessionAutomatedIntegration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C1221E525CE09C100B81D7A /* URLSessionAutomatedIntegration.swift */; };
 		0C1221E725CE09C100B81D7A /* URLSessionAutomatedIntegration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C1221E525CE09C100B81D7A /* URLSessionAutomatedIntegration.swift */; };
@@ -124,6 +132,14 @@
 
 /* Begin PBXFileReference section */
 		0C07EDCD25CEF648002DC091 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		0C0B31EA26D179A20045C9E1 /* Pulse Integration Examples iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pulse Integration Examples iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		0C0B31EC26D179A20045C9E1 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		0C0B31EE26D179A20045C9E1 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		0C0B31F026D179A20045C9E1 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		0C0B31F326D179A20045C9E1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		0C0B31F526D179A70045C9E1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		0C0B31F826D179A70045C9E1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		0C0B31FA26D179A70045C9E1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0C1221E525CE09C100B81D7A /* URLSessionAutomatedIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionAutomatedIntegration.swift; sourceTree = "<group>"; };
 		0C2464A525D9D6C40057A577 /* AppCommands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCommands.swift; sourceTree = "<group>"; };
 		0C25FB6E25CDDCAB00A895C2 /* URLSessionManualIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionManualIntegration.swift; sourceTree = "<group>"; };
@@ -172,6 +188,15 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		0C0B31E726D179A20045C9E1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0C0B321726D17D2A0045C9E1 /* PulseUI in Frameworks */,
+				0C0B321526D17D2A0045C9E1 /* PulseCore in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		0C516FB726015DD2004813B4 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -220,6 +245,20 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0C0B31EB26D179A20045C9E1 /* Integrations */ = {
+			isa = PBXGroup;
+			children = (
+				0C0B31EC26D179A20045C9E1 /* AppDelegate.swift */,
+				0C0B31EE26D179A20045C9E1 /* SceneDelegate.swift */,
+				0C0B31F026D179A20045C9E1 /* ViewController.swift */,
+				0C0B31F226D179A20045C9E1 /* Main.storyboard */,
+				0C0B31F526D179A70045C9E1 /* Assets.xcassets */,
+				0C0B31F726D179A70045C9E1 /* LaunchScreen.storyboard */,
+				0C0B31FA26D179A70045C9E1 /* Info.plist */,
+			);
+			path = Integrations;
+			sourceTree = "<group>";
+		};
 		0C25FB6725CDDC9700A895C2 /* IntegrationsExamples */ = {
 			isa = PBXGroup;
 			children = (
@@ -260,6 +299,7 @@
 				0CE3DB06260FB43D00521113 /* Scripts */,
 				0C57AD64245F0F38005B3400 /* App */,
 				0C516FBB26015DD2004813B4 /* Demo */,
+				0C0B31EB26D179A20045C9E1 /* Integrations */,
 				0C57AD4E245F0EFB005B3400 /* Products */,
 				0C57ADB2245F0FD2005B3400 /* Frameworks */,
 			);
@@ -274,6 +314,7 @@
 				0CEAB3DA25FE862D00F09B0F /* Pulse Demo watchOS.app */,
 				0CEAB3E325FE862E00F09B0F /* Pulse Demo watchOS Extension.appex */,
 				0C516FBA26015DD2004813B4 /* Pulse Demo iOS.app */,
+				0C0B31EA26D179A20045C9E1 /* Pulse Integration Examples iOS.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -419,6 +460,27 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		0C0B31E926D179A20045C9E1 /* Pulse Integration Examples iOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0C0B31FB26D179A70045C9E1 /* Build configuration list for PBXNativeTarget "Pulse Integration Examples iOS" */;
+			buildPhases = (
+				0C0B31E626D179A20045C9E1 /* Sources */,
+				0C0B31E726D179A20045C9E1 /* Frameworks */,
+				0C0B31E826D179A20045C9E1 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Pulse Integration Examples iOS";
+			packageProductDependencies = (
+				0C0B321426D17D2A0045C9E1 /* PulseCore */,
+				0C0B321626D17D2A0045C9E1 /* PulseUI */,
+			);
+			productName = "Pulse Integration Examples iOS";
+			productReference = 0C0B31EA26D179A20045C9E1 /* Pulse Integration Examples iOS.app */;
+			productType = "com.apple.product-type.application";
+		};
 		0C516FB926015DD2004813B4 /* Pulse Demo iOS */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 0C516FC826015DD3004813B4 /* Build configuration list for PBXNativeTarget "Pulse Demo iOS" */;
@@ -555,6 +617,9 @@
 				LastUpgradeCheck = 1240;
 				ORGANIZATIONNAME = kean;
 				TargetAttributes = {
+					0C0B31E926D179A20045C9E1 = {
+						CreatedOnToolsVersion = 12.4;
+					};
 					0C516FB926015DD2004813B4 = {
 						CreatedOnToolsVersion = 12.4;
 					};
@@ -596,11 +661,22 @@
 				0CEAB3D925FE862D00F09B0F /* Pulse Demo watchOS */,
 				0CEAB3E225FE862E00F09B0F /* Pulse Demo watchOS Extension */,
 				0C6460C325F5797B002C55B1 /* Pulse Demo tvOS */,
+				0C0B31E926D179A20045C9E1 /* Pulse Integration Examples iOS */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		0C0B31E826D179A20045C9E1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0C0B31F926D179A70045C9E1 /* LaunchScreen.storyboard in Resources */,
+				0C0B31F626D179A70045C9E1 /* Assets.xcassets in Resources */,
+				0C0B31F426D179A20045C9E1 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		0C516FB826015DD2004813B4 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -659,6 +735,16 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		0C0B31E626D179A20045C9E1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0C0B31F126D179A20045C9E1 /* ViewController.swift in Sources */,
+				0C0B31ED26D179A20045C9E1 /* AppDelegate.swift in Sources */,
+				0C0B31EF26D179A20045C9E1 /* SceneDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		0C516FB626015DD2004813B4 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -736,6 +822,22 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		0C0B31F226D179A20045C9E1 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				0C0B31F326D179A20045C9E1 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		0C0B31F726D179A70045C9E1 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				0C0B31F826D179A70045C9E1 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
 		0C57AD75245F0F38005B3400 /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -747,6 +849,44 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		0C0B31FC26D179A70045C9E1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = Integrations/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.github.kean.Pulse-Integration-Examples-iOS";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		0C0B31FD26D179A70045C9E1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = Integrations/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.github.kean.Pulse-Integration-Examples-iOS";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		0C516FC626015DD3004813B4 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1148,6 +1288,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		0C0B31FB26D179A70045C9E1 /* Build configuration list for PBXNativeTarget "Pulse Integration Examples iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0C0B31FC26D179A70045C9E1 /* Debug */,
+				0C0B31FD26D179A70045C9E1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		0C516FC826015DD3004813B4 /* Build configuration list for PBXNativeTarget "Pulse Demo iOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -1214,6 +1363,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		0C0B321426D17D2A0045C9E1 /* PulseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PulseCore;
+		};
+		0C0B321626D17D2A0045C9E1 /* PulseUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PulseUI;
+		};
 		0C516FD926015E32004813B4 /* PulseCore */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = PulseCore;

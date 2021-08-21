@@ -26,12 +26,9 @@ public struct ConsoleView: View {
     }
 
     public var body: some View {
-        NavigationView {
-            List {
-                ConsoleMessagesForEach(context: model.context, messages: model.messages, searchCriteria: $model.searchCriteria)
-            }
+        List {
+            ConsoleMessagesForEach(context: model.context, messages: model.messages, searchCriteria: $model.searchCriteria)
         }
-        .navigationBarTitle(Text("Console"))
     }
 }
 

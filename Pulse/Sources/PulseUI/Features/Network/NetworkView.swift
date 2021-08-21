@@ -27,15 +27,13 @@ public struct NetworkView: View {
 
     #if os(iOS)
     public var body: some View {
-        NavigationView {
-            List {
-                quickFiltersView
-                ConsoleMessagesForEach(context: model.context, messages: model.messages, searchCriteria: $model.searchCriteria)
-            }
-            .listStyle(PlainListStyle())
-            .navigationBarTitle(Text("Network"))
-            .navigationBarItems(leading: model.onDismiss.map { Button("Close", action: $0) })
+        List {
+            quickFiltersView
+            ConsoleMessagesForEach(context: model.context, messages: model.messages, searchCriteria: $model.searchCriteria)
         }
+        .listStyle(PlainListStyle())
+        .navigationBarTitle(Text("Network"))
+        .navigationBarItems(leading: model.onDismiss.map { Button("Close", action: $0) })
     }
 
     private var quickFiltersView: some View {
@@ -48,10 +46,8 @@ public struct NetworkView: View {
     }
     #elseif os(tvOS)
     public var body: some View {
-        NavigationView {
-            List {
-                ConsoleMessagesForEach(context: model.context, messages: model.messages, searchCriteria: $model.searchCriteria)
-            }
+        List {
+            ConsoleMessagesForEach(context: model.context, messages: model.messages, searchCriteria: $model.searchCriteria)
         }
     }
     #elseif os(macOS)

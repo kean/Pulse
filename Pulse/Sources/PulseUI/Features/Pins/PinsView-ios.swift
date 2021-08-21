@@ -16,19 +16,23 @@ public struct PinsView: View {
     @State private var shared: ShareItems?
     private var context: AppContext { .init(store: model.store, pins: model.pins) }
 
-    public var body: some View {
-        NavigationView {
-            contents
-                .navigationBarTitle(Text("Pins"))
-                .navigationBarItems(
-                    leading: model.onDismiss.map { Button("Close", action: $0) },
-                    trailing:
-                        Button(action: model.removeAll) { Image(systemName: "trash") }
-                            .disabled(model.messages.isEmpty)
-                )
+    public init(store: LoggerStore = .default) {
+        self.model = PinsViewModel(store: store)
+    }
 
-            PlaceholderView(imageName: "folder", title: "Select an Item", subtitle: "Please select an item from the list to view the details")
-        }
+    init(model: PinsViewModel) {
+        self.model = model
+    }
+    
+    public var body: some View {
+        contents
+            .navigationBarTitle(Text("Pins"))
+            .navigationBarItems(
+                leading: model.onDismiss.map { Button("Close", action: $0) },
+                trailing:
+                    Button(action: model.removeAll) { Image(systemName: "trash") }
+                    .disabled(model.messages.isEmpty)
+            )
     }
 
     @ViewBuilder

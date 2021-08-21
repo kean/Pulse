@@ -73,10 +73,19 @@ extension MainViewModel {
     @ViewBuilder
     func makeView(for item: MainViewModelItem) -> some View {
         switch item {
-        case .console: ConsoleView(model: consoleModel)
-        case .network: NetworkView(model: networkModel)
+        case .console:
+            NavigationView {
+                ConsoleView(model: consoleModel)
+            }
+        case .network:
+            NavigationView {
+                NetworkView(model: networkModel)
+            }
         #if !os(tvOS)
-        case .pins: PinsView(model: pinsModel)
+        case .pins:
+            NavigationView {
+                PinsView(model: pinsModel)
+            }
         #endif
         #if os(iOS) || os(tvOS)
         case .settings: SettingsView(model: settingsModel, console: consoleModel)

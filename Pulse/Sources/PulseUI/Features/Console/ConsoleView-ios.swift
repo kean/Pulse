@@ -25,17 +25,13 @@ public struct ConsoleView: View {
     }
 
     public var body: some View {
-        NavigationView {
-            contentView
-                .navigationBarTitle(Text("Console"))
-                .navigationBarItems(
-                    leading: model.onDismiss.map { Button("Close", action: $0) },
-                    trailing: shareButton
-                )
-
-            PlaceholderView(imageName: "folder", title: "Select an Item", subtitle: "Please select an item from the list to view the details")
-        }
-        .sheet(item: $shared) { ShareView($0).id($0.id) }
+        contentView
+            .navigationBarTitle(Text("Console"))
+            .navigationBarItems(
+                leading: model.onDismiss.map { Button("Close", action: $0) },
+                trailing: shareButton
+            )
+            .sheet(item: $shared) { ShareView($0).id($0.id) }
     }
 
     private var contentView: some View {
