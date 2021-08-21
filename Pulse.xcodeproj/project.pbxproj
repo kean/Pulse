@@ -442,9 +442,9 @@
 			productReference = 0C516FBA26015DD2004813B4 /* Pulse Demo iOS.app */;
 			productType = "com.apple.product-type.application";
 		};
-		0C57AD4C245F0EFB005B3400 /* Pulse iOS */ = {
+		0C57AD4C245F0EFB005B3400 /* Pulse App iOS */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 0C57AD61245F0EFD005B3400 /* Build configuration list for PBXNativeTarget "Pulse iOS" */;
+			buildConfigurationList = 0C57AD61245F0EFD005B3400 /* Build configuration list for PBXNativeTarget "Pulse App iOS" */;
 			buildPhases = (
 				0C57AD49245F0EFB005B3400 /* Sources */,
 				0C57AD4A245F0EFB005B3400 /* Frameworks */,
@@ -455,7 +455,7 @@
 			);
 			dependencies = (
 			);
-			name = "Pulse iOS";
+			name = "Pulse App iOS";
 			packageProductDependencies = (
 				0CB3074525D9AFF1004B3F4E /* PulseCore */,
 				0CB3074725D9AFF1004B3F4E /* PulseUI */,
@@ -464,9 +464,9 @@
 			productReference = 0C57AD4D245F0EFB005B3400 /* Pulse iOS.app */;
 			productType = "com.apple.product-type.application";
 		};
-		0C57AD8B245F0F55005B3400 /* Pulse */ = {
+		0C57AD8B245F0F55005B3400 /* Pulse App macOS */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 0C57AD9C245F0F56005B3400 /* Build configuration list for PBXNativeTarget "Pulse" */;
+			buildConfigurationList = 0C57AD9C245F0F56005B3400 /* Build configuration list for PBXNativeTarget "Pulse App macOS" */;
 			buildPhases = (
 				0C57AD88245F0F55005B3400 /* Sources */,
 				0C57AD89245F0F55005B3400 /* Frameworks */,
@@ -477,7 +477,7 @@
 			);
 			dependencies = (
 			);
-			name = Pulse;
+			name = "Pulse App macOS";
 			packageProductDependencies = (
 				0CB3074B25D9AFFD004B3F4E /* PulseCore */,
 				0CB3074D25D9AFFD004B3F4E /* PulseUI */,
@@ -590,8 +590,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				0C57AD4C245F0EFB005B3400 /* Pulse iOS */,
-				0C57AD8B245F0F55005B3400 /* Pulse */,
+				0C57AD4C245F0EFB005B3400 /* Pulse App iOS */,
+				0C57AD8B245F0F55005B3400 /* Pulse App macOS */,
 				0C516FB926015DD2004813B4 /* Pulse Demo iOS */,
 				0CEAB3D925FE862D00F09B0F /* Pulse Demo watchOS */,
 				0CEAB3E225FE862E00F09B0F /* Pulse Demo watchOS Extension */,
@@ -1166,7 +1166,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		0C57AD61245F0EFD005B3400 /* Build configuration list for PBXNativeTarget "Pulse iOS" */ = {
+		0C57AD61245F0EFD005B3400 /* Build configuration list for PBXNativeTarget "Pulse App iOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				0C57AD62245F0EFD005B3400 /* Debug */,
@@ -1175,7 +1175,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		0C57AD9C245F0F56005B3400 /* Build configuration list for PBXNativeTarget "Pulse" */ = {
+		0C57AD9C245F0F56005B3400 /* Build configuration list for PBXNativeTarget "Pulse App macOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				0C57AD9D245F0F56005B3400 /* Debug */,

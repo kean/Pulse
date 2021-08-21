@@ -16,7 +16,7 @@
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "0C57AD8B245F0F55005B3400"
                BuildableName = "Pulse.app"
-               BlueprintName = "Pulse"
+               BlueprintName = "Pulse App macOS"
                ReferencedContainer = "container:Pulse.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -47,7 +47,7 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "0C57AD8B245F0F55005B3400"
             BuildableName = "Pulse.app"
-            BlueprintName = "Pulse"
+            BlueprintName = "Pulse App macOS"
             ReferencedContainer = "container:Pulse.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -77,7 +77,7 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "0C57AD8B245F0F55005B3400"
             BuildableName = "Pulse.app"
-            BlueprintName = "Pulse"
+            BlueprintName = "Pulse App macOS"
             ReferencedContainer = "container:Pulse.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

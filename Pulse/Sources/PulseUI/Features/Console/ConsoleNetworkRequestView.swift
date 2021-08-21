@@ -85,19 +85,19 @@ struct ConsoleNetworkRequestView: View {
 
     private var fonts: Fonts {
         #if os(iOS)
-        Fonts(title: .caption, body: .system(size: 15))
+        return Fonts(title: .caption, body: .system(size: 15))
         #elseif os(watchOS)
-        Fonts(title: .system(size: 12), body: .system(size: 15))
+        return Fonts(title: .system(size: 12), body: .system(size: 15))
         #elseif os(tvOS)
-        Fonts(title: .body, body: .body)
+        return Fonts(title: .body, body: .body)
         #endif
     }
 
     private var circleSize: CGFloat {
         #if os(tvOS)
-        20
+        return 20
         #else
-        10
+        return 10
         #endif
     }
 }

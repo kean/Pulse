@@ -47,9 +47,9 @@ struct ConsoleMessageView: View {
         }
         var separator: Text {
             #if os(watchOS)
-            Text("\n")
+            return Text("\n")
             #else
-            Text(" · ")
+            return Text(" · ")
                 .font(fonts.title)
                 .foregroundColor(.secondary)
             #endif
@@ -80,11 +80,11 @@ struct ConsoleMessageView: View {
 
     private var fonts: Fonts {
         #if os(iOS)
-        Fonts(title: .caption, body: .system(size: 15))
+        return Fonts(title: .caption, body: .system(size: 15))
         #elseif os(watchOS)
-        Fonts(title: .system(size: 12), body: .system(size: 15))
+        return Fonts(title: .system(size: 12), body: .system(size: 15))
         #elseif os(tvOS)
-        Fonts(title: .body, body: .body)
+        return Fonts(title: .body, body: .body)
         #endif
     }
 }
