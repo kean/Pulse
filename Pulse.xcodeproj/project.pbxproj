@@ -254,6 +254,7 @@
 				0C0B31EC26D179A20045C9E1 /* AppDelegate.swift */,
 				0C0B31EE26D179A20045C9E1 /* SceneDelegate.swift */,
 				0C0B31F026D179A20045C9E1 /* ViewController.swift */,
+				0C25FB6725CDDC9700A895C2 /* IntegrationsExamples */,
 				0C0B31F226D179A20045C9E1 /* Main.storyboard */,
 				0C0B31F526D179A70045C9E1 /* Assets.xcassets */,
 				0C0B31F726D179A70045C9E1 /* LaunchScreen.storyboard */,
@@ -287,7 +288,6 @@
 			children = (
 				0C767811268F88BB0058F69B /* iOS */,
 				0C6460D525F579B8002C55B1 /* tvOS */,
-				0C25FB6725CDDC9700A895C2 /* IntegrationsExamples */,
 				0CEAB40425FE867300F09B0F /* watchOS */,
 			);
 			path = Demo;
