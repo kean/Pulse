@@ -1,5 +1,17 @@
 # Pulse 0.x
 
+## Pulse 0.16.0
+
+*21 Aug, 2021*
+
+- Fix crash with URLSession automatic session registration - [#31](https://github.com/kean/Pulse/pull/31), thanks to [Ivan Lisovyi](https://github.com/ivanlisovyi) 
+- `ConsoleView`, `NetworkView`, and `PinsView` are no longer wrapped into `NavigationView` by default. It gives you more integration options. For example, you can now push a `ConsoleView` into your own `UINavigationControllers` (or `NavigationViews`).
+- Add `onDismiss` parameter to `MainViewController` and `MainView` to show a close button
+- Make `PinsView` initializer public
+- Make Pulse compatible with earlier Xcode versions (at least down to Xcode 12.4)
+- [iOS] Add a "Remove Messages" button diretly to the console
+- Remove `date` parameter from `storeMessage` (`LoggerStore`) and add default parameters for file, function
+
 ## Pulse 0.15.3
 
 *7 Jul, 2021*
