@@ -73,7 +73,7 @@ struct SettingsView: View {
                 }
             }
             .navigationBarTitle("Settings")
-            .navigationBarItems(leading: model.onDismiss.map { Button("Close", action: $0) })
+            .navigationBarItems(leading: model.onDismiss.map { Button(action: $0) { Image(systemName: "xmark") } })
         }.navigationViewStyle(StackNavigationViewStyle())
     }
 }

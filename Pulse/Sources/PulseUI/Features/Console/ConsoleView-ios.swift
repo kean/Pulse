@@ -28,7 +28,9 @@ public struct ConsoleView: View {
         contentView
             .navigationBarTitle(Text("Console"))
             .navigationBarItems(
-                leading: model.onDismiss.map { Button("Close", action: $0) },
+                leading: model.onDismiss.map {
+                    Button(action: $0) { Image(systemName: "xmark") }
+                },
                 trailing: shareButton
             )
             .sheet(item: $shared) { ShareView($0).id($0.id) }

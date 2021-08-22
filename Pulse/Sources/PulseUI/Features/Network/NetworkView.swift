@@ -33,7 +33,7 @@ public struct NetworkView: View {
         }
         .listStyle(PlainListStyle())
         .navigationBarTitle(Text("Network"))
-        .navigationBarItems(leading: model.onDismiss.map { Button("Close", action: $0) })
+        .navigationBarItems(leading: model.onDismiss.map { Button(action: $0) { Image(systemName: "xmark") } })
     }
 
     private var quickFiltersView: some View {

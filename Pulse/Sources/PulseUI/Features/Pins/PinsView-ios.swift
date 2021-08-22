@@ -28,7 +28,7 @@ public struct PinsView: View {
         contents
             .navigationBarTitle(Text("Pins"))
             .navigationBarItems(
-                leading: model.onDismiss.map { Button("Close", action: $0) },
+                leading: model.onDismiss.map { Button(action: $0) { Image(systemName: "xmark") } },
                 trailing:
                     Button(action: model.removeAll) { Image(systemName: "trash") }
                     .disabled(model.messages.isEmpty)
