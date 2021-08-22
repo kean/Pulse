@@ -9,7 +9,7 @@
 - Add `onDismiss` parameter to `MainViewController` and `MainView` to show a close button
 - Make `PinsView` initializer public
 - Make Pulse compatible with earlier Xcode versions (at least down to Xcode 12.4)
-- [iOS] Add a "Remove Messages" button diretly to the console
+- [iOS] Add a "Remove Messages" button directly to the console
 - Remove `date` parameter from `storeMessage` (`LoggerStore`) and add default parameters for file, function
 
 ## Pulse 0.15.3
