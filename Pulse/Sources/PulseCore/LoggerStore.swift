@@ -199,9 +199,9 @@ public final class LoggerStore {
 
 extension LoggerStore {
     /// Stores the given message.
-    public func storeMessage(date: Date? = nil, label: String, level: Level, message: String, metadata: [String: MetadataValue]?, file: String, function: String, line: UInt) {
+    public func storeMessage(label: String, level: Level, message: String, metadata: [String: MetadataValue]?, file: String = #file, function: String = #function, line: UInt = #line) {
         let context = backgroundContext
-        let date = date ?? makeCurrentDate()
+        let date = makeCurrentDate()
         context.perform {
             self.makeMessageEntity(createdAt: date, label: label, level: level, message: message, metadata: metadata, file: file, function: function, line: line)
             try? context.save()
