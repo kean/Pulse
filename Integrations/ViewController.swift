@@ -10,45 +10,45 @@ import PulseUI
 import PulseCore
 import SwiftUI
 
-class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
-    let tableView = UITableView()
-    var ds: AnyObject?
-
-    var items: [MenuItem] = []
+final class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+    private let tableView = UITableView(frame: .zero, style: .grouped)
+    private var sections: [MenuSection] = []
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        #warning("TODO: add proper mocks")
         
-        for _ in 0...100 {
-            PulseCore.LoggerStore.default.storeMessage(label: "test", level: .debug, message: "test", metadata: nil, file: "dsad", function: "hey", line: 1)
-        }
+        title = "PulseUI"
 
-        #warning("TODO: add dimiss")
-
-        items = [
-            MenuItem(title: "Main", action: { [unowned self] in
-                let vc = MainViewController()
-                self.present(vc, animated: true, completion: nil)
-            }),
-            MenuItem(title: "Main (Fullscreen)", action: { [unowned self] in
-                let vc = MainViewController()
-                vc.modalPresentationStyle = .fullScreen
-                self.present(vc, animated: true, completion: nil)
-            }),
-            MenuItem(title: "Console", action: { [unowned self] in
-                let vc = UIHostingController(rootView: ConsoleView())
-                self.navigationController?.pushViewController(vc, animated: true)
-            }),
-            MenuItem(title: "Network", action: { [unowned self] in
-                let vc = UIHostingController(rootView: NetworkView())
-                self.navigationController?.pushViewController(vc, animated: true)
-            }),
-            MenuItem(title: "Pins", action: { [unowned self] in
-                let vc = UIHostingController(rootView: PinsView())
-                self.navigationController?.pushViewController(vc, animated: true)
-            })
+        sections = [
+            MenuSection(title: "Main", footer: "Demonstartes how to show the entire PulseUI interface (all four tabs)", items: [
+                MenuItem(title: "MainViewController", action: { [unowned self] in
+                    let vc = MainViewController(store: .mock, onDismiss: { [weak self] in
+                        self?.dismiss(animated: true, completion: nil)
+                    })
+                    self.present(vc, animated: true, completion: nil)
+                }),
+                MenuItem(title: "MainViewController (Fullscreen)", action: { [unowned self] in
+                    let vc = MainViewController(store: .mock, onDismiss: { [weak self] in
+                        self?.dismiss(animated: true, completion: nil)
+                    })
+                    vc.modalPresentationStyle = .fullScreen
+                    self.present(vc, animated: true, completion: nil)
+                }),
+            ]),
+            MenuSection(title: "Components", footer: "Demonstrates how you can push individual PulseUI screens into an existing navigation (UINavigationController or NavigationView)", items: [
+                MenuItem(title: "ConsoleView", action: { [unowned self] in
+                    let vc = UIHostingController(rootView: ConsoleView(store: .mock))
+                    self.navigationController?.pushViewController(vc, animated: true)
+                }),
+                MenuItem(title: "NetworkView", action: { [unowned self] in
+                    let vc = UIHostingController(rootView: NetworkView(store: .mock))
+                    self.navigationController?.pushViewController(vc, animated: true)
+                }),
+                MenuItem(title: "PinsView", action: { [unowned self] in
+                    let vc = UIHostingController(rootView: PinsView(store: .mock))
+                    self.navigationController?.pushViewController(vc, animated: true)
+                })
+            ])
         ]
 
         view.addSubview(tableView)
@@ -67,33 +67,40 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         tableView.delegate = self
     }
 
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-
-        if let row = tableView.indexPathForSelectedRow {
-            tableView.deselectRow(at: row, animated: true)
-        }
-    }
-
     func numberOfSections(in tableView: UITableView) -> Int {
-        1
+        sections.count
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        items.count
+        sections[section].items.count
     }
-
+    
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        sections[section].title
+    }
+    
+    func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
+        sections[section].footer
+    }
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "a", for: indexPath)
-        let item = items[indexPath.row]
+        let item = sections[indexPath.section].items[indexPath.row]
         cell.textLabel?.text = item.title
         return cell
     }
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let item = items[indexPath.row]
+        let item = sections[indexPath.section].items[indexPath.row]
         item.action()
+        tableView.deselectRow(at: indexPath, animated: true)
     }
+}
+
+struct MenuSection {
+    let title: String
+    let footer: String
+    let items: [MenuItem]
 }
 
 struct MenuItem {

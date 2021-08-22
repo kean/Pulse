@@ -12,9 +12,9 @@ import SwiftUI
 public final class MainViewController: UITabBarController {
     private let model: Any?
 
-    public init(store: LoggerStore = .default) {
+    public init(store: LoggerStore = .default, onDismiss: (() -> Void)? = nil) {
         if #available(iOS 13.0, *) {
-            self.model = MainViewModel(store: store, onDismiss: nil)
+            self.model = MainViewModel(store: store, onDismiss: onDismiss)
         } else {
             self.model = nil
         }

@@ -43,6 +43,9 @@
 		0C767817268F88BB0058F69B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C767812268F88BB0058F69B /* Assets.xcassets */; };
 		0C767818268F88BB0058F69B /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C767814268F88BB0058F69B /* Preview Assets.xcassets */; };
 		0C76781A268F88BB0058F69B /* Pulse_Demo_iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C767816268F88BB0058F69B /* Pulse_Demo_iOSApp.swift */; };
+		0C7A833926D1C8960082634F /* MockDataTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD2A4AC25D4A2E70087E9E3 /* MockDataTask.swift */; };
+		0C7A833A26D1C8960082634F /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD2A4AB25D4A2E70087E9E3 /* MockStore.swift */; };
+		0C7A834026D1CA290082634F /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CFF9BD825D6199A0069DB6A /* repos.json */; };
 		0CB3074625D9AFF1004B3F4E /* PulseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 0CB3074525D9AFF1004B3F4E /* PulseCore */; };
 		0CB3074825D9AFF1004B3F4E /* PulseUI in Frameworks */ = {isa = PBXBuildFile; productRef = 0CB3074725D9AFF1004B3F4E /* PulseUI */; };
 		0CB3074C25D9AFFD004B3F4E /* PulseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 0CB3074B25D9AFFD004B3F4E /* PulseCore */; };
@@ -674,6 +677,7 @@
 				0C0B31F926D179A70045C9E1 /* LaunchScreen.storyboard in Resources */,
 				0C0B31F626D179A70045C9E1 /* Assets.xcassets in Resources */,
 				0C0B31F426D179A20045C9E1 /* Main.storyboard in Resources */,
+				0C7A834026D1CA290082634F /* repos.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -739,9 +743,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0C7A833926D1C8960082634F /* MockDataTask.swift in Sources */,
 				0C0B31F126D179A20045C9E1 /* ViewController.swift in Sources */,
 				0C0B31ED26D179A20045C9E1 /* AppDelegate.swift in Sources */,
 				0C0B31EF26D179A20045C9E1 /* SceneDelegate.swift in Sources */,
+				0C7A833A26D1C8960082634F /* MockStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
