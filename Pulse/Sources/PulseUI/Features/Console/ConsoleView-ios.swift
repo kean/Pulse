@@ -47,14 +47,21 @@ public struct ConsoleView: View {
     private var shareButton: some View {
         if #available(iOS 14.0, *) {
             Menu(content: {
-                Button(action: { shared = model.share(as: .store) }) {
-                    Label("Share as File", systemImage: "square.and.arrow.up")
+                Section {
+                    Button(action: { shared = model.share(as: .store) }) {
+                        Label("Share as File", systemImage: "square.and.arrow.up")
+                    }
+                    Button(action: { shared = model.share(as: .text) }) {
+                        Label("Share as Text", systemImage: "square.and.arrow.up")
+                    }
                 }
-                Button(action: { shared = model.share(as: .text) }) {
-                    Label("Share as Text", systemImage: "square.and.arrow.up")
+                Section {
+                    ButtonRemoveAll(action: model.buttonRemoveAllMessagesTapped)
+                        .disabled(model.messages.isEmpty)
+                        .opacity(model.messages.isEmpty ? 0.33 : 1)
                 }
             }, label: {
-                Image(systemName: "square.and.arrow.up")
+                Image(systemName: "ellipsis.circle")
             })
         } else {
             ShareButton { shared = model.share(as: .store) }
