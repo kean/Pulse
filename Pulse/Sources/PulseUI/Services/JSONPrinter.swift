@@ -112,8 +112,14 @@ final class JSONPrinter {
                 }
                 append("]", .punctuation)
             }
-        case let object as Bool:
-            append(object ? "true" : "false", .valueOther)
+        case let number as NSNumber:
+            if number === kCFBooleanTrue {
+                append("true", .valueOther)
+            } else if number === kCFBooleanFalse {
+                append("false", .valueOther)
+            } else {
+                append("\(number)", .valueOther)
+            }
         default:
             if json is NSNull {
                 append("null", .null)
