@@ -24,9 +24,13 @@ struct KeyValueSectionView: View {
                     Button(action: action.action, label: {
                         Text(action.title)
                         Image(systemName: "chevron.right")
-                            .foregroundColor(.separator)
+                            .foregroundColor(Color.gray)
                             .font(.caption)
+                            .padding(.top, 2)
                     })
+                    .padding(EdgeInsets(top: 7, leading: 11, bottom: 7, trailing: 11))
+                    .background(Color.secondaryFill)
+                    .cornerRadius(20)
                 }
                 #endif
             }
@@ -44,6 +48,7 @@ struct KeyValueSectionView: View {
                         .foregroundColor(.separator)
                         .font(.caption)
                 })
+ 
             }
 
             #else
