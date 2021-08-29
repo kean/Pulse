@@ -16,11 +16,7 @@
 		0C0B321526D17D2A0045C9E1 /* PulseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 0C0B321426D17D2A0045C9E1 /* PulseCore */; };
 		0C0B321726D17D2A0045C9E1 /* PulseUI in Frameworks */ = {isa = PBXBuildFile; productRef = 0C0B321626D17D2A0045C9E1 /* PulseUI */; };
 		0C0E6318260186C700A0DF40 /* Pulse Demo watchOS.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 0CEAB3DA25FE862D00F09B0F /* Pulse Demo watchOS.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		0C1221E625CE09C100B81D7A /* URLSessionAutomatedIntegration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C1221E525CE09C100B81D7A /* URLSessionAutomatedIntegration.swift */; };
-		0C1221E725CE09C100B81D7A /* URLSessionAutomatedIntegration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C1221E525CE09C100B81D7A /* URLSessionAutomatedIntegration.swift */; };
 		0C2464A625D9D6C40057A577 /* AppCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C2464A525D9D6C40057A577 /* AppCommands.swift */; };
-		0C25FB6F25CDDCAB00A895C2 /* URLSessionManualIntegration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C25FB6E25CDDCAB00A895C2 /* URLSessionManualIntegration.swift */; };
-		0C25FB7F25CDFB1000A895C2 /* URLSessionManualIntegration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C25FB6E25CDDCAB00A895C2 /* URLSessionManualIntegration.swift */; };
 		0C516FDA26015E32004813B4 /* PulseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 0C516FD926015E32004813B4 /* PulseCore */; };
 		0C516FDC26015E32004813B4 /* PulseUI in Frameworks */ = {isa = PBXBuildFile; productRef = 0C516FDB26015E32004813B4 /* PulseUI */; };
 		0C516FE126015E8E004813B4 /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD2A4AB25D4A2E70087E9E3 /* MockStore.swift */; };
@@ -65,10 +61,6 @@
 		0CEAB42A25FE86ED00F09B0F /* MockDataTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD2A4AC25D4A2E70087E9E3 /* MockDataTask.swift */; };
 		0CEAB42F25FE86FB00F09B0F /* PulseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 0CEAB42E25FE86FB00F09B0F /* PulseCore */; };
 		0CEAB43125FE86FC00F09B0F /* PulseUI in Frameworks */ = {isa = PBXBuildFile; productRef = 0CEAB43025FE86FC00F09B0F /* PulseUI */; };
-		49E82A8626D107A00070244F /* AlamofireIntegration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49E82A8526D107A00070244F /* AlamofireIntegration.swift */; };
-		49E82A8726D107A00070244F /* AlamofireIntegration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49E82A8526D107A00070244F /* AlamofireIntegration.swift */; };
-		49E82A8926D1083D0070244F /* MoyaIntegration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49E82A8826D1083D0070244F /* MoyaIntegration.swift */; };
-		49E82A8A26D1083D0070244F /* MoyaIntegration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49E82A8826D1083D0070244F /* MoyaIntegration.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -767,11 +759,7 @@
 			files = (
 				0C57AD85245F0F38005B3400 /* AppDelegate.swift in Sources */,
 				0C57AD87245F0F38005B3400 /* SceneDelegate.swift in Sources */,
-				0C1221E625CE09C100B81D7A /* URLSessionAutomatedIntegration.swift in Sources */,
-				49E82A8926D1083D0070244F /* MoyaIntegration.swift in Sources */,
-				0C25FB6F25CDDCAB00A895C2 /* URLSessionManualIntegration.swift in Sources */,
 				0C516FF026016392004813B4 /* DocumentBrowser.swift in Sources */,
-				49E82A8626D107A00070244F /* AlamofireIntegration.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -780,12 +768,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				0C2464A625D9D6C40057A577 /* AppCommands.swift in Sources */,
-				0C1221E725CE09C100B81D7A /* URLSessionAutomatedIntegration.swift in Sources */,
 				0C57ADC2245F1441005B3400 /* AppWelcomeView.swift in Sources */,
-				49E82A8A26D1083D0070244F /* MoyaIntegration.swift in Sources */,
-				0C25FB7F25CDFB1000A895C2 /* URLSessionManualIntegration.swift in Sources */,
 				0C57ADA4245F0F91005B3400 /* App.swift in Sources */,
-				49E82A8726D107A00070244F /* AlamofireIntegration.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
