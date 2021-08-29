@@ -159,7 +159,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
             color: .blue,
             action: ActionViewModel(
                 action: { [unowned self] in isRequestRawActive = true },
-                title: "View Raw"
+                title: "View"
             ),
             items: [
                 ("Content-Type", contentType),
@@ -178,7 +178,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
             color: .indigo,
             action: ActionViewModel(
                 action: { [unowned self] in isResponseRawActive = true },
-                title: "View Raw"
+                title: "View"
             ),
             items: [
                 ("Content-Type", contentType),
