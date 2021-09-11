@@ -314,6 +314,9 @@ body {
     list-style: none;
     padding-left: 0;
   }
+  li {
+    overflow-wrap: break-word;
+  }
   strong {
     font-weight: 600;
     color: #737373;
