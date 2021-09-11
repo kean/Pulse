@@ -15,21 +15,31 @@ struct NetworkInspectorView: View {
     @ObservedObject var model: NetworkInspectorViewModel
     @State private var selectedTab: NetworkInspectorTab = .summary
     @State private var isShowingShareSheet = false
+    @State private var shareItems: ShareItems?
     @Environment(\.colorScheme) private var colorScheme
 
     #if os(iOS)
     var body: some View {
         universalBody
             .navigationBarTitle(Text(model.title), displayMode: .inline)
-            .navigationBarItems(trailing: HStack(spacing: 18) {
+            .navigationBarItems(trailing: HStack(spacing: 22) {
                 PinButton(model: model.pin, isTextNeeded: false)
-                ShareButton {
-                    isShowingShareSheet = true
+                if #available(iOS 14.0, *) {
+                    Menu(content: {
+                        NetworkMessageContextMenu(message: model.message, request: model.request, context: model.context, sharedItems: $shareItems)
+                    }, label: {
+                        Image(systemName: "square.and.arrow.up")
+                    })
+                } else {
+                    ShareButton {
+                        isShowingShareSheet = true
+                    }
                 }
             })
             .sheet(isPresented: $isShowingShareSheet) {
                 ShareView(activityItems: [model.prepareForSharing()])
             }
+            .sheet(item: $shareItems, content: ShareView.init)
     }
     #elseif os(watchOS)
     var body: some View {
@@ -179,15 +189,17 @@ private enum NetworkInspectorTab: Identifiable {
 @available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
 final class NetworkInspectorViewModel: ObservableObject {
     private(set) var title: String = ""
+    let message: LoggerMessageEntity
     let request: LoggerNetworkRequestEntity
     private let objectId: NSManagedObjectID
-    private let context: AppContext
+    let context: AppContext // TODO: make it private
     private let summary: NetworkLoggerSummary
 
     init(message: LoggerMessageEntity, request: LoggerNetworkRequestEntity, context: AppContext) {
-        self.context = context
         self.objectId = message.objectID
+        self.message = message
         self.request = request
+        self.context = context
         self.summary = NetworkLoggerSummary(request: request, store: context.store)
 
         if let url = request.url.flatMap(URL.init(string:)) {
