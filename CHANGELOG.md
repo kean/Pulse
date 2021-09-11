@@ -5,7 +5,7 @@
 *11 Sep, 2021*
 
 - Add `storeRequest(_,response:error:data:metrics)` method to `LoggerStore`. It can be used if you just want to log the response without incremental updates. For incremental updates, use the existing `NetworkLogger` class instead.
-- Fix a crash occuring when you invalidate a `URLSession` that uses `URLSessionProxyDelegate` - [#36](https://github.com/kean/Pulse/issues/36)
+- Fix a crash occurring when you invalidate a `URLSession` that uses `URLSessionProxyDelegate` - [#36](https://github.com/kean/Pulse/issues/36)
 - Fix an issue where `URLSessionProxyDelegate` was not retaining the real delegate the way `URLSession` does
 - [iOS] Display a context menu with all available options (plain text, HTML, cURL) etc when pressing "Share" button in a network request details screen on iOS 14
 - [HTML export] Add soft-wrap for long header fields
