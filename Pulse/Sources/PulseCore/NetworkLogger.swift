@@ -14,6 +14,7 @@ public final class NetworkLogger {
 
     // MARK: Logging
 
+    /// Logs the task creation (optional).
     public func logTaskCreated(_ task: URLSessionTask) {
         guard let urlRequest = task.originalRequest else { return }
         lock.lock()
@@ -23,6 +24,7 @@ public final class NetworkLogger {
         storeMessage(level: .trace, "Send \(urlRequest.httpMethod ?? "–") \(task.url ?? "–")")
     }
 
+    /// Logs the task response (optional).
     public func logDataTask(_ dataTask: URLSessionDataTask, didReceive response: URLResponse) {
         lock.lock()
         defer { lock.unlock() }
@@ -36,6 +38,7 @@ public final class NetworkLogger {
         storeMessage(level: .trace, "Did receive response with status code: \(statusCode.map(descriptionForStatusCode) ?? "–") for \(dataTask.url ?? "null")")
     }
 
+    /// Logs the task data that gets appended to the previously received chunks (required).
     public func logDataTask(_ dataTask: URLSessionDataTask, didReceive data: Data) {
         lock.lock()
         defer { lock.unlock() }
@@ -46,46 +49,64 @@ public final class NetworkLogger {
         storeMessage(level: .trace, "Did receive data: \(ByteCountFormatter.string(fromByteCount: Int64(data.count), countStyle: .file)) for \(dataTask.url ?? "null")")
     }
 
+    /// Logs the task completion (required).
     public func logTask(_ task: URLSessionTask, didCompleteWithError error: Error?) {
         lock.lock()
         defer { lock.unlock() }
+        
+        let context = self.context(for: task)
+        
+        if let response = task.response {
+            context.response = response
+        }
+        context.error = error
 
-        store.storeNetworkRequest(for: task, error: error, context: context(for: task))
+        store.storeNetworkRequest(context)
 
-        tasks[task] = nil
+        tasks[ObjectIdentifier(task)] = nil
     }
 
+    /// Logs the task metrics (optional).
     public func logTask(_ task: URLSessionTask, didFinishCollecting metrics: URLSessionTaskMetrics) {
         lock.lock()
         defer { lock.unlock() }
 
-        tasks[task]?.metrics = NetworkLoggerMetrics(metrics: metrics)
+        context(for: task).metrics = NetworkLoggerMetrics(metrics: metrics)
     }
 
+    /// Logs the task metrics (optional).
     public func logTask(_ task: URLSessionTask, didFinishCollecting metrics: NetworkLoggerMetrics) {
         lock.lock()
         defer { lock.unlock() }
 
-        tasks[task]?.metrics = metrics
+        context(for: task).metrics = metrics
     }
-
+        
     // MARK: - Private
 
-    private var tasks: [URLSessionTask: TaskContext] = [:]
+    private var tasks: [ObjectIdentifier: TaskContext] = [:]
 
     final class TaskContext {
-        let uuid = UUID()
+        var request: URLRequest?
         var response: URLResponse?
-        var metrics: NetworkLoggerMetrics?
         lazy var data = Data()
+        var error: Error?
+        var metrics: NetworkLoggerMetrics?
     }
 
     private func context(for task: URLSessionTask) -> TaskContext {
-        if let context = tasks[task] {
+        func getContext() -> TaskContext {
+            if let context = tasks[ObjectIdentifier(task)] {
+                return context
+            }
+            let context = TaskContext()
+            tasks[ObjectIdentifier(task)] = context
             return context
         }
-        let context = TaskContext()
-        tasks[task] = context
+        let context = getContext()
+        if let request = task.originalRequest {
+            context.request = request
+        }
         return context
     }
 

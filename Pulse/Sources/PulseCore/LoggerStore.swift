@@ -207,22 +207,37 @@ extension LoggerStore {
             try? context.save()
         }
     }
+    
+    /// Stores the completed network request.
+    ///
+    /// - note: If you want to store incremental updates to the task, use
+    /// `NetworkLogger` instead.
+    public func storeRequest(_ request: URLRequest, response: URLResponse?, error: Error?, data: Data?, metrics: URLSessionTaskMetrics? = nil) {
+        let context = NetworkLogger.TaskContext()
+        context.request = request
+        context.response = response
+        context.error = error
+        context.data = data ?? Data()
+        context.metrics = metrics.map(NetworkLoggerMetrics.init)
+        
+        storeNetworkRequest(context)
+    }
 
-    func storeNetworkRequest(for task: URLSessionTask, error: Error?, context: NetworkLogger.TaskContext) {
+    func storeNetworkRequest(_ context: NetworkLogger.TaskContext) {
         let date = makeCurrentDate()
         backgroundContext.perform {
-            self.storeNetworkRequest(for: task, error: error, context: context, date: date)
+            self.storeNetworkRequest(context, date: date)
             try? self.backgroundContext.save()
         }
     }
 
-    private func storeNetworkRequest(for task: URLSessionTask, error: Error?, context: NetworkLogger.TaskContext, date: Date) {
-        guard let urlRequest = task.originalRequest else { return }
+    private func storeNetworkRequest(_ context: NetworkLogger.TaskContext, date: Date) {
+        guard let urlRequest = context.request else { return }
 
         let summary = NetworkLoggerRequestSummary(
             request: NetworkLoggerRequest(urlRequest: urlRequest),
             response: context.response.map(NetworkLoggerResponse.init),
-            error: error.map(NetworkLoggerError.init),
+            error: context.error.map(NetworkLoggerError.init),
             requestBody: urlRequest.httpBody,
             responseBody: context.data,
             metrics: context.metrics
@@ -231,7 +246,7 @@ extension LoggerStore {
         let level: LoggerStore.Level
         let url = urlRequest.url?.absoluteString
         var message = "\(urlRequest.httpMethod ?? "–") \(url ?? "–")"
-        if let error = error {
+        if let error = context.error {
             level = .error
             message += " \((error as NSError).code) \(error.localizedDescription)"
         } else {
