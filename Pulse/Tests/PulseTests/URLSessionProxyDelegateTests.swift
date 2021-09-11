@@ -90,6 +90,28 @@ final class URLSessionProxyDelegateTests: XCTestCase {
         session.invalidateAndCancel()
         wait(for: [didBecomeInvalid], timeout: 5)
     }
+    
+    func testForwardingOfUnimplementedMethodWhenDelegateIsNotRetained() throws {
+        // GIVEN
+        // - proxy delegate doesn't implement a method
+        // - an actual delegate does
+        var myDelegate: MockSessionCustomMethodImplemented? = MockSessionCustomMethodImplemented()
+        let delegate = URLSessionProxyDelegate(logger: logger, delegate: myDelegate)
+        let session = URLSession(configuration: .default, delegate: delegate, delegateQueue: nil)
+
+        // WHEN
+        // THEN method is forwarded to the actual delegate
+        let didBecomeInvalid = self.expectation(description: "didBecomeInvalid")
+        myDelegate?.didBecomeInvalid = { error in
+            didBecomeInvalid.fulfill()
+        }
+        autoreleasepool {
+            myDelegate = nil
+        }
+        
+        session.invalidateAndCancel()
+        wait(for: [didBecomeInvalid], timeout: 5)
+    }
 
     func xtestAutomaticRegistration() throws {
         URLSessionProxyDelegate.enableAutomaticRegistration(logger: .init(store: store))

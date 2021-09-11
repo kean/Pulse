@@ -25,13 +25,6 @@ public final class URLSessionProxyDelegate: NSObject, URLSessionTaskDelegate, UR
         self.logger = logger
     }
     
-    // MARK: URLSessionDelegate
-
-    public func urlSession(_ session: URLSession, didBecomeInvalidWithError error: Error?) {
-        // Workaround for issue https://github.com/kean/Pulse/issues/36
-        // Should not be needed with the recent retain policy changes
-    }
-
     // MARK: URLSessionTaskDelegate
 
     public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
