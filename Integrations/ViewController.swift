@@ -18,7 +18,7 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
         super.viewDidLoad()
         
         title = "PulseUI"
-
+        
         sections = [
             MenuSection(title: "Main", footer: "Demonstartes how to show the entire PulseUI interface (all four tabs)", items: [
                 MenuItem(title: "MainViewController", isPush: false, action: { [unowned self] in
