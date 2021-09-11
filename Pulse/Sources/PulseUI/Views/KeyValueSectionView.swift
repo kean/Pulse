@@ -56,7 +56,6 @@ struct KeyValueSectionView: View {
                 .padding(EdgeInsets(top: 0, leading: 10, bottom: 0, trailing: 0))
                 .border(width: 2, edges: [.leading], color: actualTintColor)
                 .padding(EdgeInsets(top: 5, leading: 5, bottom: 5, trailing: 0))
-            Spacer()
             #endif
         }
     }
