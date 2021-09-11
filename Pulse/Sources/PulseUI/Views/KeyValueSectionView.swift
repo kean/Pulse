@@ -113,7 +113,7 @@ private struct KeyValueListView: View {
                 .lineLimit(nil)
             #else
             (title + value)
-                .lineLimit(nil)
+                .lineLimit(4)
                 .contextMenu(ContextMenu(menuItems: {
                     Button(action: {
                         UXPasteboard.general.string = "\(row.item.0): \(row.item.1 ?? "–")"
