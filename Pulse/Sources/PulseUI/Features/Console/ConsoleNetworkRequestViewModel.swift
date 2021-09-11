@@ -41,7 +41,7 @@ final class ConsoleNetworkRequestViewModel {
         if request.statusCode != 0 {
             prefix = StatusCodeFormatter.string(for: Int(request.statusCode))
         } else if request.errorCode != 0 {
-            prefix = "\(request.errorCode) (\(descriptionForURLErrorCode(Int(request.errorCode)))"
+            prefix = "\(request.errorCode) (\(descriptionForURLErrorCode(Int(request.errorCode))))"
         } else {
             prefix = "Success"
         }
