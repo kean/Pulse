@@ -6,13 +6,13 @@ import Foundation
 
 /// Automates URLSession request tracking.
 public final class URLSessionProxyDelegate: NSObject, URLSessionTaskDelegate, URLSessionDataDelegate {
-    private weak var actualDelegate: URLSessionDelegate?
-    private weak var taskDelegate: URLSessionTaskDelegate?
+    private var actualDelegate: URLSessionDelegate?
+    private var taskDelegate: URLSessionTaskDelegate?
     private let interceptedSelectors: Set<Selector>
     private let logger: NetworkLogger
 
     /// - parameter logger: By default, creates a logger with `LoggerStore.default`.
-    /// - parameter delegate: The "actual" session delegate.
+    /// - parameter delegate: The "actual" session delegate, strongly retained.
     public init(logger: NetworkLogger = .init(), delegate: URLSessionDelegate?) {
         self.actualDelegate = delegate
         self.taskDelegate = delegate as? URLSessionTaskDelegate
@@ -23,6 +23,13 @@ public final class URLSessionProxyDelegate: NSObject, URLSessionTaskDelegate, UR
             #selector(URLSessionTaskDelegate.urlSession(_:task:didFinishCollecting:))
         ]
         self.logger = logger
+    }
+    
+    // MARK: URLSessionDelegate
+
+    public func urlSession(_ session: URLSession, didBecomeInvalidWithError error: Error?) {
+        // Workaround for issue https://github.com/kean/Pulse/issues/36
+        // Should not be needed with the recent retain policy changes
     }
 
     // MARK: URLSessionTaskDelegate
