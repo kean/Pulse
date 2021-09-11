@@ -57,12 +57,12 @@ struct MainViewModelItem: Hashable, Identifiable {
 
     #if os(iOS) || os(tvOS)
     static let console = MainViewModelItem(title: "Console", imageName: "message.fill")
-    static let network = MainViewModelItem(title: "Network", imageName: "icloud.fill")
+    static let network = MainViewModelItem(title: "Network", imageName: "icloud.and.arrow.down.fill")
     static let pins = MainViewModelItem(title: "Pins", imageName: "pin.fill")
     static let settings = MainViewModelItem(title: "Settings", imageName: "ellipsis.circle.fill")
     #else
     static let console = MainViewModelItem(title: "Console", imageName: "message")
-    static let network = MainViewModelItem(title: "Network", imageName: "icloud")
+    static let network = MainViewModelItem(title: "Network", imageName: "icloud.and.arrow.down")
     static let pins = MainViewModelItem(title: "Pins", imageName: "pin")
     static let settings = MainViewModelItem(title: "Settings", imageName: "ellipsis.circle")
     #endif
