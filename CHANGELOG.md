@@ -1,5 +1,27 @@
 # Pulse 0.x
 
+## Pulse 0.17.0
+
+*11 Sep, 2021*
+
+- Add `storeRequest(_,response:error:data:metrics)` method to `LoggerStore`. It can be used if you just want to log the response without incremental updates. For incremental updates, use the existing `NetworkLogger` class instead.
+- Fix a crash occuring when you invalidate a `URLSession` that uses `URLSessionProxyDelegate` - [#36](https://github.com/kean/Pulse/issues/36)
+- Fix an issue where `URLSessionProxyDelegate` was not retaining the real delegate the way `URLSession` does
+- [iOS] Display a context menu with all available options (plain text, HTML, cURL) etc when pressing "Share" button in a network request details screen on iOS 14
+- [HTML export] Add soft-wrap for long header fields
+- [HTML export] Add proper overflow for response bodies
+- Automatically remove appearance overrides for navigation bar in MainViewController; some break SwiftUI layout (if you need to disable it, use isAutomaticAppearanceOverrideRemovalEnabled.isAutomaticAppearanceOverrideRemovalEnabled)
+- [iOS] Limit the size of text values in key-value sections to 4 lines
+- [iOS] Add a way to view raw error description
+- New icon for "Network"
+- Fix missing closing parentheses in error description in an error section
+
+## Pulse 0.16.1
+
+*24 Aug, 2021*
+
+- Fix an issue with 0 and 1 being printed as Boolean values by the JSON printer – [#34](https://github.com/kean/Pulse/pull/34), thanks to [Abdula Magomedov](https://github.com/abdula571) 
+
 ## Pulse 0.16.0
 
 *21 Aug, 2021*
