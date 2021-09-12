@@ -573,8 +573,8 @@ fileprivate extension URLRequest {
 		var bodyStreamData = Data()
 		
 		while bodyStream.hasBytesAvailable {
-			let readDat = bodyStream.read(buffer, maxLength: bufferSize)
-			bodyStreamData.append(buffer, count: readDat)
+			let readData = bodyStream.read(buffer, maxLength: bufferSize)
+			bodyStreamData.append(buffer, count: readData)
 		}
 		
 		return bodyStreamData
