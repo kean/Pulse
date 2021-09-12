@@ -238,7 +238,7 @@ extension LoggerStore {
             request: NetworkLoggerRequest(urlRequest: urlRequest),
             response: context.response.map(NetworkLoggerResponse.init),
             error: context.error.map(NetworkLoggerError.init),
-            requestBody: urlRequest.httpBody,
+			requestBody: urlRequest.httpBody ?? urlRequest.httpBodyStreamData(),
             responseBody: context.data,
             metrics: context.metrics
         )
@@ -550,4 +550,33 @@ public enum LoggerStoreError: Error, LocalizedError {
         case .unknownError: return "Unexpected error"
         }
     }
+}
+
+
+fileprivate extension URLRequest {
+	
+	func httpBodyStreamData() -> Data? {
+		guard let bodyStream = self.httpBodyStream else {
+			return nil
+		}
+		
+		bodyStream.open()
+		defer {
+			buffer.deallocate()
+			bodyStream.close()
+		}
+		
+		// Will read 16 chars per iteration. Can use bigger buffer if needed
+		let bufferSize: Int = 16
+		let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: bufferSize)
+		
+		var bodyStreamData = Data()
+		
+		while bodyStream.hasBytesAvailable {
+			let readDat = bodyStream.read(buffer, maxLength: bufferSize)
+			bodyStreamData.append(buffer, count: readDat)
+		}
+		
+		return bodyStreamData
+	}
 }
