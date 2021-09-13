@@ -20,7 +20,7 @@ extension NetworkLoggerSummary {
             components.append("-H \"\(header.key): \(escapedValue)\"")
         }
 
-        if let httpBodyData = responseBody {
+        if let httpBodyData = requestBody {
             let httpBody = String(decoding: httpBodyData, as: UTF8.self)
             var escapedBody = httpBody.replacingOccurrences(of: "\\\"", with: "\\\\\"")
             escapedBody = escapedBody.replacingOccurrences(of: "\"", with: "\\\"")
