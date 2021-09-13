@@ -1,5 +1,12 @@
 # Pulse 0.x
 
+## Pulse 0.17.1
+
+*13 Sep, 2021*
+
+- Add support to httpBodyStreamData - [#37](https://github.com/kean/Pulse/pull/37), thanks to [Klemen Košir](https://github.com/klemenkosir)
+- Fix an issue whre cURL share was using request body instead of the response body - [#38](https://github.com/kean/Pulse/pull/38), thanks to [BB9z](https://github.com/BB9z)
+
 ## Pulse 0.17.0
 
 *11 Sep, 2021*
