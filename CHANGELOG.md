@@ -1,5 +1,11 @@
 # Pulse 0.x
 
+## Pulse 0.17.2
+
+*15 Sep, 2021*
+
+- Add Xcode 13 support - [#39](https://github.com/kean/Pulse/pull/39), thanks to [Jeffrey Macko](https://github.com/mackoj)
+
 ## Pulse 0.17.1
 
 *13 Sep, 2021*
