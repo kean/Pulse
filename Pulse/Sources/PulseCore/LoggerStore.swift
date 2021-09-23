@@ -41,6 +41,10 @@ public final class LoggerStore {
     public static var logsURL: URL { URL.logs }
 
     var makeCurrentDate: () -> Date = { Date() }
+    
+    var onEvent: ((LoggerStoreEvent) -> Void)?
+    
+    private let encodingQueue = DispatchQueue(label: "com.github.kean.logger-store")
 
     private enum PulseDocument {
         case directory(blobs: BlobStore)
@@ -200,15 +204,22 @@ public final class LoggerStore {
 extension LoggerStore {
     /// Stores the given message.
     public func storeMessage(label: String, level: Level, message: String, metadata: [String: MetadataValue]?, file: String = #file, function: String = #function, line: UInt = #line) {
-        let context = backgroundContext
-        let date = makeCurrentDate()
-        context.perform {
-            self.makeMessageEntity(createdAt: date, label: label, level: level, message: message, metadata: metadata, file: file, function: function, line: line)
-            try? context.save()
-        }
+        let message = Message(createdAt: makeCurrentDate(), label: label, level: level, message: message, metadata: metadata?.unpack(), session: LoggerSession.current.id.uuidString, file: file, function: function, line: line)
+        storeMessage(message)
     }
     
-    /// Stores the completed network request.
+    /// Stores the given message.
+    func storeMessage(_ message: Message) {
+        let context = backgroundContext
+        context.perform {
+            self.makeMessageEntity(with: message)
+            try? context.save()
+        }
+        
+        onEvent?(.saveMessage(message))
+    }
+    
+    /// Stores the network request.
     ///
     /// - note: If you want to store incremental updates to the task, use
     /// `NetworkLogger` instead.
@@ -224,33 +235,50 @@ extension LoggerStore {
     }
 
     func storeNetworkRequest(_ context: NetworkLogger.TaskContext) {
+        guard let urlRequest = context.request else { return }
+        
         let date = makeCurrentDate()
-        backgroundContext.perform {
-            self.storeNetworkRequest(context, date: date)
-            try? self.backgroundContext.save()
+        encodingQueue.async {
+            self.storeNetworkRequest(urlRequest: urlRequest, context, date: date)
         }
     }
-
-    private func storeNetworkRequest(_ context: NetworkLogger.TaskContext, date: Date) {
-        guard let urlRequest = context.request else { return }
-
-        let summary = NetworkLoggerRequestSummary(
+    
+    private func storeNetworkRequest(urlRequest: URLRequest, _ context: NetworkLogger.TaskContext, date: Date) {
+        // This is pretty expensive because it perform JSON encoding, we do
+        // this on the encoding queue.
+        let message = NetworkMessage(
+            createdAt: date,
             request: NetworkLoggerRequest(urlRequest: urlRequest),
             response: context.response.map(NetworkLoggerResponse.init),
             error: context.error.map(NetworkLoggerError.init),
 			requestBody: urlRequest.httpBody ?? urlRequest.httpBodyStreamData(),
             responseBody: context.data,
-            metrics: context.metrics
+            metrics: context.metrics,
+            session: LoggerSession.current.id.uuidString
         )
-
+        storeRequest(message)
+    }
+    
+    /// Stores the network request.
+    func storeRequest(_ message: NetworkMessage) {
+        let context = backgroundContext
+        context.perform {
+            self._storeNetworkRequest(message)
+            try? context.save()
+        }
+        
+        onEvent?(.saveNetworkMessage(message))
+    }
+    
+    private func _storeNetworkRequest(_ summary: NetworkMessage) {
         let level: LoggerStore.Level
-        let url = urlRequest.url?.absoluteString
-        var message = "\(urlRequest.httpMethod ?? "–") \(url ?? "–")"
-        if let error = context.error {
+        let url = summary.request.url?.absoluteString
+        var message = "\(summary.request.httpMethod ?? "–") \(url ?? "–")"
+        if let error = summary.error {
             level = .error
-            message += " \((error as NSError).code) \(error.localizedDescription)"
+            message += " \(error.code) \(error.localizedDescription)"
         } else {
-            let statusCode = (context.response as? HTTPURLResponse)?.statusCode
+            let statusCode = summary.response?.statusCode
             if let statusCode = statusCode, !(200..<400).contains(statusCode) {
                 level = .error
             } else {
@@ -258,41 +286,39 @@ extension LoggerStore {
             }
             message += " \(statusCode.map(descriptionForStatusCode) ?? "–")"
         }
-
-        storeNetworkRequest(summary, createdAt: date, level: level, message: message)
-    }
-
-    private func storeNetworkRequest(_ summary: NetworkLoggerRequestSummary, createdAt: Date, level: Level, message: String) {
-        let messageEntity = self.makeMessageEntity(createdAt: createdAt, label: "network", level: level, message: message, metadata: nil, file: "", function: "", line: 0)
-        let requestEntity = self.makeRequest(summary, createdAt: createdAt)
+        
+        let messageObject = Message(createdAt: summary.createdAt, label: "network", level: level, message: message, metadata: nil, session: summary.session, file: "", function: "", line: 0)
+        
+        let messageEntity = self.makeMessageEntity(with: messageObject)
+        let requestEntity = self.makeRequest(summary, createdAt: summary.createdAt)
         messageEntity.request = requestEntity
         requestEntity.message = messageEntity
     }
-
+        
     @discardableResult
-    private func makeMessageEntity(createdAt: Date, label: String, level: Level, message: String, metadata: [String: MetadataValue]?, file: String, function: String, line: UInt) -> LoggerMessageEntity {
+    private func makeMessageEntity(with message: Message) -> LoggerMessageEntity {
         let entity = LoggerMessageEntity(context: backgroundContext)
-        entity.createdAt = createdAt
-        entity.level = level.rawValue
-        entity.label = label
-        entity.session = LoggerSession.current.id.uuidString
-        entity.text = String(describing: message)
-        if let entries = metadata?.unpack(), !entries.isEmpty {
-            entity.metadata = Set(entries.map { key, value in
+        entity.createdAt = message.createdAt
+        entity.level = message.level.rawValue
+        entity.label = message.label
+        entity.session = message.session
+        entity.text = message.message
+        if let metadata = message.metadata, !metadata.isEmpty {
+            entity.metadata = Set(metadata.map { key, value in
                 let entity = LoggerMetadataEntity(context: backgroundContext)
                 entity.key = key
                 entity.value = value
                 return entity
             })
         }
-        entity.file = file
-        entity.function = function
-        entity.line = Int32(line)
+        entity.file = message.file
+        entity.function = message.function
+        entity.line = Int32(message.line)
         return entity
     }
 
     @discardableResult
-    private func makeRequest(_ summary: NetworkLoggerRequestSummary, createdAt: Date) -> LoggerNetworkRequestEntity {
+    private func makeRequest(_ summary: LoggerStore.NetworkMessage, createdAt: Date) -> LoggerNetworkRequestEntity {
         let entity = LoggerNetworkRequestEntity(context: backgroundContext)
         // Primary
         entity.createdAt = createdAt
@@ -316,7 +342,7 @@ extension LoggerStore {
     }
 
     @discardableResult
-    private func makeRequestDetails(_ summary: NetworkLoggerRequestSummary) -> LoggerNetworkRequestDetailsEntity {
+    private func makeRequestDetails(_ summary: LoggerStore.NetworkMessage) -> LoggerNetworkRequestDetailsEntity {
         let entity = LoggerNetworkRequestDetailsEntity(context: backgroundContext)
         let encoder = JSONEncoder()
         entity.request = try? encoder.encode(summary.request)
@@ -342,6 +368,52 @@ extension LoggerStore {
 }
 
 extension LoggerStore {
+    public final class Message: Codable {
+        public let createdAt: Date
+        public let label: String
+        public let level: LoggerStore.Level
+        public let message: String
+        public let metadata: [String: String]?
+        public let session: String
+        public let file: String
+        public let function: String
+        public let line: UInt
+        
+        public init(createdAt: Date, label: String, level: LoggerStore.Level, message: String, metadata: [String : String]?, session: String, file: String, function: String, line: UInt) {
+            self.createdAt = createdAt
+            self.label = label
+            self.level = level
+            self.message = message
+            self.metadata = metadata
+            self.session = session
+            self.file = file
+            self.function = function
+            self.line = line
+        }
+    }
+    
+    public final class NetworkMessage: Codable {
+        public let createdAt: Date
+        public let request: NetworkLoggerRequest
+        public let response: NetworkLoggerResponse?
+        public let error: NetworkLoggerError?
+        public let requestBody: Data?
+        public let responseBody: Data?
+        public let metrics: NetworkLoggerMetrics?
+        public let session: String
+        
+        public init(createdAt: Date, request: NetworkLoggerRequest, response: NetworkLoggerResponse?, error: NetworkLoggerError?, requestBody: Data?, responseBody: Data?, metrics: NetworkLoggerMetrics?, session: String) {
+            self.createdAt = createdAt
+            self.request = request
+            self.response = response
+            self.error = error
+            self.requestBody = requestBody
+            self.responseBody = responseBody
+            self.metrics = metrics
+            self.session = session
+        }
+    }
+    
     public enum MetadataValue {
         case string(String)
         case stringConvertible(CustomStringConvertible)
@@ -457,6 +529,7 @@ extension LoggerStore {
         let currentDatabaseAttributes = try Files.attributesOfItem(atPath: storeURL.appendingPathComponent(databaseFileName).path)
         let manifest = LoggerStoreInfo(
             id: UUID(),
+            appInfo: .make(),
             device: .make(),
             storeVersion: currentStoreVersion,
             messageCount: try messageCount(),
@@ -524,12 +597,12 @@ private let databaseFileName = "logs.sqlite"
 private let blobsDirectoryName = "blobs"
 
 private extension Dictionary where Key == String, Value == LoggerStore.MetadataValue {
-    func unpack() -> [(String, String)] {
-        var entries = [(String, String)]()
+    func unpack() -> [String: String] {
+        var entries = [String: String]()
         for (key, value) in self {
             switch value {
-            case let .string(string): entries.append((key, string))
-            case let .stringConvertible(string): entries.append((key, string.description))
+            case let .string(string): entries[key] = string
+            case let .stringConvertible(string): entries[key] = string.description
             }
         }
         return entries
@@ -552,9 +625,7 @@ public enum LoggerStoreError: Error, LocalizedError {
     }
 }
 
-
-fileprivate extension URLRequest {
-	
+private extension URLRequest {
 	func httpBodyStreamData() -> Data? {
 		guard let bodyStream = self.httpBodyStream else {
 			return nil
@@ -579,4 +650,9 @@ fileprivate extension URLRequest {
 		
 		return bodyStreamData
 	}
+}
+
+enum LoggerStoreEvent {
+    case saveMessage(LoggerStore.Message)
+    case saveNetworkMessage(LoggerStore.NetworkMessage)
 }

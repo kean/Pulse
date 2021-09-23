@@ -26,7 +26,7 @@ private func makeMockStore() -> LoggerStore {
     try? FileManager.default.createDirectory(at: rootURL, withIntermediateDirectories: true, attributes: nil)
 
     let storeURL = rootURL.appendingPathComponent("demo-store")
-    return try! LoggerStore(storeURL: storeURL)
+    return try! LoggerStore(storeURL: storeURL, options: [.create])
 }
 
 private extension NSManagedObject {
@@ -46,7 +46,7 @@ private struct Logger {
     }
 }
 
-private func populateStore(_ store: LoggerStore) {
+func populateStore(_ store: LoggerStore) {
     precondition(Thread.isMainThread)
 
     func logger(named: String) -> Logger {

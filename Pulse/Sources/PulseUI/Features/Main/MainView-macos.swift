@@ -11,7 +11,7 @@ import Combine
 
 public struct MainView: View {
     @StateObject private var model: MainViewModel
-
+    
     public init(store: LoggerStore = .default) {
         self._model = StateObject(wrappedValue: MainViewModel(store: store, onDismiss: nil))
     }
@@ -51,7 +51,7 @@ private struct SidebarView: View {
     @State private var isConsoleTabSelected = true
     @State private var isNetwokTabSelected = false
     @State private var isPinsTabSelected = false
-
+    
     init(model: MainViewModel) {
         self.model = model
         self.consoleModel = model.consoleModel
@@ -60,11 +60,11 @@ private struct SidebarView: View {
 
         // Preload share services
         _ = ShareMenuContentViewModel.url
+        
+        registerViewModel()
     }
 
     var body: some View {
-        let _ = registerViewModel()
-
         List {
             SiderbarSectionTitle(text: "Menu")
             NavigationLink(destination: ConsoleView(model: model.consoleModel), isActive: $isConsoleTabSelected) {
@@ -76,7 +76,7 @@ private struct SidebarView: View {
             NavigationLink(destination: PinsView(model: model.pinsModel), isActive: $isPinsTabSelected) {
                 SidebarNavigationTab(item: .pins, count: pinsModel.messages.count)
             }
-
+            
             if isConsoleTabSelected {
                 SidebarFiltersSectionView(model: consoleModel, type: .default)
             } else if isNetwokTabSelected {

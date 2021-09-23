@@ -45,6 +45,14 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     @Published private(set) var fileTransferStatus: FileTransferStatus = .initial
     @Published var fileTransferError: FileTransferError?
     #endif
+    
+    #if os(iOS) || os(tvOS) || os(watchOS)
+    @available(iOS 14.0, tvOS 14.0, watchOS 7.0, *)
+    var remoteLoggerViewModel: RemoteLoggerSettingsViewModel? {
+        _remoteLoggerViewModel as? RemoteLoggerSettingsViewModel
+    }
+    private var _remoteLoggerViewModel: Any!
+    #endif
 
     var onDismiss: (() -> Void)?
 
@@ -74,6 +82,14 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         #if os(macOS)
         self.list = NotListViewModel()
         self.details = ConsoleDetailsRouterViewModel(context: .init(store: store, pins: pins))
+        #endif
+        
+        #if os(iOS) || os(tvOS) || os(watchOS)
+        if #available(iOS 14.0, *, tvOS 14.0, watchOS 7.0) {
+            if store === RemoteLogger.shared.store {
+                _remoteLoggerViewModel = RemoteLoggerSettingsViewModel()
+            }
+        }
         #endif
 
         super.init()
@@ -308,7 +324,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         }.show()
         #endif
     }
-
+        
     #if os(watchOS) || os(iOS)
     @available(watchOS 7.0, *)
     func tranferStore() {

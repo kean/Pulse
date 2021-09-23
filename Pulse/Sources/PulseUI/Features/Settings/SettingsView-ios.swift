@@ -53,6 +53,13 @@ struct SettingsView: View {
                             .disabled(console.messages.isEmpty)
                             .opacity(console.messages.isEmpty ? 0.33 : 1)
                     }
+                    if #available(iOS 14.0, *) {
+                        if let model = console.remoteLoggerViewModel {
+                            Section {
+                                RemoteLoggerSettingsView(model: model)
+                            }
+                        }
+                    }
                 }
                 Section(footer: Text("Pulse is funded by the community contributions.")) {
                     Button(action: {
@@ -104,7 +111,7 @@ final class SettingsViewModel: ObservableObject {
     var isReadonly: Bool {
         store.isReadonly
     }
-
+        
     var details: StoreDetailsViewModel? {
         store.info.map { StoreDetailsViewModel(storeURL: store.storeURL, info: $0) }
     }

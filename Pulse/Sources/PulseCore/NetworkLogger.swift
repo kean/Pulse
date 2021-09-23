@@ -120,21 +120,3 @@ private extension URLSessionTask {
         originalRequest?.url?.absoluteString
     }
 }
-
-final class NetworkLoggerRequestSummary {
-    let request: NetworkLoggerRequest
-    let response: NetworkLoggerResponse?
-    let error: NetworkLoggerError?
-    let requestBody: Data?
-    let responseBody: Data?
-    let metrics: NetworkLoggerMetrics?
-
-    init(request: NetworkLoggerRequest, response: NetworkLoggerResponse?, error: NetworkLoggerError?, requestBody: Data?, responseBody: Data?, metrics: NetworkLoggerMetrics?) {
-        self.request = request
-        self.response = response
-        self.error = error
-        self.requestBody = requestBody
-        self.responseBody = responseBody
-        self.metrics = metrics
-    }
-}

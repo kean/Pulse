@@ -6,6 +6,7 @@ import Foundation
 
 public struct LoggerStoreInfo: Codable {
     public let id: UUID
+    public let appInfo: AppInfo? // Should be always avail starting with 1.0
     public let device: DeviceInfo
     public let storeVersion: String
     public let messageCount: Int
@@ -16,6 +17,13 @@ public struct LoggerStoreInfo: Codable {
     public let modifiedDate: Date
     public let archivedDate: Date
 
+    public struct AppInfo: Codable {
+        public let bundleIdentifier: String?
+        public let name: String?
+        public let version: String?
+        public let build: String?
+    }
+    
     public struct DeviceInfo: Codable {
         public let name: String
         public let model: String
@@ -41,8 +49,30 @@ public struct LoggerStoreInfo: Codable {
     }
 }
 
+struct AppInfo {
+    static var bundleIdentifier: String? { Bundle.main.bundleIdentifier }
+    static var appName: String? { Bundle.main.infoDictionary?[kCFBundleNameKey as String] as? String }
+    static var appVersion: String? { Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String }
+    static var appBuild: String? { Bundle.main.infoDictionary?["CFBundleVersion"] as? String }
+}
+
+extension LoggerStoreInfo.AppInfo {
+    static func make() -> LoggerStoreInfo.AppInfo {
+        return LoggerStoreInfo.AppInfo(
+            bundleIdentifier: AppInfo.bundleIdentifier,
+            name: AppInfo.appName,
+            version: AppInfo.appVersion,
+            build: AppInfo.appBuild
+        )
+    }
+}
+
 #if os(iOS) || os(tvOS)
 import UIKit
+
+func getDeviceId() -> UUID? {
+    UIDevice.current.identifierForVendor
+}
 
 extension LoggerStoreInfo.DeviceInfo {
     static func make() -> LoggerStoreInfo.DeviceInfo {
@@ -58,6 +88,11 @@ extension LoggerStoreInfo.DeviceInfo {
 }
 #elseif os(watchOS)
 import WatchKit
+
+@available(watchOS 7.0, *)
+func getDeviceId() -> UUID? {
+    WKInterfaceDevice.current().identifierForVendor
+}
 
 extension LoggerStoreInfo.DeviceInfo {
     static func make() -> LoggerStoreInfo.DeviceInfo {

@@ -49,10 +49,10 @@ public struct ConsoleView: View {
             Menu(content: {
                 Section {
                     Button(action: { shared = model.share(as: .store) }) {
-                        Label("Share as File", systemImage: "square.and.arrow.up")
+                        Label("Share as Pulse Document", systemImage: "square.and.arrow.up")
                     }
                     Button(action: { shared = model.share(as: .text) }) {
-                        Label("Share as Text", systemImage: "square.and.arrow.up")
+                        Label("Share as Text File", systemImage: "square.and.arrow.up")
                     }
                 }
                 Section {
