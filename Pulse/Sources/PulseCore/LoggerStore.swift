@@ -128,6 +128,7 @@ public final class LoggerStore {
         }
 
         self.container = LoggerStore.makeContainer(databaseURL: databaseURL, isViewing: false)
+        try? LoggerStore.loadStore(container: container)
         self.backgroundContext = LoggerStore.makeBackgroundContext(for: container)
         self.isReadonly = false
         self.document = .directory(blobs: BlobStore(path: blobsURL))
@@ -155,6 +156,8 @@ public final class LoggerStore {
         }
 
         self.container = LoggerStore.makeContainer(databaseURL: databaseURL, isViewing: true)
+        try
+            LoggerStore.loadStore(container: container)
         self.backgroundContext = LoggerStore.makeBackgroundContext(for: container)
         self.isReadonly = true
         self.info = manifest
@@ -177,19 +180,25 @@ public final class LoggerStore {
         let container = NSPersistentContainer(name: databaseURL.lastPathComponent, managedObjectModel: Self.model)
         let store = NSPersistentStoreDescription(url: databaseURL)
         if isViewing {
-            store.setOption(NSNumber(value: true), forKey: NSReadOnlyPersistentStoreOption)
             store.setValue("DELETE" as NSString, forPragmaNamed: "journal_mode")
         }
         container.persistentStoreDescriptions = [store]
-
-        container.loadPersistentStores { description, error in
-            if let error = error {
-                debugPrint("Failed to load persistent store \(description) with error: \(error)")
-            }
-        }
         container.viewContext.automaticallyMergesChangesFromParent = true
         container.viewContext.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
         return container
+    }
+    
+    private static func loadStore(container: NSPersistentContainer) throws {
+        var loadError: Error?
+        container.loadPersistentStores { description, error in
+            if let error = error {
+                debugPrint("Failed to load persistent store \(description) with error: \(error)")
+                loadError = error
+            }
+        }
+        if let error = loadError {
+            throw error
+        }
     }
 
     private static func makeBackgroundContext(for container: NSPersistentContainer) -> NSManagedObjectContext {
@@ -300,6 +309,7 @@ extension LoggerStore {
         let entity = LoggerMessageEntity(context: backgroundContext)
         entity.createdAt = message.createdAt
         entity.level = message.level.rawValue
+        entity.levelOrder = message.level.order
         entity.label = message.label
         entity.session = message.session
         entity.text = message.message
@@ -430,6 +440,18 @@ extension LoggerStore {
         case warning
         case error
         case critical
+        
+        var order: Int16 {
+            switch self {
+            case .trace: return 0
+            case .debug: return 1
+            case .info: return 2
+            case .notice: return 3
+            case .warning: return 4
+            case .error: return 5
+            case .critical: return 6
+            }
+        }
     }
 }
 

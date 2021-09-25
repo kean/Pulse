@@ -171,6 +171,16 @@ struct StringSearchOptionsMenu: View {
     var isKindNeeded = true
 
     var body: some View {
+        #if os(macOS)
+        menu
+            .menuStyle(BorderlessButtonMenuStyle())
+        #else
+        menu
+        #endif
+        
+    }
+    
+    var menu: some View {
         Menu(content: {
             Picker(options.isCaseSensitive ? "Case Sensitive" :  "Case Insensitive", selection: $options.isCaseSensitive) {
                 Text("Case Sensitive").tag(true)

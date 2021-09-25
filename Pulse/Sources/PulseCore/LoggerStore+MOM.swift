@@ -25,6 +25,7 @@ public extension LoggerStore {
         do {
             let createdAt = NSAttributeDescription(name: "createdAt", type: .dateAttributeType)
             let level = NSAttributeDescription(name: "level", type: .stringAttributeType)
+            let levelOrder = NSAttributeDescription(name: "levelOrder", type: .integer16AttributeType)
             let label = NSAttributeDescription(name: "label", type: .stringAttributeType)
             let session = NSAttributeDescription(name: "session", type: .stringAttributeType)
             let text = NSAttributeDescription(name: "text", type: .stringAttributeType)
@@ -33,7 +34,7 @@ public extension LoggerStore {
             let function = NSAttributeDescription(name: "function", type: .stringAttributeType)
             let line = NSAttributeDescription(name: "line", type: .integer32AttributeType)
             let request = NSRelationshipDescription.make(name: "request", type: .oneToOne(isOptional: true), entity: request)
-            message.properties = [createdAt, level, label, session, text, metadata, file, function, line, request]
+            message.properties = [createdAt, level, levelOrder, label, session, text, metadata, file, function, line, request]
         }
 
         do {
@@ -116,6 +117,7 @@ private extension NSRelationshipDescription {
 public final class LoggerMessageEntity: NSManagedObject {
     @NSManaged public var createdAt: Date
     @NSManaged public var level: String
+    @NSManaged public var levelOrder: Int16
     @NSManaged public var label: String
     @NSManaged public var session: String
     @NSManaged public var text: String

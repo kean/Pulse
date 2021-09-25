@@ -18,14 +18,20 @@ struct BadgeView: View {
     let font = Font.system(size: 10, weight: .regular)
     let padding = EdgeInsets(top: 2, leading: 6, bottom: 2, trailing: 6)
     #endif
-
+    
+    #if os(macOS)
+    let cornerRadius: CGFloat = 4
+    #else
+    let cornerRadius: CGFloat = 20
+    #endif
+    
     var body: some View {
         Text(model.title)
             .font(font)
             .foregroundColor(model.textColor)
             .padding(padding)
             .background(model.color)
-            .cornerRadius(20)
+            .cornerRadius(cornerRadius)
     }
 }
 

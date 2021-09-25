@@ -13,10 +13,12 @@ import Combine
 struct DopeTextView: View {
     @ObservedObject private var model: DopeTextViewModel
     var isAutomaticLinkDetectionEnabled = true
+    var hasVerticalScroller = false
 
-    init(model: DopeTextViewModel, isAutomaticLinkDetectionEnabled: Bool = true) {
+    init(model: DopeTextViewModel, isAutomaticLinkDetectionEnabled: Bool = true, hasVerticalScroller: Bool = true) {
         self.model = model
         self.isAutomaticLinkDetectionEnabled = isAutomaticLinkDetectionEnabled
+        self.hasVerticalScroller = hasVerticalScroller
     }
 
     init(data: Data) {
@@ -54,7 +56,7 @@ struct DopeTextView: View {
     #else
     var body: some View {
         VStack(spacing: 0) {
-            WrappedTextView(text: model.text, model: model, isAutomaticLinkDetectionEnabled: isAutomaticLinkDetectionEnabled)
+            WrappedTextView(text: model.text, model: model, isAutomaticLinkDetectionEnabled: isAutomaticLinkDetectionEnabled, hasVerticalScroller: hasVerticalScroller)
             #if !os(tvOS)
             Divider()
             SearchToobar(model: model)
@@ -91,9 +93,11 @@ private struct WrappedTextView: NSViewRepresentable {
     let text: NSAttributedString
     let model: DopeTextViewModel
     let isAutomaticLinkDetectionEnabled: Bool
+    var hasVerticalScroller: Bool
 
     func makeNSView(context: Context) -> NSScrollView {
         let scrollView = NSTextView.scrollableTextView()
+        scrollView.hasVerticalScroller = hasVerticalScroller
         let textView = scrollView.documentView as! NSTextView
         configureTextView(textView, isAutomaticLinkDetectionEnabled)
         textView.isAutomaticSpellingCorrectionEnabled = false
@@ -170,20 +174,20 @@ private struct SearchToobar: View {
 
             Spacer()
 
-            HStack(spacing: 4) {
+            HStack(spacing: 12) {
                 Text(model.matches.isEmpty ? "No matches" : "\(model.selectedMatchIndex+1)/\(model.matches.count)")
                     .font(Font.body.monospacedDigit())
+                    .foregroundColor(.secondary)
                 Button(action: model.previousMatch) {
-                    Image(systemName: "chevron.left.circle")
-                }
+                    Image(systemName: "chevron.left")
+                }.buttonStyle(PlainButtonStyle())
                 Button(action: model.nextMatch) {
-                    Image(systemName: "chevron.right.circle")
-                }
+                    Image(systemName: "chevron.right")
+                }.buttonStyle(PlainButtonStyle())
             }
             .fixedSize()
         }
-        .padding(10)
-        .frame(height: 40)
+        .padding(6)
     }
     #endif
 }
@@ -223,7 +227,11 @@ final class DopeTextViewModel: ObservableObject {
     }
 
     convenience init(string: String) {
-        self.init(string: NSAttributedString(string: string, attributes: [.font: UXFont.monospacedSystemFont(ofSize: FontSize.body, weight: .regular), .foregroundColor: UXColor.label]))
+        #if os(macOS)
+        self.init(string: NSAttributedString(string: string, attributes: [.font: NSFont.preferredFont(forTextStyle: .body, options: [:]), .foregroundColor: UXColor.label]))
+        #else
+        self.init(string: NSAttributedString(string: string, attributes: [.font: UXFont.systemFont(ofSize: FontSize.body, weight: .regular), .foregroundColor: UXColor.label]))
+        #endif
     }
 
     init(string: NSAttributedString) {

@@ -81,7 +81,7 @@ private let pinImage: NSImage = {
     return image?.withSymbolConfiguration(config) ?? NSImage()
 }()
 
-private final class ConsoleNetworkRequestContextMenuView: NSView {
+final class ConsoleNetworkRequestContextMenuView: NSView {
     var model: ConsoleNetworkRequestViewModel?
 
     override func menu(for event: NSEvent) -> NSMenu? {
@@ -92,20 +92,24 @@ private final class ConsoleNetworkRequestContextMenuView: NSView {
         let menu = NSMenu()
 
         let copyURL = NSMenuItem(title: "Copy URL", action: #selector(buttonCopyURLTapped), keyEquivalent: "")
+        copyURL.target = self
         copyURL.image = NSImage(systemSymbolName: "doc.on.doc", accessibilityDescription: nil)
         menu.addItem(copyURL)
 
         let copyHost = NSMenuItem(title: "Copy Host", action: #selector(buttonCopyHostTapped), keyEquivalent: "")
+        copyHost.target = self
         copyHost.image = NSImage(systemSymbolName: "doc.on.doc", accessibilityDescription: nil)
         menu.addItem(copyHost)
 
         if model.containsResponseData {
             let copyResponse = NSMenuItem(title: "Copy Response", action: #selector(buttonCopyResponseBodyTapped), keyEquivalent: "c")
+            copyResponse.target = self
             copyResponse.image = NSImage(systemSymbolName: "doc.on.doc", accessibilityDescription: nil)
             menu.addItem(copyResponse)
         }
 
         let copyCURL = NSMenuItem(title: "Copy cURL", action: #selector(buttonCopycURLDescriptionTapped), keyEquivalent: "")
+        copyCURL.target = self
         copyCURL.image = NSImage(systemSymbolName: "doc.on.doc", accessibilityDescription: nil)
         menu.addItem(copyCURL)
 
@@ -113,11 +117,13 @@ private final class ConsoleNetworkRequestContextMenuView: NSView {
 
         let isPinned = model.isPinned
         let pinItem = NSMenuItem(title: isPinned ? "Remove Pin" : "Pin", action: #selector(togglePinTapped), keyEquivalent: "")
+        pinItem.target = self
         pinItem.image = NSImage(systemSymbolName: isPinned ? "pin.slash" : "pin", accessibilityDescription: nil)
         menu.addItem(pinItem)
 
         if model.showInConsole != nil {
             let showInConsoleItem = NSMenuItem(title: "Show in Console", action: #selector(showInConsole), keyEquivalent: "")
+            showInConsoleItem.target = self
             showInConsoleItem.image = NSImage(systemSymbolName: "link", accessibilityDescription: nil)
             menu.addItem(showInConsoleItem)
         }

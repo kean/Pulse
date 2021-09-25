@@ -83,7 +83,7 @@ private let pinImage: NSImage = {
 
 // MARK: ContextMenus
 
-private final class ConsoleMessageContextMenuView: NSView {
+final class ConsoleMessageContextMenuView: NSView {
     var model: ConsoleMessageViewModel?
 
     override func menu(for event: NSEvent) -> NSMenu? {
@@ -92,13 +92,16 @@ private final class ConsoleMessageContextMenuView: NSView {
         let menu = NSMenu()
 
         let copyItem = NSMenuItem(title: "Copy Message", action: #selector(buttonCopyTapped), keyEquivalent: "")
+        copyItem.target = self
         copyItem.image = NSImage(systemSymbolName: "doc.on.doc", accessibilityDescription: nil)
 
         let isPinned = model.isPinned
         let pinItem = NSMenuItem(title: isPinned ? "Remove Pin" : "Pin", action: #selector(togglePinTapped), keyEquivalent: "")
+        pinItem.target = self
         pinItem.image = NSImage(systemSymbolName: isPinned ? "pin.slash" : "pin", accessibilityDescription: nil)
 
         let showInConsoleItem = NSMenuItem(title: "Show in Console", action: #selector(showInConsole), keyEquivalent: "")
+        showInConsoleItem.target = self
         showInConsoleItem.image = NSImage(systemSymbolName: "link", accessibilityDescription: nil)
 
         menu.addItem(copyItem)
