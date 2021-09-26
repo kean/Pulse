@@ -16,7 +16,7 @@ final class MainViewModel: ObservableObject {
     let consoleModel: ConsoleViewModel
     let networkModel: ConsoleViewModel
     #if !os(tvOS)
-    let pinsModel: PinsViewModel
+    let pinsModel: ConsoleViewModel
     #endif
     #if os(iOS) || os(tvOS)
     let settingsModel: SettingsViewModel
@@ -30,7 +30,7 @@ final class MainViewModel: ObservableObject {
         self.networkModel.onDismiss = onDismiss
 
         #if os(iOS) || os(macOS)
-        self.pinsModel = PinsViewModel(store: store)
+        self.pinsModel = ConsoleViewModel(store: store, contentType: .pins)
         self.pinsModel.onDismiss = onDismiss
         #endif
 

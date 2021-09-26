@@ -212,7 +212,7 @@ final class NetworkInspectorViewModel: ObservableObject {
     }
 
     var pin: PinButtonViewModel {
-        PinButtonViewModel(service: context.pins, objectID: objectId)
+        PinButtonViewModel(store: context.store, message: message)
     }
 
     // MARK: - Tabs

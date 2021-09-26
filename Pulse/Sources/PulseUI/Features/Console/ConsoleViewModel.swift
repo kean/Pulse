@@ -57,10 +57,9 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     var onDismiss: (() -> Void)?
 
     // TODO: get DI right, this is a quick workaround to fix @EnvironmentObject crashes
-    var context: AppContext { .init(store: store, pins: pins) }
+    var context: AppContext { .init(store: store) }
 
     private let store: LoggerStore
-    private let pins: PinService
     private let contentType: ConsoleContentType
     private let controller: NSFetchedResultsController<LoggerMessageEntity>
     private var latestSessionId: String?
@@ -68,7 +67,6 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 
     init(store: LoggerStore, contentType: ConsoleContentType = .all) {
         self.store = store
-        self.pins = PinService.service(forStore: store)
         self.contentType = contentType
 
         let request = NSFetchRequest<LoggerMessageEntity>(entityName: "\(LoggerMessageEntity.self)")
@@ -81,11 +79,11 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 
         #if os(macOS)
         self.list = NotListViewModel()
-        self.details = ConsoleDetailsRouterViewModel(context: .init(store: store, pins: pins))
+        self.details = ConsoleDetailsRouterViewModel(context: .init(store: store))
         #endif
         
         #if os(iOS) || os(tvOS) || os(watchOS)
-        if #available(iOS 14.0, *, tvOS 14.0, watchOS 7.0) {
+        if #available(iOS 14.0, *) {
             if store === RemoteLogger.shared.store {
                 _remoteLoggerViewModel = RemoteLoggerSettingsViewModel()
             }
@@ -174,11 +172,6 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         try? controller.performFetch()
 
         self.messages = controller.fetchedObjects ?? []
-        #if os(watchOS)
-        if criteria.onlyPins {
-            self.messages = messages.filter { self.pins.pins.contains($0.objectID) }
-        }
-        #endif
 
         #if os(macOS)
         self.list.elements = self.messages
@@ -186,6 +179,12 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         #endif
     }
 
+    // MARK: Pins
+    
+    func removeAllPins() {
+        store.removeAllPins()
+    }
+    
     #if os(macOS)
     private func refresh(searchTerm: String, searchOptions: StringSearchOptions) {
         if messages.count > 0, searchTerm.count > 1 {
@@ -206,7 +205,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         }
         list.isVisibleOnlyReloadNeeded = true
     }
-
+    
     // MARK: Selection
 
     func selectEntityAt(_ index: Int) {

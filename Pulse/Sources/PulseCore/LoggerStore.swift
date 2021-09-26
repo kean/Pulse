@@ -363,6 +363,40 @@ extension LoggerStore {
         entity.responseBodySize = Int64(summary.responseBody?.count ?? 0)
         return entity
     }
+    
+    // MARK: Managing Pins
+    
+    /// Toggles pin for the give message.
+    public func togglePin(for message: LoggerMessageEntity) {
+        performChanges { _ in
+            message.isPinned.toggle()
+        }
+    }
+    
+    /// Removes all pins.
+    public func removeAllPins() {
+        performChanges { context in
+            let request = NSFetchRequest<LoggerMessageEntity>(entityName: "\(LoggerMessageEntity.self)")
+            request.fetchBatchSize = 250
+            request.predicate = NSPredicate(format: "isPinned == YES")
+            
+            let messages: [LoggerMessageEntity] = (try? context.fetch(request)) ?? []
+            for message in messages {
+                message.isPinned = false
+            }
+        }
+    }
+    
+    // MARK: Direct Modifiction
+        
+    /// Perform and save changes on the main queue.
+    func performChanges(_ closure: (NSManagedObjectContext) -> Void) {
+        precondition(Thread.isMainThread)
+        closure(container.viewContext)
+        try? container.viewContext.save()
+    }
+    
+    // MARK: Accessing Data
 
     /// Returns blob data for the given key.
     public func getData(forKey key: String) -> Data? {

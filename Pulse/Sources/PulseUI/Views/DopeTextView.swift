@@ -56,7 +56,11 @@ struct DopeTextView: View {
     #else
     var body: some View {
         VStack(spacing: 0) {
+            #if os(macOS)
             WrappedTextView(text: model.text, model: model, isAutomaticLinkDetectionEnabled: isAutomaticLinkDetectionEnabled, hasVerticalScroller: hasVerticalScroller)
+            #else
+            WrappedTextView(text: model.text, model: model, isAutomaticLinkDetectionEnabled: isAutomaticLinkDetectionEnabled)
+            #endif
             #if !os(tvOS)
             Divider()
             SearchToobar(model: model)
@@ -137,7 +141,7 @@ private struct SearchToobar: View {
     var body: some View {
         HStack {
             HStack {
-                Text(model.matches.isEmpty ? "No matches" : "\(model.selectedMatchIndex+1)/\(model.matches.count)")
+                Text(model.matches.isEmpty ? "0/0" : "\(model.selectedMatchIndex+1)/\(model.matches.count)")
                     .font(Font.body.monospacedDigit())
                 Divider()
                 Button(action: model.previousMatch) {
@@ -170,12 +174,13 @@ private struct SearchToobar: View {
             }, onReturn: model.nextMatch).frame(maxWidth: 240)
 
             StringSearchOptionsMenu(options: $model.options, isKindNeeded: false)
+                .menuStyle(BorderlessButtonMenuStyle())
                 .fixedSize()
 
             Spacer()
 
             HStack(spacing: 12) {
-                Text(model.matches.isEmpty ? "No matches" : "\(model.selectedMatchIndex+1)/\(model.matches.count)")
+                Text(model.matches.isEmpty ? "0/0" : "\(model.selectedMatchIndex+1)/\(model.matches.count)")
                     .font(Font.body.monospacedDigit())
                     .foregroundColor(.secondary)
                 Button(action: model.previousMatch) {

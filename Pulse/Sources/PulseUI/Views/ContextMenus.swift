@@ -39,7 +39,7 @@ struct ConsoleMessageContextMenu: View {
             }.foregroundColor(.red)
         }
         Section {
-            PinButton(model: .init(service: context.pins, objectID: message.objectID))
+            PinButton(model: .init(store: context.store, message: message))
         }
     }
 }
@@ -110,7 +110,7 @@ struct NetworkMessageContextMenu: View {
         }
         #endif
         NetworkMessageContextMenuCopySection(request: request, shareService: context.share)
-        PinButton(model: .init(service: context.pins, objectID: message.objectID))
+        PinButton(model: .init(store: context.store, message: message))
     }
 }
 #endif
@@ -173,7 +173,6 @@ struct StringSearchOptionsMenu: View {
     var body: some View {
         #if os(macOS)
         menu
-            .menuStyle(BorderlessButtonMenuStyle())
         #else
         menu
         #endif

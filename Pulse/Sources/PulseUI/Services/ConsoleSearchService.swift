@@ -8,6 +8,8 @@ import CoreData
 
 struct ConsoleSearchCriteria: Hashable {
     var logLevels = Set(LoggerStore.Level.allCases).subtracting([LoggerStore.Level.trace])
+    
+    static let defaultLogLevels = Set(LoggerStore.Level.allCases).subtracting([LoggerStore.Level.trace])
 
     #if os(iOS)
     var isCurrentSessionOnly = true
@@ -20,10 +22,8 @@ struct ConsoleSearchCriteria: Hashable {
     var hiddenLabels: Set<String> = []
     var focusedLabel: String?
 
-    #if os(watchOS) || os(tvOS)
     var onlyPins = false
     var onlyNetwork = false
-    #endif
 
     static let `default` = ConsoleSearchCriteria()
 
@@ -46,15 +46,16 @@ extension ConsoleSearchCriteria {
         case .network:
             predicates.append(isNetworkMessagePredicate)
         case .pins:
-            break
+            predicates.append(NSPredicate(format: "isPinned == YES"))
         }
 
-        // TODO: refactor
-        #if os(watchOS) || os(tvOS)
+        if criteria.onlyPins {
+            predicates.append(NSPredicate(format: "isPinned == YES"))
+        }
+        
         if criteria.onlyNetwork {
             predicates.append(isNetworkMessagePredicate)
         }
-        #endif
 
         if criteria.isCurrentSessionOnly, let sessionId = sessionId, !sessionId.isEmpty {
             predicates.append(NSPredicate(format: "session == %@", sessionId))

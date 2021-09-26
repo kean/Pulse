@@ -31,10 +31,12 @@ struct ConsoleMessageListView: View {
     }
 
     private func openMessage(_ message: LoggerMessageEntity) {
-        AppRouter.shared.openDetails(view: AnyView(
+        ExternalEvents.open = AnyView(
             model.details.makeDetailsRouter(for: message)
                 .frame(minWidth: 500, idealWidth: 700, maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/, minHeight: 500, idealHeight: 800, maxHeight: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/)
-        ))
+        )
+        guard let url = URL(string: "com-github-kean-pulse://open-details") else { return }
+        NSWorkspace.shared.open(url)
     }
 }
 

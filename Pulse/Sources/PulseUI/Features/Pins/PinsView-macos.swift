@@ -10,20 +10,19 @@ import Combine
 #if os(macOS)
 
 struct PinsView: View {
-    @ObservedObject var model: PinsViewModel
+    @ObservedObject var model: ConsoleViewModel
     @Environment(\.colorScheme) private var colorScheme: ColorScheme
     @State private var isShowingShareSheet = false
-    private var context: AppContext { .init(store: model.store, pins: model.pins) }
+    private var context: AppContext { model.context }
 
     public var body: some View {
         messagesListView
             .frame(minWidth: 300, idealWidth: 400, maxWidth: 700)
             .toolbar(content: {
-                Button(action: model.removeAll) {
+                Button(action: model.removeAllPins) {
                     Image(systemName: "trash")
                 }
             })
-            .background(ShareView(isPresented: $isShowingShareSheet) { [model.prepareForSharing()] })
     }
 
     @ViewBuilder
@@ -33,7 +32,7 @@ struct PinsView: View {
                 .frame(maxWidth: 200)
         } else {
             ZStack {
-                let factory = ConsoleRowFactory(context: context, showInConsole: model.showInConsole)
+                let factory = ConsoleRowFactory(context: context, showInConsole: nil)
                 NotList(model: model.list, makeRowView: factory.makeRowView, onSelectRow: model.selectEntityAt, onDoubleClickRow: {
                     openMessage(model.list.elements[$0])
                 })
@@ -44,10 +43,12 @@ struct PinsView: View {
     }
 
     private func openMessage(_ message: LoggerMessageEntity) {
-        AppRouter.shared.openDetails(view: AnyView(
+        ExternalEvents.open = AnyView(
             model.details.makeDetailsRouter(for: message)
                 .frame(minWidth: 500, idealWidth: 700, maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/, minHeight: 500, idealHeight: 800, maxHeight: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/)
-        ))
+        )
+        guard let url = URL(string: "com-github-kean-pulse://open-details") else { return }
+        NSWorkspace.shared.open(url)
     }
 
     private var placeholder: PlaceholderView {

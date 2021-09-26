@@ -46,7 +46,7 @@ private struct SidebarView: View {
     @ObservedObject private var model: MainViewModel
     @ObservedObject private var consoleModel: ConsoleViewModel
     @ObservedObject private var networkModel: ConsoleViewModel
-    @ObservedObject private var pinsModel: PinsViewModel
+    @ObservedObject private var pinsModel: ConsoleViewModel
 
     @State private var isConsoleTabSelected = true
     @State private var isNetwokTabSelected = false
@@ -60,8 +60,6 @@ private struct SidebarView: View {
 
         // Preload share services
         _ = ShareMenuContentViewModel.url
-        
-        registerViewModel()
     }
 
     var body: some View {
@@ -83,14 +81,6 @@ private struct SidebarView: View {
                 SidebarFiltersSectionView(model: networkModel, type: .network)
             }
         }.listStyle(SidebarListStyle())
-    }
-
-    private func registerViewModel() {
-        pinsModel.showInConsole = { message in
-            isPinsTabSelected = false
-            isConsoleTabSelected = true
-            consoleModel.scrollTo(message)
-        }
     }
 }
 

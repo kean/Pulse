@@ -5,6 +5,8 @@
 import Foundation
 import PulseCore
 import CoreData
+import SwiftUI
+import PulseCore
 
 enum JSONElement {
     case punctuation
@@ -181,7 +183,14 @@ final class AttributedStringJSONRenderer: JSONRenderer {
     }
 
     func make() -> NSAttributedString {
-        output.addAttributes([.font: UXFont.monospacedSystemFont(ofSize: FontSize.body, weight: .regular)])
+        let ps = NSMutableParagraphStyle()
+        ps.minimumLineHeight = 17
+        ps.maximumLineHeight = 17
+        
+        output.addAttributes([
+            .font: UXFont.monospacedSystemFont(ofSize: FontSize.body, weight: .regular),
+            .paragraphStyle: ps
+        ])
         return output
     }
 }
