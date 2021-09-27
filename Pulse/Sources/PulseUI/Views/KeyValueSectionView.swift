@@ -78,6 +78,46 @@ private struct KeyValueListView: View {
         return items
     }
 
+#if os(macOS)
+    var body: some View {
+        if model.items.isEmpty {
+            HStack {
+            Text("Empty")
+                .foregroundColor(actualTintColor)
+                .font(.system(size: fontSize, weight: .medium))
+            }
+        } else {
+            Label(text: text)
+                .padding(.bottom, 5)
+        }
+    }
+    
+    private var text: NSAttributedString {
+        let text = NSMutableAttributedString()
+        for (index, row) in items.enumerated() {
+            text.append(makeRow(row))
+            if index != items.indices.last {
+                text.append("\n")
+            }
+        }
+        return text
+    }
+
+    private func makeRow(_ row: (String, String?)) -> NSAttributedString {
+        let text = NSMutableAttributedString()
+        text.append(row.0 + ": ", [
+            .font: NSFont.systemFont(ofSize: fontSize, weight: .medium),
+            .foregroundColor: NSColor(actualTintColor),
+            .paragraphStyle: ps
+        ])
+        text.append(row.1 ?? "–", [
+            .font: NSFont.systemFont(ofSize: fontSize),
+            .foregroundColor: NSColor(Color.primary),
+            .paragraphStyle: ps
+        ])
+        return text
+    }
+    #else
     var body: some View {
         if model.items.isEmpty {
             HStack {
@@ -87,13 +127,12 @@ private struct KeyValueListView: View {
             }
         } else {
             VStack(spacing: 2) {
-
                 let rows = items.enumerated().map(Row.init)
                 ForEach(rows, id: \.index, content: makeRow)
             }
         }
     }
-
+    
     private func makeRow(_ row: Row) -> some View {
         HStack {
             let title = Text(row.item.0 + ": ")
@@ -134,7 +173,33 @@ private struct KeyValueListView: View {
             Spacer()
         }
     }
+    #endif
 }
+
+#if os(macOS)
+private struct Label: NSViewRepresentable {
+    let text: NSAttributedString
+    
+    func makeNSView(context: Context) -> NSTextField {
+        let label = NSTextField.label()
+        label.isSelectable = true
+        label.attributedStringValue = text
+        label.allowsEditingTextAttributes = true
+        return label
+    }
+    
+    func updateNSView(_ nsView: NSTextField, context: Context) {
+        
+    }
+}
+
+private let ps: NSParagraphStyle = {
+    let ps = NSMutableParagraphStyle()
+    ps.minimumLineHeight = 20
+    ps.maximumLineHeight = 20
+    return ps
+}()
+#endif
 
 private var fontSize: CGFloat {
     #if os(iOS)

@@ -163,6 +163,7 @@ struct NetworkInspectorMetricsView_Previews: PreviewProvider {
                 .background(Color(UXColor.systemBackground))
                 .previewDisplayName("Dark")
                 .environment(\.colorScheme, .dark)
+                .previewLayout(.fixed(width: 500, height: 600))
         }
     }
 }

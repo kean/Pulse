@@ -171,12 +171,7 @@ struct StringSearchOptionsMenu: View {
     var isKindNeeded = true
 
     var body: some View {
-        #if os(macOS)
         menu
-        #else
-        menu
-        #endif
-        
     }
     
     var menu: some View {
