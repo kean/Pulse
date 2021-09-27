@@ -13,6 +13,17 @@ import SwiftUI
 // A set of typealias and APIs to make AppKit and UIKit more
 // compatible with each other
 
+struct Pallete {
+    static let red = UXColor.dynamic(
+        light: .init(red: 196.0/255.0, green: 26.0/255.0, blue: 22.0/255.0, alpha: 1.0),
+        dark: .init(red: 252.0/255.0, green: 106.0/255.0, blue: 93.0/255.0, alpha: 1.0)
+    )
+    static let pink = UXColor.dynamic(
+        light: .init(red: 155.0/255.0, green: 35.0/255.0, blue: 147.00/255.0, alpha: 1.0),
+        dark: .init(red: 252.0/255.0, green: 95.0/255.0, blue: 163.0/255.0, alpha: 1.0)
+    )
+}
+
 #if os(macOS)
 typealias UXColor = NSColor
 typealias UXFont = NSFont
@@ -30,10 +41,41 @@ extension NSColor {
     static var systemGray3: NSColor { systemGray.withAlphaComponent(0.8) }
     static var systemGray2: NSColor { systemGray.withAlphaComponent(0.9) }
 }
+
+extension NSColor {
+    static func dynamic(light: NSColor, dark: NSColor) -> NSColor {
+        NSColor(name: nil) {
+            switch $0.name {
+            case .darkAqua, .vibrantDark, .accessibilityHighContrastDarkAqua, .accessibilityHighContrastVibrantDark:
+                return dark
+            default:
+                return light
+            }
+        }
+    }
+}
+
 #else
 typealias UXColor = UIColor
 typealias UXFont = UIFont
 typealias UXImage = UIImage
+
+#if !os(watchOS)
+extension UIColor {
+    
+    static func dynamic(light: UIColor, dark: UIColor) -> UIColor {
+        UIColor {
+            switch $0.userInterfaceStyle {
+            case .dark:
+                return dark
+            default:
+                return light
+            }
+        }
+    }
+}
+#endif
+
 #endif
 
 #if os(tvOS)

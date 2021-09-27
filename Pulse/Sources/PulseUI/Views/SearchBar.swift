@@ -4,6 +4,7 @@
 
 import Foundation
 import SwiftUI
+import Combine
 
 #if os(iOS)
 
@@ -49,9 +50,20 @@ struct SearchBar: NSViewRepresentable {
     var onEditingChanged: ((_ isEditing: Bool) -> Void)?
     var onCancel: (() -> Void)?
     var onReturn: (() -> Void)?
-
+    private let onFind: PassthroughSubject<Void, Never>
+    
+    init(title: String, text: Binding<String>, onFind: PassthroughSubject<Void, Never> = .init(), onEditingChanged: ((Bool) -> Void)? = nil, onCancel: (() -> Void)? = nil, onReturn: (() -> Void)? = nil) {
+        self.title = title
+        self._text = text
+        self.onFind = onFind
+        self.onEditingChanged = onEditingChanged
+        self.onCancel = onCancel
+        self.onReturn = onReturn
+    }
+    
     final class Coordinator: NSObject, NSSearchFieldDelegate {
         let parent: SearchBar
+        var cancellables: [AnyCancellable] = [] // TODO: refactor
 
         init(parent: SearchBar) {
             self.parent = parent
@@ -98,6 +110,11 @@ struct SearchBar: NSViewRepresentable {
         constraint.priority = .init(rawValue: 249)
         constraint.isActive = true
         currentSearchField = searchField
+        onFind.sink {
+            // TODO: refactor
+            guard searchField.window?.isKeyWindow ?? false else { return }
+            _ = searchField.becomeFirstResponder()
+        }.store(in: &context.coordinator.cancellables)
         return searchField
     }
 
@@ -133,3 +150,10 @@ extension View {
 }
 
 #endif
+
+struct SearchBar_Previews: PreviewProvider {
+    static var previews: some View {
+        SearchBar(title: "Search", text: .constant(""), onEditingChanged: nil, onCancel: nil, onReturn: nil)
+            .previewLayout(.fixed(width: 95, height: 44))
+    }
+}

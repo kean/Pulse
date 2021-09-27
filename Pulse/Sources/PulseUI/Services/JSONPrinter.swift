@@ -148,18 +148,30 @@ final class JSONPrinter {
 
 @available(iOS 13, tvOS 14.0, *)
 struct JSONColors {
-    static let punctuation = UXColor.label.withAlphaComponent(0.7)
+    static let punctuation = UXColor.dynamic(
+        light: .init(red: 113.0/255.0, green: 128.0/255.0, blue: 141.0/255.0, alpha: 1.0),
+        dark: .init(red: 108.0/255.0, green: 121.0/255.0, blue: 134.0/255.0, alpha: 1.0)
+    )
     static let key = UXColor.label
-    static let valueString = UXColor.systemRed
-    static let valueOther = UXColor.systemBlue
-    static let null = UXColor.systemPurple
+    static let valueString = Pallete.red
+    static let valueOther = UXColor.dynamic(
+        light: .init(red: 28.0/255.0, green: 0.0/255.0, blue: 207.0/255.0, alpha: 1.0),
+        dark: .init(red: 208.0/255.0, green: 191.0/255.0, blue: 105.0/255.0, alpha: 1.0)
+    )
+    static let null = Pallete.pink
 }
-
 
 @available(iOS 13, tvOS 14.0, *)
 final class AttributedStringJSONRenderer: JSONRenderer {
     private let output = NSMutableAttributedString()
-
+    private let fontSize: CGFloat
+    private let lineHeight: CGFloat
+    
+    init(fontSize: CGFloat = 11, lineHeight: CGFloat = 17) {
+        self.fontSize = fontSize
+        self.lineHeight = lineHeight
+    }
+    
     func append(_ string: String, element: JSONElement) {
         output.append(string, attributes(for: element))
     }
@@ -184,11 +196,11 @@ final class AttributedStringJSONRenderer: JSONRenderer {
 
     func make() -> NSAttributedString {
         let ps = NSMutableParagraphStyle()
-        ps.minimumLineHeight = 17
-        ps.maximumLineHeight = 17
+        ps.minimumLineHeight = lineHeight
+        ps.maximumLineHeight = lineHeight
         
         output.addAttributes([
-            .font: UXFont.monospacedSystemFont(ofSize: FontSize.body, weight: .regular),
+            .font: UXFont.monospacedSystemFont(ofSize: CGFloat(fontSize), weight: .regular),
             .paragraphStyle: ps
         ])
         return output
