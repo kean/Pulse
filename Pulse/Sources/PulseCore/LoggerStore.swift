@@ -341,6 +341,7 @@ extension LoggerStore {
         entity.errorCode = Int32(summary.error?.code ?? 0)
         entity.statusCode = Int32(summary.response?.statusCode ?? 0)
         entity.duration = summary.metrics?.taskInterval.duration ?? 0
+        entity.contentType = summary.response?.headers["Content-Type"]
         entity.isCompleted = true
         // Details
         entity.details = makeRequestDetails(summary)

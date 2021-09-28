@@ -21,6 +21,7 @@ struct ConsoleSearchCriteria: Hashable {
     var endDate: Date?
     var hiddenLabels: Set<String> = []
     var focusedLabel: String?
+    
 
     var onlyPins = false
     var onlyNetwork = false

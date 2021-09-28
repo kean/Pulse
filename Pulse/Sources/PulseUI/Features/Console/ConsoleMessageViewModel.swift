@@ -92,7 +92,7 @@ extension Color {
     }
 }
 
-@available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
+#if os(macOS)
 enum ConsoleMessageStyle {
     static func textColor(level: LoggerStore.Level) -> Color {
         switch level {
@@ -106,3 +106,19 @@ enum ConsoleMessageStyle {
         }
     }
 }
+#else
+@available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
+enum ConsoleMessageStyle {
+    static func textColor(level: LoggerStore.Level) -> Color {
+        switch level {
+        case .trace: return .primary
+        case .debug: return .primary
+        case .info: return .primary
+        case .notice: return .orange
+        case .warning: return .orange
+        case .error: return .red
+        case .critical: return .red
+        }
+    }
+}
+#endif

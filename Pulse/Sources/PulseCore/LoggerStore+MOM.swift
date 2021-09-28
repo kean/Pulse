@@ -58,12 +58,13 @@ public extension LoggerStore {
             let errorCode = NSAttributeDescription(name: "errorCode", type: .integer32AttributeType)
             let statusCode = NSAttributeDescription(name: "statusCode", type: .integer32AttributeType)
             let duration = NSAttributeDescription(name: "duration", type: .doubleAttributeType)
+            let contentType = NSAttributeDescription(name: "contentType", type: .stringAttributeType)
             let isCompleted = NSAttributeDescription(name: "isCompleted", type: .booleanAttributeType)
             let requestBodyKey = NSAttributeDescription(name: "requestBodyKey", type: .stringAttributeType)
             let responseBodyKey = NSAttributeDescription(name: "responseBodyKey", type: .stringAttributeType)
             let details = NSRelationshipDescription.make(name: "details", type: .oneToOne(), entity: requestDetails)
             let message = NSRelationshipDescription.make(name: "message", type: .oneToOne(), entity: message)
-            request.properties = [createdAt, session, url, host, httpMethod, errorDomain, errorCode, statusCode, duration, requestBodyKey, responseBodyKey, details, message, isCompleted]
+            request.properties = [createdAt, session, url, host, httpMethod, errorDomain, errorCode, statusCode, duration, contentType, requestBodyKey, responseBodyKey, details, message, isCompleted]
         }
 
         model.entities = [message, metadata, request, requestDetails]
@@ -149,6 +150,7 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
     @NSManaged public var errorCode: Int32
     @NSManaged public var statusCode: Int32
     @NSManaged public var duration: Double
+    @NSManaged public var contentType: String?
     @NSManaged public var isCompleted: Bool
 
     // Details

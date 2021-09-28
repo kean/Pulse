@@ -14,14 +14,28 @@ import SwiftUI
 // compatible with each other
 
 struct Pallete {
-    static let red = UXColor.dynamic(
-        light: .init(red: 196.0/255.0, green: 26.0/255.0, blue: 22.0/255.0, alpha: 1.0),
-        dark: .init(red: 252.0/255.0, green: 106.0/255.0, blue: 93.0/255.0, alpha: 1.0)
-    )
-    static let pink = UXColor.dynamic(
-        light: .init(red: 155.0/255.0, green: 35.0/255.0, blue: 147.00/255.0, alpha: 1.0),
-        dark: .init(red: 252.0/255.0, green: 95.0/255.0, blue: 163.0/255.0, alpha: 1.0)
-    )
+    #if !os(watchOS)
+    @available(iOS 13.0, tvOS 13.0, *)
+    static var red: UXColor {
+        UXColor.dynamic(light: Pallete.lightRed, dark: Pallete.darkRed)
+    }
+    
+    private static let lightRed = UXColor(red: 196.0/255.0, green: 26.0/255.0, blue: 22.0/255.0, alpha: 1.0)
+    private static let darkRed = UXColor(red: 252.0/255.0, green: 106.0/255.0, blue: 93.0/255.0, alpha: 1.0)
+    
+    @available(iOS 13.0, tvOS 13.0, *)
+    static var pink: UXColor {
+        UXColor.dynamic(light: Pallete.lightPink, dark: Pallete.darkPink)
+    }
+    
+    private static let lightPink = UXColor(red: 155.0/255.0, green: 35.0/255.0, blue: 147.00/255.0, alpha: 1.0)
+    private static let darkPink = UXColor(red: 252.0/255.0, green: 95.0/255.0, blue: 163.0/255.0, alpha: 1.0)
+    #else
+    @available(watchOS 7.0, *)
+    static var red: UXColor { UXColor(Color.red) }
+    @available(watchOS 7.0, *)
+    static var pink: UXColor { UXColor(Color.pink) }
+    #endif
 }
 
 #if os(macOS)
@@ -62,7 +76,7 @@ typealias UXImage = UIImage
 
 #if !os(watchOS)
 extension UIColor {
-    
+    @available(iOS 13.0, tvOS 13.0, *)
     static func dynamic(light: UIColor, dark: UIColor) -> UIColor {
         UIColor {
             switch $0.userInterfaceStyle {
@@ -178,7 +192,7 @@ extension Image {
 }
 #endif
 
-// MARK: - NSPasteboard
+// MARK: - Misc
 
 #if os(macOS)
 extension NSPasteboard {
@@ -207,6 +221,25 @@ extension NSTextField {
         label.isSelectable = false
         label.lineBreakMode = .byTruncatingTail
         return label
+    }
+}
+
+extension NSParagraphStyle {
+    static func make(lineHeight: CGFloat) -> NSParagraphStyle {
+        let ps = NSMutableParagraphStyle()
+        ps.maximumLineHeight = lineHeight
+        ps.minimumLineHeight = lineHeight
+        return ps
+    }
+}
+
+extension NSAttributedString {
+    static func makeAttachement(with image: NSImage?, attributes: [NSAttributedString.Key: Any]) -> NSAttributedString {
+        let attachement = NSTextAttachment()
+        attachement.image = image
+        let string = NSMutableAttributedString(attachment: attachement)
+        string.addAttributes(attributes)
+        return NSAttributedString(attributedString: string)
     }
 }
 #endif

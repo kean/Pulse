@@ -52,7 +52,7 @@ private func getClass(for element: JSONElement) -> String {
     }
 }
 
-@available(iOS 13, tvOS 14.0, *)
+@available(iOS 13.0, tvOS 14.0, *)
 final class JSONPrinter {
     private let renderer: JSONRenderer
     private var indentation = 0
