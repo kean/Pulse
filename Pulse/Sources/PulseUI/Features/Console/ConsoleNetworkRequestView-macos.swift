@@ -102,7 +102,7 @@ final class ConsoleNetworkRequestContextMenuView: NSView {
         menu.addItem(copyHost)
 
         if model.containsResponseData {
-            let copyResponse = NSMenuItem(title: "Copy Response", action: #selector(buttonCopyResponseBodyTapped), keyEquivalent: "c")
+            let copyResponse = NSMenuItem(title: "Copy Response", action: #selector(buttonCopyResponseBodyTapped), keyEquivalent: "")
             copyResponse.target = self
             copyResponse.image = NSImage(systemSymbolName: "doc.on.doc", accessibilityDescription: nil)
             menu.addItem(copyResponse)

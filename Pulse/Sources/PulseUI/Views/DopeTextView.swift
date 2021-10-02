@@ -225,7 +225,7 @@ final class DopeTextViewModel: ObservableObject {
     }
 
     convenience init(json: Any) {
-        let renderer = AttributedStringJSONRenderer()
+        let renderer = AttributedStringJSONRenderer(fontSize: FontSize.body, lineHeight: FontSize.body + 5)
         let printer = JSONPrinter(renderer: renderer)
         printer.render(json: json)
         self.init(string: renderer.make())

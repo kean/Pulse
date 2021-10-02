@@ -167,7 +167,7 @@ final class AttributedStringJSONRenderer: JSONRenderer {
     private let fontSize: CGFloat
     private let lineHeight: CGFloat
     
-    init(fontSize: CGFloat = 11, lineHeight: CGFloat = 17) {
+    init(fontSize: CGFloat, lineHeight: CGFloat) {
         self.fontSize = fontSize
         self.lineHeight = lineHeight
     }

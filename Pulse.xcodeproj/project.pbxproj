@@ -17,6 +17,10 @@
 		0C0B321726D17D2A0045C9E1 /* PulseUI in Frameworks */ = {isa = PBXBuildFile; productRef = 0C0B321626D17D2A0045C9E1 /* PulseUI */; };
 		0C0E6318260186C700A0DF40 /* Pulse Demo watchOS.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 0CEAB3DA25FE862D00F09B0F /* Pulse Demo watchOS.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		0C2464A625D9D6C40057A577 /* AppCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C2464A525D9D6C40057A577 /* AppCommands.swift */; };
+		0C4719242707EFD5008DB813 /* contributors.json in Resources */ = {isa = PBXBuildFile; fileRef = 0C4719232707EFD5008DB813 /* contributors.json */; };
+		0C4719252707EFD5008DB813 /* contributors.json in Resources */ = {isa = PBXBuildFile; fileRef = 0C4719232707EFD5008DB813 /* contributors.json */; };
+		0C4719262707EFD5008DB813 /* contributors.json in Resources */ = {isa = PBXBuildFile; fileRef = 0C4719232707EFD5008DB813 /* contributors.json */; };
+		0C4719272707EFD5008DB813 /* contributors.json in Resources */ = {isa = PBXBuildFile; fileRef = 0C4719232707EFD5008DB813 /* contributors.json */; };
 		0C516FDA26015E32004813B4 /* PulseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 0C516FD926015E32004813B4 /* PulseCore */; };
 		0C516FDC26015E32004813B4 /* PulseUI in Frameworks */ = {isa = PBXBuildFile; productRef = 0C516FDB26015E32004813B4 /* PulseUI */; };
 		0C516FE126015E8E004813B4 /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD2A4AB25D4A2E70087E9E3 /* MockStore.swift */; };
@@ -138,6 +142,7 @@
 		0C1221E525CE09C100B81D7A /* URLSessionAutomatedIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionAutomatedIntegration.swift; sourceTree = "<group>"; };
 		0C2464A525D9D6C40057A577 /* AppCommands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCommands.swift; sourceTree = "<group>"; };
 		0C25FB6E25CDDCAB00A895C2 /* URLSessionManualIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionManualIntegration.swift; sourceTree = "<group>"; };
+		0C4719232707EFD5008DB813 /* contributors.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = contributors.json; sourceTree = "<group>"; };
 		0C516FBA26015DD2004813B4 /* Pulse Demo iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pulse Demo iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C516FEF26016392004813B4 /* DocumentBrowser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentBrowser.swift; sourceTree = "<group>"; };
 		0C57AD4D245F0EFB005B3400 /* Pulse iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pulse iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -448,6 +453,7 @@
 			isa = PBXGroup;
 			children = (
 				0CFF9BD825D6199A0069DB6A /* repos.json */,
+				0C4719232707EFD5008DB813 /* contributors.json */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -669,6 +675,7 @@
 				0C0B31F926D179A70045C9E1 /* LaunchScreen.storyboard in Resources */,
 				0C0B31F626D179A70045C9E1 /* Assets.xcassets in Resources */,
 				0C0B31F426D179A20045C9E1 /* Main.storyboard in Resources */,
+				0C4719272707EFD5008DB813 /* contributors.json in Resources */,
 				0C7A834026D1CA290082634F /* repos.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -680,6 +687,7 @@
 				0C767817268F88BB0058F69B /* Assets.xcassets in Resources */,
 				0C767818268F88BB0058F69B /* Preview Assets.xcassets in Resources */,
 				0C516FE726015ED3004813B4 /* repos.json in Resources */,
+				0C4719242707EFD5008DB813 /* contributors.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -707,6 +715,7 @@
 				0C6460DE25F579B8002C55B1 /* Preview Assets.xcassets in Resources */,
 				0CCBDDC02610BDBC00DCB60C /* repos.json in Resources */,
 				0C6460DD25F579B8002C55B1 /* Assets.xcassets in Resources */,
+				0C4719262707EFD5008DB813 /* contributors.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -725,6 +734,7 @@
 				0CEAB41825FE867E00F09B0F /* Preview Assets.xcassets in Resources */,
 				0CEAB42825FE86ED00F09B0F /* repos.json in Resources */,
 				0CEAB41625FE867E00F09B0F /* Assets.xcassets in Resources */,
+				0C4719252707EFD5008DB813 /* contributors.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
