@@ -7,8 +7,6 @@ import Network
 import Combine
 import SwiftUI
 
-#warning("TODO: make sure it also works in a simulator")
-
 #if os(iOS) || os(tvOS) || os(watchOS)
 /// Connects to the remote server and sends logs remotely. In the current version,
 /// a server is a Pulse Pro app for macOS).
@@ -414,7 +412,7 @@ private func getFallbackDeviceId() -> UUID {
     return id
 }
 
-@available(iOS 14.0, tvOS 14.0, watchOS 7.0, *)
+@available(iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 private extension NWBrowser.Result {
     var name: String? {
         switch endpoint {
