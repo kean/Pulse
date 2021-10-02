@@ -44,16 +44,16 @@ struct RemoteLoggerSettingsView: View {
                     Image(systemName: "checkmark")
                         .foregroundColor(.blue)
                         .font(.system(size: 16, weight: .medium))
-                        .frame(width: 22, height: 36, alignment: .center)
+                        .frame(width: 21, height: 36, alignment: .center)
                 } else {
                     ProgressView()
                         .progressViewStyle(CircularProgressViewStyle())
-                        .frame(width: 30, height: 36, alignment: .leading)
+                        .frame(width: 21, height: 36, alignment: .leading)
                 }
             } else {
                 Rectangle()
                     .hidden()
-                    .frame(width: 22, height: 36, alignment: .center)
+                    .frame(width: 21, height: 36, alignment: .center)
             }
             Text(server.name)
                 .lineLimit(1)
@@ -82,8 +82,10 @@ final class RemoteLoggerSettingsViewModel: ObservableObject {
                 self?.didUpdateIsEnabled($0)
             }.store(in: &cancellables)
         
-        logger.$servers.receive(on: DispatchQueue.main).sink { [weak self] in
-            self?.refresh(servers: $0)
+        logger.$servers.receive(on: DispatchQueue.main).sink { [weak self] servers in
+            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1)) {
+                self?.refresh(servers: servers)
+            }
         }.store(in: &cancellables)
         
         logger.$connectionState.receive(on: DispatchQueue.main).sink { [weak self] in

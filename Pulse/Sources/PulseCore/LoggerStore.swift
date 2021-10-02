@@ -33,7 +33,7 @@ public final class LoggerStore {
     public static var blobsSizeLimit: Int = 1024 * 1024 * 200
 
     /// The default store.
-    public static let `default` = LoggerStore.make(name: "current")
+    public static let `default` = LoggerStore.makeDefault()
 
     /// Returns a URL for the directory where all Pulse stores are located.
     /// The current store is located in the "./current" directory, the rest the stores
@@ -52,9 +52,12 @@ public final class LoggerStore {
         case empty
     }
 
-    private static func make(name: String) -> LoggerStore {
-        let storeURL = URL.logs.appendingPathComponent("\(name).pulse", isDirectory: true)
+    private static func makeDefault() -> LoggerStore {
+        let storeURL = URL.logs.appendingPathComponent("current.pulse", isDirectory: true)
         let store = try? LoggerStore(storeURL: storeURL, options: [.create, .sweep])
+        if let store = store, #available(iOS 14.0, tvOS 14.0, watchOS 7.0, *) {
+            RemoteLogger.shared.initialize(store: store)
+        }
         return store ?? LoggerStore(storeURL: storeURL, isEmpty: true)
     }
 
