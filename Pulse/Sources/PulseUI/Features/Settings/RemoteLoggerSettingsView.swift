@@ -16,21 +16,33 @@ struct RemoteLoggerSettingsView: View {
     
     var body: some View {
         Toggle(isOn: $model.isEnabled, label: {
+            #if !os(watchOS)
             Image(systemName: "network")
+            #endif
             Text("Remote Logging")
         })
         if model.isEnabled {
             if !model.servers.isEmpty {
                 List(model.servers, rowContent: makeServerView)
             } else {
-                HStack(spacing: 8) {
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle())
-                    Text("Connecting...")
-                        .foregroundColor(.secondary)
-                }
+                progressView
             }
         }
+    }
+    
+    private var progressView: some View {
+        #if os(watchOS)
+        ProgressView()
+            .progressViewStyle(CircularProgressViewStyle())
+            .frame(idealWidth: .infinity, alignment: .center)
+        #else
+        HStack(spacing: 8) {
+            ProgressView()
+                .progressViewStyle(CircularProgressViewStyle())
+            Text("Searching...")
+                .foregroundColor(.secondary)
+        }
+        #endif
     }
     
     @ViewBuilder
@@ -38,26 +50,30 @@ struct RemoteLoggerSettingsView: View {
         #if os(tvOS)
         Text("Not implemented")
         #else
-        HStack {
-            if server.isSelected {
-                if model.isConnected {
-                    Image(systemName: "checkmark")
-                        .foregroundColor(.blue)
-                        .font(.system(size: 16, weight: .medium))
-                        .frame(width: 21, height: 36, alignment: .center)
+        Button(action: server.connect) {
+            HStack {
+                if server.isSelected {
+                    if model.isConnected {
+                        Image(systemName: "checkmark")
+                            .foregroundColor(.blue)
+                            .font(.system(size: 16, weight: .medium))
+                            .frame(width: 21, height: 36, alignment: .center)
+                    } else {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle())
+                            .frame(width: 21, height: 36, alignment: .leading)
+                    }
                 } else {
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle())
-                        .frame(width: 21, height: 36, alignment: .leading)
+                    Rectangle()
+                        .hidden()
+                        .frame(width: 21, height: 36, alignment: .center)
                 }
-            } else {
-                Rectangle()
-                    .hidden()
-                    .frame(width: 21, height: 36, alignment: .center)
+                Text(server.name)
+                    .lineLimit(1)
+                Spacer()
             }
-            Text(server.name)
-                .lineLimit(1)
-        }.onTapGesture(perform: server.connect)
+        }.buttonStyle(PlainButtonStyle())
+            .frame(maxWidth: .infinity)
         #endif
     }
 }

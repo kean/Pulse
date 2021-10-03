@@ -161,10 +161,14 @@ struct ButtonRemove: View {
             Button(action: {
                 self.isShowingRemoveConfirmationAlert = true
             }) {
+                #if os(watchOS)
+                Label(title, systemImage: "trash")
+                #else
                 HStack {
                     Image(systemName: "trash")
                     Text(title)
                 }
+                #endif
             }
             .alert(isPresented: $isShowingRemoveConfirmationAlert) {
                 Alert(
