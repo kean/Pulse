@@ -84,9 +84,9 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         
         #if os(iOS) || os(tvOS) || os(watchOS)
         if #available(iOS 14.0, tvOS 14.0, *) {
-//            if store === RemoteLogger.shared.store {
+            if store === RemoteLogger.shared.store {
                 _remoteLoggerViewModel = RemoteLoggerSettingsViewModel()
-//            }
+            }
         }
         #endif
 

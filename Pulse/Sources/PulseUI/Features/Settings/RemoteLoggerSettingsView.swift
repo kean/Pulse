@@ -72,7 +72,7 @@ struct RemoteLoggerSettingsView: View {
                     .lineLimit(1)
                 Spacer()
             }
-        }.buttonStyle(PlainButtonStyle())
+        }.foregroundColor(Color.primary)
             .frame(maxWidth: .infinity)
         #endif
     }
