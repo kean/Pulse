@@ -53,11 +53,13 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
     private var isInitialized = false
     
     public static let shared = RemoteLogger()
-        
+    
     /// - parameter store: The store to be synced with the server. By default,
     /// `LoggerStore.default`. Only one store can be synced at at time.
     public func initialize(store: LoggerStore = .default) {
-        guard !isInitialized else { return }
+        if isInitialized {
+            cancel()
+        }
         isInitialized = true
 
         self.store = store
