@@ -47,9 +47,6 @@ struct RemoteLoggerSettingsView: View {
     
     @ViewBuilder
     private func makeServerView(for server: RemoteLoggerServerViewModel) -> some View {
-        #if os(tvOS)
-        Text("Not implemented")
-        #else
         Button(action: server.connect) {
             HStack {
                 if server.isSelected {
@@ -74,7 +71,6 @@ struct RemoteLoggerSettingsView: View {
             }
         }.foregroundColor(Color.primary)
             .frame(maxWidth: .infinity)
-        #endif
     }
 }
 

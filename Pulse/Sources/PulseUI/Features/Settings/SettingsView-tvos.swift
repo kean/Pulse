@@ -25,6 +25,13 @@ struct SettingsView: View {
                             .opacity(console.messages.isEmpty ? 0.33 : 1)
                     }
                 }
+                Section {
+                    if let model = console.remoteLoggerViewModel {
+                        Section {
+                            RemoteLoggerSettingsView(model: model)
+                        }
+                    }
+                }
                 Section(footer: Text("Pulse is funded by the community contributions.")) {
                     Button(action: {
                         isSponsorAlertShown = true
