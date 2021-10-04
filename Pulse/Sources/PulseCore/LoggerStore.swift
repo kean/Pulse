@@ -306,7 +306,7 @@ extension LoggerStore {
         let messageEntity = self.makeMessageEntity(with: messageObject)
         let requestEntity = self.makeRequest(summary, createdAt: summary.createdAt)
         messageEntity.request = requestEntity
-        messageEntity.requestState = requestEntity.state
+        messageEntity.requestState = requestEntity.requestState
         requestEntity.message = messageEntity
     }
         
@@ -352,7 +352,7 @@ extension LoggerStore {
         entity.contentType = summary.response?.headers["Content-Type"]
         entity.isCompleted = true
         let isFailure = errorCode != 0 || (statusCode != 0 && !(200..<400).contains(statusCode))
-        entity.state = (isFailure ? LoggerNetworkRequestEntity.State.failure : .success).rawValue
+        entity.requestState = (isFailure ? LoggerNetworkRequestEntity.State.failure : .success).rawValue
         // Details
         entity.details = makeRequestDetails(summary)
         if case let .directory(store) = document {

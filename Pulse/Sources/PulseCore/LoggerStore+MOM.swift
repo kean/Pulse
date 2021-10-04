@@ -61,12 +61,12 @@ public extension LoggerStore {
             let duration = NSAttributeDescription(name: "duration", type: .doubleAttributeType)
             let contentType = NSAttributeDescription(name: "contentType", type: .stringAttributeType)
             let isCompleted = NSAttributeDescription(name: "isCompleted", type: .booleanAttributeType)
-            let state = NSAttributeDescription(name: "state", type: .integer16AttributeType)
+            let requestState = NSAttributeDescription(name: "requestState", type: .integer16AttributeType)
             let requestBodyKey = NSAttributeDescription(name: "requestBodyKey", type: .stringAttributeType)
             let responseBodyKey = NSAttributeDescription(name: "responseBodyKey", type: .stringAttributeType)
             let details = NSRelationshipDescription.make(name: "details", type: .oneToOne(), entity: requestDetails)
             let message = NSRelationshipDescription.make(name: "message", type: .oneToOne(), entity: message)
-            request.properties = [createdAt, session, url, host, httpMethod, errorDomain, errorCode, statusCode, duration, contentType, requestBodyKey, responseBodyKey, details, message, isCompleted, state]
+            request.properties = [createdAt, session, url, host, httpMethod, errorDomain, errorCode, statusCode, duration, contentType, requestBodyKey, responseBodyKey, details, message, isCompleted, requestState]
         }
 
         model.entities = [message, metadata, request, requestDetails]
@@ -155,13 +155,13 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
     @NSManaged public var duration: Double
     @NSManaged public var contentType: String?
     @NSManaged public var isCompleted: Bool
-    @NSManaged public var state: Int16
+    @NSManaged public var requestState: Int16
     
     public enum State: Int16 {
         // 0 reserved for undefined
         case pending = 1 // not used yet
-        case success
-        case failure
+        case success = 2
+        case failure = 3
     }
 
     // Details
