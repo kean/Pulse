@@ -13,10 +13,12 @@ import Combine
 struct DopeTextView: View {
     @ObservedObject private var model: DopeTextViewModel
     var isAutomaticLinkDetectionEnabled = true
+    var hasVerticalScroller = false
 
-    init(model: DopeTextViewModel, isAutomaticLinkDetectionEnabled: Bool = true) {
+    init(model: DopeTextViewModel, isAutomaticLinkDetectionEnabled: Bool = true, hasVerticalScroller: Bool = true) {
         self.model = model
         self.isAutomaticLinkDetectionEnabled = isAutomaticLinkDetectionEnabled
+        self.hasVerticalScroller = hasVerticalScroller
     }
 
     init(data: Data) {
@@ -54,7 +56,11 @@ struct DopeTextView: View {
     #else
     var body: some View {
         VStack(spacing: 0) {
+            #if os(macOS)
+            WrappedTextView(text: model.text, model: model, isAutomaticLinkDetectionEnabled: isAutomaticLinkDetectionEnabled, hasVerticalScroller: hasVerticalScroller)
+            #else
             WrappedTextView(text: model.text, model: model, isAutomaticLinkDetectionEnabled: isAutomaticLinkDetectionEnabled)
+            #endif
             #if !os(tvOS)
             Divider()
             SearchToobar(model: model)
@@ -91,9 +97,11 @@ private struct WrappedTextView: NSViewRepresentable {
     let text: NSAttributedString
     let model: DopeTextViewModel
     let isAutomaticLinkDetectionEnabled: Bool
+    var hasVerticalScroller: Bool
 
     func makeNSView(context: Context) -> NSScrollView {
         let scrollView = NSTextView.scrollableTextView()
+        scrollView.hasVerticalScroller = hasVerticalScroller
         let textView = scrollView.documentView as! NSTextView
         configureTextView(textView, isAutomaticLinkDetectionEnabled)
         textView.isAutomaticSpellingCorrectionEnabled = false
@@ -133,7 +141,7 @@ private struct SearchToobar: View {
     var body: some View {
         HStack {
             HStack {
-                Text(model.matches.isEmpty ? "No matches" : "\(model.selectedMatchIndex+1)/\(model.matches.count)")
+                Text(model.matches.isEmpty ? "0/0" : "\(model.selectedMatchIndex+1)/\(model.matches.count)")
                     .font(Font.body.monospacedDigit())
                 Divider()
                 Button(action: model.previousMatch) {
@@ -166,24 +174,25 @@ private struct SearchToobar: View {
             }, onReturn: model.nextMatch).frame(maxWidth: 240)
 
             StringSearchOptionsMenu(options: $model.options, isKindNeeded: false)
+                .menuStyle(BorderlessButtonMenuStyle())
                 .fixedSize()
 
             Spacer()
 
-            HStack(spacing: 4) {
-                Text(model.matches.isEmpty ? "No matches" : "\(model.selectedMatchIndex+1)/\(model.matches.count)")
+            HStack(spacing: 12) {
+                Text(model.matches.isEmpty ? "0/0" : "\(model.selectedMatchIndex+1)/\(model.matches.count)")
                     .font(Font.body.monospacedDigit())
+                    .foregroundColor(.secondary)
                 Button(action: model.previousMatch) {
-                    Image(systemName: "chevron.left.circle")
-                }
+                    Image(systemName: "chevron.left")
+                }.buttonStyle(PlainButtonStyle())
                 Button(action: model.nextMatch) {
-                    Image(systemName: "chevron.right.circle")
-                }
+                    Image(systemName: "chevron.right")
+                }.buttonStyle(PlainButtonStyle())
             }
             .fixedSize()
         }
-        .padding(10)
-        .frame(height: 40)
+        .padding(6)
     }
     #endif
 }
@@ -216,14 +225,18 @@ final class DopeTextViewModel: ObservableObject {
     }
 
     convenience init(json: Any) {
-        let renderer = AttributedStringJSONRenderer()
+        let renderer = AttributedStringJSONRenderer(fontSize: FontSize.body, lineHeight: FontSize.body + 5)
         let printer = JSONPrinter(renderer: renderer)
         printer.render(json: json)
         self.init(string: renderer.make())
     }
 
     convenience init(string: String) {
-        self.init(string: NSAttributedString(string: string, attributes: [.font: UXFont.monospacedSystemFont(ofSize: FontSize.body, weight: .regular), .foregroundColor: UXColor.label]))
+        #if os(macOS)
+        self.init(string: NSAttributedString(string: string, attributes: [.font: NSFont.preferredFont(forTextStyle: .body, options: [:]), .foregroundColor: UXColor.label]))
+        #else
+        self.init(string: NSAttributedString(string: string, attributes: [.font: UXFont.systemFont(ofSize: FontSize.body, weight: .regular), .foregroundColor: UXColor.label]))
+        #endif
     }
 
     init(string: NSAttributedString) {

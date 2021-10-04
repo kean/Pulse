@@ -10,38 +10,37 @@ import Combine
 
 @available(iOS 13.0, tvOS 14.0, watchOS 6, *)
 struct PinButton: View {
-    let model: PinButtonViewModel
+    @ObservedObject var model: PinButtonViewModel
     var isTextNeeded: Bool = true
-
-    @State private var isPinned = false
 
     var body: some View {
         Button(action: model.togglePin) {
             if isTextNeeded {
-                Text(isPinned ? "Remove Pin" : "Pin")
+                Text(model.isPinned ? "Remove Pin" : "Pin")
             }
-            Image(systemName: isPinned ? "pin.slash" : "pin")
-        }.onReceive(model.isPinnedPublisher) {
-            self.isPinned = $0
+            Image(systemName: model.isPinned ? "pin.slash" : "pin")
         }
     }
 }
 
 @available(iOS 13.0, tvOS 14.0, watchOS 6, *)
-struct PinButtonViewModel {
-    private let objectID: NSManagedObjectID
-    private let service: PinService
+final class PinButtonViewModel: ObservableObject {
+    @Published private(set) var isPinned = false
+    private let message: LoggerMessageEntity
+    private let store: LoggerStore
+    private var cancellables: [AnyCancellable] = []
 
-    init(service: PinService, objectID: NSManagedObjectID) {
-        self.service = service
-        self.objectID = objectID
-    }
+    init(store: LoggerStore, message: LoggerMessageEntity) {
+        self.store = store
+        self.message = message
 
-    var isPinnedPublisher: AnyPublisher<Bool, Never> {
-        service.isPinnedMessageWithID(objectID)
+        message.publisher(for: \.isPinned).sink { [weak self] in
+            guard let self = self else { return }
+            self.isPinned = $0
+        }.store(in: &cancellables)
     }
 
     func togglePin() {
-        service.togglePinWithID(objectID)
+        store.togglePin(for: message)
     }
 }

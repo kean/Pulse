@@ -29,7 +29,7 @@ private let mockLoginRequest: URLRequest = {
     request.setValue("gzip", forHTTPHeaderField: "Accept-Encoding")
     request.setValue("github.com", forHTTPHeaderField: "Host")
     request.setValue("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.2 Safari/605.1.15", forHTTPHeaderField: "User-Agent")
-    request.setValue("text/json", forHTTPHeaderField: "Content-Type")
+    request.setValue("application/json", forHTTPHeaderField: "Content-Type")
     request.setValue("no-cache", forHTTPHeaderField: "Cache-Control")
     request.setValue("en-us", forHTTPHeaderField: "Accept-Language")
     request.setValue("text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", forHTTPHeaderField: "Accept")
@@ -39,7 +39,7 @@ private let mockLoginRequest: URLRequest = {
 
 private let mockLoginResponse = HTTPURLResponse(url: URL(string: "https://github.com/login")!, statusCode: 200, httpVersion: "2.0", headerFields: [
     "Content-Length": "2298",
-    "Content-Type": "text/json; charset=utf-8",
+    "Content-Type": "application/json; charset=utf-8",
     "Cache-Control": "no-store",
     "Content-Encoding": "gzip",
     "Set-Cookie": "_device_id=11111111111; path=/; expires=Sun, 30 Jan 2022 21:49:04 GMT; secure; HttpOnly; SameSite=Lax"
@@ -152,7 +152,7 @@ private let mockProfileFailureRequest: URLRequest = {
     request.setValue("gzip", forHTTPHeaderField: "Accept-Encoding")
     request.setValue("github.com", forHTTPHeaderField: "Host")
     request.setValue("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.2 Safari/605.1.15", forHTTPHeaderField: "User-Agent")
-    request.setValue("text/json", forHTTPHeaderField: "Content-Type")
+    request.setValue("application/json", forHTTPHeaderField: "Content-Type")
     request.setValue("no-cache", forHTTPHeaderField: "Cache-Control")
     request.setValue("en-us", forHTTPHeaderField: "Accept-Language")
     request.setValue("text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", forHTTPHeaderField: "Accept")
@@ -162,7 +162,7 @@ private let mockProfileFailureRequest: URLRequest = {
 
 private let mockProfileFailureResponse = HTTPURLResponse(url: URL(string: "https://github.com/profile/valdo")!, statusCode: 404, httpVersion: "2.0", headerFields: [
     "Content-Length": "18",
-    "Content-Type": "text/json; charset=utf-8",
+    "Content-Type": "application/json; charset=utf-8",
     "Cache-Control": "no-store",
     "Content-Encoding": "gzip"
 ])!
@@ -279,7 +279,7 @@ let mockStatsFailureRequest: URLRequest = {
     request.setValue("gzip", forHTTPHeaderField: "Accept-Encoding")
     request.setValue("github.com", forHTTPHeaderField: "Host")
     request.setValue("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.2 Safari/605.1.15", forHTTPHeaderField: "User-Agent")
-    request.setValue("text/json", forHTTPHeaderField: "Content-Type")
+    request.setValue("application/json", forHTTPHeaderField: "Content-Type")
     request.setValue("no-cache", forHTTPHeaderField: "Cache-Control")
     request.setValue("en-us", forHTTPHeaderField: "Accept-Language")
     request.setValue("text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", forHTTPHeaderField: "Accept")

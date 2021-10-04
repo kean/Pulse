@@ -11,16 +11,16 @@ import Combine
 
 @available(iOS 13.0, *)
 public struct PinsView: View {
-    @ObservedObject var model: PinsViewModel
+    @ObservedObject var model: ConsoleViewModel
     @Environment(\.colorScheme) private var colorScheme: ColorScheme
     @State private var shared: ShareItems?
-    private var context: AppContext { .init(store: model.store, pins: model.pins) }
+    private var context: AppContext { model.context }
 
     public init(store: LoggerStore = .default) {
-        self.model = PinsViewModel(store: store)
+        self.model = ConsoleViewModel(store: store, contentType: .pins)
     }
 
-    init(model: PinsViewModel) {
+    init(model: ConsoleViewModel) {
         self.model = model
     }
     
@@ -30,7 +30,7 @@ public struct PinsView: View {
             .navigationBarItems(
                 leading: model.onDismiss.map { Button(action: $0) { Image(systemName: "xmark") } },
                 trailing:
-                    Button(action: model.removeAll) { Image(systemName: "trash") }
+                    Button(action: model.removeAllPins) { Image(systemName: "trash") }
                     .disabled(model.messages.isEmpty)
             )
     }
@@ -50,12 +50,6 @@ public struct PinsView: View {
 
     private var placeholder: PlaceholderView {
         PlaceholderView(imageName: "pin.circle", title: "No Pins", subtitle: "Pin messages using the context menu or from the details page")
-    }
-
-    private var shareButton: some View {
-        ShareButton {
-            shared = model.prepareForSharing()
-        }.sheet(item: $shared, content: ShareView.init)
     }
 }
 

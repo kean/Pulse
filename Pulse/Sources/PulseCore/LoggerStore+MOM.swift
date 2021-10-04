@@ -25,6 +25,7 @@ public extension LoggerStore {
         do {
             let createdAt = NSAttributeDescription(name: "createdAt", type: .dateAttributeType)
             let level = NSAttributeDescription(name: "level", type: .stringAttributeType)
+            let levelOrder = NSAttributeDescription(name: "levelOrder", type: .integer16AttributeType)
             let label = NSAttributeDescription(name: "label", type: .stringAttributeType)
             let session = NSAttributeDescription(name: "session", type: .stringAttributeType)
             let text = NSAttributeDescription(name: "text", type: .stringAttributeType)
@@ -32,8 +33,10 @@ public extension LoggerStore {
             let file = NSAttributeDescription(name: "file", type: .stringAttributeType)
             let function = NSAttributeDescription(name: "function", type: .stringAttributeType)
             let line = NSAttributeDescription(name: "line", type: .integer32AttributeType)
+            let isPinned = NSAttributeDescription(name: "isPinned", type: .booleanAttributeType)
+            let requestState = NSAttributeDescription(name: "requestState", type: .integer16AttributeType)
             let request = NSRelationshipDescription.make(name: "request", type: .oneToOne(isOptional: true), entity: request)
-            message.properties = [createdAt, level, label, session, text, metadata, file, function, line, request]
+            message.properties = [createdAt, level, levelOrder, label, session, text, metadata, file, function, line, isPinned, requestState, request]
         }
 
         do {
@@ -56,12 +59,14 @@ public extension LoggerStore {
             let errorCode = NSAttributeDescription(name: "errorCode", type: .integer32AttributeType)
             let statusCode = NSAttributeDescription(name: "statusCode", type: .integer32AttributeType)
             let duration = NSAttributeDescription(name: "duration", type: .doubleAttributeType)
+            let contentType = NSAttributeDescription(name: "contentType", type: .stringAttributeType)
             let isCompleted = NSAttributeDescription(name: "isCompleted", type: .booleanAttributeType)
+            let requestState = NSAttributeDescription(name: "requestState", type: .integer16AttributeType)
             let requestBodyKey = NSAttributeDescription(name: "requestBodyKey", type: .stringAttributeType)
             let responseBodyKey = NSAttributeDescription(name: "responseBodyKey", type: .stringAttributeType)
             let details = NSRelationshipDescription.make(name: "details", type: .oneToOne(), entity: requestDetails)
             let message = NSRelationshipDescription.make(name: "message", type: .oneToOne(), entity: message)
-            request.properties = [createdAt, session, url, host, httpMethod, errorDomain, errorCode, statusCode, duration, requestBodyKey, responseBodyKey, details, message, isCompleted]
+            request.properties = [createdAt, session, url, host, httpMethod, errorDomain, errorCode, statusCode, duration, contentType, requestBodyKey, responseBodyKey, details, message, isCompleted, requestState]
         }
 
         model.entities = [message, metadata, request, requestDetails]
@@ -116,6 +121,7 @@ private extension NSRelationshipDescription {
 public final class LoggerMessageEntity: NSManagedObject {
     @NSManaged public var createdAt: Date
     @NSManaged public var level: String
+    @NSManaged public var levelOrder: Int16
     @NSManaged public var label: String
     @NSManaged public var session: String
     @NSManaged public var text: String
@@ -123,6 +129,8 @@ public final class LoggerMessageEntity: NSManagedObject {
     @NSManaged public var file: String
     @NSManaged public var function: String
     @NSManaged public var line: Int32
+    @NSManaged public var isPinned: Bool
+    @NSManaged public var requestState: Int16
     @NSManaged public var request: LoggerNetworkRequestEntity?
 }
 
@@ -145,7 +153,16 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
     @NSManaged public var errorCode: Int32
     @NSManaged public var statusCode: Int32
     @NSManaged public var duration: Double
+    @NSManaged public var contentType: String?
     @NSManaged public var isCompleted: Bool
+    @NSManaged public var requestState: Int16
+    
+    public enum State: Int16 {
+        // 0 reserved for undefined
+        case pending = 1 // not used yet
+        case success = 2
+        case failure = 3
+    }
 
     // Details
     @NSManaged public var details: LoggerNetworkRequestDetailsEntity

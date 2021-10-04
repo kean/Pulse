@@ -68,7 +68,6 @@ struct NotList<Element: NotListIdentifiable>: NSViewRepresentable {
         @objc func tableViewDoubleClick(_ tableView: NSTableView) {
             list.onDoubleClickRow(tableView.clickedRow)
         }
-
     }
 
     func makeCoordinator() -> Coordinator {
@@ -141,7 +140,7 @@ protocol NotListIdentifiable {
 }
 
 extension NSManagedObject: NotListIdentifiable {
-    var id: NSManagedObjectID { objectID }
+    public var id: NSManagedObjectID { objectID }
 }
 
 #endif

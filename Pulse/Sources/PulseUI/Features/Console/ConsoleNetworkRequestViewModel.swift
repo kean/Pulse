@@ -16,7 +16,7 @@ final class ConsoleNetworkRequestViewModel {
 
     let showInConsole: (() -> Void)?
 
-    private let objectID: NSManagedObjectID
+    private let message: LoggerMessageEntity
     private let request: LoggerNetworkRequestEntity
     private let context: AppContext
 
@@ -60,7 +60,7 @@ final class ConsoleNetworkRequestViewModel {
 
         self.request = request
 
-        self.objectID = message.objectID
+        self.message = message
         self.context = context
         self.showInConsole = showInConsole
     }
@@ -68,15 +68,15 @@ final class ConsoleNetworkRequestViewModel {
     // MARK: Pins
 
     var isPinnedPublisher: AnyPublisher<Bool, Never> {
-        context.pins.isPinnedMessageWithID(objectID)
+        message.publisher(for: \.isPinned).eraseToAnyPublisher()
     }
 
     var isPinned: Bool {
-        context.pins.pins.contains(objectID)
+        message.isPinned
     }
 
     func togglePin() {
-        context.pins.togglePinWithID(objectID)
+        context.store.togglePin(for: message)
     }
 
     // MARK: Context Menu

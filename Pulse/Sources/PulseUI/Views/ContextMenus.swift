@@ -39,7 +39,7 @@ struct ConsoleMessageContextMenu: View {
             }.foregroundColor(.red)
         }
         Section {
-            PinButton(model: .init(service: context.pins, objectID: message.objectID))
+            PinButton(model: .init(store: context.store, message: message))
         }
     }
 }
@@ -110,7 +110,7 @@ struct NetworkMessageContextMenu: View {
         }
         #endif
         NetworkMessageContextMenuCopySection(request: request, shareService: context.share)
-        PinButton(model: .init(service: context.pins, objectID: message.objectID))
+        PinButton(model: .init(store: context.store, message: message))
     }
 }
 #endif
@@ -171,6 +171,10 @@ struct StringSearchOptionsMenu: View {
     var isKindNeeded = true
 
     var body: some View {
+        menu
+    }
+    
+    var menu: some View {
         Menu(content: {
             Picker(options.isCaseSensitive ? "Case Sensitive" :  "Case Insensitive", selection: $options.isCaseSensitive) {
                 Text("Case Sensitive").tag(true)

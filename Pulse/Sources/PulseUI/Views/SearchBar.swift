@@ -4,6 +4,7 @@
 
 import Foundation
 import SwiftUI
+import Combine
 
 #if os(iOS)
 
@@ -46,12 +47,32 @@ struct SearchBar: View {
 struct SearchBar: NSViewRepresentable {
     let title: String
     @Binding var text: String
+    let imageName: String?
     var onEditingChanged: ((_ isEditing: Bool) -> Void)?
     var onCancel: (() -> Void)?
     var onReturn: (() -> Void)?
-
+    private let onFind: PassthroughSubject<Void, Never>
+    
+    init(title: String,
+         text: Binding<String>,
+         imageName: String? = nil,
+         onFind: PassthroughSubject<Void, Never> = .init(),
+         onEditingChanged: ((Bool) -> Void)? = nil,
+         onCancel: (() -> Void)? = nil,
+         onReturn: (() -> Void)? = nil)
+    {
+        self.title = title
+        self._text = text
+        self.imageName = imageName
+        self.onFind = onFind
+        self.onEditingChanged = onEditingChanged
+        self.onCancel = onCancel
+        self.onReturn = onReturn
+    }
+    
     final class Coordinator: NSObject, NSSearchFieldDelegate {
         let parent: SearchBar
+        var cancellables: [AnyCancellable] = [] // TODO: refactor
 
         init(parent: SearchBar) {
             self.parent = parent
@@ -94,10 +115,21 @@ struct SearchBar: NSViewRepresentable {
         searchField.placeholderString = title
         searchField.delegate = context.coordinator
         searchField.translatesAutoresizingMaskIntoConstraints = false
+
+        if let imageName = self.imageName {
+            (searchField.cell as? NSSearchFieldCell)?.searchButtonCell?.image = NSImage(systemSymbolName: imageName, accessibilityDescription: nil)
+        }
+        
         let constraint = searchField.widthAnchor.constraint(greaterThanOrEqualToConstant: 200)
         constraint.priority = .init(rawValue: 249)
         constraint.isActive = true
+        
         currentSearchField = searchField
+        onFind.sink {
+            // TODO: refactor
+            guard searchField.window?.isKeyWindow ?? false else { return }
+            _ = searchField.becomeFirstResponder()
+        }.store(in: &context.coordinator.cancellables)
         return searchField
     }
 

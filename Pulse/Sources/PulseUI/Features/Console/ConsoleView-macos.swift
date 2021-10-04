@@ -128,16 +128,6 @@ private func endEditing() {
     NSApp.keyWindow?.endEditing(for: nil)
 }
 
-public struct ConsoleViewCommands: Commands {
-    public init() {}
-
-    public var body: some Commands {
-        CommandMenu("Find") {
-            Button("Find...", action: { currentSearchField?.becomeFirstResponder() }).keyboardShortcut("f")
-        }
-    }
-}
-
 #if DEBUG
 @available(iOS 13.0, *)
 struct ConsoleViewMac_Previews: PreviewProvider {

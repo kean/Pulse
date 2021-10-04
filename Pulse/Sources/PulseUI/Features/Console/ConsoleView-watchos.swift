@@ -17,6 +17,7 @@ public struct ConsoleView: View {
     @State private var isShowingFiltersView = false
     @State private var isShowingRemoveConfirmationAlert = false
     @State private var isStoreArchived = false
+    @State private var isRemoteLoggingLinkActive = false
 
     public init(store: LoggerStore = .default) {
         self.model = ConsoleViewModel(store: store)
@@ -31,6 +32,13 @@ public struct ConsoleView: View {
             Button(action: model.tranferStore) {
                 Label(model.fileTransferStatus.title, systemImage: "square.and.arrow.up")
             }.disabled(model.fileTransferStatus.isButtonDisabled)
+            if let model = model.remoteLoggerViewModel {
+                NavigationLink(destination: _RemoteLoggingSettingsView(model: model)) {
+                    Button(action: { isRemoteLoggingLinkActive = true }) {
+                        Label("Remote Logging", systemImage: "network")
+                    }
+                }
+            }
             Button(action: { isShowingFiltersView = true }) {
                 Label("Quick Filters", systemImage: "line.horizontal.3.decrease.circle")
             }
@@ -38,9 +46,11 @@ public struct ConsoleView: View {
         }
         .navigationTitle("Console")
         .toolbar {
-            ButtonRemoveAll(action: model.buttonRemoveAllMessagesTapped)
-                .disabled(model.messages.isEmpty)
-                .opacity(model.messages.isEmpty ? 0.33 : 1)
+            ToolbarItemGroup {
+                ButtonRemoveAll(action: model.buttonRemoveAllMessagesTapped)
+                    .disabled(model.messages.isEmpty)
+                    .opacity(model.messages.isEmpty ? 0.33 : 1)
+            }
         }
         .alert(item: $model.fileTransferError) { error in
             Alert(title: Text("Transfer Failed"), message: Text(error.message), dismissButton: .cancel(Text("Ok")))
@@ -59,14 +69,25 @@ public struct ConsoleView: View {
     }
 }
 
+@available(watchOS 7.0, *)
+private struct _RemoteLoggingSettingsView: View {
+    let model: RemoteLoggerSettingsViewModel
+
+    var body: some View {
+        Form {
+            RemoteLoggerSettingsView(model: model)
+        }
+    }
+}
+
 #if DEBUG
 @available(watchOS 7.0, *)
 struct ConsoleView_Previews: PreviewProvider {
     static var previews: some View {
         return Group {
-            ConsoleView(model: .init(store: .mock))
-            ConsoleView(model: .init(store: .mock))
-                .environment(\.colorScheme, .dark)
+            NavigationView {
+                ConsoleView(model: .init(store: .mock))
+            }
         }
     }
 }

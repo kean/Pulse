@@ -5,6 +5,8 @@
 import Foundation
 import PulseCore
 import CoreData
+import SwiftUI
+import PulseCore
 
 enum JSONElement {
     case punctuation
@@ -50,7 +52,7 @@ private func getClass(for element: JSONElement) -> String {
     }
 }
 
-@available(iOS 13, tvOS 14.0, *)
+@available(iOS 13.0, tvOS 14.0, *)
 final class JSONPrinter {
     private let renderer: JSONRenderer
     private var indentation = 0
@@ -146,20 +148,40 @@ final class JSONPrinter {
 
 @available(iOS 13, tvOS 14.0, *)
 struct JSONColors {
-    static let punctuation = UXColor.label.withAlphaComponent(0.7)
+    static let punctuation = UXColor.dynamic(
+        light: .init(red: 113.0/255.0, green: 128.0/255.0, blue: 141.0/255.0, alpha: 1.0),
+        dark: .init(red: 108.0/255.0, green: 121.0/255.0, blue: 134.0/255.0, alpha: 1.0)
+    )
     static let key = UXColor.label
-    static let valueString = UXColor.systemRed
-    static let valueOther = UXColor.systemBlue
-    static let null = UXColor.systemPurple
+    static let valueString = Palette.red
+    static let valueOther = UXColor.dynamic(
+        light: .init(red: 28.0/255.0, green: 0.0/255.0, blue: 207.0/255.0, alpha: 1.0),
+        dark: .init(red: 208.0/255.0, green: 191.0/255.0, blue: 105.0/255.0, alpha: 1.0)
+    )
+    static let null = Palette.pink
 }
-
 
 @available(iOS 13, tvOS 14.0, *)
 final class AttributedStringJSONRenderer: JSONRenderer {
     private let output = NSMutableAttributedString()
-
+    private let fontSize: CGFloat
+    private let lineHeight: CGFloat
+    
+    private var attributes: [JSONElement: [NSAttributedString.Key: Any]] = [
+        .punctuation: [.foregroundColor: JSONColors.punctuation],
+        .key: [.foregroundColor: JSONColors.key],
+        .valueString: [.foregroundColor: JSONColors.valueString],
+        .valueOther: [.foregroundColor: JSONColors.valueOther],
+        .null: [.foregroundColor: JSONColors.null]
+    ]
+    
+    init(fontSize: CGFloat, lineHeight: CGFloat) {
+        self.fontSize = fontSize
+        self.lineHeight = lineHeight
+    }
+    
     func append(_ string: String, element: JSONElement) {
-        output.append(string, attributes(for: element))
+        output.append(string, attributes[element]!)
     }
 
     func indent(count: Int) {
@@ -170,18 +192,15 @@ final class AttributedStringJSONRenderer: JSONRenderer {
         output.append("\n")
     }
 
-    private func attributes(for element: JSONElement) -> [NSAttributedString.Key: Any] {
-        switch element {
-        case .punctuation: return [.foregroundColor: JSONColors.punctuation]
-        case .key: return [.foregroundColor: JSONColors.key]
-        case .valueString: return [.foregroundColor: JSONColors.valueString]
-        case .valueOther: return [.foregroundColor: JSONColors.valueOther]
-        case .null: return [.foregroundColor: JSONColors.null]
-        }
-    }
-
     func make() -> NSAttributedString {
-        output.addAttributes([.font: UXFont.monospacedSystemFont(ofSize: FontSize.body, weight: .regular)])
+        let ps = NSMutableParagraphStyle()
+        ps.minimumLineHeight = lineHeight
+        ps.maximumLineHeight = lineHeight
+        
+        output.addAttributes([
+            .font: UXFont.monospacedSystemFont(ofSize: CGFloat(fontSize), weight: .regular),
+            .paragraphStyle: ps
+        ])
         return output
     }
 }

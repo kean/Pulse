@@ -13,6 +13,31 @@ import SwiftUI
 // A set of typealias and APIs to make AppKit and UIKit more
 // compatible with each other
 
+struct Palette {
+    #if !os(watchOS)
+    @available(iOS 13.0, tvOS 13.0, *)
+    static var red: UXColor {
+        UXColor.dynamic(light: Palette.lightRed, dark: Palette.darkRed)
+    }
+    
+    private static let lightRed = UXColor(red: 196.0/255.0, green: 26.0/255.0, blue: 22.0/255.0, alpha: 1.0)
+    private static let darkRed = UXColor(red: 252.0/255.0, green: 106.0/255.0, blue: 93.0/255.0, alpha: 1.0)
+    
+    @available(iOS 13.0, tvOS 13.0, *)
+    static var pink: UXColor {
+        UXColor.dynamic(light: Palette.lightPink, dark: Palette.darkPink)
+    }
+    
+    private static let lightPink = UXColor(red: 155.0/255.0, green: 35.0/255.0, blue: 147.00/255.0, alpha: 1.0)
+    private static let darkPink = UXColor(red: 252.0/255.0, green: 95.0/255.0, blue: 163.0/255.0, alpha: 1.0)
+    #else
+    @available(watchOS 7.0, *)
+    static var red: UXColor { UXColor(Color.red) }
+    @available(watchOS 7.0, *)
+    static var pink: UXColor { UXColor(Color.pink) }
+    #endif
+}
+
 #if os(macOS)
 typealias UXColor = NSColor
 typealias UXFont = NSFont
@@ -30,10 +55,41 @@ extension NSColor {
     static var systemGray3: NSColor { systemGray.withAlphaComponent(0.8) }
     static var systemGray2: NSColor { systemGray.withAlphaComponent(0.9) }
 }
+
+extension NSColor {
+    static func dynamic(light: NSColor, dark: NSColor) -> NSColor {
+        NSColor(name: nil) {
+            switch $0.name {
+            case .darkAqua, .vibrantDark, .accessibilityHighContrastDarkAqua, .accessibilityHighContrastVibrantDark:
+                return dark
+            default:
+                return light
+            }
+        }
+    }
+}
+
 #else
 typealias UXColor = UIColor
 typealias UXFont = UIFont
 typealias UXImage = UIImage
+
+#if !os(watchOS)
+extension UIColor {
+    @available(iOS 13.0, tvOS 13.0, *)
+    static func dynamic(light: UIColor, dark: UIColor) -> UIColor {
+        UIColor {
+            switch $0.userInterfaceStyle {
+            case .dark:
+                return dark
+            default:
+                return light
+            }
+        }
+    }
+}
+#endif
+
 #endif
 
 #if os(tvOS)
@@ -136,7 +192,7 @@ extension Image {
 }
 #endif
 
-// MARK: - NSPasteboard
+// MARK: - Misc
 
 #if os(macOS)
 extension NSPasteboard {
@@ -165,6 +221,25 @@ extension NSTextField {
         label.isSelectable = false
         label.lineBreakMode = .byTruncatingTail
         return label
+    }
+}
+
+extension NSParagraphStyle {
+    static func make(lineHeight: CGFloat) -> NSParagraphStyle {
+        let ps = NSMutableParagraphStyle()
+        ps.maximumLineHeight = lineHeight
+        ps.minimumLineHeight = lineHeight
+        return ps
+    }
+}
+
+extension NSAttributedString {
+    static func makeAttachment(with image: NSImage?, attributes: [NSAttributedString.Key: Any]) -> NSAttributedString {
+        let attachment = NSTextAttachment()
+        attachment.image = image
+        let string = NSMutableAttributedString(attachment: attachment)
+        string.addAttributes(attributes)
+        return NSAttributedString(attributedString: string)
     }
 }
 #endif

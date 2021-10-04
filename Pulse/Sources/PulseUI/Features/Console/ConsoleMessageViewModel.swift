@@ -16,7 +16,7 @@ final class ConsoleMessageViewModel {
 
     let showInConsole: (() -> Void)?
 
-    private let objectID: NSManagedObjectID
+    private let message: LoggerMessageEntity
     private let context: AppContext
 
     static let timeFormatter: DateFormatter = {
@@ -36,22 +36,22 @@ final class ConsoleMessageViewModel {
         self.textColor = ConsoleMessageStyle.textColor(level: LoggerStore.Level(rawValue: message.level) ?? .debug)
         self.badge = BadgeViewModel(message: message)
         self.context = context
-        self.objectID = message.objectID
+        self.message = message
         self.showInConsole = showInConsole
     }
 
     // MARK: Pins
 
     var isPinnedPublisher: AnyPublisher<Bool, Never> {
-        context.pins.isPinnedMessageWithID(objectID)
+        message.publisher(for: \.isPinned).eraseToAnyPublisher()
     }
 
     var isPinned: Bool {
-        context.pins.pins.contains(objectID)
+        message.isPinned
     }
 
     func togglePin() {
-        context.pins.togglePinWithID(objectID)
+        context.store.togglePin(for: message)
     }
 }
 
@@ -92,6 +92,21 @@ extension Color {
     }
 }
 
+#if os(macOS)
+enum ConsoleMessageStyle {
+    static func textColor(level: LoggerStore.Level) -> Color {
+        switch level {
+        case .trace: return .primary
+        case .debug: return .primary
+        case .info: return .primary
+        case .notice: return .orange
+        case .warning: return .orange
+        case .error: return Color(Palette.red)
+        case .critical: return Color(Palette.red)
+        }
+    }
+}
+#else
 @available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
 enum ConsoleMessageStyle {
     static func textColor(level: LoggerStore.Level) -> Color {
@@ -106,3 +121,4 @@ enum ConsoleMessageStyle {
         }
     }
 }
+#endif
