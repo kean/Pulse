@@ -34,8 +34,9 @@ public extension LoggerStore {
             let function = NSAttributeDescription(name: "function", type: .stringAttributeType)
             let line = NSAttributeDescription(name: "line", type: .integer32AttributeType)
             let isPinned = NSAttributeDescription(name: "isPinned", type: .booleanAttributeType)
+            let requestState = NSAttributeDescription(name: "requestState", type: .integer16AttributeType)
             let request = NSRelationshipDescription.make(name: "request", type: .oneToOne(isOptional: true), entity: request)
-            message.properties = [createdAt, level, levelOrder, label, session, text, metadata, file, function, line, isPinned, request]
+            message.properties = [createdAt, level, levelOrder, label, session, text, metadata, file, function, line, isPinned, requestState, request]
         }
 
         do {
@@ -65,7 +66,7 @@ public extension LoggerStore {
             let responseBodyKey = NSAttributeDescription(name: "responseBodyKey", type: .stringAttributeType)
             let details = NSRelationshipDescription.make(name: "details", type: .oneToOne(), entity: requestDetails)
             let message = NSRelationshipDescription.make(name: "message", type: .oneToOne(), entity: message)
-            request.properties = [createdAt, session, url, host, httpMethod, errorDomain, errorCode, statusCode, duration, contentType, requestBodyKey, responseBodyKey, details, message, isCompleted]
+            request.properties = [createdAt, session, url, host, httpMethod, errorDomain, errorCode, statusCode, duration, contentType, requestBodyKey, responseBodyKey, details, message, isCompleted, state]
         }
 
         model.entities = [message, metadata, request, requestDetails]
@@ -129,6 +130,7 @@ public final class LoggerMessageEntity: NSManagedObject {
     @NSManaged public var function: String
     @NSManaged public var line: Int32
     @NSManaged public var isPinned: Bool
+    @NSManaged public var requestState: Int16
     @NSManaged public var request: LoggerNetworkRequestEntity?
 }
 
@@ -156,7 +158,8 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
     @NSManaged public var state: Int16
     
     public enum State: Int16 {
-        case pending = 0 // not used yet
+        // 0 reserved for undefined
+        case pending = 1 // not used yet
         case success
         case failure
     }

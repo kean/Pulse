@@ -306,6 +306,7 @@ extension LoggerStore {
         let messageEntity = self.makeMessageEntity(with: messageObject)
         let requestEntity = self.makeRequest(summary, createdAt: summary.createdAt)
         messageEntity.request = requestEntity
+        messageEntity.requestState = requestEntity.state
         requestEntity.message = messageEntity
     }
         
