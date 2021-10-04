@@ -167,13 +167,21 @@ final class AttributedStringJSONRenderer: JSONRenderer {
     private let fontSize: CGFloat
     private let lineHeight: CGFloat
     
+    private var attributes: [JSONElement: [NSAttributedString.Key: Any]] = [
+        .punctuation: [.foregroundColor: JSONColors.punctuation],
+        .key: [.foregroundColor: JSONColors.key],
+        .valueString: [.foregroundColor: JSONColors.valueString],
+        .valueOther: [.foregroundColor: JSONColors.valueOther],
+        .null: [.foregroundColor: JSONColors.null]
+    ]
+    
     init(fontSize: CGFloat, lineHeight: CGFloat) {
         self.fontSize = fontSize
         self.lineHeight = lineHeight
     }
     
     func append(_ string: String, element: JSONElement) {
-        output.append(string, attributes(for: element))
+        output.append(string, attributes[element]!)
     }
 
     func indent(count: Int) {
@@ -182,16 +190,6 @@ final class AttributedStringJSONRenderer: JSONRenderer {
 
     func newline() {
         output.append("\n")
-    }
-
-    private func attributes(for element: JSONElement) -> [NSAttributedString.Key: Any] {
-        switch element {
-        case .punctuation: return [.foregroundColor: JSONColors.punctuation]
-        case .key: return [.foregroundColor: JSONColors.key]
-        case .valueString: return [.foregroundColor: JSONColors.valueString]
-        case .valueOther: return [.foregroundColor: JSONColors.valueOther]
-        case .null: return [.foregroundColor: JSONColors.null]
-        }
     }
 
     func make() -> NSAttributedString {
