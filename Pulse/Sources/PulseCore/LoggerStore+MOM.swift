@@ -60,6 +60,7 @@ public extension LoggerStore {
             let duration = NSAttributeDescription(name: "duration", type: .doubleAttributeType)
             let contentType = NSAttributeDescription(name: "contentType", type: .stringAttributeType)
             let isCompleted = NSAttributeDescription(name: "isCompleted", type: .booleanAttributeType)
+            let state = NSAttributeDescription(name: "state", type: .integer16AttributeType)
             let requestBodyKey = NSAttributeDescription(name: "requestBodyKey", type: .stringAttributeType)
             let responseBodyKey = NSAttributeDescription(name: "responseBodyKey", type: .stringAttributeType)
             let details = NSRelationshipDescription.make(name: "details", type: .oneToOne(), entity: requestDetails)
@@ -152,6 +153,13 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
     @NSManaged public var duration: Double
     @NSManaged public var contentType: String?
     @NSManaged public var isCompleted: Bool
+    @NSManaged public var state: Int16
+    
+    public enum State: Int16 {
+        case pending = 0 // not used yet
+        case success
+        case failure
+    }
 
     // Details
     @NSManaged public var details: LoggerNetworkRequestDetailsEntity

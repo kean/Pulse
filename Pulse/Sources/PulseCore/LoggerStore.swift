@@ -343,11 +343,15 @@ extension LoggerStore {
         entity.host = summary.request.url?.host
         entity.httpMethod = summary.request.httpMethod
         entity.errorDomain = summary.error?.domain
-        entity.errorCode = Int32(summary.error?.code ?? 0)
-        entity.statusCode = Int32(summary.response?.statusCode ?? 0)
+        let errorCode = Int32(summary.error?.code ?? 0)
+        entity.errorCode = errorCode
+        let statusCode = Int32(summary.response?.statusCode ?? 0)
+        entity.statusCode = statusCode
         entity.duration = summary.metrics?.taskInterval.duration ?? 0
         entity.contentType = summary.response?.headers["Content-Type"]
         entity.isCompleted = true
+        let isFailure = errorCode != 0 || (statusCode != 0 && !(200..<400).contains(statusCode))
+        entity.state = (isFailure ? LoggerNetworkRequestEntity.State.failure : .success).rawValue
         // Details
         entity.details = makeRequestDetails(summary)
         if case let .directory(store) = document {
