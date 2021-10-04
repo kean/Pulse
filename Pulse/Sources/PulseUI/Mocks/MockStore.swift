@@ -10,7 +10,9 @@ import CoreData
 extension LoggerStore {
     static let mock: LoggerStore = {
         let store = makeMockStore()
+//        for _ in 1...3 {
         populateStore(store)
+//        }
 
 //        Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { _ in
 //            populateStore(store)

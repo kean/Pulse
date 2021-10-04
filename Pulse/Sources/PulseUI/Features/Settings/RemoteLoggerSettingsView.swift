@@ -95,9 +95,7 @@ final class RemoteLoggerSettingsViewModel: ObservableObject {
             }.store(in: &cancellables)
         
         logger.$servers.receive(on: DispatchQueue.main).sink { [weak self] servers in
-            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1)) {
-                self?.refresh(servers: servers)
-            }
+            self?.refresh(servers: servers)
         }.store(in: &cancellables)
         
         logger.$connectionState.receive(on: DispatchQueue.main).sink { [weak self] in
