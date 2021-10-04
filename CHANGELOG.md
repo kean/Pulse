@@ -1,5 +1,18 @@
 # Pulse 0.x
 
+## Pulse 0.18.0
+
+*4 Oct, 2021*
+
+- [PulseCore] Add `RemoteLogger` (requires Pulse Pro releasing on Oct 5)
+- [PulseCore] Store pins persistently and add the respective APIs to `LoggerStore`
+- [PulseCore] Add new fields to the entities: `levelOrder`, `contentType`, `requestState`
+- [PulseCore] Add `LoggerStoreInfo.AppInfo` with an app name, bundle identifier, and other information about the app to the Pulse documents
+- [PulseCore] Opening a (readonly) Pulse document with an unsupported scheme will now throw an error
+- [PulseCore] Pins are now stored persistently and are exported along with the store. Add APIs for managing pins in `LoggerStore`
+- [iOS] Display new `LoggerStoreInfo.AppInfo` when opening an existing store
+- [All Platforms] Improved JSON color theme matching Xcode
+
 ## Pulse 0.17.2
 
 *15 Sep, 2021*
