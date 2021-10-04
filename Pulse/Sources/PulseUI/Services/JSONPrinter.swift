@@ -153,12 +153,12 @@ struct JSONColors {
         dark: .init(red: 108.0/255.0, green: 121.0/255.0, blue: 134.0/255.0, alpha: 1.0)
     )
     static let key = UXColor.label
-    static let valueString = Pallete.red
+    static let valueString = Palette.red
     static let valueOther = UXColor.dynamic(
         light: .init(red: 28.0/255.0, green: 0.0/255.0, blue: 207.0/255.0, alpha: 1.0),
         dark: .init(red: 208.0/255.0, green: 191.0/255.0, blue: 105.0/255.0, alpha: 1.0)
     )
-    static let null = Pallete.pink
+    static let null = Palette.pink
 }
 
 @available(iOS 13, tvOS 14.0, *)

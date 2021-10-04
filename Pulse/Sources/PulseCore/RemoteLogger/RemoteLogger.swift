@@ -276,7 +276,7 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
             guard let self = self else { return } // Failed to connect in 10 sec
             
             guard self.connectionState == .connecting else { return }
-            log(label: "RemoteLogger", "The hanshake with the server timed out")
+            log(label: "RemoteLogger", "The handshake with the server timed out")
             self.scheduleConnectionRetry()
         }
     }

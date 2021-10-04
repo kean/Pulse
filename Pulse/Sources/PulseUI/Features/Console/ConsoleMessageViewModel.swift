@@ -101,8 +101,8 @@ enum ConsoleMessageStyle {
         case .info: return .primary
         case .notice: return .orange
         case .warning: return .orange
-        case .error: return Color(Pallete.red)
-        case .critical: return Color(Pallete.red)
+        case .error: return Color(Palette.red)
+        case .critical: return Color(Palette.red)
         }
     }
 }

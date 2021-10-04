@@ -13,11 +13,11 @@ import SwiftUI
 // A set of typealias and APIs to make AppKit and UIKit more
 // compatible with each other
 
-struct Pallete {
+struct Palette {
     #if !os(watchOS)
     @available(iOS 13.0, tvOS 13.0, *)
     static var red: UXColor {
-        UXColor.dynamic(light: Pallete.lightRed, dark: Pallete.darkRed)
+        UXColor.dynamic(light: Palette.lightRed, dark: Palette.darkRed)
     }
     
     private static let lightRed = UXColor(red: 196.0/255.0, green: 26.0/255.0, blue: 22.0/255.0, alpha: 1.0)
@@ -25,7 +25,7 @@ struct Pallete {
     
     @available(iOS 13.0, tvOS 13.0, *)
     static var pink: UXColor {
-        UXColor.dynamic(light: Pallete.lightPink, dark: Pallete.darkPink)
+        UXColor.dynamic(light: Palette.lightPink, dark: Palette.darkPink)
     }
     
     private static let lightPink = UXColor(red: 155.0/255.0, green: 35.0/255.0, blue: 147.00/255.0, alpha: 1.0)
@@ -234,10 +234,10 @@ extension NSParagraphStyle {
 }
 
 extension NSAttributedString {
-    static func makeAttachement(with image: NSImage?, attributes: [NSAttributedString.Key: Any]) -> NSAttributedString {
-        let attachement = NSTextAttachment()
-        attachement.image = image
-        let string = NSMutableAttributedString(attachment: attachement)
+    static func makeAttachment(with image: NSImage?, attributes: [NSAttributedString.Key: Any]) -> NSAttributedString {
+        let attachment = NSTextAttachment()
+        attachment.image = image
+        let string = NSMutableAttributedString(attachment: attachment)
         string.addAttributes(attributes)
         return NSAttributedString(attributedString: string)
     }

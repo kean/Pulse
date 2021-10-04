@@ -95,8 +95,8 @@ final class ToastManager {
             toast.view.alpha = 0
             toast.view.transform = CGAffineTransform(scaleX: 0.95, y: 0.95).translatedBy(x: 0, y: 10)
         } completion: { isFinished in
-            guard let index = self.queue.firstIndex(where: { $0 === toast }) else { return }
-            self.queue.remove(at: index)
+            guard let line = self.queue.firstIndex(where: { $0 === toast }) else { return }
+            self.queue.remove(at: line)
 
             toast.view.removeFromSuperview()
             toast.removeFromParent()
