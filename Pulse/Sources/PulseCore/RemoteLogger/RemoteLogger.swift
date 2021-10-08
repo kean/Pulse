@@ -7,13 +7,13 @@ import Network
 import Combine
 import SwiftUI
 
-#if os(iOS) || os(tvOS) || os(watchOS)
+#if os(iOS) || os(tvOS) || os(watchOS) || os(macOS)
 /// Connects to the remote server and sends logs remotely. In the current version,
 /// a server is a Pulse Pro app for macOS).
 ///
 /// The logger is thread-safe. The updates to the `Published` properties will
 /// be delivered on a background queue.
-@available(iOS 14.0, tvOS 14.0, watchOS 7.0, *)
+@available(iOS 14.0, tvOS 14.0, watchOS 7.0, macOS 11.0, *)
 public final class RemoteLogger: RemoteLoggerConnectionDelegate {
     private(set) public var store: LoggerStore?
     
@@ -410,7 +410,7 @@ private func getFallbackDeviceId() -> UUID {
         return UUID(uuidString: value) ?? UUID()
     }
     let id = UUID()
-    UserDefaults.standard.set(id, forKey: key)
+    UserDefaults.standard.set(id.uuidString, forKey: key)
     return id
 }
 
@@ -426,7 +426,7 @@ private extension NWBrowser.Result {
     }
 }
 
-@available(iOS 14.0, tvOS 14.0, watchOS 7.0, *)
+@available(iOS 14.0, tvOS 14.0, watchOS 7.0, macOS 11.0, *)
 extension RemoteLogger.ConnectionState {
     public var description: String {
         switch self {
@@ -442,7 +442,7 @@ public enum RemoteLogger {
 }
 #endif
 
-@available(iOS 14.0, tvOS 14.0, watchOS 7.0, *)
+@available(iOS 14.0, tvOS 14.0, watchOS 7.0, macOS 11.0, *)
 extension RemoteLogger {
     public static let serviceType = "_pulse._tcp"
 }
