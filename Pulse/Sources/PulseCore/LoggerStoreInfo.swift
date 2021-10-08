@@ -120,4 +120,9 @@ extension LoggerStoreInfo.DeviceInfo {
         )
     }
 }
+
+func getDeviceId() -> UUID? {
+    return nil
+}
+
 #endif
