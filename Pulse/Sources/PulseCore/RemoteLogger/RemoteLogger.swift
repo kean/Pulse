@@ -406,8 +406,8 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
 
 private func getFallbackDeviceId() -> UUID {
     let key = "com-github-com-kean-pulse-device-id"
-    if let value = UserDefaults.standard.string(forKey: key) {
-        return UUID(uuidString: value) ?? UUID()
+    if let value = UserDefaults.standard.string(forKey: key), let uuid = UUID(uuidString: value) {
+        return uuid
     }
     let id = UUID()
     UserDefaults.standard.set(id.uuidString, forKey: key)
