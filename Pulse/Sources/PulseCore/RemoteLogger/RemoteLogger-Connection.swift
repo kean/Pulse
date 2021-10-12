@@ -51,9 +51,7 @@ extension RemoteLogger {
             connection.receive(minimumIncompleteLength: 1, maximumLength: 65535) { [weak self] data, context, isCompleted, error in
                 guard let self = self else { return }
                 if let data = data, !data.isEmpty {
-                    // TODO: optimize for a scenario where we don't need a buffer
-                    self.buffer.append(data)
-                    self.processBuffer()
+                    self.process(data: data)
                 }
                 if isCompleted {
                     self.send(event: .completed)
@@ -65,25 +63,44 @@ extension RemoteLogger {
             }
         }
         
-        private func processBuffer() {
-            func decodeNext() -> Packet? {
-                do {
-                    let (packet, size) = try RemoteLogger.decode(buffer: buffer)
-                    buffer.removeFirst(size)
-                    return packet
-                } catch {
-                    if case .notEnoughData? = error as? PacketParsingError {
-                        return nil
+        private func process(data freshData: Data) {
+            guard !freshData.isEmpty else { return }
+            
+            var freshData = freshData
+            if buffer.isEmpty {
+                while let (packet, size) = decodePacket(from: freshData) {
+                    send(event: .packet(packet))
+                    if size == freshData.count {
+                        return // No no processing needed
                     }
-                    log("Unexpected error when processing a packet: \(error)")
-                    return nil
+                    freshData.removeFirst(size)
                 }
             }
-            while let packet = decodeNext() {
-                send(event: .packet(packet))
+            
+            if !freshData.isEmpty {
+                buffer.append(freshData)
+                while let (packet, size) = decodePacket(from: buffer) {
+                    send(event: .packet(packet))
+                    buffer.removeFirst(size)
+                }
+                if buffer.count == 0 {
+                    buffer = Data()
+                }
             }
         }
         
+        private func decodePacket(from data: Data) -> (Packet, Int)? {
+            do {
+                return try RemoteLogger.decode(buffer: data)
+            } catch {
+                if case .notEnoughData? = error as? PacketParsingError {
+                    return nil
+                }
+                log("Unexpected error when processing a packet: \(error)")
+                return nil
+            }
+        }
+
         private func send(event: Event) {
             delegate?.connection(self, didReceiveEvent: event)
         }

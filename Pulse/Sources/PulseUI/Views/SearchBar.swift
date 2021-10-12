@@ -14,7 +14,6 @@ struct SearchBar: View {
     @Binding var text: String
     var onEditingChanged: ((_ isEditing: Bool) -> Void)?
 
-
     var body: some View {
         HStack {
             Image(systemName: "magnifyingglass").opacity(0.33)
@@ -71,34 +70,40 @@ struct SearchBar: NSViewRepresentable {
     }
     
     final class Coordinator: NSObject, NSSearchFieldDelegate {
-        let parent: SearchBar
+        @Binding var text: String
+        var onEditingChanged: ((_ isEditing: Bool) -> Void)?
+        var onCancel: (() -> Void)?
+        var onReturn: (() -> Void)?
         var cancellables: [AnyCancellable] = [] // TODO: refactor
 
         init(parent: SearchBar) {
-            self.parent = parent
+            self.onEditingChanged = parent.onEditingChanged
+            self.onCancel = parent.onCancel
+            self.onReturn = parent.onReturn
+            self._text = parent.$text
         }
 
         func controlTextDidChange(_ obj: Notification) {
             if let textField = obj.object as? NSTextField {
-                self.parent.text = textField.stringValue
+                self.text = textField.stringValue
             }
         }
 
         func controlTextDidBeginEditing(_ obj: Notification) {
-            parent.onEditingChanged?(true)
+            onEditingChanged?(true)
         }
 
         func controlTextDidEndEditing(_ obj: Notification) {
-            parent.onEditingChanged?(false)
+            onEditingChanged?(false)
         }
 
         func control(_ control: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
             if commandSelector == #selector(NSSearchField.cancelOperation(_:)) {
-                parent.onCancel?()
-                parent.onEditingChanged?(false)
+                onCancel?()
+                onEditingChanged?(false)
                 return false
             } else if commandSelector == #selector(NSSearchField.insertNewline(_:)) {
-                parent.onReturn?()
+                onReturn?()
                 return true
             }
             return false
@@ -110,8 +115,7 @@ struct SearchBar: NSViewRepresentable {
     }
 
     func makeNSView(context: Context) -> NSSearchField {
-        let searchField = FocusAwareTextField()
-        searchField.onFocusChange = { _ in onEditingChanged?(true) }
+        let searchField = NSSearchField()
         searchField.placeholderString = title
         searchField.delegate = context.coordinator
         searchField.translatesAutoresizingMaskIntoConstraints = false
@@ -123,11 +127,10 @@ struct SearchBar: NSViewRepresentable {
         let constraint = searchField.widthAnchor.constraint(greaterThanOrEqualToConstant: 200)
         constraint.priority = .init(rawValue: 249)
         constraint.isActive = true
-        
-        currentSearchField = searchField
-        onFind.sink {
+
+        onFind.sink { [weak searchField] in
             // TODO: refactor
-            guard searchField.window?.isKeyWindow ?? false else { return }
+            guard let searchField = searchField, searchField.window?.isKeyWindow ?? false else { return }
             _ = searchField.becomeFirstResponder()
         }.store(in: &context.coordinator.cancellables)
         return searchField
@@ -137,18 +140,6 @@ struct SearchBar: NSViewRepresentable {
         nsView.stringValue = text
     }
 }
-
-private class FocusAwareTextField: NSSearchField {
-    var onFocusChange: (Bool) -> Void = { _ in }
-
-    override func becomeFirstResponder() -> Bool {
-        onFocusChange(true)
-        return super.becomeFirstResponder()
-    }
-}
-
-// TODO: Fix this
-var currentSearchField: NSSearchField?
 
 #endif
 
