@@ -26,12 +26,16 @@ public final class LoggerStore {
 
     private let document: PulseDocument
 
+    /// Determines how often the messages are saved to the database. By default,
+    /// 100 milliseconds.
+    public var saveInterval: DispatchTimeInterval = .milliseconds(100)
+    
     /// Size limit in bytes. `30 Mb` by default. The limit is approximate.
     public static var databaseSizeLimit: Int = 1024 * 1024 * 30
 
     /// Size limit in bytes. `200 Mb` by default.
     public static var blobsSizeLimit: Int = 1024 * 1024 * 200
-
+    
     /// The default store.
     public static let `default` = LoggerStore.makeDefault()
 
@@ -46,6 +50,8 @@ public final class LoggerStore {
     
     private let encodingQueue = DispatchQueue(label: "com.github.kean.logger-store")
 
+    private var isSaveScheduled = false
+    
     private enum PulseDocument {
         case directory(blobs: BlobStore)
         case file(archive: IndexedArchive, manifest: LoggerStoreInfo)
@@ -85,7 +91,7 @@ public final class LoggerStore {
     public static var empty: LoggerStore {
         LoggerStore(storeURL: URL.logs.appendingFilename("empty"), isEmpty: true)
     }
-
+    
     /// Initializes the store with the given URL.
     ///
     /// There are two types of URLs that the store supports:
@@ -180,6 +186,17 @@ public final class LoggerStore {
         self.backgroundContext = LoggerStore.makeBackgroundContext(for: container)
         self.document = .empty
     }
+    
+    private func setNeedsSave() {
+        guard !isSaveScheduled else { return }
+        isSaveScheduled = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + saveInterval) {
+            self.backgroundContext.perform {
+                self.isSaveScheduled = false
+                try? self.backgroundContext.save()
+            }
+        }
+    }
 
     private static func makeContainer(databaseURL: URL, isViewing: Bool) -> NSPersistentContainer {
         let container = NSPersistentContainer(name: databaseURL.lastPathComponent, managedObjectModel: Self.model)
@@ -227,7 +244,7 @@ extension LoggerStore {
         let context = backgroundContext
         context.perform {
             self.makeMessageEntity(with: message)
-            try? context.save()
+            self.setNeedsSave()
         }
         
         onEvent?(.saveMessage(message))
@@ -278,7 +295,7 @@ extension LoggerStore {
         let context = backgroundContext
         context.perform {
             self._storeNetworkRequest(message)
-            try? context.save()
+            self.setNeedsSave()
         }
         
         onEvent?(.saveNetworkMessage(message))
