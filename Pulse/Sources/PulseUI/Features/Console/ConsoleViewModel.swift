@@ -37,7 +37,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     @Published private(set) var matches: [ConsoleMatch] = []
 
     private var matchesSet: Set<NSManagedObjectID> = []
-    private let textSearch = ConsoleMessagesTextSearch()
+    private let textSearch = ManagedObjectTextSearch<LoggerMessageEntity> { $0.text }
     #endif
 
     // Apple Watch file transfers

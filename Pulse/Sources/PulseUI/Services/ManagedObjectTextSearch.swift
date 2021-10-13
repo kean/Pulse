@@ -8,13 +8,18 @@ import Foundation
 import PulseCore
 import CoreData
 
-final class ConsoleMessagesTextSearch {
-    private(set) var messages: [LoggerMessageEntity] = []
+final class ManagedObjectTextSearch<T: NSManagedObject> {
+    private(set) var objects: [T] = []
     private var searchIndex: [(NSManagedObjectID, String)]?
+    private let closure: (T) -> String
     private let lock = NSLock()
-
-    func replace(_ messages: [LoggerMessageEntity]) {
-        self.messages = messages
+    
+    init(_ closure: @escaping (T) -> String) {
+        self.closure = closure
+    }
+        
+    func replace(_ objects: [T]) {
+        self.objects = objects
         self.searchIndex = nil
     }
 
@@ -50,7 +55,7 @@ final class ConsoleMessagesTextSearch {
         if let searchIndex = self.searchIndex {
             return searchIndex
         }
-        let searchIndex = messages.map { ($0.objectID, $0.text) }
+        let searchIndex = objects.map { ($0.objectID, closure($0)) }
         self.searchIndex = searchIndex
         return searchIndex
     }
