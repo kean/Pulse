@@ -9,7 +9,7 @@ import PulseCore
 import CoreData
 
 final class ConsoleMessagesTextSearch {
-    private var messages: [LoggerMessageEntity] = []
+    private(set) var messages: [LoggerMessageEntity] = []
     private var searchIndex: [(NSManagedObjectID, String)]?
     private let lock = NSLock()
 

@@ -115,10 +115,11 @@ struct SearchBar: NSViewRepresentable {
     }
 
     func makeNSView(context: Context) -> NSSearchField {
-        let searchField = NSSearchField()
+        let searchField = FocusAwareSearchField()
         searchField.placeholderString = title
         searchField.delegate = context.coordinator
         searchField.translatesAutoresizingMaskIntoConstraints = false
+        searchField.onFocusChange = onEditingChanged
 
         if let imageName = self.imageName {
             (searchField.cell as? NSSearchFieldCell)?.searchButtonCell?.image = NSImage(systemSymbolName: imageName, accessibilityDescription: nil)
@@ -127,7 +128,7 @@ struct SearchBar: NSViewRepresentable {
         let constraint = searchField.widthAnchor.constraint(greaterThanOrEqualToConstant: 200)
         constraint.priority = .init(rawValue: 249)
         constraint.isActive = true
-
+        
         onFind.sink { [weak searchField] in
             // TODO: refactor
             guard let searchField = searchField, searchField.window?.isKeyWindow ?? false else { return }
@@ -138,6 +139,15 @@ struct SearchBar: NSViewRepresentable {
 
     func updateNSView(_ nsView: NSSearchField, context: Context) {
         nsView.stringValue = text
+    }
+}
+
+private class FocusAwareSearchField: NSSearchField {
+    var onFocusChange: ((Bool) -> Void)?
+
+    override func becomeFirstResponder() -> Bool {
+        onFocusChange?(true)
+        return super.becomeFirstResponder()
     }
 }
 
