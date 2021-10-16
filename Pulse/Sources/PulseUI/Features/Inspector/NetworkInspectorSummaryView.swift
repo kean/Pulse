@@ -138,7 +138,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
             title: "Summary",
             color: tintColor,
             items: [
-                ("URL", summary.request?.url?.absoluteString ?? "–"),
+                ("URL", "https://www.google.ru/search?q=very+long+google+url&newwindow=1&hl=en&source=hp&ei=r_RqYfnxB7X59AP8z6Qg&iflsig=ALs-wAMAAAAAYWsCv804bF6Tig_Q0HLznCCxGCmznP-v&ved=0ahUKEwi5hdWgpM_zAhW1PH0KHfwnCQQQ4dUDCAw&uact=5&oq=very+long+google+url&gs_lcp=Cgdnd3Mtd2l6EAMyBQghEKABMgUIIRCgAToRCC4QgAQQsQMQxwEQowIQkwI6DgguEIAEELEDEMcBENEDOgUIABCABDoLCC4QgAQQxwEQowI6CAgAELEDEIMBOgsILhCABBDHARCvAToOCC4QgAQQsQMQxwEQowI6CAguELEDEIMBOggIABCABBCxAzoRCC4QgAQQsQMQgwEQxwEQrwE6CAguEIAEELEDOgsIABCABBCxAxDJAzoFCAAQkgM6BwguELEDEAo6DQguELEDEMcBENEDEAo6CgguEMcBEK8BEAo6BAguEAo6BAgAEAo6DQguELEDEMcBEKMCEAo6EAguEIAEEMcBEKMCEAoQkwI6BwgAEIAEEAo6CwguELEDEMcBEKMCOgsILhCABBCxAxCDAToLCC4QgAQQxwEQ0QM6CAgAEIAEEMkDOhEILhCABBCxAxCDARDHARDRAzoLCAAQgAQQsQMQgwE6CwguEIAEELEDEJMCOg4ILhCABBCxAxDHARCvAToGCAAQFhAeOggIABAWEAoQHjoFCAAQhgM6BQghEKsCOgcIIRAKEKABUMkGWNAgYKAhaABwAHgAgAGLAYgB9g-SAQQyMC41mAEAoAEB&sclient=gws-wiz"),
                 ("Method", summary.request?.httpMethod ?? "–"),
                 ("Status Code", summary.response?.statusCode.map(StatusCodeFormatter.string) ?? "–")
             ])
