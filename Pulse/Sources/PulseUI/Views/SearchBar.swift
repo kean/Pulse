@@ -116,7 +116,6 @@ struct SearchBar: NSViewRepresentable {
 
     func makeNSView(context: Context) -> NSSearchField {
         let searchField = FocusAwareSearchField()
-        searchField.placeholderString = title
         searchField.delegate = context.coordinator
         searchField.translatesAutoresizingMaskIntoConstraints = false
         searchField.onFocusChange = onEditingChanged
@@ -138,6 +137,7 @@ struct SearchBar: NSViewRepresentable {
     }
 
     func updateNSView(_ nsView: NSSearchField, context: Context) {
+        nsView.placeholderString = title
         nsView.stringValue = text
     }
 }

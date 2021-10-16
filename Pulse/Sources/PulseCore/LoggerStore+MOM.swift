@@ -31,12 +31,13 @@ public extension LoggerStore {
             let text = NSAttributeDescription(name: "text", type: .stringAttributeType)
             let metadata = NSRelationshipDescription.make(name: "metadata", type: .oneToMany, entity: metadata)
             let file = NSAttributeDescription(name: "file", type: .stringAttributeType)
+            let filename = NSAttributeDescription(name: "filename", type: .stringAttributeType)
             let function = NSAttributeDescription(name: "function", type: .stringAttributeType)
             let line = NSAttributeDescription(name: "line", type: .integer32AttributeType)
             let isPinned = NSAttributeDescription(name: "isPinned", type: .booleanAttributeType)
             let requestState = NSAttributeDescription(name: "requestState", type: .integer16AttributeType)
             let request = NSRelationshipDescription.make(name: "request", type: .oneToOne(isOptional: true), entity: request)
-            message.properties = [createdAt, level, levelOrder, label, session, text, metadata, file, function, line, isPinned, requestState, request]
+            message.properties = [createdAt, level, levelOrder, label, session, text, metadata, file, filename, function, line, isPinned, requestState, request]
         }
 
         do {
@@ -127,6 +128,7 @@ public final class LoggerMessageEntity: NSManagedObject {
     @NSManaged public var text: String
     @NSManaged public var metadata: Set<LoggerMetadataEntity>
     @NSManaged public var file: String
+    @NSManaged public var filename: String
     @NSManaged public var function: String
     @NSManaged public var line: Int32
     @NSManaged public var isPinned: Bool

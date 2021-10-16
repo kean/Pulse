@@ -15,15 +15,13 @@ private struct Logger {
     }
 }
 
-extension LoggerStore {
+extension LoggerStore {    
     func populate2() {
         precondition(Thread.isMainThread)
 
         populate3()
 
-        // Wait until everything is stored
-        container.viewContext.performAndWait {}
-        backgroundContext.performAndWait {}
+        flush()
     }
 
     func populate3() {

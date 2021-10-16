@@ -8,16 +8,6 @@ import Foundation
 import CoreData
 @testable import PulseCore
 
-extension XCTestCase {
-    func flush(store: LoggerStore) {
-        let flushCompleted = expectation(description: "Flush Completed")
-        store.backgroundContext.perform {
-            flushCompleted.fulfill()
-        }
-        wait(for: [flushCompleted], timeout: 2)
-    }
-}
-
 extension LoggerStore {
     func removeStores() {
         let coordinator = container.persistentStoreCoordinator
@@ -30,6 +20,12 @@ extension LoggerStore {
         let coordinator = container.persistentStoreCoordinator
         for store in coordinator.persistentStores {
             try? coordinator.destroyPersistentStore(at: store.url!, ofType: NSSQLiteStoreType, options: [:])
+        }
+    }
+    
+    func flush() {
+        backgroundContext.performAndWait {
+            try! backgroundContext.save()
         }
     }
 }

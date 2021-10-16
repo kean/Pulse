@@ -4,6 +4,7 @@
 
 import Foundation
 import CoreData
+import PulseInternal
 
 /// `LoggerStore` persistently stores all of the logged messages, network
 /// requests, and blobs. Use `.default` store to log messages.
@@ -27,7 +28,7 @@ public final class LoggerStore {
     private let document: PulseDocument
 
     /// Determines how often the messages are saved to the database. By default,
-    /// 100 milliseconds.
+    /// 100 milliseconds - quickly enough, but avoiding too many individual writes.
     public var saveInterval: DispatchTimeInterval = .milliseconds(100)
     
     /// Size limit in bytes. `30 Mb` by default. The limit is approximate.
@@ -48,7 +49,8 @@ public final class LoggerStore {
     
     var onEvent: ((LoggerStoreEvent) -> Void)?
     
-    private let encodingQueue = DispatchQueue(label: "com.github.kean.logger-store")
+    // Marked internal only for testing purposes.
+    let encodingQueue = DispatchQueue(label: "com.github.kean.logger-store")
 
     private var isSaveScheduled = false
     
@@ -190,10 +192,16 @@ public final class LoggerStore {
     private func setNeedsSave() {
         guard !isSaveScheduled else { return }
         isSaveScheduled = true
-        DispatchQueue.main.asyncAfter(deadline: .now() + saveInterval) {
-            self.backgroundContext.perform {
+        DispatchQueue.main.asyncAfter(deadline: .now() + saveInterval) { [weak self] in
+            guard let self = self else { return }
+            self.backgroundContext.perform { [weak self] in
+                guard let self = self else { return }
+                if self.backgroundContext.hasChanges {
+                    try? _ExceptionCatcher.catchException {
+                        try? self.backgroundContext.save()
+                    }
+                }
                 self.isSaveScheduled = false
-                try? self.backgroundContext.save()
             }
         }
     }
@@ -205,8 +213,6 @@ public final class LoggerStore {
             store.setValue("DELETE" as NSString, forPragmaNamed: "journal_mode")
         }
         container.persistentStoreDescriptions = [store]
-        container.viewContext.automaticallyMergesChangesFromParent = true
-        container.viewContext.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
         return container
     }
     
@@ -221,6 +227,9 @@ public final class LoggerStore {
         if let error = loadError {
             throw error
         }
+        
+        container.viewContext.automaticallyMergesChangesFromParent = true
+        container.viewContext.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
     }
 
     private static func makeBackgroundContext(for container: NSPersistentContainer) -> NSManagedObjectContext {
@@ -235,19 +244,23 @@ public final class LoggerStore {
 extension LoggerStore {
     /// Stores the given message.
     public func storeMessage(label: String, level: Level, message: String, metadata: [String: MetadataValue]?, file: String = #file, function: String = #function, line: UInt = #line) {
-        let message = Message(createdAt: makeCurrentDate(), label: label, level: level, message: message, metadata: metadata?.unpack(), session: LoggerSession.current.id.uuidString, file: file, function: function, line: line)
-        storeMessage(message)
+        let date = makeCurrentDate()
+        perform {
+            let message = Message(createdAt: date, label: label, level: level, message: message, metadata: metadata?.unpack(), session: LoggerSession.current.id.uuidString, file: file, function: function, line: line)
+            self.makeMessageEntity(with: message)
+            self.onEvent?(.saveMessage(message))
+        }
     }
     
     /// Stores the given message.
     func storeMessage(_ message: Message) {
-        let context = backgroundContext
-        context.perform {
-            self.makeMessageEntity(with: message)
-            self.setNeedsSave()
+        perform {
+            self._storeMessage(message)
         }
-        
-        onEvent?(.saveMessage(message))
+    }
+    
+    private func _storeMessage(_ message: Message) {
+        makeMessageEntity(with: message)
     }
     
     /// Stores the network request.
@@ -255,50 +268,31 @@ extension LoggerStore {
     /// - note: If you want to store incremental updates to the task, use
     /// `NetworkLogger` instead.
     public func storeRequest(_ request: URLRequest, response: URLResponse?, error: Error?, data: Data?, metrics: URLSessionTaskMetrics? = nil) {
-        let context = NetworkLogger.TaskContext()
-        context.request = request
-        context.response = response
-        context.error = error
-        context.data = data ?? Data()
-        context.metrics = metrics.map(NetworkLoggerMetrics.init)
-        
-        storeNetworkRequest(context)
+        storeRequest(request, response: response, error: error, data: data, metrics: metrics.map(NetworkLoggerMetrics.init))
     }
-
-    func storeNetworkRequest(_ context: NetworkLogger.TaskContext) {
-        guard let urlRequest = context.request else { return }
-        
+    
+    func storeRequest(_ request: URLRequest, response: URLResponse?, error: Error?, data: Data?, metrics: NetworkLoggerMetrics?) {
         let date = makeCurrentDate()
-        encodingQueue.async {
-            self.storeNetworkRequest(urlRequest: urlRequest, context, date: date)
-        }
-    }
-    
-    private func storeNetworkRequest(urlRequest: URLRequest, _ context: NetworkLogger.TaskContext, date: Date) {
-        // This is pretty expensive because it perform JSON encoding, we do
-        // this on the encoding queue.
-        let message = NetworkMessage(
-            createdAt: date,
-            request: NetworkLoggerRequest(urlRequest: urlRequest),
-            response: context.response.map(NetworkLoggerResponse.init),
-            error: context.error.map(NetworkLoggerError.init),
-			requestBody: urlRequest.httpBody ?? urlRequest.httpBodyStreamData(),
-            responseBody: context.data,
-            metrics: context.metrics,
-            session: LoggerSession.current.id.uuidString
-        )
-        storeRequest(message)
-    }
-    
-    /// Stores the network request.
-    func storeRequest(_ message: NetworkMessage) {
-        let context = backgroundContext
-        context.perform {
+        perform {
+            let message = NetworkMessage(
+                createdAt: date,
+                request: NetworkLoggerRequest(urlRequest: request),
+                response: response.map(NetworkLoggerResponse.init),
+                error: error.map(NetworkLoggerError.init),
+                requestBody: request.httpBody ?? request.httpBodyStreamData(),
+                responseBody: data,
+                metrics: metrics,
+                session: LoggerSession.current.id.uuidString
+            )
             self._storeNetworkRequest(message)
-            self.setNeedsSave()
+            self.onEvent?(.saveNetworkMessage(message))
         }
-        
-        onEvent?(.saveNetworkMessage(message))
+    }
+    
+    func storeRequest(_ request: NetworkMessage) {
+        perform {
+            self._storeNetworkRequest(request)
+        }
     }
     
     private func _storeNetworkRequest(_ summary: NetworkMessage) {
@@ -321,7 +315,7 @@ extension LoggerStore {
         let messageObject = Message(createdAt: summary.createdAt, label: "network", level: level, message: message, metadata: nil, session: summary.session, file: "", function: "", line: 0)
         
         let messageEntity = self.makeMessageEntity(with: messageObject)
-        let requestEntity = self.makeRequest(summary, createdAt: summary.createdAt)
+        let requestEntity = self.makeNetworkRequestEntity(summary, createdAt: summary.createdAt)
         messageEntity.request = requestEntity
         messageEntity.requestState = requestEntity.requestState
         requestEntity.message = messageEntity
@@ -345,13 +339,14 @@ extension LoggerStore {
             })
         }
         entity.file = message.file
+        entity.filename = (message.file as NSString).lastPathComponent
         entity.function = message.function
         entity.line = Int32(message.line)
         return entity
     }
 
     @discardableResult
-    private func makeRequest(_ summary: LoggerStore.NetworkMessage, createdAt: Date) -> LoggerNetworkRequestEntity {
+    private func makeNetworkRequestEntity(_ summary: LoggerStore.NetworkMessage, createdAt: Date) -> LoggerNetworkRequestEntity {
         let entity = LoggerNetworkRequestEntity(context: backgroundContext)
         // Primary
         entity.createdAt = createdAt
@@ -396,14 +391,14 @@ extension LoggerStore {
     
     /// Toggles pin for the give message.
     public func togglePin(for message: LoggerMessageEntity) {
-        performChanges { _ in
+        performChangesOnMain { _ in
             message.isPinned.toggle()
         }
     }
     
     /// Removes all pins.
     public func removeAllPins() {
-        performChanges { context in
+        performChangesOnMain { context in
             let request = NSFetchRequest<LoggerMessageEntity>(entityName: "\(LoggerMessageEntity.self)")
             request.fetchBatchSize = 250
             request.predicate = NSPredicate(format: "isPinned == YES")
@@ -418,10 +413,18 @@ extension LoggerStore {
     // MARK: Direct Modifiction
         
     /// Perform and save changes on the main queue.
-    func performChanges(_ closure: (NSManagedObjectContext) -> Void) {
+    private func performChangesOnMain(_ closure: (NSManagedObjectContext) -> Void) {
         precondition(Thread.isMainThread)
         closure(container.viewContext)
         try? container.viewContext.save()
+    }
+    
+    private func perform(_ changes: @escaping () -> Void) {
+        guard !isReadonly else { return }
+        backgroundContext.perform {
+            changes()
+            self.setNeedsSave()
+        }
     }
     
     // MARK: Accessing Data

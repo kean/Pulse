@@ -82,9 +82,9 @@ private struct KeyValueListView: View {
     var body: some View {
         if model.items.isEmpty {
             HStack {
-            Text("Empty")
-                .foregroundColor(actualTintColor)
-                .font(.system(size: fontSize, weight: .medium))
+                Text("Empty")
+                    .foregroundColor(actualTintColor)
+                    .font(.system(size: fontSize, weight: .medium))
             }
         } else {
             Label(text: text)
@@ -185,6 +185,8 @@ private struct Label: NSViewRepresentable {
         label.isSelectable = true
         label.attributedStringValue = text
         label.allowsEditingTextAttributes = true
+        label.lineBreakMode = .byCharWrapping
+        label.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         return label
     }
     
