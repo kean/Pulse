@@ -22,13 +22,17 @@ extension LoggerStore {
             try? coordinator.destroyPersistentStore(at: store.url!, ofType: NSSQLiteStoreType, options: [:])
         }
     }
-    
-    func flush() {
-        backgroundContext.performAndWait {
-            try! backgroundContext.save()
-        }
-    }
 }
+
+extension XCTestCase {
+     func flush(store: LoggerStore) {
+         let flushCompleted = expectation(description: "Flush Completed")
+         store.flush {
+             flushCompleted.fulfill()
+         }
+         wait(for: [flushCompleted], timeout: 2)
+     }
+ }
 
 struct TemporaryDirectory {
     let url: URL

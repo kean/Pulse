@@ -193,15 +193,21 @@ public final class LoggerStore {
         guard !isSaveScheduled else { return }
         isSaveScheduled = true
         DispatchQueue.main.asyncAfter(deadline: .now() + saveInterval) { [weak self] in
-            self?.backgroundContext.perform { [weak self] in
-                guard let self = self else { return }
-                if self.backgroundContext.hasChanges {
-                    try? _ExceptionCatcher.catchException {
-                        try? self.backgroundContext.save()
-                    }
+            self?.flush()
+        }
+    }
+    
+    // Internal for testing purposes.
+    func flush(_ completion: (() -> Void)? = nil) {
+        backgroundContext.perform { [weak self] in
+            guard let self = self else { return }
+            if self.isSaveScheduled {
+                try? _ExceptionCatcher.catchException {
+                    try? self.backgroundContext.save()
                 }
                 self.isSaveScheduled = false
             }
+            completion?()
         }
     }
 

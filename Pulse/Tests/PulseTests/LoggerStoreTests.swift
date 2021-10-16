@@ -135,7 +135,7 @@ final class LoggerStoreTests: XCTestCase {
 
     func testCopyDirectory() throws {
         // GIVEN
-        store.populate2()
+        populate2(store: store)
 
         let copyURL = tempDirectoryURL.appendingPathComponent("copy.pulse")
 
@@ -156,7 +156,7 @@ final class LoggerStoreTests: XCTestCase {
 
     func testCopyToNonExistingFolder() throws {
         // GIVEN
-        store.populate2()
+        populate2(store: store)
 
         let invalidURL = tempDirectoryURL
             .appendingPathComponent(UUID().uuidString, isDirectory: true)
@@ -168,7 +168,7 @@ final class LoggerStoreTests: XCTestCase {
 
     func testCopyButFileExists() throws {
         // GIVEN
-        store.populate2()
+        populate2(store: store)
 
         let copyURL = tempDirectoryURL
             .appendingPathComponent("copy.pulse")
@@ -181,7 +181,7 @@ final class LoggerStoreTests: XCTestCase {
 
     func testCreateMultipleCopies() throws {
         // GIVEN
-        store.populate2()
+        populate2(store: store)
 
         let copyURL1 = self.storeURL
             .deletingLastPathComponent()
@@ -238,7 +238,7 @@ final class LoggerStoreTests: XCTestCase {
 
         // WHEN/THEN
         store.storeMessage(label: "test", level: .info, message: "test", metadata: nil)
-        store.flush()
+        flush(store: store)
 
         // THEN nothing is written
         XCTAssertEqual(try store.allMessages().count, 23)
@@ -289,7 +289,7 @@ final class LoggerStoreTests: XCTestCase {
         // WHEN
         LoggerStore.databaseSizeLimit = 5_000 // In reality this is always going to be ignored
         store.sweep()
-        store.flush()
+        flush(store: store)
 
         // THEN
         let copyURL2 = tempDirectoryURL.appendingFilename(UUID().uuidString).appendingPathExtension("pulse")
@@ -337,9 +337,9 @@ final class LoggerStoreTests: XCTestCase {
 
     func testRemoveAllMessages() throws {
         // GIVEN
-        store.populate2()
+        populate2(store: store)
         store.storeMessage(label: "with meta", level: .debug, message: "test", metadata: ["hey": .string("this is meta yo")], file: #file, function: #function, line: #line)
-        store.flush()
+        flush(store: store)
 
         let context = store.container.viewContext
         XCTAssertEqual(try context.fetch(LoggerMessageEntity.fetchRequest()).count, 20)

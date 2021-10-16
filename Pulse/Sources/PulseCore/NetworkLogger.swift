@@ -57,11 +57,11 @@ public final class NetworkLogger {
         let context = self.context(for: task)
         tasks[ObjectIdentifier(task)] = nil
         
-        guard let request = context.request, let response = context.response else {
+        guard let request = context.request else {
             return // This should never happen
         }
 
-        store.storeRequest(request, response: response, error: error, data: context.data, metrics: context.metrics)
+        store.storeRequest(request, response: context.response, error: error, data: context.data, metrics: context.metrics)
     }
 
     /// Logs the task metrics (optional).

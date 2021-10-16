@@ -89,7 +89,7 @@ final class PersistentLogHandlerTests: XCTestCase {
     func testStoresFileInformation() throws {
         // WHEN
         sut.log(level: .debug, message: "a", metadata: nil, file: "PersistenLogHandlerTests.swift", function: "testStoresFileInformation()", line: 86)
-        store.flush()
+        flush(store: store)
 
         // THEN
         let message = try XCTUnwrap(store.allMessages().first)
@@ -101,7 +101,7 @@ final class PersistentLogHandlerTests: XCTestCase {
     func testStoresFilename() throws {
         // WHEN
         sut.log(level: .debug, message: "a", metadata: nil, file: #file, function: #function, line: 86)
-        store.flush()
+        flush(store: store)
 
         // THEN
         let message = try XCTUnwrap(store.allMessages().first)
@@ -116,7 +116,7 @@ final class PersistentLogHandlerTests: XCTestCase {
     func testStoringStringMetadata() throws {
         // WHEN
         sut.log(level: .debug, message: "request failed", metadata: ["system": "auth"])
-        store.flush()
+        flush(store: store)
 
         // THEN key-value metadata is stored
         let message = try XCTUnwrap(store.allMessages().first)
@@ -136,7 +136,7 @@ final class PersistentLogHandlerTests: XCTestCase {
 
         // WHEN
         sut.log(level: .debug, message: "a", metadata: ["system": .stringConvertible(Foo())])
-        store.flush()
+        flush(store: store)
 
         // THEN key-value metadata is stored
         let message = try XCTUnwrap(store.allMessages().first)
@@ -149,7 +149,7 @@ final class PersistentLogHandlerTests: XCTestCase {
     func testQueryingMetadata() throws {
         // GIVEN
             sut.log(level: .debug, message: "a", metadata: ["system": "auth"])
-            store.flush()
+            flush(store: store)
 
         // WHEN
         let request = NSFetchRequest<LoggerMessageEntity>(entityName: "LoggerMessageEntity")

@@ -5,6 +5,7 @@
 import Foundation
 import PulseCore
 import CoreData
+import XCTest
 
 private struct Logger {
     let label: String
@@ -15,18 +16,18 @@ private struct Logger {
     }
 }
 
-extension LoggerStore {    
-    func populate2() {
+extension XCTestCase {
+    func populate2(store: LoggerStore) {
         precondition(Thread.isMainThread)
 
-        populate3()
+        populate3(store: store)
 
-        flush()
+        flush(store: store)
     }
 
-    func populate3() {
+    func populate3(store: LoggerStore) {
         func logger(named: String) -> Logger {
-            Logger(label: named, store: self)
+            Logger(label: named, store: store)
         }
 
         logger(named: "application")
@@ -41,7 +42,7 @@ extension LoggerStore {
         logger(named: "auth")
             .log(level: .trace, "Instantiated the new login request")
 
-        let networkLogger = NetworkLogger(store: self)
+        let networkLogger = NetworkLogger(store: store)
 
         let urlSession = URLSession(configuration: .default)
 
