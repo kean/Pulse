@@ -23,7 +23,7 @@ extension LoggerStore {
 }
 
 private func makeMockStore() -> LoggerStore {
-    let rootURL = FileManager.default.temporaryDirectory.appendingPathComponent("com.github.kean.pulse-ui-demo")
+    let rootURL = FileManager.default.temporaryDirectory.appendingPathComponent("Pulse-ui-demo")
     try? FileManager.default.removeItem(at: rootURL) // TODO: cleanup
     try? FileManager.default.createDirectory(at: rootURL, withIntermediateDirectories: true, attributes: nil)
 
