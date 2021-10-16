@@ -55,15 +55,13 @@ public final class NetworkLogger {
         defer { lock.unlock() }
         
         let context = self.context(for: task)
-        
-        if let response = task.response {
-            context.response = response
-        }
-        context.error = error
-
-        store.storeNetworkRequest(context)
-
         tasks[ObjectIdentifier(task)] = nil
+        
+        guard let request = context.request, let response = context.response else {
+            return // This should never happen
+        }
+
+        store.storeRequest(request, response: response, error: error, data: context.data, metrics: context.metrics)
     }
 
     /// Logs the task metrics (optional).
@@ -90,7 +88,6 @@ public final class NetworkLogger {
         var request: URLRequest?
         var response: URLResponse?
         lazy var data = Data()
-        var error: Error?
         var metrics: NetworkLoggerMetrics?
     }
 

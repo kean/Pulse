@@ -69,34 +69,45 @@ final class PersistentLogHandlerTests: XCTestCase {
         waitForExpectations(timeout: 0.5)
 
         let persistedMessages = try store.allMessages()
-        XCTAssertEqual(persistedMessages.count, 2)
-
-        if persistedMessages.count >= 2 {
-            let persistedMessage1 = persistedMessages[0]
-            XCTAssertEqual(persistedMessage1.level, level1.rawValue)
-            XCTAssertEqual(persistedMessage1.text, message1)
-            XCTAssertEqual(persistedMessage1.createdAt, date)
-            XCTAssertEqual(persistedMessage1.label, "test.logger.1")
-            XCTAssertEqual(persistedMessage1.session, sessionID.uuidString)
-
-            let persistedMessage2 = persistedMessages[1]
-            XCTAssertEqual(persistedMessage2.level, level2.rawValue)
-            XCTAssertEqual(persistedMessage2.text, message2)
-            XCTAssertEqual(persistedMessage2.createdAt, date)
-            XCTAssertEqual(persistedMessage2.label, "test.logger.2")
-            XCTAssertEqual(persistedMessage2.session, sessionID.uuidString)
+        guard persistedMessages.count == 2 else {
+            return XCTFail("Unexpectede number of messages stored")
         }
+        
+        let persistedMessage1 = try XCTUnwrap(persistedMessages.first { $0.label == "test.logger.1" })
+        XCTAssertEqual(persistedMessage1.level, level1.rawValue)
+        XCTAssertEqual(persistedMessage1.text, message1)
+        XCTAssertEqual(persistedMessage1.createdAt, date)
+        XCTAssertEqual(persistedMessage1.session, sessionID.uuidString)
+        
+        let persistedMessage2 = try XCTUnwrap(persistedMessages.first { $0.label == "test.logger.2" })
+        XCTAssertEqual(persistedMessage2.level, level2.rawValue)
+        XCTAssertEqual(persistedMessage2.text, message2)
+        XCTAssertEqual(persistedMessage2.createdAt, date)
+        XCTAssertEqual(persistedMessage2.session, sessionID.uuidString)
     }
 
     func testStoresFileInformation() throws {
         // WHEN
         sut.log(level: .debug, message: "a", metadata: nil, file: "PersistenLogHandlerTests.swift", function: "testStoresFileInformation()", line: 86)
-        flush(store: store)
+        store.flush()
 
         // THEN
         let message = try XCTUnwrap(store.allMessages().first)
         XCTAssertEqual(message.file, "PersistenLogHandlerTests.swift")
         XCTAssertEqual(message.function, "testStoresFileInformation()")
+        XCTAssertEqual(message.line, 86)
+    }
+    
+    func testStoresFilename() throws {
+        // WHEN
+        sut.log(level: .debug, message: "a", metadata: nil, file: #file, function: #function, line: 86)
+        store.flush()
+
+        // THEN
+        let message = try XCTUnwrap(store.allMessages().first)
+        XCTAssertTrue(message.file.hasSuffix("Pulse/Tests/PulseTests/PersistenLogHandlerTests.swift"))
+        XCTAssertEqual(message.filename, "PersistenLogHandlerTests.swift")
+        XCTAssertEqual(message.function, "testStoresFilename()")
         XCTAssertEqual(message.line, 86)
     }
 
@@ -105,7 +116,7 @@ final class PersistentLogHandlerTests: XCTestCase {
     func testStoringStringMetadata() throws {
         // WHEN
         sut.log(level: .debug, message: "request failed", metadata: ["system": "auth"])
-        flush(store: store)
+        store.flush()
 
         // THEN key-value metadata is stored
         let message = try XCTUnwrap(store.allMessages().first)
@@ -125,7 +136,7 @@ final class PersistentLogHandlerTests: XCTestCase {
 
         // WHEN
         sut.log(level: .debug, message: "a", metadata: ["system": .stringConvertible(Foo())])
-        flush(store: store)
+        store.flush()
 
         // THEN key-value metadata is stored
         let message = try XCTUnwrap(store.allMessages().first)
@@ -138,7 +149,7 @@ final class PersistentLogHandlerTests: XCTestCase {
     func testQueryingMetadata() throws {
         // GIVEN
             sut.log(level: .debug, message: "a", metadata: ["system": "auth"])
-            flush(store: store)
+            store.flush()
 
         // WHEN
         let request = NSFetchRequest<LoggerMessageEntity>(entityName: "LoggerMessageEntity")

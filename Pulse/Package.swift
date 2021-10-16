@@ -21,7 +21,8 @@ let package = Package(
     targets: [
         .target(name: "PulseUI", dependencies: ["PulseCore"]),
         .target(name: "Pulse", dependencies: [.product(name: "Logging", package: "swift-log"), "PulseCore"]),
-        .target(name: "PulseCore"),
+        .target(name: "PulseCore", dependencies: ["PulseInternal"]),
+        .target(name: "PulseInternal"),
         .testTarget(name: "PulseTests", dependencies: ["Pulse"], resources: [.process("Resources")])
     ]
 )

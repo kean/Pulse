@@ -237,9 +237,12 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertEqual(try store.allMessages().count, 23)
 
         // WHEN/THEN
-        XCTAssertThrowsError(try store.populate())
+        store.storeMessage(label: "test", level: .info, message: "test", metadata: nil)
+        store.flush()
 
         // THEN nothing is written
+        XCTAssertEqual(try store.allMessages().count, 23)
+        
         let storeCopy = try XCTUnwrap(LoggerStore(storeURL: storeURL))
         XCTAssertEqual(try storeCopy.allMessages().count, 23)
     }
@@ -286,7 +289,7 @@ final class LoggerStoreTests: XCTestCase {
         // WHEN
         LoggerStore.databaseSizeLimit = 5_000 // In reality this is always going to be ignored
         store.sweep()
-        flush(store: store)
+        store.flush()
 
         // THEN
         let copyURL2 = tempDirectoryURL.appendingFilename(UUID().uuidString).appendingPathExtension("pulse")
@@ -336,7 +339,7 @@ final class LoggerStoreTests: XCTestCase {
         // GIVEN
         store.populate2()
         store.storeMessage(label: "with meta", level: .debug, message: "test", metadata: ["hey": .string("this is meta yo")], file: #file, function: #function, line: #line)
-        flush(store: store)
+        store.flush()
 
         let context = store.container.viewContext
         XCTAssertEqual(try context.fetch(LoggerMessageEntity.fetchRequest()).count, 20)
@@ -346,7 +349,12 @@ final class LoggerStoreTests: XCTestCase {
 
         // WHEN
         store.removeAll()
-        flush(store: store)
+
+        let expectation = self.expectation(description: "test")
+        store.backgroundContext.perform {
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 3)
 
         // THEN both message and metadata are removed
         XCTAssertTrue(try context.fetch(LoggerMessageEntity.fetchRequest()).isEmpty)

@@ -39,7 +39,7 @@ final class URLSessionProxyTests: XCTestCase {
         wait(for: [didComplete], timeout: 5)
 
         // RECORD
-        flush(store: store)
+        store.flush()
         let requests = try store.allNetworkRequests()
         let request = try XCTUnwrap(requests.first)
 
@@ -75,7 +75,7 @@ final class URLSessionProxyTests: XCTestCase {
         wait(for: [didComplete], timeout: 5)
 
         // RECORD
-        flush(store: store)
+        store.flush()
         let requests = try store.allNetworkRequests()
         let request = try XCTUnwrap(requests.first)
 
