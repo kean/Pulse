@@ -23,6 +23,8 @@ final class URLSessionProxyTests: XCTestCase {
     }
 
     override func tearDown() {
+        store.destroyStores()
+
         directory.remove()
 
         Experimental.URLSessionProxy.shared.isEnabled = false

@@ -46,12 +46,16 @@ final class LoggerStoreTests: XCTestCase {
         let options: LoggerStore.Options = [.create]
 
         // WHEN
-        var store = try LoggerStore(storeURL: storeURL, options: options)
-        try store.populate()
-        store = try LoggerStore(storeURL: storeURL)
+        let firstStore = try LoggerStore(storeURL: storeURL, options: options)
+        try firstStore.populate()
+        
+        let secondStore = try LoggerStore(storeURL: storeURL)
 
         // THEN data is persisted
-        XCTAssertEqual(try store.allMessages().count, 1)
+        XCTAssertEqual(try secondStore.allMessages().count, 1)
+        
+        firstStore.destroyStores()
+        secondStore.destroyStores()
     }
 
     func testInitCreateStoreIntermediateDirectoryMissing() throws {
@@ -91,6 +95,8 @@ final class LoggerStoreTests: XCTestCase {
         // THEN
         XCTAssertEqual(try store.allMessages().count, 23)
         XCTAssertEqual(try store.allNetworkRequests().count, 4)
+        
+        store.destroyStores()
     }
 
     func testInitWithArchiveURLNoExtension() throws {
@@ -152,6 +158,7 @@ final class LoggerStoreTests: XCTestCase {
         let copy = try LoggerStore(storeURL: copyURL)
         XCTAssertEqual(try copy.allMessages().count, 19)
         XCTAssertEqual(try copy.allNetworkRequests().count, 3)
+        copy.destroyStores()
     }
 
     func testCopyToNonExistingFolder() throws {
@@ -226,6 +233,7 @@ final class LoggerStoreTests: XCTestCase {
         let copy = try LoggerStore(storeURL: copyURL)
         XCTAssertEqual(try copy.allMessages().count, 23)
         XCTAssertEqual(try copy.allNetworkRequests().count, 4)
+        copy.destroyStores()
     }
 
     // MARK: - File (Readonly)
