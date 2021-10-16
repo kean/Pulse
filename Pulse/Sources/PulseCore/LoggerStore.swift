@@ -48,9 +48,6 @@ public final class LoggerStore {
     var makeCurrentDate: () -> Date = { Date() }
     
     var onEvent: ((LoggerStoreEvent) -> Void)?
-    
-    // Marked internal only for testing purposes.
-    let encodingQueue = DispatchQueue(label: "com.github.kean.logger-store")
 
     private var isSaveScheduled = false
     
