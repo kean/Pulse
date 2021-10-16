@@ -26,7 +26,7 @@ extension FileManager {
 extension URL {
     static var temp: URL {
         let url = Files.temporaryDirectory
-            .appendingDirectory("Pulse")
+            .appendingDirectory("com.github.kean.logger")
         Files.createDirectoryIfNeeded(at: url)
         return url
     }
@@ -34,7 +34,7 @@ extension URL {
     static var logs: URL {
         var url = Files.urls(for: .libraryDirectory, in: .userDomainMask).first?
             .appendingDirectory("Logs")
-            .appendingDirectory("Pulse")  ?? URL(fileURLWithPath: "/dev/null")
+            .appendingDirectory("com.github.kean.logger")  ?? URL(fileURLWithPath: "/dev/null")
         if !Files.createDirectoryIfNeeded(at: url) {
             var resourceValues = URLResourceValues()
             resourceValues.isExcludedFromBackup = true
