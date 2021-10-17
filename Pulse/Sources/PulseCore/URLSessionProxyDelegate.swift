@@ -28,7 +28,7 @@ public final class URLSessionProxyDelegate: NSObject, URLSessionTaskDelegate, UR
     // MARK: URLSessionTaskDelegate
 
     public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-        logger.logTask(task, didCompleteWithError: error)
+        logger.logTask(task, didCompleteWithError: error, session: session)
         taskDelegate?.urlSession?(session, task: task, didCompleteWithError: error)
     }
 

@@ -50,7 +50,7 @@ public final class NetworkLogger {
     }
 
     /// Logs the task completion (required).
-    public func logTask(_ task: URLSessionTask, didCompleteWithError error: Error?) {
+    public func logTask(_ task: URLSessionTask, didCompleteWithError error: Error?, session: URLSession? = nil) {
         lock.lock()
         defer { lock.unlock() }
         
@@ -61,7 +61,7 @@ public final class NetworkLogger {
             return // This should never happen
         }
 
-        store.storeRequest(request, response: context.response, error: error, data: context.data, metrics: context.metrics)
+        store.storeRequest(request, response: context.response, error: error, data: context.data, metrics: context.metrics, session: session)
     }
 
     /// Logs the task metrics (optional).

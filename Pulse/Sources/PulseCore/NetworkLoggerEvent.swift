@@ -72,6 +72,26 @@ public struct NetworkLoggerMetrics: Codable {
     }
 }
 
+public struct NetworkLoggerURLSession: Codable {
+    /// A background session identifier
+    public var identifier: String?
+    public var httpAdditionalHeaders: [String: String]?
+    public var allowsCellularAccess: Bool
+    public var timeoutIntervalForRequest: Double // TimeInterval
+    public var timeoutIntervalForResource: Double // TimeInterval
+    public var waitsForConnectivity: Bool
+    
+    public init(urlSession: URLSession) {
+        let configuration = urlSession.configuration
+        self.identifier = configuration.identifier
+        self.httpAdditionalHeaders = configuration.headers
+        self.allowsCellularAccess = configuration.allowsCellularAccess
+        self.timeoutIntervalForRequest = configuration.timeoutIntervalForRequest
+        self.timeoutIntervalForResource = configuration.timeoutIntervalForResource
+        self.waitsForConnectivity = configuration.waitsForConnectivity
+    }
+}
+
 public struct NetworkLoggerTransactionMetrics: Codable {
     public let request: NetworkLoggerRequest?
     public let response: NetworkLoggerResponse?
@@ -182,5 +202,18 @@ public enum NetworkLoggerTaskType: String, Codable {
             assertionFailure("Unknown task type: \(task)")
             self = .dataTask
         }
+    }
+}
+
+private extension URLSessionConfiguration {
+    var headers: [String: String]? {
+        guard let headers = httpAdditionalHeaders else {
+            return nil
+        }
+        var output: [String: String] = [:]
+        for (key, value) in headers {
+            output["\(key)"] = "\(value)"
+        }
+        return output
     }
 }

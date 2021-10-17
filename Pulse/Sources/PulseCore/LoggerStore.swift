@@ -247,11 +247,11 @@ extension LoggerStore {
     ///
     /// - note: If you want to store incremental updates to the task, use
     /// `NetworkLogger` instead.
-    public func storeRequest(_ request: URLRequest, response: URLResponse?, error: Error?, data: Data?, metrics: URLSessionTaskMetrics? = nil) {
-        storeRequest(request, response: response, error: error, data: data, metrics: metrics.map(NetworkLoggerMetrics.init))
+    public func storeRequest(_ request: URLRequest, response: URLResponse?, error: Error?, data: Data?, metrics: URLSessionTaskMetrics? = nil, session: URLSession? = nil) {
+        storeRequest(request, response: response, error: error, data: data, metrics: metrics.map(NetworkLoggerMetrics.init), session: session)
     }
     
-    func storeRequest(_ request: URLRequest, response: URLResponse?, error: Error?, data: Data?, metrics: NetworkLoggerMetrics?) {
+    func storeRequest(_ request: URLRequest, response: URLResponse?, error: Error?, data: Data?, metrics: NetworkLoggerMetrics?, session: URLSession?) {
         let date = makeCurrentDate()
         perform {
             let message = NetworkMessage(
@@ -262,6 +262,7 @@ extension LoggerStore {
                 requestBody: request.httpBody ?? request.httpBodyStreamData(),
                 responseBody: data,
                 metrics: metrics,
+                urlSession: session.map(NetworkLoggerURLSession.init),
                 session: LoggerSession.current.id.uuidString
             )
             self._storeNetworkRequest(message)
@@ -477,9 +478,10 @@ extension LoggerStore {
         public let requestBody: Data?
         public let responseBody: Data?
         public let metrics: NetworkLoggerMetrics?
+        public let urlSession: NetworkLoggerURLSession?
         public let session: String
         
-        public init(createdAt: Date, request: NetworkLoggerRequest, response: NetworkLoggerResponse?, error: NetworkLoggerError?, requestBody: Data?, responseBody: Data?, metrics: NetworkLoggerMetrics?, session: String) {
+        public init(createdAt: Date, request: NetworkLoggerRequest, response: NetworkLoggerResponse?, error: NetworkLoggerError?, requestBody: Data?, responseBody: Data?, metrics: NetworkLoggerMetrics?, urlSession: NetworkLoggerURLSession?, session: String) {
             self.createdAt = createdAt
             self.request = request
             self.response = response
@@ -487,6 +489,7 @@ extension LoggerStore {
             self.requestBody = requestBody
             self.responseBody = responseBody
             self.metrics = metrics
+            self.urlSession = urlSession
             self.session = session
         }
     }

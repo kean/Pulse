@@ -15,106 +15,61 @@ public extension LoggerStore {
         let metadata = NSEntityDescription(name: "LoggerMetadataEntity", class: LoggerMetadataEntity.self)
         let request = NSEntityDescription(name: "LoggerNetworkRequestEntity", class: LoggerNetworkRequestEntity.self)
         let requestDetails = NSEntityDescription(name: "LoggerNetworkRequestDetailsEntity", class: LoggerNetworkRequestDetailsEntity.self)
+        
+        metadata.properties = [
+            NSAttributeDescription(name: "key", type: .stringAttributeType),
+            NSAttributeDescription(name: "value", type: .stringAttributeType)
+        ]
 
-        do {
-            let key = NSAttributeDescription(name: "key", type: .stringAttributeType)
-            let value = NSAttributeDescription(name: "value", type: .stringAttributeType)
-            metadata.properties = [key, value]
-        }
+        message.properties = [
+            NSAttributeDescription(name: "createdAt", type: .dateAttributeType),
+            NSAttributeDescription(name: "level", type: .stringAttributeType),
+            NSAttributeDescription(name: "levelOrder", type: .integer16AttributeType),
+            NSAttributeDescription(name: "label", type: .stringAttributeType),
+            NSAttributeDescription(name: "session", type: .stringAttributeType),
+            NSAttributeDescription(name: "text", type: .stringAttributeType),
+            NSRelationshipDescription.make(name: "metadata", type: .oneToMany, entity: metadata),
+            NSAttributeDescription(name: "file", type: .stringAttributeType),
+            NSAttributeDescription(name: "filename", type: .stringAttributeType),
+            NSAttributeDescription(name: "function", type: .stringAttributeType),
+            NSAttributeDescription(name: "line", type: .integer32AttributeType),
+            NSAttributeDescription(name: "isPinned", type: .booleanAttributeType),
+            NSAttributeDescription(name: "requestState", type: .integer16AttributeType),
+            NSRelationshipDescription.make(name: "request", type: .oneToOne(isOptional: true), entity: request)
+        ]
 
-        do {
-            let createdAt = NSAttributeDescription(name: "createdAt", type: .dateAttributeType)
-            let level = NSAttributeDescription(name: "level", type: .stringAttributeType)
-            let levelOrder = NSAttributeDescription(name: "levelOrder", type: .integer16AttributeType)
-            let label = NSAttributeDescription(name: "label", type: .stringAttributeType)
-            let session = NSAttributeDescription(name: "session", type: .stringAttributeType)
-            let text = NSAttributeDescription(name: "text", type: .stringAttributeType)
-            let metadata = NSRelationshipDescription.make(name: "metadata", type: .oneToMany, entity: metadata)
-            let file = NSAttributeDescription(name: "file", type: .stringAttributeType)
-            let filename = NSAttributeDescription(name: "filename", type: .stringAttributeType)
-            let function = NSAttributeDescription(name: "function", type: .stringAttributeType)
-            let line = NSAttributeDescription(name: "line", type: .integer32AttributeType)
-            let isPinned = NSAttributeDescription(name: "isPinned", type: .booleanAttributeType)
-            let requestState = NSAttributeDescription(name: "requestState", type: .integer16AttributeType)
-            let request = NSRelationshipDescription.make(name: "request", type: .oneToOne(isOptional: true), entity: request)
-            message.properties = [createdAt, level, levelOrder, label, session, text, metadata, file, filename, function, line, isPinned, requestState, request]
-        }
+        requestDetails.properties = [
+            NSAttributeDescription(name: "request", type: .binaryDataAttributeType),
+            NSAttributeDescription(name: "response", type: .binaryDataAttributeType),
+            NSAttributeDescription(name: "error", type: .binaryDataAttributeType),
+            NSAttributeDescription(name: "metrics", type: .binaryDataAttributeType),
+            NSAttributeDescription(name: "urlSession", type: .binaryDataAttributeType),
+            NSAttributeDescription(name: "requestBodySize", type: .integer64AttributeType),
+            NSAttributeDescription(name: "responseBodySize", type: .integer64AttributeType),
+        ]
 
-        do {
-            let request = NSAttributeDescription(name: "request", type: .binaryDataAttributeType)
-            let response = NSAttributeDescription(name: "response", type: .binaryDataAttributeType)
-            let error = NSAttributeDescription(name: "error", type: .binaryDataAttributeType)
-            let metrics = NSAttributeDescription(name: "metrics", type: .binaryDataAttributeType)
-            let requestBodySize = NSAttributeDescription(name: "requestBodySize", type: .integer64AttributeType)
-            let responseBodySize = NSAttributeDescription(name: "responseBodySize", type: .integer64AttributeType)
-            requestDetails.properties = [request, response, error, metrics, requestBodySize, responseBodySize]
-        }
-
-        do {
-            let createdAt = NSAttributeDescription(name: "createdAt", type: .dateAttributeType)
-            let session = NSAttributeDescription(name: "session", type: .stringAttributeType)
-            let url = NSAttributeDescription(name: "url", type: .stringAttributeType)
-            let host = NSAttributeDescription(name: "host", type: .stringAttributeType)
-            let httpMethod = NSAttributeDescription(name: "httpMethod", type: .stringAttributeType)
-            let errorDomain = NSAttributeDescription(name: "errorDomain", type: .stringAttributeType)
-            let errorCode = NSAttributeDescription(name: "errorCode", type: .integer32AttributeType)
-            let statusCode = NSAttributeDescription(name: "statusCode", type: .integer32AttributeType)
-            let duration = NSAttributeDescription(name: "duration", type: .doubleAttributeType)
-            let contentType = NSAttributeDescription(name: "contentType", type: .stringAttributeType)
-            let isCompleted = NSAttributeDescription(name: "isCompleted", type: .booleanAttributeType)
-            let requestState = NSAttributeDescription(name: "requestState", type: .integer16AttributeType)
-            let requestBodyKey = NSAttributeDescription(name: "requestBodyKey", type: .stringAttributeType)
-            let responseBodyKey = NSAttributeDescription(name: "responseBodyKey", type: .stringAttributeType)
-            let details = NSRelationshipDescription.make(name: "details", type: .oneToOne(), entity: requestDetails)
-            let message = NSRelationshipDescription.make(name: "message", type: .oneToOne(), entity: message)
-            request.properties = [createdAt, session, url, host, httpMethod, errorDomain, errorCode, statusCode, duration, contentType, requestBodyKey, responseBodyKey, details, message, isCompleted, requestState]
-        }
+        request.properties = [
+            NSAttributeDescription(name: "createdAt", type: .dateAttributeType),
+            NSAttributeDescription(name: "session", type: .stringAttributeType),
+            NSAttributeDescription(name: "url", type: .stringAttributeType),
+            NSAttributeDescription(name: "host", type: .stringAttributeType),
+            NSAttributeDescription(name: "httpMethod", type: .stringAttributeType),
+            NSAttributeDescription(name: "errorDomain", type: .stringAttributeType),
+            NSAttributeDescription(name: "errorCode", type: .integer32AttributeType),
+            NSAttributeDescription(name: "statusCode", type: .integer32AttributeType),
+            NSAttributeDescription(name: "duration", type: .doubleAttributeType),
+            NSAttributeDescription(name: "contentType", type: .stringAttributeType),
+            NSAttributeDescription(name: "isCompleted", type: .booleanAttributeType),
+            NSAttributeDescription(name: "requestState", type: .integer16AttributeType),
+            NSAttributeDescription(name: "requestBodyKey", type: .stringAttributeType),
+            NSAttributeDescription(name: "responseBodyKey", type: .stringAttributeType),
+            NSRelationshipDescription.make(name: "details", type: .oneToOne(), entity: requestDetails),
+            NSRelationshipDescription.make(name: "message", type: .oneToOne(), entity: message)
+        ]
 
         model.entities = [message, metadata, request, requestDetails]
         return model
     }()
-}
-
-private extension NSEntityDescription {
-    convenience init<T>(name: String, class: T.Type) where T: NSManagedObject {
-        self.init()
-        self.name = name
-        self.managedObjectClassName = T.self.description()
-    }
-}
-
-private extension NSAttributeDescription {
-    convenience init(name: String, type: NSAttributeType) {
-        self.init()
-        self.name = name
-        self.attributeType = type
-    }
-}
-
-private enum RelationshipType {
-    case oneToMany
-    case oneToOne(isOptional: Bool = false)
-}
-
-private extension NSRelationshipDescription {
-    static func make(name: String,
-                     type: RelationshipType,
-                     deleteRule: NSDeleteRule = .cascadeDeleteRule,
-                     entity: NSEntityDescription) -> NSRelationshipDescription {
-        let relationship = NSRelationshipDescription()
-        relationship.name = name
-        relationship.deleteRule = deleteRule
-        relationship.destinationEntity = entity
-        switch type {
-        case .oneToMany:
-            relationship.maxCount = 0
-            relationship.minCount = 0
-        case .oneToOne(let isOptional):
-            relationship.maxCount = 1
-            relationship.minCount = isOptional ? 0 : 1
-        }
-        return relationship
-    }
 }
 
 // MARK: - NSManagedObjects
@@ -177,6 +132,51 @@ public final class LoggerNetworkRequestDetailsEntity: NSManagedObject {
     @NSManaged public var response: Data? // NetworkLoggerResponse
     @NSManaged public var error: Data? // NetworkLoggerError
     @NSManaged public var metrics: Data? // NetworkLoggerMetrics
+    @NSManaged public var urlSession: Data? // NetworkLoggerURLSession
     @NSManaged public var requestBodySize: Int64
     @NSManaged public var responseBodySize: Int64
+}
+
+// MARK: - Helpers
+
+private extension NSEntityDescription {
+    convenience init<T>(name: String, class: T.Type) where T: NSManagedObject {
+        self.init()
+        self.name = name
+        self.managedObjectClassName = T.self.description()
+    }
+}
+
+private extension NSAttributeDescription {
+    convenience init(name: String, type: NSAttributeType) {
+        self.init()
+        self.name = name
+        self.attributeType = type
+    }
+}
+
+private enum RelationshipType {
+    case oneToMany
+    case oneToOne(isOptional: Bool = false)
+}
+
+private extension NSRelationshipDescription {
+    static func make(name: String,
+                     type: RelationshipType,
+                     deleteRule: NSDeleteRule = .cascadeDeleteRule,
+                     entity: NSEntityDescription) -> NSRelationshipDescription {
+        let relationship = NSRelationshipDescription()
+        relationship.name = name
+        relationship.deleteRule = deleteRule
+        relationship.destinationEntity = entity
+        switch type {
+        case .oneToMany:
+            relationship.maxCount = 0
+            relationship.minCount = 0
+        case .oneToOne(let isOptional):
+            relationship.maxCount = 1
+            relationship.minCount = isOptional ? 0 : 1
+        }
+        return relationship
+    }
 }
