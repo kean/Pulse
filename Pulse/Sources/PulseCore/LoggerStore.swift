@@ -185,28 +185,6 @@ public final class LoggerStore {
         self.backgroundContext = LoggerStore.makeBackgroundContext(for: container)
         self.document = .empty
     }
-    
-    private func setNeedsSave() {
-        guard !isSaveScheduled else { return }
-        isSaveScheduled = true
-        DispatchQueue.main.asyncAfter(deadline: .now() + saveInterval) { [weak self] in
-            self?.flush()
-        }
-    }
-    
-    // Internal for testing purposes.
-    func flush(_ completion: (() -> Void)? = nil) {
-        backgroundContext.perform { [weak self] in
-            guard let self = self else { return }
-            if self.isSaveScheduled {
-                try? _ExceptionCatcher.catchException {
-                    try? self.backgroundContext.save()
-                }
-                self.isSaveScheduled = false
-            }
-            completion?()
-        }
-    }
 
     private static func makeContainer(databaseURL: URL, isViewing: Bool) -> NSPersistentContainer {
         let container = NSPersistentContainer(name: databaseURL.lastPathComponent, managedObjectModel: Self.model)
@@ -387,6 +365,28 @@ extension LoggerStore {
         entity.requestBodySize = Int64(summary.requestBody?.count ?? 0)
         entity.responseBodySize = Int64(summary.responseBody?.count ?? 0)
         return entity
+    }
+    
+    private func setNeedsSave() {
+        guard !isSaveScheduled else { return }
+        isSaveScheduled = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + saveInterval) { [weak self] in
+            self?.flush()
+        }
+    }
+    
+    // Internal for testing purposes.
+    func flush(_ completion: (() -> Void)? = nil) {
+        backgroundContext.perform { [weak self] in
+            guard let self = self else { return }
+            if self.isSaveScheduled {
+                try? _ExceptionCatcher.catchException {
+                    try? self.backgroundContext.save()
+                }
+                self.isSaveScheduled = false
+            }
+            completion?()
+        }
     }
     
     // MARK: Managing Pins
