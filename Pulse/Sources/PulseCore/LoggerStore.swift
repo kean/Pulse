@@ -420,7 +420,9 @@ extension LoggerStore {
     private func performChangesOnMain(_ closure: (NSManagedObjectContext) -> Void) {
         precondition(Thread.isMainThread)
         closure(container.viewContext)
-        try? container.viewContext.save()
+        try? _ExceptionCatcher.catchException {
+            try? container.viewContext.save()
+        }
     }
     
     private func perform(_ changes: @escaping () -> Void) {
