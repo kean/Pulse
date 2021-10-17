@@ -56,6 +56,9 @@ struct NetworkInspectorSummaryView: View {
 
         #if os(watchOS)
         KeyValueSectionView(model: model.requestHeaders)
+        if let additional = model.httpAdditionalHeaders {
+            KeyValueSectionView(model: additional)
+        }
         KeyValueSectionView(model: model.responseHeaders)
         #endif
 
@@ -87,6 +90,12 @@ struct NetworkInspectorSummaryView: View {
                 Text("")
             }
 
+            if let additional = model.httpAdditionalHeaders {
+                NavigationLink(destination: NetworkHeadersDetailsView(model: additional), isActive: $model.isRequestAdditionalHeadersRawActive) {
+                    Text("")
+                }.hidden()
+            }
+            
             NavigationLink(destination: NetworkHeadersDetailsView(model: model.responseHeaders), isActive: $model.isResponseHeadearsRawActive) {
                 Text("")
             }
@@ -112,6 +121,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
 
     #if os(watchOS) || os(tvOS)
     @Published var isRequestHeadersRawActive = false
+    @Published var isRequestAdditionalHeadersRawActive = false
     @Published var isResponseHeadearsRawActive = false
     #endif
 
@@ -242,6 +252,22 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
             color: .blue,
             action: ActionViewModel(
                 action: { [unowned self] in isRequestHeadersRawActive = true },
+                title: "View Raw"
+            ),
+            items: items
+        )
+    }
+    
+    var httpAdditionalHeaders: KeyValueSectionViewModel? {
+        guard let headers = summary.session?.httpAdditionalHeaders else {
+            return nil
+        }
+        let items = headers.sorted(by: { $0.key < $1.key })
+        return KeyValueSectionViewModel(
+            title: "Request Headers (Additional)",
+            color: .blue,
+            action: ActionViewModel(
+                action: { [unowned self] in isRequestAdditionalHeadersRawActive = true },
                 title: "View Raw"
             ),
             items: items

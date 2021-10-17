@@ -119,7 +119,7 @@ final class NetworkInspectorHeaderViewModel: ObservableObject {
             title: "Request Headers (Additional)",
             color: .blue,
             action: ActionViewModel(
-                action: { [unowned self] in isRequestRawActive = true },
+                action: { [unowned self] in isRequestAdditionalHeadersRawActive = true },
                 title: "View Raw"
             ),
             items: items
