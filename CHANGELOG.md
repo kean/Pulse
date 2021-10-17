@@ -2,7 +2,7 @@
 
 ## Pulse 0.19.0
 
-*Oct 17, 2021*
+*17 Oct, 2021*
 
 ### PulseCore
 
