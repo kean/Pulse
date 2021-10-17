@@ -102,7 +102,7 @@ private struct SidebarNavigationTab: View {
         HStack {
             Label(item.title, systemImage: item.imageName)
             Spacer()
-            BadgeView(model: .init(title: count.description, color: .accentColor))
+            BadgeView(model: .init(title: count.description, color: .accentColor), cornerRadius: 20)
         }
     }
 }

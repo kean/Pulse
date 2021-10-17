@@ -20,7 +20,7 @@ struct BadgeView: View {
     #endif
     
     #if os(macOS)
-    let cornerRadius: CGFloat = 4
+    var cornerRadius: CGFloat = 4
     #else
     let cornerRadius: CGFloat = 20
     #endif
