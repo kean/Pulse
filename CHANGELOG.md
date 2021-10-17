@@ -1,5 +1,23 @@
 # Pulse 0.x
 
+## Pulse 0.19.0
+
+*Oct 17, 2021*
+
+### PulseCore
+
+- Rename the folder that Pulse creates in Logs/ directory to `com.github.kean.logger`. Previously, it was using `.pulse` as a suffix which was conflicting with the extension used for [Pulse documents‘(https://kean.blog/post/pulse-store)) - [#48](https://github.com/kean/Pulse/pull/48), thanks to [Agapov Alexey](https://github.com/AgapovOne)
+- Add `filename` to `LoggerMessageEntity`
+- Add URLSession configuration information to logged network requests, including [httpAdditionalHeaders](https://developer.apple.com/documentation/foundation/urlsessionconfiguration/1411532-httpadditionalheaders)
+- Coalesce disk writes to reduce disk usage
+- Perform less work on the logger's caller's thread
+- Catch all Objective-C exceptions (just in case)
+- Fix a warning that the logger would write into the console during initialization
+
+### PulseUI
+
+- Display [additional HTTP headers](https://developer.apple.com/documentation/foundation/urlsessionconfiguration/1411532-httpadditionalheaders) - [#41](https://github.com/kean/Pulse/issues/41))
+
 ## Pulse 0.18.0
 
 *4 Oct, 2021*
