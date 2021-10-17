@@ -3,7 +3,7 @@
 
 **Pulse** is a powerful logging system for Apple Platforms. Native. Built with SwiftUI.
 
-Record and inspect network requests and logs right from your iOS app using Pulse Console. Share and view logs in Pulse macOS app. Logs are recorded locally and never leave your device. Learn more at [**kean.blog/pulse**](https://kean.blog/pulse/home) 🔗.
+Record and inspect `URLSession` network requests and logs right from your iOS app using Pulse Console. Share and view logs in Pulse macOS app. Logs are recorded locally and never leave your device. Learn more at [**kean.blog/pulse**](https://kean.blog/pulse/home) 🔗.
 
 <br/>
 <br/>
