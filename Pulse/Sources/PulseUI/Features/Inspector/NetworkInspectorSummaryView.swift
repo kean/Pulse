@@ -133,7 +133,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
         return isSuccess ? .green : .red
     }
 
-    var summaryModel: KeyValueSectionViewModel {
+    lazy var summaryModel: KeyValueSectionViewModel = {
         KeyValueSectionViewModel(
             title: "Summary",
             color: tintColor,
@@ -142,9 +142,9 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
                 ("Method", summary.request?.httpMethod ?? "–"),
                 ("Status Code", summary.response?.statusCode.map(StatusCodeFormatter.string) ?? "–")
             ])
-    }
+    }()
 
-    var errorModel: KeyValueSectionViewModel? {
+    lazy var errorModel: KeyValueSectionViewModel? = {
         guard let error = summary.error else { return nil }
         return KeyValueSectionViewModel(
             title: "Error",
@@ -158,9 +158,9 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
                 ("Code", descriptionForError(domain: error.domain, code: error.code)),
                 ("Message", error.localizedDescription)
             ])
-    }
+    }()
 
-    var requestBodySection: KeyValueSectionViewModel? {
+    lazy var requestBodySection: KeyValueSectionViewModel? = {
         guard summary.requestBodyKey != nil, summary.requestBodySize > 0 else {
             return nil
         }
@@ -177,9 +177,9 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
                 ("Size", ByteCountFormatter.string(fromByteCount: summary.requestBodySize, countStyle: .file))
             ]
         )
-    }
+    }()
 
-    var responseBodySection: KeyValueSectionViewModel? {
+    lazy var responseBodySection: KeyValueSectionViewModel? = {
         guard summary.responseBodyKey != nil, summary.responseBodySize > 0 else {
             return nil
         }
@@ -196,32 +196,32 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
                 ("Size", ByteCountFormatter.string(fromByteCount: summary.responseBodySize, countStyle: .file))
             ]
         )
-    }
+    }()
 
-    var requestBodyViewModel: NetworkInspectorResponseViewModel {
+    lazy var requestBodyViewModel: NetworkInspectorResponseViewModel = {
         let summary = self.summary
         return NetworkInspectorResponseViewModel(title: "Request", data: summary.requestBody ?? Data())
-    }
+    }()
 
-    var responseBodyViewModel: NetworkInspectorResponseViewModel {
+    lazy var responseBodyViewModel: NetworkInspectorResponseViewModel = {
         let summary = self.summary
         return NetworkInspectorResponseViewModel(title: "Response", data: summary.responseBody ?? Data())
-    }
+    }()
 
-    var transferModel: NetworkInspectorTransferInfoViewModel? {
+    lazy var transferModel: NetworkInspectorTransferInfoViewModel? = {
         summary.metrics.flatMap(NetworkInspectorTransferInfoViewModel.init)
-    }
+    }()
 
-    var timingDetailsModel: KeyValueSectionViewModel? {
+    lazy var timingDetailsModel: KeyValueSectionViewModel? = {
         guard let metrics = summary.metrics else { return nil }
         return KeyValueSectionViewModel(title: "Timing", color: .gray, items: [
             ("Start Date", dateFormatter.string(from: metrics.taskInterval.start)),
             ("Duration", DurationFormatter.string(from: metrics.taskInterval.duration)),
             ("Redirect Count", metrics.redirectCount.description),
         ])
-    }
+    }()
 
-    var parametersModel: KeyValueSectionViewModel? {
+    lazy var parametersModel: KeyValueSectionViewModel? = {
         guard let request = summary.request else { return nil }
         return KeyValueSectionViewModel(title: "Parameters", color: .gray, items: [
             ("Cache Policy", URLRequest.CachePolicy(rawValue: request.cachePolicy).map { $0.description }),
@@ -232,7 +232,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
             ("HTTP Should Handle Cookies", request.httpShouldHandleCookies.description),
             ("HTTP Should Use Pipelining", request.httpShouldUsePipelining.description)
         ])
-    }
+    }()
 
     #if os(watchOS) || os(tvOS)
     var requestHeaders: KeyValueSectionViewModel {

@@ -12,9 +12,11 @@ struct NetworkInspectorHeadersView: View {
 
     var body: some View {
         ScrollView {
-            VStack {
+            VStack(spacing: 16) {
                 KeyValueSectionView(model: model.requestHeaders)
-                Spacer(minLength: 16)
+                if let additional = model.httpAdditionalHeaders {
+                    KeyValueSectionView(model: additional)
+                }
                 KeyValueSectionView(model: model.responseHeaders)
                 Spacer()
             }.padding()
@@ -22,6 +24,12 @@ struct NetworkInspectorHeadersView: View {
             NavigationLink(destination: NetworkHeadersDetailsView(model: model.requestHeaders), isActive: $model.isRequestRawActive) {
                 Text("")
             }.hidden()
+            
+            if let additional = model.httpAdditionalHeaders {
+                NavigationLink(destination: NetworkHeadersDetailsView(model: additional), isActive: $model.isRequestAdditionalHeadersRawActive) {
+                    Text("")
+                }.hidden()
+            }
 
             NavigationLink(destination: NetworkHeadersDetailsView(model: model.responseHeaders), isActive: $model.isResponseRawActive) {
                 Text("")
@@ -75,44 +83,22 @@ struct NetworkHeadersDetailsView: View {
     }
 }
 
-// MARK: - Preview
-
-#if DEBUG
-@available(iOS 13.0, tvOS 14.0, watchOS 6, *)
-struct NetworkInspectorHeadersView_Previews: PreviewProvider {
-    static var previews: some View {
-        Group {
-            NetworkInspectorHeadersView(model: mockModel)
-
-            NetworkInspectorHeadersView(model: NetworkInspectorHeaderViewModel(request: nil, response: nil))
-        }
-    }
-}
-
-@available(iOS 13.0, tvOS 14.0, watchOS 6, *)
-private let mockModel = NetworkInspectorHeaderViewModel(
-    request: NetworkLoggerRequest(urlRequest: MockDataTask.login.request),
-    response: NetworkLoggerResponse(urlResponse:  MockDataTask.login.response)
-)
-#endif
-
 // MARK: - ViewModel
 
 @available(iOS 13.0, tvOS 14.0, watchOS 6, *)
 final class NetworkInspectorHeaderViewModel: ObservableObject {
-    let request: NetworkLoggerRequest?
-    let response: NetworkLoggerResponse?
+    let summary: NetworkLoggerSummary
 
-    init(request: NetworkLoggerRequest?, response: NetworkLoggerResponse?) {
-        self.request = request
-        self.response = response
+    init(summary: NetworkLoggerSummary) {
+        self.summary = summary
     }
 
     @Published var isRequestRawActive = false
+    @Published var isRequestAdditionalHeadersRawActive = false
     @Published var isResponseRawActive = false
 
     var requestHeaders: KeyValueSectionViewModel {
-        let items = (request?.headers ?? [:]).sorted(by: { $0.key < $1.key })
+        let items = (summary.request?.headers ?? [:]).sorted(by: { $0.key < $1.key })
         return KeyValueSectionViewModel(
             title: "Request Headers",
             color: .blue,
@@ -123,9 +109,25 @@ final class NetworkInspectorHeaderViewModel: ObservableObject {
             items: items
         )
     }
-
+    
+    var httpAdditionalHeaders: KeyValueSectionViewModel? {
+        guard let headers = summary.session?.httpAdditionalHeaders else {
+            return nil
+        }
+        let items = headers.sorted(by: { $0.key < $1.key })
+        return KeyValueSectionViewModel(
+            title: "Request Headers (Additional)",
+            color: .blue,
+            action: ActionViewModel(
+                action: { [unowned self] in isRequestRawActive = true },
+                title: "View Raw"
+            ),
+            items: items
+        )
+    }
+    
     var responseHeaders: KeyValueSectionViewModel {
-        let items = (response?.headers ?? [:]).sorted(by: { $0.key < $1.key })
+        let items = (summary.response?.headers ?? [:]).sorted(by: { $0.key < $1.key })
         return KeyValueSectionViewModel(
             title: "Response Headers",
             color: .indigo,

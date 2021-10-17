@@ -363,6 +363,7 @@ extension LoggerStore {
         entity.response = try? encoder.encode(summary.response)
         entity.error = try? encoder.encode(summary.error)
         entity.metrics = try? encoder.encode(summary.metrics)
+        entity.urlSession =  try? encoder.encode(summary.urlSession)
         entity.requestBodySize = Int64(summary.requestBody?.count ?? 0)
         entity.responseBodySize = Int64(summary.responseBody?.count ?? 0)
         return entity

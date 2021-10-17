@@ -222,10 +222,7 @@ final class NetworkInspectorViewModel: ObservableObject {
     }
 
     func makeHeadersModel() -> NetworkInspectorHeaderViewModel {
-        NetworkInspectorHeaderViewModel(
-            request: summary.request,
-            response: summary.response
-        )
+        NetworkInspectorHeaderViewModel(summary: summary)
     }
 
     func makeRequestBodyViewModel() -> NetworkInspectorResponseViewModel? {

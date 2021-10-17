@@ -28,7 +28,6 @@ private let mockLoginRequest: URLRequest = {
 
     request.setValue("gzip", forHTTPHeaderField: "Accept-Encoding")
     request.setValue("github.com", forHTTPHeaderField: "Host")
-    request.setValue("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.2 Safari/605.1.15", forHTTPHeaderField: "User-Agent")
     request.setValue("application/json", forHTTPHeaderField: "Content-Type")
     request.setValue("no-cache", forHTTPHeaderField: "Cache-Control")
     request.setValue("en-us", forHTTPHeaderField: "Accept-Language")
@@ -85,7 +84,6 @@ private let mockMetrics = try! JSONDecoder().decode(NetworkLoggerMetrics.self, f
         "allowsConstrainedNetworkAccess": true,
         "httpShouldHandleCookies": true,
         "headers": {
-          "User-Agent": "Pulse%20iOS/1 CFNetwork/1220.1 Darwin/20.2.0",
           "Accept-Encoding": "gzip, deflate, br",
           "Host": "developer.apple.com",
           "Accept-Language": "en-us",
@@ -151,7 +149,6 @@ private let mockProfileFailureRequest: URLRequest = {
 
     request.setValue("gzip", forHTTPHeaderField: "Accept-Encoding")
     request.setValue("github.com", forHTTPHeaderField: "Host")
-    request.setValue("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.2 Safari/605.1.15", forHTTPHeaderField: "User-Agent")
     request.setValue("application/json", forHTTPHeaderField: "Content-Type")
     request.setValue("no-cache", forHTTPHeaderField: "Cache-Control")
     request.setValue("en-us", forHTTPHeaderField: "Accept-Language")
@@ -183,7 +180,6 @@ private let mockOctocatRequest: URLRequest = {
 
     request.setValue("gzip", forHTTPHeaderField: "Accept-Encoding")
     request.setValue("github.com", forHTTPHeaderField: "Host")
-    request.setValue("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.2 Safari/605.1.15", forHTTPHeaderField: "User-Agent")
     request.setValue("image/any", forHTTPHeaderField: "Content-Type")
     request.setValue("en-us", forHTTPHeaderField: "Accept-Language")
 
@@ -278,7 +274,7 @@ let mockStatsFailureRequest: URLRequest = {
 
     request.setValue("gzip", forHTTPHeaderField: "Accept-Encoding")
     request.setValue("github.com", forHTTPHeaderField: "Host")
-    request.setValue("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.2 Safari/605.1.15", forHTTPHeaderField: "User-Agent")
+
     request.setValue("application/json", forHTTPHeaderField: "Content-Type")
     request.setValue("no-cache", forHTTPHeaderField: "Cache-Control")
     request.setValue("en-us", forHTTPHeaderField: "Accept-Language")

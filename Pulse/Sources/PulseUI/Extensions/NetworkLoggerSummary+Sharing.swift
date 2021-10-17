@@ -24,7 +24,7 @@ extension NetworkLoggerSummary {
         renderer.add(summary.summaryModel, isSecondaryTitle: false)
         renderer.add(summary.errorModel, isSecondaryTitle: false)
 
-        let headers = NetworkInspectorHeaderViewModel(request: request, response: response)
+        let headers = NetworkInspectorHeaderViewModel(summary: self)
 
         renderer.add(title: "Request")
         renderer.add(headers.requestHeaders)
