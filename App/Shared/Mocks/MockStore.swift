@@ -119,5 +119,7 @@ private func populateStore(_ store: LoggerStore) {
 
     // Wait until everything is stored
     store.container.viewContext.performAndWait {}
-    store.backgroundContext.performAndWait {}
+    store.backgroundContext.performAndWait {
+        try? store.backgroundContext.save()
+    }
 }
