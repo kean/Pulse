@@ -6,7 +6,7 @@
 
 ### PulseCore
 
-- Rename the folder that Pulse creates in Logs/ directory to `com.github.kean.logger`. Previously, it was using `.pulse` as a suffix which was conflicting with the extension used for [Pulse documents‘(https://kean.blog/post/pulse-store)) - [#48](https://github.com/kean/Pulse/pull/48), thanks to [Agapov Alexey](https://github.com/AgapovOne)
+- Rename the folder that Pulse creates in Logs/ directory to `com.github.kean.logger`. Previously, it was using `.pulse` as a suffix which was conflicting with the extension used for [Pulse documents](https://kean.blog/post/pulse-store) - [#48](https://github.com/kean/Pulse/pull/48), thanks to [Agapov Alexey](https://github.com/AgapovOne)
 - Add `filename` to `LoggerMessageEntity`
 - Add URLSession configuration information to logged network requests, including [httpAdditionalHeaders](https://developer.apple.com/documentation/foundation/urlsessionconfiguration/1411532-httpadditionalheaders)
 - Coalesce disk writes to reduce disk usage
@@ -16,7 +16,7 @@
 
 ### PulseUI
 
-- Display [additional HTTP headers](https://developer.apple.com/documentation/foundation/urlsessionconfiguration/1411532-httpadditionalheaders) - [#41](https://github.com/kean/Pulse/issues/41))
+- [All Platforms] Display [additional HTTP headers](https://developer.apple.com/documentation/foundation/urlsessionconfiguration/1411532-httpadditionalheaders) - [#41](https://github.com/kean/Pulse/issues/41)
 
 ## Pulse 0.18.0
 
