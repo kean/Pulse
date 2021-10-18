@@ -1,5 +1,11 @@
 # Pulse 0.x
 
+## Pulse 0.19.2
+
+*Oct 18, 2021*
+
+- Fix an issue with a URL hardcoded for testing on the summary page
+
 ## Pulse 0.19.1
 
 *18 Oct, 2021*
