@@ -1,5 +1,11 @@
 # Pulse 0.x
 
+## Pulse 0.19.1
+
+*18 Oct, 2021*
+
+- Temporarily remove `PulseInternal`
+
 ## Pulse 0.19.0
 
 *17 Oct, 2021*

@@ -4,7 +4,6 @@
 
 import Foundation
 import CoreData
-import PulseInternal
 
 /// `LoggerStore` persistently stores all of the logged messages, network
 /// requests, and blobs. Use `.default` store to log messages.
@@ -382,9 +381,7 @@ extension LoggerStore {
         backgroundContext.perform { [weak self] in
             guard let self = self else { return }
             if self.isSaveScheduled {
-                try? _ExceptionCatcher.catchException {
-                    try? self.backgroundContext.save()
-                }
+                try? self.backgroundContext.save()
                 self.isSaveScheduled = false
             }
             completion?()
@@ -420,9 +417,7 @@ extension LoggerStore {
     private func performChangesOnMain(_ closure: (NSManagedObjectContext) -> Void) {
         precondition(Thread.isMainThread)
         closure(container.viewContext)
-        try? _ExceptionCatcher.catchException {
-            try? container.viewContext.save()
-        }
+        try? container.viewContext.save()
     }
     
     private func perform(_ changes: @escaping () -> Void) {
