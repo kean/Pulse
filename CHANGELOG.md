@@ -1,5 +1,11 @@
 # Pulse 0.x
 
+## Pulse 0.19.3
+
+*Oct 19, 2021*
+
+- Remove unused `PulseInternal` target - [#51](https://github.com/kean/Pulse/pull/51), thanks to [Agapov Alexey](https://github.com/AgapovOne)
+
 ## Pulse 0.19.2
 
 *Oct 18, 2021*
