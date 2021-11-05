@@ -9,7 +9,7 @@ import PulseCore
 import CoreData
 
 final class ManagedObjectTextSearch<T: NSManagedObject> {
-    private(set) var objects: [T] = []
+    private(set) var objects: AnyCollection<T> = AnyCollection([])
     private var searchIndex: [(NSManagedObjectID, String)]?
     private let closure: (T) -> String
     private let lock = NSLock()
@@ -18,8 +18,8 @@ final class ManagedObjectTextSearch<T: NSManagedObject> {
         self.closure = closure
     }
         
-    func replace(_ objects: [T]) {
-        self.objects = objects
+    func replace<S: Collection>(_ objects: S) where S.Element == T {
+        self.objects = AnyCollection(objects)
         self.searchIndex = nil
     }
 
