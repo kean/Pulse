@@ -1,5 +1,11 @@
 # Pulse 0.x
 
+## Pulse 0.19.4
+
+*Nov 5, 2021*
+
+- Fix compilation on Xcode 13.2 beta - [#54](https://github.com/kean/Pulse/issues/54)
+
 ## Pulse 0.19.3
 
 *Oct 19, 2021*
