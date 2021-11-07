@@ -240,7 +240,14 @@ final class DopeTextViewModel: ObservableObject {
     }
 
     init(string: NSAttributedString) {
-        self.text = string
+        let attributedString = NSMutableAttributedString(attributedString: string)
+        attributedString.enumerateAttribute(.foregroundColor, in: NSMakeRange(0, attributedString.length), options: []) { value, range, _ in
+            // If foregroundColor is not set, it will be black. Set it to the label color.
+            if value == nil {
+                attributedString.addAttributes([.foregroundColor: UXColor.label], range: range)
+            }
+        }
+        self.text = attributedString
         self.string = string.string
 
         Publishers.CombineLatest($searchTerm, $options).sink { [weak self] in
