@@ -5,6 +5,8 @@
 import SwiftUI
 import PulseCore
 
+
+
 // MARK: - View
 @available(iOS 13.0, tvOS 14.0, watchOS 6, *)
 struct NetworkInspectorHeadersView: View {
@@ -79,6 +81,9 @@ struct NetworkHeadersDetailsView: View {
             output.append(item.0, [.font: UXFont.monospacedSystemFont(ofSize: FontSize.body, weight: .bold)])
             output.append(": \(item.1 ?? "–")\n", [.font: UXFont.monospacedSystemFont(ofSize: FontSize.body, weight: .regular)])
         }
+#if os(iOS) || os(macOS)
+        output.addAttributes([.foregroundColor: UXColor.label])
+#endif
         return output
     }
 }
