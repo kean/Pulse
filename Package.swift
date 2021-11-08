@@ -19,9 +19,9 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-log.git", from: "1.2.0")
     ],
     targets: [
-        .target(name: "PulseUI", dependencies: ["PulseCore"], path: "Pulse/Sources/PulseUI"),
-        .target(name: "Pulse", dependencies: [.product(name: "Logging", package: "swift-log"), "PulseCore"], path: "Pulse/Sources/Pulse"),
-        .target(name: "PulseCore", dependencies: [], path: "Pulse/Sources/PulseCore"),
-        .testTarget(name: "PulseTests", dependencies: ["Pulse"], path: "Pulse/Tests/PulseTests", resources: [.process("Resources")])
+        .target(name: "PulseUI", dependencies: ["PulseCore"]),
+        .target(name: "Pulse", dependencies: [.product(name: "Logging", package: "swift-log"), "PulseCore"]),
+        .target(name: "PulseCore"),
+        .testTarget(name: "PulseTests", dependencies: ["Pulse"], resources: [.process("Resources")])
     ]
 )
