@@ -1,5 +1,12 @@
 # Pulse 0.x
 
+## Pulse 0.19.5
+
+*Nov 8, 2021*
+
+- Fix raw HTTP headers not visible in dark mode
+- Move apps and demo projects to a [separate repo](https://github.com/kean/PulseApps), so the download is now a bit lighter
+
 ## Pulse 0.19.4
 
 *Nov 5, 2021*
