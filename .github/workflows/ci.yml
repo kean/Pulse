@@ -31,7 +31,7 @@ jobs:
         run: |
           python3 -m pip install --upgrade pip
           python3 -m pip install codespell
-          codespell --ignore-words-list="hart,inout,msdos,sur" --skip="./Pulse/.build/*"
+          codespell --ignore-words-list="hart,inout,msdos,sur" --skip="./.build/*"
 #  tvos-latest:
 #    name: Unit Tests (tvOS 14.2, Xcode 12.5.1)
 #    runs-on: macOS-11
