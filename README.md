@@ -13,6 +13,7 @@ Record and inspect logs and `URLSession` network requests right from your iOS ap
 ![promo-4-2](https://user-images.githubusercontent.com/1567433/111088123-0d052c80-84fc-11eb-921c-af8de5c8032b.png)
 
 <br/>
+ 
 
 ![promo-5](https://user-images.githubusercontent.com/1567433/113081170-2ff33a00-91a6-11eb-9e9d-5d1cd433f152.png)
 
@@ -30,15 +31,20 @@ Record and inspect logs and `URLSession` network requests right from your iOS ap
 
 <br/>
 
-<img width="2100" alt="08" src="https://user-images.githubusercontent.com/1567433/137036765-4aa2df39-8b4d-4df7-9697-0c66e5176f4e.png">
-
-<br/>
-
 ![promo-6](https://user-images.githubusercontent.com/1567433/112777967-706d7f00-9011-11eb-82a8-12b3b29097cc.png)
 
 <br/>
 
 ![promo-7](https://user-images.githubusercontent.com/1567433/112777285-d1945300-900f-11eb-8aaa-45d6ed392f3d.png)
+
+<br/>
+
+
+## Pulse Pro
+
+[**Pulse Pro**](https://kean.blog/pulse/guides/pulse-pro) is an advanced macOS providing ultimate logging experience.
+
+![promo-5 2](https://user-images.githubusercontent.com/1567433/140942609-1914c717-d644-4bb2-9a48-a82a33eea745.png)
 
 <br/>
 
