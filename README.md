@@ -42,7 +42,7 @@ Record and inspect logs and `URLSession` network requests right from your iOS ap
 
 ## Pulse Pro
 
-[**Pulse Pro**](https://kean.blog/pulse/guides/pulse-pro) is an advanced macOS providing ultimate logging experience.
+[**Pulse Pro**](https://kean.blog/pulse/guides/pulse-pro) is an advanced macOS app providing ultimate logging experience.
 
 ![promo-5 2](https://user-images.githubusercontent.com/1567433/140942609-1914c717-d644-4bb2-9a48-a82a33eea745.png)
 
