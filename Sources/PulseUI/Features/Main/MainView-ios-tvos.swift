@@ -14,8 +14,10 @@ public struct MainView: View {
     let model: MainViewModel
 
     /// - parameter onDismiss: pass onDismiss to add a close button.
-    public init(store: LoggerStore = .default, onDismiss: (() -> Void)? = nil) {
-        self.model = MainViewModel(store: store, onDismiss: onDismiss)
+    public init(store: LoggerStore = .default,
+                configuration: ConsoleConfiguration = .default,
+                onDismiss: (() -> Void)? = nil) {
+        self.model = MainViewModel(store: store, configuration: configuration, onDismiss: onDismiss)
     }
 
     public var body: some View {

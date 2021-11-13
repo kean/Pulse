@@ -21,16 +21,20 @@ final class MainViewModel: ObservableObject {
     #if os(iOS) || os(tvOS)
     let settingsModel: SettingsViewModel
     #endif
+    
+    let configuration: ConsoleConfiguration
 
-    init(store: LoggerStore, onDismiss: (() -> Void)?) {
-        self.consoleModel = ConsoleViewModel(store: store)
+    init(store: LoggerStore, configuration: ConsoleConfiguration = .default, onDismiss: (() -> Void)?) {
+        self.configuration = configuration
+        
+        self.consoleModel = ConsoleViewModel(store: store, configuration: configuration)
         self.consoleModel.onDismiss = onDismiss
 
-        self.networkModel = ConsoleViewModel(store: store, contentType: .network)
+        self.networkModel = ConsoleViewModel(store: store, configuration: configuration, contentType: .network)
         self.networkModel.onDismiss = onDismiss
 
         #if os(iOS) || os(macOS)
-        self.pinsModel = ConsoleViewModel(store: store, contentType: .pins)
+        self.pinsModel = ConsoleViewModel(store: store, configuration: configuration, contentType: .pins)
         self.pinsModel.onDismiss = onDismiss
         #endif
 
@@ -38,7 +42,7 @@ final class MainViewModel: ObservableObject {
         self.settingsModel = SettingsViewModel(store: store)
         self.settingsModel.onDismiss = onDismiss
         #endif
-
+        
         #if os(iOS)
         self.items = [.console, .network, .pins, .settings]
         #elseif os(tvOS)

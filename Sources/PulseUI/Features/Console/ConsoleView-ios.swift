@@ -16,7 +16,8 @@ public struct ConsoleView: View {
     @Environment(\.colorScheme) private var colorScheme: ColorScheme
     @State private var shared: ShareItems?
 
-    public init(store: LoggerStore = .default) {
+    public init(store: LoggerStore = .default,
+                configuration: ConsoleConfiguration = .default) {
         self.model = ConsoleViewModel(store: store)
     }
 
@@ -31,11 +32,11 @@ public struct ConsoleView: View {
                 leading: model.onDismiss.map {
                     Button(action: $0) { Image(systemName: "xmark") }
                 },
-                trailing: shareButton
+                trailing: actionButton
             )
             .sheet(item: $shared) { ShareView($0).id($0.id) }
     }
-
+    
     private var contentView: some View {
         List {
             QuickFiltersView(model: model)
@@ -44,15 +45,17 @@ public struct ConsoleView: View {
     }
 
     @ViewBuilder
-    private var shareButton: some View {
+    private var actionButton: some View {
         if #available(iOS 14.0, *) {
             Menu(content: {
-                Section {
-                    Button(action: { shared = model.share(as: .store) }) {
-                        Label("Share as Pulse Document", systemImage: "square.and.arrow.up")
-                    }
-                    Button(action: { shared = model.share(as: .text) }) {
-                        Label("Share as Text File", systemImage: "square.and.arrow.up")
+                if model.configuration.isStoreSharingEnabled {
+                    Section {
+                        Button(action: { shared = model.share(as: .store) }) {
+                            Label("Share as Pulse Document", systemImage: "square.and.arrow.up")
+                        }
+                        Button(action: { shared = model.share(as: .text) }) {
+                            Label("Share as Text File", systemImage: "square.and.arrow.up")
+                        }
                     }
                 }
                 Section {
@@ -64,7 +67,9 @@ public struct ConsoleView: View {
                 Image(systemName: "ellipsis.circle")
             })
         } else {
-            ShareButton { shared = model.share(as: .store) }
+            if model.configuration.isStoreSharingEnabled {
+                ShareButton { shared = model.share(as: .store) }
+            }
         }
     }
 }

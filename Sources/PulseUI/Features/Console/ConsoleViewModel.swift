@@ -9,7 +9,8 @@ import SwiftUI
 
 @available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
 final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, ObservableObject {
-
+    let configuration: ConsoleConfiguration
+    
     @Published private(set) var messages: [LoggerMessageEntity] {
         didSet {
             #if os(macOS)
@@ -65,8 +66,9 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     private var latestSessionId: String?
     private var cancellables = [AnyCancellable]()
 
-    init(store: LoggerStore, contentType: ConsoleContentType = .all) {
+    init(store: LoggerStore, configuration: ConsoleConfiguration = .default, contentType: ConsoleContentType = .all) {
         self.store = store
+        self.configuration = configuration
         self.contentType = contentType
 
         let request = NSFetchRequest<LoggerMessageEntity>(entityName: "\(LoggerMessageEntity.self)")
