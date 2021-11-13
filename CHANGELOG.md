@@ -1,5 +1,14 @@
 # Pulse 0.x
 
+## Pulse 0.19.5
+
+*Nov 13, 2021*
+
+- Fix [#58](https://github.com/kean/Pulse/issues/58): status code not shown when using `Alamofire.EventMonitor`
+- Request headers now display cookies
+- Add a way to filter out sensible information using `NetworkLogger` (see `willLogTask`)
+- Add an option to disable sharing
+
 ## Pulse 0.19.4
 
 *Nov 5, 2021*
