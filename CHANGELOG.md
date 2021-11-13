@@ -1,6 +1,6 @@
 # Pulse 0.x
 
-## Pulse 0.19.5
+## Pulse 0.20.0
 
 *Nov 13, 2021*
 
