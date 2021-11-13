@@ -16,9 +16,6 @@ struct NetworkInspectorHeadersView: View {
         ScrollView {
             VStack(spacing: 16) {
                 KeyValueSectionView(model: model.requestHeaders)
-                if let additional = model.httpAdditionalHeaders {
-                    KeyValueSectionView(model: additional)
-                }
                 KeyValueSectionView(model: model.responseHeaders)
                 Spacer()
             }.padding()
@@ -26,12 +23,6 @@ struct NetworkInspectorHeadersView: View {
             NavigationLink(destination: NetworkHeadersDetailsView(model: model.requestHeaders), isActive: $model.isRequestRawActive) {
                 Text("")
             }.hidden()
-            
-            if let additional = model.httpAdditionalHeaders {
-                NavigationLink(destination: NetworkHeadersDetailsView(model: additional), isActive: $model.isRequestAdditionalHeadersRawActive) {
-                    Text("")
-                }.hidden()
-            }
 
             NavigationLink(destination: NetworkHeadersDetailsView(model: model.responseHeaders), isActive: $model.isResponseRawActive) {
                 Text("")
@@ -99,7 +90,6 @@ final class NetworkInspectorHeaderViewModel: ObservableObject {
     }
 
     @Published var isRequestRawActive = false
-    @Published var isRequestAdditionalHeadersRawActive = false
     @Published var isResponseRawActive = false
 
     var requestHeaders: KeyValueSectionViewModel {
@@ -109,22 +99,6 @@ final class NetworkInspectorHeaderViewModel: ObservableObject {
             color: .blue,
             action: ActionViewModel(
                 action: { [unowned self] in isRequestRawActive = true },
-                title: "View Raw"
-            ),
-            items: items
-        )
-    }
-    
-    var httpAdditionalHeaders: KeyValueSectionViewModel? {
-        guard let headers = summary.session?.httpAdditionalHeaders else {
-            return nil
-        }
-        let items = headers.sorted(by: { $0.key < $1.key })
-        return KeyValueSectionViewModel(
-            title: "Request Headers (Additional)",
-            color: .blue,
-            action: ActionViewModel(
-                action: { [unowned self] in isRequestAdditionalHeadersRawActive = true },
                 title: "View Raw"
             ),
             items: items

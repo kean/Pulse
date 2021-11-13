@@ -57,7 +57,7 @@ public final class NetworkLogger {
         let context = self.context(for: task)
         tasks[ObjectIdentifier(task)] = nil
         
-        guard let request = context.request else {
+        guard let request = task.currentRequest ?? context.request else {
             return // This should never happen
         }
         let response = context.response ?? task.response
