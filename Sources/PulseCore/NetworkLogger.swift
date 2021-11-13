@@ -60,8 +60,9 @@ public final class NetworkLogger {
         guard let request = context.request else {
             return // This should never happen
         }
+        let response = context.response ?? task.response
 
-        store.storeRequest(request, response: context.response, error: error, data: context.data, metrics: context.metrics, session: session)
+        store.storeRequest(request, response: response, error: error, data: context.data, metrics: context.metrics, session: session)
     }
 
     /// Logs the task metrics (optional).
