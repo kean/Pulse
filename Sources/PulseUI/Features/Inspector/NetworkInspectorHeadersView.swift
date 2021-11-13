@@ -5,8 +5,6 @@
 import SwiftUI
 import PulseCore
 
-
-
 // MARK: - View
 @available(iOS 13.0, tvOS 14.0, watchOS 6, *)
 struct NetworkInspectorHeadersView: View {

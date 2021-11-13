@@ -7,9 +7,16 @@ import Foundation
 public final class NetworkLogger {
     private let store: LoggerStore
     private let lock = NSLock()
+    
+    private let willLogTask: (LoggedNetworkTask) -> LoggedNetworkTask?
 
-    public init(store: LoggerStore = .default) {
+    /// - parameter willLogTask: Allows you to filter out sensitive information
+    /// or disable logging of certain requests completely. By default, returns
+    /// the suggested task without modification.
+    public init(store: LoggerStore = .default,
+                willLogTask: @escaping (LoggedNetworkTask) -> LoggedNetworkTask? = { $0 }) {
         self.store = store
+        self.willLogTask = willLogTask
     }
 
     // MARK: Logging
@@ -61,8 +68,15 @@ public final class NetworkLogger {
             return // This should never happen
         }
         let response = context.response ?? task.response
-
-        store.storeRequest(request, response: response, error: error, data: context.data, metrics: context.metrics, session: session)
+        
+        log(LoggedNetworkTask(task: task, session: session, request: request, response: response, data: context.data, error: error, metrics: context.metrics))
+    }
+    
+    private func log(_ task: LoggedNetworkTask) {
+        guard let task = willLogTask(task) else {
+            return
+        }
+        store.storeRequest(task.request, response: task.response, error: task.error, data: task.data, metrics: task.metrics, session: task.session)
     }
 
     /// Logs the task metrics (optional).
@@ -79,6 +93,18 @@ public final class NetworkLogger {
         defer { lock.unlock() }
 
         context(for: task).metrics = metrics
+    }
+    
+    // MARK: - Filter Out
+    
+    public struct LoggedNetworkTask {
+        public var task: URLSessionTask
+        public var session: URLSession?
+        public var request: URLRequest
+        public var response: URLResponse?
+        public var data: Data?
+        public var error: Error?
+        public var metrics: NetworkLoggerMetrics?
     }
         
     // MARK: - Private
