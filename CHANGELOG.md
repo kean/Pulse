@@ -1,5 +1,11 @@
 # Pulse 0.x
 
+## Pulse 0.20.1
+
+*Dec 23, 2021*
+
+- Add a default `delegate` value to `URLSessionProxyDelegate`
+
 ## Pulse 0.20.0
 
 *Nov 13, 2021*
