@@ -47,7 +47,8 @@ public extension Experimental {
 
         private func resetSession() {
             session.invalidateAndCancel()
-            session = URLSession(configuration: .default, delegate: URLSessionProxyDelegate(logger: logger, delegate: CustomProtocolSessionDelegate.shared), delegateQueue: CustomProtocolSessionDelegate.shared.queue)
+            configuration.protocolClasses?.insert(CustomHTTPProtocol.self, at: 0)
+            session = URLSession(configuration: configuration, delegate: URLSessionProxyDelegate(logger: logger, delegate: CustomProtocolSessionDelegate.shared), delegateQueue: CustomProtocolSessionDelegate.shared.queue)
         }
     }
 }
