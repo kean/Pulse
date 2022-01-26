@@ -87,7 +87,6 @@ private struct QuickFiltersView: View {
                     isShowingFilters = true
                 }) {
                     Image(systemName: "line.horizontal.3.decrease.circle")
-                        .foregroundColor(Color.blue)
                 }.buttonStyle(PlainButtonStyle())
             }
             ConsoleQuickFiltersView(filters: model.quickFilters)
