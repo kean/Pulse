@@ -9,79 +9,87 @@ import PulseCore
 import UniformTypeIdentifiers
 
 @available(iOS 13.0, *)
-struct SettingsView: View {
+public struct SettingsView: View {
     @ObservedObject var model: SettingsViewModel
     @ObservedObject var console: ConsoleViewModel
 
     @State private var isDocumentBrowserPresented = false
 
-    var body: some View {
-        NavigationView {
-            Form {
-                if let details = model.details {
-                    Section {
-                        NavigationLink(destination: StoreDetailsView(model: details)) {
-                            HStack {
-                                Image(systemName: "info.circle")
-                                    .foregroundColor(Color.primary)
-                                Text("Store Info")
-                                    .foregroundColor(Color.primary)
-                            }
-                        }
-                    }
-                }
-
-                if !model.isReadonly {
-                    Section {
-                        if #available(iOS 14.0, *) {
-                            Button(action: {
-                                isDocumentBrowserPresented = true
-                            }) {
-                                HStack {
-                                    Image(systemName: "doc")
-                                        .foregroundColor(Color.primary)
-                                    Text("Browse Files")
-                                        .foregroundColor(Color.primary)
-                                }
-                            }
-                            .fullScreenCover(isPresented: $isDocumentBrowserPresented) {
-                                DocumentBrowser()
-                            }
-                        }
-
-                        ButtonRemoveAll(action: console.buttonRemoveAllMessagesTapped)
-                            .disabled(console.messages.isEmpty)
-                            .opacity(console.messages.isEmpty ? 0.33 : 1)
-                    }
-                    if #available(iOS 14.0, *) {
-                        if let model = console.remoteLoggerViewModel {
-                            Section {
-                                RemoteLoggerSettingsView(model: model)
-                            }
-                        }
-                    }
-                }
-                Section(footer: Text("Pulse is funded by the community contributions.")) {
-                    Button(action: {
-                        if let url = URL(string: "https://github.com/sponsors/kean") {
-                            UIApplication.shared.open(url)
-                        }
-                    }) {
+    public init(store: LoggerStore = .default) {
+        self.model = SettingsViewModel(store: store)
+        self.console = ConsoleViewModel(store: store, contentType: .all)
+    }
+    
+    init(model: SettingsViewModel, console: ConsoleViewModel) {
+        self.model = model
+        self.console = console
+    }
+    
+    public var body: some View {
+        Form {
+            if let details = model.details {
+                Section {
+                    NavigationLink(destination: StoreDetailsView(model: details)) {
                         HStack {
-                            Image(systemName: "heart.fill")
-                                .foregroundColor(Color.pink)
-                            Text("Sponsor")
+                            Image(systemName: "info.circle")
                                 .foregroundColor(Color.primary)
-                            Spacer()
-                            Image(systemName: "link")
-                                .foregroundColor(.secondary)
+                            Text("Store Info")
+                                .foregroundColor(Color.primary)
                         }
                     }
                 }
             }
-            .navigationBarTitle("Settings")
-            .navigationBarItems(leading: model.onDismiss.map { Button(action: $0) { Image(systemName: "xmark") } })
-        }.navigationViewStyle(StackNavigationViewStyle())
+
+            if !model.isReadonly {
+                Section {
+                    if #available(iOS 14.0, *) {
+                        Button(action: {
+                            isDocumentBrowserPresented = true
+                        }) {
+                            HStack {
+                                Image(systemName: "doc")
+                                    .foregroundColor(Color.primary)
+                                Text("Browse Files")
+                                    .foregroundColor(Color.primary)
+                            }
+                        }
+                        .fullScreenCover(isPresented: $isDocumentBrowserPresented) {
+                            DocumentBrowser()
+                        }
+                    }
+
+                    ButtonRemoveAll(action: console.buttonRemoveAllMessagesTapped)
+                        .disabled(console.messages.isEmpty)
+                        .opacity(console.messages.isEmpty ? 0.33 : 1)
+                }
+                if #available(iOS 14.0, *) {
+                    if let model = console.remoteLoggerViewModel {
+                        Section {
+                            RemoteLoggerSettingsView(model: model)
+                        }
+                    }
+                }
+            }
+            Section(footer: Text("Pulse is funded by the community contributions.")) {
+                Button(action: {
+                    if let url = URL(string: "https://github.com/sponsors/kean") {
+                        UIApplication.shared.open(url)
+                    }
+                }) {
+                    HStack {
+                        Image(systemName: "heart.fill")
+                            .foregroundColor(Color.pink)
+                        Text("Sponsor")
+                            .foregroundColor(Color.primary)
+                        Spacer()
+                        Image(systemName: "link")
+                            .foregroundColor(.secondary)
+                    }
+                }
+            }
+        }
+        .navigationBarTitle("Settings")
+        .navigationBarItems(leading: model.onDismiss.map { Button(action: $0) { Image(systemName: "xmark") } })
     }
 }
 
