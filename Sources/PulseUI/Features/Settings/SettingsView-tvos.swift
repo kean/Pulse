@@ -15,42 +15,49 @@ struct SettingsView: View {
 
     @State var isSponsorAlertShown = false
 
-    var body: some View {
-        NavigationView {
-            Form {
-                if !model.isReadonly {
-                    Section {
-                        ButtonRemoveAll(action: console.buttonRemoveAllMessagesTapped)
-                            .disabled(console.messages.isEmpty)
-                            .opacity(console.messages.isEmpty ? 0.33 : 1)
-                    }
-                }
+    public init(store: LoggerStore = .default) {
+        self.model = SettingsViewModel(store: store)
+        self.console = ConsoleViewModel(store: store, contentType: .all)
+    }
+    
+    init(model: SettingsViewModel, console: ConsoleViewModel) {
+        self.model = model
+        self.console = console
+    }
+    
+    public var body: some View {
+        Form {
+            if !model.isReadonly {
                 Section {
-                    if let model = console.remoteLoggerViewModel {
-                        Section {
-                            RemoteLoggerSettingsView(model: model)
-                        }
-                    }
+                    ButtonRemoveAll(action: console.buttonRemoveAllMessagesTapped)
+                        .disabled(console.messages.isEmpty)
+                        .opacity(console.messages.isEmpty ? 0.33 : 1)
                 }
-                Section(footer: Text("Pulse is funded by the community contributions.")) {
-                    Button(action: {
-                        isSponsorAlertShown = true
-                    }) {
-                        HStack {
-                            Image(systemName: "heart.fill")
-                                .foregroundColor(Color.pink)
-                            Text("Sponsor")
-                                .foregroundColor(Color.primary)
-                            Spacer()
-                            Image(systemName: "link")
-                                .foregroundColor(.secondary)
-                        }
+            }
+            Section {
+                if let model = console.remoteLoggerViewModel {
+                    Section {
+                        RemoteLoggerSettingsView(model: model)
                     }
                 }
             }
-            .frame(maxWidth: 800)
+            Section(footer: Text("Pulse is funded by the community contributions.")) {
+                Button(action: {
+                    isSponsorAlertShown = true
+                }) {
+                    HStack {
+                        Image(systemName: "heart.fill")
+                            .foregroundColor(Color.pink)
+                        Text("Sponsor")
+                            .foregroundColor(Color.primary)
+                        Spacer()
+                        Image(systemName: "link")
+                            .foregroundColor(.secondary)
+                    }
+                }
+            }
         }
-        .navigationViewStyle(StackNavigationViewStyle())
+        .frame(maxWidth: 800)
         .alert(isPresented: $isSponsorAlertShown, content: {
             Alert(title: Text("Sponsor"), message: Text("Please visit https://github.com/sponsors/kean to sponsor"), dismissButton: .cancel(Text("Ok")))
         })
