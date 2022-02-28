@@ -641,11 +641,11 @@ extension LoggerStore {
     }
 
     private func messageCount() throws -> Int {
-        try container.viewContext.fetch(LoggerMessageEntity.fetchRequest()).count
+        try backgroundContext.fetch(LoggerMessageEntity.fetchRequest()).count
     }
 
     private func networkRequestsCount() throws -> Int {
-        try container.viewContext.fetch(LoggerNetworkRequestEntity.fetchRequest()).count
+        try backgroundContext.fetch(LoggerNetworkRequestEntity.fetchRequest()).count
     }
 }
 
