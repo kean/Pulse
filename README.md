@@ -54,7 +54,7 @@ Record and inspect logs and `URLSession` network requests right from your iOS ap
 
 **Free**
 
-Pulse is currently available for free. I thought it wouldn't make sense to try to make it paid as it's primarily a framework. But I hope that teams that use it would sponsor it. Think of it as "pay as much as you want."
+Pulse is currently available for free.
 
 **What Pulse is Not**
 
