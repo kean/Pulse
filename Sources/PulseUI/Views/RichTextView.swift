@@ -10,23 +10,23 @@ import Combine
 #if os(iOS) || os(macOS) || os(tvOS)
 
 @available(iOS 13.0, tvOS 14.0, *)
-struct DopeTextView: View {
-    @ObservedObject private var model: DopeTextViewModel
+struct RichTextView: View {
+    @ObservedObject private var model: RichTextViewModel
     var isAutomaticLinkDetectionEnabled = true
     var hasVerticalScroller = false
 
-    init(model: DopeTextViewModel, isAutomaticLinkDetectionEnabled: Bool = true, hasVerticalScroller: Bool = true) {
+    init(model: RichTextViewModel, isAutomaticLinkDetectionEnabled: Bool = true, hasVerticalScroller: Bool = true) {
         self.model = model
         self.isAutomaticLinkDetectionEnabled = isAutomaticLinkDetectionEnabled
         self.hasVerticalScroller = hasVerticalScroller
     }
 
     init(data: Data) {
-        self.init(model: DopeTextViewModel(data: data))
+        self.init(model: RichTextViewModel(data: data))
     }
 
     init(string: String) {
-        self.init(model: DopeTextViewModel(string: string))
+        self.init(model: RichTextViewModel(string: string))
     }
 
     #if os(iOS)
@@ -74,7 +74,7 @@ struct DopeTextView: View {
 @available(iOS 13.0, tvOS 14.0, *)
 private struct WrappedTextView: UIViewRepresentable {
     let text: NSAttributedString
-    let model: DopeTextViewModel
+    let model: RichTextViewModel
     let isAutomaticLinkDetectionEnabled: Bool
 
     func makeUIView(context: Context) -> UXTextView {
@@ -95,7 +95,7 @@ private struct WrappedTextView: UIViewRepresentable {
 #else
 private struct WrappedTextView: NSViewRepresentable {
     let text: NSAttributedString
-    let model: DopeTextViewModel
+    let model: RichTextViewModel
     let isAutomaticLinkDetectionEnabled: Bool
     var hasVerticalScroller: Bool
 
@@ -135,7 +135,7 @@ private func configureTextView(_ textView: UXTextView, _ isAutomaticLinkDetectio
 #if os(iOS) || os(macOS)
 @available(iOS 13.0, tvOS 14.0, *)
 private struct SearchToobar: View {
-    @ObservedObject var model: DopeTextViewModel
+    @ObservedObject var model: RichTextViewModel
 
     #if os(iOS)
     var body: some View {
@@ -199,7 +199,7 @@ private struct SearchToobar: View {
 #endif
 
 @available(iOS 13.0, tvOS 14.0, *)
-final class DopeTextViewModel: ObservableObject {
+final class RichTextViewModel: ObservableObject {
     @Published var isSearching = false
     @Published var selectedMatchIndex: Int = 0
     @Published var matches: [Range<String.Index>] = []
@@ -325,14 +325,14 @@ private func highlight(range: Range<String.Index>, in text: NSMutableAttributedS
 
 #if DEBUG
 @available(iOS 13.0, tvOS 14.0, *)
-struct DopeTextView_Previews: PreviewProvider {
+struct RichTextView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            DopeTextView(data: MockJSON.allPossibleValues)
+            RichTextView(data: MockJSON.allPossibleValues)
                 .previewLayout(.sizeThatFits)
                 .environment(\.colorScheme, .light)
 
-            DopeTextView(data: MockJSON.allPossibleValues)
+            RichTextView(data: MockJSON.allPossibleValues)
             .previewDisplayName("Dark")
                 .background(Color(UXColor.systemBackground))
                 .previewLayout(.sizeThatFits)
@@ -347,8 +347,8 @@ struct DopeTextView_Previews: PreviewProvider {
 
 #if os(watchOS)
 @available(tvOS 14.0, watchOS 6, *)
-struct DopeTextView: View {
-    let model: DopeTextViewModel
+struct RichTextView: View {
+    let model: RichTextViewModel
 
     var body: some View {
         Text(model.text)
@@ -356,7 +356,7 @@ struct DopeTextView: View {
 }
 
 @available(watchOS 6, *)
-final class DopeTextViewModel: ObservableObject {
+final class RichTextViewModel: ObservableObject {
     let text: String
 
     init(string: String) {

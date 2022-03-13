@@ -57,9 +57,9 @@ struct NetworkHeadersDetailsView: View {
             PlaceholderView(imageName: "folder", title: "Empty")
         } else {
             #if os(watchOS) || os(tvOS)
-            DopeTextView(model: .init(string: text.string))
+            RichTextView(model: .init(string: text.string))
             #else
-            DopeTextView(model: .init(string: text), isAutomaticLinkDetectionEnabled: false)
+            RichTextView(model: .init(string: text), isAutomaticLinkDetectionEnabled: false)
             #endif
         }
     }

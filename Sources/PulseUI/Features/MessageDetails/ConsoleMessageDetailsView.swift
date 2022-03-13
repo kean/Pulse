@@ -70,7 +70,7 @@ struct ConsoleMessageDetailsView: View {
     }
 
     private var textView: some View {
-        DopeTextView(model: .init(string: model.text))
+        RichTextView(model: .init(string: model.text))
     }
 
     #if os(watchOS) || os(tvOS)

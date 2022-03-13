@@ -46,7 +46,7 @@ struct NetworkInspectorResponseView: View {
     @ViewBuilder
     private var contents: some View {
         if let json = try? JSONSerialization.jsonObject(with: model.data, options: []) {
-            DopeTextView(model: .init(json: json))
+            RichTextView(model: .init(json: json))
         } else if let image = UXImage(data: model.data) {
             ScrollView {
                 VStack(spacing: 16) {
@@ -69,7 +69,7 @@ struct NetworkInspectorResponseView: View {
             }
         } else {
             /// TODO: remove inefficiency where we scan this twice
-            DopeTextView(model: .init(data: model.data))
+            RichTextView(model: .init(data: model.data))
         }
     }
 }
