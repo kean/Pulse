@@ -1,5 +1,12 @@
 # Pulse 0.x
 
+## Pulse 0.20.2
+
+*Mar 23, 2022*
+
+- Fix multi-threading crash - [#69](https://github.com/kean/Pulse/pull/69), thanks to [Scott Gruby](https://github.com/sgruby)
+- Make `SettingsView` public - [#68](https://github.com/kean/Pulse/pull/68), thanks to [Martin Daum](https://github.com/martindaum)
+
 ## Pulse 0.20.1
 
 *Dec 23, 2021*
