@@ -5,6 +5,8 @@
 
 Record and inspect logs and `URLSession` network requests right from your iOS app using Pulse Console. Share and view logs in Pulse macOS app. Logs are recorded locally and never leave your device. Learn more at [**kean.blog/pulse**](https://kean.blog/pulse/home) 🔗.
 
+> [Get](https://github.com/kean/Get), web API client built using async/await, has first-class Pulse integration.
+
 <br/>
 <br/>
 <br/>
