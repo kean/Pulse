@@ -53,54 +53,54 @@ private struct ConsoleFiltersContentView: View {
         MultiSelectionPicker(
             title: "Log Level",
             items: LoggerStore.Level.allCases.map { PickerItem(title: "\($0)", tag: $0) },
-            selected: $searchCriteria.logLevels
+            selected: $searchCriteria.logLevels.levels
         )
     }
 
     private var timePeriodPicker: some View {
-        Toggle("Latest Session", isOn: $searchCriteria.isCurrentSessionOnly)
+        Toggle("Latest Session", isOn: $searchCriteria.dates.isCurrentSessionOnly)
     }
 
     @ViewBuilder
     private var startDatePicker: some View {
-        if searchCriteria.startDate == nil {
+        if searchCriteria.dates.startDate == nil {
             HStack {
                 Text("Start Date")
                 Spacer()
                 Button("Set Date") {
-                    searchCriteria.isCurrentSessionOnly = false
-                    searchCriteria.startDate = Date() - 1200
+                    searchCriteria.dates.isCurrentSessionOnly = false
+                    searchCriteria.dates.startDate = Date() - 1200
                 }
                 .buttonStyle(PlainButtonStyle())
                 .foregroundColor(.accentColor)
             }
         } else {
             DatePicker("Start Date", selection: Binding(get: {
-                searchCriteria.startDate ?? Date()
+                searchCriteria.dates.startDate ?? Date()
             }, set: { date in
-                searchCriteria.startDate = date
+                searchCriteria.dates.startDate = date
             }))
         }
     }
 
     @ViewBuilder
     private var endDatePicker: some View {
-        if searchCriteria.endDate == nil {
+        if searchCriteria.dates.endDate == nil {
             HStack {
                 Text("End Date")
                 Spacer()
                 Button("Set Date") {
-                    searchCriteria.isCurrentSessionOnly = false
-                    searchCriteria.endDate = Date()
+                    searchCriteria.dates.isCurrentSessionOnly = false
+                    searchCriteria.dates.endDate = Date()
                 }
                 .buttonStyle(PlainButtonStyle())
                 .foregroundColor(.accentColor)
             }
         } else {
             DatePicker("End Date", selection: Binding(get: {
-                searchCriteria.endDate ?? Date()
+                searchCriteria.dates.endDate ?? Date()
             }, set: { date in
-                searchCriteria.endDate = date
+                searchCriteria.dates.endDate = date
             }))
         }
     }

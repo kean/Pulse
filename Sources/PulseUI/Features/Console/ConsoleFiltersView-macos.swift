@@ -41,24 +41,24 @@ struct ConsoleFiltersView: View {
         DisclosureGroup(content: {
             VStack(alignment: .leading, spacing: 6) {
                 Toggle("All", isOn: Binding(get: {
-                    model.searchCriteria.logLevels.count == LoggerStore.Level.allCases.count
+                    model.searchCriteria.logLevels.levels.count == LoggerStore.Level.allCases.count
                 }, set: { isOn in
                     if isOn {
-                        model.searchCriteria.logLevels = Set(LoggerStore.Level.allCases)
+                        model.searchCriteria.logLevels.levels = Set(LoggerStore.Level.allCases)
                     } else {
-                        model.searchCriteria.logLevels = Set()
+                        model.searchCriteria.logLevels.levels = Set()
                     }
                 }))
                 .accentColor(Color.secondary)
                 .foregroundColor(Color.secondary)
                 ForEach(LoggerStore.Level.allCases, id: \.self) { item in
                     Toggle(item.rawValue.capitalized, isOn: Binding(get: {
-                        model.searchCriteria.logLevels.contains(item)
+                        model.searchCriteria.logLevels.levels.contains(item)
                     }, set: { isOn in
                         if isOn {
-                            model.searchCriteria.logLevels.insert(item)
+                            model.searchCriteria.logLevels.levels.insert(item)
                         } else {
-                            model.searchCriteria.logLevels.remove(item)
+                            model.searchCriteria.logLevels.levels.remove(item)
                         }
                     }))
                     .accentColor(Color.textColor(for: item))
@@ -74,24 +74,24 @@ struct ConsoleFiltersView: View {
         DisclosureGroup(content: {
             VStack(alignment: .leading, spacing: 6) {
                 Toggle("All", isOn: Binding(get: {
-                    model.searchCriteria.hiddenLabels.isEmpty
+                    model.searchCriteria.labels.hidden.isEmpty
                 }, set: { isOn in
                     if isOn {
-                        model.searchCriteria.hiddenLabels = []
+                        model.searchCriteria.labels.hidden = []
                     } else {
-                        model.searchCriteria.hiddenLabels = Set(model.allLabels)
+                        model.searchCriteria.labels.hidden = Set(model.allLabels)
                     }
                 }))
                 .accentColor(Color.secondary)
                 .foregroundColor(Color.secondary)
                 ForEach(model.allLabels, id: \.self) { item in
                     Toggle(item.capitalized, isOn: Binding(get: {
-                        !model.searchCriteria.hiddenLabels.contains(item)
+                        !model.searchCriteria.labels.hidden.contains(item)
                     }, set: { isOn in
                         if isOn {
-                            model.searchCriteria.hiddenLabels.remove(item)
+                            model.searchCriteria.labels.hidden.remove(item)
                         } else {
-                            model.searchCriteria.hiddenLabels.insert(item)
+                            model.searchCriteria.labels.hidden.insert(item)
                         }
                     }))
                 }
@@ -112,9 +112,9 @@ struct ConsoleFiltersView: View {
 
     private var timePeriodGroup: some View {
         DisclosureGroup(content: {
-            Toggle("Latest Session", isOn: $model.searchCriteria.isCurrentSessionOnly)
-            DatePickerButton(title: "From", date: $model.searchCriteria.startDate)
-            DatePickerButton(title: "To", date: $model.searchCriteria.endDate)
+            Toggle("Latest Session", isOn: $model.searchCriteria.dates.isCurrentSessionOnly)
+            DatePickerButton(title: "From", date: $model.searchCriteria.dates.startDate)
+            DatePickerButton(title: "To", date: $model.searchCriteria.dates.endDate)
         }, label: {
             Label("Time Period", systemImage: "calendar")
         })

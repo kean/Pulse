@@ -26,13 +26,15 @@ struct ConsoleMessageContextMenu: View {
             }
             ButtonCopyMessage(text: message.text)
             Button(action: {
-                searchCriteria.focusedLabel = message.label
+                searchCriteria.labels.isEnabled = true
+                searchCriteria.labels.focused = message.label
             }) {
                 Text("Focus \'\(message.label.capitalized)\'")
                 Image(systemName: "eye")
             }
             Button(action: {
-                searchCriteria.hiddenLabels.insert(message.label)
+                searchCriteria.labels.isEnabled = true
+                searchCriteria.labels.hidden.insert(message.label)
             }) {
                 Text("Hide \'\(message.label.capitalized)\'")
                 Image(systemName: "eye.slash")

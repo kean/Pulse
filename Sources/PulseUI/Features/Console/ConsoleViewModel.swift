@@ -95,7 +95,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         super.init()
 
         if store !== LoggerStore.default {
-            searchCriteria.isCurrentSessionOnly = false
+            searchCriteria.dates.isCurrentSessionOnly = false
         }
 
         controller.delegate = self
@@ -170,7 +170,8 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         let sessionId = store === LoggerStore.default ? LoggerSession.current.id.uuidString : latestSessionId
 
         // Search messages
-        ConsoleSearchCriteria.update(request: controller.fetchRequest, contentType: contentType, filterTerm: filterTerm, criteria: criteria, sessionId: sessionId)
+        #warning("TODO: [P01] Pass filters")
+        ConsoleSearchCriteria.update(request: controller.fetchRequest, contentType: contentType, filterTerm: filterTerm, criteria: criteria, filters: [], sessionId: sessionId, isOnlyErrors: false)
         try? controller.performFetch()
 
         self.messages = controller.fetchedObjects ?? []
@@ -264,11 +265,13 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         #if os(watchOS)
         addResetIfNeeded()
         #endif
-        if criteria.logLevels != [.error, .critical] {
+        if !criteria.logLevels.isEnabled || criteria.logLevels.levels != [.error, .critical] {
             filters.append(QuickFilterViewModel(title: "Errors", color: .secondary, imageName: "exclamationmark.octagon") { [weak self] in
-                self?.searchCriteria.logLevels = [.error, .critical]
+                self?.searchCriteria.logLevels.isEnabled = true
+                self?.searchCriteria.logLevels.levels = [.error, .critical]
             })
         }
+        #warning("TODO: [P01] Rework how these filters are implemented on watchOS")
         #if os(watchOS)
         if !criteria.onlyPins {
             filters.append(QuickFilterViewModel(title: "Pins", color: .secondary, imageName: "pin") { [weak self] in
@@ -281,17 +284,17 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
             })
         }
         #endif
-        if criteria.startDate == nil && criteria.endDate == nil {
+        #warning("TODO: [P01] This is incorrect + we need better filters")
+        if !criteria.dates.isEnabled ||
+            ((criteria.dates.startDate == nil || !criteria.dates.isStartDateEnabled) &&
+            (criteria.dates.endDate == nil || !criteria.dates.isEndDateEnabled)) {
             filters.append(QuickFilterViewModel(title: "Today", color: .secondary, imageName: "arrow.clockwise") { [weak self] in
                 let calendar = Calendar.current
                 let startDate = calendar.startOfDay(for: Date())
-                self?.searchCriteria.startDate = startDate
-                self?.searchCriteria.endDate = startDate + 86400
-                self?.searchCriteria.isCurrentSessionOnly = false
+                self?.searchCriteria.dates = .make(startDate: startDate, endDate: startDate + 86400)
             })
             filters.append(QuickFilterViewModel(title: "Recent", color: .secondary, imageName: "arrow.clockwise") { [weak self] in
-                self?.searchCriteria.startDate = Date() - 1200
-                self?.searchCriteria.isCurrentSessionOnly = false
+                self?.searchCriteria.dates = .make(startDate: Date() - 1200, endDate: nil)
             })
         }
         #if os(iOS)
