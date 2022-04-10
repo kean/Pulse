@@ -36,6 +36,12 @@
 		0C7A833926D1C8960082634F /* MockDataTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD2A4AC25D4A2E70087E9E3 /* MockDataTask.swift */; };
 		0C7A833A26D1C8960082634F /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD2A4AB25D4A2E70087E9E3 /* MockStore.swift */; };
 		0C7A834026D1CA290082634F /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CFF9BD825D6199A0069DB6A /* repos.json */; };
+		0CA45771280358750015648E /* PulseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 0CA45770280358750015648E /* PulseCore */; };
+		0CA45773280358750015648E /* PulseUI in Frameworks */ = {isa = PBXBuildFile; productRef = 0CA45772280358750015648E /* PulseUI */; };
+		0CA457752803587B0015648E /* PulseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 0CA457742803587B0015648E /* PulseCore */; };
+		0CA457772803587B0015648E /* PulseUI in Frameworks */ = {isa = PBXBuildFile; productRef = 0CA457762803587B0015648E /* PulseUI */; };
+		0CA45779280358830015648E /* PulseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 0CA45778280358830015648E /* PulseCore */; };
+		0CA4577B280358830015648E /* PulseUI in Frameworks */ = {isa = PBXBuildFile; productRef = 0CA4577A280358830015648E /* PulseUI */; };
 		0CCAF965280354240049F594 /* PulseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 0CCAF964280354240049F594 /* PulseCore */; };
 		0CCAF967280354240049F594 /* PulseUI in Frameworks */ = {isa = PBXBuildFile; productRef = 0CCAF966280354240049F594 /* PulseUI */; };
 		0CCAF969280354370049F594 /* PulseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 0CCAF968280354370049F594 /* PulseCore */; };
@@ -162,6 +168,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0CA457772803587B0015648E /* PulseUI in Frameworks */,
+				0CA457752803587B0015648E /* PulseCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -178,6 +186,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0CA4577B280358830015648E /* PulseUI in Frameworks */,
+				0CA45779280358830015648E /* PulseCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -185,6 +195,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0CA45773280358750015648E /* PulseUI in Frameworks */,
+				0CA45771280358750015648E /* PulseCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -414,6 +426,8 @@
 			);
 			name = "Pulse Integration Examples iOS";
 			packageProductDependencies = (
+				0CA457742803587B0015648E /* PulseCore */,
+				0CA457762803587B0015648E /* PulseUI */,
 			);
 			productName = "Pulse Integration Examples iOS";
 			productReference = 0C0B31EA26D179A20045C9E1 /* Pulse Integration Examples iOS.app */;
@@ -457,6 +471,8 @@
 			);
 			name = "Pulse App iOS";
 			packageProductDependencies = (
+				0CA45778280358830015648E /* PulseCore */,
+				0CA4577A280358830015648E /* PulseUI */,
 			);
 			productName = Pulse;
 			productReference = 0C57AD4D245F0EFB005B3400 /* Pulse iOS.app */;
@@ -476,6 +492,8 @@
 			);
 			name = "Pulse Demo tvOS";
 			packageProductDependencies = (
+				0CA45770280358750015648E /* PulseCore */,
+				0CA45772280358750015648E /* PulseUI */,
 			);
 			productName = "Pulse tvOS";
 			productReference = 0C6460C425F5797B002C55B1 /* Pulse Demo tvOS.app */;
@@ -1193,6 +1211,30 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		0CA45770280358750015648E /* PulseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PulseCore;
+		};
+		0CA45772280358750015648E /* PulseUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PulseUI;
+		};
+		0CA457742803587B0015648E /* PulseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PulseCore;
+		};
+		0CA457762803587B0015648E /* PulseUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PulseUI;
+		};
+		0CA45778280358830015648E /* PulseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PulseCore;
+		};
+		0CA4577A280358830015648E /* PulseUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PulseUI;
+		};
 		0CCAF964280354240049F594 /* PulseCore */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = PulseCore;
