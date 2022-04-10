@@ -14,7 +14,7 @@ struct ConsoleMessageContextMenu: View {
     let message: LoggerMessageEntity
     let context: AppContext
     @Binding var isShowingShareSheet: Bool
-    @Binding var searchCriteria: ConsoleSearchCriteria
+    @ObservedObject var searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
 
     var body: some View {
         Section {
@@ -26,15 +26,15 @@ struct ConsoleMessageContextMenu: View {
             }
             ButtonCopyMessage(text: message.text)
             Button(action: {
-                searchCriteria.labels.isEnabled = true
-                searchCriteria.labels.focused = message.label
+                searchCriteriaViewModel.criteria.labels.isEnabled = true
+                searchCriteriaViewModel.criteria.labels.focused = message.label
             }) {
                 Text("Focus \'\(message.label.capitalized)\'")
                 Image(systemName: "eye")
             }
             Button(action: {
-                searchCriteria.labels.isEnabled = true
-                searchCriteria.labels.hidden.insert(message.label)
+                searchCriteriaViewModel.criteria.labels.isEnabled = true
+                searchCriteriaViewModel.criteria.labels.hidden.insert(message.label)
             }) {
                 Text("Hide \'\(message.label.capitalized)\'")
                 Image(systemName: "eye.slash")

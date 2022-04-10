@@ -42,7 +42,7 @@ public struct PinsView: View {
                 .navigationBarTitle(Text("Pins"))
         } else {
             List {
-                ConsoleMessagesForEach(context: context, messages: model.messages, searchCriteria: .constant(.default))
+                ConsoleMessagesForEach(context: context, messages: model.messages, searchCriteriaViewModel: .init())
             }
             .listStyle(PlainListStyle())
         }

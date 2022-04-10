@@ -12,7 +12,7 @@ import PulseCore
 struct ConsoleMessagesForEach: View {
     let context: AppContext
     let messages: [LoggerMessageEntity]
-    @Binding var searchCriteria: ConsoleSearchCriteria
+    let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
 
     var body: some View {
         ForEach(messages, id: \.objectID, content: makeListItem)
@@ -26,7 +26,7 @@ struct ConsoleMessagesForEach: View {
             }
         } else {
             NavigationLink(destination: LazyConsoleMessageDetailsView(message: message, context: context)) {
-                ConsoleMessagesForEachRow(context: context, message: message, searchCriteria: $searchCriteria)
+                ConsoleMessagesForEachRow(context: context, message: message, searchCriteriaViewModel: searchCriteriaViewModel)
             }
         }
     }
@@ -61,7 +61,7 @@ private struct ConsoleNetworkRequestForEachRow: View {
 private struct ConsoleMessagesForEachRow: View {
     let context: AppContext
     let message: LoggerMessageEntity
-    @Binding var searchCriteria: ConsoleSearchCriteria
+    let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
 
     @State private var isShowingShareSheet = false
 
@@ -69,7 +69,7 @@ private struct ConsoleMessagesForEachRow: View {
         #if os(iOS)
         contents
             .contextMenu {
-                ConsoleMessageContextMenu(message: message, context: context, isShowingShareSheet: $isShowingShareSheet, searchCriteria: $searchCriteria)
+                ConsoleMessageContextMenu(message: message, context: context, isShowingShareSheet: $isShowingShareSheet, searchCriteriaViewModel: searchCriteriaViewModel)
             }
             .sheet(isPresented: $isShowingShareSheet) {
                 ShareView(activityItems: [context.share.share(message)])

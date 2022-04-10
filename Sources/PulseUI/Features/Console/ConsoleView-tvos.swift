@@ -27,7 +27,7 @@ public struct ConsoleView: View {
 
     public var body: some View {
         List {
-            ConsoleMessagesForEach(context: model.context, messages: model.messages, searchCriteria: $model.searchCriteria)
+            ConsoleMessagesForEach(context: model.context, messages: model.messages, searchCriteriaViewModel: model.searchCriteria)
         }
     }
 }

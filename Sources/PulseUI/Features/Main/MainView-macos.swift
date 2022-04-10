@@ -112,7 +112,7 @@ private struct SidebarFiltersSectionView: View {
     let type: ConsoleFiltersViewType
 
     var body: some View {
-        ConsoleFiltersView(model: model, type: type)
+        ConsoleFiltersView(model: model.searchCriteria, type: type)
 
         if !model.quickFilters.isEmpty {
             SiderbarSectionTitle(text: "Quick Filters")

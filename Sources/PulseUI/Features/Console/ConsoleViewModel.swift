@@ -26,8 +26,8 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     #endif
 
     // Search criteria
+    let searchCriteria = ConsoleSearchCriteriaViewModel()
     @Published var filterTerm: String = ""
-    @Published var searchCriteria: ConsoleSearchCriteria = .init()
     @Published private(set) var quickFilters: [QuickFilterViewModel] = []
 
     // Text search (not the same as filter)
@@ -95,17 +95,21 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         super.init()
 
         if store !== LoggerStore.default {
-            searchCriteria.dates.isCurrentSessionOnly = false
+            searchCriteria.criteria.dates.isCurrentSessionOnly = false
         }
 
         controller.delegate = self
 
-        Publishers.CombineLatest($filterTerm.throttle(for: 0.33, scheduler: RunLoop.main, latest: true), $searchCriteria).dropFirst().sink { [unowned self] filterTerm, criteria in
-            self.refresh(filterTerm: filterTerm, criteria: criteria)
+        $filterTerm.throttle(for: 0.33, scheduler: RunLoop.main, latest: true).dropFirst().sink { [weak self] filterTerm in
+            self?.refresh(filterTerm: filterTerm)
         }.store(in: &cancellables)
-
-        refresh(filterTerm: filterTerm, criteria: searchCriteria)
-
+        
+        searchCriteria.dataNeedsReload.throttle(for: 0.5, scheduler: DispatchQueue.main, latest: true).sink { [weak self] in
+            self?.refreshNow()
+        }.store(in: &cancellables)
+        
+        refreshNow()
+        
         #if os(macOS)
         Publishers.CombineLatest($searchTerm.throttle(for: 0.33, scheduler: RunLoop.main, latest: true), $searchOptions).dropFirst().sink { [unowned self] searchTerm, searchOptions in
             self.refresh(searchTerm: searchTerm, searchOptions: searchOptions)
@@ -148,7 +152,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 
     func scrollTo(_ message: LoggerMessageEntity) {
         doneSearch()
-        searchCriteria = .default
+        searchCriteria.resetAll()
 
         if let index = messages.firstIndex(where: { $0.objectID == message.objectID }) {
             list.scrollToIndex = index
@@ -159,9 +163,13 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 
     // MARK: Refresh
 
-    private func refresh(filterTerm: String, criteria: ConsoleSearchCriteria) {
+    private func refreshNow() {
+        refresh(filterTerm: filterTerm)
+    }
+    
+    private func refresh(filterTerm: String) {
         // Reset quick filters
-        refreshQuickFilters(criteria: criteria)
+        refreshQuickFilters(criteria: searchCriteria.criteria)
 
         // Get sessionId
         if latestSessionId == nil {
@@ -171,7 +179,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 
         // Search messages
         #warning("TODO: [P01] Pass filters")
-        ConsoleSearchCriteria.update(request: controller.fetchRequest, contentType: contentType, filterTerm: filterTerm, criteria: criteria, filters: [], sessionId: sessionId, isOnlyErrors: false)
+        ConsoleSearchCriteria.update(request: controller.fetchRequest, contentType: contentType, filterTerm: filterTerm, criteria: searchCriteria.criteria, filters: [], sessionId: sessionId, isOnlyErrors: false)
         try? controller.performFetch()
 
         self.messages = controller.fetchedObjects ?? []
@@ -256,9 +264,10 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     private func makeQuickFilters(criteria: ConsoleSearchCriteria) -> [QuickFilterViewModel] {
         var filters = [QuickFilterViewModel]()
         func addResetIfNeeded() {
+            #warning("TODO: [P01] Fix for non-current stores")
             if !criteria.isDefault {
                 filters.append(QuickFilterViewModel(title: "Reset", color: .secondary, imageName: "arrow.clockwise" ) { [weak self] in
-                    self?.searchCriteria = .default
+                    self?.searchCriteria.resetAll()
                 })
             }
         }
@@ -267,20 +276,20 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         #endif
         if !criteria.logLevels.isEnabled || criteria.logLevels.levels != [.error, .critical] {
             filters.append(QuickFilterViewModel(title: "Errors", color: .secondary, imageName: "exclamationmark.octagon") { [weak self] in
-                self?.searchCriteria.logLevels.isEnabled = true
-                self?.searchCriteria.logLevels.levels = [.error, .critical]
+                self?.searchCriteria.criteria.logLevels.isEnabled = true
+                self?.searchCriteria.criteria.logLevels.levels = [.error, .critical]
             })
         }
         #warning("TODO: [P01] Rework how these filters are implemented on watchOS")
         #if os(watchOS)
         if !criteria.onlyPins {
             filters.append(QuickFilterViewModel(title: "Pins", color: .secondary, imageName: "pin") { [weak self] in
-                self?.searchCriteria.onlyPins = true
+                self?.searchCriteria.criteria.onlyPins = true
             })
         }
         if !criteria.onlyNetwork {
             filters.append(QuickFilterViewModel(title: "Networking", color: .secondary, imageName: "cloud") { [weak self] in
-                self?.searchCriteria.onlyNetwork = true
+                self?.searchCriteria.criteria.onlyNetwork = true
             })
         }
         #endif
@@ -291,10 +300,10 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
             filters.append(QuickFilterViewModel(title: "Today", color: .secondary, imageName: "arrow.clockwise") { [weak self] in
                 let calendar = Calendar.current
                 let startDate = calendar.startOfDay(for: Date())
-                self?.searchCriteria.dates = .make(startDate: startDate, endDate: startDate + 86400)
+                self?.searchCriteria.criteria.dates = .make(startDate: startDate, endDate: startDate + 86400)
             })
             filters.append(QuickFilterViewModel(title: "Recent", color: .secondary, imageName: "arrow.clockwise") { [weak self] in
-                self?.searchCriteria.dates = .make(startDate: Date() - 1200, endDate: nil)
+                self?.searchCriteria.criteria.dates = .make(startDate: Date() - 1200, endDate: nil)
             })
         }
         #if os(iOS)

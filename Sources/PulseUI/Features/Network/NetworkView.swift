@@ -30,7 +30,7 @@ public struct NetworkView: View {
     public var body: some View {
         List {
             quickFiltersView
-            ConsoleMessagesForEach(context: model.context, messages: model.messages, searchCriteria: $model.searchCriteria)
+            ConsoleMessagesForEach(context: model.context, messages: model.messages, searchCriteriaViewModel: model.searchCriteria)
         }
         .listStyle(PlainListStyle())
         .navigationBarTitle(Text("Network"))
@@ -48,7 +48,7 @@ public struct NetworkView: View {
     #elseif os(tvOS)
     public var body: some View {
         List {
-            ConsoleMessagesForEach(context: model.context, messages: model.messages, searchCriteria: $model.searchCriteria)
+            ConsoleMessagesForEach(context: model.context, messages: model.messages, searchCriteriaViewModel: model.searchCriteria)
         }
     }
     #elseif os(macOS)

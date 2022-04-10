@@ -40,7 +40,7 @@ public struct ConsoleView: View {
     private var contentView: some View {
         List {
             QuickFiltersView(model: model)
-            ConsoleMessagesForEach(context: model.context, messages: model.messages, searchCriteria: $model.searchCriteria)
+            ConsoleMessagesForEach(context: model.context, messages: model.messages, searchCriteriaViewModel: model.searchCriteria)
         }.listStyle(PlainListStyle())
     }
 
@@ -93,7 +93,7 @@ private struct QuickFiltersView: View {
         }
         .padding(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
         .sheet(isPresented: $isShowingFilters) {
-            ConsoleFiltersView(searchCriteria: $model.searchCriteria, isPresented: $isShowingFilters)
+            ConsoleFiltersView(searchCriteriaViewModel: model.searchCriteria, isPresented: $isShowingFilters)
         }
     }
 }

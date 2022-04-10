@@ -9,12 +9,12 @@ import PulseCore
 
 @available(iOS 13.0, *)
 struct ConsoleFiltersView: View {
-    @Binding var searchCriteria: ConsoleSearchCriteria
+    let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
     @Binding var isPresented: Bool
 
     var body: some View {
         NavigationView {
-            ConsoleFiltersContentView(searchCriteria: $searchCriteria)
+            ConsoleFiltersContentView(searchCriteriaViewModel: searchCriteriaViewModel)
                 .navigationBarTitle("Filters")
                 .navigationBarItems(trailing: closeButton)
 
@@ -31,7 +31,7 @@ struct ConsoleFiltersView: View {
 
 @available(iOS 13.0, *)
 private struct ConsoleFiltersContentView: View {
-    @Binding var searchCriteria: ConsoleSearchCriteria
+    @ObservedObject var searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
 
     var body: some View {
         Form {
@@ -53,61 +53,61 @@ private struct ConsoleFiltersContentView: View {
         MultiSelectionPicker(
             title: "Log Level",
             items: LoggerStore.Level.allCases.map { PickerItem(title: "\($0)", tag: $0) },
-            selected: $searchCriteria.logLevels.levels
+            selected: $searchCriteriaViewModel.criteria.logLevels.levels
         )
     }
 
     private var timePeriodPicker: some View {
-        Toggle("Latest Session", isOn: $searchCriteria.dates.isCurrentSessionOnly)
+        Toggle("Latest Session", isOn: $searchCriteriaViewModel.criteria.dates.isCurrentSessionOnly)
     }
 
     @ViewBuilder
     private var startDatePicker: some View {
-        if searchCriteria.dates.startDate == nil {
+        if searchCriteriaViewModel.criteria.dates.startDate == nil {
             HStack {
                 Text("Start Date")
                 Spacer()
                 Button("Set Date") {
-                    searchCriteria.dates.isCurrentSessionOnly = false
-                    searchCriteria.dates.startDate = Date() - 1200
+                    searchCriteriaViewModel.criteria.dates.isCurrentSessionOnly = false
+                    searchCriteriaViewModel.criteria.dates.startDate = Date() - 1200
                 }
                 .buttonStyle(PlainButtonStyle())
                 .foregroundColor(.accentColor)
             }
         } else {
             DatePicker("Start Date", selection: Binding(get: {
-                searchCriteria.dates.startDate ?? Date()
+                searchCriteriaViewModel.criteria.dates.startDate ?? Date()
             }, set: { date in
-                searchCriteria.dates.startDate = date
+                searchCriteriaViewModel.criteria.dates.startDate = date
             }))
         }
     }
 
     @ViewBuilder
     private var endDatePicker: some View {
-        if searchCriteria.dates.endDate == nil {
+        if searchCriteriaViewModel.criteria.dates.endDate == nil {
             HStack {
                 Text("End Date")
                 Spacer()
                 Button("Set Date") {
-                    searchCriteria.dates.isCurrentSessionOnly = false
-                    searchCriteria.dates.endDate = Date()
+                    searchCriteriaViewModel.criteria.dates.isCurrentSessionOnly = false
+                    searchCriteriaViewModel.criteria.dates.endDate = Date()
                 }
                 .buttonStyle(PlainButtonStyle())
                 .foregroundColor(.accentColor)
             }
         } else {
             DatePicker("End Date", selection: Binding(get: {
-                searchCriteria.dates.endDate ?? Date()
+                searchCriteriaViewModel.criteria.dates.endDate ?? Date()
             }, set: { date in
-                searchCriteria.dates.endDate = date
+                searchCriteriaViewModel.criteria.dates.endDate = date
             }))
         }
     }
 
     private var buttonResetFilters: some View {
         Button("Reset Filters") {
-            self.searchCriteria = .init()
+            self.searchCriteriaViewModel.resetAll()
         }
     }
 }
@@ -116,7 +116,7 @@ private struct ConsoleFiltersContentView: View {
 struct ConsoleFiltersView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            ConsoleFiltersView(searchCriteria: .constant(.default), isPresented: .constant(true))
+            ConsoleFiltersView(searchCriteriaViewModel: .init(), isPresented: .constant(true))
         }
     }
 }

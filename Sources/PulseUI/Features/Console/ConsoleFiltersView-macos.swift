@@ -13,14 +13,14 @@ enum ConsoleFiltersViewType {
 }
 
 struct ConsoleFiltersView: View {
-    @ObservedObject var model: ConsoleViewModel
+    @ObservedObject var model: ConsoleSearchCriteriaViewModel
     let type: ConsoleFiltersViewType
 
     var body: some View {
         HStack {
             SiderbarSectionTitle(text: "Filters")
-            Button("Reset") { model.searchCriteria = .default }
-                .opacity(model.searchCriteria.isDefault ? 0 : 1)
+            Button("Reset") { model.criteria = .default }
+                .opacity(model.criteria.isDefault ? 0 : 1)
         }
         .frame(height: 16)
         .padding(.top, 16)
@@ -41,24 +41,24 @@ struct ConsoleFiltersView: View {
         DisclosureGroup(content: {
             VStack(alignment: .leading, spacing: 6) {
                 Toggle("All", isOn: Binding(get: {
-                    model.searchCriteria.logLevels.levels.count == LoggerStore.Level.allCases.count
+                    model.criteria.logLevels.levels.count == LoggerStore.Level.allCases.count
                 }, set: { isOn in
                     if isOn {
-                        model.searchCriteria.logLevels.levels = Set(LoggerStore.Level.allCases)
+                        model.criteria.logLevels.levels = Set(LoggerStore.Level.allCases)
                     } else {
-                        model.searchCriteria.logLevels.levels = Set()
+                        model.criteria.logLevels.levels = Set()
                     }
                 }))
                 .accentColor(Color.secondary)
                 .foregroundColor(Color.secondary)
                 ForEach(LoggerStore.Level.allCases, id: \.self) { item in
                     Toggle(item.rawValue.capitalized, isOn: Binding(get: {
-                        model.searchCriteria.logLevels.levels.contains(item)
+                        model.criteria.logLevels.levels.contains(item)
                     }, set: { isOn in
                         if isOn {
-                            model.searchCriteria.logLevels.levels.insert(item)
+                            model.criteria.logLevels.levels.insert(item)
                         } else {
-                            model.searchCriteria.logLevels.levels.remove(item)
+                            model.criteria.logLevels.levels.remove(item)
                         }
                     }))
                     .accentColor(Color.textColor(for: item))
@@ -74,24 +74,24 @@ struct ConsoleFiltersView: View {
         DisclosureGroup(content: {
             VStack(alignment: .leading, spacing: 6) {
                 Toggle("All", isOn: Binding(get: {
-                    model.searchCriteria.labels.hidden.isEmpty
+                    model.criteria.labels.hidden.isEmpty
                 }, set: { isOn in
                     if isOn {
-                        model.searchCriteria.labels.hidden = []
+                        model.criteria.labels.hidden = []
                     } else {
-                        model.searchCriteria.labels.hidden = Set(model.allLabels)
+                        model.criteria.labels.hidden = Set(model.allLabels)
                     }
                 }))
                 .accentColor(Color.secondary)
                 .foregroundColor(Color.secondary)
                 ForEach(model.allLabels, id: \.self) { item in
                     Toggle(item.capitalized, isOn: Binding(get: {
-                        !model.searchCriteria.labels.hidden.contains(item)
+                        !model.criteria.labels.hidden.contains(item)
                     }, set: { isOn in
                         if isOn {
-                            model.searchCriteria.labels.hidden.remove(item)
+                            model.criteria.labels.hidden.remove(item)
                         } else {
-                            model.searchCriteria.labels.hidden.insert(item)
+                            model.criteria.labels.hidden.insert(item)
                         }
                     }))
                 }
@@ -112,9 +112,9 @@ struct ConsoleFiltersView: View {
 
     private var timePeriodGroup: some View {
         DisclosureGroup(content: {
-            Toggle("Latest Session", isOn: $model.searchCriteria.dates.isCurrentSessionOnly)
-            DatePickerButton(title: "From", date: $model.searchCriteria.dates.startDate)
-            DatePickerButton(title: "To", date: $model.searchCriteria.dates.endDate)
+            Toggle("Latest Session", isOn: $model.criteria.dates.isCurrentSessionOnly)
+            DatePickerButton(title: "From", date: $model.criteria.dates.startDate)
+            DatePickerButton(title: "To", date: $model.criteria.dates.endDate)
         }, label: {
             Label("Time Period", systemImage: "calendar")
         })
@@ -125,7 +125,7 @@ struct ConsoleFiltersView: View {
 struct ConsoleFiltersView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            ConsoleFiltersView(model: ConsoleViewModel(store: .mock), type: .default)
+            ConsoleFiltersView(model: .init(), type: .default)
         }
     }
 }
