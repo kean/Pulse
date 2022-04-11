@@ -221,3 +221,8 @@ enum ConsoleContentType {
     case network
     case pins
 }
+
+struct ConsoleMatch {
+    let index: Int
+    let objectID: NSManagedObjectID
+}
