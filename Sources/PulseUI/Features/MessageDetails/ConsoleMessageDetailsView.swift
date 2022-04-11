@@ -5,6 +5,7 @@
 import SwiftUI
 import PulseCore
 
+#if os(iOS) || os(tvOS) || os(watchOS)
 @available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
 struct ConsoleMessageDetailsView: View {
     let model: ConsoleMessageDetailsViewModel
@@ -39,26 +40,6 @@ struct ConsoleMessageDetailsView: View {
     #elseif os(tvOS)
     var body: some View {
         contents
-    }
-    #elseif os(macOS)
-    var body: some View {
-        textView
-            .background(colorScheme == .light ? Color(UXColor.controlBackgroundColor) : Color.clear)
-            .toolbar {
-                if let badge = model.badge {
-                    BadgeView(model: BadgeViewModel(title: badge.title, color: badge.color.opacity(colorScheme == .light ? 0.25 : 0.5)))
-                }
-                Spacer()
-                Menu(content: {
-                    ShareMenuContent(model: .url, items: [model.prepareForSharing()])
-                    Section {
-                        ButtonCopyMessage(text: model.text)
-                    }
-                }, label: {
-                    Image(systemName: "square.and.arrow.up")
-                })
-                PinButton(model: model.pin, isTextNeeded: false)
-            }
     }
     #endif
 
@@ -116,3 +97,4 @@ struct ConsoleMessageDetailsView: View {
     }
     #endif
 }
+#endif

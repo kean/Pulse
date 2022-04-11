@@ -7,7 +7,7 @@ import CoreData
 import PulseCore
 import Combine
 
-#if os(iOS) || os(macOS) || os(tvOS)
+#if os(iOS) || os(tvOS)
 
 @available(iOS 13.0, tvOS 14.0, *)
 public struct NetworkView: View {
@@ -50,15 +50,6 @@ public struct NetworkView: View {
         List {
             ConsoleMessagesForEach(context: model.context, messages: model.messages, searchCriteriaViewModel: model.searchCriteria)
         }
-    }
-    #elseif os(macOS)
-    public var body: some View {
-        ConsoleMessageListView(model: model)
-            .frame(minWidth: 300, idealWidth: 400, maxWidth: 700)
-            .toolbar(content: {
-                SearchBar(title: "Search", text: $model.filterTerm)
-            })
-            .background(ShareView(isPresented: $isShowingShareSheet) { model.share(as: .text).items })
     }
     #endif
 }

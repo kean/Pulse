@@ -6,8 +6,6 @@ import SwiftUI
 import PulseCore
 import Combine
 
-#if os(iOS) || os(macOS)
-
 #if os(iOS)
 @available(iOS 13.0, *)
 struct ConsoleMessageContextMenu: View {
@@ -45,9 +43,7 @@ struct ConsoleMessageContextMenu: View {
         }
     }
 }
-#endif
 
-#if os(iOS) || os(macOS)
 @available(iOS 13.0, *)
 struct ButtonCopyMessage: View {
     let text: String
@@ -62,21 +58,16 @@ struct ButtonCopyMessage: View {
         }
     }
 }
-#endif
 
-#if os(iOS)
 @available(iOS 13.0, *)
 struct NetworkMessageContextMenu: View {
     let message: LoggerMessageEntity
     let request: LoggerNetworkRequestEntity
     let context: AppContext
 
-    #if os(iOS)
     @Binding private(set) var sharedItems: ShareItems?
-    #endif
 
     var body: some View {
-        #if os(iOS)
         Section {
             Button(action: {
                 sharedItems = ShareItems([context.share.share(request, output: .plainText)])
@@ -110,14 +101,11 @@ struct NetworkMessageContextMenu: View {
                 Image(systemName: "square.and.arrow.up")
             }
         }
-        #endif
         NetworkMessageContextMenuCopySection(request: request, shareService: context.share)
         PinButton(model: .init(store: context.store, message: message))
     }
 }
-#endif
 
-#if os(iOS) || os(macOS)
 @available(iOS 13.0, *)
 struct NetworkMessageContextMenuCopySection: View {
     var request: LoggerNetworkRequestEntity
@@ -153,20 +141,12 @@ struct NetworkMessageContextMenuCopySection: View {
                     Image(systemName: "doc.on.doc")
                 }
             }
-            #if os(macOS)
-            Button(action: {
-                let summary = NetworkLoggerSummary(request: request, store: shareService.store)
-                UXPasteboard.general.string = summary.cURLDescription()
-                runHapticFeedback()
-            }) {
-                Text("Copy cURL")
-                Image(systemName: "square.and.arrow.up")
-            }
-            #endif
         }
     }
 }
+#endif
 
+#if os(iOS) || os(macOS)
 @available(iOS 14.0, *)
 struct StringSearchOptionsMenu: View {
     @Binding private(set) var options: StringSearchOptions
@@ -198,6 +178,4 @@ struct StringSearchOptionsMenu: View {
         })
     }
 }
-#endif
-
 #endif

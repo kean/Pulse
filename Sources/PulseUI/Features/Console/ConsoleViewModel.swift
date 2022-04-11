@@ -11,35 +11,12 @@ import SwiftUI
 final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, ObservableObject {
     let configuration: ConsoleConfiguration
     
-    @Published private(set) var messages: [LoggerMessageEntity] {
-        didSet {
-            #if os(macOS)
-            textSearch.replace(messages)
-            #endif
-        }
-    }
-
-    #if os(macOS)
-    let list: NotListViewModel<LoggerMessageEntity>
-    let details: ConsoleDetailsRouterViewModel
-    @Published private(set) var allLabels: [String] = []
-    #endif
+    @Published private(set) var messages: [LoggerMessageEntity]
 
     // Search criteria
     let searchCriteria = ConsoleSearchCriteriaViewModel()
     @Published var filterTerm: String = ""
     @Published private(set) var quickFilters: [QuickFilterViewModel] = []
-
-    // Text search (not the same as filter)
-    #if os(macOS)
-    @Published var searchTerm: String = ""
-    @Published var searchOptions = StringSearchOptions()
-    @Published private(set) var selectedMatchIndex = 0
-    @Published private(set) var matches: [ConsoleMatch] = []
-
-    private var matchesSet: Set<NSManagedObjectID> = []
-    private let textSearch = ManagedObjectTextSearch<LoggerMessageEntity> { $0.text }
-    #endif
 
     // Apple Watch file transfers
     #if os(watchOS) || os(iOS)
@@ -78,11 +55,6 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 
         self.controller = NSFetchedResultsController<LoggerMessageEntity>(fetchRequest: request, managedObjectContext: store.container.viewContext, sectionNameKeyPath: nil, cacheName: nil)
         self.messages = []
-
-        #if os(macOS)
-        self.list = NotListViewModel()
-        self.details = ConsoleDetailsRouterViewModel(context: .init(store: store))
-        #endif
         
         #if os(iOS) || os(tvOS) || os(watchOS)
         if #available(iOS 14.0, *) {
@@ -110,16 +82,6 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         
         refreshNow()
         
-        #if os(macOS)
-        Publishers.CombineLatest($searchTerm.throttle(for: 0.33, scheduler: RunLoop.main, latest: true), $searchOptions).dropFirst().sink { [unowned self] searchTerm, searchOptions in
-            self.refresh(searchTerm: searchTerm, searchOptions: searchOptions)
-        }.store(in: &cancellables)
-
-        store.backgroundContext.perform {
-            self.getAllLabels()
-        }
-        #endif
-
         #if os(watchOS) || os(iOS)
         LoggerSyncSession.shared.$fileTransferStatus.sink(receiveValue: { [weak self] in
             self?.fileTransferStatus = $0
@@ -129,37 +91,6 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         }).store(in: &cancellables)
         #endif
     }
-
-    #if os(macOS)
-    private func getAllLabels() {
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "\(LoggerMessageEntity.self)")
-
-        // Required! Unless you set the resultType to NSDictionaryResultType, distinct can't work.
-        // All objects in the backing store are implicitly distinct, but two dictionaries can be duplicates.
-        // Since you only want distinct names, only ask for the 'name' property.
-        fetchRequest.resultType = .dictionaryResultType
-        fetchRequest.propertiesToFetch = ["label"]
-        fetchRequest.returnsDistinctResults = true
-
-        // Now it should yield an NSArray of distinct values in dictionaries.
-        let map = (try? store.backgroundContext.fetch(fetchRequest)) ?? []
-        let values = (map as? [[String: String]])?.compactMap { $0["label"] }
-
-        DispatchQueue.main.async {
-            self.allLabels = values?.sorted() ?? []
-        }
-    }
-
-    func scrollTo(_ message: LoggerMessageEntity) {
-        doneSearch()
-        searchCriteria.resetAll()
-
-        if let index = messages.firstIndex(where: { $0.objectID == message.objectID }) {
-            list.scrollToIndex = index
-            details.selectedEntity = messages[index]
-        }
-    }
-    #endif
 
     // MARK: Refresh
 
@@ -183,11 +114,6 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         try? controller.performFetch()
 
         self.messages = controller.fetchedObjects ?? []
-
-        #if os(macOS)
-        self.list.elements = self.messages
-        self.refresh(searchTerm: searchTerm, searchOptions: searchOptions)
-        #endif
     }
 
     // MARK: Pins
@@ -195,69 +121,6 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     func removeAllPins() {
         store.removeAllPins()
     }
-    
-    #if os(macOS)
-    private func refresh(searchTerm: String, searchOptions: StringSearchOptions) {
-        if messages.count > 0, searchTerm.count > 1 {
-            let previousMatchObjectID = !matches.isEmpty ? matches[selectedMatchIndex].objectID : nil
-            matches = textSearch.search(term: searchTerm, options: searchOptions)
-            matchesSet = Set(matches.map { $0.objectID })
-            if previousMatchObjectID == nil || !matchesSet.contains(previousMatchObjectID!) {
-               updateMatchIndex(0)
-            } else {
-                if let newIndexOfPreviousMatch = matches.firstIndex(where: { $0.objectID == previousMatchObjectID }) {
-                    selectedMatchIndex = newIndexOfPreviousMatch
-                }
-            }
-        } else {
-            selectedMatchIndex = 0
-            matches = []
-            matchesSet = []
-        }
-        list.isVisibleOnlyReloadNeeded = true
-    }
-    
-    // MARK: Selection
-
-    func selectEntityAt(_ index: Int) {
-        details.selectedEntity = messages[index]
-        if let index = matches.firstIndex(where: { $0.index == index }) {
-            selectedMatchIndex = index
-        }
-    }
-
-    // MARK: Search (Matches)
-
-    func isMatch(_ message: LoggerMessageEntity) -> Bool {
-        matchesSet.contains(message.objectID)
-    }
-
-    func doneSearch() {
-        self.searchTerm = ""
-    }
-
-    func nextMatch() {
-        guard !matches.isEmpty else { return }
-        updateMatchIndex(selectedMatchIndex + 1 < matches.count ? selectedMatchIndex + 1 : 0)
-    }
-
-    func previousMatch() {
-        guard !matches.isEmpty else { return }
-        updateMatchIndex(selectedMatchIndex - 1 < 0 ? matches.count - 1 : selectedMatchIndex - 1)
-    }
-
-    private func updateMatchIndex(_ newIndex: Int) {
-        let previousIndex = selectedMatchIndex
-        selectedMatchIndex = newIndex
-        didUpdateCurrentSelectedMatch(previousMatch: previousIndex)
-    }
-
-    private func didUpdateCurrentSelectedMatch(previousMatch: Int? = nil) {
-        guard !matches.isEmpty else { return }
-        list.scrollToIndex = matches[selectedMatchIndex].index
-        details.selectedEntity = messages[matches[selectedMatchIndex].index]
-    }
-    #endif
 
     // MARK: Quick Filters
 
@@ -350,9 +213,6 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     // This never gets called on macOS
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         self.messages = self.controller.fetchedObjects ?? []
-        #if os(macOS)
-        self.list.elements = self.messages
-        #endif
     }
 }
 
@@ -361,29 +221,3 @@ enum ConsoleContentType {
     case network
     case pins
 }
-
-#if os(macOS)
-final class ConsoleDetailsRouterViewModel: ObservableObject {
-    @Published var selectedEntity: LoggerMessageEntity?
-
-    private let context: AppContext
-
-    init(context: AppContext) {
-        self.context = context
-    }
-
-    func makeDetailsRouter(for message: LoggerMessageEntity) -> ConsoleMessageDetailsRouter {
-        ConsoleMessageDetailsRouter(context: context, message: message)
-    }
-}
-
-public struct ExternalEvents {
-    /// - warning: Don't use it, it's used internally.
-    public static var open: AnyView?
-}
-
-struct ConsoleMatch {
-    let index: Int
-    let objectID: NSManagedObjectID
-}
-#endif

@@ -9,6 +9,7 @@ import Combine
 
 // MARK: - View
 
+#if os(iOS) || os(tvOS) || os(watchOS)
 @available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
 struct NetworkInspectorView: View {
     // Make sure all tabs are updated live
@@ -251,3 +252,4 @@ final class NetworkInspectorViewModel: ObservableObject {
         ConsoleShareService(store: context.store)
     }
 }
+#endif

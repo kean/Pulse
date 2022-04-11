@@ -5,6 +5,7 @@
 import SwiftUI
 import PulseCore
 
+#if os(iOS) || os(tvOS) || os(watchOS)
 // Shortcut, should've been some sort of a ViewModel, but not sure how to do that
 // given the current SwiftUI navigation state
 @available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
@@ -20,3 +21,4 @@ struct ConsoleMessageDetailsRouter: View {
         }
     }
 }
+#endif

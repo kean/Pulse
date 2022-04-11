@@ -7,7 +7,7 @@ import CoreData
 import PulseCore
 import Combine
 
-#if os(iOS) || os(macOS) || os(tvOS)
+#if os(iOS) || os(tvOS)
 
 @available(iOS 13.0, tvOS 14.0, *)
 final class MainViewModel: ObservableObject {
@@ -33,7 +33,7 @@ final class MainViewModel: ObservableObject {
         self.networkModel = ConsoleViewModel(store: store, configuration: configuration, contentType: .network)
         self.networkModel.onDismiss = onDismiss
 
-        #if os(iOS) || os(macOS)
+        #if os(iOS)
         self.pinsModel = ConsoleViewModel(store: store, configuration: configuration, contentType: .pins)
         self.pinsModel.onDismiss = onDismiss
         #endif

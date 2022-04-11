@@ -46,34 +46,4 @@ private struct QuickFilterView: View {
         }.buttonStyle(PlainButtonStyle())
     }
 }
-#elseif os(macOS)
-@available(iOS 13.0, *)
-struct ConsoleQuickFiltersView: View {
-    let filters: [QuickFilterViewModel]
-
-    var body: some View {
-        ForEach(filters) { item in
-            Button(action: item.action) {
-                Label(item.title, systemImage: item.imageName)
-                    .foregroundColor(.primary)
-            }
-            .buttonStyle(BorderlessButtonStyle())
-            .accentColor(item.color)
-        }
-    }
-}
-
-private struct QuickFilterView: View {
-    let model: QuickFilterViewModel
-
-    var body: some View {
-        Button(action: model.action) {
-            if model.title == "Reset" {
-                Image(systemName: "xmark.circle")
-            } else {
-                Text(model.title)
-            }
-        }
-    }
-}
 #endif

@@ -4,7 +4,7 @@
 
 import SwiftUI
 
-#if os(iOS) || os(macOS)
+#if os(iOS)
 
 struct PickerItem<Tag: Hashable> {
     let title: String
