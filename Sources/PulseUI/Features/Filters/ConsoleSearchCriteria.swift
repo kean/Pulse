@@ -5,6 +5,7 @@
 import Foundation
 import PulseCore
 import CoreData
+import SwiftUI
 
 struct ConsoleSearchCriteria: Hashable {
     var isFiltersEnabled = true
@@ -38,8 +39,16 @@ struct ConsoleSearchCriteria: Hashable {
         
         static let `default` = DatesFilter()
         
-        static func make(startDate: Date, endDate: Date?) -> DatesFilter {
-            DatesFilter(isEnabled: true, isCurrentSessionOnly: false, isStartDateEnabled: true, startDate: startDate, isEndDateEnabled: true, endDate: endDate)
+        static var today: DatesFilter {
+            make(startDate: Calendar.current.startOfDay(for: Date()), endDate: nil)
+        }
+        
+        static var recent: DatesFilter {
+            make(startDate: Date().addingTimeInterval(-1800), endDate: nil)
+        }
+        
+        static func make(startDate: Date, endDate: Date? = nil) -> DatesFilter {
+            DatesFilter(isEnabled: true, isCurrentSessionOnly: false, isStartDateEnabled: true, startDate: startDate, isEndDateEnabled: endDate != nil, endDate: endDate)
         }
     }
     
@@ -109,7 +118,6 @@ final class ConsoleSearchFilter: ObservableObject, Hashable, Identifiable {
     }
     
     enum Field {
-        // Database
         case level
         case label
         case message
@@ -117,6 +125,18 @@ final class ConsoleSearchFilter: ObservableObject, Hashable, Identifiable {
         case file
         case function
         case line
+        
+        var localizedTitle: String {
+            switch self {
+            case .level: return "Level"
+            case .label: return "Label"
+            case .message: return "Message"
+            case .metadata: return "Metadata"
+            case .file: return "File"
+            case .function: return "Function"
+            case .line: return "Line"
+            }
+        }
     }
     
     enum Match {
@@ -126,6 +146,17 @@ final class ConsoleSearchFilter: ObservableObject, Hashable, Identifiable {
         case notContains
         case regex
         case beginsWith
+        
+        var localizedTitle: String {
+            switch self {
+            case .equal: return "Equal"
+            case .notEqual: return "Not Equal"
+            case .contains: return "Contains"
+            case .notContains: return "Not Contains"
+            case .regex: return "Regex"
+            case .beginsWith: return "Begins With"
+            }
+        }
     }
     
     func makePredicate() -> NSPredicate? {

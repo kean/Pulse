@@ -46,4 +46,11 @@ private struct QuickFilterView: View {
         }.buttonStyle(PlainButtonStyle())
     }
 }
+
+@available(iOS 13.0, *)
+struct QuickFilterView_Previews: PreviewProvider {
+    static var previews: some View {
+        QuickFilterView(model: .init(title: "Test", color: .green, imageName: "", action: {}))
+    }
+}
 #endif

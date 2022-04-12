@@ -21,3 +21,12 @@ extension Color {
     static var secondaryFill: Color { Color.secondary.opacity(0.3) }
 }
 #endif
+
+@available(iOS 13.0, tvOS 13.0, watchOS 6.0, *)
+extension NavigationLink where Label == EmptyView {
+    static func programmatic(isActive: Binding<Bool>, destination: @escaping () -> Destination) -> NavigationLink {
+        NavigationLink(isActive: isActive, destination: destination) {
+            EmptyView()
+        }
+    }
+}

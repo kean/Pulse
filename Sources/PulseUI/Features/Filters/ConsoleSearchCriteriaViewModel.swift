@@ -88,4 +88,76 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
             allLabels = allLabelsSet.sorted()
         }
     }
+    
+    // MARK: Helpers
+    
+    /// Returns binding to toggling the given toggle level.
+    func binding(forLevel level: LoggerStore.Level) -> Binding<Bool> {
+        Binding(get: {
+            self.criteria.logLevels.levels.contains(level)
+        }, set: { isOn in
+            if isOn {
+                self.criteria.logLevels.levels.insert(level)
+            } else {
+                self.criteria.logLevels.levels.remove(level)
+            }
+        })
+    }
+    
+    /// Returns binding for toggling all log levels.
+    var bindingForTogglingAllLevels: Binding<Bool> {
+        Binding(get: {
+            self.criteria.logLevels.levels.count == LoggerStore.Level.allCases.count
+        }, set: { isOn in
+            if isOn {
+                self.criteria.logLevels.levels = Set(LoggerStore.Level.allCases)
+            } else {
+                self.criteria.logLevels.levels = Set()
+            }
+        })
+    }
+    
+    func binding(forLabel label: String) -> Binding<Bool> {
+        Binding(get: {
+            !self.criteria.labels.hidden.contains(label)
+        }, set: { isOn in
+            self.criteria.labels.focused = nil
+            if isOn {
+                self.criteria.labels.hidden.remove(label)
+            } else {
+                self.criteria.labels.hidden.insert(label)
+            }
+        })
+    }
+    
+    var bindingForTogglingAllLabels: Binding<Bool> {
+        Binding(get: {
+            self.criteria.labels.hidden.isEmpty
+        }, set: { isOn in
+            self.criteria.labels.focused = nil
+            if isOn {
+                self.criteria.labels.hidden = []
+            } else {
+                self.criteria.labels.hidden = Set(self.allLabels)
+            }
+        })
+    }
+
+    var bindingStartDate: Binding<Date> {
+        Binding(get: {
+            self.criteria.dates.startDate ?? Date().addingTimeInterval(-3600)
+        }, set: { newValue in
+            self.criteria.dates.isStartDateEnabled = true
+            self.criteria.dates.startDate = newValue
+        })
+    }
+    
+    var bindingEndDate: Binding<Date> {
+        Binding(get: {
+            self.criteria.dates.endDate ?? Date()
+        }, set: { newValue in
+            self.criteria.dates.isEndDateEnabled = true
+            self.criteria.dates.endDate = newValue
+        })
+    }
 }

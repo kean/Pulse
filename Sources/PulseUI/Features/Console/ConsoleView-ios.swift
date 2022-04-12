@@ -87,16 +87,20 @@ private struct QuickFiltersView: View {
                     isShowingFilters = true
                 }) {
                     Image(systemName: "line.horizontal.3.decrease.circle")
-                }.buttonStyle(PlainButtonStyle())
+                        .foregroundColor(.accentColor)
+                }.buttonStyle(.plain)
             }
             ConsoleQuickFiltersView(filters: model.quickFilters)
         }
         .padding(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
         .sheet(isPresented: $isShowingFilters) {
-            ConsoleFiltersView(searchCriteriaViewModel: model.searchCriteria, isPresented: $isShowingFilters)
+            NavigationView {
+                ConsoleFiltersView(viewModel: model.searchCriteria, isPresented: $isShowingFilters)
+            }
         }
     }
 }
+#warning("TEMP^^")
 
 #if DEBUG
 @available(iOS 13.0, *)

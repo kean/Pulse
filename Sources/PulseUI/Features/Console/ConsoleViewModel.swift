@@ -65,7 +65,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         #endif
 
         super.init()
-
+        
         if store !== LoggerStore.default {
             searchCriteria.criteria.dates.isCurrentSessionOnly = false
         }
@@ -109,8 +109,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         let sessionId = store === LoggerStore.default ? LoggerSession.current.id.uuidString : latestSessionId
 
         // Search messages
-        #warning("TODO: [P01] Pass filters")
-        ConsoleSearchCriteria.update(request: controller.fetchRequest, contentType: contentType, filterTerm: filterTerm, criteria: searchCriteria.criteria, filters: [], sessionId: sessionId, isOnlyErrors: false)
+        ConsoleSearchCriteria.update(request: controller.fetchRequest, contentType: contentType, filterTerm: filterTerm, criteria: searchCriteria.criteria, filters: searchCriteria.filters, sessionId: sessionId, isOnlyErrors: false)
         try? controller.performFetch()
 
         self.messages = controller.fetchedObjects ?? []
@@ -161,12 +160,10 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
             ((criteria.dates.startDate == nil || !criteria.dates.isStartDateEnabled) &&
             (criteria.dates.endDate == nil || !criteria.dates.isEndDateEnabled)) {
             filters.append(QuickFilterViewModel(title: "Today", color: .secondary, imageName: "arrow.clockwise") { [weak self] in
-                let calendar = Calendar.current
-                let startDate = calendar.startOfDay(for: Date())
-                self?.searchCriteria.criteria.dates = .make(startDate: startDate, endDate: startDate + 86400)
+                self?.searchCriteria.criteria.dates = .today
             })
             filters.append(QuickFilterViewModel(title: "Recent", color: .secondary, imageName: "arrow.clockwise") { [weak self] in
-                self?.searchCriteria.criteria.dates = .make(startDate: Date() - 1200, endDate: nil)
+                self?.searchCriteria.criteria.dates = .recent
             })
         }
         #if os(iOS)
