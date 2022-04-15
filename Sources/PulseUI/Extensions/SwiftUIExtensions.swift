@@ -22,6 +22,7 @@ extension Color {
 }
 #endif
 
+#if os(iOS) || os(watchOS) || os(tvOS)
 @available(iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension NavigationLink where Label == EmptyView {
     static func programmatic(isActive: Binding<Bool>, destination: @escaping () -> Destination) -> NavigationLink {
@@ -30,3 +31,4 @@ extension NavigationLink where Label == EmptyView {
         }
     }
 }
+#endif
