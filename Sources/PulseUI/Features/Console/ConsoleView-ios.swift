@@ -100,7 +100,6 @@ private struct QuickFiltersView: View {
         }
     }
 }
-#warning("TEMP^^")
 
 #if DEBUG
 @available(iOS 13.0, *)

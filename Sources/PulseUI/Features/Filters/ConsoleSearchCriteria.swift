@@ -236,7 +236,6 @@ extension ConsoleSearchCriteria {
         }
         
 #if os(watchOS) || os(tvOS) || os(iOS)
-        #warning("TODO: [P01] Remove/rework these")
         if criteria.onlyPins {
             predicates.append(NSPredicate(format: "isPinned == YES"))
         }

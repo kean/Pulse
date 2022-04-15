@@ -10,6 +10,7 @@ import SwiftUI
 @available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
 final class ConsoleSearchCriteriaViewModel: ObservableObject {
     @Published var criteria: ConsoleSearchCriteria = .default
+    private(set) var defaultCriteria: ConsoleSearchCriteria = .default
     @Published var filters: [ConsoleSearchFilter] = []
     
     @Published private(set) var allLabels: [String] = []
@@ -20,8 +21,13 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
     let dataNeedsReload = PassthroughSubject<Void, Never>()
     
     private var cancellables: [AnyCancellable] = []
-    
-    init() {
+
+    init(isDefaultStore: Bool = true) {
+        if !isDefaultStore {
+            criteria.dates.isCurrentSessionOnly = false
+            defaultCriteria.dates.isCurrentSessionOnly = false
+        }
+        
         resetFilters()
         
         $criteria.dropFirst().sink { [weak self] _ in
@@ -33,7 +39,7 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
     }
 
     func resetAll() {
-        criteria = .default
+        criteria = defaultCriteria
         resetFilters()
         isButtonResetEnabled = false
     }

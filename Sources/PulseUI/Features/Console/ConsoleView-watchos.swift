@@ -32,8 +32,8 @@ public struct ConsoleView: View {
             Button(action: model.tranferStore) {
                 Label(model.fileTransferStatus.title, systemImage: "square.and.arrow.up")
             }.disabled(model.fileTransferStatus.isButtonDisabled)
-            if let model = model.remoteLoggerViewModel {
-                NavigationLink(destination: _RemoteLoggingSettingsView(model: model)) {
+            if model.context.store === RemoteLogger.shared.store {
+                NavigationLink(destination: _RemoteLoggingSettingsView(model: .shared)) {
                     Button(action: { isRemoteLoggingLinkActive = true }) {
                         Label("Remote Logging", systemImage: "network")
                     }

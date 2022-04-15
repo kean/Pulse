@@ -14,7 +14,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     @Published private(set) var messages: [LoggerMessageEntity]
     
     // Search criteria
-    let searchCriteria = ConsoleSearchCriteriaViewModel()
+    let searchCriteria: ConsoleSearchCriteriaViewModel
     @Published var filterTerm: String = ""
     @Published private(set) var quickFilters: [QuickFilterViewModel] = []
     
@@ -47,13 +47,11 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         
         self.controller = NSFetchedResultsController<LoggerMessageEntity>(fetchRequest: request, managedObjectContext: store.container.viewContext, sectionNameKeyPath: nil, cacheName: nil)
         self.messages = []
-                
+
+        self.searchCriteria = ConsoleSearchCriteriaViewModel(isDefaultStore: store === LoggerStore.default)
+        
         super.init()
-        
-        if store !== LoggerStore.default {
-            searchCriteria.criteria.dates.isCurrentSessionOnly = false
-        }
-        
+
         controller.delegate = self
         
         $filterTerm.throttle(for: 0.33, scheduler: RunLoop.main, latest: true).dropFirst().sink { [weak self] filterTerm in
@@ -110,8 +108,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     private func makeQuickFilters(criteria: ConsoleSearchCriteria) -> [QuickFilterViewModel] {
         var filters = [QuickFilterViewModel]()
         func addResetIfNeeded() {
-#warning("TODO: [P01] Fix for non-current stores")
-            if !criteria.isDefault {
+            if self.searchCriteria.defaultCriteria != criteria {
                 filters.append(QuickFilterViewModel(title: "Reset", color: .secondary, imageName: "arrow.clockwise" ) { [weak self] in
                     self?.searchCriteria.resetAll()
                 })
