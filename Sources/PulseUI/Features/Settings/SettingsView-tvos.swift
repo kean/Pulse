@@ -13,8 +13,6 @@ struct SettingsView: View {
     @ObservedObject var model: SettingsViewModel
     @ObservedObject var console: ConsoleViewModel
 
-    @State var isSponsorAlertShown = false
-
     public init(store: LoggerStore = .default) {
         self.model = SettingsViewModel(store: store)
         self.console = ConsoleViewModel(store: store, contentType: .all)
@@ -41,26 +39,8 @@ struct SettingsView: View {
                     }
                 }
             }
-            Section(footer: Text("Pulse is funded by the community contributions.")) {
-                Button(action: {
-                    isSponsorAlertShown = true
-                }) {
-                    HStack {
-                        Image(systemName: "heart.fill")
-                            .foregroundColor(Color.pink)
-                        Text("Sponsor")
-                            .foregroundColor(Color.primary)
-                        Spacer()
-                        Image(systemName: "link")
-                            .foregroundColor(.secondary)
-                    }
-                }
-            }
         }
         .frame(maxWidth: 800)
-        .alert(isPresented: $isSponsorAlertShown, content: {
-            Alert(title: Text("Sponsor"), message: Text("Please visit https://github.com/sponsors/kean to sponsor"), dismissButton: .cancel(Text("Ok")))
-        })
     }
 }
 

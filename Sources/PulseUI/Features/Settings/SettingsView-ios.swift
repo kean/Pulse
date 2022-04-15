@@ -70,23 +70,6 @@ public struct SettingsView: View {
                     }
                 }
             }
-            Section(footer: Text("Pulse is funded by the community contributions.")) {
-                Button(action: {
-                    if let url = URL(string: "https://github.com/sponsors/kean") {
-                        UIApplication.shared.open(url)
-                    }
-                }) {
-                    HStack {
-                        Image(systemName: "heart.fill")
-                            .foregroundColor(Color.pink)
-                        Text("Sponsor")
-                            .foregroundColor(Color.primary)
-                        Spacer()
-                        Image(systemName: "link")
-                            .foregroundColor(.secondary)
-                    }
-                }
-            }
         }
         .navigationBarTitle("Settings")
         .navigationBarItems(leading: model.onDismiss.map { Button(action: $0) { Image(systemName: "xmark") } })
