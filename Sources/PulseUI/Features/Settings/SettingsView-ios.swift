@@ -63,9 +63,9 @@ public struct SettingsView: View {
                         .opacity(console.messages.isEmpty ? 0.33 : 1)
                 }
                 if #available(iOS 14.0, *) {
-                    if let model = console.remoteLoggerViewModel {
+                    if console.context.store === RemoteLogger.shared.store {
                         Section {
-                            RemoteLoggerSettingsView(model: model)
+                            RemoteLoggerSettingsView(model: .shared)
                         }
                     }
                 }

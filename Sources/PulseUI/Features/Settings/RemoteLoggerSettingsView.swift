@@ -83,6 +83,8 @@ final class RemoteLoggerSettingsViewModel: ObservableObject {
     private let logger: RemoteLogger
     private var cancellables: [AnyCancellable] = []
     
+    public static var shared = RemoteLoggerSettingsViewModel()
+    
     init(logger: RemoteLogger = .shared) {
         self.logger = logger
 
