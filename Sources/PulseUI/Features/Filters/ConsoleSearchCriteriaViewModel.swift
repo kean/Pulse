@@ -166,4 +166,54 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
             self.criteria.dates.endDate = newValue
         })
     }
+    
+    // MARK: Quick Filters
+    
+    func makeQuickFilters() -> [QuickFilterViewModel] {
+        var filters = [QuickFilterViewModel]()
+        func addResetIfNeeded() {
+            if defaultCriteria != criteria {
+                filters.append(QuickFilterViewModel(title: "Reset", color: .secondary, imageName: "arrow.clockwise" ) { [weak self] in
+                    self?.resetAll()
+                })
+            }
+        }
+#if os(watchOS)
+        addResetIfNeeded()
+#endif
+        if !criteria.logLevels.isEnabled || criteria.logLevels.levels != [.error, .critical] {
+            filters.append(QuickFilterViewModel(title: "Errors", color: .secondary, imageName: "exclamationmark.octagon") { [weak self] in
+                self?.criteria.logLevels.isEnabled = true
+                self?.criteria.logLevels.levels = [.error, .critical]
+            })
+        }
+#warning("TODO: [P01] Rework how these filters are implemented on watchOS")
+#if os(watchOS)
+        if !criteria.onlyPins {
+            filters.append(QuickFilterViewModel(title: "Pins", color: .secondary, imageName: "pin") { [weak self] in
+                self?.criteria.onlyPins = true
+            })
+        }
+        if !criteria.onlyNetwork {
+            filters.append(QuickFilterViewModel(title: "Networking", color: .secondary, imageName: "cloud") { [weak self] in
+                self?.criteria.onlyNetwork = true
+            })
+        }
+#endif
+#warning("TODO: [P01] This is incorrect + we need better filters")
+        if !criteria.dates.isEnabled ||
+            ((criteria.dates.startDate == nil || !criteria.dates.isStartDateEnabled) &&
+             (criteria.dates.endDate == nil || !criteria.dates.isEndDateEnabled)) {
+            filters.append(QuickFilterViewModel(title: "Today", color: .secondary, imageName: "arrow.clockwise") { [weak self] in
+                self?.criteria.dates = .today
+            })
+            filters.append(QuickFilterViewModel(title: "Recent", color: .secondary, imageName: "arrow.clockwise") { [weak self] in
+                self?.criteria.dates = .recent
+            })
+        }
+#if os(iOS)
+        addResetIfNeeded()
+#endif
+        return filters
+    }
 }
