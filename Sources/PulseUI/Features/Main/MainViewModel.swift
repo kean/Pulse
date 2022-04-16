@@ -79,7 +79,7 @@ extension MainViewModel {
         switch item {
         case .console:
             NavigationView {
-                ConsoleView(model: consoleModel)
+                ConsoleView(viewModel: consoleModel)
             }
         case .network:
             NavigationView {

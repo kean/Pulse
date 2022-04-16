@@ -8,28 +8,27 @@ import PulseCore
 import Combine
 
 #if os(iOS)
-import UIKit
 
 @available(iOS 13.0, *)
 public struct ConsoleView: View {
-    @ObservedObject var model: ConsoleViewModel
+    @ObservedObject var viewModel: ConsoleViewModel
     @Environment(\.colorScheme) private var colorScheme: ColorScheme
     @State private var shared: ShareItems?
 
     public init(store: LoggerStore = .default,
                 configuration: ConsoleConfiguration = .default) {
-        self.model = ConsoleViewModel(store: store)
+        self.viewModel = ConsoleViewModel(store: store)
     }
 
-    init(model: ConsoleViewModel) {
-        self.model = model
+    init(viewModel: ConsoleViewModel) {
+        self.viewModel = viewModel
     }
 
     public var body: some View {
         contentView
             .navigationBarTitle(Text("Console"))
             .navigationBarItems(
-                leading: model.onDismiss.map {
+                leading: viewModel.onDismiss.map {
                     Button(action: $0) { Image(systemName: "xmark") }
                 },
                 trailing: actionButton
@@ -39,8 +38,8 @@ public struct ConsoleView: View {
     
     private var contentView: some View {
         List {
-            QuickFiltersView(model: model)
-            ConsoleMessagesForEach(context: model.context, messages: model.messages, searchCriteriaViewModel: model.searchCriteria)
+            QuickFiltersView(model: viewModel)
+            ConsoleMessagesForEach(context: viewModel.context, messages: viewModel.messages, searchCriteriaViewModel: viewModel.searchCriteria)
         }.listStyle(PlainListStyle())
     }
 
@@ -48,27 +47,27 @@ public struct ConsoleView: View {
     private var actionButton: some View {
         if #available(iOS 14.0, *) {
             Menu(content: {
-                if model.configuration.isStoreSharingEnabled {
+                if viewModel.configuration.isStoreSharingEnabled {
                     Section {
-                        Button(action: { shared = model.share(as: .store) }) {
+                        Button(action: { shared = viewModel.share(as: .store) }) {
                             Label("Share as Pulse Document", systemImage: "square.and.arrow.up")
                         }
-                        Button(action: { shared = model.share(as: .text) }) {
+                        Button(action: { shared = viewModel.share(as: .text) }) {
                             Label("Share as Text File", systemImage: "square.and.arrow.up")
                         }
                     }
                 }
                 Section {
-                    ButtonRemoveAll(action: model.buttonRemoveAllMessagesTapped)
-                        .disabled(model.messages.isEmpty)
-                        .opacity(model.messages.isEmpty ? 0.33 : 1)
+                    ButtonRemoveAll(action: viewModel.buttonRemoveAllMessagesTapped)
+                        .disabled(viewModel.messages.isEmpty)
+                        .opacity(viewModel.messages.isEmpty ? 0.33 : 1)
                 }
             }, label: {
                 Image(systemName: "ellipsis.circle")
             })
         } else {
-            if model.configuration.isStoreSharingEnabled {
-                ShareButton { shared = model.share(as: .store) }
+            if viewModel.configuration.isStoreSharingEnabled {
+                ShareButton { shared = viewModel.share(as: .store) }
             }
         }
     }
@@ -106,8 +105,8 @@ private struct QuickFiltersView: View {
 struct ConsoleView_Previews: PreviewProvider {
     static var previews: some View {
         return Group {
-            ConsoleView(model: .init(store: .mock))
-            ConsoleView(model: .init(store: .mock))
+            ConsoleView(viewModel: .init(store: .mock))
+            ConsoleView(viewModel: .init(store: .mock))
                 .environment(\.colorScheme, .dark)
         }
     }
