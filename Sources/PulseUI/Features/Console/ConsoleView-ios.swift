@@ -14,6 +14,7 @@ public struct ConsoleView: View {
     @ObservedObject var viewModel: ConsoleViewModel
     @Environment(\.colorScheme) private var colorScheme: ColorScheme
     @State private var shared: ShareItems?
+    @Environment(\.presentationMode) var presentationMode
 
     public init(store: LoggerStore = .default,
                 configuration: ConsoleConfiguration = .default) {
@@ -34,6 +35,9 @@ public struct ConsoleView: View {
                 trailing: actionButton
             )
             .sheet(item: $shared) { ShareView($0).id($0.id) }
+            .onAppear {
+                print(presentationMode.wrappedValue)
+            }
     }
     
     private var contentView: some View {
