@@ -1,11 +1,8 @@
 #!/bin/sh
 
-cd Pulse
-swift package generate-xcodeproj
-
 set -eo pipefail
 
-scheme="Pulse-Package"
+scheme="Pulse"
 
 while getopts "s:d:" opt; do
     case $opt in

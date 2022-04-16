@@ -10,6 +10,15 @@ on:
 
 jobs:
   ios-latest:
+    name: Unit Tests (iOS 15.2, Xcode 13.2)
+    runs-on: macOS-11
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_13.2.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run Tests
+        run: Scripts/test.sh -d "OS=15.2,name=iPhone 13 Pro"
+  ios-xcode-12:
     name: Unit Tests (iOS 14.2, Xcode 12.5.1)
     runs-on: macOS-11
     env: 
@@ -17,7 +26,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Run Tests
-        run: Scripts/build.sh -d "OS=14.2,name=iPhone 11"
+        run: Scripts/test.sh -d "OS=14.2,name=iPhone 11"
   macos-latest:
     name: Unit Tests (macOS, Xcode 12.5.1)
     runs-on: macOS-11
