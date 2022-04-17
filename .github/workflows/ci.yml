@@ -75,3 +75,36 @@ jobs:
           python3 -m pip install --upgrade pip
           python3 -m pip install codespell
           codespell --ignore-words-list="hart,inout,msdos,sur" --skip="./.build/*"
+  build-demo-ios:
+    name: Build Demo (iOS)
+    runs-on: macOS-11
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_13.2.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@v2
+      - name: Discover typos
+        run: |
+          set -o pipefail
+          xcodebuild build -scheme "Pulse Demo iOS" -destination "OS=15.2,name=iPhone 13 Pro" | xcpretty
+  build-demo-tvos:
+    name: Build Demo (iOS)
+    runs-on: macOS-11
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_13.2.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@v2
+      - name: Discover typos
+        run: |
+          set -o pipefail
+          xcodebuild build -scheme "Pulse Demo tvOS" -destination "OS=15.2,name=Apple TV 4K" | xcpretty
+  build-integration-examples-ios:
+    name: Build Integration Examples (iOS)
+    runs-on: macOS-11
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_13.2.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@v2
+      - name: Discover typos
+        run: |
+          set -o pipefail
+          xcodebuild build -scheme "Pulse Integration Examples iOS" -destination "OS=15.2,name=iPhone 13 Pro" | xcpretty

@@ -1,9 +1,6 @@
 #!/bin/sh
 
-cd Pulse
-swift package generate-xcodeproj
-
-scheme="Pulse-Package"
+scheme="Pulse"
 
 while getopts "d:" opt; do
     case $opt in
