@@ -64,7 +64,7 @@ jobs:
       - name: Build
         run: swift build
   discover-typos:
-    name: Unit Tests (macOS, Xcode 13.2)
+    name: Discover Typos
     runs-on: macOS-11
     env:
       DEVELOPER_DIR: /Applications/Xcode_13.2.app/Contents/Developer
