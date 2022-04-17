@@ -11,23 +11,23 @@ import Combine
 
 @available(tvOS 14, *)
 public struct ConsoleView: View {
-    @ObservedObject var model: ConsoleViewModel
+    @ObservedObject var viewModel: ConsoleViewModel
     @Environment(\.colorScheme) private var colorScheme: ColorScheme
     @State private var isShowingFiltersView = false
     @State private var isShowingRemoveConfirmationAlert = false
     @State private var isStoreArchived = false
 
     public init(store: LoggerStore = .default) {
-        self.model = ConsoleViewModel(store: store)
+        self.viewModel = ConsoleViewModel(store: store)
     }
 
-    init(model: ConsoleViewModel) {
-        self.model = model
+    init(viewModel: ConsoleViewModel) {
+        self.viewModel = viewModel
     }
 
     public var body: some View {
         List {
-            ConsoleMessagesForEach(context: model.context, messages: model.messages, searchCriteriaViewModel: model.searchCriteria)
+            ConsoleMessagesForEach(context: viewModel.context, messages: viewModel.messages, searchCriteriaViewModel: viewModel.searchCriteria)
         }
     }
 }
@@ -37,8 +37,8 @@ public struct ConsoleView: View {
 struct ConsoleView_Previews: PreviewProvider {
     static var previews: some View {
         return Group {
-            ConsoleView(model: .init(store: .mock))
-            ConsoleView(model: .init(store: .mock))
+            ConsoleView(viewModel: .init(store: .mock))
+            ConsoleView(viewModel: .init(store: .mock))
                 .environment(\.colorScheme, .dark)
         }
     }
