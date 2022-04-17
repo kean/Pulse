@@ -33,9 +33,9 @@ struct SettingsView: View {
                 }
             }
             Section {
-                if let model = console.remoteLoggerViewModel {
+                if console.context.store === RemoteLogger.shared.store {
                     Section {
-                        RemoteLoggerSettingsView(model: model)
+                        RemoteLoggerSettingsView(model: .shared)
                     }
                 }
             }
