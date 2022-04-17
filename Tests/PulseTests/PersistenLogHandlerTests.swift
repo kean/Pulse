@@ -70,7 +70,7 @@ final class PersistentLogHandlerTests: XCTestCase {
 
         let persistedMessages = try store.allMessages()
         guard persistedMessages.count == 2 else {
-            return XCTFail("Unexpectede number of messages stored")
+            return XCTFail("Unexpected number of messages stored")
         }
         
         let persistedMessage1 = try XCTUnwrap(persistedMessages.first { $0.label == "test.logger.1" })
