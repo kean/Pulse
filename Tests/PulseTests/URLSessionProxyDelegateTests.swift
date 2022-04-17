@@ -14,12 +14,17 @@ final class URLSessionProxyDelegateTests: XCTestCase {
     var logger: NetworkLogger!
 
     override func setUp() {
+        super.setUp()
+
         let storeURL = directory.url.appendingFilename("logs.pulse")
         store = try! LoggerStore(storeURL: storeURL, options: [.create])
         logger = NetworkLogger(store: store)
     }
 
     override func tearDown() {
+        super.tearDown()
+
+        store.destroyStores()
         directory.remove()
     }
 

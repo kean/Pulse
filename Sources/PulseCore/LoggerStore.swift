@@ -380,8 +380,7 @@ extension LoggerStore {
     func flush(_ completion: (() -> Void)? = nil) {
         backgroundContext.perform { [weak self] in
             guard let self = self else { return }
-            if self.isSaveScheduled {
-                guard Files.fileExists(atPath: self.storeURL.path) else { return }
+            if self.isSaveScheduled, Files.fileExists(atPath: self.storeURL.path) {
                 try? self.backgroundContext.save()
                 self.isSaveScheduled = false
             }

@@ -53,13 +53,6 @@ final class PersistentLogHandlerTests: XCTestCase {
             ])
         }
 
-        var logger1 = Logger(label: "test.logger.1")
-        logger1[metadataKey: "test-uuid"] = "\(UUID())"
-        logger1.log(level: level1, "\(message1)")
-
-        let logger2 = Logger(label: "test.logger.2")
-        logger2.log(level: level2, "\(message2)", metadata: ["foo": "bar"])
-
         let expectation = self.expectation(description: "MessagesStored")
         var storedMessages = 0
         store.onEvent = { [unowned self] _ in
@@ -70,6 +63,13 @@ final class PersistentLogHandlerTests: XCTestCase {
                 }
             }
         }
+        
+        var logger1 = Logger(label: "test.logger.1")
+        logger1[metadataKey: "test-uuid"] = "\(UUID())"
+        logger1.log(level: level1, "\(message1)")
+
+        let logger2 = Logger(label: "test.logger.2")
+        logger2.log(level: level2, "\(message2)", metadata: ["foo": "bar"])
 
         waitForExpectations(timeout: 2.0)
 

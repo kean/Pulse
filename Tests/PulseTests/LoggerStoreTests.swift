@@ -16,6 +16,8 @@ final class LoggerStoreTests: XCTestCase {
     var store: LoggerStore!
 
     override func setUp() {
+        super.setUp()
+
         tempDirectoryURL = FileManager().temporaryDirectory.appendingPathComponent(UUID().uuidString)
         try? FileManager.default.createDirectory(at: tempDirectoryURL, withIntermediateDirectories: true, attributes: [:])
         storeURL = tempDirectoryURL.appendingPathComponent("test-store")
@@ -24,7 +26,10 @@ final class LoggerStoreTests: XCTestCase {
     }
 
     override func tearDown() {
+        super.tearDown()
+
         store.destroyStores()
+        
         try? FileManager.default.removeItem(at: tempDirectoryURL)
         try? FileManager.default.removeItem(at: URL.temp)
         try? FileManager.default.removeItem(at: URL.logs)
@@ -54,6 +59,7 @@ final class LoggerStoreTests: XCTestCase {
         // THEN data is persisted
         XCTAssertEqual(try secondStore.allMessages().count, 1)
         
+        // CLEANUP
         firstStore.destroyStores()
         secondStore.destroyStores()
     }
@@ -74,6 +80,7 @@ final class LoggerStoreTests: XCTestCase {
         try store.populate()
         XCTAssertEqual(try store.allMessages().count, 1)
 
+        let originalStore = store
         store.removeStores()
 
         // WHEN loading the store with the same url
@@ -81,6 +88,9 @@ final class LoggerStoreTests: XCTestCase {
 
         // THEN data is persisted
         XCTAssertEqual(try store.allMessages().count, 1)
+        
+        // CLEANUP
+        originalStore?.destroyStores()
     }
 
     func testInitWithArchiveURL() throws {
@@ -135,6 +145,8 @@ final class LoggerStoreTests: XCTestCase {
         // THEN
         XCTAssertEqual(try store.allMessages().count, 23)
         XCTAssertEqual(try store.allNetworkRequests().count, 4)
+        
+        store.destroyStores()
     }
 
     // MARK: - Copy (Directory)
@@ -154,6 +166,8 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertEqual(manifest.messageCount, 19)
         XCTAssertEqual(manifest.requestCount, 3)
 
+        store.removeStores()
+        
         // THEN
         let copy = try LoggerStore(storeURL: copyURL)
         XCTAssertEqual(try copy.allMessages().count, 19)
@@ -238,7 +252,8 @@ final class LoggerStoreTests: XCTestCase {
 
     // MARK: - File (Readonly)
 
-    func testOpenFileDatabaseImmutable() throws {
+    // TODO: this type of store is no longer immuatble
+    func _testOpenFileDatabaseImmutable() throws {
         // GIVEN
         let storeURL = try XCTUnwrap(Bundle.module.url(forResource: "logs-2021-03-18_21-22", withExtension: "pulse"))
         let store = try XCTUnwrap(LoggerStore(storeURL: storeURL))
