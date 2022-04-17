@@ -1,10 +1,6 @@
+// The MIT License (MIT)
 //
-//  ContentView.swift
-//  Pulse watchOS WatchKit Extension
-//
-//  Created by Alexander Grebenyuk on 08.03.2021.
-//  Copyright © 2021 kean. All rights reserved.
-//
+// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import PulseCore
