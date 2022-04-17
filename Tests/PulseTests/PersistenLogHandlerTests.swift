@@ -34,8 +34,6 @@ final class PersistentLogHandlerTests: XCTestCase {
     }
 
     func testItPersistsLoggedMessages() throws {
-        let deadlineExpectation = expectation(description: "Expected the deadline to be met.")
-
         let message1 = "This is a test message"
         let level1 = Logger.Level.info
 
@@ -62,8 +60,15 @@ final class PersistentLogHandlerTests: XCTestCase {
         let logger2 = Logger(label: "test.logger.2")
         logger2.log(level: level2, "\(message2)", metadata: ["foo": "bar"])
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-            deadlineExpectation.fulfill()
+        let expectation = self.expectation(description: "MessagesStored")
+        var storedMessages = 0
+        store.onEvent = { [unowned self] _ in
+            storedMessages += 1
+            if storedMessages == 2 {
+                self.store.flush {
+                    expectation.fulfill()
+                }
+            }
         }
 
         waitForExpectations(timeout: 2.0)
