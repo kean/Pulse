@@ -1,9 +1,6 @@
+// The MIT License (MIT)
 //
-//  ViewController.swift
-//  pulse-demo
-//
-//  Created by Alexander Grebenyuk on 20.08.2021.
-//
+// Copyright (c) 2020–2021 Alexander Grebenyuk (github.com/kean).
 
 import UIKit
 import PulseUI
@@ -16,9 +13,9 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         title = "PulseUI"
-        
+
         sections = [
             MenuSection(title: "Main", footer: "Demonstartes how to show the entire PulseUI interface (all four tabs)", items: [
                 MenuItem(title: "MainViewController", isPush: false, action: { [unowned self] in
@@ -33,7 +30,7 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
                     })
                     vc.modalPresentationStyle = .fullScreen
                     self.present(vc, animated: true, completion: nil)
-                }),
+                })
             ]),
             MenuSection(title: "Components", footer: "Demonstrates how you can push individual PulseUI screens into an existing navigation (UINavigationController or NavigationView)", items: [
                 MenuItem(title: "ConsoleView", action: { [unowned self] in
@@ -74,15 +71,15 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         sections[section].items.count
     }
-    
+
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         sections[section].title
     }
-    
+
     func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
         sections[section].footer
     }
-    
+
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "a", for: indexPath)
         let item = sections[indexPath.section].items[indexPath.row]

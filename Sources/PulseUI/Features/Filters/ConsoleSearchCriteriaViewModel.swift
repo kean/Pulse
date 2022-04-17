@@ -12,14 +12,14 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
     @Published var criteria: ConsoleSearchCriteria = .default
     private(set) var defaultCriteria: ConsoleSearchCriteria = .default
     @Published var filters: [ConsoleSearchFilter] = []
-    
+
     @Published private(set) var allLabels: [String] = []
     private var allLabelsSet: Set<String> = []
-    
+
     @Published private(set) var isButtonResetEnabled = false
-    
+
     let dataNeedsReload = PassthroughSubject<Void, Never>()
-    
+
     private var cancellables: [AnyCancellable] = []
 
     init(isDefaultStore: Bool = true) {
@@ -27,9 +27,9 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
             criteria.dates.isCurrentSessionOnly = false
             defaultCriteria.dates.isCurrentSessionOnly = false
         }
-        
+
         resetFilters()
-        
+
         $criteria.dropFirst().sink { [weak self] _ in
             self?.isButtonResetEnabled = true
             DispatchQueue.main.async { // important!
@@ -43,49 +43,49 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
         resetFilters()
         isButtonResetEnabled = false
     }
-    
+
     // MARK: Managing Custom Filters
-    
+
     func resetFilters() {
         filters = ConsoleSearchFilter.defaultFilters
         for filter in filters {
-            subscribe(to: filter) 
+            subscribe(to: filter)
         }
     }
-    
+
     func addFilter() {
         let filter = ConsoleSearchFilter(id: UUID(), field: .message, match: .contains, value: "", isEnabled: true)
         filters.append(filter)
-        
+
         subscribe(to: filter)
     }
-    
+
     private func subscribe(to filter: ConsoleSearchFilter) {
         filter.objectWillChange.sink { [weak self] in
             self?.objectWillChange.send()
             self?.isButtonResetEnabled = true
         }.store(in: &cancellables)
-        
+
         filter.objectWillChange.sink { [weak self] in
             DispatchQueue.main.async { // important!
                 self?.dataNeedsReload.send()
             }
         }.store(in: &cancellables)
     }
-    
+
     func removeFilter(_ filter: ConsoleSearchFilter) {
         if let index = filters.firstIndex(of: filter) {
             filters.remove(at: index)
         }
     }
-    
+
     // MARK: Managing Labels
-    
+
     func setInitialLabels(_ labels: Set<String>) {
         allLabelsSet = labels
         allLabels = allLabelsSet.sorted()
     }
-    
+
     func didInsertEntity(_ entity: LoggerMessageEntity) {
         var labels = allLabelsSet
         labels.insert(entity.label)
@@ -94,9 +94,9 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
             allLabels = allLabelsSet.sorted()
         }
     }
-    
+
     // MARK: Helpers
-    
+
     /// Returns binding to toggling the given toggle level.
     func binding(forLevel level: LoggerStore.Level) -> Binding<Bool> {
         Binding(get: {
@@ -109,7 +109,7 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
             }
         })
     }
-    
+
     /// Returns binding for toggling all log levels.
     var bindingForTogglingAllLevels: Binding<Bool> {
         Binding(get: {
@@ -122,7 +122,7 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
             }
         })
     }
-    
+
     func binding(forLabel label: String) -> Binding<Bool> {
         Binding(get: {
             !self.criteria.labels.hidden.contains(label)
@@ -135,7 +135,7 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
             }
         })
     }
-    
+
     var bindingForTogglingAllLabels: Binding<Bool> {
         Binding(get: {
             self.criteria.labels.hidden.isEmpty
@@ -157,7 +157,7 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
             self.criteria.dates.startDate = newValue
         })
     }
-    
+
     var bindingEndDate: Binding<Date> {
         Binding(get: {
             self.criteria.dates.endDate ?? Date()
@@ -166,9 +166,9 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
             self.criteria.dates.endDate = newValue
         })
     }
-    
+
     // MARK: Quick Filters
-    
+
     func makeQuickFilters() -> [QuickFilterViewModel] {
         var filters = [QuickFilterViewModel]()
         func addResetIfNeeded() {

@@ -23,7 +23,7 @@ public struct PinsView: View {
     init(model: ConsoleViewModel) {
         self.model = model
     }
-    
+
     public var body: some View {
         contents
             .navigationBarTitle(Text("Pins"))

@@ -38,7 +38,7 @@ extension String {
         }
         return ranges
     }
-    
+
     /// Returns first range of substring.
     func firstRange(of substring: String, options: String.CompareOptions = []) -> Range<String.Index>? {
         range(of: substring, options: options, range: startIndex..<endIndex, locale: nil)

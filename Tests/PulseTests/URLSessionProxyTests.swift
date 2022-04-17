@@ -34,7 +34,7 @@ final class URLSessionProxyTests: XCTestCase {
         // WHEN
         let dataURL = try XCTUnwrap(Bundle.module.url(forResource: "logs-2021-03-18_21-22", withExtension: "pulse"))
         let didComplete = self.expectation(description: "TaskCompleted")
-        let dataTask = URLSession.shared.dataTask(with: dataURL) { data, response, error in
+        let dataTask = URLSession.shared.dataTask(with: dataURL) { _, _, _ in
             didComplete.fulfill()
         }
         dataTask.resume()
@@ -70,7 +70,7 @@ final class URLSessionProxyTests: XCTestCase {
 
         // WHEN
         let didComplete = self.expectation(description: "TaskCompleted")
-        let dataTask = URLSession.shared.dataTask(with: dataURL) { data, response, error in
+        let dataTask = URLSession.shared.dataTask(with: dataURL) { _, _, _ in
             didComplete.fulfill()
         }
         dataTask.resume()

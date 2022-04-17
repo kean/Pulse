@@ -23,7 +23,7 @@ public struct LoggerStoreInfo: Codable {
         public let version: String?
         public let build: String?
     }
-    
+
     public struct DeviceInfo: Codable {
         public let name: String
         public let model: String

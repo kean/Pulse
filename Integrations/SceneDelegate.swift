@@ -1,17 +1,12 @@
+// The MIT License (MIT)
 //
-//  SceneDelegate.swift
-//  Integrations
-//
-//  Created by Alexander Grebenyuk on 8/21/21.
-//  Copyright © 2021 kean. All rights reserved.
-//
+// Copyright (c) 2020–2021 Alexander Grebenyuk (github.com/kean).
 
 import UIKit
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
-
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
@@ -48,6 +43,4 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // to restore the scene back to its current state.
     }
 
-
 }
-

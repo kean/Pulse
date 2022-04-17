@@ -94,7 +94,7 @@ final class ToastManager {
         UIView.animate(withDuration: 0.33, delay: 0, options: [.beginFromCurrentState]) {
             toast.view.alpha = 0
             toast.view.transform = CGAffineTransform(scaleX: 0.95, y: 0.95).translatedBy(x: 0, y: 10)
-        } completion: { isFinished in
+        } completion: { _ in
             guard let line = self.queue.firstIndex(where: { $0 === toast }) else { return }
             self.queue.remove(at: line)
 

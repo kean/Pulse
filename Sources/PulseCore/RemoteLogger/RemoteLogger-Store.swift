@@ -13,7 +13,7 @@ extension RemoteLogger {
     public static func store(_ message: LoggerStore.Message, into store: LoggerStore) {
         store.storeMessage(message)
     }
-    
+
     public static func store(_ message: LoggerStore.NetworkMessage, into store: LoggerStore) {
         store.storeRequest(message)
     }

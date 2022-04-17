@@ -11,7 +11,7 @@ import SwiftUI
 
 public final class MainViewController: UITabBarController {
     private let model: Any?
-    
+
     public static var isAutomaticAppearanceOverrideRemovalEnabled = true
 
     public init(store: LoggerStore = .default, onDismiss: (() -> Void)? = nil) {
@@ -21,7 +21,7 @@ public final class MainViewController: UITabBarController {
             self.model = nil
         }
         super.init(nibName: nil, bundle: nil)
-        
+
         if MainViewController.isAutomaticAppearanceOverrideRemovalEnabled {
             removeAppearanceOverrides()
         }
@@ -100,7 +100,7 @@ private var isAppearanceCleanupNeeded = true
 private func removeAppearanceOverrides() {
     guard isAppearanceCleanupNeeded else { return }
     isAppearanceCleanupNeeded = false
-    
+
     let appearance = UINavigationBar.appearance(whenContainedInInstancesOf: [MainViewController.self])
     appearance.tintColor = nil
     appearance.barTintColor = nil

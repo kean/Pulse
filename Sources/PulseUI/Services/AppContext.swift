@@ -1,5 +1,6 @@
-
-//  Created by Alexander Grebenyuk on 29.03.2021.
+// The MIT License (MIT)
+//
+// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
 import PulseCore

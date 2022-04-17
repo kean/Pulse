@@ -7,7 +7,7 @@ import Foundation
 public final class NetworkLogger {
     private let store: LoggerStore
     private let lock = NSLock()
-    
+
     private let willLogTask: (LoggedNetworkTask) -> LoggedNetworkTask?
 
     /// - parameter willLogTask: Allows you to filter out sensitive information
@@ -27,7 +27,7 @@ public final class NetworkLogger {
         lock.lock()
         defer { lock.unlock() }
 
-        let _ = context(for: task)
+        _ = context(for: task)
         storeMessage(level: .trace, "Send \(urlRequest.httpMethod ?? "–") \(task.url ?? "–")")
     }
 
@@ -60,18 +60,18 @@ public final class NetworkLogger {
     public func logTask(_ task: URLSessionTask, didCompleteWithError error: Error?, session: URLSession? = nil) {
         lock.lock()
         defer { lock.unlock() }
-        
+
         let context = self.context(for: task)
         tasks[ObjectIdentifier(task)] = nil
-        
+
         guard let request = task.currentRequest ?? context.request else {
             return // This should never happen
         }
         let response = context.response ?? task.response
-        
+
         log(LoggedNetworkTask(task: task, session: session, request: request, response: response, data: context.data, error: error, metrics: context.metrics))
     }
-    
+
     private func log(_ task: LoggedNetworkTask) {
         guard let task = willLogTask(task) else {
             return
@@ -94,9 +94,9 @@ public final class NetworkLogger {
 
         context(for: task).metrics = metrics
     }
-    
+
     // MARK: - Filter Out
-    
+
     public struct LoggedNetworkTask {
         public var task: URLSessionTask
         public var session: URLSession?
@@ -106,7 +106,7 @@ public final class NetworkLogger {
         public var error: Error?
         public var metrics: NetworkLoggerMetrics?
     }
-        
+
     // MARK: - Private
 
     private var tasks: [ObjectIdentifier: TaskContext] = [:]

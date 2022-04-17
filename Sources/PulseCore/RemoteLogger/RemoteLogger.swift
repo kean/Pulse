@@ -16,13 +16,13 @@ import SwiftUI
 @available(iOS 14.0, tvOS 14.0, watchOS 7.0, macOS 11.0, *)
 public final class RemoteLogger: RemoteLoggerConnectionDelegate {
     private(set) public var store: LoggerStore?
-    
+
     @Published public private(set) var servers: Set<NWBrowser.Result> = []
-    
+
     // Browsing
     private var isStarted = false
     private var browser: NWBrowser?
-    
+
     // Connections
     private var connection: Connection?
     private var connectedServer: NWBrowser.Result?
@@ -32,28 +32,28 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
     private var connectionRetryItem: DispatchWorkItem?
     private var timeoutDisconnectItem: DispatchWorkItem?
     private var pingItem: DispatchWorkItem?
-    
+
     public enum ConnectionState {
         case idle, connecting, connected
     }
-    
+
     // Logging
     private var isLoggingPaused = true
     private var buffer: [LoggerStoreEvent]? = []
-    
+
     // Persistence
     @AppStorage("com-github-kean-pulse-is-remote-logger-enabled")
     private(set) public var isEnabled = false
     @AppStorage("com-github-kean-pulse-selected-server")
     private(set) public var selectedServer = ""
-    
+
     private let queue = DispatchQueue(label: "com.github.kean.remote-logger")
     private let specificKey = DispatchSpecificKey<String>()
-    
+
     private var isInitialized = false
-    
+
     public static let shared = RemoteLogger()
-    
+
     /// - parameter store: The store to be synced with the server. By default,
     /// `LoggerStore.default`. Only one store can be synced at at time.
     public func initialize(store: LoggerStore = .default) {
@@ -67,7 +67,7 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
         if isEnabled {
             queue.async(execute: startBrowser)
         }
-        
+
         store.onEvent = { [weak self] event in
             self?.queue.async {
                 self?.didReceive(event: event)
@@ -80,25 +80,25 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
             self?.buffer = nil
         }
     }
-    
+
     /// - parameter store: By default, is initialized with a `default` store.
     private init() {
         queue.setSpecific(key: specificKey, value: "yes")
     }
-    
+
     /// Enables remote logging. The logger will start searching for available
     /// servers.
     public func enable() {
         isEnabled = true
         queue.async(execute: startBrowser)
     }
-    
+
     /// Disables remote logging and disconnects from the server.
     public func disable() {
         isEnabled = false
         queue.async(execute: cancel)
     }
-    
+
     private func cancel() {
         guard isStarted else { return }
         isStarted = false
@@ -106,19 +106,19 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
         cancelBrowser()
         cancelConnection()
     }
-    
+
     // MARK: Browsing
 
     private func startBrowser() {
         precondition(DispatchQueue.getSpecific(key: specificKey) != nil)
-        
+
         guard !isStarted else { return }
         isStarted = true
-        
+
         log(label: "RemoteLogger", "Will start browser")
-        
+
         let browser = NWBrowser(for: .bonjour(type: RemoteLogger.serviceType, domain: "local"), using: .tcp)
-        
+
         browser.stateUpdateHandler = { [weak self] newState in
             guard let self = self, self.isEnabled else { return }
 
@@ -128,7 +128,7 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
             }
         }
 
-        browser.browseResultsChangedHandler = { [weak self] results, changes in
+        browser.browseResultsChangedHandler = { [weak self] results, _ in
             guard let self = self, self.isEnabled else { return }
 
             log(label: "RemoteLogger", "Found services \(results.map { $0.endpoint.debugDescription })")
@@ -136,16 +136,16 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
             self.servers = results
             self.connectAutomaticallyIfNeeded()
         }
-        
+
         // Start browsing and ask for updates on the main queue.
         browser.start(queue: queue)
 
         self.browser = browser
     }
- 
+
     private func scheduleBrowserRetry() {
         precondition(DispatchQueue.getSpecific(key: specificKey) != nil)
-        
+
         guard isStarted else { return }
 
         // Automatically retry until the user cancels
@@ -156,47 +156,47 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
 
     private func connectAutomaticallyIfNeeded() {
         precondition(DispatchQueue.getSpecific(key: specificKey) != nil)
-        
+
         guard isStarted else { return }
-        
+
         guard !selectedServer.isEmpty, connectedServer == nil,
               let server = self.servers.first(where: { $0.name == selectedServer }) else {
             return
         }
-        
+
         log(label: "RemoteLogger", "Will connect automatically to \(server.endpoint)")
 
         connect(to: server)
     }
-    
+
     private func cancelBrowser() {
         browser?.cancel()
         browser = nil
     }
-    
+
     // MARK: Connection
-    
+
     /// Returns `true` if the server is selected.
     public func isSelected(_ server: NWBrowser.Result) -> Bool {
         server.name == selectedServer
     }
-        
+
     /// Connects to the given server and saves the selection persistently. Cancels
     /// the existing connection.
     public func connect(to server: NWBrowser.Result) {
         guard let name = server.name else {
             return log(label: "RemoteLogger", "Server name is missing")
         }
-        
+
         // Save selection for the future
         selectedServer = name
-        
+
         queue.async { self._connect(to: server) }
     }
-    
+
     private func _connect(to server: NWBrowser.Result) {
         precondition(DispatchQueue.getSpecific(key: specificKey) != nil)
-        
+
         switch connectionState {
         case .idle:
             openConnection(to: server)
@@ -206,15 +206,15 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
             openConnection(to: server)
         }
     }
-    
+
     private func openConnection(to server: NWBrowser.Result) {
         precondition(DispatchQueue.getSpecific(key: specificKey) != nil)
-        
+
         connectedServer = server
         connectionState = .connecting
-        
+
         log(label: "RemoteLogger", "Will start a connection to server with endpoint \(server.endpoint)")
-        
+
         let server = servers.first(where: { $0.name == server.name }) ?? server
 
         let connection = Connection(endpoint: server.endpoint)
@@ -222,10 +222,10 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
         connection.start(on: queue)
         self.connection = connection
     }
-    
+
     public func connection(_ connection: Connection, didChangeState newState: NWConnection.State) {
         precondition(DispatchQueue.getSpecific(key: specificKey) != nil)
-        
+
         guard connectionState != .idle else { return }
 
         log(label: "RemoteLogger", "Connection did update state: \(newState)")
@@ -239,17 +239,17 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
             break
         }
     }
-    
+
     public func connection(_ connection: Connection, didReceiveEvent event: Connection.Event) {
         precondition(DispatchQueue.getSpecific(key: specificKey) != nil)
-        
+
         guard connectionState != .idle else { return }
 
         switch event {
         case .packet(let packet):
             do {
                 try didReceiveMessage(packet: packet)
-            }  catch {
+            } catch {
                 log(label: "RemoteLogger", "Invalid message from the server: \(error)")
             }
         case .error:
@@ -258,14 +258,14 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
             break
         }
     }
-    
+
     private func handshakeWithServer() {
         precondition(DispatchQueue.getSpecific(key: specificKey) != nil)
-        
+
         assert(connection != nil)
-        
+
         log(label: "RemoteLogger", "Will send hello to the server")
-        
+
         // Say "hello" to the server and share information about the client
         let deviceId = getDeviceId() ?? getFallbackDeviceId()
         let body = PacketClientHello(deviceId: deviceId, deviceInfo: .make(), appInfo: .make())
@@ -274,18 +274,18 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
         // Set timeout and retry in case there was no response from the server
         queue.asyncAfter(deadline: .now() + .seconds(10)) { [weak self] in
             guard let self = self else { return } // Failed to connect in 10 sec
-            
+
             guard self.connectionState == .connecting else { return }
             log(label: "RemoteLogger", "The handshake with the server timed out")
             self.scheduleConnectionRetry()
         }
     }
-        
+
     private func didReceiveMessage(packet: Connection.Packet) throws {
         let code = RemoteLogger.PacketCode(rawValue: packet.code)
-        
+
         log(label: "RemoteLogger", "Did receive packet with code: \(code?.description ?? "invalid")")
-        
+
         switch code {
         case .serverHello:
             guard connectionState != .connected else { return }
@@ -302,16 +302,16 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
             assertionFailure("A packet with an invalid code received from the server: \(packet.code.description)")
         }
     }
-    
+
     private func scheduleConnectionRetry() {
         precondition(DispatchQueue.getSpecific(key: specificKey) != nil)
-        
+
         guard connectionState != .idle, connectionRetryItem == nil else { return }
 
         cancelPingPong()
-        
+
         connectionState = .connecting
-                
+
         let item = DispatchWorkItem { [weak self] in
             guard let self = self else { return }
             self.connectionRetryItem = nil
@@ -322,14 +322,14 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
         queue.asyncAfter(deadline: .now() + .seconds(2), execute: item)
         connectionRetryItem = item
     }
-           
+
     private func scheduleAutomaticDisconnect() {
         precondition(DispatchQueue.getSpecific(key: specificKey) != nil)
-        
+
         timeoutDisconnectItem?.cancel()
-        
+
         guard connectionState == .connected else { return }
-        
+
         let item = DispatchWorkItem { [weak self] in
             guard let self = self else { return }
             guard self.connectionState == .connected else { return }
@@ -339,10 +339,10 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
         queue.asyncAfter(deadline: .now() + .seconds(4), execute: item)
         timeoutDisconnectItem = item
     }
-    
+
     private func schedulePing() {
         connection?.send(code: .ping)
-        
+
         let item = DispatchWorkItem { [weak self] in
             guard let self = self else { return }
             guard self.connectionState == .connected else { return }
@@ -351,10 +351,10 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
         queue.asyncAfter(deadline: .now() + .seconds(2), execute: item)
         pingItem = item
     }
-    
+
     private func cancelConnection() {
         precondition(DispatchQueue.getSpecific(key: specificKey) != nil)
-        
+
         connectionState = .idle // The order is important
         connectedServer = nil
 
@@ -366,7 +366,7 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
 
         cancelPingPong()
     }
-    
+
     private func cancelPingPong() {
         timeoutDisconnectItem?.cancel()
         timeoutDisconnectItem = nil
@@ -374,19 +374,19 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
         pingItem?.cancel()
         pingItem = nil
     }
-    
+
     // MARK: Logging
-    
+
     private func didReceive(event: LoggerStoreEvent) {
         precondition(DispatchQueue.getSpecific(key: specificKey) != nil)
-        
+
         if isLoggingPaused {
             buffer?.append(event)
         } else {
             send(event: event)
         }
     }
-    
+
     private func send(event: LoggerStoreEvent) {
         switch event {
         case .saveMessage(let message):

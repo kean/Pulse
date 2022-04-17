@@ -19,15 +19,15 @@ struct Palette {
     static var red: UXColor {
         UXColor.dynamic(light: Palette.lightRed, dark: Palette.darkRed)
     }
-    
+
     private static let lightRed = UXColor(red: 196.0/255.0, green: 26.0/255.0, blue: 22.0/255.0, alpha: 1.0)
     private static let darkRed = UXColor(red: 252.0/255.0, green: 106.0/255.0, blue: 93.0/255.0, alpha: 1.0)
-    
+
     @available(iOS 13.0, tvOS 13.0, *)
     static var pink: UXColor {
         UXColor.dynamic(light: Palette.lightPink, dark: Palette.darkPink)
     }
-    
+
     private static let lightPink = UXColor(red: 155.0/255.0, green: 35.0/255.0, blue: 147.00/255.0, alpha: 1.0)
     private static let darkPink = UXColor(red: 252.0/255.0, green: 95.0/255.0, blue: 163.0/255.0, alpha: 1.0)
     #else

@@ -76,7 +76,7 @@ struct NetworkInspectorSummaryView: View {
                     Text("")
                 }
             }
-            
+
             NavigationLink(destination: NetworkInspectorResponseView(model: model.requestBodyViewModel), isActive: $model.isRequestRawActive) {
                 Text("")
             }
@@ -95,7 +95,7 @@ struct NetworkInspectorSummaryView: View {
                     Text("")
                 }.hidden()
             }
-            
+
             NavigationLink(destination: NetworkHeadersDetailsView(model: model.responseHeaders), isActive: $model.isResponseHeadearsRawActive) {
                 Text("")
             }
@@ -169,7 +169,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
                 ("Message", error.localizedDescription)
             ])
     }
-    
+
     var requestBodySection: KeyValueSectionViewModel? {
         guard summary.requestBodyKey != nil, summary.requestBodySize > 0 else {
             return nil
@@ -227,7 +227,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
         return KeyValueSectionViewModel(title: "Timing", color: .gray, items: [
             ("Start Date", dateFormatter.string(from: metrics.taskInterval.start)),
             ("Duration", DurationFormatter.string(from: metrics.taskInterval.duration)),
-            ("Redirect Count", metrics.redirectCount.description),
+            ("Redirect Count", metrics.redirectCount.description)
         ])
     }
 
@@ -257,7 +257,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
             items: items
         )
     }
-    
+
     var httpAdditionalHeaders: KeyValueSectionViewModel? {
         guard let headers = summary.session?.httpAdditionalHeaders else {
             return nil

@@ -102,7 +102,7 @@ final class NetworkInspectorHeaderViewModel: ObservableObject {
             items: items
         )
     }
-    
+
     var responseHeaders: KeyValueSectionViewModel {
         let items = (summary.response?.headers ?? [:]).sorted(by: { $0.key < $1.key })
         return KeyValueSectionViewModel(

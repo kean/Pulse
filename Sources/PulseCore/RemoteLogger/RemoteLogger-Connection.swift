@@ -16,17 +16,17 @@ extension RemoteLogger {
     public final class Connection {
         private let connection: NWConnection
         private var buffer = Data()
-        
+
         public weak var delegate: RemoteLoggerConnectionDelegate?
-        
+
         public convenience init(endpoint: NWEndpoint) {
             self.init(NWConnection(to: endpoint, using: .tcp))
         }
-        
+
         public init(_ connection: NWConnection) {
             self.connection = connection
         }
-  
+
         public func start(on queue: DispatchQueue) {
             connection.stateUpdateHandler = { [weak self] in
                 guard let self = self else { return }
@@ -35,20 +35,20 @@ extension RemoteLogger {
             receive()
             connection.start(queue: queue)
         }
-    
+
         public enum Event {
             case packet(Packet)
             case error(Error)
             case completed
         }
-        
+
         public struct Packet {
             public let code: UInt8
             public let body: Data
         }
-        
+
         private func receive() {
-            connection.receive(minimumIncompleteLength: 1, maximumLength: 65535) { [weak self] data, context, isCompleted, error in
+            connection.receive(minimumIncompleteLength: 1, maximumLength: 65535) { [weak self] data, _, isCompleted, error in
                 guard let self = self else { return }
                 if let data = data, !data.isEmpty {
                     self.process(data: data)
@@ -62,10 +62,10 @@ extension RemoteLogger {
                 }
             }
         }
-        
+
         private func process(data freshData: Data) {
             guard !freshData.isEmpty else { return }
-            
+
             var freshData = freshData
             if buffer.isEmpty {
                 while let (packet, size) = decodePacket(from: freshData) {
@@ -76,7 +76,7 @@ extension RemoteLogger {
                     freshData.removeFirst(size)
                 }
             }
-            
+
             if !freshData.isEmpty {
                 buffer.append(freshData)
                 while let (packet, size) = decodePacket(from: buffer) {
@@ -88,7 +88,7 @@ extension RemoteLogger {
                 }
             }
         }
-        
+
         private func decodePacket(from data: Data) -> (Packet, Int)? {
             do {
                 return try RemoteLogger.decode(buffer: data)
@@ -104,7 +104,7 @@ extension RemoteLogger {
         private func send(event: Event) {
             delegate?.connection(self, didReceiveEvent: event)
         }
-        
+
         public func send(code: UInt8, data: Data, _ completion: ((NWError?) -> Void)? = nil) {
             do {
                 let data = try encode(code: code, body: data)
@@ -126,7 +126,7 @@ extension RemoteLogger {
                 log("Failed to encode a packet: \(error)") // Should never happen
             }
         }
-        
+
         public func cancel() {
             connection.cancel()
         }
@@ -148,7 +148,7 @@ private extension RemoteLogger {
         data.append(body)
         return data
     }
-        
+
     static func decode(buffer: Data) throws -> (Connection.Packet, Int) {
         let header = try PacketHeader(data: buffer)
         guard buffer.count >= header.totalPacketLength else {
@@ -158,17 +158,17 @@ private extension RemoteLogger {
         let packet = Connection.Packet(code: header.code, body: body)
         return (packet, header.totalPacketLength)
     }
-    
+
     /// |code|contentSize|body?|
     struct PacketHeader {
         let code: UInt8
         let contentSize: UInt32
-        
+
         var totalPacketLength: Int { Int(PacketHeader.size + contentSize) }
         var contentOffset: Int { Int(PacketHeader.size) }
-        
+
         static let size: UInt32 = 5
-        
+
         init(code: UInt8, contentSize: UInt32) {
             self.code = code
             self.contentSize = contentSize

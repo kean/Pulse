@@ -79,7 +79,7 @@ extension NSPersistentStoreCoordinator {
             // https://developer.apple.com/library/content/qa/qa1809/_index.html
             NSSQLitePragmasOption: ["journal_mode": "DELETE"],
             // Minimize file size
-            NSSQLiteManualVacuumOption: true,
+            NSSQLiteManualVacuumOption: true
         ]
 
         try backupCoordinator.migratePersistentStore(

@@ -34,8 +34,7 @@ public extension Experimental {
             didSet {
                 if isEnabled {
                     URLProtocol.registerClass(CustomHTTPProtocol.self)
-                }
-                else{
+                } else {
                     URLProtocol.unregisterClass(CustomHTTPProtocol.self)
                 }
             }

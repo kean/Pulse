@@ -10,7 +10,7 @@ struct BadgePickerItemView: View {
     let title: String
     @Binding var isEnabled: Bool
     var textColor: Color?
-    
+
     var body: some View {
         Button(action: { isEnabled.toggle() }) {
             HStack {

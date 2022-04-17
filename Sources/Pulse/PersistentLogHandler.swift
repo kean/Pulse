@@ -76,9 +76,8 @@ private extension LoggerStore.MetadataValue {
         switch value {
         case .string(let value): self = .string(value)
         case .stringConvertible(let value): self = .stringConvertible(value)
-        case .dictionary(_): return nil // Unsupported
-        case .array(_): return nil // Unsupported
+        case .dictionary: return nil // Unsupported
+        case .array: return nil // Unsupported
         }
     }
 }
-

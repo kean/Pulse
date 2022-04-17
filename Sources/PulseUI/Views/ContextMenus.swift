@@ -155,7 +155,7 @@ struct StringSearchOptionsMenu: View {
     var body: some View {
         menu
     }
-    
+
     var menu: some View {
         Menu(content: {
             Picker(options.isCaseSensitive ? "Case Sensitive" :  "Case Insensitive", selection: $options.isCaseSensitive) {

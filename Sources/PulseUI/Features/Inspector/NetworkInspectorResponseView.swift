@@ -57,13 +57,13 @@ struct NetworkInspectorResponseView: View {
                         ])).fixedSize()
                         Spacer()
                     }
-                    
+
                     Divider()
 
                     Image(uxImage: image)
                         .resizable()
                         .aspectRatio(contentMode: .fit)
-                    
+
                     Spacer()
                 }.padding()
             }
@@ -106,7 +106,6 @@ struct NetworkInspectorResponseView_Previews: PreviewProvider {
                 .previewDisplayName("Dark")
                 .previewLayout(.sizeThatFits)
                 .environment(\.colorScheme, .dark)
-
 
         }
     }

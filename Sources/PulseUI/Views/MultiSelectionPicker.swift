@@ -35,7 +35,7 @@ struct MultiSelectionPicker<Tag: Hashable>: View {
             Text(title)
             Button(action: {
                 isPickerPresented.toggle()
-            }){
+            }) {
                 Text(makeEmptyLabel())
             }
         }

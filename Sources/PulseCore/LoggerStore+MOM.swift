@@ -15,7 +15,7 @@ public extension LoggerStore {
         let metadata = NSEntityDescription(name: "LoggerMetadataEntity", class: LoggerMetadataEntity.self)
         let request = NSEntityDescription(name: "LoggerNetworkRequestEntity", class: LoggerNetworkRequestEntity.self)
         let requestDetails = NSEntityDescription(name: "LoggerNetworkRequestDetailsEntity", class: LoggerNetworkRequestDetailsEntity.self)
-        
+
         metadata.properties = [
             NSAttributeDescription(name: "key", type: .stringAttributeType),
             NSAttributeDescription(name: "value", type: .stringAttributeType)
@@ -45,7 +45,7 @@ public extension LoggerStore {
             NSAttributeDescription(name: "metrics", type: .binaryDataAttributeType),
             NSAttributeDescription(name: "urlSession", type: .binaryDataAttributeType),
             NSAttributeDescription(name: "requestBodySize", type: .integer64AttributeType),
-            NSAttributeDescription(name: "responseBodySize", type: .integer64AttributeType),
+            NSAttributeDescription(name: "responseBodySize", type: .integer64AttributeType)
         ]
 
         request.properties = [
@@ -113,7 +113,7 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
     @NSManaged public var contentType: String?
     @NSManaged public var isCompleted: Bool
     @NSManaged public var requestState: Int16
-    
+
     public enum State: Int16 {
         // 0 reserved for undefined
         case pending = 1 // not used yet

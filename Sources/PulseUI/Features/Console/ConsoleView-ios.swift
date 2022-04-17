@@ -39,7 +39,7 @@ public struct ConsoleView: View {
                 print(presentationMode.wrappedValue)
             }
     }
-    
+
     private var contentView: some View {
         List {
             QuickFiltersView(model: viewModel)

@@ -38,7 +38,7 @@ final class ConsoleMessageDetailsViewModel {
             ConsoleMessageTagViewModel(
                 title: "Label",
                 value: message.label
-            ),
+            )
         ]
         self.text = message.text
         self.badge = BadgeViewModel(message: message)

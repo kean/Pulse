@@ -29,7 +29,7 @@ final class LoggerStoreTests: XCTestCase {
         super.tearDown()
 
         store.destroyStores()
-        
+
         try? FileManager.default.removeItem(at: tempDirectoryURL)
         try? FileManager.default.removeItem(at: URL.temp)
         try? FileManager.default.removeItem(at: URL.logs)
@@ -53,12 +53,12 @@ final class LoggerStoreTests: XCTestCase {
         // WHEN
         let firstStore = try LoggerStore(storeURL: storeURL, options: options)
         try firstStore.populate()
-        
+
         let secondStore = try LoggerStore(storeURL: storeURL)
 
         // THEN data is persisted
         XCTAssertEqual(try secondStore.allMessages().count, 1)
-        
+
         // CLEANUP
         firstStore.destroyStores()
         secondStore.destroyStores()
@@ -88,7 +88,7 @@ final class LoggerStoreTests: XCTestCase {
 
         // THEN data is persisted
         XCTAssertEqual(try store.allMessages().count, 1)
-        
+
         // CLEANUP
         originalStore?.destroyStores()
     }
@@ -105,7 +105,7 @@ final class LoggerStoreTests: XCTestCase {
         // THEN
         XCTAssertEqual(try store.allMessages().count, 23)
         XCTAssertEqual(try store.allNetworkRequests().count, 4)
-        
+
         store.destroyStores()
     }
 
@@ -145,7 +145,7 @@ final class LoggerStoreTests: XCTestCase {
         // THEN
         XCTAssertEqual(try store.allMessages().count, 23)
         XCTAssertEqual(try store.allNetworkRequests().count, 4)
-        
+
         store.destroyStores()
     }
 
@@ -167,7 +167,7 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertEqual(manifest.requestCount, 3)
 
         store.removeStores()
-        
+
         // THEN
         let copy = try LoggerStore(storeURL: copyURL)
         XCTAssertEqual(try copy.allMessages().count, 19)
@@ -265,7 +265,7 @@ final class LoggerStoreTests: XCTestCase {
 
         // THEN nothing is written
         XCTAssertEqual(try store.allMessages().count, 23)
-        
+
         let storeCopy = try XCTUnwrap(LoggerStore(storeURL: storeURL))
         XCTAssertEqual(try storeCopy.allMessages().count, 23)
     }

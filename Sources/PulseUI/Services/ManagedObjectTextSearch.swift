@@ -13,11 +13,11 @@ final class ManagedObjectTextSearch<T: NSManagedObject> {
     private var searchIndex: [(NSManagedObjectID, String)]?
     private let closure: (T) -> String
     private let lock = NSLock()
-    
+
     init(_ closure: @escaping (T) -> String) {
         self.closure = closure
     }
-        
+
     func replace<S: Collection>(_ objects: S) where S.Element == T {
         self.objects = AnyCollection(objects)
         self.searchIndex = nil

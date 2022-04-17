@@ -41,7 +41,7 @@ final class StoreDetailsViewModel {
         let attributes = try? FileManager.default.attributesOfItem(atPath: storeURL.path)
         return attributes?[.size] as? Int64 ?? 0
     }
-    
+
     var infoSection: KeyValueSectionViewModel {
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
@@ -56,14 +56,14 @@ final class StoreDetailsViewModel {
             ("Archived", formatter.string(from: info.archivedDate))
         ].compactMap { $0 })
     }
-    
+
     var sizeSection: KeyValueSectionViewModel {
         KeyValueSectionViewModel(title: "Size", color: .gray, action: nil, items: [
             ("Archive Size", ByteCountFormatter.string(fromByteCount: fileSize, countStyle: .file) ),
             ("Messages", info.messageCount.description),
             ("Network Requests", info.requestCount.description),
             ("Blobs Size", ByteCountFormatter.string(fromByteCount: info.blobsSize, countStyle: .file)),
-            ("Messages Size", ByteCountFormatter.string(fromByteCount: info.databaseSize, countStyle: .file)),
+            ("Messages Size", ByteCountFormatter.string(fromByteCount: info.databaseSize, countStyle: .file))
         ])
     }
 }

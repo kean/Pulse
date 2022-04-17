@@ -63,7 +63,7 @@ final class PersistentLogHandlerTests: XCTestCase {
                 }
             }
         }
-        
+
         var logger1 = Logger(label: "test.logger.1")
         logger1[metadataKey: "test-uuid"] = "\(UUID())"
         logger1.log(level: level1, "\(message1)")
@@ -77,13 +77,13 @@ final class PersistentLogHandlerTests: XCTestCase {
         guard persistedMessages.count == 2 else {
             return XCTFail("Unexpected number of messages stored")
         }
-        
+
         let persistedMessage1 = try XCTUnwrap(persistedMessages.first { $0.label == "test.logger.1" })
         XCTAssertEqual(persistedMessage1.level, level1.rawValue)
         XCTAssertEqual(persistedMessage1.text, message1)
         XCTAssertEqual(persistedMessage1.createdAt, date)
         XCTAssertEqual(persistedMessage1.session, sessionID.uuidString)
-        
+
         let persistedMessage2 = try XCTUnwrap(persistedMessages.first { $0.label == "test.logger.2" })
         XCTAssertEqual(persistedMessage2.level, level2.rawValue)
         XCTAssertEqual(persistedMessage2.text, message2)
@@ -102,7 +102,7 @@ final class PersistentLogHandlerTests: XCTestCase {
         XCTAssertEqual(message.function, "testStoresFileInformation()")
         XCTAssertEqual(message.line, 86)
     }
-    
+
     func testStoresFilename() throws {
         // WHEN
         sut.log(level: .debug, message: "a", metadata: nil, file: #file, function: #function, line: 86)

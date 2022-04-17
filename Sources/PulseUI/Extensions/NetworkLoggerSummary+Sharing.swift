@@ -49,7 +49,7 @@ extension NetworkLoggerSummary {
                 ("Body Sent", transferModel.bodyBytesSent),
                 ("Total Bytes Received", transferModel.totalBytesReceived),
                 ("Headers Received", transferModel.headersBytesReceived),
-                ("Body Received", transferModel.bodyBytesReceived),
+                ("Body Received", transferModel.bodyBytesReceived)
             ]))
         }
         renderer.add(summary.parametersModel)

@@ -51,15 +51,14 @@ struct SearchBar: NSViewRepresentable {
     var onCancel: (() -> Void)?
     var onReturn: (() -> Void)?
     private let onFind: PassthroughSubject<Void, Never>
-    
+
     init(title: String,
          text: Binding<String>,
          imageName: String? = nil,
          onFind: PassthroughSubject<Void, Never> = .init(),
          onEditingChanged: ((Bool) -> Void)? = nil,
          onCancel: (() -> Void)? = nil,
-         onReturn: (() -> Void)? = nil)
-    {
+         onReturn: (() -> Void)? = nil) {
         self.title = title
         self._text = text
         self.imageName = imageName
@@ -68,7 +67,7 @@ struct SearchBar: NSViewRepresentable {
         self.onCancel = onCancel
         self.onReturn = onReturn
     }
-    
+
     final class Coordinator: NSObject, NSSearchFieldDelegate {
         @Binding var text: String
         var onEditingChanged: ((_ isEditing: Bool) -> Void)?
@@ -123,11 +122,11 @@ struct SearchBar: NSViewRepresentable {
         if let imageName = self.imageName {
             (searchField.cell as? NSSearchFieldCell)?.searchButtonCell?.image = NSImage(systemSymbolName: imageName, accessibilityDescription: nil)
         }
-        
+
         let constraint = searchField.widthAnchor.constraint(greaterThanOrEqualToConstant: 200)
         constraint.priority = .init(rawValue: 249)
         constraint.isActive = true
-        
+
         onFind.sink { [weak searchField] in
             // TODO: refactor
             guard let searchField = searchField, searchField.window?.isKeyWindow ?? false else { return }

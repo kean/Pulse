@@ -12,9 +12,9 @@ import Combine
 @available(iOS 13.0, *)
 struct ConsoleFiltersLabelsPickerView: View {
     @ObservedObject var viewModel: ConsoleSearchCriteriaViewModel
-    
+
     @State private var searchText = ""
-    
+
     var body: some View {
         if #available(iOS 15.0, *) {
             form
@@ -23,7 +23,7 @@ struct ConsoleFiltersLabelsPickerView: View {
             form
         }
     }
-    
+
     @ViewBuilder
     private var form: some View {
         Form {
@@ -37,7 +37,7 @@ struct ConsoleFiltersLabelsPickerView: View {
         }
         .navigationBarTitle("Labels")
     }
-    
+
     private var labels: [String] {
         if searchText.isEmpty {
             return viewModel.allLabels

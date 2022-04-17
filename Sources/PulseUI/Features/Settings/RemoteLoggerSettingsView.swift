@@ -13,7 +13,7 @@ import Network
 @available(iOS 14.0, tvOS 14.0, watchOS 7.0, *)
 struct RemoteLoggerSettingsView: View {
     @ObservedObject var model: RemoteLoggerSettingsViewModel
-    
+
     var body: some View {
         Toggle(isOn: $model.isEnabled, label: {
             #if !os(watchOS)
@@ -29,7 +29,7 @@ struct RemoteLoggerSettingsView: View {
             }
         }
     }
-    
+
     private var progressView: some View {
         #if os(watchOS)
         ProgressView()
@@ -44,7 +44,7 @@ struct RemoteLoggerSettingsView: View {
         }
         #endif
     }
-    
+
     @ViewBuilder
     private func makeServerView(for server: RemoteLoggerServerViewModel) -> some View {
         Button(action: server.connect) {
@@ -79,12 +79,12 @@ final class RemoteLoggerSettingsViewModel: ObservableObject {
     @Published var isEnabled: Bool = false
     @Published var servers: [RemoteLoggerServerViewModel] = []
     @Published var isConnected: Bool = false
-    
+
     private let logger: RemoteLogger
     private var cancellables: [AnyCancellable] = []
-    
+
     public static var shared = RemoteLoggerSettingsViewModel()
-    
+
     init(logger: RemoteLogger = .shared) {
         self.logger = logger
 
@@ -95,20 +95,20 @@ final class RemoteLoggerSettingsViewModel: ObservableObject {
             .sink { [weak self] in
                 self?.didUpdateIsEnabled($0)
             }.store(in: &cancellables)
-        
+
         logger.$servers.receive(on: DispatchQueue.main).sink { [weak self] servers in
             self?.refresh(servers: servers)
         }.store(in: &cancellables)
-        
+
         logger.$connectionState.receive(on: DispatchQueue.main).sink { [weak self] in
             self?.isConnected = $0 == .connected
         }.store(in: &cancellables)
     }
-    
+
     private func didUpdateIsEnabled(_ isEnabled: Bool) {
         isEnabled ? logger.enable() : logger.disable()
     }
-        
+
     private func refresh(servers: Set<NWBrowser.Result>) {
         self.servers = servers
             .map { server in
@@ -121,7 +121,7 @@ final class RemoteLoggerSettingsViewModel: ObservableObject {
             }
             .sorted { $0.name.caseInsensitiveCompare($1.name) == .orderedAscending }
     }
-    
+
     private func connect(to server: NWBrowser.Result) {
         logger.connect(to: server)
         refresh(servers: logger.servers)

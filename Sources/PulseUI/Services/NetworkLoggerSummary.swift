@@ -13,7 +13,7 @@ final class NetworkLoggerSummary {
     let error: NetworkLoggerError?
     let metrics: NetworkLoggerMetrics?
     let session: NetworkLoggerURLSession?
-    
+
     let requestBodyKey: String?
     let responseBodyKey: String?
     let requestBodySize: Int64

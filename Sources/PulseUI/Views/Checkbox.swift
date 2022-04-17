@@ -8,7 +8,7 @@ import SwiftUI
 @available(iOS 13.0, *)
 struct Checkbox: View {
     @Binding var isEnabled: Bool
-    
+
     var body: some View {
         Button(action: { isEnabled.toggle() }) {
             Image(systemName: isEnabled ? "checkmark.circle.fill" : "circle")

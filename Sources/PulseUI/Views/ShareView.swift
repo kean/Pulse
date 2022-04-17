@@ -11,7 +11,7 @@ import UIKit
 @available(iOS 13.0, *)
 struct ShareView: UIViewControllerRepresentable {
     var activityItems: [Any]
-    var applicationActivities: [UIActivity]? = nil
+    var applicationActivities: [UIActivity]?
     private let cleanup: () -> Void
 
     // TODO: remove this variant

@@ -17,12 +17,12 @@ struct SettingsView: View {
         self.model = SettingsViewModel(store: store)
         self.console = ConsoleViewModel(store: store, contentType: .all)
     }
-    
+
     init(model: SettingsViewModel, console: ConsoleViewModel) {
         self.model = model
         self.console = console
     }
-    
+
     public var body: some View {
         Form {
             if !model.isReadonly {

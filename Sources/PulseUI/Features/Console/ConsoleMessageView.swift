@@ -34,7 +34,7 @@ struct ConsoleMessageView: View {
         .padding(.vertical, 4)
         .onReceive(model.isPinnedPublisher) { isPinned = $0 }
     }
-    
+
     private var title: some View {
         badge + Text(model.title)
             .font(fonts.title)

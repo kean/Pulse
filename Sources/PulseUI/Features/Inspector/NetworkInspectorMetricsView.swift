@@ -158,7 +158,7 @@ struct NetworkInspectorMetricsView_Previews: PreviewProvider {
                 .background(Color(UXColor.systemBackground))
                 .previewDisplayName("Light")
                 .environment(\.colorScheme, .light)
-            
+
             NetworkInspectorMetricsView(model: mockModel)
                 .background(Color(UXColor.systemBackground))
                 .previewDisplayName("Dark")

@@ -48,7 +48,7 @@ struct KeyValueSectionView: View {
                         .foregroundColor(.separator)
                         .font(.caption)
                 })
- 
+
             }
 
             #else
@@ -91,7 +91,7 @@ private struct KeyValueListView: View {
                 .padding(.bottom, 5)
         }
     }
-    
+
     private var text: NSAttributedString {
         let text = NSMutableAttributedString()
         for (index, row) in items.enumerated() {
@@ -132,7 +132,7 @@ private struct KeyValueListView: View {
             }
         }
     }
-    
+
     private func makeRow(_ row: Row) -> some View {
         HStack {
             let title = Text(row.item.0 + ": ")
@@ -179,7 +179,7 @@ private struct KeyValueListView: View {
 #if os(macOS)
 private struct Label: NSViewRepresentable {
     let text: NSAttributedString
-    
+
     func makeNSView(context: Context) -> NSTextField {
         let label = NSTextField.label()
         label.isSelectable = true
@@ -189,9 +189,9 @@ private struct Label: NSViewRepresentable {
         label.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         return label
     }
-    
+
     func updateNSView(_ nsView: NSTextField, context: Context) {
-        
+
     }
 }
 

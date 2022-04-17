@@ -80,7 +80,7 @@ public struct NetworkLoggerURLSession: Codable {
     public var timeoutIntervalForRequest: Double // TimeInterval
     public var timeoutIntervalForResource: Double // TimeInterval
     public var waitsForConnectivity: Bool
-    
+
     public init(urlSession: URLSession) {
         let configuration = urlSession.configuration
         self.identifier = configuration.identifier

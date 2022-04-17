@@ -9,23 +9,23 @@ import SwiftUI
 
 struct ConsoleSearchCriteria: Hashable {
     var isFiltersEnabled = true
-    
+
     var logLevels = LogLevelsFilter.default
     var dates = DatesFilter.default
     var labels = LabelsFilter.default
-    
+
     struct LogLevelsFilter: Hashable {
         var isEnabled = true
         var levels = LogLevelsFilter.defaultLogLevels
 
         static let defaultLogLevels = Set(LoggerStore.Level.allCases).subtracting([LoggerStore.Level.trace])
-        
+
         static let `default` = LogLevelsFilter()
     }
-    
+
     struct DatesFilter: Hashable {
         var isEnabled = true
-        
+
         #if os(iOS)
         var isCurrentSessionOnly = true
         #else
@@ -36,22 +36,22 @@ struct ConsoleSearchCriteria: Hashable {
         var startDate: Date?
         var isEndDateEnabled = false
         var endDate: Date?
-        
+
         static let `default` = DatesFilter()
-        
+
         static var today: DatesFilter {
             make(startDate: Calendar.current.startOfDay(for: Date()), endDate: nil)
         }
-        
+
         static var recent: DatesFilter {
             make(startDate: Date().addingTimeInterval(-1800), endDate: nil)
         }
-        
+
         static func make(startDate: Date, endDate: Date? = nil) -> DatesFilter {
             DatesFilter(isEnabled: true, isCurrentSessionOnly: false, isStartDateEnabled: true, startDate: startDate, isEndDateEnabled: endDate != nil, endDate: endDate)
         }
     }
-    
+
     struct LabelsFilter: Hashable {
         var isEnabled = true
         var hidden: Set<String> = []
@@ -59,7 +59,7 @@ struct ConsoleSearchCriteria: Hashable {
 
         static let `default` = LabelsFilter()
     }
-        
+
     #if os(watchOS) || os(tvOS) || os(iOS)
     var onlyPins = false
     var onlyNetwork = false
@@ -79,16 +79,16 @@ final class ConsoleSearchFilter: ObservableObject, Hashable, Identifiable {
     @Published var match: Match
     @Published var value: String
     @Published var isEnabled: Bool
-        
+
     // The actual filters had to be moved to the viewmodel
     static var defaultFilters: [ConsoleSearchFilter] {
         [ConsoleSearchFilter(id: UUID(), field: .message, match: .contains, value: "", isEnabled: true)]
     }
-    
+
     var isDefault: Bool {
         field == .message && match == .contains && value == "" && isEnabled
     }
-    
+
     init(id: UUID, field: Field, match: Match, value: String, isEnabled: Bool) {
         self.id = id
         self.field = field
@@ -96,7 +96,7 @@ final class ConsoleSearchFilter: ObservableObject, Hashable, Identifiable {
         self.value = value
         self.isEnabled = isEnabled
     }
-        
+
     static func == (lhs: ConsoleSearchFilter, rhs: ConsoleSearchFilter) -> Bool {
         lhs.id == rhs.id &&
         lhs.field == rhs.field &&
@@ -104,7 +104,7 @@ final class ConsoleSearchFilter: ObservableObject, Hashable, Identifiable {
         lhs.value == rhs.value &&
         lhs.isEnabled == rhs.isEnabled
     }
-    
+
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
         hasher.combine(field)
@@ -116,7 +116,7 @@ final class ConsoleSearchFilter: ObservableObject, Hashable, Identifiable {
     var isReady: Bool {
         isEnabled && !value.isEmpty
     }
-    
+
     enum Field {
         case level
         case label
@@ -125,7 +125,7 @@ final class ConsoleSearchFilter: ObservableObject, Hashable, Identifiable {
         case file
         case function
         case line
-        
+
         var localizedTitle: String {
             switch self {
             case .level: return "Level"
@@ -138,7 +138,7 @@ final class ConsoleSearchFilter: ObservableObject, Hashable, Identifiable {
             }
         }
     }
-    
+
     enum Match {
         case equal // LIKE[c]
         case notEqual
@@ -146,7 +146,7 @@ final class ConsoleSearchFilter: ObservableObject, Hashable, Identifiable {
         case notContains
         case regex
         case beginsWith
-        
+
         var localizedTitle: String {
             switch self {
             case .equal: return "Equal"
@@ -158,7 +158,7 @@ final class ConsoleSearchFilter: ObservableObject, Hashable, Identifiable {
             }
         }
     }
-    
+
     func makePredicate() -> NSPredicate? {
         if field == .metadata {
             return makePredicateForMetadata()
@@ -175,7 +175,7 @@ final class ConsoleSearchFilter: ObservableObject, Hashable, Identifiable {
         case .regex: return NSPredicate(format: "\(key) MATCHES %@", value)
         }
     }
-    
+
     private func makePredicateForMetadata() -> NSPredicate {
         switch match {
         case .equal: return NSPredicate(format: "SUBQUERY(metadata, $entry, $entry.key LIKE[c] %@ OR $entry.value LIKE[c] %@).@count > 0", value, value)
@@ -186,7 +186,7 @@ final class ConsoleSearchFilter: ObservableObject, Hashable, Identifiable {
         case .regex: return NSPredicate(format: "SUBQUERY(metadata, $entry, $entry.key MATCHES[c] %@ OR $entry.value MATCHES[c] %@).@count > 0", value, value)
         }
     }
-    
+
     func matches(string: String) -> Bool {
         switch match {
         case .equal: return string.caseInsensitiveCompare(value) == .orderedSame
@@ -213,7 +213,7 @@ final class ConsoleSearchFilter: ObservableObject, Hashable, Identifiable {
 
 @available(iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension ConsoleSearchCriteria {
-    
+
     #warning("TODO: [P01] Remove ConsoleContentType")
     static func update(
         request: NSFetchRequest<LoggerMessageEntity>,
@@ -225,7 +225,7 @@ extension ConsoleSearchCriteria {
         isOnlyErrors: Bool
     ) {
         var predicates = [NSPredicate]()
-        
+
         switch contentType {
         case .all:
             break
@@ -234,12 +234,12 @@ extension ConsoleSearchCriteria {
         case .pins:
             predicates.append(NSPredicate(format: "isPinned == YES"))
         }
-        
+
 #if os(watchOS) || os(tvOS) || os(iOS)
         if criteria.onlyPins {
             predicates.append(NSPredicate(format: "isPinned == YES"))
         }
-        
+
         if criteria.onlyNetwork {
             predicates.append(NSPredicate(format: "request != nil"))
         }
@@ -248,7 +248,7 @@ extension ConsoleSearchCriteria {
         if criteria.dates.isCurrentSessionOnly, let sessionId = sessionId, !sessionId.isEmpty {
             predicates.append(NSPredicate(format: "session == %@", sessionId))
         }
-        
+
         if criteria.dates.isEnabled {
             if criteria.dates.isStartDateEnabled, let startDate = criteria.dates.startDate {
                 predicates.append(NSPredicate(format: "createdAt >= %@", startDate as NSDate))
@@ -260,7 +260,7 @@ extension ConsoleSearchCriteria {
         if isOnlyErrors {
             predicates.append(NSPredicate(format: "level IN %@", [LoggerStore.Level.critical, .error].map { $0.rawValue }))
         }
-        
+
         if criteria.logLevels.isEnabled {
             if criteria.logLevels.levels.count != LoggerStore.Level.allCases.count {
                 predicates.append(NSPredicate(format: "level IN %@", Array(criteria.logLevels.levels.map { $0.rawValue })))
@@ -278,7 +278,7 @@ extension ConsoleSearchCriteria {
         if filterTerm.count > 1 {
             predicates.append(NSPredicate(format: "text CONTAINS[cd] %@", filterTerm))
         }
-        
+
         if criteria.isFiltersEnabled {
             for filter in filters where filter.isReady {
                 if let predicate = filter.makePredicate() {
@@ -288,7 +288,7 @@ extension ConsoleSearchCriteria {
                 }
             }
         }
-        
+
         request.predicate = predicates.isEmpty ? nil : NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
     }
 }

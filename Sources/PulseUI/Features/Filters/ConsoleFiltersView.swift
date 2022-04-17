@@ -61,11 +61,11 @@ struct ConsoleFiltersView: View {
         .navigationBarTitle("Filters")
         .navigationBarItems(leading: buttonClose, trailing: buttonReset)
     }
-    
+
     private var buttonClose: some View {
         Button("Close") { isPresented = false }
     }
-    
+
     private var buttonReset: some View {
         Button("Reset") { viewModel.resetAll() }
             .disabled(!viewModel.isButtonResetEnabled)
@@ -98,11 +98,11 @@ struct ConsoleFiltersView: View {
         }
         .padding(.bottom, 6)
         .buttonStyle(.plain)
-        
+
         Button(viewModel.bindingForTogglingAllLevels.wrappedValue ? " Disable All" : "Enable All", action: { viewModel.bindingForTogglingAllLevels.wrappedValue.toggle() })
             .frame(maxWidth: .infinity, alignment: .center)
     }
-    
+
     private func makeLevelsSection(levels: [LoggerStore.Level]) -> some View {
         VStack(alignment: .leading) {
             Spacer()
@@ -131,20 +131,20 @@ struct ConsoleFiltersView: View {
             }
         }
     }
-    
+
     private var allLabelsNavigationLink: some View {
         NavigationLink.programmatic(isActive: $isAllLabelsShown) {
             ConsoleFiltersLabelsPickerView(viewModel: viewModel)
         }
     }
-        
+
     @ViewBuilder
     private var timePeriodGroup: some View {
         Toggle("Latest Session", isOn: $viewModel.criteria.dates.isCurrentSessionOnly)
 
         DateRangePicker(title: "Start Date", date: viewModel.bindingStartDate, isEnabled: $viewModel.criteria.dates.isStartDateEnabled)
         DateRangePicker(title: "End Date", date: viewModel.bindingEndDate, isEnabled: $viewModel.criteria.dates.isEndDateEnabled)
-        
+
         HStack(spacing: 16) {
             Button("Recent") { viewModel.criteria.dates = .recent }
             Button("Today") { viewModel.criteria.dates = .today }
@@ -158,7 +158,7 @@ private struct DateRangePicker: View {
     let title: String
     @Binding var date: Date
     @Binding var isEnabled: Bool
-    
+
     var body: some View {
         VStack(spacing: 8) {
             HStack {
@@ -190,7 +190,7 @@ private struct CustomFilterView: View {
             }
             .buttonStyle(PlainButtonStyle())
             .foregroundColor(Color.red)
-            
+
             VStack(spacing: 10) {
                 HStack(spacing: 0) {
                     fieldPicker
@@ -203,12 +203,12 @@ private struct CustomFilterView: View {
                 TextField("Value", text: $filter.value)
                     .textFieldStyle(.roundedBorder)
             }
-            
+
         }
         .padding(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 4))
         .cornerRadius(8)
     }
-    
+
     @ViewBuilder
     private var fieldPicker: some View {
         Menu(content: {
@@ -227,7 +227,7 @@ private struct CustomFilterView: View {
             makePickerButton(title: filter.field.localizedTitle)
         }).animation(.none)
     }
-    
+
     private var matchPicker: some View {
         Menu(content: {
             Picker("", selection: $filter.match) {
@@ -245,7 +245,7 @@ private struct CustomFilterView: View {
             makePickerButton(title: filter.match.localizedTitle)
         }).animation(.none)
     }
-    
+
     private func makePickerButton(title: String) -> some View {
         HStack {
             Text(title)
@@ -269,7 +269,7 @@ struct FilterSectionHeader: View {
     let reset: () -> Void
     let isDefault: Bool
     @Binding var isEnabled: Bool
-    
+
     var body: some View {
         HStack(spacing: 0) {
             HStack {
@@ -286,7 +286,7 @@ struct FilterSectionHeader: View {
             }
             .frame(width: 34, height: 34)
             .disabled(isDefault)
-            
+
             Toggle("", isOn: $isEnabled)
                 .fixedSize()
                 .disabled(isDefault)

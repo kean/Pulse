@@ -29,13 +29,13 @@ public final class LoggerStore {
     /// Determines how often the messages are saved to the database. By default,
     /// 100 milliseconds - quickly enough, but avoiding too many individual writes.
     public var saveInterval: DispatchTimeInterval = .milliseconds(100)
-    
+
     /// Size limit in bytes. `30 Mb` by default. The limit is approximate.
     public static var databaseSizeLimit: Int = 1024 * 1024 * 30
 
     /// Size limit in bytes. `200 Mb` by default.
     public static var blobsSizeLimit: Int = 1024 * 1024 * 200
-    
+
     /// The default store.
     public static let `default` = LoggerStore.makeDefault()
 
@@ -45,11 +45,11 @@ public final class LoggerStore {
     public static var logsURL: URL { URL.logs }
 
     var makeCurrentDate: () -> Date = { Date() }
-    
+
     var onEvent: ((LoggerStoreEvent) -> Void)?
 
     private var isSaveScheduled = false
-    
+
     private enum PulseDocument {
         case directory(blobs: BlobStore)
         case file(archive: IndexedArchive, manifest: LoggerStoreInfo)
@@ -89,7 +89,7 @@ public final class LoggerStore {
     public static var empty: LoggerStore {
         LoggerStore(storeURL: URL.logs.appendingFilename("empty"), isEmpty: true)
     }
-    
+
     /// Initializes the store with the given URL.
     ///
     /// There are two types of URLs that the store supports:
@@ -194,7 +194,7 @@ public final class LoggerStore {
         container.persistentStoreDescriptions = [store]
         return container
     }
-    
+
     private static func loadStore(container: NSPersistentContainer) throws {
         var loadError: Error?
         container.loadPersistentStores { description, error in
@@ -206,7 +206,7 @@ public final class LoggerStore {
         if let error = loadError {
             throw error
         }
-        
+
         container.viewContext.automaticallyMergesChangesFromParent = true
         container.viewContext.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
     }
@@ -230,18 +230,18 @@ extension LoggerStore {
             self.onEvent?(.saveMessage(message))
         }
     }
-    
+
     /// Stores the given message.
     func storeMessage(_ message: Message) {
         perform {
             self._storeMessage(message)
         }
     }
-    
+
     private func _storeMessage(_ message: Message) {
         makeMessageEntity(with: message)
     }
-    
+
     /// Stores the network request.
     ///
     /// - note: If you want to store incremental updates to the task, use
@@ -249,7 +249,7 @@ extension LoggerStore {
     public func storeRequest(_ request: URLRequest, response: URLResponse?, error: Error?, data: Data?, metrics: URLSessionTaskMetrics? = nil, session: URLSession? = nil) {
         storeRequest(request, response: response, error: error, data: data, metrics: metrics.map(NetworkLoggerMetrics.init), session: session)
     }
-    
+
     func storeRequest(_ request: URLRequest, response: URLResponse?, error: Error?, data: Data?, metrics: NetworkLoggerMetrics?, session: URLSession?) {
         let date = makeCurrentDate()
         perform {
@@ -268,13 +268,13 @@ extension LoggerStore {
             self.onEvent?(.saveNetworkMessage(message))
         }
     }
-    
+
     func storeRequest(_ request: NetworkMessage) {
         perform {
             self._storeNetworkRequest(request)
         }
     }
-    
+
     private func _storeNetworkRequest(_ summary: NetworkMessage) {
         let level: LoggerStore.Level
         let url = summary.request.url?.absoluteString
@@ -291,16 +291,16 @@ extension LoggerStore {
             }
             message += " \(statusCode.map(descriptionForStatusCode) ?? "–")"
         }
-        
+
         let messageObject = Message(createdAt: summary.createdAt, label: "network", level: level, message: message, metadata: nil, session: summary.session, file: "", function: "", line: 0)
-        
+
         let messageEntity = self.makeMessageEntity(with: messageObject)
         let requestEntity = self.makeNetworkRequestEntity(summary, createdAt: summary.createdAt)
         messageEntity.request = requestEntity
         messageEntity.requestState = requestEntity.requestState
         requestEntity.message = messageEntity
     }
-        
+
     @discardableResult
     private func makeMessageEntity(with message: Message) -> LoggerMessageEntity {
         let entity = LoggerMessageEntity(context: backgroundContext)
@@ -367,7 +367,7 @@ extension LoggerStore {
         entity.responseBodySize = Int64(summary.responseBody?.count ?? 0)
         return entity
     }
-    
+
     private func setNeedsSave() {
         guard !isSaveScheduled else { return }
         isSaveScheduled = true
@@ -375,7 +375,7 @@ extension LoggerStore {
             self?.flush()
         }
     }
-    
+
     // Internal for testing purposes.
     func flush(_ completion: (() -> Void)? = nil) {
         backgroundContext.perform { [weak self] in
@@ -387,39 +387,39 @@ extension LoggerStore {
             completion?()
         }
     }
-    
+
     // MARK: Managing Pins
-    
+
     /// Toggles pin for the give message.
     public func togglePin(for message: LoggerMessageEntity) {
         performChangesOnMain { _ in
             message.isPinned.toggle()
         }
     }
-    
+
     /// Removes all pins.
     public func removeAllPins() {
         performChangesOnMain { context in
             let request = NSFetchRequest<LoggerMessageEntity>(entityName: "\(LoggerMessageEntity.self)")
             request.fetchBatchSize = 250
             request.predicate = NSPredicate(format: "isPinned == YES")
-            
+
             let messages: [LoggerMessageEntity] = (try? context.fetch(request)) ?? []
             for message in messages {
                 message.isPinned = false
             }
         }
     }
-    
+
     // MARK: Direct Modifiction
-        
+
     /// Perform and save changes on the main queue.
     private func performChangesOnMain(_ closure: (NSManagedObjectContext) -> Void) {
         precondition(Thread.isMainThread)
         closure(container.viewContext)
         try? container.viewContext.save()
     }
-    
+
     private func perform(_ changes: @escaping () -> Void) {
         guard !isReadonly else { return }
         backgroundContext.perform {
@@ -427,7 +427,7 @@ extension LoggerStore {
             self.setNeedsSave()
         }
     }
-    
+
     // MARK: Accessing Data
 
     /// Returns blob data for the given key.
@@ -454,8 +454,8 @@ extension LoggerStore {
         public let file: String
         public let function: String
         public let line: UInt
-        
-        public init(createdAt: Date, label: String, level: LoggerStore.Level, message: String, metadata: [String : String]?, session: String, file: String, function: String, line: UInt) {
+
+        public init(createdAt: Date, label: String, level: LoggerStore.Level, message: String, metadata: [String: String]?, session: String, file: String, function: String, line: UInt) {
             self.createdAt = createdAt
             self.label = label
             self.level = level
@@ -467,7 +467,7 @@ extension LoggerStore {
             self.line = line
         }
     }
-    
+
     public final class NetworkMessage: Codable {
         public let createdAt: Date
         public let request: NetworkLoggerRequest
@@ -478,7 +478,7 @@ extension LoggerStore {
         public let metrics: NetworkLoggerMetrics?
         public let urlSession: NetworkLoggerURLSession?
         public let session: String
-        
+
         public init(createdAt: Date, request: NetworkLoggerRequest, response: NetworkLoggerResponse?, error: NetworkLoggerError?, requestBody: Data?, responseBody: Data?, metrics: NetworkLoggerMetrics?, urlSession: NetworkLoggerURLSession?, session: String) {
             self.createdAt = createdAt
             self.request = request
@@ -491,7 +491,7 @@ extension LoggerStore {
             self.session = session
         }
     }
-    
+
     public enum MetadataValue {
         case string(String)
         case stringConvertible(CustomStringConvertible)
@@ -508,7 +508,7 @@ extension LoggerStore {
         case warning
         case error
         case critical
-        
+
         var order: Int16 {
             switch self {
             case .trace: return 0
@@ -720,7 +720,7 @@ private extension URLRequest {
 		guard let bodyStream = self.httpBodyStream else {
 			return nil
 		}
-		
+
 		// Will read 16 chars per iteration. Can use bigger buffer if needed
 		let bufferSize: Int = 16
 		let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: bufferSize)
@@ -730,14 +730,14 @@ private extension URLRequest {
 			buffer.deallocate()
 			bodyStream.close()
 		}
-		
+
 		var bodyStreamData = Data()
-		
+
 		while bodyStream.hasBytesAvailable {
 			let readData = bodyStream.read(buffer, maxLength: bufferSize)
 			bodyStreamData.append(buffer, count: readData)
 		}
-		
+
 		return bodyStreamData
 	}
 }

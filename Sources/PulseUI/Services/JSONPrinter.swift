@@ -90,7 +90,7 @@ final class JSONPrinter {
             append("}", .punctuation)
         case let object as String:
             append("\"\(object)\"", .valueString)
-        case let array as Array<Any>:
+        case let array as [Any]:
             if array.contains(where: { $0 is [String: Any] }) {
                 append("[\n", .punctuation)
                 indentation += 2
@@ -166,7 +166,7 @@ final class AttributedStringJSONRenderer: JSONRenderer {
     private let output = NSMutableAttributedString()
     private let fontSize: CGFloat
     private let lineHeight: CGFloat
-    
+
     private var attributes: [JSONElement: [NSAttributedString.Key: Any]] = [
         .punctuation: [.foregroundColor: JSONColors.punctuation],
         .key: [.foregroundColor: JSONColors.key],
@@ -174,12 +174,12 @@ final class AttributedStringJSONRenderer: JSONRenderer {
         .valueOther: [.foregroundColor: JSONColors.valueOther],
         .null: [.foregroundColor: JSONColors.null]
     ]
-    
+
     init(fontSize: CGFloat, lineHeight: CGFloat) {
         self.fontSize = fontSize
         self.lineHeight = lineHeight
     }
-    
+
     func append(_ string: String, element: JSONElement) {
         output.append(string, attributes[element]!)
     }
@@ -196,7 +196,7 @@ final class AttributedStringJSONRenderer: JSONRenderer {
         let ps = NSMutableParagraphStyle()
         ps.minimumLineHeight = lineHeight
         ps.maximumLineHeight = lineHeight
-        
+
         output.addAttributes([
             .font: UXFont.monospacedSystemFont(ofSize: CGFloat(fontSize), weight: .regular),
             .paragraphStyle: ps
