@@ -5,7 +5,7 @@
 import Foundation
 import CoreData
 
-final class FetchedObjects<Element: NSManagedObject>: Collection {
+final class FetchedObjects<Element: NSManagedObject>: RandomAccessCollection {
     typealias Index = Int
 
     private let controller: NSFetchedResultsController<Element>

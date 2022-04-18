@@ -21,8 +21,8 @@ struct ConsoleMessagesForEach: View {
     @ViewBuilder
     private func makeListItem(message: LoggerMessageEntity) -> some View {
         if let request = message.request {
-            NavigationLink(destination: LazyConsoleNetworkRequestDetailsView(message: message, request: request, context: context)) {
-                ConsoleNetworkRequestForEachRow(context: context, message: message, request: request)
+            NavigationLink(destination: LazyConsoleNetworkRequestDetailsView(request: request, context: context)) {
+                ConsoleNetworkRequestForEachRow(context: context, request: request)
             }
         } else {
             NavigationLink(destination: LazyConsoleMessageDetailsView(message: message, context: context)) {
@@ -33,9 +33,25 @@ struct ConsoleMessagesForEach: View {
 }
 
 @available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
+struct NetworkMessagesForEach: View {
+    let context: AppContext
+    let entities: [LoggerNetworkRequestEntity]
+
+    var body: some View {
+        ForEach(entities, id: \.objectID, content: makeListItem)
+    }
+
+    @ViewBuilder
+    private func makeListItem(request: LoggerNetworkRequestEntity) -> some View {
+        NavigationLink(destination: LazyConsoleNetworkRequestDetailsView(request: request, context: context)) {
+            ConsoleNetworkRequestForEachRow(context: context, request: request)
+        }
+    }
+}
+
+@available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
 private struct ConsoleNetworkRequestForEachRow: View {
     let context: AppContext
-    let message: LoggerMessageEntity
     let request: LoggerNetworkRequestEntity
 
     @State private var sharedItems: ShareItems?
@@ -44,7 +60,7 @@ private struct ConsoleNetworkRequestForEachRow: View {
         #if os(iOS)
         contents
             .contextMenu {
-                NetworkMessageContextMenu(message: message, request: request, context: context, sharedItems: $sharedItems)
+                NetworkMessageContextMenu(request: request, context: context, sharedItems: $sharedItems)
             }
             .sheet(item: $sharedItems) { ShareView($0).id($0.id) }
         #else
@@ -53,7 +69,7 @@ private struct ConsoleNetworkRequestForEachRow: View {
     }
 
     var contents: some View {
-        ConsoleNetworkRequestView(model: .init(message: message, request: request, context: context))
+        ConsoleNetworkRequestView(model: .init(request: request, context: context))
     }
 }
 
@@ -96,12 +112,11 @@ private struct LazyConsoleMessageDetailsView: View {
 
 @available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
 private struct LazyConsoleNetworkRequestDetailsView: View {
-    let message: LoggerMessageEntity
     let request: LoggerNetworkRequestEntity
     let context: AppContext
 
     var body: some View {
-        NetworkInspectorView(model: .init(message: message, request: request, context: context))
+        NetworkInspectorView(model: .init(request: request, context: context))
     }
 }
 

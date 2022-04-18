@@ -61,7 +61,6 @@ struct ButtonCopyMessage: View {
 
 @available(iOS 13.0, *)
 struct NetworkMessageContextMenu: View {
-    let message: LoggerMessageEntity
     let request: LoggerNetworkRequestEntity
     let context: AppContext
 
@@ -102,7 +101,9 @@ struct NetworkMessageContextMenu: View {
             }
         }
         NetworkMessageContextMenuCopySection(request: request, shareService: context.share)
-        PinButton(model: .init(store: context.store, message: message))
+        if let message = request.message {
+            PinButton(model: .init(store: context.store, message: message))
+        }
     }
 }
 

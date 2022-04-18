@@ -14,9 +14,9 @@ final class MainViewModel: ObservableObject {
     let items: [MainViewModelItem]
 
     let consoleModel: ConsoleViewModel
-    let networkModel: ConsoleViewModel
+    let networkModel: NetworkViewModel
     #if !os(tvOS)
-    let pinsModel: ConsoleViewModel
+    let pinsModel: PinsViewModel
     #endif
     #if os(iOS) || os(tvOS)
     let settingsModel: SettingsViewModel
@@ -30,11 +30,11 @@ final class MainViewModel: ObservableObject {
         self.consoleModel = ConsoleViewModel(store: store, configuration: configuration)
         self.consoleModel.onDismiss = onDismiss
 
-        self.networkModel = ConsoleViewModel(store: store, configuration: configuration, contentType: .network)
+        self.networkModel = NetworkViewModel(store: store)
         self.networkModel.onDismiss = onDismiss
 
         #if os(iOS)
-        self.pinsModel = ConsoleViewModel(store: store, configuration: configuration, contentType: .pins)
+        self.pinsModel = PinsViewModel(store: store)
         self.pinsModel.onDismiss = onDismiss
         #endif
 
@@ -61,9 +61,9 @@ struct MainViewModelItem: Hashable, Identifiable {
 
     #if os(iOS) || os(tvOS)
     static let console = MainViewModelItem(title: "Console", imageName: "message.fill")
-    static let network = MainViewModelItem(title: "Network", imageName: "icloud.and.arrow.down.fill")
+    static let network = MainViewModelItem(title: "Network", imageName: "network") // "icloud.and.arrow.down.fill")
     static let pins = MainViewModelItem(title: "Pins", imageName: "pin.fill")
-    static let settings = MainViewModelItem(title: "Settings", imageName: "ellipsis.circle.fill")
+    static let settings = MainViewModelItem(title: "Settings", imageName: "gearshape.fill") // "ellipsis.circle.fill")
     #else
     static let console = MainViewModelItem(title: "Console", imageName: "message")
     static let network = MainViewModelItem(title: "Network", imageName: "icloud.and.arrow.down")
@@ -83,12 +83,12 @@ extension MainViewModel {
             }
         case .network:
             NavigationView {
-                NetworkView(model: networkModel)
+                NetworkView(viewModel: networkModel)
             }
         #if !os(tvOS)
         case .pins:
             NavigationView {
-                PinsView(model: pinsModel)
+                PinsView(viewModel: pinsModel)
             }
         #endif
         #if os(iOS) || os(tvOS)

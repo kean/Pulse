@@ -35,9 +35,6 @@ public struct ConsoleView: View {
                 trailing: actionButton
             )
             .sheet(item: $shared) { ShareView($0).id($0.id) }
-            .onAppear {
-                print(presentationMode.wrappedValue)
-            }
     }
 
     private var contentView: some View {

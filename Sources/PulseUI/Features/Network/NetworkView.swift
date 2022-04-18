@@ -11,44 +11,54 @@ import Combine
 
 @available(iOS 13.0, tvOS 14.0, *)
 public struct NetworkView: View {
-    @ObservedObject var model: ConsoleViewModel
+    @ObservedObject var viewModel: NetworkViewModel
 
     @State private var isShowingFilters = false
     @State private var isShowingShareSheet = false
     @Environment(\.colorScheme) private var colorScheme: ColorScheme
 
-    public init(store: LoggerStore = .default,
-                configuration: ConsoleConfiguration = .default) {
-        self.model = ConsoleViewModel(store: store, configuration: configuration, contentType: .network)
+    public init(store: LoggerStore = .default) {
+        self.viewModel = NetworkViewModel(store: store)
     }
 
-    init(model: ConsoleViewModel) {
-        self.model = model
+    init(viewModel: NetworkViewModel) {
+        self.viewModel = viewModel
     }
 
     #if os(iOS)
     public var body: some View {
         List {
             quickFiltersView
-            ConsoleMessagesForEach(context: model.context, messages: model.messages, searchCriteriaViewModel: model.searchCriteria)
+            NetworkMessagesForEach(context: viewModel.context, entities: viewModel.entities)
         }
         .listStyle(PlainListStyle())
         .navigationBarTitle(Text("Network"))
-        .navigationBarItems(leading: model.onDismiss.map { Button(action: $0) { Image(systemName: "xmark") } })
+        .navigationBarItems(leading: viewModel.onDismiss.map { Button(action: $0) { Image(systemName: "xmark") } })
     }
 
     private var quickFiltersView: some View {
         VStack {
             HStack(spacing: 16) {
-                SearchBar(title: "Search \(model.messages.count) messages", text: $model.filterTerm)
+                SearchBar(title: "Search \(viewModel.entities.count) messages", text: $viewModel.filterTerm)
+                Button(action: {
+                    isShowingFilters = true
+                }) {
+                    Image(systemName: "line.horizontal.3.decrease.circle")
+                        .foregroundColor(.accentColor)
+                }.buttonStyle(.plain)
             }
         }
         .padding(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
+        .sheet(isPresented: $isShowingFilters) {
+            NavigationView {
+                NetworkFiltersView(viewModel: viewModel.searchCriteria, isPresented: $isShowingFilters)
+            }
+        }
     }
     #elseif os(tvOS)
     public var body: some View {
         List {
-            ConsoleMessagesForEach(context: model.context, messages: model.messages, searchCriteriaViewModel: model.searchCriteria)
+            NetworkMessagesForEach(context: viewModel.context, messages: viewModel.entities)
         }
     }
     #endif

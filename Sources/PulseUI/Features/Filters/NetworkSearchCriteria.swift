@@ -225,6 +225,14 @@ struct DurationFilterPoint: Hashable {
         case minutes
         case seconds
         case milliseconds
+
+        var localizedTitle: String {
+            switch self {
+            case .minutes: return "min"
+            case .seconds: return "sec"
+            case .milliseconds: return "ms"
+            }
+        }
     }
 
     var seconds: TimeInterval? {

@@ -24,10 +24,12 @@ struct NetworkInspectorView: View {
         universalBody
             .navigationBarTitle(Text(model.title), displayMode: .inline)
             .navigationBarItems(trailing: HStack(spacing: 22) {
-                PinButton(model: model.pin, isTextNeeded: false)
+                if let pin = model.pin {
+                    PinButton(model: pin, isTextNeeded: false)
+                }
                 if #available(iOS 14.0, *) {
                     Menu(content: {
-                        NetworkMessageContextMenu(message: model.message, request: model.request, context: model.context, sharedItems: $shareItems)
+                        NetworkMessageContextMenu(request: model.request, context: model.context, sharedItems: $shareItems)
                     }, label: {
                         Image(systemName: "square.and.arrow.up")
                     })
@@ -47,7 +49,9 @@ struct NetworkInspectorView: View {
         NetworkInspectorSummaryView(model: model.makeSummaryModel())
             .navigationBarTitle(Text(model.title))
             .toolbar {
-                PinButton(model: model.pin, isTextNeeded: false)
+                if let viewModel = model.pin {
+                    PinButton(model: viewModel, isTextNeeded: false)
+                }
             }
     }
     #elseif os(tvOS)
@@ -190,15 +194,13 @@ private enum NetworkInspectorTab: Identifiable {
 @available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
 final class NetworkInspectorViewModel: ObservableObject {
     private(set) var title: String = ""
-    let message: LoggerMessageEntity
     let request: LoggerNetworkRequestEntity
     private let objectId: NSManagedObjectID
     let context: AppContext // TODO: make it private
     private let summary: NetworkLoggerSummary
 
-    init(message: LoggerMessageEntity, request: LoggerNetworkRequestEntity, context: AppContext) {
-        self.objectId = message.objectID
-        self.message = message
+    init(request: LoggerNetworkRequestEntity, context: AppContext) {
+        self.objectId = request.objectID
         self.request = request
         self.context = context
         self.summary = NetworkLoggerSummary(request: request, store: context.store)
@@ -212,8 +214,10 @@ final class NetworkInspectorViewModel: ObservableObject {
         }
     }
 
-    var pin: PinButtonViewModel {
-        PinButtonViewModel(store: context.store, message: message)
+    var pin: PinButtonViewModel? {
+        request.message.map {
+            PinButtonViewModel(store: context.store, message: $0)
+        }
     }
 
     // MARK: - Tabs

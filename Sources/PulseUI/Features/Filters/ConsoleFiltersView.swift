@@ -23,8 +23,7 @@ struct ConsoleFiltersView: View {
                     icon: "line.horizontal.3.decrease.circle", title: "Filters",
                     color: .yellow,
                     reset: { viewModel.resetFilters() },
-                    isDefault: viewModel.filters.count == 1 && viewModel.filters[0].isDefault,
-                    isEnabled: $viewModel.criteria.isFiltersEnabled
+                    isDefault: viewModel.filters.count == 1 && viewModel.filters[0].isDefault
                 )) {
                     customFiltersGroup
                 }
@@ -33,8 +32,7 @@ struct ConsoleFiltersView: View {
                 icon: "flag", title: "Levels",
                 color: .accentColor,
                 reset: { viewModel.criteria.logLevels = .default },
-                isDefault: viewModel.criteria.logLevels == .default,
-                isEnabled: $viewModel.criteria.logLevels.isEnabled
+                isDefault: viewModel.criteria.logLevels == .default
             )) {
                 logLevelsGroup
             }
@@ -42,8 +40,7 @@ struct ConsoleFiltersView: View {
                 icon: "tag", title: "Labels",
                 color: .orange,
                 reset: { viewModel.criteria.labels = .default },
-                isDefault: viewModel.criteria.labels == .default,
-                isEnabled: $viewModel.criteria.labels.isEnabled
+                isDefault: viewModel.criteria.labels == .default
             )) {
                 labelsGroup
             }
@@ -51,8 +48,7 @@ struct ConsoleFiltersView: View {
                 icon: "calendar", title: "Time Period",
                 color: .yellow,
                 reset: { viewModel.criteria.dates = .default },
-                isDefault: viewModel.criteria.dates == .default,
-                isEnabled: $viewModel.criteria.dates.isEnabled
+                isDefault: viewModel.criteria.dates == .default
             )) {
                 timePeriodGroup
             }
@@ -147,7 +143,9 @@ struct ConsoleFiltersView: View {
 
         HStack(spacing: 16) {
             Button("Recent") { viewModel.criteria.dates = .recent }
+                .foregroundColor(.accentColor)
             Button("Today") { viewModel.criteria.dates = .today }
+                .foregroundColor(.accentColor)
             Spacer()
         }.buttonStyle(.plain)
     }
@@ -223,84 +221,6 @@ private struct CustomFilterView: View {
     }
 }
 
-// MARK: - Shared
-
-@available(iOS 13.0, *)
-struct DateRangePicker: View {
-    let title: String
-    @Binding var date: Date
-    @Binding var isEnabled: Bool
-
-    var body: some View {
-        VStack(spacing: 8) {
-            HStack {
-                Text(title)
-                Spacer()
-                Toggle(title, isOn: $isEnabled)
-                    .fixedSize()
-                    .labelsHidden()
-            }
-            HStack {
-                DatePicker(title, selection: $date)
-                    .labelsHidden()
-                Spacer()
-            }
-        }.frame(height: 84)
-    }
-}
-
-@available(iOS 13.0, *)
-struct FilterPickerButton: View {
-    let title: String
-
-    var body: some View {
-        HStack {
-            Text(title)
-                .font(.subheadline)
-            Image(systemName: "chevron.right")
-                .font(.system(size: 13))
-                .foregroundColor(.secondary)
-        }
-        .foregroundColor(Color.primary.opacity(0.9))
-        .padding(EdgeInsets(top: 8, leading: 10, bottom: 8, trailing: 10))
-        .background(Color.secondaryFill)
-        .cornerRadius(8)
-    }
-}
-
-@available(iOS 13.0, *)
-struct FilterSectionHeader: View {
-    let icon: String
-    let title: String
-    let color: Color
-    let reset: () -> Void
-    let isDefault: Bool
-    @Binding var isEnabled: Bool
-
-    var body: some View {
-        HStack(spacing: 0) {
-            HStack {
-                Image(systemName: icon)
-                    .foregroundColor(.accentColor)
-                Text(title)
-            }
-            Spacer()
-
-            Button(action: reset) {
-                Image(systemName: "arrow.uturn.left")
-                    .font(.system(size: 18))
-                    .foregroundColor(.accentColor)
-            }
-            .frame(width: 34, height: 34)
-            .disabled(isDefault)
-
-            Toggle("", isOn: $isEnabled)
-                .fixedSize()
-                .disabled(isDefault)
-        }.buttonStyle(.plain)
-    }
-}
-
 @available(iOS 13.0, *)
 private func tintColor(for level: LoggerStore.Level) -> Color {
     switch level {
@@ -308,6 +228,7 @@ private func tintColor(for level: LoggerStore.Level) -> Color {
     default: return Color.textColor(for: level)
     }
 }
+
 
 // MARK: - Preview
 

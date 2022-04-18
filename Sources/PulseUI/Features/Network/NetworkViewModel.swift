@@ -9,13 +9,15 @@ import SwiftUI
 
 @available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
 final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, ObservableObject {
-    @Published private(set) var entities: AnyCollection<LoggerNetworkRequestEntity> = AnyCollection([])
+    @Published private(set) var entities: [LoggerNetworkRequestEntity] = []
 
     // Search criteria
     let searchCriteria: NetworkSearchCriteriaViewModel
     @Published var filterTerm: String = ""
     // TODO: implement quick filters
     // @Published private(set) var quickFilters: [QuickFilterViewModel] = []
+
+    var onDismiss: (() -> Void)?
 
     // TODO: get DI right, this is a quick workaround to fix @EnvironmentObject crashes
     var context: AppContext { .init(store: store) }
@@ -30,7 +32,7 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 
         let request = NSFetchRequest<LoggerNetworkRequestEntity>(entityName: "\(LoggerNetworkRequestEntity.self)")
         request.fetchBatchSize = 250
-        request.sortDescriptors = [NSSortDescriptor(keyPath: \LoggerNetworkRequestEntity.createdAt, ascending: true)]
+        request.sortDescriptors = [NSSortDescriptor(keyPath: \LoggerNetworkRequestEntity.createdAt, ascending: false)]
 
         self.controller = NSFetchedResultsController<LoggerNetworkRequestEntity>(fetchRequest: request, managedObjectContext: store.container.viewContext, sectionNameKeyPath: nil, cacheName: nil)
 
@@ -49,6 +51,10 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         }.store(in: &cancellables)
 
         refreshNow()
+
+        store.backgroundContext.perform {
+            self.getAllDomains()
+        }
     }
 
     // MARK: Refresh
@@ -73,22 +79,50 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 
     // MARK: - NSFetchedResultsControllerDelegate
 
-    // This never gets called on macOS
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         self.didRefreshEntities()
     }
 
-    private func didRefreshEntities() {
-        var entities: AnyCollection<LoggerNetworkRequestEntity>
+    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+        switch type {
+        case .insert:
+            if let entity = anObject as? LoggerNetworkRequestEntity {
+                searchCriteria.didInsertEntity(entity)
+            }
+        default:
+            break
+        }
+    }
 
+    private func didRefreshEntities() {
         // Apply filters that couldn't be done programmatically
         if let filters = searchCriteria.programmaticFilters {
             let objects = controller.fetchedObjects ?? []
-            entities = AnyCollection(objects.filter { evaluateProgrammaticFilters(filters, entity: $0, store: store) })
+            self.entities = objects.filter { evaluateProgrammaticFilters(filters, entity: $0, store: store) }
         } else {
-            entities = AnyCollection(FetchedObjects(controller: controller))
+            self.entities = controller.fetchedObjects ?? []
         }
+    }
 
-        self.entities = entities
+    // MARK: - Misc
+
+    private func getAllDomains() {
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "\(LoggerNetworkRequestEntity.self)")
+
+        // Required! Unless you set the resultType to NSDictionaryResultType, distinct can't work.
+        // All objects in the backing store are implicitly distinct, but two dictionaries can be duplicates.
+        // Since you only want distinct names, only ask for the 'name' property.
+        fetchRequest.resultType = .dictionaryResultType
+        fetchRequest.propertiesToFetch = ["host"]
+        fetchRequest.returnsDistinctResults = true
+
+        // Now it should yield an NSArray of distinct values in dictionaries.
+        let map = (try? store.backgroundContext.fetch(fetchRequest)) ?? []
+        let values = (map as? [[String: String]])?.compactMap { $0["host"] }
+        let set = Set(values ?? [])
+
+        DispatchQueue.main.async {
+            self.searchCriteria.setInitialDomains(set)
+        }
     }
 }

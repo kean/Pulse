@@ -22,41 +22,47 @@ struct NetworkFiltersView: View {
                     icon: "line.horizontal.3.decrease.circle", title: "Filters",
                     color: .yellow,
                     reset: { viewModel.resetFilters() },
-                    isDefault: viewModel.filters.count == 1 && viewModel.filters[0].isDefault,
-                    isEnabled: $viewModel.criteria.isFiltersEnabled
+                    isDefault: viewModel.filters.count == 1 && viewModel.filters[0].isDefault
                 )) {
                     customFiltersGroup
                 }
             }
 
             Section(header: FilterSectionHeader(
-                icon: "number", title: "Status Code",
+                icon: "number", title: "Parameters",
                 color: .yellow,
-                reset:  { viewModel.criteria.statusCode = .default },
-                isDefault: viewModel.criteria.statusCode == .default,
-                isEnabled: $viewModel.criteria.statusCode.isEnabled
+                reset:  {
+                    viewModel.criteria.statusCode = .default
+                    viewModel.criteria.contentType = .default
+                    viewModel.criteria.host = .default
+                    viewModel.criteria.duration = .default
+                },
+                isDefault: viewModel.criteria.statusCode == .default &&
+                viewModel.criteria.contentType == .default &&
+                viewModel.criteria.host == .default &&
+                viewModel.criteria.duration == .default
             )) {
                 statusCodeGroup
-            }
-
-            Section(header: FilterSectionHeader(
-                icon: "doc", title: "Content Type",
-                color: .yellow,
-                reset: { viewModel.criteria.contentType = .default },
-                isDefault: viewModel.criteria.contentType == .default,
-                isEnabled: $viewModel.criteria.contentType.isEnabled
-            )) {
-                Filters.contentTypesPicker(selection: $viewModel.criteria.contentType.contentType)
             }
 
             Section(header: FilterSectionHeader(
                 icon: "calendar", title: "Time Period",
                 color: .yellow,
                 reset: { viewModel.criteria.dates = .default },
-                isDefault: viewModel.criteria.dates == .default,
-                isEnabled: $viewModel.criteria.dates.isEnabled
+                isDefault: viewModel.criteria.dates == .default
             )) {
                 timePeriodGroup
+            }
+
+            if #available(iOS 14.0, *) {
+                Section(header: FilterSectionHeader(
+                    icon: "hourglass", title: "Duration",
+                    color: .yellow,
+                    reset: { viewModel.criteria.duration = .default },
+                    isDefault: viewModel.criteria.duration == .default
+                )) {
+                    durationGroup
+                }
             }
         }
         .navigationBarTitle("Filters")
@@ -94,19 +100,28 @@ struct NetworkFiltersView: View {
     @ViewBuilder
     private var statusCodeGroup: some View {
         HStack {
-            Text("Range")
+            Text("Status Code")
             Spacer()
             TextField("From", text: $viewModel.criteria.statusCode.from, onEditingChanged: {
                 if $0 { viewModel.criteria.statusCode.isEnabled = true }
             })
+            .keyboardType(.decimalPad)
             .textFieldStyle(.roundedBorder)
-            .frame(width: 100)
+            .frame(width: 85)
             TextField("To", text: $viewModel.criteria.statusCode.to, onEditingChanged: {
                 if $0 { viewModel.criteria.statusCode.isEnabled = true }
             })
             .textFieldStyle(.roundedBorder)
-            .frame(width: 100)
+            .frame(width: 85)
         }
+        Picker("Domain", selection: $viewModel.criteria.host.value) {
+            Text("Any").tag("")
+            ForEach(viewModel.allDomains, id: \.self) {
+                Text($0).tag($0)
+            }
+        }
+
+        Filters.contentTypesPicker(selection: $viewModel.criteria.contentType.contentType)
     }
 
     @ViewBuilder
@@ -118,9 +133,19 @@ struct NetworkFiltersView: View {
 
         HStack(spacing: 16) {
             Button("Recent") { viewModel.criteria.dates = .recent }
+                .foregroundColor(.accentColor)
             Button("Today") { viewModel.criteria.dates = .today }
+                .foregroundColor(.accentColor)
+
             Spacer()
         }.buttonStyle(.plain)
+    }
+
+    @available(iOS 14.0, *)
+    @ViewBuilder
+    private var durationGroup: some View {
+        DurationPicker(title: "Min", value: $viewModel.criteria.duration.from)
+        DurationPicker(title: "Max", value: $viewModel.criteria.duration.to)
     }
 }
 
@@ -160,32 +185,24 @@ private struct CustomNetworkFilterView: View {
     private var fieldPicker: some View {
         Menu(content: {
             Picker("", selection: $filter.field) {
-                // Splitting this because of the generics limitation
-                basicFields
-                Divider()
-                advancedFields
+                Section {
+                    Text("URL").tag(NetworkSearchFilter.Field.url)
+                    Text("Host").tag(NetworkSearchFilter.Field.host)
+                    Text("Method").tag(NetworkSearchFilter.Field.method)
+                    Text("Status Code").tag(NetworkSearchFilter.Field.statusCode)
+                    Text("Error Code").tag(NetworkSearchFilter.Field.errorCode)
+                }
+                Section {
+                    Text("Request Headers").tag(NetworkSearchFilter.Field.requestHeader)
+                    Text("Response Headers").tag(NetworkSearchFilter.Field.responseHeader)
+                    Divider()
+                    Text("Request Body").tag(NetworkSearchFilter.Field.requestBody)
+                    Text("Response Body").tag(NetworkSearchFilter.Field.responseBody)
+                }
             }
         }, label: {
             FilterPickerButton(title: filter.field.localizedTitle)
         }).animation(.none)
-    }
-
-    @ViewBuilder
-    private var basicFields: some View {
-        Text("URL").tag(NetworkSearchFilter.Field.url)
-        Text("Host").tag(NetworkSearchFilter.Field.host)
-        Text("Method").tag(NetworkSearchFilter.Field.method)
-        Text("Status Code").tag(NetworkSearchFilter.Field.statusCode)
-        Text("Error Code").tag(NetworkSearchFilter.Field.errorCode)
-    }
-
-    @ViewBuilder
-    private var advancedFields: some View {
-        Text("Request Headers").tag(NetworkSearchFilter.Field.requestHeader)
-        Text("Response Headers").tag(NetworkSearchFilter.Field.responseHeader)
-        Divider()
-        Text("Request Body").tag(NetworkSearchFilter.Field.requestBody)
-        Text("Response Body").tag(NetworkSearchFilter.Field.responseBody)
     }
 
     private var matchPicker: some View {

@@ -217,7 +217,6 @@ extension ConsoleSearchCriteria {
     #warning("TODO: [P01] Remove ConsoleContentType")
     static func update(
         request: NSFetchRequest<LoggerMessageEntity>,
-        contentType: ConsoleContentType = .all,
         filterTerm: String,
         criteria: ConsoleSearchCriteria,
         filters: [ConsoleSearchFilter],
@@ -225,15 +224,6 @@ extension ConsoleSearchCriteria {
         isOnlyErrors: Bool
     ) {
         var predicates = [NSPredicate]()
-
-        switch contentType {
-        case .all:
-            break
-        case .network:
-            predicates.append(NSPredicate(format: "request != nil"))
-        case .pins:
-            predicates.append(NSPredicate(format: "isPinned == YES"))
-        }
 
 #if os(watchOS) || os(tvOS) || os(iOS)
         if criteria.onlyPins {

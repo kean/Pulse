@@ -13,26 +13,21 @@ import CoreData
 struct ConsoleNetworkRequestView: View {
     let model: ConsoleNetworkRequestViewModel
 
-    // TODO: remove
-    // I tried moving this to a ViewModel, but it started crashing
-    @State private var isPinned = false
-
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(alignment: .firstTextBaseline) {
                 title
                 #if os(watchOS)
                 Spacer()
-                if isPinned { pin }
+                model.pinViewModel.map { PinView(viewModel: $0, font: fonts.title) }
                 #else
-                if isPinned { pin }
+                model.pinViewModel.map { PinView(viewModel: $0, font: fonts.title) }
                 Spacer()
                 #endif
             }
             text
         }
         .padding(.vertical, 4)
-        .onReceive(model.isPinnedPublisher) { isPinned = $0 }
     }
 
     @ViewBuilder
@@ -65,12 +60,6 @@ struct ConsoleNetworkRequestView: View {
             .foregroundColor(model.badgeColor)
     }
 
-    private var pin: some View {
-        Image(systemName: "pin")
-            .font(fonts.title)
-            .foregroundColor(.secondary)
-    }
-
     private var text: some View {
         Text(model.text)
             .font(fonts.body)
@@ -99,6 +88,20 @@ struct ConsoleNetworkRequestView: View {
         #else
         return 10
         #endif
+    }
+}
+
+@available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
+private struct PinView: View {
+    @ObservedObject var viewModel: PinButtonViewModel
+    let font: Font
+
+    var body: some View {
+        if viewModel.isPinned {
+            Image(systemName: "pin")
+                .font(font)
+                .foregroundColor(.secondary)
+        }
     }
 }
 

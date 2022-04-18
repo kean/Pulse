@@ -7,6 +7,8 @@ import CoreData
 import PulseCore
 import Combine
 
+#if !os(watchOS)
+
 @available(iOS 13.0, tvOS 14.0, *)
 enum Filters {
     typealias ContentType = NetworkSearchCriteria.ContentTypeFilter.ContentType
@@ -39,3 +41,120 @@ enum Filters {
         }
     }
 }
+
+@available(iOS 14.0, *)
+struct DurationPicker: View {
+    let title: String
+    @Binding var value: DurationFilterPoint
+
+#if os(macOS)
+    var body: some View {
+        HStack {
+            Text(title + ":")
+                .foregroundColor(.secondary)
+                .frame(width: 42, alignment: .trailing)
+            TextField("", text: $value.value)
+            Picker("", selection: $value.unit) {
+                Text("min").tag(DurationFilterPoint.Unit.minutes)
+                Text("sec").tag(DurationFilterPoint.Unit.seconds)
+                Text("ms").tag(DurationFilterPoint.Unit.milliseconds)
+            }
+            .fixedSize()
+        }
+    }
+#else
+    var body: some View {
+        HStack {
+            Text(title)
+            Spacer()
+            TextField("Duration", text: $value.value)
+                .textFieldStyle(.roundedBorder)
+                .frame(width: 100)
+            Menu(content: {
+                Picker("", selection: $value.unit) {
+                    Text("min").tag(DurationFilterPoint.Unit.minutes)
+                    Text("sec").tag(DurationFilterPoint.Unit.seconds)
+                    Text("ms").tag(DurationFilterPoint.Unit.milliseconds)
+                }
+            }, label: {
+                FilterPickerButton(title: value.unit.localizedTitle)
+            }).animation(.none)
+            .fixedSize()
+
+        }
+    }
+#endif
+}
+
+@available(iOS 13.0, *)
+struct DateRangePicker: View {
+    let title: String
+    @Binding var date: Date
+    @Binding var isEnabled: Bool
+
+    var body: some View {
+        VStack(spacing: 8) {
+            HStack {
+                Text(title)
+                Spacer()
+                Toggle(title, isOn: $isEnabled)
+                    .fixedSize()
+                    .labelsHidden()
+            }
+            HStack {
+                DatePicker(title, selection: $date)
+                    .labelsHidden()
+                Spacer()
+            }
+        }.frame(height: 84)
+    }
+}
+
+@available(iOS 13.0, *)
+struct FilterPickerButton: View {
+    let title: String
+
+    var body: some View {
+        HStack {
+            Text(title)
+                .font(.subheadline)
+            Image(systemName: "chevron.right")
+                .font(.system(size: 13))
+                .foregroundColor(.secondary)
+        }
+        .foregroundColor(Color.primary.opacity(0.9))
+        .padding(EdgeInsets(top: 8, leading: 10, bottom: 8, trailing: 10))
+        .background(Color.secondaryFill)
+        .cornerRadius(8)
+    }
+}
+
+@available(iOS 13.0, *)
+struct FilterSectionHeader: View {
+    let icon: String
+    let title: String
+    let color: Color
+    let reset: () -> Void
+    let isDefault: Bool
+
+    var body: some View {
+        HStack(spacing: 0) {
+            HStack {
+                Image(systemName: icon)
+                    .foregroundColor(.accentColor)
+                Text(title)
+            }
+            Spacer()
+
+            Button(action: reset) {
+                Image(systemName: "arrow.uturn.left")
+                    .font(.system(size: 18))
+                    .foregroundColor(.accentColor)
+            }
+            .frame(width: 34, height: 34)
+            .disabled(isDefault)
+        }.buttonStyle(.plain)
+    }
+}
+
+#endif

@@ -30,15 +30,13 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     var context: AppContext { .init(store: store) }
 
     private let store: LoggerStore
-    private let contentType: ConsoleContentType
     private let controller: NSFetchedResultsController<LoggerMessageEntity>
     private var latestSessionId: String?
     private var cancellables = [AnyCancellable]()
 
-    init(store: LoggerStore, configuration: ConsoleConfiguration = .default, contentType: ConsoleContentType = .all) {
+    init(store: LoggerStore, configuration: ConsoleConfiguration = .default) {
         self.store = store
         self.configuration = configuration
-        self.contentType = contentType
 
         let request = NSFetchRequest<LoggerMessageEntity>(entityName: "\(LoggerMessageEntity.self)")
         request.fetchBatchSize = 250
@@ -90,17 +88,13 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         let sessionId = store === LoggerStore.default ? LoggerSession.current.id.uuidString : latestSessionId
 
         // Search messages
-        ConsoleSearchCriteria.update(request: controller.fetchRequest, contentType: contentType, filterTerm: filterTerm, criteria: searchCriteria.criteria, filters: searchCriteria.filters, sessionId: sessionId, isOnlyErrors: false)
+        ConsoleSearchCriteria.update(request: controller.fetchRequest, filterTerm: filterTerm, criteria: searchCriteria.criteria, filters: searchCriteria.filters, sessionId: sessionId, isOnlyErrors: false)
         try? controller.performFetch()
 
         self.messages = controller.fetchedObjects ?? []
     }
 
     // MARK: Pins
-
-    func removeAllPins() {
-        store.removeAllPins()
-    }
 
     private func refreshQuickFilters(criteria: ConsoleSearchCriteria) {
         quickFilters = searchCriteria.makeQuickFilters()
@@ -137,16 +131,9 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 
     // MARK: - NSFetchedResultsControllerDelegate
 
-    // This never gets called on macOS
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         self.messages = self.controller.fetchedObjects ?? []
     }
-}
-
-enum ConsoleContentType {
-    case all
-    case network
-    case pins
 }
 
 struct ConsoleMatch {

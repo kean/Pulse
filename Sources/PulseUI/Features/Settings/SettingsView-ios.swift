@@ -17,7 +17,7 @@ public struct SettingsView: View {
 
     public init(store: LoggerStore = .default) {
         self.model = SettingsViewModel(store: store)
-        self.console = ConsoleViewModel(store: store, contentType: .all)
+        self.console = ConsoleViewModel(store: store)
     }
 
     init(model: SettingsViewModel, console: ConsoleViewModel) {
@@ -145,13 +145,9 @@ struct ButtonRemove: View {
     let alert: String
     let action: () -> Void
 
-    @State private var isShowingRemoveConfirmationAlert = false
-
     var body: some View {
         let button =
-            Button(action: {
-                self.isShowingRemoveConfirmationAlert = true
-            }) {
+            Button(action: action) {
                 #if os(watchOS)
                 Label(title, systemImage: "trash")
                 #else
@@ -160,13 +156,6 @@ struct ButtonRemove: View {
                     Text(title)
                 }
                 #endif
-            }
-            .alert(isPresented: $isShowingRemoveConfirmationAlert) {
-                Alert(
-                    title: Text(alert),
-                    primaryButton: .destructive(Text(title), action: action),
-                    secondaryButton: .cancel()
-                )
             }
 
         #if os(watchOS)

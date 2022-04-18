@@ -16,7 +16,6 @@ final class ConsoleNetworkRequestViewModel {
 
     let showInConsole: (() -> Void)?
 
-    private let message: LoggerMessageEntity
     private let request: LoggerNetworkRequestEntity
     private let context: AppContext
 
@@ -26,7 +25,7 @@ final class ConsoleNetworkRequestViewModel {
         return formatter
     }()
 
-    init(message: LoggerMessageEntity, request: LoggerNetworkRequestEntity, context: AppContext, showInConsole: (() -> Void)? = nil) {
+    init(request: LoggerNetworkRequestEntity, context: AppContext, showInConsole: (() -> Void)? = nil) {
         let isSuccess: Bool
         if request.errorCode != 0 {
             isSuccess = false
@@ -60,24 +59,17 @@ final class ConsoleNetworkRequestViewModel {
 
         self.request = request
 
-        self.message = message
         self.context = context
         self.showInConsole = showInConsole
     }
 
     // MARK: Pins
 
-    var isPinnedPublisher: AnyPublisher<Bool, Never> {
-        message.publisher(for: \.isPinned).eraseToAnyPublisher()
-    }
-
-    var isPinned: Bool {
-        message.isPinned
-    }
-
-    func togglePin() {
-        context.store.togglePin(for: message)
-    }
+    lazy var pinViewModel: PinButtonViewModel? = {
+        request.message.map {
+            PinButtonViewModel(store: context.store, message: $0)
+        }
+    }()
 
     // MARK: Context Menu
 
