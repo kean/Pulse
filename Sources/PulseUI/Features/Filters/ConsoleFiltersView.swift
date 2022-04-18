@@ -224,7 +224,7 @@ private struct CustomFilterView: View {
                 Text("Line").tag(ConsoleSearchFilter.Field.line)
             }
         }, label: {
-            makePickerButton(title: filter.field.localizedTitle)
+            FilterPickerButton(title: filter.field.localizedTitle)
         }).animation(.none)
     }
 
@@ -242,11 +242,16 @@ private struct CustomFilterView: View {
                 Text("Regex").tag(ConsoleSearchFilter.Match.regex)
             }
         }, label: {
-            makePickerButton(title: filter.match.localizedTitle)
+            FilterPickerButton(title: filter.match.localizedTitle)
         }).animation(.none)
     }
+}
 
-    private func makePickerButton(title: String) -> some View {
+@available(iOS 13.0, *)
+struct FilterPickerButton: View {
+    let title: String
+
+    var body: some View {
         HStack {
             Text(title)
                 .font(.subheadline)

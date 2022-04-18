@@ -137,6 +137,20 @@ final class NetworkSearchFilter: ObservableObject, Hashable, Identifiable {
         case responseHeader
         case requestBody
         case responseBody
+
+        var localizedTitle: String {
+            switch self {
+            case .url: return "URL"
+            case .host: return "Host"
+            case .method: return "Method"
+            case .statusCode: return "Status Code"
+            case .errorCode: return "Error Code"
+            case .requestHeader: return "Request Headers"
+            case .responseHeader: return "Response Headers"
+            case .requestBody: return "Request Body"
+            case .responseBody: return "Response Body"
+            }
+        }
     }
 
     enum Match {
@@ -146,6 +160,17 @@ final class NetworkSearchFilter: ObservableObject, Hashable, Identifiable {
         case notContains
         case regex
         case beginsWith
+
+        var localizedTitle: String {
+            switch self {
+            case .equal: return "Equal"
+            case .notEqual: return "Not Equal"
+            case .contains: return "Contains"
+            case .notContains: return "Not Contains"
+            case .regex: return "Regex"
+            case .beginsWith: return "Begins With"
+            }
+        }
     }
 
     var isProgrammatic: Bool {

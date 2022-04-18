@@ -48,7 +48,7 @@ struct ConsoleFiltersLabelsPickerView: View {
 }
 
 @available(iOS 13.0, *)
-struct ConsoleFiltersLabelsPickerView_Previews: PreviewProvider {
+struct ConsoleFiltersView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
             ConsoleFiltersLabelsPickerView(viewModel: .init())
