@@ -153,30 +153,6 @@ struct ConsoleFiltersView: View {
     }
 }
 
-@available(iOS 13.0, *)
-private struct DateRangePicker: View {
-    let title: String
-    @Binding var date: Date
-    @Binding var isEnabled: Bool
-
-    var body: some View {
-        VStack(spacing: 8) {
-            HStack {
-                Text(title)
-                Spacer()
-                Toggle(title, isOn: $isEnabled)
-                    .fixedSize()
-                    .labelsHidden()
-            }
-            HStack {
-                DatePicker(title, selection: $date)
-                    .labelsHidden()
-                Spacer()
-            }
-        }.frame(height: 84)
-    }
-}
-
 @available(iOS 14.0, *)
 private struct CustomFilterView: View {
     @ObservedObject var filter: ConsoleSearchFilter
@@ -247,6 +223,32 @@ private struct CustomFilterView: View {
     }
 }
 
+// MARK: - Shared
+
+@available(iOS 13.0, *)
+struct DateRangePicker: View {
+    let title: String
+    @Binding var date: Date
+    @Binding var isEnabled: Bool
+
+    var body: some View {
+        VStack(spacing: 8) {
+            HStack {
+                Text(title)
+                Spacer()
+                Toggle(title, isOn: $isEnabled)
+                    .fixedSize()
+                    .labelsHidden()
+            }
+            HStack {
+                DatePicker(title, selection: $date)
+                    .labelsHidden()
+                Spacer()
+            }
+        }.frame(height: 84)
+    }
+}
+
 @available(iOS 13.0, *)
 struct FilterPickerButton: View {
     let title: String
@@ -306,6 +308,8 @@ private func tintColor(for level: LoggerStore.Level) -> Color {
     default: return Color.textColor(for: level)
     }
 }
+
+// MARK: - Preview
 
 @available(iOS 13.0, *)
 struct ConsoleFiltersPanelPro_Previews: PreviewProvider {

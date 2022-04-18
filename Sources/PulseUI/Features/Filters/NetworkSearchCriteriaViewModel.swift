@@ -6,10 +6,12 @@ import Foundation
 import PulseCore
 import CoreData
 import Combine
+import SwiftUI
 
 @available(iOS 13.0, tvOS 14.0, *)
 final class NetworkSearchCriteriaViewModel: ObservableObject {
     @Published var criteria: NetworkSearchCriteria = .default
+    private(set) var defaultCriteria: NetworkSearchCriteria = .default
     @Published var filters: [NetworkSearchFilter] = []
 
     @Published private(set) var allDomains: [String] = []
@@ -21,7 +23,11 @@ final class NetworkSearchCriteriaViewModel: ObservableObject {
 
     private var cancellables: [AnyCancellable] = []
 
-    init() {
+    init(isDefaultStore: Bool = true) {
+        if !isDefaultStore {
+            criteria.dates.isCurrentSessionOnly = false
+            defaultCriteria.dates.isCurrentSessionOnly = false
+        }
         resetFilters()
 
         $filters.dropFirst().sink { [weak self] _ in
@@ -40,7 +46,7 @@ final class NetworkSearchCriteriaViewModel: ObservableObject {
     }
 
     func resetAll() {
-        criteria = .default
+        criteria = defaultCriteria
         resetFilters()
         isButtonResetEnabled = false
     }
@@ -110,5 +116,25 @@ final class NetworkSearchCriteriaViewModel: ObservableObject {
             allDomainsSet = domains
             allDomains = allDomainsSet.sorted()
         }
+    }
+
+    // MARK: Bindings
+
+    var bindingStartDate: Binding<Date> {
+        Binding(get: {
+            self.criteria.dates.startDate ?? Date().addingTimeInterval(-3600)
+        }, set: { newValue in
+            self.criteria.dates.isStartDateEnabled = true
+            self.criteria.dates.startDate = newValue
+        })
+    }
+
+    var bindingEndDate: Binding<Date> {
+        Binding(get: {
+            self.criteria.dates.endDate ?? Date()
+        }, set: { newValue in
+            self.criteria.dates.isEndDateEnabled = true
+            self.criteria.dates.endDate = newValue
+        })
     }
 }

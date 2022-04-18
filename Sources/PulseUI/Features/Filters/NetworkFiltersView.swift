@@ -28,6 +28,16 @@ struct NetworkFiltersView: View {
                     customFiltersGroup
                 }
             }
+
+            Section(header: FilterSectionHeader(
+                icon: "calendar", title: "Time Period",
+                color: .yellow,
+                reset: { viewModel.criteria.dates = .default },
+                isDefault: viewModel.criteria.dates == .default,
+                isEnabled: $viewModel.criteria.dates.isEnabled
+            )) {
+                timePeriodGroup
+            }
         }
         .navigationBarTitle("Filters")
         .navigationBarItems(leading: buttonClose, trailing: buttonReset)
@@ -59,6 +69,20 @@ struct NetworkFiltersView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .center)
+    }
+
+    @ViewBuilder
+    private var timePeriodGroup: some View {
+        Toggle("Latest Session", isOn: $viewModel.criteria.dates.isCurrentSessionOnly)
+
+        DateRangePicker(title: "Start Date", date: viewModel.bindingStartDate, isEnabled: $viewModel.criteria.dates.isStartDateEnabled)
+        DateRangePicker(title: "End Date", date: viewModel.bindingEndDate, isEnabled: $viewModel.criteria.dates.isEndDateEnabled)
+
+        HStack(spacing: 16) {
+            Button("Recent") { viewModel.criteria.dates = .recent }
+            Button("Today") { viewModel.criteria.dates = .today }
+            Spacer()
+        }.buttonStyle(.plain)
     }
 }
 
