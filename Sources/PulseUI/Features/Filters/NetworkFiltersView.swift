@@ -40,6 +40,16 @@ struct NetworkFiltersView: View {
             }
 
             Section(header: FilterSectionHeader(
+                icon: "doc", title: "Content Type",
+                color: .yellow,
+                reset: { viewModel.criteria.contentType = .default },
+                isDefault: viewModel.criteria.contentType == .default,
+                isEnabled: $viewModel.criteria.contentType.isEnabled
+            )) {
+                Filters.contentTypesPicker(selection: $viewModel.criteria.contentType.contentType)
+            }
+
+            Section(header: FilterSectionHeader(
                 icon: "calendar", title: "Time Period",
                 color: .yellow,
                 reset: { viewModel.criteria.dates = .default },
