@@ -34,8 +34,7 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 
         self.controller = NSFetchedResultsController<LoggerNetworkRequestEntity>(fetchRequest: request, managedObjectContext: store.container.viewContext, sectionNameKeyPath: nil, cacheName: nil)
 
-        #warning("TODO: implement isDefaultStore")
-        self.searchCriteria = NetworkSearchCriteriaViewModel() // (isDefaultStore: store === LoggerStore.default)
+        self.searchCriteria = NetworkSearchCriteriaViewModel(isDefaultStore: store === LoggerStore.default)
 
         super.init()
 

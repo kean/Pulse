@@ -30,6 +30,16 @@ struct NetworkFiltersView: View {
             }
 
             Section(header: FilterSectionHeader(
+                icon: "number", title: "Status Code",
+                color: .yellow,
+                reset:  { viewModel.criteria.statusCode = .default },
+                isDefault: viewModel.criteria.statusCode == .default,
+                isEnabled: $viewModel.criteria.statusCode.isEnabled
+            )) {
+                statusCodeGroup
+            }
+
+            Section(header: FilterSectionHeader(
                 icon: "calendar", title: "Time Period",
                 color: .yellow,
                 reset: { viewModel.criteria.dates = .default },
@@ -69,6 +79,24 @@ struct NetworkFiltersView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .center)
+    }
+
+    @ViewBuilder
+    private var statusCodeGroup: some View {
+        HStack {
+            Text("Range")
+            Spacer()
+            TextField("From", text: $viewModel.criteria.statusCode.from, onEditingChanged: {
+                if $0 { viewModel.criteria.statusCode.isEnabled = true }
+            })
+            .textFieldStyle(.roundedBorder)
+            .frame(width: 100)
+            TextField("To", text: $viewModel.criteria.statusCode.to, onEditingChanged: {
+                if $0 { viewModel.criteria.statusCode.isEnabled = true }
+            })
+            .textFieldStyle(.roundedBorder)
+            .frame(width: 100)
+        }
     }
 
     @ViewBuilder
