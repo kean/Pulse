@@ -82,7 +82,7 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     private func didRefreshEntities() {
         var entities: AnyCollection<LoggerNetworkRequestEntity>
 
-        // Apply filters that couldn't be done programatically
+        // Apply filters that couldn't be done programmatically
         if let filters = searchCriteria.programmaticFilters {
             let objects = controller.fetchedObjects ?? []
             entities = AnyCollection(objects.filter { evaluateProgrammaticFilters(filters, entity: $0, store: store) })
