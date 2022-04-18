@@ -7,6 +7,7 @@ import PulseCore
 import CoreData
 import Combine
 
+@available(iOS 13.0, tvOS 14.0, *)
 final class NetworkSearchCriteriaViewModel: ObservableObject {
     @Published var criteria: NetworkSearchCriteria = .default
     @Published var filters: [NetworkSearchFilter] = []
@@ -83,6 +84,14 @@ final class NetworkSearchCriteriaViewModel: ObservableObject {
         if let index = filters.firstIndex(of: filter) {
             filters.remove(at: index)
         }
+    }
+
+    var programmaticFilters: [NetworkSearchFilter]? {
+        let programmaticFilters = filters.filter { $0.isProgrammatic && $0.isReady }
+        guard !programmaticFilters.isEmpty && criteria.isFiltersEnabled else {
+            return nil
+        }
+        return programmaticFilters
     }
 
     // MARK: Managing Domains

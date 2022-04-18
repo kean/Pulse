@@ -79,6 +79,7 @@ struct NetworkSearchCriteria: Hashable {
     }
 }
 
+@available(iOS 13.0, tvOS 14.0, *)
 final class NetworkSearchFilter: ObservableObject, Hashable, Identifiable {
     let id: UUID
     @Published var field: Field
@@ -226,6 +227,7 @@ private struct CacheKey: Hashable {
 
 private var responseBodyCache = Cache<String, String?>(costLimit: 30_870_912, countLimit: 1000)
 
+@available(iOS 13.0, tvOS 14.0, *)
 func evaluateProgrammaticFilters(_ filters: [NetworkSearchFilter], entity: LoggerNetworkRequestEntity, store: LoggerStore) -> Bool {
     var request: NetworkLoggerRequest? {
         let key = CacheKey(id: entity.objectID, code: 0)
@@ -283,8 +285,8 @@ func evaluateProgrammaticFilters(_ filters: [NetworkSearchFilter], entity: Logge
 
 private let isNetworkMessagePredicate = NSPredicate(format: "request != nil")
 
+@available(iOS 13.0, tvOS 14.0, *)
 extension NetworkSearchCriteria {
-
     static func update(request: NSFetchRequest<LoggerNetworkRequestEntity>, filterTerm: String, criteria: NetworkSearchCriteria, filters: [NetworkSearchFilter], isOnlyErrors: Bool, sessionId: String?) {
         var predicates = [NSPredicate]()
 

@@ -11,7 +11,7 @@ import SwiftUI
 final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, ObservableObject {
     let configuration: ConsoleConfiguration
 
-    @Published private(set) var messages: [LoggerMessageEntity]
+    @Published private(set) var messages: [LoggerMessageEntity] = []
 
     // Search criteria
     let searchCriteria: ConsoleSearchCriteriaViewModel
@@ -46,7 +46,6 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         request.sortDescriptors = [NSSortDescriptor(keyPath: \LoggerMessageEntity.createdAt, ascending: false)]
 
         self.controller = NSFetchedResultsController<LoggerMessageEntity>(fetchRequest: request, managedObjectContext: store.container.viewContext, sectionNameKeyPath: nil, cacheName: nil)
-        self.messages = []
 
         self.searchCriteria = ConsoleSearchCriteriaViewModel(isDefaultStore: store === LoggerStore.default)
 
