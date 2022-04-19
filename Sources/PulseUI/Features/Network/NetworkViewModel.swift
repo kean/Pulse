@@ -13,6 +13,7 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 
     // Search criteria
     let searchCriteria: NetworkSearchCriteriaViewModel
+    @Published var isOnlyErrors: Bool = false
     @Published var filterTerm: String = ""
     // TODO: implement quick filters
     // @Published private(set) var quickFilters: [QuickFilterViewModel] = []
@@ -50,6 +51,10 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
             self?.refreshNow()
         }.store(in: &cancellables)
 
+        $isOnlyErrors.receive(on: DispatchQueue.main).dropFirst().sink { [weak self] _ in
+            self?.refreshNow()
+        }.store(in: &cancellables)
+
         refreshNow()
 
         store.backgroundContext.perform {
@@ -71,7 +76,7 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         let sessionId = store === LoggerStore.default ? LoggerSession.current.id.uuidString : latestSessionId
 
         // Search messages
-        NetworkSearchCriteria.update(request: controller.fetchRequest, filterTerm: filterTerm, criteria: searchCriteria.criteria, filters: searchCriteria.filters, isOnlyErrors: false, sessionId: sessionId)
+        NetworkSearchCriteria.update(request: controller.fetchRequest, filterTerm: filterTerm, criteria: searchCriteria.criteria, filters: searchCriteria.filters, isOnlyErrors: isOnlyErrors, sessionId: sessionId)
         try? controller.performFetch()
 
         self.didRefreshEntities()

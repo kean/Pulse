@@ -43,13 +43,15 @@ public struct NetworkView: View {
         VStack {
             HStack(spacing: 16) {
                 SearchBar(title: "Search \(viewModel.entities.count) messages", text: $viewModel.filterTerm)
-                Button(action: {
-                    isShowingFilters = true
-                }) {
+                Button(action: { viewModel.isOnlyErrors.toggle() }) {
+                    Image(systemName: viewModel.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon")
+                        .foregroundColor(.accentColor)
+                }
+                Button(action: { isShowingFilters = true }) {
                     Image(systemName: "line.horizontal.3.decrease.circle")
                         .foregroundColor(.accentColor)
-                }.buttonStyle(.plain)
-            }
+                }
+            }.buttonStyle(.plain)
         }
         .padding(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
         .sheet(isPresented: $isShowingFilters) {
