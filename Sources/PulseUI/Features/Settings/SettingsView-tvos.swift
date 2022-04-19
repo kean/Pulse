@@ -10,22 +10,22 @@ import UniformTypeIdentifiers
 
 @available(tvOS 14.0, *)
 struct SettingsView: View {
-    @ObservedObject var model: SettingsViewModel
+    @ObservedObject var viewModel: SettingsViewModel
     @ObservedObject var console: ConsoleViewModel
 
     public init(store: LoggerStore = .default) {
-        self.model = SettingsViewModel(store: store)
+        self.viewModel = SettingsViewModel(store: store)
         self.console = ConsoleViewModel(store: store)
     }
 
-    init(model: SettingsViewModel, console: ConsoleViewModel) {
-        self.model = model
+    init(viewModel: SettingsViewModel, console: ConsoleViewModel) {
+        self.viewModel = viewModel
         self.console = console
     }
 
     public var body: some View {
         Form {
-            if !model.isReadonly {
+            if !viewModel.isReadonly {
                 Section {
                     ButtonRemoveAll(action: console.buttonRemoveAllMessagesTapped)
                         .disabled(console.messages.isEmpty)
@@ -35,7 +35,7 @@ struct SettingsView: View {
             Section {
                 if console.context.store === RemoteLogger.shared.store {
                     Section {
-                        RemoteLoggerSettingsView(model: .shared)
+                        RemoteLoggerSettingsView(viewModel: .shared)
                     }
                 }
             }

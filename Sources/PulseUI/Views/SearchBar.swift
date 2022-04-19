@@ -34,7 +34,7 @@ struct SearchBar: View {
             Image(systemName: "xmark.circle.fill")
         }
         .foregroundColor(.secondaryFill)
-        .buttonStyle(PlainButtonStyle())
+        .buttonStyle(.plain)
     }
 }
 

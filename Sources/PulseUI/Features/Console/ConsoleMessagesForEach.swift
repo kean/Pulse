@@ -69,7 +69,7 @@ private struct ConsoleNetworkRequestForEachRow: View {
     }
 
     var contents: some View {
-        ConsoleNetworkRequestView(model: .init(request: request, context: context))
+        ConsoleNetworkRequestView(viewModel: .init(request: request, context: context))
     }
 }
 
@@ -96,7 +96,7 @@ private struct ConsoleMessagesForEachRow: View {
     }
 
     var contents: some View {
-        ConsoleMessageView(model: .init(message: message, context: context))
+        ConsoleMessageView(viewModel: .init(message: message, context: context))
     }
 }
 
@@ -106,7 +106,7 @@ private struct LazyConsoleMessageDetailsView: View {
     let context: AppContext
 
     var body: some View {
-        ConsoleMessageDetailsView(model: .init(context: context, message: message))
+        ConsoleMessageDetailsView(viewModel: .init(context: context, message: message))
     }
 }
 
@@ -116,7 +116,7 @@ private struct LazyConsoleNetworkRequestDetailsView: View {
     let context: AppContext
 
     var body: some View {
-        NetworkInspectorView(model: .init(request: request, context: context))
+        NetworkInspectorView(viewModel: .init(request: request, context: context))
     }
 }
 

@@ -11,19 +11,19 @@ import Combine
 
 @available(iOS 13.0, tvOS 14.0, *)
 public struct MainView: View {
-    let model: MainViewModel
+    let viewModel: MainViewModel
 
     /// - parameter onDismiss: pass onDismiss to add a close button.
     public init(store: LoggerStore = .default,
                 configuration: ConsoleConfiguration = .default,
                 onDismiss: (() -> Void)? = nil) {
-        self.model = MainViewModel(store: store, configuration: configuration, onDismiss: onDismiss)
+        self.viewModel = MainViewModel(store: store, configuration: configuration, onDismiss: onDismiss)
     }
 
     public var body: some View {
         TabView {
-            ForEach(model.items) { item in
-                model.makeView(for: item)
+            ForEach(viewModel.items) { item in
+                viewModel.makeView(for: item)
                     .tabItem {
                         Image(systemName: item.imageName)
                         Text(item.title)

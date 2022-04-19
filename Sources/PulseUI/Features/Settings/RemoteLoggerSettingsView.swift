@@ -12,18 +12,18 @@ import Network
 
 @available(iOS 14.0, tvOS 14.0, watchOS 7.0, *)
 struct RemoteLoggerSettingsView: View {
-    @ObservedObject var model: RemoteLoggerSettingsViewModel
+    @ObservedObject var viewModel: RemoteLoggerSettingsViewModel
 
     var body: some View {
-        Toggle(isOn: $model.isEnabled, label: {
+        Toggle(isOn: $viewModel.isEnabled, label: {
             #if !os(watchOS)
             Image(systemName: "network")
             #endif
             Text("Remote Logging")
         })
-        if model.isEnabled {
-            if !model.servers.isEmpty {
-                List(model.servers, rowContent: makeServerView)
+        if viewModel.isEnabled {
+            if !viewModel.servers.isEmpty {
+                List(viewModel.servers, rowContent: makeServerView)
             } else {
                 progressView
             }
@@ -50,7 +50,7 @@ struct RemoteLoggerSettingsView: View {
         Button(action: server.connect) {
             HStack {
                 if server.isSelected {
-                    if model.isConnected {
+                    if viewModel.isConnected {
                         Image(systemName: "checkmark")
                             .foregroundColor(.blue)
                             .font(.system(size: 16, weight: .medium))

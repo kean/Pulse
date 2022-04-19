@@ -11,10 +11,10 @@ import PulseCore
 
 @available(iOS 13.0, tvOS 14.0, *)
 struct NetworkInspectorMetricsDetailsView: View {
-    let model: NetworkMetricsDetailsViewModel
+    let viewModel: NetworkMetricsDetailsViewModel
 
     var body: some View {
-        KeyValueGridView(items: model.sections)
+        KeyValueGridView(items: viewModel.sections)
     }
 }
 
@@ -99,11 +99,11 @@ private func formatBytes(_ count: Int64) -> String {
 struct NetworkInspectorMetricsDetailsView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            NetworkInspectorMetricsDetailsView(model: mockModel)
+            NetworkInspectorMetricsDetailsView(viewModel: mockModel)
                 .previewDisplayName("Light")
                 .environment(\.colorScheme, .light)
 
-            NetworkInspectorMetricsDetailsView(model: mockModel)
+            NetworkInspectorMetricsDetailsView(viewModel: mockModel)
                 .background(Color(UXColor.systemBackground))
                 .previewDisplayName("Dark")
                 .environment(\.colorScheme, .dark)

@@ -13,18 +13,18 @@ import PulseCore
 struct NetworkInspectorTransferInfoView: View {
     @Environment(\.colorScheme) var colorScheme
 
-    let model: NetworkInspectorTransferInfoViewModel
+    let viewModel: NetworkInspectorTransferInfoViewModel
 
     var body: some View {
         HStack {
             Spacer()
-            makeView(title: "Bytes Sent", imageName: "icloud.and.arrow.up", total: model.totalBytesSent, headers: model.headersBytesSent, body: model.bodyBytesSent)
+            makeView(title: "Bytes Sent", imageName: "icloud.and.arrow.up", total: viewModel.totalBytesSent, headers: viewModel.headersBytesSent, body: viewModel.bodyBytesSent)
             Spacer()
 
             Divider()
 
             Spacer()
-            makeView(title: "Bytes Received", imageName: "icloud.and.arrow.down", total: model.totalBytesReceived, headers: model.headersBytesReceived, body: model.bodyBytesReceived)
+            makeView(title: "Bytes Received", imageName: "icloud.and.arrow.down", total: viewModel.totalBytesReceived, headers: viewModel.headersBytesReceived, body: viewModel.bodyBytesReceived)
             Spacer()
         }
     }
@@ -74,12 +74,12 @@ private var fontSize: CGFloat {
 struct NetworkInspectorTransferInfoView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            NetworkInspectorTransferInfoView(model: mockModel)
+            NetworkInspectorTransferInfoView(viewModel: mockModel)
                 .background(Color(UXColor.systemBackground))
                 .previewDisplayName("Light")
                 .environment(\.colorScheme, .light)
 
-            NetworkInspectorTransferInfoView(model: mockModel)
+            NetworkInspectorTransferInfoView(viewModel: mockModel)
                 .background(Color(UXColor.systemBackground))
                 .previewDisplayName("Dark")
                 .environment(\.colorScheme, .dark)

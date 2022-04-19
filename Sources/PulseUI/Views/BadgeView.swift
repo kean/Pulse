@@ -6,7 +6,7 @@ import SwiftUI
 
 @available(iOS 13.0, tvOS 14.0, watchOS 6, *)
 struct BadgeView: View {
-    let model: BadgeViewModel
+    let viewModel: BadgeViewModel
 
     #if os(iOS)
     let font = Font.system(size: 11, weight: .regular)
@@ -26,11 +26,11 @@ struct BadgeView: View {
     #endif
 
     var body: some View {
-        Text(model.title)
+        Text(viewModel.title)
             .font(font)
-            .foregroundColor(model.textColor)
+            .foregroundColor(viewModel.textColor)
             .padding(padding)
-            .background(model.color)
+            .background(viewModel.color)
             .cornerRadius(cornerRadius)
     }
 }
@@ -39,7 +39,7 @@ struct BadgeView: View {
 struct BadgeView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            BadgeView(model: BadgeViewModel(title: "DEBUG", color: Color.red.opacity(0.3)))
+            BadgeView(viewModel: BadgeViewModel(title: "DEBUG", color: Color.red.opacity(0.3)))
         }
     }
 }

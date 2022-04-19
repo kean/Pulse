@@ -10,14 +10,14 @@ import PulseCore
 #if os(iOS)
 @available(iOS 13.0, *)
 struct StoreDetailsView: View {
-    let model: StoreDetailsViewModel
+    let viewModel: StoreDetailsViewModel
 
     var body: some View {
         Form {
             Section {
-                KeyValueSectionView(model: model.infoSection)
+                KeyValueSectionView(viewModel: viewModel.infoSection)
                     .padding(.top, 8)
-                KeyValueSectionView(model: model.sizeSection)
+                KeyValueSectionView(viewModel: viewModel.sizeSection)
                     .padding(.top, 8)
             }
         }

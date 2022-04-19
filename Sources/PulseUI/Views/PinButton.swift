@@ -8,22 +8,36 @@ import CoreData
 import PulseCore
 import Combine
 
-@available(iOS 13.0, tvOS 14.0, watchOS 6, *)
+@available(iOS 13.0, tvOS 14.0, watchOS 6.0, *)
 struct PinButton: View {
-    @ObservedObject var model: PinButtonViewModel
+    @ObservedObject var viewModel: PinButtonViewModel
     var isTextNeeded: Bool = true
 
     var body: some View {
-        Button(action: model.togglePin) {
+        Button(action: viewModel.togglePin) {
             if isTextNeeded {
-                Text(model.isPinned ? "Remove Pin" : "Pin")
+                Text(viewModel.isPinned ? "Remove Pin" : "Pin")
             }
-            Image(systemName: model.isPinned ? "pin.slash" : "pin")
+            Image(systemName: viewModel.isPinned ? "pin.slash" : "pin")
         }
     }
 }
 
-@available(iOS 13.0, tvOS 14.0, watchOS 6, *)
+@available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
+struct PinView: View {
+    @ObservedObject var viewModel: PinButtonViewModel
+    let font: Font
+
+    var body: some View {
+        if viewModel.isPinned {
+            Image(systemName: "pin")
+                .font(font)
+                .foregroundColor(.secondary)
+        }
+    }
+}
+
+@available(iOS 13.0, tvOS 14.0, watchOS 6.0, *)
 final class PinButtonViewModel: ObservableObject {
     @Published private(set) var isPinned = false
     private let message: LoggerMessageEntity

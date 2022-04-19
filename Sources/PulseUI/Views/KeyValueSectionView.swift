@@ -6,21 +6,21 @@ import SwiftUI
 
 @available(iOS 13.0, tvOS 14.0, watchOS 6, *)
 struct KeyValueSectionView: View {
-    let model: KeyValueSectionViewModel
+    let viewModel: KeyValueSectionViewModel
     var limit: Int = Int.max
 
     private var actualTintColor: Color {
-        model.items.isEmpty ? .gray : model.color
+        viewModel.items.isEmpty ? .gray : viewModel.color
     }
 
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
-                Text(model.title)
+                Text(viewModel.title)
                     .font(.headline)
                 Spacer()
                 #if os(iOS)
-                if let action = model.action {
+                if let action = viewModel.action {
                     Button(action: action.action, label: {
                         Text(action.title)
                         Image(systemName: "chevron.right")
@@ -35,12 +35,12 @@ struct KeyValueSectionView: View {
                 #endif
             }
             #if os(watchOS)
-            KeyValueListView(model: model, limit: limit)
+            KeyValueListView(viewModel: viewModel, limit: limit)
                 .padding(.top, 6)
                 .border(width: 2, edges: [.top], color: actualTintColor)
                 .padding(.top, 2)
 
-            if let action = model.action {
+            if let action = viewModel.action {
                 Spacer().frame(height: 10)
                 Button(action: action.action, label: {
                     Text(action.title)
@@ -52,7 +52,7 @@ struct KeyValueSectionView: View {
             }
 
             #else
-            KeyValueListView(model: model, limit: limit)
+            KeyValueListView(viewModel: viewModel, limit: limit)
                 .padding(EdgeInsets(top: 0, leading: 10, bottom: 0, trailing: 0))
                 .border(width: 2, edges: [.leading], color: actualTintColor)
                 .padding(EdgeInsets(top: 5, leading: 5, bottom: 5, trailing: 0))
@@ -63,24 +63,24 @@ struct KeyValueSectionView: View {
 
 @available(iOS 13.0, tvOS 14.0, watchOS 6, *)
 private struct KeyValueListView: View {
-    let model: KeyValueSectionViewModel
+    let viewModel: KeyValueSectionViewModel
     var limit: Int = Int.max
 
     private var actualTintColor: Color {
-        model.items.isEmpty ? .gray : model.color
+        viewModel.items.isEmpty ? .gray : viewModel.color
     }
 
     var items: [(String, String?)] {
-        var items = Array(model.items.prefix(limit))
-        if model.items.count > limit {
-            items.append(("And \(model.items.count - limit) more", "..."))
+        var items = Array(viewModel.items.prefix(limit))
+        if viewModel.items.count > limit {
+            items.append(("And \(viewModel.items.count - limit) more", "..."))
         }
         return items
     }
 
 #if os(macOS)
     var body: some View {
-        if model.items.isEmpty {
+        if viewModel.items.isEmpty {
             HStack {
                 Text("Empty")
                     .foregroundColor(actualTintColor)
@@ -119,7 +119,7 @@ private struct KeyValueListView: View {
     }
     #else
     var body: some View {
-        if model.items.isEmpty {
+        if viewModel.items.isEmpty {
             HStack {
             Text("Empty")
                 .foregroundColor(actualTintColor)

@@ -11,38 +11,33 @@ import Combine
 
 @available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
 struct ConsoleMessageView: View {
-    let model: ConsoleMessageViewModel
-
-    // TODO: remove
-    // I tried moving this to a ViewModel, but it started crashing
-    @State private var isPinned = false
+    let viewModel: ConsoleMessageViewModel
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(alignment: .firstTextBaseline) {
                 title
-                #if os(watchOS)
+#if os(watchOS)
                 Spacer()
-                if isPinned { pin }
-                #else
-                if isPinned { pin }
+                PinView(viewModel: viewModel.pinViewModel, font: fonts.title)
+#else
+                PinView(viewModel: viewModel.pinViewModel, font: fonts.title)
                 Spacer()
-                #endif
+#endif
             }
             text
         }
         .padding(.vertical, 4)
-        .onReceive(model.isPinnedPublisher) { isPinned = $0 }
     }
 
     private var title: some View {
-        badge + Text(model.title)
+        badge + Text(viewModel.title)
             .font(fonts.title)
             .foregroundColor(.secondary)
     }
 
     private var badge: Text {
-        guard let badge = model.badge else {
+        guard let badge = viewModel.badge else {
             return Text("")
         }
         var separator: Text {
@@ -67,9 +62,9 @@ struct ConsoleMessageView: View {
     }
 
     private var text: some View {
-        Text(model.text)
+        Text(viewModel.text)
             .font(fonts.body)
-            .foregroundColor(model.textColor)
+            .foregroundColor(viewModel.textColor)
             .lineLimit(4)
     }
 

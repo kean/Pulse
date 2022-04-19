@@ -94,7 +94,7 @@ extension MainViewModel {
         #if os(iOS) || os(tvOS)
         case .settings:
             NavigationView {
-                SettingsView(model: settingsModel, console: consoleModel)
+                SettingsView(viewModel: settingsModel, console: consoleModel)
             }
         #endif
         default: fatalError()

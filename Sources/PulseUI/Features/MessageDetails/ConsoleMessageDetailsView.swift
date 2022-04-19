@@ -8,7 +8,7 @@ import PulseCore
 #if os(iOS) || os(tvOS) || os(watchOS)
 @available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
 struct ConsoleMessageDetailsView: View {
-    let model: ConsoleMessageDetailsViewModel
+    let viewModel: ConsoleMessageDetailsViewModel
     @Environment(\.colorScheme) var colorScheme: ColorScheme
     @State private var isShowingShareSheet = false
 
@@ -17,16 +17,16 @@ struct ConsoleMessageDetailsView: View {
         contents
             .navigationBarTitle("", displayMode: .inline)
             .navigationBarItems(trailing: HStack(spacing: 18) {
-                if let badge = model.badge {
-                    BadgeView(model: BadgeViewModel(title: badge.title, color: badge.color.opacity(colorScheme == .light ? 0.25 : 0.5)))
+                if let badge = viewModel.badge {
+                    BadgeView(viewModel: BadgeViewModel(title: badge.title, color: badge.color.opacity(colorScheme == .light ? 0.25 : 0.5)))
                 }
-                PinButton(model: model.pin, isTextNeeded: false)
+                PinButton(viewModel: viewModel.pin, isTextNeeded: false)
                 ShareButton {
                     self.isShowingShareSheet = true
                 }
             })
             .sheet(isPresented: $isShowingShareSheet) {
-                ShareView(activityItems: [self.model.prepareForSharing()])
+                ShareView(activityItems: [self.viewModel.prepareForSharing()])
             }
     }
     #elseif os(watchOS)
@@ -34,7 +34,7 @@ struct ConsoleMessageDetailsView: View {
         ScrollView {
             contents
         }.toolbar(content: {
-            PinButton(model: model.pin, isTextNeeded: false)
+            PinButton(viewModel: viewModel.pin, isTextNeeded: false)
         })
     }
     #elseif os(tvOS)
@@ -51,16 +51,16 @@ struct ConsoleMessageDetailsView: View {
     }
 
     private var textView: some View {
-        RichTextView(model: .init(string: model.text))
+        RichTextView(viewModel: .init(string: viewModel.text))
     }
 
     #if os(watchOS) || os(tvOS)
     private var tags: some View {
         VStack(alignment: .leading) {
-            if let badge = model.badge {
-                BadgeView(model: BadgeViewModel(title: badge.title, color: badge.color.opacity(colorScheme == .light ? 0.25 : 0.5)))
+            if let badge = viewModel.badge {
+                BadgeView(viewModel: BadgeViewModel(title: badge.title, color: badge.color.opacity(colorScheme == .light ? 0.25 : 0.5)))
             }
-            ForEach(model.tags, id: \.title) { tag in
+            ForEach(viewModel.tags, id: \.title) { tag in
                 HStack {
                     Text(tag.title)
                         .font(.caption)
@@ -79,7 +79,7 @@ struct ConsoleMessageDetailsView: View {
     #else
     private var tags: some View {
         VStack(alignment: .leading) {
-            ForEach(model.tags, id: \.title) { tag in
+            ForEach(viewModel.tags, id: \.title) { tag in
                 HStack {
                     Text(tag.title)
                         .font(.caption)

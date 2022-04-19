@@ -10,26 +10,26 @@ import UniformTypeIdentifiers
 
 @available(iOS 13.0, *)
 public struct SettingsView: View {
-    @ObservedObject var model: SettingsViewModel
+    @ObservedObject var viewModel: SettingsViewModel
     @ObservedObject var console: ConsoleViewModel
 
     @State private var isDocumentBrowserPresented = false
 
     public init(store: LoggerStore = .default) {
-        self.model = SettingsViewModel(store: store)
+        self.viewModel = SettingsViewModel(store: store)
         self.console = ConsoleViewModel(store: store)
     }
 
-    init(model: SettingsViewModel, console: ConsoleViewModel) {
-        self.model = model
+    init(viewModel: SettingsViewModel, console: ConsoleViewModel) {
+        self.viewModel = viewModel
         self.console = console
     }
 
     public var body: some View {
         Form {
-            if let details = model.details {
+            if let details = viewModel.details {
                 Section {
-                    NavigationLink(destination: StoreDetailsView(model: details)) {
+                    NavigationLink(destination: StoreDetailsView(viewModel: details)) {
                         HStack {
                             Image(systemName: "info.circle")
                                 .foregroundColor(Color.primary)
@@ -40,7 +40,7 @@ public struct SettingsView: View {
                 }
             }
 
-            if !model.isReadonly {
+            if !viewModel.isReadonly {
                 Section {
                     if #available(iOS 14.0, *) {
                         Button(action: {
@@ -65,14 +65,14 @@ public struct SettingsView: View {
                 if #available(iOS 14.0, *) {
                     if console.context.store === RemoteLogger.shared.store {
                         Section {
-                            RemoteLoggerSettingsView(model: .shared)
+                            RemoteLoggerSettingsView(viewModel: .shared)
                         }
                     }
                 }
             }
         }
         .navigationBarTitle("Settings")
-        .navigationBarItems(leading: model.onDismiss.map { Button(action: $0) { Image(systemName: "xmark") } })
+        .navigationBarItems(leading: viewModel.onDismiss.map { Button(action: $0) { Image(systemName: "xmark") } })
     }
 }
 
@@ -115,7 +115,7 @@ final class SettingsViewModel: ObservableObject {
 struct ConsoleSettingsView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            SettingsView(model: SettingsViewModel(store: .mock), console: ConsoleViewModel(store: .mock))
+            SettingsView(viewModel: SettingsViewModel(store: .mock), console: ConsoleViewModel(store: .mock))
         }
     }
 }

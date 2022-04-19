@@ -29,16 +29,15 @@ struct KeyValueGridView: View {
                     HStack {
                         ForEach(row.items, id: \.title) { item in
                             VStack {
-                                KeyValueSectionView(model: item)
-                                Spacer()
-                                    .layoutPriority(1)
+                                KeyValueSectionView(viewModel: item)
+                                Spacer().layoutPriority(1)
                             }
                         }
                     }
                 }
             } else {
                 ForEach(items, id: \.title) {
-                    KeyValueSectionView(model: $0)
+                    KeyValueSectionView(viewModel: $0)
                 }
             }
         }

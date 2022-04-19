@@ -7,21 +7,19 @@ import CoreData
 import PulseCore
 import Combine
 
-@available(iOS 13.0, tvOS 14.0, watchOS 6, *)
+@available(iOS 13.0, tvOS 14.0, watchOS 6.0, *)
 struct NetworkInspectorResponseView: View {
-    let model: NetworkInspectorResponseViewModel
+    let viewModel: NetworkInspectorResponseViewModel
 
     @State private var isShowingShareSheet = false
 
     #if os(iOS)
     var body: some View {
         contents
-            .navigationBarTitle(model.title)
-            .navigationBarItems(trailing: ShareButton {
-                isShowingShareSheet = true
-            })
+            .navigationBarTitle(viewModel.title)
+            .navigationBarItems(trailing: ShareButton { isShowingShareSheet = true })
             .sheet(isPresented: $isShowingShareSheet) {
-                ShareView(activityItems: [model.prepareForSharing()])
+                ShareView(activityItems: [viewModel.prepareForSharing()])
             }
     }
     #elseif os(watchOS)
@@ -45,13 +43,13 @@ struct NetworkInspectorResponseView: View {
 
     @ViewBuilder
     private var contents: some View {
-        if let json = try? JSONSerialization.jsonObject(with: model.data, options: []) {
-            RichTextView(model: .init(json: json))
-        } else if let image = UXImage(data: model.data) {
+        if let json = try? JSONSerialization.jsonObject(with: viewModel.data, options: []) {
+            RichTextView(viewModel: .init(json: json))
+        } else if let image = UXImage(data: viewModel.data) {
             ScrollView {
                 VStack(spacing: 16) {
                     HStack {
-                        KeyValueSectionView(model: KeyValueSectionViewModel(title: "Image", color: .pink, items: [
+                        KeyValueSectionView(viewModel: KeyValueSectionViewModel(title: "Image", color: .pink, items: [
                             ("Width", "\(image.cgImage?.width ?? 0) px"),
                             ("Height", "\(image.cgImage?.height ?? 0) px")
                         ])).fixedSize()
@@ -69,7 +67,7 @@ struct NetworkInspectorResponseView: View {
             }
         } else {
             /// TODO: remove inefficiency where we scan this twice
-            RichTextView(model: .init(data: model.data))
+            RichTextView(viewModel: .init(data: viewModel.data))
         }
     }
 }
@@ -83,26 +81,26 @@ struct NetworkInspectorResponseView_Previews: PreviewProvider {
         Group {
             #if os(iOS)
             NavigationView {
-                NetworkInspectorResponseView(model: mockModel)
+                NetworkInspectorResponseView(viewModel: mockModel)
                     .navigationBarTitle("Response")
             }
             .previewDisplayName("Light")
             .environment(\.colorScheme, .light)
             #else
-            NetworkInspectorResponseView(model: mockModel)
+            NetworkInspectorResponseView(viewModel: mockModel)
                 .previewDisplayName("Light")
                 .environment(\.colorScheme, .light)
             #endif
 
-            NetworkInspectorResponseView(model: .init(title: "Response", data: mockImage))
+            NetworkInspectorResponseView(viewModel: .init(title: "Response", data: mockImage))
                 .previewDisplayName("Image")
                 .environment(\.colorScheme, .light)
 
-            NetworkInspectorResponseView(model: .init(title: "Response", data: mockHTML))
+            NetworkInspectorResponseView(viewModel: .init(title: "Response", data: mockHTML))
                 .previewDisplayName("HTML")
                 .environment(\.colorScheme, .light)
 
-            NetworkInspectorResponseView(model: mockModel)
+            NetworkInspectorResponseView(viewModel: mockModel)
                 .previewDisplayName("Dark")
                 .previewLayout(.sizeThatFits)
                 .environment(\.colorScheme, .dark)

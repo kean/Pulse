@@ -11,7 +11,7 @@ import CoreData
 
 @available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
 struct ConsoleNetworkRequestView: View {
-    let model: ConsoleNetworkRequestViewModel
+    let viewModel: ConsoleNetworkRequestViewModel
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -19,9 +19,9 @@ struct ConsoleNetworkRequestView: View {
                 title
                 #if os(watchOS)
                 Spacer()
-                model.pinViewModel.map { PinView(viewModel: $0, font: fonts.title) }
+                viewModel.pinViewModel.map { PinView(viewModel: $0, font: fonts.title) }
                 #else
-                model.pinViewModel.map { PinView(viewModel: $0, font: fonts.title) }
+                viewModel.pinViewModel.map { PinView(viewModel: $0, font: fonts.title) }
                 Spacer()
                 #endif
             }
@@ -36,18 +36,18 @@ struct ConsoleNetworkRequestView: View {
         VStack(alignment: .leading, spacing: 1) {
             HStack(alignment: .firstTextBaseline) {
                 statusCircle
-                Text(model.status)
+                Text(viewModel.status)
                     .font(fonts.title)
                     .foregroundColor(.secondary)
             }
-            Text(model.title)
+            Text(viewModel.title)
                 .font(fonts.title)
                 .foregroundColor(.secondary)
         }
         #else
         HStack(alignment: .firstTextBaseline, spacing: 8) {
             statusCircle
-            Text(model.status + " · " + model.title)
+            Text(viewModel.status + " · " + viewModel.title)
                 .font(fonts.title)
                 .foregroundColor(.secondary)
         }
@@ -57,11 +57,11 @@ struct ConsoleNetworkRequestView: View {
     private var statusCircle: some View {
         Circle()
             .frame(width: circleSize, height: circleSize)
-            .foregroundColor(model.badgeColor)
+            .foregroundColor(viewModel.badgeColor)
     }
 
     private var text: some View {
-        Text(model.text)
+        Text(viewModel.text)
             .font(fonts.body)
             .foregroundColor(.primary)
             .lineLimit(4)
@@ -88,20 +88,6 @@ struct ConsoleNetworkRequestView: View {
         #else
         return 10
         #endif
-    }
-}
-
-@available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
-private struct PinView: View {
-    @ObservedObject var viewModel: PinButtonViewModel
-    let font: Font
-
-    var body: some View {
-        if viewModel.isPinned {
-            Image(systemName: "pin")
-                .font(font)
-                .foregroundColor(.secondary)
-        }
     }
 }
 

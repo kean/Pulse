@@ -15,8 +15,7 @@ public struct ConsoleView: View {
     @Environment(\.colorScheme) private var colorScheme: ColorScheme
     @State private var shared: ShareItems?
 
-    public init(store: LoggerStore = .default,
-                configuration: ConsoleConfiguration = .default) {
+    public init(store: LoggerStore = .default, configuration: ConsoleConfiguration = .default) {
         self.viewModel = ConsoleViewModel(store: store)
     }
 
@@ -38,12 +37,13 @@ public struct ConsoleView: View {
 
     private var contentView: some View {
         List {
-            QuickFiltersView(model: viewModel)
+            ConsoleToolbarView(viewModel: viewModel)
             if !viewModel.messages.isEmpty {
                 ConsoleMessagesForEach(context: viewModel.context, messages: viewModel.messages, searchCriteriaViewModel: viewModel.searchCriteria)
             }
-        }.listStyle(PlainListStyle())
-            .background(background)
+        }
+        .listStyle(.plain)
+        .background(background)
     }
 
     @ViewBuilder
@@ -97,17 +97,17 @@ public struct ConsoleView: View {
     }
 }
 
-@available(iOS 13, *)
-private struct QuickFiltersView: View {
-    @ObservedObject var model: ConsoleViewModel
+@available(iOS 13.0, *)
+private struct ConsoleToolbarView: View {
+    @ObservedObject var viewModel: ConsoleViewModel
     @State private var isShowingFilters = false
 
     var body: some View {
         VStack(spacing: 8) {
             HStack(spacing: 16) {
-                SearchBar(title: "Search \(model.messages.count) messages", text: $model.filterTerm)
-                Button(action: { model.isOnlyErrors.toggle() }) {
-                    Image(systemName: model.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon")
+                SearchBar(title: "Search \(viewModel.messages.count) messages", text: $viewModel.filterTerm)
+                Button(action: { viewModel.isOnlyErrors.toggle() }) {
+                    Image(systemName: viewModel.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon")
                         .foregroundColor(.accentColor)
                 }
                 Button(action: { isShowingFilters = true }) {
@@ -119,7 +119,7 @@ private struct QuickFiltersView: View {
         .padding(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
         .sheet(isPresented: $isShowingFilters) {
             NavigationView {
-                ConsoleFiltersView(viewModel: model.searchCriteria, isPresented: $isShowingFilters)
+                ConsoleFiltersView(viewModel: viewModel.searchCriteria, isPresented: $isShowingFilters)
             }
         }
     }

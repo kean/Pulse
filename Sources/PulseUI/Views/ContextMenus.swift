@@ -39,7 +39,7 @@ struct ConsoleMessageContextMenu: View {
             }.foregroundColor(.red)
         }
         Section {
-            PinButton(model: .init(store: context.store, message: message))
+            PinButton(viewModel: .init(store: context.store, message: message))
         }
     }
 }
@@ -102,7 +102,7 @@ struct NetworkMessageContextMenu: View {
         }
         NetworkMessageContextMenuCopySection(request: request, shareService: context.share)
         if let message = request.message {
-            PinButton(model: .init(store: context.store, message: message))
+            PinButton(viewModel: .init(store: context.store, message: message))
         }
     }
 }
@@ -162,17 +162,17 @@ struct StringSearchOptionsMenu: View {
             Picker(options.isCaseSensitive ? "Case Sensitive" :  "Case Insensitive", selection: $options.isCaseSensitive) {
                 Text("Case Sensitive").tag(true)
                 Text("Case Insensitive").tag(false)
-            }.pickerStyle(InlinePickerStyle())
+            }.pickerStyle(.inline)
             Picker(options.isRegex ? "Regular Expression" : "Text", selection: $options.isRegex) {
                 Text("Text").tag(false)
                 Text("Regular Expression").tag(true)
-            }.pickerStyle(InlinePickerStyle())
+            }.pickerStyle(.inline)
             if !options.isRegex && isKindNeeded {
                 Picker(options.kind.rawValue, selection: $options.kind) {
                     ForEach(StringSearchOptions.Kind.allCases, id: \.self) {
                         Text($0.rawValue).tag($0)
                     }
-                }.pickerStyle(InlinePickerStyle())
+                }.pickerStyle(.inline)
             }
         }, label: {
             Image(systemName: "ellipsis.circle")

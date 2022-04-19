@@ -28,6 +28,7 @@ struct ConsoleFiltersView: View {
                     customFiltersGroup
                 }
             }
+            
             Section(header: FilterSectionHeader(
                 icon: "flag", title: "Levels",
                 color: .accentColor,
@@ -36,6 +37,7 @@ struct ConsoleFiltersView: View {
             )) {
                 logLevelsGroup
             }
+            
             Section(header: FilterSectionHeader(
                 icon: "tag", title: "Labels",
                 color: .orange,
@@ -44,6 +46,7 @@ struct ConsoleFiltersView: View {
             )) {
                 labelsGroup
             }
+            
             Section(header: FilterSectionHeader(
                 icon: "calendar", title: "Time Period",
                 color: .yellow,

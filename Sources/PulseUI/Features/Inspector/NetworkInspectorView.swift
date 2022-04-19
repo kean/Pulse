@@ -13,7 +13,7 @@ import Combine
 @available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
 struct NetworkInspectorView: View {
     // Make sure all tabs are updated live
-    @ObservedObject var model: NetworkInspectorViewModel
+    @ObservedObject var viewModel: NetworkInspectorViewModel
     @State private var selectedTab: NetworkInspectorTab = .summary
     @State private var isShowingShareSheet = false
     @State private var shareItems: ShareItems?
@@ -22,14 +22,14 @@ struct NetworkInspectorView: View {
     #if os(iOS)
     var body: some View {
         universalBody
-            .navigationBarTitle(Text(model.title), displayMode: .inline)
+            .navigationBarTitle(Text(viewModel.title), displayMode: .inline)
             .navigationBarItems(trailing: HStack(spacing: 22) {
-                if let pin = model.pin {
-                    PinButton(model: pin, isTextNeeded: false)
+                if let pin = viewModel.pin {
+                    PinButton(viewModel: pin, isTextNeeded: false)
                 }
                 if #available(iOS 14.0, *) {
                     Menu(content: {
-                        NetworkMessageContextMenu(request: model.request, context: model.context, sharedItems: $shareItems)
+                        NetworkMessageContextMenu(request: viewModel.request, context: viewModel.context, sharedItems: $shareItems)
                     }, label: {
                         Image(systemName: "square.and.arrow.up")
                     })
@@ -40,57 +40,57 @@ struct NetworkInspectorView: View {
                 }
             })
             .sheet(isPresented: $isShowingShareSheet) {
-                ShareView(activityItems: [model.prepareForSharing()])
+                ShareView(activityItems: [viewModel.prepareForSharing()])
             }
             .sheet(item: $shareItems, content: ShareView.init)
     }
     #elseif os(watchOS)
     var body: some View {
-        NetworkInspectorSummaryView(model: model.makeSummaryModel())
-            .navigationBarTitle(Text(model.title))
+        NetworkInspectorSummaryView(viewModel: viewModel.makeSummaryModel())
+            .navigationBarTitle(Text(viewModel.title))
             .toolbar {
-                if let viewModel = model.pin {
-                    PinButton(model: viewModel, isTextNeeded: false)
+                if let viewModel = viewModel.pin {
+                    PinButton(viewModel: viewModel, isTextNeeded: false)
                 }
             }
     }
     #elseif os(tvOS)
     var body: some View {
         List {
-            let model = self.model.makeSummaryModel()
+            let viewModel = self.viewModel.makeSummaryModel()
 
-            makeKeyValueSection(model: model.summaryModel)
+            makeKeyValueSection(viewModel: viewModel.summaryModel)
 
-            if let error = model.errorModel {
-                makeKeyValueSection(model: error)
+            if let error = viewModel.errorModel {
+                makeKeyValueSection(viewModel: error)
             }
-            if let request = model.requestBodySection {
-                NavigationLink(destination: NetworkInspectorResponseView(model: model.requestBodyViewModel).focusable(true)) {
-                    KeyValueSectionView(model: request)
+            if let request = viewModel.requestBodySection {
+                NavigationLink(destination: NetworkInspectorResponseView(viewModel: viewModel.requestBodyViewModel).focusable(true)) {
+                    KeyValueSectionView(viewModel: request)
                 }
             }
-            if let response = model.responseBodySection {
-                NavigationLink(destination: NetworkInspectorResponseView(model: model.responseBodyViewModel).focusable(true)) {
-                    KeyValueSectionView(model: response)
+            if let response = viewModel.responseBodySection {
+                NavigationLink(destination: NetworkInspectorResponseView(viewModel: viewModel.responseBodyViewModel).focusable(true)) {
+                    KeyValueSectionView(viewModel: response)
                 }
             }
-            if let timing = model.timingDetailsModel, let metrics = self.model.makeMetricsModel() {
-                NavigationLink(destination: NetworkInspectorMetricsView(model: metrics).focusable(true)) {
-                    KeyValueSectionView(model: timing)
+            if let timing = viewModel.timingDetailsModel, let metrics = self.viewModel.makeMetricsModel() {
+                NavigationLink(destination: NetworkInspectorMetricsView(viewModel: metrics).focusable(true)) {
+                    KeyValueSectionView(viewModel: timing)
                 }
             }
-            if let parameters = model.parametersModel {
-                makeKeyValueSection(model: parameters)
+            if let parameters = viewModel.parametersModel {
+                makeKeyValueSection(viewModel: parameters)
             }
 
-            makeKeyValueSection(model: model.requestHeaders)
-            makeKeyValueSection(model: model.responseHeaders)
+            makeKeyValueSection(viewModel: viewModel.requestHeaders)
+            makeKeyValueSection(viewModel: viewModel.responseHeaders)
         }
     }
 
-    func makeKeyValueSection(model: KeyValueSectionViewModel) -> some View {
-        NavigationLink(destination: KeyValueSectionView(model: model).focusable(true)) {
-            KeyValueSectionView(model: model, limit: 5)
+    func makeKeyValueSection(viewModel: KeyValueSectionViewModel) -> some View {
+        NavigationLink(destination: KeyValueSectionView(viewModel: viewModel).focusable(true)) {
+            KeyValueSectionView(viewModel: viewModel, limit: 5)
         }
     }
     #else
@@ -113,7 +113,7 @@ struct NetworkInspectorView: View {
                 }, label: {
                     Image(systemName: "square.and.arrow.up")
                 })
-                PinButton(model: model.pin, isTextNeeded: false)
+                PinButton(viewModel: model.pin, isTextNeeded: false)
             })
     }
     #endif
@@ -138,24 +138,24 @@ struct NetworkInspectorView: View {
     private var selectedTabView: some View {
         switch selectedTab {
         case .summary:
-            NetworkInspectorSummaryView(model: model.makeSummaryModel())
+            NetworkInspectorSummaryView(viewModel: viewModel.makeSummaryModel())
         case .headers:
-            NetworkInspectorHeadersView(model: model.makeHeadersModel())
+            NetworkInspectorHeadersView(viewModel: viewModel.makeHeadersModel())
         case .request:
-            if let model = model.makeRequestBodyViewModel() {
-                NetworkInspectorResponseView(model: model)
+            if let model = viewModel.makeRequestBodyViewModel() {
+                NetworkInspectorResponseView(viewModel: model)
             } else {
                 makePlaceholder
             }
         case .response:
-            if let model = model.makeResponseBodyViewModel() {
-                NetworkInspectorResponseView(model: model)
+            if let model = viewModel.makeResponseBodyViewModel() {
+                NetworkInspectorResponseView(viewModel: model)
             } else {
                 makePlaceholder
             }
         case .metrics:
-            if let model = model.makeMetricsModel() {
-                NetworkInspectorMetricsView(model: model)
+            if let model = viewModel.makeMetricsModel() {
+                NetworkInspectorMetricsView(viewModel: model)
             } else {
                 makePlaceholder
             }

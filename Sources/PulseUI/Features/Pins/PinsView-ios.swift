@@ -14,7 +14,6 @@ public struct PinsView: View {
     @ObservedObject var viewModel: PinsViewModel
     @Environment(\.colorScheme) private var colorScheme: ColorScheme
     
-
     public init(store: LoggerStore = .default) {
         self.viewModel = PinsViewModel(store: store)
     }

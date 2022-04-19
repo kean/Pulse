@@ -15,9 +15,9 @@ struct ConsoleMessageDetailsRouter: View {
 
     var body: some View {
         if let request = message.request {
-            NetworkInspectorView(model: .init(request: request, context: context))
+            NetworkInspectorView(viewModel: .init(request: request, context: context))
         } else {
-            ConsoleMessageDetailsView(model: .init(context: context, message: message))
+            ConsoleMessageDetailsView(viewModel: .init(context: context, message: message))
         }
     }
 }

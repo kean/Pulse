@@ -12,7 +12,7 @@ import WatchConnectivity
 
 @available(watchOS 7.0, *)
 public struct ConsoleView: View {
-    @ObservedObject var model: ConsoleViewModel
+    @ObservedObject var viewModel: ConsoleViewModel
     @Environment(\.colorScheme) private var colorScheme: ColorScheme
     @State private var isShowingFiltersView = false
     @State private var isShowingRemoveConfirmationAlert = false
@@ -20,20 +20,20 @@ public struct ConsoleView: View {
     @State private var isRemoteLoggingLinkActive = false
 
     public init(store: LoggerStore = .default) {
-        self.model = ConsoleViewModel(store: store)
+        self.viewModel = ConsoleViewModel(store: store)
     }
 
-    init(model: ConsoleViewModel) {
-        self.model = model
+    init(viewModel: ConsoleViewModel) {
+        self.viewModel = viewModel
     }
 
     public var body: some View {
         List {
-            Button(action: model.tranferStore) {
-                Label(model.fileTransferStatus.title, systemImage: "square.and.arrow.up")
-            }.disabled(model.fileTransferStatus.isButtonDisabled)
-            if model.context.store === RemoteLogger.shared.store {
-                NavigationLink(destination: _RemoteLoggingSettingsView(model: .shared)) {
+            Button(action: viewModel.tranferStore) {
+                Label(viewModel.fileTransferStatus.title, systemImage: "square.and.arrow.up")
+            }.disabled(viewModel.fileTransferStatus.isButtonDisabled)
+            if viewModel.context.store === RemoteLogger.shared.store {
+                NavigationLink(destination: _RemoteLoggingSettingsView(viewModel: .shared)) {
                     Button(action: { isRemoteLoggingLinkActive = true }) {
                         Label("Remote Logging", systemImage: "network")
                     }
@@ -42,21 +42,21 @@ public struct ConsoleView: View {
             Button(action: { isShowingFiltersView = true }) {
                 Label("Quick Filters", systemImage: "line.horizontal.3.decrease.circle")
             }
-            ConsoleMessagesForEach(context: model.context, messages: model.messages, searchCriteriaViewModel: model.searchCriteria)
+            ConsoleMessagesForEach(context: viewModel.context, messages: viewModel.messages, searchCriteriaViewModel: viewModel.searchCriteria)
         }
         .navigationTitle("Console")
         .toolbar {
             ToolbarItemGroup {
-                ButtonRemoveAll(action: model.buttonRemoveAllMessagesTapped)
-                    .disabled(model.messages.isEmpty)
-                    .opacity(model.messages.isEmpty ? 0.33 : 1)
+                ButtonRemoveAll(action: viewModel.buttonRemoveAllMessagesTapped)
+                    .disabled(viewModel.messages.isEmpty)
+                    .opacity(viewModel.messages.isEmpty ? 0.33 : 1)
             }
         }
-        .alert(item: $model.fileTransferError) { error in
+        .alert(item: $viewModel.fileTransferError) { error in
             Alert(title: Text("Transfer Failed"), message: Text(error.message), dismissButton: .cancel(Text("Ok")))
         }
         .sheet(isPresented: $isShowingFiltersView) {
-            List(model.quickFilters) { filter in
+            List(viewModel.quickFilters) { filter in
                 Button(action: {
                     filter.action()
                     isShowingFiltersView = false
@@ -71,11 +71,11 @@ public struct ConsoleView: View {
 
 @available(watchOS 7.0, *)
 private struct _RemoteLoggingSettingsView: View {
-    let model: RemoteLoggerSettingsViewModel
+    let viewModel: RemoteLoggerSettingsViewModel
 
     var body: some View {
         Form {
-            RemoteLoggerSettingsView(model: model)
+            RemoteLoggerSettingsView(viewModel: viewModel)
         }
     }
 }
@@ -86,7 +86,7 @@ struct ConsoleView_Previews: PreviewProvider {
     static var previews: some View {
         return Group {
             NavigationView {
-                ConsoleView(model: .init(store: .mock))
+                ConsoleView(viewModel: .init(store: .mock))
             }
         }
     }

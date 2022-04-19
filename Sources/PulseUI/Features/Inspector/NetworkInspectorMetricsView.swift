@@ -11,7 +11,7 @@ import PulseCore
 
 @available(iOS 13.0, tvOS 14.0, *)
 struct NetworkInspectorMetricsView: View {
-    let model: NetworkInspectorMetricsViewModel
+    let viewModel: NetworkInspectorMetricsViewModel
 
     private static let padding: CGFloat = 16
 
@@ -19,13 +19,13 @@ struct NetworkInspectorMetricsView: View {
         GeometryReader { geo in
             ScrollView(showsIndicators: false) {
                 VStack {
-                    TimingView(model: model.timingModel, width: geo.size.width - NetworkInspectorMetricsView.padding * 2)
+                    TimingView(viewModel: viewModel.timingModel, width: geo.size.width - NetworkInspectorMetricsView.padding * 2)
                         .padding(NetworkInspectorMetricsView.padding)
                     Spacer(minLength: 32)
 
                     #if !os(tvOS)
-                    if let details = model.details {
-                        NetworkInspectorMetricsDetailsView(model: details)
+                    if let details = viewModel.details {
+                        NetworkInspectorMetricsDetailsView(viewModel: details)
                             .padding([.leading, .bottom, .trailing], NetworkInspectorMetricsView.padding)
                     }
                     #endif
@@ -154,12 +154,12 @@ private func makeTiming(metrics: NetworkLoggerMetrics) -> [TimingRowSectionViewM
 struct NetworkInspectorMetricsView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            NetworkInspectorMetricsView(model: mockModel)
+            NetworkInspectorMetricsView(viewModel: mockModel)
                 .background(Color(UXColor.systemBackground))
                 .previewDisplayName("Light")
                 .environment(\.colorScheme, .light)
 
-            NetworkInspectorMetricsView(model: mockModel)
+            NetworkInspectorMetricsView(viewModel: mockModel)
                 .background(Color(UXColor.systemBackground))
                 .previewDisplayName("Dark")
                 .environment(\.colorScheme, .dark)

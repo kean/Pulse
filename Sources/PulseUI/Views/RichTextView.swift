@@ -11,45 +11,45 @@ import Combine
 
 @available(iOS 13.0, tvOS 14.0, *)
 struct RichTextView: View {
-    @ObservedObject private var model: RichTextViewModel
+    @ObservedObject private var viewModel: RichTextViewModel
     var isAutomaticLinkDetectionEnabled = true
     var hasVerticalScroller = false
 
-    init(model: RichTextViewModel, isAutomaticLinkDetectionEnabled: Bool = true, hasVerticalScroller: Bool = true) {
-        self.model = model
+    init(viewModel: RichTextViewModel, isAutomaticLinkDetectionEnabled: Bool = true, hasVerticalScroller: Bool = true) {
+        self.viewModel = viewModel
         self.isAutomaticLinkDetectionEnabled = isAutomaticLinkDetectionEnabled
         self.hasVerticalScroller = hasVerticalScroller
     }
 
     init(data: Data) {
-        self.init(model: RichTextViewModel(data: data))
+        self.init(viewModel: RichTextViewModel(data: data))
     }
 
     init(string: String) {
-        self.init(model: RichTextViewModel(string: string))
+        self.init(viewModel: RichTextViewModel(string: string))
     }
 
     #if os(iOS)
     var body: some View {
         VStack(spacing: 0) {
             HStack(spacing: 16) {
-                SearchBar(title: "Search", text: $model.searchTerm, onEditingChanged: { isEditing in
+                SearchBar(title: "Search", text: $viewModel.searchTerm, onEditingChanged: { isEditing in
                     if isEditing {
-                        model.isSearching = isEditing
+                        viewModel.isSearching = isEditing
                     }
                 })
 
                 if #available(iOS 14.0, *) {
-                    StringSearchOptionsMenu(options: $model.options, isKindNeeded: false)
+                    StringSearchOptionsMenu(options: $viewModel.options, isKindNeeded: false)
                 }
             }
             .padding(12)
             .border(width: 1, edges: [.bottom], color: Color.separator.opacity(0.3))
 
-            WrappedTextView(text: model.text, model: model, isAutomaticLinkDetectionEnabled: isAutomaticLinkDetectionEnabled)
+            WrappedTextView(text: viewModel.text, viewModel: viewModel, isAutomaticLinkDetectionEnabled: isAutomaticLinkDetectionEnabled)
 
-            if model.isSearching {
-                SearchToobar(model: model)
+            if viewModel.isSearching {
+                SearchToobar(model: viewModel)
             }
         }
     }
@@ -57,13 +57,13 @@ struct RichTextView: View {
     var body: some View {
         VStack(spacing: 0) {
             #if os(macOS)
-            WrappedTextView(text: model.text, model: model, isAutomaticLinkDetectionEnabled: isAutomaticLinkDetectionEnabled, hasVerticalScroller: hasVerticalScroller)
+            WrappedTextView(text: viewModel.text, viewModel: viewModel, isAutomaticLinkDetectionEnabled: isAutomaticLinkDetectionEnabled, hasVerticalScroller: hasVerticalScroller)
             #else
-            WrappedTextView(text: model.text, model: model, isAutomaticLinkDetectionEnabled: isAutomaticLinkDetectionEnabled)
+            WrappedTextView(text: viewModel.text, viewModel: viewModel, isAutomaticLinkDetectionEnabled: isAutomaticLinkDetectionEnabled)
             #endif
             #if !os(tvOS)
             Divider()
-            SearchToobar(model: model)
+            SearchToobar(model: viewModel)
             #endif
         }
     }
@@ -74,7 +74,7 @@ struct RichTextView: View {
 @available(iOS 13.0, tvOS 14.0, *)
 private struct WrappedTextView: UIViewRepresentable {
     let text: NSAttributedString
-    let model: RichTextViewModel
+    let viewModel: RichTextViewModel
     let isAutomaticLinkDetectionEnabled: Bool
 
     func makeUIView(context: Context) -> UXTextView {
@@ -83,19 +83,19 @@ private struct WrappedTextView: UIViewRepresentable {
         textView.autocorrectionType = .no
         textView.autocapitalizationType = .none
         textView.textContainerInset = UIEdgeInsets(top: 12, left: 10, bottom: 12, right: 10)
-        model.textView = textView
+        viewModel.textView = textView
         return textView
     }
 
     func updateUIView(_ uiView: UXTextView, context: Context) {
         uiView.attributedText = text
-        model.textView = uiView
+        viewModel.textView = uiView
     }
 }
 #else
 private struct WrappedTextView: NSViewRepresentable {
     let text: NSAttributedString
-    let model: RichTextViewModel
+    let viewModel: RichTextViewModel
     let isAutomaticLinkDetectionEnabled: Bool
     var hasVerticalScroller: Bool
 
@@ -106,14 +106,14 @@ private struct WrappedTextView: NSViewRepresentable {
         configureTextView(textView, isAutomaticLinkDetectionEnabled)
         textView.isAutomaticSpellingCorrectionEnabled = false
         textView.textContainerInset = NSSize(width: 10, height: 10)
-        model.textView = textView
+        viewModel.textView = textView
         return scrollView
     }
 
     func updateNSView(_ nsView: NSScrollView, context: Context) {
         let textView = (nsView.documentView as! NSTextView)
         textView.attributedText = text
-        model.textView = textView
+        viewModel.textView = textView
     }
 }
 #endif
@@ -348,10 +348,10 @@ struct RichTextView_Previews: PreviewProvider {
 #if os(watchOS)
 @available(tvOS 14.0, watchOS 6, *)
 struct RichTextView: View {
-    let model: RichTextViewModel
+    let viewModel: RichTextViewModel
 
     var body: some View {
-        Text(model.text)
+        Text(viewModel.text)
     }
 }
 

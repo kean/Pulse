@@ -5,7 +5,7 @@
 import PulseCore
 import Foundation
 
-@available(iOS 13.0, tvOS 14.0, watchOS 6, *)
+@available(iOS 13.0, tvOS 14.0, watchOS 6.0, *)
 extension NetworkLoggerSummary {
     func asPlainText() -> String {
         render(using: PlainTextRenderer())

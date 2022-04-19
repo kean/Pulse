@@ -25,6 +25,10 @@ final class ConsoleMessageViewModel {
         return formatter
     }()
 
+    lazy var pinViewModel: PinButtonViewModel = {
+        PinButtonViewModel(store: context.store, message: message)
+    }()
+
     init(message: LoggerMessageEntity, context: AppContext, showInConsole: (() -> Void)? = nil) {
         let time = ConsoleMessageViewModel.timeFormatter.string(from: message.createdAt)
         if message.label == "default" {
@@ -38,20 +42,6 @@ final class ConsoleMessageViewModel {
         self.context = context
         self.message = message
         self.showInConsole = showInConsole
-    }
-
-    // MARK: Pins
-
-    var isPinnedPublisher: AnyPublisher<Bool, Never> {
-        message.publisher(for: \.isPinned).eraseToAnyPublisher()
-    }
-
-    var isPinned: Bool {
-        message.isPinned
-    }
-
-    func togglePin() {
-        context.store.togglePin(for: message)
     }
 }
 

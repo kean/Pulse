@@ -8,13 +8,13 @@ import SwiftUI
 
 @available(iOS 13.0, tvOS 14.0, *)
 struct TimingView: View {
-    let model: [TimingRowSectionViewModel]
+    let viewModel: [TimingRowSectionViewModel]
     let width: CGFloat
 
     var body: some View {
         VStack(spacing: 16) {
-            ForEach(model, id: \.self.title) {
-                TimingSectionView(model: $0, width: width)
+            ForEach(viewModel, id: \.self.title) {
+                TimingSectionView(viewModel: $0, width: width)
             }
         }
     }
@@ -22,21 +22,21 @@ struct TimingView: View {
 
 @available(iOS 13.0, tvOS 14.0, *)
 private struct TimingSectionView: View {
-    let model: TimingRowSectionViewModel
+    let viewModel: TimingRowSectionViewModel
     let width: CGFloat
 
     var body: some View {
         VStack(spacing: 6) {
             HStack {
-                Text(model.title)
+                Text(viewModel.title)
                     .font(.subheadline)
                     .foregroundColor(.primary)
                 Spacer()
             }
 
             VStack(spacing: 6) {
-                ForEach(model.items, id: \.self.title) {
-                    TimingRowView(model: $0, width: width)
+                ForEach(viewModel.items, id: \.self.title) {
+                    TimingRowView(viewModel: $0, width: width)
                 }
             }
         }
@@ -45,7 +45,7 @@ private struct TimingSectionView: View {
 
 @available(iOS 13.0, tvOS 14.0, *)
 private struct TimingRowView: View {
-    let model: TimingRowViewModel
+    let viewModel: TimingRowViewModel
     let width: CGFloat
 
     #if os(tvOS)
@@ -61,10 +61,10 @@ private struct TimingRowView: View {
     var body: some View {
         HStack {
             let barWidth = width - TimingRowView.titleWidth - TimingRowView.valueWidth - 10
-            let start = clamp(model.start)
-            let length = min(1 - start, model.length)
+            let start = clamp(viewModel.start)
+            let length = min(1 - start, viewModel.length)
 
-            Text(model.title)
+            Text(viewModel.title)
                 .font(.footnote)
                 .foregroundColor(Color(UXColor.secondaryLabel))
                 .frame(width: TimingRowView.titleWidth, alignment: .leading)
@@ -72,15 +72,15 @@ private struct TimingRowView: View {
                 .frame(width: 2 + barWidth * start)
             #if os(tvOS)
             RoundedRectangle(cornerRadius: 2)
-                .fill(Color(model.color))
+                .fill(Color(viewModel.color))
                 .frame(width: max(2, barWidth * length), height: 20)
             #else
             RoundedRectangle(cornerRadius: 2)
-                .fill(Color(model.color))
+                .fill(Color(viewModel.color))
                 .frame(width: max(2, barWidth * length))
             #endif
             Spacer()
-            Text(model.value)
+            Text(viewModel.value)
                 .font(.system(.caption, design: .monospaced))
                 .foregroundColor(Color(UXColor.secondaryLabel))
                 .frame(width: TimingRowView.valueWidth, alignment: .trailing)
@@ -120,12 +120,12 @@ struct TimingView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             GeometryReader { geo in
-                TimingView(model: mockModel, width: geo.size.width)
+                TimingView(viewModel: mockModel, width: geo.size.width)
                     .previewLayout(.fixed(width: 320, height: 200))
                     .previewDisplayName("Light")
                     .environment(\.colorScheme, .light)
 
-                TimingView(model: mockModel, width: geo.size.width)
+                TimingView(viewModel: mockModel, width: geo.size.width)
                     .previewLayout(.fixed(width: 320, height: 200))
                     .previewDisplayName("Dark")
                     .background(Color(UXColor.systemBackground))

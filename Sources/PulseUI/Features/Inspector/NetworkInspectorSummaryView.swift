@@ -11,7 +11,7 @@ import PulseCore
 
 @available(iOS 13.0, watchOS 6, *)
 struct NetworkInspectorSummaryView: View {
-    @ObservedObject var model: NetworkInspectorSummaryViewModel
+    @ObservedObject var viewModel: NetworkInspectorSummaryViewModel
 
     var body: some View {
         ScrollView {
@@ -31,35 +31,35 @@ struct NetworkInspectorSummaryView: View {
     @ViewBuilder
     private var contents: some View {
         #if !os(watchOS)
-        if let transfer = model.transferModel {
+        if let transfer = viewModel.transferModel {
             Spacer().frame(height: 12)
-            NetworkInspectorTransferInfoView(model: transfer)
+            NetworkInspectorTransferInfoView(viewModel: transfer)
             Spacer().frame(height: 20)
         }
         #endif
-        KeyValueSectionView(model: model.summaryModel)
-        if let error = model.errorModel {
-            KeyValueSectionView(model: error)
+        KeyValueSectionView(viewModel: viewModel.summaryModel)
+        if let error = viewModel.errorModel {
+            KeyValueSectionView(viewModel: error)
         }
-        if let request = model.requestBodySection {
-            KeyValueSectionView(model: request)
+        if let request = viewModel.requestBodySection {
+            KeyValueSectionView(viewModel: request)
         }
-        if let response = model.responseBodySection {
-            KeyValueSectionView(model: response)
+        if let response = viewModel.responseBodySection {
+            KeyValueSectionView(viewModel: response)
         }
-        if let timing = model.timingDetailsModel {
-            KeyValueSectionView(model: timing)
+        if let timing = viewModel.timingDetailsModel {
+            KeyValueSectionView(viewModel: timing)
         }
-        if let parameters = model.parametersModel {
-            KeyValueSectionView(model: parameters)
+        if let parameters = viewModel.parametersModel {
+            KeyValueSectionView(viewModel: parameters)
         }
 
         #if os(watchOS)
-        KeyValueSectionView(model: model.requestHeaders)
-        if let additional = model.httpAdditionalHeaders {
-            KeyValueSectionView(model: additional)
+        KeyValueSectionView(viewModel: viewModel.requestHeaders)
+        if let additional = viewModel.httpAdditionalHeaders {
+            KeyValueSectionView(viewModel: additional)
         }
-        KeyValueSectionView(model: model.responseHeaders)
+        KeyValueSectionView(viewModel: viewModel.responseHeaders)
         #endif
 
         linksView
@@ -71,32 +71,32 @@ struct NetworkInspectorSummaryView: View {
 
     private var linksView: some View {
         VStack {
-            if let errorModel = model.errorModel {
-                NavigationLink(destination: NetworkHeadersDetailsView(model: errorModel), isActive: $model.isErrorRawActive) {
+            if let errorModel = viewModel.errorModel {
+                NavigationLink(destination: NetworkHeadersDetailsView(viewModel: errorModel), isActive: $viewModel.isErrorRawActive) {
                     Text("")
                 }
             }
 
-            NavigationLink(destination: NetworkInspectorResponseView(model: model.requestBodyViewModel), isActive: $model.isRequestRawActive) {
+            NavigationLink(destination: NetworkInspectorResponseView(viewModel: viewModel.requestBodyViewModel), isActive: $viewModel.isRequestRawActive) {
                 Text("")
             }
 
-            NavigationLink(destination: NetworkInspectorResponseView(model: model.responseBodyViewModel), isActive: $model.isResponseRawActive) {
+            NavigationLink(destination: NetworkInspectorResponseView(viewModel: viewModel.responseBodyViewModel), isActive: $viewModel.isResponseRawActive) {
                 Text("")
             }
 
             #if os(watchOS)
-            NavigationLink(destination: NetworkHeadersDetailsView(model: model.requestHeaders), isActive: $model.isRequestHeadersRawActive) {
+            NavigationLink(destination: NetworkHeadersDetailsView(viewModel: viewModel.requestHeaders), isActive: $viewModel.isRequestHeadersRawActive) {
                 Text("")
             }
 
-            if let additional = model.httpAdditionalHeaders {
-                NavigationLink(destination: NetworkHeadersDetailsView(model: additional), isActive: $model.isRequestAdditionalHeadersRawActive) {
+            if let additional = viewModel.httpAdditionalHeaders {
+                NavigationLink(destination: NetworkHeadersDetailsView(viewModel: additional), isActive: $viewModel.isRequestAdditionalHeadersRawActive) {
                     Text("")
                 }.hidden()
             }
 
-            NavigationLink(destination: NetworkHeadersDetailsView(model: model.responseHeaders), isActive: $model.isResponseHeadearsRawActive) {
+            NavigationLink(destination: NetworkHeadersDetailsView(viewModel: viewModel.responseHeaders), isActive: $viewModel.isResponseHeadearsRawActive) {
                 Text("")
             }
             #endif
