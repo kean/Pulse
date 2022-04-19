@@ -214,7 +214,6 @@ final class ConsoleSearchFilter: ObservableObject, Hashable, Identifiable {
 @available(iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension ConsoleSearchCriteria {
 
-    #warning("TODO: [P01] Remove ConsoleContentType")
     static func update(
         request: NSFetchRequest<LoggerMessageEntity>,
         filterTerm: String,
