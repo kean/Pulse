@@ -15,6 +15,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 
     // Search criteria
     let searchCriteria: ConsoleSearchCriteriaViewModel
+    @Published var isOnlyErrors: Bool = false
     @Published var filterTerm: String = ""
     @Published private(set) var quickFilters: [QuickFilterViewModel] = []
 
@@ -59,6 +60,10 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
             self?.refreshNow()
         }.store(in: &cancellables)
 
+        $isOnlyErrors.receive(on: DispatchQueue.main).dropFirst().sink { [weak self] _ in
+            self?.refreshNow()
+        }.store(in: &cancellables)
+
         refreshNow()
 
 #if os(watchOS) || os(iOS)
@@ -88,7 +93,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         let sessionId = store === LoggerStore.default ? LoggerSession.current.id.uuidString : latestSessionId
 
         // Search messages
-        ConsoleSearchCriteria.update(request: controller.fetchRequest, filterTerm: filterTerm, criteria: searchCriteria.criteria, filters: searchCriteria.filters, sessionId: sessionId, isOnlyErrors: false)
+        ConsoleSearchCriteria.update(request: controller.fetchRequest, filterTerm: filterTerm, criteria: searchCriteria.criteria, filters: searchCriteria.filters, sessionId: sessionId, isOnlyErrors: isOnlyErrors)
         try? controller.performFetch()
 
         self.messages = controller.fetchedObjects ?? []

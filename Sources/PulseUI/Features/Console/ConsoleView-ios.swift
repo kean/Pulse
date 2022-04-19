@@ -106,14 +106,15 @@ private struct QuickFiltersView: View {
         VStack(spacing: 8) {
             HStack(spacing: 16) {
                 SearchBar(title: "Search \(model.messages.count) messages", text: $model.filterTerm)
-                Button(action: {
-                    isShowingFilters = true
-                }) {
+                Button(action: { model.isOnlyErrors.toggle() }) {
+                    Image(systemName: model.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon")
+                        .foregroundColor(.accentColor)
+                }
+                Button(action: { isShowingFilters = true }) {
                     Image(systemName: "line.horizontal.3.decrease.circle")
                         .foregroundColor(.accentColor)
-                }.buttonStyle(.plain)
-            }
-            ConsoleQuickFiltersView(filters: model.quickFilters)
+                }
+            }.buttonStyle(.plain)
         }
         .padding(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
         .sheet(isPresented: $isShowingFilters) {

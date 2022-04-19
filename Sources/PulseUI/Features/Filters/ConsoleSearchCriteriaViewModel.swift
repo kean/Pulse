@@ -221,3 +221,12 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
         return filters
     }
 }
+
+@available(iOS 13.0, tvOS 14.0, watchOS 6, *)
+struct QuickFilterViewModel: Identifiable {
+    var id: String { title }
+    let title: String
+    let color: Color
+    let imageName: String
+    let action: () -> Void
+}
