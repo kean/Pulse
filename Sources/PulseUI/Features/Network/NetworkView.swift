@@ -29,9 +29,12 @@ public struct NetworkView: View {
     public var body: some View {
         List {
             quickFiltersView
-            NetworkMessagesForEach(context: viewModel.context, entities: viewModel.entities)
+            if !viewModel.entities.isEmpty {
+                NetworkMessagesForEach(context: viewModel.context, entities: viewModel.entities)
+            }
         }
         .listStyle(PlainListStyle())
+        .background(background)
         .navigationBarTitle(Text("Network"))
         .navigationBarItems(leading: viewModel.onDismiss.map { Button(action: $0) { Image(systemName: "xmark") } })
     }
@@ -55,6 +58,28 @@ public struct NetworkView: View {
             }
         }
     }
+
+    @ViewBuilder
+    private var background: some View {
+        if viewModel.entities.isEmpty {
+            placeholder
+        }
+    }
+
+    private var placeholder: PlaceholderView {
+        let message: String
+        if viewModel.searchCriteria.isDefaultSearchCriteria {
+            if viewModel.searchCriteria.criteria.dates.isCurrentSessionOnly {
+                message = "There are no network requests in the current session."
+            } else {
+                message = "There are no stored network requests."
+            }
+        } else {
+            message = "There are no network requests for the selected filters."
+        }
+        return PlaceholderView(imageName: "network", title: "No Requests", subtitle: message)
+    }
+
     #elseif os(tvOS)
     public var body: some View {
         List {

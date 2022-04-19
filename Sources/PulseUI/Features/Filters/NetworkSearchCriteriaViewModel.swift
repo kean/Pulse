@@ -23,6 +23,10 @@ final class NetworkSearchCriteriaViewModel: ObservableObject {
 
     private var cancellables: [AnyCancellable] = []
 
+    var isDefaultSearchCriteria: Bool {
+        criteria == defaultCriteria && (filters.count == 0 || (filters.count == 1 && filters == NetworkSearchFilter.defaultFilters))
+    }
+
     init(isDefaultStore: Bool = true) {
         if !isDefaultStore {
             criteria.dates.isCurrentSessionOnly = false

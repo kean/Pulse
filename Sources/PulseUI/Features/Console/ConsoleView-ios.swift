@@ -43,11 +43,11 @@ public struct ConsoleView: View {
                 ConsoleMessagesForEach(context: viewModel.context, messages: viewModel.messages, searchCriteriaViewModel: viewModel.searchCriteria)
             }
         }.listStyle(PlainListStyle())
-            .background(overlay)
+            .background(background)
     }
 
     @ViewBuilder
-    private var overlay: some View {
+    private var background: some View {
         if viewModel.messages.isEmpty {
             placeholder
         }
@@ -57,12 +57,12 @@ public struct ConsoleView: View {
         let message: String
         if viewModel.searchCriteria.isDefaultSearchCriteria {
             if viewModel.searchCriteria.criteria.dates.isCurrentSessionOnly {
-                message = "There are no messages in a current session."
+                message = "There are no messages in the current session."
             } else {
-                message = "There are currently no stored messages."
+                message = "There are no stored messages."
             }
         } else {
-            message = "There are no messages for the selected filters"
+            message = "There are no messages for the selected filters."
         }
         return PlaceholderView(imageName: "message", title: "No Messages", subtitle: message)
     }
