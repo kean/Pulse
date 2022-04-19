@@ -162,7 +162,7 @@ private struct CustomFilterView: View {
                 Image(systemName: "minus.circle.fill")
                     .font(.system(size: 18))
             }
-            .buttonStyle(PlainButtonStyle())
+            .buttonStyle(.plain)
             .foregroundColor(Color.red)
 
             VStack(spacing: 10) {
