@@ -17,7 +17,10 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     let searchCriteria: ConsoleSearchCriteriaViewModel
     @Published var isOnlyErrors: Bool = false
     @Published var filterTerm: String = ""
+
+#if os(watchOS)
     @Published private(set) var quickFilters: [QuickFilterViewModel] = []
+#endif
 
     // Apple Watch file transfers
 #if os(watchOS) || os(iOS)
@@ -102,7 +105,9 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     // MARK: Pins
 
     private func refreshQuickFilters(criteria: ConsoleSearchCriteria) {
+#if os(watchOS)
         quickFilters = searchCriteria.makeQuickFilters()
+#endif
     }
 
     func share(as output: ShareStoreOutput) -> ShareItems {
