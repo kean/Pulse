@@ -56,7 +56,7 @@ public struct NetworkView: View {
                 }.frame(width: 40, height: 44)
             }.buttonStyle(.plain)
         }
-        .padding(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
+        .padding(EdgeInsets(top: 2, leading: 0, bottom: 2, trailing: -12))
         .sheet(isPresented: $isShowingFilters) {
             NavigationView {
                 NetworkFiltersView(viewModel: viewModel.searchCriteria, isPresented: $isShowingFilters)
