@@ -38,6 +38,10 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
         }.store(in: &cancellables)
     }
 
+    var isDefaultSearchCriteria: Bool {
+        criteria == defaultCriteria && (filters.count == 0 || (filters.count == 1 && filters == ConsoleSearchFilter.defaultFilters))
+    }
+
     func resetAll() {
         criteria = defaultCriteria
         resetFilters()

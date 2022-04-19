@@ -15,7 +15,7 @@ struct SettingsView: View {
 
     public init(store: LoggerStore = .default) {
         self.model = SettingsViewModel(store: store)
-        self.console = ConsoleViewModel(store: store, contentType: .all)
+        self.console = ConsoleViewModel(store: store)
     }
 
     init(model: SettingsViewModel, console: ConsoleViewModel) {

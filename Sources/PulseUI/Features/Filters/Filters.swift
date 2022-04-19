@@ -42,6 +42,7 @@ enum Filters {
     }
 }
 
+#if os(iOS) || os(macOS)
 @available(iOS 14.0, *)
 struct DurationPicker: View {
     let title: String
@@ -109,8 +110,9 @@ struct DateRangePicker: View {
         }.frame(height: 84)
     }
 }
+#endif
 
-@available(iOS 13.0, *)
+@available(iOS 13.0, tvOS 14.0, *)
 struct FilterPickerButton: View {
     let title: String
 
@@ -129,7 +131,7 @@ struct FilterPickerButton: View {
     }
 }
 
-@available(iOS 13.0, *)
+@available(iOS 13.0, tvOS 14.0, *)
 struct FilterSectionHeader: View {
     let icon: String
     let title: String

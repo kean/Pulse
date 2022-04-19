@@ -58,7 +58,7 @@ public struct NetworkView: View {
     #elseif os(tvOS)
     public var body: some View {
         List {
-            NetworkMessagesForEach(context: viewModel.context, messages: viewModel.entities)
+            NetworkMessagesForEach(context: viewModel.context, entities: viewModel.entities)
         }
     }
     #endif

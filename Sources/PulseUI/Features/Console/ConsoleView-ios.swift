@@ -14,7 +14,6 @@ public struct ConsoleView: View {
     @ObservedObject var viewModel: ConsoleViewModel
     @Environment(\.colorScheme) private var colorScheme: ColorScheme
     @State private var shared: ShareItems?
-    @Environment(\.presentationMode) var presentationMode
 
     public init(store: LoggerStore = .default,
                 configuration: ConsoleConfiguration = .default) {
@@ -40,8 +39,32 @@ public struct ConsoleView: View {
     private var contentView: some View {
         List {
             QuickFiltersView(model: viewModel)
-            ConsoleMessagesForEach(context: viewModel.context, messages: viewModel.messages, searchCriteriaViewModel: viewModel.searchCriteria)
+            if !viewModel.messages.isEmpty {
+                ConsoleMessagesForEach(context: viewModel.context, messages: viewModel.messages, searchCriteriaViewModel: viewModel.searchCriteria)
+            }
         }.listStyle(PlainListStyle())
+            .background(overlay)
+    }
+
+    @ViewBuilder
+    private var overlay: some View {
+        if viewModel.messages.isEmpty {
+            placeholder
+        }
+    }
+
+    private var placeholder: PlaceholderView {
+        let message: String
+        if viewModel.searchCriteria.isDefaultSearchCriteria {
+            if viewModel.searchCriteria.criteria.dates.isCurrentSessionOnly {
+                message = "There are no messages in a current session."
+            } else {
+                message = "There are currently no stored messages."
+            }
+        } else {
+            message = "There are no messages for the selected filters"
+        }
+        return PlaceholderView(imageName: "message", title: "No Messages", subtitle: message)
     }
 
     @ViewBuilder
