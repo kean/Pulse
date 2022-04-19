@@ -15,8 +15,6 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     let searchCriteria: NetworkSearchCriteriaViewModel
     @Published var isOnlyErrors: Bool = false
     @Published var filterTerm: String = ""
-    // TODO: implement quick filters
-    // @Published private(set) var quickFilters: [QuickFilterViewModel] = []
 
     var onDismiss: (() -> Void)?
 
