@@ -23,7 +23,7 @@ struct PinButton: View {
     }
 }
 
-@available(iOS 15.0, watchOS 8.0, *)
+@available(iOS 15.0, tvOS 15.0, watchOS 8.0, *)
 struct PinButton2: View {
     @ObservedObject var viewModel: PinButtonViewModel
 

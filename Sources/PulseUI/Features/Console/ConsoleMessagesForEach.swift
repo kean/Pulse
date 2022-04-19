@@ -25,7 +25,7 @@ struct ConsoleMessagesForEach: View {
                 ConsoleNetworkRequestForEachRow(context: context, request: request)
             }
             .backport.swipeActions(edge: .leading) {
-                if #available(iOS 15.0, watchOS 8.0, *) {
+                if #available(iOS 15.0, tvOS 15.0, watchOS 8.0, *) {
                     PinButton2(viewModel: .init(store: context.store, message: message))
                         .tint(.blue)
                 }
@@ -35,7 +35,7 @@ struct ConsoleMessagesForEach: View {
                 ConsoleMessagesForEachRow(context: context, message: message, searchCriteriaViewModel: searchCriteriaViewModel)
             }
             .backport.swipeActions(edge: .leading) {
-                if #available(iOS 15.0, watchOS 8.0, *) {
+                if #available(iOS 15.0, tvOS 15.0,  watchOS 8.0, *) {
                     PinButton2(viewModel: .init(store: context.store, message: message))
                         .tint(.blue)
                 }
@@ -59,7 +59,7 @@ struct NetworkMessagesForEach: View {
             ConsoleNetworkRequestForEachRow(context: context, request: request)
         }
         .backport.swipeActions(edge: .leading) {
-            if #available(iOS 15.0, watchOS 8.0, *), let message = request.message {
+            if #available(iOS 15.0, tvOS 15.0, watchOS 8.0, *), let message = request.message {
                 PinButton2(viewModel: .init(store: context.store, message: message))
                     .tint(.blue)
             }

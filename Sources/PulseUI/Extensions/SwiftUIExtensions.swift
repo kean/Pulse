@@ -52,7 +52,7 @@ extension Backport {
     enum HorizontalEdge {
         case leading, trailing
 
-        @available(iOS 15.0, watchOS 8.0, *)
+        @available(iOS 15.0, tvOS 15.0, watchOS 8.0, *)
         var edge: SwiftUI.HorizontalEdge {
             switch self {
             case .leading: return .leading
@@ -69,7 +69,7 @@ extension Backport {
             self.content
         }
 #else
-        return self.content
+        self.content
 #endif
     }
 }
