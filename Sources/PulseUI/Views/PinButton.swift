@@ -23,6 +23,17 @@ struct PinButton: View {
     }
 }
 
+@available(iOS 15.0, watchOS 8.0, *)
+struct PinButton2: View {
+    @ObservedObject var viewModel: PinButtonViewModel
+
+    var body: some View {
+        Button(action: viewModel.togglePin) {
+            Label(viewModel.isPinned ? "Remove Pin" : "Pin", systemImage: viewModel.isPinned ? "pin.slash" : "pin")
+        }
+    }
+}
+
 @available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
 struct PinView: View {
     @ObservedObject var viewModel: PinButtonViewModel

@@ -323,9 +323,8 @@ extension NetworkSearchCriteria {
     static func update(request: NSFetchRequest<LoggerNetworkRequestEntity>, filterTerm: String, criteria: NetworkSearchCriteria, filters: [NetworkSearchFilter], isOnlyErrors: Bool, sessionId: String?) {
         var predicates = [NSPredicate]()
 
-        // TODO: this can now be optimized by using `state`
         if isOnlyErrors {
-            predicates.append(NSPredicate(format: "errorCode != 0 OR statusCode < 200 OR statusCode > 399"))
+            predicates.append(NSPredicate(format: "requestState == %d", LoggerNetworkRequestEntity.State.failure.rawValue))
         }
 
         if criteria.dates.isCurrentSessionOnly, let sessionId = sessionId, !sessionId.isEmpty {

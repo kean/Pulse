@@ -24,9 +24,21 @@ struct ConsoleMessagesForEach: View {
             NavigationLink(destination: LazyConsoleNetworkRequestDetailsView(request: request, context: context)) {
                 ConsoleNetworkRequestForEachRow(context: context, request: request)
             }
+            .backport.swipeActions(edge: .leading) {
+                if #available(iOS 15.0, watchOS 8.0, *) {
+                    PinButton2(viewModel: .init(store: context.store, message: message))
+                        .tint(.blue)
+                }
+            }
         } else {
             NavigationLink(destination: LazyConsoleMessageDetailsView(message: message, context: context)) {
                 ConsoleMessagesForEachRow(context: context, message: message, searchCriteriaViewModel: searchCriteriaViewModel)
+            }
+            .backport.swipeActions(edge: .leading) {
+                if #available(iOS 15.0, watchOS 8.0, *) {
+                    PinButton2(viewModel: .init(store: context.store, message: message))
+                        .tint(.blue)
+                }
             }
         }
     }
@@ -45,6 +57,12 @@ struct NetworkMessagesForEach: View {
     private func makeListItem(request: LoggerNetworkRequestEntity) -> some View {
         NavigationLink(destination: LazyConsoleNetworkRequestDetailsView(request: request, context: context)) {
             ConsoleNetworkRequestForEachRow(context: context, request: request)
+        }
+        .backport.swipeActions(edge: .leading) {
+            if #available(iOS 15.0, watchOS 8.0, *), let message = request.message {
+                PinButton2(viewModel: .init(store: context.store, message: message))
+                    .tint(.blue)
+            }
         }
     }
 }
