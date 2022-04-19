@@ -28,7 +28,7 @@ public struct NetworkView: View {
     #if os(iOS)
     public var body: some View {
         List {
-            quickFiltersView
+            toolbar
             if !viewModel.entities.isEmpty {
                 NetworkMessagesForEach(context: viewModel.context, entities: viewModel.entities)
             }
@@ -39,18 +39,21 @@ public struct NetworkView: View {
         .navigationBarItems(leading: viewModel.onDismiss.map { Button(action: $0) { Image(systemName: "xmark") } })
     }
 
-    private var quickFiltersView: some View {
+    private var toolbar: some View {
         VStack {
-            HStack(spacing: 16) {
+            HStack(spacing: 0) {
                 SearchBar(title: "Search \(viewModel.entities.count) messages", text: $viewModel.filterTerm)
+                Spacer().frame(width: 10)
                 Button(action: { viewModel.isOnlyErrors.toggle() }) {
                     Image(systemName: viewModel.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon")
+                        .font(.system(size: 20))
                         .foregroundColor(.accentColor)
-                }
+                }.frame(width: 40, height: 44)
                 Button(action: { isShowingFilters = true }) {
                     Image(systemName: "line.horizontal.3.decrease.circle")
+                        .font(.system(size: 20))
                         .foregroundColor(.accentColor)
-                }
+                }.frame(width: 40, height: 44)
             }.buttonStyle(.plain)
         }
         .padding(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))

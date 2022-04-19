@@ -104,19 +104,22 @@ private struct ConsoleToolbarView: View {
 
     var body: some View {
         VStack(spacing: 8) {
-            HStack(spacing: 16) {
+            HStack(spacing: 0) {
                 SearchBar(title: "Search \(viewModel.messages.count) messages", text: $viewModel.filterTerm)
+                Spacer().frame(width: 10)
                 Button(action: { viewModel.isOnlyErrors.toggle() }) {
                     Image(systemName: viewModel.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon")
+                        .font(.system(size: 20))
                         .foregroundColor(.accentColor)
-                }
+                }.frame(width: 40, height: 44)
                 Button(action: { isShowingFilters = true }) {
                     Image(systemName: "line.horizontal.3.decrease.circle")
+                        .font(.system(size: 20))
                         .foregroundColor(.accentColor)
-                }
+                }.frame(width: 40, height: 44)
             }.buttonStyle(.plain)
         }
-        .padding(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
+        .padding(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: -12))
         .sheet(isPresented: $isShowingFilters) {
             NavigationView {
                 ConsoleFiltersView(viewModel: viewModel.searchCriteria, isPresented: $isShowingFilters)
