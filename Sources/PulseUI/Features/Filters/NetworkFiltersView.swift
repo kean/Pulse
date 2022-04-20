@@ -107,12 +107,13 @@ struct NetworkFiltersView: View {
             })
             .keyboardType(.decimalPad)
             .textFieldStyle(.roundedBorder)
-            .frame(width: 85)
+            .frame(width: 60)
+            Text("—")
             TextField("To", text: $viewModel.criteria.statusCode.to, onEditingChanged: {
                 if $0 { viewModel.criteria.statusCode.isEnabled = true }
             })
             .textFieldStyle(.roundedBorder)
-            .frame(width: 85)
+            .frame(width: 60)
         }
         Picker("Domain", selection: $viewModel.criteria.host.value) {
             Text("Any").tag("")
