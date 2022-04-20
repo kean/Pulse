@@ -37,6 +37,8 @@ extension NavigationLink where Label == EmptyView {
 
 // MARK: - Backport
 
+#if !os(macOS)
+
 @available(iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 struct Backport<Content: View> {
     let content: Content
@@ -73,3 +75,4 @@ extension Backport {
 #endif
     }
 }
+#endif

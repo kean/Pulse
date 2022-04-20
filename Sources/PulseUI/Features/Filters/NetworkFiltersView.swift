@@ -185,24 +185,31 @@ private struct CustomNetworkFilterView: View {
     private var fieldPicker: some View {
         Menu(content: {
             Picker("", selection: $filter.field) {
-                Section {
-                    Text("URL").tag(NetworkSearchFilter.Field.url)
-                    Text("Host").tag(NetworkSearchFilter.Field.host)
-                    Text("Method").tag(NetworkSearchFilter.Field.method)
-                    Text("Status Code").tag(NetworkSearchFilter.Field.statusCode)
-                    Text("Error Code").tag(NetworkSearchFilter.Field.errorCode)
-                }
-                Section {
-                    Text("Request Headers").tag(NetworkSearchFilter.Field.requestHeader)
-                    Text("Response Headers").tag(NetworkSearchFilter.Field.responseHeader)
-                    Divider()
-                    Text("Request Body").tag(NetworkSearchFilter.Field.requestBody)
-                    Text("Response Body").tag(NetworkSearchFilter.Field.responseBody)
-                }
+                fieldPickerBasicSection
+                Divider()
+                fieldPickerAdvancedSection
             }
         }, label: {
             FilterPickerButton(title: filter.field.localizedTitle)
         }).animation(.none)
+    }
+
+    @ViewBuilder
+    private var fieldPickerBasicSection: some View {
+        Text("URL").tag(NetworkSearchFilter.Field.url)
+        Text("Host").tag(NetworkSearchFilter.Field.host)
+        Text("Method").tag(NetworkSearchFilter.Field.method)
+        Text("Status Code").tag(NetworkSearchFilter.Field.statusCode)
+        Text("Error Code").tag(NetworkSearchFilter.Field.errorCode)
+    }
+
+    @ViewBuilder
+    private var fieldPickerAdvancedSection: some View {
+        Text("Request Headers").tag(NetworkSearchFilter.Field.requestHeader)
+        Text("Response Headers").tag(NetworkSearchFilter.Field.responseHeader)
+        Divider()
+        Text("Request Body").tag(NetworkSearchFilter.Field.requestBody)
+        Text("Response Body").tag(NetworkSearchFilter.Field.responseBody)
     }
 
     private var matchPicker: some View {
