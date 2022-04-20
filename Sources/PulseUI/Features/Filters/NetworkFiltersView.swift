@@ -174,6 +174,8 @@ private struct CustomNetworkFilterView: View {
                 }
                 TextField("Value", text: $filter.value)
                     .textFieldStyle(.roundedBorder)
+                    .disableAutocorrection(true)
+                    .autocapitalization(.none)
             }
 
         }
