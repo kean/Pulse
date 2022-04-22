@@ -41,7 +41,8 @@ public struct ConsoleView: View {
 
     @ViewBuilder
     private var invisibleNavigationLinks: some View {
-        NavigationLink(isActive: $isDetailsLinkActive, destination: { ConsoleMessageDetailsRouter(context: viewModel.context, entity: $selectedEntity) }, label: {  EmptyView() })
+        NavigationLink(isActive: $isDetailsLinkActive, destination: {
+            ConsoleMessageDetailsRouter(context: viewModel.context, entity: $selectedEntity) }, label: {  EmptyView() })
     }
 
     #warning("TEMP")

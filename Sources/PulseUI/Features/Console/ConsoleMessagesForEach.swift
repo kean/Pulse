@@ -99,6 +99,7 @@ private struct ConsoleMessagesForEachRow: View {
 
     @State private var isShowingShareSheet = false
 
+    #warning("TODO: remove unused iOS code")
     var body: some View {
         #if os(iOS)
         contents

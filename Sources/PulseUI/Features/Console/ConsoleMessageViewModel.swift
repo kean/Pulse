@@ -17,16 +17,23 @@ final class ConsoleMessageViewModel {
     let showInConsole: (() -> Void)?
 
     private let message: LoggerMessageEntity
+    private let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel?
     private let context: AppContext
 
+    #warning("refactor")
     #if os(iOS)
+    lazy var time = ConsoleMessageViewModel.timeFormatter2.string(from: message.createdAt)
+    lazy var textColor2 = UIColor.textColor(for: LoggerStore.Level(rawValue: message.level) ?? .debug)
     lazy var attributedTitle: NSAttributedString = {
         let string = NSMutableAttributedString()
         let level = LoggerStore.Level(rawValue: message.level) ?? .debug
         if let badge = badge {
-            string.append(badge.title, [.foregroundColor: UIColor.textColor(for: level)])
+            string.append(badge.title, [.foregroundColor: textColor2])
         }
-        string.append(title, [.foregroundColor: UIColor.secondaryLabel])
+        if message.label != "default" {
+            let prefix = badge == nil ? "" : " · "
+            string.append("\(prefix)\(message.label.capitalized)", [.foregroundColor: UIColor.secondaryLabel])
+        }
         return string
     }()
     #endif
@@ -37,11 +44,21 @@ final class ConsoleMessageViewModel {
         return formatter
     }()
 
+    static let timeFormatter2: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm:ss"
+        return formatter
+    }()
+
     lazy var pinViewModel: PinButtonViewModel = {
         PinButtonViewModel(store: context.store, message: message)
     }()
 
-    init(message: LoggerMessageEntity, context: AppContext, showInConsole: (() -> Void)? = nil) {
+    #warning("TODO: remove shotInConsole")
+    init(message: LoggerMessageEntity,
+         context: AppContext,
+         showInConsole: (() -> Void)? = nil,
+         searchCriteriaViewModel: ConsoleSearchCriteriaViewModel? = nil) {
         let time = ConsoleMessageViewModel.timeFormatter.string(from: message.createdAt)
         if message.label == "default" {
             self.title = time
@@ -54,6 +71,31 @@ final class ConsoleMessageViewModel {
         self.context = context
         self.message = message
         self.showInConsole = showInConsole
+        self.searchCriteriaViewModel = searchCriteriaViewModel
+    }
+
+    // MARK: Context Menu
+
+    func share() -> ShareItems {
+        ShareItems([context.share.share(message)])
+    }
+
+    func copy() -> String {
+        message.text
+    }
+
+    var focusLabel: String {
+        message.label.capitalized
+    }
+
+    func focus() {
+        searchCriteriaViewModel?.criteria.labels.isEnabled = true
+        searchCriteriaViewModel?.criteria.labels.focused = message.label
+    }
+
+    func hide() {
+        searchCriteriaViewModel?.criteria.labels.isEnabled = true
+        searchCriteriaViewModel?.criteria.labels.hidden.insert(message.label)
     }
 }
 

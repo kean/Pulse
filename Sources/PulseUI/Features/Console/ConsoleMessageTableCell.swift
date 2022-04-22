@@ -11,12 +11,13 @@ import Combine
 import UIKit
 
 @available(iOS 13.0, *)
-final class ConsoleMessageTableCell: UITableViewCell {
+final class ConsoleMessageTableCell: UITableViewCell, UIContextMenuInteractionDelegate {
     private let title = UILabel()
+    private let timeLabel = UILabel()
     private let details = UILabel()
     private let pin = UIImageView(image: pinImage)
 
-//    private let contextMenu = ConsoleMessageContextMenuView()
+    private var model: ConsoleMessageViewModel?
     private var cancellable: AnyCancellable?
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -28,13 +29,33 @@ final class ConsoleMessageTableCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
+    #warning("TODO: refactor")
     private func createView() {
+        timeLabel.font = .preferredFont(forTextStyle: .caption1)
+        timeLabel.textColor = .secondaryLabel
+
+        let chevron = UIImage(systemName: "chevron.right")?.withConfiguration(UIImage.SymbolConfiguration(textStyle: .caption1)) ?? UIImage()
+
+        let disc = UIImageView(image: chevron)
+        disc.tintColor = .separator
+
+        let disclosures = UIStackView(arrangedSubviews: [
+            timeLabel, disc
+        ])
+        disclosures.spacing = 6
+
+        let top = UIStackView(arrangedSubviews: [
+            title, UIView(), disclosures
+        ])
+        top.alignment = .firstBaseline
+
+
         let stack = UIStackView(arrangedSubviews: [
-            title,
+            top,
             details
         ])
         stack.axis = .vertical
-        stack.alignment = .leading
+//        stack.alignment = .leading
         stack.spacing = 8
 
         contentView.addSubview(stack)
@@ -42,16 +63,61 @@ final class ConsoleMessageTableCell: UITableViewCell {
 
         title.font = .preferredFont(forTextStyle: .caption1)
         details.font = .systemFont(ofSize: 15)
+        details.numberOfLines = 4
+
+        let interaction = UIContextMenuInteraction(delegate: self)
+        self.addInteraction(interaction)
     }
 
     func display(_ model: ConsoleMessageViewModel) {
+        self.model = model
+
         title.attributedText = model.attributedTitle
         details.text = model.text
+        details.textColor = model.textColor2
+        timeLabel.text = model.time
 
         cancellable = model.pinViewModel.$isPinned.sink(receiveValue: { [unowned self] in
             self.pin.isHidden = !$0
         })
 //        contextMenu.model = model
+    }
+
+    func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
+        guard let model = model else {
+            return nil
+        }
+
+        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil, actionProvider: { _ in
+            return self.makeMenu(for: model)
+        })
+    }
+
+    private func makeMenu(for viewModel: ConsoleMessageViewModel) -> UIMenu {
+        let share = UIAction(title: "Share Message", image: UIImage(systemName: "square.and.arrow.up")) { _ in
+            UIActivityViewController.show(with: viewModel.share())
+        }
+
+        let copy = UIAction(title: "Copy Message", image: UIImage(systemName: "doc.on.doc")) { _ in
+            UXPasteboard.general.string = viewModel.copy()
+            runHapticFeedback()
+        }
+
+        let focus = UIAction(title: "Focus \'\(viewModel.focusLabel)\'", image: UIImage(systemName: "eye")) { _ in
+            viewModel.focus()
+        }
+
+        let hide = UIAction(title: "Hide \'\(viewModel.focusLabel)\'", image: UIImage(systemName: "eye.slash")) { _ in
+            viewModel.hide()
+        }
+
+        let shareGroup = UIMenu(title: "Share", options: [.displayInline], children: [share, copy])
+
+        let filtersGroup = UIMenu(title: "Filter", options: [.displayInline], children: [focus, hide])
+
+        #warning("TODO: add pin button")
+
+        return UIMenu(title: "", options: [.displayInline], children: [shareGroup, filtersGroup])
     }
 }
 
@@ -60,53 +126,5 @@ private let pinImage: UIImage = {
     let image = UIImage(systemName: "pin")
     return image?.withConfiguration(UIImage.SymbolConfiguration(textStyle: .caption1)) ?? UIImage()
 }()
-
-#warning("TEMP")
-// MARK: ContextMenus
-//final class ConsoleMessageContextMenuView: NSView {
-//    var model: ConsoleMessageViewModel?
-//
-//    override func menu(for event: NSEvent) -> NSMenu? {
-//        guard let model = model else { return nil }
-//
-//        let menu = NSMenu()
-//
-//        let copyItem = NSMenuItem(title: "Copy Message", action: #selector(buttonCopyTapped), keyEquivalent: "")
-//        copyItem.target = self
-//        copyItem.image = NSImage(systemSymbolName: "doc.on.doc", accessibilityDescription: nil)
-//
-//        let isPinned = model.isPinned
-//        let pinItem = NSMenuItem(title: isPinned ? "Remove Pin" : "Pin", action: #selector(togglePinTapped), keyEquivalent: "")
-//        pinItem.target = self
-//        pinItem.image = NSImage(systemSymbolName: isPinned ? "pin.slash" : "pin", accessibilityDescription: nil)
-//
-//        let showInConsoleItem = NSMenuItem(title: "Show in Console", action: #selector(showInConsole), keyEquivalent: "")
-//        showInConsoleItem.target = self
-//        showInConsoleItem.image = NSImage(systemSymbolName: "link", accessibilityDescription: nil)
-//
-//        menu.addItem(copyItem)
-//        menu.addItem(NSMenuItem.separator())
-//        menu.addItem(pinItem)
-//
-//        if model.showInConsole != nil {
-//            menu.addItem(showInConsoleItem)
-//        }
-//
-//        return menu
-//    }
-//
-//    @objc private func buttonCopyTapped() {
-//        UXPasteboard.general.string = model?.text
-//        runHapticFeedback()
-//    }
-//
-//    @objc private func togglePinTapped() {
-//        model?.togglePin()
-//    }
-//
-//    @objc private func showInConsole() {
-//        model?.showInConsole?()
-//    }
-//}
 
 #endif

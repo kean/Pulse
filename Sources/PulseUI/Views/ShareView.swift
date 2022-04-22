@@ -38,6 +38,39 @@ struct ShareView: UIViewControllerRepresentable {
 }
 
 @available(iOS 13.0, *)
+extension UIActivityViewController {
+    static func show(with items: ShareItems) {
+        let vc = UIActivityViewController(activityItems: items.items, applicationActivities: nil)
+        vc.completionWithItemsHandler = { _, _, _, _ in
+            items.cleanup()
+        }
+        UIApplication.shared.topViewController?.present(vc, animated: true)
+    }
+}
+
+private extension UIApplication {
+    var topViewController: UIViewController?{
+        if keyWindow?.rootViewController == nil{
+            return keyWindow?.rootViewController
+        }
+
+        var vc = keyWindow?.rootViewController
+
+        while vc?.presentedViewController != nil {
+            switch vc?.presentedViewController {
+            case let navagationController as UINavigationController:
+                vc = navagationController.viewControllers.last
+            case let tabBarController as UITabBarController:
+                vc = tabBarController.selectedViewController
+            default:
+                vc = vc?.presentedViewController
+            }
+        }
+        return vc
+    }
+}
+
+@available(iOS 13.0, *)
 struct ShareButton: View {
     let action: () -> Void
 
