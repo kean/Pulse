@@ -15,6 +15,9 @@ public struct ConsoleView: View {
     @Environment(\.colorScheme) private var colorScheme: ColorScheme
     @State private var shared: ShareItems?
 
+    @State private var isDetailsLinkActive = false
+    @State private var selectedEntity: NSManagedObject?
+
     public init(store: LoggerStore = .default, configuration: ConsoleConfiguration = .default) {
         self.viewModel = ConsoleViewModel(store: store)
     }
@@ -33,16 +36,32 @@ public struct ConsoleView: View {
                 trailing: actionButton
             )
             .sheet(item: $shared) { ShareView($0).id($0.id) }
+            .background(invisibleNavigationLinks)
     }
 
+    @ViewBuilder
+    private var invisibleNavigationLinks: some View {
+        NavigationLink(isActive: $isDetailsLinkActive, destination: { ConsoleMessageDetailsRouter(context: viewModel.context, entity: $selectedEntity) }, label: {  EmptyView() })
+    }
+
+    #warning("TEMP")
     private var contentView: some View {
-        List {
-            ConsoleToolbarView(viewModel: viewModel)
-            if !viewModel.messages.isEmpty {
-                ConsoleMessagesForEach(context: viewModel.context, messages: viewModel.messages, searchCriteriaViewModel: viewModel.searchCriteria)
+        ConsoleTableView(
+            header: { ConsoleToolbarView(viewModel: viewModel) },
+            viewModel: viewModel.table,
+            onSelected: {
+                selectedEntity = $0
+                isDetailsLinkActive = true
             }
-        }
-        .listStyle(.plain)
+        )
+
+//        List {
+//            ConsoleToolbarView(viewModel: viewModel)
+//            if !viewModel.messages.isEmpty {
+//                ConsoleMessagesForEach(context: viewModel.context, messages: viewModel.messages, searchCriteriaViewModel: viewModel.searchCriteria)
+//            }
+//        }
+//        .listStyle(.plain)
         .background(background)
     }
 
@@ -119,7 +138,7 @@ private struct ConsoleToolbarView: View {
                 }.frame(width: 40, height: 44)
             }.buttonStyle(.plain)
         }
-        .padding(EdgeInsets(top: 2, leading: 0, bottom: 2, trailing: -12))
+        .padding(EdgeInsets(top: 2, leading: 16, bottom: 2, trailing: 8))
         .sheet(isPresented: $isShowingFilters) {
             NavigationView {
                 ConsoleFiltersView(viewModel: viewModel.searchCriteria, isPresented: $isShowingFilters)

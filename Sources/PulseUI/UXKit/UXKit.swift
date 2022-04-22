@@ -244,6 +244,23 @@ extension NSAttributedString {
 }
 #endif
 
+// MARK: - UIView (Extensions)
+
+#if os(iOS)
+@available(iOS 13.0, *)
+extension UIView {
+    func pinToSuperview(insets: UIEdgeInsets = .zero) {
+        translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            topAnchor.constraint(equalTo: superview!.topAnchor, constant: insets.top),
+            trailingAnchor.constraint(equalTo: superview!.trailingAnchor, constant: -insets.right),
+            leadingAnchor.constraint(equalTo: superview!.leadingAnchor, constant: insets.left),
+            bottomAnchor.constraint(equalTo: superview!.bottomAnchor, constant: -insets.bottom)
+        ])
+    }
+}
+#endif
+
 // MARK: - UIViewController (Extensions)
 
 #if os(iOS)

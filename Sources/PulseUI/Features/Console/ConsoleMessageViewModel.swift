@@ -19,6 +19,18 @@ final class ConsoleMessageViewModel {
     private let message: LoggerMessageEntity
     private let context: AppContext
 
+    #if os(iOS)
+    lazy var attributedTitle: NSAttributedString = {
+        let string = NSMutableAttributedString()
+        let level = LoggerStore.Level(rawValue: message.level) ?? .debug
+        if let badge = badge {
+            string.append(badge.title, [.foregroundColor: UIColor.textColor(for: level)])
+        }
+        string.append(title, [.foregroundColor: UIColor.secondaryLabel])
+        return string
+    }()
+    #endif
+
     static let timeFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm:ss.SSS"
@@ -67,7 +79,7 @@ private extension BadgeViewModel {
     }
 }
 
-@available(iOS 13.0, tvOS 14.0, watchOS 6, *)
+@available(iOS 13.0, tvOS 14.0, watchOS 6.0, *)
 extension Color {
     static func textColor(for level: LoggerStore.Level) -> Color {
         switch level {
@@ -81,6 +93,20 @@ extension Color {
         }
     }
 }
+
+#if os(iOS)
+@available(iOS 13.0, *)
+extension UIColor {
+    static func textColor(for level: LoggerStore.Level) -> UIColor {
+        switch level {
+        case .trace: return .secondaryLabel
+        case .debug, .info: return .label
+        case .notice, .warning: return .systemOrange
+        case .error, .critical: return .systemRed
+        }
+    }
+}
+#endif
 
 #if os(macOS)
 enum ConsoleMessageStyle {
