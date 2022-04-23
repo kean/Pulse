@@ -27,14 +27,11 @@ public struct NetworkView: View {
 
     #if os(iOS)
     public var body: some View {
-        List {
-            toolbar
-            if !viewModel.entities.isEmpty {
-                NetworkMessagesForEach(context: viewModel.context, entities: viewModel.entities)
-            }
-        }
-        .listStyle(PlainListStyle())
-        .background(background)
+        ConsoleTableView(
+            header: { toolbar },
+            viewModel: viewModel.table
+        )
+        .overlay(tableOverlay)
         .navigationBarTitle(Text("Network"))
         .navigationBarItems(leading: viewModel.onDismiss.map { Button(action: $0) { Image(systemName: "xmark") } })
     }
@@ -56,16 +53,16 @@ public struct NetworkView: View {
                 }.frame(width: 40, height: 44)
             }.buttonStyle(.plain)
         }
-        .padding(EdgeInsets(top: 2, leading: 0, bottom: 2, trailing: -12))
+        .padding(EdgeInsets(top: 2, leading: 16, bottom: 2, trailing: 8))
         .sheet(isPresented: $isShowingFilters) {
             NavigationView {
                 NetworkFiltersView(viewModel: viewModel.searchCriteria, isPresented: $isShowingFilters)
             }
         }
     }
-
+    
     @ViewBuilder
-    private var background: some View {
+    private var tableOverlay: some View {
         if viewModel.entities.isEmpty {
             placeholder
         }

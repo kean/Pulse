@@ -22,19 +22,45 @@ final class ConsoleTableViewModel {
     }
 }
 
+@available(iOS 13.0, *)
+struct ConsoleTableView<Header: View>: View {
+    @ViewBuilder let header: () -> Header
+    let viewModel: ConsoleTableViewModel
+
+    @State private var isDetailsLinkActive = false
+    @State private var selectedEntity: NSManagedObject?
+
+    var body: some View {
+        _ConsoleTableView(header: header, viewModel: viewModel, onSelected: {
+            selectedEntity = $0
+            isDetailsLinkActive = true
+        })
+        .background(invisibleNavigationLinks)
+    }
+
+    @ViewBuilder
+    private var invisibleNavigationLinks: some View {
+        NavigationLink(isActive: $isDetailsLinkActive, destination: {
+            ConsoleMessageDetailsRouter(context: viewModel.context, entity: $selectedEntity) }, label: {  EmptyView() })
+    }
+}
+
 /// Using this because of the following List issues:
 ///  - Reload performance issues
 ///  - NavigationLink popped when cell disappears
 ///  - List doesn't keep scroll position when reloaded
 @available(iOS 13.0, *)
-struct ConsoleTableView<Header: View>: UIViewControllerRepresentable {
+private struct _ConsoleTableView<Header: View>: UIViewControllerRepresentable {
     @ViewBuilder let header: () -> Header
     let viewModel: ConsoleTableViewModel
     let onSelected: (NSManagedObject) -> Void
 
     func makeUIViewController(context: Context) -> ConsoleTableViewController {
         let vc = ConsoleTableViewController(viewModel: viewModel)
-        vc.setHeaderView(header())
+        let header = self.header()
+        if !(header is EmptyView) {
+            vc.setHeaderView(header)
+        }
         vc.onSelected = onSelected
         return vc
     }

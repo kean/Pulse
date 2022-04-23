@@ -11,7 +11,6 @@ import SwiftUI
 final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, ObservableObject {
     let configuration: ConsoleConfiguration
 
-    #warning("TODO: cleanup")
 #if os(iOS)
     let table: ConsoleTableViewModel
 
@@ -21,6 +20,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 #else
     @Published private(set) var messages: [LoggerMessageEntity] = []
 #endif
+
     var entities: [LoggerMessageEntity] { messages }
 
     // Search criteria

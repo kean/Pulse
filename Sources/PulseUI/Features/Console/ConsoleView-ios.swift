@@ -15,9 +15,6 @@ public struct ConsoleView: View {
     @Environment(\.colorScheme) private var colorScheme: ColorScheme
     @State private var shared: ShareItems?
 
-    @State private var isDetailsLinkActive = false
-    @State private var selectedEntity: NSManagedObject?
-
     public init(store: LoggerStore = .default, configuration: ConsoleConfiguration = .default) {
         self.viewModel = ConsoleViewModel(store: store)
     }
@@ -36,38 +33,19 @@ public struct ConsoleView: View {
                 trailing: actionButton
             )
             .sheet(item: $shared) { ShareView($0).id($0.id) }
-            .background(invisibleNavigationLinks)
+
     }
 
-    @ViewBuilder
-    private var invisibleNavigationLinks: some View {
-        NavigationLink(isActive: $isDetailsLinkActive, destination: {
-            ConsoleMessageDetailsRouter(context: viewModel.context, entity: $selectedEntity) }, label: {  EmptyView() })
-    }
-
-    #warning("TEMP")
     private var contentView: some View {
         ConsoleTableView(
             header: { ConsoleToolbarView(viewModel: viewModel) },
-            viewModel: viewModel.table,
-            onSelected: {
-                selectedEntity = $0
-                isDetailsLinkActive = true
-            }
+            viewModel: viewModel.table
         )
-
-//        List {
-//            ConsoleToolbarView(viewModel: viewModel)
-//            if !viewModel.messages.isEmpty {
-//                ConsoleMessagesForEach(context: viewModel.context, messages: viewModel.messages, searchCriteriaViewModel: viewModel.searchCriteria)
-//            }
-//        }
-//        .listStyle(.plain)
-        .background(background)
+        .overlay(tableOverlay)
     }
 
     @ViewBuilder
-    private var background: some View {
+    private var tableOverlay: some View {
         if viewModel.messages.isEmpty {
             placeholder
         }

@@ -11,7 +11,15 @@ import SwiftUI
 
 @available(iOS 13.0, tvOS 14.0, *)
 final class PinsViewModel: NSObject, NSFetchedResultsControllerDelegate, ObservableObject {
+#if os(iOS)
+    let table: ConsoleTableViewModel
+
+    @Published private(set) var messages: [LoggerMessageEntity] = [] {
+        didSet { table.entities = messages }
+    }
+#else
     @Published private(set) var messages: [LoggerMessageEntity] = []
+#endif
 
     var onDismiss: (() -> Void)?
 
@@ -32,6 +40,9 @@ final class PinsViewModel: NSObject, NSFetchedResultsControllerDelegate, Observa
         request.predicate = NSPredicate(format: "isPinned == YES")
 
         self.controller = NSFetchedResultsController<LoggerMessageEntity>(fetchRequest: request, managedObjectContext: store.container.viewContext, sectionNameKeyPath: nil, cacheName: nil)
+#if os(iOS)
+        self.table = ConsoleTableViewModel(context: .init(store: store), searchCriteriaViewModel: nil)
+#endif
 
         super.init()
 
