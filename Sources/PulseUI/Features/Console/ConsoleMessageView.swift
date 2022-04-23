@@ -12,7 +12,7 @@ import Combine
 @available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
 struct ConsoleMessageView: View {
     let viewModel: ConsoleMessageViewModel
-
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(alignment: .firstTextBaseline) {
@@ -29,56 +29,56 @@ struct ConsoleMessageView: View {
         }
         .padding(.vertical, 4)
     }
-
+    
     private var title: some View {
         badge + Text(viewModel.title)
             .font(fonts.title)
             .foregroundColor(.secondary)
     }
-
+    
     private var badge: Text {
         guard let badge = viewModel.badge else {
             return Text("")
         }
         var separator: Text {
-            #if os(watchOS)
+#if os(watchOS)
             return Text("\n")
-            #else
+#else
             return Text(" · ")
                 .font(fonts.title)
                 .foregroundColor(.secondary)
-            #endif
+#endif
         }
         return Text(badge.title)
             .font(fonts.title)
             .foregroundColor(badge.color)
-            + separator
+        + separator
     }
-
+    
     private var pin: some View {
         Image(systemName: "pin")
             .font(fonts.title)
             .foregroundColor(.secondary)
     }
-
+    
     private var text: some View {
         Text(viewModel.text)
             .font(fonts.body)
             .foregroundColor(viewModel.textColor)
             .lineLimit(4)
     }
-
+    
     private struct Fonts {
         let title: Font
         let body: Font
     }
-
+    
     private var fonts: Fonts {
-        #if os(watchOS)
+#if os(watchOS)
         return Fonts(title: .system(size: 12), body: .system(size: 15))
-        #elseif os(tvOS)
+#elseif os(tvOS)
         return Fonts(title: .body, body: .body)
-        #endif
+#endif
     }
 }
 

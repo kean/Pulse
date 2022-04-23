@@ -10,15 +10,15 @@ import PulseCore
 import SwiftUI
 
 public final class MainViewController: UITabBarController {
-    private let model: Any?
+    private let viewModel: Any?
 
     public static var isAutomaticAppearanceOverrideRemovalEnabled = true
 
     public init(store: LoggerStore = .default, onDismiss: (() -> Void)? = nil) {
         if #available(iOS 13.0, *) {
-            self.model = MainViewModel(store: store, onDismiss: onDismiss)
+            self.viewModel = MainViewModel(store: store, onDismiss: onDismiss)
         } else {
-            self.model = nil
+            self.viewModel = nil
         }
         super.init(nibName: nil, bundle: nil)
 
@@ -43,7 +43,7 @@ public final class MainViewController: UITabBarController {
 
     @available(iOS 13, *)
     private func addConsoleView() {
-        guard let model = model as? MainViewModel else {
+        guard let model = viewModel as? MainViewModel else {
             return addPlaceholderView()
         }
         viewControllers = model.items.enumerated().map {

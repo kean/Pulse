@@ -49,7 +49,7 @@ struct RichTextView: View {
             WrappedTextView(text: viewModel.text, viewModel: viewModel, isAutomaticLinkDetectionEnabled: isAutomaticLinkDetectionEnabled)
 
             if viewModel.isSearching {
-                SearchToobar(model: viewModel)
+                SearchToobar(viewModel: viewModel)
             }
         }
     }
@@ -63,7 +63,7 @@ struct RichTextView: View {
             #endif
             #if !os(tvOS)
             Divider()
-            SearchToobar(model: viewModel)
+            SearchToobar(viewModel: viewModel)
             #endif
         }
     }
@@ -135,20 +135,20 @@ private func configureTextView(_ textView: UXTextView, _ isAutomaticLinkDetectio
 #if os(iOS) || os(macOS)
 @available(iOS 13.0, tvOS 14.0, *)
 private struct SearchToobar: View {
-    @ObservedObject var model: RichTextViewModel
+    @ObservedObject var viewModel: RichTextViewModel
 
     #if os(iOS)
     var body: some View {
         HStack {
             HStack {
-                Text(model.matches.isEmpty ? "0/0" : "\(model.selectedMatchIndex+1)/\(model.matches.count)")
+                Text(viewModel.matches.isEmpty ? "0/0" : "\(viewModel.selectedMatchIndex+1)/\(viewModel.matches.count)")
                     .font(Font.body.monospacedDigit())
                 Divider()
-                Button(action: model.previousMatch) {
+                Button(action: viewModel.previousMatch) {
                     Image(systemName: "chevron.left.circle")
                 }
                 Divider()
-                Button(action: model.nextMatch) {
+                Button(action: viewModel.nextMatch) {
                     Image(systemName: "chevron.right.circle")
                 }
             }
@@ -157,7 +157,7 @@ private struct SearchToobar: View {
 
             Spacer()
 
-            Button(action: model.cancelSearch) {
+            Button(action: viewModel.cancelSearch) {
                 Text("Cancel")
             }.addSearchBarIshBackground()
         }
@@ -167,26 +167,26 @@ private struct SearchToobar: View {
     #else
     var body: some View {
         HStack {
-            SearchBar(title: "Search", text: $model.searchTerm, onEditingChanged: { isEditing in
+            SearchBar(title: "Search", text: $viewModel.searchTerm, onEditingChanged: { isEditing in
                 if isEditing {
-                    model.isSearching = isEditing
+                    viewModel.isSearching = isEditing
                 }
-            }, onReturn: model.nextMatch).frame(maxWidth: 240)
+            }, onReturn: viewModel.nextMatch).frame(maxWidth: 240)
 
-            StringSearchOptionsMenu(options: $model.options, isKindNeeded: false)
+            StringSearchOptionsMenu(options: $viewModel.options, isKindNeeded: false)
                 .menuStyle(BorderlessButtonMenuStyle())
                 .fixedSize()
 
             Spacer()
 
             HStack(spacing: 12) {
-                Text(model.matches.isEmpty ? "0/0" : "\(model.selectedMatchIndex+1)/\(model.matches.count)")
+                Text(viewModel.matches.isEmpty ? "0/0" : "\(viewModel.selectedMatchIndex+1)/\(viewModel.matches.count)")
                     .font(Font.body.monospacedDigit())
                     .foregroundColor(.secondary)
-                Button(action: model.previousMatch) {
+                Button(action: viewModel.previousMatch) {
                     Image(systemName: "chevron.left")
                 }.buttonStyle(PlainButtonStyle())
-                Button(action: model.nextMatch) {
+                Button(action: viewModel.nextMatch) {
                     Image(systemName: "chevron.right")
                 }.buttonStyle(PlainButtonStyle())
             }
