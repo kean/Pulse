@@ -27,7 +27,7 @@ Record and inspect logs and `URLSession` network requests right from your iOS ap
 
 ## Pulse Pro
 
-[**Pulse Pro**](https://kean.blog/pulse/guides/pulse-pro) is an advanced macOS app providing ultimate logging experience. [Download](https://github.com/kean/Pulse/releases/download/0.20.0/PulsePro-demo.zip) a trial version.
+[**Pulse Pro**](https://kean.blog/pulse/guides/pulse-pro) is an advanced macOS app providing ultimate logging experience.
 
 <img width="2100" alt="08" src="https://user-images.githubusercontent.com/1567433/141652571-789aae3e-10b9-461f-bd51-a4a44110140f.png">
 
