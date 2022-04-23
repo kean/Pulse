@@ -23,7 +23,7 @@ struct PinButton: View {
     }
 }
 
-@available(iOS 15.0, tvOS 15.0, watchOS 8.0, *)
+@available(iOS 14.0, tvOS 14.0, watchOS 7.0, *)
 struct PinButton2: View {
     @ObservedObject var viewModel: PinButtonViewModel
 
@@ -43,6 +43,20 @@ extension UIAction {
             image: UIImage(systemName: viewModel.isPinned ? "pin.slash" : "pin"),
             handler: { _ in viewModel.togglePin() }
         )
+    }
+}
+
+@available(iOS 13.0, *)
+extension UIContextualAction {
+    static func makePinAction(with viewModel: PinButtonViewModel) -> UIContextualAction {
+        let action = UIContextualAction(
+            style: .normal,
+            title: viewModel.isPinned ? "Remove Pin" : "Pin",
+            handler: { _,_,_  in viewModel.togglePin() }
+        )
+        action.backgroundColor = .systemBlue
+        action.image = UIImage(systemName: viewModel.isPinned ? "pin.slash" : "pin")
+        return action
     }
 }
 
@@ -93,14 +107,24 @@ struct PinView: View {
 @available(iOS 13.0, tvOS 14.0, watchOS 6.0, *)
 final class PinButtonViewModel: ObservableObject {
     @Published private(set) var isPinned = false
-    private let message: LoggerMessageEntity
+    private let message: LoggerMessageEntity?
     private let store: LoggerStore
     private var cancellables: [AnyCancellable] = []
 
     init(store: LoggerStore, message: LoggerMessageEntity) {
         self.store = store
         self.message = message
+        self.subscribe()
+    }
 
+    init(store: LoggerStore, request: LoggerNetworkRequestEntity) {
+        self.store = store
+        self.message = request.message
+        self.subscribe()
+    }
+
+    private func subscribe() {
+        guard let message = message else { return } // Should never happen
         message.publisher(for: \.isPinned).sink { [weak self] in
             guard let self = self else { return }
             self.isPinned = $0
@@ -108,6 +132,12 @@ final class PinButtonViewModel: ObservableObject {
     }
 
     func togglePin() {
+        guard let message = message else { return } // Should never happen
         store.togglePin(for: message)
     }
+}
+
+@available(iOS 13.0, tvOS 14.0, watchOS 6.0, *)
+protocol Pinnable {
+    var pinViewModel: PinButtonViewModel { get }
 }

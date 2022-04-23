@@ -19,9 +19,9 @@ struct ConsoleNetworkRequestView: View {
                 title
                 #if os(watchOS)
                 Spacer()
-                viewModel.pinViewModel.map { PinView(viewModel: $0, font: fonts.title) }
+                PinView(viewModel: viewModel.pinViewModel, font: fonts.title)
                 #else
-                viewModel.pinViewModel.map { PinView(viewModel: $0, font: fonts.title) }
+                PinView(viewModel: viewModel.pinViewModel, font: fonts.title)
                 Spacer()
                 #endif
             }

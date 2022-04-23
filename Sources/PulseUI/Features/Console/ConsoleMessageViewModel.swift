@@ -8,7 +8,7 @@ import CoreData
 import Combine
 
 @available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
-final class ConsoleMessageViewModel {
+final class ConsoleMessageViewModel: Pinnable {
     let title: String
     let text: String
     let textColor: Color
@@ -44,9 +44,7 @@ final class ConsoleMessageViewModel {
         return formatter
     }()
 
-    lazy var pinViewModel: PinButtonViewModel = {
-        PinButtonViewModel(store: context.store, message: message)
-    }()
+    lazy var pinViewModel = PinButtonViewModel(store: context.store, message: message)
 
     #warning("TODO: remove shotInConsole")
     init(message: LoggerMessageEntity,

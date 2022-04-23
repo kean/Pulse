@@ -8,7 +8,7 @@ import Combine
 import CoreData
 
 @available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
-final class ConsoleNetworkRequestViewModel {
+final class ConsoleNetworkRequestViewModel: Pinnable {
     let badgeColor: Color
     let status: String
     let title: String
@@ -65,11 +65,7 @@ final class ConsoleNetworkRequestViewModel {
 
     // MARK: Pins
 
-    lazy var pinViewModel: PinButtonViewModel? = {
-        request.message.map {
-            PinButtonViewModel(store: context.store, message: $0)
-        }
-    }()
+    lazy var pinViewModel = PinButtonViewModel(store: context.store, request: request)
 
     // MARK: Context Menu
 

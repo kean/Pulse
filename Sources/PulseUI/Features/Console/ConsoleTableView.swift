@@ -48,6 +48,7 @@ struct ConsoleTableView<Header: View>: UIViewControllerRepresentable {
 final class ConsoleTableViewController: UITableViewController {
     private let viewModel: ConsoleTableViewModel
     private var entities: [NSManagedObject] = []
+    private var entityViewModels: [NSManagedObjectID: AnyObject] = [:]
     private var cancellables: [AnyCancellable] = []
 
     var onSelected: ((NSManagedObject) -> Void)?
@@ -84,6 +85,30 @@ final class ConsoleTableViewController: UITableViewController {
         tableView.tableHeaderView = header
     }
 
+    // MARK: - ViewModel
+
+    func getEntityViewModel(at indexPath: IndexPath) -> AnyObject {
+        let entity = entities[indexPath.row]
+        if let viewModel = entityViewModels[entity.objectID] {
+            return viewModel
+        }
+        let viewModel: AnyObject
+        switch entity {
+        case let message as LoggerMessageEntity:
+            if let request = message.request {
+                viewModel = ConsoleNetworkRequestViewModel(request: request, context: self.viewModel.context)
+            } else {
+                viewModel = ConsoleMessageViewModel(message: message, context: self.viewModel.context, searchCriteriaViewModel: self.viewModel.searchCriteriaViewModel)
+            }
+        case let request as LoggerNetworkRequestEntity:
+            viewModel = ConsoleNetworkRequestViewModel(request: request, context: self.viewModel.context)
+        default:
+            fatalError("Invalid entity: \(entity)")
+        }
+        entityViewModels[entity.objectID] = viewModel
+        return viewModel
+    }
+
     // MARK: - UITableViewDelegate/DataSourece
 
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -95,36 +120,33 @@ final class ConsoleTableViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let entity = entities[indexPath.row]
-
-        func makeTableCell(for message: LoggerMessageEntity) -> UITableViewCell {
+        switch getEntityViewModel(at: indexPath) {
+        case let viewModel as ConsoleMessageViewModel:
             let cell = tableView.dequeueReusableCell(withIdentifier: "ConsoleMessageTableCell", for: indexPath) as! ConsoleMessageTableCell
-            cell.display(.init(message: message, context: viewModel.context, searchCriteriaViewModel: viewModel.searchCriteriaViewModel))
+            cell.display(viewModel)
             return cell
-        }
-
-        func makeTableCell(for request: LoggerNetworkRequestEntity) -> UITableViewCell {
+        case let viewModel as ConsoleNetworkRequestViewModel:
             let cell = UITableViewCell()
-            cell.textLabel?.text = request.url
+            cell.textLabel?.text = viewModel.text
             return cell
-        }
-
-        switch entity {
-        case let message as LoggerMessageEntity:
-            if let request = message.request {
-                return makeTableCell(for: request)
-            } else {
-                return makeTableCell(for: message)
-            }
-        case let request as LoggerNetworkRequestEntity:
-            return makeTableCell(for: request)
         default:
-            fatalError("Invalid entity: \(entity)")
+            fatalError("Invalid viewModel: \(viewModel)")
         }
     }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         onSelected?(entities[indexPath.row])
+    }
+
+    override func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        guard let pinViewModel = (getEntityViewModel(at: indexPath) as? Pinnable)?.pinViewModel else {
+            return nil
+        }
+        let actions = UISwipeActionsConfiguration(actions: [
+            .makePinAction(with: pinViewModel)
+        ])
+        actions.performsFirstActionWithFullSwipe = true
+        return actions
     }
 }
 
