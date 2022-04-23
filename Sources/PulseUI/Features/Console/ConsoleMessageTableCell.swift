@@ -15,10 +15,9 @@ final class ConsoleMessageTableCell: UITableViewCell, UIContextMenuInteractionDe
     private let title = UILabel()
     private let timeLabel = UILabel()
     private let details = UILabel()
-    private let pin = UIImageView(image: pinImage)
+    private let pin = PinIndicatorView()
 
     private var model: ConsoleMessageViewModel?
-    private var cancellable: AnyCancellable?
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -45,18 +44,17 @@ final class ConsoleMessageTableCell: UITableViewCell, UIContextMenuInteractionDe
         disclosures.spacing = 6
 
         let top = UIStackView(arrangedSubviews: [
-            title, UIView(), disclosures
+            title, pin, UIView(), disclosures
         ])
+        top.spacing = 8
         top.alignment = .firstBaseline
-
 
         let stack = UIStackView(arrangedSubviews: [
             top,
             details
         ])
         stack.axis = .vertical
-//        stack.alignment = .leading
-        stack.spacing = 8
+        stack.spacing = 6
 
         contentView.addSubview(stack)
         stack.pinToSuperview(insets: .init(top: 12, left: 16, bottom: 12, right: 16))
@@ -76,11 +74,7 @@ final class ConsoleMessageTableCell: UITableViewCell, UIContextMenuInteractionDe
         details.text = model.text
         details.textColor = model.textColor2
         timeLabel.text = model.time
-
-        cancellable = model.pinViewModel.$isPinned.sink(receiveValue: { [unowned self] in
-            self.pin.isHidden = !$0
-        })
-//        contextMenu.model = model
+        pin.bind(viewModel: model.pinViewModel)
     }
 
     func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
@@ -111,20 +105,14 @@ final class ConsoleMessageTableCell: UITableViewCell, UIContextMenuInteractionDe
             viewModel.hide()
         }
 
+        let pin = UIAction.makePinAction(with: viewModel.pinViewModel)
+
         let shareGroup = UIMenu(title: "Share", options: [.displayInline], children: [share, copy])
 
         let filtersGroup = UIMenu(title: "Filter", options: [.displayInline], children: [focus, hide])
 
-        #warning("TODO: add pin button")
-
-        return UIMenu(title: "", options: [.displayInline], children: [shareGroup, filtersGroup])
+        return UIMenu(title: "", options: [.displayInline], children: [shareGroup, filtersGroup, pin])
     }
 }
-
-@available(iOS 13.0, *)
-private let pinImage: UIImage = {
-    let image = UIImage(systemName: "pin")
-    return image?.withConfiguration(UIImage.SymbolConfiguration(textStyle: .caption1)) ?? UIImage()
-}()
 
 #endif
