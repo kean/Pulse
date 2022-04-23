@@ -131,6 +131,8 @@ struct FilterPickerButton: View {
     }
 }
 
+#if os(iOS) || os(tvOS)
+
 @available(iOS 13.0, tvOS 14.0, *)
 struct FilterSectionHeader: View {
     let icon: String
@@ -158,5 +160,7 @@ struct FilterSectionHeader: View {
         }.buttonStyle(.plain)
     }
 }
+
+#endif
 
 #endif
