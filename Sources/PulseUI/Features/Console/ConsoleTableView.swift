@@ -67,6 +67,8 @@ final class ConsoleTableViewController: UITableViewController {
     private func createView() {
         tableView.register(ConsoleMessageTableCell.self, forCellReuseIdentifier: "ConsoleMessageTableCell")
         tableView.register(ConsoleNetworkRequestTableCell.self, forCellReuseIdentifier: "ConsoleNetworkRequestTableCell")
+
+        tableView.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 0)
     }
 
     private func bind(_ viewModel: ConsoleTableViewModel) {
