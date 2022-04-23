@@ -2,8 +2,6 @@
 //
 // Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
 
-#warning("TEMP")
-
 #if os(iOS)
 
 import PulseCore
@@ -28,7 +26,6 @@ final class ConsoleMessageTableCell: UITableViewCell, UIContextMenuInteractionDe
         fatalError("init(coder:) has not been implemented")
     }
 
-    #warning("TODO: refactor")
     private func createView() {
         timeLabel.font = .preferredFont(forTextStyle: .caption1)
         timeLabel.textColor = .secondaryLabel
