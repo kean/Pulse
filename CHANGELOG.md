@@ -1,3 +1,17 @@
+# Pulse 1.x
+
+## Pulse 0.20.2
+
+*Apr 23, 2022*
+
+- [iOS] Replace `List` with `UITableView` to address some performance and usability issues
+- [iOS] Add console and network filters from Pulse Pro are now available on iOS
+- [iOS] Fix an issue with “Remove Messages” button not working on the Console screen
+- [iOS] Replace quick filters with "show only errors" button, which is now also available on Network screen. The remaining quick filters are now available on the Filters screen.
+- [iOS, watchOS] Add swipe action “Pin” for table cells
+- [All] Optimize some search filters
+- [iOS] Improve table cells design, allowing for more text to be displayed and making pins more visible 
+
 # Pulse 0.x
 
 ## Pulse 0.20.2
