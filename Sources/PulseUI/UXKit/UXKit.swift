@@ -243,31 +243,3 @@ extension NSAttributedString {
     }
 }
 #endif
-
-// MARK: - UIViewController (Extensions)
-
-#if os(iOS)
-@available(iOS 13.0, *)
-extension UIViewController {
-    @discardableResult
-    static func present<ContentView: View>(_ closure: (_ dismiss: @escaping () -> Void) -> ContentView) -> UIViewController? {
-        present { UIHostingController(rootView: closure($0)) }
-    }
-
-    @discardableResult
-    static func present(_ closure: (_ dismiss: @escaping () -> Void) -> UIViewController) -> UIViewController? {
-        guard let keyWindow = UIApplication.shared.windows.filter({ $0.isKeyWindow }).first,
-              var topController = keyWindow.rootViewController else {
-            return nil
-        }
-        while let presentedViewController = topController.presentedViewController {
-            topController = presentedViewController
-        }
-        let vc = closure({ [weak topController] in
-            topController?.dismiss(animated: true, completion: nil)
-        })
-        topController.present(vc, animated: true, completion: nil)
-        return vc
-    }
-}
-#endif

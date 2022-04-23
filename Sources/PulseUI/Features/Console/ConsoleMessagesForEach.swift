@@ -6,13 +6,12 @@ import Foundation
 import SwiftUI
 import PulseCore
 
-#if os(watchOS) || os(tvOS) || os(iOS)
+#if os(watchOS) || os(tvOS)
 
-@available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
+@available(tvOS 14.0, watchOS 7.0, *)
 struct ConsoleMessagesForEach: View {
     let context: AppContext
     let messages: [LoggerMessageEntity]
-    let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
 
     var body: some View {
         ForEach(messages, id: \.objectID, content: makeListItem)
@@ -25,17 +24,17 @@ struct ConsoleMessagesForEach: View {
                 ConsoleNetworkRequestForEachRow(context: context, request: request)
             }
             .backport.swipeActions(edge: .leading) {
-                if #available(iOS 15.0, tvOS 15.0, watchOS 8.0, *) {
+                if #available(tvOS 15.0, watchOS 8.0, *) {
                     PinButton2(viewModel: .init(store: context.store, message: message))
                         .tint(.blue)
                 }
             }
         } else {
             NavigationLink(destination: LazyConsoleMessageDetailsView(message: message, context: context)) {
-                ConsoleMessagesForEachRow(context: context, message: message, searchCriteriaViewModel: searchCriteriaViewModel)
+                ConsoleMessagesForEachRow(context: context, message: message)
             }
             .backport.swipeActions(edge: .leading) {
-                if #available(iOS 15.0, tvOS 15.0,  watchOS 8.0, *) {
+                if #available(tvOS 15.0,  watchOS 8.0, *) {
                     PinButton2(viewModel: .init(store: context.store, message: message))
                         .tint(.blue)
                 }
@@ -44,7 +43,7 @@ struct ConsoleMessagesForEach: View {
     }
 }
 
-@available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
+@available(tvOS 14.0, watchOS 7.0, *)
 struct NetworkMessagesForEach: View {
     let context: AppContext
     let entities: [LoggerNetworkRequestEntity]
@@ -67,26 +66,12 @@ struct NetworkMessagesForEach: View {
     }
 }
 
-@available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
+@available(tvOS 14.0, watchOS 7.0, *)
 private struct ConsoleNetworkRequestForEachRow: View {
     let context: AppContext
     let request: LoggerNetworkRequestEntity
 
-    @State private var sharedItems: ShareItems?
-
     var body: some View {
-        #if os(iOS)
-        contents
-            .contextMenu {
-                NetworkMessageContextMenu(request: request, context: context, sharedItems: $sharedItems)
-            }
-            .sheet(item: $sharedItems) { ShareView($0).id($0.id) }
-        #else
-        contents
-        #endif
-    }
-
-    var contents: some View {
         ConsoleNetworkRequestView(viewModel: .init(request: request, context: context))
     }
 }
@@ -95,25 +80,8 @@ private struct ConsoleNetworkRequestForEachRow: View {
 private struct ConsoleMessagesForEachRow: View {
     let context: AppContext
     let message: LoggerMessageEntity
-    let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
-
-    @State private var isShowingShareSheet = false
 
     var body: some View {
-        #if os(iOS)
-        contents
-            .contextMenu {
-                ConsoleMessageContextMenu(message: message, context: context, isShowingShareSheet: $isShowingShareSheet, searchCriteriaViewModel: searchCriteriaViewModel)
-            }
-            .sheet(isPresented: $isShowingShareSheet) {
-                ShareView(activityItems: [context.share.share(message)])
-            }
-        #else
-        contents
-        #endif
-    }
-
-    var contents: some View {
         ConsoleMessageView(viewModel: .init(message: message, context: context))
     }
 }

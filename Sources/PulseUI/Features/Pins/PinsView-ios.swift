@@ -39,10 +39,10 @@ public struct PinsView: View {
             placeholder
                 .navigationBarTitle(Text("Pins"))
         } else {
-            List {
-                ConsoleMessagesForEach(context: viewModel.context, messages: viewModel.messages, searchCriteriaViewModel: .init())
-            }
-            .listStyle(PlainListStyle())
+            ConsoleTableView(
+                header: { EmptyView() },
+                viewModel: viewModel.table
+            )
         }
     }
 

@@ -8,43 +8,6 @@ import Combine
 
 #if os(iOS)
 @available(iOS 13.0, *)
-struct ConsoleMessageContextMenu: View {
-    let message: LoggerMessageEntity
-    let context: AppContext
-    @Binding var isShowingShareSheet: Bool
-    @ObservedObject var searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
-
-    var body: some View {
-        Section {
-            Button(action: {
-                isShowingShareSheet = true
-            }) {
-                Text("Share")
-                Image(systemName: "square.and.arrow.up")
-            }
-            ButtonCopyMessage(text: message.text)
-            Button(action: {
-                searchCriteriaViewModel.criteria.labels.isEnabled = true
-                searchCriteriaViewModel.criteria.labels.focused = message.label
-            }) {
-                Text("Focus \'\(message.label.capitalized)\'")
-                Image(systemName: "eye")
-            }
-            Button(action: {
-                searchCriteriaViewModel.criteria.labels.isEnabled = true
-                searchCriteriaViewModel.criteria.labels.hidden.insert(message.label)
-            }) {
-                Text("Hide \'\(message.label.capitalized)\'")
-                Image(systemName: "eye.slash")
-            }.foregroundColor(.red)
-        }
-        Section {
-            PinButton(viewModel: .init(store: context.store, message: message))
-        }
-    }
-}
-
-@available(iOS 13.0, *)
 struct ButtonCopyMessage: View {
     let text: String
 

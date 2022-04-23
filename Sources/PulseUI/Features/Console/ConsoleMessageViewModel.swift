@@ -8,16 +8,32 @@ import CoreData
 import Combine
 
 @available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
-final class ConsoleMessageViewModel {
+final class ConsoleMessageViewModel: Pinnable {
     let title: String
     let text: String
     let textColor: Color
     let badge: BadgeViewModel?
 
-    let showInConsole: (() -> Void)?
-
     private let message: LoggerMessageEntity
+    private let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel?
     private let context: AppContext
+
+    #if os(iOS)
+    lazy var time = ConsoleMessageViewModel.timeFormatter.string(from: message.createdAt)
+    lazy var textColor2 = UIColor.textColor(for: LoggerStore.Level(rawValue: message.level) ?? .debug)
+    lazy var attributedTitle: NSAttributedString = {
+        let string = NSMutableAttributedString()
+        let level = LoggerStore.Level(rawValue: message.level) ?? .debug
+        if let badge = badge {
+            string.append(badge.title, [.foregroundColor: UIColor.badgeColor(for: level)])
+        }
+        if message.label != "default" {
+            let prefix = badge == nil ? "" : " · "
+            string.append("\(prefix)\(message.label.capitalized)", [.foregroundColor: UIColor.secondaryLabel])
+        }
+        return string
+    }()
+    #endif
 
     static let timeFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -25,11 +41,11 @@ final class ConsoleMessageViewModel {
         return formatter
     }()
 
-    lazy var pinViewModel: PinButtonViewModel = {
-        PinButtonViewModel(store: context.store, message: message)
-    }()
+    lazy var pinViewModel = PinButtonViewModel(store: context.store, message: message)
 
-    init(message: LoggerMessageEntity, context: AppContext, showInConsole: (() -> Void)? = nil) {
+    init(message: LoggerMessageEntity,
+         context: AppContext,
+         searchCriteriaViewModel: ConsoleSearchCriteriaViewModel? = nil) {
         let time = ConsoleMessageViewModel.timeFormatter.string(from: message.createdAt)
         if message.label == "default" {
             self.title = time
@@ -41,7 +57,31 @@ final class ConsoleMessageViewModel {
         self.badge = BadgeViewModel(message: message)
         self.context = context
         self.message = message
-        self.showInConsole = showInConsole
+        self.searchCriteriaViewModel = searchCriteriaViewModel
+    }
+
+    // MARK: Context Menu
+
+    func share() -> ShareItems {
+        ShareItems([context.share.share(message)])
+    }
+
+    func copy() -> String {
+        message.text
+    }
+
+    var focusLabel: String {
+        message.label.capitalized
+    }
+
+    func focus() {
+        searchCriteriaViewModel?.criteria.labels.isEnabled = true
+        searchCriteriaViewModel?.criteria.labels.focused = message.label
+    }
+
+    func hide() {
+        searchCriteriaViewModel?.criteria.labels.isEnabled = true
+        searchCriteriaViewModel?.criteria.labels.hidden.insert(message.label)
     }
 }
 
@@ -56,19 +96,28 @@ private extension BadgeViewModel {
 
     init?(level: LoggerStore.Level) {
         switch level {
-        case .critical: self.init(title: "CRITICAL", color: .red)
-        case .error: self.init(title: "ERROR", color: .red)
-        case .warning: self.init(title: "WARNING", color: .orange)
-        case .info: self.init(title: "INFO", color: .blue)
-        case .notice: self.init(title: "NOTICE", color: .indigo)
-        case .debug: return nil
-        case .trace: return nil
+        case .critical, .error, .warning, .info, .notice:
+            self.init(title: level.rawValue.uppercased(), color: .badgeColor(for: level))
+        case .debug, .trace:
+            return nil // Don't show
         }
     }
 }
 
-@available(iOS 13.0, tvOS 14.0, watchOS 6, *)
+@available(iOS 13.0, tvOS 14.0, watchOS 6.0, *)
 extension Color {
+    static func badgeColor(for level: LoggerStore.Level) -> Color {
+        switch level {
+        case .critical: return .red
+        case .error: return .red
+        case .warning: return .orange
+        case .info: return .blue
+        case .notice: return .indigo
+        case .debug: return .primary
+        case .trace: return .primary
+        }
+    }
+
     static func textColor(for level: LoggerStore.Level) -> Color {
         switch level {
         case .critical: return .red
@@ -81,6 +130,32 @@ extension Color {
         }
     }
 }
+
+#if os(iOS)
+@available(iOS 13.0, *)
+extension UIColor {
+    static func badgeColor(for level: LoggerStore.Level) -> UIColor {
+        switch level {
+        case .critical: return .systemRed
+        case .error: return .systemRed
+        case .warning: return .systemOrange
+        case .info: return .systemBlue
+        case .notice: return .systemBlue
+        case .debug: return .label
+        case .trace: return .label
+        }
+    }
+
+    static func textColor(for level: LoggerStore.Level) -> UIColor {
+        switch level {
+        case .trace: return .secondaryLabel
+        case .debug, .info: return .label
+        case .notice, .warning: return .systemOrange
+        case .error, .critical: return .systemRed
+        }
+    }
+}
+#endif
 
 #if os(macOS)
 enum ConsoleMessageStyle {

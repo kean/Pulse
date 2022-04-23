@@ -42,7 +42,7 @@ public struct ConsoleView: View {
             Button(action: { isShowingFiltersView = true }) {
                 Label("Quick Filters", systemImage: "line.horizontal.3.decrease.circle")
             }
-            ConsoleMessagesForEach(context: viewModel.context, messages: viewModel.messages, searchCriteriaViewModel: viewModel.searchCriteria)
+            ConsoleMessagesForEach(context: viewModel.context, messages: viewModel.messages)
         }
         .navigationTitle("Console")
         .toolbar {

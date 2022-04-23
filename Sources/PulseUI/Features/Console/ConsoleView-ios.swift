@@ -33,21 +33,19 @@ public struct ConsoleView: View {
                 trailing: actionButton
             )
             .sheet(item: $shared) { ShareView($0).id($0.id) }
+
     }
 
     private var contentView: some View {
-        List {
-            ConsoleToolbarView(viewModel: viewModel)
-            if !viewModel.messages.isEmpty {
-                ConsoleMessagesForEach(context: viewModel.context, messages: viewModel.messages, searchCriteriaViewModel: viewModel.searchCriteria)
-            }
-        }
-        .listStyle(.plain)
-        .background(background)
+        ConsoleTableView(
+            header: { ConsoleToolbarView(viewModel: viewModel) },
+            viewModel: viewModel.table
+        )
+        .overlay(tableOverlay)
     }
 
     @ViewBuilder
-    private var background: some View {
+    private var tableOverlay: some View {
         if viewModel.messages.isEmpty {
             placeholder
         }
@@ -119,7 +117,7 @@ private struct ConsoleToolbarView: View {
                 }.frame(width: 40, height: 44)
             }.buttonStyle(.plain)
         }
-        .padding(EdgeInsets(top: 2, leading: 0, bottom: 2, trailing: -12))
+        .padding(EdgeInsets(top: 2, leading: 16, bottom: 2, trailing: 8))
         .sheet(isPresented: $isShowingFilters) {
             NavigationView {
                 ConsoleFiltersView(viewModel: viewModel.searchCriteria, isPresented: $isShowingFilters)

@@ -8,13 +8,16 @@ import Combine
 import CoreData
 
 @available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
-final class ConsoleNetworkRequestViewModel {
+final class ConsoleNetworkRequestViewModel: Pinnable {
+#if os(iOS)
+    lazy var time = ConsoleMessageViewModel.timeFormatter.string(from: request.createdAt)
+    let badgeColor: UIColor
+#else
     let badgeColor: Color
+#endif
     let status: String
     let title: String
     let text: String
-
-    let showInConsole: (() -> Void)?
 
     private let request: LoggerNetworkRequestEntity
     private let context: AppContext
@@ -25,7 +28,7 @@ final class ConsoleNetworkRequestViewModel {
         return formatter
     }()
 
-    init(request: LoggerNetworkRequestEntity, context: AppContext, showInConsole: (() -> Void)? = nil) {
+    init(request: LoggerNetworkRequestEntity, context: AppContext) {
         let isSuccess: Bool
         if request.errorCode != 0 {
             isSuccess = false
@@ -45,6 +48,16 @@ final class ConsoleNetworkRequestViewModel {
             prefix = "Success"
         }
 
+#if os(iOS)
+        self.status = ""
+        var title = prefix
+        if request.duration > 0 {
+            title += " · \(DurationFormatter.string(from: request.duration))"
+        }
+        self.title = title
+
+        self.badgeColor = isSuccess ? .systemGreen : .systemRed
+#else
         self.status = prefix
         var title = "\(time)"
         if request.duration > 0 {
@@ -52,26 +65,45 @@ final class ConsoleNetworkRequestViewModel {
         }
         self.title = title
 
+        self.badgeColor = isSuccess ? .green : .red
+#endif
+
         let method = request.httpMethod ?? "GET"
         self.text = method + " " + (request.url ?? "–")
-
-        self.badgeColor = isSuccess ? .green : .red
 
         self.request = request
 
         self.context = context
-        self.showInConsole = showInConsole
     }
 
     // MARK: Pins
 
-    lazy var pinViewModel: PinButtonViewModel? = {
-        request.message.map {
-            PinButtonViewModel(store: context.store, message: $0)
-        }
-    }()
+    lazy var pinViewModel = PinButtonViewModel(store: context.store, request: request)
 
     // MARK: Context Menu
+
+    func shareAsPlainText() -> ShareItems {
+        ShareItems([context.share.share(request, output: .plainText)])
+    }
+
+    func shareAsMarkdown() -> ShareItems {
+        let text = context.share.share(request, output: .markdown)
+        let directory = TemporaryDirectory()
+        let fileURL = directory.write(text: text, extension: "markdown")
+        return ShareItems([fileURL], cleanup: directory.remove)
+    }
+
+    func shareAsHTML() -> ShareItems {
+        let text = context.share.share(request, output: .html)
+        let directory = TemporaryDirectory()
+        let fileURL = directory.write(text: text, extension: "html")
+        return ShareItems([fileURL], cleanup: directory.remove)
+    }
+
+    func shareAsCURL() -> ShareItems {
+        let summary = NetworkLoggerSummary(request: request, store: context.store)
+        return ShareItems([summary.cURLDescription()])
+    }
 
     var containsResponseData: Bool {
         request.responseBodyKey != nil

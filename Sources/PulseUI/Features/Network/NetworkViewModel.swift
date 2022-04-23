@@ -9,7 +9,15 @@ import SwiftUI
 
 @available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
 final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, ObservableObject {
+#if os(iOS)
+    let table: ConsoleTableViewModel
+
+    @Published private(set) var entities: [LoggerNetworkRequestEntity] = [] {
+        didSet { table.entities = entities }
+    }
+#else
     @Published private(set) var entities: [LoggerNetworkRequestEntity] = []
+#endif
 
     // Search criteria
     let searchCriteria: NetworkSearchCriteriaViewModel
@@ -36,6 +44,9 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         self.controller = NSFetchedResultsController<LoggerNetworkRequestEntity>(fetchRequest: request, managedObjectContext: store.container.viewContext, sectionNameKeyPath: nil, cacheName: nil)
 
         self.searchCriteria = NetworkSearchCriteriaViewModel(isDefaultStore: store === LoggerStore.default)
+#if os(iOS)
+        self.table = ConsoleTableViewModel(context: .init(store: store), searchCriteriaViewModel: nil)
+#endif
 
         super.init()
 

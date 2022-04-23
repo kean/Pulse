@@ -11,7 +11,17 @@ import SwiftUI
 final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, ObservableObject {
     let configuration: ConsoleConfiguration
 
+#if os(iOS)
+    let table: ConsoleTableViewModel
+
+    @Published private(set) var messages: [LoggerMessageEntity] = [] {
+        didSet { table.entities = messages }
+    }
+#else
     @Published private(set) var messages: [LoggerMessageEntity] = []
+#endif
+
+    var entities: [LoggerMessageEntity] { messages }
 
     // Search criteria
     let searchCriteria: ConsoleSearchCriteriaViewModel
@@ -36,7 +46,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     private let store: LoggerStore
     private let controller: NSFetchedResultsController<LoggerMessageEntity>
     private var latestSessionId: String?
-    private var cancellables = [AnyCancellable]()
+    private var cancellables: [AnyCancellable] = []
 
     init(store: LoggerStore, configuration: ConsoleConfiguration = .default) {
         self.store = store
@@ -50,6 +60,9 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         self.controller = NSFetchedResultsController<LoggerMessageEntity>(fetchRequest: request, managedObjectContext: store.container.viewContext, sectionNameKeyPath: nil, cacheName: nil)
 
         self.searchCriteria = ConsoleSearchCriteriaViewModel(isDefaultStore: store === LoggerStore.default)
+#if os(iOS)
+        self.table = ConsoleTableViewModel(context: .init(store: store), searchCriteriaViewModel: searchCriteria)
+#endif
 
         super.init()
 

@@ -7,9 +7,9 @@ import PulseCore
 import Combine
 import CoreData
 
-#if os(iOS) || os(watchOS) || os(tvOS)
+#if os(watchOS) || os(tvOS)
 
-@available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
+@available(tvOS 14.0, watchOS 7.0, *)
 struct ConsoleNetworkRequestView: View {
     let viewModel: ConsoleNetworkRequestViewModel
 
@@ -19,9 +19,9 @@ struct ConsoleNetworkRequestView: View {
                 title
                 #if os(watchOS)
                 Spacer()
-                viewModel.pinViewModel.map { PinView(viewModel: $0, font: fonts.title) }
+                PinView(viewModel: viewModel.pinViewModel, font: fonts.title)
                 #else
-                viewModel.pinViewModel.map { PinView(viewModel: $0, font: fonts.title) }
+                PinView(viewModel: viewModel.pinViewModel, font: fonts.title)
                 Spacer()
                 #endif
             }
@@ -54,6 +54,7 @@ struct ConsoleNetworkRequestView: View {
         #endif
     }
 
+    #warning("TODO: remove this")
     private var statusCircle: some View {
         Circle()
             .frame(width: circleSize, height: circleSize)
@@ -73,9 +74,7 @@ struct ConsoleNetworkRequestView: View {
     }
 
     private var fonts: Fonts {
-        #if os(iOS)
-        return Fonts(title: .caption, body: .system(size: 15))
-        #elseif os(watchOS)
+        #if os(watchOS)
         return Fonts(title: .system(size: 12), body: .system(size: 15))
         #elseif os(tvOS)
         return Fonts(title: .body, body: .body)

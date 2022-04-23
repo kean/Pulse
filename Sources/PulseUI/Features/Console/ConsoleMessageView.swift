@@ -7,7 +7,7 @@ import PulseCore
 import CoreData
 import Combine
 
-#if os(iOS) || os(watchOS) || os(tvOS)
+#if os(watchOS) || os(tvOS)
 
 @available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
 struct ConsoleMessageView: View {
@@ -74,9 +74,7 @@ struct ConsoleMessageView: View {
     }
 
     private var fonts: Fonts {
-        #if os(iOS)
-        return Fonts(title: .caption, body: .system(size: 15))
-        #elseif os(watchOS)
+        #if os(watchOS)
         return Fonts(title: .system(size: 12), body: .system(size: 15))
         #elseif os(tvOS)
         return Fonts(title: .body, body: .body)

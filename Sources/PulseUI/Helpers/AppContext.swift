@@ -5,6 +5,7 @@
 import Foundation
 import PulseCore
 
+#warning("TODO: remove")
 @available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
 struct AppContext {
     let store: LoggerStore
