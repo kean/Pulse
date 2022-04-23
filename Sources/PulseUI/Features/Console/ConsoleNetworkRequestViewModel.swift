@@ -19,8 +19,6 @@ final class ConsoleNetworkRequestViewModel: Pinnable {
     let title: String
     let text: String
 
-    let showInConsole: (() -> Void)?
-
     private let request: LoggerNetworkRequestEntity
     private let context: AppContext
 
@@ -30,7 +28,7 @@ final class ConsoleNetworkRequestViewModel: Pinnable {
         return formatter
     }()
 
-    init(request: LoggerNetworkRequestEntity, context: AppContext, showInConsole: (() -> Void)? = nil) {
+    init(request: LoggerNetworkRequestEntity, context: AppContext) {
         let isSuccess: Bool
         if request.errorCode != 0 {
             isSuccess = false
@@ -76,7 +74,6 @@ final class ConsoleNetworkRequestViewModel: Pinnable {
         self.request = request
 
         self.context = context
-        self.showInConsole = showInConsole
     }
 
     // MARK: Pins

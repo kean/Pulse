@@ -14,13 +14,10 @@ final class ConsoleMessageViewModel: Pinnable {
     let textColor: Color
     let badge: BadgeViewModel?
 
-    let showInConsole: (() -> Void)?
-
     private let message: LoggerMessageEntity
     private let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel?
     private let context: AppContext
 
-    #warning("refactor")
     #if os(iOS)
     lazy var time = ConsoleMessageViewModel.timeFormatter.string(from: message.createdAt)
     lazy var textColor2 = UIColor.textColor(for: LoggerStore.Level(rawValue: message.level) ?? .debug)
@@ -46,10 +43,8 @@ final class ConsoleMessageViewModel: Pinnable {
 
     lazy var pinViewModel = PinButtonViewModel(store: context.store, message: message)
 
-    #warning("TODO: remove shotInConsole")
     init(message: LoggerMessageEntity,
          context: AppContext,
-         showInConsole: (() -> Void)? = nil,
          searchCriteriaViewModel: ConsoleSearchCriteriaViewModel? = nil) {
         let time = ConsoleMessageViewModel.timeFormatter.string(from: message.createdAt)
         if message.label == "default" {
@@ -62,7 +57,6 @@ final class ConsoleMessageViewModel: Pinnable {
         self.badge = BadgeViewModel(message: message)
         self.context = context
         self.message = message
-        self.showInConsole = showInConsole
         self.searchCriteriaViewModel = searchCriteriaViewModel
     }
 
