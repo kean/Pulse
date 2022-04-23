@@ -1,5 +1,5 @@
 <br/>
-<img alt="Pulse Logo" src="https://user-images.githubusercontent.com/1567433/109099548-47478f00-76f1-11eb-8ee7-652859514ab0.png">
+<img alt="Pulse Logo" src="https://user-images.githubusercontent.com/1567433/164947152-9760dd7b-c883-4059-b5dc-e66df031f0c9.png">
 
 **Pulse** is a powerful logging system for Apple Platforms. Native. Built with SwiftUI.
 
@@ -12,35 +12,18 @@ Record and inspect logs and `URLSession` network requests right from your iOS ap
 <br/>
 <br/>
 
-![promo-4-2](https://user-images.githubusercontent.com/1567433/111088123-0d052c80-84fc-11eb-921c-af8de5c8032b.png)
-
+<img width="2100" alt="02" src="https://user-images.githubusercontent.com/1567433/164947161-3e9a5343-9c4c-4d03-a4f0-24fb0a71b94d.png">
 <br/>
- 
-
-![promo-5](https://user-images.githubusercontent.com/1567433/113081170-2ff33a00-91a6-11eb-9e9d-5d1cd433f152.png)
-
+<img width="2100" alt="03" src="https://user-images.githubusercontent.com/1567433/164947162-f7ea32f9-d20b-493c-9edd-279620416872.png">
 <br/>
-
-![promo-1](https://user-images.githubusercontent.com/1567433/107718771-ab576580-6ca4-11eb-83d9-ab1176f4e1c4.png)
-
+<img width="2100" alt="04" src="https://user-images.githubusercontent.com/1567433/164947163-dfa2be99-2267-4e5c-9723-48e88d4386bd.png">
 <br/>
-
-![promo-2](https://user-images.githubusercontent.com/1567433/107718772-ab576580-6ca4-11eb-83a1-fc510e57bab1.png)
-
+<img width="2100" alt="05" src="https://user-images.githubusercontent.com/1567433/164947165-2adc3174-0d88-4e07-8428-d57a4cd35ad0.png">
 <br/>
-
-![promo-3](https://user-images.githubusercontent.com/1567433/107718773-abeffc00-6ca4-11eb-963a-04855e7304f4.png)
-
+<img width="2100" alt="06" src="https://user-images.githubusercontent.com/1567433/164947167-6f503ae1-5c40-4fc3-accb-289e160352aa.png">
 <br/>
-
-![promo-6](https://user-images.githubusercontent.com/1567433/112777967-706d7f00-9011-11eb-82a8-12b3b29097cc.png)
-
+<img width="2100" alt="07" src="https://user-images.githubusercontent.com/1567433/164947168-5e163b13-42b0-40f3-abc3-47197058e11a.png">
 <br/>
-
-![promo-7](https://user-images.githubusercontent.com/1567433/112777285-d1945300-900f-11eb-8aaa-45d6ed392f3d.png)
-
-<br/>
-
 
 ## Pulse Pro
 
@@ -61,7 +44,7 @@ Pulse **is not** a network debugging proxy tool like Proxyman, Charles, or Wires
 
 ## Documentation
 
-Pulse is easy to learn and use thanks to beautiful [**Pulse Docs**](https://kean.blog/pulse/home).
+Pulse is easy to learn and use thanks to [**Pulse Docs**](https://kean.blog/pulse/home).
 
 <a href="https://kean.blog/pulse/home">
 <img src="https://user-images.githubusercontent.com/1567433/115163600-eea0cc80-a077-11eb-8b86-3113a657816f.png">
