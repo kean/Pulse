@@ -54,10 +54,15 @@ struct ConsoleNetworkRequestView: View {
         #endif
     }
 
+    #warning("TODO: remove this")
     private var statusCircle: some View {
+        #if os(iOS)
+        EmptyView()
+        #else
         Circle()
             .frame(width: circleSize, height: circleSize)
             .foregroundColor(viewModel.badgeColor)
+        #endif
     }
 
     private var text: some View {

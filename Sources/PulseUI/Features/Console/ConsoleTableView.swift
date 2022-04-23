@@ -66,6 +66,7 @@ final class ConsoleTableViewController: UITableViewController {
 
     private func createView() {
         tableView.register(ConsoleMessageTableCell.self, forCellReuseIdentifier: "ConsoleMessageTableCell")
+        tableView.register(ConsoleNetworkRequestTableCell.self, forCellReuseIdentifier: "ConsoleNetworkRequestTableCell")
     }
 
     private func bind(_ viewModel: ConsoleTableViewModel) {
@@ -126,8 +127,8 @@ final class ConsoleTableViewController: UITableViewController {
             cell.display(viewModel)
             return cell
         case let viewModel as ConsoleNetworkRequestViewModel:
-            let cell = UITableViewCell()
-            cell.textLabel?.text = viewModel.text
+            let cell = tableView.dequeueReusableCell(withIdentifier: "ConsoleNetworkRequestTableCell", for: indexPath) as! ConsoleNetworkRequestTableCell
+            cell.display(viewModel)
             return cell
         default:
             fatalError("Invalid viewModel: \(viewModel)")

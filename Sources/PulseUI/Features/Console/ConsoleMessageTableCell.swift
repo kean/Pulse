@@ -27,15 +27,15 @@ final class ConsoleMessageTableCell: UITableViewCell, UIContextMenuInteractionDe
     }
 
     private func createView() {
-        let stack = UIView.vStack(spacing: 6, [
-            .hStack(alignment: .firstBaseline, spacing: 8, [
+        let stack = UIView.vStack(spacing: 4, [
+            .hStack(alignment: .center, spacing: 8, [
                 title, UIView(), accessory
             ]),
             details
         ])
 
         contentView.addSubview(stack)
-        stack.pinToSuperview(insets: .init(top: 12, left: 16, bottom: 12, right: 16))
+        stack.pinToSuperview(insets: .init(top: 10, left: 16, bottom: 10, right: 16))
 
         contentView.addSubview(pin)
         pin.translatesAutoresizingMaskIntoConstraints = false
@@ -115,7 +115,7 @@ final class ConsoleMessageAccessoryView: UIView {
         let disclosureIndicator = UIImageView(image: ConsoleMessageAccessoryView.chevron)
         disclosureIndicator.tintColor = .separator
 
-        let stack = UIStackView.hStack(spacing: 6, [textLabel, disclosureIndicator])
+        let stack = UIStackView.hStack(spacing: 4, [textLabel, disclosureIndicator])
         addSubview(stack)
         stack.pinToSuperview()
     }

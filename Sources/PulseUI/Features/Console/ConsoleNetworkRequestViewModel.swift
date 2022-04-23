@@ -9,7 +9,12 @@ import CoreData
 
 @available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
 final class ConsoleNetworkRequestViewModel: Pinnable {
+#if os(iOS)
+    lazy var time = ConsoleMessageViewModel.timeFormatter.string(from: request.createdAt)
+    let badgeColor: UIColor
+#else
     let badgeColor: Color
+#endif
     let status: String
     let title: String
     let text: String
@@ -45,6 +50,16 @@ final class ConsoleNetworkRequestViewModel: Pinnable {
             prefix = "Success"
         }
 
+#if os(iOS)
+        self.status = ""
+        var title = prefix
+        if request.duration > 0 {
+            title += " · \(DurationFormatter.string(from: request.duration))"
+        }
+        self.title = title
+
+        self.badgeColor = isSuccess ? .systemGreen : .systemRed
+#else
         self.status = prefix
         var title = "\(time)"
         if request.duration > 0 {
@@ -52,10 +67,11 @@ final class ConsoleNetworkRequestViewModel: Pinnable {
         }
         self.title = title
 
+        self.badgeColor = isSuccess ? .green : .red
+#endif
+
         let method = request.httpMethod ?? "GET"
         self.text = method + " " + (request.url ?? "–")
-
-        self.badgeColor = isSuccess ? .green : .red
 
         self.request = request
 
