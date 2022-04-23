@@ -281,14 +281,14 @@ final class LoggerStoreTests: XCTestCase {
 
         let date = Date()
         for index in 1...500 {
-            let message = LoggerMessageEntity(store: store)
+            let message = LoggerMessageEntity(context: context)
             message.createdAt = date + TimeInterval(index)
             message.level = "debug"
             message.label = "default"
             message.session = "1"
             message.text = "\(index)"
             if index % 50 == 0 {
-                let metadata = LoggerMetadataEntity(store: store)
+                let metadata = LoggerMetadataEntity(context: context)
                 metadata.key = "key"
                 metadata.value = "\(index)"
 
@@ -391,7 +391,7 @@ private extension LoggerStore {
     func populate() throws {
         let context = container.viewContext
 
-        let message = LoggerMessageEntity(store: store)
+        let message = LoggerMessageEntity(context: context)
         message.createdAt = Date()
         message.level = "debug"
         message.label = "default"
@@ -399,7 +399,7 @@ private extension LoggerStore {
         message.text = "Some message"
         message.metadata = [
             {
-                let entity = LoggerMetadataEntity(store: store)
+                let entity = LoggerMetadataEntity(context: context)
                 entity.key = "system"
                 entity.value = "application"
                 return entity
