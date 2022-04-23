@@ -2,10 +2,10 @@
 //
 // Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
 
+#if os(iOS)
 import UIKit
 import SwiftUI
 
-#if os(iOS)
 @available(iOS 13.0, *)
 extension UIImage {
     static func make(systemName: String, textStyle: UIFont.TextStyle) -> UIImage {
