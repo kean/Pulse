@@ -85,6 +85,29 @@ final class ConsoleNetworkRequestViewModel: Pinnable {
 
     // MARK: Context Menu
 
+    func shareAsPlainText() -> ShareItems {
+        ShareItems([context.share.share(request, output: .plainText)])
+    }
+
+    func shareAsMarkdown() -> ShareItems {
+        let text = context.share.share(request, output: .markdown)
+        let directory = TemporaryDirectory()
+        let fileURL = directory.write(text: text, extension: "markdown")
+        return ShareItems([fileURL], cleanup: directory.remove)
+    }
+
+    func shareAsHTML() -> ShareItems {
+        let text = context.share.share(request, output: .html)
+        let directory = TemporaryDirectory()
+        let fileURL = directory.write(text: text, extension: "html")
+        return ShareItems([fileURL], cleanup: directory.remove)
+    }
+
+    func shareAsCURL() -> ShareItems {
+        let summary = NetworkLoggerSummary(request: request, store: context.store)
+        return ShareItems([summary.cURLDescription()])
+    }
+
     var containsResponseData: Bool {
         request.responseBodyKey != nil
     }
