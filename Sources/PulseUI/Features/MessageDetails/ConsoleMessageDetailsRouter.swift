@@ -9,18 +9,18 @@ import PulseCore
 #if os(iOS) || os(tvOS) || os(watchOS)
 @available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
 struct ConsoleMessageDetailsRouter: View {
-    let context: AppContext
+    let store: LoggerStore
     @Binding var entity: NSManagedObject?
 
     var body: some View {
         if let message = entity as? LoggerMessageEntity {
             if let request = message.request {
-                NetworkInspectorView(viewModel: .init(request: request, context: context))
+                NetworkInspectorView(viewModel: .init(request: request, store: store))
             } else {
-                ConsoleMessageDetailsView(viewModel: .init(context: context, message: message))
+                ConsoleMessageDetailsView(viewModel: .init(store: store, message: message))
             }
         } else if let request = entity as? LoggerNetworkRequestEntity {
-            NetworkInspectorView(viewModel: .init(request: request, context: context))
+            NetworkInspectorView(viewModel: .init(request: request, store: store))
         }
     }
 }

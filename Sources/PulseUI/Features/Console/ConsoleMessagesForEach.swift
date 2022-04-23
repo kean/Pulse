@@ -10,7 +10,7 @@ import PulseCore
 
 @available(tvOS 14.0, watchOS 7.0, *)
 struct ConsoleMessagesForEach: View {
-    let context: AppContext
+    let store: LoggerStore
     let messages: [LoggerMessageEntity]
 
     var body: some View {
@@ -20,22 +20,22 @@ struct ConsoleMessagesForEach: View {
     @ViewBuilder
     private func makeListItem(message: LoggerMessageEntity) -> some View {
         if let request = message.request {
-            NavigationLink(destination: LazyConsoleNetworkRequestDetailsView(request: request, context: context)) {
-                ConsoleNetworkRequestForEachRow(context: context, request: request)
+            NavigationLink(destination: LazyConsoleNetworkRequestDetailsView(request: request, store: store)) {
+                ConsoleNetworkRequestForEachRow(store: store, request: request)
             }
             .backport.swipeActions(edge: .leading) {
                 if #available(tvOS 15.0, watchOS 8.0, *) {
-                    PinButton2(viewModel: .init(store: context.store, message: message))
+                    PinButton2(viewModel: .init(store: store, message: message))
                         .tint(.blue)
                 }
             }
         } else {
-            NavigationLink(destination: LazyConsoleMessageDetailsView(message: message, context: context)) {
-                ConsoleMessagesForEachRow(context: context, message: message)
+            NavigationLink(destination: LazyConsoleMessageDetailsView(message: message, store: store)) {
+                ConsoleMessagesForEachRow(store: store, message: message)
             }
             .backport.swipeActions(edge: .leading) {
                 if #available(tvOS 15.0,  watchOS 8.0, *) {
-                    PinButton2(viewModel: .init(store: context.store, message: message))
+                    PinButton2(viewModel: .init(store: store, message: message))
                         .tint(.blue)
                 }
             }
@@ -45,7 +45,7 @@ struct ConsoleMessagesForEach: View {
 
 @available(tvOS 14.0, watchOS 7.0, *)
 struct NetworkMessagesForEach: View {
-    let context: AppContext
+    let store: LoggerStore
     let entities: [LoggerNetworkRequestEntity]
 
     var body: some View {
@@ -54,12 +54,12 @@ struct NetworkMessagesForEach: View {
 
     @ViewBuilder
     private func makeListItem(request: LoggerNetworkRequestEntity) -> some View {
-        NavigationLink(destination: LazyConsoleNetworkRequestDetailsView(request: request, context: context)) {
-            ConsoleNetworkRequestForEachRow(context: context, request: request)
+        NavigationLink(destination: LazyConsoleNetworkRequestDetailsView(request: request, store: store)) {
+            ConsoleNetworkRequestForEachRow(store: store, request: request)
         }
         .backport.swipeActions(edge: .leading) {
             if #available(iOS 15.0, tvOS 15.0, watchOS 8.0, *), let message = request.message {
-                PinButton2(viewModel: .init(store: context.store, message: message))
+                PinButton2(viewModel: .init(store: store, message: message))
                     .tint(.blue)
             }
         }
@@ -68,41 +68,41 @@ struct NetworkMessagesForEach: View {
 
 @available(tvOS 14.0, watchOS 7.0, *)
 private struct ConsoleNetworkRequestForEachRow: View {
-    let context: AppContext
+    let store: LoggerStore
     let request: LoggerNetworkRequestEntity
 
     var body: some View {
-        ConsoleNetworkRequestView(viewModel: .init(request: request, context: context))
+        ConsoleNetworkRequestView(viewModel: .init(request: request, store: store))
     }
 }
 
 @available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
 private struct ConsoleMessagesForEachRow: View {
-    let context: AppContext
+    let store: LoggerStore
     let message: LoggerMessageEntity
 
     var body: some View {
-        ConsoleMessageView(viewModel: .init(message: message, context: context))
+        ConsoleMessageView(viewModel: .init(message: message, store: store))
     }
 }
 
 @available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
 private struct LazyConsoleMessageDetailsView: View {
     let message: LoggerMessageEntity
-    let context: AppContext
+    let store: LoggerStore
 
     var body: some View {
-        ConsoleMessageDetailsView(viewModel: .init(context: context, message: message))
+        ConsoleMessageDetailsView(viewModel: .init(store: store, message: message))
     }
 }
 
 @available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
 private struct LazyConsoleNetworkRequestDetailsView: View {
     let request: LoggerNetworkRequestEntity
-    let context: AppContext
+    let store: LoggerStore
 
     var body: some View {
-        NetworkInspectorView(viewModel: .init(request: request, context: context))
+        NetworkInspectorView(viewModel: .init(request: request, store: store))
     }
 }
 

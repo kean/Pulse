@@ -25,20 +25,20 @@ struct ButtonCopyMessage: View {
 @available(iOS 13.0, *)
 struct NetworkMessageContextMenu: View {
     let request: LoggerNetworkRequestEntity
-    let context: AppContext
+    let store: LoggerStore
 
     @Binding private(set) var sharedItems: ShareItems?
 
     var body: some View {
         Section {
             Button(action: {
-                sharedItems = ShareItems([context.share.share(request, output: .plainText)])
+                sharedItems = ShareItems([ConsoleShareService(store: store).share(request, output: .plainText)])
             }) {
                 Text("Share as Plain Text")
                 Image(systemName: "square.and.arrow.up")
             }
             Button(action: {
-                let text = context.share.share(request, output: .markdown)
+                let text = ConsoleShareService(store: store).share(request, output: .markdown)
                 let directory = TemporaryDirectory()
                 let fileURL = directory.write(text: text, extension: "markdown")
                 sharedItems = ShareItems([fileURL], cleanup: directory.remove)
@@ -47,7 +47,7 @@ struct NetworkMessageContextMenu: View {
                 Image(systemName: "square.and.arrow.up")
             }
             Button(action: {
-                let text = context.share.share(request, output: .html)
+                let text = ConsoleShareService(store: store).share(request, output: .html)
                 let directory = TemporaryDirectory()
                 let fileURL = directory.write(text: text, extension: "html")
                 sharedItems = ShareItems([fileURL], cleanup: directory.remove)
@@ -56,16 +56,16 @@ struct NetworkMessageContextMenu: View {
                 Image(systemName: "square.and.arrow.up")
             }
             Button(action: {
-                let summary = NetworkLoggerSummary(request: request, store: context.store)
+                let summary = NetworkLoggerSummary(request: request, store: store)
                 sharedItems = ShareItems([summary.cURLDescription()])
             }) {
                 Text("Share as cURL")
                 Image(systemName: "square.and.arrow.up")
             }
         }
-        NetworkMessageContextMenuCopySection(request: request, shareService: context.share)
+        NetworkMessageContextMenuCopySection(request: request, shareService: ConsoleShareService(store: store))
         if let message = request.message {
-            PinButton(viewModel: .init(store: context.store, message: message))
+            PinButton(viewModel: .init(store: store, message: message))
         }
     }
 }

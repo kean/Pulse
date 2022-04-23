@@ -12,12 +12,12 @@ import UIKit
 
 @available(iOS 13.0, *)
 final class ConsoleTableViewModel {
-    let context: AppContext
+    let store: LoggerStore
     let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel?
     @Published var entities: [NSManagedObject] = []
 
-    init(context: AppContext, searchCriteriaViewModel: ConsoleSearchCriteriaViewModel?) {
-        self.context = context
+    init(store: LoggerStore, searchCriteriaViewModel: ConsoleSearchCriteriaViewModel?) {
+        self.store = store
         self.searchCriteriaViewModel = searchCriteriaViewModel
     }
 }
@@ -41,7 +41,7 @@ struct ConsoleTableView<Header: View>: View {
     @ViewBuilder
     private var invisibleNavigationLinks: some View {
         NavigationLink(isActive: $isDetailsLinkActive, destination: {
-            ConsoleMessageDetailsRouter(context: viewModel.context, entity: $selectedEntity) }, label: {  EmptyView() })
+            ConsoleMessageDetailsRouter(store: viewModel.store, entity: $selectedEntity) }, label: {  EmptyView() })
     }
 }
 
@@ -125,12 +125,12 @@ final class ConsoleTableViewController: UITableViewController {
         switch entity {
         case let message as LoggerMessageEntity:
             if let request = message.request {
-                viewModel = ConsoleNetworkRequestViewModel(request: request, context: self.viewModel.context)
+                viewModel = ConsoleNetworkRequestViewModel(request: request, store: self.viewModel.store)
             } else {
-                viewModel = ConsoleMessageViewModel(message: message, context: self.viewModel.context, searchCriteriaViewModel: self.viewModel.searchCriteriaViewModel)
+                viewModel = ConsoleMessageViewModel(message: message, store: self.viewModel.store, searchCriteriaViewModel: self.viewModel.searchCriteriaViewModel)
             }
         case let request as LoggerNetworkRequestEntity:
-            viewModel = ConsoleNetworkRequestViewModel(request: request, context: self.viewModel.context)
+            viewModel = ConsoleNetworkRequestViewModel(request: request, store: self.viewModel.store)
         default:
             fatalError("Invalid entity: \(entity)")
         }

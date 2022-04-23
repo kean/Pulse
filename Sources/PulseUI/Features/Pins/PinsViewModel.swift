@@ -23,10 +23,7 @@ final class PinsViewModel: NSObject, NSFetchedResultsControllerDelegate, Observa
 
     var onDismiss: (() -> Void)?
 
-    // TODO: get DI right, this is a quick workaround to fix @EnvironmentObject crashes
-    var context: AppContext { .init(store: store) }
-
-    private let store: LoggerStore
+    private(set) var store: LoggerStore
     private let controller: NSFetchedResultsController<LoggerMessageEntity>
     private var cancellables = [AnyCancellable]()
 
@@ -41,7 +38,7 @@ final class PinsViewModel: NSObject, NSFetchedResultsControllerDelegate, Observa
 
         self.controller = NSFetchedResultsController<LoggerMessageEntity>(fetchRequest: request, managedObjectContext: store.container.viewContext, sectionNameKeyPath: nil, cacheName: nil)
 #if os(iOS)
-        self.table = ConsoleTableViewModel(context: .init(store: store), searchCriteriaViewModel: nil)
+        self.table = ConsoleTableViewModel(store: store, searchCriteriaViewModel: nil)
 #endif
 
         super.init()

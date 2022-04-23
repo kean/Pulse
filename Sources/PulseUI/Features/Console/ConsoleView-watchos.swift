@@ -32,7 +32,7 @@ public struct ConsoleView: View {
             Button(action: viewModel.tranferStore) {
                 Label(viewModel.fileTransferStatus.title, systemImage: "square.and.arrow.up")
             }.disabled(viewModel.fileTransferStatus.isButtonDisabled)
-            if viewModel.context.store === RemoteLogger.shared.store {
+            if viewModel.store === RemoteLogger.shared.store {
                 NavigationLink(destination: _RemoteLoggingSettingsView(viewModel: .shared)) {
                     Button(action: { isRemoteLoggingLinkActive = true }) {
                         Label("Remote Logging", systemImage: "network")
@@ -42,7 +42,7 @@ public struct ConsoleView: View {
             Button(action: { isShowingFiltersView = true }) {
                 Label("Quick Filters", systemImage: "line.horizontal.3.decrease.circle")
             }
-            ConsoleMessagesForEach(context: viewModel.context, messages: viewModel.messages)
+            ConsoleMessagesForEach(store: viewModel.store, messages: viewModel.messages)
         }
         .navigationTitle("Console")
         .toolbar {

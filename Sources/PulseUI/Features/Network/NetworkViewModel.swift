@@ -26,10 +26,7 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 
     var onDismiss: (() -> Void)?
 
-    // TODO: get DI right, this is a quick workaround to fix @EnvironmentObject crashes
-    var context: AppContext { .init(store: store) }
-
-    private let store: LoggerStore
+    private(set) var store: LoggerStore
     private let controller: NSFetchedResultsController<LoggerNetworkRequestEntity>
     private var latestSessionId: String?
     private var cancellables = [AnyCancellable]()
@@ -45,7 +42,7 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 
         self.searchCriteria = NetworkSearchCriteriaViewModel(isDefaultStore: store === LoggerStore.default)
 #if os(iOS)
-        self.table = ConsoleTableViewModel(context: .init(store: store), searchCriteriaViewModel: nil)
+        self.table = ConsoleTableViewModel(store: store, searchCriteriaViewModel: nil)
 #endif
 
         super.init()

@@ -29,7 +29,7 @@ struct NetworkInspectorView: View {
                 }
                 if #available(iOS 14.0, *) {
                     Menu(content: {
-                        NetworkMessageContextMenu(request: viewModel.request, context: viewModel.context, sharedItems: $shareItems)
+                        NetworkMessageContextMenu(request: viewModel.request, store: viewModel.store, sharedItems: $shareItems)
                     }, label: {
                         Image(systemName: "square.and.arrow.up")
                     })
@@ -196,14 +196,14 @@ final class NetworkInspectorViewModel: ObservableObject {
     private(set) var title: String = ""
     let request: LoggerNetworkRequestEntity
     private let objectId: NSManagedObjectID
-    let context: AppContext // TODO: make it private
+    let store: LoggerStore // TODO: make it private
     private let summary: NetworkLoggerSummary
 
-    init(request: LoggerNetworkRequestEntity, context: AppContext) {
+    init(request: LoggerNetworkRequestEntity, store: LoggerStore) {
         self.objectId = request.objectID
         self.request = request
-        self.context = context
-        self.summary = NetworkLoggerSummary(request: request, store: context.store)
+        self.store = store
+        self.summary = NetworkLoggerSummary(request: request, store: store)
 
         if let url = request.url.flatMap(URL.init(string:)) {
             if let httpMethod = request.httpMethod {
@@ -216,7 +216,7 @@ final class NetworkInspectorViewModel: ObservableObject {
 
     var pin: PinButtonViewModel? {
         request.message.map {
-            PinButtonViewModel(store: context.store, message: $0)
+            PinButtonViewModel(store: store, message: $0)
         }
     }
 
@@ -249,11 +249,11 @@ final class NetworkInspectorViewModel: ObservableObject {
     // MARK: Sharing
 
     func prepareForSharing() -> String {
-        ConsoleShareService(store: context.store).share(summary, output: .plainText)
+        ConsoleShareService(store: store).share(summary, output: .plainText)
     }
 
     var shareService: ConsoleShareService {
-        ConsoleShareService(store: context.store)
+        ConsoleShareService(store: store)
     }
 }
 #endif

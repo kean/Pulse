@@ -14,7 +14,7 @@ final class ConsoleMessageDetailsViewModel {
     let badge: BadgeViewModel?
 
     private let message: LoggerMessageEntity
-    private let context: AppContext
+    private let store: LoggerStore
 
     static let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -26,8 +26,8 @@ final class ConsoleMessageDetailsViewModel {
         return formatter
     }()
 
-    init(context: AppContext, message: LoggerMessageEntity) {
-        self.context = context
+    init(store: LoggerStore, message: LoggerMessageEntity) {
+        self.store = store
         self.message = message
         self.tags = [
             ConsoleMessageTagViewModel(
@@ -49,7 +49,7 @@ final class ConsoleMessageDetailsViewModel {
     }
 
     var pin: PinButtonViewModel {
-        PinButtonViewModel(store: context.store, message: message)
+        PinButtonViewModel(store: store, message: message)
     }
 }
 

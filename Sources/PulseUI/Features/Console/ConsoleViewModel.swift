@@ -40,10 +40,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 
     var onDismiss: (() -> Void)?
 
-    // TODO: get DI right, this is a quick workaround to fix @EnvironmentObject crashes
-    var context: AppContext { .init(store: store) }
-
-    private let store: LoggerStore
+    private(set) var store: LoggerStore
     private let controller: NSFetchedResultsController<LoggerMessageEntity>
     private var latestSessionId: String?
     private var cancellables: [AnyCancellable] = []
@@ -61,7 +58,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 
         self.searchCriteria = ConsoleSearchCriteriaViewModel(isDefaultStore: store === LoggerStore.default)
 #if os(iOS)
-        self.table = ConsoleTableViewModel(context: .init(store: store), searchCriteriaViewModel: searchCriteria)
+        self.table = ConsoleTableViewModel(store: store, searchCriteriaViewModel: searchCriteria)
 #endif
 
         super.init()

@@ -20,7 +20,7 @@ final class ConsoleNetworkRequestViewModel: Pinnable {
     let text: String
 
     private let request: LoggerNetworkRequestEntity
-    private let context: AppContext
+    private let store: LoggerStore
 
     static let timeFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -28,7 +28,7 @@ final class ConsoleNetworkRequestViewModel: Pinnable {
         return formatter
     }()
 
-    init(request: LoggerNetworkRequestEntity, context: AppContext) {
+    init(request: LoggerNetworkRequestEntity, store: LoggerStore) {
         let isSuccess: Bool
         if request.errorCode != 0 {
             isSuccess = false
@@ -73,35 +73,35 @@ final class ConsoleNetworkRequestViewModel: Pinnable {
 
         self.request = request
 
-        self.context = context
+        self.store = store
     }
 
     // MARK: Pins
 
-    lazy var pinViewModel = PinButtonViewModel(store: context.store, request: request)
+    lazy var pinViewModel = PinButtonViewModel(store: store, request: request)
 
     // MARK: Context Menu
 
     func shareAsPlainText() -> ShareItems {
-        ShareItems([context.share.share(request, output: .plainText)])
+        ShareItems([ConsoleShareService(store: store).share(request, output: .plainText)])
     }
 
     func shareAsMarkdown() -> ShareItems {
-        let text = context.share.share(request, output: .markdown)
+        let text = ConsoleShareService(store: store).share(request, output: .markdown)
         let directory = TemporaryDirectory()
         let fileURL = directory.write(text: text, extension: "markdown")
         return ShareItems([fileURL], cleanup: directory.remove)
     }
 
     func shareAsHTML() -> ShareItems {
-        let text = context.share.share(request, output: .html)
+        let text = ConsoleShareService(store: store).share(request, output: .html)
         let directory = TemporaryDirectory()
         let fileURL = directory.write(text: text, extension: "html")
         return ShareItems([fileURL], cleanup: directory.remove)
     }
 
     func shareAsCURL() -> ShareItems {
-        let summary = NetworkLoggerSummary(request: request, store: context.store)
+        let summary = NetworkLoggerSummary(request: request, store: store)
         return ShareItems([summary.cURLDescription()])
     }
 
@@ -112,7 +112,7 @@ final class ConsoleNetworkRequestViewModel: Pinnable {
     // WARNING: This call is relatively expensive.
     var responseString: String? {
         request.responseBodyKey
-            .flatMap(context.store.getData)
+            .flatMap(store.getData)
             .flatMap { String(data: $0, encoding: .utf8) }
     }
 
@@ -125,6 +125,6 @@ final class ConsoleNetworkRequestViewModel: Pinnable {
     }
 
     var cURLDescription: String {
-        NetworkLoggerSummary(request: request, store: context.store).cURLDescription()
+        NetworkLoggerSummary(request: request, store: store).cURLDescription()
     }
 }
