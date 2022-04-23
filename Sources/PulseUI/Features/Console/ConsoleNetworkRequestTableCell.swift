@@ -122,7 +122,11 @@ final class ConsoleNetworkRequestTableCell: UITableViewCell, UIContextMenuIntera
 
 @available(iOS 13.0, *)
 private final class CircleView: UIView {
-    var fillColor: UIColor = .red
+    var fillColor: UIColor = .red {
+        didSet {
+            setNeedsDisplay()
+        }
+    }
 
     override init(frame: CGRect) {
         super.init(frame: frame)
