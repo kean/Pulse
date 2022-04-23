@@ -6,7 +6,15 @@ import UIKit
 import SwiftUI
 
 #if os(iOS)
-public extension UIView {
+@available(iOS 13.0, *)
+extension UIImage {
+    static func make(systemName: String, textStyle: UIFont.TextStyle) -> UIImage {
+        UIImage(systemName: systemName)?
+            .withConfiguration(UIImage.SymbolConfiguration(textStyle: textStyle)) ?? UIImage()
+    }
+}
+
+extension UIView {
     static func vStack(
         alignment: UIStackView.Alignment = .fill,
         distribution: UIStackView.Distribution = .fill,

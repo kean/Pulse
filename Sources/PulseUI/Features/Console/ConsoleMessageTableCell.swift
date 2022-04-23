@@ -11,11 +11,11 @@ import UIKit
 @available(iOS 13.0, *)
 final class ConsoleMessageTableCell: UITableViewCell, UIContextMenuInteractionDelegate {
     private let title = UILabel()
-    private let timeLabel = UILabel()
+    private let accessory = ConsoleMessageAccessoryView()
     private let details = UILabel()
     private let pin = PinIndicatorView()
 
-    private var model: ConsoleMessageViewModel?
+    private var viewModel: ConsoleMessageViewModel?
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -27,31 +27,12 @@ final class ConsoleMessageTableCell: UITableViewCell, UIContextMenuInteractionDe
     }
 
     private func createView() {
-        timeLabel.font = .preferredFont(forTextStyle: .caption1)
-        timeLabel.textColor = .secondaryLabel
-
-        let chevron = UIImage(systemName: "chevron.right")?.withConfiguration(UIImage.SymbolConfiguration(textStyle: .caption1)) ?? UIImage()
-
-        let disc = UIImageView(image: chevron)
-        disc.tintColor = .separator
-
-        let disclosures = UIStackView(arrangedSubviews: [
-            timeLabel, disc
-        ])
-        disclosures.spacing = 6
-
-        let top = UIStackView(arrangedSubviews: [
-            title, pin, UIView(), disclosures
-        ])
-        top.spacing = 8
-        top.alignment = .firstBaseline
-
-        let stack = UIStackView(arrangedSubviews: [
-            top,
+        let stack = UIView.vStack(spacing: 6, [
+            .hStack(alignment: .firstBaseline, spacing: 8, [
+                title, pin, UIView(), accessory
+            ]),
             details
         ])
-        stack.axis = .vertical
-        stack.spacing = 6
 
         contentView.addSubview(stack)
         stack.pinToSuperview(insets: .init(top: 12, left: 16, bottom: 12, right: 16))
@@ -64,23 +45,23 @@ final class ConsoleMessageTableCell: UITableViewCell, UIContextMenuInteractionDe
         self.addInteraction(interaction)
     }
 
-    func display(_ model: ConsoleMessageViewModel) {
-        self.model = model
+    func display(_ viewModel: ConsoleMessageViewModel) {
+        self.viewModel = viewModel
 
-        title.attributedText = model.attributedTitle
-        details.text = model.text
-        details.textColor = model.textColor2
-        timeLabel.text = model.time
-        pin.bind(viewModel: model.pinViewModel)
+        title.attributedText = viewModel.attributedTitle
+        details.text = viewModel.text
+        details.textColor = viewModel.textColor2
+        accessory.textLabel.text = viewModel.time
+        pin.bind(viewModel: viewModel.pinViewModel)
     }
 
     func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
-        guard let model = model else {
+        guard let viewModel = viewModel else {
             return nil
         }
 
         return UIContextMenuConfiguration(identifier: nil, previewProvider: nil, actionProvider: { _ in
-            return self.makeMenu(for: model)
+            return self.makeMenu(for: viewModel)
         })
     }
 
@@ -109,6 +90,31 @@ final class ConsoleMessageTableCell: UITableViewCell, UIContextMenuInteractionDe
         let filtersGroup = UIMenu(title: "Filter", options: [.displayInline], children: [focus, hide])
 
         return UIMenu(title: "", options: [.displayInline], children: [shareGroup, filtersGroup, pin])
+    }
+}
+
+@available(iOS 13.0, *)
+final class ConsoleMessageAccessoryView: UIView {
+    let textLabel = UILabel()
+
+    private static var chevron = UIImage.make(systemName: "chevron.right", textStyle: .caption1)
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+
+        textLabel.font = .preferredFont(forTextStyle: .caption1)
+        textLabel.textColor = .secondaryLabel
+
+        let disclosureIndicator = UIImageView(image: ConsoleMessageAccessoryView.chevron)
+        disclosureIndicator.tintColor = .separator
+
+        let stack = UIStackView.hStack(spacing: 6, [textLabel, disclosureIndicator])
+        addSubview(stack)
+        stack.pinToSuperview()
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }
 

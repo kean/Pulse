@@ -22,7 +22,7 @@ final class ConsoleMessageViewModel {
 
     #warning("refactor")
     #if os(iOS)
-    lazy var time = ConsoleMessageViewModel.timeFormatter2.string(from: message.createdAt)
+    lazy var time = ConsoleMessageViewModel.timeFormatter.string(from: message.createdAt)
     lazy var textColor2 = UIColor.textColor(for: LoggerStore.Level(rawValue: message.level) ?? .debug)
     lazy var attributedTitle: NSAttributedString = {
         let string = NSMutableAttributedString()
@@ -41,12 +41,6 @@ final class ConsoleMessageViewModel {
     static let timeFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm:ss.SSS"
-        return formatter
-    }()
-
-    static let timeFormatter2: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "HH:mm:ss"
         return formatter
     }()
 
