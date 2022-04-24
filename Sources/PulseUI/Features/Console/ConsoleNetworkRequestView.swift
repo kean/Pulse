@@ -54,7 +54,6 @@ struct ConsoleNetworkRequestView: View {
         #endif
     }
 
-    #warning("TODO: remove this")
     private var statusCircle: some View {
         Circle()
             .frame(width: circleSize, height: circleSize)
