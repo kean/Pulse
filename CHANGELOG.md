@@ -1,6 +1,12 @@
 # Pulse 1.x
 
-## Pulse 0.20.2
+## Pulse 1.0.1
+
+*Apr 24, 2022*
+
+- [iOS] Fix labels not loading in console filters
+
+## Pulse 1.0.0
 
 *Apr 23, 2022*
 
