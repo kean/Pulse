@@ -87,6 +87,12 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
             }
         }).store(in: &cancellables)
 #endif
+
+#if os(iOS)
+        store.backgroundContext.perform {
+            self.getAllLabels()
+        }
+#endif
     }
 
     // MARK: Refresh
@@ -110,6 +116,28 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         try? controller.performFetch()
 
         self.messages = controller.fetchedObjects ?? []
+    }
+
+    // MARK: Labels
+
+    private func getAllLabels() {
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "\(LoggerMessageEntity.self)")
+
+        // Required! Unless you set the resultType to NSDictionaryResultType, distinct can't work.
+        // All objects in the backing store are implicitly distinct, but two dictionaries can be duplicates.
+        // Since you only want distinct names, only ask for the 'name' property.
+        fetchRequest.resultType = .dictionaryResultType
+        fetchRequest.propertiesToFetch = ["label"]
+        fetchRequest.returnsDistinctResults = true
+
+        // Now it should yield an NSArray of distinct values in dictionaries.
+        let map = (try? store.backgroundContext.fetch(fetchRequest)) ?? []
+        let values = (map as? [[String: String]])?.compactMap { $0["label"] }
+        let set = Set(values ?? [])
+
+        DispatchQueue.main.async {
+            self.searchCriteria.setInitialLabels(set)
+        }
     }
 
     // MARK: Pins
@@ -150,6 +178,17 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 #endif
 
     // MARK: - NSFetchedResultsControllerDelegate
+
+    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+        switch type {
+        case .insert:
+            if let entity = anObject as? LoggerMessageEntity {
+                searchCriteria.didInsertEntity(entity)
+            }
+        default:
+            break
+        }
+    }
 
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         self.messages = self.controller.fetchedObjects ?? []
