@@ -105,7 +105,7 @@ struct NetworkInspectorView: View {
                     Text("Response").tag(NetworkInspectorTab.response)
                     Text("Metrics").tag(NetworkInspectorTab.metrics)
                 }
-                .pickerStyle(SegmentedPickerStyle())
+                .pickerStyle(.segmented)
                 Spacer()
                 Menu(content: {
                     ShareMenuContent(model: .url, items: [model.prepareForSharing()])
@@ -126,7 +126,7 @@ struct NetworkInspectorView: View {
                 Text("Headers").tag(NetworkInspectorTab.headers)
                 Text("Metrics").tag(NetworkInspectorTab.metrics)
             }
-            .pickerStyle(SegmentedPickerStyle())
+            .pickerStyle(.segmented)
             .padding(13)
             .border(width: 1, edges: [.bottom], color: Color(UXColor.separator).opacity(0.3))
 

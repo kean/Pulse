@@ -174,7 +174,7 @@ private struct SearchToobar: View {
             }, onReturn: viewModel.nextMatch).frame(maxWidth: 240)
 
             StringSearchOptionsMenu(options: $viewModel.options, isKindNeeded: false)
-                .menuStyle(BorderlessButtonMenuStyle())
+                .menuStyle(.borderlessButton)
                 .fixedSize()
 
             Spacer()
@@ -185,10 +185,10 @@ private struct SearchToobar: View {
                     .foregroundColor(.secondary)
                 Button(action: viewModel.previousMatch) {
                     Image(systemName: "chevron.left")
-                }.buttonStyle(PlainButtonStyle())
+                }.buttonStyle(.plain)
                 Button(action: viewModel.nextMatch) {
                     Image(systemName: "chevron.right")
-                }.buttonStyle(PlainButtonStyle())
+                }.buttonStyle(.plain)
             }
             .fixedSize()
         }

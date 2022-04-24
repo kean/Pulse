@@ -33,12 +33,12 @@ struct RemoteLoggerSettingsView: View {
     private var progressView: some View {
         #if os(watchOS)
         ProgressView()
-            .progressViewStyle(CircularProgressViewStyle())
+            .progressViewStyle(.circular)
             .frame(idealWidth: .infinity, alignment: .center)
         #else
         HStack(spacing: 8) {
             ProgressView()
-                .progressViewStyle(CircularProgressViewStyle())
+                .progressViewStyle(.circular)
             Text("Searching...")
                 .foregroundColor(.secondary)
         }
@@ -57,7 +57,7 @@ struct RemoteLoggerSettingsView: View {
                             .frame(width: 21, height: 36, alignment: .center)
                     } else {
                         ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle())
+                            .progressViewStyle(.circular)
                             .frame(width: 21, height: 36, alignment: .leading)
                     }
                 } else {
