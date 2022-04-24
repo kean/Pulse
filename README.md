@@ -10,7 +10,6 @@ Record and inspect logs and `URLSession` network requests right from your iOS ap
 <br/>
 <br/>
 <br/>
-<br/>
 
 <img width="2100" alt="02" src="https://user-images.githubusercontent.com/1567433/164947161-3e9a5343-9c4c-4d03-a4f0-24fb0a71b94d.png">
 <br/>
