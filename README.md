@@ -24,14 +24,6 @@ Record and inspect logs and `URLSession` network requests right from your iOS ap
 <img width="2100" alt="07" src="https://user-images.githubusercontent.com/1567433/164947168-5e163b13-42b0-40f3-abc3-47197058e11a.png">
 <br/>
 
-## Pulse Pro
-
-[**Pulse Pro**](https://kean.blog/pulse/guides/pulse-pro) is an advanced macOS app providing ultimate logging experience.
-
-<img width="2100" alt="08" src="https://user-images.githubusercontent.com/1567433/141652571-789aae3e-10b9-461f-bd51-a4a44110140f.png">
-
-<br/>
-
 ## About
 
 `Pulse` is not a tool, it's a framework. It records events from `URLSession` or from frameworks that use it, such as `Alamofire`, and displays them using `PulseUI` views that you integrate directly into your app. This way Pulse console is available for everyone who has your test builds. You or your QA team can view the logs on the device and easily share them to attach to bug reports.
@@ -48,6 +40,10 @@ Pulse is easy to learn and use thanks to [**Pulse Docs**](https://kean.blog/puls
 <a href="https://kean.blog/pulse/home">
 <img src="https://user-images.githubusercontent.com/1567433/115163600-eea0cc80-a077-11eb-8b86-3113a657816f.png">
 </a>
+
+## Pulse Pro
+
+[**Pulse Pro**](https://kean.blog/pulse/guides/pulse-pro) is a professional open-source macOS app that allows you to view logs in real-time. The app is designed to be flexible, expansive, and precise while using all the familiar macOS patterns. It makes it easy to navigate large log files with table and text modes, filters, scroller markers, an all-new network inspector, JSON filters, and more.
 
 ## Dependencies
 
