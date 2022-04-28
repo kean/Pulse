@@ -23,11 +23,13 @@ public struct MainView: View {
     public var body: some View {
         TabView {
             ForEach(viewModel.items) { item in
-                viewModel.makeView(for: item)
-                    .tabItem {
-                        Image(systemName: item.imageName)
-                        Text(item.title)
-                    }
+                NavigationView {
+                    viewModel.makeView(for: item)
+                        .tabItem {
+                            Image(systemName: item.imageName)
+                            Text(item.title)
+                        }
+                }
             }
         }
     }
