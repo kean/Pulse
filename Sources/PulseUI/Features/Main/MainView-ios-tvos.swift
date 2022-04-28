@@ -25,10 +25,9 @@ public struct MainView: View {
             ForEach(viewModel.items) { item in
                 NavigationView {
                     viewModel.makeView(for: item)
-                        .tabItem {
-                            Image(systemName: item.imageName)
-                            Text(item.title)
-                        }
+                }.tabItem {
+                    Image(systemName: item.imageName)
+                    Text(item.title)
                 }
             }
         }
