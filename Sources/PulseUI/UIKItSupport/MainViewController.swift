@@ -48,7 +48,7 @@ public final class MainViewController: UITabBarController {
         }
         viewControllers = model.items.enumerated().map {
             let item = $0.element
-            let vc = UIHostingController(rootView: model.makeView(for: item))
+            let vc = UINavigationController(rootViewController: UIHostingController(rootView: model.makeView(for: item)))
             vc.tabBarItem = UITabBarItem(title: item.title, image: UIImage(systemName: item.imageName), tag: $0.offset)
             return vc
         }
