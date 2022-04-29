@@ -1,5 +1,13 @@
 # Pulse 1.x
 
+## Pulse 1.0.2
+
+*Apr 28, 2022*
+
+- Fix [#74](https://github.com/kean/Pulse/issues/74) – crash on Network view
+- Fix search bar behavior (replace TextField with UISearchBar)
+- Fix gray area at the bottom of MainViewController - [#73](https://github.com/kean/Pulse/pull/73), thanks to [TBXark](https://github.com/TBXark)
+
 ## Pulse 1.0.1
 
 *Apr 24, 2022*
