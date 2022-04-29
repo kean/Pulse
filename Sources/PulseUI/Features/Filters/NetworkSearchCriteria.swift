@@ -370,7 +370,7 @@ extension NetworkSearchCriteria {
         }
 
         if filterTerm.count > 1 {
-            predicates.append(NSPredicate(format: "text CONTAINS[cd] %@", filterTerm))
+            predicates.append(NSPredicate(format: "url CONTAINS[cd] %@", filterTerm))
         }
 
         if criteria.isFiltersEnabled {
