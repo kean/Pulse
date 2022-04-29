@@ -9,32 +9,49 @@ import Combine
 #if os(iOS)
 
 @available(iOS 13.0, *)
-struct SearchBar: View {
+struct SearchBar: UIViewRepresentable {
     let title: String
     @Binding var text: String
     var onEditingChanged: ((_ isEditing: Bool) -> Void)?
 
-    var body: some View {
-        HStack {
-            Image(systemName: "magnifyingglass").opacity(0.33)
-            textField
-            if !text.isEmpty { buttonClear }
+    final class Coordinator: NSObject, UISearchBarDelegate {
+        @Binding var text: String
+        let onEditingChanged: ((_ isEditing: Bool) -> Void)?
+
+        init(text: Binding<String>,
+             onEditingChanged: ((_ isEditing: Bool) -> Void)?) {
+            self._text = text
+            self.onEditingChanged = onEditingChanged
         }
-        .addSearchBarIshBackground(padding: 8)
+
+        func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+            self.text = searchText
+        }
+
+        func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
+
+        }
+
+        func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
+
+        }
     }
 
-    private var textField: some View {
-        TextField(title, text: $text, onEditingChanged: { onEditingChanged?($0) })
-            .disableAutocorrection(true)
-            .autocapitalization(.none)
+    func makeCoordinator() -> Coordinator {
+        Coordinator(text: $text, onEditingChanged: onEditingChanged)
     }
 
-    private var buttonClear: some View {
-        Button(action: { self.text = "" }) {
-            Image(systemName: "xmark.circle.fill")
-        }
-        .foregroundColor(.secondaryFill)
-        .buttonStyle(.plain)
+    func makeUIView(context: Context) -> UISearchBar {
+        let searchBar = UISearchBar()
+        searchBar.placeholder = title
+        searchBar.text = text
+        searchBar.searchBarStyle = .minimal
+        searchBar.delegate = context.coordinator
+        return searchBar
+    }
+
+    func updateUIView(_ uiView: UISearchBar, context: Context) {
+        // Do nothing
     }
 }
 

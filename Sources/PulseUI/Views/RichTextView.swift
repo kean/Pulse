@@ -32,7 +32,7 @@ struct RichTextView: View {
     #if os(iOS)
     var body: some View {
         VStack(spacing: 0) {
-            HStack(spacing: 16) {
+            HStack(spacing: 8) {
                 SearchBar(title: "Search", text: $viewModel.searchTerm, onEditingChanged: { isEditing in
                     if isEditing {
                         viewModel.isSearching = isEditing
@@ -43,7 +43,8 @@ struct RichTextView: View {
                     StringSearchOptionsMenu(options: $viewModel.options, isKindNeeded: false)
                 }
             }
-            .padding(12)
+            .padding(4)
+            .padding(.trailing, 12)
             .border(width: 1, edges: [.bottom], color: Color.separator.opacity(0.3))
 
             WrappedTextView(text: viewModel.text, viewModel: viewModel, isAutomaticLinkDetectionEnabled: isAutomaticLinkDetectionEnabled)

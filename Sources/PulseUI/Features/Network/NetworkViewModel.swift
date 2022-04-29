@@ -49,7 +49,7 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 
         controller.delegate = self
 
-        $filterTerm.throttle(for: 0.33, scheduler: RunLoop.main, latest: true).dropFirst().sink { [weak self] filterTerm in
+        $filterTerm.dropFirst().sink { [weak self] filterTerm in
             self?.refresh(filterTerm: filterTerm)
         }.store(in: &cancellables)
 

@@ -117,7 +117,7 @@ private struct ConsoleToolbarView: View {
                 }.frame(width: 40, height: 44)
             }.buttonStyle(.plain)
         }
-        .padding(EdgeInsets(top: 2, leading: 16, bottom: 2, trailing: 8))
+        .padding(EdgeInsets(top: 2, leading: 8, bottom: 2, trailing: 8))
         .sheet(isPresented: $isShowingFilters) {
             NavigationView {
                 ConsoleFiltersView(viewModel: viewModel.searchCriteria, isPresented: $isShowingFilters)
