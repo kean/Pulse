@@ -9,8 +9,6 @@ import Combine
 
 #if os(iOS)
 
-#warning("TODO: fix an issue where labels are not displayed")
-
 @available(iOS 13.0, *)
 struct ConsoleFiltersView: View {
     @ObservedObject var viewModel: ConsoleSearchCriteriaViewModel
