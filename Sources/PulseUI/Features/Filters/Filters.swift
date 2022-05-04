@@ -94,6 +94,15 @@ struct DateRangePicker: View {
     @Binding var isEnabled: Bool
 
     var body: some View {
+        if #available(iOS 14.0, *) {
+            newBody
+        } else {
+            oldBody
+        }
+    }
+
+    @ViewBuilder
+    private var newBody: some View {
         VStack(spacing: 8) {
             HStack {
                 Text(title)
@@ -108,6 +117,24 @@ struct DateRangePicker: View {
                 Spacer()
             }
         }.frame(height: 84)
+    }
+
+    @ViewBuilder
+    private var oldBody: some View {
+        NavigationLink(destination: DatePicker(title, selection: $date)
+            .navigationBarTitle(title)
+            .labelsHidden()) {
+                HStack {
+                    Toggle(title, isOn: $isEnabled)
+                        .fixedSize()
+                        .labelsHidden()
+                    Text(title)
+                        .padding(.leading, 6)
+                    Spacer()
+                    Text(DateFormatter.localizedString(from: date, dateStyle: .short, timeStyle: .short))
+                        .foregroundColor(.secondary)
+                }
+            }
     }
 }
 #endif
