@@ -94,11 +94,15 @@ struct DateRangePicker: View {
     @Binding var isEnabled: Bool
 
     var body: some View {
+#if os(iOS)
         if #available(iOS 14.0, *) {
             newBody
         } else {
             oldBody
         }
+#else
+        newBody
+#endif
     }
 
     @ViewBuilder
@@ -119,6 +123,7 @@ struct DateRangePicker: View {
         }.frame(height: 84)
     }
 
+#if os(iOS)
     @ViewBuilder
     private var oldBody: some View {
         NavigationLink(destination: DatePicker(title, selection: $date)
@@ -136,6 +141,7 @@ struct DateRangePicker: View {
                 }
             }
     }
+#endif
 }
 #endif
 
