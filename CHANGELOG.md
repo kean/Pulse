@@ -1,5 +1,13 @@
 # Pulse 1.x
 
+## Pulse 1.0.3
+
+*May 3, 2022*
+
+- Fix missing tab bar icons on iOS 13 – [#77](https://github.com/kean/Pulse/issues/77)
+- Fix Network view filters on iOS 13 – [#77](https://github.com/kean/Pulse/issues/77)
+- Fix Time Period filter design on iOS 13 
+
 ## Pulse 1.0.2
 
 *Apr 28, 2022*
