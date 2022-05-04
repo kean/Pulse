@@ -28,7 +28,7 @@ public struct NetworkView: View {
     #if os(iOS)
     public var body: some View {
         ConsoleTableView(
-            header: { toolbar },
+            header: { NetworkToolbarView(viewModel: viewModel) },
             viewModel: viewModel.table
         )
         .overlay(tableOverlay)
@@ -36,31 +36,6 @@ public struct NetworkView: View {
         .navigationBarItems(leading: viewModel.onDismiss.map { Button(action: $0) { Image(systemName: "xmark") } })
     }
 
-    private var toolbar: some View {
-        VStack {
-            HStack(spacing: 0) {
-                SearchBar(title: "Search \(viewModel.entities.count) messages", text: $viewModel.filterTerm)
-                Spacer().frame(width: 10)
-                Button(action: { viewModel.isOnlyErrors.toggle() }) {
-                    Image(systemName: viewModel.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon")
-                        .font(.system(size: 20))
-                        .foregroundColor(.accentColor)
-                }.frame(width: 40, height: 44)
-                Button(action: { isShowingFilters = true }) {
-                    Image(systemName: "line.horizontal.3.decrease.circle")
-                        .font(.system(size: 20))
-                        .foregroundColor(.accentColor)
-                }.frame(width: 40, height: 44)
-            }.buttonStyle(.plain)
-        }
-        .padding(EdgeInsets(top: 2, leading: 8, bottom: 2, trailing: 8))
-        .sheet(isPresented: $isShowingFilters) {
-            NavigationView {
-                NetworkFiltersView(viewModel: viewModel.searchCriteria, isPresented: $isShowingFilters)
-            }
-        }
-    }
-    
     @ViewBuilder
     private var tableOverlay: some View {
         if viewModel.entities.isEmpty {
@@ -89,6 +64,37 @@ public struct NetworkView: View {
         }
     }
     #endif
+}
+
+@available(iOS 13.0, *)
+private struct NetworkToolbarView: View {
+    @ObservedObject var viewModel: NetworkViewModel
+    @State private var isShowingFilters = false
+
+    var body: some View {
+        VStack {
+            HStack(spacing: 0) {
+                SearchBar(title: "Search \(viewModel.entities.count) messages", text: $viewModel.filterTerm)
+                Spacer().frame(width: 10)
+                Button(action: { viewModel.isOnlyErrors.toggle() }) {
+                    Image(systemName: viewModel.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon")
+                        .font(.system(size: 20))
+                        .foregroundColor(.accentColor)
+                }.frame(width: 40, height: 44)
+                Button(action: { isShowingFilters = true }) {
+                    Image(systemName: "line.horizontal.3.decrease.circle")
+                        .font(.system(size: 20))
+                        .foregroundColor(.accentColor)
+                }.frame(width: 40, height: 44)
+            }.buttonStyle(.plain)
+        }
+        .padding(EdgeInsets(top: 2, leading: 8, bottom: 2, trailing: 8))
+        .sheet(isPresented: $isShowingFilters) {
+            NavigationView {
+                NetworkFiltersView(viewModel: viewModel.searchCriteria, isPresented: $isShowingFilters)
+            }
+        }
+    }
 }
 
 #if DEBUG
