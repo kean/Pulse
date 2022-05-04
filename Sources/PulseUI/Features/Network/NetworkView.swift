@@ -66,6 +66,7 @@ public struct NetworkView: View {
     #endif
 }
 
+#if os(iOS)
 @available(iOS 13.0, *)
 private struct NetworkToolbarView: View {
     @ObservedObject var viewModel: NetworkViewModel
@@ -96,6 +97,7 @@ private struct NetworkToolbarView: View {
         }
     }
 }
+#endif
 
 #if DEBUG
 @available(iOS 13.0, tvOS 14.0, *)
