@@ -541,14 +541,16 @@ extension LoggerStore {
     }
 
     /// Removes all of the previously recorded messages.
-    public func removeAll() {
-        backgroundContext.perform(_removeAll)
+    public func removeAll(_ predicate: NSPredicate? = nil) {
+        backgroundContext.perform { self._removeAll(predicate) }
     }
 
-    private func _removeAll() {
+    private func _removeAll(_ predicate: NSPredicate? = nil) {
         switch document {
         case .directory(let blobs):
-            try? deleteMessages(fetchRequest: LoggerMessageEntity.fetchRequest())
+            let fetch = LoggerMessageEntity.fetchRequest()
+            if let predicate = predicate { fetch.predicate = predicate }
+            try? deleteMessages(fetchRequest: fetch)
             blobs.removeAll()
         case .file, .empty:
             break // Do nothing, readonly
