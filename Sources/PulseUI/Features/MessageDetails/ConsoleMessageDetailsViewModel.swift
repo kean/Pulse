@@ -29,7 +29,7 @@ final class ConsoleMessageDetailsViewModel {
     init(store: LoggerStore, message: LoggerMessageEntity) {
         self.store = store
         self.message = message
-        self.tags = [
+        self.tags = message.metadata.reduce(into: [
             ConsoleMessageTagViewModel(
                 title: "Date",
                 value: ConsoleMessageDetailsViewModel.dateFormatter
@@ -39,7 +39,10 @@ final class ConsoleMessageDetailsViewModel {
                 title: "Label",
                 value: message.label
             )
-        ]
+        ]) {
+            $0.append(.init(title: $1.key, value: $1.value))
+        }
+
         self.text = message.text
         self.badge = BadgeViewModel(message: message)
     }
