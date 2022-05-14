@@ -35,10 +35,21 @@ struct ConsoleMessageDetailsView: View {
     #elseif os(watchOS)
     var body: some View {
         ScrollView {
-            contents
-        }.toolbar(content: {
-            PinButton(viewModel: viewModel.pin, isTextNeeded: false)
-        })
+            VStack {
+                HStack {
+                    PinButton3(viewModel: viewModel.pin)
+                    NavigationLink(destination: ConsoleMessageMetadataView(message: viewModel.message)) {
+                        VStack(spacing: 4) {
+                            Image(systemName: "info.circle")
+                                .foregroundColor(.blue)
+                            Text("Details")
+                                .font(.caption2)
+                        }.frame(height: 42)
+                    }
+                }
+                contents
+            }
+        }
     }
     #elseif os(tvOS)
     var body: some View {

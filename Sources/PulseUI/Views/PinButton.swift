@@ -34,6 +34,24 @@ struct PinButton2: View {
     }
 }
 
+#if os(watchOS)
+@available(iOS 14.0, tvOS 14.0, watchOS 7.0, *)
+struct PinButton3: View {
+    @ObservedObject var viewModel: PinButtonViewModel
+
+    var body: some View {
+        Button(action: viewModel.togglePin) {
+            VStack(spacing: 4) {
+                Image(systemName: viewModel.isPinned ? "pin.slash" : "pin")
+                    .foregroundColor(.blue)
+                Text(viewModel.isPinned ? "Remove Pin" : "Pin")
+                    .font(.caption2)
+            }.frame(height: 42)
+        }
+    }
+}
+#endif
+
 #if os(iOS)
 @available(iOS 13.0, *)
 extension UIAction {

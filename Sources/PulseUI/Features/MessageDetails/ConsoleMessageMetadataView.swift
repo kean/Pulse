@@ -23,22 +23,33 @@ struct ConsoleMessageMetadataView: View {
     @ViewBuilder
     private var contents: some View {
         ScrollView {
+            #if os(iOS) || os(tvOS)
             VStack {
-                KeyValueSectionView(viewModel: .init(title: "Summary", color: message.tintColor, items: [
-                    ("Created At", dateFormatter.string(from: message.createdAt)),
-                    ("Level", message.level),
-                    ("Label", message.label.nonEmpty)
-                ]))
-                KeyValueSectionView(viewModel: .init(title: "Details", color: .secondary, items: [
-                    ("Session", message.session.nonEmpty),
-                    ("File", message.file.nonEmpty),
-                    ("Filename", message.filename.nonEmpty),
-                    ("Function", message.function.nonEmpty),
-                    ("Line", message.line == 0 ? nil : "\(message.line)"),
-                ]))
-                KeyValueSectionView(viewModel: metadataViewModel)
+                stackContents
             }.padding()
+            #elseif os(watchOS)
+            VStack(spacing: 16) {
+                stackContents
+            }
+            #endif
         }
+    }
+
+    @ViewBuilder
+    private var stackContents: some View {
+        KeyValueSectionView(viewModel: .init(title: "Summary", color: message.tintColor, items: [
+            ("Created At", dateFormatter.string(from: message.createdAt)),
+            ("Level", message.level),
+            ("Label", message.label.nonEmpty)
+        ]))
+        KeyValueSectionView(viewModel: .init(title: "Details", color: .secondary, items: [
+            ("Session", message.session.nonEmpty),
+            ("File", message.file.nonEmpty),
+            ("Filename", message.filename.nonEmpty),
+            ("Function", message.function.nonEmpty),
+            ("Line", message.line == 0 ? nil : "\(message.line)"),
+        ]))
+        KeyValueSectionView(viewModel: metadataViewModel)
     }
 
     private var metadataViewModel: KeyValueSectionViewModel {
@@ -52,11 +63,9 @@ struct ConsoleMessageMetadataView: View {
     }
 
     private var linksView: some View {
-        VStack {
             NavigationLink(destination: NetworkHeadersDetailsView(viewModel: metadataViewModel), isActive: $isMetadataRawLinkActive) {
                 EmptyView()
-            }
-        }
+            }.opacity(0)
     }
 }
 
