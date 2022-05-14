@@ -16,9 +16,12 @@ struct ConsoleMessageDetailsView: View {
     var body: some View {
         contents
             .navigationBarTitle("", displayMode: .inline)
-            .navigationBarItems(trailing: HStack(spacing: 18) {
+            .navigationBarItems(trailing: HStack(spacing: 14) {
                 if let badge = viewModel.badge {
                     BadgeView(viewModel: BadgeViewModel(title: badge.title, color: badge.color.opacity(colorScheme == .light ? 0.25 : 0.5)))
+                }
+                NavigationLink(destination: ConsoleMessageMetadataView(message: viewModel.message)) {
+                    Image(systemName: "info.circle")
                 }
                 PinButton(viewModel: viewModel.pin, isTextNeeded: false)
                 ShareButton {
@@ -45,7 +48,6 @@ struct ConsoleMessageDetailsView: View {
 
     private var contents: some View {
         VStack {
-            tags
             textView
         }.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
@@ -76,25 +78,40 @@ struct ConsoleMessageDetailsView: View {
         .background(Color.gray.opacity(0.15))
         .cornerRadius(8)
     }
-    #else
-    private var tags: some View {
-        VStack(alignment: .leading) {
-            ForEach(viewModel.tags, id: \.title) { tag in
-                HStack {
-                    Text(tag.title)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    Text(tag.value)
-                        .font(.caption)
-                        .bold()
-                        .foregroundColor(.secondary)
-                }
-            }
-        }
-        .padding(16)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color.gray.opacity(0.15))
-    }
     #endif
 }
+
+#if DEBUG
+@available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
+struct ConsoleMessageDetailsView_Previews: PreviewProvider {
+    static var previews: some View {
+        Group {
+            NavigationView {
+                ConsoleMessageDetailsView(viewModel: .init(store: LoggerStore.mock, message: makeMockMessage()))
+            }
+        }
+    }
+}
+
+func makeMockMessage() -> LoggerMessageEntity {
+    let entity = LoggerMessageEntity(context: LoggerStore.mock.container.viewContext)
+    entity.text = "test"
+    entity.createdAt = Date()
+    entity.label = "auth"
+    entity.level = "critical"
+    entity.session = UUID().uuidString
+    entity.file = "~/Develop/Pulse/LoggerStore.swift"
+    entity.filename = "LoggerStore.swift"
+    entity.function = "createMockMessage()"
+    entity.line = 12
+
+    let meta = LoggerMetadataEntity(context: LoggerStore.mock.container.viewContext)
+    meta.key = "customKey"
+    meta.value = "customValue"
+
+    entity.metadata = Set([meta])
+    return entity
+}
+#endif
+
 #endif
