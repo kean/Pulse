@@ -38,7 +38,7 @@ struct ConsoleMessageMetadataView: View {
     @ViewBuilder
     private var stackContents: some View {
         KeyValueSectionView(viewModel: .init(title: "Summary", color: message.tintColor, items: [
-            ("Created At", dateFormatter.string(from: message.createdAt)),
+            ("Date", dateFormatter.string(from: message.createdAt)),
             ("Level", message.level),
             ("Label", message.label.nonEmpty)
         ]))
