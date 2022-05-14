@@ -4,7 +4,8 @@
 
 *May 14, 2022*
 
-- Update message details design, display custom metadata – [#81](https://github.com/kean/Pulse/pull/81) 
+- [iOS, watchOS] Update message details design, display custom metadata – [#81](https://github.com/kean/Pulse/pull/81)
+- [iOS] Fix an issue with search toolbar not showing up during searching
 
 ## Pulse 1.0.3
 
