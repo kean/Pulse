@@ -13,7 +13,7 @@ final class ConsoleMessageDetailsViewModel {
     let text: String
     let badge: BadgeViewModel?
 
-    private let message: LoggerMessageEntity
+    let message: LoggerMessageEntity
     private let store: LoggerStore
 
     static let dateFormatter: DateFormatter = {

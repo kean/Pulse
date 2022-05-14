@@ -29,11 +29,11 @@ struct SearchBar: UIViewRepresentable {
         }
 
         func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
-
+            self.onEditingChanged?(true)
         }
 
         func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
-
+            self.onEditingChanged?(false)
         }
     }
 
