@@ -131,9 +131,12 @@ private struct ConsoleToolbarView: View {
 struct ConsoleView_Previews: PreviewProvider {
     static var previews: some View {
         return Group {
-            ConsoleView(viewModel: .init(store: .mock))
-            ConsoleView(viewModel: .init(store: .mock))
-                .environment(\.colorScheme, .dark)
+            NavigationView {
+                ConsoleView(viewModel: .init(store: .mock))
+            }
+            NavigationView {
+                ConsoleView(viewModel: .init(store: .mock))
+            }.environment(\.colorScheme, .dark)
         }
     }
 }
