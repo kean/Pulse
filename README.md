@@ -7,6 +7,10 @@ Record and inspect logs and `URLSession` network requests right from your iOS ap
 
 > [Get](https://github.com/kean/Get), web API client built using async/await, has first-class Pulse integration.
 
+## Sponsors 💖
+
+[Support](https://github.com/sponsors/kean) Pulse on GitHub Sponsors.
+
 <br/>
 <br/>
 <br/>
