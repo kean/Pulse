@@ -5,10 +5,16 @@
 import Foundation
 
 /// Automates URLSession request tracking.
+///
+/// - important: On iOS 16.0, tvOS 16.0, macOS 13.0, watchOS 9.0, it automatically
+/// tracks new task creation using the `urlSession(_:didCreateTask:)` delegate
+/// method which allows the logger to start tracking network requests right
+/// after their creation. On earlier versions, you can (optionally) call
+/// ``NetworkLogger/logTaskCreated(_:)`` manually.
 public final class URLSessionProxyDelegate: NSObject, URLSessionTaskDelegate, URLSessionDataDelegate {
     private var actualDelegate: URLSessionDelegate?
     private var taskDelegate: URLSessionTaskDelegate?
-    private let interceptedSelectors: Set<Selector>
+    private var interceptedSelectors: Set<Selector>
     private let logger: NetworkLogger
 
     /// - parameter logger: By default, creates a logger with `LoggerStore.default`.
@@ -16,16 +22,32 @@ public final class URLSessionProxyDelegate: NSObject, URLSessionTaskDelegate, UR
     public init(logger: NetworkLogger = .init(), delegate: URLSessionDelegate? = nil) {
         self.actualDelegate = delegate
         self.taskDelegate = delegate as? URLSessionTaskDelegate
+        self.logger = logger
         self.interceptedSelectors = [
             #selector(URLSessionDataDelegate.urlSession(_:dataTask:didReceive:)),
             #selector(URLSessionTaskDelegate.urlSession(_:task:didCompleteWithError:)),
             #selector(URLSessionDataDelegate.urlSession(_:dataTask:didReceive:completionHandler:)),
             #selector(URLSessionTaskDelegate.urlSession(_:task:didFinishCollecting:))
         ]
-        self.logger = logger
+#if swift(>=5.7)
+        if #available(iOS 16.0, tvOS 16.0, macOS 13.0, watchOS 9.0, *) {
+            self.interceptedSelectors.insert(
+                #selector(URLSessionTaskDelegate.urlSession(_:didCreateTask:))
+            )
+        }
+#endif
     }
 
     // MARK: URLSessionTaskDelegate
+
+#if swift(>=5.7)
+    public func urlSession(_ session: URLSession, didCreateTask task: URLSessionTask) {
+        logger.logTaskCreated(task)
+        if #available(iOS 16.0, tvOS 16.0, macOS 13.0, watchOS 9.0, *) {
+            taskDelegate?.urlSession?(session, didCreateTask: task)
+        }
+    }
+#endif
 
     public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         logger.logTask(task, didCompleteWithError: error, session: session)

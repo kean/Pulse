@@ -116,7 +116,7 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
 
     public enum State: Int16 {
         // 0 reserved for undefined
-        case pending = 1 // not used yet
+        case pending = 1
         case success = 2
         case failure = 3
     }

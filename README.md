@@ -65,4 +65,3 @@ Pulse is easy to learn and use thanks to [**Pulse Docs**](https://kean.blog/puls
 ## License
 
 Pulse is available under the MIT license. See the LICENSE file for more info.
-
