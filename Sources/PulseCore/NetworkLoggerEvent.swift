@@ -183,7 +183,7 @@ public enum NetworkLoggerTaskType: String, Codable {
         case task as URLSessionDownloadTask: self = .downloadTask
         case task as URLSessionStreamTask: self = .streamTask
         case task as URLSessionUploadTask: self = .uploadTask
-        case task is URLSessionWebSocketTask: self = .webSocketTask
+        case task as URLSessionWebSocketTask: self = .webSocketTask
         default:
             assertionFailure("Unknown task type: \(task)")
             self = .dataTask
