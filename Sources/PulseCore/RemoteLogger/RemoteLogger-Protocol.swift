@@ -55,7 +55,7 @@ extension RemoteLogger {
         static func encode(_ message: LoggerStore.NetworkMessage) throws -> Data {
             var contents = [Data]()
 
-            let strippedMessage = LoggerStore.NetworkMessage(createdAt: message.createdAt, request: message.request, response: message.response, error: message.error, requestBody: nil, responseBody: nil, metrics: message.metrics, urlSession: message.urlSession, session: message.session)
+            let strippedMessage = LoggerStore.NetworkMessage(taskId: message.taskId, createdAt: message.createdAt, request: message.request, response: message.response, error: message.error, requestBody: nil, responseBody: nil, metrics: message.metrics, urlSession: message.urlSession, session: message.session)
             let messageData = try JSONEncoder().encode(strippedMessage)
             contents.append(messageData)
 
@@ -107,7 +107,7 @@ extension RemoteLogger {
                 responseBody = data.from(Manifest.size + Int(manifest.messageSize) + Int(manifest.requestBodySize), size: Int(manifest.responseBodySize))
             }
 
-            return LoggerStore.NetworkMessage(createdAt: message.createdAt, request: message.request, response: message.response, error: message.error, requestBody: requestBody, responseBody: responseBody, metrics: message.metrics, urlSession: message.urlSession, session: message.session)
+            return LoggerStore.NetworkMessage(taskId: message.taskId, createdAt: message.createdAt, request: message.request, response: message.response, error: message.error, requestBody: requestBody, responseBody: responseBody, metrics: message.metrics, urlSession: message.urlSession, session: message.session)
         }
     }
 

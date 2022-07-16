@@ -69,14 +69,14 @@ public final class NetworkLogger {
         let data = context.data
         lock.unlock()
 
-        log(LoggedNetworkTask(task: task, session: session, request: request, response: response, data: data, error: error, metrics: metrics))
+        log(taskId: context.taskId, LoggedNetworkTask(task: task, session: session, request: request, response: response, data: data, error: error, metrics: metrics))
     }
 
-    private func log(_ task: LoggedNetworkTask) {
+    private func log(taskId: UUID, _ task: LoggedNetworkTask) {
         guard let task = willLogTask(task) else {
             return
         }
-        store.storeRequest(task.request, response: task.response, error: task.error, data: task.data, metrics: task.metrics, session: task.session)
+        store.storeRequest(taskId: taskId, request: task.request, response: task.response, error: task.error, data: task.data, metrics: task.metrics, session: task.session)
     }
 
     /// Logs the task metrics (optional).
@@ -110,6 +110,7 @@ public final class NetworkLogger {
     private var tasks: [ObjectIdentifier: TaskContext] = [:]
 
     final class TaskContext {
+        let taskId = UUID()
         var request: URLRequest?
         var response: URLResponse?
         lazy var data = Data()

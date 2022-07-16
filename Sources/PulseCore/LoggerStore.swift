@@ -247,13 +247,14 @@ extension LoggerStore {
     /// - note: If you want to store incremental updates to the task, use
     /// `NetworkLogger` instead.
     public func storeRequest(_ request: URLRequest, response: URLResponse?, error: Error?, data: Data?, metrics: URLSessionTaskMetrics? = nil, session: URLSession? = nil) {
-        storeRequest(request, response: response, error: error, data: data, metrics: metrics.map(NetworkLoggerMetrics.init), session: session)
+        storeRequest(taskId: UUID(), request: request, response: response, error: error, data: data, metrics: metrics.map(NetworkLoggerMetrics.init), session: session)
     }
 
-    func storeRequest(_ request: URLRequest, response: URLResponse?, error: Error?, data: Data?, metrics: NetworkLoggerMetrics?, session: URLSession?) {
+    func storeRequest(taskId: UUID, request: URLRequest, response: URLResponse?, error: Error?, data: Data?, metrics: NetworkLoggerMetrics?, session: URLSession?) {
         let date = makeCurrentDate()
         perform {
             let message = NetworkMessage(
+                taskId: taskId,
                 createdAt: date,
                 request: NetworkLoggerRequest(urlRequest: request),
                 response: response.map(NetworkLoggerResponse.init),
@@ -342,7 +343,6 @@ extension LoggerStore {
         entity.statusCode = statusCode
         entity.duration = summary.metrics?.taskInterval.duration ?? 0
         entity.contentType = summary.response?.headers["Content-Type"]
-        entity.isCompleted = true
         let isFailure = errorCode != 0 || (statusCode != 0 && !(200..<400).contains(statusCode))
         entity.requestState = (isFailure ? LoggerNetworkRequestEntity.State.failure : .success).rawValue
         // Details
@@ -469,6 +469,7 @@ extension LoggerStore {
     }
 
     public final class NetworkMessage: Codable {
+        public let taskId: UUID
         public let createdAt: Date
         public let request: NetworkLoggerRequest
         public let response: NetworkLoggerResponse?
@@ -479,7 +480,8 @@ extension LoggerStore {
         public let urlSession: NetworkLoggerURLSession?
         public let session: String
 
-        public init(createdAt: Date, request: NetworkLoggerRequest, response: NetworkLoggerResponse?, error: NetworkLoggerError?, requestBody: Data?, responseBody: Data?, metrics: NetworkLoggerMetrics?, urlSession: NetworkLoggerURLSession?, session: String) {
+        public init(taskId: UUID, createdAt: Date, request: NetworkLoggerRequest, response: NetworkLoggerResponse?, error: NetworkLoggerError?, requestBody: Data?, responseBody: Data?, metrics: NetworkLoggerMetrics?, urlSession: NetworkLoggerURLSession?, session: String) {
+            self.taskId = taskId
             self.createdAt = createdAt
             self.request = request
             self.response = response

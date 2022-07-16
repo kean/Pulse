@@ -49,6 +49,7 @@ public extension LoggerStore {
         ]
 
         request.properties = [
+            NSAttributeDescription(name: "taskId", type: .UUIDAttributeType),
             NSAttributeDescription(name: "createdAt", type: .dateAttributeType),
             NSAttributeDescription(name: "session", type: .stringAttributeType),
             NSAttributeDescription(name: "url", type: .stringAttributeType),
@@ -59,7 +60,6 @@ public extension LoggerStore {
             NSAttributeDescription(name: "statusCode", type: .integer32AttributeType),
             NSAttributeDescription(name: "duration", type: .doubleAttributeType),
             NSAttributeDescription(name: "contentType", type: .stringAttributeType),
-            NSAttributeDescription(name: "isCompleted", type: .booleanAttributeType),
             NSAttributeDescription(name: "requestState", type: .integer16AttributeType),
             NSAttributeDescription(name: "requestBodyKey", type: .stringAttributeType),
             NSAttributeDescription(name: "responseBodyKey", type: .stringAttributeType),
@@ -98,6 +98,7 @@ public final class LoggerMetadataEntity: NSManagedObject {
 
 public final class LoggerNetworkRequestEntity: NSManagedObject {
     // Primary
+    @NSManaged public var taskId: UUID?
     @NSManaged public var createdAt: Date
     @NSManaged public var session: String
     @NSManaged public var message: LoggerMessageEntity?
@@ -111,7 +112,6 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
     @NSManaged public var statusCode: Int32
     @NSManaged public var duration: Double
     @NSManaged public var contentType: String?
-    @NSManaged public var isCompleted: Bool
     /// Contains ``State`` raw value.
     @NSManaged public var requestState: Int16
 
