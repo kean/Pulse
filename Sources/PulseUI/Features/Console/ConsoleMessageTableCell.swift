@@ -8,7 +8,6 @@ import PulseCore
 import Combine
 import UIKit
 
-@available(iOS 13.0, *)
 final class ConsoleMessageTableCell: UITableViewCell, UIContextMenuInteractionDelegate {
     private let title = UILabel()
     private let accessory = ConsoleMessageAccessoryView()
@@ -100,7 +99,6 @@ final class ConsoleMessageTableCell: UITableViewCell, UIContextMenuInteractionDe
     }
 }
 
-@available(iOS 13.0, *)
 final class ConsoleMessageAccessoryView: UIView {
     let textLabel = UILabel()
 

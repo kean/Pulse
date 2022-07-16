@@ -10,7 +10,6 @@ import CoreData
 import Combine
 import UIKit
 
-@available(iOS 13.0, *)
 final class ConsoleTableViewModel {
     let store: LoggerStore
     let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel?
@@ -22,7 +21,6 @@ final class ConsoleTableViewModel {
     }
 }
 
-@available(iOS 13.0, *)
 struct ConsoleTableView<Header: View>: View {
     @ViewBuilder let header: () -> Header
     let viewModel: ConsoleTableViewModel
@@ -49,7 +47,6 @@ struct ConsoleTableView<Header: View>: View {
 ///  - Reload performance issues
 ///  - NavigationLink popped when cell disappears
 ///  - List doesn't keep scroll position when reloaded
-@available(iOS 13.0, *)
 private struct _ConsoleTableView<Header: View>: UIViewControllerRepresentable {
     @ViewBuilder let header: () -> Header
     let viewModel: ConsoleTableViewModel
@@ -70,7 +67,6 @@ private struct _ConsoleTableView<Header: View>: UIViewControllerRepresentable {
     }
 }
 
-@available(iOS 13.0, *)
 final class ConsoleTableViewController: UITableViewController {
     private let viewModel: ConsoleTableViewModel
     private var entities: [NSManagedObject] = []

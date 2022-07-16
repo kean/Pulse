@@ -9,7 +9,6 @@ import Combine
 
 #if os(iOS) || os(tvOS)
 
-@available(iOS 13.0, tvOS 14.0, *)
 public struct NetworkView: View {
     @ObservedObject var viewModel: NetworkViewModel
 
@@ -67,7 +66,6 @@ public struct NetworkView: View {
 }
 
 #if os(iOS)
-@available(iOS 13.0, *)
 private struct NetworkToolbarView: View {
     @ObservedObject var viewModel: NetworkViewModel
     @State private var isShowingFilters = false
@@ -100,7 +98,6 @@ private struct NetworkToolbarView: View {
 #endif
 
 #if DEBUG
-@available(iOS 13.0, tvOS 14.0, *)
 struct NetworkView_Previews: PreviewProvider {
     static var previews: some View {
         return Group {

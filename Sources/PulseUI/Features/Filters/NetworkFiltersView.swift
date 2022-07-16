@@ -9,7 +9,6 @@ import Combine
 
 #if os(iOS)
 
-@available(iOS 13.0, *)
 struct NetworkFiltersView: View {
     @ObservedObject var viewModel: NetworkSearchCriteriaViewModel
 
@@ -234,7 +233,6 @@ private struct CustomNetworkFilterView: View {
     }
 }
 
-@available(iOS 13.0, *)
 struct NetworkFiltersView_Previews: PreviewProvider {
     static var previews: some View {
         Group {

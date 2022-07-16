@@ -9,7 +9,6 @@ import PulseCore
 
 // MARK: - View
 
-@available(iOS 13.0, tvOS 14.0, *)
 struct NetworkInspectorMetricsView: View {
     let viewModel: NetworkInspectorMetricsViewModel
 
@@ -37,7 +36,6 @@ struct NetworkInspectorMetricsView: View {
 
 // MARK: - ViewModel
 
-@available(iOS 13.0, tvOS 14.0, watchOS 6, *)
 final class NetworkInspectorMetricsViewModel {
     let metrics: NetworkLoggerMetrics
     fileprivate let timingModel: [TimingRowSectionViewModel]
@@ -53,7 +51,6 @@ final class NetworkInspectorMetricsViewModel {
     }
 }
 
-@available(iOS 13.0, tvOS 14.0, *)
 private func makeTiming(metrics: NetworkLoggerMetrics) -> [TimingRowSectionViewModel] {
     let taskInterval = metrics.taskInterval
 
@@ -150,7 +147,6 @@ private func makeTiming(metrics: NetworkLoggerMetrics) -> [TimingRowSectionViewM
 // MARK: - Preview
 
 #if DEBUG
-@available(iOS 13.0, tvOS 14.0, *)
 struct NetworkInspectorMetricsView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
@@ -168,7 +164,6 @@ struct NetworkInspectorMetricsView_Previews: PreviewProvider {
     }
 }
 
-@available(iOS 13.0, tvOS 14.0, *)
 private let mockModel = NetworkInspectorMetricsViewModel(
     metrics: MockDataTask.login.metrics
 )

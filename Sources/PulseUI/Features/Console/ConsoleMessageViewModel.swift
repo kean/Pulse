@@ -7,7 +7,6 @@ import PulseCore
 import CoreData
 import Combine
 
-@available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
 final class ConsoleMessageViewModel: Pinnable {
     let title: String
     let text: String
@@ -85,7 +84,6 @@ final class ConsoleMessageViewModel: Pinnable {
     }
 }
 
-@available(iOS 13.0, tvOS 14.0, watchOS 6, *)
 private extension BadgeViewModel {
     init?(message: LoggerMessageEntity) {
         guard let model = LoggerStore.Level(rawValue: message.level).flatMap(BadgeViewModel.init) else {
@@ -104,7 +102,6 @@ private extension BadgeViewModel {
     }
 }
 
-@available(iOS 13.0, tvOS 14.0, watchOS 6.0, *)
 extension Color {
     static func badgeColor(for level: LoggerStore.Level) -> Color {
         switch level {
@@ -132,7 +129,6 @@ extension Color {
 }
 
 #if os(iOS)
-@available(iOS 13.0, *)
 extension UIColor {
     static func badgeColor(for level: LoggerStore.Level) -> UIColor {
         switch level {
@@ -172,7 +168,6 @@ enum ConsoleMessageStyle {
     }
 }
 #else
-@available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
 enum ConsoleMessageStyle {
     static func textColor(level: LoggerStore.Level) -> Color {
         switch level {

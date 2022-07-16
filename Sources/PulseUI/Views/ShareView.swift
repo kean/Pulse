@@ -8,7 +8,6 @@ import SwiftUI
 
 import UIKit
 
-@available(iOS 13.0, *)
 struct ShareView: UIViewControllerRepresentable {
     var activityItems: [Any]
     var applicationActivities: [UIActivity]?
@@ -37,7 +36,6 @@ struct ShareView: UIViewControllerRepresentable {
     }
 }
 
-@available(iOS 13.0, *)
 extension UIActivityViewController {
     static func show(with items: ShareItems) {
         let vc = UIActivityViewController(activityItems: items.items, applicationActivities: nil)
@@ -70,7 +68,6 @@ private extension UIApplication {
     }
 }
 
-@available(iOS 13.0, *)
 struct ShareButton: View {
     let action: () -> Void
 

@@ -4,7 +4,6 @@
 
 import SwiftUI
 
-@available(iOS 13.0, tvOS 14.0, watchOS 6, *)
 struct KeyValueSectionView: View {
     let viewModel: KeyValueSectionViewModel
     var limit: Int = Int.max
@@ -61,7 +60,6 @@ struct KeyValueSectionView: View {
     }
 }
 
-@available(iOS 13.0, tvOS 14.0, watchOS 6, *)
 private struct KeyValueListView: View {
     let viewModel: KeyValueSectionViewModel
     var limit: Int = Int.max
@@ -215,7 +213,6 @@ private var fontSize: CGFloat {
     #endif
 }
 
-@available(iOS 13.0, tvOS 14.0, watchOS 6, *)
 struct KeyValueSectionViewModel {
     let title: String
     let color: Color

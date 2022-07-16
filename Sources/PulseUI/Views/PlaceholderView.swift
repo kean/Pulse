@@ -4,7 +4,6 @@
 
 import SwiftUI
 
-@available(iOS 13.0, tvOS 14.0, watchOS 6, *)
 struct PlaceholderView: View {
     var imageName: String?
     let title: String

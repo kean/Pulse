@@ -24,13 +24,8 @@ public struct NetworkLoggerRequest: Codable {
         self.cachePolicy = urlRequest.cachePolicy.rawValue
         self.timeoutInterval = urlRequest.timeoutInterval
         self.allowsCellularAccess = urlRequest.allowsCellularAccess
-        if #available(iOS 13.0, OSX 10.15, tvOS 14.0, watchOS 6.0, *) {
-            self.allowsExpensiveNetworkAccess = urlRequest.allowsExpensiveNetworkAccess
-            self.allowsConstrainedNetworkAccess = urlRequest.allowsConstrainedNetworkAccess
-        } else {
-            self.allowsExpensiveNetworkAccess = true
-            self.allowsConstrainedNetworkAccess = true
-        }
+        self.allowsExpensiveNetworkAccess = urlRequest.allowsExpensiveNetworkAccess
+        self.allowsConstrainedNetworkAccess = urlRequest.allowsConstrainedNetworkAccess
         self.httpShouldHandleCookies = urlRequest.httpShouldHandleCookies
         self.httpShouldUsePipelining = urlRequest.httpShouldUsePipelining
     }
@@ -155,27 +150,23 @@ public struct NetworkLoggerTransactionDetailedMetrics: Codable {
     /// `tls_ciphersuite_t`  enum raw value
     public let negotiatedTLSCipherSuite: UInt16?
 
-    public init?(metrics: URLSessionTaskTransactionMetrics) {
-        if #available(iOS 13.0, OSX 10.15, tvOS 14.0, watchOS 6.0, *) {
-            self.countOfRequestHeaderBytesSent = metrics.countOfRequestHeaderBytesSent
-            self.countOfRequestBodyBytesSent = metrics.countOfRequestBodyBytesSent
-            self.countOfRequestBodyBytesBeforeEncoding = metrics.countOfRequestBodyBytesBeforeEncoding
-            self.countOfResponseHeaderBytesReceived = metrics.countOfResponseHeaderBytesReceived
-            self.countOfResponseBodyBytesReceived = metrics.countOfResponseBodyBytesReceived
-            self.countOfResponseBodyBytesAfterDecoding = metrics.countOfResponseBodyBytesAfterDecoding
-            self.localAddress = metrics.localAddress
-            self.remoteAddress = metrics.remoteAddress
-            self.isCellular = metrics.isCellular
-            self.isExpensive = metrics.isExpensive
-            self.isConstrained = metrics.isConstrained
-            self.isMultipath = metrics.isMultipath
-            self.localPort = metrics.localPort
-            self.remotePort = metrics.remotePort
-            self.negotiatedTLSProtocolVersion = metrics.negotiatedTLSProtocolVersion?.rawValue
-            self.negotiatedTLSCipherSuite = metrics.negotiatedTLSCipherSuite?.rawValue
-        } else {
-            return nil
-        }
+    public init(metrics: URLSessionTaskTransactionMetrics) {
+        self.countOfRequestHeaderBytesSent = metrics.countOfRequestHeaderBytesSent
+        self.countOfRequestBodyBytesSent = metrics.countOfRequestBodyBytesSent
+        self.countOfRequestBodyBytesBeforeEncoding = metrics.countOfRequestBodyBytesBeforeEncoding
+        self.countOfResponseHeaderBytesReceived = metrics.countOfResponseHeaderBytesReceived
+        self.countOfResponseBodyBytesReceived = metrics.countOfResponseBodyBytesReceived
+        self.countOfResponseBodyBytesAfterDecoding = metrics.countOfResponseBodyBytesAfterDecoding
+        self.localAddress = metrics.localAddress
+        self.remoteAddress = metrics.remoteAddress
+        self.isCellular = metrics.isCellular
+        self.isExpensive = metrics.isExpensive
+        self.isConstrained = metrics.isConstrained
+        self.isMultipath = metrics.isMultipath
+        self.localPort = metrics.localPort
+        self.remotePort = metrics.remotePort
+        self.negotiatedTLSProtocolVersion = metrics.negotiatedTLSProtocolVersion?.rawValue
+        self.negotiatedTLSCipherSuite = metrics.negotiatedTLSCipherSuite?.rawValue
     }
 }
 
@@ -187,17 +178,12 @@ public enum NetworkLoggerTaskType: String, Codable {
     case webSocketTask
 
     public init(task: URLSessionTask) {
-        if #available(iOS 13.0, OSX 10.15, tvOS 14.0, watchOS 6.0, *) {
-            if task is URLSessionWebSocketTask {
-                self = .webSocketTask
-                return
-            }
-        }
         switch task {
         case task as URLSessionDataTask: self = .dataTask
         case task as URLSessionDownloadTask: self = .downloadTask
         case task as URLSessionStreamTask: self = .streamTask
         case task as URLSessionUploadTask: self = .uploadTask
+        case task is URLSessionWebSocketTask: self = .webSocketTask
         default:
             assertionFailure("Unknown task type: \(task)")
             self = .dataTask

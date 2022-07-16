@@ -6,7 +6,6 @@ import SwiftUI
 import PulseCore
 
 #if os(iOS) || os(tvOS) || os(watchOS)
-@available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
 struct ConsoleMessageDetailsView: View {
     let viewModel: ConsoleMessageDetailsViewModel
     @Environment(\.colorScheme) var colorScheme: ColorScheme
@@ -93,7 +92,6 @@ struct ConsoleMessageDetailsView: View {
 }
 
 #if DEBUG
-@available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
 struct ConsoleMessageDetailsView_Previews: PreviewProvider {
     static var previews: some View {
         Group {

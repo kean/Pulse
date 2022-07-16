@@ -4,7 +4,6 @@
 
 import SwiftUI
 
-@available(iOS 13.0, tvOS 14.0, watchOS 6, *)
 struct BadgeView: View {
     let viewModel: BadgeViewModel
 
@@ -35,7 +34,6 @@ struct BadgeView: View {
     }
 }
 
-@available(iOS 13.0, tvOS 14.0, watchOS 6, *)
 struct BadgeView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
@@ -44,7 +42,6 @@ struct BadgeView_Previews: PreviewProvider {
     }
 }
 
-@available(iOS 13.0, tvOS 14.0, watchOS 6, *)
 struct BadgeViewModel {
     let title: String
     let color: Color

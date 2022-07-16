@@ -9,7 +9,6 @@ import Combine
 
 #if os(iOS)
 
-@available(iOS 13.0, *)
 public struct ConsoleView: View {
     @ObservedObject var viewModel: ConsoleViewModel
     @Environment(\.colorScheme) private var colorScheme: ColorScheme
@@ -95,7 +94,6 @@ public struct ConsoleView: View {
     }
 }
 
-@available(iOS 13.0, *)
 private struct ConsoleToolbarView: View {
     @ObservedObject var viewModel: ConsoleViewModel
     @State private var isShowingFilters = false
@@ -127,7 +125,6 @@ private struct ConsoleToolbarView: View {
 }
 
 #if DEBUG
-@available(iOS 13.0, *)
 struct ConsoleView_Previews: PreviewProvider {
     static var previews: some View {
         return Group {

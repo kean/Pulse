@@ -6,7 +6,6 @@ import SwiftUI
 
 #if os(iOS)
 
-@available(iOS 13, *)
 struct ToastView<Content>: View where Content: View {
     let content: () -> Content
 
@@ -25,14 +24,12 @@ struct ToastView<Content>: View where Content: View {
     }
 }
 
-@available(iOS 13, *)
 extension ToastView {
     func show() {
         ToastManager.shared.show(self)
     }
 }
 
-@available(iOS 13, *)
 final class ToastManager {
     static let shared = ToastManager()
 
@@ -109,7 +106,6 @@ final class ToastManager {
     }
 }
 
-@available(iOS 13.0, *)
 struct ToastView_Previews: PreviewProvider {
     static var previews: some View {
         Group {

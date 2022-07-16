@@ -8,7 +8,6 @@ import PulseCore
 #if os(iOS)
 import UniformTypeIdentifiers
 
-@available(iOS 13.0, *)
 public struct SettingsView: View {
     @ObservedObject var viewModel: SettingsViewModel
     @ObservedObject var console: ConsoleViewModel
@@ -89,7 +88,6 @@ private struct DocumentBrowser: UIViewControllerRepresentable {
 
 // MARK: - Settings
 
-@available(iOS 13.0, *)
 final class SettingsViewModel: ObservableObject {
     private let store: LoggerStore
 
@@ -111,7 +109,6 @@ final class SettingsViewModel: ObservableObject {
 // MARK: - Preview
 
 #if DEBUG
-@available(iOS 13.0, *)
 struct ConsoleSettingsView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
@@ -125,7 +122,6 @@ struct ConsoleSettingsView_Previews: PreviewProvider {
 // MARK: - Helpers
 #if os(iOS) || os(watchOS) || os(tvOS)
 
-@available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
 struct ButtonRemoveAll: View {
     let action: () -> Void
 
@@ -139,7 +135,6 @@ struct ButtonRemoveAll: View {
     }
 }
 
-@available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
 struct ButtonRemove: View {
     let title: String
     let alert: String

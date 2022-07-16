@@ -6,7 +6,6 @@ import SwiftUI
 import PulseCore
 
 // MARK: - View
-@available(iOS 13.0, tvOS 14.0, watchOS 6.0, *)
 struct NetworkInspectorHeadersView: View {
     @ObservedObject var viewModel: NetworkInspectorHeaderViewModel
 
@@ -29,7 +28,6 @@ struct NetworkInspectorHeadersView: View {
     }
 }
 
-@available(iOS 13.0, tvOS 14.0, watchOS 6.0, *)
 struct NetworkHeadersDetailsView: View {
     let viewModel: KeyValueSectionViewModel
     @State private var isShowingShareSheet = false
@@ -79,7 +77,6 @@ struct NetworkHeadersDetailsView: View {
 
 // MARK: - ViewModel
 
-@available(iOS 13.0, tvOS 14.0, watchOS 6, *)
 final class NetworkInspectorHeaderViewModel: ObservableObject {
     let summary: NetworkLoggerSummary
 

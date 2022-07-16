@@ -8,7 +8,6 @@ import CoreData
 import PulseCore
 import Combine
 
-@available(iOS 13.0, tvOS 14.0, watchOS 6.0, *)
 struct PinButton: View {
     @ObservedObject var viewModel: PinButtonViewModel
     var isTextNeeded: Bool = true
@@ -53,7 +52,6 @@ struct PinButton3: View {
 #endif
 
 #if os(iOS)
-@available(iOS 13.0, *)
 extension UIAction {
     static func makePinAction(with viewModel: PinButtonViewModel) -> UIAction {
         UIAction(
@@ -64,7 +62,6 @@ extension UIAction {
     }
 }
 
-@available(iOS 13.0, *)
 extension UIContextualAction {
     static func makePinAction(with viewModel: PinButtonViewModel) -> UIContextualAction {
         let action = UIContextualAction(
@@ -78,7 +75,6 @@ extension UIContextualAction {
     }
 }
 
-@available(iOS 13.0, *)
 final class PinIndicatorView: UIImageView {
     private var viewModel: PinButtonViewModel?
     private var cancellables: [AnyCancellable] = []
@@ -101,14 +97,12 @@ final class PinIndicatorView: UIImageView {
     }
 }
 
-@available(iOS 13.0, *)
 private let pinImage: UIImage = {
     let image = UIImage(systemName: "pin")
     return image?.withConfiguration(UIImage.SymbolConfiguration(textStyle: .caption1)) ?? UIImage()
 }()
 #endif
 
-@available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
 struct PinView: View {
     @ObservedObject var viewModel: PinButtonViewModel
     let font: Font
@@ -122,7 +116,6 @@ struct PinView: View {
     }
 }
 
-@available(iOS 13.0, tvOS 14.0, watchOS 6.0, *)
 final class PinButtonViewModel: ObservableObject {
     @Published private(set) var isPinned = false
     private let message: LoggerMessageEntity?
@@ -155,7 +148,6 @@ final class PinButtonViewModel: ObservableObject {
     }
 }
 
-@available(iOS 13.0, tvOS 14.0, watchOS 6.0, *)
 protocol Pinnable {
     var pinViewModel: PinButtonViewModel { get }
 }

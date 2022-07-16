@@ -149,7 +149,6 @@ extension tls_ciphersuite_t {
     }
 }
 
-@available(iOS 13.0, tvOS 13.0, watchOS 6.0, macOS 10.15, *)
 extension tls_protocol_version_t {
     var description: String {
         switch self {

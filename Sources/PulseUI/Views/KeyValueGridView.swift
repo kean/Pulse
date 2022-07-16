@@ -6,7 +6,6 @@ import SwiftUI
 
 #if os(iOS) || os(macOS) || os(tvOS)
 
-@available(iOS 13.0, tvOS 14.0, *)
 struct KeyValueGridView: View {
     #if os(iOS)
     @Environment(\.horizontalSizeClass) var sizeClass: UserInterfaceSizeClass?
@@ -44,7 +43,6 @@ struct KeyValueGridView: View {
     }
 }
 
-@available(iOS 13.0, tvOS 14.0, *)
 private struct Row {
     let index: Int
     let items: [KeyValueSectionViewModel]

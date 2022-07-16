@@ -7,7 +7,6 @@ import PulseCore
 import Combine
 import SwiftUI
 
-@available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
 final class ConsoleMessageDetailsViewModel {
     let tags: [ConsoleMessageTagViewModel]
     let text: String
@@ -53,7 +52,6 @@ final class ConsoleMessageDetailsViewModel {
     }
 }
 
-@available(iOS 13.0, tvOS 14.0, watchOS 6, *)
 private extension BadgeViewModel {
     init?(message: LoggerMessageEntity) {
         guard let level = LoggerStore.Level(rawValue: message.level) else { return nil }
@@ -61,7 +59,6 @@ private extension BadgeViewModel {
     }
 }
 
-@available(iOS 13.0, tvOS 14.0, watchOS 6, *)
 private extension Color {
     init(level: LoggerStore.Level) {
         switch level {

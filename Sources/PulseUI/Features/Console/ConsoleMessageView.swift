@@ -9,7 +9,6 @@ import Combine
 
 #if os(watchOS) || os(tvOS)
 
-@available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
 struct ConsoleMessageView: View {
     let viewModel: ConsoleMessageViewModel
     

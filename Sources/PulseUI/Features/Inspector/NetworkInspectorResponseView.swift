@@ -7,7 +7,6 @@ import CoreData
 import PulseCore
 import Combine
 
-@available(iOS 13.0, tvOS 14.0, watchOS 6.0, *)
 struct NetworkInspectorResponseView: View {
     let viewModel: NetworkInspectorResponseViewModel
 
@@ -75,7 +74,6 @@ struct NetworkInspectorResponseView: View {
 // MARK: - Preview
 
 #if DEBUG
-@available(iOS 13.0, tvOS 14.0, watchOS 6, *)
 struct NetworkInspectorResponseView_Previews: PreviewProvider {
     static var previews: some View {
         Group {

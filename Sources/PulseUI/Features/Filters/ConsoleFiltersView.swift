@@ -9,7 +9,6 @@ import Combine
 
 #if os(iOS)
 
-@available(iOS 13.0, *)
 struct ConsoleFiltersView: View {
     @ObservedObject var viewModel: ConsoleSearchCriteriaViewModel
 
@@ -226,7 +225,6 @@ private struct CustomFilterView: View {
     }
 }
 
-@available(iOS 13.0, *)
 private func tintColor(for level: LoggerStore.Level) -> Color {
     switch level {
     case .trace, .debug: return Color.primary.opacity(0.66)
@@ -237,7 +235,6 @@ private func tintColor(for level: LoggerStore.Level) -> Color {
 
 // MARK: - Preview
 
-@available(iOS 13.0, *)
 struct ConsoleFiltersPanelPro_Previews: PreviewProvider {
     static var previews: some View {
         Group {

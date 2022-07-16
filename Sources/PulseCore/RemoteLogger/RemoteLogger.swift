@@ -414,7 +414,6 @@ private func getFallbackDeviceId() -> UUID {
     return id
 }
 
-@available(iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 private extension NWBrowser.Result {
     var name: String? {
         switch endpoint {

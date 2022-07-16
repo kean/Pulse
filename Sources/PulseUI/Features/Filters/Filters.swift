@@ -9,7 +9,6 @@ import Combine
 
 #if !os(watchOS)
 
-@available(iOS 13.0, tvOS 14.0, *)
 enum Filters {
     typealias ContentType = NetworkSearchCriteria.ContentTypeFilter.ContentType
 
@@ -87,7 +86,6 @@ struct DurationPicker: View {
 #endif
 }
 
-@available(iOS 13.0, *)
 struct DateRangePicker: View {
     let title: String
     @Binding var date: Date
@@ -145,7 +143,6 @@ struct DateRangePicker: View {
 }
 #endif
 
-@available(iOS 13.0, tvOS 14.0, *)
 struct FilterPickerButton: View {
     let title: String
 
@@ -166,7 +163,6 @@ struct FilterPickerButton: View {
 
 #if os(iOS) || os(tvOS)
 
-@available(iOS 13.0, tvOS 14.0, *)
 struct FilterSectionHeader: View {
     let icon: String
     let title: String

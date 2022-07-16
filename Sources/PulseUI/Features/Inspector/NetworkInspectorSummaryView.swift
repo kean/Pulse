@@ -9,7 +9,6 @@ import PulseCore
 
 #if os(iOS) || os(watchOS) || os(macOS)
 
-@available(iOS 13.0, watchOS 6, *)
 struct NetworkInspectorSummaryView: View {
     @ObservedObject var viewModel: NetworkInspectorSummaryViewModel
 
@@ -111,7 +110,6 @@ struct NetworkInspectorSummaryView: View {
 
 // MARK: - ViewModel
 
-@available(iOS 13.0, tvOS 14.0, watchOS 6, *)
 final class NetworkInspectorSummaryViewModel: ObservableObject {
     private let summary: NetworkLoggerSummary
 

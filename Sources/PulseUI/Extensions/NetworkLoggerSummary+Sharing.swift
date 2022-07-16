@@ -5,7 +5,6 @@
 import PulseCore
 import Foundation
 
-@available(iOS 13.0, tvOS 14.0, watchOS 6.0, *)
 extension NetworkLoggerSummary {
     func asPlainText() -> String {
         render(using: PlainTextRenderer())
@@ -60,7 +59,6 @@ extension NetworkLoggerSummary {
 
 // MARK: Renderers
 
-@available(iOS 13.0, tvOS 14.0, watchOS 6, *)
 private protocol Renderer {
     func add(title: String)
     func addSecondaryTitle(_ title: String)
@@ -70,14 +68,12 @@ private protocol Renderer {
     func finalize(title: String) -> String
 }
 
-@available(iOS 13.0, tvOS 14.0, watchOS 6, *)
 extension Renderer {
     func add(_ keyValueViewModel: KeyValueSectionViewModel?) {
         add(keyValueViewModel, isSecondaryTitle: true)
     }
 }
 
-@available(iOS 13.0, tvOS 14.0, watchOS 6, *)
 private final class PlainTextRenderer: Renderer {
     private var contents = ""
 
@@ -121,7 +117,6 @@ private final class PlainTextRenderer: Renderer {
     }
 }
 
-@available(iOS 13.0, tvOS 14.0, watchOS 6, *)
 private final class MarkdownRenderer: Renderer {
     private var contents = ""
     private var toc = ""
@@ -175,7 +170,6 @@ private final class MarkdownRenderer: Renderer {
     }
 }
 
-@available(iOS 13.0, tvOS 14.0, watchOS 6, *)
 private final class HTMLRenderer: Renderer {
     private var contents = ""
     private var toc = [ToCItem]()

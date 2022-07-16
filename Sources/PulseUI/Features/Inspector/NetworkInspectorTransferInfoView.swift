@@ -9,7 +9,6 @@ import PulseCore
 
 // MARK: - View
 
-@available(iOS 13.0, *)
 struct NetworkInspectorTransferInfoView: View {
     @Environment(\.colorScheme) var colorScheme
 
@@ -70,7 +69,6 @@ private var fontSize: CGFloat {
 // MARK: - Preview
 
 #if DEBUG
-@available(iOS 13.0, *)
 struct NetworkInspectorTransferInfoView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
@@ -94,7 +92,6 @@ private let mockModel = NetworkInspectorTransferInfoViewModel(
 
 #endif
 
-@available(iOS 13.0, tvOS 14.0, watchOS 6, *)
 private struct Row {
     let index: Int
     let items: [KeyValueSectionViewModel]

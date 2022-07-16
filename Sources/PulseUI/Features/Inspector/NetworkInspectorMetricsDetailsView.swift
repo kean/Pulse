@@ -9,7 +9,6 @@ import PulseCore
 
 // MARK: - View
 
-@available(iOS 13.0, tvOS 14.0, *)
 struct NetworkInspectorMetricsDetailsView: View {
     let viewModel: NetworkMetricsDetailsViewModel
 
@@ -20,7 +19,6 @@ struct NetworkInspectorMetricsDetailsView: View {
 
 // MARK: - ViewModel
 
-@available(iOS 13.0, tvOS 14.0, *)
 struct NetworkMetricsDetailsViewModel {
     let sections: [KeyValueSectionViewModel]
 
@@ -34,7 +32,6 @@ struct NetworkMetricsDetailsViewModel {
     }
 }
 
-@available(iOS 13.0, tvOS 14.0, *)
 private func makeTransferSection(for metrics: NetworkLoggerTransactionMetrics) -> KeyValueSectionViewModel? {
     guard let metrics = metrics.details else { return nil }
     return KeyValueSectionViewModel(title: "Data Transfer", color: .secondary, items: [
@@ -47,7 +44,6 @@ private func makeTransferSection(for metrics: NetworkLoggerTransactionMetrics) -
     ])
 }
 
-@available(iOS 13.0, tvOS 14.0, *)
 private func makeProtocolSection(for metrics: NetworkLoggerTransactionMetrics) -> KeyValueSectionViewModel? {
     guard let details = metrics.details else { return nil }
     return KeyValueSectionViewModel(title: "Protocol", color: .secondary, items: [
@@ -59,7 +55,6 @@ private func makeProtocolSection(for metrics: NetworkLoggerTransactionMetrics) -
     ])
 }
 
-@available(iOS 13.0, tvOS 14.0, *)
 private func makeSecuritySection(for metrics: NetworkLoggerTransactionMetrics) -> KeyValueSectionViewModel? {
     guard let metrics = metrics.details else { return nil }
 
@@ -73,7 +68,6 @@ private func makeSecuritySection(for metrics: NetworkLoggerTransactionMetrics) -
     ])
 }
 
-@available(iOS 13.0, tvOS 14.0, *)
 private func makeMiscSection(for metrics: NetworkLoggerTransactionMetrics) -> KeyValueSectionViewModel? {
     let details = metrics.details
     return KeyValueSectionViewModel(title: "Characteristics", color: .secondary, items: [
@@ -95,7 +89,6 @@ private func formatBytes(_ count: Int64) -> String {
 // MARK: - Preview
 
 #if DEBUG
-@available(iOS 13.0, tvOS 14.0, *)
 struct NetworkInspectorMetricsDetailsView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
@@ -111,7 +104,6 @@ struct NetworkInspectorMetricsDetailsView_Previews: PreviewProvider {
     }
 }
 
-@available(iOS 13.0, tvOS 14.0, *)
 private let mockModel = NetworkMetricsDetailsViewModel(
     metrics: MockDataTask.login.metrics.transactions.first!
 )

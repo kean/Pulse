@@ -9,7 +9,6 @@ import Combine
 
 #if os(iOS) || os(tvOS)
 
-@available(iOS 13.0, tvOS 14.0, *)
 final class MainViewModel: ObservableObject {
     let items: [MainViewModelItem]
 
@@ -53,7 +52,6 @@ final class MainViewModel: ObservableObject {
     }
 }
 
-@available(iOS 13.0, tvOS 14.0, *)
 struct MainViewModelItem: Hashable, Identifiable {
     let title: String
     let imageName: String
@@ -84,7 +82,6 @@ struct MainViewModelItem: Hashable, Identifiable {
     #endif
 }
 
-@available(iOS 13.0, tvOS 14.0, *)
 extension MainViewModel {
     @ViewBuilder
     func makeView(for item: MainViewModelItem) -> some View {

@@ -6,7 +6,6 @@
 import UIKit
 import SwiftUI
 
-@available(iOS 13.0, *)
 extension UIImage {
     static func make(systemName: String, textStyle: UIFont.TextStyle) -> UIImage {
         UIImage(systemName: systemName)?
@@ -63,7 +62,6 @@ extension UIView {
     }
 }
 
-@available(iOS 13.0, *)
 extension UIViewController {
     @discardableResult
     static func present<ContentView: View>(_ closure: (_ dismiss: @escaping () -> Void) -> ContentView) -> UIViewController? {

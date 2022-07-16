@@ -8,7 +8,6 @@ import PulseCore
 import Combine
 import UIKit
 
-@available(iOS 13.0, *)
 final class ConsoleNetworkRequestTableCell: UITableViewCell, UIContextMenuInteractionDelegate {
     private let badge = CircleView()
     private let title = UILabel()
@@ -120,7 +119,6 @@ final class ConsoleNetworkRequestTableCell: UITableViewCell, UIContextMenuIntera
     }
 }
 
-@available(iOS 13.0, *)
 private final class CircleView: UIView {
     var fillColor: UIColor = .red {
         didSet {

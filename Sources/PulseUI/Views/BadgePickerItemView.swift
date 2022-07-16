@@ -5,7 +5,6 @@
 import SwiftUI
 
 #if os(iOS)
-@available(iOS 13.0, *)
 struct BadgePickerItemView: View {
     let title: String
     @Binding var isEnabled: Bool
@@ -29,7 +28,6 @@ struct BadgePickerItemView: View {
     }
 }
 
-@available(iOS 13.0, *)
 struct BadgePickerItemView_Previews: PreviewProvider {
     static var previews: some View {
         VStack(spacing: 16) {

@@ -52,7 +52,6 @@ private func getClass(for element: JSONElement) -> String {
     }
 }
 
-@available(iOS 13.0, tvOS 14.0, *)
 final class JSONPrinter {
     private let renderer: JSONRenderer
     private var indentation = 0
@@ -146,7 +145,6 @@ final class JSONPrinter {
 
 #if os(iOS) || os(macOS) || os(tvOS)
 
-@available(iOS 13, tvOS 14.0, *)
 struct JSONColors {
     static let punctuation = UXColor.dynamic(
         light: .init(red: 113.0/255.0, green: 128.0/255.0, blue: 141.0/255.0, alpha: 1.0),
@@ -161,7 +159,6 @@ struct JSONColors {
     static let null = Palette.pink
 }
 
-@available(iOS 13, tvOS 14.0, *)
 final class AttributedStringJSONRenderer: JSONRenderer {
     private let output = NSMutableAttributedString()
     private let fontSize: CGFloat

@@ -7,7 +7,6 @@ import PulseCore
 import Combine
 import CoreData
 
-@available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
 final class ConsoleNetworkRequestViewModel: Pinnable {
 #if os(iOS)
     lazy var time = ConsoleMessageViewModel.timeFormatter.string(from: request.createdAt)

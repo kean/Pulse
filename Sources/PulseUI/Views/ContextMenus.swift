@@ -7,7 +7,6 @@ import PulseCore
 import Combine
 
 #if os(iOS)
-@available(iOS 13.0, *)
 struct ButtonCopyMessage: View {
     let text: String
 
@@ -22,7 +21,6 @@ struct ButtonCopyMessage: View {
     }
 }
 
-@available(iOS 13.0, *)
 struct NetworkMessageContextMenu: View {
     let request: LoggerNetworkRequestEntity
     let store: LoggerStore
@@ -70,7 +68,6 @@ struct NetworkMessageContextMenu: View {
     }
 }
 
-@available(iOS 13.0, *)
 struct NetworkMessageContextMenuCopySection: View {
     var request: LoggerNetworkRequestEntity
     let shareService: ConsoleShareService

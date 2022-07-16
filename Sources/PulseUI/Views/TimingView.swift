@@ -6,7 +6,6 @@ import SwiftUI
 
 #if os(iOS) || os(macOS) || os(tvOS)
 
-@available(iOS 13.0, tvOS 14.0, *)
 struct TimingView: View {
     let viewModel: [TimingRowSectionViewModel]
     let width: CGFloat
@@ -20,7 +19,6 @@ struct TimingView: View {
     }
 }
 
-@available(iOS 13.0, tvOS 14.0, *)
 private struct TimingSectionView: View {
     let viewModel: TimingRowSectionViewModel
     let width: CGFloat
@@ -43,7 +41,6 @@ private struct TimingSectionView: View {
     }
 }
 
-@available(iOS 13.0, tvOS 14.0, *)
 private struct TimingRowView: View {
     let viewModel: TimingRowViewModel
     let width: CGFloat
@@ -115,7 +112,6 @@ private func clamp(_ value: CGFloat) -> CGFloat {
 // MARK: - Preview
 
 #if DEBUG
-@available(iOS 13.0, tvOS 14.0, *)
 struct TimingView_Previews: PreviewProvider {
     static var previews: some View {
         Group {

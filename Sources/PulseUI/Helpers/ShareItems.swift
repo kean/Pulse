@@ -10,7 +10,6 @@ enum ShareStoreOutput {
     case store, text
 }
 
-@available(iOS 13.0, tvOS 14.0, watchOS 6, *)
 struct ShareItems: Identifiable {
     let id = UUID()
     let items: [Any]
@@ -22,7 +21,6 @@ struct ShareItems: Identifiable {
     }
 }
 
-@available(iOS 13.0, tvOS 14.0, watchOS 6, *)
 extension ShareItems {
     static func makeCurrentDate() -> String {
         let dateFormatter = DateFormatter()
@@ -31,7 +29,6 @@ extension ShareItems {
     }
 }
 
-@available(iOS 13.0, tvOS 14.0, watchOS 6, *)
 extension ShareItems {
     init(store: LoggerStore, output: ShareStoreOutput) {
         let directory = TemporaryDirectory()
@@ -66,7 +63,6 @@ extension ShareItems {
     }
 }
 
-@available(iOS 13.0, tvOS 14.0, watchOS 6, *)
 struct ConsoleShareService {
     let store: LoggerStore
     private var context: NSManagedObjectContext { store.container.viewContext }
@@ -136,7 +132,6 @@ struct TemporaryDirectory {
     }
 }
 
-@available(iOS 13.0, tvOS 14.0, watchOS 6, *)
 extension TemporaryDirectory {
     func write(text: String, extension fileExtension: String) -> URL {
         let date = ShareItems.makeCurrentDate()

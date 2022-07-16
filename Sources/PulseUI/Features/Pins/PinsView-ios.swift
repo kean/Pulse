@@ -9,7 +9,6 @@ import Combine
 
 #if os(iOS)
 
-@available(iOS 13.0, *)
 public struct PinsView: View {
     @ObservedObject var viewModel: PinsViewModel
     @Environment(\.colorScheme) private var colorScheme: ColorScheme
@@ -52,7 +51,6 @@ public struct PinsView: View {
 }
 
 #if DEBUG
-@available(iOS 13.0, *)
 struct PinsView_Previews: PreviewProvider {
     static var previews: some View {
         return Group {

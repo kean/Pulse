@@ -7,7 +7,6 @@ import PulseCore
 import Combine
 import SwiftUI
 
-@available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
 final class ConsoleSearchCriteriaViewModel: ObservableObject {
     @Published var criteria: ConsoleSearchCriteria = .default
     private(set) var defaultCriteria: ConsoleSearchCriteria = .default
@@ -217,7 +216,6 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
 #endif
 }
 
-@available(iOS 13.0, tvOS 14.0, watchOS 6, *)
 struct QuickFilterViewModel: Identifiable {
     var id: String { title }
     let title: String

@@ -8,7 +8,6 @@ import CoreData
 import Combine
 import SwiftUI
 
-@available(iOS 13.0, tvOS 14.0, *)
 final class NetworkSearchCriteriaViewModel: ObservableObject {
     @Published var criteria: NetworkSearchCriteria = .default
     private(set) var defaultCriteria: NetworkSearchCriteria = .default

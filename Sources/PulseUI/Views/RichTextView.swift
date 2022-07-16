@@ -9,7 +9,6 @@ import Combine
 
 #if os(iOS) || os(macOS) || os(tvOS)
 
-@available(iOS 13.0, tvOS 14.0, *)
 struct RichTextView: View {
     @ObservedObject private var viewModel: RichTextViewModel
     var isAutomaticLinkDetectionEnabled = true
@@ -72,7 +71,6 @@ struct RichTextView: View {
 }
 
 #if os(iOS) || os(tvOS)
-@available(iOS 13.0, tvOS 14.0, *)
 private struct WrappedTextView: UIViewRepresentable {
     let text: NSAttributedString
     let viewModel: RichTextViewModel
@@ -119,7 +117,6 @@ private struct WrappedTextView: NSViewRepresentable {
 }
 #endif
 
-@available(iOS 13.0, tvOS 14.0, *)
 private func configureTextView(_ textView: UXTextView, _ isAutomaticLinkDetectionEnabled: Bool) {
     textView.isSelectable = true
     #if !os(tvOS)
@@ -134,7 +131,6 @@ private func configureTextView(_ textView: UXTextView, _ isAutomaticLinkDetectio
 }
 
 #if os(iOS) || os(macOS)
-@available(iOS 13.0, tvOS 14.0, *)
 private struct SearchToobar: View {
     @ObservedObject var viewModel: RichTextViewModel
 
@@ -199,7 +195,6 @@ private struct SearchToobar: View {
 }
 #endif
 
-@available(iOS 13.0, tvOS 14.0, *)
 final class RichTextViewModel: ObservableObject {
     @Published var isSearching = false
     @Published var selectedMatchIndex: Int = 0
@@ -325,7 +320,6 @@ private func highlight(range: Range<String.Index>, in text: NSMutableAttributedS
 }
 
 #if DEBUG
-@available(iOS 13.0, tvOS 14.0, *)
 struct RichTextView_Previews: PreviewProvider {
     static var previews: some View {
         Group {

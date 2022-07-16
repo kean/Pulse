@@ -8,7 +8,6 @@ import PulseCore
 // MARK: - View
 
 #if os(iOS)
-@available(iOS 13.0, *)
 struct StoreDetailsView: View {
     let viewModel: StoreDetailsViewModel
 
@@ -27,7 +26,6 @@ struct StoreDetailsView: View {
 
 // MARK: - ViewModel
 
-@available(iOS 13, *)
 final class StoreDetailsViewModel {
     private let storeURL: URL
     private let info: LoggerStoreInfo

@@ -8,7 +8,6 @@ import PulseCore
 
 #if os(watchOS) || os(tvOS)
 
-@available(tvOS 14.0, watchOS 7.0, *)
 struct ConsoleMessagesForEach: View {
     let store: LoggerStore
     let messages: [LoggerMessageEntity]
@@ -43,7 +42,6 @@ struct ConsoleMessagesForEach: View {
     }
 }
 
-@available(tvOS 14.0, watchOS 7.0, *)
 struct NetworkMessagesForEach: View {
     let store: LoggerStore
     let entities: [LoggerNetworkRequestEntity]
@@ -66,7 +64,6 @@ struct NetworkMessagesForEach: View {
     }
 }
 
-@available(tvOS 14.0, watchOS 7.0, *)
 private struct ConsoleNetworkRequestForEachRow: View {
     let store: LoggerStore
     let request: LoggerNetworkRequestEntity
@@ -76,7 +73,6 @@ private struct ConsoleNetworkRequestForEachRow: View {
     }
 }
 
-@available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
 private struct ConsoleMessagesForEachRow: View {
     let store: LoggerStore
     let message: LoggerMessageEntity
@@ -86,7 +82,6 @@ private struct ConsoleMessagesForEachRow: View {
     }
 }
 
-@available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
 private struct LazyConsoleMessageDetailsView: View {
     let message: LoggerMessageEntity
     let store: LoggerStore
@@ -96,7 +91,6 @@ private struct LazyConsoleMessageDetailsView: View {
     }
 }
 
-@available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
 private struct LazyConsoleNetworkRequestDetailsView: View {
     let request: LoggerNetworkRequestEntity
     let store: LoggerStore

@@ -72,7 +72,6 @@ struct ConsoleSearchCriteria: Hashable {
     }
 }
 
-@available(iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 final class ConsoleSearchFilter: ObservableObject, Hashable, Identifiable {
     let id: UUID
     @Published var field: Field
@@ -211,7 +210,6 @@ final class ConsoleSearchFilter: ObservableObject, Hashable, Identifiable {
     }
 }
 
-@available(iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension ConsoleSearchCriteria {
 
     static func update(

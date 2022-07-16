@@ -6,7 +6,6 @@ import SwiftUI
 import PulseCore
 
 #if os(iOS) || os(tvOS) || os(watchOS)
-@available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
 struct ConsoleMessageMetadataView: View {
     let message: LoggerMessageEntity
 
@@ -69,7 +68,6 @@ struct ConsoleMessageMetadataView: View {
     }
 }
 
-@available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
 private extension LoggerMessageEntity {
     var tintColor: Color {
         Color.badgeColor(for: .init(rawValue: level) ?? .debug)
@@ -89,7 +87,6 @@ private let dateFormatter: DateFormatter = {
 }()
 
 #if DEBUG
-@available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
 struct ConsoleMessageMetadataView_Previews: PreviewProvider {
     static var previews: some View {
         Group {

@@ -9,7 +9,6 @@ import Combine
 
 #if os(iOS) || os(tvOS)
 
-@available(iOS 13.0, tvOS 14.0, *)
 public struct MainView: View {
     let viewModel: MainViewModel
 
@@ -35,7 +34,6 @@ public struct MainView: View {
 }
 
 #if DEBUG
-@available(iOS 13.0, tvOS 14.0, *)
 struct MainView_Previews: PreviewProvider {
     static var previews: some View {
         return Group {

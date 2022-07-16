@@ -10,7 +10,6 @@ import PulseCore
 import WatchConnectivity
 import SwiftUI
 
-@available(iOS 13, watchOS 6, *)
 final class LoggerSyncSession: ObservableObject {
     @Published fileprivate(set) var fileTransferStatus: FileTransferStatus = .initial
 
@@ -41,7 +40,6 @@ final class LoggerSyncSession: ObservableObject {
     }
 }
 
-@available(iOS 13, watchOS 6, *)
 private final class SessionDelegate: NSObject, WCSessionDelegate {
     unowned var session: LoggerSyncSession!
 
@@ -106,7 +104,6 @@ private final class SessionDelegate: NSObject, WCSessionDelegate {
     }
 }
 
-@available(iOS 13, watchOS 6, *)
 enum FileTransferStatus {
     case initial
     case sending(Progress)

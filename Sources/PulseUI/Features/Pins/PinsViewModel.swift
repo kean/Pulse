@@ -9,7 +9,6 @@ import SwiftUI
 
 #if os(iOS) || os(tvOS)
 
-@available(iOS 13.0, tvOS 14.0, *)
 final class PinsViewModel: NSObject, NSFetchedResultsControllerDelegate, ObservableObject {
 #if os(iOS)
     let table: ConsoleTableViewModel

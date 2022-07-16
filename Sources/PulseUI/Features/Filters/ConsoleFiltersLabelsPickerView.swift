@@ -9,7 +9,6 @@ import Combine
 
 #if os(iOS)
 
-@available(iOS 13.0, *)
 struct ConsoleFiltersLabelsPickerView: View {
     @ObservedObject var viewModel: ConsoleSearchCriteriaViewModel
 
@@ -47,7 +46,6 @@ struct ConsoleFiltersLabelsPickerView: View {
     }
 }
 
-@available(iOS 13.0, *)
 struct ConsoleFiltersView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {

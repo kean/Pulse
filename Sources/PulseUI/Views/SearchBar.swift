@@ -8,7 +8,6 @@ import Combine
 
 #if os(iOS)
 
-@available(iOS 13.0, *)
 struct SearchBar: UIViewRepresentable {
     let title: String
     @Binding var text: String
@@ -59,7 +58,6 @@ struct SearchBar: UIViewRepresentable {
 
 #if os(macOS)
 
-@available(iOS 13.0, *)
 struct SearchBar: NSViewRepresentable {
     let title: String
     @Binding var text: String
@@ -172,7 +170,6 @@ private class FocusAwareSearchField: NSSearchField {
 #if os(iOS) || os(macOS)
 
 /// TODO: move to SwiftUI extension, make it a component?
-@available(iOS 13.0, *)
 extension View {
     func addSearchBarIshBackground(padding p: CGFloat = 9) -> some View {
         padding(p)
