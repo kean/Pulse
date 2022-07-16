@@ -31,14 +31,14 @@ public final class NetworkLogger {
         storeMessage(level: .trace, "Send \(urlRequest.httpMethod ?? "–") \(task.url ?? "–")")
 
         if let request = task.currentRequest ?? context.request {
-            store.handle(LoggerStore.NetworkTaskCreated(
+            store.handle(.networkTaskCreated(LoggerStoreEvent.NetworkTaskCreated(
                 taskId: context.taskId,
                 createdAt: Date(),
                 request: .init(urlRequest: request),
                 requestBody: request.httpBody ?? request.httpBodyStreamData(),
                 urlSession: nil,
                 session: LoggerSession.current.id.uuidString
-            ))
+            )))
         }
     }
 
