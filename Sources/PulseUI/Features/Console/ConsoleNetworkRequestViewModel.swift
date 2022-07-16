@@ -28,23 +28,17 @@ final class ConsoleNetworkRequestViewModel: Pinnable {
     }()
 
     init(request: LoggerNetworkRequestEntity, store: LoggerStore) {
-        let isSuccess: Bool
-        if request.errorCode != 0 {
-            isSuccess = false
-        } else if request.statusCode != 0, !(200..<400).contains(request.statusCode) {
-            isSuccess = false
-        } else {
-            isSuccess = true
-        }
+        let state = LoggerNetworkRequestEntity.State(rawValue: request.requestState) ?? .success
 
         let time = ConsoleMessageViewModel.timeFormatter.string(from: request.createdAt)
         let prefix: String
-        if request.statusCode != 0 {
+        switch state {
+        case .pending:
+            prefix = "PENDING"
+        case .success:
             prefix = StatusCodeFormatter.string(for: Int(request.statusCode))
-        } else if request.errorCode != 0 {
+        case .failure:
             prefix = "\(request.errorCode) (\(descriptionForURLErrorCode(Int(request.errorCode))))"
-        } else {
-            prefix = "Success"
         }
 
 #if os(iOS)
@@ -55,7 +49,12 @@ final class ConsoleNetworkRequestViewModel: Pinnable {
         }
         self.title = title
 
-        self.badgeColor = isSuccess ? .systemGreen : .systemRed
+        switch state {
+        case .pending: self.badgeColor = .systemYellow
+        case .success: self.badgeColor = .systemGreen
+        case .failure: self.badgeColor = .systemRed
+        }
+
 #else
         self.status = prefix
         var title = "\(time)"
@@ -64,7 +63,11 @@ final class ConsoleNetworkRequestViewModel: Pinnable {
         }
         self.title = title
 
-        self.badgeColor = isSuccess ? .green : .red
+        switch state {
+        case .pending: self.badgeColor = .yellow
+        case .success: self.badgeColor = .green
+        case .failure: self.badgeColor = .red
+        }
 #endif
 
         let method = request.httpMethod ?? "GET"

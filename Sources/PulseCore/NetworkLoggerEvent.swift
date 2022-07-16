@@ -67,6 +67,7 @@ public struct NetworkLoggerMetrics: Codable {
     }
 }
 
+#warning("TODO: remove this (too much info)")
 public struct NetworkLoggerURLSession: Codable {
     /// A background session identifier
     public var identifier: String?

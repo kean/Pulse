@@ -25,10 +25,21 @@ public final class NetworkLogger {
     public func logTaskCreated(_ task: URLSessionTask) {
         guard let urlRequest = task.originalRequest else { return }
         lock.lock()
-        _ = context(for: task)
+        let context = context(for: task)
         lock.unlock()
 
         storeMessage(level: .trace, "Send \(urlRequest.httpMethod ?? "–") \(task.url ?? "–")")
+
+        if let request = task.currentRequest ?? context.request {
+            store.handle(LoggerStore.NetworkTaskCreated(
+                taskId: context.taskId,
+                createdAt: Date(),
+                request: .init(urlRequest: request),
+                requestBody: request.httpBody ?? request.httpBodyStreamData(),
+                urlSession: nil,
+                session: LoggerSession.current.id.uuidString
+            ))
+        }
     }
 
     /// Logs the task response (optional).

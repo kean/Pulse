@@ -276,6 +276,34 @@ extension LoggerStore {
         }
     }
 
+    #warning("TODO: refactor")
+    #warning("TODO: fix how pinning works")
+
+    func handle(_ event: NetworkTaskCreated) {
+        perform { self._handle(event) }
+    }
+
+#warning("TODO: this should also create associated LoggerMesasge")
+    private func _handle(_ event: NetworkTaskCreated) {
+        let entity = findOrCreateNetworkRequestEntity(forTaskId: event.taskId)
+        entity.createdAt = event.createdAt
+
+        // Primary
+        entity.createdAt = event.createdAt
+        entity.session = event.session
+        // Denormalized
+        entity.url = event.request.url?.absoluteString
+        entity.host = event.request.url?.host
+        entity.httpMethod = event.request.httpMethod
+        entity.requestState = LoggerNetworkRequestEntity.State.pending.rawValue
+
+        entity.details.request = try? JSONEncoder().encode(event.request)
+
+        if case let .directory(store) = document {
+            entity.requestBodyKey = store.storeData(event.requestBody)
+        }
+    }
+
     private func _storeNetworkRequest(_ summary: NetworkMessage) {
         let level: LoggerStore.Level
         let url = summary.request.url?.absoluteString
@@ -326,9 +354,23 @@ extension LoggerStore {
         return entity
     }
 
+    private func findOrCreateNetworkRequestEntity(forTaskId taskId: UUID) -> LoggerNetworkRequestEntity {
+        let request = NSFetchRequest<LoggerNetworkRequestEntity>(entityName: "\(LoggerNetworkRequestEntity.self)")
+        request.fetchLimit = 1
+        request.predicate = NSPredicate(format: "taskId == %@", taskId as NSUUID)
+        if let entity = try? backgroundContext.fetch(request).first {
+            return entity
+        }
+        let entity = LoggerNetworkRequestEntity(context: backgroundContext)
+        entity.taskId = taskId
+        entity.details = LoggerNetworkRequestDetailsEntity(context: backgroundContext)
+        return entity
+    }
+
     @discardableResult
     private func makeNetworkRequestEntity(_ summary: LoggerStore.NetworkMessage, createdAt: Date) -> LoggerNetworkRequestEntity {
-        let entity = LoggerNetworkRequestEntity(context: backgroundContext)
+        let entity = findOrCreateNetworkRequestEntity(forTaskId: summary.taskId)
+
         // Primary
         entity.createdAt = createdAt
         entity.session = summary.session
@@ -346,7 +388,9 @@ extension LoggerStore {
         let isFailure = errorCode != 0 || (statusCode != 0 && !(200..<400).contains(statusCode))
         entity.requestState = (isFailure ? LoggerNetworkRequestEntity.State.failure : .success).rawValue
         // Details
-        entity.details = makeRequestDetails(summary)
+
+        populateDetails(entity.details, with: summary)
+
         if case let .directory(store) = document {
             entity.requestBodyKey = store.storeData(summary.requestBody)
             entity.responseBodyKey = store.storeData(summary.responseBody)
@@ -354,9 +398,7 @@ extension LoggerStore {
         return entity
     }
 
-    @discardableResult
-    private func makeRequestDetails(_ summary: LoggerStore.NetworkMessage) -> LoggerNetworkRequestDetailsEntity {
-        let entity = LoggerNetworkRequestDetailsEntity(context: backgroundContext)
+    private func populateDetails(_ entity: LoggerNetworkRequestDetailsEntity, with summary: LoggerStore.NetworkMessage) {
         let encoder = JSONEncoder()
         entity.request = try? encoder.encode(summary.request)
         entity.response = try? encoder.encode(summary.response)
@@ -365,7 +407,6 @@ extension LoggerStore {
         entity.urlSession =  try? encoder.encode(summary.urlSession)
         entity.requestBodySize = Int64(summary.requestBody?.count ?? 0)
         entity.responseBodySize = Int64(summary.responseBody?.count ?? 0)
-        return entity
     }
 
     private func setNeedsSave() {
@@ -465,6 +506,24 @@ extension LoggerStore {
             self.file = file
             self.function = function
             self.line = line
+        }
+    }
+
+    public final class NetworkTaskCreated: Codable {
+        public let taskId: UUID
+        public let createdAt: Date
+        public let request: NetworkLoggerRequest
+        public let requestBody: Data?
+        public let urlSession: NetworkLoggerURLSession?
+        public let session: String
+
+        public init(taskId: UUID, createdAt: Date, request: NetworkLoggerRequest, requestBody: Data?, urlSession: NetworkLoggerURLSession?, session: String) {
+            self.taskId = taskId
+            self.createdAt = createdAt
+            self.request = request
+            self.requestBody = requestBody
+            self.urlSession = urlSession
+            self.session = session
         }
     }
 
@@ -717,7 +776,8 @@ public enum LoggerStoreError: Error, LocalizedError {
     }
 }
 
-private extension URLRequest {
+#warning("TODO: move this")
+extension URLRequest {
 	func httpBodyStreamData() -> Data? {
 		guard let bodyStream = self.httpBodyStream else {
 			return nil
