@@ -112,10 +112,10 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
     @NSManaged public var duration: Double
     @NSManaged public var contentType: String?
     @NSManaged public var isCompleted: Bool
+    /// Contains ``State`` raw value.
     @NSManaged public var requestState: Int16
 
     public enum State: Int16 {
-        // 0 reserved for undefined
         case pending = 1
         case success = 2
         case failure = 3
@@ -123,17 +123,26 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
 
     // Details
     @NSManaged public var details: LoggerNetworkRequestDetailsEntity
-    @NSManaged public var requestBodyKey: String? // key to blob storage
-    @NSManaged public var responseBodyKey: String? // key to blob storage
+    /// The key in the blob storage. To get the data, see ``LoggerStore/getData(forKey:)``.
+    @NSManaged public var requestBodyKey: String?
+    /// The key in the blob storage. To get the data, see ``LoggerStore/getData(forKey:)``.
+    @NSManaged public var responseBodyKey: String?
 }
 
 public final class LoggerNetworkRequestDetailsEntity: NSManagedObject {
-    @NSManaged public var request: Data? // NetworkLoggerRequest
-    @NSManaged public var response: Data? // NetworkLoggerResponse
-    @NSManaged public var error: Data? // NetworkLoggerError
-    @NSManaged public var metrics: Data? // NetworkLoggerMetrics
-    @NSManaged public var urlSession: Data? // NetworkLoggerURLSession
+    /// Contains JSON-encoded ``NetworkLoggerRequest``.
+    @NSManaged public var request: Data?
+    /// Contains JSON-encoded ``NetworkLoggerResponse``.
+    @NSManaged public var response: Data?
+    /// Contains JSON-encoded ``NetworkLoggerError``.
+    @NSManaged public var error: Data?
+    /// Contains JSON-encoded ``NetworkLoggerMetrics``.
+    @NSManaged public var metrics: Data?
+    /// Contains JSON-encoded ``NetworkLoggerURLSession``.
+    @NSManaged public var urlSession: Data?
+    /// The size of the request body.
     @NSManaged public var requestBodySize: Int64
+    /// The size of the response body.
     @NSManaged public var responseBodySize: Int64
 }
 

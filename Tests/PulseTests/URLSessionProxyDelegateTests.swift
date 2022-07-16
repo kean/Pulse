@@ -67,7 +67,7 @@ final class URLSessionProxyDelegateTests: XCTestCase {
         XCTAssertEqual(request.httpMethod, "GET")
         XCTAssertNil(request.errorDomain)
         XCTAssertEqual(request.errorCode, 0)
-        XCTAssertEqual(request.isCompleted, true)
+        XCTAssertEqual(request.requestState, LoggerNetworkRequestEntity.State.success.rawValue)
 
         XCTAssertNil(request.requestBodyKey)
         XCTAssertNotNil(request.responseBodyKey)
@@ -151,7 +151,7 @@ final class URLSessionProxyDelegateTests: XCTestCase {
         XCTAssertEqual(request.httpMethod, "GET")
         XCTAssertNil(request.errorDomain)
         XCTAssertEqual(request.errorCode, 0)
-        XCTAssertEqual(request.isCompleted, true)
+        XCTAssertEqual(request.requestState, LoggerNetworkRequestEntity.State.success.rawValue)
 
         XCTAssertNil(request.requestBodyKey)
         XCTAssertNotNil(request.responseBodyKey)
