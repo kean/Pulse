@@ -25,19 +25,18 @@ public final class NetworkLogger {
     public func logTaskCreated(_ task: URLSessionTask) {
         guard let urlRequest = task.originalRequest else { return }
         lock.lock()
-        defer { lock.unlock() }
-
         _ = context(for: task)
+        lock.unlock()
+
         storeMessage(level: .trace, "Send \(urlRequest.httpMethod ?? "–") \(task.url ?? "–")")
     }
 
     /// Logs the task response (optional).
     public func logDataTask(_ dataTask: URLSessionDataTask, didReceive response: URLResponse) {
         lock.lock()
-        defer { lock.unlock() }
-
         let context = self.context(for: dataTask)
         context.response = response
+        lock.unlock()
 
         let response = NetworkLoggerResponse(urlResponse: response)
         let statusCode = response.statusCode
@@ -48,10 +47,9 @@ public final class NetworkLogger {
     /// Logs the task data that gets appended to the previously received chunks (required).
     public func logDataTask(_ dataTask: URLSessionDataTask, didReceive data: Data) {
         lock.lock()
-        defer { lock.unlock() }
-
         let context = self.context(for: dataTask)
         context.data.append(data)
+        lock.unlock()
 
         storeMessage(level: .trace, "Did receive data: \(ByteCountFormatter.string(fromByteCount: Int64(data.count), countStyle: .file)) for \(dataTask.url ?? "null")")
     }
@@ -59,17 +57,19 @@ public final class NetworkLogger {
     /// Logs the task completion (required).
     public func logTask(_ task: URLSessionTask, didCompleteWithError error: Error?, session: URLSession? = nil) {
         lock.lock()
-        defer { lock.unlock() }
-
         let context = self.context(for: task)
         tasks[ObjectIdentifier(task)] = nil
 
         guard let request = task.currentRequest ?? context.request else {
+            lock.unlock()
             return // This should never happen
         }
         let response = context.response ?? task.response
+        let metrics = context.metrics
+        let data = context.data
+        lock.unlock()
 
-        log(LoggedNetworkTask(task: task, session: session, request: request, response: response, data: context.data, error: error, metrics: context.metrics))
+        log(LoggedNetworkTask(task: task, session: session, request: request, response: response, data: data, error: error, metrics: metrics))
     }
 
     private func log(_ task: LoggedNetworkTask) {
@@ -82,17 +82,15 @@ public final class NetworkLogger {
     /// Logs the task metrics (optional).
     public func logTask(_ task: URLSessionTask, didFinishCollecting metrics: URLSessionTaskMetrics) {
         lock.lock()
-        defer { lock.unlock() }
-
         context(for: task).metrics = NetworkLoggerMetrics(metrics: metrics)
+        lock.unlock()
     }
 
     /// Logs the task metrics (optional).
     public func logTask(_ task: URLSessionTask, didFinishCollecting metrics: NetworkLoggerMetrics) {
         lock.lock()
-        defer { lock.unlock() }
-
         context(for: task).metrics = metrics
+        lock.unlock()
     }
 
     // MARK: - Filter Out
