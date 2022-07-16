@@ -86,7 +86,7 @@ jobs:
         run: |
           set -o pipefail
           xcodebuild build -scheme "Pulse Demo iOS" -destination "OS=15.5,name=iPhone 13 Pro" | xcpretty
-  build-demo-ios:
+  build-demo-tvos:
     name: Build Demo (tvOS)
     runs-on: macOS-12
     env:
