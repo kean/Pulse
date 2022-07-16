@@ -10,7 +10,7 @@ import Network
 
 #if os(iOS) || os(tvOS) || os(watchOS)
 
-@available(iOS 14.0, tvOS 14.0, watchOS 7.0, *)
+@available(iOS 14.0, tvOS 14.0, *)
 struct RemoteLoggerSettingsView: View {
     @ObservedObject var viewModel: RemoteLoggerSettingsViewModel
 
@@ -74,7 +74,7 @@ struct RemoteLoggerSettingsView: View {
     }
 }
 
-@available(iOS 14.0, tvOS 14.0, watchOS 7.0, *)
+@available(iOS 14.0, tvOS 14.0, *)
 final class RemoteLoggerSettingsViewModel: ObservableObject {
     @Published var isEnabled: Bool = false
     @Published var servers: [RemoteLoggerServerViewModel] = []
@@ -135,7 +135,7 @@ struct RemoteLoggerServerViewModel: Identifiable {
     let connect: () -> Void
 }
 
-@available(iOS 14.0, tvOS 14.0, watchOS 7.0, *)
+@available(iOS 14.0, tvOS 14.0, *)
 private extension NWBrowser.Result {
     var name: String? {
         switch endpoint {

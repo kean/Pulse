@@ -9,7 +9,6 @@ import Combine
 
 #if os(tvOS)
 
-@available(tvOS 14, *)
 public struct ConsoleView: View {
     @ObservedObject var viewModel: ConsoleViewModel
     @Environment(\.colorScheme) private var colorScheme: ColorScheme
@@ -33,7 +32,6 @@ public struct ConsoleView: View {
 }
 
 #if DEBUG
-@available(tvOS 14, *)
 struct ConsoleView_Previews: PreviewProvider {
     static var previews: some View {
         return Group {

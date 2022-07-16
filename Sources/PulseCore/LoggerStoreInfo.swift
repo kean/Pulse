@@ -89,7 +89,6 @@ extension LoggerStoreInfo.DeviceInfo {
 #elseif os(watchOS)
 import WatchKit
 
-@available(watchOS 7.0, *)
 func getDeviceId() -> UUID? {
     WKInterfaceDevice.current().identifierForVendor
 }

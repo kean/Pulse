@@ -170,7 +170,6 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     }
 
 #if os(watchOS) || os(iOS)
-    @available(watchOS 7.0, *)
     func tranferStore() {
         LoggerSyncSession.shared.transfer(store: store)
     }

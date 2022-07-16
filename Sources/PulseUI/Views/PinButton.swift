@@ -22,7 +22,7 @@ struct PinButton: View {
     }
 }
 
-@available(iOS 14.0, tvOS 14.0, watchOS 7.0, *)
+@available(iOS 14.0, tvOS 14.0, *)
 struct PinButton2: View {
     @ObservedObject var viewModel: PinButtonViewModel
 
@@ -34,7 +34,7 @@ struct PinButton2: View {
 }
 
 #if os(watchOS)
-@available(iOS 14.0, tvOS 14.0, watchOS 7.0, *)
+@available(iOS 14.0, tvOS 14.0, *)
 struct PinButton3: View {
     @ObservedObject var viewModel: PinButtonViewModel
 

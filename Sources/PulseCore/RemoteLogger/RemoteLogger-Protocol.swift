@@ -5,7 +5,7 @@
 import Foundation
 import Network
 
-@available(iOS 14.0, tvOS 14.0, watchOS 7.0, macOS 11.0, *)
+@available(iOS 14.0, tvOS 14.0, *)
 extension RemoteLogger {
     enum PacketCode: UInt8 {
         case clientHello = 0 // PacketClientHello
@@ -117,7 +117,7 @@ extension RemoteLogger {
     }
 }
 
-@available(iOS 14.0, tvOS 14.0, watchOS 7.0, macOS 11.0, *)
+@available(iOS 14.0, tvOS 14.0, *)
 extension RemoteLogger.Connection {
     func send(code: RemoteLogger.PacketCode, data: Data, _ completion: ((NWError?) -> Void)? = nil) {
         send(code: code.rawValue, data: data, completion)

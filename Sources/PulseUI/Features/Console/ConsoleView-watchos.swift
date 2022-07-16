@@ -10,7 +10,6 @@ import Combine
 #if os(watchOS)
 import WatchConnectivity
 
-@available(watchOS 7.0, *)
 public struct ConsoleView: View {
     @ObservedObject var viewModel: ConsoleViewModel
     @Environment(\.colorScheme) private var colorScheme: ColorScheme
@@ -69,7 +68,6 @@ public struct ConsoleView: View {
     }
 }
 
-@available(watchOS 7.0, *)
 private struct _RemoteLoggingSettingsView: View {
     let viewModel: RemoteLoggerSettingsViewModel
 
@@ -81,7 +79,6 @@ private struct _RemoteLoggingSettingsView: View {
 }
 
 #if DEBUG
-@available(watchOS 7.0, *)
 struct ConsoleView_Previews: PreviewProvider {
     static var previews: some View {
         return Group {

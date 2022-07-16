@@ -8,7 +8,6 @@ import PulseCore
 #if os(tvOS)
 import UniformTypeIdentifiers
 
-@available(tvOS 14.0, *)
 struct SettingsView: View {
     @ObservedObject var viewModel: SettingsViewModel
     @ObservedObject var console: ConsoleViewModel
@@ -32,10 +31,12 @@ struct SettingsView: View {
                         .opacity(console.messages.isEmpty ? 0.33 : 1)
                 }
             }
-            Section {
-                if console.store === RemoteLogger.shared.store {
-                    Section {
-                        RemoteLoggerSettingsView(viewModel: .shared)
+            if #available(tvOS 14.0, *) {
+                Section {
+                    if console.store === RemoteLogger.shared.store {
+                        Section {
+                            RemoteLoggerSettingsView(viewModel: .shared)
+                        }
                     }
                 }
             }
@@ -46,7 +47,6 @@ struct SettingsView: View {
 
 // MARK: - Settings
 
-@available(tvOS 14.0, *)
 final class SettingsViewModel: ObservableObject {
     private let store: LoggerStore
 

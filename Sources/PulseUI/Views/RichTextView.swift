@@ -341,7 +341,7 @@ struct RichTextView_Previews: PreviewProvider {
 #endif
 
 #if os(watchOS)
-@available(tvOS 14.0, watchOS 6, *)
+@available(tvOS 14.0, *)
 struct RichTextView: View {
     let viewModel: RichTextViewModel
 
@@ -350,7 +350,6 @@ struct RichTextView: View {
     }
 }
 
-@available(watchOS 6, *)
 final class RichTextViewModel: ObservableObject {
     let text: String
 

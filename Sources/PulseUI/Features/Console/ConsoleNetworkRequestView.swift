@@ -9,7 +9,6 @@ import CoreData
 
 #if os(watchOS) || os(tvOS)
 
-@available(tvOS 14.0, watchOS 7.0, *)
 struct ConsoleNetworkRequestView: View {
     let viewModel: ConsoleNetworkRequestViewModel
 

@@ -7,7 +7,7 @@ import Network
 
 // MARK: - Helpers (Descriptions)
 
-@available(iOS 14.0, tvOS 14.0, watchOS 7.0, *)
+@available(iOS 14.0, tvOS 14.0, *)
 extension NWBrowser.State {
     var description: String {
         switch self {
@@ -21,7 +21,7 @@ extension NWBrowser.State {
     }
 }
 
-@available(iOS 14.0, tvOS 14.0, watchOS 7.0, *)
+@available(iOS 14.0, tvOS 14.0, *)
 extension NWConnection.State {
     var description: String {
         switch self {

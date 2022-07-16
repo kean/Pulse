@@ -60,7 +60,7 @@ public final class LoggerStore {
         let storeURL = URL.logs.appendingPathComponent("current.pulse", isDirectory: true)
         let store = try? LoggerStore(storeURL: storeURL, options: [.create, .sweep])
         #if !os(macOS)
-        if let store = store, #available(iOS 14.0, tvOS 14.0, watchOS 7.0, *) {
+        if let store = store, #available(iOS 14.0, tvOS 14.0, *) {
             RemoteLogger.shared.initialize(store: store)
         }
         #endif

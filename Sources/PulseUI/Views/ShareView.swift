@@ -48,6 +48,8 @@ extension UIActivityViewController {
 
 private extension UIApplication {
     var topViewController: UIViewController?{
+        let keyWindow = self.currentWindow
+
         if keyWindow?.rootViewController == nil{
             return keyWindow?.rootViewController
         }
@@ -65,6 +67,13 @@ private extension UIApplication {
             }
         }
         return vc
+    }
+
+    var currentWindow: UIWindow? {
+        connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .flatMap { $0.windows }
+            .first { $0.isKeyWindow }
     }
 }
 
