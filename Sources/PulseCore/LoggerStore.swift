@@ -330,7 +330,7 @@ extension LoggerStore {
         let entity = LoggerNetworkRequestEntity(context: backgroundContext)
         // Primary
         entity.createdAt = createdAt
-        entity.session = LoggerSession.current.id.uuidString
+        entity.session = summary.session
         // Denormalized
         entity.url = summary.request.url?.absoluteString
         entity.host = summary.request.url?.host
