@@ -122,6 +122,7 @@
 		0C0B31F326D179A20045C9E1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		0C0B31F526D179A70045C9E1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0C0B31F826D179A70045C9E1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		0C0B31FA26D179A70045C9E1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0C1221E525CE09C100B81D7A /* URLSessionAutomatedIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionAutomatedIntegration.swift; sourceTree = "<group>"; };
 		0C25FB6E25CDDCAB00A895C2 /* URLSessionManualIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionManualIntegration.swift; sourceTree = "<group>"; };
 		0C4719232707EFD5008DB813 /* contributors.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = contributors.json; sourceTree = "<group>"; };
@@ -131,15 +132,18 @@
 		0C57AD74245F0F38005B3400 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0C57AD76245F0F38005B3400 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		0C57AD77245F0F38005B3400 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		0C57AD78245F0F38005B3400 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0C57AD79245F0F38005B3400 /* SceneDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		0C6460C425F5797B002C55B1 /* Pulse Demo tvOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pulse Demo tvOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C6460D625F579B8002C55B1 /* Pulse_tvOSApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Pulse_tvOSApp.swift; sourceTree = "<group>"; };
 		0C6460D725F579B8002C55B1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0C6460D925F579B8002C55B1 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		0C6460DA25F579B8002C55B1 /* ContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		0C6460DB25F579B8002C55B1 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0C6A22E9280B47D400FC8C96 /* Pulse */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Pulse; path = .; sourceTree = "<group>"; };
 		0C767812268F88BB0058F69B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0C767814268F88BB0058F69B /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		0C767815268F88BB0058F69B /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0C767816268F88BB0058F69B /* Pulse_Demo_iOSApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Pulse_Demo_iOSApp.swift; sourceTree = "<group>"; };
 		0CD2A4AB25D4A2E70087E9E3 /* MockStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockStore.swift; sourceTree = "<group>"; };
 		0CD2A4AC25D4A2E70087E9E3 /* MockDataTask.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockDataTask.swift; sourceTree = "<group>"; };
@@ -151,7 +155,9 @@
 		0CEAB40925FE867300F09B0F /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		0CEAB40A25FE867300F09B0F /* PulseAppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PulseAppApp.swift; sourceTree = "<group>"; };
 		0CEAB40B25FE867300F09B0F /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		0CEAB40C25FE867300F09B0F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0CEAB40E25FE867300F09B0F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		0CEAB40F25FE867300F09B0F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0CFF9BD825D6199A0069DB6A /* repos.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = repos.json; sourceTree = "<group>"; };
 		49E82A8526D107A00070244F /* AlamofireIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlamofireIntegration.swift; sourceTree = "<group>"; };
 		49E82A8826D1083D0070244F /* MoyaIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoyaIntegration.swift; sourceTree = "<group>"; };
@@ -216,6 +222,7 @@
 				0C0B31F226D179A20045C9E1 /* Main.storyboard */,
 				0C0B31F526D179A70045C9E1 /* Assets.xcassets */,
 				0C0B31F726D179A70045C9E1 /* LaunchScreen.storyboard */,
+				0C0B31FA26D179A70045C9E1 /* Info.plist */,
 			);
 			path = Integrations;
 			sourceTree = "<group>";
@@ -292,6 +299,7 @@
 				0C57AD74245F0F38005B3400 /* Assets.xcassets */,
 				0C57AD75245F0F38005B3400 /* LaunchScreen.storyboard */,
 				0C57AD77245F0F38005B3400 /* AppDelegate.swift */,
+				0C57AD78245F0F38005B3400 /* Info.plist */,
 				0C57AD79245F0F38005B3400 /* SceneDelegate.swift */,
 				0C516FEF26016392004813B4 /* DocumentBrowser.swift */,
 			);
@@ -312,6 +320,7 @@
 				0C6460D725F579B8002C55B1 /* Assets.xcassets */,
 				0C6460D825F579B8002C55B1 /* Preview Content */,
 				0C6460DA25F579B8002C55B1 /* ContentView.swift */,
+				0C6460DB25F579B8002C55B1 /* Info.plist */,
 			);
 			path = tvOS;
 			sourceTree = "<group>";
@@ -329,6 +338,7 @@
 			children = (
 				0C767812268F88BB0058F69B /* Assets.xcassets */,
 				0C767813268F88BB0058F69B /* Preview Content */,
+				0C767815268F88BB0058F69B /* Info.plist */,
 				0C767816268F88BB0058F69B /* Pulse_Demo_iOSApp.swift */,
 			);
 			path = iOS;
@@ -368,6 +378,7 @@
 				0CEAB40825FE867300F09B0F /* Preview Content */,
 				0CEAB40A25FE867300F09B0F /* PulseAppApp.swift */,
 				0CEAB40B25FE867300F09B0F /* ContentView.swift */,
+				0CEAB40C25FE867300F09B0F /* Info.plist */,
 			);
 			path = Extension;
 			sourceTree = "<group>";
@@ -384,6 +395,7 @@
 			isa = PBXGroup;
 			children = (
 				0CEAB40E25FE867300F09B0F /* Assets.xcassets */,
+				0CEAB40F25FE867300F09B0F /* Info.plist */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -750,6 +762,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = Integrations/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -768,6 +781,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = Integrations/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -790,6 +804,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"Demo/iOS/Preview Content\"";
 				DEVELOPMENT_TEAM = NR8DLKJ7E6;
 				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = Demo/iOS/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -813,6 +828,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"Demo/iOS/Preview Content\"";
 				DEVELOPMENT_TEAM = NR8DLKJ7E6;
 				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = Demo/iOS/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -860,7 +876,6 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -898,7 +913,6 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
@@ -914,6 +928,7 @@
 				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = NR8DLKJ7E6;
 				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = App/iOS/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -935,6 +950,7 @@
 				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = NR8DLKJ7E6;
 				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = App/iOS/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -956,6 +972,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "Demo/tvOS/Preview\\ Content";
 				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = Demo/tvOS/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -977,6 +994,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "Demo/tvOS/Preview\\ Content";
 				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = Demo/tvOS/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -999,6 +1017,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"Demo/watchOS/Extension//Preview Content\"";
 				DEVELOPMENT_TEAM = NR8DLKJ7E6;
 				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = Demo/watchOS/Extension/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1024,6 +1043,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"Demo/watchOS/Extension//Preview Content\"";
 				DEVELOPMENT_TEAM = NR8DLKJ7E6;
 				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = Demo/watchOS/Extension/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1050,6 +1070,7 @@
 				CURRENT_PROJECT_VERSION = 20;
 				DEVELOPMENT_TEAM = NR8DLKJ7E6;
 				IBSC_MODULE = Pulse_watchOS_Extension;
+				INFOPLIST_FILE = Demo/watchOS/App/Info.plist;
 				MARKETING_VERSION = 0.9.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.github.kean.PulseDemo.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1071,6 +1092,7 @@
 				CURRENT_PROJECT_VERSION = 20;
 				DEVELOPMENT_TEAM = NR8DLKJ7E6;
 				IBSC_MODULE = Pulse_watchOS_Extension;
+				INFOPLIST_FILE = Demo/watchOS/App/Info.plist;
 				MARKETING_VERSION = 0.9.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.github.kean.PulseDemo.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
