@@ -391,12 +391,12 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
         switch event {
         case .messageStored(let message):
             connection?.send(code: .storeEventMessageStored, entity: message)
-        case .networkTaskCreated:
-            #warning("TODO: implement")
-            break
-        case .networkTaskProgressUpdated:
-            #warning("TODO: implement")
-            break
+        case .networkTaskCreated(let event):
+            var event = event
+            event.requestBody = nil // Don't send it now - will send at the end
+            connection?.send(code: .storeEventNetworkTaskCreated, entity: event)
+        case .networkTaskProgressUpdated(let event):
+            connection?.send(code: .storeEventNetworkTaskProgressUpdated, entity: event)
         case .networkTaskCompleted(let message):
             do {
                 let data = try RemoteLogger.PacketNetworkMessage.encode(message)

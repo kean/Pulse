@@ -36,23 +36,11 @@ public enum LoggerStoreEvent {
         }
     }
 
-    public final class NetworkTaskProgressUpdated: Codable {
-        public let taskId: UUID
-        public let completedUnitCount: Int64
-        public let totalUnitCount: Int64
-
-        public init(taskId: UUID, completedUnitCount: Int64, totalUnitCount: Int64) {
-            self.taskId = taskId
-            self.completedUnitCount = completedUnitCount
-            self.totalUnitCount = totalUnitCount
-        }
-    }
-
-    public final class NetworkTaskCreated: Codable {
+    public struct NetworkTaskCreated: Codable {
         public let taskId: UUID
         public let createdAt: Date
         public let request: NetworkLoggerRequest
-        public let requestBody: Data?
+        public var requestBody: Data?
         public let session: String
 
         public init(taskId: UUID, createdAt: Date, request: NetworkLoggerRequest, requestBody: Data?, session: String) {
@@ -61,6 +49,18 @@ public enum LoggerStoreEvent {
             self.request = request
             self.requestBody = requestBody
             self.session = session
+        }
+    }
+
+    public struct NetworkTaskProgressUpdated: Codable {
+        public let taskId: UUID
+        public let completedUnitCount: Int64
+        public let totalUnitCount: Int64
+
+        public init(taskId: UUID, completedUnitCount: Int64, totalUnitCount: Int64) {
+            self.taskId = taskId
+            self.completedUnitCount = completedUnitCount
+            self.totalUnitCount = totalUnitCount
         }
     }
 

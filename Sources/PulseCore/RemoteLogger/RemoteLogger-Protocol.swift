@@ -19,7 +19,8 @@ extension RemoteLogger {
         // Store events
         case storeEventMessageStored = 7
         case storeEventNetworkTaskCreated = 8
-        case storeEventNetworkTaskCompleted = 9
+        case storeEventNetworkTaskProgressUpdated = 9
+        case storeEventNetworkTaskCompleted = 10
 
         var description: String {
             switch self {
@@ -30,6 +31,7 @@ extension RemoteLogger {
             case .ping: return "PacketCode.ping"
             case .storeEventMessageStored: return "PacketCode.storeEventMessageStored"
             case .storeEventNetworkTaskCreated: return "PacketCode.storeEventNetworkTaskCreated"
+            case .storeEventNetworkTaskProgressUpdated: return "Packet.storeEventNetworkTaskProgressUpdated"
             case .storeEventNetworkTaskCompleted: return "PacketCode.storeEventNetworkTaskCompleted"
             }
         }
