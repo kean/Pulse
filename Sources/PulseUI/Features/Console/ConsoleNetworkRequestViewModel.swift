@@ -73,7 +73,7 @@ final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
         }
         if request.responseBodySize > 0 {
             let size = ByteCountFormatter.string(fromByteCount: request.responseBodySize, countStyle: .file)
-            title += " · \(request.isFromCache ? size + " (cache)": size)"
+            title += " · \(request.isFromCache ? "Cache" : size)"
         }
         self.title = title
 
@@ -84,7 +84,12 @@ final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
         }
 
 #else
+        if request.responseBodySize > 0 {
+            let size = ByteCountFormatter.string(fromByteCount: request.responseBodySize, countStyle: .file)
+            prefix += " · \(request.isFromCache ? "Cache" : size)"
+        }
         self.status = prefix
+
         var title = "\(time)"
         if request.duration > 0 {
             title += " · \(DurationFormatter.string(from: request.duration))"
