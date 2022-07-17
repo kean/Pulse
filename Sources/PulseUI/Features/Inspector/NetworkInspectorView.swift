@@ -83,7 +83,9 @@ struct NetworkInspectorView: View {
             }
 
             makeKeyValueSection(viewModel: viewModel.requestHeaders)
-            makeKeyValueSection(viewModel: viewModel.responseHeaders)
+            if let responseHeaders = viewModel.responseHeaders {
+                makeKeyValueSection(viewModel: responseHeaders)
+            }
         }
     }
 

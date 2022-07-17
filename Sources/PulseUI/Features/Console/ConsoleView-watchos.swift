@@ -49,6 +49,7 @@ public struct ConsoleView: View {
                 ButtonRemoveAll(action: viewModel.buttonRemoveAllMessagesTapped)
                     .disabled(viewModel.messages.isEmpty)
                     .opacity(viewModel.messages.isEmpty ? 0.33 : 1)
+                    .padding(.bottom, 4)
             }
         }
         .alert(item: $viewModel.fileTransferError) { error in
