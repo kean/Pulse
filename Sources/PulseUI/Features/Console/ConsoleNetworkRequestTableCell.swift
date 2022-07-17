@@ -71,7 +71,7 @@ final class ConsoleNetworkRequestTableCell: UITableViewCell, UIContextMenuIntera
 
         if let state = self.state, state != viewModel.state {
             UIView.animate(withDuration: 0.33, delay: 0, options: [.allowUserInteraction]) {
-                self.backgroundColor = viewModel.badgeColor.withAlphaComponent(0.25)
+                self.backgroundColor = viewModel.badgeColor.withAlphaComponent(0.15)
             } completion: { _ in
                 UIView.animate(withDuration: 1.0, delay: 0.5, options: [.allowUserInteraction]) {
                     self.backgroundColor = .clear
