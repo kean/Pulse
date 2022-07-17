@@ -89,27 +89,18 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 
     // MARK: - NSFetchedResultsControllerDelegate
 
-    private var isUpdateOnly = false
-
-    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-        if type != .update {
-            isUpdateOnly = false
-        }
-        switch type {
-        case .insert:
-            if let entity = anObject as? LoggerNetworkRequestEntity {
-                searchCriteria.didInsertEntity(entity)
+    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChangeContentWith diff: CollectionDifference<NSManagedObjectID>) {
+        for insertion in diff.insertions {
+            if case let .insert(index, _, _) = insertion {
+                let indexPath = IndexPath(item: index, section: 0)
+                let message = controller.object(at: indexPath) as! LoggerNetworkRequestEntity
+                searchCriteria.didInsertEntity(message)
             }
-        default:
-            break
         }
-    }
-
-    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        if !isUpdateOnly {
-            self.didRefreshEntities()
-        }
-        isUpdateOnly = true
+#if os(iOS)
+        self.table.diff = diff
+#endif
+        self.didRefreshEntities()
     }
 
     private func didRefreshEntities() {

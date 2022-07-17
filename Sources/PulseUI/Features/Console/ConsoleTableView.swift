@@ -13,6 +13,7 @@ import UIKit
 final class ConsoleTableViewModel {
     let store: LoggerStore
     let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel?
+    var diff: CollectionDifference<NSManagedObjectID>?
     @Published var entities: [NSManagedObject] = []
 
     init(store: LoggerStore, searchCriteriaViewModel: ConsoleSearchCriteriaViewModel?) {
@@ -101,7 +102,12 @@ final class ConsoleTableViewController: UITableViewController {
 
     private func display(_ entities: [NSManagedObject]) {
         self.entities = entities
-        self.tableView.reloadData()
+        if let diff = viewModel.diff {
+            viewModel.diff = nil
+            tableView.apply(diff: diff)
+        } else {
+            tableView.reloadData()
+        }
     }
 
     func setHeaderView<Header: View>(_ view: Header) {
