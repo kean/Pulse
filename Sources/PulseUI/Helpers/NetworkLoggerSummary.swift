@@ -18,6 +18,7 @@ final class NetworkLoggerSummary {
     let responseBodyKey: String?
     let requestBodySize: Int64
     let responseBodySize: Int64
+    let isFromCache: Bool
 
     private(set) lazy var requestBody: Data? = requestBodyKey.flatMap(store.getData)
     private(set) lazy var responseBody: Data? = responseBodyKey.flatMap(store.getData)
@@ -32,9 +33,10 @@ final class NetworkLoggerSummary {
         self.error = details.error.flatMap(decode(NetworkLoggerError.self))
         self.metrics = details.metrics.flatMap(decode(NetworkLoggerMetrics.self))
         self.requestBodyKey = request.requestBodyKey
-        self.requestBodySize = details.requestBodySize
+        self.requestBodySize = request.requestBodySize
         self.responseBodyKey = request.responseBodyKey
-        self.responseBodySize = details.responseBodySize
+        self.responseBodySize = request.responseBodySize
+        self.isFromCache = request.isFromCache
         self.objectId = request.objectID
 
         self.store = store

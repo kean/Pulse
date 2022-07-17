@@ -43,8 +43,6 @@ public extension LoggerStore {
             NSAttributeDescription(name: "response", type: .binaryDataAttributeType),
             NSAttributeDescription(name: "error", type: .binaryDataAttributeType),
             NSAttributeDescription(name: "metrics", type: .binaryDataAttributeType),
-            NSAttributeDescription(name: "requestBodySize", type: .integer64AttributeType),
-            NSAttributeDescription(name: "responseBodySize", type: .integer64AttributeType)
         ]
 
         request.properties = [
@@ -62,6 +60,9 @@ public extension LoggerStore {
             NSAttributeDescription(name: "requestState", type: .integer16AttributeType),
             NSAttributeDescription(name: "requestBodyKey", type: .stringAttributeType),
             NSAttributeDescription(name: "responseBodyKey", type: .stringAttributeType),
+            NSAttributeDescription(name: "requestBodySize", type: .integer64AttributeType),
+            NSAttributeDescription(name: "responseBodySize", type: .integer64AttributeType),
+            NSAttributeDescription(name: "isFromCache", type: .booleanAttributeType),
             NSAttributeDescription(name: "completedUnitCount", type: .integer64AttributeType),
             NSAttributeDescription(name: "totalUnitCount", type: .integer64AttributeType),
             NSRelationshipDescription.make(name: "details", type: .oneToOne(), entity: requestDetails),
@@ -122,15 +123,22 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
         case failure = 3
     }
 
-    // Details
+    /// Request details.
     @NSManaged public var details: LoggerNetworkRequestDetailsEntity
     /// The key in the blob storage. To get the data, see ``LoggerStore/getData(forKey:)``.
     @NSManaged public var requestBodyKey: String?
     /// The key in the blob storage. To get the data, see ``LoggerStore/getData(forKey:)``.
     @NSManaged public var responseBodyKey: String?
+    /// The size of the request body.
+    @NSManaged public var requestBodySize: Int64
+    /// The size of the response body.
+    @NSManaged public var responseBodySize: Int64
+    /// Returns `true` if the response was returned from the local cache.
+    @NSManaged public var isFromCache: Bool
 
-    // Progress
+    /// Indicates current download or upload progress.
     @NSManaged public var completedUnitCount: Int64
+    /// Indicates current download or upload progress.
     @NSManaged public var totalUnitCount: Int64
 }
 
@@ -143,10 +151,6 @@ public final class LoggerNetworkRequestDetailsEntity: NSManagedObject {
     @NSManaged public var error: Data?
     /// Contains JSON-encoded ``NetworkLoggerMetrics``.
     @NSManaged public var metrics: Data?
-    /// The size of the request body.
-    @NSManaged public var requestBodySize: Int64
-    /// The size of the response body.
-    @NSManaged public var responseBodySize: Int64
 }
 
 // MARK: - Helpers

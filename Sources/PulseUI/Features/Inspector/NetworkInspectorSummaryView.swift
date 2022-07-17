@@ -182,7 +182,6 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
             return nil
         }
         let contentType = summary.response?.headers.first(where: { $0.key == "Content-Type" })?.value ?? "–"
-        let isFromCache = summary.metrics?.transactions.last?.resourceFetchType == URLSessionTaskMetrics.ResourceFetchType.localCache.rawValue
         let size = ByteCountFormatter.string(fromByteCount: summary.responseBodySize, countStyle: .file)
         return KeyValueSectionViewModel(
             title: "Response Body",
@@ -193,7 +192,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
             ),
             items: [
                 ("Content-Type", contentType),
-                ("Size", isFromCache ? size + " (from cache)": size)
+                ("Size", summary.isFromCache ? size + " (from cache)": size)
             ]
         )
     }

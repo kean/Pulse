@@ -71,6 +71,10 @@ final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
         if request.duration > 0 {
             title += " · \(DurationFormatter.string(from: request.duration))"
         }
+        if request.responseBodySize > 0 {
+            let size = ByteCountFormatter.string(fromByteCount: request.responseBodySize, countStyle: .file)
+            title += " · \(request.isFromCache ? size + " (cache)": size)"
+        }
         self.title = title
 
         switch state {

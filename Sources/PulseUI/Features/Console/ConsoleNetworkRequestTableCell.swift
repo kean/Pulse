@@ -37,7 +37,7 @@ final class ConsoleNetworkRequestTableCell: UITableViewCell, UIContextMenuIntera
         ])
 
         contentView.addSubview(stack)
-        stack.pinToSuperview(insets: .init(top: 10, left: 16, bottom: 10, right: 16))
+        stack.pinToSuperview(insets: .init(top: 10, left: 16, bottom: 10, right: 12))
 
         contentView.addSubview(pin)
         pin.translatesAutoresizingMaskIntoConstraints = false

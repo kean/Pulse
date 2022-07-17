@@ -353,6 +353,9 @@ extension LoggerStore {
             request.requestBodyKey = store.storeData(event.requestBody)
             request.responseBodyKey = store.storeData(event.responseBody)
         }
+        request.requestBodySize = Int64(event.requestBody?.count ?? 0)
+        request.responseBodySize = Int64(event.responseBody?.count ?? 0)
+        request.isFromCache = event.metrics?.transactions.last?.resourceFetchType == URLSessionTaskMetrics.ResourceFetchType.localCache.rawValue
 
         // Populate details
         let details = request.details
@@ -361,8 +364,6 @@ extension LoggerStore {
         details.response = try? encoder.encode(event.response)
         details.error = try? encoder.encode(event.error)
         details.metrics = try? encoder.encode(event.metrics)
-        details.requestBodySize = Int64(event.requestBody?.count ?? 0)
-        details.responseBodySize = Int64(event.responseBody?.count ?? 0)
 
         // Update associated message state
         let message = findOrCreateMessageEntity(for: request, networkRequest: event.request)
@@ -388,8 +389,11 @@ extension LoggerStore {
         let entity = LoggerNetworkRequestEntity(context: backgroundContext)
         entity.taskId = taskId
         entity.createdAt = createdAt
-        entity.completedUnitCount = 0
-        entity.totalUnitCount = 0
+        entity.completedUnitCount = -1
+        entity.totalUnitCount = -1
+        entity.responseBodySize = -1
+        entity.requestBodySize = -1
+        entity.isFromCache = false
         entity.details = LoggerNetworkRequestDetailsEntity(context: backgroundContext)
         return entity
     }

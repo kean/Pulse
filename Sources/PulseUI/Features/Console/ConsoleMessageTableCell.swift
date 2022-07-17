@@ -34,7 +34,7 @@ final class ConsoleMessageTableCell: UITableViewCell, UIContextMenuInteractionDe
         ])
 
         contentView.addSubview(stack)
-        stack.pinToSuperview(insets: .init(top: 10, left: 16, bottom: 10, right: 16))
+        stack.pinToSuperview(insets: .init(top: 10, left: 16, bottom: 10, right: 12))
 
         contentView.addSubview(pin)
         pin.translatesAutoresizingMaskIntoConstraints = false
@@ -109,9 +109,11 @@ final class ConsoleMessageAccessoryView: UIView {
 
         textLabel.font = .preferredFont(forTextStyle: .caption1)
         textLabel.textColor = .secondaryLabel
+        textLabel.setContentCompressionResistancePriority(.init(800), for: .horizontal)
 
         let disclosureIndicator = UIImageView(image: ConsoleMessageAccessoryView.chevron)
         disclosureIndicator.tintColor = .separator
+        disclosureIndicator.setContentCompressionResistancePriority(.init(800), for: .horizontal)
 
         let stack = UIStackView.hStack(spacing: 4, [textLabel, disclosureIndicator])
         addSubview(stack)
