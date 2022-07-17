@@ -181,7 +181,6 @@ private struct Label: NSViewRepresentable {
     func makeNSView(context: Context) -> NSTextField {
         let label = NSTextField.label()
         label.isSelectable = true
-        label.attributedStringValue = text
         label.allowsEditingTextAttributes = true
         label.lineBreakMode = .byCharWrapping
         label.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
@@ -189,7 +188,7 @@ private struct Label: NSViewRepresentable {
     }
 
     func updateNSView(_ nsView: NSTextField, context: Context) {
-
+        nsView.attributedStringValue = text
     }
 }
 
