@@ -79,12 +79,12 @@ private func populateStore(_ store: LoggerStore) {
         let dataTask = urlSession.dataTask(with: mockTask.request)
         networkLogger.logTaskCreated(dataTask)
 
-            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(Int.random(in: 2000...6000))) {
-                networkLogger.logDataTask(dataTask, didReceive: mockTask.response)
-                networkLogger.logDataTask(dataTask, didReceive: mockTask.responseBody)
-                networkLogger.logTask(dataTask, didFinishCollecting: mockTask.metrics)
-                networkLogger.logTask(dataTask, didCompleteWithError: nil, session: urlSession)
-            }
+//            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(Int.random(in: 2000...6000))) {
+//                networkLogger.logDataTask(dataTask, didReceive: mockTask.response)
+//                networkLogger.logDataTask(dataTask, didReceive: mockTask.responseBody)
+//                networkLogger.logTask(dataTask, didFinishCollecting: mockTask.metrics)
+//                networkLogger.logTask(dataTask, didCompleteWithError: nil, session: urlSession)
+//            }
         }
     }
 

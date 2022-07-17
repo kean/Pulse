@@ -13,7 +13,9 @@ struct NetworkInspectorHeadersView: View {
         ScrollView {
             VStack(spacing: 16) {
                 KeyValueSectionView(viewModel: viewModel.requestHeaders)
-                KeyValueSectionView(viewModel: viewModel.responseHeaders)
+                if let responseHeaders = viewModel.responseHeaders {
+                    KeyValueSectionView(viewModel: responseHeaders)
+                }
                 Spacer()
             }.padding()
 
@@ -21,9 +23,11 @@ struct NetworkInspectorHeadersView: View {
                 Text("")
             }.hidden()
 
-            NavigationLink(destination: NetworkHeadersDetailsView(viewModel: viewModel.responseHeaders), isActive: $viewModel.isResponseRawActive) {
-                Text("")
-            }.hidden()
+            if let responseHeaders = viewModel.responseHeaders {
+                NavigationLink(destination: NetworkHeadersDetailsView(viewModel: responseHeaders), isActive: $viewModel.isResponseRawActive) {
+                    Text("")
+                }.hidden()
+            }
         }
     }
 }
@@ -100,8 +104,10 @@ final class NetworkInspectorHeaderViewModel: ObservableObject {
         )
     }
 
-    var responseHeaders: KeyValueSectionViewModel {
-        let items = (summary.response?.headers ?? [:]).sorted(by: { $0.key < $1.key })
+    var responseHeaders: KeyValueSectionViewModel? {
+        guard let headers = summary.response?.headers else {
+            return nil
+        }
         return KeyValueSectionViewModel(
             title: "Response Headers",
             color: .indigo,
@@ -109,7 +115,7 @@ final class NetworkInspectorHeaderViewModel: ObservableObject {
                 action: { [unowned self] in isResponseRawActive = true },
                 title: "View Raw"
             ),
-            items: items
+            items: headers.sorted(by: { $0.key < $1.key })
         )
     }
 }

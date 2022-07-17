@@ -55,7 +55,9 @@ struct NetworkInspectorSummaryView: View {
 
         #if os(watchOS)
         KeyValueSectionView(viewModel: viewModel.requestHeaders)
-        KeyValueSectionView(viewModel: viewModel.responseHeaders)
+        if let responseHeaders = viewModel.responseHeaders {
+            KeyValueSectionView(viewModel: responseHeaders)
+        }
         #endif
 
         linksView
@@ -86,8 +88,10 @@ struct NetworkInspectorSummaryView: View {
                 Text("")
             }
 
-            NavigationLink(destination: NetworkHeadersDetailsView(viewModel: viewModel.responseHeaders), isActive: $viewModel.isResponseHeadearsRawActive) {
-                Text("")
+            if let responesHeaders = viewModel.responseHeaders {
+                NavigationLink(destination: NetworkHeadersDetailsView(viewModel: responesHeaders), isActive: $viewModel.isResponseHeadearsRawActive) {
+                    Text("")
+                }
             }
             #endif
         }
@@ -247,8 +251,10 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
         )
     }
 
-    var responseHeaders: KeyValueSectionViewModel {
-        let items = (summary.response?.headers ?? [:]).sorted(by: { $0.key < $1.key })
+    var responseHeaders: KeyValueSectionViewModel? {
+        guard let headers = summary.response?.headers else {
+            return nil
+        }
         return KeyValueSectionViewModel(
             title: "Response Headers",
             color: .indigo,
@@ -256,7 +262,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
                 action: { [unowned self] in isResponseHeadearsRawActive = true },
                 title: "View Raw"
             ),
-            items: items
+            items: headers.sorted(by: { $0.key < $1.key })
         )
     }
     #endif
