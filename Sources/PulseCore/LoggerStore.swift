@@ -240,11 +240,11 @@ extension LoggerStore {
     ///
     /// - note: If you want to store incremental updates to the task, use
     /// `NetworkLogger` instead.
-    public func storeRequest(_ request: URLRequest, response: URLResponse?, error: Error?, data: Data?, metrics: URLSessionTaskMetrics? = nil, session: URLSession? = nil) {
-        storeRequest(taskId: UUID(), request: request, response: response, error: error, data: data, metrics: metrics.map(NetworkLoggerMetrics.init), session: session)
+    public func storeRequest(_ request: URLRequest, response: URLResponse?, error: Error?, data: Data?, metrics: URLSessionTaskMetrics? = nil) {
+        storeRequest(taskId: UUID(), request: request, response: response, error: error, data: data, metrics: metrics.map(NetworkLoggerMetrics.init))
     }
     
-    func storeRequest(taskId: UUID, request: URLRequest, response: URLResponse?, error: Error?, data: Data?, metrics: NetworkLoggerMetrics?, session: URLSession?) {
+    func storeRequest(taskId: UUID, request: URLRequest, response: URLResponse?, error: Error?, data: Data?, metrics: NetworkLoggerMetrics?) {
         handle(.networkTaskCompleted(.init(
             taskId: taskId,
             createdAt: makeCurrentDate(),
@@ -254,7 +254,6 @@ extension LoggerStore {
             requestBody: request.httpBody ?? request.httpBodyStreamData(),
             responseBody: data,
             metrics: metrics,
-            urlSession: session.map(NetworkLoggerURLSession.init),
             session: LoggerSession.current.id.uuidString
         )))
     }
@@ -278,9 +277,10 @@ extension LoggerStore {
 
     private func _handle(_ event: LoggerStoreEvent) {
         switch event {
-        case .messageStored(let message): process(message)
-        case .networkTaskCreated(let networkTaskCreated): process(networkTaskCreated)
-        case .networkTaskCompleted(let networkMessage): process(networkMessage)
+        case .messageStored(let event): process(event)
+        case .networkTaskCreated(let event): process(event)
+        case .networkTaskProgressUpdated(let event): process(event)
+        case .networkTaskCompleted(let event): process(event)
         }
     }
 
@@ -309,10 +309,7 @@ extension LoggerStore {
     private func process(_ event: LoggerStoreEvent.NetworkTaskCreated) {
         let request = findOrCreateNetworkRequestEntity(forTaskId: event.taskId, createdAt: event.createdAt)
 
-        // Primary
-        request.createdAt = event.createdAt
         request.session = event.session
-        // Denormalized
         request.url = event.request.url?.absoluteString
         request.host = event.request.url?.host
         request.httpMethod = event.request.httpMethod
@@ -325,6 +322,12 @@ extension LoggerStore {
         }
 
         findOrCreateMessageEntity(for: request, networkRequest: event.request)
+    }
+
+    private func process(_ event: LoggerStoreEvent.NetworkTaskProgressUpdated) {
+        guard let request = findNetworkRequestEntity(forTaskId: event.taskId) else { return }
+        request.completedUnitCount = event.completedUnitCount
+        request.totalUnitCount = event.totalUnitCount
     }
 
     private func process(_ event: LoggerStoreEvent.NetworkTaskCompleted) {
@@ -358,7 +361,6 @@ extension LoggerStore {
         details.response = try? encoder.encode(event.response)
         details.error = try? encoder.encode(event.error)
         details.metrics = try? encoder.encode(event.metrics)
-        details.urlSession =  try? encoder.encode(event.urlSession)
         details.requestBodySize = Int64(event.requestBody?.count ?? 0)
         details.responseBodySize = Int64(event.responseBody?.count ?? 0)
 
@@ -372,16 +374,22 @@ extension LoggerStore {
         }
     }
 
+    private func findNetworkRequestEntity(forTaskId taskId: UUID) -> LoggerNetworkRequestEntity? {
+        let entity = NSFetchRequest<LoggerNetworkRequestEntity>(entityName: "\(LoggerNetworkRequestEntity.self)")
+        entity.fetchLimit = 1
+        entity.predicate = NSPredicate(format: "taskId == %@", taskId as NSUUID)
+        return try? backgroundContext.fetch(entity).first
+    }
+
     private func findOrCreateNetworkRequestEntity(forTaskId taskId: UUID, createdAt: Date) -> LoggerNetworkRequestEntity {
-        let request = NSFetchRequest<LoggerNetworkRequestEntity>(entityName: "\(LoggerNetworkRequestEntity.self)")
-        request.fetchLimit = 1
-        request.predicate = NSPredicate(format: "taskId == %@", taskId as NSUUID)
-        if let entity = try? backgroundContext.fetch(request).first {
+        if let entity = findNetworkRequestEntity(forTaskId: taskId) {
             return entity
         }
         let entity = LoggerNetworkRequestEntity(context: backgroundContext)
         entity.taskId = taskId
         entity.createdAt = createdAt
+        entity.completedUnitCount = 0
+        entity.totalUnitCount = 0
         entity.details = LoggerNetworkRequestDetailsEntity(context: backgroundContext)
         return entity
     }
@@ -707,32 +715,4 @@ public enum LoggerStoreError: Error, LocalizedError {
         case .unknownError: return "Unexpected error"
         }
     }
-}
-
-#warning("TODO: move this")
-extension URLRequest {
-	func httpBodyStreamData() -> Data? {
-		guard let bodyStream = self.httpBodyStream else {
-			return nil
-		}
-
-		// Will read 16 chars per iteration. Can use bigger buffer if needed
-		let bufferSize: Int = 16
-		let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: bufferSize)
-
-		bodyStream.open()
-		defer {
-			buffer.deallocate()
-			bodyStream.close()
-		}
-
-		var bodyStreamData = Data()
-
-		while bodyStream.hasBytesAvailable {
-			let readData = bodyStream.read(buffer, maxLength: bufferSize)
-			bodyStreamData.append(buffer, count: readData)
-		}
-
-		return bodyStreamData
-	}
 }

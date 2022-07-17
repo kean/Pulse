@@ -101,3 +101,32 @@ extension NSManagedObjectContext {
         return try unwrappedResult.get()
     }
 }
+
+// MARK: - Misc
+
+extension URLRequest {
+    func httpBodyStreamData() -> Data? {
+        guard let bodyStream = self.httpBodyStream else {
+            return nil
+        }
+
+        // Will read 16 chars per iteration. Can use bigger buffer if needed
+        let bufferSize: Int = 16
+        let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: bufferSize)
+
+        bodyStream.open()
+        defer {
+            buffer.deallocate()
+            bodyStream.close()
+        }
+
+        var bodyStreamData = Data()
+
+        while bodyStream.hasBytesAvailable {
+            let readData = bodyStream.read(buffer, maxLength: bufferSize)
+            bodyStreamData.append(buffer, count: readData)
+        }
+
+        return bodyStreamData
+    }
+}

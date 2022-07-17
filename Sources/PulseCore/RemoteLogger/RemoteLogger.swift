@@ -391,6 +391,12 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
         switch event {
         case .messageStored(let message):
             connection?.send(code: .storeEventMessageStored, entity: message)
+        case .networkTaskCreated:
+            #warning("TODO: implement")
+            break
+        case .networkTaskProgressUpdated:
+            #warning("TODO: implement")
+            break
         case .networkTaskCompleted(let message):
             do {
                 let data = try RemoteLogger.PacketNetworkMessage.encode(message)
@@ -398,9 +404,6 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
             } catch {
                 log(label: "RemoteLogger", "Failed to encode network message \(error)")
             }
-        case .networkTaskCreated:
-            #warning("TODO: implement")
-            break
         }
     }
 }

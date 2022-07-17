@@ -12,7 +12,6 @@ final class NetworkLoggerSummary {
     let response: NetworkLoggerResponse?
     let error: NetworkLoggerError?
     let metrics: NetworkLoggerMetrics?
-    let session: NetworkLoggerURLSession?
 
     let requestBodyKey: String?
     let responseBodyKey: String?
@@ -30,7 +29,6 @@ final class NetworkLoggerSummary {
         self.response = details.response.flatMap(decode(NetworkLoggerResponse.self))
         self.error = details.error.flatMap(decode(NetworkLoggerError.self))
         self.metrics = details.metrics.flatMap(decode(NetworkLoggerMetrics.self))
-        self.session = details.urlSession.flatMap(decode(NetworkLoggerURLSession.self))
         self.requestBodyKey = request.requestBodyKey
         self.requestBodySize = details.requestBodySize
         self.responseBodyKey = request.responseBodyKey

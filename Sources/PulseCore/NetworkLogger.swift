@@ -36,7 +36,6 @@ public final class NetworkLogger {
                 createdAt: Date(),
                 request: .init(urlRequest: request),
                 requestBody: request.httpBody ?? request.httpBodyStreamData(),
-                urlSession: nil,
                 session: LoggerSession.current.id.uuidString
             )))
         }
@@ -62,6 +61,7 @@ public final class NetworkLogger {
         context.data.append(data)
         lock.unlock()
 
+        #warning("TODO: do we need to store these trace messages?")
         storeMessage(level: .trace, "Did receive data: \(ByteCountFormatter.string(fromByteCount: Int64(data.count), countStyle: .file)) for \(dataTask.url ?? "null")")
     }
 
@@ -83,11 +83,12 @@ public final class NetworkLogger {
         log(taskId: context.taskId, LoggedNetworkTask(task: task, session: session, request: request, response: response, data: data, error: error, metrics: metrics))
     }
 
+    #warning("TODO: Use LoggerStoreEvent here?")
     private func log(taskId: UUID, _ task: LoggedNetworkTask) {
         guard let task = willLogTask(task) else {
             return
         }
-        store.storeRequest(taskId: taskId, request: task.request, response: task.response, error: task.error, data: task.data, metrics: task.metrics, session: task.session)
+        store.storeRequest(taskId: taskId, request: task.request, response: task.response, error: task.error, data: task.data, metrics: task.metrics)
     }
 
     /// Logs the task metrics (optional).

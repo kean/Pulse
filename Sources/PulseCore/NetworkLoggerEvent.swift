@@ -67,27 +67,6 @@ public struct NetworkLoggerMetrics: Codable {
     }
 }
 
-#warning("TODO: remove this (too much info)")
-public struct NetworkLoggerURLSession: Codable {
-    /// A background session identifier
-    public var identifier: String?
-    public var httpAdditionalHeaders: [String: String]?
-    public var allowsCellularAccess: Bool
-    public var timeoutIntervalForRequest: Double // TimeInterval
-    public var timeoutIntervalForResource: Double // TimeInterval
-    public var waitsForConnectivity: Bool
-
-    public init(urlSession: URLSession) {
-        let configuration = urlSession.configuration
-        self.identifier = configuration.identifier
-        self.httpAdditionalHeaders = configuration.headers
-        self.allowsCellularAccess = configuration.allowsCellularAccess
-        self.timeoutIntervalForRequest = configuration.timeoutIntervalForRequest
-        self.timeoutIntervalForResource = configuration.timeoutIntervalForResource
-        self.waitsForConnectivity = configuration.waitsForConnectivity
-    }
-}
-
 public struct NetworkLoggerTransactionMetrics: Codable {
     public let request: NetworkLoggerRequest?
     public let response: NetworkLoggerResponse?

@@ -45,10 +45,16 @@ final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
         let state = LoggerNetworkRequestEntity.State(rawValue: request.requestState) ?? .success
 
         let time = ConsoleMessageViewModel.timeFormatter.string(from: request.createdAt)
-        let prefix: String
+        var prefix: String
         switch state {
         case .pending:
             prefix = "PENDING"
+            if request.totalUnitCount > 0 {
+                func format(_ bytes: Int64) -> String {
+                    ByteCountFormatter.string(fromByteCount: bytes, countStyle: .file)
+                }
+                prefix += " · \(format(request.completedUnitCount)) / \(format(request.totalUnitCount))"
+            }
         case .success:
             prefix = StatusCodeFormatter.string(for: Int(request.statusCode))
         case .failure:

@@ -9,6 +9,7 @@ import CoreData
 public enum LoggerStoreEvent {
     case messageStored(MessageCreated)
     case networkTaskCreated(NetworkTaskCreated)
+    case networkTaskProgressUpdated(NetworkTaskProgressUpdated)
     case networkTaskCompleted(NetworkTaskCompleted)
 
     public final class MessageCreated: Codable {
@@ -35,20 +36,30 @@ public enum LoggerStoreEvent {
         }
     }
 
+    public final class NetworkTaskProgressUpdated: Codable {
+        public let taskId: UUID
+        public let completedUnitCount: Int64
+        public let totalUnitCount: Int64
+
+        public init(taskId: UUID, completedUnitCount: Int64, totalUnitCount: Int64) {
+            self.taskId = taskId
+            self.completedUnitCount = completedUnitCount
+            self.totalUnitCount = totalUnitCount
+        }
+    }
+
     public final class NetworkTaskCreated: Codable {
         public let taskId: UUID
         public let createdAt: Date
         public let request: NetworkLoggerRequest
         public let requestBody: Data?
-        public let urlSession: NetworkLoggerURLSession?
         public let session: String
 
-        public init(taskId: UUID, createdAt: Date, request: NetworkLoggerRequest, requestBody: Data?, urlSession: NetworkLoggerURLSession?, session: String) {
+        public init(taskId: UUID, createdAt: Date, request: NetworkLoggerRequest, requestBody: Data?, session: String) {
             self.taskId = taskId
             self.createdAt = createdAt
             self.request = request
             self.requestBody = requestBody
-            self.urlSession = urlSession
             self.session = session
         }
     }
@@ -62,10 +73,9 @@ public enum LoggerStoreEvent {
         public let requestBody: Data?
         public let responseBody: Data?
         public let metrics: NetworkLoggerMetrics?
-        public let urlSession: NetworkLoggerURLSession?
         public let session: String
 
-        public init(taskId: UUID, createdAt: Date, request: NetworkLoggerRequest, response: NetworkLoggerResponse?, error: NetworkLoggerError?, requestBody: Data?, responseBody: Data?, metrics: NetworkLoggerMetrics?, urlSession: NetworkLoggerURLSession?, session: String) {
+        public init(taskId: UUID, createdAt: Date, request: NetworkLoggerRequest, response: NetworkLoggerResponse?, error: NetworkLoggerError?, requestBody: Data?, responseBody: Data?, metrics: NetworkLoggerMetrics?, session: String) {
             self.taskId = taskId
             self.createdAt = createdAt
             self.request = request
@@ -74,7 +84,6 @@ public enum LoggerStoreEvent {
             self.requestBody = requestBody
             self.responseBody = responseBody
             self.metrics = metrics
-            self.urlSession = urlSession
             self.session = session
         }
     }
