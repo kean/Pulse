@@ -212,7 +212,8 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     var timingDetailsModel: KeyValueSectionViewModel? {
         guard let metrics = summary.metrics else { return nil }
         return KeyValueSectionViewModel(title: "Timing", color: .gray, items: [
-            ("Start Date", dateFormatter.string(from: metrics.taskInterval.start)),
+            ("Start Date", isoFormatter.string(from: metrics.taskInterval.start)),
+            ("End Date", isoFormatter.string(from: metrics.taskInterval.end)),
             ("Duration", DurationFormatter.string(from: metrics.taskInterval.duration)),
             ("Redirect Count", metrics.redirectCount.description)
         ])
@@ -264,12 +265,10 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
 
 // MARK: - Private
 
-private let dateFormatter: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.dateStyle = .short
-    formatter.doesRelativeDateFormatting = true
-    formatter.timeStyle = .medium
-    return formatter
+private let isoFormatter: ISO8601DateFormatter = {
+    let f = ISO8601DateFormatter()
+    f.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+    return f
 }()
 
 private func descriptionForError(domain: String, code: Int) -> String {
