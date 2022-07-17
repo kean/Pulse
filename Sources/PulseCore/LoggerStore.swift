@@ -687,7 +687,7 @@ extension LoggerStore {
 
 // MARK: - Constants
 
-private let currentStoreVersion = "1.0.0"
+private let currentStoreVersion = "2.0.0"
 let manifestFileName = "manifest.json"
 private let databaseFileName = "logs.sqlite"
 private let blobsDirectoryName = "blobs"
@@ -708,6 +708,7 @@ private extension Dictionary where Key == String, Value == LoggerStore.MetadataV
 public enum LoggerStoreError: Error, LocalizedError {
     case fileDoesntExist
     case storeInvalid
+    case unsupportedVersion
     case documentIsReadonly
     case unknownError
 
@@ -716,6 +717,7 @@ public enum LoggerStoreError: Error, LocalizedError {
         case .fileDoesntExist: return "File doesn't exist"
         case .storeInvalid: return "Store format is invalid"
         case .documentIsReadonly: return "Document is readonly"
+        case .unsupportedVersion: return "The store was created by one of the earlier versions of Pulse and is no longer supported"
         case .unknownError: return "Unexpected error"
         }
     }
