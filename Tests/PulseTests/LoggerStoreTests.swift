@@ -163,14 +163,14 @@ final class LoggerStoreTests: XCTestCase {
         // THEN
         // XCTAssertEqual(manifest.messagesSize, 73728)
         // XCTAssertEqual(manifest.blobsSize, 21195)
-        XCTAssertEqual(manifest.messageCount, 19)
+        XCTAssertEqual(manifest.messageCount, 10)
         XCTAssertEqual(manifest.requestCount, 3)
 
         store.removeStores()
 
         // THEN
         let copy = try LoggerStore(storeURL: copyURL)
-        XCTAssertEqual(try copy.allMessages().count, 19)
+        XCTAssertEqual(try copy.allMessages().count, 10)
         XCTAssertEqual(try copy.allNetworkRequests().count, 3)
         copy.destroyStores()
     }
@@ -219,9 +219,9 @@ final class LoggerStoreTests: XCTestCase {
         // THEN
         // XCTAssertEqual(manifest.messagesSize, 73728)
         // XCTAssertEqual(manifest.blobsSize, 21195)
-        XCTAssertEqual(manifest1.messageCount, 19)
+        XCTAssertEqual(manifest1.messageCount, 10)
         XCTAssertEqual(manifest1.requestCount, 3)
-        XCTAssertEqual(manifest2.messageCount, 19)
+        XCTAssertEqual(manifest2.messageCount, 10)
         XCTAssertEqual(manifest2.requestCount, 3)
         XCTAssertNotEqual(manifest1.id, manifest2.id)
     }
@@ -365,7 +365,7 @@ final class LoggerStoreTests: XCTestCase {
         flush(store: store)
 
         let context = store.container.viewContext
-        XCTAssertEqual(try context.fetch(LoggerMessageEntity.fetchRequest()).count, 20)
+        XCTAssertEqual(try context.fetch(LoggerMessageEntity.fetchRequest()).count, 11)
         XCTAssertEqual(try context.fetch(LoggerMetadataEntity.fetchRequest()).count, 1)
         XCTAssertEqual(try context.fetch(LoggerNetworkRequestEntity.fetchRequest()).count, 3)
         XCTAssertEqual(try context.fetch(LoggerNetworkRequestDetailsEntity.fetchRequest()).count, 3)
