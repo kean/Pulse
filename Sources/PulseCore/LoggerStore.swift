@@ -271,7 +271,7 @@ extension LoggerStore {
         }
     }
 
-    /// Handles event emmited by the external store.
+    /// Handles event emitted by the external store.
     func handleExternalEvent(_ event: LoggerStoreEvent) {
         perform { self._handle(event) }
     }
@@ -345,7 +345,7 @@ extension LoggerStore {
     private func process(_ event: LoggerStoreEvent.NetworkTaskCompleted) {
         let request = findOrCreateNetworkRequestEntity(forTaskId: event.taskId, createdAt: event.createdAt)
 
-        // Populare remaining request fields
+        // Populate remaining request fields
         request.session = event.session
         request.url = event.request.url?.absoluteString
         request.host = event.request.url?.host
