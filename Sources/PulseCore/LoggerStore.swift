@@ -306,7 +306,6 @@ extension LoggerStore {
         message.line = Int32(event.line)
     }
 
-#warning("TODO: this should also create associated LoggerMesasge")
     private func process(_ event: LoggerStoreEvent.NetworkTaskCreated) {
         let request = findOrCreateNetworkRequestEntity(forTaskId: event.taskId, createdAt: event.createdAt)
 
@@ -325,21 +324,7 @@ extension LoggerStore {
             request.requestBodyKey = store.storeData(event.requestBody)
         }
 
-        let message = LoggerMessageEntity(context: backgroundContext)
-        message.createdAt = event.createdAt
-        message.level = LoggerStore.Level.debug.rawValue
-        message.levelOrder = LoggerStore.Level.debug.order
-        message.label = "network"
-        message.session = event.session
-        message.text = "\(event.request.httpMethod ?? "GET") \(event.request.url?.absoluteString ?? "–")"
-        message.file = ""
-        message.filename = ""
-        message.function = ""
-        message.line = 0
-        message.requestState = LoggerNetworkRequestEntity.State.pending.rawValue
-
-        message.request = request
-        request.message = message
+        findOrCreateMessageEntity(for: request, networkRequest: event.request)
     }
 
     private func process(_ event: LoggerStoreEvent.NetworkTaskCompleted) {
@@ -378,11 +363,12 @@ extension LoggerStore {
         details.responseBodySize = Int64(event.responseBody?.count ?? 0)
 
         // Update associated message state
-        request.message?.requestState = request.requestState
+        let message = findOrCreateMessageEntity(for: request, networkRequest: event.request)
+        message.requestState = request.requestState
         if isFailure {
             let level = LoggerStore.Level.error
-            request.message?.level = level.rawValue
-            request.message?.levelOrder = level.order
+            message.level = level.rawValue
+            message.levelOrder = level.order
         }
     }
 
@@ -398,6 +384,30 @@ extension LoggerStore {
         entity.createdAt = createdAt
         entity.details = LoggerNetworkRequestDetailsEntity(context: backgroundContext)
         return entity
+    }
+
+    @discardableResult
+    private func findOrCreateMessageEntity(for request: LoggerNetworkRequestEntity, networkRequest: NetworkLoggerRequest) -> LoggerMessageEntity {
+        if let message = request.message {
+            return message
+        }
+        let message = LoggerMessageEntity(context: backgroundContext)
+        message.createdAt = request.createdAt
+        message.level = LoggerStore.Level.debug.rawValue
+        message.levelOrder = LoggerStore.Level.debug.order
+        message.label = "network"
+        message.session = request.session
+        message.text = "\(networkRequest.httpMethod ?? "GET") \(networkRequest.url?.absoluteString ?? "–")"
+        message.file = ""
+        message.filename = ""
+        message.function = ""
+        message.line = 0
+        message.requestState = LoggerNetworkRequestEntity.State.pending.rawValue
+
+        message.request = request
+        request.message = message
+
+        return message
     }
 
     private func setNeedsSave() {
