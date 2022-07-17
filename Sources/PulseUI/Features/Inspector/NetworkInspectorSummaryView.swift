@@ -122,18 +122,12 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
         self.summary = summary
     }
 
-    private var isSuccess: Bool {
-        guard let response = summary.response else {
-            return false
-        }
-        return summary.error == nil && (200..<400).contains(response.statusCode ?? 200)
-    }
-
     private var tintColor: Color {
-        guard summary.response != nil else {
-            return .gray
+        switch summary.state {
+        case .pending: return .orange
+        case .success: return .green
+        case .failure: return .red
         }
-        return isSuccess ? .green : .red
     }
 
     var summaryModel: KeyValueSectionViewModel {
