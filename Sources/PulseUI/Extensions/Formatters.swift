@@ -24,8 +24,8 @@ struct DurationFormatter {
 struct StatusCodeFormatter {
     static func string(for statusCode: Int) -> String {
         switch statusCode {
-        case 200: return "200 (OK)"
-        default: return "\(statusCode) (\( HTTPURLResponse.localizedString(forStatusCode: statusCode).capitalized))"
+        case 200: return "200 OK"
+        default: return "\(statusCode) \( HTTPURLResponse.localizedString(forStatusCode: statusCode).capitalized)"
         }
     }
 }

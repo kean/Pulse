@@ -43,12 +43,12 @@ public extension LoggerStore {
             NSAttributeDescription(name: "response", type: .binaryDataAttributeType),
             NSAttributeDescription(name: "error", type: .binaryDataAttributeType),
             NSAttributeDescription(name: "metrics", type: .binaryDataAttributeType),
-            NSAttributeDescription(name: "urlSession", type: .binaryDataAttributeType),
             NSAttributeDescription(name: "requestBodySize", type: .integer64AttributeType),
             NSAttributeDescription(name: "responseBodySize", type: .integer64AttributeType)
         ]
 
         request.properties = [
+            NSAttributeDescription(name: "taskId", type: .UUIDAttributeType),
             NSAttributeDescription(name: "createdAt", type: .dateAttributeType),
             NSAttributeDescription(name: "session", type: .stringAttributeType),
             NSAttributeDescription(name: "url", type: .stringAttributeType),
@@ -59,10 +59,11 @@ public extension LoggerStore {
             NSAttributeDescription(name: "statusCode", type: .integer32AttributeType),
             NSAttributeDescription(name: "duration", type: .doubleAttributeType),
             NSAttributeDescription(name: "contentType", type: .stringAttributeType),
-            NSAttributeDescription(name: "isCompleted", type: .booleanAttributeType),
             NSAttributeDescription(name: "requestState", type: .integer16AttributeType),
             NSAttributeDescription(name: "requestBodyKey", type: .stringAttributeType),
             NSAttributeDescription(name: "responseBodyKey", type: .stringAttributeType),
+            NSAttributeDescription(name: "completedUnitCount", type: .integer64AttributeType),
+            NSAttributeDescription(name: "totalUnitCount", type: .integer64AttributeType),
             NSRelationshipDescription.make(name: "details", type: .oneToOne(), entity: requestDetails),
             NSRelationshipDescription.make(name: "message", type: .oneToOne(), entity: message)
         ]
@@ -98,6 +99,7 @@ public final class LoggerMetadataEntity: NSManagedObject {
 
 public final class LoggerNetworkRequestEntity: NSManagedObject {
     // Primary
+    @NSManaged public var taskId: UUID?
     @NSManaged public var createdAt: Date
     @NSManaged public var session: String
     @NSManaged public var message: LoggerMessageEntity?
@@ -111,7 +113,6 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
     @NSManaged public var statusCode: Int32
     @NSManaged public var duration: Double
     @NSManaged public var contentType: String?
-    @NSManaged public var isCompleted: Bool
     /// Contains ``State`` raw value.
     @NSManaged public var requestState: Int16
 
@@ -127,6 +128,10 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
     @NSManaged public var requestBodyKey: String?
     /// The key in the blob storage. To get the data, see ``LoggerStore/getData(forKey:)``.
     @NSManaged public var responseBodyKey: String?
+
+    // Progress
+    @NSManaged public var completedUnitCount: Int64
+    @NSManaged public var totalUnitCount: Int64
 }
 
 public final class LoggerNetworkRequestDetailsEntity: NSManagedObject {
@@ -138,8 +143,6 @@ public final class LoggerNetworkRequestDetailsEntity: NSManagedObject {
     @NSManaged public var error: Data?
     /// Contains JSON-encoded ``NetworkLoggerMetrics``.
     @NSManaged public var metrics: Data?
-    /// Contains JSON-encoded ``NetworkLoggerURLSession``.
-    @NSManaged public var urlSession: Data?
     /// The size of the request body.
     @NSManaged public var requestBodySize: Int64
     /// The size of the response body.

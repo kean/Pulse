@@ -13,6 +13,7 @@ import UIKit
 final class ConsoleTableViewModel {
     let store: LoggerStore
     let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel?
+    var diff: CollectionDifference<NSManagedObjectID>?
     @Published var entities: [NSManagedObject] = []
 
     init(store: LoggerStore, searchCriteriaViewModel: ConsoleSearchCriteriaViewModel?) {
@@ -99,9 +100,17 @@ final class ConsoleTableViewController: UITableViewController {
         }.store(in: &cancellables)
     }
 
+    private var isFirstDisplay = true
+
     private func display(_ entities: [NSManagedObject]) {
         self.entities = entities
-        self.tableView.reloadData()
+        if let diff = viewModel.diff, !isFirstDisplay {
+            viewModel.diff = nil
+            tableView.apply(diff: diff)
+        } else {
+            tableView.reloadData()
+        }
+        isFirstDisplay = false
     }
 
     func setHeaderView<Header: View>(_ view: Header) {
@@ -134,7 +143,7 @@ final class ConsoleTableViewController: UITableViewController {
         return viewModel
     }
 
-    // MARK: - UITableViewDelegate/DataSourece
+    // MARK: - UITableViewDelegate
 
     override func numberOfSections(in tableView: UITableView) -> Int {
         1

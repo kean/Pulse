@@ -223,149 +223,199 @@ public final class LoggerStore {
 extension LoggerStore {
     /// Stores the given message.
     public func storeMessage(label: String, level: Level, message: String, metadata: [String: MetadataValue]?, file: String = #file, function: String = #function, line: UInt = #line) {
-        let date = makeCurrentDate()
-        perform {
-            let message = Message(createdAt: date, label: label, level: level, message: message, metadata: metadata?.unpack(), session: LoggerSession.current.id.uuidString, file: file, function: function, line: line)
-            self.makeMessageEntity(with: message)
-            self.onEvent?(.saveMessage(message))
-        }
+        handle(.messageStored(.init(
+            createdAt: makeCurrentDate(),
+            label: label,
+            level: level,
+            message: message,
+            metadata: metadata?.unpack(),
+            session: LoggerSession.current.id.uuidString,
+            file: file,
+            function: function,
+            line: line
+        )))
     }
-
-    /// Stores the given message.
-    func storeMessage(_ message: Message) {
-        perform {
-            self._storeMessage(message)
-        }
-    }
-
-    private func _storeMessage(_ message: Message) {
-        makeMessageEntity(with: message)
-    }
-
+    
     /// Stores the network request.
     ///
     /// - note: If you want to store incremental updates to the task, use
     /// `NetworkLogger` instead.
-    public func storeRequest(_ request: URLRequest, response: URLResponse?, error: Error?, data: Data?, metrics: URLSessionTaskMetrics? = nil, session: URLSession? = nil) {
-        storeRequest(request, response: response, error: error, data: data, metrics: metrics.map(NetworkLoggerMetrics.init), session: session)
+    public func storeRequest(_ request: URLRequest, response: URLResponse?, error: Error?, data: Data?, metrics: URLSessionTaskMetrics? = nil) {
+        storeRequest(taskId: UUID(), request: request, response: response, error: error, data: data, metrics: metrics.map(NetworkLoggerMetrics.init))
     }
+    
+    func storeRequest(taskId: UUID, request: URLRequest, response: URLResponse?, error: Error?, data: Data?, metrics: NetworkLoggerMetrics?) {
+        handle(.networkTaskCompleted(.init(
+            taskId: taskId,
+            createdAt: makeCurrentDate(),
+            request: NetworkLoggerRequest(urlRequest: request),
+            response: response.map(NetworkLoggerResponse.init),
+            error: error.map(NetworkLoggerError.init),
+            requestBody: request.httpBody ?? request.httpBodyStreamData(),
+            responseBody: data,
+            metrics: metrics,
+            session: LoggerSession.current.id.uuidString
+        )))
+    }
+}
 
-    func storeRequest(_ request: URLRequest, response: URLResponse?, error: Error?, data: Data?, metrics: NetworkLoggerMetrics?, session: URLSession?) {
-        let date = makeCurrentDate()
+// MARK:  - LoggerStore (Events)
+
+extension LoggerStore {
+    /// Handles event created by the current store and dispatches it to observers.
+    func handle(_ event: LoggerStoreEvent) {
         perform {
-            let message = NetworkMessage(
-                createdAt: date,
-                request: NetworkLoggerRequest(urlRequest: request),
-                response: response.map(NetworkLoggerResponse.init),
-                error: error.map(NetworkLoggerError.init),
-                requestBody: request.httpBody ?? request.httpBodyStreamData(),
-                responseBody: data,
-                metrics: metrics,
-                urlSession: session.map(NetworkLoggerURLSession.init),
-                session: LoggerSession.current.id.uuidString
-            )
-            self._storeNetworkRequest(message)
-            self.onEvent?(.saveNetworkMessage(message))
+            self._handle(event)
+            self.onEvent?(event)
         }
     }
 
-    func storeRequest(_ request: NetworkMessage) {
-        perform {
-            self._storeNetworkRequest(request)
+    /// Handles event emitted by the external store.
+    func handleExternalEvent(_ event: LoggerStoreEvent) {
+        perform { self._handle(event) }
+    }
+
+    private func _handle(_ event: LoggerStoreEvent) {
+        switch event {
+        case .messageStored(let event): process(event)
+        case .networkTaskCreated(let event): process(event)
+        case .networkTaskProgressUpdated(let event): process(event)
+        case .networkTaskCompleted(let event): process(event)
         }
     }
 
-    private func _storeNetworkRequest(_ summary: NetworkMessage) {
-        let level: LoggerStore.Level
-        let url = summary.request.url?.absoluteString
-        var message = "\(summary.request.httpMethod ?? "–") \(url ?? "–")"
-        if let error = summary.error {
-            level = .error
-            message += " \(error.code) \(error.localizedDescription)"
-        } else {
-            let statusCode = summary.response?.statusCode
-            if let statusCode = statusCode, !(200..<400).contains(statusCode) {
-                level = .error
-            } else {
-                level = .debug
-            }
-            message += " \(statusCode.map(descriptionForStatusCode) ?? "–")"
-        }
-
-        let messageObject = Message(createdAt: summary.createdAt, label: "network", level: level, message: message, metadata: nil, session: summary.session, file: "", function: "", line: 0)
-
-        let messageEntity = self.makeMessageEntity(with: messageObject)
-        let requestEntity = self.makeNetworkRequestEntity(summary, createdAt: summary.createdAt)
-        messageEntity.request = requestEntity
-        messageEntity.requestState = requestEntity.requestState
-        requestEntity.message = messageEntity
-    }
-
-    @discardableResult
-    private func makeMessageEntity(with message: Message) -> LoggerMessageEntity {
-        let entity = LoggerMessageEntity(context: backgroundContext)
-        entity.createdAt = message.createdAt
-        entity.level = message.level.rawValue
-        entity.levelOrder = message.level.order
-        entity.label = message.label
-        entity.session = message.session
-        entity.text = message.message
-        if let metadata = message.metadata, !metadata.isEmpty {
-            entity.metadata = Set(metadata.map { key, value in
+    private func process(_ event: LoggerStoreEvent.MessageCreated) {
+        let message = LoggerMessageEntity(context: backgroundContext)
+        message.createdAt = event.createdAt
+        message.level = event.level.rawValue
+        message.levelOrder = event.level.order
+        message.label = event.label
+        message.session = event.session
+        message.text = event.message
+        if let metadata = event.metadata, !metadata.isEmpty {
+            message.metadata = Set(metadata.map { key, value in
                 let entity = LoggerMetadataEntity(context: backgroundContext)
                 entity.key = key
                 entity.value = value
                 return entity
             })
         }
-        entity.file = message.file
-        entity.filename = (message.file as NSString).lastPathComponent
-        entity.function = message.function
-        entity.line = Int32(message.line)
-        return entity
+        message.file = event.file
+        message.filename = (event.file as NSString).lastPathComponent
+        message.function = event.function
+        message.line = Int32(event.line)
     }
 
-    @discardableResult
-    private func makeNetworkRequestEntity(_ summary: LoggerStore.NetworkMessage, createdAt: Date) -> LoggerNetworkRequestEntity {
-        let entity = LoggerNetworkRequestEntity(context: backgroundContext)
-        // Primary
-        entity.createdAt = createdAt
-        entity.session = LoggerSession.current.id.uuidString
-        // Denormalized
-        entity.url = summary.request.url?.absoluteString
-        entity.host = summary.request.url?.host
-        entity.httpMethod = summary.request.httpMethod
-        entity.errorDomain = summary.error?.domain
-        let errorCode = Int32(summary.error?.code ?? 0)
-        entity.errorCode = errorCode
-        let statusCode = Int32(summary.response?.statusCode ?? 0)
-        entity.statusCode = statusCode
-        entity.duration = summary.metrics?.taskInterval.duration ?? 0
-        entity.contentType = summary.response?.headers["Content-Type"]
-        entity.isCompleted = true
-        let isFailure = errorCode != 0 || (statusCode != 0 && !(200..<400).contains(statusCode))
-        entity.requestState = (isFailure ? LoggerNetworkRequestEntity.State.failure : .success).rawValue
-        // Details
-        entity.details = makeRequestDetails(summary)
+    private func process(_ event: LoggerStoreEvent.NetworkTaskCreated) {
+        let request = findOrCreateNetworkRequestEntity(forTaskId: event.taskId, createdAt: event.createdAt)
+
+        request.session = event.session
+        request.url = event.request.url?.absoluteString
+        request.host = event.request.url?.host
+        request.httpMethod = event.request.httpMethod
+        request.requestState = LoggerNetworkRequestEntity.State.pending.rawValue
+
+        request.details.request = try? JSONEncoder().encode(event.request)
+
         if case let .directory(store) = document {
-            entity.requestBodyKey = store.storeData(summary.requestBody)
-            entity.responseBodyKey = store.storeData(summary.responseBody)
+            request.requestBodyKey = store.storeData(event.requestBody)
         }
+
+        findOrCreateMessageEntity(for: request, networkRequest: event.request)
+    }
+
+    private func process(_ event: LoggerStoreEvent.NetworkTaskProgressUpdated) {
+        guard let request = findNetworkRequestEntity(forTaskId: event.taskId) else { return }
+        request.completedUnitCount = event.completedUnitCount
+        request.totalUnitCount = event.totalUnitCount
+    }
+
+    private func process(_ event: LoggerStoreEvent.NetworkTaskCompleted) {
+        let request = findOrCreateNetworkRequestEntity(forTaskId: event.taskId, createdAt: event.createdAt)
+
+        // Populate remaining request fields
+        request.session = event.session
+        request.url = event.request.url?.absoluteString
+        request.host = event.request.url?.host
+        request.httpMethod = event.request.httpMethod
+        request.errorDomain = event.error?.domain
+        let errorCode = Int32(event.error?.code ?? 0)
+        request.errorCode = errorCode
+        let statusCode = Int32(event.response?.statusCode ?? 0)
+        request.statusCode = statusCode
+        request.duration = event.metrics?.taskInterval.duration ?? 0
+        request.contentType = event.response?.headers["Content-Type"]
+        let isFailure = errorCode != 0 || (statusCode != 0 && !(200..<400).contains(statusCode))
+        request.requestState = (isFailure ? LoggerNetworkRequestEntity.State.failure : .success).rawValue
+
+        // Populate response/request data
+        if case let .directory(store) = document {
+            request.requestBodyKey = store.storeData(event.requestBody)
+            request.responseBodyKey = store.storeData(event.responseBody)
+        }
+
+        // Populate details
+        let details = request.details
+        let encoder = JSONEncoder()
+        details.request = try? encoder.encode(event.request)
+        details.response = try? encoder.encode(event.response)
+        details.error = try? encoder.encode(event.error)
+        details.metrics = try? encoder.encode(event.metrics)
+        details.requestBodySize = Int64(event.requestBody?.count ?? 0)
+        details.responseBodySize = Int64(event.responseBody?.count ?? 0)
+
+        // Update associated message state
+        let message = findOrCreateMessageEntity(for: request, networkRequest: event.request)
+        message.requestState = request.requestState
+        if isFailure {
+            let level = LoggerStore.Level.error
+            message.level = level.rawValue
+            message.levelOrder = level.order
+        }
+    }
+
+    private func findNetworkRequestEntity(forTaskId taskId: UUID) -> LoggerNetworkRequestEntity? {
+        let entity = NSFetchRequest<LoggerNetworkRequestEntity>(entityName: "\(LoggerNetworkRequestEntity.self)")
+        entity.fetchLimit = 1
+        entity.predicate = NSPredicate(format: "taskId == %@", taskId as NSUUID)
+        return try? backgroundContext.fetch(entity).first
+    }
+
+    private func findOrCreateNetworkRequestEntity(forTaskId taskId: UUID, createdAt: Date) -> LoggerNetworkRequestEntity {
+        if let entity = findNetworkRequestEntity(forTaskId: taskId) {
+            return entity
+        }
+        let entity = LoggerNetworkRequestEntity(context: backgroundContext)
+        entity.taskId = taskId
+        entity.createdAt = createdAt
+        entity.completedUnitCount = 0
+        entity.totalUnitCount = 0
+        entity.details = LoggerNetworkRequestDetailsEntity(context: backgroundContext)
         return entity
     }
 
     @discardableResult
-    private func makeRequestDetails(_ summary: LoggerStore.NetworkMessage) -> LoggerNetworkRequestDetailsEntity {
-        let entity = LoggerNetworkRequestDetailsEntity(context: backgroundContext)
-        let encoder = JSONEncoder()
-        entity.request = try? encoder.encode(summary.request)
-        entity.response = try? encoder.encode(summary.response)
-        entity.error = try? encoder.encode(summary.error)
-        entity.metrics = try? encoder.encode(summary.metrics)
-        entity.urlSession =  try? encoder.encode(summary.urlSession)
-        entity.requestBodySize = Int64(summary.requestBody?.count ?? 0)
-        entity.responseBodySize = Int64(summary.responseBody?.count ?? 0)
-        return entity
+    private func findOrCreateMessageEntity(for request: LoggerNetworkRequestEntity, networkRequest: NetworkLoggerRequest) -> LoggerMessageEntity {
+        if let message = request.message {
+            return message
+        }
+        let message = LoggerMessageEntity(context: backgroundContext)
+        message.createdAt = request.createdAt
+        message.level = LoggerStore.Level.debug.rawValue
+        message.levelOrder = LoggerStore.Level.debug.order
+        message.label = "network"
+        message.session = request.session
+        message.text = "\(networkRequest.httpMethod ?? "GET") \(networkRequest.url?.absoluteString ?? "–")"
+        message.file = ""
+        message.filename = ""
+        message.function = ""
+        message.line = 0
+        message.requestState = LoggerNetworkRequestEntity.State.pending.rawValue
+
+        message.request = request
+        request.message = message
+
+        return message
     }
 
     private func setNeedsSave() {
@@ -444,54 +494,6 @@ extension LoggerStore {
 }
 
 extension LoggerStore {
-    public final class Message: Codable {
-        public let createdAt: Date
-        public let label: String
-        public let level: LoggerStore.Level
-        public let message: String
-        public let metadata: [String: String]?
-        public let session: String
-        public let file: String
-        public let function: String
-        public let line: UInt
-
-        public init(createdAt: Date, label: String, level: LoggerStore.Level, message: String, metadata: [String: String]?, session: String, file: String, function: String, line: UInt) {
-            self.createdAt = createdAt
-            self.label = label
-            self.level = level
-            self.message = message
-            self.metadata = metadata
-            self.session = session
-            self.file = file
-            self.function = function
-            self.line = line
-        }
-    }
-
-    public final class NetworkMessage: Codable {
-        public let createdAt: Date
-        public let request: NetworkLoggerRequest
-        public let response: NetworkLoggerResponse?
-        public let error: NetworkLoggerError?
-        public let requestBody: Data?
-        public let responseBody: Data?
-        public let metrics: NetworkLoggerMetrics?
-        public let urlSession: NetworkLoggerURLSession?
-        public let session: String
-
-        public init(createdAt: Date, request: NetworkLoggerRequest, response: NetworkLoggerResponse?, error: NetworkLoggerError?, requestBody: Data?, responseBody: Data?, metrics: NetworkLoggerMetrics?, urlSession: NetworkLoggerURLSession?, session: String) {
-            self.createdAt = createdAt
-            self.request = request
-            self.response = response
-            self.error = error
-            self.requestBody = requestBody
-            self.responseBody = responseBody
-            self.metrics = metrics
-            self.urlSession = urlSession
-            self.session = session
-        }
-    }
-
     public enum MetadataValue {
         case string(String)
         case stringConvertible(CustomStringConvertible)
@@ -713,36 +715,4 @@ public enum LoggerStoreError: Error, LocalizedError {
         case .unknownError: return "Unexpected error"
         }
     }
-}
-
-private extension URLRequest {
-	func httpBodyStreamData() -> Data? {
-		guard let bodyStream = self.httpBodyStream else {
-			return nil
-		}
-
-		// Will read 16 chars per iteration. Can use bigger buffer if needed
-		let bufferSize: Int = 16
-		let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: bufferSize)
-
-		bodyStream.open()
-		defer {
-			buffer.deallocate()
-			bodyStream.close()
-		}
-
-		var bodyStreamData = Data()
-
-		while bodyStream.hasBytesAvailable {
-			let readData = bodyStream.read(buffer, maxLength: bufferSize)
-			bodyStreamData.append(buffer, count: readData)
-		}
-
-		return bodyStreamData
-	}
-}
-
-enum LoggerStoreEvent {
-    case saveMessage(LoggerStore.Message)
-    case saveNetworkMessage(LoggerStore.NetworkMessage)
 }

@@ -55,10 +55,9 @@ struct NetworkInspectorSummaryView: View {
 
         #if os(watchOS)
         KeyValueSectionView(viewModel: viewModel.requestHeaders)
-        if let additional = viewModel.httpAdditionalHeaders {
-            KeyValueSectionView(viewModel: additional)
+        if let responseHeaders = viewModel.responseHeaders {
+            KeyValueSectionView(viewModel: responseHeaders)
         }
-        KeyValueSectionView(viewModel: viewModel.responseHeaders)
         #endif
 
         linksView
@@ -89,14 +88,10 @@ struct NetworkInspectorSummaryView: View {
                 Text("")
             }
 
-            if let additional = viewModel.httpAdditionalHeaders {
-                NavigationLink(destination: NetworkHeadersDetailsView(viewModel: additional), isActive: $viewModel.isRequestAdditionalHeadersRawActive) {
+            if let responesHeaders = viewModel.responseHeaders {
+                NavigationLink(destination: NetworkHeadersDetailsView(viewModel: responesHeaders), isActive: $viewModel.isResponseHeadearsRawActive) {
                     Text("")
-                }.hidden()
-            }
-
-            NavigationLink(destination: NetworkHeadersDetailsView(viewModel: viewModel.responseHeaders), isActive: $viewModel.isResponseHeadearsRawActive) {
-                Text("")
+                }
             }
             #endif
         }
@@ -127,18 +122,12 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
         self.summary = summary
     }
 
-    private var isSuccess: Bool {
-        guard let response = summary.response else {
-            return false
-        }
-        return summary.error == nil && (200..<400).contains(response.statusCode ?? 200)
-    }
-
     private var tintColor: Color {
-        guard summary.response != nil else {
-            return .gray
+        switch summary.state {
+        case .pending: return .orange
+        case .success: return .green
+        case .failure: return .red
         }
-        return isSuccess ? .green : .red
     }
 
     var summaryModel: KeyValueSectionViewModel {
@@ -256,24 +245,10 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
         )
     }
 
-    var httpAdditionalHeaders: KeyValueSectionViewModel? {
-        guard let headers = summary.session?.httpAdditionalHeaders else {
+    var responseHeaders: KeyValueSectionViewModel? {
+        guard let headers = summary.response?.headers else {
             return nil
         }
-        let items = headers.sorted(by: { $0.key < $1.key })
-        return KeyValueSectionViewModel(
-            title: "Request Headers (Additional)",
-            color: .blue,
-            action: ActionViewModel(
-                action: { [unowned self] in isRequestAdditionalHeadersRawActive = true },
-                title: "View Raw"
-            ),
-            items: items
-        )
-    }
-
-    var responseHeaders: KeyValueSectionViewModel {
-        let items = (summary.response?.headers ?? [:]).sorted(by: { $0.key < $1.key })
         return KeyValueSectionViewModel(
             title: "Response Headers",
             color: .indigo,
@@ -281,7 +256,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
                 action: { [unowned self] in isResponseHeadearsRawActive = true },
                 title: "View Raw"
             ),
-            items: items
+            items: headers.sorted(by: { $0.key < $1.key })
         )
     }
     #endif

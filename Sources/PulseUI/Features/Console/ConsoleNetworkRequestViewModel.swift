@@ -7,19 +7,21 @@ import PulseCore
 import Combine
 import CoreData
 
-final class ConsoleNetworkRequestViewModel: Pinnable {
+final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
 #if os(iOS)
     lazy var time = ConsoleMessageViewModel.timeFormatter.string(from: request.createdAt)
-    let badgeColor: UIColor
+    var badgeColor: UIColor = .gray
 #else
-    let badgeColor: Color
+    var badgeColor: Color = .gray
 #endif
-    let status: String
-    let title: String
-    let text: String
+    var status: String = ""
+    var title: String = ""
+    var text: String = ""
+    var state: LoggerNetworkRequestEntity.State = .pending
 
     private let request: LoggerNetworkRequestEntity
     private let store: LoggerStore
+    private var cancellable: AnyCancellable?
 
     static let timeFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -28,23 +30,39 @@ final class ConsoleNetworkRequestViewModel: Pinnable {
     }()
 
     init(request: LoggerNetworkRequestEntity, store: LoggerStore) {
-        let isSuccess: Bool
-        if request.errorCode != 0 {
-            isSuccess = false
-        } else if request.statusCode != 0, !(200..<400).contains(request.statusCode) {
-            isSuccess = false
-        } else {
-            isSuccess = true
+        self.request = request
+        self.store = store
+
+        self.refresh()
+
+        self.cancellable = request.objectWillChange.sink { [weak self] in
+            self?.refresh()
+            self?.objectWillChange.send()
         }
+    }
+
+    private func refresh() {
+        let state = LoggerNetworkRequestEntity.State(rawValue: request.requestState) ?? .success
 
         let time = ConsoleMessageViewModel.timeFormatter.string(from: request.createdAt)
-        let prefix: String
-        if request.statusCode != 0 {
+        var prefix: String
+        switch state {
+        case .pending:
+            prefix = "PENDING"
+            if request.totalUnitCount > 0 {
+                func format(_ bytes: Int64) -> String {
+                    ByteCountFormatter.string(fromByteCount: bytes, countStyle: .file)
+                }
+                prefix += " · \(format(request.completedUnitCount)) / \(format(request.totalUnitCount))"
+            }
+        case .success:
             prefix = StatusCodeFormatter.string(for: Int(request.statusCode))
-        } else if request.errorCode != 0 {
-            prefix = "\(request.errorCode) (\(descriptionForURLErrorCode(Int(request.errorCode))))"
-        } else {
-            prefix = "Success"
+        case .failure:
+            if request.errorCode != 0 {
+                prefix = "\(request.errorCode) \(descriptionForURLErrorCode(Int(request.errorCode)))"
+            } else {
+                prefix = StatusCodeFormatter.string(for: Int(request.statusCode))
+            }
         }
 
 #if os(iOS)
@@ -55,7 +73,12 @@ final class ConsoleNetworkRequestViewModel: Pinnable {
         }
         self.title = title
 
-        self.badgeColor = isSuccess ? .systemGreen : .systemRed
+        switch state {
+        case .pending: self.badgeColor = .systemYellow
+        case .success: self.badgeColor = .systemGreen
+        case .failure: self.badgeColor = .systemRed
+        }
+
 #else
         self.status = prefix
         var title = "\(time)"
@@ -64,15 +87,16 @@ final class ConsoleNetworkRequestViewModel: Pinnable {
         }
         self.title = title
 
-        self.badgeColor = isSuccess ? .green : .red
+        switch state {
+        case .pending: self.badgeColor = .yellow
+        case .success: self.badgeColor = .green
+        case .failure: self.badgeColor = .red
+        }
 #endif
 
         let method = request.httpMethod ?? "GET"
         self.text = method + " " + (request.url ?? "–")
-
-        self.request = request
-
-        self.store = store
+        self.state = state
     }
 
     // MARK: Pins

@@ -7,15 +7,17 @@ import Foundation
 public final class NetworkLogger {
     private let store: LoggerStore
     private let lock = NSLock()
-
+    private let isTraceEnabled: Bool
     private let willLogTask: (LoggedNetworkTask) -> LoggedNetworkTask?
 
     /// - parameter willLogTask: Allows you to filter out sensitive information
     /// or disable logging of certain requests completely. By default, returns
     /// the suggested task without modification.
     public init(store: LoggerStore = .default,
+                isTraceEnabled: Bool = false,
                 willLogTask: @escaping (LoggedNetworkTask) -> LoggedNetworkTask? = { $0 }) {
         self.store = store
+        self.isTraceEnabled = isTraceEnabled
         self.willLogTask = willLogTask
     }
 
@@ -25,10 +27,20 @@ public final class NetworkLogger {
     public func logTaskCreated(_ task: URLSessionTask) {
         guard let urlRequest = task.originalRequest else { return }
         lock.lock()
-        _ = context(for: task)
+        let context = context(for: task)
         lock.unlock()
 
-        storeMessage(level: .trace, "Send \(urlRequest.httpMethod ?? "–") \(task.url ?? "–")")
+        trace("Did create task \(urlRequest.httpMethod ?? "–") \(task.url ?? "–")")
+
+        if let request = task.currentRequest ?? context.request {
+            store.handle(.networkTaskCreated(LoggerStoreEvent.NetworkTaskCreated(
+                taskId: context.taskId,
+                createdAt: Date(),
+                request: .init(urlRequest: request),
+                requestBody: request.httpBody ?? request.httpBodyStreamData(),
+                session: LoggerSession.current.id.uuidString
+            )))
+        }
     }
 
     /// Logs the task response (optional).
@@ -41,7 +53,7 @@ public final class NetworkLogger {
         let response = NetworkLoggerResponse(urlResponse: response)
         let statusCode = response.statusCode
 
-        storeMessage(level: .trace, "Did receive response with status code: \(statusCode.map(descriptionForStatusCode) ?? "–") for \(dataTask.url ?? "null")")
+        trace("Did receive response with status code: \(statusCode.map(descriptionForStatusCode) ?? "–") for \(dataTask.url ?? "null")")
     }
 
     /// Logs the task data that gets appended to the previously received chunks (required).
@@ -51,7 +63,7 @@ public final class NetworkLogger {
         context.data.append(data)
         lock.unlock()
 
-        storeMessage(level: .trace, "Did receive data: \(ByteCountFormatter.string(fromByteCount: Int64(data.count), countStyle: .file)) for \(dataTask.url ?? "null")")
+        trace("Did receive data: \(ByteCountFormatter.string(fromByteCount: Int64(data.count), countStyle: .file)) for \(dataTask.url ?? "null")")
     }
 
     /// Logs the task completion (required).
@@ -69,14 +81,16 @@ public final class NetworkLogger {
         let data = context.data
         lock.unlock()
 
-        log(LoggedNetworkTask(task: task, session: session, request: request, response: response, data: data, error: error, metrics: metrics))
+        trace("Did complete with error: \(error?.localizedDescription ?? "-") for \(task.url ?? "null")")
+
+        log(taskId: context.taskId, LoggedNetworkTask(task: task, session: session, request: request, response: response, data: data, error: error, metrics: metrics))
     }
 
-    private func log(_ task: LoggedNetworkTask) {
+    private func log(taskId: UUID, _ task: LoggedNetworkTask) {
         guard let task = willLogTask(task) else {
             return
         }
-        store.storeRequest(task.request, response: task.response, error: task.error, data: task.data, metrics: task.metrics, session: task.session)
+        store.storeRequest(taskId: taskId, request: task.request, response: task.response, error: task.error, data: task.data, metrics: task.metrics)
     }
 
     /// Logs the task metrics (optional).
@@ -110,6 +124,7 @@ public final class NetworkLogger {
     private var tasks: [ObjectIdentifier: TaskContext] = [:]
 
     final class TaskContext {
+        let taskId = UUID()
         var request: URLRequest?
         var response: URLResponse?
         lazy var data = Data()
@@ -132,8 +147,9 @@ public final class NetworkLogger {
         return context
     }
 
-    private func storeMessage(level: LoggerStore.Level, _ message: String, file: String = #file, function: String = #function, line: UInt = #line) {
-        store.storeMessage(label: "network", level: level, message: message, metadata: nil, file: file, function: function, line: line)
+    private func trace(_ message: String, file: String = #file, function: String = #function, line: UInt = #line) {
+        guard isTraceEnabled else { return }
+        store.storeMessage(label: "network", level: .trace, message: message, metadata: nil, file: file, function: function, line: line)
     }
 }
 

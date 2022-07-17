@@ -8,13 +8,19 @@ import Network
 @available(iOS 14.0, tvOS 14.0, *)
 extension RemoteLogger {
     enum PacketCode: UInt8 {
+        // Handshake
         case clientHello = 0 // PacketClientHello
         case serverHello = 1
+        // Controls
         case pause = 2
         case resume = 3
-        case storeMessage = 4 // Regular message
-        case storeRequest = 5 // Network message (multipart data)
+        // Ping
         case ping = 6
+        // Store events
+        case storeEventMessageStored = 7
+        case storeEventNetworkTaskCreated = 8
+        case storeEventNetworkTaskProgressUpdated = 9
+        case storeEventNetworkTaskCompleted = 10
 
         var description: String {
             switch self {
@@ -22,9 +28,11 @@ extension RemoteLogger {
             case .serverHello: return "PacketCode.serverHello"
             case .pause: return "PacketCode.pause"
             case .resume: return "PacketCode.resume"
-            case .storeMessage: return "PacketCode.storeMessage"
-            case .storeRequest: return "PacketCode.storeRequest"
             case .ping: return "PacketCode.ping"
+            case .storeEventMessageStored: return "PacketCode.storeEventMessageStored"
+            case .storeEventNetworkTaskCreated: return "PacketCode.storeEventNetworkTaskCreated"
+            case .storeEventNetworkTaskProgressUpdated: return "Packet.storeEventNetworkTaskProgressUpdated"
+            case .storeEventNetworkTaskCompleted: return "PacketCode.storeEventNetworkTaskCompleted"
             }
         }
     }
@@ -52,10 +60,10 @@ extension RemoteLogger {
             }
         }
 
-        static func encode(_ message: LoggerStore.NetworkMessage) throws -> Data {
+        static func encode(_ message: LoggerStoreEvent.NetworkTaskCompleted) throws -> Data {
             var contents = [Data]()
 
-            let strippedMessage = LoggerStore.NetworkMessage(createdAt: message.createdAt, request: message.request, response: message.response, error: message.error, requestBody: nil, responseBody: nil, metrics: message.metrics, urlSession: message.urlSession, session: message.session)
+            let strippedMessage = LoggerStoreEvent.NetworkTaskCompleted(taskId: message.taskId, createdAt: message.createdAt, request: message.request, response: message.response, error: message.error, requestBody: nil, responseBody: nil, metrics: message.metrics, session: message.session)
             let messageData = try JSONEncoder().encode(strippedMessage)
             contents.append(messageData)
 
@@ -77,7 +85,7 @@ extension RemoteLogger {
             return data
         }
 
-        static func decode(_ data: Data) throws -> LoggerStore.NetworkMessage {
+        static func decode(_ data: Data) throws -> LoggerStoreEvent.NetworkTaskCompleted {
             guard data.count >= Manifest.size else {
                 throw PacketParsingError.notEnoughData
             }
@@ -93,7 +101,7 @@ extension RemoteLogger {
             }
 
             let message = try JSONDecoder().decode(
-                LoggerStore.NetworkMessage.self,
+                LoggerStoreEvent.NetworkTaskCompleted.self,
                 from: data.from(Manifest.size, size: Int(manifest.messageSize))
             )
 
@@ -107,7 +115,7 @@ extension RemoteLogger {
                 responseBody = data.from(Manifest.size + Int(manifest.messageSize) + Int(manifest.requestBodySize), size: Int(manifest.responseBodySize))
             }
 
-            return LoggerStore.NetworkMessage(createdAt: message.createdAt, request: message.request, response: message.response, error: message.error, requestBody: requestBody, responseBody: responseBody, metrics: message.metrics, urlSession: message.urlSession, session: message.session)
+            return LoggerStoreEvent.NetworkTaskCompleted(taskId: message.taskId, createdAt: message.createdAt, request: message.request, response: message.response, error: message.error, requestBody: requestBody, responseBody: responseBody, metrics: message.metrics, session: message.session)
         }
     }
 
