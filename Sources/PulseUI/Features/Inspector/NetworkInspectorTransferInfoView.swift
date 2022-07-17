@@ -38,20 +38,26 @@ struct NetworkInspectorTransferInfoView: View {
                 Text(total)
                     .font(.headline)
             }.padding(2)
-            HStack(alignment: .center, spacing: 4) {
-                VStack(alignment: .trailing) {
-                    Text("Headers:")
-                        .foregroundColor(.secondary)
-                        .font(.system(size: fontSize))
-                    Text("Body:")
-                        .foregroundColor(.secondary)
-                        .font(.system(size: fontSize))
-                }
-                VStack(alignment: .leading) {
-                    Text(headers)
-                        .font(.system(size: fontSize))
-                    Text(body)
-                        .font(.system(size: fontSize))
+            if viewModel.isFromCache {
+                Text("(from cache)")
+                    .foregroundColor(.secondary)
+                    .font(.system(size: fontSize))
+            } else {
+                HStack(alignment: .center, spacing: 4) {
+                    VStack(alignment: .trailing) {
+                        Text("Headers:")
+                            .foregroundColor(.secondary)
+                            .font(.system(size: fontSize))
+                        Text("Body:")
+                            .foregroundColor(.secondary)
+                            .font(.system(size: fontSize))
+                    }
+                    VStack(alignment: .leading) {
+                        Text(headers)
+                            .font(.system(size: fontSize))
+                        Text(body)
+                            .font(.system(size: fontSize))
+                    }
                 }
             }
         }
@@ -108,16 +114,20 @@ struct NetworkInspectorTransferInfoViewModel {
     let bodyBytesReceived: String
     let headersBytesReceived: String
 
+    var isFromCache: Bool
+
     init?(metrics: NetworkLoggerMetrics) {
-        guard let metrics = metrics.transactions.last?.details else { return nil }
+        guard let details = metrics.transactions.last?.details else { return nil }
 
-        self.totalBytesSent = formatBytes(metrics.countOfRequestBodyBytesBeforeEncoding + metrics.countOfRequestHeaderBytesSent)
-        self.bodyBytesSent = formatBytes(metrics.countOfRequestBodyBytesSent)
-        self.headersBytesSent = formatBytes(metrics.countOfRequestHeaderBytesSent)
+        self.totalBytesSent = formatBytes(details.countOfRequestBodyBytesBeforeEncoding + details.countOfRequestHeaderBytesSent)
+        self.bodyBytesSent = formatBytes(details.countOfRequestBodyBytesSent)
+        self.headersBytesSent = formatBytes(details.countOfRequestHeaderBytesSent)
 
-        self.totalBytesReceived = formatBytes(metrics.countOfResponseBodyBytesReceived + metrics.countOfResponseHeaderBytesReceived)
-        self.bodyBytesReceived = formatBytes(metrics.countOfResponseBodyBytesReceived)
-        self.headersBytesReceived = formatBytes(metrics.countOfResponseHeaderBytesReceived)
+        self.totalBytesReceived = formatBytes(details.countOfResponseBodyBytesReceived + details.countOfResponseHeaderBytesReceived)
+        self.bodyBytesReceived = formatBytes(details.countOfResponseBodyBytesReceived)
+        self.headersBytesReceived = formatBytes(details.countOfResponseHeaderBytesReceived)
+
+        self.isFromCache = metrics.transactions.last?.resourceFetchType == URLSessionTaskMetrics.ResourceFetchType.localCache.rawValue
     }
 }
 
