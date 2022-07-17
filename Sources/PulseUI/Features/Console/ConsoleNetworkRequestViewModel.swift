@@ -59,7 +59,7 @@ final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
             prefix = StatusCodeFormatter.string(for: Int(request.statusCode))
         case .failure:
             if request.errorCode != 0 {
-                prefix = "\(request.errorCode) (\(descriptionForURLErrorCode(Int(request.errorCode))))"
+                prefix = "\(request.errorCode) \(descriptionForURLErrorCode(Int(request.errorCode)))"
             } else {
                 prefix = StatusCodeFormatter.string(for: Int(request.statusCode))
             }
