@@ -75,7 +75,7 @@ private func populateStore(_ store: LoggerStore) {
     let urlSession = URLSession(configuration: configuration)
 
     func logTask(_ mockTask: MockDataTask) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(Int.random(in: 1000...6000))) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(Int.random(in: 10000...16000))) {
         let dataTask = urlSession.dataTask(with: mockTask.request)
         networkLogger.logTaskCreated(dataTask)
 

@@ -55,9 +55,6 @@ struct NetworkInspectorSummaryView: View {
 
         #if os(watchOS)
         KeyValueSectionView(viewModel: viewModel.requestHeaders)
-        if let additional = viewModel.httpAdditionalHeaders {
-            KeyValueSectionView(viewModel: additional)
-        }
         KeyValueSectionView(viewModel: viewModel.responseHeaders)
         #endif
 
@@ -87,12 +84,6 @@ struct NetworkInspectorSummaryView: View {
             #if os(watchOS)
             NavigationLink(destination: NetworkHeadersDetailsView(viewModel: viewModel.requestHeaders), isActive: $viewModel.isRequestHeadersRawActive) {
                 Text("")
-            }
-
-            if let additional = viewModel.httpAdditionalHeaders {
-                NavigationLink(destination: NetworkHeadersDetailsView(viewModel: additional), isActive: $viewModel.isRequestAdditionalHeadersRawActive) {
-                    Text("")
-                }.hidden()
             }
 
             NavigationLink(destination: NetworkHeadersDetailsView(viewModel: viewModel.responseHeaders), isActive: $viewModel.isResponseHeadearsRawActive) {
@@ -250,22 +241,6 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
             color: .blue,
             action: ActionViewModel(
                 action: { [unowned self] in isRequestHeadersRawActive = true },
-                title: "View Raw"
-            ),
-            items: items
-        )
-    }
-
-    var httpAdditionalHeaders: KeyValueSectionViewModel? {
-        guard let headers = summary.session?.httpAdditionalHeaders else {
-            return nil
-        }
-        let items = headers.sorted(by: { $0.key < $1.key })
-        return KeyValueSectionViewModel(
-            title: "Request Headers (Additional)",
-            color: .blue,
-            action: ActionViewModel(
-                action: { [unowned self] in isRequestAdditionalHeadersRawActive = true },
                 title: "View Raw"
             ),
             items: items
