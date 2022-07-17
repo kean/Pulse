@@ -285,81 +285,108 @@ extension LoggerStore {
     }
 
     private func process(_ event: LoggerStoreEvent.MessageCreated) {
-        makeMessageEntity(with: event)
-    }
-
-#warning("TODO: this should also create associated LoggerMesasge")
-    private func process(_ event: LoggerStoreEvent.NetworkTaskCreated) {
-        let entity = findOrCreateNetworkRequestEntity(forTaskId: event.taskId)
-        entity.createdAt = event.createdAt
-
-        // Primary
-        entity.createdAt = event.createdAt
-        entity.session = event.session
-        // Denormalized
-        entity.url = event.request.url?.absoluteString
-        entity.host = event.request.url?.host
-        entity.httpMethod = event.request.httpMethod
-        entity.requestState = LoggerNetworkRequestEntity.State.pending.rawValue
-
-        entity.details.request = try? JSONEncoder().encode(event.request)
-
-        if case let .directory(store) = document {
-            entity.requestBodyKey = store.storeData(event.requestBody)
-        }
-    }
-
-    private func process(_ summary: LoggerStoreEvent.NetworkTaskCompleted) {
-        let level: LoggerStore.Level
-        let url = summary.request.url?.absoluteString
-        var message = "\(summary.request.httpMethod ?? "–") \(url ?? "–")"
-        if let error = summary.error {
-            level = .error
-            message += " \(error.code) \(error.localizedDescription)"
-        } else {
-            let statusCode = summary.response?.statusCode
-            if let statusCode = statusCode, !(200..<400).contains(statusCode) {
-                level = .error
-            } else {
-                level = .debug
-            }
-            message += " \(statusCode.map(descriptionForStatusCode) ?? "–")"
-        }
-
-        let messageObject = LoggerStoreEvent.MessageCreated(createdAt: summary.createdAt, label: "network", level: level, message: message, metadata: nil, session: summary.session, file: "", function: "", line: 0)
-
-        let messageEntity = self.makeMessageEntity(with: messageObject)
-        let requestEntity = self.makeNetworkRequestEntity(summary, createdAt: summary.createdAt)
-        messageEntity.request = requestEntity
-        messageEntity.requestState = requestEntity.requestState
-        requestEntity.message = messageEntity
-    }
-
-    @discardableResult
-    private func makeMessageEntity(with message: LoggerStoreEvent.MessageCreated) -> LoggerMessageEntity {
-        let entity = LoggerMessageEntity(context: backgroundContext)
-        entity.createdAt = message.createdAt
-        entity.level = message.level.rawValue
-        entity.levelOrder = message.level.order
-        entity.label = message.label
-        entity.session = message.session
-        entity.text = message.message
-        if let metadata = message.metadata, !metadata.isEmpty {
-            entity.metadata = Set(metadata.map { key, value in
+        let message = LoggerMessageEntity(context: backgroundContext)
+        message.createdAt = event.createdAt
+        message.level = event.level.rawValue
+        message.levelOrder = event.level.order
+        message.label = event.label
+        message.session = event.session
+        message.text = event.message
+        if let metadata = event.metadata, !metadata.isEmpty {
+            message.metadata = Set(metadata.map { key, value in
                 let entity = LoggerMetadataEntity(context: backgroundContext)
                 entity.key = key
                 entity.value = value
                 return entity
             })
         }
-        entity.file = message.file
-        entity.filename = (message.file as NSString).lastPathComponent
-        entity.function = message.function
-        entity.line = Int32(message.line)
-        return entity
+        message.file = event.file
+        message.filename = (event.file as NSString).lastPathComponent
+        message.function = event.function
+        message.line = Int32(event.line)
     }
 
-    private func findOrCreateNetworkRequestEntity(forTaskId taskId: UUID) -> LoggerNetworkRequestEntity {
+#warning("TODO: this should also create associated LoggerMesasge")
+    private func process(_ event: LoggerStoreEvent.NetworkTaskCreated) {
+        let request = findOrCreateNetworkRequestEntity(forTaskId: event.taskId, createdAt: event.createdAt)
+
+        // Primary
+        request.createdAt = event.createdAt
+        request.session = event.session
+        // Denormalized
+        request.url = event.request.url?.absoluteString
+        request.host = event.request.url?.host
+        request.httpMethod = event.request.httpMethod
+        request.requestState = LoggerNetworkRequestEntity.State.pending.rawValue
+
+        request.details.request = try? JSONEncoder().encode(event.request)
+
+        if case let .directory(store) = document {
+            request.requestBodyKey = store.storeData(event.requestBody)
+        }
+
+        let message = LoggerMessageEntity(context: backgroundContext)
+        message.createdAt = event.createdAt
+        message.level = LoggerStore.Level.debug.rawValue
+        message.levelOrder = LoggerStore.Level.debug.order
+        message.label = "network"
+        message.session = event.session
+        message.text = "\(event.request.httpMethod ?? "GET") \(event.request.url?.absoluteString ?? "–")"
+        message.file = ""
+        message.filename = ""
+        message.function = ""
+        message.line = 0
+        message.requestState = LoggerNetworkRequestEntity.State.pending.rawValue
+
+        message.request = request
+        request.message = message
+    }
+
+    private func process(_ event: LoggerStoreEvent.NetworkTaskCompleted) {
+        let request = findOrCreateNetworkRequestEntity(forTaskId: event.taskId, createdAt: event.createdAt)
+
+        // Populare remaining request fields
+        request.session = event.session
+        request.url = event.request.url?.absoluteString
+        request.host = event.request.url?.host
+        request.httpMethod = event.request.httpMethod
+        request.errorDomain = event.error?.domain
+        let errorCode = Int32(event.error?.code ?? 0)
+        request.errorCode = errorCode
+        let statusCode = Int32(event.response?.statusCode ?? 0)
+        request.statusCode = statusCode
+        request.duration = event.metrics?.taskInterval.duration ?? 0
+        request.contentType = event.response?.headers["Content-Type"]
+        let isFailure = errorCode != 0 || (statusCode != 0 && !(200..<400).contains(statusCode))
+        request.requestState = (isFailure ? LoggerNetworkRequestEntity.State.failure : .success).rawValue
+
+        // Populate response/request data
+        if case let .directory(store) = document {
+            request.requestBodyKey = store.storeData(event.requestBody)
+            request.responseBodyKey = store.storeData(event.responseBody)
+        }
+
+        // Populate details
+        let details = request.details
+        let encoder = JSONEncoder()
+        details.request = try? encoder.encode(event.request)
+        details.response = try? encoder.encode(event.response)
+        details.error = try? encoder.encode(event.error)
+        details.metrics = try? encoder.encode(event.metrics)
+        details.urlSession =  try? encoder.encode(event.urlSession)
+        details.requestBodySize = Int64(event.requestBody?.count ?? 0)
+        details.responseBodySize = Int64(event.responseBody?.count ?? 0)
+
+        // Update associated message state
+        request.message?.requestState = request.requestState
+        if isFailure {
+            let level = LoggerStore.Level.error
+            request.message?.level = level.rawValue
+            request.message?.levelOrder = level.order
+        }
+    }
+
+    private func findOrCreateNetworkRequestEntity(forTaskId taskId: UUID, createdAt: Date) -> LoggerNetworkRequestEntity {
         let request = NSFetchRequest<LoggerNetworkRequestEntity>(entityName: "\(LoggerNetworkRequestEntity.self)")
         request.fetchLimit = 1
         request.predicate = NSPredicate(format: "taskId == %@", taskId as NSUUID)
@@ -368,50 +395,9 @@ extension LoggerStore {
         }
         let entity = LoggerNetworkRequestEntity(context: backgroundContext)
         entity.taskId = taskId
+        entity.createdAt = createdAt
         entity.details = LoggerNetworkRequestDetailsEntity(context: backgroundContext)
         return entity
-    }
-
-    @discardableResult
-    private func makeNetworkRequestEntity(_ summary: LoggerStoreEvent.NetworkTaskCompleted, createdAt: Date) -> LoggerNetworkRequestEntity {
-        let entity = findOrCreateNetworkRequestEntity(forTaskId: summary.taskId)
-
-        // Primary
-        entity.createdAt = createdAt
-        entity.session = summary.session
-        // Denormalized
-        entity.url = summary.request.url?.absoluteString
-        entity.host = summary.request.url?.host
-        entity.httpMethod = summary.request.httpMethod
-        entity.errorDomain = summary.error?.domain
-        let errorCode = Int32(summary.error?.code ?? 0)
-        entity.errorCode = errorCode
-        let statusCode = Int32(summary.response?.statusCode ?? 0)
-        entity.statusCode = statusCode
-        entity.duration = summary.metrics?.taskInterval.duration ?? 0
-        entity.contentType = summary.response?.headers["Content-Type"]
-        let isFailure = errorCode != 0 || (statusCode != 0 && !(200..<400).contains(statusCode))
-        entity.requestState = (isFailure ? LoggerNetworkRequestEntity.State.failure : .success).rawValue
-        // Details
-
-        populateDetails(entity.details, with: summary)
-
-        if case let .directory(store) = document {
-            entity.requestBodyKey = store.storeData(summary.requestBody)
-            entity.responseBodyKey = store.storeData(summary.responseBody)
-        }
-        return entity
-    }
-
-    private func populateDetails(_ entity: LoggerNetworkRequestDetailsEntity, with summary: LoggerStoreEvent.NetworkTaskCompleted) {
-        let encoder = JSONEncoder()
-        entity.request = try? encoder.encode(summary.request)
-        entity.response = try? encoder.encode(summary.response)
-        entity.error = try? encoder.encode(summary.error)
-        entity.metrics = try? encoder.encode(summary.metrics)
-        entity.urlSession =  try? encoder.encode(summary.urlSession)
-        entity.requestBodySize = Int64(summary.requestBody?.count ?? 0)
-        entity.responseBodySize = Int64(summary.responseBody?.count ?? 0)
     }
 
     private func setNeedsSave() {

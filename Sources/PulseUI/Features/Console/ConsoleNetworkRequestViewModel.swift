@@ -7,19 +7,21 @@ import PulseCore
 import Combine
 import CoreData
 
-final class ConsoleNetworkRequestViewModel: Pinnable {
+final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
 #if os(iOS)
     lazy var time = ConsoleMessageViewModel.timeFormatter.string(from: request.createdAt)
-    let badgeColor: UIColor
+    var badgeColor: UIColor = .gray
 #else
-    let badgeColor: Color
+    var badgeColor: Color = .gray
 #endif
-    let status: String
-    let title: String
-    let text: String
+    var status: String = ""
+    var title: String = ""
+    var text: String = ""
+    var state: LoggerNetworkRequestEntity.State = .pending
 
     private let request: LoggerNetworkRequestEntity
     private let store: LoggerStore
+    private var cancellable: AnyCancellable?
 
     static let timeFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -28,6 +30,18 @@ final class ConsoleNetworkRequestViewModel: Pinnable {
     }()
 
     init(request: LoggerNetworkRequestEntity, store: LoggerStore) {
+        self.request = request
+        self.store = store
+
+        self.refresh()
+
+        self.cancellable = request.objectWillChange.sink { [weak self] in
+            self?.refresh()
+            self?.objectWillChange.send()
+        }
+    }
+
+    private func refresh() {
         let state = LoggerNetworkRequestEntity.State(rawValue: request.requestState) ?? .success
 
         let time = ConsoleMessageViewModel.timeFormatter.string(from: request.createdAt)
@@ -38,7 +52,11 @@ final class ConsoleNetworkRequestViewModel: Pinnable {
         case .success:
             prefix = StatusCodeFormatter.string(for: Int(request.statusCode))
         case .failure:
-            prefix = "\(request.errorCode) (\(descriptionForURLErrorCode(Int(request.errorCode))))"
+            if request.errorCode != 0 {
+                prefix = "\(request.errorCode) (\(descriptionForURLErrorCode(Int(request.errorCode))))"
+            } else {
+                prefix = StatusCodeFormatter.string(for: Int(request.statusCode))
+            }
         }
 
 #if os(iOS)
@@ -72,10 +90,7 @@ final class ConsoleNetworkRequestViewModel: Pinnable {
 
         let method = request.httpMethod ?? "GET"
         self.text = method + " " + (request.url ?? "–")
-
-        self.request = request
-
-        self.store = store
+        self.state = state
     }
 
     // MARK: Pins

@@ -14,8 +14,10 @@ final class ConsoleNetworkRequestTableCell: UITableViewCell, UIContextMenuIntera
     private let accessory = ConsoleMessageAccessoryView()
     private let details = UILabel()
     private let pin = PinIndicatorView()
+    private var state: LoggerNetworkRequestEntity.State?
 
     private var viewModel: ConsoleNetworkRequestViewModel?
+    private var cancellable: AnyCancellable?
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -55,12 +57,34 @@ final class ConsoleNetworkRequestTableCell: UITableViewCell, UIContextMenuIntera
 
     func display(_ viewModel: ConsoleNetworkRequestViewModel) {
         self.viewModel = viewModel
+        self.state = nil
+        self.refresh()
+
+        self.cancellable?.cancel()
+        self.cancellable = viewModel.objectWillChange.sink { [weak self] in
+            self?.refresh()
+        }
+    }
+
+    private func refresh() {
+        guard let viewModel = viewModel else { return }
+
+        if let state = self.state, state != viewModel.state {
+            UIView.animate(withDuration: 0.33) {
+                self.backgroundColor = viewModel.badgeColor.withAlphaComponent(0.25)
+            } completion: { _ in
+                UIView.animate(withDuration: 1.0, delay: 0.5) {
+                    self.backgroundColor = .clear
+                }
+            }
+        }
 
         badge.fillColor = viewModel.badgeColor
         title.text = viewModel.title
         details.text = viewModel.text
         accessory.textLabel.text = viewModel.time
         pin.bind(viewModel: viewModel.pinViewModel)
+        state = viewModel.state
     }
 
     func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {

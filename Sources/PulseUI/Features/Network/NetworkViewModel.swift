@@ -89,11 +89,12 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 
     // MARK: - NSFetchedResultsControllerDelegate
 
-    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        self.didRefreshEntities()
-    }
+    private var isUpdateOnly = false
 
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+        if type != .update {
+            isUpdateOnly = false
+        }
         switch type {
         case .insert:
             if let entity = anObject as? LoggerNetworkRequestEntity {
@@ -102,6 +103,13 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         default:
             break
         }
+    }
+
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        if !isUpdateOnly {
+            self.didRefreshEntities()
+        }
+        isUpdateOnly = true
     }
 
     private func didRefreshEntities() {

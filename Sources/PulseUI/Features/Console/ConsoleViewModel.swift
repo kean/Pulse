@@ -177,7 +177,16 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 
     // MARK: - NSFetchedResultsControllerDelegate
 
+    private var isUpdateOnly = false
+
+    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        isUpdateOnly = true
+    }
+
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+        if type != .update {
+            isUpdateOnly = false
+        }
         switch type {
         case .insert:
             if let entity = anObject as? LoggerMessageEntity {
@@ -189,7 +198,9 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     }
 
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        self.messages = self.controller.fetchedObjects ?? []
+        if !isUpdateOnly {
+            self.messages = self.controller.fetchedObjects ?? []
+        }
     }
 }
 

@@ -134,7 +134,7 @@ final class ConsoleTableViewController: UITableViewController {
         return viewModel
     }
 
-    // MARK: - UITableViewDelegate/DataSourece
+    // MARK: - UITableViewDelegate
 
     override func numberOfSections(in tableView: UITableView) -> Int {
         1

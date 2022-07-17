@@ -10,7 +10,7 @@ import CoreData
 #if os(watchOS) || os(tvOS)
 
 struct ConsoleNetworkRequestView: View {
-    let viewModel: ConsoleNetworkRequestViewModel
+    @ObservedObject var viewModel: ConsoleNetworkRequestViewModel
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
