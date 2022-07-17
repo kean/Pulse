@@ -100,14 +100,17 @@ final class ConsoleTableViewController: UITableViewController {
         }.store(in: &cancellables)
     }
 
+    private var isFirstDisplay = true
+
     private func display(_ entities: [NSManagedObject]) {
         self.entities = entities
-        if let diff = viewModel.diff {
+        if let diff = viewModel.diff, !isFirstDisplay {
             viewModel.diff = nil
             tableView.apply(diff: diff)
         } else {
             tableView.reloadData()
         }
+        isFirstDisplay = false
     }
 
     func setHeaderView<Header: View>(_ view: Header) {
