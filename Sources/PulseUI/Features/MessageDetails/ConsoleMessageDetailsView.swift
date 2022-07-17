@@ -15,7 +15,7 @@ struct ConsoleMessageDetailsView: View {
     var body: some View {
         contents
             .navigationBarTitle("", displayMode: .inline)
-            .navigationBarItems(trailing: HStack(spacing: 14) {
+            .navigationBarItems(trailing: HStack(spacing: 12) {
                 if let badge = viewModel.badge {
                     BadgeView(viewModel: BadgeViewModel(title: badge.title, color: badge.color.opacity(colorScheme == .light ? 0.25 : 0.5)))
                 }

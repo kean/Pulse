@@ -22,7 +22,7 @@ struct NetworkInspectorView: View {
     var body: some View {
         universalBody
             .navigationBarTitle(Text(viewModel.title), displayMode: .inline)
-            .navigationBarItems(trailing: HStack(spacing: 22) {
+            .navigationBarItems(trailing: HStack(spacing: 12) {
                 if let pin = viewModel.pin {
                     PinButton(viewModel: pin, isTextNeeded: false)
                 }
