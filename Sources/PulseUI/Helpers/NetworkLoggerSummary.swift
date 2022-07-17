@@ -28,7 +28,7 @@ final class NetworkLoggerSummary {
     init(request: LoggerNetworkRequestEntity, store: LoggerStore) {
         let details = request.details
         self.request = details.request.flatMap(decode(NetworkLoggerRequest.self))
-        self.state = LoggerNetworkRequestEntity.State(rawValue: request.requestState) ?? .success
+        self.state = request.state
         self.response = details.response.flatMap(decode(NetworkLoggerResponse.self))
         self.error = details.error.flatMap(decode(NetworkLoggerError.self))
         self.metrics = details.metrics.flatMap(decode(NetworkLoggerMetrics.self))

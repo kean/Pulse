@@ -117,6 +117,16 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
     /// Contains ``State`` raw value.
     @NSManaged public var requestState: Int16
 
+    /// Returns request state.
+    public var state: LoggerNetworkRequestEntity.State {
+        if let state = LoggerNetworkRequestEntity.State(rawValue: requestState) {
+            return state
+        }
+        // For backward-compatibility.
+        let isFailure = errorCode != 0 || (statusCode != 0 && !(200..<400).contains(statusCode))
+        return isFailure ? .failure : .success
+    }
+
     public enum State: Int16 {
         case pending = 1
         case success = 2

@@ -42,11 +42,9 @@ final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
     }
 
     private func refresh() {
-        let state = LoggerNetworkRequestEntity.State(rawValue: request.requestState) ?? .success
-
         let time = ConsoleMessageViewModel.timeFormatter.string(from: request.createdAt)
         var prefix: String
-        switch state {
+        switch request.state {
         case .pending:
             prefix = "PENDING"
             if request.totalUnitCount > 0 {
@@ -77,7 +75,7 @@ final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
         }
         self.title = title
 
-        switch state {
+        switch request.state {
         case .pending: self.badgeColor = .systemYellow
         case .success: self.badgeColor = .systemGreen
         case .failure: self.badgeColor = .systemRed
@@ -105,7 +103,7 @@ final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
 
         let method = request.httpMethod ?? "GET"
         self.text = method + " " + (request.url ?? "–")
-        self.state = state
+        self.state = request.state
     }
 
     // MARK: Pins
