@@ -195,7 +195,8 @@ final class NetworkInspectorViewModel: ObservableObject {
     let request: LoggerNetworkRequestEntity
     private let objectId: NSManagedObjectID
     let store: LoggerStore // TODO: make it private
-    private let summary: NetworkLoggerSummary
+    @Published private var summary: NetworkLoggerSummary
+    private var cancellable: AnyCancellable?
 
     init(request: LoggerNetworkRequestEntity, store: LoggerStore) {
         self.objectId = request.objectID
@@ -209,6 +210,10 @@ final class NetworkInspectorViewModel: ObservableObject {
             } else {
                 self.title = "/" + url.lastPathComponent
             }
+        }
+
+        self.cancellable = request.objectWillChange.sink { [weak self] in
+            self?.summary = NetworkLoggerSummary(request: request, store: store)
         }
     }
 
