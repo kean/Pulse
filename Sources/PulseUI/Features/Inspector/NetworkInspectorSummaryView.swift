@@ -135,9 +135,10 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
             title: "Summary",
             color: tintColor,
             items: [
-                ("URL", summary.request?.url?.absoluteString ?? "–"),
+                ("Status Code", summary.response?.statusCode.map(StatusCodeFormatter.string) ?? "–"),
                 ("Method", summary.request?.httpMethod ?? "–"),
-                ("Status Code", summary.response?.statusCode.map(StatusCodeFormatter.string) ?? "–")
+                ("URL", summary.request?.url?.absoluteString ?? "–"),
+                ("Domain", summary.request?.url?.host ?? "–")
             ])
     }
 
