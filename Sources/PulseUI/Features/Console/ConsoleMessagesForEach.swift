@@ -6,7 +6,7 @@ import Foundation
 import SwiftUI
 import PulseCore
 
-#if os(watchOS) || os(tvOS)
+#if os(watchOS) || os(tvOS) || os(macOS)
 
 struct ConsoleMessagesForEach: View {
     let store: LoggerStore
@@ -23,7 +23,7 @@ struct ConsoleMessagesForEach: View {
                 ConsoleNetworkRequestForEachRow(store: store, request: request)
             }
             .backport.swipeActions(edge: .leading) {
-                if #available(tvOS 15.0, watchOS 8.0, *) {
+                if #available(tvOS 15.0, watchOS 8.0, macOS 12.0, *) {
                     PinButton2(viewModel: .init(store: store, message: message))
                         .tint(.blue)
                 }
@@ -33,7 +33,7 @@ struct ConsoleMessagesForEach: View {
                 ConsoleMessagesForEachRow(store: store, message: message)
             }
             .backport.swipeActions(edge: .leading) {
-                if #available(tvOS 15.0,  watchOS 8.0, *) {
+                if #available(tvOS 15.0,  watchOS 8.0, macOS 12.0, *) {
                     PinButton2(viewModel: .init(store: store, message: message))
                         .tint(.blue)
                 }
@@ -56,7 +56,7 @@ struct NetworkMessagesForEach: View {
             ConsoleNetworkRequestForEachRow(store: store, request: request)
         }
         .backport.swipeActions(edge: .leading) {
-            if #available(iOS 15.0, tvOS 15.0, watchOS 8.0, *), let message = request.message {
+            if #available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *), let message = request.message {
                 PinButton2(viewModel: .init(store: store, message: message))
                     .tint(.blue)
             }

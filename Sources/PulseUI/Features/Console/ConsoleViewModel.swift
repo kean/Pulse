@@ -188,7 +188,9 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 #if os(iOS)
         self.table.diff = diff
 #endif
-        self.messages = self.controller.fetchedObjects ?? []
+        withAnimation {
+            self.messages = self.controller.fetchedObjects ?? []
+        }
     }
 }
 

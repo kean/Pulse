@@ -7,9 +7,6 @@ import CoreData
 import PulseCore
 import Combine
 
-// MARK: - View
-
-#if os(iOS) || os(tvOS) || os(watchOS)
 struct NetworkInspectorView: View {
     // Make sure all tabs are updated live
     @ObservedObject var viewModel: NetworkInspectorViewModel
@@ -109,12 +106,13 @@ struct NetworkInspectorView: View {
                 .pickerStyle(.segmented)
                 Spacer()
                 Menu(content: {
-                    ShareMenuContent(model: .url, items: [model.prepareForSharing()])
-                    NetworkMessageContextMenuCopySection(request: model.request, shareService: model.shareService)
+                    NetworkMessageContextMenuCopySection(request: viewModel.request, shareService: viewModel.shareService)
                 }, label: {
                     Image(systemName: "square.and.arrow.up")
                 })
-                PinButton(viewModel: model.pin, isTextNeeded: false)
+                if let pin = viewModel.pin {
+                    PinButton(viewModel: pin, isTextNeeded: false)
+                }
             })
     }
     #endif
@@ -261,4 +259,3 @@ final class NetworkInspectorViewModel: ObservableObject {
         ConsoleShareService(store: store)
     }
 }
-#endif

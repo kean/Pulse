@@ -6,7 +6,6 @@ import SwiftUI
 import CoreData
 import PulseCore
 
-#if os(iOS) || os(tvOS) || os(watchOS)
 struct ConsoleMessageDetailsRouter: View {
     let store: LoggerStore
     @Binding var entity: NSManagedObject?
@@ -23,4 +22,3 @@ struct ConsoleMessageDetailsRouter: View {
         }
     }
 }
-#endif

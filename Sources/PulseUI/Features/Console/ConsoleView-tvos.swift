@@ -27,7 +27,7 @@ public struct ConsoleView: View {
     public var body: some View {
         List {
             ConsoleMessagesForEach(store: viewModel.store, messages: viewModel.messages)
-        }.animation(.default)
+        }
     }
 }
 

@@ -161,7 +161,7 @@ struct FilterPickerButton: View {
     }
 }
 
-#if os(iOS) || os(tvOS)
+#if os(iOS) || os(tvOS) || os(macOS)
 
 struct FilterSectionHeader: View {
     let icon: String

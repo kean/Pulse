@@ -100,7 +100,9 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 #if os(iOS)
         self.table.diff = diff
 #endif
-        self.didRefreshEntities()
+        withAnimation {
+            self.didRefreshEntities()
+        }
     }
 
     private func didRefreshEntities() {

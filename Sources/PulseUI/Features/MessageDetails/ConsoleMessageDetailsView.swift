@@ -5,7 +5,6 @@
 import SwiftUI
 import PulseCore
 
-#if os(iOS) || os(tvOS) || os(watchOS)
 struct ConsoleMessageDetailsView: View {
     let viewModel: ConsoleMessageDetailsViewModel
     @Environment(\.colorScheme) var colorScheme: ColorScheme
@@ -50,7 +49,7 @@ struct ConsoleMessageDetailsView: View {
             }
         }
     }
-    #elseif os(tvOS)
+    #elseif os(tvOS) || os(macOS)
     var body: some View {
         contents
     }
@@ -121,6 +120,4 @@ func makeMockMessage() -> LoggerMessageEntity {
     entity.metadata = Set([meta])
     return entity
 }
-#endif
-
 #endif

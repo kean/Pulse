@@ -7,7 +7,7 @@ import CoreData
 import PulseCore
 import Combine
 
-#if os(iOS)
+#if os(iOS) || os(macOS)
 
 struct ConsoleFiltersView: View {
     @ObservedObject var viewModel: ConsoleSearchCriteriaViewModel
@@ -56,8 +56,10 @@ struct ConsoleFiltersView: View {
             }
         }
         .background(allLabelsNavigationLink)
+#if os(iOS)
         .navigationBarTitle("Filters")
         .navigationBarItems(leading: buttonClose, trailing: buttonReset)
+#endif
     }
 
     private var buttonClose: some View {
@@ -179,7 +181,9 @@ private struct CustomFilterView: View {
                 TextField("Value", text: $filter.value)
                     .textFieldStyle(.roundedBorder)
                     .disableAutocorrection(true)
+#if os(iOS)
                     .autocapitalization(.none)
+#endif
             }
 
         }

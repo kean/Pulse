@@ -7,10 +7,12 @@ import PulseCore
 import Combine
 import CoreData
 
-#if os(watchOS) || os(tvOS)
+#if os(watchOS) || os(tvOS) || os(macOS)
 
 struct ConsoleNetworkRequestView: View {
     @ObservedObject var viewModel: ConsoleNetworkRequestViewModel
+
+    @State private var backgroundColor: Color?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -27,6 +29,19 @@ struct ConsoleNetworkRequestView: View {
             text
         }
         .padding(.vertical, 4)
+        .onChange(of: viewModel.state) { newValue in
+            if newValue == .success {
+                withAnimation {
+                    backgroundColor = .green
+                    DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2)) {
+                        withAnimation {
+                            backgroundColor = nil
+                        }
+                    }
+                }
+            }
+        }
+//        .background(backgroundColor)
     }
 
     @ViewBuilder
@@ -74,7 +89,7 @@ struct ConsoleNetworkRequestView: View {
     private var fonts: Fonts {
         #if os(watchOS)
         return Fonts(title: .system(size: 12), body: .system(size: 15))
-        #elseif os(tvOS)
+        #else
         return Fonts(title: .body, body: .body)
         #endif
     }
