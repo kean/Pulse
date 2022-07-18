@@ -8,8 +8,6 @@ import Combine
 import PulseCore
 import Network
 
-#if os(iOS) || os(tvOS) || os(watchOS)
-
 @available(iOS 14.0, tvOS 14.0, *)
 struct RemoteLoggerSettingsView: View {
     @ObservedObject var viewModel: RemoteLoggerSettingsViewModel
@@ -146,5 +144,3 @@ private extension NWBrowser.Result {
         }
     }
 }
-
-#endif

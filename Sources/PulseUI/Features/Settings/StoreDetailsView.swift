@@ -7,7 +7,7 @@ import PulseCore
 
 // MARK: - View
 
-#if os(iOS)
+#if os(iOS) || os(macOS)
 struct StoreDetailsView: View {
     let viewModel: StoreDetailsViewModel
 
@@ -20,7 +20,9 @@ struct StoreDetailsView: View {
                     .padding(.top, 8)
             }
         }
+#if os(iOS)
         .navigationBarTitle("Store Details", displayMode: .inline)
+#endif
     }
 }
 

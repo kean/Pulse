@@ -54,6 +54,8 @@
 		0C9F05072884F4180035239F /* PulseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 0C9F05062884F4180035239F /* PulseCore */; };
 		0C9F05092884F4180035239F /* PulseUI in Frameworks */ = {isa = PBXBuildFile; productRef = 0C9F05082884F4180035239F /* PulseUI */; };
 		0C9F050A2884F4330035239F /* MockDataTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD2A4AC25D4A2E70087E9E3 /* MockDataTask.swift */; };
+		0C9F050C2884FA7D0035239F /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CFF9BD825D6199A0069DB6A /* repos.json */; };
+		0C9F050D2884FA7D0035239F /* contributors.json in Resources */ = {isa = PBXBuildFile; fileRef = 0C4719232707EFD5008DB813 /* contributors.json */; };
 		0CCBDDBA2610BD8200DCB60C /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD2A4AB25D4A2E70087E9E3 /* MockStore.swift */; };
 		0CCBDDBB2610BD8200DCB60C /* MockDataTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD2A4AC25D4A2E70087E9E3 /* MockDataTask.swift */; };
 		0CCBDDC02610BDBC00DCB60C /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CFF9BD825D6199A0069DB6A /* repos.json */; };
@@ -711,7 +713,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				0C9F05002884F34A0035239F /* Preview Assets.xcassets in Resources */,
+				0C9F050C2884FA7D0035239F /* repos.json in Resources */,
 				0C9F04FD2884F34A0035239F /* Assets.xcassets in Resources */,
+				0C9F050D2884FA7D0035239F /* contributors.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
