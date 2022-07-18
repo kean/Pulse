@@ -50,6 +50,10 @@
 		0C9F04FB2884F34A0035239F /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9F04FA2884F34A0035239F /* ContentView.swift */; };
 		0C9F04FD2884F34A0035239F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C9F04FC2884F34A0035239F /* Assets.xcassets */; };
 		0C9F05002884F34A0035239F /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C9F04FF2884F34A0035239F /* Preview Assets.xcassets */; };
+		0C9F05052884F40A0035239F /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD2A4AB25D4A2E70087E9E3 /* MockStore.swift */; };
+		0C9F05072884F4180035239F /* PulseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 0C9F05062884F4180035239F /* PulseCore */; };
+		0C9F05092884F4180035239F /* PulseUI in Frameworks */ = {isa = PBXBuildFile; productRef = 0C9F05082884F4180035239F /* PulseUI */; };
+		0C9F050A2884F4330035239F /* MockDataTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD2A4AC25D4A2E70087E9E3 /* MockDataTask.swift */; };
 		0CCBDDBA2610BD8200DCB60C /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD2A4AB25D4A2E70087E9E3 /* MockStore.swift */; };
 		0CCBDDBB2610BD8200DCB60C /* MockDataTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD2A4AC25D4A2E70087E9E3 /* MockDataTask.swift */; };
 		0CCBDDC02610BDBC00DCB60C /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CFF9BD825D6199A0069DB6A /* repos.json */; };
@@ -214,6 +218,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0C9F05092884F4180035239F /* PulseUI in Frameworks */,
+				0C9F05072884F4180035239F /* PulseCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -551,6 +557,10 @@
 			dependencies = (
 			);
 			name = "Pulse Demo macOS";
+			packageProductDependencies = (
+				0C9F05062884F4180035239F /* PulseCore */,
+				0C9F05082884F4180035239F /* PulseUI */,
+			);
 			productName = "Pulse Demo macOS";
 			productReference = 0C9F04F62884F34A0035239F /* Pulse Demo macOS.app */;
 			productType = "com.apple.product-type.application";
@@ -774,8 +784,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0C9F050A2884F4330035239F /* MockDataTask.swift in Sources */,
 				0C9F04FB2884F34A0035239F /* ContentView.swift in Sources */,
 				0C9F04F92884F34A0035239F /* Pulse_Demo_macOSApp.swift in Sources */,
+				0C9F05052884F40A0035239F /* MockStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1385,6 +1397,14 @@
 			productName = PulseCore;
 		};
 		0C60229A280C79E7003B1E83 /* PulseUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PulseUI;
+		};
+		0C9F05062884F4180035239F /* PulseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PulseCore;
+		};
+		0C9F05082884F4180035239F /* PulseUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = PulseUI;
 		};
