@@ -36,8 +36,10 @@ final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
         self.refresh()
 
         self.cancellable = request.objectWillChange.sink { [weak self] in
-            self?.refresh()
-            self?.objectWillChange.send()
+            withAnimation {
+                self?.refresh()
+                self?.objectWillChange.send()
+            }
         }
     }
 

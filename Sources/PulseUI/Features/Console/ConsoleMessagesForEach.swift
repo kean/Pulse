@@ -19,15 +19,7 @@ struct ConsoleMessagesForEach: View {
     @ViewBuilder
     private func makeListItem(message: LoggerMessageEntity) -> some View {
         if let request = message.request {
-            NavigationLink(destination: LazyConsoleNetworkRequestDetailsView(request: request, store: store)) {
-                ConsoleNetworkRequestForEachRow(store: store, request: request)
-            }
-            .backport.swipeActions(edge: .leading) {
-                if #available(tvOS 15.0, watchOS 8.0, macOS 12.0, *) {
-                    PinButton2(viewModel: .init(store: store, message: message))
-                        .tint(.blue)
-                }
-            }
+            NetworkRequestRow(store: store, request: request)
         } else {
             NavigationLink(destination: LazyConsoleMessageDetailsView(message: message, store: store)) {
                 ConsoleMessagesForEachRow(store: store, message: message)
@@ -37,6 +29,23 @@ struct ConsoleMessagesForEach: View {
                     PinButton2(viewModel: .init(store: store, message: message))
                         .tint(.blue)
                 }
+            }
+        }
+    }
+}
+
+private struct NetworkRequestRow: View {
+    let store: LoggerStore
+    let request: LoggerNetworkRequestEntity
+
+    var body: some View {
+        NavigationLink(destination: LazyConsoleNetworkRequestDetailsView(request: request, store: store)) {
+            ConsoleNetworkRequestForEachRow(store: store, request: request)
+        }
+        .backport.swipeActions(edge: .leading) {
+            if #available(tvOS 15.0, watchOS 8.0, macOS 12.0, *), let message = request.message {
+                PinButton2(viewModel: .init(store: store, message: message))
+                    .tint(.blue)
             }
         }
     }
@@ -52,18 +61,11 @@ struct NetworkMessagesForEach: View {
 
     @ViewBuilder
     private func makeListItem(request: LoggerNetworkRequestEntity) -> some View {
-        NavigationLink(destination: LazyConsoleNetworkRequestDetailsView(request: request, store: store)) {
-            ConsoleNetworkRequestForEachRow(store: store, request: request)
-        }
-        .backport.swipeActions(edge: .leading) {
-            if #available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *), let message = request.message {
-                PinButton2(viewModel: .init(store: store, message: message))
-                    .tint(.blue)
-            }
-        }
+        NetworkRequestRow(store: store, request: request)
     }
 }
 
+/// These exist to make sure views are rendered lazily.
 private struct ConsoleNetworkRequestForEachRow: View {
     let store: LoggerStore
     let request: LoggerNetworkRequestEntity

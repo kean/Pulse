@@ -12,8 +12,6 @@ import CoreData
 struct ConsoleNetworkRequestView: View {
     @ObservedObject var viewModel: ConsoleNetworkRequestViewModel
 
-    @State private var backgroundColor: Color?
-
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(alignment: .firstTextBaseline) {
@@ -29,19 +27,6 @@ struct ConsoleNetworkRequestView: View {
             text
         }
         .padding(.vertical, 4)
-        .onChange(of: viewModel.state) { newValue in
-            if newValue == .success {
-                withAnimation {
-                    backgroundColor = .green
-                    DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2)) {
-                        withAnimation {
-                            backgroundColor = nil
-                        }
-                    }
-                }
-            }
-        }
-//        .background(backgroundColor)
     }
 
     @ViewBuilder
