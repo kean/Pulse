@@ -25,16 +25,23 @@ public struct ConsoleView: View {
 
     #warning("TODO: add more toolbar items")
     public var body: some View {
-        VStack(spacing: 0) {
-            Divider()
+//        VStack(spacing: 0) {
+//            Divider()
             HStack(spacing: 0) {
                 NavigationView {
                     contentView
                 }
                 filterPanel
             }
+//        }
+    }
+
+    private var contentView: some View {
+        List {
+//            ConsoleToolbarView(viewModel: viewModel)
+            ConsoleMessagesForEach(store: viewModel.store, messages: viewModel.messages)
         }
-            .toolbar {
+        .toolbar {
 //                ToolbarItemGroup(placement: .navigation) {
 //                    ConsoleToolbarModePickerView(model: viewModel.mode)
 //                }
@@ -51,19 +58,12 @@ public struct ConsoleView: View {
 //                ToolbarItem {
 //                    Spacer()
 //                }
-                ToolbarItemGroup(placement: .automatic) {
+            ToolbarItemGroup(placement: .automatic) {
 //                    ConsoleToolbarSearchBar(model: viewModel)
-                    ConsoleToolbarToggleOnlyErrorsButton(isOnlyErrors: $viewModel.isOnlyErrors)
-                    ConsoleToolbarToggleFiltersButton(isFiltersPaneHidden: $isFiltersPaneHidden)
+                ConsoleToolbarToggleOnlyErrorsButton(isOnlyErrors: $viewModel.isOnlyErrors)
+                ConsoleToolbarToggleFiltersButton(isFiltersPaneHidden: $isFiltersPaneHidden)
 //                    ConsoleToolbarToggleVerticalView(model: viewModel.toolbar)
-                }
             }
-    }
-
-    private var contentView: some View {
-        List {
-//            ConsoleToolbarView(viewModel: viewModel)
-            ConsoleMessagesForEach(store: viewModel.store, messages: viewModel.messages)
         }
     }
 
