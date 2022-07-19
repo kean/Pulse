@@ -7,9 +7,7 @@ import PulseUI
 
 struct ContentView: View {
     var body: some View {
-        NavigationView {
-            ConsoleView(store: .mock)
-        }.navigationViewStyle(.automatic)
+        ConsoleView(store: .mock)
             .frame(minWidth: 700, minHeight: 600)
     }
 }
