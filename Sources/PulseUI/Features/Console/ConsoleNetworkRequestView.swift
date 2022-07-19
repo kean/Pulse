@@ -47,6 +47,7 @@ struct ConsoleNetworkRequestView: View {
         HStack(alignment: .firstTextBaseline, spacing: 8) {
             statusCircle
             Text(viewModel.status + " · " + viewModel.title)
+                .lineLimit(1)
                 .font(fonts.title)
                 .foregroundColor(.secondary)
         }
