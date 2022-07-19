@@ -7,7 +7,7 @@ import CoreData
 import PulseCore
 import Combine
 
-#if os(iOS) || os(macOS)
+#if os(iOS)
 
 struct ConsoleFiltersView: View {
     @ObservedObject var viewModel: ConsoleSearchCriteriaViewModel
