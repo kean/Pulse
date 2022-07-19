@@ -193,8 +193,3 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         }
     }
 }
-
-struct ConsoleMatch {
-    let index: Int
-    let objectID: NSManagedObjectID
-}

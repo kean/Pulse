@@ -10,17 +10,10 @@ import Combine
 #if os(macOS)
 
 public struct ConsoleView: View {
-    @ObservedObject var viewModel: ConsoleViewModel
-    @State var isFiltersPaneHidden = true
-    @Environment(\.colorScheme) private var colorScheme: ColorScheme
-    @State private var shared: ShareItems?
+    @StateObject private var viewModel: ConsoleContainerViewModel
 
-    public init(store: LoggerStore = .default, configuration: ConsoleConfiguration = .default) {
-        self.viewModel = ConsoleViewModel(store: store)
-    }
-
-    init(viewModel: ConsoleViewModel) {
-        self.viewModel = viewModel
+    public init(store: LoggerStore = .default) {
+        _viewModel = StateObject(wrappedValue: ConsoleContainerViewModel(store: store))
     }
 
     #warning("TODO: add more toolbar items")
@@ -29,42 +22,61 @@ public struct ConsoleView: View {
 //            Divider()
             HStack(spacing: 0) {
                 NavigationView {
-                    contentView
+                    MainPanelView(viewModel: viewModel, mode: viewModel.mode)
+                        .frame(minWidth: 320)
+                        .toolbar {
+                            //                ToolbarItemGroup(placement: .navigation) {
+                            //                    ConsoleToolbarModePickerView(model: viewModel.mode)
+                            //                }
+                            //                ToolbarItemGroup(placement: .principal) {
+                            //                    if let client = viewModel.remote.client {
+                            //                        RemoteLoggerClientStatusView(client: client)
+                            //                        RemoteLoggerTooglePlayButton(client: client)
+                            //                        ConsoleNowView(model: viewModel.toolbar)
+                            //                        Button(action: client.clear, label: {
+                            //                            Label("Clear", systemImage: "trash")
+                            //                        }).help("Remove All Messages (⌘K)")
+                            //                    }
+                            //                }
+                            //                ToolbarItem {
+                            //                    Spacer()
+                            //                }
+                            ToolbarItemGroup(placement: .automatic) {
+                                //                    ConsoleToolbarSearchBar(model: viewModel)
+                                ConsoleToolbarToggleOnlyErrorsButton(viewModel: viewModel.toolbar)
+                                ConsoleToolbarToggleFiltersButton(viewModel: viewModel.toolbar)
+                                ConsoleToolbarModePickerButton(viewModel: viewModel.mode)
+                                //                    ConsoleToolbarToggleVerticalView(model: viewModel.toolbar)
+                            }
+                        }
                 }
-                filterPanel
+                FiltersPanelView(viewModel: viewModel, tooblar: viewModel.toolbar)
             }
 //        }
     }
+}
 
-    private var contentView: some View {
+private struct MainPanelView: View {
+    var viewModel: ConsoleContainerViewModel
+    @ObservedObject var mode: ConsoleModePickerViewModel
+
+    var body: some View {
+        if mode.isNetworkOnly {
+            NetworkPanelView(viewModel: viewModel.network)
+        } else {
+            ConsolePanelView(viewModel: viewModel.console)
+        }
+    }
+}
+
+private struct ConsolePanelView: View {
+    @ObservedObject var viewModel: ConsoleViewModel
+
+    var body: some View {
         List {
-//            ConsoleToolbarView(viewModel: viewModel)
             ConsoleMessagesForEach(store: viewModel.store, messages: viewModel.messages)
         }
-        .toolbar {
-//                ToolbarItemGroup(placement: .navigation) {
-//                    ConsoleToolbarModePickerView(model: viewModel.mode)
-//                }
-//                ToolbarItemGroup(placement: .principal) {
-//                    if let client = viewModel.remote.client {
-//                        RemoteLoggerClientStatusView(client: client)
-//                        RemoteLoggerTooglePlayButton(client: client)
-//                        ConsoleNowView(model: viewModel.toolbar)
-//                        Button(action: client.clear, label: {
-//                            Label("Clear", systemImage: "trash")
-//                        }).help("Remove All Messages (⌘K)")
-//                    }
-//                }
-//                ToolbarItem {
-//                    Spacer()
-//                }
-            ToolbarItemGroup(placement: .automatic) {
-//                    ConsoleToolbarSearchBar(model: viewModel)
-                ConsoleToolbarToggleOnlyErrorsButton(isOnlyErrors: $viewModel.isOnlyErrors)
-                ConsoleToolbarToggleFiltersButton(isFiltersPaneHidden: $isFiltersPaneHidden)
-//                    ConsoleToolbarToggleVerticalView(model: viewModel.toolbar)
-            }
-        }
+        .overlay(tableOverlay)
     }
 
     @ViewBuilder
@@ -73,89 +85,88 @@ public struct ConsoleView: View {
             PlaceholderView.make(viewModel: viewModel)
         }
     }
+}
+
+private struct NetworkPanelView: View {
+    @ObservedObject var viewModel: NetworkViewModel
+
+    var body: some View {
+        List {
+            NetworkMessagesForEach(store: viewModel.store, entities: viewModel.entities)
+        }
+        .overlay(tableOverlay)
+    }
 
     @ViewBuilder
-    private var filterPanel: some View {
-        if !isFiltersPaneHidden {
+    private var tableOverlay: some View {
+        if viewModel.entities.isEmpty {
+            PlaceholderView.make(viewModel: viewModel)
+        }
+    }
+}
+
+private struct FiltersPanelView: View {
+    let viewModel: ConsoleContainerViewModel
+    @ObservedObject var tooblar: ConsoleToolbarViewModel
+
+    var body: some View {
+        if !tooblar.isFiltersPaneHidden {
             HStack(spacing: 0) {
                 ExDivider()
-                ConsoleContainerFiltersPanel(viewModel: viewModel)
+                ConsoleContainerFiltersPanel(viewModel: viewModel, mode: viewModel.mode)
+                    .frame(width: 200)
             }
         }
     }
 }
 
-private struct ConsoleToolbarToggleFiltersButton: View {
-    @Binding var isFiltersPaneHidden: Bool
-
-    var body: some View {
-        Button(action: { isFiltersPaneHidden.toggle() }, label: {
-            Image(systemName: isFiltersPaneHidden ? "line.horizontal.3.decrease.circle" : "line.horizontal.3.decrease.circle.fill")
-        }).foregroundColor(isFiltersPaneHidden ? .secondary : .accentColor)
-            .help("Toggle Filters Panel (⌥⌘F)")
-    }
-}
-
-private struct ConsoleToolbarToggleOnlyErrorsButton: View {
-    @Binding var isOnlyErrors: Bool
-
-    var body: some View {
-        Button(action: { isOnlyErrors.toggle() }) {
-            Image(systemName: isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon")
-        }.foregroundColor(isOnlyErrors ? .accentColor : .secondary)
-            .help("Toggle Show Only Errors (⇧⌘E)")
-    }
-}
-
-#warning("TODO: implement this")
-//private struct ConsoleToolbarView: View {
-//    @ObservedObject var viewModel: ConsoleViewModel
-//    @State private var isShowingFilters = false
-//
-//    var body: some View {
-//        VStack(spacing: 8) {
-//            HStack(spacing: 0) {
-//                SearchBar(title: "Search \(viewModel.messages.count) messages", text: $viewModel.filterTerm)
-//                Spacer().frame(width: 10)
-//                Button(action: { viewModel.isOnlyErrors.toggle() }) {
-//                    Image(systemName: viewModel.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon")
-//                        .font(.system(size: 20))
-//                        .foregroundColor(.accentColor)
-//                }.frame(width: 40, height: 44)
-//                Button(action: { isShowingFilters = true }) {
-//                    Image(systemName: "line.horizontal.3.decrease.circle")
-//                        .font(.system(size: 20))
-//                        .foregroundColor(.accentColor)
-//                }.frame(width: 40, height: 44)
-//            }.buttonStyle(.plain)
-//        }
-//        .padding(EdgeInsets(top: 2, leading: 8, bottom: 2, trailing: 8))
-//        .sheet(isPresented: $isShowingFilters) {
-//            NavigationView {
-//                ConsoleFiltersView(viewModel: viewModel.searchCriteria)
-//            }
-//        }
-//    }
-//}
-
 private struct ConsoleContainerFiltersPanel: View {
-    let viewModel: ConsoleViewModel
+    let viewModel: ConsoleContainerViewModel
+    @ObservedObject var mode: ConsoleModePickerViewModel
 
-    init(viewModel: ConsoleViewModel) {
-        self.viewModel = viewModel
-    }
-
-    #warning("TODO: enable filtesr")
     var body: some View {
-//        switch mode.mode {
-//        case .list, .text:
-        ConsoleFiltersView(viewModel: viewModel.searchCriteria)
-                .frame(width: 200)
-//        case .network:
-//            NetworkFiltersView(viewModel: viewModel.network.filters)
-//                .frame(width: 200)
-//        }
+        if mode.isNetworkOnly {
+            NetworkFiltersView(viewModel: viewModel.network.searchCriteria)
+        } else {
+            ConsoleFiltersView(viewModel: viewModel.console.searchCriteria)
+        }
     }
+}
+
+private struct ConsoleToolbarModePickerButton: View {
+    @ObservedObject var viewModel: ConsoleModePickerViewModel
+
+    var body: some View {
+        Button(action: { viewModel.isNetworkOnly.toggle() }) {
+            Image(systemName: viewModel.isNetworkOnly ? "network" : "network")
+                .foregroundColor(viewModel.isNetworkOnly ? Color.accentColor : Color.secondary)
+        }.help("Automatically Scroll to Recent Messages (⇧⌘N)")
+    }
+}
+
+// MARK: ViewModel
+
+private final class ConsoleContainerViewModel: ObservableObject {
+    let console: ConsoleViewModel
+    let network: NetworkViewModel
+    let toolbar = ConsoleToolbarViewModel()
+    let mode = ConsoleModePickerViewModel()
+
+    private var cancellables: [AnyCancellable] = []
+
+    public init(store: LoggerStore) {
+        self.console = ConsoleViewModel(store: store)
+        self.network = NetworkViewModel(store: store)
+
+        toolbar.$isOnlyErrors.sink { [weak self] in
+            self?.console.isOnlyErrors = $0
+            self?.network.isOnlyErrors = $0
+        }.store(in: &cancellables)
+    }
+}
+
+private final class ConsoleModePickerViewModel: ObservableObject {
+    @Published var isNetworkOnly = false
 }
 
 #if DEBUG
@@ -163,10 +174,10 @@ struct ConsoleView_Previews: PreviewProvider {
     static var previews: some View {
         return Group {
             NavigationView {
-                ConsoleView(viewModel: .init(store: .mock))
+                ConsoleView(store: .mock)
             }
             NavigationView {
-                ConsoleView(viewModel: .init(store: .mock))
+                ConsoleView(store: .mock)
             }.environment(\.colorScheme, .dark)
         }
     }

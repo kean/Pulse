@@ -41,19 +41,3 @@ struct PlaceholderView: View {
         .frame(maxWidth: maxWidth, maxHeight: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/, alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/)
     }
 }
-
-extension PlaceholderView {
-    static func make(viewModel: ConsoleViewModel) -> PlaceholderView {
-        let message: String
-        if viewModel.searchCriteria.isDefaultSearchCriteria {
-            if viewModel.searchCriteria.criteria.dates.isCurrentSessionOnly {
-                message = "There are no messages in the current session."
-            } else {
-                message = "There are no stored messages."
-            }
-        } else {
-            message = "There are no messages for the selected filters."
-        }
-        return PlaceholderView(imageName: "message", title: "No Messages", subtitle: message)
-    }
-}
