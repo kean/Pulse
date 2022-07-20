@@ -46,22 +46,8 @@ public struct ConsoleView: View {
     @ViewBuilder
     private var tableOverlay: some View {
         if viewModel.messages.isEmpty {
-            placeholder
+            PlaceholderView.make(viewModel: viewModel)
         }
-    }
-
-    private var placeholder: PlaceholderView {
-        let message: String
-        if viewModel.searchCriteria.isDefaultSearchCriteria {
-            if viewModel.searchCriteria.criteria.dates.isCurrentSessionOnly {
-                message = "There are no messages in the current session."
-            } else {
-                message = "There are no stored messages."
-            }
-        } else {
-            message = "There are no messages for the selected filters."
-        }
-        return PlaceholderView(imageName: "message", title: "No Messages", subtitle: message)
     }
 
     @ViewBuilder

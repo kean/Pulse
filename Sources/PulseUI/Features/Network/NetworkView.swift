@@ -38,22 +38,8 @@ public struct NetworkView: View {
     @ViewBuilder
     private var tableOverlay: some View {
         if viewModel.entities.isEmpty {
-            placeholder
+            PlaceholderView.make(viewModel: viewModel)
         }
-    }
-
-    private var placeholder: PlaceholderView {
-        let message: String
-        if viewModel.searchCriteria.isDefaultSearchCriteria {
-            if viewModel.searchCriteria.criteria.dates.isCurrentSessionOnly {
-                message = "There are no network requests in the current session."
-            } else {
-                message = "There are no stored network requests."
-            }
-        } else {
-            message = "There are no network requests for the selected filters."
-        }
-        return PlaceholderView(imageName: "network", title: "No Requests", subtitle: message)
     }
 
     #elseif os(tvOS)

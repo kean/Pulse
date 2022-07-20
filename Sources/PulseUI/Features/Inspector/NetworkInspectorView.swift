@@ -7,13 +7,14 @@ import CoreData
 import PulseCore
 import Combine
 
-// MARK: - View
-
-#if os(iOS) || os(tvOS) || os(watchOS)
 struct NetworkInspectorView: View {
     // Make sure all tabs are updated live
     @ObservedObject var viewModel: NetworkInspectorViewModel
+    #if os(macOS)
+    @State private var selectedTab: NetworkInspectorTab = .response
+    #else
     @State private var selectedTab: NetworkInspectorTab = .summary
+    #endif
     @State private var isShowingShareSheet = false
     @State private var shareItems: ShareItems?
     @Environment(\.colorScheme) private var colorScheme
@@ -94,29 +95,65 @@ struct NetworkInspectorView: View {
             KeyValueSectionView(viewModel: viewModel, limit: 5)
         }
     }
-    #else
+    #elseif os(macOS)
+    let onClose: () -> Void
+
     var body: some View {
-        selectedTabView
+        VStack {
+            toolbar
+            selectedTabView
+        }
             .background(colorScheme == .light ? Color(UXColor.controlBackgroundColor) : Color.clear)
-            .toolbar(content: {
-                Picker("", selection: $selectedTab) {
-                    Text("Summary").tag(NetworkInspectorTab.summary)
-                    Text("Headers").tag(NetworkInspectorTab.headers)
-                    Text("Request").tag(NetworkInspectorTab.request)
-                    Text("Response").tag(NetworkInspectorTab.response)
-                    Text("Metrics").tag(NetworkInspectorTab.metrics)
-                }
-                .pickerStyle(.segmented)
-                Spacer()
-                Menu(content: {
-                    ShareMenuContent(model: .url, items: [model.prepareForSharing()])
-                    NetworkMessageContextMenuCopySection(request: model.request, shareService: model.shareService)
-                }, label: {
-                    Image(systemName: "square.and.arrow.up")
-                })
-                PinButton(viewModel: model.pin, isTextNeeded: false)
-            })
     }
+
+    private var toolbar: some View {
+        VStack(spacing: 0) {
+            HStack {
+                NetworkTabView(selectedTab: $selectedTab)
+                Spacer()
+                Button(action: onClose) {
+                    Image(systemName: "xmark").foregroundColor(.secondary)
+                }.buttonStyle(PlainButtonStyle())
+            }
+            .padding(EdgeInsets(top: 8, leading: 4, bottom: 8, trailing: 10))
+            Divider()
+        }
+    }
+
+    private struct NetworkTabView: View {
+        @Binding var selectedTab: NetworkInspectorTab
+
+        var body: some View {
+            HStack(spacing: 0) {
+                HStack {
+                    makeItem("Response", tab: .response)
+                    Divider()
+                    makeItem("Request", tab: .request)
+                    Divider()
+                    makeItem("Headers", tab: .headers)
+                    Divider()
+                }
+                HStack {
+                    Spacer().frame(width: 8)
+                    makeItem("Summary", tab: .summary)
+                    Divider()
+                    makeItem("Metrics", tab: .metrics)
+                }
+            }.fixedSize()
+        }
+
+        private func makeItem(_ title: String, tab: NetworkInspectorTab) -> some View {
+            Button(action: {
+                selectedTab = tab
+            }) {
+                Text(title)
+                    .font(.system(size: 11, weight: .medium, design: .default))
+                    .foregroundColor(tab == selectedTab ? .accentColor : .primary)
+            }
+            .buttonStyle(PlainButtonStyle())
+        }
+    }
+
     #endif
 
     #if !os(watchOS) && !os(tvOS)
@@ -261,4 +298,3 @@ final class NetworkInspectorViewModel: ObservableObject {
         ConsoleShareService(store: store)
     }
 }
-#endif

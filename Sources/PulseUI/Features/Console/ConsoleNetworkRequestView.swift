@@ -7,7 +7,7 @@ import PulseCore
 import Combine
 import CoreData
 
-#if os(watchOS) || os(tvOS)
+#if os(watchOS) || os(tvOS) || os(macOS)
 
 struct ConsoleNetworkRequestView: View {
     @ObservedObject var viewModel: ConsoleNetworkRequestViewModel
@@ -47,6 +47,7 @@ struct ConsoleNetworkRequestView: View {
         HStack(alignment: .firstTextBaseline, spacing: 8) {
             statusCircle
             Text(viewModel.status + " · " + viewModel.title)
+                .lineLimit(1)
                 .font(fonts.title)
                 .foregroundColor(.secondary)
         }
@@ -74,7 +75,7 @@ struct ConsoleNetworkRequestView: View {
     private var fonts: Fonts {
         #if os(watchOS)
         return Fonts(title: .system(size: 12), body: .system(size: 15))
-        #elseif os(tvOS)
+        #else
         return Fonts(title: .body, body: .body)
         #endif
     }

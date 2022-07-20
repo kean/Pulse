@@ -8,8 +8,6 @@ import Combine
 import PulseCore
 import Network
 
-#if os(iOS) || os(tvOS) || os(watchOS)
-
 @available(iOS 14.0, tvOS 14.0, *)
 struct RemoteLoggerSettingsView: View {
     @ObservedObject var viewModel: RemoteLoggerSettingsViewModel
@@ -23,7 +21,11 @@ struct RemoteLoggerSettingsView: View {
         })
         if viewModel.isEnabled {
             if !viewModel.servers.isEmpty {
+                #if os(macOS)
+                ForEach(viewModel.servers, content: makeServerView)
+                #else
                 List(viewModel.servers, rowContent: makeServerView)
+                #endif
             } else {
                 progressView
             }
@@ -146,5 +148,3 @@ private extension NWBrowser.Result {
         }
     }
 }
-
-#endif

@@ -120,7 +120,6 @@ struct ConsoleSettingsView_Previews: PreviewProvider {
 #endif
 
 // MARK: - Helpers
-#if os(iOS) || os(watchOS) || os(tvOS)
 
 struct ButtonRemoveAll: View {
     let action: () -> Void
@@ -153,12 +152,10 @@ struct ButtonRemove: View {
                 #endif
             }
 
-        #if os(watchOS)
+        #if os(watchOS) || os(macOS)
         button
         #else
         button.foregroundColor(.red)
         #endif
     }
 }
-
-#endif

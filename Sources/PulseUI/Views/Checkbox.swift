@@ -4,7 +4,7 @@
 
 import SwiftUI
 
-#if os(iOS)
+#if os(iOS) || os(macOS)
 struct Checkbox: View {
     @Binding var isEnabled: Bool
 

@@ -22,7 +22,6 @@ extension Color {
 }
 #endif
 
-#if os(iOS) || os(watchOS) || os(tvOS)
 extension NavigationLink where Label == EmptyView {
     static func programmatic(isActive: Binding<Bool>, destination: @escaping () -> Destination) -> NavigationLink {
         NavigationLink(isActive: isActive, destination: destination) {
@@ -30,11 +29,9 @@ extension NavigationLink where Label == EmptyView {
         }
     }
 }
-#endif
 
 // MARK: - Backport
 
-#if !os(macOS)
 struct Backport<Content: View> {
     let content: Content
 }
@@ -47,7 +44,7 @@ extension Backport {
     enum HorizontalEdge {
         case leading, trailing
 
-        @available(iOS 15.0, tvOS 15.0, watchOS 8.0, *)
+        @available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
         var edge: SwiftUI.HorizontalEdge {
             switch self {
             case .leading: return .leading
@@ -68,4 +65,3 @@ extension Backport {
 #endif
     }
 }
-#endif

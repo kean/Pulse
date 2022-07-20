@@ -47,3 +47,8 @@ enum FetchedObjectsUpdate {
     case append(range: Range<Int>)
     case reload
 }
+
+struct ConsoleMatch {
+    let index: Int
+    let objectID: NSManagedObjectID
+}

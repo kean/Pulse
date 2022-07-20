@@ -6,7 +6,7 @@ import SwiftUI
 import PulseCore
 import Combine
 
-#if os(iOS)
+#if os(iOS) || os(macOS)
 struct ButtonCopyMessage: View {
     let text: String
 

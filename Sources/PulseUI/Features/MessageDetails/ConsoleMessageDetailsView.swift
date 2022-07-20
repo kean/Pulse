@@ -5,11 +5,11 @@
 import SwiftUI
 import PulseCore
 
-#if os(iOS) || os(tvOS) || os(watchOS)
 struct ConsoleMessageDetailsView: View {
     let viewModel: ConsoleMessageDetailsViewModel
     @Environment(\.colorScheme) var colorScheme: ColorScheme
     @State private var isShowingShareSheet = false
+    var onClose: (() -> Void)?
 
     #if os(iOS)
     var body: some View {
@@ -54,6 +54,27 @@ struct ConsoleMessageDetailsView: View {
     var body: some View {
         contents
     }
+    #elseif os(macOS)
+    var body: some View {
+        VStack(spacing: 0) {
+            HStack(spacing: 12) {
+                if let badge = viewModel.badge {
+                    BadgeView(viewModel: BadgeViewModel(title: badge.title, color: badge.color.opacity(colorScheme == .light ? 0.25 : 0.5)))
+                }
+                Spacer()
+                if let onClose = onClose {
+                    Button(action: onClose) {
+                        Image(systemName: "xmark").foregroundColor(.secondary)
+                    }.buttonStyle(PlainButtonStyle())
+                }
+            }
+            .padding([.leading, .trailing], 6)
+            .frame(height: 27, alignment: .center)
+            Divider()
+            textView
+                .background(colorScheme == .dark ? Color(NSColor(red: 30/255.0, green: 30/255.0, blue: 30/255.0, alpha: 1)) : .clear)
+        }
+    }
     #endif
 
     private var contents: some View {
@@ -96,7 +117,7 @@ struct ConsoleMessageDetailsView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             NavigationView {
-                ConsoleMessageDetailsView(viewModel: .init(store: LoggerStore.mock, message: makeMockMessage()))
+                ConsoleMessageDetailsView(viewModel: .init(store: LoggerStore.mock, message: makeMockMessage()), onClose: {})
             }
         }
     }
@@ -121,6 +142,4 @@ func makeMockMessage() -> LoggerMessageEntity {
     entity.metadata = Set([meta])
     return entity
 }
-#endif
-
 #endif

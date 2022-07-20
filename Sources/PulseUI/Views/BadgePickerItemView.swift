@@ -4,7 +4,7 @@
 
 import SwiftUI
 
-#if os(iOS)
+#if os(iOS) || os(macOS)
 struct BadgePickerItemView: View {
     let title: String
     @Binding var isEnabled: Bool

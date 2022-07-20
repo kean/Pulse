@@ -6,10 +6,22 @@ import Foundation
 import PulseCore
 import CoreData
 
+private var isAddingItemsDynamically = true
+private var isUsingDefaultStore = true
+
 extension LoggerStore {
     static let mock: LoggerStore = {
-        let store = makeMockStore()
-        for _ in 0..<1 {
+        let store: LoggerStore = isUsingDefaultStore ? .default : makeMockStore()
+
+        if isAddingItemsDynamically {
+            func populate() {
+                populateStore(store)
+                DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(10)) {
+                    populate()
+                }
+            }
+            populate()
+        } else {
             populateStore(store)
         }
 
@@ -26,7 +38,7 @@ private func makeMockStore() -> LoggerStore {
     try? FileManager.default.removeItem(at: rootURL) // TODO: cleanup
     try? FileManager.default.createDirectory(at: rootURL, withIntermediateDirectories: true, attributes: nil)
 
-    let storeURL = rootURL.appendingPathComponent("demo-store")
+    let storeURL = rootURL.appendingPathComponent("demo-store.pulse")
     return try! LoggerStore(storeURL: storeURL, options: [.create])
 }
 
@@ -75,15 +87,23 @@ private func populateStore(_ store: LoggerStore) {
     let urlSession = URLSession(configuration: configuration)
 
     func logTask(_ mockTask: MockDataTask) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(Int.random(in: 1000...6000))) {
         let dataTask = urlSession.dataTask(with: mockTask.request)
-        networkLogger.logTaskCreated(dataTask)
-            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(Int.random(in: 500...2000))) {
-                networkLogger.logDataTask(dataTask, didReceive: mockTask.response)
-                networkLogger.logDataTask(dataTask, didReceive: mockTask.responseBody)
-                networkLogger.logTask(dataTask, didFinishCollecting: mockTask.metrics)
-                networkLogger.logTask(dataTask, didCompleteWithError: nil, session: urlSession)
+        if isAddingItemsDynamically {
+            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(Int.random(in: 1000...6000))) {
+                networkLogger.logTaskCreated(dataTask)
+                DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(Int.random(in: 500...2000))) {
+                    networkLogger.logDataTask(dataTask, didReceive: mockTask.response)
+                    networkLogger.logDataTask(dataTask, didReceive: mockTask.responseBody)
+                    networkLogger.logTask(dataTask, didFinishCollecting: mockTask.metrics)
+                    networkLogger.logTask(dataTask, didCompleteWithError: nil, session: urlSession)
+                }
             }
+        } else {
+            networkLogger.logTaskCreated(dataTask)
+            networkLogger.logDataTask(dataTask, didReceive: mockTask.response)
+            networkLogger.logDataTask(dataTask, didReceive: mockTask.responseBody)
+            networkLogger.logTask(dataTask, didFinishCollecting: mockTask.metrics)
+            networkLogger.logTask(dataTask, didCompleteWithError: nil, session: urlSession)
         }
     }
 
@@ -122,8 +142,15 @@ private func populateStore(_ store: LoggerStore) {
     logger(named: "auth")
         .log(level: .warning, .init(stringLiteral: stackTrace))
 
-    logger(named: "default")
-        .log(level: .critical, "💥 0xDEADBEEF")
+    if isAddingItemsDynamically {
+        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(3)) {
+            logger(named: "default")
+                .log(level: .critical, "💥 0xDEADBEEF")
+        }
+    } else {
+        logger(named: "default")
+            .log(level: .critical, "💥 0xDEADBEEF")
+    }
 
     // Wait until everything is stored
     store.container.viewContext.performAndWait {}

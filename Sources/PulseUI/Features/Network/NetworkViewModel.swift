@@ -8,7 +8,7 @@ import Combine
 import SwiftUI
 
 final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, ObservableObject {
-#if os(iOS)
+#if os(iOS) || os(macOS)
     let table: ConsoleTableViewModel
 
     @Published private(set) var entities: [LoggerNetworkRequestEntity] = [] {
@@ -40,7 +40,7 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         self.controller = NSFetchedResultsController<LoggerNetworkRequestEntity>(fetchRequest: request, managedObjectContext: store.container.viewContext, sectionNameKeyPath: nil, cacheName: nil)
 
         self.searchCriteria = NetworkSearchCriteriaViewModel(isDefaultStore: store === LoggerStore.default)
-#if os(iOS)
+#if os(iOS) || os(macOS)
         self.table = ConsoleTableViewModel(store: store, searchCriteriaViewModel: nil)
 #endif
 
@@ -97,10 +97,12 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
                 searchCriteria.didInsertEntity(message)
             }
         }
-#if os(iOS)
+#if os(iOS) || os(macOS)
         self.table.diff = diff
 #endif
-        self.didRefreshEntities()
+        withAnimation {
+            self.didRefreshEntities()
+        }
     }
 
     private func didRefreshEntities() {

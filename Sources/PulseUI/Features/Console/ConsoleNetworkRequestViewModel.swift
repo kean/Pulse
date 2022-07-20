@@ -36,13 +36,16 @@ final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
         self.refresh()
 
         self.cancellable = request.objectWillChange.sink { [weak self] in
-            self?.refresh()
-            self?.objectWillChange.send()
+            withAnimation {
+                self?.refresh()
+                self?.objectWillChange.send()
+            }
         }
     }
 
     private func refresh() {
         let time = ConsoleMessageViewModel.timeFormatter.string(from: request.createdAt)
+        let state = request.state
         var prefix: String
         switch request.state {
         case .pending:
@@ -75,7 +78,7 @@ final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
         }
         self.title = title
 
-        switch request.state {
+        switch state {
         case .pending: self.badgeColor = .systemYellow
         case .success: self.badgeColor = .systemGreen
         case .failure: self.badgeColor = .systemRed

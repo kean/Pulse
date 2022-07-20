@@ -7,7 +7,7 @@ import PulseCore
 import CoreData
 import Combine
 
-#if os(watchOS) || os(tvOS)
+#if os(watchOS) || os(tvOS) || os(macOS)
 
 struct ConsoleMessageView: View {
     let viewModel: ConsoleMessageViewModel
@@ -75,7 +75,7 @@ struct ConsoleMessageView: View {
     private var fonts: Fonts {
 #if os(watchOS)
         return Fonts(title: .system(size: 12), body: .system(size: 15))
-#elseif os(tvOS)
+#else
         return Fonts(title: .body, body: .body)
 #endif
     }
