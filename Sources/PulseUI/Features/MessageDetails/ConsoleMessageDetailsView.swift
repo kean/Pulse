@@ -9,6 +9,7 @@ struct ConsoleMessageDetailsView: View {
     let viewModel: ConsoleMessageDetailsViewModel
     @Environment(\.colorScheme) var colorScheme: ColorScheme
     @State private var isShowingShareSheet = false
+    var onClose: (() -> Void)?
 
     #if os(iOS)
     var body: some View {
@@ -54,8 +55,6 @@ struct ConsoleMessageDetailsView: View {
         contents
     }
     #elseif os(macOS)
-    let onClose: () -> Void
-
     var body: some View {
         VStack(spacing: 0) {
             HStack(spacing: 12) {
@@ -63,9 +62,11 @@ struct ConsoleMessageDetailsView: View {
                     BadgeView(viewModel: BadgeViewModel(title: badge.title, color: badge.color.opacity(colorScheme == .light ? 0.25 : 0.5)))
                 }
                 Spacer()
-                Button(action: onClose) {
-                    Image(systemName: "xmark").foregroundColor(.secondary)
-                }.buttonStyle(PlainButtonStyle())
+                if let onClose = onClose {
+                    Button(action: onClose) {
+                        Image(systemName: "xmark").foregroundColor(.secondary)
+                    }.buttonStyle(PlainButtonStyle())
+                }
             }
             .padding([.leading, .trailing], 6)
             .frame(height: 27, alignment: .center)
