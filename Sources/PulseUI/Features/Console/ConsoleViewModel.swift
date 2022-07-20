@@ -10,7 +10,7 @@ import SwiftUI
 final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, ObservableObject {
     let configuration: ConsoleConfiguration
 
-#if os(iOS)
+#if os(iOS) || os(macOS)
     let table: ConsoleTableViewModel
 
     @Published private(set) var messages: [LoggerMessageEntity] = [] {
@@ -56,7 +56,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         self.controller = NSFetchedResultsController<LoggerMessageEntity>(fetchRequest: request, managedObjectContext: store.container.viewContext, sectionNameKeyPath: nil, cacheName: nil)
 
         self.searchCriteria = ConsoleSearchCriteriaViewModel(isDefaultStore: store === LoggerStore.default)
-#if os(iOS)
+#if os(iOS) || os(macOS)
         self.table = ConsoleTableViewModel(store: store, searchCriteriaViewModel: searchCriteria)
 #endif
 
@@ -185,7 +185,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
                 searchCriteria.didInsertEntity(message)
             }
         }
-#if os(iOS)
+#if os(iOS) || os(macOS)
         self.table.diff = diff
 #endif
         withAnimation {

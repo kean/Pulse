@@ -7,10 +7,11 @@ import PulseCore
 import CoreData
 
 private var isAddingItemsDynamically = true
+private var isUsingDefaultStore = true
 
 extension LoggerStore {
     static let mock: LoggerStore = {
-        let store = makeMockStore()
+        let store: LoggerStore = isUsingDefaultStore ? .default : makeMockStore()
 
         if isAddingItemsDynamically {
             func populate() {
@@ -37,7 +38,7 @@ private func makeMockStore() -> LoggerStore {
     try? FileManager.default.removeItem(at: rootURL) // TODO: cleanup
     try? FileManager.default.createDirectory(at: rootURL, withIntermediateDirectories: true, attributes: nil)
 
-    let storeURL = rootURL.appendingPathComponent("demo-store")
+    let storeURL = rootURL.appendingPathComponent("demo-store.pulse")
     return try! LoggerStore(storeURL: storeURL, options: [.create])
 }
 

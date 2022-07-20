@@ -21,7 +21,11 @@ struct RemoteLoggerSettingsView: View {
         })
         if viewModel.isEnabled {
             if !viewModel.servers.isEmpty {
+                #if os(macOS)
+                ForEach(viewModel.servers, content: makeServerView)
+                #else
                 List(viewModel.servers, rowContent: makeServerView)
+                #endif
             } else {
                 progressView
             }

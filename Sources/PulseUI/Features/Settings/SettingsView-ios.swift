@@ -152,7 +152,7 @@ struct ButtonRemove: View {
                 #endif
             }
 
-        #if os(watchOS)
+        #if os(watchOS) || os(macOS)
         button
         #else
         button.foregroundColor(.red)

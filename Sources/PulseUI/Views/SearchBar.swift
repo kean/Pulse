@@ -59,7 +59,7 @@ struct SearchBar: UIViewRepresentable {
 #if os(macOS)
 
 struct SearchBar: NSViewRepresentable {
-    let title: String
+    let title: String?
     @Binding var text: String
     let imageName: String?
     var onEditingChanged: ((_ isEditing: Bool) -> Void)?
@@ -67,7 +67,7 @@ struct SearchBar: NSViewRepresentable {
     var onReturn: (() -> Void)?
     private let onFind: PassthroughSubject<Void, Never>
 
-    init(title: String,
+    init(title: String?,
          text: Binding<String>,
          imageName: String? = nil,
          onFind: PassthroughSubject<Void, Never> = .init(),

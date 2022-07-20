@@ -7,14 +7,13 @@ import CoreData
 import PulseCore
 import Combine
 
-#if os(iOS) || os(macOS)
+#if os(iOS)
 
 struct ConsoleFiltersLabelsPickerView: View {
     @ObservedObject var viewModel: ConsoleSearchCriteriaViewModel
 
     @State private var searchText = ""
 
-    #warning("TODO: reimplememt on macOS")
     var body: some View {
         if #available(iOS 15.0, *) {
             form
