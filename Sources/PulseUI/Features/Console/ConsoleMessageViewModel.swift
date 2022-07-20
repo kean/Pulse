@@ -157,7 +157,7 @@ extension UIColor {
 enum ConsoleMessageStyle {
     static func textColor(level: LoggerStore.Level) -> Color {
         switch level {
-        case .trace: return .primary
+        case .trace: return .secondary
         case .debug: return .primary
         case .info: return .primary
         case .notice: return .orange
