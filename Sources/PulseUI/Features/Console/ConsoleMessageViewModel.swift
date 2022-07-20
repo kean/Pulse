@@ -105,8 +105,13 @@ private extension BadgeViewModel {
 extension Color {
     static func badgeColor(for level: LoggerStore.Level) -> Color {
         switch level {
+#if os(macOS)
+        case .error: return Color(Palette.red)
+        case .critical: return Color(Palette.red)
+#else
         case .critical: return .red
         case .error: return .red
+#endif
         case .warning: return .orange
         case .info: return .blue
         case .notice: return .indigo
@@ -117,8 +122,13 @@ extension Color {
 
     static func textColor(for level: LoggerStore.Level) -> Color {
         switch level {
+#if os(macOS)
+        case .error: return Color(Palette.red)
+        case .critical: return Color(Palette.red)
+#else
         case .critical: return .red
         case .error: return .red
+#endif
         case .warning: return .orange
         case .info: return .blue
         case .notice: return .blue

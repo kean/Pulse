@@ -67,7 +67,9 @@ private func populateStore(_ store: LoggerStore) {
     }
 
     logger(named: "application")
-        .log(level: .info, "UIApplication.didFinishLaunching")
+        .log(level: .info, "UIApplication.didFinishLaunching", metadata: [
+            "custom-metadata-key": .string("value")
+        ])
 
     logger(named: "application")
         .log(level: .info, "UIApplication.willEnterForeground")

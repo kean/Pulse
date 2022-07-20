@@ -5,7 +5,6 @@
 import SwiftUI
 import PulseCore
 
-#if os(iOS) || os(tvOS) || os(watchOS)
 struct ConsoleMessageMetadataView: View {
     let message: LoggerMessageEntity
 
@@ -22,7 +21,7 @@ struct ConsoleMessageMetadataView: View {
     @ViewBuilder
     private var contents: some View {
         ScrollView {
-            #if os(iOS) || os(tvOS)
+            #if os(iOS) || os(tvOS) || os(macOS)
             VStack {
                 stackContents
             }.padding()
@@ -96,6 +95,4 @@ struct ConsoleMessageMetadataView_Previews: PreviewProvider {
         }
     }
 }
-#endif
-
 #endif

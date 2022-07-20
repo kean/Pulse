@@ -55,9 +55,14 @@ struct ConsoleMessageDetailsView: View {
         contents
     }
     #elseif os(macOS)
+    @State var isMetaVisible = false
+
     var body: some View {
         VStack(spacing: 0) {
             HStack(spacing: 12) {
+                Button(action: { isMetaVisible = true }) {
+                    Image(systemName: "info.circle")
+                }.padding(.leading, 4)
                 if let badge = viewModel.badge {
                     BadgeView(viewModel: BadgeViewModel(title: badge.title, color: badge.color.opacity(colorScheme == .light ? 0.25 : 0.5)))
                 }
@@ -65,7 +70,7 @@ struct ConsoleMessageDetailsView: View {
                 if let onClose = onClose {
                     Button(action: onClose) {
                         Image(systemName: "xmark").foregroundColor(.secondary)
-                    }.buttonStyle(PlainButtonStyle())
+                    }.buttonStyle(.plain)
                 }
             }
             .padding([.leading, .trailing], 6)
@@ -74,6 +79,19 @@ struct ConsoleMessageDetailsView: View {
             textView
                 .background(colorScheme == .dark ? Color(NSColor(red: 30/255.0, green: 30/255.0, blue: 30/255.0, alpha: 1)) : .clear)
         }
+        .sheet(isPresented: $isMetaVisible, content: {
+            VStack(spacing: 0) {
+                HStack {
+                    Text("Message Details")
+                        .font(.headline)
+                        .foregroundColor(.secondary)
+                    Spacer()
+                    Button("Close") { isMetaVisible = false }
+                        .keyboardShortcut(.cancelAction)
+                }.padding()
+                ConsoleMessageMetadataView(message: viewModel.message)
+            }.frame(width: 440, height: 600)
+        })
     }
     #endif
 
