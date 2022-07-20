@@ -453,7 +453,7 @@ extension RemoteLogger {
 }
 
 func log(label: String? = nil, _ message: @autoclosure () -> String) {
-    #if DEBUG
+    #if DEBUG && PULSE_DEBUG_LOG_ENABLED
     let prefix = label.map { "[\($0)] " } ?? ""
     NSLog(prefix + message())
     #endif
