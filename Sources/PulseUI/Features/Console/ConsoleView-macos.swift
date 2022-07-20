@@ -75,7 +75,7 @@ private struct ConsolePanelView: View {
     var body: some View {
         List {
             ConsoleMessagesForEach(store: viewModel.store, messages: viewModel.messages)
-        }
+        }.listStyle(.sidebar)
         .overlay(tableOverlay)
     }
 
