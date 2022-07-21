@@ -39,7 +39,8 @@ public extension LoggerStore {
         ]
 
         requestDetails.properties = [
-            NSAttributeDescription(name: "request", type: .binaryDataAttributeType),
+            NSAttributeDescription(name: "originalRequest", type: .binaryDataAttributeType),
+            NSAttributeDescription(name: "currentRequest", type: .binaryDataAttributeType),
             NSAttributeDescription(name: "response", type: .binaryDataAttributeType),
             NSAttributeDescription(name: "error", type: .binaryDataAttributeType),
             NSAttributeDescription(name: "metrics", type: .binaryDataAttributeType),
@@ -154,7 +155,9 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
 
 public final class LoggerNetworkRequestDetailsEntity: NSManagedObject {
     /// Contains JSON-encoded ``NetworkLoggerRequest``.
-    @NSManaged public var request: Data?
+    @NSManaged public var originalRequest: Data?
+    /// Contains JSON-encoded ``NetworkLoggerRequest``.
+    @NSManaged public var currentRequest: Data?
     /// Contains JSON-encoded ``NetworkLoggerResponse``.
     @NSManaged public var response: Data?
     /// Contains JSON-encoded ``NetworkLoggerError``.

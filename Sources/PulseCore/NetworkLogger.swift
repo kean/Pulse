@@ -32,12 +32,13 @@ public final class NetworkLogger {
 
         trace("Did create task \(urlRequest.httpMethod ?? "–") \(task.url ?? "–")")
 
-        if let request = task.currentRequest ?? context.request {
+        if let originalRequest = task.originalRequest ?? context.request {
             store.handle(.networkTaskCreated(LoggerStoreEvent.NetworkTaskCreated(
                 taskId: context.taskId,
                 createdAt: Date(),
-                request: .init(urlRequest: request),
-                requestBody: request.httpBody ?? request.httpBodyStreamData(),
+                originalRequest: .init(urlRequest: originalRequest),
+                currentRequest: task.currentRequest.map(NetworkLoggerRequest.init),
+                requestBody: originalRequest.httpBody ?? originalRequest.httpBodyStreamData(),
                 session: LoggerSession.current.id.uuidString
             )))
         }
@@ -72,7 +73,7 @@ public final class NetworkLogger {
         let context = self.context(for: task)
         tasks[ObjectIdentifier(task)] = nil
 
-        guard let request = task.currentRequest ?? context.request else {
+        guard let originalRequest = task.originalRequest ?? context.request else {
             lock.unlock()
             return // This should never happen
         }
@@ -83,14 +84,21 @@ public final class NetworkLogger {
 
         trace("Did complete with error: \(error?.localizedDescription ?? "-") for \(task.url ?? "null")")
 
-        log(taskId: context.taskId, LoggedNetworkTask(task: task, session: session, request: request, response: response, data: data, error: error, metrics: metrics))
-    }
-
-    private func log(taskId: UUID, _ task: LoggedNetworkTask) {
-        guard let task = willLogTask(task) else {
-            return
-        }
-        store.storeRequest(taskId: taskId, request: task.request, response: task.response, error: task.error, data: task.data, metrics: task.metrics)
+        // TODO: reimplement
+//        let networkTask = LoggedNetworkTask(task: task, session: session, originalRequest: originalRequest, currentRequest: task.currentRequest, response: response, data: data, error: error, metrics: metrics)
+//        if let networkTask = willLogTask(networkTask) {
+        store.handle(.networkTaskCompleted(.init(
+            taskId: context.taskId,
+            createdAt: Date(),
+            originalRequest: NetworkLoggerRequest(urlRequest: originalRequest),
+            currentRequest: task.currentRequest.map(NetworkLoggerRequest.init),
+            response: response.map(NetworkLoggerResponse.init),
+            error: error.map(NetworkLoggerError.init),
+            requestBody: originalRequest.httpBody ?? originalRequest.httpBodyStreamData(),
+            responseBody: data,
+            metrics: metrics,
+            session: LoggerSession.current.id.uuidString
+        )))
     }
 
     /// Logs the task metrics (optional).
@@ -110,13 +118,14 @@ public final class NetworkLogger {
     // MARK: - Filter Out
 
     public struct LoggedNetworkTask {
-        public var task: URLSessionTask
-        public var session: URLSession?
-        public var request: URLRequest
-        public var response: URLResponse?
-        public var data: Data?
-        public var error: Error?
-        public var metrics: NetworkLoggerMetrics?
+        public let task: URLSessionTask
+        public let session: URLSession?
+        public let originalRequest: URLRequest
+        public let currentRequest: URLRequest?
+        public let response: URLResponse?
+        public let data: Data?
+        public let error: Error?
+        public let metrics: NetworkLoggerMetrics?
     }
 
     // MARK: - Private

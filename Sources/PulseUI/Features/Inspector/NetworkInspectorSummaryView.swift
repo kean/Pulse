@@ -131,15 +131,17 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     }
 
     var summaryModel: KeyValueSectionViewModel {
-        KeyValueSectionViewModel(
-            title: "Summary",
-            color: tintColor,
-            items: [
-                ("Status Code", summary.response?.statusCode.map(StatusCodeFormatter.string) ?? "–"),
-                ("Method", summary.request?.httpMethod ?? "–"),
-                ("URL", summary.request?.url?.absoluteString ?? "–"),
-                ("Domain", summary.request?.url?.host ?? "–")
-            ])
+        var items: [(String, String?)] = [
+            ("Status Code", summary.response?.statusCode.map(StatusCodeFormatter.string) ?? "–"),
+            ("Method", summary.originalRequest?.httpMethod ?? "–"),
+            ("URL", summary.originalRequest?.url?.absoluteString ?? "–"),
+            ("Domain", summary.originalRequest?.url?.host ?? "–")
+        ]
+        if summary.originalRequest?.url != summary.currentRequest?.url && summary.currentRequest?.url != nil {
+            items.append(("Redirect", summary.currentRequest?.url?.absoluteString ?? "–"))
+        }
+
+        return KeyValueSectionViewModel(title: "Summary", color: tintColor, items: items)
     }
 
     var errorModel: KeyValueSectionViewModel? {
@@ -162,7 +164,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
         guard summary.requestBodyKey != nil, summary.requestBodySize > 0 else {
             return nil
         }
-        let contentType = summary.request?.headers.first(where: { $0.key == "Content-Type" })?.value ?? "–"
+        let contentType = summary.originalRequest?.headers.first(where: { $0.key == "Content-Type" })?.value ?? "–"
         return KeyValueSectionViewModel(
             title: "Request Body",
             color: .blue,
@@ -222,7 +224,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     }
 
     var parametersModel: KeyValueSectionViewModel? {
-        guard let request = summary.request else { return nil }
+        guard let request = summary.originalRequest else { return nil }
         return KeyValueSectionViewModel(title: "Parameters", color: .gray, items: [
             ("Cache Policy", URLRequest.CachePolicy(rawValue: request.cachePolicy).map { $0.description }),
             ("Timeout Interval", DurationFormatter.string(from: request.timeoutInterval)),
@@ -235,8 +237,9 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     }
 
     #if os(watchOS) || os(tvOS)
+    // TODO: Update to support original/current request
     var requestHeaders: KeyValueSectionViewModel {
-        let items = (summary.request?.headers ?? [:]).sorted(by: { $0.key < $1.key })
+        let items = (summary.currentRequest?.headers ?? [:]).sorted(by: { $0.key < $1.key })
         return KeyValueSectionViewModel(
             title: "Request Headers",
             color: .blue,

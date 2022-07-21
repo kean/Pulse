@@ -60,25 +60,25 @@ extension RemoteLogger {
             }
         }
 
-        static func encode(_ message: LoggerStoreEvent.NetworkTaskCompleted) throws -> Data {
+        static func encode(_ event: LoggerStoreEvent.NetworkTaskCompleted) throws -> Data {
             var contents = [Data]()
 
-            let strippedMessage = LoggerStoreEvent.NetworkTaskCompleted(taskId: message.taskId, createdAt: message.createdAt, request: message.request, response: message.response, error: message.error, requestBody: nil, responseBody: nil, metrics: message.metrics, session: message.session)
+            let strippedMessage = LoggerStoreEvent.NetworkTaskCompleted(taskId: event.taskId, createdAt: event.createdAt, originalRequest: event.originalRequest, currentRequest: event.currentRequest, response: event.response, error: event.error, requestBody: nil, responseBody: nil, metrics: event.metrics, session: event.session)
             let messageData = try JSONEncoder().encode(strippedMessage)
             contents.append(messageData)
 
-            if let requestBody = message.requestBody, requestBody.count < Int32.max {
+            if let requestBody = event.requestBody, requestBody.count < Int32.max {
                 contents.append(requestBody)
             }
 
-            if let responseBody = message.responseBody, responseBody.count < Int32.max {
+            if let responseBody = event.responseBody, responseBody.count < Int32.max {
                 contents.append(responseBody)
             }
 
             var data = Data()
             data.append(Data(UInt32(messageData.count)))
-            data.append(Data(UInt32(message.requestBody?.count ?? 0)))
-            data.append(Data(UInt32(message.responseBody?.count ?? 0)))
+            data.append(Data(UInt32(event.requestBody?.count ?? 0)))
+            data.append(Data(UInt32(event.responseBody?.count ?? 0)))
             for item in contents {
                 data.append(item)
             }
@@ -100,7 +100,7 @@ extension RemoteLogger {
                 throw PacketParsingError.notEnoughData
             }
 
-            let message = try JSONDecoder().decode(
+            let event = try JSONDecoder().decode(
                 LoggerStoreEvent.NetworkTaskCompleted.self,
                 from: data.from(Manifest.size, size: Int(manifest.messageSize))
             )
@@ -115,7 +115,7 @@ extension RemoteLogger {
                 responseBody = data.from(Manifest.size + Int(manifest.messageSize) + Int(manifest.requestBodySize), size: Int(manifest.responseBodySize))
             }
 
-            return LoggerStoreEvent.NetworkTaskCompleted(taskId: message.taskId, createdAt: message.createdAt, request: message.request, response: message.response, error: message.error, requestBody: requestBody, responseBody: responseBody, metrics: message.metrics, session: message.session)
+            return LoggerStoreEvent.NetworkTaskCompleted(taskId: event.taskId, createdAt: event.createdAt, originalRequest: event.originalRequest, currentRequest: event.currentRequest, response: event.response, error: event.error, requestBody: requestBody, responseBody: responseBody, metrics: event.metrics, session: event.session)
         }
     }
 

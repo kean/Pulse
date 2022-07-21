@@ -246,7 +246,8 @@ extension LoggerStore {
         handle(.networkTaskCompleted(.init(
             taskId: taskId,
             createdAt: makeCurrentDate(),
-            request: NetworkLoggerRequest(urlRequest: request),
+            originalRequest: NetworkLoggerRequest(urlRequest: request),
+            currentRequest: NetworkLoggerRequest(urlRequest: request),
             response: response.map(NetworkLoggerResponse.init),
             error: error.map(NetworkLoggerError.init),
             requestBody: request.httpBody ?? request.httpBodyStreamData(),
@@ -308,18 +309,19 @@ extension LoggerStore {
         let request = findOrCreateNetworkRequestEntity(forTaskId: event.taskId, createdAt: event.createdAt)
 
         request.session = event.session
-        request.url = event.request.url?.absoluteString
-        request.host = event.request.url?.host
-        request.httpMethod = event.request.httpMethod
+        request.url = event.originalRequest.url?.absoluteString
+        request.host = event.originalRequest.url?.host
+        request.httpMethod = event.originalRequest.httpMethod
         request.requestState = LoggerNetworkRequestEntity.State.pending.rawValue
 
-        request.details.request = try? JSONEncoder().encode(event.request)
+        request.details.originalRequest = try? JSONEncoder().encode(event.originalRequest)
+        request.details.currentRequest = try? JSONEncoder().encode(event.currentRequest)
 
         if case let .directory(store) = document {
             request.requestBodyKey = store.storeData(event.requestBody)
         }
 
-        findOrCreateMessageEntity(for: request, networkRequest: event.request)
+        findOrCreateMessageEntity(for: request, networkRequest: event.originalRequest)
     }
 
     private func process(_ event: LoggerStoreEvent.NetworkTaskProgressUpdated) {
@@ -333,9 +335,9 @@ extension LoggerStore {
 
         // Populate remaining request fields
         request.session = event.session
-        request.url = event.request.url?.absoluteString
-        request.host = event.request.url?.host
-        request.httpMethod = event.request.httpMethod
+        request.url = event.originalRequest.url?.absoluteString
+        request.host = event.originalRequest.url?.host
+        request.httpMethod = event.originalRequest.httpMethod
         request.errorDomain = event.error?.domain
         let errorCode = Int32(event.error?.code ?? 0)
         request.errorCode = errorCode
@@ -358,13 +360,14 @@ extension LoggerStore {
         // Populate details
         let details = request.details
         let encoder = JSONEncoder()
-        details.request = try? encoder.encode(event.request)
+        details.originalRequest = try? encoder.encode(event.originalRequest)
+        details.currentRequest = try? encoder.encode(event.currentRequest)
         details.response = try? encoder.encode(event.response)
         details.error = try? encoder.encode(event.error)
         details.metrics = try? encoder.encode(event.metrics)
 
         // Update associated message state
-        let message = findOrCreateMessageEntity(for: request, networkRequest: event.request)
+        let message = findOrCreateMessageEntity(for: request, networkRequest: event.originalRequest)
         message.requestState = request.requestState
         if isFailure {
             let level = LoggerStore.Level.error

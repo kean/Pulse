@@ -12,21 +12,19 @@ struct NetworkInspectorHeadersView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
-                KeyValueSectionView(viewModel: viewModel.requestHeaders)
+                KeyValueSectionView(viewModel: viewModel.requestHeadersOriginal)
+                KeyValueSectionView(viewModel: viewModel.requestHeadersCurrent)
                 if let responseHeaders = viewModel.responseHeaders {
                     KeyValueSectionView(viewModel: responseHeaders)
                 }
                 Spacer()
             }.padding()
 
-            NavigationLink(destination: NetworkHeadersDetailsView(viewModel: viewModel.requestHeaders), isActive: $viewModel.isRequestRawActive) {
-                Text("")
-            }.hidden()
+            NavigationLink.programmatic(isActive: $viewModel.isRequestOriginalRawActive, destination:  { NetworkHeadersDetailsView(viewModel: viewModel.requestHeadersOriginal) })
+            NavigationLink.programmatic(isActive: $viewModel.isRequestCurrentRawActive, destination:  { NetworkHeadersDetailsView(viewModel: viewModel.requestHeadersCurrent) })
 
             if let responseHeaders = viewModel.responseHeaders {
-                NavigationLink(destination: NetworkHeadersDetailsView(viewModel: responseHeaders), isActive: $viewModel.isResponseRawActive) {
-                    Text("")
-                }.hidden()
+                NavigationLink.programmatic(isActive: $viewModel.isResponseRawActive, destination:  { NetworkHeadersDetailsView(viewModel: responseHeaders) })
             }
         }
     }
@@ -88,16 +86,30 @@ final class NetworkInspectorHeaderViewModel: ObservableObject {
         self.summary = summary
     }
 
-    @Published var isRequestRawActive = false
+    @Published var isRequestOriginalRawActive = false
+    @Published var isRequestCurrentRawActive = false
     @Published var isResponseRawActive = false
 
-    var requestHeaders: KeyValueSectionViewModel {
-        let items = (summary.request?.headers ?? [:]).sorted(by: { $0.key < $1.key })
+    var requestHeadersOriginal: KeyValueSectionViewModel {
+        let items = (summary.originalRequest?.headers ?? [:]).sorted(by: { $0.key < $1.key })
         return KeyValueSectionViewModel(
-            title: "Request Headers",
+            title: "Request Headers (Original)",
             color: .blue,
             action: ActionViewModel(
-                action: { [unowned self] in isRequestRawActive = true },
+                action: { [unowned self] in isRequestOriginalRawActive = true },
+                title: "View Raw"
+            ),
+            items: items
+        )
+    }
+
+    var requestHeadersCurrent: KeyValueSectionViewModel {
+        let items = (summary.currentRequest?.headers ?? [:]).sorted(by: { $0.key < $1.key })
+        return KeyValueSectionViewModel(
+            title: "Request Headers (Current)",
+            color: .blue,
+            action: ActionViewModel(
+                action: { [unowned self] in isRequestCurrentRawActive = true },
                 title: "View Raw"
             ),
             items: items

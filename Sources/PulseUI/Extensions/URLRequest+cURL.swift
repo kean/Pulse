@@ -7,7 +7,7 @@ import Foundation
 
 extension NetworkLoggerSummary {
     func cURLDescription() -> String {
-        guard let request = request, let url = request.url, let method = request.httpMethod else {
+        guard let request = currentRequest, let url = request.url, let method = request.httpMethod else {
             return "$ curl command generation failed"
         }
 

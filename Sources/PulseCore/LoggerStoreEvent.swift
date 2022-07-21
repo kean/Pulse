@@ -39,14 +39,16 @@ public enum LoggerStoreEvent {
     public struct NetworkTaskCreated: Codable {
         public let taskId: UUID
         public let createdAt: Date
-        public let request: NetworkLoggerRequest
+        public let originalRequest: NetworkLoggerRequest
+        public let currentRequest: NetworkLoggerRequest?
         public var requestBody: Data?
         public let session: String
 
-        public init(taskId: UUID, createdAt: Date, request: NetworkLoggerRequest, requestBody: Data?, session: String) {
+        public init(taskId: UUID, createdAt: Date, originalRequest: NetworkLoggerRequest, currentRequest: NetworkLoggerRequest?, requestBody: Data?, session: String) {
             self.taskId = taskId
             self.createdAt = createdAt
-            self.request = request
+            self.originalRequest = originalRequest
+            self.currentRequest = currentRequest
             self.requestBody = requestBody
             self.session = session
         }
@@ -67,7 +69,8 @@ public enum LoggerStoreEvent {
     public final class NetworkTaskCompleted: Codable {
         public let taskId: UUID
         public let createdAt: Date
-        public let request: NetworkLoggerRequest
+        public let originalRequest: NetworkLoggerRequest
+        public let currentRequest: NetworkLoggerRequest?
         public let response: NetworkLoggerResponse?
         public let error: NetworkLoggerError?
         public let requestBody: Data?
@@ -75,10 +78,11 @@ public enum LoggerStoreEvent {
         public let metrics: NetworkLoggerMetrics?
         public let session: String
 
-        public init(taskId: UUID, createdAt: Date, request: NetworkLoggerRequest, response: NetworkLoggerResponse?, error: NetworkLoggerError?, requestBody: Data?, responseBody: Data?, metrics: NetworkLoggerMetrics?, session: String) {
+        public init(taskId: UUID, createdAt: Date, originalRequest: NetworkLoggerRequest, currentRequest: NetworkLoggerRequest?, response: NetworkLoggerResponse?, error: NetworkLoggerError?, requestBody: Data?, responseBody: Data?, metrics: NetworkLoggerMetrics?, session: String) {
             self.taskId = taskId
             self.createdAt = createdAt
-            self.request = request
+            self.originalRequest = originalRequest
+            self.currentRequest = currentRequest
             self.response = response
             self.error = error
             self.requestBody = requestBody

@@ -27,7 +27,7 @@ private func testProxy() {
     URLSessionProxyDelegate.enableAutomaticRegistration()
 
     let session = URLSession(configuration: .default, delegate: MockSessionDelegate(), delegateQueue: nil)
-    task = session.dataTask(with: URL(string: "https://google.com")!)
+    task = session.dataTask(with: URL(string: "https://github.com/CreateAPI/Get")!)
     task?.resume()
 }
 

@@ -8,7 +8,8 @@ import CoreData
 
 final class NetworkLoggerSummary {
     private let objectId: NSManagedObjectID?
-    let request: NetworkLoggerRequest?
+    let originalRequest: NetworkLoggerRequest?
+    let currentRequest: NetworkLoggerRequest?
     let state: LoggerNetworkRequestEntity.State
     let response: NetworkLoggerResponse?
     let error: NetworkLoggerError?
@@ -27,7 +28,8 @@ final class NetworkLoggerSummary {
 
     init(request: LoggerNetworkRequestEntity, store: LoggerStore) {
         let details = request.details
-        self.request = details.request.flatMap(decode(NetworkLoggerRequest.self))
+        self.originalRequest = details.originalRequest.flatMap(decode(NetworkLoggerRequest.self))
+        self.currentRequest = details.currentRequest.flatMap(decode(NetworkLoggerRequest.self))
         self.state = request.state
         self.response = details.response.flatMap(decode(NetworkLoggerResponse.self))
         self.error = details.error.flatMap(decode(NetworkLoggerError.self))

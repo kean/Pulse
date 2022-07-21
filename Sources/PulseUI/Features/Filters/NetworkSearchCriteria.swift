@@ -265,7 +265,7 @@ func evaluateProgrammaticFilters(_ filters: [NetworkSearchFilter], entity: Logge
         if let value = cache.value(forKey: key) as? NetworkLoggerRequest {
             return value
         }
-        let value = entity.details.request.flatMap(decode(NetworkLoggerRequest.self))
+        let value = entity.details.originalRequest.flatMap(decode(NetworkLoggerRequest.self))
         if let value = value {
             cache.set(value, forKey: key, ttl: 60)
         }
