@@ -12,7 +12,7 @@ struct TimingView: View {
 
     var body: some View {
         VStack(spacing: 16) {
-            ForEach(viewModel, id: \.self.title) {
+            ForEach(viewModel) {
                 TimingSectionView(viewModel: $0, width: width)
             }
         }
@@ -36,7 +36,7 @@ private struct TimingSectionView: View {
             }
             if !viewModel.items.isEmpty {
                 VStack(spacing: 6) {
-                    ForEach(viewModel.items, id: \.self.title) {
+                    ForEach(viewModel.items) {
                         TimingRowView(viewModel: $0, width: width)
                     }
                 }
@@ -92,13 +92,21 @@ private struct TimingRowView: View {
 
 // MARK: - ViewModel
 
-struct TimingRowSectionViewModel {
+final class TimingRowSectionViewModel: Identifiable {
     let title: String
     let items: [TimingRowViewModel]
     var isHeader = false
+
+    var id: ObjectIdentifier { ObjectIdentifier(self) }
+
+    init(title: String, items: [TimingRowViewModel], isHeader: Bool = false) {
+        self.title = title
+        self.items = items
+        self.isHeader = isHeader
+    }
 }
 
-struct TimingRowViewModel {
+final class TimingRowViewModel: Identifiable {
     let title: String
     let value: String
     let color: UXColor
@@ -106,6 +114,16 @@ struct TimingRowViewModel {
     let start: CGFloat
     // [0, 1]
     let length: CGFloat
+
+    var id: ObjectIdentifier { ObjectIdentifier(self) }
+
+    init(title: String, value: String, color: UXColor, start: CGFloat, length: CGFloat) {
+        self.title = title
+        self.value = value
+        self.color = color
+        self.start = start
+        self.length = length
+    }
 }
 
 // MARK: - Private
