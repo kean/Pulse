@@ -64,9 +64,16 @@ private func makeTiming(metrics: NetworkLoggerMetrics) -> [TimingRowSectionViewM
         return TimingRowViewModel(title: title, value: value, color: color, start: CGFloat(start), length: length ?? 1)
     }
 
+    var currentURL: URL?
+
     for transaction in metrics.transactions {
         guard let fetchType = URLSessionTaskMetrics.ResourceFetchType(rawValue: transaction.resourceFetchType) else {
             continue
+        }
+
+        if metrics.redirectCount > 0, let url = transaction.request?.url, currentURL != url {
+            currentURL = url
+            sections.append(TimingRowSectionViewModel(title: url.absoluteString, items: [], isHeader: true))
         }
 
         switch fetchType {

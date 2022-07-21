@@ -28,13 +28,17 @@ private struct TimingSectionView: View {
             HStack {
                 Text(viewModel.title)
                     .font(.subheadline)
-                    .foregroundColor(.primary)
+                    .foregroundColor(viewModel.isHeader ? .secondary : .primary)
                 Spacer()
+            }.padding(.top, viewModel.isHeader ? 12 : 0)
+            if viewModel.isHeader {
+                Divider()
             }
-
-            VStack(spacing: 6) {
-                ForEach(viewModel.items, id: \.self.title) {
-                    TimingRowView(viewModel: $0, width: width)
+            if !viewModel.items.isEmpty {
+                VStack(spacing: 6) {
+                    ForEach(viewModel.items, id: \.self.title) {
+                        TimingRowView(viewModel: $0, width: width)
+                    }
                 }
             }
         }
@@ -91,6 +95,7 @@ private struct TimingRowView: View {
 struct TimingRowSectionViewModel {
     let title: String
     let items: [TimingRowViewModel]
+    var isHeader = false
 }
 
 struct TimingRowViewModel {
