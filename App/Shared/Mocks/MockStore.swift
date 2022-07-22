@@ -93,12 +93,12 @@ private func populateStore(_ store: LoggerStore) {
         if isAddingItemsDynamically {
             DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(Int.random(in: 1000...6000))) {
                 networkLogger.logTaskCreated(dataTask)
-//                DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(Int.random(in: 500...2000))) {
-//                    networkLogger.logDataTask(dataTask, didReceive: mockTask.response)
-//                    networkLogger.logDataTask(dataTask, didReceive: mockTask.responseBody)
-//                    networkLogger.logTask(dataTask, didFinishCollecting: mockTask.metrics)
-//                    networkLogger.logTask(dataTask, didCompleteWithError: nil, session: urlSession)
-//                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(Int.random(in: 500...2000))) {
+                    networkLogger.logDataTask(dataTask, didReceive: mockTask.response)
+                    networkLogger.logDataTask(dataTask, didReceive: mockTask.responseBody)
+                    networkLogger.logTask(dataTask, didFinishCollecting: mockTask.metrics)
+                    networkLogger.logTask(dataTask, didCompleteWithError: nil, session: urlSession)
+                }
             }
         } else {
             networkLogger.logTaskCreated(dataTask)

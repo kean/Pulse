@@ -181,16 +181,20 @@ struct NetworkInspectorView: View {
                 NetworkInspectorResponseView(viewModel: model)
             } else if !viewModel.isCompleted && !viewModel.store.isReadonly {
                 pending
+            } else if viewModel.hasRequestBody {
+                PlaceholderView(imageName: "exclamationmark.circle", title: "Unavailable")
             } else {
-                makePlaceholder
+                PlaceholderView(imageName: "nosign", title: "Empty Request")
             }
         case .response:
             if let model = viewModel.makeResponseBodyViewModel() {
                 NetworkInspectorResponseView(viewModel: model)
             } else if !viewModel.isCompleted && !viewModel.store.isReadonly {
                 pending
+            } else if viewModel.hasResponseBody  {
+                PlaceholderView(imageName: "exclamationmark.circle", title: "Unavailable")
             } else {
-                makePlaceholder
+                PlaceholderView(imageName: "nosign", title: "Empty Response")
             }
         case .metrics:
             if let model = viewModel.makeMetricsModel() {
@@ -198,7 +202,7 @@ struct NetworkInspectorView: View {
             } else if !viewModel.isCompleted && !viewModel.store.isReadonly {
                 pending
             } else {
-                makePlaceholder
+                PlaceholderView(imageName: "exclamationmark.circle", title: "Unavailable")
             }
         }
     }
@@ -212,11 +216,6 @@ struct NetworkInspectorView: View {
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
         }.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-    }
-
-    @ViewBuilder
-    private var makePlaceholder: some View {
-        PlaceholderView(imageName: "exclamationmark.circle", title: "Not Available")
     }
 }
 
