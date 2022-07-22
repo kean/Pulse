@@ -5,7 +5,7 @@
 import SwiftUI
 import PulseCore
 
-#if os(iOS) || os(macOS)
+#if os(iOS)
 
 // MARK: - View
 
@@ -19,7 +19,7 @@ struct NetworkInspectorTransactionsListView: View {
             ForEach(viewModel.sections) { section in
                 Section(header: SectionHeader(title: section.title)) {
                     ForEach(section.items) { item in
-                        NavigationLink(destination: { NetworkInspectorTransactionView(viewModel: item.viewModel()) }) {
+                        NavigationLink(destination: { destination(for: item) }) {
                             ItemView(item: item)
                         }
                     }
@@ -62,6 +62,11 @@ struct NetworkInspectorTransactionsListView: View {
                 }
             }
         }
+    }
+
+    private func destination(for item: NetworkInspectorTransactionsListViewModel.Item) -> some View {
+        NetworkInspectorTransactionView(viewModel: item.viewModel())
+            .navigationBarTitle(item.title)
     }
 }
 

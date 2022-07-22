@@ -165,7 +165,7 @@ struct NetworkInspectorView: View {
                 Text("Metrics").tag(NetworkInspectorTab.metrics)
             }
             .pickerStyle(.segmented)
-            .padding(13)
+            .padding(EdgeInsets(top: 6, leading: 13, bottom: 11, trailing: 13))
             .border(width: 1, edges: [.bottom], color: Color(UXColor.separator).opacity(0.3))
 
             selectedTabView

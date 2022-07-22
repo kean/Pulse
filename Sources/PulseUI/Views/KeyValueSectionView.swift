@@ -31,6 +31,7 @@ struct KeyValueSectionView: View {
                     .padding(EdgeInsets(top: 7, leading: 11, bottom: 7, trailing: 11))
                     .background(Color.secondaryFill)
                     .cornerRadius(20)
+                    .frame(height: 20, alignment: .center)
                 }
                 #endif
             }
@@ -55,7 +56,7 @@ struct KeyValueSectionView: View {
             KeyValueListView(viewModel: viewModel, limit: limit)
                 .padding(EdgeInsets(top: 0, leading: 10, bottom: 0, trailing: 0))
                 .border(width: 2, edges: [.leading], color: actualTintColor)
-                .padding(EdgeInsets(top: 5, leading: 5, bottom: 5, trailing: 0))
+                .padding(EdgeInsets(top: 5, leading: 2, bottom: 5, trailing: 0))
             #endif
         }
     }

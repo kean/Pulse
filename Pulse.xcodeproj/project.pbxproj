@@ -13,7 +13,6 @@
 		0C0B31F426D179A20045C9E1 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0C0B31F226D179A20045C9E1 /* Main.storyboard */; };
 		0C0B31F626D179A70045C9E1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C0B31F526D179A70045C9E1 /* Assets.xcassets */; };
 		0C0B31F926D179A70045C9E1 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0C0B31F726D179A70045C9E1 /* LaunchScreen.storyboard */; };
-		0C0E6318260186C700A0DF40 /* Pulse Demo watchOS.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 0CEAB3DA25FE862D00F09B0F /* Pulse Demo watchOS.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		0C43FFF4280B492500DD4458 /* PulseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 0C43FFF3280B492500DD4458 /* PulseCore */; };
 		0C43FFF6280B492500DD4458 /* PulseUI in Frameworks */ = {isa = PBXBuildFile; productRef = 0C43FFF5280B492500DD4458 /* PulseUI */; };
 		0C4719242707EFD5008DB813 /* contributors.json in Resources */ = {isa = PBXBuildFile; fileRef = 0C4719232707EFD5008DB813 /* contributors.json */; };
@@ -72,13 +71,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		0C0E6319260186C700A0DF40 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 0C57AD45245F0EFB005B3400 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 0CEAB3D925FE862D00F09B0F;
-			remoteInfo = "Pulse watchOS";
-		};
 		0CEAB3E525FE862E00F09B0F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0C57AD45245F0EFB005B3400 /* Project object */;
@@ -89,17 +81,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		0C0E631B260186C700A0DF40 /* Embed Watch Content */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
-			dstSubfolderSpec = 16;
-			files = (
-				0C0E6318260186C700A0DF40 /* Pulse Demo watchOS.app in Embed Watch Content */,
-			);
-			name = "Embed Watch Content";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		0C98C6C925C4C08A0086A13E /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -487,12 +468,10 @@
 				0C516FB626015DD2004813B4 /* Sources */,
 				0C516FB726015DD2004813B4 /* Frameworks */,
 				0C516FB826015DD2004813B4 /* Resources */,
-				0C0E631B260186C700A0DF40 /* Embed Watch Content */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				0C0E631A260186C700A0DF40 /* PBXTargetDependency */,
 			);
 			name = "Pulse Demo iOS";
 			packageProductDependencies = (
@@ -810,11 +789,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		0C0E631A260186C700A0DF40 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 0CEAB3D925FE862D00F09B0F /* Pulse Demo watchOS */;
-			targetProxy = 0C0E6319260186C700A0DF40 /* PBXContainerItemProxy */;
-		};
 		0CEAB3E625FE862E00F09B0F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 0CEAB3E225FE862E00F09B0F /* Pulse Demo watchOS Extension */;

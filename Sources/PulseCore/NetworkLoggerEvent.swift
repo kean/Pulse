@@ -33,11 +33,15 @@ public struct NetworkLoggerRequest: Codable {
 
 public struct NetworkLoggerResponse: Codable {
     public let statusCode: Int?
+    public let contentType: String?
+    public let expectedContentLength: Int64?
     public let headers: [String: String]
 
     public init(urlResponse: URLResponse) {
         let httpResponse = urlResponse as? HTTPURLResponse
         self.statusCode = httpResponse?.statusCode
+        self.contentType = urlResponse.mimeType
+        self.expectedContentLength = urlResponse.expectedContentLength
         self.headers = httpResponse?.allHeaderFields as? [String: String] ?? [:]
     }
 }
