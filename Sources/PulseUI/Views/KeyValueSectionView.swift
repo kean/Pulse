@@ -3,6 +3,7 @@
 // Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
+import PulseCore
 
 struct KeyValueSectionView: View {
     let viewModel: KeyValueSectionViewModel
@@ -227,4 +228,18 @@ private struct Row {
 struct ActionViewModel {
     let action: () -> Void
     let title: String
+}
+
+extension KeyValueSectionViewModel {
+    static func makeRequestParameters(for request: NetworkLoggerRequest) -> KeyValueSectionViewModel {
+        KeyValueSectionViewModel(title: "Request Parameters", color: .gray, items: [
+            ("Cache Policy", URLRequest.CachePolicy(rawValue: request.cachePolicy).map { $0.description }),
+            ("Timeout Interval", DurationFormatter.string(from: request.timeoutInterval)),
+            ("Allows Cellular Access", request.allowsCellularAccess.description),
+            ("Allows Expensive Network Access", request.allowsExpensiveNetworkAccess.description),
+            ("Allows Constrained Network Access", request.allowsConstrainedNetworkAccess.description),
+            ("HTTP Should Handle Cookies", request.httpShouldHandleCookies.description),
+            ("HTTP Should Use Pipelining", request.httpShouldUsePipelining.description)
+        ])
+    }
 }

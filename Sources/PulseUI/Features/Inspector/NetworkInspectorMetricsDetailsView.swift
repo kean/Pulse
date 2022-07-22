@@ -34,7 +34,7 @@ struct NetworkMetricsDetailsViewModel {
 
 private func makeTransferSection(for metrics: NetworkLoggerTransactionMetrics) -> KeyValueSectionViewModel? {
     guard let metrics = metrics.details else { return nil }
-    return KeyValueSectionViewModel(title: "Data Transfer", color: .secondary, items: [
+    return KeyValueSectionViewModel(title: "Data Transfer (Current)", color: .secondary, items: [
         ("Request Body", formatBytes(metrics.countOfRequestBodyBytesBeforeEncoding)),
         ("Request Body (Encoded)", formatBytes(metrics.countOfRequestBodyBytesSent)),
         ("Request Headers", formatBytes(metrics.countOfRequestHeaderBytesSent)),

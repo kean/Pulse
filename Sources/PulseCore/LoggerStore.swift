@@ -355,6 +355,7 @@ extension LoggerStore {
         }
         request.requestBodySize = Int64(event.requestBody?.count ?? 0)
         request.responseBodySize = Int64(event.responseBody?.count ?? 0)
+        #warning("TODO: this is most likely incorrect. what about 302 scenario?")
         request.isFromCache = event.metrics?.transactions.last?.resourceFetchType == URLSessionTaskMetrics.ResourceFetchType.localCache.rawValue
 
         // Populate details

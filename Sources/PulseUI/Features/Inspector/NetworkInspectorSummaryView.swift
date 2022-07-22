@@ -224,16 +224,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     }
 
     var parametersModel: KeyValueSectionViewModel? {
-        guard let request = summary.originalRequest else { return nil }
-        return KeyValueSectionViewModel(title: "Parameters", color: .gray, items: [
-            ("Cache Policy", URLRequest.CachePolicy(rawValue: request.cachePolicy).map { $0.description }),
-            ("Timeout Interval", DurationFormatter.string(from: request.timeoutInterval)),
-            ("Allows Cellular Access", request.allowsCellularAccess.description),
-            ("Allows Expensive Network Access", request.allowsExpensiveNetworkAccess.description),
-            ("Allows Constrained Network Access", request.allowsConstrainedNetworkAccess.description),
-            ("HTTP Should Handle Cookies", request.httpShouldHandleCookies.description),
-            ("HTTP Should Use Pipelining", request.httpShouldUsePipelining.description)
-        ])
+        summary.originalRequest.map(KeyValueSectionViewModel.makeRequestParameters)
     }
 
     #if os(watchOS) || os(tvOS)

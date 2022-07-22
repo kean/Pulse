@@ -65,3 +65,13 @@ extension Backport {
 #endif
     }
 }
+
+extension Backport {
+    @ViewBuilder func borderedButton() -> some View {
+        if #available(iOS 15.0, watchOS 8.0, *) {
+            self.content.buttonStyle(.bordered)
+        } else {
+            self.content
+        }
+    }
+}

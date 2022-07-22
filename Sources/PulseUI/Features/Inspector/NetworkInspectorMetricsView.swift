@@ -11,6 +11,7 @@ import PulseCore
 
 struct NetworkInspectorMetricsView: View {
     let viewModel: NetworkInspectorMetricsViewModel
+    @State private var isTransctionsListShown = false
 
     private static let padding: CGFloat = 16
 
@@ -20,15 +21,41 @@ struct NetworkInspectorMetricsView: View {
                 VStack {
                     TimingView(viewModel: viewModel.timingModel, width: geo.size.width - NetworkInspectorMetricsView.padding * 2)
                         .padding(NetworkInspectorMetricsView.padding)
-                    Spacer(minLength: 32)
 
-                    #if !os(tvOS)
+#if !os(tvOS)
+                    if viewModel.transactions != nil {
+                        Button(action: { isTransctionsListShown = true }) {
+                            HStack {
+                                Text("View All Transactions")
+                                    .foregroundColor(.primary)
+                                Image(systemName: "chevron.right")
+                                    .font(.callout)
+                                    .foregroundColor(.secondary)
+                            }
+                            .padding(EdgeInsets(top: 11, leading: 11, bottom: 11, trailing: 11))
+                            .background(Color.secondaryFill)
+                            .cornerRadius(12)
+                        }
+                        .padding([.leading, .trailing])
+                        .padding(.top, 16)
+                    }
                     if let details = viewModel.details {
                         NetworkInspectorMetricsDetailsView(viewModel: details)
                             .padding([.leading, .bottom, .trailing], NetworkInspectorMetricsView.padding)
+                            .padding(.top, 32)
                     }
-                    #endif
+#endif
                 }
+            }
+        }
+        .background(links)
+    }
+
+    @ViewBuilder
+    private var links: some View {
+        if let transactions = viewModel.transactions {
+            NavigationLink.programmatic(isActive: $isTransctionsListShown) {
+                NetworkInspectorTransactionsListView(viewModel: transactions)
             }
         }
     }
@@ -40,6 +67,7 @@ final class NetworkInspectorMetricsViewModel {
     let metrics: NetworkLoggerMetrics
     fileprivate let timingModel: [TimingRowSectionViewModel]
     fileprivate let details: NetworkMetricsDetailsViewModel?
+    let transactions: NetworkInspectorTransactionsListViewModel?
 
     init(metrics: NetworkLoggerMetrics) {
         self.metrics = metrics
@@ -48,6 +76,11 @@ final class NetworkInspectorMetricsViewModel {
         self.details = metrics.transactions.first(where: {
             $0.resourceFetchType == URLSessionTaskMetrics.ResourceFetchType.networkLoad.rawValue
         }).map(NetworkMetricsDetailsViewModel.init)
+        if !metrics.transactions.isEmpty {
+            self.transactions = NetworkInspectorTransactionsListViewModel(metrics: metrics)
+        } else {
+            self.transactions = nil
+        }
     }
 }
 
@@ -103,10 +136,8 @@ private func makeTiming(metrics: NetworkLoggerMetrics) -> [TimingRowSectionViewM
             .sorted()
             .first
 
-            let hasCacheLookup = metrics.transactions.contains(where: {
-                $0.resourceFetchType == URLSessionTaskMetrics.ResourceFetchType.localCache.rawValue
-            })
-            if !hasCacheLookup, let fetchStartDate = transaction.fetchStartDate, let endDate = earliestEventDate {
+            if let fetchStartDate = transaction.fetchStartDate, let endDate = earliestEventDate,
+               endDate.timeIntervalSince(fetchStartDate) > 0.005  {
                 scheduling.append(makeRow(title: "Queued", color: .systemGray4, from: fetchStartDate, to: endDate))
             }
 
