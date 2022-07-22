@@ -10,41 +10,52 @@ import Combine
 struct NetworkInspectorView: View {
     // Make sure all tabs are updated live
     @ObservedObject var viewModel: NetworkInspectorViewModel
-    #if os(macOS)
     @State private var selectedTab: NetworkInspectorTab = .response
-    #else
-    @State private var selectedTab: NetworkInspectorTab = .summary
-    #endif
     @State private var isShowingShareSheet = false
     @State private var shareItems: ShareItems?
     @Environment(\.colorScheme) private var colorScheme
 
-    #if os(iOS)
+#if os(iOS)
     var body: some View {
-        universalBody
-            .navigationBarTitle(Text(viewModel.title), displayMode: .inline)
-            .navigationBarItems(trailing: HStack(spacing: 12) {
-                if let pin = viewModel.pin {
-                    PinButton(viewModel: pin, isTextNeeded: false)
-                }
-                if #available(iOS 14.0, *) {
-                    Menu(content: {
-                        NetworkMessageContextMenu(request: viewModel.request, store: viewModel.store, sharedItems: $shareItems)
-                    }, label: {
-                        Image(systemName: "square.and.arrow.up")
-                    })
-                } else {
-                    ShareButton {
-                        isShowingShareSheet = true
-                    }
-                }
-            })
-            .sheet(isPresented: $isShowingShareSheet) {
-                ShareView(activityItems: [viewModel.prepareForSharing()])
+        VStack(spacing: 0) {
+            toolbar
+            selectedTabView
+        }
+        .navigationBarTitle(Text(viewModel.title), displayMode: .inline)
+        .navigationBarItems(trailing: HStack(spacing: 12) {
+            if let pin = viewModel.pin {
+                PinButton(viewModel: pin, isTextNeeded: false)
             }
-            .sheet(item: $shareItems, content: ShareView.init)
+            if #available(iOS 14.0, *) {
+                Menu(content: {
+                    NetworkMessageContextMenu(request: viewModel.request, store: viewModel.store, sharedItems: $shareItems)
+                }, label: {
+                    Image(systemName: "square.and.arrow.up")
+                })
+            } else {
+                ShareButton {
+                    isShowingShareSheet = true
+                }
+            }
+        })
+        .sheet(isPresented: $isShowingShareSheet) {
+            ShareView(activityItems: [viewModel.prepareForSharing()])
+        }
+        .sheet(item: $shareItems, content: ShareView.init)
     }
-    #elseif os(watchOS)
+
+    private var toolbar: some View {
+        Picker("", selection: $selectedTab) {
+            Text("Request").tag(NetworkInspectorTab.response)
+            Text("Response").tag(NetworkInspectorTab.request)
+            Text("Summary").tag(NetworkInspectorTab.summary)
+            Text("Metrics").tag(NetworkInspectorTab.metrics)
+        }
+        .pickerStyle(.segmented)
+        .padding(EdgeInsets(top: 6, leading: 13, bottom: 11, trailing: 13))
+        .border(width: 1, edges: [.bottom], color: Color(UXColor.separator).opacity(0.3))
+    }
+#elseif os(watchOS)
     var body: some View {
         NetworkInspectorSummaryView(viewModel: viewModel.makeSummaryModel())
             .navigationBarTitle(Text(viewModel.title))
@@ -54,7 +65,7 @@ struct NetworkInspectorView: View {
                 }
             }
     }
-    #elseif os(tvOS)
+#elseif os(tvOS)
     var body: some View {
         List {
             let viewModel = self.viewModel.makeSummaryModel()
@@ -95,7 +106,7 @@ struct NetworkInspectorView: View {
             KeyValueSectionView(viewModel: viewModel, limit: 5)
         }
     }
-    #elseif os(macOS)
+#elseif os(macOS)
     let onClose: () -> Void
 
     var body: some View {
@@ -103,7 +114,7 @@ struct NetworkInspectorView: View {
             toolbar
             selectedTabView
         }
-            .background(colorScheme == .light ? Color(UXColor.controlBackgroundColor) : Color.clear)
+        .background(colorScheme == .light ? Color(UXColor.controlBackgroundColor) : Color.clear)
     }
 
     private var toolbar: some View {
@@ -154,23 +165,9 @@ struct NetworkInspectorView: View {
         }
     }
 
-    #endif
+#endif
 
-    #if !os(watchOS) && !os(tvOS)
-    private var universalBody: some View {
-        VStack(spacing: 0) {
-            Picker("", selection: $selectedTab) {
-                Text("Summary").tag(NetworkInspectorTab.summary)
-                Text("Headers").tag(NetworkInspectorTab.headers)
-                Text("Metrics").tag(NetworkInspectorTab.metrics)
-            }
-            .pickerStyle(.segmented)
-            .padding(EdgeInsets(top: 6, leading: 13, bottom: 11, trailing: 13))
-            .border(width: 1, edges: [.bottom], color: Color(UXColor.separator).opacity(0.3))
-
-            selectedTabView
-        }
-    }
+#if os(iOS) || os(macOS)
 
     @ViewBuilder
     private var selectedTabView: some View {
@@ -182,24 +179,40 @@ struct NetworkInspectorView: View {
         case .request:
             if let model = viewModel.makeRequestBodyViewModel() {
                 NetworkInspectorResponseView(viewModel: model)
+            } else if !viewModel.isCompleted && !viewModel.store.isReadonly {
+                pending
             } else {
                 makePlaceholder
             }
         case .response:
             if let model = viewModel.makeResponseBodyViewModel() {
                 NetworkInspectorResponseView(viewModel: model)
+            } else if !viewModel.isCompleted && !viewModel.store.isReadonly {
+                pending
             } else {
                 makePlaceholder
             }
         case .metrics:
             if let model = viewModel.makeMetricsModel() {
                 NetworkInspectorMetricsView(viewModel: model)
+            } else if !viewModel.isCompleted && !viewModel.store.isReadonly {
+                pending
             } else {
                 makePlaceholder
             }
         }
     }
-    #endif
+#endif
+
+    @ViewBuilder
+    private var pending: some View {
+        VStack(spacing: 12) {
+            Spinner()
+            Text("Pending")
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+        }.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+    }
 
     @ViewBuilder
     private var makePlaceholder: some View {
@@ -262,6 +275,18 @@ final class NetworkInspectorViewModel: ObservableObject {
         }
     }
 
+    var isCompleted: Bool {
+        request.state == .failure || request.state == .success
+    }
+
+    var hasRequestBody: Bool {
+        request.requestBodyKey != nil
+    }
+
+    var hasResponseBody: Bool {
+        request.requestBodyKey != nil
+    }
+
     // MARK: - Tabs
 
     func makeSummaryModel() -> NetworkInspectorSummaryViewModel {
@@ -282,11 +307,11 @@ final class NetworkInspectorViewModel: ObservableObject {
         return NetworkInspectorResponseViewModel(title: "Response", data: responseBody)
     }
 
-    #if !os(watchOS)
+#if !os(watchOS)
     func makeMetricsModel() -> NetworkInspectorMetricsViewModel? {
         summary.metrics.map(NetworkInspectorMetricsViewModel.init)
     }
-    #endif
+#endif
 
     // MARK: Sharing
 
