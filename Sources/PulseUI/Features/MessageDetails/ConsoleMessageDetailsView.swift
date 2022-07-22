@@ -15,21 +15,29 @@ struct ConsoleMessageDetailsView: View {
     var body: some View {
         contents
             .navigationBarTitle("", displayMode: .inline)
-            .navigationBarItems(trailing: HStack(spacing: 12) {
-                if let badge = viewModel.badge {
-                    BadgeView(viewModel: BadgeViewModel(title: badge.title, color: badge.color.opacity(colorScheme == .light ? 0.25 : 0.5)))
-                }
-                NavigationLink(destination: ConsoleMessageMetadataView(message: viewModel.message)) {
-                    Image(systemName: "info.circle")
-                }
-                PinButton(viewModel: viewModel.pin, isTextNeeded: false)
-                ShareButton {
-                    self.isShowingShareSheet = true
-                }
-            })
+            .navigationBarItems(trailing: trailingNavigationBarItems)
             .sheet(isPresented: $isShowingShareSheet) {
                 ShareView(activityItems: [self.viewModel.prepareForSharing()])
             }
+    }
+
+    @ViewBuilder
+    private var trailingNavigationBarItems: some View {
+        HStack {
+            if let badge = viewModel.badge {
+                BadgeView(viewModel: BadgeViewModel(title: badge.title, color: badge.color.opacity(colorScheme == .light ? 0.25 : 0.5)))
+            }
+            NavigationLink(destination: ConsoleMessageMetadataView(message: viewModel.message)) {
+                Image(systemName: "info.circle")
+            }
+            PinButton(viewModel: viewModel.pin, isTextNeeded: false)
+            ShareButton {
+                self.isShowingShareSheet = true
+            }
+            Button(action: viewModel.textViewModel.startSearching) {
+                Image(systemName: "magnifyingglass")
+            }
+        }
     }
     #elseif os(watchOS)
     var body: some View {
@@ -102,7 +110,7 @@ struct ConsoleMessageDetailsView: View {
     }
 
     private var textView: some View {
-        RichTextView(viewModel: .init(string: viewModel.text))
+        RichTextView(viewModel: viewModel.textViewModel)
     }
 
     #if os(watchOS) || os(tvOS)

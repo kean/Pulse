@@ -10,63 +10,71 @@ import Combine
 struct NetworkInspectorResponseView: View {
     let viewModel: NetworkInspectorResponseViewModel
 
-    @State private var isShowingShareSheet = false
-
-    #if os(iOS)
+#if os(iOS)
     var body: some View {
         contents
             .navigationBarTitle(viewModel.title)
-            .navigationBarItems(trailing: ShareButton { isShowingShareSheet = true })
-            .sheet(isPresented: $isShowingShareSheet) {
-                ShareView(activityItems: [viewModel.prepareForSharing()])
-            }
+            .navigationBarItems(trailing: trailingNavigationBarItems)
     }
-    #elseif os(watchOS)
+
+    @ViewBuilder
+    private var trailingNavigationBarItems: some View {
+        if let button = viewModel.buttonSearch {
+            Button(action: button.action) {
+                Image(systemName: "magnifyingglass")
+            }
+        }
+    }
+#elseif os(watchOS)
     var body: some View {
         ScrollView {
             contents
         }
     }
-    #elseif os(tvOS)
+#elseif os(tvOS)
     var body: some View {
         HStack {
             contents
             Spacer()
         }
     }
-    #else
+#else
     var body: some View {
         contents
     }
-    #endif
+#endif
 
     @ViewBuilder
     private var contents: some View {
-        if let json = try? JSONSerialization.jsonObject(with: viewModel.data, options: []) {
-            RichTextView(viewModel: .init(json: json))
-        } else if let image = UXImage(data: viewModel.data) {
-            ScrollView {
-                VStack(spacing: 16) {
-                    HStack {
-                        KeyValueSectionView(viewModel: KeyValueSectionViewModel(title: "Image", color: .pink, items: [
-                            ("Width", "\(image.cgImage?.width ?? 0) px"),
-                            ("Height", "\(image.cgImage?.height ?? 0) px")
-                        ])).fixedSize()
-                        Spacer()
-                    }
+        switch viewModel.contents {
+        case .json(let viewModel):
+            RichTextView(viewModel: viewModel)
+        case .image(let image):
+            makeImageView(with: image)
+        case .other(let viewModel):
+            RichTextView(viewModel: viewModel)
+        }
+    }
 
-                    Divider()
-
-                    Image(uxImage: image)
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-
+    private func makeImageView(with image: UXImage) -> some View {
+        ScrollView {
+            VStack(spacing: 16) {
+                HStack {
+                    KeyValueSectionView(viewModel: KeyValueSectionViewModel(title: "Image", color: .pink, items: [
+                        ("Width", "\(image.cgImage?.width ?? 0) px"),
+                        ("Height", "\(image.cgImage?.height ?? 0) px")
+                    ])).fixedSize()
                     Spacer()
-                }.padding()
-            }
-        } else {
-            /// TODO: remove inefficiency where we scan this twice
-            RichTextView(viewModel: .init(data: viewModel.data))
+                }
+
+                Divider()
+
+                Image(uxImage: image)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+
+                Spacer()
+            }.padding()
         }
     }
 }
@@ -77,18 +85,18 @@ struct NetworkInspectorResponseView: View {
 struct NetworkInspectorResponseView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            #if os(iOS)
+#if os(iOS)
             NavigationView {
                 NetworkInspectorResponseView(viewModel: mockModel)
                     .navigationBarTitle("Response")
             }
             .previewDisplayName("Light")
             .environment(\.colorScheme, .light)
-            #else
+#else
             NetworkInspectorResponseView(viewModel: mockModel)
                 .previewDisplayName("Light")
                 .environment(\.colorScheme, .light)
-            #endif
+#endif
 
             NetworkInspectorResponseView(viewModel: .init(title: "Response", data: mockImage))
                 .previewDisplayName("Image")
@@ -126,22 +134,40 @@ private let mockHTML = """
 
 final class NetworkInspectorResponseViewModel {
     let title: String
-    lazy var data: Data = getData()
     private let getData: () -> Data
+
+    lazy var contents: Contents = {
+        let data = getData()
+        if let json = try? JSONSerialization.jsonObject(with: data, options: []) {
+            return .json(RichTextViewModel(json: json))
+        } else if let image = UXImage(data: data) {
+            return .image(image)
+        } else {
+            let string = String(data: data, encoding: .utf8) ?? "Data \(ByteCountFormatter.string(fromByteCount: Int64(data.count), countStyle: .file))"
+            return .other(RichTextViewModel(string: string))
+        }
+    }()
+
+    var buttonSearch: ActionViewModel? {
+        switch contents {
+        case .json(let viewModel):
+            return ActionViewModel(action: viewModel.startSearching, title: "Search")
+        case .other(let viewModel):
+            return ActionViewModel(action: viewModel.startSearching, title: "Search")
+        default:
+            return nil
+        }
+    }
 
     init(title: String, data: @autoclosure @escaping () -> Data) {
         self.title = title
         self.getData = data
     }
 
-    func prepareForSharing() -> Any {
-        if let image = UXImage(data: data) {
-            return image
-        } else if let string = String(data: data, encoding: .utf8) {
-            return string
-        } else {
-            return data
-        }
+    enum Contents {
+        case json(RichTextViewModel)
+        case image(UXImage)
+        case other(RichTextViewModel)
     }
 }
 

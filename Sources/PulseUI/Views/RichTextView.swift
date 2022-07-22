@@ -31,25 +31,29 @@ struct RichTextView: View {
     #if os(iOS)
     var body: some View {
         VStack(spacing: 0) {
-            HStack(spacing: 8) {
-                SearchBar(title: "Search", text: $viewModel.searchTerm, onEditingChanged: { isEditing in
-                    if isEditing {
-                        viewModel.isSearching = isEditing
-                    }
-                })
+            if viewModel.isSearching {
+                HStack(spacing: 8) {
+                    SearchBar(title: "Search", text: $viewModel.searchTerm, onEditingChanged: { isEditing in
+                        if isEditing {
+                            viewModel.isSearching = isEditing
+                        }
+                    }, onFocusNeeded: viewModel.onFocusNeeded)
 
-                if #available(iOS 14.0, *) {
-                    StringSearchOptionsMenu(options: $viewModel.options, isKindNeeded: false)
+                    if #available(iOS 14.0, *) {
+                        StringSearchOptionsMenu(options: $viewModel.options, isKindNeeded: false)
+                    }
                 }
+                .padding(4)
+                .padding(.trailing, 12)
+                .border(width: 1, edges: [.bottom], color: Color.separator.opacity(0.3))
+                .transition(.opacity)
             }
-            .padding(4)
-            .padding(.trailing, 12)
-            .border(width: 1, edges: [.bottom], color: Color.separator.opacity(0.3))
 
             WrappedTextView(text: viewModel.text, viewModel: viewModel, isAutomaticLinkDetectionEnabled: isAutomaticLinkDetectionEnabled)
 
             if viewModel.isSearching {
                 SearchToobar(viewModel: viewModel)
+                    .animation(nil)
             }
         }
     }
@@ -201,6 +205,7 @@ final class RichTextViewModel: ObservableObject {
     @Published var matches: [Range<String.Index>] = []
     @Published var searchTerm: String = ""
     @Published var options: StringSearchOptions = .default
+    fileprivate let onFocusNeeded = PassthroughSubject<Void, Never>()
 
     let text: NSAttributedString
     private let string: String
@@ -262,10 +267,18 @@ final class RichTextViewModel: ObservableObject {
         didUpdateCurrentSelectedMatch()
     }
 
+    func startSearching() {
+        withAnimation {
+            isSearching = true
+        }
+    }
+
     func cancelSearch() {
-        searchTerm = ""
-        isSearching = false
-        hideKeyboard()
+        withAnimation {
+            searchTerm = ""
+            isSearching = false
+            hideKeyboard()
+        }
     }
 
     func nextMatch() {

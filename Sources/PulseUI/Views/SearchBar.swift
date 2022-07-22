@@ -12,10 +12,12 @@ struct SearchBar: UIViewRepresentable {
     let title: String
     @Binding var text: String
     var onEditingChanged: ((_ isEditing: Bool) -> Void)?
+    var onFocusNeeded: PassthroughSubject<Void, Never>?
 
     final class Coordinator: NSObject, UISearchBarDelegate {
         @Binding var text: String
         let onEditingChanged: ((_ isEditing: Bool) -> Void)?
+        var cancellables: [AnyCancellable] = []
 
         init(text: Binding<String>,
              onEditingChanged: ((_ isEditing: Bool) -> Void)?) {
@@ -46,6 +48,9 @@ struct SearchBar: UIViewRepresentable {
         searchBar.text = text
         searchBar.searchBarStyle = .minimal
         searchBar.delegate = context.coordinator
+        onFocusNeeded?.sink {
+            searchBar.becomeFirstResponder()
+        }.store(in: &context.coordinator.cancellables)
         return searchBar
     }
 

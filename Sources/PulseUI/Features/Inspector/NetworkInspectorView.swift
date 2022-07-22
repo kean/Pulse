@@ -22,22 +22,7 @@ struct NetworkInspectorView: View {
             selectedTabView
         }
         .navigationBarTitle(Text(viewModel.title), displayMode: .inline)
-        .navigationBarItems(trailing: HStack(spacing: 12) {
-            if let pin = viewModel.pin {
-                PinButton(viewModel: pin, isTextNeeded: false)
-            }
-            if #available(iOS 14.0, *) {
-                Menu(content: {
-                    NetworkMessageContextMenu(request: viewModel.request, store: viewModel.store, sharedItems: $shareItems)
-                }, label: {
-                    Image(systemName: "square.and.arrow.up")
-                })
-            } else {
-                ShareButton {
-                    isShowingShareSheet = true
-                }
-            }
-        })
+        .navigationBarItems(trailing: trailingNavigationBarItems)
         .sheet(isPresented: $isShowingShareSheet) {
             ShareView(activityItems: [viewModel.prepareForSharing()])
         }
@@ -46,14 +31,29 @@ struct NetworkInspectorView: View {
 
     private var toolbar: some View {
         Picker("", selection: $selectedTab) {
-            Text("Request").tag(NetworkInspectorTab.response)
-            Text("Response").tag(NetworkInspectorTab.request)
+            Text("Response").tag(NetworkInspectorTab.response)
+            Text("Request").tag(NetworkInspectorTab.request)
             Text("Summary").tag(NetworkInspectorTab.summary)
             Text("Metrics").tag(NetworkInspectorTab.metrics)
         }
         .pickerStyle(.segmented)
         .padding(EdgeInsets(top: 6, leading: 13, bottom: 11, trailing: 13))
         .border(width: 1, edges: [.bottom], color: Color(UXColor.separator).opacity(0.3))
+    }
+
+    @ViewBuilder
+    private var trailingNavigationBarItems: some View {
+        if #available(iOS 14.0, *) {
+            Menu(content: {
+                NetworkMessageContextMenu(request: viewModel.request, store: viewModel.store, sharedItems: $shareItems)
+            }, label: {
+                Image(systemName: "ellipsis.circle")
+            })
+        } else {
+            ShareButton {
+                isShowingShareSheet = true
+            }
+        }
     }
 #elseif os(watchOS)
     var body: some View {

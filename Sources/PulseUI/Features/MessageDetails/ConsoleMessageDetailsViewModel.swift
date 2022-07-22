@@ -8,6 +8,8 @@ import Combine
 import SwiftUI
 
 final class ConsoleMessageDetailsViewModel {
+    let textViewModel: RichTextViewModel
+
     let tags: [ConsoleMessageTagViewModel]
     let text: String
     let badge: BadgeViewModel?
@@ -26,6 +28,7 @@ final class ConsoleMessageDetailsViewModel {
     }()
 
     init(store: LoggerStore, message: LoggerMessageEntity) {
+        self.textViewModel = RichTextViewModel(string: message.text)
         self.store = store
         self.message = message
         self.tags = [
