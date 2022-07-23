@@ -79,40 +79,6 @@ struct NetworkInspectorView: View {
             Divider()
         }
     }
-
-    private struct NetworkTabView: View {
-        @Binding var selectedTab: NetworkInspectorTab
-
-        var body: some View {
-            HStack(spacing: 0) {
-                HStack {
-                    makeItem("Response", tab: .response)
-                    Divider()
-                    makeItem("Request", tab: .request)
-                    Divider()
-                    makeItem("Headers", tab: .headers)
-                    Divider()
-                }
-                HStack {
-                    Spacer().frame(width: 8)
-                    makeItem("Summary", tab: .summary)
-                    Divider()
-                    makeItem("Metrics", tab: .metrics)
-                }
-            }.fixedSize()
-        }
-
-        private func makeItem(_ title: String, tab: NetworkInspectorTab) -> some View {
-            Button(action: {
-                selectedTab = tab
-            }) {
-                Text(title)
-                    .font(.system(size: 11, weight: .medium, design: .default))
-                    .foregroundColor(tab == selectedTab ? .accentColor : .primary)
-            }
-            .buttonStyle(PlainButtonStyle())
-        }
-    }
 #elseif os(watchOS)
     var body: some View {
         NetworkInspectorSummaryView(viewModel: viewModel.makeSummaryModel())
@@ -199,6 +165,42 @@ private enum NetworkInspectorTab: Identifiable {
         }
     }
 }
+
+#if os(macOS)
+private struct NetworkTabView: View {
+    @Binding var selectedTab: NetworkInspectorTab
+
+    var body: some View {
+        HStack(spacing: 0) {
+            HStack {
+                makeItem("Response", tab: .response)
+                Divider()
+                makeItem("Request", tab: .request)
+                Divider()
+                makeItem("Headers", tab: .headers)
+                Divider()
+            }
+            HStack {
+                Spacer().frame(width: 8)
+                makeItem("Summary", tab: .summary)
+                Divider()
+                makeItem("Metrics", tab: .metrics)
+            }
+        }.fixedSize()
+    }
+
+    private func makeItem(_ title: String, tab: NetworkInspectorTab) -> some View {
+        Button(action: {
+            selectedTab = tab
+        }) {
+            Text(title)
+                .font(.system(size: 11, weight: .medium, design: .default))
+                .foregroundColor(tab == selectedTab ? .accentColor : .primary)
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
+}
+#endif
 
 // MARK: - ViewModel
 
