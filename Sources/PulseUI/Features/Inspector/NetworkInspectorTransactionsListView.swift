@@ -14,7 +14,7 @@ struct NetworkInspectorTransactionsListView: View {
 
     var body: some View {
         VStack(spacing: 16) {
-            ForEach(viewModel.items + viewModel.items) { item in
+            ForEach(viewModel.items) { item in
                 NavigationLink(destination: { destination(for: item) }) {
                     ItemView(item: item)
                 }
@@ -72,7 +72,9 @@ final class NetworkInspectorTransactionsListViewModel {
                 let endDate = transaction.responseEndDate ?? metrics.taskInterval.end
                 details = DurationFormatter.string(from: endDate.timeIntervalSince(startDate))
             }
-            return Item(title: title, details: details, viewModel: { NetworkInspectorTransactionViewModel(transaction: transaction) })
+            return Item(title: title, details: details, viewModel: {
+                NetworkInspectorTransactionViewModel(transaction: transaction, metrics: metrics)
+            })
         }
     }
 }

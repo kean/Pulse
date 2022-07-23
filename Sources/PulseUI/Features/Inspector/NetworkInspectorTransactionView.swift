@@ -63,9 +63,9 @@ final class NetworkInspectorTransactionViewModel: ObservableObject {
 
     private let transaction: NetworkLoggerTransactionMetrics
 
-    init(transaction: NetworkLoggerTransactionMetrics) {
+    init(transaction: NetworkLoggerTransactionMetrics, metrics: NetworkLoggerMetrics) {
         self.details = NetworkMetricsDetailsViewModel(metrics: transaction)
-        self.timing = TimingRowSectionViewModel.make(transaction: transaction)
+        self.timing = TimingRowSectionViewModel.make(transaction: transaction, metrics: metrics)
         self.transaction = transaction
     }
 
@@ -114,7 +114,8 @@ struct NetworkInspectorTransactionView_Previews: PreviewProvider {
 }
 
 private let mockModel = NetworkInspectorTransactionViewModel(
-    transaction: MockDataTask.login.metrics.transactions.last!
+    transaction: MockDataTask.login.metrics.transactions.last!,
+    metrics: MockDataTask.login.metrics
 )
 
 #endif

@@ -32,7 +32,7 @@ struct NetworkInspectorMetricsView: View {
                     }
 #endif
                     if let details = viewModel.details {
-                        LargeSectionHeader(title: "Details")
+                        LargeSectionHeader(title: "Latest Details")
                             .padding(.leading, nil)
                         NetworkInspectorMetricsDetailsView(viewModel: details)
                             .padding([.leading, .bottom, .trailing], NetworkInspectorMetricsView.padding)
@@ -88,10 +88,11 @@ extension TimingRowSectionViewModel {
         makeTiming(metrics: metrics)
     }
 
-    static func make(transaction: NetworkLoggerTransactionMetrics) -> [TimingRowSectionViewModel] {
-        guard let startDate = transaction.fetchStartDate, let endDate = transaction.responseEndDate else {
+    static func make(transaction: NetworkLoggerTransactionMetrics, metrics: NetworkLoggerMetrics) -> [TimingRowSectionViewModel] {
+        guard let startDate = transaction.fetchStartDate else {
             return []
         }
+        let endDate = transaction.responseEndDate ?? metrics.taskInterval.end
         let interval = DateInterval(start: startDate, end: endDate)
         return makeTimingRows(transaction: transaction, taskInterval: interval)
     }
