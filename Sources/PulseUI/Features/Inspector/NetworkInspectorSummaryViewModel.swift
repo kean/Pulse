@@ -10,7 +10,8 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
 
     @Published var isErrorRawLinkActive = false
     @Published var isRequestRawLinkActive = false
-    @Published var isRequestHeadersLinkActive = false
+    @Published var isOriginalRequestHeadersLinkActive = false
+    @Published var isCurrentRequestHeadersLinkActive = false
     @Published var isResponseRawLinkActive = false
     @Published var isResponseHeadearsRawLinkActive = false
 
@@ -56,20 +57,20 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
         )
     }
 
-    // MARK: - Request
+    // MARK: - Request (Original)
 
-    var requestSummary: KeyValueSectionViewModel? {
+    var originalRequestSummary: KeyValueSectionViewModel? {
         summary.originalRequest.map(KeyValueSectionViewModel.makeSummary)
     }
 
-    var requestParameters: KeyValueSectionViewModel? {
+    var originalRequestParameters: KeyValueSectionViewModel? {
         summary.originalRequest.map(KeyValueSectionViewModel.makeParameters)
     }
 
-    var requestHeaders: KeyValueSectionViewModel {
+    var originalRequestHeaders: KeyValueSectionViewModel {
         KeyValueSectionViewModel.makeRequestHeaders(
             for: summary.originalRequest?.headers ?? [:],
-            action: { [unowned self] in self.isRequestHeadersLinkActive = true }
+            action: { [unowned self] in self.isOriginalRequestHeadersLinkActive = true }
         )
     }
 
@@ -78,6 +79,42 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
             return KeyValueSectionViewModel(title: "Request Body", color: .blue)
         }
         let contentType = summary.originalRequest?.headers.first(where: { $0.key == "Content-Type" })?.value ?? "–"
+        return KeyValueSectionViewModel(
+            title: "Request Body",
+            color: .blue,
+            action: ActionViewModel(
+                action: { [unowned self] in isRequestRawLinkActive = true },
+                title: "View"
+            ),
+            items: [
+                ("Content-Type", contentType),
+                ("Size", ByteCountFormatter.string(fromByteCount: summary.requestBodySize, countStyle: .file))
+            ]
+        )
+    }
+
+    // MARK: - Request (Current)
+
+    var currentRequestSummary: KeyValueSectionViewModel? {
+        summary.currentRequest.map(KeyValueSectionViewModel.makeSummary)
+    }
+
+    var currentRequestParameters: KeyValueSectionViewModel? {
+        summary.currentRequest.map(KeyValueSectionViewModel.makeParameters)
+    }
+
+    var currentRequestHeaders: KeyValueSectionViewModel {
+        KeyValueSectionViewModel.makeRequestHeaders(
+            for: summary.currentRequest?.headers ?? [:],
+            action: { [unowned self] in self.isCurrentRequestHeadersLinkActive = true }
+        )
+    }
+
+    var currentRequestBodySection: KeyValueSectionViewModel {
+        guard summary.requestBodyKey != nil, summary.requestBodySize > 0 else {
+            return KeyValueSectionViewModel(title: "Request Body", color: .blue)
+        }
+        let contentType = summary.currentRequest?.headers.first(where: { $0.key == "Content-Type" })?.value ?? "–"
         return KeyValueSectionViewModel(
             title: "Request Body",
             color: .blue,

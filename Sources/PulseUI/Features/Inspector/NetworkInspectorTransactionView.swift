@@ -47,7 +47,7 @@ struct NetworkInspectorTransactionView: View {
 
     @ViewBuilder
     private var links: some View {
-        NavigationLink.programmatic(isActive: $viewModel.isRequestHeadersLinkActive, destination:  { NetworkHeadersDetailsView(viewModel: viewModel.requestHeaders) })
+        NavigationLink.programmatic(isActive: $viewModel.isOriginalRequestHeadersLinkActive, destination:  { NetworkHeadersDetailsView(viewModel: viewModel.requestHeaders) })
         NavigationLink.programmatic(isActive: $viewModel.isResponseHeadersLinkActive, destination:  { NetworkHeadersDetailsView(viewModel: viewModel.responseHeaders) })
     }
 }
@@ -55,7 +55,7 @@ struct NetworkInspectorTransactionView: View {
 // MARK: - ViewModel
 
 final class NetworkInspectorTransactionViewModel: ObservableObject {
-    @Published var isRequestHeadersLinkActive = false
+    @Published var isOriginalRequestHeadersLinkActive = false
     @Published var isResponseHeadersLinkActive = false
 
     let details: NetworkMetricsDetailsViewModel
@@ -80,7 +80,7 @@ final class NetworkInspectorTransactionViewModel: ObservableObject {
 
     lazy var requestHeaders = KeyValueSectionViewModel.makeRequestHeaders(
         for: transaction.request?.headers ?? [:],
-        action: { [unowned self] in self.isRequestHeadersLinkActive = true }
+        action: { [unowned self] in self.isOriginalRequestHeadersLinkActive = true }
     )
 
     lazy var responseSummary: KeyValueSectionViewModel = {

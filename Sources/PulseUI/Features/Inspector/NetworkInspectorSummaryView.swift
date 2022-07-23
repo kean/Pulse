@@ -7,6 +7,7 @@ import PulseCore
 
 struct NetworkInspectorSummaryView: View {
     @ObservedObject var viewModel: NetworkInspectorSummaryViewModel
+    @State var isShowingCurrentRequest = false
 
     var body: some View {
 #if os(iOS) || os(macOS)
@@ -37,23 +38,64 @@ struct NetworkInspectorSummaryView: View {
             NetworkInspectorTransferInfoView(viewModel: transfer)
             Spacer().frame(height: 20)
         }
+
         KeyValueSectionView(viewModel: viewModel.summaryModel)
         viewModel.errorModel.map(KeyValueSectionView.init)
         viewModel.timingDetailsModel.map(KeyValueSectionView.init)
-        if let requestSummary = viewModel.requestSummary {
-            Section(header: LargeSectionHeader(title: "Request")) {
-                KeyValueSectionView(viewModel: requestSummary)
-                KeyValueSectionView(viewModel: viewModel.requestHeaders, limit: 10)
-                KeyValueSectionView(viewModel: viewModel.requestBodySection)
-                viewModel.requestParameters.map(KeyValueSectionView.init)
+
+        if viewModel.originalRequestSummary != nil {
+            if isShowingCurrentRequest {
+                currentRequestSection
+            } else {
+                originalRequestSection
             }
         }
-        if let responseSummary = viewModel.responseSummary {
-            Section(header: LargeSectionHeader(title: "Response")) {
-                KeyValueSectionView(viewModel: responseSummary)
-                KeyValueSectionView(viewModel: viewModel.responseHeaders, limit: 10)
-                KeyValueSectionView(viewModel: viewModel.responseBodySection)
+
+        if viewModel.responseSummary != nil {
+            responseSection
+        }
+    }
+
+    @ViewBuilder
+    private var requestHeaderView: some View {
+        HStack {
+            LargeSectionHeader(title: "Request")
+            Spacer()
+            Picker("Request Type", selection: $isShowingCurrentRequest) {
+                Text("Original").tag(false)
+                Text("Current").tag(true)
             }
+            .pickerStyle(.segmented)
+            .labelsHidden()
+        }
+    }
+
+    @ViewBuilder
+    private var originalRequestSection: some View {
+        Section(header: requestHeaderView) {
+            viewModel.originalRequestSummary.map(KeyValueSectionView.init)
+            KeyValueSectionView(viewModel: viewModel.originalRequestHeaders, limit: 10)
+            KeyValueSectionView(viewModel: viewModel.requestBodySection)
+            viewModel.originalRequestParameters.map(KeyValueSectionView.init)
+        }
+    }
+
+    @ViewBuilder
+    private var currentRequestSection: some View {
+        Section(header: requestHeaderView) {
+            viewModel.currentRequestSummary.map(KeyValueSectionView.init)
+            KeyValueSectionView(viewModel: viewModel.currentRequestHeaders, limit: 10)
+            KeyValueSectionView(viewModel: viewModel.requestBodySection)
+            viewModel.currentRequestParameters.map(KeyValueSectionView.init)
+        }
+    }
+
+    @ViewBuilder
+    private var responseSection: some View {
+        Section(header: LargeSectionHeader(title: "Response")) {
+            viewModel.responseSummary.map(KeyValueSectionView.init)
+            KeyValueSectionView(viewModel: viewModel.responseHeaders, limit: 10)
+            KeyValueSectionView(viewModel: viewModel.responseBodySection)
         }
     }
 #elseif os(watchOS)
@@ -71,7 +113,7 @@ struct NetworkInspectorSummaryView: View {
         // Timing
         viewModel.timingDetailsModel.map(KeyValueSectionView.init)
         // HTTTP Headers
-        KeyValueSectionView(viewModel: viewModel.requestHeaders, limit: 10)
+        KeyValueSectionView(viewModel: viewModel.originalRequestHeaders, limit: 10)
         KeyValueSectionView(viewModel: viewModel.responseHeaders, limit: 10)
     }
 #elseif os(tvOS)
@@ -96,7 +138,7 @@ struct NetworkInspectorSummaryView: View {
                 KeyValueSectionView(viewModel: timing)
             }
         }
-        makeKeyValueSection(viewModel: viewModel.requestHeaders)
+        makeKeyValueSection(viewModel: viewModel.originalRequestHeaders)
         if viewModel.responseSummary != nil {
             makeKeyValueSection(viewModel: viewModel.responseHeaders)
         }
@@ -125,8 +167,12 @@ struct NetworkInspectorSummaryView: View {
                 NetworkInspectorResponseView(viewModel: viewModel.responseBodyViewModel)
             })
 
-            NavigationLink.programmatic(isActive: $viewModel.isRequestHeadersLinkActive) {
-                NetworkHeadersDetailsView(viewModel: viewModel.requestHeaders)
+            NavigationLink.programmatic(isActive: $viewModel.isOriginalRequestHeadersLinkActive) {
+                NetworkHeadersDetailsView(viewModel: viewModel.originalRequestHeaders)
+            }
+
+            NavigationLink.programmatic(isActive: $viewModel.isCurrentRequestHeadersLinkActive) {
+                NetworkHeadersDetailsView(viewModel: viewModel.currentRequestHeaders)
             }
 
             if let responesHeaders = viewModel.responseHeaders {

@@ -24,12 +24,12 @@ extension NetworkLoggerSummary {
         renderer.add(viewModel.summaryModel, isSecondaryTitle: false)
         renderer.add(viewModel.errorModel, isSecondaryTitle: false)
 
-        if let requestSummary = viewModel.requestSummary {
+        if let requestSummary = viewModel.originalRequestSummary {
             renderer.add(title: "Request")
             renderer.add(requestSummary)
-            renderer.add(viewModel.requestHeaders)
+            renderer.add(viewModel.originalRequestHeaders)
             renderer.add(viewModel.requestBodySection)
-            renderer.add(viewModel.requestParameters)
+            renderer.add(viewModel.originalRequestParameters)
             if let body = requestBody, !body.isEmpty {
                 renderer.addSecondaryTitle("Request Body")
                 renderer.add(data: body)
