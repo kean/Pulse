@@ -6,7 +6,7 @@ import Foundation
 import PulseCore
 import CoreData
 
-private var isAddingItemsDynamically = true
+private var isAddingItemsDynamically = false
 private var isUsingDefaultStore = true
 
 extension LoggerStore {

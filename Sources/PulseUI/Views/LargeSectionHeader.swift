@@ -18,6 +18,8 @@ struct LargeSectionHeader: View {
             }
             Divider()
         }
+#if !os(watchOS)
         .padding(.bottom, 8)
+#endif
     }
 }

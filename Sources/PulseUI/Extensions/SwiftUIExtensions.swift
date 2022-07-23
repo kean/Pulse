@@ -68,7 +68,7 @@ extension Backport {
 
     @ViewBuilder
     func borderedButton() -> some View {
-        if #available(iOS 15.0, watchOS 8.0, *) {
+        if #available(iOS 15.0, tvOS 14.0, watchOS 8.0, *) {
             self.content.buttonStyle(.bordered)
         } else {
             self.content
@@ -77,7 +77,7 @@ extension Backport {
 
     @ViewBuilder
     func hideAccessibility() -> some View {
-        if #available(iOS 14.0, *) {
+        if #available(iOS 14.0, tvOS 14.0, *) {
             self.content.accessibilityHidden(true)
         } else {
             self.content

@@ -5,7 +5,7 @@
 import SwiftUI
 import PulseCore
 
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(macOS) || os(watchOS)
 
 // MARK: - View
 
@@ -14,18 +14,59 @@ struct NetworkInspectorTransferInfoView: View {
 
     let viewModel: NetworkInspectorTransferInfoViewModel
 
+#if os(watchOS)
+    var body: some View {
+        VStack {
+            HStack {
+                Spacer()
+                bytesSent
+                Spacer()
+            }
+
+            Divider()
+                .padding([.top, .bottom], 12)
+
+            HStack {
+                Spacer()
+                bytesReceived
+                Spacer()
+            }
+        }
+    }
+#else
     var body: some View {
         HStack {
             Spacer()
-            makeView(title: "Bytes Sent", imageName: "icloud.and.arrow.up", total: viewModel.totalBytesSent, headers: viewModel.headersBytesSent, body: viewModel.bodyBytesSent)
+            bytesSent
             Spacer()
 
             Divider()
 
             Spacer()
-            makeView(title: "Bytes Received", imageName: "icloud.and.arrow.down", total: viewModel.totalBytesReceived, headers: viewModel.headersBytesReceived, body: viewModel.bodyBytesReceived)
+            bytesReceived
             Spacer()
         }
+    }
+#endif
+
+    private var bytesSent: some View {
+        makeView(
+            title: "Bytes Sent",
+            imageName: "icloud.and.arrow.up",
+            total: viewModel.totalBytesSent,
+            headers: viewModel.headersBytesSent,
+            body: viewModel.bodyBytesSent
+        )
+    }
+
+    private var bytesReceived: some View {
+        makeView(
+            title: "Bytes Received",
+            imageName: "icloud.and.arrow.down",
+            total: viewModel.totalBytesReceived,
+            headers: viewModel.headersBytesReceived,
+            body: viewModel.bodyBytesReceived
+        )
     }
 
     private func makeView(title: String, imageName: String, total: String, headers: String, body: String) -> some View {
@@ -65,16 +106,16 @@ struct NetworkInspectorTransferInfoView: View {
 }
 
 private var fontSize: CGFloat {
-    #if os(iOS)
+#if os(iOS)
     return 15
-    #else
+#else
     return 12
-    #endif
+#endif
 }
 
 // MARK: - Preview
 
-#if DEBUG
+#if DEBUG && !os(watchOS)
 struct NetworkInspectorTransferInfoView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
@@ -97,11 +138,6 @@ private let mockModel = NetworkInspectorTransferInfoViewModel(
 #endif
 
 #endif
-
-private struct Row {
-    let index: Int
-    let items: [KeyValueSectionViewModel]
-}
 
 // MARK: - ViewModel
 

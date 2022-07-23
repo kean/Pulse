@@ -90,7 +90,7 @@ struct NetworkInspectorView: View {
                     KeyValueSectionView(viewModel: timing)
                 }
             }
-            if let parameters = viewModel.parametersModel {
+            if let parameters = viewModel.requestParameters {
                 makeKeyValueSection(viewModel: parameters)
             }
 

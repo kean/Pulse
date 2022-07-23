@@ -150,18 +150,9 @@ private struct KeyValueListView: View {
             let value = Text(row.item.1 ?? "–")
                 .foregroundColor(.primary)
                 .font(.system(size: fontSize, weight: .regular))
-            #if os(watchOS)
-            VStack(alignment: .leading) {
-                title
-                value
-                    .lineLimit(2)
-            }
-            #elseif os(tvOS)
-            (title + value)
-                .lineLimit(nil)
-            #else
             (title + value)
                 .lineLimit(row.item.0 == "URL" ? 8 : 3)
+#if os(iOS)
                 .contextMenu(ContextMenu(menuItems: {
                     Button(action: {
                         UXPasteboard.general.string = "\(row.item.0): \(row.item.1 ?? "–")"
@@ -178,7 +169,7 @@ private struct KeyValueListView: View {
                         Image(systemName: "doc.on.doc")
                     }
                 }))
-            #endif
+#endif
             Spacer()
         }
     }

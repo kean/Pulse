@@ -12,28 +12,28 @@ struct NetworkInspectorSummaryView: View {
 
     var body: some View {
         ScrollView {
-            #if os(watchOS)
+#if os(watchOS)
             Spacer().frame(height: 24)
             VStack(spacing: 24) {
                 contents
             }
-            #else
-            VStack(spacing: 8) {
+#else
+            VStack {
                 contents
             }.padding()
-            #endif
+#endif
         }
+        .background(linksView)
     }
 
+#if os(iOS) || os(macOS)
     @ViewBuilder
     private var contents: some View {
-        #if !os(watchOS)
         if let transfer = viewModel.transferModel {
             Spacer().frame(height: 12)
             NetworkInspectorTransferInfoView(viewModel: transfer)
             Spacer().frame(height: 20)
         }
-        #endif
         KeyValueSectionView(viewModel: viewModel.summaryModel)
         viewModel.errorModel.map(KeyValueSectionView.init)
         viewModel.timingDetailsModel.map(KeyValueSectionView.init)
@@ -52,13 +52,26 @@ struct NetworkInspectorSummaryView: View {
                 KeyValueSectionView(viewModel: viewModel.responseBodySection)
             }
         }
-
-        linksView
-
-        #if !os(watchOS)
-        Spacer()
-        #endif
     }
+#elseif os(watchOS)
+    @ViewBuilder
+    private var contents: some View {
+        if let transfer = viewModel.transferModel {
+            NetworkInspectorTransferInfoView(viewModel: transfer)
+        }
+        // Summary
+        KeyValueSectionView(viewModel: viewModel.summaryModel)
+        viewModel.errorModel.map(KeyValueSectionView.init)
+        // HTTP Body
+        KeyValueSectionView(viewModel: viewModel.requestBodySection)
+        KeyValueSectionView(viewModel: viewModel.responseBodySection)
+        // Timing
+        viewModel.timingDetailsModel.map(KeyValueSectionView.init)
+        // HTTTP Headers
+        KeyValueSectionView(viewModel: viewModel.requestHeaders, limit: 10)
+        KeyValueSectionView(viewModel: viewModel.responseHeaders, limit: 10)
+    }
+#endif
 
     private var linksView: some View {
         VStack {

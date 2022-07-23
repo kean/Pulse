@@ -46,7 +46,7 @@ extension KeyValueSectionViewModel {
         ])
     }
 
-    static func makeResponsetHeaders(for headers: [String: String], action: @escaping () -> Void) -> KeyValueSectionViewModel {
+    static func makeResponseHeaders(for headers: [String: String], action: @escaping () -> Void) -> KeyValueSectionViewModel {
         KeyValueSectionViewModel(
             title: "Response Headers",
             color: .indigo,

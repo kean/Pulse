@@ -99,7 +99,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     }
 
     var responseHeaders: KeyValueSectionViewModel {
-        KeyValueSectionViewModel.makeRequestHeaders(
+        KeyValueSectionViewModel.makeResponseHeaders(
             for: summary.response?.headers ?? [:],
             action: { [unowned self] in self.isResponseHeadearsRawLinkActive = true }
         )

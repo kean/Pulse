@@ -147,6 +147,7 @@ final class NetworkInspectorResponseViewModel {
         }
     }()
 
+#if os(iOS)
     var buttonSearch: ActionViewModel? {
         switch contents {
         case .json(let viewModel):
@@ -157,6 +158,7 @@ final class NetworkInspectorResponseViewModel {
             return nil
         }
     }
+#endif
 
     init(title: String, data: @autoclosure @escaping () -> Data) {
         self.title = title
