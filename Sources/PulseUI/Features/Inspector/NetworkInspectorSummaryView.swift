@@ -15,7 +15,7 @@ struct NetworkInspectorSummaryView: View {
             VStack {
                 contents
             }.padding()
-        }.background(invisibleLinks)
+        }.background(links)
 #elseif os(watchOS)
         ScrollView {
             Spacer().frame(height: 24)
@@ -151,7 +151,7 @@ struct NetworkInspectorSummaryView: View {
     }
 #endif
 
-    private var invisibleLinks: some View {
+    private var links: some View {
         VStack {
             if let errorModel = viewModel.errorModel {
                 NavigationLink.programmatic(isActive: $viewModel.isErrorRawLinkActive) {

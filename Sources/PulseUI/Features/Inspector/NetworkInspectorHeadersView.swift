@@ -19,7 +19,11 @@ struct NetworkInspectorHeadersView: View {
                 }
                 Spacer()
             }.padding()
+        }.background(links)
+    }
 
+    private var links: some View {
+        VStack {
             NavigationLink.programmatic(isActive: $viewModel.isRequestOriginalRawActive, destination:  { NetworkHeadersDetailsView(viewModel: viewModel.requestHeadersOriginal) })
             NavigationLink.programmatic(isActive: $viewModel.isRequestCurrentRawActive, destination:  { NetworkHeadersDetailsView(viewModel: viewModel.requestHeadersCurrent) })
 
@@ -27,6 +31,9 @@ struct NetworkInspectorHeadersView: View {
                 NavigationLink.programmatic(isActive: $viewModel.isResponseRawActive, destination:  { NetworkHeadersDetailsView(viewModel: responseHeaders) })
             }
         }
+        .frame(height: 0)
+        .hidden()
+        .backport.hideAccessibility()
     }
 }
 

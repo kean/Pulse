@@ -34,11 +34,11 @@ struct ConsoleTableView<Header: View>: View {
             detailsViewModel.select($0)
             isDetailsLinkActive = true
         })
-        .background(invisibleNavigationLinks)
+        .background(links)
     }
 
     @ViewBuilder
-    private var invisibleNavigationLinks: some View {
+    private var links: some View {
         NavigationLink.programmatic(isActive: $isDetailsLinkActive) {
             ConsoleMessageDetailsRouter(viewModel: detailsViewModel)
         }
