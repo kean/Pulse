@@ -74,6 +74,7 @@ struct NetworkInspectorSummaryView: View {
     private var originalRequestSection: some View {
         Section(header: requestHeaderView) {
             viewModel.originalRequestSummary.map(KeyValueSectionView.init)
+            viewModel.originalRequestQueryItems.map { KeyValueSectionView(viewModel: $0, limit: 10) }
             KeyValueSectionView(viewModel: viewModel.originalRequestHeaders, limit: 10)
             KeyValueSectionView(viewModel: viewModel.requestBodySection)
             viewModel.originalRequestParameters.map(KeyValueSectionView.init)
@@ -84,6 +85,7 @@ struct NetworkInspectorSummaryView: View {
     private var currentRequestSection: some View {
         Section(header: requestHeaderView) {
             viewModel.currentRequestSummary.map(KeyValueSectionView.init)
+            viewModel.currentRequestQueryItems.map { KeyValueSectionView(viewModel: $0, limit: 10) }
             KeyValueSectionView(viewModel: viewModel.currentRequestHeaders, limit: 10)
             KeyValueSectionView(viewModel: viewModel.requestBodySection)
             viewModel.currentRequestParameters.map(KeyValueSectionView.init)
@@ -159,9 +161,17 @@ struct NetworkInspectorSummaryView: View {
                 }
             }
 
+            NavigationLink.programmatic(isActive: $viewModel.isOriginalQueryItemsLinkActive) {
+                viewModel.originalRequestQueryItems.map(NetworkHeadersDetailsView.init)
+            }
+
             NavigationLink.programmatic(isActive: $viewModel.isRequestRawLinkActive, destination: {
                 NetworkInspectorResponseView(viewModel: viewModel.requestBodyViewModel)
             })
+
+            NavigationLink.programmatic(isActive: $viewModel.isCurrentQueryItemsLinkActive) {
+                viewModel.currentRequestQueryItems.map(NetworkHeadersDetailsView.init)
+            }
 
             NavigationLink.programmatic(isActive: $viewModel.isResponseRawLinkActive, destination: {
                 NetworkInspectorResponseView(viewModel: viewModel.responseBodyViewModel)

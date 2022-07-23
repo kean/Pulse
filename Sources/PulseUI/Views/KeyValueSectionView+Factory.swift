@@ -33,7 +33,7 @@ extension KeyValueSectionViewModel {
         KeyValueSectionViewModel(
             title: "Request Headers",
             color: .blue,
-            action: headers.isEmpty ? nil : ActionViewModel(action: action,title: "View Raw"),
+            action: headers.isEmpty ? nil : ActionViewModel(action: action,title: "View"),
             items: headers.sorted(by: { $0.key < $1.key })
         )
     }
@@ -50,7 +50,7 @@ extension KeyValueSectionViewModel {
         KeyValueSectionViewModel(
             title: "Response Headers",
             color: .indigo,
-            action: headers.isEmpty ? nil : ActionViewModel(action: action, title: "View Raw"),
+            action: headers.isEmpty ? nil : ActionViewModel(action: action, title: "View"),
             items: headers.sorted(by: { $0.key < $1.key })
         )
     }
@@ -103,6 +103,19 @@ extension KeyValueSectionViewModel {
                 ("Code", descriptionForError(domain: error.domain, code: error.code)),
                 ("Message", error.localizedDescription)
             ])
+    }
+
+    static func makeQueryItems(for url: URL, action: @escaping () -> Void) -> KeyValueSectionViewModel? {
+        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
+              let queryItems = components.queryItems, !queryItems.isEmpty else {
+            return nil
+        }
+        return KeyValueSectionViewModel(
+            title: "Query Items",
+            color: .blue,
+            action: ActionViewModel(action: action, title: "View"),
+            items: queryItems.map { ($0.name, $0.value) }
+        )
     }
 }
 

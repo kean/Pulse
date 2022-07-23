@@ -11,7 +11,9 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     @Published var isErrorRawLinkActive = false
     @Published var isRequestRawLinkActive = false
     @Published var isOriginalRequestHeadersLinkActive = false
+    @Published var isOriginalQueryItemsLinkActive = false
     @Published var isCurrentRequestHeadersLinkActive = false
+    @Published var isCurrentQueryItemsLinkActive = false
     @Published var isResponseRawLinkActive = false
     @Published var isResponseHeadearsRawLinkActive = false
 
@@ -54,10 +56,9 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
 
     var errorModel: KeyValueSectionViewModel? {
         guard let error = summary.error else { return nil }
-        return KeyValueSectionViewModel.makeErrorDetails(
-            for: error,
-            action: { [unowned self] in isErrorRawLinkActive = true }
-        )
+        return KeyValueSectionViewModel.makeErrorDetails(for: error) { [unowned self] in
+            isErrorRawLinkActive = true
+        }
     }
 
     // MARK: - Request (Original)
@@ -66,15 +67,22 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
         summary.originalRequest.map(KeyValueSectionViewModel.makeSummary)
     }
 
+    var originalRequestQueryItems: KeyValueSectionViewModel? {
+        summary.originalRequest?.url.flatMap {
+            KeyValueSectionViewModel.makeQueryItems(for: $0) { [unowned self] in
+                self.isOriginalQueryItemsLinkActive = true
+            }
+        }
+    }
+
     var originalRequestParameters: KeyValueSectionViewModel? {
         summary.originalRequest.map(KeyValueSectionViewModel.makeParameters)
     }
 
     var originalRequestHeaders: KeyValueSectionViewModel {
-        KeyValueSectionViewModel.makeRequestHeaders(
-            for: summary.originalRequest?.headers ?? [:],
-            action: { [unowned self] in self.isOriginalRequestHeadersLinkActive = true }
-        )
+        KeyValueSectionViewModel.makeRequestHeaders(for: summary.originalRequest?.headers ?? [:]) { [unowned self] in
+            self.isOriginalRequestHeadersLinkActive = true
+        }
     }
 
     var requestBodySection: KeyValueSectionViewModel {
@@ -102,15 +110,22 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
         summary.currentRequest.map(KeyValueSectionViewModel.makeSummary)
     }
 
+    var currentRequestQueryItems: KeyValueSectionViewModel? {
+        summary.originalRequest?.url.flatMap {
+            KeyValueSectionViewModel.makeQueryItems(for: $0) { [unowned self] in
+                self.isCurrentQueryItemsLinkActive = true
+            }
+        }
+    }
+
     var currentRequestParameters: KeyValueSectionViewModel? {
         summary.currentRequest.map(KeyValueSectionViewModel.makeParameters)
     }
 
     var currentRequestHeaders: KeyValueSectionViewModel {
-        KeyValueSectionViewModel.makeRequestHeaders(
-            for: summary.currentRequest?.headers ?? [:],
-            action: { [unowned self] in self.isCurrentRequestHeadersLinkActive = true }
-        )
+        KeyValueSectionViewModel.makeRequestHeaders(for: summary.currentRequest?.headers ?? [:]) { [unowned self] in
+            self.isCurrentRequestHeadersLinkActive = true
+        }
     }
 
     var currentRequestBodySection: KeyValueSectionViewModel {
@@ -139,10 +154,9 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     }
 
     var responseHeaders: KeyValueSectionViewModel {
-        KeyValueSectionViewModel.makeResponseHeaders(
-            for: summary.response?.headers ?? [:],
-            action: { [unowned self] in self.isResponseHeadearsRawLinkActive = true }
-        )
+        KeyValueSectionViewModel.makeResponseHeaders(for: summary.response?.headers ?? [:]) { [unowned self] in
+            self.isResponseHeadearsRawLinkActive = true
+        }
     }
 
     var responseBodySection: KeyValueSectionViewModel {
