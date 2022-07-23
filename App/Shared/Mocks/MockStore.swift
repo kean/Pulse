@@ -74,7 +74,9 @@ private func populateStore(_ store: LoggerStore) {
 
     func logTask(_ mockTask: MockDataTask, delay: Int = Int.random(in: 1000...6000)) {
         let dataTask = urlSession.dataTask(with: mockTask.request)
-        dataTask.setSwizzledCurrentRequest(mockTask.currentRequest)
+        var currentRequest = mockTask.currentRequest
+        currentRequest.setValue("Pulse Demo/2.0", forHTTPHeaderField: "User-Agent")
+        dataTask.setSwizzledCurrentRequest(currentRequest)
         if isAddingItemsDynamically {
             DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(delay)) {
                 networkLogger.logTaskCreated(dataTask)
