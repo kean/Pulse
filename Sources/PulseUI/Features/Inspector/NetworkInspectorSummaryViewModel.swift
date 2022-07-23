@@ -42,6 +42,9 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
             ("URL", summary.originalRequest?.url?.absoluteString ?? "–"),
             ("Domain", summary.originalRequest?.url?.host ?? "–")
         ]
+        if let metrics = summary.metrics {
+            items.append(("Duration", DurationFormatter.string(from: metrics.taskInterval.duration)))
+        }
         if summary.originalRequest?.url != summary.currentRequest?.url && summary.currentRequest?.url != nil {
             items.append(("Redirect", summary.currentRequest?.url?.absoluteString ?? "–"))
         }
@@ -167,8 +170,8 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     var timingDetailsModel: KeyValueSectionViewModel? {
         guard let metrics = summary.metrics else { return nil }
         return KeyValueSectionViewModel(title: "Timing", color: .orange, items: [
-            ("Start Date", isoFormatter.string(from: metrics.taskInterval.start)),
-            ("End Date", isoFormatter.string(from: metrics.taskInterval.end)),
+            ("Start Date", dateFormatter.string(from: metrics.taskInterval.start)),
+            ("End Date", dateFormatter.string(from: metrics.taskInterval.end)),
             ("Duration", DurationFormatter.string(from: metrics.taskInterval.duration)),
             ("Redirect Count", metrics.redirectCount.description)
         ])
@@ -189,8 +192,8 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
 
 // MARK: - Private
 
-private let isoFormatter: ISO8601DateFormatter = {
-    let f = ISO8601DateFormatter()
-    f.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-    return f
+private let dateFormatter: DateFormatter = {
+    let formatter = DateFormatter()
+    formatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSS"
+    return formatter
 }()

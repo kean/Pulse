@@ -41,7 +41,6 @@ struct NetworkInspectorSummaryView: View {
 
         KeyValueSectionView(viewModel: viewModel.summaryModel)
         viewModel.errorModel.map(KeyValueSectionView.init)
-        viewModel.timingDetailsModel.map(KeyValueSectionView.init)
 
         if viewModel.originalRequestSummary != nil {
             if isShowingCurrentRequest {
@@ -110,11 +109,11 @@ struct NetworkInspectorSummaryView: View {
         // HTTP Body
         KeyValueSectionView(viewModel: viewModel.requestBodySection)
         KeyValueSectionView(viewModel: viewModel.responseBodySection)
-        // Timing
-        viewModel.timingDetailsModel.map(KeyValueSectionView.init)
         // HTTTP Headers
         KeyValueSectionView(viewModel: viewModel.originalRequestHeaders, limit: 10)
         KeyValueSectionView(viewModel: viewModel.responseHeaders, limit: 10)
+        // Timing
+        viewModel.timingDetailsModel.map(KeyValueSectionView.init)
     }
 #elseif os(tvOS)
     var metrics: NetworkInspectorMetricsViewModel?
@@ -133,14 +132,14 @@ struct NetworkInspectorSummaryView: View {
                 KeyValueSectionView(viewModel: viewModel.responseBodySection)
             }
         }
+        makeKeyValueSection(viewModel: viewModel.originalRequestHeaders)
+        if viewModel.responseSummary != nil {
+            makeKeyValueSection(viewModel: viewModel.responseHeaders)
+        }
         if let timing = viewModel.timingDetailsModel, let metrics = metrics {
             NavigationLink(destination: NetworkInspectorMetricsView(viewModel: metrics).focusable(true)) {
                 KeyValueSectionView(viewModel: timing)
             }
-        }
-        makeKeyValueSection(viewModel: viewModel.originalRequestHeaders)
-        if viewModel.responseSummary != nil {
-            makeKeyValueSection(viewModel: viewModel.responseHeaders)
         }
     }
 
