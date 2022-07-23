@@ -13,6 +13,8 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 #endif
     @Published private(set) var entities: [LoggerNetworkRequestEntity] = []
 
+    let details: ConsoleDetailsRouterViewModel
+
     // Search criteria
     let searchCriteria: NetworkSearchCriteriaViewModel
     @Published var isOnlyErrors: Bool = false
@@ -27,6 +29,7 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 
     init(store: LoggerStore) {
         self.store = store
+        self.details = ConsoleDetailsRouterViewModel(store: store)
 
         let request = NSFetchRequest<LoggerNetworkRequestEntity>(entityName: "\(LoggerNetworkRequestEntity.self)")
         request.fetchBatchSize = 250

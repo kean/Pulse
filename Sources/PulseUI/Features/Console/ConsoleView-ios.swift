@@ -38,7 +38,8 @@ public struct ConsoleView: View {
     private var contentView: some View {
         ConsoleTableView(
             header: { ConsoleToolbarView(viewModel: viewModel) },
-            viewModel: viewModel.table
+            viewModel: viewModel.table,
+            detailsViewModel: viewModel.details
         )
         .overlay(tableOverlay)
     }

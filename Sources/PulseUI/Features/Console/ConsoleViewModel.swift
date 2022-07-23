@@ -15,6 +15,8 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 #endif
     @Published private(set) var entities: [LoggerMessageEntity] = []
 
+    let details: ConsoleDetailsRouterViewModel
+
     // Search criteria
     let searchCriteria: ConsoleSearchCriteriaViewModel
     @Published var isOnlyErrors: Bool = false
@@ -40,6 +42,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     init(store: LoggerStore, configuration: ConsoleConfiguration = .default) {
         self.store = store
         self.configuration = configuration
+        self.details = ConsoleDetailsRouterViewModel(store: store)
 
         let request = NSFetchRequest<LoggerMessageEntity>(entityName: "\(LoggerMessageEntity.self)")
         request.fetchBatchSize = 250

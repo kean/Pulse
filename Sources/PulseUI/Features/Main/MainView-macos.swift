@@ -56,7 +56,7 @@ public struct MainView: View {
 
 private struct ConsoleContainerView: View {
     var viewModel: MainViewModel
-    @ObservedObject var details: ConsoleDetailsPanelViewModel
+    @ObservedObject var details: ConsoleDetailsRouterViewModel
     @ObservedObject var toolbar: ConsoleToolbarViewModel
 
     var body: some View {

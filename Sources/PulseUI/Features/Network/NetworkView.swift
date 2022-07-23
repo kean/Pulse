@@ -28,7 +28,8 @@ public struct NetworkView: View {
     public var body: some View {
         ConsoleTableView(
             header: { NetworkToolbarView(viewModel: viewModel) },
-            viewModel: viewModel.table
+            viewModel: viewModel.table,
+            detailsViewModel: viewModel.details
         )
         .overlay(tableOverlay)
         .navigationBarTitle(Text("Network"))

@@ -20,6 +20,8 @@ final class PinsViewModel: NSObject, NSFetchedResultsControllerDelegate, Observa
     @Published private(set) var messages: [LoggerMessageEntity] = []
 #endif
 
+    let details: ConsoleDetailsRouterViewModel
+
     var onDismiss: (() -> Void)?
 
     private(set) var store: LoggerStore
@@ -28,6 +30,7 @@ final class PinsViewModel: NSObject, NSFetchedResultsControllerDelegate, Observa
 
     init(store: LoggerStore) {
         self.store = store
+        self.details = ConsoleDetailsRouterViewModel(store: store)
 
         let request = NSFetchRequest<LoggerMessageEntity>(entityName: "\(LoggerMessageEntity.self)")
         request.fetchBatchSize = 250

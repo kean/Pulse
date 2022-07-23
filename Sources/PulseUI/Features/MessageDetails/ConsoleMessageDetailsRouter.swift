@@ -6,10 +6,8 @@ import SwiftUI
 import CoreData
 import PulseCore
 
-#if os(macOS)
-
 struct ConsoleMessageDetailsRouter: View {
-    @ObservedObject var viewModel: ConsoleDetailsPanelViewModel
+    @ObservedObject var viewModel: ConsoleDetailsRouterViewModel
 
     var body: some View {
         if let viewModel = viewModel.viewModel {
@@ -27,7 +25,7 @@ struct ConsoleMessageDetailsRouter: View {
     }
 }
 
-final class ConsoleDetailsPanelViewModel: ObservableObject {
+final class ConsoleDetailsRouterViewModel: ObservableObject {
     @Published private(set) var viewModel: DetailsViewModel?
     private let store: LoggerStore
 
@@ -54,24 +52,3 @@ final class ConsoleDetailsPanelViewModel: ObservableObject {
         case request(NetworkInspectorViewModel)
     }
 }
-
-#else
-
-struct ConsoleMessageDetailsRouter: View {
-    let store: LoggerStore
-    @Binding var entity: NSManagedObject?
-
-    var body: some View {
-        if let message = entity as? LoggerMessageEntity {
-            if let request = message.request {
-                NetworkInspectorView(viewModel: .init(request: request, store: store))
-            } else {
-                ConsoleMessageDetailsView(viewModel: .init(store: store, message: message))
-            }
-        } else if let request = entity as? LoggerNetworkRequestEntity {
-            NetworkInspectorView(viewModel: .init(request: request, store: store))
-        }
-    }
-}
-
-#endif

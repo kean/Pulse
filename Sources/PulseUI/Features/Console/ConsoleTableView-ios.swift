@@ -25,13 +25,13 @@ final class ConsoleTableViewModel {
 struct ConsoleTableView<Header: View>: View {
     @ViewBuilder let header: () -> Header
     let viewModel: ConsoleTableViewModel
+    let detailsViewModel: ConsoleDetailsRouterViewModel
 
     @State private var isDetailsLinkActive = false
-    @State private var selectedEntity: NSManagedObject?
 
     var body: some View {
         _ConsoleTableView(header: header, viewModel: viewModel, onSelected: {
-            selectedEntity = $0
+            detailsViewModel.select($0)
             isDetailsLinkActive = true
         })
         .background(invisibleNavigationLinks)
@@ -39,8 +39,9 @@ struct ConsoleTableView<Header: View>: View {
 
     @ViewBuilder
     private var invisibleNavigationLinks: some View {
-        NavigationLink(isActive: $isDetailsLinkActive, destination: {
-            ConsoleMessageDetailsRouter(store: viewModel.store, entity: $selectedEntity) }, label: {  EmptyView() })
+        NavigationLink.programmatic(isActive: $isDetailsLinkActive) {
+            ConsoleMessageDetailsRouter(viewModel: detailsViewModel)
+        }
     }
 }
 

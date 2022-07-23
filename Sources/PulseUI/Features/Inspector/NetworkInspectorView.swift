@@ -10,6 +10,8 @@ import Combine
 struct NetworkInspectorView: View {
     // Make sure all tabs are updated live
     @ObservedObject var viewModel: NetworkInspectorViewModel
+    var onClose: (() -> Void)?
+
     @State private var selectedTab: NetworkInspectorTab = .response
     @State private var isShowingShareSheet = false
     @State private var shareItems: ShareItems?
@@ -69,8 +71,6 @@ struct NetworkInspectorView: View {
         }
     }
 #elseif os(macOS)
-    let onClose: () -> Void
-
     var body: some View {
         VStack {
             toolbar

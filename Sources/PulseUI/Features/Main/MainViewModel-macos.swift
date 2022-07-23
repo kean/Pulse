@@ -13,7 +13,7 @@ final class MainViewModel: ObservableObject {
     var store: LoggerStore { console.store }
     let console: ConsoleViewModel
     let network: NetworkViewModel
-    var details: ConsoleDetailsPanelViewModel
+    var details: ConsoleDetailsRouterViewModel
     let toolbar = ConsoleToolbarViewModel()
     let mode = ConsoleModePickerViewModel()
     let searchBar = ConsoleSearchBarViewModel()
@@ -23,7 +23,7 @@ final class MainViewModel: ObservableObject {
     public init(store: LoggerStore) {
         self.console = ConsoleViewModel(store: store)
         self.network = NetworkViewModel(store: store)
-        self.details = ConsoleDetailsPanelViewModel(store: store)
+        self.details = ConsoleDetailsRouterViewModel(store: store)
 
         toolbar.$isOnlyErrors.sink { [weak self] in
             self?.console.isOnlyErrors = $0

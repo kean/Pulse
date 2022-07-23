@@ -40,7 +40,8 @@ public struct PinsView: View {
         } else {
             ConsoleTableView(
                 header: { EmptyView() },
-                viewModel: viewModel.table
+                viewModel: viewModel.table,
+                detailsViewModel: viewModel.details
             )
         }
     }
