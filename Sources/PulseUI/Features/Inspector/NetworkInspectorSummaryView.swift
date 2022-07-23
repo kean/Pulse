@@ -58,14 +58,15 @@ struct NetworkInspectorSummaryView: View {
     @ViewBuilder
     private var requestHeaderView: some View {
         HStack {
-            LargeSectionHeader(title: "Request")
-            Spacer()
-            Picker("Request Type", selection: $isShowingCurrentRequest) {
-                Text("Original").tag(false)
-                Text("Current").tag(true)
-            }
-            .pickerStyle(.segmented)
-            .labelsHidden()
+            LargeSectionHeader(title: "Request", accessory: {
+                Picker("Request Type", selection: $isShowingCurrentRequest) {
+                    Text("Original").tag(false)
+                    Text("Current").tag(true)
+                }
+                .pickerStyle(.segmented)
+                .labelsHidden()
+                .fixedSize()
+            })
         }
     }
 
