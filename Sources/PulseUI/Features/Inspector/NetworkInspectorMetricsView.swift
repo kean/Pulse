@@ -136,10 +136,11 @@ private func makeTiming(metrics: NetworkLoggerMetrics) -> [TimingRowSectionViewM
 
 private func _makeRow(title: String, color: UXColor, from: Date, to: Date?, taskInterval: DateInterval) -> TimingRowViewModel {
     let start = CGFloat(from.timeIntervalSince(taskInterval.start) / taskInterval.duration)
-    let duration = to.map { $0.timeIntervalSince(from) }
-    let length = duration.map { CGFloat($0 / taskInterval.duration) }
-    let value = duration.map(DurationFormatter.string(from:)) ?? "–"
-    return TimingRowViewModel(title: title, value: value, color: color, start: CGFloat(start), length: length ?? 1)
+    let to = to ?? taskInterval.end
+    let duration = to.timeIntervalSince(from)
+    let length = CGFloat(duration / taskInterval.duration)
+    let value = DurationFormatter.string(from: duration)
+    return TimingRowViewModel(title: title, value: value, color: color, start: CGFloat(start), length: length)
 }
 
 private func makeTimingRows(transaction: NetworkLoggerTransactionMetrics, taskInterval: DateInterval) -> [TimingRowSectionViewModel] {

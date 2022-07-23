@@ -107,7 +107,8 @@ final class NetworkInspectorTransactionsListViewModel {
             default: title = "Unknown"
             }
             var details: String?
-            if let startDate = transaction.fetchStartDate, let endDate = transaction.responseEndDate {
+            if let startDate = transaction.fetchStartDate {
+                let endDate = transaction.responseEndDate ?? metrics.taskInterval.end
                 details = DurationFormatter.string(from: endDate.timeIntervalSince(startDate))
             }
             let item = Item(title: title, details: details, viewModel: { NetworkInspectorTransactionViewModel(transaction: transaction) })
