@@ -19,30 +19,37 @@ extension NetworkLoggerSummary {
     }
 
     private func render(using renderer: Renderer) -> String {
-        let summary = NetworkInspectorSummaryViewModel(summary: self)
-        renderer.add(summary.summaryModel, isSecondaryTitle: false)
-        renderer.add(summary.errorModel, isSecondaryTitle: false)
+        // Summary
+        let viewModel = NetworkInspectorSummaryViewModel(summary: self)
+        renderer.add(viewModel.summaryModel, isSecondaryTitle: false)
+        renderer.add(viewModel.errorModel, isSecondaryTitle: false)
 
-        let headers = NetworkInspectorHeaderViewModel(summary: self)
-
-        #warning("TODO: update")
-        renderer.add(title: "Request")
-        renderer.add(headers.requestHeadersOriginal)
-        if let body = requestBody, !body.isEmpty {
-            renderer.addSecondaryTitle("Request Body")
-            renderer.add(data: body)
+        if let requestSummary = viewModel.requestSummary {
+            renderer.add(title: "Request")
+            renderer.add(requestSummary)
+            renderer.add(viewModel.requestHeaders)
+            renderer.add(viewModel.requestBodySection)
+            renderer.add(viewModel.requestParameters)
+            if let body = requestBody, !body.isEmpty {
+                renderer.addSecondaryTitle("Request Body")
+                renderer.add(data: body)
+            }
         }
 
-        renderer.add(title: "Response")
-        renderer.add(headers.responseHeaders)
-        if let body = responseBody, !body.isEmpty {
-            renderer.addSecondaryTitle("Response Body")
-            renderer.add(data: body)
+        if let responseSummary = viewModel.responseSummary {
+            renderer.add(title: "Response")
+            renderer.add(responseSummary)
+            renderer.add(viewModel.responseHeaders)
+            renderer.add(viewModel.responseBodySection)
+            if let body = responseBody, !body.isEmpty {
+                renderer.addSecondaryTitle("Response Body")
+                renderer.add(data: body)
+            }
         }
 
         renderer.add(title: "Details")
-        renderer.add(summary.timingDetailsModel)
-        if let transferModel = summary.transferModel {
+        renderer.add(viewModel.timingDetailsModel)
+        if let transferModel = viewModel.transferModel {
             renderer.add(KeyValueSectionViewModel(title: "Sent Data", color: .gray, items: [
                 ("Total Bytes Sent", transferModel.totalBytesSent),
                 ("Headers Sent", transferModel.headersBytesSent),
