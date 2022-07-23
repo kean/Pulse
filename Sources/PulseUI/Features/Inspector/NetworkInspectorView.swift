@@ -84,9 +84,11 @@ struct NetworkInspectorView: View {
             HStack {
                 NetworkTabView(selectedTab: $selectedTab)
                 Spacer()
-                Button(action: onClose) {
-                    Image(systemName: "xmark").foregroundColor(.secondary)
-                }.buttonStyle(PlainButtonStyle())
+                if let onClose = onClose {
+                    Button(action: onClose) {
+                        Image(systemName: "xmark").foregroundColor(.secondary)
+                    }.buttonStyle(PlainButtonStyle())
+                }
             }
             .padding(EdgeInsets(top: 8, leading: 4, bottom: 8, trailing: 10))
             Divider()
