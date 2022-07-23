@@ -10,7 +10,8 @@ import Combine
 #if os(iOS) || os(tvOS)
 
 public struct MainView: View {
-    let viewModel: MainViewModel
+    // TODO: replace with StateObject when available
+    @State private var viewModel: MainViewModel
 
     /// - parameter onDismiss: pass onDismiss to add a close button.
     public init(store: LoggerStore = .default,
