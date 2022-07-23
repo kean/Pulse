@@ -10,27 +10,49 @@ import PulseCore
 
 struct ConsoleMessageDetailsRouter: View {
     @ObservedObject var viewModel: ConsoleDetailsPanelViewModel
-    let store: LoggerStore
 
     var body: some View {
-        if let message = viewModel.selectedEntity as? LoggerMessageEntity {
-            if let request = message.request {
-                NetworkInspectorView(viewModel: .init(request: request, store: store), onClose: onClose)
-            } else {
-                ConsoleMessageDetailsView(viewModel: .init(store: store, message: message), onClose: onClose)
+        if let viewModel = viewModel.viewModel {
+            switch viewModel {
+            case .message(let viewModel):
+                ConsoleMessageDetailsView(viewModel: viewModel, onClose: onClose)
+            case .request(let viewModel):
+                NetworkInspectorView(viewModel: viewModel, onClose: onClose)
             }
-        } else if let request = viewModel.selectedEntity as? LoggerNetworkRequestEntity {
-            NetworkInspectorView(viewModel: .init(request: request, store: store), onClose: onClose)
         }
     }
 
-    func onClose() {
-        viewModel.selectedEntity = nil
+    private func onClose() {
+        viewModel.select(nil)
     }
 }
 
 final class ConsoleDetailsPanelViewModel: ObservableObject {
-    @Published var selectedEntity: NSManagedObject?
+    @Published private(set) var viewModel: DetailsViewModel?
+    private let store: LoggerStore
+
+    init(store: LoggerStore) {
+        self.store = store
+    }
+
+    func select(_ entity: NSManagedObject?) {
+        if let message = entity as? LoggerMessageEntity {
+            if let request = message.request {
+                viewModel = .request(.init(request: request, store: store))
+            } else {
+                viewModel = .message(.init(store: store, message: message))
+            }
+        } else if let request = entity as? LoggerNetworkRequestEntity {
+            viewModel = .request(.init(request: request, store: store))
+        } else {
+            viewModel = nil
+        }
+    }
+
+    enum DetailsViewModel {
+        case message(ConsoleMessageDetailsViewModel)
+        case request(NetworkInspectorViewModel)
+    }
 }
 
 #else

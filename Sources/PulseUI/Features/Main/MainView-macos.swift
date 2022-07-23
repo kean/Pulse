@@ -63,9 +63,9 @@ private struct ConsoleContainerView: View {
         NotSplitView(
             MainPanelView(viewModel: viewModel, mode: viewModel.mode)
                 .frame(minWidth: 320, idealWidth: 320, maxWidth: .infinity, minHeight: 120, idealHeight: 480, maxHeight: .infinity, alignment: .center),
-            ConsoleMessageDetailsRouter(viewModel: details, store: viewModel.store)
+            ConsoleMessageDetailsRouter(viewModel: details)
                 .frame(minWidth: 430, idealWidth: 500, maxWidth: .infinity, minHeight: 320, idealHeight: 480, maxHeight: .infinity, alignment: .center),
-            isPanelTwoCollaped: viewModel.details.selectedEntity == nil,
+            isPanelTwoCollaped: viewModel.details.viewModel == nil,
             isVertical: toolbar.isVertical
         )
     }
@@ -86,12 +86,12 @@ private struct MainPanelView: View {
     private var content: some View {
         if mode.isNetworkOnly {
             ConsoleTableView(viewModel: viewModel.network.table, onSelected: {
-                viewModel.details.selectedEntity = $0
+                viewModel.details.select($0)
             })
             .background(NavigationTitleUpdater(title: "Requests", viewModel: viewModel.network.table))
         } else {
             ConsoleTableView(viewModel: viewModel.console.table, onSelected: {
-                viewModel.details.selectedEntity = $0
+                viewModel.details.select($0)
             })
             .background(NavigationTitleUpdater(title: "Messages", viewModel: viewModel.console.table))
         }
