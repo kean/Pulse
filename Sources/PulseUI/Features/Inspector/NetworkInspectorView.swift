@@ -45,21 +45,26 @@ struct NetworkInspectorView: View {
             Text("Metrics").tag(NetworkInspectorTab.metrics)
         }
         .pickerStyle(.segmented)
-        .padding(EdgeInsets(top: 2, leading: 13, bottom: 11, trailing: 13))
+        .padding(EdgeInsets(top: 4, leading: 13, bottom: 11, trailing: 13))
         .border(width: 1, edges: [.bottom], color: Color(UXColor.separator).opacity(0.3))
     }
 
     @ViewBuilder
     private var trailingNavigationBarItems: some View {
-        if #available(iOS 14.0, *) {
-            Menu(content: {
-                NetworkMessageContextMenu(request: viewModel.request, store: viewModel.store, sharedItems: $shareItems)
-            }, label: {
-                Image(systemName: "ellipsis.circle")
-            })
-        } else {
-            ShareButton {
-                isShowingShareSheet = true
+        HStack {
+            if let pin = viewModel.pin {
+                PinButton(viewModel: pin, isTextNeeded: false)
+            }
+            if #available(iOS 14.0, *) {
+                Menu(content: {
+                    NetworkMessageContextMenu(request: viewModel.request, store: viewModel.store, sharedItems: $shareItems)
+                }, label: {
+                    Image(systemName: "ellipsis.circle")
+                })
+            } else {
+                ShareButton {
+                    isShowingShareSheet = true
+                }
             }
         }
     }

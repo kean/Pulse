@@ -38,13 +38,13 @@ struct NetworkInspectorMetricsView: View {
                             .cornerRadius(12)
                         }
                         .padding([.leading, .trailing])
-                        .padding(.top, 16)
+                        .padding(.top, 10)
                     }
 #endif
                     if let details = viewModel.details {
                         NetworkInspectorMetricsDetailsView(viewModel: details)
                             .padding([.leading, .bottom, .trailing], NetworkInspectorMetricsView.padding)
-                            .padding(.top, 32)
+                            .padding(.top, 20)
                     }
 #endif
                 }
