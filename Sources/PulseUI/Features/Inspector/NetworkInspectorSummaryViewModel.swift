@@ -38,8 +38,8 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     var summaryModel: KeyValueSectionViewModel {
         var items: [(String, String?)] = [
             ("Status Code", summary.response?.statusCode.map(StatusCodeFormatter.string) ?? "–"),
-            ("Method", summary.originalRequest?.httpMethod ?? "–"),
             ("URL", summary.originalRequest?.url?.absoluteString ?? "–"),
+            ("Method", summary.originalRequest?.httpMethod ?? "–"),
             ("Domain", summary.originalRequest?.url?.host ?? "–")
         ]
         if let metrics = summary.metrics {

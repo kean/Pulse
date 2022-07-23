@@ -11,11 +11,7 @@ struct NetworkInspectorResponseView: View {
     let viewModel: NetworkInspectorResponseViewModel
     var onToggleExpanded: (() -> Void)?
 
-#if os(iOS)
-    var body: some View {
-        contents
-    }
-#elseif os(macOS)
+#if os(iOS) || os(macOS)
     var body: some View {
         contents
     }
