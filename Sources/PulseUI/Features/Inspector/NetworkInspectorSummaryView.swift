@@ -5,25 +5,28 @@
 import SwiftUI
 import PulseCore
 
-#if os(iOS) || os(watchOS) || os(macOS)
-
 struct NetworkInspectorSummaryView: View {
     @ObservedObject var viewModel: NetworkInspectorSummaryViewModel
 
     var body: some View {
+#if os(iOS) || os(macOS)
         ScrollView {
-#if os(watchOS)
+            VStack {
+                contents
+            }.padding()
+        }.background(invisibleLinks)
+#elseif os(watchOS)
+        ScrollView {
             Spacer().frame(height: 24)
             VStack(spacing: 24) {
                 contents
             }
-#else
-            VStack {
-                contents
-            }.padding()
-#endif
+        }.background(invisibleLinks)
+#elseif os(tvOS)
+        List {
+            contents
         }
-        .background(linksView)
+#endif
     }
 
 #if os(iOS) || os(macOS)
@@ -71,9 +74,42 @@ struct NetworkInspectorSummaryView: View {
         KeyValueSectionView(viewModel: viewModel.requestHeaders, limit: 10)
         KeyValueSectionView(viewModel: viewModel.responseHeaders, limit: 10)
     }
+#elseif os(tvOS)
+    var metrics: NetworkInspectorMetricsViewModel?
+
+    @ViewBuilder
+    private var contents: some View {
+        makeKeyValueSection(viewModel: viewModel.summaryModel)
+        if let error = viewModel.errorModel {
+            makeKeyValueSection(viewModel: error)
+        }
+        NavigationLink(destination: NetworkInspectorResponseView(viewModel: viewModel.requestBodyViewModel).focusable(true)) {
+            KeyValueSectionView(viewModel: viewModel.requestBodySection)
+        }
+        if viewModel.responseSummary != nil {
+            NavigationLink(destination: NetworkInspectorResponseView(viewModel: viewModel.responseBodyViewModel).focusable(true)) {
+                KeyValueSectionView(viewModel: viewModel.responseBodySection)
+            }
+        }
+        if let timing = viewModel.timingDetailsModel, let metrics = metrics {
+            NavigationLink(destination: NetworkInspectorMetricsView(viewModel: metrics).focusable(true)) {
+                KeyValueSectionView(viewModel: timing)
+            }
+        }
+        makeKeyValueSection(viewModel: viewModel.requestHeaders)
+        if viewModel.responseSummary != nil {
+            makeKeyValueSection(viewModel: viewModel.responseHeaders)
+        }
+    }
+
+    func makeKeyValueSection(viewModel: KeyValueSectionViewModel) -> some View {
+        NavigationLink(destination: KeyValueSectionView(viewModel: viewModel).focusable(true)) {
+            KeyValueSectionView(viewModel: viewModel, limit: 5)
+        }
+    }
 #endif
 
-    private var linksView: some View {
+    private var invisibleLinks: some View {
         VStack {
             if let errorModel = viewModel.errorModel {
                 NavigationLink.programmatic(isActive: $viewModel.isErrorRawLinkActive) {
@@ -104,5 +140,3 @@ struct NetworkInspectorSummaryView: View {
         .backport.hideAccessibility()
     }
 }
-
-#endif

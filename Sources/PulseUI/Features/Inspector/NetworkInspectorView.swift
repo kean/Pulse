@@ -55,57 +55,6 @@ struct NetworkInspectorView: View {
             }
         }
     }
-#elseif os(watchOS)
-    var body: some View {
-        NetworkInspectorSummaryView(viewModel: viewModel.makeSummaryModel())
-            .navigationBarTitle(Text(viewModel.title))
-            .toolbar {
-                if let viewModel = viewModel.pin {
-                    PinButton(viewModel: viewModel, isTextNeeded: false)
-                }
-            }
-    }
-#elseif os(tvOS)
-    var body: some View {
-        List {
-            let viewModel = self.viewModel.makeSummaryModel()
-
-            makeKeyValueSection(viewModel: viewModel.summaryModel)
-
-            if let error = viewModel.errorModel {
-                makeKeyValueSection(viewModel: error)
-            }
-            if let request = viewModel.requestBodySection {
-                NavigationLink(destination: NetworkInspectorResponseView(viewModel: viewModel.requestBodyViewModel).focusable(true)) {
-                    KeyValueSectionView(viewModel: request)
-                }
-            }
-            if let response = viewModel.responseBodySection {
-                NavigationLink(destination: NetworkInspectorResponseView(viewModel: viewModel.responseBodyViewModel).focusable(true)) {
-                    KeyValueSectionView(viewModel: response)
-                }
-            }
-            if let timing = viewModel.timingDetailsModel, let metrics = self.viewModel.makeMetricsModel() {
-                NavigationLink(destination: NetworkInspectorMetricsView(viewModel: metrics).focusable(true)) {
-                    KeyValueSectionView(viewModel: timing)
-                }
-            }
-            if let parameters = viewModel.requestParameters {
-                makeKeyValueSection(viewModel: parameters)
-            }
-
-            makeKeyValueSection(viewModel: viewModel.requestHeaders)
-            if let responseHeaders = viewModel.responseHeaders {
-                makeKeyValueSection(viewModel: responseHeaders)
-            }
-        }
-    }
-
-    func makeKeyValueSection(viewModel: KeyValueSectionViewModel) -> some View {
-        NavigationLink(destination: KeyValueSectionView(viewModel: viewModel).focusable(true)) {
-            KeyValueSectionView(viewModel: viewModel, limit: 5)
-        }
-    }
 #elseif os(macOS)
     let onClose: () -> Void
 
@@ -164,11 +113,23 @@ struct NetworkInspectorView: View {
             .buttonStyle(PlainButtonStyle())
         }
     }
-
+#elseif os(watchOS)
+    var body: some View {
+        NetworkInspectorSummaryView(viewModel: viewModel.makeSummaryModel())
+            .navigationBarTitle(Text(viewModel.title))
+            .toolbar {
+                if let viewModel = viewModel.pin {
+                    PinButton(viewModel: viewModel, isTextNeeded: false)
+                }
+            }
+    }
+#elseif os(tvOS)
+    var body: some View {
+        NetworkInspectorSummaryView(viewModel: viewModel.makeSummaryModel(), metrics: viewModel.makeMetricsModel())
+    }
 #endif
 
 #if os(iOS) || os(macOS)
-
     @ViewBuilder
     private var selectedTabView: some View {
         switch selectedTab {
