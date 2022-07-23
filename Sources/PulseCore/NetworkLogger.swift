@@ -84,7 +84,7 @@ public final class NetworkLogger {
 
         trace("Did complete with error: \(error?.localizedDescription ?? "-") for \(task.url ?? "null")")
 
-        // TODO: reimplement
+        #warning("TODO: reimplement")
 //        let networkTask = LoggedNetworkTask(task: task, session: session, originalRequest: originalRequest, currentRequest: task.currentRequest, response: response, data: data, error: error, metrics: metrics)
 //        if let networkTask = willLogTask(networkTask) {
         store.handle(.networkTaskCompleted(.init(
