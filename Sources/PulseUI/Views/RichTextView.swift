@@ -23,15 +23,6 @@ struct RichTextView: View {
         self.hasVerticalScroller = hasVerticalScroller
         self.onToggleExpanded = onToggleExpanded
     }
-
-    init(data: Data) {
-        self.init(viewModel: RichTextViewModel(data: data))
-    }
-
-    init(string: String) {
-        self.init(viewModel: RichTextViewModel(string: string))
-    }
-
 #if os(iOS)
     var body: some View {
         VStack(spacing: 0) {
@@ -379,11 +370,11 @@ private func highlight(range: Range<String.Index>, in text: NSMutableAttributedS
 struct RichTextView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            RichTextView(data: MockJSON.allPossibleValues)
+            RichTextView(viewModel: .init(data: MockJSON.allPossibleValues))
                 .previewLayout(.sizeThatFits)
                 .environment(\.colorScheme, .light)
 
-            RichTextView(data: MockJSON.allPossibleValues)
+            RichTextView(viewModel: .init(data: MockJSON.allPossibleValues))
                 .previewDisplayName("Dark")
                 .background(Color(UXColor.systemBackground))
                 .previewLayout(.sizeThatFits)
