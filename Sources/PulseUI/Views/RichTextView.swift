@@ -7,7 +7,7 @@ import CoreData
 import PulseCore
 import Combine
 
-#if os(iOS) || os(macOS) || os(tvOS)
+#if os(macOS) || os(tvOS) || os(iOS)
 
 struct RichTextView: View {
     @ObservedObject private var viewModel: RichTextViewModel
@@ -31,29 +31,25 @@ struct RichTextView: View {
     #if os(iOS)
     var body: some View {
         VStack(spacing: 0) {
-            if viewModel.isSearching {
-                HStack(spacing: 8) {
-                    SearchBar(title: "Search", text: $viewModel.searchTerm, onEditingChanged: { isEditing in
-                        if isEditing {
-                            viewModel.isSearching = isEditing
-                        }
-                    }, onFocusNeeded: viewModel.onFocusNeeded)
-
-                    if #available(iOS 14.0, *) {
-                        StringSearchOptionsMenu(options: $viewModel.options, isKindNeeded: false)
+            HStack(spacing: 8) {
+                SearchBar(title: "Search", text: $viewModel.searchTerm, onEditingChanged: { isEditing in
+                    if isEditing {
+                        viewModel.isSearching = isEditing
                     }
+                })
+
+                if #available(iOS 14.0, *) {
+                    StringSearchOptionsMenu(options: $viewModel.options, isKindNeeded: false)
                 }
-                .padding(4)
-                .padding(.trailing, 12)
-                .border(width: 1, edges: [.bottom], color: Color.separator.opacity(0.3))
-                .transition(.opacity)
             }
+            .padding(.leading, 4)
+            .padding(.trailing, 12)
+            .padding(.bottom, -2)
 
             WrappedTextView(text: viewModel.text, viewModel: viewModel, isAutomaticLinkDetectionEnabled: isAutomaticLinkDetectionEnabled)
 
             if viewModel.isSearching {
                 SearchToobar(viewModel: viewModel)
-                    .animation(nil)
             }
         }
     }
@@ -74,7 +70,7 @@ struct RichTextView: View {
     #endif
 }
 
-#if os(iOS) || os(tvOS)
+#if os(tvOS) || os(iOS)
 private struct WrappedTextView: UIViewRepresentable {
     let text: NSAttributedString
     let viewModel: RichTextViewModel
@@ -82,10 +78,13 @@ private struct WrappedTextView: UIViewRepresentable {
 
     func makeUIView(context: Context) -> UXTextView {
         let textView = UXTextView()
-        configureTextView(textView, isAutomaticLinkDetectionEnabled)
+        configureTextView(textView)
         textView.autocorrectionType = .no
         textView.autocapitalizationType = .none
-        textView.textContainerInset = UIEdgeInsets(top: 12, left: 10, bottom: 12, right: 10)
+        #if !os(tvOS)
+        textView.isAutomaticLinkDetectionEnabled = isAutomaticLinkDetectionEnabled
+        #endif
+        textView.textContainerInset = UIEdgeInsets(top: 8, left: 10, bottom: 8, right: 10)
         viewModel.textView = textView
         return textView
     }
@@ -95,7 +94,7 @@ private struct WrappedTextView: UIViewRepresentable {
         viewModel.textView = uiView
     }
 }
-#else
+#elseif os(macOS)
 private struct WrappedTextView: NSViewRepresentable {
     let text: NSAttributedString
     let viewModel: RichTextViewModel
@@ -106,7 +105,7 @@ private struct WrappedTextView: NSViewRepresentable {
         let scrollView = NSTextView.scrollableTextView()
         scrollView.hasVerticalScroller = hasVerticalScroller
         let textView = scrollView.documentView as! NSTextView
-        configureTextView(textView, isAutomaticLinkDetectionEnabled)
+        configureTextView(textView)
         textView.isAutomaticSpellingCorrectionEnabled = false
         textView.textContainerInset = NSSize(width: 10, height: 10)
         viewModel.textView = textView
@@ -121,11 +120,10 @@ private struct WrappedTextView: NSViewRepresentable {
 }
 #endif
 
-private func configureTextView(_ textView: UXTextView, _ isAutomaticLinkDetectionEnabled: Bool) {
+private func configureTextView(_ textView: UXTextView) {
     textView.isSelectable = true
     #if !os(tvOS)
     textView.isEditable = false
-    textView.isAutomaticLinkDetectionEnabled = isAutomaticLinkDetectionEnabled
     textView.linkTextAttributes = [
         .foregroundColor: JSONColors.valueString,
         .underlineStyle: 1
@@ -133,6 +131,7 @@ private func configureTextView(_ textView: UXTextView, _ isAutomaticLinkDetectio
     #endif
     textView.backgroundColor = .clear
 }
+#endif
 
 #if os(iOS) || os(macOS)
 private struct SearchToobar: View {
@@ -141,29 +140,26 @@ private struct SearchToobar: View {
     #if os(iOS)
     var body: some View {
         HStack {
-            HStack {
-                Text(viewModel.matches.isEmpty ? "0/0" : "\(viewModel.selectedMatchIndex+1)/\(viewModel.matches.count)")
-                    .font(Font.body.monospacedDigit())
-                Divider()
+            HStack(spacing: 12) {
                 Button(action: viewModel.previousMatch) {
                     Image(systemName: "chevron.left.circle")
                 }
-                Divider()
+                Text(viewModel.matches.isEmpty ? "0 of 0" : "\(viewModel.selectedMatchIndex+1) of \(viewModel.matches.count)")
+                    .font(Font.body.monospacedDigit())
                 Button(action: viewModel.nextMatch) {
                     Image(systemName: "chevron.right.circle")
                 }
             }
             .fixedSize()
-            .addSearchBarIshBackground()
-
             Spacer()
 
             Button(action: viewModel.cancelSearch) {
                 Text("Cancel")
-            }.addSearchBarIshBackground()
+            }
         }
-        .padding(EdgeInsets(top: 12, leading: 12, bottom: 12, trailing: 12))
+        .padding(12)
         .border(width: 1, edges: [.top], color: Color(UXColor.separator).opacity(0.3))
+        .backport.backgroundThinMaterial()
     }
     #else
     var body: some View {
@@ -200,12 +196,11 @@ private struct SearchToobar: View {
 #endif
 
 final class RichTextViewModel: ObservableObject {
+    @Published private(set) var selectedMatchIndex: Int = 0
+    @Published private(set) var matches: [Range<String.Index>] = []
     @Published var isSearching = false
-    @Published var selectedMatchIndex: Int = 0
-    @Published var matches: [Range<String.Index>] = []
     @Published var searchTerm: String = ""
     @Published var options: StringSearchOptions = .default
-    fileprivate let onFocusNeeded = PassthroughSubject<Void, Never>()
 
     let text: NSAttributedString
     private let string: String
@@ -214,6 +209,8 @@ final class RichTextViewModel: ObservableObject {
     var mutableText: NSMutableAttributedString {
         textView?.textStorage ?? NSMutableAttributedString()
     }
+
+    var isAutomaticLinkDetectionEnabled = true
 
     private var bag = [AnyCancellable]()
 
@@ -267,18 +264,10 @@ final class RichTextViewModel: ObservableObject {
         didUpdateCurrentSelectedMatch()
     }
 
-    func startSearching() {
-        withAnimation {
-            isSearching = true
-        }
-    }
-
     func cancelSearch() {
-        withAnimation {
-            searchTerm = ""
-            isSearching = false
-            hideKeyboard()
-        }
+        searchTerm = ""
+        isSearching = false
+        hideKeyboard()
     }
 
     func nextMatch() {
@@ -341,15 +330,13 @@ struct RichTextView_Previews: PreviewProvider {
                 .environment(\.colorScheme, .light)
 
             RichTextView(data: MockJSON.allPossibleValues)
-            .previewDisplayName("Dark")
+                .previewDisplayName("Dark")
                 .background(Color(UXColor.systemBackground))
                 .previewLayout(.sizeThatFits)
                 .environment(\.colorScheme, .dark)
         }
     }
 }
-
-#endif
 
 #endif
 

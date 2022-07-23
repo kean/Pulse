@@ -30,6 +30,18 @@ extension NavigationLink where Label == EmptyView {
     }
 }
 
+struct Wrapped<View: UXView>: UIViewRepresentable {
+    let view: View
+
+    func makeUIView(context: Context) -> View {
+        view
+    }
+
+    func updateUIView(_ uiView: View, context: Context) {
+        // Do nothing
+    }
+}
+
 // MARK: - Backport
 
 struct Backport<Content: View> {
@@ -79,6 +91,15 @@ extension Backport {
     func hideAccessibility() -> some View {
         if #available(iOS 14.0, tvOS 14.0, *) {
             self.content.accessibilityHidden(true)
+        } else {
+            self.content
+        }
+    }
+
+    @ViewBuilder
+    func backgroundThinMaterial() -> some View {
+        if #available(iOS 15.0, tvOS 15.0, *) {
+            self.content.background(.thinMaterial)
         } else {
             self.content
         }

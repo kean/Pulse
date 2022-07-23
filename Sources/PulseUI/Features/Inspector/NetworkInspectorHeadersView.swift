@@ -59,7 +59,11 @@ struct NetworkHeadersDetailsView: View {
             #if os(watchOS) || os(tvOS)
             RichTextView(viewModel: .init(string: text.string))
             #else
-            RichTextView(viewModel: .init(string: text), isAutomaticLinkDetectionEnabled: false)
+            RichTextView(viewModel: {
+                let viewModel = RichTextViewModel(string: text)
+                viewModel.isAutomaticLinkDetectionEnabled = false
+                return viewModel
+            }())
             #endif
         }
     }

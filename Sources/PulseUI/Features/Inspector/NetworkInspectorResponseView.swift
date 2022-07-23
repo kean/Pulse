@@ -10,19 +10,9 @@ import Combine
 struct NetworkInspectorResponseView: View {
     let viewModel: NetworkInspectorResponseViewModel
 
-#if os(iOS)
+#if os(iOS) || os(macOS)
     var body: some View {
         contents
-            .navigationBarItems(trailing: trailingNavigationBarItems)
-    }
-
-    @ViewBuilder
-    private var trailingNavigationBarItems: some View {
-        if let button = viewModel.buttonSearch {
-            Button(action: button.action) {
-                Image(systemName: "magnifyingglass")
-            }
-        }
     }
 #elseif os(watchOS)
     var body: some View {
@@ -36,10 +26,6 @@ struct NetworkInspectorResponseView: View {
             contents
             Spacer()
         }
-    }
-#else
-    var body: some View {
-        contents
     }
 #endif
 
@@ -146,19 +132,6 @@ final class NetworkInspectorResponseViewModel {
             return .other(RichTextViewModel(string: string))
         }
     }()
-
-#if os(iOS)
-    var buttonSearch: ActionViewModel? {
-        switch contents {
-        case .json(let viewModel):
-            return ActionViewModel(action: viewModel.startSearching, title: "Search")
-        case .other(let viewModel):
-            return ActionViewModel(action: viewModel.startSearching, title: "Search")
-        default:
-            return nil
-        }
-    }
-#endif
 
     init(title: String, data: @autoclosure @escaping () -> Data) {
         self.title = title

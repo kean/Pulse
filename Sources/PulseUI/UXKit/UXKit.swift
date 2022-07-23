@@ -35,6 +35,7 @@ struct Palette {
 }
 
 #if os(macOS)
+typealias UXView = NSView
 typealias UXColor = NSColor
 typealias UXFont = NSFont
 typealias UXTextView = NSTextView
@@ -66,6 +67,7 @@ extension NSColor {
 }
 
 #else
+typealias UXView = UIView
 typealias UXColor = UIColor
 typealias UXFont = UIFont
 typealias UXImage = UIImage

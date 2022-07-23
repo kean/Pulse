@@ -34,9 +34,6 @@ struct ConsoleMessageDetailsView: View {
             ShareButton {
                 self.isShowingShareSheet = true
             }
-            Button(action: viewModel.textViewModel.startSearching) {
-                Image(systemName: "magnifyingglass")
-            }
         }
     }
     #elseif os(watchOS)
