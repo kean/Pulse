@@ -13,20 +13,28 @@ struct NetworkInspectorView: View {
     @State private var selectedTab: NetworkInspectorTab = .response
     @State private var isShowingShareSheet = false
     @State private var shareItems: ShareItems?
+    @State private var isExpanded = false
     @Environment(\.colorScheme) private var colorScheme
 
 #if os(iOS)
+    @State private var viewController: UIViewController?
+
     var body: some View {
         VStack(spacing: 0) {
-            toolbar
+            if !isExpanded {
+                toolbar
+            }
             selectedTabView
         }
-        .navigationBarTitle(Text(viewModel.title), displayMode: .inline)
         .navigationBarItems(trailing: trailingNavigationBarItems)
+        .navigationBarHidden(isExpanded)
+        .navigationBarTitle(Text(viewModel.title), displayMode: .inline)
+        .statusBar(hidden: isExpanded)
         .sheet(isPresented: $isShowingShareSheet) {
             ShareView(activityItems: [viewModel.prepareForSharing()])
         }
         .sheet(item: $shareItems, content: ShareView.init)
+        .background(ViewControllerAccessor(viewController: $viewController))
     }
 
     private var toolbar: some View {
@@ -37,7 +45,7 @@ struct NetworkInspectorView: View {
             Text("Metrics").tag(NetworkInspectorTab.metrics)
         }
         .pickerStyle(.segmented)
-        .padding(EdgeInsets(top: 6, leading: 13, bottom: 11, trailing: 13))
+        .padding(EdgeInsets(top: 2, leading: 13, bottom: 11, trailing: 13))
         .border(width: 1, edges: [.bottom], color: Color(UXColor.separator).opacity(0.3))
     }
 
@@ -105,7 +113,7 @@ struct NetworkInspectorView: View {
             NetworkInspectorHeadersView(viewModel: viewModel.makeHeadersModel())
         case .request:
             if let model = viewModel.makeRequestBodyViewModel() {
-                NetworkInspectorResponseView(viewModel: model)
+                makeResponseView(viewModel: model)
             } else if !viewModel.isCompleted && !viewModel.store.isReadonly {
                 pending
             } else if viewModel.hasRequestBody {
@@ -115,7 +123,7 @@ struct NetworkInspectorView: View {
             }
         case .response:
             if let model = viewModel.makeResponseBodyViewModel() {
-                NetworkInspectorResponseView(viewModel: model)
+                makeResponseView(viewModel: model)
             } else if !viewModel.isCompleted && !viewModel.store.isReadonly {
                 pending
             } else if viewModel.hasResponseBody  {
@@ -132,6 +140,20 @@ struct NetworkInspectorView: View {
                 PlaceholderView(imageName: "exclamationmark.circle", title: "Unavailable")
             }
         }
+    }
+
+    @ViewBuilder
+    private func makeResponseView(viewModel: NetworkInspectorResponseViewModel) -> some View {
+#if os(iOS)
+        NetworkInspectorResponseView(viewModel: viewModel) {
+            isExpanded.toggle()
+            viewController?.navigationController?.setNavigationBarHidden(isExpanded, animated: false)
+            viewController?.tabBarController?.setTabBarHidden(isExpanded, animated: false)
+
+        }
+#else
+        NetworkInspectorResponseView(viewModel: viewModel)
+#endif
     }
 #endif
 

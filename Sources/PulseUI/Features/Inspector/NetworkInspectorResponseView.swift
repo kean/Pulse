@@ -9,8 +9,14 @@ import Combine
 
 struct NetworkInspectorResponseView: View {
     let viewModel: NetworkInspectorResponseViewModel
+    var onToggleExpanded: (() -> Void)?
 
-#if os(iOS) || os(macOS)
+#if os(iOS)
+    var body: some View {
+        contents
+            .edgesIgnoringSafeArea(.bottom)
+    }
+#elseif os(macOS)
     var body: some View {
         contents
     }
@@ -33,11 +39,11 @@ struct NetworkInspectorResponseView: View {
     private var contents: some View {
         switch viewModel.contents {
         case .json(let viewModel):
-            RichTextView(viewModel: viewModel)
+            RichTextView(viewModel: viewModel, onToggleExpanded: onToggleExpanded)
         case .image(let image):
             makeImageView(with: image)
         case .other(let viewModel):
-            RichTextView(viewModel: viewModel)
+            RichTextView(viewModel: viewModel, onToggleExpanded: onToggleExpanded)
         }
     }
 

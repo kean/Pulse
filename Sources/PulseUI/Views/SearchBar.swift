@@ -12,6 +12,7 @@ struct SearchBar: UIViewRepresentable {
     let title: String
     @Binding var text: String
     var onEditingChanged: ((_ isEditing: Bool) -> Void)?
+    var inputAccessoryView: UIView?
 
     final class Coordinator: NSObject, UISearchBarDelegate {
         @Binding var text: String
@@ -47,6 +48,7 @@ struct SearchBar: UIViewRepresentable {
         searchBar.searchBarStyle = .minimal
         searchBar.delegate = context.coordinator
         searchBar.spellCheckingType = .no
+        searchBar.inputAccessoryView = inputAccessoryView
         return searchBar
     }
 

@@ -11,13 +11,17 @@ import Combine
 
 struct RichTextView: View {
     @ObservedObject private var viewModel: RichTextViewModel
+    @State private var isExpanded = false
+    @State private var isScrolled = false
     var isAutomaticLinkDetectionEnabled = true
     var hasVerticalScroller = false
+    var onToggleExpanded: (() -> Void)?
 
-    init(viewModel: RichTextViewModel, isAutomaticLinkDetectionEnabled: Bool = true, hasVerticalScroller: Bool = true) {
+    init(viewModel: RichTextViewModel, isAutomaticLinkDetectionEnabled: Bool = true, hasVerticalScroller: Bool = true, onToggleExpanded: (() -> Void)? = nil) {
         self.viewModel = viewModel
         self.isAutomaticLinkDetectionEnabled = isAutomaticLinkDetectionEnabled
         self.hasVerticalScroller = hasVerticalScroller
+        self.onToggleExpanded = onToggleExpanded
     }
 
     init(data: Data) {
@@ -28,7 +32,7 @@ struct RichTextView: View {
         self.init(viewModel: RichTextViewModel(string: string))
     }
 
-    #if os(iOS)
+#if os(iOS)
     var body: some View {
         VStack(spacing: 0) {
             HStack(spacing: 8) {
@@ -36,38 +40,59 @@ struct RichTextView: View {
                     if isEditing {
                         viewModel.isSearching = isEditing
                     }
-                })
+                }, inputAccessoryView: {
+                    let view = SearchToobar(viewModel: viewModel)
+                    let vc = UIHostingController(rootView: view)
+                    vc.view.frame = CGRect(x: 0, y: 0, width: 320, height: 44) // Important
+                    return vc.view
+                }())
 
                 if #available(iOS 14.0, *) {
                     StringSearchOptionsMenu(options: $viewModel.options, isKindNeeded: false)
+                }
+                if let onToggleExpanded = onToggleExpanded {
+                    Button(action: {
+                        isExpanded.toggle()
+                        onToggleExpanded()
+                    }) {
+                        Image(systemName: isExpanded ? "arrow.down.right.and.arrow.up.left" : "arrow.up.left.and.arrow.down.right")
+                    }
+                    .padding(.leading, 6)
                 }
             }
             .padding(.leading, 4)
             .padding(.trailing, 12)
             .padding(.bottom, -2)
+            .padding(.top, -2)
+            .border(width: isScrolled ? 1 : 0, edges: [.bottom], color: Color(UXColor.separator).opacity(0.3))
 
-            WrappedTextView(text: viewModel.text, viewModel: viewModel, isAutomaticLinkDetectionEnabled: isAutomaticLinkDetectionEnabled)
-
-            if viewModel.isSearching {
-                SearchToobar(viewModel: viewModel)
-            }
+            WrappedTextView(text: viewModel.text, viewModel: viewModel, isAutomaticLinkDetectionEnabled: isAutomaticLinkDetectionEnabled, onContentOffsetChanged: { offset in
+                let isScrolled = offset.y > 10.0
+                if self.isScrolled != isScrolled {
+                    DispatchQueue.main.async {
+                        if self.isScrolled != isScrolled {
+                            self.isScrolled = isScrolled
+                        }
+                    }
+                }
+            })
         }
     }
-    #else
+#else
     var body: some View {
         VStack(spacing: 0) {
-            #if os(macOS)
+#if os(macOS)
             WrappedTextView(text: viewModel.text, viewModel: viewModel, isAutomaticLinkDetectionEnabled: isAutomaticLinkDetectionEnabled, hasVerticalScroller: hasVerticalScroller)
-            #else
+#else
             WrappedTextView(text: viewModel.text, viewModel: viewModel, isAutomaticLinkDetectionEnabled: isAutomaticLinkDetectionEnabled)
-            #endif
-            #if !os(tvOS)
+#endif
+#if !os(tvOS)
             Divider()
             SearchToobar(viewModel: viewModel)
-            #endif
+#endif
         }
     }
-    #endif
+#endif
 }
 
 #if os(tvOS) || os(iOS)
@@ -75,16 +100,71 @@ private struct WrappedTextView: UIViewRepresentable {
     let text: NSAttributedString
     let viewModel: RichTextViewModel
     let isAutomaticLinkDetectionEnabled: Bool
+    var onContentOffsetChanged: ((CGPoint) -> Void)?
+
+    private final class TextView: UXTextView {
+        private var keyboardEndFrame: CGRect = .zero
+        private var cancellable: AnyObject?
+
+        var onContentOffsetChanged: ((CGPoint) -> Void)?
+
+        func register() {
+            let notificationCenter = NotificationCenter.default
+            notificationCenter.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillHideNotification, object: nil)
+            notificationCenter.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
+
+            cancellable = observe(\.contentOffset, options: [.new]) { [weak self] _, value in
+                if let newValue = value.newValue {
+                    self?.onContentOffsetChanged?(newValue)
+                }
+            }
+        }
+
+        @objc func adjustForKeyboard(notification: Notification) {
+            guard let superview = self.superview else {
+                return
+            }
+            guard let keyboardValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else { return }
+
+            let keyboardScreenEndFrame = keyboardValue.cgRectValue
+            let keyboardViewEndFrame = superview.convert(keyboardScreenEndFrame, from: window)
+
+            if notification.name == UIResponder.keyboardWillHideNotification {
+                self.keyboardEndFrame = .zero
+            } else {
+                self.keyboardEndFrame = keyboardViewEndFrame
+            }
+
+            refreshInsets()
+        }
+
+        override func safeAreaInsetsDidChange() {
+            super.safeAreaInsetsDidChange()
+
+            refreshInsets()
+        }
+
+        private func refreshInsets() {
+            if keyboardEndFrame.height > 0 {
+                contentInset = UIEdgeInsets(top: 0, left: 0, bottom: keyboardEndFrame.height - safeAreaInsets.bottom, right: 0)
+            } else {
+                contentInset = .zero
+            }
+            scrollIndicatorInsets = contentInset
+        }
+    }
 
     func makeUIView(context: Context) -> UXTextView {
-        let textView = UXTextView()
+        let textView = TextView()
         configureTextView(textView)
         textView.autocorrectionType = .no
         textView.autocapitalizationType = .none
-        #if !os(tvOS)
+#if !os(tvOS)
         textView.isAutomaticLinkDetectionEnabled = isAutomaticLinkDetectionEnabled
-        #endif
+#endif
         textView.textContainerInset = UIEdgeInsets(top: 8, left: 10, bottom: 8, right: 10)
+        textView.register()
+        textView.onContentOffsetChanged = onContentOffsetChanged
         viewModel.textView = textView
         return textView
     }
@@ -122,13 +202,13 @@ private struct WrappedTextView: NSViewRepresentable {
 
 private func configureTextView(_ textView: UXTextView) {
     textView.isSelectable = true
-    #if !os(tvOS)
+#if !os(tvOS)
     textView.isEditable = false
     textView.linkTextAttributes = [
         .foregroundColor: JSONColors.valueString,
         .underlineStyle: 1
     ]
-    #endif
+#endif
     textView.backgroundColor = .clear
 }
 #endif
@@ -137,7 +217,7 @@ private func configureTextView(_ textView: UXTextView) {
 private struct SearchToobar: View {
     @ObservedObject var viewModel: RichTextViewModel
 
-    #if os(iOS)
+#if os(iOS)
     var body: some View {
         HStack {
             HStack(spacing: 12) {
@@ -161,7 +241,7 @@ private struct SearchToobar: View {
         .border(width: 1, edges: [.top], color: Color(UXColor.separator).opacity(0.3))
         .backport.backgroundThinMaterial()
     }
-    #else
+#else
     var body: some View {
         HStack {
             SearchBar(title: "Search", text: $viewModel.searchTerm, onEditingChanged: { isEditing in
@@ -191,7 +271,7 @@ private struct SearchToobar: View {
         }
         .padding(6)
     }
-    #endif
+#endif
 }
 #endif
 
@@ -230,11 +310,11 @@ final class RichTextViewModel: ObservableObject {
     }
 
     convenience init(string: String) {
-        #if os(macOS)
+#if os(macOS)
         self.init(string: NSAttributedString(string: string, attributes: [.font: NSFont.preferredFont(forTextStyle: .body, options: [:]), .foregroundColor: UXColor.label]))
-        #else
+#else
         self.init(string: NSAttributedString(string: string, attributes: [.font: UXFont.systemFont(ofSize: FontSize.body, weight: .regular), .foregroundColor: UXColor.label]))
-        #endif
+#endif
     }
 
     init(string: NSAttributedString) {
@@ -344,6 +424,7 @@ struct RichTextView_Previews: PreviewProvider {
 @available(tvOS 14.0, *)
 struct RichTextView: View {
     let viewModel: RichTextViewModel
+    var onToggleExpanded: (() -> Void)?
 
     var body: some View {
         Text(viewModel.text)
