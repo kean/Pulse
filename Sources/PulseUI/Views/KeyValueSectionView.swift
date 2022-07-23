@@ -9,6 +9,15 @@ struct KeyValueSectionView: View {
     let viewModel: KeyValueSectionViewModel
     var limit: Int = Int.max
 
+    init(viewModel: KeyValueSectionViewModel) {
+        self.viewModel = viewModel
+    }
+
+    init(viewModel: KeyValueSectionViewModel, limit: Int) {
+        self.viewModel = viewModel
+        self.limit = limit
+    }
+
     private var actualTintColor: Color {
         viewModel.items.isEmpty ? .gray : viewModel.color
     }
@@ -152,7 +161,7 @@ private struct KeyValueListView: View {
                 .lineLimit(nil)
             #else
             (title + value)
-                .lineLimit(row.item.0 == "URL" ? 10 : 4)
+                .lineLimit(row.item.0 == "URL" ? 8 : 3)
                 .contextMenu(ContextMenu(menuItems: {
                     Button(action: {
                         UXPasteboard.general.string = "\(row.item.0): \(row.item.1 ?? "–")"
@@ -218,7 +227,7 @@ struct KeyValueSectionViewModel {
     let title: String
     let color: Color
     var action: ActionViewModel?
-    let items: [(String, String?)]
+    var items: [(String, String?)] = []
 }
 
 private struct Row {
@@ -229,18 +238,4 @@ private struct Row {
 struct ActionViewModel {
     let action: () -> Void
     let title: String
-}
-
-extension KeyValueSectionViewModel {
-    static func makeRequestParameters(for request: NetworkLoggerRequest) -> KeyValueSectionViewModel {
-        KeyValueSectionViewModel(title: "Request Parameters", color: .gray, items: [
-            ("Cache Policy", URLRequest.CachePolicy(rawValue: request.cachePolicy).map { $0.description }),
-            ("Timeout Interval", DurationFormatter.string(from: request.timeoutInterval)),
-            ("Allows Cellular Access", request.allowsCellularAccess.description),
-            ("Allows Expensive Network Access", request.allowsExpensiveNetworkAccess.description),
-            ("Allows Constrained Network Access", request.allowsConstrainedNetworkAccess.description),
-            ("HTTP Should Handle Cookies", request.httpShouldHandleCookies.description),
-            ("HTTP Should Use Pipelining", request.httpShouldUsePipelining.description)
-        ])
-    }
 }

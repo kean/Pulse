@@ -5,8 +5,6 @@
 import SwiftUI
 import PulseCore
 
-// MARK: - View
-
 #if os(iOS) || os(watchOS) || os(macOS)
 
 struct NetworkInspectorSummaryView: View {
@@ -37,28 +35,23 @@ struct NetworkInspectorSummaryView: View {
         }
         #endif
         KeyValueSectionView(viewModel: viewModel.summaryModel)
-        if let error = viewModel.errorModel {
-            KeyValueSectionView(viewModel: error)
+        viewModel.errorModel.map(KeyValueSectionView.init)
+        viewModel.timingDetailsModel.map(KeyValueSectionView.init)
+        if let requestSummary = viewModel.requestSummary {
+            Section(header: LargeSectionHeader(title: "Request")) {
+                KeyValueSectionView(viewModel: requestSummary)
+                KeyValueSectionView(viewModel: viewModel.requestHeaders, limit: 10)
+                KeyValueSectionView(viewModel: viewModel.requestBodySection)
+                viewModel.requestParameters.map(KeyValueSectionView.init)
+            }
         }
-        if let request = viewModel.requestBodySection {
-            KeyValueSectionView(viewModel: request)
+        if let responseSummary = viewModel.responseSummary {
+            Section(header: LargeSectionHeader(title: "Response")) {
+                KeyValueSectionView(viewModel: responseSummary)
+                KeyValueSectionView(viewModel: viewModel.responseHeaders, limit: 10)
+                KeyValueSectionView(viewModel: viewModel.responseBodySection)
+            }
         }
-        if let response = viewModel.responseBodySection {
-            KeyValueSectionView(viewModel: response)
-        }
-        if let timing = viewModel.timingDetailsModel {
-            KeyValueSectionView(viewModel: timing)
-        }
-        if let parameters = viewModel.parametersModel {
-            KeyValueSectionView(viewModel: parameters)
-        }
-
-        #if os(watchOS)
-        KeyValueSectionView(viewModel: viewModel.requestHeaders)
-        if let responseHeaders = viewModel.responseHeaders {
-            KeyValueSectionView(viewModel: responseHeaders)
-        }
-        #endif
 
         linksView
 
@@ -70,206 +63,33 @@ struct NetworkInspectorSummaryView: View {
     private var linksView: some View {
         VStack {
             if let errorModel = viewModel.errorModel {
-                NavigationLink(destination: NetworkHeadersDetailsView(viewModel: errorModel), isActive: $viewModel.isErrorRawActive) {
-                    Text("")
+                NavigationLink.programmatic(isActive: $viewModel.isErrorRawLinkActive) {
+                    NetworkHeadersDetailsView(viewModel: errorModel)
                 }
             }
 
-            NavigationLink(destination: NetworkInspectorResponseView(viewModel: viewModel.requestBodyViewModel), isActive: $viewModel.isRequestRawActive) {
-                Text("")
-            }
+            NavigationLink.programmatic(isActive: $viewModel.isRequestRawLinkActive, destination: {
+                NetworkInspectorResponseView(viewModel: viewModel.requestBodyViewModel)
+            })
 
-            NavigationLink(destination: NetworkInspectorResponseView(viewModel: viewModel.responseBodyViewModel), isActive: $viewModel.isResponseRawActive) {
-                Text("")
-            }
+            NavigationLink.programmatic(isActive: $viewModel.isResponseRawLinkActive, destination: {
+                NetworkInspectorResponseView(viewModel: viewModel.responseBodyViewModel)
+            })
 
-            #if os(watchOS)
-            NavigationLink(destination: NetworkHeadersDetailsView(viewModel: viewModel.requestHeaders), isActive: $viewModel.isRequestHeadersRawActive) {
-                Text("")
+            NavigationLink.programmatic(isActive: $viewModel.isRequestHeadersLinkActive) {
+                NetworkHeadersDetailsView(viewModel: viewModel.requestHeaders)
             }
 
             if let responesHeaders = viewModel.responseHeaders {
-                NavigationLink(destination: NetworkHeadersDetailsView(viewModel: responesHeaders), isActive: $viewModel.isResponseHeadearsRawActive) {
-                    Text("")
+                NavigationLink.programmatic(isActive: $viewModel.isResponseHeadearsRawLinkActive) {
+                    NetworkHeadersDetailsView(viewModel: responesHeaders)
                 }
             }
-            #endif
         }
         .frame(height: 0)
         .hidden()
-
+        .backport.hideAccessibility()
     }
 }
 
 #endif
-
-// MARK: - ViewModel
-
-final class NetworkInspectorSummaryViewModel: ObservableObject {
-    private let summary: NetworkLoggerSummary
-
-    @Published var isErrorRawActive = false
-    @Published var isRequestRawActive = false
-    @Published var isResponseRawActive = false
-
-    #if os(watchOS) || os(tvOS)
-    @Published var isRequestHeadersRawActive = false
-    @Published var isRequestAdditionalHeadersRawActive = false
-    @Published var isResponseHeadearsRawActive = false
-    #endif
-
-    init(summary: NetworkLoggerSummary) {
-        self.summary = summary
-    }
-
-    private var tintColor: Color {
-        switch summary.state {
-        case .pending: return .orange
-        case .success: return .green
-        case .failure: return .red
-        }
-    }
-
-    var summaryModel: KeyValueSectionViewModel {
-        var items: [(String, String?)] = [
-            ("Status Code", summary.response?.statusCode.map(StatusCodeFormatter.string) ?? "–"),
-            ("Method", summary.originalRequest?.httpMethod ?? "–"),
-            ("URL", summary.originalRequest?.url?.absoluteString ?? "–"),
-            ("Domain", summary.originalRequest?.url?.host ?? "–")
-        ]
-        if summary.originalRequest?.url != summary.currentRequest?.url && summary.currentRequest?.url != nil {
-            items.append(("Redirect", summary.currentRequest?.url?.absoluteString ?? "–"))
-        }
-
-        return KeyValueSectionViewModel(title: "Summary", color: tintColor, items: items)
-    }
-
-    var errorModel: KeyValueSectionViewModel? {
-        guard let error = summary.error else { return nil }
-        return KeyValueSectionViewModel(
-            title: "Error",
-            color: .red,
-            action: ActionViewModel(
-                action: { [unowned self] in isErrorRawActive = true },
-                title: "View"
-            ),
-            items: [
-                ("Domain", error.domain),
-                ("Code", descriptionForError(domain: error.domain, code: error.code)),
-                ("Message", error.localizedDescription)
-            ])
-    }
-
-    var requestBodySection: KeyValueSectionViewModel? {
-        guard summary.requestBodyKey != nil, summary.requestBodySize > 0 else {
-            return nil
-        }
-        let contentType = summary.originalRequest?.headers.first(where: { $0.key == "Content-Type" })?.value ?? "–"
-        return KeyValueSectionViewModel(
-            title: "Request Body",
-            color: .blue,
-            action: ActionViewModel(
-                action: { [unowned self] in isRequestRawActive = true },
-                title: "View"
-            ),
-            items: [
-                ("Content-Type", contentType),
-                ("Size", ByteCountFormatter.string(fromByteCount: summary.requestBodySize, countStyle: .file))
-            ]
-        )
-    }
-
-    var responseBodySection: KeyValueSectionViewModel? {
-        guard summary.responseBodyKey != nil, summary.responseBodySize > 0 else {
-            return nil
-        }
-        let contentType = summary.response?.headers.first(where: { $0.key == "Content-Type" })?.value ?? "–"
-        let size = ByteCountFormatter.string(fromByteCount: summary.responseBodySize, countStyle: .file)
-        return KeyValueSectionViewModel(
-            title: "Response Body",
-            color: .indigo,
-            action: ActionViewModel(
-                action: { [unowned self] in isResponseRawActive = true },
-                title: "View"
-            ),
-            items: [
-                ("Content-Type", contentType),
-                ("Size", summary.isFromCache ? size + " (from cache)": size)
-            ]
-        )
-    }
-
-    var requestBodyViewModel: NetworkInspectorResponseViewModel {
-        let summary = self.summary
-        return NetworkInspectorResponseViewModel(title: "Request", data: summary.requestBody ?? Data())
-    }
-
-    var responseBodyViewModel: NetworkInspectorResponseViewModel {
-        let summary = self.summary
-        return NetworkInspectorResponseViewModel(title: "Response", data: summary.responseBody ?? Data())
-    }
-
-    var transferModel: NetworkInspectorTransferInfoViewModel? {
-        summary.metrics.flatMap(NetworkInspectorTransferInfoViewModel.init)
-    }
-
-    var timingDetailsModel: KeyValueSectionViewModel? {
-        guard let metrics = summary.metrics else { return nil }
-        return KeyValueSectionViewModel(title: "Timing", color: .gray, items: [
-            ("Start Date", isoFormatter.string(from: metrics.taskInterval.start)),
-            ("End Date", isoFormatter.string(from: metrics.taskInterval.end)),
-            ("Duration", DurationFormatter.string(from: metrics.taskInterval.duration)),
-            ("Redirect Count", metrics.redirectCount.description)
-        ])
-    }
-
-    var parametersModel: KeyValueSectionViewModel? {
-        summary.originalRequest.map(KeyValueSectionViewModel.makeRequestParameters)
-    }
-
-    #if os(watchOS) || os(tvOS)
-    // TODO: Update to support original/current request
-    var requestHeaders: KeyValueSectionViewModel {
-        let items = (summary.currentRequest?.headers ?? [:]).sorted(by: { $0.key < $1.key })
-        return KeyValueSectionViewModel(
-            title: "Request Headers",
-            color: .blue,
-            action: ActionViewModel(
-                action: { [unowned self] in isRequestHeadersRawActive = true },
-                title: "View Raw"
-            ),
-            items: items
-        )
-    }
-
-    var responseHeaders: KeyValueSectionViewModel? {
-        guard let headers = summary.response?.headers else {
-            return nil
-        }
-        return KeyValueSectionViewModel(
-            title: "Response Headers",
-            color: .indigo,
-            action: ActionViewModel(
-                action: { [unowned self] in isResponseHeadearsRawActive = true },
-                title: "View Raw"
-            ),
-            items: headers.sorted(by: { $0.key < $1.key })
-        )
-    }
-    #endif
-}
-
-// MARK: - Private
-
-private let isoFormatter: ISO8601DateFormatter = {
-    let f = ISO8601DateFormatter()
-    f.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-    return f
-}()
-
-private func descriptionForError(domain: String, code: Int) -> String {
-    guard domain == NSURLErrorDomain else {
-        return "\(code)"
-    }
-    return "\(code) (\(descriptionForURLErrorCode(code)))"
-}

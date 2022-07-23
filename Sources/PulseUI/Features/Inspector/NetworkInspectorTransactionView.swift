@@ -19,23 +19,23 @@ struct NetworkInspectorTransactionView: View {
                     if !viewModel.timing.isEmpty {
                         TimingView(viewModel: viewModel.timing, width: geo.size.width - 32)
                     }
-                    Section(header: SectionHeader(title: "Request")) {
+                    Section(header: LargeSectionHeader(title: "Request")) {
                         KeyValueSectionView(viewModel: viewModel.requestSummary)
                         KeyValueSectionView(viewModel: viewModel.requestHeaders)
                         if let requestParameters = viewModel.requestParameters {
                             KeyValueSectionView(viewModel: requestParameters)
                         }
                     }
-                    Section(header: SectionHeader(title: "Response")) {
+                    Section(header: LargeSectionHeader(title: "Response")) {
                         KeyValueSectionView(viewModel: viewModel.responseSummary)
                         KeyValueSectionView(viewModel: viewModel.responseHeaders)
                     }
-                    Section(header: SectionHeader(title: "Details")) {
+                    Section(header: LargeSectionHeader(title: "Details")) {
                         ForEach(viewModel.details.sections, id: \.title) {
                             KeyValueSectionView(viewModel: $0)
                         }
                     }
-                    Section(header: SectionHeader(title: "Timing")) {
+                    Section(header: LargeSectionHeader(title: "Timing")) {
                         KeyValueSectionView(viewModel: viewModel.timingSummary)
                     }
                 }
@@ -43,24 +43,6 @@ struct NetworkInspectorTransactionView: View {
             }
         }
         .background(links)
-    }
-
-    struct SectionHeader: View {
-        let title: String
-
-        var body: some View {
-            VStack(spacing: 10) {
-                HStack {
-                    Text(title)
-                        .bold()
-                        .font(.title)
-                        .padding(.top, 16)
-                    Spacer()
-                }
-                Divider()
-            }
-            .padding(.bottom, 8)
-        }
     }
 
     @ViewBuilder
@@ -91,94 +73,29 @@ final class NetworkInspectorTransactionViewModel: ObservableObject {
         guard let request = transaction.request else {
             return KeyValueSectionViewModel(title: "Request", color: .secondary, items: [])
         }
-        return KeyValueSectionViewModel(
-            title: "Request Summary",
-            color: .blue,
-            items: [
-                ("URL", request.url?.absoluteString),
-                ("HTTP Method", request.httpMethod)
-            ]
-        )
+        return KeyValueSectionViewModel.makeSummary(for: request)
     }()
 
-    lazy var requestParameters: KeyValueSectionViewModel? = {
-        transaction.request.map(KeyValueSectionViewModel.makeRequestParameters)
-    }()
+    lazy var requestParameters = transaction.request.map(KeyValueSectionViewModel.makeParameters)
 
-    lazy var requestHeaders: KeyValueSectionViewModel = {
-        let items = (transaction.request?.headers ?? [:]).sorted(by: { $0.key < $1.key })
-        return KeyValueSectionViewModel(
-            title: "Request Headers",
-            color: .blue,
-            action: ActionViewModel(
-                action: { [unowned self] in isRequestHeadersLinkActive = true },
-                title: "View Raw"
-            ),
-            items: items
-        )
-    }()
+    lazy var requestHeaders = KeyValueSectionViewModel.makeRequestHeaders(
+        for: transaction.request?.headers ?? [:],
+        action: { [unowned self] in self.isRequestHeadersLinkActive = true }
+    )
 
     lazy var responseSummary: KeyValueSectionViewModel = {
         guard let response = transaction.response else {
-            return KeyValueSectionViewModel(title: "Response", color: .indigo, items: [])
+            return KeyValueSectionViewModel(title: "Response", color: .indigo)
         }
-        return KeyValueSectionViewModel(title: "Response Summary", color: .indigo, items: [
-            ("Status Code", response.statusCode.map { String($0) }),
-            ("Content Type", response.contentType),
-            ("Expected Content Length", response.expectedContentLength.map { ByteCountFormatter.string(fromByteCount: $0, countStyle: .file) })
-        ])
+        return KeyValueSectionViewModel.makeSummary(for: response)
     }()
 
-    lazy var responseHeaders: KeyValueSectionViewModel = {
-        let items = (transaction.response?.headers ?? [:]).sorted(by: { $0.key < $1.key })
-        return KeyValueSectionViewModel(
-            title: "Response Headers",
-            color: .indigo,
-            action: ActionViewModel(
-                action: { [unowned self] in isResponseHeadersLinkActive = true },
-                title: "View Raw"
-            ),
-            items: items
-        )
-    }()
+    lazy var responseHeaders = KeyValueSectionViewModel.makeRequestHeaders(
+        for: transaction.response?.headers ?? [:],
+        action: { [unowned self] in self.isResponseHeadersLinkActive = true }
+    )
 
-    lazy var timingSummary: KeyValueSectionViewModel = {
-        let timeFormatter = DateFormatter()
-        timeFormatter.dateFormat = "HH:mm:ss.SSS"
-
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateStyle = .medium
-        dateFormatter.doesRelativeDateFormatting = true
-
-        var startDate: Date?
-        var items: [(String, String?)] = []
-        func addDate(_ date: Date?, title: String) {
-            guard let date = date else { return }
-            if items.isEmpty {
-                startDate = date
-                items.append(("Date", dateFormatter.string(from: date)))
-            }
-            var value = timeFormatter.string(from: date)
-            if let startDate = startDate, startDate != date {
-                let duration = date.timeIntervalSince(startDate)
-                value += " (+\(DurationFormatter.string(from: duration)))"
-            }
-            items.append((title, value))
-        }
-        addDate(transaction.fetchStartDate, title: "Fetch Start")
-        addDate(transaction.domainLookupStartDate, title: "Domain Lookup Start")
-        addDate(transaction.domainLookupEndDate, title: "Domain Lookup End")
-        addDate(transaction.connectStartDate, title: "Connect Start")
-        addDate(transaction.secureConnectionStartDate, title: "Secure Connect Start")
-        addDate(transaction.secureConnectionEndDate, title: "Secure Connect End")
-        addDate(transaction.connectEndDate, title: "Connect End")
-        addDate(transaction.requestStartDate, title: "Request Start")
-        addDate(transaction.requestEndDate, title: "Request End")
-        addDate(transaction.responseStartDate, title: "Response Start")
-        addDate(transaction.responseEndDate, title: "Response End")
-
-        return KeyValueSectionViewModel(title: "Timing", color: .orange, items: items)
-    }()
+    lazy var timingSummary = KeyValueSectionViewModel.makeTiming(for: transaction)
 }
 
 #if DEBUG

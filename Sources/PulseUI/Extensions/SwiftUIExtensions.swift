@@ -53,7 +53,8 @@ extension Backport {
         }
     }
 
-    @ViewBuilder func swipeActions<T>(edge: HorizontalEdge = .trailing, allowsFullSwipe: Bool = true, @ViewBuilder content: () -> T) -> some View where T: View {
+    @ViewBuilder
+    func swipeActions<T>(edge: HorizontalEdge = .trailing, allowsFullSwipe: Bool = true, @ViewBuilder content: () -> T) -> some View where T: View {
 #if os(iOS) || os(watchOS)
         if #available(iOS 15.0, watchOS 8.0, *) {
             self.content.swipeActions(edge: edge.edge, allowsFullSwipe: allowsFullSwipe, content: content)
@@ -64,12 +65,20 @@ extension Backport {
         self.content
 #endif
     }
-}
 
-extension Backport {
-    @ViewBuilder func borderedButton() -> some View {
+    @ViewBuilder
+    func borderedButton() -> some View {
         if #available(iOS 15.0, watchOS 8.0, *) {
             self.content.buttonStyle(.bordered)
+        } else {
+            self.content
+        }
+    }
+
+    @ViewBuilder
+    func hideAccessibility() -> some View {
+        if #available(iOS 14.0, *) {
+            self.content.accessibilityHidden(true)
         } else {
             self.content
         }

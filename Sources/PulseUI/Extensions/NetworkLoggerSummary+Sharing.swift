@@ -25,6 +25,7 @@ extension NetworkLoggerSummary {
 
         let headers = NetworkInspectorHeaderViewModel(summary: self)
 
+        #warning("TODO: update")
         renderer.add(title: "Request")
         renderer.add(headers.requestHeadersOriginal)
         if let body = requestBody, !body.isEmpty {
@@ -51,7 +52,6 @@ extension NetworkLoggerSummary {
                 ("Body Received", transferModel.bodyBytesReceived)
             ]))
         }
-        renderer.add(summary.parametersModel)
 
         return renderer.finalize(title: "Request Log")
     }

@@ -13,7 +13,6 @@ struct NetworkInspectorResponseView: View {
 #if os(iOS)
     var body: some View {
         contents
-            .navigationBarTitle(viewModel.title)
             .navigationBarItems(trailing: trailingNavigationBarItems)
     }
 
