@@ -35,6 +35,10 @@ struct SearchBar: UIViewRepresentable {
         func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
             self.onEditingChanged?(false)
         }
+
+        func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+            searchBar.resignFirstResponder()
+        }
     }
 
     func makeCoordinator() -> Coordinator {

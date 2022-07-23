@@ -14,7 +14,6 @@ struct NetworkInspectorResponseView: View {
 #if os(iOS)
     var body: some View {
         contents
-            .edgesIgnoringSafeArea(.bottom)
     }
 #elseif os(macOS)
     var body: some View {

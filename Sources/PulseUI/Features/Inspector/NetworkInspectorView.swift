@@ -248,8 +248,14 @@ final class NetworkInspectorViewModel: ObservableObject {
         }
 
         self.cancellable = request.objectWillChange.sink { [weak self] in
-            self?.summary = NetworkLoggerSummary(request: request, store: store)
+            self?.refresh()
         }
+    }
+
+    private func refresh() {
+        _requestViewModel = nil
+        _responseViewModel = nil
+        summary = NetworkLoggerSummary(request: request, store: store)
     }
 
     var pin: PinButtonViewModel? {
@@ -280,14 +286,30 @@ final class NetworkInspectorViewModel: ObservableObject {
         NetworkInspectorHeaderViewModel(summary: summary)
     }
 
+    // important:
+    private var _requestViewModel: NetworkInspectorResponseViewModel?
+
     func makeRequestBodyViewModel() -> NetworkInspectorResponseViewModel? {
+        if let viewModel = _requestViewModel {
+            return viewModel
+        }
         guard let requestBody = summary.requestBody, !requestBody.isEmpty else { return nil }
-        return NetworkInspectorResponseViewModel(title: "Request", data: requestBody)
+        let viewModel = NetworkInspectorResponseViewModel(title: "Request", data: requestBody)
+        _requestViewModel = viewModel
+        return viewModel
     }
 
+    // imporant:
+    private var _responseViewModel: NetworkInspectorResponseViewModel?
+
     func makeResponseBodyViewModel() -> NetworkInspectorResponseViewModel? {
+        if let viewModel = _responseViewModel {
+            return viewModel
+        }
         guard let responseBody = summary.responseBody, !responseBody.isEmpty else { return nil }
-        return NetworkInspectorResponseViewModel(title: "Response", data: responseBody)
+        let viewModel = NetworkInspectorResponseViewModel(title: "Response", data: responseBody)
+        _responseViewModel = viewModel
+        return viewModel
     }
 
 #if !os(watchOS)

@@ -35,48 +35,44 @@ struct RichTextView: View {
 #if os(iOS)
     var body: some View {
         VStack(spacing: 0) {
-            HStack(spacing: 8) {
-                SearchBar(title: "Search", text: $viewModel.searchTerm, onEditingChanged: { isEditing in
-                    if isEditing {
-                        viewModel.isSearching = isEditing
-                    }
-                }, inputAccessoryView: {
-                    let view = SearchToobar(viewModel: viewModel)
-                    let vc = UIHostingController(rootView: view)
-                    vc.view.frame = CGRect(x: 0, y: 0, width: 320, height: 44) // Important
-                    return vc.view
-                }())
-
-                if #available(iOS 14.0, *) {
-                    StringSearchOptionsMenu(options: $viewModel.options, isKindNeeded: false)
-                }
-                if let onToggleExpanded = onToggleExpanded {
-                    Button(action: {
-                        isExpanded.toggle()
-                        onToggleExpanded()
-                    }) {
-                        Image(systemName: isExpanded ? "arrow.down.right.and.arrow.up.left" : "arrow.up.left.and.arrow.down.right")
-                    }
-                    .padding(.leading, 6)
-                }
+            searchToolbar
+            textView
+            if viewModel.isSearching {
+                SearchToobar(viewModel: viewModel)
             }
-            .padding(.leading, 4)
-            .padding(.trailing, 12)
-            .padding(.bottom, -2)
-            .padding(.top, -2)
-            .border(width: isScrolled ? 1 : 0, edges: [.bottom], color: Color(UXColor.separator).opacity(0.3))
+        }
+    }
 
-            WrappedTextView(text: viewModel.text, viewModel: viewModel, isAutomaticLinkDetectionEnabled: isAutomaticLinkDetectionEnabled, onContentOffsetChanged: { offset in
-                let isScrolled = offset.y > 10.0
-                if self.isScrolled != isScrolled {
-                    DispatchQueue.main.async {
-                        if self.isScrolled != isScrolled {
-                            self.isScrolled = isScrolled
-                        }
-                    }
+    private var searchToolbar: some View {
+        HStack(spacing: 8) {
+            SearchBar(title: "Search", text: $viewModel.searchTerm, onEditingChanged: { isEditing in
+                if isEditing {
+                    viewModel.isSearching = isEditing
                 }
             })
+
+            if #available(iOS 14.0, *) {
+                StringSearchOptionsMenu(options: $viewModel.options, isKindNeeded: false)
+            }
+            if let onToggleExpanded = onToggleExpanded {
+                Button(action: {
+                    isExpanded.toggle()
+                    onToggleExpanded()
+                }) {
+                    Image(systemName: isExpanded ? "arrow.down.right.and.arrow.up.left" : "arrow.up.left.and.arrow.down.right")
+                }
+                .padding(.leading, 6)
+            }
         }
+        .padding(.leading, 4)
+        .padding(.trailing, 12)
+        .padding(.bottom, -2)
+        .padding(.top, -2)
+        .border(width: isScrolled ? 1 : 0, edges: [.bottom], color: Color(UXColor.separator).opacity(0.3))
+    }
+
+    private var textView: some View {
+        WrappedTextView(text: viewModel.text, viewModel: viewModel, isAutomaticLinkDetectionEnabled: isAutomaticLinkDetectionEnabled, isScrolled: $isScrolled)
     }
 #else
     var body: some View {
@@ -100,64 +96,18 @@ private struct WrappedTextView: UIViewRepresentable {
     let text: NSAttributedString
     let viewModel: RichTextViewModel
     let isAutomaticLinkDetectionEnabled: Bool
-    var onContentOffsetChanged: ((CGPoint) -> Void)?
+    @Binding var isScrolled: Bool
 
-    private final class TextView: UXTextView {
-        private var keyboardEndFrame: CGRect = .zero
-        private var cancellable: AnyObject?
+    final class Coordinator {
+        var cancellables: [AnyCancellable] = []
+    }
 
-        var onContentOffsetChanged: ((CGPoint) -> Void)?
-
-        func register() {
-            let notificationCenter = NotificationCenter.default
-            notificationCenter.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillHideNotification, object: nil)
-            notificationCenter.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
-
-            cancellable = observe(\.contentOffset, options: [.new]) { [weak self] _, value in
-                if let newValue = value.newValue {
-                    self?.onContentOffsetChanged?(newValue)
-                }
-            }
-        }
-
-        @objc func adjustForKeyboard(notification: Notification) {
-            guard let superview = self.superview else {
-                return
-            }
-            guard let keyboardValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else { return }
-
-            let keyboardScreenEndFrame = keyboardValue.cgRectValue
-            let keyboardViewEndFrame = superview.convert(keyboardScreenEndFrame, from: window)
-
-            if notification.name == UIResponder.keyboardWillHideNotification {
-                self.keyboardEndFrame = .zero
-            } else {
-                self.keyboardEndFrame = keyboardViewEndFrame
-            }
-
-            refreshInsets()
-        }
-
-        override func safeAreaInsetsDidChange() {
-            super.safeAreaInsetsDidChange()
-
-            refreshInsets()
-        }
-
-        private func refreshInsets() {
-            if keyboardEndFrame.height > 0 {
-                contentInset = UIEdgeInsets(top: 0, left: 0, bottom: keyboardEndFrame.height - safeAreaInsets.bottom, right: 0)
-            } else {
-                contentInset = .zero
-            }
-            var newScrollIndicatorInsets = contentInset
-            newScrollIndicatorInsets.top -= 1
-            scrollIndicatorInsets = newScrollIndicatorInsets
-        }
+    func makeCoordinator() -> Coordinator {
+        Coordinator()
     }
 
     func makeUIView(context: Context) -> UXTextView {
-        let textView = TextView()
+        let textView = UITextView()
         configureTextView(textView)
         textView.autocorrectionType = .no
         textView.autocapitalizationType = .none
@@ -165,15 +115,19 @@ private struct WrappedTextView: UIViewRepresentable {
         textView.isAutomaticLinkDetectionEnabled = isAutomaticLinkDetectionEnabled
 #endif
         textView.textContainerInset = UIEdgeInsets(top: 8, left: 10, bottom: 8, right: 10)
-        textView.register()
-        textView.onContentOffsetChanged = onContentOffsetChanged
+        textView.attributedText = text
+        textView.publisher(for: \.contentOffset, options: [.new])
+            .map { $0.y >= 10 }
+            .removeDuplicates()
+            .receive(on: DispatchQueue.main)
+            .sink { isScrolled = $0 }
+            .store(in: &context.coordinator.cancellables)
         viewModel.textView = textView
         return textView
     }
 
     func updateUIView(_ uiView: UXTextView, context: Context) {
-        uiView.attributedText = text
-        viewModel.textView = uiView
+        // Do nothing
     }
 }
 #elseif os(macOS)
