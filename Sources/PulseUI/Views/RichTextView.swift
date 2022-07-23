@@ -38,6 +38,7 @@ struct RichTextView: View {
             searchToolbar
                 .backport.backgroundThickMaterial(enabled: isExpanded && isScrolled)
             textView
+                .edgesIgnoringSafeArea(.bottom)
             if viewModel.isSearching {
                 SearchToobar(viewModel: viewModel)
             }
