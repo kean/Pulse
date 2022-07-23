@@ -150,7 +150,9 @@ private struct WrappedTextView: UIViewRepresentable {
             } else {
                 contentInset = .zero
             }
-            scrollIndicatorInsets = contentInset
+            var newScrollIndicatorInsets = contentInset
+            newScrollIndicatorInsets.top -= 1
+            scrollIndicatorInsets = newScrollIndicatorInsets
         }
     }
 

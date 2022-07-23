@@ -149,7 +149,6 @@ struct NetworkInspectorView: View {
             isExpanded.toggle()
             viewController?.navigationController?.setNavigationBarHidden(isExpanded, animated: false)
             viewController?.tabBarController?.setTabBarHidden(isExpanded, animated: false)
-
         }
 #else
         NetworkInspectorResponseView(viewModel: viewModel)
