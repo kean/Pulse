@@ -167,6 +167,9 @@ struct NetworkInspectorSummaryView: View {
 
             NavigationLink.programmatic(isActive: $viewModel.isRequestRawLinkActive, destination: {
                 NetworkInspectorResponseView(viewModel: viewModel.requestBodyViewModel)
+#if os(iOS)
+                    .navigationBarTitle("Request")
+#endif
             })
 
             NavigationLink.programmatic(isActive: $viewModel.isCurrentQueryItemsLinkActive) {
@@ -175,6 +178,9 @@ struct NetworkInspectorSummaryView: View {
 
             NavigationLink.programmatic(isActive: $viewModel.isResponseRawLinkActive, destination: {
                 NetworkInspectorResponseView(viewModel: viewModel.responseBodyViewModel)
+#if os(iOS)
+                    .navigationBarTitle("Response")
+#endif
             })
 
             NavigationLink.programmatic(isActive: $viewModel.isOriginalRequestHeadersLinkActive) {
