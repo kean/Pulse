@@ -37,9 +37,10 @@ struct KeyValueSectionView: View {
                             .font(.caption)
                             .padding(.top, 2)
                     })
-                    .padding(EdgeInsets(top: 7, leading: 11, bottom: 7, trailing: 11))
+                    .foregroundColor(.primary)
+                    .padding(EdgeInsets(top: 6, leading: 12, bottom: 6, trailing: 12))
                     .background(Color.secondaryFill)
-                    .cornerRadius(20)
+                    .cornerRadius(12)
                     .frame(height: 20, alignment: .center)
                 }
                 #endif
