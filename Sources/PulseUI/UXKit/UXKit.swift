@@ -67,7 +67,9 @@ extension NSColor {
 }
 
 #else
+#if os(iOS)
 typealias UXView = UIView
+#endif
 typealias UXColor = UIColor
 typealias UXFont = UIFont
 typealias UXImage = UIImage

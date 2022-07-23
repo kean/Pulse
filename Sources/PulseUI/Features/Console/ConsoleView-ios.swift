@@ -45,7 +45,7 @@ public struct ConsoleView: View {
 
     @ViewBuilder
     private var tableOverlay: some View {
-        if viewModel.messages.isEmpty {
+        if viewModel.entities.isEmpty {
             PlaceholderView.make(viewModel: viewModel)
         }
     }
@@ -66,8 +66,8 @@ public struct ConsoleView: View {
                 }
                 Section {
                     ButtonRemoveAll(action: viewModel.buttonRemoveAllMessagesTapped)
-                        .disabled(viewModel.messages.isEmpty)
-                        .opacity(viewModel.messages.isEmpty ? 0.33 : 1)
+                        .disabled(viewModel.entities.isEmpty)
+                        .opacity(viewModel.entities.isEmpty ? 0.33 : 1)
                 }
             }, label: {
                 Image(systemName: "ellipsis.circle")
@@ -83,11 +83,12 @@ public struct ConsoleView: View {
 private struct ConsoleToolbarView: View {
     @ObservedObject var viewModel: ConsoleViewModel
     @State private var isShowingFilters = false
+    @State private var messageCount = 0
 
     var body: some View {
         VStack(spacing: 8) {
             HStack(spacing: 0) {
-                SearchBar(title: "Search \(viewModel.messages.count) messages", text: $viewModel.filterTerm)
+                SearchBar(title: "Search \(viewModel.entities.count) messages", text: $viewModel.filterTerm)
                 Button(action: { viewModel.isOnlyErrors.toggle() }) {
                     Image(systemName: viewModel.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon")
                         .font(.system(size: 20))

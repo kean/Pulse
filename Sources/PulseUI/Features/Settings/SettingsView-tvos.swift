@@ -27,8 +27,8 @@ struct SettingsView: View {
             if !viewModel.isReadonly {
                 Section {
                     ButtonRemoveAll(action: console.buttonRemoveAllMessagesTapped)
-                        .disabled(console.messages.isEmpty)
-                        .opacity(console.messages.isEmpty ? 0.33 : 1)
+                        .disabled(console.entities.isEmpty)
+                        .opacity(console.entities.isEmpty ? 0.33 : 1)
                 }
             }
             if #available(tvOS 14.0, *) {

@@ -58,8 +58,8 @@ public struct SettingsView: View {
                     }
 
                     ButtonRemoveAll(action: console.buttonRemoveAllMessagesTapped)
-                        .disabled(console.messages.isEmpty)
-                        .opacity(console.messages.isEmpty ? 0.33 : 1)
+                        .disabled(console.entities.isEmpty)
+                        .opacity(console.entities.isEmpty ? 0.33 : 1)
                 }
                 if #available(iOS 14.0, *) {
                     if console.store === RemoteLogger.shared.store {

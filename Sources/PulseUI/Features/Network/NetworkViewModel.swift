@@ -10,13 +10,8 @@ import SwiftUI
 final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, ObservableObject {
 #if os(iOS) || os(macOS)
     let table: ConsoleTableViewModel
-
-    @Published private(set) var entities: [LoggerNetworkRequestEntity] = [] {
-        didSet { table.entities = entities }
-    }
-#else
-    @Published private(set) var entities: [LoggerNetworkRequestEntity] = []
 #endif
+    @Published private(set) var entities: [LoggerNetworkRequestEntity] = []
 
     // Search criteria
     let searchCriteria: NetworkSearchCriteriaViewModel
@@ -113,6 +108,9 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         } else {
             self.entities = controller.fetchedObjects ?? []
         }
+        #if os(iOS) || os(macOS)
+        self.table.entities = self.entities
+        #endif
     }
 
     // MARK: - Misc

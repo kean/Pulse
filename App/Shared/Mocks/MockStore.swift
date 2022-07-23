@@ -6,7 +6,7 @@ import Foundation
 import PulseCore
 import CoreData
 
-private var isAddingItemsDynamically = false
+private var isAddingItemsDynamically = true
 private var isUsingDefaultStore = true
 
 extension LoggerStore {
@@ -59,26 +59,14 @@ private struct Logger {
     }
 }
 
+private var isFirstLog = true
+
 private func populateStore(_ store: LoggerStore) {
     precondition(Thread.isMainThread)
 
     func logger(named: String) -> Logger {
         Logger(label: named, store: store)
     }
-
-    logger(named: "application")
-        .log(level: .info, "UIApplication.didFinishLaunching", metadata: [
-            "custom-metadata-key": .string("value")
-        ])
-
-    logger(named: "application")
-        .log(level: .info, "UIApplication.willEnterForeground")
-
-    logger(named: "auth")
-        .log(level: .trace, "Instantiated Session")
-
-    logger(named: "auth")
-        .log(level: .trace, "Instantiated the new login request")
 
     let networkLogger = NetworkLogger(store: store)
 
@@ -88,10 +76,10 @@ private func populateStore(_ store: LoggerStore) {
     ]
     let urlSession = URLSession(configuration: configuration)
 
-    func logTask(_ mockTask: MockDataTask) {
+    func logTask(_ mockTask: MockDataTask, delay: Int = Int.random(in: 1000...6000)) {
         let dataTask = urlSession.dataTask(with: mockTask.request)
         if isAddingItemsDynamically {
-            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(Int.random(in: 1000...6000))) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(delay)) {
                 networkLogger.logTaskCreated(dataTask)
                 DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(Int.random(in: 500...2000))) {
                     networkLogger.logDataTask(dataTask, didReceive: mockTask.response)
@@ -109,10 +97,29 @@ private func populateStore(_ store: LoggerStore) {
         }
     }
 
-    logTask(MockDataTask.login)
+    if isFirstLog {
+        isFirstLog = false
+        logger(named: "application")
+            .log(level: .info, "UIApplication.didFinishLaunching", metadata: [
+                "custom-metadata-key": .string("value")
+            ])
 
-    logger(named: "application")
-        .log(level: .debug, "Will navigate to Dashboard")
+        logger(named: "application")
+            .log(level: .info, "UIApplication.willEnterForeground")
+
+        logger(named: "auth")
+            .log(level: .trace, "Instantiated Session")
+
+        logger(named: "auth")
+            .log(level: .trace, "Instantiated the new login request")
+
+        logTask(MockDataTask.login, delay: 200)
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(800)) {
+            logger(named: "application")
+                .log(level: .debug, "Will navigate to Dashboard")
+        }
+    }
 
     logTask(MockDataTask.octocat)
 

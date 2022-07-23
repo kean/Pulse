@@ -41,14 +41,14 @@ public struct ConsoleView: View {
             Button(action: { isShowingFiltersView = true }) {
                 Label("Quick Filters", systemImage: "line.horizontal.3.decrease.circle")
             }
-            ConsoleMessagesForEach(store: viewModel.store, messages: viewModel.messages)
+            ConsoleMessagesForEach(store: viewModel.store, messages: viewModel.entities)
         }
         .navigationTitle("Console")
         .toolbar {
             ToolbarItemGroup {
                 ButtonRemoveAll(action: viewModel.buttonRemoveAllMessagesTapped)
-                    .disabled(viewModel.messages.isEmpty)
-                    .opacity(viewModel.messages.isEmpty ? 0.33 : 1)
+                    .disabled(viewModel.entities.isEmpty)
+                    .opacity(viewModel.entities.isEmpty ? 0.33 : 1)
                     .padding(.bottom, 4)
             }
         }

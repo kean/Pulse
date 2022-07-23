@@ -48,8 +48,8 @@ public struct SettingsView: View {
                 Section(header: Text("Manage Messages")) {
                     if !viewModel.isReadonly {
                         ButtonRemoveAll(action: console.buttonRemoveAllMessagesTapped)
-                            .disabled(console.messages.isEmpty)
-                            .opacity(console.messages.isEmpty ? 0.33 : 1)
+                            .disabled(console.entities.isEmpty)
+                            .opacity(console.entities.isEmpty ? 0.33 : 1)
                     }
                 }
                 Section(header: Text("Remote Logging")) {

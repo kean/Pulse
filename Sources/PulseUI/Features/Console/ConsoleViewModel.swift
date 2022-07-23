@@ -12,15 +12,8 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 
 #if os(iOS) || os(macOS)
     let table: ConsoleTableViewModel
-
-    @Published private(set) var messages: [LoggerMessageEntity] = [] {
-        didSet { table.entities = messages }
-    }
-#else
-    @Published private(set) var messages: [LoggerMessageEntity] = []
 #endif
-
-    var entities: [LoggerMessageEntity] { messages }
+    @Published private(set) var entities: [LoggerMessageEntity] = []
 
     // Search criteria
     let searchCriteria: ConsoleSearchCriteriaViewModel
@@ -106,7 +99,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 
         // Get sessionId
         if latestSessionId == nil {
-            latestSessionId = messages.first?.session
+            latestSessionId = entities.first?.session
         }
         let sessionId = store === LoggerStore.default ? LoggerSession.current.id.uuidString : latestSessionId
 
@@ -114,7 +107,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         ConsoleSearchCriteria.update(request: controller.fetchRequest, filterTerm: filterTerm, criteria: searchCriteria.criteria, filters: searchCriteria.filters, sessionId: sessionId, isOnlyErrors: isOnlyErrors)
         try? controller.performFetch()
 
-        self.messages = controller.fetchedObjects ?? []
+        displayNewMessages()
     }
 
     // MARK: Labels
@@ -189,7 +182,14 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         self.table.diff = diff
 #endif
         withAnimation {
-            self.messages = self.controller.fetchedObjects ?? []
+            displayNewMessages()
         }
+    }
+
+    private func displayNewMessages() {
+        entities = controller.fetchedObjects ?? []
+#if os(iOS) || os(macOS)
+        table.entities = entities
+#endif
     }
 }

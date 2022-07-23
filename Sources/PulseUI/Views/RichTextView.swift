@@ -244,7 +244,6 @@ private struct SearchToobar: View {
     }
 #endif
 }
-#endif
 
 final class RichTextViewModel: ObservableObject {
     @Published private(set) var selectedMatchIndex: Int = 0
@@ -393,6 +392,7 @@ struct RichTextView_Previews: PreviewProvider {
     }
 }
 
+#endif
 #endif
 
 #if os(watchOS)
