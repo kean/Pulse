@@ -96,7 +96,9 @@ private struct WrappedTextView: UIViewRepresentable {
     let text: NSAttributedString
     let viewModel: RichTextViewModel
     let isAutomaticLinkDetectionEnabled: Bool
+    #if os(iOS)
     @Binding var isScrolled: Bool
+    #endif
 
     final class Coordinator {
         var cancellables: [AnyCancellable] = []
@@ -116,6 +118,7 @@ private struct WrappedTextView: UIViewRepresentable {
 #endif
         textView.textContainerInset = UIEdgeInsets(top: 8, left: 10, bottom: 8, right: 10)
         textView.attributedText = text
+#if os(iOS)
         textView.publisher(for: \.contentOffset, options: [.new])
             .map { $0.y >= 10 }
             .removeDuplicates()
@@ -126,6 +129,7 @@ private struct WrappedTextView: UIViewRepresentable {
                 }
             }
             .store(in: &context.coordinator.cancellables)
+#endif
         viewModel.textView = textView
         return textView
     }

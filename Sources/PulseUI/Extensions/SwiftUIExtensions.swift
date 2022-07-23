@@ -30,18 +30,6 @@ extension NavigationLink where Label == EmptyView {
     }
 }
 
-struct Wrapped<View: UXView>: UIViewRepresentable {
-    let view: View
-
-    func makeUIView(context: Context) -> View {
-        view
-    }
-
-    func updateUIView(_ uiView: View, context: Context) {
-        // Do nothing
-    }
-}
-
 #if os(iOS)
 struct ViewControllerAccessor: UIViewRepresentable {
     @Binding var viewController: UIViewController?
@@ -121,7 +109,7 @@ extension Backport {
 
     @ViewBuilder
     func backgroundThickMaterial(enabled: Bool = true) -> some View {
-        if #available(iOS 15.0, tvOS 15.0, *) {
+        if #available(iOS 15.0, tvOS 15.0, macOS 15.0, *) {
             if enabled {
                 self.content.background(.regularMaterial)
             } else {
