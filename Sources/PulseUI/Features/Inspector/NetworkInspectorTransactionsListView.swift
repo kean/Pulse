@@ -12,40 +12,13 @@ import PulseCore
 struct NetworkInspectorTransactionsListView: View {
     let viewModel: NetworkInspectorTransactionsListViewModel
 
-    private static let padding: CGFloat = 16
-
     var body: some View {
-        List {
-            ForEach(viewModel.sections) { section in
-                Section(header: SectionHeader(title: section.title)) {
-                    ForEach(section.items) { item in
-                        NavigationLink(destination: { destination(for: item) }) {
-                            ItemView(item: item)
-                        }
-                    }
+        VStack(spacing: 16) {
+            ForEach(viewModel.items + viewModel.items) { item in
+                NavigationLink(destination: { destination(for: item) }) {
+                    ItemView(item: item)
                 }
             }
-        }
-        .navigationBarTitle("Transactions")
-    }
-
-    struct SectionHeader: View {
-        let title: String
-
-        var body: some View {
-            if #available(iOS 14.0, *) {
-                text.textCase(nil)
-            } else {
-                text
-            }
-        }
-
-        private var text: some View {
-            Text(title)
-                .font(.subheadline)
-                .fontWeight(.regular)
-                .lineLimit(2)
-                .padding(.bottom, 8)
         }
     }
 
@@ -54,12 +27,14 @@ struct NetworkInspectorTransactionsListView: View {
 
         var body: some View {
             HStack {
-            Text(item.title)
-                Spacer()
+                Text(item.title)
                 if let details = item.details {
                     Text(details)
                         .foregroundColor(.secondary)
                 }
+                Image(systemName: "chevron.right")
+                    .foregroundColor(.separator)
+                Spacer()
             }
         }
     }
@@ -73,13 +48,7 @@ struct NetworkInspectorTransactionsListView: View {
 // MARK: - ViewModel
 
 final class NetworkInspectorTransactionsListViewModel {
-    let sections: [Section]
-
-    struct Section: Identifiable {
-        let id = UUID()
-        let title: String
-        var items: [Item] = []
-    }
+    let items: [Item]
 
     struct Item: Identifiable {
         let id = UUID()
@@ -89,15 +58,7 @@ final class NetworkInspectorTransactionsListViewModel {
     }
 
     init(metrics: NetworkLoggerMetrics) {
-        var currentURL: URL?
-        var sections: [Section] = []
-
-        for transaction in metrics.transactions {
-            if transaction.request?.url != currentURL {
-                currentURL = transaction.request?.url
-                let prefix = transaction.request?.httpMethod.map { $0 + " " } ?? ""
-                sections.append(Section(title: prefix + (transaction.request?.url?.absoluteString ?? "Empty URL")))
-            }
+        self.items = metrics.transactions.map { transaction in
             let title: String
             switch URLSessionTaskMetrics.ResourceFetchType(rawValue: transaction.resourceFetchType) ?? .unknown {
             case .networkLoad: title = "Network Load"
@@ -111,12 +72,8 @@ final class NetworkInspectorTransactionsListViewModel {
                 let endDate = transaction.responseEndDate ?? metrics.taskInterval.end
                 details = DurationFormatter.string(from: endDate.timeIntervalSince(startDate))
             }
-            let item = Item(title: title, details: details, viewModel: { NetworkInspectorTransactionViewModel(transaction: transaction) })
-
-            sections[sections.endIndex - 1].items.append(item)
+            return Item(title: title, details: details, viewModel: { NetworkInspectorTransactionViewModel(transaction: transaction) })
         }
-
-        self.sections = sections
     }
 }
 

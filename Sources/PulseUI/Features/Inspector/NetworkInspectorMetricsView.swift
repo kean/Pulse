@@ -24,27 +24,18 @@ struct NetworkInspectorMetricsView: View {
 
 #if !os(tvOS)
 #if !os(macOS)
-                    if viewModel.transactions != nil {
-                        Button(action: { isTransctionsListShown = true }) {
-                            HStack {
-                                Text("View All Transactions")
-                                    .foregroundColor(.primary)
-                                Image(systemName: "chevron.right")
-                                    .font(.callout)
-                                    .foregroundColor(.secondary)
-                            }
-                            .padding(EdgeInsets(top: 11, leading: 11, bottom: 11, trailing: 11))
-                            .background(Color.secondaryFill)
-                            .cornerRadius(12)
-                        }
-                        .padding([.leading, .trailing])
-                        .padding(.top, 10)
+                    if let transactions = viewModel.transactions {
+                        LargeSectionHeader(title: "Transactions")
+                            .padding(.leading, NetworkInspectorMetricsView.padding)
+                        NetworkInspectorTransactionsListView(viewModel: transactions)
+                            .padding([.leading, .trailing], NetworkInspectorMetricsView.padding)
                     }
 #endif
                     if let details = viewModel.details {
+                        LargeSectionHeader(title: "Details")
+                            .padding(.leading, nil)
                         NetworkInspectorMetricsDetailsView(viewModel: details)
                             .padding([.leading, .bottom, .trailing], NetworkInspectorMetricsView.padding)
-                            .padding(.top, 20)
                     }
 #endif
                 }
@@ -229,13 +220,15 @@ private func makeTimingRows(transaction: NetworkLoggerTransactionMetrics, taskIn
 struct NetworkInspectorMetricsView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            NetworkInspectorMetricsView(viewModel: mockModel)
-                .background(Color(UXColor.systemBackground))
+            NavigationView {
+                NetworkInspectorMetricsView(viewModel: mockModel)
+            }
                 .previewDisplayName("Light")
                 .environment(\.colorScheme, .light)
 
+            NavigationView {
             NetworkInspectorMetricsView(viewModel: mockModel)
-                .background(Color(UXColor.systemBackground))
+            }
                 .previewDisplayName("Dark")
                 .environment(\.colorScheme, .dark)
                 .previewLayout(.fixed(width: 500, height: 600))
