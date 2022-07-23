@@ -70,14 +70,11 @@ private func populateStore(_ store: LoggerStore) {
 
     let networkLogger = NetworkLogger(store: store)
 
-    let configuration = URLSessionConfiguration.default
-    configuration.httpAdditionalHeaders = [
-        "User-Agent": "Pulse Demo/0.19 iOS"
-    ]
-    let urlSession = URLSession(configuration: configuration)
+    let urlSession = URLSession(configuration: .default)
 
     func logTask(_ mockTask: MockDataTask, delay: Int = Int.random(in: 1000...6000)) {
         let dataTask = urlSession.dataTask(with: mockTask.request)
+        dataTask.setSwizzledCurrentRequest(mockTask.currentRequest)
         if isAddingItemsDynamically {
             DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(delay)) {
                 networkLogger.logTaskCreated(dataTask)
@@ -113,13 +110,13 @@ private func populateStore(_ store: LoggerStore) {
         logger(named: "auth")
             .log(level: .trace, "Instantiated the new login request")
 
-        logTask(MockDataTask.login, delay: 200)
-
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(800)) {
             logger(named: "application")
                 .log(level: .debug, "Will navigate to Dashboard")
         }
     }
+
+    logTask(MockDataTask.login, delay: 200)
 
     logTask(MockDataTask.octocat)
 

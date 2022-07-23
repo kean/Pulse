@@ -7,6 +7,7 @@ import PulseCore
 
 struct MockDataTask {
     let request: URLRequest
+    let currentRequest: URLRequest
     let response: URLResponse
     let responseBody: Data
     let metrics: NetworkLoggerMetrics
@@ -17,6 +18,7 @@ struct MockDataTask {
 extension MockDataTask {
     static let login = MockDataTask(
         request: mockLoginRequest,
+        currentRequest: mockLoginRequest,
         response: mockLoginResponse,
         responseBody: MockJSON.githubLoginResponse,
         metrics: mockMetrics
@@ -136,6 +138,7 @@ private let mockMetrics = try! JSONDecoder().decode(NetworkLoggerMetrics.self, f
 extension MockDataTask {
     static let profileFailure = MockDataTask(
         request: mockProfileFailureRequest,
+        currentRequest: mockProfileFailureRequest,
         response: mockProfileFailureResponse,
         responseBody: """
         <h1>Error 404</h1>
@@ -169,6 +172,7 @@ private let mockProfileFailureResponse = HTTPURLResponse(url: URL(string: "https
 extension MockDataTask {
     static let octocat = MockDataTask(
         request: mockOctocatRequest,
+        currentRequest: mockOctocatRequest,
         response: mockOctocatResponse,
         responseBody: mockImage,
         metrics: mockOctocatMetrics
@@ -287,6 +291,7 @@ let mockStatsFailureRequest: URLRequest = {
 extension MockDataTask {
     static let repos = MockDataTask(
         request: mockReposRequest,
+        currentRequest: mockReposRequest,
         response: mockReposResponse,
         responseBody: mockReposBody,
         metrics: mockMetrics
@@ -381,14 +386,15 @@ let mockImage = Data(base64Encoded: "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgICAgM
 
 extension MockDataTask {
     static let createAPI = MockDataTask(
-        request: mockCreateAPIRequest,
+        request: mockCreateAPIOriginalRequest,
+        currentRequest: mockCreateAPICurrentRequest,
         response: mockCreateaAPIResponse,
         responseBody: mockCreateaAPIBody,
         metrics: mockMetricsWithRedirect
     )
 }
 
-private let mockCreateAPIRequest: URLRequest = {
+private let mockCreateAPIOriginalRequest: URLRequest = {
     var request = URLRequest(url: URL(string: "https://github.com/CreateAPI/Get")!)
 
     request.setValue("gzip", forHTTPHeaderField: "Accept-Encoding")
@@ -397,6 +403,17 @@ private let mockCreateAPIRequest: URLRequest = {
 
     return request
 }()
+
+private let mockCreateAPICurrentRequest: URLRequest = {
+    var request = URLRequest(url: URL(string: "https://github.com/kean/Get")!)
+
+    request.setValue("gzip", forHTTPHeaderField: "Accept-Encoding")
+    request.setValue("en-us", forHTTPHeaderField: "Accept-Language")
+    request.setValue("text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", forHTTPHeaderField: "Accept")
+
+    return request
+}()
+
 
 private let mockCreateaAPIResponse = HTTPURLResponse(url: URL(string: "https://github.com/kean/Get")!, statusCode: 200, httpVersion: "2.0", headerFields: [
     "Content-Length": "0",
@@ -632,3 +649,29 @@ private let mockMetricsWithRedirect = try! JSONDecoder().decode(NetworkLoggerMet
   "redirectCount": 1
 }
 """.data(using: .utf8)!)
+
+// MARK: Swizzling
+
+private var swizzledRequests: [URLSessionDataTask: URLRequest] = [:]
+private var isSwizzled = false
+
+extension URLSessionDataTask {
+    func setSwizzledCurrentRequest(_ request: URLRequest?) {
+        if !isSwizzled {
+            isSwizzled = true
+
+            let originalMethod: Method? = class_getInstanceMethod(URLSessionDataTask.self, #selector(getter: currentRequest))
+            let swizzledMethod: Method? = class_getInstanceMethod(URLSessionDataTask.self, #selector(getter: swizzledCurrentRequest))
+
+            if let originalMethod = originalMethod, let swizzledMethod = swizzledMethod {
+                method_exchangeImplementations(originalMethod, swizzledMethod)
+            }
+        }
+
+        swizzledRequests[self] = request
+    }
+
+    @objc var swizzledCurrentRequest: URLRequest? {
+        swizzledRequests[self]
+    }
+}
