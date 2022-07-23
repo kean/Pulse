@@ -341,9 +341,13 @@ final class RichTextViewModel: ObservableObject {
         guard !matches.isEmpty else { return }
 
         // Scroll to visible range
-        let range = NSRange(matches[selectedMatchIndex], in: string)
-        textView?.scrollRangeToVisible(range) // TODO: remove this workaround
-
+        var range = NSRange(matches[selectedMatchIndex], in: string)
+        if range.length + 50 < string.count {
+            range.length += 50
+        }
+        if let textView = textView {
+            textView.scrollRangeToVisible(range)
+        }
         // Update highlights
         if let previousMatch = previousMatch {
             highlight(range: matches[previousMatch], in: mutableText)
