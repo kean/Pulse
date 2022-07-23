@@ -23,14 +23,12 @@ struct NetworkInspectorMetricsView: View {
                         .padding(NetworkInspectorMetricsView.padding)
 
 #if !os(tvOS)
-#if !os(macOS)
                     if let transactions = viewModel.transactions {
                         LargeSectionHeader(title: "Transactions")
                             .padding(.leading, NetworkInspectorMetricsView.padding)
                         NetworkInspectorTransactionsListView(viewModel: transactions)
                             .padding([.leading, .trailing], NetworkInspectorMetricsView.padding)
                     }
-#endif
                     if let details = viewModel.details {
                         LargeSectionHeader(title: "Latest Details")
                             .padding(.leading, nil)
@@ -41,18 +39,6 @@ struct NetworkInspectorMetricsView: View {
                 }
             }
         }
-        .background(links)
-    }
-
-    @ViewBuilder
-    private var links: some View {
-#if os(iOS)
-        if let transactions = viewModel.transactions {
-            NavigationLink.programmatic(isActive: $isTransctionsListShown) {
-                NetworkInspectorTransactionsListView(viewModel: transactions)
-            }
-        }
-#endif
     }
 }
 
@@ -62,9 +48,7 @@ final class NetworkInspectorMetricsViewModel {
     let metrics: NetworkLoggerMetrics
     fileprivate let timingModel: [TimingRowSectionViewModel]
     fileprivate let details: NetworkMetricsDetailsViewModel?
-#if os(iOS)
     let transactions: NetworkInspectorTransactionsListViewModel?
-#endif
 
     init(metrics: NetworkLoggerMetrics) {
         self.metrics = metrics
@@ -73,13 +57,11 @@ final class NetworkInspectorMetricsViewModel {
         self.details = metrics.transactions.first(where: {
             $0.resourceFetchType == URLSessionTaskMetrics.ResourceFetchType.networkLoad.rawValue
         }).map(NetworkMetricsDetailsViewModel.init)
-#if os(iOS)
         if !metrics.transactions.isEmpty {
             self.transactions = NetworkInspectorTransactionsListViewModel(metrics: metrics)
         } else {
             self.transactions = nil
         }
-#endif
     }
 }
 

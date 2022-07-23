@@ -5,21 +5,37 @@
 import SwiftUI
 import PulseCore
 
-#if os(iOS)
+#if os(iOS) || os(macOS)
 
 // MARK: - View
 
 struct NetworkInspectorTransactionsListView: View {
     let viewModel: NetworkInspectorTransactionsListViewModel
+    @State private var presented: NetworkInspectorTransactionsListViewModel.Item?
 
     var body: some View {
         VStack(spacing: 16) {
             ForEach(viewModel.items) { item in
+                #if os(macOS)
+                HStack {
+                    Button(action: { presented = item }) {
+                        ItemView(item: item)
+                            .foregroundColor(.accentColor)
+                    }
+                    .buttonStyle(.plain)
+                    .fixedSize()
+                    Spacer()
+                }
+                #else
                 NavigationLink(destination: { destination(for: item) }) {
                     ItemView(item: item)
                 }
+                #endif
             }
         }
+        #if os(macOS)
+        .sheet(item: $presented, content: destination)
+         #endif
     }
 
     struct ItemView: View {
@@ -40,8 +56,24 @@ struct NetworkInspectorTransactionsListView: View {
     }
 
     private func destination(for item: NetworkInspectorTransactionsListViewModel.Item) -> some View {
+        #if os(iOS)
         NetworkInspectorTransactionView(viewModel: item.viewModel())
             .navigationBarTitle(item.title)
+#else
+        VStack(spacing: 0) {
+            HStack {
+                Text("\(item.title) Details")
+                    .font(.headline)
+                    .foregroundColor(.secondary)
+                Spacer()
+                Button("Close") { presented = nil }
+                    .keyboardShortcut(.cancelAction)
+            }.padding()
+            NetworkInspectorTransactionView(viewModel: item.viewModel())
+        }
+        .navigationTitle(item.title)
+        .frame(minWidth: 400, minHeight: 300, idealHeight: 600)
+        #endif
     }
 }
 

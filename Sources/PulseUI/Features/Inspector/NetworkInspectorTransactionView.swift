@@ -5,7 +5,7 @@
 import SwiftUI
 import PulseCore
 
-#if os(iOS)
+#if os(iOS) || os(macOS)
 
 // MARK: - View
 
@@ -47,8 +47,13 @@ struct NetworkInspectorTransactionView: View {
 
     @ViewBuilder
     private var links: some View {
-        NavigationLink.programmatic(isActive: $viewModel.isOriginalRequestHeadersLinkActive, destination:  { NetworkHeadersDetailsView(viewModel: viewModel.requestHeaders) })
-        NavigationLink.programmatic(isActive: $viewModel.isResponseHeadersLinkActive, destination:  { NetworkHeadersDetailsView(viewModel: viewModel.responseHeaders) })
+        HStack {
+            NavigationLink.programmatic(isActive: $viewModel.isOriginalRequestHeadersLinkActive, destination:  { NetworkHeadersDetailsView(viewModel: viewModel.requestHeaders) })
+            NavigationLink.programmatic(isActive: $viewModel.isResponseHeadersLinkActive, destination:  { NetworkHeadersDetailsView(viewModel: viewModel.responseHeaders) })
+        }
+        .frame(width: 0, height: 0)
+        .hidden()
+        .backport.hideAccessibility()
     }
 }
 
