@@ -120,9 +120,13 @@ extension Backport {
     }
 
     @ViewBuilder
-    func backgroundThinMaterial() -> some View {
+    func backgroundThickMaterial(enabled: Bool = true) -> some View {
         if #available(iOS 15.0, tvOS 15.0, *) {
-            self.content.background(.ultraThickMaterial)
+            if enabled {
+                self.content.background(.regularMaterial)
+            } else {
+                self.content
+            }
         } else {
             self.content
         }

@@ -156,6 +156,9 @@ struct StringSearchOptionsMenu: View {
             }
         }, label: {
             Image(systemName: "ellipsis.circle")
+            #if os(iOS)
+                .frame(width: 40, height: 44)
+            #endif
         })
     }
 }

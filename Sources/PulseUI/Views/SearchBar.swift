@@ -48,7 +48,6 @@ struct SearchBar: UIViewRepresentable {
     func makeUIView(context: Context) -> UISearchBar {
         let searchBar = UISearchBar()
         searchBar.placeholder = title
-        searchBar.text = text
         searchBar.searchBarStyle = .minimal
         searchBar.delegate = context.coordinator
         searchBar.spellCheckingType = .no
@@ -56,8 +55,8 @@ struct SearchBar: UIViewRepresentable {
         return searchBar
     }
 
-    func updateUIView(_ uiView: UISearchBar, context: Context) {
-        // Do nothing
+    func updateUIView(_ searchBar: UISearchBar, context: Context) {
+        searchBar.text = text
     }
 }
 

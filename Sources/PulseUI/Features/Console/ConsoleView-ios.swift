@@ -88,7 +88,6 @@ private struct ConsoleToolbarView: View {
         VStack(spacing: 8) {
             HStack(spacing: 0) {
                 SearchBar(title: "Search \(viewModel.messages.count) messages", text: $viewModel.filterTerm)
-                Spacer().frame(width: 10)
                 Button(action: { viewModel.isOnlyErrors.toggle() }) {
                     Image(systemName: viewModel.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon")
                         .font(.system(size: 20))

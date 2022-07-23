@@ -36,6 +36,7 @@ struct RichTextView: View {
     var body: some View {
         VStack(spacing: 0) {
             searchToolbar
+                .backport.backgroundThickMaterial(enabled: isExpanded && isScrolled)
             textView
             if viewModel.isSearching {
                 SearchToobar(viewModel: viewModel)
@@ -44,7 +45,7 @@ struct RichTextView: View {
     }
 
     private var searchToolbar: some View {
-        HStack(spacing: 8) {
+        HStack(spacing: 0) {
             SearchBar(title: "Search", text: $viewModel.searchTerm, onEditingChanged: { isEditing in
                 if isEditing {
                     viewModel.isSearching = isEditing
@@ -53,6 +54,7 @@ struct RichTextView: View {
 
             if #available(iOS 14.0, *) {
                 StringSearchOptionsMenu(options: $viewModel.options, isKindNeeded: false)
+                    .font(.system(size: 20))
             }
             if let onToggleExpanded = onToggleExpanded {
                 Button(action: {
@@ -60,14 +62,12 @@ struct RichTextView: View {
                     onToggleExpanded()
                 }) {
                     Image(systemName: isExpanded ? "arrow.down.right.and.arrow.up.left" : "arrow.up.left.and.arrow.down.right")
+                        .font(.system(size: 20))
+                        .frame(width: 40, height: 44)
                 }
-                .padding(.leading, 6)
             }
         }
-        .padding(.leading, 4)
-        .padding(.trailing, 12)
-        .padding(.bottom, -2)
-        .padding(.top, -2)
+        .padding(EdgeInsets(top: -2, leading: 4, bottom: -2, trailing: 6))
         .border(width: isScrolled ? 1 : 0, edges: [.bottom], color: Color(UXColor.separator).opacity(0.3))
     }
 
@@ -120,7 +120,11 @@ private struct WrappedTextView: UIViewRepresentable {
             .map { $0.y >= 10 }
             .removeDuplicates()
             .receive(on: DispatchQueue.main)
-            .sink { isScrolled = $0 }
+            .sink { isScrolled in
+                withAnimation {
+                    self.isScrolled = isScrolled
+                }
+            }
             .store(in: &context.coordinator.cancellables)
         viewModel.textView = textView
         return textView
@@ -179,12 +183,14 @@ private struct SearchToobar: View {
             HStack(spacing: 12) {
                 Button(action: viewModel.previousMatch) {
                     Image(systemName: "chevron.left.circle")
-                }
+                        .font(.system(size: 20))
+                }.disabled(viewModel.matches.isEmpty)
                 Text(viewModel.matches.isEmpty ? "0 of 0" : "\(viewModel.selectedMatchIndex+1) of \(viewModel.matches.count)")
                     .font(Font.body.monospacedDigit())
                 Button(action: viewModel.nextMatch) {
                     Image(systemName: "chevron.right.circle")
-                }
+                        .font(.system(size: 20))
+                }.disabled(viewModel.matches.isEmpty)
             }
             .fixedSize()
             Spacer()
@@ -195,7 +201,7 @@ private struct SearchToobar: View {
         }
         .padding(12)
         .border(width: 1, edges: [.top], color: Color(UXColor.separator).opacity(0.3))
-        .backport.backgroundThinMaterial()
+        .backport.backgroundThickMaterial()
     }
 #else
     var body: some View {
@@ -218,10 +224,14 @@ private struct SearchToobar: View {
                     .foregroundColor(.secondary)
                 Button(action: viewModel.previousMatch) {
                     Image(systemName: "chevron.left")
-                }.buttonStyle(.plain)
+                }
+                .buttonStyle(.plain)
+                .disabled(viewModel.matches.isEmpty)
                 Button(action: viewModel.nextMatch) {
                     Image(systemName: "chevron.right")
-                }.buttonStyle(.plain)
+                }
+                .buttonStyle(.plain)
+                .disabled(viewModel.matches.isEmpty)
             }
             .fixedSize()
         }
