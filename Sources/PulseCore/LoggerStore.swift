@@ -347,6 +347,7 @@ extension LoggerStore {
         request.contentType = event.response?.headers["Content-Type"]
         let isFailure = errorCode != 0 || (statusCode != 0 && !(200..<400).contains(statusCode))
         request.requestState = (isFailure ? LoggerNetworkRequestEntity.State.failure : .success).rawValue
+        request.redirectCount = Int16(event.metrics?.redirectCount ?? 0)
 
         // Populate response/request data
         if case let .directory(store) = document {

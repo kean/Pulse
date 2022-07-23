@@ -34,12 +34,10 @@ struct NetworkFiltersView: View {
                     viewModel.criteria.statusCode = .default
                     viewModel.criteria.contentType = .default
                     viewModel.criteria.host = .default
-                    viewModel.criteria.duration = .default
                 },
                 isDefault: viewModel.criteria.statusCode == .default &&
                 viewModel.criteria.contentType == .default &&
-                viewModel.criteria.host == .default &&
-                viewModel.criteria.duration == .default
+                viewModel.criteria.host == .default
             )) {
                 statusCodeGroup
             }
@@ -57,8 +55,12 @@ struct NetworkFiltersView: View {
                 Section(header: FilterSectionHeader(
                     icon: "hourglass", title: "Duration",
                     color: .yellow,
-                    reset: { viewModel.criteria.duration = .default },
-                    isDefault: viewModel.criteria.duration == .default
+                    reset: {
+                        viewModel.criteria.duration = .default
+                        viewModel.criteria.redirect = .default
+                    },
+                    isDefault: viewModel.criteria.duration == .default &&
+                    viewModel.criteria.redirect == .default
                 )) {
                     durationGroup
                 }
@@ -146,6 +148,7 @@ struct NetworkFiltersView: View {
     private var durationGroup: some View {
         DurationPicker(title: "Min", value: $viewModel.criteria.duration.from)
         DurationPicker(title: "Max", value: $viewModel.criteria.duration.to)
+        Toggle("Redirect", isOn: $viewModel.criteria.redirect.isRedirect)
     }
 }
 

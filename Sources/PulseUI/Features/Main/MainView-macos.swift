@@ -19,7 +19,7 @@ public struct MainView: View {
 
     public var body: some View {
         HStack(spacing: 0) {
-            ConsoleContainerView(viewModel: viewModel, details: viewModel.details, toolbar: viewModel.toolbar)
+            ConsoleContainerViewPro(viewModel: viewModel, details: viewModel.details, toolbar: viewModel.toolbar)
             FiltersPanelView(viewModel: viewModel, tooblar: viewModel.toolbar)
         }
         .navigationTitle("Console")
@@ -54,7 +54,7 @@ public struct MainView: View {
     }
 }
 
-private struct ConsoleContainerView: View {
+private struct ConsoleContainerViewPro: View {
     var viewModel: MainViewModel
     @ObservedObject var details: ConsoleDetailsRouterViewModel
     @ObservedObject var toolbar: ConsoleToolbarViewModel

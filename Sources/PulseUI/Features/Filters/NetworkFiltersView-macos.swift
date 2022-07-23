@@ -18,6 +18,8 @@ struct NetworkFiltersView: View {
     @AppStorage("networkFilterIsDomainsGroupExpanded") private var isDomainsGroupExpanded = true
     @AppStorage("networkFilterIsDurationGroupExpanded") private var isDurationGroupExpanded = true
     @AppStorage("networkFilterIsContentTypeGroupExpanded") private var isContentTypeGroupExpanded = true
+    @AppStorage("networkFilterIsRedirectGroupExpanded") private var isRedirectGroupExpanded = true
+
     
     var body: some View {
         ScrollView {
@@ -39,6 +41,7 @@ struct NetworkFiltersView: View {
                 timePeriodGroup
                 domainsGroup
                 durationGroup
+                redirectGroup
             }.padding(Filters.formPadding)
         }
     }
@@ -177,6 +180,21 @@ struct NetworkFiltersView: View {
                 reset: { viewModel.criteria.duration = .default },
                 isDefault: viewModel.criteria.duration == .default,
                 isEnabled: $viewModel.criteria.duration.isEnabled
+            )
+        })
+    }
+
+    private var redirectGroup: some View {
+        DisclosureGroup(isExpanded: $isRedirectGroupExpanded, content: {
+            Filters.toggle("One or More Redirect", isOn: $viewModel.criteria.redirect.isRedirect)
+                .padding(.top, Filters.contentTopInset)
+        }, label: {
+            FilterSectionHeader(
+                icon: "arrowshape.zigzag.right", title: "Redirect",
+                color: .yellow,
+                reset: { viewModel.criteria.redirect = .default },
+                isDefault: viewModel.criteria.redirect == .default,
+                isEnabled: $viewModel.criteria.redirect.isEnabled
             )
         })
     }

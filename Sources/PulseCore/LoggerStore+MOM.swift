@@ -59,6 +59,7 @@ public extension LoggerStore {
             NSAttributeDescription(name: "duration", type: .doubleAttributeType),
             NSAttributeDescription(name: "contentType", type: .stringAttributeType),
             NSAttributeDescription(name: "requestState", type: .integer16AttributeType),
+            NSAttributeDescription(name: "redirectCount", type: .integer16AttributeType),
             NSAttributeDescription(name: "requestBodyKey", type: .stringAttributeType),
             NSAttributeDescription(name: "responseBodyKey", type: .stringAttributeType),
             NSAttributeDescription(name: "requestBodySize", type: .integer64AttributeType),
@@ -117,6 +118,7 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
     @NSManaged public var contentType: String?
     /// Contains ``State`` raw value.
     @NSManaged public var requestState: Int16
+    @NSManaged public var redirectCount: Int16
 
     /// Returns request state.
     public var state: LoggerNetworkRequestEntity.State {

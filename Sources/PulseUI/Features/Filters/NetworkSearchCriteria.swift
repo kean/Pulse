@@ -14,6 +14,7 @@ struct NetworkSearchCriteria: Hashable {
     var host = HostFilter.default
     var duration = DurationFilter.default
     var contentType = ContentTypeFilter.default
+    var redirect = RedirectFilter.default
 
     static let `default` = NetworkSearchCriteria()
 
@@ -76,6 +77,13 @@ struct NetworkSearchCriteria: Hashable {
             // video
             case anyVideo = "video/"
         }
+    }
+
+    struct RedirectFilter: Hashable {
+        var isEnabled = true
+        var isRedirect = false
+
+        static let `default` = RedirectFilter()
     }
 }
 
@@ -357,6 +365,10 @@ extension NetworkSearchCriteria {
             if let value = criteria.duration.to.seconds {
                 predicates.append(NSPredicate(format: "duration <= %f", value))
             }
+        }
+
+        if criteria.redirect.isEnabled && criteria.redirect.isRedirect {
+            predicates.append(NSPredicate(format: "redirectCount >= 1"))
         }
 
         if criteria.contentType.isEnabled {
