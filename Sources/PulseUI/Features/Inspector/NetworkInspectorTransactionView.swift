@@ -5,7 +5,7 @@
 import SwiftUI
 import PulseCore
 
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(macOS) || os(tvOS)
 
 // MARK: - View
 
