@@ -35,19 +35,10 @@ struct NetworkFiltersView: View {
                 }
             }
 
-            Section(header: FilterSectionHeader(
-                icon: "arrow.down.circle", title: "Response",
-                color: .yellow,
-                reset: { viewModel.criteria.response = .default },
-                isDefault: viewModel.criteria.response == .default
-            )) {
-                responseGroup
-            }
-
+            responseGroup
             if #available(iOS 14.0, *) {
                 durationGroup
             }
-            
             timePeriodGroup
             domainsGroup
             networkingGroup
@@ -84,49 +75,6 @@ struct NetworkFiltersView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .center)
-    }
-
-    // MARK: - Response
-
-    @ViewBuilder
-    private var responseGroup: some View {
-        HStack {
-            makeRangePicker(title: "Status Code", from: $viewModel.criteria.response.statusCode.from, to: $viewModel.criteria.response.statusCode.to, isEnabled: $viewModel.criteria.response.isEnabled)
-        }
-        Filters.contentTypesPicker(selection: $viewModel.criteria.response.contentType.contentType)
-        HStack {
-            makeRangePicker(title: "Size", from: $viewModel.criteria.response.responseSize.from, to: $viewModel.criteria.response.responseSize.to, isEnabled: $viewModel.criteria.response.isEnabled)
-            if #available(iOS 14.0, *) {
-                Menu(content: {
-                    Filters.sizeUnitPicker($viewModel.criteria.response.responseSize.unit).labelsHidden()
-                }, label: {
-                    FilterPickerButton(title: viewModel.criteria.response.responseSize.unit.localizedTitle)
-                })
-                .animation(.none)
-                .fixedSize()
-            } else {
-                Text("KB")
-                    .foregroundColor(.secondary)
-            }
-        }
-    }
-
-    @ViewBuilder
-    private func makeRangePicker(title: String, from: Binding<String>, to: Binding<String>, isEnabled: Binding<Bool>) -> some View {
-        Text(title)
-        Spacer()
-        TextField("Min", text: from, onEditingChanged: {
-            if $0 { isEnabled.wrappedValue = true }
-        })
-        .keyboardType(.decimalPad)
-        .textFieldStyle(.roundedBorder)
-        .frame(width: 80)
-        TextField("Max", text: to, onEditingChanged: {
-            if $0 { isEnabled.wrappedValue = true }
-        })
-        .keyboardType(.decimalPad)
-        .textFieldStyle(.roundedBorder)
-        .frame(width: 80)
     }
 }
 

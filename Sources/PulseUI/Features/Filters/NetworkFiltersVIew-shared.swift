@@ -9,6 +9,121 @@ import Combine
 
 #if os(iOS) || os(macOS)
 
+// MARK: - NetworkFiltersView (Response)
+
+extension NetworkFiltersView {
+    var responseGroup: some View {
+        FiltersSection(
+            isExpanded: $isResponseGroupExpanded,
+            header: { responseGroupHeader },
+            content: { responseGroupContent }
+        )
+    }
+
+    private var responseGroupHeader: some View {
+        FilterSectionHeader(
+            icon: "arrow.down.circle", title: "Response",
+            color: .yellow,
+            reset: { viewModel.criteria.response = .default },
+            isDefault: viewModel.criteria.response == .default,
+            isEnabled: $viewModel.criteria.response.isEnabled
+        )
+    }
+
+    @ViewBuilder
+    private var responseGroupContent: some View {
+        statusCodeRow
+        contentTypeRow
+        responseSizeRow
+    }
+
+    @ViewBuilder
+    private var contentTypeRow: some View {
+        Filters.contentTypesPicker(selection: $viewModel.criteria.response.contentType.contentType)
+    }
+
+    #if os(iOS)
+
+    @ViewBuilder
+    private var statusCodeRow: some View {
+        HStack {
+            makeRangePicker(title: "Status Code", from: $viewModel.criteria.response.statusCode.from, to: $viewModel.criteria.response.statusCode.to, isEnabled: $viewModel.criteria.response.isEnabled)
+        }
+    }
+
+    @ViewBuilder
+    private var responseSizeRow: some View {
+        HStack {
+            makeRangePicker(title: "Size", from: $viewModel.criteria.response.responseSize.from, to: $viewModel.criteria.response.responseSize.to, isEnabled: $viewModel.criteria.response.isEnabled)
+            if #available(iOS 14.0, *) {
+                Menu(content: {
+                    Filters.sizeUnitPicker($viewModel.criteria.response.responseSize.unit).labelsHidden()
+                }, label: {
+                    FilterPickerButton(title: viewModel.criteria.response.responseSize.unit.localizedTitle)
+                })
+                .animation(.none)
+                .fixedSize()
+            } else {
+                Text("KB")
+                    .foregroundColor(.secondary)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func makeRangePicker(title: String, from: Binding<String>, to: Binding<String>, isEnabled: Binding<Bool>) -> some View {
+        Text(title)
+
+        Spacer()
+
+        TextField("Min", text: from, onEditingChanged: {
+            if $0 { isEnabled.wrappedValue = true }
+        })
+        .keyboardType(.decimalPad)
+        .textFieldStyle(.roundedBorder)
+        .frame(width: 80)
+
+        TextField("Max", text: to, onEditingChanged: {
+            if $0 { isEnabled.wrappedValue = true }
+        })
+        .keyboardType(.decimalPad)
+        .textFieldStyle(.roundedBorder)
+        .frame(width: 80)
+    }
+
+#elseif os(macOS)
+
+    @ViewBuilder
+    private var statusCodeRow: some View {
+        HStack {
+            Text("Status Code")
+                .fixedSize()
+
+            TextField("Min", text: $viewModel.criteria.response.statusCode.from)
+                .textFieldStyle(.roundedBorder)
+
+            TextField("Max", text: $viewModel.criteria.response.statusCode.to)
+                .textFieldStyle(.roundedBorder)
+        }
+    }
+
+    @ViewBuilder
+    private var responseSizeRow: some View {
+        HStack {
+            TextField("Min", text: $viewModel.criteria.response.responseSize.from)
+                .textFieldStyle(.roundedBorder)
+
+            TextField("Max", text: $viewModel.criteria.response.responseSize.to)
+                .textFieldStyle(.roundedBorder)
+
+            Filters.sizeUnitPicker($viewModel.criteria.response.responseSize.unit)
+                .labelsHidden()
+        }
+    }
+
+#endif
+}
+
 // MARK: - NetworkFiltersView (Time Period)
 
 extension NetworkFiltersView {
@@ -19,7 +134,7 @@ extension NetworkFiltersView {
             content: { timePeriodGroupContent }
         )
     }
-    
+
     private var timePeriodGroupHeader: some View {
         FilterSectionHeader(
             icon: "calendar", title: "Time Period",
@@ -29,14 +144,14 @@ extension NetworkFiltersView {
             isEnabled: $viewModel.criteria.dates.isEnabled
         )
     }
-    
+
     @ViewBuilder
     private var timePeriodGroupContent: some View {
         Filters.toggle("Latest Session", isOn: $viewModel.criteria.dates.isCurrentSessionOnly)
-        
+
         DateRangePicker(title: "Start Date", date: viewModel.bindingStartDate, isEnabled: $viewModel.criteria.dates.isStartDateEnabled)
         DateRangePicker(title: "End Date", date: viewModel.bindingEndDate, isEnabled: $viewModel.criteria.dates.isEndDateEnabled)
-        
+
         HStack(spacing: 16) {
             Button("Recent") { viewModel.criteria.dates = .recent }
             Button("Today") { viewModel.criteria.dates = .today }

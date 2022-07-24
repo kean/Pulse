@@ -72,63 +72,6 @@ struct NetworkFiltersView: View {
             )
         })
     }
-
-    // MARK: - Response
-    
-    private var responseGroup: some View {
-        DisclosureGroup(isExpanded: $isResponseGroupExpanded, content: {
-            FiltersSectionContent {
-                statusCodeRow
-                contentTypeRow
-                responseSizeRow
-            }
-        }, label: {
-            FilterSectionHeader(
-                icon: "arrow.down.circle", title: "Response",
-                color: .yellow,
-                reset: { viewModel.criteria.response = .default },
-                isDefault: viewModel.criteria.response == .default,
-                isEnabled: $viewModel.criteria.response.isEnabled
-            )
-        })
-    }
-
-    @ViewBuilder
-    private var statusCodeRow: some View {
-        HStack {
-            Text("Status Code")
-                .fixedSize()
-
-            TextField("Min", text: $viewModel.criteria.response.statusCode.from)
-            .textFieldStyle(.roundedBorder)
-
-            TextField("Max", text: $viewModel.criteria.response.statusCode.to)
-            .textFieldStyle(.roundedBorder)
-        }
-    }
-
-    @ViewBuilder
-    private var contentTypeRow: some View {
-        Filters.contentTypesPicker(selection: $viewModel.criteria.response.contentType.contentType)
-    }
-
-    @ViewBuilder
-    private var responseSizeRow: some View {
-        HStack {
-            TextField("Min", text: $viewModel.criteria.response.responseSize.from)
-            .textFieldStyle(.roundedBorder)
-
-            TextField("Max", text: $viewModel.criteria.response.responseSize.to)
-            .textFieldStyle(.roundedBorder)
-
-            Filters.sizeUnitPicker($viewModel.criteria.response.responseSize.unit)
-                .labelsHidden()
-        }
-    }
-
-    // MARK: - Time Period Group
-
-    private typealias ContentType = NetworkSearchCriteria.ContentTypeFilter.ContentType
 }
 
 #if DEBUG
