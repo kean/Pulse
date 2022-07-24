@@ -255,11 +255,7 @@ final class NetworkInspectorViewModel: ObservableObject {
         self.summary = NetworkLoggerSummary(request: request, store: store)
 
         if let url = request.url.flatMap(URL.init(string:)) {
-            if let httpMethod = request.httpMethod {
-                self.title = "\(httpMethod) /\(url.lastPathComponent)"
-            } else {
-                self.title = "/" + url.lastPathComponent
-            }
+            self.title = url.lastPathComponent
         }
 
         self.cancellable = request.objectWillChange.sink { [weak self] in

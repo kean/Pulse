@@ -39,10 +39,9 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
 
     var summaryModel: KeyValueSectionViewModel {
         var items: [(String, String?)] = [
-            ("Status Code", summary.response?.statusCode.map(StatusCodeFormatter.string) ?? "–"),
             ("URL", summary.originalRequest?.url?.absoluteString ?? "–"),
             ("Method", summary.originalRequest?.httpMethod ?? "–"),
-            ("Domain", summary.originalRequest?.url?.host ?? "–")
+            ("Status Code", summary.response?.statusCode.map(StatusCodeFormatter.string) ?? "–")
         ]
         if let metrics = summary.metrics {
             items.append(("Duration", DurationFormatter.string(from: metrics.taskInterval.duration)))
@@ -51,7 +50,9 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
             items.append(("Redirect", summary.currentRequest?.url?.absoluteString ?? "–"))
         }
 
-        return KeyValueSectionViewModel(title: "Summary", color: tintColor, items: items)
+        let title = summary.taskType?.urlSessionTaskClassName ?? "Summary"
+
+        return KeyValueSectionViewModel(title: title, color: tintColor, items: items)
     }
 
     var errorModel: KeyValueSectionViewModel? {

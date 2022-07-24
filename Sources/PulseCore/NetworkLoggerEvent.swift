@@ -173,6 +173,16 @@ public enum NetworkLoggerTaskType: String, Codable, CaseIterable {
         default: self = .dataTask
         }
     }
+
+    public var urlSessionTaskClassName: String {
+        switch self {
+        case .dataTask: return "URLSessionDataTask"
+        case .downloadTask: return "URLSessionDownloadTask"
+        case .streamTask: return "URLSessionStreamTask"
+        case .uploadTask: return "URLSessionUploadTask"
+        case .webSocketTask: return "URLSessionWebSocketTask"
+        }
+    }
 }
 
 private extension URLSessionConfiguration {

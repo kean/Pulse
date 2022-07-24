@@ -7,13 +7,19 @@ import PulseCore
 
 extension KeyValueSectionViewModel {
     static func makeSummary(for request: NetworkLoggerRequest) -> KeyValueSectionViewModel {
-        KeyValueSectionViewModel(
+        let components = request.url.flatMap { URLComponents(url: $0, resolvingAgainstBaseURL: false) }
+        var items: [(String, String?)] = []
+        items += [
+            ("URL", request.url?.absoluteString),
+            ("Method", request.httpMethod)
+        ]
+        if let host = components?.host {
+            items.append(("Host", host))
+        }
+        return KeyValueSectionViewModel(
             title: "Request Summary",
             color: .blue,
-            items: [
-                ("URL", request.url?.absoluteString),
-                ("Method", request.httpMethod)
-            ]
+            items: items
         )
     }
 
