@@ -20,6 +20,8 @@ struct NetworkFiltersView: View {
     @AppStorage("networkFilterIsContentTypeGroupExpanded") private var isContentTypeGroupExpanded = true
     @AppStorage("networkFilterIsRedirectGroupExpanded") private var isRedirectGroupExpanded = true
 
+    @State private var isDomainsPickerPresented = false
+
     var body: some View {
         ScrollView {
             VStack(spacing: Filters.formSpacing) {
@@ -43,8 +45,6 @@ struct NetworkFiltersView: View {
             }.padding(Filters.formPadding)
         }
     }
-
-    #warning("TODO: refactor FilterSectionHeader")
 
     // MARK: - General
     
@@ -155,47 +155,27 @@ struct NetworkFiltersView: View {
         }
     }
 
+    // MARK: - Time Period Group
+
     private var timePeriodGroup: some View {
         DisclosureGroup(isExpanded: $isTimePeriodExpanded, content: {
-            Filters.toggle("Latest Session", isOn: $viewModel.criteria.dates.isCurrentSessionOnly)
-                .padding(.top, Filters.contentTopInset)
-                        
-            let fromBinding = Binding(get: {
-                viewModel.criteria.dates.startDate ?? Date().addingTimeInterval(-3600)
-            }, set: { newValue in
-                viewModel.criteria.dates.startDate = newValue
-            })
-            
-            let toBinding = Binding(get: {
-                viewModel.criteria.dates.endDate ?? Date()
-            }, set: { newValue in
-                viewModel.criteria.dates.endDate = newValue
-            })
-            
-            Filters.toggle("Start Date", isOn: $viewModel.criteria.dates.isStartDateEnabled)
-            HStack(spacing: 0) {
-                DatePicker("", selection: fromBinding)
-                    .disabled(!viewModel.criteria.dates.isStartDateEnabled)
-                    .fixedSize()
-                Spacer()
-            }
-
-            Filters.toggle("End Date", isOn: $viewModel.criteria.dates.isEndDateEnabled)
-            HStack(spacing: 0) {
-                DatePicker("", selection: toBinding)
-                    .disabled(!viewModel.criteria.dates.isEndDateEnabled)
-                    .fixedSize()
-                Spacer()
-            }
-            HStack {
-                Button("Recent") {
-                    viewModel.criteria.dates = .recent
+            FiltersSection {
+                HStack {
+                    Toggle("Latest Session", isOn: $viewModel.criteria.dates.isCurrentSessionOnly)
+                    Spacer()
                 }
-                Button("Today") {
-                    viewModel.criteria.dates = .today
+                startDateRow
+                endDateRow
+                HStack {
+                    Button("Recent") {
+                        viewModel.criteria.dates = .recent
+                    }
+                    Button("Today") {
+                        viewModel.criteria.dates = .today
+                    }
+                    Spacer()
                 }
-                Spacer()
-            }.padding(.leading, 13)
+            }
         }, label: {
             FilterSectionHeader(
                 icon: "calendar", title: "Time Period",
@@ -207,8 +187,48 @@ struct NetworkFiltersView: View {
         })
     }
 
-    @State private var isDomainsPickerPresented = false
-    
+    @ViewBuilder
+    private var startDateRow: some View {
+        let fromBinding = Binding(get: {
+            viewModel.criteria.dates.startDate ?? Date().addingTimeInterval(-3600)
+        }, set: { newValue in
+            viewModel.criteria.dates.startDate = newValue
+        })
+
+        VStack(spacing: 5) {
+            HStack {
+                Toggle("Start Date", isOn: $viewModel.criteria.dates.isStartDateEnabled)
+                Spacer()
+            }
+            DatePicker("Start Date", selection: fromBinding)
+                .disabled(!viewModel.criteria.dates.isStartDateEnabled)
+                .fixedSize()
+                .labelsHidden()
+        }
+    }
+
+    @ViewBuilder
+    private var endDateRow: some View {
+        let toBinding = Binding(get: {
+            viewModel.criteria.dates.endDate ?? Date()
+        }, set: { newValue in
+            viewModel.criteria.dates.endDate = newValue
+        })
+
+        VStack(spacing: 5) {
+            HStack {
+                Toggle("End Date", isOn: $viewModel.criteria.dates.isEndDateEnabled)
+                Spacer()
+            }
+            DatePicker("End Date", selection: toBinding)
+                .disabled(!viewModel.criteria.dates.isEndDateEnabled)
+                .fixedSize()
+                .labelsHidden()
+        }
+    }
+
+    // MARK: - Domains Group
+
     private var domainsGroup: some View {
         DisclosureGroup(isExpanded: $isDomainsGroupExpanded, content: {
             VStack {
@@ -369,10 +389,17 @@ private struct CustomFilterView: View {
 struct NetworkFiltersPanelPro_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            NetworkFiltersView(viewModel: .init())
+            NetworkFiltersView(viewModel: makeMockViewModel())
                 .previewLayout(.fixed(width: Filters.preferredWidth - 15, height: 900))
         }
     }
+}
+
+private func makeMockViewModel() -> NetworkSearchCriteriaViewModel {
+    let viewModel = NetworkSearchCriteriaViewModel()
+    viewModel.setInitialDomains(["api.github.com", "github.com", "apple.com", "google.com", "example.com"])
+    return viewModel
+
 }
 #endif
 
