@@ -65,51 +65,6 @@ enum Filters {
     }
 }
 
-#warning("TODO: remove")
-//@available(iOS 14.0, *)
-//struct DurationPicker: View {
-//    let title: String
-//
-//#if os(macOS)
-//    var body: some View {
-//        HStack {
-//            Text(title + ":")
-//                .foregroundColor(.secondary)
-//                .frame(width: 42, alignment: .trailing)
-//            TextField("", text: $value.value)
-//            Picker("", selection: $value.unit) {
-//                Text("min").tag(DurationFilterPoint.Unit.minutes)
-//                Text("sec").tag(DurationFilterPoint.Unit.seconds)
-//                Text("ms").tag(DurationFilterPoint.Unit.milliseconds)
-//            }
-//            .fixedSize()
-//        }
-//    }
-//#else
-//    var body: some View {
-//        HStack {
-//            Text(title)
-//            Spacer()
-//            TextField("Duration", text: $value.value)
-//                .textFieldStyle(.roundedBorder)
-//                .frame(width: 100)
-//            Menu(content: {
-//                Picker("", selection: $value.unit) {
-//                    Text("min").tag(DurationFilterPoint.Unit.minutes)
-//                    Text("sec").tag(DurationFilterPoint.Unit.seconds)
-//                    Text("ms").tag(DurationFilterPoint.Unit.milliseconds)
-//                }
-//            }, label: {
-//                FilterPickerButton(title: value.unit.localizedTitle)
-//            })
-//            .animation(.none)
-//            .fixedSize()
-//
-//        }
-//    }
-//#endif
-//}
-
 struct DateRangePicker: View {
     let title: String
     @Binding var date: Date

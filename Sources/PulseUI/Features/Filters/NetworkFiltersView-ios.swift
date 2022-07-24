@@ -42,25 +42,12 @@ struct NetworkFiltersView: View {
                 responseGroup
             }
 
-            Section(header: FilterSectionHeader(
-                icon: "server.rack", title: "Hosts",
-                color: .yellow,
-                reset: { viewModel.criteria.host = .default },
-                isDefault: viewModel.criteria.host == .default
-            )) {
-                domainsGroup
-            }
-
             if #available(iOS 14.0, *) {
                 Section(header: FilterSectionHeader(
                     icon: "hourglass", title: "Duration",
                     color: .yellow,
-                    reset: {
-                        viewModel.criteria.duration = .default
-                        viewModel.criteria.networking = .default
-                    },
-                    isDefault: viewModel.criteria.duration == .default &&
-                    viewModel.criteria.networking == .default
+                    reset: { viewModel.criteria.duration = .default },
+                    isDefault: viewModel.criteria.duration == .default
                 )) {
                     durationGroup
                 }
@@ -73,6 +60,24 @@ struct NetworkFiltersView: View {
                 isDefault: viewModel.criteria.dates == .default
             )) {
                 timePeriodGroup
+            }
+
+            Section(header: FilterSectionHeader(
+                icon: "server.rack", title: "Hosts",
+                color: .yellow,
+                reset: { viewModel.criteria.host = .default },
+                isDefault: viewModel.criteria.host == .default
+            )) {
+                domainsGroup
+            }
+
+            Section(header: FilterSectionHeader(
+                icon: "arrowshape.zigzag.right", title: "Networking",
+                color: .yellow,
+                reset: { viewModel.criteria.networking = .default },
+                isDefault: viewModel.criteria.networking == .default
+            )) {
+                networkingGroup
             }
         }
         .navigationBarTitle("Filters", displayMode: .inline)
@@ -138,20 +143,21 @@ struct NetworkFiltersView: View {
     private func makeRangePicker(title: String, from: Binding<String>, to: Binding<String>, isEnabled: Binding<Bool>) -> some View {
         Text(title)
         Spacer()
-        TextField("From", text: from, onEditingChanged: {
+        TextField("Min", text: from, onEditingChanged: {
             if $0 { isEnabled.wrappedValue = true }
         })
         .keyboardType(.decimalPad)
         .textFieldStyle(.roundedBorder)
-        .frame(width: 60)
-        Text("<")
-            .foregroundColor(.secondary)
-        TextField("To", text: to, onEditingChanged: {
+        .frame(width: 80)
+        TextField("Max", text: to, onEditingChanged: {
             if $0 { isEnabled.wrappedValue = true }
         })
+        .keyboardType(.decimalPad)
         .textFieldStyle(.roundedBorder)
-        .frame(width: 60)
+        .frame(width: 80)
     }
+
+    // MARK: - Domains Group
 
     @ViewBuilder
     private var domainsGroup: some View {
@@ -189,6 +195,8 @@ struct NetworkFiltersView: View {
         }
     }
 
+    // MARK: - Time Period Group
+
     @ViewBuilder
     private var timePeriodGroup: some View {
         Toggle("Latest Session", isOn: $viewModel.criteria.dates.isCurrentSessionOnly)
@@ -209,8 +217,39 @@ struct NetworkFiltersView: View {
     @available(iOS 14.0, *)
     @ViewBuilder
     private var durationGroup: some View {
-        DurationPicker(title: "Min", value: $viewModel.criteria.duration.from)
-        DurationPicker(title: "Max", value: $viewModel.criteria.duration.to)
+        HStack {
+            TextField("Min", text: $viewModel.criteria.duration.min, onEditingChanged: {
+                if $0 { viewModel.criteria.duration.isEnabled = true }
+            })
+            .textFieldStyle(.roundedBorder)
+            .frame(maxWidth: 90)
+
+            TextField("Max", text: $viewModel.criteria.duration.max, onEditingChanged: {
+                if $0 { viewModel.criteria.duration.isEnabled = true }
+            })
+            .textFieldStyle(.roundedBorder)
+            .frame(maxWidth: 90)
+
+            Menu(content: {
+                Picker("Unit", selection: $viewModel.criteria.duration.unit) {
+                    Text("min").tag(NetworkSearchCriteria.DurationFilter.Unit.minutes)
+                    Text("sec").tag(NetworkSearchCriteria.DurationFilter.Unit.seconds)
+                    Text("ms").tag(NetworkSearchCriteria.DurationFilter.Unit.milliseconds)
+                }
+            }, label: {
+                FilterPickerButton(title: viewModel.criteria.duration.unit.localizedTitle)
+            })
+            .animation(.none)
+
+            Spacer()
+        }
+    }
+
+    // MARK: - Networking Group
+
+    @ViewBuilder
+    private var networkingGroup: some View {
+        Filters.responseSourcePicker($viewModel.criteria.networking.source)
         Toggle("Redirect", isOn: $viewModel.criteria.networking.isRedirect)
     }
 }
