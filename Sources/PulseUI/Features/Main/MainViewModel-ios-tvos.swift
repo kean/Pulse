@@ -58,7 +58,7 @@ struct MainViewModelItem: Hashable, Identifiable {
     var id: String { title }
 
     #if os(iOS) || os(tvOS)
-    static let console = MainViewModelItem(title: "Console", imageName: "message.fill")
+    static let console = MainViewModelItem(title: "Console", imageName: isPad ? "message" : "message.fill")
     static let network = MainViewModelItem(title: "Network", imageName: {
         if #available(iOS 14.0, *) {
             return "network"
@@ -66,7 +66,7 @@ struct MainViewModelItem: Hashable, Identifiable {
             return "icloud.and.arrow.down.fill"
         }
     }())
-    static let pins = MainViewModelItem(title: "Pins", imageName: "pin.fill")
+    static let pins = MainViewModelItem(title: "Pins", imageName: isPad ? "pin" : "pin.fill")
     static let settings = MainViewModelItem(title: "Settings", imageName: {
         if #available(iOS 14.0, *) {
             return "gearshape.fill"
@@ -102,5 +102,7 @@ extension MainViewModel {
         }
     }
 }
+
+private let isPad = UIDevice.current.userInterfaceIdiom == .pad
 
 #endif

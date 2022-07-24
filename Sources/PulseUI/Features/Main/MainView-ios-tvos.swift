@@ -13,6 +13,9 @@ public struct MainView: View {
     // TODO: replace with StateObject when available
     @State private var viewModel: MainViewModel
 
+    @State private var isDefaultTabSelected = true
+    @State private var viewController: UIViewController?
+
     /// - parameter onDismiss: pass onDismiss to add a close button.
     public init(store: LoggerStore = .default,
                 configuration: ConsoleConfiguration = .default,
@@ -21,13 +24,41 @@ public struct MainView: View {
     }
 
     public var body: some View {
-        TabView {
-            ForEach(viewModel.items) { item in
-                NavigationView {
-                    viewModel.makeView(for: item)
-                }.tabItem {
-                    Image(systemName: item.imageName)
-                    Text(item.title)
+        if UIDevice.current.userInterfaceIdiom == .pad, #available(iOS 14.0, *) {
+            NavigationView {
+                List(viewModel.items) { item in
+                    if item.id == viewModel.items[0].id {
+                        NavigationLink(isActive: $isDefaultTabSelected, destination: {
+                            viewModel.makeView(for: item)
+                        }) {
+                            Image(systemName: item.imageName)
+                                .foregroundColor(.accentColor)
+                            Text(item.title)
+                        }
+                    } else {
+                        NavigationLink(destination: {
+                            viewModel.makeView(for: item)
+                        }) {
+                            Image(systemName: item.imageName)
+                                .foregroundColor(.accentColor)
+                            Text(item.title)
+                        }
+                    }
+                }
+                .listStyle(.sidebar)
+                .navigationBarTitle("Menu")
+                viewModel.makeView(for: viewModel.items[0])
+                EmptyView()
+            }
+        } else {
+            TabView {
+                ForEach(viewModel.items) { item in
+                    NavigationView {
+                        viewModel.makeView(for: item)
+                    }.tabItem {
+                        Image(systemName: item.imageName)
+                        Text(item.title)
+                    }
                 }
             }
         }

@@ -31,7 +31,7 @@ struct NetworkInspectorView: View {
         .navigationBarItems(trailing: trailingNavigationBarItems)
         .navigationBarHidden(isExpanded)
         .navigationBarTitle(Text(viewModel.title), displayMode: .inline)
-        .statusBar(hidden: isExpanded)
+        .statusBar(hidden: UIDevice.current.userInterfaceIdiom == .phone && isExpanded)
         .sheet(isPresented: $isShowingShareSheet) {
             ShareView(activityItems: [viewModel.prepareForSharing()])
         }
