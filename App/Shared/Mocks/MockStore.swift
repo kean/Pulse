@@ -25,10 +25,6 @@ extension LoggerStore {
             populateStore(store)
         }
 
-//        Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { _ in
-//            store.storeMessage(label: "ping", level: .debug, message: "ping", metadata: nil, file: "a", function: "b", line: 2)
-//        }
-
         return store
     }()
 }
@@ -72,44 +68,6 @@ private func populateStore(_ store: LoggerStore) {
 
     let urlSession = URLSession(configuration: .default)
 
-    func logTask(_ mockTask: MockDataTask, delay: Int = Int.random(in: 1000...6000)) {
-        let task: URLSessionTask
-        switch mockTask.kind {
-        case .data: task = urlSession.dataTask(with: mockTask.request)
-        case .download: task = urlSession.downloadTask(with: mockTask.request)
-        case .upload: fatalError()
-        }
-        var currentRequest = mockTask.currentRequest
-        currentRequest.setValue("Pulse Demo/2.0", forHTTPHeaderField: "User-Agent")
-        task.setSwizzledCurrentRequest(currentRequest)
-        task.setSwizzledResponse(mockTask.response)
-
-        func logTaskCreated() {
-            networkLogger.logTaskCreated(task)
-        }
-
-        func logRemainigEvents() {
-            if let dataTask = task as? URLSessionDataTask {
-                networkLogger.logDataTask(dataTask, didReceive: mockTask.response)
-                networkLogger.logDataTask(dataTask, didReceive: mockTask.responseBody)
-            }
-            networkLogger.logTask(task, didFinishCollecting: mockTask.metrics)
-            networkLogger.logTask(task, didCompleteWithError: nil, session: urlSession)
-        }
-
-        if isAddingItemsDynamically {
-            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(delay)) {
-                logTaskCreated()
-                DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(Int.random(in: 500...2000))) {
-                    logRemainigEvents()
-                }
-            }
-        } else {
-            logTaskCreated()
-            logRemainigEvents()
-        }
-    }
-
     if isFirstLog {
         isFirstLog = false
         logger(named: "application")
@@ -130,6 +88,10 @@ private func populateStore(_ store: LoggerStore) {
             logger(named: "application")
                 .log(level: .debug, "Will navigate to Dashboard")
         }
+    }
+
+    func logTask(_ mockTask: MockDataTask, delay: Int = Int.random(in: 1000...6000)) {
+        _logTask(mockTask, urlSession: urlSession, logger: networkLogger, delay: delay)
     }
 
     logTask(MockDataTask.login, delay: 200)
@@ -184,5 +146,47 @@ private func populateStore(_ store: LoggerStore) {
         store.backgroundContext.performAndWait {
             try? store.backgroundContext.save()
         }
+    }
+}
+
+private func _logTask(_ mockTask: MockDataTask, urlSession: URLSession, logger: NetworkLogger, delay: Int) {
+    let task: URLSessionTask
+    switch mockTask.kind {
+    case .data: task = urlSession.dataTask(with: mockTask.request)
+    case .download: task = urlSession.downloadTask(with: mockTask.request)
+    case .upload: fatalError()
+    }
+    var currentRequest = mockTask.currentRequest
+    currentRequest.setValue("Pulse Demo/2.0", forHTTPHeaderField: "User-Agent")
+    task.setSwizzledCurrentRequest(currentRequest)
+    task.setSwizzledResponse(mockTask.response)
+
+    @Sendable func logTask() async {
+        if isAddingItemsDynamically {
+            await Task.sleep(milliseconds: delay)
+        }
+        logger.logTaskCreated(task)
+        if case .download(let size) = mockTask.kind {
+            await Task.sleep(milliseconds: 300)
+            var remaining = size
+            let chunk: Int64 = 1024 * 512
+            while remaining > 0 {
+                await Task.sleep(milliseconds: 250)
+                remaining -= chunk
+                logger.logTask(task, didUpdateProgress: (completed: size - remaining, total: size))
+            }
+        } else {
+            await Task.sleep(milliseconds: .random(in: 500...2000))
+        }
+        if let dataTask = task as? URLSessionDataTask {
+            logger.logDataTask(dataTask, didReceive: mockTask.response)
+            logger.logDataTask(dataTask, didReceive: mockTask.responseBody)
+        }
+        logger.logTask(task, didFinishCollecting: mockTask.metrics)
+        logger.logTask(task, didCompleteWithError: nil, session: urlSession)
+    }
+
+    Task.detached {
+        await logTask()
     }
 }

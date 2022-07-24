@@ -16,7 +16,7 @@ struct MockDataTask {
     enum Kind {
         case data
         case upload
-        case download
+        case download(expectedLength: Int64)
     }
 }
 
@@ -64,7 +64,7 @@ extension MockDataTask {
     )
 
     static let downloadNuke = MockDataTask(
-        kind: .download,
+        kind: .download(expectedLength: 6695689),
         request: mockDownloadNukeOriginalRequest,
         currentRequest: mockDownloadNukeCurrentRequest,
         response: mockDownloadNukeResponse,
@@ -893,5 +893,11 @@ extension URLSessionTask {
 
     @objc var swizzledResponse: URLResponse? {
         swizzledResponses[self]
+    }
+}
+
+extension Task where Success == Never, Failure == Never {
+    static func sleep(milliseconds: Int) async {
+        try! await sleep(nanoseconds: UInt64(milliseconds) * 1_000_000)
     }
 }

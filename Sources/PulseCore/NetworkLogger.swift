@@ -67,6 +67,18 @@ public final class NetworkLogger {
         trace("Did receive data: \(ByteCountFormatter.string(fromByteCount: Int64(data.count), countStyle: .file)) for \(dataTask.url ?? "null")")
     }
 
+    public func logTask(_ task: URLSessionTask, didUpdateProgress progress: (completed: Int64, total: Int64)) {
+        lock.lock()
+        let context = self.context(for: task)
+        lock.unlock()
+
+        store.handle(.networkTaskProgressUpdated(.init(
+            taskId: context.taskId,
+            completedUnitCount: progress.completed,
+            totalUnitCount: progress.total
+        )))
+    }
+
     /// Logs the task completion (required).
     public func logTask(_ task: URLSessionTask, didCompleteWithError error: Error?, session: URLSession? = nil) {
         lock.lock()
