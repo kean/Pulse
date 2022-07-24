@@ -11,6 +11,7 @@ struct NetworkSearchCriteria: Hashable {
 
     var dates = DatesFilter.default
     var statusCode = StatusCodeFilter.default
+    var responseSize = ResponseSizeFilter.default
     var host = HostFilter.default
     var duration = DurationFilter.default
     var contentType = ContentTypeFilter.default
@@ -28,6 +29,43 @@ struct NetworkSearchCriteria: Hashable {
         var to: String = ""
 
         static let `default` = StatusCodeFilter()
+    }
+
+    struct ResponseSizeFilter: Hashable {
+        var isEnabled = true
+        var from: String = ""
+        var to: String = ""
+        var unit: MeasurementUnit = .kilobytes
+
+        var fromBytes: Int64? {
+            Int64(from).map { $0 * unit.multiplier }
+        }
+
+        var toBytes: Int64? {
+            Int64(to).map { $0 * unit.multiplier }
+        }
+
+        enum MeasurementUnit: CaseIterable {
+            case bytes, kilobytes, megabytes
+
+            var localizedTitle: String {
+                switch self {
+                case .bytes: return "Bytes"
+                case .kilobytes: return "KB"
+                case .megabytes: return "MB"
+                }
+            }
+
+            var multiplier: Int64 {
+                switch self {
+                case .bytes: return 1
+                case .kilobytes: return 1024
+                case .megabytes: return 1024 * 1024
+                }
+            }
+        }
+
+        static let `default` = ResponseSizeFilter()
     }
 
     typealias DatesFilter = ConsoleSearchCriteria.DatesFilter
@@ -345,8 +383,13 @@ extension NetworkSearchCriteria {
             }
         }
 
-        if criteria.host.isEnabled, !criteria.host.values.isEmpty {
-            predicates.append(NSPredicate(format: "host IN %@", criteria.host.values))
+        if criteria.responseSize.isEnabled {
+            if let value = criteria.responseSize.fromBytes {
+                predicates.append(NSPredicate(format: "responseBodySize >= %d", value))
+            }
+            if let value = criteria.responseSize.toBytes {
+                predicates.append(NSPredicate(format: "responseBodySize < %d", value))
+            }
         }
 
         if criteria.statusCode.isEnabled {
@@ -354,7 +397,7 @@ extension NetworkSearchCriteria {
                 predicates.append(NSPredicate(format: "statusCode >= %d", value))
             }
             if let value = Int(criteria.statusCode.to), value > 0 {
-                predicates.append(NSPredicate(format: "statusCode <= %d", value))
+                predicates.append(NSPredicate(format: "statusCode < %d", value))
             }
         }
 
@@ -369,6 +412,10 @@ extension NetworkSearchCriteria {
 
         if criteria.redirect.isEnabled && criteria.redirect.isRedirect {
             predicates.append(NSPredicate(format: "redirectCount >= 1"))
+        }
+
+        if criteria.host.isEnabled, !criteria.host.values.isEmpty {
+            predicates.append(NSPredicate(format: "host IN %@", criteria.host.values))
         }
 
         if criteria.contentType.isEnabled {

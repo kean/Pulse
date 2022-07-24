@@ -28,16 +28,18 @@ struct NetworkFiltersView: View {
             }
 
             Section(header: FilterSectionHeader(
-                icon: "number", title: "Parameters",
+                icon: "arrow.down.circle", title: "Response",
                 color: .yellow,
                 reset:  {
                     viewModel.criteria.statusCode = .default
                     viewModel.criteria.contentType = .default
+                    viewModel.criteria.responseSize = .default
                 },
                 isDefault: viewModel.criteria.statusCode == .default &&
-                viewModel.criteria.contentType == .default
+                viewModel.criteria.contentType == .default &&
+                viewModel.criteria.responseSize == .default
             )) {
-                statusCodeGroup
+                responseGroup
             }
 
             Section(header: FilterSectionHeader(
@@ -106,24 +108,49 @@ struct NetworkFiltersView: View {
     }
 
     @ViewBuilder
-    private var statusCodeGroup: some View {
+    private var responseGroup: some View {
         HStack {
-            Text("Status Code")
-            Spacer()
-            TextField("From", text: $viewModel.criteria.statusCode.from, onEditingChanged: {
-                if $0 { viewModel.criteria.statusCode.isEnabled = true }
-            })
-            .keyboardType(.decimalPad)
-            .textFieldStyle(.roundedBorder)
-            .frame(width: 60)
-            Text("—")
-            TextField("To", text: $viewModel.criteria.statusCode.to, onEditingChanged: {
-                if $0 { viewModel.criteria.statusCode.isEnabled = true }
-            })
-            .textFieldStyle(.roundedBorder)
-            .frame(width: 60)
+            makeRangePicker(title: "Status Code", from: $viewModel.criteria.statusCode.from, to: $viewModel.criteria.statusCode.to, isEnabled: $viewModel.criteria.statusCode.isEnabled)
         }
         Filters.contentTypesPicker(selection: $viewModel.criteria.contentType.contentType)
+        HStack {
+            makeRangePicker(title: "Size", from: $viewModel.criteria.responseSize.from, to: $viewModel.criteria.responseSize.to, isEnabled: $viewModel.criteria.responseSize.isEnabled)
+            if #available(iOS 14.0, *) {
+                Menu(content: {
+                    Picker("", selection: $viewModel.criteria.responseSize.unit) {
+                        Text("Bytes").tag(NetworkSearchCriteria.ResponseSizeFilter.MeasurementUnit.bytes)
+                        Text("Kilobytes").tag(NetworkSearchCriteria.ResponseSizeFilter.MeasurementUnit.kilobytes)
+                        Text("Megabytes").tag(NetworkSearchCriteria.ResponseSizeFilter.MeasurementUnit.megabytes)
+                    }
+                }, label: {
+                    FilterPickerButton(title: viewModel.criteria.responseSize.unit.localizedTitle)
+                })
+                .animation(.none)
+                .fixedSize()
+            } else {
+                Text("KB")
+                    .foregroundColor(.secondary)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func makeRangePicker(title: String, from: Binding<String>, to: Binding<String>, isEnabled: Binding<Bool>) -> some View {
+        Text(title)
+        Spacer()
+        TextField("From", text: from, onEditingChanged: {
+            if $0 { isEnabled.wrappedValue = true }
+        })
+        .keyboardType(.decimalPad)
+        .textFieldStyle(.roundedBorder)
+        .frame(width: 60)
+        Text("<")
+            .foregroundColor(.secondary)
+        TextField("To", text: to, onEditingChanged: {
+            if $0 { isEnabled.wrappedValue = true }
+        })
+        .textFieldStyle(.roundedBorder)
+        .frame(width: 60)
     }
 
     @ViewBuilder

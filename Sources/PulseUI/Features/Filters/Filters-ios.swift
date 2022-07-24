@@ -78,7 +78,8 @@ struct DurationPicker: View {
                 }
             }, label: {
                 FilterPickerButton(title: value.unit.localizedTitle)
-            }).animation(.none)
+            })
+            .animation(.none)
             .fixedSize()
 
         }
@@ -175,8 +176,9 @@ struct FilterSectionHeader: View {
             HStack {
                 Image(systemName: icon)
                     .foregroundColor(.accentColor)
-                Text(title)
+                Text(title.uppercased())
             }
+            .font(.body)
             Spacer()
 
             Button(action: reset) {
