@@ -18,39 +18,36 @@ public struct MainView: View {
     }
 
     public var body: some View {
-        HStack(spacing: 0) {
-            ConsoleContainerViewPro(viewModel: viewModel, details: viewModel.details, toolbar: viewModel.toolbar)
-            FiltersPanelView(viewModel: viewModel, tooblar: viewModel.toolbar)
-        }
-        .navigationTitle("Console")
-        .toolbar {
-            ToolbarItemGroup(placement: .navigation) {
-                Button(action: { isShowingSettings = true }) {
-                    Image(systemName: "gearshape")
+        ConsoleContainerViewPro(viewModel: viewModel, details: viewModel.details, toolbar: viewModel.toolbar)
+            .navigationTitle("Console")
+            .toolbar {
+                ToolbarItemGroup(placement: .navigation) {
+                    Button(action: { isShowingSettings = true }) {
+                        Image(systemName: "gearshape")
+                    }
+                }
+                ToolbarItemGroup(placement: .automatic) {
+                    Button(action: {
+                        // TODO: Refactor
+                        viewModel.toolbar.isSearchBarActive = true
+                        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(100)) {
+                            viewModel.searchBar.onFind.send()
+                        }
+                    }) {
+                        Image(systemName: "magnifyingglass")
+                    }.keyboardShortcut("f")
+                    ConsoleToolbarToggleOnlyErrorsButton(viewModel: viewModel.toolbar)
+                        .keyboardShortcut("e", modifiers: [.command, .shift])
+                    ConsoleToolbarModePickerButton(viewModel: viewModel.mode)
+                        .keyboardShortcut("n", modifiers: [.command, .shift])
+                    FilterPopoverToolbarButton(viewModel: viewModel, mode: viewModel.mode)
+                        .keyboardShortcut("f", modifiers: [.command, .option])
+                    ConsoleToolbarToggleVerticalView(viewModel: viewModel.toolbar)
                 }
             }
-            ToolbarItemGroup(placement: .automatic) {
-                Button(action: {
-                    // TODO: Refactor
-                    viewModel.toolbar.isSearchBarActive = true
-                    DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(100)) {
-                        viewModel.searchBar.onFind.send()
-                    }
-                }) {
-                    Image(systemName: "magnifyingglass")
-                }.keyboardShortcut("f")
-                ConsoleToolbarToggleOnlyErrorsButton(viewModel: viewModel.toolbar)
-                    .keyboardShortcut("e", modifiers: [.command, .shift])
-                ConsoleToolbarModePickerButton(viewModel: viewModel.mode)
-                    .keyboardShortcut("n", modifiers: [.command, .shift])
-                ConsoleToolbarToggleFiltersButton(viewModel: viewModel.toolbar)
-                    .keyboardShortcut("f", modifiers: [.command, .option])
-                ConsoleToolbarToggleVerticalView(viewModel: viewModel.toolbar)
+            .sheet(isPresented: $isShowingSettings) {
+                SettingsView(viewModel: .init(store: viewModel.store), console: viewModel.console)
             }
-        }
-        .sheet(isPresented: $isShowingSettings) {
-            SettingsView(viewModel: .init(store: viewModel.store), console: viewModel.console)
-        }
     }
 }
 
@@ -125,26 +122,23 @@ private struct ConsoleToolbarSearchBar: View {
     }
 }
 
-private struct FiltersPanelView: View {
-    let viewModel: MainViewModel
-    @ObservedObject var tooblar: ConsoleToolbarViewModel
-
-    var body: some View {
-        if !tooblar.isFiltersPaneHidden {
-            HStack(spacing: 0) {
-                ExDivider()
-                ConsoleContainerFiltersPanel(viewModel: viewModel, mode: viewModel.mode)
-                    .frame(width: Filters.preferredWidth)
-            }
-        }
-    }
-}
-
-private struct ConsoleContainerFiltersPanel: View {
+private struct FilterPopoverToolbarButton: View {
     let viewModel: MainViewModel
     @ObservedObject var mode: ConsoleModePickerViewModel
+    @State private var isFilterPresented = false
 
     var body: some View {
+        Button(action: { isFilterPresented.toggle() }, label: {
+            Image(systemName: isFilterPresented ? "line.horizontal.3.decrease.circle.fill" : "line.horizontal.3.decrease.circle")
+        }).foregroundColor(isFilterPresented ? .accentColor : .secondary)
+            .help("Toggle Filters Panel (⌥⌘F)")
+            .popover(isPresented: $isFilterPresented, arrowEdge: .top) {
+                filters.padding(.bottom, 16)
+            }
+    }
+
+    @ViewBuilder
+    private var filters: some View {
         if mode.isNetworkOnly {
             NetworkFiltersView(viewModel: viewModel.network.searchCriteria)
         } else {
