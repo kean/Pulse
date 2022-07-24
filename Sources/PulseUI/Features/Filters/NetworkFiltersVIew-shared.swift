@@ -9,6 +9,71 @@ import Combine
 
 #if os(iOS) || os(macOS)
 
+// MARK: - NetworkFiltersView (General)
+
+extension NetworkFiltersView {
+    @available(iOS 14.0, *)
+    var generalGroup: some View {
+        FiltersSection(
+            isExpanded: $isGeneralGroupExpanded,
+            header: { generalGroupHeader },
+            content: { generalGroupContent },
+            isWrapped: false
+        )
+    }
+
+    private var generalGroupHeader: some View {
+        FilterSectionHeader(
+            icon: "line.horizontal.3.decrease.circle", title: "General",
+            color: .yellow,
+            reset: { viewModel.resetFilters() },
+            isDefault: viewModel.filters.count == 1 && viewModel.filters[0].isDefault,
+            isEnabled: $viewModel.criteria.isFiltersEnabled
+        )
+    }
+    
+#if os(iOS)
+    
+    @available(iOS 14.0, *)
+    @ViewBuilder
+    private var generalGroupContent: some View {
+        ForEach(viewModel.filters) { filter in
+            CustomNetworkFilterView(filter: filter, onRemove: {
+                viewModel.removeFilter(filter)
+            }).buttonStyle(.plain)
+        }
+        
+        Button(action: viewModel.addFilter) {
+            HStack {
+                Image(systemName: "plus.circle.fill")
+                    .font(.system(size: 18))
+                Text("Add Filter")
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .center)
+    }
+    
+#elseif os(macOS)
+    
+    @ViewBuilder
+    private var generalGroupContent: some View {
+        VStack {
+            ForEach(viewModel.filters) { filter in
+                CustomNetworkFilterView(filter: filter, onRemove: {
+                    viewModel.removeFilter(filter)
+                })
+            }
+        }
+        .padding(.leading, 4)
+        .padding(.top, Filters.contentTopInset)
+        Button(action: viewModel.addFilter) {
+            Image(systemName: "plus.circle")
+        }
+    }
+    
+#endif
+}
+
 // MARK: - NetworkFiltersView (Response)
 
 extension NetworkFiltersView {
@@ -375,6 +440,7 @@ private struct FiltersSection<Header: View, Content: View>: View {
     var isExpanded: Binding<Bool>
     @ViewBuilder var header: () -> Header
     @ViewBuilder var content: () -> Content
+    var isWrapped = true
 
     var body: some View {
 #if os(iOS)
@@ -383,12 +449,16 @@ private struct FiltersSection<Header: View, Content: View>: View {
         DisclosureGroup(
             isExpanded: isExpanded,
             content: {
-                VStack {
+                if isWrapped {
+                    VStack {
+                        content()
+                    }
+                    .padding(.leading, 12)
+                    .padding(.trailing, 5)
+                    .padding(.top, Filters.contentTopInset)
+                } else {
                     content()
                 }
-                .padding(.leading, 12)
-                .padding(.trailing, 5)
-                .padding(.top, Filters.contentTopInset)
             },
             label: header
         )

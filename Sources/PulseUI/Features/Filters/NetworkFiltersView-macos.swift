@@ -12,7 +12,7 @@ import Combine
 struct NetworkFiltersView: View {
     @ObservedObject var viewModel: NetworkSearchCriteriaViewModel
 
-    @AppStorage("networkFilterIsParametersExpanded") var isParametersExpanded = true
+    @AppStorage("networkFilterIsParametersExpanded") var isGeneralGroupExpanded = true
     @AppStorage("networkFilterIsResponseExpanded") var isResponseGroupExpanded = true
     @AppStorage("networkFilterIsTimePeriodExpanded") var isTimePeriodExpanded = true
     @AppStorage("networkFilterIsDomainsGroupExpanded") var isDomainsGroupExpanded = true
@@ -44,33 +44,6 @@ struct NetworkFiltersView: View {
                 networkingGroup
             }.padding(Filters.formPadding)
         }
-    }
-
-    // MARK: - General
-    
-    private var generalGroup: some View {
-        DisclosureGroup(isExpanded: $isParametersExpanded, content: {
-            VStack {
-                ForEach(viewModel.filters) { filter in
-                    CustomNetworkFilterView(filter: filter, onRemove: {
-                        viewModel.removeFilter(filter)
-                    })
-                }
-            }
-            .padding(.leading, 4)
-            .padding(.top, Filters.contentTopInset)
-            Button(action: viewModel.addFilter) {
-                Image(systemName: "plus.circle")
-            }
-        }, label: {
-            FilterSectionHeader(
-                icon: "line.horizontal.3.decrease.circle", title: "General",
-                color: .yellow,
-                reset: { viewModel.resetFilters() },
-                isDefault: viewModel.filters.count == 1 && viewModel.filters[0].isDefault,
-                isEnabled: $viewModel.criteria.isFiltersEnabled
-            )
-        })
     }
 }
 

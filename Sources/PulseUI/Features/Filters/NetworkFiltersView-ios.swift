@@ -12,7 +12,7 @@ import Combine
 struct NetworkFiltersView: View {
     @ObservedObject var viewModel: NetworkSearchCriteriaViewModel
 
-    @State var isParametersExpanded = true
+    @State var isGeneralGroupExpanded = true
     @State var isResponseGroupExpanded = true
     @State var isTimePeriodExpanded = true
     @State var isDomainsGroupExpanded = true
@@ -25,16 +25,8 @@ struct NetworkFiltersView: View {
     var body: some View {
         Form {
             if #available(iOS 14.0, *) {
-                Section(header: FilterSectionHeader(
-                    icon: "line.horizontal.3.decrease.circle", title: "Filters",
-                    color: .yellow,
-                    reset: { viewModel.resetFilters() },
-                    isDefault: viewModel.filters.count == 1 && viewModel.filters[0].isDefault
-                )) {
-                    generalGroup
-                }
+                generalGroup
             }
-
             responseGroup
             if #available(iOS 14.0, *) {
                 durationGroup
@@ -54,27 +46,6 @@ struct NetworkFiltersView: View {
     private var buttonReset: some View {
         Button("Reset") { viewModel.resetAll() }
             .disabled(!viewModel.isButtonResetEnabled)
-    }
-
-    // MARK: - General
-
-    @available(iOS 14.0, *)
-    @ViewBuilder
-    private var generalGroup: some View {
-        ForEach(viewModel.filters) { filter in
-            CustomNetworkFilterView(filter: filter, onRemove: {
-                viewModel.removeFilter(filter)
-            }).buttonStyle(.plain)
-        }
-
-        Button(action: { viewModel.addFilter() }) {
-            HStack {
-                Image(systemName: "plus.circle.fill")
-                    .font(.system(size: 18))
-                Text("Add Filter")
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .center)
     }
 }
 
