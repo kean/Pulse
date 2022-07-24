@@ -7,7 +7,7 @@ import CoreData
 import PulseCore
 import Combine
 
-#if !os(watchOS)
+#if os(iOS) || os(macOS)
 
 enum Filters {
     typealias ContentType = NetworkSearchCriteria.ContentTypeFilter.ContentType

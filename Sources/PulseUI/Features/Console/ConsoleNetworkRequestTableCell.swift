@@ -66,6 +66,12 @@ final class ConsoleNetworkRequestTableCell: UITableViewCell, UIContextMenuIntera
         }
     }
 
+    override func prepareForReuse() {
+        super.prepareForReuse()
+
+        layer.removeAllAnimations()
+    }
+
     private func refresh() {
         guard let viewModel = viewModel else { return }
 

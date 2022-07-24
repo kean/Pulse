@@ -33,7 +33,11 @@ extension UITableView {
             deleteRows(at: deletes, with: .left)
             insertRows(at: inserts, with: .right)
             moves.forEach { move in
-                moveRow(at: move.from, to: move.to)
+                if move.from == move.to {
+                    // Do nothing, the cell updates itself automatically
+                } else {
+                    moveRow(at: move.from, to: move.to)
+                }
             }
         }
     }
