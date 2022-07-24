@@ -140,4 +140,14 @@ final class NetworkSearchCriteriaViewModel: ObservableObject {
             self.criteria.dates.endDate = newValue
         })
     }
+
+    func binding(forDomain domain: String) -> Binding<Bool> {
+        Binding(get: {
+            self.criteria.host.values.contains(domain)
+        }, set: { newValue in
+            if self.criteria.host.values.remove(domain) == nil {
+                self.criteria.host.values.insert(domain)
+            }
+        })
+    }
 }

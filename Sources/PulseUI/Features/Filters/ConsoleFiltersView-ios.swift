@@ -56,7 +56,7 @@ struct ConsoleFiltersView: View {
             }
         }
         .background(allLabelsNavigationLink)
-        .navigationBarTitle("Filters")
+        .navigationBarTitle("Filters", displayMode: .inline)
         .navigationBarItems(leading: buttonClose, trailing: buttonReset)
     }
 

@@ -34,7 +34,7 @@ struct NetworkSearchCriteria: Hashable {
 
     struct HostFilter: Hashable {
         var isEnabled = true
-        var value: String = ""
+        var values: Set<String> = []
 
         static let `default` = HostFilter()
     }
@@ -345,8 +345,8 @@ extension NetworkSearchCriteria {
             }
         }
 
-        if criteria.host.isEnabled, !criteria.host.value.isEmpty {
-            predicates.append(NSPredicate(format: "host == %@", criteria.host.value))
+        if criteria.host.isEnabled, !criteria.host.values.isEmpty {
+            predicates.append(NSPredicate(format: "host IN %@", criteria.host.values))
         }
 
         if criteria.statusCode.isEnabled {

@@ -61,7 +61,6 @@ private struct NetworkToolbarView: View {
         VStack {
             HStack(spacing: 0) {
                 SearchBar(title: "Search \(viewModel.entities.count) messages", text: $viewModel.filterTerm)
-                Spacer().frame(width: 10)
                 Button(action: { viewModel.isOnlyErrors.toggle() }) {
                     Image(systemName: viewModel.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon")
                         .font(.system(size: 20))

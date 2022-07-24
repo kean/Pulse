@@ -43,12 +43,12 @@ struct NetworkFiltersView: View {
             }
 
             Section(header: FilterSectionHeader(
-                icon: "calendar", title: "Time Period",
+                icon: "server.rack", title: "Host",
                 color: .yellow,
-                reset: { viewModel.criteria.dates = .default },
-                isDefault: viewModel.criteria.dates == .default
+                reset: { viewModel.criteria.host = .default },
+                isDefault: viewModel.criteria.host == .default
             )) {
-                timePeriodGroup
+                domainsGroup
             }
 
             if #available(iOS 14.0, *) {
@@ -66,7 +66,7 @@ struct NetworkFiltersView: View {
                 }
             }
         }
-        .navigationBarTitle("Filters")
+        .navigationBarTitle("Filters", displayMode: .inline)
         .navigationBarItems(leading: buttonClose, trailing: buttonReset)
     }
 
@@ -116,14 +116,43 @@ struct NetworkFiltersView: View {
             .textFieldStyle(.roundedBorder)
             .frame(width: 60)
         }
-        Picker("Domain", selection: $viewModel.criteria.host.value) {
-            Text("Any").tag("")
-            ForEach(viewModel.allDomains, id: \.self) {
-                Text($0).tag($0)
+        Filters.contentTypesPicker(selection: $viewModel.criteria.contentType.contentType)
+    }
+
+    @ViewBuilder
+    private var domainsGroup: some View {
+        makeDomainPicker(limit: 4)
+        if viewModel.allDomains.count > 4 {
+            NavigationLink(destination: {
+                List {
+                    Button("Deselect All") {
+                        viewModel.criteria.host.values = []
+                    }
+                    makeDomainPicker()
+                }
+                .navigationBarTitle("Select Hosts", displayMode: .inline)
+            }) {
+                Text("Show All")
             }
         }
+    }
 
-        Filters.contentTypesPicker(selection: $viewModel.criteria.contentType.contentType)
+    private func makeDomainPicker(limit: Int? = nil) -> some View {
+        var domains = viewModel.allDomains
+        if let limit = limit {
+            domains = Array(domains.prefix(limit))
+        }
+        return ForEach(domains, id: \.self) { domain in
+            let binding = viewModel.binding(forDomain: domain)
+            Button(action: { binding.wrappedValue.toggle() }) {
+                HStack {
+                    Text(domain)
+                        .foregroundColor(.primary)
+                    Spacer()
+                    Checkbox(isEnabled: binding)
+                }
+            }
+        }
     }
 
     @ViewBuilder
