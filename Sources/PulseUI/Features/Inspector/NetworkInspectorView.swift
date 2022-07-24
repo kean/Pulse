@@ -133,8 +133,16 @@ struct NetworkInspectorView: View {
                 makeResponseView(viewModel: model)
             } else if !viewModel.isCompleted && !viewModel.store.isReadonly {
                 pending
-            } else if viewModel.hasResponseBody  {
+            } else if viewModel.hasResponseBody {
                 PlaceholderView(imageName: "exclamationmark.circle", title: "Unavailable")
+            } else if viewModel.request.taskType == .downloadTask {
+                PlaceholderView(imageName: "square.and.arrow.down", title: {
+                    var title = "Downloaded to a File"
+                    if viewModel.request.totalUnitCount > 0 {
+                        title += "\n\(ByteCountFormatter.string(fromByteCount: viewModel.request.totalUnitCount, countStyle: .file))"
+                    }
+                    return title
+                }())
             } else {
                 PlaceholderView(imageName: "nosign", title: "Empty Response")
             }
