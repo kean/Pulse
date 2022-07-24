@@ -64,15 +64,7 @@ struct NetworkFiltersView: View {
                 timePeriodGroup
             }
 
-            Section(header: FilterSectionHeader(
-                icon: "server.rack", title: "Hosts",
-                color: .yellow,
-                reset: { viewModel.criteria.host = .default },
-                isDefault: viewModel.criteria.host == .default
-            )) {
-                domainsGroup
-            }
-
+            domainsGroup
             networkingGroup
         }
         .navigationBarTitle("Filters", displayMode: .inline)
@@ -150,44 +142,6 @@ struct NetworkFiltersView: View {
         .keyboardType(.decimalPad)
         .textFieldStyle(.roundedBorder)
         .frame(width: 80)
-    }
-
-    // MARK: - Domains Group
-
-    @ViewBuilder
-    private var domainsGroup: some View {
-        makeDomainPicker(limit: 4)
-        if viewModel.allDomains.count > 4 {
-            NavigationLink(destination: {
-                List {
-                    Button("Deselect All") {
-                        viewModel.criteria.host.values = []
-                    }
-                    makeDomainPicker()
-                }
-                .navigationBarTitle("Select Hosts", displayMode: .inline)
-            }) {
-                Text("Show All")
-            }
-        }
-    }
-
-    private func makeDomainPicker(limit: Int? = nil) -> some View {
-        var domains = viewModel.allDomains
-        if let limit = limit {
-            domains = Array(domains.prefix(limit))
-        }
-        return ForEach(domains, id: \.self) { domain in
-            let binding = viewModel.binding(forDomain: domain)
-            Button(action: { binding.wrappedValue.toggle() }) {
-                HStack {
-                    Text(domain)
-                        .foregroundColor(.primary)
-                    Spacer()
-                    Checkbox(isEnabled: binding)
-                }
-            }
-        }
     }
 
     // MARK: - Time Period Group

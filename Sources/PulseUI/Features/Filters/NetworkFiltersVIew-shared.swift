@@ -9,6 +9,105 @@ import Combine
 
 #if os(iOS) || os(macOS)
 
+// MARK: - NetworkFiltersView (Domains)
+
+extension NetworkFiltersView {
+    @ViewBuilder
+    var domainsGroup: some View {
+        FiltersSection(
+            isExpanded: $isDomainsGroupExpanded,
+            header: { domainsGroupHeader },
+            content: { domainsGroupContent }
+        )
+    }
+
+    private var domainsGroupHeader: some View {
+        FilterSectionHeader(
+            icon: "server.rack", title: "Hosts",
+            color: .yellow,
+            reset: { viewModel.criteria.host = .default },
+            isDefault: viewModel.criteria.host == .default,
+            isEnabled: $viewModel.criteria.host.isEnabled
+        )
+    }
+
+    @ViewBuilder
+    private var domainsGroupContent: some View {
+        makeDomainPicker(limit: 4)
+        if viewModel.allDomains.count > 4 {
+            domainsShowAllButton
+        }
+    }
+
+    #if os(iOS)
+    private var domainsShowAllButton: some View {
+        NavigationLink(destination: { domainsPickerView}) {
+            Text("Show All")
+        }
+    }
+
+    private func makeDomainPicker(limit: Int? = nil) -> some View {
+        var domains = viewModel.allDomains
+        if let limit = limit {
+            domains = Array(domains.prefix(limit))
+        }
+        return ForEach(domains, id: \.self) { domain in
+            let binding = viewModel.binding(forDomain: domain)
+            Button(action: { binding.wrappedValue.toggle() }) {
+                HStack {
+                    Text(domain)
+                        .foregroundColor(.primary)
+                    Spacer()
+                    Checkbox(isEnabled: binding)
+                }
+            }
+        }
+    }
+    #elseif os(macOS)
+    private var domainsShowAllButton: some View {
+        HStack {
+            Spacer()
+            Button(action: { isDomainsPickerPresented = true }) {
+                Text("Show All")
+            }
+            .padding(.top, 6)
+            .popover(isPresented: $isDomainsPickerPresented) {
+                domainsPickerView
+                    .frame(width: 220, height: 340)
+            }
+            Spacer()
+        }
+    }
+
+    private func makeDomainPicker(limit: Int? = nil) -> some View {
+        var domains = viewModel.allDomains
+        if let limit = limit {
+            domains = Array(domains.prefix(limit))
+        }
+        return ForEach(domains, id: \.self) { domain in
+            HStack {
+                Toggle(domain, isOn: viewModel.binding(forDomain: domain))
+                Spacer()
+            }
+        }
+    }
+    #endif
+
+    private var domainsPickerView: some View {
+        List {
+            Button("Deselect All") {
+                viewModel.criteria.host.values = []
+            }
+            makeDomainPicker()
+        }
+        #if os(iOS)
+        .navigationBarTitle("Select Hosts", displayMode: .inline)
+        #else
+        .navigationTitle("Select Hosts")
+        #endif
+    }
+}
+
 // MARK: - NetworkFiltersView (Networking)
 
 extension NetworkFiltersView {

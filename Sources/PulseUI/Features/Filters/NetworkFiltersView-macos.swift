@@ -20,7 +20,7 @@ struct NetworkFiltersView: View {
     @AppStorage("networkFilterIsContentTypeGroupExpanded") var isContentTypeGroupExpanded = true
     @AppStorage("networkFilterIsRedirectGroupExpanded") var isRedirectGroupExpanded = true
 
-    @State private var isDomainsPickerPresented = false
+    @State var isDomainsPickerPresented = false
 
     var body: some View {
         ScrollView {
@@ -198,62 +198,6 @@ struct NetworkFiltersView: View {
         }
     }
 
-    // MARK: - Domains Group
-
-    private var domainsGroup: some View {
-        DisclosureGroup(isExpanded: $isDomainsGroupExpanded, content: {
-            FiltersSectionContent {
-                makeDomainPicker(limit: 4)
-                if viewModel.allDomains.count > 4 {
-                    domainsShowAllButton
-                }
-            }
-        }, label: {
-            FilterSectionHeader(
-                icon: "server.rack", title: "Hosts",
-                color: .yellow,
-                reset: { viewModel.criteria.host = .default },
-                isDefault: viewModel.criteria.host == .default,
-                isEnabled: $viewModel.criteria.host.isEnabled
-            )
-        })
-    }
-
-    private var domainsShowAllButton: some View {
-        HStack {
-            Spacer()
-            Button(action: { isDomainsPickerPresented = true }) {
-                Text("Show All")
-            }
-            .padding(.top, 6)
-            .popover(isPresented: $isDomainsPickerPresented) {
-                List {
-                    Button("Deselect All") {
-                        viewModel.criteria.host.values = []
-                    }
-                    makeDomainPicker()
-                        .padding(.leading, -13) // Compensate Filers.toggle inset
-                }
-                .frame(width: 220, height: 340)
-                .navigationTitle("Select Hosts")
-            }
-            Spacer()
-        }
-    }
-
-    private func makeDomainPicker(limit: Int? = nil) -> some View {
-        var domains = viewModel.allDomains
-        if let limit = limit {
-            domains = Array(domains.prefix(limit))
-        }
-        return ForEach(domains, id: \.self) { domain in
-            HStack {
-                Toggle(domain, isOn: viewModel.binding(forDomain: domain))
-                Spacer()
-            }
-        }
-    }
-    
     private var durationGroup: some View {
         DisclosureGroup(isExpanded: $isDurationGroupExpanded, content: {
             FiltersSectionContent {
