@@ -133,8 +133,8 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
     }
 
     /// Returns task type
-    public var taskType: NetworkLoggerTaskType {
-        rawTaskType.flatMap(NetworkLoggerTaskType.init) ?? .dataTask
+    public var taskType: NetworkLoggerTaskType? {
+        rawTaskType.flatMap(NetworkLoggerTaskType.init)
     }
 
     public enum State: Int16 {

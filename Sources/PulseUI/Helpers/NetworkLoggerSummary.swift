@@ -8,7 +8,7 @@ import CoreData
 
 final class NetworkLoggerSummary {
     private let objectId: NSManagedObjectID?
-    let taskType: NetworkLoggerTaskType
+    let taskType: NetworkLoggerTaskType?
     let originalRequest: NetworkLoggerRequest?
     let currentRequest: NetworkLoggerRequest?
     let state: LoggerNetworkRequestEntity.State
