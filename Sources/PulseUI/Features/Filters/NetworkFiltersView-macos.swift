@@ -198,41 +198,6 @@ struct NetworkFiltersView: View {
         }
     }
 
-    private var durationGroup: some View {
-        DisclosureGroup(isExpanded: $isDurationGroupExpanded, content: {
-            FiltersSectionContent {
-                durationRow
-            }
-        }, label: {
-            FilterSectionHeader(
-                icon: "hourglass", title: "Duration",
-                color: .yellow,
-                reset: { viewModel.criteria.duration = .default },
-                isDefault: viewModel.criteria.duration == .default,
-                isEnabled: $viewModel.criteria.duration.isEnabled
-            )
-        })
-    }
-
-    @ViewBuilder
-    private var durationRow: some View {
-        HStack {
-            TextField("Min", text: $viewModel.criteria.duration.min)
-            .textFieldStyle(.roundedBorder)
-
-            TextField("Max", text: $viewModel.criteria.duration.max)
-            .textFieldStyle(.roundedBorder)
-
-            Picker("Unit", selection: $viewModel.criteria.duration.unit) {
-                Text("Min").tag(NetworkSearchCriteria.DurationFilter.Unit.minutes)
-                Text("Sec").tag(NetworkSearchCriteria.DurationFilter.Unit.seconds)
-                Text("Ms").tag(NetworkSearchCriteria.DurationFilter.Unit.milliseconds)
-            }
-            .fixedSize()
-            .labelsHidden()
-        }
-    }
-
     private typealias ContentType = NetworkSearchCriteria.ContentTypeFilter.ContentType
 }
 

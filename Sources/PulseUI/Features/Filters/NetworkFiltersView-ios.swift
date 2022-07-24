@@ -45,14 +45,7 @@ struct NetworkFiltersView: View {
             }
 
             if #available(iOS 14.0, *) {
-                Section(header: FilterSectionHeader(
-                    icon: "hourglass", title: "Duration",
-                    color: .yellow,
-                    reset: { viewModel.criteria.duration = .default },
-                    isDefault: viewModel.criteria.duration == .default
-                )) {
-                    durationGroup
-                }
+                durationGroup
             }
 
             Section(header: FilterSectionHeader(
@@ -161,33 +154,6 @@ struct NetworkFiltersView: View {
 
             Spacer()
         }.buttonStyle(.plain)
-    }
-
-    @available(iOS 14.0, *)
-    @ViewBuilder
-    private var durationGroup: some View {
-        HStack {
-            TextField("Min", text: $viewModel.criteria.duration.min)
-            .textFieldStyle(.roundedBorder)
-            .frame(maxWidth: 90)
-
-            TextField("Max", text: $viewModel.criteria.duration.max)
-            .textFieldStyle(.roundedBorder)
-            .frame(maxWidth: 90)
-
-            Menu(content: {
-                Picker("Unit", selection: $viewModel.criteria.duration.unit) {
-                    Text("Min").tag(NetworkSearchCriteria.DurationFilter.Unit.minutes)
-                    Text("Sec").tag(NetworkSearchCriteria.DurationFilter.Unit.seconds)
-                    Text("Ms").tag(NetworkSearchCriteria.DurationFilter.Unit.milliseconds)
-                }
-            }, label: {
-                FilterPickerButton(title: viewModel.criteria.duration.unit.localizedTitle)
-            })
-            .animation(.none)
-
-            Spacer()
-        }
     }
 }
 

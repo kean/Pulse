@@ -9,10 +9,84 @@ import Combine
 
 #if os(iOS) || os(macOS)
 
+// MARK: - NetworkFiltersView (Duration)
+
+extension NetworkFiltersView {
+    @available(iOS 14.0, *)
+    var durationGroup: some View {
+        FiltersSection(
+            isExpanded: $isDurationGroupExpanded,
+            header: { durationGroupHeader },
+            content: { durationGroupContent }
+        )
+    }
+
+    private var durationGroupHeader: some View {
+        FilterSectionHeader(
+            icon: "hourglass", title: "Duration",
+            color: .yellow,
+            reset: { viewModel.criteria.duration = .default },
+            isDefault: viewModel.criteria.duration == .default,
+            isEnabled: $viewModel.criteria.duration.isEnabled
+        )
+    }
+
+#if os(iOS)
+    @available(iOS 14.0, *)
+    @ViewBuilder
+    private var durationGroupContent: some View {
+        HStack {
+            Text("Duration")
+            Spacer()
+            durationMinField
+            durationMaxField
+            Menu(content: { durationUnitPicker }, label: {
+                FilterPickerButton(title: viewModel.criteria.duration.unit.localizedTitle)
+            })
+            .animation(.none)
+        }
+    }
+#elseif os(macOS)
+    @ViewBuilder
+    private var durationGroupContent: some View {
+        HStack {
+            durationMinField
+            durationMaxField
+            durationUnitPicker.fixedSize().labelsHidden()
+        }
+    }
+#endif
+
+    private var durationMinField: some View {
+        TextField("Min", text: $viewModel.criteria.duration.min)
+            .textFieldStyle(.roundedBorder)
+#if os(iOS)
+            .keyboardType(.decimalPad)
+            .frame(maxWidth: 80)
+#endif
+    }
+
+    private var durationMaxField: some View {
+        TextField("Max", text: $viewModel.criteria.duration.max)
+            .textFieldStyle(.roundedBorder)
+#if os(iOS)
+            .keyboardType(.decimalPad)
+            .frame(maxWidth: 80)
+#endif
+    }
+
+    private var durationUnitPicker: some View {
+        Picker("Unit", selection: $viewModel.criteria.duration.unit) {
+            Text("Min").tag(NetworkSearchCriteria.DurationFilter.Unit.minutes)
+            Text("Sec").tag(NetworkSearchCriteria.DurationFilter.Unit.seconds)
+            Text("Ms").tag(NetworkSearchCriteria.DurationFilter.Unit.milliseconds)
+        }
+    }
+}
+
 // MARK: - NetworkFiltersView (Domains)
 
 extension NetworkFiltersView {
-    @ViewBuilder
     var domainsGroup: some View {
         FiltersSection(
             isExpanded: $isDomainsGroupExpanded,
@@ -111,7 +185,6 @@ extension NetworkFiltersView {
 // MARK: - NetworkFiltersView (Networking)
 
 extension NetworkFiltersView {
-    @ViewBuilder
     var networkingGroup: some View {
         FiltersSection(
             isExpanded: $isRedirectGroupExpanded,
