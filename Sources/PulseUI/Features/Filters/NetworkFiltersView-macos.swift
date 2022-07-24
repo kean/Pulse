@@ -109,13 +109,7 @@ struct NetworkFiltersView: View {
 
     @ViewBuilder
     private var contentTypeRow: some View {
-        HStack {
-            Text("Content Type")
-            Spacer()
-            Filters.contentTypesPicker(selection: $viewModel.criteria.response.contentType.contentType)
-                .labelsHidden()
-                .fixedSize()
-        }
+        Filters.contentTypesPicker(selection: $viewModel.criteria.response.contentType.contentType)
     }
 
     @ViewBuilder
@@ -286,9 +280,9 @@ struct NetworkFiltersView: View {
             .textFieldStyle(.roundedBorder)
 
             Picker("Unit", selection: $viewModel.criteria.duration.unit) {
-                Text("min").tag(NetworkSearchCriteria.DurationFilter.Unit.minutes)
-                Text("sec").tag(NetworkSearchCriteria.DurationFilter.Unit.seconds)
-                Text("ms").tag(NetworkSearchCriteria.DurationFilter.Unit.milliseconds)
+                Text("Min").tag(NetworkSearchCriteria.DurationFilter.Unit.minutes)
+                Text("Sec").tag(NetworkSearchCriteria.DurationFilter.Unit.seconds)
+                Text("Ms").tag(NetworkSearchCriteria.DurationFilter.Unit.milliseconds)
             }
             .fixedSize()
             .labelsHidden()
@@ -298,13 +292,8 @@ struct NetworkFiltersView: View {
     private var networkingGroup: some View {
         DisclosureGroup(isExpanded: $isRedirectGroupExpanded, content: {
             FiltersSection {
-                HStack {
-                    Text("Source")
-                    Spacer()
-                    Filters.responseSourcePicker($viewModel.criteria.networking.source)
-                        .fixedSize()
-                        .labelsHidden()
-                }
+                Filters.taskTypePicker($viewModel.criteria.networking.taskType)
+                Filters.responseSourcePicker($viewModel.criteria.networking.source)
                 HStack {
                     Toggle("Redirect", isOn: $viewModel.criteria.networking.isRedirect)
                     Spacer()
@@ -405,7 +394,7 @@ struct NetworkFiltersPanelPro_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             NetworkFiltersView(viewModel: makeMockViewModel())
-                .previewLayout(.fixed(width: Filters.preferredWidth - 15, height: 900))
+                .previewLayout(.fixed(width: Filters.preferredWidth - 15, height: 940))
         }
     }
 }

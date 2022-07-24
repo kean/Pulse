@@ -222,9 +222,9 @@ struct NetworkFiltersView: View {
 
             Menu(content: {
                 Picker("Unit", selection: $viewModel.criteria.duration.unit) {
-                    Text("min").tag(NetworkSearchCriteria.DurationFilter.Unit.minutes)
-                    Text("sec").tag(NetworkSearchCriteria.DurationFilter.Unit.seconds)
-                    Text("ms").tag(NetworkSearchCriteria.DurationFilter.Unit.milliseconds)
+                    Text("Min").tag(NetworkSearchCriteria.DurationFilter.Unit.minutes)
+                    Text("Sec").tag(NetworkSearchCriteria.DurationFilter.Unit.seconds)
+                    Text("Ms").tag(NetworkSearchCriteria.DurationFilter.Unit.milliseconds)
                 }
             }, label: {
                 FilterPickerButton(title: viewModel.criteria.duration.unit.localizedTitle)
@@ -239,8 +239,12 @@ struct NetworkFiltersView: View {
 
     @ViewBuilder
     private var networkingGroup: some View {
+        Filters.taskTypePicker($viewModel.criteria.networking.taskType)
         Filters.responseSourcePicker($viewModel.criteria.networking.source)
-        Toggle("Redirect", isOn: $viewModel.criteria.networking.isRedirect)
+        HStack {
+            Toggle("Redirect", isOn: $viewModel.criteria.networking.isRedirect)
+            Spacer()
+        }
     }
 }
 

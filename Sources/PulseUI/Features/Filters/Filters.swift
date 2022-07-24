@@ -57,10 +57,21 @@ enum Filters {
     }
 
     static func responseSourcePicker(_ selection: Binding<NetworkSearchCriteria.NetworkingFilter.Source>) -> some View {
-        Picker("Source", selection: selection) {
+        Picker("Response Source", selection: selection) {
             Text("Any").tag(NetworkSearchCriteria.NetworkingFilter.Source.any)
             Text("Network").tag(NetworkSearchCriteria.NetworkingFilter.Source.network)
             Text("Cache").tag(NetworkSearchCriteria.NetworkingFilter.Source.cache)
+        }
+    }
+
+    static func taskTypePicker(_ selection: Binding<NetworkSearchCriteria.NetworkingFilter.TaskType>) -> some View {
+        Picker("Task Type", selection: selection) {
+            Text("Any").tag(NetworkSearchCriteria.NetworkingFilter.TaskType.any)
+            Text("Data").tag(NetworkSearchCriteria.NetworkingFilter.TaskType.some(.dataTask))
+            Text("Download").tag(NetworkSearchCriteria.NetworkingFilter.TaskType.some(.downloadTask))
+            Text("Upload").tag(NetworkSearchCriteria.NetworkingFilter.TaskType.some(.uploadTask))
+            Text("Stream").tag(NetworkSearchCriteria.NetworkingFilter.TaskType.some(.streamTask))
+            Text("WebSocket").tag(NetworkSearchCriteria.NetworkingFilter.TaskType.some(.webSocketTask))
         }
     }
 }

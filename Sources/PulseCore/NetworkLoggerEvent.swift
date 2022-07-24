@@ -156,12 +156,12 @@ public struct NetworkLoggerTransactionDetailedMetrics: Codable {
     }
 }
 
-public enum NetworkLoggerTaskType: String, Codable {
-    case dataTask
-    case downloadTask
-    case uploadTask
-    case streamTask
-    case webSocketTask
+public enum NetworkLoggerTaskType: String, Codable, CaseIterable {
+    case dataTask = "data"
+    case downloadTask = "download"
+    case uploadTask = "upload"
+    case streamTask = "stream"
+    case webSocketTask = "websocket"
 
     public init(task: URLSessionTask) {
         switch task {
@@ -170,9 +170,7 @@ public enum NetworkLoggerTaskType: String, Codable {
         case task as URLSessionStreamTask: self = .streamTask
         case task as URLSessionUploadTask: self = .uploadTask
         case task as URLSessionWebSocketTask: self = .webSocketTask
-        default:
-            assertionFailure("Unknown task type: \(task)")
-            self = .dataTask
+        default: self = .dataTask
         }
     }
 }

@@ -150,6 +150,7 @@ struct NetworkSearchCriteria: Hashable {
         var isEnabled = true
         var isRedirect = false
         var source: Source = .any
+        var taskType: TaskType = .any
 
         enum Source {
             case any
@@ -163,6 +164,11 @@ struct NetworkSearchCriteria: Hashable {
                 case .network: return "Network"
                 }
             }
+        }
+
+        enum TaskType: Hashable {
+            case any
+            case some(NetworkLoggerTaskType)
         }
 
         static let `default` = NetworkingFilter()
@@ -441,6 +447,9 @@ extension NetworkSearchCriteria {
                 predicates.append(NSPredicate(format: "isFromCache == NO"))
             case .cache:
                 predicates.append(NSPredicate(format: "isFromCache == YES"))
+            }
+            if case .some(let taskType) = criteria.networking.taskType {
+                predicates.append(NSPredicate(format: "rawTaskType == %@", taskType.rawValue))
             }
         }
 
