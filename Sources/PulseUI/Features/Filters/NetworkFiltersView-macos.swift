@@ -231,29 +231,12 @@ struct NetworkFiltersView: View {
 
     private var domainsGroup: some View {
         DisclosureGroup(isExpanded: $isDomainsGroupExpanded, content: {
-            VStack {
+            FiltersSection {
                 makeDomainPicker(limit: 4)
                 if viewModel.allDomains.count > 4 {
-                    HStack {
-                        Button(action: { isDomainsPickerPresented = true }) {
-                            Text("Show All")
-                        }
-                        .padding(.top, 6)
-                        .popover(isPresented: $isDomainsPickerPresented) {
-                            List {
-                                Button("Deselect All") {
-                                    viewModel.criteria.host.values = []
-                                }
-                                makeDomainPicker()
-                                    .padding(.leading, -13) // Compensate Filers.toggle inset
-                            }
-                            .frame(width: 220, height: 340)
-                            .navigationTitle("Select Hosts")
-                        }
-                        Spacer()
-                    }.padding(.leading, 13)
+                    domainsShowAllButton
                 }
-            }.padding(.top, Filters.contentTopInset)
+            }
         }, label: {
             FilterSectionHeader(
                 icon: "server.rack", title: "Hosts",
@@ -265,13 +248,38 @@ struct NetworkFiltersView: View {
         })
     }
 
+    private var domainsShowAllButton: some View {
+        HStack {
+            Spacer()
+            Button(action: { isDomainsPickerPresented = true }) {
+                Text("Show All")
+            }
+            .padding(.top, 6)
+            .popover(isPresented: $isDomainsPickerPresented) {
+                List {
+                    Button("Deselect All") {
+                        viewModel.criteria.host.values = []
+                    }
+                    makeDomainPicker()
+                        .padding(.leading, -13) // Compensate Filers.toggle inset
+                }
+                .frame(width: 220, height: 340)
+                .navigationTitle("Select Hosts")
+            }
+            Spacer()
+        }
+    }
+
     private func makeDomainPicker(limit: Int? = nil) -> some View {
         var domains = viewModel.allDomains
         if let limit = limit {
             domains = Array(domains.prefix(limit))
         }
         return ForEach(domains, id: \.self) { domain in
-            Filters.toggle(domain, isOn: viewModel.binding(forDomain: domain))
+            HStack {
+                Toggle(domain, isOn: viewModel.binding(forDomain: domain))
+                Spacer()
+            }
         }
     }
     
