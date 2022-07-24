@@ -9,6 +9,49 @@ import Combine
 
 #if os(iOS) || os(macOS)
 
+// MARK: - NetworkFiltersView (Time Period)
+
+extension NetworkFiltersView {
+    var timePeriodGroup: some View {
+        FiltersSection(
+            isExpanded: $isTimePeriodExpanded,
+            header: { timePeriodGroupHeader },
+            content: { timePeriodGroupContent }
+        )
+    }
+    
+    private var timePeriodGroupHeader: some View {
+        FilterSectionHeader(
+            icon: "calendar", title: "Time Period",
+            color: .yellow,
+            reset: { viewModel.criteria.dates = .default },
+            isDefault: viewModel.criteria.dates == .default,
+            isEnabled: $viewModel.criteria.dates.isEnabled
+        )
+    }
+    
+    @ViewBuilder
+    private var timePeriodGroupContent: some View {
+        Filters.toggle("Latest Session", isOn: $viewModel.criteria.dates.isCurrentSessionOnly)
+        
+        DateRangePicker(title: "Start Date", date: viewModel.bindingStartDate, isEnabled: $viewModel.criteria.dates.isStartDateEnabled)
+        DateRangePicker(title: "End Date", date: viewModel.bindingEndDate, isEnabled: $viewModel.criteria.dates.isEndDateEnabled)
+        
+        HStack(spacing: 16) {
+            Button("Recent") { viewModel.criteria.dates = .recent }
+            Button("Today") { viewModel.criteria.dates = .today }
+            Spacer()
+        }
+#if os(iOS)
+        .foregroundColor(.accentColor)
+        .buttonStyle(.plain)
+#elseif os(macOS)
+        .padding(.top, 6)
+#endif
+    }
+}
+
+
 // MARK: - NetworkFiltersView (Duration)
 
 extension NetworkFiltersView {

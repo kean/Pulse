@@ -47,16 +47,8 @@ struct NetworkFiltersView: View {
             if #available(iOS 14.0, *) {
                 durationGroup
             }
-
-            Section(header: FilterSectionHeader(
-                icon: "calendar", title: "Time Period",
-                color: .yellow,
-                reset: { viewModel.criteria.dates = .default },
-                isDefault: viewModel.criteria.dates == .default
-            )) {
-                timePeriodGroup
-            }
-
+            
+            timePeriodGroup
             domainsGroup
             networkingGroup
         }
@@ -135,25 +127,6 @@ struct NetworkFiltersView: View {
         .keyboardType(.decimalPad)
         .textFieldStyle(.roundedBorder)
         .frame(width: 80)
-    }
-
-    // MARK: - Time Period Group
-
-    @ViewBuilder
-    private var timePeriodGroup: some View {
-        Toggle("Latest Session", isOn: $viewModel.criteria.dates.isCurrentSessionOnly)
-
-        DateRangePicker(title: "Start Date", date: viewModel.bindingStartDate, isEnabled: $viewModel.criteria.dates.isStartDateEnabled)
-        DateRangePicker(title: "End Date", date: viewModel.bindingEndDate, isEnabled: $viewModel.criteria.dates.isEndDateEnabled)
-
-        HStack(spacing: 16) {
-            Button("Recent") { viewModel.criteria.dates = .recent }
-                .foregroundColor(.accentColor)
-            Button("Today") { viewModel.criteria.dates = .today }
-                .foregroundColor(.accentColor)
-
-            Spacer()
-        }.buttonStyle(.plain)
     }
 }
 

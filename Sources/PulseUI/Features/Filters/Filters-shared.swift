@@ -89,7 +89,16 @@ struct DateRangePicker: View {
             oldBody
         }
 #else
-        newBody
+        VStack(spacing: 5) {
+            HStack {
+                Toggle(title, isOn: $isEnabled)
+                Spacer()
+            }
+            DatePicker(title, selection: $date)
+                .disabled(!isEnabled)
+                .fixedSize()
+                .labelsHidden()
+        }
 #endif
     }
 
