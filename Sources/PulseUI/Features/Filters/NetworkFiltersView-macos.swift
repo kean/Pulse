@@ -38,10 +38,10 @@ struct NetworkFiltersView: View {
                 
                 generalGroup
                 responseGroup
+                durationGroup
                 timePeriodGroup
                 domainsGroup
-                durationGroup
-                redirectGroup
+                networkingGroup
             }.padding(Filters.formPadding)
         }
     }
@@ -174,7 +174,7 @@ struct NetworkFiltersView: View {
                         viewModel.criteria.dates = .today
                     }
                     Spacer()
-                }
+                }.padding(.top, 6)
             }
         }, label: {
             FilterSectionHeader(
@@ -238,6 +238,7 @@ struct NetworkFiltersView: View {
                         Button(action: { isDomainsPickerPresented = true }) {
                             Text("Show All")
                         }
+                        .padding(.top, 6)
                         .popover(isPresented: $isDomainsPickerPresented) {
                             List {
                                 Button("Deselect All") {
@@ -313,17 +314,28 @@ struct NetworkFiltersView: View {
         }
     }
 
-    private var redirectGroup: some View {
+    private var networkingGroup: some View {
         DisclosureGroup(isExpanded: $isRedirectGroupExpanded, content: {
-            Filters.toggle("One or More Redirect", isOn: $viewModel.criteria.redirect.isRedirect)
-                .padding(.top, Filters.contentTopInset)
+            FiltersSection {
+                HStack {
+                    Text("Source")
+                    Spacer()
+                    Filters.responseSourcePicker($viewModel.criteria.networking.source)
+                        .fixedSize()
+                        .labelsHidden()
+                }
+                HStack {
+                    Toggle("Redirect", isOn: $viewModel.criteria.networking.isRedirect)
+                    Spacer()
+                }
+            }
         }, label: {
             FilterSectionHeader(
-                icon: "arrowshape.zigzag.right", title: "Redirect",
+                icon: "arrowshape.zigzag.right", title: "Networking",
                 color: .yellow,
-                reset: { viewModel.criteria.redirect = .default },
-                isDefault: viewModel.criteria.redirect == .default,
-                isEnabled: $viewModel.criteria.redirect.isEnabled
+                reset: { viewModel.criteria.networking = .default },
+                isDefault: viewModel.criteria.networking == .default,
+                isEnabled: $viewModel.criteria.networking.isEnabled
             )
         })
     }

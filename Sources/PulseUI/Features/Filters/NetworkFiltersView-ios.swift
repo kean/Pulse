@@ -57,10 +57,10 @@ struct NetworkFiltersView: View {
                     color: .yellow,
                     reset: {
                         viewModel.criteria.duration = .default
-                        viewModel.criteria.redirect = .default
+                        viewModel.criteria.networking = .default
                     },
                     isDefault: viewModel.criteria.duration == .default &&
-                    viewModel.criteria.redirect == .default
+                    viewModel.criteria.networking == .default
                 )) {
                     durationGroup
                 }
@@ -211,7 +211,7 @@ struct NetworkFiltersView: View {
     private var durationGroup: some View {
         DurationPicker(title: "Min", value: $viewModel.criteria.duration.from)
         DurationPicker(title: "Max", value: $viewModel.criteria.duration.to)
-        Toggle("Redirect", isOn: $viewModel.criteria.redirect.isRedirect)
+        Toggle("Redirect", isOn: $viewModel.criteria.networking.isRedirect)
     }
 }
 

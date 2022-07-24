@@ -15,7 +15,7 @@ struct NetworkSearchCriteria: Hashable {
     var host = HostFilter.default
     var duration = DurationFilter.default
     var contentType = ContentTypeFilter.default
-    var redirect = RedirectFilter.default
+    var networking = NetworkingFilter.default
 
     static let `default` = NetworkSearchCriteria()
 
@@ -148,11 +148,26 @@ struct NetworkSearchCriteria: Hashable {
         }
     }
 
-    struct RedirectFilter: Hashable {
+    struct NetworkingFilter: Hashable {
         var isEnabled = true
         var isRedirect = false
+        var source: Source = .any
 
-        static let `default` = RedirectFilter()
+        enum Source {
+            case any
+            case network
+            case cache
+
+            var localizedTitle: String {
+                switch self {
+                case .any: return "Any"
+                case .cache: return "Cache"
+                case .network: return "Network"
+                }
+            }
+        }
+
+        static let `default` = NetworkingFilter()
     }
 }
 
@@ -414,8 +429,18 @@ extension NetworkSearchCriteria {
             }
         }
 
-        if criteria.redirect.isEnabled && criteria.redirect.isRedirect {
-            predicates.append(NSPredicate(format: "redirectCount >= 1"))
+        if criteria.networking.isEnabled {
+            if criteria.networking.isRedirect {
+                predicates.append(NSPredicate(format: "redirectCount >= 1"))
+            }
+            switch criteria.networking.source {
+            case .any:
+                break
+            case .network:
+                predicates.append(NSPredicate(format: "isFromCache == NO"))
+            case .cache:
+                predicates.append(NSPredicate(format: "isFromCache == YES"))
+            }
         }
 
         if criteria.host.isEnabled, !criteria.host.values.isEmpty {

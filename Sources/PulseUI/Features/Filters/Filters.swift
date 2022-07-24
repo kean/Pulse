@@ -55,8 +55,17 @@ enum Filters {
         }
         #endif
     }
+
+    static func responseSourcePicker(_ selection: Binding<NetworkSearchCriteria.NetworkingFilter.Source>) -> some View {
+        Picker("Source", selection: selection) {
+            Text("Any").tag(NetworkSearchCriteria.NetworkingFilter.Source.any)
+            Text("Network").tag(NetworkSearchCriteria.NetworkingFilter.Source.network)
+            Text("Cache").tag(NetworkSearchCriteria.NetworkingFilter.Source.cache)
+        }
+    }
 }
 
+#warning("TODO: remove")
 //@available(iOS 14.0, *)
 //struct DurationPicker: View {
 //    let title: String
