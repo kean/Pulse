@@ -56,7 +56,9 @@ struct NetworkFiltersView: View {
                         viewModel.removeFilter(filter)
                     })
                 }
-            }.padding(.top, Filters.contentTopInset)
+            }
+            .padding(.leading, 4)
+            .padding(.top, Filters.contentTopInset)
             Button(action: viewModel.addFilter) {
                 Image(systemName: "plus.circle")
             }
@@ -119,8 +121,6 @@ struct NetworkFiltersView: View {
     @ViewBuilder
     private var responseSizeRow: some View {
         HStack {
-            Text("Size")
-
             TextField("Min", text: $viewModel.criteria.response.responseSize.from)
             .textFieldStyle(.roundedBorder)
 
@@ -377,7 +377,7 @@ private struct CustomFilterView: View {
                 Text("Request Body").tag(NetworkSearchFilter.Field.requestBody)
                 Text("Response Body").tag(NetworkSearchFilter.Field.responseBody)
             }
-        }.frame(width: 135)
+        }.frame(width: 130)
     }
     
     private var matchPicker: some View {
@@ -396,7 +396,7 @@ private struct CustomFilterView: View {
             Section {
                 Text("Regex").tag(NetworkSearchFilter.Match.regex)
             }
-        }.frame(width: 135)
+        }.frame(width: 130)
     }
 }
 

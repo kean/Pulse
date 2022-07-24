@@ -54,6 +54,7 @@ struct FiltersSection<Content: View>: View {
             content()
         }
         .padding(.leading, 12)
+        .padding(.trailing, 5)
         .padding(.top, Filters.contentTopInset)
     }
 }

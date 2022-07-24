@@ -29,7 +29,8 @@ struct ConsoleFiltersView: View {
                         .disabled(!viewModel.isButtonResetEnabled)
                     }
                     Divider()
-                }.padding(.top, 6)
+                }
+                .padding(.top, 6)
 
                 parametersGroup
                 logLevelsGroup
@@ -47,7 +48,10 @@ struct ConsoleFiltersView: View {
                         viewModel.removeFilter(filter)
                     })
                 }
-            }.padding(.top, Filters.contentTopInset)
+            }
+            .padding(.leading, 4)
+            .padding(.top, Filters.contentTopInset)
+
             Button(action: viewModel.addFilter) {
                 Image(systemName: "plus.circle")
             }
@@ -72,7 +76,7 @@ struct ConsoleFiltersView: View {
                         .accentColor(Color.secondary)
                         .foregroundColor(Color.secondary)
                     
-                    HStack(spacing: 18) {
+                    HStack(spacing: 32) {
                         makeLevelsSection(with: [.trace, .debug, .info, .notice])
                         makeLevelsSection(with: [.warning, .error, .critical])
                     }.fixedSize()
