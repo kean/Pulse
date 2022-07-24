@@ -25,6 +25,8 @@ final class NetworkLoggerSummary {
     private(set) lazy var requestBody: Data? = requestBodyKey.flatMap(store.getData)
     private(set) lazy var responseBody: Data? = responseBodyKey.flatMap(store.getData)
 
+    private(set) var progress: ProgressViewModel?
+
     private let store: LoggerStore
 
     init(request: LoggerNetworkRequestEntity, store: LoggerStore) {
@@ -41,6 +43,9 @@ final class NetworkLoggerSummary {
         self.responseBodyKey = request.responseBodyKey
         self.responseBodySize = request.responseBodySize
         self.isFromCache = request.isFromCache
+        if request.totalUnitCount > 0 {
+            progress = ProgressViewModel(completed: request.completedUnitCount, total: request.totalUnitCount)
+        }
         self.objectId = request.objectID
 
         self.store = store

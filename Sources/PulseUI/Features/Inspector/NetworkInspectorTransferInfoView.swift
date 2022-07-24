@@ -152,6 +152,17 @@ struct NetworkInspectorTransferInfoViewModel {
 
     var isFromCache: Bool
 
+    init(empty: Bool) {
+        self.totalBytesSent = "–"
+        self.bodyBytesSent = "–"
+        self.headersBytesSent = "–"
+        self.totalBytesReceived = "–"
+        self.bodyBytesReceived = "–"
+        self.headersBytesReceived = "–"
+
+        self.isFromCache = false
+    }
+
     init?(metrics: NetworkLoggerMetrics) {
         guard let details = metrics.transactions.last?.details else { return nil }
 

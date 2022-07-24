@@ -8,6 +8,7 @@ import PulseCore
 struct KeyValueSectionView: View {
     let viewModel: KeyValueSectionViewModel
     var limit: Int = Int.max
+    private var hideTitle = false
 
     init(viewModel: KeyValueSectionViewModel) {
         self.viewModel = viewModel
@@ -18,34 +19,22 @@ struct KeyValueSectionView: View {
         self.limit = limit
     }
 
+    func hiddenTitle() -> KeyValueSectionView {
+        var copy = self
+        copy.hideTitle = true
+        return copy
+    }
+
     private var actualTintColor: Color {
         viewModel.items.isEmpty ? .gray : viewModel.color
     }
 
     var body: some View {
         VStack(alignment: .leading) {
-            HStack {
-                Text(viewModel.title)
-                    .font(.headline)
-                Spacer()
-                #if os(iOS)
-                if let action = viewModel.action {
-                    Button(action: action.action, label: {
-                        Text(action.title)
-                        Image(systemName: "chevron.right")
-                            .foregroundColor(Color.gray)
-                            .font(.caption)
-                            .padding(.top, 2)
-                    })
-                    .foregroundColor(.primary)
-                    .padding(EdgeInsets(top: 6, leading: 12, bottom: 6, trailing: 12))
-                    .background(Color.secondaryFill)
-                    .cornerRadius(12)
-                    .frame(height: 20, alignment: .center)
-                }
-                #endif
+            if !hideTitle {
+                headerView
             }
-            #if os(watchOS)
+#if os(watchOS)
             KeyValueListView(viewModel: viewModel, limit: limit)
                 .padding(.top, 6)
                 .border(width: 2, edges: [.top], color: actualTintColor)
@@ -61,14 +50,43 @@ struct KeyValueSectionView: View {
                 })
 
             }
-
-            #else
+#else
             KeyValueListView(viewModel: viewModel, limit: limit)
                 .padding(EdgeInsets(top: 0, leading: 10, bottom: 0, trailing: 0))
                 .border(width: 2, edges: [.leading], color: actualTintColor)
                 .padding(EdgeInsets(top: 5, leading: 2, bottom: 5, trailing: 0))
-            #endif
+#endif
         }
+    }
+
+    @ViewBuilder
+    private var headerView: some View {
+        HStack {
+            Text(viewModel.title)
+                .font(.headline)
+            Spacer()
+#if os(iOS)
+            if let action = viewModel.action {
+                makeActionButton(with: action)
+            }
+#endif
+        }
+    }
+
+    @ViewBuilder
+    private func makeActionButton(with action: ActionViewModel) -> some View {
+        Button(action: action.action, label: {
+            Text(action.title)
+            Image(systemName: "chevron.right")
+                .foregroundColor(Color.gray)
+                .font(.caption)
+                .padding(.top, 2)
+        })
+        .foregroundColor(.primary)
+        .padding(EdgeInsets(top: 6, leading: 12, bottom: 6, trailing: 12))
+        .background(Color.secondaryFill)
+        .cornerRadius(12)
+        .frame(height: 20, alignment: .center)
     }
 }
 
@@ -127,13 +145,13 @@ private struct KeyValueListView: View {
         ])
         return text
     }
-    #else
+#else
     var body: some View {
         if viewModel.items.isEmpty {
             HStack {
-            Text("Empty")
-                .foregroundColor(actualTintColor)
-                .font(.system(size: fontSize, weight: .medium))
+                Text("Empty")
+                    .foregroundColor(actualTintColor)
+                    .font(.system(size: fontSize, weight: .medium))
             }
         } else {
             VStack(spacing: 2) {
@@ -174,7 +192,7 @@ private struct KeyValueListView: View {
             Spacer()
         }
     }
-    #endif
+#endif
 }
 
 #if os(macOS)
@@ -204,15 +222,15 @@ private let ps: NSParagraphStyle = {
 #endif
 
 private var fontSize: CGFloat {
-    #if os(iOS)
+#if os(iOS)
     return 15
-    #elseif os(watchOS)
+#elseif os(watchOS)
     return 14
-    #elseif os(tvOS)
+#elseif os(tvOS)
     return 28
-    #else
+#else
     return 12
-    #endif
+#endif
 }
 
 struct KeyValueSectionViewModel {

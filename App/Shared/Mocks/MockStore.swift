@@ -169,9 +169,9 @@ private func _logTask(_ mockTask: MockDataTask, urlSession: URLSession, logger: 
         if case .download(let size) = mockTask.kind {
             await Task.sleep(milliseconds: 300)
             var remaining = size
-            let chunk: Int64 = 1024 * 512
+            let chunk: Int64 = 1024 * 256
             while remaining > 0 {
-                await Task.sleep(milliseconds: 250)
+                await Task.sleep(milliseconds: 200)
                 remaining -= chunk
                 logger.logTask(task, didUpdateProgress: (completed: size - remaining, total: size))
             }

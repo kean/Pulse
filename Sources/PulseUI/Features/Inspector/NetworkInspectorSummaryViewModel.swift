@@ -17,16 +17,22 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     @Published var isResponseRawLinkActive = false
     @Published var isResponseHeadearsRawLinkActive = false
 
+    var progress: ProgressViewModel? { summary.progress }
+
     init(summary: NetworkLoggerSummary) {
         self.summary = summary
     }
 
-    private var tintColor: Color {
+    var tintColor: Color {
         switch summary.state {
         case .pending: return .orange
         case .success: return .green
         case .failure: return .red
         }
+    }
+
+    var state: LoggerNetworkRequestEntity.State {
+        summary.state
     }
 
     // MARK: - Transfer

@@ -34,12 +34,38 @@ struct NetworkInspectorSummaryView: View {
     @ViewBuilder
     private var contents: some View {
         if let transfer = viewModel.transferModel {
-            Spacer().frame(height: 12)
             NetworkInspectorTransferInfoView(viewModel: transfer)
-            Spacer().frame(height: 20)
+                .padding(.top, 12).padding(.bottom, 20)
+        } else if viewModel.state == .pending {
+            ZStack {
+                NetworkInspectorTransferInfoView(viewModel: .init(empty: true))
+                    .padding(.top, 12).padding(.bottom, 20)
+                    .hidden()
+                    .backport.hideAccessibility()
+                VStack(alignment: .center) {
+                    Spinner()
+                    Text("Pending")
+                        .foregroundColor(.secondary)
+                        .padding(.top, 6)
+                    if let progress = viewModel.progress {
+                        Text(progress.title)
+                            .foregroundColor(.secondary)
+                            .animation(nil)
+                    }
+                }.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+            }
         }
 
-        KeyValueSectionView(viewModel: viewModel.summaryModel)
+        VStack {
+            HStack {
+                Text(viewModel.summaryModel.title)
+                statusView
+                Spacer()
+            }.font(.headline)
+
+            KeyValueSectionView(viewModel: viewModel.summaryModel)
+                .hiddenTitle()
+        }
         viewModel.errorModel.map(KeyValueSectionView.init)
 
         if viewModel.originalRequestSummary != nil {
@@ -53,6 +79,17 @@ struct NetworkInspectorSummaryView: View {
         if viewModel.responseSummary != nil {
             responseSection
         }
+    }
+
+    private var statusView: some View {
+        let imageName: String
+        switch viewModel.state {
+        case .pending: imageName = "clock.fill"
+        case .success: imageName = "checkmark.circle.fill"
+        case .failure: imageName = "exclamationmark.octagon.fill"
+        }
+        return Image(systemName: imageName)
+            .foregroundColor(viewModel.tintColor)
     }
 
     @ViewBuilder
