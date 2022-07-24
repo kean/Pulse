@@ -72,9 +72,14 @@ final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
         if request.duration > 0 {
             title += " · \(DurationFormatter.string(from: request.duration))"
         }
+        func addSize(_ size: Int64) {
+            let sizeText = ByteCountFormatter.string(fromByteCount: size, countStyle: .file)
+            title += " · \(request.isFromCache ? "Cache" : sizeText)"
+        }
         if request.responseBodySize > 0 {
-            let size = ByteCountFormatter.string(fromByteCount: request.responseBodySize, countStyle: .file)
-            title += " · \(request.isFromCache ? "Cache" : size)"
+            addSize(request.responseBodySize)
+        } else if state == .success, request.totalUnitCount > 0 {
+            addSize(request.totalUnitCount)
         }
         self.title = title
 
