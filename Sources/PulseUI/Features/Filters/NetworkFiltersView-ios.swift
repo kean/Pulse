@@ -65,6 +65,15 @@ struct NetworkFiltersView: View {
                     durationGroup
                 }
             }
+
+            Section(header: FilterSectionHeader(
+                icon: "calendar", title: "Time Period",
+                color: .yellow,
+                reset: { viewModel.criteria.dates = .default },
+                isDefault: viewModel.criteria.dates == .default
+            )) {
+                timePeriodGroup
+            }
         }
         .navigationBarTitle("Filters", displayMode: .inline)
         .navigationBarItems(leading: buttonClose, trailing: buttonReset)
