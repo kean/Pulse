@@ -147,24 +147,52 @@ struct NetworkFiltersView: View {
             )
         })
     }
+
+    @State private var isDomainsPickerPresented = false
     
     private var domainsGroup: some View {
         DisclosureGroup(isExpanded: $isDomainsGroupExpanded, content: {
-            Picker("", selection: $viewModel.criteria.host.value) {
-                Text("Any").tag("")
-                ForEach(viewModel.allDomains, id: \.self) {
-                    Text($0).tag($0)
+            VStack {
+                makeDomainPicker(limit: 4)
+                if viewModel.allDomains.count > 4 {
+                    HStack {
+                        Button(action: { isDomainsPickerPresented = true }) {
+                            Text("Show All")
+                        }
+                        .popover(isPresented: $isDomainsPickerPresented) {
+                            List {
+                                Button("Deselect All") {
+                                    viewModel.criteria.host.values = []
+                                }
+                                makeDomainPicker()
+                                    .padding(.leading, -13) // Compensate Filers.toogle inset
+                            }
+                            .frame(width: 220, height: 340)
+                            .navigationTitle("Select Hosts")
+                        }
+                        Spacer()
+                    }.padding(.leading, 13)
                 }
             }.padding(.top, Filters.contentTopInset)
         }, label: {
             FilterSectionHeader(
-                icon: "server.rack", title: "Host",
+                icon: "server.rack", title: "Hosts",
                 color: .yellow,
                 reset: { viewModel.criteria.host = .default },
                 isDefault: viewModel.criteria.host == .default,
                 isEnabled: $viewModel.criteria.host.isEnabled
             )
         })
+    }
+
+    private func makeDomainPicker(limit: Int? = nil) -> some View {
+        var domains = viewModel.allDomains
+        if let limit = limit {
+            domains = Array(domains.prefix(limit))
+        }
+        return ForEach(domains, id: \.self) { domain in
+            Filters.toggle(domain, isOn: viewModel.binding(forDomain: domain))
+        }
     }
     
     private var durationGroup: some View {

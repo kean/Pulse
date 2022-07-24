@@ -43,7 +43,7 @@ struct NetworkFiltersView: View {
             }
 
             Section(header: FilterSectionHeader(
-                icon: "server.rack", title: "Host",
+                icon: "server.rack", title: "Hosts",
                 color: .yellow,
                 reset: { viewModel.criteria.host = .default },
                 isDefault: viewModel.criteria.host == .default
