@@ -86,6 +86,7 @@ final class PinIndicatorView: UIImageView {
 
     func bind(viewModel: PinButtonViewModel) {
         self.viewModel = viewModel
+        cancellables = []
         viewModel.$isPinned.sink { [weak self] isPinned in
             guard let self = self else { return }
             self.isHidden = !isPinned
