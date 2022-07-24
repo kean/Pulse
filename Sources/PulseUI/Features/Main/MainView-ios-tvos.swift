@@ -24,6 +24,7 @@ public struct MainView: View {
     }
 
     public var body: some View {
+        #if os(iOS)
         if UIDevice.current.userInterfaceIdiom == .pad, #available(iOS 14.0, *) {
             NavigationView {
                 List(viewModel.items) { item in
@@ -51,14 +52,22 @@ public struct MainView: View {
                 EmptyView()
             }
         } else {
-            TabView {
-                ForEach(viewModel.items) { item in
-                    NavigationView {
-                        viewModel.makeView(for: item)
-                    }.tabItem {
-                        Image(systemName: item.imageName)
-                        Text(item.title)
-                    }
+            tabView
+        }
+        #else
+        tabView
+        #endif
+    }
+
+    @ViewBuilder
+    private var tabView: some View {
+        TabView {
+            ForEach(viewModel.items) { item in
+                NavigationView {
+                    viewModel.makeView(for: item)
+                }.tabItem {
+                    Image(systemName: item.imageName)
+                    Text(item.title)
                 }
             }
         }
