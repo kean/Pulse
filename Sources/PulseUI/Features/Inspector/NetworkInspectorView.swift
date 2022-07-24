@@ -138,8 +138,8 @@ struct NetworkInspectorView: View {
             } else if viewModel.request.taskType == .downloadTask {
                 PlaceholderView(imageName: "square.and.arrow.down", title: {
                     var title = "Downloaded to a File"
-                    if viewModel.request.totalUnitCount > 0 {
-                        title += "\n\(ByteCountFormatter.string(fromByteCount: viewModel.request.totalUnitCount, countStyle: .file))"
+                    if viewModel.request.responseBodySize > 0 {
+                        title += "\n\(ByteCountFormatter.string(fromByteCount: viewModel.request.responseBodySize, countStyle: .file))"
                     }
                     return title
                 }())

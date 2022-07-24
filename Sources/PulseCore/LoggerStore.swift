@@ -254,8 +254,6 @@ extension LoggerStore {
             requestBody: request.httpBody ?? request.httpBodyStreamData(),
             responseBody: data,
             metrics: metrics,
-            completedUnitCount: -1,
-            totalUnitCount: -1,
             session: LoggerSession.current.id.uuidString
         )))
     }
@@ -363,8 +361,19 @@ extension LoggerStore {
             request.requestBodyKey = store.storeData(event.requestBody)
             request.responseBodyKey = store.storeData(event.responseBody)
         }
+
         request.requestBodySize = Int64(event.requestBody?.count ?? 0)
-        request.responseBodySize = Int64(event.responseBody?.count ?? 0)
+
+        switch event.taskType {
+        case .dataTask:
+            request.responseBodySize = Int64(event.responseBody?.count ?? 0)
+        case .downloadTask:
+            request.responseBodySize = event.metrics?.transactions.last(where: {
+                $0.resourceFetchType == URLSessionTaskMetrics.ResourceFetchType.networkLoad.rawValue
+            })?.details?.countOfResponseBodyBytesReceived ?? request.completedUnitCount
+        default:
+            break
+        }
 
         let transactions = event.metrics?.transactions ?? []
         request.isFromCache = transactions.last?.resourceFetchType == URLSessionTaskMetrics.ResourceFetchType.localCache.rawValue || (transactions.last?.resourceFetchType == URLSessionTaskMetrics.ResourceFetchType.networkLoad.rawValue && transactions.last?.response?.statusCode == 304)

@@ -63,7 +63,7 @@ extension RemoteLogger {
         static func encode(_ event: LoggerStoreEvent.NetworkTaskCompleted) throws -> Data {
             var contents = [Data]()
 
-            let strippedMessage = LoggerStoreEvent.NetworkTaskCompleted(taskId: event.taskId, taskType: event.taskType, createdAt: event.createdAt, originalRequest: event.originalRequest, currentRequest: event.currentRequest, response: event.response, error: event.error, requestBody: nil, responseBody: nil, metrics: event.metrics, completedUnitCount: event.completedUnitCount, totalUnitCount: event.totalUnitCount, session: event.session)
+            let strippedMessage = LoggerStoreEvent.NetworkTaskCompleted(taskId: event.taskId, taskType: event.taskType, createdAt: event.createdAt, originalRequest: event.originalRequest, currentRequest: event.currentRequest, response: event.response, error: event.error, requestBody: nil, responseBody: nil, metrics: event.metrics, session: event.session)
             let messageData = try JSONEncoder().encode(strippedMessage)
             contents.append(messageData)
 
@@ -115,7 +115,7 @@ extension RemoteLogger {
                 responseBody = data.from(Manifest.size + Int(manifest.messageSize) + Int(manifest.requestBodySize), size: Int(manifest.responseBodySize))
             }
 
-            return LoggerStoreEvent.NetworkTaskCompleted(taskId: event.taskId, taskType: event.taskType, createdAt: event.createdAt, originalRequest: event.originalRequest, currentRequest: event.currentRequest, response: event.response, error: event.error, requestBody: requestBody, responseBody: responseBody, metrics: event.metrics, completedUnitCount: event.completedUnitCount, totalUnitCount: event.totalUnitCount, session: event.session)
+            return LoggerStoreEvent.NetworkTaskCompleted(taskId: event.taskId, taskType: event.taskType, createdAt: event.createdAt, originalRequest: event.originalRequest, currentRequest: event.currentRequest, response: event.response, error: event.error, requestBody: requestBody, responseBody: responseBody, metrics: event.metrics, session: event.session)
         }
     }
 

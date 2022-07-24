@@ -111,8 +111,6 @@ public final class NetworkLogger {
             requestBody: originalRequest.httpBody ?? originalRequest.httpBodyStreamData(),
             responseBody: data,
             metrics: metrics,
-            completedUnitCount: task.progress.completedUnitCount,
-            totalUnitCount: task.progress.totalUnitCount,
             session: LoggerSession.current.id.uuidString
         )))
     }
