@@ -12,13 +12,13 @@ import Combine
 struct NetworkFiltersView: View {
     @ObservedObject var viewModel: NetworkSearchCriteriaViewModel
 
-    @AppStorage("networkFilterIsParametersExpanded") private var isParametersExpanded = true
-    @AppStorage("networkFilterIsResponseExpanded") private var isResponseGroupExpanded = true
-    @AppStorage("networkFilterIsTimePeriodExpanded") private var isTimePeriodExpanded = true
-    @AppStorage("networkFilterIsDomainsGroupExpanded") private var isDomainsGroupExpanded = true
-    @AppStorage("networkFilterIsDurationGroupExpanded") private var isDurationGroupExpanded = true
-    @AppStorage("networkFilterIsContentTypeGroupExpanded") private var isContentTypeGroupExpanded = true
-    @AppStorage("networkFilterIsRedirectGroupExpanded") private var isRedirectGroupExpanded = true
+    @AppStorage("networkFilterIsParametersExpanded") var isParametersExpanded = true
+    @AppStorage("networkFilterIsResponseExpanded") var isResponseGroupExpanded = true
+    @AppStorage("networkFilterIsTimePeriodExpanded") var isTimePeriodExpanded = true
+    @AppStorage("networkFilterIsDomainsGroupExpanded") var isDomainsGroupExpanded = true
+    @AppStorage("networkFilterIsDurationGroupExpanded") var isDurationGroupExpanded = true
+    @AppStorage("networkFilterIsContentTypeGroupExpanded") var isContentTypeGroupExpanded = true
+    @AppStorage("networkFilterIsRedirectGroupExpanded") var isRedirectGroupExpanded = true
 
     @State private var isDomainsPickerPresented = false
 
@@ -77,7 +77,7 @@ struct NetworkFiltersView: View {
     
     private var responseGroup: some View {
         DisclosureGroup(isExpanded: $isResponseGroupExpanded, content: {
-            FiltersSection {
+            FiltersSectionContent {
                 statusCodeRow
                 contentTypeRow
                 responseSizeRow
@@ -130,7 +130,7 @@ struct NetworkFiltersView: View {
 
     private var timePeriodGroup: some View {
         DisclosureGroup(isExpanded: $isTimePeriodExpanded, content: {
-            FiltersSection {
+            FiltersSectionContent {
                 HStack {
                     Toggle("Latest Session", isOn: $viewModel.criteria.dates.isCurrentSessionOnly)
                     Spacer()
@@ -202,7 +202,7 @@ struct NetworkFiltersView: View {
 
     private var domainsGroup: some View {
         DisclosureGroup(isExpanded: $isDomainsGroupExpanded, content: {
-            FiltersSection {
+            FiltersSectionContent {
                 makeDomainPicker(limit: 4)
                 if viewModel.allDomains.count > 4 {
                     domainsShowAllButton
@@ -256,7 +256,7 @@ struct NetworkFiltersView: View {
     
     private var durationGroup: some View {
         DisclosureGroup(isExpanded: $isDurationGroupExpanded, content: {
-            FiltersSection {
+            FiltersSectionContent {
                 durationRow
             }
         }, label: {
@@ -289,27 +289,6 @@ struct NetworkFiltersView: View {
         }
     }
 
-    private var networkingGroup: some View {
-        DisclosureGroup(isExpanded: $isRedirectGroupExpanded, content: {
-            FiltersSection {
-                Filters.taskTypePicker($viewModel.criteria.networking.taskType)
-                Filters.responseSourcePicker($viewModel.criteria.networking.source)
-                HStack {
-                    Toggle("Redirect", isOn: $viewModel.criteria.networking.isRedirect)
-                    Spacer()
-                }
-            }
-        }, label: {
-            FilterSectionHeader(
-                icon: "arrowshape.zigzag.right", title: "Networking",
-                color: .yellow,
-                reset: { viewModel.criteria.networking = .default },
-                isDefault: viewModel.criteria.networking == .default,
-                isEnabled: $viewModel.criteria.networking.isEnabled
-            )
-        })
-    }
-    
     private typealias ContentType = NetworkSearchCriteria.ContentTypeFilter.ContentType
 }
 

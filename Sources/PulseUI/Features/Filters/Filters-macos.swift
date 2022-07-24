@@ -46,7 +46,7 @@ extension Filters {
     static let contentTopInset: CGFloat = 8
 }
 
-struct FiltersSection<Content: View>: View {
+struct FiltersSectionContent<Content: View>: View {
     @ViewBuilder let content: () -> Content
 
     var body: some View {

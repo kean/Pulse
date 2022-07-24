@@ -136,7 +136,7 @@ struct ConsoleFiltersView: View {
 
     private var timePeriodGroup: some View {
         DisclosureGroup(isExpanded: $isTimePeriodExpanded, content: {
-            FiltersSection {
+            FiltersSectionContent {
                 HStack {
                     Toggle("Latest Session", isOn: $viewModel.criteria.dates.isCurrentSessionOnly)
                     Spacer()

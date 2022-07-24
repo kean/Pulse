@@ -12,6 +12,14 @@ import Combine
 struct NetworkFiltersView: View {
     @ObservedObject var viewModel: NetworkSearchCriteriaViewModel
 
+    @State var isParametersExpanded = true
+    @State var isResponseGroupExpanded = true
+    @State var isTimePeriodExpanded = true
+    @State var isDomainsGroupExpanded = true
+    @State var isDurationGroupExpanded = true
+    @State var isContentTypeGroupExpanded = true
+    @State var isRedirectGroupExpanded = true
+
     @Binding var isPresented: Bool
 
     var body: some View {
@@ -65,14 +73,7 @@ struct NetworkFiltersView: View {
                 domainsGroup
             }
 
-            Section(header: FilterSectionHeader(
-                icon: "arrowshape.zigzag.right", title: "Networking",
-                color: .yellow,
-                reset: { viewModel.criteria.networking = .default },
-                isDefault: viewModel.criteria.networking == .default
-            )) {
-                networkingGroup
-            }
+            networkingGroup
         }
         .navigationBarTitle("Filters", displayMode: .inline)
         .navigationBarItems(leading: buttonClose, trailing: buttonReset)
@@ -231,18 +232,6 @@ struct NetworkFiltersView: View {
             })
             .animation(.none)
 
-            Spacer()
-        }
-    }
-
-    // MARK: - Networking Group
-
-    @ViewBuilder
-    private var networkingGroup: some View {
-        Filters.taskTypePicker($viewModel.criteria.networking.taskType)
-        Filters.responseSourcePicker($viewModel.criteria.networking.source)
-        HStack {
-            Toggle("Redirect", isOn: $viewModel.criteria.networking.isRedirect)
             Spacer()
         }
     }

@@ -159,6 +159,7 @@ struct FilterSectionHeader: View {
     let color: Color
     let reset: () -> Void
     let isDefault: Bool
+    var isEnabled: Binding<Bool> = .constant(true)
 
     var body: some View {
         HStack(spacing: 0) {
