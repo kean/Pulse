@@ -24,16 +24,7 @@ struct NetworkFiltersView: View {
 
     var body: some View {
         Form {
-            if #available(iOS 14.0, *) {
-                generalGroup
-            }
-            responseGroup
-            if #available(iOS 14.0, *) {
-                durationGroup
-            }
-            timePeriodGroup
-            domainsGroup
-            networkingGroup
+            formContents
         }
         .navigationBarTitle("Filters", displayMode: .inline)
         .navigationBarItems(leading: buttonClose, trailing: buttonReset)
@@ -42,21 +33,25 @@ struct NetworkFiltersView: View {
     private var buttonClose: some View {
         Button("Close") { isPresented = false }
     }
-
-    private var buttonReset: some View {
-        Button("Reset") { viewModel.resetAll() }
-            .disabled(!viewModel.isButtonResetEnabled)
-    }
 }
 
+#if DEBUG
 struct NetworkFiltersView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             NavigationView {
-                NetworkFiltersView(viewModel: .init(), isPresented: .constant(true))
+                NetworkFiltersView(viewModel: makeMockViewModel(), isPresented: .constant(true))
             }
         }
     }
 }
+
+private func makeMockViewModel() -> NetworkSearchCriteriaViewModel {
+    let viewModel = NetworkSearchCriteriaViewModel()
+    viewModel.setInitialDomains(["api.github.com", "github.com", "apple.com", "google.com", "example.com"])
+    return viewModel
+
+}
+#endif
 
 #endif

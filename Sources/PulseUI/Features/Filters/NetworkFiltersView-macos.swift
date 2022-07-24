@@ -30,18 +30,12 @@ struct NetworkFiltersView: View {
                         Text("FILTERS")
                             .foregroundColor(.secondary)
                         Spacer()
-                        Button("Reset") { viewModel.resetAll() }
-                        .disabled(!viewModel.isButtonResetEnabled)
+                        buttonReset
                     }
                     Divider()
                 }.padding(.top, 6)
                 
-                generalGroup
-                responseGroup
-                durationGroup
-                timePeriodGroup
-                domainsGroup
-                networkingGroup
+                formContents
             }.padding(Filters.formPadding)
         }
     }

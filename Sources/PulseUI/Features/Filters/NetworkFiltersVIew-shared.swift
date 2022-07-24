@@ -9,6 +9,29 @@ import Combine
 
 #if os(iOS) || os(macOS)
 
+// MARK: - NetworkFiltersView (Contens)
+
+extension NetworkFiltersView {
+    @ViewBuilder
+    var formContents: some View {
+        if #available(iOS 14.0, *) {
+            generalGroup
+        }
+        responseGroup
+        if #available(iOS 14.0, *) {
+            durationGroup
+        }
+        timePeriodGroup
+        domainsGroup
+        networkingGroup
+    }
+
+    var buttonReset: some View {
+        Button("Reset") { viewModel.resetAll() }
+            .disabled(!viewModel.isButtonResetEnabled)
+    }
+}
+
 // MARK: - NetworkFiltersView (General)
 
 extension NetworkFiltersView {
@@ -31,9 +54,9 @@ extension NetworkFiltersView {
             isEnabled: $viewModel.criteria.isFiltersEnabled
         )
     }
-    
+
 #if os(iOS)
-    
+
     @available(iOS 14.0, *)
     @ViewBuilder
     private var generalGroupContent: some View {
@@ -42,7 +65,7 @@ extension NetworkFiltersView {
                 viewModel.removeFilter(filter)
             }).buttonStyle(.plain)
         }
-        
+
         Button(action: viewModel.addFilter) {
             HStack {
                 Image(systemName: "plus.circle.fill")
@@ -52,9 +75,9 @@ extension NetworkFiltersView {
         }
         .frame(maxWidth: .infinity, alignment: .center)
     }
-    
+
 #elseif os(macOS)
-    
+
     @ViewBuilder
     private var generalGroupContent: some View {
         VStack {
@@ -70,7 +93,7 @@ extension NetworkFiltersView {
             Image(systemName: "plus.circle")
         }
     }
-    
+
 #endif
 }
 
