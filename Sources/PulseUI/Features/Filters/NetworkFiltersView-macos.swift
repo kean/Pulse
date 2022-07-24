@@ -13,14 +13,13 @@ struct NetworkFiltersView: View {
     @ObservedObject var viewModel: NetworkSearchCriteriaViewModel
 
     @AppStorage("networkFilterIsParametersExpanded") private var isParametersExpanded = true
-    @AppStorage("networkFilterIsStatusCodeExpanded") private var isStatusCodeExpanded = true
+    @AppStorage("networkFilterIsResponseExpanded") private var isResponseGroupExpanded = true
     @AppStorage("networkFilterIsTimePeriodExpanded") private var isTimePeriodExpanded = true
     @AppStorage("networkFilterIsDomainsGroupExpanded") private var isDomainsGroupExpanded = true
     @AppStorage("networkFilterIsDurationGroupExpanded") private var isDurationGroupExpanded = true
     @AppStorage("networkFilterIsContentTypeGroupExpanded") private var isContentTypeGroupExpanded = true
     @AppStorage("networkFilterIsRedirectGroupExpanded") private var isRedirectGroupExpanded = true
 
-    
     var body: some View {
         ScrollView {
             VStack(spacing: Filters.formSpacing) {
@@ -35,9 +34,8 @@ struct NetworkFiltersView: View {
                     Divider()
                 }.padding(.top, 6)
                 
-                parametersGroup
-                statusCode
-                contentTypeGroup
+                generalGroup
+                responseGroup
                 timePeriodGroup
                 domainsGroup
                 durationGroup
@@ -45,8 +43,12 @@ struct NetworkFiltersView: View {
             }.padding(Filters.formPadding)
         }
     }
+
+    #warning("TODO: refactor FilterSectionHeader")
+
+    // MARK: - General
     
-    private var parametersGroup: some View {
+    private var generalGroup: some View {
         DisclosureGroup(isExpanded: $isParametersExpanded, content: {
             VStack {
                 ForEach(viewModel.filters) { filter in
@@ -68,34 +70,91 @@ struct NetworkFiltersView: View {
             )
         })
     }
+
+    // MARK: - Response
     
-    private var statusCode: some View {
-        DisclosureGroup(isExpanded: $isStatusCodeExpanded, content: {
-            HStack {
-                Text("Range:")
-                    .foregroundColor(.secondary)
-                TextField("From", text: $viewModel.criteria.statusCode.from, onEditingChanged: {
-                    if $0 { viewModel.criteria.statusCode.isEnabled = true }
-                })
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .frame(width: 52)
-                TextField("To", text: $viewModel.criteria.statusCode.to, onEditingChanged: {
-                    if $0 { viewModel.criteria.statusCode.isEnabled = true }
-                })
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .frame(width: 49)
-            }.padding(EdgeInsets(top: Filters.contentTopInset, leading: 8, bottom: 4, trailing: 6))
+    private var responseGroup: some View {
+        DisclosureGroup(isExpanded: $isResponseGroupExpanded, content: {
+            FiltersSection {
+                statusCodeRow
+                contentTypeRow
+                responseSizeRow
+            }
         }, label: {
             FilterSectionHeader(
-                icon: "number", title: "Status Code",
+                icon: "arrow.down.circle", title: "Response",
                 color: .yellow,
-                reset:  { viewModel.criteria.statusCode = .default },
-                isDefault: viewModel.criteria.statusCode == .default,
-                isEnabled: $viewModel.criteria.statusCode.isEnabled
+                reset:  {
+                    viewModel.criteria.statusCode = .default
+                    viewModel.criteria.contentType = .default
+                    viewModel.criteria.responseSize = .default
+                },
+                isDefault: viewModel.criteria.statusCode == .default &&
+                viewModel.criteria.contentType == .default &&
+                viewModel.criteria.responseSize == .default,
+                isEnabled: Binding(get: {
+                    viewModel.criteria.statusCode.isEnabled ||
+                    viewModel.criteria.contentType.isEnabled ||
+                    viewModel.criteria.responseSize.isEnabled
+                }, set: {
+                    viewModel.criteria.statusCode.isEnabled = $0
+                    viewModel.criteria.contentType.isEnabled = $0
+                    viewModel.criteria.responseSize.isEnabled = $0
+                })
+
             )
         })
     }
-    
+
+    @ViewBuilder
+    private var statusCodeRow: some View {
+        HStack {
+            Text("Status Code")
+                .fixedSize()
+
+            TextField("Min", text: $viewModel.criteria.statusCode.from, onEditingChanged: {
+                if $0 { viewModel.criteria.statusCode.isEnabled = true }
+            })
+            .textFieldStyle(.roundedBorder)
+
+            TextField("Max", text: $viewModel.criteria.statusCode.to, onEditingChanged: {
+                if $0 { viewModel.criteria.statusCode.isEnabled = true }
+            })
+            .textFieldStyle(.roundedBorder)
+        }
+    }
+
+    @ViewBuilder
+    private var contentTypeRow: some View {
+        HStack {
+            Text("Content Type")
+            Spacer()
+            Filters.contentTypesPicker(selection: $viewModel.criteria.contentType.contentType)
+                .labelsHidden()
+                .fixedSize()
+        }
+    }
+
+    @ViewBuilder
+    private var responseSizeRow: some View {
+        HStack {
+            Text("Size")
+
+            TextField("Min", text: $viewModel.criteria.responseSize.from, onEditingChanged: {
+                if $0 { viewModel.criteria.responseSize.isEnabled = true }
+            })
+            .textFieldStyle(.roundedBorder)
+
+            TextField("Max", text: $viewModel.criteria.responseSize.to, onEditingChanged: {
+                if $0 { viewModel.criteria.responseSize.isEnabled = true }
+            })
+            .textFieldStyle(.roundedBorder)
+
+            Filters.sizeUnitPicker($viewModel.criteria.responseSize.unit)
+                .labelsHidden()
+        }
+    }
+
     private var timePeriodGroup: some View {
         DisclosureGroup(isExpanded: $isTimePeriodExpanded, content: {
             Filters.toggle("Latest Session", isOn: $viewModel.criteria.dates.isCurrentSessionOnly)
@@ -228,23 +287,6 @@ struct NetworkFiltersView: View {
     }
     
     private typealias ContentType = NetworkSearchCriteria.ContentTypeFilter.ContentType
-    
-    private var contentTypeGroup: some View {
-        DisclosureGroup(isExpanded: $isContentTypeGroupExpanded, content: {
-            VStack(spacing: 6) {
-                Filters.contentTypesPicker(selection: $viewModel.criteria.contentType.contentType)
-                    .labelsHidden()
-            }.padding(.top, Filters.contentTopInset)
-        }, label: {
-            FilterSectionHeader(
-                icon: "doc", title: "Content Type",
-                color: .yellow,
-                reset: { viewModel.criteria.contentType = .default },
-                isDefault: viewModel.criteria.contentType == .default,
-                isEnabled: $viewModel.criteria.contentType.isEnabled
-            )
-        })
-    }
 }
 
 private struct CustomFilterView: View {
@@ -300,7 +342,7 @@ private struct CustomFilterView: View {
                 Text("Request Body").tag(NetworkSearchFilter.Field.requestBody)
                 Text("Response Body").tag(NetworkSearchFilter.Field.responseBody)
             }
-        }.frame(width: 120)
+        }.frame(width: 135)
     }
     
     private var matchPicker: some View {
@@ -319,7 +361,7 @@ private struct CustomFilterView: View {
             Section {
                 Text("Regex").tag(NetworkSearchFilter.Match.regex)
             }
-        }.frame(width: 120)
+        }.frame(width: 135)
     }
 }
 
@@ -328,7 +370,7 @@ struct NetworkFiltersPanelPro_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             NetworkFiltersView(viewModel: .init())
-                .previewLayout(.fixed(width: 175, height: 800))
+                .previewLayout(.fixed(width: Filters.preferredWidth - 15, height: 900))
         }
     }
 }

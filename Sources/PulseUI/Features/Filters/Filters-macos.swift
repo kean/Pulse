@@ -40,6 +40,7 @@ struct FilterSectionHeader: View {
 }
 
 extension Filters {
+    static let preferredWidth: CGFloat = 230
     static let formSpacing: CGFloat = 16
     static let formPadding = EdgeInsets(top: 6, leading: 8, bottom: 6, trailing: 6)
     static let contentTopInset: CGFloat = 8
@@ -50,6 +51,18 @@ extension Filters {
             Toggle(title, isOn: isOn)
             Spacer()
         }.padding(.leading, 13)
+    }
+}
+
+struct FiltersSection<Content: View>: View {
+    @ViewBuilder let content: () -> Content
+
+    var body: some View {
+        VStack {
+            content()
+        }
+        .padding(.leading, 12)
+        .padding(.top, Filters.contentTopInset)
     }
 }
 

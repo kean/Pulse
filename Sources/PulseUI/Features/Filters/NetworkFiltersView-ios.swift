@@ -23,7 +23,7 @@ struct NetworkFiltersView: View {
                     reset: { viewModel.resetFilters() },
                     isDefault: viewModel.filters.count == 1 && viewModel.filters[0].isDefault
                 )) {
-                    customFiltersGroup
+                    generalGroup
                 }
             }
 
@@ -88,9 +88,11 @@ struct NetworkFiltersView: View {
             .disabled(!viewModel.isButtonResetEnabled)
     }
 
+    // MARK: - General
+
     @available(iOS 14.0, *)
     @ViewBuilder
-    private var customFiltersGroup: some View {
+    private var generalGroup: some View {
         ForEach(viewModel.filters) { filter in
             CustomNetworkFilterView(filter: filter, onRemove: {
                 viewModel.removeFilter(filter)
@@ -107,6 +109,8 @@ struct NetworkFiltersView: View {
         .frame(maxWidth: .infinity, alignment: .center)
     }
 
+    // MARK: - Response
+
     @ViewBuilder
     private var responseGroup: some View {
         HStack {
@@ -117,11 +121,7 @@ struct NetworkFiltersView: View {
             makeRangePicker(title: "Size", from: $viewModel.criteria.responseSize.from, to: $viewModel.criteria.responseSize.to, isEnabled: $viewModel.criteria.responseSize.isEnabled)
             if #available(iOS 14.0, *) {
                 Menu(content: {
-                    Picker("", selection: $viewModel.criteria.responseSize.unit) {
-                        Text("Bytes").tag(NetworkSearchCriteria.ResponseSizeFilter.MeasurementUnit.bytes)
-                        Text("Kilobytes").tag(NetworkSearchCriteria.ResponseSizeFilter.MeasurementUnit.kilobytes)
-                        Text("Megabytes").tag(NetworkSearchCriteria.ResponseSizeFilter.MeasurementUnit.megabytes)
-                    }
+                    Filters.sizeUnitPicker($viewModel.criteria.responseSize.unit).labelsHidden()
                 }, label: {
                     FilterPickerButton(title: viewModel.criteria.responseSize.unit.localizedTitle)
                 })

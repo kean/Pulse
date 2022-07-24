@@ -134,7 +134,7 @@ private struct FiltersPanelView: View {
             HStack(spacing: 0) {
                 ExDivider()
                 ConsoleContainerFiltersPanel(viewModel: viewModel, mode: viewModel.mode)
-                    .frame(width: 200)
+                    .frame(width: Filters.preferredWidth)
             }
         }
     }
