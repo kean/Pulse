@@ -165,7 +165,7 @@ struct NetworkFiltersView: View {
                                     viewModel.criteria.host.values = []
                                 }
                                 makeDomainPicker()
-                                    .padding(.leading, -13) // Compensate Filers.toogle inset
+                                    .padding(.leading, -13) // Compensate Filers.toggle inset
                             }
                             .frame(width: 220, height: 340)
                             .navigationTitle("Select Hosts")
