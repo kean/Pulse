@@ -33,11 +33,9 @@ struct NetworkFiltersView: View {
                 reset:  {
                     viewModel.criteria.statusCode = .default
                     viewModel.criteria.contentType = .default
-                    viewModel.criteria.host = .default
                 },
                 isDefault: viewModel.criteria.statusCode == .default &&
-                viewModel.criteria.contentType == .default &&
-                viewModel.criteria.host == .default
+                viewModel.criteria.contentType == .default
             )) {
                 statusCodeGroup
             }
