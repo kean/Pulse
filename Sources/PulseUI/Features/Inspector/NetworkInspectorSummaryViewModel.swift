@@ -160,6 +160,11 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     }
 
     var responseBodySection: KeyValueSectionViewModel {
+        if summary.taskType == .downloadTask, summary.responseBodySize > 0 {
+            return KeyValueSectionViewModel(title: "Response Body", color: .indigo, items: [
+                ("Download Size", ByteCountFormatter.string(fromByteCount: summary.responseBodySize, countStyle: .file))
+            ])
+        }
         guard summary.responseBodyKey != nil, summary.responseBodySize > 0 else {
             return KeyValueSectionViewModel(title: "Response Body", color: .indigo)
         }
