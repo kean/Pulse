@@ -7,7 +7,7 @@
 import UIKit
 
 extension UITableView {
-    func apply<T: Hashable>(diff: CollectionDifference<T>) {
+    func apply<T: Hashable>(diff: CollectionDifference<T>, _ closure: () -> Void) {
         var deletes: [IndexPath] = []
         var inserts: [IndexPath] = []
         var moves: [(from: IndexPath, to: IndexPath)] = []
@@ -29,6 +29,7 @@ extension UITableView {
         }
 
         performBatchUpdates {
+            closure()
             deleteRows(at: deletes, with: .left)
             insertRows(at: inserts, with: .right)
             moves.forEach { move in

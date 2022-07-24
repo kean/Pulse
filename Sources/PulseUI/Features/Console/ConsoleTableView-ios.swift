@@ -104,13 +104,15 @@ final class ConsoleTableViewController: UITableViewController {
     private var isFirstDisplay = true
 
     private func display(_ entities: [NSManagedObject]) {
-        self.entities = entities
         if let diff = viewModel.diff, !isFirstDisplay {
-            viewModel.diff = nil
-            tableView.apply(diff: diff)
+            tableView.apply(diff: diff) {
+                self.entities = entities
+            }
         } else {
+            self.entities = entities
             tableView.reloadData()
         }
+        viewModel.diff = nil
         isFirstDisplay = false
     }
 
