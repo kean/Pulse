@@ -80,6 +80,7 @@ final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
             let sizeText = ByteCountFormatter.string(fromByteCount: request.responseBodySize, countStyle: .file)
             title += " · \(request.isFromCache ? "Cache" : sizeText)"
         }
+
         self.title = title
 
         switch state {
@@ -110,6 +111,7 @@ final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
 
         let method = request.httpMethod ?? "GET"
         self.text = method + " " + (request.url ?? "–")
+
         self.state = request.state
     }
 

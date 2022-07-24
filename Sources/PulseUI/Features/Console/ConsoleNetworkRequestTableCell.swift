@@ -11,6 +11,7 @@ import UIKit
 final class ConsoleNetworkRequestTableCell: UITableViewCell, UIContextMenuInteractionDelegate {
     private let badge = CircleView()
     private let title = UILabel()
+    private let typeIcon = UIImageView()
     private let accessory = ConsoleMessageAccessoryView()
     private let details = UILabel()
     private let pin = PinIndicatorView()
@@ -31,7 +32,7 @@ final class ConsoleNetworkRequestTableCell: UITableViewCell, UIContextMenuIntera
     private func createView() {
         let stack = UIView.vStack(spacing: 4, [
             .hStack(alignment: .center, spacing: 8, [
-                badge, title, UIView(), accessory
+                badge, title, pin, UIView(), accessory
             ]),
             details
         ])
@@ -39,15 +40,9 @@ final class ConsoleNetworkRequestTableCell: UITableViewCell, UIContextMenuIntera
         contentView.addSubview(stack)
         stack.pinToSuperview(insets: .init(top: 10, left: 16, bottom: 10, right: 12))
 
-        contentView.addSubview(pin)
-        pin.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            pin.firstBaselineAnchor.constraint(equalTo: title.firstBaselineAnchor),
-            pin.leadingAnchor.constraint(equalTo: title.trailingAnchor, constant: 6)
-        ])
-
         title.font = .preferredFont(forTextStyle: .caption1)
         title.textColor = .secondaryLabel
+
         details.font = .systemFont(ofSize: 15)
         details.numberOfLines = 4
 
