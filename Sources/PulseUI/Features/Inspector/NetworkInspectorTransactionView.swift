@@ -109,9 +109,7 @@ struct NetworkInspectorTransactionView_Previews: PreviewProvider {
         NavigationView {
             NetworkInspectorTransactionView(viewModel: mockModel)
                 .background(Color(UXColor.systemBackground))
-#if os(iOS)
-                .navigationBarTitle("Network Load")
-#endif
+                .backport.navigationTitle("Network Load")
         }
         .previewDisplayName("Light")
         .environment(\.colorScheme, .light)

@@ -17,9 +17,7 @@ struct ConsoleFiltersLabelsPickerView: View {
     var body: some View {
         if #available(iOS 15.0, *) {
             form
-#if os(iOS)
                 .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always))
-#endif
         } else {
             form
         }
@@ -36,9 +34,7 @@ struct ConsoleFiltersLabelsPickerView: View {
                 Toggle(item.capitalized, isOn: viewModel.binding(forLabel: item))
             }
         }
-#if os(iOS)
         .navigationBarTitle("Labels")
-#endif
     }
 
     private var labels: [String] {

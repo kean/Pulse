@@ -123,4 +123,17 @@ extension Backport {
             self.content
         }
     }
+
+    @ViewBuilder
+    func navigationTitle(_ title: String) -> some View {
+        if #available(iOS 14.0, tvOS 14.0, *) {
+            self.content.navigationTitle(title)
+        } else {
+#if os(iOS) || os(tvOS)
+            self.content.navigationBarTitle(title)
+#else
+            self.content.navigationTitle(title)
+#endif
+        }
+    }
 }

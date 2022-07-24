@@ -56,7 +56,7 @@ struct NetworkInspectorTransactionsListView: View {
     }
 
     private func destination(for item: NetworkInspectorTransactionsListViewModel.Item) -> some View {
-        #if os(iOS)
+#if os(iOS)
         NetworkInspectorTransactionView(viewModel: item.viewModel())
             .navigationBarTitle(item.title)
 #else
@@ -73,7 +73,7 @@ struct NetworkInspectorTransactionsListView: View {
         }
         .navigationTitle(item.title)
         .frame(minWidth: 400, minHeight: 300, idealHeight: 600)
-        #endif
+#endif
     }
 }
 

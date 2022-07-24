@@ -22,7 +22,7 @@ struct NetworkInspectorSummaryView: View {
             VStack(spacing: 24) {
                 contents
             }
-        }.background(invisibleLinks)
+        }.background(links)
 #elseif os(tvOS)
         List {
             contents
@@ -167,9 +167,7 @@ struct NetworkInspectorSummaryView: View {
 
             NavigationLink.programmatic(isActive: $viewModel.isRequestRawLinkActive, destination: {
                 NetworkInspectorResponseView(viewModel: viewModel.requestBodyViewModel)
-#if os(iOS)
-                    .navigationBarTitle("Request")
-#endif
+                    .backport.navigationTitle("Request")
             })
 
             NavigationLink.programmatic(isActive: $viewModel.isCurrentQueryItemsLinkActive) {
@@ -178,9 +176,7 @@ struct NetworkInspectorSummaryView: View {
 
             NavigationLink.programmatic(isActive: $viewModel.isResponseRawLinkActive, destination: {
                 NetworkInspectorResponseView(viewModel: viewModel.responseBodyViewModel)
-#if os(iOS)
-                    .navigationBarTitle("Response")
-#endif
+                    .backport.navigationTitle("Response")
             })
 
             NavigationLink.programmatic(isActive: $viewModel.isOriginalRequestHeadersLinkActive) {

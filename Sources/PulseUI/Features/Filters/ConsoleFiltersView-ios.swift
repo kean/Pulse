@@ -56,10 +56,8 @@ struct ConsoleFiltersView: View {
             }
         }
         .background(allLabelsNavigationLink)
-#if os(iOS)
         .navigationBarTitle("Filters")
         .navigationBarItems(leading: buttonClose, trailing: buttonReset)
-#endif
     }
 
     private var buttonClose: some View {
