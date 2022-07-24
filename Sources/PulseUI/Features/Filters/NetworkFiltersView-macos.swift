@@ -276,10 +276,9 @@ struct NetworkFiltersView: View {
     
     private var durationGroup: some View {
         DisclosureGroup(isExpanded: $isDurationGroupExpanded, content: {
-            VStack(spacing: 6) {
-                DurationPicker(title: "Min", value: $viewModel.criteria.duration.from)
-                DurationPicker(title: "Max", value: $viewModel.criteria.duration.to)
-            }.padding(.top, Filters.contentTopInset)
+            FiltersSection {
+                durationRow
+            }
         }, label: {
             FilterSectionHeader(
                 icon: "hourglass", title: "Duration",
@@ -289,6 +288,29 @@ struct NetworkFiltersView: View {
                 isEnabled: $viewModel.criteria.duration.isEnabled
             )
         })
+    }
+
+    @ViewBuilder
+    private var durationRow: some View {
+        HStack {
+            TextField("Min", text: $viewModel.criteria.duration.min, onEditingChanged: {
+                if $0 { viewModel.criteria.duration.isEnabled = true }
+            })
+            .textFieldStyle(.roundedBorder)
+
+            TextField("Max", text: $viewModel.criteria.duration.max, onEditingChanged: {
+                if $0 { viewModel.criteria.duration.isEnabled = true }
+            })
+            .textFieldStyle(.roundedBorder)
+
+            Picker("Unit", selection: $viewModel.criteria.duration.unit) {
+                Text("min").tag(NetworkSearchCriteria.DurationFilter.Unit.minutes)
+                Text("sec").tag(NetworkSearchCriteria.DurationFilter.Unit.seconds)
+                Text("ms").tag(NetworkSearchCriteria.DurationFilter.Unit.milliseconds)
+            }
+            .fixedSize()
+            .labelsHidden()
+        }
     }
 
     private var redirectGroup: some View {

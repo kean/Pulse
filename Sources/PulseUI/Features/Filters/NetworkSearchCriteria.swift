@@ -79,8 +79,39 @@ struct NetworkSearchCriteria: Hashable {
 
     struct DurationFilter: Hashable {
         var isEnabled = true
-        var from = DurationFilterPoint()
-        var to = DurationFilterPoint()
+        var min: String = ""
+        var max: String = ""
+        var unit: Unit = .seconds
+
+        enum Unit {
+            case minutes
+            case seconds
+            case milliseconds
+
+            var localizedTitle: String {
+                switch self {
+                case .minutes: return "min"
+                case .seconds: return "sec"
+                case .milliseconds: return "ms"
+                }
+            }
+
+            func convert(_ value: TimeInterval) -> TimeInterval {
+                switch self {
+                case .minutes: return value * 60
+                case .seconds: return value
+                case .milliseconds: return value / 1000
+                }
+            }
+        }
+
+        var minSeconds: TimeInterval? {
+            TimeInterval(min).map(unit.convert)
+        }
+
+        var maxSeconds: TimeInterval? {
+            TimeInterval(max).map(unit.convert)
+        }
 
         static let `default` = DurationFilter()
     }
@@ -262,33 +293,6 @@ final class NetworkSearchFilter: ObservableObject, Hashable, Identifiable {
     }
 }
 
-struct DurationFilterPoint: Hashable {
-    var value: String = ""
-    var unit: Unit = .seconds
-
-    enum Unit {
-        case minutes
-        case seconds
-        case milliseconds
-
-        var localizedTitle: String {
-            switch self {
-            case .minutes: return "min"
-            case .seconds: return "sec"
-            case .milliseconds: return "ms"
-            }
-        }
-    }
-
-    var seconds: TimeInterval? {
-        switch unit {
-        case .minutes: return TimeInterval(value).map { $0 * 60 }
-        case .seconds: return TimeInterval(value)
-        case .milliseconds: return TimeInterval(value).map { $0 / 1000 }
-        }
-    }
-}
-
 private func decode<T: Decodable>(_ type: T.Type) -> (_ data: Data?) -> T? {
     {
         guard let data = $0 else { return nil }
@@ -388,7 +392,7 @@ extension NetworkSearchCriteria {
                 predicates.append(NSPredicate(format: "responseBodySize >= %d", value))
             }
             if let value = criteria.responseSize.toBytes {
-                predicates.append(NSPredicate(format: "responseBodySize < %d", value))
+                predicates.append(NSPredicate(format: "responseBodySize <= %d", value))
             }
         }
 
@@ -397,15 +401,15 @@ extension NetworkSearchCriteria {
                 predicates.append(NSPredicate(format: "statusCode >= %d", value))
             }
             if let value = Int(criteria.statusCode.to), value > 0 {
-                predicates.append(NSPredicate(format: "statusCode < %d", value))
+                predicates.append(NSPredicate(format: "statusCode <= %d", value))
             }
         }
 
         if criteria.duration.isEnabled {
-            if let value = criteria.duration.from.seconds {
+            if let value = criteria.duration.minSeconds {
                 predicates.append(NSPredicate(format: "duration >= %f", value))
             }
-            if let value = criteria.duration.to.seconds {
+            if let value = criteria.duration.maxSeconds {
                 predicates.append(NSPredicate(format: "duration <= %f", value))
             }
         }
