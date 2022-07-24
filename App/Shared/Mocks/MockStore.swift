@@ -73,26 +73,40 @@ private func populateStore(_ store: LoggerStore) {
     let urlSession = URLSession(configuration: .default)
 
     func logTask(_ mockTask: MockDataTask, delay: Int = Int.random(in: 1000...6000)) {
-        let dataTask = urlSession.dataTask(with: mockTask.request)
+        let task: URLSessionTask
+        switch mockTask.kind {
+        case .data: task = urlSession.dataTask(with: mockTask.request)
+        case .download: task = urlSession.downloadTask(with: mockTask.request)
+        case .upload: fatalError()
+        }
         var currentRequest = mockTask.currentRequest
         currentRequest.setValue("Pulse Demo/2.0", forHTTPHeaderField: "User-Agent")
-        dataTask.setSwizzledCurrentRequest(currentRequest)
+        task.setSwizzledCurrentRequest(currentRequest)
+        task.setSwizzledResponse(mockTask.response)
+
+        func logTaskCreated() {
+            networkLogger.logTaskCreated(task)
+        }
+
+        func logRemainigEvents() {
+            if let dataTask = task as? URLSessionDataTask {
+                networkLogger.logDataTask(dataTask, didReceive: mockTask.response)
+                networkLogger.logDataTask(dataTask, didReceive: mockTask.responseBody)
+            }
+            networkLogger.logTask(task, didFinishCollecting: mockTask.metrics)
+            networkLogger.logTask(task, didCompleteWithError: nil, session: urlSession)
+        }
+
         if isAddingItemsDynamically {
             DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(delay)) {
-                networkLogger.logTaskCreated(dataTask)
+                logTaskCreated()
                 DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(Int.random(in: 500...2000))) {
-                    networkLogger.logDataTask(dataTask, didReceive: mockTask.response)
-                    networkLogger.logDataTask(dataTask, didReceive: mockTask.responseBody)
-                    networkLogger.logTask(dataTask, didFinishCollecting: mockTask.metrics)
-                    networkLogger.logTask(dataTask, didCompleteWithError: nil, session: urlSession)
+                    logRemainigEvents()
                 }
             }
         } else {
-            networkLogger.logTaskCreated(dataTask)
-            networkLogger.logDataTask(dataTask, didReceive: mockTask.response)
-            networkLogger.logDataTask(dataTask, didReceive: mockTask.responseBody)
-            networkLogger.logTask(dataTask, didFinishCollecting: mockTask.metrics)
-            networkLogger.logTask(dataTask, didCompleteWithError: nil, session: urlSession)
+            logTaskCreated()
+            logRemainigEvents()
         }
     }
 
@@ -123,6 +137,8 @@ private func populateStore(_ store: LoggerStore) {
     logTask(MockDataTask.octocat)
 
     logTask(MockDataTask.repos)
+
+    logTask(MockDataTask.downloadNuke)
 
     logTask(MockDataTask.profileFailure)
 
@@ -163,8 +179,10 @@ private func populateStore(_ store: LoggerStore) {
     }
 
     // Wait until everything is stored
-    store.container.viewContext.performAndWait {}
-    store.backgroundContext.performAndWait {
-        try? store.backgroundContext.save()
+    if !isAddingItemsDynamically {
+        store.container.viewContext.performAndWait {}
+        store.backgroundContext.performAndWait {
+            try? store.backgroundContext.save()
+        }
     }
 }

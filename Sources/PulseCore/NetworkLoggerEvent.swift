@@ -32,6 +32,7 @@ public struct NetworkLoggerRequest: Codable {
 }
 
 public struct NetworkLoggerResponse: Codable {
+    public let url: String?
     public let statusCode: Int?
     public let contentType: String?
     public let expectedContentLength: Int64?
@@ -39,6 +40,7 @@ public struct NetworkLoggerResponse: Codable {
 
     public init(urlResponse: URLResponse) {
         let httpResponse = urlResponse as? HTTPURLResponse
+        self.url = urlResponse.url?.absoluteString
         self.statusCode = httpResponse?.statusCode
         self.contentType = urlResponse.mimeType
         self.expectedContentLength = urlResponse.expectedContentLength

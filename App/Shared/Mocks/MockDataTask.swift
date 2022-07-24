@@ -30,8 +30,8 @@ extension MockDataTask {
     )
 
     static let repos = MockDataTask(
-        request: mockReposRequest,
-        currentRequest: mockReposRequest,
+        request: mockReposOriginalRequest,
+        currentRequest: mockReposCurrentRequest,
         response: mockReposResponse,
         responseBody: mockReposBody,
         metrics: mockMetrics
@@ -61,6 +61,15 @@ extension MockDataTask {
         response: mockCreateaAPIResponse,
         responseBody: mockCreateaAPIBody,
         metrics: mockMetricsWithRedirect
+    )
+
+    static let downloadNuke = MockDataTask(
+        kind: .download,
+        request: mockDownloadNukeOriginalRequest,
+        currentRequest: mockDownloadNukeCurrentRequest,
+        response: mockDownloadNukeResponse,
+        responseBody: Data(),
+        metrics: mockDownloadNukeMetrics
     )
 }
 
@@ -307,13 +316,17 @@ let mockStatsFailureRequest: URLRequest = {
 
 // MARK: - GitHub Repos (Success)
 
-private let mockReposRequest: URLRequest = {
+private let mockReposOriginalRequest: URLRequest = {
+    var request = URLRequest(url: URL(string: "https://github.com/repos")!)
+    return request
+}()
+
+private let mockReposCurrentRequest: URLRequest = {
     var request = URLRequest(url: URL(string: "https://github.com/repos")!)
 
     request.setValue("gzip", forHTTPHeaderField: "Accept-Encoding")
     request.setValue("github.com", forHTTPHeaderField: "Host")
     request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-    request.setValue("no-cache", forHTTPHeaderField: "Cache-Control")
     request.setValue("en-us", forHTTPHeaderField: "Accept-Language")
     request.setValue("text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", forHTTPHeaderField: "Accept")
 
@@ -395,21 +408,14 @@ let mockImage = Data(base64Encoded: "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgICAgM
 
 private let mockCreateAPIOriginalRequest: URLRequest = {
     var request = URLRequest(url: URL(string: "https://github.com/CreateAPI/Get")!)
-
-    request.setValue("gzip", forHTTPHeaderField: "Accept-Encoding")
-    request.setValue("en-us", forHTTPHeaderField: "Accept-Language")
-    request.setValue("text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", forHTTPHeaderField: "Accept")
-
     return request
 }()
 
 private let mockCreateAPICurrentRequest: URLRequest = {
     var request = URLRequest(url: URL(string: "https://github.com/kean/Get")!)
-
     request.setValue("gzip", forHTTPHeaderField: "Accept-Encoding")
     request.setValue("en-us", forHTTPHeaderField: "Accept-Language")
     request.setValue("text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", forHTTPHeaderField: "Accept")
-
     return request
 }()
 
@@ -649,18 +655,214 @@ private let mockMetricsWithRedirect = try! JSONDecoder().decode(NetworkLoggerMet
 }
 """.data(using: .utf8)!)
 
+// MARK: - GitHub Download Archive
+
+private let mockDownloadNukeOriginalRequest: URLRequest = {
+    var request = URLRequest(url: URL(string: "https://github.com/kean/Nuke/archive/refs/tags/11.0.0.zip")!)
+    request.httpMethod = "GET"
+    return request
+}()
+
+private let mockDownloadNukeCurrentRequest: URLRequest = {
+    var request = URLRequest(url: URL(string: "https://codeload.github.com/kean/Nuke/zip/refs/tags/11.0.0")!)
+    request.setValue("gzip, deflate, br", forHTTPHeaderField: "Accept-Encoding")
+    request.setValue("en-US,en;q=0.9", forHTTPHeaderField: "Accept-Language")
+    request.setValue("*/*", forHTTPHeaderField: "Accept")
+    return request
+}()
+
+private let mockDownloadNukeResponse: URLResponse = {
+    var response = HTTPURLResponse(url: URL(string: "https://codeload.github.com/kean/Nuke/zip/refs/tags/11.0.0")!, statusCode: 200, httpVersion: "HTTP/2.0", headerFields: [
+        "Authorization,Accept-Encoding,Origin": "Vary",
+        "Content-Type": "application/zip",
+        "x-xss-protection": "1; mode=block",
+        "content-security-policy": "default-src \'none\'; style-src \'unsafe-inline\'; sandbox",
+        "Date": "Sun, 24 Jul 2022 17:46:08 GMT",
+        "Content-Disposition": "attachment; filename=Nuke-11.0.0.zip",
+        "x-frame-options": "deny",
+        "Etag": "W/\\\"4358c3c3d9bd5a22f6d86b47cbe567417fa1efc8df6beaa54c1730caf6ad86da\\\"",
+        "Strict-Transport-Security": "max-age=31536000",
+        "Access-Control-Allow-Origin": "https://render.githubusercontent.com"
+    ])
+    return response!
+}()
+
+private let mockDownloadNukeMetrics = try! JSONDecoder().decode(NetworkLoggerMetrics.self, from: """
+{
+  "transactions": [
+    {
+      "responseStartDate": 680377568.185849,
+      "domainLookupStartDate": 680377567.9625441,
+      "fetchStartDate": 680377567.914485,
+      "requestEndDate": 680377568.113763,
+      "domainLookupEndDate": 680377567.9765441,
+      "connectEndDate": 680377568.114544,
+      "connectStartDate": 680377567.997544,
+      "secureConnectionStartDate": 680377568.0365441,
+      "networkProtocolName": "h2",
+      "secureConnectionEndDate": 680377568.114544,
+      "isProxyConnection": false,
+      "resourceFetchType": 1,
+      "details": {
+        "remoteAddress": "140.82.114.4",
+        "localPort": 52597,
+        "negotiatedTLSProtocolVersion": 772,
+        "countOfRequestBodyBytesBeforeEncoding": 0,
+        "isMultipath": false,
+        "localAddress": "192.168.1.4",
+        "isCellular": false,
+        "isConstrained": false,
+        "countOfResponseHeaderBytesReceived": 2159,
+        "isExpensive": false,
+        "remotePort": 443,
+        "negotiatedTLSCipherSuite": 4865,
+        "countOfRequestBodyBytesSent": 0,
+        "countOfResponseBodyBytesReceived": 0,
+        "countOfRequestHeaderBytesSent": 122,
+        "countOfResponseBodyBytesAfterDecoding": 0
+      },
+      "request": {
+        "allowsCellularAccess": true,
+        "httpMethod": "GET",
+        "url": "https://github.com/kean/Nuke/archive/refs/tags/11.0.0.zip",
+        "cachePolicy": 0,
+        "allowsExpensiveNetworkAccess": true,
+        "allowsConstrainedNetworkAccess": true,
+        "httpShouldHandleCookies": true,
+        "headers": {
+          "User-Agent": "Pulse%20Demo%20iOS/20 CFNetwork/1385 Darwin/22.0.0",
+          "Connection": "keep-alive",
+          "Accept-Encoding": "gzip, deflate, br",
+          "Accept-Language": "en-US,en;q=0.9",
+          "Host": "github.com",
+          "Accept": "*/*"
+        },
+        "httpShouldUsePipelining": false,
+        "timeoutInterval": 60
+      },
+      "requestStartDate": 680377568.113607,
+      "response": {
+        "statusCode": 302,
+        "headers": {
+          "Server": "GitHub.com",
+          "content-security-policy": "default-src 'none'; base-uri 'self'; block-all-mixed-content; child-src github.com/assets-cdn/worker/ gist.github.com/assets-cdn/worker/; connect-src 'self' uploads.github.com objects-origin.githubusercontent.com www.githubstatus.com collector.github.com raw.githubusercontent.com api.github.com github-cloud.s3.amazonaws.com github-production-repository-file-5c1aeb.s3.amazonaws.com github-production-upload-manifest-file-7fdce7.s3.amazonaws.com github-production-user-asset-6210df.s3.amazonaws.com cdn.optimizely.com logx.optimizely.com/v1/events *.actions.githubusercontent.com wss://*.actions.githubusercontent.com online.visualstudio.com/api/v1/locations github-production-repository-image-32fea6.s3.amazonaws.com github-production-release-asset-2e65be.s3.amazonaws.com insights.github.com wss://alive.github.com; font-src github.githubassets.com; form-action 'self' github.com gist.github.com objects-origin.githubusercontent.com; frame-ancestors 'none'; frame-src render.githubusercontent.com viewscreen.githubusercontent.com notebooks.githubusercontent.com; img-src 'self' data: github.githubassets.com identicons.github.com github-cloud.s3.amazonaws.com secured-user-images.githubusercontent.com/ github-production-user-asset-6210df.s3.amazonaws.com *.githubusercontent.com; manifest-src 'self'; media-src github.com user-images.githubusercontent.com/; script-src github.githubassets.com; style-src 'unsafe-inline' github.githubassets.com; worker-src github.com/assets-cdn/worker/ gist.github.com/assets-cdn/worker/",
+          "Vary": "X-PJAX, X-PJAX-Container, Turbo-Visit, Turbo-Frame, Accept-Encoding, Accept, X-Requested-With",
+          "x-xss-protection": "0",
+          "x-github-request-id": "CD75:1CFF:F6DEE8:1B9005A:62DD8560",
+          "Content-Type": "text/html; charset=utf-8",
+          "Location": "https://codeload.github.com/kean/Nuke/zip/refs/tags/11.0.0",
+          "referrer-policy": "no-referrer-when-downgrade",
+          "Strict-Transport-Security": "max-age=31536000; includeSubdomains; preload",
+          "Cache-Control": "max-age=0, private",
+          "expect-ct": "max-age=2592000, report-uri=\\\"https://api.github.com/_private/browser/errors\\\"",
+          "permissions-policy": "interest-cohort=()",
+          "x-content-type-options": "nosniff",
+          "Date": "Sun, 24 Jul 2022 17:46:08 GMT",
+          "x-frame-options": "deny",
+          "Content-Length": "0"
+        },
+        "contentType": "text/html",
+        "expectedContentLength": 0
+      },
+      "responseEndDate": 680377568.186837,
+      "isReusedConnection": false
+    },
+    {
+      "responseStartDate": 680377568.371462,
+      "domainLookupStartDate": 680377568.189141,
+      "fetchStartDate": 680377568.18746,
+      "requestEndDate": 680377568.271574,
+      "domainLookupEndDate": 680377568.209141,
+      "connectEndDate": 680377568.271141,
+      "connectStartDate": 680377568.209141,
+      "secureConnectionStartDate": 680377568.229141,
+      "networkProtocolName": "h2",
+      "secureConnectionEndDate": 680377568.271141,
+      "isProxyConnection": false,
+      "resourceFetchType": 1,
+      "details": {
+        "remoteAddress": "140.82.114.10",
+        "localPort": 52600,
+        "negotiatedTLSProtocolVersion": 772,
+        "countOfRequestBodyBytesBeforeEncoding": 0,
+        "isMultipath": false,
+        "localAddress": "192.168.1.4",
+        "isCellular": false,
+        "isConstrained": false,
+        "countOfResponseHeaderBytesReceived": 478,
+        "isExpensive": false,
+        "remotePort": 443,
+        "negotiatedTLSCipherSuite": 4865,
+        "countOfRequestBodyBytesSent": 0,
+        "countOfResponseBodyBytesReceived": 6695689,
+        "countOfRequestHeaderBytesSent": 124,
+        "countOfResponseBodyBytesAfterDecoding": 6691810
+      },
+      "request": {
+        "allowsCellularAccess": true,
+        "httpMethod": "GET",
+        "url": "https://codeload.github.com/kean/Nuke/zip/refs/tags/11.0.0",
+        "cachePolicy": 0,
+        "allowsExpensiveNetworkAccess": true,
+        "allowsConstrainedNetworkAccess": true,
+        "httpShouldHandleCookies": true,
+        "headers": {
+          "User-Agent": "Pulse%20Demo%20iOS/20 CFNetwork/1385 Darwin/22.0.0",
+          "Host": "codeload.github.com",
+          "Accept-Encoding": "gzip, deflate, br",
+          "Connection": "keep-alive",
+          "Accept-Language": "en-US,en;q=0.9",
+          "Accept": "*/*"
+        },
+        "httpShouldUsePipelining": false,
+        "timeoutInterval": 60
+      },
+      "requestStartDate": 680377568.271509,
+      "response": {
+        "statusCode": 200,
+        "headers": {
+          "content-security-policy": "default-src 'none'; style-src 'unsafe-inline'; sandbox",
+          "Vary": "Authorization,Accept-Encoding,Origin",
+          "x-xss-protection": "1; mode=block",
+          "x-github-request-id": "CD78:631C:1F543:9B45E:62DD8560",
+          "Content-Type": "application/zip",
+          "Access-Control-Allow-Origin": "https://render.githubusercontent.com",
+          "Etag": "W/\\\"4358c3c3d9bd5a22f6d86b47cbe567417fa1efc8df6beaa54c1730caf6ad86da\\\"",
+          "Strict-Transport-Security": "max-age=31536000",
+          "Content-Disposition": "attachment; filename=Nuke-11.0.0.zip",
+          "x-content-type-options": "nosniff",
+          "Date": "Sun, 24 Jul 2022 17:46:08 GMT",
+          "x-frame-options": "deny"
+        },
+        "contentType": "application/zip",
+        "expectedContentLength": -1
+      },
+      "responseEndDate": 680377568.756665,
+      "isReusedConnection": false
+    }
+  ],
+  "taskInterval": {
+    "start": 680377567.911655,
+    "duration": 0.8462769985198975
+  },
+  "redirectCount": 1
+}
+""".data(using: .utf8)!)
+
 // MARK: Swizzling
 
-private var swizzledRequests: [URLSessionDataTask: URLRequest] = [:]
-private var isSwizzled = false
+private var swizzledRequests: [URLSessionTask: URLRequest] = [:]
+private var swizzledResponses: [URLSessionTask: URLResponse] = [:]
+private var isSwizzledRequest = false
+private var isSwizzledResponse = false
 
-extension URLSessionDataTask {
+extension URLSessionTask {
     func setSwizzledCurrentRequest(_ request: URLRequest?) {
-        if !isSwizzled {
-            isSwizzled = true
+        if !isSwizzledRequest {
+            isSwizzledRequest = true
 
-            let originalMethod: Method? = class_getInstanceMethod(URLSessionDataTask.self, #selector(getter: currentRequest))
-            let swizzledMethod: Method? = class_getInstanceMethod(URLSessionDataTask.self, #selector(getter: swizzledCurrentRequest))
+            let originalMethod: Method? = class_getInstanceMethod(URLSessionTask.self, #selector(getter: currentRequest))
+            let swizzledMethod: Method? = class_getInstanceMethod(URLSessionTask.self, #selector(getter: swizzledCurrentRequest))
 
             if let originalMethod = originalMethod, let swizzledMethod = swizzledMethod {
                 method_exchangeImplementations(originalMethod, swizzledMethod)
@@ -672,5 +874,24 @@ extension URLSessionDataTask {
 
     @objc var swizzledCurrentRequest: URLRequest? {
         swizzledRequests[self]
+    }
+
+    func setSwizzledResponse(_ newResponse: URLResponse?) {
+        if !isSwizzledResponse {
+            isSwizzledResponse = true
+
+            let originalMethod: Method? = class_getInstanceMethod(URLSessionTask.self, #selector(getter: response))
+            let swizzledMethod: Method? = class_getInstanceMethod(URLSessionTask.self, #selector(getter: swizzledResponse))
+
+            if let originalMethod = originalMethod, let swizzledMethod = swizzledMethod {
+                method_exchangeImplementations(originalMethod, swizzledMethod)
+            }
+        }
+
+        swizzledResponses[self] = newResponse
+    }
+
+    @objc var swizzledResponse: URLResponse? {
+        swizzledResponses[self]
     }
 }
