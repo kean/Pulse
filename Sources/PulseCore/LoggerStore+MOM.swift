@@ -48,6 +48,7 @@ public extension LoggerStore {
 
         request.properties = [
             NSAttributeDescription(name: "taskId", type: .UUIDAttributeType),
+            NSAttributeDescription(name: "rawTaskType", type: .stringAttributeType),
             NSAttributeDescription(name: "createdAt", type: .dateAttributeType),
             NSAttributeDescription(name: "session", type: .stringAttributeType),
             NSAttributeDescription(name: "url", type: .stringAttributeType),
@@ -103,6 +104,7 @@ public final class LoggerMetadataEntity: NSManagedObject {
 public final class LoggerNetworkRequestEntity: NSManagedObject {
     // Primary
     @NSManaged public var taskId: UUID?
+    @NSManaged public var rawTaskType: String?
     @NSManaged public var createdAt: Date
     @NSManaged public var session: String
     @NSManaged public var message: LoggerMessageEntity?
@@ -128,6 +130,11 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
         // For backward-compatibility.
         let isFailure = errorCode != 0 || (statusCode != 0 && !(200..<400).contains(statusCode))
         return isFailure ? .failure : .success
+    }
+
+    /// Returns task type
+    public var taskType: NetworkLoggerTaskType {
+        rawTaskType.flatMap(NetworkLoggerTaskType.init) ?? .dataTask
     }
 
     public enum State: Int16 {

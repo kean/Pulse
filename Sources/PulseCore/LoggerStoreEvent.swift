@@ -38,14 +38,16 @@ public enum LoggerStoreEvent {
 
     public struct NetworkTaskCreated: Codable {
         public let taskId: UUID
+        public let taskType: NetworkLoggerTaskType
         public let createdAt: Date
         public let originalRequest: NetworkLoggerRequest
         public let currentRequest: NetworkLoggerRequest?
         public var requestBody: Data?
         public let session: String
 
-        public init(taskId: UUID, createdAt: Date, originalRequest: NetworkLoggerRequest, currentRequest: NetworkLoggerRequest?, requestBody: Data?, session: String) {
+        public init(taskId: UUID, taskType: NetworkLoggerTaskType, createdAt: Date, originalRequest: NetworkLoggerRequest, currentRequest: NetworkLoggerRequest?, requestBody: Data?, session: String) {
             self.taskId = taskId
+            self.taskType = taskType
             self.createdAt = createdAt
             self.originalRequest = originalRequest
             self.currentRequest = currentRequest
@@ -68,6 +70,7 @@ public enum LoggerStoreEvent {
 
     public final class NetworkTaskCompleted: Codable {
         public let taskId: UUID
+        public let taskType: NetworkLoggerTaskType
         public let createdAt: Date
         public let originalRequest: NetworkLoggerRequest
         public let currentRequest: NetworkLoggerRequest?
@@ -76,10 +79,13 @@ public enum LoggerStoreEvent {
         public let requestBody: Data?
         public let responseBody: Data?
         public let metrics: NetworkLoggerMetrics?
+        public let completedUnitCount: Int64
+        public let totalUnitCount: Int64
         public let session: String
 
-        public init(taskId: UUID, createdAt: Date, originalRequest: NetworkLoggerRequest, currentRequest: NetworkLoggerRequest?, response: NetworkLoggerResponse?, error: NetworkLoggerError?, requestBody: Data?, responseBody: Data?, metrics: NetworkLoggerMetrics?, session: String) {
+        public init(taskId: UUID, taskType: NetworkLoggerTaskType, createdAt: Date, originalRequest: NetworkLoggerRequest, currentRequest: NetworkLoggerRequest?, response: NetworkLoggerResponse?, error: NetworkLoggerError?, requestBody: Data?, responseBody: Data?, metrics: NetworkLoggerMetrics?, completedUnitCount: Int64, totalUnitCount: Int64, session: String) {
             self.taskId = taskId
+            self.taskType = taskType
             self.createdAt = createdAt
             self.originalRequest = originalRequest
             self.currentRequest = currentRequest
@@ -88,6 +94,8 @@ public enum LoggerStoreEvent {
             self.requestBody = requestBody
             self.responseBody = responseBody
             self.metrics = metrics
+            self.completedUnitCount = completedUnitCount
+            self.totalUnitCount = totalUnitCount
             self.session = session
         }
     }

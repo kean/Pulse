@@ -35,6 +35,7 @@ public final class NetworkLogger {
         if let originalRequest = task.originalRequest ?? context.request {
             store.handle(.networkTaskCreated(LoggerStoreEvent.NetworkTaskCreated(
                 taskId: context.taskId,
+                taskType: NetworkLoggerTaskType(task: task),
                 createdAt: Date(),
                 originalRequest: .init(urlRequest: originalRequest),
                 currentRequest: task.currentRequest.map(NetworkLoggerRequest.init),
@@ -101,6 +102,7 @@ public final class NetworkLogger {
 //        if let networkTask = willLogTask(networkTask) {
         store.handle(.networkTaskCompleted(.init(
             taskId: context.taskId,
+            taskType: NetworkLoggerTaskType(task: task),
             createdAt: Date(),
             originalRequest: NetworkLoggerRequest(urlRequest: originalRequest),
             currentRequest: task.currentRequest.map(NetworkLoggerRequest.init),
@@ -109,6 +111,8 @@ public final class NetworkLogger {
             requestBody: originalRequest.httpBody ?? originalRequest.httpBodyStreamData(),
             responseBody: data,
             metrics: metrics,
+            completedUnitCount: task.progress.completedUnitCount,
+            totalUnitCount: task.progress.totalUnitCount,
             session: LoggerSession.current.id.uuidString
         )))
     }

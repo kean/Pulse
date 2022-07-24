@@ -233,18 +233,19 @@ extension LoggerStore {
             line: line
         )))
     }
-    
+
     /// Stores the network request.
     ///
     /// - note: If you want to store incremental updates to the task, use
     /// `NetworkLogger` instead.
     public func storeRequest(_ request: URLRequest, response: URLResponse?, error: Error?, data: Data?, metrics: URLSessionTaskMetrics? = nil) {
-        storeRequest(taskId: UUID(), request: request, response: response, error: error, data: data, metrics: metrics.map(NetworkLoggerMetrics.init))
+        storeRequest(taskId: UUID(), taskType: .dataTask, request: request, response: response, error: error, data: data, metrics: metrics.map(NetworkLoggerMetrics.init))
     }
     
-    func storeRequest(taskId: UUID, request: URLRequest, response: URLResponse?, error: Error?, data: Data?, metrics: NetworkLoggerMetrics?) {
+    func storeRequest(taskId: UUID, taskType: NetworkLoggerTaskType, request: URLRequest, response: URLResponse?, error: Error?, data: Data?, metrics: NetworkLoggerMetrics?) {
         handle(.networkTaskCompleted(.init(
             taskId: taskId,
+            taskType: taskType,
             createdAt: makeCurrentDate(),
             originalRequest: NetworkLoggerRequest(urlRequest: request),
             currentRequest: NetworkLoggerRequest(urlRequest: request),
@@ -253,6 +254,8 @@ extension LoggerStore {
             requestBody: request.httpBody ?? request.httpBodyStreamData(),
             responseBody: data,
             metrics: metrics,
+            completedUnitCount: -1,
+            totalUnitCount: -1,
             session: LoggerSession.current.id.uuidString
         )))
     }
@@ -306,7 +309,12 @@ extension LoggerStore {
     }
 
     private func process(_ event: LoggerStoreEvent.NetworkTaskCreated) {
-        let request = findOrCreateNetworkRequestEntity(forTaskId: event.taskId, createdAt: event.createdAt, session: event.session)
+        let request = findOrCreateNetworkRequestEntity(
+            forTaskId: event.taskId,
+            taskType: event.taskType,
+            createdAt: event.createdAt,
+            session: event.session
+        )
 
         request.url = event.originalRequest.url?.absoluteString
         request.host = event.originalRequest.url?.host
@@ -328,7 +336,12 @@ extension LoggerStore {
     }
 
     private func process(_ event: LoggerStoreEvent.NetworkTaskCompleted) {
-        let request = findOrCreateNetworkRequestEntity(forTaskId: event.taskId, createdAt: event.createdAt, session: event.session)
+        let request = findOrCreateNetworkRequestEntity(
+            forTaskId: event.taskId,
+            taskType: event.taskType,
+            createdAt: event.createdAt,
+            session: event.session
+        )
 
         // Populate remaining request fields
         request.url = event.originalRequest.url?.absoluteString
@@ -384,13 +397,14 @@ extension LoggerStore {
         return try? backgroundContext.fetch(entity).first
     }
 
-    private func findOrCreateNetworkRequestEntity(forTaskId taskId: UUID, createdAt: Date, session: String) -> LoggerNetworkRequestEntity {
+    private func findOrCreateNetworkRequestEntity(forTaskId taskId: UUID, taskType: NetworkLoggerTaskType, createdAt: Date, session: String) -> LoggerNetworkRequestEntity {
         if let entity = findNetworkRequestEntity(forTaskId: taskId) {
             return entity
         }
 
         let request = LoggerNetworkRequestEntity(context: backgroundContext)
         request.taskId = taskId
+        request.rawTaskType = taskType.rawValue
         request.createdAt = createdAt
         request.completedUnitCount = -1
         request.totalUnitCount = -1
