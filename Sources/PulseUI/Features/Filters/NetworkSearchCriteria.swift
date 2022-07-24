@@ -10,11 +10,9 @@ struct NetworkSearchCriteria: Hashable {
     var isFiltersEnabled = true
 
     var dates = DatesFilter.default
-    var statusCode = StatusCodeFilter.default
-    var responseSize = ResponseSizeFilter.default
+    var response = ResponseFilter.default
     var host = HostFilter.default
     var duration = DurationFilter.default
-    var contentType = ContentTypeFilter.default
     var networking = NetworkingFilter.default
 
     static let `default` = NetworkSearchCriteria()
@@ -23,16 +21,21 @@ struct NetworkSearchCriteria: Hashable {
         self == NetworkSearchCriteria.default
     }
 
-    struct StatusCodeFilter: Hashable {
+    struct ResponseFilter: Hashable {
         var isEnabled = true
+        var statusCode = StatusCodeFilter()
+        var contentType = ContentTypeFilter()
+        var responseSize = ResponseSizeFilter()
+
+        static let `default` = ResponseFilter()
+    }
+
+    struct StatusCodeFilter: Hashable {
         var from: String = ""
         var to: String = ""
-
-        static let `default` = StatusCodeFilter()
     }
 
     struct ResponseSizeFilter: Hashable {
-        var isEnabled = true
         var from: String = ""
         var to: String = ""
         var unit: MeasurementUnit = .kilobytes
@@ -64,8 +67,6 @@ struct NetworkSearchCriteria: Hashable {
                 }
             }
         }
-
-        static let `default` = ResponseSizeFilter()
     }
 
     typealias DatesFilter = ConsoleSearchCriteria.DatesFilter
@@ -117,10 +118,7 @@ struct NetworkSearchCriteria: Hashable {
     }
 
     struct ContentTypeFilter: Hashable {
-        var isEnabled = true
         var contentType = ContentType.any
-
-        static let `default` = ContentTypeFilter()
 
         enum ContentType: String, CaseIterable {
             // common
@@ -402,21 +400,24 @@ extension NetworkSearchCriteria {
             }
         }
 
-        if criteria.responseSize.isEnabled {
-            if let value = criteria.responseSize.fromBytes {
+        if criteria.response.isEnabled {
+            if let value = criteria.response.responseSize.fromBytes {
                 predicates.append(NSPredicate(format: "responseBodySize >= %d", value))
             }
-            if let value = criteria.responseSize.toBytes {
+            if let value = criteria.response.responseSize.toBytes {
                 predicates.append(NSPredicate(format: "responseBodySize <= %d", value))
             }
-        }
 
-        if criteria.statusCode.isEnabled {
-            if let value = Int(criteria.statusCode.from), value > 0 {
+            if let value = Int(criteria.response.statusCode.from), value > 0 {
                 predicates.append(NSPredicate(format: "statusCode >= %d", value))
             }
-            if let value = Int(criteria.statusCode.to), value > 0 {
+            if let value = Int(criteria.response.statusCode.to), value > 0 {
                 predicates.append(NSPredicate(format: "statusCode <= %d", value))
+            }
+
+            switch criteria.response.contentType.contentType {
+            case .any: break
+            default: predicates.append(NSPredicate(format: "contentType CONTAINS %@", criteria.response.contentType.contentType.rawValue))
             }
         }
 
@@ -445,13 +446,6 @@ extension NetworkSearchCriteria {
 
         if criteria.host.isEnabled, !criteria.host.values.isEmpty {
             predicates.append(NSPredicate(format: "host IN %@", criteria.host.values))
-        }
-
-        if criteria.contentType.isEnabled {
-            switch criteria.contentType.contentType {
-            case .any: break
-            default: predicates.append(NSPredicate(format: "contentType CONTAINS %@", criteria.contentType.contentType.rawValue))
-            }
         }
 
         if filterTerm.count > 1 {

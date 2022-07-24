@@ -84,24 +84,9 @@ struct NetworkFiltersView: View {
             FilterSectionHeader(
                 icon: "arrow.down.circle", title: "Response",
                 color: .yellow,
-                reset:  {
-                    viewModel.criteria.statusCode = .default
-                    viewModel.criteria.contentType = .default
-                    viewModel.criteria.responseSize = .default
-                },
-                isDefault: viewModel.criteria.statusCode == .default &&
-                viewModel.criteria.contentType == .default &&
-                viewModel.criteria.responseSize == .default,
-                isEnabled: Binding(get: {
-                    viewModel.criteria.statusCode.isEnabled ||
-                    viewModel.criteria.contentType.isEnabled ||
-                    viewModel.criteria.responseSize.isEnabled
-                }, set: {
-                    viewModel.criteria.statusCode.isEnabled = $0
-                    viewModel.criteria.contentType.isEnabled = $0
-                    viewModel.criteria.responseSize.isEnabled = $0
-                })
-
+                reset: { viewModel.criteria.response = .default },
+                isDefault: viewModel.criteria.response == .default,
+                isEnabled: $viewModel.criteria.response.isEnabled
             )
         })
     }
@@ -112,14 +97,10 @@ struct NetworkFiltersView: View {
             Text("Status Code")
                 .fixedSize()
 
-            TextField("Min", text: $viewModel.criteria.statusCode.from, onEditingChanged: {
-                if $0 { viewModel.criteria.statusCode.isEnabled = true }
-            })
+            TextField("Min", text: $viewModel.criteria.response.statusCode.from)
             .textFieldStyle(.roundedBorder)
 
-            TextField("Max", text: $viewModel.criteria.statusCode.to, onEditingChanged: {
-                if $0 { viewModel.criteria.statusCode.isEnabled = true }
-            })
+            TextField("Max", text: $viewModel.criteria.response.statusCode.to)
             .textFieldStyle(.roundedBorder)
         }
     }
@@ -129,7 +110,7 @@ struct NetworkFiltersView: View {
         HStack {
             Text("Content Type")
             Spacer()
-            Filters.contentTypesPicker(selection: $viewModel.criteria.contentType.contentType)
+            Filters.contentTypesPicker(selection: $viewModel.criteria.response.contentType.contentType)
                 .labelsHidden()
                 .fixedSize()
         }
@@ -140,17 +121,13 @@ struct NetworkFiltersView: View {
         HStack {
             Text("Size")
 
-            TextField("Min", text: $viewModel.criteria.responseSize.from, onEditingChanged: {
-                if $0 { viewModel.criteria.responseSize.isEnabled = true }
-            })
+            TextField("Min", text: $viewModel.criteria.response.responseSize.from)
             .textFieldStyle(.roundedBorder)
 
-            TextField("Max", text: $viewModel.criteria.responseSize.to, onEditingChanged: {
-                if $0 { viewModel.criteria.responseSize.isEnabled = true }
-            })
+            TextField("Max", text: $viewModel.criteria.response.responseSize.to)
             .textFieldStyle(.roundedBorder)
 
-            Filters.sizeUnitPicker($viewModel.criteria.responseSize.unit)
+            Filters.sizeUnitPicker($viewModel.criteria.response.responseSize.unit)
                 .labelsHidden()
         }
     }
@@ -302,14 +279,10 @@ struct NetworkFiltersView: View {
     @ViewBuilder
     private var durationRow: some View {
         HStack {
-            TextField("Min", text: $viewModel.criteria.duration.min, onEditingChanged: {
-                if $0 { viewModel.criteria.duration.isEnabled = true }
-            })
+            TextField("Min", text: $viewModel.criteria.duration.min)
             .textFieldStyle(.roundedBorder)
 
-            TextField("Max", text: $viewModel.criteria.duration.max, onEditingChanged: {
-                if $0 { viewModel.criteria.duration.isEnabled = true }
-            })
+            TextField("Max", text: $viewModel.criteria.duration.max)
             .textFieldStyle(.roundedBorder)
 
             Picker("Unit", selection: $viewModel.criteria.duration.unit) {

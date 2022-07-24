@@ -30,14 +30,8 @@ struct NetworkFiltersView: View {
             Section(header: FilterSectionHeader(
                 icon: "arrow.down.circle", title: "Response",
                 color: .yellow,
-                reset:  {
-                    viewModel.criteria.statusCode = .default
-                    viewModel.criteria.contentType = .default
-                    viewModel.criteria.responseSize = .default
-                },
-                isDefault: viewModel.criteria.statusCode == .default &&
-                viewModel.criteria.contentType == .default &&
-                viewModel.criteria.responseSize == .default
+                reset: { viewModel.criteria.response = .default },
+                isDefault: viewModel.criteria.response == .default
             )) {
                 responseGroup
             }
@@ -119,16 +113,16 @@ struct NetworkFiltersView: View {
     @ViewBuilder
     private var responseGroup: some View {
         HStack {
-            makeRangePicker(title: "Status Code", from: $viewModel.criteria.statusCode.from, to: $viewModel.criteria.statusCode.to, isEnabled: $viewModel.criteria.statusCode.isEnabled)
+            makeRangePicker(title: "Status Code", from: $viewModel.criteria.response.statusCode.from, to: $viewModel.criteria.response.statusCode.to, isEnabled: $viewModel.criteria.response.isEnabled)
         }
-        Filters.contentTypesPicker(selection: $viewModel.criteria.contentType.contentType)
+        Filters.contentTypesPicker(selection: $viewModel.criteria.response.contentType.contentType)
         HStack {
-            makeRangePicker(title: "Size", from: $viewModel.criteria.responseSize.from, to: $viewModel.criteria.responseSize.to, isEnabled: $viewModel.criteria.responseSize.isEnabled)
+            makeRangePicker(title: "Size", from: $viewModel.criteria.response.responseSize.from, to: $viewModel.criteria.response.responseSize.to, isEnabled: $viewModel.criteria.response.isEnabled)
             if #available(iOS 14.0, *) {
                 Menu(content: {
-                    Filters.sizeUnitPicker($viewModel.criteria.responseSize.unit).labelsHidden()
+                    Filters.sizeUnitPicker($viewModel.criteria.response.responseSize.unit).labelsHidden()
                 }, label: {
-                    FilterPickerButton(title: viewModel.criteria.responseSize.unit.localizedTitle)
+                    FilterPickerButton(title: viewModel.criteria.response.responseSize.unit.localizedTitle)
                 })
                 .animation(.none)
                 .fixedSize()
@@ -218,15 +212,11 @@ struct NetworkFiltersView: View {
     @ViewBuilder
     private var durationGroup: some View {
         HStack {
-            TextField("Min", text: $viewModel.criteria.duration.min, onEditingChanged: {
-                if $0 { viewModel.criteria.duration.isEnabled = true }
-            })
+            TextField("Min", text: $viewModel.criteria.duration.min)
             .textFieldStyle(.roundedBorder)
             .frame(maxWidth: 90)
 
-            TextField("Max", text: $viewModel.criteria.duration.max, onEditingChanged: {
-                if $0 { viewModel.criteria.duration.isEnabled = true }
-            })
+            TextField("Max", text: $viewModel.criteria.duration.max)
             .textFieldStyle(.roundedBorder)
             .frame(maxWidth: 90)
 
