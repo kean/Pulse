@@ -357,6 +357,7 @@ extension LoggerStore {
         request.errorCode = errorCode
         let statusCode = Int32(event.response?.statusCode ?? 0)
         request.statusCode = statusCode
+        request.startDate = event.metrics?.taskInterval.start
         request.duration = event.metrics?.taskInterval.duration ?? 0
         request.contentType = event.response?.headers["Content-Type"]
         let isFailure = errorCode != 0 || (statusCode != 0 && !(200..<400).contains(statusCode))
@@ -395,6 +396,7 @@ extension LoggerStore {
         details.response = try? encoder.encode(event.response)
         details.error = try? encoder.encode(event.error)
         details.metrics = try? encoder.encode(event.metrics)
+        details.lastTransactionDetails = try? encoder.encode(event.metrics?.transactions.last?.details)
 
         // Update associated message state
         if  let message = request.message { // Should always be non-nill

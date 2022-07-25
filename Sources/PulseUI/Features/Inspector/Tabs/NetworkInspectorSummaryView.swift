@@ -153,14 +153,14 @@ struct NetworkInspectorSummaryView: View {
 #endif
     @ViewBuilder
     private var headerView: some View {
-        if let transfer = viewModel.transferModel {
+        if let transfer = viewModel.transferViewModel {
             NetworkInspectorTransferInfoView(viewModel: transfer)
-        } else if viewModel.state == .pending {
+        } else if let progress = viewModel.progressViewModel {
             ZStack {
                 NetworkInspectorTransferInfoView(viewModel: .init(empty: true))
                     .hidden()
                     .backport.hideAccessibility()
-                SpinnerView(viewModel: viewModel.progress)
+                SpinnerView(viewModel: progress)
             }
         }
     }
@@ -169,24 +169,14 @@ struct NetworkInspectorSummaryView: View {
         VStack {
             HStack(spacing: spacing) {
                 Text(viewModel.summaryModel.title)
-                statusView
+                Image(systemName: viewModel.statusImageName)
+                    .foregroundColor(viewModel.tintColor)
                 Spacer()
             }.font(.headline)
 
             KeyValueSectionView(viewModel: viewModel.summaryModel)
                 .hiddenTitle()
         }
-    }
-
-    private var statusView: some View {
-        let imageName: String
-        switch viewModel.state {
-        case .pending: imageName = "clock.fill"
-        case .success: imageName = "checkmark.circle.fill"
-        case .failure: imageName = "exclamationmark.octagon.fill"
-        }
-        return Image(systemName: imageName)
-            .foregroundColor(viewModel.tintColor)
     }
 
     private var links: some View {

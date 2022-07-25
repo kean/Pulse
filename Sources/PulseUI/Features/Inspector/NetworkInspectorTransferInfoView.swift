@@ -118,8 +118,8 @@ struct NetworkInspectorTransferInfoView_Previews: PreviewProvider {
 }
 
 private let mockModel = NetworkInspectorTransferInfoViewModel(
-    metrics: MockDataTask.login.metrics, taskType: .dataTask
-)!
+    details: MockDataTask.login.metrics.transactions.last!.details!, taskType: .dataTask
+)
 #endif
 
 // MARK: - ViewModel
@@ -145,9 +145,7 @@ struct NetworkInspectorTransferInfoViewModel {
         self.isUpload = false
     }
 
-    init?(metrics: NetworkLoggerMetrics, taskType: NetworkLoggerTaskType) {
-        guard let details = metrics.transactions.last?.details else { return nil }
-
+    init(details: NetworkLoggerTransactionDetailedMetrics, taskType: NetworkLoggerTaskType) {
         self.totalBytesSent = formatBytes(details.countOfRequestBodyBytesBeforeEncoding + details.countOfRequestHeaderBytesSent)
         self.bodyBytesSent = formatBytes(details.countOfRequestBodyBytesSent)
         self.headersBytesSent = formatBytes(details.countOfRequestHeaderBytesSent)

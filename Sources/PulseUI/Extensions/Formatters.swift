@@ -22,6 +22,10 @@ struct DurationFormatter {
 }
 
 struct StatusCodeFormatter {
+    static func string(for statusCode: Int32) -> String {
+        string(for: Int(statusCode))
+    }
+
     static func string(for statusCode: Int) -> String {
         switch statusCode {
         case 200: return "200 OK"

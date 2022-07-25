@@ -60,6 +60,8 @@ final class NetworkInspectorViewModel: ObservableObject {
 
     // MARK: - Tabs
 
+    #warning("TODO: the body should be ready lazily AND text view to load lazily too")
+
     // important:
     private var _requestViewModel: NetworkInspectorResponseViewModel?
 
@@ -68,7 +70,7 @@ final class NetworkInspectorViewModel: ObservableObject {
             return viewModel
         }
         guard let requestBody = summary.requestBody, !requestBody.isEmpty else { return nil }
-        let viewModel = NetworkInspectorResponseViewModel(title: "Request", data: requestBody)
+        let viewModel = NetworkInspectorResponseViewModel(title: "Request", data: { requestBody })
         _requestViewModel = viewModel
         return viewModel
     }
@@ -81,13 +83,13 @@ final class NetworkInspectorViewModel: ObservableObject {
             return viewModel
         }
         guard let responseBody = summary.responseBody, !responseBody.isEmpty else { return nil }
-        let viewModel = NetworkInspectorResponseViewModel(title: "Response", data: responseBody)
+        let viewModel = NetworkInspectorResponseViewModel(title: "Response", data: { responseBody })
         _responseViewModel = viewModel
         return viewModel
     }
 
     func makeSummaryModel() -> NetworkInspectorSummaryViewModel {
-        NetworkInspectorSummaryViewModel(summary: summary)
+        NetworkInspectorSummaryViewModel(request: request, store: store)
     }
 
     func makeHeadersModel() -> NetworkInspectorHeaderViewModel {

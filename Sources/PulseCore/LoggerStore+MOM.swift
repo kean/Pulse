@@ -45,6 +45,7 @@ public extension LoggerStore {
             NSAttributeDescription(name: "response", type: .binaryDataAttributeType),
             NSAttributeDescription(name: "error", type: .binaryDataAttributeType),
             NSAttributeDescription(name: "metrics", type: .binaryDataAttributeType),
+            NSAttributeDescription(name: "lastTransactionDetails", type: .binaryDataAttributeType),
         ]
 
         requestProgress.properties = [
@@ -63,6 +64,7 @@ public extension LoggerStore {
             NSAttributeDescription(name: "errorDomain", type: .stringAttributeType),
             NSAttributeDescription(name: "errorCode", type: .integer32AttributeType),
             NSAttributeDescription(name: "statusCode", type: .integer32AttributeType),
+            NSAttributeDescription(name: "startDate", type: .dateAttributeType),
             NSAttributeDescription(name: "duration", type: .doubleAttributeType),
             NSAttributeDescription(name: "contentType", type: .stringAttributeType),
             NSAttributeDescription(name: "requestState", type: .integer16AttributeType),
@@ -114,18 +116,46 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
     @NSManaged public var session: String
     @NSManaged public var message: LoggerMessageEntity?
 
-    // Denormalized
+    // MARK: Request
+
     @NSManaged public var url: String?
     @NSManaged public var host: String?
     @NSManaged public var httpMethod: String?
+
+    // MARK: Response
+
+    @NSManaged public var statusCode: Int32
     @NSManaged public var errorDomain: String?
     @NSManaged public var errorCode: Int32
-    @NSManaged public var statusCode: Int32
-    @NSManaged public var duration: Double
     @NSManaged public var contentType: String?
+    /// Returns `true` if the response was returned from the local cache.
+    @NSManaged public var isFromCache: Bool
+
+    // MARK: State
+
     /// Contains ``State`` raw value.
     @NSManaged public var requestState: Int16
+    /// Request progress.
+    ///
+    /// - note: The entity is created lazily when the first progress report
+    /// is delivered. If no progress updates are delivered, it's never created.
+    @NSManaged public var progress: LoggerNetworkRequestProgressEntity?
+
+    // MARK: Metrics (Denormalized)
+
+    // Timing
+    /// Request start date.
+    @NSManaged public var startDate: Date?
+    /// Request end date.
+    public var endDate: Date? {
+        startDate.map { $0.addingTimeInterval(duration) }
+    }
+    /// Total request duration end date.
+    @NSManaged public var duration: Double
+    /// Number of redirects.
     @NSManaged public var redirectCount: Int16
+
+    // MARK: Details
 
     /// Request details.
     @NSManaged public var details: LoggerNetworkRequestDetailsEntity
@@ -137,16 +167,8 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
     @NSManaged public var requestBodySize: Int64
     /// The size of the response body.
     @NSManaged public var responseBodySize: Int64
-    /// Returns `true` if the response was returned from the local cache.
-    @NSManaged public var isFromCache: Bool
 
-    /// Request progress.
-    ///
-    /// - note: The entity is created lazily when the first progress report
-    /// is delivered. If no progress updates are delivered, it's never created.
-    @NSManaged public var progress: LoggerNetworkRequestProgressEntity?
-
-    // MARK: - Helpers
+    // MARK: Helpers
 
     /// Returns request state.
     public var state: LoggerNetworkRequestEntity.State {
@@ -156,6 +178,14 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
         // For backward-compatibility.
         let isFailure = errorCode != 0 || (statusCode != 0 && !(200..<400).contains(statusCode))
         return isFailure ? .failure : .success
+    }
+
+    /// Returns task interval (if availalable from metrics).
+    public var taskInterval: DateInterval? {
+        guard let startDate = self.startDate, let endDate = self.endDate else {
+            return nil
+        }
+        return DateInterval(start: startDate, end: endDate)
     }
 
     /// Returns task type
@@ -190,6 +220,9 @@ public final class LoggerNetworkRequestDetailsEntity: NSManagedObject {
     @NSManaged public var error: Data?
     /// Contains JSON-encoded ``NetworkLoggerMetrics``.
     @NSManaged public var metrics: Data?
+    /// Contains JSON-encoded ``NetworkLoggerTransactionDetailedMetrics`` for
+    /// the last trasaction from metrics.
+    @NSManaged public var lastTransactionDetails: Data?
 }
 
 // MARK: - Helpers

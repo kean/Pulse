@@ -4,10 +4,9 @@
 
 import SwiftUI
 import PulseCore
+import Combine
 
 final class NetworkInspectorSummaryViewModel: ObservableObject {
-    private let summary: NetworkLoggerSummary
-
     @Published var isErrorRawLinkActive = false
     @Published var isRequestRawLinkActive = false
     @Published var isOriginalRequestHeadersLinkActive = false
@@ -17,49 +16,74 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     @Published var isResponseRawLinkActive = false
     @Published var isResponseHeadearsRawLinkActive = false
 
-    var progress: ProgressViewModel { summary.progress }
+    private(set) lazy var _progressViewModel = ProgressViewModel(request: request)
 
-    #warning("TODO: inject request")
-    init(summary: NetworkLoggerSummary) {
-        self.summary = summary
+    private let request: LoggerNetworkRequestEntity
+    private var details: DecodedNetworkRequestDetailsEntity
+    private let store: LoggerStore
+    private var cancellable: AnyCancellable?
+
+    init(request: LoggerNetworkRequestEntity, store: LoggerStore) {
+        self.request = request
+        self.details = DecodedNetworkRequestDetailsEntity(request: request)
+        self.store = store
+
+        cancellable = request.objectWillChange.sink { [weak self] in self?.refresh() }
+    }
+
+    private func refresh() {
+        details = DecodedNetworkRequestDetailsEntity(request: request)
+        withAnimation {
+            objectWillChange.send()
+        }
     }
 
     var tintColor: Color {
-        switch summary.state {
+        switch request.state {
         case .pending: return .orange
         case .success: return .green
         case .failure: return .red
         }
     }
 
-    var state: LoggerNetworkRequestEntity.State {
-        summary.state
+    var statusImageName: String {
+        switch request.state {
+        case .pending: return "clock.fill"
+        case .success: return "checkmark.circle.fill"
+        case .failure: return "exclamationmark.octagon.fill"
+        }
     }
 
-    // MARK: - Transfer
+    // MARK: - Header
 
-    var transferModel: NetworkInspectorTransferInfoViewModel? {
-        summary.metrics.flatMap { NetworkInspectorTransferInfoViewModel(metrics: $0, taskType: summary.taskType ?? .dataTask) }
+    var transferViewModel: NetworkInspectorTransferInfoViewModel? {
+        details.lastTransactionDetails.map {
+            NetworkInspectorTransferInfoViewModel(details: $0, taskType: request.taskType ?? .dataTask)
+        }
+    }
+
+    var progressViewModel: ProgressViewModel? {
+        guard request.state == .pending else { return nil }
+        return _progressViewModel
     }
 
     // MARK: - Summary
 
     var summaryModel: KeyValueSectionViewModel {
         var items: [(String, String?)] = [
-            ("URL", summary.originalRequest?.url?.absoluteString ?? "–"),
-            ("Method", summary.originalRequest?.httpMethod ?? "–")
+            ("URL", request.url ?? "–"),
+            ("Method", request.httpMethod ?? "–")
         ]
 
-        if summary.state == .failure || summary.state == .success {
-            items.append(("Status Code", summary.response?.statusCode.map(StatusCodeFormatter.string) ?? "–"))
-
-            if let metrics = summary.metrics {
-                items.append(("Duration", DurationFormatter.string(from: metrics.taskInterval.duration)))
+        if request.state == .failure || request.state == .success {
+            items.append(("Status Code", StatusCodeFormatter.string(for: request.statusCode)))
+            if request.duration > 0 {
+                items.append(("Duration", DurationFormatter.string(from: request.duration)))
             }
-            items.append(("Source", summary.isFromCache ? "Cache" : "Network"))
+            items.append(("Source", request.isFromCache ? "Cache" : "Network"))
         }
 
-        var title = summary.taskType?.urlSessionTaskClassName ?? "Summary"
+        var title = request.taskType?.urlSessionTaskClassName ?? "Summary"
         #if os(watchOS)
         title = title.replacingOccurrences(of: "URLSession", with: "")
         #endif
@@ -67,7 +91,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     }
 
     var errorModel: KeyValueSectionViewModel? {
-        guard let error = summary.error else { return nil }
+        guard let error = details.error else { return nil }
         return KeyValueSectionViewModel.makeErrorDetails(for: error) { [unowned self] in
             isErrorRawLinkActive = true
         }
@@ -76,11 +100,11 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     // MARK: - Request (Original)
 
     var originalRequestSummary: KeyValueSectionViewModel? {
-        summary.originalRequest.map(KeyValueSectionViewModel.makeSummary)
+        details.originalRequest.map(KeyValueSectionViewModel.makeSummary)
     }
 
     var originalRequestQueryItems: KeyValueSectionViewModel? {
-        summary.originalRequest?.url.flatMap {
+        details.originalRequest?.url.flatMap {
             KeyValueSectionViewModel.makeQueryItems(for: $0) { [unowned self] in
                 self.isOriginalQueryItemsLinkActive = true
             }
@@ -88,20 +112,20 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     }
 
     var originalRequestParameters: KeyValueSectionViewModel? {
-        summary.originalRequest.map(KeyValueSectionViewModel.makeParameters)
+        details.originalRequest.map(KeyValueSectionViewModel.makeParameters)
     }
 
     var originalRequestHeaders: KeyValueSectionViewModel {
-        KeyValueSectionViewModel.makeRequestHeaders(for: summary.originalRequest?.headers ?? [:]) { [unowned self] in
+        KeyValueSectionViewModel.makeRequestHeaders(for: details.originalRequest?.headers ?? [:]) { [unowned self] in
             self.isOriginalRequestHeadersLinkActive = true
         }
     }
 
     var requestBodySection: KeyValueSectionViewModel {
-        guard summary.requestBodyKey != nil, summary.requestBodySize > 0 else {
+        guard request.requestBodyKey != nil, request.requestBodySize > 0 else {
             return KeyValueSectionViewModel(title: "Request Body", color: .blue)
         }
-        let contentType = summary.originalRequest?.headers.first(where: { $0.key == "Content-Type" })?.value ?? "–"
+        let contentType = details.originalRequest?.headers.first(where: { $0.key == "Content-Type" })?.value ?? "–"
         return KeyValueSectionViewModel(
             title: "Request Body",
             color: .blue,
@@ -111,7 +135,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
             ),
             items: [
                 ("Content-Type", contentType),
-                ("Size", ByteCountFormatter.string(fromByteCount: summary.requestBodySize, countStyle: .file))
+                ("Size", ByteCountFormatter.string(fromByteCount: request.requestBodySize, countStyle: .file))
             ]
         )
     }
@@ -119,11 +143,11 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     // MARK: - Request (Current)
 
     var currentRequestSummary: KeyValueSectionViewModel? {
-        summary.currentRequest.map(KeyValueSectionViewModel.makeSummary)
+        details.currentRequest.map(KeyValueSectionViewModel.makeSummary)
     }
 
     var currentRequestQueryItems: KeyValueSectionViewModel? {
-        summary.originalRequest?.url.flatMap {
+        details.originalRequest?.url.flatMap {
             KeyValueSectionViewModel.makeQueryItems(for: $0) { [unowned self] in
                 self.isCurrentQueryItemsLinkActive = true
             }
@@ -131,20 +155,20 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     }
 
     var currentRequestParameters: KeyValueSectionViewModel? {
-        summary.currentRequest.map(KeyValueSectionViewModel.makeParameters)
+        details.currentRequest.map(KeyValueSectionViewModel.makeParameters)
     }
 
     var currentRequestHeaders: KeyValueSectionViewModel {
-        KeyValueSectionViewModel.makeRequestHeaders(for: summary.currentRequest?.headers ?? [:]) { [unowned self] in
+        KeyValueSectionViewModel.makeRequestHeaders(for: details.currentRequest?.headers ?? [:]) { [unowned self] in
             self.isCurrentRequestHeadersLinkActive = true
         }
     }
 
     var currentRequestBodySection: KeyValueSectionViewModel {
-        guard summary.requestBodyKey != nil, summary.requestBodySize > 0 else {
+        guard request.requestBodyKey != nil, request.requestBodySize > 0 else {
             return KeyValueSectionViewModel(title: "Request Body", color: .blue)
         }
-        let contentType = summary.currentRequest?.headers.first(where: { $0.key == "Content-Type" })?.value ?? "–"
+        let contentType = details.currentRequest?.headers.first(where: { $0.key == "Content-Type" })?.value ?? "–"
         return KeyValueSectionViewModel(
             title: "Request Body",
             color: .blue,
@@ -154,7 +178,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
             ),
             items: [
                 ("Content-Type", contentType),
-                ("Size", ByteCountFormatter.string(fromByteCount: summary.requestBodySize, countStyle: .file))
+                ("Size", ByteCountFormatter.string(fromByteCount: request.requestBodySize, countStyle: .file))
             ]
         )
     }
@@ -162,26 +186,26 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     // MARK: - Response
 
     var responseSummary: KeyValueSectionViewModel? {
-        summary.response.map(KeyValueSectionViewModel.makeSummary)
+        details.response.map(KeyValueSectionViewModel.makeSummary)
     }
 
     var responseHeaders: KeyValueSectionViewModel {
-        KeyValueSectionViewModel.makeResponseHeaders(for: summary.response?.headers ?? [:]) { [unowned self] in
+        KeyValueSectionViewModel.makeResponseHeaders(for: details.response?.headers ?? [:]) { [unowned self] in
             self.isResponseHeadearsRawLinkActive = true
         }
     }
 
     var responseBodySection: KeyValueSectionViewModel {
-        if summary.taskType == .downloadTask, summary.responseBodySize > 0 {
+        if request.taskType == .downloadTask, request.responseBodySize > 0 {
             return KeyValueSectionViewModel(title: "Response Body", color: .indigo, items: [
-                ("Download Size", ByteCountFormatter.string(fromByteCount: summary.responseBodySize, countStyle: .file))
+                ("Download Size", ByteCountFormatter.string(fromByteCount: request.responseBodySize, countStyle: .file))
             ])
         }
-        guard summary.responseBodyKey != nil, summary.responseBodySize > 0 else {
+        guard request.responseBodyKey != nil, request.responseBodySize > 0 else {
             return KeyValueSectionViewModel(title: "Response Body", color: .indigo)
         }
-        let contentType = summary.response?.headers.first(where: { $0.key == "Content-Type" })?.value ?? "–"
-        let size = ByteCountFormatter.string(fromByteCount: summary.responseBodySize, countStyle: .file)
+        let contentType = details.response?.headers.first(where: { $0.key == "Content-Type" })?.value ?? "–"
+        let size = ByteCountFormatter.string(fromByteCount: request.responseBodySize, countStyle: .file)
         return KeyValueSectionViewModel(
             title: "Response Body",
             color: .indigo,
@@ -191,7 +215,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
             ),
             items: [
                 ("Content-Type", contentType),
-                ("Size", summary.isFromCache ? size + " (from cache)": size)
+                ("Size", request.isFromCache ? size + " (from cache)": size)
             ]
         )
     }
@@ -199,25 +223,37 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     // MARK: - Timings
 
     var timingDetailsModel: KeyValueSectionViewModel? {
-        guard let metrics = summary.metrics else { return nil }
+        guard let taskInterval = request.taskInterval else { return nil }
         return KeyValueSectionViewModel(title: "Timing", color: .orange, items: [
-            ("Start Date", dateFormatter.string(from: metrics.taskInterval.start)),
-            ("End Date", dateFormatter.string(from: metrics.taskInterval.end)),
-            ("Duration", DurationFormatter.string(from: metrics.taskInterval.duration)),
-            ("Redirect Count", metrics.redirectCount.description)
+            ("Start Date", dateFormatter.string(from: taskInterval.start)),
+            ("End Date", dateFormatter.string(from: taskInterval.end)),
+            ("Duration", DurationFormatter.string(from: taskInterval.duration)),
+            ("Redirect Count", request.redirectCount.description)
         ])
     }
 
     // MARK: - Destinations
 
     var requestBodyViewModel: NetworkInspectorResponseViewModel {
-        let summary = self.summary
-        return NetworkInspectorResponseViewModel(title: "Request", data: summary.requestBody ?? Data())
+        NetworkInspectorResponseViewModel(
+            title: "Request",
+            data: { [weak self] in self?.requestData ?? Data() }
+        )
+    }
+
+    private var requestData: Data? {
+        request.requestBodyKey.flatMap(store.getData)
     }
 
     var responseBodyViewModel: NetworkInspectorResponseViewModel {
-        let summary = self.summary
-        return NetworkInspectorResponseViewModel(title: "Response", data: summary.responseBody ?? Data())
+        NetworkInspectorResponseViewModel(
+            title: "Response",
+            data: { [weak self] in self?.responseData ?? Data() }
+        )
+    }
+
+    private var responseData: Data? {
+        request.responseBodyKey.flatMap(store.getData)
     }
 }
 

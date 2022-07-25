@@ -20,7 +20,7 @@ extension NetworkLoggerSummary {
 
     private func render(using renderer: Renderer) -> String {
         // Summary
-        let viewModel = NetworkInspectorSummaryViewModel(summary: self)
+        let viewModel = NetworkInspectorSummaryViewModel(request: request, store: store)
         renderer.add(viewModel.summaryModel, isSecondaryTitle: false)
         renderer.add(viewModel.errorModel, isSecondaryTitle: false)
 
@@ -49,7 +49,7 @@ extension NetworkLoggerSummary {
 
         renderer.add(title: "Details")
         renderer.add(viewModel.timingDetailsModel)
-        if let transferModel = viewModel.transferModel {
+        if let transferModel = viewModel.transferViewModel {
             renderer.add(KeyValueSectionViewModel(title: "Sent Data", color: .gray, items: [
                 ("Total Bytes Sent", transferModel.totalBytesSent),
                 ("Headers Sent", transferModel.headersBytesSent),

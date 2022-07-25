@@ -103,7 +103,7 @@ extension KeyValueSectionViewModel {
     }
 
     static func makeErrorDetails(for error: NetworkLoggerError, action: @escaping () -> Void) -> KeyValueSectionViewModel {
-        return KeyValueSectionViewModel(
+        KeyValueSectionViewModel(
             title: "Error",
             color: .red,
             action: ActionViewModel(action: action, title: "View"),

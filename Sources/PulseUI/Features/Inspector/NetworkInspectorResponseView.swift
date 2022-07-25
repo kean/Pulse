@@ -84,11 +84,11 @@ struct NetworkInspectorResponseView_Previews: PreviewProvider {
                 .environment(\.colorScheme, .light)
 #endif
 
-            NetworkInspectorResponseView(viewModel: .init(title: "Response", data: mockImage))
+            NetworkInspectorResponseView(viewModel: .init(title: "Response", data: { mockImage }))
                 .previewDisplayName("Image")
                 .environment(\.colorScheme, .light)
 
-            NetworkInspectorResponseView(viewModel: .init(title: "Response", data: mockHTML))
+            NetworkInspectorResponseView(viewModel: .init(title: "Response", data: { mockHTML }))
                 .previewDisplayName("HTML")
                 .environment(\.colorScheme, .light)
 
@@ -101,7 +101,7 @@ struct NetworkInspectorResponseView_Previews: PreviewProvider {
     }
 }
 
-private let mockModel = NetworkInspectorResponseViewModel(title: "Response", data: MockJSON.allPossibleValues)
+private let mockModel = NetworkInspectorResponseViewModel(title: "Response", data: { MockJSON.allPossibleValues })
 
 private let mockHTML = """
 <!DOCTYPE html>
@@ -134,7 +134,7 @@ final class NetworkInspectorResponseViewModel {
         }
     }()
 
-    init(title: String, data: @autoclosure @escaping () -> Data) {
+    init(title: String, data: @escaping () -> Data) {
         self.title = title
         self.getData = data
     }
