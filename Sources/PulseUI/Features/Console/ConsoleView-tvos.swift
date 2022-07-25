@@ -28,6 +28,8 @@ public struct ConsoleView: View {
         List {
             ConsoleMessagesForEach(store: viewModel.store, messages: viewModel.entities)
         }
+        .onAppear(perform: viewModel.onAppear)
+        .onDisappear(perform: viewModel.onDisappear)
     }
 }
 

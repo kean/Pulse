@@ -14,10 +14,12 @@ struct RemoteLoggerSettingsView: View {
 
     var body: some View {
         Toggle(isOn: $viewModel.isEnabled, label: {
-            #if !os(watchOS)
-            Image(systemName: "network")
-            #endif
-            Text("Remote Logging")
+            HStack {
+#if !os(watchOS)
+                Image(systemName: "network")
+#endif
+                Text("Remote Logging")
+            }
         })
         if viewModel.isEnabled {
             if !viewModel.servers.isEmpty {

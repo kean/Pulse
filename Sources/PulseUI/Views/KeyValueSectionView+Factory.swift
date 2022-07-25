@@ -16,6 +16,9 @@ extension KeyValueSectionViewModel {
         if let host = components?.host {
             items.append(("Host", host))
         }
+        if let path = components?.path {
+            items.append(("Path", path))
+        }
         return KeyValueSectionViewModel(
             title: "Request Summary",
             color: .blue,

@@ -14,13 +14,14 @@ final class NetworkInspectorViewModel: ObservableObject {
     let store: LoggerStore // TODO: make it private
     @Published private var summary: NetworkLoggerSummary
     private var cancellable: AnyCancellable?
-    var progress: ProgressViewModel? { summary.progress }
+    let progress: ProgressViewModel
 
     init(request: LoggerNetworkRequestEntity, store: LoggerStore) {
         self.objectId = request.objectID
         self.request = request
         self.store = store
         self.summary = NetworkLoggerSummary(request: request, store: store)
+        self.progress = ProgressViewModel(request: request)
 
         if let url = request.url.flatMap(URL.init(string:)) {
             self.title = url.lastPathComponent
@@ -59,14 +60,6 @@ final class NetworkInspectorViewModel: ObservableObject {
 
     // MARK: - Tabs
 
-    func makeSummaryModel() -> NetworkInspectorSummaryViewModel {
-        NetworkInspectorSummaryViewModel(summary: summary)
-    }
-
-    func makeHeadersModel() -> NetworkInspectorHeaderViewModel {
-        NetworkInspectorHeaderViewModel(summary: summary)
-    }
-
     // important:
     private var _requestViewModel: NetworkInspectorResponseViewModel?
 
@@ -93,6 +86,14 @@ final class NetworkInspectorViewModel: ObservableObject {
         return viewModel
     }
 
+    func makeSummaryModel() -> NetworkInspectorSummaryViewModel {
+        NetworkInspectorSummaryViewModel(summary: summary)
+    }
+
+    func makeHeadersModel() -> NetworkInspectorHeaderViewModel {
+        NetworkInspectorHeaderViewModel(summary: summary)
+    }
+
 #if !os(watchOS)
     func makeMetricsModel() -> NetworkInspectorMetricsViewModel? {
         summary.metrics.map(NetworkInspectorMetricsViewModel.init)
@@ -109,3 +110,5 @@ final class NetworkInspectorViewModel: ObservableObject {
         ConsoleShareService(store: store)
     }
 }
+
+#warning("TODO: parse request/respones/metrics lazily")

@@ -10,14 +10,11 @@ extension UITableView {
     func apply<T: Hashable>(diff: CollectionDifference<T>, _ closure: () -> Void) {
         var deletes: [IndexPath] = []
         var inserts: [IndexPath] = []
-        var moves: [(from: IndexPath, to: IndexPath)] = []
 
         for update in diff.inferringMoves() {
             switch update {
             case .remove(let offset, _, let move):
-                if let move = move {
-                    moves.append((IndexPath(row: offset, section: 0), IndexPath(row: move, section: 0)))
-                } else {
+                if move == nil {
                     deletes.append(IndexPath(row: offset, section: 0))
                 }
             case .insert(let offset, _, let move):
@@ -30,15 +27,8 @@ extension UITableView {
 
         performBatchUpdates {
             closure()
-            deleteRows(at: deletes, with: .left)
             insertRows(at: inserts, with: .right)
-            moves.forEach { move in
-                if move.from == move.to {
-                    // Do nothing, the cell updates itself automatically
-                } else {
-                    moveRow(at: move.from, to: move.to)
-                }
-            }
+            deleteRows(at: deletes, with: .left)
         }
     }
 }

@@ -79,6 +79,9 @@ extension TimingRowSectionViewModel {
             return []
         }
         let endDate = transaction.responseEndDate ?? metrics.taskInterval.end
+        guard endDate > startDate else {
+            return [] // Should never happen
+        }
         let interval = DateInterval(start: startDate, end: endDate)
         return makeTimingRows(transaction: transaction, taskInterval: interval)
     }
@@ -148,21 +151,16 @@ private func makeTimingRows(transaction: NetworkLoggerTransactionMetrics, taskIn
         var connection: [TimingRowViewModel] = []
         var response: [TimingRowViewModel] = []
 
-        let earliestEventDate = [
-            transaction.requestStartDate,
-            transaction.connectStartDate,
-            transaction.domainLookupStartDate,
-            transaction.responseStartDate,
-            transaction.connectStartDate
-        ]
-            .compactMap { $0 }
-            .sorted()
-            .first
+        let earliestEventDate = transaction.domainLookupStartDate ?? transaction.connectStartDate ?? transaction.requestStartDate
+
+        // Scheduling Section
 
         if let fetchStartDate = transaction.fetchStartDate, let endDate = earliestEventDate,
-           endDate.timeIntervalSince(fetchStartDate) > 0.005  {
+           endDate.timeIntervalSince(fetchStartDate) > 0.001  {
             scheduling.append(makeRow(title: "Queued", color: .systemGray4, from: fetchStartDate, to: endDate))
         }
+
+        // Connection Section
 
         if let domainLookupStartDate = transaction.domainLookupStartDate {
             connection.append(makeRow(title: "DNS", color: .systemPurple, from: domainLookupStartDate, to: transaction.domainLookupEndDate))
@@ -174,15 +172,21 @@ private func makeTimingRows(transaction: NetworkLoggerTransactionMetrics, taskIn
             connection.append(makeRow(title: "Secure", color: .systemRed, from: secureConnectionStartDate, to: transaction.secureConnectionEndDate))
         }
 
+        // Response Section
+
+        let latestPreviousEndDate = transaction.requestEndDate ?? transaction.connectEndDate ?? transaction.domainLookupEndDate ?? transaction.fetchStartDate
+
         if let requestStartDate = transaction.requestStartDate {
             response.append(makeRow(title: "Request", color: .systemGreen, from: requestStartDate, to: transaction.requestEndDate))
         }
-        if let requestStartDate = transaction.requestStartDate, let responseStartDate = transaction.responseStartDate {
-            response.append(makeRow(title: "Waiting", color: .systemGray3, from: requestStartDate, to: responseStartDate))
+        if let requestEndDate = latestPreviousEndDate, let responseStartDate = transaction.responseStartDate {
+            response.append(makeRow(title: "Waiting", color: .systemGray3, from: requestEndDate, to: responseStartDate))
         }
         if let responseStartDate = transaction.responseStartDate {
             response.append(makeRow(title: "Download", color: .systemBlue, from: responseStartDate, to: transaction.responseEndDate))
         }
+
+        // Commit sections
 
         if !scheduling.isEmpty {
             sections.append(TimingRowSectionViewModel(title: "Scheduling", items: scheduling))
@@ -193,7 +197,6 @@ private func makeTimingRows(transaction: NetworkLoggerTransactionMetrics, taskIn
         if !response.isEmpty {
             sections.append(TimingRowSectionViewModel(title: "Response", items: response))
         }
-        #warning("TODO: add other types")
     default:
         return []
     }

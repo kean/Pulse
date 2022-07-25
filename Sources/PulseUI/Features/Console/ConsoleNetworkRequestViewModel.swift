@@ -8,16 +8,31 @@ import Combine
 import CoreData
 
 final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
+    private(set) lazy var time = ConsoleMessageViewModel.timeFormatter.string(from: request.createdAt)
 #if os(iOS)
-    lazy var time = ConsoleMessageViewModel.timeFormatter.string(from: request.createdAt)
     var badgeColor: UIColor = .gray
 #else
     var badgeColor: Color = .gray
 #endif
-    var status: String = ""
-    var title: String = ""
-    var text: String = ""
-    var state: LoggerNetworkRequestEntity.State = .pending
+    private(set) var title: String = ""
+    private(set) var text: String = ""
+
+    var fullTitle: String {
+        var title = self.title
+#if !os(watchOS)
+        if state == .pending, let details = progress.details {
+            title += " · \(details)"
+        }
+#endif
+#if os(macOS) || os(tvOS)
+        title += " · \(time)"
+#endif
+        return title
+    }
+
+    private(set) var state: LoggerNetworkRequestEntity.State = .pending
+
+    private(set) lazy var progress = ProgressViewModel(request: request)
 
     private let request: LoggerNetworkRequestEntity
     private let store: LoggerStore
@@ -33,48 +48,49 @@ final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
         self.request = request
         self.store = store
 
+        self.progress = ProgressViewModel(request: request)
+
         self.refresh()
 
         self.cancellable = request.objectWillChange.sink { [weak self] in
+            self?.refresh()
             withAnimation {
-                self?.refresh()
                 self?.objectWillChange.send()
             }
         }
     }
 
     private func refresh() {
-        let time = ConsoleMessageViewModel.timeFormatter.string(from: request.createdAt)
         let state = request.state
-        var prefix: String
+
+        var title: String
         switch request.state {
         case .pending:
-            let progress = ProgressViewModel(request: request)
-            prefix = progress?.title.uppercased() ?? "PENDING"
-            if let details = progress?.details {
-                prefix += " · \(details)"
-            }
+            title = progress.title.uppercased()
         case .success:
-            prefix = StatusCodeFormatter.string(for: Int(request.statusCode))
+            title = StatusCodeFormatter.string(for: Int(request.statusCode))
+#if !os(watchOS)
+            switch request.taskType ?? .dataTask {
+            case .uploadTask:
+                if request.requestBodySize > 0 {
+                    let sizeText = ByteCountFormatter.string(fromByteCount: request.requestBodySize, countStyle: .file)
+                    title += " · \(request.isFromCache ? "Cache" : sizeText)"
+                }
+            case .dataTask, .downloadTask:
+                if request.responseBodySize > 0 {
+                    let sizeText = ByteCountFormatter.string(fromByteCount: request.responseBodySize, countStyle: .file)
+                    title += " · \(request.isFromCache ? "Cache" : sizeText)"
+                }
+            case .streamTask, .webSocketTask:
+                break
+            }
+#endif
         case .failure:
             if request.errorCode != 0 {
-                prefix = "\(request.errorCode) \(descriptionForURLErrorCode(Int(request.errorCode)))"
+                title = "\(request.errorCode) \(descriptionForURLErrorCode(Int(request.errorCode)))"
             } else {
-                prefix = StatusCodeFormatter.string(for: Int(request.statusCode))
+                title = StatusCodeFormatter.string(for: Int(request.statusCode))
             }
-        }
-
-#if os(iOS)
-        self.status = ""
-        var title = prefix
-
-        func addSize(_ size: Int64) {
-            let sizeText = ByteCountFormatter.string(fromByteCount: size, countStyle: .file)
-            title += " · \(request.isFromCache ? "Cache" : sizeText)"
-        }
-        if request.responseBodySize > 0 {
-            let sizeText = ByteCountFormatter.string(fromByteCount: request.responseBodySize, countStyle: .file)
-            title += " · \(request.isFromCache ? "Cache" : sizeText)"
         }
 
         if request.duration > 0 {
@@ -83,34 +99,22 @@ final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
 
         self.title = title
 
+        let method = request.httpMethod ?? "GET"
+        self.text = method + " " + (request.url ?? "–")
+
+#if os(iOS)
         switch state {
         case .pending: self.badgeColor = .systemYellow
         case .success: self.badgeColor = .systemGreen
         case .failure: self.badgeColor = .systemRed
         }
-
 #else
-        if request.responseBodySize > 0 {
-            let size = ByteCountFormatter.string(fromByteCount: request.responseBodySize, countStyle: .file)
-            prefix += " · \(request.isFromCache ? "Cache" : size)"
-        }
-        self.status = prefix
-
-        var title = "\(time)"
-        if request.duration > 0 {
-            title += " · \(DurationFormatter.string(from: request.duration))"
-        }
-        self.title = title
-
         switch state {
         case .pending: self.badgeColor = .yellow
         case .success: self.badgeColor = .green
         case .failure: self.badgeColor = .red
         }
 #endif
-
-        let method = request.httpMethod ?? "GET"
-        self.text = method + " " + (request.url ?? "–")
 
         self.state = request.state
     }

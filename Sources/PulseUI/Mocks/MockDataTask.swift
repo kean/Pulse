@@ -6,6 +6,7 @@ import Foundation
 import PulseCore
 
 #if DEBUG
+
 struct MockDataTask {
     let request: URLRequest
     let response: URLResponse

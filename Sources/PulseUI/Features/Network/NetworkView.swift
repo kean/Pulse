@@ -31,9 +31,11 @@ public struct NetworkView: View {
             viewModel: viewModel.table,
             detailsViewModel: viewModel.details
         )
+        .onAppear(perform: viewModel.onAppear)
+        .onDisappear(perform: viewModel.onDisappear)
         .overlay(tableOverlay)
         .navigationBarTitle(Text("Network"))
-        .navigationBarItems(leading: viewModel.onDismiss.map { Button(action: $0) { Image(systemName: "xmark") } })
+        .navigationBarItems(leading: navigationBarTrailingItems)
     }
 
     @ViewBuilder
@@ -43,11 +45,22 @@ public struct NetworkView: View {
         }
     }
 
+    @ViewBuilder
+    private var navigationBarTrailingItems: some View {
+        if let onDismiss = viewModel.onDismiss {
+            Button(action: onDismiss) {
+                Image(systemName: "xmark")
+            }
+        }
+    }
+
     #elseif os(tvOS)
     public var body: some View {
         List {
             NetworkMessagesForEach(store: viewModel.store, entities: viewModel.entities)
         }
+        .onAppear(perform: viewModel.onAppear)
+        .onDisappear(perform: viewModel.onDisappear)
     }
     #endif
 }

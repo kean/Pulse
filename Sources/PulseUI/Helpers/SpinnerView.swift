@@ -7,52 +7,78 @@ import CoreData
 import PulseCore
 import Combine
 
+// MARK: - View
+
 struct SpinnerView: View {
-    let viewModel: ProgressViewModel?
+    @ObservedObject var viewModel: ProgressViewModel
 
     var body: some View {
         VStack {
             Spinner()
-            Text((viewModel?.title ?? "Pending") + "...")
+            Text(viewModel.title + "...")
                 .padding(.top, 6)
-            if let details = self.viewModel?.details {
+            if let details = viewModel.details {
                 Text(details)
                     .animation(nil)
             }
-        }.foregroundColor(.secondary)
+        }
+        .foregroundColor(.secondary)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
     }
 }
 
-struct ProgressViewModel {
-    let title: String
-    var completed: Int64
-    var total: Int64
+#if DEBUG
+struct SpinnerView_Previews: PreviewProvider {
+    static var previews: some View {
+        SpinnerView(viewModel: .init(title: "Pending", details: "2.5 MB / 6.0 MB"))
+            .frame(width: 320, height: 320, alignment: .center)
+    }
+}
+#endif
 
-    init(title: String, completed: Int64, total: Int64) {
+// MARK: - ViewModel
+
+final class ProgressViewModel: ObservableObject {
+    let title: String
+    @Published private(set) var details: String?
+
+    private var observer1: AnyCancellable?
+    private var observer2: AnyCancellable?
+
+    init(title: String, details: String?) {
         self.title = title
-        self.completed = completed
-        self.total = total
+        self.details = details
     }
 
-    init?(request: LoggerNetworkRequestEntity) {
-        guard request.state == .pending else {
-            return nil
-        }
+    init(request: LoggerNetworkRequestEntity) {
         switch request.taskType ?? .dataTask {
         case .downloadTask: self.title = "Downloading"
         case .uploadTask: self.title = "Uploading"
         default: self.title = "Pending"
         }
-        self.completed = request.completedUnitCount
-        self.total = request.totalUnitCount
+
+        observer1 = request.publisher(for: \.progress, options: [.initial, .new]).sink { [weak self] change in
+            if let progress = request.progress {
+                self?.register(for: progress)
+            }
+        }
     }
 
-    var details: String? {
-        guard completed > 0 || total > 0 else {
-            return nil
+    private func register(for progress: LoggerNetworkRequestProgressEntity) {
+        self.refresh(with: progress)
+        observer2 = progress.objectWillChange.sink { [self] in
+            self.refresh(with: progress)
         }
-        let lhs = ByteCountFormatter.string(fromByteCount: max(0, completed), countStyle: .file)
-        let rhs = ByteCountFormatter.string(fromByteCount: total, countStyle: .file)
-        return total > 0 ? "\(lhs) / \(rhs)" : lhs
+    }
+
+    private func refresh(with progress: LoggerNetworkRequestProgressEntity) {
+        let completed = progress.completedUnitCount
+        let total = progress.totalUnitCount
+
+        if completed > 0 || total > 0 {
+            let lhs = ByteCountFormatter.string(fromByteCount: max(0, completed), countStyle: .file)
+            let rhs = ByteCountFormatter.string(fromByteCount: total, countStyle: .file)
+            self.details = total > 0 ? "\(lhs) / \(rhs)" : lhs
+        }
     }
 }

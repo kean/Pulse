@@ -329,8 +329,15 @@ extension LoggerStore {
 
     private func process(_ event: LoggerStoreEvent.NetworkTaskProgressUpdated) {
         guard let request = findNetworkRequestEntity(forTaskId: event.taskId) else { return }
-        request.completedUnitCount = event.completedUnitCount
-        request.totalUnitCount = event.totalUnitCount
+
+        let progress = request.progress ?? {
+            let progress = LoggerNetworkRequestProgressEntity(context: backgroundContext)
+            request.progress = progress
+            return progress
+        }()
+
+        progress.completedUnitCount = event.completedUnitCount
+        progress.totalUnitCount = event.totalUnitCount
     }
 
     private func process(_ event: LoggerStoreEvent.NetworkTaskCompleted) {
@@ -362,15 +369,17 @@ extension LoggerStore {
             request.responseBodyKey = store.storeData(event.responseBody)
         }
 
-        request.requestBodySize = Int64(event.requestBody?.count ?? 0)
-
         switch event.taskType {
         case .dataTask:
             request.responseBodySize = Int64(event.responseBody?.count ?? 0)
         case .downloadTask:
             request.responseBodySize = event.metrics?.transactions.last(where: {
                 $0.resourceFetchType == URLSessionTaskMetrics.ResourceFetchType.networkLoad.rawValue
-            })?.details?.countOfResponseBodyBytesReceived ?? request.completedUnitCount
+            })?.details?.countOfResponseBodyBytesReceived ?? request.progress?.completedUnitCount ?? -1
+        case .uploadTask:
+            request.requestBodySize = event.metrics?.transactions.last(where: {
+                $0.resourceFetchType == URLSessionTaskMetrics.ResourceFetchType.networkLoad.rawValue
+            })?.details?.countOfRequestBodyBytesSent ?? Int64(event.requestBody?.count ?? -1)
         default:
             break
         }
@@ -415,8 +424,6 @@ extension LoggerStore {
         request.taskId = taskId
         request.rawTaskType = taskType.rawValue
         request.createdAt = createdAt
-        request.completedUnitCount = -1
-        request.totalUnitCount = -1
         request.responseBodySize = -1
         request.requestBodySize = -1
         request.isFromCache = false

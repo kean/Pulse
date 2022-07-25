@@ -15,8 +15,8 @@ struct MockDataTask {
 
     enum Kind {
         case data
-        case upload
-        case download(expectedLength: Int64)
+        case upload(size: Int64)
+        case download(size: Int64)
     }
 }
 
@@ -64,12 +64,21 @@ extension MockDataTask {
     )
 
     static let downloadNuke = MockDataTask(
-        kind: .download(expectedLength: 6695689),
+        kind: .download(size: 6695689),
         request: mockDownloadNukeOriginalRequest,
         currentRequest: mockDownloadNukeCurrentRequest,
         response: mockDownloadNukeResponse,
         responseBody: Data(),
         metrics: mockDownloadNukeMetrics
+    )
+
+    static let uploadPulseArchive = MockDataTask(
+        kind: .upload(size: 21851748),
+        request: mockUploadPulseOriginalRequest,
+        currentRequest: mockUploadPulseCurrentRequest,
+        response: mockUploadPulseResponse,
+        responseBody: Data(),
+        metrics: mockUploadPulseMetrics
     )
 }
 
@@ -101,8 +110,17 @@ private let mockMetrics = try! JSONDecoder().decode(NetworkLoggerMetrics.self, f
   "transactions": [
     {
       "resourceFetchType": 1,
-      "responseStartDate": 633801585.020091,
+      "fetchStartDate": 633801584.8037,
+      "domainLookupEndDate": 633801584.883459,
+      "domainLookupStartDate": 633801584.861459,
+      "connectStartDate": 633801584.885459,
       "secureConnectionStartDate": 633801584.903459,
+      "secureConnectionEndDate": 633801585.0024589,
+      "connectEndDate": 633801585.0024589,
+      "requestStartDate": 633801585.004591,
+      "requestEndDate": 633801585.004759,
+      "responseStartDate": 633801585.020091,
+      "responseEndDate": 633801585.03594,
       "response": {
         "headers": {
           "Server": "ATS/8.1.1",
@@ -125,8 +143,6 @@ private let mockMetrics = try! JSONDecoder().decode(NetworkLoggerMetrics.self, f
         },
         "statusCode": 200
       },
-      "fetchStartDate": 633801584.8037,
-      "requestEndDate": 633801585.004759,
       "request": {
         "allowsCellularAccess": true,
         "httpMethod": "GET",
@@ -145,16 +161,9 @@ private let mockMetrics = try! JSONDecoder().decode(NetworkLoggerMetrics.self, f
         "httpShouldUsePipelining": false,
         "timeoutInterval": 60
       },
-      "domainLookupStartDate": 633801584.861459,
-      "secureConnectionEndDate": 633801585.0024589,
       "isProxyConnection": false,
-      "connectEndDate": 633801585.0024589,
       "networkProtocolName": "http/1.1",
-      "responseEndDate": 633801585.03594,
       "isReusedConnection": false,
-      "domainLookupEndDate": 633801584.883459,
-      "connectStartDate": 633801584.885459,
-      "requestStartDate": 633801585.004591,
       "details": {
         "countOfResponseHeaderBytesReceived": 683,
         "countOfRequestBodyBytesBeforeEncoding": 0,
@@ -673,7 +682,7 @@ private let mockDownloadNukeCurrentRequest: URLRequest = {
 
 private let mockDownloadNukeResponse: URLResponse = {
     var response = HTTPURLResponse(url: URL(string: "https://codeload.github.com/kean/Nuke/zip/refs/tags/11.0.0")!, statusCode: 200, httpVersion: "HTTP/2.0", headerFields: [
-        "Authorization,Accept-Encoding,Origin": "Vary",
+        "Vary": "Authorization,Accept-Encoding,Origin",
         "Content-Type": "application/zip",
         "x-xss-protection": "1; mode=block",
         "content-security-policy": "default-src \'none\'; style-src \'unsafe-inline\'; sandbox",
@@ -699,8 +708,8 @@ private let mockDownloadNukeMetrics = try! JSONDecoder().decode(NetworkLoggerMet
       "connectEndDate": 680377568.114544,
       "connectStartDate": 680377567.997544,
       "secureConnectionStartDate": 680377568.0365441,
-      "networkProtocolName": "h2",
       "secureConnectionEndDate": 680377568.114544,
+      "networkProtocolName": "h2",
       "isProxyConnection": false,
       "resourceFetchType": 1,
       "details": {
@@ -768,16 +777,18 @@ private let mockDownloadNukeMetrics = try! JSONDecoder().decode(NetworkLoggerMet
       "isReusedConnection": false
     },
     {
-      "responseStartDate": 680377568.371462,
-      "domainLookupStartDate": 680377568.189141,
       "fetchStartDate": 680377568.18746,
-      "requestEndDate": 680377568.271574,
+      "domainLookupStartDate": 680377568.189141,
       "domainLookupEndDate": 680377568.209141,
-      "connectEndDate": 680377568.271141,
       "connectStartDate": 680377568.209141,
       "secureConnectionStartDate": 680377568.229141,
-      "networkProtocolName": "h2",
       "secureConnectionEndDate": 680377568.271141,
+      "connectEndDate": 680377568.271141,
+      "requestStartDate": 680377568.271509,
+      "requestEndDate": 680377568.271574,
+      "responseStartDate": 680377568.371462,
+      "responseEndDate": 680377569.756665,
+      "networkProtocolName": "h2",
       "isProxyConnection": false,
       "resourceFetchType": 1,
       "details": {
@@ -817,7 +828,6 @@ private let mockDownloadNukeMetrics = try! JSONDecoder().decode(NetworkLoggerMet
         "httpShouldUsePipelining": false,
         "timeoutInterval": 60
       },
-      "requestStartDate": 680377568.271509,
       "response": {
         "statusCode": 200,
         "headers": {
@@ -837,15 +847,112 @@ private let mockDownloadNukeMetrics = try! JSONDecoder().decode(NetworkLoggerMet
         "contentType": "application/zip",
         "expectedContentLength": -1
       },
-      "responseEndDate": 680377568.756665,
       "isReusedConnection": false
     }
   ],
   "taskInterval": {
     "start": 680377567.911655,
-    "duration": 0.8462769985198975
+    "duration": 1.8462769985198975
   },
   "redirectCount": 1
+}
+""".data(using: .utf8)!)
+
+// MARK: Upload
+
+private let mockUploadPulseOriginalRequest: URLRequest = {
+    var request = URLRequest(url: URL(string: "https://objects-origin.githubusercontent.com/github-production-release-asset-2e65be")!)
+    request.httpMethod = "POST"
+    request.setValue("21851748", forHTTPHeaderField: "Content-Length")
+    request.setValue("multipart/form-data; boundary=----WebKitFormBoundaryrv8XAHQPtQcWta3k", forHTTPHeaderField: "Content-Type")
+    return request
+}()
+
+private let mockUploadPulseCurrentRequest: URLRequest = {
+    var request = URLRequest(url: URL(string: "https://objects-origin.githubusercontent.com/github-production-release-asset-2e65be")!)
+    request.httpMethod = "POST"
+    request.setValue("gzip, deflate, br", forHTTPHeaderField: "Accept-Encoding")
+    request.setValue("en-US,en;q=0.9", forHTTPHeaderField: "Accept-Language")
+    request.setValue("*/*", forHTTPHeaderField: "Accept")
+    request.setValue("keep-alive", forHTTPHeaderField: "Connection")
+    request.setValue("21851748", forHTTPHeaderField: "Content-Length")
+    request.setValue("multipart/form-data; boundary=----WebKitFormBoundaryrv8XAHQPtQcWta3k", forHTTPHeaderField: "Content-Type")
+    return request
+}()
+
+private let mockUploadPulseResponse: URLResponse = {
+    var response = HTTPURLResponse(url: URL(string: "https://objects-origin.githubusercontent.com/github-production-release-asset-2e65be")!, statusCode: 204, httpVersion: "HTTP/2.0", headerFields: [
+        "Vary": "Origin",
+        "Access-Control-Allow-Origin": "https://github.com"
+    ])
+    return response!
+}()
+
+private let mockUploadPulseMetrics = try! JSONDecoder().decode(NetworkLoggerMetrics.self, from: """
+{
+  "transactions": [
+    {
+      "fetchStartDate": 680377568.18746,
+      "responseStartDate": 680377570.731462,
+      "responseEndDate": 680377570.756665,
+      "networkProtocolName": "h2",
+      "isProxyConnection": false,
+      "resourceFetchType": 1,
+      "details": {
+        "remoteAddress": "140.82.114.10",
+        "localPort": 52600,
+        "negotiatedTLSProtocolVersion": 772,
+        "isMultipath": false,
+        "localAddress": "192.168.1.4",
+        "isCellular": false,
+        "isConstrained": false,
+        "isExpensive": false,
+        "remotePort": 443,
+        "negotiatedTLSCipherSuite": 4865,
+        "countOfRequestHeaderBytesSent": 262,
+        "countOfRequestBodyBytesSent": 21851748,
+        "countOfRequestBodyBytesBeforeEncoding": 21851748,
+        "countOfResponseHeaderBytesReceived": 30,
+        "countOfResponseBodyBytesReceived": 0,
+        "countOfResponseBodyBytesAfterDecoding": 0
+      },
+      "request": {
+        "url": "https://objects-origin.githubusercontent.com/github-production-release-asset-2e65be",
+        "httpMethod": "POST",
+        "allowsCellularAccess": true,
+        "cachePolicy": 0,
+        "allowsExpensiveNetworkAccess": true,
+        "allowsConstrainedNetworkAccess": true,
+        "httpShouldHandleCookies": true,
+        "headers": {
+          "Content-Length": "21851748",
+          "Content-Type": "multipart/form-data; boundary=----WebKitFormBoundaryrv8XAHQPtQcWta3k",
+          "User-Agent": "Pulse%20Demo%20iOS/20 CFNetwork/1385 Darwin/22.0.0",
+          "Accept-Encoding": "gzip, deflate, br",
+          "Connection": "keep-alive",
+          "Accept-Language": "en-US,en;q=0.9",
+          "Accept": "*/*"
+        },
+        "httpShouldUsePipelining": false,
+        "timeoutInterval": 60
+      },
+      "response": {
+        "statusCode": 204,
+        "headers": {
+          "Vary": "Origin",
+          "Access-Control-Allow-Origin": "https://github.com"
+        },
+        "contentType": "application/zip",
+        "expectedContentLength": -1
+      },
+      "isReusedConnection": true
+    }
+  ],
+  "taskInterval": {
+    "start": 680377567.911655,
+    "duration": 2.8462769985198975
+  },
+  "redirectCount": 0
 }
 """.data(using: .utf8)!)
 

@@ -52,6 +52,8 @@ public struct ConsoleView: View {
                     .padding(.bottom, 4)
             }
         }
+        .onAppear(perform: viewModel.onAppear)
+        .onDisappear(perform: viewModel.onDisappear)
         .alert(item: $viewModel.fileTransferError) { error in
             Alert(title: Text("Transfer Failed"), message: Text(error.message), dismissButton: .cancel(Text("Ok")))
         }

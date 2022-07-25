@@ -32,6 +32,8 @@ public struct ConsoleView: View {
                 trailing: actionButton
             )
             .sheet(item: $shared) { ShareView($0).id($0.id) }
+            .onAppear(perform: viewModel.onAppear)
+            .onDisappear(perform: viewModel.onDisappear)
 
     }
 
@@ -114,7 +116,7 @@ private struct ConsoleToolbarView: View {
 #if DEBUG
 struct ConsoleView_Previews: PreviewProvider {
     static var previews: some View {
-        return Group {
+        Group {
             NavigationView {
                 ConsoleView(viewModel: .init(store: .mock))
             }

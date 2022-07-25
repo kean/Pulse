@@ -114,30 +114,15 @@ struct NetworkInspectorView: View {
     @ViewBuilder
     private var selectedTabView: some View {
         switch selectedTab {
-        case .summary:
-            NetworkInspectorSummaryView(viewModel: viewModel.makeSummaryModel())
-        case .headers:
-            NetworkInspectorHeadersView(viewModel: viewModel.makeHeadersModel())
-        case .request:
-            if let model = viewModel.makeRequestBodyViewModel() {
-                makeResponseView(viewModel: model)
-            } else if !viewModel.isCompleted && !viewModel.store.isReadonly {
-                pending
-            } else if viewModel.hasRequestBody {
-                PlaceholderView(imageName: "exclamationmark.circle", title: "Unavailable")
-            } else {
-                PlaceholderView(imageName: "nosign", title: "Empty Request")
-            }
         case .response:
-            if let model = viewModel.makeResponseBodyViewModel() {
-                makeResponseView(viewModel: model)
-            } else if !viewModel.isCompleted && !viewModel.store.isReadonly {
+            if let viewModel = viewModel.makeResponseBodyViewModel() {
+                makeResponseView(viewModel: viewModel)
+            } else if !viewModel.isCompleted {
                 SpinnerView(viewModel: viewModel.progress)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
             } else if viewModel.hasResponseBody {
                 PlaceholderView(imageName: "exclamationmark.circle", title: "Unavailable")
             } else if viewModel.request.taskType == .downloadTask {
-                PlaceholderView(imageName: "square.and.arrow.down", title: {
+                PlaceholderView(imageName: "arrow.down.circle", title: {
                     var title = "Downloaded to a File"
                     if viewModel.request.responseBodySize > 0 {
                         title = "\(ByteCountFormatter.string(fromByteCount: viewModel.request.responseBodySize, countStyle: .file))\n\(title)"
@@ -147,11 +132,33 @@ struct NetworkInspectorView: View {
             } else {
                 PlaceholderView(imageName: "nosign", title: "Empty Response")
             }
+        case .request:
+            if let viewModel = viewModel.makeRequestBodyViewModel() {
+                makeResponseView(viewModel: viewModel)
+            } else if !viewModel.isCompleted {
+                SpinnerView(viewModel: viewModel.progress)
+            } else if viewModel.hasRequestBody {
+                PlaceholderView(imageName: "exclamationmark.circle", title: "Unavailable")
+            } else if viewModel.request.taskType == .uploadTask {
+                PlaceholderView(imageName: "arrow.up.circle", title: {
+                    var title = "Uploaded from a File"
+                    if viewModel.request.requestBodySize > 0 {
+                        title = "\(ByteCountFormatter.string(fromByteCount: viewModel.request.requestBodySize, countStyle: .file))\n\(title)"
+                    }
+                    return title
+                }())
+            } else {
+                PlaceholderView(imageName: "nosign", title: "Empty Request")
+            }
+        case .summary:
+            NetworkInspectorSummaryView(viewModel: viewModel.makeSummaryModel())
+        case .headers:
+            NetworkInspectorHeadersView(viewModel: viewModel.makeHeadersModel())
         case .metrics:
-            if let model = viewModel.makeMetricsModel() {
-                NetworkInspectorMetricsView(viewModel: model)
-            } else if !viewModel.isCompleted && !viewModel.store.isReadonly {
-                pending
+            if let viewModel = viewModel.makeMetricsModel() {
+                NetworkInspectorMetricsView(viewModel: viewModel)
+            } else if !viewModel.isCompleted {
+                SpinnerView(viewModel: viewModel.progress)
             } else {
                 PlaceholderView(imageName: "exclamationmark.circle", title: "Unavailable")
             }
@@ -171,16 +178,6 @@ struct NetworkInspectorView: View {
 #endif
     }
 #endif
-
-    @ViewBuilder
-    private var pending: some View {
-        VStack(spacing: 12) {
-            Spinner()
-            Text("Pending")
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-        }.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-    }
 }
 
 private enum NetworkInspectorTab: Identifiable {

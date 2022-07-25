@@ -33,31 +33,9 @@ struct NetworkInspectorSummaryView: View {
 #if os(iOS) || os(macOS)
     @ViewBuilder
     private var contents: some View {
-        if let transfer = viewModel.transferModel {
-            NetworkInspectorTransferInfoView(viewModel: transfer)
-                .padding(.top, 12).padding(.bottom, 20)
-        } else if viewModel.state == .pending {
-            ZStack {
-                NetworkInspectorTransferInfoView(viewModel: .init(empty: true))
-                    .padding(.top, 12).padding(.bottom, 20)
-                    .hidden()
-                    .backport.hideAccessibility()
-                VStack(alignment: .center) {
-                    SpinnerView(viewModel: viewModel.progress)
-                }.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-            }
-        }
+        headerView
 
-        VStack {
-            HStack {
-                Text(viewModel.summaryModel.title)
-                statusView
-                Spacer()
-            }.font(.headline)
-
-            KeyValueSectionView(viewModel: viewModel.summaryModel)
-                .hiddenTitle()
-        }
+        summaryView
         viewModel.errorModel.map(KeyValueSectionView.init)
 
         if viewModel.originalRequestSummary != nil {
@@ -71,17 +49,6 @@ struct NetworkInspectorSummaryView: View {
         if viewModel.responseSummary != nil {
             responseSection
         }
-    }
-
-    private var statusView: some View {
-        let imageName: String
-        switch viewModel.state {
-        case .pending: imageName = "clock.fill"
-        case .success: imageName = "checkmark.circle.fill"
-        case .failure: imageName = "exclamationmark.octagon.fill"
-        }
-        return Image(systemName: imageName)
-            .foregroundColor(viewModel.tintColor)
     }
 
     @ViewBuilder
@@ -132,11 +99,10 @@ struct NetworkInspectorSummaryView: View {
 #elseif os(watchOS)
     @ViewBuilder
     private var contents: some View {
-        if let transfer = viewModel.transferModel {
-            NetworkInspectorTransferInfoView(viewModel: transfer)
-        }
+        headerView
+
         // Summary
-        KeyValueSectionView(viewModel: viewModel.summaryModel)
+        summaryView
         viewModel.errorModel.map(KeyValueSectionView.init)
         // HTTP Body
         KeyValueSectionView(viewModel: viewModel.requestBodySection)
@@ -152,7 +118,12 @@ struct NetworkInspectorSummaryView: View {
 
     @ViewBuilder
     private var contents: some View {
-        makeKeyValueSection(viewModel: viewModel.summaryModel)
+        headerView
+
+        NavigationLink(destination: KeyValueSectionView(viewModel: viewModel.summaryModel).focusable(true)) {
+            summaryView
+        }
+
         if let error = viewModel.errorModel {
             makeKeyValueSection(viewModel: error)
         }
@@ -181,6 +152,43 @@ struct NetworkInspectorSummaryView: View {
         }
     }
 #endif
+    @ViewBuilder
+    private var headerView: some View {
+        if let transfer = viewModel.transferModel {
+            NetworkInspectorTransferInfoView(viewModel: transfer)
+        } else if viewModel.state == .pending {
+            ZStack {
+                NetworkInspectorTransferInfoView(viewModel: .init(empty: true))
+                    .hidden()
+                    .backport.hideAccessibility()
+                SpinnerView(viewModel: viewModel.progress)
+            }
+        }
+    }
+
+    private var summaryView: some View {
+        VStack {
+            HStack(spacing: spacing) {
+                Text(viewModel.summaryModel.title)
+                statusView
+                Spacer()
+            }.font(.headline)
+
+            KeyValueSectionView(viewModel: viewModel.summaryModel)
+                .hiddenTitle()
+        }
+    }
+
+    private var statusView: some View {
+        let imageName: String
+        switch viewModel.state {
+        case .pending: imageName = "clock.fill"
+        case .success: imageName = "checkmark.circle.fill"
+        case .failure: imageName = "exclamationmark.octagon.fill"
+        }
+        return Image(systemName: imageName)
+            .foregroundColor(viewModel.tintColor)
+    }
 
     private var links: some View {
         VStack {
@@ -227,3 +235,9 @@ struct NetworkInspectorSummaryView: View {
         .backport.hideAccessibility()
     }
 }
+
+#if os(tvOS)
+private let spacing: CGFloat = 20
+#else
+private let spacing: CGFloat? = nil
+#endif

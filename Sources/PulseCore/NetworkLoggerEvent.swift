@@ -165,11 +165,11 @@ public enum NetworkLoggerTaskType: String, Codable, CaseIterable {
 
     public init(task: URLSessionTask) {
         switch task {
-        case task as URLSessionDataTask: self = .dataTask
-        case task as URLSessionDownloadTask: self = .downloadTask
-        case task as URLSessionStreamTask: self = .streamTask
-        case task as URLSessionUploadTask: self = .uploadTask
-        case task as URLSessionWebSocketTask: self = .webSocketTask
+        case is URLSessionUploadTask: self = .uploadTask
+        case is URLSessionDataTask: self = .dataTask
+        case is URLSessionDownloadTask: self = .downloadTask
+        case is URLSessionStreamTask: self = .streamTask
+        case is URLSessionWebSocketTask: self = .webSocketTask
         default: self = .dataTask
         }
     }

@@ -30,9 +30,9 @@ struct ConsoleMessageView: View {
     }
     
     private var title: some View {
-        badge + Text(viewModel.title)
-            .font(fonts.title)
+        badge + (Text(viewModel.title)
             .foregroundColor(.secondary)
+            .font(fonts.title))
     }
     
     private var badge: Text {
@@ -72,13 +72,11 @@ struct ConsoleMessageView: View {
         let body: Font
     }
     
-    private var fonts: Fonts {
 #if os(watchOS)
-        return Fonts(title: .system(size: 12), body: .system(size: 15))
+    private let fonts = Fonts(title: .system(size: 12), body: .system(size: 15))
 #else
-        return Fonts(title: .body, body: .body)
+    private let fonts = Fonts(title: .body, body: .body)
 #endif
-    }
 }
 
 #endif

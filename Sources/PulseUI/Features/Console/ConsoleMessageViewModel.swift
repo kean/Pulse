@@ -17,8 +17,9 @@ final class ConsoleMessageViewModel: Pinnable {
     private let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel?
     private let store: LoggerStore
 
+    private(set) lazy var time = ConsoleMessageViewModel.timeFormatter.string(from: message.createdAt)
+
     #if os(iOS)
-    lazy var time = ConsoleMessageViewModel.timeFormatter.string(from: message.createdAt)
     lazy var textColor2 = UIColor.textColor(for: LoggerStore.Level(rawValue: message.level) ?? .debug)
     lazy var attributedTitle: NSAttributedString = {
         let string = NSMutableAttributedString()

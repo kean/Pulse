@@ -17,8 +17,9 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     @Published var isResponseRawLinkActive = false
     @Published var isResponseHeadearsRawLinkActive = false
 
-    var progress: ProgressViewModel? { summary.progress }
+    var progress: ProgressViewModel { summary.progress }
 
+    #warning("TODO: inject request")
     init(summary: NetworkLoggerSummary) {
         self.summary = summary
     }
@@ -38,7 +39,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     // MARK: - Transfer
 
     var transferModel: NetworkInspectorTransferInfoViewModel? {
-        summary.metrics.flatMap(NetworkInspectorTransferInfoViewModel.init)
+        summary.metrics.flatMap { NetworkInspectorTransferInfoViewModel(metrics: $0, taskType: summary.taskType ?? .dataTask) }
     }
 
     // MARK: - Summary
@@ -46,18 +47,22 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     var summaryModel: KeyValueSectionViewModel {
         var items: [(String, String?)] = [
             ("URL", summary.originalRequest?.url?.absoluteString ?? "–"),
-            ("Method", summary.originalRequest?.httpMethod ?? "–"),
-            ("Status Code", summary.response?.statusCode.map(StatusCodeFormatter.string) ?? "–")
+            ("Method", summary.originalRequest?.httpMethod ?? "–")
         ]
-        if let metrics = summary.metrics {
-            items.append(("Duration", DurationFormatter.string(from: metrics.taskInterval.duration)))
-        }
-        if summary.originalRequest?.url != summary.currentRequest?.url && summary.currentRequest?.url != nil {
-            items.append(("Redirect", summary.currentRequest?.url?.absoluteString ?? "–"))
+
+        if summary.state == .failure || summary.state == .success {
+            items.append(("Status Code", summary.response?.statusCode.map(StatusCodeFormatter.string) ?? "–"))
+
+            if let metrics = summary.metrics {
+                items.append(("Duration", DurationFormatter.string(from: metrics.taskInterval.duration)))
+            }
+            items.append(("Source", summary.isFromCache ? "Cache" : "Network"))
         }
 
-        let title = summary.taskType?.urlSessionTaskClassName ?? "Summary"
-
+        var title = summary.taskType?.urlSessionTaskClassName ?? "Summary"
+        #if os(watchOS)
+        title = title.replacingOccurrences(of: "URLSession", with: "")
+        #endif
         return KeyValueSectionViewModel(title: title, color: tintColor, items: items)
     }
 

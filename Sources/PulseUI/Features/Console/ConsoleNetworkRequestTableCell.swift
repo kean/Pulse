@@ -18,7 +18,10 @@ final class ConsoleNetworkRequestTableCell: UITableViewCell, UIContextMenuIntera
     private var state: LoggerNetworkRequestEntity.State?
 
     private var viewModel: ConsoleNetworkRequestViewModel?
-    private var cancellable: AnyCancellable?
+    private var cancellable1: AnyCancellable?
+    private var cancellable2: AnyCancellable?
+
+    private var isAnimating = false
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -55,37 +58,49 @@ final class ConsoleNetworkRequestTableCell: UITableViewCell, UIContextMenuIntera
         self.state = nil
         self.refresh()
 
-        self.cancellable?.cancel()
-        self.cancellable = viewModel.objectWillChange.sink { [weak self] in
+        self.cancellable1 = viewModel.objectWillChange.sink { [weak self] in
             self?.refresh()
+        }
+        self.cancellable2 = viewModel.progress.objectWillChange.sink { [weak self] in
+            self?.refresh(onlyTitle: true)
         }
     }
 
     override func prepareForReuse() {
         super.prepareForReuse()
 
-        layer.removeAllAnimations()
+        if isAnimating {
+            isAnimating = false
+            contentView.backgroundColor = .clear
+            layer.removeAllAnimations()
+        }
     }
 
-    private func refresh() {
+    private func refresh(onlyTitle: Bool = false) {
         guard let viewModel = viewModel else { return }
 
         if let state = self.state, state != viewModel.state {
+            self.isAnimating = true
             UIView.animate(withDuration: 0.33, delay: 0, options: [.allowUserInteraction]) {
-                self.backgroundColor = viewModel.badgeColor.withAlphaComponent(0.15)
+                self.contentView.backgroundColor = viewModel.badgeColor.withAlphaComponent(0.15)
             } completion: { _ in
+                guard self.isAnimating else { return }
+                self.isAnimating = false
                 UIView.animate(withDuration: 1.0, delay: 0.5, options: [.allowUserInteraction]) {
-                    self.backgroundColor = .clear
+                    self.contentView.backgroundColor = .clear
                 }
             }
         }
+        self.state = viewModel.state
 
-        badge.fillColor = viewModel.badgeColor
-        title.text = viewModel.title
-        details.text = viewModel.text
-        accessory.textLabel.text = viewModel.time
-        pin.bind(viewModel: viewModel.pinViewModel)
-        state = viewModel.state
+        title.text = viewModel.fullTitle
+
+        if !onlyTitle {
+            badge.fillColor = viewModel.badgeColor
+            details.text = viewModel.text
+            accessory.textLabel.text = viewModel.time
+            pin.bind(viewModel: viewModel.pinViewModel)
+        }
     }
 
     func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {

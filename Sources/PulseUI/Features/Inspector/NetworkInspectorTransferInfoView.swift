@@ -5,31 +5,18 @@
 import SwiftUI
 import PulseCore
 
-#if os(iOS) || os(macOS) || os(watchOS)
-
 // MARK: - View
 
 struct NetworkInspectorTransferInfoView: View {
-    @Environment(\.colorScheme) var colorScheme
-
     let viewModel: NetworkInspectorTransferInfoViewModel
 
 #if os(watchOS)
     var body: some View {
-        VStack {
-            HStack {
-                Spacer()
+        HStack(alignment: .center) {
+            if viewModel.isUpload {
                 bytesSent
-                Spacer()
-            }
-
-            Divider()
-                .padding([.top, .bottom], 12)
-
-            HStack {
-                Spacer()
+            } else {
                 bytesReceived
-                Spacer()
             }
         }
     }
@@ -46,13 +33,16 @@ struct NetworkInspectorTransferInfoView: View {
             bytesReceived
             Spacer()
         }
+#if os(iOS) || os(tvOS) || os(macOS)
+        .padding(.top, 12).padding(.bottom, 20)
+#endif
     }
 #endif
 
     private var bytesSent: some View {
         makeView(
-            title: "Bytes Sent",
-            imageName: "icloud.and.arrow.up",
+            title: "Sent",
+            imageName: "arrow.up.circle",
             total: viewModel.totalBytesSent,
             headers: viewModel.headersBytesSent,
             body: viewModel.bodyBytesSent
@@ -61,8 +51,8 @@ struct NetworkInspectorTransferInfoView: View {
 
     private var bytesReceived: some View {
         makeView(
-            title: "Bytes Received",
-            imageName: "icloud.and.arrow.down",
+            title: "Received",
+            imageName: "arrow.down.circle",
             total: viewModel.totalBytesReceived,
             headers: viewModel.headersBytesReceived,
             body: viewModel.bodyBytesReceived
@@ -70,48 +60,39 @@ struct NetworkInspectorTransferInfoView: View {
     }
 
     private func makeView(title: String, imageName: String, total: String, headers: String, body: String) -> some View {
-        VStack {
-            Text(title)
-                .font(.headline)
-            HStack {
+        VStack(alignment: .center) {
+            HStack(alignment: .center, spacing: spacing) {
                 Image(systemName: imageName)
-                    .font(.system(size: 34))
-                Text(total)
+                    .font(.largeTitle)
+                Text(title + "\n" + total)
                     .font(.headline)
+                    .fixedSize()
             }.padding(2)
-            if viewModel.isFromCache {
-                Text("(from cache)")
-                    .foregroundColor(.secondary)
-                    .font(.system(size: fontSize))
-            } else {
-                HStack(alignment: .center, spacing: 4) {
-                    VStack(alignment: .trailing) {
-                        Text("Headers:")
-                            .foregroundColor(.secondary)
-                            .font(.system(size: fontSize))
-                        Text("Body:")
-                            .foregroundColor(.secondary)
-                            .font(.system(size: fontSize))
-                    }
-                    VStack(alignment: .leading) {
-                        Text(headers)
-                            .font(.system(size: fontSize))
-                        Text(body)
-                            .font(.system(size: fontSize))
-                    }
+            HStack(alignment: .center, spacing: 4) {
+                VStack(alignment: .trailing) {
+                    Text("Headers:")
+                        .foregroundColor(.secondary)
+                        .font(.footnote)
+                    Text("Body:")
+                        .foregroundColor(.secondary)
+                        .font(.footnote)
+                }
+                VStack(alignment: .leading) {
+                    Text(headers)
+                        .font(.footnote)
+                    Text(body)
+                        .font(.footnote)
                 }
             }
         }
     }
 }
 
-private var fontSize: CGFloat {
-#if os(iOS)
-    return 15
+#if os(tvOS)
+private let spacing: CGFloat = 20
 #else
-    return 12
+private let spacing: CGFloat? = nil
 #endif
-}
 
 // MARK: - Preview
 
@@ -133,10 +114,8 @@ struct NetworkInspectorTransferInfoView_Previews: PreviewProvider {
 }
 
 private let mockModel = NetworkInspectorTransferInfoViewModel(
-    metrics: MockDataTask.login.metrics
+    metrics: MockDataTask.login.metrics, taskType: .dataTask
 )!
-#endif
-
 #endif
 
 // MARK: - ViewModel
@@ -150,7 +129,7 @@ struct NetworkInspectorTransferInfoViewModel {
     let bodyBytesReceived: String
     let headersBytesReceived: String
 
-    var isFromCache: Bool
+    let isUpload: Bool
 
     init(empty: Bool) {
         self.totalBytesSent = "–"
@@ -159,11 +138,10 @@ struct NetworkInspectorTransferInfoViewModel {
         self.totalBytesReceived = "–"
         self.bodyBytesReceived = "–"
         self.headersBytesReceived = "–"
-
-        self.isFromCache = false
+        self.isUpload = false
     }
 
-    init?(metrics: NetworkLoggerMetrics) {
+    init?(metrics: NetworkLoggerMetrics, taskType: NetworkLoggerTaskType) {
         guard let details = metrics.transactions.last?.details else { return nil }
 
         self.totalBytesSent = formatBytes(details.countOfRequestBodyBytesBeforeEncoding + details.countOfRequestHeaderBytesSent)
@@ -174,15 +152,10 @@ struct NetworkInspectorTransferInfoViewModel {
         self.bodyBytesReceived = formatBytes(details.countOfResponseBodyBytesReceived)
         self.headersBytesReceived = formatBytes(details.countOfResponseHeaderBytesReceived)
 
-        self.isFromCache = metrics.transactions.last?.resourceFetchType == URLSessionTaskMetrics.ResourceFetchType.localCache.rawValue
+        self.isUpload = taskType == .uploadTask
     }
 }
 
-// MARK: - Private
-
 private func formatBytes(_ count: Int64) -> String {
-    guard count > 0 else {
-        return "0"
-    }
-    return ByteCountFormatter.string(fromByteCount: count, countStyle: .file)
+    ByteCountFormatter.string(fromByteCount: max(0, count), countStyle: .file)
 }

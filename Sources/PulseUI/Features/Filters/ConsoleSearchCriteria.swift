@@ -26,7 +26,7 @@ struct ConsoleSearchCriteria: Hashable {
     struct DatesFilter: Hashable {
         var isEnabled = true
 
-        #if os(iOS)
+        #if os(iOS) || os(watchOS) || os(tvOS)
         var isCurrentSessionOnly = true
         #else
         var isCurrentSessionOnly = false

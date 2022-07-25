@@ -22,10 +22,11 @@ final class NetworkLoggerSummary {
     let responseBodySize: Int64
     let isFromCache: Bool
 
+    #warning("remove")
+    let progress: ProgressViewModel
+
     private(set) lazy var requestBody: Data? = requestBodyKey.flatMap(store.getData)
     private(set) lazy var responseBody: Data? = responseBodyKey.flatMap(store.getData)
-
-    private(set) var progress: ProgressViewModel?
 
     private let store: LoggerStore
 
@@ -43,8 +44,8 @@ final class NetworkLoggerSummary {
         self.responseBodyKey = request.responseBodyKey
         self.responseBodySize = request.responseBodySize
         self.isFromCache = request.isFromCache
-        self.progress = ProgressViewModel(request: request)
         self.objectId = request.objectID
+        self.progress = ProgressViewModel(request: request)
 
         self.store = store
     }

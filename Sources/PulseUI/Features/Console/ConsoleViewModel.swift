@@ -36,6 +36,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 
     private(set) var store: LoggerStore
     private let controller: NSFetchedResultsController<LoggerMessageEntity>
+    private var isActive = false
     private var latestSessionId: String?
     private var cancellables: [AnyCancellable] = []
 
@@ -90,6 +91,17 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 #endif
     }
 
+    // MARK: Appearance
+
+    func onAppear() {
+        isActive = true
+        reloadMessages()
+    }
+
+    func onDisappear() {
+        isActive = false
+    }
+
     // MARK: Refresh
 
     private func refreshNow() {
@@ -110,7 +122,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         ConsoleSearchCriteria.update(request: controller.fetchRequest, filterTerm: filterTerm, criteria: searchCriteria.criteria, filters: searchCriteria.filters, sessionId: sessionId, isOnlyErrors: isOnlyErrors)
         try? controller.performFetch()
 
-        displayNewMessages()
+        reloadMessages()
     }
 
     // MARK: Labels
@@ -181,15 +193,18 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
                 searchCriteria.didInsertEntity(message)
             }
         }
+
+        if isActive {
 #if os(iOS) || os(macOS)
-        self.table.diff = diff
+            self.table.diff = diff
 #endif
-        withAnimation {
-            displayNewMessages()
+            withAnimation {
+                reloadMessages()
+            }
         }
     }
 
-    private func displayNewMessages() {
+    private func reloadMessages() {
         entities = controller.fetchedObjects ?? []
 #if os(iOS) || os(macOS)
         table.entities = entities

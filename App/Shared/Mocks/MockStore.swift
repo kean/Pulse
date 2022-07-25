@@ -7,6 +7,7 @@ import PulseCore
 import CoreData
 
 private var isAddingItemsDynamically = true
+private var isAddingItemsOnce = false
 private var isUsingDefaultStore = true
 
 extension LoggerStore {
@@ -16,8 +17,10 @@ extension LoggerStore {
         if isAddingItemsDynamically {
             func populate() {
                 populateStore(store)
-                DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(10)) {
-                    populate()
+                if !isAddingItemsOnce {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(10)) {
+                        populate()
+                    }
                 }
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(750)) {
@@ -114,6 +117,8 @@ private func _populateStore(_ store: LoggerStore) async {
 
     logTask(MockDataTask.createAPI)
 
+    logTask(MockDataTask.uploadPulseArchive)
+
     let stackTrace = """
         Replace this implementation with code to handle the error appropriately. fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
 
@@ -157,7 +162,7 @@ private func _logTask(_ mockTask: MockDataTask, urlSession: URLSession, logger: 
     switch mockTask.kind {
     case .data: task = urlSession.dataTask(with: mockTask.request)
     case .download: task = urlSession.downloadTask(with: mockTask.request)
-    case .upload: fatalError()
+    case .upload: task = urlSession.uploadTask(with: mockTask.request, from: Data())
     }
     var currentRequest = mockTask.currentRequest
     currentRequest.setValue("Pulse Demo/2.0", forHTTPHeaderField: "User-Agent")
@@ -169,16 +174,17 @@ private func _logTask(_ mockTask: MockDataTask, urlSession: URLSession, logger: 
             await Task.sleep(milliseconds: delay)
         }
         logger.logTaskCreated(task)
-        if case .download(let size) = mockTask.kind {
+        switch mockTask.kind {
+        case .download(let size), .upload(let size):
             await Task.sleep(milliseconds: 300)
             var remaining = size
-            let chunk: Int64 = 1024 * 256
+            let chunk: Int64 = 1024 * (size > 10000000 ? 1024 : 512)
             while remaining > 0 {
                 await Task.sleep(milliseconds: 200)
                 remaining -= chunk
                 logger.logTask(task, didUpdateProgress: (completed: size - remaining, total: size))
             }
-        } else {
+        case .data:
             await Task.sleep(milliseconds: .random(in: 500...2000))
         }
         if let dataTask = task as? URLSessionDataTask {

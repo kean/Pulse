@@ -24,6 +24,7 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 
     private(set) var store: LoggerStore
     private let controller: NSFetchedResultsController<LoggerNetworkRequestEntity>
+    private var isActive = false
     private var latestSessionId: String?
     private var cancellables = [AnyCancellable]()
 
@@ -65,6 +66,17 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         }
     }
 
+    // MARK: Appearance
+
+    func onAppear() {
+        isActive = true
+        didRefreshEntities()
+    }
+
+    func onDisappear() {
+        isActive = false
+    }
+
     // MARK: Refresh
 
     private func refreshNow() {
@@ -95,11 +107,13 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
                 searchCriteria.didInsertEntity(message)
             }
         }
+        if isActive {
 #if os(iOS) || os(macOS)
-        self.table.diff = diff
+            self.table.diff = diff
 #endif
-        withAnimation {
-            self.didRefreshEntities()
+            withAnimation {
+                self.didRefreshEntities()
+            }
         }
     }
 

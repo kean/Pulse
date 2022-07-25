@@ -14,6 +14,7 @@ public extension LoggerStore {
         let message = NSEntityDescription(name: "LoggerMessageEntity", class: LoggerMessageEntity.self)
         let metadata = NSEntityDescription(name: "LoggerMetadataEntity", class: LoggerMetadataEntity.self)
         let request = NSEntityDescription(name: "LoggerNetworkRequestEntity", class: LoggerNetworkRequestEntity.self)
+        let requestProgress = NSEntityDescription(name: "LoggerNetworkRequestProgressEntity", class: LoggerNetworkRequestProgressEntity.self)
         let requestDetails = NSEntityDescription(name: "LoggerNetworkRequestDetailsEntity", class: LoggerNetworkRequestDetailsEntity.self)
 
         metadata.properties = [
@@ -46,6 +47,11 @@ public extension LoggerStore {
             NSAttributeDescription(name: "metrics", type: .binaryDataAttributeType),
         ]
 
+        requestProgress.properties = [
+            NSAttributeDescription(name: "completedUnitCount", type: .integer64AttributeType),
+            NSAttributeDescription(name: "totalUnitCount", type: .integer64AttributeType)
+        ]
+
         request.properties = [
             NSAttributeDescription(name: "taskId", type: .UUIDAttributeType),
             NSAttributeDescription(name: "rawTaskType", type: .stringAttributeType),
@@ -66,13 +72,12 @@ public extension LoggerStore {
             NSAttributeDescription(name: "requestBodySize", type: .integer64AttributeType),
             NSAttributeDescription(name: "responseBodySize", type: .integer64AttributeType),
             NSAttributeDescription(name: "isFromCache", type: .booleanAttributeType),
-            NSAttributeDescription(name: "completedUnitCount", type: .integer64AttributeType),
-            NSAttributeDescription(name: "totalUnitCount", type: .integer64AttributeType),
             NSRelationshipDescription.make(name: "details", type: .oneToOne(), entity: requestDetails),
-            NSRelationshipDescription.make(name: "message", type: .oneToOne(), entity: message)
+            NSRelationshipDescription.make(name: "message", type: .oneToOne(), entity: message),
+            NSRelationshipDescription.make(name: "progress", type: .oneToOne(isOptional: true), entity: requestProgress)
         ]
 
-        model.entities = [message, metadata, request, requestDetails]
+        model.entities = [message, metadata, request, requestDetails, requestProgress]
         return model
     }()
 }
@@ -122,6 +127,27 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
     @NSManaged public var requestState: Int16
     @NSManaged public var redirectCount: Int16
 
+    /// Request details.
+    @NSManaged public var details: LoggerNetworkRequestDetailsEntity
+    /// The key in the blob storage. To get the data, see ``LoggerStore/getData(forKey:)``.
+    @NSManaged public var requestBodyKey: String?
+    /// The key in the blob storage. To get the data, see ``LoggerStore/getData(forKey:)``.
+    @NSManaged public var responseBodyKey: String?
+    /// The size of the request body.
+    @NSManaged public var requestBodySize: Int64
+    /// The size of the response body.
+    @NSManaged public var responseBodySize: Int64
+    /// Returns `true` if the response was returned from the local cache.
+    @NSManaged public var isFromCache: Bool
+
+    /// Request progress.
+    ///
+    /// - note: The entity is created lazily when the first progress report
+    /// is delivered. If no progress updates are delivered, it's never created.
+    @NSManaged public var progress: LoggerNetworkRequestProgressEntity?
+
+    // MARK: - Helpers
+
     /// Returns request state.
     public var state: LoggerNetworkRequestEntity.State {
         if let state = LoggerNetworkRequestEntity.State(rawValue: requestState) {
@@ -142,26 +168,17 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
         case success = 2
         case failure = 3
     }
+}
 
-    /// Request details.
-    @NSManaged public var details: LoggerNetworkRequestDetailsEntity
-    /// The key in the blob storage. To get the data, see ``LoggerStore/getData(forKey:)``.
-    @NSManaged public var requestBodyKey: String?
-    /// The key in the blob storage. To get the data, see ``LoggerStore/getData(forKey:)``.
-    @NSManaged public var responseBodyKey: String?
-    /// The size of the request body.
-    @NSManaged public var requestBodySize: Int64
-    /// The size of the response body.
-    @NSManaged public var responseBodySize: Int64
-    /// Returns `true` if the response was returned from the local cache.
-    @NSManaged public var isFromCache: Bool
-
+/// Indicates current download or upload progress.
+public final class LoggerNetworkRequestProgressEntity: NSManagedObject {
     /// Indicates current download or upload progress.
     @NSManaged public var completedUnitCount: Int64
     /// Indicates current download or upload progress.
     @NSManaged public var totalUnitCount: Int64
 }
 
+/// Details associated with the request.
 public final class LoggerNetworkRequestDetailsEntity: NSManagedObject {
     /// Contains JSON-encoded ``NetworkLoggerRequest``.
     @NSManaged public var originalRequest: Data?

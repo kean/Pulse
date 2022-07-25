@@ -85,11 +85,15 @@ private struct MainPanelView: View {
             ConsoleTableView(viewModel: viewModel.network.table, onSelected: {
                 viewModel.details.select($0)
             })
+            .onAppear(perform: viewModel.network.onAppear)
+            .onDisappear(perform: viewModel.network.onDisappear)
             .background(NavigationTitleUpdater(title: "Requests", viewModel: viewModel.network.table))
         } else {
             ConsoleTableView(viewModel: viewModel.console.table, onSelected: {
                 viewModel.details.select($0)
             })
+            .onAppear(perform: viewModel.console.onAppear)
+            .onDisappear(perform: viewModel.console.onDisappear)
             .background(NavigationTitleUpdater(title: "Messages", viewModel: viewModel.console.table))
         }
     }
