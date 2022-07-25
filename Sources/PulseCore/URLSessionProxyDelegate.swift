@@ -4,8 +4,6 @@
 
 import Foundation
 
-#warning("TODO: URLSessionDownloadDelegate")
-
 /// Automates URLSession request tracking.
 ///
 /// - important: On iOS 16.0, tvOS 16.0, macOS 13.0, watchOS 9.0, it automatically
@@ -13,7 +11,7 @@ import Foundation
 /// method which allows the logger to start tracking network requests right
 /// after their creation. On earlier versions, you can (optionally) call
 /// ``NetworkLogger/logTaskCreated(_:)`` manually.
-public final class URLSessionProxyDelegate: NSObject, URLSessionTaskDelegate, URLSessionDataDelegate {
+public final class URLSessionProxyDelegate: NSObject, URLSessionTaskDelegate, URLSessionDataDelegate, URLSessionDownloadDelegate {
     private var actualDelegate: URLSessionDelegate?
     private var taskDelegate: URLSessionTaskDelegate?
     private var interceptedSelectors: Set<Selector>
@@ -29,7 +27,9 @@ public final class URLSessionProxyDelegate: NSObject, URLSessionTaskDelegate, UR
             #selector(URLSessionDataDelegate.urlSession(_:dataTask:didReceive:)),
             #selector(URLSessionTaskDelegate.urlSession(_:task:didCompleteWithError:)),
             #selector(URLSessionDataDelegate.urlSession(_:dataTask:didReceive:completionHandler:)),
-            #selector(URLSessionTaskDelegate.urlSession(_:task:didFinishCollecting:))
+            #selector(URLSessionTaskDelegate.urlSession(_:task:didFinishCollecting:)),
+            #selector(URLSessionDownloadDelegate.urlSession(_:downloadTask:didFinishDownloadingTo:)),
+            #selector(URLSessionDownloadDelegate.urlSession(_:downloadTask:didWriteData:totalBytesWritten:totalBytesExpectedToWrite:))
         ]
 #if swift(>=5.7)
         if #available(iOS 16.0, tvOS 16.0, macOS 13.0, watchOS 9.0, *) {
@@ -75,6 +75,17 @@ public final class URLSessionProxyDelegate: NSObject, URLSessionTaskDelegate, UR
     public func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
         logger.logDataTask(dataTask, didReceive: data)
         (actualDelegate as? URLSessionDataDelegate)?.urlSession?(session, dataTask: dataTask, didReceive: data)
+    }
+
+    // MARK: URLSessionDownloadDelegate
+
+    public func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
+        (actualDelegate as? URLSessionDownloadDelegate)?.urlSession(session, downloadTask: downloadTask, didFinishDownloadingTo: location)
+    }
+
+    public func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
+        logger.logTask(downloadTask, didUpdateProgress: (completed: totalBytesWritten, total: totalBytesExpectedToWrite))
+        (actualDelegate as? URLSessionDownloadDelegate)?.urlSession?(session, downloadTask: downloadTask, didWriteData: bytesWritten, totalBytesWritten: totalBytesWritten, totalBytesExpectedToWrite: totalBytesExpectedToWrite)
     }
 
     // MARK: Proxy

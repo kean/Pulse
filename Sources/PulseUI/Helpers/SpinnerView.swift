@@ -13,10 +13,10 @@ struct SpinnerView: View {
     var body: some View {
         VStack {
             Spinner()
-            Text(viewModel?.title ?? "Pending...")
+            Text((viewModel?.title ?? "Pending") + "...")
                 .padding(.top, 6)
-            if let viewModel = self.viewModel {
-                Text(viewModel.details)
+            if let details = self.viewModel?.details {
+                Text(details)
                     .animation(nil)
             }
         }.foregroundColor(.secondary)
@@ -28,9 +28,31 @@ struct ProgressViewModel {
     var completed: Int64
     var total: Int64
 
-    var details: String {
-        let lhs = ByteCountFormatter.string(fromByteCount: completed, countStyle: .file)
+    init(title: String, completed: Int64, total: Int64) {
+        self.title = title
+        self.completed = completed
+        self.total = total
+    }
+
+    init?(request: LoggerNetworkRequestEntity) {
+        guard request.state == .pending else {
+            return nil
+        }
+        switch request.taskType ?? .dataTask {
+        case .downloadTask: self.title = "Downloading"
+        case .uploadTask: self.title = "Uploading"
+        default: self.title = "Pending"
+        }
+        self.completed = request.completedUnitCount
+        self.total = request.totalUnitCount
+    }
+
+    var details: String? {
+        guard completed > 0 || total > 0 else {
+            return nil
+        }
+        let lhs = ByteCountFormatter.string(fromByteCount: max(0, completed), countStyle: .file)
         let rhs = ByteCountFormatter.string(fromByteCount: total, countStyle: .file)
-        return "\(lhs) / \(rhs)"
+        return total > 0 ? "\(lhs) / \(rhs)" : lhs
     }
 }

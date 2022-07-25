@@ -873,13 +873,12 @@ extension URLSessionTask {
     }
 
     @objc var swizzledCurrentRequest: URLRequest? {
-        swizzledRequests[self]
+        swizzledRequests[self] ?? self.swizzledCurrentRequest
     }
 
     func setSwizzledResponse(_ newResponse: URLResponse?) {
         if !isSwizzledResponse {
             isSwizzledResponse = true
-
             let originalMethod: Method? = class_getInstanceMethod(URLSessionTask.self, #selector(getter: response))
             let swizzledMethod: Method? = class_getInstanceMethod(URLSessionTask.self, #selector(getter: swizzledResponse))
 
@@ -892,7 +891,7 @@ extension URLSessionTask {
     }
 
     @objc var swizzledResponse: URLResponse? {
-        swizzledResponses[self]
+        swizzledResponses[self] ?? self.swizzledResponse
     }
 }
 

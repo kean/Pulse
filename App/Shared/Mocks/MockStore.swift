@@ -58,6 +58,7 @@ private struct Logger {
 private var isFirstLog = true
 
 private func populateStore(_ store: LoggerStore) {
+    return
     precondition(Thread.isMainThread)
 
     func logger(named: String) -> Logger {

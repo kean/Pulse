@@ -43,10 +43,7 @@ final class NetworkLoggerSummary {
         self.responseBodyKey = request.responseBodyKey
         self.responseBodySize = request.responseBodySize
         self.isFromCache = request.isFromCache
-        if request.totalUnitCount > 0 {
-            let isUploading = request.taskType == .uploadTask ? "Uploading..." : "Downloading..."
-            progress = ProgressViewModel(title: isUploading, completed: request.completedUnitCount, total: request.totalUnitCount)
-        }
+        self.progress = ProgressViewModel(request: request)
         self.objectId = request.objectID
 
         self.store = store

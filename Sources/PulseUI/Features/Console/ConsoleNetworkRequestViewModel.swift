@@ -49,12 +49,10 @@ final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
         var prefix: String
         switch request.state {
         case .pending:
-            prefix = "PENDING"
-            if request.totalUnitCount > 0 {
-                func format(_ bytes: Int64) -> String {
-                    ByteCountFormatter.string(fromByteCount: bytes, countStyle: .file)
-                }
-                prefix += " · \(format(request.completedUnitCount)) / \(format(request.totalUnitCount))"
+            let progress = ProgressViewModel(request: request)
+            prefix = progress?.title.uppercased() ?? "PENDING"
+            if let details = progress?.details {
+                prefix += " · \(details)"
             }
         case .success:
             prefix = StatusCodeFormatter.string(for: Int(request.statusCode))
