@@ -43,15 +43,7 @@ struct NetworkInspectorSummaryView: View {
                     .hidden()
                     .backport.hideAccessibility()
                 VStack(alignment: .center) {
-                    Spinner()
-                    Text("Pending")
-                        .foregroundColor(.secondary)
-                        .padding(.top, 6)
-                    if let progress = viewModel.progress {
-                        Text(progress.title)
-                            .foregroundColor(.secondary)
-                            .animation(nil)
-                    }
+                    SpinnerView(viewModel: viewModel.progress)
                 }.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
             }
         }

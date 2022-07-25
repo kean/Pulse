@@ -14,6 +14,7 @@ final class NetworkInspectorViewModel: ObservableObject {
     let store: LoggerStore // TODO: make it private
     @Published private var summary: NetworkLoggerSummary
     private var cancellable: AnyCancellable?
+    var progress: ProgressViewModel? { summary.progress }
 
     init(request: LoggerNetworkRequestEntity, store: LoggerStore) {
         self.objectId = request.objectID
@@ -106,16 +107,5 @@ final class NetworkInspectorViewModel: ObservableObject {
 
     var shareService: ConsoleShareService {
         ConsoleShareService(store: store)
-    }
-}
-
-struct ProgressViewModel {
-    var completed: Int64
-    var total: Int64
-
-    var title: String {
-        let lhs = ByteCountFormatter.string(fromByteCount: completed, countStyle: .file)
-        let rhs = ByteCountFormatter.string(fromByteCount: total, countStyle: .file)
-        return "\(lhs) / \(rhs)"
     }
 }

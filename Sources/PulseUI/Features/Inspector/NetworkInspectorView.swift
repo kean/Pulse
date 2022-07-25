@@ -132,7 +132,8 @@ struct NetworkInspectorView: View {
             if let model = viewModel.makeResponseBodyViewModel() {
                 makeResponseView(viewModel: model)
             } else if !viewModel.isCompleted && !viewModel.store.isReadonly {
-                pending
+                SpinnerView(viewModel: viewModel.progress)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
             } else if viewModel.hasResponseBody {
                 PlaceholderView(imageName: "exclamationmark.circle", title: "Unavailable")
             } else if viewModel.request.taskType == .downloadTask {
