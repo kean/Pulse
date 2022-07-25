@@ -274,7 +274,7 @@ final class RichTextViewModel: ObservableObject {
 #if os(macOS)
         self.init(string: NSAttributedString(string: string, attributes: [.font: NSFont.preferredFont(forTextStyle: .body, options: [:]), .foregroundColor: UXColor.label]))
 #else
-        self.init(string: NSAttributedString(string: string, attributes: [.font: UXFont.systemFont(ofSize: FontSize.body, weight: .regular), .foregroundColor: UXColor.label]))
+        self.init(string: NSAttributedString(string: string, attributes: [.font: UXFont.systemFont(ofSize: FontSize.body + 1, weight: .regular), .foregroundColor: UXColor.label]))
 #endif
     }
 

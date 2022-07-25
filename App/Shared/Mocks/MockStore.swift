@@ -20,7 +20,9 @@ extension LoggerStore {
                     populate()
                 }
             }
-            populate()
+            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(750)) {
+                populate()
+            }
         } else {
             populateStore(store)
         }
@@ -58,9 +60,13 @@ private struct Logger {
 private var isFirstLog = true
 
 private func populateStore(_ store: LoggerStore) {
-    precondition(Thread.isMainThread)
+    Task { @MainActor in
+        await _populateStore(store)
+    }
+}
 
-    func logger(named: String) -> Logger {
+private func _populateStore(_ store: LoggerStore) async {
+    @Sendable func logger(named: String) -> Logger {
         Logger(label: named, store: store)
     }
 
@@ -78,16 +84,18 @@ private func populateStore(_ store: LoggerStore) {
         logger(named: "application")
             .log(level: .info, "UIApplication.willEnterForeground")
 
+        if isAddingItemsDynamically { await Task.sleep(milliseconds: 300) }
+
         logger(named: "auth")
             .log(level: .trace, "Instantiated Session")
 
         logger(named: "auth")
             .log(level: .trace, "Instantiated the new login request")
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(800)) {
-            logger(named: "application")
+        if isAddingItemsDynamically { await Task.sleep(milliseconds: 800) }
+
+        logger(named: "application")
                 .log(level: .debug, "Will navigate to Dashboard")
-        }
     }
 
     func logTask(_ mockTask: MockDataTask, delay: Int = Int.random(in: 1000...6000)) {
@@ -98,11 +106,11 @@ private func populateStore(_ store: LoggerStore) {
 
     logTask(MockDataTask.octocat)
 
-    logTask(MockDataTask.repos)
+    logTask(MockDataTask.repos, delay: 1000)
 
-    logTask(MockDataTask.downloadNuke)
+    logTask(MockDataTask.downloadNuke, delay: 3000)
 
-    logTask(MockDataTask.profileFailure)
+    logTask(MockDataTask.profileFailure, delay: 200)
 
     logTask(MockDataTask.createAPI)
 
@@ -130,15 +138,10 @@ private func populateStore(_ store: LoggerStore) {
     logger(named: "auth")
         .log(level: .warning, .init(stringLiteral: stackTrace))
 
-    if isAddingItemsDynamically {
-        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(3)) {
-            logger(named: "default")
-                .log(level: .critical, "💥 0xDEADBEEF")
-        }
-    } else {
-        logger(named: "default")
-            .log(level: .critical, "💥 0xDEADBEEF")
-    }
+    if isAddingItemsDynamically { await Task.sleep(milliseconds: 3000) }
+
+    logger(named: "default")
+        .log(level: .critical, "💥 0xDEADBEEF")
 
     // Wait until everything is stored
     if !isAddingItemsDynamically {
