@@ -60,14 +60,17 @@ struct NetworkInspectorTransferInfoView: View {
     }
 
     private func makeView(title: String, imageName: String, total: String, headers: String, body: String) -> some View {
-        VStack(alignment: .center) {
+        VStack {
             HStack(alignment: .center, spacing: spacing) {
                 Image(systemName: imageName)
                     .font(.largeTitle)
                 Text(title + "\n" + total)
                     .font(.headline)
                     .fixedSize()
-            }.padding(2)
+                    .lineSpacing(0)
+            }
+            .fixedSize()
+            .padding(2)
             HStack(alignment: .center, spacing: 4) {
                 VStack(alignment: .trailing) {
                     Text("Headers:")
@@ -84,6 +87,7 @@ struct NetworkInspectorTransferInfoView: View {
                         .font(.footnote)
                 }
             }
+            .fixedSize()
         }
     }
 }
