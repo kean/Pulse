@@ -30,6 +30,23 @@ extension NavigationLink where Label == EmptyView {
     }
 }
 
+struct InvisibleNavigationLinks<Content: View>: View {
+    @ViewBuilder let content: Content
+
+    var body: some View {
+        VStack { content }
+            .frame(width: 0, height: 0)
+            .invisible()
+    }
+}
+
+extension View {
+    func invisible() -> some View {
+        self.hidden()
+            .backport.hideAccessibility()
+    }
+}
+
 #if os(iOS)
 struct ViewControllerAccessor: UIViewRepresentable {
     @Binding var viewController: UIViewController?

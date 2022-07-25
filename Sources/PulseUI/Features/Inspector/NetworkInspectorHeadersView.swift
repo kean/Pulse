@@ -23,17 +23,14 @@ struct NetworkInspectorHeadersView: View {
     }
 
     private var links: some View {
-        VStack {
+        InvisibleNavigationLinks {
             NavigationLink.programmatic(isActive: $viewModel.isRequestOriginalRawActive, destination:  { NetworkHeadersDetailsView(viewModel: viewModel.requestHeadersOriginal) })
             NavigationLink.programmatic(isActive: $viewModel.isRequestCurrentRawActive, destination:  { NetworkHeadersDetailsView(viewModel: viewModel.requestHeadersCurrent) })
-
+            
             if let responseHeaders = viewModel.responseHeaders {
                 NavigationLink.programmatic(isActive: $viewModel.isResponseRawActive, destination:  { NetworkHeadersDetailsView(viewModel: responseHeaders) })
             }
         }
-        .frame(height: 0)
-        .hidden()
-        .backport.hideAccessibility()
     }
 }
 

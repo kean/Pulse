@@ -191,48 +191,45 @@ struct NetworkInspectorSummaryView: View {
     }
 
     private var links: some View {
-        VStack {
+        InvisibleNavigationLinks {
             if let errorModel = viewModel.errorModel {
                 NavigationLink.programmatic(isActive: $viewModel.isErrorRawLinkActive) {
                     NetworkHeadersDetailsView(viewModel: errorModel)
                 }
             }
-
+            
             NavigationLink.programmatic(isActive: $viewModel.isOriginalQueryItemsLinkActive) {
                 viewModel.originalRequestQueryItems.map(NetworkHeadersDetailsView.init)
             }
-
+            
             NavigationLink.programmatic(isActive: $viewModel.isRequestRawLinkActive, destination: {
                 NetworkInspectorResponseView(viewModel: viewModel.requestBodyViewModel)
                     .backport.navigationTitle("Request")
             })
-
+            
             NavigationLink.programmatic(isActive: $viewModel.isCurrentQueryItemsLinkActive) {
                 viewModel.currentRequestQueryItems.map(NetworkHeadersDetailsView.init)
             }
-
+            
             NavigationLink.programmatic(isActive: $viewModel.isResponseRawLinkActive, destination: {
                 NetworkInspectorResponseView(viewModel: viewModel.responseBodyViewModel)
                     .backport.navigationTitle("Response")
             })
-
+            
             NavigationLink.programmatic(isActive: $viewModel.isOriginalRequestHeadersLinkActive) {
                 NetworkHeadersDetailsView(viewModel: viewModel.originalRequestHeaders)
             }
-
+            
             NavigationLink.programmatic(isActive: $viewModel.isCurrentRequestHeadersLinkActive) {
                 NetworkHeadersDetailsView(viewModel: viewModel.currentRequestHeaders)
             }
-
+            
             if let responesHeaders = viewModel.responseHeaders {
                 NavigationLink.programmatic(isActive: $viewModel.isResponseHeadearsRawLinkActive) {
                     NetworkHeadersDetailsView(viewModel: responesHeaders)
                 }
             }
         }
-        .frame(height: 0)
-        .hidden()
-        .backport.hideAccessibility()
     }
 }
 

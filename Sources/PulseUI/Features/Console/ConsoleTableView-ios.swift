@@ -41,7 +41,7 @@ struct ConsoleTableView<Header: View>: View {
     private var links: some View {
         NavigationLink.programmatic(isActive: $isDetailsLinkActive) {
             ConsoleMessageDetailsRouter(viewModel: detailsViewModel)
-        }
+        }.invisible()
     }
 }
 
