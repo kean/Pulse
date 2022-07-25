@@ -13,7 +13,7 @@ import PulseUI
 @main
 struct Pulse_Demo_iOSApp: App {
     var body: some Scene {
-        let _ = testProxy()
+//        let _ = testProxy()
         WindowGroup {
             MainView(store: .mock)
         }

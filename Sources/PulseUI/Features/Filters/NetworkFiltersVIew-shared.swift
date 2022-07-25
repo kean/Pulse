@@ -9,7 +9,7 @@ import Combine
 
 #if os(iOS) || os(macOS)
 
-// MARK: - NetworkFiltersView (Contens)
+// MARK: - NetworkFiltersView (Contents)
 
 extension NetworkFiltersView {
     @ViewBuilder
