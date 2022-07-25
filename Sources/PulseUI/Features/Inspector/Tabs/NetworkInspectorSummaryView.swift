@@ -18,7 +18,6 @@ struct NetworkInspectorSummaryView: View {
         }.background(links)
 #elseif os(watchOS)
         ScrollView {
-            Spacer().frame(height: 24)
             VStack(spacing: 24) {
                 contents
             }
