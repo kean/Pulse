@@ -8,15 +8,12 @@ import PulseCore
 import Combine
 
 struct NetworkInspectorView: View {
-    // Make sure all tabs are updated live
-    @ObservedObject var viewModel: NetworkInspectorViewModel
+    let viewModel: NetworkInspectorViewModel
     var onClose: (() -> Void)?
 
     @State private var selectedTab: NetworkInspectorTab = .response
-    @State private var isShowingShareSheet = false
     @State private var shareItems: ShareItems?
     @State private var isExpanded = false
-    @Environment(\.colorScheme) private var colorScheme
 
 #if os(iOS)
     @State private var viewController: UIViewController?
@@ -29,24 +26,21 @@ struct NetworkInspectorView: View {
             selectedTabView
         }
         .navigationBarItems(trailing: trailingNavigationBarItems)
-        .navigationBarHidden(isExpanded)
         .navigationBarTitle(Text(viewModel.title), displayMode: .inline)
         .statusBar(hidden: UIDevice.current.userInterfaceIdiom == .phone && isExpanded)
-        .sheet(isPresented: $isShowingShareSheet) {
-            ShareView(activityItems: [viewModel.prepareForSharing()])
-        }
         .sheet(item: $shareItems, content: ShareView.init)
         .background(ViewControllerAccessor(viewController: $viewController))
     }
 
     private var toolbar: some View {
-        Picker("", selection: $selectedTab) {
+        Picker("Inspector Tab", selection: $selectedTab) {
             Text("Response").tag(NetworkInspectorTab.response)
             Text("Request").tag(NetworkInspectorTab.request)
             Text("Summary").tag(NetworkInspectorTab.summary)
             Text("Metrics").tag(NetworkInspectorTab.metrics)
         }
         .pickerStyle(.segmented)
+        .labelsHidden()
         .padding(EdgeInsets(top: 4, leading: 13, bottom: 11, trailing: 13))
         .border(width: 1, edges: [.bottom], color: Color(UXColor.separator).opacity(0.3))
     }
@@ -65,7 +59,7 @@ struct NetworkInspectorView: View {
                 })
             } else {
                 ShareButton {
-                    isShowingShareSheet = true
+                    shareItems = ShareItems([viewModel.prepareForSharing()])
                 }
             }
         }
@@ -76,7 +70,6 @@ struct NetworkInspectorView: View {
             toolbar
             selectedTabView
         }
-        .background(colorScheme == .light ? Color(UXColor.controlBackgroundColor) : Color.clear)
     }
 
     private var toolbar: some View {
@@ -94,19 +87,17 @@ struct NetworkInspectorView: View {
             Divider()
         }
     }
-#elseif os(watchOS)
+#else
     var body: some View {
         NetworkInspectorSummaryView(viewModel: viewModel.summaryViewModel)
+        #if os(watchOS)
             .navigationBarTitle(Text(viewModel.title))
             .toolbar {
                 if let viewModel = viewModel.pin {
                     PinButton(viewModel: viewModel, isTextNeeded: false)
                 }
             }
-    }
-#elseif os(tvOS)
-    var body: some View {
-        NetworkInspectorSummaryView(viewModel: viewModel.summaryViewModel)
+        #endif
     }
 #endif
 

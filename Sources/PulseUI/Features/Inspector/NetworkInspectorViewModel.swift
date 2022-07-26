@@ -9,11 +9,6 @@ import Combine
 
 final class NetworkInspectorViewModel: ObservableObject {
     private(set) var title: String = ""
-    let request: LoggerNetworkRequestEntity
-    private let objectId: NSManagedObjectID
-    let store: LoggerStore // TODO: make it private
-    @Published private var summary: NetworkLoggerSummary
-    private var cancellable: AnyCancellable?
 
     let summaryViewModel: NetworkInspectorSummaryViewModel
     let responseViewModel: NetworkInspectorResponseViewModel
@@ -21,11 +16,13 @@ final class NetworkInspectorViewModel: ObservableObject {
     let requestViewModel: NetworkInspectorRequestViewModel
     let metricsViewModel: NetworkInspectorMetricsTabViewModel
 
+    // TODO: Make private
+    let request: LoggerNetworkRequestEntity
+    let store: LoggerStore
+
     init(request: LoggerNetworkRequestEntity, store: LoggerStore) {
-        self.objectId = request.objectID
         self.request = request
         self.store = store
-        self.summary = NetworkLoggerSummary(request: request, store: store)
 
         if let url = request.url.flatMap(URL.init(string:)) {
             self.title = url.lastPathComponent
@@ -36,16 +33,6 @@ final class NetworkInspectorViewModel: ObservableObject {
         self.requestViewModel = NetworkInspectorRequestViewModel(request: request, store: store)
         self.headersViewModel = NetworkInspectorHeadersTabViewModel(request: request)
         self.metricsViewModel = NetworkInspectorMetricsTabViewModel(request: request)
-
-        self.cancellable = request.objectWillChange.sink { [weak self] in
-            withAnimation {
-                self?.refresh()
-            }
-        }
-    }
-
-    private func refresh() {
-        summary = NetworkLoggerSummary(request: request, store: store)
     }
 
     var pin: PinButtonViewModel? {
@@ -54,11 +41,7 @@ final class NetworkInspectorViewModel: ObservableObject {
         }
     }
 
-    // MARK: Sharing
-
     func prepareForSharing() -> String {
-        ConsoleShareService(store: store).share(summary, output: .plainText)
+        ConsoleShareService(store: store).share(request, output: .plainText)
     }
 }
-
-#warning("TODO: parse request/respones/metrics lazily")
