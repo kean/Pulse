@@ -36,10 +36,9 @@ struct NetworkMessageContextMenu: View {
             } else {
                 shareAsButtons
             }
-            if request.responseBodyKey != nil {
+            if let responseBodyKey = request.responseBodyKey {
                 Button(action: {
-                    let summary = NetworkLoggerSummary(request: request, store: store)
-                    sharedItems = ShareItems([summary.responseBody ?? Data()])
+                    sharedItems = ShareItems([store.getData(forKey: responseBodyKey) ?? Data()])
                 }) {
                     Text("Share Response")
                     Image(systemName: "square.and.arrow.up")
@@ -79,8 +78,7 @@ struct NetworkMessageContextMenu: View {
             Image(systemName: "square.and.arrow.up")
         }
         Button(action: {
-            let summary = NetworkLoggerSummary(request: request, store: store)
-            sharedItems = ShareItems([summary.cURLDescription()])
+            sharedItems = ShareItems([request.cURLDescription(store: store)])
         }) {
             Text("Share as cURL")
             Image(systemName: "square.and.arrow.up")

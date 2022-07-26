@@ -5,9 +5,10 @@
 import PulseCore
 import Foundation
 
-extension NetworkLoggerSummary {
-    func cURLDescription() -> String {
-        guard let request = currentRequest, let url = request.url, let method = request.httpMethod else {
+extension LoggerNetworkRequestEntity {
+    func cURLDescription(store: LoggerStore) -> String {
+        let details = DecodedNetworkRequestDetailsEntity(request: self)
+        guard let request = details.currentRequest, let url = request.url, let method = request.httpMethod else {
             return "$ curl command generation failed"
         }
 
@@ -20,7 +21,7 @@ extension NetworkLoggerSummary {
             components.append("-H \"\(header.key): \(escapedValue)\"")
         }
 
-        if let httpBodyData = requestBody {
+        if let httpBodyData = requestBodyKey.flatMap(store.getData) {
             let httpBody = String(decoding: httpBodyData, as: UTF8.self)
             var escapedBody = httpBody.replacingOccurrences(of: "\\\"", with: "\\\\\"")
             escapedBody = escapedBody.replacingOccurrences(of: "\"", with: "\\\"")

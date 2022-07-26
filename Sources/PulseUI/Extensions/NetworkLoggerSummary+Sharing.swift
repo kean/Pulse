@@ -5,20 +5,20 @@
 import PulseCore
 import Foundation
 
-extension NetworkLoggerSummary {
-    func asPlainText() -> String {
-        render(using: PlainTextRenderer())
+enum Render {
+    static func asPlainText(request: LoggerNetworkRequestEntity, store: LoggerStore) -> String {
+        render(request: request, store: store, using: PlainTextRenderer())
     }
 
-    func asMarkdown() -> String {
-        render(using: MarkdownRenderer())
+    static func asMarkdown(request: LoggerNetworkRequestEntity, store: LoggerStore) -> String {
+        render(request: request, store: store, using: MarkdownRenderer())
     }
 
-    func asHTML() -> String {
-        render(using: HTMLRenderer())
+    static func asHTML(request: LoggerNetworkRequestEntity, store: LoggerStore) -> String {
+        render(request: request, store: store, using: HTMLRenderer())
     }
 
-    private func render(using renderer: Renderer) -> String {
+    private static func render(request: LoggerNetworkRequestEntity, store: LoggerStore, using renderer: Renderer) -> String {
         // Summary
         let viewModel = NetworkInspectorSummaryViewModel(request: request, store: store)
         renderer.add(viewModel.summaryModel, isSecondaryTitle: false)
@@ -30,7 +30,7 @@ extension NetworkLoggerSummary {
             renderer.add(viewModel.originalRequestHeaders)
             renderer.add(viewModel.requestBodySection)
             renderer.add(viewModel.originalRequestParameters)
-            if let body = requestBody, !body.isEmpty {
+            if let body = request.requestBodyKey.flatMap(store.getData), !body.isEmpty {
                 renderer.addSecondaryTitle("Request Body")
                 renderer.add(data: body)
             }
@@ -41,7 +41,7 @@ extension NetworkLoggerSummary {
             renderer.add(responseSummary)
             renderer.add(viewModel.responseHeaders)
             renderer.add(viewModel.responseBodySection)
-            if let body = responseBody, !body.isEmpty {
+            if let body = request.responseBodyKey.flatMap(store.getData), !body.isEmpty {
                 renderer.addSecondaryTitle("Response Body")
                 renderer.add(data: body)
             }
@@ -63,8 +63,6 @@ extension NetworkLoggerSummary {
         return renderer.finalize(title: "Request Log")
     }
 }
-
-// MARK: Renderers
 
 private protocol Renderer {
     func add(title: String)

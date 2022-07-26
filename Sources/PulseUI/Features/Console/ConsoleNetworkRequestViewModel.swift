@@ -144,8 +144,7 @@ final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
     }
 
     func shareAsCURL() -> ShareItems {
-        let summary = NetworkLoggerSummary(request: request, store: store)
-        return ShareItems([summary.cURLDescription()])
+        ShareItems([request.cURLDescription(store: store)])
     }
 
     var containsResponseData: Bool {
@@ -168,6 +167,6 @@ final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
     }
 
     var cURLDescription: String {
-        NetworkLoggerSummary(request: request, store: store).cURLDescription()
+        request.cURLDescription(store: store)
     }
 }

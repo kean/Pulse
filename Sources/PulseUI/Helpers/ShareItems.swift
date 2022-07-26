@@ -106,14 +106,10 @@ struct ConsoleShareService {
     }
 
     func share(_ request: LoggerNetworkRequestEntity, output: NetworkMessageRenderType) -> String {
-        share(NetworkLoggerSummary(request: request, store: store), output: output)
-    }
-
-    func share(_ info: NetworkLoggerSummary, output: NetworkMessageRenderType) -> String {
         switch output {
-        case .plainText: return info.asPlainText()
-        case .markdown: return info.asMarkdown()
-        case .html: return info.asHTML()
+        case .plainText: return Render.asPlainText(request: request, store: store)
+        case .markdown: return Render.asMarkdown(request: request, store: store)
+        case .html: return Render.asHTML(request: request, store: store)
         }
     }
 }
