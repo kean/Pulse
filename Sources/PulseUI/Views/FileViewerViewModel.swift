@@ -7,7 +7,6 @@ import CoreData
 import PulseCore
 import Combine
 
-#warning("TODO: optimize, why data lazy?")
 final class FileViewerViewModel {
     let title: String
     private let getData: () -> Data

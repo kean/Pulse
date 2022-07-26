@@ -32,7 +32,6 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     }
 
     private func refresh() {
-        #warning("ARE WERE SURE DETAILS ARE RELOADED CORRECLY HERE?")
         details = DecodedNetworkRequestDetailsEntity(request: request)
         withAnimation {
             objectWillChange.send()
