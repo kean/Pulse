@@ -113,8 +113,6 @@ struct NetworkInspectorSummaryView: View {
         viewModel.timingDetailsModel.map(KeyValueSectionView.init)
     }
 #elseif os(tvOS)
-    var metrics: NetworkInspectorMetricsViewModel?
-
     @ViewBuilder
     private var contents: some View {
         headerView
@@ -138,7 +136,7 @@ struct NetworkInspectorSummaryView: View {
         if viewModel.responseSummary != nil {
             makeKeyValueSection(viewModel: viewModel.responseHeaders)
         }
-        if let timing = viewModel.timingDetailsModel, let metrics = metrics {
+        if let timing = viewModel.timingDetailsModel, let metrics = viewModel.makeMetricsViewModel() {
             NavigationLink(destination: NetworkInspectorMetricsView(viewModel: metrics).focusable(true)) {
                 KeyValueSectionView(viewModel: timing)
             }

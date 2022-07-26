@@ -106,7 +106,7 @@ struct NetworkInspectorView: View {
     }
 #elseif os(tvOS)
     var body: some View {
-        NetworkInspectorSummaryView(viewModel: viewModel.summaryViewModel, metrics: viewModel.makeMetricsModel())
+        NetworkInspectorSummaryView(viewModel: viewModel.summaryViewModel)
     }
 #endif
 

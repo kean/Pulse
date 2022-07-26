@@ -256,6 +256,12 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     private var responseData: Data? {
         request.responseBodyKey.flatMap(store.getData)
     }
+
+#if os(tvOS)
+    func makeMetricsViewModel() -> NetworkInspectorMetricsViewModel? {
+        details.metrics.map(NetworkInspectorMetricsViewModel.init)
+    }
+#endif
 }
 
 // MARK: - Private

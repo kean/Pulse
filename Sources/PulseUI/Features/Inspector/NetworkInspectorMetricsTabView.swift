@@ -6,6 +6,8 @@ import SwiftUI
 import PulseCore
 import Combine
 
+#if os(iOS) || os(macOS) || os(tvOS)
+
 struct NetworkInspectorMetricsTabView: View {
     @ObservedObject var viewModel: NetworkInspectorMetricsTabViewModel
 
@@ -47,3 +49,5 @@ final class NetworkInspectorMetricsTabViewModel: ObservableObject {
         }
     }
 }
+
+#endif
