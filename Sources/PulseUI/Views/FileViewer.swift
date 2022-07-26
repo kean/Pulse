@@ -6,37 +6,42 @@ import SwiftUI
 import PulseCore
 
 struct FileViewer: View {
-    let viewModel: FileViewerViewModel
+    @ObservedObject var viewModel: FileViewerViewModel
     var onToggleExpanded: (() -> Void)?
 
 #if os(iOS) || os(macOS)
     var body: some View {
         contents
+            .onAppear { viewModel.render() }
     }
 #elseif os(watchOS)
     var body: some View {
         ScrollView {
             contents
-        }
+        }.onAppear { viewModel.render() }
     }
 #elseif os(tvOS)
     var body: some View {
         HStack {
             contents
             Spacer()
-        }
+        }.onAppear { viewModel.render() }
     }
 #endif
 
     @ViewBuilder
     private var contents: some View {
-        switch viewModel.contents {
-        case .json(let viewModel):
-            RichTextView(viewModel: viewModel, onToggleExpanded: onToggleExpanded)
-        case .image(let image):
-            makeImageView(with: image)
-        case .other(let viewModel):
-            RichTextView(viewModel: viewModel, onToggleExpanded: onToggleExpanded)
+        if let contents = viewModel.contents {
+            switch contents {
+            case .json(let viewModel):
+                RichTextView(viewModel: viewModel, onToggleExpanded: onToggleExpanded)
+            case .image(let image):
+                makeImageView(with: image)
+            case .other(let viewModel):
+                RichTextView(viewModel: viewModel, onToggleExpanded: onToggleExpanded)
+            }
+        } else {
+            SpinnerView(viewModel: .init(title: "Rendering...", details: nil))
         }
     }
 
