@@ -12,9 +12,11 @@ final class NetworkInspectorViewModel: ObservableObject {
 
     let summaryViewModel: NetworkInspectorSummaryViewModel
     let responseViewModel: NetworkInspectorResponseViewModel
-    let headersViewModel: NetworkInspectorHeadersTabViewModel
     let requestViewModel: NetworkInspectorRequestViewModel
+#if !os(watchOS)
+    let headersViewModel: NetworkInspectorHeadersTabViewModel
     let metricsViewModel: NetworkInspectorMetricsTabViewModel
+#endif
 
     // TODO: Make private
     let request: LoggerNetworkRequestEntity
@@ -31,8 +33,10 @@ final class NetworkInspectorViewModel: ObservableObject {
         self.summaryViewModel = NetworkInspectorSummaryViewModel(request: request, store: store)
         self.responseViewModel = NetworkInspectorResponseViewModel(request: request, store: store)
         self.requestViewModel = NetworkInspectorRequestViewModel(request: request, store: store)
+#if !os(watchOS)
         self.headersViewModel = NetworkInspectorHeadersTabViewModel(request: request)
         self.metricsViewModel = NetworkInspectorMetricsTabViewModel(request: request)
+#endif
     }
 
     var pin: PinButtonViewModel? {

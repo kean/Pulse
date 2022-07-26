@@ -8,7 +8,11 @@ import PulseCore
 import Combine
 
 struct NetworkInspectorView: View {
+#if os(watchOS)
+    @StateObject var viewModel: NetworkInspectorViewModel
+#else
     let viewModel: NetworkInspectorViewModel
+#endif
     var onClose: (() -> Void)?
 
     @State private var selectedTab: NetworkInspectorTab = .response
