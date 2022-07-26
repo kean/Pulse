@@ -3,12 +3,10 @@
 // Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
-import CoreData
 import PulseCore
-import Combine
 
-struct NetworkInspectorResponseView: View {
-    let viewModel: NetworkInspectorResponseViewModel
+struct FileViewer: View {
+    let viewModel: FileViewerViewModel
     var onToggleExpanded: (() -> Void)?
 
 #if os(iOS) || os(macOS)
@@ -73,26 +71,26 @@ struct NetworkInspectorResponseView_Previews: PreviewProvider {
         Group {
 #if os(iOS)
             NavigationView {
-                NetworkInspectorResponseView(viewModel: mockModel)
+                FileViewer(viewModel: mockModel)
                     .navigationBarTitle("Response")
             }
             .previewDisplayName("Light")
             .environment(\.colorScheme, .light)
 #else
-            NetworkInspectorResponseView(viewModel: mockModel)
+            FileViewer(viewModel: mockModel)
                 .previewDisplayName("Light")
                 .environment(\.colorScheme, .light)
 #endif
 
-            NetworkInspectorResponseView(viewModel: .init(title: "Response", data: { mockImage }))
+            FileViewer(viewModel: .init(title: "Response", data: { mockImage }))
                 .previewDisplayName("Image")
                 .environment(\.colorScheme, .light)
 
-            NetworkInspectorResponseView(viewModel: .init(title: "Response", data: { mockHTML }))
+            FileViewer(viewModel: .init(title: "Response", data: { mockHTML }))
                 .previewDisplayName("HTML")
                 .environment(\.colorScheme, .light)
 
-            NetworkInspectorResponseView(viewModel: mockModel)
+            FileViewer(viewModel: mockModel)
                 .previewDisplayName("Dark")
                 .previewLayout(.sizeThatFits)
                 .environment(\.colorScheme, .dark)
@@ -101,7 +99,7 @@ struct NetworkInspectorResponseView_Previews: PreviewProvider {
     }
 }
 
-private let mockModel = NetworkInspectorResponseViewModel(title: "Response", data: { MockJSON.allPossibleValues })
+private let mockModel = FileViewerViewModel(title: "Response", data: { MockJSON.allPossibleValues })
 
 private let mockHTML = """
 <!DOCTYPE html>
@@ -115,39 +113,3 @@ private let mockHTML = """
 </html>
 """.data(using: .utf8)!
 #endif
-
-// MARK: - ViewModel
-
-final class NetworkInspectorResponseViewModel {
-    let title: String
-    private let getData: () -> Data
-
-    lazy var contents: Contents = {
-        let data = getData()
-        if let json = try? JSONSerialization.jsonObject(with: data, options: []) {
-            return .json(RichTextViewModel(json: json))
-        } else if let image = UXImage(data: data) {
-            return .image(image)
-        } else {
-            let string = String(data: data, encoding: .utf8) ?? "Data \(ByteCountFormatter.string(fromByteCount: Int64(data.count), countStyle: .file))"
-            return .other(RichTextViewModel(string: string))
-        }
-    }()
-
-    init(title: String, data: @escaping () -> Data) {
-        self.title = title
-        self.getData = data
-    }
-
-    enum Contents {
-        case json(RichTextViewModel)
-        case image(UXImage)
-        case other(RichTextViewModel)
-    }
-}
-
-private extension Data {
-    var localizedSize: String {
-        ByteCountFormatter.string(fromByteCount: Int64(count), countStyle: .file)
-    }
-}

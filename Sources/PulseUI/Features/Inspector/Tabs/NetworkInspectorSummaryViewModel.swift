@@ -32,6 +32,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     }
 
     private func refresh() {
+        #warning("ARE WERE SURE DETAILS ARE RELOADED CORRECLY HERE?")
         details = DecodedNetworkRequestDetailsEntity(request: request)
         withAnimation {
             objectWillChange.send()
@@ -234,8 +235,8 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
 
     // MARK: - Destinations
 
-    var requestBodyViewModel: NetworkInspectorResponseViewModel {
-        NetworkInspectorResponseViewModel(
+    var requestBodyViewModel: FileViewerViewModel {
+        FileViewerViewModel(
             title: "Request",
             data: { [weak self] in self?.requestData ?? Data() }
         )
@@ -245,8 +246,8 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
         request.requestBodyKey.flatMap(store.getData)
     }
 
-    var responseBodyViewModel: NetworkInspectorResponseViewModel {
-        NetworkInspectorResponseViewModel(
+    var responseBodyViewModel: FileViewerViewModel {
+        FileViewerViewModel(
             title: "Response",
             data: { [weak self] in self?.responseData ?? Data() }
         )

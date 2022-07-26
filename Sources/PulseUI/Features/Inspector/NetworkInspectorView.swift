@@ -115,23 +115,7 @@ struct NetworkInspectorView: View {
     private var selectedTabView: some View {
         switch selectedTab {
         case .response:
-            if let viewModel = viewModel.makeResponseBodyViewModel() {
-                makeResponseView(viewModel: viewModel)
-            } else if !viewModel.isCompleted {
-                SpinnerView(viewModel: viewModel.progress)
-            } else if viewModel.hasResponseBody {
-                PlaceholderView(imageName: "exclamationmark.circle", title: "Unavailable")
-            } else if viewModel.request.taskType == .downloadTask {
-                PlaceholderView(imageName: "arrow.down.circle", title: {
-                    var title = "Downloaded to a File"
-                    if viewModel.request.responseBodySize > 0 {
-                        title = "\(ByteCountFormatter.string(fromByteCount: viewModel.request.responseBodySize, countStyle: .file))\n\(title)"
-                    }
-                    return title
-                }())
-            } else {
-                PlaceholderView(imageName: "nosign", title: "Empty Response")
-            }
+            NetworkInspectorResponseView(viewModel: viewModel.responseViewModel, onToggleExpanded: onToggleExpanded)
         case .request:
             if let viewModel = viewModel.makeRequestBodyViewModel() {
                 makeResponseView(viewModel: viewModel)
@@ -151,7 +135,7 @@ struct NetworkInspectorView: View {
                 PlaceholderView(imageName: "nosign", title: "Empty Request")
             }
         case .summary:
-            NetworkInspectorSummaryView(viewModel: viewModel.makeSummaryModel())
+            NetworkInspectorSummaryView(viewModel: viewModel.summaryViewModel)
         case .headers:
             NetworkInspectorHeadersView(viewModel: viewModel.makeHeadersModel())
         case .metrics:
@@ -165,16 +149,24 @@ struct NetworkInspectorView: View {
         }
     }
 
-    @ViewBuilder
-    private func makeResponseView(viewModel: NetworkInspectorResponseViewModel) -> some View {
+    func onToggleExpanded() {
 #if os(iOS)
-        NetworkInspectorResponseView(viewModel: viewModel) {
+        isExpanded.toggle()
+        viewController?.navigationController?.setNavigationBarHidden(isExpanded, animated: false)
+        viewController?.tabBarController?.setTabBarHidden(isExpanded, animated: false)
+#endif
+    }
+
+    @ViewBuilder
+    private func makeResponseView(viewModel: FileViewerViewModel) -> some View {
+#if os(iOS)
+        FileViewer(viewModel: viewModel) {
             isExpanded.toggle()
             viewController?.navigationController?.setNavigationBarHidden(isExpanded, animated: false)
             viewController?.tabBarController?.setTabBarHidden(isExpanded, animated: false)
         }
 #else
-        NetworkInspectorResponseView(viewModel: viewModel)
+        FileViewer(viewModel: viewModel)
 #endif
     }
 #endif

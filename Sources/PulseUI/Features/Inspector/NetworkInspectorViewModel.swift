@@ -16,16 +16,24 @@ final class NetworkInspectorViewModel: ObservableObject {
     private var cancellable: AnyCancellable?
     let progress: ProgressViewModel
 
+    let summaryViewModel: NetworkInspectorSummaryViewModel
+    let responseViewModel: NetworkInspectorResponseViewModel
+
     init(request: LoggerNetworkRequestEntity, store: LoggerStore) {
         self.objectId = request.objectID
         self.request = request
         self.store = store
         self.summary = NetworkLoggerSummary(request: request, store: store)
+
+        #warning("REMIVE")
         self.progress = ProgressViewModel(request: request)
 
         if let url = request.url.flatMap(URL.init(string:)) {
             self.title = url.lastPathComponent
         }
+
+        self.summaryViewModel = NetworkInspectorSummaryViewModel(request: request, store: store)
+        self.responseViewModel = NetworkInspectorResponseViewModel(request: request, store: store)
 
         self.cancellable = request.objectWillChange.sink { [weak self] in
             withAnimation {
@@ -36,7 +44,6 @@ final class NetworkInspectorViewModel: ObservableObject {
 
     private func refresh() {
         _requestViewModel = nil
-        _responseViewModel = nil
         summary = NetworkLoggerSummary(request: request, store: store)
     }
 
@@ -46,6 +53,7 @@ final class NetworkInspectorViewModel: ObservableObject {
         }
     }
 
+    #warning("TEMO")
     var isCompleted: Bool {
         request.state == .failure || request.state == .success
     }
@@ -63,33 +71,16 @@ final class NetworkInspectorViewModel: ObservableObject {
     #warning("TODO: the body should be ready lazily AND text view to load lazily too")
 
     // important:
-    private var _requestViewModel: NetworkInspectorResponseViewModel?
+    private var _requestViewModel: FileViewerViewModel?
 
-    func makeRequestBodyViewModel() -> NetworkInspectorResponseViewModel? {
+    func makeRequestBodyViewModel() -> FileViewerViewModel? {
         if let viewModel = _requestViewModel {
             return viewModel
         }
         guard let requestBody = summary.requestBody, !requestBody.isEmpty else { return nil }
-        let viewModel = NetworkInspectorResponseViewModel(title: "Request", data: { requestBody })
+        let viewModel = FileViewerViewModel(title: "Request", data: { requestBody })
         _requestViewModel = viewModel
         return viewModel
-    }
-
-    // imporant:
-    private var _responseViewModel: NetworkInspectorResponseViewModel?
-
-    func makeResponseBodyViewModel() -> NetworkInspectorResponseViewModel? {
-        if let viewModel = _responseViewModel {
-            return viewModel
-        }
-        guard let responseBody = summary.responseBody, !responseBody.isEmpty else { return nil }
-        let viewModel = NetworkInspectorResponseViewModel(title: "Response", data: { responseBody })
-        _responseViewModel = viewModel
-        return viewModel
-    }
-
-    func makeSummaryModel() -> NetworkInspectorSummaryViewModel {
-        NetworkInspectorSummaryViewModel(request: request, store: store)
     }
 
     func makeHeadersModel() -> NetworkInspectorHeaderViewModel {

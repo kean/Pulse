@@ -126,11 +126,11 @@ struct NetworkInspectorSummaryView: View {
         if let error = viewModel.errorModel {
             makeKeyValueSection(viewModel: error)
         }
-        NavigationLink(destination: NetworkInspectorResponseView(viewModel: viewModel.requestBodyViewModel).focusable(true)) {
+        NavigationLink(destination: FileViewer(viewModel: viewModel.requestBodyViewModel).focusable(true)) {
             KeyValueSectionView(viewModel: viewModel.requestBodySection)
         }
         if viewModel.responseSummary != nil {
-            NavigationLink(destination: NetworkInspectorResponseView(viewModel: viewModel.responseBodyViewModel).focusable(true)) {
+            NavigationLink(destination: FileViewer(viewModel: viewModel.responseBodyViewModel).focusable(true)) {
                 KeyValueSectionView(viewModel: viewModel.responseBodySection)
             }
         }
@@ -192,7 +192,7 @@ struct NetworkInspectorSummaryView: View {
             }
             
             NavigationLink.programmatic(isActive: $viewModel.isRequestRawLinkActive, destination: {
-                NetworkInspectorResponseView(viewModel: viewModel.requestBodyViewModel)
+                FileViewer(viewModel: viewModel.requestBodyViewModel)
                     .backport.navigationTitle("Request")
             })
             
@@ -201,7 +201,7 @@ struct NetworkInspectorSummaryView: View {
             }
             
             NavigationLink.programmatic(isActive: $viewModel.isResponseRawLinkActive, destination: {
-                NetworkInspectorResponseView(viewModel: viewModel.responseBodyViewModel)
+                FileViewer(viewModel: viewModel.responseBodyViewModel)
                     .backport.navigationTitle("Response")
             })
             
