@@ -75,6 +75,7 @@ final class NetworkInspectorViewModel: ObservableObject {
         NetworkInspectorHeaderViewModel(summary: summary)
     }
 
+
     // MARK: Sharing
 
     func prepareForSharing() -> String {

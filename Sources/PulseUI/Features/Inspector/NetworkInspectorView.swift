@@ -82,7 +82,7 @@ struct NetworkInspectorView: View {
     private var toolbar: some View {
         VStack(spacing: 0) {
             HStack {
-                NetworkTabView(selectedTab: $selectedTab)
+                NetworkTabPickerView(selectedTab: $selectedTab)
                 Spacer()
                 if let onClose = onClose {
                     Button(action: onClose) {
@@ -134,19 +134,6 @@ struct NetworkInspectorView: View {
         viewController?.tabBarController?.setTabBarHidden(isExpanded, animated: false)
 #endif
     }
-
-    @ViewBuilder
-    private func makeResponseView(viewModel: FileViewerViewModel) -> some View {
-#if os(iOS)
-        FileViewer(viewModel: viewModel) {
-            isExpanded.toggle()
-            viewController?.navigationController?.setNavigationBarHidden(isExpanded, animated: false)
-            viewController?.tabBarController?.setTabBarHidden(isExpanded, animated: false)
-        }
-#else
-        FileViewer(viewModel: viewModel)
-#endif
-    }
 #endif
 }
 
@@ -171,7 +158,7 @@ private enum NetworkInspectorTab: Identifiable {
 }
 
 #if os(macOS)
-private struct NetworkTabView: View {
+private struct NetworkTabPickerView: View {
     @Binding var selectedTab: NetworkInspectorTab
 
     var body: some View {
@@ -194,9 +181,7 @@ private struct NetworkTabView: View {
     }
 
     private func makeItem(_ title: String, tab: NetworkInspectorTab) -> some View {
-        Button(action: {
-            selectedTab = tab
-        }) {
+        Button(action: { selectedTab = tab }) {
             Text(title)
                 .font(.system(size: 11, weight: .medium, design: .default))
                 .foregroundColor(tab == selectedTab ? .accentColor : .primary)

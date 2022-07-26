@@ -33,7 +33,20 @@ struct NetworkInspectorResponseView: View {
 
 final class NetworkInspectorResponseViewModel: ObservableObject {
     private(set) lazy var progress = ProgressViewModel(request: request)
-    private(set) var fileViewModel: FileViewerViewModel?
+
+    var fileViewModel: FileViewerViewModel? {
+        if let viewModel = _fileViewModel {
+            return viewModel
+        }
+        if let responseBodyKey = request.responseBodyKey,
+           let responseBody = store.getData(forKey: responseBodyKey),
+           !responseBody.isEmpty {
+            _fileViewModel = FileViewerViewModel(title: "Response", data: { responseBody })
+        }
+        return _fileViewModel
+    }
+
+    private var _fileViewModel: FileViewerViewModel?
 
     let request: LoggerNetworkRequestEntity
     private var details: DecodedNetworkRequestDetailsEntity
@@ -49,11 +62,6 @@ final class NetworkInspectorResponseViewModel: ObservableObject {
     }
 
     private func refresh() {
-        if let responesBodyKey = request.responseBodyKey,
-           let responseBody = store.getData(forKey: responesBodyKey),
-           !responseBody.isEmpty {
-            fileViewModel = FileViewerViewModel(title: "Response", data: { responseBody })
-        }
         withAnimation {
             objectWillChange.send()
         }
