@@ -398,8 +398,14 @@ extension LoggerStore {
         details.metrics = try? encoder.encode(event.metrics)
         details.lastTransactionDetails = try? encoder.encode(event.metrics?.transactions.last?.details)
 
+        // Completed
+        if let progress = request.progress {
+            backgroundContext.delete(progress)
+            request.progress = nil
+        }
+
         // Update associated message state
-        if  let message = request.message { // Should always be non-nill
+        if let message = request.message { // Should always be non-nill
             message.requestState = request.requestState
             message.text = "\(event.originalRequest.httpMethod ?? "GET") \(event.originalRequest.url?.absoluteString ?? "–")"
             if isFailure {
