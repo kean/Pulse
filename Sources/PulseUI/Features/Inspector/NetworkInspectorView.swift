@@ -123,13 +123,7 @@ struct NetworkInspectorView: View {
         case .headers:
             NetworkInspectorHeadersView(viewModel: viewModel.makeHeadersModel())
         case .metrics:
-            if let viewModel = viewModel.makeMetricsModel() {
-                NetworkInspectorMetricsView(viewModel: viewModel)
-            } else if !viewModel.isCompleted {
-                SpinnerView(viewModel: viewModel.progress)
-            } else {
-                PlaceholderView(imageName: "exclamationmark.circle", title: "Unavailable")
-            }
+            NetworkInspectorMetricsTabView(viewModel: viewModel.metricsViewModel)
         }
     }
 

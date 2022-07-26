@@ -19,6 +19,7 @@ final class NetworkInspectorViewModel: ObservableObject {
     let summaryViewModel: NetworkInspectorSummaryViewModel
     let responseViewModel: NetworkInspectorResponseViewModel
     let requestViewModel: NetworkInspectorRequestViewModel
+    let metricsViewModel: NetworkInspectorMetricsTabViewModel
 
     init(request: LoggerNetworkRequestEntity, store: LoggerStore) {
         self.objectId = request.objectID
@@ -36,6 +37,7 @@ final class NetworkInspectorViewModel: ObservableObject {
         self.summaryViewModel = NetworkInspectorSummaryViewModel(request: request, store: store)
         self.responseViewModel = NetworkInspectorResponseViewModel(request: request, store: store)
         self.requestViewModel = NetworkInspectorRequestViewModel(request: request, store: store)
+        self.metricsViewModel = NetworkInspectorMetricsTabViewModel(request: request)
 
         self.cancellable = request.objectWillChange.sink { [weak self] in
             withAnimation {
@@ -72,12 +74,6 @@ final class NetworkInspectorViewModel: ObservableObject {
     func makeHeadersModel() -> NetworkInspectorHeaderViewModel {
         NetworkInspectorHeaderViewModel(summary: summary)
     }
-
-#if !os(watchOS)
-    func makeMetricsModel() -> NetworkInspectorMetricsViewModel? {
-        summary.metrics.map(NetworkInspectorMetricsViewModel.init)
-    }
-#endif
 
     // MARK: Sharing
 
