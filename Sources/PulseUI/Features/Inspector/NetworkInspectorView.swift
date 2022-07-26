@@ -121,7 +121,7 @@ struct NetworkInspectorView: View {
         case .summary:
             NetworkInspectorSummaryView(viewModel: viewModel.summaryViewModel)
         case .headers:
-            NetworkInspectorHeadersView(viewModel: viewModel.makeHeadersModel())
+            NetworkInspectorHeadersTabView(viewModel: viewModel.headersViewModel)
         case .metrics:
             NetworkInspectorMetricsTabView(viewModel: viewModel.metricsViewModel)
         }

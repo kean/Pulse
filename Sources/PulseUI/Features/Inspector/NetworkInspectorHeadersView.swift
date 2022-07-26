@@ -88,10 +88,10 @@ struct NetworkHeadersDetailsView: View {
 // MARK: - ViewModel
 
 final class NetworkInspectorHeaderViewModel: ObservableObject {
-    let summary: NetworkLoggerSummary
+    private let details: DecodedNetworkRequestDetailsEntity
 
-    init(summary: NetworkLoggerSummary) {
-        self.summary = summary
+    init(details: DecodedNetworkRequestDetailsEntity) {
+        self.details = details
     }
 
     @Published var isRequestOriginalRawActive = false
@@ -99,7 +99,7 @@ final class NetworkInspectorHeaderViewModel: ObservableObject {
     @Published var isResponseRawActive = false
 
     var requestHeadersOriginal: KeyValueSectionViewModel {
-        let items = (summary.originalRequest?.headers ?? [:]).sorted(by: { $0.key < $1.key })
+        let items = (details.originalRequest?.headers ?? [:]).sorted(by: { $0.key < $1.key })
         return KeyValueSectionViewModel(
             title: "Request Headers (Original)",
             color: .blue,
@@ -112,7 +112,7 @@ final class NetworkInspectorHeaderViewModel: ObservableObject {
     }
 
     var requestHeadersCurrent: KeyValueSectionViewModel {
-        let items = (summary.currentRequest?.headers ?? [:]).sorted(by: { $0.key < $1.key })
+        let items = (details.currentRequest?.headers ?? [:]).sorted(by: { $0.key < $1.key })
         return KeyValueSectionViewModel(
             title: "Request Headers (Current)",
             color: .blue,
@@ -125,7 +125,7 @@ final class NetworkInspectorHeaderViewModel: ObservableObject {
     }
 
     var responseHeaders: KeyValueSectionViewModel? {
-        guard let headers = summary.response?.headers else {
+        guard let headers = details.response?.headers else {
             return nil
         }
         return KeyValueSectionViewModel(
