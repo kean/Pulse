@@ -21,9 +21,11 @@ struct ConsoleMessagesForEach: View {
         if let request = message.request {
             NetworkRequestRow(store: store, request: request)
         } else {
-            NavigationLink(destination: LazyConsoleMessageDetailsView(message: message, store: store)) {
+            NavigationLink.lazy(destination: {
+                ConsoleMessageDetailsView(viewModel: .init(store: store, message: message))
+            }, label: {
                 ConsoleMessagesForEachRow(store: store, message: message)
-            }
+            })
             .backport.swipeActions(edge: .leading) {
                 if #available(tvOS 15.0,  watchOS 8.0, macOS 12.0, *) {
                     PinButton2(viewModel: .init(store: store, message: message))
@@ -39,9 +41,11 @@ private struct NetworkRequestRow: View {
     let request: LoggerNetworkRequestEntity
 
     var body: some View {
-        NavigationLink(destination: LazyConsoleNetworkRequestDetailsView(request: request, store: store)) {
+        NavigationLink.lazy(destination: {
+            NetworkInspectorView(viewModel: .init(request: request, store: store))
+        }, label: {
             ConsoleNetworkRequestForEachRow(store: store, request: request)
-        }
+        })
         .backport.swipeActions(edge: .leading) {
             if #available(tvOS 15.0, watchOS 8.0, macOS 12.0, *), let message = request.message {
                 PinButton2(viewModel: .init(store: store, message: message))
@@ -81,24 +85,6 @@ private struct ConsoleMessagesForEachRow: View {
 
     var body: some View {
         ConsoleMessageView(viewModel: .init(message: message, store: store))
-    }
-}
-
-private struct LazyConsoleMessageDetailsView: View {
-    let message: LoggerMessageEntity
-    let store: LoggerStore
-
-    var body: some View {
-        ConsoleMessageDetailsView(viewModel: .init(store: store, message: message))
-    }
-}
-
-private struct LazyConsoleNetworkRequestDetailsView: View {
-    let request: LoggerNetworkRequestEntity
-    let store: LoggerStore
-
-    var body: some View {
-        NetworkInspectorView(viewModel: .init(request: request, store: store))
     }
 }
 

@@ -361,7 +361,7 @@ extension NetworkFiltersView {
 
     #if os(iOS)
     private var domainsShowAllButton: some View {
-        NavigationLink(destination: { domainsPickerView}) {
+        NavigationLink(destination: { domainsPickerView }) {
             Text("Show All")
         }
     }

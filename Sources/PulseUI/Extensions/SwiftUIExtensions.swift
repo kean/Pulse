@@ -23,10 +23,14 @@ extension Color {
 #endif
 
 extension NavigationLink where Label == EmptyView {
-    static func programmatic(isActive: Binding<Bool>, destination: @escaping () -> Destination) -> NavigationLink {
-        NavigationLink(isActive: isActive, destination: destination) {
-            EmptyView()
-        }
+    static func programmatic(isActive: Binding<Bool>, destination: @escaping () -> Destination) -> NavigationLink<Label, LazyView<Destination>> {
+        NavigationLink<Label, LazyView<Destination>>(isActive: isActive, destination: { LazyView(destination) }, label: { EmptyView() })
+    }
+}
+
+extension NavigationLink {
+    static func lazy(destination: @escaping () -> Destination, @ViewBuilder label: () -> Label) -> NavigationLink<Label, LazyView<Destination>> {
+        NavigationLink<Label, LazyView<Destination>>(destination: { LazyView(destination) }, label: label)
     }
 }
 
@@ -37,6 +41,18 @@ struct InvisibleNavigationLinks<Content: View>: View {
         VStack { content }
             .frame(width: 0, height: 0)
             .invisible()
+    }
+}
+
+struct LazyView<Content: View>: View {
+    let build: () -> Content
+
+    init(_ build: @escaping () -> Content) {
+        self.build = build
+    }
+
+    var body: Content {
+        build()
     }
 }
 
