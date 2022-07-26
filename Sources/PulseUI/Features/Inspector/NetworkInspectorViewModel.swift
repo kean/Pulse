@@ -14,7 +14,6 @@ final class NetworkInspectorViewModel: ObservableObject {
     let store: LoggerStore // TODO: make it private
     @Published private var summary: NetworkLoggerSummary
     private var cancellable: AnyCancellable?
-    let progress: ProgressViewModel
 
     let summaryViewModel: NetworkInspectorSummaryViewModel
     let responseViewModel: NetworkInspectorResponseViewModel
@@ -26,9 +25,6 @@ final class NetworkInspectorViewModel: ObservableObject {
         self.request = request
         self.store = store
         self.summary = NetworkLoggerSummary(request: request, store: store)
-
-        #warning("REMIVE")
-        self.progress = ProgressViewModel(request: request)
 
         if let url = request.url.flatMap(URL.init(string:)) {
             self.title = url.lastPathComponent
@@ -56,25 +52,12 @@ final class NetworkInspectorViewModel: ObservableObject {
         }
     }
 
-    #warning("TEMO")
-    var isCompleted: Bool {
-        request.state == .failure || request.state == .success
-    }
-
-    var hasRequestBody: Bool {
-        request.requestBodyKey != nil
-    }
-
-    var hasResponseBody: Bool {
-        request.requestBodyKey != nil
-    }
-
     // MARK: - Tabs
 
+    #warning("REWRITE")
     func makeHeadersModel() -> NetworkInspectorHeaderViewModel {
         NetworkInspectorHeaderViewModel(summary: summary)
     }
-
 
     // MARK: Sharing
 
