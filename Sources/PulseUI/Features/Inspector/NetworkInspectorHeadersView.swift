@@ -10,16 +10,15 @@ struct NetworkInspectorHeadersView: View {
     @ObservedObject var viewModel: NetworkInspectorHeaderViewModel
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 16) {
-                KeyValueSectionView(viewModel: viewModel.requestHeadersOriginal)
-                KeyValueSectionView(viewModel: viewModel.requestHeadersCurrent)
-                if let responseHeaders = viewModel.responseHeaders {
-                    KeyValueSectionView(viewModel: responseHeaders)
-                }
-                Spacer()
-            }.padding()
-        }.background(links)
+        VStack(spacing: 16) {
+            KeyValueSectionView(viewModel: viewModel.requestHeadersOriginal)
+            KeyValueSectionView(viewModel: viewModel.requestHeadersCurrent)
+            if let responseHeaders = viewModel.responseHeaders {
+                KeyValueSectionView(viewModel: responseHeaders)
+            }
+        }
+        .padding()
+        .background(links)
     }
 
     private var links: some View {

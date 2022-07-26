@@ -12,12 +12,15 @@ struct NetworkInspectorHeadersTabView: View {
     @ObservedObject var viewModel: NetworkInspectorHeadersTabViewModel
 
     var body: some View {
-        if let viewModel = viewModel.headersViewModel {
-            NetworkInspectorHeadersView(viewModel: viewModel)
-        } else if viewModel.isPending {
-            SpinnerView(viewModel: viewModel.progress)
-        } else {
-            PlaceholderView(imageName: "exclamationmark.circle", title: "Unavailable")
+        ScrollView {
+            VStack(spacing: 0) {
+                NetworkInspectorHeadersView(viewModel: viewModel.headersViewModel)
+                if viewModel.isPending {
+                    SpinnerView(viewModel: viewModel.progress)
+                        .frame(height: 120)
+                }
+                Spacer()
+            }
         }
     }
 }
@@ -26,14 +29,12 @@ final class NetworkInspectorHeadersTabViewModel: ObservableObject {
     var isPending: Bool { request.state == .pending }
     private(set) lazy var progress = ProgressViewModel(request: request)
 
-    var headersViewModel: NetworkInspectorHeaderViewModel? {
-        details.map(NetworkInspectorHeaderViewModel.init)
+    var headersViewModel: NetworkInspectorHeaderViewModel {
+        NetworkInspectorHeaderViewModel(details: details)
     }
 
-    private var _metricsViewModel: NetworkInspectorMetricsViewModel?
-
     private let request: LoggerNetworkRequestEntity
-    private var details: DecodedNetworkRequestDetailsEntity?
+    private var details: DecodedNetworkRequestDetailsEntity
     private var cancellable: AnyCancellable?
 
     init(request: LoggerNetworkRequestEntity) {

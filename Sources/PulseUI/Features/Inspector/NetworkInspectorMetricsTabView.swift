@@ -30,8 +30,6 @@ final class NetworkInspectorMetricsTabViewModel: ObservableObject {
         details.metrics.map(NetworkInspectorMetricsViewModel.init)
     }
 
-    private var _metricsViewModel: NetworkInspectorMetricsViewModel?
-
     private let request: LoggerNetworkRequestEntity
     private var details: DecodedNetworkRequestDetailsEntity
     private var cancellable: AnyCancellable?
