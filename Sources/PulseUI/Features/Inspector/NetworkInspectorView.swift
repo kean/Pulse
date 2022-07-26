@@ -96,7 +96,7 @@ struct NetworkInspectorView: View {
     }
 #elseif os(watchOS)
     var body: some View {
-        NetworkInspectorSummaryView(viewModel: viewModel.makeSummaryModel())
+        NetworkInspectorSummaryView(viewModel: viewModel.summaryViewModel)
             .navigationBarTitle(Text(viewModel.title))
             .toolbar {
                 if let viewModel = viewModel.pin {
@@ -106,7 +106,7 @@ struct NetworkInspectorView: View {
     }
 #elseif os(tvOS)
     var body: some View {
-        NetworkInspectorSummaryView(viewModel: viewModel.makeSummaryModel(), metrics: viewModel.makeMetricsModel())
+        NetworkInspectorSummaryView(viewModel: viewModel.summaryViewModel, metrics: viewModel.makeMetricsModel())
     }
 #endif
 
@@ -117,23 +117,7 @@ struct NetworkInspectorView: View {
         case .response:
             NetworkInspectorResponseView(viewModel: viewModel.responseViewModel, onToggleExpanded: onToggleExpanded)
         case .request:
-            if let viewModel = viewModel.makeRequestBodyViewModel() {
-                makeResponseView(viewModel: viewModel)
-            } else if !viewModel.isCompleted {
-                SpinnerView(viewModel: viewModel.progress)
-            } else if viewModel.hasRequestBody {
-                PlaceholderView(imageName: "exclamationmark.circle", title: "Unavailable")
-            } else if viewModel.request.taskType == .uploadTask {
-                PlaceholderView(imageName: "arrow.up.circle", title: {
-                    var title = "Uploaded from a File"
-                    if viewModel.request.requestBodySize > 0 {
-                        title = "\(ByteCountFormatter.string(fromByteCount: viewModel.request.requestBodySize, countStyle: .file))\n\(title)"
-                    }
-                    return title
-                }())
-            } else {
-                PlaceholderView(imageName: "nosign", title: "Empty Request")
-            }
+            NetworkInspectorRequestView(viewModel: viewModel.requestViewModel, onToggleExpanded: onToggleExpanded)
         case .summary:
             NetworkInspectorSummaryView(viewModel: viewModel.summaryViewModel)
         case .headers:

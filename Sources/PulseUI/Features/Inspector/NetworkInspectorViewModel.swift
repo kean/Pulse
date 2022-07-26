@@ -18,6 +18,7 @@ final class NetworkInspectorViewModel: ObservableObject {
 
     let summaryViewModel: NetworkInspectorSummaryViewModel
     let responseViewModel: NetworkInspectorResponseViewModel
+    let requestViewModel: NetworkInspectorRequestViewModel
 
     init(request: LoggerNetworkRequestEntity, store: LoggerStore) {
         self.objectId = request.objectID
@@ -34,6 +35,7 @@ final class NetworkInspectorViewModel: ObservableObject {
 
         self.summaryViewModel = NetworkInspectorSummaryViewModel(request: request, store: store)
         self.responseViewModel = NetworkInspectorResponseViewModel(request: request, store: store)
+        self.requestViewModel = NetworkInspectorRequestViewModel(request: request, store: store)
 
         self.cancellable = request.objectWillChange.sink { [weak self] in
             withAnimation {
@@ -43,7 +45,6 @@ final class NetworkInspectorViewModel: ObservableObject {
     }
 
     private func refresh() {
-        _requestViewModel = nil
         summary = NetworkLoggerSummary(request: request, store: store)
     }
 
@@ -67,21 +68,6 @@ final class NetworkInspectorViewModel: ObservableObject {
     }
 
     // MARK: - Tabs
-
-    #warning("TODO: the body should be ready lazily AND text view to load lazily too")
-
-    // important:
-    private var _requestViewModel: FileViewerViewModel?
-
-    func makeRequestBodyViewModel() -> FileViewerViewModel? {
-        if let viewModel = _requestViewModel {
-            return viewModel
-        }
-        guard let requestBody = summary.requestBody, !requestBody.isEmpty else { return nil }
-        let viewModel = FileViewerViewModel(title: "Request", data: { requestBody })
-        _requestViewModel = viewModel
-        return viewModel
-    }
 
     func makeHeadersModel() -> NetworkInspectorHeaderViewModel {
         NetworkInspectorHeaderViewModel(summary: summary)
