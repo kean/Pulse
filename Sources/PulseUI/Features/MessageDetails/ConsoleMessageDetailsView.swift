@@ -39,7 +39,7 @@ struct ConsoleMessageDetailsView: View {
     #elseif os(watchOS)
     var body: some View {
         ScrollView {
-            VStack {
+            VStack(spacing: 8) {
                 HStack {
                     PinButton(viewModel: viewModel.pin)
                     NavigationLink(destination: ConsoleMessageMetadataView(message: viewModel.message)) {

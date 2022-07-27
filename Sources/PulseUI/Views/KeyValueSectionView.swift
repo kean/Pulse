@@ -40,7 +40,7 @@ struct KeyValueSectionView: View {
                 .border(width: 2, edges: [.top], color: actualTintColor)
                 .padding(.top, 2)
 
-            if let action = viewModel.action {
+            if let action = viewModel.action, !viewModel.items.isEmpty {
                 Spacer().frame(height: 10)
                 Button(action: action.action, label: {
                     Text(action.title)
@@ -66,7 +66,7 @@ struct KeyValueSectionView: View {
                 .font(.headline)
             Spacer()
 #if os(iOS)
-            if let action = viewModel.action {
+            if let action = viewModel.action, !viewModel.items.isEmpty {
                 makeActionButton(with: action)
             }
 #endif

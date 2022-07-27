@@ -15,7 +15,7 @@ struct PinButton: View {
     var body: some View {
         Button(action: viewModel.togglePin) {
             VerticalButtonContent(
-                title: viewModel.isPinned ? "Remove Pin" : "Pin",
+                title: viewModel.isPinned ? "Unpin" : "Pin",
                 systemImageName: viewModel.isPinned ? "pin.slash" : "pin"
             )
         }
