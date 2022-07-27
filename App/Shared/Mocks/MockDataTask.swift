@@ -963,6 +963,8 @@ private var swizzledResponses: [URLSessionTask: URLResponse] = [:]
 private var isSwizzledRequest = false
 private var isSwizzledResponse = false
 
+private let lock = NSLock()
+
 extension URLSessionTask {
     func setSwizzledCurrentRequest(_ request: URLRequest?) {
         if !isSwizzledRequest {
@@ -976,11 +978,15 @@ extension URLSessionTask {
             }
         }
 
+        lock.lock()
         swizzledRequests[self] = request
+        lock.unlock()
     }
 
     @objc var swizzledCurrentRequest: URLRequest? {
-        swizzledRequests[self] ?? self.swizzledCurrentRequest
+        lock.lock()
+        defer { lock.unlock() }
+        return swizzledRequests[self] ?? self.swizzledCurrentRequest
     }
 
     func setSwizzledResponse(_ newResponse: URLResponse?) {
@@ -994,11 +1000,15 @@ extension URLSessionTask {
             }
         }
 
+        lock.lock()
         swizzledResponses[self] = newResponse
+        lock.unlock()
     }
 
     @objc var swizzledResponse: URLResponse? {
-        swizzledResponses[self] ?? self.swizzledResponse
+        lock.lock()
+        defer { lock.unlock() }
+        return swizzledResponses[self] ?? self.swizzledResponse
     }
 }
 
