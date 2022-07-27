@@ -169,26 +169,44 @@ private struct KeyValueListView: View {
                 .foregroundColor(.primary)
                 .font(.system(size: fontSize, weight: .regular))
             (title + value)
-                .lineLimit(row.item.0 == "URL" ? 8 : 3)
+                .lineLimit(row.item.0 == "URL" ? 3 : 3)
 #if os(iOS)
-                .contextMenu(ContextMenu(menuItems: {
-                    Button(action: {
-                        UXPasteboard.general.string = "\(row.item.0): \(row.item.1 ?? "–")"
-                        runHapticFeedback()
-                    }) {
-                        Text("Copy")
-                        Image(systemName: "doc.on.doc")
+                .backport.contextMenu(menuItems: {
+                    makeContextMenu(for: row.item)
+                }, preview: {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(row.item.0)
+                            .foregroundColor(actualTintColor)
+                            .font(.system(size: fontSize, weight: .medium))
+                        Text(row.item.1 ?? "–")
+                            .foregroundColor(.primary)
+                            .font(.system(size: fontSize, weight: .regular))
+                            .lineLimit(24)
                     }
-                    Button(action: {
-                        UXPasteboard.general.string = row.item.1
-                        runHapticFeedback()
-                    }) {
-                        Text("Copy Value")
-                        Image(systemName: "doc.on.doc")
-                    }
-                }))
+                    .padding()
+                    .frame(width: 340)
+                })
 #endif
             Spacer()
+        }
+    }
+#endif
+
+#if os(iOS)
+    @ViewBuilder
+    func makeContextMenu(for item: (String, String?)) -> some View {
+        makeCopyButton(title: "Copy Pair", value: "\(item.0): \(item.1 ?? "–")")
+        makeCopyButton(title: "Copy Key", value: item.0)
+        makeCopyButton(title: "Copy Value", value: item.1)
+    }
+
+    func makeCopyButton(title: String, value: String?) -> some View {
+        Button(action: {
+            UXPasteboard.general.string = value
+            runHapticFeedback()
+        }) {
+            Text(title)
+            Image(systemName: "doc.on.doc")
         }
     }
 #endif
@@ -253,10 +271,11 @@ struct ActionViewModel {
 struct KeyValueSectionView_Previews: PreviewProvider {
     static var previews: some View {
         VStack(spacing: 16) {
+
             KeyValueSectionView(viewModel: .init(
-                title: "Query Items",
+                title: "Sumary",
                 color: .red,
-                items: [("username", "kean")])
+                items: [("URL", "https://github.com/kean/Pulse/blob/master/Sources/PulseUI/Features/Console/This/Is/A/Very/Long/URL/that-does-not-fit-in-the-review/But/with?ios=16.0,feature=ContextMenuPreview,backport=yes,easy-to-preview-the-whole-thing-now=yes")])
             )
             KeyValueSectionView(viewModel: .init(
                 title: "Headers",
@@ -270,6 +289,8 @@ struct KeyValueSectionView_Previews: PreviewProvider {
             )
         }
         .padding()
+        .frame(maxHeight: .infinity, alignment: .top)
+        .padding(.top, 80)
         .previewLayout(.fixed(width: 320, height: 400))
     }
 }

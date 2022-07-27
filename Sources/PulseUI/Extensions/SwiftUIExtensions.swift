@@ -189,4 +189,13 @@ extension Backport {
 #endif
         }
     }
+
+    @ViewBuilder
+    func contextMenu<M: View, P: View>(@ViewBuilder menuItems: () -> M, @ViewBuilder preview: () -> P) -> some View {
+        if #available(iOS 16.0, *) {
+            self.content.contextMenu(menuItems: menuItems, preview: preview)
+        } else {
+            self.content.contextMenu(menuItems: menuItems)
+        }
+    }
 }
