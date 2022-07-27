@@ -96,11 +96,6 @@ struct NetworkInspectorView: View {
         NetworkInspectorSummaryView(viewModel: viewModel.summaryViewModel)
 #if os(watchOS)
             .navigationBarTitle(Text(viewModel.title))
-            .toolbar {
-                if let viewModel = viewModel.pin {
-                    PinButton2(viewModel: viewModel)
-                }
-            }
 #endif
     }
 #endif

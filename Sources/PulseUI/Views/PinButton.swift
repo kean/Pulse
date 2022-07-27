@@ -8,20 +8,8 @@ import CoreData
 import PulseCore
 import Combine
 
-#if os(watchOS)
-struct PinButton: View {
-    @ObservedObject var viewModel: PinButtonViewModel
+#if os(iOS) || os(tvOS) || os(macOS)
 
-    var body: some View {
-        Button(action: viewModel.togglePin) {
-            VerticalButtonContent(
-                title: viewModel.isPinned ? "Unpin" : "Pin",
-                systemImageName: viewModel.isPinned ? "pin.slash" : "pin"
-            )
-        }
-    }
-}
-#else
 struct PinButton: View {
     @ObservedObject var viewModel: PinButtonViewModel
     var isTextNeeded: Bool = true
@@ -35,15 +23,16 @@ struct PinButton: View {
         }
     }
 }
-#endif
 
-@available(iOS 14.0, tvOS 14.0, *)
-struct PinButton2: View {
+struct PinView: View {
     @ObservedObject var viewModel: PinButtonViewModel
+    let font: Font
 
     var body: some View {
-        Button(action: viewModel.togglePin) {
-            Label(viewModel.isPinned ? "Remove Pin" : "Pin", systemImage: viewModel.isPinned ? "pin.slash" : "pin")
+        if viewModel.isPinned {
+            Image(systemName: "pin")
+                .font(font)
+                .foregroundColor(.secondary)
         }
     }
 }
@@ -101,17 +90,12 @@ private let pinImage: UIImage = {
 }()
 #endif
 
-struct PinView: View {
-    @ObservedObject var viewModel: PinButtonViewModel
-    let font: Font
+#endif
 
-    var body: some View {
-        if viewModel.isPinned {
-            Image(systemName: "pin")
-                .font(font)
-                .foregroundColor(.secondary)
-        }
-    }
+// MARK: - ViewModel
+
+protocol Pinnable {
+    var pinViewModel: PinButtonViewModel { get }
 }
 
 final class PinButtonViewModel: ObservableObject {
@@ -144,8 +128,4 @@ final class PinButtonViewModel: ObservableObject {
         guard let message = message else { return } // Should never happen
         store.togglePin(for: message)
     }
-}
-
-protocol Pinnable {
-    var pinViewModel: PinButtonViewModel { get }
 }

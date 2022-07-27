@@ -191,11 +191,6 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
             })
         }
 
-        if !criteria.onlyPins {
-            filters.append(QuickFilterViewModel(title: "Pins", color: .secondary, imageName: "pin") { [weak self] in
-                self?.criteria.onlyPins = true
-            })
-        }
         if !criteria.onlyNetwork {
             filters.append(QuickFilterViewModel(title: "Networking", color: .secondary, imageName: "cloud") { [weak self] in
                 self?.criteria.onlyNetwork = true

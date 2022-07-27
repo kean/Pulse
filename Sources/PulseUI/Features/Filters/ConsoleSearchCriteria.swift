@@ -223,10 +223,6 @@ extension ConsoleSearchCriteria {
         var predicates = [NSPredicate]()
 
 #if os(watchOS)
-        if criteria.onlyPins {
-            predicates.append(NSPredicate(format: "isPinned == YES"))
-        }
-
         if criteria.onlyNetwork {
             predicates.append(NSPredicate(format: "request != nil"))
         }

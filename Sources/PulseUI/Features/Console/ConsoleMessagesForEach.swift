@@ -26,12 +26,6 @@ struct ConsoleMessagesForEach: View {
             }, label: {
                 ConsoleMessagesForEachRow(store: store, message: message)
             })
-            .backport.swipeActions(edge: .leading) {
-                if #available(tvOS 15.0,  watchOS 8.0, macOS 12.0, *) {
-                    PinButton2(viewModel: .init(store: store, message: message))
-                        .tint(.blue)
-                }
-            }
         }
     }
 }
@@ -46,12 +40,6 @@ private struct NetworkRequestRow: View {
         }, label: {
             ConsoleNetworkRequestForEachRow(store: store, request: request)
         })
-        .backport.swipeActions(edge: .leading) {
-            if #available(tvOS 15.0, watchOS 8.0, macOS 12.0, *), let message = request.message {
-                PinButton2(viewModel: .init(store: store, message: message))
-                    .tint(.blue)
-            }
-        }
     }
 }
 

@@ -12,14 +12,14 @@ final class ConsoleMessageViewModel: Pinnable {
     let text: String
     let textColor: Color
     let badge: BadgeViewModel?
-
+    
     private let message: LoggerMessageEntity
     private let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel?
     private let store: LoggerStore
-
+    
     private(set) lazy var time = ConsoleMessageViewModel.timeFormatter.string(from: message.createdAt)
-
-    #if os(iOS)
+    
+#if os(iOS)
     lazy var textColor2 = UIColor.textColor(for: LoggerStore.Level(rawValue: message.level) ?? .debug)
     lazy var attributedTitle: NSAttributedString = {
         let string = NSMutableAttributedString()
@@ -33,16 +33,16 @@ final class ConsoleMessageViewModel: Pinnable {
         }
         return string
     }()
-    #endif
-
+#endif
+    
     static let timeFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm:ss.SSS"
         return formatter
     }()
-
-    lazy var pinViewModel = PinButtonViewModel(store: store, message: message)
-
+    
+    private(set) lazy var pinViewModel = PinButtonViewModel(store: store, message: message)
+    
     init(message: LoggerMessageEntity,
          store: LoggerStore,
          searchCriteriaViewModel: ConsoleSearchCriteriaViewModel? = nil) {
@@ -59,26 +59,26 @@ final class ConsoleMessageViewModel: Pinnable {
         self.message = message
         self.searchCriteriaViewModel = searchCriteriaViewModel
     }
-
+    
     // MARK: Context Menu
-
+    
     func share() -> ShareItems {
         ShareItems([ConsoleShareService(store: store).share(message)])
     }
-
+    
     func copy() -> String {
         message.text
     }
-
+    
     var focusLabel: String {
         message.label.capitalized
     }
-
+    
     func focus() {
         searchCriteriaViewModel?.criteria.labels.isEnabled = true
         searchCriteriaViewModel?.criteria.labels.focused = message.label
     }
-
+    
     func hide() {
         searchCriteriaViewModel?.criteria.labels.isEnabled = true
         searchCriteriaViewModel?.criteria.labels.hidden.insert(message.label)
@@ -92,7 +92,7 @@ private extension BadgeViewModel {
         }
         self = model
     }
-
+    
     init?(level: LoggerStore.Level) {
         switch level {
         case .critical, .error, .warning, .info, .notice:
@@ -120,7 +120,7 @@ extension Color {
         case .trace: return .primary
         }
     }
-
+    
     static func textColor(for level: LoggerStore.Level) -> Color {
         switch level {
 #if os(macOS)
@@ -152,7 +152,7 @@ extension UIColor {
         case .trace: return .label
         }
     }
-
+    
     static func textColor(for level: LoggerStore.Level) -> UIColor {
         switch level {
         case .trace: return .secondaryLabel

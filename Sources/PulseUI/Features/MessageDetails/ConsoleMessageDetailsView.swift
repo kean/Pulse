@@ -37,11 +37,11 @@ struct ConsoleMessageDetailsView: View {
         }
     }
     #elseif os(watchOS)
+    #warning("TODO: put details somewhere else")
     var body: some View {
         ScrollView {
             VStack(spacing: 8) {
                 HStack {
-                    PinButton(viewModel: viewModel.pin)
                     NavigationLink(destination: ConsoleMessageMetadataView(message: viewModel.message)) {
                         VerticalButtonContent(title: "Details", systemImageName: "info.circle")
                     }

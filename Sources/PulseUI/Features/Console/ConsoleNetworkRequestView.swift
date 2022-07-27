@@ -22,10 +22,7 @@ struct ConsoleNetworkRequestView: View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(alignment: .firstTextBaseline) {
                 header
-                #if os(watchOS)
-                Spacer()
-                PinView(viewModel: viewModel.pinViewModel, font: fonts.title)
-                #else
+                #if os(macOS)
                 PinView(viewModel: viewModel.pinViewModel, font: fonts.title)
                 Spacer()
                 #endif
