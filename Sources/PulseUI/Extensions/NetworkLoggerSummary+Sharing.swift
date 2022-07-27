@@ -23,7 +23,7 @@ enum Render {
     private static func render(request: LoggerNetworkRequestEntity, store: LoggerStore, using renderer: Renderer) -> String {
         // Summary
         let viewModel = NetworkInspectorSummaryViewModel(request: request, store: store)
-        renderer.add(viewModel.summaryModel, isSecondaryTitle: false)
+        renderer.add(viewModel.summaryViewModel, isSecondaryTitle: false)
         renderer.add(viewModel.errorModel, isSecondaryTitle: false)
 
         if let requestSummary = viewModel.originalRequestSummary {
@@ -50,7 +50,7 @@ enum Render {
         }
 
         renderer.add(title: "Details")
-        renderer.add(viewModel.timingDetailsModel)
+        renderer.add(viewModel.timingDetailsViewModel)
         if let transferModel = viewModel.transferViewModel {
             renderer.add(KeyValueSectionViewModel(title: "Sent Data", color: .gray, items: [
                 ("Total Bytes Sent", transferModel.totalBytesSent),

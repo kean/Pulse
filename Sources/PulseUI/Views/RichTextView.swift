@@ -369,19 +369,9 @@ private func highlight(range: Range<String.Index>, in text: NSMutableAttributedS
 #if DEBUG
 struct RichTextView_Previews: PreviewProvider {
     static var previews: some View {
-        Group {
-            RichTextView(viewModel: .init(data: MockJSON.allPossibleValues))
-                .previewLayout(.sizeThatFits)
-                .environment(\.colorScheme, .light)
-
-            RichTextView(viewModel: .init(data: MockJSON.allPossibleValues))
-                .previewDisplayName("Dark")
-                .background(Color(UXColor.systemBackground))
-                .previewLayout(.sizeThatFits)
-                .environment(\.colorScheme, .dark)
-        }
+        RichTextView(viewModel: .init(data: MockJSON.allPossibleValues))
     }
 }
-
 #endif
+
 #endif

@@ -13,7 +13,7 @@ final class NetworkInspectorViewModel: ObservableObject {
     let summaryViewModel: NetworkInspectorSummaryViewModel
     let responseViewModel: NetworkInspectorResponseViewModel
     let requestViewModel: NetworkInspectorRequestViewModel
-#if !os(watchOS)
+#if !os(watchOS) && !os(tvOS)
     let metricsViewModel: NetworkInspectorMetricsTabViewModel
 #endif
 
@@ -36,7 +36,7 @@ final class NetworkInspectorViewModel: ObservableObject {
         self.summaryViewModel = NetworkInspectorSummaryViewModel(request: request, store: store)
         self.responseViewModel = NetworkInspectorResponseViewModel(request: request, store: store)
         self.requestViewModel = NetworkInspectorRequestViewModel(request: request, store: store)
-#if !os(watchOS)
+#if !os(watchOS) && !os(tvOS)
         self.metricsViewModel = NetworkInspectorMetricsTabViewModel(request: request)
 #endif
 #if os(macOS)

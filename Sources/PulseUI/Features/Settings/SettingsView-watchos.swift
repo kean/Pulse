@@ -28,7 +28,7 @@ struct SettingsView: View {
                 Alert(title: Text("Transfer Failed"), message: Text(error.message), dismissButton: .cancel(Text("Ok")))
             }
 #endif
-            if viewModel.store === RemoteLogger.shared.store, #available(tvOS 14.0, *) {
+            if #available(tvOS 14.0, *), viewModel.store === RemoteLogger.shared.store {
                 RemoteLoggerSettingsView(viewModel: .shared)
             }
         }

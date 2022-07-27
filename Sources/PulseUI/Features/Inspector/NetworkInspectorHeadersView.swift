@@ -5,8 +5,6 @@
 import SwiftUI
 import PulseCore
 
-#if os(macOS) || os(iOS) || os(watchOS)
-
 struct NetworkInspectorHeadersView: View {
     @ObservedObject var viewModel: NetworkInspectorHeaderViewModel
 
@@ -139,5 +137,3 @@ final class NetworkInspectorHeaderViewModel: ObservableObject {
         )
     }
 }
-
-#endif

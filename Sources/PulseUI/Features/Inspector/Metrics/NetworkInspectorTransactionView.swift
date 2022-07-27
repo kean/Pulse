@@ -13,34 +13,32 @@ struct NetworkInspectorTransactionView: View {
     @ObservedObject var viewModel: NetworkInspectorTransactionViewModel
 
     var body: some View {
-        GeometryReader { geo in
-            ScrollView {
-                VStack {
-                    if !viewModel.timing.isEmpty {
-                        TimingView(viewModel: viewModel.timing, width: geo.size.width - 32)
-                    }
-                    Section(header: LargeSectionHeader(title: "Request")) {
-                        KeyValueSectionView(viewModel: viewModel.requestSummary)
-                        KeyValueSectionView(viewModel: viewModel.requestHeaders)
-                        if let requestParameters = viewModel.requestParameters {
-                            KeyValueSectionView(viewModel: requestParameters)
-                        }
-                    }
-                    Section(header: LargeSectionHeader(title: "Response")) {
-                        KeyValueSectionView(viewModel: viewModel.responseSummary)
-                        KeyValueSectionView(viewModel: viewModel.responseHeaders)
-                    }
-                    Section(header: LargeSectionHeader(title: "Details")) {
-                        ForEach(viewModel.details.sections, id: \.title) {
-                            KeyValueSectionView(viewModel: $0)
-                        }
-                    }
-                    Section(header: LargeSectionHeader(title: "Timing")) {
-                        KeyValueSectionView(viewModel: viewModel.timingSummary)
+        ScrollView {
+            VStack {
+                if let timingViewModel = viewModel.timingViewModel {
+                    TimingView(viewModel: timingViewModel)
+                }
+                Section(header: LargeSectionHeader(title: "Request")) {
+                    KeyValueSectionView(viewModel: viewModel.requestSummary)
+                    KeyValueSectionView(viewModel: viewModel.requestHeaders)
+                    if let requestParameters = viewModel.requestParameters {
+                        KeyValueSectionView(viewModel: requestParameters)
                     }
                 }
-                .padding(EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
+                Section(header: LargeSectionHeader(title: "Response")) {
+                    KeyValueSectionView(viewModel: viewModel.responseSummary)
+                    KeyValueSectionView(viewModel: viewModel.responseHeaders)
+                }
+                Section(header: LargeSectionHeader(title: "Details")) {
+                    ForEach(viewModel.details.sections, id: \.title) {
+                        KeyValueSectionView(viewModel: $0)
+                    }
+                }
+                Section(header: LargeSectionHeader(title: "Timing")) {
+                    KeyValueSectionView(viewModel: viewModel.timingSummary)
+                }
             }
+            .padding(EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
         }
         .background(links)
     }
@@ -61,13 +59,13 @@ final class NetworkInspectorTransactionViewModel: ObservableObject {
     @Published var isResponseHeadersLinkActive = false
 
     let details: NetworkMetricsDetailsViewModel
-    let timing: [TimingRowSectionViewModel]
+    let timingViewModel: TimingViewModel?
 
     private let transaction: NetworkLoggerTransactionMetrics
 
     init(transaction: NetworkLoggerTransactionMetrics, metrics: NetworkLoggerMetrics) {
         self.details = NetworkMetricsDetailsViewModel(metrics: transaction)
-        self.timing = TimingRowSectionViewModel.make(transaction: transaction, metrics: metrics)
+        self.timingViewModel = TimingViewModel(transaction: transaction, metrics: metrics)
         self.transaction = transaction
     }
 

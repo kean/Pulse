@@ -12,7 +12,6 @@ struct ShareView: UIViewControllerRepresentable {
     var applicationActivities: [UIActivity]?
     private let cleanup: () -> Void
 
-    // TODO: remove this variant
     init(activityItems: [Any]) {
         self.activityItems = activityItems
         self.cleanup = {}

@@ -69,7 +69,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
 
     // MARK: - Summary
 
-    var summaryModel: KeyValueSectionViewModel {
+    var summaryViewModel: KeyValueSectionViewModel {
         var items: [(String, String?)] = [
             ("URL", request.url ?? "–"),
             ("Method", request.httpMethod ?? "–")
@@ -226,7 +226,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
 
     // MARK: - Timings
 
-    var timingDetailsModel: KeyValueSectionViewModel? {
+    var timingDetailsViewModel: KeyValueSectionViewModel? {
         guard let taskInterval = request.taskInterval else { return nil }
         return KeyValueSectionViewModel(title: "Timing", color: .orange, items: [
             ("Start Date", dateFormatter.string(from: taskInterval.start)),
@@ -261,8 +261,8 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     }
 
 #if os(tvOS)
-    func makeMetricsViewModel() -> NetworkInspectorMetricsViewModel? {
-        details.metrics.map(NetworkInspectorMetricsViewModel.init)
+    var timingViewModel: TimingViewModel? {
+        details.metrics.map(TimingViewModel.init)
     }
 #endif
 }

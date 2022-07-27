@@ -106,17 +106,19 @@ final class ToastManager {
     }
 }
 
+#if DEBUG
+
 struct ToastView_Previews: PreviewProvider {
     static var previews: some View {
-        Group {
-            ToastView {
-                HStack {
-                    Image(systemName: "archivebox")
-                    Text("Archive created (6 KB)")
-                }
+        ToastView {
+            HStack {
+                Image(systemName: "archivebox")
+                Text("Archive created (6 KB)")
             }
         }
     }
 }
+
+#endif
 
 #endif

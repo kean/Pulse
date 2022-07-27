@@ -46,6 +46,8 @@ final class FileViewerViewModel: ObservableObject {
             return .json(RichTextViewModel(json: json))
         } else if let image = UXImage(data: data) {
             return .image(image)
+        } else if data.isEmpty {
+            return .other(RichTextViewModel(string: "Unavailable"))
         } else {
             let string = String(data: data, encoding: .utf8) ?? "Data \(ByteCountFormatter.string(fromByteCount: Int64(data.count), countStyle: .file))"
             return .other(RichTextViewModel(string: string))

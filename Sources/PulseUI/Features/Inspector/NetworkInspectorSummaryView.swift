@@ -110,25 +110,25 @@ struct NetworkInspectorSummaryView: View {
         KeyValueSectionView(viewModel: viewModel.originalRequestHeaders, limit: 10)
         KeyValueSectionView(viewModel: viewModel.responseHeaders, limit: 10)
         // Timing
-        viewModel.timingDetailsModel.map(KeyValueSectionView.init)
+        viewModel.timingDetailsViewModel.map(KeyValueSectionView.init)
     }
 #elseif os(tvOS)
     @ViewBuilder
     private var contents: some View {
         headerView
 
-        NavigationLink(destination: KeyValueSectionView(viewModel: viewModel.summaryModel).focusable(true)) {
+        NavigationLink(destination: KeyValueSectionView(viewModel: viewModel.summaryViewModel).focusable()) {
             summaryView
         }
 
         if let error = viewModel.errorModel {
             makeKeyValueSection(viewModel: error)
         }
-        NavigationLink(destination: FileViewer(viewModel: viewModel.requestBodyViewModel).focusable(true)) {
+        NavigationLink(destination: FileViewer(viewModel: viewModel.requestBodyViewModel).focusable()) {
             KeyValueSectionView(viewModel: viewModel.requestBodySection)
         }
         if viewModel.responseSummary != nil {
-            NavigationLink(destination: FileViewer(viewModel: viewModel.responseBodyViewModel).focusable(true)) {
+            NavigationLink(destination: FileViewer(viewModel: viewModel.responseBodyViewModel).focusable()) {
                 KeyValueSectionView(viewModel: viewModel.responseBodySection)
             }
         }
@@ -136,15 +136,15 @@ struct NetworkInspectorSummaryView: View {
         if viewModel.responseSummary != nil {
             makeKeyValueSection(viewModel: viewModel.responseHeaders)
         }
-        if let timing = viewModel.timingDetailsModel, let metrics = viewModel.makeMetricsViewModel() {
-            NavigationLink(destination: NetworkInspectorMetricsView(viewModel: metrics).focusable(true)) {
-                KeyValueSectionView(viewModel: timing)
+        if let timingDetailsViewModel = viewModel.timingDetailsViewModel, let timingViewModel = viewModel.timingViewModel {
+            NavigationLink(destination: TimingView(viewModel: timingViewModel).focusable()) {
+                KeyValueSectionView(viewModel: timingDetailsViewModel)
             }
         }
     }
 
     func makeKeyValueSection(viewModel: KeyValueSectionViewModel) -> some View {
-        NavigationLink(destination: KeyValueSectionView(viewModel: viewModel).focusable(true)) {
+        NavigationLink(destination: KeyValueSectionView(viewModel: viewModel).focusable()) {
             KeyValueSectionView(viewModel: viewModel, limit: 5)
         }
     }
@@ -164,15 +164,16 @@ struct NetworkInspectorSummaryView: View {
     }
 
     private var summaryView: some View {
-        VStack {
+        let summaryViewModel = viewModel.summaryViewModel
+        return VStack {
             HStack(spacing: spacing) {
-                Text(viewModel.summaryModel.title)
+                Text(summaryViewModel.title)
                 Image(systemName: viewModel.statusImageName)
                     .foregroundColor(viewModel.tintColor)
                 Spacer()
             }.font(.headline)
 
-            KeyValueSectionView(viewModel: viewModel.summaryModel)
+            KeyValueSectionView(viewModel: summaryViewModel)
                 .hiddenTitle()
         }
     }
@@ -190,7 +191,7 @@ struct NetworkInspectorSummaryView: View {
                 viewModel.originalRequestQueryItems.map(NetworkHeadersDetailsView.init)
             }
 #endif
-            
+
             NavigationLink.programmatic(isActive: $viewModel.isRequestRawLinkActive, destination: {
                 FileViewer(viewModel: viewModel.requestBodyViewModel)
                     .backport.navigationTitle("Request")

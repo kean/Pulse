@@ -63,6 +63,26 @@ extension View {
     }
 }
 
+extension ContentSizeCategory {
+    var scale: CGFloat {
+        switch self {
+        case .extraSmall: return 0.7
+        case .small: return 0.8
+        case .medium: return 1.0
+        case .large: return 1.0
+        case .extraLarge: return 1.0
+        case .extraExtraLarge: return 1.2
+        case .extraExtraExtraLarge: return 1.3
+        case .accessibilityMedium: return 1.4
+        case .accessibilityLarge: return 1.6
+        case .accessibilityExtraLarge: return 1.9
+        case .accessibilityExtraExtraLarge: return 2.1
+        case .accessibilityExtraExtraExtraLarge: return 2.4
+        @unknown default: return 1.0
+        }
+    }
+}
+
 #if os(iOS)
 struct ViewControllerAccessor: UIViewRepresentable {
     @Binding var viewController: UIViewController?

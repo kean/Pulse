@@ -12,13 +12,11 @@ import Combine
 final class MainViewModel: ObservableObject {
     let items: [MainViewModelItem]
 
-    let consoleModel: ConsoleViewModel
-    let networkModel: NetworkViewModel
-#if !os(tvOS)
-    let pinsModel: PinsViewModel
-#endif
-#if os(iOS) || os(tvOS)
-    let settingsModel: SettingsViewModel
+    let consoleViewModel: ConsoleViewModel
+    let networkViewModel: NetworkViewModel
+#if os(iOS)
+    let pinsViewModel: PinsViewModel
+    let settingsViewModel: SettingsViewModel
 #endif
 
     let configuration: ConsoleConfiguration
@@ -26,20 +24,18 @@ final class MainViewModel: ObservableObject {
     init(store: LoggerStore, configuration: ConsoleConfiguration = .default, onDismiss: (() -> Void)?) {
         self.configuration = configuration
 
-        self.consoleModel = ConsoleViewModel(store: store, configuration: configuration)
-        self.consoleModel.onDismiss = onDismiss
+        self.consoleViewModel = ConsoleViewModel(store: store, configuration: configuration)
+        self.consoleViewModel.onDismiss = onDismiss
 
-        self.networkModel = NetworkViewModel(store: store)
-        self.networkModel.onDismiss = onDismiss
+        self.networkViewModel = NetworkViewModel(store: store)
+        self.networkViewModel.onDismiss = onDismiss
 
 #if os(iOS)
-        self.pinsModel = PinsViewModel(store: store)
-        self.pinsModel.onDismiss = onDismiss
-#endif
+        self.pinsViewModel = PinsViewModel(store: store)
+        self.pinsViewModel.onDismiss = onDismiss
 
-#if os(iOS) || os(tvOS)
-        self.settingsModel = SettingsViewModel(store: store)
-        self.settingsModel.onDismiss = onDismiss
+        self.settingsViewModel = SettingsViewModel(store: store)
+        self.settingsViewModel.onDismiss = onDismiss
 #endif
 
 #if os(iOS)
@@ -87,16 +83,20 @@ extension MainViewModel {
     func makeView(for item: MainViewModelItem) -> some View {
         switch item {
         case .console:
-            ConsoleView(viewModel: consoleModel)
+            ConsoleView(viewModel: consoleViewModel)
         case .network:
-            NetworkView(viewModel: networkModel)
+            NetworkView(viewModel: networkViewModel)
 #if !os(tvOS)
         case .pins:
-            PinsView(viewModel: pinsModel)
+            PinsView(viewModel: pinsViewModel)
 #endif
 #if os(iOS) || os(tvOS)
         case .settings:
-            SettingsView(viewModel: settingsModel, console: consoleModel)
+            #if os(iOS)
+            SettingsView(viewModel: settingsViewModel, console: consoleViewModel)
+            #else
+            SettingsView(viewModel: consoleViewModel)
+            #endif
 #endif
         default: fatalError()
         }
