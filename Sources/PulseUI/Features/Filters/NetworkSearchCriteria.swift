@@ -6,6 +6,8 @@ import Foundation
 import PulseCore
 import CoreData
 
+#if os(iOS) || os(macOS) || os(tvOS)
+
 struct NetworkSearchCriteria: Hashable {
     var isFiltersEnabled = true
 
@@ -474,3 +476,5 @@ extension NetworkSearchCriteria {
         request.predicate = predicates.isEmpty ? nil : NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
     }
 }
+
+#endif

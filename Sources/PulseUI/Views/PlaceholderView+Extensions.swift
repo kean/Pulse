@@ -4,6 +4,8 @@
 
 import SwiftUI
 
+#if os(iOS) || os(macOS) || os(tvOS)
+
 extension PlaceholderView {
     static func make(viewModel: ConsoleViewModel) -> PlaceholderView {
         let message: String
@@ -33,3 +35,5 @@ extension PlaceholderView {
         return PlaceholderView(imageName: "network", title: "No Requests", subtitle: message)
     }
 }
+
+#endif

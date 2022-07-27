@@ -7,6 +7,8 @@ import PulseCore
 import Combine
 import SwiftUI
 
+#if os(iOS) || os(macOS) || os(tvOS)
+
 final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, ObservableObject {
 #if os(iOS) || os(macOS)
     let table: ConsoleTableViewModel
@@ -152,3 +154,5 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         }
     }
 }
+
+#endif
