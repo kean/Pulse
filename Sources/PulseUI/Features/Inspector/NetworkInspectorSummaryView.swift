@@ -230,3 +230,36 @@ private let spacing: CGFloat = 20
 #else
 private let spacing: CGFloat? = nil
 #endif
+
+#if DEBUG
+
+struct NetworkInspectorSummaryView_Previews: PreviewProvider {
+    static var previews: some View {
+        LazySummaryPreview()
+    }
+}
+
+private struct LazySummaryPreview: View {
+    @ObservedObject var context = PreviewEntityContext()
+
+    var body: some View {
+        if let request = context.request, let store = context.store {
+            NetworkInspectorSummaryView(viewModel: .init(request: request, store: store))
+        }
+        Text("Preparing...").onAppear { context.populate(.login) }
+    }
+}
+
+final class PreviewEntityContext: ObservableObject {
+    @Published private(set) var request: LoggerNetworkRequestEntity?
+    @Published private(set) var store: LoggerStore?
+
+    func populate(_ task: MockDataTask)  {
+        MockDataTask.storeEntity(task) { request, store in
+            self.request = request
+            self.store = store
+        }
+    }
+}
+
+#endif

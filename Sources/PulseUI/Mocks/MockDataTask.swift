@@ -23,6 +23,22 @@ extension MockDataTask {
         responseBody: MockJSON.githubLoginResponse,
         metrics: mockMetrics
     )
+
+    static let profileFailure = MockDataTask(
+        request: mockProfileFailureRequest,
+        response: mockProfileFailureResponse,
+        responseBody: """
+        <h1>Error 404</h1>
+        """.data(using: .utf8)!,
+        metrics: mockMetrics
+    )
+
+    static let octocat = MockDataTask(
+        request: mockOctocatRequest,
+        response: mockOctocatResponse,
+        responseBody: mockImage,
+        metrics: mockOctocatMetrics
+    )
 }
 
 private let mockLoginRequest: URLRequest = {
@@ -135,17 +151,6 @@ private let mockMetrics = try! JSONDecoder().decode(NetworkLoggerMetrics.self, f
 
 // MARK: - GitHub Profile (Failure, 404)
 
-extension MockDataTask {
-    static let profileFailure = MockDataTask(
-        request: mockProfileFailureRequest,
-        response: mockProfileFailureResponse,
-        responseBody: """
-        <h1>Error 404</h1>
-        """.data(using: .utf8)!,
-        metrics: mockMetrics
-    )
-}
-
 private let mockProfileFailureRequest: URLRequest = {
     var request = URLRequest(url: URL(string: "https://github.com/profile/valdo")!)
 
@@ -167,15 +172,6 @@ private let mockProfileFailureResponse = HTTPURLResponse(url: URL(string: "https
 ])!
 
 // MARK: - GitHub Octovat (Success, 200)
-
-extension MockDataTask {
-    static let octocat = MockDataTask(
-        request: mockOctocatRequest,
-        response: mockOctocatResponse,
-        responseBody: mockImage,
-        metrics: mockOctocatMetrics
-    )
-}
 
 private let mockOctocatRequest: URLRequest = {
     var request = URLRequest(url: URL(string: "https://github.com/octocat.png")!)

@@ -11,19 +11,12 @@ import CoreData
 extension LoggerStore {
     static let mock: LoggerStore = {
         let store = makeMockStore()
-//        for _ in 1...3 {
         populateStore(store)
-//        }
-
-//        Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { _ in
-//            populateStore(store)
-//        }
-
         return store
     }()
 }
 
-private func makeMockStore() -> LoggerStore {
+func makeMockStore() -> LoggerStore {
     let rootURL = FileManager.default.temporaryDirectory.appendingPathComponent("Pulse-ui-demo")
     try? FileManager.default.removeItem(at: rootURL) // TODO: cleanup
     try? FileManager.default.createDirectory(at: rootURL, withIntermediateDirectories: true, attributes: nil)
@@ -76,13 +69,8 @@ func populateStore(_ store: LoggerStore) {
     ]
     let urlSession = URLSession(configuration: configuration)
 
-    func logTask(_ mockTask: MockDataTask) {
-        let dataTask = urlSession.dataTask(with: mockTask.request)
-        networkLogger.logTaskCreated(dataTask)
-        networkLogger.logDataTask(dataTask, didReceive: mockTask.response)
-        networkLogger.logDataTask(dataTask, didReceive: mockTask.responseBody)
-        networkLogger.logTask(dataTask, didFinishCollecting: mockTask.metrics)
-        networkLogger.logTask(dataTask, didCompleteWithError: nil, session: urlSession)
+    func logTask(_ task: MockDataTask) {
+        _logTask(task, logger: networkLogger, urlSession: urlSession)
     }
 
     logTask(MockDataTask.login)
@@ -124,6 +112,39 @@ func populateStore(_ store: LoggerStore) {
     // Wait until everything is stored
     store.container.viewContext.performAndWait {}
     store.backgroundContext.performAndWait {}
+}
+
+private func _logTask(_ task: MockDataTask, logger: NetworkLogger, urlSession: URLSession? = nil) {
+    let urlSession = urlSession ?? URLSession(configuration: .default)
+    let dataTask = urlSession.dataTask(with: task.request)
+    logger.logTaskCreated(dataTask)
+    logger.logDataTask(dataTask, didReceive: task.response)
+    logger.logDataTask(dataTask, didReceive: task.responseBody)
+    logger.logTask(dataTask, didFinishCollecting: task.metrics)
+    logger.logTask(dataTask, didCompleteWithError: nil, session: urlSession)
+}
+
+extension MockDataTask {
+    // Not using Async/Await because it crashes in SwiftUI Canvas.
+    static func storeEntity(_ task: MockDataTask, _ completion: @escaping (LoggerNetworkRequestEntity, LoggerStore) -> Void) {
+        final class Context {
+            var entity: LoggerNetworkRequestEntity?
+            var observer: AnyObject?
+        }
+        let context = Context()
+        let store = makeMockStore()
+        if #available(iOS 14.0, *) {
+            context.observer = NotificationCenter.default.addObserver(forName: NSManagedObjectContext.didChangeObjectsNotification, object: store.container.viewContext, queue: nil) { notification in
+                let entity = (notification.userInfo?[NSInsertedObjectsKey] as? Set<NSManagedObject> ?? [])
+                    .compactMap { $0 as? LoggerNetworkRequestEntity }
+                    .first { $0.state != .pending }
+                if let entity = entity {
+                    completion(entity, store)
+                }
+            }
+        }
+        _logTask(task, logger: NetworkLogger(store: store))
+    }
 }
 
 #endif
