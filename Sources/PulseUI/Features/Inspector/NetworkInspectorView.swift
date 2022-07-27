@@ -15,9 +15,11 @@ struct NetworkInspectorView: View {
 #endif
     var onClose: (() -> Void)?
 
+#if os(iOS) || os(macOS)
     @State private var selectedTab: NetworkInspectorTab = .response
-    @State private var shareItems: ShareItems?
     @State private var isExpanded = false
+    @State private var shareItems: ShareItems?
+#endif
 
 #if os(iOS)
     @State private var viewController: UIViewController?
@@ -111,7 +113,11 @@ struct NetworkInspectorView: View {
         case .summary:
             NetworkInspectorSummaryView(viewModel: viewModel.summaryViewModel)
         case .headers:
+#if os(macOS)
             NetworkInspectorHeadersTabView(viewModel: viewModel.headersViewModel)
+#else
+            EmptyView()
+#endif
         case .metrics:
             NetworkInspectorMetricsTabView(viewModel: viewModel.metricsViewModel)
         }

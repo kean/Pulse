@@ -143,13 +143,15 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 
     // MARK: Pins
 
+#if os(iOS) || os(macOS)
     func share(as output: ShareStoreOutput) -> ShareItems {
 #if os(iOS)
-        return ShareItems(store: store, output: output)
+        ShareItems(store: store, output: output)
 #else
-        return ShareItems(messages: store)
+        ShareItems(messages: store)
 #endif
     }
+#endif
 
     func buttonRemoveAllMessagesTapped() {
         store.removeAll()

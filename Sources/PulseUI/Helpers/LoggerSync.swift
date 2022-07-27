@@ -30,7 +30,7 @@ final class LoggerSyncSession: ObservableObject {
 
     func transfer(store: LoggerStore) {
         let directory = TemporaryDirectory()
-        let date = ShareItems.makeCurrentDate()
+        let date = makeCurrentDate()
         let storeURL = directory.url.appendingPathComponent("logs-\(date).pulse", isDirectory: true)
         _ = try? store.copy(to: storeURL)
 

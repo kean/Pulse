@@ -6,7 +6,7 @@ import SwiftUI
 import PulseCore
 import Combine
 
-#if os(iOS) || os(macOS) || os(tvOS)
+#if os(macOS)
 
 struct NetworkInspectorHeadersTabView: View {
     @ObservedObject var viewModel: NetworkInspectorHeadersTabViewModel

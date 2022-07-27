@@ -47,8 +47,8 @@ struct NetworkInspectorMetricsView: View {
 final class NetworkInspectorMetricsViewModel {
     let metrics: NetworkLoggerMetrics
     fileprivate let timingModel: [TimingRowSectionViewModel]
-    fileprivate let details: NetworkMetricsDetailsViewModel?
 #if !os(tvOS)
+    fileprivate let details: NetworkMetricsDetailsViewModel?
     let transactions: NetworkInspectorTransactionsListViewModel?
 #endif
 
@@ -56,10 +56,10 @@ final class NetworkInspectorMetricsViewModel {
         self.metrics = metrics
         self.timingModel = makeTiming(metrics: metrics)
 
+#if !os(tvOS)
         self.details = metrics.transactions.first(where: {
             $0.resourceFetchType == URLSessionTaskMetrics.ResourceFetchType.networkLoad.rawValue
         }).map(NetworkMetricsDetailsViewModel.init)
-#if !os(tvOS)
         if !metrics.transactions.isEmpty {
             self.transactions = NetworkInspectorTransactionsListViewModel(metrics: metrics)
         } else {

@@ -14,8 +14,11 @@ final class NetworkInspectorViewModel: ObservableObject {
     let responseViewModel: NetworkInspectorResponseViewModel
     let requestViewModel: NetworkInspectorRequestViewModel
 #if !os(watchOS)
-    let headersViewModel: NetworkInspectorHeadersTabViewModel
     let metricsViewModel: NetworkInspectorMetricsTabViewModel
+#endif
+
+#if os(macOS)
+    let headersViewModel: NetworkInspectorHeadersTabViewModel
 #endif
 
     // TODO: Make private
@@ -34,11 +37,14 @@ final class NetworkInspectorViewModel: ObservableObject {
         self.responseViewModel = NetworkInspectorResponseViewModel(request: request, store: store)
         self.requestViewModel = NetworkInspectorRequestViewModel(request: request, store: store)
 #if !os(watchOS)
-        self.headersViewModel = NetworkInspectorHeadersTabViewModel(request: request)
         self.metricsViewModel = NetworkInspectorMetricsTabViewModel(request: request)
+#endif
+#if os(macOS)
+        self.headersViewModel = NetworkInspectorHeadersTabViewModel(request: request)
 #endif
     }
 
+#if os(iOS) || os(macOS)
     var pin: PinButtonViewModel? {
         request.message.map {
             PinButtonViewModel(store: store, message: $0)
@@ -48,4 +54,5 @@ final class NetworkInspectorViewModel: ObservableObject {
     func prepareForSharing() -> String {
         ConsoleShareService(store: store).share(request, output: .plainText)
     }
+#endif
 }

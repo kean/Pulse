@@ -4,6 +4,8 @@
 
 import SwiftUI
 
+#if os(iOS) || os(macOS)
+
 struct LargeSectionHeader<Accessory: View>: View {
     let title: String
     var accessory: (() -> Accessory)?
@@ -19,10 +21,7 @@ struct LargeSectionHeader<Accessory: View>: View {
                 accessory?()
             }
             Divider()
-        }
-#if !os(watchOS)
-        .padding(.bottom, 8)
-#endif
+        }.padding(.bottom, 8)
     }
 }
 
@@ -31,3 +30,5 @@ extension LargeSectionHeader where Accessory == EmptyView {
         self.title = title
     }
 }
+
+#endif

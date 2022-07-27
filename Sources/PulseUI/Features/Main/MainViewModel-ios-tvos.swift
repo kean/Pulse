@@ -14,12 +14,12 @@ final class MainViewModel: ObservableObject {
 
     let consoleModel: ConsoleViewModel
     let networkModel: NetworkViewModel
-    #if !os(tvOS)
+#if !os(tvOS)
     let pinsModel: PinsViewModel
-    #endif
-    #if os(iOS) || os(tvOS)
+#endif
+#if os(iOS) || os(tvOS)
     let settingsModel: SettingsViewModel
-    #endif
+#endif
 
     let configuration: ConsoleConfiguration
 
@@ -32,23 +32,23 @@ final class MainViewModel: ObservableObject {
         self.networkModel = NetworkViewModel(store: store)
         self.networkModel.onDismiss = onDismiss
 
-        #if os(iOS)
+#if os(iOS)
         self.pinsModel = PinsViewModel(store: store)
         self.pinsModel.onDismiss = onDismiss
-        #endif
+#endif
 
-        #if os(iOS) || os(tvOS)
+#if os(iOS) || os(tvOS)
         self.settingsModel = SettingsViewModel(store: store)
         self.settingsModel.onDismiss = onDismiss
-        #endif
+#endif
 
-        #if os(iOS)
+#if os(iOS)
         self.items = [.console, .network, .pins, .settings]
-        #elseif os(tvOS)
+#elseif os(tvOS)
         self.items = [.console, .network, .settings]
-        #else
+#else
         self.items = [.console, .network, .pins]
-        #endif
+#endif
     }
 }
 
@@ -57,7 +57,7 @@ struct MainViewModelItem: Hashable, Identifiable {
     let imageName: String
     var id: String { title }
 
-    #if os(iOS) || os(tvOS)
+#if os(iOS) || os(tvOS)
     static let console = MainViewModelItem(title: "Console", imageName: isPad ? "message" : "message.fill")
     static let network = MainViewModelItem(title: "Network", imageName: {
         if #available(iOS 14.0, *) {
@@ -74,12 +74,12 @@ struct MainViewModelItem: Hashable, Identifiable {
             return "ellipsis.circle.fill"
         }
     }())
-    #else
+#else
     static let console = MainViewModelItem(title: "Console", imageName: "message")
     static let network = MainViewModelItem(title: "Network", imageName: "icloud.and.arrow.down")
     static let pins = MainViewModelItem(title: "Pins", imageName: "pin")
     static let settings = MainViewModelItem(title: "Settings", imageName: "ellipsis.circle")
-    #endif
+#endif
 }
 
 extension MainViewModel {
@@ -90,14 +90,14 @@ extension MainViewModel {
             ConsoleView(viewModel: consoleModel)
         case .network:
             NetworkView(viewModel: networkModel)
-        #if !os(tvOS)
+#if !os(tvOS)
         case .pins:
             PinsView(viewModel: pinsModel)
-        #endif
-        #if os(iOS) || os(tvOS)
+#endif
+#if os(iOS) || os(tvOS)
         case .settings:
             SettingsView(viewModel: settingsModel, console: consoleModel)
-        #endif
+#endif
         default: fatalError()
         }
     }

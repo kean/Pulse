@@ -98,6 +98,7 @@ protocol Pinnable {
     var pinViewModel: PinButtonViewModel { get }
 }
 
+#if os(iOS) || os(macOS)
 final class PinButtonViewModel: ObservableObject {
     @Published private(set) var isPinned = false
     private let message: LoggerMessageEntity?
@@ -129,3 +130,9 @@ final class PinButtonViewModel: ObservableObject {
         store.togglePin(for: message)
     }
 }
+#else
+struct PinButtonViewModel {
+    init(store: LoggerStore, message: LoggerMessageEntity) {}
+    init(store: LoggerStore, request: LoggerNetworkRequestEntity) {}
+}
+#endif

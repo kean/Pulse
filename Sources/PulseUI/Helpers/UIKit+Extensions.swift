@@ -3,6 +3,7 @@
 // Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
 
 #if os(iOS)
+
 import UIKit
 import SwiftUI
 
@@ -111,4 +112,5 @@ extension UIApplication {
             .first { $0.isKeyWindow }
     }
 }
+
 #endif

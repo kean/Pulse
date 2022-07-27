@@ -61,7 +61,8 @@ final class ConsoleMessageViewModel: Pinnable {
     }
     
     // MARK: Context Menu
-    
+
+#if os(iOS) || os(macOS)
     func share() -> ShareItems {
         ShareItems([ConsoleShareService(store: store).share(message)])
     }
@@ -83,6 +84,7 @@ final class ConsoleMessageViewModel: Pinnable {
         searchCriteriaViewModel?.criteria.labels.isEnabled = true
         searchCriteriaViewModel?.criteria.labels.hidden.insert(message.label)
     }
+#endif
 }
 
 private extension BadgeViewModel {

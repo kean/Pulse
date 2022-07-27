@@ -24,7 +24,7 @@ struct ConsoleMessagesForEach: View {
             NavigationLink.lazy(destination: {
                 ConsoleMessageDetailsView(viewModel: .init(store: store, message: message))
             }, label: {
-                ConsoleMessagesForEachRow(store: store, message: message)
+                ConsoleMessageView(viewModel: .init(message: message, store: store))
             })
         }
     }
@@ -38,7 +38,7 @@ private struct NetworkRequestRow: View {
         NavigationLink.lazy(destination: {
             NetworkInspectorView(viewModel: .init(request: request, store: store))
         }, label: {
-            ConsoleNetworkRequestForEachRow(store: store, request: request)
+            ConsoleNetworkRequestView(viewModel: .init(request: request, store: store))
         })
     }
 }
@@ -54,25 +54,6 @@ struct NetworkMessagesForEach: View {
     @ViewBuilder
     private func makeListItem(request: LoggerNetworkRequestEntity) -> some View {
         NetworkRequestRow(store: store, request: request)
-    }
-}
-
-/// These exist to make sure views are rendered lazily.
-private struct ConsoleNetworkRequestForEachRow: View {
-    let store: LoggerStore
-    let request: LoggerNetworkRequestEntity
-
-    var body: some View {
-        ConsoleNetworkRequestView(viewModel: .init(request: request, store: store))
-    }
-}
-
-private struct ConsoleMessagesForEachRow: View {
-    let store: LoggerStore
-    let message: LoggerMessageEntity
-
-    var body: some View {
-        ConsoleMessageView(viewModel: .init(message: message, store: store))
     }
 }
 

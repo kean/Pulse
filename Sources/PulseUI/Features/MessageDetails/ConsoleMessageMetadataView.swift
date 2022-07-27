@@ -12,7 +12,7 @@ struct ConsoleMessageMetadataView: View {
 
     var body: some View {
         contents
-            .background(linksView)
+            .background(links)
 #if os(iOS)
             .navigationBarTitle("Details", displayMode: .inline)
 #endif
@@ -60,10 +60,12 @@ struct ConsoleMessageMetadataView: View {
         message.metadata.sorted(by: { $0.key < $1.key }).map { ($0.key, $0.value )}
     }
 
-    private var linksView: some View {
-            NavigationLink(destination: NetworkHeadersDetailsView(viewModel: metadataViewModel), isActive: $isMetadataRawLinkActive) {
-                EmptyView()
-            }.opacity(0)
+    private var links: some View {
+        InvisibleNavigationLinks {
+            NavigationLink.programmatic(isActive: $isMetadataRawLinkActive) {
+                NetworkHeadersDetailsView(viewModel: metadataViewModel)
+            }
+        }
     }
 }
 

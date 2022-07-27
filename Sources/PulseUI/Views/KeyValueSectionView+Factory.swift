@@ -64,6 +64,39 @@ extension KeyValueSectionViewModel {
         )
     }
 
+    static func makeErrorDetails(for error: NetworkLoggerError, action: @escaping () -> Void) -> KeyValueSectionViewModel {
+        KeyValueSectionViewModel(
+            title: "Error",
+            color: .red,
+            action: ActionViewModel(action: action, title: "View"),
+            items: [
+                ("Domain", error.domain),
+                ("Code", descriptionForError(domain: error.domain, code: error.code)),
+                ("Message", error.localizedDescription)
+            ])
+    }
+
+    private static func descriptionForError(domain: String, code: Int) -> String {
+        guard domain == NSURLErrorDomain else {
+            return "\(code)"
+        }
+        return "\(code) (\(descriptionForURLErrorCode(code)))"
+    }
+
+#if os(iOS) || os(macOS)
+    static func makeQueryItems(for url: URL, action: @escaping () -> Void) -> KeyValueSectionViewModel? {
+        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
+              let queryItems = components.queryItems, !queryItems.isEmpty else {
+            return nil
+        }
+        return KeyValueSectionViewModel(
+            title: "Query Items",
+            color: .blue,
+            action: ActionViewModel(action: action, title: "View"),
+            items: queryItems.map { ($0.name, $0.value) }
+        )
+    }
+
     static func makeTiming(for transaction: NetworkLoggerTransactionMetrics) -> KeyValueSectionViewModel {
         let timeFormatter = DateFormatter()
         timeFormatter.dateFormat = "HH:mm:ss.SSS"
@@ -101,36 +134,5 @@ extension KeyValueSectionViewModel {
 
         return KeyValueSectionViewModel(title: "Timing", color: .orange, items: items)
     }
-
-    static func makeErrorDetails(for error: NetworkLoggerError, action: @escaping () -> Void) -> KeyValueSectionViewModel {
-        KeyValueSectionViewModel(
-            title: "Error",
-            color: .red,
-            action: ActionViewModel(action: action, title: "View"),
-            items: [
-                ("Domain", error.domain),
-                ("Code", descriptionForError(domain: error.domain, code: error.code)),
-                ("Message", error.localizedDescription)
-            ])
-    }
-
-    static func makeQueryItems(for url: URL, action: @escaping () -> Void) -> KeyValueSectionViewModel? {
-        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
-              let queryItems = components.queryItems, !queryItems.isEmpty else {
-            return nil
-        }
-        return KeyValueSectionViewModel(
-            title: "Query Items",
-            color: .blue,
-            action: ActionViewModel(action: action, title: "View"),
-            items: queryItems.map { ($0.name, $0.value) }
-        )
-    }
-}
-
-private func descriptionForError(domain: String, code: Int) -> String {
-    guard domain == NSURLErrorDomain else {
-        return "\(code)"
-    }
-    return "\(code) (\(descriptionForURLErrorCode(code)))"
+#endif
 }

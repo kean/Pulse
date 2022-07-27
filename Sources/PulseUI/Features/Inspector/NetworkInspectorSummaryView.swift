@@ -184,19 +184,23 @@ struct NetworkInspectorSummaryView: View {
                     NetworkHeadersDetailsView(viewModel: errorModel)
                 }
             }
-            
+
+#if os(iOS) || os(macOS)
             NavigationLink.programmatic(isActive: $viewModel.isOriginalQueryItemsLinkActive) {
                 viewModel.originalRequestQueryItems.map(NetworkHeadersDetailsView.init)
             }
+#endif
             
             NavigationLink.programmatic(isActive: $viewModel.isRequestRawLinkActive, destination: {
                 FileViewer(viewModel: viewModel.requestBodyViewModel)
                     .backport.navigationTitle("Request")
             })
-            
+
+#if os(iOS) || os(macOS)
             NavigationLink.programmatic(isActive: $viewModel.isCurrentQueryItemsLinkActive) {
                 viewModel.currentRequestQueryItems.map(NetworkHeadersDetailsView.init)
             }
+#endif
             
             NavigationLink.programmatic(isActive: $viewModel.isResponseRawLinkActive, destination: {
                 FileViewer(viewModel: viewModel.responseBodyViewModel)

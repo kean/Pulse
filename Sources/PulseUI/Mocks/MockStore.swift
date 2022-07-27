@@ -7,6 +7,7 @@ import PulseCore
 import CoreData
 
 #if DEBUG
+
 extension LoggerStore {
     static let mock: LoggerStore = {
         let store = makeMockStore()
@@ -124,4 +125,5 @@ func populateStore(_ store: LoggerStore) {
     store.container.viewContext.performAndWait {}
     store.backgroundContext.performAndWait {}
 }
+
 #endif

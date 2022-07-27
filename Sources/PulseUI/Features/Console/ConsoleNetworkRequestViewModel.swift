@@ -125,6 +125,8 @@ final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
 
     // MARK: Context Menu
 
+#if os(iOS) || os(macOS)
+
     func shareAsPlainText() -> ShareItems {
         ShareItems([ConsoleShareService(store: store).share(request, output: .plainText)])
     }
@@ -169,4 +171,5 @@ final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
     var cURLDescription: String {
         request.cURLDescription(store: store)
     }
+#endif
 }

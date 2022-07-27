@@ -103,6 +103,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
         details.originalRequest.map(KeyValueSectionViewModel.makeSummary)
     }
 
+#if os(iOS) || os(macOS)
     var originalRequestQueryItems: KeyValueSectionViewModel? {
         details.originalRequest?.url.flatMap {
             KeyValueSectionViewModel.makeQueryItems(for: $0) { [unowned self] in
@@ -110,6 +111,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
             }
         }
     }
+#endif
 
     var originalRequestParameters: KeyValueSectionViewModel? {
         details.originalRequest.map(KeyValueSectionViewModel.makeParameters)
@@ -146,6 +148,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
         details.currentRequest.map(KeyValueSectionViewModel.makeSummary)
     }
 
+#if os(iOS) || os(macOS)
     var currentRequestQueryItems: KeyValueSectionViewModel? {
         details.originalRequest?.url.flatMap {
             KeyValueSectionViewModel.makeQueryItems(for: $0) { [unowned self] in
@@ -153,6 +156,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
             }
         }
     }
+#endif
 
     var currentRequestParameters: KeyValueSectionViewModel? {
         details.currentRequest.map(KeyValueSectionViewModel.makeParameters)

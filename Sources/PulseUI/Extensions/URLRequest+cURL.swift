@@ -5,6 +5,8 @@
 import PulseCore
 import Foundation
 
+#if os(iOS) || os(macOS)
+
 extension LoggerNetworkRequestEntity {
     func cURLDescription(store: LoggerStore) -> String {
         let details = DecodedNetworkRequestDetailsEntity(request: self)
@@ -33,3 +35,5 @@ extension LoggerNetworkRequestEntity {
         return components.joined(separator: " \\\n\t")
     }
 }
+
+#endif

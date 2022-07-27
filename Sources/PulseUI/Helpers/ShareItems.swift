@@ -6,6 +6,8 @@ import Foundation
 import PulseCore
 import CoreData
 
+#if os(iOS) || os(macOS)
+
 enum ShareStoreOutput {
     case store, text
 }
@@ -22,17 +24,9 @@ struct ShareItems: Identifiable {
 }
 
 extension ShareItems {
-    static func makeCurrentDate() -> String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd_HH-mm"
-        return dateFormatter.string(from: Date())
-    }
-}
-
-extension ShareItems {
     init(store: LoggerStore, output: ShareStoreOutput) {
         let directory = TemporaryDirectory()
-        let date = ShareItems.makeCurrentDate()
+        let date = makeCurrentDate()
 
         let items: [Any]
         switch output {
@@ -114,6 +108,20 @@ struct ConsoleShareService {
     }
 }
 
+enum NetworkMessageRenderType {
+    case plainText
+    case markdown
+    case html
+}
+
+private let dateFormatter: DateFormatter = {
+    let formatter = DateFormatter()
+    formatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSSS"
+    return formatter
+}()
+
+#endif
+
 struct TemporaryDirectory {
     let url: URL
 
@@ -128,23 +136,19 @@ struct TemporaryDirectory {
     }
 }
 
+#if os(iOS) || os(macOS)
 extension TemporaryDirectory {
     func write(text: String, extension fileExtension: String) -> URL {
-        let date = ShareItems.makeCurrentDate()
+        let date = makeCurrentDate()
         let fileURL = url.appendingPathComponent("logs-\(date).\(fileExtension)", isDirectory: false)
         try? text.data(using: .utf8)?.write(to: fileURL)
         return fileURL
     }
 }
+#endif
 
-enum NetworkMessageRenderType {
-    case plainText
-    case markdown
-    case html
+func makeCurrentDate() -> String {
+    let dateFormatter = DateFormatter()
+    dateFormatter.dateFormat = "yyyy-MM-dd_HH-mm"
+    return dateFormatter.string(from: Date())
 }
-
-private let dateFormatter: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSSS"
-    return formatter
-}()

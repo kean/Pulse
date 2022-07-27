@@ -5,6 +5,8 @@
 import PulseCore
 import Foundation
 
+#if os(iOS) || os(macOS)
+
 enum Render {
     static func asPlainText(request: LoggerNetworkRequestEntity, store: LoggerStore) -> String {
         render(request: request, store: store, using: PlainTextRenderer())
@@ -359,3 +361,5 @@ body {
 }
 </style>
 """
+
+#endif
