@@ -8,7 +8,7 @@ import CoreData
 import PulseCore
 import Combine
 
-#if os(iOS) || os(tvOS) || os(macOS)
+#if os(iOS) || os(macOS)
 
 struct PinButton: View {
     @ObservedObject var viewModel: PinButtonViewModel
