@@ -377,6 +377,7 @@ extension NetworkFiltersView {
                 HStack {
                     Text(domain)
                         .foregroundColor(.primary)
+                        .lineLimit(1)
                     Spacer()
                     Checkbox(isEnabled: binding)
                 }
@@ -407,6 +408,7 @@ extension NetworkFiltersView {
         return ForEach(domains, id: \.self) { domain in
             HStack {
                 Toggle(domain, isOn: viewModel.binding(forDomain: domain))
+                    .lineLimit(1)
                 Spacer()
             }
         }
@@ -454,51 +456,6 @@ extension NetworkFiltersView {
         Filters.taskTypePicker($viewModel.criteria.networking.taskType)
         Filters.responseSourcePicker($viewModel.criteria.networking.source)
         Filters.toggle("Redirect", isOn: $viewModel.criteria.networking.isRedirect)
-    }
-}
-
-// MARK: - Helpers
-
-private struct FiltersSection<Header: View, Content: View>: View {
-    var isExpanded: Binding<Bool>
-    @ViewBuilder var header: () -> Header
-    @ViewBuilder var content: () -> Content
-    var isWrapped = true
-
-    var body: some View {
-#if os(iOS)
-        Section(content: content, header: header)
-#elseif os(macOS)
-        DisclosureGroup(
-            isExpanded: isExpanded,
-            content: {
-                if isWrapped {
-                    VStack {
-                        content()
-                    }
-                    .padding(.leading, 12)
-                    .padding(.trailing, 5)
-                    .padding(.top, Filters.contentTopInset)
-                } else {
-                    content()
-                }
-            },
-            label: header
-        )
-#endif
-    }
-}
-
-private extension Filters {
-    static func toggle(_ title: String, isOn: Binding<Bool>) -> some View {
-#if os(iOS)
-        Toggle(title, isOn: isOn)
-        #elseif os(macOS)
-        HStack {
-            Toggle(title, isOn: isOn)
-            Spacer()
-        }
-        #endif
     }
 }
 

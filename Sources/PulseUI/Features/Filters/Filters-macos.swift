@@ -46,17 +46,4 @@ extension Filters {
     static let contentTopInset: CGFloat = 8
 }
 
-struct FiltersSectionContent<Content: View>: View {
-    @ViewBuilder let content: () -> Content
-
-    var body: some View {
-        VStack {
-            content()
-        }
-        .padding(.leading, 12)
-        .padding(.trailing, 5)
-        .padding(.top, Filters.contentTopInset)
-    }
-}
-
 #endif

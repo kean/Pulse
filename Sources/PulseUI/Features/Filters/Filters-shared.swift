@@ -76,8 +76,6 @@ enum Filters {
     }
 }
 
-#endif
-
 struct FilterPickerButton: View {
     let title: String
 
@@ -96,34 +94,46 @@ struct FilterPickerButton: View {
     }
 }
 
-#if os(iOS) || os(tvOS)
-
-struct FilterSectionHeader: View {
-    let icon: String
-    let title: String
-    let color: Color
-    let reset: () -> Void
-    let isDefault: Bool
-    var isEnabled: Binding<Bool> = .constant(true)
+struct FiltersSection<Header: View, Content: View>: View {
+    var isExpanded: Binding<Bool>
+    @ViewBuilder var header: () -> Header
+    @ViewBuilder var content: () -> Content
+    var isWrapped = true
 
     var body: some View {
-        HStack(spacing: 0) {
-            HStack {
-                Image(systemName: icon)
-                    .foregroundColor(.accentColor)
-                Text(title.uppercased())
-            }
-            .font(.body)
-            Spacer()
+#if os(iOS)
+        Section(content: content, header: header)
+#elseif os(macOS)
+        DisclosureGroup(
+            isExpanded: isExpanded,
+            content: {
+                if isWrapped {
+                    VStack {
+                        content()
+                    }
+                    .padding(.leading, 12)
+                    .padding(.trailing, 5)
+                    .padding(.top, Filters.contentTopInset)
+                } else {
+                    content()
+                }
+            },
+            label: header
+        )
+#endif
+    }
+}
 
-            Button(action: reset) {
-                Image(systemName: "arrow.uturn.left")
-                    .font(.system(size: 18))
-                    .foregroundColor(.accentColor)
-            }
-            .frame(width: 34, height: 34)
-            .disabled(isDefault)
-        }.buttonStyle(.plain)
+extension Filters {
+    static func toggle(_ title: String, isOn: Binding<Bool>) -> some View {
+#if os(iOS)
+        Toggle(title, isOn: isOn)
+        #elseif os(macOS)
+        HStack {
+            Toggle(title, isOn: isOn)
+            Spacer()
+        }
+        #endif
     }
 }
 

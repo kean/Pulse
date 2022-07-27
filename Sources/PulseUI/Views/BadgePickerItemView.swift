@@ -15,6 +15,7 @@ struct BadgePickerItemView: View {
             HStack {
                 Text(title)
                     .foregroundColor(textColor)
+                Spacer()
                 Checkbox(isEnabled: $isEnabled)
             }
             .padding(EdgeInsets(top: 9, leading: 13, bottom: 9, trailing: 11))
