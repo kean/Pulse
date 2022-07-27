@@ -8,7 +8,7 @@ import PulseUI
 
 struct ContentView: View {
     var body: some View {
-        ConsoleView(store: .mock)
+        MainView(store: .mock)
     }
 }
 

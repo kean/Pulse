@@ -41,7 +41,7 @@ struct ConsoleMessageDetailsView: View {
         ScrollView {
             VStack {
                 HStack {
-                    PinButton3(viewModel: viewModel.pin)
+                    PinButton(viewModel: viewModel.pin)
                     NavigationLink(destination: ConsoleMessageMetadataView(message: viewModel.message)) {
                         VStack(spacing: 4) {
                             Image(systemName: "info.circle")

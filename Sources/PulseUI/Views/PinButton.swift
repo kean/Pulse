@@ -8,34 +8,8 @@ import CoreData
 import PulseCore
 import Combine
 
-struct PinButton: View {
-    @ObservedObject var viewModel: PinButtonViewModel
-    var isTextNeeded: Bool = true
-
-    var body: some View {
-        Button(action: viewModel.togglePin) {
-            if isTextNeeded {
-                Text(viewModel.isPinned ? "Remove Pin" : "Pin")
-            }
-            Image(systemName: viewModel.isPinned ? "pin.slash" : "pin")
-        }
-    }
-}
-
-@available(iOS 14.0, tvOS 14.0, *)
-struct PinButton2: View {
-    @ObservedObject var viewModel: PinButtonViewModel
-
-    var body: some View {
-        Button(action: viewModel.togglePin) {
-            Label(viewModel.isPinned ? "Remove Pin" : "Pin", systemImage: viewModel.isPinned ? "pin.slash" : "pin")
-        }
-    }
-}
-
 #if os(watchOS)
-@available(iOS 14.0, tvOS 14.0, *)
-struct PinButton3: View {
+struct PinButton: View {
     @ObservedObject var viewModel: PinButtonViewModel
 
     var body: some View {
@@ -49,7 +23,32 @@ struct PinButton3: View {
         }
     }
 }
+#else
+struct PinButton: View {
+    @ObservedObject var viewModel: PinButtonViewModel
+    var isTextNeeded: Bool = true
+
+    var body: some View {
+        Button(action: viewModel.togglePin) {
+            if isTextNeeded {
+                Text(viewModel.isPinned ? "Remove Pin" : "Pin")
+            }
+            Image(systemName: viewModel.isPinned ? "pin.slash" : "pin")
+        }
+    }
+}
 #endif
+
+@available(iOS 14.0, tvOS 14.0, *)
+struct PinButton2: View {
+    @ObservedObject var viewModel: PinButtonViewModel
+
+    var body: some View {
+        Button(action: viewModel.togglePin) {
+            Label(viewModel.isPinned ? "Remove Pin" : "Pin", systemImage: viewModel.isPinned ? "pin.slash" : "pin")
+        }
+    }
+}
 
 #if os(iOS)
 extension UIAction {

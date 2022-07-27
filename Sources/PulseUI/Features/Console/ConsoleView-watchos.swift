@@ -10,15 +10,15 @@ import Combine
 #if os(watchOS)
 import WatchConnectivity
 
-public struct ConsoleView: View {
+struct ConsoleView: View {
     @ObservedObject var viewModel: ConsoleViewModel
-    @Environment(\.colorScheme) private var colorScheme: ColorScheme
+
     @State private var isShowingFiltersView = false
     @State private var isShowingRemoveConfirmationAlert = false
     @State private var isStoreArchived = false
     @State private var isRemoteLoggingLinkActive = false
 
-    public init(store: LoggerStore = .default) {
+    init(store: LoggerStore = .default) {
         self.viewModel = ConsoleViewModel(store: store)
     }
 
@@ -26,7 +26,7 @@ public struct ConsoleView: View {
         self.viewModel = viewModel
     }
 
-    public var body: some View {
+    var body: some View {
         List {
             Button(action: viewModel.tranferStore) {
                 Label(viewModel.fileTransferStatus.title, systemImage: "square.and.arrow.up")
