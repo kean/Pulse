@@ -60,11 +60,6 @@ struct ConsoleSearchCriteria: Hashable {
         static let `default` = LabelsFilter()
     }
 
-#if os(watchOS)
-    var onlyPins = false
-    var onlyNetwork = false
-#endif
-
     static let `default` = ConsoleSearchCriteria()
 
     var isDefault: Bool {
@@ -218,15 +213,14 @@ extension ConsoleSearchCriteria {
         criteria: ConsoleSearchCriteria,
         filters: [ConsoleSearchFilter],
         sessionId: String?,
-        isOnlyErrors: Bool
+        isOnlyErrors: Bool,
+        isOnlyNetwork: Bool
     ) {
         var predicates = [NSPredicate]()
 
-#if os(watchOS)
-        if criteria.onlyNetwork {
+        if isOnlyNetwork {
             predicates.append(NSPredicate(format: "request != nil"))
         }
-#endif
 
         if criteria.dates.isCurrentSessionOnly, let sessionId = sessionId, !sessionId.isEmpty {
             predicates.append(NSPredicate(format: "session == %@", sessionId))

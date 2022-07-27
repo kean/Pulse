@@ -20,11 +20,8 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     // Search criteria
     let searchCriteria: ConsoleSearchCriteriaViewModel
     @Published var isOnlyErrors: Bool = false
+    @Published var isOnlyNetwork: Bool = false
     @Published var filterTerm: String = ""
-
-#if os(watchOS)
-    @Published private(set) var quickFilters: [QuickFilterViewModel] = []
-#endif
 
     // Apple Watch file transfers
 #if os(watchOS) || os(iOS)
@@ -109,9 +106,6 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     }
 
     private func refresh(filterTerm: String) {
-        // Reset quick filters
-        refreshQuickFilters(criteria: searchCriteria.criteria)
-
         // Get sessionId
         if latestSessionId == nil {
             latestSessionId = entities.first?.session
@@ -119,7 +113,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         let sessionId = store === LoggerStore.default ? LoggerSession.current.id.uuidString : latestSessionId
 
         // Search messages
-        ConsoleSearchCriteria.update(request: controller.fetchRequest, filterTerm: filterTerm, criteria: searchCriteria.criteria, filters: searchCriteria.filters, sessionId: sessionId, isOnlyErrors: isOnlyErrors)
+        ConsoleSearchCriteria.update(request: controller.fetchRequest, filterTerm: filterTerm, criteria: searchCriteria.criteria, filters: searchCriteria.filters, sessionId: sessionId, isOnlyErrors: isOnlyErrors, isOnlyNetwork: isOnlyNetwork)
         try? controller.performFetch()
 
         reloadMessages()
@@ -148,12 +142,6 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     }
 
     // MARK: Pins
-
-    private func refreshQuickFilters(criteria: ConsoleSearchCriteria) {
-#if os(watchOS)
-        quickFilters = searchCriteria.makeQuickFilters()
-#endif
-    }
 
     func share(as output: ShareStoreOutput) -> ShareItems {
 #if os(iOS)

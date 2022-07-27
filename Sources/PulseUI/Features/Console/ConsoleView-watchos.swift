@@ -13,7 +13,6 @@ import WatchConnectivity
 struct ConsoleView: View {
     @ObservedObject var viewModel: ConsoleViewModel
 
-    @State private var isShowingFiltersView = false
     @State private var isShowingRemoveConfirmationAlert = false
     @State private var isStoreArchived = false
     @State private var isRemoteLoggingLinkActive = false
@@ -38,9 +37,15 @@ struct ConsoleView: View {
                     }
                 }
             }
-            Button(action: { isShowingFiltersView = true }) {
-                Label("Quick Filters", systemImage: "line.horizontal.3.decrease.circle")
-            }
+
+            Button(action: { viewModel.isOnlyErrors.toggle() }) {
+                Label("Show Errors", systemImage: viewModel.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon")
+            }.listRowBackground(viewModel.isOnlyErrors ? Color.blue.cornerRadius(8) : nil)
+
+            Button(action: { viewModel.isOnlyNetwork.toggle() }) {
+                Label("Show Requests", systemImage: "network")
+            }.listRowBackground(viewModel.isOnlyNetwork ? Color.blue.cornerRadius(8) : nil)
+
             ConsoleMessagesForEach(store: viewModel.store, messages: viewModel.entities)
         }
         .navigationTitle("Console")
@@ -56,17 +61,6 @@ struct ConsoleView: View {
         .onDisappear(perform: viewModel.onDisappear)
         .alert(item: $viewModel.fileTransferError) { error in
             Alert(title: Text("Transfer Failed"), message: Text(error.message), dismissButton: .cancel(Text("Ok")))
-        }
-        .sheet(isPresented: $isShowingFiltersView) {
-            List(viewModel.quickFilters) { filter in
-                Button(action: {
-                    filter.action()
-                    isShowingFiltersView = false
-                }) {
-                    Label(filter.title, systemImage: filter.imageName)
-                        .foregroundColor(filter.title == "Reset" ? Color.red : nil)
-                }
-            }
         }
     }
 }
