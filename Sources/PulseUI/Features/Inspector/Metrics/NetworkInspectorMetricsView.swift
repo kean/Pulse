@@ -75,15 +75,11 @@ final class NetworkInspectorMetricsViewModel {
 #if DEBUG
 struct NetworkInspectorMetricsView_Previews: PreviewProvider {
     static var previews: some View {
-        NavigationView {
-            NetworkInspectorMetricsView(viewModel: mockModel)
-        }
+        NetworkInspectorMetricsView(viewModel: .init(
+            metrics: MockDataTask.login.metrics
+        ))
     }
 }
-
-private let mockModel = NetworkInspectorMetricsViewModel(
-    metrics: MockDataTask.login.metrics
-)
 #endif
 
 #endif

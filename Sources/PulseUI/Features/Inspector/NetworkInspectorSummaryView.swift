@@ -52,47 +52,51 @@ struct NetworkInspectorSummaryView: View {
 
     @ViewBuilder
     private var requestHeaderView: some View {
-        HStack {
-            LargeSectionHeader(title: "Request", accessory: {
-                Picker("Request Type", selection: $isShowingCurrentRequest) {
-                    Text("Original").tag(false)
-                    Text("Current").tag(true)
-                }
-                .pickerStyle(.segmented)
-                .labelsHidden()
-                .fixedSize()
-            })
-        }
+        LargeSectionHeader(title: "Request", accessory: {
+            Picker("Request Type", selection: $isShowingCurrentRequest) {
+                Text("Original").tag(false)
+                Text("Current").tag(true)
+            }
+            .pickerStyle(.segmented)
+            .labelsHidden()
+            .fixedSize()
+        })
     }
 
     @ViewBuilder
     private var originalRequestSection: some View {
         Section(header: requestHeaderView) {
-            viewModel.originalRequestSummary.map(KeyValueSectionView.init)
-            viewModel.originalRequestQueryItems.map { KeyValueSectionView(viewModel: $0, limit: 10) }
-            KeyValueSectionView(viewModel: viewModel.originalRequestHeaders, limit: 10)
-            KeyValueSectionView(viewModel: viewModel.requestBodySection)
-            viewModel.originalRequestParameters.map(KeyValueSectionView.init)
+            VStack(spacing: 16) {
+                viewModel.originalRequestSummary.map(KeyValueSectionView.init)
+                viewModel.originalRequestQueryItems.map { KeyValueSectionView(viewModel: $0, limit: 10) }
+                KeyValueSectionView(viewModel: viewModel.originalRequestHeaders, limit: 10)
+                KeyValueSectionView(viewModel: viewModel.requestBodySection)
+                viewModel.originalRequestParameters.map(KeyValueSectionView.init)
+            }
         }
     }
 
     @ViewBuilder
     private var currentRequestSection: some View {
         Section(header: requestHeaderView) {
-            viewModel.currentRequestSummary.map(KeyValueSectionView.init)
-            viewModel.currentRequestQueryItems.map { KeyValueSectionView(viewModel: $0, limit: 10) }
-            KeyValueSectionView(viewModel: viewModel.currentRequestHeaders, limit: 10)
-            KeyValueSectionView(viewModel: viewModel.requestBodySection)
-            viewModel.currentRequestParameters.map(KeyValueSectionView.init)
+            VStack(spacing: 16) {
+                viewModel.currentRequestSummary.map(KeyValueSectionView.init)
+                viewModel.currentRequestQueryItems.map { KeyValueSectionView(viewModel: $0, limit: 10) }
+                KeyValueSectionView(viewModel: viewModel.currentRequestHeaders, limit: 10)
+                KeyValueSectionView(viewModel: viewModel.requestBodySection)
+                viewModel.currentRequestParameters.map(KeyValueSectionView.init)
+            }
         }
     }
 
     @ViewBuilder
     private var responseSection: some View {
         Section(header: LargeSectionHeader(title: "Response")) {
-            viewModel.responseSummary.map(KeyValueSectionView.init)
-            KeyValueSectionView(viewModel: viewModel.responseHeaders, limit: 10)
-            KeyValueSectionView(viewModel: viewModel.responseBodySection)
+            VStack(spacing: 16) {
+                viewModel.responseSummary.map(KeyValueSectionView.init)
+                KeyValueSectionView(viewModel: viewModel.responseHeaders, limit: 10)
+                KeyValueSectionView(viewModel: viewModel.responseBodySection)
+            }
         }
     }
 #elseif os(watchOS)
@@ -165,7 +169,7 @@ struct NetworkInspectorSummaryView: View {
 
     private var summaryView: some View {
         let summaryViewModel = viewModel.summaryViewModel
-        return VStack {
+        return VStack(spacing: 8) {
             HStack(spacing: spacing) {
                 Text(summaryViewModel.title)
                 Image(systemName: viewModel.statusImageName)

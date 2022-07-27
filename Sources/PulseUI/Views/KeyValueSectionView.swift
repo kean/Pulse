@@ -30,7 +30,7 @@ struct KeyValueSectionView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading) {
+        VStack(alignment: .leading, spacing: 8) {
             if !hideTitle {
                 headerView
             }
@@ -41,7 +41,7 @@ struct KeyValueSectionView: View {
                 .padding(.top, 2)
 
             if let action = viewModel.action, !viewModel.items.isEmpty {
-                Spacer().frame(height: 10)
+                Spacer().frame(height: 8)
                 Button(action: action.action, label: {
                     Text(action.title)
                     Image(systemName: "chevron.right")
@@ -52,9 +52,9 @@ struct KeyValueSectionView: View {
             }
 #else
             KeyValueListView(viewModel: viewModel, limit: limit)
-                .padding(EdgeInsets(top: 0, leading: 10, bottom: 0, trailing: 0))
+                .padding(EdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 0))
                 .border(width: 2, edges: [.leading], color: actualTintColor)
-                .padding(EdgeInsets(top: 5, leading: 2, bottom: 5, trailing: 0))
+                .padding(EdgeInsets(top: 0, leading: 1, bottom: 0, trailing: 0))
 #endif
         }
     }
@@ -75,18 +75,17 @@ struct KeyValueSectionView: View {
 
     @ViewBuilder
     private func makeActionButton(with action: ActionViewModel) -> some View {
-        Button(action: action.action, label: {
-            Text(action.title)
-            Image(systemName: "chevron.right")
-                .foregroundColor(Color.gray)
-                .font(.caption)
-                .padding(.top, 2)
-        })
-        .foregroundColor(.primary)
-        .padding(EdgeInsets(top: 6, leading: 12, bottom: 6, trailing: 12))
-        .background(Color.secondaryFill)
-        .cornerRadius(12)
-        .frame(height: 20, alignment: .center)
+        Button(action: action.action) {
+            HStack(spacing: 4) {
+                Text(action.title)
+                    .font(.body)
+                    .foregroundColor(.accentColor)
+                Image(systemName: "chevron.right")
+                    .foregroundColor(Color.gray)
+                    .font(.caption)
+                    .padding(.top, 2)
+            }.padding(.trailing, -6)
+        }
     }
 }
 
@@ -249,3 +248,29 @@ struct ActionViewModel {
     let action: () -> Void
     let title: String
 }
+
+#if DEBUG
+struct KeyValueSectionView_Previews: PreviewProvider {
+    static var previews: some View {
+        VStack(spacing: 16) {
+            KeyValueSectionView(viewModel: .init(
+                title: "Query Items",
+                color: .red,
+                items: [("username", "kean")])
+            )
+            KeyValueSectionView(viewModel: .init(
+                title: "Headers",
+                color: .blue,
+                action: .init(action: {}, title: "Show Raw"),
+                items: [
+                    ("Content-Length", "21851748"),
+                    ("Content-Type", "multipart/form-data; boundary=----WebKitFormBoundaryrv8XAHQPtQcWta3k"),
+                    ("User-Agent", "Pulse%20Demo%20iOS/20 CFNetwork/1385 Darwin/22.0.0")
+                ])
+            )
+        }
+        .padding()
+        .previewLayout(.fixed(width: 320, height: 400))
+    }
+}
+#endif

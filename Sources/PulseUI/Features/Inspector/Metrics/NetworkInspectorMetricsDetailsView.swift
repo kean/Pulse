@@ -91,22 +91,12 @@ private func formatBytes(_ count: Int64) -> String {
 #if DEBUG
 struct NetworkInspectorMetricsDetailsView_Previews: PreviewProvider {
     static var previews: some View {
-        Group {
-            NetworkInspectorMetricsDetailsView(viewModel: mockModel)
-                .previewDisplayName("Light")
-                .environment(\.colorScheme, .light)
-
-            NetworkInspectorMetricsDetailsView(viewModel: mockModel)
-                .background(Color(UXColor.systemBackground))
-                .previewDisplayName("Dark")
-                .environment(\.colorScheme, .dark)
-        }
+        NetworkInspectorMetricsDetailsView(viewModel: .init(
+            metrics: MockDataTask.login.metrics.transactions.first!
+        ))
+        .fixedSize()
     }
 }
-
-private let mockModel = NetworkMetricsDetailsViewModel(
-    metrics: MockDataTask.login.metrics.transactions.first!
-)
 #endif
 
 #endif
