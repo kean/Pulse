@@ -60,7 +60,7 @@ struct ConsoleSearchCriteria: Hashable {
         static let `default` = LabelsFilter()
     }
 
-    #if os(watchOS) || os(tvOS) || os(iOS)
+    #if os(watchOS)
     var onlyPins = false
     var onlyNetwork = false
     #endif
@@ -222,7 +222,7 @@ extension ConsoleSearchCriteria {
     ) {
         var predicates = [NSPredicate]()
 
-#if os(watchOS) || os(tvOS) || os(iOS)
+#if os(watchOS)
         if criteria.onlyPins {
             predicates.append(NSPredicate(format: "isPinned == YES"))
         }

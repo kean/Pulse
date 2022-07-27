@@ -172,6 +172,8 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
 
     // MARK: Quick Filters
 
+#warning("TODO: remove this")
+
 #if os(watchOS)
     func makeQuickFilters() -> [QuickFilterViewModel] {
         var filters = [QuickFilterViewModel]()
