@@ -6,7 +6,6 @@ import SwiftUI
 
 #if os(iOS)
 
-#warning("TODO: can we get rid of this?")
 struct ToastView<Content>: View where Content: View {
     let content: () -> Content
 

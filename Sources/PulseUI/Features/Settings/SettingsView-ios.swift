@@ -58,8 +58,6 @@ public struct SettingsView: View {
                     }
 
                     ButtonRemoveAll(action: console.buttonRemoveAllMessagesTapped)
-                        .disabled(console.entities.isEmpty)
-                        .opacity(console.entities.isEmpty ? 0.33 : 1)
                 }
                 if #available(iOS 14.0, *) {
                     if console.store === RemoteLogger.shared.store {
@@ -152,7 +150,7 @@ struct ButtonRemove: View {
                 #endif
             }
 
-        #if os(watchOS) || os(macOS)
+        #if os(macOS)
         button
         #else
         button.foregroundColor(.red)
