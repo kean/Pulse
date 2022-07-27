@@ -60,10 +60,10 @@ struct ConsoleSearchCriteria: Hashable {
         static let `default` = LabelsFilter()
     }
 
-    #if os(watchOS)
+#if os(watchOS)
     var onlyPins = false
     var onlyNetwork = false
-    #endif
+#endif
 
     static let `default` = ConsoleSearchCriteria()
 

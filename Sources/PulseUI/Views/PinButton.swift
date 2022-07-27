@@ -14,12 +14,10 @@ struct PinButton: View {
 
     var body: some View {
         Button(action: viewModel.togglePin) {
-            VStack(spacing: 4) {
-                Image(systemName: viewModel.isPinned ? "pin.slash" : "pin")
-                    .foregroundColor(.blue)
-                Text(viewModel.isPinned ? "Remove Pin" : "Pin")
-                    .font(.caption2)
-            }.frame(height: 42)
+            VerticalButtonContent(
+                title: viewModel.isPinned ? "Remove Pin" : "Pin",
+                systemImageName: viewModel.isPinned ? "pin.slash" : "pin"
+            )
         }
     }
 }

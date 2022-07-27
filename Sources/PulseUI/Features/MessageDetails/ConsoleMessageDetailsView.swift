@@ -43,12 +43,7 @@ struct ConsoleMessageDetailsView: View {
                 HStack {
                     PinButton(viewModel: viewModel.pin)
                     NavigationLink(destination: ConsoleMessageMetadataView(message: viewModel.message)) {
-                        VStack(spacing: 4) {
-                            Image(systemName: "info.circle")
-                                .foregroundColor(.blue)
-                            Text("Details")
-                                .font(.caption2)
-                        }.frame(height: 42)
+                        VerticalButtonContent(title: "Details", systemImageName: "info.circle")
                     }
                 }
                 contents
