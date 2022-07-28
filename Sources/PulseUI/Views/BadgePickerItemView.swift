@@ -36,6 +36,8 @@ struct BadgePickerItemView_Previews: PreviewProvider {
             BadgePickerItemView(title: "Test", isEnabled: .constant(true))
             BadgePickerItemView(title: "Test", isEnabled: .constant(false))
         }
+        .frame(width: 200)
+        .previewLayout(.sizeThatFits)
     }
 }
 

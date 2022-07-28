@@ -165,7 +165,7 @@ struct TimingView_Previews: PreviewProvider {
         TimingView(viewModel: .init(sections: mockSections))
             .padding()
 #if !os(tvOS)
-            .previewLayout(.fixed(width: 420, height: 400))
+            .previewLayout(.sizeThatFits)
 #endif
     }
 }

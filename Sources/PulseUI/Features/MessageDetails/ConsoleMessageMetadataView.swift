@@ -22,7 +22,7 @@ struct ConsoleMessageMetadataView: View {
     private var contents: some View {
         ScrollView {
             #if os(iOS) || os(tvOS) || os(macOS)
-            VStack {
+            VStack(spacing: 16) {
                 stackContents
             }.padding()
             #elseif os(watchOS)

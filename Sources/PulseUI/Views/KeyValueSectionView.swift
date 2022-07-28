@@ -289,9 +289,8 @@ struct KeyValueSectionView_Previews: PreviewProvider {
             )
         }
         .padding()
-        .frame(maxHeight: .infinity, alignment: .top)
-        .padding(.top, 80)
-        .previewLayout(.fixed(width: 320, height: 400))
+        .frame(width: 400)
+        .previewLayout(.sizeThatFits)
     }
 }
 #endif

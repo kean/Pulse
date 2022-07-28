@@ -31,7 +31,7 @@ struct SpinnerView: View {
 struct SpinnerView_Previews: PreviewProvider {
     static var previews: some View {
         SpinnerView(viewModel: .init(title: "Pending", details: "2.5 MB / 6.0 MB"))
-            .frame(width: 320, height: 320, alignment: .center)
+            .previewLayout(.fixed(width: 300, height: 300))
     }
 }
 #endif

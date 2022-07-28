@@ -100,20 +100,13 @@ private let spacing: CGFloat? = nil
 
 // MARK: - Preview
 
-#if DEBUG && !os(watchOS)
+#if DEBUG
 struct NetworkInspectorTransferInfoView_Previews: PreviewProvider {
     static var previews: some View {
-        Group {
-            NetworkInspectorTransferInfoView(viewModel: mockModel)
-                .background(Color(UXColor.systemBackground))
-                .previewDisplayName("Light")
-                .environment(\.colorScheme, .light)
-
-            NetworkInspectorTransferInfoView(viewModel: mockModel)
-                .background(Color(UXColor.systemBackground))
-                .previewDisplayName("Dark")
-                .environment(\.colorScheme, .dark)
-        }
+        NetworkInspectorTransferInfoView(viewModel: mockModel)
+            .padding()
+            .fixedSize()
+            .previewLayout(.sizeThatFits)
     }
 }
 

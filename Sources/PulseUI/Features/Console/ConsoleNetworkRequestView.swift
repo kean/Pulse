@@ -7,8 +7,6 @@ import PulseCore
 import Combine
 import CoreData
 
-#if os(watchOS) || os(tvOS) || os(macOS)
-
 struct ConsoleNetworkRequestView: View {
     @ObservedObject var viewModel: ConsoleNetworkRequestViewModel
     @ObservedObject var progressViewModel: ProgressViewModel
@@ -91,4 +89,12 @@ struct ConsoleNetworkRequestView: View {
 #endif
 }
 
+#if DEBUG
+struct ConsoleNetworkRequestView_Previews: PreviewProvider {
+    static var previews: some View {
+        ConsoleNetworkRequestView(viewModel: .init(request: LoggerStore.preview.makeEntity(for: .login), store: .preview))
+            .padding()
+            .previewLayout(.sizeThatFits)
+    }
+}
 #endif

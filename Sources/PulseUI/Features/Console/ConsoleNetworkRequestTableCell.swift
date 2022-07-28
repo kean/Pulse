@@ -82,7 +82,7 @@ final class ConsoleNetworkRequestTableCell: UITableViewCell, UIContextMenuIntera
         if let state = self.state, state != viewModel.state {
             self.isAnimating = true
             UIView.animate(withDuration: 0.33, delay: 0, options: [.allowUserInteraction]) {
-                self.contentView.backgroundColor = viewModel.badgeColor.withAlphaComponent(0.15)
+                self.contentView.backgroundColor = viewModel.uiBadgeColor.withAlphaComponent(0.15)
             } completion: { _ in
                 guard self.isAnimating else { return }
                 self.isAnimating = false
@@ -96,7 +96,7 @@ final class ConsoleNetworkRequestTableCell: UITableViewCell, UIContextMenuIntera
         title.text = viewModel.fullTitle
 
         if !onlyTitle {
-            badge.fillColor = viewModel.badgeColor
+            badge.fillColor = viewModel.uiBadgeColor
             details.text = viewModel.text
             accessory.textLabel.text = viewModel.time
             pin.bind(viewModel: viewModel.pinViewModel)

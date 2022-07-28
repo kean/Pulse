@@ -150,3 +150,14 @@ private extension NWBrowser.Result {
         }
     }
 }
+
+#if DEBUG
+struct RemoteLoggerSettingsView_Previews: PreviewProvider {
+    static var previews: some View {
+        if #available(iOS 14.0, tvOS 14.0, *) {
+            RemoteLoggerSettingsView(viewModel: .shared)
+                .previewLayout(.sizeThatFits)
+        }
+    }
+}
+#endif

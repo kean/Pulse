@@ -15,7 +15,7 @@ extension LoggerStore {
         return store
     }()
 
-    static let preview = makeMockStore(options: [.create])
+    static let preview = makeMockStore()
 }
 
 private let rootURL = FileManager.default.temporaryDirectory.appendingPathComponent("pulseui-demo")
@@ -25,10 +25,10 @@ private let cleanup: Void = {
     try? FileManager.default.createDirectory(at: rootURL, withIntermediateDirectories: true, attributes: nil)
 }()
 
-func makeMockStore(options: LoggerStore.Options = [.create, .synchronous]) -> LoggerStore {
+func makeMockStore() -> LoggerStore {
     _ = cleanup
     let storeURL = rootURL.appendingPathComponent("\(UUID().uuidString).pulse")
-    return try! LoggerStore(storeURL: storeURL, options: options)
+    return try! LoggerStore(storeURL: storeURL, options: [.create, .synchronous])
 }
 
 private extension NSManagedObject {

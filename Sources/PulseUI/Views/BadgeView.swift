@@ -39,9 +39,8 @@ struct BadgeView: View {
 
 struct BadgeView_Previews: PreviewProvider {
     static var previews: some View {
-        Group {
-            BadgeView(viewModel: BadgeViewModel(title: "DEBUG", color: Color.red.opacity(0.3)))
-        }
+        BadgeView(viewModel: BadgeViewModel(title: "DEBUG", color: Color.red.opacity(0.3)))
+            .previewLayout(.sizeThatFits)
     }
 }
 

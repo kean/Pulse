@@ -116,6 +116,7 @@ struct ToastView_Previews: PreviewProvider {
                 Text("Archive created (6 KB)")
             }
         }
+        .previewLayout(.fixed(width: 400, height: 200))
     }
 }
 

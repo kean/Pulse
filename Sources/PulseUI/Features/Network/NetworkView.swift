@@ -99,10 +99,8 @@ private struct NetworkToolbarView: View {
 #if DEBUG
 struct NetworkView_Previews: PreviewProvider {
     static var previews: some View {
-        return Group {
+        NavigationView {
             NetworkView(store: .mock)
-            NetworkView(store: .mock)
-                .environment(\.colorScheme, .dark)
         }
     }
 }

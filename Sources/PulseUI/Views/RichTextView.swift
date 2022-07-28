@@ -370,6 +370,8 @@ private func highlight(range: Range<String.Index>, in text: NSMutableAttributedS
 struct RichTextView_Previews: PreviewProvider {
     static var previews: some View {
         RichTextView(viewModel: .init(data: MockJSON.allPossibleValues))
+            .frame(height: 600)
+            .previewLayout(.sizeThatFits)
     }
 }
 #endif

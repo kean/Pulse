@@ -6,7 +6,7 @@ import SwiftUI
 import PulseCore
 import Combine
 
-#if os(macOS)
+#if os(macOS) || os(iOS)
 
 struct NetworkInspectorHeadersTabView: View {
     @ObservedObject var viewModel: NetworkInspectorHeadersTabViewModel
@@ -51,5 +51,13 @@ final class NetworkInspectorHeadersTabViewModel: ObservableObject {
         }
     }
 }
+
+#if DEBUG
+struct NetworkInspectorHeadersTabView_Previews: PreviewProvider {
+    static var previews: some View {
+        NetworkInspectorHeadersTabView(viewModel: .init(request: LoggerStore.preview.makeEntity(for: .login)))
+    }
+}
+#endif
 
 #endif

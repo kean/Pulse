@@ -94,7 +94,8 @@ struct NetworkInspectorMetricsDetailsView_Previews: PreviewProvider {
         NetworkInspectorMetricsDetailsView(viewModel: .init(
             metrics: MockDataTask.login.metrics.transactions.first!
         ))
-        .fixedSize()
+        .padding()
+        .previewLayout(.sizeThatFits)
     }
 }
 #endif

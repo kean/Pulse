@@ -10,10 +10,10 @@ import CoreData
 final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
     private(set) lazy var time = ConsoleMessageViewModel.timeFormatter.string(from: request.createdAt)
 #if os(iOS)
-    var badgeColor: UIColor = .gray
-#else
-    var badgeColor: Color = .gray
+    var uiBadgeColor: UIColor = .gray
 #endif
+
+    private(set) var badgeColor: Color = .gray
     private(set) var title: String = ""
     private(set) var text: String = ""
 
@@ -104,17 +104,16 @@ final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
 
 #if os(iOS)
         switch state {
-        case .pending: self.badgeColor = .systemYellow
-        case .success: self.badgeColor = .systemGreen
-        case .failure: self.badgeColor = .systemRed
+        case .pending: self.uiBadgeColor = .systemYellow
+        case .success: self.uiBadgeColor = .systemGreen
+        case .failure: self.uiBadgeColor = .systemRed
         }
-#else
+#endif
         switch state {
         case .pending: self.badgeColor = .yellow
         case .success: self.badgeColor = .green
         case .failure: self.badgeColor = .red
         }
-#endif
 
         self.state = request.state
     }

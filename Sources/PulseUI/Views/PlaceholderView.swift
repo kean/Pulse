@@ -75,4 +75,12 @@ extension PlaceholderView {
     }
 }
 
+#if DEBUG
+struct PlaceholderView_Previews: PreviewProvider {
+    static var previews: some View {
+        PlaceholderView(imageName: "questionmark.folder", title: "Store Unavailable")
+    }
+}
+#endif
+
 #endif
