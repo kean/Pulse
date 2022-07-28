@@ -117,22 +117,8 @@ final class NetworkInspectorTransactionsListViewModel {
 @available(iOS 14.0, *)
 struct NetworkInspectorTransactionsListView_Previews: PreviewProvider {
     static var previews: some View {
-        Group {
-            NavigationView {
-                NetworkInspectorTransactionsListView(viewModel: mockModel)
-                    .background(Color(UXColor.systemBackground))
-            }
-            .previewDisplayName("Light")
-            .environment(\.colorScheme, .light)
-
-            NavigationView {
-                NetworkInspectorTransactionsListView(viewModel: mockModel)
-                    .background(Color(UXColor.systemBackground))
-                    .previewDisplayName("Dark")
-            }
-            .environment(\.colorScheme, .dark)
-            .previewLayout(.fixed(width: 500, height: 600))
-        }
+        NetworkInspectorTransactionsListView(viewModel: mockModel)
+            .previewLayout(.fixed(width: 320, height: 400))
     }
 }
 

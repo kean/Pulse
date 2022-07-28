@@ -15,7 +15,7 @@ extension LoggerStore {
         return store
     }()
 
-    static let preview = makeMockStore(options: [.create, .synchronous])
+    static let preview = makeMockStore(options: [.create])
 }
 
 private let rootURL = FileManager.default.temporaryDirectory.appendingPathComponent("pulseui-demo")
@@ -25,7 +25,7 @@ private let cleanup: Void = {
     try? FileManager.default.createDirectory(at: rootURL, withIntermediateDirectories: true, attributes: nil)
 }()
 
-func makeMockStore(options: LoggerStore.Options = [.create]) -> LoggerStore {
+func makeMockStore(options: LoggerStore.Options = [.create, .synchronous]) -> LoggerStore {
     _ = cleanup
     let storeURL = rootURL.appendingPathComponent("\(UUID().uuidString).pulse")
     return try! LoggerStore(storeURL: storeURL, options: options)
@@ -114,10 +114,6 @@ func populateStore(_ store: LoggerStore) {
 
     logger(named: "default")
         .log(level: .critical, "💥 0xDEADBEEF")
-
-    // Wait until everything is stored
-    store.container.viewContext.performAndWait {}
-    store.backgroundContext.performAndWait {}
 }
 
 private func _logTask(_ task: MockDataTask, logger: NetworkLogger, urlSession: URLSession? = nil) {
