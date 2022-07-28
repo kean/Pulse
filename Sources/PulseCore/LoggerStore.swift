@@ -48,7 +48,9 @@ public final class LoggerStore {
 
     var onEvent: ((LoggerStoreEvent) -> Void)?
 
+    private let options: Options
     private var isSaveScheduled = false
+    private let queue = DispatchQueue(label: "com.github.kean.pulse.logger-store")
 
     private enum PulseDocument {
         case directory(blobs: BlobStore)
@@ -62,7 +64,7 @@ public final class LoggerStore {
         if let store = store, #available(iOS 14.0, tvOS 14.0, *) {
             RemoteLogger.shared.initialize(store: store)
         }
-        return store ?? LoggerStore(storeURL: storeURL, isEmpty: true)
+        return store ?? LoggerStore(storeURL: storeURL, isEmpty: true, options: [])
     }
 
     // MARK: Initialization
@@ -73,19 +75,22 @@ public final class LoggerStore {
         public init(rawValue: Int) {
             self.rawValue = rawValue
         }
-
         /// Creates store if the file is missing. The intermediate directories must
         /// already exist.
         public static let create = Options(rawValue: 1 << 0)
-
         /// Reduces store size when it reaches the size limit by by removing the least
         /// recently added messages and blobs.
         public static let sweep = Options(rawValue: 1 << 1)
+        /// Flushes entities to disk immediately and synchronously.
+        ///
+        /// - warning: When this option is enabled, all writes to the store
+        /// happen immediately and synchronously.
+        public static let synchronous = Options(rawValue: 1 << 2)
     }
 
     /// An empty readonly placeholder store with no persistence.
     public static var empty: LoggerStore {
-        LoggerStore(storeURL: URL.logs.appendingFilename("empty"), isEmpty: true)
+        LoggerStore(storeURL: URL.logs.appendingFilename("empty"), isEmpty: true, options: [])
     }
 
     /// Initializes the store with the given URL.
@@ -113,7 +118,7 @@ public final class LoggerStore {
         if !fileExists || isDirectory.boolValue { // Working with a package
             try self.init(packageURL: storeURL, create: !fileExists, options: options)
         } else { // Working with a zip archive
-            try self.init(archiveURL: storeURL)
+            try self.init(archiveURL: storeURL, options: options)
         }
     }
 
@@ -139,6 +144,7 @@ public final class LoggerStore {
         self.backgroundContext = LoggerStore.makeBackgroundContext(for: container)
         self.isReadonly = false
         self.document = .directory(blobs: BlobStore(path: blobsURL))
+        self.options = options
 
         if options.contains(.sweep) {
             DispatchQueue.global().asyncAfter(deadline: .now() + .seconds(10)) { [weak self] in
@@ -147,7 +153,7 @@ public final class LoggerStore {
         }
     }
 
-    init(archiveURL: URL) throws {
+    init(archiveURL: URL, options: Options) throws {
         self.storeURL = archiveURL
 
         guard let archive = IndexedArchive(url: storeURL) else {
@@ -169,9 +175,10 @@ public final class LoggerStore {
         self.isReadonly = true
         self.info = manifest
         self.document = .file(archive: archive, manifest: manifest)
+        self.options = options
     }
 
-    init(storeURL: URL, isEmpty: Bool) {
+    init(storeURL: URL, isEmpty: Bool, options: Options) {
         self.storeURL = storeURL
         self.isReadonly = true
         self.container = NSPersistentContainer(name: "EmptyStore", managedObjectModel: Self.model)
@@ -181,6 +188,7 @@ public final class LoggerStore {
         container.loadPersistentStores { _, _ in }
         self.backgroundContext = LoggerStore.makeBackgroundContext(for: container)
         self.document = .empty
+        self.options = options
     }
 
     private static func makeContainer(databaseURL: URL, isViewing: Bool) -> NSPersistentContainer {
@@ -459,7 +467,7 @@ extension LoggerStore {
     private func setNeedsSave() {
         guard !isSaveScheduled else { return }
         isSaveScheduled = true
-        DispatchQueue.main.asyncAfter(deadline: .now() + saveInterval) { [weak self] in
+        queue.asyncAfter(deadline: .now() + saveInterval) { [weak self] in
             self?.flush()
         }
     }
@@ -510,9 +518,17 @@ extension LoggerStore {
 
     private func perform(_ changes: @escaping () -> Void) {
         guard !isReadonly else { return }
-        backgroundContext.perform {
-            changes()
-            self.setNeedsSave()
+        if options.contains(.synchronous) {
+            backgroundContext.performAndWait {
+                changes()
+                try? backgroundContext.save()
+            }
+
+        } else {
+            backgroundContext.perform {
+                changes()
+                self.setNeedsSave()
+            }
         }
     }
 

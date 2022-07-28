@@ -14,15 +14,21 @@ extension LoggerStore {
         populateStore(store)
         return store
     }()
+
+    static let preview = makeMockStore(options: [.create, .synchronous])
 }
 
-func makeMockStore() -> LoggerStore {
-    let rootURL = FileManager.default.temporaryDirectory.appendingPathComponent("Pulse-ui-demo")
-    try? FileManager.default.removeItem(at: rootURL) // TODO: cleanup
-    try? FileManager.default.createDirectory(at: rootURL, withIntermediateDirectories: true, attributes: nil)
+private let rootURL = FileManager.default.temporaryDirectory.appendingPathComponent("pulseui-demo")
 
-    let storeURL = rootURL.appendingPathComponent("demo-store.pulse")
-    return try! LoggerStore(storeURL: storeURL, options: [.create])
+private let cleanup: Void = {
+    try? FileManager.default.removeItem(at: rootURL)
+    try? FileManager.default.createDirectory(at: rootURL, withIntermediateDirectories: true, attributes: nil)
+}()
+
+func makeMockStore(options: LoggerStore.Options = [.create]) -> LoggerStore {
+    _ = cleanup
+    let storeURL = rootURL.appendingPathComponent("\(UUID().uuidString).pulse")
+    return try! LoggerStore(storeURL: storeURL, options: options)
 }
 
 private extension NSManagedObject {
@@ -124,26 +130,12 @@ private func _logTask(_ task: MockDataTask, logger: NetworkLogger, urlSession: U
     logger.logTask(dataTask, didCompleteWithError: nil, session: urlSession)
 }
 
-extension MockDataTask {
-    // Not using Async/Await because it crashes in SwiftUI Canvas.
-    static func storeEntity(_ task: MockDataTask, _ completion: @escaping (LoggerNetworkRequestEntity, LoggerStore) -> Void) {
-        final class Context {
-            var entity: LoggerNetworkRequestEntity?
-            var observer: AnyObject?
-        }
-        let context = Context()
-        let store = makeMockStore()
-        if #available(iOS 14.0, *) {
-            context.observer = NotificationCenter.default.addObserver(forName: NSManagedObjectContext.didChangeObjectsNotification, object: store.container.viewContext, queue: nil) { notification in
-                let entity = (notification.userInfo?[NSInsertedObjectsKey] as? Set<NSManagedObject> ?? [])
-                    .compactMap { $0 as? LoggerNetworkRequestEntity }
-                    .first { $0.state != .pending }
-                if let entity = entity {
-                    completion(entity, store)
-                }
-            }
-        }
-        _logTask(task, logger: NetworkLogger(store: store))
+extension LoggerStore {
+    func makeEntity(for task: MockDataTask) -> LoggerNetworkRequestEntity {
+        _logTask(task, logger: NetworkLogger(store: self))
+        let entity = (try! allNetworkRequests()).first { $0.url == task.request.url?.absoluteString }
+        assert(entity != nil)
+        return entity!
     }
 }
 
