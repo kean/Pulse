@@ -100,7 +100,11 @@ private func _populateStore(_ store: LoggerStore) async {
     }
 
     for task in MockTask.allTasks {
-        _logTask(task, urlSession: urlSession, logger: networkLogger, delay: task.delay)
+        if MockStoreConfiguration.isDelayingLogs {
+            _logTask(task, urlSession: urlSession, logger: networkLogger, delay: task.delay)
+        } else {
+            _logTask(task, urlSession: urlSession, logger: networkLogger)
+        }
     }
 
     let stackTrace = """
@@ -164,6 +168,14 @@ private func _logTask(_ mockTask: MockTask, urlSession: URLSession, logger: Netw
             return makeMetrics(for: mockTask, taskInterval: taskInterval)
         }())
         logger.logTask(task, didCompleteWithError: nil)
+
+        await Task.sleep(milliseconds: 50)
+
+        if let error = mockTask.decodingError {
+            logger.logTask(task, didFinishDecoding: .failure(error))
+        } else {
+            logger.logTask(task, didFinishDecoding: .success("success"))
+        }
     }
 
     Task.detached {
@@ -184,6 +196,11 @@ private func _logTask(_ mockTask: MockTask, urlSession: URLSession, logger: Netw
     }())
 
     logger.logTask(task, didCompleteWithError: nil)
+    if let error = mockTask.decodingError {
+        logger.logTask(task, didFinishDecoding: .failure(error))
+    } else {
+        logger.logTask(task, didFinishDecoding: .success("success"))
+    }
 }
 
 private func makeSessionTask(for mockTask: MockTask, urlSession: URLSession) -> URLSessionTask {
@@ -319,7 +336,7 @@ private func getHeadersEstimatedSize(_ headers: [String: String]?) -> Int64 {
 
 extension LoggerStore {
     func entity(for task: MockTask) -> LoggerNetworkRequestEntity {
-        _logTask(task, urlSession: URLSession.shared, logger: NetworkLogger(store: self))
+        _logTask(task, urlSession: URLSession.shared, logger: NetworkLogger(store: self, isWaitingForDecoding: true))
         let entity = (try! allNetworkRequests()).first { $0.url == task.originalRequest.url?.absoluteString }
         assert(entity != nil)
         return entity!

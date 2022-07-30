@@ -367,14 +367,15 @@ extension LoggerStore {
         request.host = event.originalRequest.url?.host
         request.httpMethod = event.originalRequest.httpMethod
         request.errorDomain = event.error?.domain
-        let errorCode = Int32(event.error?.code ?? 0)
-        request.errorCode = errorCode
+        if let error = event.error {
+            request.errorCode = Int32(error.code == 0 ? -1 : error.code)
+        }
         let statusCode = Int32(event.response?.statusCode ?? 0)
         request.statusCode = statusCode
         request.startDate = event.metrics?.taskInterval.start
         request.duration = event.metrics?.taskInterval.duration ?? 0
         request.contentType = event.response?.headers["Content-Type"]
-        let isFailure = errorCode != 0 || (statusCode != 0 && !(200..<400).contains(statusCode))
+        let isFailure = event.error != nil || (statusCode != 0 && !(200..<400).contains(statusCode))
         request.requestState = (isFailure ? LoggerNetworkRequestEntity.State.failure : .success).rawValue
         request.redirectCount = Int16(event.metrics?.redirectCount ?? 0)
 

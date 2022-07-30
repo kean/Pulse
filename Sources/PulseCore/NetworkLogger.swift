@@ -113,6 +113,14 @@ public final class NetworkLogger {
 
     /// Notifies the logger the decoding for the given task is completed.
     public func logTask<T>(_ task: URLSessionTask, didFinishDecoding result: Result<T, Error>) {
+        _logTask(task, didFinishDecoding: result)
+    }
+
+    public func logTask(_ task: URLSessionTask, didFinishDecoding result: Result<Void, Error>) {
+        _logTask(task, didFinishDecoding: result)
+    }
+
+    private func _logTask<T>(_ task: URLSessionTask, didFinishDecoding result: Result<T, Error>) {
         var error: Error?
         if case .failure(let failure) = result {
             error = failure
