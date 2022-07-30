@@ -13,9 +13,8 @@ struct MockTask {
     var currentRequest: URLRequest { transactions.last!.request }
     let response: URLResponse
     let responseBody: Data
-    var transactions: [Transaction] = []
-    #warning("TODO: use this delay")
-    var delay: TimeInterval = 0
+    let transactions: [Transaction]
+    let delay: TimeInterval
 
     enum Kind {
         case data
@@ -60,7 +59,7 @@ extension MockTask {
         transactions: [
             .init(fetchType: .networkLoad, request: mockReposCurrentRequest, response: mockReposResponse, duration: 0.52691)
         ],
-        delay: 2.2
+        delay: 2.0
     )
 
     /// A failing request:
@@ -73,7 +72,7 @@ extension MockTask {
         transactions: [
             .init(fetchType: .networkLoad, request: mockProfileCurrentRequest, response: mockProfileFailureResponse, duration: 0.22691)
         ],
-        delay: 1.5
+        delay: 2.0
     )
 
     /// A successfull response:
@@ -88,7 +87,7 @@ extension MockTask {
             .init(fetchType: .localCache, request: mockOctocatCurrentRequest, response: mockOctocatResponse, duration: 0.003),
             .init(fetchType: .networkLoad, request: mockOctocatCurrentRequest, response: mockOctocatNotModifiedResponse, duration: 0.2239)
         ],
-        delay: 4.546
+        delay: 3.5
     )
 
     static let createAPI = MockTask(
@@ -112,7 +111,7 @@ extension MockTask {
             .init(fetchType: .networkLoad, request: mockDownloadNukeOriginalRequest, response: mockDownloadNukeRedirectResponse, duration: 0.21283),
             .init(fetchType: .networkLoad, request: mockDownloadNukeCurrentRequest, response: mockDownloadNukeResponse, duration: 4.25254, isReusedConnection: true),
         ],
-        delay: 3.435
+        delay: 3.5
     )
 
     static let uploadPulseArchive = MockTask(

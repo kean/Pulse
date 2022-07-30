@@ -99,21 +99,21 @@ private func _populateStore(_ store: LoggerStore) async {
                 .log(level: .debug, "Will navigate to Dashboard")
     }
 
-    func logTask(_ mockTask: MockTask, delay: Int = Int.random(in: 1000...6000)) {
-        _logTask(mockTask, urlSession: urlSession, logger: networkLogger, delay: delay)
+    func logTask(_ mockTask: MockTask) {
+        _logTask(mockTask, urlSession: urlSession, logger: networkLogger, delay: mockTask.delay)
     }
 
-    logTask(MockTask.login, delay: 200)
+    logTask(MockTask.login)
 
     logTask(MockTask.octocat)
 
     if Bundle.main.url(forResource: "repos", withExtension: "json") != nil {
-        logTask(MockTask.repos, delay: 1000)
+        logTask(MockTask.repos)
     }
 
-    logTask(MockTask.downloadNuke, delay: 3000)
+    logTask(MockTask.downloadNuke)
 
-    logTask(MockTask.profile, delay: 200)
+    logTask(MockTask.profile)
 
     logTask(MockTask.createAPI)
 
@@ -149,12 +149,12 @@ private func _populateStore(_ store: LoggerStore) async {
         .log(level: .critical, "💥 0xDEADBEEF")
 }
 
-private func _logTask(_ mockTask: MockTask, urlSession: URLSession, logger: NetworkLogger, delay: Int) {
+private func _logTask(_ mockTask: MockTask, urlSession: URLSession, logger: NetworkLogger, delay: TimeInterval) {
     let task = makeSessionTask(for: mockTask, urlSession: urlSession)
 
     @Sendable func logTask() async {
         if MockStoreConfiguration.isDelayingLogs {
-            await Task.sleep(milliseconds: delay)
+            await Task.sleep(milliseconds: Int(1000 * delay))
         }
         let startDate = Date()
         logger.logTaskCreated(task)
