@@ -31,8 +31,10 @@ struct NetworkInspectorTransactionView: View {
                         viewModel.responseHeaders
                     ])
                 }
-                Section(header: LargeSectionHeader(title: "Details")) {
-                    KeyValueGridView(items: viewModel.details.sections)
+                if let details = viewModel.details {
+                    Section(header: LargeSectionHeader(title: "Details")) {
+                        KeyValueGridView(items: details.sections)
+                    }
                 }
                 Section(header: LargeSectionHeader(title: "Timing")) {
                     KeyValueSectionView(viewModel: viewModel.timingSummary)
@@ -58,7 +60,7 @@ final class NetworkInspectorTransactionViewModel: ObservableObject {
     @Published var isOriginalRequestHeadersLinkActive = false
     @Published var isResponseHeadersLinkActive = false
 
-    let details: NetworkMetricsDetailsViewModel
+    let details: NetworkMetricsDetailsViewModel?
     let timingViewModel: TimingViewModel?
 
     private let transaction: NetworkLoggerTransactionMetrics

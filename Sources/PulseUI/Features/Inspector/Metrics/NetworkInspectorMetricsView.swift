@@ -27,12 +27,6 @@ struct NetworkInspectorMetricsView: View {
                     NetworkInspectorTransactionsListView(viewModel: transactions)
                         .padding([.leading, .trailing], NetworkInspectorMetricsView.padding)
                 }
-                if let details = viewModel.details {
-                    LargeSectionHeader(title: "Latest Details")
-                        .padding(.leading, nil)
-                    NetworkInspectorMetricsDetailsView(viewModel: details)
-                        .padding([.leading, .bottom, .trailing], NetworkInspectorMetricsView.padding)
-                }
 #endif
             }
         }
@@ -49,7 +43,6 @@ final class NetworkInspectorMetricsViewModel {
     let metrics: NetworkLoggerMetrics
     let timingViewModel: TimingViewModel
 #if !os(tvOS)
-    let details: NetworkMetricsDetailsViewModel?
     let transactions: NetworkInspectorTransactionsListViewModel?
 #endif
 
@@ -58,9 +51,6 @@ final class NetworkInspectorMetricsViewModel {
         self.timingViewModel = TimingViewModel(metrics: metrics)
 
 #if !os(tvOS)
-        self.details = metrics.transactions.first(where: {
-            $0.resourceFetchType == URLSessionTaskMetrics.ResourceFetchType.networkLoad.rawValue
-        }).map(NetworkMetricsDetailsViewModel.init)
         if !metrics.transactions.isEmpty {
             self.transactions = NetworkInspectorTransactionsListViewModel(metrics: metrics)
         } else {

@@ -22,7 +22,10 @@ struct NetworkInspectorMetricsDetailsView: View {
 struct NetworkMetricsDetailsViewModel {
     let sections: [KeyValueSectionViewModel]
 
-    init(metrics: NetworkLoggerTransactionMetrics) {
+    init?(metrics: NetworkLoggerTransactionMetrics) {
+        guard metrics.fetchType != .localCache else {
+            return nil
+        }
         self.sections = [
             makeTransferSection(for: metrics),
             makeProtocolSection(for: metrics),
@@ -93,7 +96,7 @@ struct NetworkInspectorMetricsDetailsView_Previews: PreviewProvider {
     static var previews: some View {
         NetworkInspectorMetricsDetailsView(viewModel: .init(
             metrics: LoggerStore.preview.entity(for: .login).metrics!.transactions.first!
-        ))
+        )!)
         .padding()
         .previewLayout(.sizeThatFits)
     }

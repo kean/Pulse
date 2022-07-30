@@ -100,6 +100,10 @@ public struct NetworkLoggerTransactionMetrics: Codable {
     public var resourceFetchType: Int
     public var details: NetworkLoggerTransactionDetailedMetrics?
 
+    public var fetchType: URLSessionTaskMetrics.ResourceFetchType {
+        URLSessionTaskMetrics.ResourceFetchType(rawValue: resourceFetchType) ?? .unknown
+    }
+
     public init(metrics: URLSessionTaskTransactionMetrics) {
         self.request = NetworkLoggerRequest(metrics.request)
         self.response = metrics.response.map(NetworkLoggerResponse.init)
