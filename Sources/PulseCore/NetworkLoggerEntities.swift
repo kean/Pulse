@@ -51,13 +51,62 @@ public struct NetworkLoggerResponse: Codable {
 public struct NetworkLoggerError: Codable {
     public let code: Int
     public let domain: String
-    public let localizedDescription: String
+    public let debugDescription: String
+    /// Contains the underlying error.
+    ///
+    /// - note: Currently is only used for ``NetworkLoggerDecodingError``.
+    public let error: Error?
 
     public init(_ error: Error) {
         let error = error as NSError
-        self.code = error.code
-        self.domain = error.domain
-        self.localizedDescription = error.localizedDescription
+        self.code = error.code == 0 ? -1 : error.code
+        if error is DecodingError || error is NetworkLoggerDecodingError {
+            self.domain = NetworkLoggerDecodingError.domain
+        } else {
+            self.domain = error.domain
+        }
+        self.debugDescription = String(describing: error)
+        self.error = error
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.code = try container.decode(Int.self, forKey: .code)
+        self.domain = try container.decode(String.self, forKey: .domain)
+        self.debugDescription = (try? container.decode(String.self, forKey: .debugDescription)) ?? "–"
+        self.error = (try? container.decode(UnderlyingError.self, forKey: .error))?.error
+    }
+
+    public enum CodingKeys: CodingKey {
+        case code, domain, debugDescription, error
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(code, forKey: .code)
+        try container.encode(domain, forKey: .domain)
+        try container.encode(debugDescription, forKey: .debugDescription)
+        try? container.encode(error.map(UnderlyingError.init), forKey: .error)
+    }
+
+    private enum UnderlyingError: Codable {
+        case decodingError(NetworkLoggerDecodingError)
+
+        var error: Error? {
+            switch self {
+            case .decodingError(let error): return error
+            }
+        }
+
+        init?(_ error: Error) {
+            if let error = error as? Swift.DecodingError {
+                self = .decodingError(.init(error))
+            } else if let error = error as? NetworkLoggerDecodingError {
+                self = .decodingError(error)
+            } else {
+                return nil
+            }
+        }
     }
 }
 
@@ -200,6 +249,59 @@ public enum NetworkLoggerTaskType: String, Codable, CaseIterable {
         case .streamTask: return "URLSessionStreamTask"
         case .uploadTask: return "URLSessionUploadTask"
         case .webSocketTask: return "URLSessionWebSocketTask"
+        }
+    }
+}
+
+public enum NetworkLoggerDecodingError: Error, Codable {
+    case typeMismatch(type: String, context: Context)
+    case valueNotFound(type: String, context: Context)
+    case keyNotFound(codingKey: CodingKey, context: Context)
+    case dataCorrupted(context: Context)
+    case unknown
+
+    public static let domain = "DecodingError"
+
+    public struct Context: Codable {
+        public let codingPath: [CodingKey]
+        public let debugDescription: String
+
+        public init(_ context: DecodingError.Context) {
+            self.codingPath = context.codingPath.map(CodingKey.init)
+            self.debugDescription = context.debugDescription
+        }
+
+        public init(codingPath: [NetworkLoggerDecodingError.CodingKey], debugDescription: String) {
+            self.codingPath = codingPath
+            self.debugDescription = debugDescription
+        }
+    }
+
+    public enum CodingKey: Codable, Hashable {
+        case string(String)
+        case int(Int)
+
+        public init(_ key: Swift.CodingKey) {
+            if let value = key.intValue {
+                self = .int(value)
+            } else {
+                self = .string(key.stringValue)
+            }
+        }
+    }
+
+    public init(_ error: DecodingError) {
+        switch error {
+        case let .typeMismatch(type, context):
+            self = .typeMismatch(type: String(describing: type), context: .init(context))
+        case let .valueNotFound(type, context):
+            self = .valueNotFound(type: String(describing: type), context: .init(context))
+        case let .keyNotFound(codingKey, context):
+            self = .keyNotFound(codingKey: .init(codingKey), context: .init(context))
+        case let .dataCorrupted(context):
+            self = .dataCorrupted(context: .init(context))
+        @unknown default:
+            self = .unknown
         }
     }
 }

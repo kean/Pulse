@@ -32,7 +32,8 @@ final class URLSessionProxyTests: XCTestCase {
 
     func testRecordSuccess() throws {
         // WHEN
-        let dataURL = try XCTUnwrap(Bundle.module.url(forResource: "logs-2021-03-18_21-22", withExtension: "pulse"))
+        let dataURL = directory.url.appendingPathComponent("logs-2021-03-18_21-22.pulse")
+        try Resources.pulseArchive.write(to: dataURL)
         let didComplete = self.expectation(description: "TaskCompleted")
         let dataTask = URLSession.shared.dataTask(with: dataURL) { _, _, _ in
             didComplete.fulfill()

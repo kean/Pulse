@@ -10,6 +10,7 @@ import CoreData
 @testable import PulseCore
 
 final class LoggerStoreTests: XCTestCase {
+    let directory = TemporaryDirectory()
     var tempDirectoryURL: URL!
     var storeURL: URL!
 
@@ -27,6 +28,8 @@ final class LoggerStoreTests: XCTestCase {
 
     override func tearDown() {
         super.tearDown()
+
+        directory.remove()
 
         store.destroyStores()
 
@@ -95,9 +98,8 @@ final class LoggerStoreTests: XCTestCase {
 
     func testInitWithArchiveURL() throws {
         // GIVEN
-        let originalURL = try XCTUnwrap(Bundle.module.url(forResource: "logs-2021-03-18_21-22", withExtension: "pulse"))
-        let storeURL = tempDirectoryURL.appendingPathComponent(UUID().uuidString)
-        try FileManager.default.copyItem(at: originalURL, to: storeURL)
+        let storeURL = tempDirectoryURL.appendingPathComponent("logs-2021-03-18_21-22.pulse")
+        try Resources.pulseArchive.write(to: storeURL)
 
         // WHEN
         let store = try XCTUnwrap(LoggerStore(storeURL: storeURL))
@@ -111,7 +113,8 @@ final class LoggerStoreTests: XCTestCase {
 
     func testInitWithArchiveURLNoExtension() throws {
         // GIVEN
-        let storeURL = try XCTUnwrap(Bundle.module.url(forResource: "logs-2021-03-18_21-22", withExtension: "pulse"))
+        let storeURL = tempDirectoryURL.appendingPathComponent("logs-2021-03-18_21-22")
+        try Resources.pulseArchive.write(to: storeURL)
 
         // WHEN
         let store = try XCTUnwrap(LoggerStore(storeURL: storeURL))
@@ -123,7 +126,10 @@ final class LoggerStoreTests: XCTestCase {
 
     func testInitWithPackageURL() throws {
         // GIVEN
-        let storeURL = try XCTUnwrap(Bundle.module.url(forResource: "logs-package", withExtension: "pulse"))
+        let archiveURL = tempDirectoryURL.appendingPathComponent(UUID().uuidString)
+        try Resources.pulsePackage.write(to: archiveURL)
+        try FileManager.default.unzipItem(at: archiveURL, to: tempDirectoryURL)
+        let storeURL = tempDirectoryURL.appendingPathComponent("logs-package.pulse")
 
         // WHEN
         let store = try XCTUnwrap(LoggerStore(storeURL: storeURL))
@@ -135,7 +141,11 @@ final class LoggerStoreTests: XCTestCase {
 
     func testInitWithPackageURLNoExtension() throws {
         // GIVEN
-        let originalURL = try XCTUnwrap(Bundle.module.url(forResource: "logs-package", withExtension: "pulse"))
+        let archiveURL = tempDirectoryURL.appendingPathComponent(UUID().uuidString)
+        try Resources.pulsePackage.write(to: archiveURL)
+        try FileManager.default.unzipItem(at: archiveURL, to: tempDirectoryURL)
+        let originalURL = tempDirectoryURL.appendingPathComponent("logs-package.pulse")
+
         let storeURL = tempDirectoryURL.appendingPathComponent(UUID().uuidString)
         try FileManager.default.copyItem(at: originalURL, to: storeURL)
 
@@ -230,7 +240,9 @@ final class LoggerStoreTests: XCTestCase {
 
     func testCopyFile() throws {
         // GIVEN
-        let storeURL = try XCTUnwrap(Bundle.module.url(forResource: "logs-2021-03-18_21-22", withExtension: "pulse"))
+        let storeURL = directory.url.appendingPathComponent("logs-2021-03-18_21-22.pulse")
+        try Resources.pulseArchive.write(to: storeURL)
+
         let store = try XCTUnwrap(LoggerStore(storeURL: storeURL))
         let copyURL = tempDirectoryURL.appendingPathComponent("copy.pulse")
 
@@ -255,7 +267,9 @@ final class LoggerStoreTests: XCTestCase {
     // TODO: this type of store is no longer immuatble
     func _testOpenFileDatabaseImmutable() throws {
         // GIVEN
-        let storeURL = try XCTUnwrap(Bundle.module.url(forResource: "logs-2021-03-18_21-22", withExtension: "pulse"))
+        let storeURL = directory.url.appendingPathComponent("logs-2021-03-18_21-22.pulse")
+        try Resources.pulseArchive.write(to: storeURL)
+
         let store = try XCTUnwrap(LoggerStore(storeURL: storeURL))
         XCTAssertEqual(try store.allMessages().count, 23)
 

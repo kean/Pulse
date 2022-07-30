@@ -72,7 +72,7 @@ extension KeyValueSectionViewModel {
             items: [
                 ("Domain", error.domain),
                 ("Code", descriptionForError(domain: error.domain, code: error.code)),
-                ("Message", error.localizedDescription)
+                ("Description", error.debugDescription)
             ])
     }
 

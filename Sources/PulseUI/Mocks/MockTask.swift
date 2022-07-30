@@ -15,6 +15,7 @@ struct MockTask {
     let responseBody: Data
     let transactions: [Transaction]
     let delay: TimeInterval
+    var decodingError: Error?
 
     enum Kind {
         case data
@@ -38,7 +39,7 @@ struct MockTask {
 extension MockTask {
     static var allTasks: [MockTask] = [.login, .profile, .repos, .octocat, .downloadNuke, .createAPI, .uploadPulseArchive, .patchRepo]
 
-    /// A successfull request the demonstrates:
+    /// A successful request the demonstrates:
     ///
     /// - Query parameters in URL
     static let login = MockTask(
@@ -64,7 +65,7 @@ extension MockTask {
         delay: 2.0
     )
 
-    /// A successfull request that demonstrates:
+    /// A successful request that demonstrates:
     ///
     /// - Large response body to check FileViewer performance
     static let repos = MockTask(
@@ -77,7 +78,7 @@ extension MockTask {
         delay: 2.0
     )
 
-    /// A successfull response:
+    /// A successful response:
     ///
     /// - Image in the response with a respective "Content-Type"
     /// - Local cache lookup with further validation (302)
@@ -127,6 +128,10 @@ extension MockTask {
         delay: 5.5
     )
 
+    /// A failing request:
+    ///
+    /// - Contains Query Items in the response body
+    /// - Fails with a decoding error
     static let patchRepo = MockTask(
         originalRequest: mockPatchRepoOriginalRequest,
         response: mockPatchRepoResponse,
@@ -134,7 +139,8 @@ extension MockTask {
         transactions: [
             .init(fetchType: .networkLoad, request: mockPatchRepoCurrentRequest, response: mockPatchRepoResponse, duration: 0.82691)
         ],
-        delay: 6.5
+        delay: 6.5,
+        decodingError: mockPatchRepoDecodingError
     )
 }
 
@@ -306,6 +312,19 @@ private let mockPatchRepoResponseBody = """
   "node_id": "MDEwOlJlcG9zaXRvcnkxMjk2MjY5"
 }
 """.data(using: .utf8)!
+
+private let mockPatchRepoDecodingError: Error = {
+    struct Repo: Decodable {
+        let id: String
+        let node: String
+    }
+    do {
+        _ = try JSONDecoder().decode(Repo.self, from: mockPatchRepoResponseBody)
+        return URLError(.unknown)
+    } catch {
+        return error
+    }
+}()
 
 // MARK: - Download (GET)
 

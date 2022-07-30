@@ -1,4 +1,4 @@
-// swift-tools-version:5.5
+// swift-tools-version:5.6
 
 import PackageDescription
 
@@ -22,7 +22,7 @@ let package = Package(
         .target(name: "PulseUI", dependencies: ["PulseCore"]),
         .target(name: "Pulse", dependencies: [.product(name: "Logging", package: "swift-log"), "PulseCore"]),
         .target(name: "PulseCore"),
-        .testTarget(name: "PulseTests", dependencies: ["Pulse"], resources: [.process("Resources")]),
-        .testTarget(name: "PulseUITests", dependencies: ["PulseCore", "PulseUI"])
+        .testTarget(name: "PulseTests", dependencies: ["Pulse"]),
+        .testTarget(name: "PulseUITests", dependencies: ["PulseUI"])
     ]
 )

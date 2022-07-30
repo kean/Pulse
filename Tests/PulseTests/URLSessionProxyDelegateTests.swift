@@ -35,7 +35,8 @@ final class URLSessionProxyDelegateTests: XCTestCase {
         let session = URLSession(configuration: .default, delegate: delegate, delegateQueue: nil)
 
         // WHEN
-        let dataURL = try XCTUnwrap(Bundle.module.url(forResource: "logs-2021-03-18_21-22", withExtension: "pulse"))
+        let dataURL = directory.url.appendingPathComponent("logs-2021-03-18_21-22.pulse")
+        try Resources.pulseArchive.write(to: dataURL)
         let dataTask = session.dataTask(with: dataURL)
 
         let didComplete = self.expectation(description: "TaskCompleted")
@@ -125,7 +126,8 @@ final class URLSessionProxyDelegateTests: XCTestCase {
         let session = URLSession(configuration: .default, delegate: myDelegate, delegateQueue: nil)
 
         // WHEN
-        let dataURL = try XCTUnwrap(Bundle.module.url(forResource: "logs-2021-03-18_21-22", withExtension: "pulse"))
+        let dataURL = directory.url.appendingPathComponent("logs-2021-03-18_21-22.pulse")
+        try Resources.pulseArchive.write(to: dataURL)
         let dataTask = session.dataTask(with: dataURL)
 
         let didComplete = self.expectation(description: "TaskCompleted")
