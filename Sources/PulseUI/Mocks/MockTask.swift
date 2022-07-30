@@ -15,6 +15,7 @@ struct MockTask {
     let responseBody: Data
     let transactions: [Transaction]
     let delay: TimeInterval
+    var decodingError: Error?
 
     enum Kind {
         case data
@@ -127,6 +128,10 @@ extension MockTask {
         delay: 5.5
     )
 
+    /// A failing request:
+    ///
+    /// - Contains Query Items in the response body
+    /// - Fails with a decoding error
     static let patchRepo = MockTask(
         originalRequest: mockPatchRepoOriginalRequest,
         response: mockPatchRepoResponse,
@@ -134,7 +139,8 @@ extension MockTask {
         transactions: [
             .init(fetchType: .networkLoad, request: mockPatchRepoCurrentRequest, response: mockPatchRepoResponse, duration: 0.82691)
         ],
-        delay: 6.5
+        delay: 6.5,
+        decodingError: mockPatchRepoDecodingError
     )
 }
 
@@ -306,6 +312,8 @@ private let mockPatchRepoResponseBody = """
   "node_id": "MDEwOlJlcG9zaXRvcnkxMjk2MjY5"
 }
 """.data(using: .utf8)!
+
+private let mockPatchRepoDecodingError = NetworkLoggerDecodingError.typeMismatch(type: "Int", context: .init(codingPath: [.string("id")], debugDescription: "TypeMismatch"))
 
 // MARK: - Download (GET)
 

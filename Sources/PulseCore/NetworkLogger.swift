@@ -8,16 +8,27 @@ public final class NetworkLogger {
     private let store: LoggerStore
     private let lock = NSLock()
     private let isTraceEnabled: Bool
+    private let isWaitingForDecoding: Bool
     private let willLogTask: (LoggedNetworkTask) -> LoggedNetworkTask?
 
-    /// - parameter willLogTask: Allows you to filter out sensitive information
+    /// Initializers the network logger.
+    ///
+    /// - parameters:
+    ///   - isTraceEnabled: Add log messages with ``LoggerStore/Level/trace`` level
+    ///   for all logged `URLSession` events.
+    ///   - isWaitingForDecoding: Don't mark the request completed until the
+    ///   decoding is done. If the request itself fails, the task completes
+    ///   immediatelly.
+    ///   - willLogTask: Allows you to filter out sensitive information
     /// or disable logging of certain requests completely. By default, returns
     /// the suggested task without modification.
     public init(store: LoggerStore = .default,
                 isTraceEnabled: Bool = false,
+                isWaitingForDecoding: Bool = false,
                 willLogTask: @escaping (LoggedNetworkTask) -> LoggedNetworkTask? = { $0 }) {
         self.store = store
         self.isTraceEnabled = isTraceEnabled
+        self.isWaitingForDecoding = isWaitingForDecoding
         self.willLogTask = willLogTask
     }
 
@@ -82,6 +93,36 @@ public final class NetworkLogger {
 
     /// Logs the task completion (required).
     public func logTask(_ task: URLSessionTask, didCompleteWithError error: Error?) {
+        guard error != nil || !isWaitingForDecoding else { return }
+        _logTask(task, didCompleteWithError: error)
+    }
+
+    /// Logs the task metrics (optional).
+    public func logTask(_ task: URLSessionTask, didFinishCollecting metrics: URLSessionTaskMetrics) {
+        lock.lock()
+        context(for: task).metrics = NetworkLoggerMetrics(metrics: metrics)
+        lock.unlock()
+    }
+
+    /// Logs the task metrics (optional).
+    public func logTask(_ task: URLSessionTask, didFinishCollecting metrics: NetworkLoggerMetrics) {
+        lock.lock()
+        context(for: task).metrics = metrics
+        lock.unlock()
+    }
+
+    /// Notifies the logger the decoding for the given task is completed.
+    public func logTask<T>(_ task: URLSessionTask, didFinishDecoding result: Result<T, Error>) {
+        var error: Error?
+        if case .failure(let failure) = result {
+            error = failure
+        }
+        _logTask(task, didCompleteWithError: error)
+
+        trace("Did complete decoding with result: \(result) for \(task.url ?? "null")")
+    }
+
+    private func _logTask(_ task: URLSessionTask, didCompleteWithError error: Error?) {
         lock.lock()
         let context = self.context(for: task)
         tasks[ObjectIdentifier(task)] = nil
@@ -95,7 +136,7 @@ public final class NetworkLogger {
         let data = context.data
         lock.unlock()
 
-        trace("Did complete with error: \(error?.localizedDescription ?? "-") for \(task.url ?? "null")")
+        // TODO: (Decoding) encode decoding error
 
         #warning("TODO: reimplement")
 //        let networkTask = LoggedNetworkTask(task: task, session: session, originalRequest: originalRequest, currentRequest: task.currentRequest, response: response, data: data, error: error, metrics: metrics)
@@ -113,20 +154,8 @@ public final class NetworkLogger {
             metrics: metrics,
             session: LoggerSession.current.id.uuidString
         )))
-    }
 
-    /// Logs the task metrics (optional).
-    public func logTask(_ task: URLSessionTask, didFinishCollecting metrics: URLSessionTaskMetrics) {
-        lock.lock()
-        context(for: task).metrics = NetworkLoggerMetrics(metrics: metrics)
-        lock.unlock()
-    }
-
-    /// Logs the task metrics (optional).
-    public func logTask(_ task: URLSessionTask, didFinishCollecting metrics: NetworkLoggerMetrics) {
-        lock.lock()
-        context(for: task).metrics = metrics
-        lock.unlock()
+        trace("Did complete with error: \(error?.localizedDescription ?? "-") for \(task.url ?? "null")")
     }
 
     // MARK: - Filter Out

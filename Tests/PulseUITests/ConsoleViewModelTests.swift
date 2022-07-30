@@ -7,8 +7,5 @@ import XCTest
 @testable import PulseUI
 
 final class ConsoleViewModelTests: XCTestCase {
-    func testExample() async {
-        let entity = LoggerStore.preview.entity(for: .login)
-        XCTAssertEqual(entity.url, "https://github.com/login?username=kean&password=nope")
-    }
+
 }

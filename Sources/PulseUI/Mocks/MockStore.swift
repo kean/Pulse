@@ -71,7 +71,7 @@ private func _populateStore(_ store: LoggerStore) async {
         Logger(label: named, store: store)
     }
 
-    let networkLogger = NetworkLogger(store: store)
+    let networkLogger = NetworkLogger(store: store, isWaitingForDecoding: true)
 
     let urlSession = URLSession(configuration: .default)
 
