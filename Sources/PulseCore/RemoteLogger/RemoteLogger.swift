@@ -49,6 +49,7 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
 
     private let queue = DispatchQueue(label: "com.github.kean.remote-logger")
     private let specificKey = DispatchSpecificKey<String>()
+    private var cancellable: AnyCancellable?
 
     private var isInitialized = false
 
@@ -68,15 +69,13 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
             queue.async(execute: startBrowser)
         }
 
-        store.onEvent = { [weak self] event in
-            self?.queue.async {
-                self?.didReceive(event: event)
-            }
+        cancellable = store.events.receive(on: queue).sink { [weak self] in
+            self?.didReceive(event: $0)
         }
 
         // The buffer is used to cover the time between the app launch and the
         // iniitial (automatic) connection to the server.
-        queue.asyncAfter(deadline: .now() + .seconds(2)) { [weak self] in
+        queue.asyncAfter(deadline: .now() + .seconds(3)) { [weak self] in
             self?.buffer = nil
         }
     }

@@ -4,6 +4,7 @@
 
 import Foundation
 import CoreData
+import Combine
 
 /// `LoggerStore` persistently stores all of the logged messages, network
 /// requests, and blobs. Use `.default` store to log messages.
@@ -46,7 +47,8 @@ public final class LoggerStore {
 
     var makeCurrentDate: () -> Date = { Date() }
 
-    var onEvent: ((LoggerStoreEvent) -> Void)?
+    /// Re-transmits events processed by the store.
+    public let events = PassthroughSubject<LoggerStoreEvent, Never>()
 
     private let options: Options
     private var isSaveScheduled = false
@@ -279,7 +281,7 @@ extension LoggerStore {
         perform {
             self._handle(event)
         }
-        onEvent?(event)
+        events.send(event)
     }
 
     /// Handles event emitted by the external store.
