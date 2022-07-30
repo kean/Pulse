@@ -19,6 +19,7 @@ final class ConsoleMessageDetailsViewModel {
 
     static let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US")
         #if os(watchOS)
         formatter.dateFormat = "HH:mm:ss.SSS"
         #else

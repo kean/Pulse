@@ -104,9 +104,11 @@ extension KeyValueSectionViewModel {
 #if os(iOS) || os(macOS)
     static func makeTiming(for transaction: NetworkLoggerTransactionMetrics) -> KeyValueSectionViewModel {
         let timeFormatter = DateFormatter()
+        timeFormatter.locale = Locale(identifier: "en_US")
         timeFormatter.dateFormat = "HH:mm:ss.SSSSSS"
 
         let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale(identifier: "en_US")
         dateFormatter.dateStyle = .medium
         dateFormatter.doesRelativeDateFormatting = true
 

@@ -83,6 +83,7 @@ private extension String {
 
 private let dateFormatter: DateFormatter = {
     let formatter = DateFormatter()
+    formatter.locale = Locale(identifier: "en_US")
     formatter.dateFormat = "HH:mm:ss.SSS, yyyy-MM-dd"
     return formatter
 }()

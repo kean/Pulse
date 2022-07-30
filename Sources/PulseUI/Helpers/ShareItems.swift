@@ -116,6 +116,7 @@ enum NetworkMessageRenderType {
 
 private let dateFormatter: DateFormatter = {
     let formatter = DateFormatter()
+    formatter.locale = Locale(identifier: "en_US")
     formatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSSS"
     return formatter
 }()
@@ -148,7 +149,8 @@ extension TemporaryDirectory {
 #endif
 
 func makeCurrentDate() -> String {
-    let dateFormatter = DateFormatter()
-    dateFormatter.dateFormat = "yyyy-MM-dd_HH-mm"
-    return dateFormatter.string(from: Date())
+    let formatter = DateFormatter()
+    formatter.locale = Locale(identifier: "en_US")
+    formatter.dateFormat = "yyyy-MM-dd_HH-mm"
+    return formatter.string(from: Date())
 }

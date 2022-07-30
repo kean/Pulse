@@ -44,6 +44,7 @@ final class StoreDetailsViewModel {
 
     var infoSection: KeyValueSectionViewModel {
         let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US")
         formatter.dateStyle = .medium
         formatter.timeStyle = .medium
 
