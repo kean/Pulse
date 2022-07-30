@@ -118,8 +118,8 @@ private func makeTimingRows(transaction: NetworkLoggerTransactionMetrics, taskIn
 
         let latestPreviousEndDate = transaction.requestEndDate ?? transaction.connectEndDate ?? transaction.domainLookupEndDate ?? transaction.fetchStartDate
 
-        if let requestStartDate = transaction.requestStartDate {
-            response.append(makeRow(title: "Request", color: .systemGreen, from: requestStartDate, to: transaction.requestEndDate))
+        if let requestStartDate = transaction.requestStartDate, let requestEndDate = transaction.requestEndDate {
+            response.append(makeRow(title: "Request", color: .systemGreen, from: requestStartDate, to: requestEndDate))
         }
         if let requestEndDate = latestPreviousEndDate, let responseStartDate = transaction.responseStartDate {
             response.append(makeRow(title: "Waiting", color: .systemGray3, from: requestEndDate, to: responseStartDate))

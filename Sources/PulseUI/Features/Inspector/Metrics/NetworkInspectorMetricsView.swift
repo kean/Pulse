@@ -75,9 +75,11 @@ final class NetworkInspectorMetricsViewModel {
 #if DEBUG
 struct NetworkInspectorMetricsView_Previews: PreviewProvider {
     static var previews: some View {
-        NetworkInspectorMetricsView(viewModel: .init(
-            metrics: MockTask.login.metrics
-        ))
+        NavigationView {
+            NetworkInspectorMetricsView(viewModel: .init(
+                metrics: LoggerStore.preview.entity(for: .uploadPulseArchive).metrics!
+            ))
+        }
     }
 }
 #endif

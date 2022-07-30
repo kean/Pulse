@@ -19,26 +19,26 @@ struct NetworkInspectorTransactionView: View {
                     TimingView(viewModel: timingViewModel)
                 }
                 Section(header: LargeSectionHeader(title: "Request")) {
-                    KeyValueSectionView(viewModel: viewModel.requestSummary)
-                    KeyValueSectionView(viewModel: viewModel.requestHeaders)
-                    if let requestParameters = viewModel.requestParameters {
-                        KeyValueSectionView(viewModel: requestParameters)
-                    }
+                    KeyValueGridView(items: [
+                        viewModel.requestSummary,
+                        viewModel.requestHeaders,
+                        viewModel.requestParameters
+                    ].compactMap { $0 })
                 }
                 Section(header: LargeSectionHeader(title: "Response")) {
-                    KeyValueSectionView(viewModel: viewModel.responseSummary)
-                    KeyValueSectionView(viewModel: viewModel.responseHeaders)
+                    KeyValueGridView(items: [
+                        viewModel.responseSummary,
+                        viewModel.responseHeaders
+                    ])
                 }
                 Section(header: LargeSectionHeader(title: "Details")) {
-                    ForEach(viewModel.details.sections, id: \.title) {
-                        KeyValueSectionView(viewModel: $0)
-                    }
+                    KeyValueGridView(items: viewModel.details.sections)
                 }
                 Section(header: LargeSectionHeader(title: "Timing")) {
                     KeyValueSectionView(viewModel: viewModel.timingSummary)
                 }
             }
-            .padding(EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
+            .padding(16)
         }
         .background(links)
     }
@@ -112,9 +112,11 @@ struct NetworkInspectorTransactionView_Previews: PreviewProvider {
 }
 
 private let mockModel = NetworkInspectorTransactionViewModel(
-    transaction: MockTask.login.metrics.transactions.last!,
-    metrics: MockTask.login.metrics
+    transaction: mockMetrics.transactions.last!,
+    metrics: mockMetrics
 )
+
+private let mockMetrics = LoggerStore.preview.entity(for: .login).metrics!
 
 #endif
 

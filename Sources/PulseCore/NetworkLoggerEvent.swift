@@ -17,7 +17,7 @@ public struct NetworkLoggerRequest: Codable {
     public let httpShouldHandleCookies: Bool
     public let httpShouldUsePipelining: Bool
 
-    public init(urlRequest: URLRequest) {
+    public init(_ urlRequest: URLRequest) {
         self.url = urlRequest.url
         self.httpMethod = urlRequest.httpMethod
         self.headers = urlRequest.allHTTPHeaderFields ?? [:]
@@ -38,7 +38,7 @@ public struct NetworkLoggerResponse: Codable {
     public let expectedContentLength: Int64?
     public let headers: [String: String]
 
-    public init(urlResponse: URLResponse) {
+    public init(_ urlResponse: URLResponse) {
         let httpResponse = urlResponse as? HTTPURLResponse
         self.url = urlResponse.url?.absoluteString
         self.statusCode = httpResponse?.statusCode
@@ -53,7 +53,7 @@ public struct NetworkLoggerError: Codable {
     public let domain: String
     public let localizedDescription: String
 
-    public init(error: Error) {
+    public init(_ error: Error) {
         let error = error as NSError
         self.code = error.code
         self.domain = error.domain
@@ -71,31 +71,37 @@ public struct NetworkLoggerMetrics: Codable {
         self.redirectCount = metrics.redirectCount
         self.transactions = metrics.transactionMetrics.map(NetworkLoggerTransactionMetrics.init)
     }
+
+    public init(taskInterval: DateInterval, redirectCount: Int, transactions: [NetworkLoggerTransactionMetrics]) {
+        self.taskInterval = taskInterval
+        self.redirectCount = redirectCount
+        self.transactions = transactions
+    }
 }
 
 public struct NetworkLoggerTransactionMetrics: Codable {
-    public let request: NetworkLoggerRequest?
-    public let response: NetworkLoggerResponse?
-    public let fetchStartDate: Date?
-    public let domainLookupStartDate: Date?
-    public let domainLookupEndDate: Date?
-    public let connectStartDate: Date?
-    public let secureConnectionStartDate: Date?
-    public let secureConnectionEndDate: Date?
-    public let connectEndDate: Date?
-    public let requestStartDate: Date?
-    public let requestEndDate: Date?
-    public let responseStartDate: Date?
-    public let responseEndDate: Date?
-    public let networkProtocolName: String?
-    public let isProxyConnection: Bool
-    public let isReusedConnection: Bool
+    public var request: NetworkLoggerRequest?
+    public var response: NetworkLoggerResponse?
+    public var fetchStartDate: Date?
+    public var domainLookupStartDate: Date?
+    public var domainLookupEndDate: Date?
+    public var connectStartDate: Date?
+    public var secureConnectionStartDate: Date?
+    public var secureConnectionEndDate: Date?
+    public var connectEndDate: Date?
+    public var requestStartDate: Date?
+    public var requestEndDate: Date?
+    public var responseStartDate: Date?
+    public var responseEndDate: Date?
+    public var networkProtocolName: String?
+    public var isProxyConnection = false
+    public var isReusedConnection = false
     /// `URLSessionTaskMetrics.ResourceFetchType` enum raw value
-    public let resourceFetchType: Int
-    public let details: NetworkLoggerTransactionDetailedMetrics?
+    public var resourceFetchType: Int
+    public var details: NetworkLoggerTransactionDetailedMetrics?
 
     public init(metrics: URLSessionTaskTransactionMetrics) {
-        self.request = NetworkLoggerRequest(urlRequest: metrics.request)
+        self.request = NetworkLoggerRequest(metrics.request)
         self.response = metrics.response.map(NetworkLoggerResponse.init)
         self.fetchStartDate = metrics.fetchStartDate
         self.domainLookupStartDate = metrics.domainLookupStartDate
@@ -114,27 +120,34 @@ public struct NetworkLoggerTransactionMetrics: Codable {
         self.resourceFetchType = metrics.resourceFetchType.rawValue
         self.details = NetworkLoggerTransactionDetailedMetrics(metrics: metrics)
     }
+
+    public init(request: NetworkLoggerRequest? = nil, response: NetworkLoggerResponse? = nil, resourceFetchType: URLSessionTaskMetrics.ResourceFetchType, details: NetworkLoggerTransactionDetailedMetrics? = nil) {
+        self.request = request
+        self.response = response
+        self.resourceFetchType = resourceFetchType.rawValue
+        self.details = details
+    }
 }
 
 public struct NetworkLoggerTransactionDetailedMetrics: Codable {
-    public let countOfRequestHeaderBytesSent: Int64
-    public let countOfRequestBodyBytesSent: Int64
-    public let countOfRequestBodyBytesBeforeEncoding: Int64
-    public let countOfResponseHeaderBytesReceived: Int64
-    public let countOfResponseBodyBytesReceived: Int64
-    public let countOfResponseBodyBytesAfterDecoding: Int64
-    public let localAddress: String?
-    public let remoteAddress: String?
-    public let isCellular: Bool
-    public let isExpensive: Bool
-    public let isConstrained: Bool
-    public let isMultipath: Bool
-    public let localPort: Int?
-    public let remotePort: Int?
+    public var countOfRequestHeaderBytesSent: Int64 = 0
+    public var countOfRequestBodyBytesSent: Int64 = 0
+    public var countOfRequestBodyBytesBeforeEncoding: Int64 = 0
+    public var countOfResponseHeaderBytesReceived: Int64 = 0
+    public var countOfResponseBodyBytesReceived: Int64 = 0
+    public var countOfResponseBodyBytesAfterDecoding: Int64 = 0
+    public var localAddress: String?
+    public var remoteAddress: String?
+    public var isCellular = false
+    public var isExpensive = false
+    public var isConstrained = false
+    public var isMultipath = false
+    public var localPort: Int?
+    public var remotePort: Int?
     /// `tls_protocol_version_t` enum raw value
-    public let negotiatedTLSProtocolVersion: UInt16?
+    public var negotiatedTLSProtocolVersion: UInt16?
     /// `tls_ciphersuite_t`  enum raw value
-    public let negotiatedTLSCipherSuite: UInt16?
+    public var negotiatedTLSCipherSuite: UInt16?
 
     public init(metrics: URLSessionTaskTransactionMetrics) {
         self.countOfRequestHeaderBytesSent = metrics.countOfRequestHeaderBytesSent
@@ -154,6 +167,8 @@ public struct NetworkLoggerTransactionDetailedMetrics: Codable {
         self.negotiatedTLSProtocolVersion = metrics.negotiatedTLSProtocolVersion?.rawValue
         self.negotiatedTLSCipherSuite = metrics.negotiatedTLSCipherSuite?.rawValue
     }
+
+    public init() {}
 }
 
 public enum NetworkLoggerTaskType: String, Codable, CaseIterable {

@@ -6,6 +6,7 @@ import Foundation
 import PulseCore
 import CoreData
 
+// TODO: Add as extensions to LoggerNetworkRequestDetailsEntity?
 final class DecodedNetworkRequestDetailsEntity {
     private let details: LoggerNetworkRequestDetailsEntity
 
@@ -18,6 +19,12 @@ final class DecodedNetworkRequestDetailsEntity {
 
     init(request: LoggerNetworkRequestEntity) {
         self.details = request.details
+    }
+}
+
+extension LoggerNetworkRequestEntity {
+    var metrics: NetworkLoggerMetrics? {
+        DecodedNetworkRequestDetailsEntity(request: self).metrics
     }
 }
 

@@ -156,6 +156,7 @@ private func _logTask(_ mockTask: MockTask, urlSession: URLSession, logger: Netw
         if MockStoreConfiguration.isDelayingLogs {
             await Task.sleep(milliseconds: delay)
         }
+        let startDate = Date()
         logger.logTaskCreated(task)
         switch mockTask.kind {
         case .download(let size), .upload(let size):
@@ -174,7 +175,10 @@ private func _logTask(_ mockTask: MockTask, urlSession: URLSession, logger: Netw
             logger.logDataTask(dataTask, didReceive: mockTask.response)
             logger.logDataTask(dataTask, didReceive: mockTask.responseBody)
         }
-        logger.logTask(task, didFinishCollecting: mockTask.metrics)
+        logger.logTask(task, didFinishCollecting: {
+            let taskInterval = DateInterval(start: startDate, duration: mockTask.duration)
+            return makeMetrics(for: mockTask, taskInterval: taskInterval)
+        }())
         logger.logTask(task, didCompleteWithError: nil)
     }
 
@@ -189,7 +193,12 @@ private func _logTask(_ mockTask: MockTask, urlSession: URLSession, logger: Netw
         logger.logDataTask(dataTask, didReceive: mockTask.response)
         logger.logDataTask(dataTask, didReceive: mockTask.responseBody)
     }
-    logger.logTask(task, didFinishCollecting: mockTask.metrics)
+
+    logger.logTask(task, didFinishCollecting: {
+        let taskInterval = DateInterval(start: Date().addingTimeInterval(mockTask.delay), duration: mockTask.duration)
+        return makeMetrics(for: mockTask, taskInterval: taskInterval)
+    }())
+
     logger.logTask(task, didCompleteWithError: nil)
 }
 
@@ -206,6 +215,128 @@ private func makeSessionTask(for mockTask: MockTask, urlSession: URLSession) -> 
     task.setValue(currentRequest, forKey: "currentRequest")
     task.setValue(mockTask.response, forKey: "response")
     return task
+}
+
+private func makeMetrics(for task: MockTask, taskInterval: DateInterval) -> NetworkLoggerMetrics {
+    let redirectCount = task.transactions.filter({ $0.fetchType == .networkLoad }).count - 1
+    var currentDate = taskInterval.start
+    let transactions: [NetworkLoggerTransactionMetrics] = task.transactions.enumerated().map { index, transaction in
+        var request = transaction.request
+        request.setValue("Pulse Demo/2.0", forHTTPHeaderField: "User-Agent")
+
+        var metrics = NetworkLoggerTransactionMetrics(
+            request: NetworkLoggerRequest(request),
+            response: NetworkLoggerResponse(transaction.response),
+            resourceFetchType: transaction.fetchType
+        )
+        if transaction.fetchType == .networkLoad {
+            metrics.networkProtocolName = "http/2.0"
+        }
+        metrics.isReusedConnection = transaction.isReusedConnection
+        metrics.fetchStartDate = currentDate
+        func nextDate(delay: TimeInterval) -> Date {
+            currentDate.addTimeInterval(delay / 1000 * TimeInterval.random(in: 0.9...1.1))
+            return currentDate
+        }
+        func nextDate(percentage: TimeInterval) -> Date {
+            let remainig = transaction.duration - currentDate.timeIntervalSince(metrics.fetchStartDate!)
+            currentDate.addTimeInterval(remainig * percentage)
+            return currentDate
+        }
+        func transactionEndDate() -> Date {
+            currentDate = metrics.fetchStartDate!.addingTimeInterval(transaction.duration)
+            return currentDate
+        }
+
+        let isLastTransaction = index == task.transactions.endIndex - 1
+        let requestBodySize = Int64(transaction.request.httpBody?.count ?? 0)
+
+        switch transaction.fetchType {
+        case .networkLoad:
+            if !transaction.isReusedConnection {
+                metrics.domainLookupStartDate = nextDate(delay: 8)
+                metrics.domainLookupEndDate = nextDate(delay: 20)
+                metrics.connectStartDate = nextDate(delay: 0.5)
+                metrics.secureConnectionStartDate = nextDate(delay: 20)
+                metrics.secureConnectionEndDate = nextDate(delay: 100)
+                metrics.connectEndDate = nextDate(delay: 0.5)
+            }
+            switch task.kind {
+            case .download:
+                metrics.requestStartDate = nextDate(delay: 0.5)
+                metrics.requestEndDate = nextDate(delay: 30)
+                metrics.responseStartDate = isLastTransaction ? nextDate(delay: 10) : nextDate(percentage: 0.95)
+                metrics.responseEndDate = transactionEndDate()
+            case .data:
+                metrics.requestStartDate = nextDate(delay: 0.5)
+                metrics.requestEndDate = nextDate(delay: requestBodySize > 0 ? 30 : 4)
+                metrics.responseStartDate = (isLastTransaction && task.responseBody.count > 0) ? nextDate(percentage: 0.8) : nextDate(percentage: 0.95)
+                metrics.responseEndDate = transactionEndDate()
+            case .upload:
+                metrics.responseStartDate = nextDate(percentage: 0.98)
+                metrics.responseEndDate = transactionEndDate()
+            }
+        case .localCache:
+            metrics.requestStartDate = nextDate(delay: 0.5)
+            metrics.responseEndDate = transactionEndDate()
+        default: break
+        }
+
+        metrics.networkProtocolName = "http/2.0"
+
+        let requestHeaders = transaction.request.allHTTPHeaderFields
+        let responseHeaders = (transaction.response as? HTTPURLResponse)?.allHeaderFields as? [String: String]
+
+
+        var details = NetworkLoggerTransactionDetailedMetrics()
+        if transaction.fetchType == .networkLoad {
+            details.countOfRequestHeaderBytesSent = getHeadersEstimatedSize(requestHeaders)
+            details.countOfResponseHeaderBytesReceived = getHeadersEstimatedSize(responseHeaders)
+            if index == task.transactions.endIndex - 1 {
+                switch task.kind {
+                case .data, .download:
+                    details.countOfRequestBodyBytesBeforeEncoding = requestBodySize
+                    details.countOfRequestBodyBytesSent = Int64(Double(requestBodySize) * .random(in: 0.6...0.8))
+                case .upload(let size):
+                    details.countOfRequestBodyBytesBeforeEncoding = size
+                    details.countOfRequestBodyBytesSent = size
+                }
+                switch task.kind {
+                case .data, .upload:
+                    details.countOfResponseBodyBytesAfterDecoding = Int64(task.responseBody.count)
+                    details.countOfResponseBodyBytesReceived = Int64(Double(task.responseBody.count) * .random(in: 0.6...0.8))
+                case .download(let size):
+                    details.countOfResponseBodyBytesAfterDecoding = size
+                    details.countOfResponseBodyBytesReceived = size
+                }
+            }
+        }
+
+        details.negotiatedTLSCipherSuite = tls_ciphersuite_t.AES_128_GCM_SHA256.rawValue
+        details.negotiatedTLSProtocolVersion = tls_protocol_version_t.TLSv13.rawValue
+        details.remoteAddress = "17.253.97.204"
+        details.remotePort = 443
+        details.localAddress = "192.168.0.13"
+        details.localPort = 58622
+
+        metrics.details = details
+
+        return metrics
+    }
+
+    return NetworkLoggerMetrics(
+        taskInterval: taskInterval,
+        redirectCount: redirectCount,
+        transactions: transactions
+    )
+}
+
+private func getHeadersEstimatedSize(_ headers: [String: String]?) -> Int64 {
+    Int64((headers ?? [:])
+        .map { "\($0.key): \($0.value)" }
+        .joined(separator: "\n")
+        .data(using: .utf8)?
+        .count ?? 0)
 }
 
 extension LoggerStore {

@@ -111,8 +111,11 @@ struct NetworkInspectorTransferInfoView_Previews: PreviewProvider {
 }
 
 private let mockModel = NetworkInspectorTransferInfoViewModel(
-    details: MockTask.login.metrics.transactions.last!.details!, taskType: .dataTask
+    details: mockMetrics.transactions.last!.details!, taskType: .dataTask
 )
+
+private let mockMetrics = LoggerStore.preview.entity(for: .login).metrics!
+
 #endif
 
 // MARK: - ViewModel

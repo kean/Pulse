@@ -37,7 +37,7 @@ public final class NetworkLogger {
                 taskId: context.taskId,
                 taskType: NetworkLoggerTaskType(task: task),
                 createdAt: Date(),
-                originalRequest: .init(urlRequest: originalRequest),
+                originalRequest: .init(originalRequest),
                 currentRequest: task.currentRequest.map(NetworkLoggerRequest.init),
                 requestBody: originalRequest.httpBody ?? originalRequest.httpBodyStreamData(),
                 session: LoggerSession.current.id.uuidString
@@ -52,7 +52,7 @@ public final class NetworkLogger {
         context.response = response
         lock.unlock()
 
-        let response = NetworkLoggerResponse(urlResponse: response)
+        let response = NetworkLoggerResponse(response)
         let statusCode = response.statusCode
 
         trace("Did receive response with status code: \(statusCode.map(descriptionForStatusCode) ?? "–") for \(dataTask.url ?? "null")")
@@ -104,7 +104,7 @@ public final class NetworkLogger {
             taskId: context.taskId,
             taskType: NetworkLoggerTaskType(task: task),
             createdAt: Date(),
-            originalRequest: NetworkLoggerRequest(urlRequest: originalRequest),
+            originalRequest: NetworkLoggerRequest(originalRequest),
             currentRequest: task.currentRequest.map(NetworkLoggerRequest.init),
             response: response.map(NetworkLoggerResponse.init),
             error: error.map(NetworkLoggerError.init),

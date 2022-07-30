@@ -29,7 +29,7 @@ extension KeyValueSectionViewModel {
     static func makeParameters(for request: NetworkLoggerRequest) -> KeyValueSectionViewModel {
         KeyValueSectionViewModel(title: "Request Parameters", color: .gray, items: [
             ("Cache Policy", URLRequest.CachePolicy(rawValue: request.cachePolicy).map { $0.description }),
-            ("Timeout Interval", DurationFormatter.string(from: request.timeoutInterval)),
+            ("Timeout Interval", DurationFormatter.string(from: request.timeoutInterval, isPrecise: false)),
             ("Allows Cellular Access", request.allowsCellularAccess.description),
             ("Allows Expensive Network Access", request.allowsExpensiveNetworkAccess.description),
             ("Allows Constrained Network Access", request.allowsConstrainedNetworkAccess.description),
@@ -99,7 +99,7 @@ extension KeyValueSectionViewModel {
 
     static func makeTiming(for transaction: NetworkLoggerTransactionMetrics) -> KeyValueSectionViewModel {
         let timeFormatter = DateFormatter()
-        timeFormatter.dateFormat = "HH:mm:ss.SSS"
+        timeFormatter.dateFormat = "HH:mm:ss.SSSSSS"
 
         let dateFormatter = DateFormatter()
         dateFormatter.dateStyle = .medium

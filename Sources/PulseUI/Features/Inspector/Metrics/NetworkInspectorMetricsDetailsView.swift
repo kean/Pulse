@@ -35,12 +35,12 @@ struct NetworkMetricsDetailsViewModel {
 private func makeTransferSection(for metrics: NetworkLoggerTransactionMetrics) -> KeyValueSectionViewModel? {
     guard let metrics = metrics.details else { return nil }
     return KeyValueSectionViewModel(title: "Data Transfer", color: .secondary, items: [
+        ("Request Headers", formatBytes(metrics.countOfRequestHeaderBytesSent)),
         ("Request Body", formatBytes(metrics.countOfRequestBodyBytesBeforeEncoding)),
         ("Request Body (Encoded)", formatBytes(metrics.countOfRequestBodyBytesSent)),
-        ("Request Headers", formatBytes(metrics.countOfRequestHeaderBytesSent)),
+        ("Response Headers", formatBytes(metrics.countOfResponseHeaderBytesReceived)),
         ("Response Body", formatBytes(metrics.countOfResponseBodyBytesReceived)),
-        ("Response Body (Decoded)", formatBytes(metrics.countOfResponseBodyBytesAfterDecoding)),
-        ("Response Headers", formatBytes(metrics.countOfResponseHeaderBytesReceived))
+        ("Response Body (Decoded)", formatBytes(metrics.countOfResponseBodyBytesAfterDecoding))
     ])
 }
 
@@ -92,7 +92,7 @@ private func formatBytes(_ count: Int64) -> String {
 struct NetworkInspectorMetricsDetailsView_Previews: PreviewProvider {
     static var previews: some View {
         NetworkInspectorMetricsDetailsView(viewModel: .init(
-            metrics: MockTask.login.metrics.transactions.first!
+            metrics: LoggerStore.preview.entity(for: .login).metrics!.transactions.first!
         ))
         .padding()
         .previewLayout(.sizeThatFits)
