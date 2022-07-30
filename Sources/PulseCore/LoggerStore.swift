@@ -367,9 +367,7 @@ extension LoggerStore {
         request.host = event.originalRequest.url?.host
         request.httpMethod = event.originalRequest.httpMethod
         request.errorDomain = event.error?.domain
-        if let error = event.error {
-            request.errorCode = Int32(error.code == 0 ? -1 : error.code)
-        }
+        request.errorCode = Int32(event.error?.code ?? 0)
         let statusCode = Int32(event.response?.statusCode ?? 0)
         request.statusCode = statusCode
         request.startDate = event.metrics?.taskInterval.start

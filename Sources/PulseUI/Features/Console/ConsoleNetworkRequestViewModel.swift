@@ -87,7 +87,13 @@ final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
 #endif
         case .failure:
             if request.errorCode != 0 {
-                title = "\(request.errorCode) \(descriptionForURLErrorCode(Int(request.errorCode)))"
+                if request.errorDomain == URLError.errorDomain {
+                    title = "\(request.errorCode) \(descriptionForURLErrorCode(Int(request.errorCode)))"
+                } else if request.errorDomain == NetworkLoggerDecodingError.domain {
+                    title = "Decoding Failed"
+                } else {
+                    title = "Error"
+                }
             } else {
                 title = StatusCodeFormatter.string(for: Int(request.statusCode))
             }
