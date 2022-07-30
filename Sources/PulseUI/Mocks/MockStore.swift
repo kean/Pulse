@@ -205,14 +205,11 @@ private func _logTask(_ mockTask: MockTask, urlSession: URLSession, logger: Netw
 private func makeSessionTask(for mockTask: MockTask, urlSession: URLSession) -> URLSessionTask {
     let task: URLSessionTask
     switch mockTask.kind {
-    case .data: task = urlSession.dataTask(with: mockTask.request)
-    case .download: task = urlSession.downloadTask(with: mockTask.request)
-    case .upload: task = urlSession.uploadTask(with: mockTask.request, from: Data())
+    case .data: task = urlSession.dataTask(with: mockTask.originalRequest)
+    case .download: task = urlSession.downloadTask(with: mockTask.originalRequest)
+    case .upload: task = urlSession.uploadTask(with: mockTask.originalRequest, from: Data())
     }
-    var currentRequest = mockTask.currentRequest
-    currentRequest.setValue("Pulse Demo/2.0", forHTTPHeaderField: "User-Agent")
-
-    task.setValue(currentRequest, forKey: "currentRequest")
+    task.setValue(mockTask.currentRequest, forKey: "currentRequest")
     task.setValue(mockTask.response, forKey: "response")
     return task
 }
@@ -221,11 +218,8 @@ private func makeMetrics(for task: MockTask, taskInterval: DateInterval) -> Netw
     let redirectCount = task.transactions.filter({ $0.fetchType == .networkLoad }).count - 1
     var currentDate = taskInterval.start
     let transactions: [NetworkLoggerTransactionMetrics] = task.transactions.enumerated().map { index, transaction in
-        var request = transaction.request
-        request.setValue("Pulse Demo/2.0", forHTTPHeaderField: "User-Agent")
-
         var metrics = NetworkLoggerTransactionMetrics(
-            request: NetworkLoggerRequest(request),
+            request: NetworkLoggerRequest(transaction.request),
             response: NetworkLoggerResponse(transaction.response),
             resourceFetchType: transaction.fetchType
         )
@@ -342,7 +336,7 @@ private func getHeadersEstimatedSize(_ headers: [String: String]?) -> Int64 {
 extension LoggerStore {
     func entity(for task: MockTask) -> LoggerNetworkRequestEntity {
         _logTask(task, urlSession: URLSession.shared, logger: NetworkLogger(store: self))
-        let entity = (try! allNetworkRequests()).first { $0.url == task.request.url?.absoluteString }
+        let entity = (try! allNetworkRequests()).first { $0.url == task.originalRequest.url?.absoluteString }
         assert(entity != nil)
         return entity!
     }

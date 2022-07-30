@@ -9,8 +9,8 @@ import PulseCore
 
 struct MockTask {
     var kind: Kind = .data
-    let request: URLRequest
-    let currentRequest: URLRequest
+    let originalRequest: URLRequest
+    var currentRequest: URLRequest { transactions.last!.request }
     let response: URLResponse
     let responseBody: Data
     var transactions: [Transaction] = []
@@ -38,19 +38,17 @@ struct MockTask {
 
 extension MockTask {
     static let login = MockTask(
-        request: mockLoginRequest,
-        currentRequest: mockLoginRequest,
+        originalRequest: mockLoginOriginalRequest,
         response: mockLoginResponse,
         responseBody: MockJSON.githubLoginResponse,
         transactions: [
-            .init(fetchType: .networkLoad, request: mockLoginRequest, response: mockLoginResponse, duration: 0.42691)
+            .init(fetchType: .networkLoad, request: mockLoginCurrentRequest, response: mockLoginResponse, duration: 0.42691)
         ],
         delay: 0.4
     )
 
     static let repos = MockTask(
-        request: mockReposOriginalRequest,
-        currentRequest: mockReposCurrentRequest,
+        originalRequest: mockReposOriginalRequest,
         response: mockReposResponse,
         responseBody: mockReposBody,
         transactions: [
@@ -60,8 +58,7 @@ extension MockTask {
     )
 
     static let profileFailure = MockTask(
-        request: mockProfileFailureRequest,
-        currentRequest: mockProfileFailureRequest,
+        originalRequest: mockProfileFailureRequest,
         response: mockProfileFailureResponse,
         responseBody: """
         <h1>Error 404</h1>
@@ -73,8 +70,7 @@ extension MockTask {
     )
 
     static let octocat = MockTask(
-        request: mockOctocatRequest,
-        currentRequest: mockOctocatRequest,
+        originalRequest: mockOctocatRequest,
         response: mockOctocatResponse,
         responseBody: mockImage,
         transactions: [
@@ -84,8 +80,7 @@ extension MockTask {
     )
 
     static let createAPI = MockTask(
-        request: mockCreateAPIOriginalRequest,
-        currentRequest: mockCreateAPICurrentRequest,
+        originalRequest: mockCreateAPIOriginalRequest,
         response: mockCreateaAPIResponse,
         responseBody: mockCreateaAPIBody,
         transactions: [
@@ -98,8 +93,7 @@ extension MockTask {
 
     static let downloadNuke = MockTask(
         kind: .download(size: 6695689),
-        request: mockDownloadNukeOriginalRequest,
-        currentRequest: mockDownloadNukeCurrentRequest,
+        originalRequest: mockDownloadNukeOriginalRequest,
         response: mockDownloadNukeResponse,
         responseBody: Data(),
         transactions: [
@@ -111,8 +105,7 @@ extension MockTask {
 
     static let uploadPulseArchive = MockTask(
         kind: .upload(size: 21851748),
-        request: mockUploadPulseOriginalRequest,
-        currentRequest: mockUploadPulseCurrentRequest,
+        originalRequest: mockUploadPulseOriginalRequest,
         response: mockUploadPulseResponse,
         responseBody: Data(),
         transactions: [
@@ -124,26 +117,21 @@ extension MockTask {
 
 // MARK: - GitHub Login (Success)
 
-private let mockLoginRequest: URLRequest = {
-    var request = URLRequest(url: URL(string: "https://github.com/login?username=kean&password=nope")!)
+private let mockLoginOriginalRequest = URLRequest(
+    url: "https://github.com/login?username=kean&password=nope",
+    headers: ["Cache-Control": "no-cache"]
+)
 
-    request.setValue("gzip", forHTTPHeaderField: "Accept-Encoding")
-    request.setValue("github.com", forHTTPHeaderField: "Host")
-    request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-    request.setValue("no-cache", forHTTPHeaderField: "Cache-Control")
-    request.setValue("en-us", forHTTPHeaderField: "Accept-Language")
-    request.setValue("text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", forHTTPHeaderField: "Accept")
+private let mockLoginCurrentRequest = mockLoginOriginalRequest.adding(headers: [
+    "User-Agent": "Pulse Demo/2.0",
+    "Accept-Encoding": "gzip",
+    "Accept-Language": "en-us",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+])
 
-    return request
-}()
-
-private let mockLoginResponse = HTTPURLResponse(url: URL(string: "https://github.com/login")!, statusCode: 200, httpVersion: "2.0", headerFields: [
-    "Content-Length": "2298",
-    "Content-Type": "application/json; charset=utf-8",
-    "Cache-Control": "no-store",
-    "Content-Encoding": "gzip",
-    "Set-Cookie": "_device_id=11111111111; path=/; expires=Sun, 30 Jan 2022 21:49:04 GMT; secure; HttpOnly; SameSite=Lax"
-])!
+private let mockLoginResponse = HTTPURLResponse(url: "https://github.com/login", statusCode: 200, headers: [
+    "Set-Cookie": "token=ADSJ1239CX0; path=/; expires=Sun, 30 Jan 2030 21:49:04 GMT; secure; HttpOnly"
+])
 
 // MARK: - GitHub Profile (Failure, 404)
 
@@ -408,5 +396,28 @@ private let mockUploadPulseResponse: URLResponse = {
     ])
     return response!
 }()
+
+// MARK: Helpers
+
+private extension URLRequest {
+    init(url: String, headers: [String: String]) {
+        self.init(url: URL(string: url)!)
+        self.allHTTPHeaderFields = headers
+    }
+
+    func adding(headers: [String: String]) -> Self {
+        var request = self
+        for (name, value) in headers {
+            request.setValue(value, forHTTPHeaderField: name)
+        }
+        return request
+    }
+}
+
+private extension HTTPURLResponse {
+    convenience init(url: String, statusCode: Int, headers: [String: String] = [:]) {
+        self.init(url: URL(string: url)!, statusCode: statusCode, httpVersion: "http/2.0", headerFields: headers)!
+    }
+}
 
 #endif
