@@ -36,6 +36,8 @@ struct MockTask {
 }
 
 extension MockTask {
+    static var allTasks: [MockTask] = [.login, .profile, .repos, .octocat, .downloadNuke, .createAPI, .uploadPulseArchive, .patchRepo]
+
     /// A successfull request the demonstrates:
     ///
     /// - Query parameters in URL
@@ -49,19 +51,6 @@ extension MockTask {
         delay: 0.4
     )
 
-    /// A successfull request that demonstrates:
-    ///
-    /// - Large response body to check FileViewer performance
-    static let repos = MockTask(
-        originalRequest: mockReposOriginalRequest,
-        response: mockReposResponse,
-        responseBody: mockReposBody,
-        transactions: [
-            .init(fetchType: .networkLoad, request: mockReposCurrentRequest, response: mockReposResponse, duration: 0.52691)
-        ],
-        delay: 2.0
-    )
-
     /// A failing request:
     ///
     /// - HTTP status code (404) that doesn't pass validation
@@ -71,6 +60,19 @@ extension MockTask {
         responseBody: "<h1>Error 404</h1>".data(using: .utf8)!,
         transactions: [
             .init(fetchType: .networkLoad, request: mockProfileCurrentRequest, response: mockProfileFailureResponse, duration: 0.22691)
+        ],
+        delay: 2.0
+    )
+
+    /// A successfull request that demonstrates:
+    ///
+    /// - Large response body to check FileViewer performance
+    static let repos = MockTask(
+        originalRequest: mockReposOriginalRequest,
+        response: mockReposResponse,
+        responseBody: mockReposBody,
+        transactions: [
+            .init(fetchType: .networkLoad, request: mockReposCurrentRequest, response: mockReposResponse, duration: 0.52691)
         ],
         delay: 2.0
     )
@@ -88,18 +90,6 @@ extension MockTask {
             .init(fetchType: .networkLoad, request: mockOctocatCurrentRequest, response: mockOctocatNotModifiedResponse, duration: 0.2239)
         ],
         delay: 3.5
-    )
-
-    static let createAPI = MockTask(
-        originalRequest: mockCreateAPIOriginalRequest,
-        response: mockCreateaAPIResponse,
-        responseBody: mockCreateaAPIBody,
-        transactions: [
-            .init(fetchType: .networkLoad, request: mockCreateAPIOriginalRequest, response: mockCreateaAPIRedirectResponse, duration: 0.20283),
-            .init(fetchType: .localCache, request: mockCreateAPICurrentRequest, response: mockCreateaAPIResponse, duration: 0.003),
-            .init(fetchType: .networkLoad, request: mockCreateAPICurrentRequest, response: mockCreateAPIResponseNotChanged, duration: 0.0980, isReusedConnection: true),
-        ],
-        delay: 5.435
     )
 
     static let downloadNuke = MockTask(
@@ -122,7 +112,29 @@ extension MockTask {
         transactions: [
             .init(fetchType: .networkLoad, request: mockUploadPulseCurrentRequest, response: mockUploadPulseResponse, duration: 3.21283, isReusedConnection: true),
         ],
-        delay: 6.435
+        delay: 6.5
+    )
+
+    static let createAPI = MockTask(
+        originalRequest: mockCreateAPIOriginalRequest,
+        response: mockCreateaAPIResponse,
+        responseBody: mockCreateaAPIBody,
+        transactions: [
+            .init(fetchType: .networkLoad, request: mockCreateAPIOriginalRequest, response: mockCreateaAPIRedirectResponse, duration: 0.20283),
+            .init(fetchType: .localCache, request: mockCreateAPICurrentRequest, response: mockCreateaAPIResponse, duration: 0.003),
+            .init(fetchType: .networkLoad, request: mockCreateAPICurrentRequest, response: mockCreateAPIResponseNotChanged, duration: 0.0980, isReusedConnection: true),
+        ],
+        delay: 5.5
+    )
+
+    static let patchRepo = MockTask(
+        originalRequest: mockPatchRepoOriginalRequest,
+        response: mockPatchRepoResponse,
+        responseBody: mockPatchRepoResponseBody,
+        transactions: [
+            .init(fetchType: .networkLoad, request: mockPatchRepoCurrentRequest, response: mockPatchRepoResponse, duration: 0.82691)
+        ],
+        delay: 6.5
     )
 }
 
@@ -262,6 +274,37 @@ private let mockCreateaAPIBody = """
 <title>Get Repo</title>
 </body>
 </html>
+""".data(using: .utf8)!
+
+// MARK: - PATCH
+
+private let mockPatchRepoOriginalRequest: URLRequest = {
+    var request = URLRequest(url: "https://github.com/repos/kean/Nuke", method: "PATCH")
+    request.httpBody = """
+    name=ImageKit&description=Image%20Loading%Framework&private=false
+    """.data(using: .utf8)
+    return request
+}()
+
+private let mockPatchRepoCurrentRequest = mockPatchRepoOriginalRequest.adding(headers: [
+    "User-Agent": "Pulse Demo/2.0",
+    "Accept-Encoding": "gzip",
+    "Accept-Language": "en-us",
+    "Accept": "application/vnd.github+json"
+])
+
+private let mockPatchRepoResponse = HTTPURLResponse(url: "https://github.com/repos/kean/Nuke", statusCode: 200, headers: [
+    "Content-Length": "165061",
+    "Content-Type": "application/json; charset=utf-8",
+    "Cache-Control": "no-store",
+    "Content-Encoding": "gzip"
+])
+
+private let mockPatchRepoResponseBody = """
+{
+  "id": 1296269,
+  "node_id": "MDEwOlJlcG9zaXRvcnkxMjk2MjY5"
+}
 """.data(using: .utf8)!
 
 // MARK: - Download (GET)

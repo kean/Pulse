@@ -86,10 +86,15 @@ extension KeyValueSectionViewModel {
 #if os(iOS) || os(macOS)
     static func makeQueryItems(for url: URL, action: @escaping () -> Void) -> KeyValueSectionViewModel? {
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
-              let queryItems = components.queryItems, !queryItems.isEmpty else {
+              let queryItems = components.queryItems,
+              !queryItems.isEmpty else {
             return nil
         }
-        return KeyValueSectionViewModel(
+        return makeQueryItems(for: queryItems, action: action)
+    }
+
+    static func makeQueryItems(for queryItems: [URLQueryItem], action: @escaping () -> Void) -> KeyValueSectionViewModel? {
+        KeyValueSectionViewModel(
             title: "Query Items",
             color: .blue,
             action: ActionViewModel(action: action, title: "View"),
@@ -135,4 +140,18 @@ extension KeyValueSectionViewModel {
         return KeyValueSectionViewModel(title: "Timing", color: .orange, items: items)
     }
 #endif
+}
+
+extension KeyValueSectionViewModel {
+    func asAttributedString() -> NSAttributedString {
+        let output = NSMutableAttributedString()
+        for item in items {
+            output.append(item.0, [.font: UXFont.monospacedSystemFont(ofSize: FontSize.body, weight: .bold)])
+            output.append(": \(item.1 ?? "–")\n", [.font: UXFont.monospacedSystemFont(ofSize: FontSize.body, weight: .regular)])
+        }
+#if os(iOS) || os(macOS)
+        output.addAttributes([.foregroundColor: UXColor.label])
+#endif
+        return output
+    }
 }

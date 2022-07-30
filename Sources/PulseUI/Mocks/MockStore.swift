@@ -16,12 +16,12 @@ extension LoggerStore {
             func populate() {
                 populateStore(store)
                 if !MockStoreConfiguration.isIndefinite {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(10)) {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(14)) {
                         populate()
                     }
                 }
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(750)) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(500)) {
                 populate()
             }
         } else {
@@ -99,25 +99,9 @@ private func _populateStore(_ store: LoggerStore) async {
                 .log(level: .debug, "Will navigate to Dashboard")
     }
 
-    func logTask(_ mockTask: MockTask) {
-        _logTask(mockTask, urlSession: urlSession, logger: networkLogger, delay: mockTask.delay)
+    for task in MockTask.allTasks {
+        _logTask(task, urlSession: urlSession, logger: networkLogger, delay: task.delay)
     }
-
-    logTask(MockTask.login)
-
-    logTask(MockTask.octocat)
-
-    if Bundle.main.url(forResource: "repos", withExtension: "json") != nil {
-        logTask(MockTask.repos)
-    }
-
-    logTask(MockTask.downloadNuke)
-
-    logTask(MockTask.profile)
-
-    logTask(MockTask.createAPI)
-
-    logTask(MockTask.uploadPulseArchive)
 
     let stackTrace = """
         Replace this implementation with code to handle the error appropriately. fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
@@ -143,7 +127,7 @@ private func _populateStore(_ store: LoggerStore) async {
     logger(named: "auth")
         .log(level: .warning, .init(stringLiteral: stackTrace))
 
-    if MockStoreConfiguration.isDelayingLogs { await Task.sleep(milliseconds: 3000) }
+    if MockStoreConfiguration.isDelayingLogs { await Task.sleep(milliseconds: 10000) }
 
     logger(named: "default")
         .log(level: .critical, "💥 0xDEADBEEF")

@@ -82,6 +82,9 @@ struct NetworkInspectorResponseView_Previews: PreviewProvider {
 
             FileViewer(viewModel: .init(title: "Response", data: { mockHTML }))
                 .previewDisplayName("HTML")
+
+            FileViewer(viewModel: .init(title: "Response", data: { MockTask.patchRepo.originalRequest.httpBody ?? Data() }))
+                .previewDisplayName("Query Items")
         }
     }
 }

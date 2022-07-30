@@ -43,15 +43,31 @@ final class FileViewerViewModel: ObservableObject {
     private func render(data: Data) -> Contents {
         let data = getData()
         if let json = try? JSONSerialization.jsonObject(with: data, options: []) {
-            return .json(RichTextViewModel(json: json))
+            return .json(.init(json: json))
         } else if let image = UXImage(data: data) {
             return .image(image)
         } else if data.isEmpty {
-            return .other(RichTextViewModel(string: "Unavailable"))
+            return .other(.init(string: "Unavailable"))
+        } else if let string = String(data: data, encoding: .utf8) {
+            if let components = decodeQueryParameters(form: string) {
+                return .other(.init(string: components.asAttributedString()))
+            } else {
+                return .other(.init(string: string))
+            }
         } else {
-            let string = String(data: data, encoding: .utf8) ?? "Data \(ByteCountFormatter.string(fromByteCount: Int64(data.count), countStyle: .file))"
-            return .other(RichTextViewModel(string: string))
+            let message = "Data \(ByteCountFormatter.string(fromByteCount: Int64(data.count), countStyle: .file))"
+            return .other(RichTextViewModel(string: message))
         }
+    }
+
+    private func decodeQueryParameters(form string: String) -> KeyValueSectionViewModel? {
+        let string = "https://placeholder.com/path?" + string
+        guard let components = URLComponents(string: string),
+              let queryItems = components.queryItems,
+              !queryItems.isEmpty else {
+            return nil
+        }
+        return KeyValueSectionViewModel.makeQueryItems(for: queryItems, action: {})
     }
 }
 

@@ -85,6 +85,10 @@ public final class LoggerStore {
         ///
         /// - warning: When this option is enabled, all writes to the store
         /// happen immediately and synchronously.
+        ///
+        /// - note: This option can be used to ensure that if the app crashes,
+        /// as much logs as possible are saved persistently. It can also be
+        /// used to increase remote logging speed.
         public static let synchronous = Options(rawValue: 1 << 2)
     }
 
@@ -274,8 +278,8 @@ extension LoggerStore {
     func handle(_ event: LoggerStoreEvent) {
         perform {
             self._handle(event)
-            self.onEvent?(event)
         }
+        onEvent?(event)
     }
 
     /// Handles event emitted by the external store.

@@ -44,7 +44,7 @@ struct NetworkHeadersDetailsView: View {
                 isShowingShareSheet = true
             })
             .sheet(isPresented: $isShowingShareSheet) {
-                ShareView(activityItems: [text])
+                ShareView(activityItems: [viewModel.asAttributedString()])
             }
     }
     #else
@@ -62,24 +62,12 @@ struct NetworkHeadersDetailsView: View {
             RichTextView(viewModel: .init(string: text.string))
             #else
             RichTextView(viewModel: {
-                let viewModel = RichTextViewModel(string: text)
+                let viewModel = RichTextViewModel(string: viewModel.asAttributedString())
                 viewModel.isAutomaticLinkDetectionEnabled = false
                 return viewModel
             }())
             #endif
         }
-    }
-
-    private var text: NSAttributedString {
-        let output = NSMutableAttributedString()
-        for item in viewModel.items {
-            output.append(item.0, [.font: UXFont.monospacedSystemFont(ofSize: FontSize.body, weight: .bold)])
-            output.append(": \(item.1 ?? "–")\n", [.font: UXFont.monospacedSystemFont(ofSize: FontSize.body, weight: .regular)])
-        }
-#if os(iOS) || os(macOS)
-        output.addAttributes([.foregroundColor: UXColor.label])
-#endif
-        return output
     }
 }
 
