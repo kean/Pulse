@@ -234,8 +234,8 @@ private func makeMetrics(for task: MockTask, taskInterval: DateInterval) -> Netw
             return currentDate
         }
         func nextDate(percentage: TimeInterval) -> Date {
-            let remainig = transaction.duration - currentDate.timeIntervalSince(metrics.fetchStartDate!)
-            currentDate.addTimeInterval(remainig * percentage)
+            let remaining = transaction.duration - currentDate.timeIntervalSince(metrics.fetchStartDate!)
+            currentDate.addTimeInterval(remaining * percentage)
             return currentDate
         }
         func transactionEndDate() -> Date {

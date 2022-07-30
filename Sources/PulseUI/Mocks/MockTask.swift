@@ -39,7 +39,7 @@ struct MockTask {
 extension MockTask {
     static var allTasks: [MockTask] = [.login, .profile, .repos, .octocat, .downloadNuke, .createAPI, .uploadPulseArchive, .patchRepo]
 
-    /// A successfull request the demonstrates:
+    /// A successful request the demonstrates:
     ///
     /// - Query parameters in URL
     static let login = MockTask(
@@ -65,7 +65,7 @@ extension MockTask {
         delay: 2.0
     )
 
-    /// A successfull request that demonstrates:
+    /// A successful request that demonstrates:
     ///
     /// - Large response body to check FileViewer performance
     static let repos = MockTask(
@@ -78,7 +78,7 @@ extension MockTask {
         delay: 2.0
     )
 
-    /// A successfull response:
+    /// A successful response:
     ///
     /// - Image in the response with a respective "Content-Type"
     /// - Local cache lookup with further validation (302)

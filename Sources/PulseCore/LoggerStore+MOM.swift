@@ -180,7 +180,7 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
         return isFailure ? .failure : .success
     }
 
-    /// Returns task interval (if availalable from metrics).
+    /// Returns task interval (if available from metrics).
     public var taskInterval: DateInterval? {
         guard let startDate = self.startDate, let endDate = self.endDate else {
             return nil
@@ -221,7 +221,7 @@ public final class LoggerNetworkRequestDetailsEntity: NSManagedObject {
     /// Contains JSON-encoded ``NetworkLoggerMetrics``.
     @NSManaged public var metrics: Data?
     /// Contains JSON-encoded ``NetworkLoggerTransactionDetailedMetrics`` for
-    /// the last trasaction from metrics.
+    /// the last transaction from metrics.
     @NSManaged public var lastTransactionDetails: Data?
 }
 

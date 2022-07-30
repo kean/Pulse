@@ -18,7 +18,7 @@ public final class NetworkLogger {
     ///   for all logged `URLSession` events.
     ///   - isWaitingForDecoding: Don't mark the request completed until the
     ///   decoding is done. If the request itself fails, the task completes
-    ///   immediatelly.
+    ///   immediately.
     ///   - willLogTask: Allows you to filter out sensitive information
     /// or disable logging of certain requests completely. By default, returns
     /// the suggested task without modification.

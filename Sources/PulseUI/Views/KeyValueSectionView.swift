@@ -273,7 +273,7 @@ struct KeyValueSectionView_Previews: PreviewProvider {
         VStack(spacing: 16) {
 
             KeyValueSectionView(viewModel: .init(
-                title: "Sumary",
+                title: "Summary",
                 color: .red,
                 items: [("URL", "https://github.com/kean/Pulse/blob/master/Sources/PulseUI/Features/Console/This/Is/A/Very/Long/URL/that-does-not-fit-in-the-review/But/with?ios=16.0,feature=ContextMenuPreview,backport=yes,easy-to-preview-the-whole-thing-now=yes")])
             )
