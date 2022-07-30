@@ -5,6 +5,7 @@
 import CoreData
 import XCTest
 import Logging
+import Combine
 @testable import Pulse
 @testable import PulseCore
 
@@ -14,6 +15,8 @@ final class PersistentLogHandlerTests: XCTestCase {
 
     var store: LoggerStore!
     var sut: PersistentLogHandler!
+
+    var cancellable: AnyCancellable?
 
     var currentDate: Date = Date()
 
@@ -55,7 +58,7 @@ final class PersistentLogHandlerTests: XCTestCase {
 
         let expectation = self.expectation(description: "MessagesStored")
         var storedMessages = 0
-        store.onEvent = { [unowned self] _ in
+        cancellable = store.events.sink { _ in
             storedMessages += 1
             if storedMessages == 2 {
                 self.store.flush {

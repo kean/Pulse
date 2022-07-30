@@ -83,7 +83,6 @@ extension KeyValueSectionViewModel {
         return "\(code) (\(descriptionForURLErrorCode(code)))"
     }
 
-#if os(iOS) || os(macOS)
     static func makeQueryItems(for url: URL, action: @escaping () -> Void) -> KeyValueSectionViewModel? {
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
               let queryItems = components.queryItems,
@@ -102,6 +101,7 @@ extension KeyValueSectionViewModel {
         )
     }
 
+#if os(iOS) || os(macOS)
     static func makeTiming(for transaction: NetworkLoggerTransactionMetrics) -> KeyValueSectionViewModel {
         let timeFormatter = DateFormatter()
         timeFormatter.dateFormat = "HH:mm:ss.SSSSSS"

@@ -56,7 +56,7 @@ extension XCTestCase {
             networkLogger.logDataTask(dataTask, didReceive: mockTask.response)
             networkLogger.logDataTask(dataTask, didReceive: mockTask.responseBody)
             networkLogger.logTask(dataTask, didFinishCollecting: mockTask.metrics)
-            networkLogger.logTask(dataTask, didCompleteWithError: nil, session: urlSession)
+            networkLogger.logTask(dataTask, didCompleteWithError: nil)
         }
 
         logTask(MockDataTask.login)

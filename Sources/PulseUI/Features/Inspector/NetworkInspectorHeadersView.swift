@@ -59,7 +59,7 @@ struct NetworkHeadersDetailsView: View {
             PlaceholderView(imageName: "folder", title: "Empty")
         } else {
             #if os(watchOS) || os(tvOS)
-            RichTextView(viewModel: .init(string: text.string))
+            RichTextView(viewModel: .init(string: viewModel.asAttributedString().string))
             #else
             RichTextView(viewModel: {
                 let viewModel = RichTextViewModel(string: viewModel.asAttributedString())

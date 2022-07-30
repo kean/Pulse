@@ -22,6 +22,10 @@ final class RichTextViewModel: ObservableObject {
         self.text = string
     }
 
+    init(string: NSAttributedString) {
+        self.text = string.string
+    }
+
     convenience init(data: Data) {
         if let json = try? JSONSerialization.jsonObject(with: data, options: []) {
             self.init(json: json)
