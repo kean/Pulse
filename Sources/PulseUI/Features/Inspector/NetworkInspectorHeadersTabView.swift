@@ -55,7 +55,7 @@ final class NetworkInspectorHeadersTabViewModel: ObservableObject {
 #if DEBUG
 struct NetworkInspectorHeadersTabView_Previews: PreviewProvider {
     static var previews: some View {
-        NetworkInspectorHeadersTabView(viewModel: .init(request: LoggerStore.preview.makeEntity(for: .login)))
+        NetworkInspectorHeadersTabView(viewModel: .init(request: LoggerStore.preview.entity(for: .login)))
     }
 }
 #endif

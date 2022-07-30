@@ -81,7 +81,7 @@ public final class NetworkLogger {
     }
 
     /// Logs the task completion (required).
-    public func logTask(_ task: URLSessionTask, didCompleteWithError error: Error?, session: URLSession? = nil) {
+    public func logTask(_ task: URLSessionTask, didCompleteWithError error: Error?) {
         lock.lock()
         let context = self.context(for: task)
         tasks[ObjectIdentifier(task)] = nil

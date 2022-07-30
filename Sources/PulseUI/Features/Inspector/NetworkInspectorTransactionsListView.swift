@@ -123,7 +123,7 @@ struct NetworkInspectorTransactionsListView_Previews: PreviewProvider {
 }
 
 private let mockModel = NetworkInspectorTransactionsListViewModel(
-    metrics: MockDataTask.login.metrics
+    metrics: MockTask.login.metrics
 )
 #endif
 

@@ -10,11 +10,28 @@ import CoreData
 
 extension LoggerStore {
     static let mock: LoggerStore = {
-        let store = makeMockStore()
-        populateStore(store)
+        let store: LoggerStore = MockStoreConfiguration.isUsingDefaultStore ? .default : makeMockStore()
+
+        if MockStoreConfiguration.isAddingItemsDynamically {
+            func populate() {
+                populateStore(store)
+                if !MockStoreConfiguration.isAddingItemsOnce {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(10)) {
+                        populate()
+                    }
+                }
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(750)) {
+                populate()
+            }
+        } else {
+            populateStore(store)
+        }
+
         return store
     }()
 
+    // Store with
     static let preview = makeMockStore()
 }
 
@@ -25,18 +42,11 @@ private let cleanup: Void = {
     try? FileManager.default.createDirectory(at: rootURL, withIntermediateDirectories: true, attributes: nil)
 }()
 
-func makeMockStore() -> LoggerStore {
+private func makeMockStore() -> LoggerStore {
     _ = cleanup
+
     let storeURL = rootURL.appendingPathComponent("\(UUID().uuidString).pulse")
     return try! LoggerStore(storeURL: storeURL, options: [.create, .synchronous])
-}
-
-private extension NSManagedObject {
-    convenience init(using usedContext: NSManagedObjectContext) {
-        let name = String(describing: type(of: self))
-        let entity = NSEntityDescription.entity(forEntityName: name, in: usedContext)!
-        self.init(entity: entity, insertInto: usedContext)
-    }
 }
 
 private struct Logger {
@@ -48,45 +58,66 @@ private struct Logger {
     }
 }
 
-func populateStore(_ store: LoggerStore) {
-    precondition(Thread.isMainThread)
+private var isFirstLog = true
 
-    func logger(named: String) -> Logger {
+private func populateStore(_ store: LoggerStore) {
+    Task { @MainActor in
+        await _populateStore(store)
+    }
+}
+
+private func _populateStore(_ store: LoggerStore) async {
+    @Sendable func logger(named: String) -> Logger {
         Logger(label: named, store: store)
     }
 
-    logger(named: "application")
-        .log(level: .info, "UIApplication.didFinishLaunching")
-
-    logger(named: "application")
-        .log(level: .info, "UIApplication.willEnterForeground")
-
-    logger(named: "auth")
-        .log(level: .trace, "Instantiated Session")
-
-    logger(named: "auth")
-        .log(level: .trace, "Instantiated the new login request")
-
     let networkLogger = NetworkLogger(store: store)
 
-    let configuration = URLSessionConfiguration.default
-    configuration.httpAdditionalHeaders = [
-        "User-Agent": "Pulse Demo/0.19 iOS"
-    ]
-    let urlSession = URLSession(configuration: configuration)
+    let urlSession = URLSession(configuration: .default)
 
-    func logTask(_ task: MockDataTask) {
-        _logTask(task, logger: networkLogger, urlSession: urlSession)
+    if isFirstLog {
+        isFirstLog = false
+        logger(named: "application")
+            .log(level: .info, "UIApplication.didFinishLaunching", metadata: [
+                "custom-metadata-key": .string("value")
+            ])
+
+        logger(named: "application")
+            .log(level: .info, "UIApplication.willEnterForeground")
+
+        if MockStoreConfiguration.isAddingItemsDynamically { await Task.sleep(milliseconds: 300) }
+
+        logger(named: "auth")
+            .log(level: .trace, "Instantiated Session")
+
+        logger(named: "auth")
+            .log(level: .trace, "Instantiated the new login request")
+
+        if MockStoreConfiguration.isAddingItemsDynamically { await Task.sleep(milliseconds: 800) }
+
+        logger(named: "application")
+                .log(level: .debug, "Will navigate to Dashboard")
     }
 
-    logTask(MockDataTask.login)
+    func logTask(_ mockTask: MockTask, delay: Int = Int.random(in: 1000...6000)) {
+        _logTask(mockTask, urlSession: urlSession, logger: networkLogger, delay: delay)
+    }
 
-    logger(named: "application")
-        .log(level: .debug, "Will navigate to Dashboard")
+    logTask(MockTask.login, delay: 200)
 
-    logTask(MockDataTask.octocat)
+    logTask(MockTask.octocat)
 
-    logTask(MockDataTask.profileFailure)
+    if Bundle.main.url(forResource: "repos", withExtension: "json") != nil {
+        logTask(MockTask.repos, delay: 1000)
+    }
+
+    logTask(MockTask.downloadNuke, delay: 3000)
+
+    logTask(MockTask.profileFailure, delay: 200)
+
+    logTask(MockTask.createAPI)
+
+    logTask(MockTask.uploadPulseArchive)
 
     let stackTrace = """
         Replace this implementation with code to handle the error appropriately. fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
@@ -112,26 +143,83 @@ func populateStore(_ store: LoggerStore) {
     logger(named: "auth")
         .log(level: .warning, .init(stringLiteral: stackTrace))
 
+    if MockStoreConfiguration.isAddingItemsDynamically { await Task.sleep(milliseconds: 3000) }
+
     logger(named: "default")
         .log(level: .critical, "💥 0xDEADBEEF")
 }
 
-private func _logTask(_ task: MockDataTask, logger: NetworkLogger, urlSession: URLSession? = nil) {
-    let urlSession = urlSession ?? URLSession(configuration: .default)
-    let dataTask = urlSession.dataTask(with: task.request)
-    logger.logTaskCreated(dataTask)
-    logger.logDataTask(dataTask, didReceive: task.response)
-    logger.logDataTask(dataTask, didReceive: task.responseBody)
-    logger.logTask(dataTask, didFinishCollecting: task.metrics)
-    logger.logTask(dataTask, didCompleteWithError: nil, session: urlSession)
+private func _logTask(_ mockTask: MockTask, urlSession: URLSession, logger: NetworkLogger, delay: Int) {
+    let task = makeSessionTask(for: mockTask, urlSession: urlSession)
+
+    @Sendable func logTask() async {
+        if MockStoreConfiguration.isAddingItemsDynamically {
+            await Task.sleep(milliseconds: delay)
+        }
+        logger.logTaskCreated(task)
+        switch mockTask.kind {
+        case .download(let size), .upload(let size):
+            await Task.sleep(milliseconds: 300)
+            var remaining = size
+            let chunk: Int64 = 1024 * (size > 10000000 ? 1024 : 512)
+            while remaining > 0 {
+                await Task.sleep(milliseconds: 200)
+                remaining -= chunk
+                logger.logTask(task, didUpdateProgress: (completed: size - remaining, total: size))
+            }
+        case .data:
+            await Task.sleep(milliseconds: .random(in: 500...2000))
+        }
+        if let dataTask = task as? URLSessionDataTask {
+            logger.logDataTask(dataTask, didReceive: mockTask.response)
+            logger.logDataTask(dataTask, didReceive: mockTask.responseBody)
+        }
+        logger.logTask(task, didFinishCollecting: mockTask.metrics)
+        logger.logTask(task, didCompleteWithError: nil)
+    }
+
+    Task.detached {
+        await logTask()
+    }
+}
+
+private func _logTask(_ mockTask: MockTask, urlSession: URLSession, logger: NetworkLogger) {
+    let task = makeSessionTask(for: mockTask, urlSession: urlSession)
+    if let dataTask = task as? URLSessionDataTask {
+        logger.logDataTask(dataTask, didReceive: mockTask.response)
+        logger.logDataTask(dataTask, didReceive: mockTask.responseBody)
+    }
+    logger.logTask(task, didFinishCollecting: mockTask.metrics)
+    logger.logTask(task, didCompleteWithError: nil)
+}
+
+private func makeSessionTask(for mockTask: MockTask, urlSession: URLSession) -> URLSessionTask {
+    let task: URLSessionTask
+    switch mockTask.kind {
+    case .data: task = urlSession.dataTask(with: mockTask.request)
+    case .download: task = urlSession.downloadTask(with: mockTask.request)
+    case .upload: task = urlSession.uploadTask(with: mockTask.request, from: Data())
+    }
+    var currentRequest = mockTask.currentRequest
+    currentRequest.setValue("Pulse Demo/2.0", forHTTPHeaderField: "User-Agent")
+
+    task.setValue(currentRequest, forKey: "currentRequest")
+    task.setValue(mockTask.response, forKey: "response")
+    return task
 }
 
 extension LoggerStore {
-    func makeEntity(for task: MockDataTask) -> LoggerNetworkRequestEntity {
-        _logTask(task, logger: NetworkLogger(store: self))
+    func entity(for task: MockTask) -> LoggerNetworkRequestEntity {
+        _logTask(task, urlSession: URLSession.shared, logger: NetworkLogger(store: self))
         let entity = (try! allNetworkRequests()).first { $0.url == task.request.url?.absoluteString }
         assert(entity != nil)
         return entity!
+    }
+}
+
+extension Task where Success == Never, Failure == Never {
+    static func sleep(milliseconds: Int) async {
+        try! await sleep(nanoseconds: UInt64(milliseconds) * 1_000_000)
     }
 }
 

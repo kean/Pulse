@@ -1,11 +1,13 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2021 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
 import PulseCore
 
-struct MockDataTask {
+#if DEBUG
+
+struct MockTask {
     var kind: Kind = .data
     let request: URLRequest
     let currentRequest: URLRequest
@@ -20,8 +22,8 @@ struct MockDataTask {
     }
 }
 
-extension MockDataTask {
-    static let login = MockDataTask(
+extension MockTask {
+    static let login = MockTask(
         request: mockLoginRequest,
         currentRequest: mockLoginRequest,
         response: mockLoginResponse,
@@ -29,7 +31,7 @@ extension MockDataTask {
         metrics: mockMetrics
     )
 
-    static let repos = MockDataTask(
+    static let repos = MockTask(
         request: mockReposOriginalRequest,
         currentRequest: mockReposCurrentRequest,
         response: mockReposResponse,
@@ -37,7 +39,7 @@ extension MockDataTask {
         metrics: mockMetrics
     )
 
-    static let profileFailure = MockDataTask(
+    static let profileFailure = MockTask(
         request: mockProfileFailureRequest,
         currentRequest: mockProfileFailureRequest,
         response: mockProfileFailureResponse,
@@ -47,7 +49,7 @@ extension MockDataTask {
         metrics: mockMetrics
     )
 
-    static let octocat = MockDataTask(
+    static let octocat = MockTask(
         request: mockOctocatRequest,
         currentRequest: mockOctocatRequest,
         response: mockOctocatResponse,
@@ -55,7 +57,7 @@ extension MockDataTask {
         metrics: mockOctocatMetrics
     )
 
-    static let createAPI = MockDataTask(
+    static let createAPI = MockTask(
         request: mockCreateAPIOriginalRequest,
         currentRequest: mockCreateAPICurrentRequest,
         response: mockCreateaAPIResponse,
@@ -63,7 +65,7 @@ extension MockDataTask {
         metrics: mockMetricsWithRedirect
     )
 
-    static let downloadNuke = MockDataTask(
+    static let downloadNuke = MockTask(
         kind: .download(size: 6695689),
         request: mockDownloadNukeOriginalRequest,
         currentRequest: mockDownloadNukeCurrentRequest,
@@ -72,7 +74,7 @@ extension MockDataTask {
         metrics: mockDownloadNukeMetrics
     )
 
-    static let uploadPulseArchive = MockDataTask(
+    static let uploadPulseArchive = MockTask(
         kind: .upload(size: 21851748),
         request: mockUploadPulseOriginalRequest,
         currentRequest: mockUploadPulseCurrentRequest,
@@ -342,7 +344,7 @@ private let mockReposCurrentRequest: URLRequest = {
     return request
 }()
 
-private let mockReposResponse = HTTPURLResponse(url: URL(string: "https://github.com/repos")!, statusCode: 200, httpVersion: "2.0", headerFields: [
+private let mockReposResponse = HTTPURLResponse(url: URL(string: "https://github.com/repos")!, statusCode: 200, httpVersion: "http/2.0", headerFields: [
     "Content-Length": "2298",
     "Content-Type": "application/json; charset=utf-8",
     "Cache-Control": "no-store",
@@ -681,7 +683,7 @@ private let mockDownloadNukeCurrentRequest: URLRequest = {
 }()
 
 private let mockDownloadNukeResponse: URLResponse = {
-    var response = HTTPURLResponse(url: URL(string: "https://codeload.github.com/kean/Nuke/zip/refs/tags/11.0.0")!, statusCode: 200, httpVersion: "HTTP/2.0", headerFields: [
+    var response = HTTPURLResponse(url: URL(string: "https://codeload.github.com/kean/Nuke/zip/refs/tags/11.0.0")!, statusCode: 200, httpVersion: "http/2.0", headerFields: [
         "Vary": "Authorization,Accept-Encoding,Origin",
         "Content-Type": "application/zip",
         "x-xss-protection": "1; mode=block",
@@ -956,64 +958,4 @@ private let mockUploadPulseMetrics = try! JSONDecoder().decode(NetworkLoggerMetr
 }
 """.data(using: .utf8)!)
 
-// MARK: Swizzling
-
-private var swizzledRequests: [URLSessionTask: URLRequest] = [:]
-private var swizzledResponses: [URLSessionTask: URLResponse] = [:]
-private var isSwizzledRequest = false
-private var isSwizzledResponse = false
-
-private let lock = NSLock()
-
-extension URLSessionTask {
-    func setSwizzledCurrentRequest(_ request: URLRequest?) {
-        if !isSwizzledRequest {
-            isSwizzledRequest = true
-
-            let originalMethod: Method? = class_getInstanceMethod(URLSessionTask.self, #selector(getter: currentRequest))
-            let swizzledMethod: Method? = class_getInstanceMethod(URLSessionTask.self, #selector(getter: swizzledCurrentRequest))
-
-            if let originalMethod = originalMethod, let swizzledMethod = swizzledMethod {
-                method_exchangeImplementations(originalMethod, swizzledMethod)
-            }
-        }
-
-        lock.lock()
-        swizzledRequests[self] = request
-        lock.unlock()
-    }
-
-    @objc var swizzledCurrentRequest: URLRequest? {
-        lock.lock()
-        defer { lock.unlock() }
-        return swizzledRequests[self] ?? self.swizzledCurrentRequest
-    }
-
-    func setSwizzledResponse(_ newResponse: URLResponse?) {
-        if !isSwizzledResponse {
-            isSwizzledResponse = true
-            let originalMethod: Method? = class_getInstanceMethod(URLSessionTask.self, #selector(getter: response))
-            let swizzledMethod: Method? = class_getInstanceMethod(URLSessionTask.self, #selector(getter: swizzledResponse))
-
-            if let originalMethod = originalMethod, let swizzledMethod = swizzledMethod {
-                method_exchangeImplementations(originalMethod, swizzledMethod)
-            }
-        }
-
-        lock.lock()
-        swizzledResponses[self] = newResponse
-        lock.unlock()
-    }
-
-    @objc var swizzledResponse: URLResponse? {
-        lock.lock()
-        defer { lock.unlock() }
-        return swizzledResponses[self] ?? self.swizzledResponse
-    }
-}
-
-extension Task where Success == Never, Failure == Never {
-    static func sleep(milliseconds: Int) async {
-        try! await sleep(nanoseconds: UInt64(milliseconds) * 1_000_000)
-    }
-}
+#endif

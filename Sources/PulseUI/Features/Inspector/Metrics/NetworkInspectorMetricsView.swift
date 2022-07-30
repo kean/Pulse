@@ -76,7 +76,7 @@ final class NetworkInspectorMetricsViewModel {
 struct NetworkInspectorMetricsView_Previews: PreviewProvider {
     static var previews: some View {
         NetworkInspectorMetricsView(viewModel: .init(
-            metrics: MockDataTask.login.metrics
+            metrics: MockTask.login.metrics
         ))
     }
 }

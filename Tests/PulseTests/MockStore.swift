@@ -94,6 +94,5 @@ extension XCTestCase {
 
         logger(named: "default")
             .log(level: .critical, "💥 0xDEADBEEF")
-
     }
 }

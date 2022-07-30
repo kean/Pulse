@@ -8,7 +8,7 @@ import XCTest
 
 final class ConsoleViewModelTests: XCTestCase {
     func testExample() async {
-        let entity = LoggerStore.preview.makeEntity(for: .login)
-        XCTAssertEqual(entity.url, "https://github.com/login")
+        let entity = LoggerStore.preview.entity(for: .login)
+        XCTAssertEqual(entity.url, "https://github.com/login?username=kean&password=nope")
     }
 }

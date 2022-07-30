@@ -52,7 +52,7 @@ public final class URLSessionProxyDelegate: NSObject, URLSessionTaskDelegate, UR
 #endif
 
     public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-        logger.logTask(task, didCompleteWithError: error, session: session)
+        logger.logTask(task, didCompleteWithError: error)
         taskDelegate?.urlSession?(session, task: task, didCompleteWithError: error)
     }
 

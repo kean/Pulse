@@ -191,7 +191,7 @@ private struct NetworkTabPickerView: View {
 struct NetworkInspectorView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
-            NetworkInspectorView(viewModel: .init(request: LoggerStore.preview.makeEntity(for: .profileFailure), store: .preview))
+            NetworkInspectorView(viewModel: .init(request: LoggerStore.preview.entity(for: .profileFailure), store: .preview))
         }
     }
 }

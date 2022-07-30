@@ -112,8 +112,8 @@ struct NetworkInspectorTransactionView_Previews: PreviewProvider {
 }
 
 private let mockModel = NetworkInspectorTransactionViewModel(
-    transaction: MockDataTask.login.metrics.transactions.last!,
-    metrics: MockDataTask.login.metrics
+    transaction: MockTask.login.metrics.transactions.last!,
+    metrics: MockTask.login.metrics
 )
 
 #endif

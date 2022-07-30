@@ -238,7 +238,7 @@ private let spacing: CGFloat? = nil
 #if DEBUG
 struct NetworkInspectorSummaryView_Previews: PreviewProvider {
     static var previews: some View {
-        NetworkInspectorSummaryView(viewModel: .init(request: LoggerStore.preview.makeEntity(for: .profileFailure), store: .preview))
+        NetworkInspectorSummaryView(viewModel: .init(request: LoggerStore.preview.entity(for: .login), store: .preview))
     }
 }
 #endif

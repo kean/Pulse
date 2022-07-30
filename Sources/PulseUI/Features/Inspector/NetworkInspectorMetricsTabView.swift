@@ -52,7 +52,7 @@ final class NetworkInspectorMetricsTabViewModel: ObservableObject {
 #if DEBUG
 struct NetworkInspectorMetricsTabView_Previews: PreviewProvider {
     static var previews: some View {
-        NetworkInspectorMetricsTabView(viewModel: .init(request: LoggerStore.preview.makeEntity(for: .login)))
+        NetworkInspectorMetricsTabView(viewModel: .init(request: LoggerStore.preview.entity(for: .login)))
     }
 }
 #endif

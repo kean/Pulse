@@ -13,14 +13,17 @@
 		0C0B31F426D179A20045C9E1 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0C0B31F226D179A20045C9E1 /* Main.storyboard */; };
 		0C0B31F626D179A70045C9E1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C0B31F526D179A70045C9E1 /* Assets.xcassets */; };
 		0C0B31F926D179A70045C9E1 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0C0B31F726D179A70045C9E1 /* LaunchScreen.storyboard */; };
+		0C24CC6B289482F7008DD332 /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C24CC69289482F7008DD332 /* MockStore.swift */; };
+		0C24CC6C289482F7008DD332 /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C24CC69289482F7008DD332 /* MockStore.swift */; };
+		0C24CC6D289482F7008DD332 /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C24CC69289482F7008DD332 /* MockStore.swift */; };
+		0C24CC6E289482F7008DD332 /* MockTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C24CC6A289482F7008DD332 /* MockTask.swift */; };
+		0C24CC6F289482F7008DD332 /* MockTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C24CC6A289482F7008DD332 /* MockTask.swift */; };
+		0C24CC70289482F7008DD332 /* MockTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C24CC6A289482F7008DD332 /* MockTask.swift */; };
+		0C24CC7A2894C134008DD332 /* MockStoreConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C24CC792894C134008DD332 /* MockStoreConfiguration.swift */; };
+		0C24CC7B2894C134008DD332 /* MockStoreConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C24CC792894C134008DD332 /* MockStoreConfiguration.swift */; };
+		0C24CC7C2894C134008DD332 /* MockStoreConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C24CC792894C134008DD332 /* MockStoreConfiguration.swift */; };
 		0C43FFF4280B492500DD4458 /* PulseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 0C43FFF3280B492500DD4458 /* PulseCore */; };
 		0C43FFF6280B492500DD4458 /* PulseUI in Frameworks */ = {isa = PBXBuildFile; productRef = 0C43FFF5280B492500DD4458 /* PulseUI */; };
-		0C4719242707EFD5008DB813 /* contributors.json in Resources */ = {isa = PBXBuildFile; fileRef = 0C4719232707EFD5008DB813 /* contributors.json */; };
-		0C4719252707EFD5008DB813 /* contributors.json in Resources */ = {isa = PBXBuildFile; fileRef = 0C4719232707EFD5008DB813 /* contributors.json */; };
-		0C4719262707EFD5008DB813 /* contributors.json in Resources */ = {isa = PBXBuildFile; fileRef = 0C4719232707EFD5008DB813 /* contributors.json */; };
-		0C4719272707EFD5008DB813 /* contributors.json in Resources */ = {isa = PBXBuildFile; fileRef = 0C4719232707EFD5008DB813 /* contributors.json */; };
-		0C516FE126015E8E004813B4 /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD2A4AB25D4A2E70087E9E3 /* MockStore.swift */; };
-		0C516FE226015E8E004813B4 /* MockDataTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD2A4AC25D4A2E70087E9E3 /* MockDataTask.swift */; };
 		0C516FE726015ED3004813B4 /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CFF9BD825D6199A0069DB6A /* repos.json */; };
 		0C516FF026016392004813B4 /* DocumentBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C516FEF26016392004813B4 /* DocumentBrowser.swift */; };
 		0C57AD83245F0F38005B3400 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C57AD74245F0F38005B3400 /* Assets.xcassets */; };
@@ -42,21 +45,14 @@
 		0C767817268F88BB0058F69B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C767812268F88BB0058F69B /* Assets.xcassets */; };
 		0C767818268F88BB0058F69B /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C767814268F88BB0058F69B /* Preview Assets.xcassets */; };
 		0C76781A268F88BB0058F69B /* Pulse_Demo_iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C767816268F88BB0058F69B /* Pulse_Demo_iOSApp.swift */; };
-		0C7A833926D1C8960082634F /* MockDataTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD2A4AC25D4A2E70087E9E3 /* MockDataTask.swift */; };
-		0C7A833A26D1C8960082634F /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD2A4AB25D4A2E70087E9E3 /* MockStore.swift */; };
 		0C7A834026D1CA290082634F /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CFF9BD825D6199A0069DB6A /* repos.json */; };
 		0C9F04F92884F34A0035239F /* Pulse_Demo_macOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9F04F82884F34A0035239F /* Pulse_Demo_macOSApp.swift */; };
 		0C9F04FB2884F34A0035239F /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9F04FA2884F34A0035239F /* ContentView.swift */; };
 		0C9F04FD2884F34A0035239F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C9F04FC2884F34A0035239F /* Assets.xcassets */; };
 		0C9F05002884F34A0035239F /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C9F04FF2884F34A0035239F /* Preview Assets.xcassets */; };
-		0C9F05052884F40A0035239F /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD2A4AB25D4A2E70087E9E3 /* MockStore.swift */; };
 		0C9F05072884F4180035239F /* PulseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 0C9F05062884F4180035239F /* PulseCore */; };
 		0C9F05092884F4180035239F /* PulseUI in Frameworks */ = {isa = PBXBuildFile; productRef = 0C9F05082884F4180035239F /* PulseUI */; };
-		0C9F050A2884F4330035239F /* MockDataTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD2A4AC25D4A2E70087E9E3 /* MockDataTask.swift */; };
 		0C9F050C2884FA7D0035239F /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CFF9BD825D6199A0069DB6A /* repos.json */; };
-		0C9F050D2884FA7D0035239F /* contributors.json in Resources */ = {isa = PBXBuildFile; fileRef = 0C4719232707EFD5008DB813 /* contributors.json */; };
-		0CCBDDBA2610BD8200DCB60C /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD2A4AB25D4A2E70087E9E3 /* MockStore.swift */; };
-		0CCBDDBB2610BD8200DCB60C /* MockDataTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD2A4AC25D4A2E70087E9E3 /* MockDataTask.swift */; };
 		0CCBDDC02610BDBC00DCB60C /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CFF9BD825D6199A0069DB6A /* repos.json */; };
 		0CEAB3E425FE862E00F09B0F /* Pulse Demo watchOS Extension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 0CEAB3E325FE862E00F09B0F /* Pulse Demo watchOS Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		0CEAB41025FE867A00F09B0F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0CEAB40E25FE867300F09B0F /* Assets.xcassets */; };
@@ -66,8 +62,6 @@
 		0CEAB41725FE867E00F09B0F /* ComplicationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CEAB40625FE867300F09B0F /* ComplicationController.swift */; };
 		0CEAB41825FE867E00F09B0F /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0CEAB40925FE867300F09B0F /* Preview Assets.xcassets */; };
 		0CEAB42825FE86ED00F09B0F /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CFF9BD825D6199A0069DB6A /* repos.json */; };
-		0CEAB42925FE86ED00F09B0F /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD2A4AB25D4A2E70087E9E3 /* MockStore.swift */; };
-		0CEAB42A25FE86ED00F09B0F /* MockDataTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD2A4AC25D4A2E70087E9E3 /* MockDataTask.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -115,8 +109,10 @@
 		0C0B31F826D179A70045C9E1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		0C0B31FA26D179A70045C9E1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0C1221E525CE09C100B81D7A /* URLSessionAutomatedIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionAutomatedIntegration.swift; sourceTree = "<group>"; };
+		0C24CC69289482F7008DD332 /* MockStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockStore.swift; sourceTree = "<group>"; };
+		0C24CC6A289482F7008DD332 /* MockTask.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockTask.swift; sourceTree = "<group>"; };
+		0C24CC792894C134008DD332 /* MockStoreConfiguration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MockStoreConfiguration.swift; path = App/Shared/Mocks/MockStoreConfiguration.swift; sourceTree = SOURCE_ROOT; };
 		0C25FB6E25CDDCAB00A895C2 /* URLSessionManualIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionManualIntegration.swift; sourceTree = "<group>"; };
-		0C4719232707EFD5008DB813 /* contributors.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = contributors.json; sourceTree = "<group>"; };
 		0C516FBA26015DD2004813B4 /* Pulse Demo iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pulse Demo iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C516FEF26016392004813B4 /* DocumentBrowser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentBrowser.swift; sourceTree = "<group>"; };
 		0C57AD4D245F0EFB005B3400 /* Pulse iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pulse iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -142,8 +138,6 @@
 		0C9F04FC2884F34A0035239F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0C9F04FF2884F34A0035239F /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		0C9F05012884F34A0035239F /* Pulse_Demo_macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Pulse_Demo_macOS.entitlements; sourceTree = "<group>"; };
-		0CD2A4AB25D4A2E70087E9E3 /* MockStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockStore.swift; sourceTree = "<group>"; };
-		0CD2A4AC25D4A2E70087E9E3 /* MockDataTask.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockDataTask.swift; sourceTree = "<group>"; };
 		0CE3DB06260FB43D00521113 /* Scripts */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Scripts; sourceTree = "<group>"; };
 		0CEAB3DA25FE862D00F09B0F /* Pulse Demo watchOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pulse Demo watchOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0CEAB3E325FE862E00F09B0F /* Pulse Demo watchOS Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Pulse Demo watchOS Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -233,6 +227,17 @@
 			path = Integrations;
 			sourceTree = "<group>";
 		};
+		0C24CC68289482F7008DD332 /* Mocks */ = {
+			isa = PBXGroup;
+			children = (
+				0C24CC69289482F7008DD332 /* MockStore.swift */,
+				0C24CC6A289482F7008DD332 /* MockTask.swift */,
+				0C24CC792894C134008DD332 /* MockStoreConfiguration.swift */,
+			);
+			name = Mocks;
+			path = Sources/PulseUI/Mocks;
+			sourceTree = SOURCE_ROOT;
+		};
 		0C25FB6725CDDC9700A895C2 /* IntegrationsExamples */ = {
 			isa = PBXGroup;
 			children = (
@@ -248,7 +253,7 @@
 			isa = PBXGroup;
 			children = (
 				0CFF9BD725D619820069DB6A /* Resources */,
-				0CD2A4AA25D4A2E70087E9E3 /* Mocks */,
+				0C24CC68289482F7008DD332 /* Mocks */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -380,15 +385,6 @@
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
-		0CD2A4AA25D4A2E70087E9E3 /* Mocks */ = {
-			isa = PBXGroup;
-			children = (
-				0CD2A4AC25D4A2E70087E9E3 /* MockDataTask.swift */,
-				0CD2A4AB25D4A2E70087E9E3 /* MockStore.swift */,
-			);
-			path = Mocks;
-			sourceTree = "<group>";
-		};
 		0CEAB40425FE867300F09B0F /* watchOS */ = {
 			isa = PBXGroup;
 			children = (
@@ -432,7 +428,6 @@
 			isa = PBXGroup;
 			children = (
 				0CFF9BD825D6199A0069DB6A /* repos.json */,
-				0C4719232707EFD5008DB813 /* contributors.json */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -651,7 +646,6 @@
 				0C0B31F926D179A70045C9E1 /* LaunchScreen.storyboard in Resources */,
 				0C0B31F626D179A70045C9E1 /* Assets.xcassets in Resources */,
 				0C0B31F426D179A20045C9E1 /* Main.storyboard in Resources */,
-				0C4719272707EFD5008DB813 /* contributors.json in Resources */,
 				0C7A834026D1CA290082634F /* repos.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -663,7 +657,6 @@
 				0C767817268F88BB0058F69B /* Assets.xcassets in Resources */,
 				0C767818268F88BB0058F69B /* Preview Assets.xcassets in Resources */,
 				0C516FE726015ED3004813B4 /* repos.json in Resources */,
-				0C4719242707EFD5008DB813 /* contributors.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -683,7 +676,6 @@
 				0C6460DE25F579B8002C55B1 /* Preview Assets.xcassets in Resources */,
 				0CCBDDC02610BDBC00DCB60C /* repos.json in Resources */,
 				0C6460DD25F579B8002C55B1 /* Assets.xcassets in Resources */,
-				0C4719262707EFD5008DB813 /* contributors.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -694,7 +686,6 @@
 				0C9F05002884F34A0035239F /* Preview Assets.xcassets in Resources */,
 				0C9F050C2884FA7D0035239F /* repos.json in Resources */,
 				0C9F04FD2884F34A0035239F /* Assets.xcassets in Resources */,
-				0C9F050D2884FA7D0035239F /* contributors.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -713,7 +704,6 @@
 				0CEAB41825FE867E00F09B0F /* Preview Assets.xcassets in Resources */,
 				0CEAB42825FE86ED00F09B0F /* repos.json in Resources */,
 				0CEAB41625FE867E00F09B0F /* Assets.xcassets in Resources */,
-				0C4719252707EFD5008DB813 /* contributors.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -724,11 +714,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0C7A833926D1C8960082634F /* MockDataTask.swift in Sources */,
 				0C0B31F126D179A20045C9E1 /* ViewController.swift in Sources */,
 				0C0B31ED26D179A20045C9E1 /* AppDelegate.swift in Sources */,
 				0C0B31EF26D179A20045C9E1 /* SceneDelegate.swift in Sources */,
-				0C7A833A26D1C8960082634F /* MockStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -737,8 +725,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				0C76781A268F88BB0058F69B /* Pulse_Demo_iOSApp.swift in Sources */,
-				0C516FE226015E8E004813B4 /* MockDataTask.swift in Sources */,
-				0C516FE126015E8E004813B4 /* MockStore.swift in Sources */,
+				0C24CC6E289482F7008DD332 /* MockTask.swift in Sources */,
+				0C24CC7A2894C134008DD332 /* MockStoreConfiguration.swift in Sources */,
+				0C24CC6B289482F7008DD332 /* MockStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -756,10 +745,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0CCBDDBB2610BD8200DCB60C /* MockDataTask.swift in Sources */,
+				0C24CC70289482F7008DD332 /* MockTask.swift in Sources */,
 				0C6460DF25F579B8002C55B1 /* ContentView.swift in Sources */,
 				0C6460DC25F579B8002C55B1 /* Pulse_tvOSApp.swift in Sources */,
-				0CCBDDBA2610BD8200DCB60C /* MockStore.swift in Sources */,
+				0C24CC7C2894C134008DD332 /* MockStoreConfiguration.swift in Sources */,
+				0C24CC6D289482F7008DD332 /* MockStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -767,10 +757,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0C9F050A2884F4330035239F /* MockDataTask.swift in Sources */,
+				0C24CC6F289482F7008DD332 /* MockTask.swift in Sources */,
 				0C9F04FB2884F34A0035239F /* ContentView.swift in Sources */,
 				0C9F04F92884F34A0035239F /* Pulse_Demo_macOSApp.swift in Sources */,
-				0C9F05052884F40A0035239F /* MockStore.swift in Sources */,
+				0C24CC7B2894C134008DD332 /* MockStoreConfiguration.swift in Sources */,
+				0C24CC6C289482F7008DD332 /* MockStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -779,9 +770,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0CEAB41525FE867E00F09B0F /* ContentView.swift in Sources */,
-				0CEAB42925FE86ED00F09B0F /* MockStore.swift in Sources */,
 				0CEAB41425FE867E00F09B0F /* PulseAppApp.swift in Sources */,
-				0CEAB42A25FE86ED00F09B0F /* MockDataTask.swift in Sources */,
 				0CEAB41725FE867E00F09B0F /* ComplicationController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -1,10 +1,6 @@
+// The MIT License (MIT)
 //
-//  Pulse_Demo_iOSApp.swift
-//  Pulse Demo iOS
-//
-//  Created by Alexander Grebenyuk on 16.03.2021.
-//  Copyright © 2021 kean. All rights reserved.
-//
+// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import PulseCore

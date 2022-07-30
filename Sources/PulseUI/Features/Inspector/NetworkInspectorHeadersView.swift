@@ -142,7 +142,7 @@ final class NetworkInspectorHeaderViewModel: ObservableObject {
 struct NetworkInspectorHeadersView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
-            NetworkInspectorHeadersView(viewModel: .init(details: .init(request: LoggerStore.preview.makeEntity(for: .login))))
+            NetworkInspectorHeadersView(viewModel: .init(details: .init(request: LoggerStore.preview.entity(for: .login))))
         }
     }
 }
