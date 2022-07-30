@@ -65,7 +65,7 @@ public struct NetworkLoggerError: Codable {
         } else {
             self.domain = error.domain
         }
-        self.debugDescription = (error.userInfo[NSDebugDescriptionErrorKey] as? String) ?? error.debugDescription
+        self.debugDescription = String(describing: error)
         self.error = error
     }
 
@@ -260,7 +260,7 @@ public enum NetworkLoggerDecodingError: Error, Codable {
     case dataCorrupted(context: Context)
     case unknown
 
-    public static let domain = "NetworkLoggerDecodingError"
+    public static let domain = "DecodingError"
 
     public struct Context: Codable {
         public let codingPath: [CodingKey]

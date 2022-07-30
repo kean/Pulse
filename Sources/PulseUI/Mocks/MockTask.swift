@@ -313,7 +313,18 @@ private let mockPatchRepoResponseBody = """
 }
 """.data(using: .utf8)!
 
-private let mockPatchRepoDecodingError = NetworkLoggerDecodingError.typeMismatch(type: "Int", context: .init(codingPath: [.string("id")], debugDescription: "TypeMismatch"))
+private let mockPatchRepoDecodingError: Error = {
+    struct Repo: Decodable {
+        let id: String
+        let node: String
+    }
+    do {
+        _ = try JSONDecoder().decode(Repo.self, from: mockPatchRepoResponseBody)
+        return URLError(.unknown)
+    } catch {
+        return error
+    }
+}()
 
 // MARK: - Download (GET)
 

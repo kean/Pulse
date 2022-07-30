@@ -29,8 +29,8 @@ final class NetworkLoggerTests: XCTestCase {
             _ = try JSONDecoder().decode(Repo.self, from: data)
             XCTFail("Expected decoding to fail")
         } catch {
-            let error = NetworkLoggerError(error)
-            let encoded = try JSONEncoder().encode(error)
+            let networkError = NetworkLoggerError(error)
+            let encoded = try JSONEncoder().encode(networkError)
             let decoded = try JSONDecoder().decode(NetworkLoggerError.self, from: encoded)
             let decodingError = try XCTUnwrap(decoded.error as? NetworkLoggerDecodingError)
             switch decodingError {
@@ -38,7 +38,7 @@ final class NetworkLoggerTests: XCTestCase {
                 XCTAssertEqual(type, "String")
                 XCTAssertEqual(context.codingPath, [.string("id")])
             default:
-                XCTFail("Unexpected error: \(error)")
+                XCTFail("Unexpected error: \(networkError)")
             }
         }
     }
