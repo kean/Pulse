@@ -113,7 +113,7 @@ private func _populateStore(_ store: LoggerStore) async {
 
     logTask(MockTask.downloadNuke, delay: 3000)
 
-    logTask(MockTask.profileFailure, delay: 200)
+    logTask(MockTask.profile, delay: 200)
 
     logTask(MockTask.createAPI)
 
@@ -280,13 +280,13 @@ private func makeMetrics(for task: MockTask, taskInterval: DateInterval) -> Netw
 
         let requestHeaders = transaction.request.allHTTPHeaderFields
         let responseHeaders = (transaction.response as? HTTPURLResponse)?.allHeaderFields as? [String: String]
-
+        let statusCode = (transaction.response as? HTTPURLResponse)?.statusCode
 
         var details = NetworkLoggerTransactionDetailedMetrics()
-        if transaction.fetchType == .networkLoad {
+        if transaction.fetchType == .networkLoad  {
             details.countOfRequestHeaderBytesSent = getHeadersEstimatedSize(requestHeaders)
             details.countOfResponseHeaderBytesReceived = getHeadersEstimatedSize(responseHeaders)
-            if index == task.transactions.endIndex - 1 {
+            if index == task.transactions.endIndex - 1 && statusCode != 304 {
                 switch task.kind {
                 case .data, .download:
                     details.countOfRequestBodyBytesBeforeEncoding = requestBodySize

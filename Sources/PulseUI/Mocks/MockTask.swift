@@ -37,6 +37,9 @@ struct MockTask {
 }
 
 extension MockTask {
+    /// A successfull request the demonstrates:
+    ///
+    /// - Query parameters in URL
     static let login = MockTask(
         originalRequest: mockLoginOriginalRequest,
         response: mockLoginResponse,
@@ -47,6 +50,9 @@ extension MockTask {
         delay: 0.4
     )
 
+    /// A successfull request that demonstrates:
+    ///
+    /// - Large response body to check FileViewer performance
     static let repos = MockTask(
         originalRequest: mockReposOriginalRequest,
         response: mockReposResponse,
@@ -57,24 +63,30 @@ extension MockTask {
         delay: 2.2
     )
 
-    static let profileFailure = MockTask(
-        originalRequest: mockProfileFailureRequest,
+    /// A failing request:
+    ///
+    /// - HTTP status code (404) that doesn't pass validation
+    static let profile = MockTask(
+        originalRequest: mockProfileOriginalRequest,
         response: mockProfileFailureResponse,
-        responseBody: """
-        <h1>Error 404</h1>
-        """.data(using: .utf8)!,
+        responseBody: "<h1>Error 404</h1>".data(using: .utf8)!,
         transactions: [
-            .init(fetchType: .networkLoad, request: mockProfileFailureRequest, response: mockProfileFailureResponse, duration: 0.22691)
+            .init(fetchType: .networkLoad, request: mockProfileCurrentRequest, response: mockProfileFailureResponse, duration: 0.22691)
         ],
         delay: 1.5
     )
 
+    /// A successfull response:
+    ///
+    /// - Image in the response with a respective "Content-Type"
+    /// - Local cache lookup with further validation (302)
     static let octocat = MockTask(
-        originalRequest: mockOctocatRequest,
+        originalRequest: mockOctocatOriginalRequest,
         response: mockOctocatResponse,
         responseBody: mockImage,
         transactions: [
-            .init(fetchType: .networkLoad, request: mockOctocatRequest, response: mockOctocatResponse, duration: 0.8239)
+            .init(fetchType: .localCache, request: mockOctocatCurrentRequest, response: mockOctocatResponse, duration: 0.003),
+            .init(fetchType: .networkLoad, request: mockOctocatCurrentRequest, response: mockOctocatNotModifiedResponse, duration: 0.2239)
         ],
         delay: 4.546
     )
@@ -115,10 +127,11 @@ extension MockTask {
     )
 }
 
-// MARK: - GitHub Login (Success)
+// MARK: - Login (POST)
 
 private let mockLoginOriginalRequest = URLRequest(
     url: "https://github.com/login?username=kean&password=nope",
+    method: "POST",
     headers: ["Cache-Control": "no-cache"]
 )
 
@@ -133,65 +146,47 @@ private let mockLoginResponse = HTTPURLResponse(url: "https://github.com/login",
     "Set-Cookie": "token=ADSJ1239CX0; path=/; expires=Sun, 30 Jan 2030 21:49:04 GMT; secure; HttpOnly"
 ])
 
-// MARK: - GitHub Profile (Failure, 404)
+// MARK: - Profile (GET, 404)
 
-private let mockProfileFailureRequest: URLRequest = {
-    var request = URLRequest(url: URL(string: "https://github.com/profile/valdo")!)
+private let mockProfileOriginalRequest = URLRequest(url: "https://github.com/profile/valdo")
 
-    request.setValue("gzip", forHTTPHeaderField: "Accept-Encoding")
-    request.setValue("github.com", forHTTPHeaderField: "Host")
-    request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-    request.setValue("no-cache", forHTTPHeaderField: "Cache-Control")
-    request.setValue("en-us", forHTTPHeaderField: "Accept-Language")
-    request.setValue("text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", forHTTPHeaderField: "Accept")
+private let mockProfileCurrentRequest = mockProfileOriginalRequest.adding(headers: [
+    "User-Agent": "Pulse Demo/2.0",
+    "Accept-Encoding": "gzip",
+    "Accept-Language": "en-us",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+])
 
-    return request
-}()
-
-private let mockProfileFailureResponse = HTTPURLResponse(url: URL(string: "https://github.com/profile/valdo")!, statusCode: 404, httpVersion: "2.0", headerFields: [
+private let mockProfileFailureResponse = HTTPURLResponse(url: "https://github.com/profile/valdo", statusCode: 404, headers: [
     "Content-Length": "18",
-    "Content-Type": "application/json; charset=utf-8",
+    "Content-Type": "application/html; charset=utf-8",
     "Cache-Control": "no-store",
     "Content-Encoding": "gzip"
-])!
+])
 
-// MARK: - GitHub Octovat (Success, 200)
+// MARK: - Octocat (GET, Image)
 
-private let mockOctocatRequest: URLRequest = {
-    var request = URLRequest(url: URL(string: "https://github.com/octocat.png")!)
+private let mockOctocatOriginalRequest = URLRequest(url: "https://github.com/octocat.png", headers: [
+    "Accept": "image/any"
+])
 
-    request.setValue("gzip", forHTTPHeaderField: "Accept-Encoding")
-    request.setValue("github.com", forHTTPHeaderField: "Host")
-    request.setValue("image/any", forHTTPHeaderField: "Content-Type")
-    request.setValue("en-us", forHTTPHeaderField: "Accept-Language")
+private let mockOctocatCurrentRequest = mockOctocatOriginalRequest.adding(headers: [
+    "User-Agent": "Pulse Demo/2.0",
+    "Accept-Encoding": "gzip",
+    "Accept-Language": "en-us"
+])
 
-    return request
-}()
+private let mockOctocatNotModifiedResponse = HTTPURLResponse(url: "https://github.com/octocat.png", statusCode: 304)
 
-private let mockOctocatResponse = HTTPURLResponse(url: URL(string: "https://github.com/octocat.png")!, statusCode: 302, httpVersion: "2.0", headerFields: [
-    "Content-Length": "21504",
+private let mockOctocatResponse = HTTPURLResponse(url: "https://github.com/octocat.png", statusCode: 200, headers: [
+    "Content-Length": "11048",
     "Content-Type": "image/png",
     "Cache-Control": "public, max-age=3600",
     "Expires": "Mon, 26 Feb 2021 17:45:57 GMT",
     "Last-Modified": "Mon, 12 Jan 2016 17:45:57 GMT",
     "ETag": "686897696a7c876b7e",
     "Content-Encoding": "gzip"
-])!
-
-// MARK: - GitHub Stats (Network Error)
-
-let mockStatsFailureRequest: URLRequest = {
-    var request = URLRequest(url: URL(string: "https://github.com/stats")!)
-
-    request.setValue("gzip", forHTTPHeaderField: "Accept-Encoding")
-    request.setValue("github.com", forHTTPHeaderField: "Host")
-    request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-    request.setValue("no-cache", forHTTPHeaderField: "Cache-Control")
-    request.setValue("en-us", forHTTPHeaderField: "Accept-Language")
-    request.setValue("text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", forHTTPHeaderField: "Accept")
-
-    return request
-}()
+])
 
 // MARK: - GitHub Repos (Success)
 
@@ -400,8 +395,9 @@ private let mockUploadPulseResponse: URLResponse = {
 // MARK: Helpers
 
 private extension URLRequest {
-    init(url: String, headers: [String: String]) {
+    init(url: String, method: String = "GET", headers: [String: String] = [:]) {
         self.init(url: URL(string: url)!)
+        self.httpMethod = method
         self.allHTTPHeaderFields = headers
     }
 

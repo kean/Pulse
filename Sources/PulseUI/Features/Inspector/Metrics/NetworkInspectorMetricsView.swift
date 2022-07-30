@@ -77,7 +77,7 @@ struct NetworkInspectorMetricsView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
             NetworkInspectorMetricsView(viewModel: .init(
-                metrics: LoggerStore.preview.entity(for: .uploadPulseArchive).metrics!
+                metrics: LoggerStore.preview.entity(for: .octocat).metrics!
             ))
         }
     }
