@@ -43,7 +43,7 @@ extension MockTask {
     static let login = MockTask(
         originalRequest: mockLoginOriginalRequest,
         response: mockLoginResponse,
-        responseBody: MockJSON.githubLoginResponse,
+        responseBody: mockLoginResponseBody,
         transactions: [
             .init(fetchType: .networkLoad, request: mockLoginCurrentRequest, response: mockLoginResponse, duration: 0.42691)
         ],
@@ -83,7 +83,7 @@ extension MockTask {
     static let octocat = MockTask(
         originalRequest: mockOctocatOriginalRequest,
         response: mockOctocatResponse,
-        responseBody: mockImage,
+        responseBody: mockOcotocatResponseBody,
         transactions: [
             .init(fetchType: .localCache, request: mockOctocatCurrentRequest, response: mockOctocatResponse, duration: 0.003),
             .init(fetchType: .networkLoad, request: mockOctocatCurrentRequest, response: mockOctocatNotModifiedResponse, duration: 0.2239)
@@ -146,6 +146,20 @@ private let mockLoginResponse = HTTPURLResponse(url: "https://github.com/login",
     "Set-Cookie": "token=ADSJ1239CX0; path=/; expires=Sun, 30 Jan 2030 21:49:04 GMT; secure; HttpOnly"
 ])
 
+private let mockLoginResponseBody = """
+{
+    "access-token": "a1",
+    "refresh-token": "m1",
+    "profile": {
+        "id": 1,
+        "name": "kean",
+        "repos": ["Nuke", "Pulse", "Align"],
+        "hireable": false,
+        "email": null
+    }
+}
+""".data(using: .utf8)!
+
 // MARK: - Profile (GET, 404)
 
 private let mockProfileOriginalRequest = URLRequest(url: "https://github.com/profile/valdo")
@@ -188,132 +202,60 @@ private let mockOctocatResponse = HTTPURLResponse(url: "https://github.com/octoc
     "Content-Encoding": "gzip"
 ])
 
-// MARK: - GitHub Repos (Success)
+private let mockOcotocatResponseBody = Data(base64Encoded: "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")!
 
-private let mockReposOriginalRequest: URLRequest = {
-    var request = URLRequest(url: URL(string: "https://github.com/repos")!)
-    return request
-}()
+// MARK: - Repos (GET, Success)
 
-private let mockReposCurrentRequest: URLRequest = {
-    var request = URLRequest(url: URL(string: "https://github.com/repos")!)
+private let mockReposOriginalRequest = URLRequest(url: "https://github.com/repos")
 
-    request.setValue("gzip", forHTTPHeaderField: "Accept-Encoding")
-    request.setValue("github.com", forHTTPHeaderField: "Host")
-    request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-    request.setValue("en-us", forHTTPHeaderField: "Accept-Language")
-    request.setValue("text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", forHTTPHeaderField: "Accept")
+private let mockReposCurrentRequest = mockReposOriginalRequest.adding(headers: [
+    "User-Agent": "Pulse Demo/2.0",
+    "Accept-Encoding": "gzip",
+    "Accept-Language": "en-us",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+])
 
-    return request
-}()
-
-private let mockReposResponse = HTTPURLResponse(url: URL(string: "https://github.com/repos")!, statusCode: 200, httpVersion: "http/2.0", headerFields: [
-    "Content-Length": "2298",
+private let mockReposResponse = HTTPURLResponse(url: "https://github.com/repos", statusCode: 200, headers: [
+    "Content-Length": "165061",
     "Content-Type": "application/json; charset=utf-8",
     "Cache-Control": "no-store",
-    "Content-Encoding": "gzip",
-    "Set-Cookie": "_device_id=11111111111; path=/; expires=Sun, 30 Jan 2022 21:49:04 GMT; secure; HttpOnly; SameSite=Lax"
-])!
+    "Content-Encoding": "gzip"
+])
 
 private let mockReposBody = Bundle.main.url(forResource: "repos", withExtension: "json")
     .flatMap { try? Data(contentsOf: $0) } ?? """
     ["Nuke", "Pulse", "Get", "CreateAPI"]
     """.data(using: .utf8)!
 
-// MARK: - JSON (Mocks)
+// MARK: - /CreateAPI (GET, redirect)
 
-struct MockJSON {
-    static let githubLoginResponse = """
-    {
-        "access-token": "a1",
-        "refresh-token": "m1",
-        "profile": {
-            "id": 1,
-            "name": "kean",
-            "repos": ["Nuke", "Pulse", "Align"],
-            "hireable": false,
-            "email": null
-        }
-    }
-    """.data(using: .utf8)!
+private let mockCreateAPIOriginalRequest = URLRequest(url: "https://github.com/CreateAPI/Get")
 
-    static let allPossibleValues = """
-    {
-      "actors": [
-        {
-          "name": "Tom Cruise",
-          "age": 56,
-          "Born At": "Syracuse, NY",
-          "Birthdate": "July 3, 1962",
-          "photo": "https://jsonformatter.org/img/tom-cruise.jpg",
-          "wife": null,
-          "weight": 67.5,
-          "hasChildren": true,
-          "hasGreyHair": false,
-          "children": [
-            "Suri",
-            "Isabella Jane",
-            "Connor"
-          ]
-        },
-        {
-          "name": "Robert Downey Jr.",
-          "age": 53,
-          "born At": "New York City, NY",
-          "birthdate": "April 4, 1965",
-          "photo": "https://jsonformatter.org/img/Robert-Downey-Jr.jpg",
-          "wife": "Susan Downey",
-          "weight": 77.1,
-          "hasChildren": true,
-          "hasGreyHair": false,
-          "children": [
-            "Indio Falconer",
-            "Avri Roel",
-            "Exton Elias"
-          ]
-        }
-      ]
-    }
-    """.data(using: .utf8)!
-}
+private let mockCreateAPICurrentRequest = mockCreateAPIOriginalRequest.adding(headers: [
+    "User-Agent": "Pulse Demo/2.0",
+    "Accept-Encoding": "gzip",
+    "Accept-Language": "en-us",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+])
 
-// MARK: - Images (Mocks)
-
-let mockImage = Data(base64Encoded: "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")!
-
-// MARK: - /CreateAPI (with redirect)
-
-private let mockCreateAPIOriginalRequest: URLRequest = {
-    var request = URLRequest(url: URL(string: "https://github.com/CreateAPI/Get")!)
-    return request
-}()
-
-private let mockCreateAPICurrentRequest: URLRequest = {
-    var request = URLRequest(url: URL(string: "https://github.com/kean/Get")!)
-    request.setValue("gzip", forHTTPHeaderField: "Accept-Encoding")
-    request.setValue("en-us", forHTTPHeaderField: "Accept-Language")
-    request.setValue("text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", forHTTPHeaderField: "Accept")
-    return request
-}()
-
-private let mockCreateaAPIRedirectResponse = HTTPURLResponse(url: URL(string: "https://github.com/CreateAPI/Get")!, statusCode: 301, httpVersion: "http/2.0", headerFields: [
+private let mockCreateaAPIRedirectResponse = HTTPURLResponse(url: "https://github.com/CreateAPI/Get", statusCode: 301, headers: [
     "Content-Type": "text/html; charset=utf-8",
     "Location": "https://github.com/kean/Get",
     "Cache-Control": "no-cache",
     "Content-Length": "0",
     "Server": "GitHub.com"
-])!
+])
 
-private let mockCreateaAPIResponse = HTTPURLResponse(url: URL(string: "https://github.com/kean/Get")!, statusCode: 200, httpVersion: "http/2.0", headerFields: [
+private let mockCreateaAPIResponse = HTTPURLResponse(url: "https://github.com/kean/Get", statusCode: 200, headers: [
     "Content-Length": "0",
     "Cache-Control": "no-store",
-])!
+])
 
-private let mockCreateAPIResponseNotChanged = HTTPURLResponse(url: URL(string: "https://github.com/kean/Get")!, statusCode: 304, httpVersion: "http/2.0", headerFields: [
+private let mockCreateAPIResponseNotChanged = HTTPURLResponse(url: "https://github.com/kean/Get", statusCode: 304, headers: [
     "Content-Length": "0",
     "Cache-Control": "max-age=0, private, must-revalidate",
     "Server": "GitHub.com"
-])!
+])
 
 private let mockCreateaAPIBody = """
 <html>
@@ -323,74 +265,51 @@ private let mockCreateaAPIBody = """
 </html>
 """.data(using: .utf8)!
 
-// MARK: - GitHub Download Archive
+// MARK: - Download (GET)
 
-private let mockDownloadNukeOriginalRequest: URLRequest = {
-    var request = URLRequest(url: URL(string: "https://github.com/kean/Nuke/archive/refs/tags/11.0.0.zip")!)
-    request.httpMethod = "GET"
-    return request
-}()
+private let mockDownloadNukeOriginalRequest = URLRequest(url: "https://github.com/kean/Nuke/archive/refs/tags/11.0.0.zip")
 
-private let mockDownloadNukeCurrentRequest: URLRequest = {
-    var request = URLRequest(url: URL(string: "https://codeload.github.com/kean/Nuke/zip/refs/tags/11.0.0")!)
-    request.setValue("gzip, deflate, br", forHTTPHeaderField: "Accept-Encoding")
-    request.setValue("en-US,en;q=0.9", forHTTPHeaderField: "Accept-Language")
-    request.setValue("*/*", forHTTPHeaderField: "Accept")
-    return request
-}()
+private let mockDownloadNukeCurrentRequest = mockDownloadNukeOriginalRequest.adding(headers: [
+    "User-Agent": "Pulse Demo/2.0",
+    "Accept-Encoding": "gzip",
+    "Accept-Language": "en-us",
+    "Accept": "*/*"
+])
 
-private let mockDownloadNukeRedirectResponse = HTTPURLResponse(url: URL(string: "https://codeload.github.com/kean/Nuke/zip/refs/tags/11.0.0")!, statusCode: 302, httpVersion: "http/2.0", headerFields: [
+private let mockDownloadNukeRedirectResponse = HTTPURLResponse(url: "https://codeload.github.com/kean/Nuke/zip/refs/tags/11.0.0", statusCode: 302, headers: [
     "Server": "GitHub.com",
     "Content-Type": "text/html; charset=utf-8",
     "Location": "https://codeload.github.com/kean/Nuke/zip/refs/tags/11.0.0",
     "Cache-Control": "max-age=0, private",
     "Content-Length": "0",
-    "content-security-policy": "default-src 'none'; base-uri 'self'; block-all-mixed-content; child-src github.com/assets-cdn/worker/ gist.github.com/assets-cdn/worker/; connect-src 'self' uploads.github.com objects-origin.githubusercontent.com www.githubstatus.com collector.github.com raw.githubusercontent.com api.github.com github-cloud.s3.amazonaws.com github-production-repository-file-5c1aeb.s3.amazonaws.com github-production-upload-manifest-file-7fdce7.s3.amazonaws.com github-production-user-asset-6210df.s3.amazonaws.com cdn.optimizely.com logx.optimizely.com/v1/events *.actions.githubusercontent.com wss://*.actions.githubusercontent.com online.visualstudio.com/api/v1/locations github-production-repository-image-32fea6.s3.amazonaws.com github-production-release-asset-2e65be.s3.amazonaws.com",
+    "Content-Security-Policy": "default-src 'none'; base-uri 'self'; block-all-mixed-content; child-src github.com/assets-cdn/worker/ gist.github.com/assets-cdn/worker/; connect-src 'self' uploads.github.com objects-origin.githubusercontent.com www.githubstatus.com collector.github.com raw.githubusercontent.com api.github.com github-cloud.s3.amazonaws.com github-production-repository-file-5c1aeb.s3.amazonaws.com github-production-upload-manifest-file-7fdce7.s3.amazonaws.com github-production-user-asset-6210df.s3.amazonaws.com cdn.optimizely.com logx.optimizely.com/v1/events *.actions.githubusercontent.com wss://*.actions.githubusercontent.com online.visualstudio.com/api/v1/locations github-production-repository-image-32fea6.s3.amazonaws.com github-production-release-asset-2e65be.s3.amazonaws.com",
+])
 
-])!
-
-private let mockDownloadNukeResponse = HTTPURLResponse(url: URL(string: "https://codeload.github.com/kean/Nuke/zip/refs/tags/11.0.0")!, statusCode: 200, httpVersion: "http/2.0", headerFields: [
-    "Vary": "Authorization,Accept-Encoding,Origin",
+private let mockDownloadNukeResponse = HTTPURLResponse(url: "https://codeload.github.com/kean/Nuke/zip/refs/tags/11.0.0", statusCode: 200, headers: [
     "Content-Type": "application/zip",
-    "x-xss-protection": "1; mode=block",
-    "content-security-policy": "default-src \'none\'; style-src \'unsafe-inline\'; sandbox",
-    "Date": "Sun, 24 Jul 2022 17:46:08 GMT",
     "Content-Disposition": "attachment; filename=Nuke-11.0.0.zip",
-    "x-frame-options": "deny",
     "Etag": "W/\\\"4358c3c3d9bd5a22f6d86b47cbe567417fa1efc8df6beaa54c1730caf6ad86da\\\"",
-    "Strict-Transport-Security": "max-age=31536000",
     "Access-Control-Allow-Origin": "https://render.githubusercontent.com"
-])!
+])
 
-// MARK: Upload
+// MARK: - Upload (POST)
 
-private let mockUploadPulseOriginalRequest: URLRequest = {
-    var request = URLRequest(url: URL(string: "https://objects-origin.githubusercontent.com/github-production-release-asset-2e65be")!)
-    request.httpMethod = "POST"
-    request.setValue("21851748", forHTTPHeaderField: "Content-Length")
-    request.setValue("multipart/form-data; boundary=----WebKitFormBoundaryrv8XAHQPtQcWta3k", forHTTPHeaderField: "Content-Type")
-    return request
-}()
+private let mockUploadPulseOriginalRequest = URLRequest(url: "https://objects-origin.githubusercontent.com/github-production-release-asset-2e65be", method: "POST", headers: [
+    "Content-Length": "21851748",
+    "Content-Type": "multipart/form-data; boundary=----WebKitFormBoundaryrv8XAHQPtQcWta3k"
+])
 
-private let mockUploadPulseCurrentRequest: URLRequest = {
-    var request = URLRequest(url: URL(string: "https://objects-origin.githubusercontent.com/github-production-release-asset-2e65be")!)
-    request.httpMethod = "POST"
-    request.setValue("gzip, deflate, br", forHTTPHeaderField: "Accept-Encoding")
-    request.setValue("en-US,en;q=0.9", forHTTPHeaderField: "Accept-Language")
-    request.setValue("*/*", forHTTPHeaderField: "Accept")
-    request.setValue("keep-alive", forHTTPHeaderField: "Connection")
-    request.setValue("21851748", forHTTPHeaderField: "Content-Length")
-    request.setValue("multipart/form-data; boundary=----WebKitFormBoundaryrv8XAHQPtQcWta3k", forHTTPHeaderField: "Content-Type")
-    return request
-}()
+private let mockUploadPulseCurrentRequest = mockUploadPulseOriginalRequest.adding(headers: [
+    "User-Agent": "Pulse Demo/2.0",
+    "Accept-Encoding": "gzip",
+    "Accept-Language": "en-us",
+    "Accept": "*/*"
+])
 
-private let mockUploadPulseResponse: URLResponse = {
-    var response = HTTPURLResponse(url: URL(string: "https://objects-origin.githubusercontent.com/github-production-release-asset-2e65be")!, statusCode: 204, httpVersion: "HTTP/2.0", headerFields: [
-        "Vary": "Origin",
-        "Access-Control-Allow-Origin": "https://github.com"
-    ])
-    return response!
-}()
+private let mockUploadPulseResponse = HTTPURLResponse(url: "https://objects-origin.githubusercontent.com/github-production-release-asset-2e65be", statusCode: 204, headers: [
+    "Vary": "Origin",
+    "Access-Control-Allow-Origin": "https://github.com"
+])
 
 // MARK: Helpers
 

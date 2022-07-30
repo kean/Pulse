@@ -74,37 +74,17 @@ struct FileViewer: View {
 struct NetworkInspectorResponseView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-#if os(iOS)
-            NavigationView {
-                FileViewer(viewModel: mockModel)
-                    .navigationBarTitle("Response")
-            }
-            .previewDisplayName("Light")
-            .environment(\.colorScheme, .light)
-#else
-            FileViewer(viewModel: mockModel)
-                .previewDisplayName("Light")
-                .environment(\.colorScheme, .light)
-#endif
+            FileViewer(viewModel: .init(title: "Response", data: { MockJSON.allPossibleValues }))
+                .previewDisplayName("JSON")
 
-            FileViewer(viewModel: .init(title: "Response", data: { mockImage }))
+            FileViewer(viewModel: .init(title: "Response", data: { MockTask.octocat.responseBody }))
                 .previewDisplayName("Image")
-                .environment(\.colorScheme, .light)
 
             FileViewer(viewModel: .init(title: "Response", data: { mockHTML }))
                 .previewDisplayName("HTML")
-                .environment(\.colorScheme, .light)
-
-            FileViewer(viewModel: mockModel)
-                .previewDisplayName("Dark")
-                .previewLayout(.sizeThatFits)
-                .environment(\.colorScheme, .dark)
-
         }
     }
 }
-
-private let mockModel = FileViewerViewModel(title: "Response", data: { MockJSON.allPossibleValues })
 
 private let mockHTML = """
 <!DOCTYPE html>
@@ -117,4 +97,45 @@ private let mockHTML = """
 </body>
 </html>
 """.data(using: .utf8)!
+
+enum MockJSON {
+    static let allPossibleValues = """
+    {
+      "actors": [
+        {
+          "name": "Tom Cruise",
+          "age": 56,
+          "Born At": "Syracuse, NY",
+          "Birthdate": "July 3, 1962",
+          "photo": "https://jsonformatter.org/img/tom-cruise.jpg",
+          "wife": null,
+          "weight": 67.5,
+          "hasChildren": true,
+          "hasGreyHair": false,
+          "children": [
+            "Suri",
+            "Isabella Jane",
+            "Connor"
+          ]
+        },
+        {
+          "name": "Robert Downey Jr.",
+          "age": 53,
+          "born At": "New York City, NY",
+          "birthdate": "April 4, 1965",
+          "photo": "https://jsonformatter.org/img/Robert-Downey-Jr.jpg",
+          "wife": "Susan Downey",
+          "weight": 77.1,
+          "hasChildren": true,
+          "hasGreyHair": false,
+          "children": [
+            "Indio Falconer",
+            "Avri Roel",
+            "Exton Elias"
+          ]
+        }
+      ]
+    }
+    """.data(using: .utf8)!
+}
 #endif
