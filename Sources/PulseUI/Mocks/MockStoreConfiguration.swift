@@ -9,8 +9,8 @@ import CoreData
 #if DEBUG
 
 enum MockStoreConfiguration {
-    static let isAddingItemsDynamically = false
-    static let isAddingItemsOnce = true
+    static let isDelayingLogs = false
+    static let isIndefinite = true
     static let isUsingDefaultStore = false
 }
 

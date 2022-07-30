@@ -6,16 +6,16 @@ import Foundation
 import PulseCore
 import CoreData
 
-#if DEBUG
+#if DEBUG || PULSE_DEMO
 
 extension LoggerStore {
     static let mock: LoggerStore = {
         let store: LoggerStore = MockStoreConfiguration.isUsingDefaultStore ? .default : makeMockStore()
 
-        if MockStoreConfiguration.isAddingItemsDynamically {
+        if MockStoreConfiguration.isDelayingLogs {
             func populate() {
                 populateStore(store)
-                if !MockStoreConfiguration.isAddingItemsOnce {
+                if !MockStoreConfiguration.isIndefinite {
                     DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(10)) {
                         populate()
                     }
@@ -85,7 +85,7 @@ private func _populateStore(_ store: LoggerStore) async {
         logger(named: "application")
             .log(level: .info, "UIApplication.willEnterForeground")
 
-        if MockStoreConfiguration.isAddingItemsDynamically { await Task.sleep(milliseconds: 300) }
+        if MockStoreConfiguration.isDelayingLogs { await Task.sleep(milliseconds: 300) }
 
         logger(named: "auth")
             .log(level: .trace, "Instantiated Session")
@@ -93,7 +93,7 @@ private func _populateStore(_ store: LoggerStore) async {
         logger(named: "auth")
             .log(level: .trace, "Instantiated the new login request")
 
-        if MockStoreConfiguration.isAddingItemsDynamically { await Task.sleep(milliseconds: 800) }
+        if MockStoreConfiguration.isDelayingLogs { await Task.sleep(milliseconds: 800) }
 
         logger(named: "application")
                 .log(level: .debug, "Will navigate to Dashboard")
@@ -143,7 +143,7 @@ private func _populateStore(_ store: LoggerStore) async {
     logger(named: "auth")
         .log(level: .warning, .init(stringLiteral: stackTrace))
 
-    if MockStoreConfiguration.isAddingItemsDynamically { await Task.sleep(milliseconds: 3000) }
+    if MockStoreConfiguration.isDelayingLogs { await Task.sleep(milliseconds: 3000) }
 
     logger(named: "default")
         .log(level: .critical, "💥 0xDEADBEEF")
@@ -153,7 +153,7 @@ private func _logTask(_ mockTask: MockTask, urlSession: URLSession, logger: Netw
     let task = makeSessionTask(for: mockTask, urlSession: urlSession)
 
     @Sendable func logTask() async {
-        if MockStoreConfiguration.isAddingItemsDynamically {
+        if MockStoreConfiguration.isDelayingLogs {
             await Task.sleep(milliseconds: delay)
         }
         logger.logTaskCreated(task)

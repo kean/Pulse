@@ -2,15 +2,14 @@
 //
 // Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
 
-import Foundation
-import PulseCore
-import CoreData
-
-#if DEBUG
+#if DEBUG || PULSE_DEMO
 
 enum MockStoreConfiguration {
-    static let isAddingItemsDynamically = true
-    static let isAddingItemsOnce = false
+    /// Delay logs with random intervals.
+    static let isDelayingLogs = true
+    /// Add the same logs indefinitely with an interval.
+    static let isIndefinite = false
+    /// If true uses the default store that support remote logging.
     static let isUsingDefaultStore = true
 }
 
