@@ -3,26 +3,26 @@
 // Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
-import CoreData
 import PulseCore
-import Combine
 
-#if os(iOS)
+#if os(iOS) || os(macOS)
 
 @available(iOS 14.0, *)
 struct CustomNetworkFilterView: View {
     @ObservedObject var filter: NetworkSearchFilter
     let onRemove: () -> Void
-
+    
+#if os(iOS)
+    
     var body: some View {
         VStack(spacing: 10) {
             HStack(spacing: 0) {
-                fieldPicker
+                fieldMenu
                 Spacer().frame(width: 8)
-                matchPicker
+                matchMenu
                 Spacer(minLength: 0)
                 Button(action: onRemove) {
-                    Image(systemName: "minus.circle.fill")
+                    Image(systemName: "minus.circle")
                         .font(.system(size: 18))
                 }
                 .buttonStyle(.plain)
@@ -37,8 +37,7 @@ struct CustomNetworkFilterView: View {
         .cornerRadius(8)
     }
     
-    @ViewBuilder
-    private var fieldPicker: some View {
+    private var fieldMenu: some View {
         Menu(content: {
             Picker("", selection: $filter.field) {
                 fieldPickerBasicSection
@@ -48,6 +47,52 @@ struct CustomNetworkFilterView: View {
         }, label: {
             FilterPickerButton(title: filter.field.localizedTitle)
         }).animation(.none)
+    }
+    
+    private var matchMenu: some View {
+        Menu(content: {
+            matchPicker
+        }, label: {
+            FilterPickerButton(title: filter.match.localizedTitle)
+        }).animation(.none)
+    }
+    
+#else
+    
+    var body: some View {
+        VStack(spacing: 6) {
+            HStack {
+                fieldPicker.frame(width: 140)
+                Spacer()
+                Button(action: onRemove) {
+                    Image(systemName: "minus.circle")
+                }
+                .buttonStyle(.plain)
+                .foregroundColor(Color.red)
+            }
+            HStack {
+                matchPicker.frame(width: 140)
+                Spacer()
+            }
+            HStack {
+                TextField("Value", text: $filter.value)
+                    .textFieldStyle(.roundedBorder)
+            }
+        }
+        .padding(EdgeInsets(top: 8, leading: 6, bottom: 8, trailing: 6))
+        .background(Color(NSColor.windowBackgroundColor))
+        .cornerRadius(8)
+    }
+
+#endif
+
+    @ViewBuilder
+    private var fieldPicker: some View {
+        Picker("Field", selection: $filter.field) {
+            fieldPickerBasicSection
+            Divider()
+            fieldPickerAdvancedSection
+        }.labelsHidden()
     }
 
     @ViewBuilder
@@ -69,21 +114,17 @@ struct CustomNetworkFilterView: View {
     }
 
     private var matchPicker: some View {
-        Menu(content: {
-            Picker("", selection: $filter.match) {
-                Text("Contains").tag(NetworkSearchFilter.Match.contains)
-                Text("Not Contains").tag(NetworkSearchFilter.Match.notContains)
-                Divider()
-                Text("Equals").tag(NetworkSearchFilter.Match.equal)
-                Text("Not Equals").tag(NetworkSearchFilter.Match.notEqual)
-                Divider()
-                Text("Begins With").tag(NetworkSearchFilter.Match.beginsWith)
-                Divider()
-                Text("Regex").tag(NetworkSearchFilter.Match.regex)
-            }
-        }, label: {
-            FilterPickerButton(title: filter.match.localizedTitle)
-        }).animation(.none)
+        Picker("Matching", selection: $filter.match) {
+            Text("Contains").tag(NetworkSearchFilter.Match.contains)
+            Text("Not Contains").tag(NetworkSearchFilter.Match.notContains)
+            Divider()
+            Text("Equals").tag(NetworkSearchFilter.Match.equal)
+            Text("Not Equals").tag(NetworkSearchFilter.Match.notEqual)
+            Divider()
+            Text("Begins With").tag(NetworkSearchFilter.Match.beginsWith)
+            Divider()
+            Text("Regex").tag(NetworkSearchFilter.Match.regex)
+        }.labelsHidden()
     }
 }
 

@@ -26,7 +26,7 @@ struct CustomFilterView: View {
                         .font(.system(size: 18))
                 }
                 .buttonStyle(.plain)
-                .foregroundColor(Color.red)
+                .foregroundColor(.red)
             }
             TextField("Value", text: $filter.value)
                 .textFieldStyle(.roundedBorder)
@@ -76,10 +76,9 @@ struct CustomFilterView: View {
             HStack {
                 TextField("Value", text: $filter.value)
                     .textFieldStyle(.roundedBorder)
-                    .padding(.trailing, 2)
             }
         }
-        .padding(EdgeInsets(top: 8, leading: 6, bottom: 8, trailing: 4))
+        .padding(EdgeInsets(top: 8, leading: 6, bottom: 8, trailing: 6))
         .background(Color(NSColor.windowBackgroundColor))
         .cornerRadius(8)
     }

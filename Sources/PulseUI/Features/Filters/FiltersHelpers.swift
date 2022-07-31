@@ -111,9 +111,7 @@ struct FiltersSection<Header: View, Content: View>: View {
                     VStack {
                         content()
                     }
-                    .padding(.leading, 12)
-                    .padding(.trailing, 5)
-                    .padding(.top, Filters.contentTopInset)
+                    .padding(EdgeInsets(top: Filters.contentTopInset, leading: 12, bottom: 0, trailing: 5))
                 } else {
                     content()
                 }
@@ -128,13 +126,22 @@ extension Filters {
     static func toggle(_ title: String, isOn: Binding<Bool>) -> some View {
 #if os(iOS)
         Toggle(title, isOn: isOn)
-        #elseif os(macOS)
+#elseif os(macOS)
         HStack {
             Toggle(title, isOn: isOn)
             Spacer()
         }
-        #endif
+#endif
     }
 }
 
+#endif
+
+#if os(macOS)
+extension Filters {
+    static let preferredWidth: CGFloat = 230
+    static let formSpacing: CGFloat = 16
+    static let formPadding = EdgeInsets(top: 6, leading: 8, bottom: 6, trailing: 6)
+    static let contentTopInset: CGFloat = 8
+}
 #endif

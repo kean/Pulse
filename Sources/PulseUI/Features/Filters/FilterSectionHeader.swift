@@ -4,7 +4,7 @@
 
 import SwiftUI
 
-#if os(iOS)
+#if os(iOS) || os(macOS)
 
 struct FilterSectionHeader: View {
     let icon: String
@@ -12,8 +12,9 @@ struct FilterSectionHeader: View {
     let color: Color
     let reset: () -> Void
     let isDefault: Bool
-    var isEnabled: Binding<Bool> = .constant(true)
+    @Binding var isEnabled: Bool
 
+#if os(iOS)
     var body: some View {
         HStack(spacing: 0) {
             HStack {
@@ -33,6 +34,28 @@ struct FilterSectionHeader: View {
             .disabled(isDefault)
         }.buttonStyle(.plain)
     }
+#else
+    var body: some View {
+        HStack {
+            HStack {
+                Image(systemName: icon)
+                    .foregroundColor(.accentColor)
+                Text(title)
+            }
+            Spacer()
+            Button(action: reset) {
+                Image(systemName: "arrow.uturn.left")
+            }
+            .foregroundColor(.secondary)
+            .disabled(isDefault)
+            Button(action: { isEnabled.toggle() }) {
+                Image(systemName: isEnabled ? "checkmark.circle.fill" : "circle")
+                    .foregroundColor(isDefault ? .secondary : .accentColor)
+            }
+            .disabled(isDefault)
+        }.buttonStyle(PlainButtonStyle())
+    }
+#endif
 }
 
 #endif

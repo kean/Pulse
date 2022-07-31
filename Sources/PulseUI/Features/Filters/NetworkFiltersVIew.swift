@@ -126,7 +126,7 @@ extension NetworkFiltersView {
 
         Button(action: viewModel.addFilter) {
             HStack {
-                Image(systemName: "plus.circle.fill")
+                Image(systemName: "plus.circle")
                     .font(.system(size: 18))
                 Text("Add Filter")
             }
