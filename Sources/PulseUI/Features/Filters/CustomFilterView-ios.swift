@@ -17,7 +17,7 @@ struct CustomFilterView: View {
     var body: some View {
         HStack(spacing: 16) {
             Button(action: onRemove) {
-                Image(systemName: "minus.circle.fill")
+                Image(systemName: "minus.circle")
                     .font(.system(size: 18))
             }
             .buttonStyle(.plain)

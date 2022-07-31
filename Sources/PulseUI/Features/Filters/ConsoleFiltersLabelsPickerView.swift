@@ -43,7 +43,7 @@ struct ConsoleFiltersLabelsPickerView: View {
     }
 }
 
-struct ConsoleFiltersView_Previews: PreviewProvider {
+struct ConsoleFiltersLabelsPickerView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
             ConsoleFiltersLabelsPickerView(viewModel: .init())

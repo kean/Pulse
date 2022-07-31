@@ -3,11 +3,58 @@
 // Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
-import CoreData
 import PulseCore
-import Combine
 
 #if os(iOS) || os(macOS)
+
+struct ConsoleFiltersView: View {
+    @ObservedObject var viewModel: ConsoleSearchCriteriaViewModel
+
+#if os(iOS)
+    @State var isGeneralSectionExpanded = true
+    @State var isLevelsSectionExpanded = true
+    @State var isLabelsSectionExpanded = false
+    @State var isTimePeriodSectionExpanded = true
+
+    @State var isAllLabelsShown = false
+
+    @Binding var isPresented: Bool
+
+    var body: some View {
+        Form { formContents }
+            .navigationBarTitle("Filters", displayMode: .inline)
+            .navigationBarItems(leading: buttonClose, trailing: buttonReset)
+    }
+
+    private var buttonClose: some View {
+        Button("Close") { isPresented = false }
+    }
+#else
+    @AppStorage("networkFilterIsParametersExpanded") var isGeneralSectionExpanded = true
+    @AppStorage("consoleFiltersIsLevelsSectionExpanded") var isLevelsSectionExpanded = true
+    @AppStorage("consoleFiltersIsLabelsExpanded") var isLabelsSectionExpanded = false
+    @AppStorage("consoleFiltersIsTimePeriodExpanded") var isTimePeriodSectionExpanded = true
+
+    var body: some View {
+        ScrollView {
+            VStack(spacing: Filters.formSpacing) {
+                VStack(spacing: 6) {
+                    HStack {
+                        Text("FILTERS")
+                            .foregroundColor(.secondary)
+                        Spacer()
+                        buttonReset
+                    }
+                    Divider()
+                }
+                .padding(.top, 6)
+
+                formContents
+            }.padding(Filters.formPadding)
+        }
+    }
+#endif
+}
 
 // MARK: - ConsoleFiltersView (Contents)
 
@@ -63,7 +110,7 @@ extension ConsoleFiltersView {
 
         Button(action: { viewModel.addFilter() }) {
             HStack {
-                Image(systemName: "plus.circle.fill")
+                Image(systemName: "plus.circle")
                     .font(.system(size: 18))
                 Text("Add Filter")
             }
@@ -116,12 +163,14 @@ extension ConsoleFiltersView {
     private var logLevelsContent: some View {
         HStack(spacing: 16) {
             makeLevelsSection(levels: [.trace, .debug, .info, .notice])
+            Divider()
             makeLevelsSection(levels: [.warning, .error, .critical])
         }
-        .padding(.bottom, 6)
+        .padding(.bottom, 10)
+        .padding(.top, -12)
         .buttonStyle(.plain)
 
-        Button(viewModel.bindingForTogglingAllLevels.wrappedValue ? " Disable All" : "Enable All", action: { viewModel.bindingForTogglingAllLevels.wrappedValue.toggle() })
+        Button(viewModel.bindingForTogglingAllLevels.wrappedValue ? "Disable All" : "Enable All", action: { viewModel.bindingForTogglingAllLevels.wrappedValue.toggle() })
             .frame(maxWidth: .infinity, alignment: .center)
     }
 #else
@@ -131,7 +180,6 @@ extension ConsoleFiltersView {
                 Toggle("All", isOn: viewModel.bindingForTogglingAllLevels)
                     .accentColor(Color.secondary)
                     .foregroundColor(Color.secondary)
-
                 HStack(spacing: 32) {
                     makeLevelsSection(levels: [.trace, .debug, .info, .notice])
                     makeLevelsSection(levels: [.warning, .error, .critical])
@@ -145,21 +193,12 @@ extension ConsoleFiltersView {
     private func makeLevelsSection(levels: [LoggerStore.Level]) -> some View {
         VStack(alignment: .leading) {
             Spacer()
-            ForEach(levels, id: \.self, content: makeLevelView)
+            ForEach(levels, id: \.self) { level in
+                Toggle(level.rawValue.capitalized, isOn: viewModel.binding(forLevel: level))
+                    .accentColor(tintColor(for: level))
+            }
         }
     }
-
-#if os(macOS)
-    private func makeLevelView(for level: LoggerStore.Level) -> some View {
-        Toggle(level.rawValue.capitalized, isOn: viewModel.binding(forLevel: level))
-            .accentColor(tintColor(for: level))
-    }
-#else
-    private func makeLevelView(for level: LoggerStore.Level) -> some View {
-        BadgePickerItemView(title: level.rawValue.capitalized, isEnabled: viewModel.binding(forLevel: level), textColor: tintColor(for: level))
-            .accentColor(tintColor(for: level))
-    }
-#endif
 
     private func tintColor(for level: LoggerStore.Level) -> Color {
         switch level {
@@ -275,6 +314,25 @@ extension ConsoleFiltersView {
         .padding(.top, 6)
 #endif
     }
+}
+
+struct ConsoleFiltersView_Previews: PreviewProvider {
+    static var previews: some View {
+#if os(iOS)
+        NavigationView {
+            ConsoleFiltersView(viewModel: makeMockViewModel(), isPresented: .constant(true))
+        }
+#else
+        ConsoleFiltersView(viewModel: makeMockViewModel())
+            .previewLayout(.fixed(width: Filters.preferredWidth - 15, height: 700))
+#endif
+    }
+}
+
+private func makeMockViewModel() -> ConsoleSearchCriteriaViewModel {
+    let viewModel = ConsoleSearchCriteriaViewModel()
+    viewModel.setInitialLabels(["network", "auth", "application", "general", "navigation"])
+    return viewModel
 }
 
 #endif
