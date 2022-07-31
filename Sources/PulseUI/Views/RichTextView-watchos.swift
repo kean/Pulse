@@ -26,14 +26,6 @@ final class RichTextViewModel: ObservableObject {
         self.text = string.string
     }
 
-    convenience init(data: Data) {
-        if let json = try? JSONSerialization.jsonObject(with: data, options: []) {
-            self.init(json: json)
-        } else {
-            self.init(string: String(data: data, encoding: .utf8) ?? "Data \(ByteCountFormatter.string(fromByteCount: Int64(data.count), countStyle: .file))")
-        }
-    }
-
     convenience init(json: Any) {
         self.init(string: format(json: json))
     }

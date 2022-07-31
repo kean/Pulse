@@ -154,7 +154,9 @@ extension KeyValueSectionViewModel {
             if #available(iOS 14.0, tvOS 14.0, *) {
                 titleAttributes[.foregroundColor] = UXColor(color)
             } else {
+#if os(iOS) || os(macOS)
                 titleAttributes[.foregroundColor] = UXColor.label
+#endif
             }
             output.append(item.0, titleAttributes)
 

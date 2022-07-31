@@ -54,13 +54,14 @@ final class FileViewerViewModel: ObservableObject {
         } else if data.isEmpty {
             return .other(.init(string: "Unavailable"))
         } else if let string = String(data: data, encoding: .utf8) {
+#if os(iOS) || os(macOS) || os(tvOS)
             if contentType == "application/x-www-form-urlencoded", let components = decodeQueryParameters(form: string) {
                 return .other(.init(string: components.asAttributedString()))
             } else if contentType?.contains("html") ?? false {
                 return .other(.init(string: HTMLPrettyPrint(string: string).render()))
-            } else {
-                return .other(.init(string: string))
             }
+#endif
+            return .other(.init(string: string))
         } else {
             let message = "Data \(ByteCountFormatter.string(fromByteCount: Int64(data.count), countStyle: .file))"
             return .other(RichTextViewModel(string: message))

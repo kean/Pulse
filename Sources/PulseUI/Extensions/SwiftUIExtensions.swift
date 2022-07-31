@@ -196,7 +196,11 @@ extension Backport {
         if #available(iOS 16.0, tvOS 16.0, macOS 13.0, *) {
             self.content.contextMenu(menuItems: menuItems, preview: preview)
         } else {
-            self.content.contextMenu(menuItems: menuItems)
+            if #available(iOS 14.0, tvOS 14.0, *) {
+                self.content.contextMenu(menuItems: menuItems)
+            } else {
+                self.content
+            }
         }
 #else
         self.content

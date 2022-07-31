@@ -48,12 +48,17 @@ struct FileViewer: View {
         if let contents = viewModel.contents {
             switch contents {
             case .json(let viewModel):
+                #if os(iOS)
                 RichTextView(viewModel: viewModel, onToggleExpanded: onToggleExpanded) {
                     EmptyView()
                 }
+                #else
+                RichTextView(viewModel: viewModel)
+                #endif
             case .image(let image):
                 makeImageView(with: image)
             case .other(let viewModel):
+                #if os(iOS)
                 RichTextView(viewModel: viewModel, onToggleExpanded: onToggleExpanded) {
                     if self.viewModel.contentType?.contains("html") ?? false {
                         Button("Open in Browser") {
@@ -63,6 +68,9 @@ struct FileViewer: View {
                         EmptyView()
                     }
                 }
+                #else
+                RichTextView(viewModel: viewModel)
+                #endif
             }
         } else {
             SpinnerView(viewModel: .init(title: "Rendering...", details: nil))
