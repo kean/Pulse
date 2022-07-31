@@ -10,11 +10,13 @@ import Combine
 final class FileViewerViewModel: ObservableObject {
     let title: String
     private let getData: () -> Data
+    private let contentType: String?
 
     @Published private(set) var contents: Contents?
 
-    init(title: String, data: @escaping () -> Data) {
+    init(title: String, contentType: String?, data: @escaping () -> Data) {
         self.title = title
+        self.contentType = contentType
         self.getData = data
     }
 

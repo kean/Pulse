@@ -241,6 +241,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     var requestBodyViewModel: FileViewerViewModel {
         FileViewerViewModel(
             title: "Request",
+            contentType: details.originalRequest?.headers["Content-Type"],
             data: { [weak self] in self?.requestData ?? Data() }
         )
     }
@@ -252,6 +253,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     var responseBodyViewModel: FileViewerViewModel {
         FileViewerViewModel(
             title: "Response",
+            contentType: request.contentType,
             data: { [weak self] in self?.responseData ?? Data() }
         )
     }

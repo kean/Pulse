@@ -74,16 +74,16 @@ struct FileViewer: View {
 struct NetworkInspectorResponseView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            FileViewer(viewModel: .init(title: "Response", data: { MockJSON.allPossibleValues }))
+            FileViewer(viewModel: .init(title: "Response", contentType: "application/json", data: { MockJSON.allPossibleValues }))
                 .previewDisplayName("JSON")
 
-            FileViewer(viewModel: .init(title: "Response", data: { MockTask.octocat.responseBody }))
+            FileViewer(viewModel: .init(title: "Response", contentType: "image/png", data: { MockTask.octocat.responseBody }))
                 .previewDisplayName("Image")
 
-            FileViewer(viewModel: .init(title: "Response", data: { mockHTML }))
+            FileViewer(viewModel: .init(title: "Response", contentType: "application/html", data: { mockHTML }))
                 .previewDisplayName("HTML")
 
-            FileViewer(viewModel: .init(title: "Response", data: { MockTask.patchRepo.originalRequest.httpBody ?? Data() }))
+            FileViewer(viewModel: .init(title: "Response", contentType: "application/x-www-form-urlencoded", data: { MockTask.patchRepo.originalRequest.httpBody ?? Data() }))
                 .previewDisplayName("Query Items")
         }
     }
