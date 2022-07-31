@@ -15,14 +15,15 @@ public final class NetworkLoggerInsights {
 
     public let didUpdate = PassthroughSubject<Void, Never>()
 
+    private let queue = DispatchQueue(label: "com.githun.kean.network-logger-insights")
+
     /// Registers a given store. More than one store can be reigstered.
     public func register(store: LoggerStore) {
-        store.events.sink { [weak self] in
+        store.events.receive(on: queue).sink { [weak self] in
             self?.process(event: $0)
         }.store(in: &cancellables)
     }
 
-    // TODO: perform calculations in background
     private func process(event: LoggerStoreEvent) {
         switch event {
         case .messageStored: break
@@ -33,13 +34,21 @@ public final class NetworkLoggerInsights {
     }
 
     private func process(event: LoggerStoreEvent.NetworkTaskCompleted) {
+        var transferSize = self.transferSize
+        var duration = self.duration
+
         if let metrics = event.metrics {
             transferSize = transferSize.merging(metrics.transferSize)
         }
         if let metrics = event.metrics {
             duration.insert(duration: TimeInterval(metrics.taskInterval.duration), taskId: event.taskId)
         }
-        didUpdate.send(())
+
+        DispatchQueue.main.async {
+            self.transferSize = transferSize
+            self.duration = duration
+            self.didUpdate.send(())
+        }
     }
 
     // TODO: Add a way to reset
