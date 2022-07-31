@@ -35,13 +35,11 @@ final class HTMLPrettyPrint {
             NSRange(substring.startIndex..<substring.endIndex, in: string)
         }
 
-        let boldFont = UXFont.monospacedSystemFont(ofSize: CGFloat(FontSize.body), weight: .bold)
         let tagRegex = try! Regex("<[^>]*>")
         let attributesRegex = try! Regex(#"(\w*?)=(\"\w.*?\")"#)
         for match in tagRegex.matches(in: string) {
             let range = makeRange(from: match.fullMatch)
             text.addAttribute(.foregroundColor, value: Palette.pink, range: range)
-            text.addAttribute(.font, value: boldFont, range: range)
             for match in attributesRegex.matches(in: string, range: range) {
                 if match.groups.count == 2 {
                     text.addAttribute(.foregroundColor, value: UXColor.systemOrange, range: makeRange(from: match.groups[0]))
