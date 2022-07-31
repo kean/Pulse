@@ -420,7 +420,7 @@ extension LoggerStore {
         // Update associated message state
         if let message = request.message { // Should always be non-nill
             message.requestState = request.requestState
-            message.text = "\(event.originalRequest.httpMethod ?? "GET") \(event.originalRequest.url?.absoluteString ?? "–")"
+            message.text = event.originalRequest.url?.absoluteString ?? "–"
             if isFailure {
                 let level = LoggerStore.Level.error
                 message.level = level.rawValue
