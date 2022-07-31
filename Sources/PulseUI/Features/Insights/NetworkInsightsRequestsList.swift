@@ -9,13 +9,12 @@ import Combine
 
 #if os(iOS)
 
-struct NetworkInsightsRequestsList<Header: View>: View {
+struct NetworkInsightsRequestsList: View {
     @ObservedObject var viewModel: NetworkInsightsRequestsListViewModel
-    @ViewBuilder let header: () -> Header
 
     public var body: some View {
         ConsoleTableView(
-            header: { header() },
+            header: { EmptyView() },
             viewModel: viewModel.table,
             detailsViewModel: viewModel.details
         )

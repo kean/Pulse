@@ -114,7 +114,7 @@ public struct NetworkLoggerMetrics: Codable {
     public let taskInterval: DateInterval
     public let redirectCount: Int
     public let transactions: [NetworkLoggerTransactionMetrics]
-    public var transferSize: TransferSize { TransferSize(metrics: self) }
+    public var transferSize: TransferSizeInfo { TransferSizeInfo(metrics: self) }
 
     public init(metrics: URLSessionTaskMetrics) {
         self.taskInterval = metrics.taskInterval
@@ -129,7 +129,7 @@ public struct NetworkLoggerMetrics: Codable {
     }
 
     /// Total transfer size across all transactions.
-    public struct TransferSize {
+    public struct TransferSizeInfo {
         public var totalBytesSent: Int64 = 0
         public var bodyBytesSent: Int64 = 0
         public var headersBytesSent: Int64 = 0
@@ -150,7 +150,7 @@ public struct NetworkLoggerMetrics: Codable {
             }
         }
 
-        public func merging(_ size: TransferSize) -> TransferSize {
+        public func merging(_ size: TransferSizeInfo) -> TransferSizeInfo {
             var size = size
             size.totalBytesSent += totalBytesSent
             size.bodyBytesSent += bodyBytesSent
@@ -186,6 +186,13 @@ public struct NetworkLoggerTransactionMetrics: Codable {
 
     public var fetchType: URLSessionTaskMetrics.ResourceFetchType {
         URLSessionTaskMetrics.ResourceFetchType(rawValue: resourceFetchType) ?? .unknown
+    }
+
+    public var duration: TimeInterval? {
+        guard let startDate = fetchStartDate, let endDate = responseEndDate else {
+            return nil
+        }
+        return max(0, endDate.timeIntervalSince(startDate))
     }
 
     public init(metrics: URLSessionTaskTransactionMetrics) {

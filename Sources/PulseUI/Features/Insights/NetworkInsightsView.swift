@@ -26,29 +26,8 @@ public struct NetworkInsightsView: View {
                     .padding(.vertical, 8)
             }
             durationSection
-            Section(header: HStack {
-                Image(systemName: "exclamationmark.triangle.fill")
-                    .foregroundColor(.orange)
-                Text("Redirects")
-            }) {
-                HStack {
-                    Image(systemName: "arrowshape.zigzag.right")
-                    Text("Redirect Count")
-                    Spacer()
-                    Text("2")
-                }
-                HStack {
-                    Image(systemName: "clock")
-                    Text("Total Time Lost")
-                    Spacer()
-                    Text("2.6s")
-                }
-                NavigationLink(destination: Text("Request")) {
-                    ConsoleNetworkRequestView(viewModel: .init(request: LoggerStore.preview.entity(for: .createAPI), store: .preview))
-                }
-                NavigationLink(destination: Text("ViewAll")) {
-                    Text("View All")
-                }
+            if insights.redirects.count > 0 {
+                redirectsSection
             }
         }
         .listStyle(.automatic)
@@ -117,28 +96,58 @@ public struct NetworkInsightsView: View {
             return Color.red
         }
     }
+
+    // MARK: - Redirects
+
+    @ViewBuilder
+    private var redirectsSection: some View {
+        Section(header: HStack {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .foregroundColor(.orange)
+            Text("Redirects")
+        }) {
+            HStack {
+                Image(systemName: "arrowshape.zigzag.right")
+                Text("Redirect Count")
+                Spacer()
+                Text("\(insights.redirects.count)")
+            }
+            HStack {
+                Image(systemName: "clock")
+                Text("Total Time Lost")
+                Spacer()
+                Text(DurationFormatter.string(from: insights.redirects.timeLost, isPrecise: false))
+            }
+            NavigationLink(destination: RequestsWithRedirectsView(viewModel: viewModel)) {
+                Text("Show Requests with Redirects")
+            }.disabled(insights.duration.topSlowestRequests.isEmpty)
+
+        }
+    }
 }
 
 private struct TopSlowestRequestsViw: View {
     let viewModel: NetworkInsightsViewModel
 
     var body: some View {
-        let listViewModel = viewModel.topSlowestRequestsViewModel()
-        viewModel.destinationViewModel = listViewModel
-        return NetworkInsightsRequestsList(viewModel: listViewModel, header: {
-            HStack {
-                Image(systemName: "clock")
-                Text("Showing top \(listViewModel.table.entities.count) slowest requests")
-            }.foregroundColor(.secondary)
-        }).navigationBarTitle(Text("Requests"), displayMode: .inline)
+        NetworkInsightsRequestsList(viewModel: viewModel.topSlowestRequestsViewModel())
+            .navigationBarTitle(Text("Slowest Requests"), displayMode: .inline)
     }
 }
+
+private struct RequestsWithRedirectsView: View {
+    let viewModel: NetworkInsightsViewModel
+
+    var body: some View {
+        NetworkInsightsRequestsList(viewModel: viewModel.requestsWithRedirectsViewModel())
+            .navigationBarTitle(Text("Redirects"), displayMode: .inline)
+    }
+}
+
 
 final class NetworkInsightsViewModel: ObservableObject {
     let insights: NetworkLoggerInsights
     private var cancellables: [AnyCancellable] = []
-
-    var destinationViewModel: AnyObject?
 
     // TODO: make private
     let store: LoggerStore
@@ -193,6 +202,12 @@ final class NetworkInsightsViewModel: ObservableObject {
     func topSlowestRequestsViewModel() -> NetworkInsightsRequestsListViewModel {
         let requests = self.requests(with: Array(insights.duration.topSlowestRequests.keys))
             .sorted(by: { $0.duration > $1.duration })
+        return NetworkInsightsRequestsListViewModel(requests: requests, store: store)
+    }
+
+    func requestsWithRedirectsViewModel() -> NetworkInsightsRequestsListViewModel {
+        let requests = self.requests(with: Array(insights.redirects.taskIds))
+            .sorted(by: { $0.createdAt > $1.createdAt })
         return NetworkInsightsRequestsListViewModel(requests: requests, store: store)
     }
 

@@ -216,7 +216,9 @@ private func makeSessionTask(for mockTask: MockTask, urlSession: URLSession) -> 
 }
 
 private func makeMetrics(for task: MockTask, taskInterval: DateInterval) -> NetworkLoggerMetrics {
-    let redirectCount = task.transactions.filter({ $0.fetchType == .networkLoad }).count - 1
+    let redirectCount = task.transactions.filter {
+        $0.fetchType == .networkLoad && ($0.response as? HTTPURLResponse)?.statusCode == 302
+    }.count
     var currentDate = taskInterval.start
     let transactions: [NetworkLoggerTransactionMetrics] = task.transactions.enumerated().map { index, transaction in
         var metrics = NetworkLoggerTransactionMetrics(

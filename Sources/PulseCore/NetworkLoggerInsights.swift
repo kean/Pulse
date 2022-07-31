@@ -9,9 +9,9 @@ import Combine
 public final class NetworkLoggerInsights {
     private var cancellables: [AnyCancellable] = []
 
-    private(set) public var transferSize = NetworkLoggerMetrics.TransferSize()
-    // TODO: Add separete per task type
-    private(set) public var duration = RequestsDuration()
+    private(set) public var transferSize = NetworkLoggerMetrics.TransferSizeInfo()
+    private(set) public var duration = RequestsDurationInfo()
+    private(set) public var redirects = RedirectsInfo()
 
     public let didUpdate = PassthroughSubject<Void, Never>()
 
@@ -34,19 +34,27 @@ public final class NetworkLoggerInsights {
     }
 
     private func process(event: LoggerStoreEvent.NetworkTaskCompleted) {
+        guard let metrics = event.metrics else { return }
+
         var transferSize = self.transferSize
         var duration = self.duration
+        var redirects = self.redirects
 
-        if let metrics = event.metrics {
-            transferSize = transferSize.merging(metrics.transferSize)
-        }
-        if let metrics = event.metrics {
-            duration.insert(duration: TimeInterval(metrics.taskInterval.duration), taskId: event.taskId)
+        transferSize = transferSize.merging(metrics.transferSize)
+        duration.insert(duration: TimeInterval(metrics.taskInterval.duration), taskId: event.taskId)
+        if metrics.redirectCount > 0 {
+            redirects.count += metrics.redirectCount
+            redirects.taskIds.append(event.taskId)
+            redirects.timeLost += metrics.transactions
+                .filter({ $0.response?.statusCode == 302 })
+                .map { $0.duration ?? 0 }
+                .reduce(0, +)
         }
 
         DispatchQueue.main.async {
             self.transferSize = transferSize
             self.duration = duration
+            self.redirects = redirects
             self.didUpdate.send(())
         }
     }
@@ -57,7 +65,7 @@ public final class NetworkLoggerInsights {
     // - Slow response (Warning)
     // - Errors
 
-    public struct RequestsDuration {
+    public struct RequestsDurationInfo {
         public var median: TimeInterval?
         public var maximum: TimeInterval?
         public var minimum: TimeInterval?
@@ -103,5 +111,13 @@ public final class NetworkLoggerInsights {
             }
             return lowerBound
         }
+    }
+
+    public struct RedirectsInfo {
+        public var count: Int = 0
+        public var timeLost: TimeInterval = 0
+        public var taskIds: [UUID] = []
+
+        public init() {}
     }
 }
