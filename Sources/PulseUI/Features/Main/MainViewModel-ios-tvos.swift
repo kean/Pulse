@@ -16,13 +16,16 @@ final class MainViewModel: ObservableObject {
     let networkViewModel: NetworkViewModel
 #if os(iOS)
     let pinsViewModel: PinsViewModel
+    let insightsViewModel: NetworkInsightsViewModel
     let settingsViewModel: SettingsViewModel
 #endif
 
+    let store: LoggerStore
     let configuration: ConsoleConfiguration
 
     init(store: LoggerStore, configuration: ConsoleConfiguration = .default, onDismiss: (() -> Void)?) {
         self.configuration = configuration
+        self.store = store
 
         self.consoleViewModel = ConsoleViewModel(store: store, configuration: configuration)
         self.consoleViewModel.onDismiss = onDismiss
@@ -34,12 +37,15 @@ final class MainViewModel: ObservableObject {
         self.pinsViewModel = PinsViewModel(store: store)
         self.pinsViewModel.onDismiss = onDismiss
 
+        self.insightsViewModel = NetworkInsightsViewModel(store: store)
+
         self.settingsViewModel = SettingsViewModel(store: store)
         self.settingsViewModel.onDismiss = onDismiss
 #endif
 
 #if os(iOS)
-        self.items = [.console, .network, .pins, .settings]
+        self.items = [.console, .network, .pins, !store.isReadonly ? .insights : nil, .settings]
+            .compactMap { $0 }
 #elseif os(tvOS)
         self.items = [.console, .network, .settings]
 #else
@@ -63,6 +69,7 @@ struct MainViewModelItem: Hashable, Identifiable {
         }
     }())
     static let pins = MainViewModelItem(title: "Pins", imageName: isPad ? "pin" : "pin.fill")
+    static let insights = MainViewModelItem(title: "Insights", imageName: isPad ? "lightbulb" : "lightbulb.fill")
     static let settings = MainViewModelItem(title: "Settings", imageName: {
         if #available(iOS 14.0, *) {
             return "gearshape.fill"
@@ -91,6 +98,8 @@ extension MainViewModel {
             PinsView(viewModel: pinsViewModel)
 #endif
 #if os(iOS) || os(tvOS)
+        case .insights:
+            NetworkInsightsView(viewModel: insightsViewModel)
         case .settings:
             #if os(iOS)
             SettingsView(viewModel: settingsViewModel, console: consoleViewModel)

@@ -156,15 +156,24 @@ struct NetworkInspectorSummaryView: View {
     @ViewBuilder
     private var headerView: some View {
         if let transfer = viewModel.transferViewModel {
-            NetworkInspectorTransferInfoView(viewModel: transfer)
+            makeTransferInfo(with: transfer)
         } else if let progress = viewModel.progressViewModel {
             ZStack {
-                NetworkInspectorTransferInfoView(viewModel: .init(empty: true))
+                makeTransferInfo(with: .init(empty: true))
                     .hidden()
                     .backport.hideAccessibility()
                 SpinnerView(viewModel: progress)
             }
         }
+    }
+
+    private func makeTransferInfo(with viewModel: NetworkInspectorTransferInfoViewModel) -> some View {
+        NetworkInspectorTransferInfoView(viewModel: viewModel)
+        #if os(watchOS)
+            .padding(.top, 24)
+        #else
+            .padding(EdgeInsets(top: 12, leading: 0, bottom: 24, trailing: 0))
+        #endif
     }
 
     private var summaryView: some View {

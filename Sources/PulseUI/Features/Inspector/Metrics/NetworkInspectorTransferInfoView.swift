@@ -19,7 +19,6 @@ struct NetworkInspectorTransferInfoView: View {
                 bytesReceived
             }
         }
-        .padding(.top, 24)
     }
 #else
     var body: some View {
@@ -34,8 +33,6 @@ struct NetworkInspectorTransferInfoView: View {
             bytesReceived
             Spacer()
         }
-        .padding(.top, 12)
-        .padding(.bottom, 24)
     }
 #endif
 

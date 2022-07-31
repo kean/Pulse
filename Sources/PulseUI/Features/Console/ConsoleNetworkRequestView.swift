@@ -75,6 +75,9 @@ struct ConsoleNetworkRequestView: View {
 #if os(watchOS)
     private let spacing: CGFloat = 4
     private let fonts = Fonts(title: .system(size: 12), body: .system(size: 15))
+#elseif os(iOS)
+    private let spacing: CGFloat = 8
+    private let fonts = Fonts(title: .caption, body: .body)
 #else
     private let spacing: CGFloat = 8
     private let fonts = Fonts(title: .body, body: .body)

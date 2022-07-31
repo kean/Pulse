@@ -46,7 +46,7 @@ public final class LoggerStore {
     public static var logsURL: URL { URL.logs }
 
     /// Collects insights about the current session.
-    public private(set) var insights: LoggerStoreInsights?
+    public let insights = NetworkLoggerInsights()
 
     var makeCurrentDate: () -> Date = { Date() }
 
@@ -154,7 +154,8 @@ public final class LoggerStore {
         self.isReadonly = false
         self.document = .directory(blobs: BlobStore(path: blobsURL))
         self.options = options
-        self.insights = LoggerStoreInsights(logger: self)
+
+//        self.insights.register(store: self)
 
         if options.contains(.sweep) {
             DispatchQueue.global().asyncAfter(deadline: .now() + .seconds(10)) { [weak self] in
