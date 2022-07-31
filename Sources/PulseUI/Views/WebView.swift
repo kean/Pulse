@@ -3,9 +3,11 @@
 // Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
-import WebKit
 
 #if os(iOS)
+import WebKit
+import UIKit
+
 struct WebView: UIViewRepresentable {
     let data: Data
     let contentType: String
@@ -23,6 +25,7 @@ struct WebView: UIViewRepresentable {
 #endif
 
 #if os(macOS)
+import WebKit
 import AppKit
 
 struct WebView: NSViewRepresentable {
