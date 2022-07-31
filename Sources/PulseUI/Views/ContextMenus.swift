@@ -133,32 +133,21 @@ struct StringSearchOptionsMenu: View {
     var isKindNeeded = true
 
     var body: some View {
-        menu
-    }
-
-    var menu: some View {
-        Menu(content: {
-            Picker(options.isCaseSensitive ? "Case Sensitive" :  "Case Insensitive", selection: $options.isCaseSensitive) {
-                Text("Case Sensitive").tag(true)
-                Text("Case Insensitive").tag(false)
+        Picker(options.isCaseSensitive ? "Case Sensitive" :  "Case Insensitive", selection: $options.isCaseSensitive) {
+            Text("Case Sensitive").tag(true)
+            Text("Case Insensitive").tag(false)
+        }.pickerStyle(.inline)
+        Picker(options.isRegex ? "Regular Expression" : "Text", selection: $options.isRegex) {
+            Text("Text").tag(false)
+            Text("Regular Expression").tag(true)
+        }.pickerStyle(.inline)
+        if !options.isRegex && isKindNeeded {
+            Picker(options.kind.rawValue, selection: $options.kind) {
+                ForEach(StringSearchOptions.Kind.allCases, id: \.self) {
+                    Text($0.rawValue).tag($0)
+                }
             }.pickerStyle(.inline)
-            Picker(options.isRegex ? "Regular Expression" : "Text", selection: $options.isRegex) {
-                Text("Text").tag(false)
-                Text("Regular Expression").tag(true)
-            }.pickerStyle(.inline)
-            if !options.isRegex && isKindNeeded {
-                Picker(options.kind.rawValue, selection: $options.kind) {
-                    ForEach(StringSearchOptions.Kind.allCases, id: \.self) {
-                        Text($0.rawValue).tag($0)
-                    }
-                }.pickerStyle(.inline)
-            }
-        }, label: {
-            Image(systemName: "ellipsis.circle")
-            #if os(iOS)
-                .frame(width: 40, height: 44)
-            #endif
-        })
+        }
     }
 }
 #endif

@@ -58,7 +58,7 @@ extension MockTask {
     static let profile = MockTask(
         originalRequest: mockProfileOriginalRequest,
         response: mockProfileFailureResponse,
-        responseBody: "<h1>Error 404</h1>".data(using: .utf8)!,
+        responseBody: mockProfileFailureResponseBody,
         transactions: [
             .init(fetchType: .networkLoad, request: mockProfileCurrentRequest, response: mockProfileFailureResponse, duration: 0.22691)
         ],
@@ -195,6 +195,51 @@ private let mockProfileFailureResponse = HTTPURLResponse(url: "https://github.co
     "Content-Encoding": "gzip"
 ])
 
+private let mockProfileFailureResponseBody = """
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" /> 
+    <title>Simple 404 Error Page Design</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:700" rel="stylesheet">
+    <style>
+    h1{
+    font-size:80px;
+    font-weight:800;
+    text-align:center;
+    font-family: 'Roboto', sans-serif;
+    }
+    h2
+    {
+    font-size:25px;
+    text-align:center;
+    font-family: 'Roboto', sans-serif;
+    margin-top:-40px;
+    }
+    p{
+    text-align:center;
+    font-family: 'Roboto', sans-serif;
+    font-size:12px;
+    }
+
+    .container
+    {
+    width:300px;
+    margin: 0 auto;
+    margin-top:15%;
+    }
+    </style>
+</head>
+<body>
+    <div class="container">
+    <h1>404</h1>
+    <h2>Page Not Found</h2>
+    <p>The Page you are looking for doesn't exist or an other error occured. Go to <a href="">Home Page.</a></p>
+    </div>
+</body>
+</html>
+""".data(using: .utf8)!
+
+
 // MARK: - Octocat (GET, Image)
 
 private let mockOctocatOriginalRequest = URLRequest(url: "https://github.com/octocat.png", headers: [
@@ -264,7 +309,8 @@ private let mockCreateaAPIRedirectResponse = HTTPURLResponse(url: "https://githu
 ])
 
 private let mockCreateaAPIResponse = HTTPURLResponse(url: "https://github.com/kean/Get", statusCode: 200, headers: [
-    "Content-Length": "0",
+    "Content-Type": "text/html; charset=utf-8",
+    "Content-Length": "90",
     "Cache-Control": "no-store",
 ])
 

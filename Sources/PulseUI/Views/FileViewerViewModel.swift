@@ -9,8 +9,9 @@ import Combine
 
 final class FileViewerViewModel: ObservableObject {
     let title: String
+    let contentType: String?
+    private(set) lazy var data = getData()
     private let getData: () -> Data
-    private let contentType: String?
 
     @Published private(set) var contents: Contents?
 
@@ -27,7 +28,7 @@ final class FileViewerViewModel: ObservableObject {
     }
 
     func render() {
-        let data = getData()
+        let data = self.data
         if data.count < 30_000 {
             self.contents = render(data: data)
         } else {
@@ -51,7 +52,7 @@ final class FileViewerViewModel: ObservableObject {
         } else if data.isEmpty {
             return .other(.init(string: "Unavailable"))
         } else if let string = String(data: data, encoding: .utf8) {
-            if let components = decodeQueryParameters(form: string) {
+            if contentType == "application/x-www-form-urlencoded", let components = decodeQueryParameters(form: string) {
                 return .other(.init(string: components.asAttributedString()))
             } else {
                 return .other(.init(string: string))

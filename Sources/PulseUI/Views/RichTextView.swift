@@ -9,19 +9,25 @@ import Combine
 
 #if os(macOS) || os(iOS)
 
-struct RichTextView: View {
+struct RichTextView<ExtraMenu: View>: View {
     @ObservedObject private var viewModel: RichTextViewModel
     @State private var isExpanded = false
     @State private var isScrolled = false
     var isAutomaticLinkDetectionEnabled = true
     var hasVerticalScroller = false
     var onToggleExpanded: (() -> Void)?
+    @ViewBuilder var extraMenu: () -> ExtraMenu
 
-    init(viewModel: RichTextViewModel, isAutomaticLinkDetectionEnabled: Bool = true, hasVerticalScroller: Bool = true, onToggleExpanded: (() -> Void)? = nil) {
+    init(viewModel: RichTextViewModel,
+         isAutomaticLinkDetectionEnabled: Bool = true,
+         hasVerticalScroller: Bool = true,
+         onToggleExpanded: (() -> Void)? = nil,
+         @ViewBuilder extraMenu: @escaping () -> ExtraMenu) {
         self.viewModel = viewModel
         self.isAutomaticLinkDetectionEnabled = isAutomaticLinkDetectionEnabled
         self.hasVerticalScroller = hasVerticalScroller
         self.onToggleExpanded = onToggleExpanded
+        self.extraMenu = extraMenu
     }
 #if os(iOS)
     var body: some View {
@@ -45,8 +51,17 @@ struct RichTextView: View {
             })
 
             if #available(iOS 14.0, *) {
-                StringSearchOptionsMenu(options: $viewModel.options, isKindNeeded: false)
-                    .font(.system(size: 20))
+                Menu(content: {
+                    StringSearchOptionsMenu(options: $viewModel.options, isKindNeeded: false)
+                    let extraMenu = self.extraMenu()
+                    if !(extraMenu is EmptyView) {
+                        extraMenu
+                    }
+                }, label: {
+                    Image(systemName: "ellipsis.circle")
+                        .font(.system(size: 20))
+                        .frame(width: 40, height: 44)
+                })
             }
             if let onToggleExpanded = onToggleExpanded {
                 Button(action: {
@@ -81,6 +96,12 @@ struct RichTextView: View {
         }
     }
 #endif
+}
+
+extension RichTextView where ExtraMenu == EmptyView {
+    init(viewModel: RichTextViewModel) {
+        self.init(viewModel: viewModel, extraMenu: { EmptyView() })
+    }
 }
 
 #if os(tvOS) || os(iOS)
@@ -208,9 +229,15 @@ private struct SearchToobar: View {
                 }
             }, onReturn: viewModel.nextMatch).frame(maxWidth: 240)
 
-            StringSearchOptionsMenu(options: $viewModel.options, isKindNeeded: false)
-                .menuStyle(.borderlessButton)
-                .fixedSize()
+            Menu(content: {
+                StringSearchOptionsMenu(options: $viewModel.options, isKindNeeded: false)
+            }, label: {
+                Image(systemName: "ellipsis.circle")
+                    .font(.system(size: 20))
+                    .frame(width: 40, height: 44)
+            })
+            .menuStyle(.borderlessButton)
+            .fixedSize()
 
             Spacer()
 

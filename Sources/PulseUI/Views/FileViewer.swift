@@ -7,12 +7,26 @@ import PulseCore
 
 struct FileViewer: View {
     @ObservedObject var viewModel: FileViewerViewModel
+    @State var isWebViewOpen = false
     var onToggleExpanded: (() -> Void)?
 
 #if os(iOS) || os(macOS)
     var body: some View {
         contents
             .onAppear { viewModel.render() }
+            .sheet(isPresented: $isWebViewOpen) {
+                NavigationView {
+                    WebView(data: viewModel.data, contentType: "application/html")
+#if os(iOS)
+                        .navigationBarTitle("Browser Preview", displayMode: .inline)
+                        .navigationBarItems(trailing: Button(action: {
+                            isWebViewOpen = false
+                        }) { Image(systemName: "xmark") })
+#else
+                        .navigationTitle("Browser Preview")
+#endif
+                }
+            }
     }
 #elseif os(watchOS)
     var body: some View {
@@ -34,11 +48,21 @@ struct FileViewer: View {
         if let contents = viewModel.contents {
             switch contents {
             case .json(let viewModel):
-                RichTextView(viewModel: viewModel, onToggleExpanded: onToggleExpanded)
+                RichTextView(viewModel: viewModel, onToggleExpanded: onToggleExpanded) {
+                    EmptyView()
+                }
             case .image(let image):
                 makeImageView(with: image)
             case .other(let viewModel):
-                RichTextView(viewModel: viewModel, onToggleExpanded: onToggleExpanded)
+                RichTextView(viewModel: viewModel, onToggleExpanded: onToggleExpanded) {
+                    if self.viewModel.contentType?.contains("html") ?? false {
+                        Button("Open in Browser") {
+                            isWebViewOpen = true
+                        }
+                    } else {
+                        EmptyView()
+                    }
+                }
             }
         } else {
             SpinnerView(viewModel: .init(title: "Rendering...", details: nil))
@@ -80,7 +104,7 @@ struct NetworkInspectorResponseView_Previews: PreviewProvider {
             FileViewer(viewModel: .init(title: "Response", contentType: "image/png", data: { MockTask.octocat.responseBody }))
                 .previewDisplayName("Image")
 
-            FileViewer(viewModel: .init(title: "Response", contentType: "application/html", data: { mockHTML }))
+            FileViewer(viewModel: .init(title: "Response", contentType: "application/html", data: { MockTask.profile.responseBody }))
                 .previewDisplayName("HTML")
 
             FileViewer(viewModel: .init(title: "Response", contentType: "application/x-www-form-urlencoded", data: { MockTask.patchRepo.originalRequest.httpBody ?? Data() }))
@@ -88,18 +112,6 @@ struct NetworkInspectorResponseView_Previews: PreviewProvider {
         }
     }
 }
-
-private let mockHTML = """
-<!DOCTYPE html>
-<html>
-<body>
-
-<h1>My First Heading</h1>
-<p>My first paragraph.</p>
-
-</body>
-</html>
-""".data(using: .utf8)!
 
 enum MockJSON {
     static let allPossibleValues = """
