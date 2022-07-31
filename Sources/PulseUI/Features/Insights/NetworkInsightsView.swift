@@ -26,6 +26,9 @@ public struct NetworkInsightsView: View {
                     .padding(.vertical, 8)
             }
             durationSection
+            if insights.failures.count > 0 {
+                failuresSection
+            }
             if insights.redirects.count > 0 {
                 redirectsSection
             }
@@ -33,6 +36,8 @@ public struct NetworkInsightsView: View {
         .listStyle(.automatic)
         .backport.navigationTitle("Insights")
     }
+
+    // MARK: - Duration
 
     private var durationSection: some View {
         Section(header: Text("Duration")) {
@@ -121,7 +126,26 @@ public struct NetworkInsightsView: View {
             NavigationLink(destination: RequestsWithRedirectsView(viewModel: viewModel)) {
                 Text("Show Requests with Redirects")
             }.disabled(insights.duration.topSlowestRequests.isEmpty)
+        }
+    }
 
+    // MARK: - Failures
+
+    @ViewBuilder
+    private var failuresSection: some View {
+        Section(header: HStack {
+            Image(systemName: "xmark.octagon.fill")
+                .foregroundColor(.red)
+            Text("Failures")
+        }) {
+            NavigationLink(destination: FailingRequestsListView(viewModel: viewModel)) {
+                HStack {
+                    Text("Failed Requests")
+                    Spacer()
+                    Text("\(insights.failures.count)")
+                        .foregroundColor(.secondary)
+                }
+            }.disabled(insights.duration.topSlowestRequests.isEmpty)
         }
     }
 }
@@ -144,6 +168,14 @@ private struct RequestsWithRedirectsView: View {
     }
 }
 
+private struct FailingRequestsListView: View {
+    let viewModel: NetworkInsightsViewModel
+
+    var body: some View {
+        NetworkInsightsRequestsList(viewModel: viewModel.failedRequestsViewModel())
+            .navigationBarTitle(Text("Failed Requests"), displayMode: .inline)
+    }
+}
 
 final class NetworkInsightsViewModel: ObservableObject {
     let insights: NetworkLoggerInsights
@@ -211,7 +243,13 @@ final class NetworkInsightsViewModel: ObservableObject {
         return NetworkInsightsRequestsListViewModel(requests: requests, store: store)
     }
 
-    func requests(with ids: [UUID]) -> [LoggerNetworkRequestEntity] {
+    func failedRequestsViewModel() -> NetworkInsightsRequestsListViewModel {
+        let requests = self.requests(with: Array(insights.failures.taskIds))
+            .sorted(by: { $0.createdAt > $1.createdAt })
+        return NetworkInsightsRequestsListViewModel(requests: requests, store: store)
+    }
+
+    private func requests(with ids: [UUID]) -> [LoggerNetworkRequestEntity] {
         let request = NSFetchRequest<LoggerNetworkRequestEntity>(entityName: "\(LoggerNetworkRequestEntity.self)")
         request.fetchLimit = ids.count
         request.predicate = NSPredicate(format: "taskId IN %@", ids)

@@ -12,6 +12,7 @@ public final class NetworkLoggerInsights {
     private(set) public var transferSize = NetworkLoggerMetrics.TransferSizeInfo()
     private(set) public var duration = RequestsDurationInfo()
     private(set) public var redirects = RedirectsInfo()
+    private(set) public var failures = FailuresInfo()
 
     public let didUpdate = PassthroughSubject<Void, Never>()
 
@@ -39,6 +40,7 @@ public final class NetworkLoggerInsights {
         var transferSize = self.transferSize
         var duration = self.duration
         var redirects = self.redirects
+        var failures = self.failures
 
         transferSize = transferSize.merging(metrics.transferSize)
         duration.insert(duration: TimeInterval(metrics.taskInterval.duration), taskId: event.taskId)
@@ -51,10 +53,15 @@ public final class NetworkLoggerInsights {
                 .reduce(0, +)
         }
 
+        if event.error != nil {
+            failures.taskIds.append(event.taskId)
+        }
+
         DispatchQueue.main.async {
             self.transferSize = transferSize
             self.duration = duration
             self.redirects = redirects
+            self.failures = failures
             self.didUpdate.send(())
         }
     }
@@ -114,8 +121,16 @@ public final class NetworkLoggerInsights {
     }
 
     public struct RedirectsInfo {
+        /// A single task can be redirected multiple times.
         public var count: Int = 0
         public var timeLost: TimeInterval = 0
+        public var taskIds: [UUID] = []
+
+        public init() {}
+    }
+
+    public struct FailuresInfo {
+        public var count: Int { taskIds.count }
         public var taskIds: [UUID] = []
 
         public init() {}
