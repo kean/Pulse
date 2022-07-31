@@ -3,11 +3,69 @@
 // Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
-import CoreData
 import PulseCore
-import Combine
 
 #if os(iOS) || os(macOS)
+
+struct NetworkFiltersView: View {
+    @ObservedObject var viewModel: NetworkSearchCriteriaViewModel
+
+#if os(iOS)
+
+    @State var isGeneralGroupExpanded = true
+    @State var isResponseGroupExpanded = true
+    @State var isTimePeriodExpanded = true
+    @State var isDomainsGroupExpanded = true
+    @State var isDurationGroupExpanded = true
+    @State var isContentTypeGroupExpanded = true
+    @State var isRedirectGroupExpanded = true
+
+    @Binding var isPresented: Bool
+
+    var body: some View {
+        Form {
+            formContents
+        }
+        .navigationBarTitle("Filters", displayMode: .inline)
+        .navigationBarItems(leading: buttonClose, trailing: buttonReset)
+    }
+
+    private var buttonClose: some View {
+        Button("Close") { isPresented = false }
+    }
+
+    #else
+
+    @AppStorage("networkFilterIsParametersExpanded") var isGeneralGroupExpanded = true
+    @AppStorage("networkFilterIsResponseExpanded") var isResponseGroupExpanded = true
+    @AppStorage("networkFilterIsTimePeriodExpanded") var isTimePeriodExpanded = true
+    @AppStorage("networkFilterIsDomainsGroupExpanded") var isDomainsGroupExpanded = true
+    @AppStorage("networkFilterIsDurationGroupExpanded") var isDurationGroupExpanded = true
+    @AppStorage("networkFilterIsContentTypeGroupExpanded") var isContentTypeGroupExpanded = true
+    @AppStorage("networkFilterIsRedirectGroupExpanded") var isRedirectGroupExpanded = true
+
+    @State var isDomainsPickerPresented = false
+
+    var body: some View {
+        ScrollView {
+            VStack(spacing: Filters.formSpacing) {
+                VStack(spacing: 6) {
+                    HStack {
+                        Text("FILTERS")
+                            .foregroundColor(.secondary)
+                        Spacer()
+                        buttonReset
+                    }
+                    Divider()
+                }.padding(.top, 6)
+
+                formContents
+            }.padding(Filters.formPadding)
+        }
+    }
+
+    #endif
+}
 
 // MARK: - NetworkFiltersView (Contents)
 
@@ -458,5 +516,27 @@ extension NetworkFiltersView {
         Filters.toggle("Redirect", isOn: $viewModel.criteria.networking.isRedirect)
     }
 }
+
+#if DEBUG
+struct NetworkFiltersView_Previews: PreviewProvider {
+    static var previews: some View {
+#if os(iOS)
+        NavigationView {
+            NetworkFiltersView(viewModel: makeMockViewModel(), isPresented: .constant(true))
+        }
+#else
+        NetworkFiltersView(viewModel: makeMockViewModel())
+            .previewLayout(.fixed(width: Filters.preferredWidth - 15, height: 940))
+#endif
+    }
+}
+
+private func makeMockViewModel() -> NetworkSearchCriteriaViewModel {
+    let viewModel = NetworkSearchCriteriaViewModel()
+    viewModel.setInitialDomains(["api.github.com", "github.com", "apple.com", "google.com", "example.com"])
+    return viewModel
+
+}
+#endif
 
 #endif
