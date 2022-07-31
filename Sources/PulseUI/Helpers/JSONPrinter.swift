@@ -190,13 +190,9 @@ final class AttributedStringJSONRenderer: JSONRenderer {
     }
 
     func make() -> NSAttributedString {
-        let ps = NSMutableParagraphStyle()
-        ps.minimumLineHeight = lineHeight
-        ps.maximumLineHeight = lineHeight
-
         output.addAttributes([
             .font: UXFont.monospacedSystemFont(ofSize: CGFloat(fontSize), weight: .regular),
-            .paragraphStyle: ps
+            .paragraphStyle: NSParagraphStyle.make(lineHeight: lineHeight)
         ])
         return output
     }

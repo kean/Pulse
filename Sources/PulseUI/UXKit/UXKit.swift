@@ -193,6 +193,15 @@ extension Image {
 
 // MARK: - Misc
 
+extension NSParagraphStyle {
+    static func make(lineHeight: CGFloat) -> NSParagraphStyle {
+        let ps = NSMutableParagraphStyle()
+        ps.maximumLineHeight = lineHeight
+        ps.minimumLineHeight = lineHeight
+        return ps
+    }
+}
+
 #if os(macOS)
 extension NSPasteboard {
     var string: String? {
@@ -220,15 +229,6 @@ extension NSTextField {
         label.isSelectable = false
         label.lineBreakMode = .byTruncatingTail
         return label
-    }
-}
-
-extension NSParagraphStyle {
-    static func make(lineHeight: CGFloat) -> NSParagraphStyle {
-        let ps = NSMutableParagraphStyle()
-        ps.maximumLineHeight = lineHeight
-        ps.minimumLineHeight = lineHeight
-        return ps
     }
 }
 

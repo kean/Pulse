@@ -148,12 +148,25 @@ extension KeyValueSectionViewModel {
     func asAttributedString() -> NSAttributedString {
         let output = NSMutableAttributedString()
         for item in items {
-            output.append(item.0, [.font: UXFont.monospacedSystemFont(ofSize: FontSize.body, weight: .bold)])
-            output.append(": \(item.1 ?? "–")\n", [.font: UXFont.monospacedSystemFont(ofSize: FontSize.body, weight: .regular)])
-        }
+            var titleAttributes: [NSAttributedString.Key: Any] = [
+                .font: UXFont.monospacedSystemFont(ofSize: FontSize.body, weight: .semibold)
+            ]
+            if #available(iOS 14.0, tvOS 14.0, *) {
+                titleAttributes[.foregroundColor] = UXColor(color)
+            } else {
+                titleAttributes[.foregroundColor] = UXColor.label
+            }
+            output.append(item.0, titleAttributes)
+
+            var valueAttributes: [NSAttributedString.Key: Any] = [
+                .font: UXFont.monospacedSystemFont(ofSize: FontSize.body, weight: .regular)
+            ]
 #if os(iOS) || os(macOS)
-        output.addAttributes([.foregroundColor: UXColor.label])
+            valueAttributes[.foregroundColor] = UXColor.label
 #endif
+            output.append(": \(item.1 ?? "–")\n", valueAttributes)
+        }
+        output.addAttributes([.paragraphStyle:  NSParagraphStyle.make(lineHeight: FontSize.body + 5)])
         return output
     }
 }

@@ -42,7 +42,7 @@ final class NetworkInspectorRequestViewModel: ObservableObject {
            !requestBody.isEmpty {
             _fileViewModel = FileViewerViewModel(
                 title: "Request",
-                contentType: details.currentRequest?.headers["Content-Type"],
+                contentType: details.originalRequest?.headers["Content-Type"] ?? details.currentRequest?.headers["Content-Type"],
                 originalSize: request.requestBodySize,
                 data: { requestBody }
             )

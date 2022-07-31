@@ -339,6 +339,7 @@ private let mockPatchRepoCurrentRequest = mockPatchRepoOriginalRequest.adding(he
     "User-Agent": "Pulse Demo/2.0",
     "Accept-Encoding": "gzip",
     "Accept-Language": "en-us",
+    "Content-Type": "application/x-www-form-urlencoded",
     "Accept": "application/vnd.github+json"
 ])
 
