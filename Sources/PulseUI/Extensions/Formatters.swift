@@ -5,7 +5,11 @@
 import Foundation
 
 struct DurationFormatter {
-    static func string(from timeInterval: TimeInterval, isPrecise: Bool = true) -> String {
+    static func string(from timeInterval: TimeInterval) -> String {
+        string(from: timeInterval, isPrecise: true)
+    }
+
+    static func string(from timeInterval: TimeInterval, isPrecise: Bool) -> String {
         if timeInterval < 0.95 {
             return String(format: "%.1fms", timeInterval * 1000)
         }

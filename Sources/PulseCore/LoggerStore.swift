@@ -45,13 +45,12 @@ public final class LoggerStore {
     /// are in "./archive".
     public static var logsURL: URL { URL.logs }
 
-    /// Collects insights about the current session.
-    public let insights = NetworkLoggerInsights()
-
     var makeCurrentDate: () -> Date = { Date() }
 
     /// Re-transmits events processed by the store.
     public let events = PassthroughSubject<LoggerStoreEvent, Never>()
+
+    public let insights = NetworkLoggerInsights()
 
     private let options: Options
     private var isSaveScheduled = false
@@ -155,7 +154,7 @@ public final class LoggerStore {
         self.document = .directory(blobs: BlobStore(path: blobsURL))
         self.options = options
 
-//        self.insights.register(store: self)
+        self.insights.register(store: self)
 
         if options.contains(.sweep) {
             DispatchQueue.global().asyncAfter(deadline: .now() + .seconds(10)) { [weak self] in
