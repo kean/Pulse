@@ -44,8 +44,7 @@ public extension LoggerStore {
             NSAttributeDescription(name: "currentRequest", type: .binaryDataAttributeType),
             NSAttributeDescription(name: "response", type: .binaryDataAttributeType),
             NSAttributeDescription(name: "error", type: .binaryDataAttributeType),
-            NSAttributeDescription(name: "metrics", type: .binaryDataAttributeType),
-            NSAttributeDescription(name: "lastTransactionDetails", type: .binaryDataAttributeType),
+            NSAttributeDescription(name: "metrics", type: .binaryDataAttributeType)
         ]
 
         requestProgress.properties = [
@@ -221,9 +220,6 @@ public final class LoggerNetworkRequestDetailsEntity: NSManagedObject {
     @NSManaged public var error: Data?
     /// Contains JSON-encoded ``NetworkLoggerMetrics``.
     @NSManaged public var metrics: Data?
-    /// Contains JSON-encoded ``NetworkLoggerTransactionDetailedMetrics`` for
-    /// the last transaction from metrics.
-    @NSManaged public var lastTransactionDetails: Data?
 }
 
 // MARK: - Helpers

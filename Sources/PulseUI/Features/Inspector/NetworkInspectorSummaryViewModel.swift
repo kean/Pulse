@@ -57,8 +57,8 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     // MARK: - Header
 
     var transferViewModel: NetworkInspectorTransferInfoViewModel? {
-        details.lastTransactionDetails.map {
-            NetworkInspectorTransferInfoViewModel(details: $0, taskType: request.taskType ?? .dataTask)
+        details.metrics.map {
+            NetworkInspectorTransferInfoViewModel(metrics: $0, taskType: request.taskType ?? .dataTask)
         }
     }
 

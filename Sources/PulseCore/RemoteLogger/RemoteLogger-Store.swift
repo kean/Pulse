@@ -5,7 +5,6 @@
 import Foundation
 import Network
 import Combine
-import SwiftUI
 
 @available(iOS 14.0, tvOS 14.0, *)
 extension RemoteLogger {

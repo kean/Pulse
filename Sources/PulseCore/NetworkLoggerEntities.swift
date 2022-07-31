@@ -114,6 +114,7 @@ public struct NetworkLoggerMetrics: Codable {
     public let taskInterval: DateInterval
     public let redirectCount: Int
     public let transactions: [NetworkLoggerTransactionMetrics]
+    public var transferSize: TransferSize { TransferSize(metrics: self) }
 
     public init(metrics: URLSessionTaskMetrics) {
         self.taskInterval = metrics.taskInterval
@@ -125,6 +126,29 @@ public struct NetworkLoggerMetrics: Codable {
         self.taskInterval = taskInterval
         self.redirectCount = redirectCount
         self.transactions = transactions
+    }
+
+    /// Total transfer size across all transactions.
+    public struct TransferSize {
+        public var totalBytesSent: Int64 = 0
+        public var bodyBytesSent: Int64 = 0
+        public var headersBytesSent: Int64 = 0
+        public var totalBytesReceived: Int64 = 0
+        public var bodyBytesReceived: Int64 = 0
+        public var headersBytesReceived: Int64 = 0
+
+        public init() {}
+
+        public init(metrics: NetworkLoggerMetrics) {
+            for details in metrics.transactions.compactMap(\.details) {
+                totalBytesSent += details.countOfRequestBodyBytesBeforeEncoding + details.countOfRequestHeaderBytesSent
+                bodyBytesSent += details.countOfRequestBodyBytesSent
+                headersBytesSent += details.countOfRequestHeaderBytesSent
+                totalBytesReceived += details.countOfResponseBodyBytesReceived + details.countOfResponseHeaderBytesReceived
+                bodyBytesReceived += details.countOfResponseBodyBytesReceived
+                headersBytesReceived += details.countOfResponseHeaderBytesReceived
+            }
+        }
     }
 }
 

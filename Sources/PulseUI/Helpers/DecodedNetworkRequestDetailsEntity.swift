@@ -15,7 +15,6 @@ final class DecodedNetworkRequestDetailsEntity {
     private(set) lazy var response = decode(NetworkLoggerResponse.self, from: details.response)
     private(set) lazy var error = decode(NetworkLoggerError.self, from: details.error)
     private(set) lazy var metrics = decode(NetworkLoggerMetrics.self, from: details.metrics)
-    private(set) lazy var lastTransactionDetails = decode(NetworkLoggerTransactionDetailedMetrics.self, from: details.lastTransactionDetails)
 
     init(request: LoggerNetworkRequestEntity) {
         self.details = request.details

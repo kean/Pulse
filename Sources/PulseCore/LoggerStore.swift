@@ -409,7 +409,6 @@ extension LoggerStore {
         details.response = try? encoder.encode(event.response)
         details.error = try? encoder.encode(event.error)
         details.metrics = try? encoder.encode(event.metrics)
-        details.lastTransactionDetails = try? encoder.encode(event.metrics?.transactions.last?.details)
 
         // Completed
         if let progress = request.progress {

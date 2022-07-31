@@ -111,10 +111,8 @@ struct NetworkInspectorTransferInfoView_Previews: PreviewProvider {
 }
 
 private let mockModel = NetworkInspectorTransferInfoViewModel(
-    details: mockMetrics.transactions.last!.details!, taskType: .dataTask
+    metrics: LoggerStore.preview.entity(for: .login).metrics!, taskType: .dataTask
 )
-
-private let mockMetrics = LoggerStore.preview.entity(for: .login).metrics!
 
 #endif
 
@@ -132,25 +130,27 @@ struct NetworkInspectorTransferInfoViewModel {
     let isUpload: Bool
 
     init(empty: Bool) {
-        self.totalBytesSent = "–"
-        self.bodyBytesSent = "–"
-        self.headersBytesSent = "–"
-        self.totalBytesReceived = "–"
-        self.bodyBytesReceived = "–"
-        self.headersBytesReceived = "–"
-        self.isUpload = false
+        totalBytesSent = "–"
+        bodyBytesSent = "–"
+        headersBytesSent = "–"
+        totalBytesReceived = "–"
+        bodyBytesReceived = "–"
+        headersBytesReceived = "–"
+        isUpload = false
     }
 
-    init(details: NetworkLoggerTransactionDetailedMetrics, taskType: NetworkLoggerTaskType) {
-        self.totalBytesSent = formatBytes(details.countOfRequestBodyBytesBeforeEncoding + details.countOfRequestHeaderBytesSent)
-        self.bodyBytesSent = formatBytes(details.countOfRequestBodyBytesSent)
-        self.headersBytesSent = formatBytes(details.countOfRequestHeaderBytesSent)
+    init(metrics: NetworkLoggerMetrics, taskType: NetworkLoggerTaskType) {
+        let transfer = metrics.transferSize
 
-        self.totalBytesReceived = formatBytes(details.countOfResponseBodyBytesReceived + details.countOfResponseHeaderBytesReceived)
-        self.bodyBytesReceived = formatBytes(details.countOfResponseBodyBytesReceived)
-        self.headersBytesReceived = formatBytes(details.countOfResponseHeaderBytesReceived)
+        totalBytesSent = formatBytes(transfer.totalBytesSent)
+        bodyBytesSent = formatBytes(transfer.bodyBytesSent)
+        headersBytesSent = formatBytes(transfer.headersBytesSent)
 
-        self.isUpload = taskType == .uploadTask
+        totalBytesReceived = formatBytes(transfer.totalBytesReceived)
+        bodyBytesReceived = formatBytes(transfer.bodyBytesReceived)
+        headersBytesReceived = formatBytes(transfer.headersBytesReceived)
+
+        isUpload = taskType == .uploadTask
     }
 }
 
