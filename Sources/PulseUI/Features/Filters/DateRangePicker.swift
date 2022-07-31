@@ -29,20 +29,16 @@ struct DateRangePicker: View {
 #if os(iOS)
     @ViewBuilder
     private var newBody: some View {
-        VStack(spacing: 8) {
-            HStack {
+        HStack(alignment: .center) {
+            VStack(alignment: .leading, spacing: 8) {
                 Text(title)
-                Spacer()
-                Toggle(title, isOn: $isEnabled)
-                    .fixedSize()
-                    .labelsHidden()
-            }
-            HStack {
                 DatePicker(title, selection: $date)
-                    .labelsHidden()
-                Spacer()
+                        .labelsHidden()
             }
-        }.frame(height: 84)
+            Spacer()
+            Toggle(title, isOn: $isEnabled)
+                .labelsHidden()
+        }
     }
 
     @ViewBuilder
