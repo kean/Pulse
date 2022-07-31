@@ -200,10 +200,10 @@ extension ConsoleFiltersView {
                 .frame(maxWidth: .infinity, alignment: .center)
                 .foregroundColor(.secondary)
         } else {
-            ForEach(labels.prefix(5), id: \.self) { item in
+            ForEach(labels.prefix(4), id: \.self) { item in
                 Toggle(item.capitalized, isOn: viewModel.binding(forLabel: item))
             }
-            if labels.count > 5 {
+            if labels.count > 4 {
                 Button("View All", action: { isAllLabelsShown = true })
                     .frame(maxWidth: .infinity, alignment: .center)
                     .background(allLabelsNavigationLink)
