@@ -298,10 +298,18 @@ final class RichTextViewModel: ObservableObject {
     }
 
     convenience init(string: String) {
+        self.init(string: RichTextViewModel.makeAttributedString(for: string))
+    }
+
+    static func makeAttributedString(for string: String) -> NSAttributedString {
+        NSAttributedString(string: string, attributes: [.font: preferredFont(), .foregroundColor: UXColor.label])
+    }
+
+    static func preferredFont() -> UXFont {
 #if os(macOS)
-        self.init(string: NSAttributedString(string: string, attributes: [.font: NSFont.preferredFont(forTextStyle: .body, options: [:]), .foregroundColor: UXColor.label]))
+        NSFont.preferredFont(forTextStyle: .body, options: [:])
 #else
-        self.init(string: NSAttributedString(string: string, attributes: [.font: UXFont.systemFont(ofSize: FontSize.body + 3, weight: .regular), .foregroundColor: UXColor.label]))
+        UXFont.systemFont(ofSize: FontSize.body + 3, weight: .regular)
 #endif
     }
 
