@@ -149,6 +149,17 @@ public struct NetworkLoggerMetrics: Codable {
                 headersBytesReceived += details.countOfResponseHeaderBytesReceived
             }
         }
+
+        public func merging(_ size: TransferSize) -> TransferSize {
+            var size = size
+            size.totalBytesSent += totalBytesSent
+            size.bodyBytesSent += bodyBytesSent
+            size.headersBytesSent += headersBytesSent
+            size.totalBytesReceived += totalBytesReceived
+            size.bodyBytesReceived += bodyBytesReceived
+            size.headersBytesReceived += headersBytesReceived
+            return size
+        }
     }
 }
 
