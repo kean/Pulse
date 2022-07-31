@@ -64,50 +64,55 @@ final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
     private func refresh() {
         let state = request.state
 
-        var title: String
+        var title: String = request.httpMethod ?? "GET"
         switch request.state {
         case .pending:
-            title = progress.title.uppercased()
+            title += " · "
+            title += progress.title.uppercased()
         case .success:
-            title = StatusCodeFormatter.string(for: Int(request.statusCode))
+            title += " · "
+            title += StatusCodeFormatter.string(for: Int(request.statusCode))
 #if !os(watchOS)
             switch request.taskType ?? .dataTask {
             case .uploadTask:
                 if request.requestBodySize > 0 {
                     let sizeText = ByteCountFormatter.string(fromByteCount: request.requestBodySize, countStyle: .file)
-                    title += " · \(request.isFromCache ? "Cache" : sizeText)"
+                    title += " · "
+                    title += request.isFromCache ? "Cache" : sizeText
                 }
             case .dataTask, .downloadTask:
                 if request.responseBodySize > 0 {
                     let sizeText = ByteCountFormatter.string(fromByteCount: request.responseBodySize, countStyle: .file)
-                    title += " · \(request.isFromCache ? "Cache" : sizeText)"
+                    title += " · "
+                    title += request.isFromCache ? "Cache" : sizeText
                 }
             case .streamTask, .webSocketTask:
                 break
             }
 #endif
         case .failure:
+            title += " · "
             if request.errorCode != 0 {
                 if request.errorDomain == URLError.errorDomain {
-                    title = "\(request.errorCode) \(descriptionForURLErrorCode(Int(request.errorCode)))"
+                    title += "\(request.errorCode) \(descriptionForURLErrorCode(Int(request.errorCode)))"
                 } else if request.errorDomain == NetworkLoggerDecodingError.domain {
-                    title = "Decoding Failed"
+                    title += "Decoding Failed"
                 } else {
-                    title = "Error"
+                    title += "Error"
                 }
             } else {
-                title = StatusCodeFormatter.string(for: Int(request.statusCode))
+                title += StatusCodeFormatter.string(for: Int(request.statusCode))
             }
         }
 
         if request.duration > 0 {
-            title += " · \(DurationFormatter.string(from: request.duration))"
+            title += " · "
+            title += DurationFormatter.string(from: request.duration, isPrecise: false)
         }
 
         self.title = title
 
-        let method = request.httpMethod ?? "GET"
-        self.text = method + " " + (request.url ?? "–")
+        self.text = request.url ?? "URL Unavailable"
 
 #if os(iOS)
         switch state {
