@@ -53,11 +53,11 @@ public final class NetworkLoggerInsights {
         public var minimum: TimeInterval?
 
         /// Sorted list of all recoreded durations.
-        public var durations: [TimeInterval] = []
+        public var values: [TimeInterval] = []
 
         mutating func insert(duration: TimeInterval) {
-            durations.insert(duration, at: insertionIndex(for: duration))
-            median = durations[durations.count / 2]
+            values.insert(duration, at: insertionIndex(for: duration))
+            median = values[values.count / 2]
             if let maximum = self.maximum {
                 self.maximum = max(maximum, duration)
             } else {
@@ -72,12 +72,12 @@ public final class NetworkLoggerInsights {
 
         private func insertionIndex(for duration: TimeInterval) -> Int {
             var lowerBound = 0
-            var upperBound = durations.count
+            var upperBound = values.count
             while lowerBound < upperBound {
                 let mid = lowerBound + (upperBound - lowerBound) / 2
-                if durations[mid] == duration {
+                if values[mid] == duration {
                     return mid
-                } else if durations[mid] < duration {
+                } else if values[mid] < duration {
                     lowerBound = mid + 1
                 } else {
                     upperBound = mid

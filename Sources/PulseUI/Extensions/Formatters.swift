@@ -11,7 +11,11 @@ struct DurationFormatter {
 
     static func string(from timeInterval: TimeInterval, isPrecise: Bool) -> String {
         if timeInterval < 0.95 {
-            return String(format: "%.1fms", timeInterval * 1000)
+            if isPrecise {
+                return String(format: "%.1fms", timeInterval * 1000)
+            } else {
+                return String(format: "%.0fms", timeInterval * 1000)
+            }
         }
         if timeInterval < 200 {
             return String(format: "%.\(isPrecise ? "3" : "1")fs", timeInterval)

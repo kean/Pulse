@@ -63,8 +63,8 @@ public struct NetworkInsightsView: View {
                 Text(viewModel.medianDuration)
             }
             HStack {
-                Image(systemName: "chart.bar")
-                Text("Duration Range")
+                Image(systemName: "chart.bar").frame(width: 19)
+                Text("Durations Range")
                 Spacer()
                 Text(viewModel.durationRange)
             }
@@ -79,36 +79,36 @@ public struct NetworkInsightsView: View {
     private var durationChart: some View {
 #if swift(>=5.7)
         if #available(iOS 16.0, *) {
-            Chart {
+            Chart(viewModel.durationBars) {
                 BarMark(
-                    x: .value("Duration", "<100ms"),
-                    y: .value("Count", 10)
-                ).foregroundStyle(.green)
-                BarMark(
-                    x: .value("Duration", "<200ms"),
-                    y: .value("Count", 20)
-                ).foregroundStyle(.green)
-                BarMark(
-                    x: .value("Duration", "<500ms"),
-                    y: .value("Count", 5)
-                ).foregroundStyle(.green)
-                BarMark(
-                    x: .value("Duration", "<1s"),
-                    y: .value("Count", 5)
-                ).foregroundStyle(.yellow)
-                BarMark(
-                    x: .value("Duration", "<3s"),
-                    y: .value("Count", 5)
-                ).foregroundStyle(.orange)
-                BarMark(
-                    x: .value("Duration", "3+s"),
-                    y: .value("Count", 5)
-                ).foregroundStyle(.red)
+                    x: .value("Duration", $0.range),
+                    y: .value("Count", $0.count)
+                ).foregroundStyle(barMarkColor(for: $0.range.lowerBound))
+            }
+            .chartXScale(domain: .automatic(includesZero: false))
+            .chartXAxis {
+                AxisMarks(values: .automatic(desiredCount: 8)) { value in
+                    AxisValueLabel() {
+                        if let value = value.as(TimeInterval.self) {
+                            Text(DurationFormatter.string(from: TimeInterval(value), isPrecise: false))
+                        }
+                    }
+                }
             }
             .padding(.vertical, 8)
             .frame(height: 140)
         }
 #endif
+    }
+
+    private func barMarkColor(for duration: TimeInterval) -> Color {
+        if duration < 1.0 {
+            return Color.green
+        } else if duration < 1.9 {
+            return Color.yellow
+        } else {
+            return Color.red
+        }
     }
 }
 
@@ -130,6 +130,25 @@ final class NetworkInsightsViewModel: ObservableObject {
             return DurationFormatter.string(from: min, isPrecise: false)
         }
         return "\(DurationFormatter.string(from: min, isPrecise: false)) – \(DurationFormatter.string(from: max, isPrecise: false))"
+    }
+
+    @available(iOS 16.0, *)
+    struct Bar: Identifiable {
+        var id: Int { index }
+
+        let index: Int
+        let range: ChartBinRange<TimeInterval>
+        var count: Int
+    }
+
+    @available(iOS 16.0, *)
+    var durationBars: [Bar] {
+        let values = insights.duration.values.map { min(3.4, $0) }
+        let bins = NumberBins(data: values, desiredCount: 30)
+        let groups = Dictionary(grouping: values, by: bins.index)
+        return groups.map { key, values in
+            Bar(index: key, range: bins[key], count: values.count)
+        }
     }
 
     init(store: LoggerStore) {

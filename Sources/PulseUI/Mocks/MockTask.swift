@@ -111,7 +111,7 @@ extension MockTask {
         response: mockUploadPulseResponse,
         responseBody: Data(),
         transactions: [
-            .init(fetchType: .networkLoad, request: mockUploadPulseCurrentRequest, response: mockUploadPulseResponse, duration: 3.21283, isReusedConnection: true),
+            .init(fetchType: .networkLoad, request: mockUploadPulseCurrentRequest, response: mockUploadPulseResponse, duration: 2.21283, isReusedConnection: true),
         ],
         delay: 6.5
     )
@@ -137,7 +137,7 @@ extension MockTask {
         response: mockPatchRepoResponse,
         responseBody: mockPatchRepoResponseBody,
         transactions: [
-            .init(fetchType: .networkLoad, request: mockPatchRepoCurrentRequest, response: mockPatchRepoResponse, duration: 0.82691)
+            .init(fetchType: .networkLoad, request: mockPatchRepoCurrentRequest, response: mockPatchRepoResponse, duration: 1.32691)
         ],
         delay: 6.5,
         decodingError: mockPatchRepoDecodingError
