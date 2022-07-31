@@ -36,11 +36,7 @@ public struct ConsoleView: View {
 #if DEBUG
 struct ConsoleView_Previews: PreviewProvider {
     static var previews: some View {
-        return Group {
-            ConsoleView(viewModel: .init(store: .mock))
-            ConsoleView(viewModel: .init(store: .mock))
-                .environment(\.colorScheme, .dark)
-        }
+        ConsoleView(viewModel: .init(store: .mock))
     }
 }
 #endif

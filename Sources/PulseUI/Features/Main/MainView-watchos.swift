@@ -25,11 +25,7 @@ public struct MainView: View {
 #if DEBUG
 struct MainView_Previews: PreviewProvider {
     static var previews: some View {
-        return Group {
-            MainView(store: .mock)
-            MainView(store: .mock)
-                .environment(\.colorScheme, .dark)
-        }
+        MainView(store: .mock)
     }
 }
 

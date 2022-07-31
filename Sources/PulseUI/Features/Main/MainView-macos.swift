@@ -180,13 +180,8 @@ private struct NavigationTitleUpdater: View {
 #if DEBUG
 struct MainView_Previews: PreviewProvider {
     static var previews: some View {
-        return Group {
-            NavigationView {
-                MainView(store: .mock)
-            }
-            NavigationView {
-                MainView(store: .mock)
-            }.environment(\.colorScheme, .dark)
+        NavigationView {
+            MainView(store: .mock)
         }
     }
 }

@@ -54,11 +54,7 @@ public struct PinsView: View {
 #if DEBUG
 struct PinsView_Previews: PreviewProvider {
     static var previews: some View {
-        return Group {
-            PinsView(viewModel: .init(store: .mock))
-            PinsView(viewModel: .init(store: .mock))
-                .environment(\.colorScheme, .dark)
-        }
+        PinsView(viewModel: .init(store: .mock))
     }
 }
 #endif
