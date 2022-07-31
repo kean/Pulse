@@ -21,13 +21,8 @@ struct CustomNetworkFilterView: View {
                 Button(action: onRemove) {
                     Image(systemName: "minus.circle")
                 }
-                .buttonStyle(PlainButtonStyle())
+                .buttonStyle(.plain)
                 .foregroundColor(Color.red)
-                Button(action: { filter.isEnabled.toggle() }) {
-                    Image(systemName: filter.isEnabled ? "checkmark.circle.fill" : "circle")
-                        .foregroundColor(.accentColor)
-                }
-                .buttonStyle(PlainButtonStyle())
             }
             HStack {
                 matchPicker
@@ -35,7 +30,7 @@ struct CustomNetworkFilterView: View {
             }
             HStack {
                 TextField("Value", text: $filter.value)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .textFieldStyle(.roundedBorder)
                     .padding(.leading, 6)
                     .padding(.trailing, 2)
             }

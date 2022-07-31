@@ -182,31 +182,28 @@ final class NetworkSearchFilter: ObservableObject, Hashable, Identifiable {
     @Published var field: Field
     @Published var match: Match
     @Published var value: String
-    @Published var isEnabled: Bool
 
     // The actual filters had to be moved to the viewmodel
     static var defaultFilters: [NetworkSearchFilter] {
-        [NetworkSearchFilter(id: UUID(), field: .url, match: .contains, value: "", isEnabled: true)]
+        [NetworkSearchFilter(id: UUID(), field: .url, match: .contains, value: "")]
     }
 
     var isDefault: Bool {
-        field == .url && match == .contains && value == "" && isEnabled
+        field == .url && match == .contains && value == ""
     }
 
-    init(id: UUID, field: Field, match: Match, value: String, isEnabled: Bool) {
+    init(id: UUID, field: Field, match: Match, value: String) {
         self.id = id
         self.field = field
         self.match = match
         self.value = value
-        self.isEnabled = isEnabled
     }
 
     static func == (lhs: NetworkSearchFilter, rhs: NetworkSearchFilter) -> Bool {
         lhs.id == rhs.id &&
         lhs.field == rhs.field &&
         lhs.match == rhs.match &&
-        lhs.value == rhs.value &&
-        lhs.isEnabled == rhs.isEnabled
+        lhs.value == rhs.value
     }
 
     func hash(into hasher: inout Hasher) {
@@ -214,11 +211,10 @@ final class NetworkSearchFilter: ObservableObject, Hashable, Identifiable {
         hasher.combine(field)
         hasher.combine(match)
         hasher.combine(value)
-        hasher.combine(isEnabled)
     }
 
     var isReady: Bool {
-        isEnabled && !value.isEmpty
+        !value.isEmpty
     }
 
     enum Field {

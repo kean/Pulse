@@ -57,7 +57,7 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
     }
 
     func addFilter() {
-        let filter = ConsoleSearchFilter(id: UUID(), field: .message, match: .contains, value: "", isEnabled: true)
+        let filter = ConsoleSearchFilter(id: UUID(), field: .message, match: .contains, value: "")
         filters.append(filter)
 
         subscribe(to: filter)

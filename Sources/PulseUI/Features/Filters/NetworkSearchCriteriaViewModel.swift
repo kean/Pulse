@@ -72,7 +72,7 @@ final class NetworkSearchCriteriaViewModel: ObservableObject {
     }
 
     func addFilter() {
-        let filter = NetworkSearchFilter(id: UUID(), field: .url, match: .equal, value: "", isEnabled: true)
+        let filter = NetworkSearchFilter(id: UUID(), field: .url, match: .equal, value: "")
         filters.append(filter)
 
         subscribe(to: filter)
