@@ -80,7 +80,7 @@ public struct NetworkInsightsView: View {
     private var durationChart: some View {
 #if swift(>=5.7)
         if #available(iOS 16.0, *) {
-            if viewModel.durationBars.isEmpty {
+            if insights.duration.values.isEmpty {
                 Text("No network requests yet")
                     .foregroundColor(.secondary)
                     .frame(height: 140)
@@ -117,13 +117,6 @@ public struct NetworkInsightsView: View {
             return Color.red
         }
     }
-
-    private var topSlowestRequestView: some View {
-        let listViewModel = viewModel.topSlowestRequestsViewModel()
-        viewModel.destinationViewModel = listViewModel
-        return NetworkInsightsRequestsList(viewModel: listViewModel)
-            .navigationBarTitle(Text("Slowest Requests"), displayMode: .inline)
-    }
 }
 
 private struct TopSlowestRequestsViw: View {
@@ -132,8 +125,12 @@ private struct TopSlowestRequestsViw: View {
     var body: some View {
         let listViewModel = viewModel.topSlowestRequestsViewModel()
         viewModel.destinationViewModel = listViewModel
-        return NetworkInsightsRequestsList(viewModel: listViewModel)
-            .navigationBarTitle(Text("Slowest Requests"), displayMode: .inline)
+        return NetworkInsightsRequestsList(viewModel: listViewModel, header: {
+            HStack {
+                Image(systemName: "clock")
+                Text("Showing top \(listViewModel.table.entities.count) slowest requests")
+            }.foregroundColor(.secondary)
+        }).navigationBarTitle(Text("Requests"), displayMode: .inline)
     }
 }
 
