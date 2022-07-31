@@ -44,10 +44,8 @@ struct NetworkFiltersView: View {
 #if DEBUG
 struct NetworkFiltersPanelPro_Previews: PreviewProvider {
     static var previews: some View {
-        Group {
-            NetworkFiltersView(viewModel: makeMockViewModel())
-                .previewLayout(.fixed(width: Filters.preferredWidth - 15, height: 940))
-        }
+        NetworkFiltersView(viewModel: makeMockViewModel())
+            .previewLayout(.fixed(width: Filters.preferredWidth - 15, height: 940))
     }
 }
 

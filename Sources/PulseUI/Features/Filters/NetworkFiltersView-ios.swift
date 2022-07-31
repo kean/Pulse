@@ -38,10 +38,8 @@ struct NetworkFiltersView: View {
 #if DEBUG
 struct NetworkFiltersView_Previews: PreviewProvider {
     static var previews: some View {
-        Group {
-            NavigationView {
-                NetworkFiltersView(viewModel: makeMockViewModel(), isPresented: .constant(true))
-            }
+        NavigationView {
+            NetworkFiltersView(viewModel: makeMockViewModel(), isPresented: .constant(true))
         }
     }
 }

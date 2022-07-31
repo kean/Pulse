@@ -37,10 +37,8 @@ struct ConsoleFiltersView: View {
 #if DEBUG
 struct ConsoleFiltersPanelPro_Previews: PreviewProvider {
     static var previews: some View {
-        Group {
-            ConsoleFiltersView(viewModel: makeMockViewModel())
-                .previewLayout(.fixed(width: Filters.preferredWidth - 15, height: 700))
-        }
+        ConsoleFiltersView(viewModel: makeMockViewModel())
+            .previewLayout(.fixed(width: Filters.preferredWidth - 15, height: 700))
     }
 }
 

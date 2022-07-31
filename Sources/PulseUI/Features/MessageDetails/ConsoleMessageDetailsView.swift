@@ -130,10 +130,8 @@ struct ConsoleMessageDetailsView: View {
 #if DEBUG
 struct ConsoleMessageDetailsView_Previews: PreviewProvider {
     static var previews: some View {
-        Group {
-            NavigationView {
-                ConsoleMessageDetailsView(viewModel: .init(store: LoggerStore.mock, message: makeMockMessage()), onClose: {})
-            }
+        NavigationView {
+            ConsoleMessageDetailsView(viewModel: .init(store: LoggerStore.mock, message: makeMockMessage()), onClose: {})
         }
     }
 }

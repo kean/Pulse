@@ -91,10 +91,8 @@ private let dateFormatter: DateFormatter = {
 #if DEBUG
 struct ConsoleMessageMetadataView_Previews: PreviewProvider {
     static var previews: some View {
-        Group {
-            NavigationView {
-                ConsoleMessageMetadataView(message: makeMockMessage())
-            }
+        NavigationView {
+            ConsoleMessageMetadataView(message: makeMockMessage())
         }
     }
 }

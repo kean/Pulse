@@ -86,9 +86,7 @@ final class SettingsViewModel: ObservableObject {
 #if DEBUG
 struct ConsoleSettingsView_Previews: PreviewProvider {
     static var previews: some View {
-        Group {
-            SettingsView(viewModel: SettingsViewModel(store: .default), console: ConsoleViewModel(store: .default))
-        }
+        SettingsView(viewModel: SettingsViewModel(store: .default), console: ConsoleViewModel(store: .default))
     }
 }
 #endif

@@ -40,10 +40,8 @@ struct ConsoleView: View {
 #if DEBUG
 struct ConsoleView_Previews: PreviewProvider {
     static var previews: some View {
-        return Group {
-            NavigationView {
-                ConsoleView(viewModel: .init(store: .mock))
-            }
+        NavigationView {
+            ConsoleView(viewModel: .init(store: .mock))
         }
     }
 }

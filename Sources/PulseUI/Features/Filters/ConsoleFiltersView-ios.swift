@@ -31,10 +31,8 @@ struct ConsoleFiltersView: View {
 
 struct ConsoleFiltersPanelPro_Previews: PreviewProvider {
     static var previews: some View {
-        Group {
-            NavigationView {
-                ConsoleFiltersView(viewModel: makeMockViewModel(), isPresented: .constant(true))
-            }
+        NavigationView {
+            ConsoleFiltersView(viewModel: makeMockViewModel(), isPresented: .constant(true))
         }
     }
 }
