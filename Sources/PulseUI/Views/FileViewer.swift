@@ -72,19 +72,16 @@ struct FileViewer: View {
     private func makeImageView(with image: UXImage) -> some View {
         ScrollView {
             VStack(spacing: 16) {
-                HStack {
-                    KeyValueSectionView(viewModel: KeyValueSectionViewModel(title: "Image", color: .pink, items: [
-                        ("Width", "\(image.cgImage?.width ?? 0) px"),
-                        ("Height", "\(image.cgImage?.height ?? 0) px")
-                    ])).fixedSize()
-                    Spacer()
-                }
-
-                Divider()
-
                 Image(uxImage: image)
                     .resizable()
                     .aspectRatio(contentMode: .fit)
+                    .border(Color.separator, width: 1)
+
+                KeyValueSectionView(viewModel: KeyValueSectionViewModel(title: "Image", color: .pink, items: [
+                    ("Resolution", "\(image.cgImage?.width ?? 0) × \(image.cgImage?.height ?? 0) px"),
+                    ("Size", ByteCountFormatter.string(fromByteCount: viewModel.originalSize, countStyle: .file)),
+                    ("Type", viewModel.contentType)
+                ])).hiddenTitle()
 
                 Spacer()
             }.padding()
@@ -98,16 +95,16 @@ struct FileViewer: View {
 struct NetworkInspectorResponseView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            FileViewer(viewModel: .init(title: "Response", contentType: "application/json", data: { MockJSON.allPossibleValues }))
+            FileViewer(viewModel: .init(title: "Response", contentType: "application/json", originalSize: 1200, data: { MockJSON.allPossibleValues }))
                 .previewDisplayName("JSON")
 
-            FileViewer(viewModel: .init(title: "Response", contentType: "image/png", data: { MockTask.octocat.responseBody }))
+            FileViewer(viewModel: .init(title: "Response", contentType: "image/png", originalSize: 219543, data: { MockTask.octocat.responseBody }))
                 .previewDisplayName("Image")
 
-            FileViewer(viewModel: .init(title: "Response", contentType: "application/html", data: { MockTask.profile.responseBody }))
+            FileViewer(viewModel: .init(title: "Response", contentType: "application/html", originalSize: 1200, data: { MockTask.profile.responseBody }))
                 .previewDisplayName("HTML")
 
-            FileViewer(viewModel: .init(title: "Response", contentType: "application/x-www-form-urlencoded", data: { MockTask.patchRepo.originalRequest.httpBody ?? Data() }))
+            FileViewer(viewModel: .init(title: "Response", contentType: "application/x-www-form-urlencoded", originalSize: 1200, data: { MockTask.patchRepo.originalRequest.httpBody ?? Data() }))
                 .previewDisplayName("Query Items")
         }
     }

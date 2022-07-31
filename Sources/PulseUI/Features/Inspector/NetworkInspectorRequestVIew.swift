@@ -40,7 +40,12 @@ final class NetworkInspectorRequestViewModel: ObservableObject {
         if let requestBodyKey = request.requestBodyKey,
            let requestBody = store.getData(forKey: requestBodyKey),
            !requestBody.isEmpty {
-            _fileViewModel = FileViewerViewModel(title: "Request", contentType: details.currentRequest?.headers["Content-Type"], data: { requestBody })
+            _fileViewModel = FileViewerViewModel(
+                title: "Request",
+                contentType: details.currentRequest?.headers["Content-Type"],
+                originalSize: request.requestBodySize,
+                data: { requestBody }
+            )
         }
         return _fileViewModel
     }
