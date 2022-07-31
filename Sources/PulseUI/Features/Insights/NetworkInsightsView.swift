@@ -35,6 +35,13 @@ public struct NetworkInsightsView: View {
         }
         .listStyle(.automatic)
         .backport.navigationTitle("Insights")
+        .navigationBarItems(trailing: navigationTrailingBarItems)
+    }
+
+    private var navigationTrailingBarItems: some View {
+        Button("Reset") {
+            viewModel.insights.reset()
+        }
     }
 
     // MARK: - Duration

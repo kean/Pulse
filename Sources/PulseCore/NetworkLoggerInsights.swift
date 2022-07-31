@@ -66,11 +66,13 @@ public final class NetworkLoggerInsights {
         }
     }
 
-    // TODO: Add a way to reset
-
-    // - Redirects (Bad) + how much time can save total
-    // - Slow response (Warning)
-    // - Errors
+    public func reset() {
+        self.transferSize = .init()
+        self.duration = .init()
+        self.redirects = .init()
+        self.failures = .init()
+        self.didUpdate.send(())
+    }
 
     public struct RequestsDurationInfo {
         public var median: TimeInterval?
