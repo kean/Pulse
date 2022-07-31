@@ -10,6 +10,7 @@ public final class NetworkLoggerInsights {
     private var cancellables: [AnyCancellable] = []
 
     private(set) public var transferSize = NetworkLoggerMetrics.TransferSize()
+    // TODO: Add separete per task type
     private(set) public var duration = RequestsDuration()
 
     public let didUpdate = PassthroughSubject<Void, Never>()
@@ -36,7 +37,7 @@ public final class NetworkLoggerInsights {
             transferSize = transferSize.merging(metrics.transferSize)
         }
         if let metrics = event.metrics {
-            duration.insert(duration: TimeInterval(metrics.taskInterval.duration))
+            duration.insert(duration: TimeInterval(metrics.taskInterval.duration), taskId: event.taskId)
         }
         didUpdate.send(())
     }
@@ -55,7 +56,10 @@ public final class NetworkLoggerInsights {
         /// Sorted list of all recoreded durations.
         public var values: [TimeInterval] = []
 
-        mutating func insert(duration: TimeInterval) {
+        /// Contains top slowest requests.
+        public var topSlowestRequests: [UUID: TimeInterval] = [:]
+
+        mutating func insert(duration: TimeInterval, taskId: UUID) {
             values.insert(duration, at: insertionIndex(for: duration))
             median = values[values.count / 2]
             if let maximum = self.maximum {
@@ -67,6 +71,11 @@ public final class NetworkLoggerInsights {
                 self.minimum = min(minimum, duration)
             } else {
                 self.minimum = duration
+            }
+            topSlowestRequests[taskId] = duration
+            if topSlowestRequests.count > 10 {
+                let max = topSlowestRequests.max(by: { $0.value > $1.value })
+                topSlowestRequests[max!.key] = nil
             }
         }
 

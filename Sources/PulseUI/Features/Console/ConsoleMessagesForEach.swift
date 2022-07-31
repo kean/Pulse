@@ -6,7 +6,7 @@ import Foundation
 import SwiftUI
 import PulseCore
 
-#if os(watchOS) || os(tvOS)
+#if os(watchOS) || os(tvOS) || os(iOS)
 
 struct ConsoleMessagesForEach: View {
     let store: LoggerStore

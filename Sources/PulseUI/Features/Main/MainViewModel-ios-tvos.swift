@@ -69,7 +69,7 @@ struct MainViewModelItem: Hashable, Identifiable {
         }
     }())
     static let pins = MainViewModelItem(title: "Pins", imageName: isPad ? "pin" : "pin.fill")
-    static let insights = MainViewModelItem(title: "Insights", imageName: isPad ? "lightbulb" : "lightbulb.fill")
+    static let insights = MainViewModelItem(title: "Insights", imageName: isPad ? "chart.pie" : "chart.pie.fill")
     static let settings = MainViewModelItem(title: "Settings", imageName: {
         if #available(iOS 14.0, *) {
             return "gearshape.fill"

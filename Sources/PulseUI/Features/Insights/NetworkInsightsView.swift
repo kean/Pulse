@@ -6,6 +6,7 @@ import Foundation
 import Combine
 import PulseCore
 import SwiftUI
+import CoreData
 
 #if swift(>=5.7)
 import Charts
@@ -64,14 +65,14 @@ public struct NetworkInsightsView: View {
             }
             HStack {
                 Image(systemName: "chart.bar").frame(width: 19)
-                Text("Durations Range")
+                Text("Duration Range")
                 Spacer()
                 Text(viewModel.durationRange)
             }
             durationChart
-            NavigationLink(destination: Text("Not implemented")) {
+            NavigationLink(destination: TopSlowestRequestsViw(viewModel: viewModel)) {
                 Text("Show Slowest Requests")
-            }
+            }.disabled(insights.duration.topSlowestRequests.isEmpty)
         }
     }
 
@@ -79,24 +80,30 @@ public struct NetworkInsightsView: View {
     private var durationChart: some View {
 #if swift(>=5.7)
         if #available(iOS 16.0, *) {
-            Chart(viewModel.durationBars) {
-                BarMark(
-                    x: .value("Duration", $0.range),
-                    y: .value("Count", $0.count)
-                ).foregroundStyle(barMarkColor(for: $0.range.lowerBound))
-            }
-            .chartXScale(domain: .automatic(includesZero: false))
-            .chartXAxis {
-                AxisMarks(values: .automatic(desiredCount: 8)) { value in
-                    AxisValueLabel() {
-                        if let value = value.as(TimeInterval.self) {
-                            Text(DurationFormatter.string(from: TimeInterval(value), isPrecise: false))
+            if viewModel.durationBars.isEmpty {
+                Text("No network requests yet")
+                    .foregroundColor(.secondary)
+                    .frame(height: 140)
+            } else {
+                Chart(viewModel.durationBars) {
+                    BarMark(
+                        x: .value("Duration", $0.range),
+                        y: .value("Count", $0.count)
+                    ).foregroundStyle(barMarkColor(for: $0.range.lowerBound))
+                }
+                .chartXScale(domain: .automatic(includesZero: false))
+                .chartXAxis {
+                    AxisMarks(values: .automatic(desiredCount: 8)) { value in
+                        AxisValueLabel() {
+                            if let value = value.as(TimeInterval.self) {
+                                Text(DurationFormatter.string(from: TimeInterval(value), isPrecise: false))
+                            }
                         }
                     }
                 }
+                .padding(.vertical, 8)
+                .frame(height: 140)
             }
-            .padding(.vertical, 8)
-            .frame(height: 140)
         }
 #endif
     }
@@ -110,11 +117,34 @@ public struct NetworkInsightsView: View {
             return Color.red
         }
     }
+
+    private var topSlowestRequestView: some View {
+        let listViewModel = viewModel.topSlowestRequestsViewModel()
+        viewModel.destinationViewModel = listViewModel
+        return NetworkInsightsRequestsList(viewModel: listViewModel)
+            .navigationBarTitle(Text("Slowest Requests"), displayMode: .inline)
+    }
+}
+
+private struct TopSlowestRequestsViw: View {
+    let viewModel: NetworkInsightsViewModel
+
+    var body: some View {
+        let listViewModel = viewModel.topSlowestRequestsViewModel()
+        viewModel.destinationViewModel = listViewModel
+        return NetworkInsightsRequestsList(viewModel: listViewModel)
+            .navigationBarTitle(Text("Slowest Requests"), displayMode: .inline)
+    }
 }
 
 final class NetworkInsightsViewModel: ObservableObject {
     let insights: NetworkLoggerInsights
     private var cancellables: [AnyCancellable] = []
+
+    var destinationViewModel: AnyObject?
+
+    // TODO: make private
+    let store: LoggerStore
 
     var medianDuration: String {
         guard let median = insights.duration.median else { return "–" }
@@ -152,10 +182,29 @@ final class NetworkInsightsViewModel: ObservableObject {
     }
 
     init(store: LoggerStore) {
+        self.store = store
         self.insights = store.insights
-        store.insights.didUpdate.sink { [weak self] in
-            self?.objectWillChange.send()
+        store.insights.didUpdate.throttle(for: 1.0, scheduler: DispatchQueue.main, latest: true).sink { [weak self] in
+            withAnimation {
+                self?.objectWillChange.send()
+            }
         }.store(in: &cancellables)
+    }
+
+    // MARK: - Accessing Data
+
+    func topSlowestRequestsViewModel() -> NetworkInsightsRequestsListViewModel {
+        let requests = self.requests(with: Array(insights.duration.topSlowestRequests.keys))
+            .sorted(by: { $0.duration > $1.duration })
+        return NetworkInsightsRequestsListViewModel(requests: requests, store: store)
+    }
+
+    func requests(with ids: [UUID]) -> [LoggerNetworkRequestEntity] {
+        let request = NSFetchRequest<LoggerNetworkRequestEntity>(entityName: "\(LoggerNetworkRequestEntity.self)")
+        request.fetchLimit = ids.count
+        request.predicate = NSPredicate(format: "taskId IN %@", ids)
+
+        return (try? store.container.viewContext.fetch(request)) ?? []
     }
 }
 
