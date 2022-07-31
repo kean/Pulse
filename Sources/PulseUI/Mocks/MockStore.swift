@@ -163,10 +163,10 @@ private func _logTask(_ mockTask: MockTask, urlSession: URLSession, logger: Netw
             logger.logDataTask(dataTask, didReceive: mockTask.response)
             logger.logDataTask(dataTask, didReceive: mockTask.responseBody)
         }
-        logger.logTask(task, didFinishCollecting: {
-            let taskInterval = DateInterval(start: startDate, duration: mockTask.duration)
-            return makeMetrics(for: mockTask, taskInterval: taskInterval)
-        }())
+        
+        let taskInterval = DateInterval(start: startDate, duration: mockTask.duration)
+        let metrics = makeMetrics(for: mockTask, taskInterval: taskInterval)
+        logger.logTask(task, didFinishCollecting: metrics)
         logger.logTask(task, didCompleteWithError: nil)
 
         await Task.sleep(milliseconds: 50)
@@ -190,10 +190,10 @@ private func _logTask(_ mockTask: MockTask, urlSession: URLSession, logger: Netw
         logger.logDataTask(dataTask, didReceive: mockTask.responseBody)
     }
 
-    logger.logTask(task, didFinishCollecting: {
-        let taskInterval = DateInterval(start: Date().addingTimeInterval(mockTask.delay), duration: mockTask.duration)
-        return makeMetrics(for: mockTask, taskInterval: taskInterval)
-    }())
+    let taskInterval = DateInterval(start: Date().addingTimeInterval(mockTask.delay), duration: mockTask.duration)
+    let metrics = makeMetrics(for: mockTask, taskInterval: taskInterval)
+
+    logger.logTask(task, didFinishCollecting: metrics)
 
     logger.logTask(task, didCompleteWithError: nil)
     if let error = mockTask.decodingError {
