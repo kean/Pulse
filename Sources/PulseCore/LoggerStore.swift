@@ -566,37 +566,7 @@ extension LoggerStore {
         }
     }
 
-    // MARK: Managing Pins
-
-    /// Toggles pin for the give message.
-    public func togglePin(for message: LoggerMessageEntity) {
-        performChangesOnMain { _ in
-            message.isPinned.toggle()
-        }
-    }
-
-    /// Removes all pins.
-    public func removeAllPins() {
-        performChangesOnMain { context in
-            let request = NSFetchRequest<LoggerMessageEntity>(entityName: "\(LoggerMessageEntity.self)")
-            request.fetchBatchSize = 250
-            request.predicate = NSPredicate(format: "isPinned == YES")
-
-            let messages: [LoggerMessageEntity] = (try? context.fetch(request)) ?? []
-            for message in messages {
-                message.isPinned = false
-            }
-        }
-    }
-
     // MARK: Direct Modifiction
-
-    /// Perform and save changes on the main queue.
-    private func performChangesOnMain(_ closure: (NSManagedObjectContext) -> Void) {
-        precondition(Thread.isMainThread)
-        closure(container.viewContext)
-        try? container.viewContext.save()
-    }
 
     private func perform(_ changes: @escaping () -> Void) {
         guard !isReadonly else { return }

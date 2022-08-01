@@ -34,7 +34,6 @@ extension LoggerStore {
             NSAttributeDescription(name: "filename", type: .stringAttributeType),
             NSAttributeDescription(name: "function", type: .stringAttributeType),
             NSAttributeDescription(name: "line", type: .integer32AttributeType),
-            NSAttributeDescription(name: "isPinned", type: .booleanAttributeType),
             NSAttributeDescription(name: "requestState", type: .integer16AttributeType),
             NSRelationshipDescription.make(name: "request", type: .oneToOne(isOptional: true), entity: request)
         ]
@@ -98,7 +97,6 @@ public final class LoggerMessageEntity: NSManagedObject {
     @NSManaged public var filename: String
     @NSManaged public var function: String
     @NSManaged public var line: Int32
-    @NSManaged public var isPinned: Bool
     @NSManaged public var requestState: Int16
     @NSManaged public var request: LoggerNetworkRequestEntity?
 }

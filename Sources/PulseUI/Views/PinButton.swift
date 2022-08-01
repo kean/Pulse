@@ -102,32 +102,32 @@ protocol Pinnable {
 final class PinButtonViewModel: ObservableObject {
     @Published private(set) var isPinned = false
     private let message: LoggerMessageEntity?
-    private let store: LoggerStore
-    private var cancellables: [AnyCancellable] = []
+    private let service: PinsService
+    private var cancellable: AnyCancellable?
 
     init(store: LoggerStore, message: LoggerMessageEntity) {
-        self.store = store
+        self.service = PinsService.service(for: store)
         self.message = message
         self.subscribe()
     }
 
     init(store: LoggerStore, request: LoggerNetworkRequestEntity) {
-        self.store = store
+        self.service = PinsService.service(for: store)
         self.message = request.message
         self.subscribe()
     }
 
     private func subscribe() {
-        guard let message = message else { return } // Should never happen
-        message.publisher(for: \.isPinned).sink { [weak self] in
+        guard let objectID = message?.objectID else { return } // Should never happen
+        cancellable = service.$pinnedMessageIds.sink { [weak self] in
             guard let self = self else { return }
-            self.isPinned = $0
-        }.store(in: &cancellables)
+            self.isPinned = $0.contains(objectID)
+        }
     }
 
     func togglePin() {
         guard let message = message else { return } // Should never happen
-        store.togglePin(for: message)
+        service.togglePin(for: message)
     }
 }
 #else

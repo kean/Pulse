@@ -26,3 +26,11 @@
 
 - ``storeRequest(_:response:error:data:metrics:)``
 - ``allNetworkRequests()``
+
+### Accessing Response Blobs
+
+- ``getData(forKey:)``
+
+### Sharing the Store
+
+- ``copy(to:)``

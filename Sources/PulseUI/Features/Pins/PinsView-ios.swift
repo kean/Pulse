@@ -24,12 +24,23 @@ public struct PinsView: View {
     public var body: some View {
         contents
             .navigationBarTitle(Text("Pins"))
-            .navigationBarItems(
-                leading: viewModel.onDismiss.map { Button(action: $0) { Image(systemName: "xmark") } },
-                trailing:
-                    Button(action: viewModel.removeAllPins) { Image(systemName: "trash") }
-                    .disabled(viewModel.messages.isEmpty)
-            )
+            .navigationBarItems(leading: navigationBarLeadingItems, trailing: navigationBarTralingItems)
+            .onAppear { viewModel.isActive = true }
+            .onAppear { viewModel.isActive = false }
+    }
+
+    private var navigationBarLeadingItems: some View {
+        viewModel.onDismiss.map {
+            Button(action: $0) {
+                Image(systemName: "xmark")
+            }
+        }
+    }
+
+    private var navigationBarTralingItems: some View {
+        Button(action: viewModel.removeAllPins) {
+            Image(systemName: "trash")
+        }.disabled(viewModel.messages.isEmpty)
     }
 
     @ViewBuilder

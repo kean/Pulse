@@ -14,6 +14,7 @@ final class MainViewModel: ObservableObject {
 
     let consoleViewModel: ConsoleViewModel
     let networkViewModel: NetworkViewModel
+
 #if os(iOS)
     let pinsViewModel: PinsViewModel
     let insightsViewModel: NetworkInsightsViewModel
@@ -103,11 +104,11 @@ extension MainViewModel {
 #endif
 #if os(iOS) || os(tvOS)
         case .settings:
-            #if os(iOS)
+#if os(iOS)
             SettingsView(viewModel: settingsViewModel, console: consoleViewModel)
-            #else
+#else
             SettingsView(viewModel: consoleViewModel)
-            #endif
+#endif
 #endif
         default: fatalError()
         }

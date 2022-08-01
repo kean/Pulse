@@ -7,60 +7,51 @@ import PulseCore
 import Combine
 import SwiftUI
 
-#if os(iOS) || os(tvOS)
-
-final class PinsViewModel: NSObject, NSFetchedResultsControllerDelegate, ObservableObject {
 #if os(iOS)
+
+final class PinsViewModel: ObservableObject {
     let table: ConsoleTableViewModel
 
     @Published private(set) var messages: [LoggerMessageEntity] = [] {
         didSet { table.entities = messages }
     }
-#else
-    @Published private(set) var messages: [LoggerMessageEntity] = []
-#endif
 
     let details: ConsoleDetailsRouterViewModel
 
     var onDismiss: (() -> Void)?
 
-    private(set) var store: LoggerStore
-    private let controller: NSFetchedResultsController<LoggerMessageEntity>
+    private let service: PinsService
+    private let store: LoggerStore
     private var cancellables = [AnyCancellable]()
 
     init(store: LoggerStore) {
         self.store = store
+        self.service = PinsService.service(for: store)
         self.details = ConsoleDetailsRouterViewModel(store: store)
-
-        let request = NSFetchRequest<LoggerMessageEntity>(entityName: "\(LoggerMessageEntity.self)")
-        request.fetchBatchSize = 250
-        request.relationshipKeyPathsForPrefetching = ["request"]
-        request.sortDescriptors = [NSSortDescriptor(keyPath: \LoggerMessageEntity.createdAt, ascending: false)]
-        request.predicate = NSPredicate(format: "isPinned == YES")
-
-        self.controller = NSFetchedResultsController<LoggerMessageEntity>(fetchRequest: request, managedObjectContext: store.container.viewContext, sectionNameKeyPath: nil, cacheName: nil)
-#if os(iOS)
         self.table = ConsoleTableViewModel(store: store, searchCriteriaViewModel: nil)
-#endif
 
-        super.init()
-
-        controller.delegate = self
-
-        refreshNow()
+        service.$pinnedMessageIds.sink { [weak self] in
+            self?.refresh(with: $0)
+        }.store(in: &cancellables)
     }
 
-    private func refreshNow() {
-        try? controller.performFetch()
-        self.messages = controller.fetchedObjects ?? []
+    private func refresh(with pinnedMessageIds: Set<NSManagedObjectID>) {
+        guard isActive else { return }
+        messages = pinnedMessageIds.compactMap {
+            store.container.viewContext.object(with: $0) as? LoggerMessageEntity
+        }
+    }
+
+    var isActive = false {
+        didSet {
+            if isActive {
+                refresh(with: service.pinnedMessageIds)
+            }
+        }
     }
 
     func removeAllPins() {
-        store.removeAllPins()
-    }
-
-    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        self.messages = self.controller.fetchedObjects ?? []
+        service.removeAllPins()
     }
 }
 
