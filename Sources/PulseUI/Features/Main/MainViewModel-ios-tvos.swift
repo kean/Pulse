@@ -97,9 +97,11 @@ extension MainViewModel {
         case .pins:
             PinsView(viewModel: pinsViewModel)
 #endif
-#if os(iOS) || os(tvOS)
+#if os(iOS)
         case .insights:
             NetworkInsightsView(viewModel: insightsViewModel)
+#endif
+#if os(iOS) || os(tvOS)
         case .settings:
             #if os(iOS)
             SettingsView(viewModel: settingsViewModel, console: consoleViewModel)

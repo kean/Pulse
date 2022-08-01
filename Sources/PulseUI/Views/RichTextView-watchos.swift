@@ -3,6 +3,7 @@
 // Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
+import PulseCore
 
 #if os(watchOS) || os(tvOS)
 
@@ -26,7 +27,7 @@ final class RichTextViewModel: ObservableObject {
         self.text = string.string
     }
 
-    convenience init(json: Any) {
+    convenience init(json: Any, error: NetworkLoggerDecodingError?) {
         self.init(string: format(json: json))
     }
 }
