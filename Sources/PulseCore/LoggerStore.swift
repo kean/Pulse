@@ -133,6 +133,12 @@ public final class LoggerStore: @unchecked Sendable {
         /// For tesing purposes.
         var makeCurrentDate: () -> Date = { Date() }
 
+        /// Gets called when the store receives an event. You can use it to
+        /// modify the event before it is stored in order, for example, filter
+        /// out some sensitive information. If you return `nil`, the event
+        /// is ignored completely.
+        public var willHandleEvent: @Sendable (Event) -> Event? = { $0 }
+
         /// Initializes the configuration.
         ///
         /// - parameters:
@@ -324,6 +330,9 @@ extension LoggerStore {
 
     /// Handles event created by the current store and dispatches it to observers.
     func handle(_ event: Event) {
+        guard let event = configuration.willHandleEvent(event) else {
+            return
+        }
         perform {
             self._handle(event)
         }

@@ -71,7 +71,7 @@ private func _asyncPopulateStore(_ store: LoggerStore) async {
         Logger(label: named, store: store)
     }
 
-    let networkLogger = NetworkLogger(store: store, isWaitingForDecoding: true)
+    let networkLogger = NetworkLogger(store: store, configuration: .init(isWaitingForDecoding: true))
 
     let urlSession = URLSession(configuration: .default)
 
@@ -138,7 +138,7 @@ private func _syncPopulateStore(_ store: LoggerStore) {
         Logger(label: named, store: store)
     }
 
-    let networkLogger = NetworkLogger(store: store, isWaitingForDecoding: true)
+    let networkLogger = NetworkLogger(store: store, configuration: .init(isWaitingForDecoding: true))
 
     let urlSession = URLSession(configuration: .default)
 
@@ -393,7 +393,8 @@ private func getHeadersEstimatedSize(_ headers: [String: String]?) -> Int64 {
 
 extension LoggerStore {
     func entity(for task: MockTask) -> LoggerNetworkRequestEntity {
-        _logTask(task, urlSession: URLSession.shared, logger: NetworkLogger(store: self, isWaitingForDecoding: true))
+        let configuration = NetworkLogger.Configuration(isWaitingForDecoding: true)
+        _logTask(task, urlSession: URLSession.shared, logger: NetworkLogger(store: self, configuration: configuration))
         let entity = (try! allNetworkRequests()).first { $0.url == task.originalRequest.url?.absoluteString }
         assert(entity != nil)
         return entity!

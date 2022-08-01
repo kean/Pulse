@@ -7,8 +7,30 @@ import Foundation
 public final class NetworkLogger: @unchecked Sendable {
     private let store: LoggerStore
     private let lock = NSLock()
-    private let isTraceEnabled: Bool
-    private let isWaitingForDecoding: Bool
+    private let configuration: Configuration
+
+    /// The logger configuration.
+    public struct Configuration: Sendable {
+        /// Add log messages with ``LoggerStore/Level/trace`` level for all
+        /// logged `URLSession` events.
+        public var isTraceEnabled: Bool
+        /// If enabled, the requests are not marked as completed until the decoding
+        /// is done (see ``NetworkLogger/logTask(_:didFinishDecoding:)-347rd``).
+        /// If the request itself fails, the task completes immediately.
+        public var isWaitingForDecoding: Bool
+
+        /// Gets called when the logger receives an event. You can use it to
+        /// modify the event before it is stored in order, for example, filter
+        /// out some sensitive information. If you return `nil`, the event
+        /// is ignored completely.
+        public var willHandleEvent: @Sendable (LoggerStore.Event) -> LoggerStore.Event? = { $0 }
+
+        /// Initializes the configuration.
+        public init(isTraceEnabled: Bool = false, isWaitingForDecoding: Bool = false) {
+            self.isTraceEnabled = isTraceEnabled
+            self.isWaitingForDecoding = isWaitingForDecoding
+        }
+    }
 
     /// Initializers the network logger.
     ///
@@ -22,11 +44,9 @@ public final class NetworkLogger: @unchecked Sendable {
     /// or disable logging of certain requests completely. By default, returns
     /// the suggested task without modification.
     public init(store: LoggerStore = .shared,
-                isTraceEnabled: Bool = false,
-                isWaitingForDecoding: Bool = false) {
+                configuration: Configuration = .init()) {
         self.store = store
-        self.isTraceEnabled = isTraceEnabled
-        self.isWaitingForDecoding = isWaitingForDecoding
+        self.configuration = configuration
     }
 
     // MARK: Logging
@@ -41,7 +61,7 @@ public final class NetworkLogger: @unchecked Sendable {
         trace("Did create task \(urlRequest.httpMethod ?? "–") \(task.url ?? "–")")
 
         if let originalRequest = task.originalRequest ?? context.request {
-            store.handle(.networkTaskCreated(LoggerStore.Event.NetworkTaskCreated(
+            send(.networkTaskCreated(LoggerStore.Event.NetworkTaskCreated(
                 taskId: context.taskId,
                 taskType: NetworkLogger.TaskType(task: task),
                 createdAt: Date(),
@@ -81,7 +101,7 @@ public final class NetworkLogger: @unchecked Sendable {
         let context = self.context(for: task)
         lock.unlock()
 
-        store.handle(.networkTaskProgressUpdated(.init(
+        send(.networkTaskProgressUpdated(.init(
             taskId: context.taskId,
             completedUnitCount: progress.completed,
             totalUnitCount: progress.total
@@ -90,7 +110,7 @@ public final class NetworkLogger: @unchecked Sendable {
 
     /// Logs the task completion (required).
     public func logTask(_ task: URLSessionTask, didCompleteWithError error: Error?) {
-        guard error != nil || !isWaitingForDecoding else { return }
+        guard error != nil || !configuration.isWaitingForDecoding else { return }
         _logTask(task, didCompleteWithError: error)
     }
 
@@ -141,12 +161,7 @@ public final class NetworkLogger: @unchecked Sendable {
         let data = context.data
         lock.unlock()
 
-        // TODO: (Decoding) encode decoding error
-
-        #warning("TODO: reimplement")
-//        let networkTask = LoggedNetworkTask(task: task, session: session, originalRequest: originalRequest, currentRequest: task.currentRequest, response: response, data: data, error: error, metrics: metrics)
-//        if let networkTask = willLogTask(networkTask) {
-        store.handle(.networkTaskCompleted(.init(
+        send(.networkTaskCompleted(.init(
             taskId: context.taskId,
             taskType: NetworkLogger.TaskType(task: task),
             createdAt: Date(),
@@ -163,17 +178,11 @@ public final class NetworkLogger: @unchecked Sendable {
         trace("Did complete with error: \(error?.localizedDescription ?? "-") for \(task.url ?? "null")")
     }
 
-    // MARK: - Filter Out
-
-    public struct LoggedNetworkTask {
-        public let task: URLSessionTask
-        public let session: URLSession?
-        public let originalRequest: URLRequest
-        public let currentRequest: URLRequest?
-        public let response: URLResponse?
-        public let data: Data?
-        public let error: Error?
-        public let metrics: NetworkLogger.Metrics?
+    private func send(_ event: LoggerStore.Event) {
+        guard let event = configuration.willHandleEvent(event) else {
+            return
+        }
+        store.handle(event)
     }
 
     // MARK: - Private
@@ -205,7 +214,7 @@ public final class NetworkLogger: @unchecked Sendable {
     }
 
     private func trace(_ message: String, file: String = #file, function: String = #function, line: UInt = #line) {
-        guard isTraceEnabled else { return }
+        guard configuration.isTraceEnabled else { return }
         store.storeMessage(label: "network", level: .trace, message: message, metadata: nil, file: file, function: function, line: line)
     }
 }
