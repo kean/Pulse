@@ -17,7 +17,9 @@ enum Render {
     }
 
     static func asHTML(request: LoggerNetworkRequestEntity, store: LoggerStore) -> String {
-        render(request: request, store: store, using: HTMLRenderer())
+        let details = DecodedNetworkRequestDetailsEntity(request: request)
+        let error = details.error?.error as? NetworkLoggerDecodingError
+        return render(request: request, store: store, using: HTMLRenderer(error: error))
     }
 
     private static func render(request: LoggerNetworkRequestEntity, store: LoggerStore, using renderer: Renderer) -> String {
@@ -180,6 +182,11 @@ private final class MarkdownRenderer: Renderer {
 private final class HTMLRenderer: Renderer {
     private var contents = ""
     private var toc = [ToCItem]()
+    private var error: NetworkLoggerDecodingError?
+
+    init(error: NetworkLoggerDecodingError?) {
+        self.error = error
+    }
 
     struct ToCItem {
         let level: Int
@@ -208,14 +215,13 @@ private final class HTMLRenderer: Renderer {
         contents.append("</pre>")
     }
 
-    #warning("TODO: pass error")
     private func makePre(data: Data) -> String {
         guard let json = try? JSONSerialization.jsonObject(with: data, options: []) else {
             return String(data: data, encoding: .utf8) ?? "Data: \(ByteCountFormatter.string(fromByteCount: Int64(data.count), countStyle: .memory))"
         }
         let renderer = HTMLJSONRender()
         let printer = JSONPrinter(renderer: renderer)
-        printer.render(json: json, error: nil)
+        printer.render(json: json, error: error)
         return renderer.make()
     }
 
@@ -338,6 +344,7 @@ body {
   .s { color: rgb(255, 45, 85); }
   .o { color: rgb(0, 122, 255); }
   .n { color: rgb(191, 90, 242); }
+  .err { background-color: red; }
   @media (prefers-color-scheme: dark) {
     body {
       background-color: #211F1E;

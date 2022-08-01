@@ -25,9 +25,9 @@ protocol JSONRenderer: AnyObject {
 final class HTMLJSONRender: JSONRenderer {
     private var output = ""
 
-    #warning("TODO: add isError support")
     func append(_ string: String, element: JSONElement, error: NetworkLoggerDecodingError?) {
-        output.append("<span class=\"\(getClass(for: element))\">\(string)</span>")
+        let htmlClass = error == nil ? getClass(for: element) : "err"
+        output.append("<span class=\"\(htmlClass)\">\(string)</span>")
     }
 
     func indent(count: Int) {
