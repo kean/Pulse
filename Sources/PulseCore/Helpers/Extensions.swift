@@ -57,7 +57,7 @@ extension URL {
 extension NSPersistentStoreCoordinator {
     func createCopyOfStore(at url: URL) throws {
         guard let sourceStore = persistentStores.first else {
-            throw LoggerStoreError.unknownError // Should never happen
+            throw LoggerStore.Error.unknownError // Should never happen
         }
 
         let backupCoordinator = NSPersistentStoreCoordinator(managedObjectModel: managedObjectModel)
@@ -97,7 +97,7 @@ extension NSManagedObjectContext {
         performAndWait {
             result = Result { try closure() }
         }
-        guard let unwrappedResult = result else { throw LoggerStoreError.unknownError }
+        guard let unwrappedResult = result else { throw LoggerStore.Error.unknownError }
         return try unwrappedResult.get()
     }
 }
@@ -130,3 +130,68 @@ extension URLRequest {
         return bodyStreamData
     }
 }
+
+#if !os(macOS)
+import UIKit.UIImage
+/// Alias for `UIImage`.
+typealias PlatformImage = UIImage
+#else
+import AppKit.NSImage
+/// Alias for `NSImage`.
+typealias PlatformImage = NSImage
+#endif
+
+enum Graphics {
+    /// Creates an image thumbnail. Uses significantly less memory than other options.
+    static func makeThumbnail(from data: Data, targetSize: CGFloat) -> PlatformImage? {
+        guard let source = CGImageSourceCreateWithData(data as CFData, [kCGImageSourceShouldCache: false] as CFDictionary) else {
+            return nil
+        }
+        let options = [
+            kCGImageSourceCreateThumbnailFromImageAlways: true,
+            kCGImageSourceCreateThumbnailFromImageIfAbsent: true,
+            kCGImageSourceCreateThumbnailWithTransform: true,
+            kCGImageSourceThumbnailMaxPixelSize: targetSize] as CFDictionary
+        guard let image = CGImageSourceCreateThumbnailAtIndex(source, 0, options) else {
+            return nil
+        }
+        return PlatformImage(cgImage: image)
+    }
+
+    static func encode(_ image: PlatformImage) -> Data? {
+        guard let source = image.cgImage else {
+            return nil
+        }
+        let data = NSMutableData()
+        let type: String = "public.heic"
+        guard let destination = CGImageDestinationCreateWithData(data as CFMutableData, type as CFString, 1, nil) else {
+            return nil
+        }
+        let options: NSDictionary = [
+            kCGImageDestinationLossyCompressionQuality: 0.33
+        ]
+        CGImageDestinationAddImage(destination, source, options)
+        CGImageDestinationFinalize(destination)
+        return data as Data
+    }
+}
+
+extension CGImage {
+    /// Returns `true` if the image doesn't contain alpha channel.
+    var isOpaque: Bool {
+        let alpha = alphaInfo
+        return alpha == .none || alpha == .noneSkipFirst || alpha == .noneSkipLast
+    }
+}
+
+#if os(macOS)
+extension NSImage {
+    var cgImage: CGImage? {
+        cgImage(forProposedRect: nil, context: nil, hints: nil)
+    }
+
+    convenience init(cgImage: CGImage) {
+        self.init(cgImage: cgImage, size: .zero)
+    }
+}
+#endif

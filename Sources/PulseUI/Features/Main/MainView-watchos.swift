@@ -13,7 +13,7 @@ public struct MainView: View {
     // TODO: replace with StateObject when available
     @State private var viewModel: ConsoleViewModel
 
-    public init(store: LoggerStore = .default) {
+    public init(store: LoggerStore = .shared) {
         self.viewModel = ConsoleViewModel(store: store)
     }
 

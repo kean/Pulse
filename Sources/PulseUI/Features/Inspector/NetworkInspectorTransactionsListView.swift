@@ -89,7 +89,7 @@ final class NetworkInspectorTransactionsListViewModel {
         let viewModel: () -> NetworkInspectorTransactionViewModel
     }
 
-    init(metrics: NetworkLoggerMetrics) {
+    init(metrics: NetworkLogger.Metrics) {
         self.items = metrics.transactions.map { transaction in
             let title: String
             switch URLSessionTaskMetrics.ResourceFetchType(rawValue: transaction.resourceFetchType) ?? .unknown {

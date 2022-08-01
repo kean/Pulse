@@ -2,7 +2,6 @@
 //
 // Copyright (c) 2020-2022 Alexander Grebenyuk (github.com/kean).
 
-import Logging
 import XCTest
 import Foundation
 import CoreData
@@ -17,7 +16,7 @@ final class URLSessionProxyDelegateTests: XCTestCase {
         super.setUp()
 
         let storeURL = directory.url.appendingFilename("logs.pulse")
-        store = try! LoggerStore(storeURL: storeURL, options: [.create])
+        store = try! LoggerStore(storeURL: storeURL, options: [.create, .synchronous])
         logger = NetworkLogger(store: store)
     }
 
@@ -56,7 +55,6 @@ final class URLSessionProxyDelegateTests: XCTestCase {
         wait(for: [didComplete], timeout: 5)
 
         // RECORD
-        flush(store: store)
         let requests = try store.allNetworkRequests()
         let request = try XCTUnwrap(requests.first)
 
@@ -141,7 +139,6 @@ final class URLSessionProxyDelegateTests: XCTestCase {
         wait(for: [didComplete], timeout: 5)
 
         // RECORD
-        flush(store: store)
         let requests = try store.allNetworkRequests()
         let request = try XCTUnwrap(requests.first)
 

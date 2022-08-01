@@ -16,7 +16,7 @@ public struct SettingsView: View {
 
     @State private var isDocumentBrowserPresented = false
 
-    public init(store: LoggerStore = .default) {
+    public init(store: LoggerStore = .shared) {
         self.viewModel = SettingsViewModel(store: store)
         self.console = ConsoleViewModel(store: store)
     }

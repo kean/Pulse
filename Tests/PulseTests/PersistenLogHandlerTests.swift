@@ -16,8 +16,6 @@ final class PersistentLogHandlerTests: XCTestCase {
     var store: LoggerStore!
     var sut: PersistentLogHandler!
 
-    var cancellable: AnyCancellable?
-
     var currentDate: Date = Date()
 
     override func setUp() {
@@ -25,8 +23,9 @@ final class PersistentLogHandlerTests: XCTestCase {
         try? FileManager.default.createDirectory(at: tempDirectoryURL, withIntermediateDirectories: true, attributes: [:])
         storeURL = tempDirectoryURL.appendingPathComponent("test-store")
 
-        store = try! LoggerStore(storeURL: storeURL, options: [.create])
-        store.makeCurrentDate = { [unowned self] in currentDate }
+        var configuration = LoggerStore.Configuration()
+        configuration.makeCurrentDate = { [unowned self] in currentDate }
+        store = try! LoggerStore(storeURL: storeURL, options: [.create, .synchronous], configuration: configuration)
 
         sut = PersistentLogHandler(label: "test-hanlder", store: store)
     }
@@ -46,8 +45,8 @@ final class PersistentLogHandlerTests: XCTestCase {
         let date = Date() - 200
         currentDate = date
 
-        LoggerSession.startSession()
-        let sessionID = LoggerSession.current.id
+        LoggerStore.Session.startSession()
+        let sessionID = LoggerStore.Session.current.id
 
         LoggingSystem.bootstrap {
             MultiplexLogHandler([
@@ -56,25 +55,12 @@ final class PersistentLogHandlerTests: XCTestCase {
             ])
         }
 
-        let expectation = self.expectation(description: "MessagesStored")
-        var storedMessages = 0
-        cancellable = store.events.sink { _ in
-            storedMessages += 1
-            if storedMessages == 2 {
-                self.store.flush {
-                    expectation.fulfill()
-                }
-            }
-        }
-
         var logger1 = Logger(label: "test.logger.1")
         logger1[metadataKey: "test-uuid"] = "\(UUID())"
         logger1.log(level: level1, "\(message1)")
 
         let logger2 = Logger(label: "test.logger.2")
         logger2.log(level: level2, "\(message2)", metadata: ["foo": "bar"])
-
-        waitForExpectations(timeout: 2.0)
 
         let persistedMessages = try store.allMessages()
         guard persistedMessages.count == 2 else {
@@ -97,7 +83,6 @@ final class PersistentLogHandlerTests: XCTestCase {
     func testStoresFileInformation() throws {
         // WHEN
         sut.log(level: .debug, message: "a", metadata: nil, file: "PersistenLogHandlerTests.swift", function: "testStoresFileInformation()", line: 86)
-        flush(store: store)
 
         // THEN
         let message = try XCTUnwrap(store.allMessages().first)
@@ -109,7 +94,6 @@ final class PersistentLogHandlerTests: XCTestCase {
     func testStoresFilename() throws {
         // WHEN
         sut.log(level: .debug, message: "a", metadata: nil, file: #file, function: #function, line: 86)
-        flush(store: store)
 
         // THEN
         let message = try XCTUnwrap(store.allMessages().first)
@@ -124,7 +108,6 @@ final class PersistentLogHandlerTests: XCTestCase {
     func testStoringStringMetadata() throws {
         // WHEN
         sut.log(level: .debug, message: "request failed", metadata: ["system": "auth"])
-        flush(store: store)
 
         // THEN key-value metadata is stored
         let message = try XCTUnwrap(store.allMessages().first)
@@ -144,7 +127,6 @@ final class PersistentLogHandlerTests: XCTestCase {
 
         // WHEN
         sut.log(level: .debug, message: "a", metadata: ["system": .stringConvertible(Foo())])
-        flush(store: store)
 
         // THEN key-value metadata is stored
         let message = try XCTUnwrap(store.allMessages().first)
@@ -156,8 +138,7 @@ final class PersistentLogHandlerTests: XCTestCase {
 
     func testQueryingMetadata() throws {
         // GIVEN
-            sut.log(level: .debug, message: "a", metadata: ["system": "auth"])
-            flush(store: store)
+        sut.log(level: .debug, message: "a", metadata: ["system": "auth"])
 
         // WHEN
         let request = NSFetchRequest<LoggerMessageEntity>(entityName: "LoggerMessageEntity")
@@ -177,5 +158,14 @@ final class PersistentLogHandlerTests: XCTestCase {
 extension LogHandler {
     func log(level: Logger.Level, message: Logger.Message, metadata: Logger.Metadata? = nil, file: String = #file, function: String = #function, line: UInt = #line) {
         self.log(level: level, message: message, metadata: metadata, source: "", file: file, function: function, line: line)
+    }
+}
+
+extension LoggerStore {
+    func destroyStores() {
+        let coordinator = container.persistentStoreCoordinator
+        for store in coordinator.persistentStores {
+            try? coordinator.destroyPersistentStore(at: store.url!, ofType: NSSQLiteStoreType, options: [:])
+        }
     }
 }

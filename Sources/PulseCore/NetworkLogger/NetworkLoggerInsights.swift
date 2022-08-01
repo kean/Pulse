@@ -6,10 +6,10 @@ import Foundation
 import Combine
 
 /// Collects insights about the current session.
-public final class NetworkLoggerInsights {
+public final class NetworkLoggerInsights: @unchecked Sendable {
     private var cancellables: [AnyCancellable] = []
 
-    public var transferSize: NetworkLoggerMetrics.TransferSizeInfo { main.transferSize }
+    public var transferSize: NetworkLogger.Metrics.TransferSizeInfo { main.transferSize }
     public var duration: RequestsDurationInfo { main.duration }
     public var redirects: RedirectsInfo { main.redirects }
     public var failures: FailuresInfo { main.failures }
@@ -18,7 +18,7 @@ public final class NetworkLoggerInsights {
     private var contents = Contents()
 
     private struct Contents {
-        var transferSize = NetworkLoggerMetrics.TransferSizeInfo()
+        var transferSize = NetworkLogger.Metrics.TransferSizeInfo()
         var duration = RequestsDurationInfo()
         var redirects = RedirectsInfo()
         var failures = FailuresInfo()
@@ -35,7 +35,7 @@ public final class NetworkLoggerInsights {
         }.store(in: &cancellables)
     }
 
-    private func process(event: LoggerStoreEvent) {
+    private func process(event: LoggerStore.Event) {
         switch event {
         case .messageStored: break
         case .networkTaskCreated: break
@@ -44,7 +44,7 @@ public final class NetworkLoggerInsights {
         }
     }
 
-    private func process(event: LoggerStoreEvent.NetworkTaskCompleted) {
+    private func process(event: LoggerStore.Event.NetworkTaskCompleted) {
         guard let metrics = event.metrics else { return }
 
         contents.transferSize = contents.transferSize.merging(metrics.transferSize)
@@ -80,7 +80,7 @@ public final class NetworkLoggerInsights {
         }
     }
 
-    public struct RequestsDurationInfo {
+    public struct RequestsDurationInfo: Sendable {
         public var median: TimeInterval?
         public var maximum: TimeInterval?
         public var minimum: TimeInterval?
@@ -128,7 +128,7 @@ public final class NetworkLoggerInsights {
         }
     }
 
-    public struct RedirectsInfo {
+    public struct RedirectsInfo: Sendable {
         /// A single task can be redirected multiple times.
         public var count: Int = 0
         public var timeLost: TimeInterval = 0
@@ -137,7 +137,7 @@ public final class NetworkLoggerInsights {
         public init() {}
     }
 
-    public struct FailuresInfo {
+    public struct FailuresInfo: Sendable {
         public var count: Int { taskIds.count }
         public var taskIds: [UUID] = []
 

@@ -40,7 +40,7 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 
         self.controller = NSFetchedResultsController<LoggerNetworkRequestEntity>(fetchRequest: request, managedObjectContext: store.container.viewContext, sectionNameKeyPath: nil, cacheName: nil)
 
-        self.searchCriteria = NetworkSearchCriteriaViewModel(isDefaultStore: store === LoggerStore.default)
+        self.searchCriteria = NetworkSearchCriteriaViewModel(isDefaultStore: store === LoggerStore.shared)
 #if os(iOS) || os(macOS)
         self.table = ConsoleTableViewModel(store: store, searchCriteriaViewModel: nil)
 #endif
@@ -90,7 +90,7 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         if latestSessionId == nil {
             latestSessionId = entities.first?.session
         }
-        let sessionId = store === LoggerStore.default ? LoggerSession.current.id.uuidString : latestSessionId
+        let sessionId = store === LoggerStore.shared ? LoggerStore.Session.current.id.uuidString : latestSessionId
 
         // Search messages
         NetworkSearchCriteria.update(request: controller.fetchRequest, filterTerm: filterTerm, criteria: searchCriteria.criteria, filters: searchCriteria.filters, isOnlyErrors: isOnlyErrors, sessionId: sessionId)

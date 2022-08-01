@@ -6,7 +6,7 @@ import CoreData
 
 // MARK: - LoggerStore (NSManagedObjectModel)
 
-public extension LoggerStore {
+extension LoggerStore {
     /// Returns Core Data model used by the store.
     static let model: NSManagedObjectModel = {
         let model = NSManagedObjectModel()
@@ -44,7 +44,8 @@ public extension LoggerStore {
             NSAttributeDescription(name: "currentRequest", type: .binaryDataAttributeType),
             NSAttributeDescription(name: "response", type: .binaryDataAttributeType),
             NSAttributeDescription(name: "error", type: .binaryDataAttributeType),
-            NSAttributeDescription(name: "metrics", type: .binaryDataAttributeType)
+            NSAttributeDescription(name: "metrics", type: .binaryDataAttributeType),
+            NSAttributeDescription(name: "metadata", type: .binaryDataAttributeType)
         ]
 
         requestProgress.properties = [
@@ -133,7 +134,7 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
 
     // MARK: State
 
-    /// Contains ``State`` raw value.
+    /// Contains ``State-swift.enum`` raw value.
     @NSManaged public var requestState: Int16
     /// Request progress.
     ///
@@ -189,8 +190,8 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
     }
 
     /// Returns task type
-    public var taskType: NetworkLoggerTaskType? {
-        rawTaskType.flatMap(NetworkLoggerTaskType.init)
+    public var taskType: NetworkLogger.TaskType? {
+        rawTaskType.flatMap(NetworkLogger.TaskType.init)
     }
 
     public enum State: Int16 {
@@ -210,16 +211,18 @@ public final class LoggerNetworkRequestProgressEntity: NSManagedObject {
 
 /// Details associated with the request.
 public final class LoggerNetworkRequestDetailsEntity: NSManagedObject {
-    /// Contains JSON-encoded ``NetworkLoggerRequest``.
+    /// Contains JSON-encoded ``NetworkLogger/Request``.
     @NSManaged public var originalRequest: Data?
-    /// Contains JSON-encoded ``NetworkLoggerRequest``.
+    /// Contains JSON-encoded ``NetworkLogger/Request``.
     @NSManaged public var currentRequest: Data?
-    /// Contains JSON-encoded ``NetworkLoggerResponse``.
+    /// Contains JSON-encoded ``NetworkLogger/Response``.
     @NSManaged public var response: Data?
-    /// Contains JSON-encoded ``NetworkLoggerError``.
+    /// Contains JSON-encoded ``NetworkLogger/ResponseError``.
     @NSManaged public var error: Data?
-    /// Contains JSON-encoded ``NetworkLoggerMetrics``.
+    /// Contains JSON-encoded ``NetworkLogger/Metrics``.
     @NSManaged public var metrics: Data?
+    /// Contains JSON-encoded metadata (`[String: String]`).
+    @NSManaged public var metadata: Data?
 }
 
 // MARK: - Helpers

@@ -58,6 +58,7 @@ final class ConsoleToolbarViewModel: ObservableObject {
         didSet { objectWillChange.send() }
     }
     @Published var isOnlyErrors = false
+    @Published var isOnlyPins = false
     @Published var isSearchBarActive = false
     @Published var isNowEnabled = true
 }

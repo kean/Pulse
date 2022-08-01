@@ -2,7 +2,7 @@
 //
 // Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
 
-struct Version {
+struct Version: Sendable {
     let major: Int
     let minor: Int
     let patch: Int

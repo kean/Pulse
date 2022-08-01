@@ -30,9 +30,9 @@ struct StoreDetailsView: View {
 
 final class StoreDetailsViewModel {
     private let storeURL: URL
-    private let info: LoggerStoreInfo
+    private let info: LoggerStore.Info
 
-    init(storeURL: URL, info: LoggerStoreInfo) {
+    init(storeURL: URL, info: LoggerStore.Info) {
         self.storeURL = storeURL
         self.info = info
     }

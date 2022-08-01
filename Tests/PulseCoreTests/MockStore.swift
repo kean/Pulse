@@ -21,8 +21,6 @@ extension XCTestCase {
         precondition(Thread.isMainThread)
 
         populate3(store: store)
-
-        flush(store: store)
     }
 
     func populate3(store: LoggerStore) {

@@ -12,7 +12,7 @@ import CommonCrypto
 /// - Has size limits and performs LRU cleanup
 ///
 /// Thread-safe. Can be used with multiple logger stores.
-final class BlobStore {
+final class BlobStore: @unchecked Sendable {
     /// When performing a sweep, the cache will remote entries until the size of
     /// the remaining items is lower than or equal to `sizeLimit * trimRatio` and
     /// the total count is lower than or equal to `countLimit * trimRatio`. `0.7`
@@ -34,12 +34,15 @@ final class BlobStore {
     /// other subsystems for the resources.
     private let initialSweepDelay: TimeInterval = 5
 
+    private let sizeLimit: Int
+
     /// A queue which is used for disk I/O.
     private let queue = DispatchQueue(label: "com.github.kean.pulse.blob-storage", qos: .utility)
 
     /// Creates a cache instance with a given path.
-    init(path: URL) {
+    init(path: URL, sizeLimit: Int) {
         self.path = path
+        self.sizeLimit = sizeLimit
 
         try? Files.createDirectory(at: path, withIntermediateDirectories: true, attributes: nil)
         queue.asyncAfter(deadline: .now() + initialSweepDelay) { [weak self] in
@@ -120,11 +123,11 @@ final class BlobStore {
         var size = items.reduce(0) { $0 + ($1.meta.totalFileAllocatedSize ?? 0) }
         var count = items.count
 
-        guard size > LoggerStore.blobsSizeLimit else {
+        guard size > sizeLimit else {
             return // All good, no need to perform any work.
         }
 
-        let sizeLimit = Int(Double(LoggerStore.blobsSizeLimit) * trimRatio)
+        let sizeLimit = Int(Double(sizeLimit) * trimRatio)
 
         // Most recently accessed items first
         let past = Date.distantPast

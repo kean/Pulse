@@ -2,7 +2,6 @@
 //
 // Copyright (c) 2020-2022 Alexander Grebenyuk (github.com/kean).
 
-import Logging
 import XCTest
 import Foundation
 import CoreData
@@ -23,16 +22,6 @@ extension LoggerStore {
         }
     }
 }
-
-extension XCTestCase {
-     func flush(store: LoggerStore) {
-         let flushCompleted = expectation(description: "Flush Completed")
-         store.flush {
-             flushCompleted.fulfill()
-         }
-         wait(for: [flushCompleted], timeout: 2)
-     }
- }
 
 struct TemporaryDirectory {
     let url: URL

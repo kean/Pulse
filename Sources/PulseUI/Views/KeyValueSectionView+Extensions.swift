@@ -6,7 +6,7 @@ import SwiftUI
 import PulseCore
 
 extension KeyValueSectionViewModel {
-    static func makeSummary(for request: NetworkLoggerRequest) -> KeyValueSectionViewModel {
+    static func makeSummary(for request: NetworkLogger.Request) -> KeyValueSectionViewModel {
         let components = request.url.flatMap { URLComponents(url: $0, resolvingAgainstBaseURL: false) }
         var items: [(String, String?)] = []
         items += [
@@ -26,7 +26,7 @@ extension KeyValueSectionViewModel {
         )
     }
 
-    static func makeParameters(for request: NetworkLoggerRequest) -> KeyValueSectionViewModel {
+    static func makeParameters(for request: NetworkLogger.Request) -> KeyValueSectionViewModel {
         KeyValueSectionViewModel(title: "Request Parameters", color: .gray, items: [
             ("Cache Policy", URLRequest.CachePolicy(rawValue: request.cachePolicy).map { $0.description }),
             ("Timeout Interval", DurationFormatter.string(from: request.timeoutInterval, isPrecise: false)),
@@ -47,7 +47,7 @@ extension KeyValueSectionViewModel {
         )
     }
 
-    static func makeSummary(for response: NetworkLoggerResponse) -> KeyValueSectionViewModel {
+    static func makeSummary(for response: NetworkLogger.Response) -> KeyValueSectionViewModel {
         KeyValueSectionViewModel(title: "Response Summary", color: .indigo, items: [
             ("Status Code", response.statusCode.map { String($0) }),
             ("Content Type", response.contentType),
@@ -64,7 +64,7 @@ extension KeyValueSectionViewModel {
         )
     }
 
-    static func makeErrorDetails(for error: NetworkLoggerError, action: @escaping () -> Void) -> KeyValueSectionViewModel {
+    static func makeErrorDetails(for error: NetworkLogger.ResponseError, action: @escaping () -> Void) -> KeyValueSectionViewModel {
         KeyValueSectionViewModel(
             title: "Error",
             color: .red,
@@ -102,7 +102,7 @@ extension KeyValueSectionViewModel {
     }
 
 #if os(iOS) || os(macOS)
-    static func makeTiming(for transaction: NetworkLoggerTransactionMetrics) -> KeyValueSectionViewModel {
+    static func makeTiming(for transaction: NetworkLogger.TransactionMetrics) -> KeyValueSectionViewModel {
         let timeFormatter = DateFormatter()
         timeFormatter.locale = Locale(identifier: "en_US")
         timeFormatter.dateFormat = "HH:mm:ss.SSSSSS"

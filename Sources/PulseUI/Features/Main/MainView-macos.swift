@@ -13,7 +13,7 @@ public struct MainView: View {
     @StateObject private var viewModel: MainViewModel
     @State private var isShowingSettings = false
 
-    public init(store: LoggerStore = .default) {
+    public init(store: LoggerStore = .shared) {
         _viewModel = StateObject(wrappedValue: MainViewModel(store: store))
     }
 

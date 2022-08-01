@@ -4,12 +4,11 @@
 
 import Foundation
 
-public final class NetworkLogger {
+public final class NetworkLogger: @unchecked Sendable {
     private let store: LoggerStore
     private let lock = NSLock()
     private let isTraceEnabled: Bool
     private let isWaitingForDecoding: Bool
-    private let willLogTask: (LoggedNetworkTask) -> LoggedNetworkTask?
 
     /// Initializers the network logger.
     ///
@@ -22,14 +21,12 @@ public final class NetworkLogger {
     ///   - willLogTask: Allows you to filter out sensitive information
     /// or disable logging of certain requests completely. By default, returns
     /// the suggested task without modification.
-    public init(store: LoggerStore = .default,
+    public init(store: LoggerStore = .shared,
                 isTraceEnabled: Bool = false,
-                isWaitingForDecoding: Bool = false,
-                willLogTask: @escaping (LoggedNetworkTask) -> LoggedNetworkTask? = { $0 }) {
+                isWaitingForDecoding: Bool = false) {
         self.store = store
         self.isTraceEnabled = isTraceEnabled
         self.isWaitingForDecoding = isWaitingForDecoding
-        self.willLogTask = willLogTask
     }
 
     // MARK: Logging
@@ -44,14 +41,14 @@ public final class NetworkLogger {
         trace("Did create task \(urlRequest.httpMethod ?? "–") \(task.url ?? "–")")
 
         if let originalRequest = task.originalRequest ?? context.request {
-            store.handle(.networkTaskCreated(LoggerStoreEvent.NetworkTaskCreated(
+            store.handle(.networkTaskCreated(LoggerStore.Event.NetworkTaskCreated(
                 taskId: context.taskId,
-                taskType: NetworkLoggerTaskType(task: task),
+                taskType: NetworkLogger.TaskType(task: task),
                 createdAt: Date(),
                 originalRequest: .init(originalRequest),
-                currentRequest: task.currentRequest.map(NetworkLoggerRequest.init),
+                currentRequest: task.currentRequest.map(Request.init),
                 requestBody: originalRequest.httpBody ?? originalRequest.httpBodyStreamData(),
-                session: LoggerSession.current.id.uuidString
+                session: LoggerStore.Session.current.id.uuidString
             )))
         }
     }
@@ -63,7 +60,7 @@ public final class NetworkLogger {
         context.response = response
         lock.unlock()
 
-        let response = NetworkLoggerResponse(response)
+        let response = Response(response)
         let statusCode = response.statusCode
 
         trace("Did receive response with status code: \(statusCode.map(descriptionForStatusCode) ?? "–") for \(dataTask.url ?? "null")")
@@ -100,12 +97,12 @@ public final class NetworkLogger {
     /// Logs the task metrics (optional).
     public func logTask(_ task: URLSessionTask, didFinishCollecting metrics: URLSessionTaskMetrics) {
         lock.lock()
-        context(for: task).metrics = NetworkLoggerMetrics(metrics: metrics)
+        context(for: task).metrics = NetworkLogger.Metrics(metrics: metrics)
         lock.unlock()
     }
 
     /// Logs the task metrics (optional).
-    public func logTask(_ task: URLSessionTask, didFinishCollecting metrics: NetworkLoggerMetrics) {
+    public func logTask(_ task: URLSessionTask, didFinishCollecting metrics: NetworkLogger.Metrics) {
         lock.lock()
         context(for: task).metrics = metrics
         lock.unlock()
@@ -151,16 +148,16 @@ public final class NetworkLogger {
 //        if let networkTask = willLogTask(networkTask) {
         store.handle(.networkTaskCompleted(.init(
             taskId: context.taskId,
-            taskType: NetworkLoggerTaskType(task: task),
+            taskType: NetworkLogger.TaskType(task: task),
             createdAt: Date(),
-            originalRequest: NetworkLoggerRequest(originalRequest),
-            currentRequest: task.currentRequest.map(NetworkLoggerRequest.init),
-            response: response.map(NetworkLoggerResponse.init),
-            error: error.map(NetworkLoggerError.init),
+            originalRequest: Request(originalRequest),
+            currentRequest: task.currentRequest.map(Request.init),
+            response: response.map(Response.init),
+            error: error.map(ResponseError.init),
             requestBody: originalRequest.httpBody ?? originalRequest.httpBodyStreamData(),
             responseBody: data,
             metrics: metrics,
-            session: LoggerSession.current.id.uuidString
+            session: LoggerStore.Session.current.id.uuidString
         )))
 
         trace("Did complete with error: \(error?.localizedDescription ?? "-") for \(task.url ?? "null")")
@@ -176,7 +173,7 @@ public final class NetworkLogger {
         public let response: URLResponse?
         public let data: Data?
         public let error: Error?
-        public let metrics: NetworkLoggerMetrics?
+        public let metrics: NetworkLogger.Metrics?
     }
 
     // MARK: - Private
@@ -188,7 +185,7 @@ public final class NetworkLogger {
         var request: URLRequest?
         var response: URLResponse?
         lazy var data = Data()
-        var metrics: NetworkLoggerMetrics?
+        var metrics: NetworkLogger.Metrics?
     }
 
     private func context(for task: URLSessionTask) -> TaskContext {

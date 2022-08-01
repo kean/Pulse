@@ -63,9 +63,9 @@ final class NetworkInspectorTransactionViewModel: ObservableObject {
     let details: NetworkMetricsDetailsViewModel?
     let timingViewModel: TimingViewModel?
 
-    private let transaction: NetworkLoggerTransactionMetrics
+    private let transaction: NetworkLogger.TransactionMetrics
 
-    init(transaction: NetworkLoggerTransactionMetrics, metrics: NetworkLoggerMetrics) {
+    init(transaction: NetworkLogger.TransactionMetrics, metrics: NetworkLogger.Metrics) {
         self.details = NetworkMetricsDetailsViewModel(metrics: transaction)
         self.timingViewModel = TimingViewModel(transaction: transaction, metrics: metrics)
         self.transaction = transaction

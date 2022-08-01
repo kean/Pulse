@@ -40,13 +40,13 @@ struct NetworkInspectorMetricsView: View {
 // MARK: - ViewModel
 
 final class NetworkInspectorMetricsViewModel {
-    let metrics: NetworkLoggerMetrics
+    let metrics: NetworkLogger.Metrics
     let timingViewModel: TimingViewModel
 #if !os(tvOS)
     let transactions: NetworkInspectorTransactionsListViewModel?
 #endif
 
-    init(metrics: NetworkLoggerMetrics) {
+    init(metrics: NetworkLogger.Metrics) {
         self.metrics = metrics
         self.timingViewModel = TimingViewModel(metrics: metrics)
 

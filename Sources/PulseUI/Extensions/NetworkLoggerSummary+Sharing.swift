@@ -18,7 +18,7 @@ enum Render {
 
     static func asHTML(request: LoggerNetworkRequestEntity, store: LoggerStore) -> String {
         let details = DecodedNetworkRequestDetailsEntity(request: request)
-        let error = details.error?.error as? NetworkLoggerDecodingError
+        let error = details.decodingError
         return render(request: request, store: store, using: HTMLRenderer(error: error))
     }
 
@@ -182,9 +182,9 @@ private final class MarkdownRenderer: Renderer {
 private final class HTMLRenderer: Renderer {
     private var contents = ""
     private var toc = [ToCItem]()
-    private var error: NetworkLoggerDecodingError?
+    private var error: NetworkLogger.DecodingError?
 
-    init(error: NetworkLoggerDecodingError?) {
+    init(error: NetworkLogger.DecodingError?) {
         self.error = error
     }
 

@@ -14,7 +14,7 @@ public final class MainViewController: UITabBarController {
 
     public static var isAutomaticAppearanceOverrideRemovalEnabled = true
 
-    public init(store: LoggerStore = .default, onDismiss: (() -> Void)? = nil) {
+    public init(store: LoggerStore = .shared, onDismiss: (() -> Void)? = nil) {
         self.viewModel = MainViewModel(store: store, onDismiss: onDismiss)
         super.init(nibName: nil, bundle: nil)
 

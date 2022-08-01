@@ -39,8 +39,8 @@ extension RemoteLogger {
 
     struct PacketClientHello: Codable {
         let deviceId: UUID
-        let deviceInfo: LoggerStoreInfo.DeviceInfo
-        let appInfo: LoggerStoreInfo.AppInfo
+        let deviceInfo: LoggerStore.Info.DeviceInfo
+        let appInfo: LoggerStore.Info.AppInfo
     }
 
     struct Empty: Codable {
@@ -60,10 +60,10 @@ extension RemoteLogger {
             }
         }
 
-        static func encode(_ event: LoggerStoreEvent.NetworkTaskCompleted) throws -> Data {
+        static func encode(_ event: LoggerStore.Event.NetworkTaskCompleted) throws -> Data {
             var contents = [Data]()
 
-            let strippedMessage = LoggerStoreEvent.NetworkTaskCompleted(taskId: event.taskId, taskType: event.taskType, createdAt: event.createdAt, originalRequest: event.originalRequest, currentRequest: event.currentRequest, response: event.response, error: event.error, requestBody: nil, responseBody: nil, metrics: event.metrics, session: event.session)
+            let strippedMessage = LoggerStore.Event.NetworkTaskCompleted(taskId: event.taskId, taskType: event.taskType, createdAt: event.createdAt, originalRequest: event.originalRequest, currentRequest: event.currentRequest, response: event.response, error: event.error, requestBody: nil, responseBody: nil, metrics: event.metrics, session: event.session)
             let messageData = try JSONEncoder().encode(strippedMessage)
             contents.append(messageData)
 
@@ -85,7 +85,7 @@ extension RemoteLogger {
             return data
         }
 
-        static func decode(_ data: Data) throws -> LoggerStoreEvent.NetworkTaskCompleted {
+        static func decode(_ data: Data) throws -> LoggerStore.Event.NetworkTaskCompleted {
             guard data.count >= Manifest.size else {
                 throw PacketParsingError.notEnoughData
             }
@@ -101,7 +101,7 @@ extension RemoteLogger {
             }
 
             let event = try JSONDecoder().decode(
-                LoggerStoreEvent.NetworkTaskCompleted.self,
+                LoggerStore.Event.NetworkTaskCompleted.self,
                 from: data.from(Manifest.size, size: Int(manifest.messageSize))
             )
 
@@ -115,7 +115,7 @@ extension RemoteLogger {
                 responseBody = data.from(Manifest.size + Int(manifest.messageSize) + Int(manifest.requestBodySize), size: Int(manifest.responseBodySize))
             }
 
-            return LoggerStoreEvent.NetworkTaskCompleted(taskId: event.taskId, taskType: event.taskType, createdAt: event.createdAt, originalRequest: event.originalRequest, currentRequest: event.currentRequest, response: event.response, error: event.error, requestBody: requestBody, responseBody: responseBody, metrics: event.metrics, session: event.session)
+            return LoggerStore.Event.NetworkTaskCompleted(taskId: event.taskId, taskType: event.taskType, createdAt: event.createdAt, originalRequest: event.originalRequest, currentRequest: event.currentRequest, response: event.response, error: event.error, requestBody: requestBody, responseBody: responseBody, metrics: event.metrics, session: event.session)
         }
     }
 

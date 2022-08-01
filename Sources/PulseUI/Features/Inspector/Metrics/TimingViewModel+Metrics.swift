@@ -8,11 +8,11 @@ import PulseCore
 #if os(iOS) || os(macOS) || os(tvOS)
 
 extension TimingViewModel {
-    convenience init(metrics: NetworkLoggerMetrics) {
+    convenience init(metrics: NetworkLogger.Metrics) {
         self.init(sections: makeTimingSections(metrics: metrics))
     }
 
-    convenience init?(transaction: NetworkLoggerTransactionMetrics, metrics: NetworkLoggerMetrics) {
+    convenience init?(transaction: NetworkLogger.TransactionMetrics, metrics: NetworkLogger.Metrics) {
         guard let startDate = transaction.fetchStartDate else {
             return nil
         }
@@ -29,7 +29,7 @@ extension TimingViewModel {
     }
 }
 
-private func makeTimingSections(metrics: NetworkLoggerMetrics) -> [TimingRowSectionViewModel] {
+private func makeTimingSections(metrics: NetworkLogger.Metrics) -> [TimingRowSectionViewModel] {
     let taskInterval = metrics.taskInterval
 
     var sections = [TimingRowSectionViewModel]()
@@ -66,7 +66,7 @@ private func _makeRow(title: String, color: UXColor, from: Date, to: Date?, task
     return TimingRowViewModel(title: title, value: value, color: color, start: CGFloat(start), length: length)
 }
 
-private func makeTimingRows(transaction: NetworkLoggerTransactionMetrics, taskInterval: DateInterval) -> [TimingRowSectionViewModel] {
+private func makeTimingRows(transaction: NetworkLogger.TransactionMetrics, taskInterval: DateInterval) -> [TimingRowSectionViewModel] {
     var sections = [TimingRowSectionViewModel]()
 
     func makeRow(title: String, color: UXColor, from: Date, to: Date?) -> TimingRowViewModel {

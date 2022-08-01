@@ -7,7 +7,7 @@ import Foundation
 // `ZipFoundation.Archive` re-reads the archive's directory every time you access
 // an entry. `IndexedArchive` creates an in-memory index to avoid this overhead.
 // And it adds some convenience APIs on top of `ZipFoundation.Archive`.
-final class IndexedArchive {
+final class IndexedArchive: @unchecked Sendable {
     private let archive: Archive
     private let index: [String: Entry]
 

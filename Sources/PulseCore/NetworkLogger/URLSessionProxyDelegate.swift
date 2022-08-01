@@ -17,7 +17,7 @@ public final class URLSessionProxyDelegate: NSObject, URLSessionTaskDelegate, UR
     private var interceptedSelectors: Set<Selector>
     private let logger: NetworkLogger
 
-    /// - parameter logger: By default, creates a logger with `LoggerStore.default`.
+    /// - parameter logger: By default, creates a logger with `LoggerStore.shared`.
     /// - parameter delegate: The "actual" session delegate, strongly retained.
     public init(logger: NetworkLogger = .init(), delegate: URLSessionDelegate? = nil) {
         self.actualDelegate = delegate

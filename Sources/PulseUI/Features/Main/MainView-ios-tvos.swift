@@ -17,7 +17,7 @@ public struct MainView: View {
     @State private var viewController: UIViewController?
 
     /// - parameter onDismiss: pass onDismiss to add a close button.
-    public init(store: LoggerStore = .default,
+    public init(store: LoggerStore = .shared,
                 configuration: ConsoleConfiguration = .default,
                 onDismiss: (() -> Void)? = nil) {
         self.viewModel = MainViewModel(store: store, configuration: configuration, onDismiss: onDismiss)

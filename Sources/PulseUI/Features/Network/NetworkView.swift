@@ -16,7 +16,7 @@ public struct NetworkView: View {
     @State private var isShowingShareSheet = false
     @Environment(\.colorScheme) private var colorScheme: ColorScheme
 
-    public init(store: LoggerStore = .default) {
+    public init(store: LoggerStore = .shared) {
         self.viewModel = NetworkViewModel(store: store)
     }
 

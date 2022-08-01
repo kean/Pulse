@@ -55,12 +55,14 @@ struct FileViewer: View {
                 #else
                 RichTextView(viewModel: viewModel)
                 #endif
-            case .image(let image):
-                makeImageView(with: image)
+            case .image(let viewModel):
+                ScrollView {
+                    ImageViewer(viewModel: viewModel)
+                }
             case .other(let viewModel):
                 #if os(iOS)
                 RichTextView(viewModel: viewModel, onToggleExpanded: onToggleExpanded) {
-                    if self.viewModel.contentType?.contains("html") ?? false {
+                    if self.viewModel.contentType?.isHTML ?? false {
                         Button("Open in Browser") {
                             isWebViewOpen = true
                         }
@@ -76,25 +78,6 @@ struct FileViewer: View {
             SpinnerView(viewModel: .init(title: "Rendering...", details: nil))
         }
     }
-
-    private func makeImageView(with image: UXImage) -> some View {
-        ScrollView {
-            VStack(spacing: 16) {
-                Image(uxImage: image)
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .border(Color.separator, width: 1)
-
-                KeyValueSectionView(viewModel: KeyValueSectionViewModel(title: "Image", color: .pink, items: [
-                    ("Resolution", "\(image.cgImage?.width ?? 0) × \(image.cgImage?.height ?? 0) px"),
-                    ("Size", ByteCountFormatter.string(fromByteCount: viewModel.originalSize, countStyle: .file)),
-                    ("Type", viewModel.contentType)
-                ])).hiddenTitle()
-
-                Spacer()
-            }.padding()
-        }
-    }
 }
 
 // MARK: - Preview
@@ -103,16 +86,16 @@ struct FileViewer: View {
 struct NetworkInspectorResponseView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            FileViewer(viewModel: .init(title: "Response", contentType: "application/json", originalSize: 1200, error: nil, data: { MockJSON.allPossibleValues }))
+            FileViewer(viewModel: .init(title: "Response", context: .init(contentType: "application/json", originalSize: 1200), data: { MockJSON.allPossibleValues }))
                 .previewDisplayName("JSON")
 
-            FileViewer(viewModel: .init(title: "Response", contentType: "image/png", originalSize: 219543, error: nil, data: { MockTask.octocat.responseBody }))
+            FileViewer(viewModel: .init(title: "Response", context: .init(contentType: "image/png", originalSize: 219543), data: { MockTask.octocat.responseBody }))
                 .previewDisplayName("Image")
 
-            FileViewer(viewModel: .init(title: "Response", contentType: "application/html", originalSize: 1200, error: nil, data: { MockTask.profile.responseBody }))
+            FileViewer(viewModel: .init(title: "Response", context: .init(contentType: "application/html", originalSize: 1200), data: { MockTask.profile.responseBody }))
                 .previewDisplayName("HTML")
 
-            FileViewer(viewModel: .init(title: "Response", contentType: "application/x-www-form-urlencoded", originalSize: 1200, error: nil, data: { MockTask.patchRepo.originalRequest.httpBody ?? Data() }))
+            FileViewer(viewModel: .init(title: "Response", context: .init(contentType: "application/x-www-form-urlencoded", originalSize: 1200), data: { MockTask.patchRepo.originalRequest.httpBody ?? Data() }))
                 .previewDisplayName("Query Items")
         }
     }

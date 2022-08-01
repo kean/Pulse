@@ -9,7 +9,7 @@ struct MockDataTask {
     let request: URLRequest
     let response: URLResponse
     let responseBody: Data
-    let metrics: NetworkLoggerMetrics
+    let metrics: NetworkLogger.Metrics
 }
 
 // MARK: - GitHub Login (Success)
@@ -44,7 +44,7 @@ private let mockLoginResponse = HTTPURLResponse(url: URL(string: "https://github
     "Set-Cookie": "_device_id=11111111111; path=/; expires=Sun, 30 Jan 2022 21:49:04 GMT; secure; HttpOnly; SameSite=Lax"
 ])!
 
-private let mockMetrics = try! JSONDecoder().decode(NetworkLoggerMetrics.self, from: """
+private let mockMetrics = try! JSONDecoder().decode(NetworkLogger.Metrics.self, from: """
 {
   "transactions": [
     {
@@ -196,7 +196,7 @@ private let mockOctocatResponse = HTTPURLResponse(url: URL(string: "https://gith
     "Content-Encoding": "gzip"
 ])!
 
-private let mockOctocatMetrics = try! JSONDecoder().decode(NetworkLoggerMetrics.self, from: """
+private let mockOctocatMetrics = try! JSONDecoder().decode(NetworkLogger.Metrics.self, from: """
 {
   "transactions": [
     {

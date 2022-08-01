@@ -9,25 +9,30 @@ import Combine
 
 final class FileViewerViewModel: ObservableObject {
     let title: String
-    let contentType: String?
-    let originalSize: Int64
+    private let context: Context
+    var contentType: NetworkLogger.ContentType? { context.contentType }
     private(set) lazy var data = getData()
     private let getData: () -> Data
-    private let error: NetworkLoggerDecodingError?
 
     @Published private(set) var contents: Contents?
 
-    init(title: String, contentType: String?, originalSize: Int64, error: NetworkLoggerDecodingError?, data: @escaping () -> Data) {
+    struct Context {
+        var contentType: NetworkLogger.ContentType?
+        var originalSize: Int64
+        var metadata: [String: String]?
+        var isResponse = true
+        var error: NetworkLogger.DecodingError?
+    }
+
+    init(title: String, context: Context, data: @escaping () -> Data) {
         self.title = title
-        self.contentType = contentType
-        self.originalSize = originalSize
-        self.error = error
+        self.context = context
         self.getData = data
     }
 
     enum Contents {
         case json(RichTextViewModel)
-        case image(UXImage)
+        case image(ImagePreviewViewModel)
         case other(RichTextViewModel)
     }
 
@@ -48,18 +53,17 @@ final class FileViewerViewModel: ObservableObject {
     }
 
     private func render(data: Data) -> Contents {
-        let data = getData()
         if let json = try? JSONSerialization.jsonObject(with: data, options: []) {
-            return .json(.init(json: json, error: error))
+            return .json(.init(json: json, error: context.error))
         } else if let image = UXImage(data: data) {
-            return .image(image)
+            return .image(ImagePreviewViewModel(image: image, data: data, context: context))
         } else if data.isEmpty {
             return .other(.init(string: "Unavailable"))
         } else if let string = String(data: data, encoding: .utf8) {
 #if os(iOS) || os(macOS) || os(tvOS)
-            if contentType == "application/x-www-form-urlencoded", let components = decodeQueryParameters(form: string) {
+            if contentType?.isEncodedForm ?? false, let components = decodeQueryParameters(form: string) {
                 return .other(.init(string: components.asAttributedString()))
-            } else if contentType?.contains("html") ?? false {
+            } else if contentType?.isHTML ?? false {
                 return .other(.init(string: HTMLPrettyPrint(string: string).render()))
             }
 #endif

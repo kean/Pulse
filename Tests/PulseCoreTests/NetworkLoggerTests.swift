@@ -4,9 +4,7 @@
 
 import CoreData
 import XCTest
-import Logging
 import Combine
-@testable import Pulse
 @testable import PulseCore
 
 final class NetworkLoggerTests: XCTestCase {
@@ -29,10 +27,10 @@ final class NetworkLoggerTests: XCTestCase {
             _ = try JSONDecoder().decode(Repo.self, from: data)
             XCTFail("Expected decoding to fail")
         } catch {
-            let networkError = NetworkLoggerError(error)
+            let networkError = NetworkLogger.ResponseError(error)
             let encoded = try JSONEncoder().encode(networkError)
-            let decoded = try JSONDecoder().decode(NetworkLoggerError.self, from: encoded)
-            let decodingError = try XCTUnwrap(decoded.error as? NetworkLoggerDecodingError)
+            let decoded = try JSONDecoder().decode(NetworkLogger.ResponseError.self, from: encoded)
+            let decodingError = try XCTUnwrap(decoded.error as? NetworkLogger.DecodingError)
             switch decodingError {
             case let .typeMismatch(type, context):
                 XCTAssertEqual(type, "String")
@@ -43,3 +41,5 @@ final class NetworkLoggerTests: XCTestCase {
         }
     }
 }
+
+

@@ -4,8 +4,6 @@
 
 import CoreData
 import XCTest
-import Logging
-@testable import Pulse
 @testable import PulseCore
 
 final class PerformanceTests: XCTestCase {
@@ -19,7 +17,7 @@ final class PerformanceTests: XCTestCase {
         try? FileManager.default.createDirectory(at: tempDirectoryURL, withIntermediateDirectories: true, attributes: [:])
         storeURL = tempDirectoryURL.appendingFilename("performance-tests.pulse")
 
-        store = try! LoggerStore(storeURL: storeURL, options: [.create])
+        store = try! LoggerStore(storeURL: storeURL, options: [.create, .synchronous])
 
         populateStore()
     }
@@ -31,7 +29,7 @@ final class PerformanceTests: XCTestCase {
 
     func testInsert() {
         measure {
-            for _ in 0...3 {
+            for _ in 0...5 {
                 populate3(store: store)
             }
             store.backgroundContext.performAndWait {}
@@ -40,7 +38,7 @@ final class PerformanceTests: XCTestCase {
 
     func xtestQueryByLevel() {
         let request = NSFetchRequest<LoggerMessageEntity>(entityName: "LoggerMessageEntity")
-        request.predicate = NSPredicate(format: "level == %@", Logger.Level.info.rawValue)
+        request.predicate = NSPredicate(format: "level == %@", LoggerStore.Level.info.rawValue)
 
         let moc = store.container.viewContext
 
@@ -76,9 +74,9 @@ final class PerformanceTests: XCTestCase {
 
             addMessage {
                 $0.createdAt = Date() - 0.11
-                $0.level = Logger.Level.info.rawValue
+                $0.level = LoggerStore.Level.info.rawValue
                 $0.label = "application"
-                $0.session = LoggerSession.current.id.uuidString
+                $0.session = LoggerStore.Session.current.id.uuidString
                 $0.text = "UIApplication.didFinishLaunching"
                 $0.metadata = [
                     {
@@ -92,17 +90,17 @@ final class PerformanceTests: XCTestCase {
 
             addMessage {
                 $0.createdAt = Date() - 0.1
-                $0.level = Logger.Level.info.rawValue
+                $0.level = LoggerStore.Level.info.rawValue
                 $0.label = "application"
-                $0.session = LoggerSession.current.id.uuidString
+                $0.session = LoggerStore.Session.current.id.uuidString
                 $0.text = "UIApplication.willEnterForeground"
             }
 
             addMessage {
                 $0.createdAt = Date() - 0.07
-                $0.level = Logger.Level.debug.rawValue
+                $0.level = LoggerStore.Level.debug.rawValue
                 $0.label = "auth"
-                $0.session = LoggerSession.current.id.uuidString
+                $0.session = LoggerStore.Session.current.id.uuidString
                 $0.text = "🌐 Will authorize user with name \"kean@github.com\""
                 $0.metadata = [
                     {
@@ -116,17 +114,17 @@ final class PerformanceTests: XCTestCase {
 
             addMessage {
                 $0.createdAt = Date() - 0.05
-                $0.level = Logger.Level.warning.rawValue
+                $0.level = LoggerStore.Level.warning.rawValue
                 $0.label = "auth"
-                $0.session = LoggerSession.current.id.uuidString
+                $0.session = LoggerStore.Session.current.id.uuidString
                 $0.text = "🌐 Authorization request failed with error 500"
             }
 
             addMessage {
                 $0.createdAt = Date() - 0.04
-                $0.level = Logger.Level.debug.rawValue
+                $0.level = LoggerStore.Level.debug.rawValue
                 $0.label = "auth"
-                $0.session = LoggerSession.current.id.uuidString
+                $0.session = LoggerStore.Session.current.id.uuidString
                 $0.text = """
                 Replace this implementation with code to handle the error appropriately. fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
 
@@ -151,9 +149,9 @@ final class PerformanceTests: XCTestCase {
 
             addMessage {
                 $0.createdAt = Date() - 0.03
-                $0.level = Logger.Level.critical.rawValue
+                $0.level = LoggerStore.Level.critical.rawValue
                 $0.label = "default"
-                $0.session = LoggerSession.current.id.uuidString
+                $0.session = LoggerStore.Session.current.id.uuidString
                 $0.text = "💥 0xDEADBEEF"
             }
         }

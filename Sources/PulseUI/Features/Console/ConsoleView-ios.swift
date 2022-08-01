@@ -14,7 +14,7 @@ public struct ConsoleView: View {
     @Environment(\.colorScheme) private var colorScheme: ColorScheme
     @State private var shared: ShareItems?
 
-    public init(store: LoggerStore = .default, configuration: ConsoleConfiguration = .default) {
+    public init(store: LoggerStore = .shared, configuration: ConsoleConfiguration = .default) {
         self.viewModel = ConsoleViewModel(store: store)
     }
 

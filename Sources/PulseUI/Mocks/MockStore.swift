@@ -10,7 +10,7 @@ import CoreData
 
 extension LoggerStore {
     static let mock: LoggerStore = {
-        let store: LoggerStore = MockStoreConfiguration.isUsingDefaultStore ? .default : makeMockStore()
+        let store: LoggerStore = MockStoreConfiguration.isUsingDefaultStore ? .shared : makeMockStore()
 
         if MockStoreConfiguration.isDelayingLogs {
             func populate() {
@@ -270,15 +270,15 @@ private func makeSessionTask(for mockTask: MockTask, urlSession: URLSession) -> 
     return task
 }
 
-private func makeMetrics(for task: MockTask, taskInterval: DateInterval) -> NetworkLoggerMetrics {
+private func makeMetrics(for task: MockTask, taskInterval: DateInterval) -> NetworkLogger.Metrics {
     let redirectCount = task.transactions.filter {
         $0.fetchType == .networkLoad && ($0.response as? HTTPURLResponse)?.statusCode == 302
     }.count
     var currentDate = taskInterval.start
-    let transactions: [NetworkLoggerTransactionMetrics] = task.transactions.enumerated().map { index, transaction in
-        var metrics = NetworkLoggerTransactionMetrics(
-            request: NetworkLoggerRequest(transaction.request),
-            response: NetworkLoggerResponse(transaction.response),
+    let transactions: [NetworkLogger.TransactionMetrics] = task.transactions.enumerated().map { index, transaction in
+        var metrics = NetworkLogger.TransactionMetrics(
+            request: NetworkLogger.Request(transaction.request),
+            response: NetworkLogger.Response(transaction.response),
             resourceFetchType: transaction.fetchType
         )
         if transaction.fetchType == .networkLoad {
@@ -340,7 +340,7 @@ private func makeMetrics(for task: MockTask, taskInterval: DateInterval) -> Netw
         let responseHeaders = (transaction.response as? HTTPURLResponse)?.allHeaderFields as? [String: String]
         let statusCode = (transaction.response as? HTTPURLResponse)?.statusCode
 
-        var details = NetworkLoggerTransactionDetailedMetrics()
+        var details = NetworkLogger.TransactionDetailedMetrics()
         if transaction.fetchType == .networkLoad  {
             details.countOfRequestHeaderBytesSent = getHeadersEstimatedSize(requestHeaders)
             details.countOfResponseHeaderBytesReceived = getHeadersEstimatedSize(responseHeaders)
@@ -376,7 +376,7 @@ private func makeMetrics(for task: MockTask, taskInterval: DateInterval) -> Netw
         return metrics
     }
 
-    return NetworkLoggerMetrics(
+    return NetworkLogger.Metrics(
         taskInterval: taskInterval,
         redirectCount: redirectCount,
         transactions: transactions

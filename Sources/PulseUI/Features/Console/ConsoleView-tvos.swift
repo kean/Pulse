@@ -16,7 +16,7 @@ public struct ConsoleView: View {
     @State private var isShowingRemoveConfirmationAlert = false
     @State private var isStoreArchived = false
 
-    public init(store: LoggerStore = .default) {
+    public init(store: LoggerStore = .shared) {
         self.viewModel = ConsoleViewModel(store: store)
     }
 

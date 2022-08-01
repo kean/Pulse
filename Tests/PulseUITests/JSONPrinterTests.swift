@@ -28,7 +28,7 @@ final class JSONPrinterTests: XCTestCase {
 }
 
 
-private func generateTypeMismatchError() -> NetworkLoggerDecodingError? {
+private func generateTypeMismatchError() -> NetworkLogger.DecodingError? {
     struct JSON: Decodable {
         let actors: [Actor]
 
@@ -40,6 +40,6 @@ private func generateTypeMismatchError() -> NetworkLoggerDecodingError? {
         _ = try JSONDecoder().decode(JSON.self, from: MockJSON.allPossibleValues)
         return nil
     } catch {
-        return NetworkLoggerDecodingError(error as! DecodingError)
+        return NetworkLogger.DecodingError(error as! DecodingError)
     }
 }

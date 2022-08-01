@@ -6,9 +6,29 @@ import Foundation
 import CoreData
 import Combine
 
-/// `LoggerStore` persistently stores all of the logged messages, network
-/// requests, and blobs. Use `.default` store to log messages.
-public final class LoggerStore {
+/// Persistently stores all the logged messages, network requests, and response blobs.
+///
+/// The recommended way to use the store is by installing `Pulse` module and using
+/// it with the Swift Logging system ([SwiftLog](https://github.com/apple/swift-log)).
+///
+/// ```swift
+/// import Pulse
+/// import Logging
+///
+/// LoggingSystem.bootstrap(PersistentLogHandler.init)
+/// ```
+///
+/// If used this way, you never need to interact with the store directly. To log
+/// messages, you'll interact only with the SwiftLog APIs.
+///
+/// ```swift
+/// let logger = Logger(label: "com.yourcompany.yourapp")
+/// logger.info("This message will be stored persistently")
+/// ```
+///
+/// But SwiftLog is not required and ``LoggerStore`` can also just as easily be used
+/// directly. You can either create a custom store, or use ``LoggerStore/shared`` one.
+public final class LoggerStore: @unchecked Sendable {
     /// The URL the store was initialized with.
     public let storeURL: URL
 
@@ -17,7 +37,7 @@ public final class LoggerStore {
     public let isReadonly: Bool
 
     /// Returns the store info (only available for archives).
-    public private(set) var info: LoggerStoreInfo?
+    public let info: Info?
 
     /// Returns the Core Data container associated with the store.
     public let container: NSPersistentContainer
@@ -27,64 +47,64 @@ public final class LoggerStore {
 
     private let document: PulseDocument
 
-    /// Determines how often the messages are saved to the database. By default,
-    /// 100 milliseconds - quickly enough, but avoiding too many individual writes.
-    public var saveInterval: DispatchTimeInterval = .milliseconds(100)
+    // Deprecated in Pulse 2.0.
+    @available(*, deprecated, message: "Renamed to `shared`")
+    public static var `default`: LoggerStore { LoggerStore.shared }
 
-    /// Size limit in bytes. `30 Mb` by default. The limit is approximate.
-    public static var databaseSizeLimit: Int = 1024 * 1024 * 30
+    /// Re-transmits events processed by the store.
+    public let events = PassthroughSubject<Event, Never>()
 
-    /// Size limit in bytes. `200 Mb` by default.
-    public static var blobsSizeLimit: Int = 1024 * 1024 * 200
+    public let insights = NetworkLoggerInsights()
 
-    /// The default store.
-    public static let `default` = LoggerStore.makeDefault()
+    private let options: Options
+    private let configuration: Configuration
+    private var isSaveScheduled = false
+    private let queue = DispatchQueue(label: "com.github.kean.pulse.logger-store")
+
+    // MARK: Shared
+
+    /// Returns a shared store.
+    ///
+    /// You can replace the default store with a custom one. If you replace the
+    /// shared store, it automatically gets registered as the default store
+    /// for ``RemoteLogger``.
+    public static var shared = LoggerStore.makeDefault() {
+        didSet {
+            if #available(iOS 14.0, tvOS 14.0, *) {
+                RemoteLogger.shared.initialize(store: shared)
+            }
+        }
+    }
 
     /// Returns a URL for the directory where all Pulse stores are located.
     /// The current store is located in the "./current" directory, the rest the stores
     /// are in "./archive".
     public static var logsURL: URL { URL.logs }
 
-    var makeCurrentDate: () -> Date = { Date() }
-
-    /// Re-transmits events processed by the store.
-    public let events = PassthroughSubject<LoggerStoreEvent, Never>()
-
-    public let insights = NetworkLoggerInsights()
-
-    private let options: Options
-    private var isSaveScheduled = false
-    private let queue = DispatchQueue(label: "com.github.kean.pulse.logger-store")
-
-    private enum PulseDocument {
-        case directory(blobs: BlobStore)
-        case file(archive: IndexedArchive, manifest: LoggerStoreInfo)
-        case empty
-    }
-
     private static func makeDefault() -> LoggerStore {
         let storeURL = URL.logs.appendingPathComponent("current.pulse", isDirectory: true)
         let store = try? LoggerStore(storeURL: storeURL, options: [.create, .sweep])
-        if let store = store, #available(iOS 14.0, tvOS 14.0, *) {
-            RemoteLogger.shared.initialize(store: store)
-        }
-        return store ?? LoggerStore(storeURL: storeURL, isEmpty: true, options: [])
+        return store ?? LoggerStore(inMemoryStore: storeURL) // Right side should never happend
     }
 
-    // MARK: Initialization
+    // MARK: Configuration
 
-    public struct Options: OptionSet {
+    /// The store creation options.
+    public struct Options: OptionSet, Sendable {
         public let rawValue: Int
 
         public init(rawValue: Int) {
             self.rawValue = rawValue
         }
+
         /// Creates store if the file is missing. The intermediate directories must
         /// already exist.
         public static let create = Options(rawValue: 1 << 0)
+
         /// Reduces store size when it reaches the size limit by by removing the least
         /// recently added messages and blobs.
         public static let sweep = Options(rawValue: 1 << 1)
+
         /// Flushes entities to disk immediately and synchronously.
         ///
         /// - warning: When this option is enabled, all writes to the store
@@ -96,42 +116,70 @@ public final class LoggerStore {
         public static let synchronous = Options(rawValue: 1 << 2)
     }
 
-    /// An empty readonly placeholder store with no persistence.
-    public static var empty: LoggerStore {
-        LoggerStore(storeURL: URL.logs.appendingFilename("empty"), isEmpty: true, options: [])
+    /// The store configuration.
+    public struct Configuration: @unchecked Sendable {
+        /// Size limit in bytes. `64 Mb` by default. The limit is approximate.
+        public var databaseSizeLimit: Int
+
+        /// Size limit in bytes. `512 Mb` by default.
+        public var blobsSizeLimit: Int
+
+        /// Determines how often the messages are saved to the database. By default,
+        /// 100 milliseconds - quickly enough, but avoiding too many individual writes.
+        public var saveInterval: DispatchTimeInterval = .milliseconds(100)
+
+        /// If `true`, the images added to the store as saved as small thumbnails.
+        public var isStoringOnlyImageThumbnails = true
+
+        /// For tesing purposes.
+        var makeCurrentDate: () -> Date = { Date() }
+
+        /// Initializes the configuration.
+        ///
+        /// - parameters:
+        ///   - databaseSizeLimit: The approximate limit of the database size. `64 Mb`
+        ///   - blobsSizeLimit: The approximate limit of the blob storage that
+        ///   contains network responses (HTTP body). `512 Mb` by default.
+        public init(databaseSizeLimit: Int = 1048576 * 64, blobsSizeLimit: Int = 1048576 * 512) {
+            self.databaseSizeLimit = databaseSizeLimit
+            self.blobsSizeLimit = blobsSizeLimit
+        }
     }
+
+    // MARK: Initialization
 
     /// Initializes the store with the given URL.
     ///
     /// There are two types of URLs that the store supports:
-    /// - A plain directory with a Pulse database (optimized for writing)
-    /// - A document with `.pulse` extension (readonly, archive)
+    /// - A package (directory) with a Pulse database (optimized for writing)
+    /// - A document (readonly, archive, optimized to storage and sharing)
     ///
-    /// `Logger.default` is a plain directory optimized for writing. When you are
-    /// ready to share the store, create a Pulse document using `archive()` or
-    /// `copy(to:)` methods. The document format is optimized to use the least
+    /// The ``LoggerStore/shared`` store is a package optimized for writing. When
+    /// you are ready to share the store, create a Pulse document using `archive()`
+    /// or `copy(to:)` methods. The document format is optimized to use the least
     /// amount of space possible.
     ///
-    /// - parameter storeURL: The store URL.
-    /// - parameter options: By default, empty. To create a new store, pass `.create`
-    /// option.
-    public convenience init(storeURL: URL, options: Options = []) throws {
+    /// - parameters:
+    ///   - storeURL: The store URL.
+    ///   - options: By default, empty. To create a store, use ``Options/create``.
+    ///   - configuration: The store configuration specifiying size limit, etc.
+    public convenience init(storeURL: URL, options: Options = [], configuration: Configuration = .init()) throws {
         var isDirectory: ObjCBool = ObjCBool(false)
         let fileExists = Files.fileExists(atPath: storeURL.path, isDirectory: &isDirectory)
-
         guard fileExists || options.contains(.create) else {
-            throw LoggerStoreError.fileDoesntExist
+            throw LoggerStore.Error.fileDoesntExist
         }
-
         if !fileExists || isDirectory.boolValue { // Working with a package
-            try self.init(packageURL: storeURL, create: !fileExists, options: options)
+            try self.init(packageURL: storeURL, create: !fileExists, options: options, configuration: configuration)
         } else { // Working with a zip archive
-            try self.init(archiveURL: storeURL, options: options)
+            try self.init(archiveURL: storeURL, options: options, configuration: configuration)
         }
     }
 
-    init(packageURL: URL, create: Bool, options: Options) throws {
+    init(packageURL: URL, create: Bool, options: Options, configuration: Configuration) throws {
         self.storeURL = packageURL
+        self.options = options
+        self.configuration = configuration
 
         if create {
             try Files.createDirectory(at: storeURL, withIntermediateDirectories: false, attributes: nil)
@@ -139,7 +187,7 @@ public final class LoggerStore {
         let databaseURL = storeURL.appendingFilename(databaseFileName)
         if !create {
             guard Files.fileExists(atPath: databaseURL.path) else {
-                throw LoggerStoreError.storeInvalid
+                throw LoggerStore.Error.storeInvalid
             }
         }
         let blobsURL = storeURL.appendingDirectory(blobsDirectoryName)
@@ -151,8 +199,8 @@ public final class LoggerStore {
         try? LoggerStore.loadStore(container: container)
         self.backgroundContext = LoggerStore.makeBackgroundContext(for: container)
         self.isReadonly = false
-        self.document = .directory(blobs: BlobStore(path: blobsURL))
-        self.options = options
+        self.info = nil
+        self.document = .directory(blobs: BlobStore(path: blobsURL, sizeLimit: configuration.blobsSizeLimit))
 
         self.insights.register(store: self)
 
@@ -163,32 +211,32 @@ public final class LoggerStore {
         }
     }
 
-    init(archiveURL: URL, options: Options) throws {
+    init(archiveURL: URL, options: Options, configuration: Configuration) throws {
         self.storeURL = archiveURL
+        self.options = options
+        self.configuration = configuration
 
         guard let archive = IndexedArchive(url: storeURL) else {
-            throw LoggerStoreError.storeInvalid
+            throw LoggerStore.Error.storeInvalid
         }
-        let manifest = try LoggerStoreInfo.make(archive: archive)
+        let manifest = try Info.make(archive: archive)
         let databaseURL = URL.temp.appendingFilename(manifest.id.uuidString)
         if !Files.fileExists(atPath: databaseURL.path) {
             guard let database = archive[databaseFileName] else {
-                throw LoggerStoreError.storeInvalid
+                throw LoggerStore.Error.storeInvalid
             }
             try archive.extract(database, to: databaseURL)
         }
 
         self.container = LoggerStore.makeContainer(databaseURL: databaseURL, isViewing: true)
-        try
-            LoggerStore.loadStore(container: container)
+        try LoggerStore.loadStore(container: container)
         self.backgroundContext = LoggerStore.makeBackgroundContext(for: container)
         self.isReadonly = true
         self.info = manifest
         self.document = .file(archive: archive, manifest: manifest)
-        self.options = options
     }
 
-    init(storeURL: URL, isEmpty: Bool, options: Options) {
+    init(inMemoryStore storeURL: URL) {
         self.storeURL = storeURL
         self.isReadonly = true
         self.container = NSPersistentContainer(name: "EmptyStore", managedObjectModel: Self.model)
@@ -197,8 +245,10 @@ public final class LoggerStore {
         container.persistentStoreDescriptions = [description]
         container.loadPersistentStores { _, _ in }
         self.backgroundContext = LoggerStore.makeBackgroundContext(for: container)
+        self.info = nil
         self.document = .empty
-        self.options = options
+        self.options = []
+        self.configuration = .init()
     }
 
     private static func makeContainer(databaseURL: URL, isViewing: Bool) -> NSPersistentContainer {
@@ -212,7 +262,7 @@ public final class LoggerStore {
     }
 
     private static func loadStore(container: NSPersistentContainer) throws {
-        var loadError: Error?
+        var loadError: Swift.Error?
         container.loadPersistentStores { description, error in
             if let error = error {
                 debugPrint("Failed to load persistent store \(description) with error: \(error)")
@@ -222,7 +272,6 @@ public final class LoggerStore {
         if let error = loadError {
             throw error
         }
-
         container.viewContext.automaticallyMergesChangesFromParent = true
         container.viewContext.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
     }
@@ -240,12 +289,12 @@ extension LoggerStore {
     /// Stores the given message.
     public func storeMessage(label: String, level: Level, message: String, metadata: [String: MetadataValue]?, file: String = #file, function: String = #function, line: UInt = #line) {
         handle(.messageStored(.init(
-            createdAt: makeCurrentDate(),
+            createdAt: configuration.makeCurrentDate(),
             label: label,
             level: level,
             message: message,
             metadata: metadata?.unpack(),
-            session: LoggerSession.current.id.uuidString,
+            session: Session.current.id.uuidString,
             file: file,
             function: function,
             line: line
@@ -257,31 +306,27 @@ extension LoggerStore {
     /// - note: If you want to store incremental updates to the task, use
     /// `NetworkLogger` instead.
     public func storeRequest(_ request: URLRequest, response: URLResponse?, error: Error?, data: Data?, metrics: URLSessionTaskMetrics? = nil) {
-        storeRequest(taskId: UUID(), taskType: .dataTask, request: request, response: response, error: error, data: data, metrics: metrics.map(NetworkLoggerMetrics.init))
+        storeRequest(taskId: UUID(), taskType: .dataTask, request: request, response: response, error: error, data: data, metrics: metrics.map(NetworkLogger.Metrics.init))
     }
     
-    func storeRequest(taskId: UUID, taskType: NetworkLoggerTaskType, request: URLRequest, response: URLResponse?, error: Error?, data: Data?, metrics: NetworkLoggerMetrics?) {
+    func storeRequest(taskId: UUID, taskType: NetworkLogger.TaskType, request: URLRequest, response: URLResponse?, error: Error?, data: Data?, metrics: NetworkLogger.Metrics?) {
         handle(.networkTaskCompleted(.init(
             taskId: taskId,
             taskType: taskType,
-            createdAt: makeCurrentDate(),
-            originalRequest: NetworkLoggerRequest(request),
-            currentRequest: NetworkLoggerRequest(request),
-            response: response.map(NetworkLoggerResponse.init),
-            error: error.map(NetworkLoggerError.init),
+            createdAt: configuration.makeCurrentDate(),
+            originalRequest: NetworkLogger.Request(request),
+            currentRequest: NetworkLogger.Request(request),
+            response: response.map(NetworkLogger.Response.init),
+            error: error.map(NetworkLogger.ResponseError.init),
             requestBody: request.httpBody ?? request.httpBodyStreamData(),
             responseBody: data,
             metrics: metrics,
-            session: LoggerSession.current.id.uuidString
+            session: LoggerStore.Session.current.id.uuidString
         )))
     }
-}
 
-// MARK:  - LoggerStore (Events)
-
-extension LoggerStore {
     /// Handles event created by the current store and dispatches it to observers.
-    func handle(_ event: LoggerStoreEvent) {
+    func handle(_ event: Event) {
         perform {
             self._handle(event)
         }
@@ -289,11 +334,11 @@ extension LoggerStore {
     }
 
     /// Handles event emitted by the external store.
-    func handleExternalEvent(_ event: LoggerStoreEvent) {
+    func handleExternalEvent(_ event: Event) {
         perform { self._handle(event) }
     }
 
-    private func _handle(_ event: LoggerStoreEvent) {
+    private func _handle(_ event: Event) {
         switch event {
         case .messageStored(let event): process(event)
         case .networkTaskCreated(let event): process(event)
@@ -302,7 +347,7 @@ extension LoggerStore {
         }
     }
 
-    private func process(_ event: LoggerStoreEvent.MessageCreated) {
+    private func process(_ event: Event.MessageCreated) {
         let message = LoggerMessageEntity(context: backgroundContext)
         message.createdAt = event.createdAt
         message.level = event.level.rawValue
@@ -324,7 +369,7 @@ extension LoggerStore {
         message.line = Int32(event.line)
     }
 
-    private func process(_ event: LoggerStoreEvent.NetworkTaskCreated) {
+    private func process(_ event: Event.NetworkTaskCreated) {
         let request = findOrCreateNetworkRequestEntity(
             forTaskId: event.taskId,
             taskType: event.taskType,
@@ -345,7 +390,7 @@ extension LoggerStore {
         }
     }
 
-    private func process(_ event: LoggerStoreEvent.NetworkTaskProgressUpdated) {
+    private func process(_ event: Event.NetworkTaskProgressUpdated) {
         guard let request = findNetworkRequestEntity(forTaskId: event.taskId) else { return }
 
         let progress = request.progress ?? {
@@ -358,7 +403,7 @@ extension LoggerStore {
         progress.totalUnitCount = event.totalUnitCount
     }
 
-    private func process(_ event: LoggerStoreEvent.NetworkTaskCompleted) {
+    private func process(_ event: Event.NetworkTaskCompleted) {
         let request = findOrCreateNetworkRequestEntity(
             forTaskId: event.taskId,
             taskType: event.taskType,
@@ -382,9 +427,12 @@ extension LoggerStore {
         request.redirectCount = Int16(event.metrics?.redirectCount ?? 0)
 
         // Populate response/request data
+        let contentType = event.response?.headers["Content-Type"].flatMap(NetworkLogger.ContentType.init)
         if case let .directory(store) = document {
             request.requestBodyKey = store.storeData(event.requestBody)
-            request.responseBodyKey = store.storeData(event.responseBody)
+            if let responseBody = event.responseBody {
+                request.responseBodyKey = store.storeData(preprocessData(responseBody, contentType: contentType))
+            }
         }
 
         switch event.taskType {
@@ -413,6 +461,10 @@ extension LoggerStore {
         details.response = try? encoder.encode(event.response)
         details.error = try? encoder.encode(event.error)
         details.metrics = try? encoder.encode(event.metrics)
+        if let responseBody = event.responseBody, (contentType?.isImage ?? false),
+           let metadata = makeImageMetadata(from: responseBody) {
+            details.metadata = try? encoder.encode(metadata)
+        }
 
         // Completed
         if let progress = request.progress {
@@ -425,11 +477,35 @@ extension LoggerStore {
             message.requestState = request.requestState
             message.text = event.originalRequest.url?.absoluteString ?? "–"
             if isFailure {
-                let level = LoggerStore.Level.error
+                let level = Level.error
                 message.level = level.rawValue
                 message.levelOrder = level.order
             }
         }
+    }
+
+    private func preprocessData(_ data: Data, contentType: NetworkLogger.ContentType?) -> Data {
+        guard data.count > 5000 else { // 5 KB is ok
+            return data
+        }
+        guard configuration.isStoringOnlyImageThumbnails && (contentType?.isImage ?? false) else {
+            return data
+        }
+        guard let thumbnail = Graphics.makeThumbnail(from: data, targetSize: 256),
+              let data = Graphics.encode(thumbnail) else {
+            return data
+        }
+        return data
+    }
+
+    private func makeImageMetadata(from data: Data) -> [String: String]? {
+        guard let image = PlatformImage(data: data) else {
+            return nil
+        }
+        return [
+            "ResponsePixelWidth": String(Int(image.size.width)),
+            "ResponsePixelHeight": String(Int(image.size.height))
+        ]
     }
 
     private func findNetworkRequestEntity(forTaskId taskId: UUID) -> LoggerNetworkRequestEntity? {
@@ -439,7 +515,7 @@ extension LoggerStore {
         return try? backgroundContext.fetch(entity).first
     }
 
-    private func findOrCreateNetworkRequestEntity(forTaskId taskId: UUID, taskType: NetworkLoggerTaskType, createdAt: Date, session: String) -> LoggerNetworkRequestEntity {
+    private func findOrCreateNetworkRequestEntity(forTaskId taskId: UUID, taskType: NetworkLogger.TaskType, createdAt: Date, session: String) -> LoggerNetworkRequestEntity {
         if let entity = findNetworkRequestEntity(forTaskId: taskId) {
             return entity
         }
@@ -456,8 +532,8 @@ extension LoggerStore {
 
         let message = LoggerMessageEntity(context: backgroundContext)
         message.createdAt = createdAt
-        message.level = LoggerStore.Level.debug.rawValue
-        message.levelOrder = LoggerStore.Level.debug.order
+        message.level = Level.debug.rawValue
+        message.levelOrder = Level.debug.order
         message.label = "network"
         message.session = session
         message.file = ""
@@ -475,20 +551,18 @@ extension LoggerStore {
     private func setNeedsSave() {
         guard !isSaveScheduled else { return }
         isSaveScheduled = true
-        queue.asyncAfter(deadline: .now() + saveInterval) { [weak self] in
+        queue.asyncAfter(deadline: .now() + configuration.saveInterval) { [weak self] in
             self?.flush()
         }
     }
 
-    // Internal for testing purposes.
-    func flush(_ completion: (() -> Void)? = nil) {
+    private func flush() {
         backgroundContext.perform { [weak self] in
             guard let self = self else { return }
             if self.isSaveScheduled, Files.fileExists(atPath: self.storeURL.path) {
                 try? self.backgroundContext.save()
                 self.isSaveScheduled = false
             }
-            completion?()
         }
     }
 
@@ -526,6 +600,7 @@ extension LoggerStore {
 
     private func perform(_ changes: @escaping () -> Void) {
         guard !isReadonly else { return }
+
         if options.contains(.synchronous) {
             backgroundContext.performAndWait {
                 changes()
@@ -553,6 +628,12 @@ extension LoggerStore {
             return nil
         }
     }
+
+    private enum PulseDocument: Sendable {
+        case directory(blobs: BlobStore)
+        case file(archive: IndexedArchive, manifest: Info)
+        case empty
+    }
 }
 
 extension LoggerStore {
@@ -564,7 +645,7 @@ extension LoggerStore {
     public typealias Metadata = [String: MetadataValue]
 
     // Compatible with SwiftLog.Logger.Level
-    @frozen public enum Level: String, CaseIterable, Codable, Hashable {
+    @frozen public enum Level: String, CaseIterable, Codable, Hashable, Sendable {
         case trace
         case debug
         case info
@@ -606,7 +687,7 @@ extension LoggerStore {
 
     /// Removes all of the previously recorded messages.
     public func removeAll() {
-        backgroundContext.perform(_removeAll)
+        perform { self._removeAll() }
     }
 
     private func _removeAll() {
@@ -644,7 +725,7 @@ extension LoggerStore {
     ///
     /// Thread-safe. But must not be called inside the `backgroundContext` queue.
     @discardableResult
-    public func copy(to targetURL: URL) throws -> LoggerStoreInfo {
+    public func copy(to targetURL: URL) throws -> Info {
         switch document {
         case .directory(let blobs):
             return try backgroundContext.tryPerform {
@@ -654,11 +735,11 @@ extension LoggerStore {
             try Files.copyItem(at: storeURL, to: targetURL)
             return manifest
         case .empty:
-            throw LoggerStoreError.storeInvalid
+            throw LoggerStore.Error.storeInvalid
         }
     }
 
-    private func copy(to targetURL: URL, blobs: BlobStore) throws -> LoggerStoreInfo {
+    private func copy(to targetURL: URL, blobs: BlobStore) throws -> Info {
         let tempURL = URL.temp.appendingPathComponent(UUID().uuidString, isDirectory: true)
         Files.createDirectoryIfNeeded(at: tempURL)
         do {
@@ -669,7 +750,7 @@ extension LoggerStore {
         }
     }
 
-    private func copy(to targetURL: URL, tempURL: URL, blobs: BlobStore) throws -> LoggerStoreInfo {
+    private func copy(to targetURL: URL, tempURL: URL, blobs: BlobStore) throws -> Info {
         // Create copy of the store
         let databaseURL = tempURL.appendingPathComponent(databaseFileName, isDirectory: false)
         try container.persistentStoreCoordinator.createCopyOfStore(at: databaseURL)
@@ -681,7 +762,7 @@ extension LoggerStore {
         // Create description
         let databaseAttributes = try Files.attributesOfItem(atPath: databaseURL.path)
         let currentDatabaseAttributes = try Files.attributesOfItem(atPath: storeURL.appendingPathComponent(databaseFileName).path)
-        let manifest = LoggerStoreInfo(
+        let manifest = Info(
             id: UUID(),
             appInfo: .make(),
             device: .make(),
@@ -716,14 +797,14 @@ extension LoggerStore {
 
 extension LoggerStore {
     public func sweep() {
-        backgroundContext.perform { try? self._sweep() }
+        perform { try? self._sweep() }
     }
 
     private func _sweep() throws {
         let attributes = try Files.attributesOfItem(atPath: storeURL.appendingFilename(databaseFileName).path)
         let size = attributes[.size] as? Int64 ?? 0
 
-        guard size > LoggerStore.databaseSizeLimit else {
+        guard size > configuration.databaseSizeLimit else {
             return // All good, no need to perform any work.
         }
 
@@ -763,20 +844,22 @@ private extension Dictionary where Key == String, Value == LoggerStore.MetadataV
     }
 }
 
-public enum LoggerStoreError: Error, LocalizedError {
-    case fileDoesntExist
-    case storeInvalid
-    case unsupportedVersion
-    case documentIsReadonly
-    case unknownError
+extension LoggerStore {
+    public enum Error: Swift.Error, LocalizedError {
+        case fileDoesntExist
+        case storeInvalid
+        case unsupportedVersion
+        case documentIsReadonly
+        case unknownError
 
-    public var errorDescription: String? {
-        switch self {
-        case .fileDoesntExist: return "File doesn't exist"
-        case .storeInvalid: return "Store format is invalid"
-        case .documentIsReadonly: return "Document is readonly"
-        case .unsupportedVersion: return "The store was created by one of the earlier versions of Pulse and is no longer supported"
-        case .unknownError: return "Unexpected error"
+        public var errorDescription: String? {
+            switch self {
+            case .fileDoesntExist: return "File doesn't exist"
+            case .storeInvalid: return "Store format is invalid"
+            case .documentIsReadonly: return "Document is readonly"
+            case .unsupportedVersion: return "The store was created by one of the earlier versions of Pulse and is no longer supported"
+            case .unknownError: return "Unexpected error"
+            }
         }
     }
 }

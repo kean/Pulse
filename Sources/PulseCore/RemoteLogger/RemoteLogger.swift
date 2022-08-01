@@ -7,7 +7,6 @@ import Network
 import Combine
 import SwiftUI
 
-#if os(iOS) || os(tvOS) || os(watchOS) || os(macOS)
 /// Connects to the remote server and sends logs remotely. In the current version,
 /// a server is a Pulse Pro app for macOS).
 ///
@@ -15,7 +14,7 @@ import SwiftUI
 /// be delivered on a background queue.
 @available(iOS 14.0, tvOS 14.0, *)
 public final class RemoteLogger: RemoteLoggerConnectionDelegate {
-    private(set) public var store: LoggerStore?
+    public private(set) var store: LoggerStore?
 
     @Published public private(set) var servers: Set<NWBrowser.Result> = []
 
@@ -39,13 +38,13 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
 
     // Logging
     private var isLoggingPaused = true
-    private var buffer: [LoggerStoreEvent]? = []
+    private var buffer: [LoggerStore.Event]? = []
 
     // Persistence
     @AppStorage("com-github-kean-pulse-is-remote-logger-enabled")
-    private(set) public var isEnabled = false
+    public private(set) var isEnabled = false
     @AppStorage("com-github-kean-pulse-selected-server")
-    private(set) public var selectedServer = ""
+    public private(set) var selectedServer = ""
 
     private let queue = DispatchQueue(label: "com.github.kean.remote-logger")
     private let specificKey = DispatchSpecificKey<String>()
@@ -56,8 +55,8 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
     public static let shared = RemoteLogger()
 
     /// - parameter store: The store to be synced with the server. By default,
-    /// `LoggerStore.default`. Only one store can be synced at at time.
-    public func initialize(store: LoggerStore = .default) {
+    /// ``LoggerStore/shared``. Only one store can be synced at at time.
+    public func initialize(store: LoggerStore = .shared) {
         if isInitialized {
             cancel()
         }
@@ -376,7 +375,7 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
 
     // MARK: Logging
 
-    private func didReceive(event: LoggerStoreEvent) {
+    private func didReceive(event: LoggerStore.Event) {
         precondition(DispatchQueue.getSpecific(key: specificKey) != nil)
 
         if isLoggingPaused {
@@ -386,7 +385,7 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
         }
     }
 
-    private func send(event: LoggerStoreEvent) {
+    private func send(event: LoggerStore.Event) {
         switch event {
         case .messageStored(let message):
             connection?.send(code: .storeEventMessageStored, entity: message)
@@ -440,11 +439,6 @@ extension RemoteLogger.ConnectionState {
         }
     }
 }
-
-#else
-public enum RemoteLogger {
-}
-#endif
 
 @available(iOS 14.0, tvOS 14.0, *)
 extension RemoteLogger {

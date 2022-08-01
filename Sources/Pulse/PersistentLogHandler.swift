@@ -8,7 +8,6 @@ import Logging
 
 public typealias NetworkLogger = PulseCore.NetworkLogger
 public typealias LoggerStore = PulseCore.LoggerStore
-public typealias LoggerSession = PulseCore.LoggerSession
 public typealias URLSessionProxyDelegate = PulseCore.URLSessionProxyDelegate
 
 public struct PersistentLogHandler {
@@ -20,7 +19,7 @@ public struct PersistentLogHandler {
     private let label: String
 
     public init(label: String) {
-        self.init(label: label, store: .default)
+        self.init(label: label, store: .shared)
     }
 
     public init(label: String, store: LoggerStore) {

@@ -312,7 +312,7 @@ final class RichTextViewModel: ObservableObject {
     @Published var isSearching = false
     @Published var searchTerm: String = ""
     @Published var options: StringSearchOptions = .default
-    var error: NetworkLoggerDecodingError?
+    var error: NetworkLogger.DecodingError?
 
     let text: NSAttributedString
     private let string: String
@@ -326,7 +326,7 @@ final class RichTextViewModel: ObservableObject {
 
     private var bag = [AnyCancellable]()
 
-    convenience init(json: Any, error: NetworkLoggerDecodingError?) {
+    convenience init(json: Any, error: NetworkLogger.DecodingError?) {
         let renderer = AttributedStringJSONRenderer(fontSize: FontSize.body, lineHeight: FontSize.body + 5)
         let printer = JSONPrinter(renderer: renderer)
         printer.render(json: json, error: error)

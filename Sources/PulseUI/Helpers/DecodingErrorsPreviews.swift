@@ -27,12 +27,12 @@ struct DecodingErrors_Previews: PreviewProvider {
         }
     }
 
-    private static func fileViewer(error: NetworkLoggerDecodingError) -> some View {
-        FileViewer(viewModel: .init(title: "Response", contentType: "application/json", originalSize: 1200, error: error, data: { MockJSON.allPossibleValues }))
+    private static func fileViewer(error: NetworkLogger.DecodingError) -> some View {
+        FileViewer(viewModel: .init(title: "Response", context: .init(contentType: .init(rawValue: "application/json"), originalSize: 1200, error: error), data: { MockJSON.allPossibleValues }))
     }
 }
 
-private func typeMismatchError() -> NetworkLoggerDecodingError {
+private func typeMismatchError() -> NetworkLogger.DecodingError {
     struct JSON: Decodable {
         let actors: [Actor]
 
@@ -43,7 +43,7 @@ private func typeMismatchError() -> NetworkLoggerDecodingError {
     return getError(JSON.self)
 }
 
-private func typeMismatchErrorInArray() -> NetworkLoggerDecodingError {
+private func typeMismatchErrorInArray() -> NetworkLogger.DecodingError {
     struct JSON: Decodable {
         let actors: [Actor]
 
@@ -54,7 +54,7 @@ private func typeMismatchErrorInArray() -> NetworkLoggerDecodingError {
     return getError(JSON.self)
 }
 
-private func valueNotFoundError() -> NetworkLoggerDecodingError {
+private func valueNotFoundError() -> NetworkLogger.DecodingError {
     struct JSON: Decodable {
         let actors: [Actor]
 
@@ -65,7 +65,7 @@ private func valueNotFoundError() -> NetworkLoggerDecodingError {
     return getError(JSON.self)
 }
 
-private func keyNotFound() -> NetworkLoggerDecodingError {
+private func keyNotFound() -> NetworkLogger.DecodingError {
     struct JSON: Decodable {
         let actors: [Actor]
 
@@ -76,7 +76,7 @@ private func keyNotFound() -> NetworkLoggerDecodingError {
     return getError(JSON.self)
 }
 
-private func dataCorrupted() -> NetworkLoggerDecodingError {
+private func dataCorrupted() -> NetworkLogger.DecodingError {
     struct JSON: Decodable {
         let actors: [Actor]
 
@@ -87,12 +87,12 @@ private func dataCorrupted() -> NetworkLoggerDecodingError {
     return getError(JSON.self)
 }
 
-private func getError<T: Decodable>(_ type: T.Type) -> NetworkLoggerDecodingError {
+private func getError<T: Decodable>(_ type: T.Type) -> NetworkLogger.DecodingError {
     do {
         _ = try JSONDecoder().decode(type, from: MockJSON.allPossibleValues)
         fatalError()
     } catch {
-        return NetworkLoggerDecodingError(error as! DecodingError)
+        return NetworkLogger.DecodingError(error as! DecodingError)
     }
 }
 

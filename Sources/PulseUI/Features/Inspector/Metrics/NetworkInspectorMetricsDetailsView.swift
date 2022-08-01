@@ -22,7 +22,7 @@ struct NetworkInspectorMetricsDetailsView: View {
 struct NetworkMetricsDetailsViewModel {
     let sections: [KeyValueSectionViewModel]
 
-    init?(metrics: NetworkLoggerTransactionMetrics) {
+    init?(metrics: NetworkLogger.TransactionMetrics) {
         guard metrics.fetchType != .localCache else {
             return nil
         }
@@ -35,7 +35,7 @@ struct NetworkMetricsDetailsViewModel {
     }
 }
 
-private func makeTransferSection(for metrics: NetworkLoggerTransactionMetrics) -> KeyValueSectionViewModel? {
+private func makeTransferSection(for metrics: NetworkLogger.TransactionMetrics) -> KeyValueSectionViewModel? {
     guard let metrics = metrics.details else { return nil }
     return KeyValueSectionViewModel(title: "Data Transfer", color: .secondary, items: [
         ("Request Headers", formatBytes(metrics.countOfRequestHeaderBytesSent)),
@@ -47,7 +47,7 @@ private func makeTransferSection(for metrics: NetworkLoggerTransactionMetrics) -
     ])
 }
 
-private func makeProtocolSection(for metrics: NetworkLoggerTransactionMetrics) -> KeyValueSectionViewModel? {
+private func makeProtocolSection(for metrics: NetworkLogger.TransactionMetrics) -> KeyValueSectionViewModel? {
     guard let details = metrics.details else { return nil }
     return KeyValueSectionViewModel(title: "Protocol", color: .secondary, items: [
         ("Network Protocol", metrics.networkProtocolName),
@@ -58,7 +58,7 @@ private func makeProtocolSection(for metrics: NetworkLoggerTransactionMetrics) -
     ])
 }
 
-private func makeSecuritySection(for metrics: NetworkLoggerTransactionMetrics) -> KeyValueSectionViewModel? {
+private func makeSecuritySection(for metrics: NetworkLogger.TransactionMetrics) -> KeyValueSectionViewModel? {
     guard let metrics = metrics.details else { return nil }
 
     guard let suite = metrics.negotiatedTLSCipherSuite.flatMap(tls_ciphersuite_t.init(rawValue:)),
@@ -71,7 +71,7 @@ private func makeSecuritySection(for metrics: NetworkLoggerTransactionMetrics) -
     ])
 }
 
-private func makeMiscSection(for metrics: NetworkLoggerTransactionMetrics) -> KeyValueSectionViewModel? {
+private func makeMiscSection(for metrics: NetworkLogger.TransactionMetrics) -> KeyValueSectionViewModel? {
     let details = metrics.details
     return KeyValueSectionViewModel(title: "Characteristics", color: .secondary, items: [
         ("Cellular", details?.isCellular.description),

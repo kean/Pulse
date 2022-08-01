@@ -2,11 +2,9 @@
 //
 // Copyright (c) 2020-2022 Alexander Grebenyuk (github.com/kean).
 
-import Logging
 import XCTest
 import Foundation
 import CoreData
-@testable import Pulse
 @testable import PulseCore
 
 final class LoggerStoreTests: XCTestCase {
@@ -23,7 +21,7 @@ final class LoggerStoreTests: XCTestCase {
         try? FileManager.default.createDirectory(at: tempDirectoryURL, withIntermediateDirectories: true, attributes: [:])
         storeURL = tempDirectoryURL.appendingPathComponent("test-store")
 
-        store = try! LoggerStore(storeURL: storeURL, options: [.create])
+        store = try! LoggerStore(storeURL: storeURL, options: [.create, .synchronous])
     }
 
     override func tearDown() {
@@ -103,12 +101,11 @@ final class LoggerStoreTests: XCTestCase {
 
         // WHEN
         let store = try XCTUnwrap(LoggerStore(storeURL: storeURL))
+        defer { store.destroyStores() }
 
         // THEN
         XCTAssertEqual(try store.allMessages().count, 23)
         XCTAssertEqual(try store.allNetworkRequests().count, 4)
-
-        store.destroyStores()
     }
 
     func testInitWithArchiveURLNoExtension() throws {
@@ -118,6 +115,7 @@ final class LoggerStoreTests: XCTestCase {
 
         // WHEN
         let store = try XCTUnwrap(LoggerStore(storeURL: storeURL))
+        defer { store.destroyStores() }
 
         // THEN
         XCTAssertEqual(try store.allMessages().count, 23)
@@ -133,6 +131,7 @@ final class LoggerStoreTests: XCTestCase {
 
         // WHEN
         let store = try XCTUnwrap(LoggerStore(storeURL: storeURL))
+        defer { store.destroyStores() }
 
         // THEN
         XCTAssertEqual(try store.allMessages().count, 23)
@@ -151,12 +150,11 @@ final class LoggerStoreTests: XCTestCase {
 
         // WHEN
         let store = try XCTUnwrap(LoggerStore(storeURL: storeURL))
+        defer { store.destroyStores() }
 
         // THEN
         XCTAssertEqual(try store.allMessages().count, 23)
         XCTAssertEqual(try store.allNetworkRequests().count, 4)
-
-        store.destroyStores()
     }
 
     // MARK: - Copy (Directory)
@@ -180,9 +178,10 @@ final class LoggerStoreTests: XCTestCase {
 
         // THEN
         let copy = try LoggerStore(storeURL: copyURL)
+        defer { copy.destroyStores() }
+
         XCTAssertEqual(try copy.allMessages().count, 10)
         XCTAssertEqual(try copy.allNetworkRequests().count, 3)
-        copy.destroyStores()
     }
 
     func testCopyToNonExistingFolder() throws {
@@ -257,9 +256,10 @@ final class LoggerStoreTests: XCTestCase {
 
         // THEN
         let copy = try LoggerStore(storeURL: copyURL)
+        defer { copy.destroyStores() }
+
         XCTAssertEqual(try copy.allMessages().count, 23)
         XCTAssertEqual(try copy.allNetworkRequests().count, 4)
-        copy.destroyStores()
     }
 
     // MARK: - File (Readonly)
@@ -275,7 +275,6 @@ final class LoggerStoreTests: XCTestCase {
 
         // WHEN/THEN
         store.storeMessage(label: "test", level: .info, message: "test", metadata: nil)
-        flush(store: store)
 
         // THEN nothing is written
         XCTAssertEqual(try store.allMessages().count, 23)
@@ -287,8 +286,12 @@ final class LoggerStoreTests: XCTestCase {
     // MARK: - Expiration
 
     func testSizeLimit() throws {
-        let limitBefore = LoggerStore.databaseSizeLimit
-        defer { LoggerStore.databaseSizeLimit = limitBefore }
+        let store = try! LoggerStore(
+            storeURL: directory.url.appendingPathComponent(UUID().uuidString),
+            options: [.create, .synchronous],
+            configuration: .init(databaseSizeLimit: 5000)
+        )
+        defer { store.destroyStores() }
 
         // GIVEN
         let context = store.container.viewContext
@@ -324,9 +327,7 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertEqual(try context.fetch(LoggerMetadataEntity.fetchRequest()).count, 10)
 
         // WHEN
-        LoggerStore.databaseSizeLimit = 5_000 // In reality this is always going to be ignored
         store.sweep()
-        flush(store: store)
 
         // THEN
         let copyURL2 = tempDirectoryURL.appendingFilename(UUID().uuidString).appendingPathExtension("pulse")
@@ -355,6 +356,7 @@ final class LoggerStoreTests: XCTestCase {
 
         // WHEN migrating to the store with the latest model
         let store = try LoggerStore(storeURL: storeURL)
+        defer { store.destroyStores() }
 
         // THEN automatic migration is performed and new field are populated with
         // empty values
@@ -366,8 +368,6 @@ final class LoggerStoreTests: XCTestCase {
 
         // THEN can write new messages
         XCTAssertEqual(try store.allMessages().count, 1)
-
-        store.destroyStores()
     }
 
     // MARK: - Remove Messages
@@ -376,7 +376,6 @@ final class LoggerStoreTests: XCTestCase {
         // GIVEN
         populate2(store: store)
         store.storeMessage(label: "with meta", level: .debug, message: "test", metadata: ["hey": .string("this is meta yo")], file: #file, function: #function, line: #line)
-        flush(store: store)
 
         let context = store.container.viewContext
         XCTAssertEqual(try context.fetch(LoggerMessageEntity.fetchRequest()).count, 11)
@@ -399,6 +398,51 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertTrue(try context.fetch(LoggerNetworkRequestEntity.fetchRequest()).isEmpty)
         XCTAssertTrue(try context.fetch(LoggerNetworkRequestDetailsEntity.fetchRequest()).isEmpty)
     }
+
+    // MARK: - Image Support
+
+#if os(iOS)
+    func testImageThumbnailsAreStored() throws {
+        // GIVEN
+        let image = try makeMockImage()
+        XCTAssertEqual(image.size, CGSize(width: 2048, height: 2048))
+        let imageData = try XCTUnwrap(image.pngData())
+
+        // WHEN
+        let url = try XCTUnwrap(URL(string: "https://example.com/image"))
+        let taskId = UUID()
+
+        let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: "http/2.0", headerFields: [
+            "Content-Type": "image/png"
+        ])
+
+        store.storeRequest(taskId: taskId, taskType: .dataTask, request: URLRequest(url: url), response: response, error: nil, data: imageData, metrics: nil)
+
+        // THEN
+        let request = try XCTUnwrap(store.allNetworkRequests().first(where: { $0.taskId == taskId }))
+        let responseBodyKey = try XCTUnwrap(request.responseBodyKey)
+        let processedData = try XCTUnwrap(store.getData(forKey: responseBodyKey))
+        let thumbnail = try XCTUnwrap(UIImage(data: processedData))
+        XCTAssertEqual(thumbnail.size, CGSize(width: 256, height: 256))
+
+        // THEN original image size saved
+        let metadata = try XCTUnwrap(JSONDecoder().decode([String: String].self, from: request.details.metadata ?? Data()))
+        XCTAssertEqual(metadata["ResponsePixelWidth"].flatMap { Int($0) }, 2048)
+        XCTAssertEqual(metadata["ResponsePixelHeight"].flatMap { Int($0) }, 2048)
+    }
+
+    private func makeMockImage() throws -> UIImage {
+        UIGraphicsBeginImageContextWithOptions(CGSize(width: 2048, height: 2048), true, 1)
+        let context = try XCTUnwrap(UIGraphicsGetCurrentContext())
+
+        UIColor.red.setFill()
+        context.fill(CGRect(x: 0, y: 0, width: 2048, height: 2048))
+
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return try XCTUnwrap(image)
+    }
+#endif
 }
 
 private extension LoggerStore {

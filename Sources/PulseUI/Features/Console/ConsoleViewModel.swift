@@ -49,7 +49,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 
         self.controller = NSFetchedResultsController<LoggerMessageEntity>(fetchRequest: request, managedObjectContext: store.container.viewContext, sectionNameKeyPath: nil, cacheName: nil)
 
-        self.searchCriteria = ConsoleSearchCriteriaViewModel(isDefaultStore: store === LoggerStore.default)
+        self.searchCriteria = ConsoleSearchCriteriaViewModel(isDefaultStore: store === LoggerStore.shared)
 #if os(iOS) || os(macOS)
         self.table = ConsoleTableViewModel(store: store, searchCriteriaViewModel: searchCriteria)
 #endif
@@ -110,7 +110,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         if latestSessionId == nil {
             latestSessionId = entities.first?.session
         }
-        let sessionId = store === LoggerStore.default ? LoggerSession.current.id.uuidString : latestSessionId
+        let sessionId = store === LoggerStore.shared ? LoggerStore.Session.current.id.uuidString : latestSessionId
 
         // Search messages
         ConsoleSearchCriteria.update(request: controller.fetchRequest, filterTerm: filterTerm, criteria: searchCriteria.criteria, filters: searchCriteria.filters, sessionId: sessionId, isOnlyErrors: isOnlyErrors, isOnlyNetwork: isOnlyNetwork)

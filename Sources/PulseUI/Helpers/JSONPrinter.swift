@@ -17,7 +17,7 @@ enum JSONElement {
 }
 
 protocol JSONRenderer: AnyObject {
-    func append(_ string: String, element: JSONElement, error: NetworkLoggerDecodingError?)
+    func append(_ string: String, element: JSONElement, error: NetworkLogger.DecodingError?)
     func indent(count: Int)
     func newline()
 }
@@ -25,7 +25,7 @@ protocol JSONRenderer: AnyObject {
 final class HTMLJSONRender: JSONRenderer {
     private var output = ""
 
-    func append(_ string: String, element: JSONElement, error: NetworkLoggerDecodingError?) {
+    func append(_ string: String, element: JSONElement, error: NetworkLogger.DecodingError?) {
         let htmlClass = error == nil ? getClass(for: element) : "err"
         output.append("<span class=\"\(htmlClass)\">\(string)</span>")
     }
@@ -56,20 +56,20 @@ private func getClass(for element: JSONElement) -> String {
 final class JSONPrinter {
     private let renderer: JSONRenderer
     private var indentation = 0
-    private var error: NetworkLoggerDecodingError?
-    private var codingPath: [NetworkLoggerDecodingError.CodingKey] = []
+    private var error: NetworkLogger.DecodingError?
+    private var codingPath: [NetworkLogger.DecodingError.CodingKey] = []
 
     init(renderer: JSONRenderer) {
         self.renderer = renderer
     }
 
-    func render(json: Any, error: NetworkLoggerDecodingError?) {
+    func render(json: Any, error: NetworkLogger.DecodingError?) {
         self.error = error
         print(json: json, isFree: true)
     }
 
     private func print(json: Any, isFree: Bool) {
-        func _print(json: Any, key: NetworkLoggerDecodingError.CodingKey, isFree: Bool) {
+        func _print(json: Any, key: NetworkLogger.DecodingError.CodingKey, isFree: Bool) {
             codingPath.append(key)
             print(json: json, isFree: isFree)
             _ = codingPath.popLast()
@@ -141,7 +141,7 @@ final class JSONPrinter {
     }
 
     func append(_ string: String, _ element: JSONElement) {
-        var error: NetworkLoggerDecodingError?
+        var error: NetworkLogger.DecodingError?
         if codingPath == self.error?.context?.codingPath {
             error = self.error
             self.error = nil
@@ -192,7 +192,7 @@ final class AttributedStringJSONRenderer: JSONRenderer {
         self.lineHeight = lineHeight
     }
 
-    func append(_ string: String, element: JSONElement, error: NetworkLoggerDecodingError?) {
+    func append(_ string: String, element: JSONElement, error: NetworkLogger.DecodingError?) {
         var attributes = self.attributes[element]!
         if let error = error {
             attributes[.backgroundColor] = UXColor.red

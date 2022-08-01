@@ -74,9 +74,11 @@ private final class SessionDelegate: NSObject, WCSessionDelegate {
                         Text("Store received")
                         Spacer().frame(width: 16)
                         Button("Open", action: {
-                            let store = try? LoggerStore(storeURL: storeURL)
+                            guard let store = try? LoggerStore(storeURL: storeURL) else {
+                                return
+                            }
                             let vc = UIViewController.present { dismiss in
-                                MainView(store: store ?? .empty, onDismiss: dismiss)
+                                MainView(store: store, onDismiss: dismiss)
                             }
                             vc?.onDeinit(directory.remove)
                         }).foregroundColor(Color.blue)

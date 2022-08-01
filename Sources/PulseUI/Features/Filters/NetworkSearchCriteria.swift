@@ -170,7 +170,7 @@ struct NetworkSearchCriteria: Hashable {
 
         enum TaskType: Hashable {
             case any
-            case some(NetworkLoggerTaskType)
+            case some(NetworkLogger.TaskType)
         }
 
         static let `default` = NetworkingFilter()
@@ -327,23 +327,23 @@ private struct CacheKey: Hashable {
 private var responseBodyCache = Cache<String, String?>(costLimit: 30_870_912, countLimit: 1000)
 
 func evaluateProgrammaticFilters(_ filters: [NetworkSearchFilter], entity: LoggerNetworkRequestEntity, store: LoggerStore) -> Bool {
-    var request: NetworkLoggerRequest? {
+    var request: NetworkLogger.Request? {
         let key = CacheKey(id: entity.objectID, code: 0)
-        if let value = cache.value(forKey: key) as? NetworkLoggerRequest {
+        if let value = cache.value(forKey: key) as? NetworkLogger.Request {
             return value
         }
-        let value = entity.details.originalRequest.flatMap(decode(NetworkLoggerRequest.self))
+        let value = entity.details.originalRequest.flatMap(decode(NetworkLogger.Request.self))
         if let value = value {
             cache.set(value, forKey: key, ttl: 60)
         }
         return value
     }
-    var response: NetworkLoggerResponse? {
+    var response: NetworkLogger.Response? {
         let key = CacheKey(id: entity.objectID, code: 1)
-        if let value = cache.value(forKey: key) as? NetworkLoggerResponse {
+        if let value = cache.value(forKey: key) as? NetworkLogger.Response {
             return value
         }
-        let value = entity.details.response.flatMap(decode(NetworkLoggerResponse.self))
+        let value = entity.details.response.flatMap(decode(NetworkLogger.Response.self))
         if let value = value {
             cache.set(value, forKey: key, ttl: 60)
         }

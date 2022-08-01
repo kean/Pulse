@@ -13,7 +13,7 @@ public struct PinsView: View {
     @ObservedObject var viewModel: PinsViewModel
     @Environment(\.colorScheme) private var colorScheme: ColorScheme
     
-    public init(store: LoggerStore = .default) {
+    public init(store: LoggerStore = .shared) {
         self.viewModel = PinsViewModel(store: store)
     }
 

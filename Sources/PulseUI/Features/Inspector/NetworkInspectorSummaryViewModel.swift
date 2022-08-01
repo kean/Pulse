@@ -241,9 +241,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     var requestBodyViewModel: FileViewerViewModel {
         FileViewerViewModel(
             title: "Request",
-            contentType: details.originalRequest?.headers["Content-Type"],
-            originalSize: request.requestBodySize,
-            error: nil,
+            context: details.requestFileViewerContext,
             data: { [weak self] in self?.requestData ?? Data() }
         )
     }
@@ -255,9 +253,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     var responseBodyViewModel: FileViewerViewModel {
         FileViewerViewModel(
             title: "Response",
-            contentType: request.contentType,
-            originalSize: request.responseBodySize,
-            error: details.error?.error as? NetworkLoggerDecodingError,
+            context: details.responseFileViewerContext,
             data: { [weak self] in self?.responseData ?? Data() }
         )
     }

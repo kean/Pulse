@@ -43,9 +43,7 @@ final class NetworkInspectorResponseViewModel: ObservableObject {
            !responseBody.isEmpty {
             _fileViewModel = FileViewerViewModel(
                 title: "Response",
-                contentType: request.contentType,
-                originalSize: request.responseBodySize,
-                error: details.error?.error as? NetworkLoggerDecodingError,
+                context: details.responseFileViewerContext,
                 data: { responseBody }
             )
         }

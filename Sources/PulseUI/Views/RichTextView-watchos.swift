@@ -27,7 +27,7 @@ final class RichTextViewModel: ObservableObject {
         self.text = string.string
     }
 
-    convenience init(json: Any, error: NetworkLoggerDecodingError?) {
+    convenience init(json: Any, error: NetworkLogger.DecodingError?) {
         self.init(string: format(json: json))
     }
 }
