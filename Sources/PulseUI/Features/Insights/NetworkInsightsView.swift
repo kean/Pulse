@@ -207,6 +207,7 @@ final class NetworkInsightsViewModel: ObservableObject {
         return "\(DurationFormatter.string(from: min, isPrecise: false)) – \(DurationFormatter.string(from: max, isPrecise: false))"
     }
 
+#if swift(>=5.7)
     @available(iOS 16.0, *)
     struct Bar: Identifiable {
         var id: Int { index }
@@ -225,6 +226,7 @@ final class NetworkInsightsViewModel: ObservableObject {
             Bar(index: key, range: bins[key], count: values.count)
         }
     }
+#endif
 
     init(store: LoggerStore) {
         self.store = store
