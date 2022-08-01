@@ -353,18 +353,72 @@ private let mockPatchRepoResponse = HTTPURLResponse(url: "https://github.com/rep
 private let mockPatchRepoResponseBody = """
 {
   "id": 1296269,
-  "node_id": "MDEwOlJlcG9zaXRvcnkxMjk2MjY5"
+  "node_id": "MDEwOlJlcG9zaXRvcnkxMjk2MjY5",
+  "name": "Hello-World",
+  "full_name": "octocat/Hello-World",
+  "owner": {
+    "login": "octocat",
+    "id": 1,
+    "node_id": "MDQ6VXNlcjE=",
+    "avatar_url": "https://github.com/images/error/octocat_happy.gif",
+    "url": "https://api.github.com/users/octocat",
+    "html_url": "https://github.com/octocat",
+    "type": "User",
+    "site_admin": false
+  },
+  "private": false,
+  "description": "This your first repo!",
+  "fork": false,
+  "url": "https://api.github.com/repos/octocat/Hello-World",
+  "homepage": "https://github.com",
+  "license": {
+    "key": "mit",
+    "name": "MIT License",
+    "url": "https://api.github.com/licenses/mit"
+  },
+  "language": null,
+  "forks": 9,
+  "watchers": 80,
+  "size": 108,
+  "default_branch": "master",
+  "open_issues": 0,
+  "is_template": false,
+  "topics": [
+    "octocat",
+    "atom",
+    "electron",
+    "api"
+  ],
+  "archived": false,
+  "disabled": false,
+  "visibility": "public",
+  "pushed_at": "2011-01-26T19:06:43Z",
+  "created_at": "2011-01-26T19:01:12Z",
+  "updated_at": "2011-01-26T19:14:43Z",
+  "permissions": {
+    "pull": true,
+    "push": false,
+    "admin": false
+  },
+  "subscribers_count": 42,
+  "organization": {
+    "login": "octocat",
+    "id": 1,
+    "avatar_url": "https://github.com/images/error/octocat_happy.gif",
+    "url": "https://api.github.com/users/octocat",
+    "type": "Organization",
+    "site_admin": false
+  }
 }
 """.data(using: .utf8)!
 
 private let mockPatchRepoDecodingError: Error = {
     struct Repo: Decodable {
         let id: String
-        let node: String
     }
     do {
         _ = try JSONDecoder().decode(Repo.self, from: mockPatchRepoResponseBody)
-        return URLError(.unknown)
+        fatalError()
     } catch {
         return error
     }

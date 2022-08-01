@@ -125,9 +125,9 @@ struct RichTextView<ExtraMenu: View>: View {
                 }
                 .foregroundColor(.white)
                 .padding(8)
-                .background(Color.red.opacity(0.85))
+                .background(Color.red.opacity(0.9))
                 .cornerRadius(12)
-                .frame(maxWidth: 320)
+                .frame(maxWidth: 400)
                 Spacer()
             }
             .padding()
