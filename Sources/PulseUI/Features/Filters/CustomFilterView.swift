@@ -37,7 +37,7 @@ struct CustomFilterView: View {
         .cornerRadius(8)
     }
 
-    // TOOD: On iOS 16, inline picker looks OK
+    // TODO: On iOS 16, inline picker looks OK
     private var fieldMenu: some View {
         Menu(content: {
             fieldPicker

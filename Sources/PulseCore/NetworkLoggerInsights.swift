@@ -28,7 +28,7 @@ public final class NetworkLoggerInsights {
 
     private let queue = DispatchQueue(label: "com.githun.kean.network-logger-insights")
 
-    /// Registers a given store. More than one store can be reigstered.
+    /// Registers a given store. More than one store can be registered.
     public func register(store: LoggerStore) {
         store.events.receive(on: queue).sink { [weak self] in
             self?.process(event: $0)
