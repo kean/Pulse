@@ -144,6 +144,7 @@ final class JSONPrinter {
         var error: NetworkLoggerDecodingError?
         if codingPath == self.error?.context?.codingPath {
             error = self.error
+            self.error = nil
         }
         renderer.append(string, element: element, error: error)
     }
@@ -228,35 +229,5 @@ private extension NetworkLoggerDecodingError {
         }
     }
 }
-
-#if DEBUG
-
-struct JSONRenderer_Previews: PreviewProvider {
-    static var previews: some View {
-        Group {
-            FileViewer(viewModel: .init(title: "Response", contentType: "application/json", originalSize: 1200, error: generateTypeMismatchError(), data: { MockJSON.allPossibleValues }))
-                .previewDisplayName("Type Mismatch Error")
-
-        }
-    }
-}
-
-private func generateTypeMismatchError() -> NetworkLoggerDecodingError? {
-    struct JSON: Decodable {
-        let actors: [Actor]
-
-        struct Actor: Decodable {
-            let age: String
-        }
-    }
-    do {
-        _ = try JSONDecoder().decode(JSON.self, from: MockJSON.allPossibleValues)
-        return nil
-    } catch {
-        return NetworkLoggerDecodingError(error as! DecodingError)
-    }
-}
-
-#endif
 
 #endif
