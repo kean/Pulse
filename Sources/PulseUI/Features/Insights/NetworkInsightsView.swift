@@ -228,10 +228,10 @@ final class NetworkInsightsViewModel: ObservableObject {
     }
 #endif
 
-    init(store: LoggerStore) {
+    init(store: LoggerStore, insights: NetworkLoggerInsights = .shared) {
         self.store = store
-        self.insights = store.insights
-        store.insights.didUpdate.throttle(for: 1.0, scheduler: DispatchQueue.main, latest: true).sink { [weak self] in
+        self.insights = insights
+        insights.didUpdate.throttle(for: 1.0, scheduler: DispatchQueue.main, latest: true).sink { [weak self] in
             withAnimation {
                 self?.objectWillChange.send()
             }

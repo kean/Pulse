@@ -7,7 +7,7 @@ import Combine
 
 /// Collects insights about the current session.
 public final class NetworkLoggerInsights: @unchecked Sendable {
-    private var cancellables: [AnyCancellable] = []
+    private var cancellable: AnyCancellable?
 
     public var transferSize: NetworkLogger.Metrics.TransferSizeInfo { main.transferSize }
     public var duration: RequestsDurationInfo { main.duration }
@@ -24,15 +24,17 @@ public final class NetworkLoggerInsights: @unchecked Sendable {
         var failures = FailuresInfo()
     }
 
+    public static let shared = NetworkLoggerInsights()
+
     public let didUpdate = PassthroughSubject<Void, Never>()
 
     private let queue = DispatchQueue(label: "com.githun.kean.network-logger-insights")
 
-    /// Registers a given store. More than one store can be registered.
+    /// Registers a given store. Only one store can be registered.
     public func register(store: LoggerStore) {
-        store.events.receive(on: queue).sink { [weak self] in
+        cancellable = store.events.receive(on: queue).sink { [weak self] in
             self?.process(event: $0)
-        }.store(in: &cancellables)
+        }
     }
 
     private func process(event: LoggerStore.Event) {

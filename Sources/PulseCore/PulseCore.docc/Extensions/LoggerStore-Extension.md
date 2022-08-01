@@ -42,10 +42,6 @@
 - ``events``
 - ``Event``
 
-### Network Insights
-
-- ``insights``
-
 ### Nested
 
 - ``Session``

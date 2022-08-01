@@ -54,8 +54,6 @@ public final class LoggerStore: @unchecked Sendable {
     /// Re-transmits events processed by the store.
     public let events = PassthroughSubject<Event, Never>()
 
-    public let insights = NetworkLoggerInsights()
-
     private let options: Options
     private let configuration: Configuration
     private var isSaveScheduled = false
@@ -67,19 +65,25 @@ public final class LoggerStore: @unchecked Sendable {
     ///
     /// You can replace the default store with a custom one. If you replace the
     /// shared store, it automatically gets registered as the default store
-    /// for ``RemoteLogger``.
+    /// for ``RemoteLogger`` and ``NetworkLoggerInsights``.
     public static var shared = LoggerStore.makeDefault() {
-        didSet {
-            if #available(iOS 14.0, tvOS 14.0, *) {
-                RemoteLogger.shared.initialize(store: shared)
-            }
+        didSet { register(store: shared) }
+    }
+
+    private static func register(store: LoggerStore) {
+        if #available(iOS 14.0, tvOS 14.0, *) {
+            RemoteLogger.shared.initialize(store: store)
         }
+        NetworkLoggerInsights.shared.register(store: store)
     }
 
     private static func makeDefault() -> LoggerStore {
         let storeURL = URL.logs.appendingPathComponent("current.pulse", isDirectory: true)
-        let store = try? LoggerStore(storeURL: storeURL, options: [.create, .sweep])
-        return store ?? LoggerStore(inMemoryStore: storeURL) // Right side should never happend
+        guard let store = try? LoggerStore(storeURL: storeURL, options: [.create, .sweep]) else {
+            return LoggerStore(inMemoryStore: storeURL) // Right side should never happend
+        }
+        register(store: store)
+        return store
     }
 
     // MARK: Configuration
@@ -196,8 +200,6 @@ public final class LoggerStore: @unchecked Sendable {
         self.isReadonly = false
         self.info = nil
         self.document = .directory(blobs: BlobStore(path: blobsURL, sizeLimit: configuration.blobsSizeLimit))
-
-        self.insights.register(store: self)
 
         if options.contains(.sweep) {
             DispatchQueue.global().asyncAfter(deadline: .now() + .seconds(10)) { [weak self] in
