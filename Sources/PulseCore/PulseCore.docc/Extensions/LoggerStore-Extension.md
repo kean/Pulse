@@ -12,25 +12,44 @@
 - ``Options``
 - ``Configuration``
 
-### Receiving and Filtering Events
+### Instance Properties
 
-- ``events``
-- ``Event``
+- ``container``
+- ``backgroundContext``
+- ``info-swift.property``
+- ``Info-swift.struct``
+- ``isReadonly``
+- ``storeURL``
 
 ### Storing and Accessing Messages
 
 - ``storeMessage(label:level:message:metadata:file:function:line:)``
 - ``allMessages()``
+- ``removeAll()``
 
 ### Storing and Accessing Network Requests
 
 - ``storeRequest(_:response:error:data:metrics:)``
 - ``allNetworkRequests()``
-
-### Accessing Response Blobs
-
 - ``getData(forKey:)``
 
 ### Sharing the Store
 
 - ``copy(to:)``
+
+### Receiving and Filtering Events
+
+- ``events``
+- ``Event``
+
+### Network Insights
+
+- ``insights``
+
+### Nested
+
+- ``Session``
+- ``Error``
+- ``Level``
+- ``Metadata``
+- ``MetadataValue``

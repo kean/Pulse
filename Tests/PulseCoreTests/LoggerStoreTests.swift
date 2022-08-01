@@ -328,6 +328,7 @@ final class LoggerStoreTests: XCTestCase {
 
         // WHEN
         store.sweep()
+        store.backgroundContext.performAndWait {}
 
         // THEN
         let copyURL2 = tempDirectoryURL.appendingFilename(UUID().uuidString).appendingPathExtension("pulse")

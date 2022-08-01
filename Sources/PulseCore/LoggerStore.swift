@@ -6,9 +6,9 @@ import Foundation
 import CoreData
 import Combine
 
-/// Persistently stores all the logged messages, network requests, and response blobs.
+/// Persistently stores logs, network requests, and response blobs.
 ///
-/// The recommended way to use the store is by installing `Pulse` module and using
+/// The recommended way to use the store is by adding the `Pulse` module and using
 /// it with the Swift Logging system ([SwiftLog](https://github.com/apple/swift-log)).
 ///
 /// ```swift
@@ -27,7 +27,7 @@ import Combine
 /// ```
 ///
 /// But SwiftLog is not required and ``LoggerStore`` can also just as easily be used
-/// directly. You can either create a custom store, or use ``LoggerStore/shared`` one.
+/// directly. You can either create a custom store or use ``LoggerStore/shared`` one.
 public final class LoggerStore: @unchecked Sendable {
     /// The URL the store was initialized with.
     public let storeURL: URL
@@ -75,11 +75,6 @@ public final class LoggerStore: @unchecked Sendable {
             }
         }
     }
-
-    /// Returns a URL for the directory where all Pulse stores are located.
-    /// The current store is located in the "./current" directory, the rest the stores
-    /// are in "./archive".
-    public static var logsURL: URL { URL.logs }
 
     private static func makeDefault() -> LoggerStore {
         let storeURL = URL.logs.appendingPathComponent("current.pulse", isDirectory: true)
@@ -766,8 +761,8 @@ extension LoggerStore {
 // MARK: - LoggerStore (Sweep)
 
 extension LoggerStore {
-    public func sweep() {
-        perform { try? self._sweep() }
+    func sweep() {
+        backgroundContext.perform { try? self._sweep() }
     }
 
     private func _sweep() throws {
