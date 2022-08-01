@@ -103,21 +103,22 @@ struct FileViewer: View {
 struct NetworkInspectorResponseView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            FileViewer(viewModel: .init(title: "Response", contentType: "application/json", originalSize: 1200, data: { MockJSON.allPossibleValues }))
+            FileViewer(viewModel: .init(title: "Response", contentType: "application/json", originalSize: 1200, error: nil, data: { MockJSON.allPossibleValues }))
                 .previewDisplayName("JSON")
 
-            FileViewer(viewModel: .init(title: "Response", contentType: "image/png", originalSize: 219543, data: { MockTask.octocat.responseBody }))
+            FileViewer(viewModel: .init(title: "Response", contentType: "image/png", originalSize: 219543, error: nil, data: { MockTask.octocat.responseBody }))
                 .previewDisplayName("Image")
 
-            FileViewer(viewModel: .init(title: "Response", contentType: "application/html", originalSize: 1200, data: { MockTask.profile.responseBody }))
+            FileViewer(viewModel: .init(title: "Response", contentType: "application/html", originalSize: 1200, error: nil, data: { MockTask.profile.responseBody }))
                 .previewDisplayName("HTML")
 
-            FileViewer(viewModel: .init(title: "Response", contentType: "application/x-www-form-urlencoded", originalSize: 1200, data: { MockTask.patchRepo.originalRequest.httpBody ?? Data() }))
+            FileViewer(viewModel: .init(title: "Response", contentType: "application/x-www-form-urlencoded", originalSize: 1200, error: nil, data: { MockTask.patchRepo.originalRequest.httpBody ?? Data() }))
                 .previewDisplayName("Query Items")
         }
     }
 }
 
+#warning("TODO: remove ")
 enum MockJSON {
     static let allPossibleValues = """
     {
@@ -153,7 +154,23 @@ enum MockJSON {
             "Avri Roel",
             "Exton Elias"
           ]
-        }
+        },
+            {
+              "name": "Robert Downey Jr.",
+              "age": 53,
+              "born At": "New York City, NY",
+              "birthdate": "April 4, 1965",
+              "photo": "https://jsonformatter.org/img/Robert-Downey-Jr.jpg",
+              "wife": "Susan Downey",
+              "weight": 77.1,
+              "hasChildren": true,
+              "hasGreyHair": false,
+              "children": [
+                "Indio Falconer",
+                "Avri Roel",
+                "Exton Elias"
+              ]
+            }
       ]
     }
     """.data(using: .utf8)!

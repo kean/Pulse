@@ -17,8 +17,7 @@ final class FileViewerViewModel: ObservableObject {
 
     @Published private(set) var contents: Contents?
 
-    #warning("TODO: pass error")
-    init(title: String, contentType: String?, originalSize: Int64, error: NetworkLoggerDecodingError? = nil, data: @escaping () -> Data) {
+    init(title: String, contentType: String?, originalSize: Int64, error: NetworkLoggerDecodingError?, data: @escaping () -> Data) {
         self.title = title
         self.contentType = contentType
         self.originalSize = originalSize

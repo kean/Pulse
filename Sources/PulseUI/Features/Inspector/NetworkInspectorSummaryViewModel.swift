@@ -243,6 +243,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
             title: "Request",
             contentType: details.originalRequest?.headers["Content-Type"],
             originalSize: request.requestBodySize,
+            error: nil,
             data: { [weak self] in self?.requestData ?? Data() }
         )
     }
@@ -256,6 +257,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
             title: "Response",
             contentType: request.contentType,
             originalSize: request.responseBodySize,
+            error: details.error?.error as? NetworkLoggerDecodingError,
             data: { [weak self] in self?.responseData ?? Data() }
         )
     }

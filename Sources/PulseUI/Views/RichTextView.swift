@@ -13,6 +13,7 @@ struct RichTextView<ExtraMenu: View>: View {
     @ObservedObject private var viewModel: RichTextViewModel
     @State private var isExpanded = false
     @State private var isScrolled = false
+    @State private var isShowingError = true
     var isAutomaticLinkDetectionEnabled = true
     var hasVerticalScroller = false
     var onToggleExpanded: (() -> Void)?
@@ -34,8 +35,11 @@ struct RichTextView<ExtraMenu: View>: View {
         VStack(spacing: 0) {
             searchToolbar
                 .backport.backgroundThickMaterial(enabled: isExpanded && isScrolled)
-            textView
-                .edgesIgnoringSafeArea(.bottom)
+            ZStack(alignment: .bottom) {
+                textView
+                    .edgesIgnoringSafeArea(.bottom)
+                errorView
+            }
             if viewModel.isSearching {
                 SearchToobar(viewModel: viewModel)
             }
@@ -85,7 +89,10 @@ struct RichTextView<ExtraMenu: View>: View {
     var body: some View {
         VStack(spacing: 0) {
 #if os(macOS)
-            WrappedTextView(text: viewModel.text, viewModel: viewModel, isAutomaticLinkDetectionEnabled: isAutomaticLinkDetectionEnabled, hasVerticalScroller: hasVerticalScroller)
+            ZStack(alignment: .bottom) {
+                WrappedTextView(text: viewModel.text, viewModel: viewModel, isAutomaticLinkDetectionEnabled: isAutomaticLinkDetectionEnabled, hasVerticalScroller: hasVerticalScroller)
+                errorView
+            }
 #else
             WrappedTextView(text: viewModel.text, viewModel: viewModel, isAutomaticLinkDetectionEnabled: isAutomaticLinkDetectionEnabled)
 #endif
@@ -96,6 +103,30 @@ struct RichTextView<ExtraMenu: View>: View {
         }
     }
 #endif
+
+    @ViewBuilder
+    private var errorView: some View {
+        if let error = viewModel.error?.context?.debugDescription, isShowingError {
+            HStack {
+                Spacer()
+                HStack {
+                    Image(systemName: "xmark.octagon.fill")
+                        .font(.title)
+                    Text(error).bold()
+                }
+                .foregroundColor(.white)
+                .padding(8)
+                .background(Color.red.opacity(0.85))
+                .cornerRadius(12)
+                .frame(maxWidth: 320)
+                Spacer()
+            }
+            .padding()
+            .onTapGesture {
+                isShowingError = false
+            }
+        }
+    }
 }
 
 extension RichTextView where ExtraMenu == EmptyView {
@@ -269,6 +300,7 @@ final class RichTextViewModel: ObservableObject {
     @Published var isSearching = false
     @Published var searchTerm: String = ""
     @Published var options: StringSearchOptions = .default
+    var error: NetworkLoggerDecodingError?
 
     let text: NSAttributedString
     private let string: String
@@ -287,6 +319,7 @@ final class RichTextViewModel: ObservableObject {
         let printer = JSONPrinter(renderer: renderer)
         printer.render(json: json, error: error)
         self.init(string: renderer.make())
+        self.error = error
     }
 
     convenience init(string: String) {

@@ -45,6 +45,7 @@ final class NetworkInspectorResponseViewModel: ObservableObject {
                 title: "Response",
                 contentType: request.contentType,
                 originalSize: request.responseBodySize,
+                error: details.error?.error as? NetworkLoggerDecodingError,
                 data: { responseBody }
             )
         }

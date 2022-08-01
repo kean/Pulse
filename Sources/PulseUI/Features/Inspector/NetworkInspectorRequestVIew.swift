@@ -44,6 +44,7 @@ final class NetworkInspectorRequestViewModel: ObservableObject {
                 title: "Request",
                 contentType: details.originalRequest?.headers["Content-Type"] ?? details.currentRequest?.headers["Content-Type"],
                 originalSize: request.requestBodySize,
+                error: nil,
                 data: { requestBody }
             )
         }

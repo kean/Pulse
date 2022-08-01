@@ -194,9 +194,10 @@ final class AttributedStringJSONRenderer: JSONRenderer {
 
     func append(_ string: String, element: JSONElement, error: NetworkLoggerDecodingError?) {
         var attributes = self.attributes[element]!
-        if error != nil {
-            attributes[.backgroundColor] = UXColor.red.withAlphaComponent(1)
+        if let error = error {
+            attributes[.backgroundColor] = UXColor.red
             attributes[.foregroundColor] = UXColor.white
+            attributes[.decodingError] = error
         }
         output.append(string, attributes)
     }
@@ -218,16 +219,8 @@ final class AttributedStringJSONRenderer: JSONRenderer {
     }
 }
 
-private extension NetworkLoggerDecodingError {
-    var context: Context? {
-        switch self {
-        case .typeMismatch(_, let context): return context
-        case .valueNotFound(_, let context): return context
-        case .keyNotFound(_, let context): return context
-        case .dataCorrupted(let context): return context
-        case .unknown: return nil
-        }
-    }
+extension NSAttributedString.Key {
+    static let decodingError = NSAttributedString.Key(rawValue: "com.github.kean.pulse.decoding-error-key")
 }
 
 #endif

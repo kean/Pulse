@@ -6,7 +6,7 @@ import Foundation
 import SwiftUI
 import PulseCore
 
-#if os(iOS)
+#if os(iOS) || os(macOS)
 
 #if DEBUG
 
