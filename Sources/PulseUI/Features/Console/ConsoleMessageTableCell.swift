@@ -26,22 +26,14 @@ final class ConsoleMessageTableCell: UITableViewCell, UIContextMenuInteractionDe
     }
 
     private func createView() {
-        let stack = UIView.vStack(spacing: 4, [
-            .hStack(alignment: .center, spacing: 8, [
-                title, UIView(), accessory
-            ]),
-            details
+        let topStack = UIView.hStack(alignment: .center, spacing: 8, [
+            title, UIView(), pin, accessory
         ])
+        topStack.setCustomSpacing(4, after: pin)
+        let stack = UIView.vStack(spacing: 4, [topStack, details])
 
         contentView.addSubview(stack)
         stack.pinToSuperview(insets: .init(top: 10, left: 16, bottom: 10, right: 12))
-
-        contentView.addSubview(pin)
-        pin.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            pin.firstBaselineAnchor.constraint(equalTo: title.firstBaselineAnchor),
-            pin.leadingAnchor.constraint(equalTo: title.trailingAnchor, constant: 6)
-        ])
 
         title.font = .preferredFont(forTextStyle: .caption1)
         details.font = .systemFont(ofSize: 15)

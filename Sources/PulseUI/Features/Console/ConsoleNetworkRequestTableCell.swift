@@ -33,12 +33,11 @@ final class ConsoleNetworkRequestTableCell: UITableViewCell, UIContextMenuIntera
     }
 
     private func createView() {
-        let stack = UIView.vStack(spacing: 4, [
-            .hStack(alignment: .center, spacing: 8, [
-                badge, title, pin, UIView(), accessory
-            ]),
-            details
+        let topStack = UIView.hStack(alignment: .center, spacing: 8, [
+            badge, title, UIView(), pin, accessory
         ])
+        topStack.setCustomSpacing(4, after: pin)
+        let stack = UIView.vStack(spacing: 4, [topStack, details])
 
         contentView.addSubview(stack)
         stack.pinToSuperview(insets: .init(top: 10, left: 16, bottom: 10, right: 12))
