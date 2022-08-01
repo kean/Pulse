@@ -208,13 +208,14 @@ private final class HTMLRenderer: Renderer {
         contents.append("</pre>")
     }
 
+    #warning("TODO: pass error")
     private func makePre(data: Data) -> String {
         guard let json = try? JSONSerialization.jsonObject(with: data, options: []) else {
             return String(data: data, encoding: .utf8) ?? "Data: \(ByteCountFormatter.string(fromByteCount: Int64(data.count), countStyle: .memory))"
         }
         let renderer = HTMLJSONRender()
         let printer = JSONPrinter(renderer: renderer)
-        printer.render(json: json)
+        printer.render(json: json, error: nil)
         return renderer.make()
     }
 

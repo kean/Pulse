@@ -10,7 +10,7 @@ import CoreData
 
 enum MockStoreConfiguration {
     static let isDelayingLogs = false
-    static let isIndefinite = true
+    static let isIndefinite = false
     static let isUsingDefaultStore = false
 }
 

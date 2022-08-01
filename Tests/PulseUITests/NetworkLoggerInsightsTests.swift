@@ -9,6 +9,7 @@ import Combine
 @testable import PulseCore
 @testable import PulseUI
 
+#if os(iOS)
 final class NetworkLoggerInsightsTests: XCTestCase {
     private var cancellable: AnyCancellable?
 
@@ -19,11 +20,14 @@ final class NetworkLoggerInsightsTests: XCTestCase {
 
         // THEN
         let expectation = self.expectation(description: "WillChange")
-        expectation.expectedFulfillmentCount = 16
-        cancellable = insights.objectWillChange.sink { expectation.fulfill() }
+        expectation.expectedFulfillmentCount = try store.allNetworkRequests().count
+        cancellable = insights.didUpdate.sink {
+            expectation.fulfill()
+        }
         wait(for: [expectation], timeout: 2.0)
 
-        XCTAssertEqual(insights.duration.durations.count, 8)
-        XCTAssertEqual(insights.duration.durations.sorted(), insights.duration.durations)
+        XCTAssertEqual(insights.duration.values.count, 8)
+        XCTAssertEqual(insights.duration.values.sorted(), insights.duration.values)
     }
 }
+#endif

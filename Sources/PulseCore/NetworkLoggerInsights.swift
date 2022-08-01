@@ -9,10 +9,20 @@ import Combine
 public final class NetworkLoggerInsights {
     private var cancellables: [AnyCancellable] = []
 
-    private(set) public var transferSize = NetworkLoggerMetrics.TransferSizeInfo()
-    private(set) public var duration = RequestsDurationInfo()
-    private(set) public var redirects = RedirectsInfo()
-    private(set) public var failures = FailuresInfo()
+    public var transferSize: NetworkLoggerMetrics.TransferSizeInfo { main.transferSize }
+    public var duration: RequestsDurationInfo { main.duration }
+    public var redirects: RedirectsInfo { main.redirects }
+    public var failures: FailuresInfo { main.failures }
+
+    private var main = Contents()
+    private var contents = Contents()
+
+    private struct Contents {
+        var transferSize = NetworkLoggerMetrics.TransferSizeInfo()
+        var duration = RequestsDurationInfo()
+        var redirects = RedirectsInfo()
+        var failures = FailuresInfo()
+    }
 
     public let didUpdate = PassthroughSubject<Void, Never>()
 
@@ -37,41 +47,37 @@ public final class NetworkLoggerInsights {
     private func process(event: LoggerStoreEvent.NetworkTaskCompleted) {
         guard let metrics = event.metrics else { return }
 
-        var transferSize = self.transferSize
-        var duration = self.duration
-        var redirects = self.redirects
-        var failures = self.failures
-
-        transferSize = transferSize.merging(metrics.transferSize)
-        duration.insert(duration: TimeInterval(metrics.taskInterval.duration), taskId: event.taskId)
+        contents.transferSize = contents.transferSize.merging(metrics.transferSize)
+        contents.duration.insert(duration: TimeInterval(metrics.taskInterval.duration), taskId: event.taskId)
         if metrics.redirectCount > 0 {
-            redirects.count += metrics.redirectCount
-            redirects.taskIds.append(event.taskId)
-            redirects.timeLost += metrics.transactions
+            contents.redirects.count += metrics.redirectCount
+            contents.redirects.taskIds.append(event.taskId)
+            contents.redirects.timeLost += metrics.transactions
                 .filter({ $0.response?.statusCode == 302 })
                 .map { $0.duration ?? 0 }
                 .reduce(0, +)
         }
 
         if event.error != nil {
-            failures.taskIds.append(event.taskId)
+            contents.failures.taskIds.append(event.taskId)
         }
 
+        let contents = self.contents
+
         DispatchQueue.main.async {
-            self.transferSize = transferSize
-            self.duration = duration
-            self.redirects = redirects
-            self.failures = failures
+            self.main = contents
             self.didUpdate.send(())
         }
     }
 
     public func reset() {
-        self.transferSize = .init()
-        self.duration = .init()
-        self.redirects = .init()
-        self.failures = .init()
-        self.didUpdate.send(())
+        queue.async {
+            self.contents = .init()
+            DispatchQueue.main.async {
+                self.main = .init()
+                self.didUpdate.send(())
+            }
+        }
     }
 
     public struct RequestsDurationInfo {

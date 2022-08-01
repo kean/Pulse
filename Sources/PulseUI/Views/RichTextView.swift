@@ -282,18 +282,10 @@ final class RichTextViewModel: ObservableObject {
 
     private var bag = [AnyCancellable]()
 
-    convenience init(data: Data) {
-        if let json = try? JSONSerialization.jsonObject(with: data, options: []) {
-            self.init(json: json)
-        } else {
-            self.init(string: String(data: data, encoding: .utf8) ?? "Data \(ByteCountFormatter.string(fromByteCount: Int64(data.count), countStyle: .file))")
-        }
-    }
-
-    convenience init(json: Any) {
+    convenience init(json: Any, error: NetworkLoggerDecodingError?) {
         let renderer = AttributedStringJSONRenderer(fontSize: FontSize.body, lineHeight: FontSize.body + 5)
         let printer = JSONPrinter(renderer: renderer)
-        printer.render(json: json)
+        printer.render(json: json, error: error)
         self.init(string: renderer.make())
     }
 
@@ -404,7 +396,7 @@ private func highlight(range: Range<String.Index>, in text: NSMutableAttributedS
 #if DEBUG
 struct RichTextView_Previews: PreviewProvider {
     static var previews: some View {
-        RichTextView(viewModel: .init(data: MockJSON.allPossibleValues))
+        RichTextView(viewModel: .init(json: try! JSONSerialization.jsonObject(with: MockJSON.allPossibleValues), error: nil))
             .frame(height: 600)
             .previewLayout(.sizeThatFits)
     }

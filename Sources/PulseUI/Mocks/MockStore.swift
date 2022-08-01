@@ -14,7 +14,7 @@ extension LoggerStore {
 
         if MockStoreConfiguration.isDelayingLogs {
             func populate() {
-                populateStore(store)
+                asyncPopulateStore(store)
                 if !MockStoreConfiguration.isIndefinite {
                     DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(14)) {
                         populate()
@@ -25,7 +25,7 @@ extension LoggerStore {
                 populate()
             }
         } else {
-            populateStore(store)
+            _syncPopulateStore(store)
         }
 
         return store
@@ -60,13 +60,13 @@ private struct Logger {
 
 private var isFirstLog = true
 
-private func populateStore(_ store: LoggerStore) {
+private func asyncPopulateStore(_ store: LoggerStore) {
     Task { @MainActor in
-        await _populateStore(store)
+        await _asyncPopulateStore(store)
     }
 }
 
-private func _populateStore(_ store: LoggerStore) async {
+private func _asyncPopulateStore(_ store: LoggerStore) async {
     @Sendable func logger(named: String) -> Logger {
         Logger(label: named, store: store)
     }
@@ -85,7 +85,7 @@ private func _populateStore(_ store: LoggerStore) async {
         logger(named: "application")
             .log(level: .info, "UIApplication.willEnterForeground")
 
-        if MockStoreConfiguration.isDelayingLogs { await Task.sleep(milliseconds: 300) }
+        await Task.sleep(milliseconds: 300)
 
         logger(named: "auth")
             .log(level: .trace, "Instantiated Session")
@@ -93,18 +93,14 @@ private func _populateStore(_ store: LoggerStore) async {
         logger(named: "auth")
             .log(level: .trace, "Instantiated the new login request")
 
-        if MockStoreConfiguration.isDelayingLogs { await Task.sleep(milliseconds: 800) }
+        await Task.sleep(milliseconds: 800)
 
         logger(named: "application")
                 .log(level: .debug, "Will navigate to Dashboard")
     }
 
     for task in MockTask.allTasks {
-        if MockStoreConfiguration.isDelayingLogs {
-            _logTask(task, urlSession: urlSession, logger: networkLogger, delay: task.delay)
-        } else {
-            _logTask(task, urlSession: urlSession, logger: networkLogger)
-        }
+        _logTask(task, urlSession: urlSession, logger: networkLogger, delay: task.delay)
     }
 
     let stackTrace = """
@@ -131,7 +127,68 @@ private func _populateStore(_ store: LoggerStore) async {
     logger(named: "auth")
         .log(level: .warning, .init(stringLiteral: stackTrace))
 
-    if MockStoreConfiguration.isDelayingLogs { await Task.sleep(milliseconds: 10000) }
+    await Task.sleep(milliseconds: 10000)
+
+    logger(named: "default")
+        .log(level: .critical, "💥 0xDEADBEEF")
+}
+
+private func _syncPopulateStore(_ store: LoggerStore) {
+    func logger(named: String) -> Logger {
+        Logger(label: named, store: store)
+    }
+
+    let networkLogger = NetworkLogger(store: store, isWaitingForDecoding: true)
+
+    let urlSession = URLSession(configuration: .default)
+
+    if isFirstLog {
+        isFirstLog = false
+        logger(named: "application")
+            .log(level: .info, "UIApplication.didFinishLaunching", metadata: [
+                "custom-metadata-key": .string("value")
+            ])
+
+        logger(named: "application")
+            .log(level: .info, "UIApplication.willEnterForeground")
+
+        logger(named: "auth")
+            .log(level: .trace, "Instantiated Session")
+
+        logger(named: "auth")
+            .log(level: .trace, "Instantiated the new login request")
+
+        logger(named: "application")
+                .log(level: .debug, "Will navigate to Dashboard")
+    }
+
+    for task in MockTask.allTasks {
+        _logTask(task, urlSession: urlSession, logger: networkLogger)
+    }
+
+    let stackTrace = """
+        Replace this implementation with code to handle the error appropriately. fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+
+        2015-12-08 15:04:03.888 Conversion[76776:4410388] call stack:
+        (
+            0   Conversion                          0x000694b5 -[ViewController viewDidLoad] + 128
+            1   UIKit                               0x27259f55 <redacted> + 1028
+            ...
+            9   UIKit                               0x274f67a7 <redacted> + 134
+            10  FrontBoardServices                  0x2b358ca5 <redacted> + 232
+            11  FrontBoardServices                  0x2b358f91 <redacted> + 44
+            12  CoreFoundation                      0x230e87c7 <redacted> + 14
+            ...
+            16  CoreFoundation                      0x23038ecd CFRunLoopRunInMode + 108
+            17  UIKit                               0x272c7607 <redacted> + 526
+            18  UIKit                               0x272c22dd UIApplicationMain + 144
+            19  Conversion                          0x000767b5 main + 108
+            20  libdyld.dylib                       0x34f34873 <redacted> + 2
+        )
+        """
+
+    logger(named: "auth")
+        .log(level: .warning, .init(stringLiteral: stackTrace))
 
     logger(named: "default")
         .log(level: .critical, "💥 0xDEADBEEF")
@@ -141,9 +198,7 @@ private func _logTask(_ mockTask: MockTask, urlSession: URLSession, logger: Netw
     let task = makeSessionTask(for: mockTask, urlSession: urlSession)
 
     @Sendable func logTask() async {
-        if MockStoreConfiguration.isDelayingLogs {
-            await Task.sleep(milliseconds: Int(1000 * delay))
-        }
+        await Task.sleep(milliseconds: Int(1000 * delay))
         let startDate = Date()
         logger.logTaskCreated(task)
         switch mockTask.kind {

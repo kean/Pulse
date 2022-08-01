@@ -319,7 +319,7 @@ public enum NetworkLoggerDecodingError: Error, Codable {
         }
     }
 
-    public enum CodingKey: Codable, Hashable {
+    public enum CodingKey: Codable, Hashable, CustomDebugStringConvertible {
         case string(String)
         case int(Int)
 
@@ -328,6 +328,13 @@ public enum NetworkLoggerDecodingError: Error, Codable {
                 self = .int(value)
             } else {
                 self = .string(key.stringValue)
+            }
+        }
+
+        public var debugDescription: String {
+            switch self {
+            case .string(let value): return "CodingKey.string(\"\(value)\")"
+            case .int(let value): return "CodingKey.int(\(value))"
             }
         }
     }

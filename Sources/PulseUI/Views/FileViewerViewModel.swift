@@ -13,13 +13,16 @@ final class FileViewerViewModel: ObservableObject {
     let originalSize: Int64
     private(set) lazy var data = getData()
     private let getData: () -> Data
+    private let error: NetworkLoggerDecodingError?
 
     @Published private(set) var contents: Contents?
 
-    init(title: String, contentType: String?, originalSize: Int64, data: @escaping () -> Data) {
+    #warning("TODO: pass error")
+    init(title: String, contentType: String?, originalSize: Int64, error: NetworkLoggerDecodingError? = nil, data: @escaping () -> Data) {
         self.title = title
         self.contentType = contentType
         self.originalSize = originalSize
+        self.error = error
         self.getData = data
     }
 
@@ -48,7 +51,7 @@ final class FileViewerViewModel: ObservableObject {
     private func render(data: Data) -> Contents {
         let data = getData()
         if let json = try? JSONSerialization.jsonObject(with: data, options: []) {
-            return .json(.init(json: json))
+            return .json(.init(json: json, error: error))
         } else if let image = UXImage(data: data) {
             return .image(image)
         } else if data.isEmpty {

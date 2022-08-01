@@ -17,7 +17,7 @@ enum JSONElement {
 }
 
 protocol JSONRenderer: AnyObject {
-    func append(_ string: String, element: JSONElement)
+    func append(_ string: String, element: JSONElement, error: NetworkLoggerDecodingError?)
     func indent(count: Int)
     func newline()
 }
@@ -25,7 +25,8 @@ protocol JSONRenderer: AnyObject {
 final class HTMLJSONRender: JSONRenderer {
     private var output = ""
 
-    func append(_ string: String, element: JSONElement) {
+    #warning("TODO: add isError support")
+    func append(_ string: String, element: JSONElement, error: NetworkLoggerDecodingError?) {
         output.append("<span class=\"\(getClass(for: element))\">\(string)</span>")
     }
 
@@ -55,16 +56,25 @@ private func getClass(for element: JSONElement) -> String {
 final class JSONPrinter {
     private let renderer: JSONRenderer
     private var indentation = 0
+    private var error: NetworkLoggerDecodingError?
+    private var codingPath: [NetworkLoggerDecodingError.CodingKey] = []
 
     init(renderer: JSONRenderer) {
         self.renderer = renderer
     }
 
-    func render(json: Any) {
+    func render(json: Any, error: NetworkLoggerDecodingError?) {
+        self.error = error
         print(json: json, isFree: true)
     }
 
     private func print(json: Any, isFree: Bool) {
+        func _print(json: Any, key: NetworkLoggerDecodingError.CodingKey, isFree: Bool) {
+            codingPath.append(key)
+            print(json: json, isFree: isFree)
+            _ = codingPath.popLast()
+        }
+
         switch json {
         case let object as [String: Any]:
             if isFree {
@@ -78,7 +88,7 @@ final class JSONPrinter {
                 append("  \"\(key)\"", .key)
                 append(": ", .punctuation)
                 indentation += 2
-                print(json: object[key]!, isFree: false)
+                _print(json: object[key]!, key: .string(key), isFree: false)
                 indentation -= 2
                 if key != keys.last {
                     append(",", .punctuation)
@@ -94,7 +104,7 @@ final class JSONPrinter {
                 append("[\n", .punctuation)
                 indentation += 2
                 for index in array.indices {
-                    print(json: array[index], isFree: true)
+                    _print(json: array[index], key: .int(index), isFree: true)
                     if index < array.endIndex - 1 {
                         append(",", .punctuation)
                     }
@@ -106,7 +116,7 @@ final class JSONPrinter {
             } else {
                 append("[", .punctuation)
                 for index in array.indices {
-                    print(json: array[index], isFree: true)
+                    _print(json: array[index], key: .int(index), isFree: true)
                     if index < array.endIndex - 1 {
                         append(", ", .punctuation)
                     }
@@ -131,7 +141,11 @@ final class JSONPrinter {
     }
 
     func append(_ string: String, _ element: JSONElement) {
-        renderer.append(string, element: element)
+        var error: NetworkLoggerDecodingError?
+        if codingPath == self.error?.context?.codingPath {
+            error = self.error
+        }
+        renderer.append(string, element: element, error: error)
     }
 
     func indent() {
@@ -177,12 +191,17 @@ final class AttributedStringJSONRenderer: JSONRenderer {
         self.lineHeight = lineHeight
     }
 
-    func append(_ string: String, element: JSONElement) {
-        output.append(string, attributes[element]!)
+    func append(_ string: String, element: JSONElement, error: NetworkLoggerDecodingError?) {
+        var attributes = self.attributes[element]!
+        if error != nil {
+            attributes[.backgroundColor] = UXColor.red.withAlphaComponent(1)
+            attributes[.foregroundColor] = UXColor.white
+        }
+        output.append(string, attributes)
     }
 
     func indent(count: Int) {
-        append(String(repeating: " ", count: count), element: .punctuation)
+        append(String(repeating: " ", count: count), element: .punctuation, error: nil)
     }
 
     func newline() {
@@ -197,5 +216,47 @@ final class AttributedStringJSONRenderer: JSONRenderer {
         return output
     }
 }
+
+private extension NetworkLoggerDecodingError {
+    var context: Context? {
+        switch self {
+        case .typeMismatch(_, let context): return context
+        case .valueNotFound(_, let context): return context
+        case .keyNotFound(_, let context): return context
+        case .dataCorrupted(let context): return context
+        case .unknown: return nil
+        }
+    }
+}
+
+#if DEBUG
+
+struct JSONRenderer_Previews: PreviewProvider {
+    static var previews: some View {
+        Group {
+            FileViewer(viewModel: .init(title: "Response", contentType: "application/json", originalSize: 1200, error: generateTypeMismatchError(), data: { MockJSON.allPossibleValues }))
+                .previewDisplayName("Type Mismatch Error")
+
+        }
+    }
+}
+
+private func generateTypeMismatchError() -> NetworkLoggerDecodingError? {
+    struct JSON: Decodable {
+        let actors: [Actor]
+
+        struct Actor: Decodable {
+            let age: String
+        }
+    }
+    do {
+        _ = try JSONDecoder().decode(JSON.self, from: MockJSON.allPossibleValues)
+        return nil
+    } catch {
+        return NetworkLoggerDecodingError(error as! DecodingError)
+    }
+}
+
+#endif
 
 #endif
