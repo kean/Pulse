@@ -5,6 +5,7 @@
 import Foundation
 
 extension LoggerStore {
+    /// The archive info.
     public struct Info: Codable, Sendable {
         public let id: UUID
         public let appInfo: AppInfo? // Should be always avail starting with 1.0

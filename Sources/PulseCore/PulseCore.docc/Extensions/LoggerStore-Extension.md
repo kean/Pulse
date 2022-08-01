@@ -14,12 +14,10 @@
 
 ### Instance Properties
 
-- ``container``
-- ``backgroundContext``
+- ``storeURL``
+- ``isReadonly``
 - ``info-swift.property``
 - ``Info-swift.struct``
-- ``isReadonly``
-- ``storeURL``
 
 ### Storing and Accessing Messages
 
@@ -41,6 +39,11 @@
 
 - ``events``
 - ``Event``
+
+### Direct Database Access 
+
+- ``container``
+- ``backgroundContext``
 
 ### Nested
 
