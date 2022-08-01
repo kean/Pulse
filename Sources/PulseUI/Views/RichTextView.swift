@@ -13,7 +13,7 @@ struct RichTextView<ExtraMenu: View>: View {
     @ObservedObject private var viewModel: RichTextViewModel
     @State private var isExpanded = false
     @State private var isScrolled = false
-    @State private var isShowingError = true
+    @State private var errorViewOpacity = 0.0
     var isAutomaticLinkDetectionEnabled = true
     var hasVerticalScroller = false
     var onToggleExpanded: (() -> Void)?
@@ -44,6 +44,7 @@ struct RichTextView<ExtraMenu: View>: View {
                 SearchToobar(viewModel: viewModel)
             }
         }
+        .onAppear(perform: onAppear)
     }
 
     private var searchToolbar: some View {
@@ -92,7 +93,7 @@ struct RichTextView<ExtraMenu: View>: View {
             ZStack(alignment: .bottom) {
                 WrappedTextView(text: viewModel.text, viewModel: viewModel, isAutomaticLinkDetectionEnabled: isAutomaticLinkDetectionEnabled, hasVerticalScroller: hasVerticalScroller)
                 errorView
-            }
+            }.onAppear(perform: onAppear)
 #else
             WrappedTextView(text: viewModel.text, viewModel: viewModel, isAutomaticLinkDetectionEnabled: isAutomaticLinkDetectionEnabled)
 #endif
@@ -104,9 +105,17 @@ struct RichTextView<ExtraMenu: View>: View {
     }
 #endif
 
+    private func onAppear() {
+        guard viewModel.error != nil else { return }
+        viewModel.onAppear()
+        withAnimation {
+            errorViewOpacity = 1.0
+        }
+    }
+
     @ViewBuilder
     private var errorView: some View {
-        if let error = viewModel.error?.context?.debugDescription, isShowingError {
+        if let error = viewModel.error?.context?.debugDescription {
             HStack {
                 Spacer()
                 HStack {
@@ -123,8 +132,11 @@ struct RichTextView<ExtraMenu: View>: View {
             }
             .padding()
             .onTapGesture {
-                isShowingError = false
+                withAnimation {
+                    errorViewOpacity = 0
+                }
             }
+            .opacity(errorViewOpacity)
         }
     }
 }
@@ -345,6 +357,19 @@ final class RichTextViewModel: ObservableObject {
         Publishers.CombineLatest($searchTerm, $options).sink { [weak self] in
             self?.refresh(searchTerm: $0, options: $1)
         }.store(in: &bag)
+    }
+
+    func onAppear() {
+        if error != nil {
+            let range = NSRange(location: 0, length: text.length)
+            text.enumerateAttribute(.decodingError, in: range) { _, range, _ in
+                var range = range
+                if range.location > 50 {
+                    range.location -= 50
+                }
+                textView?.scrollRangeToVisible(range)
+            }
+        }
     }
 
     private func refresh(searchTerm: String, options: StringSearchOptions) {

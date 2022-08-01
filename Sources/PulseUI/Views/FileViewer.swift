@@ -118,7 +118,6 @@ struct NetworkInspectorResponseView_Previews: PreviewProvider {
     }
 }
 
-#warning("TODO: remove ")
 enum MockJSON {
     static let allPossibleValues = """
     {
@@ -154,23 +153,7 @@ enum MockJSON {
             "Avri Roel",
             "Exton Elias"
           ]
-        },
-            {
-              "name": "Robert Downey Jr.",
-              "age": 53,
-              "born At": "New York City, NY",
-              "birthdate": "April 4, 1965",
-              "photo": "https://jsonformatter.org/img/Robert-Downey-Jr.jpg",
-              "wife": "Susan Downey",
-              "weight": 77.1,
-              "hasChildren": true,
-              "hasGreyHair": false,
-              "children": [
-                "Indio Falconer",
-                "Avri Roel",
-                "Exton Elias"
-              ]
-            }
+        }
       ]
     }
     """.data(using: .utf8)!
