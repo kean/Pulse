@@ -315,7 +315,9 @@ final class LoggerStoreTests: XCTestCase {
 
         try context.save()
 
-        let copyURL = tempDirectoryURL.appendingFilename(UUID().uuidString).appendingPathExtension("pulse")
+        let copyURL = tempDirectoryURL
+            .appendingPathComponent(UUID().uuidString, isDirectory: false)
+            .appendingPathExtension("pulse")
         try store.copy(to: copyURL)
 
         // SANITY
@@ -331,7 +333,9 @@ final class LoggerStoreTests: XCTestCase {
         store.backgroundContext.performAndWait {}
 
         // THEN
-        let copyURL2 = tempDirectoryURL.appendingFilename(UUID().uuidString).appendingPathExtension("pulse")
+        let copyURL2 = tempDirectoryURL
+            .appendingPathComponent(UUID().uuidString, isDirectory: false)
+            .appendingPathExtension("pulse")
         try store.copy(to: copyURL2)
 
         // THEN unwanted messages were removed
@@ -349,10 +353,10 @@ final class LoggerStoreTests: XCTestCase {
     func testMigrationFromVersion0_2ToLatest() throws {
         // GIVEN store created with the model from Pulse 0.2
         let storeURL = tempDirectoryURL
-            .appendingDirectory(UUID().uuidString)
+            .appendingPathComponent(UUID().uuidString, isDirectory: false)
         try? FileManager.default.createDirectory(at: storeURL, withIntermediateDirectories: true, attributes: nil)
         let databaseURL = storeURL
-            .appendingFilename("logs.sqlite")
+            .appendingPathComponent("logs.sqlite", isDirectory: false)
         try Resources.outdatedDatabase.write(to: databaseURL)
 
         // WHEN migrating to the store with the latest model

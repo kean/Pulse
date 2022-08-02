@@ -15,7 +15,7 @@ final class URLSessionProxyTests: XCTestCase {
     override func setUp() {
         super.setUp()
 
-        let storeURL = directory.url.appendingFilename("logs.pulse")
+        let storeURL = directory.url.appendingPathComponent("logs.pulse", isDirectory: false)
         store = try! LoggerStore(storeURL: storeURL, options: [.create, .synchronous])
         logger = NetworkLogger(store: store)
 
@@ -69,7 +69,7 @@ final class URLSessionProxyTests: XCTestCase {
 
     func testRecordError() throws {
         // GIVEN file that doesn't exist
-        let dataURL = FileManager.default.temporaryDirectory.appendingFilename(UUID().uuidString)
+        let dataURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: false)
 
         // WHEN
         let didComplete = self.expectation(description: "TaskCompleted")

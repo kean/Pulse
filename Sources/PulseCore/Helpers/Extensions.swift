@@ -26,29 +26,21 @@ extension FileManager {
 extension URL {
     static var temp: URL {
         let url = Files.temporaryDirectory
-            .appendingDirectory("com.github.kean.logger")
+            .appendingPathComponent("com.github.kean.logger", isDirectory: true)
         Files.createDirectoryIfNeeded(at: url)
         return url
     }
 
     static var logs: URL {
         var url = Files.urls(for: .libraryDirectory, in: .userDomainMask).first?
-            .appendingDirectory("Logs")
-            .appendingDirectory("com.github.kean.logger")  ?? URL(fileURLWithPath: "/dev/null")
+            .appendingPathComponent("Logs", isDirectory: true)
+            .appendingPathComponent("com.github.kean.logger", isDirectory: true)  ?? URL(fileURLWithPath: "/dev/null")
         if !Files.createDirectoryIfNeeded(at: url) {
             var resourceValues = URLResourceValues()
             resourceValues.isExcludedFromBackup = true
             try? url.setResourceValues(resourceValues)
         }
         return url
-    }
-
-    func appendingFilename(_ filename: String) -> URL {
-        appendingPathComponent(filename, isDirectory: false)
-    }
-
-    func appendingDirectory(_ directory: String) -> URL {
-        appendingPathComponent(directory, isDirectory: true)
     }
 }
 
@@ -88,17 +80,6 @@ extension NSPersistentStoreCoordinator {
             options: backupStoreOptions,
             withType: NSSQLiteStoreType
         )
-    }
-}
-
-extension NSManagedObjectContext {
-    func tryPerform<T>(_ closure: () throws -> T) throws -> T {
-        var result: Result<T, Error>?
-        performAndWait {
-            result = Result { try closure() }
-        }
-        guard let unwrappedResult = result else { throw LoggerStore.Error.unknownError }
-        return try unwrappedResult.get()
     }
 }
 

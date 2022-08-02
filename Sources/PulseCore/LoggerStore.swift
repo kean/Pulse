@@ -189,13 +189,13 @@ public final class LoggerStore: @unchecked Sendable {
         if create {
             try Files.createDirectory(at: storeURL, withIntermediateDirectories: false, attributes: nil)
         }
-        let databaseURL = storeURL.appendingFilename(databaseFileName)
+        let databaseURL = storeURL.appendingPathComponent(databaseFileName, isDirectory: false)
         if !create {
             guard Files.fileExists(atPath: databaseURL.path) else {
                 throw LoggerStore.Error.storeInvalid
             }
         }
-        let blobsURL = storeURL.appendingDirectory(blobsDirectoryName)
+        let blobsURL = storeURL.appendingPathComponent(blobsDirectoryName, isDirectory: true)
         if !Files.fileExists(atPath: blobsURL.path) {
             try Files.createDirectory(at: blobsURL, withIntermediateDirectories: false, attributes: nil)
         }
@@ -223,7 +223,7 @@ public final class LoggerStore: @unchecked Sendable {
             throw LoggerStore.Error.storeInvalid
         }
         let manifest = try Info.make(archive: archive)
-        let databaseURL = URL.temp.appendingFilename(manifest.id.uuidString)
+        let databaseURL = URL.temp.appendingPathComponent(manifest.id.uuidString, isDirectory: false)
         if !Files.fileExists(atPath: databaseURL.path) {
             guard let database = archive[databaseFileName] else {
                 throw LoggerStore.Error.storeInvalid
@@ -704,9 +704,11 @@ extension LoggerStore {
     public func copy(to targetURL: URL) throws -> Info {
         switch document {
         case .directory(let blobs):
-            return try backgroundContext.tryPerform {
-                try copy(to: targetURL, blobs: blobs)
+            var result: Result<Info, Swift.Error>?
+            backgroundContext.performAndWait {
+                result = Result { try copy(to: targetURL, blobs: blobs) }
             }
+            return try (result ?? .failure(Error.unknownError)).get()
         case .file(_, let manifest):
             try Files.copyItem(at: storeURL, to: targetURL)
             return manifest
@@ -777,7 +779,7 @@ extension LoggerStore {
     }
 
     private func _sweep() throws {
-        let attributes = try Files.attributesOfItem(atPath: storeURL.appendingFilename(databaseFileName).path)
+        let attributes = try Files.attributesOfItem(atPath: storeURL.appendingPathComponent(databaseFileName, isDirectory: false).path)
         let size = attributes[.size] as? Int64 ?? 0
 
         guard size > configuration.databaseSizeLimit else {

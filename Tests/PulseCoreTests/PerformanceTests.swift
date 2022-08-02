@@ -15,7 +15,7 @@ final class PerformanceTests: XCTestCase {
     override func setUp() {
         tempDirectoryURL = FileManager().temporaryDirectory.appendingPathComponent(UUID().uuidString)
         try? FileManager.default.createDirectory(at: tempDirectoryURL, withIntermediateDirectories: true, attributes: [:])
-        storeURL = tempDirectoryURL.appendingFilename("performance-tests.pulse")
+        storeURL = tempDirectoryURL.appendingPathComponent("performance-tests.pulse", isDirectory: false)
 
         store = try! LoggerStore(storeURL: storeURL, options: [.create, .synchronous])
 

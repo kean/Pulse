@@ -15,7 +15,7 @@ final class URLSessionProxyDelegateTests: XCTestCase {
     override func setUp() {
         super.setUp()
 
-        let storeURL = directory.url.appendingFilename("logs.pulse")
+        let storeURL = directory.url.appendingPathComponent("logs.pulse", isDirectory: false)
         store = try! LoggerStore(storeURL: storeURL, options: [.create, .synchronous])
         logger = NetworkLogger(store: store)
     }
