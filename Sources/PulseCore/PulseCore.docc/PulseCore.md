@@ -10,6 +10,7 @@ Logger and network inspector for Apple platforms.
 
 ### Network Logging
 
+- <doc:NetworkLogging-Article>
 - ``NetworkLogger``
 - ``NetworkLoggerInsights``
 - ``URLSessionProxyDelegate``

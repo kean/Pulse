@@ -12,16 +12,16 @@ extension LoggerStore {
         case networkTaskProgressUpdated(NetworkTaskProgressUpdated)
         case networkTaskCompleted(NetworkTaskCompleted)
 
-        public final class MessageCreated: Codable, Sendable {
-            public let createdAt: Date
-            public let label: String
-            public let level: LoggerStore.Level
-            public let message: String
-            public let metadata: [String: String]?
-            public let session: String
-            public let file: String
-            public let function: String
-            public let line: UInt
+        public struct MessageCreated: Codable, Sendable {
+            public var createdAt: Date
+            public var label: String
+            public var level: LoggerStore.Level
+            public var message: String
+            public var metadata: [String: String]?
+            public var session: String
+            public var file: String
+            public var function: String
+            public var line: UInt
 
             public init(createdAt: Date, label: String, level: LoggerStore.Level, message: String, metadata: [String: String]?, session: String, file: String, function: String, line: UInt) {
                 self.createdAt = createdAt
@@ -37,13 +37,13 @@ extension LoggerStore {
         }
 
         public struct NetworkTaskCreated: Codable, Sendable {
-            public let taskId: UUID
-            public let taskType: NetworkLogger.TaskType
-            public let createdAt: Date
-            public let originalRequest: NetworkLogger.Request
-            public let currentRequest: NetworkLogger.Request?
+            public var taskId: UUID
+            public var taskType: NetworkLogger.TaskType
+            public var createdAt: Date
+            public var originalRequest: NetworkLogger.Request
+            public var currentRequest: NetworkLogger.Request?
             public var requestBody: Data?
-            public let session: String
+            public var session: String
 
             public init(taskId: UUID, taskType: NetworkLogger.TaskType, createdAt: Date, originalRequest: NetworkLogger.Request, currentRequest: NetworkLogger.Request?, requestBody: Data?, session: String) {
                 self.taskId = taskId
@@ -57,9 +57,9 @@ extension LoggerStore {
         }
 
         public struct NetworkTaskProgressUpdated: Codable, Sendable {
-            public let taskId: UUID
-            public let completedUnitCount: Int64
-            public let totalUnitCount: Int64
+            public var taskId: UUID
+            public var completedUnitCount: Int64
+            public var totalUnitCount: Int64
 
             public init(taskId: UUID, completedUnitCount: Int64, totalUnitCount: Int64) {
                 self.taskId = taskId
@@ -68,18 +68,18 @@ extension LoggerStore {
             }
         }
 
-        public final class NetworkTaskCompleted: Codable, Sendable {
-            public let taskId: UUID
-            public let taskType: NetworkLogger.TaskType
-            public let createdAt: Date
-            public let originalRequest: NetworkLogger.Request
-            public let currentRequest: NetworkLogger.Request?
-            public let response: NetworkLogger.Response?
-            public let error: NetworkLogger.ResponseError?
-            public let requestBody: Data?
-            public let responseBody: Data?
-            public let metrics: NetworkLogger.Metrics?
-            public let session: String
+        public struct NetworkTaskCompleted: Codable, Sendable {
+            public var taskId: UUID
+            public var taskType: NetworkLogger.TaskType
+            public var createdAt: Date
+            public var originalRequest: NetworkLogger.Request
+            public var currentRequest: NetworkLogger.Request?
+            public var response: NetworkLogger.Response?
+            public var error: NetworkLogger.ResponseError?
+            public var requestBody: Data?
+            public var responseBody: Data?
+            public var metrics: NetworkLogger.Metrics?
+            public var session: String
 
             public init(taskId: UUID, taskType: NetworkLogger.TaskType, createdAt: Date, originalRequest: NetworkLogger.Request, currentRequest: NetworkLogger.Request?, response: NetworkLogger.Response?, error: NetworkLogger.ResponseError?, requestBody: Data?, responseBody: Data?, metrics: NetworkLogger.Metrics?, session: String) {
                 self.taskId = taskId
