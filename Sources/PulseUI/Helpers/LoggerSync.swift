@@ -44,20 +44,12 @@ private final class SessionDelegate: NSObject, WCSessionDelegate {
     unowned var session: LoggerSyncSession!
 
     #if os(iOS)
-    func sessionDidBecomeInactive(_ session: WCSession) {
-        debugPrint("WCSession did activate")
-    }
+    func sessionDidBecomeInactive(_ session: WCSession) {}
 
-    func sessionDidDeactivate(_ session: WCSession) {
-        debugPrint("WCSession did deactivate")
-    }
+    func sessionDidDeactivate(_ session: WCSession) {}
     #endif
 
-    func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
-        if let error = error {
-            debugPrint("Failed to active watch communication session: \(error)")
-        }
-    }
+    func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {}
 
     #if os(iOS)
     func session(_ session: WCSession, didReceive file: WCSessionFile) {

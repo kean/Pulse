@@ -70,12 +70,12 @@ extension NetworkLogger {
         /// Contains the underlying error.
         ///
         /// - note: Currently is only used for ``NetworkLogger/DecodingError``.
-        public var error: Error?
+        public var error: Swift.Error?
 
-        public init(_ error: Error) {
+        public init(_ error: Swift.Error) {
             let error = error as NSError
             self.code = error.code == 0 ? -1 : error.code
-            if error is DecodingError || error is NetworkLogger.DecodingError {
+            if error is Swift.DecodingError || error is NetworkLogger.DecodingError {
                 self.domain = NetworkLogger.DecodingError.domain
             } else {
                 self.domain = error.domain
@@ -161,9 +161,11 @@ extension NetworkLogger {
         public init() {}
 
         public init(metrics: NetworkLogger.Metrics) {
+            var size = TransferSizeInfo()
             for transaction in metrics.transactions {
-                self = self.merging(transaction.transferSize)
+                size = size.merging(transaction.transferSize)
             }
+            self = size
         }
 
         init(metrics: URLSessionTaskTransactionMetrics) {
@@ -177,12 +179,13 @@ extension NetworkLogger {
 
         public func merging(_ size: TransferSizeInfo) -> TransferSizeInfo {
             var size = size
-            size.requestHeaderBytesSent += requestHeaderBytesSent
-            size.requestBodyBytesBeforeEncoding += requestBodyBytesBeforeEncoding
-            size.requestBodyBytesSent += requestBodyBytesSent
-            size.responseHeaderBytesReceived += responseHeaderBytesReceived
-            size.requestBodyBytesBeforeEncoding += requestBodyBytesBeforeEncoding
-            size.responseBodyBytesReceived += responseBodyBytesReceived
+            // Using overflow operators just in case
+            size.requestHeaderBytesSent &+= requestHeaderBytesSent
+            size.requestBodyBytesBeforeEncoding &+= requestBodyBytesBeforeEncoding
+            size.requestBodyBytesSent &+= requestBodyBytesSent
+            size.responseHeaderBytesReceived &+= responseHeaderBytesReceived
+            size.responseBodyBytesAfterDecoding &+= responseBodyBytesAfterDecoding
+            size.responseBodyBytesReceived &+= responseBodyBytesReceived
             return size
         }
     }
