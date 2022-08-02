@@ -63,8 +63,11 @@ extension RemoteLogger {
         static func encode(_ event: LoggerStore.Event.NetworkTaskCompleted) throws -> Data {
             var contents = [Data]()
 
-            let strippedMessage = LoggerStore.Event.NetworkTaskCompleted(taskId: event.taskId, taskType: event.taskType, createdAt: event.createdAt, originalRequest: event.originalRequest, currentRequest: event.currentRequest, response: event.response, error: event.error, requestBody: nil, responseBody: nil, metrics: event.metrics, session: event.session)
-            let messageData = try JSONEncoder().encode(strippedMessage)
+            var slimEvent = event
+            slimEvent.requestBody = nil // Sent separately using binary
+            slimEvent.responseBody = nil
+
+            let messageData = try JSONEncoder().encode(slimEvent)
             contents.append(messageData)
 
             if let requestBody = event.requestBody, requestBody.count < Int32.max {
