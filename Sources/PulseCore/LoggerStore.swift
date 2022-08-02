@@ -80,7 +80,7 @@ public final class LoggerStore: @unchecked Sendable {
     private static func makeDefault() -> LoggerStore {
         let storeURL = URL.logs.appendingPathComponent("current.pulse", isDirectory: true)
         guard let store = try? LoggerStore(storeURL: storeURL, options: [.create, .sweep]) else {
-            return LoggerStore(inMemoryStore: storeURL) // Right side should never happend
+            return LoggerStore(inMemoryStore: storeURL) // Right side should never happen
         }
         register(store: store)
         return store
@@ -167,7 +167,7 @@ public final class LoggerStore: @unchecked Sendable {
     /// - parameters:
     ///   - storeURL: The store URL.
     ///   - options: By default, empty. To create a store, use ``Options/create``.
-    ///   - configuration: The store configuration specifiying size limit, etc.
+    ///   - configuration: The store configuration specifying size limit, etc.
     public convenience init(storeURL: URL, options: Options = [], configuration: Configuration = .init()) throws {
         var isDirectory: ObjCBool = ObjCBool(false)
         let fileExists = Files.fileExists(atPath: storeURL.path, isDirectory: &isDirectory)
