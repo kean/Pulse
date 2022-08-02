@@ -132,7 +132,7 @@ public final class LoggerStore: @unchecked Sendable {
 
         /// Limit the maximum response size stored by the logger. The default
         /// value is `10 Mb`. The same limit applies to requests.
-        public var responseBodySizeLimit: Int = 10 * 1024
+        public var responseBodySizeLimit: Int = 10 * 1048576
 
         /// By default, two weeks. The messages and requests that are older that
         /// two weeks will get automatically deleted.
@@ -156,7 +156,7 @@ public final class LoggerStore: @unchecked Sendable {
         ///   - databaseSizeLimit: The approximate limit of the database size. `64 Mb`
         ///   - blobsSizeLimit: The approximate limit of the blob storage that
         ///   contains network responses (HTTP body). `512 Mb` by default.
-        public init(databaseSizeLimit: Int = 1048576 * 64, blobsSizeLimit: Int = 1048576 * 512) {
+        public init(databaseSizeLimit: Int = 64 * 1048576, blobsSizeLimit: Int = 512 * 1048576) {
             self.databaseSizeLimit = databaseSizeLimit
             self.blobsSizeLimit = blobsSizeLimit
         }
