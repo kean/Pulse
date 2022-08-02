@@ -267,6 +267,8 @@ final class NetworkInsightsViewModel: ObservableObject {
     }
 }
 
+#if DEBUG
+
 struct NetworkInsightsView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
@@ -274,5 +276,7 @@ struct NetworkInsightsView_Previews: PreviewProvider {
         }
     }
 }
+
+#endif
 
 #endif
