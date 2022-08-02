@@ -11,6 +11,7 @@ final class LoggerStoreTests: XCTestCase {
     let directory = TemporaryDirectory()
     var tempDirectoryURL: URL!
     var storeURL: URL!
+    var date: Date = Date()
 
     var store: LoggerStore!
 
@@ -329,8 +330,7 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertEqual(try context.fetch(LoggerMetadataEntity.fetchRequest()).count, 10)
 
         // WHEN
-        store.sweep()
-        store.backgroundContext.performAndWait {}
+        store.syncSweep()
 
         // THEN
         let copyURL2 = tempDirectoryURL
@@ -346,6 +346,44 @@ final class LoggerStoreTests: XCTestCase {
         // THEN metadata and other relationships also removed
         XCTAssertEqual(try context.fetch(LoggerMessageEntity.fetchRequest()).count, 251)
         XCTAssertEqual(try context.fetch(LoggerMetadataEntity.fetchRequest()).count, 6)
+    }
+
+    func testMaxAgeSweep() throws {
+        // GIVEN the store with 5 minute max age
+        var configuration = LoggerStore.Configuration()
+        configuration.maxAge = 300
+        configuration.makeCurrentDate = { [unowned self] in self.date }
+
+        let store = try! LoggerStore(
+            storeURL: directory.url.appendingPathComponent(UUID().uuidString),
+            options: [.create, .synchronous],
+            configuration: configuration
+        )
+        defer { store.destroyStores() }
+
+        // GIVEN some messages stored before the cutoff date
+        date = Date().addingTimeInterval(-1000)
+        store.storeMessage(label: "deleted", level: .debug, message: "test")
+        store.storeRequest(URLRequest(url: URL(string: "example.com/deleted")!), response: nil, error: nil, data: nil)
+
+        // GIVEN some messages stored after
+        date = Date()
+        store.storeMessage(label: "kept", level: .debug, message: "test")
+        store.storeRequest(URLRequest(url: URL(string: "example.com/kept")!), response: nil, error: nil, data: nil)
+
+        // WHEN
+        store.syncSweep()
+
+        // THEN
+        let context = store.backgroundContext
+        XCTAssertEqual(try context.fetch(LoggerMessageEntity.fetchRequest()).count, 2)
+        XCTAssertEqual(try context.fetch(LoggerMetadataEntity.fetchRequest()).count, 0)
+        XCTAssertEqual(try context.fetch(LoggerNetworkRequestEntity.fetchRequest()).count, 1)
+        XCTAssertEqual(try context.fetch(LoggerNetworkRequestDetailsEntity.fetchRequest()).count, 1)
+        XCTAssertEqual(try context.fetch(LoggerNetworkRequestProgressEntity.fetchRequest()).count, 0)
+
+        XCTAssertEqual(try store.allMessages().first?.label, "kept")
+        XCTAssertEqual(try store.allNetworkRequests().first?.url, "example.com/kept")
     }
 
     // MARK: - Migration

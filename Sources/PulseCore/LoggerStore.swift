@@ -134,6 +134,13 @@ public final class LoggerStore: @unchecked Sendable {
         /// value is `10 Mb`. The same limit applies to requests.
         public var responseBodySizeLimit: Int = 10 * 1024
 
+        /// By default, two weeks. The messages and requests that are older that
+        /// two weeks will get automatically deleted.
+        ///
+        /// - note: This option request the store to be instantiated with a
+        /// ``LoggerStore/Options/sweep`` option. The default store supports sweeps.
+        public var maxAge: TimeInterval = 14 * 86400
+
         /// For tesing purposes.
         var makeCurrentDate: () -> Date = { Date() }
 
@@ -294,7 +301,7 @@ public final class LoggerStore: @unchecked Sendable {
 
 extension LoggerStore {
     /// Stores the given message.
-    public func storeMessage(label: String, level: Level, message: String, metadata: [String: MetadataValue]?, file: String = #file, function: String = #function, line: UInt = #line) {
+    public func storeMessage(label: String, level: Level, message: String, metadata: [String: MetadataValue]? = nil, file: String = #file, function: String = #function, line: UInt = #line) {
         handle(.messageStored(.init(
             createdAt: configuration.makeCurrentDate(),
             label: label,
@@ -782,7 +789,15 @@ extension LoggerStore {
         backgroundContext.perform { try? self._sweep() }
     }
 
+    func syncSweep() {
+        backgroundContext.performAndWait { try? self._sweep() }
+    }
+
     private func _sweep() throws {
+        // First try to remove all outdated message.
+        try removeOutdatedMessages()
+
+        // Then if the size is still surpases the limit, remove remainig ones until it doesn't.
         let attributes = try Files.attributesOfItem(atPath: storeURL.appendingPathComponent(databaseFileName, isDirectory: false).path)
         let size = attributes[.size] as? Int64 ?? 0
 
@@ -803,6 +818,13 @@ extension LoggerStore {
         let deleteRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "LoggerMessageEntity")
         deleteRequest.predicate = NSPredicate(format: "createdAt < %@", dateTo as NSDate)
         try self.deleteMessages(fetchRequest: deleteRequest)
+    }
+
+    private func removeOutdatedMessages() throws {
+        let cutoffDate = configuration.makeCurrentDate().addingTimeInterval(-configuration.maxAge)
+        let deleteRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "LoggerMessageEntity")
+        deleteRequest.predicate = NSPredicate(format: "createdAt < %@", cutoffDate as NSDate)
+        try deleteMessages(fetchRequest: deleteRequest)
     }
 }
 
