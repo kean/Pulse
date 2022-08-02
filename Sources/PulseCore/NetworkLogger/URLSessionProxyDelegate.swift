@@ -28,8 +28,9 @@ public final class URLSessionProxyDelegate: NSObject, URLSessionTaskDelegate, UR
             #selector(URLSessionTaskDelegate.urlSession(_:task:didCompleteWithError:)),
             #selector(URLSessionDataDelegate.urlSession(_:dataTask:didReceive:completionHandler:)),
             #selector(URLSessionTaskDelegate.urlSession(_:task:didFinishCollecting:)),
+            #selector(URLSessionTaskDelegate.urlSession(_:task:didSendBodyData:totalBytesSent:totalBytesExpectedToSend:)),
             #selector(URLSessionDownloadDelegate.urlSession(_:downloadTask:didFinishDownloadingTo:)),
-            #selector(URLSessionDownloadDelegate.urlSession(_:downloadTask:didWriteData:totalBytesWritten:totalBytesExpectedToWrite:))
+            #selector(URLSessionDownloadDelegate.urlSession(_:downloadTask:didWriteData:totalBytesWritten:totalBytesExpectedToWrite:)),
         ]
 #if swift(>=5.7)
         if #available(iOS 16.0, tvOS 16.0, macOS 13.0, watchOS 9.0, *) {
@@ -59,6 +60,13 @@ public final class URLSessionProxyDelegate: NSObject, URLSessionTaskDelegate, UR
     public func urlSession(_ session: URLSession, task: URLSessionTask, didFinishCollecting metrics: URLSessionTaskMetrics) {
         logger.logTask(task, didFinishCollecting: metrics)
         taskDelegate?.urlSession?(session, task: task, didFinishCollecting: metrics)
+    }
+
+    public func urlSession(_ session: URLSession, task: URLSessionTask, didSendBodyData bytesSent: Int64, totalBytesSent: Int64, totalBytesExpectedToSend: Int64) {
+        if task is URLSessionUploadTask {
+            logger.logTask(task, didUpdateProgress: (completed: totalBytesSent, total: totalBytesExpectedToSend))
+        }
+        (actualDelegate as? URLSessionTaskDelegate)?.urlSession?(session, task: task, didSendBodyData: bytesSent, totalBytesSent: totalBytesSent, totalBytesExpectedToSend: totalBytesExpectedToSend)
     }
 
     // MARK: URLSessionDataDelegate
