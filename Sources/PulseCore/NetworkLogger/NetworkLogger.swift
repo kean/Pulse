@@ -16,7 +16,7 @@ public final class NetworkLogger: @unchecked Sendable {
     /// The logger configuration.
     public struct Configuration: Sendable {
         /// If enabled, the requests are not marked as completed until the decoding
-        /// is done (see ``NetworkLogger/logTask(_:didFinishDecodingWithError:)-347rd``).
+        /// is done (see ``NetworkLogger/logTask(_:didFinishDecodingWithError:)``.
         /// If the request itself fails, the task completes immediately.
         public var isWaitingForDecoding: Bool
 

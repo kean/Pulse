@@ -73,6 +73,20 @@ Experimental.URLSessionProxy.shared.isEnabled = true
 
 > warning: As clearly communicate by its namespace, it's an experimental feature and it might negatively affect your networking. The way it works is by registering a custom [URLProtocol](https://developer.apple.com/documentation/foundation/urlprotocol) and using a secondary URLSession instance in it, but it can be a useful tool.
 
+## Recoding Decoding Errors
+
+The network requests usually can only be considered successful when the app was able to decode the response data. With Pulse, you can do just that and when you open the response body, it'll even highlight the part of the response that's causing the decoding error.
+
+```swift
+// Initial setup
+let logger = NetworkLogger(configuration: .init(isWaitingForDecoding: true))
+let delegate = URLSessionProxyDelegate(logger: logger, delegate: YourURLSessionDelegate()))
+// ... create session
+
+// Somewhere else in the app where decoding is done.
+logger.logTask(task, didFinishDecodingWithError: decodingError)
+```
+
 ## Redacting Sensitive Data
 
 There is usually a lot of sensitive information in network requests, such as passwords, access tokens, user information, and more. It's important to keep this information safe.
