@@ -6,17 +6,17 @@ import Foundation
 
 extension NetworkLogger {
     public struct Request: Codable, Sendable {
-        public let url: URL?
-        public let httpMethod: String?
-        public let headers: [String: String]
+        public var url: URL?
+        public var httpMethod: String?
+        public var headers: [String: String]
         /// `URLRequest.CachePolicy` raw value
-        public let cachePolicy: UInt
-        public let timeoutInterval: TimeInterval
-        public let allowsCellularAccess: Bool
-        public let allowsExpensiveNetworkAccess: Bool
-        public let allowsConstrainedNetworkAccess: Bool
-        public let httpShouldHandleCookies: Bool
-        public let httpShouldUsePipelining: Bool
+        public var cachePolicy: UInt
+        public var timeoutInterval: TimeInterval
+        public var allowsCellularAccess: Bool
+        public var allowsExpensiveNetworkAccess: Bool
+        public var allowsConstrainedNetworkAccess: Bool
+        public var httpShouldHandleCookies: Bool
+        public var httpShouldUsePipelining: Bool
 
         public init(_ urlRequest: URLRequest) {
             self.url = urlRequest.url
@@ -30,14 +30,21 @@ extension NetworkLogger {
             self.httpShouldHandleCookies = urlRequest.httpShouldHandleCookies
             self.httpShouldUsePipelining = urlRequest.httpShouldUsePipelining
         }
+
+        /// Redacts values for the provided headers.
+        public func redactingSensitiveHeaders(_ redactedHeaders: Set<String>) -> Request {
+            var copy = self
+            copy.headers = _redactingSensitiveHeaders(redactedHeaders, from: self.headers)
+            return copy
+        }
     }
 
     public struct Response: Codable, Sendable {
-        public let url: String?
-        public let statusCode: Int?
-        public let contentType: String?
-        public let expectedContentLength: Int64?
-        public let headers: [String: String]
+        public var url: String?
+        public var statusCode: Int?
+        public var contentType: String?
+        public var expectedContentLength: Int64?
+        public var headers: [String: String]
 
         public init(_ urlResponse: URLResponse) {
             let httpResponse = urlResponse as? HTTPURLResponse
@@ -47,16 +54,23 @@ extension NetworkLogger {
             self.expectedContentLength = urlResponse.expectedContentLength
             self.headers = httpResponse?.allHeaderFields as? [String: String] ?? [:]
         }
+
+        /// Redacts values for the provided headers.
+        public func redactingSensitiveHeaders(_ redactedHeaders: Set<String>) -> Response {
+            var copy = self
+            copy.headers = _redactingSensitiveHeaders(redactedHeaders, from: self.headers)
+            return copy
+        }
     }
 
     public struct ResponseError: Codable, Sendable {
-        public let code: Int
-        public let domain: String
-        public let debugDescription: String
+        public var code: Int
+        public var domain: String
+        public var debugDescription: String
         /// Contains the underlying error.
         ///
         /// - note: Currently is only used for ``NetworkLogger/DecodingError``.
-        public let error: Error?
+        public var error: Error?
 
         public init(_ error: Error) {
             let error = error as NSError
@@ -112,9 +126,9 @@ extension NetworkLogger {
     }
 
     public struct Metrics: Codable, Sendable {
-        public let taskInterval: DateInterval
-        public let redirectCount: Int
-        public let transactions: [NetworkLogger.TransactionMetrics]
+        public var taskInterval: DateInterval
+        public var redirectCount: Int
+        public var transactions: [NetworkLogger.TransactionMetrics]
         public var transferSize: TransferSizeInfo { TransferSizeInfo(metrics: self) }
 
         public init(metrics: URLSessionTaskMetrics) {
@@ -306,8 +320,8 @@ extension NetworkLogger {
         public static let domain = "DecodingError"
 
         public struct Context: Codable, Sendable {
-            public let codingPath: [CodingKey]
-            public let debugDescription: String
+            public var codingPath: [CodingKey]
+            public var debugDescription: String
 
             public init(_ context: Swift.DecodingError.Context) {
                 self.codingPath = context.codingPath.map(CodingKey.init)
@@ -369,15 +383,15 @@ extension NetworkLogger {
     public struct ContentType: Hashable, ExpressibleByStringLiteral {
         /// The type and subtype of the content type. This is everything except for
         /// any parameters that are also attached.
-        public let type: String
+        public var type: String
 
         /// Key/Value pairs serialized as parameters for the content type.
         ///
         /// For example, in "`text/plain; charset=UTF-8`" "charset" is
         /// the name of a parameter with the value "UTF-8".
-        public let parameters: [String: String]
+        public var parameters: [String: String]
 
-        public let rawValue: String
+        public var rawValue: String
 
         public init?(rawValue: String) {
             let parts = rawValue.split(separator: ";")
@@ -409,4 +423,17 @@ private func parseParameter(_ param: Substring) -> (String, String)? {
         return nil
     }
     return (name.trimmingCharacters(in: .whitespaces), value.trimmingCharacters(in: .whitespaces))
+}
+
+private func _redactingSensitiveHeaders(_ redactedHeaders: Set<String>, from headers: [String: String]) -> [String: String] {
+    var newHeaders: [String: String] = [:]
+    let redactedHeaders = Set(redactedHeaders.map { $0.lowercased() })
+    for (key, value) in headers {
+        if redactedHeaders.contains(key.lowercased()) {
+            newHeaders[key] = "<private>"
+        } else {
+            newHeaders[key] = value
+        }
+    }
+    return newHeaders
 }

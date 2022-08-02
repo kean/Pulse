@@ -40,6 +40,21 @@ final class NetworkLoggerTests: XCTestCase {
             }
         }
     }
+
+    func testRedactingSentitiveHeaders() {
+        // GIVEN
+        var urlRequest = URLRequest(url: URL(string: "comexample.com")!)
+        urlRequest.setValue("123", forHTTPHeaderField: "Authorization")
+        urlRequest.setValue("456", forHTTPHeaderField: "Content-Size")
+        let request = NetworkLogger.Request(urlRequest)
+
+        // WHEN
+        let radacted = request.redactingSensitiveHeaders(["authorization"])
+
+        // THEN
+        XCTAssertEqual(radacted.headers, [
+            "Authorization": "<private>",
+            "Content-Size": "456"
+        ])
+    }
 }
-
-
