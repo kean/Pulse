@@ -122,6 +122,10 @@ import AppKit.NSImage
 typealias PlatformImage = NSImage
 #endif
 
+#if os(watchOS)
+import ImageIO
+#endif
+
 enum Graphics {
     /// Creates an image thumbnail. Uses significantly less memory than other options.
     static func makeThumbnail(from data: Data, targetSize: CGFloat) -> PlatformImage? {

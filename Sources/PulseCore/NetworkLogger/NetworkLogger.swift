@@ -38,7 +38,7 @@ public final class NetworkLogger: @unchecked Sendable {
         self.configuration = configuration
     }
 
-    // MARK: Logging
+    // MARK: Loggin
 
     /// Logs the task creation (optional).
     public func logTaskCreated(_ task: URLSessionTask) {
