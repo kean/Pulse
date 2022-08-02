@@ -19,27 +19,43 @@ struct ConsoleMessagesForEach: View {
     @ViewBuilder
     private func makeListItem(message: LoggerMessageEntity) -> some View {
         if let request = message.request {
-            NetworkRequestRow(store: store, request: request)
+            NetworkRequestRow(request: request, store: store)
         } else {
-            NavigationLink.lazy(destination: {
-                ConsoleMessageDetailsView(viewModel: .init(store: store, message: message))
-            }, label: {
+            NavigationLink(destination: LazyConsoleeDetailsView(message: message, store: store)) {
                 ConsoleMessageView(viewModel: .init(message: message, store: store))
-            })
+            }
         }
     }
 }
 
 private struct NetworkRequestRow: View {
-    let store: LoggerStore
     let request: LoggerNetworkRequestEntity
+    let store: LoggerStore
 
     var body: some View {
-        NavigationLink.lazy(destination: {
-            NetworkInspectorView(viewModel: .init(request: request, store: store))
-        }, label: {
+        NavigationLink(destination: LazyNetworkInspectorView(request: request, store: store)) {
             ConsoleNetworkRequestView(viewModel: .init(request: request, store: store))
-        })
+        }
+    }
+}
+
+// Create the underlying ViewModel lazily.
+private struct LazyNetworkInspectorView: View {
+    let request: LoggerNetworkRequestEntity
+    let store: LoggerStore
+
+    var body: some View {
+        NetworkInspectorView(viewModel: .init(request: request, store: store))
+    }
+}
+
+// Create the underlying ViewModel lazily.
+private struct LazyConsoleeDetailsView: View {
+    let message: LoggerMessageEntity
+    let store: LoggerStore
+
+    var body: some View {
+        ConsoleMessageDetailsView(viewModel: .init(store: store, message: message))
     }
 }
 
@@ -53,7 +69,7 @@ struct NetworkMessagesForEach: View {
 
     @ViewBuilder
     private func makeListItem(request: LoggerNetworkRequestEntity) -> some View {
-        NetworkRequestRow(store: store, request: request)
+        NetworkRequestRow(request: request, store: store)
     }
 }
 

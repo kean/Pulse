@@ -15,7 +15,7 @@ struct ConsoleView: View {
 
     var body: some View {
         List {
-            NavigationLink.lazy(destination: { SettingsView(viewModel: viewModel) }) {
+            NavigationLink(destination: SettingsView(viewModel: viewModel)) {
                 Label("Settings", systemImage: "gearshape")
             }
 

@@ -28,12 +28,6 @@ extension NavigationLink where Label == EmptyView {
     }
 }
 
-extension NavigationLink {
-    static func lazy(destination: @escaping () -> Destination, @ViewBuilder label: () -> Label) -> NavigationLink<Label, LazyView<Destination>> {
-        NavigationLink<Label, LazyView<Destination>>(destination: { LazyView(destination) }, label: label)
-    }
-}
-
 struct InvisibleNavigationLinks<Content: View>: View {
     @ViewBuilder let content: Content
 
