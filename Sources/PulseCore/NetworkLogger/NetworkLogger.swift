@@ -16,7 +16,7 @@ public final class NetworkLogger: @unchecked Sendable {
     /// The logger configuration.
     public struct Configuration: Sendable {
         /// If enabled, the requests are not marked as completed until the decoding
-        /// is done (see ``NetworkLogger/logTask(_:didFinishDecoding:)-347rd``).
+        /// is done (see ``NetworkLogger/logTask(_:didFinishDecodingWithError:)-347rd``).
         /// If the request itself fails, the task completes immediately.
         public var isWaitingForDecoding: Bool
 
@@ -102,20 +102,7 @@ public final class NetworkLogger: @unchecked Sendable {
         lock.unlock()
     }
 
-    /// Notifies the logger the decoding for the given task is completed.
-    public func logTask<T>(_ task: URLSessionTask, didFinishDecoding result: Result<T, Error>) {
-        _logTask(task, didFinishDecoding: result)
-    }
-
-    public func logTask(_ task: URLSessionTask, didFinishDecoding result: Result<Void, Error>) {
-        _logTask(task, didFinishDecoding: result)
-    }
-
-    private func _logTask<T>(_ task: URLSessionTask, didFinishDecoding result: Result<T, Error>) {
-        var error: Error?
-        if case .failure(let failure) = result {
-            error = failure
-        }
+    public func logTask(_ task: URLSessionTask, didFinishDecodingWithError error: Error?) {
         _logTask(task, didCompleteWithError: error)
     }
 

@@ -225,11 +225,7 @@ private func _logTask(_ mockTask: MockTask, urlSession: URLSession, logger: Netw
 
         await Task.sleep(milliseconds: 50)
 
-        if let error = mockTask.decodingError {
-            logger.logTask(task, didFinishDecoding: .failure(error))
-        } else {
-            logger.logTask(task, didFinishDecoding: .success("success"))
-        }
+        logger.logTask(task, didFinishDecodingWithError: mockTask.decodingError)
     }
 
     Task.detached {
@@ -249,11 +245,7 @@ private func _logTask(_ mockTask: MockTask, urlSession: URLSession, logger: Netw
     logger.logTask(task, didFinishCollecting: metrics)
 
     logger.logTask(task, didCompleteWithError: nil)
-    if let error = mockTask.decodingError {
-        logger.logTask(task, didFinishDecoding: .failure(error))
-    } else {
-        logger.logTask(task, didFinishDecoding: .success("success"))
-    }
+    logger.logTask(task, didFinishDecodingWithError: mockTask.decodingError)
 }
 
 private func makeSessionTask(for mockTask: MockTask, urlSession: URLSession) -> URLSessionTask {
