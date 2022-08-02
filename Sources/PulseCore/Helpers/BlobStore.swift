@@ -35,14 +35,16 @@ final class BlobStore: @unchecked Sendable {
     private let initialSweepDelay: TimeInterval = 5
 
     private let sizeLimit: Int
+    private let responseBodySizeLimit: Int
 
     /// A queue which is used for disk I/O.
     private let queue = DispatchQueue(label: "com.github.kean.pulse.blob-storage", qos: .utility)
 
     /// Creates a cache instance with a given path.
-    init(path: URL, sizeLimit: Int) {
+    init(path: URL, sizeLimit: Int, responseBodySizeLimit: Int) {
         self.path = path
         self.sizeLimit = sizeLimit
+        self.responseBodySizeLimit = responseBodySizeLimit
 
         try? Files.createDirectory(at: path, withIntermediateDirectories: true, attributes: nil)
         queue.asyncAfter(deadline: .now() + initialSweepDelay) { [weak self] in
@@ -60,6 +62,9 @@ final class BlobStore: @unchecked Sendable {
     /// already stored, returns the existing file.
     func storeData(_ data: Data?) -> String? {
         guard let data = data, !data.isEmpty else {
+            return nil
+        }
+        guard data.count < responseBodySizeLimit else {
             return nil
         }
         let hash = data.sha256

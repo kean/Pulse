@@ -130,6 +130,10 @@ public final class LoggerStore: @unchecked Sendable {
         /// If `true`, the images added to the store as saved as small thumbnails.
         public var isStoringOnlyImageThumbnails = true
 
+        /// Limit the maximum response size stored by the logger. The default
+        /// value is `10 Mb`. The same limit applies to requests.
+        public var responseBodySizeLimit: Int = 10 * 1024
+
         /// For tesing purposes.
         var makeCurrentDate: () -> Date = { Date() }
 
@@ -205,7 +209,7 @@ public final class LoggerStore: @unchecked Sendable {
         self.backgroundContext = LoggerStore.makeBackgroundContext(for: container)
         self.isReadonly = false
         self.info = nil
-        self.document = .directory(blobs: BlobStore(path: blobsURL, sizeLimit: configuration.blobsSizeLimit))
+        self.document = .directory(blobs: BlobStore(path: blobsURL, sizeLimit: configuration.blobsSizeLimit, responseBodySizeLimit: configuration.responseBodySizeLimit))
 
         if options.contains(.sweep) {
             DispatchQueue.global().asyncAfter(deadline: .now() + .seconds(10)) { [weak self] in
