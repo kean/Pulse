@@ -279,7 +279,8 @@ private func makeMetrics(for task: MockTask, taskInterval: DateInterval) -> Netw
         var metrics = NetworkLogger.TransactionMetrics(
             request: NetworkLogger.Request(transaction.request),
             response: NetworkLogger.Response(transaction.response),
-            resourceFetchType: transaction.fetchType
+            resourceFetchType: transaction.fetchType,
+            details: .init()
         )
         if transaction.fetchType == .networkLoad {
             metrics.networkProtocolName = "http/2.0"
@@ -340,38 +341,41 @@ private func makeMetrics(for task: MockTask, taskInterval: DateInterval) -> Netw
         let responseHeaders = (transaction.response as? HTTPURLResponse)?.allHeaderFields as? [String: String]
         let statusCode = (transaction.response as? HTTPURLResponse)?.statusCode
 
-        var details = NetworkLogger.TransactionDetailedMetrics()
+        var transferSize = NetworkLogger.TransferSizeInfo()
         if transaction.fetchType == .networkLoad  {
-            details.countOfRequestHeaderBytesSent = getHeadersEstimatedSize(requestHeaders)
-            details.countOfResponseHeaderBytesReceived = getHeadersEstimatedSize(responseHeaders)
+            transferSize.requestHeaderBytesSent = getHeadersEstimatedSize(requestHeaders)
+            transferSize.responseHeaderBytesReceived = getHeadersEstimatedSize(responseHeaders)
             if index == task.transactions.endIndex - 1 && statusCode != 304 {
                 switch task.kind {
                 case .data, .download:
-                    details.countOfRequestBodyBytesBeforeEncoding = requestBodySize
-                    details.countOfRequestBodyBytesSent = Int64(Double(requestBodySize) * .random(in: 0.6...0.8))
+                    transferSize.requestBodyBytesBeforeEncoding = requestBodySize
+                    transferSize.requestBodyBytesSent = Int64(Double(requestBodySize) * .random(in: 0.6...0.8))
                 case .upload(let size):
-                    details.countOfRequestBodyBytesBeforeEncoding = size
-                    details.countOfRequestBodyBytesSent = size
+                    transferSize.requestBodyBytesBeforeEncoding = size
+                    transferSize.requestBodyBytesSent = size
                 }
                 switch task.kind {
                 case .data, .upload:
-                    details.countOfResponseBodyBytesAfterDecoding = Int64(task.responseBody.count)
-                    details.countOfResponseBodyBytesReceived = Int64(Double(task.responseBody.count) * .random(in: 0.6...0.8))
+                    transferSize.responseBodyBytesAfterDecoding = Int64(task.responseBody.count)
+                    transferSize.responseBodyBytesReceived = Int64(Double(task.responseBody.count) * .random(in: 0.6...0.8))
                 case .download(let size):
-                    details.countOfResponseBodyBytesAfterDecoding = size
-                    details.countOfResponseBodyBytesReceived = size
+                    transferSize.responseBodyBytesAfterDecoding = size
+                    transferSize.responseBodyBytesReceived = size
                 }
             }
         }
+        metrics.transferSize = transferSize
 
-        details.negotiatedTLSCipherSuite = tls_ciphersuite_t.AES_128_GCM_SHA256.rawValue
-        details.negotiatedTLSProtocolVersion = tls_protocol_version_t.TLSv13.rawValue
-        details.remoteAddress = "17.253.97.204"
-        details.remotePort = 443
-        details.localAddress = "192.168.0.13"
-        details.localPort = 58622
-
-        metrics.details = details
+        metrics.details = {
+            var details = NetworkLogger.TransactionDetailedMetrics()
+            details.negotiatedTLSCipherSuite = tls_ciphersuite_t.AES_128_GCM_SHA256.rawValue
+            details.negotiatedTLSProtocolVersion = tls_protocol_version_t.TLSv13.rawValue
+            details.remoteAddress = "17.253.97.204"
+            details.remotePort = 443
+            details.localAddress = "192.168.0.13"
+            details.localPort = 58622
+            return details
+        }()
 
         return metrics
     }

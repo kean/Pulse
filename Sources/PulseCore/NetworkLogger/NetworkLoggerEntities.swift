@@ -142,39 +142,48 @@ extension NetworkLogger {
             self.redirectCount = redirectCount
             self.transactions = transactions
         }
+    }
 
-        /// Total transfer size across all transactions.
-        public struct TransferSizeInfo: Sendable {
-            public var totalBytesSent: Int64 = 0
-            public var bodyBytesSent: Int64 = 0
-            public var headersBytesSent: Int64 = 0
-            public var totalBytesReceived: Int64 = 0
-            public var bodyBytesReceived: Int64 = 0
-            public var headersBytesReceived: Int64 = 0
+    /// Total transfer size across all transactions.
+    public struct TransferSizeInfo: Codable, Sendable {
+        // MARK: Sent
+        public var totalBytesSent: Int64 { requestBodyBytesSent + requestHeaderBytesSent }
+        public var requestHeaderBytesSent: Int64 = 0
+        public var requestBodyBytesBeforeEncoding: Int64 = 0
+        public var requestBodyBytesSent: Int64 = 0
 
-            public init() {}
+        // MARK: Received
+        public var totalBytesReceived: Int64 { responseBodyBytesReceived + responseHeaderBytesReceived }
+        public var responseHeaderBytesReceived: Int64 = 0
+        public var responseBodyBytesAfterDecoding: Int64 = 0
+        public var responseBodyBytesReceived: Int64 = 0
 
-            public init(metrics: NetworkLogger.Metrics) {
-                for details in metrics.transactions.compactMap(\.details) {
-                    totalBytesSent += details.countOfRequestBodyBytesBeforeEncoding + details.countOfRequestHeaderBytesSent
-                    bodyBytesSent += details.countOfRequestBodyBytesSent
-                    headersBytesSent += details.countOfRequestHeaderBytesSent
-                    totalBytesReceived += details.countOfResponseBodyBytesReceived + details.countOfResponseHeaderBytesReceived
-                    bodyBytesReceived += details.countOfResponseBodyBytesReceived
-                    headersBytesReceived += details.countOfResponseHeaderBytesReceived
-                }
+        public init() {}
+
+        public init(metrics: NetworkLogger.Metrics) {
+            for transaction in metrics.transactions {
+                self = self.merging(transaction.transferSize)
             }
+        }
 
-            public func merging(_ size: TransferSizeInfo) -> TransferSizeInfo {
-                var size = size
-                size.totalBytesSent += totalBytesSent
-                size.bodyBytesSent += bodyBytesSent
-                size.headersBytesSent += headersBytesSent
-                size.totalBytesReceived += totalBytesReceived
-                size.bodyBytesReceived += bodyBytesReceived
-                size.headersBytesReceived += headersBytesReceived
-                return size
-            }
+        init(metrics: URLSessionTaskTransactionMetrics) {
+            requestHeaderBytesSent = metrics.countOfRequestHeaderBytesSent
+            requestBodyBytesBeforeEncoding = metrics.countOfRequestBodyBytesBeforeEncoding
+            requestBodyBytesSent = metrics.countOfRequestBodyBytesSent
+            responseHeaderBytesReceived = metrics.countOfResponseHeaderBytesReceived
+            responseBodyBytesReceived = metrics.countOfResponseBodyBytesReceived
+            responseBodyBytesAfterDecoding = metrics.countOfResponseBodyBytesAfterDecoding
+        }
+
+        public func merging(_ size: TransferSizeInfo) -> TransferSizeInfo {
+            var size = size
+            size.requestHeaderBytesSent += requestHeaderBytesSent
+            size.requestBodyBytesBeforeEncoding += requestBodyBytesBeforeEncoding
+            size.requestBodyBytesSent += requestBodyBytesSent
+            size.responseHeaderBytesReceived += responseHeaderBytesReceived
+            size.requestBodyBytesBeforeEncoding += requestBodyBytesBeforeEncoding
+            size.responseBodyBytesReceived += responseBodyBytesReceived
+            return size
         }
     }
 
@@ -197,7 +206,16 @@ extension NetworkLogger {
         public var isReusedConnection = false
         /// `URLSessionTaskMetrics.ResourceFetchType` enum raw value
         public var resourceFetchType: Int
-        public var details: NetworkLogger.TransactionDetailedMetrics?
+        public var transferSize: TransferSizeInfo {
+            get { _transferSize ?? .init() }
+            set { _transferSize = newValue }
+        }
+        var _transferSize: TransferSizeInfo? // Backward-compatibility
+        public var details: NetworkLogger.TransactionDetailedMetrics {
+            get { _details ?? .init() }
+            set { _details = newValue }
+        }
+        public var _details: NetworkLogger.TransactionDetailedMetrics? // Backward-compatibility
 
         public var fetchType: URLSessionTaskMetrics.ResourceFetchType {
             URLSessionTaskMetrics.ResourceFetchType(rawValue: resourceFetchType) ?? .unknown
@@ -228,10 +246,11 @@ extension NetworkLogger {
             self.isProxyConnection = metrics.isProxyConnection
             self.isReusedConnection = metrics.isReusedConnection
             self.resourceFetchType = metrics.resourceFetchType.rawValue
+            self.transferSize = TransferSizeInfo(metrics: metrics)
             self.details = NetworkLogger.TransactionDetailedMetrics(metrics: metrics)
         }
 
-        public init(request: NetworkLogger.Request? = nil, response: NetworkLogger.Response? = nil, resourceFetchType: URLSessionTaskMetrics.ResourceFetchType, details: NetworkLogger.TransactionDetailedMetrics? = nil) {
+        public init(request: NetworkLogger.Request? = nil, response: NetworkLogger.Response? = nil, resourceFetchType: URLSessionTaskMetrics.ResourceFetchType, details: NetworkLogger.TransactionDetailedMetrics) {
             self.request = request
             self.response = response
             self.resourceFetchType = resourceFetchType.rawValue
@@ -240,12 +259,6 @@ extension NetworkLogger {
     }
 
     public struct TransactionDetailedMetrics: Codable, Sendable {
-        public var countOfRequestHeaderBytesSent: Int64 = 0
-        public var countOfRequestBodyBytesSent: Int64 = 0
-        public var countOfRequestBodyBytesBeforeEncoding: Int64 = 0
-        public var countOfResponseHeaderBytesReceived: Int64 = 0
-        public var countOfResponseBodyBytesReceived: Int64 = 0
-        public var countOfResponseBodyBytesAfterDecoding: Int64 = 0
         public var localAddress: String?
         public var remoteAddress: String?
         public var isCellular = false
@@ -260,12 +273,6 @@ extension NetworkLogger {
         public var negotiatedTLSCipherSuite: UInt16?
 
         public init(metrics: URLSessionTaskTransactionMetrics) {
-            self.countOfRequestHeaderBytesSent = metrics.countOfRequestHeaderBytesSent
-            self.countOfRequestBodyBytesSent = metrics.countOfRequestBodyBytesSent
-            self.countOfRequestBodyBytesBeforeEncoding = metrics.countOfRequestBodyBytesBeforeEncoding
-            self.countOfResponseHeaderBytesReceived = metrics.countOfResponseHeaderBytesReceived
-            self.countOfResponseBodyBytesReceived = metrics.countOfResponseBodyBytesReceived
-            self.countOfResponseBodyBytesAfterDecoding = metrics.countOfResponseBodyBytesAfterDecoding
             self.localAddress = metrics.localAddress
             self.remoteAddress = metrics.remoteAddress
             self.isCellular = metrics.isCellular

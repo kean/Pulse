@@ -9,7 +9,7 @@ import Combine
 public final class NetworkLoggerInsights: @unchecked Sendable {
     private var cancellable: AnyCancellable?
 
-    public var transferSize: NetworkLogger.Metrics.TransferSizeInfo { main.transferSize }
+    public var transferSize: NetworkLogger.TransferSizeInfo { main.transferSize }
     public var duration: RequestsDurationInfo { main.duration }
     public var redirects: RedirectsInfo { main.redirects }
     public var failures: FailuresInfo { main.failures }
@@ -18,7 +18,7 @@ public final class NetworkLoggerInsights: @unchecked Sendable {
     private var contents = Contents()
 
     private struct Contents {
-        var transferSize = NetworkLogger.Metrics.TransferSizeInfo()
+        var transferSize = NetworkLogger.TransferSizeInfo()
         var duration = RequestsDurationInfo()
         var redirects = RedirectsInfo()
         var failures = FailuresInfo()

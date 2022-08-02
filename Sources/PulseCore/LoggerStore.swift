@@ -458,11 +458,11 @@ extension LoggerStore {
         case .downloadTask:
             request.responseBodySize = event.metrics?.transactions.last(where: {
                 $0.resourceFetchType == URLSessionTaskMetrics.ResourceFetchType.networkLoad.rawValue
-            })?.details?.countOfResponseBodyBytesReceived ?? request.progress?.completedUnitCount ?? -1
+            })?.transferSize.responseBodyBytesReceived ?? request.progress?.completedUnitCount ?? -1
         case .uploadTask:
             request.requestBodySize = event.metrics?.transactions.last(where: {
                 $0.resourceFetchType == URLSessionTaskMetrics.ResourceFetchType.networkLoad.rawValue
-            })?.details?.countOfRequestBodyBytesSent ?? Int64(event.requestBody?.count ?? -1)
+            })?.transferSize.requestBodyBytesSent ?? Int64(event.requestBody?.count ?? -1)
         default:
             break
         }

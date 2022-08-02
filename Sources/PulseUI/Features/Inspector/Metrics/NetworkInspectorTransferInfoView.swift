@@ -140,14 +140,14 @@ struct NetworkInspectorTransferInfoViewModel {
         self.init(transferSize: metrics.transferSize, isUpload: taskType == .uploadTask)
     }
 
-    init(transferSize: NetworkLogger.Metrics.TransferSizeInfo, isUpload: Bool = false) {
+    init(transferSize: NetworkLogger.TransferSizeInfo, isUpload: Bool = false) {
         totalBytesSent = formatBytes(transferSize.totalBytesSent)
-        bodyBytesSent = formatBytes(transferSize.bodyBytesSent)
-        headersBytesSent = formatBytes(transferSize.headersBytesSent)
+        bodyBytesSent = formatBytes(transferSize.requestBodyBytesSent)
+        headersBytesSent = formatBytes(transferSize.requestHeaderBytesSent)
 
         totalBytesReceived = formatBytes(transferSize.totalBytesReceived)
-        bodyBytesReceived = formatBytes(transferSize.bodyBytesReceived)
-        headersBytesReceived = formatBytes(transferSize.headersBytesReceived)
+        bodyBytesReceived = formatBytes(transferSize.responseBodyBytesReceived)
+        headersBytesReceived = formatBytes(transferSize.responseHeaderBytesReceived)
 
         self.isUpload = isUpload
     }

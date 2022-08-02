@@ -18,6 +18,11 @@ struct NetworkInspectorTransactionView: View {
                 if let timingViewModel = viewModel.timingViewModel {
                     TimingView(viewModel: timingViewModel)
                 }
+                if let viewModel = viewModel.transferSizeViewModel {
+                    Section(header: LargeSectionHeader(title: "Transfer Size")) {
+                        NetworkInspectorTransferInfoView(viewModel: viewModel)
+                    }
+                }
                 Section(header: LargeSectionHeader(title: "Request")) {
                     KeyValueGridView(items: [
                         viewModel.requestSummary,
@@ -62,12 +67,18 @@ final class NetworkInspectorTransactionViewModel: ObservableObject {
 
     let details: NetworkMetricsDetailsViewModel?
     let timingViewModel: TimingViewModel?
+    let transferSizeViewModel: NetworkInspectorTransferInfoViewModel?
 
     private let transaction: NetworkLogger.TransactionMetrics
 
     init(transaction: NetworkLogger.TransactionMetrics, metrics: NetworkLogger.Metrics) {
         self.details = NetworkMetricsDetailsViewModel(metrics: transaction)
         self.timingViewModel = TimingViewModel(transaction: transaction, metrics: metrics)
+        if transaction.fetchType == .networkLoad {
+            self.transferSizeViewModel = NetworkInspectorTransferInfoViewModel(transferSize: transaction.transferSize, isUpload: false)
+        } else {
+            self.transferSizeViewModel = nil
+        }
         self.transaction = transaction
     }
 

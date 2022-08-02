@@ -36,19 +36,19 @@ struct NetworkMetricsDetailsViewModel {
 }
 
 private func makeTransferSection(for metrics: NetworkLogger.TransactionMetrics) -> KeyValueSectionViewModel? {
-    guard let metrics = metrics.details else { return nil }
+    let transferSize = metrics.transferSize
     return KeyValueSectionViewModel(title: "Data Transfer", color: .secondary, items: [
-        ("Request Headers", formatBytes(metrics.countOfRequestHeaderBytesSent)),
-        ("Request Body", formatBytes(metrics.countOfRequestBodyBytesBeforeEncoding)),
-        ("Request Body (Encoded)", formatBytes(metrics.countOfRequestBodyBytesSent)),
-        ("Response Headers", formatBytes(metrics.countOfResponseHeaderBytesReceived)),
-        ("Response Body", formatBytes(metrics.countOfResponseBodyBytesReceived)),
-        ("Response Body (Decoded)", formatBytes(metrics.countOfResponseBodyBytesAfterDecoding))
+        ("Request Headers", formatBytes(transferSize.requestHeaderBytesSent)),
+        ("Request Body", formatBytes(transferSize.requestBodyBytesBeforeEncoding)),
+        ("Request Body (Encoded)", formatBytes(transferSize.requestBodyBytesSent)),
+        ("Response Headers", formatBytes(transferSize.responseHeaderBytesReceived)),
+        ("Response Body", formatBytes(transferSize.responseBodyBytesReceived)),
+        ("Response Body (Decoded)", formatBytes(transferSize.responseBodyBytesAfterDecoding))
     ])
 }
 
 private func makeProtocolSection(for metrics: NetworkLogger.TransactionMetrics) -> KeyValueSectionViewModel? {
-    guard let details = metrics.details else { return nil }
+    let details = metrics.details
     return KeyValueSectionViewModel(title: "Protocol", color: .secondary, items: [
         ("Network Protocol", metrics.networkProtocolName),
         ("Remote Address", details.remoteAddress),
@@ -59,8 +59,7 @@ private func makeProtocolSection(for metrics: NetworkLogger.TransactionMetrics) 
 }
 
 private func makeSecuritySection(for metrics: NetworkLogger.TransactionMetrics) -> KeyValueSectionViewModel? {
-    guard let metrics = metrics.details else { return nil }
-
+    let metrics = metrics.details
     guard let suite = metrics.negotiatedTLSCipherSuite.flatMap(tls_ciphersuite_t.init(rawValue:)),
           let version = metrics.negotiatedTLSProtocolVersion.flatMap(tls_protocol_version_t.init(rawValue:)) else {
         return nil
@@ -74,12 +73,12 @@ private func makeSecuritySection(for metrics: NetworkLogger.TransactionMetrics) 
 private func makeMiscSection(for metrics: NetworkLogger.TransactionMetrics) -> KeyValueSectionViewModel? {
     let details = metrics.details
     return KeyValueSectionViewModel(title: "Characteristics", color: .secondary, items: [
-        ("Cellular", details?.isCellular.description),
-        ("Expensive", details?.isExpensive.description),
-        ("Constrained", details?.isConstrained.description),
+        ("Cellular", details.isCellular.description),
+        ("Expensive", details.isExpensive.description),
+        ("Constrained", details.isConstrained.description),
         ("Proxy Connection", metrics.isProxyConnection.description),
         ("Reused Connection", metrics.isReusedConnection.description),
-        ("Multipath", details?.isMultipath.description)
+        ("Multipath", details.isMultipath.description)
     ])
 }
 
