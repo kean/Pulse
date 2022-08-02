@@ -797,7 +797,7 @@ extension LoggerStore {
         // First try to remove all outdated message.
         try removeOutdatedMessages()
 
-        // Then if the size is still surpases the limit, remove remainig ones until it doesn't.
+        // Then if the size is still surpases the limit, remove remaining ones until it doesn't.
         let attributes = try Files.attributesOfItem(atPath: storeURL.appendingPathComponent(databaseFileName, isDirectory: false).path)
         let size = attributes[.size] as? Int64 ?? 0
 
