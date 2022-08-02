@@ -26,7 +26,6 @@ public final class URLSessionProxyDelegate: NSObject, URLSessionTaskDelegate, UR
         self.interceptedSelectors = [
             #selector(URLSessionDataDelegate.urlSession(_:dataTask:didReceive:)),
             #selector(URLSessionTaskDelegate.urlSession(_:task:didCompleteWithError:)),
-            #selector(URLSessionDataDelegate.urlSession(_:dataTask:didReceive:completionHandler:)),
             #selector(URLSessionTaskDelegate.urlSession(_:task:didFinishCollecting:)),
             #selector(URLSessionTaskDelegate.urlSession(_:task:didSendBodyData:totalBytesSent:totalBytesExpectedToSend:)),
             #selector(URLSessionDownloadDelegate.urlSession(_:downloadTask:didFinishDownloadingTo:)),
@@ -70,15 +69,6 @@ public final class URLSessionProxyDelegate: NSObject, URLSessionTaskDelegate, UR
     }
 
     // MARK: URLSessionDataDelegate
-
-    public func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
-        logger.logDataTask(dataTask, didReceive: response)
-        if actualDelegate?.responds(to: #selector(URLSessionDataDelegate.urlSession(_:dataTask:didReceive:completionHandler:))) ?? false {
-            (actualDelegate as? URLSessionDataDelegate)?.urlSession?(session, dataTask: dataTask, didReceive: response, completionHandler: completionHandler)
-        } else {
-            completionHandler(.allow)
-        }
-    }
 
     public func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
         logger.logDataTask(dataTask, didReceive: data)

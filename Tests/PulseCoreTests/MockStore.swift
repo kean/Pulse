@@ -51,7 +51,6 @@ extension XCTestCase {
         func logTask(_ mockTask: MockDataTask) {
             let dataTask = urlSession.dataTask(with: mockTask.request)
             networkLogger.logTaskCreated(dataTask)
-            networkLogger.logDataTask(dataTask, didReceive: mockTask.response)
             networkLogger.logDataTask(dataTask, didReceive: mockTask.responseBody)
             networkLogger.logTask(dataTask, didFinishCollecting: mockTask.metrics)
             networkLogger.logTask(dataTask, didCompleteWithError: nil)

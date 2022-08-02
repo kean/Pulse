@@ -4,6 +4,10 @@
 
 import Foundation
 
+/// A thin wrapper on top of ``LoggerStore`` that simplifies logging of network requests.
+///
+/// - note: ``NetworkLogger`` is used internally by ``URLSessionProxyDelegate`` and
+/// should generally not be used directly.
 public final class NetworkLogger: @unchecked Sendable {
     private let store: LoggerStore
     private let lock = NSLock()
@@ -56,14 +60,6 @@ public final class NetworkLogger: @unchecked Sendable {
             requestBody: originalRequest.httpBody ?? originalRequest.httpBodyStreamData(),
             session: LoggerStore.Session.current.id.uuidString
         )))
-    }
-
-    /// Logs the task response (optional).
-    public func logDataTask(_ dataTask: URLSessionDataTask, didReceive response: URLResponse) {
-        lock.lock()
-        let context = self.context(for: dataTask)
-        context.response = response
-        lock.unlock()
     }
 
     /// Logs the task data that gets appended to the previously received chunks (required).
@@ -132,7 +128,7 @@ public final class NetworkLogger: @unchecked Sendable {
             lock.unlock()
             return // This should never happen
         }
-        let response = context.response ?? task.response
+
         let metrics = context.metrics
         let data = context.data
         lock.unlock()
@@ -143,7 +139,7 @@ public final class NetworkLogger: @unchecked Sendable {
             createdAt: Date(),
             originalRequest: Request(originalRequest),
             currentRequest: task.currentRequest.map(Request.init),
-            response: response.map(Response.init),
+            response: task.response.map(Response.init),
             error: error.map(ResponseError.init),
             requestBody: originalRequest.httpBody ?? originalRequest.httpBodyStreamData(),
             responseBody: data,
@@ -166,7 +162,6 @@ public final class NetworkLogger: @unchecked Sendable {
     final class TaskContext {
         let taskId = UUID()
         var request: URLRequest?
-        var response: URLResponse?
         lazy var data = Data()
         var metrics: NetworkLogger.Metrics?
     }

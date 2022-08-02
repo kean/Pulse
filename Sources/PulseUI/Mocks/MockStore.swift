@@ -215,7 +215,6 @@ private func _logTask(_ mockTask: MockTask, urlSession: URLSession, logger: Netw
             await Task.sleep(milliseconds: .random(in: 500...2000))
         }
         if let dataTask = task as? URLSessionDataTask {
-            logger.logDataTask(dataTask, didReceive: mockTask.response)
             logger.logDataTask(dataTask, didReceive: mockTask.responseBody)
         }
         
@@ -241,7 +240,6 @@ private func _logTask(_ mockTask: MockTask, urlSession: URLSession, logger: Netw
 private func _logTask(_ mockTask: MockTask, urlSession: URLSession, logger: NetworkLogger) {
     let task = makeSessionTask(for: mockTask, urlSession: urlSession)
     if let dataTask = task as? URLSessionDataTask {
-        logger.logDataTask(dataTask, didReceive: mockTask.response)
         logger.logDataTask(dataTask, didReceive: mockTask.responseBody)
     }
 
