@@ -38,7 +38,7 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         request.fetchBatchSize = 250
         request.sortDescriptors = [NSSortDescriptor(keyPath: \LoggerNetworkRequestEntity.createdAt, ascending: false)]
 
-        self.controller = NSFetchedResultsController<LoggerNetworkRequestEntity>(fetchRequest: request, managedObjectContext: store.container.viewContext, sectionNameKeyPath: nil, cacheName: nil)
+        self.controller = NSFetchedResultsController<LoggerNetworkRequestEntity>(fetchRequest: request, managedObjectContext: store.viewContext, sectionNameKeyPath: nil, cacheName: nil)
 
         self.searchCriteria = NetworkSearchCriteriaViewModel(isDefaultStore: store === LoggerStore.shared)
 #if os(iOS) || os(macOS)

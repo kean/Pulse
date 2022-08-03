@@ -47,7 +47,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         request.relationshipKeyPathsForPrefetching = ["request"]
         request.sortDescriptors = [NSSortDescriptor(keyPath: \LoggerMessageEntity.createdAt, ascending: false)]
 
-        self.controller = NSFetchedResultsController<LoggerMessageEntity>(fetchRequest: request, managedObjectContext: store.container.viewContext, sectionNameKeyPath: nil, cacheName: nil)
+        self.controller = NSFetchedResultsController<LoggerMessageEntity>(fetchRequest: request, managedObjectContext: store.viewContext, sectionNameKeyPath: nil, cacheName: nil)
 
         self.searchCriteria = ConsoleSearchCriteriaViewModel(isDefaultStore: store === LoggerStore.shared)
 #if os(iOS) || os(macOS)

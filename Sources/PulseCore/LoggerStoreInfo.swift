@@ -19,6 +19,10 @@ extension LoggerStore {
         public let modifiedDate: Date
         public let archivedDate: Date
 
+        var version: Version {
+            Version(storeVersion) ?? .init(1, 0, 0) // should always succeed
+        }
+
         public struct AppInfo: Codable, Sendable {
             public let bundleIdentifier: String?
             public let name: String?

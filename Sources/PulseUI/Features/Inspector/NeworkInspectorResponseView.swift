@@ -24,7 +24,7 @@ struct NetworkInspectorResponseView: View {
                 return title
             }())
         } else if viewModel.request.responseBodyKey != nil {
-            PlaceholderView(imageName: "exclamationmark.circle", title: "Unavailable", messages: "The response body was deleted from the store to reduce its size"))
+            PlaceholderView(imageName: "exclamationmark.circle", title: "Unavailable", subtitle: "The response body was deleted from the store to reduce its size")
         } else {
             PlaceholderView(imageName: "nosign", title: "Empty Response")
         }

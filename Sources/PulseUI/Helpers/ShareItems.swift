@@ -59,7 +59,7 @@ extension ShareItems {
 
 struct ConsoleShareService {
     let store: LoggerStore
-    private var context: NSManagedObjectContext { store.container.viewContext }
+    private var context: NSManagedObjectContext { store.viewContext }
 
     init(store: LoggerStore) {
         self.store = store

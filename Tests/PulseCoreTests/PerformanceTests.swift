@@ -40,7 +40,7 @@ final class PerformanceTests: XCTestCase {
         let request = NSFetchRequest<LoggerMessageEntity>(entityName: "LoggerMessageEntity")
         request.predicate = NSPredicate(format: "level == %@", LoggerStore.Level.info.rawValue)
 
-        let moc = store.container.viewContext
+        let moc = store.viewContext
 
         measure {
             let messages = (try? moc.fetch(request)) ?? []
@@ -52,7 +52,7 @@ final class PerformanceTests: XCTestCase {
         let request = NSFetchRequest<LoggerMessageEntity>(entityName: "LoggerMessageEntity")
         request.predicate = NSPredicate(format: "SUBQUERY(metadata, $entry, $entry.key == %@ AND $entry.value == %@).@count > 0", "system", "auth")
 
-        let moc = store.container.viewContext
+        let moc = store.viewContext
 
         measure {
             let messages = (try? moc.fetch(request)) ?? []
@@ -61,7 +61,7 @@ final class PerformanceTests: XCTestCase {
     }
 
     func populateStore() {
-        let moc = store.container.viewContext
+        let moc = store.viewContext
 
         func addMessage(_ closure: (LoggerMessageEntity) -> Void) {
             let message = LoggerMessageEntity(context: moc)

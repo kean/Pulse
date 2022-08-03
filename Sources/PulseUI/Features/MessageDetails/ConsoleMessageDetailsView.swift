@@ -137,7 +137,7 @@ struct ConsoleMessageDetailsView_Previews: PreviewProvider {
 }
 
 func makeMockMessage() -> LoggerMessageEntity {
-    let entity = LoggerMessageEntity(context: LoggerStore.mock.container.viewContext)
+    let entity = LoggerMessageEntity(context: LoggerStore.mock.viewContext)
     entity.text = "test"
     entity.createdAt = Date()
     entity.label = "auth"
@@ -148,7 +148,7 @@ func makeMockMessage() -> LoggerMessageEntity {
     entity.function = "createMockMessage()"
     entity.line = 12
 
-    let meta = LoggerMetadataEntity(context: LoggerStore.mock.container.viewContext)
+    let meta = LoggerMetadataEntity(context: LoggerStore.mock.viewContext)
     meta.key = "customKey"
     meta.value = "customValue"
 

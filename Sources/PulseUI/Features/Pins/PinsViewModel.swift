@@ -38,7 +38,7 @@ final class PinsViewModel: ObservableObject {
     private func refresh(with pinnedMessageIds: Set<NSManagedObjectID>) {
         guard isActive else { return }
         messages = pinnedMessageIds.compactMap {
-            store.container.viewContext.object(with: $0) as? LoggerMessageEntity
+            store.viewContext.object(with: $0) as? LoggerMessageEntity
         }
     }
 

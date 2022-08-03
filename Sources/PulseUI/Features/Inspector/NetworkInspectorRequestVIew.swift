@@ -24,7 +24,7 @@ struct NetworkInspectorRequestView: View {
                 return title
             }())
         } else if viewModel.request.requestBodyKey != nil {
-            PlaceholderView(imageName: "exclamationmark.circle", title: "Unavailable", messages: "The request body was deleted from the store to reduce its size")
+            PlaceholderView(imageName: "exclamationmark.circle", title: "Unavailable", subtitle: "The request body was deleted from the store to reduce its size")
         } else {
             PlaceholderView(imageName: "nosign", title: "Empty Request")
         }

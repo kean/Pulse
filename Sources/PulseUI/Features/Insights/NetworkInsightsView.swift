@@ -263,7 +263,7 @@ final class NetworkInsightsViewModel: ObservableObject {
         request.fetchLimit = ids.count
         request.predicate = NSPredicate(format: "taskId IN %@", ids)
 
-        return (try? store.container.viewContext.fetch(request)) ?? []
+        return (try? store.viewContext.fetch(request)) ?? []
     }
 }
 

@@ -43,7 +43,7 @@ final class BlobStore: @unchecked Sendable {
     private let queue = DispatchQueue(label: "com.github.kean.pulse.blob-storage", qos: .utility)
 
     /// Creates a cache instance with a given path.
-    init(path: URL, sizeLimit: Int, responseBodySizeLimit: Int) {
+    init(path: URL, sizeLimit: Int, responseBodySizeLimit: Int, sweep: Bool) {
         self.path = path
         self.sizeLimit = sizeLimit
         self.responseBodySizeLimit = responseBodySizeLimit
@@ -66,6 +66,7 @@ final class BlobStore: @unchecked Sendable {
         guard let data = data, !data.isEmpty else {
             return nil
         }
+        #warning("TODO: move this")
         guard data.count < responseBodySizeLimit else {
             return nil
         }
