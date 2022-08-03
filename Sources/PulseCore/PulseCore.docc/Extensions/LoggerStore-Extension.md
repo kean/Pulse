@@ -40,9 +40,10 @@
 - ``events``
 - ``Event``
 
-### Direct Database Access 
+### Direct Database Access
 
 - ``container``
+- ``viewContext``
 - ``backgroundContext``
 
 ### Nested

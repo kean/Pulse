@@ -71,7 +71,6 @@ final class PerformanceTests: XCTestCase {
 
         /// Create 60000 messages
         for _ in 0..<10000 {
-
             addMessage {
                 $0.createdAt = Date() - 0.11
                 $0.level = LoggerStore.Level.info.rawValue

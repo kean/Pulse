@@ -5,6 +5,8 @@
 import Foundation
 import CommonCrypto
 
+#warning("TODO: remove sweep and size limit")
+
 /// Blob storage.
 ///
 /// - Stores blobs using file system

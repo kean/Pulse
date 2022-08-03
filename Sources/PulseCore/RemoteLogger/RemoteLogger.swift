@@ -390,8 +390,6 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
         case .messageStored(let message):
             connection?.send(code: .storeEventMessageStored, entity: message)
         case .networkTaskCreated(let event):
-            var event = event
-            event.requestBody = nil // Don't send it now - will send at the end
             connection?.send(code: .storeEventNetworkTaskCreated, entity: event)
         case .networkTaskProgressUpdated(let event):
             connection?.send(code: .storeEventNetworkTaskProgressUpdated, entity: event)

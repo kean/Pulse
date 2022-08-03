@@ -16,7 +16,8 @@ extension LoggerStore {
         let request = NSEntityDescription(name: "LoggerNetworkRequestEntity", class: LoggerNetworkRequestEntity.self)
         let requestProgress = NSEntityDescription(name: "LoggerNetworkRequestProgressEntity", class: LoggerNetworkRequestProgressEntity.self)
         let requestDetails = NSEntityDescription(name: "LoggerNetworkRequestDetailsEntity", class: LoggerNetworkRequestDetailsEntity.self)
-
+        let blob = NSEntityDescription(name: "LoggerBlobHandleEntity", class: LoggerBlobHandleEntity.self)
+        
         metadata.properties = [
             NSAttributeDescription(name: "key", type: .stringAttributeType),
             NSAttributeDescription(name: "value", type: .stringAttributeType)
@@ -68,17 +69,23 @@ extension LoggerStore {
             NSAttributeDescription(name: "contentType", type: .stringAttributeType),
             NSAttributeDescription(name: "requestState", type: .integer16AttributeType),
             NSAttributeDescription(name: "redirectCount", type: .integer16AttributeType),
-            NSAttributeDescription(name: "requestBodyKey", type: .stringAttributeType),
-            NSAttributeDescription(name: "responseBodyKey", type: .stringAttributeType),
             NSAttributeDescription(name: "requestBodySize", type: .integer64AttributeType),
             NSAttributeDescription(name: "responseBodySize", type: .integer64AttributeType),
             NSAttributeDescription(name: "isFromCache", type: .booleanAttributeType),
             NSRelationshipDescription.make(name: "details", type: .oneToOne(), entity: requestDetails),
             NSRelationshipDescription.make(name: "message", type: .oneToOne(), entity: message),
+            NSRelationshipDescription.make(name: "requestBody", type: .oneToOne(isOptional: true), deleteRule: .noActionDeleteRule, entity: blob),
+            NSRelationshipDescription.make(name: "responseBody", type: .oneToOne(isOptional: true), deleteRule: .noActionDeleteRule, entity: blob),
             NSRelationshipDescription.make(name: "progress", type: .oneToOne(isOptional: true), entity: requestProgress)
         ]
 
-        model.entities = [message, metadata, request, requestDetails, requestProgress]
+        blob.properties = [
+            NSAttributeDescription(name: "key", type: .stringAttributeType),
+            NSAttributeDescription(name: "size", type: .integer64AttributeType),
+            NSAttributeDescription(name: "links", type: .integer16AttributeType)
+        ]
+
+        model.entities = [message, metadata, request, requestDetails, requestProgress, blob]
         return model
     }()
 }
@@ -159,9 +166,13 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
     /// Request details.
     @NSManaged public var details: LoggerNetworkRequestDetailsEntity
     /// The key in the blob storage. To get the data, see ``LoggerStore/getData(forKey:)``.
-    @NSManaged public var requestBodyKey: String?
+    public var requestBodyKey: String? { requestBody?.key }
+    /// The request body handle.
+    @NSManaged public var requestBody: LoggerBlobHandleEntity?
     /// The key in the blob storage. To get the data, see ``LoggerStore/getData(forKey:)``.
-    @NSManaged public var responseBodyKey: String?
+    public var responseBodyKey: String? { responseBody?.key }
+    /// The response body handle.
+    @NSManaged public var responseBody: LoggerBlobHandleEntity?
     /// The size of the request body.
     @NSManaged public var requestBodySize: Int64
     /// The size of the response body.
@@ -221,6 +232,18 @@ public final class LoggerNetworkRequestDetailsEntity: NSManagedObject {
     @NSManaged public var metrics: Data?
     /// Contains JSON-encoded metadata (`[String: String]`).
     @NSManaged public var metadata: Data?
+}
+
+/// Doesn't contain any data, just the key and some additional payload.
+public final class LoggerBlobHandleEntity: NSManagedObject {
+    /// A blob hash (sha256).
+    @NSManaged public var key: String
+
+    /// A blob size.
+    @NSManaged public var size: Int64
+
+    /// A number of requests referencing it.
+    @NSManaged public var links: Int16
 }
 
 // MARK: - Helpers

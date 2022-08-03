@@ -42,6 +42,12 @@ public final class LoggerStore: @unchecked Sendable {
     /// Returns the Core Data container associated with the store.
     public let container: NSPersistentContainer
 
+    #warning("TODO: disk sweep on LoggerStore level")
+
+    #warning("TODO: use everywehere")
+    /// Returns the view context for accessing entities on the main thead.
+    public var viewContext: NSManagedObjectContext { container.viewContext }
+
     /// Returns the background managed object context used for all write operations.
     public let backgroundContext: NSManagedObjectContext
 
@@ -57,6 +63,7 @@ public final class LoggerStore: @unchecked Sendable {
     private let options: Options
     private let configuration: Configuration
     private var isSaveScheduled = false
+    private var didChangeObserver: AnyObject?
     private let queue = DispatchQueue(label: "com.github.kean.pulse.logger-store")
 
     // MARK: Shared
@@ -120,7 +127,7 @@ public final class LoggerStore: @unchecked Sendable {
         /// Size limit in bytes. `64 Mb` by default. The limit is approximate.
         public var databaseSizeLimit: Int
 
-        /// Size limit in bytes. `512 Mb` by default.
+        /// Size limit in bytes. `384 Mb` by default.
         public var blobsSizeLimit: Int
 
         /// Determines how often the messages are saved to the database. By default,
@@ -155,12 +162,14 @@ public final class LoggerStore: @unchecked Sendable {
         /// - parameters:
         ///   - databaseSizeLimit: The approximate limit of the database size. `64 Mb`
         ///   - blobsSizeLimit: The approximate limit of the blob storage that
-        ///   contains network responses (HTTP body). `512 Mb` by default.
-        public init(databaseSizeLimit: Int = 64 * 1048576, blobsSizeLimit: Int = 512 * 1048576) {
+        ///   contains network responses (HTTP body). `384 Mb` by default.
+        public init(databaseSizeLimit: Int = 64 * 1048576, blobsSizeLimit: Int = 384 * 1048576) {
             self.databaseSizeLimit = databaseSizeLimit
             self.blobsSizeLimit = blobsSizeLimit
         }
     }
+
+#warning("TODO: update migration to delete blobs store and recreate it and update sweep to delete blobs")
 
     // MARK: Initialization
 
@@ -217,6 +226,15 @@ public final class LoggerStore: @unchecked Sendable {
         self.isReadonly = false
         self.info = nil
         self.document = .directory(blobs: BlobStore(path: blobsURL, sizeLimit: configuration.blobsSizeLimit, responseBodySizeLimit: configuration.responseBodySizeLimit))
+
+        if #available(iOS 14.0, tvOS 14.0, *) {
+            didChangeObserver = NotificationCenter.default.addObserver(forName: NSManagedObjectContext.didChangeObjectsNotification, object: backgroundContext, queue: nil) { [weak self] notification in
+                self?.backgroundContextDidChangeObjects(notification)
+            }
+        } else {
+            // It's not critical that we won't eagerly delete these blobs
+            // because the sweep will eventualy pick them up.
+        }
 
         if options.contains(.sweep) {
             DispatchQueue.global().asyncAfter(deadline: .now() + .seconds(10)) { [weak self] in
@@ -401,10 +419,6 @@ extension LoggerStore {
 
         request.details.originalRequest = try? JSONEncoder().encode(event.originalRequest)
         request.details.currentRequest = try? JSONEncoder().encode(event.currentRequest)
-
-        if case let .directory(store) = document {
-            request.requestBodyKey = store.storeData(event.requestBody)
-        }
     }
 
     private func process(_ event: Event.NetworkTaskProgressUpdated) {
@@ -445,15 +459,18 @@ extension LoggerStore {
 
         // Populate response/request data
         let contentType = event.response?.headers["Content-Type"].flatMap(NetworkLogger.ContentType.init)
-        if case let .directory(store) = document {
-            request.requestBodyKey = store.storeData(event.requestBody)
-            if let responseBody = event.responseBody {
-                request.responseBodyKey = store.storeData(preprocessData(responseBody, contentType: contentType))
-            }
+
+        if let requestBody = event.requestBody {
+            let contentType = event.originalRequest.headers["Content-Type"].flatMap(NetworkLogger.ContentType.init)
+            request.requestBody = storeBlob(preprocessData(requestBody, contentType: contentType))
+        }
+        if let responseData = event.responseBody {
+            request.responseBody = storeBlob(preprocessData(responseData, contentType: contentType))
         }
 
         switch event.taskType {
         case .dataTask:
+            request.requestBodySize = Int64(event.requestBody?.count ?? 0)
             request.responseBodySize = Int64(event.responseBody?.count ?? 0)
         case .downloadTask:
             request.responseBodySize = event.metrics?.transactions.last(where: {
@@ -526,10 +543,10 @@ extension LoggerStore {
     }
 
     private func findNetworkRequestEntity(forTaskId taskId: UUID) -> LoggerNetworkRequestEntity? {
-        let entity = NSFetchRequest<LoggerNetworkRequestEntity>(entityName: "\(LoggerNetworkRequestEntity.self)")
-        entity.fetchLimit = 1
-        entity.predicate = NSPredicate(format: "taskId == %@", taskId as NSUUID)
-        return try? backgroundContext.fetch(entity).first
+        let request = NSFetchRequest<LoggerNetworkRequestEntity>(entityName: "\(LoggerNetworkRequestEntity.self)")
+        request.fetchLimit = 1
+        request.predicate = NSPredicate(format: "taskId == %@", taskId as NSUUID)
+        return try? backgroundContext.fetch(request).first
     }
 
     private func findOrCreateNetworkRequestEntity(forTaskId taskId: UUID, taskType: NetworkLogger.TaskType, createdAt: Date, session: String) -> LoggerNetworkRequestEntity {
@@ -565,6 +582,29 @@ extension LoggerStore {
         return request
     }
 
+    private func storeBlob(_ data: Data) -> LoggerBlobHandleEntity? {
+        guard case .directory(let store) = document, !data.isEmpty else {
+            return nil
+        }
+
+        let key = data.sha256
+
+        let request = NSFetchRequest<LoggerBlobHandleEntity>(entityName: "\(LoggerBlobHandleEntity.self)")
+        request.fetchLimit = 1
+        request.predicate = NSPredicate(format: "key == %@", key)
+        if let entity = try? backgroundContext.fetch(request).first {
+            entity.links += 1
+            return entity
+        }
+        let entity = LoggerBlobHandleEntity(context: backgroundContext)
+        #warning("update")
+        _ = store.storeData(data)
+        entity.key = key
+        entity.links = 1
+        entity.size = Int64(data.count)
+        return entity
+    }
+
     private func setNeedsSave() {
         guard !isSaveScheduled else { return }
         isSaveScheduled = true
@@ -579,6 +619,34 @@ extension LoggerStore {
             if self.isSaveScheduled, Files.fileExists(atPath: self.storeURL.path) {
                 try? self.backgroundContext.save()
                 self.isSaveScheduled = false
+            }
+        }
+    }
+
+    // MARK: Notifications
+
+    private func backgroundContextDidChangeObjects(_ notification: Notification) {
+        guard case .directory(let store) = document, // The opposite should never happen
+              let deletedObjects = notification.userInfo?[NSDeletedObjectsKey] as? Set<NSManagedObject> else {
+            return
+        }
+        for object in deletedObjects {
+            switch object {
+            case let request as LoggerNetworkRequestEntity:
+                // Unlink the blobs
+                func unlink(_ blob: LoggerBlobHandleEntity) {
+                    blob.links -= 1
+                    if blob.links == 0 {
+                        backgroundContext.delete(blob)
+                    }
+                }
+                if let blob = request.requestBody { unlink(blob) }
+                if let blob = request.responseBody { unlink(blob) }
+            case let blob as LoggerBlobHandleEntity:
+                // Delete data for the delete blobs
+                store.removeData(for: blob.key)
+            default:
+                break
             }
         }
     }
@@ -680,14 +748,14 @@ extension LoggerStore {
     private func _removeAll() {
         switch document {
         case .directory(let blobs):
-            try? deleteMessages(fetchRequest: LoggerMessageEntity.fetchRequest())
+            try? deleteEntities(for: LoggerMessageEntity.fetchRequest())
             blobs.removeAll()
         case .file, .empty:
             break // Do nothing, readonly
         }
     }
 
-    private func deleteMessages(fetchRequest: NSFetchRequest<NSFetchRequestResult>) throws {
+    private func deleteEntities(for fetchRequest: NSFetchRequest<NSFetchRequestResult>) throws {
         let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
         deleteRequest.resultType = .resultTypeObjectIDs
 
@@ -817,14 +885,14 @@ extension LoggerStore {
         let dateTo = messages[count / 2].createdAt
         let deleteRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "LoggerMessageEntity")
         deleteRequest.predicate = NSPredicate(format: "createdAt < %@", dateTo as NSDate)
-        try self.deleteMessages(fetchRequest: deleteRequest)
+        try self.deleteEntities(for: deleteRequest)
     }
 
     private func removeOutdatedMessages() throws {
         let cutoffDate = configuration.makeCurrentDate().addingTimeInterval(-configuration.maxAge)
         let deleteRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "LoggerMessageEntity")
         deleteRequest.predicate = NSPredicate(format: "createdAt < %@", cutoffDate as NSDate)
-        try deleteMessages(fetchRequest: deleteRequest)
+        try deleteEntities(for: deleteRequest)
     }
 }
 
@@ -834,6 +902,8 @@ private let currentStoreVersion = "2.0.0"
 let manifestFileName = "manifest.json"
 private let databaseFileName = "logs.sqlite"
 private let blobsDirectoryName = "blobs"
+
+// MARK: - Helpers
 
 private extension Dictionary where Key == String, Value == LoggerStore.MetadataValue {
     func unpack() -> [String: String] {
@@ -865,5 +935,24 @@ extension LoggerStore {
             case .unknownError: return "Unexpected error"
             }
         }
+    }
+}
+
+import CommonCrypto
+
+private extension Data {
+    /// Calculates SHA256 from the given string and returns its hex representation.
+    ///
+    /// ```swift
+    /// print("http://test.com".data(using: .utf8)!.sha256)
+    /// // prints "8b408a0c7163fdfff06ced3e80d7d2b3acd9db900905c4783c28295b8c996165"
+    /// ```
+    var sha256: String {
+        let hash = withUnsafeBytes { (bytes: UnsafeRawBufferPointer) -> [UInt8] in
+            var hash = [UInt8](repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH))
+            CC_SHA256(bytes.baseAddress, CC_LONG(count), &hash)
+            return hash
+        }
+        return hash.map({ String(format: "%02x", $0) }).joined()
     }
 }

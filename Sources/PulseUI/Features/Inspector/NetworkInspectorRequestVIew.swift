@@ -15,8 +15,6 @@ struct NetworkInspectorRequestView: View {
             FileViewer(viewModel: viewModel, onToggleExpanded: onToggleExpanded)
         } else if viewModel.request.state == .pending {
             SpinnerView(viewModel: viewModel.progress)
-        } else if viewModel.request.requestBodyKey != nil {
-            PlaceholderView(imageName: "exclamationmark.circle", title: "Unavailable")
         } else if viewModel.request.taskType == .uploadTask {
             PlaceholderView(imageName: "arrow.up.circle", title: {
                 var title = "Uploaded from a File"
@@ -25,6 +23,8 @@ struct NetworkInspectorRequestView: View {
                 }
                 return title
             }())
+        } else if viewModel.request.requestBodyKey != nil {
+            PlaceholderView(imageName: "exclamationmark.circle", title: "Unavailable", messages: "The request body was deleted from the store to reduce its size")
         } else {
             PlaceholderView(imageName: "nosign", title: "Empty Request")
         }

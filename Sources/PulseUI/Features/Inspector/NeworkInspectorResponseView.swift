@@ -15,8 +15,6 @@ struct NetworkInspectorResponseView: View {
             FileViewer(viewModel: viewModel, onToggleExpanded: onToggleExpanded)
         } else if viewModel.request.state == .pending {
             SpinnerView(viewModel: viewModel.progress)
-        } else if viewModel.request.responseBodyKey != nil {
-            PlaceholderView(imageName: "exclamationmark.circle", title: "Unavailable")
         } else if viewModel.request.taskType == .downloadTask {
             PlaceholderView(imageName: "arrow.down.circle", title: {
                 var title = "Downloaded to a File"
@@ -25,6 +23,8 @@ struct NetworkInspectorResponseView: View {
                 }
                 return title
             }())
+        } else if viewModel.request.responseBodyKey != nil {
+            PlaceholderView(imageName: "exclamationmark.circle", title: "Unavailable", messages: "The response body was deleted from the store to reduce its size"))
         } else {
             PlaceholderView(imageName: "nosign", title: "Empty Response")
         }

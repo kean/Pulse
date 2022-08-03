@@ -297,24 +297,11 @@ final class LoggerStoreTests: XCTestCase {
         // GIVEN
         let context = store.container.viewContext
 
-        let date = Date()
         for index in 1...500 {
-            let message = LoggerMessageEntity(context: context)
-            message.createdAt = date + TimeInterval(index)
-            message.level = "debug"
-            message.label = "default"
-            message.session = "1"
-            message.text = "\(index)"
-            if index % 50 == 0 {
-                let metadata = LoggerMetadataEntity(context: context)
-                metadata.key = "key"
-                metadata.value = "\(index)"
-
-                message.metadata = [metadata]
-            }
+            store.storeMessage(label: "default", level: .debug, message: "\(index)", metadata: {
+                index % 50 == 0 ? ["key": .stringConvertible(index)] : nil
+            }())
         }
-
-        try context.save()
 
         let copyURL = tempDirectoryURL
             .appendingPathComponent(UUID().uuidString, isDirectory: false)
@@ -350,15 +337,7 @@ final class LoggerStoreTests: XCTestCase {
 
     func testMaxAgeSweep() throws {
         // GIVEN the store with 5 minute max age
-        var configuration = LoggerStore.Configuration()
-        configuration.maxAge = 300
-        configuration.makeCurrentDate = { [unowned self] in self.date }
-
-        let store = try! LoggerStore(
-            storeURL: directory.url.appendingPathComponent(UUID().uuidString),
-            options: [.create, .synchronous],
-            configuration: configuration
-        )
+        let store = makeStoreWithMaxAge()
         defer { store.destroyStores() }
 
         // GIVEN some messages stored before the cutoff date
@@ -371,19 +350,118 @@ final class LoggerStoreTests: XCTestCase {
         store.storeMessage(label: "kept", level: .debug, message: "test")
         store.storeRequest(URLRequest(url: URL(string: "example.com/kept")!), response: nil, error: nil, data: nil)
 
+        // ASSERT
+        let context = store.backgroundContext
+        XCTAssertEqual(try context.fetch(LoggerMessageEntity.fetchRequest()).count, 4)
+        XCTAssertEqual(try context.fetch(LoggerNetworkRequestEntity.fetchRequest()).count, 2)
+        XCTAssertEqual(try context.fetch(LoggerNetworkRequestDetailsEntity.fetchRequest()).count, 2)
+        XCTAssertEqual(try context.fetch(LoggerBlobHandleEntity.fetchRequest()).count, 0)
+
         // WHEN
         store.syncSweep()
 
         // THEN
-        let context = store.backgroundContext
         XCTAssertEqual(try context.fetch(LoggerMessageEntity.fetchRequest()).count, 2)
         XCTAssertEqual(try context.fetch(LoggerMetadataEntity.fetchRequest()).count, 0)
         XCTAssertEqual(try context.fetch(LoggerNetworkRequestEntity.fetchRequest()).count, 1)
         XCTAssertEqual(try context.fetch(LoggerNetworkRequestDetailsEntity.fetchRequest()).count, 1)
         XCTAssertEqual(try context.fetch(LoggerNetworkRequestProgressEntity.fetchRequest()).count, 0)
+        XCTAssertEqual(try context.fetch(LoggerBlobHandleEntity.fetchRequest()).count, 0)
 
         XCTAssertEqual(try store.allMessages().first?.label, "kept")
         XCTAssertEqual(try store.allNetworkRequests().first?.url, "example.com/kept")
+    }
+
+    func testMaxAgeSweepBlobIsDeletedWhenEntityIsDeleted() throws {
+        // GIVEN the store with 5 minute max age
+        let store = makeStoreWithMaxAge()
+        defer { store.destroyStores() }
+
+        // GIVEN a request with response body stored
+        date = Date().addingTimeInterval(-1000)
+        let responseData = "body".data(using: .utf8)!
+        store.storeRequest(URLRequest(url: URL(string: "example.com/deleted")!), response: nil, error: nil, data: responseData)
+
+        // ASSERT
+        let responseBodyKey = try XCTUnwrap(store.allNetworkRequests().first?.responseBodyKey)
+        XCTAssertEqual(store.getData(forKey: responseBodyKey), responseData)
+
+        XCTAssertEqual(try store.backgroundContext.fetch(LoggerBlobHandleEntity.fetchRequest()).count, 1)
+
+        // WHEN
+        date = Date()
+        store.syncSweep()
+
+        // THEN associated data is deleted
+        XCTAssertEqual(try store.backgroundContext.fetch(LoggerBlobHandleEntity.fetchRequest()).count, 0)
+        XCTAssertNil(store.getData(forKey: responseBodyKey))
+    }
+
+    func testMaxAgeSweepBlobIsDeletedWhenBothEntitiesReferencingItAre() throws {
+        // GIVEN the store with 5 minute max age
+        let store = makeStoreWithMaxAge()
+        defer { store.destroyStores() }
+
+        // GIVEN a request with response body stored
+        date = Date().addingTimeInterval(-1000)
+        let responseData = "body".data(using: .utf8)!
+        store.storeRequest(URLRequest(url: URL(string: "example.com/deleted1")!), response: nil, error: nil, data: responseData)
+        store.storeRequest(URLRequest(url: URL(string: "example.com/deleted2")!), response: nil, error: nil, data: responseData)
+
+        // ASSERT
+        let responseBodyKey = try XCTUnwrap(store.allNetworkRequests().first?.responseBodyKey)
+        XCTAssertEqual(store.getData(forKey: responseBodyKey), responseData)
+        XCTAssertEqual(try store.backgroundContext.fetch(LoggerBlobHandleEntity.fetchRequest()).count, 1)
+
+        // WHEN
+        date = Date()
+        store.syncSweep()
+
+        // THEN associated data is deleted
+        XCTAssertEqual(try store.backgroundContext.fetch(LoggerBlobHandleEntity.fetchRequest()).count, 0)
+        XCTAssertNil(store.getData(forKey: responseBodyKey))
+    }
+
+    func testMaxAgeSweepBlobIsKeptIfOnlyOneReferencingEntityIsDeleted() throws {
+        // GIVEN the store with 5 minute max age
+        let store = makeStoreWithMaxAge()
+        defer { store.destroyStores() }
+
+        // GIVEN a request with response body stored
+        date = Date().addingTimeInterval(-1000)
+        let responseData = "body".data(using: .utf8)!
+        store.storeRequest(URLRequest(url: URL(string: "example.com/deleted")!), response: nil, error: nil, data: responseData)
+
+        // GIVEN a request that's not deleted
+        date = Date()
+        store.storeRequest(URLRequest(url: URL(string: "example.com/kept")!), response: nil, error: nil, data: responseData)
+
+        // ASSERT
+        let responseBodyKey = try XCTUnwrap(store.allNetworkRequests().first?.responseBodyKey)
+        XCTAssertEqual(store.getData(forKey: responseBodyKey), responseData)
+        XCTAssertEqual(try store.backgroundContext.fetch(LoggerNetworkRequestEntity.fetchRequest()).count, 2)
+        XCTAssertEqual(try store.backgroundContext.fetch(LoggerBlobHandleEntity.fetchRequest()).count, 1)
+
+        // WHEN
+        date = Date()
+        store.syncSweep()
+
+        // THEN associated data is deleted
+        XCTAssertEqual(try store.backgroundContext.fetch(LoggerNetworkRequestEntity.fetchRequest()).count, 1)
+        XCTAssertEqual(try store.backgroundContext.fetch(LoggerBlobHandleEntity.fetchRequest()).count, 1)
+        XCTAssertEqual(store.getData(forKey: responseBodyKey), responseData)
+    }
+
+    private func makeStoreWithMaxAge() -> LoggerStore {
+        var configuration = LoggerStore.Configuration()
+        configuration.maxAge = 300
+        configuration.makeCurrentDate = { [unowned self] in self.date }
+
+        return try! LoggerStore(
+            storeURL: directory.url.appendingPathComponent(UUID().uuidString),
+            options: [.create, .synchronous],
+            configuration: configuration
+        )
     }
 
     // MARK: - Migration
@@ -398,13 +476,13 @@ final class LoggerStoreTests: XCTestCase {
         try Resources.outdatedDatabase.write(to: databaseURL)
 
         // WHEN migrating to the store with the latest model
-        let store = try LoggerStore(storeURL: storeURL)
+        let store = try LoggerStore(storeURL: storeURL, options: [.synchronous])
         defer { store.destroyStores() }
 
         // THEN automatic migration is performed and new field are populated with
         // empty values
         let messages = try store.allMessages()
-        XCTAssertEqual(messages.count, 0, "Previously recoreded messages are going to be lost")
+        XCTAssertEqual(messages.count, 0, "Previously recorded messages are going to be lost")
 
         // WHEN
         try store.populate()
@@ -490,23 +568,8 @@ final class LoggerStoreTests: XCTestCase {
 
 private extension LoggerStore {
     func populate() throws {
-        let context = container.viewContext
-
-        let message = LoggerMessageEntity(context: context)
-        message.createdAt = Date()
-        message.level = "debug"
-        message.label = "default"
-        message.session = "1"
-        message.text = "Some message"
-        message.metadata = [
-            {
-                let entity = LoggerMetadataEntity(context: context)
-                entity.key = "system"
-                entity.value = "application"
-                return entity
-            }()
-        ]
-
-        try context.save()
+        storeMessage(label: "default", level: .debug, message: "Some message", metadata: [
+            "system": .string("application")
+        ])
     }
 }

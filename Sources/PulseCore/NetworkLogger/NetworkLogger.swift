@@ -57,7 +57,6 @@ public final class NetworkLogger: @unchecked Sendable {
             createdAt: Date(),
             originalRequest: .init(originalRequest),
             currentRequest: task.currentRequest.map(Request.init),
-            requestBody: originalRequest.httpBody ?? originalRequest.httpBodyStreamData(),
             session: LoggerStore.Session.current.id.uuidString
         )))
     }

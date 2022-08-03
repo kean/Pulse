@@ -42,16 +42,14 @@ extension LoggerStore {
             public var createdAt: Date
             public var originalRequest: NetworkLogger.Request
             public var currentRequest: NetworkLogger.Request?
-            public var requestBody: Data?
             public var session: String
 
-            public init(taskId: UUID, taskType: NetworkLogger.TaskType, createdAt: Date, originalRequest: NetworkLogger.Request, currentRequest: NetworkLogger.Request?, requestBody: Data?, session: String) {
+            public init(taskId: UUID, taskType: NetworkLogger.TaskType, createdAt: Date, originalRequest: NetworkLogger.Request, currentRequest: NetworkLogger.Request?, session: String) {
                 self.taskId = taskId
                 self.taskType = taskType
                 self.createdAt = createdAt
                 self.originalRequest = originalRequest
                 self.currentRequest = currentRequest
-                self.requestBody = requestBody
                 self.session = session
             }
         }
