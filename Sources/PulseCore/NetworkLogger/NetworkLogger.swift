@@ -4,7 +4,7 @@
 
 import Foundation
 
-/// A thin wrapper on top of ``LoggerStore`` that simplifies logging of network requests.
+/// A wrapper on top of ``LoggerStore`` that simplifies logging of network requests.
 ///
 /// - note: ``NetworkLogger`` is used internally by ``URLSessionProxyDelegate`` and
 /// should generally not be used directly.

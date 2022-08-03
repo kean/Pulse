@@ -2,6 +2,11 @@
 
 ## Topics
 
+### Initializers
+
+- ``init(store:configuration:)``
+- ``Configuration``
+
 ### Logging Events
 
 - ``logTaskCreated(_:)``
@@ -11,3 +16,16 @@
 - ``logTask(_:didFinishCollecting:)-44o60``
 - ``logTask(_:didCompleteWithError:)``
 - ``logTask(_:didFinishDecodingWithError:)``
+
+### Network Entities
+
+- ``Request``
+- ``Response``
+- ``ResponseError``
+- ``Metrics``
+- ``TransactionMetrics``
+- ``TransactionDetailedMetrics``
+- ``TransferSizeInfo``
+- ``ContentType``
+- ``DecodingError``
+- ``TaskType``

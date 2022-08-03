@@ -144,7 +144,6 @@ extension NetworkLogger {
         }
     }
 
-    /// Total transfer size across all transactions.
     public struct TransferSizeInfo: Codable, Sendable {
         // MARK: Sent
         public var totalBytesSent: Int64 { requestBodyBytesSent + requestHeaderBytesSent }
