@@ -4,6 +4,7 @@
 
 import Foundation
 import CoreData
+import CommonCrypto
 
 func descriptionForStatusCode(_ statusCode: Int) -> String {
     switch statusCode {
@@ -24,17 +25,25 @@ extension FileManager {
 }
 
 extension URL {
+    func appending(filename: String) -> URL {
+        appendingPathComponent(filename, isDirectory: false)
+    }
+
+    func appending(directory: String) -> URL {
+        appendingPathComponent(directory, isDirectory: true)
+    }
+
     static var temp: URL {
         let url = Files.temporaryDirectory
-            .appendingPathComponent("com.github.kean.logger", isDirectory: true)
+            .appending(directory: "com.github.kean.logger")
         Files.createDirectoryIfNeeded(at: url)
         return url
     }
 
     static var logs: URL {
         var url = Files.urls(for: .libraryDirectory, in: .userDomainMask).first?
-            .appendingPathComponent("Logs", isDirectory: true)
-            .appendingPathComponent("com.github.kean.logger", isDirectory: true)  ?? URL(fileURLWithPath: "/dev/null")
+            .appending(directory: "Logs")
+            .appending(directory: "com.github.kean.logger")  ?? URL(fileURLWithPath: "/dev/null")
         if !Files.createDirectoryIfNeeded(at: url) {
             var resourceValues = URLResourceValues()
             resourceValues.isExcludedFromBackup = true
@@ -44,46 +53,22 @@ extension URL {
     }
 }
 
-// MARK: - CoreData
-
-extension NSPersistentStoreCoordinator {
-    func createCopyOfStore(at url: URL) throws {
-        guard let sourceStore = persistentStores.first else {
-            throw LoggerStore.Error.unknownError // Should never happen
+extension Data {
+    /// Calculates SHA1 from the given string and returns its hex representation.
+    ///
+    /// ```swift
+    /// print("http://test.com".data(using: .utf8)!.sha1)
+    /// // prints "c6b6cafcb77f54d43cd1bd5361522a5e0c074b65"
+    /// ```
+    var sha1: String {
+        let hash = withUnsafeBytes { (bytes: UnsafeRawBufferPointer) -> [UInt8] in
+            var hash = [UInt8](repeating: 0, count: Int(CC_SHA1_DIGEST_LENGTH))
+            CC_SHA1(bytes.baseAddress, CC_LONG(count), &hash)
+            return hash
         }
-
-        let backupCoordinator = NSPersistentStoreCoordinator(managedObjectModel: managedObjectModel)
-
-        var intermediateStoreOptions = sourceStore.options ?? [:]
-        intermediateStoreOptions[NSReadOnlyPersistentStoreOption] = true
-
-        let intermediateStore = try backupCoordinator.addPersistentStore(
-            ofType: sourceStore.type,
-            configurationName: sourceStore.configurationName,
-            at: sourceStore.url,
-            options: intermediateStoreOptions
-        )
-
-        let backupStoreOptions: [AnyHashable: Any] = [
-            NSReadOnlyPersistentStoreOption: true,
-            // Disable write-ahead logging. Benefit: the entire store will be
-            // contained in a single file. No need to handle -wal/-shm files.
-            // https://developer.apple.com/library/content/qa/qa1809/_index.html
-            NSSQLitePragmasOption: ["journal_mode": "DELETE"],
-            // Minimize file size
-            NSSQLiteManualVacuumOption: true
-        ]
-
-        try backupCoordinator.migratePersistentStore(
-            intermediateStore,
-            to: url,
-            options: backupStoreOptions,
-            withType: NSSQLiteStoreType
-        )
+        return hash.map({ String(format: "%02x", $0) }).joined()
     }
 }
-
-// MARK: - Misc
 
 extension URLRequest {
     func httpBodyStreamData() -> Data? {
@@ -180,3 +165,31 @@ extension NSImage {
     }
 }
 #endif
+
+extension URL {
+    func directoryTotalAllocatedSize() throws -> Int64 {
+        guard let urls = Files.enumerator(at: self, includingPropertiesForKeys: nil)?.allObjects as? [URL] else { return 0 }
+        return try urls.lazy.reduce(Int64(0)) {
+            let size = try $1.resourceValues(forKeys: [.totalFileAllocatedSizeKey]).totalFileAllocatedSize
+            return Int64(size ?? 0) + $0
+        }
+    }
+}
+
+func benchmark(title: String, operation: () -> Void) {
+    let startTime = CFAbsoluteTimeGetCurrent()
+    operation()
+    let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
+    debugPrint("Time elapsed for \(title): \(timeElapsed * 1000.0) ms.")
+}
+
+final class WeakLoggerStore {
+    weak var store: LoggerStore?
+
+    init(store: LoggerStore?) {
+        self.store = store
+    }
+
+    /// The key for `NSManagedObjectContext` `userInfo`.
+    static let loggerStoreKey = "com.github.kean.pulse.associated-logger-store"
+}

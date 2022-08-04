@@ -15,7 +15,7 @@ final class URLSessionProxyDelegateTests: XCTestCase {
     override func setUp() {
         super.setUp()
 
-        let storeURL = directory.url.appendingPathComponent("logs.pulse", isDirectory: false)
+        let storeURL = directory.url.appending(filename: "logs.pulse")
         store = try! LoggerStore(storeURL: storeURL, options: [.create, .synchronous])
         logger = NetworkLogger(store: store)
     }
@@ -34,7 +34,7 @@ final class URLSessionProxyDelegateTests: XCTestCase {
         let session = URLSession(configuration: .default, delegate: delegate, delegateQueue: nil)
 
         // WHEN
-        let dataURL = directory.url.appendingPathComponent("logs-2021-03-18_21-22.pulse")
+        let dataURL = directory.url.appending(filename: "logs-archive-v2.pulse")
         try Resources.pulseArchive.write(to: dataURL)
         let dataTask = session.dataTask(with: dataURL)
 
@@ -67,9 +67,6 @@ final class URLSessionProxyDelegateTests: XCTestCase {
         XCTAssertNil(request.errorDomain)
         XCTAssertEqual(request.errorCode, 0)
         XCTAssertEqual(request.requestState, LoggerNetworkRequestEntity.State.success.rawValue)
-
-        XCTAssertNil(request.requestBodyKey)
-        XCTAssertNotNil(request.responseBodyKey)
 
         XCTAssertNotNil(request.details)
 
@@ -124,7 +121,7 @@ final class URLSessionProxyDelegateTests: XCTestCase {
         let session = URLSession(configuration: .default, delegate: myDelegate, delegateQueue: nil)
 
         // WHEN
-        let dataURL = directory.url.appendingPathComponent("logs-2021-03-18_21-22.pulse")
+        let dataURL = directory.url.appending(filename: "logs-archive-v2.pulse")
         try Resources.pulseArchive.write(to: dataURL)
         let dataTask = session.dataTask(with: dataURL)
 
@@ -151,9 +148,6 @@ final class URLSessionProxyDelegateTests: XCTestCase {
         XCTAssertNil(request.errorDomain)
         XCTAssertEqual(request.errorCode, 0)
         XCTAssertEqual(request.requestState, LoggerNetworkRequestEntity.State.success.rawValue)
-
-        XCTAssertNil(request.requestBodyKey)
-        XCTAssertNotNil(request.responseBodyKey)
 
         XCTAssertNotNil(request.details)
 

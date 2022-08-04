@@ -28,7 +28,8 @@ struct TemporaryDirectory {
 
     init() {
         url = FileManager.default.temporaryDirectory
-            .appendingPathComponent(UUID().uuidString, isDirectory: true)
+            .appending(directory: "com.github.kean.logger-testing")
+            .appending(directory: UUID().uuidString)
         try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
     }
 

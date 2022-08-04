@@ -19,9 +19,9 @@ final class PersistentLogHandlerTests: XCTestCase {
     var currentDate: Date = Date()
 
     override func setUp() {
-        tempDirectoryURL = FileManager().temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        tempDirectoryURL = FileManager().temporaryDirectory.appending(directory: UUID().uuidString)
         try? FileManager.default.createDirectory(at: tempDirectoryURL, withIntermediateDirectories: true, attributes: [:])
-        storeURL = tempDirectoryURL.appendingPathComponent("test-store")
+        storeURL = tempDirectoryURL.appending(filename: "test-store")
 
         var configuration = LoggerStore.Configuration()
         configuration.makeCurrentDate = { [unowned self] in currentDate }
@@ -143,7 +143,7 @@ final class PersistentLogHandlerTests: XCTestCase {
         // WHEN
         let request = NSFetchRequest<LoggerMessageEntity>(entityName: "LoggerMessageEntity")
         request.predicate = NSPredicate(format: "text == %@ AND SUBQUERY(metadata, $entry, $entry.key == %@ AND $entry.value == %@).@count > 0", "a", "system", "auth")
-        let messages = try store.container.viewContext.fetch(request)
+        let messages = try store.viewContext.fetch(request)
 
         // THEN
         let message = try XCTUnwrap(messages.first)

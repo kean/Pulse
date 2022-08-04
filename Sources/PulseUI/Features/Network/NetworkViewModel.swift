@@ -24,7 +24,7 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 
     var onDismiss: (() -> Void)?
 
-    private(set) var store: LoggerStore
+    private let store: LoggerStore
     private let controller: NSFetchedResultsController<LoggerNetworkRequestEntity>
     private var isActive = false
     private var latestSessionId: String?
@@ -32,17 +32,17 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 
     init(store: LoggerStore) {
         self.store = store
-        self.details = ConsoleDetailsRouterViewModel(store: store)
+        self.details = ConsoleDetailsRouterViewModel()
 
         let request = NSFetchRequest<LoggerNetworkRequestEntity>(entityName: "\(LoggerNetworkRequestEntity.self)")
-        request.fetchBatchSize = 250
+        request.fetchBatchSize = 100
         request.sortDescriptors = [NSSortDescriptor(keyPath: \LoggerNetworkRequestEntity.createdAt, ascending: false)]
 
-        self.controller = NSFetchedResultsController<LoggerNetworkRequestEntity>(fetchRequest: request, managedObjectContext: store.container.viewContext, sectionNameKeyPath: nil, cacheName: nil)
+        self.controller = NSFetchedResultsController<LoggerNetworkRequestEntity>(fetchRequest: request, managedObjectContext: store.viewContext, sectionNameKeyPath: nil, cacheName: nil)
 
         self.searchCriteria = NetworkSearchCriteriaViewModel(isDefaultStore: store === LoggerStore.shared)
 #if os(iOS) || os(macOS)
-        self.table = ConsoleTableViewModel(store: store, searchCriteriaViewModel: nil)
+        self.table = ConsoleTableViewModel(searchCriteriaViewModel: nil)
 #endif
 
         super.init()

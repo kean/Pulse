@@ -25,8 +25,8 @@ public struct PinsView: View {
         contents
             .navigationBarTitle(Text("Pins"))
             .navigationBarItems(leading: navigationBarLeadingItems, trailing: navigationBarTralingItems)
-            .onAppear { viewModel.isActive = true }
-            .onAppear { viewModel.isActive = false }
+            .onAppear { viewModel.onAppear() }
+            .onAppear { viewModel.onDisappear() }
     }
 
     private var navigationBarLeadingItems: some View {

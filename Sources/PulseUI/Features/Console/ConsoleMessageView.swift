@@ -77,7 +77,7 @@ struct ConsoleMessageView: View {
 #if DEBUG
 struct ConsoleMessageView_Previews: PreviewProvider {
     static var previews: some View {
-        ConsoleMessageView(viewModel: .init(message: (try!  LoggerStore.mock.allMessages())[0], store: .mock))
+        ConsoleMessageView(viewModel: .init(message: (try!  LoggerStore.mock.allMessages())[0]))
             .padding()
             .previewLayout(.sizeThatFits)
     }

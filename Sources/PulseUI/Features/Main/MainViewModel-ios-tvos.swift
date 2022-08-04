@@ -45,13 +45,17 @@ final class MainViewModel: ObservableObject {
 #endif
 
 #if os(iOS)
-        self.items = [.console, .network, .pins, !store.isReadonly ? .insights : nil, .settings]
+        self.items = [.console, .network, .pins, !store.isArchive ? .insights : nil, .settings]
             .compactMap { $0 }
 #elseif os(tvOS)
         self.items = [.console, .network, .settings]
 #else
         self.items = [.console, .network, .pins]
 #endif
+    }
+
+    func freeMemory() {
+        store.viewContext.reset()
     }
 }
 

@@ -31,7 +31,7 @@ final class IndexedArchive: @unchecked Sendable {
         _ = try archive.extract(entry, to: url, skipCRC32: true)
     }
 
-    func dataForEntry(_ name: String) -> Data? {
+    func getData(for name: String) -> Data? {
         guard let entry = index[name] else {
             return nil
         }

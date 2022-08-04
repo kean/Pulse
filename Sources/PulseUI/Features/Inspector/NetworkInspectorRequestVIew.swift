@@ -13,10 +13,9 @@ struct NetworkInspectorRequestView: View {
     var body: some View {
         if let viewModel = viewModel.fileViewModel {
             FileViewer(viewModel: viewModel, onToggleExpanded: onToggleExpanded)
+                .onDisappear { self.viewModel.onDisappear() }
         } else if viewModel.request.state == .pending {
             SpinnerView(viewModel: viewModel.progress)
-        } else if viewModel.request.requestBodyKey != nil {
-            PlaceholderView(imageName: "exclamationmark.circle", title: "Unavailable")
         } else if viewModel.request.taskType == .uploadTask {
             PlaceholderView(imageName: "arrow.up.circle", title: {
                 var title = "Uploaded from a File"
@@ -25,6 +24,8 @@ struct NetworkInspectorRequestView: View {
                 }
                 return title
             }())
+        } else if viewModel.request.requestBodySize > 0 {
+            PlaceholderView(imageName: "exclamationmark.circle", title: "Unavailable", subtitle: "The request body was deleted from the store to reduce its size")
         } else {
             PlaceholderView(imageName: "nosign", title: "Empty Request")
         }
@@ -37,9 +38,7 @@ final class NetworkInspectorRequestViewModel: ObservableObject {
         if let viewModel = _fileViewModel {
             return viewModel
         }
-        if let requestBodyKey = request.requestBodyKey,
-           let requestBody = store.getData(forKey: requestBodyKey),
-           !requestBody.isEmpty {
+        if let requestBody = request.requestBody?.data {
             _fileViewModel = FileViewerViewModel(
                 title: "Request",
                 context: details.requestFileViewerContext,
@@ -53,15 +52,17 @@ final class NetworkInspectorRequestViewModel: ObservableObject {
 
     let request: LoggerNetworkRequestEntity
     private var details: DecodedNetworkRequestDetailsEntity
-    private let store: LoggerStore
     private var cancellable: AnyCancellable?
 
-    init(request: LoggerNetworkRequestEntity, store: LoggerStore) {
+    init(request: LoggerNetworkRequestEntity) {
         self.request = request
         self.details = DecodedNetworkRequestDetailsEntity(request: request)
-        self.store = store
 
         cancellable = request.objectWillChange.sink { [weak self] in self?.refresh() }
+    }
+
+    func onDisappear() {
+        request.requestBody?.reset()
     }
 
     private func refresh() {

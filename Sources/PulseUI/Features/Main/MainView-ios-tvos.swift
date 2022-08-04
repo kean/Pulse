@@ -51,11 +51,14 @@ public struct MainView: View {
                 viewModel.makeView(for: viewModel.items[0])
                 EmptyView()
             }
+            .onDisappear { viewModel.freeMemory() }
         } else {
             tabView
+                .onDisappear { viewModel.freeMemory() }
         }
         #else
         tabView
+            .onDisappear { viewModel.freeMemory() }
         #endif
     }
 

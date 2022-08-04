@@ -29,7 +29,7 @@ struct ConsoleView: View {
             }
             .listRowBackground(viewModel.isOnlyNetwork ? Color.blue.cornerRadius(8) : nil)
 
-            ConsoleMessagesForEach(store: viewModel.store, messages: viewModel.entities)
+            ConsoleMessagesForEach(messages: viewModel.entities)
         }
         .navigationTitle("Console")
         .onAppear(perform: viewModel.onAppear)

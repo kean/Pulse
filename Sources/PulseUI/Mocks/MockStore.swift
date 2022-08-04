@@ -15,7 +15,7 @@ extension LoggerStore {
         if MockStoreConfiguration.isDelayingLogs {
             func populate() {
                 asyncPopulateStore(store)
-                if !MockStoreConfiguration.isIndefinite {
+                if MockStoreConfiguration.isIndefinite {
                     DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(14)) {
                         populate()
                     }

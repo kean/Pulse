@@ -11,13 +11,11 @@ import Combine
 import UIKit
 
 final class ConsoleTableViewModel {
-    let store: LoggerStore
     let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel?
     var diff: CollectionDifference<NSManagedObjectID>?
     @Published var entities: [NSManagedObject] = []
 
-    init(store: LoggerStore, searchCriteriaViewModel: ConsoleSearchCriteriaViewModel?) {
-        self.store = store
+    init(searchCriteriaViewModel: ConsoleSearchCriteriaViewModel?) {
         self.searchCriteriaViewModel = searchCriteriaViewModel
     }
 }
@@ -34,11 +32,11 @@ struct ConsoleTableView<Header: View>: View {
             detailsViewModel.select($0)
             isDetailsLinkActive = true
         })
-        .background(links)
+        .background(linkCount)
     }
 
     @ViewBuilder
-    private var links: some View {
+    private var linkCount: some View {
         NavigationLink.programmatic(isActive: $isDetailsLinkActive) {
             ConsoleMessageDetailsRouter(viewModel: detailsViewModel)
         }.invisible()
@@ -133,12 +131,12 @@ final class ConsoleTableViewController: UITableViewController {
         switch entity {
         case let message as LoggerMessageEntity:
             if let request = message.request {
-                viewModel = ConsoleNetworkRequestViewModel(request: request, store: self.viewModel.store)
+                viewModel = ConsoleNetworkRequestViewModel(request: request)
             } else {
-                viewModel = ConsoleMessageViewModel(message: message, store: self.viewModel.store, searchCriteriaViewModel: self.viewModel.searchCriteriaViewModel)
+                viewModel = ConsoleMessageViewModel(message: message, searchCriteriaViewModel: self.viewModel.searchCriteriaViewModel)
             }
         case let request as LoggerNetworkRequestEntity:
-            viewModel = ConsoleNetworkRequestViewModel(request: request, store: self.viewModel.store)
+            viewModel = ConsoleNetworkRequestViewModel(request: request)
         default:
             fatalError("Invalid entity: \(entity)")
         }

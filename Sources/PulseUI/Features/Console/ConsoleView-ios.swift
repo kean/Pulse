@@ -11,7 +11,6 @@ import Combine
 
 public struct ConsoleView: View {
     @ObservedObject var viewModel: ConsoleViewModel
-    @Environment(\.colorScheme) private var colorScheme: ColorScheme
     @State private var shared: ShareItems?
 
     public init(store: LoggerStore = .shared, configuration: ConsoleConfiguration = .default) {

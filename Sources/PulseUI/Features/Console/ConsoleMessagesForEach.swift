@@ -9,7 +9,6 @@ import PulseCore
 #if os(watchOS) || os(tvOS) || os(iOS)
 
 struct ConsoleMessagesForEach: View {
-    let store: LoggerStore
     let messages: [LoggerMessageEntity]
 
     var body: some View {
@@ -19,10 +18,10 @@ struct ConsoleMessagesForEach: View {
     @ViewBuilder
     private func makeListItem(message: LoggerMessageEntity) -> some View {
         if let request = message.request {
-            NetworkRequestRow(request: request, store: store)
+            NetworkRequestRow(request: request)
         } else {
-            NavigationLink(destination: LazyConsoleeDetailsView(message: message, store: store)) {
-                ConsoleMessageView(viewModel: .init(message: message, store: store))
+            NavigationLink(destination: LazyConsoleeDetailsView(message: message)) {
+                ConsoleMessageView(viewModel: .init(message: message))
             }
         }
     }
@@ -30,11 +29,10 @@ struct ConsoleMessagesForEach: View {
 
 private struct NetworkRequestRow: View {
     let request: LoggerNetworkRequestEntity
-    let store: LoggerStore
 
     var body: some View {
-        NavigationLink(destination: LazyNetworkInspectorView(request: request, store: store)) {
-            ConsoleNetworkRequestView(viewModel: .init(request: request, store: store))
+        NavigationLink(destination: LazyNetworkInspectorView(request: request)) {
+            ConsoleNetworkRequestView(viewModel: .init(request: request))
         }
     }
 }
@@ -42,25 +40,22 @@ private struct NetworkRequestRow: View {
 // Create the underlying ViewModel lazily.
 private struct LazyNetworkInspectorView: View {
     let request: LoggerNetworkRequestEntity
-    let store: LoggerStore
 
     var body: some View {
-        NetworkInspectorView(viewModel: .init(request: request, store: store))
+        NetworkInspectorView(viewModel: .init(request: request))
     }
 }
 
 // Create the underlying ViewModel lazily.
 private struct LazyConsoleeDetailsView: View {
     let message: LoggerMessageEntity
-    let store: LoggerStore
 
     var body: some View {
-        ConsoleMessageDetailsView(viewModel: .init(store: store, message: message))
+        ConsoleMessageDetailsView(viewModel: .init(message: message))
     }
 }
 
 struct NetworkMessagesForEach: View {
-    let store: LoggerStore
     let entities: [LoggerNetworkRequestEntity]
 
     var body: some View {
@@ -69,7 +64,7 @@ struct NetworkMessagesForEach: View {
 
     @ViewBuilder
     private func makeListItem(request: LoggerNetworkRequestEntity) -> some View {
-        NetworkRequestRow(request: request, store: store)
+        NetworkRequestRow(request: request)
     }
 }
 

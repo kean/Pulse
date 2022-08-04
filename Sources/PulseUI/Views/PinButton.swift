@@ -102,37 +102,39 @@ protocol Pinnable {
 final class PinButtonViewModel: ObservableObject {
     @Published private(set) var isPinned = false
     private let message: LoggerMessageEntity?
-    private let service: PinsService
-    private var cancellable: AnyCancellable?
+    private let pins: LoggerStore.Pins?
+    private var cancellables: [AnyCancellable] = []
 
-    init(store: LoggerStore, message: LoggerMessageEntity) {
-        self.service = PinsService.service(for: store)
+    init(message: LoggerMessageEntity) {
         self.message = message
+        self.pins = message.managedObjectContext?.userInfo[pinServiceKey] as? LoggerStore.Pins
         self.subscribe()
     }
 
-    init(store: LoggerStore, request: LoggerNetworkRequestEntity) {
-        self.service = PinsService.service(for: store)
+    init(request: LoggerNetworkRequestEntity) {
         self.message = request.message
+        self.pins = request.managedObjectContext?.userInfo[pinServiceKey] as? LoggerStore.Pins
         self.subscribe()
     }
 
     private func subscribe() {
-        guard let objectID = message?.objectID else { return } // Should never happen
-        cancellable = service.$pinnedMessageIds.sink { [weak self] in
+        guard let message = message else { return } // Should never happen
+        message.publisher(for: \.isPinned).sink { [weak self] in
             guard let self = self else { return }
-            self.isPinned = $0.contains(objectID)
-        }
+            self.isPinned = $0
+        }.store(in: &cancellables)
     }
 
     func togglePin() {
         guard let message = message else { return } // Should never happen
-        service.togglePin(for: message)
+        pins?.togglePin(for: message)
     }
 }
 #else
 struct PinButtonViewModel {
-    init(store: LoggerStore, message: LoggerMessageEntity) {}
-    init(store: LoggerStore, request: LoggerNetworkRequestEntity) {}
+    init(message: LoggerMessageEntity) {}
+    init(request: LoggerNetworkRequestEntity) {}
 }
 #endif
+
+private let pinServiceKey = "com.github.kean.pulse.pin-service"

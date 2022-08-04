@@ -13,9 +13,9 @@ final class PerformanceTests: XCTestCase {
     var store: LoggerStore!
 
     override func setUp() {
-        tempDirectoryURL = FileManager().temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        tempDirectoryURL = FileManager().temporaryDirectory.appending(directory: UUID().uuidString)
         try? FileManager.default.createDirectory(at: tempDirectoryURL, withIntermediateDirectories: true, attributes: [:])
-        storeURL = tempDirectoryURL.appendingPathComponent("performance-tests.pulse", isDirectory: false)
+        storeURL = tempDirectoryURL.appending(filename: "performance-tests.pulse")
 
         store = try! LoggerStore(storeURL: storeURL, options: [.create, .synchronous])
 
@@ -30,7 +30,7 @@ final class PerformanceTests: XCTestCase {
     func testInsert() {
         measure {
             for _ in 0...5 {
-                populate3(store: store)
+                populate2(store: store)
             }
             store.backgroundContext.performAndWait {}
         }
@@ -40,7 +40,7 @@ final class PerformanceTests: XCTestCase {
         let request = NSFetchRequest<LoggerMessageEntity>(entityName: "LoggerMessageEntity")
         request.predicate = NSPredicate(format: "level == %@", LoggerStore.Level.info.rawValue)
 
-        let moc = store.container.viewContext
+        let moc = store.viewContext
 
         measure {
             let messages = (try? moc.fetch(request)) ?? []
@@ -52,7 +52,7 @@ final class PerformanceTests: XCTestCase {
         let request = NSFetchRequest<LoggerMessageEntity>(entityName: "LoggerMessageEntity")
         request.predicate = NSPredicate(format: "SUBQUERY(metadata, $entry, $entry.key == %@ AND $entry.value == %@).@count > 0", "system", "auth")
 
-        let moc = store.container.viewContext
+        let moc = store.viewContext
 
         measure {
             let messages = (try? moc.fetch(request)) ?? []
@@ -61,7 +61,7 @@ final class PerformanceTests: XCTestCase {
     }
 
     func populateStore() {
-        let moc = store.container.viewContext
+        let moc = store.viewContext
 
         func addMessage(_ closure: (LoggerMessageEntity) -> Void) {
             let message = LoggerMessageEntity(context: moc)
@@ -71,7 +71,6 @@ final class PerformanceTests: XCTestCase {
 
         /// Create 60000 messages
         for _ in 0..<10000 {
-
             addMessage {
                 $0.createdAt = Date() - 0.11
                 $0.level = LoggerStore.Level.info.rawValue

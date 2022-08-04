@@ -39,7 +39,7 @@ public struct SettingsView: View {
                 }
             }
 
-            if !viewModel.isReadonly {
+            if !viewModel.isArchive {
                 Section {
                     if #available(iOS 14.0, *) {
                         Button(action: {
@@ -60,6 +60,7 @@ public struct SettingsView: View {
                     ButtonRemoveAll(action: console.buttonRemoveAllMessagesTapped)
                 }
                 if #available(iOS 14.0, *) {
+                    #warning("TODO: rewrite using SettingsViewModel")
                     if console.store === RemoteLogger.shared.store {
                         Section {
                             RemoteLoggerSettingsView(viewModel: .shared)
@@ -95,12 +96,14 @@ final class SettingsViewModel: ObservableObject {
         self.store = store
     }
 
-    var isReadonly: Bool {
-        store.isReadonly
+    var isArchive: Bool {
+        store.isArchive
     }
 
+    #warning("TODO: rework")
     var details: StoreDetailsViewModel? {
-        store.info.map { StoreDetailsViewModel(storeURL: store.storeURL, info: $0) }
+        nil
+//        store.info.map { StoreDetailsViewModel(storeURL: store.storeURL, info: $0) }
     }
 }
 

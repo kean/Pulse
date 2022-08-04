@@ -23,7 +23,7 @@ final class MainViewModel: ObservableObject {
     public init(store: LoggerStore) {
         self.console = ConsoleViewModel(store: store)
         self.network = NetworkViewModel(store: store)
-        self.details = ConsoleDetailsRouterViewModel(store: store)
+        self.details = ConsoleDetailsRouterViewModel()
 
         toolbar.$isOnlyErrors.sink { [weak self] in
             self?.console.isOnlyErrors = $0
@@ -51,6 +51,10 @@ final class MainViewModel: ObservableObject {
         } else {
             console.filterTerm = text
         }
+    }
+
+    func freeMemory() {
+        store.viewContext.reset()
     }
 }
 

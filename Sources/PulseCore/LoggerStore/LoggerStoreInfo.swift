@@ -5,19 +5,49 @@
 import Foundation
 
 extension LoggerStore {
-    /// The archive info.
+    /// The store info.
     public struct Info: Codable, Sendable {
-        public let id: UUID
-        public let appInfo: AppInfo? // Should be always avail starting with 1.0
-        public let device: DeviceInfo
-        public let storeVersion: String
-        public let messageCount: Int
-        public let requestCount: Int
-        public let databaseSize: Int64
-        public let blobsSize: Int64
-        public let createdDate: Date
-        public let modifiedDate: Date
-        public let archivedDate: Date
+        // MARK: Store Info
+
+        /// The id of the store.
+        ///
+        /// - note: If you create a copy of the store for exporting, the copy
+        /// gets its own unique ID.
+        public var storeId: UUID
+
+        /// The internal version of the store.
+        public var storeVersion: String
+
+        // MARK: Creation Dates
+
+        /// The date the store was originally created.
+        public var createdDate: Date
+        /// The date the store was last modified.
+        public var modifiedDate: Date
+
+        // MARK: Usage Statistics
+
+        /// The numbers of recorded messages.
+        ///
+        /// - note: This excludes the technical messages associated with the
+        /// network requests.
+        public var messageCount: Int
+        /// The number of recorded network requests.
+        public var requestCount: Int
+        /// The number of stored network response and requests bodies.
+        public var blobCount: Int
+        /// The complete size of the store, including the database and all
+        /// externally stored blobs.
+        public var totalStoreSize: Int64
+        /// The size stored network response and requests bodies.
+        public var blobsSize: Int64
+
+        // MARK: App and Device Info
+
+        /// Information about the app which created the store.
+        public var appInfo: AppInfo
+        /// Information about the device which created the store.
+        public var deviceInfo: DeviceInfo
 
         public struct AppInfo: Codable, Sendable {
             public let bundleIdentifier: String?
@@ -34,20 +64,18 @@ extension LoggerStore {
             public let systemVersion: String
         }
 
-        public static func make(storeURL: URL) -> LoggerStore.Info? {
+        /// Reads info from the given archive.
+        ///
+        /// - important: This API is designed to be used only with Pulse documents
+        /// exported from the app without unarchaving the document. If you need
+        /// to get info about the current store, use ``LoggerStore/info()``.
+        public static func make(storeURL: URL) -> Info? {
             guard let archive = Archive(url: storeURL, accessMode: .read),
-                  let entry = archive[manifestFileName],
+                  let entry = archive[infoFilename],
                   let data = archive.getData(for: entry) else {
                 return nil
             }
             return try? JSONDecoder().decode(LoggerStore.Info.self, from: data)
-        }
-
-        static func make(archive: IndexedArchive) throws -> LoggerStore.Info {
-            guard let data = archive.dataForEntry(manifestFileName) else {
-                throw NSError(domain: NSErrorDomain() as String, code: NSURLErrorResourceUnavailable, userInfo: [NSLocalizedDescriptionKey: "Store manifest is missing"])
-            }
-            return try JSONDecoder().decode(LoggerStore.Info.self, from: data)
         }
     }
 }
@@ -61,7 +89,7 @@ enum AppInfo {
 
 extension LoggerStore.Info.AppInfo {
     static func make() -> LoggerStore.Info.AppInfo {
-        return LoggerStore.Info.AppInfo(
+        LoggerStore.Info.AppInfo(
             bundleIdentifier: AppInfo.bundleIdentifier,
             name: AppInfo.appName,
             version: AppInfo.appVersion,

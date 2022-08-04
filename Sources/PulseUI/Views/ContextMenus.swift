@@ -24,7 +24,6 @@ struct ButtonCopyMessage: View {
 
 struct NetworkMessageContextMenu: View {
     let request: LoggerNetworkRequestEntity
-    let store: LoggerStore
 
     @Binding private(set) var sharedItems: ShareItems?
 
@@ -37,31 +36,31 @@ struct NetworkMessageContextMenu: View {
             } else {
                 shareAsButtons
             }
-            if let responseBodyKey = request.responseBodyKey {
+            if request.responseBodySize > 0 {
                 Button(action: {
-                    sharedItems = ShareItems([store.getData(forKey: responseBodyKey) ?? Data()])
+                    sharedItems = ShareItems([request.responseBody?.data ?? Data()])
                 }) {
                     Text("Share Response")
                     Image(systemName: "square.and.arrow.up")
                 }
             }
         }
-        NetworkMessageContextMenuCopySection(request: request, shareService: ConsoleShareService(store: store))
+        NetworkMessageContextMenuCopySection(request: request)
         if let message = request.message {
-            PinButton(viewModel: .init(store: store, message: message))
+            PinButton(viewModel: .init(message: message))
         }
     }
 
     @ViewBuilder
     private var shareAsButtons: some View {
         Button(action: {
-            sharedItems = ShareItems([ConsoleShareService(store: store).share(request, output: .plainText)])
+            sharedItems = ShareItems([ConsoleShareService.share(request, output: .plainText)])
         }) {
             Text("Share as Plain Text")
             Image(systemName: "square.and.arrow.up")
         }
         Button(action: {
-            let text = ConsoleShareService(store: store).share(request, output: .markdown)
+            let text = ConsoleShareService.share(request, output: .markdown)
             let directory = TemporaryDirectory()
             let fileURL = directory.write(text: text, extension: "markdown")
             sharedItems = ShareItems([fileURL], cleanup: directory.remove)
@@ -70,7 +69,7 @@ struct NetworkMessageContextMenu: View {
             Image(systemName: "square.and.arrow.up")
         }
         Button(action: {
-            let text = ConsoleShareService(store: store).share(request, output: .html)
+            let text = ConsoleShareService.share(request, output: .html)
             let directory = TemporaryDirectory()
             let fileURL = directory.write(text: text, extension: "html")
             sharedItems = ShareItems([fileURL], cleanup: directory.remove)
@@ -79,7 +78,7 @@ struct NetworkMessageContextMenu: View {
             Image(systemName: "square.and.arrow.up")
         }
         Button(action: {
-            sharedItems = ShareItems([request.cURLDescription(store: store)])
+            sharedItems = ShareItems([request.cURLDescription()])
         }) {
             Text("Share as cURL")
             Image(systemName: "square.and.arrow.up")
@@ -89,7 +88,6 @@ struct NetworkMessageContextMenu: View {
 
 struct NetworkMessageContextMenuCopySection: View {
     var request: LoggerNetworkRequestEntity
-    let shareService: ConsoleShareService
 
     var body: some View {
         Section {
@@ -111,9 +109,9 @@ struct NetworkMessageContextMenuCopySection: View {
                     Image(systemName: "doc.on.doc")
                 }
             }
-            if let responseKey = request.responseBodyKey {
+            if request.responseBodySize > 0 {
                 Button(action: {
-                    guard let data = shareService.store.getData(forKey: responseKey) else { return }
+                    guard let data = request.responseBody?.data else { return }
                     UXPasteboard.general.string = String(data: data, encoding: .utf8)
                     runHapticFeedback()
                 }) {

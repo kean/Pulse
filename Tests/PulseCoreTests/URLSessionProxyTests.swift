@@ -15,7 +15,7 @@ final class URLSessionProxyTests: XCTestCase {
     override func setUp() {
         super.setUp()
 
-        let storeURL = directory.url.appendingPathComponent("logs.pulse", isDirectory: false)
+        let storeURL = directory.url.appending(filename: "logs.pulse")
         store = try! LoggerStore(storeURL: storeURL, options: [.create, .synchronous])
         logger = NetworkLogger(store: store)
 
@@ -35,7 +35,7 @@ final class URLSessionProxyTests: XCTestCase {
 
     func testRecordSuccess() throws {
         // WHEN
-        let dataURL = directory.url.appendingPathComponent("logs-2021-03-18_21-22.pulse")
+        let dataURL = directory.url.appending(filename: "logs-archive-v2.pulse")
         try Resources.pulseArchive.write(to: dataURL)
         let didComplete = self.expectation(description: "TaskCompleted")
         let dataTask = URLSession.shared.dataTask(with: dataURL) { _, _, _ in
@@ -58,9 +58,6 @@ final class URLSessionProxyTests: XCTestCase {
         XCTAssertEqual(request.errorCode, 0)
         XCTAssertEqual(request.requestState, LoggerNetworkRequestEntity.State.success.rawValue)
 
-        XCTAssertNil(request.requestBodyKey)
-        XCTAssertNotNil(request.responseBodyKey)
-
         XCTAssertNotNil(request.details)
 
         let message = try XCTUnwrap(request.message)
@@ -69,7 +66,7 @@ final class URLSessionProxyTests: XCTestCase {
 
     func testRecordError() throws {
         // GIVEN file that doesn't exist
-        let dataURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: false)
+        let dataURL = FileManager.default.temporaryDirectory.appending(filename: UUID().uuidString)
 
         // WHEN
         let didComplete = self.expectation(description: "TaskCompleted")
@@ -92,9 +89,6 @@ final class URLSessionProxyTests: XCTestCase {
         XCTAssertEqual(request.errorDomain, "NSURLErrorDomain")
         XCTAssertEqual(request.errorCode, -1100)
         XCTAssertEqual(request.requestState, LoggerNetworkRequestEntity.State.failure.rawValue)
-
-        XCTAssertNil(request.requestBodyKey)
-        XCTAssertNil(request.responseBodyKey)
 
         XCTAssertNotNil(request.details)
 

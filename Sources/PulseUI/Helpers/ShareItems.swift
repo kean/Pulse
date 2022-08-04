@@ -31,7 +31,7 @@ extension ShareItems {
         let items: [Any]
         switch output {
         case .store:
-            if store.isReadonly {
+            if store.isArchive {
                 items = [store.storeURL]
             } else {
                 let storeURL = directory.url.appendingPathComponent("logs-\(date).pulse", isDirectory: false)
@@ -40,7 +40,7 @@ extension ShareItems {
             }
         case .text:
             let messages = (try? store.allMessages()) ?? []
-            let text = ConsoleShareService(store: store).format(messages)
+            let text = ConsoleShareService.format(messages)
             let logsURL = directory.url.appendingPathComponent("logs-\(date).txt")
             try? text.data(using: .utf8)?.write(to: logsURL)
             items = [logsURL]
@@ -52,20 +52,13 @@ extension ShareItems {
 
     init(messages store: LoggerStore) {
         let messages = (try? store.allMessages()) ?? []
-        let text = ConsoleShareService(store: store).format(messages)
+        let text = ConsoleShareService.format(messages)
         self.init([text])
     }
 }
 
-struct ConsoleShareService {
-    let store: LoggerStore
-    private var context: NSManagedObjectContext { store.container.viewContext }
-
-    init(store: LoggerStore) {
-        self.store = store
-    }
-
-    func format(_ messages: [LoggerMessageEntity]) -> String {
+enum ConsoleShareService {
+    static func format(_ messages: [LoggerMessageEntity]) -> String {
         var output = ""
         for message in messages {
             output.append(format(message: message))
@@ -74,7 +67,7 @@ struct ConsoleShareService {
         return output
     }
 
-    private func format(message: LoggerMessageEntity) -> String {
+    private static func format(message: LoggerMessageEntity) -> String {
         let title = "\(dateFormatter.string(from: message.createdAt)) [\(message.level)]-[\(message.label)] \(message.text)"
         if let request = message.request {
             return title + "\n\n" + share(request, output: .plainText)
@@ -83,7 +76,7 @@ struct ConsoleShareService {
         }
     }
 
-    func share(_ messages: [LoggerMessageEntity]) -> ShareItems {
+    static func share(_ messages: [LoggerMessageEntity]) -> ShareItems {
         let tempDir = TemporaryDirectory()
         let allLogsUrl = tempDir.url.appendingPathComponent("logs.txt")
         let allLogs = format(messages).data(using: .utf8) ?? Data()
@@ -91,7 +84,7 @@ struct ConsoleShareService {
         return ShareItems([allLogsUrl], cleanup: tempDir.remove)
     }
 
-    func share(_ message: LoggerMessageEntity) -> String {
+    static func share(_ message: LoggerMessageEntity) -> String {
         if let request = message.request {
             return share(request, output: .plainText) // this should never happen
         } else {
@@ -99,11 +92,11 @@ struct ConsoleShareService {
         }
     }
 
-    func share(_ request: LoggerNetworkRequestEntity, output: NetworkMessageRenderType) -> String {
+    static func share(_ request: LoggerNetworkRequestEntity, output: NetworkMessageRenderType) -> String {
         switch output {
-        case .plainText: return Render.asPlainText(request: request, store: store)
-        case .markdown: return Render.asMarkdown(request: request, store: store)
-        case .html: return Render.asHTML(request: request, store: store)
+        case .plainText: return Render.asPlainText(request: request)
+        case .markdown: return Render.asMarkdown(request: request)
+        case .html: return Render.asHTML(request: request)
         }
     }
 }
@@ -128,6 +121,7 @@ struct TemporaryDirectory {
 
     init() {
         url = FileManager.default.temporaryDirectory
+            .appendingPathComponent("com.github.kean.logger", isDirectory: true)
             .appendingPathComponent(UUID().uuidString, isDirectory: true)
         try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
     }

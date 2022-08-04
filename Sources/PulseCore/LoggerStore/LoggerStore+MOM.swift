@@ -16,18 +16,16 @@ extension LoggerStore {
         let request = NSEntityDescription(name: "LoggerNetworkRequestEntity", class: LoggerNetworkRequestEntity.self)
         let requestProgress = NSEntityDescription(name: "LoggerNetworkRequestProgressEntity", class: LoggerNetworkRequestProgressEntity.self)
         let requestDetails = NSEntityDescription(name: "LoggerNetworkRequestDetailsEntity", class: LoggerNetworkRequestDetailsEntity.self)
-
-        metadata.properties = [
-            NSAttributeDescription(name: "key", type: .stringAttributeType),
-            NSAttributeDescription(name: "value", type: .stringAttributeType)
-        ]
+        let blob = NSEntityDescription(name: "LoggerBlobHandleEntity", class: LoggerBlobHandleEntity.self)
+        let inlinedData = NSEntityDescription(name: "LoggerInlineDataEntity", class: LoggerInlineDataEntity.self)
 
         message.properties = [
             NSAttributeDescription(name: "createdAt", type: .dateAttributeType),
+            NSAttributeDescription(name: "isPinned", type: .booleanAttributeType),
+            NSAttributeDescription(name: "session", type: .stringAttributeType),
             NSAttributeDescription(name: "level", type: .stringAttributeType),
             NSAttributeDescription(name: "levelOrder", type: .integer16AttributeType),
             NSAttributeDescription(name: "label", type: .stringAttributeType),
-            NSAttributeDescription(name: "session", type: .stringAttributeType),
             NSAttributeDescription(name: "text", type: .stringAttributeType),
             NSRelationshipDescription.make(name: "metadata", type: .oneToMany, entity: metadata),
             NSAttributeDescription(name: "file", type: .stringAttributeType),
@@ -36,6 +34,38 @@ extension LoggerStore {
             NSAttributeDescription(name: "line", type: .integer32AttributeType),
             NSAttributeDescription(name: "requestState", type: .integer16AttributeType),
             NSRelationshipDescription.make(name: "request", type: .oneToOne(isOptional: true), entity: request)
+        ]
+
+        metadata.properties = [
+            NSAttributeDescription(name: "key", type: .stringAttributeType),
+            NSAttributeDescription(name: "value", type: .stringAttributeType)
+        ]
+
+        request.properties = [
+            NSAttributeDescription(name: "createdAt", type: .dateAttributeType),
+            NSAttributeDescription(name: "isPinned", type: .booleanAttributeType),
+            NSAttributeDescription(name: "session", type: .stringAttributeType),
+            NSAttributeDescription(name: "taskId", type: .UUIDAttributeType),
+            NSAttributeDescription(name: "rawTaskType", type: .stringAttributeType),
+            NSAttributeDescription(name: "url", type: .stringAttributeType),
+            NSAttributeDescription(name: "host", type: .stringAttributeType),
+            NSAttributeDescription(name: "httpMethod", type: .stringAttributeType),
+            NSAttributeDescription(name: "errorDomain", type: .stringAttributeType),
+            NSAttributeDescription(name: "errorCode", type: .integer32AttributeType),
+            NSAttributeDescription(name: "statusCode", type: .integer32AttributeType),
+            NSAttributeDescription(name: "startDate", type: .dateAttributeType),
+            NSAttributeDescription(name: "duration", type: .doubleAttributeType),
+            NSAttributeDescription(name: "contentType", type: .stringAttributeType),
+            NSAttributeDescription(name: "requestState", type: .integer16AttributeType),
+            NSAttributeDescription(name: "redirectCount", type: .integer16AttributeType),
+            NSAttributeDescription(name: "requestBodySize", type: .integer64AttributeType),
+            NSAttributeDescription(name: "responseBodySize", type: .integer64AttributeType),
+            NSAttributeDescription(name: "isFromCache", type: .booleanAttributeType),
+            NSRelationshipDescription.make(name: "details", type: .oneToOne(), entity: requestDetails),
+            NSRelationshipDescription.make(name: "message", type: .oneToOne(), entity: message),
+            NSRelationshipDescription.make(name: "requestBody", type: .oneToOne(isOptional: true), deleteRule: .noActionDeleteRule, entity: blob),
+            NSRelationshipDescription.make(name: "responseBody", type: .oneToOne(isOptional: true), deleteRule: .noActionDeleteRule, entity: blob),
+            NSRelationshipDescription.make(name: "progress", type: .oneToOne(isOptional: true), entity: requestProgress)
         ]
 
         requestDetails.properties = [
@@ -52,33 +82,18 @@ extension LoggerStore {
             NSAttributeDescription(name: "totalUnitCount", type: .integer64AttributeType)
         ]
 
-        request.properties = [
-            NSAttributeDescription(name: "taskId", type: .UUIDAttributeType),
-            NSAttributeDescription(name: "rawTaskType", type: .stringAttributeType),
-            NSAttributeDescription(name: "createdAt", type: .dateAttributeType),
-            NSAttributeDescription(name: "session", type: .stringAttributeType),
-            NSAttributeDescription(name: "url", type: .stringAttributeType),
-            NSAttributeDescription(name: "host", type: .stringAttributeType),
-            NSAttributeDescription(name: "httpMethod", type: .stringAttributeType),
-            NSAttributeDescription(name: "errorDomain", type: .stringAttributeType),
-            NSAttributeDescription(name: "errorCode", type: .integer32AttributeType),
-            NSAttributeDescription(name: "statusCode", type: .integer32AttributeType),
-            NSAttributeDescription(name: "startDate", type: .dateAttributeType),
-            NSAttributeDescription(name: "duration", type: .doubleAttributeType),
-            NSAttributeDescription(name: "contentType", type: .stringAttributeType),
-            NSAttributeDescription(name: "requestState", type: .integer16AttributeType),
-            NSAttributeDescription(name: "redirectCount", type: .integer16AttributeType),
-            NSAttributeDescription(name: "requestBodyKey", type: .stringAttributeType),
-            NSAttributeDescription(name: "responseBodyKey", type: .stringAttributeType),
-            NSAttributeDescription(name: "requestBodySize", type: .integer64AttributeType),
-            NSAttributeDescription(name: "responseBodySize", type: .integer64AttributeType),
-            NSAttributeDescription(name: "isFromCache", type: .booleanAttributeType),
-            NSRelationshipDescription.make(name: "details", type: .oneToOne(), entity: requestDetails),
-            NSRelationshipDescription.make(name: "message", type: .oneToOne(), entity: message),
-            NSRelationshipDescription.make(name: "progress", type: .oneToOne(isOptional: true), entity: requestProgress)
+        blob.properties = [
+            NSAttributeDescription(name: "key", type: .stringAttributeType),
+            NSAttributeDescription(name: "size", type: .integer64AttributeType),
+            NSAttributeDescription(name: "linkCount", type: .integer16AttributeType),
+            NSRelationshipDescription.make(name: "inlineData", type: .oneToOne(isOptional: true), entity: inlinedData)
         ]
 
-        model.entities = [message, metadata, request, requestDetails, requestProgress]
+        inlinedData.properties = [
+            NSAttributeDescription(name: "data", type: .binaryDataAttributeType)
+        ]
+
+        model.entities = [message, metadata, request, requestDetails, requestProgress, blob, inlinedData]
         return model
     }()
 }
@@ -87,10 +102,11 @@ extension LoggerStore {
 
 public final class LoggerMessageEntity: NSManagedObject {
     @NSManaged public var createdAt: Date
+    @NSManaged public var isPinned: Bool
+    @NSManaged public var session: String
     @NSManaged public var level: String
     @NSManaged public var levelOrder: Int16
     @NSManaged public var label: String
-    @NSManaged public var session: String
     @NSManaged public var text: String
     @NSManaged public var metadata: Set<LoggerMetadataEntity>
     @NSManaged public var file: String
@@ -108,10 +124,11 @@ public final class LoggerMetadataEntity: NSManagedObject {
 
 public final class LoggerNetworkRequestEntity: NSManagedObject {
     // Primary
+    @NSManaged public var createdAt: Date
+    @NSManaged public var isPinned: Bool
+    @NSManaged public var session: String
     @NSManaged public var taskId: UUID?
     @NSManaged public var rawTaskType: String?
-    @NSManaged public var createdAt: Date
-    @NSManaged public var session: String
     @NSManaged public var message: LoggerMessageEntity?
 
     // MARK: Request
@@ -158,10 +175,10 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
 
     /// Request details.
     @NSManaged public var details: LoggerNetworkRequestDetailsEntity
-    /// The key in the blob storage. To get the data, see ``LoggerStore/getData(forKey:)``.
-    @NSManaged public var requestBodyKey: String?
-    /// The key in the blob storage. To get the data, see ``LoggerStore/getData(forKey:)``.
-    @NSManaged public var responseBodyKey: String?
+    /// The request body handle.
+    @NSManaged public var requestBody: LoggerBlobHandleEntity?
+    /// The response body handle.
+    @NSManaged public var responseBody: LoggerBlobHandleEntity?
     /// The size of the request body.
     @NSManaged public var requestBodySize: Int64
     /// The size of the response body.
@@ -223,46 +240,49 @@ public final class LoggerNetworkRequestDetailsEntity: NSManagedObject {
     @NSManaged public var metadata: Data?
 }
 
-// MARK: - Helpers
+/// Doesn't contain any data, just the key and some additional payload.
+public final class LoggerBlobHandleEntity: NSManagedObject {
+    /// A blob hash (sha1, 40 characters).
+    @NSManaged public var key: String
 
-private extension NSEntityDescription {
-    convenience init<T>(name: String, class: T.Type) where T: NSManagedObject {
-        self.init()
-        self.name = name
-        self.managedObjectClassName = T.self.description()
-    }
-}
+    /// A blob size.
+    @NSManaged public var size: Int64
 
-private extension NSAttributeDescription {
-    convenience init(name: String, type: NSAttributeType) {
-        self.init()
-        self.name = name
-        self.attributeType = type
-    }
-}
+    /// A number of requests referencing it.
+    @NSManaged var linkCount: Int16
 
-private enum RelationshipType {
-    case oneToMany
-    case oneToOne(isOptional: Bool = false)
-}
+    /// The logger inlines small blobs in a separate table in the database which
+    /// significantly [reduces](https://www.sqlite.org/intern-v-extern-blob.html)
+    /// the total allocated size for these files and improves the overall performance.
+    ///
+    /// The larger blobs are stored in an file system. And when you export a Pulse
+    /// document, the larger blobs are read from the created archive on-demand,
+    /// significantly reducing the speed with this the documents are opened and
+    /// reducing space usage.
+    ///
+    /// To access data, use the convenience ``data`` property.
+    @NSManaged var inlineData: LoggerInlineDataEntity?
 
-private extension NSRelationshipDescription {
-    static func make(name: String,
-                     type: RelationshipType,
-                     deleteRule: NSDeleteRule = .cascadeDeleteRule,
-                     entity: NSEntityDescription) -> NSRelationshipDescription {
-        let relationship = NSRelationshipDescription()
-        relationship.name = name
-        relationship.deleteRule = deleteRule
-        relationship.destinationEntity = entity
-        switch type {
-        case .oneToMany:
-            relationship.maxCount = 0
-            relationship.minCount = 0
-        case .oneToOne(let isOptional):
-            relationship.maxCount = 1
-            relationship.minCount = isOptional ? 0 : 1
+    static let inlineLimit = 32768 // 32 KB
+
+    /// Returns the associated data.
+    ///
+    /// - important: This property only works with `NSManagedObjectContext` instances
+    /// created by the ``LoggerStore``. If you are reading the database manually,
+    /// you'll need to access the files directly by using the associated ``key``
+    /// that matches the name o the file in the `/blobs` directly in the store
+    /// directory.
+    public var data: Data? {
+        if let inlineData = self.inlineData?.data {
+            return inlineData
         }
-        return relationship
+        guard let store = managedObjectContext?.userInfo[WeakLoggerStore.loggerStoreKey] as? WeakLoggerStore else {
+            return nil // Should never happen unless the object was created outside of the LoggerStore moc
+        }
+        return store.store?.getBlobData(forKey: key)
     }
+}
+
+final class LoggerInlineDataEntity: NSManagedObject {
+    @NSManaged var data: Data
 }

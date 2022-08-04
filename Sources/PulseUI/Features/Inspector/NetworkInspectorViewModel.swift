@@ -23,19 +23,17 @@ final class NetworkInspectorViewModel: ObservableObject {
 
     // TODO: Make private
     let request: LoggerNetworkRequestEntity
-    let store: LoggerStore
 
-    init(request: LoggerNetworkRequestEntity, store: LoggerStore) {
+    init(request: LoggerNetworkRequestEntity) {
         self.request = request
-        self.store = store
 
         if let url = request.url.flatMap(URL.init(string:)) {
             self.title = url.lastPathComponent
         }
 
-        self.summaryViewModel = NetworkInspectorSummaryViewModel(request: request, store: store)
-        self.responseViewModel = NetworkInspectorResponseViewModel(request: request, store: store)
-        self.requestViewModel = NetworkInspectorRequestViewModel(request: request, store: store)
+        self.summaryViewModel = NetworkInspectorSummaryViewModel(request: request)
+        self.responseViewModel = NetworkInspectorResponseViewModel(request: request)
+        self.requestViewModel = NetworkInspectorRequestViewModel(request: request)
 #if !os(watchOS) && !os(tvOS)
         self.metricsViewModel = NetworkInspectorMetricsTabViewModel(request: request)
 #endif
@@ -46,13 +44,11 @@ final class NetworkInspectorViewModel: ObservableObject {
 
 #if os(iOS) || os(macOS)
     var pin: PinButtonViewModel? {
-        request.message.map {
-            PinButtonViewModel(store: store, message: $0)
-        }
+        request.message.map(PinButtonViewModel.init)
     }
 
     func prepareForSharing() -> String {
-        ConsoleShareService(store: store).share(request, output: .plainText)
+        ConsoleShareService.share(request, output: .plainText)
     }
 #endif
 }

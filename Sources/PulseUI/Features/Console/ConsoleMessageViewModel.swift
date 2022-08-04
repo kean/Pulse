@@ -15,7 +15,6 @@ final class ConsoleMessageViewModel: Pinnable {
     
     private let message: LoggerMessageEntity
     private let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel?
-    private let store: LoggerStore
     
     private(set) lazy var time = ConsoleMessageViewModel.timeFormatter.string(from: message.createdAt)
     
@@ -42,11 +41,9 @@ final class ConsoleMessageViewModel: Pinnable {
         return formatter
     }()
     
-    private(set) lazy var pinViewModel = PinButtonViewModel(store: store, message: message)
+    private(set) lazy var pinViewModel = PinButtonViewModel(message: message)
     
-    init(message: LoggerMessageEntity,
-         store: LoggerStore,
-         searchCriteriaViewModel: ConsoleSearchCriteriaViewModel? = nil) {
+    init(message: LoggerMessageEntity, searchCriteriaViewModel: ConsoleSearchCriteriaViewModel? = nil) {
         let time = ConsoleMessageViewModel.timeFormatter.string(from: message.createdAt)
         if message.label == "default" {
             self.title = time
@@ -56,7 +53,6 @@ final class ConsoleMessageViewModel: Pinnable {
         self.text = message.text
         self.textColor = ConsoleMessageStyle.textColor(level: LoggerStore.Level(rawValue: message.level) ?? .debug)
         self.badge = BadgeViewModel(message: message)
-        self.store = store
         self.message = message
         self.searchCriteriaViewModel = searchCriteriaViewModel
     }
@@ -65,7 +61,7 @@ final class ConsoleMessageViewModel: Pinnable {
 
 #if os(iOS) || os(macOS)
     func share() -> ShareItems {
-        ShareItems([ConsoleShareService(store: store).share(message)])
+        ShareItems([ConsoleShareService.share(message)])
     }
     
     func copy() -> String {

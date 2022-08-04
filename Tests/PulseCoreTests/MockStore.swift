@@ -18,12 +18,6 @@ private struct Logger {
 
 extension XCTestCase {
     func populate2(store: LoggerStore) {
-        precondition(Thread.isMainThread)
-
-        populate3(store: store)
-    }
-
-    func populate3(store: LoggerStore) {
         func logger(named: String) -> Logger {
             Logger(label: named, store: store)
         }

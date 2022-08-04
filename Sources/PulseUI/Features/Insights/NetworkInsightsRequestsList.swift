@@ -25,10 +25,10 @@ final class NetworkInsightsRequestsListViewModel: ObservableObject {
     let table: ConsoleTableViewModel
     let details: ConsoleDetailsRouterViewModel
 
-    init(requests: [LoggerNetworkRequestEntity], store: LoggerStore) {
-        self.table = ConsoleTableViewModel(store: store, searchCriteriaViewModel: nil)
+    init(requests: [LoggerNetworkRequestEntity]) {
+        self.table = ConsoleTableViewModel(searchCriteriaViewModel: nil)
         self.table.entities = requests
-        self.details = ConsoleDetailsRouterViewModel(store: store)
+        self.details = ConsoleDetailsRouterViewModel()
     }
 }
 

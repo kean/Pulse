@@ -16,7 +16,7 @@ struct SettingsView: View {
 
     public var body: some View {
         Form {
-            if !viewModel.store.isReadonly {
+            if !viewModel.store.isArchive {
                 ButtonRemoveAll(action: viewModel.buttonRemoveAllMessagesTapped)
             }
 #if os(watchOS)

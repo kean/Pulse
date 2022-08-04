@@ -15,40 +15,54 @@
 ### Instance Properties
 
 - ``storeURL``
-- ``isReadonly``
-- ``info-swift.property``
-- ``Info-swift.struct``
+- ``isArchive``
 
-### Storing and Accessing Messages
+### Storing Logs
 
 - ``storeMessage(label:level:message:metadata:file:function:line:)``
-- ``allMessages()``
-- ``removeAll()``
-
-### Storing and Accessing Network Requests
-
 - ``storeRequest(_:response:error:data:metrics:)``
+
+### Accessing Logs
+
+- ``allMessages()``
 - ``allNetworkRequests()``
-- ``getData(forKey:)``
+- ``getBlobData(forKey:)``
+- ``removeAll()``
 
 ### Sharing the Store
 
 - ``copy(to:)``
+
+### Getting Store Info
+
+- ``info-swift.property``
+- ``Info-swift.struct``
+
+### Managing Pins
+
+- ``pins-swift.property``
+- ``Pins-swift.class``
 
 ### Receiving and Filtering Events
 
 - ``events``
 - ``Event``
 
-### Direct Database Access 
+### Direct Database Access
 
 - ``container``
+- ``viewContext``
 - ``backgroundContext``
 
 ### Nested
 
-- ``Session``
-- ``Error``
 - ``Level``
 - ``Metadata``
 - ``MetadataValue``
+- ``Error``
+- ``Session``
+
+
+### Deprecated
+
+- ``default``

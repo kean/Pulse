@@ -28,3 +28,4 @@ Logger and network inspector for Apple platforms.
 - ``LoggerNetworkRequestEntity``
 - ``LoggerNetworkRequestDetailsEntity``
 - ``LoggerNetworkRequestProgressEntity``
+- ``LoggerBlobHandleEntity``
