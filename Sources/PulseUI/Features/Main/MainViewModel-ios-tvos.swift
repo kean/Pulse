@@ -53,6 +53,10 @@ final class MainViewModel: ObservableObject {
         self.items = [.console, .network, .pins]
 #endif
     }
+
+    func freeMemory() {
+        store.viewContext.reset()
+    }
 }
 
 struct MainViewModelItem: Hashable, Identifiable {

@@ -42,8 +42,6 @@ public final class LoggerStore: @unchecked Sendable {
     /// Returns the Core Data container associated with the store.
     public let container: NSPersistentContainer
 
-#warning("TODO: reset when closing Pulse.MainView")
-
     /// Returns the view context for accessing entities on the main thead.
     public var viewContext: NSManagedObjectContext { container.viewContext }
 
@@ -137,8 +135,6 @@ public final class LoggerStore: @unchecked Sendable {
 
         /// Every 20 minutes.
         var sweepInterval: TimeInterval = 1200
-
-        #warning("TODO: max count of messages")
 
         /// Determines how often the messages are saved to the database. By default,
         /// 100 milliseconds - quickly enough, but avoiding too many individual writes.

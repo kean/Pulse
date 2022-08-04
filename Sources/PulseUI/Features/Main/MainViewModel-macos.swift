@@ -52,6 +52,10 @@ final class MainViewModel: ObservableObject {
             console.filterTerm = text
         }
     }
+
+    func freeMemory() {
+        store.viewContext.reset()
+    }
 }
 
 final class ConsoleModePickerViewModel: ObservableObject {
