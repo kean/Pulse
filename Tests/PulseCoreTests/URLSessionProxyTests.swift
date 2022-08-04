@@ -26,7 +26,7 @@ final class URLSessionProxyTests: XCTestCase {
     override func tearDown() {
         super.tearDown()
 
-        store.destroyStores()
+        store.destroy()
 
         directory.remove()
 

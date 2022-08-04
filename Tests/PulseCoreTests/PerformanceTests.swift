@@ -23,7 +23,7 @@ final class PerformanceTests: XCTestCase {
     }
 
     override func tearDown() {
-        store.destroyStores()
+        store.destroy()
         try? FileManager.default.removeItem(at: tempDirectoryURL)
     }
 

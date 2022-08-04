@@ -25,7 +25,7 @@ final class LoggerStoreTests: XCTestCase {
     override func tearDown() {
         super.tearDown()
 
-        store.destroyStores()
+        store.destroy()
         directory.remove()
 
         try? FileManager.default.removeItem(at: URL.temp)
@@ -56,8 +56,8 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertEqual(try secondStore.allMessages().count, 1)
 
         // CLEANUP
-        firstStore.destroyStores()
-        secondStore.destroyStores()
+        firstStore.destroy()
+        secondStore.destroy()
     }
 
     func testInitCreateStoreIntermediateDirectoryMissing() throws {
@@ -86,7 +86,7 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertEqual(try store.allMessages().count, 1)
 
         // CLEANUP
-        originalStore?.destroyStores()
+        originalStore?.destroy()
     }
 
     func testInitWithArchiveURL() throws {
@@ -96,7 +96,7 @@ final class LoggerStoreTests: XCTestCase {
 
         // WHEN
         let store = try XCTUnwrap(LoggerStore(storeURL: storeURL))
-        defer { store.destroyStores() }
+        defer { store.destroy() }
 
         // THEN entities can be opened
         XCTAssertEqual(try store.viewContext.count(for: LoggerMessageEntity.self), 15)
@@ -119,7 +119,7 @@ final class LoggerStoreTests: XCTestCase {
 
         // WHEN
         let store = try XCTUnwrap(LoggerStore(storeURL: storeURL))
-        defer { store.destroyStores() }
+        defer { store.destroy() }
 
         // THEN entities can be opened
         XCTAssertEqual(try store.viewContext.count(for: LoggerMessageEntity.self), 15)
@@ -144,7 +144,7 @@ final class LoggerStoreTests: XCTestCase {
 
         // WHEN
         let store = try XCTUnwrap(LoggerStore(storeURL: storeURL))
-        defer { store.destroyStores() }
+        defer { store.destroy() }
 
         // THEN entities can be opened
         XCTAssertEqual(try store.viewContext.count(for: LoggerMessageEntity.self), 15)
@@ -169,7 +169,7 @@ final class LoggerStoreTests: XCTestCase {
 
         // WHEN
         let store = try XCTUnwrap(LoggerStore(storeURL: storeURL))
-        defer { store.destroyStores() }
+        defer { store.destroy() }
 
         // THEN entities can be opened
         XCTAssertEqual(try store.viewContext.count(for: LoggerMessageEntity.self), 15)
@@ -201,7 +201,7 @@ final class LoggerStoreTests: XCTestCase {
 
         // THEN
         let copy = try LoggerStore(storeURL: copyURL)
-        defer { copy.destroyStores() }
+        defer { copy.destroy() }
 
         XCTAssertEqual(try copy.allMessages().count, 10)
         XCTAssertEqual(try copy.allNetworkRequests().count, 3)
@@ -234,7 +234,7 @@ final class LoggerStoreTests: XCTestCase {
     func testCopyCreatesInto() throws {
         // GIVEN
         let store = makeStore()
-        defer { store.destroyStores() }
+        defer { store.destroy() }
 
         populate2(store: store)
         date = Date()
@@ -268,7 +268,7 @@ final class LoggerStoreTests: XCTestCase {
 
         // THEN
         let copy = try LoggerStore(storeURL: copyURL)
-        defer { copy.destroyStores() }
+        defer { copy.destroy() }
 
         XCTAssertEqual(try copy.allMessages().count, 15)
         XCTAssertEqual(try copy.allNetworkRequests().count, 8)
@@ -303,7 +303,7 @@ final class LoggerStoreTests: XCTestCase {
             options: [.create, .synchronous],
             configuration: .init(databaseSizeLimit: 5000)
         )
-        defer { store.destroyStores() }
+        defer { store.destroy() }
 
         // GIVEN
         let context = store.viewContext
@@ -357,7 +357,7 @@ final class LoggerStoreTests: XCTestCase {
         let store = makeStore {
             $0.maxAge = 300
         }
-        defer { store.destroyStores() }
+        defer { store.destroy() }
 
         // GIVEN some messages stored before the cutoff date
         date = Date().addingTimeInterval(-1000)
@@ -398,7 +398,7 @@ final class LoggerStoreTests: XCTestCase {
         let store = makeStore {
             $0.maxAge = 300
         }
-        defer { store.destroyStores() }
+        defer { store.destroy() }
 
         // GIVEN a request with response body stored
         date = Date().addingTimeInterval(-1000)
@@ -428,7 +428,7 @@ final class LoggerStoreTests: XCTestCase {
         let store = makeStore {
             $0.maxAge = 300
         }
-        defer { store.destroyStores() }
+        defer { store.destroy() }
 
         // GIVEN a request with response body stored
         date = Date().addingTimeInterval(-1000)
@@ -454,7 +454,7 @@ final class LoggerStoreTests: XCTestCase {
         let store = makeStore {
             $0.maxAge = 300
         }
-        defer { store.destroyStores() }
+        defer { store.destroy() }
 
         // GIVEN a request with response body stored
         date = Date().addingTimeInterval(-1000)
@@ -554,7 +554,7 @@ final class LoggerStoreTests: XCTestCase {
 
         // WHEN migrating to the store with the latest model
         let store = try LoggerStore(storeURL: storeURL, options: [.synchronous])
-        defer { store.destroyStores() }
+        defer { store.destroy() }
 
         // THEN automatic migration is performed and new field are populated with
         // empty values

@@ -15,7 +15,7 @@ extension LoggerStore {
         }
     }
 
-    func destroyStores() {
+    func destroy() {
         let coordinator = container.persistentStoreCoordinator
         for store in coordinator.persistentStores {
             try? coordinator.destroyPersistentStore(at: store.url!, ofType: NSSQLiteStoreType, options: [:])
