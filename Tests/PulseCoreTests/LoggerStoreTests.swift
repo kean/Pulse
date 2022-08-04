@@ -18,7 +18,7 @@ final class LoggerStoreTests: XCTestCase {
         super.setUp()
 
         try? FileManager.default.createDirectory(at: directory.url, withIntermediateDirectories: true, attributes: nil)
-        storeURL = directory.url.appendingPathComponent("test-store")
+        storeURL = directory.url.appending(filename: "test-store")
         store = try! LoggerStore(storeURL: storeURL, options: [.create, .synchronous])
     }
 
@@ -35,7 +35,7 @@ final class LoggerStoreTests: XCTestCase {
 
     func testInitStoreMissing() throws {
         // GIVEN
-        let storeURL = directory.url.appendingPathComponent(UUID().uuidString)
+        let storeURL = directory.url.appending(filename: UUID().uuidString)
 
         // WHEN/THEN
         XCTAssertThrowsError(try LoggerStore(storeURL: storeURL))
@@ -43,7 +43,7 @@ final class LoggerStoreTests: XCTestCase {
 
     func testInitCreateStoreURL() throws {
         // GIVEN
-        let storeURL = directory.url.appendingPathComponent(UUID().uuidString)
+        let storeURL = directory.url.appending(filename: UUID().uuidString)
         let options: LoggerStore.Options = [.create, .synchronous]
 
         // WHEN
@@ -63,8 +63,8 @@ final class LoggerStoreTests: XCTestCase {
     func testInitCreateStoreIntermediateDirectoryMissing() throws {
         // GIVEN
         let storeURL = directory.url
-            .appendingPathComponent(UUID().uuidString, isDirectory: false) // Missing directory
-            .appendingPathComponent(UUID().uuidString)
+            .appending(directory: UUID().uuidString)
+            .appending(filename: UUID().uuidString)
         let options: LoggerStore.Options = [.create]
 
         // WHEN/THEN
@@ -91,7 +91,7 @@ final class LoggerStoreTests: XCTestCase {
 
     func testInitWithArchiveURL() throws {
         // GIVEN
-        let storeURL = directory.url.appendingPathComponent("logs-archive-v2.pulse")
+        let storeURL = directory.url.appending(filename: "logs-archive-v2.pulse")
         try Resources.pulseArchive.write(to: storeURL)
 
         // WHEN
@@ -109,12 +109,12 @@ final class LoggerStoreTests: XCTestCase {
             $0.predicate = NSPredicate(format: "url == %@", "https://github.com/repos")
         })
         XCTAssertEqual(request.responseBodySize, 165061)
-        XCTAssertEqual(request.responseBody?.data.count, 165061)
+        XCTAssertEqual(request.responseBody?.data?.count, 165061)
     }
 
     func testInitWithArchiveURLNoExtension() throws {
         // GIVEN
-        let storeURL = directory.url.appendingPathComponent("logs-archive-v2")
+        let storeURL = directory.url.appending(filename: "logs-archive-v2")
         try Resources.pulseArchive.write(to: storeURL)
 
         // WHEN
@@ -132,14 +132,14 @@ final class LoggerStoreTests: XCTestCase {
             $0.predicate = NSPredicate(format: "url == %@", "https://github.com/repos")
         })
         XCTAssertEqual(request.responseBodySize, 165061)
-        XCTAssertEqual(request.responseBody?.data.count, 165061)
+        XCTAssertEqual(request.responseBody?.data?.count, 165061)
     }
 
     func testInitWithPackageURL() throws {
         // GIVEN
-        let archiveURL = directory.url.appendingPathComponent(UUID().uuidString)
+        let archiveURL = directory.url.appending(filename: UUID().uuidString)
         try Resources.pulseArchive.write(to: archiveURL)
-        let storeURL = directory.url.appendingPathComponent(UUID().uuidString)
+        let storeURL = directory.url.appending(filename: UUID().uuidString)
         try FileManager.default.unzipItem(at: archiveURL, to: storeURL)
 
         // WHEN
@@ -157,14 +157,14 @@ final class LoggerStoreTests: XCTestCase {
             $0.predicate = NSPredicate(format: "url == %@", "https://github.com/repos")
         })
         XCTAssertEqual(request.responseBodySize, 165061)
-        XCTAssertEqual(request.responseBody?.data.count, 165061)
+        XCTAssertEqual(request.responseBody?.data?.count, 165061)
     }
 
     func testInitWithPackageURLNoExtension() throws {
         // GIVEN
-        let archiveURL = directory.url.appendingPathComponent(UUID().uuidString)
+        let archiveURL = directory.url.appending(filename: UUID().uuidString)
         try Resources.pulseArchive.write(to: archiveURL)
-        let storeURL = directory.url.appendingPathComponent(UUID().uuidString)
+        let storeURL = directory.url.appending(filename: UUID().uuidString)
         try FileManager.default.unzipItem(at: archiveURL, to: storeURL)
 
         // WHEN
@@ -182,7 +182,7 @@ final class LoggerStoreTests: XCTestCase {
             $0.predicate = NSPredicate(format: "url == %@", "https://github.com/repos")
         })
         XCTAssertEqual(request.responseBodySize, 165061)
-        XCTAssertEqual(request.responseBody?.data.count, 165061)
+        XCTAssertEqual(request.responseBody?.data?.count, 165061)
     }
 
     // MARK: - Copy (Directory)
@@ -191,7 +191,7 @@ final class LoggerStoreTests: XCTestCase {
         // GIVEN
         populate2(store: store)
 
-        let copyURL = directory.url.appendingPathComponent("copy.pulse")
+        let copyURL = directory.url.appending(filename: "copy.pulse")
 
         // WHEN
         try store.copy(to: copyURL)
@@ -212,8 +212,8 @@ final class LoggerStoreTests: XCTestCase {
         populate2(store: store)
 
         let invalidURL = directory.url
-            .appendingPathComponent(UUID().uuidString, isDirectory: true)
-            .appendingPathComponent("copy.pulse")
+            .appending(directory: UUID().uuidString)
+            .appending(filename: "copy.pulse")
 
         // WHEN/THEN
         XCTAssertThrowsError(try store.copy(to: invalidURL))
@@ -223,8 +223,7 @@ final class LoggerStoreTests: XCTestCase {
         // GIVEN
         populate2(store: store)
 
-        let copyURL = directory.url
-            .appendingPathComponent("copy.pulse")
+        let copyURL = directory.url.appending(filename: "copy.pulse")
 
         try store.copy(to: copyURL)
 
@@ -236,11 +235,11 @@ final class LoggerStoreTests: XCTestCase {
 
     func testCopyFile() throws {
         // GIVEN
-        let storeURL = directory.url.appendingPathComponent("logs-archive-v2.pulse")
+        let storeURL = directory.url.appending(filename: "logs-archive-v2.pulse")
         try Resources.pulseArchive.write(to: storeURL)
 
         let store = try XCTUnwrap(LoggerStore(storeURL: storeURL))
-        let copyURL = directory.url.appendingPathComponent("copy.pulse")
+        let copyURL = directory.url.appending(filename: "copy.pulse")
 
         // WHEN
         try store.copy(to: copyURL)
@@ -258,7 +257,7 @@ final class LoggerStoreTests: XCTestCase {
     // TODO: this type of store is no longer immuatble
     func _testOpenFileDatabaseImmutable() throws {
         // GIVEN
-        let storeURL = directory.url.appendingPathComponent("logs-archive-v2.pulse")
+        let storeURL = directory.url.appending(filename: "logs-archive-v2.pulse")
         try Resources.pulseArchive.write(to: storeURL)
 
         let store = try XCTUnwrap(LoggerStore(storeURL: storeURL))
@@ -278,7 +277,7 @@ final class LoggerStoreTests: XCTestCase {
 
     func testSizeLimit() throws {
         let store = try! LoggerStore(
-            storeURL: directory.url.appendingPathComponent(UUID().uuidString),
+            storeURL: directory.url.appending(filename: UUID().uuidString),
             options: [.create, .synchronous],
             configuration: .init(databaseSizeLimit: 5000)
         )
@@ -295,7 +294,7 @@ final class LoggerStoreTests: XCTestCase {
         }
 
         let copyURL = directory.url
-            .appendingPathComponent(UUID().uuidString, isDirectory: false)
+            .appending(filename: UUID().uuidString)
             .appendingPathExtension("pulse")
         try store.copy(to: copyURL)
 
@@ -315,7 +314,7 @@ final class LoggerStoreTests: XCTestCase {
 
         // THEN
         let copyURL2 = directory.url
-            .appendingPathComponent(UUID().uuidString, isDirectory: false)
+            .appending(filename: UUID().uuidString)
             .appendingPathExtension("pulse")
         try store.copy(to: copyURL2)
 
@@ -366,6 +365,7 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertEqual(try context.count(for: LoggerNetworkRequestDetailsEntity.self), 1)
         XCTAssertEqual(try context.count(for: LoggerNetworkRequestProgressEntity.self), 0)
         XCTAssertEqual(try context.count(for: LoggerBlobHandleEntity.self), 0)
+        XCTAssertEqual(try context.count(for: LoggerInlineDataEntity.self), 0)
 
         XCTAssertEqual(try store.allMessages().first?.label, "kept")
         XCTAssertEqual(try store.allNetworkRequests().first?.url, "example.com/kept")
@@ -398,6 +398,7 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertEqual(try store.backgroundContext.count(for: LoggerNetworkRequestDetailsEntity.self), 0)
         XCTAssertEqual(try store.backgroundContext.count(for: LoggerNetworkRequestProgressEntity.self), 0)
         XCTAssertEqual(try store.backgroundContext.count(for: LoggerBlobHandleEntity.self), 0)
+        XCTAssertEqual(try store.backgroundContext.count(for: LoggerInlineDataEntity.self), 0)
     }
 
     func testMaxAgeSweepBlobIsDeletedWhenBothEntitiesReferencingItAre() throws {
@@ -423,6 +424,7 @@ final class LoggerStoreTests: XCTestCase {
 
         // THEN associated data is deleted
         XCTAssertEqual(try store.backgroundContext.count(for: LoggerBlobHandleEntity.self), 0)
+        XCTAssertEqual(try store.backgroundContext.count(for: LoggerInlineDataEntity.self), 0)
     }
 
     func testMaxAgeSweepBlobIsKeptIfOnlyOneReferencingEntityIsDeleted() throws {
@@ -453,6 +455,7 @@ final class LoggerStoreTests: XCTestCase {
         // THEN associated data is deleted
         XCTAssertEqual(try store.backgroundContext.count(for: LoggerNetworkRequestEntity.self), 1)
         XCTAssertEqual(try store.backgroundContext.count(for: LoggerBlobHandleEntity.self), 1)
+        XCTAssertEqual(try store.backgroundContext.count(for: LoggerInlineDataEntity.self), 1)
     }
 
     func testBlobSizeLimitSweep() throws {
@@ -488,6 +491,32 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertEqual(requests.count, 3) // Keeps the requests
         XCTAssertEqual(requests.compactMap(\.responseBody).count, 1)
         XCTAssertEqual(try store.backgroundContext.count(for: LoggerBlobHandleEntity.self), 1)
+        XCTAssertEqual(try store.backgroundContext.count(for: LoggerInlineDataEntity.self), 1)
+    }
+
+    func testBlobSizeLimitSweepLargeBlob() throws {
+        // GIVEN store with blob size limit
+        let store = makeStore {
+            $0.blobsSizeLimit = 100 // will trigger sweep
+        }
+
+        let responseData = Data(count: 256 * 1024)
+        store.storeRequest(URLRequest(url: URL(string: "example.com/1")!), response: nil, error: nil, data: responseData)
+
+        // ASSERT it's stored in a file system
+        XCTAssertEqual(try store.backgroundContext.count(for: LoggerBlobHandleEntity.self), 1)
+        XCTAssertEqual(try store.backgroundContext.count(for: LoggerInlineDataEntity.self), 0)
+        let request = try store.backgroundContext.first(LoggerNetworkRequestEntity.self)
+        let key = try XCTUnwrap(request?.responseBody?.key)
+        XCTAssertEqual(store.getBlobData(forKey: key), responseData)
+
+        // WHEN
+        store.syncSweep()
+
+        // THEN the file is deleted from the file system
+        XCTAssertEqual(try store.backgroundContext.count(for: LoggerBlobHandleEntity.self), 0)
+        XCTAssertEqual(try store.backgroundContext.count(for: LoggerInlineDataEntity.self), 0)
+        XCTAssertNil(store.getBlobData(forKey: key))
     }
 
     // MARK: - Migration
@@ -495,10 +524,10 @@ final class LoggerStoreTests: XCTestCase {
     func testMigrationFromVersion0_2ToLatest() throws {
         // GIVEN store created with the model from Pulse 0.2
         let storeURL = directory.url
-            .appendingPathComponent(UUID().uuidString, isDirectory: false)
+            .appending(filename: UUID().uuidString)
         try? FileManager.default.createDirectory(at: storeURL, withIntermediateDirectories: true, attributes: nil)
         let databaseURL = storeURL
-            .appendingPathComponent("logs.sqlite", isDirectory: false)
+            .appending(filename: "logs.sqlite")
         try Resources.outdatedDatabase.write(to: databaseURL)
 
         // WHEN migrating to the store with the latest model
@@ -540,6 +569,33 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertEqual(try context.count(for: LoggerNetworkRequestEntity.self), 0)
         XCTAssertEqual(try context.count(for: LoggerNetworkRequestDetailsEntity.self), 0)
         XCTAssertEqual(try context.count(for: LoggerBlobHandleEntity.self), 0)
+    }
+
+    func testRemoveAllWithLargeBlob() throws {
+        // GIVEN large blob
+        let responseData = Data(count: 256 * 1024)
+        store.storeRequest(URLRequest(url: URL(string: "example.com/1")!), response: nil, error: nil, data: responseData)
+
+        // ASSERT it's stored in a file system
+        XCTAssertEqual(try store.backgroundContext.count(for: LoggerBlobHandleEntity.self), 1)
+        XCTAssertEqual(try store.backgroundContext.count(for: LoggerInlineDataEntity.self), 0)
+        let request = try store.backgroundContext.first(LoggerNetworkRequestEntity.self)
+        let key = try XCTUnwrap(request?.responseBody?.key)
+        XCTAssertEqual(store.getBlobData(forKey: key), responseData)
+
+        // WHEN
+        store.removeAll()
+
+        // THEN the file is deleted from the file system
+        XCTAssertEqual(try store.backgroundContext.count(for: LoggerBlobHandleEntity.self), 0)
+        XCTAssertEqual(try store.backgroundContext.count(for: LoggerInlineDataEntity.self), 0)
+        XCTAssertNil(store.getBlobData(forKey: key))
+
+        // WHEN store new files after removal
+        store.storeRequest(URLRequest(url: URL(string: "example.com/1")!), response: nil, error: nil, data: responseData)
+
+        // THEN you can store more files after removal
+        XCTAssertEqual(store.getBlobData(forKey: key), responseData)
     }
 
     // MARK: - Image Support
@@ -596,7 +652,6 @@ final class LoggerStoreTests: XCTestCase {
 
         // THEN
         XCTAssertEqual(info.storeVersion, "2.0.0")
-        XCTAssertNil(info.archivedDate) // It's a writable package
         XCTAssertEqual(info.messageCount, 7)
         XCTAssertEqual(info.requestCount, 3)
         XCTAssertEqual(info.blobCount, 3)
@@ -612,7 +667,7 @@ final class LoggerStoreTests: XCTestCase {
         closure(&configuration)
 
         return try! LoggerStore(
-            storeURL: directory.url.appendingPathComponent(UUID().uuidString),
+            storeURL: directory.url.appending(filename: UUID().uuidString),
             options: [.create, .synchronous],
             configuration: configuration
         )

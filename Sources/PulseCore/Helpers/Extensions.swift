@@ -25,17 +25,25 @@ extension FileManager {
 }
 
 extension URL {
+    func appending(filename: String) -> URL {
+        appendingPathComponent(filename, isDirectory: false)
+    }
+
+    func appending(directory: String) -> URL {
+        appendingPathComponent(directory, isDirectory: true)
+    }
+
     static var temp: URL {
         let url = Files.temporaryDirectory
-            .appendingPathComponent("com.github.kean.logger", isDirectory: true)
+            .appending(directory: "com.github.kean.logger")
         Files.createDirectoryIfNeeded(at: url)
         return url
     }
 
     static var logs: URL {
         var url = Files.urls(for: .libraryDirectory, in: .userDomainMask).first?
-            .appendingPathComponent("Logs", isDirectory: true)
-            .appendingPathComponent("com.github.kean.logger", isDirectory: true)  ?? URL(fileURLWithPath: "/dev/null")
+            .appending(directory: "Logs")
+            .appending(directory: "com.github.kean.logger")  ?? URL(fileURLWithPath: "/dev/null")
         if !Files.createDirectoryIfNeeded(at: url) {
             var resourceValues = URLResourceValues()
             resourceValues.isExcludedFromBackup = true
@@ -46,16 +54,16 @@ extension URL {
 }
 
 extension Data {
-    /// Calculates SHA256 from the given string and returns its hex representation.
+    /// Calculates SHA1 from the given string and returns its hex representation.
     ///
     /// ```swift
-    /// print("http://test.com".data(using: .utf8)!.sha256)
-    /// // prints "8b408a0c7163fdfff06ced3e80d7d2b3acd9db900905c4783c28295b8c996165"
+    /// print("http://test.com".data(using: .utf8)!.sha1)
+    /// // prints "c6b6cafcb77f54d43cd1bd5361522a5e0c074b65"
     /// ```
-    var sha256: String {
+    var sha1: String {
         let hash = withUnsafeBytes { (bytes: UnsafeRawBufferPointer) -> [UInt8] in
-            var hash = [UInt8](repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH))
-            CC_SHA256(bytes.baseAddress, CC_LONG(count), &hash)
+            var hash = [UInt8](repeating: 0, count: Int(CC_SHA1_DIGEST_LENGTH))
+            CC_SHA1(bytes.baseAddress, CC_LONG(count), &hash)
             return hash
         }
         return hash.map({ String(format: "%02x", $0) }).joined()
@@ -86,16 +94,6 @@ extension URLRequest {
         }
 
         return bodyStreamData
-    }
-}
-
-extension Archive {
-    func getData(for entry: Entry) -> Data? {
-        var data = Data()
-        _ = try? extract(entry, skipCRC32: true) {
-            data.append($0)
-        }
-        return data
     }
 }
 
@@ -176,4 +174,22 @@ extension URL {
             return Int64(size ?? 0) + $0
         }
     }
+}
+
+func benchmark(title: String, operation: () -> Void) {
+    let startTime = CFAbsoluteTimeGetCurrent()
+    operation()
+    let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
+    debugPrint("Time elapsed for \(title): \(timeElapsed * 1000.0) ms.")
+}
+
+final class WeakLoggerStore {
+    weak var store: LoggerStore?
+
+    init(store: LoggerStore?) {
+        self.store = store
+    }
+
+    /// The key for `NSManagedObjectContext` `userInfo`.
+    static let loggerStoreKey = "com.github.kean.pulse.associated-logger-store"
 }

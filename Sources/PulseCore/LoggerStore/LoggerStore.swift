@@ -52,8 +52,6 @@ public final class LoggerStore: @unchecked Sendable {
     /// Re-transmits events processed by the store.
     public let events = PassthroughSubject<Event, Never>()
 
-    /// In case of a temporary store, contains URL to the database open for writing.
-    private let writableStoreURL: URL
     private let options: Options
     private let configuration: Configuration
     private let document: PulseDocument
@@ -62,6 +60,8 @@ public final class LoggerStore: @unchecked Sendable {
     private var manifest: Manifest {
         didSet { try? save(manifest) }
     }
+
+    private let blobsURL: URL
 
     // MARK: Shared
 
@@ -82,7 +82,7 @@ public final class LoggerStore: @unchecked Sendable {
     }
 
     private static func makeDefault() -> LoggerStore {
-        let storeURL = URL.logs.appendingPathComponent("current.pulse", isDirectory: true)
+        let storeURL = URL.logs.appending(directory: "current.pulse")
         guard let store = try? LoggerStore(storeURL: storeURL, options: [.create, .sweep]) else {
             return LoggerStore(inMemoryStore: storeURL) // Right side should never happen
         }
@@ -122,15 +122,17 @@ public final class LoggerStore: @unchecked Sendable {
 
     init(packageURL: URL, create: Bool, options: Options, configuration: Configuration) throws {
         self.storeURL = packageURL
+        self.blobsURL = storeURL.appending(directory: blobsDirectoryName)
+
         self.options = options
         self.configuration = configuration
+
+        let databaseURL = storeURL.appending(filename: databaseFileName)
+        let manifestURL = storeURL.appending(filename: manifestFileName)
 
         if create {
             try Files.createDirectory(at: storeURL, withIntermediateDirectories: false, attributes: nil)
         }
-
-        let databaseURL = storeURL.appendingPathComponent(databaseFileName, isDirectory: false)
-        let manifestURL = storeURL.appendingPathComponent(manifestFileName, isDirectory: false)
 
         if !create {
             guard Files.fileExists(atPath: databaseURL.path) else {
@@ -138,26 +140,26 @@ public final class LoggerStore: @unchecked Sendable {
             }
         }
 
+        #warning("TODO: make this more clear for the `create` scenario + move reset earlier (should remove everything)")
         // Read the store version and perform migration if needed
         var manifest = try LoggerStore.readOrCreateManifest(at: manifestURL)
         if !manifest.isCurrentVersion {
             // The safest option is to simply remove old data on all version updates
             // and not even attempt to be any potetially slow and error-pront migration.
-            let blobsURL = storeURL.appendingPathComponent("blobs", isDirectory: true)
             try? Files.removeItem(at: blobsURL) // Blobs were previously stored in a filesystem
+            Files.createDirectoryIfNeeded(at: blobsURL)
             try? Files.removeItem(at: databaseURL)
             // Update info with the latest version
             manifest.version = Manifest.currentVersion
         }
         self.manifest = manifest
-        self.writableStoreURL = packageURL
 
         self.container = LoggerStore.makeContainer(databaseURL: databaseURL, isViewing: false)
         try? LoggerStore.loadStore(container: container)
         self.backgroundContext = LoggerStore.makeBackgroundContext(for: container)
         self.isArchive = false
         self.document = .package
-        self.viewContext.userInfo[Pins.pinServiceKey] = Pins(store: self)
+        self.onDidInitialize()
         try save(manifest)
 
         if isAutomaticSweepNeeded {
@@ -169,33 +171,39 @@ public final class LoggerStore: @unchecked Sendable {
 
     init(archiveURL: URL, options: Options, configuration: Configuration) throws {
         self.storeURL = archiveURL
+        self.blobsURL = storeURL.appending(directory: blobsDirectoryName)
+
         self.options = options
         self.configuration = configuration
 
-        guard let archive = Archive(url: storeURL, accessMode: .read) else {
+        guard let archive = IndexedArchive(url: storeURL) else {
             throw LoggerStore.Error.storeInvalid
         }
         let manifest = try Manifest.make(archive: archive)
         guard manifest.version >= Version(2, 0, 0) else {
             throw LoggerStore.Error.unsupportedVersion
         }
-        let tempStoreURL = URL.temp.appendingPathComponent(manifest.storeId.uuidString, isDirectory: false)
+        let tempStoreURL = URL.temp.appending(filename: manifest.storeId.uuidString)
         if !Files.fileExists(atPath: tempStoreURL.path) {
             try Files.unzipItem(at: archiveURL, to: tempStoreURL)
         }
 
         self.manifest = manifest
-        self.writableStoreURL = tempStoreURL
 
-        let databaseURL = tempStoreURL.appendingPathComponent(databaseFileName, isDirectory: false)
+        let databaseURL = tempStoreURL.appending(filename: databaseFileName)
         self.container = LoggerStore.makeContainer(databaseURL: databaseURL, isViewing: true)
         try LoggerStore.loadStore(container: container)
         self.backgroundContext = LoggerStore.makeBackgroundContext(for: container)
         self.isArchive = true
         self.manifest = manifest
-        self.document = .file
+        self.document = .archive(archive)
+        self.onDidInitialize()
+    }
+
+    private func onDidInitialize() {
         self.viewContext.userInfo[Pins.pinServiceKey] = Pins(store: self)
-        try save(manifest)
+        self.viewContext.userInfo[WeakLoggerStore.loggerStoreKey] = WeakLoggerStore(store: self)
+        self.backgroundContext.userInfo[WeakLoggerStore.loggerStoreKey] = WeakLoggerStore(store: self)
     }
 
     private static func readOrCreateManifest(at url: URL) throws -> Manifest {
@@ -209,7 +217,7 @@ public final class LoggerStore: @unchecked Sendable {
 
     init(inMemoryStore storeURL: URL) {
         self.storeURL = storeURL
-        self.writableStoreURL = storeURL
+        self.blobsURL = storeURL.appending(directory: blobsDirectoryName)
         self.isArchive = true
         self.container = NSPersistentContainer(name: "EmptyStore", managedObjectModel: Self.model)
         let description = NSPersistentStoreDescription()
@@ -518,11 +526,13 @@ extension LoggerStore {
         return request
     }
 
+    // MARK: - Managing Blobs
+
     private func storeBlob(_ data: Data) -> LoggerBlobHandleEntity? {
         guard !data.isEmpty else {
             return nil
         }
-        let key = data.sha256
+        let key = data.sha1
         let existingEntity = try? backgroundContext.first(LoggerBlobHandleEntity.self) {
             $0.predicate = NSPredicate(format: "key == %@", key)
         }
@@ -533,17 +543,42 @@ extension LoggerStore {
         let entity = LoggerBlobHandleEntity(context: backgroundContext)
         entity.key = key
         entity.linkCount = 1
-        entity.data = data
         entity.size = Int64(data.count)
+        if data.count <= LoggerBlobHandleEntity.inlineLimit {
+            let inlineData = LoggerInlineDataEntity(context: backgroundContext)
+            inlineData.data = data
+            entity.inlineData = inlineData
+        } else {
+            try? data.write(to: makeBlobURL(for: key))
+        }
         return entity
     }
 
     private func unlink(_ blob: LoggerBlobHandleEntity) {
         blob.linkCount -= 1
         if blob.linkCount == 0 {
+            if blob.inlineData == nil {
+                try? Files.removeItem(at: makeBlobURL(for: blob.key))
+            }
             backgroundContext.delete(blob)
         }
     }
+
+    private func makeBlobURL(for key: String) -> URL {
+        blobsURL.appending(filename: key)
+    }
+
+    /// Returns blob data for the given key.
+     public func getBlobData(forKey key: String) -> Data? {
+         switch document {
+         case .package:
+             return try? Data(contentsOf: makeBlobURL(for: key))
+         case .archive(let archive):
+             return archive.getData(for: "\(blobsDirectoryName)/\(key)")
+         case .empty:
+             return nil
+         }
+     }
 
     // MARK: - Performing Changes
 
@@ -610,7 +645,9 @@ extension LoggerStore {
         case .package:
             try? deleteEntities(for: LoggerMessageEntity.fetchRequest())
             try? deleteEntities(for: LoggerBlobHandleEntity.fetchRequest())
-        case .file, .empty:
+            try? Files.removeItem(at: blobsURL)
+            Files.createDirectoryIfNeeded(at: blobsURL)
+        case .archive, .empty:
             break // Do nothing, readonly
         }
     }
@@ -619,8 +656,6 @@ extension LoggerStore {
 // MARK: - LoggerStore (Copy)
 
 extension LoggerStore {
-    #warning("TODO: make async")
-
     /// Creates a copy of the current store at the given URL. The created copy
     /// has `.pulse` extension (actually a `.zip` archive).
     ///
@@ -636,7 +671,7 @@ extension LoggerStore {
                 result = Result { try _copy(to: targetURL) }
             }
             return try (result ?? .failure(Error.unknownError)).get()
-        case .file:
+        case .archive:
             try Files.copyItem(at: storeURL, to: targetURL)
         case .empty:
             throw LoggerStore.Error.storeInvalid
@@ -644,7 +679,7 @@ extension LoggerStore {
     }
 
     private func _copy(to targetURL: URL) throws {
-        let tempURL = URL.temp.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        let tempURL = URL.temp.appending(directory: UUID().uuidString)
         Files.createDirectoryIfNeeded(at: tempURL)
         do {
             try _copy(to: targetURL, tempURL: tempURL)
@@ -656,14 +691,22 @@ extension LoggerStore {
 
     private func _copy(to targetURL: URL, tempURL: URL) throws {
         // Create copy of the store
-        let databaseURL = tempURL.appendingPathComponent(databaseFileName, isDirectory: false)
+        let databaseURL = tempURL.appending(filename: databaseFileName)
         try container.persistentStoreCoordinator.createCopyOfStore(at: databaseURL)
 
-        // Create description
-        let manifestURL = tempURL.appendingPathComponent(manifestFileName, isDirectory: false)
+        // Copy blobs
+        let blobsURL = tempURL.appending(directory: blobsDirectoryName)
+        try Files.copyItem(at: self.blobsURL, to: blobsURL)
+
+        // Create manifest
+        let manifestURL = tempURL.appending(filename: manifestFileName)
         var manifest = manifest
         manifest.storeId = UUID()
         try JSONEncoder().encode(manifest).write(to: manifestURL)
+
+        // Add store info
+        let info = try getInfo()
+        let infoURL = tempURL.appending(filename: infoFilename)
 
         // Archive and add .pulse extension
         try Files.zipItem(at: tempURL, to: targetURL, shouldKeepParent: false, compressionMethod: .deflate)
@@ -708,7 +751,7 @@ extension LoggerStore {
     }
 
     private func reduceDatabaseSize() throws {
-        let attributes = try Files.attributesOfItem(atPath: storeURL.appendingPathComponent(databaseFileName, isDirectory: false).path)
+        let attributes = try Files.attributesOfItem(atPath: storeURL.appending(filename: databaseFileName).path)
         let size = attributes[.size] as? Int64 ?? 0
 
         guard size > configuration.databaseSizeLimit else {
@@ -811,7 +854,7 @@ extension LoggerStore {
             return info
         }
 
-        let databasURL = storeURL.appendingPathComponent(databaseFileName, isDirectory: false)
+        let databasURL = storeURL.appending(filename: databaseFileName)
         let databaseAttributes = try Files.attributesOfItem(atPath: databasURL.path)
 
         let messageCount = try backgroundContext.count(for: LoggerMessageEntity.self)
@@ -823,7 +866,6 @@ extension LoggerStore {
             storeVersion: manifest.version.description,
             createdDate: (databaseAttributes[.creationDate] as? Date) ?? Date(),
             modifiedDate: (databaseAttributes[.modificationDate] as? Date) ?? Date(),
-            archivedDate: nil,
             messageCount: messageCount - requestCount,
             requestCount: requestCount,
             blobCount: blobCount,
@@ -902,7 +944,7 @@ extension LoggerStore {
     }
 
     private func save(_ manifest: Manifest) throws {
-        let manifestURL = writableStoreURL.appendingPathComponent(manifestFileName, isDirectory: false)
+        let manifestURL = storeURL.appending(filename: manifestFileName)
         try JSONEncoder().encode(manifest).write(to: manifestURL)
     }
 }
@@ -943,9 +985,8 @@ extension LoggerStore {
 
         static let currentVersion = Version(2, 0, 0)
 
-        static func make(archive: Archive) throws -> Manifest {
-            guard let manifest = archive[manifestFileName],
-                  let data = archive.getData(for: manifest) else {
+        static func make(archive: IndexedArchive) throws -> Manifest {
+            guard let data = archive.getData(for: manifestFileName) else {
                 throw NSError(domain: NSErrorDomain() as String, code: NSURLErrorResourceUnavailable, userInfo: [NSLocalizedDescriptionKey: "Store manifest is missing"])
             }
             return try JSONDecoder().decode(Manifest.self, from: data)
@@ -958,9 +999,15 @@ extension LoggerStore {
 let manifestFileName = "manifest.json"
 let databaseFileName = "logs.sqlite"
 let infoFilename = "info.json"
+let blobsDirectoryName = "blobs"
 
 private enum PulseDocument: Sendable {
+    /// A plain directory (aka "package"). If it has a `.pulse` file extension,
+    /// it can be automatically opened by the Pulse apps.
     case package
-    case file
+    /// An archive created by exporting the store.
+    case archive(IndexedArchive)
+
+    #warning("TODO: can we remove this?")
     case empty
 }

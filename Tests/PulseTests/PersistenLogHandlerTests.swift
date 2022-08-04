@@ -19,9 +19,9 @@ final class PersistentLogHandlerTests: XCTestCase {
     var currentDate: Date = Date()
 
     override func setUp() {
-        tempDirectoryURL = FileManager().temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        tempDirectoryURL = FileManager().temporaryDirectory.appending(directory: UUID().uuidString)
         try? FileManager.default.createDirectory(at: tempDirectoryURL, withIntermediateDirectories: true, attributes: [:])
-        storeURL = tempDirectoryURL.appendingPathComponent("test-store")
+        storeURL = tempDirectoryURL.appending(filename: "test-store")
 
         var configuration = LoggerStore.Configuration()
         configuration.makeCurrentDate = { [unowned self] in currentDate }

@@ -24,8 +24,6 @@ extension LoggerStore {
         public var createdDate: Date
         /// The date the store was last modified.
         public var modifiedDate: Date
-        /// The date the archive was created (only valid for exported Pulse document).
-        public var archivedDate: Date?
 
         // MARK: Usage Statistics
 
@@ -50,10 +48,6 @@ extension LoggerStore {
         public var appInfo: AppInfo
         /// Information about the device which created the store.
         public var deviceInfo: DeviceInfo
-
-        var version: Version {
-            Version(storeVersion) ?? .init(1, 0, 0) // should always succeed
-        }
 
         public struct AppInfo: Codable, Sendable {
             public let bundleIdentifier: String?

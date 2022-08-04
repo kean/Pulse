@@ -164,7 +164,7 @@ final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
 
     // WARNING: This call is relatively expensive.
     var responseString: String? {
-        request.responseBody.flatMap { String(data: $0.data, encoding: .utf8) }
+        request.responseBody?.data.flatMap { String(data: $0, encoding: .utf8) }
     }
 
     var url: String? {

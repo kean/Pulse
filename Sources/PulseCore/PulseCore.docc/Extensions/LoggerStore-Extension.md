@@ -26,6 +26,7 @@
 
 - ``allMessages()``
 - ``allNetworkRequests()``
+- ``getBlobData(forKey:)``
 - ``removeAll()``
 
 ### Sharing the Store
