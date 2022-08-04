@@ -31,7 +31,7 @@ final class LoggerSyncSession: ObservableObject {
     func transfer(store: LoggerStore) {
         let directory = TemporaryDirectory()
         let date = makeCurrentDate()
-        let storeURL = directory.url.appending(directory: "logs-\(date).pulse")
+        let storeURL = directory.url.appendingPathComponent("logs-\(date).pulse", isDirectory: true)
         _ = try? store.copy(to: storeURL)
 
         let session = WCSession.default.transferFile(storeURL, metadata: nil)
@@ -56,7 +56,7 @@ private final class SessionDelegate: NSObject, WCSessionDelegate {
         DispatchQueue.main.async {
             do {
                 let directory = TemporaryDirectory()
-                let storeURL = directory.url.appending(filename: file.fileURL.lastPathComponent)
+                let storeURL = directory.url.appendingPathComponent(file.fileURL.lastPathComponent, isDirectory: false)
                 try FileManager.default.moveItem(at: file.fileURL, to: storeURL)
 
                 runHapticFeedback(.success)

@@ -253,7 +253,7 @@ public final class LoggerBlobHandleEntity: NSManagedObject {
 
     /// The logger inlines small blobs in a separate table in the database which
     /// significantly [reduces](https://www.sqlite.org/intern-v-extern-blob.html)
-    /// the total allocated size for these files and improves the overall performace.
+    /// the total allocated size for these files and improves the overall performance.
     ///
     /// The larger blobs are stored in an file system. And when you export a Pulse
     /// document, the larger blobs are read from the created archive on-demand,

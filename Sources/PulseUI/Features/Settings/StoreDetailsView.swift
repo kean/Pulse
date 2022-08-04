@@ -54,8 +54,7 @@ final class StoreDetailsViewModel {
             ("Device", "\(device.name) (\(device.systemName) \(device.systemVersion))"),
             ("App", "\(app.name ?? "–") \(app.version ?? "–") (\(app.build ?? "–"))"),
             ("Created", formatter.string(from: info.createdDate)),
-            ("Modified", formatter.string(from: info.modifiedDate)),
-            ("Archived", info.archivedDate.map(formatter.string))
+            ("Modified", formatter.string(from: info.modifiedDate))
         ])
     }
 
