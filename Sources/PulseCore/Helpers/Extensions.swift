@@ -45,7 +45,7 @@ extension URL {
     }
 }
 
-private extension Data {
+extension Data {
     /// Calculates SHA256 from the given string and returns its hex representation.
     ///
     /// ```swift

@@ -32,9 +32,6 @@ public final class LoggerStore: @unchecked Sendable {
     /// The URL the store was initialized with.
     public let storeURL: URL
 
-    /// In case of a temporary store, contains URL to the database open for writing.
-    private let writableStoreURL: URL
-
     /// Returns `true` if the store was opened with a Pulse archive (a document
     /// with `.pulse` extension). The archives are readonly.
     public let isReadonly: Bool
@@ -48,8 +45,6 @@ public final class LoggerStore: @unchecked Sendable {
     /// Returns the background managed object context used for all write operations.
     public let backgroundContext: NSManagedObjectContext
 
-    private let document: PulseDocument
-
     // Deprecated in Pulse 2.0.
     @available(*, deprecated, message: "Renamed to `shared`")
     public static var `default`: LoggerStore { LoggerStore.shared }
@@ -57,15 +52,16 @@ public final class LoggerStore: @unchecked Sendable {
     /// Re-transmits events processed by the store.
     public let events = PassthroughSubject<Event, Never>()
 
-    var manifest: Manifest {
-        didSet {
-            try? save(manifest)
-        }
-    }
+    /// In case of a temporary store, contains URL to the database open for writing.
+    private let writableStoreURL: URL
     private let options: Options
     private let configuration: Configuration
+    private let document: PulseDocument
     private var isSaveScheduled = false
     private let queue = DispatchQueue(label: "com.github.kean.pulse.logger-store")
+    private var manifest: Manifest {
+        didSet { try? save(manifest) }
+    }
 
     // MARK: Shared
 
@@ -92,89 +88,6 @@ public final class LoggerStore: @unchecked Sendable {
         }
         register(store: store)
         return store
-    }
-
-    // MARK: Configuration
-
-    /// The store creation options.
-    public struct Options: OptionSet, Sendable {
-        public let rawValue: Int
-
-        public init(rawValue: Int) {
-            self.rawValue = rawValue
-        }
-
-        /// Creates store if the file is missing. The intermediate directories must
-        /// already exist.
-        public static let create = Options(rawValue: 1 << 0)
-
-        /// Reduces store size when it reaches the size limit by by removing the least
-        /// recently added messages and blobs.
-        public static let sweep = Options(rawValue: 1 << 1)
-
-        /// Flushes entities to disk immediately and synchronously.
-        ///
-        /// - warning: When this option is enabled, all writes to the store
-        /// happen immediately and synchronously.
-        ///
-        /// - note: This option can be used to ensure that if the app crashes,
-        /// as much logs as possible are saved persistently. It can also be
-        /// used to increase remote logging speed.
-        public static let synchronous = Options(rawValue: 1 << 2)
-    }
-
-    /// The store configuration.
-    public struct Configuration: @unchecked Sendable {
-        /// Size limit in bytes. `128 Mb` by default. The limit is approximate.
-        ///
-        /// - important: This limit also applies to small network responses stored inline.
-        public var databaseSizeLimit: Int
-
-        /// Size limit in bytes. `256 Mb` by default.
-        public var blobsSizeLimit: Int
-
-        var trimRatio = 0.7
-
-        /// Every 20 minutes.
-        var sweepInterval: TimeInterval = 1200
-
-        /// Determines how often the messages are saved to the database. By default,
-        /// 100 milliseconds - quickly enough, but avoiding too many individual writes.
-        public var saveInterval: DispatchTimeInterval = .milliseconds(100)
-
-        /// If `true`, the images added to the store as saved as small thumbnails.
-        public var isStoringOnlyImageThumbnails = true
-
-        /// Limit the maximum response size stored by the logger. The default
-        /// value is `10 Mb`. The same limit applies to requests.
-        public var responseBodySizeLimit: Int = 10 * 1048576
-
-        /// By default, two weeks. The messages and requests that are older that
-        /// two weeks will get automatically deleted.
-        ///
-        /// - note: This option request the store to be instantiated with a
-        /// ``LoggerStore/Options/sweep`` option. The default store supports sweeps.
-        public var maxAge: TimeInterval = 14 * 86400
-
-        /// For tesing purposes.
-        var makeCurrentDate: () -> Date = { Date() }
-
-        /// Gets called when the store receives an event. You can use it to
-        /// modify the event before it is stored in order, for example, filter
-        /// out some sensitive information. If you return `nil`, the event
-        /// is ignored completely.
-        public var willHandleEvent: @Sendable (Event) -> Event? = { $0 }
-
-        /// Initializes the configuration.
-        ///
-        /// - parameters:
-        ///   - databaseSizeLimit: The approximate limit of the database size. `128 Mb`
-        ///   - blobsSizeLimit: The approximate limit of the blob storage that
-        ///   contains network responses (HTTP body). `256 Mb` by default.
-        public init(databaseSizeLimit: Int = 128 * 1048576, blobsSizeLimit: Int = 256 * 1048576) {
-            self.databaseSizeLimit = databaseSizeLimit
-            self.blobsSizeLimit = blobsSizeLimit
-        }
     }
 
     // MARK: Initialization
@@ -678,44 +591,6 @@ extension LoggerStore {
     }
 }
 
-extension LoggerStore {
-    public enum MetadataValue {
-        case string(String)
-        case stringConvertible(CustomStringConvertible)
-    }
-
-    public typealias Metadata = [String: MetadataValue]
-
-    // Compatible with SwiftLog.Logger.Level
-    @frozen public enum Level: String, CaseIterable, Codable, Hashable, Sendable {
-        case trace
-        case debug
-        case info
-        case notice
-        case warning
-        case error
-        case critical
-
-        var order: Int16 {
-            switch self {
-            case .trace: return 0
-            case .debug: return 1
-            case .info: return 2
-            case .notice: return 3
-            case .warning: return 4
-            case .error: return 5
-            case .critical: return 6
-            }
-        }
-    }
-}
-
-private enum PulseDocument: Sendable {
-    case package
-    case file
-    case empty
-}
-
 // MARK: - LoggerStore (Accessing Messages)
 
 extension LoggerStore {
@@ -743,28 +618,9 @@ extension LoggerStore {
             break // Do nothing, readonly
         }
     }
-
-    private func deleteEntities(for fetchRequest: NSFetchRequest<NSFetchRequestResult>) throws {
-        let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
-        deleteRequest.resultType = .resultTypeObjectIDs
-
-        let result = try backgroundContext.execute(deleteRequest) as? NSBatchDeleteResult
-        guard let ids = result?.result as? [NSManagedObjectID] else { return }
-
-        NSManagedObjectContext.mergeChanges(fromRemoteContextSave: [NSDeletedObjectsKey: ids], into: [backgroundContext])
-
-        viewContext.perform {
-            NSManagedObjectContext.mergeChanges(fromRemoteContextSave: [NSDeletedObjectsKey: ids], into: [self.viewContext])
-        }
-    }
-
-    private func save(_ manifest: Manifest) throws {
-        let manifestURL = writableStoreURL.appendingPathComponent(manifestFileName, isDirectory: false)
-        try JSONEncoder().encode(manifest).write(to: manifestURL)
-    }
 }
 
-// MARK: - LoggerStore (Archive and Copy)
+// MARK: - LoggerStore (Copy)
 
 extension LoggerStore {
     /// Creates a copy of the current store at the given URL. The created copy
@@ -793,14 +649,14 @@ extension LoggerStore {
         let tempURL = URL.temp.appendingPathComponent(UUID().uuidString, isDirectory: true)
         Files.createDirectoryIfNeeded(at: tempURL)
         do {
-            try copy(to: targetURL, tempURL: tempURL)
+            try _copy(to: targetURL, tempURL: tempURL)
         } catch {
             try? Files.removeItem(at: tempURL)
             throw error
         }
     }
 
-    private func copy(to targetURL: URL, tempURL: URL) throws {
+    private func _copy(to targetURL: URL, tempURL: URL) throws {
         // Create copy of the store
         let databaseURL = tempURL.appendingPathComponent(databaseFileName, isDirectory: false)
         try container.persistentStoreCoordinator.createCopyOfStore(at: databaseURL)
@@ -930,7 +786,7 @@ extension LoggerStore {
     }
 }
 
-// MARK: - PinService
+// MARK: - LoggerStore (Pins)
 
 extension LoggerStore {
     public var pins: Pins { Pins(store: self) }
@@ -979,26 +835,30 @@ extension LoggerStore {
     }
 }
 
-// MARK: - Constants
+// MARK: - LoggerStore (Private)
 
-let manifestFileName = "manifest.json"
-private let databaseFileName = "logs.sqlite"
-let infoFilename = "info.json"
+extension LoggerStore {
+    private func deleteEntities(for fetchRequest: NSFetchRequest<NSFetchRequestResult>) throws {
+        let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
+        deleteRequest.resultType = .resultTypeObjectIDs
 
-// MARK: - Helpers
+        let result = try backgroundContext.execute(deleteRequest) as? NSBatchDeleteResult
+        guard let ids = result?.result as? [NSManagedObjectID] else { return }
 
-private extension Dictionary where Key == String, Value == LoggerStore.MetadataValue {
-    func unpack() -> [String: String] {
-        var entries = [String: String]()
-        for (key, value) in self {
-            switch value {
-            case let .string(string): entries[key] = string
-            case let .stringConvertible(string): entries[key] = string.description
-            }
+        NSManagedObjectContext.mergeChanges(fromRemoteContextSave: [NSDeletedObjectsKey: ids], into: [backgroundContext])
+
+        viewContext.perform {
+            NSManagedObjectContext.mergeChanges(fromRemoteContextSave: [NSDeletedObjectsKey: ids], into: [self.viewContext])
         }
-        return entries
+    }
+
+    private func save(_ manifest: Manifest) throws {
+        let manifestURL = writableStoreURL.appendingPathComponent(manifestFileName, isDirectory: false)
+        try JSONEncoder().encode(manifest).write(to: manifestURL)
     }
 }
+
+// MARK: - LoggerStore (Error)
 
 extension LoggerStore {
     public enum Error: Swift.Error, LocalizedError {
@@ -1018,4 +878,40 @@ extension LoggerStore {
             }
         }
     }
+}
+
+// MARK: - LoggerStore (Manifest)
+
+extension LoggerStore {
+    private struct Manifest: Codable {
+        var storeId: UUID
+        var version: Version
+        var lastSweepDate: Date?
+
+        var isCurrentVersion: Bool {
+            version == Manifest.currentVersion
+        }
+
+        static let currentVersion = Version(2, 0, 0)
+
+        static func make(archive: Archive) throws -> Manifest {
+            guard let manifest = archive[manifestFileName],
+                  let data = archive.getData(for: manifest) else {
+                throw NSError(domain: NSErrorDomain() as String, code: NSURLErrorResourceUnavailable, userInfo: [NSLocalizedDescriptionKey: "Store manifest is missing"])
+            }
+            return try JSONDecoder().decode(Manifest.self, from: data)
+        }
+    }
+}
+
+// MARK: - Constants
+
+let manifestFileName = "manifest.json"
+let databaseFileName = "logs.sqlite"
+let infoFilename = "info.json"
+
+private enum PulseDocument: Sendable {
+    case package
+    case file
+    case empty
 }

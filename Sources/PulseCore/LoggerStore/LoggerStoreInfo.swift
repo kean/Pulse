@@ -5,26 +5,6 @@
 import Foundation
 
 extension LoggerStore {
-    struct Manifest: Codable {
-        var storeId: UUID
-        var version: Version
-        var lastSweepDate: Date?
-
-        var isCurrentVersion: Bool {
-            version == Manifest.currentVersion
-        }
-
-        static let currentVersion = Version(2, 0, 0)
-
-        static func make(archive: Archive) throws -> Manifest {
-            guard let manifest = archive[manifestFileName],
-                  let data = archive.getData(for: manifest) else {
-                throw NSError(domain: NSErrorDomain() as String, code: NSURLErrorResourceUnavailable, userInfo: [NSLocalizedDescriptionKey: "Store manifest is missing"])
-            }
-            return try JSONDecoder().decode(Manifest.self, from: data)
-        }
-    }
-
     #warning("TODO: test export and manifets")
     /// The archive info.
     public struct Info: Codable, Sendable {

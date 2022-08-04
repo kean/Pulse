@@ -48,11 +48,9 @@ final class LoggerStoreTests: XCTestCase {
 
         // WHEN
         let firstStore = try LoggerStore(storeURL: storeURL, options: options)
-        XCTAssertEqual(firstStore.manifest.version, LoggerStore.Manifest.currentVersion)
         try firstStore.populate()
 
         let secondStore = try LoggerStore(storeURL: storeURL)
-        XCTAssertEqual(secondStore.manifest.version, LoggerStore.Manifest.currentVersion)
 
         // THEN data is persisted
         XCTAssertEqual(try secondStore.allMessages().count, 1)
