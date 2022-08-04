@@ -13,19 +13,19 @@ extension LoggerStore {
         ///
         /// - note: If you create a copy of the store for exporting, the copy
         /// gets its own unique ID.
-        public let id: UUID
+        public var storeId: UUID
 
         /// The internal version of the store.
-        public let storeVersion: String
+        public var storeVersion: String
 
         // MARK: Creation Dates
 
         /// The date the store was originally created.
-        public let createdDate: Date
+        public var createdDate: Date
         /// The date the store was last modified.
-        public let modifiedDate: Date
+        public var modifiedDate: Date
         /// The date the archive was created (only valid for exported Pulse document).
-        public let archivedDate: Date?
+        public var archivedDate: Date?
 
         // MARK: Usage Statistics
 
@@ -33,23 +33,23 @@ extension LoggerStore {
         ///
         /// - note: This excludes the technical messages associated with the
         /// network requests.
-        public let messageCount: Int
+        public var messageCount: Int
         /// The number of recorded network requests.
-        public let requestCount: Int
+        public var requestCount: Int
+        /// The number of stored network response and requests bodies.
+        public var blobCount: Int
         /// The complete size of the store, including the database and all
         /// externally stored blobs.
-        public let storeSize: Int64
-        /// The number of stored network response and requests bodies.
-        public let blobsCount: Int64
+        public var totalStoreSize: Int64
         /// The size stored network response and requests bodies.
-        public let blobsSize: Int64
+        public var blobsSize: Int64
 
         // MARK: App and Device Info
 
         /// Information about the app which created the store.
-        public let appInfo: AppInfo
+        public var appInfo: AppInfo
         /// Information about the device which created the store.
-        public let deviceInfo: DeviceInfo
+        public var deviceInfo: DeviceInfo
 
         var version: Version {
             Version(storeVersion) ?? .init(1, 0, 0) // should always succeed
@@ -75,14 +75,13 @@ extension LoggerStore {
         /// - important: This API is designed to be used only with Pulse documents
         /// exported from the app without unarchaving the document. If you need
         /// to get info about the current store, use ``LoggerStore/info()``.
-        public init?(storeURL: URL) {
+        public static func make(storeURL: URL) -> Info? {
             guard let archive = Archive(url: storeURL, accessMode: .read),
                   let entry = archive[infoFilename],
-                  let data = archive.getData(for: entry),
-                  let info = try? JSONDecoder().decode(LoggerStore.Info.self, from: data) else {
+                  let data = archive.getData(for: entry) else {
                 return nil
             }
-            self = info
+            return try? JSONDecoder().decode(LoggerStore.Info.self, from: data)
         }
     }
 }

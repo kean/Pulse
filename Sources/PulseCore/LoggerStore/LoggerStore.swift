@@ -619,6 +619,8 @@ extension LoggerStore {
 // MARK: - LoggerStore (Copy)
 
 extension LoggerStore {
+    #warning("TODO: make async")
+
     /// Creates a copy of the current store at the given URL. The created copy
     /// has `.pulse` extension (actually a `.zip` archive).
     ///
@@ -784,29 +786,52 @@ extension LoggerStore {
 
 // MARK: - LoggerStore (Info)
 
+#warning("TODO: save info for archive & add test")
+
 extension LoggerStore {
-    /// Returns info about the current store and the device.
-    public func info() throws -> Info {
-        fatalError()
-//        let databaseAttributes = try Files.attributesOfItem(atPath: databaseURL.path)
-//        let currentDatabaseAttributes = try Files.attributesOfItem(atPath: storeURL.appendingPathComponent(databaseFileName).path)
-//
-//        let messageCount = try backgroundContext.count(for: LoggerMessageEntity.self)
-//        let requestCount = try backgroundContext.count(for: LoggerNetworkRequestEntity.self)
-//
-//        return Info(
-//            id: UUID(),
-//            appInfo: .make(),
-//            deviceInfo: .make(),
-//            storeVersion: manifest.version.description,
-//            messageCount: messageCount - requestCount,
-//            requestCount: requestCount,
-//            databaseSize: (databaseAttributes[.size] as? Int64) ?? 00, // Right-side should never happen
-//            blobsSize: try getBlobsSize(),
-//            createdDate: (currentDatabaseAttributes[.creationDate] as? Date) ?? Date(),
-//            modifiedDate: (currentDatabaseAttributes[.modificationDate] as? Date) ?? Date(),
-//            archivedDate: Date()
-//        )
+    /// Returns info about the current store.
+    public var info: Info {
+        get async throws {
+            try await withUnsafeThrowingContinuation { continuation in
+                do {
+                    let info = try getInfo()
+                    continuation.resume(with: .success(info))
+                } catch {
+                    continuation.resume(with: .failure(error))
+                }
+            }
+        }
+    }
+
+    private func getInfo() throws -> Info {
+        if isArchive {
+            guard let info = Info.make(storeURL: storeURL) else {
+                throw LoggerStore.Error.storeInvalid
+            }
+            return info
+        }
+
+        let databasURL = storeURL.appendingPathComponent(databaseFileName, isDirectory: false)
+        let databaseAttributes = try Files.attributesOfItem(atPath: databasURL.path)
+
+        let messageCount = try backgroundContext.count(for: LoggerMessageEntity.self)
+        let requestCount = try backgroundContext.count(for: LoggerNetworkRequestEntity.self)
+        let blobCount = try backgroundContext.count(for: LoggerBlobHandleEntity.self)
+
+        return Info(
+            storeId: manifest.storeId,
+            storeVersion: manifest.version.description,
+            createdDate: (databaseAttributes[.creationDate] as? Date) ?? Date(),
+            modifiedDate: (databaseAttributes[.modificationDate] as? Date) ?? Date(),
+            archivedDate: nil,
+            messageCount: messageCount - requestCount,
+            requestCount: requestCount,
+            blobCount: blobCount,
+            totalStoreSize: try storeURL.directoryTotalAllocatedSize(),
+            blobsSize: try getBlobsSize(),
+            appInfo: .make(),
+            deviceInfo: .make()
+        )
     }
 }
 

@@ -167,3 +167,13 @@ extension NSImage {
     }
 }
 #endif
+
+extension URL {
+    func directoryTotalAllocatedSize() throws -> Int64 {
+        guard let urls = Files.enumerator(at: self, includingPropertiesForKeys: nil)?.allObjects as? [URL] else { return 0 }
+        return try urls.lazy.reduce(Int64(0)) {
+            let size = try $1.resourceValues(forKeys: [.totalFileAllocatedSizeKey]).totalFileAllocatedSize
+            return Int64(size ?? 0) + $0
+        }
+    }
+}

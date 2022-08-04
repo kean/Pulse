@@ -34,8 +34,8 @@
 
 ### Getting Store Info
 
-- ``info()``
-- ``Info``
+- ``info-swift.property``
+- ``Info-swift.struct``
 
 ### Managing Pins
 

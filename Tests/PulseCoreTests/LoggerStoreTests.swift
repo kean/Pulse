@@ -585,6 +585,25 @@ final class LoggerStoreTests: XCTestCase {
     }
 #endif
 
+    // MARK: - Info
+
+    func testGetStoreInfo() async throws {
+        // GIVEN
+        populate2(store: store)
+
+        // WHEN
+        let info = try await store.info
+
+        // THEN
+        XCTAssertEqual(info.storeVersion, "2.0.0")
+        XCTAssertNil(info.archivedDate) // It's a writable package
+        XCTAssertEqual(info.messageCount, 7)
+        XCTAssertEqual(info.requestCount, 3)
+        XCTAssertEqual(info.blobCount, 3)
+        // Can't check complete store size, but blobs are exact.
+        XCTAssertEqual(info.blobsSize, 21195)
+    }
+
     // MARK: - Helpers
 
     private func makeStore(_ closure: (inout LoggerStore.Configuration) -> Void) -> LoggerStore {
