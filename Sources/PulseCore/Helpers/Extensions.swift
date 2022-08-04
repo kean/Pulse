@@ -4,6 +4,7 @@
 
 import Foundation
 import CoreData
+import CommonCrypto
 
 func descriptionForStatusCode(_ statusCode: Int) -> String {
     switch statusCode {
@@ -44,46 +45,22 @@ extension URL {
     }
 }
 
-// MARK: - CoreData
-
-extension NSPersistentStoreCoordinator {
-    func createCopyOfStore(at url: URL) throws {
-        guard let sourceStore = persistentStores.first else {
-            throw LoggerStore.Error.unknownError // Should never happen
+private extension Data {
+    /// Calculates SHA256 from the given string and returns its hex representation.
+    ///
+    /// ```swift
+    /// print("http://test.com".data(using: .utf8)!.sha256)
+    /// // prints "8b408a0c7163fdfff06ced3e80d7d2b3acd9db900905c4783c28295b8c996165"
+    /// ```
+    var sha256: String {
+        let hash = withUnsafeBytes { (bytes: UnsafeRawBufferPointer) -> [UInt8] in
+            var hash = [UInt8](repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH))
+            CC_SHA256(bytes.baseAddress, CC_LONG(count), &hash)
+            return hash
         }
-
-        let backupCoordinator = NSPersistentStoreCoordinator(managedObjectModel: managedObjectModel)
-
-        var intermediateStoreOptions = sourceStore.options ?? [:]
-        intermediateStoreOptions[NSReadOnlyPersistentStoreOption] = true
-
-        let intermediateStore = try backupCoordinator.addPersistentStore(
-            ofType: sourceStore.type,
-            configurationName: sourceStore.configurationName,
-            at: sourceStore.url,
-            options: intermediateStoreOptions
-        )
-
-        let backupStoreOptions: [AnyHashable: Any] = [
-            NSReadOnlyPersistentStoreOption: true,
-            // Disable write-ahead logging. Benefit: the entire store will be
-            // contained in a single file. No need to handle -wal/-shm files.
-            // https://developer.apple.com/library/content/qa/qa1809/_index.html
-            NSSQLitePragmasOption: ["journal_mode": "DELETE"],
-            // Minimize file size
-            NSSQLiteManualVacuumOption: true
-        ]
-
-        try backupCoordinator.migratePersistentStore(
-            intermediateStore,
-            to: url,
-            options: backupStoreOptions,
-            withType: NSSQLiteStoreType
-        )
+        return hash.map({ String(format: "%02x", $0) }).joined()
     }
 }
-
-// MARK: - Misc
 
 extension URLRequest {
     func httpBodyStreamData() -> Data? {
