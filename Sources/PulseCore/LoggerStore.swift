@@ -135,6 +135,9 @@ public final class LoggerStore: @unchecked Sendable {
 
         var trimRatio = 0.7
 
+        /// Every 20 minutes.
+        var sweepInterval: TimeInterval = 1200
+
         #warning("TODO: max count of messages")
 
         /// Determines how often the messages are saved to the database. By default,
@@ -224,7 +227,6 @@ public final class LoggerStore: @unchecked Sendable {
             }
         }
 
-        #warning("don't run sweeps as often + + remove optional that not needed now")
         // Read the store version and perform migration if needed
         var manifest = try LoggerStore.readOrCreateManifest(at: manifestURL)
         if !manifest.isCurrentVersion {
@@ -247,8 +249,8 @@ public final class LoggerStore: @unchecked Sendable {
         self.viewContext.userInfo[Pins.pinServiceKey] = Pins(store: self)
         try save(manifest)
 
-        if options.contains(.sweep) {
-            DispatchQueue.global().asyncAfter(deadline: .now() + .seconds(10)) { [weak self] in
+        if isAutomaticSweepNeeded {
+            DispatchQueue.global().asyncAfter(deadline: .now() + .seconds(15)) { [weak self] in
                 self?.sweep()
             }
         }
@@ -823,8 +825,19 @@ extension LoggerStore {
 // MARK: - LoggerStore (Sweep)
 
 extension LoggerStore {
+
+    var isAutomaticSweepNeeded: Bool {
+        guard options.contains(.sweep) else { return false }
+        guard let lastSweepDate = manifest.lastSweepDate else {
+            manifest.lastSweepDate = Date() // No need to run it right away
+            return false
+        }
+        return Date().timeIntervalSince(lastSweepDate) > configuration.sweepInterval
+    }
+
     func sweep() {
         backgroundContext.perform { try? self._sweep() }
+        manifest.lastSweepDate = Date()
     }
 
     func syncSweep() {
