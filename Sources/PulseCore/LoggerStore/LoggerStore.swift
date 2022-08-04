@@ -279,13 +279,9 @@ extension LoggerStore {
     /// - note: If you want to store incremental updates to the task, use
     /// `NetworkLogger` instead.
     public func storeRequest(_ request: URLRequest, response: URLResponse?, error: Error?, data: Data?, metrics: URLSessionTaskMetrics? = nil) {
-        storeRequest(taskId: UUID(), taskType: .dataTask, request: request, response: response, error: error, data: data, metrics: metrics.map(NetworkLogger.Metrics.init))
-    }
-    
-    func storeRequest(taskId: UUID, taskType: NetworkLogger.TaskType, request: URLRequest, response: URLResponse?, error: Error?, data: Data?, metrics: NetworkLogger.Metrics?) {
         handle(.networkTaskCompleted(.init(
-            taskId: taskId,
-            taskType: taskType,
+            taskId: UUID(),
+            taskType: .dataTask,
             createdAt: configuration.makeCurrentDate(),
             originalRequest: NetworkLogger.Request(request),
             currentRequest: NetworkLogger.Request(request),
@@ -293,7 +289,7 @@ extension LoggerStore {
             error: error.map(NetworkLogger.ResponseError.init),
             requestBody: request.httpBody ?? request.httpBodyStreamData(),
             responseBody: data,
-            metrics: metrics,
+            metrics: metrics.map(NetworkLogger.Metrics.init),
             session: LoggerStore.Session.current.id.uuidString
         )))
     }
@@ -783,6 +779,34 @@ extension LoggerStore {
 
         let result = try backgroundContext.fetch(request) as? [[String: Any]]
         return (result?.first?[description.name] as? Int64) ?? 0
+    }
+}
+
+// MARK: - LoggerStore (Info)
+
+extension LoggerStore {
+    /// Returns info about the current store and the device.
+    public func info() throws -> Info {
+        fatalError()
+//        let databaseAttributes = try Files.attributesOfItem(atPath: databaseURL.path)
+//        let currentDatabaseAttributes = try Files.attributesOfItem(atPath: storeURL.appendingPathComponent(databaseFileName).path)
+//
+//        let messageCount = try backgroundContext.count(for: LoggerMessageEntity.self)
+//        let requestCount = try backgroundContext.count(for: LoggerNetworkRequestEntity.self)
+//
+//        return Info(
+//            id: UUID(),
+//            appInfo: .make(),
+//            deviceInfo: .make(),
+//            storeVersion: manifest.version.description,
+//            messageCount: messageCount - requestCount,
+//            requestCount: requestCount,
+//            databaseSize: (databaseAttributes[.size] as? Int64) ?? 00, // Right-side should never happen
+//            blobsSize: try getBlobsSize(),
+//            createdDate: (currentDatabaseAttributes[.creationDate] as? Date) ?? Date(),
+//            modifiedDate: (currentDatabaseAttributes[.modificationDate] as? Date) ?? Date(),
+//            archivedDate: Date()
+//        )
     }
 }
 

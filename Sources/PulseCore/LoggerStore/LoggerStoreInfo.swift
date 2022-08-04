@@ -5,20 +5,51 @@
 import Foundation
 
 extension LoggerStore {
-    #warning("TODO: test export and manifets")
-    /// The archive info.
+    /// The store info.
     public struct Info: Codable, Sendable {
+        // MARK: Store Info
+
+        /// The id of the store.
+        ///
+        /// - note: If you create a copy of the store for exporting, the copy
+        /// gets its own unique ID.
         public let id: UUID
-        public let appInfo: AppInfo? // Should be always avail starting with 1.0
-        public let device: DeviceInfo
+
+        /// The internal version of the store.
         public let storeVersion: String
-        public let messageCount: Int
-        public let requestCount: Int
-        public let databaseSize: Int64
-        public let blobsSize: Int64
+
+        // MARK: Creation Dates
+
+        /// The date the store was originally created.
         public let createdDate: Date
+        /// The date the store was last modified.
         public let modifiedDate: Date
-        public let archivedDate: Date
+        /// The date the archive was created (only valid for exported Pulse document).
+        public let archivedDate: Date?
+
+        // MARK: Usage Statistics
+
+        /// The numbers of recorded messages.
+        ///
+        /// - note: This excludes the technical messages associated with the
+        /// network requests.
+        public let messageCount: Int
+        /// The number of recorded network requests.
+        public let requestCount: Int
+        /// The complete size of the store, including the database and all
+        /// externally stored blobs.
+        public let storeSize: Int64
+        /// The number of stored network response and requests bodies.
+        public let blobsCount: Int64
+        /// The size stored network response and requests bodies.
+        public let blobsSize: Int64
+
+        // MARK: App and Device Info
+
+        /// Information about the app which created the store.
+        public let appInfo: AppInfo
+        /// Information about the device which created the store.
+        public let deviceInfo: DeviceInfo
 
         var version: Version {
             Version(storeVersion) ?? .init(1, 0, 0) // should always succeed
@@ -39,22 +70,19 @@ extension LoggerStore {
             public let systemVersion: String
         }
 
-        public static func make(storeURL: URL) -> LoggerStore.Info? {
+        /// Reads info from the given archive.
+        ///
+        /// - important: This API is designed to be used only with Pulse documents
+        /// exported from the app without unarchaving the document. If you need
+        /// to get info about the current store, use ``LoggerStore/info()``.
+        public init?(storeURL: URL) {
             guard let archive = Archive(url: storeURL, accessMode: .read),
-                  let entry = archive[manifestFileName],
-                  let data = archive.getData(for: entry) else {
+                  let entry = archive[infoFilename],
+                  let data = archive.getData(for: entry),
+                  let info = try? JSONDecoder().decode(LoggerStore.Info.self, from: data) else {
                 return nil
             }
-            return try? JSONDecoder().decode(LoggerStore.Info.self, from: data)
-        }
-
-        #warning("TODO: remove")
-        static func make(archive: Archive) throws -> LoggerStore.Info {
-            guard let manifest = archive[manifestFileName],
-                  let data = archive.getData(for: manifest) else {
-                throw NSError(domain: NSErrorDomain() as String, code: NSURLErrorResourceUnavailable, userInfo: [NSLocalizedDescriptionKey: "Store manifest is missing"])
-            }
-            return try JSONDecoder().decode(LoggerStore.Info.self, from: data)
+            self = info
         }
     }
 }
@@ -68,7 +96,7 @@ enum AppInfo {
 
 extension LoggerStore.Info.AppInfo {
     static func make() -> LoggerStore.Info.AppInfo {
-        return LoggerStore.Info.AppInfo(
+        LoggerStore.Info.AppInfo(
             bundleIdentifier: AppInfo.bundleIdentifier,
             name: AppInfo.appName,
             version: AppInfo.appVersion,

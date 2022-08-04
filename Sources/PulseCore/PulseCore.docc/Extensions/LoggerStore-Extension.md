@@ -16,28 +16,31 @@
 
 - ``storeURL``
 - ``isReadonly``
-- ``info-swift.property``
-- ``Info-swift.struct``
 
-### Storing and Accessing Messages
+### Storing Logs
 
 - ``storeMessage(label:level:message:metadata:file:function:line:)``
-- ``allMessages()``
-- ``removeAll()``
-
-### Storing and Accessing Network Requests
-
 - ``storeRequest(_:response:error:data:metrics:)``
+
+### Accessing Logs
+
+- ``allMessages()``
 - ``allNetworkRequests()``
+- ``removeAll()``
 
 ### Managing Pins
 
-- ``pins``
-- ``PinService``
+- ``pins-swift.property``
+- ``Pins-swift.class``
 
 ### Sharing the Store
 
 - ``copy(to:)``
+
+### Getting Store Info
+
+- ``info()``
+- ``Info``
 
 ### Receiving and Filtering Events
 
@@ -52,8 +55,13 @@
 
 ### Nested
 
-- ``Session``
-- ``Error``
 - ``Level``
 - ``Metadata``
 - ``MetadataValue``
+- ``Error``
+- ``Session``
+
+
+### Deprecated
+
+- ``default``
