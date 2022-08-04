@@ -185,7 +185,7 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertEqual(request.responseBody?.data?.count, 165061)
     }
 
-    // MARK: - Copy (Directory)
+    // MARK: - Copy (Package)
 
     func testCopyDirectory() throws {
         // GIVEN
@@ -231,7 +231,29 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertThrowsError(try store.copy(to: copyURL))
     }
 
-    // MARK: - Copy (File)
+    func testCopyCreatesInto() throws {
+        // GIVEN
+        let store = makeStore()
+        defer { store.destroyStores() }
+
+        populate2(store: store)
+        date = Date()
+        let copyURL = directory.url.appending(filename: "copy.pulse")
+        try store.copy(to: copyURL)
+
+        // WHEN
+        let info = try LoggerStore.Info.make(storeURL: copyURL)
+
+        XCTAssertEqual(info.storeVersion, "2.0.0")
+        XCTAssertEqual(info.messageCount, 7)
+        XCTAssertEqual(info.requestCount, 3)
+        XCTAssertEqual(info.blobCount, 3)
+        XCTAssertEqual(info.archivedDate, date)
+        // Can't check complete store size, but blobs are exact.
+        XCTAssertEqual(info.blobsSize, 21195)
+    }
+
+    // MARK: - Copy (Archive)
 
     func testCopyFile() throws {
         // GIVEN
@@ -661,7 +683,7 @@ final class LoggerStoreTests: XCTestCase {
 
     // MARK: - Helpers
 
-    private func makeStore(_ closure: (inout LoggerStore.Configuration) -> Void) -> LoggerStore {
+    private func makeStore(_ closure: (inout LoggerStore.Configuration) -> Void = { _ in }) -> LoggerStore {
         var configuration = LoggerStore.Configuration()
         configuration.makeCurrentDate = { [unowned self] in self.date }
         closure(&configuration)

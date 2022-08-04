@@ -24,6 +24,8 @@ extension LoggerStore {
         public var createdDate: Date
         /// The date the store was last modified.
         public var modifiedDate: Date
+        /// The date when the current archive was created.
+        public var archivedDate: Date?
 
         // MARK: Usage Statistics
 
@@ -68,14 +70,14 @@ extension LoggerStore {
         ///
         /// - important: This API is designed to be used only with Pulse documents
         /// exported from the app without unarchaving the document. If you need
-        /// to get info about the current store, use ``LoggerStore/info()``.
-        public static func make(storeURL: URL) -> Info? {
+        /// to get info about the current store, use ``LoggerStore/info-swift.property``.
+        public static func make(storeURL: URL) throws -> Info {
             guard let archive = Archive(url: storeURL, accessMode: .read),
                   let entry = archive[infoFilename],
                   let data = archive.getData(for: entry) else {
-                return nil
+                throw LoggerStore.Error.fileDoesntExist
             }
-            return try? JSONDecoder().decode(LoggerStore.Info.self, from: data)
+            return try JSONDecoder().decode(LoggerStore.Info.self, from: data)
         }
     }
 }

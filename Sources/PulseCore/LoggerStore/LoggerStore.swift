@@ -705,8 +705,11 @@ extension LoggerStore {
         try JSONEncoder().encode(manifest).write(to: manifestURL)
 
         // Add store info
-        let info = try getInfo()
+        var info = try getInfo()
+        info.storeId = manifest.storeId
+        info.archivedDate = configuration.makeCurrentDate()
         let infoURL = tempURL.appending(filename: infoFilename)
+        try JSONEncoder().encode(info).write(to: infoURL)
 
         // Archive and add .pulse extension
         try Files.zipItem(at: tempURL, to: targetURL, shouldKeepParent: false, compressionMethod: .deflate)
@@ -829,8 +832,6 @@ extension LoggerStore {
 
 // MARK: - LoggerStore (Info)
 
-#warning("TODO: save info for archive & add test")
-
 extension LoggerStore {
     /// Returns info about the current store.
     public var info: Info {
@@ -847,11 +848,8 @@ extension LoggerStore {
     }
 
     private func getInfo() throws -> Info {
-        if isArchive {
-            guard let info = Info.make(storeURL: storeURL) else {
-                throw LoggerStore.Error.storeInvalid
-            }
-            return info
+        guard !isArchive else {
+            return try Info.make(storeURL: storeURL)
         }
 
         let databasURL = storeURL.appending(filename: databaseFileName)
