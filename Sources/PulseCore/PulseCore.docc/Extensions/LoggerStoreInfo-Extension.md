@@ -1,13 +1,13 @@
-# ``PulseCore/LoggerStore/Info``
+# ``PulseCore/LoggerStore/Info-swift.struct``
 
 ## Topics
 
 ### Store Info
 
-- ``id``
+- ``storeId``
 - ``storeVersion``
 
-### Creation Dates
+### Creation and Update Dates
 
 - ``createdDate``
 - ``modifiedDate``
@@ -17,8 +17,8 @@
 
 - ``messageCount``
 - ``requestCount``
-- ``storeSize``
-- ``blobsCount``
+- ``blobCount``
+- ``totalStoreSize``
 - ``blobsSize``
 
 ### App and Device Info
@@ -27,3 +27,7 @@
 - ``AppInfo-swift.struct``
 - ``deviceInfo-swift.property``
 - ``DeviceInfo-swift.struct``
+
+### Reading Archive Info
+
+- ``make(storeURL:)``
