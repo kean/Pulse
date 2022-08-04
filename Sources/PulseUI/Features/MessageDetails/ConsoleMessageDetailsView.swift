@@ -131,7 +131,7 @@ struct ConsoleMessageDetailsView: View {
 struct ConsoleMessageDetailsView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
-            ConsoleMessageDetailsView(viewModel: .init(store: LoggerStore.mock, message: makeMockMessage()), onClose: {})
+            ConsoleMessageDetailsView(viewModel: .init(message: makeMockMessage()), onClose: {})
         }
     }
 }

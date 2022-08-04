@@ -29,7 +29,11 @@
 
 - ``storeRequest(_:response:error:data:metrics:)``
 - ``allNetworkRequests()``
-- ``getData(forKey:)``
+
+### Managing Pins
+
+- ``pins``
+- ``PinService``
 
 ### Sharing the Store
 

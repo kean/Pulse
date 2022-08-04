@@ -27,21 +27,16 @@ struct ConsoleMessageDetailsRouter: View {
 
 final class ConsoleDetailsRouterViewModel: ObservableObject {
     @Published private(set) var viewModel: DetailsViewModel?
-    private let store: LoggerStore
-
-    init(store: LoggerStore) {
-        self.store = store
-    }
 
     func select(_ entity: NSManagedObject?) {
         if let message = entity as? LoggerMessageEntity {
             if let request = message.request {
-                viewModel = .request(.init(request: request, store: store))
+                viewModel = .request(.init(request: request))
             } else {
-                viewModel = .message(.init(store: store, message: message))
+                viewModel = .message(.init(message: message))
             }
         } else if let request = entity as? LoggerNetworkRequestEntity {
-            viewModel = .request(.init(request: request, store: store))
+            viewModel = .request(.init(request: request))
         } else {
             viewModel = nil
         }

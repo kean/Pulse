@@ -188,8 +188,7 @@ final class NetworkInsightsViewModel: ObservableObject {
     let insights: NetworkLoggerInsights
     private var cancellables: [AnyCancellable] = []
 
-    // TODO: make private
-    let store: LoggerStore
+    private let store: LoggerStore
 
     var medianDuration: String {
         guard let median = insights.duration.median else { return "–" }
@@ -243,19 +242,19 @@ final class NetworkInsightsViewModel: ObservableObject {
     func topSlowestRequestsViewModel() -> NetworkInsightsRequestsListViewModel {
         let requests = self.requests(with: Array(insights.duration.topSlowestRequests.keys))
             .sorted(by: { $0.duration > $1.duration })
-        return NetworkInsightsRequestsListViewModel(requests: requests, store: store)
+        return NetworkInsightsRequestsListViewModel(requests: requests)
     }
 
     func requestsWithRedirectsViewModel() -> NetworkInsightsRequestsListViewModel {
         let requests = self.requests(with: Array(insights.redirects.taskIds))
             .sorted(by: { $0.createdAt > $1.createdAt })
-        return NetworkInsightsRequestsListViewModel(requests: requests, store: store)
+        return NetworkInsightsRequestsListViewModel(requests: requests)
     }
 
     func failedRequestsViewModel() -> NetworkInsightsRequestsListViewModel {
         let requests = self.requests(with: Array(insights.failures.taskIds))
             .sorted(by: { $0.createdAt > $1.createdAt })
-        return NetworkInsightsRequestsListViewModel(requests: requests, store: store)
+        return NetworkInsightsRequestsListViewModel(requests: requests)
     }
 
     private func requests(with ids: [UUID]) -> [LoggerNetworkRequestEntity] {

@@ -20,13 +20,11 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
 
     private let request: LoggerNetworkRequestEntity
     private var details: DecodedNetworkRequestDetailsEntity
-    private let store: LoggerStore
     private var cancellable: AnyCancellable?
 
-    init(request: LoggerNetworkRequestEntity, store: LoggerStore) {
+    init(request: LoggerNetworkRequestEntity) {
         self.request = request
         self.details = DecodedNetworkRequestDetailsEntity(request: request)
-        self.store = store
 
         cancellable = request.objectWillChange.sink { [weak self] in self?.refresh() }
     }
@@ -124,7 +122,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     }
 
     var requestBodySection: KeyValueSectionViewModel {
-        guard request.requestBodyKey != nil, request.requestBodySize > 0 else {
+        guard request.requestBodySize > 0 else {
             return KeyValueSectionViewModel(title: "Request Body", color: .blue)
         }
         let contentType = details.originalRequest?.headers.first(where: { $0.key == "Content-Type" })?.value ?? "–"
@@ -169,7 +167,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     }
 
     var currentRequestBodySection: KeyValueSectionViewModel {
-        guard request.requestBodyKey != nil, request.requestBodySize > 0 else {
+        guard request.requestBodySize > 0 else {
             return KeyValueSectionViewModel(title: "Request Body", color: .blue)
         }
         let contentType = details.currentRequest?.headers.first(where: { $0.key == "Content-Type" })?.value ?? "–"
@@ -205,7 +203,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
                 ("Download Size", ByteCountFormatter.string(fromByteCount: request.responseBodySize, countStyle: .file))
             ])
         }
-        guard request.responseBodyKey != nil, request.responseBodySize > 0 else {
+        guard request.responseBodySize > 0 else {
             return KeyValueSectionViewModel(title: "Response Body", color: .indigo)
         }
         let contentType = details.response?.headers.first(where: { $0.key == "Content-Type" })?.value ?? "–"
@@ -247,7 +245,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     }
 
     private var requestData: Data? {
-        request.requestBodyKey.flatMap(store.getData)
+        request.requestBody?.data
     }
 
     var responseBodyViewModel: FileViewerViewModel {
@@ -259,7 +257,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     }
 
     private var responseData: Data? {
-        request.responseBodyKey.flatMap(store.getData)
+        request.responseBody?.data
     }
 
 #if os(tvOS)

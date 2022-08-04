@@ -8,23 +8,23 @@ import Foundation
 #if os(iOS) || os(macOS)
 
 enum Render {
-    static func asPlainText(request: LoggerNetworkRequestEntity, store: LoggerStore) -> String {
-        render(request: request, store: store, using: PlainTextRenderer())
+    static func asPlainText(request: LoggerNetworkRequestEntity) -> String {
+        render(request: request, using: PlainTextRenderer())
     }
 
-    static func asMarkdown(request: LoggerNetworkRequestEntity, store: LoggerStore) -> String {
-        render(request: request, store: store, using: MarkdownRenderer())
+    static func asMarkdown(request: LoggerNetworkRequestEntity) -> String {
+        render(request: request, using: MarkdownRenderer())
     }
 
-    static func asHTML(request: LoggerNetworkRequestEntity, store: LoggerStore) -> String {
+    static func asHTML(request: LoggerNetworkRequestEntity) -> String {
         let details = DecodedNetworkRequestDetailsEntity(request: request)
         let error = details.decodingError
-        return render(request: request, store: store, using: HTMLRenderer(error: error))
+        return render(request: request, using: HTMLRenderer(error: error))
     }
 
-    private static func render(request: LoggerNetworkRequestEntity, store: LoggerStore, using renderer: Renderer) -> String {
+    private static func render(request: LoggerNetworkRequestEntity, using renderer: Renderer) -> String {
         // Summary
-        let viewModel = NetworkInspectorSummaryViewModel(request: request, store: store)
+        let viewModel = NetworkInspectorSummaryViewModel(request: request)
         renderer.add(viewModel.summaryViewModel, isSecondaryTitle: false)
         renderer.add(viewModel.errorModel, isSecondaryTitle: false)
 
@@ -34,7 +34,7 @@ enum Render {
             renderer.add(viewModel.originalRequestHeaders)
             renderer.add(viewModel.requestBodySection)
             renderer.add(viewModel.originalRequestParameters)
-            if let body = request.requestBodyKey.flatMap(store.getData), !body.isEmpty {
+            if let body = request.requestBody?.data, !body.isEmpty {
                 renderer.addSecondaryTitle("Request Body")
                 renderer.add(data: body)
             }
@@ -45,7 +45,7 @@ enum Render {
             renderer.add(responseSummary)
             renderer.add(viewModel.responseHeaders)
             renderer.add(viewModel.responseBodySection)
-            if let body = request.responseBodyKey.flatMap(store.getData), !body.isEmpty {
+            if let body = request.responseBody?.data, !body.isEmpty {
                 renderer.addSecondaryTitle("Response Body")
                 renderer.add(data: body)
             }

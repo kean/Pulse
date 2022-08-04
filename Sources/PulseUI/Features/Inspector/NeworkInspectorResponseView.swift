@@ -23,7 +23,7 @@ struct NetworkInspectorResponseView: View {
                 }
                 return title
             }())
-        } else if viewModel.request.responseBodyKey != nil {
+        } else if viewModel.request.responseBodySize > 0 {
             PlaceholderView(imageName: "exclamationmark.circle", title: "Unavailable", subtitle: "The response body was deleted from the store to reduce its size")
         } else {
             PlaceholderView(imageName: "nosign", title: "Empty Response")
@@ -38,9 +38,7 @@ final class NetworkInspectorResponseViewModel: ObservableObject {
         if let viewModel = _fileViewModel {
             return viewModel
         }
-        if let responseBodyKey = request.responseBodyKey,
-           let responseBody = store.getData(forKey: responseBodyKey),
-           !responseBody.isEmpty {
+        if let responseBody = request.responseBody?.data {
             _fileViewModel = FileViewerViewModel(
                 title: "Response",
                 context: details.responseFileViewerContext,
@@ -54,13 +52,11 @@ final class NetworkInspectorResponseViewModel: ObservableObject {
 
     let request: LoggerNetworkRequestEntity
     private var details: DecodedNetworkRequestDetailsEntity
-    private let store: LoggerStore
     private var cancellable: AnyCancellable?
 
-    init(request: LoggerNetworkRequestEntity, store: LoggerStore) {
+    init(request: LoggerNetworkRequestEntity) {
         self.request = request
         self.details = DecodedNetworkRequestDetailsEntity(request: request)
-        self.store = store
 
         cancellable = request.objectWillChange.sink { [weak self] in self?.refresh() }
     }

@@ -129,7 +129,7 @@ extension NetworkLogger {
         public var taskInterval: DateInterval
         public var redirectCount: Int
         public var transactions: [NetworkLogger.TransactionMetrics]
-        public var transferSize: TransferSizeInfo { TransferSizeInfo(metrics: self) }
+        public var totalTransferSize: TransferSizeInfo { TransferSizeInfo(metrics: self) }
 
         public init(metrics: URLSessionTaskMetrics) {
             self.taskInterval = metrics.taskInterval
@@ -190,7 +190,7 @@ extension NetworkLogger {
     }
 
     public struct TransactionMetrics: Codable, Sendable {
-        public var request: NetworkLogger.Request?
+        public var request: NetworkLogger.Request
         public var response: NetworkLogger.Response?
         public var fetchStartDate: Date?
         public var domainLookupStartDate: Date?
@@ -208,16 +208,8 @@ extension NetworkLogger {
         public var isReusedConnection = false
         /// `URLSessionTaskMetrics.ResourceFetchType` enum raw value
         public var resourceFetchType: Int
-        public var transferSize: TransferSizeInfo {
-            get { _transferSize ?? .init() }
-            set { _transferSize = newValue }
-        }
-        var _transferSize: TransferSizeInfo? // Backward-compatibility
-        public var details: NetworkLogger.TransactionDetailedMetrics {
-            get { _details ?? .init() }
-            set { _details = newValue }
-        }
-        public var _details: NetworkLogger.TransactionDetailedMetrics? // Backward-compatibility
+        public var transferSize: TransferSizeInfo
+        public var details: NetworkLogger.TransactionDetailedMetrics
 
         public var fetchType: URLSessionTaskMetrics.ResourceFetchType {
             URLSessionTaskMetrics.ResourceFetchType(rawValue: resourceFetchType) ?? .unknown
@@ -252,11 +244,13 @@ extension NetworkLogger {
             self.details = NetworkLogger.TransactionDetailedMetrics(metrics: metrics)
         }
 
-        public init(request: NetworkLogger.Request? = nil, response: NetworkLogger.Response? = nil, resourceFetchType: URLSessionTaskMetrics.ResourceFetchType, details: NetworkLogger.TransactionDetailedMetrics) {
+        public init(request: NetworkLogger.Request, response: NetworkLogger.Response? = nil, resourceFetchType: URLSessionTaskMetrics.ResourceFetchType, details: NetworkLogger.TransactionDetailedMetrics) {
             self.request = request
             self.response = response
             self.resourceFetchType = resourceFetchType.rawValue
             self.details = details
+            self.transferSize = .init()
+            self.details = .init()
         }
     }
 

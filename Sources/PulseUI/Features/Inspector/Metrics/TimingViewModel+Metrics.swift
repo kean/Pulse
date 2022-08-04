@@ -42,7 +42,7 @@ private func makeTimingSections(metrics: NetworkLogger.Metrics) -> [TimingRowSec
             continue
         }
 
-        if metrics.redirectCount > 0, let url = transaction.request?.url, currentURL != url {
+        if metrics.redirectCount > 0, let url = transaction.request.url, currentURL != url {
             currentURL = url
             sections.append(TimingRowSectionViewModel(title: url.absoluteString, items: [], isHeader: true))
         }

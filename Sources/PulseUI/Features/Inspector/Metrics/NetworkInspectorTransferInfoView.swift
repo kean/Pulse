@@ -137,7 +137,7 @@ struct NetworkInspectorTransferInfoViewModel {
     }
 
     init(metrics: NetworkLogger.Metrics, taskType: NetworkLogger.TaskType) {
-        self.init(transferSize: metrics.transferSize, isUpload: taskType == .uploadTask)
+        self.init(transferSize: metrics.totalTransferSize, isUpload: taskType == .uploadTask)
     }
 
     init(transferSize: NetworkLogger.TransferSizeInfo, isUpload: Bool = false) {

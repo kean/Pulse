@@ -57,7 +57,7 @@ public struct NetworkView: View {
     #elseif os(tvOS)
     public var body: some View {
         List {
-            NetworkMessagesForEach(store: viewModel.store, entities: viewModel.entities)
+            NetworkMessagesForEach(entities: viewModel.entities)
         }
         .onAppear(perform: viewModel.onAppear)
         .onDisappear(perform: viewModel.onDisappear)

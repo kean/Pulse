@@ -317,14 +317,13 @@ private func decode<T: Decodable>(_ type: T.Type) -> (_ data: Data?) -> T? {
     }
 }
 
+#warning("TODO: remove cache")
 private var cache = Cache<CacheKey, Any>(costLimit: Int.max, countLimit: 1000)
 
 private struct CacheKey: Hashable {
     let id: NSManagedObjectID
     let code: Int
 }
-
-private var responseBodyCache = Cache<String, String?>(costLimit: 30_870_912, countLimit: 1000)
 
 func evaluateProgrammaticFilters(_ filters: [NetworkSearchFilter], entity: LoggerNetworkRequestEntity, store: LoggerStore) -> Bool {
     var request: NetworkLogger.Request? {
@@ -350,24 +349,13 @@ func evaluateProgrammaticFilters(_ filters: [NetworkSearchFilter], entity: Logge
         return value
     }
 
-    func storedString(for key: String) -> String? {
-        if let string = responseBodyCache.value(forKey: key) {
-            return string
-        }
-        guard let data = store.getData(forKey: key), let string = String(data: data, encoding: .utf8) else {
-            responseBodyCache.set(nil, forKey: key, cost: 0, ttl: 60) // Record miss
-            return nil
-        }
-        responseBodyCache.set(string, forKey: key, cost: data.count, ttl: 60)
-        return string
-    }
-
+#warning("TODO: this should be rewritten to fault stuff")
     func isMatch(filter: NetworkSearchFilter) -> Bool {
         switch filter.field {
         case .requestHeader: return (request?.headers ?? [:]).contains { filter.matches(string: $0.key) || filter.matches(string: $0.value) }
         case .responseHeader: return (response?.headers ?? [:]).contains { filter.matches(string: $0.key) || filter.matches(string: $0.value) }
-        case .requestBody: return filter.matches(string: entity.requestBodyKey.flatMap(storedString(for:)) ?? "")
-        case .responseBody: return filter.matches(string: entity.responseBodyKey.flatMap(storedString(for:)) ?? "")
+        case .requestBody: return filter.matches(string: String(data: entity.requestBody?.data ?? Data(), encoding: .utf8) ?? "")
+        case .responseBody: return filter.matches(string: String(data: entity.responseBody?.data ?? Data(), encoding: .utf8) ?? "")
         default: assertionFailure(); return false
         }
     }

@@ -47,11 +47,11 @@ struct NetworkInspectorTransactionView: View {
             }
             .padding(16)
         }
-        .background(links)
+        .background(linkCount)
     }
 
     @ViewBuilder
-    private var links: some View {
+    private var linkCount: some View {
         InvisibleNavigationLinks {
             NavigationLink.programmatic(isActive: $viewModel.isOriginalRequestHeadersLinkActive, destination:  { NetworkHeadersDetailsView(viewModel: viewModel.requestHeaders) })
             NavigationLink.programmatic(isActive: $viewModel.isResponseHeadersLinkActive, destination:  { NetworkHeadersDetailsView(viewModel: viewModel.responseHeaders) })
@@ -82,17 +82,12 @@ final class NetworkInspectorTransactionViewModel: ObservableObject {
         self.transaction = transaction
     }
 
-    lazy var requestSummary: KeyValueSectionViewModel = {
-        guard let request = transaction.request else {
-            return KeyValueSectionViewModel(title: "Request", color: .secondary, items: [])
-        }
-        return KeyValueSectionViewModel.makeSummary(for: request)
-    }()
+    lazy var requestSummary = KeyValueSectionViewModel.makeSummary(for: transaction.request)
 
-    lazy var requestParameters = transaction.request.map(KeyValueSectionViewModel.makeParameters)
+    lazy var requestParameters = KeyValueSectionViewModel.makeParameters(for: transaction.request)
 
     lazy var requestHeaders = KeyValueSectionViewModel.makeRequestHeaders(
-        for: transaction.request?.headers ?? [:],
+        for: transaction.request.headers,
         action: { [unowned self] in self.isOriginalRequestHeadersLinkActive = true }
     )
 
@@ -103,7 +98,7 @@ final class NetworkInspectorTransactionViewModel: ObservableObject {
         return KeyValueSectionViewModel.makeSummary(for: response)
     }()
 
-    lazy var responseHeaders = KeyValueSectionViewModel.makeRequestHeaders(
+    lazy var responseHeaders = KeyValueSectionViewModel.makeResponseHeaders(
         for: transaction.response?.headers ?? [:],
         action: { [unowned self] in self.isResponseHeadersLinkActive = true }
     )

@@ -17,18 +17,14 @@ extension LoggerStore {
         let requestProgress = NSEntityDescription(name: "LoggerNetworkRequestProgressEntity", class: LoggerNetworkRequestProgressEntity.self)
         let requestDetails = NSEntityDescription(name: "LoggerNetworkRequestDetailsEntity", class: LoggerNetworkRequestDetailsEntity.self)
         let blob = NSEntityDescription(name: "LoggerBlobHandleEntity", class: LoggerBlobHandleEntity.self)
-        
-        metadata.properties = [
-            NSAttributeDescription(name: "key", type: .stringAttributeType),
-            NSAttributeDescription(name: "value", type: .stringAttributeType)
-        ]
 
         message.properties = [
             NSAttributeDescription(name: "createdAt", type: .dateAttributeType),
+            NSAttributeDescription(name: "isPinned", type: .booleanAttributeType),
+            NSAttributeDescription(name: "session", type: .stringAttributeType),
             NSAttributeDescription(name: "level", type: .stringAttributeType),
             NSAttributeDescription(name: "levelOrder", type: .integer16AttributeType),
             NSAttributeDescription(name: "label", type: .stringAttributeType),
-            NSAttributeDescription(name: "session", type: .stringAttributeType),
             NSAttributeDescription(name: "text", type: .stringAttributeType),
             NSRelationshipDescription.make(name: "metadata", type: .oneToMany, entity: metadata),
             NSAttributeDescription(name: "file", type: .stringAttributeType),
@@ -39,25 +35,17 @@ extension LoggerStore {
             NSRelationshipDescription.make(name: "request", type: .oneToOne(isOptional: true), entity: request)
         ]
 
-        requestDetails.properties = [
-            NSAttributeDescription(name: "originalRequest", type: .binaryDataAttributeType),
-            NSAttributeDescription(name: "currentRequest", type: .binaryDataAttributeType),
-            NSAttributeDescription(name: "response", type: .binaryDataAttributeType),
-            NSAttributeDescription(name: "error", type: .binaryDataAttributeType),
-            NSAttributeDescription(name: "metrics", type: .binaryDataAttributeType),
-            NSAttributeDescription(name: "metadata", type: .binaryDataAttributeType)
-        ]
-
-        requestProgress.properties = [
-            NSAttributeDescription(name: "completedUnitCount", type: .integer64AttributeType),
-            NSAttributeDescription(name: "totalUnitCount", type: .integer64AttributeType)
+        metadata.properties = [
+            NSAttributeDescription(name: "key", type: .stringAttributeType),
+            NSAttributeDescription(name: "value", type: .stringAttributeType)
         ]
 
         request.properties = [
+            NSAttributeDescription(name: "createdAt", type: .dateAttributeType),
+            NSAttributeDescription(name: "isPinned", type: .booleanAttributeType),
+            NSAttributeDescription(name: "session", type: .stringAttributeType),
             NSAttributeDescription(name: "taskId", type: .UUIDAttributeType),
             NSAttributeDescription(name: "rawTaskType", type: .stringAttributeType),
-            NSAttributeDescription(name: "createdAt", type: .dateAttributeType),
-            NSAttributeDescription(name: "session", type: .stringAttributeType),
             NSAttributeDescription(name: "url", type: .stringAttributeType),
             NSAttributeDescription(name: "host", type: .stringAttributeType),
             NSAttributeDescription(name: "httpMethod", type: .stringAttributeType),
@@ -82,7 +70,24 @@ extension LoggerStore {
         blob.properties = [
             NSAttributeDescription(name: "key", type: .stringAttributeType),
             NSAttributeDescription(name: "size", type: .integer64AttributeType),
-            NSAttributeDescription(name: "links", type: .integer16AttributeType)
+            NSAttributeDescription(name: "linkCount", type: .integer16AttributeType),
+            NSAttributeDescription(name: "data", type: .binaryDataAttributeType) {
+                $0.allowsExternalBinaryDataStorage = true
+            }
+        ]
+
+        requestDetails.properties = [
+            NSAttributeDescription(name: "originalRequest", type: .binaryDataAttributeType),
+            NSAttributeDescription(name: "currentRequest", type: .binaryDataAttributeType),
+            NSAttributeDescription(name: "response", type: .binaryDataAttributeType),
+            NSAttributeDescription(name: "error", type: .binaryDataAttributeType),
+            NSAttributeDescription(name: "metrics", type: .binaryDataAttributeType),
+            NSAttributeDescription(name: "metadata", type: .binaryDataAttributeType)
+        ]
+
+        requestProgress.properties = [
+            NSAttributeDescription(name: "completedUnitCount", type: .integer64AttributeType),
+            NSAttributeDescription(name: "totalUnitCount", type: .integer64AttributeType)
         ]
 
         model.entities = [message, metadata, request, requestDetails, requestProgress, blob]
@@ -94,10 +99,11 @@ extension LoggerStore {
 
 public final class LoggerMessageEntity: NSManagedObject {
     @NSManaged public var createdAt: Date
+    @NSManaged public var isPinned: Bool
+    @NSManaged public var session: String
     @NSManaged public var level: String
     @NSManaged public var levelOrder: Int16
     @NSManaged public var label: String
-    @NSManaged public var session: String
     @NSManaged public var text: String
     @NSManaged public var metadata: Set<LoggerMetadataEntity>
     @NSManaged public var file: String
@@ -115,10 +121,11 @@ public final class LoggerMetadataEntity: NSManagedObject {
 
 public final class LoggerNetworkRequestEntity: NSManagedObject {
     // Primary
+    @NSManaged public var createdAt: Date
+    @NSManaged public var isPinned: Bool
+    @NSManaged public var session: String
     @NSManaged public var taskId: UUID?
     @NSManaged public var rawTaskType: String?
-    @NSManaged public var createdAt: Date
-    @NSManaged public var session: String
     @NSManaged public var message: LoggerMessageEntity?
 
     // MARK: Request
@@ -165,12 +172,8 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
 
     /// Request details.
     @NSManaged public var details: LoggerNetworkRequestDetailsEntity
-    /// The key in the blob storage. To get the data, see ``LoggerStore/getData(forKey:)``.
-    public var requestBodyKey: String? { requestBody?.key }
     /// The request body handle.
     @NSManaged public var requestBody: LoggerBlobHandleEntity?
-    /// The key in the blob storage. To get the data, see ``LoggerStore/getData(forKey:)``.
-    public var responseBodyKey: String? { responseBody?.key }
     /// The response body handle.
     @NSManaged public var responseBody: LoggerBlobHandleEntity?
     /// The size of the request body.
@@ -243,7 +246,10 @@ public final class LoggerBlobHandleEntity: NSManagedObject {
     @NSManaged public var size: Int64
 
     /// A number of requests referencing it.
-    @NSManaged public var links: Int16
+    @NSManaged public var linkCount: Int16
+
+    /// A blob data (stored in an external database if too large).
+    @NSManaged public var data: Data
 }
 
 // MARK: - Helpers
@@ -257,10 +263,11 @@ private extension NSEntityDescription {
 }
 
 private extension NSAttributeDescription {
-    convenience init(name: String, type: NSAttributeType) {
+    convenience init(name: String, type: NSAttributeType, _ configure: (NSAttributeDescription) -> Void = { _ in }) {
         self.init()
         self.name = name
         self.attributeType = type
+        configure(self)
     }
 }
 

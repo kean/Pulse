@@ -112,6 +112,16 @@ extension URLRequest {
     }
 }
 
+extension Archive {
+    func getData(for entry: Entry) -> Data? {
+        var data = Data()
+        _ = try? extract(entry, skipCRC32: true) {
+            data.append($0)
+        }
+        return data
+    }
+}
+
 #if !os(macOS)
 import UIKit.UIImage
 /// Alias for `UIImage`.

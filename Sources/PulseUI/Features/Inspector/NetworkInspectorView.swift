@@ -59,7 +59,7 @@ struct NetworkInspectorView: View {
             }
             if #available(iOS 14.0, *) {
                 Menu(content: {
-                    NetworkMessageContextMenu(request: viewModel.request, store: viewModel.store, sharedItems: $shareItems)
+                    NetworkMessageContextMenu(request: viewModel.request, sharedItems: $shareItems)
                 }, label: {
                     Image(systemName: "ellipsis.circle")
                 })
@@ -191,7 +191,7 @@ private struct NetworkTabPickerView: View {
 struct NetworkInspectorView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
-            NetworkInspectorView(viewModel: .init(request: LoggerStore.preview.entity(for: .profile), store: .preview))
+            NetworkInspectorView(viewModel: .init(request: LoggerStore.preview.entity(for: .profile)))
         }
     }
 }

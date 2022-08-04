@@ -11,13 +11,11 @@ import Combine
 import AppKit
 
 final class ConsoleTableViewModel: ObservableObject {
-    let store: LoggerStore
     let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel?
     var diff: CollectionDifference<NSManagedObjectID>?
     @Published var entities: [NSManagedObject] = []
 
-    init(store: LoggerStore, searchCriteriaViewModel: ConsoleSearchCriteriaViewModel?) {
-        self.store = store
+    init(searchCriteriaViewModel: ConsoleSearchCriteriaViewModel?) {
         self.searchCriteriaViewModel = searchCriteriaViewModel
     }
 }
@@ -67,12 +65,12 @@ struct ConsoleTableView: NSViewRepresentable {
             switch entities[row] {
             case let message as LoggerMessageEntity:
                 if let request = message.request {
-                    cell.hostingView.rootView = AnyView(ConsoleNetworkRequestView(viewModel: .init(request: request, store: viewModel.store)))
+                    cell.hostingView.rootView = AnyView(ConsoleNetworkRequestView(viewModel: .init(request: request)))
                 } else {
-                    cell.hostingView.rootView = AnyView(ConsoleMessageView(viewModel: .init(message: message, store: viewModel.store)))
+                    cell.hostingView.rootView = AnyView(ConsoleMessageView(viewModel: .init(message: message)))
                 }
             case let request as LoggerNetworkRequestEntity:
-                cell.hostingView.rootView = AnyView(ConsoleNetworkRequestView(viewModel: .init(request: request, store: viewModel.store)))
+                cell.hostingView.rootView = AnyView(ConsoleNetworkRequestView(viewModel: .init(request: request)))
             default:
                 fatalError("Invalid entity: \(entities[row])")
             }

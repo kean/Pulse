@@ -9,7 +9,6 @@ import CoreData
 
 final class LoggerStoreTests: XCTestCase {
     let directory = TemporaryDirectory()
-    var tempDirectoryURL: URL!
     var storeURL: URL!
     var date: Date = Date()
 
@@ -18,30 +17,25 @@ final class LoggerStoreTests: XCTestCase {
     override func setUp() {
         super.setUp()
 
-        tempDirectoryURL = FileManager().temporaryDirectory.appendingPathComponent(UUID().uuidString)
-        try? FileManager.default.createDirectory(at: tempDirectoryURL, withIntermediateDirectories: true, attributes: [:])
-        storeURL = tempDirectoryURL.appendingPathComponent("test-store")
-
+        try? FileManager.default.createDirectory(at: directory.url, withIntermediateDirectories: true, attributes: nil)
+        storeURL = directory.url.appendingPathComponent("test-store")
         store = try! LoggerStore(storeURL: storeURL, options: [.create, .synchronous])
     }
 
     override func tearDown() {
         super.tearDown()
 
+        store.destroyStores()
         directory.remove()
 
-        store.destroyStores()
-
-        try? FileManager.default.removeItem(at: tempDirectoryURL)
         try? FileManager.default.removeItem(at: URL.temp)
-        try? FileManager.default.removeItem(at: URL.logs)
     }
 
     // MARK: - Init
 
     func testInitStoreMissing() throws {
         // GIVEN
-        let storeURL = tempDirectoryURL.appendingPathComponent(UUID().uuidString)
+        let storeURL = directory.url.appendingPathComponent(UUID().uuidString)
 
         // WHEN/THEN
         XCTAssertThrowsError(try LoggerStore(storeURL: storeURL))
@@ -49,14 +43,16 @@ final class LoggerStoreTests: XCTestCase {
 
     func testInitCreateStoreURL() throws {
         // GIVEN
-        let storeURL = tempDirectoryURL.appendingPathComponent(UUID().uuidString)
-        let options: LoggerStore.Options = [.create]
+        let storeURL = directory.url.appendingPathComponent(UUID().uuidString)
+        let options: LoggerStore.Options = [.create, .synchronous]
 
         // WHEN
         let firstStore = try LoggerStore(storeURL: storeURL, options: options)
+        XCTAssertEqual(firstStore.manifest.version, LoggerStore.Manifest.currentVersion)
         try firstStore.populate()
 
         let secondStore = try LoggerStore(storeURL: storeURL)
+        XCTAssertEqual(secondStore.manifest.version, LoggerStore.Manifest.currentVersion)
 
         // THEN data is persisted
         XCTAssertEqual(try secondStore.allMessages().count, 1)
@@ -68,7 +64,7 @@ final class LoggerStoreTests: XCTestCase {
 
     func testInitCreateStoreIntermediateDirectoryMissing() throws {
         // GIVEN
-        let storeURL = tempDirectoryURL
+        let storeURL = directory.url
             .appendingPathComponent(UUID().uuidString, isDirectory: false) // Missing directory
             .appendingPathComponent(UUID().uuidString)
         let options: LoggerStore.Options = [.create]
@@ -97,65 +93,98 @@ final class LoggerStoreTests: XCTestCase {
 
     func testInitWithArchiveURL() throws {
         // GIVEN
-        let storeURL = tempDirectoryURL.appendingPathComponent("logs-2021-03-18_21-22.pulse")
+        let storeURL = directory.url.appendingPathComponent("logs-archive-v2.pulse")
         try Resources.pulseArchive.write(to: storeURL)
 
         // WHEN
         let store = try XCTUnwrap(LoggerStore(storeURL: storeURL))
         defer { store.destroyStores() }
 
-        // THEN
-        XCTAssertEqual(try store.allMessages().count, 23)
-        XCTAssertEqual(try store.allNetworkRequests().count, 4)
+        // THEN entities can be opened
+        XCTAssertEqual(try store.viewContext.count(for: LoggerMessageEntity.self), 15)
+        XCTAssertEqual(try store.viewContext.count(for: LoggerNetworkRequestEntity.self), 8)
+        XCTAssertEqual(try store.viewContext.count(for: LoggerMetadataEntity.self), 1)
+        XCTAssertEqual(try store.viewContext.count(for: LoggerBlobHandleEntity.self), 7)
+
+        // THEN data stored in external storage also persist
+        let request = try XCTUnwrap(store.viewContext.first(LoggerNetworkRequestEntity.self) {
+            $0.predicate = NSPredicate(format: "url == %@", "https://github.com/repos")
+        })
+        XCTAssertEqual(request.responseBodySize, 165061)
+        XCTAssertEqual(request.responseBody?.data.count, 165061)
     }
 
     func testInitWithArchiveURLNoExtension() throws {
         // GIVEN
-        let storeURL = tempDirectoryURL.appendingPathComponent("logs-2021-03-18_21-22")
+        let storeURL = directory.url.appendingPathComponent("logs-archive-v2")
         try Resources.pulseArchive.write(to: storeURL)
 
         // WHEN
         let store = try XCTUnwrap(LoggerStore(storeURL: storeURL))
         defer { store.destroyStores() }
 
-        // THEN
-        XCTAssertEqual(try store.allMessages().count, 23)
-        XCTAssertEqual(try store.allNetworkRequests().count, 4)
+        // THEN entities can be opened
+        XCTAssertEqual(try store.viewContext.count(for: LoggerMessageEntity.self), 15)
+        XCTAssertEqual(try store.viewContext.count(for: LoggerNetworkRequestEntity.self), 8)
+        XCTAssertEqual(try store.viewContext.count(for: LoggerMetadataEntity.self), 1)
+        XCTAssertEqual(try store.viewContext.count(for: LoggerBlobHandleEntity.self), 7)
+
+        // THEN data stored in external storage also persist
+        let request = try XCTUnwrap(store.viewContext.first(LoggerNetworkRequestEntity.self) {
+            $0.predicate = NSPredicate(format: "url == %@", "https://github.com/repos")
+        })
+        XCTAssertEqual(request.responseBodySize, 165061)
+        XCTAssertEqual(request.responseBody?.data.count, 165061)
     }
 
     func testInitWithPackageURL() throws {
         // GIVEN
-        let archiveURL = tempDirectoryURL.appendingPathComponent(UUID().uuidString)
-        try Resources.pulsePackage.write(to: archiveURL)
-        try FileManager.default.unzipItem(at: archiveURL, to: tempDirectoryURL)
-        let storeURL = tempDirectoryURL.appendingPathComponent("logs-package.pulse")
+        let archiveURL = directory.url.appendingPathComponent(UUID().uuidString)
+        try Resources.pulseArchive.write(to: archiveURL)
+        let storeURL = directory.url.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.unzipItem(at: archiveURL, to: storeURL)
 
         // WHEN
         let store = try XCTUnwrap(LoggerStore(storeURL: storeURL))
         defer { store.destroyStores() }
 
-        // THEN
-        XCTAssertEqual(try store.allMessages().count, 23)
-        XCTAssertEqual(try store.allNetworkRequests().count, 4)
+        // THEN entities can be opened
+        XCTAssertEqual(try store.viewContext.count(for: LoggerMessageEntity.self), 15)
+        XCTAssertEqual(try store.viewContext.count(for: LoggerNetworkRequestEntity.self), 8)
+        XCTAssertEqual(try store.viewContext.count(for: LoggerMetadataEntity.self), 1)
+        XCTAssertEqual(try store.viewContext.count(for: LoggerBlobHandleEntity.self), 7)
+
+        // THEN data stored in external storage also persist
+        let request = try XCTUnwrap(store.viewContext.first(LoggerNetworkRequestEntity.self) {
+            $0.predicate = NSPredicate(format: "url == %@", "https://github.com/repos")
+        })
+        XCTAssertEqual(request.responseBodySize, 165061)
+        XCTAssertEqual(request.responseBody?.data.count, 165061)
     }
 
     func testInitWithPackageURLNoExtension() throws {
         // GIVEN
-        let archiveURL = tempDirectoryURL.appendingPathComponent(UUID().uuidString)
-        try Resources.pulsePackage.write(to: archiveURL)
-        try FileManager.default.unzipItem(at: archiveURL, to: tempDirectoryURL)
-        let originalURL = tempDirectoryURL.appendingPathComponent("logs-package.pulse")
-
-        let storeURL = tempDirectoryURL.appendingPathComponent(UUID().uuidString)
-        try FileManager.default.copyItem(at: originalURL, to: storeURL)
+        let archiveURL = directory.url.appendingPathComponent(UUID().uuidString)
+        try Resources.pulseArchive.write(to: archiveURL)
+        let storeURL = directory.url.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.unzipItem(at: archiveURL, to: storeURL)
 
         // WHEN
         let store = try XCTUnwrap(LoggerStore(storeURL: storeURL))
         defer { store.destroyStores() }
 
-        // THEN
-        XCTAssertEqual(try store.allMessages().count, 23)
-        XCTAssertEqual(try store.allNetworkRequests().count, 4)
+        // THEN entities can be opened
+        XCTAssertEqual(try store.viewContext.count(for: LoggerMessageEntity.self), 15)
+        XCTAssertEqual(try store.viewContext.count(for: LoggerNetworkRequestEntity.self), 8)
+        XCTAssertEqual(try store.viewContext.count(for: LoggerMetadataEntity.self), 1)
+        XCTAssertEqual(try store.viewContext.count(for: LoggerBlobHandleEntity.self), 7)
+
+        // THEN data stored in external storage also persist
+        let request = try XCTUnwrap(store.viewContext.first(LoggerNetworkRequestEntity.self) {
+            $0.predicate = NSPredicate(format: "url == %@", "https://github.com/repos")
+        })
+        XCTAssertEqual(request.responseBodySize, 165061)
+        XCTAssertEqual(request.responseBody?.data.count, 165061)
     }
 
     // MARK: - Copy (Directory)
@@ -164,17 +193,12 @@ final class LoggerStoreTests: XCTestCase {
         // GIVEN
         populate2(store: store)
 
-        let copyURL = tempDirectoryURL.appendingPathComponent("copy.pulse")
+        let copyURL = directory.url.appendingPathComponent("copy.pulse")
 
         // WHEN
-        let manifest = try store.copy(to: copyURL)
+        try store.copy(to: copyURL)
 
         // THEN
-        // XCTAssertEqual(manifest.messagesSize, 73728)
-        // XCTAssertEqual(manifest.blobsSize, 21195)
-        XCTAssertEqual(manifest.messageCount, 10)
-        XCTAssertEqual(manifest.requestCount, 3)
-
         store.removeStores()
 
         // THEN
@@ -189,7 +213,7 @@ final class LoggerStoreTests: XCTestCase {
         // GIVEN
         populate2(store: store)
 
-        let invalidURL = tempDirectoryURL
+        let invalidURL = directory.url
             .appendingPathComponent(UUID().uuidString, isDirectory: true)
             .appendingPathComponent("copy.pulse")
 
@@ -201,7 +225,7 @@ final class LoggerStoreTests: XCTestCase {
         // GIVEN
         populate2(store: store)
 
-        let copyURL = tempDirectoryURL
+        let copyURL = directory.url
             .appendingPathComponent("copy.pulse")
 
         try store.copy(to: copyURL)
@@ -210,57 +234,25 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertThrowsError(try store.copy(to: copyURL))
     }
 
-    func testCreateMultipleCopies() throws {
-        // GIVEN
-        populate2(store: store)
-
-        let copyURL1 = self.storeURL
-            .deletingLastPathComponent()
-            .appendingPathComponent("copy.pulse")
-
-        let copyURL2 = self.storeURL
-            .deletingLastPathComponent()
-            .appendingPathComponent("copy2.pulse")
-
-        // WHEN
-        let manifest1 = try store.copy(to: copyURL1)
-        let manifest2 = try store.copy(to: copyURL2)
-
-        // THEN
-        // XCTAssertEqual(manifest.messagesSize, 73728)
-        // XCTAssertEqual(manifest.blobsSize, 21195)
-        XCTAssertEqual(manifest1.messageCount, 10)
-        XCTAssertEqual(manifest1.requestCount, 3)
-        XCTAssertEqual(manifest2.messageCount, 10)
-        XCTAssertEqual(manifest2.requestCount, 3)
-        XCTAssertNotEqual(manifest1.id, manifest2.id)
-    }
-
     // MARK: - Copy (File)
 
     func testCopyFile() throws {
         // GIVEN
-        let storeURL = directory.url.appendingPathComponent("logs-2021-03-18_21-22.pulse")
+        let storeURL = directory.url.appendingPathComponent("logs-archive-v2.pulse")
         try Resources.pulseArchive.write(to: storeURL)
 
         let store = try XCTUnwrap(LoggerStore(storeURL: storeURL))
-        let copyURL = tempDirectoryURL.appendingPathComponent("copy.pulse")
+        let copyURL = directory.url.appendingPathComponent("copy.pulse")
 
         // WHEN
-        let manifest = try store.copy(to: copyURL)
-
-        // THEN
-        // XCTAssertEqual(manifest.messagesSize, 73728)
-        // XCTAssertEqual(manifest.blobsSize, 21195)
-        XCTAssertEqual(manifest.messageCount, 23)
-        XCTAssertEqual(manifest.requestCount, 4)
+        try store.copy(to: copyURL)
 
         // THEN
         let copy = try LoggerStore(storeURL: copyURL)
         defer { copy.destroyStores() }
 
-        XCTAssertEqual(try copy.allMessages().count, 23)
-        XCTAssertEqual(try copy.allNetworkRequests().count, 4)
+        XCTAssertEqual(try copy.allMessages().count, 15)
+        XCTAssertEqual(try copy.allNetworkRequests().count, 8)
     }
 
     // MARK: - File (Readonly)
@@ -268,7 +260,7 @@ final class LoggerStoreTests: XCTestCase {
     // TODO: this type of store is no longer immuatble
     func _testOpenFileDatabaseImmutable() throws {
         // GIVEN
-        let storeURL = directory.url.appendingPathComponent("logs-2021-03-18_21-22.pulse")
+        let storeURL = directory.url.appendingPathComponent("logs-archive-v2.pulse")
         try Resources.pulseArchive.write(to: storeURL)
 
         let store = try XCTUnwrap(LoggerStore(storeURL: storeURL))
@@ -297,42 +289,48 @@ final class LoggerStoreTests: XCTestCase {
         // GIVEN
         let context = store.viewContext
 
+        store.storeRequest(URLRequest(url: URL(string: "example.com/delete-this")!), response: nil, error: nil, data: "hello".data(using: .utf8))
         for index in 1...500 {
             store.storeMessage(label: "default", level: .debug, message: "\(index)", metadata: {
                 index % 50 == 0 ? ["key": .stringConvertible(index)] : nil
             }())
         }
 
-        let copyURL = tempDirectoryURL
+        let copyURL = directory.url
             .appendingPathComponent(UUID().uuidString, isDirectory: false)
             .appendingPathExtension("pulse")
         try store.copy(to: copyURL)
 
         // SANITY
         var messages = try store.allMessages()
-        XCTAssertEqual(messages.count, 500)
+        XCTAssertEqual(messages.count, 501)
         XCTAssertEqual(messages.last?.text, "500")
 
-        XCTAssertEqual(try context.fetch(LoggerMessageEntity.fetchRequest()).count, 500)
-        XCTAssertEqual(try context.fetch(LoggerMetadataEntity.fetchRequest()).count, 10)
+        XCTAssertEqual(try context.count(for: LoggerMessageEntity.self), 501)
+        XCTAssertEqual(try context.count(for: LoggerMetadataEntity.self), 10)
+        XCTAssertEqual(try context.count(for: LoggerNetworkRequestEntity.self), 1)
+        XCTAssertEqual(try context.count(for: LoggerBlobHandleEntity.self), 1)
+        context.reset()
 
         // WHEN
         store.syncSweep()
 
         // THEN
-        let copyURL2 = tempDirectoryURL
+        let copyURL2 = directory.url
             .appendingPathComponent(UUID().uuidString, isDirectory: false)
             .appendingPathExtension("pulse")
         try store.copy(to: copyURL2)
 
         // THEN unwanted messages were removed
-        messages = try store.allMessages()
-        XCTAssertEqual(messages.count, 251)
+        messages = try context.fetch(LoggerMessageEntity.self)
+        XCTAssertEqual(messages.count, 351)
         XCTAssertEqual(messages.last?.text, "500") // Latest stored
 
-        // THEN metadata and other relationships also removed
-        XCTAssertEqual(try context.fetch(LoggerMessageEntity.fetchRequest()).count, 251)
-        XCTAssertEqual(try context.fetch(LoggerMetadataEntity.fetchRequest()).count, 6)
+        // THEN metadata, network requests, blobs are removed
+        XCTAssertEqual(try context.count(for: LoggerMessageEntity.self), 351)
+        XCTAssertEqual(try context.count(for: LoggerMetadataEntity.self), 8)
+        XCTAssertEqual(try context.count(for: LoggerNetworkRequestEntity.self), 0)
+        XCTAssertEqual(try context.count(for: LoggerBlobHandleEntity.self), 0)
     }
 
     func testMaxAgeSweep() throws {
@@ -354,21 +352,22 @@ final class LoggerStoreTests: XCTestCase {
 
         // ASSERT
         let context = store.backgroundContext
-        XCTAssertEqual(try context.fetch(LoggerMessageEntity.fetchRequest()).count, 4)
-        XCTAssertEqual(try context.fetch(LoggerNetworkRequestEntity.fetchRequest()).count, 2)
-        XCTAssertEqual(try context.fetch(LoggerNetworkRequestDetailsEntity.fetchRequest()).count, 2)
-        XCTAssertEqual(try context.fetch(LoggerBlobHandleEntity.fetchRequest()).count, 0)
+        XCTAssertEqual(try context.count(for: LoggerMessageEntity.self), 4)
+        XCTAssertEqual(try context.count(for: LoggerNetworkRequestEntity.self), 2)
+        XCTAssertEqual(try context.count(for: LoggerNetworkRequestDetailsEntity.self), 2)
+        XCTAssertEqual(try context.count(for: LoggerBlobHandleEntity.self), 0)
+        context.reset()
 
         // WHEN
         store.syncSweep()
 
         // THEN
-        XCTAssertEqual(try context.fetch(LoggerMessageEntity.fetchRequest()).count, 2)
-        XCTAssertEqual(try context.fetch(LoggerMetadataEntity.fetchRequest()).count, 0)
-        XCTAssertEqual(try context.fetch(LoggerNetworkRequestEntity.fetchRequest()).count, 1)
-        XCTAssertEqual(try context.fetch(LoggerNetworkRequestDetailsEntity.fetchRequest()).count, 1)
-        XCTAssertEqual(try context.fetch(LoggerNetworkRequestProgressEntity.fetchRequest()).count, 0)
-        XCTAssertEqual(try context.fetch(LoggerBlobHandleEntity.fetchRequest()).count, 0)
+        XCTAssertEqual(try context.count(for: LoggerMessageEntity.self), 2)
+        XCTAssertEqual(try context.count(for: LoggerMetadataEntity.self), 0)
+        XCTAssertEqual(try context.count(for: LoggerNetworkRequestEntity.self), 1)
+        XCTAssertEqual(try context.count(for: LoggerNetworkRequestDetailsEntity.self), 1)
+        XCTAssertEqual(try context.count(for: LoggerNetworkRequestProgressEntity.self), 0)
+        XCTAssertEqual(try context.count(for: LoggerBlobHandleEntity.self), 0)
 
         XCTAssertEqual(try store.allMessages().first?.label, "kept")
         XCTAssertEqual(try store.allNetworkRequests().first?.url, "example.com/kept")
@@ -387,18 +386,20 @@ final class LoggerStoreTests: XCTestCase {
         store.storeRequest(URLRequest(url: URL(string: "example.com/deleted")!), response: nil, error: nil, data: responseData)
 
         // ASSERT
-        let responseBodyKey = try XCTUnwrap(store.allNetworkRequests().first?.responseBodyKey)
-        XCTAssertEqual(store.getData(forKey: responseBodyKey), responseData)
-
-        XCTAssertEqual(try store.backgroundContext.fetch(LoggerBlobHandleEntity.fetchRequest()).count, 1)
+        XCTAssertEqual(try store.backgroundContext.count(for: LoggerBlobHandleEntity.self), 1)
+        XCTAssertEqual(try store.backgroundContext.first(LoggerBlobHandleEntity.self)?.data, responseData)
 
         // WHEN
         date = Date()
         store.syncSweep()
 
         // THEN associated data is deleted
-        XCTAssertEqual(try store.backgroundContext.fetch(LoggerBlobHandleEntity.fetchRequest()).count, 0)
-        XCTAssertNil(store.getData(forKey: responseBodyKey))
+        XCTAssertEqual(try store.backgroundContext.count(for: LoggerMessageEntity.self), 0)
+        XCTAssertEqual(try store.backgroundContext.count(for: LoggerMetadataEntity.self), 0)
+        XCTAssertEqual(try store.backgroundContext.count(for: LoggerNetworkRequestEntity.self), 0)
+        XCTAssertEqual(try store.backgroundContext.count(for: LoggerNetworkRequestDetailsEntity.self), 0)
+        XCTAssertEqual(try store.backgroundContext.count(for: LoggerNetworkRequestProgressEntity.self), 0)
+        XCTAssertEqual(try store.backgroundContext.count(for: LoggerBlobHandleEntity.self), 0)
     }
 
     func testMaxAgeSweepBlobIsDeletedWhenBothEntitiesReferencingItAre() throws {
@@ -415,17 +416,15 @@ final class LoggerStoreTests: XCTestCase {
         store.storeRequest(URLRequest(url: URL(string: "example.com/deleted2")!), response: nil, error: nil, data: responseData)
 
         // ASSERT
-        let responseBodyKey = try XCTUnwrap(store.backgroundContext.fetch(LoggerNetworkRequestEntity.self).first?.responseBody?.key)
-        XCTAssertEqual(store.getData(forKey: responseBodyKey), responseData)
-        XCTAssertEqual(try store.backgroundContext.fetch(LoggerBlobHandleEntity.fetchRequest()).count, 1)
+        XCTAssertEqual(try store.backgroundContext.count(for: LoggerBlobHandleEntity.self), 1)
+        XCTAssertEqual(try store.backgroundContext.first(LoggerBlobHandleEntity.self)?.data, responseData)
 
         // WHEN
         date = Date()
         store.syncSweep()
 
         // THEN associated data is deleted
-        XCTAssertEqual(try store.backgroundContext.fetch(LoggerBlobHandleEntity.fetchRequest()).count, 0)
-        XCTAssertNil(store.getData(forKey: responseBodyKey))
+        XCTAssertEqual(try store.backgroundContext.count(for: LoggerBlobHandleEntity.self), 0)
     }
 
     func testMaxAgeSweepBlobIsKeptIfOnlyOneReferencingEntityIsDeleted() throws {
@@ -445,19 +444,17 @@ final class LoggerStoreTests: XCTestCase {
         store.storeRequest(URLRequest(url: URL(string: "example.com/kept")!), response: nil, error: nil, data: responseData)
 
         // ASSERT
-        let responseBodyKey = try XCTUnwrap(store.backgroundContext.fetch(LoggerNetworkRequestEntity.self).first?.responseBody?.key)
-        XCTAssertEqual(store.getData(forKey: responseBodyKey), responseData)
-        XCTAssertEqual(try store.backgroundContext.fetch(LoggerNetworkRequestEntity.fetchRequest()).count, 2)
-        XCTAssertEqual(try store.backgroundContext.fetch(LoggerBlobHandleEntity.fetchRequest()).count, 1)
+        XCTAssertEqual(try store.backgroundContext.count(for: LoggerNetworkRequestEntity.fetchRequest()), 2)
+        XCTAssertEqual(try store.backgroundContext.count(for: LoggerBlobHandleEntity.self), 1)
+        XCTAssertEqual(try store.backgroundContext.first(LoggerBlobHandleEntity.self)?.data, responseData)
 
         // WHEN
         date = Date()
         store.syncSweep()
 
         // THEN associated data is deleted
-        XCTAssertEqual(try store.backgroundContext.fetch(LoggerNetworkRequestEntity.fetchRequest()).count, 1)
-        XCTAssertEqual(try store.backgroundContext.fetch(LoggerBlobHandleEntity.fetchRequest()).count, 1)
-        XCTAssertEqual(store.getData(forKey: responseBodyKey), responseData)
+        XCTAssertEqual(try store.backgroundContext.count(for: LoggerNetworkRequestEntity.self), 1)
+        XCTAssertEqual(try store.backgroundContext.count(for: LoggerBlobHandleEntity.self), 1)
     }
 
     func testBlobSizeLimitSweep() throws {
@@ -483,9 +480,7 @@ final class LoggerStoreTests: XCTestCase {
         storeRequest(id: "3", offset: -200)
 
         // ASSERT
-        let responseBodyKeys = try store.backgroundContext.fetch(LoggerNetworkRequestEntity.self).compactMap { $0.responseBodyKey }
-        XCTAssertEqual(try store.backgroundContext.fetch(LoggerBlobHandleEntity.self).count, 3)
-        XCTAssertEqual(responseBodyKeys.compactMap(store.getData).count, 3)
+        XCTAssertEqual(try store.backgroundContext.count(for: LoggerBlobHandleEntity.self), 3)
 
         // WHEN
         store.syncSweep()
@@ -494,15 +489,14 @@ final class LoggerStoreTests: XCTestCase {
         let requests = try store.backgroundContext.fetch(LoggerNetworkRequestEntity.self)
         XCTAssertEqual(requests.count, 3) // Keeps the requests
         XCTAssertEqual(requests.compactMap(\.responseBody).count, 1)
-        XCTAssertEqual(try store.backgroundContext.fetch(LoggerBlobHandleEntity.self).count, 1)
-        XCTAssertEqual(responseBodyKeys.compactMap(store.getData(forKey:)).count, 1)
+        XCTAssertEqual(try store.backgroundContext.count(for: LoggerBlobHandleEntity.self), 1)
     }
 
     // MARK: - Migration
 
     func testMigrationFromVersion0_2ToLatest() throws {
         // GIVEN store created with the model from Pulse 0.2
-        let storeURL = tempDirectoryURL
+        let storeURL = directory.url
             .appendingPathComponent(UUID().uuidString, isDirectory: false)
         try? FileManager.default.createDirectory(at: storeURL, withIntermediateDirectories: true, attributes: nil)
         let databaseURL = storeURL
@@ -527,26 +521,27 @@ final class LoggerStoreTests: XCTestCase {
 
     // MARK: - Remove Messages
 
-    #warning("TODO: add blobs tests")
     func testRemoveAllMessages() throws {
         // GIVEN
         populate2(store: store)
         store.storeMessage(label: "with meta", level: .debug, message: "test", metadata: ["hey": .string("this is meta yo")], file: #file, function: #function, line: #line)
 
         let context = store.viewContext
-        XCTAssertEqual(try context.fetch(LoggerMessageEntity.self).count, 11)
-        XCTAssertEqual(try context.fetch(LoggerMetadataEntity.self).count, 1)
-        XCTAssertEqual(try context.fetch(LoggerNetworkRequestEntity.self).count, 3)
-        XCTAssertEqual(try context.fetch(LoggerNetworkRequestDetailsEntity.self).count, 3)
+        XCTAssertEqual(try context.count(for: LoggerMessageEntity.self), 11)
+        XCTAssertEqual(try context.count(for: LoggerMetadataEntity.self), 1)
+        XCTAssertEqual(try context.count(for: LoggerNetworkRequestEntity.self), 3)
+        XCTAssertEqual(try context.count(for: LoggerNetworkRequestDetailsEntity.self), 3)
+        XCTAssertEqual(try context.count(for: LoggerBlobHandleEntity.self), 3)
 
         // WHEN
         store.removeAll()
 
         // THEN both message and metadata are removed
-        XCTAssertTrue(try context.fetch(LoggerMessageEntity.self).isEmpty)
-        XCTAssertTrue(try context.fetch(LoggerMetadataEntity.self).isEmpty)
-        XCTAssertTrue(try context.fetch(LoggerNetworkRequestEntity.self).isEmpty)
-        XCTAssertTrue(try context.fetch(LoggerNetworkRequestDetailsEntity.self).isEmpty)
+        XCTAssertEqual(try context.count(for: LoggerMessageEntity.self), 0)
+        XCTAssertEqual(try context.count(for: LoggerMetadataEntity.self), 0)
+        XCTAssertEqual(try context.count(for: LoggerNetworkRequestEntity.self), 0)
+        XCTAssertEqual(try context.count(for: LoggerNetworkRequestDetailsEntity.self), 0)
+        XCTAssertEqual(try context.count(for: LoggerBlobHandleEntity.self), 0)
     }
 
     // MARK: - Image Support
@@ -569,9 +564,8 @@ final class LoggerStoreTests: XCTestCase {
         store.storeRequest(taskId: taskId, taskType: .dataTask, request: URLRequest(url: url), response: response, error: nil, data: imageData, metrics: nil)
 
         // THEN
-        let request = try XCTUnwrap(store.allNetworkRequests().first(where: { $0.taskId == taskId }))
-        let responseBodyKey = try XCTUnwrap(request.responseBodyKey)
-        let processedData = try XCTUnwrap(store.getData(forKey: responseBodyKey))
+        let request = try XCTUnwrap(try store.backgroundContext.first(LoggerNetworkRequestEntity.self))
+        let processedData = try XCTUnwrap(request.responseBody?.data)
         let thumbnail = try XCTUnwrap(UIImage(data: processedData))
         XCTAssertEqual(thumbnail.size, CGSize(width: 256, height: 256))
 

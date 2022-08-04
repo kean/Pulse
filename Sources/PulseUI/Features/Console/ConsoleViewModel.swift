@@ -40,10 +40,10 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     init(store: LoggerStore, configuration: ConsoleConfiguration = .default) {
         self.store = store
         self.configuration = configuration
-        self.details = ConsoleDetailsRouterViewModel(store: store)
+        self.details = ConsoleDetailsRouterViewModel()
 
         let request = NSFetchRequest<LoggerMessageEntity>(entityName: "\(LoggerMessageEntity.self)")
-        request.fetchBatchSize = 250
+        request.fetchBatchSize = 100
         request.relationshipKeyPathsForPrefetching = ["request"]
         request.sortDescriptors = [NSSortDescriptor(keyPath: \LoggerMessageEntity.createdAt, ascending: false)]
 
@@ -51,7 +51,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 
         self.searchCriteria = ConsoleSearchCriteriaViewModel(isDefaultStore: store === LoggerStore.shared)
 #if os(iOS) || os(macOS)
-        self.table = ConsoleTableViewModel(store: store, searchCriteriaViewModel: searchCriteria)
+        self.table = ConsoleTableViewModel(searchCriteriaViewModel: searchCriteria)
 #endif
 
         super.init()

@@ -49,7 +49,7 @@ public final class NetworkLoggerInsights: @unchecked Sendable {
     private func process(event: LoggerStore.Event.NetworkTaskCompleted) {
         guard let metrics = event.metrics else { return }
 
-        contents.transferSize = contents.transferSize.merging(metrics.transferSize)
+        contents.transferSize = contents.transferSize.merging(metrics.totalTransferSize)
         contents.duration.insert(duration: TimeInterval(metrics.taskInterval.duration), taskId: event.taskId)
         if metrics.redirectCount > 0 {
             contents.redirects.count += metrics.redirectCount

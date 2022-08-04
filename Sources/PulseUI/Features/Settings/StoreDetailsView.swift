@@ -72,16 +72,7 @@ final class StoreDetailsViewModel {
 #if DEBUG
 struct StoreDetailsView_Previews: PreviewProvider {
     static var previews: some View {
-        let store = LoggerStore.preview
-        let newURL = FileManager.default.temporaryDirectory
-            .appendingPathComponent(UUID().uuidString + ".pulse")
-        let info = try! store.copy(to: newURL)
-
-        if #available(iOS 14.0, tvOS 14.0, *) {
-            NavigationView {
-                StoreDetailsView(viewModel: .init(storeURL: newURL, info: info))
-            }
-        }
+        Text("rework")
     }
 }
 #endif

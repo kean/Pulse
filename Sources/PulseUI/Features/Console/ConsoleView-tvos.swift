@@ -11,7 +11,6 @@ import Combine
 
 public struct ConsoleView: View {
     @ObservedObject var viewModel: ConsoleViewModel
-    @Environment(\.colorScheme) private var colorScheme: ColorScheme
     @State private var isShowingFiltersView = false
     @State private var isShowingRemoveConfirmationAlert = false
     @State private var isStoreArchived = false
@@ -26,7 +25,7 @@ public struct ConsoleView: View {
 
     public var body: some View {
         List {
-            ConsoleMessagesForEach(store: viewModel.store, messages: viewModel.entities)
+            ConsoleMessagesForEach(messages: viewModel.entities)
         }
         .onAppear(perform: viewModel.onAppear)
         .onDisappear(perform: viewModel.onDisappear)
