@@ -125,10 +125,12 @@ public final class LoggerStore: @unchecked Sendable {
 
     /// The store configuration.
     public struct Configuration: @unchecked Sendable {
-        /// Size limit in bytes. `64 Mb` by default. The limit is approximate.
+        /// Size limit in bytes. `128 Mb` by default. The limit is approximate.
+        ///
+        /// - important: This limit also applies to small network responses stored inline.
         public var databaseSizeLimit: Int
 
-        /// Size limit in bytes. `384 Mb` by default.
+        /// Size limit in bytes. `256 Mb` by default.
         public var blobsSizeLimit: Int
 
         var trimRatio = 0.7
@@ -166,10 +168,10 @@ public final class LoggerStore: @unchecked Sendable {
         /// Initializes the configuration.
         ///
         /// - parameters:
-        ///   - databaseSizeLimit: The approximate limit of the database size. `64 Mb`
+        ///   - databaseSizeLimit: The approximate limit of the database size. `128 Mb`
         ///   - blobsSizeLimit: The approximate limit of the blob storage that
-        ///   contains network responses (HTTP body). `384 Mb` by default.
-        public init(databaseSizeLimit: Int = 64 * 1048576, blobsSizeLimit: Int = 384 * 1048576) {
+        ///   contains network responses (HTTP body). `256 Mb` by default.
+        public init(databaseSizeLimit: Int = 128 * 1048576, blobsSizeLimit: Int = 256 * 1048576) {
             self.databaseSizeLimit = databaseSizeLimit
             self.blobsSizeLimit = blobsSizeLimit
         }
@@ -764,8 +766,6 @@ extension LoggerStore {
 
 // MARK: - LoggerStore (Archive and Copy)
 
-#warning("TEST THAT THIS STILL WORKS including blos (and large?)")
-
 extension LoggerStore {
     /// Creates a copy of the current store at the given URL. The created copy
     /// has `.pulse` extension (actually a `.zip` archive).
@@ -853,7 +853,6 @@ extension LoggerStore {
         try removeMessage(before: cutoffDate)
     }
 
-    #warning("TODO: this probably isn't going to work relialy anymore because of blobs")
     private func reduceDatabaseSize() throws {
         let attributes = try Files.attributesOfItem(atPath: storeURL.appendingPathComponent(databaseFileName, isDirectory: false).path)
         let size = attributes[.size] as? Int64 ?? 0
