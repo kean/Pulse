@@ -553,13 +553,12 @@ final class LoggerStoreTests: XCTestCase {
 
         // WHEN
         let url = try XCTUnwrap(URL(string: "https://example.com/image"))
-        let taskId = UUID()
 
         let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: "http/2.0", headerFields: [
             "Content-Type": "image/png"
         ])
 
-        store.storeRequest(taskId: taskId, taskType: .dataTask, request: URLRequest(url: url), response: response, error: nil, data: imageData, metrics: nil)
+        store.storeRequest(URLRequest(url: url), response: response, error: nil, data: imageData)
 
         // THEN
         let request = try XCTUnwrap(try store.backgroundContext.first(LoggerNetworkRequestEntity.self))

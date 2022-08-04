@@ -34,7 +34,7 @@ public final class LoggerStore: @unchecked Sendable {
 
     /// Returns `true` if the store was opened with a Pulse archive (a document
     /// with `.pulse` extension). The archives are readonly.
-    public let isReadonly: Bool
+    public let isArchive: Bool
 
     /// Returns the Core Data container associated with the store.
     public let container: NSPersistentContainer
@@ -155,7 +155,7 @@ public final class LoggerStore: @unchecked Sendable {
         self.container = LoggerStore.makeContainer(databaseURL: databaseURL, isViewing: false)
         try? LoggerStore.loadStore(container: container)
         self.backgroundContext = LoggerStore.makeBackgroundContext(for: container)
-        self.isReadonly = false
+        self.isArchive = false
         self.document = .package
         self.viewContext.userInfo[Pins.pinServiceKey] = Pins(store: self)
         try save(manifest)
@@ -191,7 +191,7 @@ public final class LoggerStore: @unchecked Sendable {
         self.container = LoggerStore.makeContainer(databaseURL: databaseURL, isViewing: true)
         try LoggerStore.loadStore(container: container)
         self.backgroundContext = LoggerStore.makeBackgroundContext(for: container)
-        self.isReadonly = true
+        self.isArchive = true
         self.manifest = manifest
         self.document = .file
         self.viewContext.userInfo[Pins.pinServiceKey] = Pins(store: self)
@@ -210,7 +210,7 @@ public final class LoggerStore: @unchecked Sendable {
     init(inMemoryStore storeURL: URL) {
         self.storeURL = storeURL
         self.writableStoreURL = storeURL
-        self.isReadonly = true
+        self.isArchive = true
         self.container = NSPersistentContainer(name: "EmptyStore", managedObjectModel: Self.model)
         let description = NSPersistentStoreDescription()
         description.type = NSInMemoryStoreType
@@ -548,7 +548,7 @@ extension LoggerStore {
     // MARK: - Performing Changes
 
     private func perform(_ changes: @escaping () -> Void) {
-        guard !isReadonly else { return }
+        guard !isArchive else { return }
 
         if options.contains(.synchronous) {
             backgroundContext.performAndWait {

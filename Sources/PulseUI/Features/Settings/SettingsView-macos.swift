@@ -46,7 +46,7 @@ public struct SettingsView: View {
                     }
                 }
                 Section(header: Text("Manage Messages")) {
-                    if !viewModel.isReadonly {
+                    if !viewModel.isArchive {
                         ButtonRemoveAll(action: console.buttonRemoveAllMessagesTapped)
                     }
                 }
@@ -76,8 +76,8 @@ final class SettingsViewModel: ObservableObject {
         self.store = store
     }
 
-    var isReadonly: Bool {
-        store.isReadonly
+    var isArchive: Bool {
+        store.isArchive
     }
 }
 

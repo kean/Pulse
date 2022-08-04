@@ -31,7 +31,7 @@ extension ShareItems {
         let items: [Any]
         switch output {
         case .store:
-            if store.isReadonly {
+            if store.isArchive {
                 items = [store.storeURL]
             } else {
                 let storeURL = directory.url.appendingPathComponent("logs-\(date).pulse", isDirectory: false)

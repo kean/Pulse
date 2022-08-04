@@ -15,7 +15,7 @@
 ### Instance Properties
 
 - ``storeURL``
-- ``isReadonly``
+- ``isArchive``
 
 ### Storing Logs
 
@@ -28,11 +28,6 @@
 - ``allNetworkRequests()``
 - ``removeAll()``
 
-### Managing Pins
-
-- ``pins-swift.property``
-- ``Pins-swift.class``
-
 ### Sharing the Store
 
 - ``copy(to:)``
@@ -41,6 +36,11 @@
 
 - ``info()``
 - ``Info``
+
+### Managing Pins
+
+- ``pins-swift.property``
+- ``Pins-swift.class``
 
 ### Receiving and Filtering Events
 

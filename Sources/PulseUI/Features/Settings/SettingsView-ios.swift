@@ -39,7 +39,7 @@ public struct SettingsView: View {
                 }
             }
 
-            if !viewModel.isReadonly {
+            if !viewModel.isArchive {
                 Section {
                     if #available(iOS 14.0, *) {
                         Button(action: {
@@ -96,8 +96,8 @@ final class SettingsViewModel: ObservableObject {
         self.store = store
     }
 
-    var isReadonly: Bool {
-        store.isReadonly
+    var isArchive: Bool {
+        store.isArchive
     }
 
     #warning("TODO: rework")
