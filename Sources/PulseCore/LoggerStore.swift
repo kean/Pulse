@@ -612,7 +612,6 @@ extension LoggerStore {
             return nil
         }
         let key = data.sha256
-
         let existingEntity = try? backgroundContext.first(LoggerBlobHandleEntity.self) {
             $0.predicate = NSPredicate(format: "key == %@", key)
         }
@@ -620,7 +619,6 @@ extension LoggerStore {
             entity.linkCount += 1
             return entity
         }
-        #warning("TRY store blobs in database, but reset memory after opening body in viewer + is copying going to work")
         let entity = LoggerBlobHandleEntity(context: backgroundContext)
         entity.key = key
         entity.linkCount = 1

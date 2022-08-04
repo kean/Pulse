@@ -13,6 +13,7 @@ struct NetworkInspectorResponseView: View {
     var body: some View {
         if let viewModel = viewModel.fileViewModel {
             FileViewer(viewModel: viewModel, onToggleExpanded: onToggleExpanded)
+                .onDisappear { self.viewModel.onDisappear() }
         } else if viewModel.request.state == .pending {
             SpinnerView(viewModel: viewModel.progress)
         } else if viewModel.request.taskType == .downloadTask {
@@ -59,6 +60,10 @@ final class NetworkInspectorResponseViewModel: ObservableObject {
         self.details = DecodedNetworkRequestDetailsEntity(request: request)
 
         cancellable = request.objectWillChange.sink { [weak self] in self?.refresh() }
+    }
+
+    func onDisappear() {
+        request.responseBody?.reset()
     }
 
     private func refresh() {

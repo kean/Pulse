@@ -4,6 +4,7 @@
 
 import Foundation
 import CommonCrypto
+import CoreData
 
 extension Array {
     func chunked(into size: Int) -> [[Element]] {
@@ -83,6 +84,12 @@ func benchmark(title: String, operation: () -> Void) {
     operation()
     let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
     debugPrint("Time elapsed for \(title): \(timeElapsed * 1000.0) ms.")
+}
+
+extension NSManagedObject {
+    func reset() {
+        managedObjectContext?.refresh(self, mergeChanges: false)
+    }
 }
 
 extension NSMutableAttributedString {
