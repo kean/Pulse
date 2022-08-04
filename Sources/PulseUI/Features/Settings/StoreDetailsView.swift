@@ -48,14 +48,15 @@ final class StoreDetailsViewModel {
         formatter.dateStyle = .medium
         formatter.timeStyle = .medium
 
-        let device = info.device
+        let device = info.deviceInfo
+        let app = info.appInfo
         return KeyValueSectionViewModel(title: "Info", color: .gray, action: nil, items: [
             ("Device", "\(device.name) (\(device.systemName) \(device.systemVersion))"),
-            info.appInfo.map { ("App", "\($0.name ?? "–") \($0.version ?? "–") (\($0.build ?? "–"))") },
+            ("App", "\(app.name ?? "–") \(app.version ?? "–") (\(app.build ?? "–"))"),
             ("Created", formatter.string(from: info.createdDate)),
             ("Modified", formatter.string(from: info.modifiedDate)),
-            ("Archived", formatter.string(from: info.archivedDate))
-        ].compactMap { $0 })
+            ("Archived", info.archivedDate.map(formatter.string))
+        ])
     }
 
     var sizeSection: KeyValueSectionViewModel {
@@ -64,7 +65,7 @@ final class StoreDetailsViewModel {
             ("Messages", info.messageCount.description),
             ("Network Requests", info.requestCount.description),
             ("Blobs Size", ByteCountFormatter.string(fromByteCount: info.blobsSize, countStyle: .file)),
-            ("Messages Size", ByteCountFormatter.string(fromByteCount: info.databaseSize, countStyle: .file))
+            ("Total Size", ByteCountFormatter.string(fromByteCount: info.totalStoreSize, countStyle: .file))
         ])
     }
 }
