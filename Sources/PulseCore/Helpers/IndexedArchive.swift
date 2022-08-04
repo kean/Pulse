@@ -11,9 +11,9 @@ final class IndexedArchive: @unchecked Sendable {
     private let archive: Archive
     private let index: [String: Entry]
 
-    convenience init?(url: URL) {
+    convenience init(url: URL) throws {
         guard let archive = Archive(url: url, accessMode: .read) else {
-            return nil
+            throw LoggerStore.Error.storeInvalid
         }
         self.init(archive: archive)
     }
