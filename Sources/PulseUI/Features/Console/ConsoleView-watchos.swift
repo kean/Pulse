@@ -8,14 +8,16 @@ import SwiftUI
 
 struct ConsoleView: View {
     @ObservedObject var viewModel: ConsoleViewModel
+    let main: MainViewModel
 
-    init(viewModel: ConsoleViewModel) {
-        self.viewModel = viewModel
+    init(viewModel: MainViewModel) {
+        self.viewModel = viewModel.console
+        self.main = viewModel
     }
 
     var body: some View {
         List {
-            NavigationLink(destination: SettingsView(viewModel: viewModel)) {
+            NavigationLink(destination: SettingsView(viewModel: main.settings)) {
                 Label("Settings", systemImage: "gearshape")
             }
 

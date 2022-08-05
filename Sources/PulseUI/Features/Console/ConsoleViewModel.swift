@@ -23,12 +23,6 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     @Published var isOnlyNetwork: Bool = false
     @Published var filterTerm: String = ""
 
-    // Apple Watch file transfers
-#if os(watchOS) || os(iOS)
-    @Published private(set) var fileTransferStatus: FileTransferStatus = .initial
-    @Published var fileTransferError: FileTransferError?
-#endif
-
     var onDismiss: (() -> Void)?
 
     private(set) var store: LoggerStore
@@ -71,15 +65,6 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         }.store(in: &cancellables)
 
         refreshNow()
-
-#if os(watchOS) || os(iOS)
-        LoggerSyncSession.shared.$fileTransferStatus.sink(receiveValue: { [weak self] in
-            self?.fileTransferStatus = $0
-            if case let .failure(error) = $0 {
-                self?.fileTransferError = FileTransferError(message: error.localizedDescription)
-            }
-        }).store(in: &cancellables)
-#endif
 
 #if os(iOS)
         store.backgroundContext.perform {
@@ -143,6 +128,8 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 
     // MARK: Pins
 
+#warning("TODO: remove")
+
 #if os(iOS) || os(macOS)
     func share(as output: ShareStoreOutput) -> ShareItems {
 #if os(iOS)
@@ -150,26 +137,6 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 #else
         ShareItems(messages: store)
 #endif
-    }
-#endif
-
-    func buttonRemoveAllMessagesTapped() {
-        store.removeAll()
-
-#if os(iOS)
-        runHapticFeedback(.success)
-        ToastView {
-            HStack {
-                Image(systemName: "trash")
-                Text("All messages removed")
-            }
-        }.show()
-#endif
-    }
-
-#if os(watchOS) || os(iOS)
-    func tranferStore() {
-        LoggerSyncSession.shared.transfer(store: store)
     }
 #endif
 

@@ -10,11 +10,10 @@ import Combine
 #if os(watchOS)
 
 public struct MainView: View {
-    // TODO: replace with StateObject when available
-    @State private var viewModel: ConsoleViewModel
+    @StateObject private var viewModel: MainViewModel
 
     public init(store: LoggerStore = .shared) {
-        self.viewModel = ConsoleViewModel(store: store)
+        self._viewModel = StateObject(wrappedValue: .init(store: store))
     }
 
     public var body: some View {

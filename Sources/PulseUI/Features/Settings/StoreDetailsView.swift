@@ -5,8 +5,7 @@
 import SwiftUI
 import PulseCore
 
-#if os(iOS) || os(macOS)
-@available(iOS 14.0, *)
+@available(iOS 14.0, tvOS 14.0, *)
 struct StoreDetailsView: View {
     @StateObject private var viewModel = StoreDetailsViewModel()
 
@@ -162,6 +161,4 @@ struct StoreDetailsView_Previews: PreviewProvider {
         StoreDetailsView(source: .store(.mock))
     }
 }
-#endif
-
 #endif

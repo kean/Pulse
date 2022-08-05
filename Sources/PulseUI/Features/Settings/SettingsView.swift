@@ -5,7 +5,7 @@
 import SwiftUI
 import PulseCore
 
-#if os(iOS) || os(watchOS)
+#if os(iOS) || os(watchOS) || os(tvOS)
 import UniformTypeIdentifiers
 
 public struct SettingsView: View {
@@ -26,21 +26,33 @@ public struct SettingsView: View {
 
     public var body: some View {
         Form {
-            if #available(iOS 14.0, *) {
+            if #available(iOS 14.0, tvOS 14.0, *) {
                 sectionStoreDetails
             }
-            ButtonRemoveAll(action: viewModel.buttonRemoveAllMessagesTapped)
-            if #available(iOS 14.0, *), viewModel.isRemoteLoggingAvailable {
+#if os(watchOS)
+            sectionTransferStore
+#endif
+            if !viewModel.isArchive {
+                Section {
+                    ButtonRemoveAll(action: viewModel.buttonRemoveAllMessagesTapped)
+                }
+            }
+            if #available(iOS 14.0, tvOS 14.0, *), viewModel.isRemoteLoggingAvailable {
                 Section {
                     RemoteLoggerSettingsView(viewModel: .shared)
                 }
             }
         }
         .backport.navigationTitle("Settings")
+#if os(iOS)
         .navigationBarItems(leading: viewModel.onDismiss.map { Button(action: $0) { Image(systemName: "xmark") } })
+#endif
+#if os(tvOS)
+        .frame(maxWidth: 800)
+#endif
     }
 
-    @available(iOS 14.0, *)
+    @available(iOS 14.0, tvOS 14.0, *)
     private var sectionStoreDetails: some View {
         Section {
             NavigationLink(destination: StoreDetailsView(source: .store(viewModel.store))) {
@@ -49,6 +61,7 @@ public struct SettingsView: View {
                     Text("Store Info")
                 }
             }
+#if os(iOS)
             if !viewModel.isArchive {
                 Button(action: { isDocumentBrowserPresented = true }) {
                     HStack {
@@ -60,10 +73,24 @@ public struct SettingsView: View {
                     DocumentBrowser()
                 }
             }
+#endif
         }
     }
+
+#if os(watchOS)
+    private var sectionTransferStore: some View {
+        Button(action: viewModel.tranferStore) {
+            Label(viewModel.fileTransferStatus.title, systemImage: "square.and.arrow.up")
+        }
+        .disabled(viewModel.fileTransferStatus.isButtonDisabled)
+        .alert(item: $viewModel.fileTransferError) { error in
+            Alert(title: Text("Transfer Failed"), message: Text(error.message), dismissButton: .cancel(Text("Ok")))
+        }
+    }
+#endif
 }
 
+#if os(iOS)
 @available(iOS 14.0, *)
 private struct DocumentBrowser: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> DocumentBrowserViewController {
@@ -74,6 +101,7 @@ private struct DocumentBrowser: UIViewControllerRepresentable {
 
     }
 }
+#endif
 
 // MARK: - Preview
 

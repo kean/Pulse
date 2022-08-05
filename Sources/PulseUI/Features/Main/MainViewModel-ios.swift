@@ -7,20 +7,21 @@ import CoreData
 import PulseCore
 import Combine
 
-#if os(iOS) || os(tvOS)
+#if os(iOS) || os(tvOS) || os(watchOS)
 
 final class MainViewModel: ObservableObject {
     let items: [MainViewModelItem]
 
-    let consoleViewModel: ConsoleViewModel
-
-
-    let networkViewModel: NetworkViewModel
+    let console: ConsoleViewModel
+    let network: NetworkViewModel
 
 #if os(iOS)
-    let pinsViewModel: PinsViewModel
-    let insightsViewModel: NetworkInsightsViewModel
-    let settingsViewModel: SettingsViewModel
+    let pins: PinsViewModel
+    let insights: NetworkInsightsViewModel
+#endif
+
+#if os(iOS) || os(tvOS)
+    let settings: SettingsViewModel
 #endif
 
     let store: LoggerStore
@@ -30,20 +31,22 @@ final class MainViewModel: ObservableObject {
         self.configuration = configuration
         self.store = store
 
-        self.consoleViewModel = ConsoleViewModel(store: store, configuration: configuration)
-        self.consoleViewModel.onDismiss = onDismiss
+        self.console = ConsoleViewModel(store: store, configuration: configuration)
+        self.console.onDismiss = onDismiss
 
-        self.networkViewModel = NetworkViewModel(store: store)
-        self.networkViewModel.onDismiss = onDismiss
+        self.network = NetworkViewModel(store: store)
+        self.network.onDismiss = onDismiss
 
 #if os(iOS)
-        self.pinsViewModel = PinsViewModel(store: store)
-        self.pinsViewModel.onDismiss = onDismiss
+        self.pins = PinsViewModel(store: store)
+        self.pins.onDismiss = onDismiss
 
-        self.insightsViewModel = NetworkInsightsViewModel(store: store)
+        self.insights = NetworkInsightsViewModel(store: store)
+#endif
 
-        self.settingsViewModel = SettingsViewModel(store: store)
-        self.settingsViewModel.onDismiss = onDismiss
+#if os(iOS) || os(tvOS)
+        self.settings = SettingsViewModel(store: store)
+        self.settings.onDismiss = onDismiss
 #endif
 
 #if os(iOS)
@@ -97,24 +100,20 @@ extension MainViewModel {
     func makeView(for item: MainViewModelItem) -> some View {
         switch item {
         case .console:
-            ConsoleView(viewModel: consoleViewModel)
+            ConsoleView(viewModel: console)
         case .network:
-            NetworkView(viewModel: networkViewModel)
+            NetworkView(viewModel: network)
 #if !os(tvOS)
         case .pins:
-            PinsView(viewModel: pinsViewModel)
+            PinsView(viewModel: pins)
 #endif
 #if os(iOS)
         case .insights:
-            NetworkInsightsView(viewModel: insightsViewModel)
+            NetworkInsightsView(viewModel: insights)
 #endif
 #if os(iOS) || os(tvOS)
         case .settings:
-#if os(iOS)
-            SettingsView(viewModel: settingsViewModel)
-#else
-            SettingsView(viewModel: consoleViewModel)
-#endif
+            SettingsView(viewModel: settings)
 #endif
         default: fatalError()
         }

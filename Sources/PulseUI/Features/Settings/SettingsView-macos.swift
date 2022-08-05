@@ -13,19 +13,19 @@ public struct SettingsView: View {
     @ObservedObject var console: ConsoleViewModel
     @Environment(\.presentationMode) var presentationMode
     var store: LoggerStore { console.store }
-
+    
     @State private var isDocumentBrowserPresented = false
-
+    
     public init(store: LoggerStore = .shared) {
         self.viewModel = SettingsViewModel(store: store)
         self.console = ConsoleViewModel(store: store)
     }
-
+    
     init(viewModel: SettingsViewModel, console: ConsoleViewModel) {
         self.viewModel = viewModel
         self.console = console
     }
-
+    
     public var body: some View {
         VStack {
             List {
@@ -62,22 +62,6 @@ public struct SettingsView: View {
         }
         .listStyle(.sidebar)
         .frame(width: 260, height: 400)
-    }
-}
-
-// MARK: - Settings
-
-final class SettingsViewModel: ObservableObject {
-    private let store: LoggerStore
-
-    var onDismiss: (() -> Void)?
-
-    init(store: LoggerStore) {
-        self.store = store
-    }
-
-    var isArchive: Bool {
-        store.isArchive
     }
 }
 

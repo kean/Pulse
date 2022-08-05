@@ -5,8 +5,6 @@
 import SwiftUI
 import PulseCore
 
-#if os(iOS) || os(macOS)
-
 #if swift(>=5.7)
 import Charts
 #endif
@@ -48,8 +46,14 @@ struct LoggerStoreSizeChart: View {
             Category.free: .secondaryFill
         ])
         .chartPlotStyle { $0.cornerRadius(8) }
+#if os(tvOS)
+        .chartLegend(position: .bottom, spacing: -20)
+        .padding(.bottom, 4)
+        .frame(height: 90)
+#else
         .chartLegend(position: .bottom, spacing: -8)
         .frame(height: 50)
+#endif
     }
 
     private var data: [Series] {
@@ -81,8 +85,6 @@ struct LoggerStoreSizeChart_Previews: PreviewProvider {
             .previewLayout(.sizeThatFits)
     }
 }
-#endif
-
 #endif
 
 #endif

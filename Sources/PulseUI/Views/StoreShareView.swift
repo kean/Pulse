@@ -7,6 +7,8 @@ import CoreData
 import PulseCore
 import Combine
 
+#if os(iOS) || os(macOS)
+
 @available(iOS 14.0, tvOS 14.0, *)
 struct ShareStoreView: View {
     let store: LoggerStore
@@ -287,4 +289,6 @@ struct ShareStoreView_Previews: PreviewProvider {
 #endif
     }
 }
+#endif
+
 #endif
