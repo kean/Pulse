@@ -13,6 +13,8 @@ final class MainViewModel: ObservableObject {
     let items: [MainViewModelItem]
 
     let consoleViewModel: ConsoleViewModel
+
+
     let networkViewModel: NetworkViewModel
 
 #if os(iOS)
@@ -109,7 +111,7 @@ extension MainViewModel {
 #if os(iOS) || os(tvOS)
         case .settings:
 #if os(iOS)
-            SettingsView(viewModel: settingsViewModel, console: consoleViewModel)
+            SettingsView(viewModel: settingsViewModel)
 #else
             SettingsView(viewModel: consoleViewModel)
 #endif
