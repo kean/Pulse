@@ -801,13 +801,13 @@ extension LoggerStore {
     }
 
     private func reduceDatabaseSize() throws {
-        let attributes = try Files.attributesOfItem(atPath: databaseURL.path)
-        let size = attributes[.size] as? Int64 ?? 0
+        let size = try storeURL.directoryTotalSize()
 
-        guard size > configuration.databaseSizeLimit else {
+        guard size > configuration.sizeLimit else {
             return // All good, no need to perform any work.
         }
 
+        // First remove some old messages
         let messages = try backgroundContext.fetch(LoggerMessageEntity.self, sortedBy: \.createdAt, ascending: false)
         let count = messages.count
         guard count > 10 else { return } // Sanity check
@@ -833,14 +833,15 @@ extension LoggerStore {
     }
 
     private func reduceBlobStoreSize() throws {
-        var currentSize = try getBlobsSize(isCompressed: true)
-        guard currentSize > configuration.blobsSizeLimit else {
+        var currentSize = try storeURL.directoryTotalSize()
+
+        guard currentSize > configuration.blobSizeLimit else {
             return // All good, no need to remove anything
         }
         let requests = try backgroundContext.fetch(LoggerNetworkRequestEntity.self, sortedBy: \.createdAt) {
             $0.predicate = NSPredicate(format: "requestBody != NULL OR responseBody != NULL")
         }
-        let targetSize = Int(Double(configuration.blobsSizeLimit) * configuration.trimRatio)
+        let targetSize = Int(Double(configuration.blobSizeLimit) * configuration.trimRatio)
         func _unlink(_ blob: LoggerBlobHandleEntity) {
             unlink(blob)
             currentSize -= blob.size

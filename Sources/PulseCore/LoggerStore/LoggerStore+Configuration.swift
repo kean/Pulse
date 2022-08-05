@@ -39,15 +39,12 @@ extension LoggerStore {
 
     /// The store configuration.
     public struct Configuration: @unchecked Sendable {
-        /// Size limit in bytes. `128 Mb` by default. The limit is approximate.
-        ///
-        /// - important: This limit also applies to small network responses stored inline.
-        public var databaseSizeLimit: Int
+        /// Size limit in bytes. `256 MB` by default.
+        public var sizeLimit: Int64
 
-        /// Size limit in bytes. `256 Mb` by default.
-        public var blobsSizeLimit: Int
-
-        public var sizeLimit: Int64 { Int64(blobsSizeLimit) }
+        var blobSizeLimit: Int64 {
+            Int64(Double(sizeLimit) * 0.7)
+        }
 
         var trimRatio = 0.7
 
@@ -85,20 +82,13 @@ extension LoggerStore {
         /// is ignored completely.
         public var willHandleEvent: @Sendable (Event) -> Event? = { $0 }
 
-#warning("TODO: implement a single limit for messages and blobs")
-
         /// Initializes the configuration.
         ///
         /// - parameters:
-        ///   - databaseSizeLimit: The approximate limit of the database size.
-        ///   `128 Mb` by default. Please note that it stores small response
-        ///   blobs inline in a separate table, so it's not advised to set the
-        ///   size to be too small.
-        ///   - blobsSizeLimit: The approximate limit of the blob storage that
-        ///   contains network responses (HTTP body). `256 Mb` by default.
-        public init(databaseSizeLimit: Int = 128 * 1048576, blobsSizeLimit: Int = 256 * 1048576) {
-            self.databaseSizeLimit = databaseSizeLimit
-            self.blobsSizeLimit = blobsSizeLimit
+        ///   - sizeLimit: The approximate limit of the logger store, including
+        ///   both the database and the blobs. `256 Mb` by default.
+        public init(sizeLimit: Int64 = 256 * 1_000_000) {
+            self.sizeLimit = sizeLimit
         }
     }
 }
