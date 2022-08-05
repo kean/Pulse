@@ -29,6 +29,32 @@ extension NSManagedObjectContext {
     }
 }
 
+extension NSPersistentContainer {
+    static var inMemoryReadonlyContainer: NSPersistentContainer {
+        let container = NSPersistentContainer(name: "EmptyStore", managedObjectModel: LoggerStore.model)
+        let description = NSPersistentStoreDescription()
+        description.type = NSInMemoryStoreType
+        container.persistentStoreDescriptions = [description]
+        container.loadPersistentStores { _, _ in }
+        return container
+    }
+
+    func loadStore() throws {
+        var loadError: Swift.Error?
+        loadPersistentStores { description, error in
+            if let error = error {
+                debugPrint("Failed to load persistent store \(description) with error: \(error)")
+                loadError = error
+            }
+        }
+        if let error = loadError {
+            throw error
+        }
+        viewContext.automaticallyMergesChangesFromParent = true
+        viewContext.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
+    }
+}
+
 extension NSPersistentStoreCoordinator {
     func createCopyOfStore(at url: URL) throws {
         guard let sourceStore = persistentStores.first else {

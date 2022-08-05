@@ -162,9 +162,19 @@ public final class LoggerStore: @unchecked Sendable {
         }
 
         self.container = LoggerStore.makeContainer(databaseURL: databaseURL, isViewing: isArchive)
-        try LoggerStore.loadStore(container: container)
+        try container.loadStore()
+        self.backgroundContext = container.newBackgroundContext()
+        try postInitialization()
+    }
 
-        backgroundContext = LoggerStore.makeBackgroundContext(for: container)
+    // When migrating to a new version of the store, the most reliable and safest
+    // option is to remove the previous data which is acceptable for logs.
+    private static func removePreviousStore(at storeURL: URL) throws {
+        try Files.removeItem(at: storeURL)
+        try Files.createDirectory(at: storeURL, withIntermediateDirectories: true)
+    }
+
+    private func postInitialization() throws {
         backgroundContext.userInfo[WeakLoggerStore.loggerStoreKey] = WeakLoggerStore(store: self)
         viewContext.userInfo[Pins.pinServiceKey] = Pins(store: self)
         viewContext.userInfo[WeakLoggerStore.loggerStoreKey] = WeakLoggerStore(store: self)
@@ -179,25 +189,15 @@ public final class LoggerStore: @unchecked Sendable {
         }
     }
 
-    // When migrating to a new version of the store, the most reliable and safest
-    // option is to remove the previous data which is acceptable for logs.
-    private static func removePreviousStore(at storeURL: URL) throws {
-        try Files.removeItem(at: storeURL)
-        try Files.createDirectory(at: storeURL, withIntermediateDirectories: true)
-    }
-
+    /// This is a safe fallback for the initialization of the shared store.
     init(inMemoryStore storeURL: URL) {
         self.storeURL = storeURL
         self.blobsURL = storeURL.appending(directory: blobsDirectoryName)
         self.manifestURL = storeURL.appending(directory: manifestFilename)
         self.databaseURL = storeURL.appending(directory: databaseFilename)
         self.isArchive = true
-        self.container = NSPersistentContainer(name: "EmptyStore", managedObjectModel: Self.model)
-        let description = NSPersistentStoreDescription()
-        description.type = NSInMemoryStoreType
-        container.persistentStoreDescriptions = [description]
-        container.loadPersistentStores { _, _ in }
-        self.backgroundContext = LoggerStore.makeBackgroundContext(for: container)
+        self.container = .inMemoryReadonlyContainer
+        self.backgroundContext = container.newBackgroundContext()
         self.manifest = .init(storeId: UUID(), version: .currentStoreVersion)
         self.document = .package
         self.options = []
@@ -212,28 +212,6 @@ public final class LoggerStore: @unchecked Sendable {
         }
         container.persistentStoreDescriptions = [store]
         return container
-    }
-
-    private static func loadStore(container: NSPersistentContainer) throws {
-        var loadError: Swift.Error?
-        container.loadPersistentStores { description, error in
-            if let error = error {
-                debugPrint("Failed to load persistent store \(description) with error: \(error)")
-                loadError = error
-            }
-        }
-        if let error = loadError {
-            throw error
-        }
-        container.viewContext.automaticallyMergesChangesFromParent = true
-        container.viewContext.undoManager = nil
-        container.viewContext.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
-    }
-
-    private static func makeBackgroundContext(for container: NSPersistentContainer) -> NSManagedObjectContext {
-        let context = container.newBackgroundContext()
-        context.undoManager = nil
-        return context
     }
 }
 
@@ -308,6 +286,10 @@ extension LoggerStore {
         message.label = event.label
         message.session = event.session
         message.text = event.message
+        message.file = event.file
+        message.filename = (event.file as NSString).lastPathComponent
+        message.function = event.function
+        message.line = Int32(event.line)
         if let metadata = event.metadata, !metadata.isEmpty {
             message.metadata = Set(metadata.map { key, value in
                 let entity = LoggerMetadataEntity(context: backgroundContext)
@@ -316,51 +298,35 @@ extension LoggerStore {
                 return entity
             })
         }
-        message.file = event.file
-        message.filename = (event.file as NSString).lastPathComponent
-        message.function = event.function
-        message.line = Int32(event.line)
     }
 
     private func process(_ event: Event.NetworkTaskCreated) {
-        let request = findOrCreateNetworkRequestEntity(
-            forTaskId: event.taskId,
-            taskType: event.taskType,
-            createdAt: event.createdAt,
-            session: event.session
-        )
+        let request = findOrCreateNetworkRequestEntity(forTaskId: event.taskId, taskType: event.taskType, createdAt: event.createdAt, session: event.session)
 
         request.url = event.originalRequest.url?.absoluteString
         request.host = event.originalRequest.url?.host
         request.httpMethod = event.originalRequest.httpMethod
         request.requestState = LoggerNetworkRequestEntity.State.pending.rawValue
-
         request.details.originalRequest = try? JSONEncoder().encode(event.originalRequest)
         request.details.currentRequest = try? JSONEncoder().encode(event.currentRequest)
     }
 
     private func process(_ event: Event.NetworkTaskProgressUpdated) {
-        guard let request = findNetworkRequestEntity(forTaskId: event.taskId) else { return }
-
+        guard let request = forNetworkRequest(forTaskId: event.taskId) else {
+            return
+        }
         let progress = request.progress ?? {
             let progress = LoggerNetworkRequestProgressEntity(context: backgroundContext)
             request.progress = progress
             return progress
         }()
-
         progress.completedUnitCount = event.completedUnitCount
         progress.totalUnitCount = event.totalUnitCount
     }
 
     private func process(_ event: Event.NetworkTaskCompleted) {
-        let request = findOrCreateNetworkRequestEntity(
-            forTaskId: event.taskId,
-            taskType: event.taskType,
-            createdAt: event.createdAt,
-            session: event.session
-        )
+        let request = findOrCreateNetworkRequestEntity(forTaskId: event.taskId, taskType: event.taskType, createdAt: event.createdAt, session: event.session)
 
-        // Populate remaining request fields
         request.url = event.originalRequest.url?.absoluteString
         request.host = event.originalRequest.url?.host
         request.httpMethod = event.originalRequest.httpMethod
@@ -460,14 +426,14 @@ extension LoggerStore {
         ]
     }
 
-    private func findNetworkRequestEntity(forTaskId taskId: UUID) -> LoggerNetworkRequestEntity? {
+    private func forNetworkRequest(forTaskId taskId: UUID) -> LoggerNetworkRequestEntity? {
         try? backgroundContext.first(LoggerNetworkRequestEntity.self) {
             $0.predicate = NSPredicate(format: "taskId == %@", taskId as NSUUID)
         }
     }
 
     private func findOrCreateNetworkRequestEntity(forTaskId taskId: UUID, taskType: NetworkLogger.TaskType, createdAt: Date, session: String) -> LoggerNetworkRequestEntity {
-        if let entity = findNetworkRequestEntity(forTaskId: taskId) {
+        if let entity = forNetworkRequest(forTaskId: taskId) {
             return entity
         }
 
