@@ -186,7 +186,7 @@ private struct FailingRequestsListView: View {
 
 final class NetworkInsightsViewModel: ObservableObject {
     let insights: NetworkLoggerInsights
-    private var cancellables: [AnyCancellable] = []
+    private var cancellable: AnyCancellable?
 
     private let store: LoggerStore
 
@@ -230,11 +230,11 @@ final class NetworkInsightsViewModel: ObservableObject {
     init(store: LoggerStore, insights: NetworkLoggerInsights = .shared) {
         self.store = store
         self.insights = insights
-        insights.didUpdate.throttle(for: 1.0, scheduler: DispatchQueue.main, latest: true).sink { [weak self] in
+        cancellable = insights.didUpdate.throttle(for: 1.0, scheduler: DispatchQueue.main, latest: true).sink { [weak self] in
             withAnimation {
                 self?.objectWillChange.send()
             }
-        }.store(in: &cancellables)
+        }
     }
 
     // MARK: - Accessing Data

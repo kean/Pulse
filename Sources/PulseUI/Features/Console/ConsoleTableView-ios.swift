@@ -71,7 +71,7 @@ final class ConsoleTableViewController: UITableViewController {
     private let viewModel: ConsoleTableViewModel
     private var entities: [NSManagedObject] = []
     private var entityViewModels: [NSManagedObjectID: AnyObject] = [:]
-    private var cancellables: [AnyCancellable] = []
+    private var cancellable: AnyCancellable?
 
     var onSelected: ((NSManagedObject) -> Void)?
 
@@ -94,9 +94,9 @@ final class ConsoleTableViewController: UITableViewController {
     }
 
     private func bind(_ viewModel: ConsoleTableViewModel) {
-        viewModel.$entities.sink { [weak self] entities in
+        cancellable = viewModel.$entities.sink { [weak self] entities in
             self?.display(entities)
-        }.store(in: &cancellables)
+        }
     }
 
     private var isFirstDisplay = true
