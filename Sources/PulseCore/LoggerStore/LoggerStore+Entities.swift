@@ -7,17 +7,14 @@ import CoreData
 public final class LoggerMessageEntity: NSManagedObject {
     @NSManaged public var createdAt: Date
     @NSManaged public var isPinned: Bool
-    @NSManaged public var session: String
-    @NSManaged public var level: String
-    @NSManaged public var levelOrder: Int16
+    @NSManaged public var session: UUID
+    @NSManaged public var level: Int16
     @NSManaged public var label: String
     @NSManaged public var text: String
-    @NSManaged public var metadata: Set<LoggerMetadataEntity>
     @NSManaged public var file: String
-    @NSManaged public var filename: String
     @NSManaged public var function: String
-    @NSManaged public var line: Int32
-    @NSManaged public var requestState: Int16
+    @NSManaged public var line: Int32 // Doubles as request state storage to save space
+    @NSManaged public var metadata: Set<LoggerMetadataEntity>
     @NSManaged public var request: LoggerNetworkRequestEntity?
 }
 
@@ -30,9 +27,9 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
     // Primary
     @NSManaged public var createdAt: Date
     @NSManaged public var isPinned: Bool
-    @NSManaged public var session: String
-    @NSManaged public var taskId: UUID?
-    @NSManaged public var rawTaskType: String?
+    @NSManaged public var session: UUID
+    @NSManaged public var taskId: UUID
+    @NSManaged public var rawTaskType: Int16
     @NSManaged public var message: LoggerMessageEntity?
 
     // MARK: Request
@@ -110,7 +107,7 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
 
     /// Returns task type
     public var taskType: NetworkLogger.TaskType? {
-        rawTaskType.flatMap(NetworkLogger.TaskType.init)
+        NetworkLogger.TaskType(rawValue: rawTaskType)
     }
 
     public enum State: Int16 {
@@ -152,6 +149,9 @@ public final class LoggerBlobHandleEntity: NSManagedObject {
     /// A blob size.
     @NSManaged public var size: Int64
 
+    /// A compressed blob size.
+    @NSManaged public var compressedSize: Int64
+
     /// A number of requests referencing it.
     @NSManaged var linkCount: Int16
 
@@ -177,13 +177,10 @@ public final class LoggerBlobHandleEntity: NSManagedObject {
     /// that matches the name o the file in the `/blobs` directly in the store
     /// directory.
     public var data: Data? {
-        if let inlineData = self.inlineData?.data {
-            return inlineData
-        }
         guard let store = managedObjectContext?.userInfo[WeakLoggerStore.loggerStoreKey] as? WeakLoggerStore else {
             return nil // Should never happen unless the object was created outside of the LoggerStore moc
         }
-        return store.store?.getBlobData(forKey: key)
+        return store.store?.getDecompressedData(for: self)
     }
 }
 

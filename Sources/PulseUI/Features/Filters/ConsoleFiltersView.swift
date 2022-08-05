@@ -167,7 +167,6 @@ extension ConsoleFiltersView {
             makeLevelsSection(levels: [.warning, .error, .critical])
         }
         .padding(.bottom, 10)
-        .padding(.top, -12)
         .buttonStyle(.plain)
 
         Button(viewModel.bindingForTogglingAllLevels.wrappedValue ? "Disable All" : "Enable All", action: { viewModel.bindingForTogglingAllLevels.wrappedValue.toggle() })
@@ -194,7 +193,7 @@ extension ConsoleFiltersView {
         VStack(alignment: .leading) {
             Spacer()
             ForEach(levels, id: \.self) { level in
-                Toggle(level.rawValue.capitalized, isOn: viewModel.binding(forLevel: level))
+                Toggle(level.name.capitalized, isOn: viewModel.binding(forLevel: level))
                     .accentColor(tintColor(for: level))
             }
         }

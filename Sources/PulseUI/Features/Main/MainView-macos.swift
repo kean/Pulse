@@ -12,6 +12,8 @@ import Combine
 public struct MainView: View {
     @StateObject private var viewModel: MainViewModel
     @State private var isShowingSettings = false
+    @State private var isShowingShareSheet = false
+    @State private var shareItems: ShareItems?
 
     public init(store: LoggerStore = .shared) {
         _viewModel = StateObject(wrappedValue: MainViewModel(store: store))
@@ -24,6 +26,21 @@ public struct MainView: View {
                 ToolbarItemGroup(placement: .navigation) {
                     Button(action: { isShowingSettings = true }) {
                         Image(systemName: "gearshape")
+                    }
+                    Button(action: { isShowingShareSheet = true }) {
+                        Image(systemName: "square.and.arrow.up")
+                    }
+                    .popover(isPresented: $isShowingShareSheet, arrowEdge: .top) {
+                        ShareStoreView(store: viewModel.store, isPresented: $isShowingShareSheet) { item in
+                            isShowingShareSheet = false
+                            DispatchQueue.main.async {
+                                shareItems = item
+                            }
+                        }
+                    }
+                    .popover(item: $shareItems) { item in
+                        ShareView(item)
+                            .fixedSize()
                     }
                 }
                 ToolbarItemGroup(placement: .automatic) {

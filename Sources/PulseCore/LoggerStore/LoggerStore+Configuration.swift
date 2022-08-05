@@ -26,12 +26,14 @@ extension LoggerStore {
 
         /// Flushes entities to disk immediately and synchronously.
         ///
-        /// - warning: When this option is enabled, all writes to the store
-        /// happen immediately and synchronously.
+        /// - warning: This options is not recommended for general use. When it
+        /// is enabled, all writes to the store happen immediately and synchronously
+        /// as oppose to coalesed updates that significantly improve write efficiency.
         ///
-        /// - note: This option can be used to ensure that if the app crashes,
-        /// as much logs as possible are saved persistently. It can also be
-        /// used to increase remote logging speed.
+        /// - note: This option will not improve remote logging speed because
+        /// when the log events are registered in ``LoggerStore``, they are
+        /// immediately retransmitted to the remote logger before any entities
+        /// are even created.
         public static let synchronous = Options(rawValue: 1 << 2)
     }
 
@@ -45,10 +47,16 @@ extension LoggerStore {
         /// Size limit in bytes. `256 Mb` by default.
         public var blobsSizeLimit: Int
 
+        public var sizeLimit: Int64 { Int64(blobsSizeLimit) }
+
         var trimRatio = 0.7
 
         /// Every 20 minutes.
         var sweepInterval: TimeInterval = 1200
+
+        /// If enabled, all blobs will be stored in a compressed format and
+        /// decompressed on the fly, significantly reducing the space usage.
+        var isCompressionEnabled = true
 
         /// Determines how often the messages are saved to the database. By default,
         /// 100 milliseconds - quickly enough, but avoiding too many individual writes.
@@ -77,10 +85,15 @@ extension LoggerStore {
         /// is ignored completely.
         public var willHandleEvent: @Sendable (Event) -> Event? = { $0 }
 
+#warning("TODO: implement a single limit for messages and blobs")
+
         /// Initializes the configuration.
         ///
         /// - parameters:
-        ///   - databaseSizeLimit: The approximate limit of the database size. `128 Mb`
+        ///   - databaseSizeLimit: The approximate limit of the database size.
+        ///   `128 Mb` by default. Please note that it stores small response
+        ///   blobs inline in a separate table, so it's not advised to set the
+        ///   size to be too small.
         ///   - blobsSizeLimit: The approximate limit of the blob storage that
         ///   contains network responses (HTTP body). `256 Mb` by default.
         public init(databaseSizeLimit: Int = 128 * 1048576, blobsSizeLimit: Int = 256 * 1048576) {

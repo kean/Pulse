@@ -10,7 +10,7 @@ import Foundation
 extension LoggerNetworkRequestEntity {
     func cURLDescription() -> String {
         let details = DecodedNetworkRequestDetailsEntity(request: self)
-        guard let request = details.currentRequest, let url = request.url, let method = request.httpMethod else {
+        guard let request = details.currentRequest, let url = request.url, let method = request.method else {
             return "$ curl command generation failed"
         }
 
@@ -18,7 +18,7 @@ extension LoggerNetworkRequestEntity {
 
         components.append("-X \(method)")
 
-        for header in request.headers {
+        for header in request.headers ?? [:] {
             let escapedValue = header.value.replacingOccurrences(of: "\"", with: "\\\"")
             components.append("-H \"\(header.key): \(escapedValue)\"")
         }

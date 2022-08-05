@@ -18,12 +18,12 @@ extension LoggerStore {
             public var level: LoggerStore.Level
             public var message: String
             public var metadata: [String: String]?
-            public var session: String
+            public var session: UUID
             public var file: String
             public var function: String
             public var line: UInt
 
-            public init(createdAt: Date, label: String, level: LoggerStore.Level, message: String, metadata: [String: String]?, session: String, file: String, function: String, line: UInt) {
+            public init(createdAt: Date, label: String, level: LoggerStore.Level, message: String, metadata: [String: String]?, session: UUID, file: String, function: String, line: UInt) {
                 self.createdAt = createdAt
                 self.label = label
                 self.level = level
@@ -42,9 +42,9 @@ extension LoggerStore {
             public var createdAt: Date
             public var originalRequest: NetworkLogger.Request
             public var currentRequest: NetworkLogger.Request?
-            public var session: String
+            public var session: UUID
 
-            public init(taskId: UUID, taskType: NetworkLogger.TaskType, createdAt: Date, originalRequest: NetworkLogger.Request, currentRequest: NetworkLogger.Request?, session: String) {
+            public init(taskId: UUID, taskType: NetworkLogger.TaskType, createdAt: Date, originalRequest: NetworkLogger.Request, currentRequest: NetworkLogger.Request?, session: UUID) {
                 self.taskId = taskId
                 self.taskType = taskType
                 self.createdAt = createdAt
@@ -77,9 +77,9 @@ extension LoggerStore {
             public var requestBody: Data?
             public var responseBody: Data?
             public var metrics: NetworkLogger.Metrics?
-            public var session: String
+            public var session: UUID
 
-            public init(taskId: UUID, taskType: NetworkLogger.TaskType, createdAt: Date, originalRequest: NetworkLogger.Request, currentRequest: NetworkLogger.Request?, response: NetworkLogger.Response?, error: NetworkLogger.ResponseError?, requestBody: Data?, responseBody: Data?, metrics: NetworkLogger.Metrics?, session: String) {
+            public init(taskId: UUID, taskType: NetworkLogger.TaskType, createdAt: Date, originalRequest: NetworkLogger.Request, currentRequest: NetworkLogger.Request?, response: NetworkLogger.Response?, error: NetworkLogger.ResponseError?, requestBody: Data?, responseBody: Data?, metrics: NetworkLogger.Metrics?, session: UUID) {
                 self.taskId = taskId
                 self.taskType = taskType
                 self.createdAt = createdAt

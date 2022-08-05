@@ -21,11 +21,9 @@ extension LoggerStore {
         // MARK: Creation Dates
 
         /// The date the store was originally created.
-        public var createdDate: Date
+        public var creationDate: Date
         /// The date the store was last modified.
         public var modifiedDate: Date
-        /// The date when the current archive was created.
-        public var archivedDate: Date?
 
         // MARK: Usage Statistics
 
@@ -41,8 +39,11 @@ extension LoggerStore {
         /// The complete size of the store, including the database and all
         /// externally stored blobs.
         public var totalStoreSize: Int64
-        /// The size stored network response and requests bodies.
+        /// The size of stored network response and requests bodies.
         public var blobsSize: Int64
+        /// The size of compressed stored network response and requests bodies.
+        /// The blobs are compressed by default.
+        public var blobsCompressedSize: Int64
 
         // MARK: App and Device Info
 

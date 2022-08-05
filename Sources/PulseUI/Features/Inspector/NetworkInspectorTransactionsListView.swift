@@ -92,7 +92,7 @@ final class NetworkInspectorTransactionsListViewModel {
     init(metrics: NetworkLogger.Metrics) {
         self.items = metrics.transactions.map { transaction in
             let title: String
-            switch URLSessionTaskMetrics.ResourceFetchType(rawValue: transaction.resourceFetchType) ?? .unknown {
+            switch transaction.fetchType {
             case .networkLoad: title = "Network Load"
             case .localCache: title = "Cache Lookup"
             case .serverPush: title = "Server Push"
@@ -100,8 +100,8 @@ final class NetworkInspectorTransactionsListViewModel {
             default: title = "Unknown"
             }
             var details: String?
-            if let startDate = transaction.fetchStartDate {
-                let endDate = transaction.responseEndDate ?? metrics.taskInterval.end
+            if let startDate = transaction.timing.fetchStartDate {
+                let endDate = transaction.timing.responseEndDate ?? metrics.taskInterval.end
                 details = DurationFormatter.string(from: endDate.timeIntervalSince(startDate))
             }
             return Item(title: title, details: details, viewModel: {

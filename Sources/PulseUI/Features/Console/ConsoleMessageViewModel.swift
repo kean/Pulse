@@ -95,7 +95,7 @@ private extension BadgeViewModel {
     init?(level: LoggerStore.Level) {
         switch level {
         case .critical, .error, .warning, .info, .notice:
-            self.init(title: level.rawValue.uppercased(), color: .badgeColor(for: level))
+            self.init(title: level.name.uppercased(), color: .badgeColor(for: level))
         case .debug, .trace:
             return nil // Don't show
         }

@@ -167,10 +167,10 @@ extension NSImage {
 #endif
 
 extension URL {
-    func directoryTotalAllocatedSize() throws -> Int64 {
+    func directoryTotalSize() throws -> Int64 {
         guard let urls = Files.enumerator(at: self, includingPropertiesForKeys: nil)?.allObjects as? [URL] else { return 0 }
         return try urls.lazy.reduce(Int64(0)) {
-            let size = try $1.resourceValues(forKeys: [.totalFileAllocatedSizeKey]).totalFileAllocatedSize
+            let size = try $1.resourceValues(forKeys: [.fileSizeKey]).fileSize
             return Int64(size ?? 0) + $0
         }
     }
@@ -192,4 +192,18 @@ final class WeakLoggerStore {
 
     /// The key for `NSManagedObjectContext` `userInfo`.
     static let loggerStoreKey = "com.github.kean.pulse.associated-logger-store"
+}
+
+struct TemporaryDirectory {
+    let url: URL
+
+
+    init() {
+        url = URL.temp.appending(directory: UUID().uuidString)
+        try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
+    }
+
+    func remove() {
+        try? FileManager.default.removeItem(at: url)
+    }
 }

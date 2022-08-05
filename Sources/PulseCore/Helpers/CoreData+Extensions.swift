@@ -27,6 +27,15 @@ extension NSManagedObjectContext {
     func count<T: NSManagedObject>(for entity: T.Type) throws -> Int {
         try count(for: NSFetchRequest<T>(entityName: String(describing: entity)))
     }
+
+    func performAndReturn<T>(_ closure: () throws -> T) throws -> T {
+        var result: Result<T, Error>?
+        performAndWait {
+            result = Result { try closure() }
+        }
+        guard let result else { throw LoggerStore.Error.unknownError }
+        return try result.get()
+    }
 }
 
 extension NSPersistentContainer {
@@ -78,9 +87,9 @@ extension NSPersistentStoreCoordinator {
             // Disable write-ahead logging. Benefit: the entire store will be
             // contained in a single file. No need to handle -wal/-shm files.
             // https://developer.apple.com/library/content/qa/qa1809/_index.html
-            NSSQLitePragmasOption: ["journal_mode": "DELETE"],
+            NSSQLitePragmasOption: ["journal_mode": "OFF"],
             // Minimize file size
-            NSSQLiteManualVacuumOption: true
+            NSSQLiteManualVacuumOption: true,
         ]
 
         try backupCoordinator.migratePersistentStore(

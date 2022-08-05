@@ -37,13 +37,12 @@ struct ConsoleMessageMetadataView: View {
     private var stackContents: some View {
         KeyValueSectionView(viewModel: .init(title: "Summary", color: message.tintColor, items: [
             ("Date", dateFormatter.string(from: message.createdAt)),
-            ("Level", message.level),
+            ("Level", LoggerStore.Level(rawValue: message.level)?.name),
             ("Label", message.label.nonEmpty)
         ]))
         KeyValueSectionView(viewModel: .init(title: "Details", color: .secondary, items: [
-            ("Session", message.session.nonEmpty),
+            ("Session", message.session.uuidString.nonEmpty),
             ("File", message.file.nonEmpty),
-            ("Filename", message.filename.nonEmpty),
             ("Function", message.function.nonEmpty),
             ("Line", message.line == 0 ? nil : "\(message.line)"),
         ]))

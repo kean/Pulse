@@ -27,17 +27,13 @@ final class DecodedNetworkRequestDetailsEntity {
         currentRequest?.headers ?? originalRequest?.headers ?? [:]
     }
 
-    var requestContentType: NetworkLogger.ContentType? {
-        requestHeaders["Content-Type"].flatMap(NetworkLogger.ContentType.init)
-    }
-
     var decodingError: NetworkLogger.DecodingError? {
         error?.error as? NetworkLogger.DecodingError
     }
 
     var requestFileViewerContext: FileViewerViewModel.Context {
         FileViewerViewModel.Context(
-            contentType: requestContentType,
+            contentType: originalRequest?.contentType,
             originalSize: request.requestBodySize,
             metadata: metadata,
             isResponse: false,
@@ -47,7 +43,7 @@ final class DecodedNetworkRequestDetailsEntity {
 
     var responseFileViewerContext: FileViewerViewModel.Context {
         FileViewerViewModel.Context(
-            contentType: request.contentType.flatMap(NetworkLogger.ContentType.init),
+            contentType: response?.contentType,
             originalSize: request.responseBodySize,
             metadata: metadata,
             isResponse: true,

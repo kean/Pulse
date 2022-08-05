@@ -57,7 +57,7 @@ public final class NetworkLogger: @unchecked Sendable {
             createdAt: Date(),
             originalRequest: .init(originalRequest),
             currentRequest: task.currentRequest.map(Request.init),
-            session: LoggerStore.Session.current.id.uuidString
+            session: LoggerStore.Session.current.id
         )))
     }
 
@@ -130,7 +130,7 @@ public final class NetworkLogger: @unchecked Sendable {
             requestBody: originalRequest.httpBody ?? originalRequest.httpBodyStreamData(),
             responseBody: data,
             metrics: metrics,
-            session: LoggerStore.Session.current.id.uuidString
+            session: LoggerStore.Session.current.id
         )))
     }
 

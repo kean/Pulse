@@ -34,7 +34,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     private(set) var store: LoggerStore
     private let controller: NSFetchedResultsController<LoggerMessageEntity>
     private var isActive = false
-    private var latestSessionId: String?
+    private var latestSessionId: UUID?
     private var cancellables: [AnyCancellable] = []
 
     init(store: LoggerStore, configuration: ConsoleConfiguration = .default) {
@@ -110,7 +110,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         if latestSessionId == nil {
             latestSessionId = entities.first?.session
         }
-        let sessionId = store === LoggerStore.shared ? LoggerStore.Session.current.id.uuidString : latestSessionId
+        let sessionId = store === LoggerStore.shared ? LoggerStore.Session.current.id : latestSessionId
 
         // Search messages
         ConsoleSearchCriteria.update(request: controller.fetchRequest, filterTerm: filterTerm, criteria: searchCriteria.criteria, filters: searchCriteria.filters, sessionId: sessionId, isOnlyErrors: isOnlyErrors, isOnlyNetwork: isOnlyNetwork)

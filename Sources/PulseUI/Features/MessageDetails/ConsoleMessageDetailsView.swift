@@ -141,10 +141,9 @@ func makeMockMessage() -> LoggerMessageEntity {
     entity.text = "test"
     entity.createdAt = Date()
     entity.label = "auth"
-    entity.level = "critical"
-    entity.session = UUID().uuidString
-    entity.file = "~/Develop/Pulse/LoggerStore.swift"
-    entity.filename = "LoggerStore.swift"
+    entity.level = LoggerStore.Level.critical.rawValue
+    entity.session = UUID()
+    entity.file = "LoggerStore.swift"
     entity.function = "createMockMessage()"
     entity.line = 12
 

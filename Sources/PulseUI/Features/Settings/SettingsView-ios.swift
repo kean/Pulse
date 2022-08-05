@@ -26,18 +26,18 @@ public struct SettingsView: View {
 
     public var body: some View {
         Form {
-            if let details = viewModel.details {
-                Section {
-                    NavigationLink(destination: StoreDetailsView(viewModel: details)) {
-                        HStack {
-                            Image(systemName: "info.circle")
-                                .foregroundColor(Color.primary)
-                            Text("Store Info")
-                                .foregroundColor(Color.primary)
-                        }
-                    }
-                }
-            }
+//            if let details = viewModel.details {
+//                Section {
+//                    NavigationLink(destination: StoreDetailsView(viewModel: details)) {
+//                        HStack {
+//                            Image(systemName: "info.circle")
+//                                .foregroundColor(Color.primary)
+//                            Text("Store Info")
+//                                .foregroundColor(Color.primary)
+//                        }
+//                    }
+//                }
+//            }
 
             if !viewModel.isArchive {
                 Section {
@@ -101,10 +101,10 @@ final class SettingsViewModel: ObservableObject {
     }
 
     #warning("TODO: rework")
-    var details: StoreDetailsViewModel? {
-        nil
-//        store.info.map { StoreDetailsViewModel(storeURL: store.storeURL, info: $0) }
-    }
+//    var details: StoreDetailsViewModel? {
+//        nil
+////        store.info.map { StoreDetailsViewModel(storeURL: store.storeURL, info: $0) }
+//    }
 }
 
 // MARK: - Preview

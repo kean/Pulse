@@ -11,7 +11,7 @@ extension KeyValueSectionViewModel {
         var items: [(String, String?)] = []
         items += [
             ("URL", request.url?.absoluteString),
-            ("Method", request.httpMethod)
+            ("Method", request.method)
         ]
         if let host = components?.host {
             items.append(("Host", host))
@@ -28,13 +28,13 @@ extension KeyValueSectionViewModel {
 
     static func makeParameters(for request: NetworkLogger.Request) -> KeyValueSectionViewModel {
         KeyValueSectionViewModel(title: "Request Parameters", color: .gray, items: [
-            ("Cache Policy", URLRequest.CachePolicy(rawValue: request.cachePolicy).map { $0.description }),
-            ("Timeout Interval", DurationFormatter.string(from: request.timeoutInterval, isPrecise: false)),
-            ("Allows Cellular Access", request.allowsCellularAccess.description),
-            ("Allows Expensive Network Access", request.allowsExpensiveNetworkAccess.description),
-            ("Allows Constrained Network Access", request.allowsConstrainedNetworkAccess.description),
-            ("HTTP Should Handle Cookies", request.httpShouldHandleCookies.description),
-            ("HTTP Should Use Pipelining", request.httpShouldUsePipelining.description)
+            ("Cache Policy", request.cachePolicy.description),
+            ("Timeout Interval", DurationFormatter.string(from: request.timeout, isPrecise: false)),
+            ("Allows Cellular Access", request.options.contains(.allowsCellularAccess).description),
+            ("Allows Expensive Network Access", request.options.contains(.allowsExpensiveNetworkAccess).description),
+            ("Allows Constrained Network Access", request.options.contains(.allowsConstrainedNetworkAccess).description),
+            ("HTTP Should Handle Cookies", request.options.contains(.httpShouldHandleCookies).description),
+            ("HTTP Should Use Pipelining", request.options.contains(.httpShouldUsePipelining).description)
         ])
     }
 
@@ -50,7 +50,7 @@ extension KeyValueSectionViewModel {
     static func makeSummary(for response: NetworkLogger.Response) -> KeyValueSectionViewModel {
         KeyValueSectionViewModel(title: "Response Summary", color: .indigo, items: [
             ("Status Code", response.statusCode.map { String($0) }),
-            ("Content Type", response.contentType),
+            ("Content Type", response.contentType?.rawValue),
             ("Expected Content Length", response.expectedContentLength.map { ByteCountFormatter.string(fromByteCount: max(0, $0), countStyle: .file) })
         ])
     }
@@ -127,17 +127,19 @@ extension KeyValueSectionViewModel {
             }
             items.append((title, value))
         }
-        addDate(transaction.fetchStartDate, title: "Fetch Start")
-        addDate(transaction.domainLookupStartDate, title: "Domain Lookup Start")
-        addDate(transaction.domainLookupEndDate, title: "Domain Lookup End")
-        addDate(transaction.connectStartDate, title: "Connect Start")
-        addDate(transaction.secureConnectionStartDate, title: "Secure Connect Start")
-        addDate(transaction.secureConnectionEndDate, title: "Secure Connect End")
-        addDate(transaction.connectEndDate, title: "Connect End")
-        addDate(transaction.requestStartDate, title: "Request Start")
-        addDate(transaction.requestEndDate, title: "Request End")
-        addDate(transaction.responseStartDate, title: "Response Start")
-        addDate(transaction.responseEndDate, title: "Response End")
+        let timing = transaction.timing
+        #warning("TODO: show duration instead and offset")
+        addDate(timing.fetchStartDate, title: "Fetch Start")
+        addDate(timing.domainLookupStartDate, title: "Domain Lookup Start")
+        addDate(timing.domainLookupEndDate, title: "Domain Lookup End")
+        addDate(timing.connectStartDate, title: "Connect Start")
+        addDate(timing.secureConnectionStartDate, title: "Secure Connect Start")
+        addDate(timing.secureConnectionEndDate, title: "Secure Connect End")
+        addDate(timing.connectEndDate, title: "Connect End")
+        addDate(timing.requestStartDate, title: "Request Start")
+        addDate(timing.requestEndDate, title: "Request End")
+        addDate(timing.responseStartDate, title: "Response Start")
+        addDate(timing.responseEndDate, title: "Response End")
 
         return KeyValueSectionViewModel(title: "Timing", color: .orange, items: items)
     }

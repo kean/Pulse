@@ -125,7 +125,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
         guard request.requestBodySize > 0 else {
             return KeyValueSectionViewModel(title: "Request Body", color: .blue)
         }
-        let contentType = details.originalRequest?.headers.first(where: { $0.key == "Content-Type" })?.value ?? "–"
+        let contentType = details.originalRequest?.headers?.first(where: { $0.key == "Content-Type" })?.value ?? "–"
         return KeyValueSectionViewModel(
             title: "Request Body",
             color: .blue,
@@ -170,7 +170,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
         guard request.requestBodySize > 0 else {
             return KeyValueSectionViewModel(title: "Request Body", color: .blue)
         }
-        let contentType = details.currentRequest?.headers.first(where: { $0.key == "Content-Type" })?.value ?? "–"
+        let contentType = details.currentRequest?.headers?.first(where: { $0.key == "Content-Type" })?.value ?? "–"
         return KeyValueSectionViewModel(
             title: "Request Body",
             color: .blue,
@@ -206,7 +206,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
         guard request.responseBodySize > 0 else {
             return KeyValueSectionViewModel(title: "Response Body", color: .indigo)
         }
-        let contentType = details.response?.headers.first(where: { $0.key == "Content-Type" })?.value ?? "–"
+        let contentType = details.response?.headers?.first(where: { $0.key == "Content-Type" })?.value ?? "–"
         let size = ByteCountFormatter.string(fromByteCount: request.responseBodySize, countStyle: .file)
         return KeyValueSectionViewModel(
             title: "Response Body",

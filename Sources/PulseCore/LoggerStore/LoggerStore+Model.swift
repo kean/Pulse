@@ -20,17 +20,14 @@ extension LoggerStore {
         message.properties = [
             NSAttributeDescription(name: "createdAt", type: .dateAttributeType),
             NSAttributeDescription(name: "isPinned", type: .booleanAttributeType),
-            NSAttributeDescription(name: "session", type: .stringAttributeType),
-            NSAttributeDescription(name: "level", type: .stringAttributeType),
-            NSAttributeDescription(name: "levelOrder", type: .integer16AttributeType),
+            NSAttributeDescription(name: "session", type: .UUIDAttributeType),
+            NSAttributeDescription(name: "level", type: .integer16AttributeType),
             NSAttributeDescription(name: "label", type: .stringAttributeType),
             NSAttributeDescription(name: "text", type: .stringAttributeType),
             NSRelationshipDescription.make(name: "metadata", type: .oneToMany, entity: metadata),
             NSAttributeDescription(name: "file", type: .stringAttributeType),
-            NSAttributeDescription(name: "filename", type: .stringAttributeType),
             NSAttributeDescription(name: "function", type: .stringAttributeType),
             NSAttributeDescription(name: "line", type: .integer32AttributeType),
-            NSAttributeDescription(name: "requestState", type: .integer16AttributeType),
             NSRelationshipDescription.make(name: "request", type: .oneToOne(isOptional: true), entity: request)
         ]
 
@@ -42,9 +39,9 @@ extension LoggerStore {
         request.properties = [
             NSAttributeDescription(name: "createdAt", type: .dateAttributeType),
             NSAttributeDescription(name: "isPinned", type: .booleanAttributeType),
-            NSAttributeDescription(name: "session", type: .stringAttributeType),
+            NSAttributeDescription(name: "session", type: .UUIDAttributeType),
             NSAttributeDescription(name: "taskId", type: .UUIDAttributeType),
-            NSAttributeDescription(name: "rawTaskType", type: .stringAttributeType),
+            NSAttributeDescription(name: "rawTaskType", type: .integer16AttributeType),
             NSAttributeDescription(name: "url", type: .stringAttributeType),
             NSAttributeDescription(name: "host", type: .stringAttributeType),
             NSAttributeDescription(name: "httpMethod", type: .stringAttributeType),
@@ -83,6 +80,7 @@ extension LoggerStore {
         blob.properties = [
             NSAttributeDescription(name: "key", type: .stringAttributeType),
             NSAttributeDescription(name: "size", type: .integer64AttributeType),
+            NSAttributeDescription(name: "compressedSize", type: .integer64AttributeType),
             NSAttributeDescription(name: "linkCount", type: .integer16AttributeType),
             NSRelationshipDescription.make(name: "inlineData", type: .oneToOne(isOptional: true), entity: inlinedData)
         ]

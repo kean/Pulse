@@ -23,6 +23,7 @@ struct ShareItems: Identifiable {
     }
 }
 
+#warning("TODO: remove")
 extension ShareItems {
     init(store: LoggerStore, output: ShareStoreOutput) {
         let directory = TemporaryDirectory()
@@ -145,6 +146,6 @@ extension TemporaryDirectory {
 func makeCurrentDate() -> String {
     let formatter = DateFormatter()
     formatter.locale = Locale(identifier: "en_US")
-    formatter.dateFormat = "yyyy-MM-dd_HH-mm"
+    formatter.dateFormat = "yyyy-MM-dd-HH-mm"
     return formatter.string(from: Date())
 }

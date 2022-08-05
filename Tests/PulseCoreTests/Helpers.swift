@@ -14,23 +14,24 @@ extension LoggerStore {
             try? coordinator.remove(store)
         }
     }
-
-    func destroy() {
-        let coordinator = container.persistentStoreCoordinator
-        for store in coordinator.persistentStores {
-            try? coordinator.destroyPersistentStore(at: store.url!, ofType: NSSQLiteStoreType, options: [:])
-        }
-    }
 }
 
 struct TemporaryDirectory {
     let url: URL
 
+    static var isFirstRun = true
+
     init() {
-        url = FileManager.default.temporaryDirectory
+        let rootTempURL = Files.temporaryDirectory
             .appending(directory: "com.github.kean.logger-testing")
-            .appending(directory: UUID().uuidString)
-        try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
+
+        if TemporaryDirectory.isFirstRun {
+            TemporaryDirectory.isFirstRun = false
+            try? Files.removeItem(at: rootTempURL)
+        }
+
+        url = rootTempURL.appending(directory: UUID().uuidString)
+        try? Files.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
     }
 
     func remove() {

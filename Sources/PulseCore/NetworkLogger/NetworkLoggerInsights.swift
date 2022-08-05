@@ -56,7 +56,7 @@ public final class NetworkLoggerInsights: @unchecked Sendable {
             contents.redirects.taskIds.append(event.taskId)
             contents.redirects.timeLost += metrics.transactions
                 .filter({ $0.response?.statusCode == 302 })
-                .map { $0.duration ?? 0 }
+                .map { $0.timing.duration ?? 0 }
                 .reduce(0, +)
         }
 

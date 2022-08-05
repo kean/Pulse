@@ -16,6 +16,7 @@
 
 - ``storeURL``
 - ``isArchive``
+- ``configuration-swift.property``
 
 ### Storing Logs
 
@@ -27,11 +28,12 @@
 - ``allMessages()``
 - ``allRequests()``
 - ``getBlobData(forKey:)``
+
+### Managing the Store
+
 - ``removeAll()``
-
-### Sharing the Store
-
 - ``copy(to:)``
+- ``destroy()``
 
 ### Getting Store Info
 
@@ -61,7 +63,6 @@
 - ``MetadataValue``
 - ``Error``
 - ``Session``
-
 
 ### Deprecated
 

@@ -13,10 +13,10 @@ extension TimingViewModel {
     }
 
     convenience init?(transaction: NetworkLogger.TransactionMetrics, metrics: NetworkLogger.Metrics) {
-        guard let startDate = transaction.fetchStartDate else {
+        guard let startDate = transaction.timing.fetchStartDate else {
             return nil
         }
-        let endDate = transaction.responseEndDate ?? metrics.taskInterval.end
+        let endDate = transaction.timing.responseEndDate ?? metrics.taskInterval.end
         guard endDate > startDate else {
             return nil
         }
@@ -73,14 +73,12 @@ private func makeTimingRows(transaction: NetworkLogger.TransactionMetrics, taskI
         _makeRow(title: title, color: color, from: from, to: to, taskInterval: taskInterval)
     }
 
-    guard let fetchType = URLSessionTaskMetrics.ResourceFetchType(rawValue: transaction.resourceFetchType) else {
-        return []
-    }
+    let timing = transaction.timing
 
-    switch fetchType {
+    switch transaction.fetchType {
     case .localCache:
-        if let requestStartDate = transaction.requestStartDate,
-           let responseEndDate = transaction.responseEndDate {
+        if let requestStartDate = timing.requestStartDate,
+           let responseEndDate = timing.responseEndDate {
             let section = TimingRowSectionViewModel(
                 title: "Local Cache",
                 items: [
@@ -93,39 +91,39 @@ private func makeTimingRows(transaction: NetworkLogger.TransactionMetrics, taskI
         var connection: [TimingRowViewModel] = []
         var response: [TimingRowViewModel] = []
 
-        let earliestEventDate = transaction.domainLookupStartDate ?? transaction.connectStartDate ?? transaction.requestStartDate
+        let earliestEventDate = timing.domainLookupStartDate ?? timing.connectStartDate ?? timing.requestStartDate
 
         // Scheduling Section
 
-        if let fetchStartDate = transaction.fetchStartDate, let endDate = earliestEventDate,
+        if let fetchStartDate = timing.fetchStartDate, let endDate = earliestEventDate,
            endDate.timeIntervalSince(fetchStartDate) > 0.001  {
             scheduling.append(makeRow(title: "Queued", color: .systemGray4, from: fetchStartDate, to: endDate))
         }
 
         // Connection Section
 
-        if let domainLookupStartDate = transaction.domainLookupStartDate {
-            connection.append(makeRow(title: "DNS", color: .systemPurple, from: domainLookupStartDate, to: transaction.domainLookupEndDate))
+        if let domainLookupStartDate = timing.domainLookupStartDate {
+            connection.append(makeRow(title: "DNS", color: .systemPurple, from: domainLookupStartDate, to: timing.domainLookupEndDate))
         }
-        if let connectStartDate = transaction.connectStartDate {
-            connection.append(makeRow(title: "TCP", color: .systemYellow, from: connectStartDate, to: transaction.connectEndDate))
+        if let connectStartDate = timing.connectStartDate {
+            connection.append(makeRow(title: "TCP", color: .systemYellow, from: connectStartDate, to: timing.connectEndDate))
         }
-        if let secureConnectionStartDate = transaction.secureConnectionStartDate {
-            connection.append(makeRow(title: "Secure", color: .systemRed, from: secureConnectionStartDate, to: transaction.secureConnectionEndDate))
+        if let secureConnectionStartDate = timing.secureConnectionStartDate {
+            connection.append(makeRow(title: "Secure", color: .systemRed, from: secureConnectionStartDate, to: timing.secureConnectionEndDate))
         }
 
         // Response Section
 
-        let latestPreviousEndDate = transaction.requestEndDate ?? transaction.connectEndDate ?? transaction.domainLookupEndDate ?? transaction.fetchStartDate
+        let latestPreviousEndDate = timing.requestEndDate ?? timing.connectEndDate ?? timing.domainLookupEndDate ?? timing.fetchStartDate
 
-        if let requestStartDate = transaction.requestStartDate, let requestEndDate = transaction.requestEndDate {
+        if let requestStartDate = timing.requestStartDate, let requestEndDate = timing.requestEndDate {
             response.append(makeRow(title: "Request", color: .systemGreen, from: requestStartDate, to: requestEndDate))
         }
-        if let requestEndDate = latestPreviousEndDate, let responseStartDate = transaction.responseStartDate {
+        if let requestEndDate = latestPreviousEndDate, let responseStartDate = timing.responseStartDate {
             response.append(makeRow(title: "Waiting", color: .systemGray3, from: requestEndDate, to: responseStartDate))
         }
-        if let responseStartDate = transaction.responseStartDate {
-            response.append(makeRow(title: "Download", color: .systemBlue, from: responseStartDate, to: transaction.responseEndDate))
+        if let responseStartDate = timing.responseStartDate {
+            response.append(makeRow(title: "Download", color: .systemBlue, from: responseStartDate, to: timing.responseEndDate))
         }
 
         // Commit sections

@@ -48,20 +48,18 @@ private func makeTransferSection(for metrics: NetworkLogger.TransactionMetrics) 
 }
 
 private func makeProtocolSection(for metrics: NetworkLogger.TransactionMetrics) -> KeyValueSectionViewModel? {
-    let details = metrics.details
-    return KeyValueSectionViewModel(title: "Protocol", color: .secondary, items: [
-        ("Network Protocol", metrics.networkProtocolName),
-        ("Remote Address", details.remoteAddress),
-        ("Remote Port", details.remotePort.map(String.init)),
-        ("Local Address", details.localAddress),
-        ("Local Port", details.localPort.map(String.init))
+    KeyValueSectionViewModel(title: "Protocol", color: .secondary, items: [
+        ("Network Protocol", metrics.networkProtocol),
+        ("Remote Address", metrics.remoteAddress),
+        ("Remote Port", metrics.remotePort.map(String.init)),
+        ("Local Address", metrics.localAddress),
+        ("Local Port", metrics.localPort.map(String.init))
     ])
 }
 
 private func makeSecuritySection(for metrics: NetworkLogger.TransactionMetrics) -> KeyValueSectionViewModel? {
-    let metrics = metrics.details
-    guard let suite = metrics.negotiatedTLSCipherSuite.flatMap(tls_ciphersuite_t.init(rawValue:)),
-          let version = metrics.negotiatedTLSProtocolVersion.flatMap(tls_protocol_version_t.init(rawValue:)) else {
+    guard let suite = metrics.negotiatedTLSCipherSuite,
+          let version = metrics.negotiatedTLSProtocolVersion else {
         return nil
     }
     return KeyValueSectionViewModel(title: "Security", color: .secondary, items: [
@@ -71,14 +69,13 @@ private func makeSecuritySection(for metrics: NetworkLogger.TransactionMetrics) 
 }
 
 private func makeMiscSection(for metrics: NetworkLogger.TransactionMetrics) -> KeyValueSectionViewModel? {
-    let details = metrics.details
-    return KeyValueSectionViewModel(title: "Characteristics", color: .secondary, items: [
-        ("Cellular", details.isCellular.description),
-        ("Expensive", details.isExpensive.description),
-        ("Constrained", details.isConstrained.description),
-        ("Proxy Connection", metrics.isProxyConnection.description),
-        ("Reused Connection", metrics.isReusedConnection.description),
-        ("Multipath", details.isMultipath.description)
+    KeyValueSectionViewModel(title: "Characteristics", color: .secondary, items: [
+        ("Cellular", metrics.conditions.contains(.isCellular).description),
+        ("Expensive", metrics.conditions.contains(.isExpensive).description),
+        ("Constrained", metrics.conditions.contains(.isConstrained).description),
+        ("Proxy Connection", metrics.conditions.contains(.isProxyConnection).description),
+        ("Reused Connection", metrics.conditions.contains(.isReusedConnection).description),
+        ("Multipath", metrics.conditions.contains(.isMultipath).description)
     ])
 }
 

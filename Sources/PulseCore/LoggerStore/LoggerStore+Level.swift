@@ -11,8 +11,8 @@ extension LoggerStore {
     public typealias Metadata = [String: MetadataValue]
 
     // Compatible with SwiftLog.Logger.Level
-    @frozen public enum Level: String, CaseIterable, Codable, Hashable, Sendable {
-        case trace
+    public enum Level: Int16, CaseIterable, Codable, Hashable, Sendable {
+        case trace = 1
         case debug
         case info
         case notice
@@ -20,15 +20,15 @@ extension LoggerStore {
         case error
         case critical
 
-        var order: Int16 {
+        public var name: String {
             switch self {
-            case .trace: return 0
-            case .debug: return 1
-            case .info: return 2
-            case .notice: return 3
-            case .warning: return 4
-            case .error: return 5
-            case .critical: return 6
+            case .trace: return "trace"
+            case .debug: return "debug"
+            case .info: return "info"
+            case .notice: return "notice"
+            case .warning: return "warning"
+            case .error: return "error"
+            case .critical: return "critical"
             }
         }
     }

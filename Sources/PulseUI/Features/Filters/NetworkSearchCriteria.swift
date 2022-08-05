@@ -372,15 +372,15 @@ func evaluateProgrammaticFilters(_ filters: [NetworkSearchFilter], entity: Logge
 private let isNetworkMessagePredicate = NSPredicate(format: "request != nil")
 
 extension NetworkSearchCriteria {
-    static func update(request: NSFetchRequest<LoggerNetworkRequestEntity>, filterTerm: String, criteria: NetworkSearchCriteria, filters: [NetworkSearchFilter], isOnlyErrors: Bool, sessionId: String?) {
+    static func update(request: NSFetchRequest<LoggerNetworkRequestEntity>, filterTerm: String, criteria: NetworkSearchCriteria, filters: [NetworkSearchFilter], isOnlyErrors: Bool, sessionId: UUID?) {
         var predicates = [NSPredicate]()
 
         if isOnlyErrors {
             predicates.append(NSPredicate(format: "requestState == %d", LoggerNetworkRequestEntity.State.failure.rawValue))
         }
 
-        if criteria.dates.isCurrentSessionOnly, let sessionId = sessionId, !sessionId.isEmpty {
-            predicates.append(NSPredicate(format: "session == %@", sessionId))
+        if criteria.dates.isCurrentSessionOnly, let sessionId = sessionId {
+            predicates.append(NSPredicate(format: "session == %@", sessionId as NSUUID))
         }
 
         if criteria.dates.isEnabled {
@@ -435,7 +435,7 @@ extension NetworkSearchCriteria {
                 predicates.append(NSPredicate(format: "isFromCache == YES"))
             }
             if case .some(let taskType) = criteria.networking.taskType {
-                predicates.append(NSPredicate(format: "rawTaskType == %@", taskType.rawValue))
+                predicates.append(NSPredicate(format: "rawTaskType == %i", taskType.rawValue))
             }
         }
 

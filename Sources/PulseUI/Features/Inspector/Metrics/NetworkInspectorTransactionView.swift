@@ -87,7 +87,7 @@ final class NetworkInspectorTransactionViewModel: ObservableObject {
     lazy var requestParameters = KeyValueSectionViewModel.makeParameters(for: transaction.request)
 
     lazy var requestHeaders = KeyValueSectionViewModel.makeRequestHeaders(
-        for: transaction.request.headers,
+        for: transaction.request.headers ?? [:],
         action: { [unowned self] in self.isOriginalRequestHeadersLinkActive = true }
     )
 

@@ -208,7 +208,7 @@ extension ConsoleSearchCriteria {
         filterTerm: String,
         criteria: ConsoleSearchCriteria,
         filters: [ConsoleSearchFilter],
-        sessionId: String?,
+        sessionId: UUID?,
         isOnlyErrors: Bool,
         isOnlyNetwork: Bool
     ) {
@@ -218,8 +218,8 @@ extension ConsoleSearchCriteria {
             predicates.append(NSPredicate(format: "request != nil"))
         }
 
-        if criteria.dates.isCurrentSessionOnly, let sessionId = sessionId, !sessionId.isEmpty {
-            predicates.append(NSPredicate(format: "session == %@", sessionId))
+        if criteria.dates.isCurrentSessionOnly, let sessionId = sessionId {
+            predicates.append(NSPredicate(format: "session == %@", sessionId as NSUUID))
         }
 
         if criteria.dates.isEnabled {

@@ -7,34 +7,50 @@ import Foundation
 extension NetworkLogger {
     public struct Request: Codable, Sendable {
         public var url: URL?
-        public var httpMethod: String?
-        public var headers: [String: String]
-        /// `URLRequest.CachePolicy` raw value
-        public var cachePolicy: UInt
-        public var timeoutInterval: TimeInterval
-        public var allowsCellularAccess: Bool
-        public var allowsExpensiveNetworkAccess: Bool
-        public var allowsConstrainedNetworkAccess: Bool
-        public var httpShouldHandleCookies: Bool
-        public var httpShouldUsePipelining: Bool
+        public var method: String?
+        public var headers: [String: String]?
+        public var cachePolicy: URLRequest.CachePolicy {
+            policy.flatMap(URLRequest.CachePolicy.init) ?? .useProtocolCachePolicy
+        }
+        public var timeout: TimeInterval
+        public var options: Options
+
+        public var contentType: ContentType? {
+            headers?["Content-Type"].flatMap(ContentType.init)
+        }
+
+        // Skip encoding when it is set to a default value which is very likely
+        private var policy: UInt?
+
+        public struct Options: OptionSet, Codable, Sendable {
+            public let rawValue: Int8
+            public init(rawValue: Int8) { self.rawValue = rawValue }
+
+            public static let allowsCellularAccess = Options(rawValue: 1 << 0)
+            public static let allowsExpensiveNetworkAccess = Options(rawValue: 1 << 1)
+            public static let allowsConstrainedNetworkAccess = Options(rawValue: 1 << 2)
+            public static let httpShouldHandleCookies = Options(rawValue: 1 << 3)
+            public static let httpShouldUsePipelining = Options(rawValue: 1 << 4)
+        }
 
         public init(_ urlRequest: URLRequest) {
             self.url = urlRequest.url
-            self.httpMethod = urlRequest.httpMethod
-            self.headers = urlRequest.allHTTPHeaderFields ?? [:]
-            self.cachePolicy = urlRequest.cachePolicy.rawValue
-            self.timeoutInterval = urlRequest.timeoutInterval
-            self.allowsCellularAccess = urlRequest.allowsCellularAccess
-            self.allowsExpensiveNetworkAccess = urlRequest.allowsExpensiveNetworkAccess
-            self.allowsConstrainedNetworkAccess = urlRequest.allowsConstrainedNetworkAccess
-            self.httpShouldHandleCookies = urlRequest.httpShouldHandleCookies
-            self.httpShouldUsePipelining = urlRequest.httpShouldUsePipelining
+            self.method = urlRequest.httpMethod
+            self.headers = urlRequest.allHTTPHeaderFields
+            self.policy = urlRequest.cachePolicy == .useProtocolCachePolicy ? nil : urlRequest.cachePolicy.rawValue
+            self.timeout = urlRequest.timeoutInterval
+            self.options = []
+            if urlRequest.allowsCellularAccess { options.insert(.allowsCellularAccess) }
+            if urlRequest.allowsExpensiveNetworkAccess { options.insert(.allowsExpensiveNetworkAccess) }
+            if urlRequest.allowsConstrainedNetworkAccess { options.insert(.allowsConstrainedNetworkAccess) }
+            if urlRequest.httpShouldHandleCookies { options.insert(.httpShouldHandleCookies) }
+            if urlRequest.httpShouldUsePipelining { options.insert(.httpShouldUsePipelining) }
         }
 
         /// Redacts values for the provided headers.
         public func redactingSensitiveHeaders(_ redactedHeaders: Set<String>) -> Request {
             var copy = self
-            copy.headers = _redactingSensitiveHeaders(redactedHeaders, from: self.headers)
+            copy.headers = _redactingSensitiveHeaders(redactedHeaders, from: headers)
             return copy
         }
     }
@@ -42,23 +58,26 @@ extension NetworkLogger {
     public struct Response: Codable, Sendable {
         public var url: String?
         public var statusCode: Int?
-        public var contentType: String?
-        public var expectedContentLength: Int64?
-        public var headers: [String: String]
+        public var headers: [String: String]?
+
+        public var contentType: ContentType? {
+            headers?["Content-Type"].flatMap(ContentType.init)
+        }
+        public var expectedContentLength: Int64? {
+            headers?["Content-Length"].flatMap { Int64($0) }
+        }
 
         public init(_ urlResponse: URLResponse) {
             let httpResponse = urlResponse as? HTTPURLResponse
             self.url = urlResponse.url?.absoluteString
             self.statusCode = httpResponse?.statusCode
-            self.contentType = urlResponse.mimeType
-            self.expectedContentLength = urlResponse.expectedContentLength
-            self.headers = httpResponse?.allHeaderFields as? [String: String] ?? [:]
+            self.headers = httpResponse?.allHeaderFields as? [String: String]
         }
 
         /// Redacts values for the provided headers.
         public func redactingSensitiveHeaders(_ redactedHeaders: Set<String>) -> Response {
             var copy = self
-            copy.headers = _redactingSensitiveHeaders(redactedHeaders, from: self.headers)
+            copy.headers = _redactingSensitiveHeaders(redactedHeaders, from: headers)
             return copy
         }
     }
@@ -128,16 +147,16 @@ extension NetworkLogger {
     public struct Metrics: Codable, Sendable {
         public var taskInterval: DateInterval
         public var redirectCount: Int
-        public var transactions: [NetworkLogger.TransactionMetrics]
+        public var transactions: [TransactionMetrics]
         public var totalTransferSize: TransferSizeInfo { TransferSizeInfo(metrics: self) }
 
         public init(metrics: URLSessionTaskMetrics) {
             self.taskInterval = metrics.taskInterval
             self.redirectCount = metrics.redirectCount
-            self.transactions = metrics.transactionMetrics.map(NetworkLogger.TransactionMetrics.init)
+            self.transactions = metrics.transactionMetrics.map(TransactionMetrics.init)
         }
 
-        public init(taskInterval: DateInterval, redirectCount: Int, transactions: [NetworkLogger.TransactionMetrics]) {
+        public init(taskInterval: DateInterval, redirectCount: Int, transactions: [TransactionMetrics]) {
             self.taskInterval = taskInterval
             self.redirectCount = redirectCount
             self.transactions = transactions
@@ -159,7 +178,7 @@ extension NetworkLogger {
 
         public init() {}
 
-        public init(metrics: NetworkLogger.Metrics) {
+        public init(metrics: Metrics) {
             var size = TransferSizeInfo()
             for transaction in metrics.transactions {
                 size = size.merging(transaction.transferSize)
@@ -187,11 +206,95 @@ extension NetworkLogger {
             size.responseBodyBytesReceived &+= responseBodyBytesReceived
             return size
         }
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.singleValueContainer()
+            let values = try container.decode([Int64].self)
+            guard values.count >= 6 else {
+                throw Swift.DecodingError.dataCorruptedError(in: container, debugDescription: "Invalid transfer size info")
+            }
+            (requestHeaderBytesSent, requestBodyBytesBeforeEncoding, requestBodyBytesSent, responseHeaderBytesReceived, responseBodyBytesReceived, responseBodyBytesAfterDecoding) = (values[0], values[1], values[2], values[3], values[4], values[5])
+        }
+
+        /// Just a space and compile time optimization
+        public func encode(to encoder: Encoder) throws {
+            try [requestHeaderBytesSent, requestBodyBytesBeforeEncoding, requestBodyBytesSent, responseHeaderBytesReceived, responseBodyBytesReceived, responseBodyBytesAfterDecoding].encode(to: encoder)
+        }
     }
 
     public struct TransactionMetrics: Codable, Sendable {
-        public var request: NetworkLogger.Request
-        public var response: NetworkLogger.Response?
+        public var fetchType: URLSessionTaskMetrics.ResourceFetchType {
+            get { type.flatMap(URLSessionTaskMetrics.ResourceFetchType.init) ?? .networkLoad }
+            set { type = newValue.rawValue }
+        }
+        public var request: Request
+        public var response: Response?
+        public var timing: TransactionTimingInfo
+        public var networkProtocol: String?
+        public var transferSize: TransferSizeInfo
+        public var conditions: Conditions
+        public var localAddress: String?
+        public var remoteAddress: String?
+        public var localPort: Int?
+        public var remotePort: Int?
+        public var negotiatedTLSProtocolVersion: tls_protocol_version_t? {
+            get { tlsVersion.flatMap(tls_protocol_version_t.init) }
+            set { tlsVersion = newValue?.rawValue }
+        }
+        public var negotiatedTLSCipherSuite: tls_ciphersuite_t? {
+            get { tlsSuite.flatMap(tls_ciphersuite_t.init) }
+            set { tlsSuite = newValue?.rawValue }
+        }
+
+        private var tlsVersion: UInt16?
+        private var tlsSuite: UInt16?
+        private var type: Int?
+
+        public init(metrics: URLSessionTaskTransactionMetrics) {
+            self.request = Request(metrics.request)
+            self.response = metrics.response.map(Response.init)
+            self.timing = TransactionTimingInfo(metrics: metrics)
+            self.networkProtocol = metrics.networkProtocolName
+            self.type = (metrics.resourceFetchType == .networkLoad ? nil :  metrics.resourceFetchType.rawValue)
+            self.transferSize = TransferSizeInfo(metrics: metrics)
+            self.conditions = []
+            if metrics.isProxyConnection { conditions.insert(.isProxyConnection) }
+            if metrics.isReusedConnection { conditions.insert(.isReusedConnection) }
+            if metrics.isCellular { conditions.insert(.isCellular) }
+            if metrics.isExpensive { conditions.insert(.isExpensive) }
+            if metrics.isConstrained { conditions.insert(.isConstrained) }
+            if metrics.isMultipath { conditions.insert(.isMultipath) }
+            self.localAddress = metrics.localAddress
+            self.remoteAddress = metrics.remoteAddress
+            self.localPort = metrics.localPort
+            self.remotePort = metrics.remotePort
+            self.tlsVersion = metrics.negotiatedTLSProtocolVersion?.rawValue
+            self.tlsSuite = metrics.negotiatedTLSCipherSuite?.rawValue
+        }
+
+        public init(request: Request, response: Response? = nil, resourceFetchType: URLSessionTaskMetrics.ResourceFetchType) {
+            self.request = request
+            self.response = response
+            self.timing = .init()
+            self.type = resourceFetchType.rawValue
+            self.transferSize = .init()
+            self.conditions = []
+        }
+
+        public struct Conditions: OptionSet, Codable, Sendable {
+            public let rawValue: Int8
+            public init(rawValue: Int8) { self.rawValue = rawValue }
+
+            public static let isProxyConnection = Conditions(rawValue: 1 << 0)
+            public static let isReusedConnection = Conditions(rawValue: 1 << 1)
+            public static let isCellular = Conditions(rawValue: 1 << 2)
+            public static let isExpensive = Conditions(rawValue: 1 << 3)
+            public static let isConstrained = Conditions(rawValue: 1 << 4)
+            public static let isMultipath = Conditions(rawValue: 1 << 5)
+        }
+    }
+
+    public struct TransactionTimingInfo: Codable, Sendable {
         public var fetchStartDate: Date?
         public var domainLookupStartDate: Date?
         public var domainLookupEndDate: Date?
@@ -203,17 +306,6 @@ extension NetworkLogger {
         public var requestEndDate: Date?
         public var responseStartDate: Date?
         public var responseEndDate: Date?
-        public var networkProtocolName: String?
-        public var isProxyConnection = false
-        public var isReusedConnection = false
-        /// `URLSessionTaskMetrics.ResourceFetchType` enum raw value
-        public var resourceFetchType: Int
-        public var transferSize: TransferSizeInfo
-        public var details: NetworkLogger.TransactionDetailedMetrics
-
-        public var fetchType: URLSessionTaskMetrics.ResourceFetchType {
-            URLSessionTaskMetrics.ResourceFetchType(rawValue: resourceFetchType) ?? .unknown
-        }
 
         public var duration: TimeInterval? {
             guard let startDate = fetchStartDate, let endDate = responseEndDate else {
@@ -223,8 +315,6 @@ extension NetworkLogger {
         }
 
         public init(metrics: URLSessionTaskTransactionMetrics) {
-            self.request = NetworkLogger.Request(metrics.request)
-            self.response = metrics.response.map(NetworkLogger.Response.init)
             self.fetchStartDate = metrics.fetchStartDate
             self.domainLookupStartDate = metrics.domainLookupStartDate
             self.domainLookupEndDate = metrics.domainLookupEndDate
@@ -236,60 +326,31 @@ extension NetworkLogger {
             self.requestEndDate = metrics.requestEndDate
             self.responseStartDate = metrics.responseStartDate
             self.responseEndDate = metrics.responseEndDate
-            self.networkProtocolName = metrics.networkProtocolName
-            self.isProxyConnection = metrics.isProxyConnection
-            self.isReusedConnection = metrics.isReusedConnection
-            self.resourceFetchType = metrics.resourceFetchType.rawValue
-            self.transferSize = TransferSizeInfo(metrics: metrics)
-            self.details = NetworkLogger.TransactionDetailedMetrics(metrics: metrics)
-        }
-
-        public init(request: NetworkLogger.Request, response: NetworkLogger.Response? = nil, resourceFetchType: URLSessionTaskMetrics.ResourceFetchType, details: NetworkLogger.TransactionDetailedMetrics) {
-            self.request = request
-            self.response = response
-            self.resourceFetchType = resourceFetchType.rawValue
-            self.details = details
-            self.transferSize = .init()
-            self.details = .init()
-        }
-    }
-
-    public struct TransactionDetailedMetrics: Codable, Sendable {
-        public var localAddress: String?
-        public var remoteAddress: String?
-        public var isCellular = false
-        public var isExpensive = false
-        public var isConstrained = false
-        public var isMultipath = false
-        public var localPort: Int?
-        public var remotePort: Int?
-        /// `tls_protocol_version_t` enum raw value
-        public var negotiatedTLSProtocolVersion: UInt16?
-        /// `tls_ciphersuite_t`  enum raw value
-        public var negotiatedTLSCipherSuite: UInt16?
-
-        public init(metrics: URLSessionTaskTransactionMetrics) {
-            self.localAddress = metrics.localAddress
-            self.remoteAddress = metrics.remoteAddress
-            self.isCellular = metrics.isCellular
-            self.isExpensive = metrics.isExpensive
-            self.isConstrained = metrics.isConstrained
-            self.isMultipath = metrics.isMultipath
-            self.localPort = metrics.localPort
-            self.remotePort = metrics.remotePort
-            self.negotiatedTLSProtocolVersion = metrics.negotiatedTLSProtocolVersion?.rawValue
-            self.negotiatedTLSCipherSuite = metrics.negotiatedTLSCipherSuite?.rawValue
         }
 
         public init() {}
+
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.singleValueContainer()
+            let values = try container.decode([Date?].self)
+            guard values.count >= 11 else {
+                throw Swift.DecodingError.dataCorruptedError(in: container, debugDescription: "Invalid transfer size info")
+            }
+            (fetchStartDate, domainLookupStartDate, domainLookupEndDate, connectStartDate, secureConnectionStartDate, secureConnectionEndDate, connectEndDate, requestStartDate, requestEndDate, responseStartDate, responseEndDate) = (values[0], values[1], values[2], values[3], values[4], values[5], values[6], values[7], values[8], values[9], values[10])
+        }
+
+        /// Just a space and compile time optimization
+        public func encode(to encoder: Encoder) throws {
+            try [fetchStartDate, domainLookupStartDate, domainLookupEndDate, connectStartDate, secureConnectionStartDate, secureConnectionEndDate, connectEndDate, requestStartDate, requestEndDate, responseStartDate, responseEndDate].encode(to: encoder)
+        }
     }
 
-    public enum TaskType: String, Codable, CaseIterable, Sendable {
-        case dataTask = "data"
-        case downloadTask = "download"
-        case uploadTask = "upload"
-        case streamTask = "stream"
-        case webSocketTask = "websocket"
+    public enum TaskType: Int16, Codable, CaseIterable, Sendable {
+        case dataTask
+        case downloadTask
+        case uploadTask
+        case streamTask
+        case webSocketTask
 
         public init(task: URLSessionTask) {
             switch task {
@@ -428,7 +489,10 @@ private func parseParameter(_ param: Substring) -> (String, String)? {
     return (name.trimmingCharacters(in: .whitespaces), value.trimmingCharacters(in: .whitespaces))
 }
 
-private func _redactingSensitiveHeaders(_ redactedHeaders: Set<String>, from headers: [String: String]) -> [String: String] {
+private func _redactingSensitiveHeaders(_ redactedHeaders: Set<String>, from headers: [String: String]?) -> [String: String]? {
+    guard let headers = headers else {
+        return nil
+    }
     var newHeaders: [String: String] = [:]
     let redactedHeaders = Set(redactedHeaders.map { $0.lowercased() })
     for (key, value) in headers {

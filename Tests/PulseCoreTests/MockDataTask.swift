@@ -48,46 +48,13 @@ private let mockMetrics = try! JSONDecoder().decode(NetworkLogger.Metrics.self, 
 {
   "transactions": [
     {
-      "responseStartDate": 681270022.7511908,
-      "transferSize": {
-        "requestHeaderBytesSent": 167,
-        "responseBodyBytesReceived": 166,
-        "responseBodyBytesAfterDecoding": 214,
-        "requestBodyBytesBeforeEncoding": 0,
-        "requestBodyBytesSent": 0,
-        "responseHeaderBytesReceived": 94
-      },
-      "domainLookupStartDate": 681270022.3860258,
-      "fetchStartDate": 681270022.377544,
-      "requestEndDate": 681270022.5381376,
-      "domainLookupEndDate": 681270022.4066201,
-      "connectEndDate": 681270022.5338686,
-      "connectStartDate": 681270022.4071407,
-      "secureConnectionStartDate": 681270022.4251491,
-      "networkProtocolName": "http/2.0",
-      "secureConnectionEndDate": 681270022.533362,
-      "isProxyConnection": false,
-      "resourceFetchType": 1,
-      "details": {
-        "negotiatedTLSProtocolVersion": 772,
-        "localAddress": "192.168.0.13",
-        "negotiatedTLSCipherSuite": 4865,
-        "isCellular": false,
-        "isConstrained": false,
-        "isExpensive": false,
-        "remotePort": 443,
-        "isMultipath": false,
-        "remoteAddress": "17.253.97.204",
-        "localPort": 58622
-      },
+      "transferSize": [167, 0, 0, 94, 166, 214],
+      "timing": [681270022.377544, 681270022.3860258, 681270022.4066201, 681270022.4071407, 681270022.4251491, 681270022.533362, 681270022.5338686, 681270022.5343999, 681270022.5381376, 681270022.7511908, 681270022.8044541],
+      "networkProtocol": "http/2.0",
+      "conditions": 0,
       "request": {
-        "allowsCellularAccess": true,
-        "httpMethod": "POST",
         "url": "https://github.com/login?username=kean&password=nope",
-        "cachePolicy": 0,
-        "allowsExpensiveNetworkAccess": true,
-        "allowsConstrainedNetworkAccess": true,
-        "httpShouldHandleCookies": true,
+        "method": "POST",
         "headers": {
           "User-Agent": "Pulse Demo/2.0",
           "Accept-Encoding": "gzip",
@@ -95,20 +62,22 @@ private let mockMetrics = try! JSONDecoder().decode(NetworkLogger.Metrics.self, 
           "Accept-Language": "en-us",
           "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
         },
-        "httpShouldUsePipelining": false,
-        "timeoutInterval": 60
+        "options": 15,
+        "timeout": 60
       },
-      "requestStartDate": 681270022.5343999,
       "response": {
         "statusCode": 200,
         "headers": {
           "Set-Cookie": "token=ADSJ1239CX0; path=/; expires=Sun, 30 Jan 2030 21:49:04 GMT; secure; HttpOnly"
         },
         "url": "https://github.com/login",
-        "expectedContentLength": -1
       },
-      "responseEndDate": 681270022.8044541,
-      "isReusedConnection": false
+      "localAddress": "192.168.0.13",
+      "remotePort": 443,
+      "remoteAddress": "17.253.97.204",
+      "localPort": 58622,
+      "tlsVersion": 772,
+      "tlsSuite": 4865
     }
   ],
   "taskInterval": {

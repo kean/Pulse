@@ -2,15 +2,16 @@
 //
 // Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
 
-#if os(iOS)
-
 import SwiftUI
+
+#if os(iOS)
 import UIKit
 
 struct ShareView: UIViewControllerRepresentable {
     var activityItems: [Any]
     var applicationActivities: [UIActivity]?
     private let cleanup: () -> Void
+    private var completion: (() -> Void)?
 
     init(activityItems: [Any]) {
         self.activityItems = activityItems
@@ -22,10 +23,17 @@ struct ShareView: UIViewControllerRepresentable {
         self.cleanup = items.cleanup
     }
 
+    func onCompletion(_ completion: @escaping () -> Void) -> Self {
+        var copy = self
+        copy.completion = completion
+        return copy
+    }
+
     func makeUIViewController(context: UIViewControllerRepresentableContext<ShareView>) -> UIActivityViewController {
         let controller = UIActivityViewController(activityItems: activityItems, applicationActivities: applicationActivities)
         controller.completionWithItemsHandler = { _, _, _, _ in
             cleanup()
+            completion?()
         }
         return controller
     }
@@ -77,4 +85,40 @@ struct ShareButton: View {
         }
     }
 }
+#endif
+
+#if os(macOS)
+import AppKit
+
+struct ShareView: View {
+    let items: ShareItems
+
+    private var cleanup: (() -> Void)?
+    private var completion: (() -> Void)?
+
+    init(_ items: ShareItems) {
+        self.items = items
+        self.cleanup = items.cleanup
+    }
+
+    func onCompletion(_ completion: @escaping () -> Void) -> Self {
+        var copy = self
+        copy.completion = completion
+        return copy
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            ForEach(NSSharingService.sharingServices(forItems: items.items), id: \.title) { item in
+                Button(action: { item.perform(withItems: items.items) }) {
+                    HStack {
+                        Image(nsImage: item.image)
+                        Text(item.title)
+                    }
+                }.buttonStyle(.plain)
+            }
+        }.padding(8)
+    }
+}
+
 #endif

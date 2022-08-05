@@ -57,7 +57,7 @@ final class ConsoleMessageDetailsViewModel {
 private extension BadgeViewModel {
     init?(message: LoggerMessageEntity) {
         guard let level = LoggerStore.Level(rawValue: message.level) else { return nil }
-        self.init(title: level.rawValue.uppercased(), color: Color(level: level))
+        self.init(title: level.name.uppercased(), color: Color(level: level))
     }
 }
 

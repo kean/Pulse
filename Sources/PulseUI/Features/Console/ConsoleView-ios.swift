@@ -11,7 +11,7 @@ import Combine
 
 public struct ConsoleView: View {
     @ObservedObject var viewModel: ConsoleViewModel
-    @State private var shared: ShareItems?
+    @State private var isSharing = false
 
     public init(store: LoggerStore = .shared, configuration: ConsoleConfiguration = .default) {
         self.viewModel = ConsoleViewModel(store: store)
@@ -28,9 +28,17 @@ public struct ConsoleView: View {
                 leading: viewModel.onDismiss.map {
                     Button(action: $0) { Image(systemName: "xmark") }
                 },
-                trailing: actionButton
+                trailing: ShareButton { isSharing = true }
             )
-            .sheet(item: $shared) { ShareView($0).id($0.id) }
+            .sheet(isPresented: $isSharing) {
+                if #available(iOS 14.0, *) {
+                    NavigationView {
+                        ShareStoreView(store: viewModel.store, isPresented: $isSharing)
+                    }
+                } else {
+                    ShareView(ShareItems(messages: viewModel.store))
+                }
+            }
             .onAppear(perform: viewModel.onAppear)
             .onDisappear(perform: viewModel.onDisappear)
 
@@ -49,35 +57,6 @@ public struct ConsoleView: View {
     private var tableOverlay: some View {
         if viewModel.entities.isEmpty {
             PlaceholderView.make(viewModel: viewModel)
-        }
-    }
-
-    @ViewBuilder
-    private var actionButton: some View {
-        if #available(iOS 14.0, *) {
-            Menu(content: {
-                if viewModel.configuration.isStoreSharingEnabled {
-                    Section {
-                        Button(action: { shared = viewModel.share(as: .store) }) {
-                            Label("Share as Pulse Document", systemImage: "square.and.arrow.up")
-                        }
-                        Button(action: { shared = viewModel.share(as: .text) }) {
-                            Label("Share as Text File", systemImage: "square.and.arrow.up")
-                        }
-                    }
-                }
-                Section {
-                    ButtonRemoveAll(action: viewModel.buttonRemoveAllMessagesTapped)
-                        .disabled(viewModel.entities.isEmpty)
-                        .opacity(viewModel.entities.isEmpty ? 0.33 : 1)
-                }
-            }, label: {
-                Image(systemName: "ellipsis.circle")
-            })
-        } else {
-            if viewModel.configuration.isStoreSharingEnabled {
-                ShareButton { shared = viewModel.share(as: .store) }
-            }
         }
     }
 }

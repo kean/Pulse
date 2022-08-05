@@ -57,4 +57,23 @@ final class NetworkLoggerTests: XCTestCase {
             "Content-Size": "456"
         ])
     }
+
+    func testEncodingSize() throws {
+        let task = MockDataTask.login
+        let encoder = JSONEncoder()
+
+        let request = try encoder.encode(NetworkLogger.Request(task.request))
+        let response = try encoder.encode(NetworkLogger.Response(task.response))
+        let metrics = try encoder.encode(task.metrics)
+
+        XCTAssertEqual(request.count, 302)
+        XCTAssertEqual(response.count, 311)
+        XCTAssertEqual(metrics.count, 1039)
+
+        func printJSON(_ json: Data) throws {
+            let value = try JSONSerialization.jsonObject(with: json)
+            let data = try JSONSerialization.data(withJSONObject: value, options: [.prettyPrinted])
+            NSLog(String(data: data, encoding: .utf8) ?? "–")
+        }
+    }
 }

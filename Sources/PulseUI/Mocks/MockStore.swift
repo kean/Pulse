@@ -269,25 +269,27 @@ private func makeMetrics(for task: MockTask, taskInterval: DateInterval) -> Netw
         var metrics = NetworkLogger.TransactionMetrics(
             request: NetworkLogger.Request(transaction.request),
             response: NetworkLogger.Response(transaction.response),
-            resourceFetchType: transaction.fetchType,
-            details: .init()
+            resourceFetchType: transaction.fetchType
         )
         if transaction.fetchType == .networkLoad {
-            metrics.networkProtocolName = "http/2.0"
+            metrics.networkProtocol = "http/2.0"
         }
-        metrics.isReusedConnection = transaction.isReusedConnection
-        metrics.fetchStartDate = currentDate
+        if transaction.isReusedConnection {
+            metrics.conditions.insert(.isReusedConnection)
+        }
+        var timing = NetworkLogger.TransactionTimingInfo()
+        timing.fetchStartDate = currentDate
         func nextDate(delay: TimeInterval) -> Date {
             currentDate.addTimeInterval(delay / 1000 * TimeInterval.random(in: 0.9...1.1))
             return currentDate
         }
         func nextDate(percentage: TimeInterval) -> Date {
-            let remaining = transaction.duration - currentDate.timeIntervalSince(metrics.fetchStartDate!)
+            let remaining = transaction.duration - currentDate.timeIntervalSince(timing.fetchStartDate!)
             currentDate.addTimeInterval(remaining * percentage)
             return currentDate
         }
         func transactionEndDate() -> Date {
-            currentDate = metrics.fetchStartDate!.addingTimeInterval(transaction.duration)
+            currentDate = timing.fetchStartDate!.addingTimeInterval(transaction.duration)
             return currentDate
         }
 
@@ -297,35 +299,35 @@ private func makeMetrics(for task: MockTask, taskInterval: DateInterval) -> Netw
         switch transaction.fetchType {
         case .networkLoad:
             if !transaction.isReusedConnection {
-                metrics.domainLookupStartDate = nextDate(delay: 8)
-                metrics.domainLookupEndDate = nextDate(delay: 20)
-                metrics.connectStartDate = nextDate(delay: 0.5)
-                metrics.secureConnectionStartDate = nextDate(delay: 20)
-                metrics.secureConnectionEndDate = nextDate(delay: 100)
-                metrics.connectEndDate = nextDate(delay: 0.5)
+                timing.domainLookupStartDate = nextDate(delay: 8)
+                timing.domainLookupEndDate = nextDate(delay: 20)
+                timing.connectStartDate = nextDate(delay: 0.5)
+                timing.secureConnectionStartDate = nextDate(delay: 20)
+                timing.secureConnectionEndDate = nextDate(delay: 100)
+                timing.connectEndDate = nextDate(delay: 0.5)
             }
             switch task.kind {
             case .download:
-                metrics.requestStartDate = nextDate(delay: 0.5)
-                metrics.requestEndDate = nextDate(delay: 30)
-                metrics.responseStartDate = isLastTransaction ? nextDate(delay: 10) : nextDate(percentage: 0.95)
-                metrics.responseEndDate = transactionEndDate()
+                timing.requestStartDate = nextDate(delay: 0.5)
+                timing.requestEndDate = nextDate(delay: 30)
+                timing.responseStartDate = isLastTransaction ? nextDate(delay: 10) : nextDate(percentage: 0.95)
+                timing.responseEndDate = transactionEndDate()
             case .data:
-                metrics.requestStartDate = nextDate(delay: 0.5)
-                metrics.requestEndDate = nextDate(delay: requestBodySize > 0 ? 30 : 4)
-                metrics.responseStartDate = (isLastTransaction && task.responseBody.count > 0) ? nextDate(percentage: 0.8) : nextDate(percentage: 0.95)
-                metrics.responseEndDate = transactionEndDate()
+                timing.requestStartDate = nextDate(delay: 0.5)
+                timing.requestEndDate = nextDate(delay: requestBodySize > 0 ? 30 : 4)
+                timing.responseStartDate = (isLastTransaction && task.responseBody.count > 0) ? nextDate(percentage: 0.8) : nextDate(percentage: 0.95)
+                timing.responseEndDate = transactionEndDate()
             case .upload:
-                metrics.responseStartDate = nextDate(percentage: 0.98)
-                metrics.responseEndDate = transactionEndDate()
+                timing.responseStartDate = nextDate(percentage: 0.98)
+                timing.responseEndDate = transactionEndDate()
             }
         case .localCache:
-            metrics.requestStartDate = nextDate(delay: 0.5)
-            metrics.responseEndDate = transactionEndDate()
+            timing.requestStartDate = nextDate(delay: 0.5)
+            timing.responseEndDate = transactionEndDate()
         default: break
         }
-
-        metrics.networkProtocolName = "http/2.0"
+        metrics.timing = timing
+        metrics.networkProtocol = "http/2.0"
 
         let requestHeaders = transaction.request.allHTTPHeaderFields
         let responseHeaders = (transaction.response as? HTTPURLResponse)?.allHeaderFields as? [String: String]
@@ -356,17 +358,12 @@ private func makeMetrics(for task: MockTask, taskInterval: DateInterval) -> Netw
         }
         metrics.transferSize = transferSize
 
-        metrics.details = {
-            var details = NetworkLogger.TransactionDetailedMetrics()
-            details.negotiatedTLSCipherSuite = tls_ciphersuite_t.AES_128_GCM_SHA256.rawValue
-            details.negotiatedTLSProtocolVersion = tls_protocol_version_t.TLSv13.rawValue
-            details.remoteAddress = "17.253.97.204"
-            details.remotePort = 443
-            details.localAddress = "192.168.0.13"
-            details.localPort = 58622
-            return details
-        }()
-
+        metrics.remoteAddress = "17.253.97.204"
+        metrics.remotePort = 443
+        metrics.localAddress = "192.168.0.13"
+        metrics.localPort = 58622
+        metrics.negotiatedTLSCipherSuite = .AES_128_GCM_SHA256
+        metrics.negotiatedTLSProtocolVersion = .TLSv13
         return metrics
     }
 
