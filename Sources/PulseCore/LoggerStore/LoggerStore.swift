@@ -302,7 +302,7 @@ extension LoggerStore {
 
     private func process(_ event: Event.NetworkTaskCreated) {
         let request = findOrCreateNetworkRequestEntity(forTaskId: event.taskId, taskType: event.taskType, createdAt: event.createdAt, session: event.session)
-
+        
         request.url = event.originalRequest.url?.absoluteString
         request.host = event.originalRequest.url?.host
         request.httpMethod = event.originalRequest.httpMethod
@@ -312,7 +312,7 @@ extension LoggerStore {
     }
 
     private func process(_ event: Event.NetworkTaskProgressUpdated) {
-        guard let request = forNetworkRequest(forTaskId: event.taskId) else {
+        guard let request = firstNetworkRequest(forTaskId: event.taskId) else {
             return
         }
         let progress = request.progress ?? {
@@ -426,14 +426,14 @@ extension LoggerStore {
         ]
     }
 
-    private func forNetworkRequest(forTaskId taskId: UUID) -> LoggerNetworkRequestEntity? {
+    private func firstNetworkRequest(forTaskId taskId: UUID) -> LoggerNetworkRequestEntity? {
         try? backgroundContext.first(LoggerNetworkRequestEntity.self) {
             $0.predicate = NSPredicate(format: "taskId == %@", taskId as NSUUID)
         }
     }
 
     private func findOrCreateNetworkRequestEntity(forTaskId taskId: UUID, taskType: NetworkLogger.TaskType, createdAt: Date, session: String) -> LoggerNetworkRequestEntity {
-        if let entity = forNetworkRequest(forTaskId: taskId) {
+        if let entity = firstNetworkRequest(forTaskId: taskId) {
             return entity
         }
 
