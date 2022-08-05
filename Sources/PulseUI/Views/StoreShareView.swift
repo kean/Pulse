@@ -116,7 +116,7 @@ struct ShareStoreView: View {
 #if os(macOS)
         onShare(item)
 #else
-        item = shareItem
+        self.shareItem = item
 #endif
     }
 }
