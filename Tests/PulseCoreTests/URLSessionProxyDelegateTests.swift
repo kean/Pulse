@@ -55,7 +55,7 @@ final class URLSessionProxyDelegateTests: XCTestCase {
         wait(for: [didComplete], timeout: 5)
 
         // RECORD
-        let requests = try store.allNetworkRequests()
+        let requests = try store.allRequests()
         let request = try XCTUnwrap(requests.first)
 
         // THEN
@@ -136,7 +136,7 @@ final class URLSessionProxyDelegateTests: XCTestCase {
         wait(for: [didComplete], timeout: 5)
 
         // RECORD
-        let requests = try store.allNetworkRequests()
+        let requests = try store.allRequests()
         let request = try XCTUnwrap(requests.first)
 
         // THEN

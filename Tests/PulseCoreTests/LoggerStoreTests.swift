@@ -204,7 +204,7 @@ final class LoggerStoreTests: XCTestCase {
         defer { copy.destroy() }
 
         XCTAssertEqual(try copy.allMessages().count, 10)
-        XCTAssertEqual(try copy.allNetworkRequests().count, 3)
+        XCTAssertEqual(try copy.allRequests().count, 3)
     }
 
     func testCopyToNonExistingFolder() throws {
@@ -271,7 +271,7 @@ final class LoggerStoreTests: XCTestCase {
         defer { copy.destroy() }
 
         XCTAssertEqual(try copy.allMessages().count, 15)
-        XCTAssertEqual(try copy.allNetworkRequests().count, 8)
+        XCTAssertEqual(try copy.allRequests().count, 8)
     }
 
     // MARK: - File (Readonly)
@@ -390,7 +390,7 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertEqual(try context.count(for: LoggerInlineDataEntity.self), 0)
 
         XCTAssertEqual(try store.allMessages().first?.label, "kept")
-        XCTAssertEqual(try store.allNetworkRequests().first?.url, "example.com/kept")
+        XCTAssertEqual(try store.allRequests().first?.url, "example.com/kept")
     }
 
     func testMaxAgeSweepBlobIsDeletedWhenEntityIsDeleted() throws {

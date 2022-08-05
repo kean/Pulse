@@ -25,7 +25,7 @@
 ### Accessing Logs
 
 - ``allMessages()``
-- ``allNetworkRequests()``
+- ``allRequests()``
 - ``getBlobData(forKey:)``
 - ``removeAll()``
 

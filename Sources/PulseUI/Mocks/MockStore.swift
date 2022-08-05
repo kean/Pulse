@@ -389,7 +389,7 @@ extension LoggerStore {
     func entity(for task: MockTask) -> LoggerNetworkRequestEntity {
         let configuration = NetworkLogger.Configuration(isWaitingForDecoding: true)
         _logTask(task, urlSession: URLSession.shared, logger: NetworkLogger(store: self, configuration: configuration))
-        let entity = (try! allNetworkRequests()).first { $0.url == task.originalRequest.url?.absoluteString }
+        let entity = (try! allRequests()).first { $0.url == task.originalRequest.url?.absoluteString }
         assert(entity != nil)
         return entity!
     }

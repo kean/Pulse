@@ -568,7 +568,7 @@ extension LoggerStore {
     }
 
     /// Returns all recorded network requests, least recent messages come first.
-    public func allNetworkRequests() throws -> [LoggerNetworkRequestEntity] {
+    public func allRequests() throws -> [LoggerNetworkRequestEntity] {
         try viewContext.fetch(LoggerNetworkRequestEntity.self, sortedBy: \.createdAt)
     }
 
