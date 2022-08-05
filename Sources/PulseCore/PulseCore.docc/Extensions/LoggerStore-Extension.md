@@ -10,7 +10,7 @@
 
 - ``init(storeURL:options:configuration:)``
 - ``Options``
-- ``Configuration``
+- ``Configuration-swift.struct``
 
 ### Instance Properties
 
@@ -37,8 +37,8 @@
 
 ### Getting Store Info
 
-- ``info-swift.property``
-- ``Info-swift.struct``
+- ``info()``
+- ``Info``
 
 ### Managing Pins
 

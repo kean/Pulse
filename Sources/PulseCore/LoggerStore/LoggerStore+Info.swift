@@ -71,7 +71,7 @@ extension LoggerStore {
         ///
         /// - important: This API is designed to be used only with Pulse documents
         /// exported from the app without unarchaving the document. If you need
-        /// to get info about the current store, use ``LoggerStore/info-swift.property``.
+        /// to get info about the current store, use ``LoggerStore/Info``.
         public static func make(storeURL: URL) throws -> Info {
             guard let archive = Archive(url: storeURL, accessMode: .read),
                   let entry = archive[infoFilename],

@@ -24,8 +24,8 @@
 - ``ResponseError``
 - ``Metrics``
 - ``TransactionMetrics``
-- ``TransactionDetailedMetrics``
 - ``TransferSizeInfo``
+- ``TransactionTimingInfo``
 - ``ContentType``
 - ``DecodingError``
 - ``TaskType``
