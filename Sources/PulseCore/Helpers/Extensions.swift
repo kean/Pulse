@@ -23,6 +23,9 @@ extension FileManager {
         return true
     }
 
+
+    #warning("TODO: remove")
+
     /// Decompresses file at the given URL replacing the original file.
     func decompressFile(at url: URL) throws {
         try (Data(contentsOf: url) as NSData)
@@ -190,11 +193,13 @@ extension URL {
     }
 }
 
-func benchmark(title: String, operation: () -> Void) {
+@discardableResult
+func benchmark<T>(title: String, operation: () throws -> T) rethrows -> T {
     let startTime = CFAbsoluteTimeGetCurrent()
-    operation()
+    let value = try operation()
     let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
     debugPrint("Time elapsed for \(title): \(timeElapsed * 1000.0) ms.")
+    return value
 }
 
 final class WeakLoggerStore {
@@ -219,5 +224,16 @@ struct TemporaryDirectory {
 
     func remove() {
         try? FileManager.default.removeItem(at: url)
+    }
+}
+
+#warning("adopt everywhere")
+extension Data {
+    func compressed() throws -> Data {
+        try (self as NSData).compressed(using: .zlib) as Data
+    }
+
+    func decompressed() throws -> Data {
+        try (self as NSData).decompressed(using: .zlib) as Data
     }
 }

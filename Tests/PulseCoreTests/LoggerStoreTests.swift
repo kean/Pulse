@@ -109,7 +109,10 @@ final class LoggerStoreTests: XCTestCase {
             $0.predicate = NSPredicate(format: "url == %@", "https://github.com/repos")
         })
         XCTAssertEqual(request.responseBodySize, 165061)
-        XCTAssertEqual(request.responseBody?.data?.count, 165061)
+        let blob = benchmark(title: "Access Blob") {
+            return request.responseBody?.data
+        }
+        XCTAssertEqual(blob?.count, 165061)
     }
 
     func testInitWithArchiveURLNoExtension() throws {
@@ -246,21 +249,6 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertEqual(try context.count(for: LoggerNetworkRequestProgressEntity.self), 0)
         XCTAssertEqual(try context.count(for: LoggerBlobHandleEntity.self), 0)
         XCTAssertEqual(try context.count(for: LoggerInlineDataEntity.self), 0)
-    }
-
-    func testMesasureExportSize() throws {
-        // GIVEN
-        let storeURL = try makePulsePackage()
-
-        // WHEN
-        let store = try XCTUnwrap(LoggerStore(storeURL: storeURL))
-        defer { try? store.destroy() }
-
-        let copyURL = directory.url.appending(filename: "compressed.pulse")
-        try store.copy(to: copyURL)
-
-        let size = (try Files.attributesOfItem(atPath: copyURL.path)[.size] as? Int64) ?? 0
-        debugPrint("Package: \(try storeURL.directoryTotalSize()). Archive: \(size)")
     }
 
     func testCopyToNonExistingFolder() throws {
@@ -741,14 +729,14 @@ final class LoggerStoreTests: XCTestCase {
 
     // MARK: - Helpers
 
-    private func makeStore(_ closure: (inout LoggerStore.Configuration) -> Void = { _ in }) -> LoggerStore {
+    private func makeStore(options: LoggerStore.Options =  [.create, .synchronous], _ closure: (inout LoggerStore.Configuration) -> Void = { _ in }) -> LoggerStore {
         var configuration = LoggerStore.Configuration()
         configuration.makeCurrentDate = { [unowned self] in self.date }
         closure(&configuration)
 
         return try! LoggerStore(
             storeURL: directory.url.appending(filename: UUID().uuidString),
-            options: [.create, .synchronous],
+            options: options,
             configuration: configuration
         )
     }
@@ -761,4 +749,49 @@ final class LoggerStoreTests: XCTestCase {
         try Files.decompressFile(at: storeURL.appending(filename: "logs.sqlite"))
         return storeURL
     }
+
+    // MARK: - Measure Export Speed & Size
+
+    func testMesasureExportSize() throws {
+        // GIVEN
+        let storeURL = try makePulsePackage()
+
+        // WHEN
+        let store = try XCTUnwrap(LoggerStore(storeURL: storeURL))
+        defer { try? store.destroy() }
+
+        let copyURL = directory.url.appending(filename: "compressed.pulse")
+        try benchmark(title: "Archive") {
+            try store.copy(to: copyURL)
+        }
+
+        let size = (try Files.attributesOfItem(atPath: copyURL.path)[.size] as? Int64) ?? 0
+        debugPrint("Package: \(try storeURL.directoryTotalSize()). Archive: \(size)")
+    }
+
+#warning("TODO: add a test for external blobs")
+    func testMesasureExportSizeLarge() throws {
+        // GIVEN
+        let store = makeStore()
+        defer { try? store.destroy() }
+
+        for _ in 0..<100 {
+            populate(store: store)
+        }
+
+        let copyURL = directory.url.appending(filename: "compressed.pulse")
+        try benchmark(title: "Archive") {
+            try store.copy(to: copyURL)
+        }
+
+        let size = (try Files.attributesOfItem(atPath: copyURL.path)[.size] as? Int64) ?? 0
+        debugPrint("Package: \(try store.storeURL.directoryTotalSize()). Archive: \(size)")
+
+        let info = try benchmark(title: "Open") {
+            try LoggerStore(storeURL: copyURL)
+        }
+        XCTAssertEqual(try info.viewContext.count(for: LoggerMessageEntity.self), 1000)
+    }
 }
+
+#warning("TODO: measure opening speed")

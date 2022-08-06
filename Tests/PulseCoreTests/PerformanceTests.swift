@@ -31,7 +31,7 @@ final class PerformanceTests: XCTestCase {
         try? FileManager.default.removeItem(at: tempDirectoryURL)
     }
 
-    func testInsert() {
+    func _testInsert() {
         measure {
             for _ in 0...5 {
                 populate(store: store)

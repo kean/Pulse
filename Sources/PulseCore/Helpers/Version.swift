@@ -24,6 +24,13 @@ struct Version: Comparable, LosslessStringConvertible, Codable, Sendable {
         (lhs.major, lhs.minor, lhs.patch) < (rhs.major, rhs.minor, rhs.patch)
     }
 
+    init(string: String) throws {
+        guard let version = Version(string) else {
+            throw LoggerStore.Error.unknownError // Should never happen
+        }
+        self = version
+    }
+
     // MARK: LosslessStringConvertible
 
     init?(_ string: String) {

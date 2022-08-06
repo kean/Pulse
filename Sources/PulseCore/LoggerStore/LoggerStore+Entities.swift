@@ -191,8 +191,6 @@ public final class LoggerBlobHandleEntity: NSManagedObject {
     /// To access data, use the convenience ``data`` property.
     @NSManaged var inlineData: LoggerInlineDataEntity?
 
-    static let inlineLimit = 32768 // 32 KB
-
     /// Returns the associated data.
     ///
     /// - important: This property only works with `NSManagedObjectContext` instances

@@ -56,7 +56,7 @@ public final class LoggerStore: @unchecked Sendable {
     public let events = PassthroughSubject<Event, Never>()
 
     private let options: Options
-    private let document: PulseDocument
+    private let document: PulseDocumentType
     private var isSaveScheduled = false
     private let queue = DispatchQueue(label: "com.github.kean.pulse.logger-store")
     private var manifest: Manifest {
@@ -151,22 +151,20 @@ public final class LoggerStore: @unchecked Sendable {
             }
             self.document = .package
         } else {
-            let archive = try IndexedArchive(url: storeURL)
-            self.manifest = try Manifest(archive: archive)
-            guard manifest.version >= .currentStoreVersion else {
+            let document = try PulseDocument2(documentURL: storeURL)
+            let info = try document.open()
+            guard try Version(string: info.storeVersion) >= .currentStoreVersion else {
                 throw LoggerStore.Error.unsupportedVersion
             }
             // Extract and decompress _only_ the database. The blobs can be read
             // directly from the compressed archive on demand.
-            self.databaseURL = URL.temp.appending(filename: manifest.storeId.uuidString)
+            self.databaseURL = URL.temp.appending(filename: info.storeId.uuidString)
             if !Files.fileExists(atPath: databaseURL.path) {
-                guard let database = archive[databaseFilename] else {
-                    throw LoggerStore.Error.storeInvalid
-                }
-                try archive.extract(database, to: databaseURL)
-                try Files.decompressFile(at: databaseURL)
+                try document.database().write(to: databaseURL)
             }
-            self.document = .archive(archive)
+            self.document = .archive(document)
+            #warning("TODO make manifest optional")
+            self.manifest = .init(storeId: info.storeId, version: try Version(string: info.storeVersion))
         }
 
         self.container = LoggerStore.makeContainer(databaseURL: databaseURL)
@@ -501,7 +499,7 @@ extension LoggerStore {
         entity.linkCount = 1
         entity.size = Int64(compressedData.count)
         entity.decompressedSize = Int64(data.count)
-        if compressedData.count <= LoggerBlobHandleEntity.inlineLimit {
+        if compressedData.count <= configuration.inlineLimit {
             let inlineData = LoggerInlineDataEntity(context: backgroundContext)
             inlineData.data = compressedData
             entity.inlineData = inlineData
@@ -545,8 +543,8 @@ extension LoggerStore {
         switch document {
         case .package:
             return try? Data(contentsOf: makeBlobURL(for: key))
-        case .archive(let archive):
-            return archive.getData(for: "\(blobsDirectoryName)/\(key)")
+        case .archive(let document):
+            return document.getBlob(forKey: key)
         }
     }
 
@@ -673,19 +671,36 @@ extension LoggerStore {
     }
 
     private func _copy(to targetURL: URL) throws -> Info {
-        let directory = TemporaryDirectory()
-        defer { directory.remove() }
+    #warning("TODO: remove")
+        let useDB = true
+        if useDB {
+            let document = try PulseDocument2(documentURL: targetURL)
+            return try write(to: document)
+        } else {
+            let directory = TemporaryDirectory()
+            defer { directory.remove() }
 
-        // Copy the database
-        let info = try _copyAllFiles(to: directory.url)
+            // Copy the database
+            let info = try _copyAllFiles(to: directory.url)
 
-        // Archive and add .pulse extension. Note: it uses zlib compression under
-        // the hood which proved to be the best option in terms of space/speed balance.
-        try Files.zipItem(at: directory.url, to: targetURL, shouldKeepParent: false, compressionMethod: .none)
+            // Archive and add .pulse extension. Note: it uses zlib compression under
+            // the hood which proved to be the best option in terms of space/speed balance.
+            try Files.zipItem(at: directory.url, to: targetURL, shouldKeepParent: false, compressionMethod: .none)
 
-        return info
+            return info
+        }
+
+//        // Copy the database
+//        let info = try _copyAllFiles(to: directory.url)
+//
+//        // Archive and add .pulse extension. Note: it uses zlib compression under
+//        // the hood which proved to be the best option in terms of space/speed balance.
+//        try Files.zipItem(at: directory.url, to: targetURL, shouldKeepParent: false, compressionMethod: .none)
+//
+//        return info
     }
 
+    #warning("TODO: remove")
     private func _copyAllFiles(to targetURL: URL, compress: Bool = true) throws -> Info {
         // Create copy of the store
         let databaseURL = targetURL.appending(filename: databaseFilename)
@@ -713,6 +728,46 @@ extension LoggerStore {
         info.modifiedDate = info.creationDate
         let infoURL = targetURL.appending(filename: infoFilename)
         try JSONEncoder().encode(info).write(to: infoURL)
+
+        return info
+    }
+
+    private func write(to document: PulseDocument2) throws -> Info {
+        let temporary = TemporaryDirectory()
+        defer { temporary.remove() }
+
+        let documentEntity = PulseDocumentEntity(context: document.context)
+
+        var totalSize: Int64 = 0
+
+        // Create copy of the store
+        let databaseURL = temporary.url.appending(filename: databaseFilename)
+        try container.persistentStoreCoordinator.createCopyOfStore(at: databaseURL)
+
+        documentEntity.database = try Data(contentsOf: databaseURL).compressed()
+        totalSize += Int64(documentEntity.database.count)
+
+#warning("TODO: save in batches")
+        // Copy blobs (they are already compressed)
+        for blobURL in try Files.contentsOfDirectory(at: blobsURL, includingPropertiesForKeys: nil) {
+            let blobEntity = PulseBlobEntity(context: document.context)
+            // Blobs are already compressed
+            blobEntity.data = try Data(contentsOf: blobURL)
+            totalSize += Int64(blobEntity.data.count)
+            documentEntity.blobs.insert(blobEntity)
+        }
+
+        // Add store info
+        var info = try _info()
+        info.storeId = UUID()
+        // Chicken and an egg problem: don't know the exact size
+        info.totalStoreSize = totalSize + 500 // info is roughly 500 bytes
+        info.creationDate = configuration.makeCurrentDate()
+        info.modifiedDate = info.creationDate
+        documentEntity.info = try JSONEncoder().encode(info)
+
+        try document.context.save()
+        try? document.close()
 
         return info
     }
@@ -1068,10 +1123,10 @@ let databaseFilename = "logs.sqlite"
 let infoFilename = "info.json"
 let blobsDirectoryName = "blobs"
 
-private enum PulseDocument: Sendable {
+private enum PulseDocumentType: Sendable {
     /// A plain directory (aka "package"). If it has a `.pulse` file extension,
     /// it can be automatically opened by the Pulse apps.
     case package
     /// An archive created by exporting the store.
-    case archive(IndexedArchive)
+    case archive(PulseDocument2)
 }
