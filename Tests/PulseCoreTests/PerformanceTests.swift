@@ -34,7 +34,7 @@ final class PerformanceTests: XCTestCase {
     func testInsert() {
         measure {
             for _ in 0...5 {
-                populate2(store: store)
+                populate(store: store)
             }
             store.backgroundContext.performAndWait {}
         }

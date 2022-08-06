@@ -17,7 +17,7 @@ private struct Logger {
 }
 
 extension XCTestCase {
-    func populate2(store: LoggerStore) {
+    func populate(store: LoggerStore) {
         func logger(named: String) -> Logger {
             Logger(label: named, store: store)
         }

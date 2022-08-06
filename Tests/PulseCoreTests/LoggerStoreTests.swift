@@ -48,12 +48,12 @@ final class LoggerStoreTests: XCTestCase {
 
         // WHEN
         let firstStore = try LoggerStore(storeURL: storeURL, options: options)
-        try firstStore.populate()
+        populate(store: firstStore)
 
         let secondStore = try LoggerStore(storeURL: storeURL)
 
         // THEN data is persisted
-        XCTAssertEqual(try secondStore.allMessages().count, 1)
+        XCTAssertEqual(try secondStore.allMessages().count, 10)
 
         // CLEANUP
         try? firstStore.destroy()
@@ -73,8 +73,8 @@ final class LoggerStoreTests: XCTestCase {
 
     func testInitStoreWithURL() throws {
         // GIVEN
-        try store.populate()
-        XCTAssertEqual(try store.allMessages().count, 1)
+        populate(store: store)
+        XCTAssertEqual(try store.allMessages().count, 10)
 
         let originalStore = store
         store.removeStores()
@@ -83,7 +83,7 @@ final class LoggerStoreTests: XCTestCase {
         store = try LoggerStore(storeURL: storeURL)
 
         // THEN data is persisted
-        XCTAssertEqual(try store.allMessages().count, 1)
+        XCTAssertEqual(try store.allMessages().count, 10)
 
         // CLEANUP
         try? originalStore?.destroy()
@@ -183,7 +183,7 @@ final class LoggerStoreTests: XCTestCase {
 
     func testCopyDirectory() throws {
         // GIVEN
-        populate2(store: store)
+        populate(store: store)
 
         let copyURL = directory.url.appending(filename: "copy.pulse")
 
@@ -206,7 +206,7 @@ final class LoggerStoreTests: XCTestCase {
         let store = makeStore()
         defer { try? store.destroy() }
 
-        populate2(store: store)
+        populate(store: store)
         date = Date()
         let copyURL = directory.url.appending(filename: "copy.pulse")
         try store.copy(to: copyURL)
@@ -224,7 +224,7 @@ final class LoggerStoreTests: XCTestCase {
 
     func testCopyWithPredicate() throws {
         // GIVEN
-        populate2(store: store)
+        populate(store: store)
 
         let copyURL = directory.url.appending(filename: "copy.pulse")
 
@@ -265,7 +265,7 @@ final class LoggerStoreTests: XCTestCase {
 
     func testCopyToNonExistingFolder() throws {
         // GIVEN
-        populate2(store: store)
+        populate(store: store)
 
         let invalidURL = directory.url
             .appending(directory: UUID().uuidString)
@@ -277,7 +277,7 @@ final class LoggerStoreTests: XCTestCase {
 
     func testCopyButFileExists() throws {
         // GIVEN
-        populate2(store: store)
+        populate(store: store)
 
         let copyURL = directory.url.appending(filename: "copy.pulse")
 
@@ -592,17 +592,17 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertEqual(messages.count, 0, "Previously recorded messages are going to be lost")
 
         // WHEN
-        try store.populate()
+        populate(store: store)
 
         // THEN can write new messages
-        XCTAssertEqual(try store.allMessages().count, 1)
+        XCTAssertEqual(try store.allMessages().count, 10)
     }
 
     // MARK: - Remove Messages
 
     func testRemoveAllMessages() throws {
         // GIVEN
-        populate2(store: store)
+        populate(store: store)
         store.storeMessage(label: "with meta", level: .debug, message: "test", metadata: ["hey": .string("this is meta yo")], file: #file, function: #function, line: #line)
 
         let context = store.viewContext
@@ -658,7 +658,7 @@ final class LoggerStoreTests: XCTestCase {
 
     func testStoreRequest() throws {
         // WHEN
-        populate2(store: store)
+        populate(store: store)
 
         // THEN
         let request = try XCTUnwrap(store.viewContext.first(LoggerNetworkRequestEntity.self) {
@@ -727,7 +727,7 @@ final class LoggerStoreTests: XCTestCase {
 
     func testGetStoreInfo() throws {
         // GIVEN
-        populate2(store: store)
+        populate(store: store)
 
         // WHEN
         let info = try store.info()
@@ -760,15 +760,5 @@ final class LoggerStoreTests: XCTestCase {
         try Files.unzipItem(at: archiveURL, to: storeURL)
         try Files.decompressFile(at: storeURL.appending(filename: "logs.sqlite"))
         return storeURL
-    }
-}
-
-#warning("TODO: remove and rename populate2")
-
-private extension LoggerStore {
-    func populate() throws {
-        storeMessage(label: "default", level: .debug, message: "Some message", metadata: [
-            "system": .string("application")
-        ])
     }
 }
