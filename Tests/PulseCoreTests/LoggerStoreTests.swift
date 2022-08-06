@@ -137,13 +137,10 @@ final class LoggerStoreTests: XCTestCase {
 
     func testInitWithPackageURL() throws {
         // GIVEN
-        let archiveURL = directory.url.appending(filename: UUID().uuidString)
-        try Resources.pulsePackage.write(to: archiveURL)
-        let storeURL = directory.url.appending(filename: UUID().uuidString)
-        try FileManager.default.unzipItem(at: archiveURL, to: storeURL)
+        let storeURL = try makePulsePackage()
 
         // WHEN
-        let store = try XCTUnwrap(LoggerStore(storeURL: storeURL.appending(filename: "current.pulse")))
+        let store = try XCTUnwrap(LoggerStore(storeURL: storeURL))
         defer { try? store.destroy() }
 
         // THEN entities can be opened
@@ -162,13 +159,10 @@ final class LoggerStoreTests: XCTestCase {
 
     func testInitWithPackageURLNoExtension() throws {
         // GIVEN
-        let archiveURL = directory.url.appending(filename: UUID().uuidString)
-        try Resources.pulsePackage.write(to: archiveURL)
-        let storeURL = directory.url.appending(filename: UUID().uuidString)
-        try FileManager.default.unzipItem(at: archiveURL, to: storeURL)
+        let storeURL = try makePulsePackage()
 
         // WHEN
-        let store = try XCTUnwrap(LoggerStore(storeURL: storeURL.appending(filename: "current.pulse")))
+        let store = try XCTUnwrap(LoggerStore(storeURL: storeURL))
         defer { try? store.destroy() }
 
         // THEN entities can be opened
@@ -259,17 +253,14 @@ final class LoggerStoreTests: XCTestCase {
 
     func testMesasureExportSize() throws {
         // GIVEN
-        let archiveURL = directory.url.appending(filename: UUID().uuidString)
-        try Resources.pulsePackage.write(to: archiveURL)
-        let storeURL = directory.url.appending(filename: UUID().uuidString)
-        try FileManager.default.unzipItem(at: archiveURL, to: storeURL)
+        let storeURL = try makePulsePackage()
 
         // WHEN
-        let store = try XCTUnwrap(LoggerStore(storeURL: storeURL.appending(filename: "current.pulse")))
+        let store = try XCTUnwrap(LoggerStore(storeURL: storeURL))
         defer { try? store.destroy() }
 
         let copyURL = directory.url.appending(filename: "compressed.pulse")
-        let info = try store.copy(to: copyURL)
+        try store.copy(to: copyURL)
 
         let size = (try Files.attributesOfItem(atPath: copyURL.path)[.size] as? Int64) ?? 0
         debugPrint(size)
@@ -748,6 +739,15 @@ final class LoggerStoreTests: XCTestCase {
             options: [.create, .synchronous],
             configuration: configuration
         )
+    }
+
+    private func makePulsePackage() throws -> URL {
+        let archiveURL = directory.url.appending(filename: UUID().uuidString)
+        try Resources.pulseArchive.write(to: archiveURL)
+        let storeURL = directory.url.appending(filename: UUID().uuidString)
+        try Files.unzipItem(at: archiveURL, to: storeURL)
+        try Files.decompressFile(at: storeURL.appending(filename: "logs.sqlite"))
+        return storeURL
     }
 }
 

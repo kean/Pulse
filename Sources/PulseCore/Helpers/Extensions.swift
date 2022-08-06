@@ -22,6 +22,20 @@ extension FileManager {
         try? createDirectory(at: url, withIntermediateDirectories: true, attributes: [:])
         return true
     }
+
+    /// Decompresses file at the given URL replacing the original file.
+    func decompressFile(at url: URL) throws {
+        try (Data(contentsOf: url) as NSData)
+            .decompressed(using: .zlib)
+            .write(to: url)
+    }
+
+    /// Compresses file at the given URL replacing the original file.
+    func compressFile(at url: URL) throws {
+        try (Data(contentsOf: url) as NSData)
+            .compressed(using: .zlib)
+            .write(to: url)
+    }
 }
 
 extension URL {

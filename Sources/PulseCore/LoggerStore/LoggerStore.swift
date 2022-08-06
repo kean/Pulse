@@ -164,7 +164,7 @@ public final class LoggerStore: @unchecked Sendable {
                     throw LoggerStore.Error.storeInvalid
                 }
                 try archive.extract(database, to: databaseURL)
-                try (Data(contentsOf: databaseURL) as NSData).decompressed(using: .zlib).write(to: databaseURL)
+                try Files.decompressFile(at: databaseURL)
             }
             self.document = .archive(archive)
         }
@@ -674,8 +674,7 @@ extension LoggerStore {
         let databaseURL = targetURL.appending(filename: databaseFilename)
         try container.persistentStoreCoordinator.createCopyOfStore(at: databaseURL)
         if compress {
-            let database = try Data(contentsOf: databaseURL) as NSData
-            try database.compressed(using: .zlib).write(to: databaseURL)
+            try Files.compressFile(at: databaseURL)
         }
 
         // Copy blobs (they are already compressed)
@@ -691,6 +690,7 @@ extension LoggerStore {
         // Add store info
         var info = try _info()
         info.storeId = manifest.storeId
+        // Chicken and an egg problem: don't know the exact size
         info.totalStoreSize = try targetURL.directoryTotalSize()
         info.creationDate = configuration.makeCurrentDate()
         info.modifiedDate = info.creationDate
