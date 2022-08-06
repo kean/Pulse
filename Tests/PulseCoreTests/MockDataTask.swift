@@ -25,14 +25,12 @@ extension MockDataTask {
 
 private let mockLoginRequest: URLRequest = {
     var request = URLRequest(url: URL(string: "https://github.com/login")!)
-
     request.setValue("gzip", forHTTPHeaderField: "Accept-Encoding")
     request.setValue("github.com", forHTTPHeaderField: "Host")
     request.setValue("application/json", forHTTPHeaderField: "Content-Type")
     request.setValue("no-cache", forHTTPHeaderField: "Cache-Control")
     request.setValue("en-us", forHTTPHeaderField: "Accept-Language")
     request.setValue("text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", forHTTPHeaderField: "Accept")
-
     return request
 }()
 

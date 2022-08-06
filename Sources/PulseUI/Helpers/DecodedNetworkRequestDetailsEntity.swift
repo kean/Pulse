@@ -7,20 +7,21 @@ import PulseCore
 import CoreData
 
 // TODO: Add as extensions to LoggerNetworkRequestDetailsEntity?
+
+#warning("TODO: remove this")
 final class DecodedNetworkRequestDetailsEntity {
     private let request: LoggerNetworkRequestEntity
-    private let details: LoggerNetworkRequestDetailsEntity
+    private lazy var details = request.details
 
-    private(set) lazy var originalRequest = decode(NetworkLogger.Request.self, from: details.originalRequest)
-    private(set) lazy var currentRequest = decode(NetworkLogger.Request.self, from: details.currentRequest)
-    private(set) lazy var response = decode(NetworkLogger.Response.self, from: details.response)
-    private(set) lazy var error = decode(NetworkLogger.ResponseError.self, from: details.error)
-    private(set) lazy var metrics = decode(NetworkLogger.Metrics.self, from: details.metrics)
-    private(set) lazy var metadata = decode([String: String].self, from: details.metadata)
+    private(set) lazy var originalRequest = details?.originalRequest
+    private(set) lazy var currentRequest = details?.currentRequest
+    private(set) lazy var response = details?.response
+    private(set) lazy var error = details?.error
+    private(set) lazy var metrics = details?.metrics
+    private(set) lazy var metadata = details?.metadata
 
     init(request: LoggerNetworkRequestEntity) {
         self.request = request
-        self.details = request.details
     }
 
     var requestHeaders: [String: String] {

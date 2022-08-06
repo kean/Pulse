@@ -311,8 +311,9 @@ extension LoggerStore {
         request.host = event.originalRequest.url?.host
         request.httpMethod = event.originalRequest.method
         request.requestState = LoggerNetworkRequestEntity.State.pending.rawValue
-        request.details.originalRequest = try? JSONEncoder().encode(event.originalRequest)
-        request.details.currentRequest = try? JSONEncoder().encode(event.currentRequest)
+
+        let details = LoggerNetworkRequestDetails(originalRequest: event.originalRequest, currentRequest: event.currentRequest)
+        populateDetails(details, for: request)
     }
 
     private func process(_ event: Event.NetworkTaskProgressUpdated) {
@@ -376,17 +377,20 @@ extension LoggerStore {
         request.isFromCache = transactions.last?.fetchType == .localCache || (transactions.last?.fetchType == .networkLoad && transactions.last?.response?.statusCode == 304)
 
         // Populate details
-        let details = request.details
-        let encoder = JSONEncoder()
-        details.originalRequest = try? encoder.encode(event.originalRequest)
-        details.currentRequest = try? encoder.encode(event.currentRequest)
-        details.response = try? encoder.encode(event.response)
-        details.error = try? encoder.encode(event.error)
-        details.metrics = try? encoder.encode(event.metrics)
-        if let responseBody = event.responseBody, (contentType?.isImage ?? false),
-           let metadata = makeImageMetadata(from: responseBody) {
-            details.metadata = try? encoder.encode(metadata)
-        }
+        let details = LoggerNetworkRequestDetails(
+            originalRequest: event.originalRequest,
+            currentRequest: event.currentRequest,
+            response: event.response,
+            error: event.error,
+            metrics: event.metrics,
+            metadata: {
+                if let responseBody = event.responseBody, (contentType?.isImage ?? false) {
+                    return makeImageMetadata(from: responseBody)
+                }
+                return nil
+            }()
+        )
+        populateDetails(details, for: request)
 
         // Completed
         if let progress = request.progress {
@@ -400,6 +404,20 @@ extension LoggerStore {
             if isFailure {
                 message.level = Level.error.rawValue
             }
+        }
+    }
+
+    private func populateDetails(_ details: LoggerNetworkRequestDetails, for request: LoggerNetworkRequestEntity) {
+        guard let data = try? JSONEncoder().encode(details),
+              let compressedData = try? (data as NSData).compressed(using: .zlib) as Data else {
+            return
+        }
+        if let entity = request.detailsData {
+            entity.data = compressedData
+        } else {
+            let entity = LoggerInlineDataEntity(context: backgroundContext)
+            entity.data = compressedData
+            request.detailsData = entity
         }
     }
 
@@ -445,7 +463,6 @@ extension LoggerStore {
         request.responseBodySize = -1
         request.requestBodySize = -1
         request.isFromCache = false
-        request.details = LoggerNetworkRequestDetailsEntity(context: backgroundContext)
         request.session = session
 
         let message = LoggerMessageEntity(context: backgroundContext)

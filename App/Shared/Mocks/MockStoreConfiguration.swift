@@ -4,9 +4,10 @@
 
 #if DEBUG || PULSE_DEMO
 
+#warning("TODO: switch to defaults")
 enum MockStoreConfiguration {
     /// Delay logs with random intervals.
-    static let isDelayingLogs = true
+    static let isDelayingLogs = false
     /// Add the same logs indefinitely with an interval.
     static let isIndefinite = false
     /// If true uses the default store that support remote logging.

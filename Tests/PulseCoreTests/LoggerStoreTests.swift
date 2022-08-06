@@ -220,8 +220,6 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertEqual(info.blobCount, 3)
         XCTAssertEqual(info.creationDate, date)
         XCTAssertEqual(info.modifiedDate, date)
-        // Can't check complete store size, but blobs are exact.
-        XCTAssertEqual(info.blobsDecompressedSize, 21195)
     }
 
     func testCopyWithPredicate() throws {
@@ -245,7 +243,6 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertEqual(try context.count(for: LoggerMessageEntity.self), 2)
         XCTAssertEqual(try context.count(for: LoggerMetadataEntity.self), 0)
         XCTAssertEqual(try context.count(for: LoggerNetworkRequestEntity.self), 0)
-        XCTAssertEqual(try context.count(for: LoggerNetworkRequestDetailsEntity.self), 0)
         XCTAssertEqual(try context.count(for: LoggerNetworkRequestProgressEntity.self), 0)
         XCTAssertEqual(try context.count(for: LoggerBlobHandleEntity.self), 0)
         XCTAssertEqual(try context.count(for: LoggerInlineDataEntity.self), 0)
@@ -410,7 +407,6 @@ final class LoggerStoreTests: XCTestCase {
         let context = store.backgroundContext
         XCTAssertEqual(try context.count(for: LoggerMessageEntity.self), 4)
         XCTAssertEqual(try context.count(for: LoggerNetworkRequestEntity.self), 2)
-        XCTAssertEqual(try context.count(for: LoggerNetworkRequestDetailsEntity.self), 2)
         XCTAssertEqual(try context.count(for: LoggerBlobHandleEntity.self), 0)
         context.reset()
 
@@ -421,10 +417,8 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertEqual(try context.count(for: LoggerMessageEntity.self), 2)
         XCTAssertEqual(try context.count(for: LoggerMetadataEntity.self), 0)
         XCTAssertEqual(try context.count(for: LoggerNetworkRequestEntity.self), 1)
-        XCTAssertEqual(try context.count(for: LoggerNetworkRequestDetailsEntity.self), 1)
         XCTAssertEqual(try context.count(for: LoggerNetworkRequestProgressEntity.self), 0)
         XCTAssertEqual(try context.count(for: LoggerBlobHandleEntity.self), 0)
-        XCTAssertEqual(try context.count(for: LoggerInlineDataEntity.self), 0)
 
         XCTAssertEqual(try store.allMessages().first?.label, "kept")
         XCTAssertEqual(try store.allRequests().first?.url, "example.com/kept")
@@ -454,7 +448,6 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertEqual(try store.backgroundContext.count(for: LoggerMessageEntity.self), 0)
         XCTAssertEqual(try store.backgroundContext.count(for: LoggerMetadataEntity.self), 0)
         XCTAssertEqual(try store.backgroundContext.count(for: LoggerNetworkRequestEntity.self), 0)
-        XCTAssertEqual(try store.backgroundContext.count(for: LoggerNetworkRequestDetailsEntity.self), 0)
         XCTAssertEqual(try store.backgroundContext.count(for: LoggerNetworkRequestProgressEntity.self), 0)
         XCTAssertEqual(try store.backgroundContext.count(for: LoggerBlobHandleEntity.self), 0)
         XCTAssertEqual(try store.backgroundContext.count(for: LoggerInlineDataEntity.self), 0)
@@ -514,7 +507,6 @@ final class LoggerStoreTests: XCTestCase {
         // THEN associated data is deleted
         XCTAssertEqual(try store.backgroundContext.count(for: LoggerNetworkRequestEntity.self), 1)
         XCTAssertEqual(try store.backgroundContext.count(for: LoggerBlobHandleEntity.self), 1)
-        XCTAssertEqual(try store.backgroundContext.count(for: LoggerInlineDataEntity.self), 1)
     }
 
     func testBlobSizeLimitSweep() throws {
@@ -552,7 +544,6 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertEqual(requests.count, 3) // Keeps the requests
         XCTAssertEqual(requests.compactMap(\.responseBody).count, 1)
         XCTAssertEqual(try store.backgroundContext.count(for: LoggerBlobHandleEntity.self), 1)
-        XCTAssertEqual(try store.backgroundContext.count(for: LoggerInlineDataEntity.self), 1)
     }
 
     func testBlobSizeLimitSweepLargeBlob() throws {
@@ -568,7 +559,6 @@ final class LoggerStoreTests: XCTestCase {
 
         // ASSERT it's stored in a file system
         XCTAssertEqual(try store.backgroundContext.count(for: LoggerBlobHandleEntity.self), 1)
-        XCTAssertEqual(try store.backgroundContext.count(for: LoggerInlineDataEntity.self), 0)
         let request = try store.backgroundContext.first(LoggerNetworkRequestEntity.self)
         let key = try XCTUnwrap(request?.responseBody?.key)
         XCTAssertEqual(store.getBlobData(forKey: key), responseData)
@@ -578,7 +568,6 @@ final class LoggerStoreTests: XCTestCase {
 
         // THEN the file is deleted from the file system
         XCTAssertEqual(try store.backgroundContext.count(for: LoggerBlobHandleEntity.self), 0)
-        XCTAssertEqual(try store.backgroundContext.count(for: LoggerInlineDataEntity.self), 0)
         XCTAssertNil(store.getBlobData(forKey: key))
     }
 
@@ -620,8 +609,8 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertEqual(try context.count(for: LoggerMessageEntity.self), 11)
         XCTAssertEqual(try context.count(for: LoggerMetadataEntity.self), 1)
         XCTAssertEqual(try context.count(for: LoggerNetworkRequestEntity.self), 3)
-        XCTAssertEqual(try context.count(for: LoggerNetworkRequestDetailsEntity.self), 3)
         XCTAssertEqual(try context.count(for: LoggerBlobHandleEntity.self), 3)
+        XCTAssertEqual(try context.count(for: LoggerInlineDataEntity.self), 6)
 
         // WHEN
         store.removeAll()
@@ -630,8 +619,8 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertEqual(try context.count(for: LoggerMessageEntity.self), 0)
         XCTAssertEqual(try context.count(for: LoggerMetadataEntity.self), 0)
         XCTAssertEqual(try context.count(for: LoggerNetworkRequestEntity.self), 0)
-        XCTAssertEqual(try context.count(for: LoggerNetworkRequestDetailsEntity.self), 0)
         XCTAssertEqual(try context.count(for: LoggerBlobHandleEntity.self), 0)
+        XCTAssertEqual(try context.count(for: LoggerInlineDataEntity.self), 0)
     }
 
     func testRemoveAllWithLargeBlob() throws {
@@ -646,7 +635,6 @@ final class LoggerStoreTests: XCTestCase {
 
         // ASSERT it's stored in a file system
         XCTAssertEqual(try store.backgroundContext.count(for: LoggerBlobHandleEntity.self), 1)
-        XCTAssertEqual(try store.backgroundContext.count(for: LoggerInlineDataEntity.self), 0)
         let request = try store.backgroundContext.first(LoggerNetworkRequestEntity.self)
         let key = try XCTUnwrap(request?.responseBody?.key)
         XCTAssertEqual(store.getBlobData(forKey: key), responseData)
@@ -664,6 +652,32 @@ final class LoggerStoreTests: XCTestCase {
 
         // THEN you can store more files after removal
         XCTAssertEqual(store.getBlobData(forKey: key), responseData)
+    }
+
+    // MARK: - Store Request
+
+    func testStoreRequest() throws {
+        // WHEN
+        populate2(store: store)
+
+        // THEN
+        let request = try XCTUnwrap(store.viewContext.first(LoggerNetworkRequestEntity.self) {
+            $0.predicate = NSPredicate(format: "url == %@", "https://github.com/login")
+        })
+
+        XCTAssertEqual(request.url, "https://github.com/login")
+        XCTAssertEqual(request.host, "github.com")
+        XCTAssertEqual(request.httpMethod, "GET")
+        XCTAssertEqual(request.taskType, .dataTask)
+        XCTAssertEqual(request.statusCode, 200)
+        XCTAssertEqual(request.state, .success)
+        XCTAssertEqual(request.contentType, "application/json; charset=utf-8")
+        XCTAssertEqual(request.isFromCache, false)
+        XCTAssertEqual(request.redirectCount, 0)
+
+        // Details
+        let details = try XCTUnwrap(request.details)
+        XCTAssertEqual(details.originalRequest.url?.absoluteString, "https://github.com/login")
     }
 
     // MARK: - Image Support
@@ -691,7 +705,7 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertEqual(thumbnail.size, CGSize(width: 512, height: 512))
 
         // THEN original image size saved
-        let metadata = try XCTUnwrap(JSONDecoder().decode([String: String].self, from: request.details.metadata ?? Data()))
+        let metadata = try XCTUnwrap(request.details?.metadata)
         XCTAssertEqual(metadata["ResponsePixelWidth"].flatMap { Int($0) }, 2048)
         XCTAssertEqual(metadata["ResponsePixelHeight"].flatMap { Int($0) }, 2048)
     }
@@ -723,8 +737,6 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertEqual(info.messageCount, 7)
         XCTAssertEqual(info.requestCount, 3)
         XCTAssertEqual(info.blobCount, 3)
-        // Can't check complete store size, but blobs are exact.
-        XCTAssertEqual(info.blobsDecompressedSize, 21195)
     }
 
     // MARK: - Helpers
@@ -750,6 +762,8 @@ final class LoggerStoreTests: XCTestCase {
         return storeURL
     }
 }
+
+#warning("TODO: remove and rename populate2")
 
 private extension LoggerStore {
     func populate() throws {

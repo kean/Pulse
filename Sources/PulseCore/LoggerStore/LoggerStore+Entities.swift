@@ -43,6 +43,7 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
     @NSManaged public var statusCode: Int32
     @NSManaged public var errorDomain: String?
     @NSManaged public var errorCode: Int32
+#warning("TODO: rename to responseContentType")
     /// Response content-type.
     @NSManaged public var contentType: String?
     /// Returns `true` if the response was returned from the local cache.
@@ -50,8 +51,13 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
 
     // MARK: State
 
+    /// Returns request state.
+    public var state: LoggerNetworkRequestEntity.State {
+        LoggerNetworkRequestEntity.State(rawValue: requestState) ?? .pending
+    }
+
     /// Contains ``State-swift.enum`` raw value.
-    @NSManaged public var requestState: Int16
+    @NSManaged var requestState: Int16
     /// Request progress.
     ///
     /// - note: The entity is created lazily when the first progress report
@@ -74,8 +80,19 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
 
     // MARK: Details
 
-    /// Request details.
-    @NSManaged public var details: LoggerNetworkRequestDetailsEntity
+    #warning("TODO: should it be lazy. If yes, how to we revalidate it?")
+    /// Returns decoded details.
+    public lazy var details: LoggerNetworkRequestDetails? = {
+        guard let compressedData = detailsData?.data,
+              let data = try? (compressedData as NSData).decompressed(using: .zlib) else {
+            return nil
+        }
+        return try? JSONDecoder().decode(LoggerNetworkRequestDetails.self, from: data as Data)
+    }()
+
+    /// Request details (encoded and compresed ``LoggerNetworkRequestDetails``).
+    @NSManaged var detailsData: LoggerInlineDataEntity?
+
     /// The request body handle.
     @NSManaged public var requestBody: LoggerBlobHandleEntity?
     /// The response body handle.
@@ -86,16 +103,6 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
     @NSManaged public var responseBodySize: Int64
 
     // MARK: Helpers
-
-    /// Returns request state.
-    public var state: LoggerNetworkRequestEntity.State {
-        if let state = LoggerNetworkRequestEntity.State(rawValue: requestState) {
-            return state
-        }
-        // For backward-compatibility.
-        let isFailure = errorCode != 0 || (statusCode != 0 && !(200..<400).contains(statusCode))
-        return isFailure ? .failure : .success
-    }
 
     /// Returns task interval (if available from metrics).
     public var taskInterval: DateInterval? {
@@ -125,20 +132,23 @@ public final class LoggerNetworkRequestProgressEntity: NSManagedObject {
     @NSManaged public var totalUnitCount: Int64
 }
 
-/// Details associated with the request.
-public final class LoggerNetworkRequestDetailsEntity: NSManagedObject {
-    /// Contains JSON-encoded ``NetworkLogger/Request``.
-    @NSManaged public var originalRequest: Data?
-    /// Contains JSON-encoded ``NetworkLogger/Request``.
-    @NSManaged public var currentRequest: Data?
-    /// Contains JSON-encoded ``NetworkLogger/Response``.
-    @NSManaged public var response: Data?
-    /// Contains JSON-encoded ``NetworkLogger/ResponseError``.
-    @NSManaged public var error: Data?
-    /// Contains JSON-encoded ``NetworkLogger/Metrics``.
-    @NSManaged public var metrics: Data?
-    /// Contains JSON-encoded metadata (`[String: String]`).
-    @NSManaged public var metadata: Data?
+/// The request details stored in a database in a denormalized format.
+public final class LoggerNetworkRequestDetails: Codable, Sendable {
+    public let originalRequest: NetworkLogger.Request
+    public let currentRequest: NetworkLogger.Request?
+    public let response: NetworkLogger.Response?
+    public let error: NetworkLogger.ResponseError?
+    public let metrics: NetworkLogger.Metrics?
+    public let metadata: [String: String]?
+
+    public init(originalRequest: NetworkLogger.Request, currentRequest: NetworkLogger.Request?, response: NetworkLogger.Response? = nil, error: NetworkLogger.ResponseError? = nil, metrics: NetworkLogger.Metrics? = nil, metadata: [String : String]? = nil) {
+        self.originalRequest = originalRequest
+        self.currentRequest = currentRequest
+        self.response = response
+        self.error = error
+        self.metrics = metrics
+        self.metadata = metadata
+    }
 }
 
 /// Doesn't contain any data, just the key and some additional payload.

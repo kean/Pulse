@@ -13,7 +13,6 @@ extension LoggerStore {
         let metadata = NSEntityDescription(name: "LoggerMetadataEntity", class: LoggerMetadataEntity.self)
         let request = NSEntityDescription(name: "LoggerNetworkRequestEntity", class: LoggerNetworkRequestEntity.self)
         let requestProgress = NSEntityDescription(name: "LoggerNetworkRequestProgressEntity", class: LoggerNetworkRequestProgressEntity.self)
-        let requestDetails = NSEntityDescription(name: "LoggerNetworkRequestDetailsEntity", class: LoggerNetworkRequestDetailsEntity.self)
         let blob = NSEntityDescription(name: "LoggerBlobHandleEntity", class: LoggerBlobHandleEntity.self)
         let inlinedData = NSEntityDescription(name: "LoggerInlineDataEntity", class: LoggerInlineDataEntity.self)
 
@@ -56,20 +55,11 @@ extension LoggerStore {
             NSAttributeDescription(name: "requestBodySize", type: .integer64AttributeType),
             NSAttributeDescription(name: "responseBodySize", type: .integer64AttributeType),
             NSAttributeDescription(name: "isFromCache", type: .booleanAttributeType),
-            NSRelationshipDescription.make(name: "details", type: .oneToOne(), entity: requestDetails),
             NSRelationshipDescription.make(name: "message", type: .oneToOne(), entity: message),
+            NSRelationshipDescription.make(name: "detailsData", type: .oneToOne(), entity: inlinedData),
             NSRelationshipDescription.make(name: "requestBody", type: .oneToOne(isOptional: true), deleteRule: .noActionDeleteRule, entity: blob),
             NSRelationshipDescription.make(name: "responseBody", type: .oneToOne(isOptional: true), deleteRule: .noActionDeleteRule, entity: blob),
             NSRelationshipDescription.make(name: "progress", type: .oneToOne(isOptional: true), entity: requestProgress)
-        ]
-
-        requestDetails.properties = [
-            NSAttributeDescription(name: "originalRequest", type: .binaryDataAttributeType),
-            NSAttributeDescription(name: "currentRequest", type: .binaryDataAttributeType),
-            NSAttributeDescription(name: "response", type: .binaryDataAttributeType),
-            NSAttributeDescription(name: "error", type: .binaryDataAttributeType),
-            NSAttributeDescription(name: "metrics", type: .binaryDataAttributeType),
-            NSAttributeDescription(name: "metadata", type: .binaryDataAttributeType)
         ]
 
         requestProgress.properties = [
@@ -89,7 +79,7 @@ extension LoggerStore {
             NSAttributeDescription(name: "data", type: .binaryDataAttributeType)
         ]
 
-        model.entities = [message, metadata, request, requestDetails, requestProgress, blob, inlinedData]
+        model.entities = [message, metadata, request, requestProgress, blob, inlinedData]
         return model
     }()
 }

@@ -40,10 +40,11 @@ extension XCTestCase {
         configuration.httpAdditionalHeaders = [
             "User-Agent": "Pulse Demo/0.19 iOS"
         ]
-        let urlSession = URLSession(configuration: configuration)
+        let urlSession = URLSession(configuration: .default)
 
         func logTask(_ mockTask: MockDataTask) {
             let dataTask = urlSession.dataTask(with: mockTask.request)
+            dataTask.setValue(mockTask.response, forKey: "response")
             networkLogger.logTaskCreated(dataTask)
             networkLogger.logDataTask(dataTask, didReceive: mockTask.responseBody)
             networkLogger.logTask(dataTask, didFinishCollecting: mockTask.metrics)
