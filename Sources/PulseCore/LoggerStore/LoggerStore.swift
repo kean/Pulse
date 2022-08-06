@@ -162,8 +162,7 @@ public final class LoggerStore: @unchecked Sendable {
             if !Files.fileExists(atPath: databaseURL.path) {
                 try document.database().write(to: databaseURL)
             }
-            self.document = .archive(document)
-            #warning("TODO make manifest optional")
+            self.document = .archive(info, document)
             self.manifest = .init(storeId: info.storeId, version: try Version(string: info.storeVersion))
         }
 
@@ -543,7 +542,7 @@ extension LoggerStore {
         switch document {
         case .package:
             return try? Data(contentsOf: makeBlobURL(for: key))
-        case .archive(let document):
+        case let .archive(_, document):
             return document.getBlob(forKey: key)
         }
     }
@@ -895,16 +894,15 @@ extension LoggerStore {
     ///
     /// - important Thread-safe. But must NOT be called inside the `backgroundContext` queue.
     public func info() throws -> Info {
-        try backgroundContext.performAndReturn {
-            try self._info()
+        switch document {
+        case let .archive(info, _):
+            return info
+        case .package:
+            return try backgroundContext.performAndReturn { try self._info() }
         }
     }
 
     private func _info() throws -> Info {
-        guard !isArchive else {
-            return try Info.make(storeURL: storeURL)
-        }
-
         let databaseAttributes = try Files.attributesOfItem(atPath: databaseURL.path)
 
         let messageCount = try backgroundContext.count(for: LoggerMessageEntity.self)
@@ -1060,5 +1058,5 @@ private enum PulseDocumentType {
     /// it can be automatically opened by the Pulse apps.
     case package
     /// An archive created by exporting the store.
-    case archive(PulseDocument)
+    case archive(LoggerStore.Info, PulseDocument)
 }
