@@ -29,8 +29,13 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
     @NSManaged public var isPinned: Bool
     @NSManaged public var session: UUID
     @NSManaged public var taskId: UUID
-    @NSManaged public var rawTaskType: Int16
     @NSManaged public var message: LoggerMessageEntity?
+
+    /// Returns task type
+    public var taskType: NetworkLogger.TaskType? {
+        NetworkLogger.TaskType(rawValue: rawTaskType)
+    }
+    @NSManaged var rawTaskType: Int16
 
     // MARK: Request
 
@@ -79,15 +84,30 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
 
     // MARK: Details
 
-    #warning("TODO: should it be lazy. If yes, how to we revalidate it?")
-    /// Returns decoded details.
-    public lazy var details: LoggerNetworkRequestDetails? = {
+    /// Returns request details.
+    ///
+    /// - important: Accessing it for the first time can be a relatively slow
+    /// operation because it performs decoding on the fly, but the decoded
+    /// entity is cached until the object is turned into a fault.
+    public var details: LoggerNetworkRequestDetails? {
+        if let (details, count) = cachedDetails, count == detailsData?.data.count {
+            return details
+        }
         guard let compressedData = detailsData?.data,
-              let data = try? (compressedData as NSData).decompressed(using: .zlib) else {
+              let data = try? (compressedData as NSData).decompressed(using: .zlib),
+              let details = try? JSONDecoder().decode(LoggerNetworkRequestDetails.self, from: data as Data) else {
             return nil
         }
-        return try? JSONDecoder().decode(LoggerNetworkRequestDetails.self, from: data as Data)
-    }()
+        self.cachedDetails = (details, compressedData.count)
+        return details
+    }
+
+    public override func willTurnIntoFault() {
+        super.willTurnIntoFault()
+        cachedDetails = nil
+    }
+
+    private var cachedDetails: (LoggerNetworkRequestDetails, Int)?
 
     /// Request details (encoded and compresed ``LoggerNetworkRequestDetails``).
     @NSManaged var detailsData: LoggerInlineDataEntity?
@@ -109,11 +129,6 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
             return nil
         }
         return DateInterval(start: startDate, end: endDate)
-    }
-
-    /// Returns task type
-    public var taskType: NetworkLogger.TaskType? {
-        NetworkLogger.TaskType(rawValue: rawTaskType)
     }
 
     public enum State: Int16 {
