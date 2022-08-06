@@ -263,7 +263,7 @@ final class LoggerStoreTests: XCTestCase {
         try store.copy(to: copyURL)
 
         let size = (try Files.attributesOfItem(atPath: copyURL.path)[.size] as? Int64) ?? 0
-        debugPrint(size)
+        debugPrint("Package: \(try storeURL.directoryTotalSize()). Archive: \(size)")
     }
 
     func testCopyToNonExistingFolder() throws {
