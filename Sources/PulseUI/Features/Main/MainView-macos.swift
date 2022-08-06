@@ -63,7 +63,7 @@ public struct MainView: View {
                 }
             }
             .sheet(isPresented: $isShowingSettings) {
-                SettingsView(viewModel: .init(store: viewModel.store), console: viewModel.console)
+                SettingsView(viewModel: .init(store: viewModel.store))
             }
             .onDisappear { viewModel.freeMemory() }
     }

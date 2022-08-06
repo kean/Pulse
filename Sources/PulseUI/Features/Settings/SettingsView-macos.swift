@@ -10,22 +10,19 @@ import UniformTypeIdentifiers
 
 public struct SettingsView: View {
     @ObservedObject var viewModel: SettingsViewModel
-    @ObservedObject var console: ConsoleViewModel
     @Environment(\.presentationMode) var presentationMode
-    var store: LoggerStore { console.store }
-    
+    var store: LoggerStore { viewModel.store }
+
     @State private var isDocumentBrowserPresented = false
-    
+
     public init(store: LoggerStore = .shared) {
         self.viewModel = SettingsViewModel(store: store)
-        self.console = ConsoleViewModel(store: store)
     }
-    
-    init(viewModel: SettingsViewModel, console: ConsoleViewModel) {
+
+    init(viewModel: SettingsViewModel) {
         self.viewModel = viewModel
-        self.console = console
     }
-    
+
     public var body: some View {
         VStack {
             List {
@@ -47,11 +44,11 @@ public struct SettingsView: View {
                 }
                 Section(header: Text("Manage Messages")) {
                     if !viewModel.isArchive {
-                        ButtonRemoveAll(action: console.buttonRemoveAllMessagesTapped)
+                        ButtonRemoveAll(action: viewModel.buttonRemoveAllMessagesTapped)
                     }
                 }
                 Section(header: Text("Remote Logging")) {
-                    if console.store === RemoteLogger.shared.store {
+                    if viewModel.isRemoteLoggingAvailable {
                         RemoteLoggerSettingsView(viewModel: .shared)
                     } else {
                         Text("Not available")
@@ -70,7 +67,7 @@ public struct SettingsView: View {
 #if DEBUG
 struct ConsoleSettingsView_Previews: PreviewProvider {
     static var previews: some View {
-        SettingsView(viewModel: SettingsViewModel(store: .shared), console: ConsoleViewModel(store: .shared))
+        SettingsView(viewModel: SettingsViewModel(store: .shared))
     }
 }
 #endif
