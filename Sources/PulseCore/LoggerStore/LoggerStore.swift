@@ -687,13 +687,16 @@ extension LoggerStore {
         documentEntity.database = try Data(contentsOf: databaseURL).compressed()
         totalSize += Int64(documentEntity.database.count)
 
-#warning("TODO: save in batches")
-        // Copy blobs (they are already compressed)
-        for blobURL in try Files.contentsOfDirectory(at: blobsURL, includingPropertiesForKeys: nil) {
-            let blobEntity = PulseBlobEntity(context: document.context)
-            // Blobs are already compressed
-            blobEntity.data = try Data(contentsOf: blobURL)
-            totalSize += Int64(blobEntity.data.count)
+        let blobURLs = try Files.contentsOfDirectory(at: blobsURL, includingPropertiesForKeys: nil)
+        for chunk in blobURLs.chunked(into: 100) {
+            var objects: [[String: Any]] = []
+            for blobURL in chunk {
+                if let data = try? Data(contentsOf: blobURL) {
+                    objects.append(["data": data])
+                    totalSize += Int64(data.count)
+                }
+            }
+            try document.context.execute(NSBatchInsertRequest(entityName: String(describing: PulseBlobEntity.self), objects: objects))
         }
 
         // Add store info
