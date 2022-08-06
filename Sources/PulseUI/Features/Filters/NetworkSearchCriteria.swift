@@ -317,7 +317,6 @@ private func decode<T: Decodable>(_ type: T.Type) -> (_ data: Data?) -> T? {
     }
 }
 
-#warning("TODO: remove cache")
 private var cache = Cache<CacheKey, Any>(costLimit: Int.max, countLimit: 1000)
 
 private struct CacheKey: Hashable {
@@ -349,7 +348,6 @@ func evaluateProgrammaticFilters(_ filters: [NetworkSearchFilter], entity: Logge
         return value
     }
 
-#warning("TODO: this should be rewritten to fault stuff")
     func isMatch(filter: NetworkSearchFilter) -> Bool {
         switch filter.field {
         case .requestHeader: return (request?.headers ?? [:]).contains { filter.matches(string: $0.key) || filter.matches(string: $0.value) }

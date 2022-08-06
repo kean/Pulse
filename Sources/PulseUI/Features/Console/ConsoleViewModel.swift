@@ -126,20 +126,6 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         }
     }
 
-    // MARK: Pins
-
-#warning("TODO: remove")
-
-#if os(iOS) || os(macOS)
-    func share(as output: ShareStoreOutput) -> ShareItems {
-#if os(iOS)
-        ShareItems(store: store, output: output)
-#else
-        ShareItems(messages: store)
-#endif
-    }
-#endif
-
     // MARK: - NSFetchedResultsControllerDelegate
 
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChangeContentWith diff: CollectionDifference<NSManagedObjectID>) {

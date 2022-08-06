@@ -322,7 +322,6 @@ final class LoggerStoreTests: XCTestCase {
 
     // MARK: - File (Readonly)
 
-    #warning("TODO: fix")
     // TODO: this type of store is no longer immuatble
     func _testOpenFileDatabaseImmutable() throws {
         // GIVEN

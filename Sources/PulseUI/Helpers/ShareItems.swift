@@ -23,34 +23,7 @@ struct ShareItems: Identifiable {
     }
 }
 
-#warning("TODO: remove")
 extension ShareItems {
-    init(store: LoggerStore, output: ShareStoreOutput) {
-        let directory = TemporaryDirectory()
-        let date = makeCurrentDate()
-
-        let items: [Any]
-        switch output {
-        case .store:
-            if store.isArchive {
-                items = [store.storeURL]
-            } else {
-                let storeURL = directory.url.appendingPathComponent("logs-\(date).pulse", isDirectory: false)
-                _ = try? store.copy(to: storeURL)
-                items = [storeURL]
-            }
-        case .text:
-            let messages = (try? store.allMessages()) ?? []
-            let text = ConsoleShareService.format(messages)
-            let logsURL = directory.url.appendingPathComponent("logs-\(date).txt")
-            try? text.data(using: .utf8)?.write(to: logsURL)
-            items = [logsURL]
-            break
-        }
-
-        self.init(items, cleanup: directory.remove)
-    }
-
     init(messages store: LoggerStore) {
         let messages = (try? store.allMessages()) ?? []
         let text = ConsoleShareService.format(messages)

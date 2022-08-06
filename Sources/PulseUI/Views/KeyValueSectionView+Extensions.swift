@@ -128,7 +128,6 @@ extension KeyValueSectionViewModel {
             items.append((title, value))
         }
         let timing = transaction.timing
-        #warning("TODO: show duration instead and offset")
         addDate(timing.fetchStartDate, title: "Fetch Start")
         addDate(timing.domainLookupStartDate, title: "Domain Lookup Start")
         addDate(timing.domainLookupEndDate, title: "Domain Lookup End")
