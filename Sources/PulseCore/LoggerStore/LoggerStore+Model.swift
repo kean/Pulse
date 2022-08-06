@@ -117,7 +117,7 @@ final class PulseBlobEntity: NSManagedObject {
     @NSManaged var data: Data
 }
 
-final class PulseDocument2 {
+final class PulseDocument {
     let container: NSPersistentContainer
     var context: NSManagedObjectContext { container.viewContext }
 

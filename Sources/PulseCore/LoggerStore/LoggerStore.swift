@@ -126,7 +126,7 @@ public final class LoggerStore: @unchecked Sendable {
         if !isArchive {
             self.databaseURL = storeURL.appending(filename: databaseFilename)
             if options.contains(.create) {
-                if !Files.itemExists(at: storeURL) {
+                if !Files.fileExists(atPath: storeURL.path) {
                     try Files.createDirectory(at: storeURL, withIntermediateDirectories: false)
                 }
                 Files.createDirectoryIfNeeded(at: blobsURL)
@@ -151,7 +151,7 @@ public final class LoggerStore: @unchecked Sendable {
             }
             self.document = .package
         } else {
-            let document = try PulseDocument2(documentURL: storeURL)
+            let document = try PulseDocument(documentURL: storeURL)
             let info = try document.open()
             guard try Version(string: info.storeVersion) >= .currentStoreVersion else {
                 throw LoggerStore.Error.unsupportedVersion
@@ -647,8 +647,8 @@ extension LoggerStore {
 
 extension LoggerStore {
     /// Creates a copy of the current store at the given URL. The created copy
-    /// has `.pulse` extension (actually is a `.zip` archive). If the store is
-    /// already an archive, creates a copy.
+    /// has `.pulse` extension (the document format is based on SQLite). If the
+    /// store is already an archive, creates a copy.
     ///
     /// - parameters:
     ///   - targetURL: The destination directory must already exist. But if the
@@ -662,7 +662,7 @@ extension LoggerStore {
         switch document {
         case .package:
             return try backgroundContext.performAndReturn {
-                try _copy(to: targetURL)
+                try write(to: try PulseDocument(documentURL: targetURL))
             }
         case .archive:
             try Files.copyItem(at: storeURL, to: targetURL)
@@ -670,69 +670,7 @@ extension LoggerStore {
         }
     }
 
-    private func _copy(to targetURL: URL) throws -> Info {
-    #warning("TODO: remove")
-        let useDB = true
-        if useDB {
-            let document = try PulseDocument2(documentURL: targetURL)
-            return try write(to: document)
-        } else {
-            let directory = TemporaryDirectory()
-            defer { directory.remove() }
-
-            // Copy the database
-            let info = try _copyAllFiles(to: directory.url)
-
-            // Archive and add .pulse extension. Note: it uses zlib compression under
-            // the hood which proved to be the best option in terms of space/speed balance.
-            try Files.zipItem(at: directory.url, to: targetURL, shouldKeepParent: false, compressionMethod: .none)
-
-            return info
-        }
-
-//        // Copy the database
-//        let info = try _copyAllFiles(to: directory.url)
-//
-//        // Archive and add .pulse extension. Note: it uses zlib compression under
-//        // the hood which proved to be the best option in terms of space/speed balance.
-//        try Files.zipItem(at: directory.url, to: targetURL, shouldKeepParent: false, compressionMethod: .none)
-//
-//        return info
-    }
-
-    #warning("TODO: remove")
-    private func _copyAllFiles(to targetURL: URL, compress: Bool = true) throws -> Info {
-        // Create copy of the store
-        let databaseURL = targetURL.appending(filename: databaseFilename)
-        try container.persistentStoreCoordinator.createCopyOfStore(at: databaseURL)
-        if compress {
-            try Files.compressFile(at: databaseURL)
-        }
-
-        // Copy blobs (they are already compressed)
-        let blobsURL = targetURL.appending(directory: blobsDirectoryName)
-        try Files.copyItem(at: self.blobsURL, to: blobsURL)
-
-        // Create manifest
-        let manifestURL = targetURL.appending(filename: manifestFilename)
-        var manifest = manifest
-        manifest.storeId = UUID()
-        try JSONEncoder().encode(manifest).write(to: manifestURL)
-
-        // Add store info
-        var info = try _info()
-        info.storeId = manifest.storeId
-        // Chicken and an egg problem: don't know the exact size
-        info.totalStoreSize = try targetURL.directoryTotalSize()
-        info.creationDate = configuration.makeCurrentDate()
-        info.modifiedDate = info.creationDate
-        let infoURL = targetURL.appending(filename: infoFilename)
-        try JSONEncoder().encode(info).write(to: infoURL)
-
-        return info
-    }
-
-    private func write(to document: PulseDocument2) throws -> Info {
+    private func write(to document: PulseDocument) throws -> Info {
         let temporary = TemporaryDirectory()
         defer { temporary.remove() }
 
@@ -773,7 +711,7 @@ extension LoggerStore {
     }
 
     /// Creates a copy of the current store at the given URL. The created copy
-    /// has `.pulse` extension (actually is a `.zip` archive).
+    /// has `.pulse` extension.
     ///
     /// - parameters:
     ///   - targetURL: The destination directory must already exist. But if the
@@ -803,7 +741,8 @@ extension LoggerStore {
         let directory = TemporaryDirectory()
         defer { directory.remove() }
 
-        _ = try _copyAllFiles(to: directory.url, compress: false)
+    #warning("TODO: reimplement")
+//        _ = try _copyAllFiles(to: directory.url, compress: false)
 
         // Open the copy of the store
         let store = try LoggerStore(storeURL: directory.url)
@@ -1102,13 +1041,6 @@ extension LoggerStore {
             }
             self = manifest
         }
-
-        init(archive: IndexedArchive) throws {
-            guard let data = archive.getData(for: manifestFilename) else {
-                throw NSError(domain: NSErrorDomain() as String, code: NSURLErrorResourceUnavailable, userInfo: [NSLocalizedDescriptionKey: "Store manifest is missing"])
-            }
-            self = try JSONDecoder().decode(Manifest.self, from: data)
-        }
     }
 }
 
@@ -1123,10 +1055,10 @@ let databaseFilename = "logs.sqlite"
 let infoFilename = "info.json"
 let blobsDirectoryName = "blobs"
 
-private enum PulseDocumentType: Sendable {
+private enum PulseDocumentType {
     /// A plain directory (aka "package"). If it has a `.pulse` file extension,
     /// it can be automatically opened by the Pulse apps.
     case package
     /// An archive created by exporting the store.
-    case archive(PulseDocument2)
+    case archive(PulseDocument)
 }

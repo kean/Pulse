@@ -77,12 +77,7 @@ extension LoggerStore {
         /// exported from the app without unarchaving the document. If you need
         /// to get info about the current store, use ``LoggerStore/Info``.
         public static func make(storeURL: URL) throws -> Info {
-            guard let archive = Archive(url: storeURL, accessMode: .read),
-                  let entry = archive[infoFilename],
-                  let data = archive.getData(for: entry) else {
-                throw LoggerStore.Error.fileDoesntExist
-            }
-            return try JSONDecoder().decode(LoggerStore.Info.self, from: data)
+            try PulseDocument(documentURL: storeURL).open()
         }
     }
 }
