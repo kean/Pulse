@@ -18,6 +18,9 @@ final class PulseDocument {
     private var _document: PulseDocumentEntity?
 
     init(documentURL: URL) throws {
+        guard Files.fileExists(atPath: documentURL.deletingLastPathComponent().path) else {
+            throw LoggerStore.Error.fileDoesntExist
+        }
         self.container = NSPersistentContainer(name: documentURL.lastPathComponent, managedObjectModel: PulseDocument.model)
         let store = NSPersistentStoreDescription(url: documentURL)
         store.setValue("NONE" as NSString, forPragmaNamed: "journal_mode")

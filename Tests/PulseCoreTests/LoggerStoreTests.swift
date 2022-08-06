@@ -147,17 +147,10 @@ final class LoggerStoreTests: XCTestCase {
         defer { try? store.destroy() }
 
         // THEN entities can be opened
-        XCTAssertEqual(try store.viewContext.count(for: LoggerMessageEntity.self), 15)
-        XCTAssertEqual(try store.viewContext.count(for: LoggerNetworkRequestEntity.self), 8)
-        XCTAssertEqual(try store.viewContext.count(for: LoggerMetadataEntity.self), 1)
-        XCTAssertEqual(try store.viewContext.count(for: LoggerBlobHandleEntity.self), 7)
-
-        // THEN data stored in external storage also persist
-        let request = try XCTUnwrap(store.viewContext.first(LoggerNetworkRequestEntity.self) {
-            $0.predicate = NSPredicate(format: "url == %@", "https://github.com/repos")
-        })
-        XCTAssertEqual(request.responseBodySize, 165061)
-        XCTAssertEqual(request.responseBody?.data?.count, 165061)
+        XCTAssertEqual(try store.viewContext.count(for: LoggerMessageEntity.self), 10)
+        XCTAssertEqual(try store.viewContext.count(for: LoggerNetworkRequestEntity.self), 3)
+        XCTAssertEqual(try store.viewContext.count(for: LoggerMetadataEntity.self), 0)
+        XCTAssertEqual(try store.viewContext.count(for: LoggerBlobHandleEntity.self), 3)
     }
 
     func testInitWithPackageURLNoExtension() throws {
@@ -169,17 +162,10 @@ final class LoggerStoreTests: XCTestCase {
         defer { try? store.destroy() }
 
         // THEN entities can be opened
-        XCTAssertEqual(try store.viewContext.count(for: LoggerMessageEntity.self), 15)
-        XCTAssertEqual(try store.viewContext.count(for: LoggerNetworkRequestEntity.self), 8)
-        XCTAssertEqual(try store.viewContext.count(for: LoggerMetadataEntity.self), 1)
-        XCTAssertEqual(try store.viewContext.count(for: LoggerBlobHandleEntity.self), 7)
-
-        // THEN data stored in external storage also persist
-        let request = try XCTUnwrap(store.viewContext.first(LoggerNetworkRequestEntity.self) {
-            $0.predicate = NSPredicate(format: "url == %@", "https://github.com/repos")
-        })
-        XCTAssertEqual(request.responseBodySize, 165061)
-        XCTAssertEqual(request.responseBody?.data?.count, 165061)
+        XCTAssertEqual(try store.viewContext.count(for: LoggerMessageEntity.self), 10)
+        XCTAssertEqual(try store.viewContext.count(for: LoggerNetworkRequestEntity.self), 3)
+        XCTAssertEqual(try store.viewContext.count(for: LoggerMetadataEntity.self), 0)
+        XCTAssertEqual(try store.viewContext.count(for: LoggerBlobHandleEntity.self), 3)
     }
 
     // MARK: - Copy (Package)
@@ -273,6 +259,8 @@ final class LoggerStoreTests: XCTestCase {
 
         // WHEN/THEN
         XCTAssertThrowsError(try store.copy(to: copyURL))
+
+        print(copyURL)
     }
 
     // MARK: - Copy (Archive)
@@ -742,11 +730,10 @@ final class LoggerStoreTests: XCTestCase {
     }
 
     private func makePulsePackage() throws -> URL {
-        let archiveURL = directory.url.appending(filename: UUID().uuidString)
-        try Resources.pulseArchive.write(to: archiveURL)
         let storeURL = directory.url.appending(filename: UUID().uuidString)
-        try Files.unzipItem(at: archiveURL, to: storeURL)
-        try Files.decompressFile(at: storeURL.appending(filename: "logs.sqlite"))
+        let store = try LoggerStore(storeURL: storeURL, options: [.create, .synchronous])
+        populate(store: store)
+        store.removeStores()
         return storeURL
     }
 
@@ -770,7 +757,7 @@ final class LoggerStoreTests: XCTestCase {
     }
 
 #warning("TODO: add a test for external blobs")
-    func testMesasureExportSizeLarge() throws {
+    func _testMesasureExportSizeLarge() throws {
         // GIVEN
         let store = makeStore()
         defer { try? store.destroy() }

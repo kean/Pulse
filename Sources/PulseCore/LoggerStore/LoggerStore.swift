@@ -658,6 +658,9 @@ extension LoggerStore {
     /// - returns: The information about the created store.
     @discardableResult
     public func copy(to targetURL: URL) throws -> Info {
+        guard !FileManager.default.fileExists(atPath: targetURL.path) else {
+            throw LoggerStore.Error.fileAleadyExists
+        }
         switch document {
         case .package:
             return try backgroundContext.performAndReturn {
@@ -1005,6 +1008,7 @@ extension LoggerStore {
         case storeInvalid
         case unsupportedVersion
         case documentIsReadonly
+        case fileAleadyExists
         case unknownError
 
         public var errorDescription: String? {
@@ -1013,6 +1017,7 @@ extension LoggerStore {
             case .storeInvalid: return "Store format is invalid"
             case .documentIsReadonly: return "Document is readonly"
             case .unsupportedVersion: return "The store was created by one of the earlier versions of Pulse and is no longer supported"
+            case .fileAleadyExists: return "The file at the given location already exists"
             case .unknownError: return "Unexpected error"
             }
         }
