@@ -43,9 +43,8 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
     @NSManaged public var statusCode: Int32
     @NSManaged public var errorDomain: String?
     @NSManaged public var errorCode: Int32
-#warning("TODO: rename to responseContentType")
     /// Response content-type.
-    @NSManaged public var contentType: String?
+    @NSManaged public var responseContentType: String?
     /// Returns `true` if the response was returned from the local cache.
     @NSManaged public var isFromCache: Bool
 

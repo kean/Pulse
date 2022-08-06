@@ -49,7 +49,7 @@ extension LoggerStore {
             NSAttributeDescription(name: "statusCode", type: .integer32AttributeType),
             NSAttributeDescription(name: "startDate", type: .dateAttributeType),
             NSAttributeDescription(name: "duration", type: .doubleAttributeType),
-            NSAttributeDescription(name: "contentType", type: .stringAttributeType),
+            NSAttributeDescription(name: "responseContentType", type: .stringAttributeType),
             NSAttributeDescription(name: "requestState", type: .integer16AttributeType),
             NSAttributeDescription(name: "redirectCount", type: .integer16AttributeType),
             NSAttributeDescription(name: "requestBodySize", type: .integer64AttributeType),

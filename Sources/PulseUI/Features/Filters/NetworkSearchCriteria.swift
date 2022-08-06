@@ -407,7 +407,7 @@ extension NetworkSearchCriteria {
 
             switch criteria.response.contentType.contentType {
             case .any: break
-            default: predicates.append(NSPredicate(format: "contentType CONTAINS %@", criteria.response.contentType.contentType.rawValue))
+            default: predicates.append(NSPredicate(format: "responseContentType CONTAINS %@", criteria.response.contentType.contentType.rawValue))
             }
         }
 

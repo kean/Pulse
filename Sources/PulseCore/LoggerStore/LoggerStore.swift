@@ -341,20 +341,20 @@ extension LoggerStore {
         request.statusCode = statusCode
         request.startDate = event.metrics?.taskInterval.start
         request.duration = event.metrics?.taskInterval.duration ?? 0
-        request.contentType = event.response?.contentType?.rawValue
+        request.responseContentType = event.response?.contentType?.rawValue
         let isFailure = event.error != nil || (statusCode != 0 && !(200..<400).contains(statusCode))
         request.requestState = (isFailure ? LoggerNetworkRequestEntity.State.failure : .success).rawValue
         request.redirectCount = Int16(event.metrics?.redirectCount ?? 0)
 
         // Populate response/request data
-        let contentType = event.response?.contentType
+        let responseContentType = event.response?.contentType
 
         if let requestBody = event.requestBody {
-            let contentType = event.originalRequest.contentType
-            request.requestBody = storeBlob(preprocessData(requestBody, contentType: contentType))
+            let requestContentType = event.originalRequest.contentType
+            request.requestBody = storeBlob(preprocessData(requestBody, contentType: requestContentType))
         }
         if let responseData = event.responseBody {
-            request.responseBody = storeBlob(preprocessData(responseData, contentType: contentType))
+            request.responseBody = storeBlob(preprocessData(responseData, contentType: responseContentType))
         }
 
         switch event.taskType {
@@ -384,7 +384,7 @@ extension LoggerStore {
             error: event.error,
             metrics: event.metrics,
             metadata: {
-                if let responseBody = event.responseBody, (contentType?.isImage ?? false) {
+                if let responseBody = event.responseBody, (responseContentType?.isImage ?? false) {
                     return makeImageMetadata(from: responseBody)
                 }
                 return nil

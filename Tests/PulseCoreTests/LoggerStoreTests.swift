@@ -671,7 +671,7 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertEqual(request.taskType, .dataTask)
         XCTAssertEqual(request.statusCode, 200)
         XCTAssertEqual(request.state, .success)
-        XCTAssertEqual(request.contentType, "application/json; charset=utf-8")
+        XCTAssertEqual(request.responseContentType, "application/json; charset=utf-8")
         XCTAssertEqual(request.isFromCache, false)
         XCTAssertEqual(request.redirectCount, 0)
 
