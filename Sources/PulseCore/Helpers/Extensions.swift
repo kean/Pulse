@@ -212,11 +212,11 @@ struct TemporaryDirectory {
 
 extension Data {
     func compressed() throws -> Data {
-        try (self as NSData).compressed(using: .zlib) as Data
+        try (self as NSData).compressed(using: .lzfse) as Data
     }
 
     func decompressed() throws -> Data {
-        try (self as NSData).decompressed(using: .zlib) as Data
+        try (self as NSData).decompressed(using: .lzfse) as Data
     }
 }
 

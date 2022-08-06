@@ -41,7 +41,7 @@ final class PulseDocument {
 
     // Opens an existing database.
     func database() throws -> Data {
-        try document().database.decompressed()
+        try document().database
     }
 
     func getBlob(forKey key: String) -> Data? {

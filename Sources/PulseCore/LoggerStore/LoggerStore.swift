@@ -160,7 +160,7 @@ public final class LoggerStore: @unchecked Sendable {
             // directly from the compressed archive on demand.
             self.databaseURL = URL.temp.appending(filename: info.storeId.uuidString)
             if !Files.fileExists(atPath: databaseURL.path) {
-                try document.database().write(to: databaseURL)
+                try document.database().decompressed().write(to: databaseURL)
             }
             self.document = .archive(info, document)
             self.manifest = .init(storeId: info.storeId, version: try Version(string: info.storeVersion))
