@@ -756,8 +756,7 @@ final class LoggerStoreTests: XCTestCase {
         debugPrint("Package: \(try storeURL.directoryTotalSize()). Archive: \(size)")
     }
 
-#warning("TODO: add a test for external blobs")
-    func testMesasureExportSizeLarge() throws {
+    func _testMesasureExportSizeLarge() throws {
         // GIVEN
         let store = makeStore()
         defer { try? store.destroy() }
@@ -780,5 +779,3 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertEqual(try info.viewContext.count(for: LoggerMessageEntity.self), 1000)
     }
 }
-
-#warning("TODO: measure opening speed")
