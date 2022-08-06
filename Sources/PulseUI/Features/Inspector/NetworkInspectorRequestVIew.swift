@@ -41,7 +41,7 @@ final class NetworkInspectorRequestViewModel: ObservableObject {
         if let requestBody = request.requestBody?.data {
             _fileViewModel = FileViewerViewModel(
                 title: "Request",
-                context: details.requestFileViewerContext,
+                context: request.requestFileViewerContext,
                 data: { requestBody }
             )
         }

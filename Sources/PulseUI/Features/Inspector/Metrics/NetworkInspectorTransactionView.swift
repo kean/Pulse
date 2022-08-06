@@ -124,7 +124,7 @@ private let mockModel = NetworkInspectorTransactionViewModel(
     metrics: mockMetrics
 )
 
-private let mockMetrics = LoggerStore.preview.entity(for: .login).metrics!
+private let mockMetrics = LoggerStore.preview.entity(for: .login).details!.metrics!
 
 #endif
 

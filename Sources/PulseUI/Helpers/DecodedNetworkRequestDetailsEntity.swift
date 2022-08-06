@@ -23,42 +23,4 @@ final class DecodedNetworkRequestDetailsEntity {
     init(request: LoggerNetworkRequestEntity) {
         self.request = request
     }
-
-    var requestHeaders: [String: String] {
-        currentRequest?.headers ?? originalRequest?.headers ?? [:]
-    }
-
-    var decodingError: NetworkLogger.DecodingError? {
-        error?.error as? NetworkLogger.DecodingError
-    }
-
-    var requestFileViewerContext: FileViewerViewModel.Context {
-        FileViewerViewModel.Context(
-            contentType: originalRequest?.contentType,
-            originalSize: request.requestBodySize,
-            metadata: metadata,
-            isResponse: false,
-            error: nil
-        )
-    }
-
-    var responseFileViewerContext: FileViewerViewModel.Context {
-        FileViewerViewModel.Context(
-            contentType: response?.contentType,
-            originalSize: request.responseBodySize,
-            metadata: metadata,
-            isResponse: true,
-            error: decodingError
-        )
-    }
-}
-
-extension LoggerNetworkRequestEntity {
-    var metrics: NetworkLogger.Metrics? {
-        DecodedNetworkRequestDetailsEntity(request: self).metrics
-    }
-}
-
-private func decode<T: Decodable>(_ type: T.Type, from data: Data?) -> T? {
-    data.flatMap { try? JSONDecoder().decode(type, from: $0) }
 }
