@@ -44,7 +44,12 @@ extension NSTableView {
             endUpdates()
             var newScrollOffset = oldScrollOffset
             newScrollOffset.y += (bounds.size.height - previousHeight)
-            if oldScrollOffset.y > 0, newScrollOffset.y > oldScrollOffset.y {
+
+            print(oldScrollOffset, newScrollOffset)
+
+            if oldScrollOffset.y == 0 {
+                scroll(oldScrollOffset)
+            } else if newScrollOffset.y > oldScrollOffset.y {
                 scroll(newScrollOffset)
             }
         }
