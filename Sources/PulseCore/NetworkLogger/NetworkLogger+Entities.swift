@@ -2,7 +2,11 @@
 //
 // Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
 
+#if swift(>=5.7)
 import Foundation
+#else
+@preconcurrency import Foundation
+#endif
 
 extension NetworkLogger {
     public struct Request: Codable, Sendable {

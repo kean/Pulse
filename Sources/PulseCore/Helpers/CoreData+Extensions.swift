@@ -33,7 +33,7 @@ extension NSManagedObjectContext {
         performAndWait {
             result = Result { try closure() }
         }
-        guard let result else { throw LoggerStore.Error.unknownError }
+        guard let result = result else { throw LoggerStore.Error.unknownError }
         return try result.get()
     }
 }
