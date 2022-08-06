@@ -699,7 +699,8 @@ extension LoggerStore {
             let store = try LoggerStore(storeURL: temporary.url)
             defer { try? store.close() }
             try store.backgroundContext.performAndReturn {
-                try store.removeMessages(with: predicate)
+                try store.removeMessages(with:  NSCompoundPredicate(notPredicateWithSubpredicate: predicate))
+                try store.backgroundContext.save()
             }
         }
 
@@ -733,29 +734,6 @@ extension LoggerStore {
         try? document.close()
 
         return info
-    }
-
-    #warning("TODO: reuse with removeMessage")
-    private func removeMessages(with predicate: NSPredicate) throws {
-        // Delete blobs that don't pass the predicate
-        let notPredicate = NSCompoundPredicate(notPredicateWithSubpredicate: predicate)
-        let messagesWithRequests = try backgroundContext.fetch(LoggerMessageEntity.self) {
-            $0.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [notPredicate, NSPredicate(format: "request != NULL")])
-        }
-        for message in messagesWithRequests {
-            message.request?.requestBody.map(unlink)
-            message.request?.responseBody.map(unlink)
-        }
-        try backgroundContext.save()
-
-        // Delete messages that don't pass the predicate
-        let deleteRequest = NSBatchDeleteRequest(fetchRequest: {
-            let request = LoggerMessageEntity.fetchRequest()
-            request.predicate = notPredicate
-            return request
-        }())
-        deleteRequest.resultType = .resultTypeStatusOnly
-        try backgroundContext.execute(deleteRequest)
     }
 }
 
@@ -793,7 +771,7 @@ extension LoggerStore {
 
     private func removeExpiredMessages() throws {
         let cutoffDate = configuration.makeCurrentDate().addingTimeInterval(-configuration.maxAge)
-        try removeMessage(before: cutoffDate)
+        try removeMessages(before: cutoffDate)
     }
 
     private func reduceDatabaseSize() throws {
@@ -809,22 +787,27 @@ extension LoggerStore {
         guard count > 10 else { return } // Sanity check
 
         let cutoffDate = messages[Int(Double(count) * configuration.trimRatio)].createdAt
-        try removeMessage(before: cutoffDate)
+        try removeMessages(before: cutoffDate)
     }
 
-    private func removeMessage(before date: Date) throws {
+    private func removeMessages(before date: Date) throws {
+        let predicate = NSPredicate(format: "createdAt < %@", date as NSDate)
+        try removeMessages(with: predicate)
+    }
+
+    private func removeMessages(with predicate: NSPredicate) throws {
         // Unlink blobs associated with the requests the store is about to remove
-        let requests = try backgroundContext.fetch(LoggerNetworkRequestEntity.self) {
-            $0.predicate = NSPredicate(format: "createdAt < %@ AND (requestBody != NULL OR responseBody != NULL)", date as NSDate)
+        let messages = try backgroundContext.fetch(LoggerMessageEntity.self) {
+            $0.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [predicate, NSPredicate(format: "request != NULL")])
         }
-        for request in requests {
-            request.requestBody.map(unlink)
-            request.responseBody.map(unlink)
+        for message in messages {
+            message.request?.requestBody.map(unlink)
+            message.request?.responseBody.map(unlink)
         }
 
         // Remove messages using an efficient batch request
         let deleteRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "LoggerMessageEntity")
-        deleteRequest.predicate = NSPredicate(format: "createdAt < %@", date as NSDate)
+        deleteRequest.predicate = predicate
         try deleteEntities(for: deleteRequest)
     }
 

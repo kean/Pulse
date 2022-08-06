@@ -494,6 +494,7 @@ final class LoggerStoreTests: XCTestCase {
             $0.expectedBlobRatio = 1.0
             $0.trimRatio = 0.5 // will remove items until 350 bytes are used
         }
+        defer { try? store.destroy() }
 
         let now = Date()
 
@@ -529,6 +530,7 @@ final class LoggerStoreTests: XCTestCase {
             $0.sizeLimit = 100 // will trigger sweep
             $0.expectedBlobRatio = 1.0
         }
+        defer { try? store.destroy() }
 
         let responseData = Data(count: 256 * 1024)
         store.storeRequest(URLRequest(url: URL(string: "example.com/1")!), response: nil, error: nil, data: responseData)
