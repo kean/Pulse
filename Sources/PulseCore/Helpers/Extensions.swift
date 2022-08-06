@@ -210,7 +210,6 @@ struct TemporaryDirectory {
     }
 }
 
-#warning("adopt everywhere")
 extension Data {
     func compressed() throws -> Data {
         try (self as NSData).compressed(using: .zlib) as Data

@@ -489,7 +489,7 @@ final class LoggerStoreTests: XCTestCase {
         // GIVEN store with blob size limit
         let store = makeStore {
             $0.maxAge = 300
-            $0.isCompressionEnabled = false
+            $0.isBlobCompressionEnabled = false
             $0.sizeLimit = 700 // will trigger sweep
             $0.expectedBlobRatio = 1.0
             $0.trimRatio = 0.5 // will remove items until 350 bytes are used
@@ -525,7 +525,7 @@ final class LoggerStoreTests: XCTestCase {
     func testBlobSizeLimitSweepLargeBlob() throws {
         // GIVEN store with blob size limit
         let store = makeStore {
-            $0.isCompressionEnabled = false
+            $0.isBlobCompressionEnabled = false
             $0.sizeLimit = 100 // will trigger sweep
             $0.expectedBlobRatio = 1.0
         }
@@ -602,7 +602,7 @@ final class LoggerStoreTests: XCTestCase {
     func testRemoveAllWithLargeBlob() throws {
         // GIVEN large blob
         let store = makeStore {
-            $0.isCompressionEnabled = false
+            $0.isBlobCompressionEnabled = false
         }
         defer { try? store.destroy() }
 

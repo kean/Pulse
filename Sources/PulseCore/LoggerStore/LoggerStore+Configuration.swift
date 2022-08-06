@@ -54,7 +54,7 @@ extension LoggerStore {
 
         /// If enabled, all blobs will be stored in a compressed format and
         /// decompressed on the fly, significantly reducing the space usage.
-        var isCompressionEnabled = true
+        var isBlobCompressionEnabled = true
 
         /// Determines how often the messages are saved to the database. By default,
         /// 100 milliseconds - quickly enough, but avoiding too many individual writes.

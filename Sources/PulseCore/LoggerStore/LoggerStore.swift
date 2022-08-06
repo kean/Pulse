@@ -405,15 +405,14 @@ extension LoggerStore {
     }
 
     private func populateDetails(_ details: LoggerNetworkRequestDetails, for request: LoggerNetworkRequestEntity) {
-        guard let data = try? JSONEncoder().encode(details),
-              let compressedData = try? (data as NSData).compressed(using: .zlib) as Data else {
+        guard let data = try? JSONEncoder().encode(details).compressed() else {
             return
         }
         if let entity = request.detailsData {
-            entity.data = compressedData
+            entity.data = data
         } else {
             let entity = LoggerInlineDataEntity(context: backgroundContext)
-            entity.data = compressedData
+            entity.data = data
             request.detailsData = entity
         }
     }
@@ -548,14 +547,13 @@ extension LoggerStore {
     }
 
     private func compress(_ data: Data) -> Data {
-        guard configuration.isCompressionEnabled else { return data }
-        let compressed = try? (data as NSData).compressed(using: .zlib) as Data
-        return compressed ?? data
+        guard configuration.isBlobCompressionEnabled else { return data }
+        return (try? data.compressed()) ?? data
     }
 
     private func decompress(_ data: Data) -> Data? {
-        guard configuration.isCompressionEnabled else { return data }
-        return try? (data as NSData).decompressed(using: .zlib) as Data
+        guard configuration.isBlobCompressionEnabled else { return data }
+        return try? data.decompressed()
     }
 
     // MARK: - Performing Changes

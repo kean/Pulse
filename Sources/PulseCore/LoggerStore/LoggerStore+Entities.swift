@@ -94,7 +94,7 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
             return details
         }
         guard let compressedData = detailsData?.data,
-              let data = try? (compressedData as NSData).decompressed(using: .zlib),
+              let data = try? compressedData.decompressed(),
               let details = try? JSONDecoder().decode(LoggerNetworkRequestDetails.self, from: data as Data) else {
             return nil
         }
