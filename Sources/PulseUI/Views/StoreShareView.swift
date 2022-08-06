@@ -233,7 +233,7 @@ private final class ShareStoreViewModel: ObservableObject {
         switch output {
         case .store:
             logsURL = directory.url.appendingPathComponent("logs-\(makeCurrentDate()).pulse")
-            if let predicate {
+            if let predicate = predicate {
                 info = try store.copy(to: logsURL, predicate: predicate)
             } else {
                 info = try store.copy(to: logsURL)
