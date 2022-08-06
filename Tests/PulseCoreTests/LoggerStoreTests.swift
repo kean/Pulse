@@ -757,7 +757,7 @@ final class LoggerStoreTests: XCTestCase {
     }
 
 #warning("TODO: add a test for external blobs")
-    func _testMesasureExportSizeLarge() throws {
+    func testMesasureExportSizeLarge() throws {
         // GIVEN
         let store = makeStore()
         defer { try? store.destroy() }

@@ -65,8 +65,7 @@ final class PulseDocument {
 
         archive.properties = [
             NSAttributeDescription(name: "info", type: .binaryDataAttributeType),
-            NSAttributeDescription(name: "database", type: .binaryDataAttributeType),
-            NSRelationshipDescription.make(name: "blobs", type: .oneToMany, entity: blob)
+            NSAttributeDescription(name: "database", type: .binaryDataAttributeType)
         ]
 
         blob.properties = [
@@ -83,7 +82,6 @@ final class PulseDocument {
 final class PulseDocumentEntity: NSManagedObject {
     @NSManaged var info: Data
     @NSManaged var database: Data
-    @NSManaged var blobs: Set<PulseBlobEntity>
 }
 
 final class PulseBlobEntity: NSManagedObject {

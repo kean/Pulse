@@ -694,7 +694,6 @@ extension LoggerStore {
             // Blobs are already compressed
             blobEntity.data = try Data(contentsOf: blobURL)
             totalSize += Int64(blobEntity.data.count)
-            documentEntity.blobs.insert(blobEntity)
         }
 
         // Add store info
