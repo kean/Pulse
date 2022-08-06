@@ -68,16 +68,14 @@ final class PersistentLogHandlerTests: XCTestCase {
         }
 
         let persistedMessage1 = try XCTUnwrap(persistedMessages.first { $0.label == "test.logger.1" })
-        XCTAssertEqual(persistedMessage1.level, level1.rawValue)
         XCTAssertEqual(persistedMessage1.text, message1)
         XCTAssertEqual(persistedMessage1.createdAt, date)
-        XCTAssertEqual(persistedMessage1.session, sessionID.uuidString)
+        XCTAssertEqual(persistedMessage1.session, sessionID)
 
         let persistedMessage2 = try XCTUnwrap(persistedMessages.first { $0.label == "test.logger.2" })
-        XCTAssertEqual(persistedMessage2.level, level2.rawValue)
         XCTAssertEqual(persistedMessage2.text, message2)
         XCTAssertEqual(persistedMessage2.createdAt, date)
-        XCTAssertEqual(persistedMessage2.session, sessionID.uuidString)
+        XCTAssertEqual(persistedMessage2.session, sessionID)
     }
 
     func testStoresFileInformation() throws {
@@ -97,8 +95,7 @@ final class PersistentLogHandlerTests: XCTestCase {
 
         // THEN
         let message = try XCTUnwrap(store.allMessages().first)
-        XCTAssertTrue(message.file.hasSuffix("Pulse/Tests/PulseTests/PersistenLogHandlerTests.swift"))
-        XCTAssertEqual(message.filename, "PersistenLogHandlerTests.swift")
+        XCTAssertEqual(message.file, "PersistenLogHandlerTests.swift")
         XCTAssertEqual(message.function, "testStoresFilename()")
         XCTAssertEqual(message.line, 86)
     }
