@@ -103,7 +103,7 @@ public final class LoggerStore: @unchecked Sendable {
     /// - A document (readonly, archive, optimized to storage and sharing)
     ///
     /// The ``LoggerStore/shared`` store is a package optimized for writing. When
-    /// you are ready to share the store, create a Pulse document using ``copy(to:)`` method. The document format is optimized to use the least
+    /// you are ready to share the store, create a Pulse document using ``copy(to:predicate:)`` method. The document format is optimized to use the least
     /// amount of space possible.
     ///
     /// - parameters:
@@ -638,6 +638,13 @@ extension LoggerStore {
         }
         try Files.removeItem(at: storeURL)
     }
+
+    func close() throws {
+        let coordinator = container.persistentStoreCoordinator
+        for store in coordinator.persistentStores {
+            try coordinator.remove(store)
+        }
+    }
 }
 
 // MARK: - LoggerStore (Copy)
@@ -650,19 +657,20 @@ extension LoggerStore {
     /// - parameters:
     ///   - targetURL: The destination directory must already exist. But if the
     ///   file at the destination URL already exists, throws an error.
+    ///   - predicate: The predicate describing which messages to keep.
     ///
     /// - important Thread-safe. But must NOT be called inside the `backgroundContext` queue.
     ///
     /// - returns: The information about the created store.
     @discardableResult
-    public func copy(to targetURL: URL) throws -> Info {
+    public func copy(to targetURL: URL, predicate: NSPredicate? = nil) throws -> Info {
         guard !FileManager.default.fileExists(atPath: targetURL.path) else {
             throw LoggerStore.Error.fileAleadyExists
         }
         switch document {
         case .package:
             return try backgroundContext.performAndReturn {
-                try write(to: try PulseDocument(documentURL: targetURL))
+                try _copy(to: targetURL, predicate: predicate)
             }
         case .archive:
             try Files.copyItem(at: storeURL, to: targetURL)
@@ -670,9 +678,12 @@ extension LoggerStore {
         }
     }
 
-    private func write(to document: PulseDocument) throws -> Info {
+    // There must be a simpler and more efficient way of doing it
+    private func _copy(to targetURL: URL, predicate: NSPredicate? = nil) throws -> Info {
         let temporary = TemporaryDirectory()
         defer { temporary.remove() }
+
+        let document = try PulseDocument(documentURL: targetURL)
 
         let documentEntity = PulseDocumentEntity(context: document.context)
 
@@ -682,19 +693,31 @@ extension LoggerStore {
         let databaseURL = temporary.url.appending(filename: databaseFilename)
         try container.persistentStoreCoordinator.createCopyOfStore(at: databaseURL)
 
+        // Remove unwanted messages
+        if let predicate = predicate {
+            try Files.copyItem(at: manifestURL, to: temporary.url.appending(filename: manifestFilename)) // Important
+            let store = try LoggerStore(storeURL: temporary.url)
+            defer { try? store.close() }
+            try store.backgroundContext.performAndReturn {
+                try store.removeMessages(with: predicate)
+            }
+        }
+
         documentEntity.database = try Data(contentsOf: databaseURL).compressed()
         totalSize += Int64(documentEntity.database.count)
 
-        let blobURLs = try Files.contentsOfDirectory(at: blobsURL, includingPropertiesForKeys: nil)
-        for chunk in blobURLs.chunked(into: 100) {
-            var objects: [[String: Any]] = []
-            for blobURL in chunk {
-                if let data = try? Data(contentsOf: blobURL) {
-                    objects.append(["data": data])
-                    totalSize += Int64(data.count)
+        if Files.fileExists(atPath: blobsURL.path) {
+            let blobURLs = try Files.contentsOfDirectory(at: blobsURL, includingPropertiesForKeys: nil)
+            for chunk in blobURLs.chunked(into: 100) {
+                var objects: [[String: Any]] = []
+                for blobURL in chunk {
+                    if let data = try? Data(contentsOf: blobURL) {
+                        objects.append(["data": data])
+                        totalSize += Int64(data.count)
+                    }
                 }
+                try document.context.execute(NSBatchInsertRequest(entityName: String(describing: PulseBlobEntity.self), objects: objects))
             }
-            try document.context.execute(NSBatchInsertRequest(entityName: String(describing: PulseBlobEntity.self), objects: objects))
         }
 
         // Add store info
@@ -712,54 +735,18 @@ extension LoggerStore {
         return info
     }
 
-    /// Creates a copy of the current store at the given URL. The created copy
-    /// has `.pulse` extension.
-    ///
-    /// - parameters:
-    ///   - targetURL: The destination directory must already exist. But if the
-    ///   file at the destination URL already exists, throws an error.
-    ///   - predicate: The predicate
-    ///
-    /// - important Thread-safe. But must NOT be called inside the `backgroundContext` queue.
-    ///
-    /// - warning: This API currently works only with the Pulse packages and
-    /// not the archives.
-    ///
-    /// - returns: The information about the created store.
-    @discardableResult
-    public func copy(to targetURL: URL, predicate: NSPredicate) throws -> Info {
-        switch document {
-        case .package:
-            return try backgroundContext.performAndReturn {
-                try _copy(to: targetURL, predicate: predicate)
-            }
-        case .archive:
-            throw LoggerStore.Error.storeInvalid
-        }
-    }
-
-    // There must be a simpler and more efficient way of doing it
-    private func _copy(to targetURL: URL, predicate: NSPredicate) throws -> Info {
-        let directory = TemporaryDirectory()
-        defer { directory.remove() }
-
-    #warning("TODO: reimplement")
-//        _ = try _copyAllFiles(to: directory.url, compress: false)
-
-        // Open the copy of the store
-        let store = try LoggerStore(storeURL: directory.url)
-        defer { try? store.destroy() }
-
+    #warning("TODO: reuse with removeMessage")
+    private func removeMessages(with predicate: NSPredicate) throws {
         // Delete blobs that don't pass the predicate
         let notPredicate = NSCompoundPredicate(notPredicateWithSubpredicate: predicate)
-        let messagesWithRequests = try store.backgroundContext.fetch(LoggerMessageEntity.self) {
+        let messagesWithRequests = try backgroundContext.fetch(LoggerMessageEntity.self) {
             $0.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [notPredicate, NSPredicate(format: "request != NULL")])
         }
         for message in messagesWithRequests {
-            message.request?.requestBody.map(store.unlink)
-            message.request?.responseBody.map(store.unlink)
+            message.request?.requestBody.map(unlink)
+            message.request?.responseBody.map(unlink)
         }
-        try store.backgroundContext.save()
+        try backgroundContext.save()
 
         // Delete messages that don't pass the predicate
         let deleteRequest = NSBatchDeleteRequest(fetchRequest: {
@@ -768,10 +755,7 @@ extension LoggerStore {
             return request
         }())
         deleteRequest.resultType = .resultTypeStatusOnly
-        try store.backgroundContext.execute(deleteRequest)
-
-        // Finally create the proper archive with only the selected item
-        return try store.copy(to: targetURL)
+        try backgroundContext.execute(deleteRequest)
     }
 }
 

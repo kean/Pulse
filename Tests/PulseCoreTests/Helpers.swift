@@ -7,15 +7,6 @@ import Foundation
 import CoreData
 @testable import PulseCore
 
-extension LoggerStore {
-    func removeStores() {
-        let coordinator = container.persistentStoreCoordinator
-        for store in coordinator.persistentStores {
-            try? coordinator.remove(store)
-        }
-    }
-}
-
 struct TemporaryDirectory {
     let url: URL
 

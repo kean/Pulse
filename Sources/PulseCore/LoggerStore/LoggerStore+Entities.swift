@@ -146,6 +146,8 @@ public final class LoggerNetworkRequestProgressEntity: NSManagedObject {
     @NSManaged public var totalUnitCount: Int64
 }
 
+#warning("TODO: rename this")
+
 /// The request details stored in a database in a denormalized format.
 public final class LoggerNetworkRequestDetails: Codable, Sendable {
     public let originalRequest: NetworkLogger.Request

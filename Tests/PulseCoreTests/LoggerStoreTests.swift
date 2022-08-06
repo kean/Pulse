@@ -77,7 +77,7 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertEqual(try store.allMessages().count, 10)
 
         let originalStore = store
-        store.removeStores()
+        try? store.close()
 
         // WHEN loading the store with the same url
         store = try LoggerStore(storeURL: storeURL)
@@ -180,7 +180,7 @@ final class LoggerStoreTests: XCTestCase {
         try store.copy(to: copyURL)
 
         // THEN
-        store.removeStores()
+        try? store.close()
 
         // THEN
         let copy = try LoggerStore(storeURL: copyURL)
@@ -221,7 +221,7 @@ final class LoggerStoreTests: XCTestCase {
         try store.copy(to: copyURL, predicate: NSPredicate(format: "level == %i", LoggerStore.Level.trace.rawValue))
 
         // THEN
-        store.removeStores()
+        try? store.close()
 
         // THEN all non-trace messages are removed, as well as network messages
         // and associated blobs
@@ -733,7 +733,7 @@ final class LoggerStoreTests: XCTestCase {
         let storeURL = directory.url.appending(filename: UUID().uuidString)
         let store = try LoggerStore(storeURL: storeURL, options: [.create, .synchronous])
         populate(store: store)
-        store.removeStores()
+        try? store.close()
         return storeURL
     }
 
