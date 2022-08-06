@@ -691,6 +691,7 @@ extension LoggerStore {
         // Add store info
         var info = try _info()
         info.storeId = manifest.storeId
+        info.totalStoreSize = try targetURL.directoryTotalSize()
         info.creationDate = configuration.makeCurrentDate()
         info.modifiedDate = info.creationDate
         let infoURL = targetURL.appending(filename: infoFilename)

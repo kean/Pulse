@@ -269,7 +269,7 @@ final class LoggerStoreTests: XCTestCase {
         defer { try? store.destroy() }
 
         let copyURL = directory.url.appending(filename: "compressed.pulse")
-        try store.copy(to: copyURL)
+        let info = try store.copy(to: copyURL)
 
         let size = (try Files.attributesOfItem(atPath: copyURL.path)[.size] as? Int64) ?? 0
         debugPrint(size)
