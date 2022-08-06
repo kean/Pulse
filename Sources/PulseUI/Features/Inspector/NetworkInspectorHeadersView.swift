@@ -74,10 +74,10 @@ struct NetworkHeadersDetailsView: View {
 // MARK: - ViewModel
 
 final class NetworkInspectorHeaderViewModel: ObservableObject {
-    private let details: DecodedNetworkRequestDetailsEntity
+    private let request: LoggerNetworkRequestEntity
 
-    init(details: DecodedNetworkRequestDetailsEntity) {
-        self.details = details
+    init(request: LoggerNetworkRequestEntity) {
+        self.request = request
     }
 
     @Published var isRequestOriginalRawActive = false
@@ -85,7 +85,7 @@ final class NetworkInspectorHeaderViewModel: ObservableObject {
     @Published var isResponseRawActive = false
 
     var requestHeadersOriginal: KeyValueSectionViewModel {
-        let items = (details.originalRequest?.headers ?? [:]).sorted(by: { $0.key < $1.key })
+        let items = (request.details?.originalRequest.headers ?? [:]).sorted(by: { $0.key < $1.key })
         return KeyValueSectionViewModel(
             title: "Request Headers (Original)",
             color: .blue,
@@ -98,7 +98,7 @@ final class NetworkInspectorHeaderViewModel: ObservableObject {
     }
 
     var requestHeadersCurrent: KeyValueSectionViewModel {
-        let items = (details.currentRequest?.headers ?? [:]).sorted(by: { $0.key < $1.key })
+        let items = (request.details?.currentRequest?.headers ?? [:]).sorted(by: { $0.key < $1.key })
         return KeyValueSectionViewModel(
             title: "Request Headers (Current)",
             color: .blue,
@@ -111,7 +111,7 @@ final class NetworkInspectorHeaderViewModel: ObservableObject {
     }
 
     var responseHeaders: KeyValueSectionViewModel? {
-        guard let headers = details.response?.headers else {
+        guard let headers = request.details?.response?.headers else {
             return nil
         }
         return KeyValueSectionViewModel(
@@ -130,7 +130,7 @@ final class NetworkInspectorHeaderViewModel: ObservableObject {
 struct NetworkInspectorHeadersView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
-            NetworkInspectorHeadersView(viewModel: .init(details: .init(request: LoggerStore.preview.entity(for: .login))))
+            NetworkInspectorHeadersView(viewModel: .init(request: LoggerStore.preview.entity(for: .login)))
         }
     }
 }

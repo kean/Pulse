@@ -64,8 +64,6 @@ final class NetworkInspectorResponseViewModel: ObservableObject {
     }
 
     private func refresh() {
-        withAnimation {
-            objectWillChange.send()
-        }
+withAnimation { objectWillChange.send() }
     }
 }

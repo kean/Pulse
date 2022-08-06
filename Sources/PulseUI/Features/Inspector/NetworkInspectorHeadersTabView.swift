@@ -30,25 +30,19 @@ final class NetworkInspectorHeadersTabViewModel: ObservableObject {
     private(set) lazy var progress = ProgressViewModel(request: request)
 
     var headersViewModel: NetworkInspectorHeaderViewModel {
-        NetworkInspectorHeaderViewModel(details: details)
+        NetworkInspectorHeaderViewModel(request: request)
     }
 
     private let request: LoggerNetworkRequestEntity
-    private var details: DecodedNetworkRequestDetailsEntity
     private var cancellable: AnyCancellable?
 
     init(request: LoggerNetworkRequestEntity) {
         self.request = request
-        self.details = DecodedNetworkRequestDetailsEntity(request: request)
-
         cancellable = request.objectWillChange.sink { [weak self] in self?.refresh() }
     }
 
     private func refresh() {
-        self.details = DecodedNetworkRequestDetailsEntity(request: request)
-        withAnimation {
-            objectWillChange.send()
-        }
+        withAnimation { objectWillChange.send() }
     }
 }
 

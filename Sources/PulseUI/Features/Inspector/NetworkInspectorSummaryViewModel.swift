@@ -28,9 +28,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     }
 
     private func refresh() {
-        withAnimation {
-            objectWillChange.send()
-        }
+withAnimation { objectWillChange.send() }
     }
 
     var tintColor: Color {
