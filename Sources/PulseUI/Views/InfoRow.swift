@@ -6,13 +6,15 @@ import SwiftUI
 
 struct InfoRow: View {
     let title: String
-    let details: String
+    let details: String?
 
     var body: some View {
         HStack {
             Text(title)
             Spacer()
-            Text(details).foregroundColor(.secondary)
+            if let details = details {
+                Text(details).foregroundColor(.secondary)
+            }
         }
     }
 }

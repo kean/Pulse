@@ -154,13 +154,13 @@ private struct KeyValueListView: View {
             }
         } else {
             VStack(spacing: 2) {
-                let rows = items.enumerated().map(Row.init)
-                ForEach(rows, id: \.index, content: makeRow)
+                let rows = items.enumerated().map(KeyValueRow.init)
+                ForEach(rows, content: makeRow)
             }
         }
     }
 
-    private func makeRow(_ row: Row) -> some View {
+    private func makeRow(_ row: KeyValueRow) -> some View {
         HStack {
             let title = Text(row.item.0 + ": ")
                 .foregroundColor(actualTintColor)
@@ -257,9 +257,12 @@ struct KeyValueSectionViewModel {
     var items: [(String, String?)] = []
 }
 
-private struct Row {
-    let index: Int
+struct KeyValueRow: Identifiable {
+    let id: Int
     let item: (String, String?)
+
+    var title: String { item.0 }
+    var details: String? { item.1 }
 }
 
 struct ActionViewModel {
