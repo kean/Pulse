@@ -149,8 +149,8 @@ public final class LoggerBlobHandleEntity: NSManagedObject {
     /// A blob size.
     @NSManaged public var size: Int64
 
-    /// A compressed blob size.
-    @NSManaged public var compressedSize: Int64
+    /// A decompressed blob size.
+    @NSManaged public var decompressedSize: Int64
 
     /// A number of requests referencing it.
     @NSManaged var linkCount: Int16

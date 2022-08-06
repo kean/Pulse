@@ -47,7 +47,7 @@ extension LoggerStore {
         public var blobsSize: Int64
         /// The size of compressed stored network response and requests bodies.
         /// The blobs are compressed by default.
-        public var blobsCompressedSize: Int64
+        public var blobsDecompressedSize: Int64
 
         // MARK: App and Device Info
 

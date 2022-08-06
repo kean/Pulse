@@ -468,7 +468,7 @@ extension LoggerStore {
 
     private func storeBlob(_ data: Data) -> LoggerBlobHandleEntity? {
         guard !data.isEmpty else {
-            return nil
+            return nil // Sanity check
         }
         let key = data.sha1
         let existingEntity = try? backgroundContext.first(LoggerBlobHandleEntity.self) {
@@ -478,20 +478,18 @@ extension LoggerStore {
             entity.linkCount += 1
             return entity
         }
-
-        let compressed = self.compress(data)
-
+        let compressedData = compress(data)
         let entity = LoggerBlobHandleEntity(context: backgroundContext)
         entity.key = key
         entity.linkCount = 1
-        entity.size = Int64(data.count)
-        entity.compressedSize = Int64(compressed.count)
-        if compressed.count <= LoggerBlobHandleEntity.inlineLimit {
+        entity.size = Int64(compressedData.count)
+        entity.decompressedSize = Int64(data.count)
+        if compressedData.count <= LoggerBlobHandleEntity.inlineLimit {
             let inlineData = LoggerInlineDataEntity(context: backgroundContext)
-            inlineData.data = compressed
+            inlineData.data = compressedData
             entity.inlineData = inlineData
         } else {
-            try? compressed.write(to: makeBlobURL(for: key))
+            try? compressedData.write(to: makeBlobURL(for: key))
         }
         return entity
     }
@@ -521,6 +519,11 @@ extension LoggerStore {
         return getRawData(forKey: entity.key)
     }
 
+    /// Returns blob data for the given key.
+    public func getBlobData(forKey key: String) -> Data? {
+        getRawData(forKey: key).flatMap(decompress)
+    }
+
     private func getRawData(forKey key: String) -> Data? {
         switch document {
         case .package:
@@ -528,11 +531,6 @@ extension LoggerStore {
         case .archive(let archive):
             return archive.getData(for: "\(blobsDirectoryName)/\(key)")
         }
-    }
-
-    /// Returns blob data for the given key.
-    public func getBlobData(forKey key: String) -> Data? {
-        return getRawData(forKey: key).flatMap(decompress)
     }
 
     private func compress(_ data: Data) -> Data {
@@ -833,7 +831,7 @@ extension LoggerStore {
     }
 
     private func reduceBlobStoreSize() throws {
-        var currentSize = try getBlobsSize(isCompressed: true)
+        var currentSize = try getBlobsSize()
 
         guard currentSize > configuration.blobSizeLimit else {
             return // All good, no need to remove anything
@@ -858,13 +856,13 @@ extension LoggerStore {
         }
     }
 
-    private func getBlobsSize(isCompressed: Bool) throws -> Int64 {
+    private func getBlobsSize(isDecompressed: Bool = false) throws -> Int64 {
         let request = LoggerBlobHandleEntity.fetchRequest()
 
         let description = NSExpressionDescription()
         description.name = "sum"
 
-        let keypathExp1 = NSExpression(forKeyPath: isCompressed ? "compressedSize" : "size")
+        let keypathExp1 = NSExpression(forKeyPath: isDecompressed ? "decompressedSize" : "size")
         let expression = NSExpression(forFunction: "sum:", arguments: [keypathExp1])
         description.expression = expression
         description.expressionResultType = .integer64AttributeType
@@ -910,8 +908,8 @@ extension LoggerStore {
             requestCount: requestCount,
             blobCount: blobCount,
             totalStoreSize: try storeURL.directoryTotalSize(),
-            blobsSize: try getBlobsSize(isCompressed: false),
-            blobsCompressedSize: try getBlobsSize(isCompressed: true),
+            blobsSize: try getBlobsSize(),
+            blobsDecompressedSize: try getBlobsSize(isDecompressed: true),
             appInfo: .make(),
             deviceInfo: .make()
         )
@@ -1042,7 +1040,7 @@ extension LoggerStore {
 }
 
 extension Version {
-    static let currentStoreVersion = Version(2, 0, 0)
+    static let currentStoreVersion = Version(2, 0, 1)
 }
 
 // MARK: - Constants

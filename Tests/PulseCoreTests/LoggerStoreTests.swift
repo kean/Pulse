@@ -220,14 +220,14 @@ final class LoggerStoreTests: XCTestCase {
         // WHEN
         let info = try LoggerStore.Info.make(storeURL: copyURL)
 
-        XCTAssertEqual(info.storeVersion, "2.0.0")
+        XCTAssertEqual(info.storeVersion, "2.0.1")
         XCTAssertEqual(info.messageCount, 7)
         XCTAssertEqual(info.requestCount, 3)
         XCTAssertEqual(info.blobCount, 3)
         XCTAssertEqual(info.creationDate, date)
         XCTAssertEqual(info.modifiedDate, date)
         // Can't check complete store size, but blobs are exact.
-        XCTAssertEqual(info.blobsSize, 21195)
+        XCTAssertEqual(info.blobsDecompressedSize, 21195)
     }
 
     func testCopyWithPredicate() throws {
@@ -728,12 +728,12 @@ final class LoggerStoreTests: XCTestCase {
         let info = try store.info()
 
         // THEN
-        XCTAssertEqual(info.storeVersion, "2.0.0")
+        XCTAssertEqual(info.storeVersion, "2.0.1")
         XCTAssertEqual(info.messageCount, 7)
         XCTAssertEqual(info.requestCount, 3)
         XCTAssertEqual(info.blobCount, 3)
         // Can't check complete store size, but blobs are exact.
-        XCTAssertEqual(info.blobsSize, 21195)
+        XCTAssertEqual(info.blobsDecompressedSize, 21195)
     }
 
     // MARK: - Helpers

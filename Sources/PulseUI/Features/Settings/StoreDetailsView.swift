@@ -138,8 +138,8 @@ final class StoreDetailsViewModel: ObservableObject {
 
     private func makeBlobsSizeText(for info: LoggerStore.Info) -> String {
         let size = ByteCountFormatter.string(fromByteCount: info.blobsSize)
-        let compressed = ByteCountFormatter.string(fromByteCount: info.blobsCompressedSize)
-        if info.blobsCompressedSize == info.blobsSize {
+        let compressed = ByteCountFormatter.string(fromByteCount: info.blobsDecompressedSize)
+        if info.blobsDecompressedSize == info.blobsSize {
             return size
         }
         return "\(compressed) (\(size) decompressed)"
