@@ -28,7 +28,7 @@ extension LoggerStore {
         ///
         /// - warning: This options is not recommended for general use. When it
         /// is enabled, all writes to the store happen immediately and synchronously
-        /// as oppose to coalesed updates that significantly improve write efficiency.
+        /// as oppose to coalesced updates that significantly improve write efficiency.
         ///
         /// - note: This option will not improve remote logging speed because
         /// when the log events are registered in ``LoggerStore``, they are
