@@ -833,7 +833,7 @@ extension LoggerStore {
     }
 
     private func reduceBlobStoreSize() throws {
-        var currentSize = try storeURL.directoryTotalSize()
+        var currentSize = try getBlobsSize(isCompressed: true)
 
         guard currentSize > configuration.blobSizeLimit else {
             return // All good, no need to remove anything
@@ -901,7 +901,6 @@ extension LoggerStore {
         let requestCount = try backgroundContext.count(for: LoggerNetworkRequestEntity.self)
         let blobCount = try backgroundContext.count(for: LoggerBlobHandleEntity.self)
 
-        #warning("TODO: show allocated")
         return Info(
             storeId: manifest.storeId,
             storeVersion: manifest.version.description,

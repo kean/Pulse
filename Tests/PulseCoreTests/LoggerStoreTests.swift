@@ -348,7 +348,7 @@ final class LoggerStoreTests: XCTestCase {
         let store = try! LoggerStore(
             storeURL: directory.url.appending(filename: UUID().uuidString),
             options: [.create, .synchronous],
-            configuration: .init(databaseSizeLimit: 5000)
+            configuration: .init(sizeLimit: 5000)
         )
         defer { try? store.destroy() }
 
@@ -532,7 +532,8 @@ final class LoggerStoreTests: XCTestCase {
         let store = makeStore {
             $0.maxAge = 300
             $0.isCompressionEnabled = false
-            $0.blobsSizeLimit = 700 // will trigger sweep
+            $0.sizeLimit = 700 // will trigger sweep
+            $0.expectedBlobRatio = 1.0
             $0.trimRatio = 0.5 // will remove items until 350 bytes are used
         }
 
@@ -568,7 +569,8 @@ final class LoggerStoreTests: XCTestCase {
         // GIVEN store with blob size limit
         let store = makeStore {
             $0.isCompressionEnabled = false
-            $0.blobsSizeLimit = 100 // will trigger sweep
+            $0.sizeLimit = 100 // will trigger sweep
+            $0.expectedBlobRatio = 1.0
         }
 
         let responseData = Data(count: 256 * 1024)

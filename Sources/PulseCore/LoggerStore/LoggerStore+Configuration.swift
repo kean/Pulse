@@ -43,9 +43,10 @@ extension LoggerStore {
         public var sizeLimit: Int64
 
         var blobSizeLimit: Int64 {
-            Int64(Double(sizeLimit) * 0.7)
+            Int64(Double(sizeLimit) * expectedBlobRatio)
         }
 
+        var expectedBlobRatio = 0.7
         var trimRatio = 0.7
 
         /// Every 20 minutes.
