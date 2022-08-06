@@ -60,7 +60,7 @@ extension LoggerNetworkRequestEntity {
     }
 }
 
-extension LoggerNetworkRequestDetails {
+extension LoggerNetworkRequestEntity.RequestDetails {
     var decodingError: NetworkLogger.DecodingError? {
         error?.error as? NetworkLogger.DecodingError
     }

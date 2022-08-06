@@ -89,13 +89,13 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
     /// - important: Accessing it for the first time can be a relatively slow
     /// operation because it performs decoding on the fly, but the decoded
     /// entity is cached until the object is turned into a fault.
-    public var details: LoggerNetworkRequestDetails? {
+    public var details: LoggerNetworkRequestEntity.RequestDetails? {
         if let (details, count) = cachedDetails, count == detailsData?.data.count {
             return details
         }
         guard let compressedData = detailsData?.data,
               let data = try? compressedData.decompressed(),
-              let details = try? JSONDecoder().decode(LoggerNetworkRequestDetails.self, from: data as Data) else {
+              let details = try? JSONDecoder().decode(LoggerNetworkRequestEntity.RequestDetails.self, from: data as Data) else {
             return nil
         }
         self.cachedDetails = (details, compressedData.count)
@@ -107,7 +107,7 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
         cachedDetails = nil
     }
 
-    private var cachedDetails: (LoggerNetworkRequestDetails, Int)?
+    private var cachedDetails: (RequestDetails, Int)?
 
     /// Request details (encoded and compresed ``LoggerNetworkRequestDetails``).
     @NSManaged var detailsData: LoggerInlineDataEntity?
@@ -136,6 +136,25 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
         case success = 2
         case failure = 3
     }
+
+    /// The request details stored in a database in a denormalized format.
+    public final class RequestDetails: Codable, Sendable {
+        public let originalRequest: NetworkLogger.Request
+        public let currentRequest: NetworkLogger.Request?
+        public let response: NetworkLogger.Response?
+        public let error: NetworkLogger.ResponseError?
+        public let metrics: NetworkLogger.Metrics?
+        public let metadata: [String: String]?
+
+        public init(originalRequest: NetworkLogger.Request, currentRequest: NetworkLogger.Request?, response: NetworkLogger.Response? = nil, error: NetworkLogger.ResponseError? = nil, metrics: NetworkLogger.Metrics? = nil, metadata: [String : String]? = nil) {
+            self.originalRequest = originalRequest
+            self.currentRequest = currentRequest
+            self.response = response
+            self.error = error
+            self.metrics = metrics
+            self.metadata = metadata
+        }
+    }
 }
 
 /// Indicates current download or upload progress.
@@ -144,27 +163,6 @@ public final class LoggerNetworkRequestProgressEntity: NSManagedObject {
     @NSManaged public var completedUnitCount: Int64
     /// Indicates current download or upload progress.
     @NSManaged public var totalUnitCount: Int64
-}
-
-#warning("TODO: rename this")
-
-/// The request details stored in a database in a denormalized format.
-public final class LoggerNetworkRequestDetails: Codable, Sendable {
-    public let originalRequest: NetworkLogger.Request
-    public let currentRequest: NetworkLogger.Request?
-    public let response: NetworkLogger.Response?
-    public let error: NetworkLogger.ResponseError?
-    public let metrics: NetworkLogger.Metrics?
-    public let metadata: [String: String]?
-
-    public init(originalRequest: NetworkLogger.Request, currentRequest: NetworkLogger.Request?, response: NetworkLogger.Response? = nil, error: NetworkLogger.ResponseError? = nil, metrics: NetworkLogger.Metrics? = nil, metadata: [String : String]? = nil) {
-        self.originalRequest = originalRequest
-        self.currentRequest = currentRequest
-        self.response = response
-        self.error = error
-        self.metrics = metrics
-        self.metadata = metadata
-    }
 }
 
 /// Doesn't contain any data, just the key and some additional payload.

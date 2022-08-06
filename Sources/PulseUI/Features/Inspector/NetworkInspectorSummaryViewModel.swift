@@ -19,7 +19,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     private(set) lazy var _progressViewModel = ProgressViewModel(request: request)
 
     private let request: LoggerNetworkRequestEntity
-    private var details: LoggerNetworkRequestDetails? { request.details }
+    private var details: LoggerNetworkRequestEntity.RequestDetails? { request.details }
     private var cancellable: AnyCancellable?
 
     init(request: LoggerNetworkRequestEntity) {

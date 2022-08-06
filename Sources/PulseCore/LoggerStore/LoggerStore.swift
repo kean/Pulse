@@ -309,7 +309,7 @@ extension LoggerStore {
         request.httpMethod = event.originalRequest.method
         request.requestState = LoggerNetworkRequestEntity.State.pending.rawValue
 
-        let details = LoggerNetworkRequestDetails(originalRequest: event.originalRequest, currentRequest: event.currentRequest)
+        let details = LoggerNetworkRequestEntity.RequestDetails(originalRequest: event.originalRequest, currentRequest: event.currentRequest)
         populateDetails(details, for: request)
     }
 
@@ -374,7 +374,7 @@ extension LoggerStore {
         request.isFromCache = transactions.last?.fetchType == .localCache || (transactions.last?.fetchType == .networkLoad && transactions.last?.response?.statusCode == 304)
 
         // Populate details
-        let details = LoggerNetworkRequestDetails(
+        let details = LoggerNetworkRequestEntity.RequestDetails(
             originalRequest: event.originalRequest,
             currentRequest: event.currentRequest,
             response: event.response,
@@ -404,7 +404,7 @@ extension LoggerStore {
         }
     }
 
-    private func populateDetails(_ details: LoggerNetworkRequestDetails, for request: LoggerNetworkRequestEntity) {
+    private func populateDetails(_ details: LoggerNetworkRequestEntity.RequestDetails, for request: LoggerNetworkRequestEntity) {
         guard let data = try? JSONEncoder().encode(details).compressed() else {
             return
         }
