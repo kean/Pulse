@@ -47,7 +47,7 @@ extension LoggerStore {
         public var blobsSize: Int64
         /// The size of compressed stored network response and requests bodies.
         /// The blobs are compressed by default.
-        public var blobsCompressedSize: Int64
+        public var blobsDecompressedSize: Int64
 
         // MARK: App and Device Info
 
@@ -77,12 +77,10 @@ extension LoggerStore {
         /// exported from the app without unarchaving the document. If you need
         /// to get info about the current store, use ``LoggerStore/Info``.
         public static func make(storeURL: URL) throws -> Info {
-            guard let archive = Archive(url: storeURL, accessMode: .read),
-                  let entry = archive[infoFilename],
-                  let data = archive.getData(for: entry) else {
-                throw LoggerStore.Error.fileDoesntExist
-            }
-            return try JSONDecoder().decode(LoggerStore.Info.self, from: data)
+            let document = try PulseDocument(documentURL: storeURL)
+            defer { try? document.close() }
+            let info = try document.open()
+            return info
         }
     }
 }

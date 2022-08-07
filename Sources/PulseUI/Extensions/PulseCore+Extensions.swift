@@ -2,15 +2,15 @@
 //
 // Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
 
-import PulseCore
 import Foundation
+import PulseCore
 
 #if os(iOS) || os(macOS)
 
 extension LoggerNetworkRequestEntity {
     func cURLDescription() -> String {
-        let details = DecodedNetworkRequestDetailsEntity(request: self)
-        guard let request = details.currentRequest, let url = request.url, let method = request.method else {
+        guard let request = details?.currentRequest ?? details?.originalRequest,
+              let url = request.url, let method = request.method else {
             return "$ curl command generation failed"
         }
 
@@ -37,3 +37,31 @@ extension LoggerNetworkRequestEntity {
 }
 
 #endif
+
+extension LoggerNetworkRequestEntity {
+    var requestFileViewerContext: FileViewerViewModel.Context {
+        FileViewerViewModel.Context(
+            contentType: details?.originalRequest.contentType,
+            originalSize: requestBodySize,
+            metadata: details?.metadata,
+            isResponse: false,
+            error: nil
+        )
+    }
+
+    var responseFileViewerContext: FileViewerViewModel.Context {
+        FileViewerViewModel.Context(
+            contentType: details?.response?.contentType,
+            originalSize: responseBodySize,
+            metadata: details?.metadata,
+            isResponse: true,
+            error: details?.decodingError
+        )
+    }
+}
+
+extension LoggerNetworkRequestEntity.RequestDetails {
+    var decodingError: NetworkLogger.DecodingError? {
+        error?.error as? NetworkLogger.DecodingError
+    }
+}

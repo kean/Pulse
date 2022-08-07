@@ -56,7 +56,7 @@ public final class LoggerStore: @unchecked Sendable {
     public let events = PassthroughSubject<Event, Never>()
 
     private let options: Options
-    private let document: PulseDocument
+    private let document: PulseDocumentType
     private var isSaveScheduled = false
     private let queue = DispatchQueue(label: "com.github.kean.pulse.logger-store")
     private var manifest: Manifest {
@@ -103,7 +103,7 @@ public final class LoggerStore: @unchecked Sendable {
     /// - A document (readonly, archive, optimized to storage and sharing)
     ///
     /// The ``LoggerStore/shared`` store is a package optimized for writing. When
-    /// you are ready to share the store, create a Pulse document using ``copy(to:)`` method. The document format is optimized to use the least
+    /// you are ready to share the store, create a Pulse document using ``copy(to:predicate:)`` method. The document format is optimized to use the least
     /// amount of space possible.
     ///
     /// - parameters:
@@ -126,7 +126,7 @@ public final class LoggerStore: @unchecked Sendable {
         if !isArchive {
             self.databaseURL = storeURL.appending(filename: databaseFilename)
             if options.contains(.create) {
-                if !Files.itemExists(at: storeURL) {
+                if !Files.fileExists(atPath: storeURL.path) {
                     try Files.createDirectory(at: storeURL, withIntermediateDirectories: false)
                 }
                 Files.createDirectoryIfNeeded(at: blobsURL)
@@ -151,22 +151,19 @@ public final class LoggerStore: @unchecked Sendable {
             }
             self.document = .package
         } else {
-            let archive = try IndexedArchive(url: storeURL)
-            self.manifest = try Manifest(archive: archive)
-            guard manifest.version >= .currentStoreVersion else {
+            let document = try PulseDocument(documentURL: storeURL)
+            let info = try document.open()
+            guard try Version(string: info.storeVersion) >= .currentStoreVersion else {
                 throw LoggerStore.Error.unsupportedVersion
             }
             // Extract and decompress _only_ the database. The blobs can be read
             // directly from the compressed archive on demand.
-            self.databaseURL = URL.temp.appending(filename: manifest.storeId.uuidString)
+            self.databaseURL = URL.temp.appending(filename: info.storeId.uuidString)
             if !Files.fileExists(atPath: databaseURL.path) {
-                guard let database = archive[databaseFilename] else {
-                    throw LoggerStore.Error.storeInvalid
-                }
-                try archive.extract(database, to: databaseURL)
-                try (Data(contentsOf: databaseURL) as NSData).decompressed(using: .zlib).write(to: databaseURL)
+                try document.database().decompressed().write(to: databaseURL)
             }
-            self.document = .archive(archive)
+            self.document = .archive(info, document)
+            self.manifest = .init(storeId: info.storeId, version: try Version(string: info.storeVersion))
         }
 
         self.container = LoggerStore.makeContainer(databaseURL: databaseURL)
@@ -311,8 +308,9 @@ extension LoggerStore {
         request.host = event.originalRequest.url?.host
         request.httpMethod = event.originalRequest.method
         request.requestState = LoggerNetworkRequestEntity.State.pending.rawValue
-        request.details.originalRequest = try? JSONEncoder().encode(event.originalRequest)
-        request.details.currentRequest = try? JSONEncoder().encode(event.currentRequest)
+
+        let details = LoggerNetworkRequestEntity.RequestDetails(originalRequest: event.originalRequest, currentRequest: event.currentRequest)
+        populateDetails(details, for: request)
     }
 
     private func process(_ event: Event.NetworkTaskProgressUpdated) {
@@ -340,20 +338,20 @@ extension LoggerStore {
         request.statusCode = statusCode
         request.startDate = event.metrics?.taskInterval.start
         request.duration = event.metrics?.taskInterval.duration ?? 0
-        request.contentType = event.response?.contentType?.rawValue
+        request.responseContentType = event.response?.contentType?.rawValue
         let isFailure = event.error != nil || (statusCode != 0 && !(200..<400).contains(statusCode))
         request.requestState = (isFailure ? LoggerNetworkRequestEntity.State.failure : .success).rawValue
         request.redirectCount = Int16(event.metrics?.redirectCount ?? 0)
 
         // Populate response/request data
-        let contentType = event.response?.contentType
+        let responseContentType = event.response?.contentType
 
         if let requestBody = event.requestBody {
-            let contentType = event.originalRequest.contentType
-            request.requestBody = storeBlob(preprocessData(requestBody, contentType: contentType))
+            let requestContentType = event.originalRequest.contentType
+            request.requestBody = storeBlob(preprocessData(requestBody, contentType: requestContentType))
         }
         if let responseData = event.responseBody {
-            request.responseBody = storeBlob(preprocessData(responseData, contentType: contentType))
+            request.responseBody = storeBlob(preprocessData(responseData, contentType: responseContentType))
         }
 
         switch event.taskType {
@@ -376,17 +374,20 @@ extension LoggerStore {
         request.isFromCache = transactions.last?.fetchType == .localCache || (transactions.last?.fetchType == .networkLoad && transactions.last?.response?.statusCode == 304)
 
         // Populate details
-        let details = request.details
-        let encoder = JSONEncoder()
-        details.originalRequest = try? encoder.encode(event.originalRequest)
-        details.currentRequest = try? encoder.encode(event.currentRequest)
-        details.response = try? encoder.encode(event.response)
-        details.error = try? encoder.encode(event.error)
-        details.metrics = try? encoder.encode(event.metrics)
-        if let responseBody = event.responseBody, (contentType?.isImage ?? false),
-           let metadata = makeImageMetadata(from: responseBody) {
-            details.metadata = try? encoder.encode(metadata)
-        }
+        let details = LoggerNetworkRequestEntity.RequestDetails(
+            originalRequest: event.originalRequest,
+            currentRequest: event.currentRequest,
+            response: event.response,
+            error: event.error,
+            metrics: event.metrics,
+            metadata: {
+                if let responseBody = event.responseBody, (responseContentType?.isImage ?? false) {
+                    return makeImageMetadata(from: responseBody)
+                }
+                return nil
+            }()
+        )
+        populateDetails(details, for: request)
 
         // Completed
         if let progress = request.progress {
@@ -400,6 +401,19 @@ extension LoggerStore {
             if isFailure {
                 message.level = Level.error.rawValue
             }
+        }
+    }
+
+    private func populateDetails(_ details: LoggerNetworkRequestEntity.RequestDetails, for request: LoggerNetworkRequestEntity) {
+        guard let data = try? JSONEncoder().encode(details).compressed() else {
+            return
+        }
+        if let entity = request.detailsData {
+            entity.data = data
+        } else {
+            let entity = LoggerInlineDataEntity(context: backgroundContext)
+            entity.data = data
+            request.detailsData = entity
         }
     }
 
@@ -445,7 +459,6 @@ extension LoggerStore {
         request.responseBodySize = -1
         request.requestBodySize = -1
         request.isFromCache = false
-        request.details = LoggerNetworkRequestDetailsEntity(context: backgroundContext)
         request.session = session
 
         let message = LoggerMessageEntity(context: backgroundContext)
@@ -468,7 +481,7 @@ extension LoggerStore {
 
     private func storeBlob(_ data: Data) -> LoggerBlobHandleEntity? {
         guard !data.isEmpty else {
-            return nil
+            return nil // Sanity check
         }
         let key = data.sha1
         let existingEntity = try? backgroundContext.first(LoggerBlobHandleEntity.self) {
@@ -478,20 +491,18 @@ extension LoggerStore {
             entity.linkCount += 1
             return entity
         }
-
-        let compressed = self.compress(data)
-
+        let compressedData = compress(data)
         let entity = LoggerBlobHandleEntity(context: backgroundContext)
         entity.key = key
         entity.linkCount = 1
-        entity.size = Int64(data.count)
-        entity.compressedSize = Int64(compressed.count)
-        if compressed.count <= LoggerBlobHandleEntity.inlineLimit {
+        entity.size = Int64(compressedData.count)
+        entity.decompressedSize = Int64(data.count)
+        if compressedData.count <= configuration.inlineLimit {
             let inlineData = LoggerInlineDataEntity(context: backgroundContext)
-            inlineData.data = compressed
+            inlineData.data = compressedData
             entity.inlineData = inlineData
         } else {
-            try? compressed.write(to: makeBlobURL(for: key))
+            try? compressedData.write(to: makeBlobURL(for: key))
         }
         return entity
     }
@@ -521,29 +532,28 @@ extension LoggerStore {
         return getRawData(forKey: entity.key)
     }
 
+    /// Returns blob data for the given key.
+    public func getBlobData(forKey key: String) -> Data? {
+        getRawData(forKey: key).flatMap(decompress)
+    }
+
     private func getRawData(forKey key: String) -> Data? {
         switch document {
         case .package:
             return try? Data(contentsOf: makeBlobURL(for: key))
-        case .archive(let archive):
-            return archive.getData(for: "\(blobsDirectoryName)/\(key)")
+        case let .archive(_, document):
+            return document.getBlob(forKey: key)
         }
     }
 
-    /// Returns blob data for the given key.
-    public func getBlobData(forKey key: String) -> Data? {
-        return getRawData(forKey: key).flatMap(decompress)
-    }
-
     private func compress(_ data: Data) -> Data {
-        guard configuration.isCompressionEnabled else { return data }
-        let compressed = try? (data as NSData).compressed(using: .zlib) as Data
-        return compressed ?? data
+        guard configuration.isBlobCompressionEnabled else { return data }
+        return (try? data.compressed()) ?? data
     }
 
     private func decompress(_ data: Data) -> Data? {
-        guard configuration.isCompressionEnabled else { return data }
-        return try? (data as NSData).decompressed(using: .zlib) as Data
+        guard configuration.isBlobCompressionEnabled else { return data }
+        return try? data.decompressed()
     }
 
     // MARK: - Performing Changes
@@ -628,28 +638,39 @@ extension LoggerStore {
         }
         try Files.removeItem(at: storeURL)
     }
+
+    func close() throws {
+        let coordinator = container.persistentStoreCoordinator
+        for store in coordinator.persistentStores {
+            try coordinator.remove(store)
+        }
+    }
 }
 
 // MARK: - LoggerStore (Copy)
 
 extension LoggerStore {
     /// Creates a copy of the current store at the given URL. The created copy
-    /// has `.pulse` extension (actually is a `.zip` archive). If the store is
-    /// already an archive, creates a copy.
+    /// has `.pulse` extension (the document format is based on SQLite). If the
+    /// store is already an archive, creates a copy.
     ///
     /// - parameters:
     ///   - targetURL: The destination directory must already exist. But if the
     ///   file at the destination URL already exists, throws an error.
+    ///   - predicate: The predicate describing which messages to keep.
     ///
     /// - important Thread-safe. But must NOT be called inside the `backgroundContext` queue.
     ///
     /// - returns: The information about the created store.
     @discardableResult
-    public func copy(to targetURL: URL) throws -> Info {
+    public func copy(to targetURL: URL, predicate: NSPredicate? = nil) throws -> Info {
+        guard !FileManager.default.fileExists(atPath: targetURL.path) else {
+            throw LoggerStore.Error.fileAleadyExists
+        }
         switch document {
         case .package:
             return try backgroundContext.performAndReturn {
-                try _copy(to: targetURL)
+                try _copy(to: targetURL, predicate: predicate)
             }
         case .archive:
             try Files.copyItem(at: storeURL, to: targetURL)
@@ -657,109 +678,62 @@ extension LoggerStore {
         }
     }
 
-    private func _copy(to targetURL: URL) throws -> Info {
-        let directory = TemporaryDirectory()
-        defer { directory.remove() }
+    // There must be a simpler and more efficient way of doing it
+    private func _copy(to targetURL: URL, predicate: NSPredicate? = nil) throws -> Info {
+        let temporary = TemporaryDirectory()
+        defer { temporary.remove() }
 
-        // Copy the database
-        let info = try _copyAllFiles(to: directory.url)
+        let document = try PulseDocument(documentURL: targetURL)
 
-        // Archive and add .pulse extension. Note: it uses zlib compression under
-        // the hood which proved to be the best option in terms of space/speed balance.
-        try Files.zipItem(at: directory.url, to: targetURL, shouldKeepParent: false, compressionMethod: .none)
+        let documentEntity = PulseDocumentEntity(context: document.context)
 
-        return info
-    }
+        var totalSize: Int64 = 0
 
-    private func _copyAllFiles(to targetURL: URL, compress: Bool = true) throws -> Info {
         // Create copy of the store
-        let databaseURL = targetURL.appending(filename: databaseFilename)
+        let databaseURL = temporary.url.appending(filename: databaseFilename)
         try container.persistentStoreCoordinator.createCopyOfStore(at: databaseURL)
-        if compress {
-            let database = try Data(contentsOf: databaseURL) as NSData
-            try database.compressed(using: .zlib).write(to: databaseURL)
+
+        // Remove unwanted messages
+        if let predicate = predicate {
+            try Files.copyItem(at: manifestURL, to: temporary.url.appending(filename: manifestFilename)) // Important
+            let store = try LoggerStore(storeURL: temporary.url)
+            defer { try? store.close() }
+            try store.backgroundContext.performAndReturn {
+                try store.removeMessages(with:  NSCompoundPredicate(notPredicateWithSubpredicate: predicate))
+                try store.backgroundContext.save()
+            }
         }
 
-        // Copy blobs (they are already compressed)
-        let blobsURL = targetURL.appending(directory: blobsDirectoryName)
-        try Files.copyItem(at: self.blobsURL, to: blobsURL)
+        documentEntity.database = try Data(contentsOf: databaseURL).compressed()
+        totalSize += Int64(documentEntity.database.count)
 
-        // Create manifest
-        let manifestURL = targetURL.appending(filename: manifestFilename)
-        var manifest = manifest
-        manifest.storeId = UUID()
-        try JSONEncoder().encode(manifest).write(to: manifestURL)
+        if Files.fileExists(atPath: blobsURL.path) {
+            let blobURLs = try Files.contentsOfDirectory(at: blobsURL, includingPropertiesForKeys: nil)
+            for chunk in blobURLs.chunked(into: 100) {
+                var objects: [[String: Any]] = []
+                for blobURL in chunk {
+                    if let data = try? Data(contentsOf: blobURL) {
+                        objects.append(["data": data])
+                        totalSize += Int64(data.count)
+                    }
+                }
+                try document.context.execute(NSBatchInsertRequest(entityName: String(describing: PulseBlobEntity.self), objects: objects))
+            }
+        }
 
         // Add store info
         var info = try _info()
-        info.storeId = manifest.storeId
+        info.storeId = UUID()
+        // Chicken and an egg problem: don't know the exact size
+        info.totalStoreSize = totalSize + 500 // info is roughly 500 bytes
         info.creationDate = configuration.makeCurrentDate()
         info.modifiedDate = info.creationDate
-        let infoURL = targetURL.appending(filename: infoFilename)
-        try JSONEncoder().encode(info).write(to: infoURL)
+        documentEntity.info = try JSONEncoder().encode(info)
+
+        try document.context.save()
+        try? document.close()
 
         return info
-    }
-
-    /// Creates a copy of the current store at the given URL. The created copy
-    /// has `.pulse` extension (actually is a `.zip` archive).
-    ///
-    /// - parameters:
-    ///   - targetURL: The destination directory must already exist. But if the
-    ///   file at the destination URL already exists, throws an error.
-    ///   - predicate: The predicate
-    ///
-    /// - important Thread-safe. But must NOT be called inside the `backgroundContext` queue.
-    ///
-    /// - warning: This API currently works only with the Pulse packages and
-    /// not the archives.
-    ///
-    /// - returns: The information about the created store.
-    @discardableResult
-    public func copy(to targetURL: URL, predicate: NSPredicate) throws -> Info {
-        switch document {
-        case .package:
-            return try backgroundContext.performAndReturn {
-                try _copy(to: targetURL, predicate: predicate)
-            }
-        case .archive:
-            throw LoggerStore.Error.storeInvalid
-        }
-    }
-
-    // There must be a simpler and more efficient way of doing it
-    private func _copy(to targetURL: URL, predicate: NSPredicate) throws -> Info {
-        let directory = TemporaryDirectory()
-        defer { directory.remove() }
-
-        _ = try _copyAllFiles(to: directory.url, compress: false)
-
-        // Open the copy of the store
-        let store = try LoggerStore(storeURL: directory.url)
-        defer { try? store.destroy() }
-
-        // Delete blobs that don't pass the predicate
-        let notPredicate = NSCompoundPredicate(notPredicateWithSubpredicate: predicate)
-        let messagesWithRequests = try store.backgroundContext.fetch(LoggerMessageEntity.self) {
-            $0.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [notPredicate, NSPredicate(format: "request != NULL")])
-        }
-        for message in messagesWithRequests {
-            message.request?.requestBody.map(store.unlink)
-            message.request?.responseBody.map(store.unlink)
-        }
-        try store.backgroundContext.save()
-
-        // Delete messages that don't pass the predicate
-        let deleteRequest = NSBatchDeleteRequest(fetchRequest: {
-            let request = LoggerMessageEntity.fetchRequest()
-            request.predicate = notPredicate
-            return request
-        }())
-        deleteRequest.resultType = .resultTypeStatusOnly
-        try store.backgroundContext.execute(deleteRequest)
-
-        // Finally create the proper archive with only the selected item
-        return try store.copy(to: targetURL)
     }
 }
 
@@ -797,7 +771,7 @@ extension LoggerStore {
 
     private func removeExpiredMessages() throws {
         let cutoffDate = configuration.makeCurrentDate().addingTimeInterval(-configuration.maxAge)
-        try removeMessage(before: cutoffDate)
+        try removeMessages(before: cutoffDate)
     }
 
     private func reduceDatabaseSize() throws {
@@ -813,27 +787,32 @@ extension LoggerStore {
         guard count > 10 else { return } // Sanity check
 
         let cutoffDate = messages[Int(Double(count) * configuration.trimRatio)].createdAt
-        try removeMessage(before: cutoffDate)
+        try removeMessages(before: cutoffDate)
     }
 
-    private func removeMessage(before date: Date) throws {
+    private func removeMessages(before date: Date) throws {
+        let predicate = NSPredicate(format: "createdAt < %@", date as NSDate)
+        try removeMessages(with: predicate)
+    }
+
+    private func removeMessages(with predicate: NSPredicate) throws {
         // Unlink blobs associated with the requests the store is about to remove
-        let requests = try backgroundContext.fetch(LoggerNetworkRequestEntity.self) {
-            $0.predicate = NSPredicate(format: "createdAt < %@ AND (requestBody != NULL OR responseBody != NULL)", date as NSDate)
+        let messages = try backgroundContext.fetch(LoggerMessageEntity.self) {
+            $0.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [predicate, NSPredicate(format: "request != NULL")])
         }
-        for request in requests {
-            request.requestBody.map(unlink)
-            request.responseBody.map(unlink)
+        for message in messages {
+            message.request?.requestBody.map(unlink)
+            message.request?.responseBody.map(unlink)
         }
 
         // Remove messages using an efficient batch request
         let deleteRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "LoggerMessageEntity")
-        deleteRequest.predicate = NSPredicate(format: "createdAt < %@", date as NSDate)
+        deleteRequest.predicate = predicate
         try deleteEntities(for: deleteRequest)
     }
 
     private func reduceBlobStoreSize() throws {
-        var currentSize = try getBlobsSize(isCompressed: true)
+        var currentSize = try getBlobsSize()
 
         guard currentSize > configuration.blobSizeLimit else {
             return // All good, no need to remove anything
@@ -858,13 +837,13 @@ extension LoggerStore {
         }
     }
 
-    private func getBlobsSize(isCompressed: Bool) throws -> Int64 {
+    private func getBlobsSize(isDecompressed: Bool = false) throws -> Int64 {
         let request = LoggerBlobHandleEntity.fetchRequest()
 
         let description = NSExpressionDescription()
         description.name = "sum"
 
-        let keypathExp1 = NSExpression(forKeyPath: isCompressed ? "compressedSize" : "size")
+        let keypathExp1 = NSExpression(forKeyPath: isDecompressed ? "decompressedSize" : "size")
         let expression = NSExpression(forFunction: "sum:", arguments: [keypathExp1])
         description.expression = expression
         description.expressionResultType = .integer64AttributeType
@@ -885,16 +864,15 @@ extension LoggerStore {
     ///
     /// - important Thread-safe. But must NOT be called inside the `backgroundContext` queue.
     public func info() throws -> Info {
-        try backgroundContext.performAndReturn {
-            try self._info()
+        switch document {
+        case let .archive(info, _):
+            return info
+        case .package:
+            return try backgroundContext.performAndReturn { try self._info() }
         }
     }
 
     private func _info() throws -> Info {
-        guard !isArchive else {
-            return try Info.make(storeURL: storeURL)
-        }
-
         let databaseAttributes = try Files.attributesOfItem(atPath: databaseURL.path)
 
         let messageCount = try backgroundContext.count(for: LoggerMessageEntity.self)
@@ -910,8 +888,8 @@ extension LoggerStore {
             requestCount: requestCount,
             blobCount: blobCount,
             totalStoreSize: try storeURL.directoryTotalSize(),
-            blobsSize: try getBlobsSize(isCompressed: false),
-            blobsCompressedSize: try getBlobsSize(isCompressed: true),
+            blobsSize: try getBlobsSize(),
+            blobsDecompressedSize: try getBlobsSize(isDecompressed: true),
             appInfo: .make(),
             deviceInfo: .make()
         )
@@ -997,6 +975,7 @@ extension LoggerStore {
         case storeInvalid
         case unsupportedVersion
         case documentIsReadonly
+        case fileAleadyExists
         case unknownError
 
         public var errorDescription: String? {
@@ -1005,6 +984,7 @@ extension LoggerStore {
             case .storeInvalid: return "Store format is invalid"
             case .documentIsReadonly: return "Document is readonly"
             case .unsupportedVersion: return "The store was created by one of the earlier versions of Pulse and is no longer supported"
+            case .fileAleadyExists: return "The file at the given location already exists"
             case .unknownError: return "Unexpected error"
             }
         }
@@ -1031,18 +1011,11 @@ extension LoggerStore {
             }
             self = manifest
         }
-
-        init(archive: IndexedArchive) throws {
-            guard let data = archive.getData(for: manifestFilename) else {
-                throw NSError(domain: NSErrorDomain() as String, code: NSURLErrorResourceUnavailable, userInfo: [NSLocalizedDescriptionKey: "Store manifest is missing"])
-            }
-            self = try JSONDecoder().decode(Manifest.self, from: data)
-        }
     }
 }
 
 extension Version {
-    static let currentStoreVersion = Version(2, 0, 0)
+    static let currentStoreVersion = Version(2, 0, 1)
 }
 
 // MARK: - Constants
@@ -1052,10 +1025,10 @@ let databaseFilename = "logs.sqlite"
 let infoFilename = "info.json"
 let blobsDirectoryName = "blobs"
 
-private enum PulseDocument: Sendable {
+private enum PulseDocumentType {
     /// A plain directory (aka "package"). If it has a `.pulse` file extension,
     /// it can be automatically opened by the Pulse apps.
     case package
     /// An archive created by exporting the store.
-    case archive(IndexedArchive)
+    case archive(LoggerStore.Info, PulseDocument)
 }

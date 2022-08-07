@@ -49,10 +49,6 @@ Pulse is easy to learn and use thanks to [**Pulse Docs**](https://kean.blog/puls
 
 [**Pulse Pro**](https://kean.blog/pulse/guides/pulse-pro) is a professional open-source macOS app that allows you to view logs in real-time. The app is designed to be flexible, expansive, and precise while using all the familiar macOS patterns. It makes it easy to navigate large log files with table and text modes, filters, scroller markers, an all-new network inspector, JSON filters, and more.
 
-## Dependencies
-
-- [ZIPFoundation](https://github.com/weichsel/ZIPFoundation/) for archiving Pulse documents. It's included directly in the binary.
-
 ## Minimum Requirements
 
 **PulseUI** views are available only on indicated platforms, but the framework can be installed in the app targeting the **PulseCore** platforms – you just won't be able to use the views.

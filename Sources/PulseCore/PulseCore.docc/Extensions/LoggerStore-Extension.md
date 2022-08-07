@@ -32,7 +32,7 @@
 ### Managing the Store
 
 - ``removeAll()``
-- ``copy(to:)``
+- ``copy(to:predicate:)``
 - ``destroy()``
 
 ### Getting Store Info

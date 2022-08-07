@@ -17,9 +17,7 @@ enum Render {
     }
 
     static func asHTML(request: LoggerNetworkRequestEntity) -> String {
-        let details = DecodedNetworkRequestDetailsEntity(request: request)
-        let error = details.decodingError
-        return render(request: request, using: HTMLRenderer(error: error))
+        render(request: request, using: HTMLRenderer(error: request.details?.decodingError))
     }
 
     private static func render(request: LoggerNetworkRequestEntity, using renderer: Renderer) -> String {

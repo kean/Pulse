@@ -52,9 +52,9 @@ struct StoreDetailsView: View {
 #endif
             ForEach(viewModel.sections, id: \.title) { section in
                 Section(header: Text(section.title)) {
-                    KeyValueSectionView(viewModel: section)
-                        .hiddenTitle()
-                        .padding(.vertical, 8)
+                    ForEach(section.items.enumerated().map(KeyValueRow.init)) { item in
+                        InfoRow(title: item.title, details: item.details)
+                    }
                 }
             }
         }
@@ -129,20 +129,18 @@ final class StoreDetailsViewModel: ObservableObject {
     private func makeSizeSection(for info: LoggerStore.Info) -> KeyValueSectionViewModel {
         KeyValueSectionViewModel(title: "Statistics", color: .gray, action: nil, items: [
             ("Created", dateFormatter.string(from: info.creationDate)),
-            ("Total Size", ByteCountFormatter.string(fromByteCount: info.totalStoreSize) ),
-            ("Blobs Size", makeBlobsSizeText(for: info)),
             ("Messages", info.messageCount.description),
-            ("Requests", info.requestCount.description)
-        ])
+            ("Requests", info.requestCount.description),
+            ("Blobs Size", ByteCountFormatter.string(fromByteCount: info.blobsSize)),
+            makeDecompressedRow(for: info),
+        ].compactMap { $0 })
     }
 
-    private func makeBlobsSizeText(for info: LoggerStore.Info) -> String {
-        let size = ByteCountFormatter.string(fromByteCount: info.blobsSize)
-        let compressed = ByteCountFormatter.string(fromByteCount: info.blobsCompressedSize)
-        if info.blobsCompressedSize == info.blobsSize {
-            return size
+    private func makeDecompressedRow(for info: LoggerStore.Info) -> (String, String?)? {
+        if info.blobsDecompressedSize == info.blobsSize {
+            return nil
         }
-        return "\(compressed) (\(size) decompressed)"
+        return ("Blobs Size Decompressed", ByteCountFormatter.string(fromByteCount: info.blobsDecompressedSize))
     }
 }
 

@@ -4,8 +4,6 @@
 
 import SwiftUI
 
-// MARK: - Extensions
-
 #if os(iOS) || os(macOS)
 extension Color {
     static var separator: Color { Color(UXColor.separator) }

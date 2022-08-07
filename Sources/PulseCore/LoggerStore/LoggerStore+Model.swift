@@ -13,7 +13,6 @@ extension LoggerStore {
         let metadata = NSEntityDescription(name: "LoggerMetadataEntity", class: LoggerMetadataEntity.self)
         let request = NSEntityDescription(name: "LoggerNetworkRequestEntity", class: LoggerNetworkRequestEntity.self)
         let requestProgress = NSEntityDescription(name: "LoggerNetworkRequestProgressEntity", class: LoggerNetworkRequestProgressEntity.self)
-        let requestDetails = NSEntityDescription(name: "LoggerNetworkRequestDetailsEntity", class: LoggerNetworkRequestDetailsEntity.self)
         let blob = NSEntityDescription(name: "LoggerBlobHandleEntity", class: LoggerBlobHandleEntity.self)
         let inlinedData = NSEntityDescription(name: "LoggerInlineDataEntity", class: LoggerInlineDataEntity.self)
 
@@ -50,26 +49,17 @@ extension LoggerStore {
             NSAttributeDescription(name: "statusCode", type: .integer32AttributeType),
             NSAttributeDescription(name: "startDate", type: .dateAttributeType),
             NSAttributeDescription(name: "duration", type: .doubleAttributeType),
-            NSAttributeDescription(name: "contentType", type: .stringAttributeType),
+            NSAttributeDescription(name: "responseContentType", type: .stringAttributeType),
             NSAttributeDescription(name: "requestState", type: .integer16AttributeType),
             NSAttributeDescription(name: "redirectCount", type: .integer16AttributeType),
             NSAttributeDescription(name: "requestBodySize", type: .integer64AttributeType),
             NSAttributeDescription(name: "responseBodySize", type: .integer64AttributeType),
             NSAttributeDescription(name: "isFromCache", type: .booleanAttributeType),
-            NSRelationshipDescription.make(name: "details", type: .oneToOne(), entity: requestDetails),
             NSRelationshipDescription.make(name: "message", type: .oneToOne(), entity: message),
+            NSRelationshipDescription.make(name: "detailsData", type: .oneToOne(), entity: inlinedData),
             NSRelationshipDescription.make(name: "requestBody", type: .oneToOne(isOptional: true), deleteRule: .noActionDeleteRule, entity: blob),
             NSRelationshipDescription.make(name: "responseBody", type: .oneToOne(isOptional: true), deleteRule: .noActionDeleteRule, entity: blob),
             NSRelationshipDescription.make(name: "progress", type: .oneToOne(isOptional: true), entity: requestProgress)
-        ]
-
-        requestDetails.properties = [
-            NSAttributeDescription(name: "originalRequest", type: .binaryDataAttributeType),
-            NSAttributeDescription(name: "currentRequest", type: .binaryDataAttributeType),
-            NSAttributeDescription(name: "response", type: .binaryDataAttributeType),
-            NSAttributeDescription(name: "error", type: .binaryDataAttributeType),
-            NSAttributeDescription(name: "metrics", type: .binaryDataAttributeType),
-            NSAttributeDescription(name: "metadata", type: .binaryDataAttributeType)
         ]
 
         requestProgress.properties = [
@@ -80,7 +70,7 @@ extension LoggerStore {
         blob.properties = [
             NSAttributeDescription(name: "key", type: .stringAttributeType),
             NSAttributeDescription(name: "size", type: .integer64AttributeType),
-            NSAttributeDescription(name: "compressedSize", type: .integer64AttributeType),
+            NSAttributeDescription(name: "decompressedSize", type: .integer64AttributeType),
             NSAttributeDescription(name: "linkCount", type: .integer16AttributeType),
             NSRelationshipDescription.make(name: "inlineData", type: .oneToOne(isOptional: true), entity: inlinedData)
         ]
@@ -89,52 +79,7 @@ extension LoggerStore {
             NSAttributeDescription(name: "data", type: .binaryDataAttributeType)
         ]
 
-        model.entities = [message, metadata, request, requestDetails, requestProgress, blob, inlinedData]
+        model.entities = [message, metadata, request, requestProgress, blob, inlinedData]
         return model
     }()
-}
-
-// MARK: - Helpers
-
-private extension NSEntityDescription {
-    convenience init<T>(name: String, class: T.Type) where T: NSManagedObject {
-        self.init()
-        self.name = name
-        self.managedObjectClassName = T.self.description()
-    }
-}
-
-private extension NSAttributeDescription {
-    convenience init(name: String, type: NSAttributeType, _ configure: (NSAttributeDescription) -> Void = { _ in }) {
-        self.init()
-        self.name = name
-        self.attributeType = type
-        configure(self)
-    }
-}
-
-private enum RelationshipType {
-    case oneToMany
-    case oneToOne(isOptional: Bool = false)
-}
-
-private extension NSRelationshipDescription {
-    static func make(name: String,
-                     type: RelationshipType,
-                     deleteRule: NSDeleteRule = .cascadeDeleteRule,
-                     entity: NSEntityDescription) -> NSRelationshipDescription {
-        let relationship = NSRelationshipDescription()
-        relationship.name = name
-        relationship.deleteRule = deleteRule
-        relationship.destinationEntity = entity
-        switch type {
-        case .oneToMany:
-            relationship.maxCount = 0
-            relationship.minCount = 0
-        case .oneToOne(let isOptional):
-            relationship.maxCount = 1
-            relationship.minCount = isOptional ? 0 : 1
-        }
-        return relationship
-    }
 }

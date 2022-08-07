@@ -29,8 +29,13 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
     @NSManaged public var isPinned: Bool
     @NSManaged public var session: UUID
     @NSManaged public var taskId: UUID
-    @NSManaged public var rawTaskType: Int16
     @NSManaged public var message: LoggerMessageEntity?
+
+    /// Returns task type
+    public var taskType: NetworkLogger.TaskType? {
+        NetworkLogger.TaskType(rawValue: rawTaskType)
+    }
+    @NSManaged var rawTaskType: Int16
 
     // MARK: Request
 
@@ -44,14 +49,19 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
     @NSManaged public var errorDomain: String?
     @NSManaged public var errorCode: Int32
     /// Response content-type.
-    @NSManaged public var contentType: String?
+    @NSManaged public var responseContentType: String?
     /// Returns `true` if the response was returned from the local cache.
     @NSManaged public var isFromCache: Bool
 
     // MARK: State
 
+    /// Returns request state.
+    public var state: LoggerNetworkRequestEntity.State {
+        LoggerNetworkRequestEntity.State(rawValue: requestState) ?? .pending
+    }
+
     /// Contains ``State-swift.enum`` raw value.
-    @NSManaged public var requestState: Int16
+    @NSManaged var requestState: Int16
     /// Request progress.
     ///
     /// - note: The entity is created lazily when the first progress report
@@ -74,8 +84,34 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
 
     // MARK: Details
 
-    /// Request details.
-    @NSManaged public var details: LoggerNetworkRequestDetailsEntity
+    /// Returns request details.
+    ///
+    /// - important: Accessing it for the first time can be a relatively slow
+    /// operation because it performs decoding on the fly, but the decoded
+    /// entity is cached until the object is turned into a fault.
+    public var details: LoggerNetworkRequestEntity.RequestDetails? {
+        if let (details, count) = cachedDetails, count == detailsData?.data.count {
+            return details
+        }
+        guard let compressedData = detailsData?.data,
+              let data = try? compressedData.decompressed(),
+              let details = try? JSONDecoder().decode(LoggerNetworkRequestEntity.RequestDetails.self, from: data as Data) else {
+            return nil
+        }
+        self.cachedDetails = (details, compressedData.count)
+        return details
+    }
+
+    public override func willTurnIntoFault() {
+        super.willTurnIntoFault()
+        cachedDetails = nil
+    }
+
+    private var cachedDetails: (RequestDetails, Int)?
+
+    /// Request details (encoded and compressed ``LoggerNetworkRequestDetails``).
+    @NSManaged var detailsData: LoggerInlineDataEntity?
+
     /// The request body handle.
     @NSManaged public var requestBody: LoggerBlobHandleEntity?
     /// The response body handle.
@@ -87,16 +123,6 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
 
     // MARK: Helpers
 
-    /// Returns request state.
-    public var state: LoggerNetworkRequestEntity.State {
-        if let state = LoggerNetworkRequestEntity.State(rawValue: requestState) {
-            return state
-        }
-        // For backward-compatibility.
-        let isFailure = errorCode != 0 || (statusCode != 0 && !(200..<400).contains(statusCode))
-        return isFailure ? .failure : .success
-    }
-
     /// Returns task interval (if available from metrics).
     public var taskInterval: DateInterval? {
         guard let startDate = self.startDate, let endDate = self.endDate else {
@@ -105,15 +131,29 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
         return DateInterval(start: startDate, end: endDate)
     }
 
-    /// Returns task type
-    public var taskType: NetworkLogger.TaskType? {
-        NetworkLogger.TaskType(rawValue: rawTaskType)
-    }
-
     public enum State: Int16 {
         case pending = 1
         case success = 2
         case failure = 3
+    }
+
+    /// The request details stored in a database in a denormalized format.
+    public final class RequestDetails: Codable, Sendable {
+        public let originalRequest: NetworkLogger.Request
+        public let currentRequest: NetworkLogger.Request?
+        public let response: NetworkLogger.Response?
+        public let error: NetworkLogger.ResponseError?
+        public let metrics: NetworkLogger.Metrics?
+        public let metadata: [String: String]?
+
+        public init(originalRequest: NetworkLogger.Request, currentRequest: NetworkLogger.Request?, response: NetworkLogger.Response? = nil, error: NetworkLogger.ResponseError? = nil, metrics: NetworkLogger.Metrics? = nil, metadata: [String : String]? = nil) {
+            self.originalRequest = originalRequest
+            self.currentRequest = currentRequest
+            self.response = response
+            self.error = error
+            self.metrics = metrics
+            self.metadata = metadata
+        }
     }
 }
 
@@ -125,22 +165,6 @@ public final class LoggerNetworkRequestProgressEntity: NSManagedObject {
     @NSManaged public var totalUnitCount: Int64
 }
 
-/// Details associated with the request.
-public final class LoggerNetworkRequestDetailsEntity: NSManagedObject {
-    /// Contains JSON-encoded ``NetworkLogger/Request``.
-    @NSManaged public var originalRequest: Data?
-    /// Contains JSON-encoded ``NetworkLogger/Request``.
-    @NSManaged public var currentRequest: Data?
-    /// Contains JSON-encoded ``NetworkLogger/Response``.
-    @NSManaged public var response: Data?
-    /// Contains JSON-encoded ``NetworkLogger/ResponseError``.
-    @NSManaged public var error: Data?
-    /// Contains JSON-encoded ``NetworkLogger/Metrics``.
-    @NSManaged public var metrics: Data?
-    /// Contains JSON-encoded metadata (`[String: String]`).
-    @NSManaged public var metadata: Data?
-}
-
 /// Doesn't contain any data, just the key and some additional payload.
 public final class LoggerBlobHandleEntity: NSManagedObject {
     /// A blob hash (sha1, 40 characters).
@@ -149,8 +173,8 @@ public final class LoggerBlobHandleEntity: NSManagedObject {
     /// A blob size.
     @NSManaged public var size: Int64
 
-    /// A compressed blob size.
-    @NSManaged public var compressedSize: Int64
+    /// A decompressed blob size.
+    @NSManaged public var decompressedSize: Int64
 
     /// A number of requests referencing it.
     @NSManaged var linkCount: Int16
@@ -166,8 +190,6 @@ public final class LoggerBlobHandleEntity: NSManagedObject {
     ///
     /// To access data, use the convenience ``data`` property.
     @NSManaged var inlineData: LoggerInlineDataEntity?
-
-    static let inlineLimit = 32768 // 32 KB
 
     /// Returns the associated data.
     ///

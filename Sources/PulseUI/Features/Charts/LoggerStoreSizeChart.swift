@@ -65,8 +65,8 @@ struct LoggerStoreSizeChart: View {
 }
 
 private enum Category: String, Hashable, Plottable {
-    case messages = "Messages"
-    case responses = "Responses"
+    case messages = "Logs"
+    case responses = "Blobs"
     case free = "Free"
 }
 

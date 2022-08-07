@@ -54,7 +54,7 @@ extension LoggerStore {
 
         /// If enabled, all blobs will be stored in a compressed format and
         /// decompressed on the fly, significantly reducing the space usage.
-        var isCompressionEnabled = true
+        var isBlobCompressionEnabled = true
 
         /// Determines how often the messages are saved to the database. By default,
         /// 100 milliseconds - quickly enough, but avoiding too many individual writes.
@@ -66,6 +66,8 @@ extension LoggerStore {
         /// Limit the maximum response size stored by the logger. The default
         /// value is `10 Mb`. The same limit applies to requests.
         public var responseBodySizeLimit: Int = 10 * 1048576
+
+        var inlineLimit = 32768 // 32 KB
 
         /// By default, two weeks. The messages and requests that are older that
         /// two weeks will get automatically deleted.

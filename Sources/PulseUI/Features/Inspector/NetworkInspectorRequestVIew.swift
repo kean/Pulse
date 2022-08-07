@@ -41,7 +41,7 @@ final class NetworkInspectorRequestViewModel: ObservableObject {
         if let requestBody = request.requestBody?.data {
             _fileViewModel = FileViewerViewModel(
                 title: "Request",
-                context: details.requestFileViewerContext,
+                context: request.requestFileViewerContext,
                 data: { requestBody }
             )
         }
@@ -51,13 +51,10 @@ final class NetworkInspectorRequestViewModel: ObservableObject {
     private var _fileViewModel: FileViewerViewModel?
 
     let request: LoggerNetworkRequestEntity
-    private var details: DecodedNetworkRequestDetailsEntity
     private var cancellable: AnyCancellable?
 
     init(request: LoggerNetworkRequestEntity) {
         self.request = request
-        self.details = DecodedNetworkRequestDetailsEntity(request: request)
-
         cancellable = request.objectWillChange.sink { [weak self] in self?.refresh() }
     }
 
@@ -66,8 +63,6 @@ final class NetworkInspectorRequestViewModel: ObservableObject {
     }
 
     private func refresh() {
-        withAnimation {
-            objectWillChange.send()
-        }
+withAnimation { objectWillChange.send() }
     }
 }

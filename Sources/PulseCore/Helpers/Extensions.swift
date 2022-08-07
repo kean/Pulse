@@ -176,11 +176,13 @@ extension URL {
     }
 }
 
-func benchmark(title: String, operation: () -> Void) {
+@discardableResult
+func benchmark<T>(title: String, operation: () throws -> T) rethrows -> T {
     let startTime = CFAbsoluteTimeGetCurrent()
-    operation()
+    let value = try operation()
     let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
     debugPrint("Time elapsed for \(title): \(timeElapsed * 1000.0) ms.")
+    return value
 }
 
 final class WeakLoggerStore {
@@ -205,5 +207,23 @@ struct TemporaryDirectory {
 
     func remove() {
         try? FileManager.default.removeItem(at: url)
+    }
+}
+
+extension Data {
+    func compressed() throws -> Data {
+        try (self as NSData).compressed(using: .lzfse) as Data
+    }
+
+    func decompressed() throws -> Data {
+        try (self as NSData).decompressed(using: .lzfse) as Data
+    }
+}
+
+extension Array {
+    func chunked(into size: Int) -> [[Element]] {
+        return stride(from: 0, to: count, by: size).map {
+            Array(self[$0 ..< Swift.min($0 + size, count)])
+        }
     }
 }
