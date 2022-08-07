@@ -507,7 +507,7 @@ extension LoggerStore {
             inlineData.data = compressedData
             entity.inlineData = inlineData
         } else {
-            try? compressedData.write(to: makeBlobURL(for: key.string))
+            try? compressedData.write(to: makeBlobURL(for: key.hexString))
         }
         return entity
     }
@@ -516,7 +516,7 @@ extension LoggerStore {
         blob.linkCount -= 1
         if blob.linkCount == 0 {
             if blob.inlineData == nil {
-                try? Files.removeItem(at: makeBlobURL(for: blob.key.string))
+                try? Files.removeItem(at: makeBlobURL(for: blob.key.hexString))
             }
             backgroundContext.delete(blob)
         }
@@ -534,7 +534,7 @@ extension LoggerStore {
         if let inlineData = entity.inlineData {
             return inlineData.data
         }
-        return getRawData(forKey: entity.key.string)
+        return getRawData(forKey: entity.key.hexString)
     }
 
     /// Returns blob data for the given key.
@@ -634,6 +634,8 @@ extension LoggerStore {
     }
 
     /// Safely closes the database and removes all information from the store.
+    ///
+    /// - note: After the store is destroyed, you can't write any new messages to it.
     public func destroy() throws {
         let coordinator = container.persistentStoreCoordinator
         for store in coordinator.persistentStores {
@@ -644,10 +646,10 @@ extension LoggerStore {
         try Files.removeItem(at: storeURL)
     }
 
-    func close() throws {
-        let coordinator = container.persistentStoreCoordinator
-        for store in coordinator.persistentStores {
-            try coordinator.remove(store)
+    /// Safely closes the database.
+    public func close() throws {
+        for store in container.persistentStoreCoordinator.persistentStores {
+            try container.persistentStoreCoordinator.remove(store)
         }
     }
 }
@@ -689,7 +691,6 @@ extension LoggerStore {
         defer { temporary.remove() }
 
         let document = try PulseDocument(documentURL: targetURL)
-
         var totalSize: Int64 = 0
 
         // Create copy of the store
@@ -707,11 +708,13 @@ extension LoggerStore {
             }
         }
 
+        // Add database
         let documentBlob = PulseBlobEntity(context: document.context)
         documentBlob.key = "database"
         documentBlob.data = try Data(contentsOf: databaseURL).compressed()
         totalSize += Int64(documentBlob.data.count)
 
+        // Add blobs
         if Files.fileExists(atPath: blobsURL.path) {
             let blobURLs = try Files.contentsOfDirectory(at: blobsURL, includingPropertiesForKeys: nil)
             for chunk in blobURLs.chunked(into: 100) {
@@ -729,7 +732,9 @@ extension LoggerStore {
         // Add store info
         var info = try _info()
         info.storeId = UUID()
-        // Chicken and an egg problem: don't know the exact size
+        // Chicken and an egg problem: don't know the exact size.
+        // The output file is also going to be about 10-20% larger because of
+        // the unused pages in the sqlite database.
         info.totalStoreSize = totalSize + 500 // info is roughly 500 bytes
         info.creationDate = configuration.makeCurrentDate()
         info.modifiedDate = info.creationDate
@@ -748,7 +753,6 @@ extension LoggerStore {
 // MARK: - LoggerStore (Sweep)
 
 extension LoggerStore {
-
     var isAutomaticSweepNeeded: Bool {
         guard options.contains(.sweep) && !isArchive else { return false }
         guard let lastSweepDate = manifest.lastSweepDate else {

@@ -33,6 +33,7 @@
 
 - ``removeAll()``
 - ``copy(to:predicate:)``
+- ``close()``
 - ``destroy()``
 
 ### Getting Store Info

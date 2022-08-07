@@ -92,12 +92,7 @@ extension NSPersistentStoreCoordinator {
             NSSQLiteManualVacuumOption: true,
         ]
 
-        try backupCoordinator.migratePersistentStore(
-            intermediateStore,
-            to: url,
-            options: backupStoreOptions,
-            withType: NSSQLiteStoreType
-        )
+        try backupCoordinator.migratePersistentStore(intermediateStore, to: url, options: backupStoreOptions, withType: NSSQLiteStoreType)
     }
 }
 

@@ -539,14 +539,14 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertEqual(try store.backgroundContext.count(for: LoggerBlobHandleEntity.self), 1)
         let request = try store.backgroundContext.first(LoggerNetworkRequestEntity.self)
         let key = try XCTUnwrap(request?.responseBody?.key)
-        XCTAssertEqual(store.getBlobData(forKey: key.string), responseData)
+        XCTAssertEqual(store.getBlobData(forKey: key.hexString), responseData)
 
         // WHEN
         store.syncSweep()
 
         // THEN the file is deleted from the file system
         XCTAssertEqual(try store.backgroundContext.count(for: LoggerBlobHandleEntity.self), 0)
-        XCTAssertNil(store.getBlobData(forKey: key.string))
+        XCTAssertNil(store.getBlobData(forKey: key.hexString))
     }
 
     // MARK: - Migration
@@ -615,7 +615,7 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertEqual(try store.backgroundContext.count(for: LoggerBlobHandleEntity.self), 1)
         let request = try store.backgroundContext.first(LoggerNetworkRequestEntity.self)
         let key = try XCTUnwrap(request?.responseBody?.key)
-        XCTAssertEqual(store.getBlobData(forKey: key.string), responseData)
+        XCTAssertEqual(store.getBlobData(forKey: key.hexString), responseData)
 
         // WHEN
         store.removeAll()
@@ -623,13 +623,13 @@ final class LoggerStoreTests: XCTestCase {
         // THEN the file is deleted from the file system
         XCTAssertEqual(try store.backgroundContext.count(for: LoggerBlobHandleEntity.self), 0)
         XCTAssertEqual(try store.backgroundContext.count(for: LoggerInlineDataEntity.self), 0)
-        XCTAssertNil(store.getBlobData(forKey: key.string))
+        XCTAssertNil(store.getBlobData(forKey: key.hexString))
 
         // WHEN store new files after removal
         store.storeRequest(URLRequest(url: URL(string: "example.com/1")!), response: nil, error: nil, data: responseData)
 
         // THEN you can store more files after removal
-        XCTAssertEqual(store.getBlobData(forKey: key.string), responseData)
+        XCTAssertEqual(store.getBlobData(forKey: key.hexString), responseData)
     }
 
     // MARK: - Store Request

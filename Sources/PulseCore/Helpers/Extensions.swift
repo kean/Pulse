@@ -68,7 +68,7 @@ extension Data {
         })
     }
 
-    var string: String {
+    var hexString: String {
         map { String(format: "%02x", $0) }.joined()
     }
 }
@@ -78,9 +78,7 @@ extension URLRequest {
         guard let bodyStream = self.httpBodyStream else {
             return nil
         }
-
-        // Will read 16 chars per iteration. Can use bigger buffer if needed
-        let bufferSize: Int = 16
+        let bufferSize: Int = 1024
         let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: bufferSize)
 
         bodyStream.open()
@@ -90,12 +88,10 @@ extension URLRequest {
         }
 
         var bodyStreamData = Data()
-
         while bodyStream.hasBytesAvailable {
             let readData = bodyStream.read(buffer, maxLength: bufferSize)
             bodyStreamData.append(buffer, count: readData)
         }
-
         return bodyStreamData
     }
 }
@@ -149,14 +145,6 @@ enum Graphics {
     }
 }
 
-extension CGImage {
-    /// Returns `true` if the image doesn't contain alpha channel.
-    var isOpaque: Bool {
-        let alpha = alphaInfo
-        return alpha == .none || alpha == .noneSkipFirst || alpha == .noneSkipLast
-    }
-}
-
 #if os(macOS)
 extension NSImage {
     var cgImage: CGImage? {
@@ -201,7 +189,6 @@ final class WeakLoggerStore {
 
 struct TemporaryDirectory {
     let url: URL
-
 
     init() {
         url = URL.temp.appending(directory: UUID().uuidString)
