@@ -109,7 +109,7 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
 
     private var cachedDetails: (RequestDetails, Int)?
 
-    /// Request details (encoded and compresed ``LoggerNetworkRequestDetails``).
+    /// Request details (encoded and compressed ``LoggerNetworkRequestDetails``).
     @NSManaged var detailsData: LoggerInlineDataEntity?
 
     /// The request body handle.
