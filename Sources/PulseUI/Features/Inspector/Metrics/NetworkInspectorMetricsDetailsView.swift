@@ -82,7 +82,7 @@ private func makeMiscSection(for metrics: NetworkLogger.TransactionMetrics) -> K
 // MARK: - Private
 
 private func formatBytes(_ count: Int64) -> String {
-    ByteCountFormatter.string(fromByteCount: count, countStyle: .file)
+    ByteCountFormatter.string(fromByteCount: count)
 }
 
 // MARK: - Preview

@@ -55,12 +55,12 @@ struct ImagePreviewViewModel {
 
         var info: [(String, String?)] = [
             ("Resolution", originalImageSize.map { "\(Int($0.width)) × \(Int($0.height)) px" }),
-            ("Size", ByteCountFormatter.string(fromByteCount: context.originalSize, countStyle: .file)),
+            ("Size", ByteCountFormatter.string(fromByteCount: context.originalSize)),
             ("Type", context.contentType?.rawValue),
             ("Displayed", isShowingOriginal ? "original image" : "preview (original not saved)")
         ]
         if !isShowingOriginal {
-            info.append(("Preview Size", ByteCountFormatter.string(fromByteCount: Int64(data.count), countStyle: .file)))
+            info.append(("Preview Size", ByteCountFormatter.string(fromByteCount: Int64(data.count))))
         }
 
         self.image = image

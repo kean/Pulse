@@ -154,5 +154,5 @@ struct NetworkInspectorTransferInfoViewModel {
 }
 
 private func formatBytes(_ count: Int64) -> String {
-    ByteCountFormatter.string(fromByteCount: max(0, count), countStyle: .file)
+    ByteCountFormatter.string(fromByteCount: max(0, count))
 }

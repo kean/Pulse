@@ -51,7 +51,7 @@ extension KeyValueSectionViewModel {
         KeyValueSectionViewModel(title: "Response Summary", color: .indigo, items: [
             ("Status Code", response.statusCode.map { String($0) }),
             ("Content Type", response.contentType?.rawValue),
-            ("Expected Content Length", response.expectedContentLength.map { ByteCountFormatter.string(fromByteCount: max(0, $0), countStyle: .file) })
+            ("Expected Content Length", response.expectedContentLength.map { ByteCountFormatter.string(fromByteCount: max(0, $0)) })
         ])
     }
 

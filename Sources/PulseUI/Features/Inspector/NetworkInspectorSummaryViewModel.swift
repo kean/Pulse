@@ -130,7 +130,7 @@ withAnimation { objectWillChange.send() }
             ),
             items: [
                 ("Content-Type", contentType),
-                ("Size", ByteCountFormatter.string(fromByteCount: request.requestBodySize, countStyle: .file))
+                ("Size", ByteCountFormatter.string(fromByteCount: request.requestBodySize))
             ]
         )
     }
@@ -175,7 +175,7 @@ withAnimation { objectWillChange.send() }
             ),
             items: [
                 ("Content-Type", contentType),
-                ("Size", ByteCountFormatter.string(fromByteCount: request.requestBodySize, countStyle: .file))
+                ("Size", ByteCountFormatter.string(fromByteCount: request.requestBodySize))
             ]
         )
     }
@@ -195,14 +195,14 @@ withAnimation { objectWillChange.send() }
     var responseBodySection: KeyValueSectionViewModel {
         if request.taskType == .downloadTask, request.responseBodySize > 0 {
             return KeyValueSectionViewModel(title: "Response Body", color: .indigo, items: [
-                ("Download Size", ByteCountFormatter.string(fromByteCount: request.responseBodySize, countStyle: .file))
+                ("Download Size", ByteCountFormatter.string(fromByteCount: request.responseBodySize))
             ])
         }
         guard request.responseBodySize > 0 else {
             return KeyValueSectionViewModel(title: "Response Body", color: .indigo)
         }
         let contentType = details?.response?.headers?.first(where: { $0.key == "Content-Type" })?.value ?? "–"
-        let size = ByteCountFormatter.string(fromByteCount: request.responseBodySize, countStyle: .file)
+        let size = ByteCountFormatter.string(fromByteCount: request.responseBodySize)
         return KeyValueSectionViewModel(
             title: "Response Body",
             color: .indigo,

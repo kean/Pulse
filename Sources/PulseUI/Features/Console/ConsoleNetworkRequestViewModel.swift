@@ -74,13 +74,13 @@ final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
             switch request.taskType ?? .dataTask {
             case .uploadTask:
                 if request.requestBodySize > 0 {
-                    let sizeText = ByteCountFormatter.string(fromByteCount: request.requestBodySize, countStyle: .file)
+                    let sizeText = ByteCountFormatter.string(fromByteCount: request.requestBodySize)
                     title += " · "
                     title += request.isFromCache ? "Cache" : sizeText
                 }
             case .dataTask, .downloadTask:
                 if request.responseBodySize > 0 {
-                    let sizeText = ByteCountFormatter.string(fromByteCount: request.responseBodySize, countStyle: .file)
+                    let sizeText = ByteCountFormatter.string(fromByteCount: request.responseBodySize)
                     title += " · "
                     title += request.isFromCache ? "Cache" : sizeText
                 }

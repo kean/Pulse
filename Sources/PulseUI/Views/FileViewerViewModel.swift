@@ -69,7 +69,7 @@ final class FileViewerViewModel: ObservableObject {
 #endif
             return .other(.init(string: string))
         } else {
-            let message = "Data \(ByteCountFormatter.string(fromByteCount: Int64(data.count), countStyle: .file))"
+            let message = "Data \(ByteCountFormatter.string(fromByteCount: Int64(data.count)))"
             return .other(RichTextViewModel(string: message))
         }
     }
@@ -87,6 +87,6 @@ final class FileViewerViewModel: ObservableObject {
 
 private extension Data {
     var localizedSize: String {
-        ByteCountFormatter.string(fromByteCount: Int64(count), countStyle: .file)
+        ByteCountFormatter.string(fromByteCount: Int64(count))
     }
 }

@@ -20,7 +20,7 @@ struct NetworkInspectorResponseView: View {
             PlaceholderView(imageName: "arrow.down.circle", title: {
                 var title = "Downloaded to a File"
                 if viewModel.request.responseBodySize > 0 {
-                    title = "\(ByteCountFormatter.string(fromByteCount: viewModel.request.responseBodySize, countStyle: .file))\n\(title)"
+                    title = "\(ByteCountFormatter.string(fromByteCount: viewModel.request.responseBodySize))\n\(title)"
                 }
                 return title
             }())

@@ -76,8 +76,8 @@ final class ProgressViewModel: ObservableObject {
         let total = progress.totalUnitCount
 
         if completed > 0 || total > 0 {
-            let lhs = ByteCountFormatter.string(fromByteCount: max(0, completed), countStyle: .file)
-            let rhs = ByteCountFormatter.string(fromByteCount: total, countStyle: .file)
+            let lhs = ByteCountFormatter.string(fromByteCount: max(0, completed))
+            let rhs = ByteCountFormatter.string(fromByteCount: total)
             self.details = total > 0 ? "\(lhs) / \(rhs)" : lhs
         }
     }
