@@ -46,7 +46,7 @@ extension XCTestCase {
             let dataTask = urlSession.dataTask(with: mockTask.request)
             dataTask.setValue(mockTask.response, forKey: "response")
             networkLogger.logTaskCreated(dataTask)
-            networkLogger.logDataTask(dataTask, didReceive: mockTask.responseBody)
+            networkLogger.logDataTask(dataTask, didReceive: mockTask.responseBody + UUID().uuidString.data(using: .utf8)!)
             networkLogger.logTask(dataTask, didFinishCollecting: mockTask.metrics)
             networkLogger.logTask(dataTask, didCompleteWithError: nil)
         }

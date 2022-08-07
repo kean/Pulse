@@ -8,15 +8,6 @@ final class PulseDocument {
     let container: NSPersistentContainer
     var context: NSManagedObjectContext { container.viewContext }
 
-    private func document() throws -> PulseDocumentEntity {
-        guard let document = self._document else {
-            throw LoggerStore.Error.unknownError // Programmatic error
-        }
-        return document
-    }
-
-    private var _document: PulseDocumentEntity?
-
     init(documentURL: URL) throws {
         guard Files.fileExists(atPath: documentURL.deletingLastPathComponent().path) else {
             throw LoggerStore.Error.fileDoesntExist
@@ -31,20 +22,22 @@ final class PulseDocument {
 
     /// Opens existing store and returns store info.
     func open() throws -> LoggerStore.Info {
-        guard let document = try context.first(PulseDocumentEntity.self) else {
+        guard let info = getBlob(forKey: "info") else {
             throw LoggerStore.Error.storeInvalid
         }
-        self._document = document
-        return try JSONDecoder().decode(LoggerStore.Info.self, from: document.info)
+        return try JSONDecoder().decode(LoggerStore.Info.self, from: info)
     }
 
     // Opens an existing database.
     func database() throws -> Data {
-        try document().database
+        guard let database = getBlob(forKey: "database") else {
+            throw LoggerStore.Error.storeInvalid
+        }
+        return database
     }
 
     func getBlob(forKey key: String) -> Data? {
-        try? context.first(LoggerBlobHandleEntity.self) {
+        try? context.first(PulseBlobEntity.self) {
             $0.predicate = NSPredicate(format: "key == %@", key)
         }?.data
     }
@@ -58,29 +51,14 @@ final class PulseDocument {
 
     static let model: NSManagedObjectModel = {
         let model = NSManagedObjectModel()
-
-        let archive = NSEntityDescription(name: "PulseDocumentEntity", class: PulseDocumentEntity.self)
         let blob = NSEntityDescription(name: "PulseBlobEntity", class: PulseBlobEntity.self)
-
-        archive.properties = [
-            NSAttributeDescription(name: "info", type: .binaryDataAttributeType),
-            NSAttributeDescription(name: "database", type: .binaryDataAttributeType)
-        ]
-
         blob.properties = [
             NSAttributeDescription(name: "key", type: .stringAttributeType),
             NSAttributeDescription(name: "data", type: .binaryDataAttributeType)
         ]
-
-        model.entities = [archive, blob]
-
+        model.entities = [blob]
         return model
     }()
-}
-
-final class PulseDocumentEntity: NSManagedObject {
-    @NSManaged var info: Data
-    @NSManaged var database: Data
 }
 
 final class PulseBlobEntity: NSManagedObject {

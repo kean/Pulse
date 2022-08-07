@@ -685,8 +685,6 @@ extension LoggerStore {
 
         let document = try PulseDocument(documentURL: targetURL)
 
-        let documentEntity = PulseDocumentEntity(context: document.context)
-
         var totalSize: Int64 = 0
 
         // Create copy of the store
@@ -704,8 +702,10 @@ extension LoggerStore {
             }
         }
 
-        documentEntity.database = try Data(contentsOf: databaseURL).compressed()
-        totalSize += Int64(documentEntity.database.count)
+        let documentBlob = PulseBlobEntity(context: document.context)
+        documentBlob.key = "database"
+        documentBlob.data = try Data(contentsOf: databaseURL).compressed()
+        totalSize += Int64(documentBlob.data.count)
 
         if Files.fileExists(atPath: blobsURL.path) {
             let blobURLs = try Files.contentsOfDirectory(at: blobsURL, includingPropertiesForKeys: nil)
@@ -728,7 +728,10 @@ extension LoggerStore {
         info.totalStoreSize = totalSize + 500 // info is roughly 500 bytes
         info.creationDate = configuration.makeCurrentDate()
         info.modifiedDate = info.creationDate
-        documentEntity.info = try JSONEncoder().encode(info)
+
+        let infoBlob = PulseBlobEntity(context: document.context)
+        infoBlob.key = "info"
+        infoBlob.data = try JSONEncoder().encode(info)
 
         try document.context.save()
         try? document.close()
