@@ -771,7 +771,7 @@ final class LoggerStoreTests: XCTestCase {
         }
 
         let copyURL = directory.url.appending(filename: "compressed.pulse")
-        try benchmark(title: "Archive") {
+        try benchmark(title: "archive") {
             try store.copy(to: copyURL)
         }
 

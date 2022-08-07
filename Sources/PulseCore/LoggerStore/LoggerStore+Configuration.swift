@@ -67,7 +67,7 @@ extension LoggerStore {
         /// value is `5 Mb`. The same limit applies to requests.
         public var responseBodySizeLimit: Int = 5 * 1048576
 
-        var inlineLimit = 32768 // 32 KB
+        var inlineLimit = 16384 // 16 KB
 
         /// By default, two weeks. The messages and requests that are older that
         /// two weeks will get automatically deleted.
