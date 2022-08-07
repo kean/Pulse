@@ -172,7 +172,7 @@ func benchmark<T>(title: String, operation: () throws -> T) rethrows -> T {
     let startTime = CFAbsoluteTimeGetCurrent()
     let value = try operation()
     let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
-    debugPrint("Time elapsed for \(title): \(timeElapsed * 1000.0) ms.")
+    print("Time elapsed for \(title): \(timeElapsed * 1000.0) ms.")
     return value
 }
 

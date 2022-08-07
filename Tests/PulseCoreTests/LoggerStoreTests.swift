@@ -755,12 +755,15 @@ final class LoggerStoreTests: XCTestCase {
         }
 
         let size = (try Files.attributesOfItem(atPath: copyURL.path)[.size] as? Int64) ?? 0
-        debugPrint("Package: \(try storeURL.directoryTotalSize()). Archive: \(size)")
+        print("Package: \(try storeURL.directoryTotalSize()). Archive: \(size)")
     }
 
     func _testMesasureExportSizeLarge() throws {
         // GIVEN
-        let store = makeStore()
+        let store = makeStore {
+            // Thumbnail generation significantly impacts the right speed
+            $0.isStoringOnlyImageThumbnails = false
+        }
         defer { try? store.destroy() }
 
         for _ in 0..<100 {
@@ -773,7 +776,8 @@ final class LoggerStoreTests: XCTestCase {
         }
 
         let size = (try Files.attributesOfItem(atPath: copyURL.path)[.size] as? Int64) ?? 0
-        debugPrint("Package: \(try store.storeURL.directoryTotalSize()). Archive: \(size)")
+        let compressed = try Data(contentsOf: copyURL).compressed()
+        print("Package: \(try store.storeURL.directoryTotalSize())\nArchive: \(size) (\(compressed) compressed)")
 
         let info = try benchmark(title: "Open") {
             try LoggerStore(storeURL: copyURL)
