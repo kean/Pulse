@@ -60,13 +60,16 @@ extension Data {
     /// print("http://test.com".data(using: .utf8)!.sha1)
     /// // prints "c6b6cafcb77f54d43cd1bd5361522a5e0c074b65"
     /// ```
-    var sha1: String {
-        let hash = withUnsafeBytes { (bytes: UnsafeRawBufferPointer) -> [UInt8] in
+    var sha1: Data {
+        Data(withUnsafeBytes { (bytes: UnsafeRawBufferPointer) -> [UInt8] in
             var hash = [UInt8](repeating: 0, count: Int(CC_SHA1_DIGEST_LENGTH))
             CC_SHA1(bytes.baseAddress, CC_LONG(count), &hash)
             return hash
-        }
-        return hash.map({ String(format: "%02x", $0) }).joined()
+        })
+    }
+
+    var string: String {
+        map { String(format: "%02x", $0) }.joined()
     }
 }
 

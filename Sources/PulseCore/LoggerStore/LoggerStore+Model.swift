@@ -68,7 +68,7 @@ extension LoggerStore {
         ]
 
         blob.properties = [
-            NSAttributeDescription(name: "key", type: .stringAttributeType),
+            NSAttributeDescription(name: "key", type: .binaryDataAttributeType),
             NSAttributeDescription(name: "size", type: .integer64AttributeType),
             NSAttributeDescription(name: "decompressedSize", type: .integer64AttributeType),
             NSAttributeDescription(name: "linkCount", type: .integer16AttributeType),

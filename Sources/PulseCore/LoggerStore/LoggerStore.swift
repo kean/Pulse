@@ -485,7 +485,7 @@ extension LoggerStore {
         }
         let key = data.sha1
         let existingEntity = try? backgroundContext.first(LoggerBlobHandleEntity.self) {
-            $0.predicate = NSPredicate(format: "key == %@", key)
+            $0.predicate = NSPredicate(format: "key == %@", key as NSData)
         }
         if let entity = existingEntity {
             entity.linkCount += 1
@@ -502,7 +502,7 @@ extension LoggerStore {
             inlineData.data = compressedData
             entity.inlineData = inlineData
         } else {
-            try? compressedData.write(to: makeBlobURL(for: key))
+            try? compressedData.write(to: makeBlobURL(for: key.string))
         }
         return entity
     }
@@ -511,7 +511,7 @@ extension LoggerStore {
         blob.linkCount -= 1
         if blob.linkCount == 0 {
             if blob.inlineData == nil {
-                try? Files.removeItem(at: makeBlobURL(for: blob.key))
+                try? Files.removeItem(at: makeBlobURL(for: blob.key.string))
             }
             backgroundContext.delete(blob)
         }
@@ -529,7 +529,7 @@ extension LoggerStore {
         if let inlineData = entity.inlineData {
             return inlineData.data
         }
-        return getRawData(forKey: entity.key)
+        return getRawData(forKey: entity.key.string)
     }
 
     /// Returns blob data for the given key.

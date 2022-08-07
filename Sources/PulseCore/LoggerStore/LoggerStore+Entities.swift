@@ -171,8 +171,8 @@ public final class LoggerNetworkRequestProgressEntity: NSManagedObject {
 
 /// Doesn't contain any data, just the key and some additional payload.
 public final class LoggerBlobHandleEntity: NSManagedObject {
-    /// A blob hash (sha1, 40 characters).
-    @NSManaged public var key: String
+    /// A blob hash (sha1, stored in a binary format).
+    @NSManaged public var key: Data
 
     /// A blob size.
     @NSManaged public var size: Int64
