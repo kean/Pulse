@@ -58,7 +58,6 @@ extension NetworkLogger {
             return copy
         }
 
-        // Poor-man protobuf. We are not incluiding 15K line package just to use it.
         enum CodingKeys: String, CodingKey {
             case url = "0", method = "1", headers = "2", timeout = "3", options = "4", policy = "5"
         }

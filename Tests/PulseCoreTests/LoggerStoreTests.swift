@@ -760,9 +760,7 @@ final class LoggerStoreTests: XCTestCase {
 
     func _testMesasureExportSizeLarge() throws {
         // GIVEN
-        let store = makeStore {
-            $0.inlineLimit = 0
-        }
+        let store = makeStore()
         defer { try? store.destroy() }
 
         for _ in 0..<100 {

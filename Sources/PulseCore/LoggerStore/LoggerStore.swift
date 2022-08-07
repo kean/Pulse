@@ -483,6 +483,10 @@ extension LoggerStore {
         guard !data.isEmpty else {
             return nil // Sanity check
         }
+        let sizeLimit = min(Int(Int32.max), configuration.responseBodySizeLimit)
+        guard data.count < sizeLimit else {
+            return nil
+        }
         let key = data.sha1
         let existingEntity = try? backgroundContext.first(LoggerBlobHandleEntity.self) {
             $0.predicate = NSPredicate(format: "key == %@", key as NSData)
@@ -495,8 +499,9 @@ extension LoggerStore {
         let entity = LoggerBlobHandleEntity(context: backgroundContext)
         entity.key = key
         entity.linkCount = 1
-        entity.size = Int64(compressedData.count)
-        entity.decompressedSize = Int64(data.count)
+        // It's safe to use Int32 because we prevent larger values from being stored
+        entity.size = Int32(compressedData.count)
+        entity.decompressedSize = Int32(data.count)
         if compressedData.count <= configuration.inlineLimit {
             let inlineData = LoggerInlineDataEntity(context: backgroundContext)
             inlineData.data = compressedData
@@ -826,7 +831,7 @@ extension LoggerStore {
         let targetSize = Int(Double(configuration.blobSizeLimit) * configuration.trimRatio)
         func _unlink(_ blob: LoggerBlobHandleEntity) {
             unlink(blob)
-            currentSize -= blob.size
+            currentSize -= Int64(blob.size)
         }
         for request in requests where currentSize > targetSize {
             if let requestBody = request.requestBody {
