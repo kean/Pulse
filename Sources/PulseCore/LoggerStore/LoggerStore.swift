@@ -306,7 +306,7 @@ extension LoggerStore {
         
         request.url = event.originalRequest.url?.absoluteString
         request.host = event.originalRequest.url?.host
-        request.httpMethod = event.originalRequest.method
+        request.httpMethod = event.originalRequest.httpMethod
         request.requestState = LoggerNetworkRequestEntity.State.pending.rawValue
 
         let details = LoggerNetworkRequestEntity.RequestDetails(originalRequest: event.originalRequest, currentRequest: event.currentRequest)
@@ -331,7 +331,7 @@ extension LoggerStore {
 
         request.url = event.originalRequest.url?.absoluteString
         request.host = event.originalRequest.url?.host
-        request.httpMethod = event.originalRequest.method
+        request.httpMethod = event.originalRequest.httpMethod
         request.errorDomain = event.error?.domain
         request.errorCode = Int32(event.error?.code ?? 0)
         let statusCode = Int32(event.response?.statusCode ?? 0)

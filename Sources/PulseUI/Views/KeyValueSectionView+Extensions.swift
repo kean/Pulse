@@ -11,7 +11,7 @@ extension KeyValueSectionViewModel {
         var items: [(String, String?)] = []
         items += [
             ("URL", request.url?.absoluteString),
-            ("Method", request.method)
+            ("Method", request.httpMethod)
         ]
         if let host = components?.host {
             items.append(("Host", host))

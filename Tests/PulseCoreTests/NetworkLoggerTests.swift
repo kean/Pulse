@@ -67,10 +67,10 @@ final class NetworkLoggerTests: XCTestCase {
         let metrics = try encoder.encode(task.metrics)
         let details = try encoder.encode(LoggerNetworkRequestEntity.RequestDetails(originalRequest: NetworkLogger.Request(task.request), currentRequest: NetworkLogger.Request(task.request), response: NetworkLogger.Response(task.response), error: .init(URLError(.badURL)), metrics: task.metrics, metadata: ["customKey":"customValue"]))
 
-        XCTAssertEqual(request.count, 277)
+        XCTAssertEqual(request.count, 267)
         XCTAssertEqual(response.count, 294)
         XCTAssertEqual(metrics.count, 843)
-        XCTAssertEqual(details.count, 1850)
+        XCTAssertEqual(details.count, 1830)
 
         // These values are slightly different across invocations
 //        XCTAssertEqual(try request.compressed().count, 251, accuracy: 10)

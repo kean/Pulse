@@ -10,13 +10,13 @@ import PulseCore
 extension LoggerNetworkRequestEntity {
     func cURLDescription() -> String {
         guard let request = details?.currentRequest ?? details?.originalRequest,
-              let url = request.url, let method = request.method else {
+              let url = request.url else {
             return "$ curl command generation failed"
         }
 
         var components = ["curl -v"]
 
-        components.append("-X \(method)")
+        components.append("-X \(request.httpMethod)")
 
         for header in request.headers ?? [:] {
             let escapedValue = header.value.replacingOccurrences(of: "\"", with: "\\\"")

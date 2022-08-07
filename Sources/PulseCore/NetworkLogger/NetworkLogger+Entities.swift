@@ -11,10 +11,13 @@ import Foundation
 extension NetworkLogger {
     public struct Request: Codable, Sendable {
         public var url: URL?
-        public var method: String?
+        public var httpMethod: String {
+            get { rawMethod ?? "GET" }
+            set { rawMethod = newValue }
+        }
         public var headers: [String: String]?
         public var cachePolicy: URLRequest.CachePolicy {
-            policy.flatMap(URLRequest.CachePolicy.init) ?? .useProtocolCachePolicy
+            rawCachePolicy.flatMap(URLRequest.CachePolicy.init) ?? .useProtocolCachePolicy
         }
         public var timeout: TimeInterval
         public var options: Options
@@ -24,7 +27,8 @@ extension NetworkLogger {
         }
 
         // Skip encoding when it is set to a default value which is very likely
-        private var policy: UInt?
+        private var rawCachePolicy: UInt?
+        private var rawMethod: String?
 
         public struct Options: OptionSet, Codable, Sendable {
             public let rawValue: Int8
@@ -39,9 +43,9 @@ extension NetworkLogger {
 
         public init(_ urlRequest: URLRequest) {
             self.url = urlRequest.url
-            self.method = urlRequest.httpMethod
             self.headers = urlRequest.allHTTPHeaderFields
-            self.policy = urlRequest.cachePolicy == .useProtocolCachePolicy ? nil : urlRequest.cachePolicy.rawValue
+            self.rawMethod = urlRequest.httpMethod == "GET" ? nil : urlRequest.httpMethod
+            self.rawCachePolicy = urlRequest.cachePolicy == .useProtocolCachePolicy ? nil : urlRequest.cachePolicy.rawValue
             self.timeout = urlRequest.timeoutInterval
             self.options = []
             if urlRequest.allowsCellularAccess { options.insert(.allowsCellularAccess) }
@@ -59,7 +63,7 @@ extension NetworkLogger {
         }
 
         enum CodingKeys: String, CodingKey {
-            case url = "0", method = "1", headers = "2", timeout = "3", options = "4", policy = "5"
+            case url = "0", rawMethod = "1", headers = "2", timeout = "3", options = "4", rawCachePolicy = "5"
         }
     }
 
