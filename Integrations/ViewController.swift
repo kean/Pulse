@@ -45,6 +45,13 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
                     let vc = UIHostingController(rootView: PinsView(store: .mock))
                     self.navigationController?.pushViewController(vc, animated: true)
                 })
+            ]),
+            MenuSection(title: "Modal", footer: "The same screens, but as a modal view controller", items: [
+                MenuItem(title: "Show Modally", action: { [unowned self] in
+                    let vc = ViewController()
+                    let navigation = UINavigationController(rootViewController: vc)
+                    self.present(navigation, animated: true)
+                })
             ])
         ]
 

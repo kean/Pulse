@@ -11,9 +11,12 @@ struct InfoRow: View {
     var body: some View {
         HStack {
             Text(title)
+                .lineLimit(1)
             Spacer()
             if let details = details {
-                Text(details).foregroundColor(.secondary)
+                Text(details)
+                    .lineLimit(1)
+                    .foregroundColor(.secondary)
             }
         }
     }
