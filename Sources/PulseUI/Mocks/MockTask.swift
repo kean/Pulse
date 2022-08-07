@@ -147,7 +147,7 @@ extension MockTask {
 // MARK: - Login (POST)
 
 private let mockLoginOriginalRequest = URLRequest(
-    url: "https://github.com/login?username=kean&password=nope",
+    url: "https://github.com/login?username=kean&password=sensitive",
     method: "POST",
     headers: ["Cache-Control": "no-cache"]
 )

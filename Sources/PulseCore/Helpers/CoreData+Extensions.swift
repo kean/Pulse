@@ -87,8 +87,8 @@ extension NSPersistentStoreCoordinator {
             // Disable write-ahead logging. Benefit: the entire store will be
             // contained in a single file. No need to handle -wal/-shm files.
             // https://developer.apple.com/library/content/qa/qa1809/_index.html
-            NSSQLitePragmasOption: ["journal_mode": "OFF"],
-            // Minimize file size
+             NSSQLitePragmasOption: ["journal_mode": "OFF"],
+            // Minimize file size (not sure it does anything snice the store empty this point)
             NSSQLiteManualVacuumOption: true,
         ]
 

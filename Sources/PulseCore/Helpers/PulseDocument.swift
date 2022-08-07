@@ -23,8 +23,7 @@ final class PulseDocument {
         }
         self.container = NSPersistentContainer(name: documentURL.lastPathComponent, managedObjectModel: PulseDocument.model)
         let store = NSPersistentStoreDescription(url: documentURL)
-        store.setValue("NONE" as NSString, forPragmaNamed: "journal_mode")
-        store.setOption(true as NSNumber, forKey: NSSQLiteManualVacuumOption)
+        store.setValue("OFF" as NSString, forPragmaNamed: "journal_mode")
         container.persistentStoreDescriptions = [store]
 
         try container.loadStore()

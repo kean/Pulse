@@ -51,7 +51,7 @@ private let mockMetrics = try! JSONDecoder().decode(NetworkLogger.Metrics.self, 
       "3": "http/2.0",
       "5": 0,
       "0": {
-        "0": "https://github.com/login?username=kean&password=nope",
+        "0": "https://github.com/login?username=kean&password=sensitive",
         "1": "POST",
         "2": {
           "User-Agent": "Pulse Demo/2.0",
