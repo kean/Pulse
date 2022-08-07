@@ -39,7 +39,7 @@ extension LoggerStore {
 
     /// The store configuration.
     public struct Configuration: @unchecked Sendable {
-        /// Size limit in bytes. `256 MB` by default.
+        /// Size limit in bytes. `128 MB` by default.
         public var sizeLimit: Int64
 
         var blobSizeLimit: Int64 {
@@ -58,14 +58,14 @@ extension LoggerStore {
 
         /// Determines how often the messages are saved to the database. By default,
         /// 100 milliseconds - quickly enough, but avoiding too many individual writes.
-        public var saveInterval: DispatchTimeInterval = .milliseconds(100)
+        public var saveInterval: DispatchTimeInterval = .milliseconds(125)
 
         /// If `true`, the images added to the store as saved as small thumbnails.
         public var isStoringOnlyImageThumbnails = true
 
         /// Limit the maximum response size stored by the logger. The default
-        /// value is `10 Mb`. The same limit applies to requests.
-        public var responseBodySizeLimit: Int = 10 * 1048576
+        /// value is `5 Mb`. The same limit applies to requests.
+        public var responseBodySizeLimit: Int = 5 * 1048576
 
         var inlineLimit = 32768 // 32 KB
 
@@ -89,8 +89,8 @@ extension LoggerStore {
         ///
         /// - parameters:
         ///   - sizeLimit: The approximate limit of the logger store, including
-        ///   both the database and the blobs. `256 Mb` by default.
-        public init(sizeLimit: Int64 = 256 * 1_000_000) {
+        ///   both the database and the blobs. `128 Mb` by default.
+        public init(sizeLimit: Int64 = 128 * 1_000_000) {
             self.sizeLimit = sizeLimit
         }
     }
