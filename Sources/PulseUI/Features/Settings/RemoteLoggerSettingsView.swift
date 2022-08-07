@@ -41,8 +41,10 @@ struct RemoteLoggerSettingsView: View {
             .frame(idealWidth: .infinity, alignment: .center)
 #else
         HStack(spacing: 8) {
+#if !os(macOS)
             ProgressView()
                 .progressViewStyle(.circular)
+#endif
             Text("Searching...")
                 .foregroundColor(.secondary)
         }
