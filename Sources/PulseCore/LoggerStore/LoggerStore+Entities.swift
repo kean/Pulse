@@ -154,6 +154,10 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
             self.metrics = metrics
             self.metadata = metadata
         }
+
+        enum CodingKeys: String, CodingKey {
+            case originalRequest = "0", currentRequest = "1", response = "2", error = "3", metrics = "4", metadata = "5"
+        }
     }
 }
 

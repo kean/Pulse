@@ -57,6 +57,11 @@ extension NetworkLogger {
             copy.headers = _redactingSensitiveHeaders(redactedHeaders, from: headers)
             return copy
         }
+
+        // Poor-man protobuf. We are not incluiding 15K line package just to use it.
+        enum CodingKeys: String, CodingKey {
+            case url = "0", method = "1", headers = "2", timeout = "3", options = "4", policy = "5"
+        }
     }
 
     public struct Response: Codable, Sendable {
@@ -83,6 +88,10 @@ extension NetworkLogger {
             var copy = self
             copy.headers = _redactingSensitiveHeaders(redactedHeaders, from: headers)
             return copy
+        }
+
+        enum CodingKeys: String, CodingKey {
+            case url = "0", statusCode = "1", headers = "2"
         }
     }
 
@@ -115,8 +124,8 @@ extension NetworkLogger {
             self.error = (try? container.decode(UnderlyingError.self, forKey: .error))?.error
         }
 
-        public enum CodingKeys: CodingKey {
-            case code, domain, debugDescription, error
+        public enum CodingKeys: String, CodingKey {
+            case code = "0", domain = "1", debugDescription = "2", error = "3"
         }
 
         public func encode(to encoder: Encoder) throws {
@@ -149,21 +158,37 @@ extension NetworkLogger {
     }
 
     public struct Metrics: Codable, Sendable {
-        public var taskInterval: DateInterval
+        public var taskInterval: DateInterval {
+            get { Metrics.dateInterval(from: rawTaskInterval) }
+            set { rawTaskInterval = Metrics.values(for: newValue) }
+        }
+        private var rawTaskInterval: [TimeInterval]
         public var redirectCount: Int
         public var transactions: [TransactionMetrics]
         public var totalTransferSize: TransferSizeInfo { TransferSizeInfo(metrics: self) }
 
         public init(metrics: URLSessionTaskMetrics) {
-            self.taskInterval = metrics.taskInterval
+            self.rawTaskInterval = Metrics.values(for: metrics.taskInterval)
             self.redirectCount = metrics.redirectCount
             self.transactions = metrics.transactionMetrics.map(TransactionMetrics.init)
         }
 
         public init(taskInterval: DateInterval, redirectCount: Int, transactions: [TransactionMetrics]) {
-            self.taskInterval = taskInterval
+            self.rawTaskInterval = Metrics.values(for: taskInterval)
             self.redirectCount = redirectCount
             self.transactions = transactions
+        }
+
+        enum CodingKeys: String, CodingKey {
+            case rawTaskInterval = "0", redirectCount = "1", transactions = "2"
+        }
+
+        static func values(for dateInterval: DateInterval) -> [TimeInterval] {
+            [dateInterval.start.timeIntervalSince1970, dateInterval.duration]
+        }
+
+        static func dateInterval(from values: [TimeInterval]) -> DateInterval {
+            DateInterval(start: Date(timeIntervalSince1970: values[0]), duration: values[1])
         }
     }
 
@@ -295,6 +320,10 @@ extension NetworkLogger {
             public static let isExpensive = Conditions(rawValue: 1 << 3)
             public static let isConstrained = Conditions(rawValue: 1 << 4)
             public static let isMultipath = Conditions(rawValue: 1 << 5)
+        }
+
+        enum CodingKeys: String, CodingKey {
+            case request = "0", response = "1", timing = "2", networkProtocol = "3", transferSize = "4", conditions = "5", localAddress = "6", remoteAddress = "7", localPort = "8", remotePort = "9", tlsVersion = "10", tlsSuite = "11", type = "12"
         }
     }
 
