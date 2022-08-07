@@ -35,7 +35,7 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
     public var taskType: NetworkLogger.TaskType? {
         NetworkLogger.TaskType(rawValue: rawTaskType)
     }
-    @NSManaged var rawTaskType: Int16
+    @NSManaged public var rawTaskType: Int16
 
     // MARK: Request
 
@@ -61,7 +61,7 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
     }
 
     /// Contains ``State-swift.enum`` raw value.
-    @NSManaged var requestState: Int16
+    @NSManaged public var requestState: Int16
     /// Request progress.
     ///
     /// - note: The entity is created lazily when the first progress report
