@@ -69,8 +69,8 @@ final class NetworkLoggerTests: XCTestCase {
 
         XCTAssertEqual(request.count, 277)
         XCTAssertEqual(response.count, 294)
-        XCTAssertEqual(metrics.count, 838)
-        XCTAssertEqual(details.count, 1845)
+        XCTAssertEqual(metrics.count, 843)
+        XCTAssertEqual(details.count, 1850)
 
         // These values are slightly different across invocations
 //        XCTAssertEqual(try request.compressed().count, 251, accuracy: 10)
@@ -84,6 +84,6 @@ final class NetworkLoggerTests: XCTestCase {
             debugPrint(NSString(string: String(data: data, encoding: .utf8) ?? "–"))
         }
 
-//        try printJSON(details)
+        try printJSON(details)
     }
 }
