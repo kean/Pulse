@@ -31,6 +31,7 @@ public struct NetworkView: View {
             viewModel: viewModel.table,
             detailsViewModel: viewModel.details
         )
+        .edgesIgnoringSafeArea(.bottom)
         .onAppear(perform: viewModel.onAppear)
         .onDisappear(perform: viewModel.onDisappear)
         .overlay(tableOverlay)

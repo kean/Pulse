@@ -23,6 +23,7 @@ public struct PinsView: View {
 
     public var body: some View {
         contents
+            .edgesIgnoringSafeArea(.bottom)
             .navigationBarTitle(Text("Pins"))
             .navigationBarItems(leading: navigationBarLeadingItems, trailing: navigationBarTralingItems)
             .onAppear { viewModel.onAppear() }

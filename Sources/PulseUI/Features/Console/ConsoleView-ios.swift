@@ -23,6 +23,7 @@ public struct ConsoleView: View {
 
     public var body: some View {
         contentView
+            .edgesIgnoringSafeArea(.bottom)
             .navigationBarTitle(Text("Console"))
             .navigationBarItems(
                 leading: viewModel.onDismiss.map {
