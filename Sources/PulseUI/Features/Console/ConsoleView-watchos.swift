@@ -43,7 +43,7 @@ struct ConsoleView: View {
 struct ConsoleView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
-            ConsoleView(viewModel: .init(store: .mock))
+            ConsoleView(viewModel: .init(store: .mock, onDismiss: nil))
         }
     }
 }

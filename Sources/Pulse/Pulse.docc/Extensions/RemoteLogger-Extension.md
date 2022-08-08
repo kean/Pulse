@@ -1,4 +1,4 @@
-# ``PulseCore/RemoteLogger``
+# ``Pulse/RemoteLogger``
 
 
 ## Topics

@@ -1,4 +1,4 @@
-# ``PulseCore/LoggerStore``
+# ``Pulse/LoggerStore``
 
 ## Topics
 

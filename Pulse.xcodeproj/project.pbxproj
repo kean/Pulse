@@ -22,22 +22,12 @@
 		0C24CC7A2894C134008DD332 /* MockStoreConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C24CC792894C134008DD332 /* MockStoreConfiguration.swift */; };
 		0C24CC7B2894C134008DD332 /* MockStoreConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C24CC792894C134008DD332 /* MockStoreConfiguration.swift */; };
 		0C24CC7C2894C134008DD332 /* MockStoreConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C24CC792894C134008DD332 /* MockStoreConfiguration.swift */; };
-		0C43FFF4280B492500DD4458 /* PulseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 0C43FFF3280B492500DD4458 /* PulseCore */; };
-		0C43FFF6280B492500DD4458 /* PulseUI in Frameworks */ = {isa = PBXBuildFile; productRef = 0C43FFF5280B492500DD4458 /* PulseUI */; };
 		0C516FE726015ED3004813B4 /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CFF9BD825D6199A0069DB6A /* repos.json */; };
 		0C516FF026016392004813B4 /* DocumentBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C516FEF26016392004813B4 /* DocumentBrowser.swift */; };
 		0C57AD83245F0F38005B3400 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C57AD74245F0F38005B3400 /* Assets.xcassets */; };
 		0C57AD84245F0F38005B3400 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0C57AD75245F0F38005B3400 /* LaunchScreen.storyboard */; };
 		0C57AD85245F0F38005B3400 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C57AD77245F0F38005B3400 /* AppDelegate.swift */; };
 		0C57AD87245F0F38005B3400 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C57AD79245F0F38005B3400 /* SceneDelegate.swift */; };
-		0C602289280C784A003B1E83 /* PulseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 0C602288280C784A003B1E83 /* PulseCore */; };
-		0C60228B280C784A003B1E83 /* PulseUI in Frameworks */ = {isa = PBXBuildFile; productRef = 0C60228A280C784A003B1E83 /* PulseUI */; };
-		0C60228D280C78B4003B1E83 /* PulseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 0C60228C280C78B4003B1E83 /* PulseCore */; };
-		0C60228F280C78B4003B1E83 /* PulseUI in Frameworks */ = {isa = PBXBuildFile; productRef = 0C60228E280C78B4003B1E83 /* PulseUI */; };
-		0C602291280C78F5003B1E83 /* PulseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 0C602290280C78F5003B1E83 /* PulseCore */; };
-		0C602293280C78F5003B1E83 /* PulseUI in Frameworks */ = {isa = PBXBuildFile; productRef = 0C602292280C78F5003B1E83 /* PulseUI */; };
-		0C602299280C79E7003B1E83 /* PulseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 0C602298280C79E7003B1E83 /* PulseCore */; };
-		0C60229B280C79E7003B1E83 /* PulseUI in Frameworks */ = {isa = PBXBuildFile; productRef = 0C60229A280C79E7003B1E83 /* PulseUI */; };
 		0C6460DC25F579B8002C55B1 /* Pulse_tvOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C6460D625F579B8002C55B1 /* Pulse_tvOSApp.swift */; };
 		0C6460DD25F579B8002C55B1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C6460D725F579B8002C55B1 /* Assets.xcassets */; };
 		0C6460DE25F579B8002C55B1 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C6460D925F579B8002C55B1 /* Preview Assets.xcassets */; };
@@ -46,12 +36,22 @@
 		0C767818268F88BB0058F69B /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C767814268F88BB0058F69B /* Preview Assets.xcassets */; };
 		0C76781A268F88BB0058F69B /* Pulse_Demo_iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C767816268F88BB0058F69B /* Pulse_Demo_iOSApp.swift */; };
 		0C7A834026D1CA290082634F /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CFF9BD825D6199A0069DB6A /* repos.json */; };
+		0C855DCE28A096300007D325 /* Pulse in Frameworks */ = {isa = PBXBuildFile; productRef = 0C855DCD28A096300007D325 /* Pulse */; };
+		0C855DD028A096300007D325 /* PulseUI in Frameworks */ = {isa = PBXBuildFile; productRef = 0C855DCF28A096300007D325 /* PulseUI */; };
+		0C855DD228A0963A0007D325 /* Pulse in Frameworks */ = {isa = PBXBuildFile; productRef = 0C855DD128A0963A0007D325 /* Pulse */; };
+		0C855DD428A0963A0007D325 /* PulseUI in Frameworks */ = {isa = PBXBuildFile; productRef = 0C855DD328A0963A0007D325 /* PulseUI */; };
+		0C855DD628A096420007D325 /* Pulse in Frameworks */ = {isa = PBXBuildFile; productRef = 0C855DD528A096420007D325 /* Pulse */; };
+		0C855DD828A096420007D325 /* PulseUI in Frameworks */ = {isa = PBXBuildFile; productRef = 0C855DD728A096420007D325 /* PulseUI */; };
+		0C855DDA28A096480007D325 /* Pulse in Frameworks */ = {isa = PBXBuildFile; productRef = 0C855DD928A096480007D325 /* Pulse */; };
+		0C855DDC28A096480007D325 /* PulseUI in Frameworks */ = {isa = PBXBuildFile; productRef = 0C855DDB28A096480007D325 /* PulseUI */; };
+		0C855DDE28A0964F0007D325 /* Pulse in Frameworks */ = {isa = PBXBuildFile; productRef = 0C855DDD28A0964F0007D325 /* Pulse */; };
+		0C855DE028A0964F0007D325 /* PulseUI in Frameworks */ = {isa = PBXBuildFile; productRef = 0C855DDF28A0964F0007D325 /* PulseUI */; };
+		0C855DE228A096550007D325 /* Pulse in Frameworks */ = {isa = PBXBuildFile; productRef = 0C855DE128A096550007D325 /* Pulse */; };
+		0C855DE428A096550007D325 /* PulseUI in Frameworks */ = {isa = PBXBuildFile; productRef = 0C855DE328A096550007D325 /* PulseUI */; };
 		0C9F04F92884F34A0035239F /* Pulse_Demo_macOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9F04F82884F34A0035239F /* Pulse_Demo_macOSApp.swift */; };
 		0C9F04FB2884F34A0035239F /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9F04FA2884F34A0035239F /* ContentView.swift */; };
 		0C9F04FD2884F34A0035239F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C9F04FC2884F34A0035239F /* Assets.xcassets */; };
 		0C9F05002884F34A0035239F /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C9F04FF2884F34A0035239F /* Preview Assets.xcassets */; };
-		0C9F05072884F4180035239F /* PulseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 0C9F05062884F4180035239F /* PulseCore */; };
-		0C9F05092884F4180035239F /* PulseUI in Frameworks */ = {isa = PBXBuildFile; productRef = 0C9F05082884F4180035239F /* PulseUI */; };
 		0C9F050C2884FA7D0035239F /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CFF9BD825D6199A0069DB6A /* repos.json */; };
 		0CCBDDC02610BDBC00DCB60C /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CFF9BD825D6199A0069DB6A /* repos.json */; };
 		0CEAB3E425FE862E00F09B0F /* Pulse Demo watchOS Extension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 0CEAB3E325FE862E00F09B0F /* Pulse Demo watchOS Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -168,8 +168,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0C43FFF6280B492500DD4458 /* PulseUI in Frameworks */,
-				0C43FFF4280B492500DD4458 /* PulseCore in Frameworks */,
+				0C855DE428A096550007D325 /* PulseUI in Frameworks */,
+				0C855DE228A096550007D325 /* Pulse in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -177,8 +177,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0C60229B280C79E7003B1E83 /* PulseUI in Frameworks */,
-				0C602299280C79E7003B1E83 /* PulseCore in Frameworks */,
+				0C855DD028A096300007D325 /* PulseUI in Frameworks */,
+				0C855DCE28A096300007D325 /* Pulse in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -186,8 +186,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0C60228F280C78B4003B1E83 /* PulseUI in Frameworks */,
-				0C60228D280C78B4003B1E83 /* PulseCore in Frameworks */,
+				0C855DD428A0963A0007D325 /* PulseUI in Frameworks */,
+				0C855DD228A0963A0007D325 /* Pulse in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -195,8 +195,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0C602293280C78F5003B1E83 /* PulseUI in Frameworks */,
-				0C602291280C78F5003B1E83 /* PulseCore in Frameworks */,
+				0C855DE028A0964F0007D325 /* PulseUI in Frameworks */,
+				0C855DDE28A0964F0007D325 /* Pulse in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -204,8 +204,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0C9F05092884F4180035239F /* PulseUI in Frameworks */,
-				0C9F05072884F4180035239F /* PulseCore in Frameworks */,
+				0C855DDC28A096480007D325 /* PulseUI in Frameworks */,
+				0C855DDA28A096480007D325 /* Pulse in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -213,8 +213,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0C60228B280C784A003B1E83 /* PulseUI in Frameworks */,
-				0C602289280C784A003B1E83 /* PulseCore in Frameworks */,
+				0C855DD828A096420007D325 /* PulseUI in Frameworks */,
+				0C855DD628A096420007D325 /* Pulse in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -458,8 +458,8 @@
 			);
 			name = "Pulse Integration Examples iOS";
 			packageProductDependencies = (
-				0C43FFF3280B492500DD4458 /* PulseCore */,
-				0C43FFF5280B492500DD4458 /* PulseUI */,
+				0C855DE128A096550007D325 /* Pulse */,
+				0C855DE328A096550007D325 /* PulseUI */,
 			);
 			productName = "Pulse Integration Examples iOS";
 			productReference = 0C0B31EA26D179A20045C9E1 /* Pulse Integration Examples iOS.app */;
@@ -479,8 +479,8 @@
 			);
 			name = "Pulse Demo iOS";
 			packageProductDependencies = (
-				0C602298280C79E7003B1E83 /* PulseCore */,
-				0C60229A280C79E7003B1E83 /* PulseUI */,
+				0C855DCD28A096300007D325 /* Pulse */,
+				0C855DCF28A096300007D325 /* PulseUI */,
 			);
 			productName = "Pulse Demo iOS";
 			productReference = 0C516FBA26015DD2004813B4 /* Pulse Demo iOS.app */;
@@ -501,8 +501,8 @@
 			);
 			name = "Pulse App iOS";
 			packageProductDependencies = (
-				0C60228C280C78B4003B1E83 /* PulseCore */,
-				0C60228E280C78B4003B1E83 /* PulseUI */,
+				0C855DD128A0963A0007D325 /* Pulse */,
+				0C855DD328A0963A0007D325 /* PulseUI */,
 			);
 			productName = Pulse;
 			productReference = 0C57AD4D245F0EFB005B3400 /* Pulse iOS.app */;
@@ -522,8 +522,8 @@
 			);
 			name = "Pulse Demo tvOS";
 			packageProductDependencies = (
-				0C602290280C78F5003B1E83 /* PulseCore */,
-				0C602292280C78F5003B1E83 /* PulseUI */,
+				0C855DDD28A0964F0007D325 /* Pulse */,
+				0C855DDF28A0964F0007D325 /* PulseUI */,
 			);
 			productName = "Pulse tvOS";
 			productReference = 0C6460C425F5797B002C55B1 /* Pulse Demo tvOS.app */;
@@ -543,8 +543,8 @@
 			);
 			name = "Pulse Demo macOS";
 			packageProductDependencies = (
-				0C9F05062884F4180035239F /* PulseCore */,
-				0C9F05082884F4180035239F /* PulseUI */,
+				0C855DD928A096480007D325 /* Pulse */,
+				0C855DDB28A096480007D325 /* PulseUI */,
 			);
 			productName = "Pulse Demo macOS";
 			productReference = 0C9F04F62884F34A0035239F /* Pulse Demo macOS.app */;
@@ -581,8 +581,8 @@
 			);
 			name = "Pulse Demo watchOS Extension";
 			packageProductDependencies = (
-				0C602288280C784A003B1E83 /* PulseCore */,
-				0C60228A280C784A003B1E83 /* PulseUI */,
+				0C855DD528A096420007D325 /* Pulse */,
+				0C855DD728A096420007D325 /* PulseUI */,
 			);
 			productName = "Pulse watchOS Extension";
 			productReference = 0CEAB3E325FE862E00F09B0F /* Pulse Demo watchOS Extension.appex */;
@@ -1352,51 +1352,51 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		0C43FFF3280B492500DD4458 /* PulseCore */ = {
+		0C855DCD28A096300007D325 /* Pulse */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = PulseCore;
+			productName = Pulse;
 		};
-		0C43FFF5280B492500DD4458 /* PulseUI */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = PulseUI;
-		};
-		0C602288280C784A003B1E83 /* PulseCore */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = PulseCore;
-		};
-		0C60228A280C784A003B1E83 /* PulseUI */ = {
+		0C855DCF28A096300007D325 /* PulseUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = PulseUI;
 		};
-		0C60228C280C78B4003B1E83 /* PulseCore */ = {
+		0C855DD128A0963A0007D325 /* Pulse */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = PulseCore;
+			productName = Pulse;
 		};
-		0C60228E280C78B4003B1E83 /* PulseUI */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = PulseUI;
-		};
-		0C602290280C78F5003B1E83 /* PulseCore */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = PulseCore;
-		};
-		0C602292280C78F5003B1E83 /* PulseUI */ = {
+		0C855DD328A0963A0007D325 /* PulseUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = PulseUI;
 		};
-		0C602298280C79E7003B1E83 /* PulseCore */ = {
+		0C855DD528A096420007D325 /* Pulse */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = PulseCore;
+			productName = Pulse;
 		};
-		0C60229A280C79E7003B1E83 /* PulseUI */ = {
+		0C855DD728A096420007D325 /* PulseUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = PulseUI;
 		};
-		0C9F05062884F4180035239F /* PulseCore */ = {
+		0C855DD928A096480007D325 /* Pulse */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = PulseCore;
+			productName = Pulse;
 		};
-		0C9F05082884F4180035239F /* PulseUI */ = {
+		0C855DDB28A096480007D325 /* PulseUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PulseUI;
+		};
+		0C855DDD28A0964F0007D325 /* Pulse */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Pulse;
+		};
+		0C855DDF28A0964F0007D325 /* PulseUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PulseUI;
+		};
+		0C855DE128A096550007D325 /* Pulse */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Pulse;
+		};
+		0C855DE328A096550007D325 /* PulseUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = PulseUI;
 		};

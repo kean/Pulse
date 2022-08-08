@@ -1,4 +1,4 @@
-# ``PulseCore/LoggerStore/Info-swift.struct``
+# ``Pulse/LoggerStore/Info-swift.struct``
 
 ## Topics
 

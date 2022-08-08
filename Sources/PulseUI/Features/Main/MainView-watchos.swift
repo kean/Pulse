@@ -13,7 +13,7 @@ public struct MainView: View {
     @StateObject private var viewModel: MainViewModel
 
     public init(store: LoggerStore = .shared) {
-        self._viewModel = StateObject(wrappedValue: .init(store: store))
+        self._viewModel = StateObject(wrappedValue: .init(store: store, onDismiss: nil))
     }
 
     public var body: some View {

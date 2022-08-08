@@ -13,16 +13,17 @@ final class MainViewModel: ObservableObject {
     let items: [MainViewModelItem]
 
     let console: ConsoleViewModel
+
+#if !os(watchOS)
     let network: NetworkViewModel
+#endif
 
 #if os(iOS)
     let pins: PinsViewModel
     let insights: NetworkInsightsViewModel
 #endif
 
-#if os(iOS) || os(tvOS)
     let settings: SettingsViewModel
-#endif
 
     let store: LoggerStore
     let configuration: ConsoleConfiguration
@@ -34,8 +35,10 @@ final class MainViewModel: ObservableObject {
         self.console = ConsoleViewModel(store: store, configuration: configuration)
         self.console.onDismiss = onDismiss
 
+#if !os(watchOS)
         self.network = NetworkViewModel(store: store)
         self.network.onDismiss = onDismiss
+#endif
 
 #if os(iOS)
         self.pins = PinsViewModel(store: store)
@@ -44,10 +47,8 @@ final class MainViewModel: ObservableObject {
         self.insights = NetworkInsightsViewModel(store: store)
 #endif
 
-#if os(iOS) || os(tvOS)
         self.settings = SettingsViewModel(store: store)
         self.settings.onDismiss = onDismiss
-#endif
 
 #if os(iOS)
         self.items = [.console, .network, .pins, !store.isArchive ? .insights : nil, .settings]
@@ -100,26 +101,32 @@ extension MainViewModel {
     func makeView(for item: MainViewModelItem) -> some View {
         switch item {
         case .console:
+#if os(watchOS)
+            ConsoleView(viewModel: self)
+#else
             ConsoleView(viewModel: console)
+#endif
+#if !os(watchOS)
         case .network:
             NetworkView(viewModel: network)
 #if !os(tvOS)
         case .pins:
             PinsView(viewModel: pins)
 #endif
+#endif
 #if os(iOS)
         case .insights:
             NetworkInsightsView(viewModel: insights)
 #endif
-#if os(iOS) || os(tvOS)
         case .settings:
             SettingsView(viewModel: settings)
-#endif
         default: fatalError()
         }
     }
 }
 
+#if os(iOS) || os(tvOS)
 private let isPad = UIDevice.current.userInterfaceIdiom == .pad
+#endif
 
 #endif

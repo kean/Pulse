@@ -1,4 +1,4 @@
-# ``PulseCore``
+# ``Pulse``
 
 Logger and network inspector for Apple platforms.
 

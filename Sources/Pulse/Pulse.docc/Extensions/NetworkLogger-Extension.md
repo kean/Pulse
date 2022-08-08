@@ -1,4 +1,4 @@
-# ``PulseCore/NetworkLogger``
+# ``Pulse/NetworkLogger``
 
 ## Topics
 

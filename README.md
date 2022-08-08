@@ -51,8 +51,6 @@ Pulse is easy to learn and use thanks to [**Pulse Docs**](https://kean.blog/puls
 
 ## Minimum Requirements
 
-**PulseUI** views are available only on indicated platforms, but the framework can be installed in the app targeting the **PulseCore** platforms – you just won't be able to use the views.
-
 | Pulse      | Swift     | Xcode       | Platforms                                     |
 |------------|-----------|-------------|-----------------------------------------------|
 | Pulse 2.0  | Swift 5.6 | Xcode 13.3  | iOS 13.0, watchOS 7.0, tvOS 13.0, macOS 11.0  |
