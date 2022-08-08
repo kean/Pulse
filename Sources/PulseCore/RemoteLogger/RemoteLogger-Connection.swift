@@ -136,7 +136,7 @@ extension RemoteLogger {
 // MARK: Helpers
 
 @available(iOS 14.0, tvOS 14.0, *)
-private extension RemoteLogger {
+extension RemoteLogger {
     static func encode(code: UInt8, body: Data) throws -> Data {
         guard body.count < UInt32.max else {
             throw PacketParsingError.unsupportedContentSize

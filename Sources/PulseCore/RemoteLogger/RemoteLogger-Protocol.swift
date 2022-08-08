@@ -7,7 +7,7 @@ import Network
 
 @available(iOS 14.0, tvOS 14.0, *)
 extension RemoteLogger {
-    enum PacketCode: UInt8 {
+    enum PacketCode: UInt8, Equatable {
         // Handshake
         case clientHello = 0 // PacketClientHello
         case serverHello = 1
@@ -69,11 +69,9 @@ extension RemoteLogger {
 
             let messageData = try JSONEncoder().encode(slimEvent)
             contents.append(messageData)
-
             if let requestBody = event.requestBody, requestBody.count < Int32.max {
                 contents.append(requestBody)
             }
-
             if let responseBody = event.responseBody, responseBody.count < Int32.max {
                 contents.append(responseBody)
             }
