@@ -60,7 +60,7 @@ struct ImagePreviewViewModel {
             ("Displayed", isShowingOriginal ? "original image" : "preview (original not saved)")
         ]
         if !isShowingOriginal {
-            info.append(("Preview Size", ByteCountFormatter.string(fromByteCount: Int64(data.count))))
+            info.append(("Preview Size (Decompressed)", ByteCountFormatter.string(fromByteCount: Int64(data.count))))
         }
 
         self.image = image

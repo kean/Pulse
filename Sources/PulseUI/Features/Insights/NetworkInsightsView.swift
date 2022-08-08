@@ -48,18 +48,8 @@ public struct NetworkInsightsView: View {
 
     private var durationSection: some View {
         Section(header: Text("Duration")) {
-            HStack {
-                Image(systemName: "clock")
-                Text("Median Duration")
-                Spacer()
-                Text(viewModel.medianDuration)
-            }
-            HStack {
-                Image(systemName: "chart.bar").frame(width: 19)
-                Text("Duration Range")
-                Spacer()
-                Text(viewModel.durationRange)
-            }
+            InfoRow(title: "Median Duration", details: viewModel.medianDuration)
+            InfoRow(title: "Duration Range", details: viewModel.durationRange)
             durationChart
             NavigationLink(destination: TopSlowestRequestsViw(viewModel: viewModel)) {
                 Text("Show Slowest Requests")
@@ -118,18 +108,8 @@ public struct NetworkInsightsView: View {
                 .foregroundColor(.orange)
             Text("Redirects")
         }) {
-            HStack {
-                Image(systemName: "arrowshape.zigzag.right")
-                Text("Redirect Count")
-                Spacer()
-                Text("\(insights.redirects.count)")
-            }
-            HStack {
-                Image(systemName: "clock")
-                Text("Total Time Lost")
-                Spacer()
-                Text(DurationFormatter.string(from: insights.redirects.timeLost, isPrecise: false))
-            }
+            InfoRow(title: "Redirect Count", details: "\(insights.redirects.count)")
+            InfoRow(title: "Total Time Lost", details: DurationFormatter.string(from: insights.redirects.timeLost, isPrecise: false))
             NavigationLink(destination: RequestsWithRedirectsView(viewModel: viewModel)) {
                 Text("Show Requests with Redirects")
             }.disabled(insights.duration.topSlowestRequests.isEmpty)
