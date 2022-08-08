@@ -13,8 +13,8 @@ struct ImageViewer: View {
             Image(uxImage: viewModel.image)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
-                .border(Color.separator, width: 1)
                 .frame(maxWidth: viewModel.image.size.width, maxHeight: viewModel.image.size.height)
+                .border(Color.separator, width: 1)
 
             KeyValueSectionView(viewModel: viewModel.info)
                 .hiddenTitle()
