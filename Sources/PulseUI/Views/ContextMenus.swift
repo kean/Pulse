@@ -130,15 +130,41 @@ struct StringSearchOptionsMenu: View {
     @Binding private(set) var options: StringSearchOptions
     var isKindNeeded = true
 
+    #if os(macOS)
     var body: some View {
+        Menu(content: {
+            pickerCase
+            pickerKind
+            pickerOptions
+        }, label: {
+            Image(systemName: "ellipsis.circle")
+        })
+        .menuStyle(BorderlessButtonMenuStyle(showsMenuIndicator: false))
+    }
+    #else
+    var body: some View {
+        pickerCase
+        pickerKind
+        pickerOptions
+    }
+    #endif
+
+    var pickerCase: some View {
         Picker(options.isCaseSensitive ? "Case Sensitive" :  "Case Insensitive", selection: $options.isCaseSensitive) {
             Text("Case Sensitive").tag(true)
             Text("Case Insensitive").tag(false)
         }.pickerStyle(.inline)
+    }
+
+    var pickerKind: some View {
         Picker(options.isRegex ? "Regular Expression" : "Text", selection: $options.isRegex) {
             Text("Text").tag(false)
             Text("Regular Expression").tag(true)
         }.pickerStyle(.inline)
+    }
+
+    @ViewBuilder
+    var pickerOptions: some View {
         if !options.isRegex && isKindNeeded {
             Picker(options.kind.rawValue, selection: $options.kind) {
                 ForEach(StringSearchOptions.Kind.allCases, id: \.self) {
