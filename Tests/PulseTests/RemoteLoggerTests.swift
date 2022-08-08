@@ -26,7 +26,7 @@ final class RemoteLoggerTests: XCTestCase {
         )
 
         // WHEN
-        let decoded = try benchmark(title: "encode/decode") {
+        let decoded: LoggerStore.Event.NetworkTaskCompleted = try benchmark(title: "encode/decode") {
             // Encode packed
             let payload = try RemoteLogger.PacketNetworkMessage.encode(event)
             let sentPacket = try RemoteLogger.encode(code: RemoteLogger.PacketCode.storeEventNetworkTaskCompleted.rawValue, body: payload)
