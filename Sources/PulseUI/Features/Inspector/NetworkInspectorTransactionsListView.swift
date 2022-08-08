@@ -72,7 +72,7 @@ struct NetworkInspectorTransactionsListView: View {
             NetworkInspectorTransactionView(viewModel: item.viewModel())
         }
         .navigationTitle(item.title)
-        .frame(minWidth: 400, minHeight: 300, idealHeight: 600)
+        .frame(minWidth: 400, idealWidth: 800, maxWidth: 1000, minHeight: 300, idealHeight: 600)
 #endif
     }
 }
