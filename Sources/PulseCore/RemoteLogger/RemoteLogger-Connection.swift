@@ -144,6 +144,7 @@ extension RemoteLogger {
 
         var data = Data()
         data.append(code)
+        let body = try body.compressed()
         data.append(Data(UInt32(body.count)))
         data.append(body)
         return data
@@ -151,12 +152,12 @@ extension RemoteLogger {
 
     static func decode(buffer: Data) throws -> (Connection.Packet, Int) {
         let header = try PacketHeader(data: buffer)
-        guard buffer.count >= header.totalPacketLength else {
+        guard buffer.count >= header.compressedPacketLength else {
             throw PacketParsingError.notEnoughData
         }
         let body = buffer.from(header.contentOffset, size: Int(header.contentSize))
-        let packet = Connection.Packet(code: header.code, body: body)
-        return (packet, header.totalPacketLength)
+        let packet = Connection.Packet(code: header.code, body: try body.decompressed())
+        return (packet, header.compressedPacketLength)
     }
 
     /// |code|contentSize|body?|
@@ -164,7 +165,7 @@ extension RemoteLogger {
         let code: UInt8
         let contentSize: UInt32
 
-        var totalPacketLength: Int { Int(PacketHeader.size + contentSize) }
+        var compressedPacketLength: Int { Int(PacketHeader.size + contentSize) }
         var contentOffset: Int { Int(PacketHeader.size) }
 
         static let size: UInt32 = 5
