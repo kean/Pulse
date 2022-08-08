@@ -4,7 +4,7 @@
 
 import Foundation
 import SwiftUI
-import PulseCore
+import Pulse
 
 #if os(watchOS) || os(tvOS) || os(iOS)
 

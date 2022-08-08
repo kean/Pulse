@@ -3,13 +3,29 @@
 // Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
-import PulseCore
+import Pulse
 import Logging
 
-public typealias NetworkLogger = PulseCore.NetworkLogger
-public typealias LoggerStore = PulseCore.LoggerStore
-public typealias URLSessionProxyDelegate = PulseCore.URLSessionProxyDelegate
+public typealias NetworkLogger = Pulse.NetworkLogger
+public typealias LoggerStore = Pulse.LoggerStore
+public typealias URLSessionProxyDelegate = Pulse.URLSessionProxyDelegate
 
+/// Allows ``LoggerStore`` to be used with with [SwiftLog](https://github.com/apple/swift-log).
+///
+/// ```swift
+/// import PulseLogHandler
+/// import Logging
+///
+/// LoggingSystem.bootstrap(PersistentLogHandler.init)
+/// ```
+///
+/// If used this way, you never need to interact with the store directly. To log
+/// messages, you'll interact only with the SwiftLog APIs.
+///
+/// ```swift
+/// let logger = Logger(label: "com.yourcompany.yourapp")
+/// logger.info("This message will be stored persistently")
+/// ```
 public struct PersistentLogHandler {
     public var metadata = Logger.Metadata()
     public var logLevel = Logger.Level.info

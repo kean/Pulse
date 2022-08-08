@@ -8,7 +8,7 @@
 
 import Foundation
 import Alamofire
-import Pulse
+import PulseLogHandler
 
 typealias Session = Alamofire.Session
 

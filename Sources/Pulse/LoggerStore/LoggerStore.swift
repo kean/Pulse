@@ -8,24 +8,6 @@ import Combine
 
 /// Persistently stores logs, network requests, and response blobs.
 ///
-/// The recommended way to use the store is by adding the `Pulse` module and using
-/// it with the Swift Logging system ([SwiftLog](https://github.com/apple/swift-log)).
-///
-/// ```swift
-/// import Pulse
-/// import Logging
-///
-/// LoggingSystem.bootstrap(PersistentLogHandler.init)
-/// ```
-///
-/// If used this way, you never need to interact with the store directly. To log
-/// messages, you'll interact only with the SwiftLog APIs.
-///
-/// ```swift
-/// let logger = Logger(label: "com.yourcompany.yourapp")
-/// logger.info("This message will be stored persistently")
-/// ```
-///
 /// But SwiftLog is not required and ``LoggerStore`` can also just as easily be used
 /// directly. You can either create a custom store or use ``LoggerStore/shared`` one.
 public final class LoggerStore: @unchecked Sendable {

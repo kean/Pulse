@@ -4,7 +4,7 @@
 
 #if os(iOS)
 
-import PulseCore
+import Pulse
 import Combine
 import UIKit
 

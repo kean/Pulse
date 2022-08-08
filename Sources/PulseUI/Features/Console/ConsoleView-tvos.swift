@@ -4,7 +4,7 @@
 
 import SwiftUI
 import CoreData
-import PulseCore
+import Pulse
 import Combine
 
 #if os(tvOS)

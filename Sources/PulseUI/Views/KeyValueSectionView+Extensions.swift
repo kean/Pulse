@@ -3,7 +3,7 @@
 // Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
-import PulseCore
+import Pulse
 
 extension KeyValueSectionViewModel {
     static func makeSummary(for request: NetworkLogger.Request) -> KeyValueSectionViewModel {

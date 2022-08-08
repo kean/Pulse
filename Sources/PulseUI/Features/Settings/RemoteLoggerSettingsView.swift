@@ -5,7 +5,7 @@
 import Foundation
 import SwiftUI
 import Combine
-import PulseCore
+import Pulse
 import Network
 
 @available(iOS 14.0, tvOS 14.0, *)

@@ -9,7 +9,7 @@
 import Foundation
 import Moya
 import Alamofire
-import Pulse
+import PulseLogHandler
 
 // MARK: - EXAMPLE PROVIDER WITH LOGGER
 let ExampleProvider: MoyaProvider<ExampleEndpoints> = {

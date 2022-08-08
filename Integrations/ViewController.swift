@@ -4,7 +4,7 @@
 
 import UIKit
 import PulseUI
-import PulseCore
+import Pulse
 import SwiftUI
 
 final class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {

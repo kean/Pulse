@@ -5,7 +5,7 @@
 #if os(macOS)
 
 import SwiftUI
-import PulseCore
+import Pulse
 import CoreData
 import Combine
 import AppKit

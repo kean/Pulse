@@ -4,7 +4,7 @@
 
 import Foundation
 import Combine
-import PulseCore
+import Pulse
 import SwiftUI
 import CoreData
 

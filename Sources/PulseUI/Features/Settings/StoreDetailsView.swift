@@ -3,7 +3,7 @@
 // Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
-import PulseCore
+import Pulse
 
 @available(iOS 14.0, tvOS 14.0, *)
 struct StoreDetailsView: View {

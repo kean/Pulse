@@ -4,7 +4,7 @@
 
 import CoreData
 import XCTest
-@testable import PulseCore
+@testable import Pulse
 
 final class PerformanceTests: XCTestCase {
     var tempDirectoryURL: URL!

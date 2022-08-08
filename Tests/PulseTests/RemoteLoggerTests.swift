@@ -5,7 +5,7 @@
 import XCTest
 import Foundation
 import CoreData
-@testable import PulseCore
+@testable import Pulse
 
 @available(iOS 14.0, *)
 final class RemoteLoggerTests: XCTestCase {

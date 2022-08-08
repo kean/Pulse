@@ -3,10 +3,10 @@
 // Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
-import PulseCore
+import Pulse
 import CoreData
 import SwiftUI
-import PulseCore
+import Pulse
 
 enum JSONElement {
     case punctuation

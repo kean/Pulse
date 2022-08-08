@@ -6,7 +6,7 @@
 
 import UIKit
 import SwiftUI
-import PulseCore
+import Pulse
 import UniformTypeIdentifiers
 
 final class DocumentBrowserViewController: UIDocumentPickerViewController, UIDocumentPickerDelegate, UIDocumentBrowserViewControllerDelegate {

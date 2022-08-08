@@ -6,7 +6,7 @@ import UIKit
 import SwiftUI
 import CoreData
 import PulseUI
-import PulseCore
+import Pulse
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 

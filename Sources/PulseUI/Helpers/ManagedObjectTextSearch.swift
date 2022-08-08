@@ -5,7 +5,7 @@
 #if os(macOS)
 
 import Foundation
-import PulseCore
+import Pulse
 import CoreData
 
 final class ManagedObjectTextSearch<T: NSManagedObject> {

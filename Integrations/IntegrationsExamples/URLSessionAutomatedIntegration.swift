@@ -4,7 +4,7 @@
 
 import Foundation
 import PulseUI
-import PulseCore
+import Pulse
 
 // Uses `URLSessionProxyDelegate` to automatically log the requests.
 final class URLSessionAutomatedIntegration {

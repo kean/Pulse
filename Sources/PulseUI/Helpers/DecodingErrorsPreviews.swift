@@ -4,7 +4,7 @@
 
 import Foundation
 import SwiftUI
-import PulseCore
+import Pulse
 
 #if os(iOS) || os(macOS)
 

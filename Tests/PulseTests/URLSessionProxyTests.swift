@@ -5,7 +5,7 @@
 import XCTest
 import Foundation
 import CoreData
-@testable import PulseCore
+@testable import Pulse
 
 final class URLSessionProxyTests: XCTestCase {
     let directory = TemporaryDirectory()

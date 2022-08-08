@@ -3,7 +3,7 @@
 // Copyright (c) 2020-2022 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
-import PulseCore
+import Pulse
 import CoreData
 import XCTest
 

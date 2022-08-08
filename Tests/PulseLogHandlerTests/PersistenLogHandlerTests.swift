@@ -6,8 +6,8 @@ import CoreData
 import XCTest
 import Logging
 import Combine
+@testable import PulseLogHandler
 @testable import Pulse
-@testable import PulseCore
 
 final class PersistentLogHandlerTests: XCTestCase {
     var tempDirectoryURL: URL!

@@ -5,7 +5,7 @@
 import CoreData
 import XCTest
 import Combine
-@testable import PulseCore
+@testable import Pulse
 
 final class NetworkLoggerTests: XCTestCase {
     func testCreatingDecodingError() throws {

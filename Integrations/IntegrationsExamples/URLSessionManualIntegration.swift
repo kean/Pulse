@@ -4,7 +4,7 @@
 
 import Foundation
 import PulseUI
-import PulseCore
+import Pulse
 
 // If you want to avoid using swizzling and proxies, just implement the following
 // URLSession delegate methods.

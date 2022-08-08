@@ -6,7 +6,7 @@
 
 import CoreData
 import Combine
-import PulseCore
+import Pulse
 import WatchConnectivity
 import SwiftUI
 

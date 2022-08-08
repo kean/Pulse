@@ -12,18 +12,18 @@ let package = Package(
     ],
     products: [
         .library(name: "Pulse", targets: ["Pulse"]),
-        .library(name: "PulseCore", targets: ["PulseCore"]),
-        .library(name: "PulseUI", targets: ["PulseUI"])
+        .library(name: "PulseUI", targets: ["PulseUI"]),
+        .library(name: "PulseLogHandler", targets: ["PulseLogHandler"])
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-log.git", from: "1.2.0")
     ],
     targets: [
-        .target(name: "PulseCore"),
-        .target(name: "PulseUI", dependencies: ["PulseCore"]),
-        .target(name: "Pulse", dependencies: [.product(name: "Logging", package: "swift-log"), "PulseCore"]),
-        .testTarget(name: "PulseCoreTests", dependencies: ["PulseCore"]),
+        .target(name: "Pulse"),
+        .target(name: "PulseUI", dependencies: ["Pulse"]),
+        .target(name: "PulseLogHandler", dependencies: [.product(name: "Logging", package: "swift-log"), "Pulse"]),
+        .testTarget(name: "PulseTests", dependencies: ["Pulse"]),
         .testTarget(name: "PulseUITests", dependencies: ["PulseUI"]),
-        .testTarget(name: "PulseTests", dependencies: ["Pulse"])
+        .testTarget(name: "PulseLogHandlerTests", dependencies: ["PulseLogHandler"])
     ]
 )

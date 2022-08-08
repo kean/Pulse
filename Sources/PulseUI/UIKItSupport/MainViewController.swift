@@ -6,7 +6,7 @@
 
 import Foundation
 import UIKit
-import PulseCore
+import Pulse
 import SwiftUI
 
 public final class MainViewController: UITabBarController {

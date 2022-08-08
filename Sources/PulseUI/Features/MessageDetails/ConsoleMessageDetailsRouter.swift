@@ -4,7 +4,7 @@
 
 import SwiftUI
 import CoreData
-import PulseCore
+import Pulse
 
 struct ConsoleMessageDetailsRouter: View {
     @ObservedObject var viewModel: ConsoleDetailsRouterViewModel
