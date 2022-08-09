@@ -64,12 +64,14 @@ struct LoggerStoreSizeChart: View {
     }
 }
 
+@available(iOS 16.0, tvOS 16.0, macOS 13.0, watchOS 9.0, *)
 private enum Category: String, Hashable, Plottable {
     case messages = "Logs"
     case responses = "Blobs"
     case free = "Free"
 }
 
+@available(iOS 16.0, tvOS 16.0, macOS 13.0, watchOS 9.0, *)
 private struct Series: Identifiable {
     let category: Category
     let bytes: Int64
