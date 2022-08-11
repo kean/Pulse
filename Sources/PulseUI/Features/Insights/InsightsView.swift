@@ -14,8 +14,8 @@ import Charts
 
 #if os(iOS)
 
-public struct NetworkInsightsView: View {
-    @ObservedObject var viewModel: NetworkInsightsViewModel
+public struct InsightsView: View {
+    @ObservedObject var viewModel: InsightsViewModel
 
     private var insights: NetworkLoggerInsights { viewModel.insights }
 
@@ -138,7 +138,7 @@ public struct NetworkInsightsView: View {
 }
 
 private struct TopSlowestRequestsViw: View {
-    let viewModel: NetworkInsightsViewModel
+    let viewModel: InsightsViewModel
 
     var body: some View {
         NetworkInsightsRequestsList(viewModel: viewModel.topSlowestRequestsViewModel())
@@ -147,7 +147,7 @@ private struct TopSlowestRequestsViw: View {
 }
 
 private struct RequestsWithRedirectsView: View {
-    let viewModel: NetworkInsightsViewModel
+    let viewModel: InsightsViewModel
 
     var body: some View {
         NetworkInsightsRequestsList(viewModel: viewModel.requestsWithRedirectsViewModel())
@@ -156,7 +156,7 @@ private struct RequestsWithRedirectsView: View {
 }
 
 private struct FailingRequestsListView: View {
-    let viewModel: NetworkInsightsViewModel
+    let viewModel: InsightsViewModel
 
     var body: some View {
         NetworkInsightsRequestsList(viewModel: viewModel.failedRequestsViewModel())
@@ -164,7 +164,7 @@ private struct FailingRequestsListView: View {
     }
 }
 
-final class NetworkInsightsViewModel: ObservableObject {
+final class InsightsViewModel: ObservableObject {
     let insights: NetworkLoggerInsights
     private var cancellable: AnyCancellable?
 
@@ -251,7 +251,7 @@ final class NetworkInsightsViewModel: ObservableObject {
 struct NetworkInsightsView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
-            NetworkInsightsView(viewModel: .init(store: LoggerStore.mock))
+            InsightsView(viewModel: .init(store: LoggerStore.mock))
         }
     }
 }

@@ -14,7 +14,7 @@ public struct MainView: View {
     @State private var isShowingSettings = false
     @State private var isShowingShareSheet = false
     @State private var shareItems: ShareItems?
-
+ 
     public init(store: LoggerStore = .shared) {
         _viewModel = StateObject(wrappedValue: MainViewModel(store: store))
     }

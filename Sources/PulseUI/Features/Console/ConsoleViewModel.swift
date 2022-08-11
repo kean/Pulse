@@ -8,8 +8,6 @@ import Combine
 import SwiftUI
 
 final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, ObservableObject {
-    let configuration: ConsoleConfiguration
-
 #if os(iOS) || os(macOS)
     let table: ConsoleTableViewModel
 #endif
@@ -31,9 +29,8 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     private var latestSessionId: UUID?
     private var cancellables: [AnyCancellable] = []
 
-    init(store: LoggerStore, configuration: ConsoleConfiguration = .default) {
+    init(store: LoggerStore) {
         self.store = store
-        self.configuration = configuration
         self.details = ConsoleDetailsRouterViewModel()
 
         let request = NSFetchRequest<LoggerMessageEntity>(entityName: "\(LoggerMessageEntity.self)")

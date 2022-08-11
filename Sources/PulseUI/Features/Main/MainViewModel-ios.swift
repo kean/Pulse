@@ -20,19 +20,17 @@ final class MainViewModel: ObservableObject {
 
 #if os(iOS)
     let pins: PinsViewModel
-    let insights: NetworkInsightsViewModel
+    let insights: InsightsViewModel
 #endif
 
     let settings: SettingsViewModel
 
     let store: LoggerStore
-    let configuration: ConsoleConfiguration
 
-    init(store: LoggerStore, configuration: ConsoleConfiguration = .default, onDismiss: (() -> Void)?) {
-        self.configuration = configuration
+    init(store: LoggerStore, onDismiss: (() -> Void)?) {
         self.store = store
 
-        self.console = ConsoleViewModel(store: store, configuration: configuration)
+        self.console = ConsoleViewModel(store: store)
         self.console.onDismiss = onDismiss
 
 #if !os(watchOS)
@@ -44,7 +42,7 @@ final class MainViewModel: ObservableObject {
         self.pins = PinsViewModel(store: store)
         self.pins.onDismiss = onDismiss
 
-        self.insights = NetworkInsightsViewModel(store: store)
+        self.insights = InsightsViewModel(store: store)
 #endif
 
         self.settings = SettingsViewModel(store: store)
@@ -116,7 +114,7 @@ extension MainViewModel {
 #endif
 #if os(iOS)
         case .insights:
-            NetworkInsightsView(viewModel: insights)
+            InsightsView(viewModel: insights)
 #endif
         case .settings:
             SettingsView(viewModel: settings)

@@ -13,7 +13,7 @@ public struct ConsoleView: View {
     @ObservedObject var viewModel: ConsoleViewModel
     @State private var isSharing = false
 
-    public init(store: LoggerStore = .shared, configuration: ConsoleConfiguration = .default) {
+    public init(store: LoggerStore = .shared) {
         self.viewModel = ConsoleViewModel(store: store)
     }
 
