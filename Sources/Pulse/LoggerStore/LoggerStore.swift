@@ -290,9 +290,8 @@ extension LoggerStore {
         request.host = event.originalRequest.url?.host
         request.httpMethod = event.originalRequest.httpMethod
         request.requestState = LoggerNetworkRequestEntity.State.pending.rawValue
-
-        let details = LoggerNetworkRequestEntity.RequestDetails(originalRequest: event.originalRequest, currentRequest: event.currentRequest)
-        populateDetails(details, for: request)
+        request.originalRequest = makeRequest(for: event.originalRequest)
+        request.currentRequest = event.currentRequest.map(makeRequest)
     }
 
     private func process(_ event: Event.NetworkTaskProgressUpdated) {
@@ -355,10 +354,11 @@ extension LoggerStore {
         let transactions = event.metrics?.transactions ?? []
         request.isFromCache = transactions.last?.fetchType == .localCache || (transactions.last?.fetchType == .networkLoad && transactions.last?.response?.statusCode == 304)
 
+        request.originalRequest = makeRequest(for: event.originalRequest)
+        request.currentRequest = event.currentRequest.map(makeRequest)
+
         // Populate details
         let details = LoggerNetworkRequestEntity.RequestDetails(
-            originalRequest: event.originalRequest,
-            currentRequest: event.currentRequest,
             response: event.response,
             error: event.error,
             metrics: event.metrics,
@@ -386,6 +386,7 @@ extension LoggerStore {
         }
     }
 
+#warning("TODO: remove this")
     private func populateDetails(_ details: LoggerNetworkRequestEntity.RequestDetails, for request: LoggerNetworkRequestEntity) {
         guard let data = try? JSONEncoder().encode(details).compressed() else {
             return
@@ -457,6 +458,26 @@ extension LoggerStore {
         request.message = message
 
         return request
+    }
+
+    private func makeRequest(for request: NetworkLogger.Request) -> NetworkRequestEntity {
+        let entity = NetworkRequestEntity(context: backgroundContext)
+        entity.url = request.url?.absoluteString
+        entity.httpMethod = request.httpMethod
+        entity.httpHeaders = Set((request.headers ?? [:]).map { name, value in
+            let entity = NetworkRequestHeaderEntity(context: backgroundContext)
+            entity.name = name
+            entity.value = value
+            return entity
+        })
+        entity.allowsCellularAccess = request.options.contains(.allowsCellularAccess)
+        entity.allowsExpensiveNetworkAccess = request.options.contains(.allowsExpensiveNetworkAccess)
+        entity.allowsConstrainedNetworkAccess = request.options.contains(.allowsConstrainedNetworkAccess)
+        entity.httpShouldHandleCookies = request.options.contains(.httpShouldHandleCookies)
+        entity.httpShouldUsePipelining = request.options.contains(.httpShouldUsePipelining)
+        entity.timeoutInterval = Double(request.timeout)
+        entity.rawCachePolicy = UInt16(request.cachePolicy.rawValue)
+        return entity
     }
 
     // MARK: - Managing Blobs

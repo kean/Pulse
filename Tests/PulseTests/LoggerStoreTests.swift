@@ -654,8 +654,7 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertEqual(request.redirectCount, 0)
 
         // Details
-        let details = try XCTUnwrap(request.details)
-        XCTAssertEqual(details.originalRequest.url?.absoluteString, "https://github.com/login")
+        XCTAssertEqual(request.originalRequest.url, "https://github.com/login")
     }
 
     // MARK: - Image Support

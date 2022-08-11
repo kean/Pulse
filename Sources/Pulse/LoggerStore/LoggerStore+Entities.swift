@@ -79,10 +79,16 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
     }
     /// Total request duration end date.
     @NSManaged public var duration: Double
+
+    #warning("remove")
     /// Number of redirects.
     @NSManaged public var redirectCount: Int16
 
     // MARK: Details
+
+    @NSManaged public var originalRequest: NetworkRequestEntity
+
+    @NSManaged public var currentRequest: NetworkRequestEntity?
 
     /// Returns request details.
     ///
@@ -139,16 +145,12 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
 
     /// The request details stored in a database in a denormalized format.
     public final class RequestDetails: Codable, Sendable {
-        public let originalRequest: NetworkLogger.Request
-        public let currentRequest: NetworkLogger.Request?
         public let response: NetworkLogger.Response?
         public let error: NetworkLogger.ResponseError?
         public let metrics: NetworkLogger.Metrics?
         public let metadata: [String: String]?
 
-        public init(originalRequest: NetworkLogger.Request, currentRequest: NetworkLogger.Request?, response: NetworkLogger.Response? = nil, error: NetworkLogger.ResponseError? = nil, metrics: NetworkLogger.Metrics? = nil, metadata: [String : String]? = nil) {
-            self.originalRequest = originalRequest
-            self.currentRequest = currentRequest
+        public init(response: NetworkLogger.Response? = nil, error: NetworkLogger.ResponseError? = nil, metrics: NetworkLogger.Metrics? = nil, metadata: [String : String]? = nil) {
             self.response = response
             self.error = error
             self.metrics = metrics
@@ -156,17 +158,75 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
         }
 
         enum CodingKeys: String, CodingKey {
-            case originalRequest = "0", currentRequest = "1", response = "2", error = "3", metrics = "4", metadata = "5"
+            case response = "2", error = "3", metrics = "4", metadata = "5"
         }
     }
 }
 
+#warning("TODO: remove Logger prefix")
 /// Indicates current download or upload progress.
 public final class LoggerNetworkRequestProgressEntity: NSManagedObject {
     /// Indicates current download or upload progress.
     @NSManaged public var completedUnitCount: Int64
     /// Indicates current download or upload progress.
     @NSManaged public var totalUnitCount: Int64
+}
+
+#warning("TODO: move metrics here")
+public final class NetworkRequestMetricsEntity: NSManagedObject {
+    @NSManaged public var startDate: Date
+    @NSManaged public var duration: Double
+    @NSManaged public var redirectCount: Int
+    @NSManaged public var transactions: Set<NetworkRequestTransactionEntity>
+
+    public var taskInterval: DateInterval {
+        DateInterval(start: startDate, duration: duration)
+    }
+}
+
+public final class NetworkRequestTransactionEntity: NSManagedObject {
+    @NSManaged public var index: Int
+}
+
+public final class NetworkRequestEntity: NSManagedObject {
+    // MARK: Details
+
+    @NSManaged public var url: String?
+    @NSManaged public var httpMethod: String?
+    @NSManaged public var httpHeaders: Set<NetworkRequestHeaderEntity>
+
+    // MARK: Options
+
+    @NSManaged public var allowsCellularAccess: Bool
+    @NSManaged public var allowsExpensiveNetworkAccess: Bool
+    @NSManaged public var allowsConstrainedNetworkAccess: Bool
+    @NSManaged public var httpShouldHandleCookies: Bool
+    @NSManaged public var httpShouldUsePipelining: Bool
+    @NSManaged public var timeoutInterval: Double
+    @NSManaged public var rawCachePolicy: UInt16
+
+    public var cachePolicy: URLRequest.CachePolicy {
+        URLRequest.CachePolicy(rawValue: UInt(rawCachePolicy)) ?? .useProtocolCachePolicy
+    }
+
+    public var contentType: NetworkLogger.ContentType? {
+        httpHeaders
+            .first { $0.name == "Content-Type" }
+            .flatMap { NetworkLogger.ContentType(rawValue: $0.value) }
+    }
+
+    public var headers: [String: String] {
+        var headers: [String: String] = [:]
+        for header in httpHeaders {
+            headers[header.name] = header.value
+        }
+        return headers
+    }
+}
+
+public final class NetworkRequestHeaderEntity: NSManagedObject {
+    @NSManaged public var name: String
+    @NSManaged public var value: String
 }
 
 /// Doesn't contain any data, just the key and some additional payload.

@@ -160,6 +160,7 @@ extension NetworkLogger {
         }
     }
 
+#warning("TODO: remove all json tricks that are not mostly useless")
     public struct Metrics: Codable, Sendable {
         public var taskInterval: DateInterval {
             get { Metrics.dateInterval(from: rawTaskInterval) }

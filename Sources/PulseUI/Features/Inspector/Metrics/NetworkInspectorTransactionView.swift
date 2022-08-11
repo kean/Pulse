@@ -82,9 +82,11 @@ final class NetworkInspectorTransactionViewModel: ObservableObject {
         self.transaction = transaction
     }
 
-    lazy var requestSummary = KeyValueSectionViewModel.makeSummary(for: transaction.request)
+#warning("TODO: reimplemnet")
+    lazy var requestSummary: KeyValueSectionViewModel? = nil // = KeyValueSectionViewModel.makeSummary(for: transaction.request)
 
-    lazy var requestParameters = KeyValueSectionViewModel.makeParameters(for: transaction.request)
+#warning("TODO: reimplemnet")
+    lazy var requestParameters: KeyValueSectionViewModel? = nil // = KeyValueSectionViewModel.makeParameters(for: transaction.request)
 
     lazy var requestHeaders = KeyValueSectionViewModel.makeRequestHeaders(
         for: transaction.request.headers ?? [:],

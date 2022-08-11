@@ -6,11 +6,11 @@ import SwiftUI
 import Pulse
 
 extension KeyValueSectionViewModel {
-    static func makeSummary(for request: NetworkLogger.Request) -> KeyValueSectionViewModel {
-        let components = request.url.flatMap { URLComponents(url: $0, resolvingAgainstBaseURL: false) }
+    static func makeSummary(for request: NetworkRequestEntity) -> KeyValueSectionViewModel {
+        let components = request.url.flatMap { URLComponents(string: $0) }
         var items: [(String, String?)] = []
         items += [
-            ("URL", request.url?.absoluteString),
+            ("URL", request.url),
             ("Method", request.httpMethod)
         ]
         if let host = components?.host {
@@ -26,15 +26,15 @@ extension KeyValueSectionViewModel {
         )
     }
 
-    static func makeParameters(for request: NetworkLogger.Request) -> KeyValueSectionViewModel {
+    static func makeParameters(for request: NetworkRequestEntity) -> KeyValueSectionViewModel {
         KeyValueSectionViewModel(title: "Request Parameters", color: .gray, items: [
             ("Cache Policy", request.cachePolicy.description),
-            ("Timeout Interval", DurationFormatter.string(from: request.timeout, isPrecise: false)),
-            ("Allows Cellular Access", request.options.contains(.allowsCellularAccess).description),
-            ("Allows Expensive Network Access", request.options.contains(.allowsExpensiveNetworkAccess).description),
-            ("Allows Constrained Network Access", request.options.contains(.allowsConstrainedNetworkAccess).description),
-            ("HTTP Should Handle Cookies", request.options.contains(.httpShouldHandleCookies).description),
-            ("HTTP Should Use Pipelining", request.options.contains(.httpShouldUsePipelining).description)
+            ("Timeout Interval", DurationFormatter.string(from: request.timeoutInterval, isPrecise: false)),
+            ("Allows Cellular Access", request.allowsCellularAccess.description),
+            ("Allows Expensive Network Access", request.allowsExpensiveNetworkAccess.description),
+            ("Allows Constrained Network Access", request.allowsConstrainedNetworkAccess.description),
+            ("HTTP Should Handle Cookies", request.httpShouldHandleCookies.description),
+            ("HTTP Should Use Pipelining", request.httpShouldUsePipelining.description)
         ])
     }
 

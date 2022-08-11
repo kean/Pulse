@@ -9,18 +9,18 @@ import Pulse
 
 extension LoggerNetworkRequestEntity {
     func cURLDescription() -> String {
-        guard let request = details?.currentRequest ?? details?.originalRequest,
-              let url = request.url else {
+        let request = currentRequest ?? originalRequest
+        guard let url = request.url else {
             return "$ curl command generation failed"
         }
 
         var components = ["curl -v"]
 
-        components.append("-X \(request.httpMethod)")
+        components.append("-X \(request.httpMethod ?? "GET")")
 
-        for header in request.headers ?? [:] {
+        for header in request.httpHeaders {
             let escapedValue = header.value.replacingOccurrences(of: "\"", with: "\\\"")
-            components.append("-H \"\(header.key): \(escapedValue)\"")
+            components.append("-H \"\(header.name): \(escapedValue)\"")
         }
 
         if let httpBodyData = requestBody?.data {
@@ -30,7 +30,7 @@ extension LoggerNetworkRequestEntity {
             components.append("-d \"\(escapedBody)\"")
         }
 
-        components.append("\"\(url.absoluteString)\"")
+        components.append("\"\(url)\"")
 
         return components.joined(separator: " \\\n\t")
     }
@@ -41,7 +41,7 @@ extension LoggerNetworkRequestEntity {
 extension LoggerNetworkRequestEntity {
     var requestFileViewerContext: FileViewerViewModel.Context {
         FileViewerViewModel.Context(
-            contentType: details?.originalRequest.contentType,
+            contentType: originalRequest.contentType,
             originalSize: requestBodySize,
             metadata: details?.metadata,
             isResponse: false,

@@ -325,17 +325,7 @@ private struct CacheKey: Hashable {
 }
 
 func evaluateProgrammaticFilters(_ filters: [NetworkSearchFilter], entity: LoggerNetworkRequestEntity, store: LoggerStore) -> Bool {
-    var request: NetworkLogger.Request? {
-        let key = CacheKey(id: entity.objectID, code: 0)
-        if let value = cache.value(forKey: key) as? NetworkLogger.Request {
-            return value
-        }
-        let value = entity.details?.originalRequest
-        if let value = value {
-            cache.set(value, forKey: key, ttl: 60)
-        }
-        return value
-    }
+    let request = entity.originalRequest
     var response: NetworkLogger.Response? {
         let key = CacheKey(id: entity.objectID, code: 1)
         if let value = cache.value(forKey: key) as? NetworkLogger.Response {
@@ -350,7 +340,7 @@ func evaluateProgrammaticFilters(_ filters: [NetworkSearchFilter], entity: Logge
 
     func isMatch(filter: NetworkSearchFilter) -> Bool {
         switch filter.field {
-        case .requestHeader: return (request?.headers ?? [:]).contains { filter.matches(string: $0.key) || filter.matches(string: $0.value) }
+        case .requestHeader: return request.headers.contains { filter.matches(string: $0.key) || filter.matches(string: $0.value) }
         case .responseHeader: return (response?.headers ?? [:]).contains { filter.matches(string: $0.key) || filter.matches(string: $0.value) }
         case .requestBody: return filter.matches(string: String(data: entity.requestBody?.data ?? Data(), encoding: .utf8) ?? "")
         case .responseBody: return filter.matches(string: String(data: entity.responseBody?.data ?? Data(), encoding: .utf8) ?? "")
