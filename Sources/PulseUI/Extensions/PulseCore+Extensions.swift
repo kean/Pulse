@@ -51,7 +51,7 @@ extension LoggerNetworkRequestEntity {
 
     var responseFileViewerContext: FileViewerViewModel.Context {
         FileViewerViewModel.Context(
-            contentType: details?.response?.contentType,
+            contentType: response?.contentType,
             originalSize: responseBodySize,
             metadata: details?.metadata,
             isResponse: true,

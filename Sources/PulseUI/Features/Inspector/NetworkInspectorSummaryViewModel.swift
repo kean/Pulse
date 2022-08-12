@@ -183,11 +183,11 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     // MARK: - Response
 
     var responseSummary: KeyValueSectionViewModel? {
-        details?.response.map(KeyValueSectionViewModel.makeSummary)
+        request.response.map(KeyValueSectionViewModel.makeSummary)
     }
 
     var responseHeaders: KeyValueSectionViewModel {
-        KeyValueSectionViewModel.makeResponseHeaders(for: details?.response?.headers ?? [:]) { [unowned self] in
+        KeyValueSectionViewModel.makeResponseHeaders(for: request.response?.headers ?? [:]) { [unowned self] in
             self.isResponseHeadearsRawLinkActive = true
         }
     }
@@ -201,7 +201,6 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
         guard request.responseBodySize > 0 else {
             return KeyValueSectionViewModel(title: "Response Body", color: .indigo)
         }
-        let contentType = details?.response?.headers?.first(where: { $0.key == "Content-Type" })?.value ?? "–"
         let size = ByteCountFormatter.string(fromByteCount: request.responseBodySize)
         return KeyValueSectionViewModel(
             title: "Response Body",
@@ -211,7 +210,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
                 title: "View"
             ),
             items: [
-                ("Content-Type", contentType),
+                ("Content-Type", request.response?.contentType?.rawValue),
                 ("Size", request.isFromCache ? size + " (from cache)": size)
             ]
         )

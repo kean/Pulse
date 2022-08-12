@@ -90,6 +90,8 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
 
     @NSManaged public var currentRequest: NetworkRequestEntity?
 
+    @NSManaged public var response: NetworkResponseEntity?
+
     /// Returns request details.
     ///
     /// - important: Accessing it for the first time can be a relatively slow
@@ -145,20 +147,18 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
 
     /// The request details stored in a database in a denormalized format.
     public final class RequestDetails: Codable, Sendable {
-        public let response: NetworkLogger.Response?
         public let error: NetworkLogger.ResponseError?
         public let metrics: NetworkLogger.Metrics?
         public let metadata: [String: String]?
 
-        public init(response: NetworkLogger.Response? = nil, error: NetworkLogger.ResponseError? = nil, metrics: NetworkLogger.Metrics? = nil, metadata: [String : String]? = nil) {
-            self.response = response
+        public init(error: NetworkLogger.ResponseError? = nil, metrics: NetworkLogger.Metrics? = nil, metadata: [String : String]? = nil) {
             self.error = error
             self.metrics = metrics
             self.metadata = metadata
         }
 
         enum CodingKeys: String, CodingKey {
-            case response = "2", error = "3", metrics = "4", metadata = "5"
+            case error = "3", metrics = "4", metadata = "5"
         }
     }
 }
@@ -210,23 +210,41 @@ public final class NetworkRequestEntity: NSManagedObject {
     }
 
     public var contentType: NetworkLogger.ContentType? {
-        httpHeaders
-            .first { $0.name == "Content-Type" }
-            .flatMap { NetworkLogger.ContentType(rawValue: $0.value) }
+        headers["Content-Type"].flatMap(NetworkLogger.ContentType.init)
     }
 
-    public var headers: [String: String] {
+    public var headers: [String: String] { httpHeaders.asDictionary() }
+}
+
+public final class NetworkRequestHeaderEntity: NSManagedObject {
+    @NSManaged public var name: String
+    @NSManaged public var value: String
+}
+
+extension Set where Element == NetworkRequestHeaderEntity {
+    func asDictionary() -> [String: String] {
         var headers: [String: String] = [:]
-        for header in httpHeaders {
+        for header in self {
             headers[header.name] = header.value
         }
         return headers
     }
 }
 
-public final class NetworkRequestHeaderEntity: NSManagedObject {
-    @NSManaged public var name: String
-    @NSManaged public var value: String
+public final class NetworkResponseEntity: NSManagedObject {
+    @NSManaged public var url: String?
+    @NSManaged public var statusCode: Int16
+    @NSManaged public var httpHeaders: Set<NetworkRequestHeaderEntity>
+
+    public var contentType: NetworkLogger.ContentType? {
+        headers["Content-Type"].flatMap(NetworkLogger.ContentType.init)
+    }
+
+    public var expectedContentLength: Int64? {
+        headers["Content-Length"].flatMap { Int64($0) }
+    }
+
+    public var headers: [String: String] { httpHeaders.asDictionary() }
 }
 
 /// Doesn't contain any data, just the key and some additional payload.

@@ -16,6 +16,7 @@ extension LoggerStore {
         let blob = NSEntityDescription(class: LoggerBlobHandleEntity.self)
         let inlinedData = NSEntityDescription(class: LoggerInlineDataEntity.self)
         let urlRequest = NSEntityDescription(class: NetworkRequestEntity.self)
+        let urlResponse = NSEntityDescription(class: NetworkResponseEntity.self)
         let httpHeader = NSEntityDescription(class: NetworkRequestHeaderEntity.self)
 
         message.properties = [
@@ -59,6 +60,7 @@ extension LoggerStore {
             NSAttributeDescription(name: "isFromCache", type: .booleanAttributeType),
             NSRelationshipDescription.make(name: "originalRequest", type: .oneToOne(), entity: urlRequest),
             NSRelationshipDescription.make(name: "currentRequest", type: .oneToOne(isOptional: true), entity: urlRequest),
+            NSRelationshipDescription.make(name: "response", type: .oneToOne(isOptional: true), entity: urlResponse),
             NSRelationshipDescription.make(name: "message", type: .oneToOne(), entity: message),
             NSRelationshipDescription.make(name: "detailsData", type: .oneToOne(), entity: inlinedData),
             NSRelationshipDescription.make(name: "requestBody", type: .oneToOne(isOptional: true), deleteRule: .noActionDeleteRule, entity: blob),
@@ -77,6 +79,12 @@ extension LoggerStore {
             NSAttributeDescription(name: "httpShouldUsePipelining", type: .booleanAttributeType),
             NSAttributeDescription(name: "timeoutInterval", type: .doubleAttributeType),
             NSAttributeDescription(name: "rawCachePolicy", type: .integer16AttributeType)
+        ]
+
+        urlResponse.properties = [
+            NSAttributeDescription(name: "url", type: .stringAttributeType),
+            NSAttributeDescription(name: "statusCode", type: .integer16AttributeType),
+            NSRelationshipDescription.make(name: "httpHeaders", type: .oneToMany, entity: httpHeader),
         ]
 
         httpHeader.properties = [
@@ -101,7 +109,7 @@ extension LoggerStore {
             NSAttributeDescription(name: "data", type: .binaryDataAttributeType)
         ]
 
-        model.entities = [message, metadata, request, requestProgress, blob, inlinedData, urlRequest, httpHeader]
+        model.entities = [message, metadata, request, requestProgress, blob, inlinedData, urlRequest, urlResponse, httpHeader]
         return model
     }()
 }

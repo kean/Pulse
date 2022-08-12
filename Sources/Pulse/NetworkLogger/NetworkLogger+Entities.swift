@@ -75,9 +75,6 @@ extension NetworkLogger {
         public var contentType: ContentType? {
             headers?["Content-Type"].flatMap(ContentType.init)
         }
-        public var expectedContentLength: Int64? {
-            headers?["Content-Length"].flatMap { Int64($0) }
-        }
 
         public init(_ urlResponse: URLResponse) {
             let httpResponse = urlResponse as? HTTPURLResponse

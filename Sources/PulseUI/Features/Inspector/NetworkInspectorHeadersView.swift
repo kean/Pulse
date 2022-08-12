@@ -111,7 +111,7 @@ final class NetworkInspectorHeaderViewModel: ObservableObject {
     }
 
     var responseHeaders: KeyValueSectionViewModel? {
-        guard let headers = request.details?.response?.headers else {
+        guard let headers = request.response?.headers else {
             return nil
         }
         return KeyValueSectionViewModel(

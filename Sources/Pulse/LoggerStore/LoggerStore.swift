@@ -356,10 +356,10 @@ extension LoggerStore {
 
         request.originalRequest = makeRequest(for: event.originalRequest)
         request.currentRequest = event.currentRequest.map(makeRequest)
+        request.response = event.response.map(makeResponse)
 
         // Populate details
         let details = LoggerNetworkRequestEntity.RequestDetails(
-            response: event.response,
             error: event.error,
             metrics: event.metrics,
             metadata: {
@@ -464,12 +464,7 @@ extension LoggerStore {
         let entity = NetworkRequestEntity(context: backgroundContext)
         entity.url = request.url?.absoluteString
         entity.httpMethod = request.httpMethod
-        entity.httpHeaders = Set((request.headers ?? [:]).map { name, value in
-            let entity = NetworkRequestHeaderEntity(context: backgroundContext)
-            entity.name = name
-            entity.value = value
-            return entity
-        })
+        entity.httpHeaders = makeHeaders(for: request.headers)
         entity.allowsCellularAccess = request.options.contains(.allowsCellularAccess)
         entity.allowsExpensiveNetworkAccess = request.options.contains(.allowsExpensiveNetworkAccess)
         entity.allowsConstrainedNetworkAccess = request.options.contains(.allowsConstrainedNetworkAccess)
@@ -478,6 +473,23 @@ extension LoggerStore {
         entity.timeoutInterval = Double(request.timeout)
         entity.rawCachePolicy = UInt16(request.cachePolicy.rawValue)
         return entity
+    }
+
+    private func makeResponse(for response: NetworkLogger.Response) -> NetworkResponseEntity {
+        let entity = NetworkResponseEntity(context: backgroundContext)
+        entity.url = response.url
+        entity.statusCode = Int16(response.statusCode ?? 0)
+        entity.httpHeaders = makeHeaders(for: response.headers)
+        return entity
+    }
+
+    private func makeHeaders(for headers: [String: String]?) -> Set<NetworkRequestHeaderEntity> {
+        Set((headers ?? [:]).map { name, value in
+            let entity = NetworkRequestHeaderEntity(context: backgroundContext)
+            entity.name = name
+            entity.value = value
+            return entity
+        })
     }
 
     // MARK: - Managing Blobs

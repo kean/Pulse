@@ -310,33 +310,10 @@ final class NetworkSearchFilter: ObservableObject, Hashable, Identifiable {
     }
 }
 
-private func decode<T: Decodable>(_ type: T.Type) -> (_ data: Data?) -> T? {
-    {
-        guard let data = $0 else { return nil }
-        return try? JSONDecoder().decode(type, from: data)
-    }
-}
-
-private var cache = Cache<CacheKey, Any>(costLimit: Int.max, countLimit: 1000)
-
-private struct CacheKey: Hashable {
-    let id: NSManagedObjectID
-    let code: Int
-}
-
+#warning("TODO: reimplement using SQL queries")
 func evaluateProgrammaticFilters(_ filters: [NetworkSearchFilter], entity: LoggerNetworkRequestEntity, store: LoggerStore) -> Bool {
     let request = entity.originalRequest
-    var response: NetworkLogger.Response? {
-        let key = CacheKey(id: entity.objectID, code: 1)
-        if let value = cache.value(forKey: key) as? NetworkLogger.Response {
-            return value
-        }
-        let value = entity.details?.response
-        if let value = value {
-            cache.set(value, forKey: key, ttl: 60)
-        }
-        return value
-    }
+    let response = entity.response
 
     func isMatch(filter: NetworkSearchFilter) -> Bool {
         switch filter.field {

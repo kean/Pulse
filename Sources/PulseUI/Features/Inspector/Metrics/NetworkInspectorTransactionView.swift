@@ -93,11 +93,13 @@ final class NetworkInspectorTransactionViewModel: ObservableObject {
         action: { [unowned self] in self.isOriginalRequestHeadersLinkActive = true }
     )
 
+#warning("TODO: reimplement")
     lazy var responseSummary: KeyValueSectionViewModel = {
-        guard let response = transaction.response else {
-            return KeyValueSectionViewModel(title: "Response", color: .indigo)
-        }
-        return KeyValueSectionViewModel.makeSummary(for: response)
+        return KeyValueSectionViewModel(title: "temp", color: .red)
+//        guard let response = transaction.response else {
+//            return KeyValueSectionViewModel(title: "Response", color: .indigo)
+//        }
+//        return KeyValueSectionViewModel.makeSummary(for: response)
     }()
 
     lazy var responseHeaders = KeyValueSectionViewModel.makeResponseHeaders(

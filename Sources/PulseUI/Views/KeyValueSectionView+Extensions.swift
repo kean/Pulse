@@ -47,9 +47,9 @@ extension KeyValueSectionViewModel {
         )
     }
 
-    static func makeSummary(for response: NetworkLogger.Response) -> KeyValueSectionViewModel {
+    static func makeSummary(for response: NetworkResponseEntity) -> KeyValueSectionViewModel {
         KeyValueSectionViewModel(title: "Response Summary", color: .indigo, items: [
-            ("Status Code", response.statusCode.map { String($0) }),
+            ("Status Code", String(response.statusCode)),
             ("Content Type", response.contentType?.rawValue),
             ("Expected Content Length", response.expectedContentLength.map { ByteCountFormatter.string(fromByteCount: max(0, $0)) })
         ])
