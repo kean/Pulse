@@ -95,7 +95,7 @@ struct ConsoleNetworkRequestView: View {
 #if DEBUG
 struct ConsoleNetworkRequestView_Previews: PreviewProvider {
     static var previews: some View {
-        ConsoleNetworkRequestView(viewModel: .init(request: LoggerStore.preview.entity(for: .login)))
+        ConsoleNetworkRequestView(viewModel: .init(task: LoggerStore.preview.entity(for: .login)))
             .padding()
             .previewLayout(.sizeThatFits)
     }

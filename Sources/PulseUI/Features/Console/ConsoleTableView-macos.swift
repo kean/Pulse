@@ -64,13 +64,13 @@ struct ConsoleTableView: NSViewRepresentable {
             let cell = HostingTableCell.make(in: tableView)
             switch entities[row] {
             case let message as LoggerMessageEntity:
-                if let request = message.request {
-                    cell.hostingView.rootView = AnyView(ConsoleNetworkRequestView(viewModel: .init(request: request)))
+                if let task = message.task {
+                    cell.hostingView.rootView = AnyView(ConsoleNetworkRequestView(viewModel: .init(task: task)))
                 } else {
                     cell.hostingView.rootView = AnyView(ConsoleMessageView(viewModel: .init(message: message)))
                 }
-            case let request as LoggerNetworkRequestEntity:
-                cell.hostingView.rootView = AnyView(ConsoleNetworkRequestView(viewModel: .init(request: request)))
+            case let task as NetworkTaskEntity:
+                cell.hostingView.rootView = AnyView(ConsoleNetworkRequestView(viewModel: .init(task: task)))
             default:
                 fatalError("Invalid entity: \(entities[row])")
             }

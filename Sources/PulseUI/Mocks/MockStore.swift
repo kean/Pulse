@@ -381,12 +381,12 @@ private func getHeadersEstimatedSize(_ headers: [String: String]?) -> Int64 {
 }
 
 extension LoggerStore {
-    func entity(for task: MockTask) -> LoggerNetworkRequestEntity {
+    func entity(for task: MockTask) -> NetworkTaskEntity {
         let configuration = NetworkLogger.Configuration(isWaitingForDecoding: true)
         _logTask(task, urlSession: URLSession.shared, logger: NetworkLogger(store: self, configuration: configuration))
-        let entity = (try! allRequests()).first { $0.url == task.originalRequest.url?.absoluteString }
-        assert(entity != nil)
-        return entity!
+        let task = (try! allTasks()).first { $0.url == task.originalRequest.url?.absoluteString }
+        assert(task != nil)
+        return task!
     }
 }
 

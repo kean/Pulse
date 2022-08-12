@@ -50,15 +50,15 @@ final class ProgressViewModel: ObservableObject {
         self.details = details
     }
 
-    init(request: LoggerNetworkRequestEntity) {
-        switch request.taskType ?? .dataTask {
+    init(task: NetworkTaskEntity) {
+        switch task.taskType ?? .dataTask {
         case .downloadTask: self.title = "Downloading"
         case .uploadTask: self.title = "Uploading"
         default: self.title = "Pending"
         }
 
-        observer1 = request.publisher(for: \.progress, options: [.initial, .new]).sink { [weak self] change in
-            if let progress = request.progress {
+        observer1 = task.publisher(for: \.progress, options: [.initial, .new]).sink { [weak self] change in
+            if let progress = task.progress {
                 self?.register(for: progress)
             }
         }

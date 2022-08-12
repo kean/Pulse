@@ -15,7 +15,7 @@ public final class LoggerMessageEntity: NSManagedObject {
     @NSManaged public var function: String
     @NSManaged public var line: Int32 // Doubles as request state storage to save space
     @NSManaged public var metadata: Set<LoggerMetadataEntity>
-    @NSManaged public var request: LoggerNetworkRequestEntity?
+    @NSManaged public var task: NetworkTaskEntity?
 }
 
 public final class LoggerMetadataEntity: NSManagedObject {
@@ -23,7 +23,7 @@ public final class LoggerMetadataEntity: NSManagedObject {
     @NSManaged public var value: String
 }
 
-public final class LoggerNetworkRequestEntity: NSManagedObject {
+public final class NetworkTaskEntity: NSManagedObject {
     // Primary
     @NSManaged public var createdAt: Date
     @NSManaged public var isPinned: Bool
@@ -56,8 +56,8 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
     // MARK: State
 
     /// Returns request state.
-    public var state: LoggerNetworkRequestEntity.State {
-        LoggerNetworkRequestEntity.State(rawValue: requestState) ?? .pending
+    public var state: State {
+        State(rawValue: requestState) ?? .pending
     }
 
     /// Contains ``State-swift.enum`` raw value.
@@ -109,7 +109,6 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
     }
 }
 
-#warning("TODO: remove Logger prefix")
 /// Indicates current download or upload progress.
 public final class LoggerNetworkRequestProgressEntity: NSManagedObject {
     /// Indicates current download or upload progress.

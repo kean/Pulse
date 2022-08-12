@@ -17,10 +17,10 @@ struct ConsoleMessagesForEach: View {
 
     @ViewBuilder
     private func makeListItem(message: LoggerMessageEntity) -> some View {
-        if let request = message.request {
-            NetworkRequestRow(request: request)
+        if let task = message.task {
+            NetworkRequestRow(task: task)
         } else {
-            NavigationLink(destination: LazyConsoleeDetailsView(message: message)) {
+            NavigationLink(destination: LazyConsoleDetailsView(message: message)) {
                 ConsoleMessageView(viewModel: .init(message: message))
             }
         }
@@ -28,26 +28,26 @@ struct ConsoleMessagesForEach: View {
 }
 
 private struct NetworkRequestRow: View {
-    let request: LoggerNetworkRequestEntity
+    let task: NetworkTaskEntity
 
     var body: some View {
-        NavigationLink(destination: LazyNetworkInspectorView(request: request)) {
-            ConsoleNetworkRequestView(viewModel: .init(request: request))
+        NavigationLink(destination: LazyNetworkInspectorView(task: task)) {
+            ConsoleNetworkRequestView(viewModel: .init(task: task))
         }
     }
 }
 
 // Create the underlying ViewModel lazily.
 private struct LazyNetworkInspectorView: View {
-    let request: LoggerNetworkRequestEntity
+    let task: NetworkTaskEntity
 
     var body: some View {
-        NetworkInspectorView(viewModel: .init(request: request))
+        NetworkInspectorView(viewModel: .init(task: task))
     }
 }
 
 // Create the underlying ViewModel lazily.
-private struct LazyConsoleeDetailsView: View {
+private struct LazyConsoleDetailsView: View {
     let message: LoggerMessageEntity
 
     var body: some View {
@@ -56,15 +56,15 @@ private struct LazyConsoleeDetailsView: View {
 }
 
 struct NetworkMessagesForEach: View {
-    let entities: [LoggerNetworkRequestEntity]
+    let entities: [NetworkTaskEntity]
 
     var body: some View {
         ForEach(entities, id: \.objectID, content: makeListItem)
     }
 
     @ViewBuilder
-    private func makeListItem(request: LoggerNetworkRequestEntity) -> some View {
-        NetworkRequestRow(request: request)
+    private func makeListItem(task: NetworkTaskEntity) -> some View {
+        NetworkRequestRow(task: task)
     }
 }
 

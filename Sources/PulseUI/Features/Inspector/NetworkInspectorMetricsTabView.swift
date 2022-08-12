@@ -23,30 +23,30 @@ struct NetworkInspectorMetricsTabView: View {
 }
 
 final class NetworkInspectorMetricsTabViewModel: ObservableObject {
-    var isPending: Bool { request.state == .pending }
-    private(set) lazy var progress = ProgressViewModel(request: request)
+    var isPending: Bool { task.state == .pending }
+    private(set) lazy var progress = ProgressViewModel(task: task)
 
     var metricsViewModel: NetworkInspectorMetricsViewModel? {
-        request.metrics.map(NetworkInspectorMetricsViewModel.init)
+        task.metrics.map(NetworkInspectorMetricsViewModel.init)
     }
 
-    private let request: LoggerNetworkRequestEntity
+    private let task: NetworkTaskEntity
     private var cancellable: AnyCancellable?
 
-    init(request: LoggerNetworkRequestEntity) {
-        self.request = request
-        cancellable = request.objectWillChange.sink { [weak self] in self?.refresh() }
+    init(task: NetworkTaskEntity) {
+        self.task = task
+        cancellable = task.objectWillChange.sink { [weak self] in self?.refresh() }
     }
 
     private func refresh() {
-withAnimation { objectWillChange.send() }
+        withAnimation { objectWillChange.send() }
     }
 }
 
 #if DEBUG
 struct NetworkInspectorMetricsTabView_Previews: PreviewProvider {
     static var previews: some View {
-        NetworkInspectorMetricsTabView(viewModel: .init(request: LoggerStore.preview.entity(for: .login)))
+        NetworkInspectorMetricsTabView(viewModel: .init(task: LoggerStore.preview.entity(for: .login)))
     }
 }
 #endif

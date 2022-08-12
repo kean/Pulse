@@ -13,7 +13,7 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 #if os(iOS) || os(macOS)
     let table: ConsoleTableViewModel
 #endif
-    @Published private(set) var entities: [LoggerNetworkRequestEntity] = []
+    @Published private(set) var entities: [NetworkTaskEntity] = []
 
     let details: ConsoleDetailsRouterViewModel
 
@@ -25,7 +25,7 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     var onDismiss: (() -> Void)?
 
     private let store: LoggerStore
-    private let controller: NSFetchedResultsController<LoggerNetworkRequestEntity>
+    private let controller: NSFetchedResultsController<NetworkTaskEntity>
     private var isActive = false
     private var latestSessionId: UUID?
     private var cancellables = [AnyCancellable]()
@@ -34,11 +34,11 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         self.store = store
         self.details = ConsoleDetailsRouterViewModel()
 
-        let request = NSFetchRequest<LoggerNetworkRequestEntity>(entityName: "\(LoggerNetworkRequestEntity.self)")
+        let request = NSFetchRequest<NetworkTaskEntity>(entityName: "\(NetworkTaskEntity.self)")
         request.fetchBatchSize = 100
-        request.sortDescriptors = [NSSortDescriptor(keyPath: \LoggerNetworkRequestEntity.createdAt, ascending: false)]
+        request.sortDescriptors = [NSSortDescriptor(keyPath: \NetworkTaskEntity.createdAt, ascending: false)]
 
-        self.controller = NSFetchedResultsController<LoggerNetworkRequestEntity>(fetchRequest: request, managedObjectContext: store.viewContext, sectionNameKeyPath: nil, cacheName: nil)
+        self.controller = NSFetchedResultsController<NetworkTaskEntity>(fetchRequest: request, managedObjectContext: store.viewContext, sectionNameKeyPath: nil, cacheName: nil)
 
         self.searchCriteria = NetworkSearchCriteriaViewModel(isDefaultStore: store === LoggerStore.shared)
 #if os(iOS) || os(macOS)
@@ -105,8 +105,8 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         for insertion in diff.insertions {
             if case let .insert(index, _, _) = insertion {
                 let indexPath = IndexPath(item: index, section: 0)
-                let message = controller.object(at: indexPath) as! LoggerNetworkRequestEntity
-                searchCriteria.didInsertEntity(message)
+                let task = controller.object(at: indexPath) as! NetworkTaskEntity
+                searchCriteria.didInsertEntity(task)
             }
         }
         if isActive {
@@ -135,7 +135,7 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     // MARK: - Misc
 
     private func getAllDomains() {
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "\(LoggerNetworkRequestEntity.self)")
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "\(NetworkTaskEntity.self)")
 
         // Required! Unless you set the resultType to NSDictionaryResultType, distinct can't work.
         // All objects in the backing store are implicitly distinct, but two dictionaries can be duplicates.

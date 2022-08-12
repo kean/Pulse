@@ -130,13 +130,13 @@ final class ConsoleTableViewController: UITableViewController {
         let viewModel: AnyObject
         switch entity {
         case let message as LoggerMessageEntity:
-            if let request = message.request {
-                viewModel = ConsoleNetworkRequestViewModel(request: request)
+            if let task = message.task {
+                viewModel = ConsoleNetworkRequestViewModel(task: task)
             } else {
                 viewModel = ConsoleMessageViewModel(message: message, searchCriteriaViewModel: self.viewModel.searchCriteriaViewModel)
             }
-        case let request as LoggerNetworkRequestEntity:
-            viewModel = ConsoleNetworkRequestViewModel(request: request)
+        case let task as NetworkTaskEntity:
+            viewModel = ConsoleNetworkRequestViewModel(task: task)
         default:
             fatalError("Invalid entity: \(entity)")
         }

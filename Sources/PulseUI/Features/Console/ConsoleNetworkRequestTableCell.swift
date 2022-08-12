@@ -15,7 +15,7 @@ final class ConsoleNetworkRequestTableCell: UITableViewCell, UIContextMenuIntera
     private let accessory = ConsoleMessageAccessoryView()
     private let details = UILabel()
     private let pin = PinIndicatorView()
-    private var state: LoggerNetworkRequestEntity.State?
+    private var state: NetworkTaskEntity.State?
 
     private var viewModel: ConsoleNetworkRequestViewModel?
     private var cancellable1: AnyCancellable?

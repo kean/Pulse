@@ -7,16 +7,13 @@ import CoreData
 extension LoggerStore {
     /// Returns Core Data model used by the store.
     static let model: NSManagedObjectModel = {
-        let model = NSManagedObjectModel()
-
         typealias Entity = NSEntityDescription
         typealias Attribute = NSAttributeDescription
         typealias Relationship = NSRelationshipDescription
 
-
         let message = Entity(class: LoggerMessageEntity.self)
         let metadata = Entity(class: LoggerMetadataEntity.self)
-        let request = Entity(class: LoggerNetworkRequestEntity.self)
+        let task = Entity(class: NetworkTaskEntity.self)
         let requestProgress = Entity(class: LoggerNetworkRequestProgressEntity.self)
         let blob = Entity(class: LoggerBlobHandleEntity.self)
         let inlinedData = Entity(class: LoggerInlineDataEntity.self)
@@ -33,11 +30,11 @@ extension LoggerStore {
             Attribute(name: "level", type: .integer16AttributeType),
             Attribute(name: "label", type: .stringAttributeType),
             Attribute(name: "text", type: .stringAttributeType),
-            Relationship(name: "metadata", type: .oneToMany, entity: metadata),
             Attribute(name: "file", type: .stringAttributeType),
             Attribute(name: "function", type: .stringAttributeType),
             Attribute(name: "line", type: .integer32AttributeType),
-            Relationship(name: "request", type: .oneToOne(isOptional: true), entity: request)
+            Relationship(name: "metadata", type: .oneToMany, entity: metadata),
+            Relationship(name: "task", type: .oneToOne(isOptional: true), entity: task)
         ]
 
         metadata.properties = [
@@ -45,7 +42,7 @@ extension LoggerStore {
             Attribute(name: "value", type: .stringAttributeType)
         ]
 
-        request.properties = [
+        task.properties = [
             Attribute(name: "createdAt", type: .dateAttributeType),
             Attribute(name: "isPinned", type: .booleanAttributeType),
             Attribute(name: "session", type: .UUIDAttributeType),
@@ -162,7 +159,8 @@ extension LoggerStore {
             Attribute(name: "data", type: .binaryDataAttributeType)
         ]
 
-        model.entities = [message, metadata, request, requestProgress, blob, inlinedData, urlRequest, urlResponse, error, metrics, transactionMetrics]
+        let model = NSManagedObjectModel()
+        model.entities = [message, metadata, task, requestProgress, blob, inlinedData, urlRequest, urlResponse, error, metrics, transactionMetrics]
         return model
     }()
 }

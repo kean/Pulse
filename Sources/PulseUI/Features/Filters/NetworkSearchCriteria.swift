@@ -312,7 +312,7 @@ final class NetworkSearchFilter: ObservableObject, Hashable, Identifiable {
     }
 }
 
-func evaluateProgrammaticFilters(_ filters: [NetworkSearchFilter], entity: LoggerNetworkRequestEntity, store: LoggerStore) -> Bool {
+func evaluateProgrammaticFilters(_ filters: [NetworkSearchFilter], entity: NetworkTaskEntity, store: LoggerStore) -> Bool {
     func isMatch(filter: NetworkSearchFilter) -> Bool {
         switch filter.field {
         case .requestBody: return filter.matches(string: String(data: entity.requestBody?.data ?? Data(), encoding: .utf8) ?? "")
@@ -328,14 +328,12 @@ func evaluateProgrammaticFilters(_ filters: [NetworkSearchFilter], entity: Logge
     return true
 }
 
-private let isNetworkMessagePredicate = NSPredicate(format: "request != nil")
-
 extension NetworkSearchCriteria {
-    static func update(request: NSFetchRequest<LoggerNetworkRequestEntity>, filterTerm: String, criteria: NetworkSearchCriteria, filters: [NetworkSearchFilter], isOnlyErrors: Bool, sessionId: UUID?) {
+    static func update(request: NSFetchRequest<NetworkTaskEntity>, filterTerm: String, criteria: NetworkSearchCriteria, filters: [NetworkSearchFilter], isOnlyErrors: Bool, sessionId: UUID?) {
         var predicates = [NSPredicate]()
 
         if isOnlyErrors {
-            predicates.append(NSPredicate(format: "requestState == %d", LoggerNetworkRequestEntity.State.failure.rawValue))
+            predicates.append(NSPredicate(format: "requestState == %d", NetworkTaskEntity.State.failure.rawValue))
         }
 
         if criteria.dates.isCurrentSessionOnly, let sessionId = sessionId {

@@ -7,7 +7,7 @@ import Pulse
 
 #if os(iOS) || os(macOS)
 
-extension LoggerNetworkRequestEntity {
+extension NetworkTaskEntity {
     func cURLDescription() -> String {
         let request = currentRequest ?? originalRequest
         guard let url = request.url else {
@@ -38,7 +38,7 @@ extension LoggerNetworkRequestEntity {
 
 #endif
 
-extension LoggerNetworkRequestEntity {
+extension NetworkTaskEntity {
     var requestFileViewerContext: FileViewerViewModel.Context {
         FileViewerViewModel.Context(
             contentType: originalRequest.contentType,
@@ -58,9 +58,7 @@ extension LoggerNetworkRequestEntity {
             error: decodingError
         )
     }
-}
 
-extension LoggerNetworkRequestEntity {
     var decodingError: NetworkLogger.DecodingError? {
         error?.error as? NetworkLogger.DecodingError
     }

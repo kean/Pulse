@@ -45,20 +45,20 @@ final class URLSessionProxyTests: XCTestCase {
         wait(for: [didComplete], timeout: 5)
 
         // RECORD
-        let requests = try store.allRequests()
-        let request = try XCTUnwrap(requests.first)
+        let tasks = try store.allTasks()
+        let task = try XCTUnwrap(tasks.first)
 
         // THEN
-        XCTAssertEqual(requests.count, 1)
+        XCTAssertEqual(tasks.count, 1)
 
-        XCTAssertEqual(request.url, dataURL.absoluteString)
-        XCTAssertEqual(request.host, nil)
-        XCTAssertEqual(request.httpMethod, "GET")
-        XCTAssertNil(request.errorDomain)
-        XCTAssertEqual(request.errorCode, 0)
-        XCTAssertEqual(request.requestState, LoggerNetworkRequestEntity.State.success.rawValue)
+        XCTAssertEqual(task.url, dataURL.absoluteString)
+        XCTAssertEqual(task.host, nil)
+        XCTAssertEqual(task.httpMethod, "GET")
+        XCTAssertNil(task.errorDomain)
+        XCTAssertEqual(task.errorCode, 0)
+        XCTAssertEqual(task.requestState, NetworkTaskEntity.State.success.rawValue)
 
-        let message = try XCTUnwrap(request.message)
+        let message = try XCTUnwrap(task.message)
         XCTAssertEqual(message.label, "network")
     }
 
@@ -75,20 +75,20 @@ final class URLSessionProxyTests: XCTestCase {
         wait(for: [didComplete], timeout: 5)
 
         // RECORD
-        let requests = try store.allRequests()
-        let request = try XCTUnwrap(requests.first)
+        let tasks = try store.allTasks()
+        let task = try XCTUnwrap(tasks.first)
 
         // THEN
-        XCTAssertEqual(requests.count, 1)
+        XCTAssertEqual(tasks.count, 1)
 
-        XCTAssertEqual(request.url, dataURL.absoluteString)
-        XCTAssertEqual(request.host, nil)
-        XCTAssertEqual(request.httpMethod, "GET")
-        XCTAssertEqual(request.errorDomain, .urlError)
-        XCTAssertEqual(request.errorCode, -1100)
-        XCTAssertEqual(request.requestState, LoggerNetworkRequestEntity.State.failure.rawValue)
+        XCTAssertEqual(task.url, dataURL.absoluteString)
+        XCTAssertEqual(task.host, nil)
+        XCTAssertEqual(task.httpMethod, "GET")
+        XCTAssertEqual(task.errorDomain, .urlError)
+        XCTAssertEqual(task.errorCode, -1100)
+        XCTAssertEqual(task.requestState, NetworkTaskEntity.State.failure.rawValue)
 
-        let message = try XCTUnwrap(request.message)
+        let message = try XCTUnwrap(task.message)
         XCTAssertEqual(message.label, "network")
     }
 }

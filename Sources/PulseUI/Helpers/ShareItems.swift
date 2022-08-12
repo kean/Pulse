@@ -43,8 +43,8 @@ enum ConsoleShareService {
 
     private static func format(message: LoggerMessageEntity) -> String {
         let title = "\(dateFormatter.string(from: message.createdAt)) [\(message.level)]-[\(message.label)] \(message.text)"
-        if let request = message.request {
-            return title + "\n\n" + share(request, output: .plainText)
+        if let task = message.task {
+            return title + "\n\n" + share(task, output: .plainText)
         } else {
             return title
         }
@@ -59,18 +59,18 @@ enum ConsoleShareService {
     }
 
     static func share(_ message: LoggerMessageEntity) -> String {
-        if let request = message.request {
-            return share(request, output: .plainText) // this should never happen
+        if let task = message.task {
+            return share(task, output: .plainText) // this should never happen
         } else {
             return message.text
         }
     }
 
-    static func share(_ request: LoggerNetworkRequestEntity, output: NetworkMessageRenderType) -> String {
+    static func share(_ task: NetworkTaskEntity, output: NetworkMessageRenderType) -> String {
         switch output {
-        case .plainText: return Render.asPlainText(request: request)
-        case .markdown: return Render.asMarkdown(request: request)
-        case .html: return Render.asHTML(request: request)
+        case .plainText: return Render.asPlainText(task: task)
+        case .markdown: return Render.asMarkdown(task: task)
+        case .html: return Render.asHTML(task: task)
         }
     }
 }

@@ -37,7 +37,7 @@ extension LoggerStore {
         /// network requests.
         public var messageCount: Int
         /// The number of recorded network requests.
-        public var requestCount: Int
+        public var taskCount: Int
         /// The number of stored network response and requests bodies.
         public var blobCount: Int
         /// The complete size of the store, including the database and all

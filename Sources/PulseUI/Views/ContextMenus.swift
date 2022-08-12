@@ -23,7 +23,7 @@ struct ButtonCopyMessage: View {
 }
 
 struct NetworkMessageContextMenu: View {
-    let request: LoggerNetworkRequestEntity
+    let task: NetworkTaskEntity
 
     @Binding private(set) var sharedItems: ShareItems?
 
@@ -36,17 +36,17 @@ struct NetworkMessageContextMenu: View {
             } else {
                 shareAsButtons
             }
-            if request.responseBodySize > 0 {
+            if task.responseBodySize > 0 {
                 Button(action: {
-                    sharedItems = ShareItems([request.responseBody?.data ?? Data()])
+                    sharedItems = ShareItems([task.responseBody?.data ?? Data()])
                 }) {
                     Text("Share Response")
                     Image(systemName: "square.and.arrow.up")
                 }
             }
         }
-        NetworkMessageContextMenuCopySection(request: request)
-        if let message = request.message {
+        NetworkMessageContextMenuCopySection(task: task)
+        if let message = task.message {
             PinButton(viewModel: .init(message: message))
         }
     }
@@ -54,13 +54,13 @@ struct NetworkMessageContextMenu: View {
     @ViewBuilder
     private var shareAsButtons: some View {
         Button(action: {
-            sharedItems = ShareItems([ConsoleShareService.share(request, output: .plainText)])
+            sharedItems = ShareItems([ConsoleShareService.share(task, output: .plainText)])
         }) {
             Text("Share as Plain Text")
             Image(systemName: "square.and.arrow.up")
         }
         Button(action: {
-            let text = ConsoleShareService.share(request, output: .markdown)
+            let text = ConsoleShareService.share(task, output: .markdown)
             let directory = TemporaryDirectory()
             let fileURL = directory.write(text: text, extension: "markdown")
             sharedItems = ShareItems([fileURL], cleanup: directory.remove)
@@ -69,7 +69,7 @@ struct NetworkMessageContextMenu: View {
             Image(systemName: "square.and.arrow.up")
         }
         Button(action: {
-            let text = ConsoleShareService.share(request, output: .html)
+            let text = ConsoleShareService.share(task, output: .html)
             let directory = TemporaryDirectory()
             let fileURL = directory.write(text: text, extension: "html")
             sharedItems = ShareItems([fileURL], cleanup: directory.remove)
@@ -78,7 +78,7 @@ struct NetworkMessageContextMenu: View {
             Image(systemName: "square.and.arrow.up")
         }
         Button(action: {
-            sharedItems = ShareItems([request.cURLDescription()])
+            sharedItems = ShareItems([task.cURLDescription()])
         }) {
             Text("Share as cURL")
             Image(systemName: "square.and.arrow.up")
@@ -87,11 +87,11 @@ struct NetworkMessageContextMenu: View {
 }
 
 struct NetworkMessageContextMenuCopySection: View {
-    var request: LoggerNetworkRequestEntity
+    var task: NetworkTaskEntity
 
     var body: some View {
         Section {
-            if let url = request.url {
+            if let url = task.url {
                 Button(action: {
                     UXPasteboard.general.string = url
                     runHapticFeedback()
@@ -100,7 +100,7 @@ struct NetworkMessageContextMenuCopySection: View {
                     Image(systemName: "doc.on.doc")
                 }
             }
-            if let host = request.host {
+            if let host = task.host {
                 Button(action: {
                     UXPasteboard.general.string = host
                     runHapticFeedback()
@@ -109,9 +109,9 @@ struct NetworkMessageContextMenuCopySection: View {
                     Image(systemName: "doc.on.doc")
                 }
             }
-            if request.responseBodySize > 0 {
+            if task.responseBodySize > 0 {
                 Button(action: {
-                    guard let data = request.responseBody?.data else { return }
+                    guard let data = task.responseBody?.data else { return }
                     UXPasteboard.general.string = String(data: data, encoding: .utf8)
                     runHapticFeedback()
                 }) {
