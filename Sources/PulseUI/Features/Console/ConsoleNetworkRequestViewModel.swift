@@ -70,7 +70,7 @@ final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
             title += " · "
             title += StatusCodeFormatter.string(for: Int(task.statusCode))
 #if !os(watchOS)
-            switch task.taskType ?? .dataTask {
+            switch task.type ?? .dataTask {
             case .uploadTask:
                 if task.requestBodySize > 0 {
                     let sizeText = ByteCountFormatter.string(fromByteCount: task.requestBodySize)

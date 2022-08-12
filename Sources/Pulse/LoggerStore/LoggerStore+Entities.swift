@@ -29,13 +29,12 @@ public final class NetworkTaskEntity: NSManagedObject {
     @NSManaged public var isPinned: Bool
     @NSManaged public var session: UUID
     @NSManaged public var taskId: UUID
-    @NSManaged public var message: LoggerMessageEntity?
 
     /// Returns task type
-    public var taskType: NetworkLogger.TaskType? {
-        NetworkLogger.TaskType(rawValue: rawTaskType)
+    public var type: NetworkLogger.TaskType? {
+        NetworkLogger.TaskType(rawValue: taskType)
     }
-    @NSManaged public var rawTaskType: Int16
+    @NSManaged public var taskType: Int16
 
     // MARK: Request
 
@@ -55,18 +54,13 @@ public final class NetworkTaskEntity: NSManagedObject {
 
     // MARK: State
 
-    /// Returns request state.
-    public var state: State {
-        State(rawValue: requestState) ?? .pending
-    }
-
     /// Contains ``State-swift.enum`` raw value.
     @NSManaged public var requestState: Int16
     /// Request progress.
     ///
     /// - note: The entity is created lazily when the first progress report
     /// is delivered. If no progress updates are delivered, it's never created.
-    @NSManaged public var progress: LoggerNetworkRequestProgressEntity?
+    @NSManaged public var progress: NetworkTaskProgressEntity?
 
     /// Total request duration end date.
     @NSManaged public var duration: Double
@@ -80,10 +74,6 @@ public final class NetworkTaskEntity: NSManagedObject {
     @NSManaged public var metrics: NetworkMetricsEntity?
     @NSManaged var rawMetadata: LoggerInlineDataEntity?
 
-    public var metadata: [String: String] {
-        rawMetadata.flatMap { try? JSONDecoder().decode([String: String].self, from: $0.data) } ?? [:]
-    }
-
     /// The request body handle.
     @NSManaged public var requestBody: LoggerBlobHandleEntity?
     /// The response body handle.
@@ -92,12 +82,23 @@ public final class NetworkTaskEntity: NSManagedObject {
     @NSManaged public var requestBodySize: Int64
     /// The size of the response body.
     @NSManaged public var responseBodySize: Int64
+    /// Associated (technical) message.
+    @NSManaged public var message: LoggerMessageEntity?
 
     // MARK: Helpers
+
+    public var metadata: [String: String] {
+        rawMetadata.flatMap { try? JSONDecoder().decode([String: String].self, from: $0.data) } ?? [:]
+    }
 
     public var errorDomain: ErrorDomain? {
         get { ErrorDomain(rawValue: rawErrorDomain) }
         set { rawErrorDomain = newValue?.rawValue ?? 0 }
+    }
+
+    /// Returns request state.
+    public var state: State {
+        State(rawValue: requestState) ?? .pending
     }
 
     public enum State: Int16 {
@@ -110,7 +111,7 @@ public final class NetworkTaskEntity: NSManagedObject {
 }
 
 /// Indicates current download or upload progress.
-public final class LoggerNetworkRequestProgressEntity: NSManagedObject {
+public final class NetworkTaskProgressEntity: NSManagedObject {
     /// Indicates current download or upload progress.
     @NSManaged public var completedUnitCount: Int64
     /// Indicates current download or upload progress.

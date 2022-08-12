@@ -16,7 +16,7 @@ struct NetworkInspectorResponseView: View {
                 .onDisappear { self.viewModel.onDisappear() }
         } else if viewModel.task.state == .pending {
             SpinnerView(viewModel: viewModel.progress)
-        } else if viewModel.task.taskType == .downloadTask {
+        } else if viewModel.task.type == .downloadTask {
             PlaceholderView(imageName: "arrow.down.circle", title: {
                 var title = "Downloaded to a File"
                 if viewModel.task.responseBodySize > 0 {

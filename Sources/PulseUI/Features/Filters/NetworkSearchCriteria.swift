@@ -392,7 +392,7 @@ extension NetworkSearchCriteria {
                 predicates.append(NSPredicate(format: "isFromCache == YES"))
             }
             if case .some(let taskType) = criteria.networking.taskType {
-                predicates.append(NSPredicate(format: "rawTaskType == %i", taskType.rawValue))
+                predicates.append(NSPredicate(format: "taskType == %i", taskType.rawValue))
             }
         }
 

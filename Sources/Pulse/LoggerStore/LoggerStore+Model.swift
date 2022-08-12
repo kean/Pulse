@@ -12,16 +12,18 @@ extension LoggerStore {
         typealias Relationship = NSRelationshipDescription
 
         let message = Entity(class: LoggerMessageEntity.self)
-        let metadata = Entity(class: LoggerMetadataEntity.self)
+
         let task = Entity(class: NetworkTaskEntity.self)
-        let requestProgress = Entity(class: LoggerNetworkRequestProgressEntity.self)
-        let blob = Entity(class: LoggerBlobHandleEntity.self)
-        let inlinedData = Entity(class: LoggerInlineDataEntity.self)
-        let urlRequest = Entity(class: NetworkRequestEntity.self)
-        let urlResponse = Entity(class: NetworkResponseEntity.self)
+        let progress = Entity(class: NetworkTaskProgressEntity.self)
+        let request = Entity(class: NetworkRequestEntity.self)
+        let response = Entity(class: NetworkResponseEntity.self)
         let error = Entity(class: NetworkErrorEntity.self)
         let metrics = Entity(class: NetworkMetricsEntity.self)
-        let transactionMetrics = Entity(class: NetworkTransactionMetricsEntity.self)
+        let transaction = Entity(class: NetworkTransactionMetricsEntity.self)
+
+        let metadata = Entity(class: LoggerMetadataEntity.self)
+        let data = Entity(class: LoggerInlineDataEntity.self)
+        let blob = Entity(class: LoggerBlobHandleEntity.self)
 
         message.properties = [
             Attribute(name: "createdAt", type: .dateAttributeType),
@@ -47,7 +49,7 @@ extension LoggerStore {
             Attribute(name: "isPinned", type: .booleanAttributeType),
             Attribute(name: "session", type: .UUIDAttributeType),
             Attribute(name: "taskId", type: .UUIDAttributeType),
-            Attribute(name: "rawTaskType", type: .integer16AttributeType),
+            Attribute(name: "taskType", type: .integer16AttributeType),
             Attribute(name: "url", type: .stringAttributeType),
             Attribute(name: "host", type: .stringAttributeType),
             Attribute(name: "httpMethod", type: .stringAttributeType),
@@ -60,19 +62,19 @@ extension LoggerStore {
             Attribute(name: "requestBodySize", type: .integer64AttributeType),
             Attribute(name: "responseBodySize", type: .integer64AttributeType),
             Attribute(name: "isFromCache", type: .booleanAttributeType),
-            Relationship(name: "originalRequest", type: .oneToOne(), entity: urlRequest),
-            Relationship(name: "currentRequest", type: .oneToOne(isOptional: true), entity: urlRequest),
-            Relationship(name: "response", type: .oneToOne(isOptional: true), entity: urlResponse),
+            Relationship(name: "originalRequest", type: .oneToOne(), entity: request),
+            Relationship(name: "currentRequest", type: .oneToOne(isOptional: true), entity: request),
+            Relationship(name: "response", type: .oneToOne(isOptional: true), entity: response),
             Relationship(name: "error", type: .oneToOne(isOptional: true), entity: error),
             Relationship(name: "metrics", type: .oneToOne(isOptional: true), entity: metrics),
             Relationship(name: "message", type: .oneToOne(), entity: message),
-            Relationship(name: "rawMetadata", type: .oneToOne(), entity: inlinedData),
+            Relationship(name: "rawMetadata", type: .oneToOne(), entity: data),
             Relationship(name: "requestBody", type: .oneToOne(isOptional: true), deleteRule: .noActionDeleteRule, entity: blob),
             Relationship(name: "responseBody", type: .oneToOne(isOptional: true), deleteRule: .noActionDeleteRule, entity: blob),
-            Relationship(name: "progress", type: .oneToOne(isOptional: true), entity: requestProgress)
+            Relationship(name: "progress", type: .oneToOne(isOptional: true), entity: progress)
         ]
 
-        urlRequest.properties = [
+        request.properties = [
             Attribute(name: "url", type: .stringAttributeType) { $0.isOptional = true },
             Attribute(name: "httpMethod", type: .stringAttributeType) { $0.isOptional = true },
             Attribute(name: "httpHeaders", type: .stringAttributeType),
@@ -85,7 +87,7 @@ extension LoggerStore {
             Attribute(name: "rawCachePolicy", type: .integer16AttributeType)
         ]
 
-        urlResponse.properties = [
+        response.properties = [
             Attribute(name: "url", type: .stringAttributeType),
             Attribute(name: "statusCode", type: .integer16AttributeType),
             Attribute(name: "httpHeaders", type: .stringAttributeType),
@@ -98,7 +100,7 @@ extension LoggerStore {
             Attribute(name: "underlyingError", type: .binaryDataAttributeType)
         ]
 
-        requestProgress.properties = [
+        progress.properties = [
             Attribute(name: "completedUnitCount", type: .integer64AttributeType),
             Attribute(name: "totalUnitCount", type: .integer64AttributeType)
         ]
@@ -107,14 +109,14 @@ extension LoggerStore {
             Attribute(name: "startDate", type: .dateAttributeType),
             Attribute(name: "duration", type: .doubleAttributeType),
             Attribute(name: "redirectCount", type: .integer16AttributeType),
-            Relationship(name: "transactions", type: .oneToMany, entity: transactionMetrics)
+            Relationship(name: "transactions", type: .oneToMany, entity: transaction)
         ]
 
-        transactionMetrics.properties = [
+        transaction.properties = [
             Attribute(name: "index", type: .integer16AttributeType),
             Attribute(name: "rawFetchType", type: .integer16AttributeType),
-            Relationship(name: "request", type: .oneToOne(), entity: urlRequest),
-            Relationship(name: "response", type: .oneToOne(isOptional: true), entity: urlResponse),
+            Relationship(name: "request", type: .oneToOne(), entity: request),
+            Relationship(name: "response", type: .oneToOne(isOptional: true), entity: response),
             Attribute(name: "networkProtocol", type: .stringAttributeType),
             Attribute(name: "localAddress", type: .stringAttributeType),
             Attribute(name: "remoteAddress", type: .stringAttributeType),
@@ -152,15 +154,15 @@ extension LoggerStore {
             Attribute(name: "size", type: .integer32AttributeType),
             Attribute(name: "decompressedSize", type: .integer32AttributeType),
             Attribute(name: "linkCount", type: .integer16AttributeType),
-            Relationship(name: "inlineData", type: .oneToOne(isOptional: true), entity: inlinedData)
+            Relationship(name: "inlineData", type: .oneToOne(isOptional: true), entity: data)
         ]
 
-        inlinedData.properties = [
+        data.properties = [
             Attribute(name: "data", type: .binaryDataAttributeType)
         ]
 
         let model = NSManagedObjectModel()
-        model.entities = [message, metadata, task, requestProgress, blob, inlinedData, urlRequest, urlResponse, error, metrics, transactionMetrics]
+        model.entities = [message, metadata, task, progress, blob, data, request, response, error, metrics, transaction]
         return model
     }()
 }

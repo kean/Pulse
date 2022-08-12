@@ -301,7 +301,7 @@ extension LoggerStore {
             return
         }
         let progress = request.progress ?? {
-            let progress = LoggerNetworkRequestProgressEntity(context: backgroundContext)
+            let progress = NetworkTaskProgressEntity(context: backgroundContext)
             request.progress = progress
             return progress
         }()
@@ -428,7 +428,7 @@ extension LoggerStore {
 
         let task = NetworkTaskEntity(context: backgroundContext)
         task.taskId = taskId
-        task.rawTaskType = taskType.rawValue
+        task.taskType = taskType.rawValue
         task.createdAt = createdAt
         task.responseBodySize = -1
         task.requestBodySize = -1

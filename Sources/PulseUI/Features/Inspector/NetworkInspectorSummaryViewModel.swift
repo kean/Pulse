@@ -50,7 +50,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
 
     var transferViewModel: NetworkInspectorTransferInfoViewModel? {
         task.metrics.map {
-            NetworkInspectorTransferInfoViewModel(metrics: $0, taskType: task.taskType ?? .dataTask)
+            NetworkInspectorTransferInfoViewModel(metrics: $0, taskType: task.type ?? .dataTask)
         }
     }
 
@@ -75,7 +75,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
             items.append(("Source", task.isFromCache ? "Cache" : "Network"))
         }
 
-        var title = task.taskType?.urlSessionTaskClassName ?? "Summary"
+        var title = task.type?.urlSessionTaskClassName ?? "Summary"
         #if os(watchOS)
         title = title.replacingOccurrences(of: "URLSession", with: "")
         #endif
@@ -192,7 +192,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     }
 
     var responseBodySection: KeyValueSectionViewModel {
-        if task.taskType == .downloadTask, task.responseBodySize > 0 {
+        if task.type == .downloadTask, task.responseBodySize > 0 {
             return KeyValueSectionViewModel(title: "Response Body", color: .indigo, items: [
                 ("Download Size", ByteCountFormatter.string(fromByteCount: task.responseBodySize))
             ])

@@ -232,7 +232,7 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertEqual(try context.count(for: LoggerMessageEntity.self), 2)
         XCTAssertEqual(try context.count(for: LoggerMetadataEntity.self), 0)
         XCTAssertEqual(try context.count(for: NetworkTaskEntity.self), 0)
-        XCTAssertEqual(try context.count(for: LoggerNetworkRequestProgressEntity.self), 0)
+        XCTAssertEqual(try context.count(for: NetworkTaskProgressEntity.self), 0)
         XCTAssertEqual(try context.count(for: LoggerBlobHandleEntity.self), 0)
         XCTAssertEqual(try context.count(for: LoggerInlineDataEntity.self), 0)
     }
@@ -393,7 +393,7 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertEqual(try context.count(for: LoggerMessageEntity.self), 2)
         XCTAssertEqual(try context.count(for: LoggerMetadataEntity.self), 0)
         XCTAssertEqual(try context.count(for: NetworkTaskEntity.self), 1)
-        XCTAssertEqual(try context.count(for: LoggerNetworkRequestProgressEntity.self), 0)
+        XCTAssertEqual(try context.count(for: NetworkTaskProgressEntity.self), 0)
         XCTAssertEqual(try context.count(for: LoggerBlobHandleEntity.self), 0)
 
         XCTAssertEqual(try store.allMessages().first?.label, "kept")
@@ -424,7 +424,7 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertEqual(try store.backgroundContext.count(for: LoggerMessageEntity.self), 0)
         XCTAssertEqual(try store.backgroundContext.count(for: LoggerMetadataEntity.self), 0)
         XCTAssertEqual(try store.backgroundContext.count(for: NetworkTaskEntity.self), 0)
-        XCTAssertEqual(try store.backgroundContext.count(for: LoggerNetworkRequestProgressEntity.self), 0)
+        XCTAssertEqual(try store.backgroundContext.count(for: NetworkTaskProgressEntity.self), 0)
         XCTAssertEqual(try store.backgroundContext.count(for: LoggerBlobHandleEntity.self), 0)
         XCTAssertEqual(try store.backgroundContext.count(for: LoggerInlineDataEntity.self), 0)
     }
