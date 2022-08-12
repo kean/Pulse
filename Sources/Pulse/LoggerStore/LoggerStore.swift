@@ -286,10 +286,12 @@ extension LoggerStore {
 
     private func makeLabel(named name: String) -> LoggerLabelEntity {
         if let entity = try? backgroundContext.first(LoggerLabelEntity.self, { $0.predicate = NSPredicate(format: "name == %@", name) }) {
+            entity.count += 1
             return entity
         }
         let entity = LoggerLabelEntity(context: backgroundContext)
         entity.name = name
+        entity.count = 1
         return entity
     }
 
@@ -693,6 +695,7 @@ extension LoggerStore {
         switch document {
         case .package:
             try? deleteEntities(for: LoggerMessageEntity.fetchRequest())
+            try? deleteEntities(for: LoggerLabelEntity.fetchRequest())
             try? deleteEntities(for: LoggerBlobHandleEntity.fetchRequest())
             try? Files.removeItem(at: blobsURL)
             Files.createDirectoryIfNeeded(at: blobsURL)
@@ -883,6 +886,10 @@ extension LoggerStore {
         for message in messages {
             message.task?.requestBody.map(unlink)
             message.task?.responseBody.map(unlink)
+            message.label.count -= 1
+            if message.label.count == 0 {
+                backgroundContext.delete(message.label)
+            }
         }
 
         // Remove messages using an efficient batch request

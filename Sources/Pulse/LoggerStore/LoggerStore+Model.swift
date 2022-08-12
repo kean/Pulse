@@ -12,7 +12,6 @@ extension LoggerStore {
         typealias Relationship = NSRelationshipDescription
 
         let message = Entity(class: LoggerMessageEntity.self)
-#warning("TODO: implement label deletion")
         let label = Entity(class: LoggerLabelEntity.self)
 
         let task = Entity(class: NetworkTaskEntity.self)
@@ -43,6 +42,7 @@ extension LoggerStore {
 
         label.properties = [
             Attribute(name: "name", type: .stringAttributeType),
+            Attribute(name: "count", type: .integer64AttributeType),
         ]
 
         metadata.properties = [

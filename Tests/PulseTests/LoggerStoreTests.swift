@@ -576,17 +576,22 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertEqual(try store.allMessages().count, 10)
     }
 
-    // MARK: - Remove Messages
+    // MARK: - Remove All
 
-    func testRemoveAllMessages() throws {
+    func testRemoveAll() throws {
         // GIVEN
         populate(store: store)
         store.storeMessage(label: "with meta", level: .debug, message: "test", metadata: ["hey": .string("this is meta yo")], file: #file, function: #function, line: #line)
 
         let context = store.viewContext
         XCTAssertEqual(try context.count(for: LoggerMessageEntity.self), 11)
+        XCTAssertEqual(try context.count(for: LoggerLabelEntity.self), 5)
         XCTAssertEqual(try context.count(for: LoggerMetadataEntity.self), 1)
         XCTAssertEqual(try context.count(for: NetworkTaskEntity.self), 3)
+        XCTAssertEqual(try context.count(for: NetworkRequestEntity.self), 9)
+        XCTAssertEqual(try context.count(for: NetworkResponseEntity.self), 6)
+        XCTAssertEqual(try context.count(for: NetworkMetricsEntity.self), 3)
+        XCTAssertEqual(try context.count(for: NetworkTransactionMetricsEntity.self), 3)
         XCTAssertEqual(try context.count(for: LoggerBlobHandleEntity.self), 3)
         XCTAssertEqual(try context.count(for: LoggerInlineDataEntity.self), 4)
 
@@ -595,8 +600,13 @@ final class LoggerStoreTests: XCTestCase {
 
         // THEN both message and metadata are removed
         XCTAssertEqual(try context.count(for: LoggerMessageEntity.self), 0)
+        XCTAssertEqual(try context.count(for: LoggerLabelEntity.self), 0)
         XCTAssertEqual(try context.count(for: LoggerMetadataEntity.self), 0)
         XCTAssertEqual(try context.count(for: NetworkTaskEntity.self), 0)
+        XCTAssertEqual(try context.count(for: NetworkRequestEntity.self), 0)
+        XCTAssertEqual(try context.count(for: NetworkResponseEntity.self), 0)
+        XCTAssertEqual(try context.count(for: NetworkMetricsEntity.self), 0)
+        XCTAssertEqual(try context.count(for: NetworkTransactionMetricsEntity.self), 0)
         XCTAssertEqual(try context.count(for: LoggerBlobHandleEntity.self), 0)
         XCTAssertEqual(try context.count(for: LoggerInlineDataEntity.self), 0)
     }
@@ -757,7 +767,7 @@ final class LoggerStoreTests: XCTestCase {
         print("Package: \(try storeURL.directoryTotalSize()). Archive: \(size)")
     }
 
-    func _testMesasureExportSizeLarge() throws {
+    func testMesasureExportSizeLarge() throws {
         // GIVEN
         let store = makeStore {
             // Thumbnail generation significantly impacts the right speed

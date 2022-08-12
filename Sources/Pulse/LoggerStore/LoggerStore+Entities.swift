@@ -20,6 +20,7 @@ public final class LoggerMessageEntity: NSManagedObject {
 
 public final class LoggerLabelEntity: NSManagedObject {
     @NSManaged public var name: String
+    @NSManaged public var count: Int64
 }
 
 public final class LoggerMetadataEntity: NSManagedObject {
