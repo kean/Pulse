@@ -268,7 +268,7 @@ extension LoggerStore {
         let message = LoggerMessageEntity(context: backgroundContext)
         message.createdAt = event.createdAt
         message.level = event.level.rawValue
-        message.label = event.label
+        message.label = makeLabel(named: event.label)
         message.session = event.session
         message.text = event.message
         message.file = (event.file as NSString).lastPathComponent
@@ -282,6 +282,15 @@ extension LoggerStore {
                 return entity
             })
         }
+    }
+
+    private func makeLabel(named name: String) -> LoggerLabelEntity {
+        if let entity = try? backgroundContext.first(LoggerLabelEntity.self, { $0.predicate = NSPredicate(format: "name == %@", name) }) {
+            return entity
+        }
+        let entity = LoggerLabelEntity(context: backgroundContext)
+        entity.name = name
+        return entity
     }
 
     private func process(_ event: Event.NetworkTaskCreated) {
@@ -438,7 +447,7 @@ extension LoggerStore {
         let message = LoggerMessageEntity(context: backgroundContext)
         message.createdAt = createdAt
         message.level = Level.debug.rawValue
-        message.label = "network"
+        message.label = makeLabel(named: "network")
         message.session = session
         message.file = ""
         message.function = ""

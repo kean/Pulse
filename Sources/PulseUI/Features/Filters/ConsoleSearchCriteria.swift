@@ -242,9 +242,9 @@ extension ConsoleSearchCriteria {
 
         if criteria.labels.isEnabled {
             if let focusedLabel = criteria.labels.focused {
-                predicates.append(NSPredicate(format: "label == %@", focusedLabel))
+                predicates.append(NSPredicate(format: "label.name == %@", focusedLabel))
             } else if !criteria.labels.hidden.isEmpty {
-                predicates.append(NSPredicate(format: "NOT label IN %@", Array(criteria.labels.hidden)))
+                predicates.append(NSPredicate(format: "NOT label.name IN %@", Array(criteria.labels.hidden)))
             }
         }
 

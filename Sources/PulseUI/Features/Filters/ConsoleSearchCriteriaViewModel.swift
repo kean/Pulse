@@ -14,6 +14,7 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
 
     @Published private(set) var allLabels: [String] = []
     private var allLabelsSet: Set<String> = []
+    private let labels: ManagedObjectsObserver<LoggerLabelEntity>
 
     @Published private(set) var isButtonResetEnabled = false
 
@@ -21,11 +22,17 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
 
     private var cancellables: [AnyCancellable] = []
 
-    init(isDefaultStore: Bool = true) {
-        if !isDefaultStore {
+    init(store: LoggerStore) {
+        labels = ManagedObjectsObserver(context: store.viewContext, sortDescriptior: NSSortDescriptor(keyPath: \LoggerLabelEntity.name, ascending: true))
+
+        if store !== LoggerStore.shared {
             criteria.dates.isCurrentSessionOnly = false
             defaultCriteria.dates.isCurrentSessionOnly = false
         }
+
+        labels.$objects.sink { [weak self] in
+            self?.displayLabels($0.map(\.name))
+        }.store(in: &cancellables)
 
         resetFilters()
 
@@ -84,18 +91,9 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
 
     // MARK: Managing Labels
 
-    func setInitialLabels(_ labels: Set<String>) {
-        allLabelsSet = labels
-        allLabels = allLabelsSet.sorted()
-    }
-
-    func didInsertEntity(_ entity: LoggerMessageEntity) {
-        var labels = allLabelsSet
-        labels.insert(entity.label)
-        if labels.count > allLabels.count {
-            allLabelsSet = labels
-            allLabels = allLabelsSet.sorted()
-        }
+    private func displayLabels(_ labels: [String]) {
+        allLabelsSet = Set(labels)
+        allLabels = labels
     }
 
     // MARK: Helpers

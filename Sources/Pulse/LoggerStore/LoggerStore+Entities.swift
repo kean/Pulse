@@ -9,13 +9,17 @@ public final class LoggerMessageEntity: NSManagedObject {
     @NSManaged public var isPinned: Bool
     @NSManaged public var session: UUID
     @NSManaged public var level: Int16
-    @NSManaged public var label: String
     @NSManaged public var text: String
     @NSManaged public var file: String
     @NSManaged public var function: String
     @NSManaged public var line: Int32 // Doubles as request state storage to save space
+    @NSManaged public var label: LoggerLabelEntity
     @NSManaged public var metadata: Set<LoggerMetadataEntity>
     @NSManaged public var task: NetworkTaskEntity?
+}
+
+public final class LoggerLabelEntity: NSManagedObject {
+    @NSManaged public var name: String
 }
 
 public final class LoggerMetadataEntity: NSManagedObject {

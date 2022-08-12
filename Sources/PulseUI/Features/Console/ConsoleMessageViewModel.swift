@@ -26,9 +26,9 @@ final class ConsoleMessageViewModel: Pinnable {
         if let badge = badge {
             string.append(badge.title, [.foregroundColor: UIColor.badgeColor(for: level)])
         }
-        if message.label != "default" {
+        if message.label.name != "default" {
             let prefix = badge == nil ? "" : " · "
-            string.append("\(prefix)\(message.label.capitalized)", [.foregroundColor: UIColor.secondaryLabel])
+            string.append("\(prefix)\(message.label.name.capitalized)", [.foregroundColor: UIColor.secondaryLabel])
         }
         return string
     }()
@@ -45,10 +45,10 @@ final class ConsoleMessageViewModel: Pinnable {
     
     init(message: LoggerMessageEntity, searchCriteriaViewModel: ConsoleSearchCriteriaViewModel? = nil) {
         let time = ConsoleMessageViewModel.timeFormatter.string(from: message.createdAt)
-        if message.label == "default" {
+        if message.label.name == "default" {
             self.title = time
         } else {
-            self.title = "\(time) · \(message.label.capitalized)"
+            self.title = "\(time) · \(message.label.name.capitalized)"
         }
         self.text = message.text
         self.textColor = ConsoleMessageStyle.textColor(level: LoggerStore.Level(rawValue: message.level) ?? .debug)
@@ -69,17 +69,17 @@ final class ConsoleMessageViewModel: Pinnable {
     }
     
     var focusLabel: String {
-        message.label.capitalized
+        message.label.name.capitalized
     }
     
     func focus() {
         searchCriteriaViewModel?.criteria.labels.isEnabled = true
-        searchCriteriaViewModel?.criteria.labels.focused = message.label
+        searchCriteriaViewModel?.criteria.labels.focused = message.label.name
     }
     
     func hide() {
         searchCriteriaViewModel?.criteria.labels.isEnabled = true
-        searchCriteriaViewModel?.criteria.labels.hidden.insert(message.label)
+        searchCriteriaViewModel?.criteria.labels.hidden.insert(message.label.name)
     }
 #endif
 }

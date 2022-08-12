@@ -396,7 +396,7 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertEqual(try context.count(for: NetworkTaskProgressEntity.self), 0)
         XCTAssertEqual(try context.count(for: LoggerBlobHandleEntity.self), 0)
 
-        XCTAssertEqual(try store.allMessages().first?.label, "kept")
+        XCTAssertEqual(try store.allMessages().first?.label.name, "kept")
         XCTAssertEqual(try store.allTasks().first?.url, "example.com/kept")
     }
 
@@ -646,7 +646,7 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertEqual(request.url, "https://github.com/login")
         XCTAssertEqual(request.host, "github.com")
         XCTAssertEqual(request.httpMethod, "GET")
-        XCTAssertEqual(request.taskType, .dataTask)
+        XCTAssertEqual(request.type, .dataTask)
         XCTAssertEqual(request.statusCode, 200)
         XCTAssertEqual(request.state, .success)
         XCTAssertEqual(request.responseContentType, "application/json")

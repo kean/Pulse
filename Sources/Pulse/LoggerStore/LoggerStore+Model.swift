@@ -12,6 +12,8 @@ extension LoggerStore {
         typealias Relationship = NSRelationshipDescription
 
         let message = Entity(class: LoggerMessageEntity.self)
+#warning("TODO: implement label deletion")
+        let label = Entity(class: LoggerLabelEntity.self)
 
         let task = Entity(class: NetworkTaskEntity.self)
         let progress = Entity(class: NetworkTaskProgressEntity.self)
@@ -30,13 +32,17 @@ extension LoggerStore {
             Attribute(name: "isPinned", type: .booleanAttributeType),
             Attribute(name: "session", type: .UUIDAttributeType),
             Attribute(name: "level", type: .integer16AttributeType),
-            Attribute(name: "label", type: .stringAttributeType),
             Attribute(name: "text", type: .stringAttributeType),
             Attribute(name: "file", type: .stringAttributeType),
             Attribute(name: "function", type: .stringAttributeType),
             Attribute(name: "line", type: .integer32AttributeType),
+            Relationship(name: "label", type: .oneToOne(), deleteRule: .noActionDeleteRule, entity: label),
             Relationship(name: "metadata", type: .oneToMany, entity: metadata),
             Relationship(name: "task", type: .oneToOne(isOptional: true), entity: task)
+        ]
+
+        label.properties = [
+            Attribute(name: "name", type: .stringAttributeType),
         ]
 
         metadata.properties = [
@@ -162,7 +168,7 @@ extension LoggerStore {
         ]
 
         let model = NSManagedObjectModel()
-        model.entities = [message, metadata, task, progress, blob, data, request, response, error, metrics, transaction]
+        model.entities = [message, label, metadata, task, progress, blob, data, request, response, error, metrics, transaction]
         return model
     }()
 }
