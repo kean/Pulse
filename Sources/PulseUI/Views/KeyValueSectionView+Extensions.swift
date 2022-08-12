@@ -29,7 +29,7 @@ extension KeyValueSectionViewModel {
     static func makeParameters(for request: NetworkRequestEntity) -> KeyValueSectionViewModel {
         KeyValueSectionViewModel(title: "Request Parameters", color: .gray, items: [
             ("Cache Policy", request.cachePolicy.description),
-            ("Timeout Interval", DurationFormatter.string(from: request.timeoutInterval, isPrecise: false)),
+            ("Timeout Interval", DurationFormatter.string(from: TimeInterval(request.timeoutInterval), isPrecise: false)),
             ("Allows Cellular Access", request.allowsCellularAccess.description),
             ("Allows Expensive Network Access", request.allowsExpensiveNetworkAccess.description),
             ("Allows Constrained Network Access", request.allowsConstrainedNetworkAccess.description),

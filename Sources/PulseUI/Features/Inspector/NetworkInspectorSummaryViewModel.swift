@@ -218,7 +218,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     // MARK: - Timings
 
     var timingDetailsViewModel: KeyValueSectionViewModel? {
-        guard let taskInterval = request.taskInterval else { return nil }
+        guard let taskInterval = request.metrics?.taskInterval else { return nil }
         return KeyValueSectionViewModel(title: "Timing", color: .orange, items: [
             ("Start Date", dateFormatter.string(from: taskInterval.start)),
             ("End Date", dateFormatter.string(from: taskInterval.end)),

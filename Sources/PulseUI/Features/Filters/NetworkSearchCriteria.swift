@@ -268,7 +268,7 @@ final class NetworkSearchFilter: ObservableObject, Hashable, Identifiable {
 
     var isProgrammatic: Bool {
         switch field {
-        case .requestHeader, .responseHeader, .requestBody, .responseBody: return true
+        case .requestBody, .responseBody: return true
         default: return false
         }
     }
@@ -305,32 +305,26 @@ final class NetworkSearchFilter: ObservableObject, Hashable, Identifiable {
         case .method: return "httpMethod"
         case .statusCode: return "statusCode"
         case .errorCode: return "errorCode"
+        case .requestHeader: return "originalRequest.httpHeaders"
+        case .responseHeader: return "response.httpHeaders"
         default: return nil
         }
     }
 }
 
-#warning("TODO: reimplement using SQL queries")
 func evaluateProgrammaticFilters(_ filters: [NetworkSearchFilter], entity: LoggerNetworkRequestEntity, store: LoggerStore) -> Bool {
-    let request = entity.originalRequest
-    let response = entity.response
-
     func isMatch(filter: NetworkSearchFilter) -> Bool {
         switch filter.field {
-        case .requestHeader: return request.headers.contains { filter.matches(string: $0.key) || filter.matches(string: $0.value) }
-        case .responseHeader: return (response?.headers ?? [:]).contains { filter.matches(string: $0.key) || filter.matches(string: $0.value) }
         case .requestBody: return filter.matches(string: String(data: entity.requestBody?.data ?? Data(), encoding: .utf8) ?? "")
         case .responseBody: return filter.matches(string: String(data: entity.responseBody?.data ?? Data(), encoding: .utf8) ?? "")
         default: assertionFailure(); return false
         }
     }
-
     for filter in filters where filter.isProgrammatic {
         if !isMatch(filter: filter) {
             return false
         }
     }
-
     return true
 }
 

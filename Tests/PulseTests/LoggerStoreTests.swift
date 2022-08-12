@@ -757,7 +757,7 @@ final class LoggerStoreTests: XCTestCase {
         print("Package: \(try storeURL.directoryTotalSize()). Archive: \(size)")
     }
 
-    func testMesasureExportSizeLarge() throws {
+    func _testMesasureExportSizeLarge() throws {
         // GIVEN
         let store = makeStore {
             // Thumbnail generation significantly impacts the right speed
@@ -765,7 +765,7 @@ final class LoggerStoreTests: XCTestCase {
         }
         defer { try? store.destroy() }
 
-        for _ in 0..<100 {
+        for _ in 0..<1000 {
             populate(store: store)
         }
 
@@ -781,6 +781,6 @@ final class LoggerStoreTests: XCTestCase {
         let info = try benchmark(title: "Open") {
             try LoggerStore(storeURL: copyURL)
         }
-        XCTAssertEqual(try info.viewContext.count(for: LoggerMessageEntity.self), 1000)
+        XCTAssertEqual(try info.viewContext.count(for: LoggerMessageEntity.self), 10000)
     }
 }
