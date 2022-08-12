@@ -108,7 +108,7 @@ struct NetworkInspectorTransferInfoView_Previews: PreviewProvider {
 }
 
 private let mockModel = NetworkInspectorTransferInfoViewModel(
-    metrics: LoggerStore.preview.entity(for: .login).details!.metrics!, taskType: .dataTask
+    metrics: LoggerStore.preview.entity(for: .login).metrics!, taskType: .dataTask
 )
 
 #endif
@@ -136,7 +136,7 @@ struct NetworkInspectorTransferInfoViewModel {
         isUpload = false
     }
 
-    init(metrics: NetworkLogger.Metrics, taskType: NetworkLogger.TaskType) {
+    init(metrics: NetworkMetricsEntity, taskType: NetworkLogger.TaskType) {
         self.init(transferSize: metrics.totalTransferSize, isUpload: taskType == .uploadTask)
     }
 

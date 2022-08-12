@@ -69,9 +69,9 @@ final class NetworkInspectorTransactionViewModel: ObservableObject {
     let timingViewModel: TimingViewModel?
     let transferSizeViewModel: NetworkInspectorTransferInfoViewModel?
 
-    private let transaction: NetworkLogger.TransactionMetrics
+    private let transaction: NetworkTransactionMetricsEntity
 
-    init(transaction: NetworkLogger.TransactionMetrics, metrics: NetworkLogger.Metrics) {
+    init(transaction: NetworkTransactionMetricsEntity, metrics: NetworkMetricsEntity) {
         self.details = NetworkMetricsDetailsViewModel(metrics: transaction)
         self.timingViewModel = TimingViewModel(transaction: transaction, metrics: metrics)
         if transaction.fetchType == .networkLoad {
@@ -82,24 +82,20 @@ final class NetworkInspectorTransactionViewModel: ObservableObject {
         self.transaction = transaction
     }
 
-#warning("TODO: reimplemnet")
-    lazy var requestSummary: KeyValueSectionViewModel? = nil // = KeyValueSectionViewModel.makeSummary(for: transaction.request)
+    lazy var requestSummary = KeyValueSectionViewModel.makeSummary(for: transaction.request)
 
-#warning("TODO: reimplemnet")
-    lazy var requestParameters: KeyValueSectionViewModel? = nil // = KeyValueSectionViewModel.makeParameters(for: transaction.request)
+    lazy var requestParameters = KeyValueSectionViewModel.makeParameters(for: transaction.request)
 
     lazy var requestHeaders = KeyValueSectionViewModel.makeRequestHeaders(
-        for: transaction.request.headers ?? [:],
+        for: transaction.request.headers,
         action: { [unowned self] in self.isOriginalRequestHeadersLinkActive = true }
     )
 
-#warning("TODO: reimplement")
     lazy var responseSummary: KeyValueSectionViewModel = {
-        return KeyValueSectionViewModel(title: "temp", color: .red)
-//        guard let response = transaction.response else {
-//            return KeyValueSectionViewModel(title: "Response", color: .indigo)
-//        }
-//        return KeyValueSectionViewModel.makeSummary(for: response)
+        guard let response = transaction.response else {
+            return KeyValueSectionViewModel(title: "Response", color: .indigo)
+        }
+        return KeyValueSectionViewModel.makeSummary(for: response)
     }()
 
     lazy var responseHeaders = KeyValueSectionViewModel.makeResponseHeaders(
@@ -124,11 +120,11 @@ struct NetworkInspectorTransactionView_Previews: PreviewProvider {
 }
 
 private let mockModel = NetworkInspectorTransactionViewModel(
-    transaction: mockMetrics.transactions.last!,
+    transaction: mockMetrics.orderedTransactions.last!,
     metrics: mockMetrics
 )
 
-private let mockMetrics = LoggerStore.preview.entity(for: .login).details!.metrics!
+private let mockMetrics = LoggerStore.preview.entity(for: .login).metrics!
 
 #endif
 

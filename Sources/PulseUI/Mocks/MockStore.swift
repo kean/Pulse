@@ -362,8 +362,6 @@ private func makeMetrics(for task: MockTask, taskInterval: DateInterval) -> Netw
         metrics.remotePort = 443
         metrics.localAddress = "192.168.0.13"
         metrics.localPort = 58622
-        metrics.negotiatedTLSCipherSuite = .AES_128_GCM_SHA256
-        metrics.negotiatedTLSProtocolVersion = .TLSv13
         return metrics
     }
 

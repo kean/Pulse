@@ -91,9 +91,9 @@ final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
         case .failure:
             title += " · "
             if request.errorCode != 0 {
-                if request.errorDomain == URLError.errorDomain {
+                if request.errorDomain == .urlError {
                     title += "\(request.errorCode) \(descriptionForURLErrorCode(Int(request.errorCode)))"
-                } else if request.errorDomain == NetworkLogger.DecodingError.domain {
+                } else if request.errorDomain == .decoding {
                     title += "Decoding Failed"
                 } else {
                     title += "Error"

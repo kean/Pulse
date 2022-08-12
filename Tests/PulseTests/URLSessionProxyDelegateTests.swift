@@ -68,8 +68,6 @@ final class URLSessionProxyDelegateTests: XCTestCase {
         XCTAssertEqual(request.errorCode, 0)
         XCTAssertEqual(request.requestState, LoggerNetworkRequestEntity.State.success.rawValue)
 
-        XCTAssertNotNil(request.details)
-
         let message = try XCTUnwrap(request.message)
         XCTAssertEqual(message.label, "network")
     }
@@ -148,8 +146,6 @@ final class URLSessionProxyDelegateTests: XCTestCase {
         XCTAssertNil(request.errorDomain)
         XCTAssertEqual(request.errorCode, 0)
         XCTAssertEqual(request.requestState, LoggerNetworkRequestEntity.State.success.rawValue)
-
-        XCTAssertNotNil(request.details)
 
         let message = try XCTUnwrap(request.message)
         XCTAssertEqual(message.label, "network")

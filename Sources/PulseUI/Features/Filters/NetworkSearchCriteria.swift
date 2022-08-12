@@ -389,7 +389,7 @@ extension NetworkSearchCriteria {
 
         if criteria.networking.isEnabled {
             if criteria.networking.isRedirect {
-                predicates.append(NSPredicate(format: "redirectCount >= 1"))
+                predicates.append(NSPredicate(format: "metrics.redirectCount >= 1"))
             }
             switch criteria.networking.source {
             case .any:

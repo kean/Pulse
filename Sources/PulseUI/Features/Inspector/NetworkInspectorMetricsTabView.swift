@@ -26,8 +26,8 @@ final class NetworkInspectorMetricsTabViewModel: ObservableObject {
     var isPending: Bool { request.state == .pending }
     private(set) lazy var progress = ProgressViewModel(request: request)
 
-    var metricsViewModel: NetworkInspectorMetricsViewModel?{
-        request.details?.metrics.map(NetworkInspectorMetricsViewModel.init)
+    var metricsViewModel: NetworkInspectorMetricsViewModel? {
+        request.metrics.map(NetworkInspectorMetricsViewModel.init)
     }
 
     private let request: LoggerNetworkRequestEntity

@@ -89,7 +89,7 @@ final class NetworkInspectorTransactionsListViewModel {
         let viewModel: () -> NetworkInspectorTransactionViewModel
     }
 
-    init(metrics: NetworkLogger.Metrics) {
+    init(metrics: NetworkMetricsEntity) {
         self.items = metrics.transactions.map { transaction in
             let title: String
             switch transaction.fetchType {
@@ -123,7 +123,7 @@ struct NetworkInspectorTransactionsListView_Previews: PreviewProvider {
 }
 
 private let mockModel = NetworkInspectorTransactionsListViewModel(
-    metrics: LoggerStore.preview.entity(for: .login).details!.metrics!
+    metrics: LoggerStore.preview.entity(for: .login).metrics!
 )
 #endif
 

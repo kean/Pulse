@@ -64,7 +64,7 @@ extension KeyValueSectionViewModel {
         )
     }
 
-    static func makeErrorDetails(for error: NetworkLogger.ResponseError, action: @escaping () -> Void) -> KeyValueSectionViewModel {
+    static func makeErrorDetails(for error: NetworkErrorEntity, action: @escaping () -> Void) -> KeyValueSectionViewModel {
         KeyValueSectionViewModel(
             title: "Error",
             color: .red,
@@ -72,7 +72,7 @@ extension KeyValueSectionViewModel {
             items: [
                 ("Domain", error.domain),
                 ("Code", descriptionForError(domain: error.domain, code: error.code)),
-                ("Description", error.debugDescription)
+                ("Description", error.errorDebugDescription)
             ])
     }
 
@@ -102,7 +102,7 @@ extension KeyValueSectionViewModel {
     }
 
 #if os(iOS) || os(macOS)
-    static func makeTiming(for transaction: NetworkLogger.TransactionMetrics) -> KeyValueSectionViewModel {
+    static func makeTiming(for transaction: NetworkTransactionMetricsEntity) -> KeyValueSectionViewModel {
         let timeFormatter = DateFormatter()
         timeFormatter.locale = Locale(identifier: "en_US")
         timeFormatter.dateFormat = "HH:mm:ss.SSSSSS"

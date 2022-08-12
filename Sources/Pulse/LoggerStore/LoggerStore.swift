@@ -48,6 +48,7 @@ public final class LoggerStore: @unchecked Sendable {
     private let blobsURL: URL
     private let manifestURL: URL
     private let databaseURL: URL // Points to a tempporary location if archive
+    private var requestsCache: [NetworkLogger.Request: NetworkRequestEntity] = [:]
 
     // MARK: Shared
 
@@ -292,6 +293,7 @@ extension LoggerStore {
         request.requestState = LoggerNetworkRequestEntity.State.pending.rawValue
         request.originalRequest = makeRequest(for: event.originalRequest)
         request.currentRequest = event.currentRequest.map(makeRequest)
+        requestsCache = [:]
     }
 
     private func process(_ event: Event.NetworkTaskProgressUpdated) {
@@ -313,16 +315,18 @@ extension LoggerStore {
         request.url = event.originalRequest.url?.absoluteString
         request.host = event.originalRequest.url?.host
         request.httpMethod = event.originalRequest.httpMethod
-        request.errorDomain = event.error?.domain
+        switch event.error?.domain {
+        case URLError.errorDomain: request.errorDomain = .urlError
+        case NetworkLogger.DecodingError.domain: request.errorDomain = .decoding
+        default: request.errorDomain = nil
+        }
         request.errorCode = Int32(event.error?.code ?? 0)
         let statusCode = Int32(event.response?.statusCode ?? 0)
         request.statusCode = statusCode
-        request.startDate = event.metrics?.taskInterval.start
         request.duration = event.metrics?.taskInterval.duration ?? 0
-        request.responseContentType = event.response?.contentType?.rawValue
+        request.responseContentType = event.response?.contentType?.type
         let isFailure = event.error != nil || (statusCode != 0 && !(200..<400).contains(statusCode))
         request.requestState = (isFailure ? LoggerNetworkRequestEntity.State.failure : .success).rawValue
-        request.redirectCount = Int16(event.metrics?.redirectCount ?? 0)
 
         // Populate response/request data
         let responseContentType = event.response?.contentType
@@ -357,21 +361,18 @@ extension LoggerStore {
         request.originalRequest = makeRequest(for: event.originalRequest)
         request.currentRequest = event.currentRequest.map(makeRequest)
         request.response = event.response.map(makeResponse)
+        request.error = event.error.map(makeError)
         request.metrics = event.metrics.map(makeMetrics)
-
-
-#warning("TEM")
-        // Populate details
-//        let details = LoggerNetworkRequestEntity.RequestDetails(
-//            error: event.error,
-//            metadata: {
-//                if let responseBody = event.responseBody, (responseContentType?.isImage ?? false) {
-//                    return makeImageMetadata(from: responseBody)
-//                }
-//                return nil
-//            }()
-//        )
-//        populateDetails(details, for: request)
+        request.rawMetadata = {
+            guard let responseBody = event.responseBody,
+               (responseContentType?.isImage ?? false),
+                  let data = try? JSONEncoder().encode(makeImageMetadata(from: responseBody)) else {
+                return nil
+            }
+            let entity = LoggerInlineDataEntity(context: backgroundContext)
+            entity.data = data
+            return entity
+        }()
 
         // Completed
         if let progress = request.progress {
@@ -386,20 +387,8 @@ extension LoggerStore {
                 message.level = Level.error.rawValue
             }
         }
-    }
 
-#warning("TODO: remove this")
-    private func populateDetails(_ details: LoggerNetworkRequestEntity.RequestDetails, for request: LoggerNetworkRequestEntity) {
-        guard let data = try? JSONEncoder().encode(details).compressed() else {
-            return
-        }
-        if let entity = request.detailsData {
-            entity.data = data
-        } else {
-            let entity = LoggerInlineDataEntity(context: backgroundContext)
-            entity.data = data
-            request.detailsData = entity
-        }
+        requestsCache = [:]
     }
 
     private func preprocessData(_ data: Data, contentType: NetworkLogger.ContentType?) -> Data {
@@ -432,8 +421,6 @@ extension LoggerStore {
         }
     }
 
-    #warning("TODO: move this side somewhere else")
-
     private func findOrCreateNetworkRequestEntity(forTaskId taskId: UUID, taskType: NetworkLogger.TaskType, createdAt: Date, session: UUID, url: URL?) -> LoggerNetworkRequestEntity {
         if let entity = firstNetworkRequest(forTaskId: taskId) {
             return entity
@@ -465,17 +452,21 @@ extension LoggerStore {
     }
 
     private func makeRequest(for request: NetworkLogger.Request) -> NetworkRequestEntity {
+        if let entity = requestsCache[request] {
+            return entity
+        }
         let entity = NetworkRequestEntity(context: backgroundContext)
         entity.url = request.url?.absoluteString
         entity.httpMethod = request.httpMethod
-        entity.httpHeaders = makeHeaders(for: request.headers)
+        entity.httpHeaders = NetworkRequestEntity.encodeHeaders(request.headers)
         entity.allowsCellularAccess = request.options.contains(.allowsCellularAccess)
         entity.allowsExpensiveNetworkAccess = request.options.contains(.allowsExpensiveNetworkAccess)
         entity.allowsConstrainedNetworkAccess = request.options.contains(.allowsConstrainedNetworkAccess)
         entity.httpShouldHandleCookies = request.options.contains(.httpShouldHandleCookies)
         entity.httpShouldUsePipelining = request.options.contains(.httpShouldUsePipelining)
-        entity.timeoutInterval = Double(request.timeout)
+        entity.timeoutInterval = Int32(request.timeout)
         entity.rawCachePolicy = UInt16(request.cachePolicy.rawValue)
+        requestsCache[request] = entity
         return entity
     }
 
@@ -483,33 +474,20 @@ extension LoggerStore {
         let entity = NetworkResponseEntity(context: backgroundContext)
         entity.url = response.url
         entity.statusCode = Int16(response.statusCode ?? 0)
-        entity.httpHeaders = makeHeaders(for: response.headers)
+        entity.httpHeaders = NetworkRequestEntity.encodeHeaders(response.headers)
         return entity
     }
 
-    private func makeHeaders(for headers: [String: String]?) -> Set<NetworkRequestHeaderEntity> {
-        Set((headers ?? [:]).map(findOrCreateHeader))
+    private func makeError(for error: NetworkLogger.ResponseError) -> NetworkErrorEntity {
+        let entity = NetworkErrorEntity(context: backgroundContext)
+        entity.code = error.code
+        entity.domain = error.domain
+        entity.errorDebugDescription = error.debugDescription
+        entity.underlyingError = error.underlyingError.flatMap { try? JSONEncoder().encode($0) }
+        return entity
     }
 
 #warning("TODO: normalize more data")
-
-#warning("TODO: implement removal (or not?)")
-    private func findOrCreateHeader(name: String, value: String) -> NetworkRequestHeaderEntity {
-        if let entity = findHeader(name: name, value: value) {
-            return entity
-        }
-        let entity = NetworkRequestHeaderEntity(context: backgroundContext)
-        entity.name = name
-        entity.value = value
-        return entity
-    }
-
-    private func findHeader(name: String, value: String) -> NetworkRequestHeaderEntity? {
-        try? backgroundContext.first(NetworkRequestHeaderEntity.self) {
-            $0.predicate = NSPredicate(format: "name == %@ AND value == %@", name, value)
-        }
-    }
-
     private func makeMetrics(for metrics: NetworkLogger.Metrics) -> NetworkMetricsEntity {
         let entity = NetworkMetricsEntity(context: backgroundContext)
         entity.startDate = metrics.taskInterval.start

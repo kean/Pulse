@@ -18,9 +18,9 @@ extension LoggerNetworkRequestEntity {
 
         components.append("-X \(request.httpMethod ?? "GET")")
 
-        for header in request.httpHeaders {
+        for header in request.headers {
             let escapedValue = header.value.replacingOccurrences(of: "\"", with: "\\\"")
-            components.append("-H \"\(header.name): \(escapedValue)\"")
+            components.append("-H \"\(header.key): \(escapedValue)\"")
         }
 
         if let httpBodyData = requestBody?.data {
@@ -43,7 +43,7 @@ extension LoggerNetworkRequestEntity {
         FileViewerViewModel.Context(
             contentType: originalRequest.contentType,
             originalSize: requestBodySize,
-            metadata: details?.metadata,
+            metadata: metadata,
             isResponse: false,
             error: nil
         )
@@ -53,14 +53,14 @@ extension LoggerNetworkRequestEntity {
         FileViewerViewModel.Context(
             contentType: response?.contentType,
             originalSize: responseBodySize,
-            metadata: details?.metadata,
+            metadata: metadata,
             isResponse: true,
-            error: details?.decodingError
+            error: decodingError
         )
     }
 }
 
-extension LoggerNetworkRequestEntity.RequestDetails {
+extension LoggerNetworkRequestEntity {
     var decodingError: NetworkLogger.DecodingError? {
         error?.error as? NetworkLogger.DecodingError
     }

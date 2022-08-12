@@ -8,11 +8,11 @@ import Pulse
 #if os(iOS) || os(macOS) || os(tvOS)
 
 extension TimingViewModel {
-    convenience init(metrics: NetworkLogger.Metrics) {
+    convenience init(metrics: NetworkMetricsEntity) {
         self.init(sections: makeTimingSections(metrics: metrics))
     }
 
-    convenience init?(transaction: NetworkLogger.TransactionMetrics, metrics: NetworkLogger.Metrics) {
+    convenience init?(transaction: NetworkTransactionMetricsEntity, metrics: NetworkMetricsEntity) {
         guard let startDate = transaction.timing.fetchStartDate else {
             return nil
         }
@@ -29,14 +29,14 @@ extension TimingViewModel {
     }
 }
 
-private func makeTimingSections(metrics: NetworkLogger.Metrics) -> [TimingRowSectionViewModel] {
+private func makeTimingSections(metrics: NetworkMetricsEntity) -> [TimingRowSectionViewModel] {
     let taskInterval = metrics.taskInterval
 
     var sections = [TimingRowSectionViewModel]()
 
-    var currentURL: URL?
+    var currentURL: String?
 
-    for transaction in metrics.transactions {
+    for transaction in metrics.orderedTransactions {
         let rows = makeTimingRows(transaction: transaction, taskInterval: taskInterval)
         guard !rows.isEmpty else {
             continue
@@ -44,7 +44,7 @@ private func makeTimingSections(metrics: NetworkLogger.Metrics) -> [TimingRowSec
 
         if metrics.redirectCount > 0, let url = transaction.request.url, currentURL != url {
             currentURL = url
-            sections.append(TimingRowSectionViewModel(title: url.absoluteString, items: [], isHeader: true))
+            sections.append(TimingRowSectionViewModel(title: url, items: [], isHeader: true))
         }
 
         sections += rows
@@ -66,7 +66,7 @@ private func _makeRow(title: String, color: UXColor, from: Date, to: Date?, task
     return TimingRowViewModel(title: title, value: value, color: color, start: CGFloat(start), length: length)
 }
 
-private func makeTimingRows(transaction: NetworkLogger.TransactionMetrics, taskInterval: DateInterval) -> [TimingRowSectionViewModel] {
+private func makeTimingRows(transaction: NetworkTransactionMetricsEntity, taskInterval: DateInterval) -> [TimingRowSectionViewModel] {
     var sections = [TimingRowSectionViewModel]()
 
     func makeRow(title: String, color: UXColor, from: Date, to: Date?) -> TimingRowViewModel {

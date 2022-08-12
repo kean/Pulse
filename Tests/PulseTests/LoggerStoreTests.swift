@@ -588,7 +588,7 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertEqual(try context.count(for: LoggerMetadataEntity.self), 1)
         XCTAssertEqual(try context.count(for: LoggerNetworkRequestEntity.self), 3)
         XCTAssertEqual(try context.count(for: LoggerBlobHandleEntity.self), 3)
-        XCTAssertEqual(try context.count(for: LoggerInlineDataEntity.self), 6)
+        XCTAssertEqual(try context.count(for: LoggerInlineDataEntity.self), 4)
 
         // WHEN
         store.removeAll()
@@ -651,7 +651,7 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertEqual(request.state, .success)
         XCTAssertEqual(request.responseContentType, "application/json; charset=utf-8")
         XCTAssertEqual(request.isFromCache, false)
-        XCTAssertEqual(request.redirectCount, 0)
+        XCTAssertEqual(request.metrics?.redirectCount, 0)
 
         // Details
         XCTAssertEqual(request.originalRequest.url, "https://github.com/login")

@@ -40,13 +40,13 @@ struct NetworkInspectorMetricsView: View {
 // MARK: - ViewModel
 
 final class NetworkInspectorMetricsViewModel {
-    let metrics: NetworkLogger.Metrics
+    let metrics: NetworkMetricsEntity
     let timingViewModel: TimingViewModel
 #if !os(tvOS)
     let transactions: NetworkInspectorTransactionsListViewModel?
 #endif
 
-    init(metrics: NetworkLogger.Metrics) {
+    init(metrics: NetworkMetricsEntity) {
         self.metrics = metrics
         self.timingViewModel = TimingViewModel(metrics: metrics)
 
@@ -67,7 +67,7 @@ struct NetworkInspectorMetricsView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
             NetworkInspectorMetricsView(viewModel: .init(
-                metrics: LoggerStore.preview.entity(for: .octocat).details!.metrics!
+                metrics: LoggerStore.preview.entity(for: .octocat).metrics!
             ))
         }
     }

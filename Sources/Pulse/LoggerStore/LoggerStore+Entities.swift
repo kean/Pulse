@@ -46,7 +46,7 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
     // MARK: Response
 
     @NSManaged public var statusCode: Int32
-    @NSManaged public var errorDomain: String?
+    @NSManaged public var rawErrorDomain: Int16
     @NSManaged public var errorCode: Int32
     /// Response content-type.
     @NSManaged public var responseContentType: String?
@@ -68,56 +68,21 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
     /// is delivered. If no progress updates are delivered, it's never created.
     @NSManaged public var progress: LoggerNetworkRequestProgressEntity?
 
-    // MARK: Metrics (Denormalized)
-
-    // Timing
-    /// Request start date.
-    @NSManaged public var startDate: Date?
-    /// Request end date.
-    public var endDate: Date? {
-        startDate.map { $0.addingTimeInterval(duration) }
-    }
     /// Total request duration end date.
     @NSManaged public var duration: Double
-
-    #warning("remove")
-    /// Number of redirects.
-    @NSManaged public var redirectCount: Int16
 
     // MARK: Details
 
     @NSManaged public var originalRequest: NetworkRequestEntity
     @NSManaged public var currentRequest: NetworkRequestEntity?
     @NSManaged public var response: NetworkResponseEntity?
+    @NSManaged public var error: NetworkErrorEntity?
     @NSManaged public var metrics: NetworkMetricsEntity?
+    @NSManaged var rawMetadata: LoggerInlineDataEntity?
 
-    /// Returns request details.
-    ///
-    /// - important: Accessing it for the first time can be a relatively slow
-    /// operation because it performs decoding on the fly, but the decoded
-    /// entity is cached until the object is turned into a fault.
-    public var details: LoggerNetworkRequestEntity.RequestDetails? {
-        if let (details, count) = cachedDetails, count == detailsData?.data.count {
-            return details
-        }
-        guard let compressedData = detailsData?.data,
-              let data = try? compressedData.decompressed(),
-              let details = try? JSONDecoder().decode(LoggerNetworkRequestEntity.RequestDetails.self, from: data as Data) else {
-            return nil
-        }
-        self.cachedDetails = (details, compressedData.count)
-        return details
+    public var metadata: [String: String] {
+        rawMetadata.flatMap { try? JSONDecoder().decode([String: String].self, from: $0.data) } ?? [:]
     }
-
-    public override func willTurnIntoFault() {
-        super.willTurnIntoFault()
-        cachedDetails = nil
-    }
-
-    private var cachedDetails: (RequestDetails, Int)?
-
-    /// Request details (encoded and compressed ``LoggerNetworkRequestDetails``).
-    @NSManaged var detailsData: LoggerInlineDataEntity?
 
     /// The request body handle.
     @NSManaged public var requestBody: LoggerBlobHandleEntity?
@@ -130,33 +95,17 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
 
     // MARK: Helpers
 
-    /// Returns task interval (if available from metrics).
-    public var taskInterval: DateInterval? {
-        guard let startDate = self.startDate, let endDate = self.endDate else {
-            return nil
-        }
-        return DateInterval(start: startDate, end: endDate)
+    public var errorDomain: ErrorDomain? {
+        get { ErrorDomain(rawValue: rawErrorDomain) }
+        set { rawErrorDomain = newValue?.rawValue ?? 0 }
     }
 
     public enum State: Int16 {
-        case pending = 1
-        case success = 2
-        case failure = 3
+        case pending = 1, success, failure = 3
     }
 
-    /// The request details stored in a database in a denormalized format.
-    public final class RequestDetails: Codable, Sendable {
-        public let error: NetworkLogger.ResponseError?
-        public let metadata: [String: String]?
-
-        public init(error: NetworkLogger.ResponseError? = nil, metadata: [String : String]? = nil) {
-            self.error = error
-            self.metadata = metadata
-        }
-
-        enum CodingKeys: String, CodingKey {
-            case error = "3", metadata = "5"
-        }
+    public enum ErrorDomain: Int16 {
+        case urlError = 1, decoding
     }
 }
 
@@ -169,16 +118,41 @@ public final class LoggerNetworkRequestProgressEntity: NSManagedObject {
     @NSManaged public var totalUnitCount: Int64
 }
 
-#warning("TODO: move metrics here")
 public final class NetworkMetricsEntity: NSManagedObject {
     @NSManaged public var startDate: Date
     @NSManaged public var duration: Double
     @NSManaged public var redirectCount: Int16
     @NSManaged public var transactions: Set<NetworkTransactionMetricsEntity>
 
+    public var orderedTransactions: [NetworkTransactionMetricsEntity] {
+        transactions.sorted { $0.index < $1.index }
+    }
+
     public var taskInterval: DateInterval {
         DateInterval(start: startDate, duration: duration)
     }
+
+    public var totalTransferSize: NetworkLogger.TransferSizeInfo {
+        var size = NetworkLogger.TransferSizeInfo()
+        for transaction in transactions {
+            size = size.merging(transaction.transferSize)
+        }
+        return size
+    }
+}
+
+public final class NetworkErrorEntity: NSManagedObject {
+    @NSManaged public var code: Int
+    @NSManaged public var domain: String
+    @NSManaged public var errorDebugDescription: String
+    /// JSON-encoded underlying error
+    @NSManaged public var underlyingError: Data?
+
+    public lazy var error: Error? = {
+        guard let data = underlyingError else { return nil }
+        let error = try? JSONDecoder().decode(NetworkLogger.ResponseError.UnderlyingError.self, from: data)
+        return error?.error
+    }()
 }
 
 public final class NetworkTransactionMetricsEntity: NSManagedObject {
@@ -221,6 +195,14 @@ public final class NetworkTransactionMetricsEntity: NSManagedObject {
         URLSessionTaskMetrics.ResourceFetchType(rawValue: Int(rawFetchType)) ?? .networkLoad
     }
 
+    public var negotiatedTLSProtocolVersion: tls_protocol_version_t? {
+        tls_protocol_version_t(rawValue: UInt16(rawNegotiatedTLSProtocolVersion))
+    }
+
+    public var negotiatedTLSCipherSuite: tls_ciphersuite_t? {
+        tls_ciphersuite_t(rawValue: UInt16(rawNegotiatedTLSCipherSuite))
+    }
+
     public var transferSize: NetworkLogger.TransferSizeInfo {
         var value = NetworkLogger.TransferSizeInfo()
         value.requestHeaderBytesSent = requestHeaderBytesSent
@@ -254,7 +236,7 @@ public final class NetworkRequestEntity: NSManagedObject {
 
     @NSManaged public var url: String?
     @NSManaged public var httpMethod: String?
-    @NSManaged public var httpHeaders: Set<NetworkRequestHeaderEntity>
+    @NSManaged public var httpHeaders: String
 
     // MARK: Options
 
@@ -263,7 +245,7 @@ public final class NetworkRequestEntity: NSManagedObject {
     @NSManaged public var allowsConstrainedNetworkAccess: Bool
     @NSManaged public var httpShouldHandleCookies: Bool
     @NSManaged public var httpShouldUsePipelining: Bool
-    @NSManaged public var timeoutInterval: Double
+    @NSManaged public var timeoutInterval: Int32
     @NSManaged public var rawCachePolicy: UInt16
 
     public var cachePolicy: URLRequest.CachePolicy {
@@ -274,21 +256,29 @@ public final class NetworkRequestEntity: NSManagedObject {
         headers["Content-Type"].flatMap(NetworkLogger.ContentType.init)
     }
 
-    public var headers: [String: String] { httpHeaders.asDictionary() }
+    public lazy var headers: [String: String] = NetworkRequestEntity.decodeHeaders(httpHeaders)
 }
 
-public final class NetworkRequestHeaderEntity: NSManagedObject {
-    @NSManaged public var name: String
-    @NSManaged public var value: String
-}
+extension NetworkRequestEntity {
+    static func encodeHeaders(_ headers: [String: String]?) -> String {
+        var output = ""
+        for (name, value) in headers ?? [:] {
+            if !output.isEmpty { output.append("\n")}
+            output.append("\(name): \(value)")
+        }
+        return output
+    }
 
-#warning("TODO: udpate docc")
-
-extension Set where Element == NetworkRequestHeaderEntity {
-    func asDictionary() -> [String: String] {
+    static func decodeHeaders(_ string: String) -> [String: String] {
+        let pairs = string.components(separatedBy: "\n")
         var headers: [String: String] = [:]
-        for header in self {
-            headers[header.name] = header.value
+        for pair in pairs {
+            if let separatorIndex = pair.firstIndex(of: ":") {
+                let valueStartIndex = pair.index(separatorIndex, offsetBy: 2)
+                if pair.indices.contains(valueStartIndex) {
+                    headers[String(pair[..<separatorIndex])] = String(pair[valueStartIndex...])
+                }
+            }
         }
         return headers
     }
@@ -297,7 +287,7 @@ extension Set where Element == NetworkRequestHeaderEntity {
 public final class NetworkResponseEntity: NSManagedObject {
     @NSManaged public var url: String?
     @NSManaged public var statusCode: Int16
-    @NSManaged public var httpHeaders: Set<NetworkRequestHeaderEntity>
+    @NSManaged public var httpHeaders: String
 
     public var contentType: NetworkLogger.ContentType? {
         headers["Content-Type"].flatMap(NetworkLogger.ContentType.init)
@@ -307,7 +297,7 @@ public final class NetworkResponseEntity: NSManagedObject {
         headers["Content-Length"].flatMap { Int64($0) }
     }
 
-    public var headers: [String: String] { httpHeaders.asDictionary() }
+    public lazy var headers: [String: String] = NetworkRequestEntity.decodeHeaders(httpHeaders)
 }
 
 /// Doesn't contain any data, just the key and some additional payload.

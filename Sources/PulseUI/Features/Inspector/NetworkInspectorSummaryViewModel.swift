@@ -19,7 +19,6 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     private(set) lazy var _progressViewModel = ProgressViewModel(request: request)
 
     private let request: LoggerNetworkRequestEntity
-    private var details: LoggerNetworkRequestEntity.RequestDetails? { request.details }
     private var cancellable: AnyCancellable?
 
     init(request: LoggerNetworkRequestEntity) {
@@ -50,7 +49,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     // MARK: - Header
 
     var transferViewModel: NetworkInspectorTransferInfoViewModel? {
-        details?.metrics.map {
+        request.metrics.map {
             NetworkInspectorTransferInfoViewModel(metrics: $0, taskType: request.taskType ?? .dataTask)
         }
     }
@@ -84,7 +83,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     }
 
     var errorModel: KeyValueSectionViewModel? {
-        guard let error = details?.error else { return nil }
+        guard let error = request.error else { return nil }
         return KeyValueSectionViewModel.makeErrorDetails(for: error) { [unowned self] in
             isErrorRawLinkActive = true
         }
@@ -224,7 +223,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
             ("Start Date", dateFormatter.string(from: taskInterval.start)),
             ("End Date", dateFormatter.string(from: taskInterval.end)),
             ("Duration", DurationFormatter.string(from: taskInterval.duration)),
-            ("Redirect Count", request.redirectCount.description)
+            ("Redirect Count", (request.metrics?.redirectCount ?? 0).description)
         ])
     }
 

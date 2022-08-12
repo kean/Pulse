@@ -22,7 +22,7 @@ struct NetworkInspectorMetricsDetailsView: View {
 struct NetworkMetricsDetailsViewModel {
     let sections: [KeyValueSectionViewModel]
 
-    init?(metrics: NetworkLogger.TransactionMetrics) {
+    init?(metrics: NetworkTransactionMetricsEntity) {
         guard metrics.fetchType != .localCache else {
             return nil
         }
@@ -35,7 +35,7 @@ struct NetworkMetricsDetailsViewModel {
     }
 }
 
-private func makeTransferSection(for metrics: NetworkLogger.TransactionMetrics) -> KeyValueSectionViewModel? {
+private func makeTransferSection(for metrics: NetworkTransactionMetricsEntity) -> KeyValueSectionViewModel? {
     let transferSize = metrics.transferSize
     return KeyValueSectionViewModel(title: "Data Transfer", color: .secondary, items: [
         ("Request Headers", formatBytes(transferSize.requestHeaderBytesSent)),
@@ -47,17 +47,17 @@ private func makeTransferSection(for metrics: NetworkLogger.TransactionMetrics) 
     ])
 }
 
-private func makeProtocolSection(for metrics: NetworkLogger.TransactionMetrics) -> KeyValueSectionViewModel? {
+private func makeProtocolSection(for metrics: NetworkTransactionMetricsEntity) -> KeyValueSectionViewModel? {
     KeyValueSectionViewModel(title: "Protocol", color: .secondary, items: [
         ("Network Protocol", metrics.networkProtocol),
         ("Remote Address", metrics.remoteAddress),
-        ("Remote Port", metrics.remotePort.map(String.init)),
+        ("Remote Port", metrics.remotePort > 0 ? String(metrics.remotePort) : nil),
         ("Local Address", metrics.localAddress),
-        ("Local Port", metrics.localPort.map(String.init))
+        ("Local Port", metrics.localPort > 0 ? String(metrics.localPort) : nil)
     ])
 }
 
-private func makeSecuritySection(for metrics: NetworkLogger.TransactionMetrics) -> KeyValueSectionViewModel? {
+private func makeSecuritySection(for metrics: NetworkTransactionMetricsEntity) -> KeyValueSectionViewModel? {
     guard let suite = metrics.negotiatedTLSCipherSuite,
           let version = metrics.negotiatedTLSProtocolVersion else {
         return nil
@@ -68,14 +68,14 @@ private func makeSecuritySection(for metrics: NetworkLogger.TransactionMetrics) 
     ])
 }
 
-private func makeMiscSection(for metrics: NetworkLogger.TransactionMetrics) -> KeyValueSectionViewModel? {
+private func makeMiscSection(for metrics: NetworkTransactionMetricsEntity) -> KeyValueSectionViewModel? {
     KeyValueSectionViewModel(title: "Characteristics", color: .secondary, items: [
-        ("Cellular", metrics.conditions.contains(.isCellular).description),
-        ("Expensive", metrics.conditions.contains(.isExpensive).description),
-        ("Constrained", metrics.conditions.contains(.isConstrained).description),
-        ("Proxy Connection", metrics.conditions.contains(.isProxyConnection).description),
-        ("Reused Connection", metrics.conditions.contains(.isReusedConnection).description),
-        ("Multipath", metrics.conditions.contains(.isMultipath).description)
+        ("Cellular", metrics.isCellular.description),
+        ("Expensive", metrics.isExpensive.description),
+        ("Constrained", metrics.isConstrained.description),
+        ("Proxy Connection", metrics.isProxyConnection.description),
+        ("Reused Connection", metrics.isReusedConnection.description),
+        ("Multipath", metrics.isMultipath.description)
     ])
 }
 
@@ -91,7 +91,7 @@ private func formatBytes(_ count: Int64) -> String {
 struct NetworkInspectorMetricsDetailsView_Previews: PreviewProvider {
     static var previews: some View {
         NetworkInspectorMetricsDetailsView(viewModel: .init(
-            metrics: LoggerStore.preview.entity(for: .login).details!.metrics!.transactions.first!
+            metrics: LoggerStore.preview.entity(for: .login).metrics!.transactions.first!
         )!)
         .padding()
         .previewLayout(.sizeThatFits)

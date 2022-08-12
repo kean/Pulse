@@ -22,7 +22,7 @@ extension LoggerStore {
         let inlinedData = Entity(class: LoggerInlineDataEntity.self)
         let urlRequest = Entity(class: NetworkRequestEntity.self)
         let urlResponse = Entity(class: NetworkResponseEntity.self)
-        let httpHeader = Entity(class: NetworkRequestHeaderEntity.self)
+        let error = Entity(class: NetworkErrorEntity.self)
         let metrics = Entity(class: NetworkMetricsEntity.self)
         let transactionMetrics = Entity(class: NetworkTransactionMetricsEntity.self)
 
@@ -54,23 +54,22 @@ extension LoggerStore {
             Attribute(name: "url", type: .stringAttributeType),
             Attribute(name: "host", type: .stringAttributeType),
             Attribute(name: "httpMethod", type: .stringAttributeType),
-            Attribute(name: "errorDomain", type: .stringAttributeType),
+            Attribute(name: "rawErrorDomain", type: .integer16AttributeType),
             Attribute(name: "errorCode", type: .integer32AttributeType),
             Attribute(name: "statusCode", type: .integer32AttributeType),
-            Attribute(name: "startDate", type: .dateAttributeType),
             Attribute(name: "duration", type: .doubleAttributeType),
             Attribute(name: "responseContentType", type: .stringAttributeType),
             Attribute(name: "requestState", type: .integer16AttributeType),
-            Attribute(name: "redirectCount", type: .integer16AttributeType),
             Attribute(name: "requestBodySize", type: .integer64AttributeType),
             Attribute(name: "responseBodySize", type: .integer64AttributeType),
             Attribute(name: "isFromCache", type: .booleanAttributeType),
             Relationship(name: "originalRequest", type: .oneToOne(), entity: urlRequest),
             Relationship(name: "currentRequest", type: .oneToOne(isOptional: true), entity: urlRequest),
             Relationship(name: "response", type: .oneToOne(isOptional: true), entity: urlResponse),
+            Relationship(name: "error", type: .oneToOne(isOptional: true), entity: error),
             Relationship(name: "metrics", type: .oneToOne(isOptional: true), entity: metrics),
             Relationship(name: "message", type: .oneToOne(), entity: message),
-            Relationship(name: "detailsData", type: .oneToOne(), entity: inlinedData),
+            Relationship(name: "rawMetadata", type: .oneToOne(), entity: inlinedData),
             Relationship(name: "requestBody", type: .oneToOne(isOptional: true), deleteRule: .noActionDeleteRule, entity: blob),
             Relationship(name: "responseBody", type: .oneToOne(isOptional: true), deleteRule: .noActionDeleteRule, entity: blob),
             Relationship(name: "progress", type: .oneToOne(isOptional: true), entity: requestProgress)
@@ -79,25 +78,27 @@ extension LoggerStore {
         urlRequest.properties = [
             Attribute(name: "url", type: .stringAttributeType) { $0.isOptional = true },
             Attribute(name: "httpMethod", type: .stringAttributeType) { $0.isOptional = true },
-            Relationship(name: "httpHeaders", type: .oneToMany, entity: httpHeader),
+            Attribute(name: "httpHeaders", type: .stringAttributeType),
             Attribute(name: "allowsCellularAccess", type: .booleanAttributeType),
             Attribute(name: "allowsExpensiveNetworkAccess", type: .booleanAttributeType),
             Attribute(name: "allowsConstrainedNetworkAccess", type: .booleanAttributeType),
             Attribute(name: "httpShouldHandleCookies", type: .booleanAttributeType),
             Attribute(name: "httpShouldUsePipelining", type: .booleanAttributeType),
-            Attribute(name: "timeoutInterval", type: .doubleAttributeType),
+            Attribute(name: "timeoutInterval", type: .integer32AttributeType),
             Attribute(name: "rawCachePolicy", type: .integer16AttributeType)
         ]
 
         urlResponse.properties = [
             Attribute(name: "url", type: .stringAttributeType),
             Attribute(name: "statusCode", type: .integer16AttributeType),
-            Relationship(name: "httpHeaders", type: .oneToMany, entity: httpHeader),
+            Attribute(name: "httpHeaders", type: .stringAttributeType),
         ]
 
-        httpHeader.properties = [
-            Attribute(name: "name", type: .stringAttributeType),
-            Attribute(name: "value", type: .stringAttributeType)
+        error.properties = [
+            Attribute(name: "code", type: .integer32AttributeType),
+            Attribute(name: "domain", type: .stringAttributeType),
+            Attribute(name: "errorDebugDescription", type: .stringAttributeType),
+            Attribute(name: "underlyingError", type: .binaryDataAttributeType)
         ]
 
         requestProgress.properties = [
@@ -161,7 +162,7 @@ extension LoggerStore {
             Attribute(name: "data", type: .binaryDataAttributeType)
         ]
 
-        model.entities = [message, metadata, request, requestProgress, blob, inlinedData, urlRequest, urlResponse, httpHeader, metrics, transactionMetrics]
+        model.entities = [message, metadata, request, requestProgress, blob, inlinedData, urlRequest, urlResponse, error, metrics, transactionMetrics]
         return model
     }()
 }
