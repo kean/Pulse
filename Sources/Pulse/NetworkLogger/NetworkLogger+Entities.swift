@@ -8,6 +8,8 @@ import Foundation
 @preconcurrency import Foundation
 #endif
 
+#warning("TODO: remove all these ugly tricks")
+
 extension NetworkLogger {
     public struct Request: Codable, Sendable {
         public var url: URL?

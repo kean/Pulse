@@ -117,22 +117,21 @@ enum RelationshipType {
 }
 
 extension NSRelationshipDescription {
-    static func make(name: String,
+    convenience init(name: String,
                      type: RelationshipType,
                      deleteRule: NSDeleteRule = .cascadeDeleteRule,
-                     entity: NSEntityDescription) -> NSRelationshipDescription {
-        let relationship = NSRelationshipDescription()
-        relationship.name = name
-        relationship.deleteRule = deleteRule
-        relationship.destinationEntity = entity
+                     entity: NSEntityDescription) {
+        self.init()
+        self.name = name
+        self.deleteRule = deleteRule
+        self.destinationEntity = entity
         switch type {
         case .oneToMany:
-            relationship.maxCount = 0
-            relationship.minCount = 0
+            self.maxCount = 0
+            self.minCount = 0
         case .oneToOne(let isOptional):
-            relationship.maxCount = 1
-            relationship.minCount = isOptional ? 0 : 1
+            self.maxCount = 1
+            self.minCount = isOptional ? 0 : 1
         }
-        return relationship
     }
 }

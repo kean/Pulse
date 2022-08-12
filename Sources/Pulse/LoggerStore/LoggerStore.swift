@@ -357,19 +357,21 @@ extension LoggerStore {
         request.originalRequest = makeRequest(for: event.originalRequest)
         request.currentRequest = event.currentRequest.map(makeRequest)
         request.response = event.response.map(makeResponse)
+        request.metrics = event.metrics.map(makeMetrics)
 
+
+#warning("TEM")
         // Populate details
-        let details = LoggerNetworkRequestEntity.RequestDetails(
-            error: event.error,
-            metrics: event.metrics,
-            metadata: {
-                if let responseBody = event.responseBody, (responseContentType?.isImage ?? false) {
-                    return makeImageMetadata(from: responseBody)
-                }
-                return nil
-            }()
-        )
-        populateDetails(details, for: request)
+//        let details = LoggerNetworkRequestEntity.RequestDetails(
+//            error: event.error,
+//            metadata: {
+//                if let responseBody = event.responseBody, (responseContentType?.isImage ?? false) {
+//                    return makeImageMetadata(from: responseBody)
+//                }
+//                return nil
+//            }()
+//        )
+//        populateDetails(details, for: request)
 
         // Completed
         if let progress = request.progress {
@@ -430,6 +432,8 @@ extension LoggerStore {
         }
     }
 
+    #warning("TODO: move this side somewhere else")
+
     private func findOrCreateNetworkRequestEntity(forTaskId taskId: UUID, taskType: NetworkLogger.TaskType, createdAt: Date, session: UUID, url: URL?) -> LoggerNetworkRequestEntity {
         if let entity = firstNetworkRequest(forTaskId: taskId) {
             return entity
@@ -484,12 +488,74 @@ extension LoggerStore {
     }
 
     private func makeHeaders(for headers: [String: String]?) -> Set<NetworkRequestHeaderEntity> {
-        Set((headers ?? [:]).map { name, value in
-            let entity = NetworkRequestHeaderEntity(context: backgroundContext)
-            entity.name = name
-            entity.value = value
+        Set((headers ?? [:]).map(findOrCreateHeader))
+    }
+
+#warning("TODO: normalize more data")
+
+#warning("TODO: implement removal (or not?)")
+    private func findOrCreateHeader(name: String, value: String) -> NetworkRequestHeaderEntity {
+        if let entity = findHeader(name: name, value: value) {
             return entity
-        })
+        }
+        let entity = NetworkRequestHeaderEntity(context: backgroundContext)
+        entity.name = name
+        entity.value = value
+        return entity
+    }
+
+    private func findHeader(name: String, value: String) -> NetworkRequestHeaderEntity? {
+        try? backgroundContext.first(NetworkRequestHeaderEntity.self) {
+            $0.predicate = NSPredicate(format: "name == %@ AND value == %@", name, value)
+        }
+    }
+
+    private func makeMetrics(for metrics: NetworkLogger.Metrics) -> NetworkMetricsEntity {
+        let entity = NetworkMetricsEntity(context: backgroundContext)
+        entity.startDate = metrics.taskInterval.start
+        entity.duration = metrics.taskInterval.duration
+        entity.redirectCount = Int16(min(Int(Int16.max), metrics.redirectCount))
+        entity.transactions = Set(metrics.transactions.enumerated().map(makeTransaction))
+        return entity
+    }
+
+    private func makeTransaction(at index: Int, transaction: NetworkLogger.TransactionMetrics) -> NetworkTransactionMetricsEntity {
+        let entity = NetworkTransactionMetricsEntity(context: backgroundContext)
+        entity.index = Int16(index)
+        entity.rawFetchType = Int16(transaction.fetchType.rawValue)
+        entity.request = makeRequest(for: transaction.request)
+        entity.response = transaction.response.map(makeResponse)
+        entity.networkProtocol = transaction.networkProtocol
+        entity.localAddress = transaction.localAddress
+        entity.remoteAddress = transaction.remoteAddress
+        entity.localPort = Int32(transaction.localPort ?? 0)
+        entity.remotePort = Int32(transaction.remotePort ?? 0)
+        entity.isProxyConnection = transaction.conditions.contains(.isProxyConnection)
+        entity.isReusedConnection = transaction.conditions.contains(.isReusedConnection)
+        entity.isCellular = transaction.conditions.contains(.isCellular)
+        entity.isExpensive = transaction.conditions.contains(.isExpensive)
+        entity.isConstrained = transaction.conditions.contains(.isConstrained)
+        entity.isMultipath = transaction.conditions.contains(.isMultipath)
+        entity.rawNegotiatedTLSProtocolVersion = Int16(transaction.negotiatedTLSProtocolVersion?.rawValue ?? 0)
+        entity.rawNegotiatedTLSCipherSuite = Int16(transaction.negotiatedTLSCipherSuite?.rawValue ?? 0)
+        entity.fetchStartDate = transaction.timing.fetchStartDate
+        entity.domainLookupStartDate = transaction.timing.domainLookupStartDate
+        entity.domainLookupEndDate = transaction.timing.domainLookupEndDate
+        entity.connectStartDate = transaction.timing.connectStartDate
+        entity.secureConnectionStartDate = transaction.timing.secureConnectionStartDate
+        entity.secureConnectionEndDate = transaction.timing.secureConnectionEndDate
+        entity.connectEndDate = transaction.timing.connectEndDate
+        entity.requestStartDate = transaction.timing.requestStartDate
+        entity.requestEndDate = transaction.timing.requestEndDate
+        entity.responseStartDate = transaction.timing.responseStartDate
+        entity.responseEndDate = transaction.timing.responseEndDate
+        entity.requestHeaderBytesSent = transaction.transferSize.requestHeaderBytesSent
+        entity.requestBodyBytesBeforeEncoding = transaction.transferSize.requestBodyBytesBeforeEncoding
+        entity.requestBodyBytesSent = transaction.transferSize.requestBodyBytesSent
+        entity.responseHeaderBytesReceived = transaction.transferSize.responseHeaderBytesReceived
+        entity.responseBodyBytesAfterDecoding = transaction.transferSize.responseBodyBytesAfterDecoding
+        entity.responseBodyBytesReceived = transaction.transferSize.responseBodyBytesReceived
+        return entity
     }
 
     // MARK: - Managing Blobs

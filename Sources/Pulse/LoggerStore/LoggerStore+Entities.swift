@@ -87,10 +87,9 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
     // MARK: Details
 
     @NSManaged public var originalRequest: NetworkRequestEntity
-
     @NSManaged public var currentRequest: NetworkRequestEntity?
-
     @NSManaged public var response: NetworkResponseEntity?
+    @NSManaged public var metrics: NetworkMetricsEntity?
 
     /// Returns request details.
     ///
@@ -148,17 +147,15 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
     /// The request details stored in a database in a denormalized format.
     public final class RequestDetails: Codable, Sendable {
         public let error: NetworkLogger.ResponseError?
-        public let metrics: NetworkLogger.Metrics?
         public let metadata: [String: String]?
 
-        public init(error: NetworkLogger.ResponseError? = nil, metrics: NetworkLogger.Metrics? = nil, metadata: [String : String]? = nil) {
+        public init(error: NetworkLogger.ResponseError? = nil, metadata: [String : String]? = nil) {
             self.error = error
-            self.metrics = metrics
             self.metadata = metadata
         }
 
         enum CodingKeys: String, CodingKey {
-            case error = "3", metrics = "4", metadata = "5"
+            case error = "3", metadata = "5"
         }
     }
 }
@@ -173,19 +170,83 @@ public final class LoggerNetworkRequestProgressEntity: NSManagedObject {
 }
 
 #warning("TODO: move metrics here")
-public final class NetworkRequestMetricsEntity: NSManagedObject {
+public final class NetworkMetricsEntity: NSManagedObject {
     @NSManaged public var startDate: Date
     @NSManaged public var duration: Double
-    @NSManaged public var redirectCount: Int
-    @NSManaged public var transactions: Set<NetworkRequestTransactionEntity>
+    @NSManaged public var redirectCount: Int16
+    @NSManaged public var transactions: Set<NetworkTransactionMetricsEntity>
 
     public var taskInterval: DateInterval {
         DateInterval(start: startDate, duration: duration)
     }
 }
 
-public final class NetworkRequestTransactionEntity: NSManagedObject {
-    @NSManaged public var index: Int
+public final class NetworkTransactionMetricsEntity: NSManagedObject {
+    @NSManaged public var index: Int16
+    @NSManaged public var rawFetchType: Int16
+    @NSManaged public var request: NetworkRequestEntity
+    @NSManaged public var response: NetworkResponseEntity?
+    @NSManaged public var networkProtocol: String?
+    @NSManaged public var localAddress: String?
+    @NSManaged public var remoteAddress: String?
+    @NSManaged public var localPort: Int32
+    @NSManaged public var remotePort: Int32
+    @NSManaged public var isProxyConnection: Bool
+    @NSManaged public var isReusedConnection: Bool
+    @NSManaged public var isCellular: Bool
+    @NSManaged public var isExpensive: Bool
+    @NSManaged public var isConstrained: Bool
+    @NSManaged public var isMultipath: Bool
+    @NSManaged public var rawNegotiatedTLSProtocolVersion: Int16
+    @NSManaged public var rawNegotiatedTLSCipherSuite: Int16
+    @NSManaged public var fetchStartDate: Date?
+    @NSManaged public var domainLookupStartDate: Date?
+    @NSManaged public var domainLookupEndDate: Date?
+    @NSManaged public var connectStartDate: Date?
+    @NSManaged public var secureConnectionStartDate: Date?
+    @NSManaged public var secureConnectionEndDate: Date?
+    @NSManaged public var connectEndDate: Date?
+    @NSManaged public var requestStartDate: Date?
+    @NSManaged public var requestEndDate: Date?
+    @NSManaged public var responseStartDate: Date?
+    @NSManaged public var responseEndDate: Date?
+    @NSManaged public var requestHeaderBytesSent: Int64
+    @NSManaged public var requestBodyBytesBeforeEncoding: Int64
+    @NSManaged public var requestBodyBytesSent: Int64
+    @NSManaged public var responseHeaderBytesReceived: Int64
+    @NSManaged public var responseBodyBytesAfterDecoding: Int64
+    @NSManaged public var responseBodyBytesReceived: Int64
+
+    public var fetchType: URLSessionTaskMetrics.ResourceFetchType {
+        URLSessionTaskMetrics.ResourceFetchType(rawValue: Int(rawFetchType)) ?? .networkLoad
+    }
+
+    public var transferSize: NetworkLogger.TransferSizeInfo {
+        var value = NetworkLogger.TransferSizeInfo()
+        value.requestHeaderBytesSent = requestHeaderBytesSent
+        value.requestBodyBytesBeforeEncoding = requestBodyBytesBeforeEncoding
+        value.requestBodyBytesSent = requestBodyBytesSent
+        value.responseHeaderBytesReceived = responseHeaderBytesReceived
+        value.responseBodyBytesAfterDecoding = responseBodyBytesAfterDecoding
+        value.responseBodyBytesReceived = responseBodyBytesReceived
+        return value
+    }
+
+    public var timing: NetworkLogger.TransactionTimingInfo {
+        var value = NetworkLogger.TransactionTimingInfo()
+        value.fetchStartDate = fetchStartDate
+        value.domainLookupStartDate = domainLookupStartDate
+        value.domainLookupEndDate = domainLookupEndDate
+        value.connectStartDate = connectStartDate
+        value.secureConnectionStartDate = secureConnectionStartDate
+        value.secureConnectionEndDate = secureConnectionEndDate
+        value.connectEndDate = connectEndDate
+        value.requestStartDate = requestStartDate
+        value.requestEndDate = requestEndDate
+        value.responseStartDate = responseStartDate
+        value.responseEndDate = responseEndDate
+        return value
+    }
 }
 
 public final class NetworkRequestEntity: NSManagedObject {
@@ -220,6 +281,8 @@ public final class NetworkRequestHeaderEntity: NSManagedObject {
     @NSManaged public var name: String
     @NSManaged public var value: String
 }
+
+#warning("TODO: udpate docc")
 
 extension Set where Element == NetworkRequestHeaderEntity {
     func asDictionary() -> [String: String] {
