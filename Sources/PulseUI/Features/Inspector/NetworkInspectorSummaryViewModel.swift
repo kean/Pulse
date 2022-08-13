@@ -253,7 +253,8 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
 
 #if os(tvOS)
     var timingViewModel: TimingViewModel? {
-        task.metrics.map(TimingViewModel.init)
+        guard task.hasMetrics else { return nil }
+        return TimingViewModel(task: task)
     }
 #endif
 }
