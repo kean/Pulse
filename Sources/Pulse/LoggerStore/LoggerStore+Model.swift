@@ -152,9 +152,3 @@ extension LoggerStore {
         return model
     }()
 }
-
-extension NSEntityDescription {
-    func property(named name: String) -> NSPropertyDescription {
-        properties.first { $0.name == name }!
-    }
-}
