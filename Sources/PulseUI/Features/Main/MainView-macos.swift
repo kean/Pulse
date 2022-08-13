@@ -155,7 +155,7 @@ private struct FilterPopoverToolbarButton: View {
         }).foregroundColor(isFilterPresented ? .accentColor : .secondary)
             .help("Toggle Filters Panel (⌥⌘F)")
             .popover(isPresented: $isFilterPresented, arrowEdge: .top) {
-                filters.padding(.bottom, 16)
+                filters.frame(width: Filters.preferredWidth).padding(.bottom, 16)
             }
     }
 
