@@ -81,7 +81,7 @@ private struct NetworkToolbarView: View {
                         .foregroundColor(.accentColor)
                 }.frame(width: 40, height: 44)
                 Button(action: { isShowingFilters = true }) {
-                    Image(systemName: "line.horizontal.3.decrease.circle")
+                    Image(systemName: viewModel.searchCriteria.isDefaultSearchCriteria ? "line.horizontal.3.decrease.circle" : "line.3.horizontal.decrease.circle.fill")
                         .font(.system(size: 20))
                         .foregroundColor(.accentColor)
                 }.frame(width: 40, height: 44)
