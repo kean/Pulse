@@ -272,7 +272,8 @@ public final class NetworkRequestEntity: NSManagedObject {
 extension NetworkRequestEntity {
     static func encodeHeaders(_ headers: [String: String]?) -> String {
         var output = ""
-        for (name, value) in headers ?? [:] {
+        let sorted = (headers ?? [:]).sorted { $0.key < $1.key }
+        for (name, value) in sorted {
             if !output.isEmpty { output.append("\n")}
             output.append("\(name): \(value)")
         }
