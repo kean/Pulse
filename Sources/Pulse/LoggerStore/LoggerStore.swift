@@ -329,7 +329,6 @@ extension LoggerStore {
         entity.errorCode = Int32(event.error?.code ?? 0)
         let statusCode = Int32(event.response?.statusCode ?? 0)
         entity.statusCode = statusCode
-        entity.duration = event.metrics?.taskInterval.duration ?? 0
         entity.responseContentType = event.response?.contentType?.type
         let isFailure = event.error != nil || (statusCode != 0 && !(200..<400).contains(statusCode))
         entity.requestState = (isFailure ? NetworkTaskEntity.State.failure : .success).rawValue
@@ -364,11 +363,17 @@ extension LoggerStore {
         let transactions = event.metrics?.transactions ?? []
         entity.isFromCache = transactions.last?.fetchType == .localCache || (transactions.last?.fetchType == .networkLoad && transactions.last?.response?.statusCode == 304)
 
+        if let metrics = event.metrics {
+            entity.startDate = metrics.taskInterval.start
+            entity.duration = metrics.taskInterval.duration
+            entity.redirectCount = Int16(min(Int(Int16.max), metrics.redirectCount))
+            entity.transactions = Set(metrics.transactions.enumerated().map(makeTransaction))
+        }
+
         entity.originalRequest = makeRequest(for: event.originalRequest)
         entity.currentRequest = event.currentRequest.map(makeRequest)
         entity.response = event.response.map(makeResponse)
         entity.error = event.error.map(makeError)
-        entity.metrics = event.metrics.map(makeMetrics)
         entity.rawMetadata = {
             guard let responseBody = event.responseBody,
                (responseContentType?.isImage ?? false),
@@ -498,16 +503,6 @@ extension LoggerStore {
         entity.domain = error.domain
         entity.errorDebugDescription = error.debugDescription
         entity.underlyingError = error.underlyingError.flatMap { try? JSONEncoder().encode($0) }
-        return entity
-    }
-
-#warning("TODO: normalize more data")
-    private func makeMetrics(for metrics: NetworkLogger.Metrics) -> NetworkMetricsEntity {
-        let entity = NetworkMetricsEntity(context: backgroundContext)
-        entity.startDate = metrics.taskInterval.start
-        entity.duration = metrics.taskInterval.duration
-        entity.redirectCount = Int16(min(Int(Int16.max), metrics.redirectCount))
-        entity.transactions = Set(metrics.transactions.enumerated().map(makeTransaction))
         return entity
     }
 

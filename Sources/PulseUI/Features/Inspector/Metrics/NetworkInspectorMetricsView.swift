@@ -40,19 +40,20 @@ struct NetworkInspectorMetricsView: View {
 // MARK: - ViewModel
 
 final class NetworkInspectorMetricsViewModel {
-    let metrics: NetworkMetricsEntity
+    let task: NetworkTaskEntity
     let timingViewModel: TimingViewModel
 #if !os(tvOS)
     let transactions: NetworkInspectorTransactionsListViewModel?
 #endif
 
-    init(metrics: NetworkMetricsEntity) {
-        self.metrics = metrics
-        self.timingViewModel = TimingViewModel(metrics: metrics)
+    init?(task: NetworkTaskEntity) {
+        guard task.hasMetrics else { return nil }
+        self.task = task
+        self.timingViewModel = TimingViewModel(task: task)
 
 #if !os(tvOS)
-        if !metrics.transactions.isEmpty {
-            self.transactions = NetworkInspectorTransactionsListViewModel(metrics: metrics)
+        if !task.transactions.isEmpty {
+            self.transactions = NetworkInspectorTransactionsListViewModel(task: task)
         } else {
             self.transactions = nil
         }
@@ -67,8 +68,8 @@ struct NetworkInspectorMetricsView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
             NetworkInspectorMetricsView(viewModel: .init(
-                metrics: LoggerStore.preview.entity(for: .octocat).metrics!
-            ))
+                task: LoggerStore.preview.entity(for: .octocat)
+            )!)
         }
     }
 }

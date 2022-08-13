@@ -91,7 +91,7 @@ private func formatBytes(_ count: Int64) -> String {
 struct NetworkInspectorMetricsDetailsView_Previews: PreviewProvider {
     static var previews: some View {
         NetworkInspectorMetricsDetailsView(viewModel: .init(
-            metrics: LoggerStore.preview.entity(for: .login).metrics!.transactions.first!
+            metrics: LoggerStore.preview.entity(for: .login).transactions.first!
         )!)
         .padding()
         .previewLayout(.sizeThatFits)

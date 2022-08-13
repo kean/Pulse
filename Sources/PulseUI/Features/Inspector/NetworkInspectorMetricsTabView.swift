@@ -27,7 +27,7 @@ final class NetworkInspectorMetricsTabViewModel: ObservableObject {
     private(set) lazy var progress = ProgressViewModel(task: task)
 
     var metricsViewModel: NetworkInspectorMetricsViewModel? {
-        task.metrics.map(NetworkInspectorMetricsViewModel.init)
+        NetworkInspectorMetricsViewModel(task: task)
     }
 
     private let task: NetworkTaskEntity

@@ -66,6 +66,8 @@ public final class NetworkTaskEntity: NSManagedObject {
 
     /// Total request duration end date.
     @NSManaged public var duration: Double
+    @NSManaged public var startDate: Date?
+    @NSManaged public var redirectCount: Int16
 
     // MARK: Details
 
@@ -73,7 +75,7 @@ public final class NetworkTaskEntity: NSManagedObject {
     @NSManaged public var currentRequest: NetworkRequestEntity?
     @NSManaged public var response: NetworkResponseEntity?
     @NSManaged public var error: NetworkErrorEntity?
-    @NSManaged public var metrics: NetworkMetricsEntity?
+    @NSManaged public var transactions: Set<NetworkTransactionMetricsEntity>
     @NSManaged var rawMetadata: String?
 
     /// The request body handle.
@@ -108,33 +110,13 @@ public final class NetworkTaskEntity: NSManagedObject {
     public enum ErrorDomain: Int16 {
         case urlError = 1, decoding
     }
-}
-
-public final class NetworkDomainEntity: NSManagedObject {
-    @NSManaged public var value: String
-    @NSManaged public var count: Int64
-}
-
-/// Indicates current download or upload progress.
-public final class NetworkTaskProgressEntity: NSManagedObject {
-    /// Indicates current download or upload progress.
-    @NSManaged public var completedUnitCount: Int64
-    /// Indicates current download or upload progress.
-    @NSManaged public var totalUnitCount: Int64
-}
-
-public final class NetworkMetricsEntity: NSManagedObject {
-    @NSManaged public var startDate: Date
-    @NSManaged public var duration: Double
-    @NSManaged public var redirectCount: Int16
-    @NSManaged public var transactions: Set<NetworkTransactionMetricsEntity>
 
     public var orderedTransactions: [NetworkTransactionMetricsEntity] {
         transactions.sorted { $0.index < $1.index }
     }
 
-    public var taskInterval: DateInterval {
-        DateInterval(start: startDate, duration: duration)
+    public var taskInterval: DateInterval? {
+        startDate.map { DateInterval(start: $0, duration: duration) }
     }
 
     public var totalTransferSize: NetworkLogger.TransferSizeInfo {
@@ -144,8 +126,27 @@ public final class NetworkMetricsEntity: NSManagedObject {
         }
         return size
     }
+
+    public var hasMetrics: Bool {
+        startDate != nil
+    }
 }
 
+public final class NetworkDomainEntity: NSManagedObject {
+    @NSManaged public var value: String
+    @NSManaged public var count: Int64
+}
+
+#warning("TODO: embed in Task?")
+/// Indicates current download or upload progress.
+public final class NetworkTaskProgressEntity: NSManagedObject {
+    /// Indicates current download or upload progress.
+    @NSManaged public var completedUnitCount: Int64
+    /// Indicates current download or upload progress.
+    @NSManaged public var totalUnitCount: Int64
+}
+
+#warning("TODO: move this to reponse and remove duplicated entities?")
 public final class NetworkErrorEntity: NSManagedObject {
     @NSManaged public var code: Int
     @NSManaged public var domain: String

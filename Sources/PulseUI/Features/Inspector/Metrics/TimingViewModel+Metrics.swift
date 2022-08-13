@@ -8,16 +8,16 @@ import Pulse
 #if os(iOS) || os(macOS) || os(tvOS)
 
 extension TimingViewModel {
-    convenience init(metrics: NetworkMetricsEntity) {
-        self.init(sections: makeTimingSections(metrics: metrics))
+    convenience init(task: NetworkTaskEntity) {
+        self.init(sections: makeTimingSections(task: task))
     }
 
-    convenience init?(transaction: NetworkTransactionMetricsEntity, metrics: NetworkMetricsEntity) {
+    convenience init?(transaction: NetworkTransactionMetricsEntity, task: NetworkTaskEntity) {
         guard let startDate = transaction.timing.fetchStartDate else {
             return nil
         }
-        let endDate = transaction.timing.responseEndDate ?? metrics.taskInterval.end
-        guard endDate > startDate else {
+        guard let endDate = transaction.timing.responseEndDate ?? task.taskInterval?.end,
+              endDate > startDate else {
             return nil
         }
         let interval = DateInterval(start: startDate, end: endDate)
@@ -29,20 +29,22 @@ extension TimingViewModel {
     }
 }
 
-private func makeTimingSections(metrics: NetworkMetricsEntity) -> [TimingRowSectionViewModel] {
-    let taskInterval = metrics.taskInterval
+private func makeTimingSections(task: NetworkTaskEntity) -> [TimingRowSectionViewModel] {
+    guard let taskInterval = task.taskInterval else {
+        return []
+    }
 
     var sections = [TimingRowSectionViewModel]()
 
     var currentURL: String?
 
-    for transaction in metrics.orderedTransactions {
+    for transaction in task.orderedTransactions {
         let rows = makeTimingRows(transaction: transaction, taskInterval: taskInterval)
         guard !rows.isEmpty else {
             continue
         }
 
-        if metrics.redirectCount > 0, let url = transaction.request.url, currentURL != url {
+        if task.redirectCount > 0, let url = transaction.request.url, currentURL != url {
             currentURL = url
             sections.append(TimingRowSectionViewModel(title: url, items: [], isHeader: true))
         }

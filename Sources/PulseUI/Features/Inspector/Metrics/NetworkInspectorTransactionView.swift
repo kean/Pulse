@@ -71,9 +71,9 @@ final class NetworkInspectorTransactionViewModel: ObservableObject {
 
     private let transaction: NetworkTransactionMetricsEntity
 
-    init(transaction: NetworkTransactionMetricsEntity, metrics: NetworkMetricsEntity) {
+    init(transaction: NetworkTransactionMetricsEntity, task: NetworkTaskEntity) {
         self.details = NetworkMetricsDetailsViewModel(metrics: transaction)
-        self.timingViewModel = TimingViewModel(transaction: transaction, metrics: metrics)
+        self.timingViewModel = TimingViewModel(transaction: transaction, task: task)
         if transaction.fetchType == .networkLoad {
             self.transferSizeViewModel = NetworkInspectorTransferInfoViewModel(transferSize: transaction.transferSize, isUpload: false)
         } else {
@@ -119,12 +119,9 @@ struct NetworkInspectorTransactionView_Previews: PreviewProvider {
     }
 }
 
-private let mockModel = NetworkInspectorTransactionViewModel(
-    transaction: mockMetrics.orderedTransactions.last!,
-    metrics: mockMetrics
-)
+private let mockModel = NetworkInspectorTransactionViewModel(transaction: mockTask.orderedTransactions.last!, task: mockTask)
 
-private let mockMetrics = LoggerStore.preview.entity(for: .login).metrics!
+private let mockTask = LoggerStore.preview.entity(for: .login)
 
 #endif
 

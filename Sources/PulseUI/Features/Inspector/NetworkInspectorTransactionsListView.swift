@@ -89,8 +89,8 @@ final class NetworkInspectorTransactionsListViewModel {
         let viewModel: () -> NetworkInspectorTransactionViewModel
     }
 
-    init(metrics: NetworkMetricsEntity) {
-        self.items = metrics.transactions.map { transaction in
+    init(task: NetworkTaskEntity) {
+        self.items = task.transactions.map { transaction in
             let title: String
             switch transaction.fetchType {
             case .networkLoad: title = "Network Load"
@@ -100,12 +100,12 @@ final class NetworkInspectorTransactionsListViewModel {
             default: title = "Unknown"
             }
             var details: String?
-            if let startDate = transaction.timing.fetchStartDate {
-                let endDate = transaction.timing.responseEndDate ?? metrics.taskInterval.end
+            if let startDate = transaction.timing.fetchStartDate,
+               let endDate = transaction.timing.responseEndDate ?? task.taskInterval?.end {
                 details = DurationFormatter.string(from: endDate.timeIntervalSince(startDate))
             }
             return Item(title: title, details: details, viewModel: {
-                NetworkInspectorTransactionViewModel(transaction: transaction, metrics: metrics)
+                NetworkInspectorTransactionViewModel(transaction: transaction, task: task)
             })
         }
     }
@@ -123,7 +123,7 @@ struct NetworkInspectorTransactionsListView_Previews: PreviewProvider {
 }
 
 private let mockModel = NetworkInspectorTransactionsListViewModel(
-    metrics: LoggerStore.preview.entity(for: .login).metrics!
+    task: LoggerStore.preview.entity(for: .login)
 )
 #endif
 

@@ -49,9 +49,8 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     // MARK: - Header
 
     var transferViewModel: NetworkInspectorTransferInfoViewModel? {
-        task.metrics.map {
-            NetworkInspectorTransferInfoViewModel(metrics: $0, taskType: task.type ?? .dataTask)
-        }
+        guard task.hasMetrics else { return nil }
+        return NetworkInspectorTransferInfoViewModel(task: task, taskType: task.type ?? .dataTask)
     }
 
     var progressViewModel: ProgressViewModel? {
@@ -218,12 +217,12 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     // MARK: - Timings
 
     var timingDetailsViewModel: KeyValueSectionViewModel? {
-        guard let taskInterval = task.metrics?.taskInterval else { return nil }
+        guard let taskInterval = task.taskInterval else { return nil }
         return KeyValueSectionViewModel(title: "Timing", color: .orange, items: [
             ("Start Date", dateFormatter.string(from: taskInterval.start)),
             ("End Date", dateFormatter.string(from: taskInterval.end)),
             ("Duration", DurationFormatter.string(from: taskInterval.duration)),
-            ("Redirect Count", (task.metrics?.redirectCount ?? 0).description)
+            ("Redirect Count", task.redirectCount.description)
         ])
     }
 

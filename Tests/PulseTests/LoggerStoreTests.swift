@@ -229,7 +229,6 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertEqual(try context.count(for: NetworkTaskEntity.self), 0)
         XCTAssertEqual(try context.count(for: NetworkTaskProgressEntity.self), 0)
         XCTAssertEqual(try context.count(for: LoggerBlobHandleEntity.self), 0)
-        XCTAssertEqual(try context.count(for: LoggerInlineDataEntity.self), 0)
     }
 
     func testCopyToNonExistingFolder() throws {
@@ -417,7 +416,6 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertEqual(try store.backgroundContext.count(for: NetworkTaskEntity.self), 0)
         XCTAssertEqual(try store.backgroundContext.count(for: NetworkTaskProgressEntity.self), 0)
         XCTAssertEqual(try store.backgroundContext.count(for: LoggerBlobHandleEntity.self), 0)
-        XCTAssertEqual(try store.backgroundContext.count(for: LoggerInlineDataEntity.self), 0)
     }
 
     func testMaxAgeSweepBlobIsDeletedWhenBothEntitiesReferencingItAre() throws {
@@ -443,7 +441,6 @@ final class LoggerStoreTests: XCTestCase {
 
         // THEN associated data is deleted
         XCTAssertEqual(try store.backgroundContext.count(for: LoggerBlobHandleEntity.self), 0)
-        XCTAssertEqual(try store.backgroundContext.count(for: LoggerInlineDataEntity.self), 0)
     }
 
     func testMaxAgeSweepBlobIsKeptIfOnlyOneReferencingEntityIsDeleted() throws {
@@ -580,10 +577,8 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertEqual(try context.count(for: NetworkTaskEntity.self), 3)
         XCTAssertEqual(try context.count(for: NetworkRequestEntity.self), 9)
         XCTAssertEqual(try context.count(for: NetworkResponseEntity.self), 6)
-        XCTAssertEqual(try context.count(for: NetworkMetricsEntity.self), 3)
         XCTAssertEqual(try context.count(for: NetworkTransactionMetricsEntity.self), 3)
         XCTAssertEqual(try context.count(for: LoggerBlobHandleEntity.self), 3)
-        XCTAssertEqual(try context.count(for: LoggerInlineDataEntity.self), 4)
 
         // WHEN
         store.removeAll()
@@ -594,10 +589,8 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertEqual(try context.count(for: NetworkTaskEntity.self), 0)
         XCTAssertEqual(try context.count(for: NetworkRequestEntity.self), 0)
         XCTAssertEqual(try context.count(for: NetworkResponseEntity.self), 0)
-        XCTAssertEqual(try context.count(for: NetworkMetricsEntity.self), 0)
         XCTAssertEqual(try context.count(for: NetworkTransactionMetricsEntity.self), 0)
         XCTAssertEqual(try context.count(for: LoggerBlobHandleEntity.self), 0)
-        XCTAssertEqual(try context.count(for: LoggerInlineDataEntity.self), 0)
     }
 
     func testRemoveAllWithLargeBlob() throws {
@@ -621,7 +614,6 @@ final class LoggerStoreTests: XCTestCase {
 
         // THEN the file is deleted from the file system
         XCTAssertEqual(try store.backgroundContext.count(for: LoggerBlobHandleEntity.self), 0)
-        XCTAssertEqual(try store.backgroundContext.count(for: LoggerInlineDataEntity.self), 0)
         XCTAssertNil(store.getBlobData(forKey: key.hexString))
 
         // WHEN store new files after removal
@@ -650,7 +642,7 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertEqual(request.state, .success)
         XCTAssertEqual(request.responseContentType, "application/json")
         XCTAssertEqual(request.isFromCache, false)
-        XCTAssertEqual(request.metrics?.redirectCount, 0)
+        XCTAssertEqual(request.redirectCount, 0)
 
         // Details
         XCTAssertEqual(request.originalRequest.url, "https://github.com/login")

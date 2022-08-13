@@ -20,7 +20,6 @@ extension LoggerStore {
         let request = Entity(class: NetworkRequestEntity.self)
         let response = Entity(class: NetworkResponseEntity.self)
         let error = Entity(class: NetworkErrorEntity.self)
-        let metrics = Entity(class: NetworkMetricsEntity.self)
         let transaction = Entity(class: NetworkTransactionMetricsEntity.self)
 
         let blob = Entity(class: LoggerBlobHandleEntity.self)
@@ -56,7 +55,9 @@ extension LoggerStore {
             Attribute(name: "rawErrorDomain", type: .integer16AttributeType),
             Attribute(name: "errorCode", type: .integer32AttributeType),
             Attribute(name: "statusCode", type: .integer32AttributeType),
+            Attribute(name: "startDate", type: .dateAttributeType),
             Attribute(name: "duration", type: .doubleAttributeType),
+            Attribute(name: "redirectCount", type: .integer16AttributeType),
             Attribute(name: "responseContentType", type: .stringAttributeType),
             Attribute(name: "requestState", type: .integer16AttributeType),
             Attribute(name: "requestBodySize", type: .integer64AttributeType),
@@ -67,7 +68,7 @@ extension LoggerStore {
             Relationship(name: "currentRequest", type: .oneToOne(isOptional: true), entity: request),
             Relationship(name: "response", type: .oneToOne(isOptional: true), entity: response),
             Relationship(name: "error", type: .oneToOne(isOptional: true), entity: error),
-            Relationship(name: "metrics", type: .oneToOne(isOptional: true), entity: metrics),
+            Relationship(name: "transactions", type: .oneToMany, entity: transaction),
             Relationship(name: "message", type: .oneToOne(), entity: message),
             Relationship(name: "requestBody", type: .oneToOne(isOptional: true), deleteRule: .noActionDeleteRule, entity: blob),
             Relationship(name: "responseBody", type: .oneToOne(isOptional: true), deleteRule: .noActionDeleteRule, entity: blob),
@@ -107,13 +108,6 @@ extension LoggerStore {
         progress.properties = [
             Attribute(name: "completedUnitCount", type: .integer64AttributeType),
             Attribute(name: "totalUnitCount", type: .integer64AttributeType)
-        ]
-
-        metrics.properties = [
-            Attribute(name: "startDate", type: .dateAttributeType),
-            Attribute(name: "duration", type: .doubleAttributeType),
-            Attribute(name: "redirectCount", type: .integer16AttributeType),
-            Relationship(name: "transactions", type: .oneToMany, entity: transaction)
         ]
 
         transaction.properties = [
@@ -162,7 +156,7 @@ extension LoggerStore {
         ]
 
         let model = NSManagedObjectModel()
-        model.entities = [message, label, task, domain, progress, blob, request, response, error, metrics, transaction]
+        model.entities = [message, label, task, domain, progress, blob, request, response, error, transaction]
         return model
     }()
 }
