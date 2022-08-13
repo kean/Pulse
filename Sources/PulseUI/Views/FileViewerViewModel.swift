@@ -7,6 +7,10 @@ import CoreData
 import Pulse
 import Combine
 
+#if os(iOS) || os(macOS)
+import PDFKit
+#endif
+
 final class FileViewerViewModel: ObservableObject {
     let title: String
     private let context: Context
@@ -34,6 +38,9 @@ final class FileViewerViewModel: ObservableObject {
         case json(RichTextViewModel)
         case image(ImagePreviewViewModel)
         case other(RichTextViewModel)
+#if os(iOS) || os(macOS)
+        case pdf(PDFDocument)
+#endif
     }
 
     func render() {
@@ -57,6 +64,8 @@ final class FileViewerViewModel: ObservableObject {
             return .json(.init(json: json, error: context.error))
         } else if let image = UXImage(data: data) {
             return .image(ImagePreviewViewModel(image: image, data: data, context: context))
+        } else if let pdf = makePDF(data: data) {
+            return pdf
         } else if data.isEmpty {
             return .other(.init(string: "Unavailable"))
         } else if let string = String(data: data, encoding: .utf8) {
@@ -72,6 +81,15 @@ final class FileViewerViewModel: ObservableObject {
             let message = "Data \(ByteCountFormatter.string(fromByteCount: Int64(data.count)))"
             return .other(RichTextViewModel(string: message))
         }
+    }
+
+    private func makePDF(data: Data) -> Contents? {
+#if os(iOS) || os(macOS)
+        if let pdf = PDFDocument(data: data) {
+            return .pdf(pdf)
+        }
+#endif
+        return nil
     }
 
     private func decodeQueryParameters(form string: String) -> KeyValueSectionViewModel? {

@@ -48,19 +48,23 @@ struct FileViewer: View {
         if let contents = viewModel.contents {
             switch contents {
             case .json(let viewModel):
-                #if os(iOS)
+#if os(iOS)
                 RichTextView(viewModel: viewModel, onToggleExpanded: onToggleExpanded) {
                     EmptyView()
                 }
-                #else
+#else
                 RichTextView(viewModel: viewModel)
-                #endif
+#endif
             case .image(let viewModel):
                 ScrollView {
                     ImageViewer(viewModel: viewModel)
                 }
+#if os(iOS) || os(macOS)
+            case .pdf(let document):
+                PDFKitRepresentedView(document: document)
+#endif
             case .other(let viewModel):
-                #if os(iOS)
+#if os(iOS)
                 RichTextView(viewModel: viewModel, onToggleExpanded: onToggleExpanded) {
                     if self.viewModel.contentType?.isHTML ?? false {
                         Button("Open in Browser") {
@@ -70,9 +74,9 @@ struct FileViewer: View {
                         EmptyView()
                     }
                 }
-                #else
+#else
                 RichTextView(viewModel: viewModel)
-                #endif
+#endif
             }
         } else {
             SpinnerView(viewModel: .init(title: "Rendering...", details: nil))
@@ -97,6 +101,9 @@ struct NetworkInspectorResponseView_Previews: PreviewProvider {
 
             FileViewer(viewModel: .init(title: "Response", context: .init(contentType: "application/x-www-form-urlencoded", originalSize: 1200), data: { MockTask.patchRepo.originalRequest.httpBody ?? Data() }))
                 .previewDisplayName("Query Items")
+
+            FileViewer(viewModel: .init(title: "Response", context: .init(contentType: "application/pdf", originalSize: 1000), data: { mockPDF }))
+                .previewDisplayName("PDF")
         }
     }
 }
