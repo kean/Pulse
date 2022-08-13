@@ -132,24 +132,6 @@ final class PersistentLogHandlerTests: XCTestCase {
         XCTAssertEqual(entry.key, "system")
         XCTAssertEqual(entry.value, "foo")
     }
-
-    func testQueryingMetadata() throws {
-        // GIVEN
-        sut.log(level: .debug, message: "a", metadata: ["system": "auth"])
-
-        // WHEN
-        let request = NSFetchRequest<LoggerMessageEntity>(entityName: "LoggerMessageEntity")
-        request.predicate = NSPredicate(format: "text == %@ AND SUBQUERY(metadata, $entry, $entry.key == %@ AND $entry.value == %@).@count > 0", "a", "system", "auth")
-        let messages = try store.viewContext.fetch(request)
-
-        // THEN
-        let message = try XCTUnwrap(messages.first)
-        XCTAssertEqual(message.metadata.count, 1)
-        let entry = try XCTUnwrap(message.metadata.first)
-        XCTAssertEqual(message.text, "a")
-        XCTAssertEqual(entry.key, "system")
-        XCTAssertEqual(entry.value, "auth")
-    }
 }
 
 extension LogHandler {

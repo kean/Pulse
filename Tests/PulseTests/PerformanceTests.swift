@@ -52,18 +52,6 @@ final class PerformanceTests: XCTestCase {
         }
     }
 
-    func xtestQueryByMetadata() {
-        let request = NSFetchRequest<LoggerMessageEntity>(entityName: "LoggerMessageEntity")
-        request.predicate = NSPredicate(format: "SUBQUERY(metadata, $entry, $entry.key == %@ AND $entry.value == %@).@count > 0", "system", "auth")
-
-        let moc = store.viewContext
-
-        measure {
-            let messages = (try? moc.fetch(request)) ?? []
-            XCTAssertEqual(messages.count, 10000)
-        }
-    }
-
     func populateStore() {
         /// Create 60000 messages
         for _ in 0..<10000 {

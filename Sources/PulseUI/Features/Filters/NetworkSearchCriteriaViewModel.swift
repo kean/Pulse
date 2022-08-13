@@ -112,9 +112,10 @@ final class NetworkSearchCriteriaViewModel: ObservableObject {
         allDomains = allDomainsSet.sorted()
     }
 
+    #warning("TODO: rewrite this")
     func didInsertEntity(_ entity: NetworkTaskEntity) {
         var domains = allDomainsSet
-        if let host = entity.host {
+        if let host = entity.host?.value {
             domains.insert(host)
         }
         if domains.count > allDomains.count {

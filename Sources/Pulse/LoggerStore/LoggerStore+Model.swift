@@ -23,7 +23,6 @@ extension LoggerStore {
         let metrics = Entity(class: NetworkMetricsEntity.self)
         let transaction = Entity(class: NetworkTransactionMetricsEntity.self)
 
-        let metadata = Entity(class: LoggerMetadataEntity.self)
         let data = Entity(class: LoggerInlineDataEntity.self)
         let blob = Entity(class: LoggerBlobHandleEntity.self)
 
@@ -36,19 +35,14 @@ extension LoggerStore {
             Attribute(name: "file", type: .stringAttributeType),
             Attribute(name: "function", type: .stringAttributeType),
             Attribute(name: "line", type: .integer32AttributeType),
+            Attribute(name: "rawMetadata", type: .stringAttributeType),
             Relationship(name: "label", type: .oneToOne(), deleteRule: .noActionDeleteRule, entity: label),
-            Relationship(name: "metadata", type: .oneToMany, entity: metadata),
             Relationship(name: "task", type: .oneToOne(isOptional: true), entity: task)
         ]
 
         label.properties = [
             Attribute(name: "name", type: .stringAttributeType),
             Attribute(name: "count", type: .integer64AttributeType),
-        ]
-
-        metadata.properties = [
-            Attribute(name: "key", type: .stringAttributeType),
-            Attribute(name: "value", type: .stringAttributeType)
         ]
 
         task.properties = [
@@ -173,7 +167,7 @@ extension LoggerStore {
         ]
 
         let model = NSManagedObjectModel()
-        model.entities = [message, label, metadata, task, domain, progress, blob, data, request, response, error, metrics, transaction]
+        model.entities = [message, label, task, domain, progress, blob, data, request, response, error, metrics, transaction]
         return model
     }()
 }

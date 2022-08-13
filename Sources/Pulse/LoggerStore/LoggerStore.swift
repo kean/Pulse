@@ -275,12 +275,7 @@ extension LoggerStore {
         message.function = event.function
         message.line = Int32(event.line)
         if let metadata = event.metadata, !metadata.isEmpty {
-            message.metadata = Set(metadata.map { key, value in
-                let entity = LoggerMetadataEntity(context: backgroundContext)
-                entity.key = key
-                entity.value = value
-                return entity
-            })
+            message.rawMetadata = KeyValueEncoding.encodeKeyValuePairs(metadata, sanitize: true)
         }
     }
 
@@ -480,7 +475,7 @@ extension LoggerStore {
         let entity = NetworkRequestEntity(context: backgroundContext)
         entity.url = request.url?.absoluteString
         entity.httpMethod = request.httpMethod
-        entity.httpHeaders = NetworkRequestEntity.encodeHeaders(request.headers)
+        entity.httpHeaders = KeyValueEncoding.encodeKeyValuePairs(request.headers)
         entity.allowsCellularAccess = request.options.contains(.allowsCellularAccess)
         entity.allowsExpensiveNetworkAccess = request.options.contains(.allowsExpensiveNetworkAccess)
         entity.allowsConstrainedNetworkAccess = request.options.contains(.allowsConstrainedNetworkAccess)
@@ -495,7 +490,7 @@ extension LoggerStore {
     private func makeResponse(for response: NetworkLogger.Response) -> NetworkResponseEntity {
         let entity = NetworkResponseEntity(context: backgroundContext)
         entity.statusCode = Int16(response.statusCode ?? 0)
-        entity.httpHeaders = NetworkRequestEntity.encodeHeaders(response.headers)
+        entity.httpHeaders = KeyValueEncoding.encodeKeyValuePairs(response.headers)
         return entity
     }
 

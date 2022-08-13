@@ -135,3 +135,31 @@ extension NSRelationshipDescription {
         }
     }
 }
+
+enum KeyValueEncoding {
+    static func encodeKeyValuePairs(_ pairs: [String: String]?, sanitize: Bool = false) -> String {
+        var output = ""
+        let sorted = (pairs ?? [:]).sorted { $0.key < $1.key }
+        for (name, value) in sorted {
+            if !output.isEmpty { output.append("\n")}
+            let name = sanitize ? name.replacingOccurrences(of: ":", with: "") : name
+            let value = sanitize ? String(value.filter { !$0.isWhitespace }) : value
+            output.append("\(name): \(value)")
+        }
+        return output
+    }
+
+    static func decodeKeyValuePairs(_ string: String) -> [String: String] {
+        let pairs = string.components(separatedBy: "\n")
+        var output: [String: String] = [:]
+        for pair in pairs {
+            if let separatorIndex = pair.firstIndex(of: ":") {
+                let valueStartIndex = pair.index(separatorIndex, offsetBy: 2)
+                if pair.indices.contains(valueStartIndex) {
+                    output[String(pair[..<separatorIndex])] = String(pair[valueStartIndex...])
+                }
+            }
+        }
+        return output
+    }
+}

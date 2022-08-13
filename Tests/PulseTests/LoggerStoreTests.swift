@@ -101,7 +101,6 @@ final class LoggerStoreTests: XCTestCase {
         // THEN entities can be opened
         XCTAssertEqual(try store.viewContext.count(for: LoggerMessageEntity.self), 15)
         XCTAssertEqual(try store.viewContext.count(for: NetworkTaskEntity.self), 8)
-        XCTAssertEqual(try store.viewContext.count(for: LoggerMetadataEntity.self), 1)
         XCTAssertEqual(try store.viewContext.count(for: LoggerBlobHandleEntity.self), 7)
 
         // THEN data stored in external storage also persist
@@ -127,7 +126,6 @@ final class LoggerStoreTests: XCTestCase {
         // THEN entities can be opened
         XCTAssertEqual(try store.viewContext.count(for: LoggerMessageEntity.self), 15)
         XCTAssertEqual(try store.viewContext.count(for: NetworkTaskEntity.self), 8)
-        XCTAssertEqual(try store.viewContext.count(for: LoggerMetadataEntity.self), 1)
         XCTAssertEqual(try store.viewContext.count(for: LoggerBlobHandleEntity.self), 7)
 
         // THEN data stored in external storage also persist
@@ -149,7 +147,6 @@ final class LoggerStoreTests: XCTestCase {
         // THEN entities can be opened
         XCTAssertEqual(try store.viewContext.count(for: LoggerMessageEntity.self), 10)
         XCTAssertEqual(try store.viewContext.count(for: NetworkTaskEntity.self), 3)
-        XCTAssertEqual(try store.viewContext.count(for: LoggerMetadataEntity.self), 0)
         XCTAssertEqual(try store.viewContext.count(for: LoggerBlobHandleEntity.self), 3)
     }
 
@@ -164,7 +161,6 @@ final class LoggerStoreTests: XCTestCase {
         // THEN entities can be opened
         XCTAssertEqual(try store.viewContext.count(for: LoggerMessageEntity.self), 10)
         XCTAssertEqual(try store.viewContext.count(for: NetworkTaskEntity.self), 3)
-        XCTAssertEqual(try store.viewContext.count(for: LoggerMetadataEntity.self), 0)
         XCTAssertEqual(try store.viewContext.count(for: LoggerBlobHandleEntity.self), 3)
     }
 
@@ -230,7 +226,6 @@ final class LoggerStoreTests: XCTestCase {
 
         let context = copy.viewContext
         XCTAssertEqual(try context.count(for: LoggerMessageEntity.self), 2)
-        XCTAssertEqual(try context.count(for: LoggerMetadataEntity.self), 0)
         XCTAssertEqual(try context.count(for: NetworkTaskEntity.self), 0)
         XCTAssertEqual(try context.count(for: NetworkTaskProgressEntity.self), 0)
         XCTAssertEqual(try context.count(for: LoggerBlobHandleEntity.self), 0)
@@ -336,7 +331,6 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertEqual(messages.last?.text, "500")
 
         XCTAssertEqual(try context.count(for: LoggerMessageEntity.self), 501)
-        XCTAssertEqual(try context.count(for: LoggerMetadataEntity.self), 10)
         XCTAssertEqual(try context.count(for: NetworkTaskEntity.self), 1)
         XCTAssertEqual(try context.count(for: LoggerBlobHandleEntity.self), 1)
         context.reset()
@@ -357,7 +351,6 @@ final class LoggerStoreTests: XCTestCase {
 
         // THEN metadata, network requests, blobs are removed
         XCTAssertEqual(try context.count(for: LoggerMessageEntity.self), 351)
-        XCTAssertEqual(try context.count(for: LoggerMetadataEntity.self), 8)
         XCTAssertEqual(try context.count(for: NetworkTaskEntity.self), 0)
         XCTAssertEqual(try context.count(for: LoggerBlobHandleEntity.self), 0)
     }
@@ -391,7 +384,6 @@ final class LoggerStoreTests: XCTestCase {
 
         // THEN
         XCTAssertEqual(try context.count(for: LoggerMessageEntity.self), 2)
-        XCTAssertEqual(try context.count(for: LoggerMetadataEntity.self), 0)
         XCTAssertEqual(try context.count(for: NetworkTaskEntity.self), 1)
         XCTAssertEqual(try context.count(for: NetworkTaskProgressEntity.self), 0)
         XCTAssertEqual(try context.count(for: LoggerBlobHandleEntity.self), 0)
@@ -422,7 +414,6 @@ final class LoggerStoreTests: XCTestCase {
 
         // THEN associated data is deleted
         XCTAssertEqual(try store.backgroundContext.count(for: LoggerMessageEntity.self), 0)
-        XCTAssertEqual(try store.backgroundContext.count(for: LoggerMetadataEntity.self), 0)
         XCTAssertEqual(try store.backgroundContext.count(for: NetworkTaskEntity.self), 0)
         XCTAssertEqual(try store.backgroundContext.count(for: NetworkTaskProgressEntity.self), 0)
         XCTAssertEqual(try store.backgroundContext.count(for: LoggerBlobHandleEntity.self), 0)
@@ -586,7 +577,6 @@ final class LoggerStoreTests: XCTestCase {
         let context = store.viewContext
         XCTAssertEqual(try context.count(for: LoggerMessageEntity.self), 11)
         XCTAssertEqual(try context.count(for: LoggerLabelEntity.self), 5)
-        XCTAssertEqual(try context.count(for: LoggerMetadataEntity.self), 1)
         XCTAssertEqual(try context.count(for: NetworkTaskEntity.self), 3)
         XCTAssertEqual(try context.count(for: NetworkRequestEntity.self), 9)
         XCTAssertEqual(try context.count(for: NetworkResponseEntity.self), 6)
@@ -601,7 +591,6 @@ final class LoggerStoreTests: XCTestCase {
         // THEN both message and metadata are removed
         XCTAssertEqual(try context.count(for: LoggerMessageEntity.self), 0)
         XCTAssertEqual(try context.count(for: LoggerLabelEntity.self), 0)
-        XCTAssertEqual(try context.count(for: LoggerMetadataEntity.self), 0)
         XCTAssertEqual(try context.count(for: NetworkTaskEntity.self), 0)
         XCTAssertEqual(try context.count(for: NetworkRequestEntity.self), 0)
         XCTAssertEqual(try context.count(for: NetworkResponseEntity.self), 0)

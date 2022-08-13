@@ -100,7 +100,7 @@ struct NetworkMessageContextMenuCopySection: View {
                     Image(systemName: "doc.on.doc")
                 }
             }
-            if let host = task.host {
+            if let host = task.host?.value {
                 Button(action: {
                     UXPasteboard.general.string = host
                     runHapticFeedback()

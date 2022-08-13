@@ -171,7 +171,7 @@ final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
     }
 
     var host: String? {
-        task.host
+        task.host?.value
     }
 
     var cURLDescription: String {

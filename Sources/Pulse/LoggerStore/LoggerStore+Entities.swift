@@ -14,18 +14,15 @@ public final class LoggerMessageEntity: NSManagedObject {
     @NSManaged public var function: String
     @NSManaged public var line: Int32 // Doubles as request state storage to save space
     @NSManaged public var label: LoggerLabelEntity
-    @NSManaged public var metadata: Set<LoggerMetadataEntity>
+    @NSManaged public var rawMetadata: String
     @NSManaged public var task: NetworkTaskEntity?
+
+    public lazy var metadata = KeyValueEncoding.decodeKeyValuePairs(rawMetadata)
 }
 
 public final class LoggerLabelEntity: NSManagedObject {
     @NSManaged public var name: String
     @NSManaged public var count: Int64
-}
-
-public final class LoggerMetadataEntity: NSManagedObject {
-    @NSManaged public var key: String
-    @NSManaged public var value: String
 }
 
 public final class NetworkTaskEntity: NSManagedObject {
@@ -266,33 +263,7 @@ public final class NetworkRequestEntity: NSManagedObject {
         headers["Content-Type"].flatMap(NetworkLogger.ContentType.init)
     }
 
-    public lazy var headers: [String: String] = NetworkRequestEntity.decodeHeaders(httpHeaders)
-}
-
-extension NetworkRequestEntity {
-    static func encodeHeaders(_ headers: [String: String]?) -> String {
-        var output = ""
-        let sorted = (headers ?? [:]).sorted { $0.key < $1.key }
-        for (name, value) in sorted {
-            if !output.isEmpty { output.append("\n")}
-            output.append("\(name): \(value)")
-        }
-        return output
-    }
-
-    static func decodeHeaders(_ string: String) -> [String: String] {
-        let pairs = string.components(separatedBy: "\n")
-        var headers: [String: String] = [:]
-        for pair in pairs {
-            if let separatorIndex = pair.firstIndex(of: ":") {
-                let valueStartIndex = pair.index(separatorIndex, offsetBy: 2)
-                if pair.indices.contains(valueStartIndex) {
-                    headers[String(pair[..<separatorIndex])] = String(pair[valueStartIndex...])
-                }
-            }
-        }
-        return headers
-    }
+    public lazy var headers: [String: String] = KeyValueEncoding.decodeKeyValuePairs(httpHeaders)
 }
 
 public final class NetworkResponseEntity: NSManagedObject {
@@ -307,7 +278,7 @@ public final class NetworkResponseEntity: NSManagedObject {
         headers["Content-Length"].flatMap { Int64($0) }
     }
 
-    public lazy var headers: [String: String] = NetworkRequestEntity.decodeHeaders(httpHeaders)
+    public lazy var headers: [String: String] = KeyValueEncoding.decodeKeyValuePairs(httpHeaders)
 }
 
 /// Doesn't contain any data, just the key and some additional payload.
