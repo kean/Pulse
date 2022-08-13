@@ -672,7 +672,7 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertEqual(thumbnail.size, CGSize(width: 512, height: 512))
 
         // THEN original image size saved
-        let metadata = try XCTUnwrap(request.details?.metadata)
+        let metadata = try XCTUnwrap(request.metadata)
         XCTAssertEqual(metadata["ResponsePixelWidth"].flatMap { Int($0) }, 2048)
         XCTAssertEqual(metadata["ResponsePixelHeight"].flatMap { Int($0) }, 2048)
     }
