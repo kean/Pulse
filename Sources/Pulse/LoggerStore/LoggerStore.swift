@@ -372,12 +372,10 @@ extension LoggerStore {
         entity.rawMetadata = {
             guard let responseBody = event.responseBody,
                (responseContentType?.isImage ?? false),
-                  let data = try? JSONEncoder().encode(makeImageMetadata(from: responseBody)) else {
+                  let metadata = makeImageMetadata(from: responseBody) else {
                 return nil
             }
-            let entity = LoggerInlineDataEntity(context: backgroundContext)
-            entity.data = data
-            return entity
+            return KeyValueEncoding.encodeKeyValuePairs(metadata)
         }()
 
         // Completed

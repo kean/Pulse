@@ -74,7 +74,7 @@ public final class NetworkTaskEntity: NSManagedObject {
     @NSManaged public var response: NetworkResponseEntity?
     @NSManaged public var error: NetworkErrorEntity?
     @NSManaged public var metrics: NetworkMetricsEntity?
-    @NSManaged var rawMetadata: LoggerInlineDataEntity?
+    @NSManaged var rawMetadata: String?
 
     /// The request body handle.
     @NSManaged public var requestBody: LoggerBlobHandleEntity?
@@ -89,9 +89,7 @@ public final class NetworkTaskEntity: NSManagedObject {
 
     // MARK: Helpers
 
-    public var metadata: [String: String] {
-        rawMetadata.flatMap { try? JSONDecoder().decode([String: String].self, from: $0.data) } ?? [:]
-    }
+    public lazy var metadata = rawMetadata.map(KeyValueEncoding.decodeKeyValuePairs)
 
     public var errorDomain: ErrorDomain? {
         get { ErrorDomain(rawValue: rawErrorDomain) }
