@@ -37,6 +37,7 @@ final class HTMLPrettyPrint {
 
         let tagRegex = try! Regex("<[^>]*>")
         let attributesRegex = try! Regex(#"(\w*?)=(\"\w.*?\")"#)
+        text.addAttributes([.foregroundColor: UXColor.textColor])
         for match in tagRegex.matches(in: string) {
             let range = makeRange(from: match.fullMatch)
             text.addAttribute(.foregroundColor, value: Palette.pink, range: range)
