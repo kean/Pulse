@@ -40,7 +40,7 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 
         self.controller = NSFetchedResultsController<NetworkTaskEntity>(fetchRequest: request, managedObjectContext: store.viewContext, sectionNameKeyPath: nil, cacheName: nil)
 
-        self.searchCriteria = NetworkSearchCriteriaViewModel(isDefaultStore: store === LoggerStore.shared)
+        self.searchCriteria = NetworkSearchCriteriaViewModel(store: store)
 #if os(iOS) || os(macOS)
         self.table = ConsoleTableViewModel(searchCriteriaViewModel: nil)
 #endif
@@ -62,10 +62,6 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         }.store(in: &cancellables)
 
         refreshNow()
-
-        store.backgroundContext.perform {
-            self.getAllDomains()
-        }
     }
 
     // MARK: Appearance
@@ -102,20 +98,13 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     // MARK: - NSFetchedResultsControllerDelegate
 
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChangeContentWith diff: CollectionDifference<NSManagedObjectID>) {
-        for insertion in diff.insertions {
-            if case let .insert(index, _, _) = insertion {
-                let indexPath = IndexPath(item: index, section: 0)
-                let task = controller.object(at: indexPath) as! NetworkTaskEntity
-                searchCriteria.didInsertEntity(task)
-            }
-        }
-        if isActive {
+        guard isActive else { return }
+
 #if os(iOS) || os(macOS)
-            self.table.diff = diff
+        self.table.diff = diff
 #endif
-            withAnimation {
-                self.didRefreshEntities()
-            }
+        withAnimation {
+            self.didRefreshEntities()
         }
     }
 
@@ -130,28 +119,6 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         #if os(iOS) || os(macOS)
         self.table.entities = self.entities
         #endif
-    }
-
-    // MARK: - Misc
-
-    private func getAllDomains() {
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "\(NetworkTaskEntity.self)")
-
-        // Required! Unless you set the resultType to NSDictionaryResultType, distinct can't work.
-        // All objects in the backing store are implicitly distinct, but two dictionaries can be duplicates.
-        // Since you only want distinct names, only ask for the 'name' property.
-        fetchRequest.resultType = .dictionaryResultType
-        fetchRequest.propertiesToFetch = ["host"]
-        fetchRequest.returnsDistinctResults = true
-
-        // Now it should yield an NSArray of distinct values in dictionaries.
-        let map = (try? store.backgroundContext.fetch(fetchRequest)) ?? []
-        let values = (map as? [[String: String]])?.compactMap { $0["host"] }
-        let set = Set(values ?? [])
-
-        DispatchQueue.main.async {
-            self.searchCriteria.setInitialDomains(set)
-        }
     }
 }
 
