@@ -21,21 +21,28 @@ struct StoreDetailsView: View {
     }
 
     var body: some View {
-        contents
+        Contents(viewModel: viewModel)
             .onAppear { viewModel.load(from: source) }
 #if os(iOS)
             .navigationBarTitle("Store Details", displayMode: .inline)
 #endif
     }
+}
 
-    @ViewBuilder
-    private var contents: some View {
-        if viewModel.isLoading {
-            Spinner().frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-        } else if let error = viewModel.errorMessage {
-            PlaceholderView(imageName: "exclamationmark.circle", title: "Failed to load info", subtitle: error)
-        } else {
-            form
+@available(iOS 14.0, tvOS 14.0, *)
+private struct Contents: View {
+    @ObservedObject var viewModel: StoreDetailsViewModel
+
+    var body: some View {
+        // important: zstack fixed infinite onAppear loop on iOS 14
+        ZStack {
+            if viewModel.isLoading {
+                Spinner().frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+            } else if let error = viewModel.errorMessage {
+                PlaceholderView(imageName: "exclamationmark.circle", title: "Failed to load info", subtitle: error)
+            } else {
+                form
+            }
         }
     }
 
