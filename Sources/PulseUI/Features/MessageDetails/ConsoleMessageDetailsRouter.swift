@@ -14,8 +14,11 @@ struct ConsoleMessageDetailsRouter: View {
             switch viewModel {
             case .message(let viewModel):
                 ConsoleMessageDetailsView(viewModel: viewModel, onClose: onClose)
+                    .id(self.viewModel.id)
             case .task(let viewModel):
+                // TODO: rework the inspector to not require id workaround
                 NetworkInspectorView(viewModel: viewModel, onClose: onClose)
+                    .id(self.viewModel.id)
             }
         }
     }
@@ -27,8 +30,10 @@ struct ConsoleMessageDetailsRouter: View {
 
 final class ConsoleDetailsRouterViewModel: ObservableObject {
     @Published private(set) var viewModel: DetailsViewModel?
+    var id: NSManagedObjectID?
 
     func select(_ entity: NSManagedObject?) {
+        self.id = entity?.objectID
         if let message = entity as? LoggerMessageEntity {
             if let task = message.task {
                 viewModel = .task(.init(task: task))
