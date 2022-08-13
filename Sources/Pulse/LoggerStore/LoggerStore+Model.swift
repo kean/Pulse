@@ -100,7 +100,6 @@ extension LoggerStore {
         ]
 
         response.properties = [
-            Attribute(name: "url", type: .stringAttributeType),
             Attribute(name: "statusCode", type: .integer16AttributeType),
             Attribute(name: "httpHeaders", type: .stringAttributeType),
         ]
@@ -177,4 +176,10 @@ extension LoggerStore {
         model.entities = [message, label, metadata, task, domain, progress, blob, data, request, response, error, metrics, transaction]
         return model
     }()
+}
+
+extension NSEntityDescription {
+    func property(named name: String) -> NSPropertyDescription {
+        properties.first { $0.name == name }!
+    }
 }

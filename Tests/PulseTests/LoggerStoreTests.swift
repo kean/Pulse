@@ -775,8 +775,10 @@ final class LoggerStoreTests: XCTestCase {
         }
         defer { try? store.destroy() }
 
-        for _ in 0..<1000 {
-            populate(store: store)
+        benchmark(title: "populate") {
+            for _ in 0..<1000 {
+                populate(store: store)
+            }
         }
 
         let copyURL = directory.url.appending(filename: "compressed.pulse")

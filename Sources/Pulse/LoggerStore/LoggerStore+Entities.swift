@@ -296,7 +296,6 @@ extension NetworkRequestEntity {
 }
 
 public final class NetworkResponseEntity: NSManagedObject {
-    @NSManaged public var url: String?
     @NSManaged public var statusCode: Int16
     @NSManaged public var httpHeaders: String
 
