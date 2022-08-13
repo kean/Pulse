@@ -23,7 +23,6 @@ extension LoggerStore {
         let metrics = Entity(class: NetworkMetricsEntity.self)
         let transaction = Entity(class: NetworkTransactionMetricsEntity.self)
 
-        let data = Entity(class: LoggerInlineDataEntity.self)
         let blob = Entity(class: LoggerBlobHandleEntity.self)
 
         message.properties = [
@@ -159,15 +158,11 @@ extension LoggerStore {
             Attribute(name: "size", type: .integer32AttributeType),
             Attribute(name: "decompressedSize", type: .integer32AttributeType),
             Attribute(name: "linkCount", type: .integer16AttributeType),
-            Relationship(name: "inlineData", type: .oneToOne(isOptional: true), entity: data)
-        ]
-
-        data.properties = [
-            Attribute(name: "data", type: .binaryDataAttributeType)
+            Attribute(name: "inlineData", type: .binaryDataAttributeType)
         ]
 
         let model = NSManagedObjectModel()
-        model.entities = [message, label, task, domain, progress, blob, data, request, response, error, metrics, transaction]
+        model.entities = [message, label, task, domain, progress, blob, request, response, error, metrics, transaction]
         return model
     }()
 }

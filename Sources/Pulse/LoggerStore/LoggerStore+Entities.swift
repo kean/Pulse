@@ -303,7 +303,7 @@ public final class LoggerBlobHandleEntity: NSManagedObject {
     /// reducing space usage.
     ///
     /// To access data, use the convenience ``data`` property.
-    @NSManaged var inlineData: LoggerInlineDataEntity?
+    @NSManaged public var inlineData: Data?
 
     /// Returns the associated data.
     ///
@@ -318,8 +318,4 @@ public final class LoggerBlobHandleEntity: NSManagedObject {
         }
         return store.store?.getDecompressedData(for: self)
     }
-}
-
-final class LoggerInlineDataEntity: NSManagedObject {
-    @NSManaged var data: Data
 }

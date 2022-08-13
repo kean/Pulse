@@ -576,9 +576,7 @@ extension LoggerStore {
         entity.size = Int32(compressedData.count)
         entity.decompressedSize = Int32(data.count)
         if compressedData.count <= configuration.inlineLimit {
-            let inlineData = LoggerInlineDataEntity(context: backgroundContext)
-            inlineData.data = compressedData
-            entity.inlineData = inlineData
+            entity.inlineData = compressedData
         } else {
             try? compressedData.write(to: makeBlobURL(for: key.hexString))
         }
@@ -604,10 +602,7 @@ extension LoggerStore {
     }
 
     private func getRawData(for entity: LoggerBlobHandleEntity) -> Data? {
-        if let inlineData = entity.inlineData {
-            return inlineData.data
-        }
-        return getRawData(forKey: entity.key.hexString)
+        entity.inlineData ?? getRawData(forKey: entity.key.hexString)
     }
 
     /// Returns blob data for the given key.
