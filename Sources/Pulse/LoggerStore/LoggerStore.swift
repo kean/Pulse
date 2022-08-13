@@ -1026,7 +1026,6 @@ extension LoggerStore {
 
         private func _togglePin(for message: LoggerMessageEntity) {
             message.isPinned.toggle()
-            message.task?.isPinned.toggle()
         }
     }
 }

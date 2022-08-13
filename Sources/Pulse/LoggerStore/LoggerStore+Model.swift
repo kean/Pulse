@@ -44,7 +44,6 @@ extension LoggerStore {
 
         task.properties = [
             Attribute(name: "createdAt", type: .dateAttributeType),
-            Attribute(name: "isPinned", type: .booleanAttributeType),
             Attribute(name: "session", type: .UUIDAttributeType),
             Attribute(name: "taskId", type: .UUIDAttributeType),
             Attribute(name: "taskType", type: .integer16AttributeType),
