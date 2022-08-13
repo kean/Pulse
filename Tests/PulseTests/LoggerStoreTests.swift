@@ -774,6 +774,7 @@ final class LoggerStoreTests: XCTestCase {
         let info = try benchmark(title: "Open") {
             try LoggerStore(storeURL: copyURL)
         }
+        XCTAssertEqual(try info.viewContext.count(for: NetworkRequestEntity.self), 6000)
         XCTAssertEqual(try info.viewContext.count(for: LoggerMessageEntity.self), 10000)
     }
 }

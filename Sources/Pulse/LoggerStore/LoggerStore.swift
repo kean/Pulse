@@ -49,6 +49,7 @@ public final class LoggerStore: @unchecked Sendable {
     private let manifestURL: URL
     private let databaseURL: URL // Points to a tempporary location if archive
     private var requestsCache: [NetworkLogger.Request: NetworkRequestEntity] = [:]
+    private var responsesCache: [NetworkLogger.Response: NetworkResponseEntity] = [:]
 
     // MARK: Shared
 
@@ -300,6 +301,7 @@ extension LoggerStore {
         entity.originalRequest = makeRequest(for: event.originalRequest)
         entity.currentRequest = event.currentRequest.map(makeRequest)
         requestsCache = [:]
+        responsesCache = [:]
     }
 
     private func process(_ event: Event.NetworkTaskProgressUpdated) {
@@ -371,6 +373,9 @@ extension LoggerStore {
             entity.underlyingError = error.underlyingError.flatMap { try? JSONEncoder().encode($0) }
         }
 
+        backgroundContext.delete(entity.originalRequest)
+        entity.currentRequest.map(backgroundContext.delete)
+
         entity.originalRequest = makeRequest(for: event.originalRequest)
         entity.currentRequest = event.currentRequest.map(makeRequest)
         entity.response = event.response.map(makeResponse)
@@ -398,6 +403,7 @@ extension LoggerStore {
         }
 
         requestsCache = [:]
+        responsesCache = [:]
     }
 
     private func preprocessData(_ data: Data, contentType: NetworkLogger.ContentType?) -> Data {

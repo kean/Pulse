@@ -9,7 +9,7 @@ import Foundation
 #endif
 
 extension NetworkLogger {
-    public struct Request: Codable, Hashable, Sendable {
+    public struct Request: Hashable, Codable, Sendable {
         public var url: URL?
         public var httpMethod: String?
         public var headers: [String: String]?
@@ -25,7 +25,7 @@ extension NetworkLogger {
 
         private var rawCachePolicy: UInt?
 
-        public struct Options: OptionSet, Codable, Hashable, Sendable {
+        public struct Options: OptionSet, Hashable, Codable, Sendable {
             public let rawValue: Int8
             public init(rawValue: Int8) { self.rawValue = rawValue }
 
@@ -63,7 +63,7 @@ extension NetworkLogger {
         }
     }
 
-    public struct Response: Codable, Sendable {
+    public struct Response: Hashable, Codable, Sendable {
         public var url: String?
         public var statusCode: Int?
         public var headers: [String: String]?
