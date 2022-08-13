@@ -64,7 +64,6 @@ extension NetworkLogger {
     }
 
     public struct Response: Hashable, Codable, Sendable {
-        public var url: String?
         public var statusCode: Int?
         public var headers: [String: String]?
 
@@ -74,7 +73,6 @@ extension NetworkLogger {
 
         public init(_ urlResponse: URLResponse) {
             let httpResponse = urlResponse as? HTTPURLResponse
-            self.url = urlResponse.url?.absoluteString
             self.statusCode = httpResponse?.statusCode
             self.headers = httpResponse?.allHeaderFields as? [String: String]
         }

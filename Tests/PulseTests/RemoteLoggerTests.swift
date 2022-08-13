@@ -42,7 +42,6 @@ final class RemoteLoggerTests: XCTestCase {
         XCTAssertEqual(decoded.taskType, event.taskType)
         XCTAssertEqual(decoded.createdAt, event.createdAt)
         XCTAssertEqual(decoded.originalRequest.url, event.originalRequest.url)
-        XCTAssertEqual(decoded.response?.url, event.response?.url)
         XCTAssertEqual(decoded.requestBody, "hello".data(using: .utf8))
         XCTAssertEqual(decoded.responseBody, event.responseBody)
         XCTAssertEqual(decoded.metrics?.totalTransferSize.totalBytesSent, event.metrics?.totalTransferSize.totalBytesSent)

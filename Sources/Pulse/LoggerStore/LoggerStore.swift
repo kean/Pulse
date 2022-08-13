@@ -497,9 +497,13 @@ extension LoggerStore {
     }
 
     private func makeResponse(for response: NetworkLogger.Response) -> NetworkResponseEntity {
+        if let entity = responsesCache[response] {
+            return entity
+        }
         let entity = NetworkResponseEntity(context: backgroundContext)
         entity.statusCode = Int16(response.statusCode ?? 0)
         entity.httpHeaders = KeyValueEncoding.encodeKeyValuePairs(response.headers)
+        responsesCache[response] = entity
         return entity
     }
 

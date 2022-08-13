@@ -35,11 +35,7 @@ private let mockLoginRequest: URLRequest = {
 }()
 
 private let mockLoginResponse = HTTPURLResponse(url: URL(string: "https://github.com/login")!, statusCode: 200, httpVersion: "2.0", headerFields: [
-    "Content-Length": "2298",
-    "Content-Type": "application/json; charset=utf-8",
-    "Cache-Control": "no-store",
-    "Content-Encoding": "gzip",
-    "Set-Cookie": "_device_id=11111111111; path=/; expires=Sun, 30 Jan 2022 21:49:04 GMT; secure; HttpOnly; SameSite=Lax"
+    "Set-Cookie": "token=ADSJ1239CX0; path=/; expires=Sun, 30 Jan 2030 21:49:04 GMT; secure; HttpOnly"
 ])!
 
 private let mockMetrics = try! JSONDecoder().decode(NetworkLogger.Metrics.self, from: """
@@ -67,8 +63,7 @@ private let mockMetrics = try! JSONDecoder().decode(NetworkLogger.Metrics.self, 
         "statusCode": 200,
         "headers": {
           "Set-Cookie": "token=ADSJ1239CX0; path=/; expires=Sun, 30 Jan 2030 21:49:04 GMT; secure; HttpOnly"
-        },
-        "url": "https://github.com/login",
+        }
       },
       "localAddress": "192.168.0.13",
       "remotePort": 443,
@@ -116,7 +111,8 @@ private let mockProfileFailureResponse = HTTPURLResponse(url: URL(string: "https
     "Content-Length": "18",
     "Content-Type": "application/json; charset=utf-8",
     "Cache-Control": "no-store",
-    "Content-Encoding": "gzip"
+    "Content-Encoding": "gzip",
+    "Set-Cookie": "_device_id=11111111111; path=/; expires=Sun, 30 Jan 2022 21:49:04 GMT; secure; HttpOnly; SameSite=Lax"
 ])!
 
 // MARK: - GitHub Octovat (Success, 200)

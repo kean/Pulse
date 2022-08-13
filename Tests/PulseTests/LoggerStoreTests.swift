@@ -775,6 +775,7 @@ final class LoggerStoreTests: XCTestCase {
             try LoggerStore(storeURL: copyURL)
         }
         XCTAssertEqual(try info.viewContext.count(for: NetworkRequestEntity.self), 6000)
+        XCTAssertEqual(try info.viewContext.count(for: NetworkResponseEntity.self), 5000)
         XCTAssertEqual(try info.viewContext.count(for: LoggerMessageEntity.self), 10000)
     }
 }
