@@ -4,7 +4,7 @@
 
 import Foundation
 
-#if os(iOS) || os(macOS) || os(tvOS)
+#if os(iOS) || os(macOS)
 
 #if os(macOS)
 import AppKit

@@ -69,7 +69,7 @@ final class FileViewerViewModel: ObservableObject {
         } else if data.isEmpty {
             return .other(.init(string: "Unavailable"))
         } else if let string = String(data: data, encoding: .utf8) {
-#if os(iOS) || os(macOS) || os(tvOS)
+#if os(iOS) || os(macOS)
             if contentType?.isEncodedForm ?? false, let components = decodeQueryParameters(form: string) {
                 return .other(.init(string: components.asAttributedString()))
             } else if contentType?.isHTML ?? false {
