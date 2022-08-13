@@ -132,7 +132,11 @@ enum Graphics {
             return nil
         }
         let data = NSMutableData()
+#if os(watchOS)
+        let type: String = "public.jpeg"
+#else
         let type: String = "public.heic"
+#endif
         guard let destination = CGImageDestinationCreateWithData(data as CFMutableData, type as CFString, 1, nil) else {
             return nil
         }
@@ -141,6 +145,7 @@ enum Graphics {
         ]
         CGImageDestinationAddImage(destination, source, options)
         CGImageDestinationFinalize(destination)
+        guard !data.isEmpty else { return nil }
         return data as Data
     }
 }
