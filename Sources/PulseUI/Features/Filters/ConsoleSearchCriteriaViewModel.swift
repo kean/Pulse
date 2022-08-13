@@ -22,8 +22,6 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
 
     private var cancellables: [AnyCancellable] = []
 
-#warning("TOOD: dispaly count for labels")
-
     init(store: LoggerStore) {
         labels = ManagedObjectsObserver(context: store.viewContext, sortDescriptior: NSSortDescriptor(keyPath: \LoggerLabelEntity.name, ascending: true))
 

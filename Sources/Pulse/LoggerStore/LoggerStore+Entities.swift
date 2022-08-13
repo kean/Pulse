@@ -138,7 +138,6 @@ public final class NetworkDomainEntity: NSManagedObject {
     @NSManaged public var count: Int64
 }
 
-#warning("TODO: embed in Task?")
 /// Indicates current download or upload progress.
 public final class NetworkTaskProgressEntity: NSManagedObject {
     /// Indicates current download or upload progress.
