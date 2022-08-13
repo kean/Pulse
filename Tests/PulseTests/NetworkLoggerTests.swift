@@ -80,9 +80,9 @@ final class NetworkLoggerTests: XCTestCase {
         ))
 
         XCTAssertEqual(request.count, 325)
-        XCTAssertEqual(response.count, 311)
-        XCTAssertEqual(metrics.count, 1023)
-        XCTAssertEqual(event.count, 1843)
+        XCTAssertEqual(response.count, 129)
+        XCTAssertEqual(metrics.count, 987)
+        XCTAssertEqual(event.count, 1625)
 
         // These values are slightly different across invocations
 //        XCTAssertEqual(try request.compressed().count, 251, accuracy: 10)

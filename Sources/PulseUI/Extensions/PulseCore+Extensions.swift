@@ -9,8 +9,8 @@ import Pulse
 
 extension NetworkTaskEntity {
     func cURLDescription() -> String {
-        let request = currentRequest ?? originalRequest
-        guard let url = request.url else {
+        guard let request = currentRequest ?? originalRequest,
+              let url = request.url else {
             return "$ curl command generation failed"
         }
 
@@ -41,7 +41,7 @@ extension NetworkTaskEntity {
 extension NetworkTaskEntity {
     var requestFileViewerContext: FileViewerViewModel.Context {
         FileViewerViewModel.Context(
-            contentType: originalRequest.contentType,
+            contentType: originalRequest?.contentType,
             originalSize: requestBodySize,
             metadata: metadata,
             isResponse: false,

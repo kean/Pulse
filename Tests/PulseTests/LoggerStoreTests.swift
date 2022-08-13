@@ -575,8 +575,8 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertEqual(try context.count(for: LoggerMessageEntity.self), 11)
         XCTAssertEqual(try context.count(for: LoggerLabelEntity.self), 5)
         XCTAssertEqual(try context.count(for: NetworkTaskEntity.self), 3)
-        XCTAssertEqual(try context.count(for: NetworkRequestEntity.self), 9)
-        XCTAssertEqual(try context.count(for: NetworkResponseEntity.self), 6)
+        XCTAssertEqual(try context.count(for: NetworkRequestEntity.self), 6)
+        XCTAssertEqual(try context.count(for: NetworkResponseEntity.self), 5)
         XCTAssertEqual(try context.count(for: NetworkTransactionMetricsEntity.self), 3)
         XCTAssertEqual(try context.count(for: LoggerBlobHandleEntity.self), 3)
 
@@ -640,12 +640,11 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertEqual(request.type, .dataTask)
         XCTAssertEqual(request.statusCode, 200)
         XCTAssertEqual(request.state, .success)
-        XCTAssertEqual(request.responseContentType, "application/json")
         XCTAssertEqual(request.isFromCache, false)
         XCTAssertEqual(request.redirectCount, 0)
 
         // Details
-        XCTAssertEqual(request.originalRequest.url, "https://github.com/login")
+        XCTAssertEqual(request.originalRequest?.url, "https://github.com/login")
     }
 
     // MARK: - Image Support
@@ -748,7 +747,7 @@ final class LoggerStoreTests: XCTestCase {
         print("Package: \(try storeURL.directoryTotalSize()). Archive: \(size)")
     }
 
-    func testMesasureExportSizeLarge() throws {
+    func _testMesasureExportSizeLarge() throws {
         // GIVEN
         let store = makeStore {
             // Thumbnail generation significantly impacts the right speed

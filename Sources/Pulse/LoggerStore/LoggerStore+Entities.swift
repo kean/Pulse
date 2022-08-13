@@ -76,7 +76,7 @@ public final class NetworkTaskEntity: NSManagedObject {
 
     // MARK: Details
 
-    @NSManaged public var originalRequest: NetworkRequestEntity
+    @NSManaged public var originalRequest: NetworkRequestEntity?
     @NSManaged public var currentRequest: NetworkRequestEntity?
     @NSManaged public var response: NetworkResponseEntity?
     @NSManaged public var transactions: Set<NetworkTransactionMetricsEntity>

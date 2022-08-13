@@ -373,7 +373,7 @@ extension LoggerStore {
             entity.underlyingError = error.underlyingError.flatMap { try? JSONEncoder().encode($0) }
         }
 
-        backgroundContext.delete(entity.originalRequest)
+        entity.originalRequest.map(backgroundContext.delete)
         entity.currentRequest.map(backgroundContext.delete)
 
         entity.originalRequest = makeRequest(for: event.originalRequest)

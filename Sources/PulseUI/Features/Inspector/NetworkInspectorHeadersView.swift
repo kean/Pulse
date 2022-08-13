@@ -85,7 +85,7 @@ final class NetworkInspectorHeaderViewModel: ObservableObject {
     @Published var isResponseRawActive = false
 
     var requestHeadersOriginal: KeyValueSectionViewModel {
-        let items = task.originalRequest.headers.sorted(by: { $0.key < $1.key })
+        let items = (task.originalRequest?.headers ?? [:]).sorted(by: { $0.key < $1.key })
         return KeyValueSectionViewModel(
             title: "Request Headers (Original)",
             color: .blue,

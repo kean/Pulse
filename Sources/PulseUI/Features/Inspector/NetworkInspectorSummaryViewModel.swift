@@ -90,12 +90,12 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     // MARK: - Request (Original)
 
     var originalRequestSummary: KeyValueSectionViewModel? {
-        KeyValueSectionViewModel.makeSummary(for: task.originalRequest)
+        task.originalRequest.map(KeyValueSectionViewModel.makeSummary)
     }
 
 #if os(iOS) || os(macOS)
     var originalRequestQueryItems: KeyValueSectionViewModel? {
-        task.originalRequest.url.flatMap(URL.init).flatMap {
+        task.originalRequest?.url.flatMap(URL.init).flatMap {
             KeyValueSectionViewModel.makeQueryItems(for: $0) { [unowned self] in
                 self.isOriginalQueryItemsLinkActive = true
             }
@@ -103,12 +103,12 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     }
 #endif
 
-    var originalRequestParameters: KeyValueSectionViewModel {
-        KeyValueSectionViewModel.makeParameters(for: task.originalRequest)
+    var originalRequestParameters: KeyValueSectionViewModel? {
+        task.originalRequest.map(KeyValueSectionViewModel.makeParameters)
     }
 
     var originalRequestHeaders: KeyValueSectionViewModel {
-        KeyValueSectionViewModel.makeRequestHeaders(for: task.originalRequest.headers) { [unowned self] in
+        KeyValueSectionViewModel.makeRequestHeaders(for: task.originalRequest?.headers ?? [:]) { [unowned self] in
             self.isOriginalRequestHeadersLinkActive = true
         }
     }
@@ -117,7 +117,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
         guard task.requestBodySize > 0 else {
             return KeyValueSectionViewModel(title: "Request Body", color: .blue)
         }
-        let contentType = task.originalRequest.headers.first(where: { $0.key == "Content-Type" })?.value ?? "–"
+        let contentType = (task.originalRequest?.headers ?? [:]).first(where: { $0.key == "Content-Type" })?.value ?? "–"
         return KeyValueSectionViewModel(
             title: "Request Body",
             color: .blue,
@@ -140,7 +140,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
 
 #if os(iOS) || os(macOS)
     var currentRequestQueryItems: KeyValueSectionViewModel? {
-        task.originalRequest.url.flatMap(URL.init).flatMap {
+        task.originalRequest?.url.flatMap(URL.init).flatMap {
             KeyValueSectionViewModel.makeQueryItems(for: $0) { [unowned self] in
                 self.isCurrentQueryItemsLinkActive = true
             }

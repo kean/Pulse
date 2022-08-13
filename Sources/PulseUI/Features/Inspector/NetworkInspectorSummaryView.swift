@@ -71,7 +71,7 @@ struct NetworkInspectorSummaryView: View {
                 viewModel.originalRequestQueryItems.map { KeyValueSectionView(viewModel: $0, limit: 10) }
                 KeyValueSectionView(viewModel: viewModel.originalRequestHeaders, limit: 10)
                 KeyValueSectionView(viewModel: viewModel.requestBodySection)
-                KeyValueSectionView(viewModel: viewModel.originalRequestParameters)
+                viewModel.originalRequestParameters.map(KeyValueSectionView.init)
             }
         }
     }
