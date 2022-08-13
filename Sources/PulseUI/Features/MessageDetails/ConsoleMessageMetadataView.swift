@@ -38,7 +38,7 @@ struct ConsoleMessageMetadataView: View {
         KeyValueSectionView(viewModel: .init(title: "Summary", color: message.tintColor, items: [
             ("Date", dateFormatter.string(from: message.createdAt)),
             ("Level", LoggerStore.Level(rawValue: message.level)?.name),
-            ("Label", message.label.nonEmpty)
+            ("Label", message.label.name.nonEmpty)
         ]))
         KeyValueSectionView(viewModel: .init(title: "Details", color: .secondary, items: [
             ("Session", message.session.uuidString.nonEmpty),

@@ -40,7 +40,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 
         self.controller = NSFetchedResultsController<LoggerMessageEntity>(fetchRequest: request, managedObjectContext: store.viewContext, sectionNameKeyPath: nil, cacheName: nil)
 
-        self.searchCriteria = ConsoleSearchCriteriaViewModel(isDefaultStore: store === LoggerStore.shared)
+        self.searchCriteria = ConsoleSearchCriteriaViewModel(store: store)
 #if os(iOS) || os(macOS)
         self.table = ConsoleTableViewModel(searchCriteriaViewModel: searchCriteria)
 #endif
@@ -62,12 +62,6 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         }.store(in: &cancellables)
 
         refreshNow()
-
-#if os(iOS)
-        store.backgroundContext.perform {
-            self.getAllLabels()
-        }
-#endif
     }
 
     // MARK: Appearance
@@ -101,46 +95,16 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         reloadMessages()
     }
 
-    // MARK: Labels
-
-    private func getAllLabels() {
-        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "\(LoggerMessageEntity.self)")
-
-        // Required! Unless you set the resultType to NSDictionaryResultType, distinct can't work.
-        // All objects in the backing store are implicitly distinct, but two dictionaries can be duplicates.
-        // Since you only want distinct names, only ask for the 'name' property.
-        fetchRequest.resultType = .dictionaryResultType
-        fetchRequest.propertiesToFetch = ["label"]
-        fetchRequest.returnsDistinctResults = true
-
-        // Now it should yield an NSArray of distinct values in dictionaries.
-        let map = (try? store.backgroundContext.fetch(fetchRequest)) ?? []
-        let values = (map as? [[String: String]])?.compactMap { $0["label"] }
-        let set = Set(values ?? [])
-
-        DispatchQueue.main.async {
-            self.searchCriteria.setInitialLabels(set)
-        }
-    }
-
     // MARK: - NSFetchedResultsControllerDelegate
 
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChangeContentWith diff: CollectionDifference<NSManagedObjectID>) {
-        for insertion in diff.insertions {
-            if case let .insert(index, _, _) = insertion {
-                let indexPath = IndexPath(item: index, section: 0)
-                let message = controller.object(at: indexPath) as! LoggerMessageEntity
-                searchCriteria.didInsertEntity(message)
-            }
-        }
+        guard isActive else { return }
 
-        if isActive {
 #if os(iOS) || os(macOS)
-            self.table.diff = diff
+        self.table.diff = diff
 #endif
-            withAnimation {
-                reloadMessages()
-            }
+        withAnimation {
+            reloadMessages()
         }
     }
 

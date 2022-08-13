@@ -130,7 +130,7 @@ final class StoreDetailsViewModel: ObservableObject {
         KeyValueSectionViewModel(title: "Statistics", color: .gray, action: nil, items: [
             ("Created", dateFormatter.string(from: info.creationDate)),
             ("Messages", info.messageCount.description),
-            ("Requests", info.requestCount.description),
+            ("Requests", info.taskCount.description),
             ("Blobs Size", ByteCountFormatter.string(fromByteCount: info.blobsSize)),
             makeDecompressedRow(for: info),
         ].compactMap { $0 })

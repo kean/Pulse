@@ -111,9 +111,9 @@ final class PinButtonViewModel: ObservableObject {
         self.subscribe()
     }
 
-    init(request: LoggerNetworkRequestEntity) {
-        self.message = request.message
-        self.pins = request.managedObjectContext?.userInfo[pinServiceKey] as? LoggerStore.Pins
+    init(task: NetworkTaskEntity) {
+        self.message = task.message
+        self.pins = task.managedObjectContext?.userInfo[pinServiceKey] as? LoggerStore.Pins
         self.subscribe()
     }
 
@@ -133,7 +133,7 @@ final class PinButtonViewModel: ObservableObject {
 #else
 struct PinButtonViewModel {
     init(message: LoggerMessageEntity) {}
-    init(request: LoggerNetworkRequestEntity) {}
+    init(task: NetworkTaskEntity) {}
 }
 #endif
 

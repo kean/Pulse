@@ -95,10 +95,10 @@ extension NSPersistentStoreCoordinator {
 }
 
 extension NSEntityDescription {
-    convenience init<T>(name: String, class: T.Type) where T: NSManagedObject {
+    convenience init<T>(class customClass: T.Type) where T: NSManagedObject {
         self.init()
-        self.name = name
-        self.managedObjectClassName = T.self.description()
+        self.name = String(describing: customClass) // e.g. `LoggerMessageEntity`
+        self.managedObjectClassName = T.self.description() // e.g. `Pulse.LoggerMessageEntity`
     }
 }
 
@@ -117,22 +117,49 @@ enum RelationshipType {
 }
 
 extension NSRelationshipDescription {
-    static func make(name: String,
+    convenience init(name: String,
                      type: RelationshipType,
                      deleteRule: NSDeleteRule = .cascadeDeleteRule,
-                     entity: NSEntityDescription) -> NSRelationshipDescription {
-        let relationship = NSRelationshipDescription()
-        relationship.name = name
-        relationship.deleteRule = deleteRule
-        relationship.destinationEntity = entity
+                     entity: NSEntityDescription) {
+        self.init()
+        self.name = name
+        self.deleteRule = deleteRule
+        self.destinationEntity = entity
         switch type {
         case .oneToMany:
-            relationship.maxCount = 0
-            relationship.minCount = 0
+            self.maxCount = 0
+            self.minCount = 0
         case .oneToOne(let isOptional):
-            relationship.maxCount = 1
-            relationship.minCount = isOptional ? 0 : 1
+            self.maxCount = 1
+            self.minCount = isOptional ? 0 : 1
         }
-        return relationship
+    }
+}
+
+enum KeyValueEncoding {
+    static func encodeKeyValuePairs(_ pairs: [String: String]?, sanitize: Bool = false) -> String {
+        var output = ""
+        let sorted = (pairs ?? [:]).sorted { $0.key < $1.key }
+        for (name, value) in sorted {
+            if !output.isEmpty { output.append("\n")}
+            let name = sanitize ? name.replacingOccurrences(of: ":", with: "") : name
+            let value = sanitize ? String(value.filter { !$0.isWhitespace }) : value
+            output.append("\(name): \(value)")
+        }
+        return output
+    }
+
+    static func decodeKeyValuePairs(_ string: String) -> [String: String] {
+        let pairs = string.components(separatedBy: "\n")
+        var output: [String: String] = [:]
+        for pair in pairs {
+            if let separatorIndex = pair.firstIndex(of: ":") {
+                let valueStartIndex = pair.index(separatorIndex, offsetBy: 2)
+                if pair.indices.contains(valueStartIndex) {
+                    output[String(pair[..<separatorIndex])] = String(pair[valueStartIndex...])
+                }
+            }
+        }
+        return output
     }
 }

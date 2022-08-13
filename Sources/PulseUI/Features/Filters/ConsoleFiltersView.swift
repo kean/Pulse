@@ -329,9 +329,7 @@ struct ConsoleFiltersView_Previews: PreviewProvider {
 }
 
 private func makeMockViewModel() -> ConsoleSearchCriteriaViewModel {
-    let viewModel = ConsoleSearchCriteriaViewModel()
-    viewModel.setInitialLabels(["network", "auth", "application", "general", "navigation"])
-    return viewModel
+    ConsoleSearchCriteriaViewModel(store: .mock)
 }
 
 #endif

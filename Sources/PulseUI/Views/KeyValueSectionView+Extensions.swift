@@ -6,11 +6,11 @@ import SwiftUI
 import Pulse
 
 extension KeyValueSectionViewModel {
-    static func makeSummary(for request: NetworkLogger.Request) -> KeyValueSectionViewModel {
-        let components = request.url.flatMap { URLComponents(url: $0, resolvingAgainstBaseURL: false) }
+    static func makeSummary(for request: NetworkRequestEntity) -> KeyValueSectionViewModel {
+        let components = request.url.flatMap { URLComponents(string: $0) }
         var items: [(String, String?)] = []
         items += [
-            ("URL", request.url?.absoluteString),
+            ("URL", request.url),
             ("Method", request.httpMethod)
         ]
         if let host = components?.host {
@@ -26,15 +26,15 @@ extension KeyValueSectionViewModel {
         )
     }
 
-    static func makeParameters(for request: NetworkLogger.Request) -> KeyValueSectionViewModel {
+    static func makeParameters(for request: NetworkRequestEntity) -> KeyValueSectionViewModel {
         KeyValueSectionViewModel(title: "Request Parameters", color: .gray, items: [
             ("Cache Policy", request.cachePolicy.description),
-            ("Timeout Interval", DurationFormatter.string(from: request.timeout, isPrecise: false)),
-            ("Allows Cellular Access", request.options.contains(.allowsCellularAccess).description),
-            ("Allows Expensive Network Access", request.options.contains(.allowsExpensiveNetworkAccess).description),
-            ("Allows Constrained Network Access", request.options.contains(.allowsConstrainedNetworkAccess).description),
-            ("HTTP Should Handle Cookies", request.options.contains(.httpShouldHandleCookies).description),
-            ("HTTP Should Use Pipelining", request.options.contains(.httpShouldUsePipelining).description)
+            ("Timeout Interval", DurationFormatter.string(from: TimeInterval(request.timeoutInterval), isPrecise: false)),
+            ("Allows Cellular Access", request.allowsCellularAccess.description),
+            ("Allows Expensive Network Access", request.allowsExpensiveNetworkAccess.description),
+            ("Allows Constrained Network Access", request.allowsConstrainedNetworkAccess.description),
+            ("HTTP Should Handle Cookies", request.httpShouldHandleCookies.description),
+            ("HTTP Should Use Pipelining", request.httpShouldUsePipelining.description)
         ])
     }
 
@@ -47,9 +47,9 @@ extension KeyValueSectionViewModel {
         )
     }
 
-    static func makeSummary(for response: NetworkLogger.Response) -> KeyValueSectionViewModel {
+    static func makeSummary(for response: NetworkResponseEntity) -> KeyValueSectionViewModel {
         KeyValueSectionViewModel(title: "Response Summary", color: .indigo, items: [
-            ("Status Code", response.statusCode.map { String($0) }),
+            ("Status Code", String(response.statusCode)),
             ("Content Type", response.contentType?.rawValue),
             ("Expected Content Length", response.expectedContentLength.map { ByteCountFormatter.string(fromByteCount: max(0, $0)) })
         ])
@@ -64,23 +64,26 @@ extension KeyValueSectionViewModel {
         )
     }
 
-    static func makeErrorDetails(for error: NetworkLogger.ResponseError, action: @escaping () -> Void) -> KeyValueSectionViewModel {
-        KeyValueSectionViewModel(
+    static func makeErrorDetails(for task: NetworkTaskEntity, action: @escaping () -> Void) -> KeyValueSectionViewModel? {
+        guard task.errorCode != 0, task.state == .failure else {
+            return nil
+        }
+        return KeyValueSectionViewModel(
             title: "Error",
             color: .red,
             action: ActionViewModel(action: action, title: "View"),
             items: [
-                ("Domain", error.domain),
-                ("Code", descriptionForError(domain: error.domain, code: error.code)),
-                ("Description", error.debugDescription)
+                ("Domain", task.errorDomain),
+                ("Code", descriptionForError(domain: task.errorDomain, code: task.errorCode)),
+                ("Description", task.errorDebugDescription)
             ])
     }
 
-    private static func descriptionForError(domain: String, code: Int) -> String {
+    private static func descriptionForError(domain: String?, code: Int32) -> String {
         guard domain == NSURLErrorDomain else {
             return "\(code)"
         }
-        return "\(code) (\(descriptionForURLErrorCode(code)))"
+        return "\(code) (\(descriptionForURLErrorCode(Int(code)))"
     }
 
     static func makeQueryItems(for url: URL, action: @escaping () -> Void) -> KeyValueSectionViewModel? {
@@ -102,7 +105,7 @@ extension KeyValueSectionViewModel {
     }
 
 #if os(iOS) || os(macOS)
-    static func makeTiming(for transaction: NetworkLogger.TransactionMetrics) -> KeyValueSectionViewModel {
+    static func makeTiming(for transaction: NetworkTransactionMetricsEntity) -> KeyValueSectionViewModel {
         let timeFormatter = DateFormatter()
         timeFormatter.locale = Locale(identifier: "en_US")
         timeFormatter.dateFormat = "HH:mm:ss.SSSSSS"

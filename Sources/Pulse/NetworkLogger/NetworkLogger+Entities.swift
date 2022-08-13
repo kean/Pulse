@@ -9,12 +9,9 @@ import Foundation
 #endif
 
 extension NetworkLogger {
-    public struct Request: Codable, Sendable {
+    public struct Request: Hashable, Codable, Sendable {
         public var url: URL?
-        public var httpMethod: String {
-            get { rawMethod ?? "GET" }
-            set { rawMethod = newValue }
-        }
+        public var httpMethod: String?
         public var headers: [String: String]?
         public var cachePolicy: URLRequest.CachePolicy {
             rawCachePolicy.flatMap(URLRequest.CachePolicy.init) ?? .useProtocolCachePolicy
@@ -26,11 +23,9 @@ extension NetworkLogger {
             headers?["Content-Type"].flatMap(ContentType.init)
         }
 
-        // Skip encoding when it is set to a default value which is very likely
         private var rawCachePolicy: UInt?
-        private var rawMethod: String?
 
-        public struct Options: OptionSet, Codable, Sendable {
+        public struct Options: OptionSet, Hashable, Codable, Sendable {
             public let rawValue: Int8
             public init(rawValue: Int8) { self.rawValue = rawValue }
 
@@ -39,20 +34,25 @@ extension NetworkLogger {
             public static let allowsConstrainedNetworkAccess = Options(rawValue: 1 << 2)
             public static let httpShouldHandleCookies = Options(rawValue: 1 << 3)
             public static let httpShouldUsePipelining = Options(rawValue: 1 << 4)
+
+            init(_ request: URLRequest) {
+                self = []
+                if request.allowsCellularAccess { insert(.allowsCellularAccess) }
+                if request.allowsExpensiveNetworkAccess { insert(.allowsExpensiveNetworkAccess) }
+                if request.allowsConstrainedNetworkAccess { insert(.allowsConstrainedNetworkAccess) }
+                if request.httpShouldHandleCookies { insert(.httpShouldHandleCookies) }
+                if request.httpShouldUsePipelining { insert(.httpShouldUsePipelining) }
+            }
         }
 
         public init(_ urlRequest: URLRequest) {
             self.url = urlRequest.url
             self.headers = urlRequest.allHTTPHeaderFields
-            self.rawMethod = urlRequest.httpMethod == "GET" ? nil : urlRequest.httpMethod
-            self.rawCachePolicy = urlRequest.cachePolicy == .useProtocolCachePolicy ? nil : urlRequest.cachePolicy.rawValue
+            self.httpMethod = urlRequest.httpMethod
+            self.rawCachePolicy = urlRequest.cachePolicy.rawValue
             self.timeout = urlRequest.timeoutInterval
-            self.options = []
-            if urlRequest.allowsCellularAccess { options.insert(.allowsCellularAccess) }
-            if urlRequest.allowsExpensiveNetworkAccess { options.insert(.allowsExpensiveNetworkAccess) }
-            if urlRequest.allowsConstrainedNetworkAccess { options.insert(.allowsConstrainedNetworkAccess) }
-            if urlRequest.httpShouldHandleCookies { options.insert(.httpShouldHandleCookies) }
-            if urlRequest.httpShouldUsePipelining { options.insert(.httpShouldUsePipelining) }
+            self.options = Options(urlRequest)
+
         }
 
         /// Redacts values for the provided headers.
@@ -61,27 +61,18 @@ extension NetworkLogger {
             copy.headers = _redactingSensitiveHeaders(redactedHeaders, from: headers)
             return copy
         }
-
-        enum CodingKeys: String, CodingKey {
-            case url = "0", rawMethod = "1", headers = "2", timeout = "3", options = "4", rawCachePolicy = "5"
-        }
     }
 
-    public struct Response: Codable, Sendable {
-        public var url: String?
+    public struct Response: Hashable, Codable, Sendable {
         public var statusCode: Int?
         public var headers: [String: String]?
 
         public var contentType: ContentType? {
             headers?["Content-Type"].flatMap(ContentType.init)
         }
-        public var expectedContentLength: Int64? {
-            headers?["Content-Length"].flatMap { Int64($0) }
-        }
 
         public init(_ urlResponse: URLResponse) {
             let httpResponse = urlResponse as? HTTPURLResponse
-            self.url = urlResponse.url?.absoluteString
             self.statusCode = httpResponse?.statusCode
             self.headers = httpResponse?.allHeaderFields as? [String: String]
         }
@@ -92,10 +83,6 @@ extension NetworkLogger {
             copy.headers = _redactingSensitiveHeaders(redactedHeaders, from: headers)
             return copy
         }
-
-        enum CodingKeys: String, CodingKey {
-            case url = "0", statusCode = "1", headers = "2"
-        }
     }
 
     public struct ResponseError: Codable, Sendable {
@@ -105,7 +92,9 @@ extension NetworkLogger {
         /// Contains the underlying error.
         ///
         /// - note: Currently is only used for ``NetworkLogger/DecodingError``.
-        public var error: Swift.Error?
+        public var error: Swift.Error? { underlyingError?.error }
+
+        var underlyingError: UnderlyingError?
 
         public init(_ error: Swift.Error) {
             let error = error as NSError
@@ -116,30 +105,10 @@ extension NetworkLogger {
                 self.domain = error.domain
             }
             self.debugDescription = String(describing: error)
-            self.error = error
+            self.underlyingError = UnderlyingError(error)
         }
 
-        public init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: CodingKeys.self)
-            self.code = try container.decode(Int.self, forKey: .code)
-            self.domain = try container.decode(String.self, forKey: .domain)
-            self.debugDescription = (try? container.decode(String.self, forKey: .debugDescription)) ?? "–"
-            self.error = (try? container.decode(UnderlyingError.self, forKey: .error))?.error
-        }
-
-        public enum CodingKeys: String, CodingKey {
-            case code = "0", domain = "1", debugDescription = "2", error = "3"
-        }
-
-        public func encode(to encoder: Encoder) throws {
-            var container = encoder.container(keyedBy: CodingKeys.self)
-            try container.encode(code, forKey: .code)
-            try container.encode(domain, forKey: .domain)
-            try container.encode(debugDescription, forKey: .debugDescription)
-            try? container.encode(error.map(UnderlyingError.init), forKey: .error)
-        }
-
-        private enum UnderlyingError: Codable, Sendable {
+        enum UnderlyingError: Codable, Sendable {
             case decodingError(NetworkLogger.DecodingError)
 
             var error: Error? {
@@ -161,37 +130,21 @@ extension NetworkLogger {
     }
 
     public struct Metrics: Codable, Sendable {
-        public var taskInterval: DateInterval {
-            get { Metrics.dateInterval(from: rawTaskInterval) }
-            set { rawTaskInterval = Metrics.values(for: newValue) }
-        }
-        private var rawTaskInterval: [TimeInterval]
+        public var taskInterval: DateInterval
         public var redirectCount: Int
         public var transactions: [TransactionMetrics]
         public var totalTransferSize: TransferSizeInfo { TransferSizeInfo(metrics: self) }
 
         public init(metrics: URLSessionTaskMetrics) {
-            self.rawTaskInterval = Metrics.values(for: metrics.taskInterval)
+            self.taskInterval = metrics.taskInterval
             self.redirectCount = metrics.redirectCount
             self.transactions = metrics.transactionMetrics.map(TransactionMetrics.init)
         }
 
         public init(taskInterval: DateInterval, redirectCount: Int, transactions: [TransactionMetrics]) {
-            self.rawTaskInterval = Metrics.values(for: taskInterval)
+            self.taskInterval = taskInterval
             self.redirectCount = redirectCount
             self.transactions = transactions
-        }
-
-        enum CodingKeys: String, CodingKey {
-            case rawTaskInterval = "0", redirectCount = "1", transactions = "2"
-        }
-
-        static func values(for dateInterval: DateInterval) -> [TimeInterval] {
-            [dateInterval.start.timeIntervalSince1970, dateInterval.duration]
-        }
-
-        static func dateInterval(from values: [TimeInterval]) -> DateInterval {
-            DateInterval(start: Date(timeIntervalSince1970: values[0]), duration: values[1])
         }
     }
 
@@ -256,8 +209,7 @@ extension NetworkLogger {
 
     public struct TransactionMetrics: Codable, Sendable {
         public var fetchType: URLSessionTaskMetrics.ResourceFetchType {
-            get { type.flatMap(URLSessionTaskMetrics.ResourceFetchType.init) ?? .networkLoad }
-            set { type = newValue.rawValue }
+            type.flatMap(URLSessionTaskMetrics.ResourceFetchType.init) ?? .networkLoad
         }
         public var request: Request
         public var response: Response?
@@ -270,12 +222,10 @@ extension NetworkLogger {
         public var localPort: Int?
         public var remotePort: Int?
         public var negotiatedTLSProtocolVersion: tls_protocol_version_t? {
-            get { tlsVersion.flatMap(tls_protocol_version_t.init) }
-            set { tlsVersion = newValue?.rawValue }
+            tlsVersion.flatMap(tls_protocol_version_t.init)
         }
         public var negotiatedTLSCipherSuite: tls_ciphersuite_t? {
-            get { tlsSuite.flatMap(tls_ciphersuite_t.init) }
-            set { tlsSuite = newValue?.rawValue }
+            tlsSuite.flatMap(tls_ciphersuite_t.init)
         }
 
         private var tlsVersion: UInt16?
@@ -289,13 +239,7 @@ extension NetworkLogger {
             self.networkProtocol = metrics.networkProtocolName
             self.type = (metrics.resourceFetchType == .networkLoad ? nil :  metrics.resourceFetchType.rawValue)
             self.transferSize = TransferSizeInfo(metrics: metrics)
-            self.conditions = []
-            if metrics.isProxyConnection { conditions.insert(.isProxyConnection) }
-            if metrics.isReusedConnection { conditions.insert(.isReusedConnection) }
-            if metrics.isCellular { conditions.insert(.isCellular) }
-            if metrics.isExpensive { conditions.insert(.isExpensive) }
-            if metrics.isConstrained { conditions.insert(.isConstrained) }
-            if metrics.isMultipath { conditions.insert(.isMultipath) }
+            self.conditions = Conditions(metrics: metrics)
             self.localAddress = metrics.localAddress
             self.remoteAddress = metrics.remoteAddress
             self.localPort = metrics.localPort
@@ -323,10 +267,16 @@ extension NetworkLogger {
             public static let isExpensive = Conditions(rawValue: 1 << 3)
             public static let isConstrained = Conditions(rawValue: 1 << 4)
             public static let isMultipath = Conditions(rawValue: 1 << 5)
-        }
 
-        enum CodingKeys: String, CodingKey {
-            case request = "0", response = "1", timing = "2", networkProtocol = "3", transferSize = "4", conditions = "5", localAddress = "6", remoteAddress = "7", localPort = "8", remotePort = "9", tlsVersion = "10", tlsSuite = "11", type = "12"
+            init(metrics: URLSessionTaskTransactionMetrics) {
+                self = []
+                if metrics.isProxyConnection { insert(.isProxyConnection) }
+                if metrics.isReusedConnection { insert(.isReusedConnection) }
+                if metrics.isCellular { insert(.isCellular) }
+                if metrics.isExpensive { insert(.isExpensive) }
+                if metrics.isConstrained { insert(.isConstrained) }
+                if metrics.isMultipath { insert(.isMultipath) }
+            }
         }
     }
 

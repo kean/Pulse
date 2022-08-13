@@ -220,25 +220,25 @@ final class InsightsViewModel: ObservableObject {
     // MARK: - Accessing Data
 
     func topSlowestRequestsViewModel() -> NetworkInsightsRequestsListViewModel {
-        let requests = self.requests(with: Array(insights.duration.topSlowestRequests.keys))
+        let tasks = self.tasks(with: Array(insights.duration.topSlowestRequests.keys))
             .sorted(by: { $0.duration > $1.duration })
-        return NetworkInsightsRequestsListViewModel(requests: requests)
+        return NetworkInsightsRequestsListViewModel(tasks: tasks)
     }
 
     func requestsWithRedirectsViewModel() -> NetworkInsightsRequestsListViewModel {
-        let requests = self.requests(with: Array(insights.redirects.taskIds))
+        let tasks = self.tasks(with: Array(insights.redirects.taskIds))
             .sorted(by: { $0.createdAt > $1.createdAt })
-        return NetworkInsightsRequestsListViewModel(requests: requests)
+        return NetworkInsightsRequestsListViewModel(tasks: tasks)
     }
 
     func failedRequestsViewModel() -> NetworkInsightsRequestsListViewModel {
-        let requests = self.requests(with: Array(insights.failures.taskIds))
+        let tasks = self.tasks(with: Array(insights.failures.taskIds))
             .sorted(by: { $0.createdAt > $1.createdAt })
-        return NetworkInsightsRequestsListViewModel(requests: requests)
+        return NetworkInsightsRequestsListViewModel(tasks: tasks)
     }
 
-    private func requests(with ids: [UUID]) -> [LoggerNetworkRequestEntity] {
-        let request = NSFetchRequest<LoggerNetworkRequestEntity>(entityName: "\(LoggerNetworkRequestEntity.self)")
+    private func tasks(with ids: [UUID]) -> [NetworkTaskEntity] {
+        let request = NSFetchRequest<NetworkTaskEntity>(entityName: "\(NetworkTaskEntity.self)")
         request.fetchLimit = ids.count
         request.predicate = NSPredicate(format: "taskId IN %@", ids)
 

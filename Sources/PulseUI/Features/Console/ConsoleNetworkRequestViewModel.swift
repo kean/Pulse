@@ -8,7 +8,7 @@ import Combine
 import CoreData
 
 final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
-    private(set) lazy var time = ConsoleMessageViewModel.timeFormatter.string(from: request.createdAt)
+    private(set) lazy var time = ConsoleMessageViewModel.timeFormatter.string(from: task.createdAt)
 #if os(iOS)
     var uiBadgeColor: UIColor = .gray
 #endif
@@ -30,11 +30,11 @@ final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
         return title
     }
 
-    private(set) var state: LoggerNetworkRequestEntity.State = .pending
+    private(set) var state: NetworkTaskEntity.State = .pending
 
-    private(set) lazy var progress = ProgressViewModel(request: request)
+    private(set) lazy var progress = ProgressViewModel(task: task)
 
-    private let request: LoggerNetworkRequestEntity
+    private let task: NetworkTaskEntity
     private var cancellable: AnyCancellable?
 
     static let timeFormatter: DateFormatter = {
@@ -44,14 +44,13 @@ final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
         return formatter
     }()
 
-    init(request: LoggerNetworkRequestEntity) {
-        self.request = request
-
-        self.progress = ProgressViewModel(request: request)
+    init(task: NetworkTaskEntity) {
+        self.task = task
+        self.progress = ProgressViewModel(task: task)
 
         self.refresh()
 
-        self.cancellable = request.objectWillChange.sink { [weak self] in
+        self.cancellable = task.objectWillChange.sink { [weak self] in
             self?.refresh()
             withAnimation {
                 self?.objectWillChange.send()
@@ -60,29 +59,29 @@ final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
     }
 
     private func refresh() {
-        let state = request.state
+        let state = task.state
 
-        var title: String = request.httpMethod ?? "GET"
-        switch request.state {
+        var title: String = task.httpMethod ?? "GET"
+        switch task.state {
         case .pending:
             title += " · "
             title += progress.title.uppercased()
         case .success:
             title += " · "
-            title += StatusCodeFormatter.string(for: Int(request.statusCode))
+            title += StatusCodeFormatter.string(for: Int(task.statusCode))
 #if !os(watchOS)
-            switch request.taskType ?? .dataTask {
+            switch task.type ?? .dataTask {
             case .uploadTask:
-                if request.requestBodySize > 0 {
-                    let sizeText = ByteCountFormatter.string(fromByteCount: request.requestBodySize)
+                if task.requestBodySize > 0 {
+                    let sizeText = ByteCountFormatter.string(fromByteCount: task.requestBodySize)
                     title += " · "
-                    title += request.isFromCache ? "Cache" : sizeText
+                    title += task.isFromCache ? "Cache" : sizeText
                 }
             case .dataTask, .downloadTask:
-                if request.responseBodySize > 0 {
-                    let sizeText = ByteCountFormatter.string(fromByteCount: request.responseBodySize)
+                if task.responseBodySize > 0 {
+                    let sizeText = ByteCountFormatter.string(fromByteCount: task.responseBodySize)
                     title += " · "
-                    title += request.isFromCache ? "Cache" : sizeText
+                    title += task.isFromCache ? "Cache" : sizeText
                 }
             case .streamTask, .webSocketTask:
                 break
@@ -90,27 +89,27 @@ final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
 #endif
         case .failure:
             title += " · "
-            if request.errorCode != 0 {
-                if request.errorDomain == URLError.errorDomain {
-                    title += "\(request.errorCode) \(descriptionForURLErrorCode(Int(request.errorCode)))"
-                } else if request.errorDomain == NetworkLogger.DecodingError.domain {
+            if task.errorCode != 0 {
+                if task.errorDomain == URLError.errorDomain {
+                    title += "\(task.errorCode) \(descriptionForURLErrorCode(Int(task.errorCode)))"
+                } else if task.errorDomain == NetworkLogger.DecodingError.domain {
                     title += "Decoding Failed"
                 } else {
                     title += "Error"
                 }
             } else {
-                title += StatusCodeFormatter.string(for: Int(request.statusCode))
+                title += StatusCodeFormatter.string(for: Int(task.statusCode))
             }
         }
 
-        if request.duration > 0 {
+        if task.duration > 0 {
             title += " · "
-            title += DurationFormatter.string(from: request.duration, isPrecise: false)
+            title += DurationFormatter.string(from: task.duration, isPrecise: false)
         }
 
         self.title = title
 
-        self.text = request.url ?? "URL Unavailable"
+        self.text = task.url ?? "URL Unavailable"
 
 #if os(iOS)
         switch state {
@@ -125,58 +124,58 @@ final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
         case .failure: self.badgeColor = .red
         }
 
-        self.state = request.state
+        self.state = task.state
     }
 
     // MARK: Pins
 
-    lazy var pinViewModel = PinButtonViewModel(request: request)
+    lazy var pinViewModel = PinButtonViewModel(task: task)
 
     // MARK: Context Menu
 
 #if os(iOS) || os(macOS)
 
     func shareAsPlainText() -> ShareItems {
-        ShareItems([ConsoleShareService.share(request, output: .plainText)])
+        ShareItems([ConsoleShareService.share(task, output: .plainText)])
     }
 
     func shareAsMarkdown() -> ShareItems {
-        let text = ConsoleShareService.share(request, output: .markdown)
+        let text = ConsoleShareService.share(task, output: .markdown)
         let directory = TemporaryDirectory()
         let fileURL = directory.write(text: text, extension: "markdown")
         return ShareItems([fileURL], cleanup: directory.remove)
     }
 
     func shareAsHTML() -> ShareItems {
-        let text = ConsoleShareService.share(request, output: .html)
+        let text = ConsoleShareService.share(task, output: .html)
         let directory = TemporaryDirectory()
         let fileURL = directory.write(text: text, extension: "html")
         return ShareItems([fileURL], cleanup: directory.remove)
     }
 
     func shareAsCURL() -> ShareItems {
-        ShareItems([request.cURLDescription()])
+        ShareItems([task.cURLDescription()])
     }
 
     var containsResponseData: Bool {
-        request.responseBodySize > 0
+        task.responseBodySize > 0
     }
 
     // WARNING: This call is relatively expensive.
     var responseString: String? {
-        request.responseBody?.data.flatMap { String(data: $0, encoding: .utf8) }
+        task.responseBody?.data.flatMap { String(data: $0, encoding: .utf8) }
     }
 
     var url: String? {
-        request.url
+        task.url
     }
 
     var host: String? {
-        request.host
+        task.host?.value
     }
 
     var cURLDescription: String {
-        request.cURLDescription()
+        task.cURLDescription()
     }
 #endif
 }

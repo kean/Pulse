@@ -26,19 +26,19 @@ struct NetworkInspectorHeadersTabView: View {
 }
 
 final class NetworkInspectorHeadersTabViewModel: ObservableObject {
-    var isPending: Bool { request.state == .pending }
-    private(set) lazy var progress = ProgressViewModel(request: request)
+    var isPending: Bool { task.state == .pending }
+    private(set) lazy var progress = ProgressViewModel(task: task)
 
     var headersViewModel: NetworkInspectorHeaderViewModel {
-        NetworkInspectorHeaderViewModel(request: request)
+        NetworkInspectorHeaderViewModel(task: task)
     }
 
-    private let request: LoggerNetworkRequestEntity
+    private let task: NetworkTaskEntity
     private var cancellable: AnyCancellable?
 
-    init(request: LoggerNetworkRequestEntity) {
-        self.request = request
-        cancellable = request.objectWillChange.sink { [weak self] in self?.refresh() }
+    init(task: NetworkTaskEntity) {
+        self.task = task
+        cancellable = task.objectWillChange.sink { [weak self] in self?.refresh() }
     }
 
     private func refresh() {
@@ -49,7 +49,7 @@ final class NetworkInspectorHeadersTabViewModel: ObservableObject {
 #if DEBUG
 struct NetworkInspectorHeadersTabView_Previews: PreviewProvider {
     static var previews: some View {
-        NetworkInspectorHeadersTabView(viewModel: .init(request: LoggerStore.preview.entity(for: .login)))
+        NetworkInspectorHeadersTabView(viewModel: .init(task: LoggerStore.preview.entity(for: .login)))
     }
 }
 #endif

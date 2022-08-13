@@ -14,17 +14,17 @@ struct NetworkInspectorRequestView: View {
         if let viewModel = viewModel.fileViewModel {
             FileViewer(viewModel: viewModel, onToggleExpanded: onToggleExpanded)
                 .onDisappear { self.viewModel.onDisappear() }
-        } else if viewModel.request.state == .pending {
+        } else if viewModel.task.state == .pending {
             SpinnerView(viewModel: viewModel.progress)
-        } else if viewModel.request.taskType == .uploadTask {
+        } else if viewModel.task.type == .uploadTask {
             PlaceholderView(imageName: "arrow.up.circle", title: {
                 var title = "Uploaded from a File"
-                if viewModel.request.requestBodySize > 0 {
-                    title = "\(ByteCountFormatter.string(fromByteCount: viewModel.request.requestBodySize))\n\(title)"
+                if viewModel.task.requestBodySize > 0 {
+                    title = "\(ByteCountFormatter.string(fromByteCount: viewModel.task.requestBodySize))\n\(title)"
                 }
                 return title
             }())
-        } else if viewModel.request.requestBodySize > 0 {
+        } else if viewModel.task.requestBodySize > 0 {
             PlaceholderView(imageName: "exclamationmark.circle", title: "Unavailable", subtitle: "The request body was deleted from the store to reduce its size")
         } else {
             PlaceholderView(imageName: "nosign", title: "Empty Request")
@@ -33,15 +33,15 @@ struct NetworkInspectorRequestView: View {
 }
 
 final class NetworkInspectorRequestViewModel: ObservableObject {
-    private(set) lazy var progress = ProgressViewModel(request: request)
+    private(set) lazy var progress = ProgressViewModel(task: task)
     var fileViewModel: FileViewerViewModel? {
         if let viewModel = _fileViewModel {
             return viewModel
         }
-        if let requestBody = request.requestBody?.data {
+        if let requestBody = task.requestBody?.data {
             _fileViewModel = FileViewerViewModel(
                 title: "Request",
-                context: request.requestFileViewerContext,
+                context: task.requestFileViewerContext,
                 data: { requestBody }
             )
         }
@@ -50,19 +50,19 @@ final class NetworkInspectorRequestViewModel: ObservableObject {
 
     private var _fileViewModel: FileViewerViewModel?
 
-    let request: LoggerNetworkRequestEntity
+    let task: NetworkTaskEntity
     private var cancellable: AnyCancellable?
 
-    init(request: LoggerNetworkRequestEntity) {
-        self.request = request
-        cancellable = request.objectWillChange.sink { [weak self] in self?.refresh() }
+    init(task: NetworkTaskEntity) {
+        self.task = task
+        cancellable = task.objectWillChange.sink { [weak self] in self?.refresh() }
     }
 
     func onDisappear() {
-        request.requestBody?.reset()
+        task.requestBody?.reset()
     }
 
     private func refresh() {
-withAnimation { objectWillChange.send() }
+        withAnimation { objectWillChange.send() }
     }
 }

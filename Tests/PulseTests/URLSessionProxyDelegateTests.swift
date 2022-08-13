@@ -55,23 +55,21 @@ final class URLSessionProxyDelegateTests: XCTestCase {
         wait(for: [didComplete], timeout: 5)
 
         // RECORD
-        let requests = try store.allRequests()
-        let request = try XCTUnwrap(requests.first)
+        let tasks = try store.allTasks()
+        let task = try XCTUnwrap(tasks.first)
 
         // THEN
-        XCTAssertEqual(requests.count, 1)
+        XCTAssertEqual(tasks.count, 1)
 
-        XCTAssertEqual(request.url, dataURL.absoluteString)
-        XCTAssertEqual(request.host, nil)
-        XCTAssertEqual(request.httpMethod, "GET")
-        XCTAssertNil(request.errorDomain)
-        XCTAssertEqual(request.errorCode, 0)
-        XCTAssertEqual(request.requestState, LoggerNetworkRequestEntity.State.success.rawValue)
+        XCTAssertEqual(task.url, dataURL.absoluteString)
+        XCTAssertEqual(task.host, nil)
+        XCTAssertEqual(task.httpMethod, "GET")
+        XCTAssertNil(task.errorDomain)
+        XCTAssertEqual(task.errorCode, 0)
+        XCTAssertEqual(task.requestState, NetworkTaskEntity.State.success.rawValue)
 
-        XCTAssertNotNil(request.details)
-
-        let message = try XCTUnwrap(request.message)
-        XCTAssertEqual(message.label, "network")
+        let message = try XCTUnwrap(task.message)
+        XCTAssertEqual(message.label.name, "network")
     }
 
     func testForwardingOfUnimplementedMethod() throws {
@@ -136,23 +134,21 @@ final class URLSessionProxyDelegateTests: XCTestCase {
         wait(for: [didComplete], timeout: 5)
 
         // RECORD
-        let requests = try store.allRequests()
-        let request = try XCTUnwrap(requests.first)
+        let tasks = try store.allTasks()
+        let task = try XCTUnwrap(tasks.first)
 
         // THEN
-        XCTAssertEqual(requests.count, 1)
+        XCTAssertEqual(tasks.count, 1)
 
-        XCTAssertEqual(request.url, dataURL.absoluteString)
-        XCTAssertEqual(request.host, nil)
-        XCTAssertEqual(request.httpMethod, "GET")
-        XCTAssertNil(request.errorDomain)
-        XCTAssertEqual(request.errorCode, 0)
-        XCTAssertEqual(request.requestState, LoggerNetworkRequestEntity.State.success.rawValue)
+        XCTAssertEqual(task.url, dataURL.absoluteString)
+        XCTAssertEqual(task.host, nil)
+        XCTAssertEqual(task.httpMethod, "GET")
+        XCTAssertNil(task.errorDomain)
+        XCTAssertEqual(task.errorCode, 0)
+        XCTAssertEqual(task.requestState, NetworkTaskEntity.State.success.rawValue)
 
-        XCTAssertNotNil(request.details)
-
-        let message = try XCTUnwrap(request.message)
-        XCTAssertEqual(message.label, "network")
+        let message = try XCTUnwrap(task.message)
+        XCTAssertEqual(message.label.name, "network")
     }
 }
 

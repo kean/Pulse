@@ -22,33 +22,33 @@ final class NetworkInspectorViewModel: ObservableObject {
 #endif
 
     // TODO: Make private
-    let request: LoggerNetworkRequestEntity
+    let task: NetworkTaskEntity
 
-    init(request: LoggerNetworkRequestEntity) {
-        self.request = request
+    init(task: NetworkTaskEntity) {
+        self.task = task
 
-        if let url = request.url.flatMap(URL.init(string:)) {
+        if let url = task.url.flatMap(URL.init(string:)) {
             self.title = url.lastPathComponent
         }
 
-        self.summaryViewModel = NetworkInspectorSummaryViewModel(request: request)
-        self.responseViewModel = NetworkInspectorResponseViewModel(request: request)
-        self.requestViewModel = NetworkInspectorRequestViewModel(request: request)
+        self.summaryViewModel = NetworkInspectorSummaryViewModel(task: task)
+        self.responseViewModel = NetworkInspectorResponseViewModel(task: task)
+        self.requestViewModel = NetworkInspectorRequestViewModel(task: task)
 #if !os(watchOS) && !os(tvOS)
-        self.metricsViewModel = NetworkInspectorMetricsTabViewModel(request: request)
+        self.metricsViewModel = NetworkInspectorMetricsTabViewModel(task: task)
 #endif
 #if os(macOS)
-        self.headersViewModel = NetworkInspectorHeadersTabViewModel(request: request)
+        self.headersViewModel = NetworkInspectorHeadersTabViewModel(task: task)
 #endif
     }
 
 #if os(iOS) || os(macOS)
     var pin: PinButtonViewModel? {
-        request.message.map(PinButtonViewModel.init)
+        task.message.map(PinButtonViewModel.init)
     }
 
     func prepareForSharing() -> String {
-        ConsoleShareService.share(request, output: .plainText)
+        ConsoleShareService.share(task, output: .plainText)
     }
 #endif
 }

@@ -14,7 +14,7 @@ struct ConsoleMessageDetailsRouter: View {
             switch viewModel {
             case .message(let viewModel):
                 ConsoleMessageDetailsView(viewModel: viewModel, onClose: onClose)
-            case .request(let viewModel):
+            case .task(let viewModel):
                 NetworkInspectorView(viewModel: viewModel, onClose: onClose)
             }
         }
@@ -30,13 +30,13 @@ final class ConsoleDetailsRouterViewModel: ObservableObject {
 
     func select(_ entity: NSManagedObject?) {
         if let message = entity as? LoggerMessageEntity {
-            if let request = message.request {
-                viewModel = .request(.init(request: request))
+            if let task = message.task {
+                viewModel = .task(.init(task: task))
             } else {
                 viewModel = .message(.init(message: message))
             }
-        } else if let request = entity as? LoggerNetworkRequestEntity {
-            viewModel = .request(.init(request: request))
+        } else if let task = entity as? NetworkTaskEntity {
+            viewModel = .task(.init(task: task))
         } else {
             viewModel = nil
         }
@@ -44,6 +44,6 @@ final class ConsoleDetailsRouterViewModel: ObservableObject {
 
     enum DetailsViewModel {
         case message(ConsoleMessageDetailsViewModel)
-        case request(NetworkInspectorViewModel)
+        case task(NetworkInspectorViewModel)
     }
 }

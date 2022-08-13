@@ -268,7 +268,7 @@ final class NetworkSearchFilter: ObservableObject, Hashable, Identifiable {
 
     var isProgrammatic: Bool {
         switch field {
-        case .requestHeader, .responseHeader, .requestBody, .responseBody: return true
+        case .requestBody, .responseBody: return true
         default: return false
         }
     }
@@ -305,76 +305,35 @@ final class NetworkSearchFilter: ObservableObject, Hashable, Identifiable {
         case .method: return "httpMethod"
         case .statusCode: return "statusCode"
         case .errorCode: return "errorCode"
+        case .requestHeader: return "originalRequest.httpHeaders"
+        case .responseHeader: return "response.httpHeaders"
         default: return nil
         }
     }
 }
 
-private func decode<T: Decodable>(_ type: T.Type) -> (_ data: Data?) -> T? {
-    {
-        guard let data = $0 else { return nil }
-        return try? JSONDecoder().decode(type, from: data)
-    }
-}
-
-private var cache = Cache<CacheKey, Any>(costLimit: Int.max, countLimit: 1000)
-
-private struct CacheKey: Hashable {
-    let id: NSManagedObjectID
-    let code: Int
-}
-
-func evaluateProgrammaticFilters(_ filters: [NetworkSearchFilter], entity: LoggerNetworkRequestEntity, store: LoggerStore) -> Bool {
-    var request: NetworkLogger.Request? {
-        let key = CacheKey(id: entity.objectID, code: 0)
-        if let value = cache.value(forKey: key) as? NetworkLogger.Request {
-            return value
-        }
-        let value = entity.details?.originalRequest
-        if let value = value {
-            cache.set(value, forKey: key, ttl: 60)
-        }
-        return value
-    }
-    var response: NetworkLogger.Response? {
-        let key = CacheKey(id: entity.objectID, code: 1)
-        if let value = cache.value(forKey: key) as? NetworkLogger.Response {
-            return value
-        }
-        let value = entity.details?.response
-        if let value = value {
-            cache.set(value, forKey: key, ttl: 60)
-        }
-        return value
-    }
-
+func evaluateProgrammaticFilters(_ filters: [NetworkSearchFilter], entity: NetworkTaskEntity, store: LoggerStore) -> Bool {
     func isMatch(filter: NetworkSearchFilter) -> Bool {
         switch filter.field {
-        case .requestHeader: return (request?.headers ?? [:]).contains { filter.matches(string: $0.key) || filter.matches(string: $0.value) }
-        case .responseHeader: return (response?.headers ?? [:]).contains { filter.matches(string: $0.key) || filter.matches(string: $0.value) }
         case .requestBody: return filter.matches(string: String(data: entity.requestBody?.data ?? Data(), encoding: .utf8) ?? "")
         case .responseBody: return filter.matches(string: String(data: entity.responseBody?.data ?? Data(), encoding: .utf8) ?? "")
         default: assertionFailure(); return false
         }
     }
-
     for filter in filters where filter.isProgrammatic {
         if !isMatch(filter: filter) {
             return false
         }
     }
-
     return true
 }
 
-private let isNetworkMessagePredicate = NSPredicate(format: "request != nil")
-
 extension NetworkSearchCriteria {
-    static func update(request: NSFetchRequest<LoggerNetworkRequestEntity>, filterTerm: String, criteria: NetworkSearchCriteria, filters: [NetworkSearchFilter], isOnlyErrors: Bool, sessionId: UUID?) {
+    static func update(request: NSFetchRequest<NetworkTaskEntity>, filterTerm: String, criteria: NetworkSearchCriteria, filters: [NetworkSearchFilter], isOnlyErrors: Bool, sessionId: UUID?) {
         var predicates = [NSPredicate]()
 
         if isOnlyErrors {
-            predicates.append(NSPredicate(format: "requestState == %d", LoggerNetworkRequestEntity.State.failure.rawValue))
+            predicates.append(NSPredicate(format: "requestState == %d", NetworkTaskEntity.State.failure.rawValue))
         }
 
         if criteria.dates.isCurrentSessionOnly, let sessionId = sessionId {
@@ -433,7 +392,7 @@ extension NetworkSearchCriteria {
                 predicates.append(NSPredicate(format: "isFromCache == YES"))
             }
             if case .some(let taskType) = criteria.networking.taskType {
-                predicates.append(NSPredicate(format: "rawTaskType == %i", taskType.rawValue))
+                predicates.append(NSPredicate(format: "taskType == %i", taskType.rawValue))
             }
         }
 

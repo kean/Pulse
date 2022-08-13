@@ -35,51 +35,49 @@ private let mockLoginRequest: URLRequest = {
 }()
 
 private let mockLoginResponse = HTTPURLResponse(url: URL(string: "https://github.com/login")!, statusCode: 200, httpVersion: "2.0", headerFields: [
-    "Content-Length": "2298",
-    "Content-Type": "application/json; charset=utf-8",
-    "Cache-Control": "no-store",
-    "Content-Encoding": "gzip",
-    "Set-Cookie": "_device_id=11111111111; path=/; expires=Sun, 30 Jan 2022 21:49:04 GMT; secure; HttpOnly; SameSite=Lax"
+    "Set-Cookie": "token=ADSJ1239CX0; path=/; expires=Sun, 30 Jan 2030 21:49:04 GMT; secure; HttpOnly"
 ])!
 
 private let mockMetrics = try! JSONDecoder().decode(NetworkLogger.Metrics.self, from: """
 {
-  "2": [
+  "transactions": [
     {
-      "4": [167, 0, 0, 94, 166, 214],
-      "2": [681270022.377544, 681270022.3860258, 681270022.4066201, 681270022.4071407, 681270022.4251491, 681270022.533362, 681270022.5338686, 681270022.5343999, 681270022.5381376, 681270022.7511908, 681270022.8044541],
-      "3": "http/2.0",
-      "5": 0,
-      "0": {
-        "0": "https://github.com/login?username=kean&password=sensitive",
-        "1": "POST",
-        "2": {
+      "transferSize": [167, 0, 0, 94, 166, 214],
+      "timing": [681270022.377544, 681270022.3860258, 681270022.4066201, 681270022.4071407, 681270022.4251491, 681270022.533362, 681270022.5338686, 681270022.5343999, 681270022.5381376, 681270022.7511908, 681270022.8044541],
+      "networkProtocol": "http/2.0",
+      "conditions": 0,
+      "request": {
+        "url": "https://github.com/login?username=kean&password=nope",
+        "method": "POST",
+        "headers": {
           "User-Agent": "Pulse Demo/2.0",
           "Accept-Encoding": "gzip",
           "Cache-Control": "no-cache",
           "Accept-Language": "en-us",
           "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
         },
-        "4": 15,
-        "3": 60
+        "options": 15,
+        "timeout": 60
       },
-      "1": {
-        "1": 200,
-        "2": {
+      "response": {
+        "statusCode": 200,
+        "headers": {
           "Set-Cookie": "token=ADSJ1239CX0; path=/; expires=Sun, 30 Jan 2030 21:49:04 GMT; secure; HttpOnly"
-        },
-        "0": "https://github.com/login",
+        }
       },
-      "6": "192.168.0.13",
-      "9": 443,
-      "7": "17.253.97.204",
-      "8": 58622,
-      "10": 772,
-      "11": 4865
+      "localAddress": "192.168.0.13",
+      "remotePort": 443,
+      "remoteAddress": "17.253.97.204",
+      "localPort": 58622,
+      "tlsVersion": 772,
+      "tlsSuite": 4865
     }
   ],
-  "0": [681270022.377544, 0.42691],
-  "1": 0
+  "taskInterval": {
+    "start": 681270022.377544,
+    "duration": 0.42691
+  },
+  "redirectCount": 0
 }
 """.data(using: .utf8)!)
 
@@ -113,7 +111,8 @@ private let mockProfileFailureResponse = HTTPURLResponse(url: URL(string: "https
     "Content-Length": "18",
     "Content-Type": "application/json; charset=utf-8",
     "Cache-Control": "no-store",
-    "Content-Encoding": "gzip"
+    "Content-Encoding": "gzip",
+    "Set-Cookie": "_device_id=11111111111; path=/; expires=Sun, 30 Jan 2022 21:49:04 GMT; secure; HttpOnly; SameSite=Lax"
 ])!
 
 // MARK: - GitHub Octovat (Success, 200)

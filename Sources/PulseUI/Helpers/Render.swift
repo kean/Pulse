@@ -8,21 +8,21 @@ import Foundation
 #if os(iOS) || os(macOS)
 
 enum Render {
-    static func asPlainText(request: LoggerNetworkRequestEntity) -> String {
-        render(request: request, using: PlainTextRenderer())
+    static func asPlainText(task: NetworkTaskEntity) -> String {
+        render(task: task, using: PlainTextRenderer())
     }
 
-    static func asMarkdown(request: LoggerNetworkRequestEntity) -> String {
-        render(request: request, using: MarkdownRenderer())
+    static func asMarkdown(task: NetworkTaskEntity) -> String {
+        render(task: task, using: MarkdownRenderer())
     }
 
-    static func asHTML(request: LoggerNetworkRequestEntity) -> String {
-        render(request: request, using: HTMLRenderer(error: request.details?.decodingError))
+    static func asHTML(task: NetworkTaskEntity) -> String {
+        render(task: task, using: HTMLRenderer(error: task.decodingError))
     }
 
-    private static func render(request: LoggerNetworkRequestEntity, using renderer: Renderer) -> String {
+    private static func render(task: NetworkTaskEntity, using renderer: Renderer) -> String {
         // Summary
-        let viewModel = NetworkInspectorSummaryViewModel(request: request)
+        let viewModel = NetworkInspectorSummaryViewModel(task: task)
         renderer.add(viewModel.summaryViewModel, isSecondaryTitle: false)
         renderer.add(viewModel.errorModel, isSecondaryTitle: false)
 
@@ -32,7 +32,7 @@ enum Render {
             renderer.add(viewModel.originalRequestHeaders)
             renderer.add(viewModel.requestBodySection)
             renderer.add(viewModel.originalRequestParameters)
-            if let body = request.requestBody?.data, !body.isEmpty {
+            if let body = task.requestBody?.data, !body.isEmpty {
                 renderer.addSecondaryTitle("Request Body")
                 renderer.add(data: body)
             }
@@ -43,7 +43,7 @@ enum Render {
             renderer.add(responseSummary)
             renderer.add(viewModel.responseHeaders)
             renderer.add(viewModel.responseBodySection)
-            if let body = request.responseBody?.data, !body.isEmpty {
+            if let body = task.responseBody?.data, !body.isEmpty {
                 renderer.addSecondaryTitle("Response Body")
                 renderer.add(data: body)
             }

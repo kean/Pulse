@@ -16,7 +16,7 @@ final class NetworkSearchCriteriaViewModel: ObservableObject {
     @Published var filters: [NetworkSearchFilter] = []
 
     @Published private(set) var allDomains: [String] = []
-    private var allDomainsSet: Set<String> = []
+    private let domains: ManagedObjectsObserver<NetworkDomainEntity>
 
     @Published private(set) var isButtonResetEnabled = false
 
@@ -28,11 +28,18 @@ final class NetworkSearchCriteriaViewModel: ObservableObject {
         criteria == defaultCriteria && (filters.count == 0 || (filters.count == 1 && filters == NetworkSearchFilter.defaultFilters))
     }
 
-    init(isDefaultStore: Bool = true) {
-        if !isDefaultStore {
+    init(store: LoggerStore) {
+        domains = ManagedObjectsObserver(context: store.viewContext, sortDescriptior: NSSortDescriptor(keyPath: \NetworkDomainEntity.count, ascending: false))
+
+        if store !== LoggerStore.shared {
             criteria.dates.isCurrentSessionOnly = false
             defaultCriteria.dates.isCurrentSessionOnly = false
         }
+
+        domains.$objects.sink { [weak self] in
+            self?.allDomains = $0.map(\.value)
+        }.store(in: &cancellables)
+
         resetFilters()
 
         $filters.dropFirst().sink { [weak self] _ in
@@ -103,24 +110,6 @@ final class NetworkSearchCriteriaViewModel: ObservableObject {
             return nil
         }
         return programmaticFilters
-    }
-
-    // MARK: Managing Domains
-
-    func setInitialDomains(_ domains: Set<String>) {
-        allDomainsSet = domains
-        allDomains = allDomainsSet.sorted()
-    }
-
-    func didInsertEntity(_ entity: LoggerNetworkRequestEntity) {
-        var domains = allDomainsSet
-        if let host = entity.host {
-            domains.insert(host)
-        }
-        if domains.count > allDomains.count {
-            allDomainsSet = domains
-            allDomains = allDomainsSet.sorted()
-        }
     }
 
     // MARK: Bindings

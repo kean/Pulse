@@ -362,8 +362,6 @@ private func makeMetrics(for task: MockTask, taskInterval: DateInterval) -> Netw
         metrics.remotePort = 443
         metrics.localAddress = "192.168.0.13"
         metrics.localPort = 58622
-        metrics.negotiatedTLSCipherSuite = .AES_128_GCM_SHA256
-        metrics.negotiatedTLSProtocolVersion = .TLSv13
         return metrics
     }
 
@@ -383,12 +381,12 @@ private func getHeadersEstimatedSize(_ headers: [String: String]?) -> Int64 {
 }
 
 extension LoggerStore {
-    func entity(for task: MockTask) -> LoggerNetworkRequestEntity {
+    func entity(for task: MockTask) -> NetworkTaskEntity {
         let configuration = NetworkLogger.Configuration(isWaitingForDecoding: true)
         _logTask(task, urlSession: URLSession.shared, logger: NetworkLogger(store: self, configuration: configuration))
-        let entity = (try! allRequests()).first { $0.url == task.originalRequest.url?.absoluteString }
-        assert(entity != nil)
-        return entity!
+        let task = (try! allTasks()).first { $0.url == task.originalRequest.url?.absoluteString }
+        assert(task != nil)
+        return task!
     }
 }
 

@@ -9,56 +9,57 @@ public final class LoggerMessageEntity: NSManagedObject {
     @NSManaged public var isPinned: Bool
     @NSManaged public var session: UUID
     @NSManaged public var level: Int16
-    @NSManaged public var label: String
     @NSManaged public var text: String
     @NSManaged public var file: String
     @NSManaged public var function: String
     @NSManaged public var line: Int32 // Doubles as request state storage to save space
-    @NSManaged public var metadata: Set<LoggerMetadataEntity>
-    @NSManaged public var request: LoggerNetworkRequestEntity?
+    @NSManaged public var label: LoggerLabelEntity
+    @NSManaged public var rawMetadata: String
+    @NSManaged public var task: NetworkTaskEntity?
+
+    public lazy var metadata = KeyValueEncoding.decodeKeyValuePairs(rawMetadata)
 }
 
-public final class LoggerMetadataEntity: NSManagedObject {
-    @NSManaged public var key: String
-    @NSManaged public var value: String
+public final class LoggerLabelEntity: NSManagedObject {
+    @NSManaged public var name: String
+    @NSManaged public var count: Int64
 }
 
-public final class LoggerNetworkRequestEntity: NSManagedObject {
+public final class NetworkTaskEntity: NSManagedObject {
     // Primary
     @NSManaged public var createdAt: Date
-    @NSManaged public var isPinned: Bool
     @NSManaged public var session: UUID
     @NSManaged public var taskId: UUID
-    @NSManaged public var message: LoggerMessageEntity?
 
     /// Returns task type
-    public var taskType: NetworkLogger.TaskType? {
-        NetworkLogger.TaskType(rawValue: rawTaskType)
+    public var type: NetworkLogger.TaskType? {
+        NetworkLogger.TaskType(rawValue: taskType)
     }
-    @NSManaged public var rawTaskType: Int16
+    @NSManaged public var taskType: Int16
 
     // MARK: Request
 
     @NSManaged public var url: String?
-    @NSManaged public var host: String?
+    @NSManaged public var host: NetworkDomainEntity?
     @NSManaged public var httpMethod: String?
 
     // MARK: Response
 
     @NSManaged public var statusCode: Int32
-    @NSManaged public var errorDomain: String?
-    @NSManaged public var errorCode: Int32
     /// Response content-type.
     @NSManaged public var responseContentType: String?
     /// Returns `true` if the response was returned from the local cache.
     @NSManaged public var isFromCache: Bool
 
-    // MARK: State
+    // MARK: Error
 
-    /// Returns request state.
-    public var state: LoggerNetworkRequestEntity.State {
-        LoggerNetworkRequestEntity.State(rawValue: requestState) ?? .pending
-    }
+    @NSManaged public var errorCode: Int32
+    @NSManaged public var errorDomain: String?
+    @NSManaged public var errorDebugDescription: String?
+    /// JSON-encoded underlying error
+    @NSManaged public var underlyingError: Data?
+
+    // MARK: State
 
     /// Contains ``State-swift.enum`` raw value.
     @NSManaged public var requestState: Int16
@@ -66,51 +67,20 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
     ///
     /// - note: The entity is created lazily when the first progress report
     /// is delivered. If no progress updates are delivered, it's never created.
-    @NSManaged public var progress: LoggerNetworkRequestProgressEntity?
+    @NSManaged public var progress: NetworkTaskProgressEntity?
 
-    // MARK: Metrics (Denormalized)
-
-    // Timing
-    /// Request start date.
-    @NSManaged public var startDate: Date?
-    /// Request end date.
-    public var endDate: Date? {
-        startDate.map { $0.addingTimeInterval(duration) }
-    }
     /// Total request duration end date.
     @NSManaged public var duration: Double
-    /// Number of redirects.
+    @NSManaged public var startDate: Date?
     @NSManaged public var redirectCount: Int16
 
     // MARK: Details
 
-    /// Returns request details.
-    ///
-    /// - important: Accessing it for the first time can be a relatively slow
-    /// operation because it performs decoding on the fly, but the decoded
-    /// entity is cached until the object is turned into a fault.
-    public var details: LoggerNetworkRequestEntity.RequestDetails? {
-        if let (details, count) = cachedDetails, count == detailsData?.data.count {
-            return details
-        }
-        guard let compressedData = detailsData?.data,
-              let data = try? compressedData.decompressed(),
-              let details = try? JSONDecoder().decode(LoggerNetworkRequestEntity.RequestDetails.self, from: data as Data) else {
-            return nil
-        }
-        self.cachedDetails = (details, compressedData.count)
-        return details
-    }
-
-    public override func willTurnIntoFault() {
-        super.willTurnIntoFault()
-        cachedDetails = nil
-    }
-
-    private var cachedDetails: (RequestDetails, Int)?
-
-    /// Request details (encoded and compressed ``LoggerNetworkRequestDetails``).
-    @NSManaged var detailsData: LoggerInlineDataEntity?
+    @NSManaged public var originalRequest: NetworkRequestEntity?
+    @NSManaged public var currentRequest: NetworkRequestEntity?
+    @NSManaged public var response: NetworkResponseEntity?
+    @NSManaged public var transactions: Set<NetworkTransactionMetricsEntity>
+    @NSManaged var rawMetadata: String?
 
     /// The request body handle.
     @NSManaged public var requestBody: LoggerBlobHandleEntity?
@@ -120,53 +90,179 @@ public final class LoggerNetworkRequestEntity: NSManagedObject {
     @NSManaged public var requestBodySize: Int64
     /// The size of the response body.
     @NSManaged public var responseBodySize: Int64
+    /// Associated (technical) message.
+    @NSManaged public var message: LoggerMessageEntity?
 
     // MARK: Helpers
 
-    /// Returns task interval (if available from metrics).
-    public var taskInterval: DateInterval? {
-        guard let startDate = self.startDate, let endDate = self.endDate else {
-            return nil
-        }
-        return DateInterval(start: startDate, end: endDate)
+    public lazy var metadata = rawMetadata.map(KeyValueEncoding.decodeKeyValuePairs)
+
+    /// Returns request state.
+    public var state: State {
+        State(rawValue: requestState) ?? .pending
     }
 
     public enum State: Int16 {
-        case pending = 1
-        case success = 2
-        case failure = 3
+        case pending = 1, success, failure = 3
     }
 
-    /// The request details stored in a database in a denormalized format.
-    public final class RequestDetails: Codable, Sendable {
-        public let originalRequest: NetworkLogger.Request
-        public let currentRequest: NetworkLogger.Request?
-        public let response: NetworkLogger.Response?
-        public let error: NetworkLogger.ResponseError?
-        public let metrics: NetworkLogger.Metrics?
-        public let metadata: [String: String]?
+    public lazy var error: Error? = {
+        guard let data = underlyingError else { return nil }
+        let error = try? JSONDecoder().decode(NetworkLogger.ResponseError.UnderlyingError.self, from: data)
+        return error?.error
+    }()
 
-        public init(originalRequest: NetworkLogger.Request, currentRequest: NetworkLogger.Request?, response: NetworkLogger.Response? = nil, error: NetworkLogger.ResponseError? = nil, metrics: NetworkLogger.Metrics? = nil, metadata: [String : String]? = nil) {
-            self.originalRequest = originalRequest
-            self.currentRequest = currentRequest
-            self.response = response
-            self.error = error
-            self.metrics = metrics
-            self.metadata = metadata
-        }
+    public var orderedTransactions: [NetworkTransactionMetricsEntity] {
+        transactions.sorted { $0.index < $1.index }
+    }
 
-        enum CodingKeys: String, CodingKey {
-            case originalRequest = "0", currentRequest = "1", response = "2", error = "3", metrics = "4", metadata = "5"
+    public var taskInterval: DateInterval? {
+        startDate.map { DateInterval(start: $0, duration: duration) }
+    }
+
+    public var totalTransferSize: NetworkLogger.TransferSizeInfo {
+        var size = NetworkLogger.TransferSizeInfo()
+        for transaction in transactions {
+            size = size.merging(transaction.transferSize)
         }
+        return size
+    }
+
+    public var hasMetrics: Bool {
+        startDate != nil
     }
 }
 
+public final class NetworkDomainEntity: NSManagedObject {
+    @NSManaged public var value: String
+    @NSManaged public var count: Int64
+}
+
 /// Indicates current download or upload progress.
-public final class LoggerNetworkRequestProgressEntity: NSManagedObject {
+public final class NetworkTaskProgressEntity: NSManagedObject {
     /// Indicates current download or upload progress.
     @NSManaged public var completedUnitCount: Int64
     /// Indicates current download or upload progress.
     @NSManaged public var totalUnitCount: Int64
+}
+
+public final class NetworkTransactionMetricsEntity: NSManagedObject {
+    @NSManaged public var index: Int16
+    @NSManaged public var rawFetchType: Int16
+    @NSManaged public var request: NetworkRequestEntity
+    @NSManaged public var response: NetworkResponseEntity?
+    @NSManaged public var networkProtocol: String?
+    @NSManaged public var localAddress: String?
+    @NSManaged public var remoteAddress: String?
+    @NSManaged public var localPort: Int32
+    @NSManaged public var remotePort: Int32
+    @NSManaged public var isProxyConnection: Bool
+    @NSManaged public var isReusedConnection: Bool
+    @NSManaged public var isCellular: Bool
+    @NSManaged public var isExpensive: Bool
+    @NSManaged public var isConstrained: Bool
+    @NSManaged public var isMultipath: Bool
+    @NSManaged public var rawNegotiatedTLSProtocolVersion: Int16
+    @NSManaged public var rawNegotiatedTLSCipherSuite: Int16
+    @NSManaged public var fetchStartDate: Date?
+    @NSManaged public var domainLookupStartDate: Date?
+    @NSManaged public var domainLookupEndDate: Date?
+    @NSManaged public var connectStartDate: Date?
+    @NSManaged public var secureConnectionStartDate: Date?
+    @NSManaged public var secureConnectionEndDate: Date?
+    @NSManaged public var connectEndDate: Date?
+    @NSManaged public var requestStartDate: Date?
+    @NSManaged public var requestEndDate: Date?
+    @NSManaged public var responseStartDate: Date?
+    @NSManaged public var responseEndDate: Date?
+    @NSManaged public var requestHeaderBytesSent: Int64
+    @NSManaged public var requestBodyBytesBeforeEncoding: Int64
+    @NSManaged public var requestBodyBytesSent: Int64
+    @NSManaged public var responseHeaderBytesReceived: Int64
+    @NSManaged public var responseBodyBytesAfterDecoding: Int64
+    @NSManaged public var responseBodyBytesReceived: Int64
+
+    public var fetchType: URLSessionTaskMetrics.ResourceFetchType {
+        URLSessionTaskMetrics.ResourceFetchType(rawValue: Int(rawFetchType)) ?? .networkLoad
+    }
+
+    public var negotiatedTLSProtocolVersion: tls_protocol_version_t? {
+        tls_protocol_version_t(rawValue: UInt16(rawNegotiatedTLSProtocolVersion))
+    }
+
+    public var negotiatedTLSCipherSuite: tls_ciphersuite_t? {
+        tls_ciphersuite_t(rawValue: UInt16(rawNegotiatedTLSCipherSuite))
+    }
+
+    public var transferSize: NetworkLogger.TransferSizeInfo {
+        var value = NetworkLogger.TransferSizeInfo()
+        value.requestHeaderBytesSent = requestHeaderBytesSent
+        value.requestBodyBytesBeforeEncoding = requestBodyBytesBeforeEncoding
+        value.requestBodyBytesSent = requestBodyBytesSent
+        value.responseHeaderBytesReceived = responseHeaderBytesReceived
+        value.responseBodyBytesAfterDecoding = responseBodyBytesAfterDecoding
+        value.responseBodyBytesReceived = responseBodyBytesReceived
+        return value
+    }
+
+    public var timing: NetworkLogger.TransactionTimingInfo {
+        var value = NetworkLogger.TransactionTimingInfo()
+        value.fetchStartDate = fetchStartDate
+        value.domainLookupStartDate = domainLookupStartDate
+        value.domainLookupEndDate = domainLookupEndDate
+        value.connectStartDate = connectStartDate
+        value.secureConnectionStartDate = secureConnectionStartDate
+        value.secureConnectionEndDate = secureConnectionEndDate
+        value.connectEndDate = connectEndDate
+        value.requestStartDate = requestStartDate
+        value.requestEndDate = requestEndDate
+        value.responseStartDate = responseStartDate
+        value.responseEndDate = responseEndDate
+        return value
+    }
+}
+
+public final class NetworkRequestEntity: NSManagedObject {
+    // MARK: Details
+
+    @NSManaged public var url: String?
+    @NSManaged public var httpMethod: String?
+    @NSManaged public var httpHeaders: String
+
+    // MARK: Options
+
+    @NSManaged public var allowsCellularAccess: Bool
+    @NSManaged public var allowsExpensiveNetworkAccess: Bool
+    @NSManaged public var allowsConstrainedNetworkAccess: Bool
+    @NSManaged public var httpShouldHandleCookies: Bool
+    @NSManaged public var httpShouldUsePipelining: Bool
+    @NSManaged public var timeoutInterval: Int32
+    @NSManaged public var rawCachePolicy: UInt16
+
+    public var cachePolicy: URLRequest.CachePolicy {
+        URLRequest.CachePolicy(rawValue: UInt(rawCachePolicy)) ?? .useProtocolCachePolicy
+    }
+
+    public var contentType: NetworkLogger.ContentType? {
+        headers["Content-Type"].flatMap(NetworkLogger.ContentType.init)
+    }
+
+    public lazy var headers: [String: String] = KeyValueEncoding.decodeKeyValuePairs(httpHeaders)
+}
+
+public final class NetworkResponseEntity: NSManagedObject {
+    @NSManaged public var statusCode: Int16
+    @NSManaged public var httpHeaders: String
+
+    public var contentType: NetworkLogger.ContentType? {
+        headers["Content-Type"].flatMap(NetworkLogger.ContentType.init)
+    }
+
+    public var expectedContentLength: Int64? {
+        headers["Content-Length"].flatMap { Int64($0) }
+    }
+
+    public lazy var headers: [String: String] = KeyValueEncoding.decodeKeyValuePairs(httpHeaders)
 }
 
 /// Doesn't contain any data, just the key and some additional payload.
@@ -193,7 +289,7 @@ public final class LoggerBlobHandleEntity: NSManagedObject {
     /// reducing space usage.
     ///
     /// To access data, use the convenience ``data`` property.
-    @NSManaged var inlineData: LoggerInlineDataEntity?
+    @NSManaged public var inlineData: Data?
 
     /// Returns the associated data.
     ///
@@ -208,8 +304,4 @@ public final class LoggerBlobHandleEntity: NSManagedObject {
         }
         return store.store?.getDecompressedData(for: self)
     }
-}
-
-final class LoggerInlineDataEntity: NSManagedObject {
-    @NSManaged var data: Data
 }

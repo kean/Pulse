@@ -50,28 +50,28 @@ final class ProgressViewModel: ObservableObject {
         self.details = details
     }
 
-    init(request: LoggerNetworkRequestEntity) {
-        switch request.taskType ?? .dataTask {
+    init(task: NetworkTaskEntity) {
+        switch task.type ?? .dataTask {
         case .downloadTask: self.title = "Downloading"
         case .uploadTask: self.title = "Uploading"
         default: self.title = "Pending"
         }
 
-        observer1 = request.publisher(for: \.progress, options: [.initial, .new]).sink { [weak self] change in
-            if let progress = request.progress {
+        observer1 = task.publisher(for: \.progress, options: [.initial, .new]).sink { [weak self] change in
+            if let progress = task.progress {
                 self?.register(for: progress)
             }
         }
     }
 
-    private func register(for progress: LoggerNetworkRequestProgressEntity) {
+    private func register(for progress: NetworkTaskProgressEntity) {
         self.refresh(with: progress)
         observer2 = progress.objectWillChange.sink { [self] in
             self.refresh(with: progress)
         }
     }
 
-    private func refresh(with progress: LoggerNetworkRequestProgressEntity) {
+    private func refresh(with progress: NetworkTaskProgressEntity) {
         let completed = progress.completedUnitCount
         let total = progress.totalUnitCount
 

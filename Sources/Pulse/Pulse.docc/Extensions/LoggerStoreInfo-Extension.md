@@ -16,7 +16,7 @@
 ### Usage Statistics
 
 - ``messageCount``
-- ``requestCount``
+- ``taskCount``
 - ``blobCount``
 - ``totalStoreSize``
 - ``blobsSize``

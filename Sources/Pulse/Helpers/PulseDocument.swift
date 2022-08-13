@@ -51,7 +51,7 @@ final class PulseDocument {
 
     static let model: NSManagedObjectModel = {
         let model = NSManagedObjectModel()
-        let blob = NSEntityDescription(name: "PulseBlobEntity", class: PulseBlobEntity.self)
+        let blob = NSEntityDescription(class: PulseBlobEntity.self)
         blob.properties = [
             NSAttributeDescription(name: "key", type: .stringAttributeType),
             NSAttributeDescription(name: "data", type: .binaryDataAttributeType)

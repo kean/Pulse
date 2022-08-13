@@ -25,9 +25,9 @@ final class NetworkInsightsRequestsListViewModel: ObservableObject {
     let table: ConsoleTableViewModel
     let details: ConsoleDetailsRouterViewModel
 
-    init(requests: [LoggerNetworkRequestEntity]) {
+    init(tasks: [NetworkTaskEntity]) {
         self.table = ConsoleTableViewModel(searchCriteriaViewModel: nil)
-        self.table.entities = requests
+        self.table.entities = tasks
         self.details = ConsoleDetailsRouterViewModel()
     }
 }

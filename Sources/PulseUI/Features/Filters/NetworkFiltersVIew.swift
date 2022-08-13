@@ -532,9 +532,7 @@ struct NetworkFiltersView_Previews: PreviewProvider {
 }
 
 private func makeMockViewModel() -> NetworkSearchCriteriaViewModel {
-    let viewModel = NetworkSearchCriteriaViewModel()
-    viewModel.setInitialDomains(["api.github.com", "github.com", "apple.com", "google.com", "example.com"])
-    return viewModel
+    NetworkSearchCriteriaViewModel(store: .mock)
 
 }
 #endif

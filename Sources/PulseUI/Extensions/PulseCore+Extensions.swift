@@ -7,18 +7,18 @@ import Pulse
 
 #if os(iOS) || os(macOS)
 
-extension LoggerNetworkRequestEntity {
+extension NetworkTaskEntity {
     func cURLDescription() -> String {
-        guard let request = details?.currentRequest ?? details?.originalRequest,
+        guard let request = currentRequest ?? originalRequest,
               let url = request.url else {
             return "$ curl command generation failed"
         }
 
         var components = ["curl -v"]
 
-        components.append("-X \(request.httpMethod)")
+        components.append("-X \(request.httpMethod ?? "GET")")
 
-        for header in request.headers ?? [:] {
+        for header in request.headers {
             let escapedValue = header.value.replacingOccurrences(of: "\"", with: "\\\"")
             components.append("-H \"\(header.key): \(escapedValue)\"")
         }
@@ -30,7 +30,7 @@ extension LoggerNetworkRequestEntity {
             components.append("-d \"\(escapedBody)\"")
         }
 
-        components.append("\"\(url.absoluteString)\"")
+        components.append("\"\(url)\"")
 
         return components.joined(separator: " \\\n\t")
     }
@@ -38,12 +38,12 @@ extension LoggerNetworkRequestEntity {
 
 #endif
 
-extension LoggerNetworkRequestEntity {
+extension NetworkTaskEntity {
     var requestFileViewerContext: FileViewerViewModel.Context {
         FileViewerViewModel.Context(
-            contentType: details?.originalRequest.contentType,
+            contentType: originalRequest?.contentType,
             originalSize: requestBodySize,
-            metadata: details?.metadata,
+            metadata: metadata,
             isResponse: false,
             error: nil
         )
@@ -51,17 +51,15 @@ extension LoggerNetworkRequestEntity {
 
     var responseFileViewerContext: FileViewerViewModel.Context {
         FileViewerViewModel.Context(
-            contentType: details?.response?.contentType,
+            contentType: response?.contentType,
             originalSize: responseBodySize,
-            metadata: details?.metadata,
+            metadata: metadata,
             isResponse: true,
-            error: details?.decodingError
+            error: decodingError
         )
     }
-}
 
-extension LoggerNetworkRequestEntity.RequestDetails {
     var decodingError: NetworkLogger.DecodingError? {
-        error?.error as? NetworkLogger.DecodingError
+        error as? NetworkLogger.DecodingError
     }
 }

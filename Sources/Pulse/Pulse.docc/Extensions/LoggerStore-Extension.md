@@ -26,7 +26,7 @@
 ### Accessing Logs
 
 - ``allMessages()``
-- ``allRequests()``
+- ``allTasks()``
 - ``getBlobData(forKey:)``
 
 ### Managing the Store

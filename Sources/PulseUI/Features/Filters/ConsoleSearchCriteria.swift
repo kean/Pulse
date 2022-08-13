@@ -150,9 +150,6 @@ final class ConsoleSearchFilter: ObservableObject, Hashable, Identifiable {
     }
 
     func makePredicate() -> NSPredicate? {
-        if field == .metadata {
-            return makePredicateForMetadata()
-        }
         guard let key = self.key else {
             return nil
         }
@@ -163,17 +160,6 @@ final class ConsoleSearchFilter: ObservableObject, Hashable, Identifiable {
         case .notContains: return NSPredicate(format: "NOT (\(key) CONTAINS[c] %@)", value)
         case .beginsWith: return NSPredicate(format: "\(key) BEGINSWITH[c] %@", value)
         case .regex: return NSPredicate(format: "\(key) MATCHES %@", value)
-        }
-    }
-
-    private func makePredicateForMetadata() -> NSPredicate {
-        switch match {
-        case .equal: return NSPredicate(format: "SUBQUERY(metadata, $entry, $entry.key LIKE[c] %@ OR $entry.value LIKE[c] %@).@count > 0", value, value)
-        case .notEqual: return NSPredicate(format: "SUBQUERY(metadata, $entry, $entry.key LIKE[c] %@ OR $entry.value LIKE[c] %@).@count == 0", value, value)
-        case .contains: return NSPredicate(format: "SUBQUERY(metadata, $entry, $entry.key CONTAINS[c] %@ OR $entry.value CONTAINS[c] %@).@count > 0", value, value)
-        case .notContains: return NSPredicate(format: "SUBQUERY(metadata, $entry, $entry.key CONTAINS[c] %@ OR $entry.value CONTAINS[c] %@).@count == 0", value, value)
-        case .beginsWith: return NSPredicate(format: "SUBQUERY(metadata, $entry, $entry.key BEGINSWITH[c] %@ OR $entry.value CONTAINS[c] %@).@count > 0", value, value)
-        case .regex: return NSPredicate(format: "SUBQUERY(metadata, $entry, $entry.key MATCHES[c] %@ OR $entry.value MATCHES[c] %@).@count > 0", value, value)
         }
     }
 
@@ -193,7 +179,7 @@ final class ConsoleSearchFilter: ObservableObject, Hashable, Identifiable {
         case .level: return "level"
         case .label: return "label"
         case .message: return "text"
-        case .metadata: return nil
+        case .metadata: return "rawMetadata"
         case .file: return "file"
         case .function: return "function"
         case .line: return "line"
@@ -242,9 +228,9 @@ extension ConsoleSearchCriteria {
 
         if criteria.labels.isEnabled {
             if let focusedLabel = criteria.labels.focused {
-                predicates.append(NSPredicate(format: "label == %@", focusedLabel))
+                predicates.append(NSPredicate(format: "label.name == %@", focusedLabel))
             } else if !criteria.labels.hidden.isEmpty {
-                predicates.append(NSPredicate(format: "NOT label IN %@", Array(criteria.labels.hidden)))
+                predicates.append(NSPredicate(format: "NOT label.name IN %@", Array(criteria.labels.hidden)))
             }
         }
 

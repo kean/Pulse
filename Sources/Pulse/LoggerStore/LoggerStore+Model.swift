@@ -7,79 +7,154 @@ import CoreData
 extension LoggerStore {
     /// Returns Core Data model used by the store.
     static let model: NSManagedObjectModel = {
-        let model = NSManagedObjectModel()
+        typealias Entity = NSEntityDescription
+        typealias Attribute = NSAttributeDescription
+        typealias Relationship = NSRelationshipDescription
 
-        let message = NSEntityDescription(name: "LoggerMessageEntity", class: LoggerMessageEntity.self)
-        let metadata = NSEntityDescription(name: "LoggerMetadataEntity", class: LoggerMetadataEntity.self)
-        let request = NSEntityDescription(name: "LoggerNetworkRequestEntity", class: LoggerNetworkRequestEntity.self)
-        let requestProgress = NSEntityDescription(name: "LoggerNetworkRequestProgressEntity", class: LoggerNetworkRequestProgressEntity.self)
-        let blob = NSEntityDescription(name: "LoggerBlobHandleEntity", class: LoggerBlobHandleEntity.self)
-        let inlinedData = NSEntityDescription(name: "LoggerInlineDataEntity", class: LoggerInlineDataEntity.self)
+        let message = Entity(class: LoggerMessageEntity.self)
+        let label = Entity(class: LoggerLabelEntity.self)
+
+        let task = Entity(class: NetworkTaskEntity.self)
+        let domain = Entity(class: NetworkDomainEntity.self)
+        let progress = Entity(class: NetworkTaskProgressEntity.self)
+        let request = Entity(class: NetworkRequestEntity.self)
+        let response = Entity(class: NetworkResponseEntity.self)
+        let transaction = Entity(class: NetworkTransactionMetricsEntity.self)
+
+        let blob = Entity(class: LoggerBlobHandleEntity.self)
 
         message.properties = [
-            NSAttributeDescription(name: "createdAt", type: .dateAttributeType),
-            NSAttributeDescription(name: "isPinned", type: .booleanAttributeType),
-            NSAttributeDescription(name: "session", type: .UUIDAttributeType),
-            NSAttributeDescription(name: "level", type: .integer16AttributeType),
-            NSAttributeDescription(name: "label", type: .stringAttributeType),
-            NSAttributeDescription(name: "text", type: .stringAttributeType),
-            NSRelationshipDescription.make(name: "metadata", type: .oneToMany, entity: metadata),
-            NSAttributeDescription(name: "file", type: .stringAttributeType),
-            NSAttributeDescription(name: "function", type: .stringAttributeType),
-            NSAttributeDescription(name: "line", type: .integer32AttributeType),
-            NSRelationshipDescription.make(name: "request", type: .oneToOne(isOptional: true), entity: request)
+            Attribute(name: "createdAt", type: .dateAttributeType),
+            Attribute(name: "isPinned", type: .booleanAttributeType),
+            Attribute(name: "session", type: .UUIDAttributeType),
+            Attribute(name: "level", type: .integer16AttributeType),
+            Attribute(name: "text", type: .stringAttributeType),
+            Attribute(name: "file", type: .stringAttributeType),
+            Attribute(name: "function", type: .stringAttributeType),
+            Attribute(name: "line", type: .integer32AttributeType),
+            Attribute(name: "rawMetadata", type: .stringAttributeType),
+            Relationship(name: "label", type: .oneToOne(), deleteRule: .noActionDeleteRule, entity: label),
+            Relationship(name: "task", type: .oneToOne(isOptional: true), entity: task)
         ]
 
-        metadata.properties = [
-            NSAttributeDescription(name: "key", type: .stringAttributeType),
-            NSAttributeDescription(name: "value", type: .stringAttributeType)
+        label.properties = [
+            Attribute(name: "name", type: .stringAttributeType),
+            Attribute(name: "count", type: .integer64AttributeType),
+        ]
+
+        task.properties = [
+            Attribute(name: "createdAt", type: .dateAttributeType),
+            Attribute(name: "session", type: .UUIDAttributeType),
+            Attribute(name: "taskId", type: .UUIDAttributeType),
+            Attribute(name: "taskType", type: .integer16AttributeType),
+            Attribute(name: "url", type: .stringAttributeType),
+            Relationship(name: "host", type: .oneToOne(isOptional: true), entity: domain),
+            Attribute(name: "httpMethod", type: .stringAttributeType),
+            Attribute(name: "statusCode", type: .integer32AttributeType),
+            Attribute(name: "errorCode", type: .integer32AttributeType),
+            Attribute(name: "errorDomain", type: .stringAttributeType),
+            Attribute(name: "errorDebugDescription", type: .stringAttributeType),
+            Attribute(name: "underlyingError", type: .binaryDataAttributeType),
+            Attribute(name: "startDate", type: .dateAttributeType),
+            Attribute(name: "duration", type: .doubleAttributeType),
+            Attribute(name: "redirectCount", type: .integer16AttributeType),
+            Attribute(name: "responseContentType", type: .stringAttributeType),
+            Attribute(name: "requestState", type: .integer16AttributeType),
+            Attribute(name: "requestBodySize", type: .integer64AttributeType),
+            Attribute(name: "responseBodySize", type: .integer64AttributeType),
+            Attribute(name: "isFromCache", type: .booleanAttributeType),
+            Attribute(name: "rawMetadata", type: .stringAttributeType),
+            Relationship(name: "originalRequest", type: .oneToOne(), entity: request),
+            Relationship(name: "currentRequest", type: .oneToOne(isOptional: true), entity: request),
+            Relationship(name: "response", type: .oneToOne(isOptional: true), entity: response),
+            Relationship(name: "transactions", type: .oneToMany, entity: transaction),
+            Relationship(name: "message", type: .oneToOne(), entity: message),
+            Relationship(name: "requestBody", type: .oneToOne(isOptional: true), deleteRule: .noActionDeleteRule, entity: blob),
+            Relationship(name: "responseBody", type: .oneToOne(isOptional: true), deleteRule: .noActionDeleteRule, entity: blob),
+            Relationship(name: "progress", type: .oneToOne(isOptional: true), entity: progress)
+        ]
+
+        domain.properties = [
+            Attribute(name: "value", type: .stringAttributeType),
+            Attribute(name: "count", type: .integer64AttributeType)
         ]
 
         request.properties = [
-            NSAttributeDescription(name: "createdAt", type: .dateAttributeType),
-            NSAttributeDescription(name: "isPinned", type: .booleanAttributeType),
-            NSAttributeDescription(name: "session", type: .UUIDAttributeType),
-            NSAttributeDescription(name: "taskId", type: .UUIDAttributeType),
-            NSAttributeDescription(name: "rawTaskType", type: .integer16AttributeType),
-            NSAttributeDescription(name: "url", type: .stringAttributeType),
-            NSAttributeDescription(name: "host", type: .stringAttributeType),
-            NSAttributeDescription(name: "httpMethod", type: .stringAttributeType),
-            NSAttributeDescription(name: "errorDomain", type: .stringAttributeType),
-            NSAttributeDescription(name: "errorCode", type: .integer32AttributeType),
-            NSAttributeDescription(name: "statusCode", type: .integer32AttributeType),
-            NSAttributeDescription(name: "startDate", type: .dateAttributeType),
-            NSAttributeDescription(name: "duration", type: .doubleAttributeType),
-            NSAttributeDescription(name: "responseContentType", type: .stringAttributeType),
-            NSAttributeDescription(name: "requestState", type: .integer16AttributeType),
-            NSAttributeDescription(name: "redirectCount", type: .integer16AttributeType),
-            NSAttributeDescription(name: "requestBodySize", type: .integer64AttributeType),
-            NSAttributeDescription(name: "responseBodySize", type: .integer64AttributeType),
-            NSAttributeDescription(name: "isFromCache", type: .booleanAttributeType),
-            NSRelationshipDescription.make(name: "message", type: .oneToOne(), entity: message),
-            NSRelationshipDescription.make(name: "detailsData", type: .oneToOne(), entity: inlinedData),
-            NSRelationshipDescription.make(name: "requestBody", type: .oneToOne(isOptional: true), deleteRule: .noActionDeleteRule, entity: blob),
-            NSRelationshipDescription.make(name: "responseBody", type: .oneToOne(isOptional: true), deleteRule: .noActionDeleteRule, entity: blob),
-            NSRelationshipDescription.make(name: "progress", type: .oneToOne(isOptional: true), entity: requestProgress)
+            Attribute(name: "url", type: .stringAttributeType),
+            Attribute(name: "httpMethod", type: .stringAttributeType) { $0.isOptional = true },
+            Attribute(name: "httpHeaders", type: .stringAttributeType),
+            Attribute(name: "allowsCellularAccess", type: .booleanAttributeType),
+            Attribute(name: "allowsExpensiveNetworkAccess", type: .booleanAttributeType),
+            Attribute(name: "allowsConstrainedNetworkAccess", type: .booleanAttributeType),
+            Attribute(name: "httpShouldHandleCookies", type: .booleanAttributeType),
+            Attribute(name: "httpShouldUsePipelining", type: .booleanAttributeType),
+            Attribute(name: "timeoutInterval", type: .integer32AttributeType),
+            Attribute(name: "rawCachePolicy", type: .integer16AttributeType)
         ]
 
-        requestProgress.properties = [
-            NSAttributeDescription(name: "completedUnitCount", type: .integer64AttributeType),
-            NSAttributeDescription(name: "totalUnitCount", type: .integer64AttributeType)
+        response.properties = [
+            Attribute(name: "statusCode", type: .integer16AttributeType),
+            Attribute(name: "httpHeaders", type: .stringAttributeType),
+        ]
+
+        progress.properties = [
+            Attribute(name: "completedUnitCount", type: .integer64AttributeType),
+            Attribute(name: "totalUnitCount", type: .integer64AttributeType)
+        ]
+
+        transaction.properties = [
+            Attribute(name: "index", type: .integer16AttributeType),
+            Attribute(name: "rawFetchType", type: .integer16AttributeType),
+            Relationship(name: "request", type: .oneToOne(), entity: request),
+            Relationship(name: "response", type: .oneToOne(isOptional: true), entity: response),
+            Attribute(name: "networkProtocol", type: .stringAttributeType),
+            Attribute(name: "localAddress", type: .stringAttributeType),
+            Attribute(name: "remoteAddress", type: .stringAttributeType),
+            Attribute(name: "localPort", type: .integer32AttributeType),
+            Attribute(name: "remotePort", type: .integer32AttributeType),
+            Attribute(name: "isProxyConnection", type: .booleanAttributeType),
+            Attribute(name: "isReusedConnection", type: .booleanAttributeType),
+            Attribute(name: "isCellular", type: .booleanAttributeType),
+            Attribute(name: "isExpensive", type: .booleanAttributeType),
+            Attribute(name: "isConstrained", type: .booleanAttributeType),
+            Attribute(name: "isMultipath", type: .booleanAttributeType),
+            Attribute(name: "rawNegotiatedTLSProtocolVersion", type: .integer16AttributeType),
+            Attribute(name: "rawNegotiatedTLSCipherSuite", type: .integer16AttributeType),
+            Attribute(name: "fetchStartDate", type: .dateAttributeType),
+            Attribute(name: "domainLookupStartDate", type: .dateAttributeType),
+            Attribute(name: "domainLookupEndDate", type: .dateAttributeType),
+            Attribute(name: "connectStartDate", type: .dateAttributeType),
+            Attribute(name: "secureConnectionStartDate", type: .dateAttributeType),
+            Attribute(name: "secureConnectionEndDate", type: .dateAttributeType),
+            Attribute(name: "connectEndDate", type: .dateAttributeType),
+            Attribute(name: "requestStartDate", type: .dateAttributeType),
+            Attribute(name: "requestEndDate", type: .dateAttributeType),
+            Attribute(name: "responseStartDate", type: .dateAttributeType),
+            Attribute(name: "responseEndDate", type: .dateAttributeType),
+            Attribute(name: "requestHeaderBytesSent", type: .integer64AttributeType),
+            Attribute(name: "requestBodyBytesBeforeEncoding", type: .integer64AttributeType),
+            Attribute(name: "requestBodyBytesSent", type: .integer64AttributeType),
+            Attribute(name: "responseHeaderBytesReceived", type: .integer64AttributeType),
+            Attribute(name: "responseBodyBytesAfterDecoding", type: .integer64AttributeType),
+            Attribute(name: "responseBodyBytesReceived", type: .integer64AttributeType)
         ]
 
         blob.properties = [
-            NSAttributeDescription(name: "key", type: .binaryDataAttributeType),
-            NSAttributeDescription(name: "size", type: .integer32AttributeType),
-            NSAttributeDescription(name: "decompressedSize", type: .integer32AttributeType),
-            NSAttributeDescription(name: "linkCount", type: .integer16AttributeType),
-            NSRelationshipDescription.make(name: "inlineData", type: .oneToOne(isOptional: true), entity: inlinedData)
+            Attribute(name: "key", type: .binaryDataAttributeType),
+            Attribute(name: "size", type: .integer32AttributeType),
+            Attribute(name: "decompressedSize", type: .integer32AttributeType),
+            Attribute(name: "linkCount", type: .integer16AttributeType),
+            Attribute(name: "inlineData", type: .binaryDataAttributeType)
         ]
 
-        inlinedData.properties = [
-            NSAttributeDescription(name: "data", type: .binaryDataAttributeType)
-        ]
-
-        model.entities = [message, metadata, request, requestProgress, blob, inlinedData]
+        let model = NSManagedObjectModel()
+        model.entities = [message, label, task, domain, progress, blob, request, response, transaction]
         return model
     }()
+}
+
+extension NSEntityDescription {
+    func property(named name: String) -> NSPropertyDescription {
+        properties.first { $0.name == name }!
+    }
 }
