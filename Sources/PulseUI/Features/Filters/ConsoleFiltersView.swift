@@ -315,6 +315,7 @@ extension ConsoleFiltersView {
     }
 }
 
+#if DEBUG
 struct ConsoleFiltersView_Previews: PreviewProvider {
     static var previews: some View {
 #if os(iOS)
@@ -331,5 +332,6 @@ struct ConsoleFiltersView_Previews: PreviewProvider {
 private func makeMockViewModel() -> ConsoleSearchCriteriaViewModel {
     ConsoleSearchCriteriaViewModel(store: .mock)
 }
+#endif
 
 #endif

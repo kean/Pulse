@@ -730,7 +730,7 @@ final class LoggerStoreTests: XCTestCase {
 
     // MARK: - Measure Export Speed & Size
 
-    func testMesasureExportSize() throws {
+    func testMeasureExportSize() throws {
         // GIVEN
         let storeURL = try makePulsePackage()
 
@@ -747,7 +747,7 @@ final class LoggerStoreTests: XCTestCase {
         print("Package: \(try storeURL.directoryTotalSize()). Archive: \(size)")
     }
 
-    func _testMesasureExportSizeLarge() throws {
+    func _testMeasureExportSizeLarge() throws {
         // GIVEN
         let store = makeStore {
             // Thumbnail generation significantly impacts the right speed

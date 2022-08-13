@@ -6,6 +6,7 @@ import XCTest
 @testable import Pulse
 @testable import PulseUI
 
+#if DEBUG
 #if !os(watchOS)
 final class JSONPrinterTests: XCTestCase {
     func testTypMismatchError() throws {
@@ -44,4 +45,5 @@ private func generateTypeMismatchError() -> NetworkLogger.DecodingError? {
         return NetworkLogger.DecodingError(error as! DecodingError)
     }
 }
+#endif
 #endif
