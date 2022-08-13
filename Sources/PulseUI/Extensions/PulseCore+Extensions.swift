@@ -60,6 +60,6 @@ extension NetworkTaskEntity {
     }
 
     var decodingError: NetworkLogger.DecodingError? {
-        error?.error as? NetworkLogger.DecodingError
+        error as? NetworkLogger.DecodingError
     }
 }

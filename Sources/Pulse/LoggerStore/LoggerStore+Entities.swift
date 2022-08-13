@@ -47,12 +47,18 @@ public final class NetworkTaskEntity: NSManagedObject {
     // MARK: Response
 
     @NSManaged public var statusCode: Int32
-    @NSManaged public var rawErrorDomain: Int16
-    @NSManaged public var errorCode: Int32
     /// Response content-type.
     @NSManaged public var responseContentType: String?
     /// Returns `true` if the response was returned from the local cache.
     @NSManaged public var isFromCache: Bool
+
+    // MARK: Error
+
+    @NSManaged public var errorCode: Int32
+    @NSManaged public var errorDomain: String?
+    @NSManaged public var errorDebugDescription: String?
+    /// JSON-encoded underlying error
+    @NSManaged public var underlyingError: Data?
 
     // MARK: State
 
@@ -74,7 +80,6 @@ public final class NetworkTaskEntity: NSManagedObject {
     @NSManaged public var originalRequest: NetworkRequestEntity
     @NSManaged public var currentRequest: NetworkRequestEntity?
     @NSManaged public var response: NetworkResponseEntity?
-    @NSManaged public var error: NetworkErrorEntity?
     @NSManaged public var transactions: Set<NetworkTransactionMetricsEntity>
     @NSManaged var rawMetadata: String?
 
@@ -93,11 +98,6 @@ public final class NetworkTaskEntity: NSManagedObject {
 
     public lazy var metadata = rawMetadata.map(KeyValueEncoding.decodeKeyValuePairs)
 
-    public var errorDomain: ErrorDomain? {
-        get { ErrorDomain(rawValue: rawErrorDomain) }
-        set { rawErrorDomain = newValue?.rawValue ?? 0 }
-    }
-
     /// Returns request state.
     public var state: State {
         State(rawValue: requestState) ?? .pending
@@ -107,9 +107,11 @@ public final class NetworkTaskEntity: NSManagedObject {
         case pending = 1, success, failure = 3
     }
 
-    public enum ErrorDomain: Int16 {
-        case urlError = 1, decoding
-    }
+    public lazy var error: Error? = {
+        guard let data = underlyingError else { return nil }
+        let error = try? JSONDecoder().decode(NetworkLogger.ResponseError.UnderlyingError.self, from: data)
+        return error?.error
+    }()
 
     public var orderedTransactions: [NetworkTransactionMetricsEntity] {
         transactions.sorted { $0.index < $1.index }
@@ -144,21 +146,6 @@ public final class NetworkTaskProgressEntity: NSManagedObject {
     @NSManaged public var completedUnitCount: Int64
     /// Indicates current download or upload progress.
     @NSManaged public var totalUnitCount: Int64
-}
-
-#warning("TODO: move this to reponse and remove duplicated entities?")
-public final class NetworkErrorEntity: NSManagedObject {
-    @NSManaged public var code: Int
-    @NSManaged public var domain: String
-    @NSManaged public var errorDebugDescription: String
-    /// JSON-encoded underlying error
-    @NSManaged public var underlyingError: Data?
-
-    public lazy var error: Error? = {
-        guard let data = underlyingError else { return nil }
-        let error = try? JSONDecoder().decode(NetworkLogger.ResponseError.UnderlyingError.self, from: data)
-        return error?.error
-    }()
 }
 
 public final class NetworkTransactionMetricsEntity: NSManagedObject {

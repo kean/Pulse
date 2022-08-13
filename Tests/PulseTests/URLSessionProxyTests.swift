@@ -84,7 +84,7 @@ final class URLSessionProxyTests: XCTestCase {
         XCTAssertEqual(task.url, dataURL.absoluteString)
         XCTAssertEqual(task.host, nil)
         XCTAssertEqual(task.httpMethod, "GET")
-        XCTAssertEqual(task.errorDomain, .urlError)
+        XCTAssertEqual(task.errorDomain, URLError.errorDomain)
         XCTAssertEqual(task.errorCode, -1100)
         XCTAssertEqual(task.requestState, NetworkTaskEntity.State.failure.rawValue)
 

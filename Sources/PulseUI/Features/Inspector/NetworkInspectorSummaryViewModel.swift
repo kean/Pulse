@@ -82,8 +82,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     }
 
     var errorModel: KeyValueSectionViewModel? {
-        guard let error = task.error else { return nil }
-        return KeyValueSectionViewModel.makeErrorDetails(for: error) { [unowned self] in
+        KeyValueSectionViewModel.makeErrorDetails(for: task) { [unowned self] in
             isErrorRawLinkActive = true
         }
     }

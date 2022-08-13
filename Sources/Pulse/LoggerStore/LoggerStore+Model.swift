@@ -19,7 +19,6 @@ extension LoggerStore {
         let progress = Entity(class: NetworkTaskProgressEntity.self)
         let request = Entity(class: NetworkRequestEntity.self)
         let response = Entity(class: NetworkResponseEntity.self)
-        let error = Entity(class: NetworkErrorEntity.self)
         let transaction = Entity(class: NetworkTransactionMetricsEntity.self)
 
         let blob = Entity(class: LoggerBlobHandleEntity.self)
@@ -52,9 +51,11 @@ extension LoggerStore {
             Attribute(name: "url", type: .stringAttributeType),
             Relationship(name: "host", type: .oneToOne(isOptional: true), entity: domain),
             Attribute(name: "httpMethod", type: .stringAttributeType),
-            Attribute(name: "rawErrorDomain", type: .integer16AttributeType),
-            Attribute(name: "errorCode", type: .integer32AttributeType),
             Attribute(name: "statusCode", type: .integer32AttributeType),
+            Attribute(name: "errorCode", type: .integer32AttributeType),
+            Attribute(name: "errorDomain", type: .stringAttributeType),
+            Attribute(name: "errorDebugDescription", type: .stringAttributeType),
+            Attribute(name: "underlyingError", type: .binaryDataAttributeType),
             Attribute(name: "startDate", type: .dateAttributeType),
             Attribute(name: "duration", type: .doubleAttributeType),
             Attribute(name: "redirectCount", type: .integer16AttributeType),
@@ -67,7 +68,6 @@ extension LoggerStore {
             Relationship(name: "originalRequest", type: .oneToOne(), entity: request),
             Relationship(name: "currentRequest", type: .oneToOne(isOptional: true), entity: request),
             Relationship(name: "response", type: .oneToOne(isOptional: true), entity: response),
-            Relationship(name: "error", type: .oneToOne(isOptional: true), entity: error),
             Relationship(name: "transactions", type: .oneToMany, entity: transaction),
             Relationship(name: "message", type: .oneToOne(), entity: message),
             Relationship(name: "requestBody", type: .oneToOne(isOptional: true), deleteRule: .noActionDeleteRule, entity: blob),
@@ -96,13 +96,6 @@ extension LoggerStore {
         response.properties = [
             Attribute(name: "statusCode", type: .integer16AttributeType),
             Attribute(name: "httpHeaders", type: .stringAttributeType),
-        ]
-
-        error.properties = [
-            Attribute(name: "code", type: .integer32AttributeType),
-            Attribute(name: "domain", type: .stringAttributeType),
-            Attribute(name: "errorDebugDescription", type: .stringAttributeType),
-            Attribute(name: "underlyingError", type: .binaryDataAttributeType)
         ]
 
         progress.properties = [
@@ -156,7 +149,7 @@ extension LoggerStore {
         ]
 
         let model = NSManagedObjectModel()
-        model.entities = [message, label, task, domain, progress, blob, request, response, error, transaction]
+        model.entities = [message, label, task, domain, progress, blob, request, response, transaction]
         return model
     }()
 }

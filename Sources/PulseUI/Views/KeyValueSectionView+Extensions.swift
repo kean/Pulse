@@ -64,23 +64,26 @@ extension KeyValueSectionViewModel {
         )
     }
 
-    static func makeErrorDetails(for error: NetworkErrorEntity, action: @escaping () -> Void) -> KeyValueSectionViewModel {
-        KeyValueSectionViewModel(
+    static func makeErrorDetails(for task: NetworkTaskEntity, action: @escaping () -> Void) -> KeyValueSectionViewModel? {
+        guard task.errorCode != 0, task.state == .failure else {
+            return nil
+        }
+        return KeyValueSectionViewModel(
             title: "Error",
             color: .red,
             action: ActionViewModel(action: action, title: "View"),
             items: [
-                ("Domain", error.domain),
-                ("Code", descriptionForError(domain: error.domain, code: error.code)),
-                ("Description", error.errorDebugDescription)
+                ("Domain", task.errorDomain),
+                ("Code", descriptionForError(domain: task.errorDomain, code: task.errorCode)),
+                ("Description", task.errorDebugDescription)
             ])
     }
 
-    private static func descriptionForError(domain: String, code: Int) -> String {
+    private static func descriptionForError(domain: String?, code: Int32) -> String {
         guard domain == NSURLErrorDomain else {
             return "\(code)"
         }
-        return "\(code) (\(descriptionForURLErrorCode(code)))"
+        return "\(code) (\(descriptionForURLErrorCode(Int(code)))"
     }
 
     static func makeQueryItems(for url: URL, action: @escaping () -> Void) -> KeyValueSectionViewModel? {

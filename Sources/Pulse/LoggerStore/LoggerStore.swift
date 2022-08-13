@@ -321,12 +321,6 @@ extension LoggerStore {
         entity.url = event.originalRequest.url?.absoluteString
         entity.host = event.originalRequest.url?.host.map(makeDomain)
         entity.httpMethod = event.originalRequest.httpMethod
-        switch event.error?.domain {
-        case URLError.errorDomain: entity.errorDomain = .urlError
-        case NetworkLogger.DecodingError.domain: entity.errorDomain = .decoding
-        default: entity.errorDomain = nil
-        }
-        entity.errorCode = Int32(event.error?.code ?? 0)
         let statusCode = Int32(event.response?.statusCode ?? 0)
         entity.statusCode = statusCode
         entity.responseContentType = event.response?.contentType?.type
@@ -370,10 +364,16 @@ extension LoggerStore {
             entity.transactions = Set(metrics.transactions.enumerated().map(makeTransaction))
         }
 
+        if let error = event.error {
+            entity.errorCode = Int32(error.code)
+            entity.errorDomain = error.domain
+            entity.errorDebugDescription = error.debugDescription
+            entity.underlyingError = error.underlyingError.flatMap { try? JSONEncoder().encode($0) }
+        }
+
         entity.originalRequest = makeRequest(for: event.originalRequest)
         entity.currentRequest = event.currentRequest.map(makeRequest)
         entity.response = event.response.map(makeResponse)
-        entity.error = event.error.map(makeError)
         entity.rawMetadata = {
             guard let responseBody = event.responseBody,
                (responseContentType?.isImage ?? false),
@@ -494,15 +494,6 @@ extension LoggerStore {
         let entity = NetworkResponseEntity(context: backgroundContext)
         entity.statusCode = Int16(response.statusCode ?? 0)
         entity.httpHeaders = KeyValueEncoding.encodeKeyValuePairs(response.headers)
-        return entity
-    }
-
-    private func makeError(for error: NetworkLogger.ResponseError) -> NetworkErrorEntity {
-        let entity = NetworkErrorEntity(context: backgroundContext)
-        entity.code = error.code
-        entity.domain = error.domain
-        entity.errorDebugDescription = error.debugDescription
-        entity.underlyingError = error.underlyingError.flatMap { try? JSONEncoder().encode($0) }
         return entity
     }
 
