@@ -199,7 +199,7 @@ final class LoggerStoreTests: XCTestCase {
         // WHEN
         let info = try LoggerStore.Info.make(storeURL: copyURL)
 
-        XCTAssertEqual(info.storeVersion, "2.0.1")
+        XCTAssertEqual(info.storeVersion, "2.0.2")
         XCTAssertEqual(info.messageCount, 7)
         XCTAssertEqual(info.taskCount, 3)
         XCTAssertEqual(info.blobCount, 3)
@@ -700,7 +700,7 @@ final class LoggerStoreTests: XCTestCase {
         let info = try store.info()
 
         // THEN
-        XCTAssertEqual(info.storeVersion, "2.0.1")
+        XCTAssertEqual(info.storeVersion, "2.0.2")
         XCTAssertEqual(info.messageCount, 7)
         XCTAssertEqual(info.taskCount, 3)
         XCTAssertEqual(info.blobCount, 3)
