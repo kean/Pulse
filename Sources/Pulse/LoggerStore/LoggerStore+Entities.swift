@@ -131,6 +131,10 @@ public final class NetworkTaskEntity: NSManagedObject {
     public var hasMetrics: Bool {
         startDate != nil
     }
+
+    public var decodingError: NetworkLogger.DecodingError? {
+        error as? NetworkLogger.DecodingError
+    }
 }
 
 public final class NetworkDomainEntity: NSManagedObject {
