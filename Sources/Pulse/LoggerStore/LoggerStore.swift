@@ -299,7 +299,7 @@ extension LoggerStore {
         let entity = findOrCreateTask(forTaskId: event.taskId, taskType: event.taskType, createdAt: event.createdAt, session: event.session, url: event.originalRequest.url)
         
         entity.url = event.originalRequest.url?.absoluteString
-        entity.host = event.originalRequest.url?.host
+        entity.host = event.originalRequest.url?.host.map(makeDomain)
         entity.httpMethod = event.originalRequest.httpMethod
         entity.requestState = NetworkTaskEntity.State.pending.rawValue
         entity.originalRequest = makeRequest(for: event.originalRequest)
@@ -324,7 +324,7 @@ extension LoggerStore {
         let entity = findOrCreateTask(forTaskId: event.taskId, taskType: event.taskType, createdAt: event.createdAt, session: event.session, url: event.originalRequest.url)
 
         entity.url = event.originalRequest.url?.absoluteString
-        entity.host = event.originalRequest.url?.host
+        entity.host = event.originalRequest.url?.host.map(makeDomain)
         entity.httpMethod = event.originalRequest.httpMethod
         switch event.error?.domain {
         case URLError.errorDomain: entity.errorDomain = .urlError
@@ -424,6 +424,17 @@ extension LoggerStore {
             "ResponsePixelWidth": String(Int(image.size.width)),
             "ResponsePixelHeight": String(Int(image.size.height))
         ]
+    }
+
+    private func makeDomain(_ name: String) -> NetworkDomainEntity {
+        if let entity = try? backgroundContext.first(NetworkDomainEntity.self, { $0.predicate = NSPredicate(format: "value == %@", name) }) {
+            entity.count += 1
+            return entity
+        }
+        let entity = NetworkDomainEntity(context: backgroundContext)
+        entity.value = name
+        entity.count = 1
+        return entity
     }
 
     private func findTask(forTaskId taskId: UUID) -> NetworkTaskEntity? {
@@ -696,6 +707,7 @@ extension LoggerStore {
         case .package:
             try? deleteEntities(for: LoggerMessageEntity.fetchRequest())
             try? deleteEntities(for: LoggerLabelEntity.fetchRequest())
+            try? deleteEntities(for: NetworkDomainEntity.fetchRequest())
             try? deleteEntities(for: LoggerBlobHandleEntity.fetchRequest())
             try? Files.removeItem(at: blobsURL)
             Files.createDirectoryIfNeeded(at: blobsURL)
@@ -884,8 +896,16 @@ extension LoggerStore {
             $0.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [predicate, NSPredicate(format: "task != NULL")])
         }
         for message in messages {
-            message.task?.requestBody.map(unlink)
-            message.task?.responseBody.map(unlink)
+            if let task = message.task {
+                task.requestBody.map(unlink)
+                task.responseBody.map(unlink)
+                if let host = task.host {
+                    host.count -= 1
+                    if host.count == 0 {
+                        backgroundContext.delete(host)
+                    }
+                }
+            }
             message.label.count -= 1
             if message.label.count == 0 {
                 backgroundContext.delete(message.label)

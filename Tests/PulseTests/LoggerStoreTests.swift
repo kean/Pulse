@@ -654,7 +654,7 @@ final class LoggerStoreTests: XCTestCase {
         })
 
         XCTAssertEqual(request.url, "https://github.com/login")
-        XCTAssertEqual(request.host, "github.com")
+        XCTAssertEqual(request.host?.value, "github.com")
         XCTAssertEqual(request.httpMethod, "GET")
         XCTAssertEqual(request.type, .dataTask)
         XCTAssertEqual(request.statusCode, 200)

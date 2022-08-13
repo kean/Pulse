@@ -15,6 +15,7 @@ extension LoggerStore {
         let label = Entity(class: LoggerLabelEntity.self)
 
         let task = Entity(class: NetworkTaskEntity.self)
+        let domain = Entity(class: NetworkDomainEntity.self)
         let progress = Entity(class: NetworkTaskProgressEntity.self)
         let request = Entity(class: NetworkRequestEntity.self)
         let response = Entity(class: NetworkResponseEntity.self)
@@ -57,7 +58,7 @@ extension LoggerStore {
             Attribute(name: "taskId", type: .UUIDAttributeType),
             Attribute(name: "taskType", type: .integer16AttributeType),
             Attribute(name: "url", type: .stringAttributeType),
-            Attribute(name: "host", type: .stringAttributeType),
+            Relationship(name: "host", type: .oneToOne(isOptional: true), entity: domain),
             Attribute(name: "httpMethod", type: .stringAttributeType),
             Attribute(name: "rawErrorDomain", type: .integer16AttributeType),
             Attribute(name: "errorCode", type: .integer32AttributeType),
@@ -80,8 +81,13 @@ extension LoggerStore {
             Relationship(name: "progress", type: .oneToOne(isOptional: true), entity: progress)
         ]
 
+        domain.properties = [
+            Attribute(name: "value", type: .stringAttributeType),
+            Attribute(name: "count", type: .integer64AttributeType)
+        ]
+
         request.properties = [
-            Attribute(name: "url", type: .stringAttributeType) { $0.isOptional = true },
+            Attribute(name: "url", type: .stringAttributeType),
             Attribute(name: "httpMethod", type: .stringAttributeType) { $0.isOptional = true },
             Attribute(name: "httpHeaders", type: .stringAttributeType),
             Attribute(name: "allowsCellularAccess", type: .booleanAttributeType),
@@ -168,7 +174,7 @@ extension LoggerStore {
         ]
 
         let model = NSManagedObjectModel()
-        model.entities = [message, label, metadata, task, progress, blob, data, request, response, error, metrics, transaction]
+        model.entities = [message, label, metadata, task, domain, progress, blob, data, request, response, error, metrics, transaction]
         return model
     }()
 }

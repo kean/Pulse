@@ -44,7 +44,7 @@ public final class NetworkTaskEntity: NSManagedObject {
     // MARK: Request
 
     @NSManaged public var url: String?
-    @NSManaged public var host: String?
+    @NSManaged public var host: NetworkDomainEntity?
     @NSManaged public var httpMethod: String?
 
     // MARK: Response
@@ -113,6 +113,11 @@ public final class NetworkTaskEntity: NSManagedObject {
     public enum ErrorDomain: Int16 {
         case urlError = 1, decoding
     }
+}
+
+public final class NetworkDomainEntity: NSManagedObject {
+    @NSManaged public var value: String
+    @NSManaged public var count: Int64
 }
 
 /// Indicates current download or upload progress.
