@@ -28,6 +28,7 @@ final class HTMLPrettyPrint {
 
         text.addAttributes([
             .font: UXFont.monospacedSystemFont(ofSize: CGFloat(FontSize.body), weight: .regular),
+            .foregroundColor: UXColor.label,
             .paragraphStyle: ps
         ])
 
@@ -37,7 +38,6 @@ final class HTMLPrettyPrint {
 
         let tagRegex = try! Regex("<[^>]*>")
         let attributesRegex = try! Regex(#"(\w*?)=(\"\w.*?\")"#)
-        text.addAttributes([.foregroundColor: UXColor.textColor])
         for match in tagRegex.matches(in: string) {
             let range = makeRange(from: match.fullMatch)
             text.addAttribute(.foregroundColor, value: Palette.pink, range: range)

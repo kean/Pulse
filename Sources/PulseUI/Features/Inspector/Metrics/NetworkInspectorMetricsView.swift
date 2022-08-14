@@ -33,7 +33,9 @@ struct NetworkInspectorMetricsView: View {
 #if os(tvOS)
         .frame(maxWidth: 1200, alignment: .center)
 #endif
+#if !os(iOS)
         .backport.navigationTitle("Metrics")
+#endif
     }
 }
 

@@ -125,12 +125,12 @@ struct RichTextView<ExtraMenu: View>: View {
                 }
                 .foregroundColor(.white)
                 .padding(8)
-                .background(Color.red.opacity(0.9))
+                .background(Color.red.opacity(0.8))
                 .cornerRadius(12)
                 .frame(maxWidth: 400)
                 Spacer()
             }
-            .padding()
+            .padding(.bottom, 16)
             .onTapGesture {
                 withAnimation {
                     errorViewOpacity = 0
