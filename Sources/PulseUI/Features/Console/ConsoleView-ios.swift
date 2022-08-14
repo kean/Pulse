@@ -23,6 +23,8 @@ public struct ConsoleView: View {
 
     public var body: some View {
         contentView
+            .onAppear(perform: viewModel.onAppear)
+            .onDisappear(perform: viewModel.onDisappear)
             .edgesIgnoringSafeArea(.bottom)
             .navigationBarTitle(Text("Console"))
             .navigationBarItems(
@@ -40,9 +42,6 @@ public struct ConsoleView: View {
                     ShareView(ShareItems(messages: viewModel.store))
                 }
             }
-            .onAppear(perform: viewModel.onAppear)
-            .onDisappear(perform: viewModel.onDisappear)
-
     }
 
     private var contentView: some View {

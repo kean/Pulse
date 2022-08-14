@@ -42,6 +42,9 @@ public struct SettingsView: View {
                     RemoteLoggerSettingsView(viewModel: .shared)
                 }
             }
+#if os(iOS)
+            sectionSponsor
+#endif
         }
         .backport.navigationTitle("Settings")
 #if os(iOS)
@@ -85,6 +88,28 @@ public struct SettingsView: View {
         .disabled(viewModel.fileTransferStatus.isButtonDisabled)
         .alert(item: $viewModel.fileTransferError) { error in
             Alert(title: Text("Transfer Failed"), message: Text(error.message), dismissButton: .cancel(Text("Ok")))
+        }
+    }
+#endif
+
+#if os(iOS)
+    private var sectionSponsor: some View {
+        Section(footer: Text("Pulse is funded by the community contributions.")) {
+            Button(action: {
+                if let url = URL(string: "https://github.com/sponsors/kean") {
+                    UIApplication.shared.open(url)
+                }
+            }) {
+                HStack {
+                    Image(systemName: "heart.fill")
+                        .foregroundColor(Color.pink)
+                    Text("Sponsor")
+                        .foregroundColor(Color.primary)
+                    Spacer()
+                    Image(systemName: "link")
+                        .foregroundColor(.secondary)
+                }
+            }
         }
     }
 #endif
