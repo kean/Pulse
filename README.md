@@ -42,7 +42,7 @@ Pulse **is not** a network debugging proxy tool like Proxyman, Charles, or Wires
 Pulse is easy to learn and use thanks to [**Pulse Docs**](https://kean.blog/pulse/home).
 
 <a href="https://kean.blog/pulse/home">
-<img src="https://user-images.githubusercontent.com/1567433/115163600-eea0cc80-a077-11eb-8b86-3113a657816f.png">
+<img src="https://user-images.githubusercontent.com/1567433/184552639-cf6765df-b5af-416b-95d3-0204e32df9d6.png">
 </a>
 
 ## Pulse Pro
@@ -54,7 +54,7 @@ Pulse is easy to learn and use thanks to [**Pulse Docs**](https://kean.blog/puls
 | Pulse      | Swift     | Xcode       | Platforms                                     |
 |------------|-----------|-------------|-----------------------------------------------|
 | Pulse 2.0  | Swift 5.6 | Xcode 13.3  | iOS 13.0, watchOS 7.0, tvOS 13.0, macOS 11.0  |
-| Pulse 0.14 | Swift 5.3 | Xcode 12.0  | iOS 11.0, watchOS 6.0, tvOS 11.0, macOS 11.0  |
+| Pulse 1.0  | Swift 5.3 | Xcode 12.0  | iOS 11.0, watchOS 6.0, tvOS 11.0, macOS 11.0  |
 
 ## License
 
