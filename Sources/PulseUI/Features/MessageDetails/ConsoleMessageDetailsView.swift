@@ -23,7 +23,7 @@ struct ConsoleMessageDetailsView: View {
 
     @ViewBuilder
     private var trailingNavigationBarItems: some View {
-        HStack {
+        HStack(spacing: 10) {
             if let badge = viewModel.badge {
                 BadgeView(viewModel: BadgeViewModel(title: badge.title, color: badge.color.opacity(colorScheme == .light ? 0.25 : 0.5)))
             }

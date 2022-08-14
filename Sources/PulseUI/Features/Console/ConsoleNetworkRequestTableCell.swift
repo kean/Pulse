@@ -33,6 +33,8 @@ final class ConsoleNetworkRequestTableCell: UITableViewCell, UIContextMenuIntera
     }
 
     private func createView() {
+        selectionStyle = .gray
+
         let topStack = UIView.hStack(alignment: .center, spacing: 8, [
             badge, title, UIView(), pin, accessory
         ])

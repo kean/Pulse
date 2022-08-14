@@ -26,6 +26,8 @@ final class ConsoleMessageTableCell: UITableViewCell, UIContextMenuInteractionDe
     }
 
     private func createView() {
+        selectionStyle = .gray
+
         let topStack = UIView.hStack(alignment: .center, spacing: 8, [
             title, UIView(), pin, accessory
         ])
