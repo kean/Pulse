@@ -26,6 +26,9 @@ struct NetworkInspectorMetricsView: View {
                         .padding(.leading, NetworkInspectorMetricsView.padding)
                     NetworkInspectorTransactionsListView(viewModel: transactions)
                         .padding([.leading, .trailing], NetworkInspectorMetricsView.padding)
+#if os(macOS)
+                        .padding(.bottom, 16)
+#endif
                 }
 #endif
             }
