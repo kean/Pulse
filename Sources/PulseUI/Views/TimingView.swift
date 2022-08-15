@@ -6,97 +6,140 @@ import SwiftUI
 
 #if os(iOS) || os(macOS) || os(tvOS)
 
-@available(iOS 13.0, tvOS 14.0, *)
 struct TimingView: View {
-    let viewModel: [TimingRowSectionViewModel]
-    let width: CGFloat
+    let viewModel: TimingViewModel
 
     var body: some View {
+#if os(tvOS)
+        List(viewModel.sections) {
+            TimingSectionView(viewModel: $0, parent: viewModel)
+        }.frame(maxWidth: 1000)
+#else
         VStack(spacing: 16) {
-            ForEach(viewModel, id: \.self.title) {
-                TimingSectionView(viewModel: $0, width: width)
+            ForEach(viewModel.sections) {
+                TimingSectionView(viewModel: $0, parent: viewModel)
             }
         }
+#endif
     }
 }
 
-@available(iOS 13.0, tvOS 14.0, *)
 private struct TimingSectionView: View {
     let viewModel: TimingRowSectionViewModel
-    let width: CGFloat
+    let parent: TimingViewModel
 
     var body: some View {
         VStack(spacing: 6) {
             HStack {
                 Text(viewModel.title)
                     .font(.subheadline)
-                    .foregroundColor(.primary)
+                    .lineLimit(1)
+                    .foregroundColor(viewModel.isHeader ? .secondary : .primary)
                 Spacer()
+            }.padding(.top, viewModel.isHeader ? 16 : 0)
+            if viewModel.isHeader {
+                Divider()
             }
-
-            VStack(spacing: 6) {
-                ForEach(viewModel.items, id: \.self.title) {
-                    TimingRowView(viewModel: $0, width: width)
+            if !viewModel.items.isEmpty {
+                ForEach(viewModel.items) {
+                    TimingRowView(viewModel: $0, parent: parent)
                 }
             }
         }
     }
 }
 
-@available(iOS 13.0, tvOS 14.0, *)
 private struct TimingRowView: View {
     let viewModel: TimingRowViewModel
-    let width: CGFloat
+    let parent: TimingViewModel
 
-    #if os(tvOS)
-    static let rowHeight: CGFloat = 46
-    static let titleWidth: CGFloat = 170
-    static let valueWidth: CGFloat = 120
-    #else
-    static let rowHeight: CGFloat = 14
-    static let titleWidth: CGFloat = 80
-    static let valueWidth: CGFloat = 56
-    #endif
+#if os(tvOS)
+    let barHeight: CGFloat = 20
+#else
+    let barHeight: CGFloat = 14
+#endif
+
+    @Environment(\.sizeCategory) var sizeCategory
 
     var body: some View {
-        HStack {
-            let barWidth = width - TimingRowView.titleWidth - TimingRowView.valueWidth - 10
-            let start = clamp(viewModel.start)
-            let length = min(1 - start, viewModel.length)
+        HStack(alignment: .center, spacing: 12) {
+            ZStack(alignment: .leading) {
+                makeTitle(viewModel.title)
+                makeTitle(parent.longestTitle).invisible() // Calculates width
+            }.layoutPriority(1)
 
-            Text(viewModel.title)
-                .font(.footnote)
-                .foregroundColor(Color(UXColor.secondaryLabel))
-                .frame(width: TimingRowView.titleWidth, alignment: .leading)
-            Spacer()
-                .frame(width: 2 + barWidth * start)
-            #if os(tvOS)
-            RoundedRectangle(cornerRadius: 2)
-                .fill(Color(viewModel.color))
-                .frame(width: max(2, barWidth * length), height: 20)
-            #else
-            RoundedRectangle(cornerRadius: 2)
-                .fill(Color(viewModel.color))
-                .frame(width: max(2, barWidth * length))
-            #endif
-            Spacer()
-            Text(viewModel.value)
-                .font(.system(.caption, design: .monospaced))
-                .foregroundColor(Color(UXColor.secondaryLabel))
-                .frame(width: TimingRowView.valueWidth, alignment: .trailing)
+            bar
+            
+            ZStack(alignment: .leading) {
+                makeValue(viewModel.value)
+                makeValue(parent.longestValue).invisible() // Calculates width
+            }.layoutPriority(1)
         }
-        .frame(height: TimingRowView.rowHeight)
+    }
+
+    private var bar: some View {
+        GeometryReader { proxy in
+            let start = max(0, min(1, viewModel.start))
+            let length = min(1 - start, viewModel.length)
+            RoundedRectangle(cornerRadius: 2 * sizeCategory.scale)
+                .fill(Color(viewModel.color))
+                .frame(width: max(2, proxy.size.width * length))
+                .padding(.leading, proxy.size.width * start)
+        }
+        .frame(height: barHeight * sizeCategory.scale)
+
+    }
+
+    private func makeTitle(_ text: String) -> some View {
+        Text(text)
+            .font(.footnote)
+            .lineLimit(1)
+            .foregroundColor(.secondary)
+    }
+
+    private func makeValue(_ text: String) -> some View {
+        Text(text)
+            .font(.system(.caption, design: .monospaced))
+            .lineLimit(1)
+            .foregroundColor(.secondary)
     }
 }
 
-// MARK: - ViewModel
+final class TimingViewModel {
+    let sections: [TimingRowSectionViewModel]
 
-struct TimingRowSectionViewModel {
-    let title: String
-    let items: [TimingRowViewModel]
+    init(sections: [TimingRowSectionViewModel]) {
+        self.sections = sections
+    }
+
+    private(set) lazy var longestTitle: String = {
+        allRows.map(\.title).max { $0.count < $1.count } ?? ""
+    }()
+
+    private(set) lazy var longestValue: String = {
+        allRows.map(\.value).max { $0.count < $1.count } ?? ""
+    }()
+
+    private var allRows: [TimingRowViewModel] {
+        sections.flatMap(\.items)
+    }
 }
 
-struct TimingRowViewModel {
+final class TimingRowSectionViewModel: Identifiable {
+    let title: String
+    let items: [TimingRowViewModel]
+    var isHeader = false
+
+    var id: ObjectIdentifier { ObjectIdentifier(self) }
+
+    init(title: String, items: [TimingRowViewModel], isHeader: Bool = false) {
+        self.title = title
+        self.items = items
+        self.isHeader = isHeader
+    }
+}
+
+final class TimingRowViewModel: Identifiable {
     let title: String
     let value: String
     let color: UXColor
@@ -104,38 +147,30 @@ struct TimingRowViewModel {
     let start: CGFloat
     // [0, 1]
     let length: CGFloat
-}
 
-// MARK: - Private
+    var id: ObjectIdentifier { ObjectIdentifier(self) }
 
-private func clamp(_ value: CGFloat) -> CGFloat {
-    max(0, min(1, value))
-}
-
-// MARK: - Preview
-
-#if DEBUG
-@available(iOS 13.0, tvOS 14.0, *)
-struct TimingView_Previews: PreviewProvider {
-    static var previews: some View {
-        Group {
-            GeometryReader { geo in
-                TimingView(viewModel: mockModel, width: geo.size.width)
-                    .previewLayout(.fixed(width: 320, height: 200))
-                    .previewDisplayName("Light")
-                    .environment(\.colorScheme, .light)
-
-                TimingView(viewModel: mockModel, width: geo.size.width)
-                    .previewLayout(.fixed(width: 320, height: 200))
-                    .previewDisplayName("Dark")
-                    .background(Color(UXColor.systemBackground))
-                    .environment(\.colorScheme, .dark)
-            }
-        }
+    init(title: String, value: String, color: UXColor, start: CGFloat, length: CGFloat) {
+        self.title = title
+        self.value = value
+        self.color = color
+        self.start = start
+        self.length = length
     }
 }
 
-private let mockModel = [
+#if DEBUG
+struct TimingView_Previews: PreviewProvider {
+    static var previews: some View {
+        TimingView(viewModel: .init(sections: mockSections))
+            .padding()
+#if !os(tvOS)
+            .previewLayout(.sizeThatFits)
+#endif
+    }
+}
+
+private let mockSections = [
     TimingRowSectionViewModel(title: "Response", items: [
         TimingRowViewModel(title: "Scheduling", value: "0.01ms", color: .systemBlue, start: 0.0, length: 0.001),
         TimingRowViewModel(title: "Waiting", value: "41.2ms", color: .systemBlue, start: 0.0, length: 0.4),
@@ -143,7 +178,7 @@ private let mockModel = [
     ]),
     TimingRowSectionViewModel(title: "Cache Lookup", items: [
         TimingRowViewModel(title: "Waiting", value: "50.2ms", color: .systemYellow, start: 0.45, length: 0.3),
-        TimingRowViewModel(title: "Download", value: "–", color: .systemGreen, start: 0.75, length: 100.0)
+        TimingRowViewModel(title: "Download", value: "30.0ms", color: .systemGreen, start: 0.75, length: 100.0)
     ])
 ]
 #endif

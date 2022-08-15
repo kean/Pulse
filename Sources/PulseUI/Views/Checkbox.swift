@@ -4,8 +4,8 @@
 
 import SwiftUI
 
-#if os(iOS)
-@available(iOS 13.0, *)
+#if os(iOS) || os(macOS)
+
 struct Checkbox: View {
     @Binding var isEnabled: Bool
 
@@ -18,7 +18,6 @@ struct Checkbox: View {
     }
 }
 
-@available(iOS 13.0, *)
 struct CheckboxView_Previews: PreviewProvider {
     static var previews: some View {
         VStack(spacing: 32) {

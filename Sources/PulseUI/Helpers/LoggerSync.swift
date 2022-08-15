@@ -6,11 +6,10 @@
 
 import CoreData
 import Combine
-import PulseCore
+import Pulse
 import WatchConnectivity
 import SwiftUI
 
-@available(iOS 13, watchOS 6, *)
 final class LoggerSyncSession: ObservableObject {
     @Published fileprivate(set) var fileTransferStatus: FileTransferStatus = .initial
 
@@ -31,7 +30,7 @@ final class LoggerSyncSession: ObservableObject {
 
     func transfer(store: LoggerStore) {
         let directory = TemporaryDirectory()
-        let date = ShareItems.makeCurrentDate()
+        let date = makeCurrentDate()
         let storeURL = directory.url.appendingPathComponent("logs-\(date).pulse", isDirectory: true)
         _ = try? store.copy(to: storeURL)
 
@@ -41,25 +40,16 @@ final class LoggerSyncSession: ObservableObject {
     }
 }
 
-@available(iOS 13, watchOS 6, *)
 private final class SessionDelegate: NSObject, WCSessionDelegate {
     unowned var session: LoggerSyncSession!
 
     #if os(iOS)
-    func sessionDidBecomeInactive(_ session: WCSession) {
-        debugPrint("WCSession did activate")
-    }
+    func sessionDidBecomeInactive(_ session: WCSession) {}
 
-    func sessionDidDeactivate(_ session: WCSession) {
-        debugPrint("WCSession did deactivate")
-    }
+    func sessionDidDeactivate(_ session: WCSession) {}
     #endif
 
-    func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
-        if let error = error {
-            debugPrint("Failed to active watch communication session: \(error)")
-        }
-    }
+    func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {}
 
     #if os(iOS)
     func session(_ session: WCSession, didReceive file: WCSessionFile) {
@@ -76,9 +66,11 @@ private final class SessionDelegate: NSObject, WCSessionDelegate {
                         Text("Store received")
                         Spacer().frame(width: 16)
                         Button("Open", action: {
-                            let store = try? LoggerStore(storeURL: storeURL)
+                            guard let store = try? LoggerStore(storeURL: storeURL) else {
+                                return
+                            }
                             let vc = UIViewController.present { dismiss in
-                                MainView(store: store ?? .empty, onDismiss: dismiss)
+                                MainView(store: store, onDismiss: dismiss)
                             }
                             vc?.onDeinit(directory.remove)
                         }).foregroundColor(Color.blue)
@@ -106,7 +98,6 @@ private final class SessionDelegate: NSObject, WCSessionDelegate {
     }
 }
 
-@available(iOS 13, watchOS 6, *)
 enum FileTransferStatus {
     case initial
     case sending(Progress)

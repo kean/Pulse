@@ -4,20 +4,18 @@
 
 import SwiftUI
 import CoreData
-import PulseCore
+import Pulse
 import Combine
 
 #if os(tvOS)
 
-@available(tvOS 14, *)
 public struct ConsoleView: View {
     @ObservedObject var viewModel: ConsoleViewModel
-    @Environment(\.colorScheme) private var colorScheme: ColorScheme
     @State private var isShowingFiltersView = false
     @State private var isShowingRemoveConfirmationAlert = false
     @State private var isStoreArchived = false
 
-    public init(store: LoggerStore = .default) {
+    public init(store: LoggerStore = .shared) {
         self.viewModel = ConsoleViewModel(store: store)
     }
 
@@ -27,20 +25,17 @@ public struct ConsoleView: View {
 
     public var body: some View {
         List {
-            ConsoleMessagesForEach(store: viewModel.store, messages: viewModel.messages)
+            ConsoleMessagesForEach(messages: viewModel.entities)
         }
+        .onAppear(perform: viewModel.onAppear)
+        .onDisappear(perform: viewModel.onDisappear)
     }
 }
 
 #if DEBUG
-@available(tvOS 14, *)
 struct ConsoleView_Previews: PreviewProvider {
     static var previews: some View {
-        return Group {
-            ConsoleView(viewModel: .init(store: .mock))
-            ConsoleView(viewModel: .init(store: .mock))
-                .environment(\.colorScheme, .dark)
-        }
+        ConsoleView(viewModel: .init(store: .mock))
     }
 }
 #endif

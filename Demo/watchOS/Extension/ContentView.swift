@@ -3,12 +3,12 @@
 // Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
-import PulseCore
+import Pulse
 import PulseUI
 
 struct ContentView: View {
     var body: some View {
-        ConsoleView(store: .mock)
+        MainView(store: .mock)
     }
 }
 

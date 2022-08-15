@@ -4,169 +4,133 @@
 
 import SwiftUI
 import CoreData
-import PulseCore
+import Pulse
 import Combine
 
-// MARK: - View
-
-#if os(iOS) || os(tvOS) || os(watchOS)
-@available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
 struct NetworkInspectorView: View {
-    // Make sure all tabs are updated live
-    @ObservedObject var viewModel: NetworkInspectorViewModel
-    @State private var selectedTab: NetworkInspectorTab = .summary
-    @State private var isShowingShareSheet = false
+#if os(watchOS)
+    @StateObject var viewModel: NetworkInspectorViewModel
+#else
+    let viewModel: NetworkInspectorViewModel
+#endif
+    var onClose: (() -> Void)?
+
+#if os(iOS) || os(macOS)
+    @State private var selectedTab: NetworkInspectorTab = .response
+    @State private var isExpanded = false
     @State private var shareItems: ShareItems?
-    @Environment(\.colorScheme) private var colorScheme
+#endif
 
-    #if os(iOS)
+#if os(iOS)
+    @State private var viewController: UIViewController?
+
     var body: some View {
-        universalBody
-            .navigationBarTitle(Text(viewModel.title), displayMode: .inline)
-            .navigationBarItems(trailing: HStack(spacing: 22) {
-                if let pin = viewModel.pin {
-                    PinButton(viewModel: pin, isTextNeeded: false)
-                }
-                if #available(iOS 14.0, *) {
-                    Menu(content: {
-                        NetworkMessageContextMenu(request: viewModel.request, store: viewModel.store, sharedItems: $shareItems)
-                    }, label: {
-                        Image(systemName: "square.and.arrow.up")
-                    })
-                } else {
-                    ShareButton {
-                        isShowingShareSheet = true
-                    }
-                }
-            })
-            .sheet(isPresented: $isShowingShareSheet) {
-                ShareView(activityItems: [viewModel.prepareForSharing()])
-            }
-            .sheet(item: $shareItems, content: ShareView.init)
-    }
-    #elseif os(watchOS)
-    var body: some View {
-        NetworkInspectorSummaryView(viewModel: viewModel.makeSummaryModel())
-            .navigationBarTitle(Text(viewModel.title))
-            .toolbar {
-                if let viewModel = viewModel.pin {
-                    PinButton(viewModel: viewModel, isTextNeeded: false)
-                }
-            }
-    }
-    #elseif os(tvOS)
-    var body: some View {
-        List {
-            let viewModel = self.viewModel.makeSummaryModel()
-
-            makeKeyValueSection(viewModel: viewModel.summaryModel)
-
-            if let error = viewModel.errorModel {
-                makeKeyValueSection(viewModel: error)
-            }
-            if let request = viewModel.requestBodySection {
-                NavigationLink(destination: NetworkInspectorResponseView(viewModel: viewModel.requestBodyViewModel).focusable(true)) {
-                    KeyValueSectionView(viewModel: request)
-                }
-            }
-            if let response = viewModel.responseBodySection {
-                NavigationLink(destination: NetworkInspectorResponseView(viewModel: viewModel.responseBodyViewModel).focusable(true)) {
-                    KeyValueSectionView(viewModel: response)
-                }
-            }
-            if let timing = viewModel.timingDetailsModel, let metrics = self.viewModel.makeMetricsModel() {
-                NavigationLink(destination: NetworkInspectorMetricsView(viewModel: metrics).focusable(true)) {
-                    KeyValueSectionView(viewModel: timing)
-                }
-            }
-            if let parameters = viewModel.parametersModel {
-                makeKeyValueSection(viewModel: parameters)
-            }
-
-            makeKeyValueSection(viewModel: viewModel.requestHeaders)
-            makeKeyValueSection(viewModel: viewModel.responseHeaders)
-        }
-    }
-
-    func makeKeyValueSection(viewModel: KeyValueSectionViewModel) -> some View {
-        NavigationLink(destination: KeyValueSectionView(viewModel: viewModel).focusable(true)) {
-            KeyValueSectionView(viewModel: viewModel, limit: 5)
-        }
-    }
-    #else
-    var body: some View {
-        selectedTabView
-            .background(colorScheme == .light ? Color(UXColor.controlBackgroundColor) : Color.clear)
-            .toolbar(content: {
-                Picker("", selection: $selectedTab) {
-                    Text("Summary").tag(NetworkInspectorTab.summary)
-                    Text("Headers").tag(NetworkInspectorTab.headers)
-                    Text("Request").tag(NetworkInspectorTab.request)
-                    Text("Response").tag(NetworkInspectorTab.response)
-                    Text("Metrics").tag(NetworkInspectorTab.metrics)
-                }
-                .pickerStyle(.segmented)
-                Spacer()
-                Menu(content: {
-                    ShareMenuContent(model: .url, items: [model.prepareForSharing()])
-                    NetworkMessageContextMenuCopySection(request: model.request, shareService: model.shareService)
-                }, label: {
-                    Image(systemName: "square.and.arrow.up")
-                })
-                PinButton(viewModel: model.pin, isTextNeeded: false)
-            })
-    }
-    #endif
-
-    #if !os(watchOS) && !os(tvOS)
-    private var universalBody: some View {
         VStack(spacing: 0) {
-            Picker("", selection: $selectedTab) {
-                Text("Summary").tag(NetworkInspectorTab.summary)
-                Text("Headers").tag(NetworkInspectorTab.headers)
-                Text("Metrics").tag(NetworkInspectorTab.metrics)
+            if !isExpanded {
+                toolbar
             }
-            .pickerStyle(.segmented)
-            .padding(13)
-            .border(width: 1, edges: [.bottom], color: Color(UXColor.separator).opacity(0.3))
+            selectedTabView
+        }
+        .navigationBarItems(trailing: trailingNavigationBarItems)
+        .navigationBarTitle(Text(viewModel.title), displayMode: .inline)
+        .statusBar(hidden: UIDevice.current.userInterfaceIdiom == .phone && isExpanded)
+        .sheet(item: $shareItems, content: ShareView.init)
+        .background(ViewControllerAccessor(viewController: $viewController))
+    }
 
+    private var toolbar: some View {
+        Picker("Inspector Tab", selection: $selectedTab) {
+            Text("Response").tag(NetworkInspectorTab.response)
+            Text("Request").tag(NetworkInspectorTab.request)
+            Text("Summary").tag(NetworkInspectorTab.summary)
+            Text("Metrics").tag(NetworkInspectorTab.metrics)
+        }
+        .pickerStyle(.segmented)
+        .labelsHidden()
+        .padding(EdgeInsets(top: 4, leading: 13, bottom: 11, trailing: 13))
+        .border(width: 1, edges: [.bottom], color: Color(UXColor.separator).opacity(0.3))
+    }
+
+    @ViewBuilder
+    private var trailingNavigationBarItems: some View {
+        HStack {
+            if let pin = viewModel.pin {
+                PinButton(viewModel: pin, isTextNeeded: false)
+            }
+            if #available(iOS 14.0, *) {
+                Menu(content: {
+                    NetworkMessageContextMenu(task: viewModel.task, sharedItems: $shareItems)
+                }, label: {
+                    Image(systemName: "ellipsis.circle")
+                })
+            } else {
+                ShareButton {
+                    shareItems = ShareItems([viewModel.prepareForSharing()])
+                }
+            }
+        }
+    }
+#elseif os(macOS)
+    var body: some View {
+        VStack {
+            toolbar
             selectedTabView
         }
     }
 
+    private var toolbar: some View {
+        VStack(spacing: 0) {
+            HStack {
+                NetworkTabPickerView(selectedTab: $selectedTab)
+                Spacer()
+                if let onClose = onClose {
+                    Button(action: onClose) {
+                        Image(systemName: "xmark").foregroundColor(.secondary)
+                    }.buttonStyle(PlainButtonStyle())
+                }
+            }
+            .padding(EdgeInsets(top: 8, leading: 4, bottom: 8, trailing: 10))
+            Divider()
+        }
+    }
+#else
+    var body: some View {
+        NetworkInspectorSummaryView(viewModel: viewModel.summaryViewModel)
+#if os(watchOS)
+            .navigationBarTitle(Text(viewModel.title))
+#endif
+    }
+#endif
+
+#if os(iOS) || os(macOS)
     @ViewBuilder
     private var selectedTabView: some View {
         switch selectedTab {
-        case .summary:
-            NetworkInspectorSummaryView(viewModel: viewModel.makeSummaryModel())
-        case .headers:
-            NetworkInspectorHeadersView(viewModel: viewModel.makeHeadersModel())
-        case .request:
-            if let model = viewModel.makeRequestBodyViewModel() {
-                NetworkInspectorResponseView(viewModel: model)
-            } else {
-                makePlaceholder
-            }
         case .response:
-            if let model = viewModel.makeResponseBodyViewModel() {
-                NetworkInspectorResponseView(viewModel: model)
-            } else {
-                makePlaceholder
-            }
+            NetworkInspectorResponseView(viewModel: viewModel.responseViewModel, onToggleExpanded: onToggleExpanded)
+        case .request:
+            NetworkInspectorRequestView(viewModel: viewModel.requestViewModel, onToggleExpanded: onToggleExpanded)
+        case .summary:
+            NetworkInspectorSummaryView(viewModel: viewModel.summaryViewModel)
+        case .headers:
+#if os(macOS)
+            NetworkInspectorHeadersTabView(viewModel: viewModel.headersViewModel)
+#else
+            EmptyView()
+#endif
         case .metrics:
-            if let model = viewModel.makeMetricsModel() {
-                NetworkInspectorMetricsView(viewModel: model)
-            } else {
-                makePlaceholder
-            }
+            NetworkInspectorMetricsTabView(viewModel: viewModel.metricsViewModel)
         }
     }
-    #endif
 
-    @ViewBuilder
-    private var makePlaceholder: some View {
-        PlaceholderView(imageName: "exclamationmark.circle", title: "Not Available")
+    func onToggleExpanded() {
+#if os(iOS)
+        isExpanded.toggle()
+        viewController?.navigationController?.setNavigationBarHidden(isExpanded, animated: false)
+        viewController?.tabBarController?.setTabBarHidden(isExpanded, animated: false)
+#endif
     }
+#endif
 }
 
 private enum NetworkInspectorTab: Identifiable {
@@ -189,71 +153,46 @@ private enum NetworkInspectorTab: Identifiable {
     }
 }
 
-// MARK: - ViewModel
+#if os(macOS)
+private struct NetworkTabPickerView: View {
+    @Binding var selectedTab: NetworkInspectorTab
 
-@available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
-final class NetworkInspectorViewModel: ObservableObject {
-    private(set) var title: String = ""
-    let request: LoggerNetworkRequestEntity
-    private let objectId: NSManagedObjectID
-    let store: LoggerStore // TODO: make it private
-    private let summary: NetworkLoggerSummary
-
-    init(request: LoggerNetworkRequestEntity, store: LoggerStore) {
-        self.objectId = request.objectID
-        self.request = request
-        self.store = store
-        self.summary = NetworkLoggerSummary(request: request, store: store)
-
-        if let url = request.url.flatMap(URL.init(string:)) {
-            if let httpMethod = request.httpMethod {
-                self.title = "\(httpMethod) /\(url.lastPathComponent)"
-            } else {
-                self.title = "/" + url.lastPathComponent
+    var body: some View {
+        HStack(spacing: 0) {
+            HStack {
+                makeItem("Response", tab: .response)
+                Divider()
+                makeItem("Request", tab: .request)
+                Divider()
+                makeItem("Headers", tab: .headers)
+                Divider()
             }
+            HStack {
+                Spacer().frame(width: 8)
+                makeItem("Summary", tab: .summary)
+                Divider()
+                makeItem("Metrics", tab: .metrics)
+            }
+        }.fixedSize()
+    }
+
+    private func makeItem(_ title: String, tab: NetworkInspectorTab) -> some View {
+        Button(action: { selectedTab = tab }) {
+            Text(title)
+                .font(.system(size: 11, weight: .medium, design: .default))
+                .foregroundColor(tab == selectedTab ? .accentColor : .primary)
         }
+        .buttonStyle(PlainButtonStyle())
     }
+}
+#endif
 
-    var pin: PinButtonViewModel? {
-        request.message.map {
-            PinButtonViewModel(store: store, message: $0)
+#if DEBUG
+struct NetworkInspectorView_Previews: PreviewProvider {
+    static var previews: some View {
+        NavigationView {
+            NetworkInspectorView(viewModel: .init(task: LoggerStore.preview.entity(for: .profile)))
         }
-    }
-
-    // MARK: - Tabs
-
-    func makeSummaryModel() -> NetworkInspectorSummaryViewModel {
-        NetworkInspectorSummaryViewModel(summary: summary)
-    }
-
-    func makeHeadersModel() -> NetworkInspectorHeaderViewModel {
-        NetworkInspectorHeaderViewModel(summary: summary)
-    }
-
-    func makeRequestBodyViewModel() -> NetworkInspectorResponseViewModel? {
-        guard let requestBody = summary.requestBody, !requestBody.isEmpty else { return nil }
-        return NetworkInspectorResponseViewModel(title: "Request", data: requestBody)
-    }
-
-    func makeResponseBodyViewModel() -> NetworkInspectorResponseViewModel? {
-        guard let responseBody = summary.responseBody, !responseBody.isEmpty else { return nil }
-        return NetworkInspectorResponseViewModel(title: "Response", data: responseBody)
-    }
-
-    #if !os(watchOS)
-    func makeMetricsModel() -> NetworkInspectorMetricsViewModel? {
-        summary.metrics.map(NetworkInspectorMetricsViewModel.init)
-    }
-    #endif
-
-    // MARK: Sharing
-
-    func prepareForSharing() -> String {
-        ConsoleShareService(store: store).share(summary, output: .plainText)
-    }
-
-    var shareService: ConsoleShareService {
-        ConsoleShareService(store: store)
     }
 }
 #endif

@@ -3,13 +3,10 @@
 // Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
-import PulseCore
+import Pulse
 import CoreData
 import Combine
 
-#if os(watchOS) || os(tvOS)
-
-@available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
 struct ConsoleMessageView: View {
     let viewModel: ConsoleMessageViewModel
     
@@ -17,10 +14,7 @@ struct ConsoleMessageView: View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(alignment: .firstTextBaseline) {
                 title
-#if os(watchOS)
-                Spacer()
-                PinView(viewModel: viewModel.pinViewModel, font: fonts.title)
-#else
+#if os(macOS)
                 PinView(viewModel: viewModel.pinViewModel, font: fonts.title)
                 Spacer()
 #endif
@@ -31,9 +25,9 @@ struct ConsoleMessageView: View {
     }
     
     private var title: some View {
-        badge + Text(viewModel.title)
-            .font(fonts.title)
+        badge + (Text(viewModel.title)
             .foregroundColor(.secondary)
+            .font(fonts.title))
     }
     
     private var badge: Text {
@@ -73,13 +67,20 @@ struct ConsoleMessageView: View {
         let body: Font
     }
     
-    private var fonts: Fonts {
 #if os(watchOS)
-        return Fonts(title: .system(size: 12), body: .system(size: 15))
-#elseif os(tvOS)
-        return Fonts(title: .body, body: .body)
+    private let fonts = Fonts(title: .system(size: 12), body: .system(size: 15))
+#else
+    private let fonts = Fonts(title: .body, body: .body)
 #endif
-    }
 }
 
+#if DEBUG
+struct ConsoleMessageView_Previews: PreviewProvider {
+    static var previews: some View {
+        ConsoleMessageView(viewModel: .init(message: (try!  LoggerStore.mock.allMessages())[0]))
+            .padding()
+            .previewLayout(.sizeThatFits)
+    }
+}
 #endif
+

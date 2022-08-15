@@ -4,12 +4,11 @@
 
 import SwiftUI
 import CoreData
-import PulseCore
+import Pulse
 import Combine
 
 #if os(iOS) || os(tvOS)
 
-@available(iOS 13.0, tvOS 14.0, *)
 public struct NetworkView: View {
     @ObservedObject var viewModel: NetworkViewModel
 
@@ -17,7 +16,7 @@ public struct NetworkView: View {
     @State private var isShowingShareSheet = false
     @Environment(\.colorScheme) private var colorScheme: ColorScheme
 
-    public init(store: LoggerStore = .default) {
+    public init(store: LoggerStore = .shared) {
         self.viewModel = NetworkViewModel(store: store)
     }
 
@@ -29,45 +28,45 @@ public struct NetworkView: View {
     public var body: some View {
         ConsoleTableView(
             header: { NetworkToolbarView(viewModel: viewModel) },
-            viewModel: viewModel.table
+            viewModel: viewModel.table,
+            detailsViewModel: viewModel.details
         )
+        .edgesIgnoringSafeArea(.bottom)
+        .onAppear(perform: viewModel.onAppear)
+        .onDisappear(perform: viewModel.onDisappear)
         .overlay(tableOverlay)
         .navigationBarTitle(Text("Network"))
-        .navigationBarItems(leading: viewModel.onDismiss.map { Button(action: $0) { Image(systemName: "xmark") } })
+        .navigationBarItems(leading: navigationBarTrailingItems)
     }
 
     @ViewBuilder
     private var tableOverlay: some View {
         if viewModel.entities.isEmpty {
-            placeholder
+            PlaceholderView.make(viewModel: viewModel)
         }
     }
 
-    private var placeholder: PlaceholderView {
-        let message: String
-        if viewModel.searchCriteria.isDefaultSearchCriteria {
-            if viewModel.searchCriteria.criteria.dates.isCurrentSessionOnly {
-                message = "There are no network requests in the current session."
-            } else {
-                message = "There are no stored network requests."
+    @ViewBuilder
+    private var navigationBarTrailingItems: some View {
+        if let onDismiss = viewModel.onDismiss {
+            Button(action: onDismiss) {
+                Image(systemName: "xmark")
             }
-        } else {
-            message = "There are no network requests for the selected filters."
         }
-        return PlaceholderView(imageName: "network", title: "No Requests", subtitle: message)
     }
 
     #elseif os(tvOS)
     public var body: some View {
         List {
-            NetworkMessagesForEach(store: viewModel.store, entities: viewModel.entities)
+            NetworkMessagesForEach(entities: viewModel.entities)
         }
+        .onAppear(perform: viewModel.onAppear)
+        .onDisappear(perform: viewModel.onDisappear)
     }
     #endif
 }
 
 #if os(iOS)
-@available(iOS 13.0, *)
 private struct NetworkToolbarView: View {
     @ObservedObject var viewModel: NetworkViewModel
     @State private var isShowingFilters = false
@@ -76,14 +75,13 @@ private struct NetworkToolbarView: View {
         VStack {
             HStack(spacing: 0) {
                 SearchBar(title: "Search \(viewModel.entities.count) messages", text: $viewModel.filterTerm)
-                Spacer().frame(width: 10)
                 Button(action: { viewModel.isOnlyErrors.toggle() }) {
                     Image(systemName: viewModel.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon")
                         .font(.system(size: 20))
                         .foregroundColor(.accentColor)
                 }.frame(width: 40, height: 44)
                 Button(action: { isShowingFilters = true }) {
-                    Image(systemName: "line.horizontal.3.decrease.circle")
+                    Image(systemName: viewModel.searchCriteria.isDefaultSearchCriteria ? "line.horizontal.3.decrease.circle" : "line.3.horizontal.decrease.circle.fill")
                         .font(.system(size: 20))
                         .foregroundColor(.accentColor)
                 }.frame(width: 40, height: 44)
@@ -100,13 +98,10 @@ private struct NetworkToolbarView: View {
 #endif
 
 #if DEBUG
-@available(iOS 13.0, tvOS 14.0, *)
 struct NetworkView_Previews: PreviewProvider {
     static var previews: some View {
-        return Group {
+        NavigationView {
             NetworkView(store: .mock)
-            NetworkView(store: .mock)
-                .environment(\.colorScheme, .dark)
         }
     }
 }

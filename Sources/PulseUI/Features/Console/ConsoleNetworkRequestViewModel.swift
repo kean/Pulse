@@ -3,128 +3,179 @@
 // Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
-import PulseCore
+import Pulse
 import Combine
 import CoreData
 
-@available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
-final class ConsoleNetworkRequestViewModel: Pinnable {
+final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
+    private(set) lazy var time = ConsoleMessageViewModel.timeFormatter.string(from: task.createdAt)
 #if os(iOS)
-    lazy var time = ConsoleMessageViewModel.timeFormatter.string(from: request.createdAt)
-    let badgeColor: UIColor
-#else
-    let badgeColor: Color
+    var uiBadgeColor: UIColor = .gray
 #endif
-    let status: String
-    let title: String
-    let text: String
 
-    private let request: LoggerNetworkRequestEntity
-    private let store: LoggerStore
+    private(set) var badgeColor: Color = .gray
+    private(set) var title: String = ""
+    private(set) var text: String = ""
+
+    var fullTitle: String {
+        var title = self.title
+#if !os(watchOS)
+        if state == .pending, let details = progress.details {
+            title += " · \(details)"
+        }
+#endif
+#if os(macOS) || os(tvOS)
+        title += " · \(time)"
+#endif
+        return title
+    }
+
+    private(set) var state: NetworkTaskEntity.State = .pending
+
+    private(set) lazy var progress = ProgressViewModel(task: task)
+
+    private let task: NetworkTaskEntity
+    private var cancellable: AnyCancellable?
 
     static let timeFormatter: DateFormatter = {
         let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US")
         formatter.dateFormat = "HH:mm:ss.SSS"
         return formatter
     }()
 
-    init(request: LoggerNetworkRequestEntity, store: LoggerStore) {
-        let isSuccess: Bool
-        if request.errorCode != 0 {
-            isSuccess = false
-        } else if request.statusCode != 0, !(200..<400).contains(request.statusCode) {
-            isSuccess = false
-        } else {
-            isSuccess = true
+    init(task: NetworkTaskEntity) {
+        self.task = task
+        self.progress = ProgressViewModel(task: task)
+
+        self.refresh()
+
+        self.cancellable = task.objectWillChange.sink { [weak self] in
+            self?.refresh()
+            withAnimation {
+                self?.objectWillChange.send()
+            }
+        }
+    }
+
+    private func refresh() {
+        let state = task.state
+
+        var title: String = task.httpMethod ?? "GET"
+        switch task.state {
+        case .pending:
+            title += " · "
+            title += progress.title.uppercased()
+        case .success:
+            title += " · "
+            title += StatusCodeFormatter.string(for: Int(task.statusCode))
+#if !os(watchOS)
+            switch task.type ?? .dataTask {
+            case .uploadTask:
+                if task.requestBodySize > 0 {
+                    let sizeText = ByteCountFormatter.string(fromByteCount: task.requestBodySize)
+                    title += " · "
+                    title += task.isFromCache ? "Cache" : sizeText
+                }
+            case .dataTask, .downloadTask:
+                if task.responseBodySize > 0 {
+                    let sizeText = ByteCountFormatter.string(fromByteCount: task.responseBodySize)
+                    title += " · "
+                    title += task.isFromCache ? "Cache" : sizeText
+                }
+            case .streamTask, .webSocketTask:
+                break
+            }
+#endif
+        case .failure:
+            title += " · "
+            if task.errorCode != 0 {
+                if task.errorDomain == URLError.errorDomain {
+                    title += "\(task.errorCode) \(descriptionForURLErrorCode(Int(task.errorCode)))"
+                } else if task.errorDomain == NetworkLogger.DecodingError.domain {
+                    title += "Decoding Failed"
+                } else {
+                    title += "Error"
+                }
+            } else {
+                title += StatusCodeFormatter.string(for: Int(task.statusCode))
+            }
         }
 
-        let time = ConsoleMessageViewModel.timeFormatter.string(from: request.createdAt)
-        let prefix: String
-        if request.statusCode != 0 {
-            prefix = StatusCodeFormatter.string(for: Int(request.statusCode))
-        } else if request.errorCode != 0 {
-            prefix = "\(request.errorCode) (\(descriptionForURLErrorCode(Int(request.errorCode))))"
-        } else {
-            prefix = "Success"
+        if task.duration > 0 {
+            title += " · "
+            title += DurationFormatter.string(from: task.duration, isPrecise: false)
         }
+
+        self.title = title
+
+        self.text = task.url ?? "URL Unavailable"
 
 #if os(iOS)
-        self.status = ""
-        var title = prefix
-        if request.duration > 0 {
-            title += " · \(DurationFormatter.string(from: request.duration))"
+        switch state {
+        case .pending: self.uiBadgeColor = .systemYellow
+        case .success: self.uiBadgeColor = .systemGreen
+        case .failure: self.uiBadgeColor = .systemRed
         }
-        self.title = title
-
-        self.badgeColor = isSuccess ? .systemGreen : .systemRed
-#else
-        self.status = prefix
-        var title = "\(time)"
-        if request.duration > 0 {
-            title += " · \(DurationFormatter.string(from: request.duration))"
-        }
-        self.title = title
-
-        self.badgeColor = isSuccess ? .green : .red
 #endif
+        switch state {
+        case .pending: self.badgeColor = .yellow
+        case .success: self.badgeColor = .green
+        case .failure: self.badgeColor = .red
+        }
 
-        let method = request.httpMethod ?? "GET"
-        self.text = method + " " + (request.url ?? "–")
-
-        self.request = request
-
-        self.store = store
+        self.state = task.state
     }
 
     // MARK: Pins
 
-    lazy var pinViewModel = PinButtonViewModel(store: store, request: request)
+    lazy var pinViewModel = PinButtonViewModel(task: task)
 
     // MARK: Context Menu
 
+#if os(iOS) || os(macOS)
+
     func shareAsPlainText() -> ShareItems {
-        ShareItems([ConsoleShareService(store: store).share(request, output: .plainText)])
+        ShareItems([ConsoleShareService.share(task, output: .plainText)])
     }
 
     func shareAsMarkdown() -> ShareItems {
-        let text = ConsoleShareService(store: store).share(request, output: .markdown)
+        let text = ConsoleShareService.share(task, output: .markdown)
         let directory = TemporaryDirectory()
         let fileURL = directory.write(text: text, extension: "markdown")
         return ShareItems([fileURL], cleanup: directory.remove)
     }
 
     func shareAsHTML() -> ShareItems {
-        let text = ConsoleShareService(store: store).share(request, output: .html)
+        let text = ConsoleShareService.share(task, output: .html)
         let directory = TemporaryDirectory()
         let fileURL = directory.write(text: text, extension: "html")
         return ShareItems([fileURL], cleanup: directory.remove)
     }
 
     func shareAsCURL() -> ShareItems {
-        let summary = NetworkLoggerSummary(request: request, store: store)
-        return ShareItems([summary.cURLDescription()])
+        ShareItems([task.cURLDescription()])
     }
 
     var containsResponseData: Bool {
-        request.responseBodyKey != nil
+        task.responseBodySize > 0
     }
 
     // WARNING: This call is relatively expensive.
     var responseString: String? {
-        request.responseBodyKey
-            .flatMap(store.getData)
-            .flatMap { String(data: $0, encoding: .utf8) }
+        task.responseBody?.data.flatMap { String(data: $0, encoding: .utf8) }
     }
 
     var url: String? {
-        request.url
+        task.url
     }
 
     var host: String? {
-        request.host
+        task.host?.value
     }
 
     var cURLDescription: String {
-        NetworkLoggerSummary(request: request, store: store).cURLDescription()
+        task.cURLDescription()
     }
+#endif
 }

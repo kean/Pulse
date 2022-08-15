@@ -3,7 +3,7 @@
 // Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
-import PulseCore
+import Pulse
 import CoreData
 import SwiftUI
 
@@ -26,7 +26,7 @@ struct ConsoleSearchCriteria: Hashable {
     struct DatesFilter: Hashable {
         var isEnabled = true
 
-        #if os(iOS)
+        #if os(iOS) || os(watchOS) || os(tvOS)
         var isCurrentSessionOnly = true
         #else
         var isCurrentSessionOnly = false
@@ -60,11 +60,6 @@ struct ConsoleSearchCriteria: Hashable {
         static let `default` = LabelsFilter()
     }
 
-    #if os(watchOS) || os(tvOS) || os(iOS)
-    var onlyPins = false
-    var onlyNetwork = false
-    #endif
-
     static let `default` = ConsoleSearchCriteria()
 
     var isDefault: Bool {
@@ -72,37 +67,31 @@ struct ConsoleSearchCriteria: Hashable {
     }
 }
 
-@available(iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 final class ConsoleSearchFilter: ObservableObject, Hashable, Identifiable {
     let id: UUID
     @Published var field: Field
     @Published var match: Match
     @Published var value: String
-    @Published var isEnabled: Bool
 
     // The actual filters had to be moved to the viewmodel
-    static var defaultFilters: [ConsoleSearchFilter] {
-        [ConsoleSearchFilter(id: UUID(), field: .message, match: .contains, value: "", isEnabled: true)]
-    }
+    static let defaultFilters = [ConsoleSearchFilter(id: UUID(), field: .message, match: .contains, value: "")]
 
     var isDefault: Bool {
-        field == .message && match == .contains && value == "" && isEnabled
+        field == .message && match == .contains && value == ""
     }
 
-    init(id: UUID, field: Field, match: Match, value: String, isEnabled: Bool) {
+    init(id: UUID, field: Field, match: Match, value: String) {
         self.id = id
         self.field = field
         self.match = match
         self.value = value
-        self.isEnabled = isEnabled
     }
 
     static func == (lhs: ConsoleSearchFilter, rhs: ConsoleSearchFilter) -> Bool {
         lhs.id == rhs.id &&
         lhs.field == rhs.field &&
         lhs.match == rhs.match &&
-        lhs.value == rhs.value &&
-        lhs.isEnabled == rhs.isEnabled
+        lhs.value == rhs.value
     }
 
     func hash(into hasher: inout Hasher) {
@@ -110,11 +99,10 @@ final class ConsoleSearchFilter: ObservableObject, Hashable, Identifiable {
         hasher.combine(field)
         hasher.combine(match)
         hasher.combine(value)
-        hasher.combine(isEnabled)
     }
 
     var isReady: Bool {
-        isEnabled && !value.isEmpty
+        !value.isEmpty
     }
 
     enum Field {
@@ -160,9 +148,6 @@ final class ConsoleSearchFilter: ObservableObject, Hashable, Identifiable {
     }
 
     func makePredicate() -> NSPredicate? {
-        if field == .metadata {
-            return makePredicateForMetadata()
-        }
         guard let key = self.key else {
             return nil
         }
@@ -173,17 +158,6 @@ final class ConsoleSearchFilter: ObservableObject, Hashable, Identifiable {
         case .notContains: return NSPredicate(format: "NOT (\(key) CONTAINS[c] %@)", value)
         case .beginsWith: return NSPredicate(format: "\(key) BEGINSWITH[c] %@", value)
         case .regex: return NSPredicate(format: "\(key) MATCHES %@", value)
-        }
-    }
-
-    private func makePredicateForMetadata() -> NSPredicate {
-        switch match {
-        case .equal: return NSPredicate(format: "SUBQUERY(metadata, $entry, $entry.key LIKE[c] %@ OR $entry.value LIKE[c] %@).@count > 0", value, value)
-        case .notEqual: return NSPredicate(format: "SUBQUERY(metadata, $entry, $entry.key LIKE[c] %@ OR $entry.value LIKE[c] %@).@count == 0", value, value)
-        case .contains: return NSPredicate(format: "SUBQUERY(metadata, $entry, $entry.key CONTAINS[c] %@ OR $entry.value CONTAINS[c] %@).@count > 0", value, value)
-        case .notContains: return NSPredicate(format: "SUBQUERY(metadata, $entry, $entry.key CONTAINS[c] %@ OR $entry.value CONTAINS[c] %@).@count == 0", value, value)
-        case .beginsWith: return NSPredicate(format: "SUBQUERY(metadata, $entry, $entry.key BEGINSWITH[c] %@ OR $entry.value CONTAINS[c] %@).@count > 0", value, value)
-        case .regex: return NSPredicate(format: "SUBQUERY(metadata, $entry, $entry.key MATCHES[c] %@ OR $entry.value MATCHES[c] %@).@count > 0", value, value)
         }
     }
 
@@ -203,7 +177,7 @@ final class ConsoleSearchFilter: ObservableObject, Hashable, Identifiable {
         case .level: return "level"
         case .label: return "label"
         case .message: return "text"
-        case .metadata: return nil
+        case .metadata: return "rawMetadata"
         case .file: return "file"
         case .function: return "function"
         case .line: return "line"
@@ -211,7 +185,6 @@ final class ConsoleSearchFilter: ObservableObject, Hashable, Identifiable {
     }
 }
 
-@available(iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension ConsoleSearchCriteria {
 
     static func update(
@@ -219,23 +192,18 @@ extension ConsoleSearchCriteria {
         filterTerm: String,
         criteria: ConsoleSearchCriteria,
         filters: [ConsoleSearchFilter],
-        sessionId: String?,
-        isOnlyErrors: Bool
+        sessionId: UUID?,
+        isOnlyErrors: Bool,
+        isOnlyNetwork: Bool
     ) {
         var predicates = [NSPredicate]()
 
-#if os(watchOS) || os(tvOS) || os(iOS)
-        if criteria.onlyPins {
-            predicates.append(NSPredicate(format: "isPinned == YES"))
-        }
-
-        if criteria.onlyNetwork {
+        if isOnlyNetwork {
             predicates.append(NSPredicate(format: "request != nil"))
         }
-#endif
 
-        if criteria.dates.isCurrentSessionOnly, let sessionId = sessionId, !sessionId.isEmpty {
-            predicates.append(NSPredicate(format: "session == %@", sessionId))
+        if criteria.dates.isCurrentSessionOnly, let sessionId = sessionId {
+            predicates.append(NSPredicate(format: "session == %@", sessionId as NSUUID))
         }
 
         if criteria.dates.isEnabled {
@@ -258,9 +226,9 @@ extension ConsoleSearchCriteria {
 
         if criteria.labels.isEnabled {
             if let focusedLabel = criteria.labels.focused {
-                predicates.append(NSPredicate(format: "label == %@", focusedLabel))
+                predicates.append(NSPredicate(format: "label.name == %@", focusedLabel))
             } else if !criteria.labels.hidden.isEmpty {
-                predicates.append(NSPredicate(format: "NOT label IN %@", Array(criteria.labels.hidden)))
+                predicates.append(NSPredicate(format: "NOT label.name IN %@", Array(criteria.labels.hidden)))
             }
         }
 

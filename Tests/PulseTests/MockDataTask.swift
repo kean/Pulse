@@ -1,15 +1,15 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2021 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2022 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
-import PulseCore
+import Pulse
 
 struct MockDataTask {
     let request: URLRequest
     let response: URLResponse
     let responseBody: Data
-    let metrics: NetworkLoggerMetrics
+    let metrics: NetworkLogger.Metrics
 }
 
 // MARK: - GitHub Login (Success)
@@ -25,107 +25,57 @@ extension MockDataTask {
 
 private let mockLoginRequest: URLRequest = {
     var request = URLRequest(url: URL(string: "https://github.com/login")!)
-
     request.setValue("gzip", forHTTPHeaderField: "Accept-Encoding")
     request.setValue("github.com", forHTTPHeaderField: "Host")
     request.setValue("application/json", forHTTPHeaderField: "Content-Type")
     request.setValue("no-cache", forHTTPHeaderField: "Cache-Control")
     request.setValue("en-us", forHTTPHeaderField: "Accept-Language")
     request.setValue("text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", forHTTPHeaderField: "Accept")
-
     return request
 }()
 
 private let mockLoginResponse = HTTPURLResponse(url: URL(string: "https://github.com/login")!, statusCode: 200, httpVersion: "2.0", headerFields: [
-    "Content-Length": "2298",
-    "Content-Type": "application/json; charset=utf-8",
-    "Cache-Control": "no-store",
-    "Content-Encoding": "gzip",
-    "Set-Cookie": "_device_id=11111111111; path=/; expires=Sun, 30 Jan 2022 21:49:04 GMT; secure; HttpOnly; SameSite=Lax"
+    "Set-Cookie": "token=ADSJ1239CX0; path=/; expires=Sun, 30 Jan 2030 21:49:04 GMT; secure; HttpOnly"
 ])!
 
-private let mockMetrics = try! JSONDecoder().decode(NetworkLoggerMetrics.self, from: """
+private let mockMetrics = try! JSONDecoder().decode(NetworkLogger.Metrics.self, from: """
 {
   "transactions": [
     {
-      "resourceFetchType": 1,
-      "responseStartDate": 633801585.020091,
-      "secureConnectionStartDate": 633801584.903459,
-      "response": {
-        "headers": {
-          "Server": "ATS/8.1.1",
-          "Connection": "keep-alive",
-          "Content-Encoding": "gzip",
-          "Vary": "Accept-Encoding",
-          "Content-Type": "application/javascript",
-          "X-Frame-Options": "sameorigin",
-          "Expires": "Sun, 31 Jan 2021 15:59:12 GMT",
-          "Strict-Transport-Security": "max-age=31536000",
-          "Cache-Control": "max-age=300, public",
-          "X-Cache": "hit-fresh, hit-stale",
-          "CDNUUID": "7bacabb5-d210-42a2-94bb-a5a6a03e6e36-20658596809",
-          "X-B3-TraceId": "033cc1f07abf7ac2",
-          "Content-Security-Policy": "frame-ancestors 'self'",
-          "Date": "Sun, 31 Jan 2021 15:59:02 GMT",
-          "Age": "43",
-          "Via": "https/1.1 usewr1-edge-lx-007.ts.apple.com (ApacheTrafficServer/8.1.1), http/1.1 usewr1-edge-bx-016.ts.apple.com (ApacheTrafficServer/8.1.1)",
-          "Content-Length": "22988"
-        },
-        "statusCode": 200
-      },
-      "fetchStartDate": 633801584.8037,
-      "requestEndDate": 633801585.004759,
+      "transferSize": [167, 0, 0, 94, 166, 214],
+      "timing": [681270022.377544, 681270022.3860258, 681270022.4066201, 681270022.4071407, 681270022.4251491, 681270022.533362, 681270022.5338686, 681270022.5343999, 681270022.5381376, 681270022.7511908, 681270022.8044541],
+      "networkProtocol": "http/2.0",
+      "conditions": 0,
       "request": {
-        "allowsCellularAccess": true,
-        "httpMethod": "GET",
-        "url": "https://developer.apple.com/tutorials/js/analytics.js",
-        "cachePolicy": 0,
-        "allowsExpensiveNetworkAccess": true,
-        "allowsConstrainedNetworkAccess": true,
-        "httpShouldHandleCookies": true,
+        "url": "https://github.com/login?username=kean&password=nope",
+        "method": "POST",
         "headers": {
-          "Accept-Encoding": "gzip, deflate, br",
-          "Host": "developer.apple.com",
+          "User-Agent": "Pulse Demo/2.0",
+          "Accept-Encoding": "gzip",
+          "Cache-Control": "no-cache",
           "Accept-Language": "en-us",
-          "Connection": "keep-alive",
-          "Accept": "*/*"
+          "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
         },
-        "httpShouldUsePipelining": false,
-        "timeoutInterval": 60
+        "options": 15,
+        "timeout": 60
       },
-      "domainLookupStartDate": 633801584.861459,
-      "secureConnectionEndDate": 633801585.0024589,
-      "isProxyConnection": false,
-      "connectEndDate": 633801585.0024589,
-      "networkProtocolName": "http/1.1",
-      "responseEndDate": 633801585.03594,
-      "isReusedConnection": false,
-      "domainLookupEndDate": 633801584.883459,
-      "connectStartDate": 633801584.885459,
-      "requestStartDate": 633801585.004591,
-      "details": {
-        "countOfResponseHeaderBytesReceived": 683,
-        "countOfRequestBodyBytesBeforeEncoding": 0,
-        "countOfResponseBodyBytesReceived": 22988,
-        "countOfRequestBodyBytesSent": 0,
-        "countOfResponseBodyBytesAfterDecoding": 64979,
-        "countOfRequestHeaderBytesSent": 225,
-        "localAddress": "192.168.0.13",
-        "remoteAddress": "17.253.97.204",
-        "localPort": 58622,
-        "remotePort": 443,
-        "isMultipath": false,
-        "isExpensive": false,
-        "isConstrained": false,
-        "isCellular": false,
-        "negotiatedTLSProtocolVersion": 772,
-        "negotiatedTLSCipherSuite": 4865
-      }
+      "response": {
+        "statusCode": 200,
+        "headers": {
+          "Set-Cookie": "token=ADSJ1239CX0; path=/; expires=Sun, 30 Jan 2030 21:49:04 GMT; secure; HttpOnly"
+        }
+      },
+      "localAddress": "192.168.0.13",
+      "remotePort": 443,
+      "remoteAddress": "17.253.97.204",
+      "localPort": 58622,
+      "tlsVersion": 772,
+      "tlsSuite": 4865
     }
   ],
   "taskInterval": {
-    "start": 633801584.802039,
-    "duration": 0.23401391506195068
+    "start": 681270022.377544,
+    "duration": 0.42691
   },
   "redirectCount": 0
 }
@@ -161,7 +111,8 @@ private let mockProfileFailureResponse = HTTPURLResponse(url: URL(string: "https
     "Content-Length": "18",
     "Content-Type": "application/json; charset=utf-8",
     "Cache-Control": "no-store",
-    "Content-Encoding": "gzip"
+    "Content-Encoding": "gzip",
+    "Set-Cookie": "_device_id=11111111111; path=/; expires=Sun, 30 Jan 2022 21:49:04 GMT; secure; HttpOnly; SameSite=Lax"
 ])!
 
 // MARK: - GitHub Octovat (Success, 200)
@@ -171,7 +122,7 @@ extension MockDataTask {
         request: mockOctocatRequest,
         response: mockOctocatResponse,
         responseBody: mockImage,
-        metrics: mockOctocatMetrics
+        metrics: mockMetrics
     )
 }
 
@@ -195,77 +146,6 @@ private let mockOctocatResponse = HTTPURLResponse(url: URL(string: "https://gith
     "ETag": "686897696a7c876b7e",
     "Content-Encoding": "gzip"
 ])!
-
-private let mockOctocatMetrics = try! JSONDecoder().decode(NetworkLoggerMetrics.self, from: """
-{
-  "transactions": [
-    {
-      "resourceFetchType": 3,
-      "requestStartDate": 634787164.088428,
-      "isReusedConnection": false,
-      "details": {
-        "countOfResponseBodyBytesReceived": 0,
-        "countOfRequestHeaderBytesSent": 0,
-        "countOfRequestBodyBytesBeforeEncoding": 0,
-        "countOfResponseBodyBytesAfterDecoding": 0,
-        "isCellular": false,
-        "countOfResponseHeaderBytesReceived": 0,
-        "isExpensive": false,
-        "isConstrained": false,
-        "countOfRequestBodyBytesSent": 0,
-        "isMultipath": false
-      },
-      "responseEndDate": 634787164.08845,
-      "request": {
-        "allowsCellularAccess": true,
-        "httpMethod": "GET",
-        "url": "https://github.com/octocat.png",
-        "cachePolicy": 0,
-        "allowsExpensiveNetworkAccess": true,
-        "allowsConstrainedNetworkAccess": true,
-        "httpShouldHandleCookies": true,
-        "headers": {
-          "Accept-Language": "en-us",
-          "Accept-Encoding": "gzip, deflate, br",
-          "Accept": "*/*"
-        },
-        "httpShouldUsePipelining": false,
-        "timeoutInterval": 60
-      },
-      "isProxyConnection": false,
-      "response": {
-        "headers": {
-          "Content-Length": "13069",
-          "Server": "GitHub Cloud",
-          "x-cache-hits": "1",
-          "Etag": "dafb3e40cd51e0105a0e925608d5f769",
-          "Via": "1.1 varnish",
-          "Content-Type": "image/png",
-          "timing-allow-origin": "https://github.com",
-          "Cache-Control": "max-age=2592000",
-          "Accept-Ranges": "bytes",
-          "Last-Modified": "Fri, 12 Feb 2021 01:05:47 GMT",
-          "x-fastly-request-id": "1a13a50f66f1764d946d2ed569dd41520caf7a20",
-          "x-timer": "S1613094362.120096,VS0,VE1",
-          "Date": "Fri, 12 Feb 2021 01:46:02 GMT",
-          "Age": "2407",
-          "x-served-by": "cache-ewr18153-EWR",
-          "x-cache": "HIT"
-        },
-        "statusCode": 200
-      },
-      "fetchStartDate": 634787164.088354,
-      "responseStartDate": 634787164.08845,
-      "requestEndDate": 634787164.088428
-    }
-  ],
-  "taskInterval": {
-    "start": 634787164.087835,
-    "duration": 0.0008800029754638672
-  },
-  "redirectCount": 0
-}
-""".data(using: .utf8)!)
 
 // MARK: - GitHub Stats (Network Error)
 

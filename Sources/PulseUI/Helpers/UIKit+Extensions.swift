@@ -3,10 +3,10 @@
 // Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
 
 #if os(iOS)
+
 import UIKit
 import SwiftUI
 
-@available(iOS 13.0, *)
 extension UIImage {
     static func make(systemName: String, textStyle: UIFont.TextStyle) -> UIImage {
         UIImage(systemName: systemName)?
@@ -63,7 +63,6 @@ extension UIView {
     }
 }
 
-@available(iOS 13.0, *)
 extension UIViewController {
     @discardableResult
     static func present<ContentView: View>(_ closure: (_ dismiss: @escaping () -> Void) -> ContentView) -> UIViewController? {
@@ -86,4 +85,32 @@ extension UIViewController {
         return vc
     }
 }
+
+extension UITabBarController {
+    func setTabBarHidden(_ hidden: Bool, animated: Bool = true, duration: TimeInterval = 0.3) {
+        if animated {
+            if !hidden {
+                self.tabBar.isHidden = false
+                self.tabBar.alpha = 0
+            }
+            UIView.animate(withDuration: duration, animations: {
+                self.tabBar.alpha = hidden ? 0 : 1
+            }, completion: { isCompleted in
+                self.tabBar.isHidden = hidden
+            })
+        } else {
+            self.tabBar.isHidden = hidden
+        }
+    }
+}
+
+extension UIApplication {
+    static var keyWindow: UIWindow? {
+        shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .flatMap { $0.windows }
+            .first { $0.isKeyWindow }
+    }
+}
+
 #endif

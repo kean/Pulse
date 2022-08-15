@@ -4,6 +4,7 @@
 
 import Foundation
 import CommonCrypto
+import CoreData
 
 extension Array {
     func chunked(into size: Int) -> [[Element]] {
@@ -78,11 +79,10 @@ extension String.CompareOptions {
     }
 }
 
-func benchmark(title: String, operation: () -> Void) {
-    let startTime = CFAbsoluteTimeGetCurrent()
-    operation()
-    let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
-    debugPrint("Time elapsed for \(title): \(timeElapsed * 1000.0) ms.")
+extension NSManagedObject {
+    func reset() {
+        managedObjectContext?.refresh(self, mergeChanges: false)
+    }
 }
 
 extension NSMutableAttributedString {
@@ -149,7 +149,6 @@ extension tls_ciphersuite_t {
     }
 }
 
-@available(iOS 13.0, tvOS 13.0, watchOS 6.0, macOS 10.15, *)
 extension tls_protocol_version_t {
     var description: String {
         switch self {

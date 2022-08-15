@@ -5,10 +5,11 @@
 
 import SwiftUI
 import CoreData
-import PulseCore
+import Pulse
 import Combine
 
-@available(iOS 13.0, tvOS 14.0, watchOS 6.0, *)
+#if os(iOS) || os(macOS)
+
 struct PinButton: View {
     @ObservedObject var viewModel: PinButtonViewModel
     var isTextNeeded: Bool = true
@@ -23,92 +24,6 @@ struct PinButton: View {
     }
 }
 
-@available(iOS 14.0, tvOS 14.0, watchOS 7.0, *)
-struct PinButton2: View {
-    @ObservedObject var viewModel: PinButtonViewModel
-
-    var body: some View {
-        Button(action: viewModel.togglePin) {
-            Label(viewModel.isPinned ? "Remove Pin" : "Pin", systemImage: viewModel.isPinned ? "pin.slash" : "pin")
-        }
-    }
-}
-
-#if os(watchOS)
-@available(iOS 14.0, tvOS 14.0, watchOS 7.0, *)
-struct PinButton3: View {
-    @ObservedObject var viewModel: PinButtonViewModel
-
-    var body: some View {
-        Button(action: viewModel.togglePin) {
-            VStack(spacing: 4) {
-                Image(systemName: viewModel.isPinned ? "pin.slash" : "pin")
-                    .foregroundColor(.blue)
-                Text(viewModel.isPinned ? "Remove Pin" : "Pin")
-                    .font(.caption2)
-            }.frame(height: 42)
-        }
-    }
-}
-#endif
-
-#if os(iOS)
-@available(iOS 13.0, *)
-extension UIAction {
-    static func makePinAction(with viewModel: PinButtonViewModel) -> UIAction {
-        UIAction(
-            title: viewModel.isPinned ? "Remove Pin" : "Pin",
-            image: UIImage(systemName: viewModel.isPinned ? "pin.slash" : "pin"),
-            handler: { _ in viewModel.togglePin() }
-        )
-    }
-}
-
-@available(iOS 13.0, *)
-extension UIContextualAction {
-    static func makePinAction(with viewModel: PinButtonViewModel) -> UIContextualAction {
-        let action = UIContextualAction(
-            style: .normal,
-            title: viewModel.isPinned ? "Remove Pin" : "Pin",
-            handler: { _,_,_  in viewModel.togglePin() }
-        )
-        action.backgroundColor = .systemBlue
-        action.image = UIImage(systemName: viewModel.isPinned ? "pin.slash" : "pin")
-        return action
-    }
-}
-
-@available(iOS 13.0, *)
-final class PinIndicatorView: UIImageView {
-    private var viewModel: PinButtonViewModel?
-    private var cancellables: [AnyCancellable] = []
-
-    init() {
-        super.init(image: pinImage)
-        self.tintColor = .systemPink
-    }
-
-    func bind(viewModel: PinButtonViewModel) {
-        self.viewModel = viewModel
-        viewModel.$isPinned.sink { [weak self] isPinned in
-            guard let self = self else { return }
-            self.isHidden = !isPinned
-        }.store(in: &cancellables)
-    }
-
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-}
-
-@available(iOS 13.0, *)
-private let pinImage: UIImage = {
-    let image = UIImage(systemName: "pin")
-    return image?.withConfiguration(UIImage.SymbolConfiguration(textStyle: .caption1)) ?? UIImage()
-}()
-#endif
-
-@available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
 struct PinView: View {
     @ObservedObject var viewModel: PinButtonViewModel
     let font: Font
@@ -122,22 +37,83 @@ struct PinView: View {
     }
 }
 
-@available(iOS 13.0, tvOS 14.0, watchOS 6.0, *)
+#if os(iOS)
+extension UIAction {
+    static func makePinAction(with viewModel: PinButtonViewModel) -> UIAction {
+        UIAction(
+            title: viewModel.isPinned ? "Remove Pin" : "Pin",
+            image: UIImage(systemName: viewModel.isPinned ? "pin.slash" : "pin"),
+            handler: { _ in viewModel.togglePin() }
+        )
+    }
+}
+
+extension UIContextualAction {
+    static func makePinAction(with viewModel: PinButtonViewModel) -> UIContextualAction {
+        let action = UIContextualAction(
+            style: .normal,
+            title: viewModel.isPinned ? "Remove Pin" : "Pin",
+            handler: { _,_,_  in viewModel.togglePin() }
+        )
+        action.backgroundColor = .systemBlue
+        action.image = UIImage(systemName: viewModel.isPinned ? "pin.slash" : "pin")
+        return action
+    }
+}
+
+final class PinIndicatorView: UIImageView {
+    private var viewModel: PinButtonViewModel?
+    private var cancellables: [AnyCancellable] = []
+
+    init() {
+        super.init(image: pinImage)
+        self.tintColor = .systemPink
+    }
+
+    func bind(viewModel: PinButtonViewModel) {
+        self.viewModel = viewModel
+        cancellables = []
+        viewModel.$isPinned.sink { [weak self] isPinned in
+            guard let self = self else { return }
+            self.isHidden = !isPinned
+        }.store(in: &cancellables)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+}
+
+private let pinImage: UIImage = {
+    let image = UIImage(systemName: "pin")
+    return image?.withConfiguration(UIImage.SymbolConfiguration(textStyle: .caption1)) ?? UIImage()
+}()
+#endif
+
+#endif
+
+// MARK: - ViewModel
+
+protocol Pinnable {
+    var pinViewModel: PinButtonViewModel { get }
+}
+
+#if os(iOS) || os(macOS)
 final class PinButtonViewModel: ObservableObject {
     @Published private(set) var isPinned = false
     private let message: LoggerMessageEntity?
-    private let store: LoggerStore
+    private let pins: LoggerStore.Pins?
     private var cancellables: [AnyCancellable] = []
 
-    init(store: LoggerStore, message: LoggerMessageEntity) {
-        self.store = store
+    init(message: LoggerMessageEntity) {
         self.message = message
+        self.pins = message.managedObjectContext?.userInfo[pinServiceKey] as? LoggerStore.Pins
         self.subscribe()
     }
 
-    init(store: LoggerStore, request: LoggerNetworkRequestEntity) {
-        self.store = store
-        self.message = request.message
+    init(task: NetworkTaskEntity) {
+        self.message = task.message
+        self.pins = task.managedObjectContext?.userInfo[pinServiceKey] as? LoggerStore.Pins
         self.subscribe()
     }
 
@@ -151,11 +127,14 @@ final class PinButtonViewModel: ObservableObject {
 
     func togglePin() {
         guard let message = message else { return } // Should never happen
-        store.togglePin(for: message)
+        pins?.togglePin(for: message)
     }
 }
-
-@available(iOS 13.0, tvOS 14.0, watchOS 6.0, *)
-protocol Pinnable {
-    var pinViewModel: PinButtonViewModel { get }
+#else
+struct PinButtonViewModel {
+    init(message: LoggerMessageEntity) {}
+    init(task: NetworkTaskEntity) {}
 }
+#endif
+
+private let pinServiceKey = "com.github.kean.pulse.pin-service"

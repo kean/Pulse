@@ -3,19 +3,20 @@
 // Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
-import PulseCore
+import Pulse
 import CoreData
 import Combine
 import SwiftUI
 
-@available(iOS 13.0, tvOS 14.0, *)
+#if os(iOS) || os(macOS) || os(tvOS)
+
 final class NetworkSearchCriteriaViewModel: ObservableObject {
     @Published var criteria: NetworkSearchCriteria = .default
     private(set) var defaultCriteria: NetworkSearchCriteria = .default
     @Published var filters: [NetworkSearchFilter] = []
 
     @Published private(set) var allDomains: [String] = []
-    private var allDomainsSet: Set<String> = []
+    private let domains: ManagedObjectsObserver<NetworkDomainEntity>
 
     @Published private(set) var isButtonResetEnabled = false
 
@@ -27,11 +28,18 @@ final class NetworkSearchCriteriaViewModel: ObservableObject {
         criteria == defaultCriteria && (filters.count == 0 || (filters.count == 1 && filters == NetworkSearchFilter.defaultFilters))
     }
 
-    init(isDefaultStore: Bool = true) {
-        if !isDefaultStore {
+    init(store: LoggerStore) {
+        domains = ManagedObjectsObserver(context: store.viewContext, sortDescriptior: NSSortDescriptor(keyPath: \NetworkDomainEntity.count, ascending: false))
+
+        if store !== LoggerStore.shared {
             criteria.dates.isCurrentSessionOnly = false
             defaultCriteria.dates.isCurrentSessionOnly = false
         }
+
+        domains.$objects.sink { [weak self] in
+            self?.allDomains = $0.map(\.value)
+        }.store(in: &cancellables)
+
         resetFilters()
 
         $filters.dropFirst().sink { [weak self] _ in
@@ -71,7 +79,7 @@ final class NetworkSearchCriteriaViewModel: ObservableObject {
     }
 
     func addFilter() {
-        let filter = NetworkSearchFilter(id: UUID(), field: .url, match: .equal, value: "", isEnabled: true)
+        let filter = NetworkSearchFilter(id: UUID(), field: .url, match: .equal, value: "")
         filters.append(filter)
 
         subscribe(to: filter)
@@ -104,24 +112,6 @@ final class NetworkSearchCriteriaViewModel: ObservableObject {
         return programmaticFilters
     }
 
-    // MARK: Managing Domains
-
-    func setInitialDomains(_ domains: Set<String>) {
-        allDomainsSet = domains
-        allDomains = allDomainsSet.sorted()
-    }
-
-    func didInsertEntity(_ entity: LoggerNetworkRequestEntity) {
-        var domains = allDomainsSet
-        if let host = entity.host {
-            domains.insert(host)
-        }
-        if domains.count > allDomains.count {
-            allDomainsSet = domains
-            allDomains = allDomainsSet.sorted()
-        }
-    }
-
     // MARK: Bindings
 
     var bindingStartDate: Binding<Date> {
@@ -141,4 +131,16 @@ final class NetworkSearchCriteriaViewModel: ObservableObject {
             self.criteria.dates.endDate = newValue
         })
     }
+
+    func binding(forDomain domain: String) -> Binding<Bool> {
+        Binding(get: {
+            self.criteria.host.values.contains(domain)
+        }, set: { newValue in
+            if self.criteria.host.values.remove(domain) == nil {
+                self.criteria.host.values.insert(domain)
+            }
+        })
+    }
 }
+
+#endif

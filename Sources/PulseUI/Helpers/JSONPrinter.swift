@@ -3,10 +3,10 @@
 // Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
-import PulseCore
+import Pulse
 import CoreData
 import SwiftUI
-import PulseCore
+import Pulse
 
 enum JSONElement {
     case punctuation
@@ -17,7 +17,7 @@ enum JSONElement {
 }
 
 protocol JSONRenderer: AnyObject {
-    func append(_ string: String, element: JSONElement)
+    func append(_ string: String, element: JSONElement, error: NetworkLogger.DecodingError?)
     func indent(count: Int)
     func newline()
 }
@@ -25,8 +25,9 @@ protocol JSONRenderer: AnyObject {
 final class HTMLJSONRender: JSONRenderer {
     private var output = ""
 
-    func append(_ string: String, element: JSONElement) {
-        output.append("<span class=\"\(getClass(for: element))\">\(string)</span>")
+    func append(_ string: String, element: JSONElement, error: NetworkLogger.DecodingError?) {
+        let htmlClass = error == nil ? getClass(for: element) : "err"
+        output.append("<span class=\"\(htmlClass)\">\(string)</span>")
     }
 
     func indent(count: Int) {
@@ -52,20 +53,28 @@ private func getClass(for element: JSONElement) -> String {
     }
 }
 
-@available(iOS 13.0, tvOS 14.0, *)
 final class JSONPrinter {
     private let renderer: JSONRenderer
     private var indentation = 0
+    private var error: NetworkLogger.DecodingError?
+    private var codingPath: [NetworkLogger.DecodingError.CodingKey] = []
 
     init(renderer: JSONRenderer) {
         self.renderer = renderer
     }
 
-    func render(json: Any) {
+    func render(json: Any, error: NetworkLogger.DecodingError?) {
+        self.error = error
         print(json: json, isFree: true)
     }
 
     private func print(json: Any, isFree: Bool) {
+        func _print(json: Any, key: NetworkLogger.DecodingError.CodingKey, isFree: Bool) {
+            codingPath.append(key)
+            print(json: json, isFree: isFree)
+            _ = codingPath.popLast()
+        }
+
         switch json {
         case let object as [String: Any]:
             if isFree {
@@ -79,7 +88,7 @@ final class JSONPrinter {
                 append("  \"\(key)\"", .key)
                 append(": ", .punctuation)
                 indentation += 2
-                print(json: object[key]!, isFree: false)
+                _print(json: object[key]!, key: .string(key), isFree: false)
                 indentation -= 2
                 if key != keys.last {
                     append(",", .punctuation)
@@ -95,7 +104,7 @@ final class JSONPrinter {
                 append("[\n", .punctuation)
                 indentation += 2
                 for index in array.indices {
-                    print(json: array[index], isFree: true)
+                    _print(json: array[index], key: .int(index), isFree: true)
                     if index < array.endIndex - 1 {
                         append(",", .punctuation)
                     }
@@ -107,7 +116,7 @@ final class JSONPrinter {
             } else {
                 append("[", .punctuation)
                 for index in array.indices {
-                    print(json: array[index], isFree: true)
+                    _print(json: array[index], key: .int(index), isFree: true)
                     if index < array.endIndex - 1 {
                         append(", ", .punctuation)
                     }
@@ -132,7 +141,12 @@ final class JSONPrinter {
     }
 
     func append(_ string: String, _ element: JSONElement) {
-        renderer.append(string, element: element)
+        var error: NetworkLogger.DecodingError?
+        if codingPath == self.error?.context?.codingPath {
+            error = self.error
+            self.error = nil
+        }
+        renderer.append(string, element: element, error: error)
     }
 
     func indent() {
@@ -146,7 +160,6 @@ final class JSONPrinter {
 
 #if os(iOS) || os(macOS) || os(tvOS)
 
-@available(iOS 13, tvOS 14.0, *)
 struct JSONColors {
     static let punctuation = UXColor.dynamic(
         light: .init(red: 113.0/255.0, green: 128.0/255.0, blue: 141.0/255.0, alpha: 1.0),
@@ -161,7 +174,6 @@ struct JSONColors {
     static let null = Palette.pink
 }
 
-@available(iOS 13, tvOS 14.0, *)
 final class AttributedStringJSONRenderer: JSONRenderer {
     private let output = NSMutableAttributedString()
     private let fontSize: CGFloat
@@ -180,12 +192,18 @@ final class AttributedStringJSONRenderer: JSONRenderer {
         self.lineHeight = lineHeight
     }
 
-    func append(_ string: String, element: JSONElement) {
-        output.append(string, attributes[element]!)
+    func append(_ string: String, element: JSONElement, error: NetworkLogger.DecodingError?) {
+        var attributes = self.attributes[element]!
+        if let error = error {
+            attributes[.backgroundColor] = UXColor.red
+            attributes[.foregroundColor] = UXColor.white
+            attributes[.decodingError] = error
+        }
+        output.append(string, attributes)
     }
 
     func indent(count: Int) {
-        append(String(repeating: " ", count: count), element: .punctuation)
+        append(String(repeating: " ", count: count), element: .punctuation, error: nil)
     }
 
     func newline() {
@@ -193,16 +211,16 @@ final class AttributedStringJSONRenderer: JSONRenderer {
     }
 
     func make() -> NSAttributedString {
-        let ps = NSMutableParagraphStyle()
-        ps.minimumLineHeight = lineHeight
-        ps.maximumLineHeight = lineHeight
-
         output.addAttributes([
             .font: UXFont.monospacedSystemFont(ofSize: CGFloat(fontSize), weight: .regular),
-            .paragraphStyle: ps
+            .paragraphStyle: NSParagraphStyle.make(lineHeight: lineHeight)
         ])
         return output
     }
+}
+
+extension NSAttributedString.Key {
+    static let decodingError = NSAttributedString.Key(rawValue: "com.github.kean.pulse.decoding-error-key")
 }
 
 #endif

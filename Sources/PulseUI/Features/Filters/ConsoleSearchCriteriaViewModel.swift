@@ -3,11 +3,10 @@
 // Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
 
 import CoreData
-import PulseCore
+import Pulse
 import Combine
 import SwiftUI
 
-@available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
 final class ConsoleSearchCriteriaViewModel: ObservableObject {
     @Published var criteria: ConsoleSearchCriteria = .default
     private(set) var defaultCriteria: ConsoleSearchCriteria = .default
@@ -15,6 +14,7 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
 
     @Published private(set) var allLabels: [String] = []
     private var allLabelsSet: Set<String> = []
+    private let labels: ManagedObjectsObserver<LoggerLabelEntity>
 
     @Published private(set) var isButtonResetEnabled = false
 
@@ -22,11 +22,17 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
 
     private var cancellables: [AnyCancellable] = []
 
-    init(isDefaultStore: Bool = true) {
-        if !isDefaultStore {
+    init(store: LoggerStore) {
+        labels = ManagedObjectsObserver(context: store.viewContext, sortDescriptior: NSSortDescriptor(keyPath: \LoggerLabelEntity.name, ascending: true))
+
+        if store !== LoggerStore.shared {
             criteria.dates.isCurrentSessionOnly = false
             defaultCriteria.dates.isCurrentSessionOnly = false
         }
+
+        labels.$objects.sink { [weak self] in
+            self?.displayLabels($0.map(\.name))
+        }.store(in: &cancellables)
 
         resetFilters()
 
@@ -58,7 +64,7 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
     }
 
     func addFilter() {
-        let filter = ConsoleSearchFilter(id: UUID(), field: .message, match: .contains, value: "", isEnabled: true)
+        let filter = ConsoleSearchFilter(id: UUID(), field: .message, match: .contains, value: "")
         filters.append(filter)
 
         subscribe(to: filter)
@@ -85,18 +91,9 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
 
     // MARK: Managing Labels
 
-    func setInitialLabels(_ labels: Set<String>) {
-        allLabelsSet = labels
-        allLabels = allLabelsSet.sorted()
-    }
-
-    func didInsertEntity(_ entity: LoggerMessageEntity) {
-        var labels = allLabelsSet
-        labels.insert(entity.label)
-        if labels.count > allLabels.count {
-            allLabelsSet = labels
-            allLabels = allLabelsSet.sorted()
-        }
+    private func displayLabels(_ labels: [String]) {
+        allLabelsSet = Set(labels)
+        allLabels = labels
     }
 
     // MARK: Helpers
@@ -170,58 +167,4 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
             self.criteria.dates.endDate = newValue
         })
     }
-
-    // MARK: Quick Filters
-
-#if os(watchOS)
-    func makeQuickFilters() -> [QuickFilterViewModel] {
-        var filters = [QuickFilterViewModel]()
-
-        if defaultCriteria != criteria {
-            filters.append(QuickFilterViewModel(title: "Reset", color: .secondary, imageName: "arrow.clockwise" ) { [weak self] in
-                self?.resetAll()
-            })
-        }
-
-        if !criteria.logLevels.isEnabled || criteria.logLevels.levels != [.error, .critical] {
-            filters.append(QuickFilterViewModel(title: "Errors", color: .secondary, imageName: "exclamationmark.octagon") { [weak self] in
-                self?.criteria.logLevels.isEnabled = true
-                self?.criteria.logLevels.levels = [.error, .critical]
-            })
-        }
-
-        if !criteria.onlyPins {
-            filters.append(QuickFilterViewModel(title: "Pins", color: .secondary, imageName: "pin") { [weak self] in
-                self?.criteria.onlyPins = true
-            })
-        }
-        if !criteria.onlyNetwork {
-            filters.append(QuickFilterViewModel(title: "Networking", color: .secondary, imageName: "cloud") { [weak self] in
-                self?.criteria.onlyNetwork = true
-            })
-        }
-
-        if !criteria.dates.isEnabled ||
-            ((criteria.dates.startDate == nil || !criteria.dates.isStartDateEnabled) &&
-             (criteria.dates.endDate == nil || !criteria.dates.isEndDateEnabled)) {
-            filters.append(QuickFilterViewModel(title: "Today", color: .secondary, imageName: "arrow.clockwise") { [weak self] in
-                self?.criteria.dates = .today
-            })
-            filters.append(QuickFilterViewModel(title: "Recent", color: .secondary, imageName: "arrow.clockwise") { [weak self] in
-                self?.criteria.dates = .recent
-            })
-        }
-
-        return filters
-    }
-#endif
-}
-
-@available(iOS 13.0, tvOS 14.0, watchOS 6, *)
-struct QuickFilterViewModel: Identifiable {
-    var id: String { title }
-    let title: String
-    let color: Color
-    let imageName: String
-    let action: () -> Void
 }

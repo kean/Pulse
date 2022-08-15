@@ -3,24 +3,24 @@
 // Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
-import PulseCore
+import Pulse
 import Combine
 import CoreData
 
-#if os(watchOS) || os(tvOS)
-
-@available(tvOS 14.0, watchOS 7.0, *)
 struct ConsoleNetworkRequestView: View {
-    let viewModel: ConsoleNetworkRequestViewModel
+    @ObservedObject var viewModel: ConsoleNetworkRequestViewModel
+    @ObservedObject var progressViewModel: ProgressViewModel
+
+    init(viewModel: ConsoleNetworkRequestViewModel) {
+        self.viewModel = viewModel
+        self.progressViewModel = viewModel.progress
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(alignment: .firstTextBaseline) {
-                title
-                #if os(watchOS)
-                Spacer()
-                PinView(viewModel: viewModel.pinViewModel, font: fonts.title)
-                #else
+                header
+                #if os(macOS)
                 PinView(viewModel: viewModel.pinViewModel, font: fonts.title)
                 Spacer()
                 #endif
@@ -31,27 +31,27 @@ struct ConsoleNetworkRequestView: View {
     }
 
     @ViewBuilder
-    private var title: some View {
+    private var header: some View {
         #if os(watchOS)
         VStack(alignment: .leading, spacing: 1) {
-            HStack(alignment: .firstTextBaseline) {
-                statusCircle
-                Text(viewModel.status)
-                    .font(fonts.title)
-                    .foregroundColor(.secondary)
-            }
-            Text(viewModel.title)
+            title
+            Text(viewModel.time)
                 .font(fonts.title)
                 .foregroundColor(.secondary)
         }
         #else
-        HStack(alignment: .firstTextBaseline, spacing: 8) {
+        title
+        #endif
+    }
+
+    private var title: some View {
+        HStack(alignment: .firstTextBaseline, spacing: spacing) {
             statusCircle
-            Text(viewModel.status + " · " + viewModel.title)
+            Text(viewModel.fullTitle)
+                .lineLimit(1)
                 .font(fonts.title)
                 .foregroundColor(.secondary)
         }
-        #endif
     }
 
     private var statusCircle: some View {
@@ -72,21 +72,32 @@ struct ConsoleNetworkRequestView: View {
         let body: Font
     }
 
-    private var fonts: Fonts {
-        #if os(watchOS)
-        return Fonts(title: .system(size: 12), body: .system(size: 15))
-        #elseif os(tvOS)
-        return Fonts(title: .body, body: .body)
-        #endif
-    }
+#if os(watchOS)
+    private let spacing: CGFloat = 4
+    private let fonts = Fonts(title: .system(size: 12), body: .system(size: 15))
+#elseif os(iOS)
+    private let spacing: CGFloat = 8
+    private let fonts = Fonts(title: .caption, body: .body)
+#else
+    private let spacing: CGFloat = 8
+    private let fonts = Fonts(title: .body, body: .body)
+#endif
 
-    private var circleSize: CGFloat {
-        #if os(tvOS)
-        return 20
-        #else
-        return 10
-        #endif
-    }
+#if os(watchOS)
+    private let circleSize: CGFloat = 8
+#elseif os(tvOS)
+    private let circleSize: CGFloat = 20
+#else
+    private let circleSize: CGFloat = 10
+#endif
 }
 
+#if DEBUG
+struct ConsoleNetworkRequestView_Previews: PreviewProvider {
+    static var previews: some View {
+        ConsoleNetworkRequestView(viewModel: .init(task: LoggerStore.preview.entity(for: .login)))
+            .padding()
+            .previewLayout(.sizeThatFits)
+    }
+}
 #endif

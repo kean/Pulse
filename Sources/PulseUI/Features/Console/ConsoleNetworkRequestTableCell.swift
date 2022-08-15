@@ -4,19 +4,24 @@
 
 #if os(iOS)
 
-import PulseCore
+import Pulse
 import Combine
 import UIKit
 
-@available(iOS 13.0, *)
 final class ConsoleNetworkRequestTableCell: UITableViewCell, UIContextMenuInteractionDelegate {
     private let badge = CircleView()
     private let title = UILabel()
+    private let typeIcon = UIImageView()
     private let accessory = ConsoleMessageAccessoryView()
     private let details = UILabel()
     private let pin = PinIndicatorView()
+    private var state: NetworkTaskEntity.State?
 
     private var viewModel: ConsoleNetworkRequestViewModel?
+    private var cancellable1: AnyCancellable?
+    private var cancellable2: AnyCancellable?
+
+    private var isAnimating = false
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -28,25 +33,20 @@ final class ConsoleNetworkRequestTableCell: UITableViewCell, UIContextMenuIntera
     }
 
     private func createView() {
-        let stack = UIView.vStack(spacing: 4, [
-            .hStack(alignment: .center, spacing: 8, [
-                badge, title, UIView(), accessory
-            ]),
-            details
+        selectionStyle = .gray
+
+        let topStack = UIView.hStack(alignment: .center, spacing: 8, [
+            badge, title, UIView(), pin, accessory
         ])
+        topStack.setCustomSpacing(4, after: pin)
+        let stack = UIView.vStack(spacing: 4, [topStack, details])
 
         contentView.addSubview(stack)
-        stack.pinToSuperview(insets: .init(top: 10, left: 16, bottom: 10, right: 16))
-
-        contentView.addSubview(pin)
-        pin.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            pin.firstBaselineAnchor.constraint(equalTo: title.firstBaselineAnchor),
-            pin.leadingAnchor.constraint(equalTo: title.trailingAnchor, constant: 6)
-        ])
+        stack.pinToSuperview(insets: .init(top: 10, left: 16, bottom: 10, right: 12))
 
         title.font = .preferredFont(forTextStyle: .caption1)
         title.textColor = .secondaryLabel
+
         details.font = .systemFont(ofSize: 15)
         details.numberOfLines = 4
 
@@ -56,12 +56,52 @@ final class ConsoleNetworkRequestTableCell: UITableViewCell, UIContextMenuIntera
 
     func display(_ viewModel: ConsoleNetworkRequestViewModel) {
         self.viewModel = viewModel
+        self.state = nil
+        self.refresh()
 
-        badge.fillColor = viewModel.badgeColor
-        title.text = viewModel.title
-        details.text = viewModel.text
-        accessory.textLabel.text = viewModel.time
-        pin.bind(viewModel: viewModel.pinViewModel)
+        self.cancellable1 = viewModel.objectWillChange.sink { [weak self] in
+            self?.refresh()
+        }
+        self.cancellable2 = viewModel.progress.objectWillChange.sink { [weak self] in
+            self?.refresh(onlyTitle: true)
+        }
+    }
+
+    override func prepareForReuse() {
+        super.prepareForReuse()
+
+        if isAnimating {
+            isAnimating = false
+            contentView.backgroundColor = .clear
+            layer.removeAllAnimations()
+        }
+    }
+
+    private func refresh(onlyTitle: Bool = false) {
+        guard let viewModel = viewModel else { return }
+
+        if let state = self.state, state != viewModel.state {
+            self.isAnimating = true
+            UIView.animate(withDuration: 0.33, delay: 0, options: [.allowUserInteraction]) {
+                self.contentView.backgroundColor = viewModel.uiBadgeColor.withAlphaComponent(0.15)
+            } completion: { _ in
+                guard self.isAnimating else { return }
+                self.isAnimating = false
+                UIView.animate(withDuration: 1.0, delay: 0.5, options: [.allowUserInteraction]) {
+                    self.contentView.backgroundColor = .clear
+                }
+            }
+        }
+        self.state = viewModel.state
+
+        title.text = viewModel.fullTitle
+
+        if !onlyTitle {
+            badge.fillColor = viewModel.uiBadgeColor
+            details.text = viewModel.text
+            accessory.textLabel.text = viewModel.time
+            pin.bind(viewModel: viewModel.pinViewModel)
+        }
     }
 
     func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
@@ -120,7 +160,6 @@ final class ConsoleNetworkRequestTableCell: UITableViewCell, UIContextMenuIntera
     }
 }
 
-@available(iOS 13.0, *)
 private final class CircleView: UIView {
     var fillColor: UIColor = .red {
         didSet {

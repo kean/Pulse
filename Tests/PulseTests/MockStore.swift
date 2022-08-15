@@ -1,9 +1,9 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2021 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2022 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
-import PulseCore
+import Pulse
 import CoreData
 import XCTest
 
@@ -17,15 +17,7 @@ private struct Logger {
 }
 
 extension XCTestCase {
-    func populate2(store: LoggerStore) {
-        precondition(Thread.isMainThread)
-
-        populate3(store: store)
-
-        flush(store: store)
-    }
-
-    func populate3(store: LoggerStore) {
+    func populate(store: LoggerStore) {
         func logger(named: String) -> Logger {
             Logger(label: named, store: store)
         }
@@ -48,15 +40,15 @@ extension XCTestCase {
         configuration.httpAdditionalHeaders = [
             "User-Agent": "Pulse Demo/0.19 iOS"
         ]
-        let urlSession = URLSession(configuration: configuration)
+        let urlSession = URLSession(configuration: .default)
 
         func logTask(_ mockTask: MockDataTask) {
             let dataTask = urlSession.dataTask(with: mockTask.request)
+            dataTask.setValue(mockTask.response, forKey: "response")
             networkLogger.logTaskCreated(dataTask)
-            networkLogger.logDataTask(dataTask, didReceive: mockTask.response)
             networkLogger.logDataTask(dataTask, didReceive: mockTask.responseBody)
             networkLogger.logTask(dataTask, didFinishCollecting: mockTask.metrics)
-            networkLogger.logTask(dataTask, didCompleteWithError: nil, session: urlSession)
+            networkLogger.logTask(dataTask, didCompleteWithError: nil)
         }
 
         logTask(MockDataTask.login)
@@ -94,6 +86,5 @@ extension XCTestCase {
 
         logger(named: "default")
             .log(level: .critical, "💥 0xDEADBEEF")
-
     }
 }

@@ -1,27 +1,29 @@
-// swift-tools-version:5.3
+// swift-tools-version:5.6
 
 import PackageDescription
 
 let package = Package(
     name: "Pulse",
     platforms: [
-        .iOS(.v11),
-        .watchOS(.v6),
+        .iOS(.v13),
+        .tvOS(.v13),
         .macOS(.v11),
-        .tvOS(.v11)
+        .watchOS(.v7)
     ],
     products: [
         .library(name: "Pulse", targets: ["Pulse"]),
-        .library(name: "PulseCore", targets: ["PulseCore"]),
-        .library(name: "PulseUI", targets: ["PulseUI"])
+        .library(name: "PulseUI", targets: ["PulseUI"]),
+        .library(name: "PulseLogHandler", targets: ["PulseLogHandler"])
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-log.git", from: "1.2.0")
     ],
     targets: [
-        .target(name: "PulseUI", dependencies: ["PulseCore"]),
-        .target(name: "Pulse", dependencies: [.product(name: "Logging", package: "swift-log"), "PulseCore"]),
-        .target(name: "PulseCore"),
-        .testTarget(name: "PulseTests", dependencies: ["Pulse"], resources: [.process("Resources")])
+        .target(name: "Pulse"),
+        .target(name: "PulseUI", dependencies: ["Pulse"]),
+        .target(name: "PulseLogHandler", dependencies: [.product(name: "Logging", package: "swift-log"), "Pulse"]),
+        .testTarget(name: "PulseTests", dependencies: ["Pulse"]),
+        .testTarget(name: "PulseUITests", dependencies: ["PulseUI"]),
+        .testTarget(name: "PulseLogHandlerTests", dependencies: ["PulseLogHandler"])
     ]
 )

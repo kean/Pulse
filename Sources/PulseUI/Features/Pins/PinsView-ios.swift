@@ -4,17 +4,16 @@
 
 import SwiftUI
 import CoreData
-import PulseCore
+import Pulse
 import Combine
 
 #if os(iOS)
 
-@available(iOS 13.0, *)
 public struct PinsView: View {
     @ObservedObject var viewModel: PinsViewModel
     @Environment(\.colorScheme) private var colorScheme: ColorScheme
     
-    public init(store: LoggerStore = .default) {
+    public init(store: LoggerStore = .shared) {
         self.viewModel = PinsViewModel(store: store)
     }
 
@@ -24,13 +23,25 @@ public struct PinsView: View {
 
     public var body: some View {
         contents
+            .edgesIgnoringSafeArea(.bottom)
             .navigationBarTitle(Text("Pins"))
-            .navigationBarItems(
-                leading: viewModel.onDismiss.map { Button(action: $0) { Image(systemName: "xmark") } },
-                trailing:
-                    Button(action: viewModel.removeAllPins) { Image(systemName: "trash") }
-                    .disabled(viewModel.messages.isEmpty)
-            )
+            .navigationBarItems(leading: navigationBarLeadingItems, trailing: navigationBarTralingItems)
+            .onAppear { viewModel.onAppear() }
+            .onAppear { viewModel.onDisappear() }
+    }
+
+    private var navigationBarLeadingItems: some View {
+        viewModel.onDismiss.map {
+            Button(action: $0) {
+                Image(systemName: "xmark")
+            }
+        }
+    }
+
+    private var navigationBarTralingItems: some View {
+        Button(action: viewModel.removeAllPins) {
+            Image(systemName: "trash")
+        }.disabled(viewModel.messages.isEmpty)
     }
 
     @ViewBuilder
@@ -41,7 +52,8 @@ public struct PinsView: View {
         } else {
             ConsoleTableView(
                 header: { EmptyView() },
-                viewModel: viewModel.table
+                viewModel: viewModel.table,
+                detailsViewModel: viewModel.details
             )
         }
     }
@@ -52,14 +64,9 @@ public struct PinsView: View {
 }
 
 #if DEBUG
-@available(iOS 13.0, *)
 struct PinsView_Previews: PreviewProvider {
     static var previews: some View {
-        return Group {
-            PinsView(viewModel: .init(store: .mock))
-            PinsView(viewModel: .init(store: .mock))
-                .environment(\.colorScheme, .dark)
-        }
+        PinsView(viewModel: .init(store: .mock))
     }
 }
 #endif

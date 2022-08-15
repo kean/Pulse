@@ -1,12 +1,11 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2021 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2022 Alexander Grebenyuk (github.com/kean).
 
-import Logging
 import XCTest
 import Foundation
 import CoreData
-@testable import PulseCore
+@testable import Pulse
 
 final class URLSessionProxyDelegateTests: XCTestCase {
     let directory = TemporaryDirectory()
@@ -16,15 +15,15 @@ final class URLSessionProxyDelegateTests: XCTestCase {
     override func setUp() {
         super.setUp()
 
-        let storeURL = directory.url.appendingFilename("logs.pulse")
-        store = try! LoggerStore(storeURL: storeURL, options: [.create])
+        let storeURL = directory.url.appending(filename: "logs.pulse")
+        store = try! LoggerStore(storeURL: storeURL, options: [.create, .synchronous])
         logger = NetworkLogger(store: store)
     }
 
     override func tearDown() {
         super.tearDown()
 
-        store.destroyStores()
+        try? store.destroy()
         directory.remove()
     }
 
@@ -35,7 +34,8 @@ final class URLSessionProxyDelegateTests: XCTestCase {
         let session = URLSession(configuration: .default, delegate: delegate, delegateQueue: nil)
 
         // WHEN
-        let dataURL = try XCTUnwrap(Bundle.module.url(forResource: "logs-2021-03-18_21-22", withExtension: "pulse"))
+        let dataURL = directory.url.appending(filename: "logs-archive-v2.pulse")
+        try Resources.pulseArchive.write(to: dataURL)
         let dataTask = session.dataTask(with: dataURL)
 
         let didComplete = self.expectation(description: "TaskCompleted")
@@ -55,27 +55,21 @@ final class URLSessionProxyDelegateTests: XCTestCase {
         wait(for: [didComplete], timeout: 5)
 
         // RECORD
-        flush(store: store)
-        let requests = try store.allNetworkRequests()
-        let request = try XCTUnwrap(requests.first)
+        let tasks = try store.allTasks()
+        let task = try XCTUnwrap(tasks.first)
 
         // THEN
-        XCTAssertEqual(requests.count, 1)
+        XCTAssertEqual(tasks.count, 1)
 
-        XCTAssertEqual(request.url, dataURL.absoluteString)
-        XCTAssertEqual(request.host, nil)
-        XCTAssertEqual(request.httpMethod, "GET")
-        XCTAssertNil(request.errorDomain)
-        XCTAssertEqual(request.errorCode, 0)
-        XCTAssertEqual(request.isCompleted, true)
+        XCTAssertEqual(task.url, dataURL.absoluteString)
+        XCTAssertEqual(task.host, nil)
+        XCTAssertEqual(task.httpMethod, "GET")
+        XCTAssertNil(task.errorDomain)
+        XCTAssertEqual(task.errorCode, 0)
+        XCTAssertEqual(task.requestState, NetworkTaskEntity.State.success.rawValue)
 
-        XCTAssertNil(request.requestBodyKey)
-        XCTAssertNotNil(request.responseBodyKey)
-
-        XCTAssertNotNil(request.details)
-
-        let message = try XCTUnwrap(request.message)
-        XCTAssertEqual(message.label, "network")
+        let message = try XCTUnwrap(task.message)
+        XCTAssertEqual(message.label.name, "network")
     }
 
     func testForwardingOfUnimplementedMethod() throws {
@@ -125,7 +119,8 @@ final class URLSessionProxyDelegateTests: XCTestCase {
         let session = URLSession(configuration: .default, delegate: myDelegate, delegateQueue: nil)
 
         // WHEN
-        let dataURL = try XCTUnwrap(Bundle.module.url(forResource: "logs-2021-03-18_21-22", withExtension: "pulse"))
+        let dataURL = directory.url.appending(filename: "logs-archive-v2.pulse")
+        try Resources.pulseArchive.write(to: dataURL)
         let dataTask = session.dataTask(with: dataURL)
 
         let didComplete = self.expectation(description: "TaskCompleted")
@@ -139,27 +134,21 @@ final class URLSessionProxyDelegateTests: XCTestCase {
         wait(for: [didComplete], timeout: 5)
 
         // RECORD
-        flush(store: store)
-        let requests = try store.allNetworkRequests()
-        let request = try XCTUnwrap(requests.first)
+        let tasks = try store.allTasks()
+        let task = try XCTUnwrap(tasks.first)
 
         // THEN
-        XCTAssertEqual(requests.count, 1)
+        XCTAssertEqual(tasks.count, 1)
 
-        XCTAssertEqual(request.url, dataURL.absoluteString)
-        XCTAssertEqual(request.host, nil)
-        XCTAssertEqual(request.httpMethod, "GET")
-        XCTAssertNil(request.errorDomain)
-        XCTAssertEqual(request.errorCode, 0)
-        XCTAssertEqual(request.isCompleted, true)
+        XCTAssertEqual(task.url, dataURL.absoluteString)
+        XCTAssertEqual(task.host, nil)
+        XCTAssertEqual(task.httpMethod, "GET")
+        XCTAssertNil(task.errorDomain)
+        XCTAssertEqual(task.errorCode, 0)
+        XCTAssertEqual(task.requestState, NetworkTaskEntity.State.success.rawValue)
 
-        XCTAssertNil(request.requestBodyKey)
-        XCTAssertNotNil(request.responseBodyKey)
-
-        XCTAssertNotNil(request.details)
-
-        let message = try XCTUnwrap(request.message)
-        XCTAssertEqual(message.label, "network")
+        let message = try XCTUnwrap(task.message)
+        XCTAssertEqual(message.label.name, "network")
     }
 }
 

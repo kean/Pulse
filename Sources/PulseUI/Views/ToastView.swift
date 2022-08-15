@@ -2,13 +2,20 @@
 //
 // Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
 
-import SwiftUI
-
 #if os(iOS)
 
-@available(iOS 13, *)
+import SwiftUI
+import Foundation
+
 struct ToastView<Content>: View where Content: View {
     let content: () -> Content
+    var dismissDelay: TimeInterval = 3.0
+
+    func dismissDelay(_ delay: TimeInterval) -> Self {
+        var copy = self
+        copy.dismissDelay = delay
+        return copy
+    }
 
     var body: some View {
         content()
@@ -25,30 +32,33 @@ struct ToastView<Content>: View where Content: View {
     }
 }
 
-@available(iOS 13, *)
 extension ToastView {
     func show() {
         ToastManager.shared.show(self)
     }
 }
 
-@available(iOS 13, *)
 final class ToastManager {
     static let shared = ToastManager()
 
-    var queue = [UIViewController]()
+    var queue = [EnqueuedToast]()
 
     private var isShowingToast = false
+
+    struct EnqueuedToast {
+        let vc: UIViewController
+        let dismissDelay: TimeInterval
+    }
 
     init() {}
 
     @objc func swipeRecognized() {
-        queue.first.map(dismissToast)
+        queue.first.map(\.vc).map(dismissToast)
     }
 
     func show<Content: View>(_ toast: ToastView<Content>) {
         let vc = UIHostingController(rootView: toast)
-        queue.append(vc)
+        queue.append(EnqueuedToast(vc: vc, dismissDelay: toast.dismissDelay))
         showToastIfNeeded()
     }
 
@@ -56,7 +66,7 @@ final class ToastManager {
         guard !isShowingToast else {
             return
         }
-        guard let toast = queue.first,
+        guard let enqueuedToast = queue.first,
               let window = UIApplication.shared.windows.filter({ $0.isKeyWindow }).first,
               let container = window.rootViewController else {
             return
@@ -64,6 +74,7 @@ final class ToastManager {
 
         isShowingToast = true
 
+        let toast = enqueuedToast.vc
         toast.view.backgroundColor = .clear
 
         container.addChild(toast)
@@ -84,7 +95,7 @@ final class ToastManager {
             toast.view.alpha = 1
             toast.view.transform = .identity
         }) { _ in
-            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(3)) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(Int(enqueuedToast.dismissDelay))) {
                 self.dismissToast(toast)
             }
         }
@@ -95,7 +106,7 @@ final class ToastManager {
             toast.view.alpha = 0
             toast.view.transform = CGAffineTransform(scaleX: 0.95, y: 0.95).translatedBy(x: 0, y: 10)
         } completion: { _ in
-            guard let line = self.queue.firstIndex(where: { $0 === toast }) else { return }
+            guard let line = self.queue.firstIndex(where: { $0.vc === toast }) else { return }
             self.queue.remove(at: line)
 
             toast.view.removeFromSuperview()
@@ -109,18 +120,20 @@ final class ToastManager {
     }
 }
 
-@available(iOS 13.0, *)
+#if DEBUG
+
 struct ToastView_Previews: PreviewProvider {
     static var previews: some View {
-        Group {
-            ToastView {
-                HStack {
-                    Image(systemName: "archivebox")
-                    Text("Archive created (6 KB)")
-                }
+        ToastView {
+            HStack {
+                Image(systemName: "archivebox")
+                Text("Archive created (6 KB)")
             }
         }
+        .previewLayout(.fixed(width: 400, height: 200))
     }
 }
+
+#endif
 
 #endif

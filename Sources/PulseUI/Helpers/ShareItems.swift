@@ -3,14 +3,15 @@
 // Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
-import PulseCore
+import Pulse
 import CoreData
+
+#if os(iOS) || os(macOS)
 
 enum ShareStoreOutput {
     case store, text
 }
 
-@available(iOS 13.0, tvOS 14.0, watchOS 6, *)
 struct ShareItems: Identifiable {
     let id = UUID()
     let items: [Any]
@@ -22,60 +23,16 @@ struct ShareItems: Identifiable {
     }
 }
 
-@available(iOS 13.0, tvOS 14.0, watchOS 6, *)
 extension ShareItems {
-    static func makeCurrentDate() -> String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd_HH-mm"
-        return dateFormatter.string(from: Date())
-    }
-}
-
-@available(iOS 13.0, tvOS 14.0, watchOS 6, *)
-extension ShareItems {
-    init(store: LoggerStore, output: ShareStoreOutput) {
-        let directory = TemporaryDirectory()
-        let date = ShareItems.makeCurrentDate()
-
-        let items: [Any]
-        switch output {
-        case .store:
-            if store.isReadonly {
-                items = [store.storeURL]
-            } else {
-                let storeURL = directory.url.appendingPathComponent("logs-\(date).pulse", isDirectory: false)
-                _ = try? store.copy(to: storeURL)
-                items = [storeURL]
-            }
-        case .text:
-            let messages = (try? store.allMessages()) ?? []
-            let text = ConsoleShareService(store: store).format(messages)
-            let logsURL = directory.url.appendingPathComponent("logs-\(date).txt")
-            try? text.data(using: .utf8)?.write(to: logsURL)
-            items = [logsURL]
-            break
-        }
-
-        self.init(items, cleanup: directory.remove)
-    }
-
     init(messages store: LoggerStore) {
         let messages = (try? store.allMessages()) ?? []
-        let text = ConsoleShareService(store: store).format(messages)
+        let text = ConsoleShareService.format(messages)
         self.init([text])
     }
 }
 
-@available(iOS 13.0, tvOS 14.0, watchOS 6, *)
-struct ConsoleShareService {
-    let store: LoggerStore
-    private var context: NSManagedObjectContext { store.container.viewContext }
-
-    init(store: LoggerStore) {
-        self.store = store
-    }
-
-    func format(_ messages: [LoggerMessageEntity]) -> String {
+enum ConsoleShareService {
+    static func format(_ messages: [LoggerMessageEntity]) -> String {
         var output = ""
         for message in messages {
             output.append(format(message: message))
@@ -84,16 +41,16 @@ struct ConsoleShareService {
         return output
     }
 
-    private func format(message: LoggerMessageEntity) -> String {
+    private static func format(message: LoggerMessageEntity) -> String {
         let title = "\(dateFormatter.string(from: message.createdAt)) [\(message.level)]-[\(message.label)] \(message.text)"
-        if let request = message.request {
-            return title + "\n\n" + share(request, output: .plainText)
+        if let task = message.task {
+            return title + "\n\n" + share(task, output: .plainText)
         } else {
             return title
         }
     }
 
-    func share(_ messages: [LoggerMessageEntity]) -> ShareItems {
+    static func share(_ messages: [LoggerMessageEntity]) -> ShareItems {
         let tempDir = TemporaryDirectory()
         let allLogsUrl = tempDir.url.appendingPathComponent("logs.txt")
         let allLogs = format(messages).data(using: .utf8) ?? Data()
@@ -101,48 +58,20 @@ struct ConsoleShareService {
         return ShareItems([allLogsUrl], cleanup: tempDir.remove)
     }
 
-    func share(_ message: LoggerMessageEntity) -> String {
-        if let request = message.request {
-            return share(request, output: .plainText) // this should never happen
+    static func share(_ message: LoggerMessageEntity) -> String {
+        if let task = message.task {
+            return share(task, output: .plainText) // this should never happen
         } else {
             return message.text
         }
     }
 
-    func share(_ request: LoggerNetworkRequestEntity, output: NetworkMessageRenderType) -> String {
-        share(NetworkLoggerSummary(request: request, store: store), output: output)
-    }
-
-    func share(_ info: NetworkLoggerSummary, output: NetworkMessageRenderType) -> String {
+    static func share(_ task: NetworkTaskEntity, output: NetworkMessageRenderType) -> String {
         switch output {
-        case .plainText: return info.asPlainText()
-        case .markdown: return info.asMarkdown()
-        case .html: return info.asHTML()
+        case .plainText: return Render.asPlainText(task: task)
+        case .markdown: return Render.asMarkdown(task: task)
+        case .html: return Render.asHTML(task: task)
         }
-    }
-}
-
-struct TemporaryDirectory {
-    let url: URL
-
-    init() {
-        url = FileManager.default.temporaryDirectory
-            .appendingPathComponent(UUID().uuidString, isDirectory: true)
-        try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
-    }
-
-    func remove() {
-        try? FileManager.default.removeItem(at: url)
-    }
-}
-
-@available(iOS 13.0, tvOS 14.0, watchOS 6, *)
-extension TemporaryDirectory {
-    func write(text: String, extension fileExtension: String) -> URL {
-        let date = ShareItems.makeCurrentDate()
-        let fileURL = url.appendingPathComponent("logs-\(date).\(fileExtension)", isDirectory: false)
-        try? text.data(using: .utf8)?.write(to: fileURL)
-        return fileURL
     }
 }
 
@@ -154,6 +83,42 @@ enum NetworkMessageRenderType {
 
 private let dateFormatter: DateFormatter = {
     let formatter = DateFormatter()
+    formatter.locale = Locale(identifier: "en_US")
     formatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSSS"
     return formatter
 }()
+
+#endif
+
+struct TemporaryDirectory {
+    let url: URL
+
+    init() {
+        url = FileManager.default.temporaryDirectory
+            .appendingPathComponent("com.github.kean.logger", isDirectory: true)
+            .appendingPathComponent(UUID().uuidString, isDirectory: true)
+        try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
+    }
+
+    func remove() {
+        try? FileManager.default.removeItem(at: url)
+    }
+}
+
+#if os(iOS) || os(macOS)
+extension TemporaryDirectory {
+    func write(text: String, extension fileExtension: String) -> URL {
+        let date = makeCurrentDate()
+        let fileURL = url.appendingPathComponent("logs-\(date).\(fileExtension)", isDirectory: false)
+        try? text.data(using: .utf8)?.write(to: fileURL)
+        return fileURL
+    }
+}
+#endif
+
+func makeCurrentDate() -> String {
+    let formatter = DateFormatter()
+    formatter.locale = Locale(identifier: "en_US")
+    formatter.dateFormat = "yyyy-MM-dd-HH-mm"
+    return formatter.string(from: Date())
+}

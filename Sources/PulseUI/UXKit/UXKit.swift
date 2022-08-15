@@ -15,7 +15,6 @@ import SwiftUI
 
 struct Palette {
     #if !os(watchOS)
-    @available(iOS 13.0, tvOS 13.0, *)
     static var red: UXColor {
         UXColor.dynamic(light: Palette.lightRed, dark: Palette.darkRed)
     }
@@ -23,7 +22,6 @@ struct Palette {
     private static let lightRed = UXColor(red: 196.0/255.0, green: 26.0/255.0, blue: 22.0/255.0, alpha: 1.0)
     private static let darkRed = UXColor(red: 252.0/255.0, green: 106.0/255.0, blue: 93.0/255.0, alpha: 1.0)
 
-    @available(iOS 13.0, tvOS 13.0, *)
     static var pink: UXColor {
         UXColor.dynamic(light: Palette.lightPink, dark: Palette.darkPink)
     }
@@ -31,14 +29,13 @@ struct Palette {
     private static let lightPink = UXColor(red: 155.0/255.0, green: 35.0/255.0, blue: 147.00/255.0, alpha: 1.0)
     private static let darkPink = UXColor(red: 252.0/255.0, green: 95.0/255.0, blue: 163.0/255.0, alpha: 1.0)
     #else
-    @available(watchOS 7.0, *)
     static var red: UXColor { UXColor(Color.red) }
-    @available(watchOS 7.0, *)
     static var pink: UXColor { UXColor(Color.pink) }
     #endif
 }
 
 #if os(macOS)
+typealias UXView = NSView
 typealias UXColor = NSColor
 typealias UXFont = NSFont
 typealias UXTextView = NSTextView
@@ -70,13 +67,15 @@ extension NSColor {
 }
 
 #else
+#if os(iOS)
+typealias UXView = UIView
+#endif
 typealias UXColor = UIColor
 typealias UXFont = UIFont
 typealias UXImage = UIImage
 
 #if !os(watchOS)
 extension UIColor {
-    @available(iOS 13.0, tvOS 13.0, *)
     static func dynamic(light: UIColor, dark: UIColor) -> UIColor {
         UIColor {
             switch $0.userInterfaceStyle {
@@ -113,8 +112,10 @@ extension UIColor {
 
 enum FontSize {
     static var body: CGFloat {
-        #if os(macOS)
-            return 11
+        #if os(iOS)
+            return 12
+        #elseif os(macOS)
+            return 12
         #elseif os(tvOS)
             return 24
         #else
@@ -175,7 +176,6 @@ func runHapticFeedback(_ type: NSHapticFeedabackTypePlaceholder = .success) {
 // MARK: - UIImageView
 
 #if os(iOS) || os(watchOS) || os(tvOS)
-@available(iOS 13.0, tvOS 14.0, watchOS 6, *)
 extension Image {
     init(uxImage: UXImage) {
         self.init(uiImage: uxImage)
@@ -184,7 +184,6 @@ extension Image {
 #endif
 
 #if os(macOS)
-@available(iOS 13.0, *)
 extension Image {
     init(uxImage: UXImage) {
         self.init(nsImage: uxImage)
@@ -193,6 +192,15 @@ extension Image {
 #endif
 
 // MARK: - Misc
+
+extension NSParagraphStyle {
+    static func make(lineHeight: CGFloat) -> NSParagraphStyle {
+        let ps = NSMutableParagraphStyle()
+        ps.maximumLineHeight = lineHeight
+        ps.minimumLineHeight = lineHeight
+        return ps
+    }
+}
 
 #if os(macOS)
 extension NSPasteboard {
@@ -221,15 +229,6 @@ extension NSTextField {
         label.isSelectable = false
         label.lineBreakMode = .byTruncatingTail
         return label
-    }
-}
-
-extension NSParagraphStyle {
-    static func make(lineHeight: CGFloat) -> NSParagraphStyle {
-        let ps = NSMutableParagraphStyle()
-        ps.maximumLineHeight = lineHeight
-        ps.minimumLineHeight = lineHeight
-        return ps
     }
 }
 

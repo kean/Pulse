@@ -3,21 +3,22 @@
 // Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
 
 import CoreData
-import PulseCore
+import Pulse
 import Combine
 import SwiftUI
 
-@available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
 final class ConsoleMessageDetailsViewModel {
+    let textViewModel: RichTextViewModel
+
     let tags: [ConsoleMessageTagViewModel]
     let text: String
     let badge: BadgeViewModel?
 
     let message: LoggerMessageEntity
-    private let store: LoggerStore
 
     static let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US")
         #if os(watchOS)
         formatter.dateFormat = "HH:mm:ss.SSS"
         #else
@@ -26,8 +27,8 @@ final class ConsoleMessageDetailsViewModel {
         return formatter
     }()
 
-    init(store: LoggerStore, message: LoggerMessageEntity) {
-        self.store = store
+    init(message: LoggerMessageEntity) {
+        self.textViewModel = RichTextViewModel(string: message.text)
         self.message = message
         self.tags = [
             ConsoleMessageTagViewModel(
@@ -35,33 +36,28 @@ final class ConsoleMessageDetailsViewModel {
                 value: ConsoleMessageDetailsViewModel.dateFormatter
                     .string(from: message.createdAt)
             ),
-            ConsoleMessageTagViewModel(
-                title: "Label",
-                value: message.label
-            )
+            ConsoleMessageTagViewModel(title: "Label", value: message.label.name)
         ]
         self.text = message.text
         self.badge = BadgeViewModel(message: message)
     }
 
     func prepareForSharing() -> Any {
-        return text
+        text
     }
 
     var pin: PinButtonViewModel {
-        PinButtonViewModel(store: store, message: message)
+        PinButtonViewModel(message: message)
     }
 }
 
-@available(iOS 13.0, tvOS 14.0, watchOS 6, *)
 private extension BadgeViewModel {
     init?(message: LoggerMessageEntity) {
         guard let level = LoggerStore.Level(rawValue: message.level) else { return nil }
-        self.init(title: level.rawValue.uppercased(), color: Color(level: level))
+        self.init(title: level.name.uppercased(), color: Color(level: level))
     }
 }
 
-@available(iOS 13.0, tvOS 14.0, watchOS 6, *)
 private extension Color {
     init(level: LoggerStore.Level) {
         switch level {

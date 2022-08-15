@@ -3,13 +3,9 @@
 // Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
-import CoreData
-import PulseCore
-import Combine
 
 #if os(iOS)
 
-@available(iOS 13.0, *)
 struct ConsoleFiltersLabelsPickerView: View {
     @ObservedObject var viewModel: ConsoleSearchCriteriaViewModel
 
@@ -47,11 +43,10 @@ struct ConsoleFiltersLabelsPickerView: View {
     }
 }
 
-@available(iOS 13.0, *)
-struct ConsoleFiltersView_Previews: PreviewProvider {
+struct ConsoleFiltersLabelsPickerView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
-            ConsoleFiltersLabelsPickerView(viewModel: .init())
+            ConsoleFiltersLabelsPickerView(viewModel: .init(store: .mock))
         }
     }
 }

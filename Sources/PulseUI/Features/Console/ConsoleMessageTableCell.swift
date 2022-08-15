@@ -4,11 +4,10 @@
 
 #if os(iOS)
 
-import PulseCore
+import Pulse
 import Combine
 import UIKit
 
-@available(iOS 13.0, *)
 final class ConsoleMessageTableCell: UITableViewCell, UIContextMenuInteractionDelegate {
     private let title = UILabel()
     private let accessory = ConsoleMessageAccessoryView()
@@ -27,22 +26,16 @@ final class ConsoleMessageTableCell: UITableViewCell, UIContextMenuInteractionDe
     }
 
     private func createView() {
-        let stack = UIView.vStack(spacing: 4, [
-            .hStack(alignment: .center, spacing: 8, [
-                title, UIView(), accessory
-            ]),
-            details
+        selectionStyle = .gray
+
+        let topStack = UIView.hStack(alignment: .center, spacing: 8, [
+            title, UIView(), pin, accessory
         ])
+        topStack.setCustomSpacing(4, after: pin)
+        let stack = UIView.vStack(spacing: 4, [topStack, details])
 
         contentView.addSubview(stack)
-        stack.pinToSuperview(insets: .init(top: 10, left: 16, bottom: 10, right: 16))
-
-        contentView.addSubview(pin)
-        pin.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            pin.firstBaselineAnchor.constraint(equalTo: title.firstBaselineAnchor),
-            pin.leadingAnchor.constraint(equalTo: title.trailingAnchor, constant: 6)
-        ])
+        stack.pinToSuperview(insets: .init(top: 10, left: 16, bottom: 10, right: 12))
 
         title.font = .preferredFont(forTextStyle: .caption1)
         details.font = .systemFont(ofSize: 15)
@@ -100,7 +93,6 @@ final class ConsoleMessageTableCell: UITableViewCell, UIContextMenuInteractionDe
     }
 }
 
-@available(iOS 13.0, *)
 final class ConsoleMessageAccessoryView: UIView {
     let textLabel = UILabel()
 
@@ -111,9 +103,11 @@ final class ConsoleMessageAccessoryView: UIView {
 
         textLabel.font = .preferredFont(forTextStyle: .caption1)
         textLabel.textColor = .secondaryLabel
+        textLabel.setContentCompressionResistancePriority(.init(800), for: .horizontal)
 
         let disclosureIndicator = UIImageView(image: ConsoleMessageAccessoryView.chevron)
         disclosureIndicator.tintColor = .separator
+        disclosureIndicator.setContentCompressionResistancePriority(.init(800), for: .horizontal)
 
         let stack = UIStackView.hStack(spacing: 4, [textLabel, disclosureIndicator])
         addSubview(stack)

@@ -3,33 +3,35 @@
 // Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
-import PulseCore
+import Pulse
 
-// MARK: - View
-@available(iOS 13.0, tvOS 14.0, watchOS 6.0, *)
 struct NetworkInspectorHeadersView: View {
     @ObservedObject var viewModel: NetworkInspectorHeaderViewModel
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 16) {
-                KeyValueSectionView(viewModel: viewModel.requestHeaders)
-                KeyValueSectionView(viewModel: viewModel.responseHeaders)
-                Spacer()
-            }.padding()
+        VStack(spacing: 16) {
+            KeyValueSectionView(viewModel: viewModel.requestHeadersOriginal)
+            KeyValueSectionView(viewModel: viewModel.requestHeadersCurrent)
+            if let responseHeaders = viewModel.responseHeaders {
+                KeyValueSectionView(viewModel: responseHeaders)
+            }
+        }
+        .padding()
+        .background(links)
+    }
 
-            NavigationLink(destination: NetworkHeadersDetailsView(viewModel: viewModel.requestHeaders), isActive: $viewModel.isRequestRawActive) {
-                Text("")
-            }.hidden()
-
-            NavigationLink(destination: NetworkHeadersDetailsView(viewModel: viewModel.responseHeaders), isActive: $viewModel.isResponseRawActive) {
-                Text("")
-            }.hidden()
+    private var links: some View {
+        InvisibleNavigationLinks {
+            NavigationLink.programmatic(isActive: $viewModel.isRequestOriginalRawActive, destination:  { NetworkHeadersDetailsView(viewModel: viewModel.requestHeadersOriginal) })
+            NavigationLink.programmatic(isActive: $viewModel.isRequestCurrentRawActive, destination:  { NetworkHeadersDetailsView(viewModel: viewModel.requestHeadersCurrent) })
+            
+            if let responseHeaders = viewModel.responseHeaders {
+                NavigationLink.programmatic(isActive: $viewModel.isResponseRawActive, destination:  { NetworkHeadersDetailsView(viewModel: responseHeaders) })
+            }
         }
     }
 }
 
-@available(iOS 13.0, tvOS 14.0, watchOS 6.0, *)
 struct NetworkHeadersDetailsView: View {
     let viewModel: KeyValueSectionViewModel
     @State private var isShowingShareSheet = false
@@ -42,7 +44,7 @@ struct NetworkHeadersDetailsView: View {
                 isShowingShareSheet = true
             })
             .sheet(isPresented: $isShowingShareSheet) {
-                ShareView(activityItems: [text])
+                ShareView(activityItems: [viewModel.asAttributedString()])
             }
     }
     #else
@@ -57,54 +59,61 @@ struct NetworkHeadersDetailsView: View {
             PlaceholderView(imageName: "folder", title: "Empty")
         } else {
             #if os(watchOS) || os(tvOS)
-            RichTextView(viewModel: .init(string: text.string))
+            RichTextView(viewModel: .init(string: viewModel.asAttributedString().string))
             #else
-            RichTextView(viewModel: .init(string: text), isAutomaticLinkDetectionEnabled: false)
+            RichTextView(viewModel: {
+                let viewModel = RichTextViewModel(string: viewModel.asAttributedString())
+                viewModel.isAutomaticLinkDetectionEnabled = false
+                return viewModel
+            }())
             #endif
         }
-    }
-
-    private var text: NSAttributedString {
-        let output = NSMutableAttributedString()
-        for item in viewModel.items {
-            output.append(item.0, [.font: UXFont.monospacedSystemFont(ofSize: FontSize.body, weight: .bold)])
-            output.append(": \(item.1 ?? "–")\n", [.font: UXFont.monospacedSystemFont(ofSize: FontSize.body, weight: .regular)])
-        }
-#if os(iOS) || os(macOS)
-        output.addAttributes([.foregroundColor: UXColor.label])
-#endif
-        return output
     }
 }
 
 // MARK: - ViewModel
 
-@available(iOS 13.0, tvOS 14.0, watchOS 6, *)
 final class NetworkInspectorHeaderViewModel: ObservableObject {
-    let summary: NetworkLoggerSummary
+    private let task: NetworkTaskEntity
 
-    init(summary: NetworkLoggerSummary) {
-        self.summary = summary
+    init(task: NetworkTaskEntity) {
+        self.task = task
     }
 
-    @Published var isRequestRawActive = false
+    @Published var isRequestOriginalRawActive = false
+    @Published var isRequestCurrentRawActive = false
     @Published var isResponseRawActive = false
 
-    var requestHeaders: KeyValueSectionViewModel {
-        let items = (summary.request?.headers ?? [:]).sorted(by: { $0.key < $1.key })
+    var requestHeadersOriginal: KeyValueSectionViewModel {
+        let items = (task.originalRequest?.headers ?? [:]).sorted(by: { $0.key < $1.key })
         return KeyValueSectionViewModel(
-            title: "Request Headers",
+            title: "Request Headers (Original)",
             color: .blue,
             action: ActionViewModel(
-                action: { [unowned self] in isRequestRawActive = true },
+                action: { [unowned self] in isRequestOriginalRawActive = true },
                 title: "View Raw"
             ),
             items: items
         )
     }
 
-    var responseHeaders: KeyValueSectionViewModel {
-        let items = (summary.response?.headers ?? [:]).sorted(by: { $0.key < $1.key })
+    var requestHeadersCurrent: KeyValueSectionViewModel {
+        let items = (task.currentRequest?.headers ?? [:]).sorted(by: { $0.key < $1.key })
+        return KeyValueSectionViewModel(
+            title: "Request Headers (Current)",
+            color: .blue,
+            action: ActionViewModel(
+                action: { [unowned self] in isRequestCurrentRawActive = true },
+                title: "View Raw"
+            ),
+            items: items
+        )
+    }
+
+    var responseHeaders: KeyValueSectionViewModel? {
+        guard let headers = task.response?.headers else {
+            return nil
+        }
         return KeyValueSectionViewModel(
             title: "Response Headers",
             color: .indigo,
@@ -112,7 +121,17 @@ final class NetworkInspectorHeaderViewModel: ObservableObject {
                 action: { [unowned self] in isResponseRawActive = true },
                 title: "View Raw"
             ),
-            items: items
+            items: headers.sorted(by: { $0.key < $1.key })
         )
     }
 }
+
+#if DEBUG
+struct NetworkInspectorHeadersView_Previews: PreviewProvider {
+    static var previews: some View {
+        NavigationView {
+            NetworkInspectorHeadersView(viewModel: .init(task: LoggerStore.preview.entity(for: .login)))
+        }
+    }
+}
+#endif

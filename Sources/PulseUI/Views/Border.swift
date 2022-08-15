@@ -4,14 +4,12 @@
 
 import SwiftUI
 
-@available(iOS 13.0, tvOS 14.0, watchOS 6, *)
 extension View {
     func border(width: CGFloat, edges: [Edge], color: Color) -> some View {
         overlay(EdgeBorder(width: width, edges: edges).foregroundColor(color))
     }
 }
 
-@available(iOS 13.0, tvOS 14.0, watchOS 6, *)
 struct EdgeBorder: Shape {
     let width: CGFloat
     let edges: [Edge]

@@ -3,49 +3,45 @@
 // Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
-import PulseCore
+import Pulse
 
-#if os(iOS) || os(tvOS) || os(watchOS)
-@available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
 struct ConsoleMessageDetailsView: View {
     let viewModel: ConsoleMessageDetailsViewModel
     @Environment(\.colorScheme) var colorScheme: ColorScheme
     @State private var isShowingShareSheet = false
+    var onClose: (() -> Void)?
 
     #if os(iOS)
     var body: some View {
         contents
             .navigationBarTitle("", displayMode: .inline)
-            .navigationBarItems(trailing: HStack(spacing: 14) {
-                if let badge = viewModel.badge {
-                    BadgeView(viewModel: BadgeViewModel(title: badge.title, color: badge.color.opacity(colorScheme == .light ? 0.25 : 0.5)))
-                }
-                NavigationLink(destination: ConsoleMessageMetadataView(message: viewModel.message)) {
-                    Image(systemName: "info.circle")
-                }
-                PinButton(viewModel: viewModel.pin, isTextNeeded: false)
-                ShareButton {
-                    self.isShowingShareSheet = true
-                }
-            })
+            .navigationBarItems(trailing: trailingNavigationBarItems)
             .sheet(isPresented: $isShowingShareSheet) {
                 ShareView(activityItems: [self.viewModel.prepareForSharing()])
             }
     }
+
+    @ViewBuilder
+    private var trailingNavigationBarItems: some View {
+        HStack(spacing: 10) {
+            if let badge = viewModel.badge {
+                BadgeView(viewModel: BadgeViewModel(title: badge.title, color: badge.color.opacity(colorScheme == .light ? 0.25 : 0.5)))
+            }
+            NavigationLink(destination: ConsoleMessageMetadataView(message: viewModel.message)) {
+                Image(systemName: "info.circle")
+            }
+            PinButton(viewModel: viewModel.pin, isTextNeeded: false)
+            ShareButton {
+                self.isShowingShareSheet = true
+            }
+        }
+    }
     #elseif os(watchOS)
     var body: some View {
         ScrollView {
-            VStack {
-                HStack {
-                    PinButton3(viewModel: viewModel.pin)
-                    NavigationLink(destination: ConsoleMessageMetadataView(message: viewModel.message)) {
-                        VStack(spacing: 4) {
-                            Image(systemName: "info.circle")
-                                .foregroundColor(.blue)
-                            Text("Details")
-                                .font(.caption2)
-                        }.frame(height: 42)
-                    }
+            VStack(spacing: 8) {
+                NavigationLink(destination: ConsoleMessageMetadataView(message: viewModel.message)) {
+                    Label("Details", systemImage: "info.circle")
                 }
                 contents
             }
@@ -54,6 +50,45 @@ struct ConsoleMessageDetailsView: View {
     #elseif os(tvOS)
     var body: some View {
         contents
+    }
+    #elseif os(macOS)
+    @State var isMetaVisible = false
+
+    var body: some View {
+        VStack(spacing: 0) {
+            HStack(spacing: 12) {
+                Button(action: { isMetaVisible = true }) {
+                    Image(systemName: "info.circle")
+                }.padding(.leading, 4)
+                if let badge = viewModel.badge {
+                    BadgeView(viewModel: BadgeViewModel(title: badge.title, color: badge.color.opacity(colorScheme == .light ? 0.25 : 0.5)))
+                }
+                Spacer()
+                if let onClose = onClose {
+                    Button(action: onClose) {
+                        Image(systemName: "xmark").foregroundColor(.secondary)
+                    }.buttonStyle(.plain)
+                }
+            }
+            .padding([.leading, .trailing], 6)
+            .frame(height: 27, alignment: .center)
+            Divider()
+            textView
+                .background(colorScheme == .dark ? Color(NSColor(red: 30/255.0, green: 30/255.0, blue: 30/255.0, alpha: 1)) : .clear)
+        }
+        .sheet(isPresented: $isMetaVisible, content: {
+            VStack(spacing: 0) {
+                HStack {
+                    Text("Message Details")
+                        .font(.headline)
+                        .foregroundColor(.secondary)
+                    Spacer()
+                    Button("Close") { isMetaVisible = false }
+                        .keyboardShortcut(.cancelAction)
+                }.padding()
+                ConsoleMessageMetadataView(message: viewModel.message)
+            }.frame(width: 440, height: 600)
+        })
     }
     #endif
 
@@ -64,7 +99,7 @@ struct ConsoleMessageDetailsView: View {
     }
 
     private var textView: some View {
-        RichTextView(viewModel: .init(string: viewModel.text))
+        RichTextView(viewModel: viewModel.textViewModel)
     }
 
     #if os(watchOS) || os(tvOS)
@@ -93,36 +128,29 @@ struct ConsoleMessageDetailsView: View {
 }
 
 #if DEBUG
-@available(iOS 13.0, tvOS 14.0, watchOS 7.0, *)
 struct ConsoleMessageDetailsView_Previews: PreviewProvider {
     static var previews: some View {
-        Group {
-            NavigationView {
-                ConsoleMessageDetailsView(viewModel: .init(store: LoggerStore.mock, message: makeMockMessage()))
-            }
+        NavigationView {
+            ConsoleMessageDetailsView(viewModel: .init(message: makeMockMessage()), onClose: {})
         }
     }
 }
 
 func makeMockMessage() -> LoggerMessageEntity {
-    let entity = LoggerMessageEntity(context: LoggerStore.mock.container.viewContext)
+    let entity = LoggerMessageEntity(context: LoggerStore.mock.viewContext)
     entity.text = "test"
     entity.createdAt = Date()
-    entity.label = "auth"
-    entity.level = "critical"
-    entity.session = UUID().uuidString
-    entity.file = "~/Develop/Pulse/LoggerStore.swift"
-    entity.filename = "LoggerStore.swift"
+
+    let label = LoggerLabelEntity(context: LoggerStore.mock.viewContext)
+    label.name = "auth"
+    entity.label = label
+
+    entity.level = LoggerStore.Level.critical.rawValue
+    entity.session = UUID()
+    entity.file = "LoggerStore.swift"
     entity.function = "createMockMessage()"
     entity.line = 12
-
-    let meta = LoggerMetadataEntity(context: LoggerStore.mock.container.viewContext)
-    meta.key = "customKey"
-    meta.value = "customValue"
-
-    entity.metadata = Set([meta])
+    entity.rawMetadata = "customKey: customValue"
     return entity
 }
-#endif
-
 #endif
