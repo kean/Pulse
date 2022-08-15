@@ -12,8 +12,8 @@ import Foundation
 /// after their creation. On earlier versions, you can (optionally) call
 /// ``NetworkLogger/logTaskCreated(_:)`` manually.
 public final class URLSessionProxyDelegate: NSObject, URLSessionTaskDelegate, URLSessionDataDelegate, URLSessionDownloadDelegate {
-    private var actualDelegate: URLSessionDelegate?
-    private var taskDelegate: URLSessionTaskDelegate?
+    private weak var actualDelegate: URLSessionDelegate?
+    private weak var taskDelegate: URLSessionTaskDelegate?
     private var interceptedSelectors: Set<Selector>
     private let logger: NetworkLogger
 
