@@ -6,8 +6,8 @@ import Foundation
 
 /// Automates URLSession request tracking.
 public final class URLSessionProxyDelegate: NSObject, URLSessionTaskDelegate, URLSessionDataDelegate {
-    private var actualDelegate: URLSessionDelegate?
-    private var taskDelegate: URLSessionTaskDelegate?
+    weak private var actualDelegate: URLSessionDelegate?
+    weak private var taskDelegate: URLSessionTaskDelegate?
     private let interceptedSelectors: Set<Selector>
     private let logger: NetworkLogger
 
