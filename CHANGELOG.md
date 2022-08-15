@@ -1,3 +1,14 @@
+# Pulse 2.x
+
+## Pulse 2.0.0
+
+*Aug 15, 2022*
+
+> There are too many changes to list them here.
+
+See [Introducing Pulse 2.0](https://kean.blog/post/pulse-2) to learn about the new major features.
+
+
 # Pulse 1.x
 
 ## Pulse 1.1.0
