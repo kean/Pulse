@@ -18,7 +18,7 @@ public struct MainView: View {
 
     /// - parameter onDismiss: pass onDismiss to add a close button.
     public init(store: LoggerStore = .shared, onDismiss: (() -> Void)? = nil) {
-        self.viewModel = MainViewModel(store: store, onDismiss: onDismiss)
+        _viewModel = State(wrappedValue: MainViewModel(store: store, onDismiss: onDismiss))
     }
 
     public var body: some View {

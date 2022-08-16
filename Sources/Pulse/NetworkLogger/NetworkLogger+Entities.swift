@@ -331,7 +331,7 @@ extension NetworkLogger {
         }
     }
 
-    public enum TaskType: Int16, Codable, CaseIterable, Sendable {
+    @frozen public enum TaskType: Int16, Codable, CaseIterable, Sendable {
         case dataTask
         case downloadTask
         case uploadTask

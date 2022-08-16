@@ -102,7 +102,7 @@ public final class NetworkTaskEntity: NSManagedObject {
         State(rawValue: requestState) ?? .pending
     }
 
-    public enum State: Int16 {
+    @frozen public enum State: Int16 {
         case pending = 1, success, failure = 3
     }
 
