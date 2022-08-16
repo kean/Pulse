@@ -43,6 +43,7 @@ struct ConsoleFiltersLabelsPickerView: View {
     }
 }
 
+#if DEBUG
 struct ConsoleFiltersLabelsPickerView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
@@ -50,5 +51,6 @@ struct ConsoleFiltersLabelsPickerView_Previews: PreviewProvider {
         }
     }
 }
+#endif
 
 #endif
