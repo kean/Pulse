@@ -1110,7 +1110,7 @@ extension LoggerStore {
 }
 
 extension Version {
-    static let currentStoreVersion = Version(2, 0, 2)
+    static let currentStoreVersion = Version(2, 0, 3)
 }
 
 // MARK: - Constants

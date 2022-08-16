@@ -1,5 +1,12 @@
 # Pulse 2.x
 
+## Pulse 2.0.1
+
+*Aug 16, 2022*
+
+- Fix a crash when saving connection security details - [#100](https://github.com/kean/Pulse/issues/100#issuecomment-1216826547)
+
+
 ## Pulse 2.0.0
 
 *Aug 15, 2022*
