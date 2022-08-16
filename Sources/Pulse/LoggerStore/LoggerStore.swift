@@ -524,8 +524,8 @@ extension LoggerStore {
         entity.isExpensive = transaction.conditions.contains(.isExpensive)
         entity.isConstrained = transaction.conditions.contains(.isConstrained)
         entity.isMultipath = transaction.conditions.contains(.isMultipath)
-        entity.rawNegotiatedTLSProtocolVersion = Int16(transaction.negotiatedTLSProtocolVersion?.rawValue ?? 0)
-        entity.rawNegotiatedTLSCipherSuite = Int16(transaction.negotiatedTLSCipherSuite?.rawValue ?? 0)
+        entity.rawNegotiatedTLSProtocolVersion = Int32(transaction.negotiatedTLSProtocolVersion?.rawValue ?? 0)
+        entity.rawNegotiatedTLSCipherSuite = Int32(transaction.negotiatedTLSCipherSuite?.rawValue ?? 0)
         entity.fetchStartDate = transaction.timing.fetchStartDate
         entity.domainLookupStartDate = transaction.timing.domainLookupStartDate
         entity.domainLookupEndDate = transaction.timing.domainLookupEndDate

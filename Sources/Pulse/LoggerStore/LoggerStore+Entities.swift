@@ -166,8 +166,8 @@ public final class NetworkTransactionMetricsEntity: NSManagedObject {
     @NSManaged public var isExpensive: Bool
     @NSManaged public var isConstrained: Bool
     @NSManaged public var isMultipath: Bool
-    @NSManaged public var rawNegotiatedTLSProtocolVersion: Int16
-    @NSManaged public var rawNegotiatedTLSCipherSuite: Int16
+    @NSManaged public var rawNegotiatedTLSProtocolVersion: Int32
+    @NSManaged public var rawNegotiatedTLSCipherSuite: Int32
     @NSManaged public var fetchStartDate: Date?
     @NSManaged public var domainLookupStartDate: Date?
     @NSManaged public var domainLookupEndDate: Date?
