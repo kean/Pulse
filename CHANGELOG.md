@@ -4,6 +4,7 @@
 
 *Aug 19, 2022*
 
+- Fix [#102](https://github.com/kean/Pulse/issues/102) – invalid error type used in `LoggerStore/storeRequest(...)` method
 - Fix toolbar icons color on Ventura (macOS)
 
 ## Pulse 2.0.1
