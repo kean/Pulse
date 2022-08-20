@@ -224,7 +224,7 @@ extension LoggerStore {
     ///
     /// - note: If you want to store incremental updates to the task, use
     /// `NetworkLogger` instead.
-    public func storeRequest(_ request: URLRequest, response: URLResponse?, error: Error?, data: Data?, metrics: URLSessionTaskMetrics? = nil) {
+    public func storeRequest(_ request: URLRequest, response: URLResponse?, error: Swift.Error?, data: Data?, metrics: URLSessionTaskMetrics? = nil) {
         handle(.networkTaskCompleted(.init(
             taskId: UUID(),
             taskType: .dataTask,
