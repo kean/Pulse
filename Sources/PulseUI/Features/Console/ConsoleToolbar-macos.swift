@@ -26,8 +26,8 @@ struct ConsoleToolbarToggleFiltersButton: View {
     var body: some View {
         Button(action: { viewModel.isFiltersPaneHidden.toggle() }, label: {
             Image(systemName: viewModel.isFiltersPaneHidden ? "line.horizontal.3.decrease.circle" : "line.horizontal.3.decrease.circle.fill")
-        }).foregroundColor(viewModel.isFiltersPaneHidden ? .secondary : .accentColor)
-            .help("Toggle Filters Panel (⌥⌘F)")
+                .foregroundColor(viewModel.isFiltersPaneHidden ? .secondary : .accentColor)
+        }).help("Toggle Filters Panel (⌥⌘F)")
     }
 }
 
@@ -37,8 +37,8 @@ struct ConsoleToolbarToggleOnlyErrorsButton: View {
     var body: some View {
         Button(action: { viewModel.isOnlyErrors.toggle() }) {
             Image(systemName: viewModel.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon")
-        }.foregroundColor(viewModel.isOnlyErrors ? .accentColor : .secondary)
-            .help("Toggle Show Only Errors (⇧⌘E)")
+                .foregroundColor(viewModel.isOnlyErrors ? .accentColor : .secondary)
+        }.help("Toggle Show Only Errors (⇧⌘E)")
     }
 }
 

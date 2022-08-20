@@ -152,11 +152,12 @@ private struct FilterPopoverToolbarButton: View {
     var body: some View {
         Button(action: { isFilterPresented.toggle() }, label: {
             Image(systemName: isFilterPresented ? "line.horizontal.3.decrease.circle.fill" : "line.horizontal.3.decrease.circle")
-        }).foregroundColor(isFilterPresented ? .accentColor : .secondary)
-            .help("Toggle Filters Panel (⌥⌘F)")
-            .popover(isPresented: $isFilterPresented, arrowEdge: .top) {
-                filters.frame(width: Filters.preferredWidth).padding(.bottom, 16)
-            }
+                .foregroundColor(isFilterPresented ? .accentColor : .secondary)
+        })
+        .help("Toggle Filters Panel (⌥⌘F)")
+        .popover(isPresented: $isFilterPresented, arrowEdge: .top) {
+            filters.frame(width: Filters.preferredWidth).padding(.bottom, 16)
+        }
     }
 
     @ViewBuilder
