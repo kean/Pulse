@@ -73,7 +73,7 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
         }
 
         // The buffer is used to cover the time between the app launch and the
-        // iniitial (automatic) connection to the server.
+        // initial (automatic) connection to the server.
         queue.asyncAfter(deadline: .now() + .seconds(3)) { [weak self] in
             self?.buffer = nil
         }

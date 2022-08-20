@@ -155,7 +155,7 @@ See [Introducing Pulse 2.0](https://kean.blog/post/pulse-2) to learn about the n
 *13 Sep, 2021*
 
 - Add support to httpBodyStreamData - [#37](https://github.com/kean/Pulse/pull/37), thanks to [Klemen Košir](https://github.com/klemenkosir)
-- Fix an issue whre cURL share was using request body instead of the response body - [#38](https://github.com/kean/Pulse/pull/38), thanks to [BB9z](https://github.com/BB9z)
+- Fix an issue where cURL share was using request body instead of the response body - [#38](https://github.com/kean/Pulse/pull/38), thanks to [BB9z](https://github.com/BB9z)
 
 ## Pulse 0.17.0
 
@@ -421,7 +421,7 @@ macOS-only release
 - Add badge to details screen with message status
 - In addition to JSON, response body viewer now supports more content types: plain text, images
 - You can now copy HTTP header keys and values
-- Copy or share respones/request in Network Inspector
+- Copy or share response/request in Network Inspector
 - In case of a URLError, display both the code and the short description in the list
 - Network tab. Search based on method, path, parameters - anything
 - Add powerful search to Response view
