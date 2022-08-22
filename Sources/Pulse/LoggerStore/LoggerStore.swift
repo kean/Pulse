@@ -164,12 +164,17 @@ public final class LoggerStore: @unchecked Sendable {
     }
 
     private func postInitialization() throws {
-        backgroundContext.perform {
+        backgroundContext.performAndWait {
             self.backgroundContext.userInfo[WeakLoggerStore.loggerStoreKey] = WeakLoggerStore(store: self)
         }
-        viewContext.perform {
+        if Thread.isMainThread {
             self.viewContext.userInfo[Pins.pinServiceKey] = Pins(store: self)
             self.viewContext.userInfo[WeakLoggerStore.loggerStoreKey] = WeakLoggerStore(store: self)
+        } else {
+            viewContext.performAndWait {
+                self.viewContext.userInfo[Pins.pinServiceKey] = Pins(store: self)
+                self.viewContext.userInfo[WeakLoggerStore.loggerStoreKey] = WeakLoggerStore(store: self)
+            }
         }
         if !isArchive {
             try save(manifest)
