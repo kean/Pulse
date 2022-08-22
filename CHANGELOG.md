@@ -1,5 +1,11 @@
 # Pulse 2.x
 
+## Pulse 2.0.3
+
+*Aug 22, 2022*
+
+- Fix an issue caught by ConcurrencyDebug - [#104](https://github.com/kean/Pulse/issues/104)
+
 ## Pulse 2.0.2
 
 *Aug 19, 2022*
