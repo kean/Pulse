@@ -39,7 +39,11 @@ Pulse **is not** a network debugging proxy tool like Proxyman, Charles, or Wires
 
 ## Documentation
 
-Pulse is easy to learn and use thanks to [**Pulse Docs**](https://kean.blog/pulse/home).
+Pulse is easy to learn and use:
+
+- [Pulse Docs](https://kean-docs.github.io/pulse/documentation/pulse/) describe how to integrate the main framework and enable logging
+- [PulseUI Docs](https://kean-docs.github.io/pulseui/documentation/pulseui/) contains information about adding the debug menu and console into your app
+- [PulseLogHandler Docs](https://kean-docs.github.io/pulseloghandler/documentation/pulseloghandler/) describe how to use Pulse as [SwiftLog](https://github.com/apple/swift-log) backend
 
 <a href="https://kean.blog/pulse/home">
 <img src="https://user-images.githubusercontent.com/1567433/184552639-cf6765df-b5af-416b-95d3-0204e32df9d6.png">
