@@ -1,5 +1,11 @@
 # Pulse 2.x
 
+## Pulse 2.1.1
+
+*Sep 10, 2022*
+
+- Fix a build issue with Catalyst on Xcode 14.0
+
 ## Pulse 2.1.0
 
 *Sep 10, 2022*
