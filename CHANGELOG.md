@@ -1,5 +1,12 @@
 # Pulse 2.x
 
+## Pulse 2.1.2
+
+*Sep 11, 2022*
+
+- Fix build issues with Catalyst on Xcode 14.0 (PulseUI framework) 
+- Address warnings on macOS
+
 ## Pulse 2.1.1
 
 *Sep 10, 2022*
