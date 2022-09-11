@@ -8,7 +8,7 @@ import Pulse
 import SwiftUI
 import CoreData
 
-#if swift(>=5.7)
+#if !os(macOS) && !targetEnvironment(macCatalyst) && swift(>=5.7)
 import Charts
 #endif
 
@@ -59,7 +59,7 @@ public struct InsightsView: View {
 
     @ViewBuilder
     private var durationChart: some View {
-#if swift(>=5.7)
+#if !os(macOS) && !targetEnvironment(macCatalyst) && swift(>=5.7)
         if #available(iOS 16.0, *) {
             if insights.duration.values.isEmpty {
                 Text("No network requests yet")
@@ -186,7 +186,7 @@ final class InsightsViewModel: ObservableObject {
         return "\(DurationFormatter.string(from: min, isPrecise: false)) – \(DurationFormatter.string(from: max, isPrecise: false))"
     }
 
-#if swift(>=5.7)
+#if !os(macOS) && !targetEnvironment(macCatalyst) && swift(>=5.7)
     @available(iOS 16.0, *)
     struct Bar: Identifiable {
         var id: Int { index }

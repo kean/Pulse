@@ -49,7 +49,7 @@ private struct Contents: View {
     @ViewBuilder
     private var form: some View {
         Form {
-#if swift(>=5.7)
+#if !os(macOS) && !targetEnvironment(macCatalyst) && swift(>=5.7)
             if #available(iOS 16.0, tvOS 16.0, macOS 13.0, watchOS 9.0, *), let info = viewModel.info {
                 LoggerStoreSizeChart(info: info, sizeLimit: viewModel.storeSizeLimit)
 #if os(macOS)
