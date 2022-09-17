@@ -67,12 +67,12 @@ final class PersistentLogHandlerTests: XCTestCase {
             return XCTFail("Unexpected number of messages stored")
         }
 
-        let persistedMessage1 = try XCTUnwrap(persistedMessages.first { $0.label == "test.logger.1" })
+        let persistedMessage1 = try XCTUnwrap(persistedMessages.first { $0.label.name == "test.logger.1" })
         XCTAssertEqual(persistedMessage1.text, message1)
         XCTAssertEqual(persistedMessage1.createdAt, date)
         XCTAssertEqual(persistedMessage1.session, sessionID)
 
-        let persistedMessage2 = try XCTUnwrap(persistedMessages.first { $0.label == "test.logger.2" })
+        let persistedMessage2 = try XCTUnwrap(persistedMessages.first { $0.label.name == "test.logger.2" })
         XCTAssertEqual(persistedMessage2.text, message2)
         XCTAssertEqual(persistedMessage2.createdAt, date)
         XCTAssertEqual(persistedMessage2.session, sessionID)
