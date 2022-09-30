@@ -37,6 +37,12 @@ Record and inspect logs and `URLSession` network requests right from your iOS ap
 Pulse **is not** a network debugging proxy tool like Proxyman, Charles, or Wireshark. It *won't* automatically intercept all network traffic coming from your app or device. And to view logs in realtime, you need to use `PulseUI.framework` that you integrate into your app. The dedicated Pulse iOS and macOS also use `PulseUI.framework` and are there to view logs manually shared from other devices.
 
 
+## Getting Started
+
+1. Follow [Pulse docs](https://kean-docs.github.io/pulse/documentation/pulse/) to integrate `Pulse` framework and enable [network logging](https://kean-docs.github.io/pulse/documentation/pulse/networklogging-article)
+2. Follow [PulseUI docs](https://kean-docs.github.io/pulseui/documentation/pulseui/) to add Pulse console into your app (see `MainView`)
+2. Download [Pulse Pro](https://github.com/kean/PulsePro) to use remote logging and view logs shared from other devices
+
 ## Documentation
 
 Pulse is easy to learn and use:
