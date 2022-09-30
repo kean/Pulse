@@ -3,38 +3,19 @@
 
 **Pulse** is a powerful logging system for Apple Platforms. Native. Built with SwiftUI.
 
-Record and inspect logs and `URLSession` network requests right from your iOS app using Pulse Console. Share and view logs in Pulse macOS app. Logs are recorded locally and never leave your device.
+Record and inspect logs and `URLSession` network requests right from your iOS app using Pulse Console. Share and view logs in Pulse macOS app. Logs are recorded locally and never leave your device. [Learn more](https://kean.blog/pulse/home).
 
-> [Get](https://github.com/kean/Get), web API client built using async/await, has first-class Pulse integration.
+> Try [Get](https://github.com/kean/Get), a web API client built using async/await with first-class Pulse integration
 
 ## Sponsors 💖
 
 [Support](https://github.com/sponsors/kean) Pulse on GitHub Sponsors.
 
-<br/>
-<br/>
-<br/>
-
-<img width="2100" alt="02" src="https://user-images.githubusercontent.com/1567433/184552587-60547a4e-eba9-4975-acb5-7ba53512a428.png">
-<br/>
-<img width="2100" alt="03" src="https://user-images.githubusercontent.com/1567433/184552588-2456b0de-7ac5-46cf-93e8-a74167993a94.png">
-<br/>
-<img width="2100" alt="04" src="https://user-images.githubusercontent.com/1567433/184552589-97bda910-e24e-4d16-8758-d44f9ccf7f4d.png">
-<br/>
-<img width="2100" alt="05" src="https://user-images.githubusercontent.com/1567433/184552590-a5b26199-3dcb-401f-b587-4d5688f9435e.png">
-<br/>
-<img width="2100" alt="06" src="https://user-images.githubusercontent.com/1567433/184552592-b7dedd25-18db-4017-9ced-9b311e9dc836.png">
-<br/>
-<img width="2100" alt="07" src="https://user-images.githubusercontent.com/1567433/184552593-aac8fa5a-7000-4ca8-80d8-f92c3d695002.png">
-<br/>
-
 ## About
 
-`Pulse` is not a tool, it's a framework. It records events from `URLSession` or from frameworks that use it, such as `Alamofire`, and displays them using `PulseUI` views that you integrate directly into your app. This way Pulse console is available for everyone who has your test builds. You or your QA team can view the logs on the device and easily share them to attach to bug reports.
+`Pulse` is not just a tool, it's a framework. It records events from `URLSession` or from frameworks that use it, such as `Alamofire`, and displays them using `PulseUI` views that you integrate directly into your app. This way Pulse console is available for everyone who has your test builds. You or your QA team can view the logs on the device and easily share them to attach to bug reports.
 
-**What Pulse is Not**
-
-Pulse **is not** a network debugging proxy tool like Proxyman, Charles, or Wireshark. It *won't* automatically intercept all network traffic coming from your app or device. And to view logs in realtime, you need to use `PulseUI.framework` that you integrate into your app. The dedicated Pulse iOS and macOS also use `PulseUI.framework` and are there to view logs manually shared from other devices.
+> Pulse **is not** a network debugging proxy tool like Proxyman, Charles, or Wireshark. It *won't* automatically intercept all network traffic coming from your app or device.
 
 
 ## Getting Started
