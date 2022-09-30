@@ -1,5 +1,8 @@
 # Pulse 2.x
 
+- Fix crash when using a custom filter and searching by "label" - [#116](https://github.com/kean/Pulse/issues/116)
+- Remove "line" and "function" filters
+
 ## Pulse 2.1.2
 
 *Sep 11, 2022*

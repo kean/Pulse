@@ -94,8 +94,6 @@ struct CustomFilterView: View {
             Text("Metadata").tag(ConsoleSearchFilter.Field.metadata)
             Divider()
             Text("File").tag(ConsoleSearchFilter.Field.file)
-            Text("Function").tag(ConsoleSearchFilter.Field.function)
-            Text("Line").tag(ConsoleSearchFilter.Field.line)
         }
         .labelsHidden()
     }

@@ -111,8 +111,6 @@ final class ConsoleSearchFilter: ObservableObject, Hashable, Identifiable {
         case message
         case metadata
         case file
-        case function
-        case line
 
         var localizedTitle: String {
             switch self {
@@ -121,8 +119,6 @@ final class ConsoleSearchFilter: ObservableObject, Hashable, Identifiable {
             case .message: return "Message"
             case .metadata: return "Metadata"
             case .file: return "File"
-            case .function: return "Function"
-            case .line: return "Line"
             }
         }
     }
@@ -175,12 +171,10 @@ final class ConsoleSearchFilter: ObservableObject, Hashable, Identifiable {
     private var key: String? {
         switch field {
         case .level: return "level"
-        case .label: return "label"
+        case .label: return "label.name"
         case .message: return "text"
         case .metadata: return "rawMetadata"
         case .file: return "file"
-        case .function: return "function"
-        case .line: return "line"
         }
     }
 }
