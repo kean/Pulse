@@ -788,43 +788,47 @@ extension LoggerStore {
             }
         }
 
-        // Add database
-        let documentBlob = PulseBlobEntity(context: document.context)
-        documentBlob.key = "database"
-        documentBlob.data = try Data(contentsOf: databaseURL).compressed()
-        totalSize += Int64(documentBlob.data.count)
+        let info: Info = try document.context.performAndReturn {
+            // Add database
+            let documentBlob = PulseBlobEntity(context: document.context)
+            documentBlob.key = "database"
+            documentBlob.data = try Data(contentsOf: databaseURL).compressed()
+            totalSize += Int64(documentBlob.data.count)
 
-        // Add blobs
-        if Files.fileExists(atPath: blobsURL.path) {
-            let blobURLs = try Files.contentsOfDirectory(at: blobsURL, includingPropertiesForKeys: nil)
-            for chunk in blobURLs.chunked(into: 100) {
-                var objects: [[String: Any]] = []
-                for blobURL in chunk {
-                    if let data = try? Data(contentsOf: blobURL) {
-                        objects.append(["data": data])
-                        totalSize += Int64(data.count)
+            // Add blobs
+            if Files.fileExists(atPath: blobsURL.path) {
+                let blobURLs = try Files.contentsOfDirectory(at: blobsURL, includingPropertiesForKeys: nil)
+                for chunk in blobURLs.chunked(into: 100) {
+                    var objects: [[String: Any]] = []
+                    for blobURL in chunk {
+                        if let data = try? Data(contentsOf: blobURL) {
+                            objects.append(["data": data])
+                            totalSize += Int64(data.count)
+                        }
                     }
+                    try document.context.execute(NSBatchInsertRequest(entityName: String(describing: PulseBlobEntity.self), objects: objects))
                 }
-                try document.context.execute(NSBatchInsertRequest(entityName: String(describing: PulseBlobEntity.self), objects: objects))
             }
+
+            // Add store info
+            var info = try _info()
+            info.storeId = UUID()
+            // Chicken and an egg problem: don't know the exact size.
+            // The output file is also going to be about 10-20% larger because of
+            // the unused pages in the sqlite database.
+            info.totalStoreSize = totalSize + 500 // info is roughly 500 bytes
+            info.creationDate = configuration.makeCurrentDate()
+            info.modifiedDate = info.creationDate
+
+            let infoBlob = PulseBlobEntity(context: document.context)
+            infoBlob.key = "info"
+            infoBlob.data = try JSONEncoder().encode(info)
+
+            try document.context.save()
+            try? document.close()
+
+            return info
         }
-
-        // Add store info
-        var info = try _info()
-        info.storeId = UUID()
-        // Chicken and an egg problem: don't know the exact size.
-        // The output file is also going to be about 10-20% larger because of
-        // the unused pages in the sqlite database.
-        info.totalStoreSize = totalSize + 500 // info is roughly 500 bytes
-        info.creationDate = configuration.makeCurrentDate()
-        info.modifiedDate = info.creationDate
-
-        let infoBlob = PulseBlobEntity(context: document.context)
-        infoBlob.key = "info"
-        infoBlob.data = try JSONEncoder().encode(info)
-
-        try document.context.save()
-        try? document.close()
 
         return info
     }
