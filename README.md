@@ -9,7 +9,7 @@ Record and inspect logs and `URLSession` network requests right from your iOS ap
 
 ## Sponsors 💖
 
-[Support](https://github.com/sponsors/kean) Pulse on GitHub Sponsors.
+While you can use Pulse and Pulse Pro for free, if you enjoy it, please make sure to [support](https://github.com/sponsors/kean) it on GitHub Sponsors.
 
 ## About
 
@@ -17,20 +17,13 @@ Record and inspect logs and `URLSession` network requests right from your iOS ap
 
 > Pulse **is not** a network debugging proxy tool like Proxyman, Charles, or Wireshark. It *won't* automatically intercept all network traffic coming from your app or device.
 
-
 ## Getting Started
 
-1. Follow [Pulse docs](https://kean-docs.github.io/pulse/documentation/pulse/) to integrate `Pulse` framework and enable [network logging](https://kean-docs.github.io/pulse/documentation/pulse/networklogging-article)
-2. Follow [PulseUI docs](https://kean-docs.github.io/pulseui/documentation/pulseui/) to add Pulse console into your app (see `MainView`)
-2. Download [Pulse Pro](https://github.com/kean/PulsePro) to use remote logging and view logs shared from other devices
+The best way to start using Pulse is with the [**Getting Started**](https://kean-docs.github.io/pulse/documentation/pulse/gettingstarted) guide. There are many ways to use it and to learn more, see the dedicated docs: 
 
-## Documentation
-
-Pulse is easy to learn and use:
-
-- [Pulse Docs](https://kean-docs.github.io/pulse/documentation/pulse/) describe how to integrate the main framework and enable logging
-- [PulseUI Docs](https://kean-docs.github.io/pulseui/documentation/pulseui/) contains information about adding the debug menu and console into your app
-- [PulseLogHandler Docs](https://kean-docs.github.io/pulseloghandler/documentation/pulseloghandler/) describe how to use Pulse as [SwiftLog](https://github.com/apple/swift-log) backend
+- [**Pulse Docs**](https://kean-docs.github.io/pulse/documentation/pulse/) describe how to integrate the main framework and enable logging
+- [**PulseUI Docs**](https://kean-docs.github.io/pulseui/documentation/pulseui/) contains information about adding the debug menu and console into your app
+- [**PulseLogHandler Docs**](https://kean-docs.github.io/pulseloghandler/documentation/pulseloghandler/) describe how to use Pulse as [SwiftLog](https://github.com/apple/swift-log) backend
 
 <a href="https://kean.blog/pulse/home">
 <img src="https://user-images.githubusercontent.com/1567433/184552639-cf6765df-b5af-416b-95d3-0204e32df9d6.png">
@@ -39,6 +32,8 @@ Pulse is easy to learn and use:
 ## Pulse Pro
 
 [**Pulse Pro**](https://kean.blog/pulse/pro) is a professional open-source macOS app that allows you to view logs in real-time. The app is designed to be flexible, expansive, and precise while using all the familiar macOS patterns. It makes it easy to navigate large log files with table and text modes, filters, scroller markers, an all-new network inspector, JSON filters, and more.
+
+Both Pulse and Pulse Pro are fully open-source.
 
 ## Minimum Requirements
 
