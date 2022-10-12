@@ -6,6 +6,7 @@ Logger and network inspector for Apple platforms.
 
 ### Essentials
 
+- <doc:GettingStarted>
 - ``LoggerStore``
 
 ### Network Logging
