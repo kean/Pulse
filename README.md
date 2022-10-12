@@ -9,7 +9,7 @@ Record and inspect logs and `URLSession` network requests right from your iOS ap
 
 ## Sponsors 💖
 
-While you can use Pulse and Pulse Pro for free, if you enjoy it, please make sure to [support](https://github.com/sponsors/kean) it on GitHub Sponsors.
+While you can use Pulse and Pulse Pro for free, if you enjoy it, please [support](https://github.com/sponsors/kean) it on GitHub Sponsors.
 
 ## About
 
