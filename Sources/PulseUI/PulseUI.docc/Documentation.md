@@ -6,7 +6,7 @@ A set of components that you can integrate into your app to view the logs.
 
 The easiest way to integrate PulseUI is by using ``MainView`` (for SwiftUI) or ``MainViewController`` (for UIKit).
 
-![A sloth hanging off a tree.](pulseui-main.png)
+![PulseUI MainView](pulseui-main.png)
 
 In addition to ``MainView``, you can also show individual tabs. For example, if you have an existing debug menu and 
 
