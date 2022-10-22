@@ -1,5 +1,11 @@
 # Pulse 2.x
 
+## Pulse 2.1.4
+
+*Oct 22, 2022*
+
+- Fix xcodebuild & docc issue in Xcode 14.0
+
 ## Pulse 2.1.3
 
 *Sep 30, 2022*
