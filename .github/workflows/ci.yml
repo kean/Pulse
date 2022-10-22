@@ -44,7 +44,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Run Tests
-        run: Scripts/test.sh -d "OS=8.5,name=Apple Watch Series 6 - 44mm"
+        run: Scripts/test.sh -d "OS=8.5,name=Apple Watch Series 7 - 45mm"
   ios-xcode-13-3:
     name: Unit Tests (iOS 15.4, Xcode 13.3.1)
     runs-on: macOS-12
