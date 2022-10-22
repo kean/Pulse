@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>runDestinationsByUUID</key>
+	<dict>
+		<key>06D1E214-A40F-456F-838C-37646621B357</key>
+		<dict>
+			<key>localComputer</key>
+			<dict>
+				<key>busSpeedInMHz</key>
+				<integer>400</integer>
+				<key>cpuCount</key>
+				<integer>1</integer>
+				<key>cpuKind</key>
+				<string>6-Core Intel Core i7</string>
+				<key>cpuSpeedInMHz</key>
+				<integer>2200</integer>
+				<key>logicalCPUCoresPerPackage</key>
+				<integer>12</integer>
+				<key>modelCode</key>
+				<string>MacBookPro15,1</string>
+				<key>physicalCPUCoresPerPackage</key>
+				<integer>6</integer>
+				<key>platformIdentifier</key>
+				<string>com.apple.platform.macosx</string>
+			</dict>
+			<key>targetArchitecture</key>
+			<string>x86_64</string>
+			<key>targetDevice</key>
+			<dict>
+				<key>modelCode</key>
+				<string>iPhone10,6</string>
+				<key>platformIdentifier</key>
+				<string>com.apple.platform.iphonesimulator</string>
+			</dict>
+		</dict>
+		<key>B699C7A7-2279-455D-9896-4904EF31626D</key>
+		<dict>
+			<key>targetArchitecture</key>
+			<string>arm64e</string>
+			<key>targetDevice</key>
+			<dict>
+				<key>modelCode</key>
+				<string>iPhone12,3</string>
+				<key>platformIdentifier</key>
+				<string>com.apple.platform.iphoneos</string>
+			</dict>
+		</dict>
+	</dict>
+</dict>
+</plist>
