@@ -5,12 +5,6 @@
 import Foundation
 
 final class Regex {
-    static var isDebugModeEnabled = false
-
-    var numberOfCaptureGroups: Int {
-        return regex.numberOfCaptureGroups
-    }
-
     private let regex: NSRegularExpression
 
     struct Options: OptionSet {
