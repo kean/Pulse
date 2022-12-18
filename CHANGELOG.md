@@ -1,5 +1,9 @@
 # Pulse 2.x
 
+## Upcoming Release
+
+- Move .docc files back to Sources/ to make them available in Xcode
+
 ## Pulse 2.1.4
 
 *Oct 22, 2022*
