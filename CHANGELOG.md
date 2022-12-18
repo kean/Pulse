@@ -1,15 +1,10 @@
 # Pulse 2.x
 
-## Upcoming Release
-
-- Move .docc files back to Sources/ to make them available in Xcode
-- Fix an issue with tabbar transparency (iOS 15 feature) not always working as expected
-
 ## Pulse 2.1.4
 
-*Oct 22, 2022*
+*Dec 18, 2022*
 
-- Fix xcodebuild & docc issue in Xcode 14.0
+- Fix an issue with tabbar transparency (iOS 15 feature) not always working as expected
 
 ## Pulse 2.1.3
 
