@@ -30,6 +30,7 @@ struct NetworkInspectorView: View {
                 toolbar
             }
             selectedTabView
+                .clipped()
         }
         .navigationBarItems(trailing: trailingNavigationBarItems)
         .navigationBarTitle(Text(viewModel.title), displayMode: .inline)

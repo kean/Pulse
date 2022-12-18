@@ -3,6 +3,7 @@
 ## Upcoming Release
 
 - Move .docc files back to Sources/ to make them available in Xcode
+- Fix an issue with tabbar transparency (iOS 15 feature) not always working as expected
 
 ## Pulse 2.1.4
 
