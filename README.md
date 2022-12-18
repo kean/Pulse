@@ -5,15 +5,6 @@
 
 Record and inspect logs and `URLSession` network requests right from your iOS app. Shared logs and view them in [Pulse Pro](https://kean.blog/pulse/pro) or use remote logging to see them in real-time. Logs are stored locally and never leave your devices.
 
-## Sponsors 💖
-
-While you can use Pulse and Pulse Pro for free, if you do, please [support](https://github.com/sponsors/kean) it on GitHub Sponsors.
-
-<a target="_blank" rel="noopener noreferrer" href="https://getstream.io/chat/sdk/swiftui/?utm_source=Github&utm_medium=github_repo_content_ad&utm_content=Developer&utm_campaign=Pulse_October2022_SwiftUI_klmh22#gh-light-mode-only"><img src="https://user-images.githubusercontent.com/1567433/175186173-64eb53cb-b5d6-4ed4-aaca-87dbbb0834ab.png#gh-light-mode-only" width="300px" alt="Stream Logo" style="max-width: 100%;"></a>
-<a target="_blank" rel="noopener noreferrer" href="https://getstream.io/chat/sdk/swiftui/?utm_source=Github&utm_medium=github_repo_content_ad&utm_content=Developer&utm_campaign=Pulse_October2022_SwiftUI_klmh22#gh-dark-mode-only"><img src="https://user-images.githubusercontent.com/1567433/175562043-0ab82adc-e3c7-4c0b-8813-a7940ff41db8.png#gh-dark-mode-only" width="244px" alt="Stream Logo" style="max-width: 100%;"></a>
-
-Pulse is proudly sponsored by [Stream](https://getstream.io/chat/sdk/swiftui/?utm_source=Github&utm_medium=github_repo_content_ad&utm_content=Developer&utm_campaign=Pulse_October2022_SwiftUI_klmh22), the leading provider in enterprise grade Feed & Chat APIs.
-
 ## About
 
 `Pulse` is not just a tool, it's a framework. It records events from `URLSession` or from frameworks that use it, such as [Alamofire](https://github.com/Alamofire/Alamofire) or [Get](https://github.com/kean/Get), and displays them using `PulseUI` views that you integrate directly into your app. This way Pulse console is available for everyone who has your test builds. You or your QA team can view the logs on the device and easily share them to attach to bug reports.
