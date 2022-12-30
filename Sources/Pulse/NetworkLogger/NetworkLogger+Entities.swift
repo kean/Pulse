@@ -61,6 +61,12 @@ extension NetworkLogger {
             copy.headers = _redactingSensitiveHeaders(redactedHeaders, from: headers)
             return copy
         }
+
+        func redactingSensitiveHeaders(_ redactedHeaders: [Regex]) -> Request {
+            var copy = self
+            copy.headers = _redactingSensitiveHeaders(redactedHeaders, from: headers)
+            return copy
+        }
     }
 
     public struct Response: Hashable, Codable, Sendable {
@@ -79,6 +85,12 @@ extension NetworkLogger {
 
         /// Redacts values for the provided headers.
         public func redactingSensitiveHeaders(_ redactedHeaders: Set<String>) -> Response {
+            var copy = self
+            copy.headers = _redactingSensitiveHeaders(redactedHeaders, from: headers)
+            return copy
+        }
+
+        func redactingSensitiveHeaders(_ redactedHeaders: [Regex]) -> Response {
             var copy = self
             copy.headers = _redactingSensitiveHeaders(redactedHeaders, from: headers)
             return copy
@@ -489,4 +501,14 @@ private func _redactingSensitiveHeaders(_ redactedHeaders: Set<String>, from hea
         }
     }
     return newHeaders
+}
+
+private func _redactingSensitiveHeaders(_ redactedHeaders: [Regex], from headers: [String: String]?) -> [String: String]? {
+    guard let headers = headers else {
+        return nil
+    }
+    let redacted = headers.keys.filter { header in
+        redactedHeaders.contains { $0.isMatch(header) }
+    }
+    return _redactingSensitiveHeaders(Set(redacted), from: headers)
 }

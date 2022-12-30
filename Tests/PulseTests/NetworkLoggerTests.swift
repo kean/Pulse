@@ -133,6 +133,7 @@ final class NetworkLoggerTests: XCTestCase {
         logTask(url: "logging.example.com/path")
         logTask(url: "api.example.com")
         logTask(url: "pulse.com")
+        logTask(url: "example.com.net")
 
         // THEN only included path is logged
         let tasks = try store.allTasks()
@@ -210,6 +211,51 @@ final class NetworkLoggerTests: XCTestCase {
         let tasks = try store.allTasks()
         XCTAssertEqual(tasks.count, 1)
         XCTAssertTrue(tasks.contains(where: { $0.url ==  "api.example.com" }))
+    }
+
+    func testExcludeSensitiveHeaders() throws {
+        // GIVEN
+        logger = NetworkLogger(store: store) {
+            $0.excludedHeaders = ["Password", "Set-Cookie", "X-*"]
+        }
+
+        // WHEN
+        let url = URL(string: "example.com/login")!
+        var request = URLRequest(url: URL(string: "example.com/login")!)
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("123456", forHTTPHeaderField: "Password")
+
+        let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: "http/2.0", headerFields: [
+            "Set-Cookie": "token=123",
+            "Content-Type": "JSON",
+            "X-Name": "hello"
+        ])
+
+        logger.logTask({
+            let task = URLSession.shared.dataTask(with: request)
+            task.setValue(request, forKey: "currentRequest")
+            task.setValue(response, forKey: "response")
+            return task
+        }(), didCompleteWithError: nil)
+
+        // THEN sensitive headers are redacted from both requests and responses
+        let tasks = try store.allTasks()
+        XCTAssertEqual(tasks.count, 1)
+        let task = try XCTUnwrap(tasks.first)
+
+        XCTAssertEqual(task.originalRequest?.headers, [
+            "Password": "<private>",
+            "Content-Type": "application/json"
+        ])
+        XCTAssertEqual(task.currentRequest?.headers, [
+            "Password": "<private>",
+            "Content-Type": "application/json"
+        ])
+        XCTAssertEqual(task.response?.headers, [
+            "Set-Cookie": "<private>",
+            "X-Name": "<private>",
+            "Content-Type": "JSON"
+        ])
     }
 
     // MARK: Helpers

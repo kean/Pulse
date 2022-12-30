@@ -12,10 +12,11 @@ public final class NetworkLogger: @unchecked Sendable {
     private let configuration: Configuration
     private let store: LoggerStore
 
-    private let includedHosts: [Regex]
-    private let includedURLs: [Regex]
-    private let excludedHosts: [Regex]
-    private let excludedURLs: [Regex]
+    private var includedHosts: [Regex] = []
+    private var includedURLs: [Regex] = []
+    private var excludedHosts: [Regex] = []
+    private var excludedURLs: [Regex] = []
+    private var excludedHeaders: [Regex] = []
 
     private let lock = NSLock()
 
@@ -50,6 +51,12 @@ public final class NetworkLogger: @unchecked Sendable {
         /// when ``isRegexEnabled`` option is enabled.
         public var excludedURLs: Set<String> = []
 
+        /// Excludes the given HTTP headers from logged requests and responses.
+        ///
+        /// - note: Supports wildcards, e.g. `X-*`, and full regex
+        /// when ``isRegexEnabled`` option is enabled.
+        public var excludedHeaders: Set<String> = []
+
         /// If enabled, processes `include` and `exclude` patterns using regex.
         /// By default, patterns support only basic wildcard syntax: `*.example.com`.
         public var isRegexEnabled = false
@@ -74,12 +81,26 @@ public final class NetworkLogger: @unchecked Sendable {
     public init(store: LoggerStore = .shared, configuration: Configuration = .init()) {
         self.store = store
         self.configuration = configuration
+        self.processPatterns()
+    }
 
+    /// Initialiers and configures the network logger.
+    public convenience init(store: LoggerStore = .shared, _ configure: (inout Configuration) -> Void) {
+        var configuration = Configuration()
+        configure(&configuration)
+        self.init(store: store, configuration: configuration)
+    }
+
+    // MARK: Patterns
+
+    private func processPatterns() {
         func process(_ pattern: String) -> Regex? {
+            process(pattern, options: [])
+        }
+
+        func process(_ pattern: String, options: [Regex.Options]) -> Regex? {
             do {
-                let pattern = configuration.isRegexEnabled ? pattern : pattern
-                    .replacingOccurrences(of: ".", with: "\\.")
-                    .replacingOccurrences(of: "*", with: ".*?")
+                let pattern = configuration.isRegexEnabled ? pattern : expandingWildcards(pattern)
                 return try Regex(pattern)
             } catch {
                 debugPrint("Failed to parse pattern: \(pattern) \(error)")
@@ -91,13 +112,7 @@ public final class NetworkLogger: @unchecked Sendable {
         self.includedURLs = configuration.includedURLs.compactMap(process)
         self.excludedHosts = configuration.excludedHosts.compactMap(process)
         self.excludedURLs = configuration.excludedURLs.compactMap(process)
-    }
-
-    /// Initialiers and configures the network logger.
-    public convenience init(store: LoggerStore = .shared, _ configure: (inout Configuration) -> Void) {
-        var configuration = Configuration()
-        configure(&configuration)
-        self.init(store: store, configuration: configuration)
+        self.excludedHeaders = configuration.excludedHeaders.compactMap { process($0, options: [.caseInsensitive]) }
     }
 
     // MARK: Logging
@@ -197,12 +212,13 @@ public final class NetworkLogger: @unchecked Sendable {
         guard filter(event) else {
             return
         }
-        guard let event = configuration.willHandleEvent(event) else {
+        guard let event = configuration.willHandleEvent(preprocess(event)) else {
             return
         }
         store.handle(event)
     }
 
+    /// Check if the events can be stored (included and not excluded).
     private func filter(_ event: LoggerStore.Event) -> Bool {
         guard let url = event.url else {
             return false // Should never happen
@@ -225,6 +241,27 @@ public final class NetworkLogger: @unchecked Sendable {
             return false
         }
         return true
+    }
+
+    private func preprocess(_ event: LoggerStore.Event) -> LoggerStore.Event {
+        guard !excludedHeaders.isEmpty else {
+            return event
+        }
+        switch event {
+        case .messageStored, .networkTaskProgressUpdated:
+            return event
+        case .networkTaskCreated(let event):
+            var event = event
+            event.originalRequest = event.originalRequest.redactingSensitiveHeaders(excludedHeaders)
+            event.currentRequest = event.currentRequest?.redactingSensitiveHeaders(excludedHeaders)
+            return .networkTaskCreated(event)
+        case .networkTaskCompleted(let event):
+            var event = event
+            event.originalRequest = event.originalRequest.redactingSensitiveHeaders(excludedHeaders)
+            event.currentRequest = event.currentRequest?.redactingSensitiveHeaders(excludedHeaders)
+            event.response = event.response?.redactingSensitiveHeaders(excludedHeaders)
+            return .networkTaskCompleted(event)
+        }
     }
 
     // MARK: - Private
@@ -274,4 +311,11 @@ private extension URLSessionTask {
     var url: String? {
         originalRequest?.url?.absoluteString
     }
+}
+
+private func expandingWildcards(_ pattern: String) -> String {
+    let pattern = pattern
+        .replacingOccurrences(of: ".", with: "\\.")
+        .replacingOccurrences(of: "*", with: ".*?")
+    return "^\(pattern)$"
 }
