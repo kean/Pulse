@@ -10,8 +10,70 @@ import Foundation
 
 // MARK: - Redacting Sensitive Headers
 
+extension LoggerStore.Event {
+    func redactingSensitiveHeaders(_ excludedHeaders: [Regex]) -> Self {
+        guard !excludedHeaders.isEmpty else {
+            return self
+        }
+        switch self {
+        case .messageStored, .networkTaskProgressUpdated:
+            return self
+        case .networkTaskCreated(let event):
+            var event = event
+            event.originalRequest = event.originalRequest.redactingSensitiveHeaders(excludedHeaders)
+            event.currentRequest = event.currentRequest?.redactingSensitiveHeaders(excludedHeaders)
+            return .networkTaskCreated(event)
+        case .networkTaskCompleted(let event):
+            var event = event
+            event.originalRequest = event.originalRequest.redactingSensitiveHeaders(excludedHeaders)
+            event.currentRequest = event.currentRequest?.redactingSensitiveHeaders(excludedHeaders)
+            event.response = event.response?.redactingSensitiveHeaders(excludedHeaders)
+            event.metrics = event.metrics?.redactingSensitiveHeaders(excludedHeaders)
+            return .networkTaskCompleted(event)
+        }
+    }
+
+    func redactingSensitiveQueryItems(_ excludedQueryItems: Set<String>) -> Self {
+        guard !excludedQueryItems.isEmpty else {
+            return self
+        }
+        switch self {
+        case .messageStored, .networkTaskProgressUpdated:
+            return self
+        case .networkTaskCreated(let event):
+            var event = event
+            event.originalRequest = event.originalRequest.redactingSensitiveQueryItems(excludedQueryItems)
+            event.currentRequest = event.currentRequest?.redactingSensitiveQueryItems(excludedQueryItems)
+            return .networkTaskCreated(event)
+        case .networkTaskCompleted(let event):
+            var event = event
+            event.originalRequest = event.originalRequest.redactingSensitiveQueryItems(excludedQueryItems)
+            event.currentRequest = event.currentRequest?.redactingSensitiveQueryItems(excludedQueryItems)
+            event.metrics = event.metrics?.redactingSensitiveQueryItems(excludedQueryItems)
+            return .networkTaskCompleted(event)
+        }
+    }
+
+    func redactingSensitiveResponseDataFields(_ excludedDataFields: Set<String>) -> LoggerStore.Event {
+        guard !excludedDataFields.isEmpty else {
+            return self
+        }
+        switch self {
+        case .messageStored, .networkTaskProgressUpdated, .networkTaskCreated:
+            return self
+        case .networkTaskCompleted(let event):
+            var event = event
+            event.requestBody = event.requestBody?.redactingSensitiveFields(excludedDataFields)
+            event.responseBody = event.responseBody?.redactingSensitiveFields(excludedDataFields)
+            return .networkTaskCompleted(event)
+        }
+    }
+}
+
+// MARK: - Redacting Headers
+
 extension NetworkLogger.Request {
-    /// Redacts values for the provided headers.
+    /// Soft-deprecated in Pulse 2.2
     public func redactingSensitiveHeaders(_ redactedHeaders: Set<String>) -> Self {
         var copy = self
         copy.headers = _redactingSensitiveHeaders(redactedHeaders, from: headers)
@@ -26,7 +88,7 @@ extension NetworkLogger.Request {
 }
 
 extension NetworkLogger.Response {
-    /// Redacts values for the provided headers.
+    /// Soft-deprecated in Pulse 2.2
     public func redactingSensitiveHeaders(_ redactedHeaders: Set<String>) -> Self {
         var copy = self
         copy.headers = _redactingSensitiveHeaders(redactedHeaders, from: headers)
@@ -40,7 +102,7 @@ extension NetworkLogger.Response {
     }
 }
 
-extension NetworkLogger.Metrics {
+private extension NetworkLogger.Metrics {
     func redactingSensitiveHeaders(_ redactedHeaders: [Regex]) -> Self {
         var copy = self
         copy.transactions = transactions.map {
@@ -79,9 +141,47 @@ private func _redactingSensitiveHeaders(_ redactedHeaders: [Regex], from headers
     return _redactingSensitiveHeaders(Set(redacted), from: headers)
 }
 
-// MARK: - Redacting Sensitive Data Fields
+// MARK: - Redacting Query Items
 
-extension Data {
+private extension NetworkLogger.Request {
+    func redactingSensitiveQueryItems(_ redactedQueryItems: Set<String>) -> Self {
+        var copy = self
+        copy.url = url?.redactingSensitiveQueryItems(redactedQueryItems)
+        return copy
+    }
+}
+
+private extension NetworkLogger.Metrics {
+    func redactingSensitiveQueryItems(_ redactedQueryItems: Set<String>) -> Self {
+        var copy = self
+        copy.transactions = transactions.map {
+            var transaction = $0
+            transaction.request = transaction.request.redactingSensitiveQueryItems(redactedQueryItems)
+            return transaction
+        }
+        return copy
+    }
+}
+
+private extension URL {
+    func redactingSensitiveQueryItems(_ redactedQueryItems: Set<String>) -> Self {
+        guard var components = URLComponents(url: self, resolvingAgainstBaseURL: false) else {
+            return self
+        }
+        components.queryItems = components.queryItems?.map {
+            var item = $0
+            if redactedQueryItems.contains($0.name.lowercased()) {
+                item.value = "private"
+            }
+            return item
+        }
+        return components.url ?? self
+    }
+}
+
+// MARK: - Redacting Data Fields
+
+private extension Data {
     func redactingSensitiveFields(_ fields: Set<String>) -> Data {
         guard let json = try? JSONSerialization.jsonObject(with: self)  else {
             return self
@@ -91,7 +191,7 @@ extension Data {
     }
 }
 
-func redactingSensitiveFields(_ value: Any, _ fields: Set<String>) -> Any {
+private func redactingSensitiveFields(_ value: Any, _ fields: Set<String>) -> Any {
     switch value {
     case var object as [String: Any]:
         for key in object.keys.filter(fields.contains) {

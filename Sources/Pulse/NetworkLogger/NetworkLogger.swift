@@ -16,8 +16,10 @@ public final class NetworkLogger: @unchecked Sendable {
     private var includedURLs: [Regex] = []
     private var excludedHosts: [Regex] = []
     private var excludedURLs: [Regex] = []
-    private var excludedHeaders: [Regex] = []
-    private var excludedDataFields: Set<String> = []
+
+    private var sensitiveHeaders: [Regex] = []
+    private var sensitiveQueryItems: Set<String> = []
+    private var sensitiveDataFields: Set<String> = []
 
     private let lock = NSLock()
 
@@ -56,12 +58,17 @@ public final class NetworkLogger: @unchecked Sendable {
         ///
         /// - note: Supports wildcards, e.g. `X-*`, and full regex
         /// when ``isRegexEnabled`` option is enabled.
-        public var excludedHeaders: Set<String> = []
+        public var sensitiveHeaders: Set<String> = []
+
+        /// Redact the given query items from the URLs.
+        ///
+        /// - note: Supports only plain strings. Case-sensitive.
+        public var sensitiveQueryItems: Set<String> = []
 
         /// Redact the given JSON fields from the logged requests and responses bodies.
         ///
-        /// - note: Unlike other options, doesn't support wildcards or regex.
-        public var excludedDataFields: Set<String> = []
+        /// - note: Supports only plain strings. Case-sensitive.
+        public var sensitiveDataFields: Set<String> = []
 
         /// If enabled, processes `include` and `exclude` patterns using regex.
         /// By default, patterns support only basic wildcard syntax: `*.example.com`.
@@ -122,10 +129,11 @@ public final class NetworkLogger: @unchecked Sendable {
         self.includedURLs = configuration.includedURLs.compactMap(process)
         self.excludedHosts = configuration.excludedHosts.compactMap(process)
         self.excludedURLs = configuration.excludedURLs.compactMap(process)
-        self.excludedHeaders = configuration.excludedHeaders.compactMap {
+        self.sensitiveHeaders = configuration.sensitiveHeaders.compactMap {
             process($0, options: [.caseInsensitive])
         }
-        self.excludedDataFields = configuration.excludedDataFields
+        self.sensitiveQueryItems = configuration.sensitiveQueryItems
+        self.sensitiveDataFields = configuration.sensitiveDataFields
     }
 
     // MARK: Logging
@@ -257,44 +265,10 @@ public final class NetworkLogger: @unchecked Sendable {
     }
 
     private func preprocess(_ event: LoggerStore.Event) -> LoggerStore.Event {
-        removeExcludedResponseFields(removeExcludedHeaders(event))
-    }
-
-    private func removeExcludedHeaders(_ event: LoggerStore.Event) -> LoggerStore.Event {
-        guard !excludedHeaders.isEmpty else {
-            return event
-        }
-        switch event {
-        case .messageStored, .networkTaskProgressUpdated:
-            return event
-        case .networkTaskCreated(let event):
-            var event = event
-            event.originalRequest = event.originalRequest.redactingSensitiveHeaders(excludedHeaders)
-            event.currentRequest = event.currentRequest?.redactingSensitiveHeaders(excludedHeaders)
-            return .networkTaskCreated(event)
-        case .networkTaskCompleted(let event):
-            var event = event
-            event.originalRequest = event.originalRequest.redactingSensitiveHeaders(excludedHeaders)
-            event.currentRequest = event.currentRequest?.redactingSensitiveHeaders(excludedHeaders)
-            event.response = event.response?.redactingSensitiveHeaders(excludedHeaders)
-            event.metrics = event.metrics?.redactingSensitiveHeaders(excludedHeaders)
-            return .networkTaskCompleted(event)
-        }
-    }
-
-    private func removeExcludedResponseFields(_ event: LoggerStore.Event) -> LoggerStore.Event {
-        guard !excludedDataFields.isEmpty else {
-            return event
-        }
-        switch event {
-        case .messageStored, .networkTaskProgressUpdated, .networkTaskCreated:
-            return event
-        case .networkTaskCompleted(let event):
-            var event = event
-            event.requestBody = event.requestBody?.redactingSensitiveFields(excludedDataFields)
-            event.responseBody = event.responseBody?.redactingSensitiveFields(excludedDataFields)
-            return .networkTaskCompleted(event)
-        }
+        event
+            .redactingSensitiveHeaders(sensitiveHeaders)
+            .redactingSensitiveQueryItems(sensitiveQueryItems)
+            .redactingSensitiveResponseDataFields(sensitiveDataFields)
     }
 
     // MARK: - Private

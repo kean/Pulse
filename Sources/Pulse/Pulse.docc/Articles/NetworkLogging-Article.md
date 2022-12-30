@@ -87,7 +87,7 @@ let delegate = URLSessionProxyDelegate(logger: logger, delegate: YourURLSessionD
 logger.logTask(task, didFinishDecodingWithError: decodingError)
 ```
 
-## Exclude Information From the Logs
+## Exclude Information From Logs
 
 There is usually some sensitive information in network requests, such as passwords, access tokens, and more. It's important to keep it safe.
 
@@ -109,10 +109,13 @@ let logger = NetworkLogger {
     $0.excludedURLs = ["*/log/event"]
 
     // Replaces values for the given HTTP headers with "<private>"
-    $0.excludedHeaders = ["Authorization", "Access-Token"]
+    $0.sensitiveHeaders = ["Authorization", "Access-Token"]
+
+    // Redacts senstive query items.
+    $0.sensitiveQueryItems = ["password"]
 
     // Replaces values for the given response and request JSON fields with "<private>"
-    $0.excludedDataFields = ["Refresh-Token"]
+    $0.sensitiveDataFields = ["Refresh-Token"]
 }
 ```
 

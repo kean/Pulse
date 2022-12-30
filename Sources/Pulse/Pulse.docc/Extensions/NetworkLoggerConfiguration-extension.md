@@ -6,14 +6,18 @@
 
 - ``init()``
 
-### Exclude Information From the Logs
+### Exclude Requests From Logs
 
 - ``includedHosts``
 - ``excludedHosts``
 - ``includedURLs``
 - ``excludedURLs``
-- ``excludedHeaders``
-- ``isRegexEnabled``
+
+### Redact Sensitive Information
+
+- ``sensitiveHeaders``
+- ``sensitiveQueryItems``
+- ``sensitiveDataFields``
 
 ### Observe and Filter Events
 

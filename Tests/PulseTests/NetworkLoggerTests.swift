@@ -264,6 +264,41 @@ final class NetworkLoggerTests: XCTestCase {
         ])
     }
 
+    func testExcludeSentitiveQueryItems() throws {
+        // GIVEN
+        logger = NetworkLogger(store: store) {
+            $0.excludedQueryItems = ["password"]
+        }
+
+        // WHEN
+        let request = URLRequest(url: URL(string: "api.example.com/path?password=123456&mobile=true")!)
+        let dataTask = URLSession.shared.dataTask(with: request)
+        logger.logTask(dataTask, didFinishCollecting: MockDataTask.login.metrics)
+        logger.logTask(dataTask, didCompleteWithError: nil)
+
+        // THEN only included path is logged
+        let tasks = try store.allTasks()
+        XCTAssertEqual(tasks.count, 1)
+        let task = try XCTUnwrap(tasks.first)
+        do {
+            let url = try XCTUnwrap(URL(string: task.originalRequest?.url ?? ""))
+            let queryItem = try XCTUnwrap(url.queryItems.first(where: { $0.name == "password" }))
+            XCTAssertEqual(queryItem.value, "private")
+        }
+        do {
+            let url = try XCTUnwrap(URL(string: task.currentRequest?.url ?? ""))
+            let queryItem = try XCTUnwrap(url.queryItems.first(where: { $0.name == "password" }))
+            XCTAssertEqual(queryItem.value, "private")
+        }
+        do {
+            XCTAssertEqual(task.transactions.count, 1)
+            let request = try XCTUnwrap(task.transactions.first?.request)
+            let url = try XCTUnwrap(URL(string: request.url ?? ""))
+            let queryItem = try XCTUnwrap(url.queryItems.first(where: { $0.name == "password" }))
+            XCTAssertEqual(queryItem.value, "private")
+        }
+    }
+
     func testExcludeSensitiveResponseFields() throws {
         // GIVEN
         logger = NetworkLogger(store: store) {
@@ -296,5 +331,11 @@ final class NetworkLoggerTests: XCTestCase {
         let request = URLRequest(url: URL(string: url)!)
         let task = URLSession.shared.dataTask(with: request)
         logger.logTask(task, didCompleteWithError: nil)
+    }
+}
+
+private extension URL {
+    var queryItems: [URLQueryItem] {
+        URLComponents(url: self, resolvingAgainstBaseURL: false)?.queryItems ?? []
     }
 }
