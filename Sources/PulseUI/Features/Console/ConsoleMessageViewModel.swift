@@ -26,7 +26,8 @@ final class ConsoleMessageViewModel: Pinnable {
         if let badge = badge {
             string.append(badge.title, [.foregroundColor: UIColor.badgeColor(for: level)])
         }
-        if message.label.name != "default" {
+        let label = message.label.name
+        if label != "default", !label.isEmpty {
             let prefix = badge == nil ? "" : " · "
             string.append("\(prefix)\(message.label.name.capitalized)", [.foregroundColor: UIColor.secondaryLabel])
         }
@@ -45,7 +46,7 @@ final class ConsoleMessageViewModel: Pinnable {
     
     init(message: LoggerMessageEntity, searchCriteriaViewModel: ConsoleSearchCriteriaViewModel? = nil) {
         let time = ConsoleMessageViewModel.timeFormatter.string(from: message.createdAt)
-        if message.label.name == "default" {
+        if message.label.name == "default" || message.label.name.isEmpty {
             self.title = time
         } else {
             self.title = "\(time) · \(message.label.name.capitalized)"
