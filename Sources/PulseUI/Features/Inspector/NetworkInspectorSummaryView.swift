@@ -67,7 +67,6 @@ struct NetworkInspectorSummaryView: View {
     private var originalRequestSection: some View {
         Section(header: requestHeaderView) {
             VStack(spacing: 16) {
-                KeyValueSectionView(viewModel: viewModel.currentHeadersCookies)
                 viewModel.originalRequestSummary.map(KeyValueSectionView.init)
                 viewModel.originalRequestQueryItems.map { KeyValueSectionView(viewModel: $0, limit: 10) }
                 KeyValueSectionView(viewModel: viewModel.originalRequestHeaders, limit: 10)

@@ -89,10 +89,9 @@ final class NetworkInspectorHeaderViewModel: ObservableObject {
         return KeyValueSectionViewModel(
             title: "Request Headers (Original)",
             color: .blue,
-            action: ActionViewModel(
-                action: { [unowned self] in isRequestOriginalRawActive = true },
-                title: "View Raw"
-            ),
+            action: ActionViewModel(title: "View Raw") { [unowned self] in
+                isRequestOriginalRawActive = true
+            },
             items: items
         )
     }
@@ -102,10 +101,9 @@ final class NetworkInspectorHeaderViewModel: ObservableObject {
         return KeyValueSectionViewModel(
             title: "Request Headers (Current)",
             color: .blue,
-            action: ActionViewModel(
-                action: { [unowned self] in isRequestCurrentRawActive = true },
-                title: "View Raw"
-            ),
+            action: ActionViewModel(title: "View Raw") { [unowned self] in
+                isRequestCurrentRawActive = true
+            },
             items: items
         )
     }
@@ -117,10 +115,9 @@ final class NetworkInspectorHeaderViewModel: ObservableObject {
         return KeyValueSectionViewModel(
             title: "Response Headers",
             color: .indigo,
-            action: ActionViewModel(
-                action: { [unowned self] in isResponseRawActive = true },
-                title: "View Raw"
-            ),
+            action: ActionViewModel(title: "View Raw") { [unowned self] in
+                isResponseRawActive = true
+            },
             items: headers.sorted(by: { $0.key < $1.key })
         )
     }

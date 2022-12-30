@@ -121,10 +121,9 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
         return KeyValueSectionViewModel(
             title: "Request Body",
             color: .blue,
-            action: ActionViewModel(
-                action: { [unowned self] in isRequestRawLinkActive = true },
-                title: "View"
-            ),
+            action: ActionViewModel(title: "View") { [unowned self] in
+                isRequestRawLinkActive = true
+            },
             items: [
                 ("Content-Type", contentType),
                 ("Size", ByteCountFormatter.string(fromByteCount: task.requestBodySize))
@@ -166,10 +165,9 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
         return KeyValueSectionViewModel(
             title: "Request Body",
             color: .blue,
-            action: ActionViewModel(
-                action: { [unowned self] in isRequestRawLinkActive = true },
-                title: "View"
-            ),
+            action: ActionViewModel(title: "View") { [unowned self] in
+                isRequestRawLinkActive = true
+            },
             items: [
                 ("Content-Type", contentType),
                 ("Size", ByteCountFormatter.string(fromByteCount: task.requestBodySize))
@@ -202,10 +200,9 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
         return KeyValueSectionViewModel(
             title: "Response Body",
             color: .indigo,
-            action: ActionViewModel(
-                action: { [unowned self] in isResponseRawLinkActive = true },
-                title: "View"
-            ),
+            action: ActionViewModel(title: "View") { [unowned self] in
+                isResponseRawLinkActive = true
+            },
             items: [
                 ("Content-Type", task.response?.contentType?.rawValue),
                 ("Size", task.isFromCache ? size + " (from cache)": size)
