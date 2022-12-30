@@ -216,7 +216,7 @@ final class NetworkLoggerTests: XCTestCase {
     func testExcludeSensitiveHeaders() throws {
         // GIVEN
         logger = NetworkLogger(store: store) {
-            $0.excludedHeaders = ["Password", "Set-Cookie", "X-*"]
+            $0.sensitiveHeaders = ["Password", "Set-Cookie", "X-*"]
         }
 
         // WHEN
@@ -267,7 +267,7 @@ final class NetworkLoggerTests: XCTestCase {
     func testExcludeSentitiveQueryItems() throws {
         // GIVEN
         logger = NetworkLogger(store: store) {
-            $0.excludedQueryItems = ["password"]
+            $0.sensitiveQueryItems = ["password"]
         }
 
         // WHEN
@@ -302,7 +302,7 @@ final class NetworkLoggerTests: XCTestCase {
     func testExcludeSensitiveResponseFields() throws {
         // GIVEN
         logger = NetworkLogger(store: store) {
-            $0.excludedDataFields = ["access-token", "refresh-token"]
+            $0.sensitiveDataFields = ["access-token", "refresh-token"]
         }
 
         // WHEN
