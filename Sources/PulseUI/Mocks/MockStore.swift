@@ -97,7 +97,7 @@ private func _asyncPopulateStore(_ store: LoggerStore) async {
 
         await Task.sleep(milliseconds: 800)
 
-        logger(named: "application")
+        logger(named: "default")
                 .log(level: .debug, "Will navigate to Dashboard")
     }
 

@@ -93,12 +93,7 @@ private extension BadgeViewModel {
     }
     
     init?(level: LoggerStore.Level) {
-        switch level {
-        case .critical, .error, .warning, .info, .notice:
-            self.init(title: level.name.uppercased(), color: .badgeColor(for: level))
-        case .debug, .trace:
-            return nil // Don't show
-        }
+        self.init(title: level.name.uppercased(), color: .badgeColor(for: level))
     }
 }
 
@@ -115,8 +110,8 @@ extension Color {
         case .warning: return .orange
         case .info: return .blue
         case .notice: return .indigo
-        case .debug: return .primary
-        case .trace: return .primary
+        case .debug: return .secondary
+        case .trace: return .secondary
         }
     }
     
@@ -147,8 +142,8 @@ extension UIColor {
         case .warning: return .systemOrange
         case .info: return .systemBlue
         case .notice: return .systemBlue
-        case .debug: return .label
-        case .trace: return .label
+        case .debug: return .secondaryLabel
+        case .trace: return .secondaryLabel
         }
     }
     
