@@ -167,7 +167,7 @@ public final class NetworkLogger: @unchecked Sendable {
     private func _logTask(_ task: URLSessionTask, didCompleteWithError error: Error?) {
         lock.lock()
         let context = self.context(for: task)
-        tasks[ObjectIdentifier(task)] = nil
+        tasks[TaskKey(task: task)] = nil
 
         guard let originalRequest = task.originalRequest ?? context.request else {
             lock.unlock()
@@ -229,7 +229,7 @@ public final class NetworkLogger: @unchecked Sendable {
 
     // MARK: - Private
 
-    private var tasks: [ObjectIdentifier: TaskContext] = [:]
+    private var tasks: [TaskKey: TaskContext] = [:]
 
     final class TaskContext {
         let taskId = UUID()
@@ -240,11 +240,12 @@ public final class NetworkLogger: @unchecked Sendable {
 
     private func context(for task: URLSessionTask) -> TaskContext {
         func getContext() -> TaskContext {
-            if let context = tasks[ObjectIdentifier(task)] {
+            let key = TaskKey(task: task)
+            if let context = tasks[key] {
                 return context
             }
             let context = TaskContext()
-            tasks[ObjectIdentifier(task)] = context
+            tasks[key] = context
             return context
         }
         let context = getContext()
@@ -252,6 +253,20 @@ public final class NetworkLogger: @unchecked Sendable {
             context.request = request
         }
         return context
+    }
+
+    private struct TaskKey: Hashable {
+        weak var task: URLSessionTask?
+
+        var id: ObjectIdentifier? { task.map(ObjectIdentifier.init) }
+
+        func hash(into hasher: inout Hasher) {
+            hasher.combine(id?.hashValue)
+        }
+
+        static func == (lhs: TaskKey, rhs: TaskKey) -> Bool {
+            lhs.task != nil && lhs.id == rhs.id
+        }
     }
 }
 
