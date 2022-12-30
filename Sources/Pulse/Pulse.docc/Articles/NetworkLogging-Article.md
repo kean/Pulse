@@ -115,7 +115,7 @@ let logger = NetworkLogger {
     $0.sensitiveQueryItems = ["password"]
 
     // Replaces values for the given response and request JSON fields with "<private>"
-    $0.sensitiveDataFields = ["Refresh-Token"]
+    $0.sensitiveDataFields = ["password"]
 }
 ```
 
