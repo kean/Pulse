@@ -158,6 +158,17 @@ extension NetworkLogger {
             self.redirectCount = redirectCount
             self.transactions = transactions
         }
+
+        func redactingSensitiveHeaders(_ redactedHeaders: [Regex]) -> Metrics {
+            var copy = self
+            copy.transactions = transactions.map {
+                var transaction = $0
+                transaction.request = transaction.request.redactingSensitiveHeaders(redactedHeaders)
+                transaction.response = transaction.response?.redactingSensitiveHeaders(redactedHeaders)
+                return transaction
+            }
+            return copy
+        }
     }
 
     public struct TransferSizeInfo: Codable, Sendable {

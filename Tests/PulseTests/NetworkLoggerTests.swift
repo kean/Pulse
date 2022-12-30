@@ -231,12 +231,12 @@ final class NetworkLoggerTests: XCTestCase {
             "X-Name": "hello"
         ])
 
-        logger.logTask({
-            let task = URLSession.shared.dataTask(with: request)
-            task.setValue(request, forKey: "currentRequest")
-            task.setValue(response, forKey: "response")
-            return task
-        }(), didCompleteWithError: nil)
+        let dataTask = URLSession.shared.dataTask(with: request)
+        dataTask.setValue(request, forKey: "currentRequest")
+        dataTask.setValue(response, forKey: "response")
+
+        logger.logTask(dataTask, didFinishCollecting: MockDataTask.login.metrics)
+        logger.logTask(dataTask, didCompleteWithError: nil)
 
         // THEN sensitive headers are redacted from both requests and responses
         let tasks = try store.allTasks()
@@ -255,6 +255,12 @@ final class NetworkLoggerTests: XCTestCase {
             "Set-Cookie": "<private>",
             "X-Name": "<private>",
             "Content-Type": "JSON"
+        ])
+        let responseFromMetrics = try XCTUnwrap(task.transactions.first(where: {
+            $0.response?.headers.keys.contains("Set-Cookie") ?? false
+        })?.response)
+        XCTAssertEqual(responseFromMetrics.headers, [
+            "Set-Cookie": "<private>"
         ])
     }
 

@@ -264,6 +264,7 @@ public final class NetworkLogger: @unchecked Sendable {
             event.originalRequest = event.originalRequest.redactingSensitiveHeaders(excludedHeaders)
             event.currentRequest = event.currentRequest?.redactingSensitiveHeaders(excludedHeaders)
             event.response = event.response?.redactingSensitiveHeaders(excludedHeaders)
+            event.metrics = event.metrics?.redactingSensitiveHeaders(excludedHeaders)
             return .networkTaskCompleted(event)
         }
     }
