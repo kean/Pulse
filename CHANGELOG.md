@@ -6,7 +6,7 @@
 - Add `excludedHeaders` to `NetworkLogger/Configuration` for redacting sentitive information from logged HTTP headers 
 - Add a new convenience initializer to `NetworkLogger` with `configure` trailing closure
 - Make `LoggerStore.Event` frozen
-- Add cookies section and details screens to the request summary - [#124](https://github.com/kean/Pulse/pull/124) 
+- Add cookies section and details screens to the request summary - [#124](https://github.com/kean/Pulse/pull/124)
 
 ## Pulse 2.1.4
 

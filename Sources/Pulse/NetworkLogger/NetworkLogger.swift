@@ -25,7 +25,7 @@ public final class NetworkLogger: @unchecked Sendable {
         /// If enabled, the requests are not marked as completed until the decoding
         /// is done (see ``NetworkLogger/logTask(_:didFinishDecodingWithError:)``.
         /// If the request itself fails, the task completes immediately.
-        public var isWaitingForDecoding: Bool
+        public var isWaitingForDecoding = false
 
         /// Stores logs only for the included hosts.
         ///
@@ -67,7 +67,12 @@ public final class NetworkLogger: @unchecked Sendable {
         /// is ignored completely.
         public var willHandleEvent: @Sendable (LoggerStore.Event) -> LoggerStore.Event? = { $0 }
 
-        /// Initializes the configuration.
+        /// Initializes the default configuration.
+        public init() {
+}
+
+        // Deprecated in Pulse 2.2
+        @available(*, deprecated, message: "The isWaitingForDecoding parameter was removed")
         public init(isWaitingForDecoding: Bool = false) {
             self.isWaitingForDecoding = isWaitingForDecoding
         }

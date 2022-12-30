@@ -1,31 +1,28 @@
-# ``Pulse/NetworkLogger``
+# ``Pulse/NetworkLogger/Configuration``
 
 ## Topics
 
 ### Initializers
 
-- ``init(store:configuration:)``
-- ``Configuration``
+- ``init()``
 
-### Logging Events
+### Including and Excluding Information From the Logs
 
-- ``logTaskCreated(_:)``
-- ``logDataTask(_:didReceive:)``
-- ``logTask(_:didUpdateProgress:)``
-- ``logTask(_:didFinishCollecting:)-xcb1``
-- ``logTask(_:didFinishCollecting:)-vuf``
-- ``logTask(_:didCompleteWithError:)``
-- ``logTask(_:didFinishDecodingWithError:)``
+- ``includedHosts``
+- ``excludedHosts``
+- ``includedURLs``
+- ``excludedURLs``
+- ``excludedHeaders``
+- ``isRegexEnabled``
 
-### Network Entities
+### Observing and Filtering Events
 
-- ``Request``
-- ``Response``
-- ``ResponseError``
-- ``Metrics``
-- ``TransactionMetrics``
-- ``TransferSizeInfo``
-- ``TransactionTimingInfo``
-- ``ContentType``
-- ``DecodingError``
-- ``TaskType``
+- ``willHandleEvent``
+
+### Managing Logger Behavior
+
+- ``isWaitingForDecoding``
+
+### Deprecated
+
+- ``init(isWaitingForDecoding:)``
