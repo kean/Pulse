@@ -114,6 +114,8 @@ configuration.willHandleEvent = { event in
 }
 ```
 
+> tip: You can also use convenience ``NetworkLogger/Configuration/includedHosts``, ``NetworkLogger/Configuration/includedURLs``, ``NetworkLogger/Configuration/excludedHosts``, and ``NetworkLogger/Configuration/excludedURLs`` configuration options to control what tasks are logged. By default, they support simple wildcards, e.g. `*.example.com`, but you can also enable full regex using another new configuration options: ``NetworkLogger/Configuration/isRegexEnabled``.
+
 > important: If you do decide to redact some information from requests or responses, make sure to also update ``NetworkLogger/Metrics`` because individual transactions within metrics contain recorded request and response pairs.
 
 ## Trace in Xcode Console

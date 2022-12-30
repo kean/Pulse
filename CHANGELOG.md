@@ -1,5 +1,10 @@
 # Pulse 2.x
 
+## Upcoming
+
+- Add `includedHosts`, `includedURLs`, `excludedHosts`, and `excludedURLs` to `NetworkLogger.Configuration`. By default, they support simple wildcards, e.g. `*.example.com`, but you can also enable full regex using another new configuration options: `isRegexEnabled`.
+- Add a new convenience initializer to `NetworkLogger` with `configure` trailing closure
+
 ## Pulse 2.1.4
 
 *Dec 18, 2022*

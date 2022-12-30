@@ -8,6 +8,28 @@ import Combine
 @testable import Pulse
 
 final class NetworkLoggerTests: XCTestCase {
+    let directory = TemporaryDirectory()
+    var storeURL: URL!
+    var store: LoggerStore!
+    var logger: NetworkLogger!
+
+    override func setUp() {
+        super.setUp()
+
+        try? FileManager.default.createDirectory(at: directory.url, withIntermediateDirectories: true, attributes: nil)
+        storeURL = directory.url.appending(filename: "test-store")
+        store = try! LoggerStore(storeURL: storeURL, options: [.create, .synchronous])
+
+        logger = NetworkLogger(store: store)
+    }
+
+    override func tearDown() {
+        super.tearDown()
+
+        try? store.destroy()
+        directory.remove()
+    }
+
     func testCreatingDecodingError() throws {
         // GIVEN
         let data = """
@@ -97,5 +119,104 @@ final class NetworkLoggerTests: XCTestCase {
         }
 
         try printJSON(event)
+    }
+
+    // MARK: Include/Exclude
+
+    func testIncludedHosts() throws {
+        // GIVEN
+        logger = NetworkLogger(store: store) {
+            $0.includedHosts = ["api.example.com"]
+        }
+
+        // WHEN
+        logTask(url: "logging.example.com/path")
+        logTask(url: "api.example.com")
+        logTask(url: "pulse.com")
+
+        // THEN only included path is logged
+        let tasks = try store.allTasks()
+        XCTAssertEqual(tasks.count, 1)
+        XCTAssertTrue(tasks.contains(where: { $0.url ==  "api.example.com" }))
+    }
+
+    func testIncludeHostsWildcard() throws {
+        // GIVEN
+        logger = NetworkLogger(store: store) {
+            $0.includedHosts = ["*.example.com"]
+        }
+
+        // WHEN
+        logTask(url: "logging.example.com")
+        logTask(url: "api.example.com")
+        logTask(url: "pulse.com")
+
+        // THEN only included path is logged
+        let tasks = try store.allTasks()
+        XCTAssertEqual(tasks.count, 2)
+        XCTAssertTrue(tasks.contains(where: { $0.url ==  "api.example.com" }))
+        XCTAssertTrue(tasks.contains(where: { $0.url ==  "logging.example.com" }))
+    }
+
+    func testIncludeHostsRegex() throws {
+        // GIVEN
+        logger = NetworkLogger(store: store) {
+            $0.includedHosts = ["(logging|api).example.com"]
+            $0.isRegexEnabled = true
+        }
+
+        // WHEN
+        logTask(url: "logging.example.com")
+        logTask(url: "api.example.com")
+        logTask(url: "pulse.com")
+
+        // THEN only included path is logged
+        let tasks = try store.allTasks()
+        XCTAssertEqual(tasks.count, 2)
+        XCTAssertTrue(tasks.contains(where: { $0.url ==  "api.example.com" }))
+        XCTAssertTrue(tasks.contains(where: { $0.url ==  "logging.example.com" }))
+    }
+
+    func testExcludeHosts() throws {
+        // GIVEN
+        logger = NetworkLogger(store: store) {
+            $0.excludedHosts = ["*.example.com"]
+        }
+
+        // WHEN
+        logTask(url: "logging.example.com")
+        logTask(url: "api.example.com")
+        logTask(url: "pulse.com")
+
+        // THEN only included path is logged
+        let tasks = try store.allTasks()
+        XCTAssertEqual(tasks.count, 1)
+        XCTAssertTrue(tasks.contains(where: { $0.url ==  "pulse.com" }))
+    }
+
+    func testIncludeAndExcludeHosts() throws {
+        // GIVEN
+        logger = NetworkLogger(store: store) {
+            $0.includedHosts = ["*.example.com"]
+            $0.excludedHosts = ["logging.example.com"]
+        }
+
+        // WHEN
+        logTask(url: "logging.example.com")
+        logTask(url: "api.example.com")
+        logTask(url: "pulse.com")
+
+        // THEN only included path is logged
+        let tasks = try store.allTasks()
+        XCTAssertEqual(tasks.count, 1)
+        XCTAssertTrue(tasks.contains(where: { $0.url ==  "api.example.com" }))
+    }
+
+    // MARK: Helpers
+
+    func logTask(url: String) {
+        let request = URLRequest(url: URL(string: url)!)
+        let task = URLSession.shared.dataTask(with: request)
+        logger.logTask(task, didCompleteWithError: nil)
     }
 }

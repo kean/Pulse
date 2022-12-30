@@ -60,11 +60,13 @@ extension LoggerStore {
 
         public struct NetworkTaskProgressUpdated: Codable, Sendable {
             public var taskId: UUID
+            public var url: URL?
             public var completedUnitCount: Int64
             public var totalUnitCount: Int64
 
-            public init(taskId: UUID, completedUnitCount: Int64, totalUnitCount: Int64) {
+            public init(taskId: UUID, url: URL?, completedUnitCount: Int64, totalUnitCount: Int64) {
                 self.taskId = taskId
+                self.url = url
                 self.completedUnitCount = completedUnitCount
                 self.totalUnitCount = totalUnitCount
             }
@@ -95,6 +97,19 @@ extension LoggerStore {
                 self.responseBody = responseBody
                 self.metrics = metrics
                 self.session = session
+            }
+        }
+
+        var url: URL? {
+            switch self {
+            case .messageStored:
+                return nil
+            case .networkTaskCreated(let event):
+                return event.originalRequest.url
+            case .networkTaskProgressUpdated(let event):
+                return event.url
+            case .networkTaskCompleted(let event):
+                return event.originalRequest.url
             }
         }
     }

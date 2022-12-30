@@ -9,9 +9,15 @@ import Foundation
 /// - note: ``NetworkLogger`` is used internally by ``URLSessionProxyDelegate`` and
 /// should generally not be used directly.
 public final class NetworkLogger: @unchecked Sendable {
-    private let store: LoggerStore
-    private let lock = NSLock()
     private let configuration: Configuration
+    private let store: LoggerStore
+
+    private let includedHosts: [Regex]
+    private let includedURLs: [Regex]
+    private let excludedHosts: [Regex]
+    private let excludedURLs: [Regex]
+
+    private let lock = NSLock()
 
     /// The logger configuration.
     public struct Configuration: Sendable {
@@ -19,6 +25,34 @@ public final class NetworkLogger: @unchecked Sendable {
         /// is done (see ``NetworkLogger/logTask(_:didFinishDecodingWithError:)``.
         /// If the request itself fails, the task completes immediately.
         public var isWaitingForDecoding: Bool
+
+        /// Stores logs only for the included hosts.
+        ///
+        /// - note: Supports wildcards, e.g. `*.example.com`, and full regex
+        /// when ``isRegexEnabled`` option is enabled.
+        public var includedHosts: Set<String> = []
+
+        /// Stores logs only for the included URLs.
+        ///
+        /// - note: Supports wildcards, e.g. `*.example.com`, and full regex
+        /// when ``isRegexEnabled`` option is enabled.
+        public var includedURLs: Set<String> = []
+
+        /// Excludes the given hosts from the logs.
+        ///
+        /// - note: Supports wildcards, e.g. `*.example.com`, and full regex
+        /// when ``isRegexEnabled`` option is enabled.
+        public var excludedHosts: Set<String> = []
+
+        /// Excludes the given URLs from the logs.
+        ///
+        /// - note: Supports wildcards, e.g. `*.example.com`, and full regex
+        /// when ``isRegexEnabled`` option is enabled.
+        public var excludedURLs: Set<String> = []
+
+        /// If enabled, processes `include` and `exclude` patterns using regex.
+        /// By default, patterns support only basic wildcard syntax: `*.example.com`.
+        public var isRegexEnabled = false
 
         /// Gets called when the logger receives an event. You can use it to
         /// modify the event before it is stored in order, for example, filter
@@ -32,7 +66,7 @@ public final class NetworkLogger: @unchecked Sendable {
         }
     }
 
-    /// Initializers the network logger.
+    /// Initialiers the network logger.
     ///
     /// - parameters:
     ///   - store: The target store for network requests.
@@ -40,6 +74,30 @@ public final class NetworkLogger: @unchecked Sendable {
     public init(store: LoggerStore = .shared, configuration: Configuration = .init()) {
         self.store = store
         self.configuration = configuration
+
+        func process(_ pattern: String) -> Regex? {
+            do {
+                let pattern = configuration.isRegexEnabled ? pattern : pattern
+                    .replacingOccurrences(of: ".", with: "\\.")
+                    .replacingOccurrences(of: "*", with: ".*?")
+                return try Regex(pattern)
+            } catch {
+                debugPrint("Failed to parse pattern: \(pattern) \(error)")
+                return nil
+            }
+        }
+
+        self.includedHosts = configuration.includedHosts.compactMap(process)
+        self.includedURLs = configuration.includedURLs.compactMap(process)
+        self.excludedHosts = configuration.excludedHosts.compactMap(process)
+        self.excludedURLs = configuration.excludedURLs.compactMap(process)
+    }
+
+    /// Initialiers and configures the network logger.
+    public convenience init(store: LoggerStore = .shared, _ configure: (inout Configuration) -> Void) {
+        var configuration = Configuration()
+        configure(&configuration)
+        self.init(store: store, configuration: configuration)
     }
 
     // MARK: Logging
@@ -76,6 +134,7 @@ public final class NetworkLogger: @unchecked Sendable {
 
         send(.networkTaskProgressUpdated(.init(
             taskId: context.taskId,
+            url: task.originalRequest?.url,
             completedUnitCount: progress.completed,
             totalUnitCount: progress.total
         )))
@@ -135,10 +194,37 @@ public final class NetworkLogger: @unchecked Sendable {
     }
 
     private func send(_ event: LoggerStore.Event) {
+        guard filter(event) else {
+            return
+        }
         guard let event = configuration.willHandleEvent(event) else {
             return
         }
         store.handle(event)
+    }
+
+    private func filter(_ event: LoggerStore.Event) -> Bool {
+        guard let url = event.url else {
+            return false // Should never happen
+        }
+        var host = url.host ?? ""
+        if url.scheme == nil, let url = URL(string: "https://" + url.absoluteString) {
+            host = url.host ?? "" // URL(string: "example.com")?.host with not scheme returns host: ""
+        }
+        let absoluteString = url.absoluteString
+        if !includedHosts.isEmpty || !includedURLs.isEmpty {
+            guard includedHosts.contains(where: { $0.isMatch(host) }) ||
+                    includedURLs.contains(where: { $0.isMatch(absoluteString) }) else {
+                return false
+            }
+        }
+        if !excludedHosts.isEmpty && excludedHosts.contains(where: { $0.isMatch(host) }) {
+            return false
+        }
+        if !excludedURLs.isEmpty && excludedURLs.contains(where: { $0.isMatch(absoluteString) }) {
+            return false
+        }
+        return true
     }
 
     // MARK: - Private
