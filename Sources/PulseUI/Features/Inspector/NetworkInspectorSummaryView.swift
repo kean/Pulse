@@ -67,7 +67,9 @@ struct NetworkInspectorSummaryView: View {
     private var originalRequestSection: some View {
         Section(header: requestHeaderView) {
             VStack(spacing: 16) {
-                viewModel.originalRequestSummary.map(KeyValueSectionView.init)
+                viewModel.originalRequestSummary.map {
+                    KeyValueSectionView(viewModel: $0).hiddenTitle()
+                }
                 viewModel.originalRequestQueryItems.map { KeyValueSectionView(viewModel: $0, limit: 10) }
                 KeyValueSectionView(viewModel: viewModel.originalRequestHeaders, limit: 10)
                 viewModel.originalRequestCookies.map(KeyValueSectionView.init)
@@ -81,7 +83,9 @@ struct NetworkInspectorSummaryView: View {
     private var currentRequestSection: some View {
         Section(header: requestHeaderView) {
             VStack(spacing: 16) {
-                viewModel.currentRequestSummary.map(KeyValueSectionView.init)
+                viewModel.currentRequestSummary.map {
+                    KeyValueSectionView(viewModel: $0).hiddenTitle()
+                }
                 viewModel.currentRequestQueryItems.map { KeyValueSectionView(viewModel: $0, limit: 10) }
                 KeyValueSectionView(viewModel: viewModel.currentRequestHeaders, limit: 10)
                 viewModel.currentRequestCookies.map(KeyValueSectionView.init)
@@ -95,7 +99,9 @@ struct NetworkInspectorSummaryView: View {
     private var responseSection: some View {
         Section(header: LargeSectionHeader(title: "Response")) {
             VStack(spacing: 16) {
-                viewModel.responseSummary.map(KeyValueSectionView.init)
+                viewModel.responseSummary.map {
+                    KeyValueSectionView(viewModel: $0).hiddenTitle()
+                }
                 KeyValueSectionView(viewModel: viewModel.responseHeaders, limit: 10)
                 viewModel.responseCookies.map(KeyValueSectionView.init)
                 KeyValueSectionView(viewModel: viewModel.responseBodySection)
