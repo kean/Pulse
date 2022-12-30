@@ -79,6 +79,19 @@ extension KeyValueSectionViewModel {
             ])
     }
 
+    static func makeDetails(for cookie: HTTPCookie, color: Color) -> KeyValueSectionViewModel {
+        KeyValueSectionViewModel(title: "Response Cookies", color: color, items: [
+            ("Name", cookie.name),
+            ("Value", cookie.value),
+            ("Domain", cookie.domain),
+            ("Path", cookie.path),
+            ("Expires", cookie.expiresDate?.description(with: .current)),
+            ("Secure", "\(cookie.isSecure)"),
+            ("HTTP Only", "\(cookie.isHTTPOnly)"),
+            ("Session Only", "\(cookie.isSessionOnly)")
+        ])
+    }
+
     private static func descriptionForError(domain: String?, code: Int32) -> String {
         guard domain == NSURLErrorDomain else {
             return "\(code)"
