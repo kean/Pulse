@@ -60,7 +60,7 @@ public final class NetworkLogger: @unchecked Sendable {
 
         /// Redact the given JSON fields from the logged requests and responses bodies.
         ///
-        /// - note: Unlike other fields, doesn't support wildcards or regex.
+        /// - note: Unlike other options, doesn't support wildcards or regex.
         public var excludedDataFields: Set<String> = []
 
         /// If enabled, processes `include` and `exclude` patterns using regex.

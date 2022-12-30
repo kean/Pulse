@@ -54,19 +54,6 @@ extension NetworkLogger {
             self.options = Options(urlRequest)
 
         }
-
-        /// Redacts values for the provided headers.
-        public func redactingSensitiveHeaders(_ redactedHeaders: Set<String>) -> Request {
-            var copy = self
-            copy.headers = _redactingSensitiveHeaders(redactedHeaders, from: headers)
-            return copy
-        }
-
-        func redactingSensitiveHeaders(_ redactedHeaders: [Regex]) -> Request {
-            var copy = self
-            copy.headers = _redactingSensitiveHeaders(redactedHeaders, from: headers)
-            return copy
-        }
     }
 
     public struct Response: Hashable, Codable, Sendable {
@@ -81,19 +68,6 @@ extension NetworkLogger {
             let httpResponse = urlResponse as? HTTPURLResponse
             self.statusCode = httpResponse?.statusCode
             self.headers = httpResponse?.allHeaderFields as? [String: String]
-        }
-
-        /// Redacts values for the provided headers.
-        public func redactingSensitiveHeaders(_ redactedHeaders: Set<String>) -> Response {
-            var copy = self
-            copy.headers = _redactingSensitiveHeaders(redactedHeaders, from: headers)
-            return copy
-        }
-
-        func redactingSensitiveHeaders(_ redactedHeaders: [Regex]) -> Response {
-            var copy = self
-            copy.headers = _redactingSensitiveHeaders(redactedHeaders, from: headers)
-            return copy
         }
     }
 
@@ -157,17 +131,6 @@ extension NetworkLogger {
             self.taskInterval = taskInterval
             self.redirectCount = redirectCount
             self.transactions = transactions
-        }
-
-        func redactingSensitiveHeaders(_ redactedHeaders: [Regex]) -> Metrics {
-            var copy = self
-            copy.transactions = transactions.map {
-                var transaction = $0
-                transaction.request = transaction.request.redactingSensitiveHeaders(redactedHeaders)
-                transaction.response = transaction.response?.redactingSensitiveHeaders(redactedHeaders)
-                return transaction
-            }
-            return copy
         }
     }
 
@@ -497,54 +460,3 @@ private func parseParameter(_ param: Substring) -> (String, String)? {
     }
     return (name.trimmingCharacters(in: .whitespaces), value.trimmingCharacters(in: .whitespaces))
 }
-
-private func _redactingSensitiveHeaders(_ redactedHeaders: Set<String>, from headers: [String: String]?) -> [String: String]? {
-    guard let headers = headers else {
-        return nil
-    }
-    var newHeaders: [String: String] = [:]
-    let redactedHeaders = Set(redactedHeaders.map { $0.lowercased() })
-    for (key, value) in headers {
-        if redactedHeaders.contains(key.lowercased()) {
-            newHeaders[key] = "<private>"
-        } else {
-            newHeaders[key] = value
-        }
-    }
-    return newHeaders
-}
-
-private func _redactingSensitiveHeaders(_ redactedHeaders: [Regex], from headers: [String: String]?) -> [String: String]? {
-    guard let headers = headers else {
-        return nil
-    }
-    let redacted = headers.keys.filter { header in
-        redactedHeaders.contains { $0.isMatch(header) }
-    }
-    return _redactingSensitiveHeaders(Set(redacted), from: headers)
-}
-
-extension Data {
-    func redactingSensitiveFields(_ fields: Set<String>) -> Data {
-        guard let json = try? JSONSerialization.jsonObject(with: self)  else {
-            return self
-        }
-        let redacted = Pulse.redactingSensitiveFields(json, fields)
-        return (try? JSONSerialization.data(withJSONObject: redacted)) ?? self
-    }
-}
-
-func redactingSensitiveFields(_ value: Any, _ fields: Set<String>) -> Any {
-    switch value {
-    case var object as [String: Any]:
-        for key in object.keys.filter(fields.contains) {
-            object[key] = "<private>"
-        }
-        return object
-    case let array as [Any]:
-        return array.map { _ in redactingSensitiveFields(array, fields) }
-    default:
-        return value
-    }
-}
-
