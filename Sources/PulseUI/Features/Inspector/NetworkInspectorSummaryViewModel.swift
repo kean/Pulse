@@ -144,7 +144,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
             action: ActionViewModel(title: "View") { [unowned self] in
                 isOriginalRequestCookiesLinkActive = true
             },
-            items: cookies.map { ($0.name, $0.value) }
+            items: makePreview(for: cookies)
         )
     }
 
@@ -206,7 +206,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
             action: ActionViewModel(title: "View") { [unowned self] in
                 isCurrentRequestCookiesLinkActive = true
             },
-            items: cookies.map { ($0.name, $0.value) }
+            items: makePreview(for: cookies)
         )
     }
 
@@ -237,7 +237,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
             action: ActionViewModel(title: "View") { [unowned self] in
                 isResponseCookiesLinkActive = true
             },
-            items: cookies.map { ($0.name, $0.value) }
+            items: makePreview(for: cookies)
         )
     }
 
@@ -316,13 +316,21 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
 
 // MARK: - Private
 
+private func makePreview(for cookies: [HTTPCookie]) -> [(String, String?)] {
+    cookies
+        .sorted(by:  { $0.name.caseInsensitiveCompare($1.name) == .orderedAscending })
+        .map { ($0.name, $0.value) }
+}
+
 private func makeAttributedString(for cookies: [HTTPCookie], color: Color) -> NSAttributedString? {
     guard !cookies.isEmpty else {
         return nil
     }
-    let sections = cookies.map {
-        KeyValueSectionViewModel.makeDetails(for: $0, color: color)
-    }
+    let sections = cookies
+        .sorted(by:  { $0.name.caseInsensitiveCompare($1.name) == .orderedAscending })
+        .map {
+            KeyValueSectionViewModel.makeDetails(for: $0, color: color)
+        }
     let text = NSMutableAttributedString()
     for (index, section) in sections.enumerated() {
         text.append(section.asAttributedString())
