@@ -11,10 +11,13 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     @Published var isRequestRawLinkActive = false
     @Published var isOriginalRequestHeadersLinkActive = false
     @Published var isOriginalQueryItemsLinkActive = false
+    @Published var isOriginalRequestCookiesLinkActive = false
     @Published var isCurrentRequestHeadersLinkActive = false
     @Published var isCurrentQueryItemsLinkActive = false
+    @Published var isCurrentRequestCookiesLinkActive = false
     @Published var isResponseRawLinkActive = false
     @Published var isResponseHeadearsRawLinkActive = false
+    @Published var isResponseCookiesLinkActive = false
 
     private(set) lazy var _progressViewModel = ProgressViewModel(task: task)
 
@@ -121,15 +124,32 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
         return KeyValueSectionViewModel(
             title: "Request Body",
             color: .blue,
-            action: ActionViewModel(
-                action: { [unowned self] in isRequestRawLinkActive = true },
-                title: "View"
-            ),
+            action: ActionViewModel(title: "View") { [unowned self] in
+                isRequestRawLinkActive = true
+            },
             items: [
                 ("Content-Type", contentType),
                 ("Size", ByteCountFormatter.string(fromByteCount: task.requestBodySize))
             ]
         )
+    }
+
+    var originalRequestCookies: KeyValueSectionViewModel? {
+        guard let cookies = task.originalRequest?.cookies, !cookies.isEmpty else {
+            return nil
+        }
+        return KeyValueSectionViewModel(
+            title: "Request Cookies",
+            color: .blue,
+            action: ActionViewModel(title: "View") { [unowned self] in
+                isOriginalRequestCookiesLinkActive = true
+            },
+            items: makePreview(for: cookies)
+        )
+    }
+
+    var originalRequestCookiesDetails: NSAttributedString? {
+        makeAttributedString(for: task.originalRequest?.cookies ?? [], color: .blue)
     }
 
     // MARK: - Request (Current)
@@ -166,15 +186,32 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
         return KeyValueSectionViewModel(
             title: "Request Body",
             color: .blue,
-            action: ActionViewModel(
-                action: { [unowned self] in isRequestRawLinkActive = true },
-                title: "View"
-            ),
+            action: ActionViewModel(title: "View") { [unowned self] in
+                isRequestRawLinkActive = true
+            },
             items: [
                 ("Content-Type", contentType),
                 ("Size", ByteCountFormatter.string(fromByteCount: task.requestBodySize))
             ]
         )
+    }
+
+    var currentRequestCookies: KeyValueSectionViewModel? {
+        guard let cookies = task.currentRequest?.cookies, !cookies.isEmpty else {
+            return nil
+        }
+        return KeyValueSectionViewModel(
+            title: "Request Cookies",
+            color: .blue,
+            action: ActionViewModel(title: "View") { [unowned self] in
+                isCurrentRequestCookiesLinkActive = true
+            },
+            items: makePreview(for: cookies)
+        )
+    }
+
+    var currentRequestCookiesDetails: NSAttributedString? {
+        makeAttributedString(for: task.currentRequest?.cookies ?? [], color: .blue)
     }
 
     // MARK: - Response
@@ -187,6 +224,25 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
         KeyValueSectionViewModel.makeResponseHeaders(for: task.response?.headers ?? [:]) { [unowned self] in
             self.isResponseHeadearsRawLinkActive = true
         }
+    }
+
+    var responseCookies: KeyValueSectionViewModel? {
+        let cookies = task.responseCookies
+        guard !cookies.isEmpty else {
+            return nil
+        }
+        return KeyValueSectionViewModel(
+            title: "Response Cookies",
+            color: .indigo,
+            action: ActionViewModel(title: "View") { [unowned self] in
+                isResponseCookiesLinkActive = true
+            },
+            items: makePreview(for: cookies)
+        )
+    }
+
+    var responseCookiesDetails: NSAttributedString? {
+        makeAttributedString(for: task.responseCookies, color: .indigo)
     }
 
     var responseBodySection: KeyValueSectionViewModel {
@@ -202,10 +258,9 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
         return KeyValueSectionViewModel(
             title: "Response Body",
             color: .indigo,
-            action: ActionViewModel(
-                action: { [unowned self] in isResponseRawLinkActive = true },
-                title: "View"
-            ),
+            action: ActionViewModel(title: "View") { [unowned self] in
+                isResponseRawLinkActive = true
+            },
             items: [
                 ("Content-Type", task.response?.contentType?.rawValue),
                 ("Size", task.isFromCache ? size + " (from cache)": size)
@@ -260,6 +315,31 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
 }
 
 // MARK: - Private
+
+private func makePreview(for cookies: [HTTPCookie]) -> [(String, String?)] {
+    cookies
+        .sorted(by:  { $0.name.caseInsensitiveCompare($1.name) == .orderedAscending })
+        .map { ($0.name, $0.value) }
+}
+
+private func makeAttributedString(for cookies: [HTTPCookie], color: Color) -> NSAttributedString? {
+    guard !cookies.isEmpty else {
+        return nil
+    }
+    let sections = cookies
+        .sorted(by:  { $0.name.caseInsensitiveCompare($1.name) == .orderedAscending })
+        .map {
+            KeyValueSectionViewModel.makeDetails(for: $0, color: color)
+        }
+    let text = NSMutableAttributedString()
+    for (index, section) in sections.enumerated() {
+        text.append(section.asAttributedString())
+        if index != sections.endIndex - 1 {
+            text.append("\n\n")
+        }
+    }
+    return text
+}
 
 private let dateFormatter: DateFormatter = {
     let formatter = DateFormatter()

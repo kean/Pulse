@@ -42,7 +42,7 @@ extension KeyValueSectionViewModel {
         KeyValueSectionViewModel(
             title: "Request Headers",
             color: .blue,
-            action: headers.isEmpty ? nil : ActionViewModel(action: action,title: "View"),
+            action: headers.isEmpty ? nil : ActionViewModel(title: "View", action: action),
             items: headers.sorted(by: { $0.key < $1.key })
         )
     }
@@ -59,7 +59,7 @@ extension KeyValueSectionViewModel {
         KeyValueSectionViewModel(
             title: "Response Headers",
             color: .indigo,
-            action: headers.isEmpty ? nil : ActionViewModel(action: action, title: "View"),
+            action: headers.isEmpty ? nil : ActionViewModel(title: "View", action: action),
             items: headers.sorted(by: { $0.key < $1.key })
         )
     }
@@ -71,12 +71,25 @@ extension KeyValueSectionViewModel {
         return KeyValueSectionViewModel(
             title: "Error",
             color: .red,
-            action: ActionViewModel(action: action, title: "View"),
+            action: ActionViewModel(title: "View", action: action),
             items: [
                 ("Domain", task.errorDomain),
                 ("Code", descriptionForError(domain: task.errorDomain, code: task.errorCode)),
                 ("Description", task.errorDebugDescription)
             ])
+    }
+
+    static func makeDetails(for cookie: HTTPCookie, color: Color) -> KeyValueSectionViewModel {
+        KeyValueSectionViewModel(title: "Response Cookies", color: color, items: [
+            ("Name", cookie.name),
+            ("Value", cookie.value),
+            ("Domain", cookie.domain),
+            ("Path", cookie.path),
+            ("Expires", cookie.expiresDate?.description(with: Locale(identifier: "en_US"))),
+            ("Secure", "\(cookie.isSecure)"),
+            ("HTTP Only", "\(cookie.isHTTPOnly)"),
+            ("Session Only", "\(cookie.isSessionOnly)")
+        ])
     }
 
     private static func descriptionForError(domain: String?, code: Int32) -> String {
@@ -99,7 +112,7 @@ extension KeyValueSectionViewModel {
         KeyValueSectionViewModel(
             title: "Query Items",
             color: .blue,
-            action: ActionViewModel(action: action, title: "View"),
+            action: ActionViewModel(title: "View", action: action),
             items: queryItems.map { ($0.name, $0.value) }
         )
     }

@@ -167,6 +167,7 @@ private struct WrappedTextView: UIViewRepresentable {
     func makeUIView(context: Context) -> UXTextView {
         let textView = UITextView()
         configureTextView(textView)
+        textView.alwaysBounceVertical = true
         textView.autocorrectionType = .no
         textView.autocapitalizationType = .none
 #if !os(tvOS)

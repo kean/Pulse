@@ -266,8 +266,8 @@ struct KeyValueRow: Identifiable {
 }
 
 struct ActionViewModel {
-    let action: () -> Void
     let title: String
+    let action: () -> Void
 }
 
 #if DEBUG
@@ -283,7 +283,7 @@ struct KeyValueSectionView_Previews: PreviewProvider {
             KeyValueSectionView(viewModel: .init(
                 title: "Headers",
                 color: .blue,
-                action: .init(action: {}, title: "Show Raw"),
+                action: .init(title: "Show Raw") {},
                 items: [
                     ("Content-Length", "21851748"),
                     ("Content-Type", "multipart/form-data; boundary=----WebKitFormBoundaryrv8XAHQPtQcWta3k"),

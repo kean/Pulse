@@ -25,4 +25,21 @@ extension NetworkTaskEntity {
             error: decodingError
         )
     }
+
+    var responseCookies: [HTTPCookie] {
+        guard let headers = response?.headers, !headers.isEmpty,
+              let url = originalRequest?.url.flatMap(URL.init) else {
+            return []
+        }
+        return HTTPCookie.cookies(withResponseHeaderFields: headers, for: url)
+    }
+}
+
+extension NetworkRequestEntity {
+    var cookies: [HTTPCookie] {
+        guard !headers.isEmpty, let url = url.flatMap(URL.init) else {
+            return []
+        }
+        return HTTPCookie.cookies(withResponseHeaderFields: headers, for: url)
+    }
 }

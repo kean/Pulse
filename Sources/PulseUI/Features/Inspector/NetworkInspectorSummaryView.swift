@@ -70,6 +70,7 @@ struct NetworkInspectorSummaryView: View {
                 viewModel.originalRequestSummary.map(KeyValueSectionView.init)
                 viewModel.originalRequestQueryItems.map { KeyValueSectionView(viewModel: $0, limit: 10) }
                 KeyValueSectionView(viewModel: viewModel.originalRequestHeaders, limit: 10)
+                viewModel.originalRequestCookies.map(KeyValueSectionView.init)
                 KeyValueSectionView(viewModel: viewModel.requestBodySection)
                 viewModel.originalRequestParameters.map(KeyValueSectionView.init)
             }
@@ -83,6 +84,7 @@ struct NetworkInspectorSummaryView: View {
                 viewModel.currentRequestSummary.map(KeyValueSectionView.init)
                 viewModel.currentRequestQueryItems.map { KeyValueSectionView(viewModel: $0, limit: 10) }
                 KeyValueSectionView(viewModel: viewModel.currentRequestHeaders, limit: 10)
+                viewModel.currentRequestCookies.map(KeyValueSectionView.init)
                 KeyValueSectionView(viewModel: viewModel.requestBodySection)
                 viewModel.currentRequestParameters.map(KeyValueSectionView.init)
             }
@@ -95,6 +97,7 @@ struct NetworkInspectorSummaryView: View {
             VStack(spacing: 16) {
                 viewModel.responseSummary.map(KeyValueSectionView.init)
                 KeyValueSectionView(viewModel: viewModel.responseHeaders, limit: 10)
+                viewModel.responseCookies.map(KeyValueSectionView.init)
                 KeyValueSectionView(viewModel: viewModel.responseBodySection)
             }
         }
@@ -195,13 +198,31 @@ struct NetworkInspectorSummaryView: View {
         InvisibleNavigationLinks {
             if let errorModel = viewModel.errorModel {
                 NavigationLink.programmatic(isActive: $viewModel.isErrorRawLinkActive) {
-                    NetworkHeadersDetailsView(viewModel: errorModel)
+                    NetworkDetailsView(viewModel: errorModel)
                 }
             }
 
 #if os(iOS) || os(macOS)
-            NavigationLink.programmatic(isActive: $viewModel.isOriginalQueryItemsLinkActive) {
-                viewModel.originalRequestQueryItems.map(NetworkHeadersDetailsView.init)
+            Group {
+                NavigationLink.programmatic(isActive: $viewModel.isOriginalQueryItemsLinkActive) {
+                    viewModel.originalRequestQueryItems.map(NetworkDetailsView.init)
+                }
+                
+                NavigationLink.programmatic(isActive: $viewModel.isCurrentQueryItemsLinkActive) {
+                    viewModel.currentRequestQueryItems.map(NetworkDetailsView.init)
+                }
+                
+                NavigationLink.programmatic(isActive: $viewModel.isOriginalRequestCookiesLinkActive) {
+                    viewModel.originalRequestCookiesDetails.map { NetworkDetailsView(title: "Request Cookies", text: $0) }
+                }
+                
+                NavigationLink.programmatic(isActive: $viewModel.isCurrentRequestCookiesLinkActive) {
+                    viewModel.currentRequestCookiesDetails.map { NetworkDetailsView(title: "Request Cookies", text: $0) }
+                }
+                
+                NavigationLink.programmatic(isActive: $viewModel.isResponseCookiesLinkActive) {
+                    viewModel.responseCookiesDetails.map { NetworkDetailsView(title: "Response Cookies", text: $0) }
+                }
             }
 #endif
 
@@ -210,28 +231,22 @@ struct NetworkInspectorSummaryView: View {
                     .backport.navigationTitle("Request")
             })
 
-#if os(iOS) || os(macOS)
-            NavigationLink.programmatic(isActive: $viewModel.isCurrentQueryItemsLinkActive) {
-                viewModel.currentRequestQueryItems.map(NetworkHeadersDetailsView.init)
-            }
-#endif
-            
             NavigationLink.programmatic(isActive: $viewModel.isResponseRawLinkActive, destination: {
                 FileViewer(viewModel: viewModel.responseBodyViewModel)
                     .backport.navigationTitle("Response")
             })
             
             NavigationLink.programmatic(isActive: $viewModel.isOriginalRequestHeadersLinkActive) {
-                NetworkHeadersDetailsView(viewModel: viewModel.originalRequestHeaders)
+                NetworkDetailsView(viewModel: viewModel.originalRequestHeaders)
             }
             
             NavigationLink.programmatic(isActive: $viewModel.isCurrentRequestHeadersLinkActive) {
-                NetworkHeadersDetailsView(viewModel: viewModel.currentRequestHeaders)
+                NetworkDetailsView(viewModel: viewModel.currentRequestHeaders)
             }
             
             if let responesHeaders = viewModel.responseHeaders {
                 NavigationLink.programmatic(isActive: $viewModel.isResponseHeadearsRawLinkActive) {
-                    NetworkHeadersDetailsView(viewModel: responesHeaders)
+                    NetworkDetailsView(viewModel: responesHeaders)
                 }
             }
         }
@@ -248,7 +263,7 @@ private let spacing: CGFloat? = nil
 struct NetworkInspectorSummaryView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
-            NetworkInspectorSummaryView(viewModel: .init(task: LoggerStore.preview.entity(for: .patchRepo)))
+            NetworkInspectorSummaryView(viewModel: .init(task: LoggerStore.preview.entity(for: .login)))
         }
     }
 }

@@ -50,9 +50,9 @@ struct ConsoleMessageMetadataView: View {
     }
 
     private var metadataViewModel: KeyValueSectionViewModel {
-        KeyValueSectionViewModel(title: "Metadata", color: .indigo, action: .init(action: {
+        KeyValueSectionViewModel(title: "Metadata", color: .indigo, action: ActionViewModel(title: "View") {
             isMetadataRawLinkActive = true
-        }, title: "View"), items: metadataItems)
+        }, items: metadataItems)
     }
 
     private var metadataItems: [(String, String?)] {
@@ -62,7 +62,7 @@ struct ConsoleMessageMetadataView: View {
     private var links: some View {
         InvisibleNavigationLinks {
             NavigationLink.programmatic(isActive: $isMetadataRawLinkActive) {
-                NetworkHeadersDetailsView(viewModel: metadataViewModel)
+                NetworkDetailsView(viewModel: metadataViewModel)
             }
         }
     }
