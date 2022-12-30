@@ -5,7 +5,23 @@
 import SwiftUI
 import Pulse
 
-struct FileViewer: View {
+#if os(iOS)
+// TOOD: Remove this code workaround (control over RichTextView reloads is completely lost)
+struct FileViewer: UIViewControllerRepresentable {
+    let viewModel: FileViewerViewModel
+    var onToggleExpanded: (() -> Void)?
+
+    func makeUIViewController(context: Context) -> UIHostingController<_FileViewer> {
+        UIHostingController(rootView: _FileViewer(viewModel: viewModel, onToggleExpanded: onToggleExpanded))
+    }
+
+    func updateUIViewController(_ uiViewController: UIHostingController<_FileViewer>, context: Context) {}
+}
+#else
+typealias FileViewer = _FileViewer
+#endif
+
+struct _FileViewer: View {
     @ObservedObject var viewModel: FileViewerViewModel
     @State var isWebViewOpen = false
     var onToggleExpanded: (() -> Void)?

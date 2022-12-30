@@ -6,6 +6,7 @@
 - Add `sensitiveHeaders`, `sensitiveQueryItems`, `sensitiveDataFields` to `NetworkLogger/Configuration` for redacting sentitive information from logged HTTP headers 
 - Add a new convenience initializer to `NetworkLogger` with `configure` trailing closure
 - Make `LoggerStore.Event` frozen
+- Fix an issue where search in text viewer would occasionally stop highlighting the results 
 - Add cookies section and details screens to the request summary - [#124](https://github.com/kean/Pulse/pull/124)
 - A couple of minor UI improvements across the board 
 
