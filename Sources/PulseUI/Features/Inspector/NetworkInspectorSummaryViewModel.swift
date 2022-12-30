@@ -11,10 +11,13 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     @Published var isRequestRawLinkActive = false
     @Published var isOriginalRequestHeadersLinkActive = false
     @Published var isOriginalQueryItemsLinkActive = false
+    @Published var isOriginalRequestCookiesLinkActive = false
     @Published var isCurrentRequestHeadersLinkActive = false
     @Published var isCurrentQueryItemsLinkActive = false
+    @Published var isCurrentRequestCookiesLinkActive = false
     @Published var isResponseRawLinkActive = false
     @Published var isResponseHeadearsRawLinkActive = false
+    @Published var isResponseCookiesLinkActive = false
 
     private(set) lazy var _progressViewModel = ProgressViewModel(task: task)
 
@@ -131,6 +134,20 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
         )
     }
 
+    var originalRequestCookies: KeyValueSectionViewModel? {
+        guard let cookies = task.originalRequest?.cookies, !cookies.isEmpty else {
+            return nil
+        }
+        return KeyValueSectionViewModel(
+            title: "Request Cookies",
+            color: .blue,
+            action: ActionViewModel(title: "View") { [unowned self] in
+                isOriginalRequestCookiesLinkActive = true
+            },
+            items: cookies.map { ($0.name, $0.value) }
+        )
+    }
+
     // MARK: - Request (Current)
 
     var currentRequestSummary: KeyValueSectionViewModel? {
@@ -175,6 +192,20 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
         )
     }
 
+    var currentRequestCookies: KeyValueSectionViewModel? {
+        guard let cookies = task.currentRequest?.cookies, !cookies.isEmpty else {
+            return nil
+        }
+        return KeyValueSectionViewModel(
+            title: "Request Cookies",
+            color: .blue,
+            action: ActionViewModel(title: "View") { [unowned self] in
+                isCurrentRequestCookiesLinkActive = true
+            },
+            items: cookies.map { ($0.name, $0.value) }
+        )
+    }
+
     // MARK: - Response
 
     var responseSummary: KeyValueSectionViewModel? {
@@ -185,6 +216,21 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
         KeyValueSectionViewModel.makeResponseHeaders(for: task.response?.headers ?? [:]) { [unowned self] in
             self.isResponseHeadearsRawLinkActive = true
         }
+    }
+
+    var responseCookies: KeyValueSectionViewModel? {
+        let cookies = task.responseCookies
+        guard !cookies.isEmpty else {
+            return nil
+        }
+        return KeyValueSectionViewModel(
+            title: "Response Cookies",
+            color: .indigo,
+            action: ActionViewModel(title: "View") { [unowned self] in
+                isResponseCookiesLinkActive = true
+            },
+            items: cookies.map { ($0.name, $0.value) }
+        )
     }
 
     var responseBodySection: KeyValueSectionViewModel {
@@ -209,6 +255,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
             ]
         )
     }
+    
 
     // MARK: - Timings
 

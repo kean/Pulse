@@ -70,6 +70,7 @@ struct NetworkInspectorSummaryView: View {
                 viewModel.originalRequestSummary.map(KeyValueSectionView.init)
                 viewModel.originalRequestQueryItems.map { KeyValueSectionView(viewModel: $0, limit: 10) }
                 KeyValueSectionView(viewModel: viewModel.originalRequestHeaders, limit: 10)
+                viewModel.originalRequestCookies.map(KeyValueSectionView.init)
                 KeyValueSectionView(viewModel: viewModel.requestBodySection)
                 viewModel.originalRequestParameters.map(KeyValueSectionView.init)
             }
@@ -83,6 +84,7 @@ struct NetworkInspectorSummaryView: View {
                 viewModel.currentRequestSummary.map(KeyValueSectionView.init)
                 viewModel.currentRequestQueryItems.map { KeyValueSectionView(viewModel: $0, limit: 10) }
                 KeyValueSectionView(viewModel: viewModel.currentRequestHeaders, limit: 10)
+                viewModel.currentRequestCookies.map(KeyValueSectionView.init)
                 KeyValueSectionView(viewModel: viewModel.requestBodySection)
                 viewModel.currentRequestParameters.map(KeyValueSectionView.init)
             }
@@ -95,6 +97,7 @@ struct NetworkInspectorSummaryView: View {
             VStack(spacing: 16) {
                 viewModel.responseSummary.map(KeyValueSectionView.init)
                 KeyValueSectionView(viewModel: viewModel.responseHeaders, limit: 10)
+                viewModel.responseCookies.map(KeyValueSectionView.init)
                 KeyValueSectionView(viewModel: viewModel.responseBodySection)
             }
         }
@@ -198,6 +201,8 @@ struct NetworkInspectorSummaryView: View {
                     NetworkHeadersDetailsView(viewModel: errorModel)
                 }
             }
+
+            #warning("TODO: add links")
 
 #if os(iOS) || os(macOS)
             NavigationLink.programmatic(isActive: $viewModel.isOriginalQueryItemsLinkActive) {
