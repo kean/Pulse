@@ -111,7 +111,7 @@ let logger = NetworkLogger {
     // Replaces values for the given HTTP headers with "<private>"
     $0.sensitiveHeaders = ["Authorization", "Access-Token"]
 
-    // Redacts senstive query items.
+    // Redacts sensitive query items.
     $0.sensitiveQueryItems = ["password"]
 
     // Replaces values for the given response and request JSON fields with "<private>"
