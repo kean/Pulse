@@ -22,29 +22,40 @@ struct NetworkInspectorHeadersView: View {
 
     private var links: some View {
         InvisibleNavigationLinks {
-            NavigationLink.programmatic(isActive: $viewModel.isRequestOriginalRawActive, destination:  { NetworkHeadersDetailsView(viewModel: viewModel.requestHeadersOriginal) })
-            NavigationLink.programmatic(isActive: $viewModel.isRequestCurrentRawActive, destination:  { NetworkHeadersDetailsView(viewModel: viewModel.requestHeadersCurrent) })
+            NavigationLink.programmatic(isActive: $viewModel.isRequestOriginalRawActive, destination:  { NetworkDetailsView(viewModel: viewModel.requestHeadersOriginal) })
+            NavigationLink.programmatic(isActive: $viewModel.isRequestCurrentRawActive, destination:  { NetworkDetailsView(viewModel: viewModel.requestHeadersCurrent) })
             
             if let responseHeaders = viewModel.responseHeaders {
-                NavigationLink.programmatic(isActive: $viewModel.isResponseRawActive, destination:  { NetworkHeadersDetailsView(viewModel: responseHeaders) })
+                NavigationLink.programmatic(isActive: $viewModel.isResponseRawActive, destination:  { NetworkDetailsView(viewModel: responseHeaders) })
             }
         }
     }
 }
 
-struct NetworkHeadersDetailsView: View {
-    let viewModel: KeyValueSectionViewModel
+struct NetworkDetailsView: View {
+    private let title: String
+    private let text: NSAttributedString
     @State private var isShowingShareSheet = false
+
+    init(viewModel: KeyValueSectionViewModel) {
+        self.title = viewModel.title
+        self.text = viewModel.asAttributedString()
+    }
+
+    init(title: String, text: NSAttributedString) {
+        self.title = title
+        self.text = text
+    }
 
     #if os(iOS)
     var body: some View {
         contents
-            .navigationBarTitle(viewModel.title)
+            .navigationBarTitle(title)
             .navigationBarItems(trailing: ShareButton {
                 isShowingShareSheet = true
             })
             .sheet(isPresented: $isShowingShareSheet) {
-                ShareView(activityItems: [viewModel.asAttributedString()])
+                ShareView(activityItems: [text])
             }
     }
     #else
@@ -55,14 +66,14 @@ struct NetworkHeadersDetailsView: View {
 
     @ViewBuilder
     private var contents: some View {
-        if viewModel.items.isEmpty {
+        if text.string.isEmpty {
             PlaceholderView(imageName: "folder", title: "Empty")
         } else {
             #if os(watchOS) || os(tvOS)
-            RichTextView(viewModel: .init(string: viewModel.asAttributedString().string))
+            RichTextView(viewModel: .init(string: text.string))
             #else
             RichTextView(viewModel: {
-                let viewModel = RichTextViewModel(string: viewModel.asAttributedString())
+                let viewModel = RichTextViewModel(string: text)
                 viewModel.isAutomaticLinkDetectionEnabled = false
                 return viewModel
             }())

@@ -85,7 +85,7 @@ extension KeyValueSectionViewModel {
             ("Value", cookie.value),
             ("Domain", cookie.domain),
             ("Path", cookie.path),
-            ("Expires", cookie.expiresDate?.description(with: .current)),
+            ("Expires", cookie.expiresDate?.description(with: Locale(identifier: "en_US"))),
             ("Secure", "\(cookie.isSecure)"),
             ("HTTP Only", "\(cookie.isHTTPOnly)"),
             ("Session Only", "\(cookie.isSessionOnly)")

@@ -148,6 +148,10 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
         )
     }
 
+    var originalRequestCookiesDetails: NSAttributedString? {
+        makeAttributedString(for: task.originalRequest?.cookies ?? [], color: .blue)
+    }
+
     // MARK: - Request (Current)
 
     var currentRequestSummary: KeyValueSectionViewModel? {
@@ -206,6 +210,10 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
         )
     }
 
+    var currentRequestCookiesDetails: NSAttributedString? {
+        makeAttributedString(for: task.currentRequest?.cookies ?? [], color: .blue)
+    }
+
     // MARK: - Response
 
     var responseSummary: KeyValueSectionViewModel? {
@@ -233,6 +241,10 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
         )
     }
 
+    var responseCookiesDetails: NSAttributedString? {
+        makeAttributedString(for: task.responseCookies, color: .indigo)
+    }
+
     var responseBodySection: KeyValueSectionViewModel {
         if task.type == .downloadTask, task.responseBodySize > 0 {
             return KeyValueSectionViewModel(title: "Response Body", color: .indigo, items: [
@@ -255,7 +267,6 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
             ]
         )
     }
-    
 
     // MARK: - Timings
 
@@ -304,6 +315,23 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
 }
 
 // MARK: - Private
+
+private func makeAttributedString(for cookies: [HTTPCookie], color: Color) -> NSAttributedString? {
+    guard !cookies.isEmpty else {
+        return nil
+    }
+    let sections = cookies.map {
+        KeyValueSectionViewModel.makeDetails(for: $0, color: color)
+    }
+    let text = NSMutableAttributedString()
+    for (index, section) in sections.enumerated() {
+        text.append(section.asAttributedString())
+        if index != sections.endIndex - 1 {
+            text.append("\n\n")
+        }
+    }
+    return text
+}
 
 private let dateFormatter: DateFormatter = {
     let formatter = DateFormatter()
