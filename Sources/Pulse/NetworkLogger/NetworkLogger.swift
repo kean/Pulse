@@ -68,8 +68,7 @@ public final class NetworkLogger: @unchecked Sendable {
         public var willHandleEvent: @Sendable (LoggerStore.Event) -> LoggerStore.Event? = { $0 }
 
         /// Initializes the default configuration.
-        public init() {
-}
+        public init() {}
 
         // Deprecated in Pulse 2.2
         @available(*, deprecated, message: "The isWaitingForDecoding parameter was removed")

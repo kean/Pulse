@@ -87,36 +87,37 @@ let delegate = URLSessionProxyDelegate(logger: logger, delegate: YourURLSessionD
 logger.logTask(task, didFinishDecodingWithError: decodingError)
 ```
 
-## Redacting Sensitive Data
+## Exclude Information From the Logs
 
-There is usually a lot of sensitive information in network requests, such as passwords, access tokens, user information, and more. It's important to keep this information safe.
+There is usually some sensitive information in network requests, such as passwords, access tokens, and more. It's important to keep it safe.
 
-> tip: It's recommended to enable Pulse and its Console _only_ in the debug mode and never in production. 
+> tip: It's recommended to use Pulse _only_ in the debug mode.
 
-Pulse captures the logged information safely in its internal database and it never leaves your device. Nothing is ever written to the system's logging system, so it won't appear in the Console. But of course, logs are meant to be viewed and shared. For example, QA might be testing your debug app with a Pulse console built-in and they'll want to export the logs from the device, which they easily can do. You might want to make sure the sensitive information is redacted in that case.
+``NetworkLogger`` captures data safely in a local database and it never leaves your device. Logs are never written to the system's logging system. But of course, logs are meant to be viewed and shared, which is why PulseUI provides sharing options. In case the logs do leave your device, it's best to redact any sensitive information. 
 
-Both ``NetworkLogger`` and ``LoggerStore`` can be configured with a ``NetworkLogger/Configuration/willHandleEvent`` closure that can be used to filter out the sensitive events. You can either return `nil` to prevent the response from ever being recorded or modify the event before returning it.
+``NetworkLogger/Configuration`` has a set of convenience APIs for managing what information is included or excluded from the logs.
 
 ```swift
-var configuration = NetworkLogger.Configuration()
-configuration.willHandleEvent = { event in
-    switch event {
-    case .networkTaskCreated(let event):
-        var event = event
-        event.originalRequest = event.originalRequest.redactingSensitiveHeaders(["Authorization"])
-        event.currentRequest = event.currentRequest?.redactingSensitiveHeaders(["Authorization"])
-        return .networkTaskCreated(event)
-    case .networkTaskCompleted(let event):
-        // Repeat the same for .networkTaskCompleted 
-    default:
-        return event
-    }
+let logger = NetworkLogger {
+    // Includes only requests with the given domain.
+    $0.includedHosts = ["*.example.com"]
+
+    // Exclude some subdomains.
+    $0.excludedHosts = ["logging.example.com"]
+
+    // Exclude specific URLs.
+    $0.excludedURLs = ["*/log/event"]
+
+    // Redact authorization headeres.
+    $0.excludedHeaders = ["Authorization", "Access-Token"]
 }
 ```
 
-> tip: You can also use convenience ``NetworkLogger/Configuration/includedHosts``, ``NetworkLogger/Configuration/includedURLs``, ``NetworkLogger/Configuration/excludedHosts``, and ``NetworkLogger/Configuration/excludedURLs`` configuration options to control what tasks are logged. By default, they support simple wildcards, e.g. `*.example.com`, but you can also enable full regex using another new configuration options: ``NetworkLogger/Configuration/isRegexEnabled``.
+> tip: "Include" and "exclude" patterns support basic wildcards (`*`), but you can also turns them into full-features regex patterns using ``NetworkLogger/Configuration/isRegexEnabled``. 
 
-> important: If you do decide to redact some information from requests or responses, make sure to also update ``NetworkLogger/Metrics`` because individual transactions within metrics contain recorded request and response pairs.
+If the built-in configuration options don't cover all of your use-cases, you can set  ``NetworkLogger/Configuration/willHandleEvent`` closure that provides you complete control for filtering out and updating the events.
+
+> important: If you redact information manually from requests or responses, make sure to also update ``NetworkLogger/Metrics`` because individual transactions within metrics contain recorded request and response pairs.
 
 ## Trace in Xcode Console
 

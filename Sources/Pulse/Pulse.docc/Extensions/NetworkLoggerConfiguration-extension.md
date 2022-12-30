@@ -6,7 +6,7 @@
 
 - ``init()``
 
-### Including and Excluding Information From the Logs
+### Exclude Information From the Logs
 
 - ``includedHosts``
 - ``excludedHosts``
@@ -15,11 +15,11 @@
 - ``excludedHeaders``
 - ``isRegexEnabled``
 
-### Observing and Filtering Events
+### Observe and Filter Events
 
 - ``willHandleEvent``
 
-### Managing Logger Behavior
+### Manage Logger Behavior
 
 - ``isWaitingForDecoding``
 
