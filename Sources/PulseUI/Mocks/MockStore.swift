@@ -89,9 +89,6 @@ private func _asyncPopulateStore(_ store: LoggerStore) async {
 
         await Task.sleep(milliseconds: 300)
 
-        logger(named: "default")
-            .log(level: .debug, "test")
-
         logger(named: "auth")
             .log(level: .trace, "Instantiated Session")
 
