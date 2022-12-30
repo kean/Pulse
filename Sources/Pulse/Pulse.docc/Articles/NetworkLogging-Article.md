@@ -108,8 +108,11 @@ let logger = NetworkLogger {
     // Exclude specific URLs.
     $0.excludedURLs = ["*/log/event"]
 
-    // Redact authorization headeres.
+    // Replaces values for the given HTTP headers with "<private>"
     $0.excludedHeaders = ["Authorization", "Access-Token"]
+
+    // Replaces values for the given response and request JSON fields with "<private>"
+    $0.excludedDataFields = ["Refresh-Token"]
 }
 ```
 

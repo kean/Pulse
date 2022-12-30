@@ -264,6 +264,32 @@ final class NetworkLoggerTests: XCTestCase {
         ])
     }
 
+    func testExcludeSensitiveResponseFields() throws {
+        // GIVEN
+        logger = NetworkLogger(store: store) {
+            $0.excludedDataFields = ["access-token", "refresh-token"]
+        }
+
+        // WHEN
+        let mockTask = MockDataTask.login
+        let dataTask = URLSession.shared.dataTask(with: mockTask.request)
+        dataTask.setValue(mockTask.request, forKey: "currentRequest")
+        dataTask.setValue(mockTask.response, forKey: "response")
+        logger.logDataTask(dataTask, didReceive: mockTask.responseBody)
+        logger.logTask(dataTask, didFinishCollecting: mockTask.metrics)
+        logger.logTask(dataTask, didFinishDecodingWithError: nil)
+
+        // THEN sensitive response fields are redacted from both requests and responses
+        let tasks = try store.allTasks()
+        XCTAssertEqual(tasks.count, 1)
+        let task = try XCTUnwrap(tasks.first)
+        let data = try XCTUnwrap(task.responseBody?.data)
+        let json = try XCTUnwrap(String(data: data, encoding: .utf8))
+
+        XCTAssertTrue(json.contains("\"access-token\":\"<private>\""))
+        XCTAssertTrue(json.contains("\"refresh-token\":\"<private>\""))
+    }
+
     // MARK: Helpers
 
     func logTask(url: String) {

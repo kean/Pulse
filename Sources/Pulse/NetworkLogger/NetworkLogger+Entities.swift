@@ -523,3 +523,28 @@ private func _redactingSensitiveHeaders(_ redactedHeaders: [Regex], from headers
     }
     return _redactingSensitiveHeaders(Set(redacted), from: headers)
 }
+
+extension Data {
+    func redactingSensitiveFields(_ fields: Set<String>) -> Data {
+        guard let json = try? JSONSerialization.jsonObject(with: self)  else {
+            return self
+        }
+        let redacted = Pulse.redactingSensitiveFields(json, fields)
+        return (try? JSONSerialization.data(withJSONObject: redacted)) ?? self
+    }
+}
+
+func redactingSensitiveFields(_ value: Any, _ fields: Set<String>) -> Any {
+    switch value {
+    case var object as [String: Any]:
+        for key in object.keys.filter(fields.contains) {
+            object[key] = "<private>"
+        }
+        return object
+    case let array as [Any]:
+        return array.map { _ in redactingSensitiveFields(array, fields) }
+    default:
+        return value
+    }
+}
+

@@ -17,6 +17,7 @@ public final class NetworkLogger: @unchecked Sendable {
     private var excludedHosts: [Regex] = []
     private var excludedURLs: [Regex] = []
     private var excludedHeaders: [Regex] = []
+    private var excludedDataFields: Set<String> = []
 
     private let lock = NSLock()
 
@@ -27,35 +28,40 @@ public final class NetworkLogger: @unchecked Sendable {
         /// If the request itself fails, the task completes immediately.
         public var isWaitingForDecoding = false
 
-        /// Stores logs only for the included hosts.
+        /// Store logs only for the included hosts.
         ///
         /// - note: Supports wildcards, e.g. `*.example.com`, and full regex
         /// when ``isRegexEnabled`` option is enabled.
         public var includedHosts: Set<String> = []
 
-        /// Stores logs only for the included URLs.
+        /// Store logs only for the included URLs.
         ///
         /// - note: Supports wildcards, e.g. `*.example.com`, and full regex
         /// when ``isRegexEnabled`` option is enabled.
         public var includedURLs: Set<String> = []
 
-        /// Excludes the given hosts from the logs.
+        /// Exclude the given hosts from the logs.
         ///
         /// - note: Supports wildcards, e.g. `*.example.com`, and full regex
         /// when ``isRegexEnabled`` option is enabled.
         public var excludedHosts: Set<String> = []
 
-        /// Excludes the given URLs from the logs.
+        /// Exclude the given URLs from the logs.
         ///
         /// - note: Supports wildcards, e.g. `*.example.com`, and full regex
         /// when ``isRegexEnabled`` option is enabled.
         public var excludedURLs: Set<String> = []
 
-        /// Excludes the given HTTP headers from logged requests and responses.
+        /// Redact the given HTTP headers from the logged requests and responses.
         ///
         /// - note: Supports wildcards, e.g. `X-*`, and full regex
         /// when ``isRegexEnabled`` option is enabled.
         public var excludedHeaders: Set<String> = []
+
+        /// Redact the given JSON fields from the logged requests and responses bodies.
+        ///
+        /// - note: Unlike other fields, doesn't support wildcards or regex.
+        public var excludedDataFields: Set<String> = []
 
         /// If enabled, processes `include` and `exclude` patterns using regex.
         /// By default, patterns support only basic wildcard syntax: `*.example.com`.
@@ -116,7 +122,10 @@ public final class NetworkLogger: @unchecked Sendable {
         self.includedURLs = configuration.includedURLs.compactMap(process)
         self.excludedHosts = configuration.excludedHosts.compactMap(process)
         self.excludedURLs = configuration.excludedURLs.compactMap(process)
-        self.excludedHeaders = configuration.excludedHeaders.compactMap { process($0, options: [.caseInsensitive]) }
+        self.excludedHeaders = configuration.excludedHeaders.compactMap {
+            process($0, options: [.caseInsensitive])
+        }
+        self.excludedDataFields = configuration.excludedDataFields
     }
 
     // MARK: Logging
@@ -248,6 +257,10 @@ public final class NetworkLogger: @unchecked Sendable {
     }
 
     private func preprocess(_ event: LoggerStore.Event) -> LoggerStore.Event {
+        removeExcludedResponseFields(removeExcludedHeaders(event))
+    }
+
+    private func removeExcludedHeaders(_ event: LoggerStore.Event) -> LoggerStore.Event {
         guard !excludedHeaders.isEmpty else {
             return event
         }
@@ -265,6 +278,21 @@ public final class NetworkLogger: @unchecked Sendable {
             event.currentRequest = event.currentRequest?.redactingSensitiveHeaders(excludedHeaders)
             event.response = event.response?.redactingSensitiveHeaders(excludedHeaders)
             event.metrics = event.metrics?.redactingSensitiveHeaders(excludedHeaders)
+            return .networkTaskCompleted(event)
+        }
+    }
+
+    private func removeExcludedResponseFields(_ event: LoggerStore.Event) -> LoggerStore.Event {
+        guard !excludedDataFields.isEmpty else {
+            return event
+        }
+        switch event {
+        case .messageStored, .networkTaskProgressUpdated, .networkTaskCreated:
+            return event
+        case .networkTaskCompleted(let event):
+            var event = event
+            event.requestBody = event.requestBody?.redactingSensitiveFields(excludedDataFields)
+            event.responseBody = event.responseBody?.redactingSensitiveFields(excludedDataFields)
             return .networkTaskCompleted(event)
         }
     }
