@@ -70,8 +70,8 @@ struct NetworkInspectorSummaryView: View {
                 viewModel.originalRequestSummary.map {
                     KeyValueSectionView(viewModel: $0).hiddenTitle()
                 }
-                viewModel.originalRequestQueryItems.map { KeyValueSectionView(viewModel: $0, limit: 10) }
-                KeyValueSectionView(viewModel: viewModel.originalRequestHeaders, limit: 10)
+                viewModel.originalRequestQueryItems.map { KeyValueSectionView(viewModel: $0, limit: 8) }
+                KeyValueSectionView(viewModel: viewModel.originalRequestHeaders, limit: 8)
                 viewModel.originalRequestCookies.map(KeyValueSectionView.init)
                 KeyValueSectionView(viewModel: viewModel.requestBodySection)
                 viewModel.originalRequestParameters.map(KeyValueSectionView.init)
@@ -86,8 +86,8 @@ struct NetworkInspectorSummaryView: View {
                 viewModel.currentRequestSummary.map {
                     KeyValueSectionView(viewModel: $0).hiddenTitle()
                 }
-                viewModel.currentRequestQueryItems.map { KeyValueSectionView(viewModel: $0, limit: 10) }
-                KeyValueSectionView(viewModel: viewModel.currentRequestHeaders, limit: 10)
+                viewModel.currentRequestQueryItems.map { KeyValueSectionView(viewModel: $0, limit: 8) }
+                KeyValueSectionView(viewModel: viewModel.currentRequestHeaders, limit: 8)
                 viewModel.currentRequestCookies.map(KeyValueSectionView.init)
                 KeyValueSectionView(viewModel: viewModel.requestBodySection)
                 viewModel.currentRequestParameters.map(KeyValueSectionView.init)
@@ -102,7 +102,7 @@ struct NetworkInspectorSummaryView: View {
                 viewModel.responseSummary.map {
                     KeyValueSectionView(viewModel: $0).hiddenTitle()
                 }
-                KeyValueSectionView(viewModel: viewModel.responseHeaders, limit: 10)
+                KeyValueSectionView(viewModel: viewModel.responseHeaders, limit: 8)
                 viewModel.responseCookies.map(KeyValueSectionView.init)
                 KeyValueSectionView(viewModel: viewModel.responseBodySection)
             }
@@ -120,8 +120,8 @@ struct NetworkInspectorSummaryView: View {
         KeyValueSectionView(viewModel: viewModel.requestBodySection)
         KeyValueSectionView(viewModel: viewModel.responseBodySection)
         // HTTTP Headers
-        KeyValueSectionView(viewModel: viewModel.originalRequestHeaders, limit: 10)
-        KeyValueSectionView(viewModel: viewModel.responseHeaders, limit: 10)
+        KeyValueSectionView(viewModel: viewModel.originalRequestHeaders, limit: 8)
+        KeyValueSectionView(viewModel: viewModel.responseHeaders, limit: 8)
         // Timing
         viewModel.timingDetailsViewModel.map(KeyValueSectionView.init)
     }
