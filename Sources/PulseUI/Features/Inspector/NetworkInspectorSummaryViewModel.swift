@@ -183,7 +183,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
             return nil
         }
         return KeyValueSectionViewModel(
-            title: "Request Cookies",
+            title: "Cookies",
             color: .blue,
             action: ActionViewModel(title: "View") { [unowned self] in
                 isCurrentRequestCookiesLinkActive = true
@@ -214,7 +214,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
             return nil
         }
         return KeyValueSectionViewModel(
-            title: "Response Cookies",
+            title: "Cookies",
             color: .indigo,
             action: ActionViewModel(title: "View") { [unowned self] in
                 isResponseCookiesLinkActive = true
@@ -229,16 +229,16 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
 
     var responseBodySection: KeyValueSectionViewModel {
         if task.type == .downloadTask, task.responseBodySize > 0 {
-            return KeyValueSectionViewModel(title: "Response Body", color: .indigo, items: [
+            return KeyValueSectionViewModel(title: "Body", color: .indigo, items: [
                 ("Download Size", ByteCountFormatter.string(fromByteCount: task.responseBodySize))
             ])
         }
         guard task.responseBodySize > 0 else {
-            return KeyValueSectionViewModel(title: "Response Body", color: .indigo)
+            return KeyValueSectionViewModel(title: "Body", color: .indigo)
         }
         let size = ByteCountFormatter.string(fromByteCount: task.responseBodySize)
         return KeyValueSectionViewModel(
-            title: "Response Body",
+            title: "Body",
             color: .indigo,
             action: ActionViewModel(title: "View") { [unowned self] in
                 isResponseRawLinkActive = true

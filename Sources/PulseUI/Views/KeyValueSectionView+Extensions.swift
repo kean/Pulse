@@ -69,7 +69,7 @@ extension KeyValueSectionViewModel {
 
     static func makeResponseHeaders(for headers: [String: String], action: @escaping () -> Void) -> KeyValueSectionViewModel {
         KeyValueSectionViewModel(
-            title: "Response Headers",
+            title: "Headers",
             color: .indigo,
             action: headers.isEmpty ? nil : ActionViewModel(title: "View", action: action),
             items: headers.sorted(by: { $0.key < $1.key })
@@ -92,7 +92,7 @@ extension KeyValueSectionViewModel {
     }
 
     static func makeDetails(for cookie: HTTPCookie, color: Color) -> KeyValueSectionViewModel {
-        KeyValueSectionViewModel(title: "Response Cookies", color: color, items: [
+        KeyValueSectionViewModel(title: "Cookies", color: color, items: [
             ("Name", cookie.name),
             ("Value", cookie.value),
             ("Domain", cookie.domain),
