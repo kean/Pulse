@@ -64,6 +64,8 @@ struct ConsoleContextMenu: View {
         .sheet(isPresented: $isShowingSettings) {
             NavigationView {
                 SettingsView(store: store)
+                    .navigationTitle("Settings")
+                    .navigationBarTitleDisplayMode(.inline)
                     .navigationBarItems(trailing: Button(action: { isShowingSettings = false }) {
                         Text("Done")
                     })

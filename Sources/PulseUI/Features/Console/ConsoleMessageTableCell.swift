@@ -39,7 +39,6 @@ final class ConsoleMessageTableCell: UITableViewCell, UIContextMenuInteractionDe
 
         title.font = .preferredFont(forTextStyle: .caption1)
         details.font = .systemFont(ofSize: 15)
-        details.numberOfLines = 4
 
         let interaction = UIContextMenuInteraction(delegate: self)
         self.addInteraction(interaction)
@@ -48,6 +47,7 @@ final class ConsoleMessageTableCell: UITableViewCell, UIContextMenuInteractionDe
     func display(_ viewModel: ConsoleMessageViewModel) {
         self.viewModel = viewModel
 
+        details.numberOfLines = ConsoleSettings.shared.lineLimit
         title.attributedText = viewModel.attributedTitle
         details.text = viewModel.text
         details.textColor = viewModel.textColor2

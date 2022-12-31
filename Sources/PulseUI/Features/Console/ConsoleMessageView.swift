@@ -9,7 +9,7 @@ import Combine
 
 struct ConsoleMessageView: View {
     let viewModel: ConsoleMessageViewModel
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(alignment: .firstTextBaseline) {
@@ -59,7 +59,6 @@ struct ConsoleMessageView: View {
         Text(viewModel.text)
             .font(fonts.body)
             .foregroundColor(viewModel.textColor)
-            .lineLimit(4)
     }
     
     private struct Fonts {

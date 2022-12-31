@@ -5,15 +5,10 @@
 import SwiftUI
 import Pulse
 
-#if os(iOS) || os(watchOS) || os(tvOS)
-import UniformTypeIdentifiers
+#if os(watchOS) || os(tvOS)
 
 public struct SettingsView: View {
     @ObservedObject var viewModel: SettingsViewModel
-
-#if os(iOS)
-    @State private var isDocumentBrowserPresented = false
-#endif
 
     public init(store: LoggerStore = .shared) {
         // TODO: Fix ownership
@@ -26,7 +21,7 @@ public struct SettingsView: View {
 
     public var body: some View {
         Form {
-            if #available(iOS 14.0, tvOS 14.0, *) {
+            if #available(tvOS 14.0, *) {
                 sectionStoreDetails
             }
 #if os(watchOS)
@@ -37,14 +32,11 @@ public struct SettingsView: View {
                     ButtonRemoveAll(action: viewModel.buttonRemoveAllMessagesTapped)
                 }
             }
-            if #available(iOS 14.0, tvOS 14.0, *), viewModel.isRemoteLoggingAvailable {
+            if #available(tvOS 14.0, *), viewModel.isRemoteLoggingAvailable {
                 Section {
                     RemoteLoggerSettingsView(viewModel: .shared)
                 }
             }
-#if os(iOS)
-            sectionSponsor
-#endif
         }
         .backport.navigationTitle("Settings")
 #if os(tvOS)
@@ -52,7 +44,7 @@ public struct SettingsView: View {
 #endif
     }
 
-    @available(iOS 14.0, tvOS 14.0, *)
+    @available(tvOS 14.0, *)
     private var sectionStoreDetails: some View {
         Section {
             NavigationLink(destination: StoreDetailsView(source: .store(viewModel.store))) {
@@ -61,19 +53,6 @@ public struct SettingsView: View {
                     Text("Store Info")
                 }
             }
-#if os(iOS)
-            if !viewModel.isArchive {
-                Button(action: { isDocumentBrowserPresented = true }) {
-                    HStack {
-                        Image(systemName: "doc")
-                        Text("Browse Stores")
-                    }
-                }
-                .fullScreenCover(isPresented: $isDocumentBrowserPresented) {
-                    DocumentBrowser()
-                }
-            }
-#endif
         }
     }
 
@@ -88,47 +67,12 @@ public struct SettingsView: View {
         }
     }
 #endif
-
-#if os(iOS)
-    private var sectionSponsor: some View {
-        Section(footer: Text("Pulse is funded by the community contributions.")) {
-            Button(action: {
-                if let url = URL(string: "https://github.com/sponsors/kean") {
-                    UIApplication.shared.open(url)
-                }
-            }) {
-                HStack {
-                    Image(systemName: "heart.fill")
-                        .foregroundColor(Color.pink)
-                    Text("Sponsor")
-                        .foregroundColor(Color.primary)
-                    Spacer()
-                    Image(systemName: "link")
-                        .foregroundColor(.secondary)
-                }
-            }
-        }
-    }
-#endif
 }
-
-#if os(iOS)
-@available(iOS 14.0, *)
-private struct DocumentBrowser: UIViewControllerRepresentable {
-    func makeUIViewController(context: Context) -> DocumentBrowserViewController {
-        DocumentBrowserViewController(forOpeningContentTypes: [UTType(filenameExtension: "pulse")].compactMap { $0 })
-    }
-
-    func updateUIViewController(_ uiViewController: DocumentBrowserViewController, context: Context) {
-
-    }
-}
-#endif
 
 // MARK: - Preview
 
 #if DEBUG
-struct ConsoleSettingsView_Previews: PreviewProvider {
+struct SettingsView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
             SettingsView(viewModel: .init(store: .mock))

@@ -116,7 +116,11 @@ extension MainViewModel {
             InsightsView(viewModel: insights)
 #endif
         case .settings:
+#if os(iOS)
+            EmptyView()
+#else
             SettingsView(viewModel: settings)
+#endif
         default: fatalError()
         }
     }
