@@ -9,10 +9,14 @@ import Combine
 
 #if os(iOS)
 
+import UniformTypeIdentifiers
+
 public struct ConsoleView: View {
     @ObservedObject var viewModel: ConsoleViewModel
     @State private var isSharing = false
     @State private var isShowingSettings = false
+    @State private var isShowingStoreInfo = false
+    @State private var isDocumentBrowserPresented = false
 
     public init(store: LoggerStore = .shared) {
         self.viewModel = ConsoleViewModel(store: store)
@@ -56,20 +60,51 @@ public struct ConsoleView: View {
                         })
                 }
             }
+            .sheet(isPresented: $isShowingStoreInfo) {
+                if #available(iOS 14.0, *) {
+                    NavigationView {
+                        StoreDetailsView(source: .store(viewModel.store))
+                            .navigationBarItems(trailing: Button(action: { isShowingStoreInfo = false }) {
+                                Text("Done")
+                            })
+                    }
+                }
+            }
+            .backport.fullScreenCover(isPresented: $isDocumentBrowserPresented) {
+                if #available(iOS 14.0, *) {
+                    DocumentBrowser()
+                }
+            }
     }
 
     @available(iOS 14.0, *)
     private var contextMenu: some View {
         Menu {
             Section {
+                Button(action: { isShowingStoreInfo = true }) {
+                    Label("Store Info", systemImage: "info.circle")
+                }
+                if !viewModel.store.isArchive {
+                    Button(action: { isDocumentBrowserPresented = true }) {
+                        Label("Browse Stores", systemImage: "doc")
+                    }
+                }
+            }
+            Section {
                 Button(action: { isShowingSettings = true }) {
-                    SwiftUI.Label("Settings", systemImage: "gear")
+                    Label("Settings", systemImage: "gear")
                 }
             }
             if !viewModel.store.isArchive {
                 Section {
-                    Button(action: buttonRemoveAllTapped) {
-                        SwiftUI.Label("Remove Message", systemImage: "trash")
+                    if #available(iOS 15.0, *) {
+                        Button(role: .destructive, action: buttonRemoveAllTapped) {
+                            Label("Remove Message", systemImage: "trash")
+                        }
+                    } else {
+                        Button(action: buttonRemoveAllTapped) {
+                            Label("Remove Message", systemImage: "trash")
+                        }
                     }
                 }
             }
@@ -141,6 +176,17 @@ private struct ConsoleToolbarView: View {
     }
 }
 
+@available(iOS 14.0, *)
+private struct DocumentBrowser: UIViewControllerRepresentable {
+    func makeUIViewController(context: Context) -> DocumentBrowserViewController {
+        DocumentBrowserViewController(forOpeningContentTypes: [UTType(filenameExtension: "pulse")].compactMap { $0 })
+    }
+
+    func updateUIViewController(_ uiViewController: DocumentBrowserViewController, context: Context) {
+
+    }
+}
+
 #if DEBUG
 struct ConsoleView_Previews: PreviewProvider {
     static var previews: some View {
@@ -150,4 +196,5 @@ struct ConsoleView_Previews: PreviewProvider {
     }
 }
 #endif
+
 #endif
