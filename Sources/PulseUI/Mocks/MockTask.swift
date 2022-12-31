@@ -160,12 +160,12 @@ private let mockLoginCurrentRequest = mockLoginOriginalRequest.adding(headers: [
 ])
 
 private let mockLoginResponse = HTTPURLResponse(url: "https://github.com/login", statusCode: 200, headers: [
-    "Set-Cookie": "token=ADSJ1239CX0; path=/; expires=Sun, 30 Jan 2030 21:49:04 GMT; secure; HttpOnly"
+    "Set-Cookie": "token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c; path=/; expires=Sun, 30 Jan 2030 21:49:04 GMT; secure; HttpOnly"
 ])
 
 private let mockLoginResponseBody = """
 {
-    "access-token": "a1",
+    "access-token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
     "refresh-token": "m1",
     "profile": {
         "id": 1,

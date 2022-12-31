@@ -129,6 +129,44 @@ extension KeyValueSectionViewModel {
         )
     }
 
+#if !os(watchOS)
+    static func makeDetails(for jwt: JWT) -> NSAttributedString {
+        let titleAttributes: [NSAttributedString.Key: Any] = [
+            .foregroundColor: UXColor.label,
+            .font: UXFont.preferredFont(forTextStyle: .headline)
+        ]
+        let bodyAttributes: [NSAttributedString.Key: Any] = [
+            .foregroundColor: UXColor.secondaryLabel,
+            .font: UXFont.monospacedSystemFont(ofSize: FontSize.body, weight: .regular)
+        ]
+
+        let string = NSMutableAttributedString()
+        string.append("Header\n", titleAttributes)
+        string.append(JSONPrinter.asAttributedString(jwt.header).with(.foregroundColor, UXColor.systemRed))
+        string.append("\n\n")
+        string.append("Payload\n", titleAttributes)
+        string.append(JSONPrinter.asAttributedString(jwt.body).with(.foregroundColor, UXColor.systemPurple))
+        if let signature = jwt.signature {
+            string.append("\n\n")
+            string.append("Signature\n", titleAttributes)
+            string.append(NSAttributedString(string: signature, attributes: bodyAttributes).with(.foregroundColor, UXColor.systemBlue))
+        }
+        string.append("\n\n")
+        string.append("Encoded\n", titleAttributes)
+        string.append(NSAttributedString(string: jwt.parts[0], attributes: bodyAttributes).with(.foregroundColor, UXColor.systemRed))
+        string.append(".", bodyAttributes)
+        string.append(NSAttributedString(string: jwt.parts[1], attributes: bodyAttributes).with(.foregroundColor, UXColor.systemPurple))
+        string.append(".", bodyAttributes)
+        string.append(NSAttributedString(string: jwt.parts[2], attributes: bodyAttributes).with(.foregroundColor, UXColor.systemBlue))
+
+        string.addAttributes([
+            .paragraphStyle: NSParagraphStyle.make(lineHeight: FontSize.body + 8)
+        ])
+
+        return string
+    }
+#endif
+
 #if os(iOS) || os(macOS)
     static func makeTiming(for transaction: NetworkTransactionMetricsEntity) -> KeyValueSectionViewModel {
         let timeFormatter = DateFormatter()

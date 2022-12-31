@@ -242,3 +242,11 @@ extension NSAttributedString {
     }
 }
 #endif
+
+extension NSAttributedString {
+    func with(_ key: NSAttributedString.Key, _ value: Any) -> NSAttributedString {
+        let string = NSMutableAttributedString(attributedString: self)
+        string.addAttributes([key: value])
+        return string
+    }
+}

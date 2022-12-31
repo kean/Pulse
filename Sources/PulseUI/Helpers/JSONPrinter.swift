@@ -223,6 +223,15 @@ final class AttributedStringJSONRenderer: JSONRenderer {
     }
 }
 
+extension JSONPrinter {
+    static func asAttributedString(_ json: Any) -> NSAttributedString {
+        let renderer = AttributedStringJSONRenderer(fontSize: FontSize.body, lineHeight: FontSize.body + 5)
+        let printer = JSONPrinter(renderer: renderer)
+        printer.render(json: json, error: nil)
+        return renderer.make()
+    }
+}
+
 extension NSAttributedString.Key {
     static let decodingError = NSAttributedString.Key(rawValue: "com.github.kean.pulse.decoding-error-key")
 }
