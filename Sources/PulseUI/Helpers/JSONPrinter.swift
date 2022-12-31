@@ -63,13 +63,6 @@ final class JSONPrinter {
         self.renderer = renderer
     }
 
-    static func asAttributedString(_ json: Any) -> NSAttributedString {
-        let renderer = AttributedStringJSONRenderer(fontSize: FontSize.body, lineHeight: FontSize.body + 5)
-        let printer = JSONPrinter(renderer: renderer)
-        printer.render(json: json, error: nil)
-        return renderer.make()
-    }
-
     func render(json: Any, error: NetworkLogger.DecodingError?) {
         self.error = error
         print(json: json, isFree: true)
@@ -227,6 +220,15 @@ final class AttributedStringJSONRenderer: JSONRenderer {
             .paragraphStyle: paragraphStyle
         ])
         return output
+    }
+}
+
+extension JSONPrinter {
+    static func asAttributedString(_ json: Any) -> NSAttributedString {
+        let renderer = AttributedStringJSONRenderer(fontSize: FontSize.body, lineHeight: FontSize.body + 5)
+        let printer = JSONPrinter(renderer: renderer)
+        printer.render(json: json, error: nil)
+        return renderer.make()
     }
 }
 

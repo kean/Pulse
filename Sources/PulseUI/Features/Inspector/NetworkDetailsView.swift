@@ -63,7 +63,9 @@ struct NetworkDetailsView: View {
 #if DEBUG
 struct NetworkDetailsView_Previews: PreviewProvider {
     static var previews: some View {
+#if !os(watchOS)
         NetworkDetailsView(title: "JWT", text: KeyValueSectionViewModel.makeDetails(for: jwt))
+#endif
     }
 }
 

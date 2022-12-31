@@ -129,6 +129,7 @@ extension KeyValueSectionViewModel {
         )
     }
 
+#if !os(watchOS)
     static func makeDetails(for jwt: JWT) -> NSAttributedString {
         let titleAttributes: [NSAttributedString.Key: Any] = [
             .foregroundColor: UXColor.label,
@@ -164,6 +165,7 @@ extension KeyValueSectionViewModel {
 
         return string
     }
+#endif
 
 #if os(iOS) || os(macOS)
     static func makeTiming(for transaction: NetworkTransactionMetricsEntity) -> KeyValueSectionViewModel {
