@@ -52,7 +52,7 @@ extension KeyValueSectionViewModel {
 
     static func makeRequestHeaders(for headers: [String: String], action: @escaping () -> Void) -> KeyValueSectionViewModel {
         KeyValueSectionViewModel(
-            title: "Request Headers",
+            title: "Headers",
             color: .blue,
             action: headers.isEmpty ? nil : ActionViewModel(title: "View", action: action),
             items: headers.sorted(by: { $0.key < $1.key })

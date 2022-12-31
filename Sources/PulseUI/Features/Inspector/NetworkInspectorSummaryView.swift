@@ -244,15 +244,18 @@ struct NetworkInspectorSummaryView: View {
             
             NavigationLink.programmatic(isActive: $viewModel.isOriginalRequestHeadersLinkActive) {
                 NetworkDetailsView(viewModel: viewModel.originalRequestHeaders)
+                    .title("Request Headers")
             }
             
             NavigationLink.programmatic(isActive: $viewModel.isCurrentRequestHeadersLinkActive) {
                 NetworkDetailsView(viewModel: viewModel.currentRequestHeaders)
+                    .title("Request Headers")
             }
             
             if let responesHeaders = viewModel.responseHeaders {
                 NavigationLink.programmatic(isActive: $viewModel.isResponseHeadearsRawLinkActive) {
                     NetworkDetailsView(viewModel: responesHeaders)
+                        .title("Response Headers")
                 }
             }
         }

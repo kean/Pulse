@@ -118,11 +118,11 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
 
     var requestBodySection: KeyValueSectionViewModel {
         guard task.requestBodySize > 0 else {
-            return KeyValueSectionViewModel(title: "Request Body", color: .blue)
+            return KeyValueSectionViewModel(title: "Body", color: .blue)
         }
         let contentType = (task.originalRequest?.headers ?? [:]).first(where: { $0.key == "Content-Type" })?.value ?? "–"
         return KeyValueSectionViewModel(
-            title: "Request Body",
+            title: "Body",
             color: .blue,
             action: ActionViewModel(title: "View") { [unowned self] in
                 isRequestRawLinkActive = true
@@ -139,7 +139,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
             return nil
         }
         return KeyValueSectionViewModel(
-            title: "Request Cookies",
+            title: "Cookies",
             color: .blue,
             action: ActionViewModel(title: "View") { [unowned self] in
                 isOriginalRequestCookiesLinkActive = true

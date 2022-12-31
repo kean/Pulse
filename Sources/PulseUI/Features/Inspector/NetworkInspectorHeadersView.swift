@@ -33,7 +33,7 @@ struct NetworkInspectorHeadersView: View {
 }
 
 struct NetworkDetailsView: View {
-    private let title: String
+    private var title: String
     private let text: NSAttributedString
     @State private var isShowingShareSheet = false
 
@@ -45,6 +45,12 @@ struct NetworkDetailsView: View {
     init(title: String, text: NSAttributedString) {
         self.title = title
         self.text = text
+    }
+
+    func title(_ title: String) -> NetworkDetailsView {
+        var copy = self
+        copy.title = title
+        return copy
     }
 
     #if os(iOS)
