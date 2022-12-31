@@ -178,24 +178,6 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
         }
     }
 
-    var currentRequestBodySection: KeyValueSectionViewModel {
-        guard task.requestBodySize > 0 else {
-            return KeyValueSectionViewModel(title: "Request Body", color: .blue)
-        }
-        let contentType = task.currentRequest?.headers.first(where: { $0.key == "Content-Type" })?.value ?? "–"
-        return KeyValueSectionViewModel(
-            title: "Request Body",
-            color: .blue,
-            action: ActionViewModel(title: "View") { [unowned self] in
-                isRequestRawLinkActive = true
-            },
-            items: [
-                ("Content-Type", contentType),
-                ("Size", ByteCountFormatter.string(fromByteCount: task.requestBodySize))
-            ]
-        )
-    }
-
     var currentRequestCookies: KeyValueSectionViewModel? {
         guard let cookies = task.currentRequest?.cookies, !cookies.isEmpty else {
             return nil
