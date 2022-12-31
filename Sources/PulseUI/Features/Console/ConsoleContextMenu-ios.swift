@@ -50,9 +50,11 @@ struct ConsoleContextMenu: View {
                 }
             }
             Section {
-                Text("Pulse is funded by the community contributions")
-                Button(action: buttonSponsorTapped) {
-                    Label("Sponsor", systemImage: "heart")
+                if !UserDefaults.standard.bool(forKey: "pulse-disable-support-prompts") {
+                    Text("Pulse is funded by the community contributions")
+                    Button(action: buttonSponsorTapped) {
+                        Label("Sponsor", systemImage: "heart")
+                    }
                 }
                 Button(action: buttonSendFeedbackTapped) {
                     Label("Report Issue", systemImage: "envelope")
