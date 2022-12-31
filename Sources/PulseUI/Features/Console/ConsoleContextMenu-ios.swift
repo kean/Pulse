@@ -27,7 +27,7 @@ struct ConsoleContextMenu: View {
                 }
                 if !store.isArchive {
                     Button(action: { isDocumentBrowserPresented = true }) {
-                        Label("Browse Stores", systemImage: "doc")
+                        Label("Browse Saved Logs", systemImage: "folder")
                     }
                 }
             }
@@ -40,11 +40,11 @@ struct ConsoleContextMenu: View {
                 Section {
                     if #available(iOS 15.0, *) {
                         Button(role: .destructive, action: buttonRemoveAllTapped) {
-                            Label("Remove Message", systemImage: "trash")
+                            Label("Remove Logs", systemImage: "trash")
                         }
                     } else {
                         Button(action: buttonRemoveAllTapped) {
-                            Label("Remove Message", systemImage: "trash")
+                            Label("Remove Logs", systemImage: "trash")
                         }
                     }
                 }
