@@ -50,10 +50,13 @@ struct ConsoleContextMenu: View {
                 }
             }
             Section {
-                Button(action: buttonSponsorTapped) {
-                    Label("Sponsor", systemImage: "link")
-                }
                 Text("Pulse is funded by the community contributions")
+                Button(action: buttonSponsorTapped) {
+                    Label("Sponsor", systemImage: "heart")
+                }
+                Button(action: buttonSendFeedbackTapped) {
+                    Label("Report Issue", systemImage: "envelope")
+                }
             }
         } label: {
             Image(systemName: "ellipsis.circle")
@@ -92,9 +95,12 @@ struct ConsoleContextMenu: View {
     }
 
     private func buttonSponsorTapped() {
-        guard let url = URL(string: "https://github.com/sponsors/kean") else {
-            return
-        }
+        guard let url = URL(string: "https://github.com/sponsors/kean") else { return }
+        UIApplication.shared.open(url)
+    }
+
+    private func buttonSendFeedbackTapped() {
+        guard let url = URL(string: "https://github.com/kean/Pulse/issu") else { return }
         UIApplication.shared.open(url)
     }
 }
