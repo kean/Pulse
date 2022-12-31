@@ -27,15 +27,27 @@ extension KeyValueSectionViewModel {
     }
 
     static func makeParameters(for request: NetworkRequestEntity) -> KeyValueSectionViewModel {
-        KeyValueSectionViewModel(title: "Request Parameters", color: .gray, items: [
+        var items: [(String, String?)] = [
             ("Cache Policy", request.cachePolicy.description),
-            ("Timeout Interval", DurationFormatter.string(from: TimeInterval(request.timeoutInterval), isPrecise: false)),
-            ("Allows Cellular Access", request.allowsCellularAccess.description),
-            ("Allows Expensive Network Access", request.allowsExpensiveNetworkAccess.description),
-            ("Allows Constrained Network Access", request.allowsConstrainedNetworkAccess.description),
-            ("HTTP Should Handle Cookies", request.httpShouldHandleCookies.description),
-            ("HTTP Should Use Pipelining", request.httpShouldUsePipelining.description)
-        ])
+            ("Timeout Interval", DurationFormatter.string(from: TimeInterval(request.timeoutInterval), isPrecise: false))
+        ]
+        // Display only non-default values
+        if !request.allowsCellularAccess {
+            items.append(("Allows Cellular Access", request.allowsCellularAccess.description))
+        }
+        if !request.allowsExpensiveNetworkAccess {
+            items.append(("Allows Expensive Network Access", request.allowsExpensiveNetworkAccess.description))
+        }
+        if !request.allowsConstrainedNetworkAccess {
+            items.append(("Allows Constrained Network Access", request.allowsConstrainedNetworkAccess.description))
+        }
+        if !request.httpShouldHandleCookies {
+            items.append(("Should Handle Cookies", request.httpShouldHandleCookies.description))
+        }
+        if request.httpShouldUsePipelining {
+            items.append(("HTTP Should Use Pipelining", request.httpShouldUsePipelining.description))
+        }
+        return KeyValueSectionViewModel(title: "Options", color: .gray, items: items)
     }
 
     static func makeRequestHeaders(for headers: [String: String], action: @escaping () -> Void) -> KeyValueSectionViewModel {
