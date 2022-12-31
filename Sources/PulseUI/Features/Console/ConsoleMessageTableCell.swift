@@ -97,6 +97,7 @@ final class ConsoleMessageAccessoryView: UIView {
     let textLabel = UILabel()
 
     private static var chevron = UIImage.make(systemName: "chevron.right", textStyle: .caption1)
+        .imageFlippedForRightToLeftLayoutDirection()
 
     override init(frame: CGRect) {
         super.init(frame: frame)
