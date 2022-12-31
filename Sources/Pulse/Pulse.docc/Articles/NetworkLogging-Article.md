@@ -73,6 +73,8 @@ Experimental.URLSessionProxy.shared.isEnabled = true
 
 > warning: As clearly communicate by its namespace, it's an experimental feature and it might negatively affect your networking. The way it works is by registering a custom [URLProtocol](https://developer.apple.com/documentation/foundation/urlprotocol) and using a secondary URLSession instance in it, but it can be a useful tool.
 
+> note: Alternatively, you can give the following swizzle-based [approach](https://gist.github.com/kean/3154a5bde8e0c5e9dc3322f21ba86757) a try that is less intrusive but requires more swizzling and can't be shipped with the production code.
+
 ## Recoding Decoding Errors
 
 The network requests usually can only be considered successful when the app was able to decode the response data. With Pulse, you can do just that and when you open the response body, it'll even highlight the part of the response that's causing the decoding error.
