@@ -62,8 +62,12 @@ struct ShareStoreView: View {
                 Text("Errors").tag(LoggerStore.Level.error)
             }
             Picker("Output Format", selection: $viewModel.output) {
-                Text("Pulse Document").tag(ShareStoreOutput.store)
-                Text("Text Document").tag(ShareStoreOutput.text)
+                Text("File (.pulse)")
+                    .lineLimit(1)
+                    .tag(ShareStoreOutput.store)
+                Text("Text (.txt)")
+                    .lineLimit(1)
+                    .tag(ShareStoreOutput.text)
             }
         }
     }
@@ -269,7 +273,7 @@ private struct SharedContents {
 }
 
 private enum TimeRange: String, CaseIterable {
-    case currentSession = "Current Session"
+    case currentSession = "This Session"
     case lastHour = "Last Hour"
     case today = "Today"
     case all = "All Messages"
