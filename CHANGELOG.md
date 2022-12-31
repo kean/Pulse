@@ -15,7 +15,7 @@
 - Fix an issue where search in text viewer would occasionally stop highlighting the results
 - Add a missing public `InsightsView` initializer 
 - Add cookies section and details screens to the request summary - [#124](https://github.com/kean/Pulse/pull/124)
-- A couple of minor UI improvements and bug fixes 
+- A couple of minor UI improvements and bug fixes
 
 ## Pulse 2.1.4
 

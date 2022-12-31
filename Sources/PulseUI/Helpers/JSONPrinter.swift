@@ -211,9 +211,13 @@ final class AttributedStringJSONRenderer: JSONRenderer {
     }
 
     func make() -> NSAttributedString {
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.maximumLineHeight = lineHeight
+        paragraphStyle.minimumLineHeight = lineHeight
+        paragraphStyle.alignment = .left
         output.addAttributes([
             .font: UXFont.monospacedSystemFont(ofSize: CGFloat(fontSize), weight: .regular),
-            .paragraphStyle: NSParagraphStyle.make(lineHeight: lineHeight)
+            .paragraphStyle: paragraphStyle
         ])
         return output
     }
