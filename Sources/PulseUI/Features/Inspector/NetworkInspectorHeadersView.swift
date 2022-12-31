@@ -32,62 +32,6 @@ struct NetworkInspectorHeadersView: View {
     }
 }
 
-struct NetworkDetailsView: View {
-    private var title: String
-    private let text: NSAttributedString
-    @State private var isShowingShareSheet = false
-
-    init(viewModel: KeyValueSectionViewModel) {
-        self.title = viewModel.title
-        self.text = viewModel.asAttributedString()
-    }
-
-    init(title: String, text: NSAttributedString) {
-        self.title = title
-        self.text = text
-    }
-
-    func title(_ title: String) -> NetworkDetailsView {
-        var copy = self
-        copy.title = title
-        return copy
-    }
-
-    #if os(iOS)
-    var body: some View {
-        contents
-            .navigationBarTitle(title)
-            .navigationBarItems(trailing: ShareButton {
-                isShowingShareSheet = true
-            })
-            .sheet(isPresented: $isShowingShareSheet) {
-                ShareView(activityItems: [text])
-            }
-    }
-    #else
-    var body: some View {
-        contents
-    }
-    #endif
-
-    @ViewBuilder
-    private var contents: some View {
-        if text.string.isEmpty {
-            PlaceholderView(imageName: "folder", title: "Empty")
-        } else {
-            #if os(watchOS) || os(tvOS)
-            RichTextView(viewModel: .init(string: text.string))
-            #else
-            RichTextView(viewModel: {
-                let viewModel = RichTextViewModel(string: text)
-                viewModel.isAutomaticLinkDetectionEnabled = false
-                return viewModel
-            }())
-            #endif
-        }
-    }
-}
-
 // MARK: - ViewModel
 
 final class NetworkInspectorHeaderViewModel: ObservableObject {

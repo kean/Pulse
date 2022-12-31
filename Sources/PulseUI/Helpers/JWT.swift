@@ -4,21 +4,26 @@
 
 import Foundation
 
-struct JWT {
+struct JWT: Identifiable {
     let header: [String: Any]
     let body: [String: Any]
     let signature: String?
-    let string: String
 
-    init(jwt: String) throws {
-        let parts = jwt.components(separatedBy: ".")
+    let string: String
+    let parts: [String]
+
+    var id: String { string }
+
+    init(_ string: String) throws {
+        let parts = string.components(separatedBy: ".")
         guard parts.count == 3 else {
-            throw JWTDecodeError.invalidPartCount(jwt, parts.count)
+            throw JWTDecodeError.invalidPartCount(string, parts.count)
         }
+        self.parts = parts
         self.header = try decodeJWTPart(parts[0])
         self.body = try decodeJWTPart(parts[1])
         self.signature = parts[2]
-        self.string = jwt
+        self.string = string
     }
 
     var expiresAt: Date? { claim(name: "exp").date }

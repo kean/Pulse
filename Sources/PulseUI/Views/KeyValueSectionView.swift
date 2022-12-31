@@ -93,6 +93,8 @@ private struct KeyValueListView: View {
     let viewModel: KeyValueSectionViewModel
     var limit: Int = Int.max
 
+    @State var jwt: JWT?
+
     private var actualTintColor: Color {
         viewModel.items.isEmpty ? .gray : viewModel.color
     }
@@ -189,6 +191,15 @@ private struct KeyValueListView: View {
 #endif
             Spacer()
         }
+#if os(iOS)
+        .sheet(item: $jwt) { jwt in
+            NavigationView {
+                NetworkDetailsView(title: "JWT", text: KeyValueSectionViewModel.makeDetails(for: jwt))
+                    .navigationBarTitle("JWT", displayMode: .inline)
+                    .navigationBarItems(leading: Button("Close") { self.jwt = nil })
+            }
+        }
+#endif
     }
 #endif
 
@@ -198,6 +209,16 @@ private struct KeyValueListView: View {
         makeCopyButton(title: "Copy Pair", value: "\(item.0): \(item.1 ?? "–")")
         makeCopyButton(title: "Copy Key", value: item.0)
         makeCopyButton(title: "Copy Value", value: item.1)
+        if let value = item.1, let jwt = try? JWT(value) {
+            makeShowJWTButton(jwt: jwt)
+        }
+    }
+
+    func makeShowJWTButton(jwt: JWT) -> some View {
+        Button(action: { self.jwt = jwt }) {
+            Text("View JWT")
+            Image(systemName: "magnifyingglass")
+        }
     }
 
     func makeCopyButton(title: String, value: String?) -> some View {
