@@ -8,7 +8,7 @@ import CoreData
 
 #if os(iOS) || os(macOS)
 
-enum ShareStoreOutput: String {
+enum ShareStoreOutput: String, RawRepresentable {
     case store, text
 }
 

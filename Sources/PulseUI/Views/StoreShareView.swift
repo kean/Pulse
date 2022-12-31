@@ -129,9 +129,9 @@ struct ShareStoreView: View {
 
 private final class ShareStoreViewModel: ObservableObject {
     // Sharing options
-    @Published var timeRange: TimeRange = .currentSession
-    @Published var output: ShareStoreOutput = .store
-    @Published var level: LoggerStore.Level = .trace
+    @Published var timeRange: TimeRange
+    @Published var level: LoggerStore.Level
+    @Published var output: ShareStoreOutput
 
     // Settings
     @Published private(set) var isPreparingForSharing = false
@@ -141,6 +141,12 @@ private final class ShareStoreViewModel: ObservableObject {
     private var store: LoggerStore?
     private var isPrepareForSharingNeeded = false
     private var cancellable: AnyCancellable?
+
+    init() {
+        timeRange = UserDefaults.sharingTimeRange.flatMap(TimeRange.init) ?? .currentSession
+        level = UserDefaults.sharingLevel.flatMap(LoggerStore.Level.init) ?? .trace
+        output = UserDefaults.sharingOutput.flatMap(ShareStoreOutput.init) ?? .store
+    }
 
     func display(_ store: LoggerStore) {
         guard self.store !== store else {
@@ -154,6 +160,7 @@ private final class ShareStoreViewModel: ObservableObject {
                 .dropFirst()
                 .throttle(for: 0.5, scheduler: DispatchQueue.main, latest: true)
                 .sink { [weak self] _, _, _ in
+                    self?.saveSharingOptions()
                     self?.setNeedsPrepareForSharing()
                 }
         }
@@ -167,6 +174,12 @@ private final class ShareStoreViewModel: ObservableObject {
         } else {
             prepareForSharing()
         }
+    }
+
+    private func saveSharingOptions() {
+        UserDefaults.sharingTimeRange = timeRange.rawValue
+        UserDefaults.sharingLevel = level.rawValue
+        UserDefaults.sharingOutput = output.rawValue
     }
 
     func prepareForSharing() {

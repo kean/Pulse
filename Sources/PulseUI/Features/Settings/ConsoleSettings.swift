@@ -6,11 +6,11 @@ import SwiftUI
 import Pulse
 import Combine
 
-// TODO: Switch to AppStorage on iOS 14
-public final class ConsoleSettings: ObservableObject {
+// TODO: Switch to AppStorage on iOS 14 (or write a custom wrapper?)
+public final class ConsoleSettings: ObservableObject, DynamicProperty {
     public static let shared = ConsoleSettings()
 
-    @Published public var lineLimit: Int
+    @Published var lineLimit: Int
 
     private var cancellables: [AnyCancellable] = []
 
@@ -40,6 +40,15 @@ struct UserDefault<Value> {
 extension UserDefaults {
     @UserDefault("\(keyPrefix)_console-line-limit")
     static var lineLimit: Int?
+
+    @UserDefault("\(keyPrefix)_sharing-time-range")
+    static var sharingTimeRange: String?
+
+    @UserDefault("\(keyPrefix)_sharing-level")
+    static var sharingLevel: Int16?
+
+    @UserDefault("\(keyPrefix)_sharing-output")
+    static var sharingOutput: String?
 }
 
 private let keyPrefix = "com-github-com-kean-pulse"
