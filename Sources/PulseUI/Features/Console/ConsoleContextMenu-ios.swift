@@ -49,6 +49,12 @@ struct ConsoleContextMenu: View {
                     }
                 }
             }
+            Section {
+                Button(action: buttonSponsorTapped) {
+                    Label("Sponsor", systemImage: "link")
+                }
+                Text("Pulse is funded by the community contributions")
+            }
         } label: {
             Image(systemName: "ellipsis.circle")
         }
@@ -76,7 +82,6 @@ struct ConsoleContextMenu: View {
     private func buttonRemoveAllTapped() {
         store.removeAll()
 
-#if os(iOS)
         runHapticFeedback(.success)
         ToastView {
             HStack {
@@ -84,7 +89,13 @@ struct ConsoleContextMenu: View {
                 Text("All messages removed")
             }
         }.show()
-#endif
+    }
+
+    private func buttonSponsorTapped() {
+        guard let url = URL(string: "https://github.com/sponsors/kean") else {
+            return
+        }
+        UIApplication.shared.open(url)
     }
 }
 
@@ -104,7 +115,10 @@ private struct DocumentBrowser: UIViewControllerRepresentable {
 struct ConsoleContextMenu_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
-            ConsoleContextMenu(store: .mock)
+            VStack {
+                ConsoleContextMenu(store: .mock)
+                Spacer()
+            }
         }
     }
 }
