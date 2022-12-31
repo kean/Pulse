@@ -51,8 +51,7 @@ struct LoggerStoreSizeChart: View {
         .padding(.bottom, 4)
         .frame(height: 90)
 #else
-        .chartLegend(position: .bottom, spacing: -8)
-        .frame(height: 50)
+        .frame(height: 66)
 #endif
     }
 
