@@ -6,7 +6,7 @@ import SwiftUI
 import Pulse
 
 #if os(iOS)
-// TOOD: Remove this code workaround (control over RichTextView reloads is completely lost)
+// TODO: Remove this code workaround (control over RichTextView reloads is completely lost)
 struct FileViewer: UIViewControllerRepresentable {
     let viewModel: FileViewerViewModel
     var onToggleExpanded: (() -> Void)?
