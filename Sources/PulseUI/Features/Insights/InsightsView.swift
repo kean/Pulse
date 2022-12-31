@@ -19,6 +19,14 @@ public struct InsightsView: View {
 
     private var insights: NetworkLoggerInsights { viewModel.insights }
 
+    init(viewModel: InsightsViewModel) {
+        self.viewModel = viewModel
+    }
+
+    public init(store: LoggerStore) {
+        self.viewModel = InsightsViewModel(store: store)
+    }
+
     public var body: some View {
         List {
             Section(header: Text("Transfer Size")) {
