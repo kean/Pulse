@@ -770,25 +770,22 @@ extension LoggerStore {
         let temporary = TemporaryDirectory()
         defer { temporary.remove() }
 
-        let document = try PulseDocument(documentURL: targetURL)
-        var totalSize: Int64 = 0
-
         // Create copy of the store
         let databaseURL = temporary.url.appending(filename: databaseFilename)
         try container.persistentStoreCoordinator.createCopyOfStore(at: databaseURL)
 
+        var info = try _info()
+
         // Remove unwanted messages
         if let predicate = predicate {
             try Files.copyItem(at: manifestURL, to: temporary.url.appending(filename: manifestFilename)) // Important
-            let store = try LoggerStore(storeURL: temporary.url)
-            defer { try? store.close() }
-            try store.backgroundContext.performAndReturn {
-                try store.removeMessages(with:  NSCompoundPredicate(notPredicateWithSubpredicate: predicate))
-                try store.backgroundContext.save()
-            }
+            info = try removeMessages(with: predicate, at: temporary.url)
         }
 
-        let info: Info = try document.context.performAndReturn {
+        let document = try PulseDocument(documentURL: targetURL)
+        var totalSize: Int64 = 0
+
+        return try document.context.performAndReturn {
             // Add database
             let documentBlob = PulseBlobEntity(context: document.context)
             documentBlob.key = "database"
@@ -811,7 +808,6 @@ extension LoggerStore {
             }
 
             // Add store info
-            var info = try _info()
             info.storeId = UUID()
             // Chicken and an egg problem: don't know the exact size.
             // The output file is also going to be about 10-20% larger because of
@@ -829,8 +825,17 @@ extension LoggerStore {
 
             return info
         }
+    }
 
-        return info
+    /// Temporary open the store, remove message, and close it.
+    private func removeMessages(with predicate: NSPredicate, at targetURL: URL) throws -> Info {
+        let store = try LoggerStore(storeURL: targetURL)
+        defer { try? store.close() }
+        return try store.backgroundContext.performAndReturn {
+            try store.removeMessages(with:  NSCompoundPredicate(notPredicateWithSubpredicate: predicate))
+            try store.backgroundContext.save()
+            return try store._info()
+        }
     }
 }
 

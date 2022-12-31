@@ -214,10 +214,12 @@ final class LoggerStoreTests: XCTestCase {
         let copyURL = directory.url.appending(filename: "copy.pulse")
 
         // WHEN
-        try store.copy(to: copyURL, predicate: NSPredicate(format: "level == %i", LoggerStore.Level.trace.rawValue))
+        let info = try store.copy(to: copyURL, predicate: NSPredicate(format: "level == %i", LoggerStore.Level.trace.rawValue))
+        try? store.close()
 
         // THEN
-        try? store.close()
+        XCTAssertEqual(info.messageCount, 2)
+        XCTAssertEqual(info.taskCount, 0)
 
         // THEN all non-trace messages are removed, as well as network messages
         // and associated blobs
