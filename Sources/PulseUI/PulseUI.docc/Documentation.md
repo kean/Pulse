@@ -44,10 +44,14 @@ private let timeFormatter = DateFormatter(format: "HH:mm:ss.SSS")
 - ``MainView``
 - ``MainViewController``
 
-### Individual Tabs
+### Primary Tabs
 
 - ``ConsoleView``
 - ``NetworkView``
 - ``PinsView``
 - ``InsightsView``
 - ``SettingsView``
+
+### Other Views
+
+- ``StoreDetailsView``

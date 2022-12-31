@@ -6,12 +6,12 @@ import SwiftUI
 import Pulse
 
 @available(iOS 14.0, tvOS 14.0, *)
-struct StoreDetailsView: View {
+public struct StoreDetailsView: View {
     @StateObject private var viewModel = StoreDetailsViewModel()
 
     let source: Source
 
-    enum Source {
+    public enum Source {
         /// Loads the info when the view appears on screen.
         case store(LoggerStore)
         /// Opens the info for the given archive.
@@ -20,7 +20,11 @@ struct StoreDetailsView: View {
         case info(LoggerStore.Info)
     }
 
-    var body: some View {
+    public init(source: Source) {
+        self.source = source
+    }
+
+    public var body: some View {
         Contents(viewModel: viewModel)
             .onAppear { viewModel.load(from: source) }
 #if os(iOS)
