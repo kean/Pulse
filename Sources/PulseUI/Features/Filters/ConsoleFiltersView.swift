@@ -23,11 +23,11 @@ struct ConsoleFiltersView: View {
     var body: some View {
         Form { formContents }
             .navigationBarTitle("Filters", displayMode: .inline)
-            .navigationBarItems(leading: buttonClose, trailing: buttonReset)
+            .navigationBarItems(leading: buttonReset, trailing: buttonDone)
     }
 
-    private var buttonClose: some View {
-        Button("Close") { isPresented = false }
+    private var buttonDone: some View {
+        Button("Done") { isPresented = false }
     }
 #else
     @AppStorage("networkFilterIsParametersExpanded") var isGeneralSectionExpanded = true
@@ -72,6 +72,7 @@ extension ConsoleFiltersView {
     var buttonReset: some View {
         Button("Reset") { viewModel.resetAll() }
             .disabled(!viewModel.isButtonResetEnabled)
+
     }
 }
 
