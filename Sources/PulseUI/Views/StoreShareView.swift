@@ -56,10 +56,10 @@ struct ShareStoreView: View {
                     Text($0.rawValue).tag($0)
                 }
             }
-            Picker("Log Level", selection: $viewModel.level) {
+            Picker("Minimum Log Level", selection: $viewModel.level) {
                 Text("Trace").tag(LoggerStore.Level.trace)
                 Text("Debug").tag(LoggerStore.Level.debug)
-                Text("Errors").tag(LoggerStore.Level.error)
+                Text("Error").tag(LoggerStore.Level.error)
             }
             Picker("Output Format", selection: $viewModel.output) {
                 Text("File (.pulse)")
