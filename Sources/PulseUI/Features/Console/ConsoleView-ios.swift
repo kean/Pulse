@@ -73,7 +73,7 @@ private struct ConsoleToolbarView: View {
                 Button(action: { viewModel.isOnlyErrors.toggle() }) {
                     Image(systemName: viewModel.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon")
                         .font(.system(size: 20))
-                        .foregroundColor(.accentColor)
+                        .foregroundColor(viewModel.isOnlyErrors ? .red : .accentColor)
                 }.frame(width: 40, height: 44)
                 Button(action: { isShowingFilters = true }) {
                     Image(systemName: viewModel.searchCriteria.isDefaultSearchCriteria ? "line.horizontal.3.decrease.circle" : "line.3.horizontal.decrease.circle.fill")
