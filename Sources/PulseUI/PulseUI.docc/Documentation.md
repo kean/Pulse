@@ -55,7 +55,3 @@ private let timeFormatter = DateFormatter(format: "HH:mm:ss.SSS")
 ### Other Views
 
 - ``StoreDetailsView``
-
-### Settings
-
-- ``ConsoleSettings``

@@ -7,8 +7,8 @@ import Pulse
 import Combine
 
 // TODO: Switch to AppStorage on iOS 14 (or write a custom wrapper?)
-public final class ConsoleSettings: ObservableObject, DynamicProperty {
-    public static let shared = ConsoleSettings()
+final class ConsoleSettings: ObservableObject, DynamicProperty {
+    static let shared = ConsoleSettings()
 
     @Published var lineLimit: Int
 
