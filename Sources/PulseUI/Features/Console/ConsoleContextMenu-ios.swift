@@ -27,7 +27,7 @@ struct ConsoleContextMenu: View {
                 }
                 if !store.isArchive {
                     Button(action: { isDocumentBrowserPresented = true }) {
-                        Label("Browse Saved Logs", systemImage: "folder")
+                        Label("Browse Logs", systemImage: "folder")
                     }
                 }
             }
