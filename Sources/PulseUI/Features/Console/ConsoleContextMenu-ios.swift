@@ -31,11 +31,6 @@ struct ConsoleContextMenu: View {
                     }
                 }
             }
-            Section {
-                Button(action: { isShowingSettings = true }) {
-                    Label("Settings", systemImage: "gear")
-                }
-            }
             if !store.isArchive {
                 Section {
                     if #available(iOS 15.0, *) {
@@ -47,6 +42,11 @@ struct ConsoleContextMenu: View {
                             Label("Remove Logs", systemImage: "trash")
                         }
                     }
+                }
+            }
+            Section {
+                Button(action: { isShowingSettings = true }) {
+                    Label("Settings", systemImage: "gear")
                 }
             }
             Section {
