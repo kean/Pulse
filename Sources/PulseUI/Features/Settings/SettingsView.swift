@@ -47,9 +47,6 @@ public struct SettingsView: View {
 #endif
         }
         .backport.navigationTitle("Settings")
-#if os(iOS)
-        .navigationBarItems(leading: viewModel.onDismiss.map { Button(action: $0) { Image(systemName: "xmark") } })
-#endif
 #if os(tvOS)
         .frame(maxWidth: 800)
 #endif

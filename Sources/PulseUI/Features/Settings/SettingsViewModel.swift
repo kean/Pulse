@@ -8,7 +8,6 @@ import Combine
 
 final class SettingsViewModel: ObservableObject {
     let store: LoggerStore
-    var onDismiss: (() -> Void)?
 
     var isArchive: Bool { store.isArchive }
 
