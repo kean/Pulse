@@ -17,6 +17,7 @@
 - Rework Settings screen on iOS. Add a few new options: `lineLimit`.
 - Add public `StoreDetailsView`
 - Fix an issue where search in text viewer would occasionally stop highlighting the results
+- Fix sharing as text formatting
 - Add a missing public `InsightsView` initializer 
 - Add cookies section and details screens to the request summary - [#124](https://github.com/kean/Pulse/pull/124)
 - A couple of minor UI improvements and bug fixes

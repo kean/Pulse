@@ -42,7 +42,8 @@ enum ConsoleShareService {
     }
 
     private static func format(message: LoggerMessageEntity) -> String {
-        let title = "\(dateFormatter.string(from: message.createdAt)) [\(message.level)]-[\(message.label)] \(message.text)"
+        let level = LoggerStore.Level(rawValue: message.level) ?? .debug
+        let title = "\(dateFormatter.string(from: message.createdAt)) [\(level.title)]-[\(message.label.name)] \(message.text)"
         if let task = message.task {
             return title + "\n\n" + share(task, output: .plainText)
         } else {
@@ -121,4 +122,18 @@ func makeCurrentDate() -> String {
     formatter.locale = Locale(identifier: "en_US")
     formatter.dateFormat = "yyyy-MM-dd-HH-mm"
     return formatter.string(from: Date())
+}
+
+private extension LoggerStore.Level {
+    var title: String {
+        switch self {
+        case .trace: return "trace"
+        case .debug: return "debug"
+        case .info: return "info"
+        case .notice: return "notice"
+        case .warning: return "warning"
+        case .error: return "error"
+        case .critical: return "critical"
+        }
+    }
 }
