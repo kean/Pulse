@@ -61,8 +61,17 @@ public struct ConsoleView: View {
     @available(iOS 14.0, *)
     private var contextMenu: some View {
         Menu {
-            Button(action: { isShowingSettings = true }) {
-                SwiftUI.Label("Settings", systemImage: "gear")
+            Section {
+                Button(action: { isShowingSettings = true }) {
+                    SwiftUI.Label("Settings", systemImage: "gear")
+                }
+            }
+            if !viewModel.store.isArchive {
+                Section {
+                    Button(action: buttonRemoveAllTapped) {
+                        SwiftUI.Label("Remove Message", systemImage: "trash")
+                    }
+                }
             }
         } label: {
             Image(systemName: "ellipsis.circle")
@@ -83,6 +92,22 @@ public struct ConsoleView: View {
         if viewModel.entities.isEmpty {
             PlaceholderView.make(viewModel: viewModel)
         }
+    }
+
+    // MARK: Helpers
+
+    private func buttonRemoveAllTapped() {
+        viewModel.store.removeAll()
+
+#if os(iOS)
+        runHapticFeedback(.success)
+        ToastView {
+            HStack {
+                Image(systemName: "trash")
+                Text("All messages removed")
+            }
+        }.show()
+#endif
     }
 }
 
