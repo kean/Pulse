@@ -12,6 +12,7 @@ import Combine
 public struct ConsoleView: View {
     @ObservedObject var viewModel: ConsoleViewModel
     @State private var isSharing = false
+    @State private var isShowingSettings = false
 
     public init(store: LoggerStore = .shared) {
         self.viewModel = ConsoleViewModel(store: store)
@@ -31,7 +32,12 @@ public struct ConsoleView: View {
                 leading: viewModel.onDismiss.map {
                     Button(action: $0) { Image(systemName: "xmark") }
                 },
-                trailing: ShareButton { isSharing = true }
+                trailing: HStack {
+                    ShareButton { isSharing = true }
+                    if #available(iOS 14.0, *) {
+                        contextMenu
+                    }
+                }
             )
             .sheet(isPresented: $isSharing) {
                 if #available(iOS 14.0, *) {
@@ -42,6 +48,25 @@ public struct ConsoleView: View {
                     ShareView(ShareItems(messages: viewModel.store))
                 }
             }
+            .sheet(isPresented: $isShowingSettings) {
+                NavigationView {
+                    SettingsView(store: viewModel.store)
+                        .navigationBarItems(trailing: Button(action: { isShowingSettings = false }) {
+                            Text("Done")
+                        })
+                }
+            }
+    }
+
+    @available(iOS 14.0, *)
+    private var contextMenu: some View {
+        Menu {
+            Button(action: { isShowingSettings = true }) {
+                SwiftUI.Label("Settings", systemImage: "gear")
+            }
+        } label: {
+            Image(systemName: "ellipsis.circle")
+        }
     }
 
     private var contentView: some View {
