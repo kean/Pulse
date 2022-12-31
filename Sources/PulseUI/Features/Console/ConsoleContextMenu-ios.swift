@@ -102,7 +102,7 @@ struct ConsoleContextMenu: View {
     }
 
     private func buttonSendFeedbackTapped() {
-        guard let url = URL(string: "https://github.com/kean/Pulse/issu") else { return }
+        guard let url = URL(string: "https://github.com/kean/Pulse/issues") else { return }
         UIApplication.shared.open(url)
     }
 }
