@@ -28,7 +28,7 @@ final class NetworkInspectorViewModel: ObservableObject {
         self.task = task
 
         if let url = task.url.flatMap(URL.init(string:)) {
-            self.title = url.lastPathComponent
+            self.title = "/" + url.lastPathComponent
         }
 
         self.summaryViewModel = NetworkInspectorSummaryViewModel(task: task)
