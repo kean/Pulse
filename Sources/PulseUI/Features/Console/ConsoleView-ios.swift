@@ -31,13 +31,18 @@ public struct ConsoleView: View {
                 leading: viewModel.onDismiss.map {
                     Button(action: $0) { Image(systemName: "xmark") }
                 },
-                trailing: ShareButton { isSharing = true }
+                trailing: HStack {
+                    ShareButton { isSharing = true }
+                    if #available(iOS 14.0, *) {
+                        ConsoleContextMenu(store: viewModel.store)
+                    }
+                }
             )
             .sheet(isPresented: $isSharing) {
                 if #available(iOS 14.0, *) {
                     NavigationView {
                         ShareStoreView(store: viewModel.store, isPresented: $isSharing)
-                    }
+                    }.backport.presentationDetents([.medium])
                 } else {
                     ShareView(ShareItems(messages: viewModel.store))
                 }
@@ -100,4 +105,5 @@ struct ConsoleView_Previews: PreviewProvider {
     }
 }
 #endif
+
 #endif

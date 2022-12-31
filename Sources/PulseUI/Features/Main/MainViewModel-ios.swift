@@ -46,10 +46,9 @@ final class MainViewModel: ObservableObject {
 #endif
 
         self.settings = SettingsViewModel(store: store)
-        self.settings.onDismiss = onDismiss
 
 #if os(iOS)
-        self.items = [.console, .network, .pins, !store.isArchive ? .insights : nil, .settings]
+        self.items = [.console, .network, .pins, !store.isArchive ? .insights : nil]
             .compactMap { $0 }
 #elseif os(tvOS)
         self.items = [.console, .network, .settings]
@@ -117,7 +116,11 @@ extension MainViewModel {
             InsightsView(viewModel: insights)
 #endif
         case .settings:
+#if os(iOS)
+            EmptyView()
+#else
             SettingsView(viewModel: settings)
+#endif
         default: fatalError()
         }
     }

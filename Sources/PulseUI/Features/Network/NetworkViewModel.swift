@@ -24,7 +24,7 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 
     var onDismiss: (() -> Void)?
 
-    private let store: LoggerStore
+    let store: LoggerStore
     private let controller: NSFetchedResultsController<NetworkTaskEntity>
     private var isActive = false
     private var latestSessionId: UUID?

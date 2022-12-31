@@ -13,7 +13,7 @@ public struct NetworkView: View {
     @ObservedObject var viewModel: NetworkViewModel
 
     @State private var isShowingFilters = false
-    @State private var isShowingShareSheet = false
+    @State private var isSharing = false
     @Environment(\.colorScheme) private var colorScheme: ColorScheme
 
     public init(store: LoggerStore = .shared) {
@@ -36,7 +36,24 @@ public struct NetworkView: View {
         .onDisappear(perform: viewModel.onDisappear)
         .overlay(tableOverlay)
         .navigationBarTitle(Text("Network"))
-        .navigationBarItems(leading: navigationBarTrailingItems)
+        .navigationBarItems(
+            leading: navigationBarTrailingItems,
+            trailing: HStack {
+                ShareButton { isSharing = true }
+                if #available(iOS 14.0, *) {
+                    ConsoleContextMenu(store: viewModel.store)
+                }
+            }
+        )
+        .sheet(isPresented: $isSharing) {
+            if #available(iOS 14.0, *) {
+                NavigationView {
+                    ShareStoreView(store: viewModel.store, isPresented: $isSharing)
+                }.backport.presentationDetents([.medium])
+            } else {
+                ShareView(ShareItems(messages: viewModel.store))
+            }
+        }
     }
 
     @ViewBuilder

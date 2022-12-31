@@ -48,7 +48,6 @@ final class ConsoleNetworkRequestTableCell: UITableViewCell, UIContextMenuIntera
         title.textColor = .secondaryLabel
 
         details.font = .systemFont(ofSize: 15)
-        details.numberOfLines = 4
 
         let interaction = UIContextMenuInteraction(delegate: self)
         self.addInteraction(interaction)
@@ -97,6 +96,7 @@ final class ConsoleNetworkRequestTableCell: UITableViewCell, UIContextMenuIntera
         title.text = viewModel.fullTitle
 
         if !onlyTitle {
+            details.numberOfLines = ConsoleSettings.shared.lineLimit
             badge.fillColor = viewModel.uiBadgeColor
             details.text = viewModel.text
             accessory.textLabel.text = viewModel.time

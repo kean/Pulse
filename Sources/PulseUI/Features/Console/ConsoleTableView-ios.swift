@@ -71,7 +71,7 @@ final class ConsoleTableViewController: UITableViewController {
     private let viewModel: ConsoleTableViewModel
     private var entities: [NSManagedObject] = []
     private var entityViewModels: [NSManagedObjectID: AnyObject] = [:]
-    private var cancellable: AnyCancellable?
+    private var cancellables: [AnyCancellable] = []
 
     var onSelected: ((NSManagedObject) -> Void)?
 
@@ -91,12 +91,16 @@ final class ConsoleTableViewController: UITableViewController {
         tableView.register(ConsoleNetworkRequestTableCell.self, forCellReuseIdentifier: "ConsoleNetworkRequestTableCell")
 
         tableView.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 0)
+
+        ConsoleSettings.shared.$lineLimit.sink { [weak self] _ in
+            self?.tableView.reloadData()
+        }.store(in: &cancellables)
     }
 
     private func bind(_ viewModel: ConsoleTableViewModel) {
-        cancellable = viewModel.$entities.sink { [weak self] entities in
+        viewModel.$entities.sink { [weak self] entities in
             self?.display(entities)
-        }
+        }.store(in: &cancellables)
     }
 
     private var isFirstDisplay = true
