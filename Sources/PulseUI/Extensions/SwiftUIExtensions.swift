@@ -186,4 +186,28 @@ extension Backport {
         self.content
 #endif
     }
+
+    @ViewBuilder
+    func presentationDetents(_ detents: Set<PresentationDetent>) -> some View {
+#if os(iOS)
+        if #available(iOS 16.0, *) {
+            let detents = detents.map { (detent)-> SwiftUI.PresentationDetent in
+                switch detent {
+                case .large: return .large
+                case .medium: return .medium
+                }
+            }
+            self.content.presentationDetents(Set(detents))
+        } else {
+            self.content
+        }
+#else
+        self.content
+#endif
+    }
+
+    enum PresentationDetent {
+        case large
+        case medium
+    }
 }

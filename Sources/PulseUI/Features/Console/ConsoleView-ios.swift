@@ -37,7 +37,7 @@ public struct ConsoleView: View {
                 if #available(iOS 14.0, *) {
                     NavigationView {
                         ShareStoreView(store: viewModel.store, isPresented: $isSharing)
-                    }
+                    }.backport.presentationDetents([.medium])
                 } else {
                     ShareView(ShareItems(messages: viewModel.store))
                 }
