@@ -237,7 +237,7 @@ final class TextRenderingHelpers {
                 let style = NSMutableParagraphStyle()
                 style.maximumLineHeight = lineHeight
                 style.minimumLineHeight = lineHeight
-                style.paragraphSpacingBefore = 12
+                style.paragraphSpacingBefore = 10
                 return style
             }()
         ]
