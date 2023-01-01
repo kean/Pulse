@@ -13,7 +13,10 @@ import Pulse
 final class ConsoleTextRenderer {
     struct Options {
         var networkContent: NetworkContent = []
+        var isColorEnabled = false
+        var isBodySyntaxHighlightingEnabled = true
         var fontSize: CGFloat = 15
+        var monospacedFontSize: CGFloat = 12
     }
 
     struct NetworkContent: OptionSet {
@@ -112,7 +115,9 @@ final class ConsoleTextRenderer {
 
         text.append(makeTitle() + "\n", {
             var attributes = helpers.titleAttributes
-            attributes[.foregroundColor] = tintColor
+            if options.isColorEnabled {
+                attributes[.foregroundColor] = tintColor
+            }
             return attributes
         }())
 
@@ -121,10 +126,16 @@ final class ConsoleTextRenderer {
             text.append(section.title + "\n", helpers.titleAttributes)
             var keyAttributes = helpers.detailsAttributes
             keyAttributes[.font] = UXFont.systemFont(ofSize: options.fontSize, weight: .medium)
-            keyAttributes[.foregroundColor] = UXColor(section.color)
-            for (key, value) in section.items {
-                text.append(key, keyAttributes)
-                text.append(": \(value ?? "–")\n", helpers.detailsAttributes)
+            if options.isColorEnabled {
+                keyAttributes[.foregroundColor] = UXColor(section.color)
+            }
+            if section.items.isEmpty {
+                text.append("–\n", helpers.detailsAttributes)
+            } else {
+                for (key, value) in section.items {
+                    text.append(key, keyAttributes)
+                    text.append(": \(value ?? "–")\n", helpers.detailsAttributes)
+                }
             }
         }
 
@@ -144,6 +155,7 @@ final class ConsoleTextRenderer {
                 if let data = task.requestBody?.data, !data.isEmpty {
                     text.append("Request Body\n", helpers.titleAttributes)
                     text.append(renderNetworkTaskBody(data, contentType: task.responseContentType.map(NetworkLogger.ContentType.init), error: task.decodingError))
+                    text.append("\n", helpers.detailsAttributes)
                 }
             }
 
@@ -153,6 +165,7 @@ final class ConsoleTextRenderer {
                 if let data = task.responseBody?.data, !data.isEmpty {
                     text.append("Response Body\n", helpers.titleAttributes)
                     text.append(renderNetworkTaskBody(data, contentType: task.responseContentType.map(NetworkLogger.ContentType.init), error: task.decodingError))
+                    text.append("\n", helpers.detailsAttributes)
                 }
             }
         }
@@ -160,8 +173,21 @@ final class ConsoleTextRenderer {
     }
 
     private func renderNetworkTaskBody(_ data: Data, contentType: NetworkLogger.ContentType?, error: NetworkLogger.DecodingError?) -> NSAttributedString {
+        let text = _renderNetworkTaskBody(data, contentType: contentType, error: error)
+        guard !options.isBodySyntaxHighlightingEnabled else {
+            return text
+        }
+        let mutable = NSMutableAttributedString(attributedString: text)
+        mutable.addAttributes([
+            .foregroundColor: UXColor.label
+        ])
+        return mutable
+    }
+
+    #warning("TODO: fix font size")
+    private func _renderNetworkTaskBody(_ data: Data, contentType: NetworkLogger.ContentType?, error: NetworkLogger.DecodingError?) -> NSAttributedString {
         if let json = try? JSONSerialization.jsonObject(with: data, options: []) {
-            let fontSize = options.fontSize - 1
+            let fontSize = options.monospacedFontSize
             let renderer = AttributedStringJSONRenderer(fontSize: fontSize, lineHeight: geLineHeight(for: Int(fontSize)))
             let printer = JSONPrinter(renderer: renderer)
             printer.render(json: json, error: error)
@@ -216,7 +242,12 @@ final class TextRenderingHelpers {
         ]
 
         func makeLabelAttributes(level: LoggerStore.Level) -> [NSAttributedString.Key: Any] {
-            let textColor = level == .trace ? .secondaryLabel : UXColor(ConsoleMessageStyle.textColor(level: level))
+            let textColor: UXColor
+            if options.isColorEnabled {
+                textColor = level == .trace ? .secondaryLabel : UXColor(ConsoleMessageStyle.textColor(level: level))
+            } else {
+                textColor = .label
+            }
             return [
                 .font: UXFont.systemFont(ofSize: options.fontSize),
                 .foregroundColor: textColor,
