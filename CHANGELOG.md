@@ -14,6 +14,7 @@
 - Add new context menu to Console and Network screen with many quick actions that were previously hidden in Settings, e.g. "Remove Logs". Settings were removed from the primary tabs `MainView`. With this change, for apps that don't use `MainView` and integrate individual tabs into their own debug menus, integration became significantly eaier because both Console and Network screens are fully self-sufficient.
 - Add "Report Issue" button.
 - `ShareStoreView` now remembers user settings.
+- Add JWT token decoded and viewer
 - Rework Settings screen on iOS. Add a few new options: `lineLimit`.
 - Add public `StoreDetailsView`
 - Fix an issue where search in text viewer would occasionally stop highlighting the results

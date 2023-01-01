@@ -15,6 +15,7 @@ import UniformTypeIdentifiers
 struct ConsoleContextMenu: View {
     let store: LoggerStore
 
+    @Binding var isShowingAsText: Bool
     @State private var isShowingSettings = false
     @State private var isShowingStoreInfo = false
     @State private var isDocumentBrowserPresented = false
@@ -22,6 +23,9 @@ struct ConsoleContextMenu: View {
     var body: some View {
         Menu {
             Section {
+                Button(action: { isShowingAsText = true }) {
+                    Label("View as Text", systemImage: "text.quote")
+                }
                 Button(action: { isShowingStoreInfo = true }) {
                     Label("Store Info", systemImage: "info.circle")
                 }
@@ -126,7 +130,7 @@ struct ConsoleContextMenu_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
             VStack {
-                ConsoleContextMenu(store: .mock)
+                ConsoleContextMenu(store: .mock, isShowingAsText: .constant(false))
                 Spacer()
             }
         }

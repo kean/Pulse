@@ -12,6 +12,7 @@ import Combine
 public struct ConsoleView: View {
     @ObservedObject var viewModel: ConsoleViewModel
     @State private var isSharing = false
+    @State private var isShowingText = false
 
     public init(store: LoggerStore = .shared) {
         self.viewModel = ConsoleViewModel(store: store)
@@ -34,7 +35,7 @@ public struct ConsoleView: View {
                 trailing: HStack {
                     ShareButton { isSharing = true }
                     if #available(iOS 14.0, *) {
-                        ConsoleContextMenu(store: viewModel.store)
+                        ConsoleContextMenu(store: viewModel.store, isShowingAsText: $isShowingText)
                     }
                 }
             )
@@ -45,6 +46,11 @@ public struct ConsoleView: View {
                     }.backport.presentationDetents([.medium])
                 } else {
                     ShareView(ShareItems(messages: viewModel.store))
+                }
+            }
+            .backport.fullScreenCover(isPresented: $isShowingText) {
+                if #available(iOS 14.0, *) {
+                    ConsoleTextView(entities: viewModel.entities)
                 }
             }
     }
