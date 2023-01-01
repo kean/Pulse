@@ -15,16 +15,37 @@ struct ConsoleTextView: View {
 
     var entities: () -> [LoggerMessageEntity]
     var options: ConsoleTextRenderer.Options = .init()
+    var onClose: (() -> Void)?
 
     var body: some View {
-        RichTextView(viewModel: viewModel.text, isAutomaticLinkDetectionEnabled: options.isLinkDetectionEnabled)
-            .id(ObjectIdentifier(viewModel.text)) // TODO: fix this, should not be required
-            .navigationTitle("Console")
+        textView
             .navigationBarTitleDisplayMode(.inline)
             .onAppear { viewModel.display(entities(), options) }
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    HStack {
+                        Menu(content: { menu }) {
+                            Image(systemName: "ellipsis.circle")
+                        }
+                        if let onClose = onClose {
+                            Button(action: onClose) {
+                                Image(systemName: "xmark")
+                            }
+                        }
+                    }
+                }
+            }
     }
 
-        #warning("TODO: reimplemnt")
+    private var textView: some View {
+        RichTextView(
+            viewModel: viewModel.text,
+            isAutomaticLinkDetectionEnabled: options.isLinkDetectionEnabled,
+            isPrincipalSearchBarPlacement: true
+        )
+        .id(ObjectIdentifier(viewModel.text)) // TODO: fix this, should not be required
+    }
+
     @ViewBuilder
     private var menu: some View {
         Button(action: { viewModel.display(entities(), options) }) {
@@ -98,7 +119,7 @@ private extension ConsoleTextView {
     init(entities: [LoggerMessageEntity], _ configure: (inout ConsoleTextRenderer.Options) -> Void) {
         var options = ConsoleTextRenderer.Options()
         configure(&options)
-        self.init(entities: { entities }, options: options)
+        self.init(entities: { entities }, options: options, onClose: {})
     }
 }
 

@@ -10,47 +10,53 @@ import Combine
 #if os(macOS) || os(iOS)
 
 struct RichTextView: View {
-    @ObservedObject private var viewModel: RichTextViewModel
+    @ObservedObject var viewModel: RichTextViewModel
     @State private var isExpanded = false
     @State private var isScrolled = false
     @State private var errorViewOpacity = 0.0
     var isAutomaticLinkDetectionEnabled = true
-    var hasVerticalScroller = false
+    var isPrincipalSearchBarPlacement = false
+    var hasVerticalScroller = true
     var onToggleExpanded: (() -> Void)?
-
-    init(viewModel: RichTextViewModel,
-         isAutomaticLinkDetectionEnabled: Bool = true,
-         hasVerticalScroller: Bool = true,
-         onToggleExpanded: (() -> Void)? = nil) {
-        self.viewModel = viewModel
-        self.isAutomaticLinkDetectionEnabled = isAutomaticLinkDetectionEnabled
-        self.hasVerticalScroller = hasVerticalScroller
-        self.onToggleExpanded = onToggleExpanded
-    }
 #if os(iOS)
     var body: some View {
-        VStack(spacing: 0) {
-            searchToolbar
-                .backport.backgroundThickMaterial(enabled: isExpanded && isScrolled)
-            ZStack(alignment: .bottom) {
-                textView
-                    .edgesIgnoringSafeArea(.bottom)
-                errorView
-            }
-            if viewModel.isSearching {
-                SearchToobar(viewModel: viewModel)
-            }
-        }
-        .onAppear(perform: onAppear)
+        content
+            .onAppear(perform: onAppear)
     }
 
-    private var searchToolbar: some View {
-        HStack(spacing: 0) {
-            SearchBar(title: "Search", text: $viewModel.searchTerm, onEditingChanged: { isEditing in
-                if isEditing {
-                    viewModel.isSearching = isEditing
+    @ViewBuilder
+    private var content: some View {
+        if #available(iOS 14.0, *), isPrincipalSearchBarPlacement {
+            VStack(spacing: 0) {
+                mainView
+            }.toolbar {
+                ToolbarItem(placement: .principal) {
+                    searchBar
                 }
-            })
+            }
+        } else {
+            VStack(spacing: 0) {
+                inlineSearchBar
+                mainView
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var mainView: some View {
+        ZStack(alignment: .bottom) {
+            textView
+                .edgesIgnoringSafeArea(.bottom)
+            errorView
+        }
+        if viewModel.isSearching {
+            SearchToobar(viewModel: viewModel)
+        }
+    }
+
+    private var inlineSearchBar: some View {
+        HStack(spacing: 0) {
+            searchBar
             if let onToggleExpanded = onToggleExpanded {
                 Button(action: {
                     isExpanded.toggle()
@@ -64,6 +70,14 @@ struct RichTextView: View {
         }
         .padding(EdgeInsets(top: -2, leading: 4, bottom: -2, trailing: 6))
         .border(width: isScrolled ? 1 : 0, edges: [.bottom], color: Color(UXColor.separator).opacity(0.3))
+    }
+
+    private var searchBar: some View {
+        SearchBar(title: "Search", text: $viewModel.searchTerm, onEditingChanged: { isEditing in
+            if isEditing {
+                viewModel.isSearching = isEditing
+            }
+        })
     }
 
     private var textView: some View {
@@ -222,9 +236,6 @@ private struct SearchToobar: View {
                     StringSearchOptionsMenu(options: $viewModel.options, isKindNeeded: false)
                 }, label: {
                     Text("Options")
-//                    Image(systemName: "ellipsis.circle")
-//                        .font(.system(size: 20))
-//                        .frame(width: 40, height: 44)
                 })
             }
 

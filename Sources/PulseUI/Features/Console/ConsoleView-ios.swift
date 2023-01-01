@@ -51,10 +51,9 @@ public struct ConsoleView: View {
             .backport.fullScreenCover(isPresented: $isShowingAsText) {
                 if #available(iOS 14.0, *) {
                     NavigationView {
-                        ConsoleTextView(entities: { viewModel.entities })
-                            .navigationBarItems(trailing: Button(action: { isShowingAsText = false }) {
-                                Text("Done")
-                            })
+                        ConsoleTextView(entities: { viewModel.entities }) {
+                            isShowingAsText = false
+                        }
                     }
                 }
             }
