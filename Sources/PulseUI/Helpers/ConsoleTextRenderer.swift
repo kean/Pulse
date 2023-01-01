@@ -12,7 +12,7 @@ import Pulse
 @available(iOS 14.0, tvOS 14.0, *)
 final class ConsoleTextRenderer {
     struct Options {
-        var isNetworkExpanded = true
+        var isNetworkExpanded = false
         var isCompactMode = false
         var fontSize: CGFloat = 13
     }
@@ -92,13 +92,13 @@ final class ConsoleTextRenderer {
         text.append(titleFirstPart, helpers.digitalAttributes)
 
         // Title second part (regular)
-        var titleSecondPart = options.isCompactMode ? "" : "\(message.level) · "
+        let level = LoggerStore.Level(rawValue: message.level) ?? .debug
+        var titleSecondPart = options.isCompactMode ? "" : "\(level.name) · "
         titleSecondPart.append("\(message.label.name)")
         titleSecondPart.append(options.isCompactMode ? " " : "\n")
         text.append(titleSecondPart, helpers.titleAttributes)
 
         // Text
-        let level = LoggerStore.Level(rawValue: message.level) ?? .debug
         let textAttributes = helpers.textAttributes[level]!
         if options.isCompactMode {
             if let newlineIndex = message.text.firstIndex(of: "\n") {
