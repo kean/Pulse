@@ -26,8 +26,8 @@ struct ConsoleTextView: View {
 
     @ViewBuilder
     private var menu: some View {
-        Button("Refresh") {
-            viewModel.display(entities(), options)
+        Button(action: { viewModel.display(entities(), options) }) {
+            Label("Refresh", systemImage: "arrow.clockwise")
         }
     }
 }
