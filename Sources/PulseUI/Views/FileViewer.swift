@@ -65,9 +65,7 @@ struct _FileViewer: View {
             switch contents {
             case .json(let viewModel):
 #if os(iOS)
-                RichTextView(viewModel: viewModel, onToggleExpanded: onToggleExpanded) {
-                    EmptyView()
-                }
+                RichTextView(viewModel: viewModel, onToggleExpanded: onToggleExpanded)
 #else
                 RichTextView(viewModel: viewModel)
 #endif
@@ -81,15 +79,17 @@ struct _FileViewer: View {
 #endif
             case .other(let viewModel):
 #if os(iOS)
-                RichTextView(viewModel: viewModel, onToggleExpanded: onToggleExpanded) {
-                    if self.viewModel.contentType?.isHTML ?? false {
-                        Button("Open in Browser") {
-                            isWebViewOpen = true
-                        }
-                    } else {
-                        EmptyView()
-                    }
-                }
+
+                #warning("TODO: reimplement open in browser")
+
+                RichTextView(viewModel: viewModel, onToggleExpanded: onToggleExpanded)
+//                    if self.viewModel.contentType?.isHTML ?? false {
+//                        Button("Open in Browser") {
+//                            isWebViewOpen = true
+//                        }
+//                    } else {
+//                        EmptyView()
+//                    }
 #else
                 RichTextView(viewModel: viewModel)
 #endif

@@ -17,13 +17,14 @@ struct ConsoleTextView: View {
     var options: ConsoleTextRenderer.Options = .init()
 
     var body: some View {
-        RichTextView(viewModel: viewModel.text, isAutomaticLinkDetectionEnabled: options.isLinkDetectionEnabled, extraMenu: { menu })
+        RichTextView(viewModel: viewModel.text, isAutomaticLinkDetectionEnabled: options.isLinkDetectionEnabled)
             .id(ObjectIdentifier(viewModel.text)) // TODO: fix this, should not be required
             .navigationTitle("Console")
             .navigationBarTitleDisplayMode(.inline)
             .onAppear { viewModel.display(entities(), options) }
     }
 
+        #warning("TODO: reimplemnt")
     @ViewBuilder
     private var menu: some View {
         Button(action: { viewModel.display(entities(), options) }) {

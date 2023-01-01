@@ -9,7 +9,7 @@ import Combine
 
 #if os(macOS) || os(iOS)
 
-struct RichTextView<ExtraMenu: View>: View {
+struct RichTextView: View {
     @ObservedObject private var viewModel: RichTextViewModel
     @State private var isExpanded = false
     @State private var isScrolled = false
@@ -17,18 +17,15 @@ struct RichTextView<ExtraMenu: View>: View {
     var isAutomaticLinkDetectionEnabled = true
     var hasVerticalScroller = false
     var onToggleExpanded: (() -> Void)?
-    @ViewBuilder var extraMenu: () -> ExtraMenu
 
     init(viewModel: RichTextViewModel,
          isAutomaticLinkDetectionEnabled: Bool = true,
          hasVerticalScroller: Bool = true,
-         onToggleExpanded: (() -> Void)? = nil,
-         @ViewBuilder extraMenu: @escaping () -> ExtraMenu) {
+         onToggleExpanded: (() -> Void)? = nil) {
         self.viewModel = viewModel
         self.isAutomaticLinkDetectionEnabled = isAutomaticLinkDetectionEnabled
         self.hasVerticalScroller = hasVerticalScroller
         self.onToggleExpanded = onToggleExpanded
-        self.extraMenu = extraMenu
     }
 #if os(iOS)
     var body: some View {
@@ -54,20 +51,6 @@ struct RichTextView<ExtraMenu: View>: View {
                     viewModel.isSearching = isEditing
                 }
             })
-
-            if #available(iOS 14.0, *) {
-                Menu(content: {
-                    StringSearchOptionsMenu(options: $viewModel.options, isKindNeeded: false)
-                    let extraMenu = self.extraMenu()
-                    if !(extraMenu is EmptyView) {
-                        extraMenu
-                    }
-                }, label: {
-                    Image(systemName: "ellipsis.circle")
-                        .font(.system(size: 20))
-                        .frame(width: 40, height: 44)
-                })
-            }
             if let onToggleExpanded = onToggleExpanded {
                 Button(action: {
                     isExpanded.toggle()
@@ -138,12 +121,6 @@ struct RichTextView<ExtraMenu: View>: View {
             }
             .opacity(errorViewOpacity)
         }
-    }
-}
-
-extension RichTextView where ExtraMenu == EmptyView {
-    init(viewModel: RichTextViewModel) {
-        self.init(viewModel: viewModel, extraMenu: { EmptyView() })
     }
 }
 
@@ -240,6 +217,19 @@ private struct SearchToobar: View {
 #if os(iOS)
     var body: some View {
         HStack {
+            if #available(iOS 14.0, *) {
+                Menu(content: {
+                    StringSearchOptionsMenu(options: $viewModel.options, isKindNeeded: false)
+                }, label: {
+                    Text("Options")
+//                    Image(systemName: "ellipsis.circle")
+//                        .font(.system(size: 20))
+//                        .frame(width: 40, height: 44)
+                })
+            }
+
+            Spacer()
+
             HStack(spacing: 12) {
                 Button(action: viewModel.previousMatch) {
                     Image(systemName: "chevron.left.circle")
@@ -253,6 +243,7 @@ private struct SearchToobar: View {
                 }.disabled(viewModel.matches.isEmpty)
             }
             .fixedSize()
+
             Spacer()
 
             Button(action: viewModel.cancelSearch) {
