@@ -155,18 +155,8 @@ struct WrappedTextView: UIViewRepresentable {
     @Binding var isScrolled: Bool
     #endif
 
-    final class Coordinator: NSObject, UITextViewDelegate {
+    final class Coordinator {
         var cancellables: [AnyCancellable] = []
-
-        func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
-            if URL.scheme == "pulse", URL.host == "show-details" {
-                let path = URL.path
-                #warning("TODO: open details")
-                // TODO: open details
-                return true
-            }
-            return true
-        }
     }
 
     func makeCoordinator() -> Coordinator {
@@ -184,7 +174,6 @@ struct WrappedTextView: UIViewRepresentable {
 #endif
         textView.textContainerInset = UIEdgeInsets(top: 8, left: 10, bottom: 8, right: 10)
         textView.attributedText = viewModel.text
-        textView.delegate = context.coordinator
 #if os(iOS)
         textView.publisher(for: \.contentOffset, options: [.new])
             .map { $0.y >= 10 }

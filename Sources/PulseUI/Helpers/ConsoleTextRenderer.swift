@@ -53,10 +53,6 @@ final class ConsoleTextRenderer {
         return text
     }
 
-    private func makeToggleInfoURL(for id: NSManagedObjectID) -> URL {
-        URL(string: "pulse://show-details/\(id.uriRepresentation().absoluteString)")!
-    }
-
     private func makeText(for message: LoggerMessageEntity, index: Int, options: Options, helpers: TextRenderingHelpers) -> NSAttributedString {
         if let task = message.task {
             return makeText(for: message, task: task, index: index, options: options, helpers: helpers)
@@ -123,14 +119,7 @@ final class ConsoleTextRenderer {
         let textAttributes = helpers.textAttributes[level]!
         let messageText = task.url ?? "–"
 
-        text.append(messageText + " ", {
-            var attributes = textAttributes
-            attributes[.link] = makeToggleInfoURL(for: message.objectID)
-            attributes[.underlineColor] = UXColor.systemBlue
-            attributes[.underlineStyle] = NSUnderlineStyle.single.rawValue
-            attributes[.foregroundColor] = UXColor.systemBlue
-            return attributes
-        }())
+        text.append(messageText + " ", textAttributes)
 
         if options.isNetworkExpanded, let data = task.responseBody?.data {
             text.append("\n")
