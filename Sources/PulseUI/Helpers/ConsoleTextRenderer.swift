@@ -13,26 +13,21 @@ import Pulse
 final class ConsoleTextRenderer {
     struct Options {
         var networkContent: NetworkContent = []
-        var fontSize: CGFloat = 13
+        var fontSize: CGFloat = 15
     }
 
     struct NetworkContent: OptionSet {
-        let rawValue: Int
+        let rawValue: Int16
 
-        init(rawValue: Int) {
+        init(rawValue: Int16) {
             self.rawValue = rawValue
         }
 
-        static let originalRequestHeaders = NetworkContent(rawValue: 1 << 0)
-        static let originalRequestBody = NetworkContent(rawValue: 1 << 1)
-        static let currentRequestHeaders = NetworkContent(rawValue: 1 << 2)
-        static let responseHeader = NetworkContent(rawValue: 1 << 3)
-        static let responseBody = NetworkContent(rawValue: 1 << 4)
-        static let responseMetrics = NetworkContent(rawValue: 1 << 5)
-        static let summary = NetworkContent(rawValue: 1 << 6)
-        static let error = NetworkContent(rawValue: 1 << 7)
+        static let summary = NetworkContent(rawValue: 1 << 0)
 
-        static let all: NetworkContent = [summary, error, originalRequestHeaders, originalRequestBody, currentRequestHeaders, responseHeader, responseBody, responseMetrics]
+        static let all: NetworkContent = [
+            summary
+        ]
     }
 
     private let options: Options
@@ -53,11 +48,8 @@ final class ConsoleTextRenderer {
 
     private func joined(_ strings: [NSAttributedString]) -> NSAttributedString {
         let output = NSMutableAttributedString()
-        for index in strings.indices {
-            output.append(strings[index])
-            if index < strings.count - 1 {
-                output.append("\n", helpers.titleAttributes)
-            }
+        for string in strings {
+            output.append(string)
         }
         return output
     }
@@ -78,7 +70,7 @@ final class ConsoleTextRenderer {
 
         // Text
         let textAttributes = helpers.textAttributes[level]!
-        text.append(message.text, textAttributes)
+        text.append(message.text + "\n", textAttributes)
 
         return text
     }
@@ -124,13 +116,45 @@ final class ConsoleTextRenderer {
             return attributes
         }())
 
-        if let url = task.url {
-            text.append(url, helpers.textAttributes[.debug]!)
+        func append(section: KeyValueSectionViewModel?) {
+            guard let section = section else { return }
+            text.append(section.title + "\n", helpers.titleAttributes)
+            var keyAttributes = helpers.detailsAttributes
+            keyAttributes[.font] = UXFont.systemFont(ofSize: options.fontSize, weight: .medium)
+            keyAttributes[.foregroundColor] = UXColor(section.color)
+            for (key, value) in section.items {
+                text.append(key, keyAttributes)
+                text.append(": \(value ?? "–")\n", helpers.detailsAttributes)
+            }
         }
 
-        if options.networkContent.contains(.responseBody), let data = task.responseBody?.data {
-            text.append("\n")
-            text.append(renderNetworkTaskBody(data, contentType: task.responseContentType.map(NetworkLogger.ContentType.init), error: task.decodingError))
+        if let url = task.url {
+            text.append(url + "\n", helpers.textAttributes[.debug]!)
+        }
+
+        let viewModel = NetworkInspectorSummaryViewModel(task: task)
+        let content = options.networkContent
+
+        if content.contains(.all) {
+            append(section: viewModel.errorModel)
+
+            if viewModel.originalRequestSummary != nil {
+                append(section: viewModel.originalRequestHeaders.title("Request Headers"))
+                append(section: viewModel.originalRequestParameters?.title("Request Options"))
+                if let data = task.requestBody?.data, !data.isEmpty {
+                    text.append("Request Body\n", helpers.titleAttributes)
+                    text.append(renderNetworkTaskBody(data, contentType: task.responseContentType.map(NetworkLogger.ContentType.init), error: task.decodingError))
+                }
+            }
+
+            if let responseSummary = viewModel.responseSummary {
+                append(section: responseSummary.title("Response Summary"))
+                append(section: viewModel.responseHeaders.title("Response Headers"))
+                if let data = task.responseBody?.data, !data.isEmpty {
+                    text.append("Response Body\n", helpers.titleAttributes)
+                    text.append(renderNetworkTaskBody(data, contentType: task.responseContentType.map(NetworkLogger.ContentType.init), error: task.decodingError))
+                }
+            }
         }
         return text
     }
@@ -173,6 +197,8 @@ final class TextRenderingHelpers {
     let titleAttributes: [NSAttributedString.Key: Any]
     private(set) var textAttributes: [LoggerStore.Level: [NSAttributedString.Key: Any]] = [:]
 
+    var detailsAttributes: [NSAttributedString.Key: Any] { textAttributes[.debug]! }
+
     init(options: ConsoleTextRenderer.Options) {
         let lineHeight = geLineHeight(for: Int(options.fontSize))
         self.paragraphStyle = NSParagraphStyle.make(lineHeight: lineHeight)
@@ -192,7 +218,7 @@ final class TextRenderingHelpers {
         func makeLabelAttributes(level: LoggerStore.Level) -> [NSAttributedString.Key: Any] {
             let textColor = level == .trace ? .secondaryLabel : UXColor(ConsoleMessageStyle.textColor(level: level))
             return [
-                .font: UXFont.systemFont(ofSize: 15),
+                .font: UXFont.systemFont(ofSize: options.fontSize),
                 .foregroundColor: textColor,
                 .paragraphStyle: paragraphStyle
             ]

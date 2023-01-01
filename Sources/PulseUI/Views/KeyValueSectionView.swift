@@ -272,10 +272,16 @@ private var fontSize: CGFloat {
 }
 
 struct KeyValueSectionViewModel {
-    let title: String
-    let color: Color
+    var title: String
+    var color: Color
     var action: ActionViewModel?
     var items: [(String, String?)] = []
+
+    func title(_ title: String) -> KeyValueSectionViewModel {
+        var copy = self
+        copy.title = title
+        return copy
+    }
 }
 
 struct KeyValueRow: Identifiable {
