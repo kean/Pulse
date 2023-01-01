@@ -13,19 +13,32 @@ import UniformTypeIdentifiers
 
 @available(iOS 14.0, *)
 struct ConsoleContextMenu: View {
-    let store: LoggerStore
+    private let store: LoggerStore
+    private let isShowingAsText: Binding<Bool>?
 
-    @Binding var isShowingAsText: Bool
     @State private var isShowingSettings = false
     @State private var isShowingStoreInfo = false
     @State private var isDocumentBrowserPresented = false
 
+    init(store: LoggerStore, isShowingAsText: Binding<Bool>? = nil) {
+        self.store = store
+        self.isShowingAsText = isShowingAsText
+    }
+
     var body: some View {
         Menu {
-            Section {
-                Button(action: { isShowingAsText = true }) {
-                    Label("View as Text", systemImage: "text.quote")
+            if let isShowingAsText = isShowingAsText {
+                Section {
+                    Button(action: { isShowingAsText.wrappedValue.toggle() }) {
+                        if isShowingAsText.wrappedValue {
+                            Label("View as List", systemImage: "list.bullet.rectangle.portrait")
+                        } else {
+                            Label("View as Text", systemImage: "text.quote")
+                        }
+                    }
                 }
+            }
+            Section {
                 Button(action: { isShowingStoreInfo = true }) {
                     Label("Store Info", systemImage: "info.circle")
                 }

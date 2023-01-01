@@ -84,18 +84,18 @@ struct RichTextView<ExtraMenu: View>: View {
     }
 
     private var textView: some View {
-        WrappedTextView(text: viewModel.text, viewModel: viewModel, isAutomaticLinkDetectionEnabled: isAutomaticLinkDetectionEnabled, isScrolled: $isScrolled)
+        WrappedTextView(viewModel: viewModel, isAutomaticLinkDetectionEnabled: isAutomaticLinkDetectionEnabled, isScrolled: $isScrolled)
     }
 #else
     var body: some View {
         VStack(spacing: 0) {
 #if os(macOS)
             ZStack(alignment: .bottom) {
-                WrappedTextView(text: viewModel.text, viewModel: viewModel, isAutomaticLinkDetectionEnabled: isAutomaticLinkDetectionEnabled, hasVerticalScroller: hasVerticalScroller)
+                WrappedTextView(viewModel: viewModel, isAutomaticLinkDetectionEnabled: isAutomaticLinkDetectionEnabled, hasVerticalScroller: hasVerticalScroller)
                 errorView
             }.onAppear(perform: onAppear)
 #else
-            WrappedTextView(text: viewModel.text, viewModel: viewModel, isAutomaticLinkDetectionEnabled: isAutomaticLinkDetectionEnabled)
+            WrappedTextView(viewModel: viewModel, isAutomaticLinkDetectionEnabled: isAutomaticLinkDetectionEnabled)
 #endif
 #if !os(tvOS)
             Divider()
@@ -148,16 +148,25 @@ extension RichTextView where ExtraMenu == EmptyView {
 }
 
 #if os(tvOS) || os(iOS)
-private struct WrappedTextView: UIViewRepresentable {
-    let text: NSAttributedString
+struct WrappedTextView: UIViewRepresentable {
     let viewModel: RichTextViewModel
     let isAutomaticLinkDetectionEnabled: Bool
     #if os(iOS)
     @Binding var isScrolled: Bool
     #endif
 
-    final class Coordinator {
+    final class Coordinator: NSObject, UITextViewDelegate {
         var cancellables: [AnyCancellable] = []
+
+        func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
+            if URL.scheme == "pulse", URL.host == "show-details" {
+                let path = URL.path
+                #warning("TODO: open details")
+                // TODO: open details
+                return true
+            }
+            return true
+        }
     }
 
     func makeCoordinator() -> Coordinator {
@@ -174,7 +183,8 @@ private struct WrappedTextView: UIViewRepresentable {
         textView.isAutomaticLinkDetectionEnabled = isAutomaticLinkDetectionEnabled
 #endif
         textView.textContainerInset = UIEdgeInsets(top: 8, left: 10, bottom: 8, right: 10)
-        textView.attributedText = text
+        textView.attributedText = viewModel.text
+        textView.delegate = context.coordinator
 #if os(iOS)
         textView.publisher(for: \.contentOffset, options: [.new])
             .map { $0.y >= 10 }

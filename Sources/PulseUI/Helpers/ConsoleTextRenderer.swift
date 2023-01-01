@@ -13,7 +13,6 @@ import Pulse
 final class ConsoleTextRenderer {
     struct Options {
         var isNetworkExpanded = false
-        var isCompactMode = false
         var fontSize: CGFloat = 13
     }
 
@@ -48,27 +47,14 @@ final class ConsoleTextRenderer {
         for index in indices {
             text.append(makeText(for: messages[index], index: index, options: options, helpers: helpers))
             if index != lastIndex {
-                if options.isCompactMode {
-                    text.append("\n", helpers.digitalAttributes)
-                } else {
-                    text.append("\n\n", helpers.digitalAttributes)
-                }
+                text.append("\n", helpers.titleAttributes)
             }
         }
-#warning("TODO: customize this")
-        text.addAttributes([
-            .paragraphStyle: NSParagraphStyle.make(lineHeight: lineHeight(for: Int(options.fontSize)))
-        ])
         return text
     }
 
     private func makeToggleInfoURL(for id: NSManagedObjectID) -> URL {
-        URL(string: "story://toggle-info/\(id.uriRepresentation().absoluteString)")!
-    }
-
-    private func getInterval(for message: LoggerMessageEntity) -> TimeInterval {
-        guard let first = messages.first else { return 0 }
-        return message.createdAt.timeIntervalSince1970 - first.createdAt.timeIntervalSince1970
+        URL(string: "pulse://show-details/\(id.uriRepresentation().absoluteString)")!
     }
 
     private func makeText(for message: LoggerMessageEntity, index: Int, options: Options, helpers: TextRenderingHelpers) -> NSAttributedString {
@@ -80,39 +66,14 @@ final class ConsoleTextRenderer {
 
         // Title
         let time = ConsoleMessageViewModel.timeFormatter.string(from: message.createdAt)
-
-        // Title first part (digital)
-        var titleFirstPart = "\(time) · "
-        if !options.isCompactMode {
-            let interval = getInterval(for: message)
-            if interval < 3600 * 24 {
-                titleFirstPart.append(contentsOf: "\(DurationFormatter.string(from: interval)) · ")
-            }
-        }
-        text.append(titleFirstPart, helpers.digitalAttributes)
-
-        // Title second part (regular)
         let level = LoggerStore.Level(rawValue: message.level) ?? .debug
-        var titleSecondPart = options.isCompactMode ? "" : "\(level.name) · "
-        titleSecondPart.append("\(message.label.name)")
-        titleSecondPart.append(options.isCompactMode ? " " : "\n")
-        text.append(titleSecondPart, helpers.titleAttributes)
+        let title = [time, level.name.capitalized, message.label.name.capitalized]
+            .joined(separator: " · ")
+        text.append(title + "\n", helpers.titleAttributes)
 
         // Text
         let textAttributes = helpers.textAttributes[level]!
-        if options.isCompactMode {
-            if let newlineIndex = message.text.firstIndex(of: "\n") {
-                text.append(message.text[..<newlineIndex] + " ", textAttributes)
-                var moreAttr = helpers.showAllAttributes
-                #warning("REMOVe")
-                moreAttr[.link] = makeToggleInfoURL(for: message.objectID)
-                text.append("Show More", moreAttr)
-            } else {
-                text.append(message.text, textAttributes)
-            }
-        } else {
-            text.append(message.text, textAttributes)
-        }
+        text.append(message.text, textAttributes)
 
         return text
     }
@@ -120,21 +81,28 @@ final class ConsoleTextRenderer {
     private func makeText(for message: LoggerMessageEntity, task: NetworkTaskEntity, index: Int, options: Options, helpers: TextRenderingHelpers) -> NSAttributedString {
         let text = NSMutableAttributedString()
 
-        // Title
         let state = task.state
-        let time = ConsoleMessageViewModel.timeFormatter.string(from: message.createdAt)
-        var prefix: String
-        switch state {
-        case .pending:
-            prefix = "PENDING"
-        case .success:
-            prefix = StatusCodeFormatter.string(for: Int(task.statusCode))
-        case .failure:
-            if task.errorCode != 0 {
-                prefix = "\(task.errorCode) (\(descriptionForURLErrorCode(Int(task.errorCode))))"
-            } else {
-                prefix = StatusCodeFormatter.string(for: Int(task.statusCode))
+
+        func makeTitle() -> String {
+            let time = ConsoleMessageViewModel.timeFormatter.string(from: message.createdAt)
+            let status: String
+            switch state {
+            case .pending:
+                status = "PENDING"
+            case .success:
+                status = StatusCodeFormatter.string(for: Int(task.statusCode))
+            case .failure:
+                if task.errorCode != 0 {
+                    status = "\(task.errorCode) (\(descriptionForURLErrorCode(Int(task.errorCode))))"
+                } else {
+                    status = StatusCodeFormatter.string(for: Int(task.statusCode))
+                }
             }
+            var duration: String?
+            if task.duration > 0 {
+                duration = "\(DurationFormatter.string(from: task.duration))"
+            }
+            return [time, task.httpMethod, status, duration].compactMap { $0 }.joined(separator: " · ")
         }
 
         let tintColor: UXColor = {
@@ -145,31 +113,15 @@ final class ConsoleTextRenderer {
             }
         }()
 
-        var title = "\(prefix)"
-        if task.duration > 0 {
-            title += " · \(DurationFormatter.string(from: task.duration))"
-        }
-
-        text.append("\(time) · ", helpers.digitalAttributes)
-        if !options.isCompactMode  {
-            let interval = getInterval(for: message)
-            if interval < 3600 * 24 {
-                text.append("\(DurationFormatter.string(from: interval)) · ", helpers.digitalAttributes)
-            }
-        }
-        text.append(title + " ", {
+        text.append(makeTitle() + "\n", {
             var attributes = helpers.titleAttributes
             attributes[.foregroundColor] = tintColor
             return attributes
         }())
-        //        text.append(title + " ", helpers.titleAttributes)
-        text.append(options.isCompactMode ? " " : "\n", helpers.titleAttributes)
 
-        // Text
         let level = LoggerStore.Level(rawValue: message.level) ?? .debug
         let textAttributes = helpers.textAttributes[level]!
-        let method = task.httpMethod ?? "GET"
-        let messageText = method + " " + (task.url ?? "–")
+        let messageText = task.url ?? "–"
 
         text.append(messageText + " ", {
             var attributes = textAttributes
@@ -190,7 +142,7 @@ final class ConsoleTextRenderer {
     private func renderNetworkTaskBody(_ data: Data, contentType: NetworkLogger.ContentType?, error: NetworkLogger.DecodingError?) -> NSAttributedString {
         if let json = try? JSONSerialization.jsonObject(with: data, options: []) {
             let fontSize = options.fontSize - 1
-            let renderer = AttributedStringJSONRenderer(fontSize: fontSize, lineHeight: lineHeight(for: Int(fontSize)))
+            let renderer = AttributedStringJSONRenderer(fontSize: fontSize, lineHeight: geLineHeight(for: Int(fontSize)))
             let printer = JSONPrinter(renderer: renderer)
             printer.render(json: json, error: error)
             return renderer.make()
@@ -223,32 +175,27 @@ final class ConsoleTextRenderer {
 @available(iOS 14.0, tvOS 14.0, *)
 private final class TextRenderingHelpers {
     let ps: NSParagraphStyle
-    let digitalAttributes: [NSAttributedString.Key: Any]
     let titleAttributes: [NSAttributedString.Key: Any]
     private(set) var textAttributes: [LoggerStore.Level: [NSAttributedString.Key: Any]] = [:]
 
-    let infoIconAttributes: [NSAttributedString.Key: Any]
     let showAllAttributes: [NSAttributedString.Key: Any]
 
     init(options: ConsoleTextRenderer.Options) {
-        let ps = NSParagraphStyle.make(lineHeight: lineHeight(for: Int(options.fontSize)))
+        let lineHeight = geLineHeight(for: Int(options.fontSize))
+        let ps = NSParagraphStyle.make(lineHeight: lineHeight)
         self.ps = ps
 
-        self.digitalAttributes = [
-            .font: UXFont.monospacedSystemFont(ofSize: options.fontSize, weight: .regular),
-            .foregroundColor: UXColor.secondaryLabel,
-            .paragraphStyle: ps
-        ]
-
         self.titleAttributes = [
-            .font: UXFont.monospacedSystemFont(ofSize: options.fontSize, weight: .regular),
+            .font: UXFont.preferredFont(forTextStyle: .caption1),
             .foregroundColor: UXColor.secondaryLabel,
-            .paragraphStyle: ps
+            .paragraphStyle: {
+                let style = NSMutableParagraphStyle()
+                style.maximumLineHeight = lineHeight
+                style.minimumLineHeight = lineHeight
+                style.paragraphSpacingBefore = 12
+                return style
+            }()
         ]
-
-        var infoIconAttributes = titleAttributes
-        infoIconAttributes[.foregroundColor] = UXColor.blue
-        self.infoIconAttributes = infoIconAttributes
 
         self.showAllAttributes = [
             .font: UXFont.monospacedSystemFont(ofSize: options.fontSize, weight: .regular),
@@ -259,7 +206,8 @@ private final class TextRenderingHelpers {
         func makeLabelAttributes(level: LoggerStore.Level) -> [NSAttributedString.Key: Any] {
             let textColor = level == .trace ? .secondaryLabel : UXColor(ConsoleMessageStyle.textColor(level: level))
             return [
-                .font: UXFont.monospacedSystemFont(ofSize: options.fontSize, weight: .regular),
+                .font: UXFont.systemFont(ofSize: 15),
+//                .font: UXFont.monospacedSystemFont(ofSize: options.fontSize, weight: .regular),
                 .foregroundColor: textColor,
                 .paragraphStyle: ps
             ]
@@ -271,6 +219,6 @@ private final class TextRenderingHelpers {
     }
 }
 
-private func lineHeight(for fontSize: Int) -> CGFloat {
+private func geLineHeight(for fontSize: Int) -> CGFloat {
     CGFloat(fontSize + 6)
 }

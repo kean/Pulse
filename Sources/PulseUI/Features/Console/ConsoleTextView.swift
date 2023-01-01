@@ -9,7 +9,6 @@ import Combine
 
 #if os(iOS)
 
-// TODO: feature parity with Pulse Pro
 @available(iOS 14.0, tvOS 14.0, *)
 struct ConsoleTextView: View {
     @StateObject private var viewModel = ConsoleTextViewModel()
@@ -18,8 +17,10 @@ struct ConsoleTextView: View {
     var options: ConsoleTextRenderer.Options = .init()
 
     var body: some View {
-        NetworkDetailsView(title: "Console", text: viewModel.text)
+        RichTextView(viewModel: viewModel.text)
+            .navigationTitle("Console")
             .navigationBarTitleDisplayMode(.inline)
+            .id(ObjectIdentifier(viewModel.text)) // TODO: fix this, should not be required
             .onAppear { viewModel.display(entities, options) }
     }
 }
@@ -29,15 +30,15 @@ final class ConsoleTextViewModel: ObservableObject {
     private var messages: [LoggerMessageEntity] = []
     private var renderer = ConsoleTextRenderer()
 
-    @Published private(set) var text: NSAttributedString
+    @Published private(set) var text: RichTextViewModel
 
     init() {
-        self.text = NSAttributedString(string: "")
+        self.text = RichTextViewModel(string: "")
     }
 
     func display(_ entities: [LoggerMessageEntity], _ options: ConsoleTextRenderer.Options) {
         self.renderer = ConsoleTextRenderer(options: options)
-        self.text = renderer.render(entities)
+        self.text = RichTextViewModel(string: renderer.render(entities))
     }
 }
 
@@ -50,13 +51,6 @@ struct ConsoleTextView_Previews: PreviewProvider {
                 ConsoleTextView(entities: entitites)
             }
             .previewDisplayName("Default")
-
-            NavigationView {
-                ConsoleTextView(entities: entitites) {
-                    $0.isCompactMode = true
-                }
-            }
-            .previewDisplayName("Compact Mode")
 
             NavigationView {
                 ConsoleTextView(entities: entitites) {
