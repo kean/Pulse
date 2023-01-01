@@ -12,8 +12,26 @@ import Pulse
 @available(iOS 14.0, tvOS 14.0, *)
 final class ConsoleTextRenderer {
     struct Options {
-        var isNetworkExpanded = false
+        var networkContent: NetworkContent = []
+
         var fontSize: CGFloat = 13
+    }
+
+    struct NetworkContent: OptionSet {
+        let rawValue: Int
+
+        init(rawValue: Int) {
+            self.rawValue = rawValue
+        }
+
+        static let originalRequestHeaders = NetworkContent(rawValue: 1 << 0)
+        static let originalRequestBody = NetworkContent(rawValue: 1 << 1)
+        static let currentRequestHeaders = NetworkContent(rawValue: 1 << 2)
+        static let responseHeader = NetworkContent(rawValue: 1 << 3)
+        static let responseBody = NetworkContent(rawValue: 1 << 4)
+        static let responseMetrics = NetworkContent(rawValue: 1 << 5)
+
+        static let all: NetworkContent = [originalRequestHeaders, originalRequestBody, currentRequestHeaders, responseHeader, responseBody, responseMetrics]
     }
 
     private let options: Options
@@ -121,7 +139,7 @@ final class ConsoleTextRenderer {
 
         text.append(messageText + " ", textAttributes)
 
-        if options.isNetworkExpanded, let data = task.responseBody?.data {
+        if options.networkContent.contains(.responseBody), let data = task.responseBody?.data {
             text.append("\n")
             text.append(renderNetworkTaskBody(data, contentType: task.responseContentType.map(NetworkLogger.ContentType.init), error: task.decodingError))
         }

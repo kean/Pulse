@@ -54,7 +54,7 @@ struct ConsoleTextView_Previews: PreviewProvider {
 
             NavigationView {
                 ConsoleTextView(entities: entitites) {
-                    $0.isNetworkExpanded = true
+                    $0.networkContent = .all
                 }
             }
             .previewDisplayName("Netwok Expanded")
