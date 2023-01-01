@@ -13,14 +13,14 @@ import Combine
 struct ConsoleTextView: View {
     @StateObject private var viewModel = ConsoleTextViewModel()
 
-    let entities: [LoggerMessageEntity]
+    var entities: [LoggerMessageEntity]
     var options: ConsoleTextRenderer.Options = .init()
 
     var body: some View {
-        RichTextView(viewModel: viewModel.text)
+        RichTextView(viewModel: viewModel.text, isAutomaticLinkDetectionEnabled: options.isLinkDetectionEnabled, extraMenu: { EmptyView() })
+            .id(ObjectIdentifier(viewModel.text)) // TODO: fix this, should not be required
             .navigationTitle("Console")
             .navigationBarTitleDisplayMode(.inline)
-            .id(ObjectIdentifier(viewModel.text)) // TODO: fix this, should not be required
             .onAppear { viewModel.display(entities, options) }
     }
 }
@@ -48,9 +48,30 @@ struct ConsoleTextView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             NavigationView {
-                ConsoleTextView(entities: entitites)
+                ConsoleTextView(entities: entitites) { _ in
+                    return // Use default settings
+                }
             }
             .previewDisplayName("Default")
+
+            NavigationView {
+                ConsoleTextView(entities: entitites) {
+                    $0.isMonocrhome = true
+                    $0.isBodySyntaxHighlightingEnabled = true
+                    $0.networkContent = .all
+                }
+            }
+            .previewDisplayName("Color")
+
+            NavigationView {
+                ConsoleTextView(entities: entitites) {
+                    $0.isMonocrhome = true
+                    $0.isBodySyntaxHighlightingEnabled = false
+                    $0.isLinkDetectionEnabled = false
+                    $0.networkContent = .all
+                }
+            }
+            .previewDisplayName("Monochrome")
 
             NavigationView {
                 ConsoleTextView(entities: entitites) {

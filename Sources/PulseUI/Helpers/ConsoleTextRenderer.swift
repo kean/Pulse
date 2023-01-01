@@ -13,8 +13,9 @@ import Pulse
 final class ConsoleTextRenderer {
     struct Options {
         var networkContent: NetworkContent = []
-        var isColorEnabled = false
+        var isMonocrhome = true
         var isBodySyntaxHighlightingEnabled = true
+        var isLinkDetectionEnabled = true
         var fontSize: CGFloat = 15
         var monospacedFontSize: CGFloat = 12
     }
@@ -115,7 +116,7 @@ final class ConsoleTextRenderer {
 
         text.append(makeTitle() + "\n", {
             var attributes = helpers.titleAttributes
-            if options.isColorEnabled {
+            if !options.isMonocrhome {
                 attributes[.foregroundColor] = tintColor
             }
             return attributes
@@ -126,7 +127,7 @@ final class ConsoleTextRenderer {
             text.append(section.title + "\n", helpers.titleAttributes)
             var keyAttributes = helpers.detailsAttributes
             keyAttributes[.font] = UXFont.systemFont(ofSize: options.fontSize, weight: .medium)
-            if options.isColorEnabled {
+            if !options.isMonocrhome {
                 keyAttributes[.foregroundColor] = UXColor(section.color)
             }
             if section.items.isEmpty {
@@ -243,7 +244,7 @@ final class TextRenderingHelpers {
 
         func makeLabelAttributes(level: LoggerStore.Level) -> [NSAttributedString.Key: Any] {
             let textColor: UXColor
-            if options.isColorEnabled {
+            if !options.isMonocrhome {
                 textColor = level == .trace ? .secondaryLabel : UXColor(ConsoleMessageStyle.textColor(level: level))
             } else {
                 textColor = .label
