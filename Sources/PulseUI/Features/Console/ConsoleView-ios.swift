@@ -52,6 +52,9 @@ public struct ConsoleView: View {
                 if #available(iOS 14.0, *) {
                     NavigationView {
                         ConsoleTextView(entities: viewModel.entities)
+                            .navigationBarItems(trailing: Button(action: { isShowingAsText = false }) {
+                                Text("Done")
+                            })
                     }
                 }
             }
