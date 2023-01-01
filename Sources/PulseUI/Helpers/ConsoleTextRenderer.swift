@@ -13,7 +13,6 @@ import Pulse
 final class ConsoleTextRenderer {
     struct Options {
         var networkContent: NetworkContent = []
-
         var fontSize: CGFloat = 13
     }
 
@@ -30,13 +29,14 @@ final class ConsoleTextRenderer {
         static let responseHeader = NetworkContent(rawValue: 1 << 3)
         static let responseBody = NetworkContent(rawValue: 1 << 4)
         static let responseMetrics = NetworkContent(rawValue: 1 << 5)
+        static let summary = NetworkContent(rawValue: 1 << 6)
+        static let error = NetworkContent(rawValue: 1 << 7)
 
-        static let all: NetworkContent = [originalRequestHeaders, originalRequestBody, currentRequestHeaders, responseHeader, responseBody, responseMetrics]
+        static let all: NetworkContent = [summary, error, originalRequestHeaders, originalRequestBody, currentRequestHeaders, responseHeader, responseBody, responseMetrics]
     }
 
     private let options: Options
     private let helpers: TextRenderingHelpers
-    private var messages: [LoggerMessageEntity] = []
 
     init(options: Options = .init()) {
         self.options = options
@@ -44,36 +44,27 @@ final class ConsoleTextRenderer {
     }
 
     func render(_ entities: [NetworkTaskEntity]) -> NSAttributedString {
-        messages = entities.compactMap(\.message)
-        defer { messages = [] }
-        return makeText()
+        joined(entities.map(render))
     }
 
     func render(_ entities: [LoggerMessageEntity]) -> NSAttributedString {
-        messages = entities
-        defer { messages = [] }
-        return makeText()
+        joined(entities.map(render))
     }
 
-    func makeText(indices: Range<Int>? = nil) -> NSAttributedString {
-        makeText(indices: indices ?? messages.indices, options: options, helpers: helpers)
-    }
-
-    private func makeText(indices: Range<Int>, options: Options, helpers: TextRenderingHelpers) -> NSAttributedString {
-        let text = NSMutableAttributedString()
-        let lastIndex = messages.count - 1
-        for index in indices {
-            text.append(makeText(for: messages[index], index: index, options: options, helpers: helpers))
-            if index != lastIndex {
-                text.append("\n", helpers.titleAttributes)
+    private func joined(_ strings: [NSAttributedString]) -> NSAttributedString {
+        let output = NSMutableAttributedString()
+        for index in strings.indices {
+            output.append(strings[index])
+            if index < strings.count - 1 {
+                output.append("\n", helpers.titleAttributes)
             }
         }
-        return text
+        return output
     }
 
-    private func makeText(for message: LoggerMessageEntity, index: Int, options: Options, helpers: TextRenderingHelpers) -> NSAttributedString {
+    func render(_ message: LoggerMessageEntity) -> NSAttributedString {
         if let task = message.task {
-            return makeText(for: message, task: task, index: index, options: options, helpers: helpers)
+            return render(task)
         }
 
         let text = NSMutableAttributedString()
@@ -92,13 +83,13 @@ final class ConsoleTextRenderer {
         return text
     }
 
-    private func makeText(for message: LoggerMessageEntity, task: NetworkTaskEntity, index: Int, options: Options, helpers: TextRenderingHelpers) -> NSAttributedString {
+    func render(_ task: NetworkTaskEntity) -> NSAttributedString {
         let text = NSMutableAttributedString()
 
         let state = task.state
 
         func makeTitle() -> String {
-            let time = ConsoleMessageViewModel.timeFormatter.string(from: message.createdAt)
+            let time = ConsoleMessageViewModel.timeFormatter.string(from: task.createdAt)
             let status: String
             switch state {
             case .pending:
@@ -133,11 +124,9 @@ final class ConsoleTextRenderer {
             return attributes
         }())
 
-        let level = LoggerStore.Level(rawValue: message.level) ?? .debug
-        let textAttributes = helpers.textAttributes[level]!
-        let messageText = task.url ?? "–"
-
-        text.append(messageText + " ", textAttributes)
+        if let url = task.url {
+            text.append(url, helpers.textAttributes[.debug]!)
+        }
 
         if options.networkContent.contains(.responseBody), let data = task.responseBody?.data {
             text.append("\n")
@@ -177,20 +166,16 @@ final class ConsoleTextRenderer {
     }
 }
 
-
 #warning("TODO: remove unused attributes")
 @available(iOS 14.0, tvOS 14.0, *)
-private final class TextRenderingHelpers {
-    let ps: NSParagraphStyle
+final class TextRenderingHelpers {
+    let paragraphStyle: NSParagraphStyle
     let titleAttributes: [NSAttributedString.Key: Any]
     private(set) var textAttributes: [LoggerStore.Level: [NSAttributedString.Key: Any]] = [:]
 
-    let showAllAttributes: [NSAttributedString.Key: Any]
-
     init(options: ConsoleTextRenderer.Options) {
         let lineHeight = geLineHeight(for: Int(options.fontSize))
-        let ps = NSParagraphStyle.make(lineHeight: lineHeight)
-        self.ps = ps
+        self.paragraphStyle = NSParagraphStyle.make(lineHeight: lineHeight)
 
         self.titleAttributes = [
             .font: UXFont.preferredFont(forTextStyle: .caption1),
@@ -204,19 +189,12 @@ private final class TextRenderingHelpers {
             }()
         ]
 
-        self.showAllAttributes = [
-            .font: UXFont.monospacedSystemFont(ofSize: options.fontSize, weight: .regular),
-            .foregroundColor: UXColor.systemBlue,
-            .paragraphStyle: ps
-        ]
-
         func makeLabelAttributes(level: LoggerStore.Level) -> [NSAttributedString.Key: Any] {
             let textColor = level == .trace ? .secondaryLabel : UXColor(ConsoleMessageStyle.textColor(level: level))
             return [
                 .font: UXFont.systemFont(ofSize: 15),
-//                .font: UXFont.monospacedSystemFont(ofSize: options.fontSize, weight: .regular),
                 .foregroundColor: textColor,
-                .paragraphStyle: ps
+                .paragraphStyle: paragraphStyle
             ]
         }
 
