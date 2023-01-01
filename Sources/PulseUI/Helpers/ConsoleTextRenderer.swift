@@ -181,20 +181,40 @@ final class ConsoleTextRenderer {
         }())
 
         if options.isNetworkExpanded, let data = task.responseBody?.data {
-            if let json = try? JSONSerialization.jsonObject(with: data, options: []) {
-                let fontSize = options.fontSize - 1
-                let renderer = AttributedStringJSONRenderer(fontSize: fontSize, lineHeight: lineHeight(for: Int(fontSize)))
-                let printer = JSONPrinter(renderer: renderer)
-#warning("TODO: pass error")
-                printer.render(json: json, error: task.decodingError)
-                text.append("\n")
-                text.append(renderer.make())
-            } else if let string = String(data: data, encoding: .utf8) {
-                text.append("\n")
-                text.append(string, helpers.textAttributes[.debug]!)
-            }
+            text.append("\n")
+            text.append(renderNetworkTaskBody(data, contentType: task.responseContentType.map(NetworkLogger.ContentType.init), error: task.decodingError))
         }
         return text
+    }
+
+    private func renderNetworkTaskBody(_ data: Data, contentType: NetworkLogger.ContentType?, error: NetworkLogger.DecodingError?) -> NSAttributedString {
+        if let json = try? JSONSerialization.jsonObject(with: data, options: []) {
+            let fontSize = options.fontSize - 1
+            let renderer = AttributedStringJSONRenderer(fontSize: fontSize, lineHeight: lineHeight(for: Int(fontSize)))
+            let printer = JSONPrinter(renderer: renderer)
+            printer.render(json: json, error: error)
+            return renderer.make()
+        } else if let string = String(data: data, encoding: .utf8) {
+            if contentType?.isEncodedForm ?? false, let components = decodeQueryParameters(form: string) {
+                return components.asAttributedString()
+            } else if contentType?.isHTML ?? false {
+                return HTMLPrettyPrint(string: string).render()
+            }
+            return NSAttributedString(string: string, attributes: helpers.textAttributes[.debug]!)
+        } else {
+            let message = "Data \(ByteCountFormatter.string(fromByteCount: Int64(data.count)))"
+            return NSAttributedString(string: message, attributes: helpers.textAttributes[.debug]!)
+        }
+    }
+
+    private func decodeQueryParameters(form string: String) -> KeyValueSectionViewModel? {
+        let string = "https://placeholder.com/path?" + string
+        guard let components = URLComponents(string: string),
+              let queryItems = components.queryItems,
+              !queryItems.isEmpty else {
+            return nil
+        }
+        return KeyValueSectionViewModel.makeQueryItems(for: queryItems, action: {})
     }
 }
 
