@@ -13,15 +13,22 @@ import Combine
 struct ConsoleTextView: View {
     @StateObject private var viewModel = ConsoleTextViewModel()
 
-    var entities: [LoggerMessageEntity]
+    var entities: () -> [LoggerMessageEntity]
     var options: ConsoleTextRenderer.Options = .init()
 
     var body: some View {
-        RichTextView(viewModel: viewModel.text, isAutomaticLinkDetectionEnabled: options.isLinkDetectionEnabled, extraMenu: { EmptyView() })
+        RichTextView(viewModel: viewModel.text, isAutomaticLinkDetectionEnabled: options.isLinkDetectionEnabled, extraMenu: { menu })
             .id(ObjectIdentifier(viewModel.text)) // TODO: fix this, should not be required
             .navigationTitle("Console")
             .navigationBarTitleDisplayMode(.inline)
-            .onAppear { viewModel.display(entities, options) }
+            .onAppear { viewModel.display(entities(), options) }
+    }
+
+    @ViewBuilder
+    private var menu: some View {
+        Button("Refresh") {
+            viewModel.display(entities(), options)
+        }
     }
 }
 
@@ -90,7 +97,7 @@ private extension ConsoleTextView {
     init(entities: [LoggerMessageEntity], _ configure: (inout ConsoleTextRenderer.Options) -> Void) {
         var options = ConsoleTextRenderer.Options()
         configure(&options)
-        self.init(entities: entities, options: options)
+        self.init(entities: { entities }, options: options)
     }
 }
 
