@@ -9,6 +9,8 @@ import Combine
 
 #if os(macOS) || os(iOS)
 
+/// - warning: state management is broken beyond repair and needs to be
+/// rewrittn (using StateObject as soon as SwiftUI is updated)
 struct RichTextView: View {
     @ObservedObject var viewModel: RichTextViewModel
     @State private var isExpanded = false
@@ -263,7 +265,6 @@ private struct SearchToobar: View {
         }
         .padding(12)
         .border(width: 1, edges: [.top], color: Color(UXColor.separator).opacity(0.3))
-        .backport.backgroundThickMaterial()
     }
 #else
     var body: some View {
