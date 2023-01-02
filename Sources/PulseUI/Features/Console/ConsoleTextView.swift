@@ -57,6 +57,9 @@ struct ConsoleTextView: View {
             Button(action: { viewModel.display(entities, options) }) {
                 Label("Refresh", systemImage: "arrow.clockwise")
             }.disabled(viewModel.isButtonRefreshHidden)
+            Button(action: viewModel.text.scrollToBottom) {
+                Label("Scroll to Bottom", systemImage: "arrow.down")
+            }
         }
     }
 }

@@ -432,6 +432,13 @@ final class RichTextViewModel: ObservableObject {
         highlight(range: matches[selectedMatchIndex], in: mutableText, isFocused: true)
     }
 
+    func scrollToBottom() {
+        guard let textView = textView else { return }
+        let length = text.length
+        guard length > 0 else { return }
+        textView.scrollRangeToVisible(NSRange(location: length - 1, length: 1))
+    }
+
     private func clearMatches() {
         for match in matches {
             let range = NSRange(match, in: string)
