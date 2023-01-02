@@ -53,7 +53,7 @@ final class ConsoleTextRenderer {
         } else if let entities = entities as? [NetworkTaskEntity] {
             return render(entities, options: options)
         } else {
-            return NSAttributedString(string: "Unsupported entitites")
+            return NSAttributedString(string: "Unsupported entities")
         }
     }
 
