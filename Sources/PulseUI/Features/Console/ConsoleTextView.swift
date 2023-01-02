@@ -84,14 +84,14 @@ struct ConsoleTextView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             NavigationView {
-                ConsoleTextView(entities: entitites) { _ in
+                ConsoleTextView(entities: entities) { _ in
                     return // Use default settings
                 }
             }
             .previewDisplayName("Default")
 
             NavigationView {
-                ConsoleTextView(entities: entitites) {
+                ConsoleTextView(entities: entities) {
                     $0.isMonocrhome = false
                     $0.isBodySyntaxHighlightingEnabled = true
                     $0.networkContent = .all
@@ -100,7 +100,7 @@ struct ConsoleTextView_Previews: PreviewProvider {
             .previewDisplayName("Color")
 
             NavigationView {
-                ConsoleTextView(entities: entitites) {
+                ConsoleTextView(entities: entities) {
                     $0.isMonocrhome = true
                     $0.isBodySyntaxHighlightingEnabled = false
                     $0.networkContent = .all
@@ -109,7 +109,7 @@ struct ConsoleTextView_Previews: PreviewProvider {
             .previewDisplayName("Monochrome")
 
             NavigationView {
-                ConsoleTextView(entities: entitites) {
+                ConsoleTextView(entities: entities) {
                     $0.networkContent = .all
                     $0.isBodyExpanded = true
                 }
@@ -119,7 +119,7 @@ struct ConsoleTextView_Previews: PreviewProvider {
     }
 }
 
-private let entitites = try! LoggerStore.mock.allMessages()
+private let entities = try! LoggerStore.mock.allMessages()
 
 @available(iOS 14.0, tvOS 14.0, *)
 private extension ConsoleTextView {
