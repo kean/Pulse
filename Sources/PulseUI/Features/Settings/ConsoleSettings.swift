@@ -23,24 +23,36 @@ final class ConsoleSettings: ObservableObject {
 
     // MARK: ConsoleTextView
 
-    @UserDefault("text-view-order-ascending")
+    @UserDefault("console-text-view__order-ascending")
     var isTextViewOrderAscending = false
 
-    @UserDefault("text-view-responses-collapsed")
+    @UserDefault("console-text-view__responses-collapsed")
     var isTextViewResponsesCollaped = true
 
-    @UserDefault("console-text-view-is-monochrome")
+    @UserDefault("console-text-view__is-monochrome")
     var isConsoleTextViewMonochrome = true
 
-    @UserDefault("console-text-view-syntax-highlighting")
+    @UserDefault("console-text-view__syntax-highlighting")
     var isConsoleTextViewSyntaxHighlightingEnabled = true
 
-    @UserDefault("console-text-view-link-detection")
+    @UserDefault("console-text-view__link-detection")
     var isConsoleTextViewLinkDetection = true
 
+    @UserDefault("console-text-view__view-font-size")
+    var consoleTextViewFontSize = 15
+
+    @UserDefault("console-text-view__monospaced-font-size")
+    var consoleTextViewMonospacedFontSize = 12
+
+    func resetConsoleTextViewSettings() {
+        for key in UserDefaults.standard.dictionaryRepresentation().keys {
+            if key.hasPrefix(commonKeyPrefix + "console-text-view__") {
+                UserDefaults.standard.removeObject(forKey: key)
+            }
+        }
+    }
+
 //    var networkContent: NetworkContent = [.errorDetails, .requestBody, .responseBody]
-//    var fontSize: CGFloat = 15
-//    var monospacedFontSize: CGFloat = 12
 //}
 //
 //struct NetworkContent: OptionSet {
@@ -82,7 +94,7 @@ final class UserDefault<Value: UserDefaultSupportedValue>: UserDefaultProtocol, 
     private let publisher = PassthroughSubject<Value, Never>()
 
     init(wrappedValue value: Value, _ key: String) {
-        self.key = "com-github-com-kean-pulse__" + key
+        self.key = commonKeyPrefix + key
         self.defaultValue = value
     }
 
@@ -104,6 +116,8 @@ final class UserDefault<Value: UserDefaultSupportedValue>: UserDefaultProtocol, 
         publisher.map { _ in () }.eraseToAnyPublisher()
     }
 }
+
+private let commonKeyPrefix = "com-github-com-kean-pulse__"
 
 protocol UserDefaultSupportedValue {}
 

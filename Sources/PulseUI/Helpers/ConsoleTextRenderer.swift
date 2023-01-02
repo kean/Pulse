@@ -21,7 +21,6 @@ final class ConsoleTextRenderer {
         var bodyCollapseLimit = 20
         var isLinkDetectionEnabled = true
         var fontSize: CGFloat = 15
-        var monospacedFontSize: CGFloat = 12
     }
 
     struct NetworkContent: OptionSet {
@@ -230,8 +229,8 @@ final class ConsoleTextRenderer {
     }
 
     private func _renderNetworkTaskBody(_ data: Data, contentType: NetworkLogger.ContentType?, error: NetworkLogger.DecodingError?) -> NSAttributedString {
+        let fontSize = options.fontSize - 3
         if let json = try? JSONSerialization.jsonObject(with: data, options: []) {
-            let fontSize = options.monospacedFontSize
             let renderer = AttributedStringJSONRenderer(fontSize: fontSize, lineHeight: geLineHeight(for: Int(fontSize)))
             let printer = JSONPrinter(renderer: renderer)
             printer.render(json: json, error: error)
@@ -240,7 +239,7 @@ final class ConsoleTextRenderer {
             if contentType?.isEncodedForm ?? false, let components = decodeQueryParameters(form: string) {
                 return components.asAttributedString()
             } else if contentType?.isHTML ?? false {
-                return HTMLPrettyPrint(string: string).render()
+                return HTMLPrettyPrint(string: string, fontSize: Int(fontSize)).render()
             }
             return NSAttributedString(string: string, attributes: helpers.textAttributes[.debug]!)
         } else {

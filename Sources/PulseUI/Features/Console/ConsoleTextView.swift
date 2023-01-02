@@ -94,6 +94,7 @@ struct ConsoleTextView: View {
     }
 }
 
+@available(iOS 14.0, *)
 private struct ConsoleTextViewSettingsView: View {
     @ObservedObject private var settings: ConsoleSettings = .shared
 
@@ -103,8 +104,16 @@ private struct ConsoleTextViewSettingsView: View {
                 Toggle("Monochrome", isOn: $settings.isConsoleTextViewMonochrome)
                 Toggle("Syntax Highlighting", isOn: $settings.isConsoleTextViewSyntaxHighlightingEnabled)
                 Toggle("Link Detection", isOn: $settings.isConsoleTextViewLinkDetection)
+                Stepper("Font Size: \(settings.consoleTextViewFontSize)", value: $settings.consoleTextViewFontSize)
             }
             Section(header: Text("Network Requests")) {
+
+            }
+            Section {
+                Button("Reset Settings") {
+                    settings.resetConsoleTextViewSettings()
+                }
+                .foregroundColor(.red)
             }
         }
     }
@@ -153,6 +162,7 @@ final class ConsoleTextViewModel: ObservableObject {
         options.isMonocrhome = settings.isConsoleTextViewMonochrome
         options.isBodySyntaxHighlightingEnabled = settings.isConsoleTextViewSyntaxHighlightingEnabled
         options.isLinkDetectionEnabled = settings.isConsoleTextViewLinkDetection
+        options.fontSize = CGFloat(settings.consoleTextViewFontSize)
     }
 
     func refresh() {
