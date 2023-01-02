@@ -9,65 +9,56 @@ import Combine
 
 #if os(macOS) || os(iOS)
 
-struct RichTextView<ExtraMenu: View>: View {
-    @ObservedObject private var viewModel: RichTextViewModel
+/// - warning: state management is broken beyond repair and needs to be
+/// rewrittn (using StateObject as soon as SwiftUI is updated)
+struct RichTextView: View {
+    @ObservedObject var viewModel: RichTextViewModel
     @State private var isExpanded = false
     @State private var isScrolled = false
     @State private var errorViewOpacity = 0.0
     var isAutomaticLinkDetectionEnabled = true
+    var isPrincipalSearchBarPlacement = false
     var hasVerticalScroller = false
     var onToggleExpanded: (() -> Void)?
-    @ViewBuilder var extraMenu: () -> ExtraMenu
-
-    init(viewModel: RichTextViewModel,
-         isAutomaticLinkDetectionEnabled: Bool = true,
-         hasVerticalScroller: Bool = true,
-         onToggleExpanded: (() -> Void)? = nil,
-         @ViewBuilder extraMenu: @escaping () -> ExtraMenu) {
-        self.viewModel = viewModel
-        self.isAutomaticLinkDetectionEnabled = isAutomaticLinkDetectionEnabled
-        self.hasVerticalScroller = hasVerticalScroller
-        self.onToggleExpanded = onToggleExpanded
-        self.extraMenu = extraMenu
-    }
 #if os(iOS)
     var body: some View {
-        VStack(spacing: 0) {
-            searchToolbar
-                .backport.backgroundThickMaterial(enabled: isExpanded && isScrolled)
-            ZStack(alignment: .bottom) {
-                textView
-                    .edgesIgnoringSafeArea(.bottom)
-                errorView
-            }
-            if viewModel.isSearching {
-                SearchToobar(viewModel: viewModel)
-            }
-        }
-        .onAppear(perform: onAppear)
+        content
+            .onAppear(perform: onAppear)
     }
 
-    private var searchToolbar: some View {
-        HStack(spacing: 0) {
-            SearchBar(title: "Search", text: $viewModel.searchTerm, onEditingChanged: { isEditing in
-                if isEditing {
-                    viewModel.isSearching = isEditing
+    @ViewBuilder
+    private var content: some View {
+        if #available(iOS 14.0, *), isPrincipalSearchBarPlacement {
+            VStack(spacing: 0) {
+                mainView
+            }.toolbar {
+                ToolbarItem(placement: .principal) {
+                    searchBar
                 }
-            })
-
-            if #available(iOS 14.0, *) {
-                Menu(content: {
-                    StringSearchOptionsMenu(options: $viewModel.options, isKindNeeded: false)
-                    let extraMenu = self.extraMenu()
-                    if !(extraMenu is EmptyView) {
-                        extraMenu
-                    }
-                }, label: {
-                    Image(systemName: "ellipsis.circle")
-                        .font(.system(size: 20))
-                        .frame(width: 40, height: 44)
-                })
             }
+        } else {
+            VStack(spacing: 0) {
+                inlineSearchBar
+                mainView
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var mainView: some View {
+        ZStack(alignment: .bottom) {
+            textView
+                .edgesIgnoringSafeArea(.bottom)
+            errorView
+        }
+        if viewModel.isSearching {
+            SearchToobar(viewModel: viewModel)
+        }
+    }
+
+    private var inlineSearchBar: some View {
+        HStack(spacing: 0) {
+            searchBar
             if let onToggleExpanded = onToggleExpanded {
                 Button(action: {
                     isExpanded.toggle()
@@ -83,8 +74,16 @@ struct RichTextView<ExtraMenu: View>: View {
         .border(width: isScrolled ? 1 : 0, edges: [.bottom], color: Color(UXColor.separator).opacity(0.3))
     }
 
+    private var searchBar: some View {
+        SearchBar(title: "Search", text: $viewModel.searchTerm, onEditingChanged: { isEditing in
+            if isEditing {
+                viewModel.isSearching = isEditing
+            }
+        })
+    }
+
     private var textView: some View {
-        WrappedTextView(text: viewModel.text, viewModel: viewModel, isAutomaticLinkDetectionEnabled: isAutomaticLinkDetectionEnabled, isScrolled: $isScrolled)
+        WrappedTextView(viewModel: viewModel, isAutomaticLinkDetectionEnabled: isAutomaticLinkDetectionEnabled, isScrolled: $isScrolled)
     }
 #else
     var body: some View {
@@ -95,7 +94,7 @@ struct RichTextView<ExtraMenu: View>: View {
                 errorView
             }.onAppear(perform: onAppear)
 #else
-            WrappedTextView(text: viewModel.text, viewModel: viewModel, isAutomaticLinkDetectionEnabled: isAutomaticLinkDetectionEnabled)
+            WrappedTextView(viewModel: viewModel, isAutomaticLinkDetectionEnabled: isAutomaticLinkDetectionEnabled)
 #endif
 #if !os(tvOS)
             Divider()
@@ -141,27 +140,30 @@ struct RichTextView<ExtraMenu: View>: View {
     }
 }
 
-extension RichTextView where ExtraMenu == EmptyView {
-    init(viewModel: RichTextViewModel) {
-        self.init(viewModel: viewModel, extraMenu: { EmptyView() })
-    }
-}
-
 #if os(tvOS) || os(iOS)
-private struct WrappedTextView: UIViewRepresentable {
-    let text: NSAttributedString
+struct WrappedTextView: UIViewRepresentable {
     let viewModel: RichTextViewModel
     let isAutomaticLinkDetectionEnabled: Bool
     #if os(iOS)
     @Binding var isScrolled: Bool
     #endif
 
-    final class Coordinator {
+    final class Coordinator: NSObject, UITextViewDelegate {
+        var onLinkTapped: ((URL) -> Bool)?
         var cancellables: [AnyCancellable] = []
+
+        func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
+            if let onLinkTapped = onLinkTapped, onLinkTapped(URL) {
+                return false
+            }
+            return true
+        }
     }
 
     func makeCoordinator() -> Coordinator {
-        Coordinator()
+        let coordinator = Coordinator()
+        coordinator.onLinkTapped = viewModel.onLinkTapped
+        return coordinator
     }
 
     func makeUIView(context: Context) -> UXTextView {
@@ -170,11 +172,12 @@ private struct WrappedTextView: UIViewRepresentable {
         textView.alwaysBounceVertical = true
         textView.autocorrectionType = .no
         textView.autocapitalizationType = .none
+        textView.delegate = context.coordinator
 #if !os(tvOS)
         textView.isAutomaticLinkDetectionEnabled = isAutomaticLinkDetectionEnabled
 #endif
         textView.textContainerInset = UIEdgeInsets(top: 8, left: 10, bottom: 8, right: 10)
-        textView.attributedText = text
+        textView.attributedText = viewModel.text
 #if os(iOS)
         textView.publisher(for: \.contentOffset, options: [.new])
             .map { $0.y >= 10 }
@@ -226,7 +229,6 @@ private func configureTextView(_ textView: UXTextView) {
 #if !os(tvOS)
     textView.isEditable = false
     textView.linkTextAttributes = [
-        .foregroundColor: JSONColors.valueString,
         .underlineStyle: 1
     ]
 #endif
@@ -241,6 +243,16 @@ private struct SearchToobar: View {
 #if os(iOS)
     var body: some View {
         HStack {
+            if #available(iOS 14.0, *) {
+                Menu(content: {
+                    StringSearchOptionsMenu(options: $viewModel.options, isKindNeeded: false)
+                }, label: {
+                    Text("Options")
+                })
+            }
+
+            Spacer()
+
             HStack(spacing: 12) {
                 Button(action: viewModel.previousMatch) {
                     Image(systemName: "chevron.left.circle")
@@ -254,6 +266,7 @@ private struct SearchToobar: View {
                 }.disabled(viewModel.matches.isEmpty)
             }
             .fixedSize()
+
             Spacer()
 
             Button(action: viewModel.cancelSearch) {
@@ -262,7 +275,6 @@ private struct SearchToobar: View {
         }
         .padding(12)
         .border(width: 1, edges: [.top], color: Color(UXColor.separator).opacity(0.3))
-        .backport.backgroundThickMaterial()
     }
 #else
     var body: some View {
@@ -314,9 +326,10 @@ final class RichTextViewModel: ObservableObject {
     @Published var searchTerm: String = ""
     @Published var options: StringSearchOptions = .default
     var error: NetworkLogger.DecodingError?
+    var onLinkTapped: ((URL) -> Bool)?
 
-    let text: NSAttributedString
-    private let string: String
+    private(set) var text: NSAttributedString
+    private var string: String
 
     weak var textView: UXTextView?
     var mutableText: NSMutableAttributedString {
@@ -358,6 +371,17 @@ final class RichTextViewModel: ObservableObject {
         Publishers.CombineLatest($searchTerm, $options).sink { [weak self] in
             self?.refresh(searchTerm: $0, options: $1)
         }.store(in: &bag)
+    }
+
+    // This needs to be improved
+    func display(_ text: NSAttributedString) {
+        self.text = text
+        self.string = text.string
+        self.matches.removeAll()
+
+        let textStorage: NSTextStorage? = textView?.textStorage
+        textStorage?.setAttributedString(text)
+        searchTerm = ""
     }
 
     func onAppear() {

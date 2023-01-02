@@ -6,11 +6,11 @@ import Foundation
 import Pulse
 import CoreData
 
-#if os(iOS) || os(macOS)
-
 enum ShareStoreOutput: String, RawRepresentable {
     case store, text
 }
+
+#if os(iOS) || os(macOS)
 
 struct ShareItems: Identifiable {
     let id = UUID()

@@ -2,9 +2,9 @@
 //
 // Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
 
-import Foundation
+#if !os(watchOS)
 
-#if os(iOS) || os(macOS)
+import Foundation
 
 #if os(macOS)
 import AppKit
@@ -14,20 +14,22 @@ import UIKit
 
 final class HTMLPrettyPrint {
     private let string: String
+    private let fontSize: CGFloat
 
-    init(string: String) {
+    init(string: String, fontSize: Int = Int(FontSize.body)) {
         self.string = string
+        self.fontSize = CGFloat(fontSize)
     }
 
     func render() -> NSAttributedString {
         let text = NSMutableAttributedString(string: string)
 
         let ps = NSMutableParagraphStyle()
-        ps.minimumLineHeight = FontSize.body + 5
-        ps.maximumLineHeight = FontSize.body + 5
+        ps.minimumLineHeight = fontSize + 5
+        ps.maximumLineHeight = fontSize + 5
 
         text.addAttributes([
-            .font: UXFont.monospacedSystemFont(ofSize: CGFloat(FontSize.body), weight: .regular),
+            .font: UXFont.monospacedSystemFont(ofSize: CGFloat(fontSize), weight: .regular),
             .foregroundColor: UXColor.label,
             .paragraphStyle: ps
         ])

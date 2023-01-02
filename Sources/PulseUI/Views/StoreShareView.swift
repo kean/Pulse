@@ -52,7 +52,7 @@ struct ShareStoreView: View {
     private var sectionSharingOptions: some View {
         Section {
             Picker("Time Range", selection: $viewModel.timeRange) {
-                ForEach(TimeRange.allCases, id: \.self) {
+                ForEach(SharingTimeRange.allCases, id: \.self) {
                     Text($0.rawValue).tag($0)
                 }
             }
@@ -129,7 +129,7 @@ struct ShareStoreView: View {
 
 private final class ShareStoreViewModel: ObservableObject {
     // Sharing options
-    @Published var timeRange: TimeRange
+    @Published var timeRange: SharingTimeRange
     @Published var level: LoggerStore.Level
     @Published var output: ShareStoreOutput
 
@@ -143,9 +143,9 @@ private final class ShareStoreViewModel: ObservableObject {
     private var cancellable: AnyCancellable?
 
     init() {
-        timeRange = UserDefaults.sharingTimeRange.flatMap(TimeRange.init) ?? .currentSession
-        level = UserDefaults.sharingLevel.flatMap(LoggerStore.Level.init) ?? .trace
-        output = UserDefaults.sharingOutput.flatMap(ShareStoreOutput.init) ?? .store
+        timeRange = ConsoleSettings.shared.sharingTimeRange
+        level = ConsoleSettings.shared.sharingLevel
+        output = ConsoleSettings.shared.sharingOutput
     }
 
     func display(_ store: LoggerStore) {
@@ -177,9 +177,9 @@ private final class ShareStoreViewModel: ObservableObject {
     }
 
     private func saveSharingOptions() {
-        UserDefaults.sharingTimeRange = timeRange.rawValue
-        UserDefaults.sharingLevel = level.rawValue
-        UserDefaults.sharingOutput = output.rawValue
+        ConsoleSettings.shared.sharingTimeRange = timeRange
+        ConsoleSettings.shared.sharingLevel = level
+        ConsoleSettings.shared.sharingOutput = output
     }
 
     func prepareForSharing() {
@@ -285,13 +285,6 @@ private struct SharedContents {
     }
 }
 
-private enum TimeRange: String, CaseIterable {
-    case currentSession = "This Session"
-    case lastHour = "Last Hour"
-    case today = "Today"
-    case all = "All Messages"
-}
-
 #if DEBUG
 @available(iOS 14.0, tvOS 14.0, *)
 struct ShareStoreView_Previews: PreviewProvider {
@@ -309,3 +302,10 @@ struct ShareStoreView_Previews: PreviewProvider {
 #endif
 
 #endif
+
+enum SharingTimeRange: String, CaseIterable, RawRepresentable {
+    case currentSession = "This Session"
+    case lastHour = "Last Hour"
+    case today = "Today"
+    case all = "All Messages"
+}

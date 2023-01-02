@@ -47,7 +47,7 @@ extension KeyValueSectionViewModel {
         if request.httpShouldUsePipelining {
             items.append(("HTTP Should Use Pipelining", request.httpShouldUsePipelining.description))
         }
-        return KeyValueSectionViewModel(title: "Options", color: .gray, items: items)
+        return KeyValueSectionViewModel(title: "Options", color: .blue, items: items)
     }
 
     static func makeRequestHeaders(for headers: [String: String], action: @escaping () -> Void) -> KeyValueSectionViewModel {

@@ -13,14 +13,31 @@ import UniformTypeIdentifiers
 
 @available(iOS 14.0, *)
 struct ConsoleContextMenu: View {
-    let store: LoggerStore
+    private let store: LoggerStore
+    private let isShowingAsText: Binding<Bool>?
 
     @State private var isShowingSettings = false
     @State private var isShowingStoreInfo = false
     @State private var isDocumentBrowserPresented = false
 
+    init(store: LoggerStore, isShowingAsText: Binding<Bool>? = nil) {
+        self.store = store
+        self.isShowingAsText = isShowingAsText
+    }
+
     var body: some View {
         Menu {
+            if let isShowingAsText = isShowingAsText {
+                Section {
+                    Button(action: { isShowingAsText.wrappedValue.toggle() }) {
+                        if isShowingAsText.wrappedValue {
+                            Label("View as List", systemImage: "list.bullet.rectangle.portrait")
+                        } else {
+                            Label("View as Text", systemImage: "text.quote")
+                        }
+                    }
+                }
+            }
             Section {
                 Button(action: { isShowingStoreInfo = true }) {
                     Label("Store Info", systemImage: "info.circle")
@@ -126,7 +143,7 @@ struct ConsoleContextMenu_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
             VStack {
-                ConsoleContextMenu(store: .mock)
+                ConsoleContextMenu(store: .mock, isShowingAsText: .constant(false))
                 Spacer()
             }
         }

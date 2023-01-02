@@ -31,9 +31,7 @@ struct ConsoleMessageView: View {
     }
     
     private var badge: Text {
-        guard let badge = viewModel.badge else {
-            return Text("")
-        }
+        let badge = viewModel.badge
         var separator: Text {
 #if os(watchOS)
             return Text("\n")
