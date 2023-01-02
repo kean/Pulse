@@ -6,7 +6,7 @@ import SwiftUI
 import Pulse
 import Combine
 
-final class ConsoleSettings: ObservableObject {
+final class ConsoleSettings: PersistentSettings {
     static let shared = ConsoleSettings()
 
     @UserDefault("console-line-limit")
@@ -20,50 +20,51 @@ final class ConsoleSettings: ObservableObject {
 
     @UserDefaultRaw("sharing-output")
     var sharingOutput: ShareStoreOutput = .store
+}
 
-    // MARK: ConsoleTextView
+final class ConsoleTextViewSettings: PersistentSettings {
+    static let shared = ConsoleTextViewSettings()
 
     @UserDefault("console-text-view__order-ascending")
-    var isConsoleTextViewOrderAscending = false
+    var orderAscending = false
 
     @UserDefault("console-text-view__responses-collapsed")
-    var isConsoleTextViewResponsesCollaped = true
+    var isCollapsingResponses = true
 
-    @UserDefault("console-text-view__is-monochrome")
-    var isConsoleTextViewMonochrome = true
+    @UserDefault("console-text-view__monochrome")
+    var isMonochrome = true
 
     @UserDefault("console-text-view__syntax-highlighting")
-    var isConsoleTextViewSyntaxHighlightingEnabled = true
+    var isSyntaxHighlightingEnabled = true
 
     @UserDefault("console-text-view__link-detection")
-    var isConsoleTextViewLinkDetection = true
+    var isLinkDetectionEnabled = true
 
     @UserDefault("console-text-view__view-font-size")
-    var consoleTextViewFontSize = 15
-
-    @UserDefault("console-text-view__monospaced-font-size")
-    var consoleTextViewMonospacedFontSize = 12
+    var fontSize = 15
 
     @UserDefault("console-text-view__request-headers")
-    var isConsoleTextViewRequestHeadersShown = false
+    var showsTaskRequestHeader = false
 
     @UserDefault("console-text-view__response-body-shown")
-    var isConsoleTextViewResponseBodyShown = true
+    var showsResponseBody = true
 
     @UserDefault("console-text-view__response-headers")
-    var isConsoleTextViewResponseHeadersShown = false
+    var showsResponseHeaders = false
 
     @UserDefault("console-text-view__request-body-shown")
-    var isConsoleTextViewRequestBodyShown = true
+    var showsRequestBody = true
 
-    func resetConsoleTextViewSettings() {
+    func reset() {
         for key in UserDefaults.standard.dictionaryRepresentation().keys {
             if key.hasPrefix(commonKeyPrefix + "console-text-view__") {
                 UserDefaults.standard.removeObject(forKey: key)
             }
         }
     }
+}
 
+class PersistentSettings: ObservableObject {
     private var cancellables: [AnyCancellable] = []
 
     init() {
@@ -111,8 +112,6 @@ final class UserDefault<Value: UserDefaultSupportedValue>: UserDefaultProtocol, 
     }
 }
 
-private let commonKeyPrefix = "com-github-com-kean-pulse__"
-
 protocol UserDefaultSupportedValue {}
 
 extension Bool: UserDefaultSupportedValue {}
@@ -128,7 +127,7 @@ final class UserDefaultRaw<Value: RawRepresentable>: UserDefaultProtocol, Dynami
     private let publisher = PassthroughSubject<Value, Never>()
 
     init(wrappedValue value: Value, _ key: String) {
-        self.key = "com-github-com-kean-pulse__" + key
+        self.key = "commonKeyPrefix" + key
         self.defaultValue = value
     }
 
@@ -155,3 +154,5 @@ final class UserDefaultRaw<Value: RawRepresentable>: UserDefaultProtocol, Dynami
 protocol UserDefaultProtocol {
     var didUpdate: AnyPublisher<Void, Never> { get }
 }
+
+private let commonKeyPrefix = "com-github-com-kean-pulse__"

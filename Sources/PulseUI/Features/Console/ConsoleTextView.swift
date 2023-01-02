@@ -14,17 +14,19 @@ struct ConsoleTextView: View {
     @StateObject private var viewModel = ConsoleTextViewModel()
     @State private var shareItems: ShareItems?
     @State private var isShowingSettings = false
-    @ObservedObject private var settings: ConsoleSettings = .shared
+    @ObservedObject private var settings: ConsoleTextViewSettings = .shared
 
     var entities: CurrentValueSubject<[LoggerMessageEntity], Never>
-    var options: ConsoleTextRenderer.Options = .init()
+    var options: ConsoleTextRenderer.Options?
     var onClose: (() -> Void)?
 
     var body: some View {
         textView
             .navigationBarTitleDisplayMode(.inline)
             .onAppear {
-                viewModel.options = options
+                if let options = options {
+                    viewModel.options = options
+                }
                 viewModel.bind(entities)
             }
             .toolbar {
@@ -48,7 +50,7 @@ struct ConsoleTextView: View {
     private var textView: some View {
         RichTextView(
             viewModel: viewModel.text,
-            isAutomaticLinkDetectionEnabled: options.isLinkDetectionEnabled,
+            isAutomaticLinkDetectionEnabled: settings.isLinkDetectionEnabled,
             isPrincipalSearchBarPlacement: true
         )
     }
@@ -56,11 +58,11 @@ struct ConsoleTextView: View {
     @ViewBuilder
     private var menu: some View {
         Section {
-            Button(action: { settings.isConsoleTextViewOrderAscending.toggle() }) {
-                Label("Order by Date", systemImage: settings.isConsoleTextViewOrderAscending ? "arrow.up" : "arrow.down")
+            Button(action: { settings.orderAscending.toggle() }) {
+                Label("Order by Date", systemImage: settings.orderAscending ? "arrow.up" : "arrow.down")
             }
-            Button(action: { settings.isConsoleTextViewResponsesCollaped.toggle() }) {
-                Label(settings.isConsoleTextViewResponsesCollaped ? "Expand Responses" : "Collapse Responses", systemImage: settings.isConsoleTextViewResponsesCollaped ? "arrow.up.left.and.arrow.down.right" : "arrow.down.right.and.arrow.up.left")
+            Button(action: { settings.isCollapsingResponses.toggle() }) {
+                Label(settings.isCollapsingResponses ? "Expand Responses" : "Collapse Responses", systemImage: settings.isCollapsingResponses ? "arrow.up.left.and.arrow.down.right" : "arrow.down.right.and.arrow.up.left")
             }
             Button(action: { isShowingSettings = true }) {
                 Label("Settings", systemImage: "gearshape")
@@ -96,25 +98,25 @@ struct ConsoleTextView: View {
 
 @available(iOS 14.0, *)
 private struct ConsoleTextViewSettingsView: View {
-    @ObservedObject private var settings: ConsoleSettings = .shared
+    @ObservedObject private var settings: ConsoleTextViewSettings = .shared
 
     var body: some View {
         Form {
             Section(header: Text("Appearance")) {
-                Toggle("Monochrome", isOn: $settings.isConsoleTextViewMonochrome)
-                Toggle("Syntax Highlighting", isOn: $settings.isConsoleTextViewSyntaxHighlightingEnabled)
-                Toggle("Link Detection", isOn: $settings.isConsoleTextViewLinkDetection)
-                Stepper("Font Size: \(settings.consoleTextViewFontSize)", value: $settings.consoleTextViewFontSize)
+                Toggle("Monochrome", isOn: $settings.isMonochrome)
+                Toggle("Syntax Highlighting", isOn: $settings.isSyntaxHighlightingEnabled)
+                Toggle("Link Detection", isOn: $settings.isLinkDetectionEnabled)
+                Stepper("Font Size: \(settings.fontSize)", value: $settings.fontSize)
             }
             Section(header: Text("Request Info")) {
-                Toggle("Request Headers", isOn: $settings.isConsoleTextViewRequestHeadersShown)
-                Toggle("Response Headers", isOn: $settings.isConsoleTextViewResponseHeadersShown)
-                Toggle("Request Body", isOn: $settings.isConsoleTextViewRequestBodyShown)
-                Toggle("Response Body", isOn: $settings.isConsoleTextViewResponseBodyShown)
+                Toggle("Request Headers", isOn: $settings.showsTaskRequestHeader)
+                Toggle("Response Headers", isOn: $settings.showsResponseHeaders)
+                Toggle("Request Body", isOn: $settings.showsRequestBody)
+                Toggle("Response Body", isOn: $settings.showsResponseBody)
             }
             Section {
                 Button("Reset Settings") {
-                    settings.resetConsoleTextViewSettings()
+                    settings.reset()
                 }
                 .foregroundColor(.red)
             }
@@ -131,7 +133,7 @@ final class ConsoleTextViewModel: ObservableObject {
 
     var options: ConsoleTextRenderer.Options = .init()
 
-    private let settings = ConsoleSettings.shared
+    private let settings = ConsoleTextViewSettings.shared
 
     let text: RichTextViewModel
     @Published private(set) var isButtonRefreshHidden = true
@@ -142,11 +144,11 @@ final class ConsoleTextViewModel: ObservableObject {
         self.text.onLinkTapped = { [unowned self] in onLinkTapped($0) }
         self.reloadOptions()
 
-        ConsoleSettings.shared.$isConsoleTextViewOrderAscending.sink { [weak self] _ in
+        ConsoleTextViewSettings.shared.$orderAscending.sink { [weak self] _ in
             self?.refreshText()
         }.store(in: &cancellables)
 
-        ConsoleSettings.shared.$isConsoleTextViewResponsesCollaped.sink { [weak self] isCollaped in
+        ConsoleTextViewSettings.shared.$isCollapsingResponses.sink { [weak self] isCollaped in
             self?.options.isBodyExpanded = !isCollaped
             self?.renderer.expanded.removeAll()
             self?.refreshText()
@@ -162,33 +164,34 @@ final class ConsoleTextViewModel: ObservableObject {
     }
 
     func reloadOptions() {
-        options.isBodyExpanded = settings.isConsoleTextViewResponsesCollaped
-        options.isMonocrhome = settings.isConsoleTextViewMonochrome
-        options.isBodySyntaxHighlightingEnabled = settings.isConsoleTextViewSyntaxHighlightingEnabled
-        options.isLinkDetectionEnabled = settings.isConsoleTextViewLinkDetection
-        options.fontSize = CGFloat(settings.consoleTextViewFontSize)
-        if settings.isConsoleTextViewRequestHeadersShown {
+        options.isBodyExpanded = settings.isCollapsingResponses
+        options.isMonocrhome = settings.isMonochrome
+        options.isBodySyntaxHighlightingEnabled = settings.isSyntaxHighlightingEnabled
+        options.fontSize = CGFloat(settings.fontSize)
+        if settings.showsTaskRequestHeader {
             options.networkContent.insert(.currentRequestHeaders)
             options.networkContent.insert(.originalRequestHeaders)
         } else {
             options.networkContent.remove(.currentRequestHeaders)
             options.networkContent.remove(.originalRequestHeaders)
         }
-        if settings.isConsoleTextViewRequestBodyShown {
+        if settings.showsRequestBody {
             options.networkContent.insert(.requestBody)
         } else {
             options.networkContent.remove(.requestBody)
         }
-        if settings.isConsoleTextViewResponseHeadersShown {
+        if settings.showsResponseHeaders {
             options.networkContent.insert(.responseHeaders)
         } else {
             options.networkContent.remove(.responseHeaders)
         }
-        if settings.isConsoleTextViewResponseBodyShown {
+        if settings.showsResponseBody {
             options.networkContent.insert(.responseBody)
         } else {
             options.networkContent.remove(.responseBody)
         }
+
+        text.textView?.isAutomaticLinkDetectionEnabled = settings.isLinkDetectionEnabled
     }
 
     func refresh() {
@@ -197,7 +200,7 @@ final class ConsoleTextViewModel: ObservableObject {
     }
 
     private func refreshText() {
-        let entities = ConsoleSettings.shared.isConsoleTextViewOrderAscending ? entities.value : entities.value.reversed()
+        let entities = settings.orderAscending ? entities.value : entities.value.reversed()
         let string = renderer.render(entities, options: options)
         self.text.display(string)
     }

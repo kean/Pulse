@@ -19,7 +19,6 @@ final class ConsoleTextRenderer {
         var isBodySyntaxHighlightingEnabled = true
         var isBodyExpanded = false
         var bodyCollapseLimit = 20
-        var isLinkDetectionEnabled = true
         var fontSize: CGFloat = 15
     }
 
