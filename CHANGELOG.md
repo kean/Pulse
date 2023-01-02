@@ -11,6 +11,7 @@
 
 ### PulseUI
 
+- Add all-new Text Mode - [#127](https://github.com/kean/Pulse/pull/127/)
 - Add new context menu to Console and Network screen with many quick actions that were previously hidden in Settings, e.g. "Remove Logs". Settings were removed from the primary tabs `MainView`. With this change, for apps that don't use `MainView` and integrate individual tabs into their own debug menus, integration became significantly eaier because both Console and Network screens are fully self-sufficient.
 - Add "Report Issue" button.
 - `ShareStoreView` now remembers user settings.
