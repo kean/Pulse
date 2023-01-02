@@ -13,6 +13,7 @@ import Combine
 struct ConsoleTextView: View {
     @StateObject private var viewModel = ConsoleTextViewModel()
     @State private var shareItems: ShareItems?
+    @ObservedObject private var settings: ConsoleSettings = .shared
 
     var entities: CurrentValueSubject<[LoggerMessageEntity], Never>
     var options: ConsoleTextRenderer.Options = .init()
@@ -53,6 +54,9 @@ struct ConsoleTextView: View {
     @ViewBuilder
     private var menu: some View {
         Section {
+            Button(action: { settings.isTextViewOrderAscending.toggle() }) {
+                Label("Order by Date", systemImage: settings.isTextViewOrderAscending ? "arrow.up" : "arrow.down")
+            }
             Button(action: { shareItems = ShareItems([viewModel.text.text.string]) }) {
                 Label("Share", systemImage: "square.and.arrow.up")
             }
@@ -83,6 +87,10 @@ final class ConsoleTextViewModel: ObservableObject {
     init() {
         self.text = RichTextViewModel(string: "")
         self.text.onLinkTapped = { [unowned self] in onLinkTapped($0) }
+
+        ConsoleSettings.shared.$isTextViewOrderAscending.sink { [weak self] _ in
+            self?.refreshText()
+        }.store(in: &cancellables)
     }
 
     func bind(_ entities: CurrentValueSubject<[LoggerMessageEntity], Never>) {
@@ -99,7 +107,8 @@ final class ConsoleTextViewModel: ObservableObject {
     }
 
     private func refreshText() {
-        let string = renderer.render(entities.value.reversed(), options: options)
+        let entities = ConsoleSettings.shared.isTextViewOrderAscending ? entities.value : entities.value.reversed()
+        let string = renderer.render(entities, options: options)
         self.text.display(string)
     }
 

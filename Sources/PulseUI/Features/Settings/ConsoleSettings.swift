@@ -21,6 +21,9 @@ final class ConsoleSettings: ObservableObject {
     @UserDefaultRaw("sharing-output")
     var sharingOutput: ShareStoreOutput = .store
 
+    @UserDefault("text-view-order-ascending")
+    var isTextViewOrderAscending = false
+
     private var cancellables: [AnyCancellable] = []
 
     init() {
@@ -38,7 +41,7 @@ final class ConsoleSettings: ObservableObject {
 }
 
 @propertyWrapper
-struct UserDefault<Value: UserDefaultSupportedValue>: UserDefaultProtocol, DynamicProperty {
+final class UserDefault<Value: UserDefaultSupportedValue>: UserDefaultProtocol, DynamicProperty {
     private let key: String
     private let defaultValue: Value
     private let container: UserDefaults = .standard
@@ -70,12 +73,13 @@ struct UserDefault<Value: UserDefaultSupportedValue>: UserDefaultProtocol, Dynam
 
 protocol UserDefaultSupportedValue {}
 
+extension Bool: UserDefaultSupportedValue {}
 extension Int: UserDefaultSupportedValue {}
 extension Int16: UserDefaultSupportedValue {}
 extension String: UserDefaultSupportedValue {}
 
 @propertyWrapper
-struct UserDefaultRaw<Value: RawRepresentable>: UserDefaultProtocol, DynamicProperty {
+final class UserDefaultRaw<Value: RawRepresentable>: UserDefaultProtocol, DynamicProperty {
     private let key: String
     private let defaultValue: Value
     private let container: UserDefaults = .standard
