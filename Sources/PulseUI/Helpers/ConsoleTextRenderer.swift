@@ -160,7 +160,7 @@ final class ConsoleTextRenderer {
 
         if task.originalRequest != nil {
             let originalHeaders = viewModel.originalRequestHeaders
-            var currentHeaders = viewModel.originalRequestHeaders
+            var currentHeaders = viewModel.currentRequestHeaders
             if content.contains(.originalRequestHeaders) {
                 append(section:originalHeaders .title("Original Request Headers"))
             }
