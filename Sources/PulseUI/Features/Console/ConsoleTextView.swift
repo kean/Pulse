@@ -12,6 +12,7 @@ import Combine
 @available(iOS 14.0, tvOS 14.0, *)
 struct ConsoleTextView: View {
     @StateObject private var viewModel = ConsoleTextViewModel()
+    @State private var shareItems: ShareItems?
 
     var entities: () -> [LoggerMessageEntity]
     var options: ConsoleTextRenderer.Options = .init()
@@ -35,6 +36,7 @@ struct ConsoleTextView: View {
                     }
                 }
             }
+            .sheet(item: $shareItems, content: ShareView.init)
     }
 
     private var textView: some View {
@@ -48,8 +50,13 @@ struct ConsoleTextView: View {
 
     @ViewBuilder
     private var menu: some View {
-        Button(action: { viewModel.display(entities(), options) }) {
-            Label("Refresh", systemImage: "arrow.clockwise")
+        Section {
+            Button(action: { shareItems = ShareItems([viewModel.text.text.string]) }) {
+                Label("Share", systemImage: "square.and.arrow.up")
+            }
+            Button(action: { viewModel.display(entities(), options) }) {
+                Label("Refresh", systemImage: "arrow.clockwise")
+            }
         }
     }
 }
@@ -67,7 +74,7 @@ final class ConsoleTextViewModel: ObservableObject {
 
     func display(_ entities: [LoggerMessageEntity], _ options: ConsoleTextRenderer.Options) {
         self.renderer = ConsoleTextRenderer(options: options)
-        self.text = RichTextViewModel(string: renderer.render(entities))
+        self.text = RichTextViewModel(string: renderer.render(entities.reversed()))
     }
 }
 
@@ -118,7 +125,7 @@ private extension ConsoleTextView {
     init(entities: [LoggerMessageEntity], _ configure: (inout ConsoleTextRenderer.Options) -> Void) {
         var options = ConsoleTextRenderer.Options()
         configure(&options)
-        self.init(entities: { entities }, options: options, onClose: {})
+        self.init(entities: { entities.reversed() }, options: options, onClose: {})
     }
 }
 
