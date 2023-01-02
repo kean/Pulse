@@ -25,6 +25,21 @@ struct NetworkInspectorView: View {
     @State private var viewController: UIViewController?
 
     var body: some View {
+#if os(iOS)
+        if #available(iOS 16.0, *) {
+            _body
+                .toolbar(isExpanded ? .hidden : .visible, for: .navigationBar)
+                .toolbar(isExpanded ? .hidden : .visible, for: .tabBar)
+        } else {
+            _body
+        }
+#else
+        _body
+#endif
+    }
+
+    @ViewBuilder
+    var _body: some View {
         VStack(spacing: 0) {
             if !isExpanded {
                 toolbar
@@ -126,8 +141,10 @@ struct NetworkInspectorView: View {
     func onToggleExpanded() {
 #if os(iOS)
         isExpanded.toggle()
-        viewController?.navigationController?.setNavigationBarHidden(isExpanded, animated: false)
-        viewController?.tabBarController?.setTabBarHidden(isExpanded, animated: false)
+        if #unavailable(iOS 16.0) {
+            viewController?.navigationController?.setNavigationBarHidden(isExpanded, animated: false)
+            viewController?.tabBarController?.setTabBarHidden(isExpanded, animated: false)
+        }
 #endif
     }
 #endif
