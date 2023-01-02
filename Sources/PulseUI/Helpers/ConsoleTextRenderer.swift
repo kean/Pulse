@@ -46,6 +46,7 @@ final class ConsoleTextRenderer {
 
     private let options: Options
     private let helpers: TextRenderingHelpers
+    private var index = 0
 
     init(options: Options = .init()) {
         self.options = options

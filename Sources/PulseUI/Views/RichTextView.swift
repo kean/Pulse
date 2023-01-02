@@ -20,10 +20,17 @@ struct RichTextView: View {
     var isPrincipalSearchBarPlacement = false
     var hasVerticalScroller = false
     var onToggleExpanded: (() -> Void)?
+    var onLinkTapped: ((URL) -> Bool)?
 #if os(iOS)
     var body: some View {
         content
             .onAppear(perform: onAppear)
+    }
+
+    func onLinkTapped(_ closure: @escaping (URL) -> Bool) -> Self {
+        var copy = self
+        copy.onLinkTapped = onLinkTapped
+        return copy
     }
 
     @ViewBuilder
@@ -146,14 +153,25 @@ struct WrappedTextView: UIViewRepresentable {
     let isAutomaticLinkDetectionEnabled: Bool
     #if os(iOS)
     @Binding var isScrolled: Bool
+    var onLinkTapped: ((URL) -> Bool)?
     #endif
 
-    final class Coordinator {
+    final class Coordinator: NSObject, UITextViewDelegate {
+        var onLinkTapped: ((URL) -> Bool)?
         var cancellables: [AnyCancellable] = []
+
+        func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
+            if let onLinkTapped = onLinkTapped, onLinkTapped(URL) {
+                return false
+            }
+            return true
+        }
     }
 
     func makeCoordinator() -> Coordinator {
-        Coordinator()
+        let coordinator = Coordinator()
+        coordinator.onLinkTapped = onLinkTapped
+        return coordinator
     }
 
     func makeUIView(context: Context) -> UXTextView {
@@ -162,6 +180,7 @@ struct WrappedTextView: UIViewRepresentable {
         textView.alwaysBounceVertical = true
         textView.autocorrectionType = .no
         textView.autocapitalizationType = .none
+        textView.delegate = context.coordinator
 #if !os(tvOS)
         textView.isAutomaticLinkDetectionEnabled = isAutomaticLinkDetectionEnabled
 #endif
