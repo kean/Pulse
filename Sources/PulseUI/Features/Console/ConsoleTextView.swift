@@ -85,7 +85,7 @@ struct ConsoleTextView_Previews: PreviewProvider {
 
             NavigationView {
                 ConsoleTextView(entities: entitites) {
-                    $0.isMonocrhome = true
+                    $0.isMonocrhome = false
                     $0.isBodySyntaxHighlightingEnabled = true
                     $0.networkContent = .all
                 }
