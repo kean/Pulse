@@ -85,8 +85,10 @@ struct ConsoleTextView: View {
                 .navigationBarTitleDisplayMode(.inline)
                 .navigationBarItems(trailing: Button("Done") {
                     isShowingSettings = false
-                    viewModel.reloadOptions()
-                    viewModel.refresh()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(250)) {
+                        viewModel.reloadOptions()
+                        viewModel.refresh()
+                    }
                 })
         }
     }
@@ -99,9 +101,10 @@ private struct ConsoleTextViewSettingsView: View {
         Form {
             Section(header: Text("Appearance")) {
                 Toggle("Monochrome", isOn: $settings.isConsoleTextViewMonochrome)
+                Toggle("Link Detection", isOn: $settings.isConsoleTextViewLinkDetection)
             }
             Section(header: Text("Network Requests")) {
-
+                Toggle("Syntax Highlighting", isOn: $settings.isConsoleTextViewSyntaxHighlightingEnabled)
             }
         }
     }
@@ -148,6 +151,8 @@ final class ConsoleTextViewModel: ObservableObject {
 
     func reloadOptions() {
         options.isMonocrhome = settings.isConsoleTextViewMonochrome
+        options.isBodySyntaxHighlightingEnabled = settings.isConsoleTextViewSyntaxHighlightingEnabled
+        options.isLinkDetectionEnabled = settings.isConsoleTextViewLinkDetection
     }
 
     func refresh() {

@@ -32,11 +32,13 @@ final class ConsoleSettings: ObservableObject {
     @UserDefault("console-text-view-is-monochrome")
     var isConsoleTextViewMonochrome = true
 
+    @UserDefault("console-text-view-syntax-highlighting")
+    var isConsoleTextViewSyntaxHighlightingEnabled = true
+
+    @UserDefault("console-text-view-link-detection")
+    var isConsoleTextViewLinkDetection = true
+
 //    var networkContent: NetworkContent = [.errorDetails, .requestBody, .responseBody]
-//    var isMonocrhome = true
-//    var isBodySyntaxHighlightingEnabled = true
-//    var isBodyExpanded = false
-//    var bodyCollapseLimit = 20
 //    var isLinkDetectionEnabled = true
 //    var fontSize: CGFloat = 15
 //    var monospacedFontSize: CGFloat = 12
