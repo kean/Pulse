@@ -51,7 +51,7 @@ public struct ConsoleView: View {
             .backport.fullScreenCover(isPresented: $isShowingAsText) {
                 if #available(iOS 14.0, *) {
                     NavigationView {
-                        ConsoleTextView(entities: { viewModel.entities }) {
+                        ConsoleTextView(entities: viewModel.getObservableProperties()) {
                             isShowingAsText = false
                         }
                     }

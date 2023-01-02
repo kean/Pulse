@@ -64,6 +64,12 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         refreshNow()
     }
 
+    func getObservableProperties() -> CurrentValueSubject<[LoggerMessageEntity], Never> {
+        let subject = CurrentValueSubject<[LoggerMessageEntity], Never>(entities)
+        $entities.sink { subject.send($0) }.store(in: &cancellables)
+        return subject
+    }
+
     // MARK: Appearance
 
     func onAppear() {

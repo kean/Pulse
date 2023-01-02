@@ -14,14 +14,14 @@ struct ConsoleTextView: View {
     @StateObject private var viewModel = ConsoleTextViewModel()
     @State private var shareItems: ShareItems?
 
-    var entities: () -> [LoggerMessageEntity]
+    var entities: CurrentValueSubject<[LoggerMessageEntity], Never>
     var options: ConsoleTextRenderer.Options = .init()
     var onClose: (() -> Void)?
 
     var body: some View {
         textView
             .navigationBarTitleDisplayMode(.inline)
-            .onAppear { viewModel.display(entities(), options) }
+            .onAppear { viewModel.display(entities, options) }
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     HStack {
@@ -54,27 +54,45 @@ struct ConsoleTextView: View {
             Button(action: { shareItems = ShareItems([viewModel.text.text.string]) }) {
                 Label("Share", systemImage: "square.and.arrow.up")
             }
-            Button(action: { viewModel.display(entities(), options) }) {
+            Button(action: { viewModel.display(entities, options) }) {
                 Label("Refresh", systemImage: "arrow.clockwise")
-            }
+            }.disabled(viewModel.isButtonRefreshHidden)
         }
     }
 }
 
 @available(iOS 14.0, *)
 final class ConsoleTextViewModel: ObservableObject {
-    private var messages: [LoggerMessageEntity] = []
+    private var messages: CurrentValueSubject<[LoggerMessageEntity], Never> = .init([])
     private var renderer = ConsoleTextRenderer()
+    private var cancellables: [AnyCancellable] = []
 
     @Published private(set) var text: RichTextViewModel
+    @Published private(set) var isButtonRefreshHidden = true
+    private var lastTimeRefreshHidden = Date().addingTimeInterval(-3)
 
     init() {
         self.text = RichTextViewModel(string: "")
     }
 
-    func display(_ entities: [LoggerMessageEntity], _ options: ConsoleTextRenderer.Options) {
+    func display(_ entities: CurrentValueSubject<[LoggerMessageEntity], Never>, _ options: ConsoleTextRenderer.Options) {
         self.renderer = ConsoleTextRenderer(options: options)
-        self.text = RichTextViewModel(string: renderer.render(entities.reversed()))
+        self.text = RichTextViewModel(string: renderer.render(entities.value.reversed()))
+        self.hideRefreshButton()
+
+        entities.dropFirst().sink { [weak self] _ in
+            self?.showRefreshButtonIfNeeded()
+        }.store(in: &cancellables)
+    }
+
+    private func hideRefreshButton() {
+        guard !isButtonRefreshHidden else { return }
+        isButtonRefreshHidden = true
+    }
+
+    private func showRefreshButtonIfNeeded() {
+        guard !isButtonRefreshHidden else { return }
+        isButtonRefreshHidden = true
     }
 }
 
@@ -126,7 +144,7 @@ private extension ConsoleTextView {
     init(entities: [LoggerMessageEntity], _ configure: (inout ConsoleTextRenderer.Options) -> Void) {
         var options = ConsoleTextRenderer.Options()
         configure(&options)
-        self.init(entities: { entities.reversed() }, options: options, onClose: {})
+        self.init(entities: .init(entities.reversed()), options: options, onClose: {})
     }
 }
 
