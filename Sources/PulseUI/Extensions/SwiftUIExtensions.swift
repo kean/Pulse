@@ -63,29 +63,6 @@ extension ContentSizeCategory {
     }
 }
 
-#if os(iOS)
-struct ViewControllerAccessor: UIViewRepresentable {
-    @Binding var viewController: UIViewController?
-
-    func makeUIView(context: Context) -> UIView {
-        let view = UIView()
-        view.isHidden = true
-        view.accessibilityElementsHidden = true
-        DispatchQueue.main.async {
-            self.viewController = sequence(first: view) { $0.next }
-                .first(where: { $0 is UIViewController })
-                .flatMap { $0 as? UIViewController }
-        }
-        return view
-    }
-
-    func updateUIView(_ uiView: UIView, context: Context) {
-        // Do nothing
-    }
-}
-
-#endif
-
 // MARK: - Backport
 
 struct Backport<Content: View> {

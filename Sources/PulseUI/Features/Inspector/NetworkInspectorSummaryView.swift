@@ -5,6 +5,9 @@
 import SwiftUI
 import Pulse
 
+#warning("TODO: remove for iOS")
+#warning("TODO: remove for other platforms")
+
 struct NetworkInspectorSummaryView: View {
     @ObservedObject var viewModel: NetworkInspectorSummaryViewModel
     @State var isShowingCurrentRequest = false
@@ -33,8 +36,8 @@ struct NetworkInspectorSummaryView: View {
     @ViewBuilder
     private var contents: some View {
         headerView
-
         summaryView
+
         viewModel.errorModel.map(KeyValueSectionView.init)
 
         if viewModel.originalRequestSummary != nil {

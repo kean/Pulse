@@ -6,6 +6,8 @@ import SwiftUI
 import Pulse
 import Combine
 
+#warning("TODO: naviation using NavigaitonLink")
+
 #if os(iOS) || os(macOS)
 
 struct NetworkInspectorMetricsTabView: View {

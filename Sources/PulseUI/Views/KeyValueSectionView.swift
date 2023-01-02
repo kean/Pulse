@@ -9,6 +9,7 @@ struct KeyValueSectionView: View {
     let viewModel: KeyValueSectionViewModel
     var limit: Int = Int.max
     private var hideTitle = false
+    private var hideAction = false
 
     init(viewModel: KeyValueSectionViewModel) {
         self.viewModel = viewModel
@@ -22,6 +23,12 @@ struct KeyValueSectionView: View {
     func hiddenTitle() -> KeyValueSectionView {
         var copy = self
         copy.hideTitle = true
+        return copy
+    }
+
+    func hiddenAction() -> KeyValueSectionView {
+        var copy = self
+        copy.hideAction = true
         return copy
     }
 
@@ -66,7 +73,7 @@ struct KeyValueSectionView: View {
                 .font(.headline)
             Spacer()
 #if os(iOS)
-            if let action = viewModel.action, !viewModel.items.isEmpty {
+            if !hideAction, let action = viewModel.action, !viewModel.items.isEmpty {
                 makeActionButton(with: action)
             }
 #endif

@@ -6,6 +6,8 @@ import SwiftUI
 import Pulse
 import Combine
 
+#warning("TODO: simplify this")
+
 final class NetworkInspectorSummaryViewModel: ObservableObject {
     @Published var isErrorRawLinkActive = false
     @Published var isRequestRawLinkActive = false
