@@ -96,7 +96,6 @@ struct ConsoleTextView_Previews: PreviewProvider {
                 ConsoleTextView(entities: entitites) {
                     $0.isMonocrhome = true
                     $0.isBodySyntaxHighlightingEnabled = false
-                    $0.isLinkDetectionEnabled = false
                     $0.networkContent = .all
                 }
             }

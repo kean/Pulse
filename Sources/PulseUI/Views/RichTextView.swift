@@ -218,7 +218,6 @@ private func configureTextView(_ textView: UXTextView) {
 #if !os(tvOS)
     textView.isEditable = false
     textView.linkTextAttributes = [
-        .foregroundColor: JSONColors.valueString,
         .underlineStyle: 1
     ]
 #endif

@@ -124,24 +124,32 @@ final class ConsoleTextRenderer {
 
         func append(section: KeyValueSectionViewModel?) {
             guard let section = section else { return }
+            let fontSize = options.fontSize - 1
             text.append(section.title + "\n", helpers.titleAttributes)
             var keyAttributes = helpers.detailsAttributes
-            keyAttributes[.font] = UXFont.systemFont(ofSize: options.fontSize, weight: .medium)
+            keyAttributes[.font] = UXFont.systemFont(ofSize: fontSize, weight: .medium)
             if !options.isMonocrhome {
                 keyAttributes[.foregroundColor] = UXColor(section.color)
             }
+            var valueAttributes = helpers.detailsAttributes
+            valueAttributes[.font] = UXFont.systemFont(ofSize: fontSize, weight: .regular)
             if section.items.isEmpty {
                 text.append("–\n", helpers.detailsAttributes)
             } else {
                 for (key, value) in section.items {
                     text.append(key, keyAttributes)
-                    text.append(": \(value ?? "–")\n", helpers.detailsAttributes)
+                    text.append(": \(value ?? "–")\n", valueAttributes)
                 }
             }
         }
 
         if let url = task.url {
-            text.append(url + "\n", helpers.textAttributes[.debug]!)
+            var attributes = helpers.textAttributes[.debug]!
+            attributes[.font] = UXFont.systemFont(ofSize: options.fontSize, weight: .medium)
+            if !options.isMonocrhome {
+                attributes[.foregroundColor] = tintColor
+            }
+            text.append(url + "\n", attributes)
         }
 
         let viewModel = NetworkInspectorSummaryViewModel(task: task)
