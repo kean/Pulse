@@ -22,7 +22,7 @@ struct ConsoleTextView: View {
         textView
             .navigationBarTitleDisplayMode(.inline)
             .onAppear {
-                viewModel.setOptions(options)
+                viewModel.options = options
                 viewModel.bind(entities)
             }
             .toolbar {
@@ -74,6 +74,8 @@ final class ConsoleTextViewModel: ObservableObject {
 
     private var cancellables: [AnyCancellable] = []
 
+    var options: ConsoleTextRenderer.Options = .init()
+
     let text: RichTextViewModel
     @Published private(set) var isButtonRefreshHidden = true
     private var lastTimeRefreshHidden = Date().addingTimeInterval(-3)
@@ -81,10 +83,6 @@ final class ConsoleTextViewModel: ObservableObject {
     init() {
         self.text = RichTextViewModel(string: "")
         self.text.onLinkTapped = { [unowned self] in onLinkTapped($0) }
-    }
-
-    func setOptions(_ options: ConsoleTextRenderer.Options) {
-        self.renderer.setOptions(options)
     }
 
     func bind(_ entities: CurrentValueSubject<[LoggerMessageEntity], Never>) {
@@ -101,7 +99,7 @@ final class ConsoleTextViewModel: ObservableObject {
     }
 
     private func refreshText() {
-        let string = renderer.render(entities.value.reversed())
+        let string = renderer.render(entities.value.reversed(), options: options)
         self.text.display(string)
     }
 

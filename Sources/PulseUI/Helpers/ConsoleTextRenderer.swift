@@ -44,29 +44,25 @@ final class ConsoleTextRenderer {
         ]
     }
 
-    private var options: Options
-    private var helpers: TextRenderingHelpers
+    private var options: Options = .init()
+    private var helpers = TextRenderingHelpers(options: .init())
     private var index = 0
     var expanded: Set<Int> = []
 
-    init(options: Options = .init()) {
-        self.options = options
-        self.helpers = TextRenderingHelpers(options: options)
-    }
-
-    func setOptions(_ options: Options) {
-        self.options = options
-        self.helpers = TextRenderingHelpers(options: options)
-    }
-
-    func render(_ entities: [NetworkTaskEntity]) -> NSAttributedString {
-        defer { index = 0 }
+    func render(_ entities: [NetworkTaskEntity], options: Options = .init()) -> NSAttributedString {
+        prepare(options: options)
         return joined(entities.map(render))
     }
 
-    func render(_ entities: [LoggerMessageEntity]) -> NSAttributedString {
-        defer { index = 0 }
+    func render(_ entities: [LoggerMessageEntity], options: Options = .init()) -> NSAttributedString {
+        prepare(options: options)
         return joined(entities.map(render))
+    }
+
+    private func prepare(options: Options) {
+        self.options = options
+        self.helpers = TextRenderingHelpers(options: options)
+        self.index = 0
     }
 
     private func joined(_ strings: [NSAttributedString]) -> NSAttributedString {
