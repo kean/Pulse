@@ -380,6 +380,7 @@ final class RichTextViewModel: ObservableObject {
         self.matches.removeAll()
 
         textView?.textStorage.setAttributedString(text)
+        searchTerm = ""
     }
 
     func onAppear() {
