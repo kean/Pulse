@@ -30,6 +30,10 @@ final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
         return title
     }
 
+    var titleForTextRepresentation: String {
+        "\(time) · \(title)"
+    }
+
     private(set) var state: NetworkTaskEntity.State = .pending
 
     private(set) lazy var progress = ProgressViewModel(task: task)

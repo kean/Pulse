@@ -12,7 +12,7 @@ import Pulse
 @available(iOS 14.0, tvOS 14.0, *)
 final class ConsoleTextRenderer {
     struct Options {
-        var networkContent: NetworkContent = []
+        var networkContent: NetworkContent = [.errorDetails]
         var isMonocrhome = true
         var isBodySyntaxHighlightingEnabled = true
         var isLinkDetectionEnabled = true
@@ -27,10 +27,11 @@ final class ConsoleTextRenderer {
             self.rawValue = rawValue
         }
 
-        static let summary = NetworkContent(rawValue: 1 << 0)
+        static let errorDetails = NetworkContent(rawValue: 1 << 0)
+        static let summary = NetworkContent(rawValue: 1 << 1)
 
         static let all: NetworkContent = [
-            summary
+            errorDetails, summary
         ]
     }
 
@@ -84,28 +85,6 @@ final class ConsoleTextRenderer {
 
         let state = task.state
 
-        func makeTitle() -> String {
-            let time = ConsoleMessageViewModel.timeFormatter.string(from: task.createdAt)
-            let status: String
-            switch state {
-            case .pending:
-                status = "PENDING"
-            case .success:
-                status = StatusCodeFormatter.string(for: Int(task.statusCode))
-            case .failure:
-                if task.errorCode != 0 {
-                    status = "\(task.errorCode) (\(descriptionForURLErrorCode(Int(task.errorCode))))"
-                } else {
-                    status = StatusCodeFormatter.string(for: Int(task.statusCode))
-                }
-            }
-            var duration: String?
-            if task.duration > 0 {
-                duration = "\(DurationFormatter.string(from: task.duration))"
-            }
-            return [time, task.httpMethod, status, duration].compactMap { $0 }.joined(separator: " · ")
-        }
-
         let tintColor: UXColor = {
             switch state {
             case .pending: return .systemYellow
@@ -114,7 +93,10 @@ final class ConsoleTextRenderer {
             }
         }()
 
-        text.append(makeTitle() + "\n", {
+        let topViewModel = ConsoleNetworkRequestViewModel(task: task)
+        let title = topViewModel.titleForTextRepresentation
+
+        text.append(title + "\n", {
             var attributes = helpers.titleAttributes
             if !options.isMonocrhome {
                 attributes[.foregroundColor] = tintColor
@@ -155,9 +137,11 @@ final class ConsoleTextRenderer {
         let viewModel = NetworkInspectorSummaryViewModel(task: task)
         let content = options.networkContent
 
-        if content.contains(.all) {
+        if content.contains(.errorDetails) {
             append(section: viewModel.errorModel)
+        }
 
+        if content.contains(.all) {
             if viewModel.originalRequestSummary != nil {
                 append(section: viewModel.originalRequestHeaders.title("Request Headers"))
                 append(section: viewModel.originalRequestParameters?.title("Request Options"))
