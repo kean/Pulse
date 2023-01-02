@@ -57,6 +57,9 @@ struct ConsoleTextView: View {
             Button(action: { settings.isTextViewOrderAscending.toggle() }) {
                 Label("Order by Date", systemImage: settings.isTextViewOrderAscending ? "arrow.up" : "arrow.down")
             }
+            Button(action: { settings.isTextViewResponsesCollaped.toggle() }) {
+                Label(settings.isTextViewResponsesCollaped ? "Expand Responses" : "Collapse Responses", systemImage: settings.isTextViewResponsesCollaped ? "arrow.up.left.and.arrow.down.right" : "arrow.down.right.and.arrow.up.left")
+            }
             Button(action: { shareItems = ShareItems([viewModel.text.text.string]) }) {
                 Label("Share", systemImage: "square.and.arrow.up")
             }
@@ -89,6 +92,12 @@ final class ConsoleTextViewModel: ObservableObject {
         self.text.onLinkTapped = { [unowned self] in onLinkTapped($0) }
 
         ConsoleSettings.shared.$isTextViewOrderAscending.sink { [weak self] _ in
+            self?.refreshText()
+        }.store(in: &cancellables)
+
+        ConsoleSettings.shared.$isTextViewResponsesCollaped.sink { [weak self] isCollaped in
+            self?.options.isBodyExpanded = !isCollaped
+            self?.renderer.expanded.removeAll()
             self?.refreshText()
         }.store(in: &cancellables)
     }

@@ -24,6 +24,9 @@ final class ConsoleSettings: ObservableObject {
     @UserDefault("text-view-order-ascending")
     var isTextViewOrderAscending = false
 
+    @UserDefault("text-view-responses-collapsed")
+    var isTextViewResponsesCollaped = true
+
     private var cancellables: [AnyCancellable] = []
 
     init() {
