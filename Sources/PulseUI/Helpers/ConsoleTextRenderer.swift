@@ -2,6 +2,8 @@
 //
 // Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
 
+#if !os(watchOS)
+
 import Foundation
 import Pulse
 import CoreData
@@ -264,3 +266,5 @@ final class TextRenderingHelpers {
 private func geLineHeight(for fontSize: Int) -> CGFloat {
     CGFloat(fontSize + 6)
 }
+
+#endif

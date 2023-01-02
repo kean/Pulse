@@ -90,7 +90,7 @@ struct RichTextView: View {
         VStack(spacing: 0) {
 #if os(macOS)
             ZStack(alignment: .bottom) {
-                WrappedTextView(viewModel: viewModel, isAutomaticLinkDetectionEnabled: isAutomaticLinkDetectionEnabled, hasVerticalScroller: hasVerticalScroller)
+                WrappedTextView(text: viewModel.text, viewModel: viewModel, isAutomaticLinkDetectionEnabled: isAutomaticLinkDetectionEnabled, hasVerticalScroller: hasVerticalScroller)
                 errorView
             }.onAppear(perform: onAppear)
 #else

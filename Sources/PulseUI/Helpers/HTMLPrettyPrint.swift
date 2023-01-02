@@ -2,9 +2,9 @@
 //
 // Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
 
-import Foundation
+#if !os(watchOS)
 
-#if os(iOS) || os(macOS)
+import Foundation
 
 #if os(macOS)
 import AppKit
