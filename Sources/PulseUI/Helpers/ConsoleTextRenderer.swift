@@ -17,6 +17,8 @@ final class ConsoleTextRenderer {
         var networkContent: NetworkContent = [.errorDetails, .requestBody, .responseBody]
         var isMonocrhome = true
         var isBodySyntaxHighlightingEnabled = true
+        var isBodyExpanded = true
+        var bodyCollapseLimit = 20
         var isLinkDetectionEnabled = true
         var fontSize: CGFloat = 15
         var monospacedFontSize: CGFloat = 12
@@ -184,6 +186,27 @@ final class ConsoleTextRenderer {
             text.addAttributes([
                 .foregroundColor: UXColor.label
             ])
+        }
+        if !options.isBodyExpanded {
+            let string = text.string as NSString
+            var counter = 0
+            var index = 0
+            while index < string.length, counter < options.bodyCollapseLimit {
+                if string.character(at: index) == 0x0a {
+                    counter += 1
+                }
+                index += 1
+            }
+            if index != string.length {
+                do { // trim newlines
+                    while index > 1, string.character(at: index - 1) == 0x0a {
+                        index -= 1
+                    }
+                }
+                let text = NSMutableAttributedString(attributedString: text.attributedSubstring(from: NSRange(location: 0, length: index)))
+                text.append("\n\n...", helpers.detailsAttributes)
+                return text
+            }
         }
         return text
     }
