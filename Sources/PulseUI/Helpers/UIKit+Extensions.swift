@@ -86,24 +86,6 @@ extension UIViewController {
     }
 }
 
-extension UITabBarController {
-    func setTabBarHidden(_ hidden: Bool, animated: Bool = true, duration: TimeInterval = 0.3) {
-        if animated {
-            if !hidden {
-                self.tabBar.isHidden = false
-                self.tabBar.alpha = 0
-            }
-            UIView.animate(withDuration: duration, animations: {
-                self.tabBar.alpha = hidden ? 0 : 1
-            }, completion: { isCompleted in
-                self.tabBar.isHidden = hidden
-            })
-        } else {
-            self.tabBar.isHidden = hidden
-        }
-    }
-}
-
 extension UIApplication {
     static var keyWindow: UIWindow? {
         shared.connectedScenes

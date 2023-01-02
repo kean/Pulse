@@ -17,7 +17,6 @@ struct NetworkInspectorView: View {
 
 #if os(iOS) || os(macOS)
     @State private var selectedTab: NetworkInspectorTab = .response
-    @State private var isExpanded = false
     @State private var shareItems: ShareItems?
 #endif
 
@@ -25,22 +24,8 @@ struct NetworkInspectorView: View {
     @State private var viewController: UIViewController?
 
     var body: some View {
-        if #available(iOS 16.0, *) {
-            _body
-                .toolbar(isExpanded ? .hidden : .visible, for: .navigationBar)
-                .toolbar(isExpanded ? .hidden : .visible, for: .tabBar)
-        } else {
-            _body
-                .background(ViewControllerAccessor(viewController: $viewController))
-        }
-    }
-
-    @ViewBuilder
-    var _body: some View {
         VStack(spacing: 0) {
-            if !isExpanded {
-                toolbar
-            }
+            toolbar
             selectedTabView
                 .clipped()
         }
@@ -118,9 +103,9 @@ struct NetworkInspectorView: View {
     private var selectedTabView: some View {
         switch selectedTab {
         case .response:
-            NetworkInspectorResponseView(viewModel: viewModel.responseViewModel, onToggleExpanded: onToggleExpanded)
+            NetworkInspectorResponseView(viewModel: viewModel.responseViewModel)
         case .request:
-            NetworkInspectorRequestView(viewModel: viewModel.requestViewModel, onToggleExpanded: onToggleExpanded)
+            NetworkInspectorRequestView(viewModel: viewModel.requestViewModel)
         case .summary:
             NetworkInspectorSummaryView(viewModel: viewModel.summaryViewModel)
         case .headers:
@@ -132,16 +117,6 @@ struct NetworkInspectorView: View {
         case .metrics:
             NetworkInspectorMetricsTabView(viewModel: viewModel.metricsViewModel)
         }
-    }
-
-    func onToggleExpanded() {
-#if os(iOS)
-        isExpanded.toggle()
-        if #unavailable(iOS 16.0) {
-            viewController?.navigationController?.setNavigationBarHidden(isExpanded, animated: false)
-            viewController?.tabBarController?.setTabBarHidden(isExpanded, animated: false)
-        }
-#endif
     }
 #endif
 }

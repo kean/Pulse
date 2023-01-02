@@ -9,10 +9,9 @@ import Pulse
 // TODO: Remove this code workaround (control over RichTextView reloads is completely lost)
 struct FileViewer: UIViewControllerRepresentable {
     let viewModel: FileViewerViewModel
-    var onToggleExpanded: (() -> Void)?
 
     func makeUIViewController(context: Context) -> UIHostingController<_FileViewer> {
-        UIHostingController(rootView: _FileViewer(viewModel: viewModel, onToggleExpanded: onToggleExpanded))
+        UIHostingController(rootView: _FileViewer(viewModel: viewModel))
     }
 
     func updateUIViewController(_ uiViewController: UIHostingController<_FileViewer>, context: Context) {}
@@ -24,7 +23,6 @@ typealias FileViewer = _FileViewer
 struct _FileViewer: View {
     @ObservedObject var viewModel: FileViewerViewModel
     @State var isWebViewOpen = false
-    var onToggleExpanded: (() -> Void)?
 
 #if os(iOS) || os(macOS)
     var body: some View {
@@ -64,11 +62,7 @@ struct _FileViewer: View {
         if let contents = viewModel.contents {
             switch contents {
             case .json(let viewModel):
-#if os(iOS)
-                RichTextView(viewModel: viewModel, onToggleExpanded: onToggleExpanded)
-#else
                 RichTextView(viewModel: viewModel)
-#endif
             case .image(let viewModel):
                 ScrollView {
                     ImageViewer(viewModel: viewModel)
@@ -82,7 +76,7 @@ struct _FileViewer: View {
 
                 #warning("TODO: reimplement open in browser")
 
-                RichTextView(viewModel: viewModel, onToggleExpanded: onToggleExpanded)
+                RichTextView(viewModel: viewModel)
 //                    if self.viewModel.contentType?.isHTML ?? false {
 //                        Button("Open in Browser") {
 //                            isWebViewOpen = true

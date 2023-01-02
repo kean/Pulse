@@ -8,11 +8,10 @@ import Combine
 
 struct NetworkInspectorRequestView: View {
     @ObservedObject var viewModel: NetworkInspectorRequestViewModel
-    let onToggleExpanded: () -> Void
 
     var body: some View {
         if let viewModel = viewModel.fileViewModel {
-            FileViewer(viewModel: viewModel, onToggleExpanded: onToggleExpanded)
+            FileViewer(viewModel: viewModel)
                 .onDisappear { self.viewModel.onDisappear() }
         } else if viewModel.task.state == .pending {
             SpinnerView(viewModel: viewModel.progress)

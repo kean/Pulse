@@ -9,7 +9,6 @@ import Pulse
 
 struct RichTextView: View {
     let viewModel: RichTextViewModel
-    var onToggleExpanded: (() -> Void)?
 
     var body: some View {
         Text(viewModel.text)

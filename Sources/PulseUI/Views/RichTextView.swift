@@ -7,19 +7,19 @@ import CoreData
 import Pulse
 import Combine
 
+#warning("TODO: remoe isScrolled?")
+
 #if os(macOS) || os(iOS)
 
 /// - warning: state management is broken beyond repair and needs to be
 /// rewrittn (using StateObject as soon as SwiftUI is updated)
 struct RichTextView: View {
     @ObservedObject var viewModel: RichTextViewModel
-    @State private var isExpanded = false
     @State private var isScrolled = false
     @State private var errorViewOpacity = 0.0
     var isAutomaticLinkDetectionEnabled = true
     var isPrincipalSearchBarPlacement = false
     var hasVerticalScroller = false
-    var onToggleExpanded: (() -> Void)?
 #if os(iOS)
     var body: some View {
         content
@@ -59,16 +59,6 @@ struct RichTextView: View {
     private var inlineSearchBar: some View {
         HStack(spacing: 0) {
             searchBar
-            if let onToggleExpanded = onToggleExpanded {
-                Button(action: {
-                    isExpanded.toggle()
-                    onToggleExpanded()
-                }) {
-                    Image(systemName: isExpanded ? "arrow.down.right.and.arrow.up.left" : "arrow.up.left.and.arrow.down.right")
-                        .font(.system(size: 20))
-                        .frame(width: 40, height: 44)
-                }
-            }
         }
         .padding(EdgeInsets(top: -2, leading: 4, bottom: -2, trailing: 6))
         .border(width: isScrolled ? 1 : 0, edges: [.bottom], color: Color(UXColor.separator).opacity(0.3))
