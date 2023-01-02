@@ -39,7 +39,6 @@ final class ConsoleSettings: ObservableObject {
     var isConsoleTextViewLinkDetection = true
 
 //    var networkContent: NetworkContent = [.errorDetails, .requestBody, .responseBody]
-//    var isLinkDetectionEnabled = true
 //    var fontSize: CGFloat = 15
 //    var monospacedFontSize: CGFloat = 12
 //}

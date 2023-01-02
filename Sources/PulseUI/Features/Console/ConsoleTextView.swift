@@ -101,10 +101,10 @@ private struct ConsoleTextViewSettingsView: View {
         Form {
             Section(header: Text("Appearance")) {
                 Toggle("Monochrome", isOn: $settings.isConsoleTextViewMonochrome)
+                Toggle("Syntax Highlighting", isOn: $settings.isConsoleTextViewSyntaxHighlightingEnabled)
                 Toggle("Link Detection", isOn: $settings.isConsoleTextViewLinkDetection)
             }
             Section(header: Text("Network Requests")) {
-                Toggle("Syntax Highlighting", isOn: $settings.isConsoleTextViewSyntaxHighlightingEnabled)
             }
         }
     }
