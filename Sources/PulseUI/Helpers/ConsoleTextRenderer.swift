@@ -12,7 +12,7 @@ import Pulse
 @available(iOS 14.0, tvOS 14.0, *)
 final class ConsoleTextRenderer {
     struct Options {
-        var networkContent: NetworkContent = [.errorDetails]
+        var networkContent: NetworkContent = [.errorDetails, .requestBody, .responseBody]
         var isMonocrhome = true
         var isBodySyntaxHighlightingEnabled = true
         var isLinkDetectionEnabled = true
@@ -28,10 +28,15 @@ final class ConsoleTextRenderer {
         }
 
         static let errorDetails = NetworkContent(rawValue: 1 << 0)
-        static let summary = NetworkContent(rawValue: 1 << 1)
+        static let originalRequestHeaders = NetworkContent(rawValue: 1 << 2)
+        static let currentRequestHeaders = NetworkContent(rawValue: 1 << 3)
+        static let requestOptions = NetworkContent(rawValue: 1 << 4)
+        static let requestBody = NetworkContent(rawValue: 1 << 5)
+        static let responseHeaders = NetworkContent(rawValue: 1 << 6)
+        static let responseBody = NetworkContent(rawValue: 1 << 7)
 
         static let all: NetworkContent = [
-            errorDetails, summary
+            errorDetails, originalRequestHeaders, currentRequestHeaders, requestOptions, requestBody, responseHeaders, responseBody
         ]
     }
 
@@ -141,26 +146,34 @@ final class ConsoleTextRenderer {
             append(section: viewModel.errorModel)
         }
 
-        if content.contains(.all) {
-            if viewModel.originalRequestSummary != nil {
-                append(section: viewModel.originalRequestHeaders.title("Request Headers"))
+        if task.originalRequest != nil {
+            let originalHeaders = viewModel.originalRequestHeaders
+            var currentHeaders = viewModel.originalRequestHeaders
+            if content.contains(.originalRequestHeaders) {
+                append(section:originalHeaders .title("Original Request Headers"))
+            }
+            if content.contains(.currentRequestHeaders), task.currentRequest != nil {
+                if task.originalRequest?.headers == task.currentRequest?.headers {
+                    currentHeaders.items = [("Headers", "<original>")]
+                }
+                append(section: currentHeaders.title("Current Request Headers"))
+            }
+            if content.contains(.requestOptions) {
                 append(section: viewModel.originalRequestParameters?.title("Request Options"))
-                if let data = task.requestBody?.data, !data.isEmpty {
-                    text.append("Request Body\n", helpers.titleAttributes)
-                    text.append(renderNetworkTaskBody(data, contentType: task.responseContentType.map(NetworkLogger.ContentType.init), error: task.decodingError))
-                    text.append("\n", helpers.detailsAttributes)
-                }
             }
-
-            if let responseSummary = viewModel.responseSummary {
-                append(section: responseSummary.title("Response Summary"))
-                append(section: viewModel.responseHeaders.title("Response Headers"))
-                if let data = task.responseBody?.data, !data.isEmpty {
-                    text.append("Response Body\n", helpers.titleAttributes)
-                    text.append(renderNetworkTaskBody(data, contentType: task.responseContentType.map(NetworkLogger.ContentType.init), error: task.decodingError))
-                    text.append("\n", helpers.detailsAttributes)
-                }
+            if content.contains(.requestBody), let data = task.requestBody?.data, !data.isEmpty {
+                text.append("Request Body\n", helpers.titleAttributes)
+                text.append(renderNetworkTaskBody(data, contentType: task.responseContentType.map(NetworkLogger.ContentType.init), error: task.decodingError))
+                text.append("\n", helpers.detailsAttributes)
             }
+        }
+        if content.contains(.responseHeaders), task.response != nil {
+            append(section: viewModel.responseHeaders.title("Response Headers"))
+        }
+        if content.contains(.responseBody), let data = task.responseBody?.data, !data.isEmpty {
+            text.append("Response Body\n", helpers.titleAttributes)
+            text.append(renderNetworkTaskBody(data, contentType: task.responseContentType.map(NetworkLogger.ContentType.init), error: task.decodingError))
+            text.append("\n", helpers.detailsAttributes)
         }
         return text
     }
