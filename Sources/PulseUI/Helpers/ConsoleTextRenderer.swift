@@ -72,11 +72,9 @@ final class ConsoleTextRenderer {
         let text = NSMutableAttributedString()
 
         // Title
-        let time = ConsoleMessageViewModel.timeFormatter.string(from: message.createdAt)
+        let viewModel = ConsoleMessageViewModel(message: message)
         let level = LoggerStore.Level(rawValue: message.level) ?? .debug
-        let title = [time, level.name.capitalized, message.label.name.capitalized]
-            .joined(separator: " · ")
-        text.append(title + "\n", helpers.titleAttributes)
+        text.append(viewModel.titleForTextRepresentation + "\n", helpers.titleAttributes)
 
         // Text
         let textAttributes = helpers.textAttributes[level]!

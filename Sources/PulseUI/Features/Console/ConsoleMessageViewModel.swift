@@ -11,25 +11,32 @@ final class ConsoleMessageViewModel: Pinnable {
     let title: String
     let text: String
     let textColor: Color
-    let badge: BadgeViewModel?
+    let badge: BadgeViewModel
     
     private let message: LoggerMessageEntity
     private let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel?
     
     private(set) lazy var time = ConsoleMessageViewModel.timeFormatter.string(from: message.createdAt)
-    
+
+    var titleForTextRepresentation: String {
+        let level = LoggerStore.Level(rawValue: message.level) ?? .debug
+        var title = "\(time) · \(level.name.capitalized)"
+        let label = message.label.name
+        if label != "default", !label.isEmpty {
+            title.append(" · \(label.capitalized)")
+        }
+        return title
+    }
+
 #if os(iOS)
     lazy var textColor2 = UIColor.textColor(for: LoggerStore.Level(rawValue: message.level) ?? .debug)
     lazy var attributedTitle: NSAttributedString = {
         let string = NSMutableAttributedString()
         let level = LoggerStore.Level(rawValue: message.level) ?? .debug
-        if let badge = badge {
-            string.append(badge.title, [.foregroundColor: UIColor.badgeColor(for: level)])
-        }
+        string.append(badge.title, [.foregroundColor: UIColor.badgeColor(for: level)])
         let label = message.label.name
         if label != "default", !label.isEmpty {
-            let prefix = badge == nil ? "" : " · "
-            string.append("\(prefix)\(message.label.name.capitalized)", [.foregroundColor: UIColor.secondaryLabel])
+            string.append(" · \(label.capitalized)", [.foregroundColor: UIColor.secondaryLabel])
         }
         return string
     }()
@@ -53,7 +60,8 @@ final class ConsoleMessageViewModel: Pinnable {
         }
         self.text = message.text
         self.textColor = ConsoleMessageStyle.textColor(level: LoggerStore.Level(rawValue: message.level) ?? .debug)
-        self.badge = BadgeViewModel(message: message)
+        let level = LoggerStore.Level(rawValue: message.level) ?? .debug
+        self.badge = BadgeViewModel(level: level)
         self.message = message
         self.searchCriteriaViewModel = searchCriteriaViewModel
     }
@@ -86,14 +94,7 @@ final class ConsoleMessageViewModel: Pinnable {
 }
 
 private extension BadgeViewModel {
-    init?(message: LoggerMessageEntity) {
-        guard let model = LoggerStore.Level(rawValue: message.level).flatMap(BadgeViewModel.init) else {
-            return nil
-        }
-        self = model
-    }
-    
-    init?(level: LoggerStore.Level) {
+    init(level: LoggerStore.Level) {
         self.init(title: level.name.uppercased(), color: .badgeColor(for: level))
     }
 }
