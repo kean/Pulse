@@ -58,21 +58,25 @@ struct ConsoleTextView: View {
     @ViewBuilder
     private var menu: some View {
         Section {
-            Button(action: { settings.orderAscending.toggle() }) {
-                Label("Order by Date", systemImage: settings.orderAscending ? "arrow.up" : "arrow.down")
-            }
-            Button(action: { settings.isCollapsingResponses.toggle() }) {
-                Label(settings.isCollapsingResponses ? "Expand Responses" : "Collapse Responses", systemImage: settings.isCollapsingResponses ? "arrow.up.left.and.arrow.down.right" : "arrow.down.right.and.arrow.up.left")
-            }
-            Button(action: { isShowingSettings = true }) {
-                Label("Settings", systemImage: "gearshape")
-            }
             Button(action: { shareItems = ShareItems([viewModel.text.text.string]) }) {
                 Label("Share", systemImage: "square.and.arrow.up")
             }
-            Button(action: viewModel.refresh) {
-                Label("Refresh", systemImage: "arrow.clockwise")
-            }.disabled(viewModel.isButtonRefreshHidden)
+            Section {
+                Button(action: { settings.orderAscending.toggle() }) {
+                    Label("Order by Date", systemImage: settings.orderAscending ? "arrow.up" : "arrow.down")
+                }
+                Button(action: { settings.isCollapsingResponses.toggle() }) {
+                    Label(settings.isCollapsingResponses ? "Expand Responses" : "Collapse Responses", systemImage: settings.isCollapsingResponses ? "arrow.up.left.and.arrow.down.right" : "arrow.down.right.and.arrow.up.left")
+                }
+                Button(action: viewModel.refresh) {
+                    Label("Refresh", systemImage: "arrow.clockwise")
+                }.disabled(viewModel.isButtonRefreshHidden)
+            }
+            Section {
+                Button(action: { isShowingSettings = true }) {
+                    Label("Settings", systemImage: "gearshape")
+                }
+            }
 //            // Unfortunately, this isn't working properly in UITextView (use WebView!)
 //            Button(action: viewModel.text.scrollToBottom) {
 //                Label("Scroll to Bottom", systemImage: "arrow.down")
