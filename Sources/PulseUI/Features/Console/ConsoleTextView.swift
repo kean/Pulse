@@ -16,7 +16,7 @@ struct ConsoleTextView: View {
     @State private var isShowingSettings = false
     @ObservedObject private var settings: ConsoleTextViewSettings = .shared
 
-    var entities: CurrentValueSubject<[LoggerMessageEntity], Never>
+    var entities: CurrentValueSubject<[NSManagedObject], Never>
     var options: ConsoleTextRenderer.Options?
     var onClose: (() -> Void)?
 
@@ -130,7 +130,7 @@ private struct ConsoleTextViewSettingsView: View {
 
 @available(iOS 14.0, *)
 final class ConsoleTextViewModel: ObservableObject {
-    private var entities: CurrentValueSubject<[LoggerMessageEntity], Never> = .init([])
+    private var entities: CurrentValueSubject<[NSManagedObject], Never> = .init([])
     private let renderer = ConsoleTextRenderer()
 
     private var cancellables: [AnyCancellable] = []
@@ -159,7 +159,7 @@ final class ConsoleTextViewModel: ObservableObject {
         }.store(in: &cancellables)
     }
 
-    func bind(_ entities: CurrentValueSubject<[LoggerMessageEntity], Never>) {
+    func bind(_ entities: CurrentValueSubject<[NSManagedObject], Never>) {
         self.entities = entities
         entities.dropFirst().sink { [weak self] _ in
             self?.showRefreshButtonIfNeeded()

@@ -47,6 +47,16 @@ final class ConsoleTextRenderer {
     private var index = 0
     var expanded: Set<Int> = []
 
+    func render(_ entities: [NSManagedObject], options: Options = .init()) -> NSAttributedString {
+        if let entities = entities as? [LoggerMessageEntity] {
+            return render(entities, options: options)
+        } else if let entities = entities as? [NetworkTaskEntity] {
+            return render(entities, options: options)
+        } else {
+            return NSAttributedString(string: "Unsupported entitites")
+        }
+    }
+
     func render(_ entities: [NetworkTaskEntity], options: Options = .init()) -> NSAttributedString {
         prepare(options: options)
         return joined(entities.map(render))

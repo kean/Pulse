@@ -14,7 +14,7 @@ public struct NetworkView: View {
 
     @State private var isShowingFilters = false
     @State private var isSharing = false
-    @State private var isShowingText = false
+    @State private var isShowingAsText = false
     @Environment(\.colorScheme) private var colorScheme: ColorScheme
 
     public init(store: LoggerStore = .shared) {
@@ -42,7 +42,7 @@ public struct NetworkView: View {
             trailing: HStack {
                 ShareButton { isSharing = true }
                 if #available(iOS 14.0, *) {
-                    ConsoleContextMenu(store: viewModel.store, isShowingAsText: $isShowingText)
+                    ConsoleContextMenu(store: viewModel.store, isShowingAsText: $isShowingAsText)
                 }
             }
         )
@@ -53,6 +53,15 @@ public struct NetworkView: View {
                 }.backport.presentationDetents([.medium])
             } else {
                 ShareView(ShareItems(messages: viewModel.store))
+            }
+        }
+        .backport.fullScreenCover(isPresented: $isShowingAsText) {
+            if #available(iOS 14.0, *) {
+                NavigationView {
+                    ConsoleTextView(entities: viewModel.getObservableProperties()) {
+                        isShowingAsText = false
+                    }
+                }
             }
         }
     }
