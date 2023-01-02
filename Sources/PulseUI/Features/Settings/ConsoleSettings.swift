@@ -21,11 +21,41 @@ final class ConsoleSettings: ObservableObject {
     @UserDefaultRaw("sharing-output")
     var sharingOutput: ShareStoreOutput = .store
 
+    // MARK: ConsoleTextView
+
     @UserDefault("text-view-order-ascending")
     var isTextViewOrderAscending = false
 
     @UserDefault("text-view-responses-collapsed")
     var isTextViewResponsesCollaped = true
+
+    @UserDefault("console-text-view-is-monochrome")
+    var isConsoleTextViewMonochrome = true
+
+//    var networkContent: NetworkContent = [.errorDetails, .requestBody, .responseBody]
+//    var isMonocrhome = true
+//    var isBodySyntaxHighlightingEnabled = true
+//    var isBodyExpanded = false
+//    var bodyCollapseLimit = 20
+//    var isLinkDetectionEnabled = true
+//    var fontSize: CGFloat = 15
+//    var monospacedFontSize: CGFloat = 12
+//}
+//
+//struct NetworkContent: OptionSet {
+//    let rawValue: Int16
+//
+//    init(rawValue: Int16) {
+//        self.rawValue = rawValue
+//    }
+//
+//    static let errorDetails = NetworkContent(rawValue: 1 << 0)
+//    static let originalRequestHeaders = NetworkContent(rawValue: 1 << 2)
+//    static let currentRequestHeaders = NetworkContent(rawValue: 1 << 3)
+//    static let requestOptions = NetworkContent(rawValue: 1 << 4)
+//    static let requestBody = NetworkContent(rawValue: 1 << 5)
+//    static let responseHeaders = NetworkContent(rawValue: 1 << 6)
+//    static let responseBody = NetworkContent(rawValue: 1 << 7)
 
     private var cancellables: [AnyCancellable] = []
 

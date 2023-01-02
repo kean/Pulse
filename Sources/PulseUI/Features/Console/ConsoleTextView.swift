@@ -13,6 +13,7 @@ import Combine
 struct ConsoleTextView: View {
     @StateObject private var viewModel = ConsoleTextViewModel()
     @State private var shareItems: ShareItems?
+    @State private var isShowingSettings = false
     @ObservedObject private var settings: ConsoleSettings = .shared
 
     var entities: CurrentValueSubject<[LoggerMessageEntity], Never>
@@ -41,6 +42,7 @@ struct ConsoleTextView: View {
                 }
             }
             .sheet(item: $shareItems, content: ShareView.init)
+            .sheet(isPresented: $isShowingSettings) { settingsView }
     }
 
     private var textView: some View {
@@ -60,6 +62,9 @@ struct ConsoleTextView: View {
             Button(action: { settings.isTextViewResponsesCollaped.toggle() }) {
                 Label(settings.isTextViewResponsesCollaped ? "Expand Responses" : "Collapse Responses", systemImage: settings.isTextViewResponsesCollaped ? "arrow.up.left.and.arrow.down.right" : "arrow.down.right.and.arrow.up.left")
             }
+            Button(action: { isShowingSettings = true }) {
+                Label("Settings", systemImage: "gearshape")
+            }
             Button(action: { shareItems = ShareItems([viewModel.text.text.string]) }) {
                 Label("Share", systemImage: "square.and.arrow.up")
             }
@@ -70,6 +75,34 @@ struct ConsoleTextView: View {
 //            Button(action: viewModel.text.scrollToBottom) {
 //                Label("Scroll to Bottom", systemImage: "arrow.down")
 //            }
+        }
+    }
+
+    private var settingsView: some View {
+        NavigationView {
+            ConsoleTextViewSettingsView()
+                .navigationTitle("Settings")
+                .navigationBarTitleDisplayMode(.inline)
+                .navigationBarItems(trailing: Button("Done") {
+                    isShowingSettings = false
+                    viewModel.reloadOptions()
+                    viewModel.refresh()
+                })
+        }
+    }
+}
+
+private struct ConsoleTextViewSettingsView: View {
+    @ObservedObject private var settings: ConsoleSettings = .shared
+
+    var body: some View {
+        Form {
+            Section(header: Text("Appearance")) {
+                Toggle("Monochrome", isOn: $settings.isConsoleTextViewMonochrome)
+            }
+            Section(header: Text("Network Requests")) {
+
+            }
         }
     }
 }
@@ -83,6 +116,8 @@ final class ConsoleTextViewModel: ObservableObject {
 
     var options: ConsoleTextRenderer.Options = .init()
 
+    private let settings = ConsoleSettings.shared
+
     let text: RichTextViewModel
     @Published private(set) var isButtonRefreshHidden = true
     private var lastTimeRefreshHidden = Date().addingTimeInterval(-3)
@@ -90,6 +125,7 @@ final class ConsoleTextViewModel: ObservableObject {
     init() {
         self.text = RichTextViewModel(string: "")
         self.text.onLinkTapped = { [unowned self] in onLinkTapped($0) }
+        self.reloadOptions()
 
         ConsoleSettings.shared.$isTextViewOrderAscending.sink { [weak self] _ in
             self?.refreshText()
@@ -108,6 +144,10 @@ final class ConsoleTextViewModel: ObservableObject {
             self?.showRefreshButtonIfNeeded()
         }.store(in: &cancellables)
         self.refresh()
+    }
+
+    func reloadOptions() {
+        options.isMonocrhome = settings.isConsoleTextViewMonochrome
     }
 
     func refresh() {
