@@ -25,17 +25,14 @@ struct NetworkInspectorView: View {
     @State private var viewController: UIViewController?
 
     var body: some View {
-#if os(iOS)
         if #available(iOS 16.0, *) {
             _body
                 .toolbar(isExpanded ? .hidden : .visible, for: .navigationBar)
                 .toolbar(isExpanded ? .hidden : .visible, for: .tabBar)
         } else {
             _body
+                .background(ViewControllerAccessor(viewController: $viewController))
         }
-#else
-        _body
-#endif
     }
 
     @ViewBuilder
@@ -50,7 +47,6 @@ struct NetworkInspectorView: View {
         .navigationBarItems(trailing: trailingNavigationBarItems)
         .navigationBarTitle(Text(viewModel.title), displayMode: .inline)
         .sheet(item: $shareItems, content: ShareView.init)
-        .background(ViewControllerAccessor(viewController: $viewController))
     }
 
     private var toolbar: some View {
