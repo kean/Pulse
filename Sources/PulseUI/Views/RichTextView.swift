@@ -379,7 +379,8 @@ final class RichTextViewModel: ObservableObject {
         self.string = text.string
         self.matches.removeAll()
 
-        textView?.textStorage.setAttributedString(text)
+        let textStorage: NSTextStorage? = textView?.textStorage
+        textStorage?.setAttributedString(text)
         searchTerm = ""
     }
 
