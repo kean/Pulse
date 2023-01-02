@@ -56,11 +56,11 @@ struct ConsoleTextView: View {
     @ViewBuilder
     private var menu: some View {
         Section {
-            Button(action: { settings.isTextViewOrderAscending.toggle() }) {
-                Label("Order by Date", systemImage: settings.isTextViewOrderAscending ? "arrow.up" : "arrow.down")
+            Button(action: { settings.isConsoleTextViewOrderAscending.toggle() }) {
+                Label("Order by Date", systemImage: settings.isConsoleTextViewOrderAscending ? "arrow.up" : "arrow.down")
             }
-            Button(action: { settings.isTextViewResponsesCollaped.toggle() }) {
-                Label(settings.isTextViewResponsesCollaped ? "Expand Responses" : "Collapse Responses", systemImage: settings.isTextViewResponsesCollaped ? "arrow.up.left.and.arrow.down.right" : "arrow.down.right.and.arrow.up.left")
+            Button(action: { settings.isConsoleTextViewResponsesCollaped.toggle() }) {
+                Label(settings.isConsoleTextViewResponsesCollaped ? "Expand Responses" : "Collapse Responses", systemImage: settings.isConsoleTextViewResponsesCollaped ? "arrow.up.left.and.arrow.down.right" : "arrow.down.right.and.arrow.up.left")
             }
             Button(action: { isShowingSettings = true }) {
                 Label("Settings", systemImage: "gearshape")
@@ -106,8 +106,11 @@ private struct ConsoleTextViewSettingsView: View {
                 Toggle("Link Detection", isOn: $settings.isConsoleTextViewLinkDetection)
                 Stepper("Font Size: \(settings.consoleTextViewFontSize)", value: $settings.consoleTextViewFontSize)
             }
-            Section(header: Text("Network Requests")) {
-
+            Section(header: Text("Request Info")) {
+                Toggle("Request Headers", isOn: $settings.isConsoleTextViewRequestHeadersShown)
+                Toggle("Response Headers", isOn: $settings.isConsoleTextViewResponseHeadersShown)
+                Toggle("Request Body", isOn: $settings.isConsoleTextViewRequestBodyShown)
+                Toggle("Response Body", isOn: $settings.isConsoleTextViewResponseBodyShown)
             }
             Section {
                 Button("Reset Settings") {
@@ -139,11 +142,11 @@ final class ConsoleTextViewModel: ObservableObject {
         self.text.onLinkTapped = { [unowned self] in onLinkTapped($0) }
         self.reloadOptions()
 
-        ConsoleSettings.shared.$isTextViewOrderAscending.sink { [weak self] _ in
+        ConsoleSettings.shared.$isConsoleTextViewOrderAscending.sink { [weak self] _ in
             self?.refreshText()
         }.store(in: &cancellables)
 
-        ConsoleSettings.shared.$isTextViewResponsesCollaped.sink { [weak self] isCollaped in
+        ConsoleSettings.shared.$isConsoleTextViewResponsesCollaped.sink { [weak self] isCollaped in
             self?.options.isBodyExpanded = !isCollaped
             self?.renderer.expanded.removeAll()
             self?.refreshText()
@@ -159,10 +162,33 @@ final class ConsoleTextViewModel: ObservableObject {
     }
 
     func reloadOptions() {
+        options.isBodyExpanded = settings.isConsoleTextViewResponsesCollaped
         options.isMonocrhome = settings.isConsoleTextViewMonochrome
         options.isBodySyntaxHighlightingEnabled = settings.isConsoleTextViewSyntaxHighlightingEnabled
         options.isLinkDetectionEnabled = settings.isConsoleTextViewLinkDetection
         options.fontSize = CGFloat(settings.consoleTextViewFontSize)
+        if settings.isConsoleTextViewRequestHeadersShown {
+            options.networkContent.insert(.currentRequestHeaders)
+            options.networkContent.insert(.originalRequestHeaders)
+        } else {
+            options.networkContent.remove(.currentRequestHeaders)
+            options.networkContent.remove(.originalRequestHeaders)
+        }
+        if settings.isConsoleTextViewRequestBodyShown {
+            options.networkContent.insert(.requestBody)
+        } else {
+            options.networkContent.remove(.requestBody)
+        }
+        if settings.isConsoleTextViewResponseHeadersShown {
+            options.networkContent.insert(.responseHeaders)
+        } else {
+            options.networkContent.remove(.responseHeaders)
+        }
+        if settings.isConsoleTextViewResponseBodyShown {
+            options.networkContent.insert(.responseBody)
+        } else {
+            options.networkContent.remove(.responseBody)
+        }
     }
 
     func refresh() {
@@ -171,7 +197,7 @@ final class ConsoleTextViewModel: ObservableObject {
     }
 
     private func refreshText() {
-        let entities = ConsoleSettings.shared.isTextViewOrderAscending ? entities.value : entities.value.reversed()
+        let entities = ConsoleSettings.shared.isConsoleTextViewOrderAscending ? entities.value : entities.value.reversed()
         let string = renderer.render(entities, options: options)
         self.text.display(string)
     }

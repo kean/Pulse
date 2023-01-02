@@ -24,10 +24,10 @@ final class ConsoleSettings: ObservableObject {
     // MARK: ConsoleTextView
 
     @UserDefault("console-text-view__order-ascending")
-    var isTextViewOrderAscending = false
+    var isConsoleTextViewOrderAscending = false
 
     @UserDefault("console-text-view__responses-collapsed")
-    var isTextViewResponsesCollaped = true
+    var isConsoleTextViewResponsesCollaped = true
 
     @UserDefault("console-text-view__is-monochrome")
     var isConsoleTextViewMonochrome = true
@@ -44,6 +44,18 @@ final class ConsoleSettings: ObservableObject {
     @UserDefault("console-text-view__monospaced-font-size")
     var consoleTextViewMonospacedFontSize = 12
 
+    @UserDefault("console-text-view__request-headers")
+    var isConsoleTextViewRequestHeadersShown = false
+
+    @UserDefault("console-text-view__response-body-shown")
+    var isConsoleTextViewResponseBodyShown = true
+
+    @UserDefault("console-text-view__response-headers")
+    var isConsoleTextViewResponseHeadersShown = false
+
+    @UserDefault("console-text-view__request-body-shown")
+    var isConsoleTextViewRequestBodyShown = true
+
     func resetConsoleTextViewSettings() {
         for key in UserDefaults.standard.dictionaryRepresentation().keys {
             if key.hasPrefix(commonKeyPrefix + "console-text-view__") {
@@ -51,24 +63,6 @@ final class ConsoleSettings: ObservableObject {
             }
         }
     }
-
-//    var networkContent: NetworkContent = [.errorDetails, .requestBody, .responseBody]
-//}
-//
-//struct NetworkContent: OptionSet {
-//    let rawValue: Int16
-//
-//    init(rawValue: Int16) {
-//        self.rawValue = rawValue
-//    }
-//
-//    static let errorDetails = NetworkContent(rawValue: 1 << 0)
-//    static let originalRequestHeaders = NetworkContent(rawValue: 1 << 2)
-//    static let currentRequestHeaders = NetworkContent(rawValue: 1 << 3)
-//    static let requestOptions = NetworkContent(rawValue: 1 << 4)
-//    static let requestBody = NetworkContent(rawValue: 1 << 5)
-//    static let responseHeaders = NetworkContent(rawValue: 1 << 6)
-//    static let responseBody = NetworkContent(rawValue: 1 << 7)
 
     private var cancellables: [AnyCancellable] = []
 
