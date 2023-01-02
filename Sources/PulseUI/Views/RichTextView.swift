@@ -18,7 +18,7 @@ struct RichTextView: View {
     @State private var errorViewOpacity = 0.0
     var isAutomaticLinkDetectionEnabled = true
     var isPrincipalSearchBarPlacement = false
-    var hasVerticalScroller = true
+    var hasVerticalScroller = false
     var onToggleExpanded: (() -> Void)?
 #if os(iOS)
     var body: some View {
