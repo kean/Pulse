@@ -87,10 +87,21 @@ final class UserDefault<Value: UserDefaultSupportedValue>: UserDefaultProtocol, 
     private let defaultValue: Value
     private let container: UserDefaults = .standard
     private let publisher = PassthroughSubject<Value, Never>()
+    private let observer: AnyObject?
 
     init(wrappedValue value: Value, _ key: String) {
         self.key = commonKeyPrefix + key
         self.defaultValue = value
+        self.observer = UserDefaultsObserver(key: self.key, onChange: { [publisher] _, newValue in
+            if let newValue = newValue as? Optional<Value>, newValue == nil {
+                publisher.send(value) // Send default value
+            } else {
+                guard let value = newValue as? Value else {
+                    return assertionFailure()
+                }
+                publisher.send(value)
+            }
+        })
     }
 
     var wrappedValue: Value {
@@ -99,7 +110,6 @@ final class UserDefault<Value: UserDefaultSupportedValue>: UserDefaultProtocol, 
         }
         set {
             container.set(newValue, forKey: key)
-            publisher.send(newValue)
         }
     }
 
@@ -125,10 +135,21 @@ final class UserDefaultRaw<Value: RawRepresentable>: UserDefaultProtocol, Dynami
     private let defaultValue: Value
     private let container: UserDefaults = .standard
     private let publisher = PassthroughSubject<Value, Never>()
+    private let observer: AnyObject?
 
     init(wrappedValue value: Value, _ key: String) {
         self.key = "commonKeyPrefix" + key
         self.defaultValue = value
+        self.observer = UserDefaultsObserver(key: self.key, onChange: { [publisher] _, newValue in
+            if let newValue = newValue as? Optional<Value>, newValue == nil {
+                publisher.send(value) // Send default value
+            } else {
+                guard let value = newValue as? Value else {
+                    return assertionFailure()
+                }
+                publisher.send(value)
+            }
+        })
     }
 
     var wrappedValue: Value {
@@ -138,7 +159,6 @@ final class UserDefaultRaw<Value: RawRepresentable>: UserDefaultProtocol, Dynami
         }
         set {
             container.set(newValue.rawValue, forKey: key)
-            publisher.send(newValue)
         }
     }
 
@@ -156,3 +176,24 @@ protocol UserDefaultProtocol {
 }
 
 private let commonKeyPrefix = "com-github-com-kean-pulse__"
+
+private final class UserDefaultsObserver: NSObject {
+    let key: String
+    private var onChange: (Any, Any) -> Void
+
+    init(key: String, onChange: @escaping (Any, Any) -> Void) {
+        self.onChange = onChange
+        self.key = key
+        super.init()
+        UserDefaults.standard.addObserver(self, forKeyPath: key, options: [.new], context: nil)
+    }
+
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
+        guard let change = change, object != nil, keyPath == key else { return }
+        onChange(change[.oldKey] as Any, change[.newKey] as Any)
+    }
+
+    deinit {
+        UserDefaults.standard.removeObserver(self, forKeyPath: key, context: nil)
+    }
+}
