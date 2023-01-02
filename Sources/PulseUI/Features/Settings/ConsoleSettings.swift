@@ -6,49 +6,106 @@ import SwiftUI
 import Pulse
 import Combine
 
-// TODO: Switch to AppStorage on iOS 14 (or write a custom wrapper?)
-final class ConsoleSettings: ObservableObject, DynamicProperty {
+final class ConsoleSettings: ObservableObject {
     static let shared = ConsoleSettings()
 
-    @Published var lineLimit: Int
+    @UserDefault("console-line-limit")
+    var lineLimit: Int = 4
+
+    @UserDefaultRaw("sharing-time-range")
+    var sharingTimeRange: SharingTimeRange = .currentSession
+
+    @UserDefaultRaw("sharing-level")
+    var sharingLevel: LoggerStore.Level = .trace
+
+    @UserDefaultRaw("sharing-output")
+    var sharingOutput: ShareStoreOutput = .store
 
     private var cancellables: [AnyCancellable] = []
 
     init() {
-        lineLimit = UserDefaults.lineLimit ?? 4
+        let properties = Mirror(reflecting: self).children
+            .compactMap { $0.value as? UserDefaultProtocol }
+        print(properties)
+        ConsoleSettings.onChange(of: properties).sink { [objectWillChange] in
+            objectWillChange.send()
+        }.store(in: &cancellables)
+    }
 
-        $lineLimit.sink { UserDefaults.lineLimit = $0 }.store(in: &cancellables)
+    private static func onChange(of properties: [UserDefaultProtocol]) -> AnyPublisher<Void, Never> {
+        Publishers.MergeMany(properties.map(\.didUpdate)).eraseToAnyPublisher()
     }
 }
 
 @propertyWrapper
-struct UserDefault<Value> {
-    var wrappedValue: Value? {
-        get { storage.value(forKey: key) as? Value }
-        set { storage.setValue(newValue, forKey: key) }
-    }
-
+struct UserDefault<Value: UserDefaultSupportedValue>: UserDefaultProtocol, DynamicProperty {
     private let key: String
-    private let storage: UserDefaults
+    private let defaultValue: Value
+    private let container: UserDefaults = .standard
+    private let publisher = PassthroughSubject<Value, Never>()
 
-    init(_ key: String, storage: UserDefaults = .standard) {
-        self.key = key
-        self.storage = storage
+    init(wrappedValue value: Value, _ key: String) {
+        self.key = "com-github-com-kean-pulse__" + key
+        self.defaultValue = value
+    }
+
+    var wrappedValue: Value {
+        get {
+            (container.object(forKey: key) as? Value) ?? defaultValue
+        }
+        set {
+            container.set(newValue, forKey: key)
+            publisher.send(newValue)
+        }
+    }
+
+    var projectedValue: AnyPublisher<Value, Never> {
+        publisher.eraseToAnyPublisher()
+    }
+
+    var didUpdate: AnyPublisher<Void, Never> {
+        publisher.map { _ in () }.eraseToAnyPublisher()
     }
 }
 
-extension UserDefaults {
-    @UserDefault("\(keyPrefix)_console-line-limit")
-    static var lineLimit: Int?
+protocol UserDefaultSupportedValue {}
 
-    @UserDefault("\(keyPrefix)_sharing-time-range")
-    static var sharingTimeRange: String?
+extension Int: UserDefaultSupportedValue {}
+extension Int16: UserDefaultSupportedValue {}
+extension String: UserDefaultSupportedValue {}
 
-    @UserDefault("\(keyPrefix)_sharing-level")
-    static var sharingLevel: Int16?
+@propertyWrapper
+struct UserDefaultRaw<Value: RawRepresentable>: UserDefaultProtocol, DynamicProperty {
+    private let key: String
+    private let defaultValue: Value
+    private let container: UserDefaults = .standard
+    private let publisher = PassthroughSubject<Value, Never>()
 
-    @UserDefault("\(keyPrefix)_sharing-output")
-    static var sharingOutput: String?
+    init(wrappedValue value: Value, _ key: String) {
+        self.key = "com-github-com-kean-pulse__" + key
+        self.defaultValue = value
+    }
+
+    var wrappedValue: Value {
+        get {
+            (container.object(forKey: key) as? Value.RawValue)
+                .flatMap(Value.init) ?? defaultValue
+        }
+        set {
+            container.set(newValue.rawValue, forKey: key)
+            publisher.send(newValue)
+        }
+    }
+
+    var projectedValue: AnyPublisher<Value, Never> {
+        publisher.eraseToAnyPublisher()
+    }
+
+    var didUpdate: AnyPublisher<Void, Never> {
+        publisher.map { _ in () }.eraseToAnyPublisher()
+    }
 }
 
-private let keyPrefix = "com-github-com-kean-pulse"
+protocol UserDefaultProtocol {
+    var didUpdate: AnyPublisher<Void, Never> { get }
+}
