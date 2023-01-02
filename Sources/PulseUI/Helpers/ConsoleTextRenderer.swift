@@ -188,7 +188,6 @@ final class ConsoleTextRenderer {
         return text
     }
 
-    #warning("TODO: fix font size")
     private func _renderNetworkTaskBody(_ data: Data, contentType: NetworkLogger.ContentType?, error: NetworkLogger.DecodingError?) -> NSAttributedString {
         if let json = try? JSONSerialization.jsonObject(with: data, options: []) {
             let fontSize = options.monospacedFontSize
@@ -220,7 +219,6 @@ final class ConsoleTextRenderer {
     }
 }
 
-#warning("TODO: remove unused attributes")
 @available(iOS 14.0, tvOS 14.0, *)
 final class TextRenderingHelpers {
     let paragraphStyle: NSParagraphStyle
