@@ -17,7 +17,7 @@ final class ConsoleTextRenderer {
         var networkContent: NetworkContent = [.errorDetails, .requestBody, .responseBody]
         var isMonocrhome = true
         var isBodySyntaxHighlightingEnabled = true
-        var isBodyExpanded = true
+        var isBodyExpanded = false
         var bodyCollapseLimit = 20
         var isLinkDetectionEnabled = true
         var fontSize: CGFloat = 15
@@ -44,21 +44,29 @@ final class ConsoleTextRenderer {
         ]
     }
 
-    private let options: Options
-    private let helpers: TextRenderingHelpers
+    private var options: Options
+    private var helpers: TextRenderingHelpers
     private var index = 0
+    var expanded: Set<Int> = []
 
     init(options: Options = .init()) {
         self.options = options
         self.helpers = TextRenderingHelpers(options: options)
     }
 
+    func setOptions(_ options: Options) {
+        self.options = options
+        self.helpers = TextRenderingHelpers(options: options)
+    }
+
     func render(_ entities: [NetworkTaskEntity]) -> NSAttributedString {
-        joined(entities.map(render))
+        defer { index = 0 }
+        return joined(entities.map(render))
     }
 
     func render(_ entities: [LoggerMessageEntity]) -> NSAttributedString {
-        joined(entities.map(render))
+        defer { index = 0 }
+        return joined(entities.map(render))
     }
 
     private func joined(_ strings: [NSAttributedString]) -> NSAttributedString {
@@ -71,6 +79,8 @@ final class ConsoleTextRenderer {
     }
 
     func render(_ message: LoggerMessageEntity) -> NSAttributedString {
+        defer { index += 1 }
+
         if let task = message.task {
             return render(task)
         }
@@ -90,6 +100,8 @@ final class ConsoleTextRenderer {
     }
 
     func render(_ task: NetworkTaskEntity) -> NSAttributedString {
+        defer { index += 1 }
+
         let text = NSMutableAttributedString()
 
         let state = task.state
@@ -193,7 +205,7 @@ final class ConsoleTextRenderer {
                 .foregroundColor: UXColor.label
             ])
         }
-        if !options.isBodyExpanded {
+        if !options.isBodyExpanded && !expanded.contains(index) {
             let string = text.string as NSString
             var counter = 0
             var index = 0
@@ -210,7 +222,11 @@ final class ConsoleTextRenderer {
                     }
                 }
                 let text = NSMutableAttributedString(attributedString: text.attributedSubstring(from: NSRange(location: 0, length: index)))
-                text.append("\n\n...", helpers.detailsAttributes)
+                var attributes = helpers.detailsAttributes
+                attributes[.foregroundColor] = UXColor.systemBlue
+                attributes[.link] = URL(string: "pulse://expand/\(self.index)")
+                attributes[.underlineColor] = UXColor.clear
+                text.append("\n\nShow More ▷", attributes)
                 return text
             }
         }

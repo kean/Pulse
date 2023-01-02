@@ -21,7 +21,10 @@ struct ConsoleTextView: View {
     var body: some View {
         textView
             .navigationBarTitleDisplayMode(.inline)
-            .onAppear { viewModel.display(entities, options) }
+            .onAppear {
+                viewModel.setOptions(options)
+                viewModel.bind(entities)
+            }
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     HStack {
@@ -53,7 +56,7 @@ struct ConsoleTextView: View {
             Button(action: { shareItems = ShareItems([viewModel.text.text.string]) }) {
                 Label("Share", systemImage: "square.and.arrow.up")
             }
-            Button(action: { viewModel.display(entities, options) }) {
+            Button(action: viewModel.refresh) {
                 Label("Refresh", systemImage: "arrow.clockwise")
             }.disabled(viewModel.isButtonRefreshHidden)
 //            // Unfortunately, this isn't working properly in UITextView (use WebView!)
@@ -66,10 +69,10 @@ struct ConsoleTextView: View {
 
 @available(iOS 14.0, *)
 final class ConsoleTextViewModel: ObservableObject {
-    private var messages: CurrentValueSubject<[LoggerMessageEntity], Never> = .init([])
-    private var renderer = ConsoleTextRenderer()
+    private var entities: CurrentValueSubject<[LoggerMessageEntity], Never> = .init([])
+    private let renderer = ConsoleTextRenderer()
+
     private var cancellables: [AnyCancellable] = []
-    private var entitiesObserver: AnyCancellable?
 
     let text: RichTextViewModel
     @Published private(set) var isButtonRefreshHidden = true
@@ -77,17 +80,38 @@ final class ConsoleTextViewModel: ObservableObject {
 
     init() {
         self.text = RichTextViewModel(string: "")
+        self.text.onLinkTapped = { [unowned self] in onLinkTapped($0) }
     }
 
-    func display(_ entities: CurrentValueSubject<[LoggerMessageEntity], Never>, _ options: ConsoleTextRenderer.Options) {
-        self.renderer = ConsoleTextRenderer(options: options)
+    func setOptions(_ options: ConsoleTextRenderer.Options) {
+        self.renderer.setOptions(options)
+    }
+
+    func bind(_ entities: CurrentValueSubject<[LoggerMessageEntity], Never>) {
+        self.entities = entities
+        entities.dropFirst().sink { [weak self] _ in
+            self?.showRefreshButtonIfNeeded()
+        }.store(in: &cancellables)
+        self.refresh()
+    }
+
+    func refresh() {
+        self.refreshText()
+        self.hideRefreshButton()
+    }
+
+    private func refreshText() {
         let string = renderer.render(entities.value.reversed())
         self.text.display(string)
+    }
 
-        self.hideRefreshButton()
-        self.entitiesObserver = entities.dropFirst().sink { [weak self] _ in
-            self?.showRefreshButtonIfNeeded()
+    func onLinkTapped(_ url: URL) -> Bool {
+        guard url.scheme == "pulse", url.host == "expand", let index = Int(url.lastPathComponent) else {
+            return false
         }
+        renderer.expanded.insert(index)
+        refreshText()
+        return true
     }
 
     private func hideRefreshButton() {
@@ -137,7 +161,7 @@ struct ConsoleTextView_Previews: PreviewProvider {
                     $0.isBodyExpanded = true
                 }
             }
-            .previewDisplayName("Netwok Expanded")
+            .previewDisplayName("Network: All")
         }
     }
 }

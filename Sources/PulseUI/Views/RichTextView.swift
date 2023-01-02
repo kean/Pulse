@@ -20,17 +20,10 @@ struct RichTextView: View {
     var isPrincipalSearchBarPlacement = false
     var hasVerticalScroller = false
     var onToggleExpanded: (() -> Void)?
-    var onLinkTapped: ((URL) -> Bool)?
 #if os(iOS)
     var body: some View {
         content
             .onAppear(perform: onAppear)
-    }
-
-    func onLinkTapped(_ closure: @escaping (URL) -> Bool) -> Self {
-        var copy = self
-        copy.onLinkTapped = onLinkTapped
-        return copy
     }
 
     @ViewBuilder
@@ -153,7 +146,6 @@ struct WrappedTextView: UIViewRepresentable {
     let isAutomaticLinkDetectionEnabled: Bool
     #if os(iOS)
     @Binding var isScrolled: Bool
-    var onLinkTapped: ((URL) -> Bool)?
     #endif
 
     final class Coordinator: NSObject, UITextViewDelegate {
@@ -170,7 +162,7 @@ struct WrappedTextView: UIViewRepresentable {
 
     func makeCoordinator() -> Coordinator {
         let coordinator = Coordinator()
-        coordinator.onLinkTapped = onLinkTapped
+        coordinator.onLinkTapped = viewModel.onLinkTapped
         return coordinator
     }
 
@@ -334,6 +326,7 @@ final class RichTextViewModel: ObservableObject {
     @Published var searchTerm: String = ""
     @Published var options: StringSearchOptions = .default
     var error: NetworkLogger.DecodingError?
+    var onLinkTapped: ((URL) -> Bool)?
 
     private(set) var text: NSAttributedString
     private var string: String
