@@ -45,7 +45,6 @@ struct ConsoleTextView: View {
             isAutomaticLinkDetectionEnabled: options.isLinkDetectionEnabled,
             isPrincipalSearchBarPlacement: true
         )
-        .id(ObjectIdentifier(viewModel.text)) // TODO: fix this, should not be required
     }
 
     @ViewBuilder
@@ -57,9 +56,10 @@ struct ConsoleTextView: View {
             Button(action: { viewModel.display(entities, options) }) {
                 Label("Refresh", systemImage: "arrow.clockwise")
             }.disabled(viewModel.isButtonRefreshHidden)
-            Button(action: viewModel.text.scrollToBottom) {
-                Label("Scroll to Bottom", systemImage: "arrow.down")
-            }
+//            // Unfortunately, this isn't working properly in UITextView (use WebView!)
+//            Button(action: viewModel.text.scrollToBottom) {
+//                Label("Scroll to Bottom", systemImage: "arrow.down")
+//            }
         }
     }
 }
@@ -69,8 +69,9 @@ final class ConsoleTextViewModel: ObservableObject {
     private var messages: CurrentValueSubject<[LoggerMessageEntity], Never> = .init([])
     private var renderer = ConsoleTextRenderer()
     private var cancellables: [AnyCancellable] = []
+    private var entitiesObserver: AnyCancellable?
 
-    @Published private(set) var text: RichTextViewModel
+    let text: RichTextViewModel
     @Published private(set) var isButtonRefreshHidden = true
     private var lastTimeRefreshHidden = Date().addingTimeInterval(-3)
 
@@ -80,12 +81,13 @@ final class ConsoleTextViewModel: ObservableObject {
 
     func display(_ entities: CurrentValueSubject<[LoggerMessageEntity], Never>, _ options: ConsoleTextRenderer.Options) {
         self.renderer = ConsoleTextRenderer(options: options)
-        self.text = RichTextViewModel(string: renderer.render(entities.value.reversed()))
-        self.hideRefreshButton()
+        let string = renderer.render(entities.value.reversed())
+        self.text.display(string)
 
-        entities.dropFirst().sink { [weak self] _ in
+        self.hideRefreshButton()
+        self.entitiesObserver = entities.dropFirst().sink { [weak self] _ in
             self?.showRefreshButtonIfNeeded()
-        }.store(in: &cancellables)
+        }
     }
 
     private func hideRefreshButton() {
@@ -94,8 +96,8 @@ final class ConsoleTextViewModel: ObservableObject {
     }
 
     private func showRefreshButtonIfNeeded() {
-        guard !isButtonRefreshHidden else { return }
-        isButtonRefreshHidden = true
+        guard isButtonRefreshHidden else { return }
+        isButtonRefreshHidden = false
     }
 }
 

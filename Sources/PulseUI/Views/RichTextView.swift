@@ -316,8 +316,8 @@ final class RichTextViewModel: ObservableObject {
     @Published var options: StringSearchOptions = .default
     var error: NetworkLogger.DecodingError?
 
-    let text: NSAttributedString
-    private let string: String
+    private(set) var text: NSAttributedString
+    private var string: String
 
     weak var textView: UXTextView?
     var mutableText: NSMutableAttributedString {
@@ -359,6 +359,15 @@ final class RichTextViewModel: ObservableObject {
         Publishers.CombineLatest($searchTerm, $options).sink { [weak self] in
             self?.refresh(searchTerm: $0, options: $1)
         }.store(in: &bag)
+    }
+
+    // This needs to be improved
+    func display(_ text: NSAttributedString) {
+        self.text = text
+        self.string = text.string
+        self.matches.removeAll()
+
+        textView?.textStorage.setAttributedString(text)
     }
 
     func onAppear() {
@@ -430,13 +439,6 @@ final class RichTextViewModel: ObservableObject {
             highlight(range: matches[previousMatch], in: mutableText)
         }
         highlight(range: matches[selectedMatchIndex], in: mutableText, isFocused: true)
-    }
-
-    func scrollToBottom() {
-        guard let textView = textView else { return }
-        let length = text.length
-        guard length > 0 else { return }
-        textView.scrollRangeToVisible(NSRange(location: length - 1, length: 1))
     }
 
     private func clearMatches() {
