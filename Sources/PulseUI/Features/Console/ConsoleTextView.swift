@@ -144,12 +144,12 @@ final class ConsoleTextViewModel: ObservableObject {
         self.text.onLinkTapped = { [unowned self] in onLinkTapped($0) }
         self.reloadOptions()
 
-        ConsoleTextViewSettings.shared.$orderAscending.sink { [weak self] _ in
+        ConsoleTextViewSettings.shared.$orderAscending.dropFirst().sink { [weak self] _ in
             self?.refreshText()
         }.store(in: &cancellables)
 
-        ConsoleTextViewSettings.shared.$isCollapsingResponses.sink { [weak self] isCollaped in
-            self?.options.isBodyExpanded = !isCollaped
+        ConsoleTextViewSettings.shared.$isCollapsingResponses.dropFirst().sink { [weak self] isCollasped in
+            self?.options.isBodyExpanded = !isCollasped
             self?.renderer.expanded.removeAll()
             self?.refreshText()
         }.store(in: &cancellables)
@@ -164,7 +164,7 @@ final class ConsoleTextViewModel: ObservableObject {
     }
 
     func reloadOptions() {
-        options.isBodyExpanded = settings.isCollapsingResponses
+        options.isBodyExpanded = !settings.isCollapsingResponses
         options.isMonocrhome = settings.isMonochrome
         options.isBodySyntaxHighlightingEnabled = settings.isSyntaxHighlightingEnabled
         options.fontSize = CGFloat(settings.fontSize)

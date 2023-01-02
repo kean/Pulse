@@ -220,7 +220,8 @@ final class ConsoleTextRenderer {
                 attributes[.foregroundColor] = UXColor.systemBlue
                 attributes[.link] = URL(string: "pulse://expand/\(self.index)")
                 attributes[.underlineColor] = UXColor.clear
-                text.append("\n\nShow More ▷", attributes)
+                text.append("\n", helpers.newlineAttributes)
+                text.append("\nExpand ▷", attributes)
                 return text
             }
         }
