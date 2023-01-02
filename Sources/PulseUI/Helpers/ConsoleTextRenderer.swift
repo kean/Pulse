@@ -179,15 +179,13 @@ final class ConsoleTextRenderer {
     }
 
     private func renderNetworkTaskBody(_ data: Data, contentType: NetworkLogger.ContentType?, error: NetworkLogger.DecodingError?) -> NSAttributedString {
-        let text = _renderNetworkTaskBody(data, contentType: contentType, error: error)
-        guard !options.isBodySyntaxHighlightingEnabled else {
-            return text
+        let text = NSMutableAttributedString(attributedString: _renderNetworkTaskBody(data, contentType: contentType, error: error))
+        if !options.isBodySyntaxHighlightingEnabled {
+            text.addAttributes([
+                .foregroundColor: UXColor.label
+            ])
         }
-        let mutable = NSMutableAttributedString(attributedString: text)
-        mutable.addAttributes([
-            .foregroundColor: UXColor.label
-        ])
-        return mutable
+        return text
     }
 
     #warning("TODO: fix font size")
