@@ -64,6 +64,7 @@ final class ConsoleTextRenderer {
         let output = NSMutableAttributedString()
         for string in strings {
             output.append(string)
+            output.append("\n", helpers.newlineAttributes)
         }
         return output
     }
@@ -113,6 +114,8 @@ final class ConsoleTextRenderer {
 
         func append(section: KeyValueSectionViewModel?) {
             guard let section = section else { return }
+            text.append("\n", helpers.newlineAttributes)
+
             let fontSize = options.fontSize - 1
             text.append(section.title + "\n", helpers.titleAttributes)
             var keyAttributes = helpers.detailsAttributes
@@ -164,6 +167,7 @@ final class ConsoleTextRenderer {
                 append(section: viewModel.originalRequestParameters?.title("Request Options"))
             }
             if content.contains(.requestBody), let data = task.requestBody?.data, !data.isEmpty {
+                text.append("\n", helpers.newlineAttributes)
                 text.append("Request Body\n", helpers.titleAttributes)
                 text.append(renderNetworkTaskBody(data, contentType: task.responseContentType.map(NetworkLogger.ContentType.init), error: task.decodingError))
                 text.append("\n", helpers.detailsAttributes)
@@ -173,6 +177,7 @@ final class ConsoleTextRenderer {
             append(section: viewModel.responseHeaders.title("Response Headers"))
         }
         if content.contains(.responseBody), let data = task.responseBody?.data, !data.isEmpty {
+            text.append("\n", helpers.newlineAttributes)
             text.append("Response Body\n", helpers.titleAttributes)
             text.append(renderNetworkTaskBody(data, contentType: task.responseContentType.map(NetworkLogger.ContentType.init), error: task.decodingError))
             text.append("\n", helpers.detailsAttributes)
@@ -246,6 +251,7 @@ final class ConsoleTextRenderer {
 final class TextRenderingHelpers {
     let paragraphStyle: NSParagraphStyle
     let titleAttributes: [NSAttributedString.Key: Any]
+    let newlineAttributes: [NSAttributedString.Key: Any]
     private(set) var textAttributes: [LoggerStore.Level: [NSAttributedString.Key: Any]] = [:]
 
     var detailsAttributes: [NSAttributedString.Key: Any] { textAttributes[.debug]! }
@@ -257,11 +263,15 @@ final class TextRenderingHelpers {
         self.titleAttributes = [
             .font: UXFont.preferredFont(forTextStyle: .caption1),
             .foregroundColor: UXColor.secondaryLabel,
+            .paragraphStyle: paragraphStyle
+        ]
+
+        self.newlineAttributes = [
+            .font: UXFont.preferredFont(forTextStyle: .caption1),
             .paragraphStyle: {
                 let style = NSMutableParagraphStyle()
-                style.maximumLineHeight = lineHeight
-                style.minimumLineHeight = lineHeight
-                style.paragraphSpacingBefore = 10
+                style.maximumLineHeight = 10
+                style.minimumLineHeight = 10
                 return style
             }()
         ]
