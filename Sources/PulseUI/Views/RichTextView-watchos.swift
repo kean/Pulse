@@ -18,6 +18,8 @@ struct RichTextView: View {
 final class RichTextViewModel: ObservableObject {
     let text: String
 
+    var isEmpty: Bool { text.isEmpty }
+
     init(string: String) {
         self.text = string
     }

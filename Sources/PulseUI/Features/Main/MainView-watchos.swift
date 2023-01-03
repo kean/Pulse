@@ -18,7 +18,6 @@ public struct MainView: View {
 
     public var body: some View {
        ConsoleView(viewModel: viewModel)
-            .onDisappear { viewModel.freeMemory() }
     }
 }
 

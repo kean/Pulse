@@ -77,9 +77,9 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
         }
 
         var title = task.type?.urlSessionTaskClassName ?? "Summary"
-        #if os(watchOS)
+#if os(watchOS)
         title = title.replacingOccurrences(of: "URLSession", with: "")
-        #endif
+#endif
         return KeyValueSectionViewModel(title: title, color: tintColor, items: items)
     }
 

@@ -14,7 +14,10 @@ import SwiftUI
 // compatible with each other
 
 struct Palette {
-    #if !os(watchOS)
+    #if os(watchOS)
+    static var red: UXColor { UXColor(Color.red) }
+    static var pink: UXColor { UXColor(Color.pink) }
+    #else
     static var red: UXColor {
         UXColor.dynamic(light: Palette.lightRed, dark: Palette.darkRed)
     }
@@ -28,9 +31,6 @@ struct Palette {
 
     private static let lightPink = UXColor(red: 155.0/255.0, green: 35.0/255.0, blue: 147.00/255.0, alpha: 1.0)
     private static let darkPink = UXColor(red: 252.0/255.0, green: 95.0/255.0, blue: 163.0/255.0, alpha: 1.0)
-    #else
-    static var red: UXColor { UXColor(Color.red) }
-    static var pink: UXColor { UXColor(Color.pink) }
     #endif
 }
 
@@ -70,6 +70,7 @@ extension NSColor {
 #if os(iOS)
 typealias UXView = UIView
 #endif
+
 typealias UXColor = UIColor
 typealias UXFont = UIFont
 typealias UXImage = UIImage
@@ -105,6 +106,12 @@ extension UIColor {
     static var systemGray3: UIColor { systemGray.withAlphaComponent(0.8) }
     static var systemGray2: UIColor { systemGray.withAlphaComponent(0.9) }
     static var controlBackgroundColor: UIColor { .clear }
+}
+#endif
+
+#if os(watchOS)
+extension UXColor {
+    static let label = UXColor(Color.primary)
 }
 #endif
 
@@ -190,7 +197,6 @@ extension Image {
     }
 }
 #endif
-
 // MARK: - Misc
 
 extension NSParagraphStyle {

@@ -34,7 +34,7 @@ struct NetworkDetailsView: View {
 
     @ViewBuilder
     private var contents: some View {
-        if viewModel.text.text.length == 0 {
+        if viewModel.text.isEmpty {
             PlaceholderView(imageName: "folder", title: "Empty")
         } else {
             RichTextView(viewModel: viewModel.text)

@@ -19,6 +19,7 @@ struct NetworkInspectorTransferInfoView: View {
                 bytesReceived
             }
         }
+        .frame(maxWidth: .infinity)
     }
 #else
     var body: some View {

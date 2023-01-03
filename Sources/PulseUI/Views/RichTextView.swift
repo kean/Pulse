@@ -401,6 +401,7 @@ final class RichTextViewModel: ObservableObject {
 
     private(set) var text: NSAttributedString
     private var string: String
+    var isEmpty: Bool { string.isEmpty }
 
     weak var textView: UXTextView?
     var mutableText: NSMutableAttributedString {

@@ -7,6 +7,7 @@ import CoreData
 import Pulse
 import Combine
 
+#warning("TODO: fix invalid linelimit on watchOS")
 #warning("TODO: remove onClose")
 
 #if os(iOS) || os(watchOS) || os(tvOS)
@@ -25,12 +26,16 @@ struct NetworkInspectorView: View {
     
     @State private var isShowingCurrentRequest = false
     
-#if os(iOS)
+#if os(iOS) || os(watchOS)
     var body: some View {
         contents
+#if os(iOS)
             .navigationBarItems(trailing: trailingNavigationBarItems)
             .navigationBarTitle(Text(viewModel.title), displayMode: .inline)
             .sheet(item: $shareItems, content: ShareView.init)
+#else
+            .navigationTitle(viewModel.title)
+#endif
     }
 
     var contents: some View {
@@ -51,9 +56,11 @@ struct NetworkInspectorView: View {
                 Section {
                     sectionResponse
                 }
+#if !os(watchOS)
                 Section {
                     sectionMetrics
                 }
+#endif
             }
         }
     }
@@ -143,6 +150,9 @@ struct NetworkInspectorView: View {
         }.disabled(viewModel.responseCookies.isEmpty)
     }
 
+    #warning("TODO: it does have Metrics?")
+
+#if !os(watchOS)
     @ViewBuilder
     private var sectionMetrics: some View {
         NavigationLink(destination: destinationMetrics) {
@@ -154,6 +164,7 @@ struct NetworkInspectorView: View {
             )
         }.disabled(!viewModel.task.hasMetrics)
     }
+#endif
 
     // MARK: - Subviews
     
@@ -175,7 +186,7 @@ struct NetworkInspectorView: View {
 
     @ViewBuilder
     var headerView: some View {
-        HStack(spacing: spacing) {
+        HStack {
             if #available(iOS 14.0, *) {
                 Text(Image(systemName: viewModel.statusImageName))
                     .foregroundColor(viewModel.statusTintColor)
@@ -215,7 +226,9 @@ struct NetworkInspectorView: View {
                 Text("Original").tag(false)
                 Text("Current").tag(true)
             }
+#if os(iOS)
             .pickerStyle(.segmented)
+#endif
             .labelsHidden()
             .fixedSize()
             .padding(.bottom, 4)
@@ -262,11 +275,13 @@ struct NetworkInspectorView: View {
         NetworkInspectorResponseView(viewModel: NetworkInspectorResponseViewModel(task: viewModel.task))
             .navigationBarTitle("Response Body")
     }
-    
+
+#if !os(watchOS)
     private var destinationMetrics: some View {
         NetworkInspectorMetricsTabView(viewModel: NetworkInspectorMetricsTabViewModel(task: viewModel.task))
             .navigationBarTitle("Metrics")
     }
+#endif
 
     @ViewBuilder
     private var destinaitionError: some View {
@@ -294,7 +309,8 @@ struct NetworkInspectorView: View {
             }
         }
     }
-    
+
+#if os(iOS)
     @ViewBuilder
     private var trailingNavigationBarItems: some View {
         HStack {
@@ -314,21 +330,14 @@ struct NetworkInspectorView: View {
             }
         }
     }
+#endif
+
 #else
     var body: some View {
         NetworkInspectorSummaryView(viewModel: viewModel.summaryViewModel)
-#if os(watchOS)
-            .navigationBarTitle(Text(viewModel.title))
-#endif
     }
 #endif
 }
-
-#if os(tvOS)
-private let spacing: CGFloat = 20
-#else
-private let spacing: CGFloat? = nil
-#endif
 
 private func stringFromByteCount(_ count: Int64) -> String {
     guard count > 0 else {
@@ -365,6 +374,7 @@ struct NetworkInspectorView_Previews: PreviewProvider {
             NavigationView {
                 NetworkInspectorView(viewModel: .init(task: LoggerStore.preview.entity(for: .login)))
             }.previewDisplayName("Success")
+
             NavigationView {
                 NetworkInspectorView(viewModel: .init(task: LoggerStore.preview.entity(for: .patchRepo)))
             }.previewDisplayName("Failure")
