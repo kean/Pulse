@@ -7,7 +7,6 @@ import CoreData
 import Pulse
 import Combine
 
-#warning("TODO: fix invalid linelimit on watchOS")
 #warning("TODO: remove onClose")
 
 #if os(iOS) || os(watchOS) || os(tvOS)
@@ -157,8 +156,6 @@ struct NetworkInspectorView: View {
         }.disabled(viewModel.responseCookies.isEmpty)
     }
 
-    #warning("TODO: it does have Metrics?")
-
 #if !os(watchOS)
     @ViewBuilder
     private var sectionMetrics: some View {
@@ -188,8 +185,6 @@ struct NetworkInspectorView: View {
             }
         }
     }
-
-#warning("TODO: remove .spacing")
 
     @ViewBuilder
     var headerView: some View {
@@ -313,16 +308,29 @@ struct NetworkInspectorView: View {
         let details: String
         
         var body: some View {
+            let image = Image(systemName: icon)
+                .foregroundColor(tintColor)
+#if os(watchOS)
             HStack {
-                Image(systemName: icon)
-                    .foregroundColor(tintColor)
+                VStack(alignment: .leading) {
+                    Text(title)
+                    Text(details).foregroundColor(.secondary)
+                }
+                Spacer()
+                image
+                    .font(.system(size: 18))
+                    .frame(width: 18, alignment: .trailing)
+            }
+#else
+            HStack {
+                image
                     .font(.system(size: 20))
                     .frame(width: 27, alignment: .leading)
                 Text(title)
                 Spacer()
-                Text(details)
-                    .foregroundColor(.secondary)
+                Text(details).foregroundColor(.secondary)
             }
+#endif
         }
     }
 

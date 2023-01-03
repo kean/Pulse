@@ -5,9 +5,7 @@
 import SwiftUI
 import Pulse
 
-#if os(iOS) || os(macOS)
-
-#warning("TODO: enable transactoin list tvOS")
+#if os(iOS) || os(macOS) || os(tvOS)
 
 // MARK: - View
 
