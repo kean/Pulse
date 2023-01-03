@@ -187,6 +187,7 @@ struct NetworkInspectorView: View {
     @ViewBuilder
     var headerView: some View {
         HStack {
+#if !os(watchOS)
             if #available(iOS 14.0, *) {
                 Text(Image(systemName: viewModel.statusImageName))
                     .foregroundColor(viewModel.statusTintColor)
@@ -194,8 +195,13 @@ struct NetworkInspectorView: View {
                 Image(systemName: viewModel.statusImageName)
                     .foregroundColor(viewModel.statusTintColor)
             }
+#endif
             Text(viewModel.status)
+#if os(watchOS)
+                .lineLimit(3)
+#else
                 .lineLimit(1)
+#endif
                 .foregroundColor(viewModel.statusTintColor)
             Spacer()
             DurationLabel(viewModel: viewModel.durationViewModel)
