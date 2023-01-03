@@ -232,13 +232,13 @@ private struct SearchToobar: View {
 
 #if os(iOS)
     var body: some View {
-        HStack {
+        HStack(alignment: .center) {
             if #available(iOS 14.0, *) {
                 Menu(content: {
                     StringSearchOptionsMenu(options: $viewModel.options, isKindNeeded: false)
                 }, label: {
                     Text("Options")
-                })
+                }).fixedSize()
             }
 
             Spacer()
@@ -261,7 +261,7 @@ private struct SearchToobar: View {
 
             Button(action: viewModel.cancelSearch) {
                 Text("Cancel")
-            }
+            }.fixedSize()
         }
         .padding(12)
         .border(width: 1, edges: [.top], color: Color(UXColor.separator).opacity(0.3))

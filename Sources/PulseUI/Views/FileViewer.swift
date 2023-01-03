@@ -5,8 +5,11 @@
 import SwiftUI
 import Pulse
 
+#warning("TODO: add share icon on iOS")
+
 struct FileViewer: View {
     @ObservedObject var viewModel: FileViewerViewModel
+    var isPrincipalSearchBarPlacement = false
     @State var isWebViewOpen = false
 
 #if os(iOS) || os(macOS)
@@ -47,7 +50,7 @@ struct FileViewer: View {
         if let contents = viewModel.contents {
             switch contents {
             case .json(let viewModel):
-                RichTextView(viewModel: viewModel)
+                RichTextView(viewModel: viewModel, isPrincipalSearchBarPlacement: isPrincipalSearchBarPlacement)
             case .image(let viewModel):
                 ScrollView {
                     ImageViewer(viewModel: viewModel)
@@ -57,11 +60,9 @@ struct FileViewer: View {
                 PDFKitRepresentedView(document: document)
 #endif
             case .other(let viewModel):
-#if os(iOS)
-
                 #warning("TODO: reimplement open in browser")
-
-                RichTextView(viewModel: viewModel)
+                RichTextView(viewModel: viewModel, isPrincipalSearchBarPlacement: isPrincipalSearchBarPlacement)
+// #if os(iOS)
 //                    if self.viewModel.contentType?.isHTML ?? false {
 //                        Button("Open in Browser") {
 //                            isWebViewOpen = true
@@ -69,9 +70,6 @@ struct FileViewer: View {
 //                    } else {
 //                        EmptyView()
 //                    }
-#else
-                RichTextView(viewModel: viewModel)
-#endif
             }
         } else {
             SpinnerView(viewModel: .init(title: "Rendering...", details: nil))

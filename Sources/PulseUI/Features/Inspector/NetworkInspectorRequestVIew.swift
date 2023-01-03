@@ -11,7 +11,7 @@ struct NetworkInspectorRequestView: View {
 
     var body: some View {
         if let viewModel = viewModel.fileViewModel {
-            FileViewer(viewModel: viewModel)
+            FileViewer(viewModel: viewModel, isPrincipalSearchBarPlacement: true)
                 .onDisappear { self.viewModel.onDisappear() }
         } else if viewModel.task.state == .pending {
             SpinnerView(viewModel: viewModel.progress)

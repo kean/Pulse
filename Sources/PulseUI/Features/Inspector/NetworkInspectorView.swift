@@ -7,6 +7,7 @@ import CoreData
 import Pulse
 import Combine
 
+#warning("TODO: fix size -1 bytes")
 #warning("TODO: fix an issue with reload not working")
 #warning("TODO: check if all deatils label are OK")
 
@@ -33,11 +34,15 @@ import Combine
 
 #warning("TODO: move pin button to the bottom somewhere")
 
+#warning("TODO: try variation with not tabbar at all!")
+
+#warning("TODO: add context menu to URL and display query items")
+
 struct NetworkInspectorView: View {
 #if os(watchOS)
     @StateObject var viewModel: NetworkInspectorViewModel
 #else
-    let viewModel: NetworkInspectorViewModel
+    @ObservedObject var viewModel: NetworkInspectorViewModel
 #endif
     var onClose: (() -> Void)?
     
@@ -111,7 +116,7 @@ struct NetworkInspectorView: View {
                         )
                     }.disabled((viewModel.task.originalRequest?.cookies.count ?? 0) == 0)
                 } else {
-                    NavigationLink(destination: destinationOriginalRequestHeaders) {
+                    NavigationLink(destination: destinationCurrentRequestHeaders) {
                         MenuItem(
                             icon: "info.square.fill",
                             tintColor: .blue,
@@ -212,11 +217,11 @@ struct NetworkInspectorView: View {
     // MARK: - Destinations
     
     private var destinationOriginalRequestHeaders: some View {
-        NetworkDetailsView(viewModel: viewModel.originalRequestHeadersViewModel.title("HTTP Headers"))
+        NetworkDetailsView(viewModel: viewModel.originalRequestHeadersViewModel.title("Request Headers"))
     }
     
     private var destinationCurrentRequestHeaders: some View {
-        NetworkDetailsView(viewModel: viewModel.currenetRequestHeadersViewModel.title("HTTP Headers"))
+        NetworkDetailsView(viewModel: viewModel.currenetRequestHeadersViewModel.title("Request Headers"))
     }
     
     private var destinationRequestCokies: some View {

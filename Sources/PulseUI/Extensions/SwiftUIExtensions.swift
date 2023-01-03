@@ -196,6 +196,15 @@ extension Backport {
 #endif
     }
 
+    @ViewBuilder
+    func tabBarHidden() -> some View {
+        if #available(iOS 16.0, *) {
+            self.content.toolbar(.hidden, for: .tabBar)
+        } else {
+            self.content
+        }
+    }
+
     enum PresentationDetent {
         case large
         case medium

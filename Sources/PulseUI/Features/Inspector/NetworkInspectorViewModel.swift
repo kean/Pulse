@@ -42,7 +42,12 @@ final class NetworkInspectorViewModel: ObservableObject {
         self.task = task
 
         if let url = task.url.flatMap(URL.init(string:)) {
-            self.title = "/" + url.lastPathComponent
+            let components = Array(url.pathComponents)
+            if components.count > 1 {
+                self.title = components.last!.capitalized
+            } else {
+                self.title = "Request"
+            }
         }
 
         cancellable = task.objectWillChange.sink { [weak self] in  self?.refresh()
