@@ -122,7 +122,6 @@
 		0C24CC6A289482F7008DD332 /* MockTask.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockTask.swift; sourceTree = "<group>"; };
 		0C24CC792894C134008DD332 /* MockStoreConfiguration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MockStoreConfiguration.swift; path = App/Shared/Mocks/MockStoreConfiguration.swift; sourceTree = SOURCE_ROOT; };
 		0C25FB6E25CDDCAB00A895C2 /* URLSessionManualIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionManualIntegration.swift; sourceTree = "<group>"; };
-		0C510F77295F643D000D80D0 /* NetworkLoggerConfiguration-extension.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = "NetworkLoggerConfiguration-extension.md"; path = "Sources/Pulse/Pulse.docc/Extensions/NetworkLoggerConfiguration-extension.md"; sourceTree = "<group>"; };
 		0C516FBA26015DD2004813B4 /* Pulse Demo iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pulse Demo iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C516FEF26016392004813B4 /* DocumentBrowser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentBrowser.swift; sourceTree = "<group>"; };
 		0C57AD4D245F0EFB005B3400 /* Pulse iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pulse iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -283,7 +282,6 @@
 		0C57AD44245F0EFB005B3400 = {
 			isa = PBXGroup;
 			children = (
-				0C510F77295F643D000D80D0 /* NetworkLoggerConfiguration-extension.md */,
 				0C07EDCD25CEF648002DC091 /* README.md */,
 				0C6A22E9280B47D400FC8C96 /* Pulse */,
 				0C57AD64245F0F38005B3400 /* App */,
