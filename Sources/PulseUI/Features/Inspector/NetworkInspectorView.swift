@@ -59,7 +59,6 @@ struct NetworkInspectorView: View {
 #if os(iOS)
     var body: some View {
         contents
-            .environment(\.defaultMinListRowHeight, 16)
             .navigationBarItems(trailing: trailingNavigationBarItems)
             .navigationBarTitle(Text(viewModel.title), displayMode: .inline)
             .sheet(item: $shareItems, content: ShareView.init)

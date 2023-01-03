@@ -19,7 +19,7 @@ struct PinButton: View {
             if isTextNeeded {
                 Text(viewModel.isPinned ? "Remove Pin" : "Pin")
             }
-            Image(systemName: viewModel.isPinned ? "pin.slash" : "pin")
+            Image(systemName: viewModel.isPinned ? "pin.fill" : "pin")
         }
     }
 }
