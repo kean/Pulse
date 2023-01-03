@@ -49,9 +49,16 @@ struct NetworkInspectorView: View {
             Section {
                 headerView
             }
+#if os(watchOS)
+            Section {
+                requestTypePickerView
+                sectionRequest
+            }
+#else
             Section(header: requestTypePickerView) {
                 sectionRequest
             }
+#endif
             if viewModel.task.state != .pending {
                 Section {
                     sectionResponse
@@ -225,23 +232,26 @@ struct NetworkInspectorView: View {
 
     @ViewBuilder
     private var requestTypePickerView: some View {
+        let picker = Picker("Request Type", selection: $isShowingCurrentRequest) {
+            Text("Original").tag(false)
+            Text("Current").tag(true)
+        }
+#if os(iOS)
         HStack {
             Text("Request Type")
             Spacer()
-            Picker("Request Type", selection: $isShowingCurrentRequest) {
-                Text("Original").tag(false)
-                Text("Current").tag(true)
-            }
-#if os(iOS)
-            .pickerStyle(.segmented)
-#endif
-            .labelsHidden()
-            .fixedSize()
-            .padding(.bottom, 4)
-            .padding(.top, -10)
+            picker
+                .pickerStyle(.segmented)
+                .labelsHidden()
+                .fixedSize()
+                .padding(.bottom, 4)
+                .padding(.top, -10)
         }
+#else
+        picker
+#endif
     }
-    
+
     // MARK: - Destinations
 
     private var destinationRequestDetails: some View {
