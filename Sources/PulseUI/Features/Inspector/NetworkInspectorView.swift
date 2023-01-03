@@ -7,6 +7,10 @@ import CoreData
 import Pulse
 import Combine
 
+#warning("TODO: remove onClose")
+
+#if os(iOS) || os(watchOS) || os(tvOS)
+
 struct NetworkInspectorView: View {
 #if os(watchOS)
     @StateObject var viewModel: NetworkInspectorViewModel
@@ -14,12 +18,8 @@ struct NetworkInspectorView: View {
     @ObservedObject var viewModel: NetworkInspectorViewModel
 #endif
     var onClose: (() -> Void)?
-    
-#if os(macOS)
-    @State private var selectedTab: NetworkInspectorTab = .response
-#endif
-    
-#if os(iOS) || os(macOS)
+
+#if os(iOS)
     @State private var shareItems: ShareItems?
 #endif
     
@@ -171,6 +171,8 @@ struct NetworkInspectorView: View {
         }
     }
 
+#warning("TODO: remove .spacing")
+
     @ViewBuilder
     var headerView: some View {
         HStack(spacing: spacing) {
@@ -199,8 +201,8 @@ struct NetworkInspectorView: View {
         NavigationLink(destination: destinationRequestDetails) {
             (Text(viewModel.task.httpMethod ?? "GET").bold()
              + Text(" ") + Text(viewModel.task.url ?? "–"))
-                .lineLimit(4)
-                .font(.callout)
+            .lineLimit(4)
+            .font(.callout)
         }
     }
 
@@ -312,29 +314,6 @@ struct NetworkInspectorView: View {
             }
         }
     }
-#elseif os(macOS)
-    var body: some View {
-        VStack {
-            toolbar
-            selectedTabView
-        }
-    }
-    
-    private var toolbar: some View {
-        VStack(spacing: 0) {
-            HStack {
-                NetworkTabPickerView(selectedTab: $selectedTab)
-                Spacer()
-                if let onClose = onClose {
-                    Button(action: onClose) {
-                        Image(systemName: "xmark").foregroundColor(.secondary)
-                    }.buttonStyle(PlainButtonStyle())
-                }
-            }
-            .padding(EdgeInsets(top: 8, leading: 4, bottom: 8, trailing: 10))
-            Divider()
-        }
-    }
 #else
     var body: some View {
         NetworkInspectorSummaryView(viewModel: viewModel.summaryViewModel)
@@ -343,81 +322,7 @@ struct NetworkInspectorView: View {
 #endif
     }
 #endif
-    
-#warning("TODO: move to -macOS")
-    
-#if os(macOS)
-    @ViewBuilder
-    private var selectedTabView: some View {
-        switch selectedTab {
-        case .response:
-            NetworkInspectorResponseView(viewModel: viewModel.responseViewModel)
-        case .request:
-            NetworkInspectorRequestView(viewModel: viewModel.requestViewModel)
-        case .summary:
-            NetworkInspectorSummaryView(viewModel: viewModel.summaryViewModel)
-        case .headers:
-            NetworkInspectorHeadersTabView(viewModel: viewModel.headersViewModel)
-        case .metrics:
-            NetworkInspectorMetricsTabView(viewModel: viewModel.metricsViewModel)
-        }
-    }
-#endif
 }
-
-#if os(macOS)
-private enum NetworkInspectorTab: Identifiable {
-    case summary
-    case headers
-    case request
-    case response
-    case metrics
-    
-    var id: NetworkInspectorTab { self }
-    
-    var text: String {
-        switch self {
-        case .summary: return "Summary"
-        case .headers: return "Headers"
-        case .request: return "Request"
-        case .response: return "Response"
-        case .metrics: return "Metrics"
-        }
-    }
-}
-
-private struct NetworkTabPickerView: View {
-    @Binding var selectedTab: NetworkInspectorTab
-    
-    var body: some View {
-        HStack(spacing: 0) {
-            HStack {
-                makeItem("Response", tab: .response)
-                Divider()
-                makeItem("Request", tab: .request)
-                Divider()
-                makeItem("Headers", tab: .headers)
-                Divider()
-            }
-            HStack {
-                Spacer().frame(width: 8)
-                makeItem("Summary", tab: .summary)
-                Divider()
-                makeItem("Metrics", tab: .metrics)
-            }
-        }.fixedSize()
-    }
-    
-    private func makeItem(_ title: String, tab: NetworkInspectorTab) -> some View {
-        Button(action: { selectedTab = tab }) {
-            Text(title)
-                .font(.system(size: 11, weight: .medium, design: .default))
-                .foregroundColor(tab == selectedTab ? .accentColor : .primary)
-        }
-        .buttonStyle(PlainButtonStyle())
-    }
-}
-#endif
 
 #if os(tvOS)
 private let spacing: CGFloat = 20
@@ -466,4 +371,6 @@ struct NetworkInspectorView_Previews: PreviewProvider {
         }
     }
 }
+#endif
+
 #endif
