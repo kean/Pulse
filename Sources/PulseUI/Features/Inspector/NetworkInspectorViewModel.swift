@@ -18,22 +18,6 @@ final class NetworkInspectorViewModel: ObservableObject {
     #warning("TODO: maek private")
     let task: NetworkTaskEntity
 
-    var taskDetails: String {
-        var components: [String] = []
-        components.append((task.type ?? .dataTask).urlSessionTaskClassName)
-        if task.state == .failure || task.state == .success {
-            if task.duration > 0 {
-                components.append(DurationFormatter.string(from: task.duration, isPrecise: false))
-            }
-            if task.isFromCache {
-                components.append("Cached Response")
-            }
-        } else {
-            components.append("Pending")
-        }
-        return components.joined(separator: " · ")
-    }
-
     var taskStatus: String {
         switch task.state {
         case .pending:
@@ -43,7 +27,7 @@ final class NetworkInspectorViewModel: ObservableObject {
         case .failure:
             if task.errorCode != 0 {
                 if task.errorDomain == URLError.errorDomain {
-                    return "\(task.errorCode) \(descriptionForURLErrorCode(Int(task.errorCode)))"
+                    return "\(descriptionForURLErrorCode(Int(task.errorCode))) (\(task.errorCode))"
                 } else if task.errorDomain == NetworkLogger.DecodingError.domain {
                     return "Decoding Failed"
                 } else {
@@ -73,10 +57,13 @@ final class NetworkInspectorViewModel: ObservableObject {
         }
     }
 
+    let duration: DurationViewModel
+
     private var cancellable: AnyCancellable?
 
     init(task: NetworkTaskEntity) {
         self.task = task
+        self.duration = DurationViewModel(task: task)
 
         if let url = task.url.flatMap(URL.init(string:)) {
             let components = Array(url.pathComponents)
@@ -119,6 +106,22 @@ final class NetworkInspectorViewModel: ObservableObject {
 
     var currenetRequestHeadersViewModel: KeyValueSectionViewModel {
         KeyValueSectionViewModel.makeRequestHeaders(for: task.currentRequest?.headers ?? [:]) {}
+    }
+
+    var requestDetailsViewModel: NetworkInspectorRequestDetailsViewModel {
+        NetworkInspectorRequestDetailsViewModel(task: task)
+    }
+
+    var originalRequestCookiesString: NSAttributedString {
+        makeAttributedString(for: task.originalRequest?.cookies ?? [], color: .blue)
+    }
+
+    var currentRequestCookiesString: NSAttributedString {
+        makeAttributedString(for: task.currentRequest?.cookies ?? [], color: .blue)
+    }
+
+    var responseCookiesString: NSAttributedString {
+        makeAttributedString(for: task.responseCookies, color: .indigo)
     }
 }
 
@@ -171,3 +174,65 @@ final class NetworkInspectorViewModel: ObservableObject {
 }
 
 #endif
+
+private func makePreview(for cookies: [HTTPCookie]) -> [(String, String?)] {
+    cookies
+        .sorted(by: { $0.name.caseInsensitiveCompare($1.name) == .orderedAscending })
+        .map { ($0.name, $0.value) }
+}
+
+private func makeAttributedString(for cookies: [HTTPCookie], color: Color) -> NSAttributedString {
+    guard !cookies.isEmpty else {
+        return NSAttributedString(string: "Empty")
+    }
+    let sections = cookies
+        .sorted(by:  { $0.name.caseInsensitiveCompare($1.name) == .orderedAscending })
+        .map {
+            KeyValueSectionViewModel.makeDetails(for: $0, color: color)
+        }
+    let text = NSMutableAttributedString()
+    for (index, section) in sections.enumerated() {
+        text.append(section.asAttributedString())
+        if index != sections.endIndex - 1 {
+            text.append("\n\n")
+        }
+    }
+    return text
+}
+
+private let dateFormatter: DateFormatter = {
+    let formatter = DateFormatter()
+    formatter.locale = Locale(identifier: "en_US")
+    formatter.dateFormat = "yyyy-MM-dd HH:mm:ss.SSS"
+    return formatter
+}()
+
+
+final class DurationViewModel: ObservableObject {
+    @Published var duration: String?
+
+    private let task: NetworkTaskEntity
+    private weak var timer: Timer?
+
+    init(task: NetworkTaskEntity) {
+        self.task = task
+        switch task.state {
+        case .pending:
+            timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] _ in
+                self?.refreshPendingDuration()
+            }
+        case .failure, .success:
+            duration = DurationFormatter.string(from: task.duration, isPrecise: false)
+        }
+    }
+
+    private func refreshPendingDuration() {
+        let duration = Date().timeIntervalSince(task.createdAt)
+        if duration > 0 {
+            self.duration = DurationFormatter.string(from: duration, isPrecise: false)
+        }
+        if task.state != .pending {
+            timer?.invalidate()
+        }
+    }
+}

@@ -7,15 +7,14 @@ import CoreData
 import Pulse
 import Combine
 
-#warning("TODO: headers viewer better line height")
-
-#warning("TODO: rework for other platfrms too")
-#warning("TODO: rework trailing navigaiton bar buttons")
+#warning("TODO: add remaining destinations")
+#warning("TODO: cookies nicely colored + display count somwhere?")
+#warning("TODO: are destinations lazy?")
+#warning("TODO: rework trailing navigaiton bar buttons (fix sharing)")
 #warning("TODO: pass details to list items")
 #warning("TODO: network details view to show fullscreen")
-#warning("TODO: are destinations lazy?")
 
-#warning("TODO: optimize task.responseCooki")
+#warning("TODO: optimize task.responseCookies")
 #warning("TODO: isShowingCurrentRequest remember persisetneyl")
 
 #warning("TODO: show error (maybe simply in bottom seciont?")
@@ -28,9 +27,11 @@ import Combine
 
 #warning("TODO: add context menu to URL and display query items")
 
-#warning("TODO: try info icon for headers/cookies")
 
+#warning("TODO: JWT where?")
+#warning("TODO: rework for other platfrms too")
 
+#warning("TODO: context actions for each cell")
 
 struct NetworkInspectorView: View {
 #if os(watchOS)
@@ -66,96 +67,120 @@ struct NetworkInspectorView: View {
             .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
             .listRowBackground(Color.clear)
 
-            Section(footer: Text(viewModel.taskDetails)) {
+            Section {
                 headerView
             }
-
-            // TODO: display error
-            
             Section(header: requestTypePickerView) {
-                NavigationLink(destination: destinationRequestBody) {
-                    MenuItem(
-                        icon: "arrow.up.circle.fill",
-                        tintColor: .blue,
-                        title: "Request Body",
-                        details: stringFromByteCount(viewModel.task.requestBodySize)
-                    )
-                }.disabled(viewModel.task.requestBodySize <= 0)
-                if !isShowingCurrentRequest {
-                    NavigationLink(destination: destinationOriginalRequestHeaders) {
-                        MenuItem(
-                            icon: "rectangle.tophalf.inset.filled",
-                            tintColor: .secondary,
-                            title: "Request Headers",
-                            details: stringFromCount(viewModel.task.originalRequest?.headers.count)
-                        )
-                    }.disabled((viewModel.task.originalRequest?.headers.count ?? 0) == 0)
-                    NavigationLink(destination: EmptyView()) {
-                        MenuItem(
-                            icon: "key.horizontal.fill",
-                            tintColor: .secondary,
-                            title: "Request Cookies",
-                            details: stringFromCount(viewModel.task.originalRequest?.cookies.count)
-                        )
-                    }.disabled((viewModel.task.originalRequest?.cookies.count ?? 0) == 0)
-                } else {
-                    NavigationLink(destination: destinationCurrentRequestHeaders) {
-                        MenuItem(
-                            icon: "rectangle.tophalf.inset.filled",
-                            tintColor: .secondary,
-                            title: "Request Headers",
-                            details: stringFromCount(viewModel.task.currentRequest?.headers.count)
-                        )
-                    }.disabled((viewModel.task.currentRequest?.headers.count ?? 0) == 0)
-                    NavigationLink(destination: EmptyView()) {
-                        MenuItem(
-                            icon: "key.horizontal.fill",
-                            tintColor: .secondary,
-                            title: "Request Cookies",
-                            details: stringFromCount(viewModel.task.currentRequest?.cookies.count)
-                        )
-                    }.disabled((viewModel.task.currentRequest?.cookies.count ?? 0) == 0)
+                sectionRequest
+            }
+            if viewModel.task.state != .pending {
+                Section {
+                    sectionResponse
                 }
-            }
-            Section {
-                NavigationLink(destination: destinationResponseBody) {
-                    MenuItem(
-                        icon: "arrow.down.circle.fill",
-                        tintColor: .indigo,
-                        title: "Response Body",
-                        details: stringFromByteCount(viewModel.task.responseBodySize)
-                    )
-                }.disabled(viewModel.task.responseBodySize <= 0)
-                NavigationLink(destination: EmptyView()) {
-                    MenuItem(
-                        icon: "rectangle.tophalf.inset.filled",
-                        tintColor: .secondary,
-                        title: "Response Headers",
-                        details: stringFromCount(viewModel.task.response?.headers.count)
-                    )
-                }.disabled((viewModel.task.response?.headers.count ?? 0) == 0)
-                NavigationLink(destination: EmptyView()) {
-                    MenuItem(
-                        icon: "key.horizontal.fill",
-                        tintColor: .secondary,
-                        title: "Response Cookies",
-                        details: stringFromCount(viewModel.task.responseCookies.count)
-                    )
-                }.disabled(viewModel.task.responseCookies.count == 0)
-            }
-            Section {
-                NavigationLink(destination: destinationMetrics) {
-                    MenuItem(
-                        icon: "clock.fill",
-                        tintColor: .orange,
-                        title: "Metrics",
-                        details: stringFromCount(viewModel.task.transactions.count)
-                    )
-                }.disabled(!viewModel.task.hasMetrics)
+                Section {
+                    sectionMetrics
+                }
             }
         }
     }
-    
+
+    @ViewBuilder
+    private var sectionRequest: some View {
+        NavigationLink(destination: destinationRequestBody) {
+            MenuItem(
+                icon: "arrow.up.circle",
+                tintColor: .blue,
+                title: "Request Body",
+                details: stringFromByteCount(viewModel.task.requestBodySize)
+            )
+        }.disabled(viewModel.task.requestBodySize <= 0)
+        if !isShowingCurrentRequest {
+            NavigationLink(destination: destinationOriginalRequestHeaders) {
+                MenuItem(
+                    icon: "doc.plaintext",
+                    tintColor: .secondary,
+                    title: "Request Headers",
+                    details: stringFromCount(viewModel.task.originalRequest?.headers.count)
+                )
+            }.disabled((viewModel.task.originalRequest?.headers.count ?? 0) == 0)
+            NavigationLink(destination: destinationOriginalRequestCookies) {
+                MenuItem(
+                    icon: "lock",
+                    tintColor: .secondary,
+                    title: "Request Cookies",
+                    details: stringFromCount(viewModel.task.originalRequest?.cookies.count)
+                )
+            }.disabled((viewModel.task.originalRequest?.cookies.count ?? 0) == 0)
+        } else {
+            NavigationLink(destination: destinationCurrentRequestHeaders) {
+                MenuItem(
+                    icon: "doc.plaintext",
+                    tintColor: .secondary,
+                    title: "Request Headers",
+                    details: stringFromCount(viewModel.task.currentRequest?.headers.count)
+                )
+            }.disabled((viewModel.task.currentRequest?.headers.count ?? 0) == 0)
+            NavigationLink(destination: destinationCurrentRequestCookies) {
+                MenuItem(
+                    icon: "lock",
+                    tintColor: .secondary,
+                    title: "Request Cookies",
+                    details: stringFromCount(viewModel.task.currentRequest?.cookies.count)
+                )
+            }.disabled((viewModel.task.currentRequest?.cookies.count ?? 0) == 0)
+        }
+    }
+
+    @ViewBuilder
+    private var sectionResponse: some View {
+        NavigationLink(destination: destinationResponseBody) {
+            MenuItem(
+                icon: "arrow.down.circle",
+                tintColor: .indigo,
+                title: "Response Body",
+                details: {
+                    if viewModel.task.responseBodySize > 0 {
+                        var title = stringFromByteCount(viewModel.task.responseBodySize)
+                        if viewModel.task.isFromCache {
+                            title += " (Cache)"
+                        }
+                        return title
+                    } else {
+                        return "Empty"
+                    }
+                }()
+            )
+        }.disabled(viewModel.task.responseBodySize <= 0)
+        NavigationLink(destination: EmptyView()) {
+            MenuItem(
+                icon: "doc.plaintext",
+                tintColor: .secondary,
+                title: "Response Headers",
+                details: stringFromCount(viewModel.task.response?.headers.count)
+            )
+        }.disabled((viewModel.task.response?.headers.count ?? 0) == 0)
+        NavigationLink(destination: destinationResponseCookies) {
+            MenuItem(
+                icon: "lock",
+                tintColor: .secondary,
+                title: "Response Cookies",
+                details: stringFromCount(viewModel.task.responseCookies.count)
+            )
+        }.disabled(viewModel.task.responseCookies.count == 0)
+    }
+
+    @ViewBuilder
+    private var sectionMetrics: some View {
+        NavigationLink(destination: destinationMetrics) {
+            MenuItem(
+                icon: "clock.fill",
+                tintColor: .orange,
+                title: "Metrics",
+                details: stringFromCount(viewModel.task.transactions.count)
+            )
+        }.disabled(!viewModel.task.hasMetrics)
+    }
+
     // MARK: - Subviews
     
     @ViewBuilder
@@ -175,18 +200,32 @@ struct NetworkInspectorView: View {
     @ViewBuilder
     var headerView: some View {
         HStack(spacing: spacing) {
-            Text(viewModel.task.httpMethod ?? "GET")
+            if #available(iOS 14.0, *) {
+                Text(Image(systemName: viewModel.statusImageName))
+                    .foregroundColor(viewModel.tintColor)
+            } else {
+                Image(systemName: viewModel.statusImageName)
+                    .foregroundColor(viewModel.tintColor)
+            }
+            Text(viewModel.taskStatus)
+                .lineLimit(1)
                 .foregroundColor(viewModel.tintColor)
             Spacer()
-            Text(viewModel.taskStatus)
-                .foregroundColor(viewModel.tintColor)
-            Image(systemName: viewModel.statusImageName)
-                .foregroundColor(viewModel.tintColor)
+            DurationLabel(viewModel: viewModel.duration)
         }.font(.headline)
 
-        NavigationLink(destination: destinationURLView) {
-            Text(viewModel.task.url ?? "–")
-                .lineLimit(3)
+        if viewModel.task.state == .failure, let description = viewModel.task.errorDebugDescription {
+            NavigationLink(destination: destinaitionError) {
+                Text(description)
+                    .lineLimit(4)
+                    .font(.callout)
+            }
+        }
+
+        NavigationLink(destination: destinationURLRequestDetails) {
+            (Text(viewModel.task.httpMethod ?? "GET").bold()
+             + Text(" ") + Text(viewModel.task.url ?? "–"))
+                .lineLimit(4)
                 .font(.callout)
         }
     }
@@ -196,7 +235,6 @@ struct NetworkInspectorView: View {
         HStack {
             Text("Request Type")
             Spacer()
-
             Picker("Request Type", selection: $isShowingCurrentRequest) {
                 Text("Original").tag(false)
                 Text("Current").tag(true)
@@ -204,21 +242,15 @@ struct NetworkInspectorView: View {
             .pickerStyle(.segmented)
             .labelsHidden()
             .fixedSize()
-            .padding(.bottom, 3)
+            .padding(.bottom, 4)
+            .padding(.top, -10)
         }
     }
     
     // MARK: - Destinations
 
-    @ViewBuilder
-    private var destinationURLView: some View {
-        if let url = viewModel.task.url.flatMap(URL.init) {
-            NetworkDetailsView(title: "URL", text: KeyValueSectionViewModel.makeDetails(for: url))
-        } else {
-            Text("URL is Invalid")
-                .foregroundColor(.secondary)
-                .font(.headline)
-        }
+    private var destinationURLRequestDetails: some View {
+        NetworkInspectorRequestDetailsView(viewModel: viewModel.requestDetailsViewModel)
     }
     
     private var destinationOriginalRequestHeaders: some View {
@@ -229,22 +261,41 @@ struct NetworkInspectorView: View {
         NetworkDetailsView(viewModel: viewModel.currenetRequestHeadersViewModel.title("Request Headers"))
     }
     
-    private var destinationRequestCokies: some View {
-        EmptyView()
+    private var destinationOriginalRequestCookies: some View {
+        NetworkDetailsView(title: "Request Cookies", text: viewModel.originalRequestCookiesString)
+    }
+
+    private var destinationCurrentRequestCookies: some View {
+        NetworkDetailsView(title: "Request Cookies", text: viewModel.currentRequestCookiesString)
+    }
+
+    private var destinationResponseCookies: some View {
+        NetworkDetailsView(title: "Request Cookies", text: viewModel.responseCookiesString)
     }
     
     private var destinationRequestBody: some View {
         NetworkInspectorRequestView(viewModel: NetworkInspectorRequestViewModel(task: viewModel.task))
+            .navigationBarTitle("Request Body")
     }
     
     private var destinationResponseBody: some View {
         NetworkInspectorResponseView(viewModel: NetworkInspectorResponseViewModel(task: viewModel.task))
+            .navigationBarTitle("Response Body")
     }
     
     private var destinationMetrics: some View {
         NetworkInspectorMetricsTabView(viewModel: NetworkInspectorMetricsTabViewModel(task: viewModel.task))
+            .navigationBarTitle("Metrics")
     }
-    
+
+    @ViewBuilder
+    private var destinaitionError: some View {
+        if let viewModel = KeyValueSectionViewModel.makeErrorDetails(for: viewModel.task, action: {}) {
+            NetworkDetailsView(viewModel: viewModel)
+                .navigationBarTitle("Error")
+        }
+    }
+
     // MARK: - Helpers
     
     private struct MenuItem: View {
@@ -256,9 +307,9 @@ struct NetworkInspectorView: View {
         var body: some View {
             HStack {
                 Image(systemName: icon)
-                    .frame(width: 36)
                     .foregroundColor(tintColor)
-                    .font(.system(size: 24))
+                    .font(.system(size: 20))
+                    .frame(width: 27, alignment: .leading)
                 Text(title)
                 Spacer()
                 Text(details)
@@ -413,11 +464,30 @@ private func stringFromCount(_ count: Int?) -> String {
     return count.description
 }
 
+private struct DurationLabel: View {
+    @ObservedObject var viewModel: DurationViewModel
+
+    var body: some View {
+        if let duration = viewModel.duration {
+            Text(duration)
+                .backport.monospacedDigit()
+                .lineLimit(1)
+                .font(.body)
+                .foregroundColor(.secondary)
+        }
+    }
+}
+
 #if DEBUG
 struct NetworkInspectorView_Previews: PreviewProvider {
     static var previews: some View {
-        NavigationView {
-            NetworkInspectorView(viewModel: .init(task: LoggerStore.preview.entity(for: .login)))
+        Group {
+            NavigationView {
+                NetworkInspectorView(viewModel: .init(task: LoggerStore.preview.entity(for: .login)))
+            }.previewDisplayName("Success")
+            NavigationView {
+                NetworkInspectorView(viewModel: .init(task: LoggerStore.preview.entity(for: .patchRepo)))
+            }.previewDisplayName("Failure")
         }
     }
 }

@@ -28,7 +28,9 @@ struct DecodingErrors_Previews: PreviewProvider {
     }
 
     private static func fileViewer(error: NetworkLogger.DecodingError) -> some View {
-        FileViewer(viewModel: .init(title: "Response", context: .init(contentType: .init(rawValue: "application/json"), originalSize: 1200, error: error), data: { MockJSON.allPossibleValues }))
+        NavigationView {
+            FileViewer(viewModel: .init(title: "Response", context: .init(contentType: .init(rawValue: "application/json"), originalSize: 1200, error: error), data: { MockJSON.allPossibleValues }))
+        }
     }
 }
 

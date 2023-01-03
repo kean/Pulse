@@ -133,8 +133,8 @@ struct StringSearchOptionsMenu: View {
     #if os(macOS)
     var body: some View {
         Menu(content: {
-            pickerCase
             pickerKind
+            pickerCase
             pickerOptions
         }, label: {
             Image(systemName: "ellipsis.circle")
@@ -151,14 +151,14 @@ struct StringSearchOptionsMenu: View {
 
     var pickerCase: some View {
         Picker(options.isCaseSensitive ? "Case Sensitive" :  "Case Insensitive", selection: $options.isCaseSensitive) {
+            Label("Case Insensitive", systemImage: "textformat.size").tag(false)
             Text("Case Sensitive").tag(true)
-            Text("Case Insensitive").tag(false)
         }.pickerStyle(.inline)
     }
 
     var pickerKind: some View {
         Picker(options.isRegex ? "Regular Expression" : "Text", selection: $options.isRegex) {
-            Text("Text").tag(false)
+            Label("Text", systemImage: "text.magnifyingglass").tag(false)
             Text("Regular Expression").tag(true)
         }.pickerStyle(.inline)
     }

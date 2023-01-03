@@ -5,6 +5,8 @@
 import SwiftUI
 import Pulse
 
+#warning("TODO: fix this on macOs")
+
 #if os(iOS) || os(macOS)
 
 // MARK: - View
@@ -13,10 +15,10 @@ struct NetworkInspectorTransactionsListView: View {
     let viewModel: NetworkInspectorTransactionsListViewModel
     @State private var presented: NetworkInspectorTransactionsListViewModel.Item?
 
+#if os(macOS)
     var body: some View {
         VStack(spacing: 16) {
             ForEach(viewModel.items) { item in
-                #if os(macOS)
                 HStack {
                     Button(action: { presented = item }) {
                         ItemView(item: item)
@@ -26,17 +28,19 @@ struct NetworkInspectorTransactionsListView: View {
                     .fixedSize()
                     Spacer()
                 }
-                #else
-                NavigationLink(destination: { destination(for: item) }) {
-                    ItemView(item: item)
-                }
-                #endif
             }
         }
-        #if os(macOS)
         .sheet(item: $presented, content: destination)
-         #endif
     }
+#else
+    var body: some View {
+        ForEach(viewModel.items) { item in
+            NavigationLink(destination: { destination(for: item) }) {
+                ItemView(item: item)
+            }
+        }
+    }
+#endif
 
     struct ItemView: View {
         let item: NetworkInspectorTransactionsListViewModel.Item
@@ -48,8 +52,10 @@ struct NetworkInspectorTransactionsListView: View {
                     Text(details)
                         .foregroundColor(.secondary)
                 }
+#if os(macOS)
                 Image(systemName: "chevron.right")
                     .foregroundColor(.separator)
+#endif
                 Spacer()
             }
         }

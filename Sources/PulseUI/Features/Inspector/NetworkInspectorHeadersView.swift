@@ -5,6 +5,8 @@
 import SwiftUI
 import Pulse
 
+#warning("TODO: only needed for macOS?")
+
 struct NetworkInspectorHeadersView: View {
     @ObservedObject var viewModel: NetworkInspectorHeaderViewModel
 

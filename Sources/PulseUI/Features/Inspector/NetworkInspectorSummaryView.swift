@@ -75,7 +75,6 @@ struct NetworkInspectorSummaryView: View {
                 }
                 viewModel.originalRequestQueryItems.map { KeyValueSectionView(viewModel: $0, limit: 8) }
                 KeyValueSectionView(viewModel: viewModel.originalRequestHeaders, limit: 8)
-                viewModel.originalRequestCookies.map(KeyValueSectionView.init)
                 KeyValueSectionView(viewModel: viewModel.requestBodySection)
                 viewModel.originalRequestParameters.map(KeyValueSectionView.init)
             }
@@ -91,7 +90,6 @@ struct NetworkInspectorSummaryView: View {
                 }
                 viewModel.currentRequestQueryItems.map { KeyValueSectionView(viewModel: $0, limit: 8) }
                 KeyValueSectionView(viewModel: viewModel.currentRequestHeaders, limit: 8)
-                viewModel.currentRequestCookies.map(KeyValueSectionView.init)
                 KeyValueSectionView(viewModel: viewModel.requestBodySection)
                 viewModel.currentRequestParameters.map(KeyValueSectionView.init)
             }
@@ -106,7 +104,6 @@ struct NetworkInspectorSummaryView: View {
                     KeyValueSectionView(viewModel: $0).hiddenTitle()
                 }
                 KeyValueSectionView(viewModel: viewModel.responseHeaders, limit: 8)
-                viewModel.responseCookies.map(KeyValueSectionView.init)
                 KeyValueSectionView(viewModel: viewModel.responseBodySection)
             }
         }
@@ -219,18 +216,6 @@ struct NetworkInspectorSummaryView: View {
                 
                 NavigationLink.programmatic(isActive: $viewModel.isCurrentQueryItemsLinkActive) {
                     viewModel.currentRequestQueryItems.map(NetworkDetailsView.init)
-                }
-                
-                NavigationLink.programmatic(isActive: $viewModel.isOriginalRequestCookiesLinkActive) {
-                    viewModel.originalRequestCookiesDetails.map { NetworkDetailsView(title: "Request Cookies", text: $0) }
-                }
-                
-                NavigationLink.programmatic(isActive: $viewModel.isCurrentRequestCookiesLinkActive) {
-                    viewModel.currentRequestCookiesDetails.map { NetworkDetailsView(title: "Request Cookies", text: $0) }
-                }
-                
-                NavigationLink.programmatic(isActive: $viewModel.isResponseCookiesLinkActive) {
-                    viewModel.responseCookiesDetails.map { NetworkDetailsView(title: "Response Cookies", text: $0) }
                 }
             }
 #endif

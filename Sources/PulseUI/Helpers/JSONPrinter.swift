@@ -198,6 +198,17 @@ final class AttributedStringJSONRenderer: JSONRenderer {
             attributes[.backgroundColor] = UXColor.red
             attributes[.foregroundColor] = UXColor.white
             attributes[.decodingError] = error
+            attributes[.link] = {
+                var components = URLComponents()
+                components.scheme = "pulse"
+                components.path = "tooltip"
+                components.queryItems = [
+                    URLQueryItem(name: "title", value: "Decoding Error"),
+                    URLQueryItem(name: "message", value: error.debugDescription)
+                ]
+                return components.url
+            }()
+            attributes[.underlineColor] = UXColor.clear
         }
         output.append(string, attributes)
     }

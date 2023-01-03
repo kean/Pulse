@@ -196,10 +196,25 @@ extension Backport {
 #endif
     }
 
+#warning("TODO: this should no logner be needed")
+
     @ViewBuilder
     func tabBarHidden() -> some View {
+#if os(iOS)
         if #available(iOS 16.0, *) {
             self.content.toolbar(.hidden, for: .tabBar)
+        } else {
+            self.content
+        }
+#else
+            self.content
+#endif
+    }
+
+    @ViewBuilder
+    func monospacedDigit() -> some View {
+        if #available(iOS 15.0, tvOS 15.0, macOS 12.0, watchOS 8.0, *) {
+            self.content.monospacedDigit()
         } else {
             self.content
         }

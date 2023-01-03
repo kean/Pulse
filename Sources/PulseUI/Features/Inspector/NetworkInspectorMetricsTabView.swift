@@ -7,6 +7,7 @@ import Pulse
 import Combine
 
 #warning("TODO: naviation using NavigaitonLink")
+#warning("TODO: fix separator before top view")
 
 #if os(iOS) || os(macOS)
 

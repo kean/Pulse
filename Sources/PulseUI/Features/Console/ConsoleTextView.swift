@@ -50,8 +50,7 @@ struct ConsoleTextView: View {
     private var textView: some View {
         RichTextView(
             viewModel: viewModel.text,
-            isAutomaticLinkDetectionEnabled: settings.isLinkDetectionEnabled,
-            isPrincipalSearchBarPlacement: true
+            isAutomaticLinkDetectionEnabled: settings.isLinkDetectionEnabled
         )
     }
 

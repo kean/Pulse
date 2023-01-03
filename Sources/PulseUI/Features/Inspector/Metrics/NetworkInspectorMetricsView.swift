@@ -7,32 +7,28 @@ import Pulse
 
 #if os(iOS) || os(macOS)
 
+#warning("TODO: enable transactoin list tvOS")
+
 // MARK: - View
 
 struct NetworkInspectorMetricsView: View {
     let viewModel: NetworkInspectorMetricsViewModel
     @State private var isTransctionsListShown = false
 
-    private static let padding: CGFloat = 16
-
     var body: some View {
-        ScrollView(showsIndicators: false) {
-            VStack {
+        List {
                 TimingView(viewModel: viewModel.timingViewModel)
-                    .padding(NetworkInspectorMetricsView.padding)
+                    .padding(.bottom, 32)
 #if !os(tvOS)
                 if let transactions = viewModel.transactions {
-                    LargeSectionHeader(title: "Transactions")
-                        .padding(.leading, NetworkInspectorMetricsView.padding)
                     NetworkInspectorTransactionsListView(viewModel: transactions)
-                        .padding([.leading, .trailing], NetworkInspectorMetricsView.padding)
 #if os(macOS)
                         .padding(.bottom, 16)
 #endif
                 }
 #endif
-            }
         }
+        .listStyle(.plain)
 #if os(tvOS)
         .frame(maxWidth: 1200, alignment: .center)
 #endif

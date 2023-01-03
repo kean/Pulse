@@ -3,20 +3,22 @@
 // Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
+import Pulse
 
 struct NetworkDetailsView: View {
+    // TODO: Fix liofecycle on iOS 14+
+    private let viewModel: NetworkDetailsViewModel
     private var title: String
-    private let text: NSAttributedString
     @State private var isShowingShareSheet = false
 
     init(viewModel: KeyValueSectionViewModel) {
         self.title = viewModel.title
-        self.text = viewModel.asAttributedString()
+        self.viewModel = NetworkDetailsViewModel { viewModel.asAttributedString() }
     }
 
-    init(title: String, text: NSAttributedString) {
+    init(title: String, text: @autoclosure @escaping () -> NSAttributedString) {
         self.title = title
-        self.text = text
+        self.viewModel = NetworkDetailsViewModel(text)
     }
 
     func title(_ title: String) -> NetworkDetailsView {
@@ -29,12 +31,6 @@ struct NetworkDetailsView: View {
     var body: some View {
         contents
             .navigationBarTitle(title)
-            .navigationBarItems(trailing: ShareButton {
-                isShowingShareSheet = true
-            })
-            .sheet(isPresented: $isShowingShareSheet) {
-                ShareView(activityItems: [text])
-            }
     }
     #else
     var body: some View {
@@ -44,19 +40,20 @@ struct NetworkDetailsView: View {
 
     @ViewBuilder
     private var contents: some View {
-        if text.string.isEmpty {
+        if viewModel.text.text.length == 0 {
             PlaceholderView(imageName: "folder", title: "Empty")
         } else {
-            #if os(watchOS) || os(tvOS)
-            RichTextView(viewModel: .init(string: text.string))
-            #else
-            RichTextView(viewModel: {
-                let viewModel = RichTextViewModel(string: text)
-                viewModel.isAutomaticLinkDetectionEnabled = false
-                return viewModel
-            }())
-            #endif
+            RichTextView(viewModel: viewModel.text)
         }
+    }
+}
+
+final class NetworkDetailsViewModel {
+    private(set) lazy var text = RichTextViewModel(string: makeString())
+    private let makeString: () -> NSAttributedString
+
+    init(_ closure: @escaping () -> NSAttributedString) {
+        self.makeString = closure
     }
 }
 
@@ -64,7 +61,10 @@ struct NetworkDetailsView: View {
 struct NetworkDetailsView_Previews: PreviewProvider {
     static var previews: some View {
 #if !os(watchOS)
-        NetworkDetailsView(title: "JWT", text: KeyValueSectionViewModel.makeDetails(for: jwt))
+        NavigationView {
+            NetworkDetailsView(title: "JWT", text: KeyValueSectionViewModel.makeDetails(for: jwt))
+        }
+                .previewDisplayName("JWT")
 #endif
     }
 }

@@ -18,7 +18,7 @@ final class FileViewerViewModel: ObservableObject {
     private(set) lazy var data = getData()
     private let getData: () -> Data
 
-    @Published private(set) var contents: Contents?
+    private(set) lazy var contents = render(data: data)
 
     struct Context {
         var contentType: NetworkLogger.ContentType?
@@ -43,25 +43,9 @@ final class FileViewerViewModel: ObservableObject {
 #endif
     }
 
-    func render() {
-        let data = self.data
-        if data.count < 30_000 {
-            self.contents = render(data: data)
-        } else {
-            Task.detached {
-                let contents = self.render(data: data)
-                Task { @MainActor in
-                    withAnimation {
-                        self.contents = contents
-                    }
-                }
-            }
-        }
-    }
-
     private func render(data: Data) -> Contents {
         if let json = try? JSONSerialization.jsonObject(with: data, options: []) {
-            return .json(.init(json: json, error: context.error))
+            return .json(RichTextViewModel(json: json, error: context.error))
         } else if let image = UXImage(data: data) {
             return .image(ImagePreviewViewModel(image: image, data: data, context: context))
         } else if let pdf = makePDF(data: data) {
@@ -71,9 +55,9 @@ final class FileViewerViewModel: ObservableObject {
         } else if let string = String(data: data, encoding: .utf8) {
 #if os(iOS) || os(macOS)
             if contentType?.isEncodedForm ?? false, let components = decodeQueryParameters(form: string) {
-                return .other(.init(string: components.asAttributedString()))
+                return .other(RichTextViewModel(string: components.asAttributedString()))
             } else if contentType?.isHTML ?? false {
-                return .other(.init(string: HTMLPrettyPrint(string: string).render()))
+                return .other(RichTextViewModel(string: HTMLPrettyPrint(string: string).render(), contentType: "text/html"))
             }
 #endif
             return .other(.init(string: string))

@@ -106,49 +106,6 @@ extension KeyValueSectionViewModel {
         ])
     }
 
-    static func makeDetails(for url: URL) -> NSAttributedString {
-        let bodyAttributes: [NSAttributedString.Key: Any] = [
-            .foregroundColor: UXColor.label,
-            .font: UXFont.monospacedSystemFont(ofSize: FontSize.body, weight: .regular)
-        ]
-
-        let string = NSMutableAttributedString(string: url.absoluteString, attributes: bodyAttributes)
-
-        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
-            return string
-        }
-
-        string.append("\n\n", bodyAttributes)
-
-        let items: [(String, String?)] = [
-            ("Scheme", components.scheme),
-            ("Port", components.port?.description),
-            ("User", components.user),
-            ("Password", components.password),
-            ("Host", components.host),
-            ("Path", components.path),
-            ("Query", components.query),
-            ("Fragment", components.fragment)
-        ]
-
-        let section = KeyValueSectionViewModel(title: "", color: .primary, items: items.filter { $0.1?.isEmpty == false })
-
-        string.append(section.asAttributedString())
-
-        if var queryItems = makeQueryItems(for: url, action: {}) {
-            queryItems.color = .primary
-            string.append("\n\n", bodyAttributes)
-            var bodyAttributes = bodyAttributes
-            bodyAttributes[.font] = UXFont.monospacedSystemFont(ofSize: FontSize.body, weight: .semibold)
-            string.append("Query Items:\n\n", bodyAttributes)
-            string.append(queryItems.asAttributedString())
-        }
-
-        string.addAttributes([.underlineColor: UXColor.clear])
-
-        return string
-    }
-
     private static func descriptionForError(domain: String?, code: Int32) -> String {
         guard domain == NSURLErrorDomain else {
             return "\(code)"
@@ -178,7 +135,12 @@ extension KeyValueSectionViewModel {
     static func makeDetails(for jwt: JWT) -> NSAttributedString {
         let titleAttributes: [NSAttributedString.Key: Any] = [
             .foregroundColor: UXColor.label,
-            .font: UXFont.preferredFont(forTextStyle: .headline)
+            .font: UXFont.monospacedSystemFont(ofSize: FontSize.body + 2, weight: .semibold),
+            .paragraphStyle: {
+                let style = NSMutableParagraphStyle()
+                style.paragraphSpacing = 8
+                return style
+            }()
         ]
         let bodyAttributes: [NSAttributedString.Key: Any] = [
             .foregroundColor: UXColor.secondaryLabel,
@@ -188,25 +150,21 @@ extension KeyValueSectionViewModel {
         let string = NSMutableAttributedString()
         string.append("Header\n", titleAttributes)
         string.append(JSONPrinter.asAttributedString(jwt.header).with(.foregroundColor, UXColor.systemRed))
-        string.append("\n\n")
+        string.append("\n\n", titleAttributes)
         string.append("Payload\n", titleAttributes)
         string.append(JSONPrinter.asAttributedString(jwt.body).with(.foregroundColor, UXColor.systemPurple))
         if let signature = jwt.signature {
-            string.append("\n\n")
+            string.append("\n\n", titleAttributes)
             string.append("Signature\n", titleAttributes)
             string.append(NSAttributedString(string: signature, attributes: bodyAttributes).with(.foregroundColor, UXColor.systemBlue))
         }
-        string.append("\n\n")
+        string.append("\n\n", titleAttributes)
         string.append("Encoded\n", titleAttributes)
         string.append(NSAttributedString(string: jwt.parts[0], attributes: bodyAttributes).with(.foregroundColor, UXColor.systemRed))
         string.append(".", bodyAttributes)
         string.append(NSAttributedString(string: jwt.parts[1], attributes: bodyAttributes).with(.foregroundColor, UXColor.systemPurple))
         string.append(".", bodyAttributes)
         string.append(NSAttributedString(string: jwt.parts[2], attributes: bodyAttributes).with(.foregroundColor, UXColor.systemBlue))
-
-        string.addAttributes([
-            .paragraphStyle: NSParagraphStyle.make(lineHeight: FontSize.body + 8)
-        ])
 
         return string
     }
@@ -280,7 +238,7 @@ extension KeyValueSectionViewModel {
 #endif
             output.append(": \(item.1 ?? "–")\n", valueAttributes)
         }
-        output.addAttributes([.paragraphStyle:  NSParagraphStyle.make(lineHeight: FontSize.body + 5)])
+        output.addAttributes([.paragraphStyle:  NSParagraphStyle.make(lineHeight: FontSize.body + 7)])
         return output
     }
 }

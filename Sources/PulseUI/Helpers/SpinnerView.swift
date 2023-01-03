@@ -15,10 +15,9 @@ struct SpinnerView: View {
     var body: some View {
         VStack {
             Spinner()
-            Text(viewModel.title + "...")
-                .padding(.top, 6)
             if let details = viewModel.details {
                 Text(details)
+                    .padding(.top, 6)
                     .animation(nil)
             }
         }

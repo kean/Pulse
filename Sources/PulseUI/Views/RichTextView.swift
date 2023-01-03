@@ -12,13 +12,14 @@ import Combine
 #if os(macOS) || os(iOS)
 
 /// - warning: state management is broken beyond repair and needs to be
-/// rewrittn (using StateObject as soon as SwiftUI is updated)
+/// rewritten (using StateObject as soon as SwiftUI is updated)
 struct RichTextView: View {
     @ObservedObject var viewModel: RichTextViewModel
     @State private var isScrolled = false
     @State private var errorViewOpacity = 0.0
+    @State private var shareItems: ShareItems?
+    @State private var isWebViewOpen = false
     var isAutomaticLinkDetectionEnabled = true
-    var isPrincipalSearchBarPlacement = false
     var hasVerticalScroller = false
 #if os(iOS)
     var body: some View {
@@ -28,14 +29,33 @@ struct RichTextView: View {
 
     @ViewBuilder
     private var content: some View {
-        if #available(iOS 14.0, *), isPrincipalSearchBarPlacement {
-            VStack(spacing: 0) {
-                mainView
-            }.toolbar {
-                ToolbarItem(placement: .principal) {
-                    searchBar
+        if #available(iOS 15.0, *) {
+            mainView
+                .navigationBarItems(trailing: Menu(content: {
+                    Section {
+                        Button(action: { shareItems = .init([viewModel.text.string]) }, label: {
+                            Label("Share", systemImage: "square.and.arrow.up")
+                        })
+                    }
+                    if viewModel.contentType?.isHTML == true {
+                        Button(action: { isWebViewOpen = true }) {
+                            Label("Open in Browser", systemImage: "safari")
+                        }
+                    }
+                    StringSearchOptionsMenu(options: $viewModel.options, isKindNeeded: false)
+                }, label: {
+                    Image(systemName: "ellipsis.circle")
+                }))
+                .sheet(item: $shareItems, content: ShareView.init)
+                .sheet(isPresented: $isWebViewOpen) {
+                    NavigationView {
+                        WebView(data: viewModel.text.string.data(using: .utf8) ?? Data(), contentType: "application/html")
+                            .navigationBarTitle("Browser Preview", displayMode: .inline)
+                            .navigationBarItems(trailing: Button(action: {
+                                isWebViewOpen = false
+                            }) { Image(systemName: "xmark") })
+                    }
                 }
-            }
         } else {
             VStack(spacing: 0) {
                 inlineSearchBar
@@ -46,13 +66,56 @@ struct RichTextView: View {
 
     @ViewBuilder
     private var mainView: some View {
-        ZStack(alignment: .bottom) {
+        if #available(iOS 15.0, *) {
             textView
-                .edgesIgnoringSafeArea(.bottom)
-            errorView
+                .searchable(text: $viewModel.searchTerm)
+                .overlay {
+                    if !viewModel.matches.isEmpty {
+                        VStack {
+                            Spacer()
+                            HStack {
+                                Spacer()
+                                SearchHoverView(viewModel: viewModel)
+                                    .padding()
+                            }
+                        }
+                    }
+                }
+        } else {
+            ZStack(alignment: .bottom) {
+                textView
+                    .edgesIgnoringSafeArea(.bottom)
+                errorView
+            }
+            if viewModel.isSearching {
+                SearchToobar(viewModel: viewModel)
+            }
         }
-        if viewModel.isSearching {
-            SearchToobar(viewModel: viewModel)
+    }
+
+    @available(iOS 15.0, *)
+    private struct SearchHoverView: View {
+        @ObservedObject var viewModel: RichTextViewModel
+
+        var body: some View {
+            HStack(spacing: 16) {
+                HStack(spacing: 12) {
+                    Button(action: viewModel.previousMatch) {
+                        Image(systemName: "chevron.left.circle")
+                            .font(.system(size: 20))
+                    }.disabled(viewModel.matches.isEmpty)
+                    Text(viewModel.matches.isEmpty ? "0 of 0" : "\(viewModel.selectedMatchIndex+1) of \(viewModel.matches.count)")
+                        .font(Font.body.monospacedDigit())
+                    Button(action: viewModel.nextMatch) {
+                        Image(systemName: "chevron.right.circle")
+                            .font(.system(size: 20))
+                    }.disabled(viewModel.matches.isEmpty)
+                }
+                .fixedSize()
+            }
+            .padding(12)
+            .background(Material.regular)
+            .cornerRadius(8)
         }
     }
 
@@ -95,10 +158,12 @@ struct RichTextView: View {
 #endif
 
     private func onAppear() {
-        guard viewModel.error != nil else { return }
-        viewModel.onAppear()
-        withAnimation {
-            errorViewOpacity = 1.0
+        if #unavailable(iOS 15.0) {
+            guard viewModel.error != nil else { return }
+            viewModel.scrollToError()
+            withAnimation {
+                errorViewOpacity = 1.0
+            }
         }
     }
 
@@ -145,6 +210,19 @@ struct WrappedTextView: UIViewRepresentable {
         func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
             if let onLinkTapped = onLinkTapped, onLinkTapped(URL) {
                 return false
+            }
+            if let components = URLComponents(url: URL, resolvingAgainstBaseURL: false) {
+                if components.scheme == "pulse",
+                   components.path == "tooltip",
+                   let queryItems = components.queryItems,
+                   let message = queryItems.first(where: { $0.name == "message" })?.value {
+                    let title = queryItems.first(where: { $0.name == "title" })?.value
+                    let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+                    alert.addAction(.init(title: "Done", style: .cancel))
+                    UIApplication.keyWindow?.rootViewController?.present(alert, animated: true)
+
+                    return false
+                }
             }
             return true
         }
@@ -317,6 +395,7 @@ final class RichTextViewModel: ObservableObject {
     @Published var options: StringSearchOptions = .default
     var error: NetworkLogger.DecodingError?
     var onLinkTapped: ((URL) -> Bool)?
+    let contentType: NetworkLogger.ContentType?
 
     private(set) var text: NSAttributedString
     private var string: String
@@ -334,7 +413,7 @@ final class RichTextViewModel: ObservableObject {
         let renderer = AttributedStringJSONRenderer(fontSize: FontSize.body, lineHeight: FontSize.body + 5)
         let printer = JSONPrinter(renderer: renderer)
         printer.render(json: json, error: error)
-        self.init(string: renderer.make())
+        self.init(string: renderer.make(), contentType: "application/json")
         self.error = error
     }
 
@@ -354,9 +433,10 @@ final class RichTextViewModel: ObservableObject {
 #endif
     }
 
-    init(string: NSAttributedString) {
+    init(string: NSAttributedString, contentType: NetworkLogger.ContentType? = nil) {
         self.text = string
         self.string = string.string
+        self.contentType = contentType
 
         Publishers.CombineLatest($searchTerm, $options).sink { [weak self] in
             self?.refresh(searchTerm: $0, options: $1)
@@ -374,16 +454,15 @@ final class RichTextViewModel: ObservableObject {
         searchTerm = ""
     }
 
-    func onAppear() {
-        if error != nil {
-            let range = NSRange(location: 0, length: text.length)
-            text.enumerateAttribute(.decodingError, in: range) { _, range, _ in
-                var range = range
-                if range.location > 50 {
-                    range.location -= 50
-                }
-                textView?.scrollRangeToVisible(range)
+    func scrollToError() {
+        guard error != nil else { return }
+        let range = NSRange(location: 0, length: text.length)
+        text.enumerateAttribute(.decodingError, in: range) { _, range, _ in
+            var range = range
+            if range.location > 50 {
+                range.location -= 50
             }
+            textView?.scrollRangeToVisible(range)
         }
     }
 
@@ -469,9 +548,16 @@ private func highlight(range: Range<String.Index>, in text: NSMutableAttributedS
 #if DEBUG
 struct RichTextView_Previews: PreviewProvider {
     static var previews: some View {
-        RichTextView(viewModel: .init(json: try! JSONSerialization.jsonObject(with: MockJSON.allPossibleValues), error: nil))
+        NavigationView {
+            RichTextView(viewModel: .init(json: try! JSONSerialization.jsonObject(with: MockJSON.allPossibleValues), error: nil))
+#if os(iOS)
+                .navigationBarTitle("RichTextView", displayMode: .inline)
+#endif
+        }
+#if os(macOS)
             .frame(height: 600)
             .previewLayout(.sizeThatFits)
+#endif
     }
 }
 #endif
