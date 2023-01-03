@@ -9,13 +9,14 @@ import Combine
 
 #warning("TODO: creat ViewModel that are needed only")
 #warning("TODO: populate items from there")
+#warning("TODO: refactor")
+#warning("TODO: use LazyReset")
 
 #if os(iOS)
 
 final class NetworkInspectorViewModel: ObservableObject {
     private(set) var title: String = ""
 
-    #warning("TODO: maek private")
     let task: NetworkTaskEntity
 
     var taskStatus: String {
@@ -59,26 +60,34 @@ final class NetworkInspectorViewModel: ObservableObject {
 
     let duration: DurationViewModel
 
+    @LazyReset var originalRequestCookies: [HTTPCookie]
+    @LazyReset var currentRequestCookies: [HTTPCookie]
+    @LazyReset var responseCookies: [HTTPCookie]
+
     private var cancellable: AnyCancellable?
 
     init(task: NetworkTaskEntity) {
         self.task = task
         self.duration = DurationViewModel(task: task)
 
+        _originalRequestCookies = LazyReset { task.originalRequest?.cookies ?? [] }
+        _currentRequestCookies = LazyReset { task.currentRequest?.cookies ?? [] }
+        _responseCookies = LazyReset { task.responseCookies }
+
         if let url = task.url.flatMap(URL.init(string:)) {
-            let components = Array(url.pathComponents)
-            if components.count > 1 {
-                self.title = components.last!.capitalized
-            } else {
-                self.title = "Request"
-            }
+            self.title = url.lastPathComponent
         }
 
-        cancellable = task.objectWillChange.sink { [weak self] in  self?.refresh()
+        cancellable = task.objectWillChange.sink { [weak self] in
+            self?.refresh()
         }
     }
 
     private func refresh() {
+        _originalRequestCookies.reset()
+        _currentRequestCookies.reset()
+        _responseCookies.reset()
+
         withAnimation { objectWillChange.send() }
     }
 

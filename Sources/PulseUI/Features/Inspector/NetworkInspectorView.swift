@@ -7,8 +7,6 @@ import CoreData
 import Pulse
 import Combine
 
-#warning("TODO: are destinations lazy?")
-#warning("TODO: rework trailing navigaiton bar buttons (fix sharing)")
 #warning("TODO: pass details to list items")
 #warning("TODO: network details view to show fullscreen")
 
@@ -106,9 +104,9 @@ struct NetworkInspectorView: View {
                     icon: "lock",
                     tintColor: .secondary,
                     title: "Request Cookies",
-                    details: stringFromCount(viewModel.task.originalRequest?.cookies.count)
+                    details: stringFromCount(viewModel.originalRequestCookies.count)
                 )
-            }.disabled((viewModel.task.originalRequest?.cookies.count ?? 0) == 0)
+            }.disabled(viewModel.originalRequestCookies.isEmpty)
         } else {
             NavigationLink(destination: destinationCurrentRequestHeaders) {
                 MenuItem(
@@ -123,9 +121,9 @@ struct NetworkInspectorView: View {
                     icon: "lock",
                     tintColor: .secondary,
                     title: "Request Cookies",
-                    details: stringFromCount(viewModel.task.currentRequest?.cookies.count)
+                    details: stringFromCount(viewModel.currentRequestCookies.count)
                 )
-            }.disabled((viewModel.task.currentRequest?.cookies.count ?? 0) == 0)
+            }.disabled(viewModel.currentRequestCookies.isEmpty)
         }
     }
 
@@ -162,9 +160,9 @@ struct NetworkInspectorView: View {
                 icon: "lock",
                 tintColor: .secondary,
                 title: "Response Cookies",
-                details: stringFromCount(viewModel.task.responseCookies.count)
+                details: stringFromCount(viewModel.responseCookies.count)
             )
-        }.disabled(viewModel.task.responseCookies.count == 0)
+        }.disabled(viewModel.responseCookies.isEmpty)
     }
 
     @ViewBuilder

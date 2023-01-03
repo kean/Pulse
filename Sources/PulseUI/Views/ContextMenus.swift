@@ -22,6 +22,9 @@ struct ButtonCopyMessage: View {
     }
 }
 
+#warning("TODO: add share request")
+#warning("TODO: fix sharing responseBody (share text)?")
+
 struct NetworkMessageContextMenu: View {
     let task: NetworkTaskEntity
 
@@ -30,7 +33,7 @@ struct NetworkMessageContextMenu: View {
     var body: some View {
         Section {
             if #available(iOS 14.0, *) {
-                Menu("Share Request Log") {
+                Menu("Share Log") {
                     shareAsButtons
                 }
             } else {
