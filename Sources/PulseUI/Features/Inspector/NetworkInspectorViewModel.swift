@@ -104,7 +104,7 @@ final class NetworkInspectorViewModel: ObservableObject {
         KeyValueSectionViewModel.makeRequestHeaders(for: task.originalRequest?.headers ?? [:]) {}
     }
 
-    var currenetRequestHeadersViewModel: KeyValueSectionViewModel {
+    var currnetRequestHeadersViewModel: KeyValueSectionViewModel {
         KeyValueSectionViewModel.makeRequestHeaders(for: task.currentRequest?.headers ?? [:]) {}
     }
 
@@ -118,6 +118,10 @@ final class NetworkInspectorViewModel: ObservableObject {
 
     var currentRequestCookiesString: NSAttributedString {
         makeAttributedString(for: task.currentRequest?.cookies ?? [], color: .blue)
+    }
+
+    var responseHeadersViewModel: KeyValueSectionViewModel {
+        KeyValueSectionViewModel.makeResponseHeaders(for: task.currentRequest?.headers ?? [:], action: {})
     }
 
     var responseCookiesString: NSAttributedString {

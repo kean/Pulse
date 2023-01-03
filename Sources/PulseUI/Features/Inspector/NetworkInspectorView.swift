@@ -7,7 +7,6 @@ import CoreData
 import Pulse
 import Combine
 
-#warning("TODO: add remaining destinations")
 #warning("TODO: cookies nicely colored + display count somwhere?")
 #warning("TODO: are destinations lazy?")
 #warning("TODO: rework trailing navigaiton bar buttons (fix sharing)")
@@ -151,7 +150,7 @@ struct NetworkInspectorView: View {
                 }()
             )
         }.disabled(viewModel.task.responseBodySize <= 0)
-        NavigationLink(destination: EmptyView()) {
+        NavigationLink(destination: destinationResponseHeaders) {
             MenuItem(
                 icon: "doc.plaintext",
                 tintColor: .secondary,
@@ -258,7 +257,7 @@ struct NetworkInspectorView: View {
     }
     
     private var destinationCurrentRequestHeaders: some View {
-        NetworkDetailsView(viewModel: viewModel.currenetRequestHeadersViewModel.title("Request Headers"))
+        NetworkDetailsView(viewModel: viewModel.currnetRequestHeadersViewModel.title("Request Headers"))
     }
     
     private var destinationOriginalRequestCookies: some View {
@@ -271,6 +270,10 @@ struct NetworkInspectorView: View {
 
     private var destinationResponseCookies: some View {
         NetworkDetailsView(title: "Request Cookies", text: viewModel.responseCookiesString)
+    }
+
+    private var destinationResponseHeaders: some View {
+        NetworkDetailsView(viewModel: viewModel.responseHeadersViewModel)
     }
     
     private var destinationRequestBody: some View {
