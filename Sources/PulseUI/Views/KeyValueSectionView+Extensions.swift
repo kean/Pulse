@@ -5,6 +5,8 @@
 import SwiftUI
 import Pulse
 
+#warning("TODO: remoe actions for KeyValueSectionViewModel")
+
 extension KeyValueSectionViewModel {
     static func makeSummary(for request: NetworkRequestEntity) -> KeyValueSectionViewModel {
         let components = request.url.flatMap { URLComponents(string: $0) }
@@ -102,6 +104,49 @@ extension KeyValueSectionViewModel {
             ("HTTP Only", "\(cookie.isHTTPOnly)"),
             ("Session Only", "\(cookie.isSessionOnly)")
         ])
+    }
+
+    static func makeDetails(for url: URL) -> NSAttributedString {
+        let bodyAttributes: [NSAttributedString.Key: Any] = [
+            .foregroundColor: UXColor.label,
+            .font: UXFont.monospacedSystemFont(ofSize: FontSize.body, weight: .regular)
+        ]
+
+        let string = NSMutableAttributedString(string: url.absoluteString, attributes: bodyAttributes)
+
+        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
+            return string
+        }
+
+        string.append("\n\n", bodyAttributes)
+
+        let items: [(String, String?)] = [
+            ("Scheme", components.scheme),
+            ("Port", components.port?.description),
+            ("User", components.user),
+            ("Password", components.password),
+            ("Host", components.host),
+            ("Path", components.path),
+            ("Query", components.query),
+            ("Fragment", components.fragment)
+        ]
+
+        let section = KeyValueSectionViewModel(title: "", color: .primary, items: items.filter { $0.1?.isEmpty == false })
+
+        string.append(section.asAttributedString())
+
+        if var queryItems = makeQueryItems(for: url, action: {}) {
+            queryItems.color = .primary
+            string.append("\n\n", bodyAttributes)
+            var bodyAttributes = bodyAttributes
+            bodyAttributes[.font] = UXFont.monospacedSystemFont(ofSize: FontSize.body, weight: .semibold)
+            string.append("Query Items:\n\n", bodyAttributes)
+            string.append(queryItems.asAttributedString())
+        }
+
+        string.addAttributes([.underlineColor: UXColor.clear])
+
+        return string
     }
 
     private static func descriptionForError(domain: String?, code: Int32) -> String {

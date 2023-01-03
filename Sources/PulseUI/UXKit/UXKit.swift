@@ -113,7 +113,7 @@ extension UIColor {
 enum FontSize {
     static var body: CGFloat {
         #if os(iOS)
-            return 12
+            return 13
         #elseif os(macOS)
             return 12
         #elseif os(tvOS)

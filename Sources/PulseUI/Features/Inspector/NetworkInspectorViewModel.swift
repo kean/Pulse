@@ -18,6 +18,43 @@ final class NetworkInspectorViewModel: ObservableObject {
     #warning("TODO: maek private")
     let task: NetworkTaskEntity
 
+    var taskDetails: String {
+        var components: [String] = []
+        components.append((task.type ?? .dataTask).urlSessionTaskClassName)
+        if task.state == .failure || task.state == .success {
+            if task.duration > 0 {
+                components.append(DurationFormatter.string(from: task.duration, isPrecise: false))
+            }
+            if task.isFromCache {
+                components.append("Cached Response")
+            }
+        } else {
+            components.append("Pending")
+        }
+        return components.joined(separator: " · ")
+    }
+
+    var taskStatus: String {
+        switch task.state {
+        case .pending:
+            return _progressViewModel.title.capitalized
+        case .success:
+            return StatusCodeFormatter.string(for: Int(task.statusCode))
+        case .failure:
+            if task.errorCode != 0 {
+                if task.errorDomain == URLError.errorDomain {
+                    return "\(task.errorCode) \(descriptionForURLErrorCode(Int(task.errorCode)))"
+                } else if task.errorDomain == NetworkLogger.DecodingError.domain {
+                    return "Decoding Failed"
+                } else {
+                    return "Failed"
+                }
+            } else {
+                return StatusCodeFormatter.string(for: Int(task.statusCode))
+            }
+        }
+    }
+
     private(set) lazy var _progressViewModel = ProgressViewModel(task: task)
 
     var tintColor: Color {

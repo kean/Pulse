@@ -7,36 +7,30 @@ import CoreData
 import Pulse
 import Combine
 
-#warning("TODO: fix size -1 bytes")
-#warning("TODO: fix an issue with reload not working")
-#warning("TODO: check if all deatils label are OK")
+#warning("TODO: headers viewer better line height")
 
 #warning("TODO: rework for other platfrms too")
 #warning("TODO: rework trailing navigaiton bar buttons")
 #warning("TODO: pass details to list items")
 #warning("TODO: network details view to show fullscreen")
-#warning("TODO: proper icons")
 #warning("TODO: are destinations lazy?")
-#warning("TODO: how to switch between current and original request? maube sections?")
 
 #warning("TODO: optimize task.responseCooki")
 #warning("TODO: isShowingCurrentRequest remember persisetneyl")
 
-#warning("TODO: add query items")
-
 #warning("TODO: show error (maybe simply in bottom seciont?")
-#warning("TODO: resue preview")
 
 #warning("TODO: handle all destinations")
-#warning("TODO: improve how requst status is rendered")
-
-#warning("TODO: fix hardcoded URLSessionDownloadTask")
 
 #warning("TODO: move pin button to the bottom somewhere")
 
 #warning("TODO: try variation with not tabbar at all!")
 
 #warning("TODO: add context menu to URL and display query items")
+
+#warning("TODO: try info icon for headers/cookies")
+
+
 
 struct NetworkInspectorView: View {
 #if os(watchOS)
@@ -63,117 +57,99 @@ struct NetworkInspectorView: View {
             .navigationBarTitle(Text(viewModel.title), displayMode: .inline)
             .sheet(item: $shareItems, content: ShareView.init)
     }
-    
-    @ViewBuilder
+
     var contents: some View {
         Form {
             Section {
-                headerView
+                transferStatusView
             }
             .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
             .listRowBackground(Color.clear)
-            
-            // TODO: pass action task and satus
-            Section(footer: Text("URLSessionDownloadTask · 427ms · Network")) {
-                HStack(spacing: spacing) {
-                    
-                    Text(viewModel.task.httpMethod ?? "GET")
-                        .foregroundColor(viewModel.tintColor)
-                    // TODO: pass status code
-                    Spacer()
-                    Text("200 OK")
-                        .foregroundColor(viewModel.tintColor)
-                    Image(systemName: viewModel.statusImageName)
-                        .foregroundColor(viewModel.tintColor)
-                }.font(.headline)
-                
-                // TODO: handle desctination
-                // TODO: display query items there?
-                NavigationLink(destination: EmptyView()) {
-                    Text(viewModel.task.url ?? "–")
-                        .lineLimit(3)
-                        .font(.callout)
-                }
+
+            Section(footer: Text(viewModel.taskDetails)) {
+                headerView
             }
+
+            // TODO: display error
             
             Section(header: requestTypePickerView) {
+                NavigationLink(destination: destinationRequestBody) {
+                    MenuItem(
+                        icon: "arrow.up.circle.fill",
+                        tintColor: .blue,
+                        title: "Request Body",
+                        details: stringFromByteCount(viewModel.task.requestBodySize)
+                    )
+                }.disabled(viewModel.task.requestBodySize <= 0)
                 if !isShowingCurrentRequest {
                     NavigationLink(destination: destinationOriginalRequestHeaders) {
                         MenuItem(
-                            icon: "info.square.fill",
-                            tintColor: .blue,
+                            icon: "rectangle.tophalf.inset.filled",
+                            tintColor: .secondary,
                             title: "Request Headers",
-                            details: String(viewModel.task.originalRequest?.headers.count ?? 0)
+                            details: stringFromCount(viewModel.task.originalRequest?.headers.count)
                         )
                     }.disabled((viewModel.task.originalRequest?.headers.count ?? 0) == 0)
                     NavigationLink(destination: EmptyView()) {
                         MenuItem(
-                            icon: "arrow.down.square.fill",
-                            tintColor: .blue,
+                            icon: "key.horizontal.fill",
+                            tintColor: .secondary,
                             title: "Request Cookies",
-                            details: String(viewModel.task.originalRequest?.cookies.count ?? 0)
+                            details: stringFromCount(viewModel.task.originalRequest?.cookies.count)
                         )
                     }.disabled((viewModel.task.originalRequest?.cookies.count ?? 0) == 0)
                 } else {
                     NavigationLink(destination: destinationCurrentRequestHeaders) {
                         MenuItem(
-                            icon: "info.square.fill",
-                            tintColor: .blue,
+                            icon: "rectangle.tophalf.inset.filled",
+                            tintColor: .secondary,
                             title: "Request Headers",
-                            details: String(viewModel.task.currentRequest?.headers.count ?? 0)
+                            details: stringFromCount(viewModel.task.currentRequest?.headers.count)
                         )
                     }.disabled((viewModel.task.currentRequest?.headers.count ?? 0) == 0)
                     NavigationLink(destination: EmptyView()) {
                         MenuItem(
-                            icon: "arrow.down.square.fill",
-                            tintColor: .blue,
+                            icon: "key.horizontal.fill",
+                            tintColor: .secondary,
                             title: "Request Cookies",
-                            details: String(viewModel.task.currentRequest?.cookies.count ?? 0)
+                            details: stringFromCount(viewModel.task.currentRequest?.cookies.count)
                         )
                     }.disabled((viewModel.task.currentRequest?.cookies.count ?? 0) == 0)
                 }
-                NavigationLink(destination: destinationRequestBody) {
-                    MenuItem(
-                        icon: "arrow.up.square.fill",
-                        tintColor: .blue,
-                        title: "Request Body",
-                        details: ByteCountFormatter.string(fromByteCount: viewModel.task.requestBodySize)
-                    )
-                }.disabled(viewModel.task.requestBodySize == 0)
             }
             Section {
                 NavigationLink(destination: destinationResponseBody) {
                     MenuItem(
-                        icon: "arrow.down.square.fill",
+                        icon: "arrow.down.circle.fill",
                         tintColor: .indigo,
                         title: "Response Body",
-                        details: ByteCountFormatter.string(fromByteCount: viewModel.task.responseBodySize)
+                        details: stringFromByteCount(viewModel.task.responseBodySize)
                     )
-                }.disabled(viewModel.task.responseBodySize == 0)
+                }.disabled(viewModel.task.responseBodySize <= 0)
                 NavigationLink(destination: EmptyView()) {
                     MenuItem(
-                        icon: "arrow.down.square.fill",
-                        tintColor: .indigo,
+                        icon: "rectangle.tophalf.inset.filled",
+                        tintColor: .secondary,
                         title: "Response Headers",
-                        details: String(viewModel.task.response?.headers.count ?? 0)
+                        details: stringFromCount(viewModel.task.response?.headers.count)
                     )
                 }.disabled((viewModel.task.response?.headers.count ?? 0) == 0)
                 NavigationLink(destination: EmptyView()) {
                     MenuItem(
-                        icon: "arrow.down.square.fill",
-                        tintColor: .indigo,
+                        icon: "key.horizontal.fill",
+                        tintColor: .secondary,
                         title: "Response Cookies",
-                        details: String(viewModel.task.responseCookies.count)
+                        details: stringFromCount(viewModel.task.responseCookies.count)
                     )
                 }.disabled(viewModel.task.responseCookies.count == 0)
             }
             Section {
                 NavigationLink(destination: destinationMetrics) {
                     MenuItem(
-                        icon: "chart.bar.doc.horizontal.fill",
+                        icon: "clock.fill",
                         tintColor: .orange,
                         title: "Metrics",
-                        details: String(viewModel.task.transactions.count)
+                        details: stringFromCount(viewModel.task.transactions.count)
                     )
                 }.disabled(!viewModel.task.hasMetrics)
             }
@@ -183,24 +159,7 @@ struct NetworkInspectorView: View {
     // MARK: - Subviews
     
     @ViewBuilder
-    private var requestTypePickerView: some View {
-        HStack {
-            Text("Request Type")
-            Spacer()
-            
-            Picker("Request Type", selection: $isShowingCurrentRequest) {
-                Text("Original").tag(false)
-                Text("Current").tag(true)
-            }
-            .pickerStyle(.segmented)
-            .labelsHidden()
-            .fixedSize()
-            .padding(.bottom, 3)
-        }
-    }
-    
-    @ViewBuilder
-    private var headerView: some View {
+    private var transferStatusView: some View {
         if let transfer = viewModel.transferViewModel {
             NetworkInspectorTransferInfoView(viewModel: transfer)
         } else if let progress = viewModel.progressViewModel {
@@ -212,8 +171,55 @@ struct NetworkInspectorView: View {
             }
         }
     }
+
+    @ViewBuilder
+    var headerView: some View {
+        HStack(spacing: spacing) {
+            Text(viewModel.task.httpMethod ?? "GET")
+                .foregroundColor(viewModel.tintColor)
+            Spacer()
+            Text(viewModel.taskStatus)
+                .foregroundColor(viewModel.tintColor)
+            Image(systemName: viewModel.statusImageName)
+                .foregroundColor(viewModel.tintColor)
+        }.font(.headline)
+
+        NavigationLink(destination: destinationURLView) {
+            Text(viewModel.task.url ?? "–")
+                .lineLimit(3)
+                .font(.callout)
+        }
+    }
+
+    @ViewBuilder
+    private var requestTypePickerView: some View {
+        HStack {
+            Text("Request Type")
+            Spacer()
+
+            Picker("Request Type", selection: $isShowingCurrentRequest) {
+                Text("Original").tag(false)
+                Text("Current").tag(true)
+            }
+            .pickerStyle(.segmented)
+            .labelsHidden()
+            .fixedSize()
+            .padding(.bottom, 3)
+        }
+    }
     
     // MARK: - Destinations
+
+    @ViewBuilder
+    private var destinationURLView: some View {
+        if let url = viewModel.task.url.flatMap(URL.init) {
+            NetworkDetailsView(title: "URL", text: KeyValueSectionViewModel.makeDetails(for: url))
+        } else {
+            Text("URL is Invalid")
+                .foregroundColor(.secondary)
+                .font(.headline)
+        }
+    }
     
     private var destinationOriginalRequestHeaders: some View {
         NetworkDetailsView(viewModel: viewModel.originalRequestHeadersViewModel.title("Request Headers"))
@@ -250,8 +256,9 @@ struct NetworkInspectorView: View {
         var body: some View {
             HStack {
                 Image(systemName: icon)
+                    .frame(width: 36)
                     .foregroundColor(tintColor)
-                    .font(.headline)
+                    .font(.system(size: 24))
                 Text(title)
                 Spacer()
                 Text(details)
@@ -391,6 +398,20 @@ private let spacing: CGFloat = 20
 #else
 private let spacing: CGFloat? = nil
 #endif
+
+private func stringFromByteCount(_ count: Int64) -> String {
+    guard count > 0 else {
+        return "Empty"
+    }
+    return ByteCountFormatter.string(fromByteCount: count)
+}
+
+private func stringFromCount(_ count: Int?) -> String {
+    guard let count = count, count > 0 else {
+        return "Empty"
+    }
+    return count.description
+}
 
 #if DEBUG
 struct NetworkInspectorView_Previews: PreviewProvider {
