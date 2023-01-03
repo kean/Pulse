@@ -203,7 +203,7 @@ struct NetworkInspectorView: View {
                 Image(systemName: viewModel.statusImageName)
                     .foregroundColor(viewModel.tintColor)
             }
-            Text(viewModel.taskStatus)
+            Text(viewModel.status)
                 .lineLimit(1)
                 .foregroundColor(viewModel.tintColor)
             Spacer()

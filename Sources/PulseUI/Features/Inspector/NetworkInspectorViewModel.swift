@@ -16,24 +16,14 @@ final class NetworkInspectorViewModel: ObservableObject {
 
     let task: NetworkTaskEntity
 
-    var taskStatus: String {
+    var status: String {
         switch task.state {
         case .pending:
             return _progressViewModel.title.capitalized
         case .success:
             return StatusCodeFormatter.string(for: Int(task.statusCode))
         case .failure:
-            if task.errorCode != 0 {
-                if task.errorDomain == URLError.errorDomain {
-                    return "\(descriptionForURLErrorCode(Int(task.errorCode))) (\(task.errorCode))"
-                } else if task.errorDomain == NetworkLogger.DecodingError.domain {
-                    return "Decoding Failed"
-                } else {
-                    return "Failed"
-                }
-            } else {
-                return StatusCodeFormatter.string(for: Int(task.statusCode))
-            }
+            return ErrorFormatter.shortErrorDescription(for: task)
         }
     }
 

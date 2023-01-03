@@ -3,8 +3,9 @@
 // Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
+import Pulse
 
-struct DurationFormatter {
+enum DurationFormatter {
     static func string(from timeInterval: TimeInterval) -> String {
         string(from: timeInterval, isPrecise: true)
     }
@@ -29,7 +30,7 @@ struct DurationFormatter {
     }
 }
 
-struct StatusCodeFormatter {
+enum StatusCodeFormatter {
     static func string(for statusCode: Int32) -> String {
         string(for: Int(statusCode))
     }
@@ -38,6 +39,22 @@ struct StatusCodeFormatter {
         switch statusCode {
         case 200: return "200 OK"
         default: return "\(statusCode) \( HTTPURLResponse.localizedString(forStatusCode: statusCode).capitalized)"
+        }
+    }
+}
+
+enum ErrorFormatter {
+    static func shortErrorDescription(for task: NetworkTaskEntity) -> String {
+        if task.errorCode != 0 {
+            if task.errorDomain == URLError.errorDomain {
+                return "\(task.errorCode) \(descriptionForURLErrorCode(Int(task.errorCode)))"
+            } else if task.errorDomain == NetworkLogger.DecodingError.domain {
+                return "Decoding Failed"
+            } else {
+                return "Error"
+            }
+        } else {
+            return StatusCodeFormatter.string(for: Int(task.statusCode))
         }
     }
 }
