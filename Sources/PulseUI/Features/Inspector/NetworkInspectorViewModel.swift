@@ -7,45 +7,12 @@ import CoreData
 import Pulse
 import Combine
 
-#warning("TODO: refactor")
-
 #if os(iOS)
 
 final class NetworkInspectorViewModel: ObservableObject {
-    private(set) var title: String = ""
+    let title: String
 
     let task: NetworkTaskEntity
-
-    var status: String {
-        switch task.state {
-        case .pending:
-            return _progressViewModel.title.capitalized
-        case .success:
-            return StatusCodeFormatter.string(for: Int(task.statusCode))
-        case .failure:
-            return ErrorFormatter.shortErrorDescription(for: task)
-        }
-    }
-
-    private(set) lazy var _progressViewModel = ProgressViewModel(task: task)
-
-    var tintColor: Color {
-        switch task.state {
-        case .pending: return .orange
-        case .success: return .green
-        case .failure: return .red
-        }
-    }
-
-    var statusImageName: String {
-        switch task.state {
-        case .pending: return "clock.fill"
-        case .success: return "checkmark.circle.fill"
-        case .failure: return "exclamationmark.octagon.fill"
-        }
-    }
-
-    let duration: DurationViewModel
 
     @LazyReset var originalRequestHeaders: [String: String]
     @LazyReset var originalRequestCookies: [HTTPCookie]
@@ -54,11 +21,14 @@ final class NetworkInspectorViewModel: ObservableObject {
     @LazyReset var responseHeaders: [String: String]
     @LazyReset var responseCookies: [HTTPCookie]
 
+    let durationViewModel: DurationViewModel
+    private(set) lazy var _progressViewModel = ProgressViewModel(task: task)
+
     private var cancellable: AnyCancellable?
 
     init(task: NetworkTaskEntity) {
         self.task = task
-        self.duration = DurationViewModel(task: task)
+        self.durationViewModel = DurationViewModel(task: task)
 
         _originalRequestHeaders = LazyReset { task.originalRequest?.headers ?? [:] }
         _originalRequestCookies = LazyReset { task.originalRequest?.cookies ?? [] }
@@ -69,6 +39,8 @@ final class NetworkInspectorViewModel: ObservableObject {
 
         if let url = task.url.flatMap(URL.init(string:)) {
             self.title = url.lastPathComponent
+        } else {
+            self.title = "Request"
         }
 
         cancellable = task.objectWillChange.sink { [weak self] in
@@ -87,6 +59,33 @@ final class NetworkInspectorViewModel: ObservableObject {
         withAnimation { objectWillChange.send() }
     }
 
+    var status: String {
+        switch task.state {
+        case .pending:
+            return _progressViewModel.title.capitalized
+        case .success:
+            return StatusCodeFormatter.string(for: Int(task.statusCode))
+        case .failure:
+            return ErrorFormatter.shortErrorDescription(for: task)
+        }
+    }
+
+    var statusImageName: String {
+        switch task.state {
+        case .pending: return "clock.fill"
+        case .success: return "checkmark.circle.fill"
+        case .failure: return "exclamationmark.octagon.fill"
+        }
+    }
+
+    var statusTintColor: Color {
+        switch task.state {
+        case .pending: return .orange
+        case .success: return .green
+        case .failure: return .red
+        }
+    }
+
     var transferViewModel: NetworkInspectorTransferInfoViewModel? {
         guard task.hasMetrics else { return nil }
         return NetworkInspectorTransferInfoViewModel(task: task, taskType: task.type ?? .dataTask)
@@ -97,7 +96,7 @@ final class NetworkInspectorViewModel: ObservableObject {
         return _progressViewModel
     }
 
-    var pin: PinButtonViewModel? {
+    var pinViewModel: PinButtonViewModel? {
         task.message.map(PinButtonViewModel.init)
     }
 

@@ -7,28 +7,6 @@ import CoreData
 import Pulse
 import Combine
 
-#warning("TODO: pass details to list items")
-#warning("TODO: network details view to show fullscreen")
-
-#warning("TODO: optimize task.responseCookies")
-#warning("TODO: isShowingCurrentRequest remember persisetneyl")
-
-#warning("TODO: show error (maybe simply in bottom seciont?")
-
-#warning("TODO: handle all destinations")
-
-#warning("TODO: move pin button to the bottom somewhere")
-
-#warning("TODO: try variation with not tabbar at all!")
-
-#warning("TODO: add context menu to URL and display query items")
-
-
-#warning("TODO: JWT where?")
-#warning("TODO: rework for other platfrms too")
-
-#warning("TODO: context actions for each cell")
-
 struct NetworkInspectorView: View {
 #if os(watchOS)
     @StateObject var viewModel: NetworkInspectorViewModel
@@ -198,16 +176,16 @@ struct NetworkInspectorView: View {
         HStack(spacing: spacing) {
             if #available(iOS 14.0, *) {
                 Text(Image(systemName: viewModel.statusImageName))
-                    .foregroundColor(viewModel.tintColor)
+                    .foregroundColor(viewModel.statusTintColor)
             } else {
                 Image(systemName: viewModel.statusImageName)
-                    .foregroundColor(viewModel.tintColor)
+                    .foregroundColor(viewModel.statusTintColor)
             }
             Text(viewModel.status)
                 .lineLimit(1)
-                .foregroundColor(viewModel.tintColor)
+                .foregroundColor(viewModel.statusTintColor)
             Spacer()
-            DurationLabel(viewModel: viewModel.duration)
+            DurationLabel(viewModel: viewModel.durationViewModel)
         }.font(.headline)
 
         if viewModel.task.state == .failure, let description = viewModel.task.errorDebugDescription {
@@ -318,8 +296,8 @@ struct NetworkInspectorView: View {
     @ViewBuilder
     private var trailingNavigationBarItems: some View {
         HStack {
-            if let pin = viewModel.pin {
-                PinButton(viewModel: pin, isTextNeeded: false)
+            if let viewModel = viewModel.pinViewModel {
+                PinButton(viewModel: viewModel, isTextNeeded: false)
             }
             if #available(iOS 14.0, *) {
                 Menu(content: {
