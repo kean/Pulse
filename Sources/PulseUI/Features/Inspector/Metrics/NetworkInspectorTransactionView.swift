@@ -53,8 +53,8 @@ struct NetworkInspectorTransactionView: View {
     @ViewBuilder
     private var linkCount: some View {
         InvisibleNavigationLinks {
-            NavigationLink.programmatic(isActive: $viewModel.isOriginalRequestHeadersLinkActive, destination:  { NetworkDetailsView(viewModel: viewModel.requestHeaders) })
-            NavigationLink.programmatic(isActive: $viewModel.isResponseHeadersLinkActive, destination:  { NetworkDetailsView(viewModel: viewModel.responseHeaders) })
+            NavigationLink.programmatic(isActive: $viewModel.isOriginalRequestHeadersLinkActive, destination:  { NetworkDetailsView(title: "Request Headers", viewModel: viewModel.requestHeaders) })
+            NavigationLink.programmatic(isActive: $viewModel.isResponseHeadersLinkActive, destination:  { NetworkDetailsView(title: "Response Headers", viewModel: viewModel.responseHeaders) })
         }
     }
 }

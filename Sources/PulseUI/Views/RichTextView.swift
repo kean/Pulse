@@ -247,16 +247,18 @@ struct WrappedTextView: UIViewRepresentable {
         textView.textContainerInset = UIEdgeInsets(top: 8, left: 10, bottom: 8, right: 10)
         textView.attributedText = viewModel.text
 #if os(iOS)
-        textView.publisher(for: \.contentOffset, options: [.new])
-            .map { $0.y >= 10 }
-            .removeDuplicates()
-            .receive(on: DispatchQueue.main)
-            .sink { isScrolled in
-                withAnimation {
-                    self.isScrolled = isScrolled
+        if #unavailable(iOS 15.0) {
+            textView.publisher(for: \.contentOffset, options: [.new])
+                .map { $0.y >= 10 }
+                .removeDuplicates()
+                .receive(on: DispatchQueue.main)
+                .sink { isScrolled in
+                    withAnimation {
+                        self.isScrolled = isScrolled
+                    }
                 }
-            }
-            .store(in: &context.coordinator.cancellables)
+                .store(in: &context.coordinator.cancellables)
+        }
 #endif
         viewModel.textView = textView
         return textView

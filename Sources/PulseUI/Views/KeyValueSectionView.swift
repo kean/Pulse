@@ -284,10 +284,15 @@ struct KeyValueSectionViewModel {
     var action: ActionViewModel?
     var items: [(String, String?)] = []
 
+    #warning("TODO: remove")
     func title(_ title: String) -> KeyValueSectionViewModel {
         var copy = self
         copy.title = title
         return copy
+    }
+
+    static func empty() -> KeyValueSectionViewModel {
+        KeyValueSectionViewModel(title: "Empty", color: .secondary)
     }
 }
 

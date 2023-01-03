@@ -221,7 +221,7 @@ struct NetworkInspectorView: View {
             }
         }
 
-        NavigationLink(destination: destinationURLRequestDetails) {
+        NavigationLink(destination: destinationRequestDetails) {
             (Text(viewModel.task.httpMethod ?? "GET").bold()
              + Text(" ") + Text(viewModel.task.url ?? "–"))
                 .lineLimit(4)
@@ -248,16 +248,21 @@ struct NetworkInspectorView: View {
     
     // MARK: - Destinations
 
-    private var destinationURLRequestDetails: some View {
+    private var destinationRequestDetails: some View {
         NetworkInspectorRequestDetailsView(viewModel: viewModel.requestDetailsViewModel)
+    }
+
+    private var destinationRequestBody: some View {
+        NetworkInspectorRequestView(viewModel: NetworkInspectorRequestViewModel(task: viewModel.task))
+            .navigationBarTitle("Request Body")
     }
     
     private var destinationOriginalRequestHeaders: some View {
-        NetworkDetailsView(viewModel: viewModel.originalRequestHeadersViewModel.title("Request Headers"))
+        NetworkDetailsView(title: "Request Headers", viewModel: viewModel.originalRequestHeadersViewModel)
     }
     
     private var destinationCurrentRequestHeaders: some View {
-        NetworkDetailsView(viewModel: viewModel.currnetRequestHeadersViewModel.title("Request Headers"))
+        NetworkDetailsView(title: "Request Headers", viewModel: viewModel.currnetRequestHeadersViewModel)
     }
     
     private var destinationOriginalRequestCookies: some View {
@@ -273,14 +278,9 @@ struct NetworkInspectorView: View {
     }
 
     private var destinationResponseHeaders: some View {
-        NetworkDetailsView(viewModel: viewModel.responseHeadersViewModel)
+        NetworkDetailsView(title: "Respons Header", viewModel: viewModel.responseHeadersViewModel)
     }
-    
-    private var destinationRequestBody: some View {
-        NetworkInspectorRequestView(viewModel: NetworkInspectorRequestViewModel(task: viewModel.task))
-            .navigationBarTitle("Request Body")
-    }
-    
+
     private var destinationResponseBody: some View {
         NetworkInspectorResponseView(viewModel: NetworkInspectorResponseViewModel(task: viewModel.task))
             .navigationBarTitle("Response Body")
@@ -293,10 +293,7 @@ struct NetworkInspectorView: View {
 
     @ViewBuilder
     private var destinaitionError: some View {
-        if let viewModel = KeyValueSectionViewModel.makeErrorDetails(for: viewModel.task, action: {}) {
-            NetworkDetailsView(viewModel: viewModel)
-                .navigationBarTitle("Error")
-        }
+        NetworkDetailsView(title: "Error", viewModel: KeyValueSectionViewModel.makeErrorDetails(for: viewModel.task, action: {}) ?? .empty())
     }
 
     // MARK: - Helpers

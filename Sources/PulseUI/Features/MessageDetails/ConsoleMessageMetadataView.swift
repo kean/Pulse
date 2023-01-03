@@ -62,7 +62,7 @@ struct ConsoleMessageMetadataView: View {
     private var links: some View {
         InvisibleNavigationLinks {
             NavigationLink.programmatic(isActive: $isMetadataRawLinkActive) {
-                NetworkDetailsView(viewModel: metadataViewModel)
+                NetworkDetailsView(title: "Metadata", viewModel: metadataViewModel)
             }
         }
     }

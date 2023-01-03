@@ -24,11 +24,11 @@ struct NetworkInspectorHeadersView: View {
 
     private var links: some View {
         InvisibleNavigationLinks {
-            NavigationLink.programmatic(isActive: $viewModel.isRequestOriginalRawActive, destination:  { NetworkDetailsView(viewModel: viewModel.requestHeadersOriginal) })
-            NavigationLink.programmatic(isActive: $viewModel.isRequestCurrentRawActive, destination:  { NetworkDetailsView(viewModel: viewModel.requestHeadersCurrent) })
+            NavigationLink.programmatic(isActive: $viewModel.isRequestOriginalRawActive, destination:  { NetworkDetailsView(title: "Request Header", viewModel: viewModel.requestHeadersOriginal) })
+            NavigationLink.programmatic(isActive: $viewModel.isRequestCurrentRawActive, destination:  { NetworkDetailsView(title: "Request Headers", viewModel: viewModel.requestHeadersCurrent) })
             
             if let responseHeaders = viewModel.responseHeaders {
-                NavigationLink.programmatic(isActive: $viewModel.isResponseRawActive, destination:  { NetworkDetailsView(viewModel: responseHeaders) })
+                NavigationLink.programmatic(isActive: $viewModel.isResponseRawActive, destination:  { NetworkDetailsView(title: "Response Headers", viewModel: responseHeaders) })
             }
         }
     }

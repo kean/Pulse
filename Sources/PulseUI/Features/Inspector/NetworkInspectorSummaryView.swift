@@ -204,18 +204,22 @@ struct NetworkInspectorSummaryView: View {
         InvisibleNavigationLinks {
             if let errorModel = viewModel.errorModel {
                 NavigationLink.programmatic(isActive: $viewModel.isErrorRawLinkActive) {
-                    NetworkDetailsView(viewModel: errorModel)
+                    NetworkDetailsView(title: "Error", viewModel: errorModel)
                 }
             }
 
 #if os(iOS) || os(macOS)
             Group {
                 NavigationLink.programmatic(isActive: $viewModel.isOriginalQueryItemsLinkActive) {
-                    viewModel.originalRequestQueryItems.map(NetworkDetailsView.init)
+                    viewModel.originalRequestQueryItems.map {
+                        NetworkDetailsView(title: "Query Items", viewModel: $0)
+                    }
                 }
                 
                 NavigationLink.programmatic(isActive: $viewModel.isCurrentQueryItemsLinkActive) {
-                    viewModel.currentRequestQueryItems.map(NetworkDetailsView.init)
+                    viewModel.currentRequestQueryItems.map {
+                        NetworkDetailsView(title: "Query Items", viewModel: $0)
+                    }
                 }
             }
 #endif
@@ -231,19 +235,16 @@ struct NetworkInspectorSummaryView: View {
             })
             
             NavigationLink.programmatic(isActive: $viewModel.isOriginalRequestHeadersLinkActive) {
-                NetworkDetailsView(viewModel: viewModel.originalRequestHeaders)
-                    .title("Request Headers")
+                NetworkDetailsView(title: "Request Headers", viewModel: viewModel.originalRequestHeaders)
             }
             
             NavigationLink.programmatic(isActive: $viewModel.isCurrentRequestHeadersLinkActive) {
-                NetworkDetailsView(viewModel: viewModel.currentRequestHeaders)
-                    .title("Request Headers")
+                NetworkDetailsView(title: "Request Headers", viewModel: viewModel.currentRequestHeaders)
             }
             
             if let responesHeaders = viewModel.responseHeaders {
                 NavigationLink.programmatic(isActive: $viewModel.isResponseHeadearsRawLinkActive) {
-                    NetworkDetailsView(viewModel: responesHeaders)
-                        .title("Response Headers")
+                    NetworkDetailsView(title: "Response Headers", viewModel: responesHeaders)
                 }
             }
         }

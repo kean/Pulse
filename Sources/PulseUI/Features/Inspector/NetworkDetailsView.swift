@@ -11,20 +11,14 @@ struct NetworkDetailsView: View {
     private var title: String
     @State private var isShowingShareSheet = false
 
-    init(viewModel: KeyValueSectionViewModel) {
-        self.title = viewModel.title
-        self.viewModel = NetworkDetailsViewModel { viewModel.asAttributedString() }
+    init(title: String, viewModel: @autoclosure @escaping () -> KeyValueSectionViewModel) {
+        self.title = title
+        self.viewModel = NetworkDetailsViewModel { viewModel().asAttributedString() }
     }
 
     init(title: String, text: @autoclosure @escaping () -> NSAttributedString) {
         self.title = title
         self.viewModel = NetworkDetailsViewModel(text)
-    }
-
-    func title(_ title: String) -> NetworkDetailsView {
-        var copy = self
-        copy.title = title
-        return copy
     }
 
     #if os(iOS)
