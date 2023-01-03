@@ -55,10 +55,10 @@ final class NetworkDetailsViewModel {
 struct NetworkDetailsView_Previews: PreviewProvider {
     static var previews: some View {
 #if !os(watchOS)
-        NavigationView {
-            NetworkDetailsView(title: "JWT", text: KeyValueSectionViewModel.makeDetails(for: jwt))
-        }
-                .previewDisplayName("JWT")
+            NavigationView {
+                NetworkDetailsView(title: "JWT", text: KeyValueSectionViewModel.makeDetails(for: jwt))
+            }
+            .previewDisplayName("JWT")
 #endif
     }
 }

@@ -11,12 +11,25 @@ struct RichTextView: View {
     let viewModel: RichTextViewModel
 
     var body: some View {
-        Text(viewModel.text)
+        ScrollView {
+            if #available(watchOS 8.0, *), let string = viewModel.attributedString {
+                Text(string)
+            } else {
+                Text(viewModel.text)
+            }
+        }
     }
 }
 
 final class RichTextViewModel: ObservableObject {
     let text: String
+
+    @available(watchOS 8.0, *)
+    var attributedString: AttributedString? {
+        _attributedString as? AttributedString
+    }
+
+    private var _attributedString: Any?
 
     var isEmpty: Bool { text.isEmpty }
 
@@ -25,6 +38,9 @@ final class RichTextViewModel: ObservableObject {
     }
 
     init(string: NSAttributedString) {
+        if #available(watchOS 8.0, *) {
+            self._attributedString = try? AttributedString(string, including: \.uiKit)
+        }
         self.text = string.string
     }
 
