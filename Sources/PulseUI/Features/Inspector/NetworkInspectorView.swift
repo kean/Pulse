@@ -7,7 +7,6 @@ import CoreData
 import Pulse
 import Combine
 
-#warning("TODO: cookies nicely colored + display count somwhere?")
 #warning("TODO: are destinations lazy?")
 #warning("TODO: rework trailing navigaiton bar buttons (fix sharing)")
 #warning("TODO: pass details to list items")

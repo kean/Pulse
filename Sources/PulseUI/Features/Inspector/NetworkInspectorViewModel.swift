@@ -189,10 +189,18 @@ private func makeAttributedString(for cookies: [HTTPCookie], color: Color) -> NS
     guard !cookies.isEmpty else {
         return NSAttributedString(string: "Empty")
     }
+    var colorIndex = 0
+    let colors: [Color] = [.blue, .purple, .orange, .red, .indigo, .green]
+
     let sections = cookies
         .sorted(by:  { $0.name.caseInsensitiveCompare($1.name) == .orderedAscending })
         .map {
-            KeyValueSectionViewModel.makeDetails(for: $0, color: color)
+            let section = KeyValueSectionViewModel.makeDetails(for: $0, color: colors[colorIndex])
+            colorIndex += 1
+            if colorIndex == colors.endIndex {
+                colorIndex = 0
+            }
+            return section
         }
     let text = NSMutableAttributedString()
     for (index, section) in sections.enumerated() {
