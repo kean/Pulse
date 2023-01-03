@@ -96,9 +96,9 @@ struct NetworkInspectorView: View {
                     icon: "doc.plaintext",
                     tintColor: .secondary,
                     title: "Request Headers",
-                    details: stringFromCount(viewModel.task.originalRequest?.headers.count)
+                    details: stringFromCount(viewModel.originalRequestHeaders.count)
                 )
-            }.disabled((viewModel.task.originalRequest?.headers.count ?? 0) == 0)
+            }.disabled(viewModel.originalRequestHeaders.isEmpty)
             NavigationLink(destination: destinationOriginalRequestCookies) {
                 MenuItem(
                     icon: "lock",
@@ -113,9 +113,9 @@ struct NetworkInspectorView: View {
                     icon: "doc.plaintext",
                     tintColor: .secondary,
                     title: "Request Headers",
-                    details: stringFromCount(viewModel.task.currentRequest?.headers.count)
+                    details: stringFromCount(viewModel.currentRequestHeaders.count)
                 )
-            }.disabled((viewModel.task.currentRequest?.headers.count ?? 0) == 0)
+            }.disabled(viewModel.currentRequestHeaders.isEmpty)
             NavigationLink(destination: destinationCurrentRequestCookies) {
                 MenuItem(
                     icon: "lock",
@@ -152,9 +152,9 @@ struct NetworkInspectorView: View {
                 icon: "doc.plaintext",
                 tintColor: .secondary,
                 title: "Response Headers",
-                details: stringFromCount(viewModel.task.response?.headers.count)
+                details: stringFromCount(viewModel.responseHeaders.count)
             )
-        }.disabled((viewModel.task.response?.headers.count ?? 0) == 0)
+        }.disabled(viewModel.responseHeaders.isEmpty)
         NavigationLink(destination: destinationResponseCookies) {
             MenuItem(
                 icon: "lock",
@@ -246,7 +246,7 @@ struct NetworkInspectorView: View {
     // MARK: - Destinations
 
     private var destinationRequestDetails: some View {
-        NetworkInspectorRequestDetailsView(viewModel: viewModel.requestDetailsViewModel)
+        NetworkInspectorRequestDetailsView(viewModel: .init(task: viewModel.task))
     }
 
     private var destinationRequestBody: some View {
@@ -259,7 +259,7 @@ struct NetworkInspectorView: View {
     }
     
     private var destinationCurrentRequestHeaders: some View {
-        NetworkDetailsView(title: "Request Headers", viewModel: viewModel.currnetRequestHeadersViewModel)
+        NetworkDetailsView(title: "Request Headers", viewModel: viewModel.currentRequestHeadersViewModel)
     }
     
     private var destinationOriginalRequestCookies: some View {

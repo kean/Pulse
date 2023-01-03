@@ -7,10 +7,7 @@ import CoreData
 import Pulse
 import Combine
 
-#warning("TODO: creat ViewModel that are needed only")
-#warning("TODO: populate items from there")
 #warning("TODO: refactor")
-#warning("TODO: use LazyReset")
 
 #if os(iOS)
 
@@ -60,8 +57,11 @@ final class NetworkInspectorViewModel: ObservableObject {
 
     let duration: DurationViewModel
 
+    @LazyReset var originalRequestHeaders: [String: String]
     @LazyReset var originalRequestCookies: [HTTPCookie]
+    @LazyReset var currentRequestHeaders: [String: String]
     @LazyReset var currentRequestCookies: [HTTPCookie]
+    @LazyReset var responseHeaders: [String: String]
     @LazyReset var responseCookies: [HTTPCookie]
 
     private var cancellable: AnyCancellable?
@@ -70,8 +70,11 @@ final class NetworkInspectorViewModel: ObservableObject {
         self.task = task
         self.duration = DurationViewModel(task: task)
 
+        _originalRequestHeaders = LazyReset { task.originalRequest?.headers ?? [:] }
         _originalRequestCookies = LazyReset { task.originalRequest?.cookies ?? [] }
+        _currentRequestHeaders = LazyReset { task.originalRequest?.headers ?? [:] }
         _currentRequestCookies = LazyReset { task.currentRequest?.cookies ?? [] }
+        _responseHeaders = LazyReset { task.response?.headers ?? [:] }
         _responseCookies = LazyReset { task.responseCookies }
 
         if let url = task.url.flatMap(URL.init(string:)) {
@@ -84,8 +87,11 @@ final class NetworkInspectorViewModel: ObservableObject {
     }
 
     private func refresh() {
+        _originalRequestHeaders.reset()
         _originalRequestCookies.reset()
+        _currentRequestHeaders.reset()
         _currentRequestCookies.reset()
+        _responseHeaders.reset()
         _responseCookies.reset()
 
         withAnimation { objectWillChange.send() }
@@ -110,31 +116,27 @@ final class NetworkInspectorViewModel: ObservableObject {
     }
 
     var originalRequestHeadersViewModel: KeyValueSectionViewModel {
-        KeyValueSectionViewModel.makeRequestHeaders(for: task.originalRequest?.headers ?? [:]) {}
+        KeyValueSectionViewModel.makeRequestHeaders(for: originalRequestHeaders) {}
     }
 
-    var currnetRequestHeadersViewModel: KeyValueSectionViewModel {
-        KeyValueSectionViewModel.makeRequestHeaders(for: task.currentRequest?.headers ?? [:]) {}
-    }
-
-    var requestDetailsViewModel: NetworkInspectorRequestDetailsViewModel {
-        NetworkInspectorRequestDetailsViewModel(task: task)
+    var currentRequestHeadersViewModel: KeyValueSectionViewModel {
+        KeyValueSectionViewModel.makeRequestHeaders(for: currentRequestHeaders) {}
     }
 
     var originalRequestCookiesString: NSAttributedString {
-        makeAttributedString(for: task.originalRequest?.cookies ?? [], color: .blue)
+        makeAttributedString(for: originalRequestCookies, color: .blue)
     }
 
     var currentRequestCookiesString: NSAttributedString {
-        makeAttributedString(for: task.currentRequest?.cookies ?? [], color: .blue)
+        makeAttributedString(for: currentRequestCookies, color: .blue)
     }
 
     var responseHeadersViewModel: KeyValueSectionViewModel {
-        KeyValueSectionViewModel.makeResponseHeaders(for: task.currentRequest?.headers ?? [:], action: {})
+        KeyValueSectionViewModel.makeResponseHeaders(for: responseHeaders, action: {})
     }
 
     var responseCookiesString: NSAttributedString {
-        makeAttributedString(for: task.responseCookies, color: .indigo)
+        makeAttributedString(for: responseCookies, color: .indigo)
     }
 }
 
