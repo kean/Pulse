@@ -5,22 +5,7 @@
 import SwiftUI
 import Pulse
 
-#if os(iOS)
-// TODO: Remove this code workaround (control over RichTextView reloads is completely lost)
-struct FileViewer: UIViewControllerRepresentable {
-    let viewModel: FileViewerViewModel
-
-    func makeUIViewController(context: Context) -> UIHostingController<_FileViewer> {
-        UIHostingController(rootView: _FileViewer(viewModel: viewModel))
-    }
-
-    func updateUIViewController(_ uiViewController: UIHostingController<_FileViewer>, context: Context) {}
-}
-#else
-typealias FileViewer = _FileViewer
-#endif
-
-struct _FileViewer: View {
+struct FileViewer: View {
     @ObservedObject var viewModel: FileViewerViewModel
     @State var isWebViewOpen = false
 
