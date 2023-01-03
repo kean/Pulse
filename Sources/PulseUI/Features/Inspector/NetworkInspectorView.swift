@@ -31,6 +31,8 @@ import Combine
 
 #warning("TODO: fix hardcoded URLSessionDownloadTask")
 
+#warning("TODO: move pin button to the bottom somewhere")
+
 struct NetworkInspectorView: View {
 #if os(watchOS)
     @StateObject var viewModel: NetworkInspectorViewModel
@@ -38,17 +40,17 @@ struct NetworkInspectorView: View {
     let viewModel: NetworkInspectorViewModel
 #endif
     var onClose: (() -> Void)?
-
+    
 #if os(macOS)
     @State private var selectedTab: NetworkInspectorTab = .response
 #endif
-
+    
 #if os(iOS) || os(macOS)
     @State private var shareItems: ShareItems?
 #endif
-
+    
     @State private var isShowingCurrentRequest = false
-
+    
 #if os(iOS)
     var body: some View {
         contents
@@ -57,7 +59,7 @@ struct NetworkInspectorView: View {
             .navigationBarTitle(Text(viewModel.title), displayMode: .inline)
             .sheet(item: $shareItems, content: ShareView.init)
     }
-
+    
     @ViewBuilder
     var contents: some View {
         Form {
@@ -66,11 +68,11 @@ struct NetworkInspectorView: View {
             }
             .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
             .listRowBackground(Color.clear)
-
+            
             // TODO: pass action task and satus
             Section(footer: Text("URLSessionDownloadTask · 427ms · Network")) {
                 HStack(spacing: spacing) {
-
+                    
                     Text(viewModel.task.httpMethod ?? "GET")
                         .foregroundColor(viewModel.tintColor)
                     // TODO: pass status code
@@ -80,7 +82,7 @@ struct NetworkInspectorView: View {
                     Image(systemName: viewModel.statusImageName)
                         .foregroundColor(viewModel.tintColor)
                 }.font(.headline)
-
+                
                 // TODO: handle desctination
                 // TODO: display query items there?
                 NavigationLink(destination: EmptyView()) {
@@ -89,7 +91,7 @@ struct NetworkInspectorView: View {
                         .font(.callout)
                 }
             }
-
+            
             Section(header: requestTypePickerView) {
                 if !isShowingCurrentRequest {
                     NavigationLink(destination: destinationOriginalRequestHeaders) {
@@ -99,7 +101,7 @@ struct NetworkInspectorView: View {
                             title: "Request Headers",
                             details: String(viewModel.task.originalRequest?.headers.count ?? 0)
                         )
-                    }
+                    }.disabled((viewModel.task.originalRequest?.headers.count ?? 0) == 0)
                     NavigationLink(destination: EmptyView()) {
                         MenuItem(
                             icon: "arrow.down.square.fill",
@@ -107,7 +109,7 @@ struct NetworkInspectorView: View {
                             title: "Request Cookies",
                             details: String(viewModel.task.originalRequest?.cookies.count ?? 0)
                         )
-                    }
+                    }.disabled((viewModel.task.originalRequest?.cookies.count ?? 0) == 0)
                 } else {
                     NavigationLink(destination: destinationOriginalRequestHeaders) {
                         MenuItem(
@@ -116,7 +118,7 @@ struct NetworkInspectorView: View {
                             title: "Request Headers",
                             details: String(viewModel.task.currentRequest?.headers.count ?? 0)
                         )
-                    }
+                    }.disabled((viewModel.task.currentRequest?.headers.count ?? 0) == 0)
                     NavigationLink(destination: EmptyView()) {
                         MenuItem(
                             icon: "arrow.down.square.fill",
@@ -124,7 +126,7 @@ struct NetworkInspectorView: View {
                             title: "Request Cookies",
                             details: String(viewModel.task.currentRequest?.cookies.count ?? 0)
                         )
-                    }
+                    }.disabled((viewModel.task.currentRequest?.cookies.count ?? 0) == 0)
                 }
                 NavigationLink(destination: destinationRequestBody) {
                     MenuItem(
@@ -133,7 +135,7 @@ struct NetworkInspectorView: View {
                         title: "Request Body",
                         details: ByteCountFormatter.string(fromByteCount: viewModel.task.requestBodySize)
                     )
-                }
+                }.disabled(viewModel.task.requestBodySize == 0)
             }
             Section {
                 NavigationLink(destination: destinationResponseBody) {
@@ -143,7 +145,7 @@ struct NetworkInspectorView: View {
                         title: "Response Body",
                         details: ByteCountFormatter.string(fromByteCount: viewModel.task.responseBodySize)
                     )
-                }
+                }.disabled(viewModel.task.responseBodySize == 0)
                 NavigationLink(destination: EmptyView()) {
                     MenuItem(
                         icon: "arrow.down.square.fill",
@@ -151,7 +153,7 @@ struct NetworkInspectorView: View {
                         title: "Response Headers",
                         details: String(viewModel.task.response?.headers.count ?? 0)
                     )
-                }
+                }.disabled((viewModel.task.response?.headers.count ?? 0) == 0)
                 NavigationLink(destination: EmptyView()) {
                     MenuItem(
                         icon: "arrow.down.square.fill",
@@ -159,7 +161,7 @@ struct NetworkInspectorView: View {
                         title: "Response Cookies",
                         details: String(viewModel.task.responseCookies.count)
                     )
-                }
+                }.disabled(viewModel.task.responseCookies.count == 0)
             }
             Section {
                 NavigationLink(destination: destinationMetrics) {
@@ -169,19 +171,19 @@ struct NetworkInspectorView: View {
                         title: "Metrics",
                         details: String(viewModel.task.transactions.count)
                     )
-                }
+                }.disabled(!viewModel.task.hasMetrics)
             }
         }
     }
-
+    
     // MARK: - Subviews
-
+    
     @ViewBuilder
     private var requestTypePickerView: some View {
         HStack {
             Text("Request Type")
             Spacer()
-
+            
             Picker("Request Type", selection: $isShowingCurrentRequest) {
                 Text("Original").tag(false)
                 Text("Current").tag(true)
@@ -192,7 +194,7 @@ struct NetworkInspectorView: View {
             .padding(.bottom, 3)
         }
     }
-
+    
     @ViewBuilder
     private var headerView: some View {
         if let transfer = viewModel.transferViewModel {
@@ -206,41 +208,41 @@ struct NetworkInspectorView: View {
             }
         }
     }
-
+    
     // MARK: - Destinations
-
+    
     private var destinationOriginalRequestHeaders: some View {
         NetworkDetailsView(viewModel: viewModel.originalRequestHeadersViewModel.title("HTTP Headers"))
     }
-
+    
     private var destinationCurrentRequestHeaders: some View {
         NetworkDetailsView(viewModel: viewModel.currenetRequestHeadersViewModel.title("HTTP Headers"))
     }
-
+    
     private var destinationRequestCokies: some View {
         EmptyView()
     }
-
+    
     private var destinationRequestBody: some View {
         NetworkInspectorRequestView(viewModel: NetworkInspectorRequestViewModel(task: viewModel.task))
     }
-
+    
     private var destinationResponseBody: some View {
         NetworkInspectorResponseView(viewModel: NetworkInspectorResponseViewModel(task: viewModel.task))
     }
-
+    
     private var destinationMetrics: some View {
         NetworkInspectorMetricsTabView(viewModel: NetworkInspectorMetricsTabViewModel(task: viewModel.task))
     }
-
+    
     // MARK: - Helpers
-
+    
     private struct MenuItem: View {
         let icon: String
         let tintColor: Color
         let title: String
         let details: String
-
+        
         var body: some View {
             HStack {
                 Image(systemName: icon)
@@ -253,7 +255,7 @@ struct NetworkInspectorView: View {
             }
         }
     }
-
+    
     @ViewBuilder
     private var trailingNavigationBarItems: some View {
         HStack {
@@ -280,7 +282,7 @@ struct NetworkInspectorView: View {
             selectedTabView
         }
     }
-
+    
     private var toolbar: some View {
         VStack(spacing: 0) {
             HStack {
@@ -304,9 +306,9 @@ struct NetworkInspectorView: View {
 #endif
     }
 #endif
-
+    
 #warning("TODO: move to -macOS")
-
+    
 #if os(macOS)
     @ViewBuilder
     private var selectedTabView: some View {
@@ -333,9 +335,9 @@ private enum NetworkInspectorTab: Identifiable {
     case request
     case response
     case metrics
-
+    
     var id: NetworkInspectorTab { self }
-
+    
     var text: String {
         switch self {
         case .summary: return "Summary"
@@ -349,7 +351,7 @@ private enum NetworkInspectorTab: Identifiable {
 
 private struct NetworkTabPickerView: View {
     @Binding var selectedTab: NetworkInspectorTab
-
+    
     var body: some View {
         HStack(spacing: 0) {
             HStack {
@@ -368,7 +370,7 @@ private struct NetworkTabPickerView: View {
             }
         }.fixedSize()
     }
-
+    
     private func makeItem(_ title: String, tab: NetworkInspectorTab) -> some View {
         Button(action: { selectedTab = tab }) {
             Text(title)
