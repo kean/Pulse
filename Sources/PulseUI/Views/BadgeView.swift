@@ -4,8 +4,7 @@
 
 import SwiftUI
 
-#warning("TODO: remove")
-
+@available(*, deprecated, message: "Deprecated")
 struct BadgeView: View {
     let viewModel: BadgeViewModel
 

@@ -4,10 +4,9 @@
 
 import SwiftUI
 
-#warning("TODO: remove")
-
 #if os(iOS) || os(macOS) || os(tvOS)
 
+@available(*, deprecated, message: "Deprecated")
 struct KeyValueGridView: View {
 #if os(iOS)
     @Environment(\.horizontalSizeClass) var sizeClass: UserInterfaceSizeClass?

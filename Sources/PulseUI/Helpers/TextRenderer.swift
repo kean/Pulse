@@ -25,6 +25,8 @@ final class TextRenderer {
         var isBodySyntaxHighlightingEnabled = true
         var isBodyExpanded = false
         var bodyCollapseLimit = 20
+
+        @available(*, deprecated, message: "Deprecated")
         var fontSize: CGFloat = 15
     }
 
@@ -50,14 +52,12 @@ final class TextRenderer {
         }
     }
 
-#warning("TODO: remove")
     @available(*, deprecated, message: "Deprecated")
     func render(_ entities: [NetworkTaskEntity], options: Options = .init()) -> NSAttributedString {
         prepare(options: options)
         return joined(entities.map(render))
     }
     
-#warning("TODO: remove")
     @available(*, deprecated, message: "Deprecated")
     func render(_ entities: [LoggerMessageEntity], options: Options = .init()) -> NSAttributedString {
         prepare(options: options)
@@ -250,7 +250,6 @@ final class TextRenderer {
         }
     }
 
-    #warning("TODO: remove")
     @available(*, deprecated, message: "Deprecated")
     private func decodeQueryParameters(form string: String) -> KeyValueSectionViewModel? {
         let string = "https://placeholder.com/path?" + string
@@ -431,7 +430,7 @@ private func fontSize(for style: UXFont.TextStyle) -> CGFloat {
     UXFont.preferredFont(forTextStyle: style).fontDescriptor.pointSize
 }
 
-#warning("TODO: remove")
+@available(*, deprecated, message: "Deprecated")
 private func geLineHeight(for fontSize: Int) -> CGFloat {
     CGFloat(fontSize + 6)
 }
@@ -468,7 +467,6 @@ struct RenteredNetworkContent: OptionSet {
     ]
 }
 
-#warning("TODO: remove")
 @available(*, deprecated, message: "Deprecated")
 enum FontSize {
     static var body: CGFloat {

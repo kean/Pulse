@@ -96,7 +96,6 @@ final class FileViewerViewModel: ObservableObject {
         return nil
     }
 
-#warning("TODO: remove")
     @available(*, deprecated, message: "Deprecated")
     private func decodeQueryParameters(form string: String) -> KeyValueSectionViewModel? {
         let string = "https://placeholder.com/path?" + string
@@ -109,6 +108,7 @@ final class FileViewerViewModel: ObservableObject {
     }
 }
 
+@available(*, deprecated, message: "Deprecated")
 private extension Data {
     var localizedSize: String {
         ByteCountFormatter.string(fromByteCount: Int64(count))

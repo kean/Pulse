@@ -7,7 +7,6 @@ import Foundation
 
 #if os(iOS) || os(macOS)
 
-#warning("TODO: remove")
 @available(*, deprecated, message: "Deprecated")
 enum Render {
     static func asPlainText(task: NetworkTaskEntity) -> String {
