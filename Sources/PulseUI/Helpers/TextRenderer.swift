@@ -13,7 +13,7 @@ import CoreData
 import SwiftUI
 import Pulse
 
-#if !os(watchOS)
+#if os(iOS)
 import PDFKit
 #endif
 
@@ -104,6 +104,7 @@ final class TextRenderer {
         defer { index += 1 }
 
 #warning("TODO: refactor remainig")
+#warning("TODO: fix fonts on other platforms, e.g. URL on tvOS")
 
         let text = NSMutableAttributedString()
 
@@ -319,7 +320,7 @@ final class TextRenderer {
 #warning("TODO: imporve and enable sharing (in diff parts of the app) + check printing + monochrome always")
 #warning("TODO: check if we can render as a single page if that even makes sense")
     /// Renderes the given attributed string as PDF
-#if canImport(UIKit)
+#if os(iOS)
     static func pdf(from string: NSAttributedString) throws -> Data {
         let formatter = UISimpleTextPrintFormatter(attributedText: string)
         let renderer = UIPrintPageRenderer()
@@ -512,7 +513,7 @@ struct ConsoleTextRenderer_Previews: PreviewProvider {
                 .previewDisplayName("HTML")
 #endif
 
-#if !os(watchOS) && !os(macOS)
+#if os(iOS)
             PDFKitRepresentedView(document: PDFDocument(data: try! TextRenderer.pdf(from: string))!)
                 .previewDisplayName("PDF")
 #endif

@@ -10,11 +10,11 @@ import Combine
 #if os(tvOS)
 
 public struct MainView: View {
-    @StateObject private var viewModel: MainViewModel
+    @ObservedObject private var viewModel: MainViewModel // TODO: replace with StateObject
 
     /// - parameter onDismiss: pass onDismiss to add a close button.
     public init(store: LoggerStore = .shared) {
-        _viewModel = StateObject(wrappedValue: MainViewModel(store: store, onDismiss: nil))
+        viewModel = MainViewModel(store: store, onDismiss: nil)
     }
 
     public var body: some View {

@@ -6,7 +6,7 @@ let package = Package(
     name: "Pulse",
     platforms: [
         .iOS(.v13),
-        .tvOS(.v14),
+        .tvOS(.v13),
         .macOS(.v11),
         .watchOS(.v7)
     ],
