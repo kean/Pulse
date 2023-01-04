@@ -4,7 +4,7 @@
 
 import SwiftUI
 
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(macOS) || os(tvOS)
 
 struct KeyValueGridView: View {
 #if os(iOS)

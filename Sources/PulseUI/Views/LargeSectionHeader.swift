@@ -4,9 +4,8 @@
 
 import SwiftUI
 
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(macOS) || os(tvOS)
 
-#warning("TODO: remove LargeSectionHeader")
 struct LargeSectionHeader<Accessory: View>: View {
     let title: String
     var accessory: (() -> Accessory)?

@@ -7,7 +7,7 @@ import Pulse
 
 #warning("TODO: fix this on macOs")
 
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(macOS) || os(tvOS)
 
 // MARK: - View
 
@@ -45,6 +45,18 @@ struct NetworkInspectorTransactionsListView: View {
     struct ItemView: View {
         let item: NetworkInspectorTransactionsListViewModel.Item
 
+#if os(tvOS)
+        var body: some View {
+            HStack {
+                Text(item.title)
+                Spacer()
+                if let details = item.details {
+                    Text(details)
+                        .foregroundColor(.secondary)
+                }
+            }
+        }
+#else
         var body: some View {
             HStack {
                 Text(item.title)
@@ -59,10 +71,11 @@ struct NetworkInspectorTransactionsListView: View {
                 Spacer()
             }
         }
+#endif
     }
 
     private func destination(for item: NetworkInspectorTransactionsListViewModel.Item) -> some View {
-#if os(iOS)
+#if os(iOS) || os(tvOS)
         NetworkInspectorTransactionView(viewModel: item.viewModel())
             .navigationBarTitle(item.title)
 #else

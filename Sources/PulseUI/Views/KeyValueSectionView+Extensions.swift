@@ -170,7 +170,7 @@ extension KeyValueSectionViewModel {
     }
 #endif
 
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(macOS) || os(tvOS)
     static func makeTiming(for transaction: NetworkTransactionMetricsEntity) -> KeyValueSectionViewModel {
         let timeFormatter = DateFormatter()
         timeFormatter.locale = Locale(identifier: "en_US")

@@ -8,6 +8,8 @@ import Pulse
 import Combine
 
 #warning("TODO: remove onClose")
+#warning("TODO: tvOS enable scroll on left side")
+#warning("TODO: tvOS fix transaction details UI")
 
 #if os(iOS) || os(watchOS) || os(tvOS)
 
@@ -211,7 +213,7 @@ struct NetworkInspectorView: View {
         }.disabled(viewModel.responseCookies.isEmpty)
     }
 
-#if !os(watchOS)
+#if os(iOS)
     @ViewBuilder
     private var sectionMetrics: some View {
         NavigationLink(destination: destinationMetrics) {
@@ -222,6 +224,11 @@ struct NetworkInspectorView: View {
                 details: stringFromCount(viewModel.task.transactions.count)
             )
         }.disabled(!viewModel.task.hasMetrics)
+    }
+#elseif os(tvOS)
+    @ViewBuilder
+    private var sectionMetrics: some View {
+        NetworkInspectorTransactionsListView(viewModel: .init(task: viewModel.task))
     }
 #endif
 
@@ -379,8 +386,7 @@ struct NetworkInspectorView: View {
             HStack {
                 Text(title)
                 Spacer()
-                Text(details)
-                    .foregroundColor(.secondary)
+                Text(details).foregroundColor(.secondary)
             }
 #else
             HStack {
