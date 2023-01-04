@@ -7,14 +7,15 @@
 #warning("TODO: remove FontSize setting from ConsoleTextView for now")
 #warning("TODO: do other styles work?")
 
-#if !os(watchOS)
-
 import Foundation
 import Pulse
 import CoreData
 import SwiftUI
 import Pulse
+
+#if !os(watchOS)
 import PDFKit
+#endif
 
 /// Renders console messages as attributed strings.
 final class TextRenderer {
@@ -25,12 +26,16 @@ final class TextRenderer {
         var isBodyExpanded = false
         var bodyCollapseLimit = 20
         var fontSize: CGFloat = 15
-        var isHTMLSafeFonts = false
     }
 
-    private var options: Options = .init()
-    private var helpers = TextHelpers(options: .init())
+    private var options: Options
+    private var helpers: TextHelpers
     private var index = 0
+
+    init(options: Options = .init()) {
+        self.options = options
+        self.helpers = TextHelpers(options: options)
+    }
 
     #warning("TODO: remove options parameter & move expanded to Console (or options?)")
     var expanded: Set<Int> = []
@@ -273,6 +278,7 @@ final class TextRenderer {
 
     // MARK: - Convert to HTML/PDF
 
+#warning("TODO: add author, date, and other meta attributes + link to Pulse (?)")
     static func html(from string: NSAttributedString) throws -> Data {
         let range = NSRange(location: 0, length: string.length)
         let data = try string.data(from: range, documentAttributes: [
@@ -447,13 +453,15 @@ enum FontSize {
 
 // MARK: - Previews
 
+#warning("TODO: enable previews on other platforms")
+
 #if DEBUG
 struct ConsoleTextRenderer_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             let renderer = TextRenderer()
             let string = renderer.render([task], options: .init(networkContent: [.all]))
-            let safeString = renderer.render([task], options: .init(networkContent: [.all], isHTMLSafeFonts: true))
+            let safeString = renderer.render([task], options: .init(networkContent: [.all]))
             let html = try! TextRenderer.html(from: safeString)
             let pdf = try! TextRenderer.pdf(from: safeString)
 
@@ -467,11 +475,15 @@ struct ConsoleTextRenderer_Previews: PreviewProvider {
                 .previewLayout(.fixed(width: 1160, height: 2000)) // Disable interaction to view it
                 .previewDisplayName("HTML (Raw)")
 
+#if os(iOS) || os(macOS)
             WebView(data: html, contentType: "application/html")
                 .previewDisplayName("HTML")
+#endif
 
+#if !os(watchOS)
             PDFKitRepresentedView(document: PDFDocument(data: pdf)!)
                 .previewDisplayName("PDF")
+#endif
         }
     }
 }
@@ -479,4 +491,75 @@ struct ConsoleTextRenderer_Previews: PreviewProvider {
 private let task = LoggerStore.preview.entity(for: .login)
 #endif
 
-#endif
+#warning("TODO: remove this when we are done with HTML output")
+
+private let style = """
+<style>
+  body {
+    font: 400 16px/1.55 -apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Icons","Helvetica Neue",Helvetica,Arial,sans-serif;
+    background-color: #FDFDFD;
+    color: #353535;
+  }
+  pre {
+    font-family: 'SF Mono', Menlo, monospace, Courier, Consolas, "Liberation Mono", monospace;
+    font-size: 14px;
+    overflow-x: auto;
+  }
+  h2 {
+    margin-top: 30px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #DDDDDD;
+    font-weight: 600;
+    font-size: 34px;
+  }
+  ul {
+    list-style: none;
+    padding-left: 0;
+  }
+  li {
+    overflow-wrap: break-word;
+  }
+  strong {
+    font-weight: 600;
+    color: #737373;
+  }
+  main {
+    max-width: 900px;
+    padding: 15px;
+  }
+  pre {
+    padding: 8px;
+    border-radius: 8px;
+    background-color: #FDFDFD;
+  }
+  a {
+    color: #0066FF;
+  }
+  .s { color: rgb(255, 45, 85); }
+  .o { color: rgb(0, 122, 255); }
+  .n { color: rgb(191, 90, 242); }
+  .err { background-color: red; }
+  @media (prefers-color-scheme: dark) {
+    body {
+      background-color: #211F1E;
+      color: #DFDFDF;
+    }
+    strong {
+      color: #878787;
+    }
+    h2 {
+      border-bottom: 2px solid #3C3A38;
+    }
+    pre {
+      background-color: #2C2A28;
+    }
+    a {
+      color: #67A6F8;
+    }
+    .s { color: rgb(255, 55, 95); }
+    .o { color: rgb(10, 132, 255); }
+    .n { color: rgb(175, 82, 222); }
+  }
+}
+</style>
+"""

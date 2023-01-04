@@ -18,6 +18,7 @@ import Combine
 #warning("TODO: tvOS fix transaction details UI")
 #warning("TODO: rewrite TransactionsDeatilsView without KeyValueView")
 #warning("TODO: macos show response body automatically when task finished loading")
+#warning("TODO: add sharing on watchOS")
 
 struct NetworkInspectorView: View {
 #if os(watchOS)
@@ -108,7 +109,7 @@ struct NetworkInspectorView: View {
                 viewModel.statusSectionViewModel.map(NetworkRequestStatusSectionView.init)
             }
             Section {
-                requestTypePickerView
+                requestTypePicker
                 sectionRequest
             }
             if viewModel.task.state != .pending {
