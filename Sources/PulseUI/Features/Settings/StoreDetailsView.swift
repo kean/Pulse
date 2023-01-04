@@ -26,6 +26,9 @@ public struct StoreDetailsView: View {
 
     public var body: some View {
         Contents(viewModel: viewModel)
+#if os(tvOS)
+            .frame(maxWidth: 860)
+#endif
             .onAppear { viewModel.load(from: source) }
 #if os(iOS)
             .navigationBarTitle("Store Details", displayMode: .inline)
