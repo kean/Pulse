@@ -32,6 +32,8 @@ private func getClass(for element: JSONElement) -> String {
     }
 }
 
+#warning("TODO: move to TextRenderer")
+@available(*, deprecated, message: "Deprecated")
 final class JSONPrinter {
     private let renderer: JSONRenderer
     private var indentation = 0

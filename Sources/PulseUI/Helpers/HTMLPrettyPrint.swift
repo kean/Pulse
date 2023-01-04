@@ -10,6 +10,8 @@ import AppKit
 import UIKit
 #endif
 
+#warning("TODO: move to TextRenderer")
+@available(*, deprecated, message: "Deprecated")
 final class HTMLPrettyPrint {
     private let string: String
     private let fontSize: CGFloat
