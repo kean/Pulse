@@ -21,16 +21,10 @@ struct NetworkDetailsView: View {
         self.viewModel = NetworkDetailsViewModel(text)
     }
 
-    #if os(iOS)
     var body: some View {
         contents
             .navigationBarTitle(title)
     }
-    #else
-    var body: some View {
-        contents
-    }
-    #endif
 
     @ViewBuilder
     private var contents: some View {
