@@ -495,7 +495,6 @@ struct ConsoleTextRenderer_Previews: PreviewProvider {
             let string = TextRenderer(options: .init(networkContent: [.all])).render(task)
             let string2 = TextRenderer(options: .init(networkContent: [.all], isMonocrhome: false)).render(task)
             let html = try! TextRenderer.html(from: string)
-            let pdf = try! TextRenderer.pdf(from: string)
 
             RichTextView(viewModel: .init(string: string))
                 .previewDisplayName("NSAttributedString")
@@ -515,8 +514,8 @@ struct ConsoleTextRenderer_Previews: PreviewProvider {
                 .previewDisplayName("HTML")
 #endif
 
-#if !os(watchOS)
-            PDFKitRepresentedView(document: PDFDocument(data: pdf)!)
+#if !os(watchOS) && !os(macOS)
+            PDFKitRepresentedView(document: PDFDocument(data: try! TextRenderer.pdf(from: string))!)
                 .previewDisplayName("PDF")
 #endif
         }

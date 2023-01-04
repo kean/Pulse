@@ -61,4 +61,9 @@ final class ManagedObjectTextSearch<T: NSManagedObject> {
     }
 }
 
+struct ConsoleMatch {
+    let index: Int
+    let objectID: NSManagedObjectID
+}
+
 #endif
