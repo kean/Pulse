@@ -5,7 +5,9 @@
 import SwiftUI
 import Pulse
 
-#if os(iOS) || os(macOS) || os(tvOS)
+#warning("TODO: simplify")
+
+#if os(iOS) || os(macOS)
 
 // MARK: - View
 
@@ -14,25 +16,17 @@ struct NetworkInspectorMetricsView: View {
     @State private var isTransctionsListShown = false
 
     var body: some View {
-        List {
-                TimingView(viewModel: viewModel.timingViewModel)
-                    .padding(.bottom, 32)
-#if !os(tvOS)
-                if let transactions = viewModel.transactions {
-                    NetworkInspectorTransactionsListView(viewModel: transactions)
+        ScrollView {
+            TimingView(viewModel: viewModel.timingViewModel)
+                .padding()
 #if os(macOS)
-                        .padding(.bottom, 16)
-#endif
-                }
+            if let transactions = viewModel.transactions {
+                NetworkInspectorTransactionsListView(viewModel: transactions)
+                    .padding(.bottom, 16)
+            }
 #endif
         }
-        .listStyle(.plain)
-#if os(tvOS)
-        .frame(maxWidth: 1200, alignment: .center)
-#endif
-#if !os(iOS)
         .backport.navigationTitle("Metrics")
-#endif
     }
 }
 

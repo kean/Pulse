@@ -56,7 +56,7 @@ struct NetworkInspectorTransactionsListView: View {
                 }
             }
         }
-#else
+#elseif os(macOS)
         var body: some View {
             HStack {
                 Text(item.title)
@@ -64,11 +64,20 @@ struct NetworkInspectorTransactionsListView: View {
                     Text(details)
                         .foregroundColor(.secondary)
                 }
-#if os(macOS)
                 Image(systemName: "chevron.right")
                     .foregroundColor(.separator)
-#endif
                 Spacer()
+            }
+        }
+#else
+        var body: some View {
+            HStack {
+                Text(item.title)
+                Spacer()
+                if let details = item.details {
+                    Text(details)
+                        .foregroundColor(.secondary)
+                }
             }
         }
 #endif
@@ -110,14 +119,15 @@ final class NetworkInspectorTransactionsListViewModel {
 
     init(task: NetworkTaskEntity) {
         self.items = task.transactions.map { transaction in
-            let title: String
-            switch transaction.fetchType {
-            case .networkLoad: title = "Network Load"
-            case .localCache: title = "Cache Lookup"
-            case .serverPush: title = "Server Push"
-            case .unknown: title = "Unknown"
-            default: title = "Unknown"
-            }
+            let title: String = {
+                switch transaction.fetchType {
+                case .networkLoad: return "Network Load"
+                case .localCache: return "Cache Lookup"
+                case .serverPush: return "Server Push"
+                case .unknown: return "Unknown"
+                default: return "Unknown"
+                }
+            }()
             var details: String?
             if let startDate = transaction.timing.fetchStartDate,
                let endDate = transaction.timing.responseEndDate ?? task.taskInterval?.end {
@@ -136,8 +146,9 @@ final class NetworkInspectorTransactionsListViewModel {
 @available(iOS 14.0, *)
 struct NetworkInspectorTransactionsListView_Previews: PreviewProvider {
     static var previews: some View {
-        NetworkInspectorTransactionsListView(viewModel: mockModel)
-            .previewLayout(.fixed(width: 320, height: 400))
+        List {
+            NetworkInspectorTransactionsListView(viewModel: mockModel)
+        }
     }
 }
 

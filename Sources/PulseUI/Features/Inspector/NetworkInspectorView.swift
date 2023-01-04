@@ -213,9 +213,10 @@ struct NetworkInspectorView: View {
         }.disabled(viewModel.responseCookies.isEmpty)
     }
 
-#if os(iOS)
+#if os(iOS) || os(tvOS)
     @ViewBuilder
     private var sectionMetrics: some View {
+#if os(iOS)
         NavigationLink(destination: destinationMetrics) {
             MenuItem(
                 icon: "clock.fill",
@@ -224,10 +225,7 @@ struct NetworkInspectorView: View {
                 details: stringFromCount(viewModel.task.transactions.count)
             )
         }.disabled(!viewModel.task.hasMetrics)
-    }
-#elseif os(tvOS)
-    @ViewBuilder
-    private var sectionMetrics: some View {
+#endif
         NetworkInspectorTransactionsListView(viewModel: .init(task: viewModel.task))
     }
 #endif

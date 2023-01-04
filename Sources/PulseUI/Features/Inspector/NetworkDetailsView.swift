@@ -23,7 +23,7 @@ struct NetworkDetailsView: View {
 
     var body: some View {
         contents
-            .navigationBarTitle(title)
+            .backport.navigationTitle(title)
     }
 
     @ViewBuilder
