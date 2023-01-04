@@ -2,7 +2,6 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
-#warning("TODO: remove Markdown export")
 #warning("TODO: add PDF export and test printing")
 #warning("TODO: add metrics and cookies and other missing values from summary")
 #warning("TODO: remove FontSize setting from ConsoleTextView for now")

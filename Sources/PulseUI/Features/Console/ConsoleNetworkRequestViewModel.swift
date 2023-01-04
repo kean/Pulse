@@ -133,13 +133,6 @@ final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
         ShareItems([ConsoleShareService.share(task, output: .plainText)])
     }
 
-    func shareAsMarkdown() -> ShareItems {
-        let text = ConsoleShareService.share(task, output: .markdown)
-        let directory = TemporaryDirectory()
-        let fileURL = directory.write(text: text, extension: "markdown")
-        return ShareItems([fileURL], cleanup: directory.remove)
-    }
-
     func shareAsHTML() -> ShareItems {
         let text = ConsoleShareService.share(task, output: .html)
         let directory = TemporaryDirectory()

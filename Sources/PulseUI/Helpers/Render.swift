@@ -14,10 +14,6 @@ enum Render {
         render(task: task, using: PlainTextRenderer())
     }
 
-    static func asMarkdown(task: NetworkTaskEntity) -> String {
-        render(task: task, using: MarkdownRenderer())
-    }
-
     static func asHTML(task: NetworkTaskEntity) -> String {
         render(task: task, using: HTMLRenderer(error: task.decodingError))
     }
@@ -123,59 +119,6 @@ private final class PlainTextRenderer: Renderer {
 
     func finalize(title: String) -> String {
         contents
-    }
-}
-
-private final class MarkdownRenderer: Renderer {
-    private var contents = ""
-    private var toc = ""
-
-    func anchor(for title: String) -> String {
-        title.replacingOccurrences(of: " ", with: "_").lowercased()
-    }
-
-    func add(title: String) {
-        if !toc.isEmpty {
-            toc.append("\n")
-        }
-        toc.append("- [**\(title)**](\(anchor(for: title)))")
-        contents.append("## \(title)\n\n")
-    }
-
-    func addSecondaryTitle(_ title: String) {
-        toc.append("\n  - [\(title)](\(anchor(for: title)))")
-        contents.append("#### \(title)\n\n")
-    }
-
-    func add(data: Data) {
-        let json = try? JSONSerialization.jsonObject(with: data, options: [])
-        contents.append("```\(json != nil ? "json" : "")\n")
-        contents.append(prettifyJSON(data))
-        contents.append("\n")
-        contents.append("```")
-        contents.append("\n\n")
-    }
-
-    func add(_ keyValueViewModel: KeyValueSectionViewModel?, isSecondaryTitle: Bool = true) {
-        guard let model = keyValueViewModel else { return }
-        if isSecondaryTitle {
-            addSecondaryTitle(model.title)
-        } else {
-            add(title: model.title)
-        }
-        if model.items.isEmpty {
-            contents.append("Empty\n")
-        } else {
-            for item in model.items {
-                contents.append("- **\(item.0)**: \(item.1 ?? "–")")
-                contents.append("\n")
-            }
-        }
-        contents.append("\n")
-    }
-
-    func finalize(title: String) -> String {
-        "# \(title)\n\n\(toc)\n\n\(contents)"
     }
 }
 

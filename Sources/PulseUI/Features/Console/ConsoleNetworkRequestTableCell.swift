@@ -118,10 +118,6 @@ final class ConsoleNetworkRequestTableCell: UITableViewCell, UIContextMenuIntera
             UIActivityViewController.show(with: viewModel.shareAsPlainText())
         }
 
-        let shareAsMarkdown = UIAction(title: "Share as Markdown", image: UIImage(systemName: "square.and.arrow.up")) { _ in
-            UIActivityViewController.show(with: viewModel.shareAsMarkdown())
-        }
-
         let shareAsHTML = UIAction(title: "Share as HTML", image: UIImage(systemName: "square.and.arrow.up")) { _ in
             UIActivityViewController.show(with: viewModel.shareAsHTML())
         }
@@ -152,7 +148,7 @@ final class ConsoleNetworkRequestTableCell: UITableViewCell, UIContextMenuIntera
 
         let pin = UIAction.makePinAction(with: viewModel.pinViewModel)
 
-        let shareGroup = UIMenu(title: "Share", options: [.displayInline], children: [shareAsText, shareAsMarkdown, shareAsHTML, shareAsCURL])
+        let shareGroup = UIMenu(title: "Share", options: [.displayInline], children: [shareAsText, shareAsHTML, shareAsCURL])
 
         let copyGroup = UIMenu(title: "Copy", options: [.displayInline], children: copyItems)
 

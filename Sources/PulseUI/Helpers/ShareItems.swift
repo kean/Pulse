@@ -70,7 +70,6 @@ enum ConsoleShareService {
     static func share(_ task: NetworkTaskEntity, output: NetworkMessageRenderType) -> String {
         switch output {
         case .plainText: return Render.asPlainText(task: task)
-        case .markdown: return Render.asMarkdown(task: task)
         case .html: return Render.asHTML(task: task)
         }
     }
@@ -78,7 +77,6 @@ enum ConsoleShareService {
 
 enum NetworkMessageRenderType {
     case plainText
-    case markdown
     case html
 }
 

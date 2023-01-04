@@ -63,15 +63,6 @@ struct NetworkMessageContextMenu: View {
             Image(systemName: "square.and.arrow.up")
         }
         Button(action: {
-            let text = ConsoleShareService.share(task, output: .markdown)
-            let directory = TemporaryDirectory()
-            let fileURL = directory.write(text: text, extension: "markdown")
-            sharedItems = ShareItems([fileURL], cleanup: directory.remove)
-        }) {
-            Text("Share as Markdown")
-            Image(systemName: "square.and.arrow.up")
-        }
-        Button(action: {
             let text = ConsoleShareService.share(task, output: .html)
             let directory = TemporaryDirectory()
             let fileURL = directory.write(text: text, extension: "html")
