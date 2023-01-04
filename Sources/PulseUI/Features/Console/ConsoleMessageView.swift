@@ -19,7 +19,7 @@ struct ConsoleMessageView: View {
                 Spacer()
 #endif
             }
-            text
+            text.lineLimit(4)
         }
         .padding(.vertical, 4)
     }
