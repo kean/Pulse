@@ -57,7 +57,7 @@ final class TextRenderer {
         prepare(options: options)
         return joined(entities.map(render))
     }
-    
+
     @available(*, deprecated, message: "Deprecated")
     func render(_ entities: [LoggerMessageEntity], options: Options = .init()) -> NSAttributedString {
         prepare(options: options)

@@ -52,11 +52,4 @@ final class RichTextViewModel: ObservableObject {
     }
 }
 
-private func format(json: Any) -> String {
-    guard let data = try? JSONSerialization.data(withJSONObject: json, options: [.prettyPrinted]) else {
-        return ""
-    }
-    return String(data: data, encoding: .utf8) ?? ""
-}
-
 #endif

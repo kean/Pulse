@@ -9,6 +9,8 @@ import Combine
 
 #if os(iOS) || os(tvOS) || os(watchOS)
 
+#warning("TODO: simplify this")
+
 final class MainViewModel: ObservableObject {
     let items: [MainViewModelItem]
 
