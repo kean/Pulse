@@ -7,9 +7,8 @@ import Foundation
 
 #if os(iOS) || os(macOS)
 
-#warning("TODO: better API and available on other platforms")
-#warning("TODO: remove this API")
-
+#warning("TODO: remove")
+@available(*, deprecated, message: "Deprecated")
 enum Render {
     static func asPlainText(task: NetworkTaskEntity) -> String {
         let renderer = TextRenderer(options: .init(networkContent: [.all]))

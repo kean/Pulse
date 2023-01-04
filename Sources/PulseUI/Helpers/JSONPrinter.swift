@@ -22,27 +22,6 @@ protocol JSONRenderer: AnyObject {
     func newline()
 }
 
-final class HTMLJSONRender: JSONRenderer {
-    private var output = ""
-
-    func append(_ string: String, element: JSONElement, error: NetworkLogger.DecodingError?) {
-        let htmlClass = error == nil ? getClass(for: element) : "err"
-        output.append("<span class=\"\(htmlClass)\">\(string)</span>")
-    }
-
-    func indent(count: Int) {
-        output.append(String(repeating: " ", count: count))
-    }
-
-    func newline() {
-        output.append("\n")
-    }
-
-    func make() -> String {
-        output
-    }
-}
-
 private func getClass(for element: JSONElement) -> String {
     switch element {
     case .punctuation: return "p"
