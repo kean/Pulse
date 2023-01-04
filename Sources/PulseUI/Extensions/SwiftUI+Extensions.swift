@@ -4,6 +4,8 @@
 
 import SwiftUI
 
+#warning("TODO: remove unused extensions and backports + see which views can be moved to iOS 14 fully to remove backports")
+
 #if os(iOS) || os(macOS)
 extension Color {
     static var separator: Color { Color(UXColor.separator) }
