@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import Pulse
@@ -12,7 +12,6 @@ struct ConsoleMessageDetailsView: View {
     let viewModel: ConsoleMessageDetailsViewModel
     @Environment(\.colorScheme) var colorScheme: ColorScheme
     @State private var isShowingShareSheet = false
-    var onClose: (() -> Void)?
 
     #if os(iOS)
     var body: some View {
@@ -123,7 +122,7 @@ private struct _MessageTextView: View {
 struct ConsoleMessageDetailsView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
-            ConsoleMessageDetailsView(viewModel: .init(message: makeMockMessage()), onClose: {})
+            ConsoleMessageDetailsView(viewModel: .init(message: makeMockMessage()))
         }
     }
 }

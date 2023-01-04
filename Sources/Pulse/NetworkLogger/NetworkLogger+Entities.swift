@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 #if !os(macOS) && !targetEnvironment(macCatalyst) && swift(>=5.7)
 import Foundation
@@ -62,6 +62,10 @@ extension NetworkLogger {
 
         public var contentType: ContentType? {
             headers?["Content-Type"].flatMap(ContentType.init)
+        }
+
+        var isSuccess: Bool {
+            (200..<400).contains(statusCode ?? 0)
         }
 
         public init(_ urlResponse: URLResponse) {

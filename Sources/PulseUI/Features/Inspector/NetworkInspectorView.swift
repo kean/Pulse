@@ -1,13 +1,19 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import CoreData
 import Pulse
 import Combine
 
-#warning("TODO: remove onClose")
+#warning("TODO: fix state management at least on the top level")
+#warning("TODO: rework metrics")
+#warning("TODO: find better icons")
+#warning("TODO: simplify response views to not show progress (or remove entirely?")
+
+#warning("TODO: add task rype somewhere ")
+
 #warning("TODO: tvOS enable scroll on left side")
 #warning("TODO: tvOS fix transaction details UI")
 #warning("TODO: rewrite TransactionsDeatilsView without KeyValueView")
@@ -19,7 +25,6 @@ struct NetworkInspectorView: View {
 #else
     @ObservedObject var viewModel: NetworkInspectorViewModel
 #endif
-    var onClose: (() -> Void)?
 
 #if os(iOS)
     @State private var shareItems: ShareItems?
@@ -75,11 +80,10 @@ struct NetworkInspectorView: View {
         .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
         .listRowBackground(Color.clear)
 #endif
-
         Section {
-            headerView
+            viewModel.statusSectionViewModel.map(NetworkRequestStatusSectionView.init)
         }
-        Section(header: requestTypePickerView) {
+        Section(header: requestTypePicker) {
             sectionRequest
         }
         if viewModel.task.state != .pending {
@@ -101,7 +105,7 @@ struct NetworkInspectorView: View {
             .listRowBackground(Color.clear)
 
             Section {
-                headerView
+                viewModel.statusSectionViewModel.map(NetworkRequestStatusSectionView.init)
             }
             Section {
                 requestTypePickerView
@@ -126,20 +130,19 @@ struct NetworkInspectorView: View {
                 .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
                 .listRowBackground(Color.clear)
 
+#warning("TODO: what if not available?")
                 Section {
-                    NetworkInspectorMetricsViewModel(task: viewModel.task).map {
-                        TimingView(viewModel: $0.timingViewModel)
-                    }
+                    TimingView(viewModel: .init(task: viewModel.task))
                 }
             }
             .listStyle(.plain)
             .frame(width: 1000)
             Form {
                 Section {
-                    headerView
+                    viewModel.statusSectionViewModel.map(NetworkRequestStatusSectionView.init)
                 }
                 Section(header: Text("Request")) {
-                    requestTypePickerView
+                    requestTypePicker
                     sectionRequest
                 }
                 if viewModel.task.state != .pending {
@@ -158,7 +161,7 @@ struct NetworkInspectorView: View {
     @ViewBuilder
     private var sectionRequest: some View {
         NavigationLink(destination: destinationRequestBody) {
-            MenuItem(
+            NetworkMenuCell(
                 icon: "arrow.up.circle",
                 tintColor: .blue,
                 title: "Request Body",
@@ -166,46 +169,18 @@ struct NetworkInspectorView: View {
             )
         }.disabled(viewModel.task.requestBodySize <= 0)
         if !isShowingCurrentRequest {
-            NavigationLink(destination: destinationOriginalRequestHeaders) {
-                MenuItem(
-                    icon: "doc.plaintext",
-                    tintColor: .secondary,
-                    title: "Request Headers",
-                    details: stringFromCount(viewModel.originalRequestHeaders.count)
-                )
-            }.disabled(viewModel.originalRequestHeaders.isEmpty)
-            NavigationLink(destination: destinationOriginalRequestCookies) {
-                MenuItem(
-                    icon: "lock",
-                    tintColor: .secondary,
-                    title: "Request Cookies",
-                    details: stringFromCount(viewModel.originalRequestCookies.count)
-                )
-            }.disabled(viewModel.originalRequestCookies.isEmpty)
+            viewModel.originalRequestHeadersViewModel.map(NetworkHeadersCell.init)
+            viewModel.originalRequestCookiesViewModel.map(NetworkCookiesCell.init)
         } else {
-            NavigationLink(destination: destinationCurrentRequestHeaders) {
-                MenuItem(
-                    icon: "doc.plaintext",
-                    tintColor: .secondary,
-                    title: "Request Headers",
-                    details: stringFromCount(viewModel.currentRequestHeaders.count)
-                )
-            }.disabled(viewModel.currentRequestHeaders.isEmpty)
-            NavigationLink(destination: destinationCurrentRequestCookies) {
-                MenuItem(
-                    icon: "lock",
-                    tintColor: .secondary,
-                    title: "Request Cookies",
-                    details: stringFromCount(viewModel.currentRequestCookies.count)
-                )
-            }.disabled(viewModel.currentRequestCookies.isEmpty)
+            viewModel.currentRequestHeadersViewModel.map(NetworkHeadersCell.init)
+            viewModel.currentRequestCookiesViewModel.map(NetworkCookiesCell.init)
         }
     }
 
     @ViewBuilder
     private var sectionResponse: some View {
         NavigationLink(isActive: $isResponseBodyLinkActive, destination: { destinationResponseBody }) {
-            MenuItem(
+            NetworkMenuCell(
                 icon: "arrow.down.circle",
                 tintColor: .indigo,
                 title: "Response Body",
@@ -222,22 +197,8 @@ struct NetworkInspectorView: View {
                 }()
             )
         }.disabled(viewModel.task.responseBodySize <= 0)
-        NavigationLink(destination: destinationResponseHeaders) {
-            MenuItem(
-                icon: "doc.plaintext",
-                tintColor: .secondary,
-                title: "Response Headers",
-                details: stringFromCount(viewModel.responseHeaders.count)
-            )
-        }.disabled(viewModel.responseHeaders.isEmpty)
-        NavigationLink(destination: destinationResponseCookies) {
-            MenuItem(
-                icon: "lock",
-                tintColor: .secondary,
-                title: "Response Cookies",
-                details: stringFromCount(viewModel.responseCookies.count)
-            )
-        }.disabled(viewModel.responseCookies.isEmpty)
+        viewModel.responseHeadersViewModel.map(NetworkHeadersCell.init)
+        viewModel.responseCookiesViewModel.map(NetworkCookiesCell.init)
     }
 
 #if os(iOS) || os(tvOS) || os(macOS)
@@ -245,7 +206,7 @@ struct NetworkInspectorView: View {
     private var sectionMetrics: some View {
 #if os(iOS) || os(macOS)
         NavigationLink(destination: destinationMetrics) {
-            MenuItem(
+            NetworkMenuCell(
                 icon: "clock.fill",
                 tintColor: .orange,
                 title: "Metrics",
@@ -258,62 +219,30 @@ struct NetworkInspectorView: View {
 #endif
 
     // MARK: - Subviews
-    
+
+    #warning("TODO: this fallback isn't ideal on other paltforms only on ios")
+
     @ViewBuilder
     private var transferStatusView: some View {
-        if let transfer = viewModel.transferViewModel {
-            NetworkInspectorTransferInfoView(viewModel: transfer)
-        } else if let progress = viewModel.progressViewModel {
-            ZStack {
-                NetworkInspectorTransferInfoView(viewModel: .init(empty: true))
-                    .hidden()
-                    .backport.hideAccessibility()
+        ZStack {
+            NetworkInspectorTransferInfoView(viewModel: .init(empty: true))
+                .hidden()
+                .backport.hideAccessibility()
+            if let transfer = viewModel.transferViewModel {
+                NetworkInspectorTransferInfoView(viewModel: transfer)
+            } else if let progress = viewModel.progressViewModel {
                 SpinnerView(viewModel: progress)
-            }
+            } else if let status = viewModel.statusSectionViewModel?.status {
+                // Fallback in case metrics are disabled
+                Image(systemName: status.imageName)
+                    .foregroundColor(status.tintColor)
+                    .font(.system(size: 64))
+            } // Should never happen
         }
     }
 
     @ViewBuilder
-    var headerView: some View {
-        HStack(spacing: spacing) {
-#if !os(watchOS)
-            if #available(iOS 14.0, tvOS 14.0, *) {
-                Text(Image(systemName: viewModel.statusImageName))
-                    .foregroundColor(viewModel.statusTintColor)
-            } else {
-                Image(systemName: viewModel.statusImageName)
-                    .foregroundColor(viewModel.statusTintColor)
-            }
-#endif
-            Text(viewModel.status)
-#if os(watchOS)
-                .lineLimit(3)
-#else
-                .lineLimit(1)
-#endif
-                .foregroundColor(viewModel.statusTintColor)
-            Spacer()
-            DurationLabel(viewModel: viewModel.durationViewModel)
-        }.font(.headline)
-
-        if viewModel.task.state == .failure, let description = viewModel.task.errorDebugDescription {
-            NavigationLink(destination: destinaitionError) {
-                Text(description)
-                    .lineLimit(4)
-                    .font(.callout)
-            }
-        }
-
-        NavigationLink(destination: destinationRequestDetails) {
-            (Text(viewModel.task.httpMethod ?? "GET").bold()
-             + Text(" ") + Text(viewModel.task.url ?? "–"))
-            .lineLimit(4)
-            .font(.callout)
-        }
-    }
-
-    @ViewBuilder
-    private var requestTypePickerView: some View {
+    private var requestTypePicker: some View {
         let picker = Picker("Request Type", selection: $isShowingCurrentRequest) {
             Text("Original").tag(false)
             Text("Current").tag(true)
@@ -336,57 +265,24 @@ struct NetworkInspectorView: View {
 
     // MARK: - Destinations
 
-    private var destinationRequestDetails: some View {
-        NetworkInspectorRequestDetailsView(viewModel: .init(task: viewModel.task))
-    }
-
 #warning("TODO: remove these naviation titles")
 
     private var destinationRequestBody: some View {
-        NetworkInspectorRequestView(viewModel: NetworkInspectorRequestViewModel(task: viewModel.task))
-            .backport.navigationTitle("Request Body")
-    }
-    
-    private var destinationOriginalRequestHeaders: some View {
-        NetworkDetailsView(title: "Request Headers", viewModel: viewModel.originalRequestHeadersViewModel)
-    }
-    
-    private var destinationCurrentRequestHeaders: some View {
-        NetworkDetailsView(title: "Request Headers", viewModel: viewModel.currentRequestHeadersViewModel)
-    }
-    
-    private var destinationOriginalRequestCookies: some View {
-        NetworkDetailsView(title: "Request Cookies", text: viewModel.originalRequestCookiesString)
-    }
-
-    private var destinationCurrentRequestCookies: some View {
-        NetworkDetailsView(title: "Request Cookies", text: viewModel.currentRequestCookiesString)
-    }
-
-    private var destinationResponseCookies: some View {
-        NetworkDetailsView(title: "Request Cookies", text: viewModel.responseCookiesString)
-    }
-
-    private var destinationResponseHeaders: some View {
-        NetworkDetailsView(title: "Response Header", viewModel: viewModel.responseHeadersViewModel)
+        NetworkInspectorRequestBodyView(viewModel: NetworkInspectorRequestBodyViewModel(task: viewModel.task))
     }
 
     private var destinationResponseBody: some View {
-        NetworkInspectorResponseView(viewModel: NetworkInspectorResponseViewModel(task: viewModel.task))
-            .backport.navigationTitle("Response Body")
+        NetworkInspectorResponseBodyView(viewModel: NetworkInspectorResponseBodyViewModel(task: viewModel.task))
     }
 
 #if !os(watchOS)
     private var destinationMetrics: some View {
-        NetworkInspectorMetricsTabView(viewModel: NetworkInspectorMetricsTabViewModel(task: viewModel.task))
-            .backport.navigationTitle("Metrics")
+        NetworkInspectorMetricsViewModel(task: viewModel.task).map {
+            NetworkInspectorMetricsView(viewModel: $0)
+                .backport.navigationTitle("Metrics")
+        }
     }
 #endif
-
-    @ViewBuilder
-    private var destinaitionError: some View {
-        NetworkDetailsView(title: "Error", viewModel: KeyValueSectionViewModel.makeErrorDetails(for: viewModel.task, action: {}) ?? .empty())
-    }
 
     // MARK: - Helpers
 
@@ -397,45 +293,6 @@ struct NetworkInspectorView: View {
     #warning("TODO: macOS use pro version of the text viewer")
     #warning("TODO: macos remvoe hor/vert switch")
 
-    private struct MenuItem: View {
-        let icon: String
-        let tintColor: Color
-        let title: String
-        let details: String
-        
-        var body: some View {
-#if os(watchOS)
-            HStack {
-                VStack(alignment: .leading) {
-                    Text(title)
-                    Text(details).foregroundColor(.secondary)
-                }
-                Spacer()
-                Image(systemName: icon)
-                    .foregroundColor(tintColor)
-                    .font(.system(size: 18))
-                    .frame(width: 18, alignment: .trailing)
-            }
-#elseif os(tvOS)
-            HStack {
-                Text(title)
-                Spacer()
-                Text(details).foregroundColor(.secondary)
-            }
-#else
-            HStack {
-                Image(systemName: icon)
-                    .foregroundColor(tintColor)
-                    .font(.system(size: 20))
-                    .frame(width: 27, alignment: .leading)
-                Text(title)
-                Spacer()
-                Text(details).foregroundColor(.secondary)
-            }
-#endif
-        }
-    }
-
 #if os(iOS)
     @ViewBuilder
     private var trailingNavigationBarItems: some View {
@@ -443,7 +300,7 @@ struct NetworkInspectorView: View {
             if let viewModel = viewModel.pinViewModel {
                 PinButton(viewModel: viewModel, isTextNeeded: false)
             }
-            if #available(iOS 14.0, *) {
+            if #available(iOS 14, *) {
                 Menu(content: {
                     NetworkMessageContextMenu(task: viewModel.task, sharedItems: $shareItems)
                 }, label: {
@@ -466,32 +323,13 @@ private func stringFromByteCount(_ count: Int64) -> String {
     return ByteCountFormatter.string(fromByteCount: count)
 }
 
+@available(*, deprecated, message: "Deprecated")
 private func stringFromCount(_ count: Int?) -> String {
     guard let count = count, count > 0 else {
         return "Empty"
     }
     return count.description
 }
-
-private struct DurationLabel: View {
-    @ObservedObject var viewModel: DurationViewModel
-
-    var body: some View {
-        if let duration = viewModel.duration {
-            Text(duration)
-                .backport.monospacedDigit()
-                .lineLimit(1)
-                .font(.body)
-                .foregroundColor(.secondary)
-        }
-    }
-}
-
-#if os(tvOS)
-private let spacing: CGFloat = 20
-#else
-private let spacing: CGFloat? = nil
-#endif
 
 #if DEBUG
 struct NetworkInspectorView_Previews: PreviewProvider {

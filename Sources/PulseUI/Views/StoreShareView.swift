@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import CoreData
@@ -9,7 +9,7 @@ import Combine
 
 #if os(iOS) || os(macOS)
 
-@available(iOS 14.0, tvOS 14.0, *)
+@available(iOS 14, tvOS 14, *)
 struct ShareStoreView: View {
     let store: LoggerStore
 
@@ -286,7 +286,7 @@ private struct SharedContents {
 }
 
 #if DEBUG
-@available(iOS 14.0, tvOS 14.0, *)
+@available(iOS 14, tvOS 14, *)
 struct ShareStoreView_Previews: PreviewProvider {
     static var previews: some View {
 #if os(iOS)

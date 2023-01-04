@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import Pulse
@@ -56,7 +56,7 @@ struct FileViewer: View {
 // MARK: - Preview
 
 #if DEBUG
-struct NetworkInspectorResponseView_Previews: PreviewProvider {
+struct FileViewer_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             NavigationView {

@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import Pulse
@@ -201,9 +201,11 @@ private struct KeyValueListView: View {
 #if os(iOS)
         .sheet(item: $jwt) { jwt in
             NavigationView {
-                NetworkDetailsView(title: "JWT", text: KeyValueSectionViewModel.makeDetails(for: jwt))
-                    .navigationBarTitle("JWT", displayMode: .inline)
-                    .navigationBarItems(leading: Button("Close") { self.jwt = nil })
+                NetworkDetailsView(title: "JWT") {
+                    KeyValueSectionViewModel.makeDetails(for: jwt)
+                }
+                .navigationBarTitle("JWT", displayMode: .inline)
+                .navigationBarItems(leading: Button("Close") { self.jwt = nil })
             }
         }
 #endif
@@ -258,6 +260,7 @@ private struct Label: NSViewRepresentable {
     }
 }
 
+#warning("TODO: remove this")
 private let ps: NSParagraphStyle = {
     let ps = NSMutableParagraphStyle()
     ps.minimumLineHeight = 20
@@ -266,6 +269,7 @@ private let ps: NSParagraphStyle = {
 }()
 #endif
 
+#warning("TODO: remove this")
 private var fontSize: CGFloat {
 #if os(iOS)
     return 15

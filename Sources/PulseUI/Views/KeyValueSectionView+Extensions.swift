@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import Pulse
@@ -52,6 +52,9 @@ extension KeyValueSectionViewModel {
         return KeyValueSectionViewModel(title: "Options", color: .blue, items: items)
     }
 
+#warning("TODO: remove unused")
+
+    @available(*, deprecated, message: "Deprecated")
     static func makeRequestHeaders(for headers: [String: String], action: @escaping () -> Void) -> KeyValueSectionViewModel {
         KeyValueSectionViewModel(
             title: "Headers",
@@ -61,6 +64,7 @@ extension KeyValueSectionViewModel {
         )
     }
 
+    @available(*, deprecated, message: "Deprecated")
     static func makeSummary(for response: NetworkResponseEntity) -> KeyValueSectionViewModel {
         KeyValueSectionViewModel(title: "Response Summary", color: .indigo, items: [
             ("Status Code", String(response.statusCode)),
@@ -69,6 +73,7 @@ extension KeyValueSectionViewModel {
         ])
     }
 
+    @available(*, deprecated, message: "Deprecated")
     static func makeResponseHeaders(for headers: [String: String], action: @escaping () -> Void) -> KeyValueSectionViewModel {
         KeyValueSectionViewModel(
             title: "Headers",
@@ -91,19 +96,6 @@ extension KeyValueSectionViewModel {
                 ("Code", descriptionForError(domain: task.errorDomain, code: task.errorCode)),
                 ("Description", task.errorDebugDescription)
             ])
-    }
-
-    static func makeDetails(for cookie: HTTPCookie, color: Color) -> KeyValueSectionViewModel {
-        KeyValueSectionViewModel(title: "Cookies", color: color, items: [
-            ("Name", cookie.name),
-            ("Value", cookie.value),
-            ("Domain", cookie.domain),
-            ("Path", cookie.path),
-            ("Expires", cookie.expiresDate?.description(with: Locale(identifier: "en_US"))),
-            ("Secure", "\(cookie.isSecure)"),
-            ("HTTP Only", "\(cookie.isHTTPOnly)"),
-            ("Session Only", "\(cookie.isSessionOnly)")
-        ])
     }
 
     private static func descriptionForError(domain: String?, code: Int32) -> String {
@@ -215,13 +207,14 @@ extension KeyValueSectionViewModel {
 }
 
 extension KeyValueSectionViewModel {
+    @available(*, deprecated, message: "Please user TextRenderer instead")
     func asAttributedString() -> NSAttributedString {
         let output = NSMutableAttributedString()
         for item in items {
             var titleAttributes: [NSAttributedString.Key: Any] = [
                 .font: UXFont.monospacedSystemFont(ofSize: FontSize.body, weight: .semibold)
             ]
-            if #available(iOS 14.0, tvOS 14.0, *) {
+            if #available(iOS 14, tvOS 14, *) {
                 titleAttributes[.foregroundColor] = UXColor(color)
             } else {
 #if os(iOS) || os(macOS)

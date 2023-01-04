@@ -1,11 +1,11 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
 import Network
 
-@available(iOS 14.0, tvOS 14.0, *)
+@available(iOS 14, tvOS 14, *)
 extension RemoteLogger {
     enum PacketCode: UInt8, Equatable {
         // Handshake
@@ -126,7 +126,7 @@ extension RemoteLogger {
     }
 }
 
-@available(iOS 14.0, tvOS 14.0, *)
+@available(iOS 14, tvOS 14, *)
 extension RemoteLogger.Connection {
     func send(code: RemoteLogger.PacketCode, data: Data, _ completion: ((NWError?) -> Void)? = nil) {
         send(code: code.rawValue, data: data, completion)

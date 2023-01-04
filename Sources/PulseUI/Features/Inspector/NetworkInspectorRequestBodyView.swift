@@ -1,20 +1,23 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import Pulse
-import Combine
 
-struct NetworkInspectorRequestView: View {
-    @ObservedObject var viewModel: NetworkInspectorRequestViewModel
+struct NetworkInspectorRequestBodyView: View {
+    let viewModel: NetworkInspectorRequestBodyViewModel
 
     var body: some View {
+        contents
+            .backport.navigationTitle("Request Body")
+    }
+
+    @ViewBuilder
+    private var contents: some View {
         if let viewModel = viewModel.fileViewModel {
             FileViewer(viewModel: viewModel)
                 .onDisappear { self.viewModel.onDisappear() }
-        } else if viewModel.task.state == .pending {
-            SpinnerView(viewModel: viewModel.progress)
         } else if viewModel.task.type == .uploadTask {
             PlaceholderView(imageName: "arrow.up.circle", title: {
                 var title = "Uploaded from a File"
@@ -31,37 +34,27 @@ struct NetworkInspectorRequestView: View {
     }
 }
 
-final class NetworkInspectorRequestViewModel: ObservableObject {
-    private(set) lazy var progress = ProgressViewModel(task: task)
-    var fileViewModel: FileViewerViewModel? {
-        if let viewModel = _fileViewModel {
-            return viewModel
-        }
-        if let requestBody = task.requestBody?.data {
-            _fileViewModel = FileViewerViewModel(
-                title: "Request",
-                context: task.requestFileViewerContext,
-                data: { requestBody }
-            )
-        }
-        return _fileViewModel
+final class NetworkInspectorRequestBodyViewModel {
+    private(set) lazy var fileViewModel = data.map { data in
+        FileViewerViewModel(
+            title: "Request Body",
+            context: task.requestFileViewerContext,
+            data: { data }
+        )
     }
 
-    private var _fileViewModel: FileViewerViewModel?
+    private var data: Data? {
+        guard let data = task.requestBody?.data, !data.isEmpty else { return nil }
+        return data
+    }
 
     let task: NetworkTaskEntity
-    private var cancellable: AnyCancellable?
 
     init(task: NetworkTaskEntity) {
         self.task = task
-        cancellable = task.objectWillChange.sink { [weak self] in self?.refresh() }
     }
 
     func onDisappear() {
         task.requestBody?.reset()
-    }
-
-    private func refresh() {
-        withAnimation { objectWillChange.send() }
     }
 }

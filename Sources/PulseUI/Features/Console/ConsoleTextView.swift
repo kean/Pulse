@@ -1,15 +1,17 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import CoreData
 import Pulse
 import Combine
 
+#warning("TODO: fix where share and close buttons are")
+
 #if os(iOS)
 
-@available(iOS 14.0, tvOS 14.0, *)
+@available(iOS 14, tvOS 14, *)
 struct ConsoleTextView: View {
     @StateObject private var viewModel = ConsoleTextViewModel()
     @State private var shareItems: ShareItems?
@@ -17,7 +19,7 @@ struct ConsoleTextView: View {
     @ObservedObject private var settings: ConsoleTextViewSettings = .shared
 
     var entities: CurrentValueSubject<[NSManagedObject], Never>
-    var options: ConsoleTextRenderer.Options?
+    var options: TextRenderer.Options?
     var onClose: (() -> Void)?
 
     var body: some View {
@@ -99,7 +101,7 @@ struct ConsoleTextView: View {
     }
 }
 
-@available(iOS 14.0, *)
+@available(iOS 14, *)
 private struct ConsoleTextViewSettingsView: View {
     @ObservedObject private var settings: ConsoleTextViewSettings = .shared
 
@@ -127,14 +129,14 @@ private struct ConsoleTextViewSettingsView: View {
     }
 }
 
-@available(iOS 14.0, *)
+@available(iOS 14, *)
 final class ConsoleTextViewModel: ObservableObject {
     private var entities: CurrentValueSubject<[NSManagedObject], Never> = .init([])
-    private let renderer = ConsoleTextRenderer()
+    private let renderer = TextRenderer()
 
     private var cancellables: [AnyCancellable] = []
 
-    var options: ConsoleTextRenderer.Options = .init()
+    var options: TextRenderer.Options = .init()
 
     private let settings = ConsoleTextViewSettings.shared
 
@@ -229,7 +231,7 @@ final class ConsoleTextViewModel: ObservableObject {
 }
 
 #if DEBUG
-@available(iOS 14.0, *)
+@available(iOS 14, *)
 struct ConsoleTextView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
@@ -271,10 +273,10 @@ struct ConsoleTextView_Previews: PreviewProvider {
 
 private let entities = try! LoggerStore.mock.allMessages()
 
-@available(iOS 14.0, tvOS 14.0, *)
+@available(iOS 14, tvOS 14, *)
 private extension ConsoleTextView {
-    init(entities: [LoggerMessageEntity], _ configure: (inout ConsoleTextRenderer.Options) -> Void) {
-        var options = ConsoleTextRenderer.Options()
+    init(entities: [LoggerMessageEntity], _ configure: (inout TextRenderer.Options) -> Void) {
+        var options = TextRenderer.Options()
         configure(&options)
         self.init(entities: .init(entities.reversed()), options: options, onClose: {})
     }

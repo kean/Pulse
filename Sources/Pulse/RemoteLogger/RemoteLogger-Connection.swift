@@ -1,17 +1,17 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
 import Network
 
-@available(iOS 14.0, tvOS 14.0, *)
+@available(iOS 14, tvOS 14, *)
 public protocol RemoteLoggerConnectionDelegate: AnyObject {
     func connection(_ connection: RemoteLogger.Connection, didChangeState newState: NWConnection.State)
     func connection(_ connection: RemoteLogger.Connection, didReceiveEvent event: RemoteLogger.Connection.Event)
 }
 
-@available(iOS 14.0, tvOS 14.0, *)
+@available(iOS 14, tvOS 14, *)
 extension RemoteLogger {
     public final class Connection {
         private let connection: NWConnection
@@ -135,7 +135,7 @@ extension RemoteLogger {
 
 // MARK: Helpers
 
-@available(iOS 14.0, tvOS 14.0, *)
+@available(iOS 14, tvOS 14, *)
 extension RemoteLogger {
     static func encode(code: UInt8, body: Data) throws -> Data {
         guard body.count < UInt32.max else {

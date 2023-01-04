@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import Pulse
@@ -72,11 +72,11 @@ struct NetworkFiltersView: View {
 extension NetworkFiltersView {
     @ViewBuilder
     var formContents: some View {
-        if #available(iOS 14.0, *) {
+        if #available(iOS 14, *) {
             generalGroup
         }
         responseGroup
-        if #available(iOS 14.0, *) {
+        if #available(iOS 14, *) {
             durationGroup
         }
         timePeriodGroup
@@ -93,7 +93,7 @@ extension NetworkFiltersView {
 // MARK: - NetworkFiltersView (General)
 
 extension NetworkFiltersView {
-    @available(iOS 14.0, *)
+    @available(iOS 14, *)
     var generalGroup: some View {
         FiltersSection(
             isExpanded: $isGeneralGroupExpanded,
@@ -115,7 +115,7 @@ extension NetworkFiltersView {
 
 #if os(iOS)
 
-    @available(iOS 14.0, *)
+    @available(iOS 14, *)
     @ViewBuilder
     private var generalGroupContent: some View {
         ForEach(viewModel.filters) { filter in
@@ -201,7 +201,7 @@ extension NetworkFiltersView {
     private var responseSizeRow: some View {
         HStack {
             makeRangePicker(title: "Size", from: $viewModel.criteria.response.responseSize.from, to: $viewModel.criteria.response.responseSize.to, isEnabled: $viewModel.criteria.response.isEnabled)
-            if #available(iOS 14.0, *) {
+            if #available(iOS 14, *) {
                 Menu(content: {
                     Filters.sizeUnitPicker($viewModel.criteria.response.responseSize.unit).labelsHidden()
                 }, label: {
@@ -316,7 +316,7 @@ extension NetworkFiltersView {
 // MARK: - NetworkFiltersView (Duration)
 
 extension NetworkFiltersView {
-    @available(iOS 14.0, *)
+    @available(iOS 14, *)
     var durationGroup: some View {
         FiltersSection(
             isExpanded: $isDurationGroupExpanded,
@@ -336,7 +336,7 @@ extension NetworkFiltersView {
     }
 
 #if os(iOS)
-    @available(iOS 14.0, *)
+    @available(iOS 14, *)
     @ViewBuilder
     private var durationGroupContent: some View {
         HStack {

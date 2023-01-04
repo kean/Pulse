@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 
@@ -10,7 +10,7 @@ import UIKit
 
 struct Spinner: View {
     var body: some View {
-        if #available(iOS 14.0, tvOS 14.0, *) {
+        if #available(iOS 14, tvOS 14, *) {
             ProgressView()
         } else {
             ActivityIndicator()

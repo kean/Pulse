@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 
@@ -101,7 +101,7 @@ extension Backport {
 
     @ViewBuilder
     func borderedButton() -> some View {
-        if #available(iOS 15.0, tvOS 14.0, watchOS 8.0, *) {
+        if #available(iOS 15.0, tvOS 14, watchOS 8.0, *) {
             self.content.buttonStyle(.bordered)
         } else {
             self.content
@@ -110,7 +110,7 @@ extension Backport {
 
     @ViewBuilder
     func hideAccessibility() -> some View {
-        if #available(iOS 14.0, tvOS 14.0, *) {
+        if #available(iOS 14, tvOS 14, *) {
             self.content.accessibilityHidden(true)
         } else {
             self.content
@@ -136,7 +136,7 @@ extension Backport {
 
     @ViewBuilder
     func navigationTitle(_ title: String) -> some View {
-        if #available(iOS 14.0, tvOS 14.0, *) {
+        if #available(iOS 14, tvOS 14, *) {
             self.content.navigationTitle(title)
         } else {
 #if os(iOS) || os(tvOS)
@@ -153,7 +153,7 @@ extension Backport {
         if #available(iOS 16.0, tvOS 16.0, macOS 13.0, *) {
             self.content.contextMenu(menuItems: menuItems, preview: preview)
         } else {
-            if #available(iOS 14.0, tvOS 14.0, *) {
+            if #available(iOS 14, tvOS 14, *) {
                 self.content.contextMenu(menuItems: menuItems)
             } else {
                 self.content
@@ -186,7 +186,7 @@ extension Backport {
     @ViewBuilder
     func fullScreenCover<Content: View>(isPresented: Binding<Bool>, @ViewBuilder _ content: @escaping () -> Content) -> some View {
 #if os(iOS)
-        if #available(iOS 14.0, *) {
+        if #available(iOS 14, *) {
             self.content.fullScreenCover(isPresented: isPresented, content: content)
         } else {
             self.content

@@ -1,22 +1,21 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import Pulse
 
 struct NetworkDetailsView: View {
-    // TODO: Fix liofecycle on iOS 14+
-    private let viewModel: NetworkDetailsViewModel
     private var title: String
+    private let viewModel: NetworkDetailsViewModel?
     @State private var isShowingShareSheet = false
 
-    init(title: String, viewModel: @autoclosure @escaping () -> KeyValueSectionViewModel) {
+    init(title: String, viewModel: @escaping () -> KeyValueSectionViewModel?) {
         self.title = title
-        self.viewModel = NetworkDetailsViewModel { viewModel().asAttributedString() }
+        self.viewModel = NetworkDetailsViewModel { viewModel()?.asAttributedString() }
     }
 
-    init(title: String, text: @autoclosure @escaping () -> NSAttributedString) {
+    init(title: String, text: @escaping () -> NSAttributedString?) {
         self.title = title
         self.viewModel = NetworkDetailsViewModel(text)
     }
@@ -28,19 +27,19 @@ struct NetworkDetailsView: View {
 
     @ViewBuilder
     private var contents: some View {
-        if viewModel.text.isEmpty {
-            PlaceholderView(imageName: "folder", title: "Empty")
+        if let viewModel = viewModel?.text, !viewModel.isEmpty {
+            RichTextView(viewModel: viewModel)
         } else {
-            RichTextView(viewModel: viewModel.text)
+            PlaceholderView(imageName: "nosign", title: "Empty")
         }
     }
 }
 
 final class NetworkDetailsViewModel {
-    private(set) lazy var text = RichTextViewModel(string: makeString())
-    private let makeString: () -> NSAttributedString
+    private(set) lazy var text = makeString().map { RichTextViewModel(string: $0) }
+    private let makeString: () -> NSAttributedString?
 
-    init(_ closure: @escaping () -> NSAttributedString) {
+    init(_ closure: @escaping () -> NSAttributedString?) {
         self.makeString = closure
     }
 }
@@ -50,7 +49,9 @@ struct NetworkDetailsView_Previews: PreviewProvider {
     static var previews: some View {
 #if !os(watchOS)
             NavigationView {
-                NetworkDetailsView(title: "JWT", text: KeyValueSectionViewModel.makeDetails(for: jwt))
+                NetworkDetailsView(title: "JWT") {
+                    KeyValueSectionViewModel.makeDetails(for: jwt)
+                }
             }
             .previewDisplayName("JWT")
 #endif

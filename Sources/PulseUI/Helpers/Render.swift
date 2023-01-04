@@ -1,11 +1,13 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import Pulse
 import Foundation
 
 #if os(iOS) || os(macOS)
+
+#warning("TODO: better API and available on other platforms")
 
 enum Render {
     static func asPlainText(task: NetworkTaskEntity) -> String {
@@ -300,7 +302,7 @@ private final class HTMLRenderer: Renderer {
 
 private let style = """
 <style>
-body {
+  body {
     font: 400 16px/1.55 -apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Icons","Helvetica Neue",Helvetica,Arial,sans-serif;
     background-color: #FDFDFD;
     color: #353535;
@@ -308,6 +310,7 @@ body {
   pre {
     font-family: 'SF Mono', Menlo, monospace, Courier, Consolas, "Liberation Mono", monospace;
     font-size: 14px;
+    overflow-x: auto;
   }
   h2 {
     margin-top: 30px;

@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
 import SwiftUI
@@ -8,7 +8,7 @@ import Combine
 import Pulse
 import Network
 
-@available(iOS 14.0, tvOS 14.0, *)
+@available(iOS 14, tvOS 14, *)
 struct RemoteLoggerSettingsView: View {
     @ObservedObject var viewModel: RemoteLoggerSettingsViewModel
     
@@ -80,7 +80,7 @@ struct RemoteLoggerSettingsView: View {
     }
 }
 
-@available(iOS 14.0, tvOS 14.0, *)
+@available(iOS 14, tvOS 14, *)
 final class RemoteLoggerSettingsViewModel: ObservableObject {
     @Published var isEnabled: Bool = false
     @Published var servers: [RemoteLoggerServerViewModel] = []
@@ -141,7 +141,7 @@ struct RemoteLoggerServerViewModel: Identifiable {
     let connect: () -> Void
 }
 
-@available(iOS 14.0, tvOS 14.0, *)
+@available(iOS 14, tvOS 14, *)
 private extension NWBrowser.Result {
     var name: String? {
         switch endpoint {
@@ -156,7 +156,7 @@ private extension NWBrowser.Result {
 #if DEBUG
 struct RemoteLoggerSettingsView_Previews: PreviewProvider {
     static var previews: some View {
-        if #available(iOS 14.0, tvOS 14.0, *) {
+        if #available(iOS 14, tvOS 14, *) {
             RemoteLoggerSettingsView(viewModel: .shared)
                 .previewLayout(.sizeThatFits)
         }

@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import Pulse
@@ -61,7 +61,7 @@ struct ConsoleFiltersView: View {
 extension ConsoleFiltersView {
     @ViewBuilder
     var formContents: some View {
-        if #available(iOS 14.0, *) {
+        if #available(iOS 14, *) {
             generalSection
         }
         logLevelsSection
@@ -79,7 +79,7 @@ extension ConsoleFiltersView {
 // MARK: - ConsoleFiltersView (Custom Filters)
 
 extension ConsoleFiltersView {
-    @available(iOS 14.0, *)
+    @available(iOS 14, *)
     var generalSection: some View {
         FiltersSection(
             isExpanded: $isGeneralSectionExpanded,
@@ -100,7 +100,7 @@ extension ConsoleFiltersView {
     }
 
 #if os(iOS)
-    @available(iOS 14.0, *)
+    @available(iOS 14, *)
     @ViewBuilder
     private var generalContent: some View {
         ForEach(viewModel.filters) { filter in

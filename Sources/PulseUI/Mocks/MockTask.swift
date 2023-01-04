@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
 import Pulse
@@ -37,6 +37,8 @@ struct MockTask {
 }
 
 extension MockTask {
+    static let allEntities: [NetworkTaskEntity]  = MockTask.allTasks.map(LoggerStore.preview.entity)
+
     static var allTasks: [MockTask] = [.login, .profile, .repos, .octocat, .downloadNuke, .createAPI, .uploadPulseArchive, .patchRepo]
 
     /// A successful request the demonstrates:

@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 #if os(macOS)
 import AppKit
@@ -117,22 +117,6 @@ extension UXColor {
     static let systemOrange = UXColor(Color.orange)
 }
 #endif
-
-// MARK: - FontSize
-
-enum FontSize {
-    static var body: CGFloat {
-        #if os(iOS)
-            return 13
-        #elseif os(macOS)
-            return 12
-        #elseif os(tvOS)
-            return 24
-        #else
-            return 12
-        #endif
-    }
-}
 
 // MARK: - NSTextView
 

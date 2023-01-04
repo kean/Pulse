@@ -1,8 +1,10 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
+
+#warning("TODO: remove")
 
 #if os(iOS) || os(macOS) || os(tvOS)
 

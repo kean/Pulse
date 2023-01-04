@@ -1,12 +1,12 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import Pulse
 import Combine
 
-#warning("TODO: simplify this")
+#warning("TODO: remove this")
 
 final class NetworkInspectorSummaryViewModel: ObservableObject {
     @Published var isErrorRawLinkActive = false

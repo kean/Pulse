@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import CoreData
@@ -50,16 +50,19 @@ final class ProgressViewModel: ObservableObject {
     }
 
     init(task: NetworkTaskEntity) {
-        switch task.type ?? .dataTask {
-        case .downloadTask: self.title = "Downloading"
-        case .uploadTask: self.title = "Uploading"
-        default: self.title = "Pending"
-        }
-
+        self.title = ProgressViewModel.title(for: task)
         observer1 = task.publisher(for: \.progress, options: [.initial, .new]).sink { [weak self] change in
             if let progress = task.progress {
                 self?.register(for: progress)
             }
+        }
+    }
+
+    static func title(for task: NetworkTaskEntity) -> String {
+        switch task.type ?? .dataTask {
+        case .downloadTask: return "Downloading"
+        case .uploadTask: return "Uploading"
+        default: return "Pending"
         }
     }
 

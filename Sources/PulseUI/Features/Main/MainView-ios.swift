@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import CoreData
@@ -20,7 +20,7 @@ public struct MainView: View {
     }
 
     public var body: some View {
-        if UIDevice.current.userInterfaceIdiom == .pad, #available(iOS 14.0, *) {
+        if UIDevice.current.userInterfaceIdiom == .pad, #available(iOS 14, *) {
             NavigationView {
                 List(viewModel.items) { item in
                     if item.id == viewModel.items[0].id {

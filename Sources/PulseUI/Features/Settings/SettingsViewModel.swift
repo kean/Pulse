@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import Pulse
@@ -19,7 +19,7 @@ final class SettingsViewModel: ObservableObject {
 
     private var cancellables: [AnyCancellable] = []
 
-    @available(iOS 14.0, tvOS 14.0, *)
+    @available(iOS 14, tvOS 14, *)
     var isRemoteLoggingAvailable: Bool {
         store === RemoteLogger.shared.store
     }

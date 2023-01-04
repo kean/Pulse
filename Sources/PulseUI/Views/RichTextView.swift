@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import CoreData
@@ -9,6 +9,7 @@ import Combine
 
 #warning("TODO: remoe isScrolled?")
 #warning("TODO: handle clicks on decoding error on other platforms")
+#warning("TODO: fix missing vertical scroller on macOS")
 
 #if os(macOS) || os(iOS)
 
@@ -314,7 +315,7 @@ private struct SearchToobar: View {
 #if os(iOS)
     var body: some View {
         HStack(alignment: .center) {
-            if #available(iOS 14.0, *) {
+            if #available(iOS 14, *) {
                 Menu(content: {
                     StringSearchOptionsMenu(options: $viewModel.options, isKindNeeded: false)
                 }, label: {

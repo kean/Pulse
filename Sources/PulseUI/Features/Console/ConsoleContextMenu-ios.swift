@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import CoreData
@@ -11,7 +11,7 @@ import Combine
 
 import UniformTypeIdentifiers
 
-@available(iOS 14.0, *)
+@available(iOS 14, *)
 struct ConsoleContextMenu: View {
     private let store: LoggerStore
     private let isShowingAsText: Binding<Bool>?
@@ -126,7 +126,7 @@ struct ConsoleContextMenu: View {
     }
 }
 
-@available(iOS 14.0, *)
+@available(iOS 14, *)
 private struct DocumentBrowser: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> DocumentBrowserViewController {
         DocumentBrowserViewController(forOpeningContentTypes: [UTType(filenameExtension: "pulse")].compactMap { $0 })
@@ -138,7 +138,7 @@ private struct DocumentBrowser: UIViewControllerRepresentable {
 }
 
 #if DEBUG
-@available(iOS 14.0, *)
+@available(iOS 14, *)
 struct ConsoleContextMenu_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
