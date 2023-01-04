@@ -7,21 +7,18 @@ import CoreData
 import Pulse
 import Combine
 
-#if os(iOS) || os(tvOS)
+#if os(iOS)
 
 public struct MainView: View {
     // TODO: replace with StateObject when available
     @State private var viewModel: MainViewModel
-
     @State private var isDefaultTabSelected = true
-    @State private var viewController: UIViewController?
 
     /// - parameter onDismiss: pass onDismiss to add a close button.
     public init(store: LoggerStore = .shared, onDismiss: (() -> Void)? = nil) {
         _viewModel = State(wrappedValue: MainViewModel(store: store, onDismiss: onDismiss))
     }
 
-#if os(iOS)
     public var body: some View {
         if UIDevice.current.userInterfaceIdiom == .pad, #available(iOS 14.0, *) {
             NavigationView {
@@ -64,21 +61,6 @@ public struct MainView: View {
             .onDisappear { viewModel.freeMemory() }
         }
     }
-#else
-    public var body: some View {
-        NavigationView {
-            TabView {
-                ForEach(viewModel.items) { item in
-                    viewModel.makeView(for: item)
-                        .tabItem {
-                            Image(systemName: item.imageName)
-                            Text(item.title)
-                        }
-                }
-            }
-        }
-    }
-#endif
 }
 
 #if DEBUG
