@@ -12,7 +12,7 @@ struct RichTextView: View {
 
     var body: some View {
         ScrollView {
-            if #available(watchOS 8.0, *), let string = viewModel.attributedString {
+            if #available(watchOS 8.0, tvOS 15.0, *), let string = viewModel.attributedString {
                 Text(string)
             } else {
                 Text(viewModel.text)
@@ -24,7 +24,7 @@ struct RichTextView: View {
 final class RichTextViewModel: ObservableObject {
     let text: String
 
-    @available(watchOS 8.0, *)
+    @available(watchOS 8.0, tvOS 15.0, *)
     var attributedString: AttributedString? {
         _attributedString as? AttributedString
     }
@@ -38,7 +38,7 @@ final class RichTextViewModel: ObservableObject {
     }
 
     init(string: NSAttributedString, contentType: NetworkLogger.ContentType? = nil) {
-        if #available(watchOS 8.0, *) {
+        if #available(watchOS 8.0, tvOS 15.0, *) {
             self._attributedString = try? AttributedString(string, including: \.uiKit)
         }
         self.text = string.string
