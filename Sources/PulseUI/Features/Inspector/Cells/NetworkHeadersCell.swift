@@ -31,11 +31,7 @@ final class NetworkHeadersCellViewModel {
     let details: String
     let isEnabled: Bool
 
-    lazy var detailsViewModel = KeyValueSectionViewModel(
-        title: title,
-        color: .red,
-        items: headers.sorted { $0.key < $1.key }
-    )
+    lazy var detailsViewModel = KeyValueSectionViewModel.makeHeaders(title: title, headers: headers)
 
     private let headers: [String: String]
 

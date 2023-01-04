@@ -36,7 +36,7 @@ final class NetworkRequestStatusSectionViewModel {
         self.status = NetworkRequestStatusCellModel(task: task)
         self.errorDescription = task.state == .failure ? task.errorDebugDescription : nil
         self.requestViewModel = NetworkRequestInfoCellViewModel(task: task)
-        self.errorDetailsViewModel = KeyValueSectionViewModel.makeErrorDetails(for: task, action: {})
+        self.errorDetailsViewModel = KeyValueSectionViewModel.makeErrorDetails(for: task)
     }
 
     init(transaction: NetworkTransactionMetricsEntity) {

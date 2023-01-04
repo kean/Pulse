@@ -84,9 +84,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
     }
 
     var errorModel: KeyValueSectionViewModel? {
-        KeyValueSectionViewModel.makeErrorDetails(for: task) { [unowned self] in
-            isErrorRawLinkActive = true
-        }
+        KeyValueSectionViewModel.makeErrorDetails(for: task)
     }
 
     // MARK: - Request (Original)
@@ -98,9 +96,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
 #if os(iOS) || os(macOS)
     var originalRequestQueryItems: KeyValueSectionViewModel? {
         task.originalRequest?.url.flatMap(URL.init).flatMap {
-            KeyValueSectionViewModel.makeQueryItems(for: $0) { [unowned self] in
-                self.isOriginalQueryItemsLinkActive = true
-            }
+            KeyValueSectionViewModel.makeQueryItems(for: $0)
         }
     }
 #endif
@@ -142,9 +138,7 @@ final class NetworkInspectorSummaryViewModel: ObservableObject {
 #if os(iOS) || os(macOS)
     var currentRequestQueryItems: KeyValueSectionViewModel? {
         task.originalRequest?.url.flatMap(URL.init).flatMap {
-            KeyValueSectionViewModel.makeQueryItems(for: $0) { [unowned self] in
-                self.isCurrentQueryItemsLinkActive = true
-            }
+            KeyValueSectionViewModel.makeQueryItems(for: $0)
         }
     }
 #endif

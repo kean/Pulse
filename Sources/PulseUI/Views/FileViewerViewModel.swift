@@ -96,6 +96,8 @@ final class FileViewerViewModel: ObservableObject {
         return nil
     }
 
+#warning("TODO: remove")
+    @available(*, deprecated, message: "Deprecated")
     private func decodeQueryParameters(form string: String) -> KeyValueSectionViewModel? {
         let string = "https://placeholder.com/path?" + string
         guard let components = URLComponents(string: string),
@@ -103,7 +105,7 @@ final class FileViewerViewModel: ObservableObject {
               !queryItems.isEmpty else {
             return nil
         }
-        return KeyValueSectionViewModel.makeQueryItems(for: queryItems, action: {})
+        return KeyValueSectionViewModel.makeQueryItems(for: queryItems)
     }
 }
 

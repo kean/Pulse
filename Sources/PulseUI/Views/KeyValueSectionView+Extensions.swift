@@ -49,7 +49,7 @@ extension KeyValueSectionViewModel {
         if request.httpShouldUsePipelining {
             items.append(("HTTP Should Use Pipelining", request.httpShouldUsePipelining.description))
         }
-        return KeyValueSectionViewModel(title: "Options", color: .blue, items: items)
+        return KeyValueSectionViewModel(title: "Options", color: .indigo, items: items)
     }
 
 #warning("TODO: remove unused")
@@ -83,14 +83,40 @@ extension KeyValueSectionViewModel {
         )
     }
 
-    static func makeErrorDetails(for task: NetworkTaskEntity, action: @escaping () -> Void) -> KeyValueSectionViewModel? {
+    static func makeComponents(for url: URL) -> KeyValueSectionViewModel? {
+        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
+            return nil
+        }
+        return KeyValueSectionViewModel(
+            title: "URL Components",
+            color: .blue,
+            items: [
+                ("Scheme", components.scheme),
+                ("Port", components.port?.description),
+                ("User", components.user),
+                ("Password", components.password),
+                ("Host", components.host),
+                ("Path", components.path),
+                ("Query", components.query),
+                ("Fragment", components.fragment)
+            ].filter { $0.1?.isEmpty == false })
+    }
+
+    static func makeHeaders(title: String, headers: [String: String]?) -> KeyValueSectionViewModel {
+        KeyValueSectionViewModel(
+            title: title,
+            color: .red,
+            items: (headers ?? [:]).sorted { $0.key < $1.key }
+        )
+    }
+
+    static func makeErrorDetails(for task: NetworkTaskEntity) -> KeyValueSectionViewModel? {
         guard task.errorCode != 0, task.state == .failure else {
             return nil
         }
         return KeyValueSectionViewModel(
             title: "Error",
             color: .red,
-            action: ActionViewModel(title: "View", action: action),
             items: [
                 ("Domain", task.errorDomain),
                 ("Code", descriptionForError(domain: task.errorDomain, code: task.errorCode)),
@@ -105,20 +131,19 @@ extension KeyValueSectionViewModel {
         return "\(code) (\(descriptionForURLErrorCode(Int(code)))"
     }
 
-    static func makeQueryItems(for url: URL, action: @escaping () -> Void) -> KeyValueSectionViewModel? {
+    static func makeQueryItems(for url: URL) -> KeyValueSectionViewModel? {
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
               let queryItems = components.queryItems,
               !queryItems.isEmpty else {
             return nil
         }
-        return makeQueryItems(for: queryItems, action: action)
+        return makeQueryItems(for: queryItems)
     }
 
-    static func makeQueryItems(for queryItems: [URLQueryItem], action: @escaping () -> Void) -> KeyValueSectionViewModel? {
+    static func makeQueryItems(for queryItems: [URLQueryItem]) -> KeyValueSectionViewModel? {
         KeyValueSectionViewModel(
             title: "Query Items",
-            color: .blue,
-            action: ActionViewModel(title: "View", action: action),
+            color: .purple,
             items: queryItems.map { ($0.name, $0.value) }
         )
     }

@@ -21,6 +21,7 @@ final class NetworkInspectorRequestDetailsViewModel {
         self.request = request
     }
 
+    #warning("TODO: perform rendering using TextRenderer (?)")
     private func makeDetails() -> NSAttributedString {
         guard let url = URL(string: request.url ?? "") else {
             return NSAttributedString(string: "Invalid URL")
@@ -49,32 +50,19 @@ final class NetworkInspectorRequestDetailsViewModel {
         }
 
         string.append("\n", bodyAttributes)
+        if let section = KeyValueSectionViewModel.makeComponents(for: url) {
+            string.append("\nURL Components\n", titleAttributes)
+            string.append(section.asAttributedString())
+        }
 
-        let items: [(String, String?)] = [
-            ("Scheme", components.scheme),
-            ("Port", components.port?.description),
-            ("User", components.user),
-            ("Password", components.password),
-            ("Host", components.host),
-            ("Path", components.path),
-            ("Query", components.query),
-            ("Fragment", components.fragment)
-        ]
-
-        let section = KeyValueSectionViewModel(title: "", color: .blue, items: items.filter { $0.1?.isEmpty == false })
-        string.append("\nURL Components\n", titleAttributes)
-        string.append(section.asAttributedString())
-
-        if var queryItems = KeyValueSectionViewModel.makeQueryItems(for: url, action: {}) {
-            queryItems.color = .purple
+        if let queryItems = KeyValueSectionViewModel.makeQueryItems(for: url) {
             string.append("\nQuery Items\n", titleAttributes)
             string.append(queryItems.asAttributedString())
         }
 
         string.append("\nRequest Parameters\n", titleAttributes)
 
-        var parametersSection = KeyValueSectionViewModel.makeParameters(for: request)
-        parametersSection.color = .indigo
+        let parametersSection = KeyValueSectionViewModel.makeParameters(for: request)
         string.append(parametersSection.asAttributedString())
 
         string.addAttributes([.underlineColor: UXColor.clear])

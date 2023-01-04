@@ -5,6 +5,8 @@
 import SwiftUI
 import Pulse
 
+#warning("TODO: remove")
+@available(*, deprecated, message: "Deprecated")
 struct KeyValueSectionView: View {
     let viewModel: KeyValueSectionViewModel
     var limit: Int = Int.max
@@ -96,6 +98,8 @@ struct KeyValueSectionView: View {
     }
 }
 
+#warning("TODO: remove")
+@available(*, deprecated, message: "Deprecated")
 private struct KeyValueListView: View {
     let viewModel: KeyValueSectionViewModel
     var limit: Int = Int.max
@@ -288,13 +292,16 @@ struct KeyValueSectionViewModel {
     var action: ActionViewModel?
     var items: [(String, String?)] = []
 
-    #warning("TODO: remove")
+#warning("TODO: remove")
+    @available(*, deprecated, message: "Deprecated")
     func title(_ title: String) -> KeyValueSectionViewModel {
         var copy = self
         copy.title = title
         return copy
     }
 
+#warning("TODO: remove")
+    @available(*, deprecated, message: "Deprecated")
     static func empty() -> KeyValueSectionViewModel {
         KeyValueSectionViewModel(title: "Empty", color: .secondary)
     }
@@ -308,6 +315,8 @@ struct KeyValueRow: Identifiable {
     var details: String? { item.1 }
 }
 
+#warning("TODO: remove")
+@available(*, deprecated, message: "Deprecated")
 struct ActionViewModel {
     let title: String
     let action: () -> Void

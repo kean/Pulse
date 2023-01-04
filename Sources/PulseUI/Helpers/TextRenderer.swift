@@ -50,11 +50,15 @@ final class TextRenderer {
         }
     }
 
+#warning("TODO: remove")
+    @available(*, deprecated, message: "Deprecated")
     func render(_ entities: [NetworkTaskEntity], options: Options = .init()) -> NSAttributedString {
         prepare(options: options)
         return joined(entities.map(render))
     }
-
+    
+#warning("TODO: remove")
+    @available(*, deprecated, message: "Deprecated")
     func render(_ entities: [LoggerMessageEntity], options: Options = .init()) -> NSAttributedString {
         prepare(options: options)
         return joined(entities.map(render))
@@ -128,36 +132,45 @@ final class TextRenderer {
             text.append(render(section))
         }
 
-        if let url = task.url {
+        let url = task.url.flatMap(URL.init) ?? URL(string: "invalid-url")!
+
+        text.append(url.absoluteString + "\n", {
             var attributes = helpers.textAttributes[.debug]!
             attributes[.font] = UXFont.systemFont(ofSize: options.fontSize, weight: .medium)
             if !options.isMonocrhome {
                 attributes[.foregroundColor] = tintColor
             }
-            text.append(url + "\n", attributes)
-        }
+            return attributes
+        }())
 
-        let viewModel = NetworkInspectorSummaryViewModel(task: task)
         let content = options.networkContent
 
-        if content.contains(.errorDetails) {
-            append(section: viewModel.errorModel)
+        if content.contains(.requestComponents) {
+            append(section: .makeComponents(for: url))
         }
-
-        if task.originalRequest != nil {
-            let originalHeaders = viewModel.originalRequestHeaders
-            var currentHeaders = viewModel.currentRequestHeaders
+        if content.contains(.requestQueryItems) {
+            append(section: .makeQueryItems(for: url))
+        }
+        if content.contains(.requestOptions), let request = task.originalRequest {
+            append(section: .makeParameters(for: request))
+        }
+        if content.contains(.errorDetails) {
+            append(section: .makeErrorDetails(for: task))
+        }
+        if let originalRequest = task.originalRequest {
             if content.contains(.originalRequestHeaders) {
-                append(section:originalHeaders .title("Original Request Headers"))
+                append(section: .makeHeaders(title: "Original Request Headers", headers: originalRequest.headers))
             }
-            if content.contains(.currentRequestHeaders), task.currentRequest != nil {
-                if task.originalRequest?.headers == task.currentRequest?.headers {
-                    currentHeaders.items = [("Headers", "<original>")]
+            if content.contains(.currentRequestHeaders), let currentRequest = task.currentRequest {
+                if originalRequest.headers == currentRequest.headers {
+                    text.append("Same as Original", [
+                        .font: UXFont.systemFont(ofSize: TextSize.body, weight: .regular),
+                        .foregroundColor: UXColor.secondaryLabel,
+                        .paragraphStyle: helpers.bodParagraphStyle
+                    ])
+                } else {
+                    append(section: .makeHeaders(title: "Current Request Headers", headers: currentRequest.headers))
                 }
-                append(section: currentHeaders.title("Current Request Headers"))
-            }
-            if content.contains(.requestOptions) {
-                append(section: viewModel.originalRequestParameters?.title("Request Options"))
             }
             if content.contains(.requestBody), let data = task.requestBody?.data, !data.isEmpty {
                 text.append("\n", helpers.spacerAttributes)
@@ -166,8 +179,8 @@ final class TextRenderer {
                 text.append("\n", helpers.detailsAttributes)
             }
         }
-        if content.contains(.responseHeaders), task.response != nil {
-            append(section: viewModel.responseHeaders.title("Response Headers"))
+        if content.contains(.responseHeaders), let response = task.response {
+            append(section: .makeHeaders(title: "Response Headers", headers: response.headers))
         }
         if content.contains(.responseBody), let data = task.responseBody?.data, !data.isEmpty {
             text.append("\n", helpers.spacerAttributes)
@@ -234,6 +247,8 @@ final class TextRenderer {
         }
     }
 
+    #warning("TODO: remove")
+    @available(*, deprecated, message: "Deprecated")
     private func decodeQueryParameters(form string: String) -> KeyValueSectionViewModel? {
         let string = "https://placeholder.com/path?" + string
         guard let components = URLComponents(string: string),
@@ -241,7 +256,7 @@ final class TextRenderer {
               !queryItems.isEmpty else {
             return nil
         }
-        return KeyValueSectionViewModel.makeQueryItems(for: queryItems, action: {})
+        return KeyValueSectionViewModel.makeQueryItems(for: queryItems)
     }
 
     func render(_ section: KeyValueSectionViewModel, isMonospaced: Bool = true) -> NSAttributedString {
@@ -345,7 +360,7 @@ final class TextHelpers {
 
     let monoParagraphStyle: NSParagraphStyle
 
-    let paragraphStyle: NSParagraphStyle
+    let bodParagraphStyle: NSParagraphStyle
     private(set) var textAttributes: [LoggerStore.Level: [NSAttributedString.Key: Any]] = [:]
     var detailsAttributes: [NSAttributedString.Key: Any] { textAttributes[.debug]! }
 
@@ -357,14 +372,14 @@ final class TextHelpers {
         self.fontMono = .monospacedSystemFont(ofSize: TextSize.mono, weight: .regular)
 
         let lineHeight = geLineHeight(for: Int(options.fontSize))
-        self.paragraphStyle = NSParagraphStyle.make(lineHeight: lineHeight)
+        self.bodParagraphStyle = NSParagraphStyle.make(lineHeight: lineHeight)
 
         self.monoParagraphStyle = NSParagraphStyle.make(lineHeight: TextSize.mono + 6)
 
         self.captionAttributes = [
             .font: fontCaption,
             .foregroundColor: UXColor.secondaryLabel,
-            .paragraphStyle: paragraphStyle
+            .paragraphStyle: bodParagraphStyle
         ]
 
         self.spacerAttributes = [
@@ -387,7 +402,7 @@ final class TextHelpers {
             return [
                 .font: fontCaption,
                 .foregroundColor: textColor,
-                .paragraphStyle: paragraphStyle
+                .paragraphStyle: bodParagraphStyle
             ]
         }
 
@@ -423,19 +438,32 @@ struct RenteredNetworkContent: OptionSet {
         self.rawValue = rawValue
     }
 
-    static let errorDetails = RenteredNetworkContent(rawValue: 1 << 0)
-    static let originalRequestHeaders = RenteredNetworkContent(rawValue: 1 << 2)
-    static let currentRequestHeaders = RenteredNetworkContent(rawValue: 1 << 3)
-    static let requestOptions = RenteredNetworkContent(rawValue: 1 << 4)
-    static let requestBody = RenteredNetworkContent(rawValue: 1 << 5)
-    static let responseHeaders = RenteredNetworkContent(rawValue: 1 << 6)
-    static let responseBody = RenteredNetworkContent(rawValue: 1 << 7)
+    static let requestComponents = RenteredNetworkContent(rawValue: 1 << 0)
+    static let requestQueryItems = RenteredNetworkContent(rawValue: 1 << 1)
+    static let errorDetails = RenteredNetworkContent(rawValue: 1 << 2)
+    static let originalRequestHeaders = RenteredNetworkContent(rawValue: 1 << 3)
+    static let currentRequestHeaders = RenteredNetworkContent(rawValue: 1 << 5)
+    static let requestOptions = RenteredNetworkContent(rawValue: 1 << 7)
+    static let requestBody = RenteredNetworkContent(rawValue: 1 << 8)
+    static let responseHeaders = RenteredNetworkContent(rawValue: 1 << 9)
+    static let responseBody = RenteredNetworkContent(rawValue: 1 << 11)
+
+    #warning("TODO: add subset for sharing (not all?)")
 
     static let all: RenteredNetworkContent = [
-        errorDetails, originalRequestHeaders, currentRequestHeaders, requestOptions, requestBody, responseHeaders, responseBody
+        requestComponents,
+        requestQueryItems,
+        errorDetails,
+        originalRequestHeaders,
+        currentRequestHeaders,
+        requestOptions,
+        requestBody,
+        responseHeaders,
+        responseBody
     ]
 }
 
+#warning("TODO: remove")
 @available(*, deprecated, message: "Deprecated")
 enum FontSize {
     static var body: CGFloat {
@@ -459,14 +487,16 @@ enum FontSize {
 struct ConsoleTextRenderer_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            let renderer = TextRenderer()
-            let string = renderer.render([task], options: .init(networkContent: [.all]))
-            let safeString = renderer.render([task], options: .init(networkContent: [.all]))
-            let html = try! TextRenderer.html(from: safeString)
-            let pdf = try! TextRenderer.pdf(from: safeString)
+            let string = TextRenderer(options: .init(networkContent: [.all])).render(task)
+            let string2 = TextRenderer(options: .init(networkContent: [.all], isMonocrhome: false)).render(task)
+            let html = try! TextRenderer.html(from: string)
+            let pdf = try! TextRenderer.pdf(from: string)
 
             RichTextView(viewModel: .init(string: string))
                 .previewDisplayName("NSAttributedString")
+
+            RichTextView(viewModel: .init(string: string2))
+                .previewDisplayName("NSAttributedString (Color)")
 
             RichTextView(viewModel: .init(string: string.string))
                 .previewDisplayName("Plain Text")
