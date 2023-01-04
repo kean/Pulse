@@ -28,24 +28,33 @@ private struct TimingSectionView: View {
     let viewModel: TimingRowSectionViewModel
     let parent: TimingViewModel
 
+    @State private var isFocused = false
+
     var body: some View {
         VStack(spacing: 6) {
             HStack {
                 Text(viewModel.title)
                     .font(.subheadline)
                     .lineLimit(1)
-                    .foregroundColor(viewModel.isHeader ? .secondary : .primary)
+                    .foregroundColor(isFocused ? Color.blue : viewModel.isHeader ? .secondary : .primary)
                 Spacer()
             }.padding(.top, viewModel.isHeader ? 16 : 0)
             if viewModel.isHeader {
                 Divider()
             }
             if !viewModel.items.isEmpty {
-                ForEach(viewModel.items) {
-                    TimingRowView(viewModel: $0, parent: parent)
+                ForEach(viewModel.items) { item in
+                    TimingRowView(viewModel: item, parent: parent)
                 }
             }
         }
+#if os(tvOS)
+        .focusable(true, onFocusChange: { isFocused in
+            withAnimation {
+                self.isFocused = isFocused
+            }
+        })
+#endif
     }
 }
 

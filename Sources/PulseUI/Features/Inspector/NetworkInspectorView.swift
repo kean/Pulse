@@ -37,6 +37,7 @@ struct NetworkInspectorView: View {
 #endif
     }
 
+#if os(iOS)
     var contents: some View {
         Form {
             Section {
@@ -48,28 +49,82 @@ struct NetworkInspectorView: View {
             Section {
                 headerView
             }
-#if os(watchOS)
-            Section {
-                requestTypePickerView
-                sectionRequest
-            }
-#else
             Section(header: requestTypePickerView) {
                 sectionRequest
             }
-#endif
             if viewModel.task.state != .pending {
                 Section {
                     sectionResponse
                 }
-#if !os(watchOS)
                 Section {
                     sectionMetrics
                 }
-#endif
             }
         }
     }
+#elseif os(watchOS)
+    var contents: some View {
+        Form {
+            Section {
+                transferStatusView
+            }
+            .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+            .listRowBackground(Color.clear)
+
+            Section {
+                headerView
+            }
+            Section {
+                requestTypePickerView
+                sectionRequest
+            }
+            if viewModel.task.state != .pending {
+                Section {
+                    sectionResponse
+                }
+            }
+        }
+    }
+#elseif os(tvOS)
+    var contents: some View {
+        HStack {
+            Form {
+                Section {
+                    transferStatusView
+                        .padding(.top, 16)
+                        .padding(.bottom, 16)
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+                .listRowBackground(Color.clear)
+
+                Section {
+                    NetworkInspectorMetricsViewModel(task: viewModel.task).map {
+                        TimingView(viewModel: $0.timingViewModel)
+                    }
+                }
+            }
+            .listStyle(.plain)
+            .frame(width: 1000)
+            Form {
+                Section {
+                    headerView
+                }
+                Section(header: Text("Request")) {
+                    requestTypePickerView
+                    sectionRequest
+                }
+                if viewModel.task.state != .pending {
+                    Section(header: Text("Response")) {
+                        sectionResponse
+                    }
+                    Section(header: Text("Transactions")) {
+                        sectionMetrics
+                    }
+                }
+            }
+        }
+    }
+#endif
 
     @ViewBuilder
     private var sectionRequest: some View {
@@ -188,7 +243,7 @@ struct NetworkInspectorView: View {
 
     @ViewBuilder
     var headerView: some View {
-        HStack {
+        HStack(spacing: spacing) {
 #if !os(watchOS)
             if #available(iOS 14.0, tvOS 14.0, *) {
                 Text(Image(systemName: viewModel.statusImageName))
@@ -308,8 +363,6 @@ struct NetworkInspectorView: View {
         let details: String
         
         var body: some View {
-            let image = Image(systemName: icon)
-                .foregroundColor(tintColor)
 #if os(watchOS)
             HStack {
                 VStack(alignment: .leading) {
@@ -317,13 +370,22 @@ struct NetworkInspectorView: View {
                     Text(details).foregroundColor(.secondary)
                 }
                 Spacer()
-                image
+                Image(systemName: icon)
+                    .foregroundColor(tintColor)
                     .font(.system(size: 18))
                     .frame(width: 18, alignment: .trailing)
             }
+#elseif os(tvOS)
+            HStack {
+                Text(title)
+                Spacer()
+                Text(details)
+                    .foregroundColor(.secondary)
+            }
 #else
             HStack {
-                image
+                Image(systemName: icon)
+                    .foregroundColor(tintColor)
                     .font(.system(size: 20))
                     .frame(width: 27, alignment: .leading)
                 Text(title)
@@ -390,6 +452,12 @@ private struct DurationLabel: View {
         }
     }
 }
+
+#if os(tvOS)
+private let spacing: CGFloat = 20
+#else
+private let spacing: CGFloat? = nil
+#endif
 
 #if DEBUG
 struct NetworkInspectorView_Previews: PreviewProvider {
