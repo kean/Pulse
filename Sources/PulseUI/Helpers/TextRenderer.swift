@@ -191,6 +191,7 @@ final class TextRenderer {
         return text
     }
 
+    #warning("TODO: rework this")
     private func renderNetworkTaskBody(_ data: Data, contentType: NetworkLogger.ContentType?, error: NetworkLogger.DecodingError?) -> NSAttributedString {
         let text = NSMutableAttributedString(attributedString: _renderNetworkTaskBody(data, contentType: contentType, error: error))
         if !options.isBodySyntaxHighlightingEnabled {
