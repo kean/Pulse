@@ -21,8 +21,8 @@ public struct MainView: View {
         _viewModel = State(wrappedValue: MainViewModel(store: store, onDismiss: onDismiss))
     }
 
+#if os(iOS)
     public var body: some View {
-        #if os(iOS)
         if UIDevice.current.userInterfaceIdiom == .pad, #available(iOS 14.0, *) {
             NavigationView {
                 List(viewModel.items) { item in
@@ -51,28 +51,34 @@ public struct MainView: View {
             }
             .onDisappear { viewModel.freeMemory() }
         } else {
-            tabView
-                .onDisappear { viewModel.freeMemory() }
-        }
-        #else
-        tabView
+            TabView {
+                ForEach(viewModel.items) { item in
+                    NavigationView {
+                        viewModel.makeView(for: item)
+                    }.tabItem {
+                        Image(systemName: item.imageName)
+                        Text(item.title)
+                    }
+                }
+            }
             .onDisappear { viewModel.freeMemory() }
-        #endif
+        }
     }
-
-    @ViewBuilder
-    private var tabView: some View {
-        TabView {
-            ForEach(viewModel.items) { item in
-                NavigationView {
+#else
+    public var body: some View {
+        NavigationView {
+            TabView {
+                ForEach(viewModel.items) { item in
                     viewModel.makeView(for: item)
-                }.tabItem {
-                    Image(systemName: item.imageName)
-                    Text(item.title)
+                        .tabItem {
+                            Image(systemName: item.imageName)
+                            Text(item.title)
+                        }
                 }
             }
         }
     }
+#endif
 }
 
 #if DEBUG
