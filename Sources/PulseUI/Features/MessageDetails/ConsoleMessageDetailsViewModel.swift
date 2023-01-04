@@ -28,7 +28,15 @@ final class ConsoleMessageDetailsViewModel {
     }()
 
     init(message: LoggerMessageEntity) {
+#if os(macOS)
+        self.textViewModel = RichTextViewModel(string: NSAttributedString(string: message.text, attributes: [
+                .foregroundColor: UXColor.label,
+                .font: UXFont.monospacedSystemFont(ofSize: FontSize.body, weight: .regular),
+                .paragraphStyle: NSParagraphStyle.make(lineHeight: FontSize.body + 7)
+        ]))
+#else
         self.textViewModel = RichTextViewModel(string: message.text)
+#endif
         self.message = message
         self.tags = [
             ConsoleMessageTagViewModel(

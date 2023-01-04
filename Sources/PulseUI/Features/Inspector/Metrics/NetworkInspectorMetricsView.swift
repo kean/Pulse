@@ -13,18 +13,11 @@ import Pulse
 
 struct NetworkInspectorMetricsView: View {
     let viewModel: NetworkInspectorMetricsViewModel
-    @State private var isTransctionsListShown = false
 
     var body: some View {
         ScrollView {
             TimingView(viewModel: viewModel.timingViewModel)
                 .padding()
-#if os(macOS)
-            if let transactions = viewModel.transactions {
-                NetworkInspectorTransactionsListView(viewModel: transactions)
-                    .padding(.bottom, 16)
-            }
-#endif
         }
         .backport.navigationTitle("Metrics")
     }
@@ -35,22 +28,11 @@ struct NetworkInspectorMetricsView: View {
 final class NetworkInspectorMetricsViewModel {
     let task: NetworkTaskEntity
     let timingViewModel: TimingViewModel
-#if !os(tvOS)
-    let transactions: NetworkInspectorTransactionsListViewModel?
-#endif
 
     init?(task: NetworkTaskEntity) {
         guard task.hasMetrics else { return nil }
         self.task = task
         self.timingViewModel = TimingViewModel(task: task)
-
-#if !os(tvOS)
-        if !task.transactions.isEmpty {
-            self.transactions = NetworkInspectorTransactionsListViewModel(task: task)
-        } else {
-            self.transactions = nil
-        }
-#endif
     }
 }
 

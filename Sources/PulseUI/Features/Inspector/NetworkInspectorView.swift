@@ -10,8 +10,8 @@ import Combine
 #warning("TODO: remove onClose")
 #warning("TODO: tvOS enable scroll on left side")
 #warning("TODO: tvOS fix transaction details UI")
-
-#if os(iOS) || os(watchOS) || os(tvOS)
+#warning("TODO: rewrite TransactionsDeatilsView without KeyValueView")
+#warning("TODO: macos show response body automatically when task finished loading")
 
 struct NetworkInspectorView: View {
 #if os(watchOS)
@@ -26,8 +26,9 @@ struct NetworkInspectorView: View {
 #endif
     
     @State private var isShowingCurrentRequest = false
-    
-#if os(iOS) || os(watchOS) || os(tvOS)
+    @State private var isEmptyLinkActive = false
+    @State private var isResponseBodyLinkActive = false
+
     var body: some View {
         contents
 #if os(iOS)
@@ -37,30 +38,56 @@ struct NetworkInspectorView: View {
 #else
             .backport.navigationTitle(viewModel.title)
 #endif
+#if os(macOS)
+            .background(InvisibleNavigationLinks {
+                NavigationLink.programmatic(isActive: $isEmptyLinkActive) { EmptyView () }
+            })
+            .onAppear {
+                DispatchQueue.main.async {
+                    if viewModel.task.responseBodySize > 0 {
+                        isResponseBodyLinkActive = true
+                    } else {
+                        isEmptyLinkActive = true
+                    }
+                }
+            }
+#endif
     }
 
-#if os(iOS)
+#if os(iOS) || os(macOS)
     var contents: some View {
-        Form {
-            Section {
-                transferStatusView
-            }
-            .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
-            .listRowBackground(Color.clear)
+#if os(macOS)
+        List { _contents }
+#else
+        Form { _contents } // Cant't figure out how to disable collapsible sections
+#endif
+    }
 
+    @ViewBuilder
+    private var _contents: some View {
+        Section {
+            transferStatusView
+#if os(macOS)
+                .padding(.top)
+#endif
+        }
+#if os(iOS)
+        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+        .listRowBackground(Color.clear)
+#endif
+
+        Section {
+            headerView
+        }
+        Section(header: requestTypePickerView) {
+            sectionRequest
+        }
+        if viewModel.task.state != .pending {
             Section {
-                headerView
+                sectionResponse
             }
-            Section(header: requestTypePickerView) {
-                sectionRequest
-            }
-            if viewModel.task.state != .pending {
-                Section {
-                    sectionResponse
-                }
-                Section {
-                    sectionMetrics
-                }
+            Section {
+                sectionMetrics
             }
         }
     }
@@ -177,7 +204,7 @@ struct NetworkInspectorView: View {
 
     @ViewBuilder
     private var sectionResponse: some View {
-        NavigationLink(destination: destinationResponseBody) {
+        NavigationLink(isActive: $isResponseBodyLinkActive, destination: { destinationResponseBody }) {
             MenuItem(
                 icon: "arrow.down.circle",
                 tintColor: .indigo,
@@ -213,10 +240,10 @@ struct NetworkInspectorView: View {
         }.disabled(viewModel.responseCookies.isEmpty)
     }
 
-#if os(iOS) || os(tvOS)
+#if os(iOS) || os(tvOS) || os(macOS)
     @ViewBuilder
     private var sectionMetrics: some View {
-#if os(iOS)
+#if os(iOS) || os(macOS)
         NavigationLink(destination: destinationMetrics) {
             MenuItem(
                 icon: "clock.fill",
@@ -313,9 +340,11 @@ struct NetworkInspectorView: View {
         NetworkInspectorRequestDetailsView(viewModel: .init(task: viewModel.task))
     }
 
+#warning("TODO: remove these naviation titles")
+
     private var destinationRequestBody: some View {
         NetworkInspectorRequestView(viewModel: NetworkInspectorRequestViewModel(task: viewModel.task))
-            .navigationBarTitle("Request Body")
+            .backport.navigationTitle("Request Body")
     }
     
     private var destinationOriginalRequestHeaders: some View {
@@ -344,13 +373,13 @@ struct NetworkInspectorView: View {
 
     private var destinationResponseBody: some View {
         NetworkInspectorResponseView(viewModel: NetworkInspectorResponseViewModel(task: viewModel.task))
-            .navigationBarTitle("Response Body")
+            .backport.navigationTitle("Response Body")
     }
 
 #if !os(watchOS)
     private var destinationMetrics: some View {
         NetworkInspectorMetricsTabView(viewModel: NetworkInspectorMetricsTabViewModel(task: viewModel.task))
-            .navigationBarTitle("Metrics")
+            .backport.navigationTitle("Metrics")
     }
 #endif
 
@@ -360,7 +389,14 @@ struct NetworkInspectorView: View {
     }
 
     // MARK: - Helpers
-    
+
+    #warning("TODO: rewrite transaction details page on all platforms")
+    #warning("TODO: instaed of NetworkInspectorTransactionsListView, use MenuItem + proper style of macOS")
+    #warning("TODO: if there is only one operation, show it there? or remove NetworkLoad view entirely?")
+    #warning("TOOD: rewrite NetworkTransactionDetailsView? show one-two columns based on size + rewrite without KeyValueView")
+    #warning("TODO: macOS use pro version of the text viewer")
+    #warning("TODO: macos remvoe hor/vert switch")
+
     private struct MenuItem: View {
         let icon: String
         let tintColor: Color
@@ -421,12 +457,6 @@ struct NetworkInspectorView: View {
         }
     }
 #endif
-
-#else
-    var body: some View {
-        NetworkInspectorSummaryView(viewModel: viewModel.summaryViewModel)
-    }
-#endif
 }
 
 private func stringFromByteCount(_ count: Int64) -> String {
@@ -467,6 +497,13 @@ private let spacing: CGFloat? = nil
 struct NetworkInspectorView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
+#if os(macOS)
+            if #available(macOS 13.0, *) {
+                NavigationStack {
+                    NetworkInspectorView(viewModel: .init(task: LoggerStore.preview.entity(for: .login)))
+                }.previewLayout(.fixed(width: MainView.contentColumnWidth, height: 800))
+            }
+#else
             NavigationView {
                 NetworkInspectorView(viewModel: .init(task: LoggerStore.preview.entity(for: .login)))
             }.previewDisplayName("Success")
@@ -474,9 +511,8 @@ struct NetworkInspectorView_Previews: PreviewProvider {
             NavigationView {
                 NetworkInspectorView(viewModel: .init(task: LoggerStore.preview.entity(for: .patchRepo)))
             }.previewDisplayName("Failure")
+#endif
         }
     }
 }
-#endif
-
 #endif

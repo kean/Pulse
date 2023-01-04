@@ -238,7 +238,9 @@ extension KeyValueSectionViewModel {
 #endif
             output.append(": \(item.1 ?? "–")\n", valueAttributes)
         }
-        output.addAttributes([.paragraphStyle:  NSParagraphStyle.make(lineHeight: FontSize.body + 7)])
+        output.addAttributes([.paragraphStyle: NSParagraphStyle.make(lineHeight: FontSize.body + 7)])
         return output
     }
 }
+
+#warning("TODO: standardize lineHeight")

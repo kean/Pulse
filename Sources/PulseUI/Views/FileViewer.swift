@@ -5,16 +5,21 @@
 import SwiftUI
 import Pulse
 
+#warning("TODO: tvos fix hstack")
+#warning("TODO: macos fix reload of NetworkInspectorView (not working)")
+
 struct FileViewer: View {
     @ObservedObject var viewModel: FileViewerViewModel
 
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(watchOS)
     var body: some View {
         contents
     }
-#elseif os(watchOS)
+#elseif os(macOS)
     var body: some View {
-        contents
+        VStack {
+            contents
+        }.onAppear { viewModel.render() }
     }
 #elseif os(tvOS)
     var body: some View {
@@ -27,19 +32,23 @@ struct FileViewer: View {
 
     @ViewBuilder
     private var contents: some View {
-        switch viewModel.contents {
-        case .json(let viewModel):
-            RichTextView(viewModel: viewModel)
-        case .image(let viewModel):
-            ScrollView {
-                ImageViewer(viewModel: viewModel)
-            }
+        if let contents = viewModel.contents {
+            switch contents {
+            case .json(let viewModel):
+                RichTextView(viewModel: viewModel)
+            case .image(let viewModel):
+                ScrollView {
+                    ImageViewer(viewModel: viewModel)
+                }
 #if os(iOS) || os(macOS)
-        case .pdf(let document):
-            PDFKitRepresentedView(document: document)
+            case .pdf(let document):
+                PDFKitRepresentedView(document: document)
 #endif
-        case .other(let viewModel):
-            RichTextView(viewModel: viewModel)
+            case .other(let viewModel):
+                RichTextView(viewModel: viewModel)
+            }
+        } else {
+            SpinnerView(viewModel: .init(title: "Preparing...", details: nil))
         }
     }
 }

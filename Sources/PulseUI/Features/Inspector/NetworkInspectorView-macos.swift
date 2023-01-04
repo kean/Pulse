@@ -7,7 +7,9 @@ import CoreData
 import Pulse
 import Combine
 
-#if os(macOS)
+#warning("TODO: remove this")
+
+#if os(no)
 
 #warning("TODO: remove onClose")
 

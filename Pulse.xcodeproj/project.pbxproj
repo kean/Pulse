@@ -49,7 +49,6 @@
 		0C855DE228A096550007D325 /* Pulse in Frameworks */ = {isa = PBXBuildFile; productRef = 0C855DE128A096550007D325 /* Pulse */; };
 		0C855DE428A096550007D325 /* PulseUI in Frameworks */ = {isa = PBXBuildFile; productRef = 0C855DE328A096550007D325 /* PulseUI */; };
 		0C9F04F92884F34A0035239F /* Pulse_Demo_macOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9F04F82884F34A0035239F /* Pulse_Demo_macOSApp.swift */; };
-		0C9F04FB2884F34A0035239F /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9F04FA2884F34A0035239F /* ContentView.swift */; };
 		0C9F04FD2884F34A0035239F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C9F04FC2884F34A0035239F /* Assets.xcassets */; };
 		0C9F05002884F34A0035239F /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C9F04FF2884F34A0035239F /* Preview Assets.xcassets */; };
 		0C9F050C2884FA7D0035239F /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CFF9BD825D6199A0069DB6A /* repos.json */; };
@@ -143,7 +142,6 @@
 		0C767816268F88BB0058F69B /* Pulse_Demo_iOSApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Pulse_Demo_iOSApp.swift; sourceTree = "<group>"; };
 		0C9F04F62884F34A0035239F /* Pulse Demo macOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pulse Demo macOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C9F04F82884F34A0035239F /* Pulse_Demo_macOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pulse_Demo_macOSApp.swift; sourceTree = "<group>"; };
-		0C9F04FA2884F34A0035239F /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		0C9F04FC2884F34A0035239F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0C9F04FF2884F34A0035239F /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		0C9F05012884F34A0035239F /* Pulse_Demo_macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Pulse_Demo_macOS.entitlements; sourceTree = "<group>"; };
@@ -378,7 +376,6 @@
 			isa = PBXGroup;
 			children = (
 				0C9F04F82884F34A0035239F /* Pulse_Demo_macOSApp.swift */,
-				0C9F04FA2884F34A0035239F /* ContentView.swift */,
 				0C9F04FC2884F34A0035239F /* Assets.xcassets */,
 				0C9F05012884F34A0035239F /* Pulse_Demo_macOS.entitlements */,
 				0C9F04FE2884F34A0035239F /* Preview Content */,
@@ -773,7 +770,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				0C24CC6F289482F7008DD332 /* MockTask.swift in Sources */,
-				0C9F04FB2884F34A0035239F /* ContentView.swift in Sources */,
 				0C9F04F92884F34A0035239F /* Pulse_Demo_macOSApp.swift in Sources */,
 				0C24CC7B2894C134008DD332 /* MockStoreConfiguration.swift in Sources */,
 				0C24CC6C289482F7008DD332 /* MockStore.swift in Sources */,

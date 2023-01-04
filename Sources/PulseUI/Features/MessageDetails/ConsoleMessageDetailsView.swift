@@ -5,6 +5,9 @@
 import SwiftUI
 import Pulse
 
+#warning("TODO: macOS reimplement")
+#warning("TODO: move toolbar items to the proper sections")
+
 struct ConsoleMessageDetailsView: View {
     let viewModel: ConsoleMessageDetailsViewModel
     @Environment(\.colorScheme) var colorScheme: ColorScheme
@@ -52,43 +55,17 @@ struct ConsoleMessageDetailsView: View {
         contents
     }
     #elseif os(macOS)
-    @State var isMetaVisible = false
+    @State private var isDetailsLinkActive = false
 
     var body: some View {
-        VStack(spacing: 0) {
-            HStack(spacing: 12) {
-                Button(action: { isMetaVisible = true }) {
-                    Image(systemName: "info.circle")
-                }.padding(.leading, 4)
-                if let badge = viewModel.badge {
-                    BadgeView(viewModel: BadgeViewModel(title: badge.title, color: badge.color.opacity(colorScheme == .light ? 0.25 : 0.5)))
+        ConsoleMessageMetadataView(message: viewModel.message)
+            .background(InvisibleNavigationLinks {
+                    NavigationLink.programmatic(isActive: $isDetailsLinkActive) {
+                        _MessageTextView(viewModel: viewModel)
+                    }
                 }
-                Spacer()
-                if let onClose = onClose {
-                    Button(action: onClose) {
-                        Image(systemName: "xmark").foregroundColor(.secondary)
-                    }.buttonStyle(.plain)
-                }
-            }
-            .padding([.leading, .trailing], 6)
-            .frame(height: 27, alignment: .center)
-            Divider()
-            textView
-                .background(colorScheme == .dark ? Color(NSColor(red: 30/255.0, green: 30/255.0, blue: 30/255.0, alpha: 1)) : .clear)
-        }
-        .sheet(isPresented: $isMetaVisible, content: {
-            VStack(spacing: 0) {
-                HStack {
-                    Text("Message Details")
-                        .font(.headline)
-                        .foregroundColor(.secondary)
-                    Spacer()
-                    Button("Close") { isMetaVisible = false }
-                        .keyboardShortcut(.cancelAction)
-                }.padding()
-                ConsoleMessageMetadataView(message: viewModel.message)
-            }.frame(width: 440, height: 600)
-        })
+            )
+            .onAppear { isDetailsLinkActive = true }
     }
     #endif
 
@@ -126,6 +103,21 @@ struct ConsoleMessageDetailsView: View {
     }
     #endif
 }
+
+#if os(macOS)
+
+#warning("TODO: reimplemmet this")
+
+private struct _MessageTextView: View {
+    let viewModel: ConsoleMessageDetailsViewModel
+    @Environment(\.colorScheme) var colorScheme: ColorScheme
+    @State private var isShowingShareSheet = false
+
+    var body: some View {
+        RichTextView(viewModel: viewModel.textViewModel)
+    }
+}
+#endif
 
 #if DEBUG
 struct ConsoleMessageDetailsView_Previews: PreviewProvider {

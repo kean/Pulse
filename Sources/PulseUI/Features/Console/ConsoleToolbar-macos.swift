@@ -9,17 +9,6 @@ import Combine
 
 #if os(macOS)
 
-struct ConsoleNowView: View {
-    @ObservedObject var viewModel: ConsoleToolbarViewModel
-
-    var body: some View {
-        Button(action: { viewModel.isNowEnabled.toggle() }) {
-            Image(systemName: viewModel.isNowEnabled ? "clock.fill" : "clock")
-                .foregroundColor(viewModel.isNowEnabled ? Color.accentColor : Color.secondary)
-        }.help("Automatically Scroll to Recent Messages (⇧⌘N)")
-    }
-}
-
 struct ConsoleToolbarToggleFiltersButton: View {
     @ObservedObject var viewModel: ConsoleToolbarViewModel
 
@@ -42,25 +31,11 @@ struct ConsoleToolbarToggleOnlyErrorsButton: View {
     }
 }
 
-struct ConsoleToolbarToggleVerticalView: View {
-    @ObservedObject var viewModel: ConsoleToolbarViewModel
-
-    var body: some View {
-        Button(action: { viewModel.isVertical.toggle() }, label: {
-            Image(systemName: viewModel.isVertical ? "square.split.2x1" : "square.split.1x2")
-        }).help(viewModel.isVertical ? "Switch to Horizontal Layout" : "Switch to Vertical Layout")
-    }
-}
-
 final class ConsoleToolbarViewModel: ObservableObject {
     @Published var isFiltersPaneHidden = true
-    @AppStorage("console-view-is-vertical") var isVertical = true {
-        didSet { objectWillChange.send() }
-    }
     @Published var isOnlyErrors = false
     @Published var isOnlyPins = false
     @Published var isSearchBarActive = false
-    @Published var isNowEnabled = true
 }
 
 #endif

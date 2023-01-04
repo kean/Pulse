@@ -7,6 +7,10 @@ import CoreData
 import Pulse
 import Combine
 
+#warning("TODO: experiemnt with different navigation styles on macos")
+#warning("TODO: show message details in the details and metadata in main panel")
+#warning("TDO: move search button somewhere else")
+
 #if os(macOS)
 
 public struct MainView: View {
@@ -20,7 +24,7 @@ public struct MainView: View {
     }
 
     public var body: some View {
-        ConsoleContainerViewPro(viewModel: viewModel, details: viewModel.details, toolbar: viewModel.toolbar)
+        contents
             .navigationTitle("Console")
             .toolbar {
                 ToolbarItemGroup(placement: .navigation) {
@@ -43,46 +47,63 @@ public struct MainView: View {
                             .fixedSize()
                     }
                 }
-                ToolbarItemGroup(placement: .automatic) {
-                    Button(action: {
-                        // TODO: Refactor
-                        viewModel.toolbar.isSearchBarActive = true
-                        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(100)) {
-                            viewModel.searchBar.onFind.send()
-                        }
-                    }) {
-                        Image(systemName: "magnifyingglass")
-                    }.keyboardShortcut("f")
-                    ConsoleToolbarToggleOnlyErrorsButton(viewModel: viewModel.toolbar)
-                        .keyboardShortcut("e", modifiers: [.command, .shift])
-                    ConsoleToolbarModePickerButton(viewModel: viewModel.mode)
-                        .keyboardShortcut("n", modifiers: [.command, .shift])
-                    FilterPopoverToolbarButton(viewModel: viewModel, mode: viewModel.mode)
-                        .keyboardShortcut("f", modifiers: [.command, .option])
-                    ConsoleToolbarToggleVerticalView(viewModel: viewModel.toolbar)
-                }
             }
             .sheet(isPresented: $isShowingSettings) {
                 SettingsView(viewModel: .init(store: viewModel.store))
             }
             .onDisappear { viewModel.freeMemory() }
     }
+
+    @ViewBuilder
+    private var contents: some View {
+        if #available(macOS 13.0, *) {
+            ConsoleContainerView(viewModel: viewModel, details: viewModel.details)
+        } else {
+            LegacyConsoleContainerView(viewModel: viewModel, details: viewModel.details)
+        }
+    }
+
+    static let contentColumnWidth: CGFloat = 280
 }
 
-private struct ConsoleContainerViewPro: View {
+#warning("TODO: this is incomplete")
+
+@available(macOS 13.0, *)
+private struct ConsoleContainerView: View {
     var viewModel: MainViewModel
     @ObservedObject var details: ConsoleDetailsRouterViewModel
-    @ObservedObject var toolbar: ConsoleToolbarViewModel
+    @State private var columnVisibility = NavigationSplitViewVisibility.all
 
     var body: some View {
-        NotSplitView(
-            MainPanelView(viewModel: viewModel, mode: viewModel.mode)
-                .frame(minWidth: 320, idealWidth: 320, maxWidth: .infinity, minHeight: 120, idealHeight: 480, maxHeight: .infinity, alignment: .center),
-            ConsoleMessageDetailsRouter(viewModel: details)
-                .frame(minWidth: 430, idealWidth: 500, maxWidth: .infinity, minHeight: 320, idealHeight: 480, maxHeight: .infinity, alignment: .center),
-            isPanelTwoCollaped: viewModel.details.viewModel == nil,
-            isVertical: toolbar.isVertical
+        NavigationSplitView(
+            columnVisibility: $columnVisibility,
+            sidebar: {
+                MainPanelView(viewModel: viewModel, mode: viewModel.mode)
+                    .navigationSplitViewColumnWidth(min: MainView.contentColumnWidth, ideal: 420, max: 640)
+            },
+            content: {
+                ConsoleMessageDetailsRouter(viewModel: details)
+                    .navigationSplitViewColumnWidth(MainView.contentColumnWidth)
+            },
+            detail: {
+                PlaceholderView(imageName: "questionmark.circle", title: "No Selection")
+            }
         )
+    }
+}
+
+private struct LegacyConsoleContainerView: View {
+    var viewModel: MainViewModel
+    @ObservedObject var details: ConsoleDetailsRouterViewModel
+
+    var body: some View {
+        NavigationView {
+            MainPanelView(viewModel: viewModel, mode: viewModel.mode)
+                .frame(minWidth: 320, idealWidth: 320, maxWidth: 600, minHeight: 120, idealHeight: 480, maxHeight: .infinity)
+            ConsoleMessageDetailsRouter(viewModel: details)
+                .frame(minWidth: 430, idealWidth: 500, maxWidth: 600, minHeight: 320, idealHeight: 480, maxHeight: .infinity)
+            EmptyView()
+        }
     }
 }
 
@@ -94,6 +115,25 @@ private struct MainPanelView: View {
         VStack(spacing: 0) {
             content
             ConsoleToolbarSearchBar(viewModel: viewModel)
+        }
+        .toolbar {
+            ToolbarItemGroup(placement: .automatic) {
+                Button(action: {
+                    // TODO: Refactor
+                    viewModel.toolbar.isSearchBarActive = true
+                    DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(100)) {
+                        viewModel.searchBar.onFind.send()
+                    }
+                }) {
+                    Image(systemName: "magnifyingglass")
+                }.keyboardShortcut("f")
+                ConsoleToolbarToggleOnlyErrorsButton(viewModel: viewModel.toolbar)
+                    .keyboardShortcut("e", modifiers: [.command, .shift])
+                ConsoleToolbarModePickerButton(viewModel: viewModel.mode)
+                    .keyboardShortcut("n", modifiers: [.command, .shift])
+                FilterPopoverToolbarButton(viewModel: viewModel, mode: viewModel.mode)
+                    .keyboardShortcut("f", modifiers: [.command, .option])
+            }
         }
     }
 
@@ -199,9 +239,8 @@ private struct NavigationTitleUpdater: View {
 #if DEBUG
 struct MainView_Previews: PreviewProvider {
     static var previews: some View {
-        NavigationView {
-            MainView(store: .mock)
-        }
+        MainView(store: .mock)
+            .previewLayout(.fixed(width: 1200, height: 800))
     }
 }
 #endif

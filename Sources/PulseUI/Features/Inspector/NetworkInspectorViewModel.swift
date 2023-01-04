@@ -7,8 +7,6 @@ import CoreData
 import Pulse
 import Combine
 
-#if os(iOS) || os(watchOS) || os(tvOS)
-
 final class NetworkInspectorViewModel: ObservableObject {
     let title: String
 
@@ -133,55 +131,55 @@ final class NetworkInspectorViewModel: ObservableObject {
     }
 }
 
-#else
 
-final class NetworkInspectorViewModel: ObservableObject {
-    private(set) var title: String = ""
+#warning("TODO: remoev it and related types")
 
-    let summaryViewModel: NetworkInspectorSummaryViewModel
-    let responseViewModel: NetworkInspectorResponseViewModel
-    let requestViewModel: NetworkInspectorRequestViewModel
-#if !os(watchOS) && !os(tvOS)
-    let metricsViewModel: NetworkInspectorMetricsTabViewModel
-#endif
+//final class NetworkInspectorViewModel: ObservableObject {
+//    private(set) var title: String = ""
+//
+//    let summaryViewModel: NetworkInspectorSummaryViewModel
+//    let responseViewModel: NetworkInspectorResponseViewModel
+//    let requestViewModel: NetworkInspectorRequestViewModel
+//#if !os(watchOS) && !os(tvOS)
+//    let metricsViewModel: NetworkInspectorMetricsTabViewModel
+//#endif
+//
+//#if os(macOS)
+//    let headersViewModel: NetworkInspectorHeadersTabViewModel
+//#endif
+//
+//    // TODO: Make private
+//    let task: NetworkTaskEntity
+//
+//    init(task: NetworkTaskEntity) {
+//        self.task = task
+//
+//        if let url = task.url.flatMap(URL.init(string:)) {
+//            self.title = "/" + url.lastPathComponent
+//        }
+//
+//        self.summaryViewModel = NetworkInspectorSummaryViewModel(task: task)
+//        self.responseViewModel = NetworkInspectorResponseViewModel(task: task)
+//        self.requestViewModel = NetworkInspectorRequestViewModel(task: task)
+//#if !os(watchOS) && !os(tvOS)
+//        self.metricsViewModel = NetworkInspectorMetricsTabViewModel(task: task)
+//#endif
+//#if os(macOS)
+//        self.headersViewModel = NetworkInspectorHeadersTabViewModel(task: task)
+//#endif
+//    }
+//
+//#if os(iOS) || os(macOS)
+//    var pin: PinButtonViewModel? {
+//        task.message.map(PinButtonViewModel.init)
+//    }
+//
+//    func prepareForSharing() -> String {
+//        ConsoleShareService.share(task, output: .plainText)
+//    }
+//#endif
+//}
 
-#if os(macOS)
-    let headersViewModel: NetworkInspectorHeadersTabViewModel
-#endif
-
-    // TODO: Make private
-    let task: NetworkTaskEntity
-
-    init(task: NetworkTaskEntity) {
-        self.task = task
-
-        if let url = task.url.flatMap(URL.init(string:)) {
-            self.title = "/" + url.lastPathComponent
-        }
-
-        self.summaryViewModel = NetworkInspectorSummaryViewModel(task: task)
-        self.responseViewModel = NetworkInspectorResponseViewModel(task: task)
-        self.requestViewModel = NetworkInspectorRequestViewModel(task: task)
-#if !os(watchOS) && !os(tvOS)
-        self.metricsViewModel = NetworkInspectorMetricsTabViewModel(task: task)
-#endif
-#if os(macOS)
-        self.headersViewModel = NetworkInspectorHeadersTabViewModel(task: task)
-#endif
-    }
-
-#if os(iOS) || os(macOS)
-    var pin: PinButtonViewModel? {
-        task.message.map(PinButtonViewModel.init)
-    }
-
-    func prepareForSharing() -> String {
-        ConsoleShareService.share(task, output: .plainText)
-    }
-#endif
-}
-
-#endif
 
 private func makePreview(for cookies: [HTTPCookie]) -> [(String, String?)] {
     cookies

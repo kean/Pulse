@@ -8,6 +8,7 @@ import Pulse
 import Combine
 
 #warning("TODO: remoe isScrolled?")
+#warning("TODO: handle clicks on decoding error on other platforms")
 
 #if os(macOS) || os(iOS)
 
