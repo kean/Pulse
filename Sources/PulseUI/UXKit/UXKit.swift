@@ -75,9 +75,9 @@ typealias UXColor = UIColor
 typealias UXFont = UIFont
 typealias UXImage = UIImage
 
-#if !os(watchOS)
 extension UIColor {
     static func dynamic(light: UIColor, dark: UIColor) -> UIColor {
+#if !os(watchOS)
         UIColor {
             switch $0.userInterfaceStyle {
             case .dark:
@@ -86,9 +86,11 @@ extension UIColor {
                 return light
             }
         }
+#else
+        dark
+#endif
     }
 }
-#endif
 
 #endif
 

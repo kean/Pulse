@@ -158,8 +158,6 @@ final class JSONPrinter {
     }
 }
 
-#if os(iOS) || os(macOS) || os(tvOS)
-
 struct JSONColors {
     static let punctuation = UXColor.dynamic(
         light: .init(red: 113.0/255.0, green: 128.0/255.0, blue: 141.0/255.0, alpha: 1.0),
@@ -246,5 +244,3 @@ extension JSONPrinter {
 extension NSAttributedString.Key {
     static let decodingError = NSAttributedString.Key(rawValue: "com.github.kean.pulse.decoding-error-key")
 }
-
-#endif

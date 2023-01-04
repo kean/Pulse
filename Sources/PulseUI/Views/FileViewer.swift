@@ -14,9 +14,7 @@ struct FileViewer: View {
     }
 #elseif os(watchOS)
     var body: some View {
-        ScrollView {
-            contents
-        }
+        contents
     }
 #elseif os(tvOS)
     var body: some View {
