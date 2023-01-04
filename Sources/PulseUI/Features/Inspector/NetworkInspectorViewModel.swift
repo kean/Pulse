@@ -7,7 +7,7 @@ import CoreData
 import Pulse
 import Combine
 
-#if os(iOS) || os(watchOS)
+#if os(iOS) || os(watchOS) || os(tvOS)
 
 final class NetworkInspectorViewModel: ObservableObject {
     let title: String
@@ -101,7 +101,7 @@ final class NetworkInspectorViewModel: ObservableObject {
     }
 
     func prepareForSharing() -> String {
-#if !os(watchOS)
+#if !os(watchOS) && !os(tvOS)
         return ConsoleShareService.share(task, output: .plainText)
 #else
         return "Sharing not supported on watchOS"

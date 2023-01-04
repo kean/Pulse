@@ -25,7 +25,7 @@ struct NetworkInspectorView: View {
     
     @State private var isShowingCurrentRequest = false
     
-#if os(iOS) || os(watchOS)
+#if os(iOS) || os(watchOS) || os(tvOS)
     var body: some View {
         contents
 #if os(iOS)
@@ -33,7 +33,7 @@ struct NetworkInspectorView: View {
             .navigationBarTitle(Text(viewModel.title), displayMode: .inline)
             .sheet(item: $shareItems, content: ShareView.init)
 #else
-            .navigationTitle(viewModel.title)
+            .backport.navigationTitle(viewModel.title)
 #endif
     }
 
@@ -190,7 +190,7 @@ struct NetworkInspectorView: View {
     var headerView: some View {
         HStack {
 #if !os(watchOS)
-            if #available(iOS 14.0, *) {
+            if #available(iOS 14.0, tvOS 14.0, *) {
                 Text(Image(systemName: viewModel.statusImageName))
                     .foregroundColor(viewModel.statusTintColor)
             } else {
@@ -279,7 +279,7 @@ struct NetworkInspectorView: View {
     }
 
     private var destinationResponseHeaders: some View {
-        NetworkDetailsView(title: "Respons Header", viewModel: viewModel.responseHeadersViewModel)
+        NetworkDetailsView(title: "Response Header", viewModel: viewModel.responseHeadersViewModel)
     }
 
     private var destinationResponseBody: some View {

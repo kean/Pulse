@@ -9,7 +9,7 @@ import Combine
 #warning("TODO: naviation using NavigaitonLink")
 #warning("TODO: fix separator before top view")
 
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(macOS) || os(tvOS)
 
 struct NetworkInspectorMetricsTabView: View {
     @ObservedObject var viewModel: NetworkInspectorMetricsTabViewModel
