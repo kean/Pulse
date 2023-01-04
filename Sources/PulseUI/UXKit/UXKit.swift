@@ -114,6 +114,7 @@ extension UIColor {
 #if os(watchOS)
 extension UXColor {
     static let label = UXColor(Color.primary)
+    static let systemOrange = UXColor(Color.orange)
 }
 #endif
 

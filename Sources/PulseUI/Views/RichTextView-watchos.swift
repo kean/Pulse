@@ -37,7 +37,7 @@ final class RichTextViewModel: ObservableObject {
         self.text = string
     }
 
-    init(string: NSAttributedString) {
+    init(string: NSAttributedString, contentType: NetworkLogger.ContentType? = nil) {
         if #available(watchOS 8.0, *) {
             self._attributedString = try? AttributedString(string, including: \.uiKit)
         }

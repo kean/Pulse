@@ -53,13 +53,11 @@ final class FileViewerViewModel: ObservableObject {
         } else if data.isEmpty {
             return .other(.init(string: "Unavailable"))
         } else if let string = String(data: data, encoding: .utf8) {
-#if os(iOS) || os(macOS)
             if contentType?.isEncodedForm ?? false, let components = decodeQueryParameters(form: string) {
                 return .other(RichTextViewModel(string: components.asAttributedString()))
             } else if contentType?.isHTML ?? false {
                 return .other(RichTextViewModel(string: HTMLPrettyPrint(string: string).render(), contentType: "text/html"))
             }
-#endif
             return .other(.init(string: string))
         } else {
             let message = "Data \(ByteCountFormatter.string(fromByteCount: Int64(data.count)))"

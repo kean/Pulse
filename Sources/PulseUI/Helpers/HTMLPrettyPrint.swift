@@ -2,8 +2,6 @@
 //
 // Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
 
-#if !os(watchOS)
-
 import Foundation
 
 #if os(macOS)
@@ -46,12 +44,10 @@ final class HTMLPrettyPrint {
             for match in attributesRegex.matches(in: string, range: range) {
                 if match.groups.count == 2 {
                     text.addAttribute(.foregroundColor, value: UXColor.systemOrange, range: makeRange(from: match.groups[0]))
-                    text.addAttribute(.foregroundColor, value: UXColor.systemRed, range: makeRange(from: match.groups[1]))
+                    text.addAttribute(.foregroundColor, value: Palette.red, range: makeRange(from: match.groups[1]))
                 }
             }
         }
         return text
     }
 }
-
-#endif
