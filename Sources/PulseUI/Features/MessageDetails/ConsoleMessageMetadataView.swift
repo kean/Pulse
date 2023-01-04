@@ -49,6 +49,7 @@ struct ConsoleMessageMetadataView: View {
         KeyValueSectionView(viewModel: metadataViewModel)
     }
 
+#warning("TODO: use navigation link")
     private var metadataViewModel: KeyValueSectionViewModel {
         KeyValueSectionViewModel(title: "Metadata", color: .indigo, action: ActionViewModel(title: "View") {
             isMetadataRawLinkActive = true

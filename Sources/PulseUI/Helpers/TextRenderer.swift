@@ -37,7 +37,7 @@ final class TextRenderer {
         self.helpers = TextHelpers(options: options)
     }
 
-    #warning("TODO: remove options parameter & move expanded to Console (or options?)")
+#warning("TODO: this should not be TextRenderer responsbility")
     var expanded: Set<Int> = []
 
     func render(_ entities: [NSManagedObject], options: Options = .init()) -> NSAttributedString {
@@ -102,6 +102,8 @@ final class TextRenderer {
 
     func render(_ task: NetworkTaskEntity) -> NSAttributedString {
         defer { index += 1 }
+
+#warning("TODO: refactor remainig")
 
         let text = NSMutableAttributedString()
 
@@ -191,7 +193,7 @@ final class TextRenderer {
         return text
     }
 
-    #warning("TODO: rework this")
+#warning("TODO: rework this")
     private func renderNetworkTaskBody(_ data: Data, contentType: NetworkLogger.ContentType?, error: NetworkLogger.DecodingError?) -> NSAttributedString {
         let text = NSMutableAttributedString(attributedString: _renderNetworkTaskBody(data, contentType: contentType, error: error))
         if !options.isBodySyntaxHighlightingEnabled {
@@ -315,6 +317,8 @@ final class TextRenderer {
         return html.data(using: .utf8) ?? data
     }
 
+#warning("TODO: imporve and enable sharing (in diff parts of the app) + check printing + monochrome always")
+#warning("TODO: check if we can render as a single page if that even makes sense")
     /// Renderes the given attributed string as PDF
 #if canImport(UIKit)
     static func pdf(from string: NSAttributedString) throws -> Data {
@@ -323,7 +327,7 @@ final class TextRenderer {
         renderer.addPrintFormatter(formatter, startingAtPageAt: 0)
 
         let pageSize = CGSize(width: 612, height: 792) // US letter size
-        let pageMargins = UIEdgeInsets(top: 64, left: 64, bottom: 64, right: 64)
+        let pageMargins = UIEdgeInsets(top: 32, left: 32, bottom: 32, right: 32)
 
         // Calculate the printable rect from the above two
         let printableRect = CGRect(x: pageMargins.left, y: pageMargins.top, width: pageSize.width - pageMargins.left - pageMargins.right, height: pageSize.height - pageMargins.top - pageMargins.bottom)
