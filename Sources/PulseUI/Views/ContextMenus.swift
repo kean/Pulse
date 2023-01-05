@@ -118,6 +118,8 @@ struct NetworkMessageContextMenuCopySection: View {
 }
 #endif
 
+#warning("TODO: combine into one section + allow filering")
+
 #if os(iOS) || os(macOS)
 @available(iOS 14, *)
 struct StringSearchOptionsMenu: View {

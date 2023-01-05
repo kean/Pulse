@@ -46,7 +46,7 @@ final class RichTextViewModel: ObservableObject {
 
     convenience init(json: Any, error: NetworkLogger.DecodingError?) {
         let renderer = AttributedStringJSONRenderer(fontSize: FontSize.body, lineHeight: FontSize.body + 5)
-        let printer = JSONPrinter(renderer: renderer)
+        let printer = TextRendererJSON(renderer: renderer)
         printer.render(json: json, error: error)
         self.init(string: renderer.make())
     }

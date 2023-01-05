@@ -16,7 +16,7 @@ final class JSONPrinterTests: XCTestCase {
 
         // WHEN
         let renderer = AttributedStringJSONRenderer(fontSize: 12, lineHeight: 15)
-        let printer = JSONPrinter(renderer: renderer)
+        let printer = TextRendererJSON(renderer: renderer)
         printer.render(json: json, error: error)
         let string = renderer.make()
 

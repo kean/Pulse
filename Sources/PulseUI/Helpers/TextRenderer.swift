@@ -31,12 +31,12 @@ final class TextRenderer {
     }
 
     private var options: Options
-    private var helpers: TextHelpers
+    private var helpers: TextHelper
     private var index = 0
 
     init(options: Options = .init()) {
         self.options = options
-        self.helpers = TextHelpers(options: options)
+        self.helpers = TextHelper(options: options)
     }
 
 #warning("TODO: this should not be TextRenderer responsbility")
@@ -66,7 +66,7 @@ final class TextRenderer {
 
     private func prepare(options: Options) {
         self.options = options
-        self.helpers = TextHelpers(options: options)
+        self.helpers = TextHelper(options: options)
         self.index = 0
     }
 
@@ -234,10 +234,8 @@ final class TextRenderer {
     private func _renderNetworkTaskBody(_ data: Data, contentType: NetworkLogger.ContentType?, error: NetworkLogger.DecodingError?) -> NSAttributedString {
         let fontSize = options.fontSize - 3
         if let json = try? JSONSerialization.jsonObject(with: data, options: []) {
-            let renderer = AttributedStringJSONRenderer(fontSize: fontSize, lineHeight: geLineHeight(for: Int(fontSize)))
-            let printer = JSONPrinter(renderer: renderer)
-            printer.render(json: json, error: error)
-            return renderer.make()
+            let renderer = TextRendererJSON(json: json, error: error, options: options)
+            return renderer.render()
         } else if let string = String(data: data, encoding: .utf8) {
             if contentType?.isEncodedForm ?? false, let components = decodeQueryParameters(form: string) {
                 return components.asAttributedString()
@@ -354,7 +352,7 @@ final class TextRenderer {
 }
 
 #warning("TODO: remove unused values")
-final class TextHelpers {
+final class TextHelper {
     let fontHeadline: UXFont
     let fontBody: UXFont
     let fontMono: UXFont

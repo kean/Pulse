@@ -4,50 +4,61 @@
 
 import Foundation
 import Pulse
-import CoreData
-import SwiftUI
-import Pulse
 
-enum JSONElement {
-    case punctuation
-    case key
-    case valueString
-    case valueOther
-    case null
-}
-
-protocol JSONRenderer: AnyObject {
-    func append(_ string: String, element: JSONElement, error: NetworkLogger.DecodingError?)
-    func indent(count: Int)
-    func newline()
-}
-
-private func getClass(for element: JSONElement) -> String {
-    switch element {
-    case .punctuation: return "p"
-    case .key: return "k"
-    case .valueString: return "s"
-    case .valueOther: return "o"
-    case .null: return "n"
-    }
-}
-
-#warning("TODO: move to TextRenderer")
-@available(*, deprecated, message: "Deprecated")
-final class JSONPrinter {
-    private let renderer: JSONRenderer
-    private var indentation = 0
+final class TextRendererJSON {
+    // Input
+    private let json: Any
     private var error: NetworkLogger.DecodingError?
+
+    // Settings
+    private let options: TextRenderer.Options
+    private let helper: TextHelper
+    private let attributes: [JSONElement: [NSAttributedString.Key: Any]]
+
+    // Temporary state (one-shot, doesn't reset)
+    private var indentation = 0
     private var codingPath: [NetworkLogger.DecodingError.CodingKey] = []
+    private var string = NSMutableAttributedString()
 
-    init(renderer: JSONRenderer) {
-        self.renderer = renderer
-    }
-
-    func render(json: Any, error: NetworkLogger.DecodingError?) {
+    init(json: Any, error: NetworkLogger.DecodingError? = nil, options: TextRenderer.Options = .init()) {
+        self.options = options
+        self.helper = TextHelper(options: options)
+        self.json = json
         self.error = error
-        print(json: json, isFree: true)
+
+        if options.isMonocrhome {
+            attributes = [
+                .punctuation: [.foregroundColor: UXColor.secondaryLabel],
+                .key: [.foregroundColor: UXColor.label],
+                .valueString: [.foregroundColor: UXColor.label],
+                .valueOther: [.foregroundColor: UXColor.label],
+                .null: [.foregroundColor: UXColor.label]
+            ]
+        } else {
+            attributes = [
+                .punctuation: [.foregroundColor: JSONColors.punctuation],
+                .key: [.foregroundColor: JSONColors.key],
+                .valueString: [.foregroundColor: JSONColors.valueString],
+                .valueOther: [.foregroundColor: JSONColors.valueOther],
+                .null: [.foregroundColor: JSONColors.null]
+            ]
+        }
     }
+
+    func render() -> NSAttributedString {
+        guard string.length == 0 else {
+            assertionFailure("TextRendererJSON is a one-shot object")
+            return string
+        }
+        print(json: json, isFree: true)
+        string.addAttributes([
+            .font: helper.fontMono,
+            .paragraphStyle: helper.monoParagraphStyle
+        ])
+        return string
+    }
+
+    // MARK: - Walk JSON
 
     private func print(json: Any, isFree: Bool) {
         func _print(json: Any, key: NetworkLogger.DecodingError.CodingKey, isFree: Bool) {
@@ -121,60 +132,18 @@ final class JSONPrinter {
         }
     }
 
-    func append(_ string: String, _ element: JSONElement) {
+    // MARK: - Modify String
+
+    private func append(_ string: String, _ element: JSONElement) {
         var error: NetworkLogger.DecodingError?
         if codingPath == self.error?.context?.codingPath {
             error = self.error
             self.error = nil
         }
-        renderer.append(string, element: element, error: error)
-    }
 
-    func indent() {
-        renderer.indent(count: indentation)
-    }
-
-    func newline() {
-        renderer.newline()
-    }
-}
-
-struct JSONColors {
-    static let punctuation = UXColor.dynamic(
-        light: .init(red: 113.0/255.0, green: 128.0/255.0, blue: 141.0/255.0, alpha: 1.0),
-        dark: .init(red: 108.0/255.0, green: 121.0/255.0, blue: 134.0/255.0, alpha: 1.0)
-    )
-    static let key = UXColor.label
-    static let valueString = Palette.red
-    static let valueOther = UXColor.dynamic(
-        light: .init(red: 28.0/255.0, green: 0.0/255.0, blue: 207.0/255.0, alpha: 1.0),
-        dark: .init(red: 208.0/255.0, green: 191.0/255.0, blue: 105.0/255.0, alpha: 1.0)
-    )
-    static let null = Palette.pink
-}
-
-final class AttributedStringJSONRenderer: JSONRenderer {
-    private let output = NSMutableAttributedString()
-    private let fontSize: CGFloat
-    private let lineHeight: CGFloat
-
-    private var attributes: [JSONElement: [NSAttributedString.Key: Any]] = [
-        .punctuation: [.foregroundColor: JSONColors.punctuation],
-        .key: [.foregroundColor: JSONColors.key],
-        .valueString: [.foregroundColor: JSONColors.valueString],
-        .valueOther: [.foregroundColor: JSONColors.valueOther],
-        .null: [.foregroundColor: JSONColors.null]
-    ]
-
-    init(fontSize: CGFloat, lineHeight: CGFloat) {
-        self.fontSize = fontSize
-        self.lineHeight = lineHeight
-    }
-
-    func append(_ string: String, element: JSONElement, error: NetworkLogger.DecodingError?) {
         var attributes = self.attributes[element]!
         if let error = error {
-            attributes[.backgroundColor] = UXColor.red
+            attributes[.backgroundColor] = options.isMonocrhome ? UXColor.label : UXColor.red
             attributes[.foregroundColor] = UXColor.white
             attributes[.decodingError] = error
             attributes[.link] = {
@@ -189,39 +158,40 @@ final class AttributedStringJSONRenderer: JSONRenderer {
             }()
             attributes[.underlineColor] = UXColor.clear
         }
-        output.append(string, attributes)
+        self.string.append(string, attributes)
     }
 
-    func indent(count: Int) {
-        append(String(repeating: " ", count: count), element: .punctuation, error: nil)
+    private func indent() {
+        append(String(repeating: " ", count: indentation), .punctuation)
     }
 
-    func newline() {
-        output.append("\n")
-    }
-
-    func make() -> NSAttributedString {
-        let paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.maximumLineHeight = lineHeight
-        paragraphStyle.minimumLineHeight = lineHeight
-        paragraphStyle.alignment = .left
-        output.addAttributes([
-            .font: UXFont.monospacedSystemFont(ofSize: CGFloat(fontSize), weight: .regular),
-            .paragraphStyle: paragraphStyle
-        ])
-        return output
+    private func newline() {
+        string.append("\n")
     }
 }
 
-extension JSONPrinter {
-    static func asAttributedString(_ json: Any) -> NSAttributedString {
-        let renderer = AttributedStringJSONRenderer(fontSize: FontSize.body, lineHeight: FontSize.body + 5)
-        let printer = JSONPrinter(renderer: renderer)
-        printer.render(json: json, error: nil)
-        return renderer.make()
-    }
+private struct JSONColors {
+    static let punctuation = UXColor.dynamic(
+        light: .init(red: 113.0/255.0, green: 128.0/255.0, blue: 141.0/255.0, alpha: 1.0),
+        dark: .init(red: 108.0/255.0, green: 121.0/255.0, blue: 134.0/255.0, alpha: 1.0)
+    )
+    static let key = UXColor.label
+    static let valueString = Palette.red
+    static let valueOther = UXColor.dynamic(
+        light: .init(red: 28.0/255.0, green: 0.0/255.0, blue: 207.0/255.0, alpha: 1.0),
+        dark: .init(red: 208.0/255.0, green: 191.0/255.0, blue: 105.0/255.0, alpha: 1.0)
+    )
+    static let null = Palette.pink
 }
 
 extension NSAttributedString.Key {
     static let decodingError = NSAttributedString.Key(rawValue: "com.github.kean.pulse.decoding-error-key")
+}
+
+private enum JSONElement {
+    case punctuation
+    case key
+    case valueString
+    case valueOther
+    case null
 }

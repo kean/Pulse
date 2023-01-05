@@ -415,10 +415,8 @@ final class RichTextViewModel: ObservableObject {
     private var bag = [AnyCancellable]()
 
     convenience init(json: Any, error: NetworkLogger.DecodingError?) {
-        let renderer = AttributedStringJSONRenderer(fontSize: FontSize.body, lineHeight: FontSize.body + 5)
-        let printer = JSONPrinter(renderer: renderer)
-        printer.render(json: json, error: error)
-        self.init(string: renderer.make(), contentType: "application/json")
+        let renderer = TextRendererJSON(json: json, error: error)
+        self.init(string: renderer.render(), contentType: "application/json")
         self.error = error
     }
 

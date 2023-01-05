@@ -166,10 +166,10 @@ extension KeyValueSectionViewModel {
 
         let string = NSMutableAttributedString()
         string.append("Header\n", titleAttributes)
-        string.append(JSONPrinter.asAttributedString(jwt.header).with(.foregroundColor, UXColor.systemRed))
+        string.append(TextRendererJSON(json: jwt.header).render().with(.foregroundColor, UXColor.systemRed))
         string.append("\n\n", titleAttributes)
         string.append("Payload\n", titleAttributes)
-        string.append(JSONPrinter.asAttributedString(jwt.body).with(.foregroundColor, UXColor.systemPurple))
+        string.append(TextRendererJSON(json: jwt.body).render().with(.foregroundColor, UXColor.systemPurple))
         if let signature = jwt.signature {
             string.append("\n\n", titleAttributes)
             string.append("Signature\n", titleAttributes)
