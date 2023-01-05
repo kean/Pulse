@@ -101,6 +101,8 @@ struct ConsoleTextView: View {
     }
 }
 
+#warning("TODO: add more seettings for what to show in request info + show all")
+
 @available(iOS 14, *)
 private struct ConsoleTextViewSettingsView: View {
     @ObservedObject private var settings: ConsoleTextViewSettings = .shared
@@ -108,8 +110,11 @@ private struct ConsoleTextViewSettingsView: View {
     var body: some View {
         Form {
             Section(header: Text("Appearance")) {
-                Toggle("Monochrome", isOn: $settings.isMonochrome)
-                Toggle("Syntax Highlighting", isOn: $settings.isSyntaxHighlightingEnabled)
+                Picker("Color Mode", selection: $settings.colorMode) {
+                    Text("Automatic").tag(TextRenderer.ColorMode.automatic)
+                    Text("Full").tag(TextRenderer.ColorMode.full)
+                    Text("Monochrome").tag(TextRenderer.ColorMode.monochrome)
+                }
                 Toggle("Link Detection", isOn: $settings.isLinkDetectionEnabled)
             }
             Section(header: Text("Request Info")) {
@@ -169,8 +174,7 @@ final class ConsoleTextViewModel: ObservableObject {
 
     func reloadOptions() {
         options.isBodyExpanded = !settings.isCollapsingResponses
-        options.isMonocrhome = settings.isMonochrome
-        options.isBodySyntaxHighlightingEnabled = settings.isSyntaxHighlightingEnabled
+        options.color = settings.colorMode
         if settings.showsTaskRequestHeader {
             options.networkContent.insert(.currentRequestHeaders)
             options.networkContent.insert(.originalRequestHeaders)
@@ -242,17 +246,15 @@ struct ConsoleTextView_Previews: PreviewProvider {
 
             NavigationView {
                 ConsoleTextView(entities: entities) {
-                    $0.isMonocrhome = false
-                    $0.isBodySyntaxHighlightingEnabled = true
+                    $0.color = .full
                     $0.networkContent = .all
                 }
             }
-            .previewDisplayName("Color")
+            .previewDisplayName("Full Color")
 
             NavigationView {
                 ConsoleTextView(entities: entities) {
-                    $0.isMonocrhome = true
-                    $0.isBodySyntaxHighlightingEnabled = false
+                    $0.color = .monochrome
                     $0.networkContent = .all
                 }
             }

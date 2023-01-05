@@ -31,11 +31,8 @@ final class ConsoleTextViewSettings: PersistentSettings {
     @UserDefault("console-text-view__responses-collapsed")
     var isCollapsingResponses = true
 
-    @UserDefault("console-text-view__monochrome")
-    var isMonochrome = true
-
-    @UserDefault("console-text-view__syntax-highlighting")
-    var isSyntaxHighlightingEnabled = true
+    @UserDefaultRaw("console-text-view__color-mode")
+    var colorMode = TextRenderer.ColorMode.automatic
 
     @UserDefault("console-text-view__link-detection")
     var isLinkDetectionEnabled = true

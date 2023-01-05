@@ -26,7 +26,7 @@ final class TextRendererJSON {
         self.json = json
         self.error = error
 
-        if options.isMonocrhome {
+        if options.color == .monochrome {
             attributes = [
                 .punctuation: [.foregroundColor: UXColor.secondaryLabel],
                 .key: [.foregroundColor: UXColor.label],
@@ -143,7 +143,7 @@ final class TextRendererJSON {
 
         var attributes = self.attributes[element]!
         if let error = error {
-            attributes[.backgroundColor] = options.isMonocrhome ? UXColor.label : UXColor.red
+            attributes[.backgroundColor] = options.color == .monochrome ? UXColor.label : UXColor.red
             attributes[.foregroundColor] = UXColor.white
             attributes[.decodingError] = error
             attributes[.link] = {

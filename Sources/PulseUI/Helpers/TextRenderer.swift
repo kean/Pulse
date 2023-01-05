@@ -20,20 +20,16 @@ import PDFKit
 final class TextRenderer {
     struct Options {
         var networkContent: NetworkContent = [.errorDetails, .requestBody, .responseBody]
+        var color: ColorMode = .automatic
 
-#warning("TODO: rework what can be colored and what is not & use isBodySyntaxHighlightingEnabled")
-        var isMonocrhome = true
-        var isBodySyntaxHighlightingEnabled = true
+#warning("TODO: rework body collapse")
         var isBodyExpanded = false
         var bodyCollapseLimit = 20
     }
 
     struct NetworkContent: OptionSet {
         let rawValue: Int16
-
-        init(rawValue: Int16) {
-            self.rawValue = rawValue
-        }
+        init(rawValue: Int16) { self.rawValue = rawValue }
 
         static let requestComponents = NetworkContent(rawValue: 1 << 0)
         static let requestQueryItems = NetworkContent(rawValue: 1 << 1)
@@ -48,16 +44,14 @@ final class TextRenderer {
         #warning("TODO: add subset for sharing (not all?)")
 
         static let all: NetworkContent = [
-            requestComponents,
-            requestQueryItems,
-            errorDetails,
-            originalRequestHeaders,
-            currentRequestHeaders,
-            requestOptions,
-            requestBody,
-            responseHeaders,
-            responseBody
+            requestComponents, requestQueryItems, errorDetails, originalRequestHeaders, currentRequestHeaders, requestOptions, requestBody, responseHeaders, responseBody
         ]
+    }
+
+    enum ColorMode: String, RawRepresentable {
+        case monochrome
+        case automatic
+        case full
     }
 
     private var options: Options
@@ -136,42 +130,32 @@ final class TextRenderer {
 #warning("TODO: refactor remainig")
 #warning("TODO: fix fonts on other platforms, e.g. URL on tvOS")
 
-        let text = NSMutableAttributedString()
-
-        let state = task.state
-
-        let tintColor: UXColor = {
-            switch state {
-            case .pending: return .systemYellow
-            case .success: return .systemGreen
-            case .failure: return Palette.red
-            }
-        }()
+        let string = NSMutableAttributedString()
 
         let topViewModel = ConsoleNetworkRequestViewModel(task: task)
         let title = topViewModel.titleForTextRepresentation
 
-        text.append(title + "\n", {
+        string.append(title + "\n", {
             var attributes = helpers.captionAttributes
-            if !options.isMonocrhome {
-                attributes[.foregroundColor] = tintColor
+            if task.state == .failure && options.color != .monochrome {
+                attributes[.foregroundColor] = UXColor.systemRed
             }
             return attributes
         }())
 
         func append(section: KeyValueSectionViewModel?) {
             guard let section = section else { return }
-            text.append("\n", helpers.spacerAttributes)
-            text.append(render(section))
+            string.append("\n", helpers.spacerAttributes)
+            string.append(render(section))
         }
 
         let url = task.url.flatMap(URL.init) ?? URL(string: "invalid-url")!
 
-        text.append(url.absoluteString + "\n", {
+        string.append(url.absoluteString + "\n", {
             var attributes = helpers.textAttributes[.debug]!
             attributes[.font] = UXFont.systemFont(ofSize: TextSize.body, weight: .medium)
-            if !options.isMonocrhome {
-                attributes[.foregroundColor] = tintColor
+            if task.state == .failure && options.color != .monochrome {
+                attributes[.foregroundColor] = UXColor.systemRed
             }
             return attributes
         }())
@@ -196,7 +180,7 @@ final class TextRenderer {
             }
             if content.contains(.currentRequestHeaders), let currentRequest = task.currentRequest {
                 if originalRequest.headers == currentRequest.headers {
-                    text.append("Same as Original", [
+                    string.append("Same as Original", [
                         .font: UXFont.systemFont(ofSize: TextSize.body, weight: .regular),
                         .foregroundColor: UXColor.secondaryLabel,
                         .paragraphStyle: helpers.bodParagraphStyle
@@ -206,22 +190,22 @@ final class TextRenderer {
                 }
             }
             if content.contains(.requestBody), let data = task.requestBody?.data, !data.isEmpty {
-                text.append("\n", helpers.spacerAttributes)
-                text.append("Request Body\n", helpers.captionAttributes)
-                text.append(renderNetworkTaskBody(data, contentType: task.responseContentType.map(NetworkLogger.ContentType.init), error: task.decodingError))
-                text.append("\n", helpers.detailsAttributes)
+                string.append("\n", helpers.spacerAttributes)
+                string.append("Request Body\n", helpers.captionAttributes)
+                string.append(renderNetworkTaskBody(data, contentType: task.responseContentType.map(NetworkLogger.ContentType.init), error: task.decodingError))
+                string.append("\n", helpers.detailsAttributes)
             }
         }
         if content.contains(.responseHeaders), let response = task.response {
             append(section: .makeHeaders(title: "Response Headers", headers: response.headers))
         }
         if content.contains(.responseBody), let data = task.responseBody?.data, !data.isEmpty {
-            text.append("\n", helpers.spacerAttributes)
-            text.append("Response Body\n", helpers.captionAttributes)
-            text.append(renderNetworkTaskBody(data, contentType: task.responseContentType.map(NetworkLogger.ContentType.init), error: task.decodingError))
-            text.append("\n", helpers.detailsAttributes)
+            string.append("\n", helpers.spacerAttributes)
+            string.append("Response Body\n", helpers.captionAttributes)
+            string.append(renderNetworkTaskBody(data, contentType: task.responseContentType.map(NetworkLogger.ContentType.init), error: task.decodingError))
+            string.append("\n", helpers.detailsAttributes)
         }
-        return text
+        return string
     }
 
 #warning("TODO: rework this")
@@ -301,8 +285,8 @@ final class TextRenderer {
             .foregroundColor: UXColor.label,
             .paragraphStyle: helpers.monoParagraphStyle,
         ]
-        if #available(iOS 14, tvOS 14, *), !options.isMonocrhome {
-            keyAttributes[.foregroundColor] = options.isMonocrhome ? UXColor.label : UXColor(color)
+        if #available(iOS 14, tvOS 14, *), options.color == .full {
+            keyAttributes[.foregroundColor] = UXColor(color)
         }
         let valueAttributes: [NSAttributedString.Key: Any] = [
             .font: isMonospaced ? UXFont.monospacedSystemFont(ofSize: TextSize.mono, weight: .regular) : UXFont.systemFont(ofSize: TextSize.caption, weight: .regular),
@@ -419,7 +403,7 @@ final class TextHelper {
 
         func makeLabelAttributes(level: LoggerStore.Level) -> [NSAttributedString.Key: Any] {
             let textColor: UXColor
-            if #available(iOS 14, tvOS 14, *), !options.isMonocrhome {
+            if #available(iOS 14, tvOS 14, *), options.color != .monochrome {
                 textColor = level == .trace ? .secondaryLabel : UXColor(ConsoleMessageStyle.textColor(level: level))
             } else {
                 textColor = .label
@@ -474,13 +458,13 @@ struct ConsoleTextRenderer_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             let string = TextRenderer(options: .init(networkContent: [.all])).render(task)
-            let string2 = TextRenderer(options: .init(networkContent: [.all], isMonocrhome: false)).render(task)
+            let stringWithColor = TextRenderer(options: .init(networkContent: [.all], color: .full)).render(task)
             let html = try! TextRenderer.html(from: string)
 
             RichTextView(viewModel: .init(string: string))
                 .previewDisplayName("NSAttributedString")
 
-            RichTextView(viewModel: .init(string: string2))
+            RichTextView(viewModel: .init(string: stringWithColor))
                 .previewDisplayName("NSAttributedString (Color)")
 
             RichTextView(viewModel: .init(string: string.string))
