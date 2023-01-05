@@ -21,6 +21,8 @@ import PDFKit
 final class TextRenderer {
     struct Options {
         var networkContent: RenteredNetworkContent = [.errorDetails, .requestBody, .responseBody]
+
+#warning("TODO: rework what can be colored and what is not & use isBodySyntaxHighlightingEnabled")
         var isMonocrhome = true
         var isBodySyntaxHighlightingEnabled = true
         var isBodyExpanded = false
@@ -197,11 +199,6 @@ final class TextRenderer {
 #warning("TODO: rework this")
     private func renderNetworkTaskBody(_ data: Data, contentType: NetworkLogger.ContentType?, error: NetworkLogger.DecodingError?) -> NSAttributedString {
         let text = NSMutableAttributedString(attributedString: _renderNetworkTaskBody(data, contentType: contentType, error: error))
-        if !options.isBodySyntaxHighlightingEnabled {
-            text.addAttributes([
-                .foregroundColor: UXColor.label
-            ])
-        }
         if !options.isBodyExpanded && !expanded.contains(index) {
             let string = text.string as NSString
             var counter = 0
@@ -374,9 +371,7 @@ final class TextHelper {
         self.fontCaption = .preferredFont(forTextStyle: .caption1)
         self.fontMono = .monospacedSystemFont(ofSize: TextSize.mono, weight: .regular)
 
-        let lineHeight = geLineHeight(for: Int(options.fontSize))
-        self.bodParagraphStyle = NSParagraphStyle.make(lineHeight: lineHeight)
-
+        self.bodParagraphStyle = NSParagraphStyle.make(lineHeight: TextSize.body + 6)
         self.monoParagraphStyle = NSParagraphStyle.make(lineHeight: TextSize.mono + 6)
 
         self.captionAttributes = [
@@ -403,7 +398,7 @@ final class TextHelper {
                 textColor = .label
             }
             return [
-                .font: fontCaption,
+                .font: UXFont.systemFont(ofSize: TextSize.body),
                 .foregroundColor: textColor,
                 .paragraphStyle: bodParagraphStyle
             ]
@@ -419,19 +414,13 @@ final class TextHelper {
 
 struct TextSize {
     static let headline = fontSize(for: .headline)
-    static let body = fontSize(for: .body)
-    static let mono = fontSize(for: .body) - 5
-    static let callout = fontSize(for: .callout)
+    static let body = fontSize(for: .body) - 2
+    static let mono = fontSize(for: .body) - 4
     static let caption = fontSize(for: .caption1)
 }
 
 private func fontSize(for style: UXFont.TextStyle) -> CGFloat {
     UXFont.preferredFont(forTextStyle: style).fontDescriptor.pointSize
-}
-
-@available(*, deprecated, message: "Deprecated")
-private func geLineHeight(for fontSize: Int) -> CGFloat {
-    CGFloat(fontSize + 6)
 }
 
 struct RenteredNetworkContent: OptionSet {
