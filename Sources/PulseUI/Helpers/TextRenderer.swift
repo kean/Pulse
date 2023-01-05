@@ -19,13 +19,45 @@ import PDFKit
 /// Renders console messages as attributed strings.
 final class TextRenderer {
     struct Options {
-        var networkContent: RenteredNetworkContent = [.errorDetails, .requestBody, .responseBody]
+        var networkContent: NetworkContent = [.errorDetails, .requestBody, .responseBody]
 
 #warning("TODO: rework what can be colored and what is not & use isBodySyntaxHighlightingEnabled")
         var isMonocrhome = true
         var isBodySyntaxHighlightingEnabled = true
         var isBodyExpanded = false
         var bodyCollapseLimit = 20
+    }
+
+    struct NetworkContent: OptionSet {
+        let rawValue: Int16
+
+        init(rawValue: Int16) {
+            self.rawValue = rawValue
+        }
+
+        static let requestComponents = NetworkContent(rawValue: 1 << 0)
+        static let requestQueryItems = NetworkContent(rawValue: 1 << 1)
+        static let errorDetails = NetworkContent(rawValue: 1 << 2)
+        static let originalRequestHeaders = NetworkContent(rawValue: 1 << 3)
+        static let currentRequestHeaders = NetworkContent(rawValue: 1 << 5)
+        static let requestOptions = NetworkContent(rawValue: 1 << 7)
+        static let requestBody = NetworkContent(rawValue: 1 << 8)
+        static let responseHeaders = NetworkContent(rawValue: 1 << 9)
+        static let responseBody = NetworkContent(rawValue: 1 << 11)
+
+        #warning("TODO: add subset for sharing (not all?)")
+
+        static let all: NetworkContent = [
+            requestComponents,
+            requestQueryItems,
+            errorDetails,
+            originalRequestHeaders,
+            currentRequestHeaders,
+            requestOptions,
+            requestBody,
+            responseHeaders,
+            responseBody
+        ]
     }
 
     private var options: Options
@@ -416,38 +448,6 @@ struct TextSize {
 
 private func fontSize(for style: UXFont.TextStyle) -> CGFloat {
     UXFont.preferredFont(forTextStyle: style).fontDescriptor.pointSize
-}
-
-struct RenteredNetworkContent: OptionSet {
-    let rawValue: Int16
-
-    init(rawValue: Int16) {
-        self.rawValue = rawValue
-    }
-
-    static let requestComponents = RenteredNetworkContent(rawValue: 1 << 0)
-    static let requestQueryItems = RenteredNetworkContent(rawValue: 1 << 1)
-    static let errorDetails = RenteredNetworkContent(rawValue: 1 << 2)
-    static let originalRequestHeaders = RenteredNetworkContent(rawValue: 1 << 3)
-    static let currentRequestHeaders = RenteredNetworkContent(rawValue: 1 << 5)
-    static let requestOptions = RenteredNetworkContent(rawValue: 1 << 7)
-    static let requestBody = RenteredNetworkContent(rawValue: 1 << 8)
-    static let responseHeaders = RenteredNetworkContent(rawValue: 1 << 9)
-    static let responseBody = RenteredNetworkContent(rawValue: 1 << 11)
-
-    #warning("TODO: add subset for sharing (not all?)")
-
-    static let all: RenteredNetworkContent = [
-        requestComponents,
-        requestQueryItems,
-        errorDetails,
-        originalRequestHeaders,
-        currentRequestHeaders,
-        requestOptions,
-        requestBody,
-        responseHeaders,
-        responseBody
-    ]
 }
 
 @available(*, deprecated, message: "Deprecated")
