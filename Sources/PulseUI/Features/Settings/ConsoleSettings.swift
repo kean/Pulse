@@ -138,8 +138,11 @@ final class UserDefaultRaw<Value: RawRepresentable>: UserDefaultProtocol, Dynami
             if let newValue = newValue as? Optional<Value>, newValue == nil {
                 publisher.send(value) // Send default value
             } else {
-                guard let value = newValue as? Value else {
+                guard let rawValue = newValue as? Value.RawValue else {
                     return assertionFailure()
+                }
+                guard let value = Value(rawValue: rawValue) else {
+                    return
                 }
                 publisher.send(value)
             }

@@ -54,47 +54,15 @@ final class TextRenderer {
         case full
     }
 
-    private var options: Options
-    private var helpers: TextHelper
-    private var index = 0
+    private let options: Options
+    private let helpers: TextHelper
 
     init(options: Options = .init()) {
         self.options = options
         self.helpers = TextHelper(options: options)
     }
 
-#warning("TODO: this should not be TextRenderer responsbility")
-    var expanded: Set<Int> = []
-
-    func render(_ entities: [NSManagedObject], options: Options = .init()) -> NSAttributedString {
-        if let entities = entities as? [LoggerMessageEntity] {
-            return render(entities, options: options)
-        } else if let entities = entities as? [NetworkTaskEntity] {
-            return render(entities, options: options)
-        } else {
-            return NSAttributedString(string: "Unsupported entities")
-        }
-    }
-
-    @available(*, deprecated, message: "Deprecated")
-    func render(_ entities: [NetworkTaskEntity], options: Options = .init()) -> NSAttributedString {
-        prepare(options: options)
-        return joined(entities.map(render))
-    }
-
-    @available(*, deprecated, message: "Deprecated")
-    func render(_ entities: [LoggerMessageEntity], options: Options = .init()) -> NSAttributedString {
-        prepare(options: options)
-        return joined(entities.map(render))
-    }
-
-    private func prepare(options: Options) {
-        self.options = options
-        self.helpers = TextHelper(options: options)
-        self.index = 0
-    }
-
-    private func joined(_ strings: [NSAttributedString]) -> NSAttributedString {
+    func join(_ strings: [NSAttributedString]) -> NSAttributedString {
         let output = NSMutableAttributedString()
         for string in strings {
             output.append(string)
@@ -104,10 +72,12 @@ final class TextRenderer {
     }
 
     func render(_ message: LoggerMessageEntity) -> NSAttributedString {
-        defer { index += 1 }
+        render(message, index: nil, isExpanded: true)
+    }
 
+    func render(_ message: LoggerMessageEntity, index: Int?, isExpanded: Bool) -> NSAttributedString {
         if let task = message.task {
-            return render(task)
+            return render(task, index: index, isExpanded: isExpanded)
         }
 
         let text = NSMutableAttributedString()
@@ -125,8 +95,10 @@ final class TextRenderer {
     }
 
     func render(_ task: NetworkTaskEntity) -> NSAttributedString {
-        defer { index += 1 }
+        render(task, index: nil, isExpanded: true)
+    }
 
+    func render(_ task: NetworkTaskEntity, index: Int?, isExpanded: Bool) -> NSAttributedString {
 #warning("TODO: refactor remainig")
 #warning("TODO: fix fonts on other platforms, e.g. URL on tvOS")
 
@@ -192,7 +164,7 @@ final class TextRenderer {
             if content.contains(.requestBody), let data = task.requestBody?.data, !data.isEmpty {
                 string.append("\n", helpers.spacerAttributes)
                 string.append("Request Body\n", helpers.captionAttributes)
-                string.append(renderNetworkTaskBody(data, contentType: task.responseContentType.map(NetworkLogger.ContentType.init), error: task.decodingError))
+                string.append(renderNetworkTaskBody(data, contentType: task.responseContentType.map(NetworkLogger.ContentType.init), error: task.decodingError, index: index, isExpanded: isExpanded))
                 string.append("\n", helpers.detailsAttributes)
             }
         }
@@ -202,35 +174,35 @@ final class TextRenderer {
         if content.contains(.responseBody), let data = task.responseBody?.data, !data.isEmpty {
             string.append("\n", helpers.spacerAttributes)
             string.append("Response Body\n", helpers.captionAttributes)
-            string.append(renderNetworkTaskBody(data, contentType: task.responseContentType.map(NetworkLogger.ContentType.init), error: task.decodingError))
+            string.append(renderNetworkTaskBody(data, contentType: task.responseContentType.map(NetworkLogger.ContentType.init), error: task.decodingError, index: index, isExpanded: isExpanded))
             string.append("\n", helpers.detailsAttributes)
         }
         return string
     }
 
 #warning("TODO: rework this")
-    private func renderNetworkTaskBody(_ data: Data, contentType: NetworkLogger.ContentType?, error: NetworkLogger.DecodingError?) -> NSAttributedString {
+    private func renderNetworkTaskBody(_ data: Data, contentType: NetworkLogger.ContentType?, error: NetworkLogger.DecodingError?, index: Int?, isExpanded: Bool) -> NSAttributedString {
         let text = NSMutableAttributedString(attributedString: _renderNetworkTaskBody(data, contentType: contentType, error: error))
-        if !options.isBodyExpanded && !expanded.contains(index) {
+        if !options.isBodyExpanded && !isExpanded, let index = index {
             let string = text.string as NSString
             var counter = 0
-            var index = 0
-            while index < string.length, counter < options.bodyCollapseLimit {
-                if string.character(at: index) == 0x0a {
+            var stringIndex = 0
+            while stringIndex < string.length, counter < options.bodyCollapseLimit {
+                if string.character(at: stringIndex) == 0x0a {
                     counter += 1
                 }
-                index += 1
+                stringIndex += 1
             }
-            if index != string.length {
+            if stringIndex != string.length {
                 do { // trim newlines
-                    while index > 1, string.character(at: index - 1) == 0x0a {
-                        index -= 1
+                    while stringIndex > 1, string.character(at: stringIndex - 1) == 0x0a {
+                        stringIndex -= 1
                     }
                 }
-                let text = NSMutableAttributedString(attributedString: text.attributedSubstring(from: NSRange(location: 0, length: index)))
+                let text = NSMutableAttributedString(attributedString: text.attributedSubstring(from: NSRange(location: 0, length: stringIndex)))
                 var attributes = helpers.detailsAttributes
                 attributes[.foregroundColor] = UXColor.systemBlue
-                attributes[.link] = URL(string: "pulse://expand/\(self.index)")
+                attributes[.link] = URL(string: "pulse://expand/\(index)")
                 attributes[.underlineColor] = UXColor.clear
                 text.append("\n", helpers.spacerAttributes)
                 text.append("\nExpand ▷", attributes)

@@ -7,7 +7,10 @@ import CoreData
 import Pulse
 import Combine
 
-#warning("TODO: fix where share and close buttons are")
+#warning("TODO: fix safe area")
+#warning("TODO: fix where share and close buttons are form FIleView?")
+#warning("TODO: cache strings")
+#warning("TODO: fix jumping when updating expanding view (when new contnet is available?)")
 
 #if os(iOS)
 
@@ -135,18 +138,16 @@ private struct ConsoleTextViewSettingsView: View {
 
 @available(iOS 14, *)
 final class ConsoleTextViewModel: ObservableObject {
+    let text: RichTextViewModel
+    var options: TextRenderer.Options = .init()
+    @Published private(set) var isButtonRefreshHidden = true
+
+    private var expanded: Set<NSManagedObjectID> = []
+    private let settings = ConsoleTextViewSettings.shared
     private var entities: CurrentValueSubject<[NSManagedObject], Never> = .init([])
-    private let renderer = TextRenderer()
+    private var lastTimeRefreshHidden = Date().addingTimeInterval(-3)
 
     private var cancellables: [AnyCancellable] = []
-
-    var options: TextRenderer.Options = .init()
-
-    private let settings = ConsoleTextViewSettings.shared
-
-    let text: RichTextViewModel
-    @Published private(set) var isButtonRefreshHidden = true
-    private var lastTimeRefreshHidden = Date().addingTimeInterval(-3)
 
     init() {
         self.text = RichTextViewModel(string: "")
@@ -159,7 +160,7 @@ final class ConsoleTextViewModel: ObservableObject {
 
         ConsoleTextViewSettings.shared.$isCollapsingResponses.dropFirst().sink { [weak self] isCollasped in
             self?.options.isBodyExpanded = !isCollasped
-            self?.renderer.expanded.removeAll()
+            self?.expanded.removeAll()
             self?.refreshText()
         }.store(in: &cancellables)
     }
@@ -208,7 +209,21 @@ final class ConsoleTextViewModel: ObservableObject {
 
     private func refreshText() {
         let entities = settings.orderAscending ? entities.value : entities.value.reversed()
-        let string = renderer.render(entities, options: options)
+        let renderer = TextRenderer(options: options)
+        let strings: [NSAttributedString]
+        if let messages = entities as? [LoggerMessageEntity] {
+            strings = messages.enumerated().map { (index, message) in
+                renderer.render(message, index: index, isExpanded: expanded.contains(message.objectID))
+            }
+        } else if let tasks = entities as? [NetworkTaskEntity] {
+            strings = tasks.enumerated().map { (index, task) in
+                renderer.render(task, index: index, isExpanded: expanded.contains(task.objectID))
+            }
+        } else {
+            assertionFailure("Unsupported entities: \(entities)")
+            strings = []
+        }
+        let string = renderer.join(strings)
         self.text.display(string)
     }
 
@@ -216,7 +231,7 @@ final class ConsoleTextViewModel: ObservableObject {
         guard url.scheme == "pulse", url.host == "expand", let index = Int(url.lastPathComponent) else {
             return false
         }
-        renderer.expanded.insert(index)
+        expanded.insert(entities.value[index].objectID)
         refreshText()
         return true
     }
