@@ -7,6 +7,8 @@ import CoreData
 import Pulse
 import Combine
 
+#warning("TODO: add View Raw + cURL descriootion")
+#warning("TODO: when highlighting textview use prepareUpdate and commitUpdates")
 #warning("TODO: fix state management at least on the top level")
 #warning("TODO: rework metrics")
 #warning("TODO: find better icons")
@@ -19,6 +21,7 @@ import Combine
 #warning("TODO: rewrite TransactionsDeatilsView without KeyValueView")
 #warning("TODO: macos show response body automatically when task finished loading")
 #warning("TODO: add sharing on watchOS")
+
 
 struct NetworkInspectorView: View {
 #if os(watchOS)
