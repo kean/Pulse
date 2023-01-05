@@ -4,7 +4,6 @@
 
 #warning("TODO: add PDF export and test printing")
 #warning("TODO: add metrics and cookies and other missing values from summary")
-#warning("TODO: remove FontSize setting from ConsoleTextView for now")
 #warning("TODO: do other styles work?")
 
 import Foundation
@@ -27,9 +26,6 @@ final class TextRenderer {
         var isBodySyntaxHighlightingEnabled = true
         var isBodyExpanded = false
         var bodyCollapseLimit = 20
-
-        @available(*, deprecated, message: "Deprecated")
-        var fontSize: CGFloat = 15
     }
 
     private var options: Options
@@ -141,7 +137,7 @@ final class TextRenderer {
 
         text.append(url.absoluteString + "\n", {
             var attributes = helpers.textAttributes[.debug]!
-            attributes[.font] = UXFont.systemFont(ofSize: options.fontSize, weight: .medium)
+            attributes[.font] = UXFont.systemFont(ofSize: TextSize.body, weight: .medium)
             if !options.isMonocrhome {
                 attributes[.foregroundColor] = tintColor
             }
@@ -229,7 +225,6 @@ final class TextRenderer {
     }
 
     private func _renderNetworkTaskBody(_ data: Data, contentType: NetworkLogger.ContentType?, error: NetworkLogger.DecodingError?) -> NSAttributedString {
-        let fontSize = options.fontSize - 3
         if let json = try? JSONSerialization.jsonObject(with: data, options: []) {
             let renderer = TextRendererJSON(json: json, error: error, options: options)
             return renderer.render()
@@ -237,7 +232,7 @@ final class TextRenderer {
             if contentType?.isEncodedForm ?? false, let components = decodeQueryParameters(form: string) {
                 return components.asAttributedString()
             } else if contentType?.isHTML ?? false {
-                return HTMLPrettyPrint(string: string, fontSize: Int(fontSize)).render()
+                return HTMLPrettyPrint(string: string, fontSize: Int(TextSize.mono)).render()
             }
             return NSAttributedString(string: string, attributes: helpers.textAttributes[.debug]!)
         } else {

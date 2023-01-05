@@ -111,7 +111,6 @@ private struct ConsoleTextViewSettingsView: View {
                 Toggle("Monochrome", isOn: $settings.isMonochrome)
                 Toggle("Syntax Highlighting", isOn: $settings.isSyntaxHighlightingEnabled)
                 Toggle("Link Detection", isOn: $settings.isLinkDetectionEnabled)
-                Stepper("Font Size: \(settings.fontSize)", value: $settings.fontSize)
             }
             Section(header: Text("Request Info")) {
                 Toggle("Request Headers", isOn: $settings.showsTaskRequestHeader)
@@ -172,7 +171,6 @@ final class ConsoleTextViewModel: ObservableObject {
         options.isBodyExpanded = !settings.isCollapsingResponses
         options.isMonocrhome = settings.isMonochrome
         options.isBodySyntaxHighlightingEnabled = settings.isSyntaxHighlightingEnabled
-        options.fontSize = CGFloat(settings.fontSize)
         if settings.showsTaskRequestHeader {
             options.networkContent.insert(.currentRequestHeaders)
             options.networkContent.insert(.originalRequestHeaders)

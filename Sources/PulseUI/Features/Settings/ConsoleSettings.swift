@@ -40,9 +40,6 @@ final class ConsoleTextViewSettings: PersistentSettings {
     @UserDefault("console-text-view__link-detection")
     var isLinkDetectionEnabled = true
 
-    @UserDefault("console-text-view__view-font-size")
-    var fontSize = 15
-
     @UserDefault("console-text-view__request-headers")
     var showsTaskRequestHeader = false
 
