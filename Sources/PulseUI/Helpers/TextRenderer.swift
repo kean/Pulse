@@ -248,7 +248,7 @@ final class TextRenderer {
             if contentType?.isEncodedForm ?? false, let components = decodeQueryParameters(form: string) {
                 return components.asAttributedString()
             } else if contentType?.isHTML ?? false {
-                return HTMLPrettyPrint(string: string, fontSize: Int(TextSize.mono)).render()
+                return TextRendererHTML(html: string, options: options).render()
             }
             return NSAttributedString(string: string, attributes: helpers.textAttributes[.debug]!)
         } else {
@@ -470,7 +470,7 @@ struct ConsoleTextRenderer_Previews: PreviewProvider {
             RichTextView(viewModel: .init(string: string.string))
                 .previewDisplayName("Plain Text")
 
-            RichTextView(viewModel: .init(string: HTMLPrettyPrint(string: String(data: html, encoding: .utf8)!).render()))
+            RichTextView(viewModel: .init(string: TextRendererHTML(html: String(data: html, encoding: .utf8)!).render()))
                 .previewLayout(.fixed(width: 1160, height: 2000)) // Disable interaction to view it
                 .previewDisplayName("HTML (Raw)")
 

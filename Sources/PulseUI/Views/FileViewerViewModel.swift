@@ -78,7 +78,8 @@ final class FileViewerViewModel: ObservableObject {
             if contentType?.isEncodedForm ?? false, let components = decodeQueryParameters(form: string) {
                 return .other(RichTextViewModel(string: components.asAttributedString()))
             } else if contentType?.isHTML ?? false {
-                return .other(RichTextViewModel(string: HTMLPrettyPrint(string: string).render(), contentType: "text/html"))
+                let renderer = TextRendererHTML(html: string)
+                return .other(RichTextViewModel(string: renderer.render(), contentType: "text/html"))
             }
             return .other(.init(string: string))
         } else {
