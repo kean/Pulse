@@ -5,29 +5,11 @@
 import SwiftUI
 import Pulse
 
+#warning("TODO: remove unused")
 #warning("TODO: remoe actions for KeyValueSectionViewModel")
+#warning("TODO: standardize lineHeight")
 
 extension KeyValueSectionViewModel {
-    static func makeSummary(for request: NetworkRequestEntity) -> KeyValueSectionViewModel {
-        let components = request.url.flatMap { URLComponents(string: $0) }
-        var items: [(String, String?)] = []
-        items += [
-            ("URL", request.url),
-            ("Method", request.httpMethod)
-        ]
-        if let host = components?.host {
-            items.append(("Host", host))
-        }
-        if let path = components?.path {
-            items.append(("Path", path))
-        }
-        return KeyValueSectionViewModel(
-            title: "Request Summary",
-            color: .blue,
-            items: items
-        )
-    }
-
     static func makeParameters(for request: NetworkRequestEntity) -> KeyValueSectionViewModel {
         var items: [(String, String?)] = [
             ("Cache Policy", request.cachePolicy.description),
@@ -50,37 +32,6 @@ extension KeyValueSectionViewModel {
             items.append(("HTTP Should Use Pipelining", request.httpShouldUsePipelining.description))
         }
         return KeyValueSectionViewModel(title: "Options", color: .indigo, items: items)
-    }
-
-#warning("TODO: remove unused")
-
-    @available(*, deprecated, message: "Deprecated")
-    static func makeRequestHeaders(for headers: [String: String], action: @escaping () -> Void) -> KeyValueSectionViewModel {
-        KeyValueSectionViewModel(
-            title: "Headers",
-            color: .blue,
-            action: headers.isEmpty ? nil : ActionViewModel(title: "View", action: action),
-            items: headers.sorted(by: { $0.key < $1.key })
-        )
-    }
-
-    @available(*, deprecated, message: "Deprecated")
-    static func makeSummary(for response: NetworkResponseEntity) -> KeyValueSectionViewModel {
-        KeyValueSectionViewModel(title: "Response Summary", color: .indigo, items: [
-            ("Status Code", String(response.statusCode)),
-            ("Content Type", response.contentType?.rawValue),
-            ("Expected Content Length", response.expectedContentLength.map { ByteCountFormatter.string(fromByteCount: max(0, $0)) })
-        ])
-    }
-
-    @available(*, deprecated, message: "Deprecated")
-    static func makeResponseHeaders(for headers: [String: String], action: @escaping () -> Void) -> KeyValueSectionViewModel {
-        KeyValueSectionViewModel(
-            title: "Headers",
-            color: .indigo,
-            action: headers.isEmpty ? nil : ActionViewModel(title: "View", action: action),
-            items: headers.sorted(by: { $0.key < $1.key })
-        )
     }
 
     static func makeComponents(for url: URL) -> KeyValueSectionViewModel? {
@@ -187,6 +138,8 @@ extension KeyValueSectionViewModel {
     }
 #endif
 
+#warning("TODO: remove?")
+
 #if os(iOS) || os(macOS) || os(tvOS)
     static func makeTiming(for transaction: NetworkTransactionMetricsEntity) -> KeyValueSectionViewModel {
         let timeFormatter = DateFormatter()
@@ -260,5 +213,3 @@ extension KeyValueSectionViewModel {
         return output
     }
 }
-
-#warning("TODO: standardize lineHeight")
