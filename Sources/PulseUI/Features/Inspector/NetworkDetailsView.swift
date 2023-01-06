@@ -13,7 +13,11 @@ struct NetworkDetailsView: View {
 
     init(title: String, viewModel: @escaping () -> KeyValueSectionViewModel?) {
         self.title = title
-        self.viewModel = NetworkDetailsViewModel { viewModel()?.asAttributedString() }
+        self.viewModel = NetworkDetailsViewModel {
+            viewModel().map {
+                TextRenderer().render($0.items, color: $0.color)
+            }
+        }
     }
 
     init(title: String, text: @escaping () -> NSAttributedString?) {
@@ -48,6 +52,12 @@ final class NetworkDetailsViewModel {
 #if DEBUG
 struct NetworkDetailsView_Previews: PreviewProvider {
     static var previews: some View {
+        Group {
+            NavigationView {
+                NetworkDetailsView(title: "Section") {
+                    KeyValueSectionViewModel.makeComponents(for: URL(string: LoggerStore.preview.entity(for: .login).url!)!)
+                }
+            }
 #if !os(watchOS)
             NavigationView {
                 NetworkDetailsView(title: "JWT") {
@@ -56,6 +66,7 @@ struct NetworkDetailsView_Previews: PreviewProvider {
             }
             .previewDisplayName("JWT")
 #endif
+        }
     }
 }
 
