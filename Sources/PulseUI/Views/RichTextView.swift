@@ -7,6 +7,7 @@ import CoreData
 import Pulse
 import Combine
 
+#warning("TODO: add other sharing options, e.g. as HTML/PDF + print")
 #warning("TODO: rework API - this should be used everywhere")
 #warning("TODO: remoe isScrolled?")
 #warning("TODO: handle clicks on decoding error on other platforms")
