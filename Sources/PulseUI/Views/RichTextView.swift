@@ -7,6 +7,7 @@ import CoreData
 import Pulse
 import Combine
 
+#warning("TODO: rework API - this should be used everywhere")
 #warning("TODO: remoe isScrolled?")
 #warning("TODO: handle clicks on decoding error on other platforms")
 #warning("TODO: fix missing vertical scroller on macOS")
@@ -21,8 +22,19 @@ struct RichTextView: View {
     @State private var errorViewOpacity = 0.0
     @State private var shareItems: ShareItems?
     @State private var isWebViewOpen = false
-    var isAutomaticLinkDetectionEnabled = true
+
     var hasVerticalScroller = false
+
+    // TODO: rework this: use linkDetectionEnabled
+    @available(*, deprecated, message: "Deprecated")
+    var isAutomaticLinkDetectionEnabled = true
+
+    func linkDetectionEnabled(_ isEnabled: Bool) -> RichTextView {
+        var copy = self
+        copy.isAutomaticLinkDetectionEnabled = isEnabled
+        return copy
+    }
+
 #if os(iOS)
     var body: some View {
         content
@@ -424,19 +436,11 @@ final class RichTextViewModel: ObservableObject {
         self.init(string: RichTextViewModel.makeAttributedString(for: string))
     }
 
-    static func makeAttributedString(for string: String) -> NSAttributedString {
-        NSAttributedString(string: string, attributes: [.font: preferredFont(), .foregroundColor: UXColor.label])
+    convenience init(string: NSAttributedString) {
+        self.init(string: string, contentType: nil)
     }
 
-    static func preferredFont() -> UXFont {
-#if os(macOS)
-        NSFont.preferredFont(forTextStyle: .body, options: [:])
-#else
-        UXFont.systemFont(ofSize: FontSize.body + 3, weight: .regular)
-#endif
-    }
-
-    init(string: NSAttributedString, contentType: NetworkLogger.ContentType? = nil) {
+    init(string: NSAttributedString, contentType: NetworkLogger.ContentType?) {
         self.text = string
         self.string = string.string
         self.contentType = contentType
@@ -444,6 +448,20 @@ final class RichTextViewModel: ObservableObject {
         Publishers.CombineLatest($searchTerm, $options).sink { [weak self] in
             self?.refresh(searchTerm: $0, options: $1)
         }.store(in: &bag)
+    }
+
+    @available(*, deprecated, message: "Deprecated")
+    static func makeAttributedString(for string: String) -> NSAttributedString {
+        NSAttributedString(string: string, attributes: [.font: preferredFont(), .foregroundColor: UXColor.label])
+    }
+
+    @available(*, deprecated, message: "Deprecated")
+    static func preferredFont() -> UXFont {
+#if os(macOS)
+        NSFont.preferredFont(forTextStyle: .body, options: [:])
+#else
+        UXFont.systemFont(ofSize: FontSize.body + 3, weight: .regular)
+#endif
     }
 
     // This needs to be improved

@@ -5,6 +5,7 @@
 import SwiftUI
 import Pulse
 
+@available(*, deprecated, message: "Deprecated")
 struct NetworkDetailsView: View {
     private var title: String
     private let viewModel: NetworkDetailsViewModel?

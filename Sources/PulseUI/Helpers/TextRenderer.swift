@@ -155,7 +155,7 @@ final class TextRenderer {
                     string.append("Same as Original", [
                         .font: UXFont.systemFont(ofSize: TextSize.body, weight: .regular),
                         .foregroundColor: UXColor.secondaryLabel,
-                        .paragraphStyle: helpers.bodParagraphStyle
+                        .paragraphStyle: helpers.bodyParagraphStyle
                     ])
                 } else {
                     append(section: .makeHeaders(title: "Current Request Headers", headers: currentRequest.headers))
@@ -329,6 +329,10 @@ final class TextRenderer {
         return data as Data
     }
 #endif
+
+    func render(string: String, style: TextStyle, weight: UXFont.Weight = .regular) -> NSAttributedString {
+        NSAttributedString(string: string, attributes: helpers.attributes(for: style, weight: weight))
+    }
 }
 
 #warning("TODO: remove unused values")
@@ -340,27 +344,39 @@ final class TextHelper {
 
     let captionAttributes: [NSAttributedString.Key: Any]
     let spacerAttributes: [NSAttributedString.Key: Any]
+    let monospacedAttributes: [NSAttributedString.Key: Any]
+    let bodyAttributes: [NSAttributedString.Key: Any]
 
     let monoParagraphStyle: NSParagraphStyle
 
-    let bodParagraphStyle: NSParagraphStyle
+    let bodyParagraphStyle: NSParagraphStyle
     private(set) var textAttributes: [LoggerStore.Level: [NSAttributedString.Key: Any]] = [:]
     var detailsAttributes: [NSAttributedString.Key: Any] { textAttributes[.debug]! }
 
     init(options: TextRenderer.Options) {
 #warning("TODO: remove these fonts?")
         self.fontHeadline = .preferredFont(forTextStyle: .headline)
-        self.fontBody = .preferredFont(forTextStyle: .body)
+        self.fontBody = .systemFont(ofSize: TextSize.body, weight: .regular)
         self.fontCaption = .preferredFont(forTextStyle: .caption1)
         self.fontMono = .monospacedSystemFont(ofSize: TextSize.mono, weight: .regular)
 
-        self.bodParagraphStyle = NSParagraphStyle.make(lineHeight: TextSize.body + 6)
-        self.monoParagraphStyle = NSParagraphStyle.make(lineHeight: TextSize.mono + 6)
+        self.bodyParagraphStyle = NSParagraphStyle.make(lineHeight: TextSize.body + 6)
+        self.bodyAttributes = [
+            .font: fontBody,
+            .foregroundColor: UXColor.label,
+            .paragraphStyle: bodyParagraphStyle
+        ]
 
+        self.monoParagraphStyle = NSParagraphStyle.make(lineHeight: TextSize.mono + 6)
+        self.monospacedAttributes = [
+            .font: fontMono,
+            .paragraphStyle: monoParagraphStyle,
+            .foregroundColor: UXColor.label
+        ]
         self.captionAttributes = [
             .font: fontCaption,
             .foregroundColor: UXColor.secondaryLabel,
-            .paragraphStyle: bodParagraphStyle
+            .paragraphStyle: bodyParagraphStyle
         ]
 
         self.spacerAttributes = [
@@ -383,7 +399,7 @@ final class TextHelper {
             return [
                 .font: UXFont.systemFont(ofSize: TextSize.body),
                 .foregroundColor: textColor,
-                .paragraphStyle: bodParagraphStyle
+                .paragraphStyle: bodyParagraphStyle
             ]
         }
 
@@ -392,7 +408,29 @@ final class TextHelper {
         }
     }
 
+    func attributes(for style: TextStyle, weight: UXFont.Weight = .regular) -> [NSAttributedString.Key: Any] {
+        switch style {
+        case .body:
+            var attributes = bodyAttributes
+            if weight != .regular {
+                attributes[.font] = UXFont.systemFont(ofSize: TextSize.body, weight: weight)
+            }
+            return attributes
+        case .monospaced:
+            var attributes = monospacedAttributes
+            if weight != .regular {
+                attributes[.font] = UXFont.monospacedSystemFont(ofSize: TextSize.body, weight: weight)
+            }
+            return attributes
+        }
+    }
+
     #warning("TODO: move body and KeyValueSectoinView rendering here too")
+}
+
+enum TextStyle {
+    case body
+    case monospaced
 }
 
 struct TextSize {

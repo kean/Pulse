@@ -217,8 +217,8 @@ struct NetworkInspectorView: View {
                 details: stringFromCount(viewModel.task.transactions.count)
             )
         }.disabled(!viewModel.task.hasMetrics)
-#endif
-        NetworkInspectorTransactionsListView(viewModel: .init(task: viewModel.task))
+#endif 
+        NetworkCURLCell(task: viewModel.task)
     }
 #endif
 
