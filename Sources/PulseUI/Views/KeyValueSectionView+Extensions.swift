@@ -101,40 +101,31 @@ extension KeyValueSectionViewModel {
 
 #if !os(watchOS)
     static func makeDetails(for jwt: JWT) -> NSAttributedString {
-        let titleAttributes: [NSAttributedString.Key: Any] = [
-            .foregroundColor: UXColor.label,
-            .font: UXFont.monospacedSystemFont(ofSize: FontSize.body + 2, weight: .semibold),
-            .paragraphStyle: {
-                let style = NSMutableParagraphStyle()
-                style.paragraphSpacing = 8
-                return style
-            }()
-        ]
-        let bodyAttributes: [NSAttributedString.Key: Any] = [
-            .foregroundColor: UXColor.secondaryLabel,
-            .font: UXFont.monospacedSystemFont(ofSize: FontSize.body, weight: .regular)
-        ]
-
-        let string = NSMutableAttributedString()
-        string.append("Header\n", titleAttributes)
-        string.append(TextRendererJSON(json: jwt.header).render().with(.foregroundColor, UXColor.systemRed))
-        string.append("\n\n", titleAttributes)
-        string.append("Payload\n", titleAttributes)
-        string.append(TextRendererJSON(json: jwt.body).render().with(.foregroundColor, UXColor.systemPurple))
-        if let signature = jwt.signature {
-            string.append("\n\n", titleAttributes)
-            string.append("Signature\n", titleAttributes)
-            string.append(NSAttributedString(string: signature, attributes: bodyAttributes).with(.foregroundColor, UXColor.systemBlue))
-        }
-        string.append("\n\n", titleAttributes)
-        string.append("Encoded\n", titleAttributes)
-        string.append(NSAttributedString(string: jwt.parts[0], attributes: bodyAttributes).with(.foregroundColor, UXColor.systemRed))
-        string.append(".", bodyAttributes)
-        string.append(NSAttributedString(string: jwt.parts[1], attributes: bodyAttributes).with(.foregroundColor, UXColor.systemPurple))
-        string.append(".", bodyAttributes)
-        string.append(NSAttributedString(string: jwt.parts[2], attributes: bodyAttributes).with(.foregroundColor, UXColor.systemBlue))
-
-        return string
+        let renderer = TextRenderer()
+        let sections: [NSAttributedString] = [
+            TextMake(renderer: renderer)
+                .subheadline("Header")
+                .json(jwt.header, color: .systemRed)
+                .newline(),
+            TextMake(renderer: renderer)
+                .subheadline("Payload")
+                .json(jwt.body, color: .systemPurple)
+                .newline(),
+            jwt.signature.map {
+                TextMake(renderer: renderer)
+                    .subheadline("Signature")
+                    .pre($0, color: .systemBlue)
+                    .newline()
+            },
+            TextMake(renderer: renderer)
+                .subheadline("Encoded")
+                .pre(jwt.parts[0], color: .systemRed)
+                .pre(".")
+                .pre(jwt.parts[1], color: .systemPurple)
+                .pre(".")
+                .pre(jwt.parts[2], color: .systemBlue)
+        ].compactMap { $0?.make() }
+        return renderer.joined(sections)
     }
 #endif
 
@@ -182,34 +173,4 @@ extension KeyValueSectionViewModel {
         return KeyValueSectionViewModel(title: "Timing", color: .orange, items: items)
     }
 #endif
-}
-
-extension KeyValueSectionViewModel {
-    @available(*, deprecated, message: "Please user TextRenderer instead")
-    func asAttributedString() -> NSAttributedString {
-        let output = NSMutableAttributedString()
-        for item in items {
-            var titleAttributes: [NSAttributedString.Key: Any] = [
-                .font: UXFont.monospacedSystemFont(ofSize: FontSize.body, weight: .semibold)
-            ]
-            if #available(iOS 14, tvOS 14, *) {
-                titleAttributes[.foregroundColor] = UXColor(color)
-            } else {
-#if os(iOS) || os(macOS)
-                titleAttributes[.foregroundColor] = UXColor.label
-#endif
-            }
-            output.append(item.0, titleAttributes)
-
-            var valueAttributes: [NSAttributedString.Key: Any] = [
-                .font: UXFont.monospacedSystemFont(ofSize: FontSize.body, weight: .regular)
-            ]
-#if os(iOS) || os(macOS)
-            valueAttributes[.foregroundColor] = UXColor.label
-#endif
-            output.append(": \(item.1 ?? "–")\n", valueAttributes)
-        }
-        output.addAttributes([.paragraphStyle: NSParagraphStyle.make(lineHeight: FontSize.body + 7)])
-        return output
-    }
 }

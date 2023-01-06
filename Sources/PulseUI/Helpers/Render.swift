@@ -10,14 +10,14 @@ import Foundation
 @available(*, deprecated, message: "Deprecated")
 enum Render {
     static func asPlainText(task: NetworkTaskEntity) -> String {
-        let renderer = TextRenderer(options: .init(networkContent: [.all]))
-        let string = renderer.render(task)
+        let renderer = TextRenderer()
+        let string = renderer.render(task, content: .all)
         return string.string
     }
 
     static func asHTML(task: NetworkTaskEntity) -> String {
-        let renderer = TextRenderer(options: .init(networkContent: [.all]))
-        let string = renderer.render(task)
+        let renderer = TextRenderer()
+        let string = renderer.render(task, content: .all)
         guard let data = try? TextRenderer.html(from: string),
               let string = String(data: data, encoding: .utf8) else {
             return "Export Failed"

@@ -26,7 +26,7 @@ final class NetworkInspectorRequestDetailsViewModel {
             return NSAttributedString(string: "Invalid URL")
         }
         let renderer = TextRenderer()
-        let urlString = renderer.render(url.absoluteString + "\n", style: .monospaced)
+        let urlString = renderer.render(url.absoluteString + "\n", role: .body2, style: .monospaced)
         let sections: [NSAttributedString] = [
             KeyValueSectionViewModel.makeComponents(for: url),
             KeyValueSectionViewModel.makeQueryItems(for: url),

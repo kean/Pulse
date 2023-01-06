@@ -13,10 +13,13 @@ final class ConsoleMessageTableCell: UITableViewCell, UIContextMenuInteractionDe
     private let accessory = ConsoleMessageAccessoryView()
     private let details = UILabel()
     private let pin = PinIndicatorView()
+    private var titleAttributes: [NSAttributedString.Key: Any] = [:]
 
     private var viewModel: ConsoleMessageViewModel?
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        titleAttributes = TextHelper().attributes(role: .subheadline, style: .monospacedDigital, width: .condensed, color: .secondaryLabel)
+
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         createView()
     }
@@ -37,7 +40,6 @@ final class ConsoleMessageTableCell: UITableViewCell, UIContextMenuInteractionDe
         contentView.addSubview(stack)
         stack.pinToSuperview(insets: .init(top: 10, left: 16, bottom: 10, right: 12))
 
-        title.font = .preferredFont(forTextStyle: .caption1)
         details.font = .systemFont(ofSize: 15)
 
         let interaction = UIContextMenuInteraction(delegate: self)
@@ -48,10 +50,10 @@ final class ConsoleMessageTableCell: UITableViewCell, UIContextMenuInteractionDe
         self.viewModel = viewModel
 
         details.numberOfLines = ConsoleSettings.shared.lineLimit
-        title.attributedText = viewModel.attributedTitle
+        title.attributedText = NSAttributedString(string: viewModel.title2, attributes: titleAttributes)
         details.text = viewModel.text
         details.textColor = viewModel.textColor2
-        accessory.textLabel.text = viewModel.time
+        accessory.textLabel.attributedText = NSAttributedString(string: viewModel.time, attributes: titleAttributes)
         pin.bind(viewModel: viewModel.pinViewModel)
     }
 
@@ -96,14 +98,13 @@ final class ConsoleMessageTableCell: UITableViewCell, UIContextMenuInteractionDe
 final class ConsoleMessageAccessoryView: UIView {
     let textLabel = UILabel()
 
+    #warning("TODO: udpate font")
     private static var chevron = UIImage.make(systemName: "chevron.right", textStyle: .caption1)
         .imageFlippedForRightToLeftLayoutDirection()
 
     override init(frame: CGRect) {
         super.init(frame: frame)
 
-        textLabel.font = .preferredFont(forTextStyle: .caption1)
-        textLabel.textColor = .secondaryLabel
         textLabel.setContentCompressionResistancePriority(.init(800), for: .horizontal)
 
         let disclosureIndicator = UIImageView(image: ConsoleMessageAccessoryView.chevron)

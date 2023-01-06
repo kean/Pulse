@@ -21,9 +21,13 @@ final class ConsoleNetworkRequestTableCell: UITableViewCell, UIContextMenuIntera
     private var cancellable1: AnyCancellable?
     private var cancellable2: AnyCancellable?
 
+    private var titleAttributes: [NSAttributedString.Key: Any] = [:]
+
     private var isAnimating = false
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        titleAttributes = TextHelper().attributes(role: .subheadline, style: .monospacedDigital, width: .condensed, color: .secondaryLabel)
+
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         createView()
     }
@@ -43,9 +47,6 @@ final class ConsoleNetworkRequestTableCell: UITableViewCell, UIContextMenuIntera
 
         contentView.addSubview(stack)
         stack.pinToSuperview(insets: .init(top: 10, left: 16, bottom: 10, right: 12))
-
-        title.font = .preferredFont(forTextStyle: .caption1)
-        title.textColor = .secondaryLabel
 
         details.font = .systemFont(ofSize: 15)
 
@@ -93,13 +94,13 @@ final class ConsoleNetworkRequestTableCell: UITableViewCell, UIContextMenuIntera
         }
         self.state = viewModel.state
 
-        title.text = viewModel.fullTitle
+        title.attributedText = NSAttributedString(string: viewModel.fullTitle, attributes: titleAttributes)
 
         if !onlyTitle {
             details.numberOfLines = ConsoleSettings.shared.lineLimit
             badge.fillColor = viewModel.uiBadgeColor
             details.text = viewModel.text
-            accessory.textLabel.text = viewModel.time
+            accessory.textLabel.attributedText = NSAttributedString(string: viewModel.time, attributes: titleAttributes)
             pin.bind(viewModel: viewModel.pinViewModel)
         }
     }

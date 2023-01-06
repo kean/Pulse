@@ -5,6 +5,7 @@
 import SwiftUI
 import Pulse
 
+#warning("TODO: cant we just use RichTextView or file/content viewer?")
 @available(*, deprecated, message: "Deprecated")
 struct NetworkDetailsView: View {
     private var title: String
@@ -58,14 +59,6 @@ struct NetworkDetailsView_Previews: PreviewProvider {
                     KeyValueSectionViewModel.makeComponents(for: URL(string: LoggerStore.preview.entity(for: .login).url!)!)
                 }
             }
-#if !os(watchOS)
-            NavigationView {
-                NetworkDetailsView(title: "JWT") {
-                    KeyValueSectionViewModel.makeDetails(for: jwt)
-                }
-            }
-            .previewDisplayName("JWT")
-#endif
         }
     }
 }

@@ -25,12 +25,6 @@ final class ConsoleSettings: PersistentSettings {
 final class ConsoleTextViewSettings: PersistentSettings {
     static let shared = ConsoleTextViewSettings()
 
-    @UserDefault("console-text-view__order-ascending")
-    var orderAscending = false
-
-    @UserDefault("console-text-view__responses-collapsed")
-    var isCollapsingResponses = true
-
     @UserDefaultRaw("console-text-view__color-mode")
     var colorMode = TextRenderer.ColorMode.automatic
 
@@ -38,7 +32,7 @@ final class ConsoleTextViewSettings: PersistentSettings {
     var isLinkDetectionEnabled = true
 
     @UserDefault("console-text-view__request-headers")
-    var showsTaskRequestHeader = false
+    var showsRequestHeaders = false
 
     @UserDefault("console-text-view__response-body-shown")
     var showsResponseBody = true
@@ -64,7 +58,6 @@ class PersistentSettings: ObservableObject {
     init() {
         let properties = Mirror(reflecting: self).children
             .compactMap { $0.value as? UserDefaultProtocol }
-        print(properties)
         ConsoleSettings.onChange(of: properties).sink { [objectWillChange] in
             objectWillChange.send()
         }.store(in: &cancellables)

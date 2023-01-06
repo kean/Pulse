@@ -4,7 +4,7 @@
 
 import Foundation
 
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(macOS) || os(tvOS)
 
 extension NetworkTaskEntity {
     public func cURLDescription() -> String {

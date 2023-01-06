@@ -67,7 +67,8 @@ final class FileViewerViewModel: ObservableObject {
 
     private func render(data: Data) -> Contents {
         if let json = try? JSONSerialization.jsonObject(with: data, options: []) {
-            return .json(RichTextViewModel(json: json, error: context.error))
+            let string = TextRenderer().render(json: json, error: context.error)
+            return .json(RichTextViewModel(string: string, contentType: "application/json"))
         } else if let image = UXImage(data: data) {
             return .image(ImagePreviewViewModel(image: image, data: data, context: context))
         } else if let pdf = makePDF(data: data) {
@@ -76,7 +77,7 @@ final class FileViewerViewModel: ObservableObject {
             return .other(.init(string: "Unavailable"))
         } else if let string = String(data: data, encoding: .utf8) {
             if contentType?.isEncodedForm ?? false, let components = decodeQueryParameters(form: string) {
-                return .other(RichTextViewModel(string: components.asAttributedString()))
+                return .other(RichTextViewModel(string: TextRenderer().render(components, style: .monospaced)))
             } else if contentType?.isHTML ?? false {
                 let renderer = TextRendererHTML(html: string)
                 return .other(RichTextViewModel(string: renderer.render(), contentType: "text/html"))

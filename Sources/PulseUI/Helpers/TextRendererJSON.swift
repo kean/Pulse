@@ -22,7 +22,7 @@ final class TextRendererJSON {
 
     init(json: Any, error: NetworkLogger.DecodingError? = nil, options: TextRenderer.Options = .init()) {
         self.options = options
-        self.helper = TextHelper(options: options)
+        self.helper = TextHelper()
         self.json = json
         self.error = error
 
@@ -51,14 +51,13 @@ final class TextRendererJSON {
             return string
         }
         print(json: json, isFree: true)
-        string.addAttributes([
-            .font: helper.fontMono,
-            .paragraphStyle: helper.monoParagraphStyle
-        ])
+        string.addAttributes(helper.attributes(role: .body2, style: .monospaced, color: nil))
         return string
     }
 
     // MARK: - Walk JSON
+
+    private let spaces = 2
 
     private func print(json: Any, isFree: Bool) {
         func _print(json: Any, key: NetworkLogger.DecodingError.CodingKey, isFree: Bool) {
@@ -77,11 +76,11 @@ final class TextRendererJSON {
             let keys = object.keys.sorted()
             for key in keys {
                 indent()
-                append("  \"\(key)\"", .key)
+                append("\(String(repeating: " ", count: spaces))\"\(key)\"", .key)
                 append(": ", .punctuation)
-                indentation += 2
+                indentation += 1
                 _print(json: object[key]!, key: .string(key), isFree: false)
-                indentation -= 2
+                indentation -= 1
                 if key != keys.last {
                     append(",", .punctuation)
                 }
@@ -94,7 +93,7 @@ final class TextRendererJSON {
         case let array as [Any]:
             if array.contains(where: { $0 is [String: Any] }) {
                 append("[\n", .punctuation)
-                indentation += 2
+                indentation += 1
                 for index in array.indices {
                     _print(json: array[index], key: .int(index), isFree: true)
                     if index < array.endIndex - 1 {
@@ -102,7 +101,7 @@ final class TextRendererJSON {
                     }
                     newline()
                 }
-                indentation -= 2
+                indentation -= 1
                 indent()
                 append("]", .punctuation)
             } else {
@@ -162,7 +161,7 @@ final class TextRendererJSON {
     }
 
     private func indent() {
-        append(String(repeating: " ", count: indentation), .punctuation)
+        append(String(repeating: " ", count: indentation * spaces), .punctuation)
     }
 
     private func newline() {

@@ -7,14 +7,11 @@ import CoreData
 import Pulse
 import Combine
 
-#warning("TODO: fix safe area")
 #warning("TODO: fix where share and close buttons are form FIleView?")
-#warning("TODO: cache strings")
-#warning("TODO: fix jumping when updating expanding view (when new contnet is available?)")
 
 #if os(iOS)
 
-@available(iOS 14, tvOS 14, *)
+@available(iOS 14, *)
 struct ConsoleTextView: View {
     @StateObject private var viewModel = ConsoleTextViewModel()
     @State private var shareItems: ShareItems?
@@ -53,10 +50,7 @@ struct ConsoleTextView: View {
     }
 
     private var textView: some View {
-        RichTextView(
-            viewModel: viewModel.text,
-            isAutomaticLinkDetectionEnabled: settings.isLinkDetectionEnabled
-        )
+        RichTextView(viewModel: viewModel.text)
     }
 
     @ViewBuilder
@@ -66,11 +60,11 @@ struct ConsoleTextView: View {
                 Label("Share", systemImage: "square.and.arrow.up")
             }
             Section {
-                Button(action: { settings.orderAscending.toggle() }) {
-                    Label("Order by Date", systemImage: settings.orderAscending ? "arrow.up" : "arrow.down")
+                Button(action: { viewModel.isOrderedAscending.toggle() }) {
+                    Label("Order by Date", systemImage: viewModel.isOrderedAscending ? "arrow.up" : "arrow.down")
                 }
-                Button(action: { settings.isCollapsingResponses.toggle() }) {
-                    Label(settings.isCollapsingResponses ? "Expand Responses" : "Collapse Responses", systemImage: settings.isCollapsingResponses ? "arrow.up.left.and.arrow.down.right" : "arrow.down.right.and.arrow.up.left")
+                Button(action: { viewModel.isExpanded.toggle() }) {
+                    Label(viewModel.isExpanded ? "Collapse Details" : "Expand Details", systemImage: viewModel.isExpanded ? "arrow.down.right.and.arrow.up.left" : "arrow.up.left.and.arrow.down.right")
                 }
                 Button(action: viewModel.refresh) {
                     Label("Refresh", systemImage: "arrow.clockwise")
@@ -104,8 +98,6 @@ struct ConsoleTextView: View {
     }
 }
 
-#warning("TODO: add more seettings for what to show in request info + show all")
-
 @available(iOS 14, *)
 private struct ConsoleTextViewSettingsView: View {
     @ObservedObject private var settings: ConsoleTextViewSettings = .shared
@@ -121,7 +113,7 @@ private struct ConsoleTextViewSettingsView: View {
                 Toggle("Link Detection", isOn: $settings.isLinkDetectionEnabled)
             }
             Section(header: Text("Request Info")) {
-                Toggle("Request Headers", isOn: $settings.showsTaskRequestHeader)
+                Toggle("Request Headers", isOn: $settings.showsRequestHeaders)
                 Toggle("Response Headers", isOn: $settings.showsResponseHeaders)
                 Toggle("Request Body", isOn: $settings.showsRequestBody)
                 Toggle("Response Body", isOn: $settings.showsResponseBody)
@@ -138,28 +130,30 @@ private struct ConsoleTextViewSettingsView: View {
 
 @available(iOS 14, *)
 final class ConsoleTextViewModel: ObservableObject {
-    let text: RichTextViewModel
+    let text = RichTextViewModel()
     var options: TextRenderer.Options = .init()
+
+    @Published var isOrderedAscending = false
+    @Published var isExpanded = false
     @Published private(set) var isButtonRefreshHidden = true
 
+    private var content: NetworkContent = []
     private var expanded: Set<NSManagedObjectID> = []
     private let settings = ConsoleTextViewSettings.shared
     private var entities: CurrentValueSubject<[NSManagedObject], Never> = .init([])
     private var lastTimeRefreshHidden = Date().addingTimeInterval(-3)
-
+    private var objectIDs: [UUID: NSManagedObjectID] = [:]
     private var cancellables: [AnyCancellable] = []
 
     init() {
-        self.text = RichTextViewModel(string: "")
         self.text.onLinkTapped = { [unowned self] in onLinkTapped($0) }
         self.reloadOptions()
 
-        ConsoleTextViewSettings.shared.$orderAscending.dropFirst().sink { [weak self] _ in
+        $isOrderedAscending.dropFirst().receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.refreshText()
         }.store(in: &cancellables)
 
-        ConsoleTextViewSettings.shared.$isCollapsingResponses.dropFirst().sink { [weak self] isCollasped in
-            self?.options.isBodyExpanded = !isCollasped
+        $isExpanded.dropFirst().receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.expanded.removeAll()
             self?.refreshText()
         }.store(in: &cancellables)
@@ -174,32 +168,9 @@ final class ConsoleTextViewModel: ObservableObject {
     }
 
     func reloadOptions() {
-        options.isBodyExpanded = !settings.isCollapsingResponses
+        content = makeNetworkContent()
         options.color = settings.colorMode
-        if settings.showsTaskRequestHeader {
-            options.networkContent.insert(.currentRequestHeaders)
-            options.networkContent.insert(.originalRequestHeaders)
-        } else {
-            options.networkContent.remove(.currentRequestHeaders)
-            options.networkContent.remove(.originalRequestHeaders)
-        }
-        if settings.showsRequestBody {
-            options.networkContent.insert(.requestBody)
-        } else {
-            options.networkContent.remove(.requestBody)
-        }
-        if settings.showsResponseHeaders {
-            options.networkContent.insert(.responseHeaders)
-        } else {
-            options.networkContent.remove(.responseHeaders)
-        }
-        if settings.showsResponseBody {
-            options.networkContent.insert(.responseBody)
-        } else {
-            options.networkContent.remove(.responseBody)
-        }
-
-        text.textView?.isAutomaticLinkDetectionEnabled = settings.isLinkDetectionEnabled
+        text.isLinkDetectionEnabled = settings.isLinkDetectionEnabled
     }
 
     func refresh() {
@@ -208,16 +179,16 @@ final class ConsoleTextViewModel: ObservableObject {
     }
 
     private func refreshText() {
-        let entities = settings.orderAscending ? entities.value : entities.value.reversed()
+        let entities = isOrderedAscending ? entities.value : entities.value.reversed()
         let renderer = TextRenderer(options: options)
-        let strings: [NSAttributedString]
+        var strings: [NSAttributedString] = []
         if let messages = entities as? [LoggerMessageEntity] {
-            strings = messages.enumerated().map { (index, message) in
-                renderer.render(message, index: index, isExpanded: expanded.contains(message.objectID))
+            for (index, message) in messages.enumerated() {
+                strings.append(render(message, at: index, using: renderer))
             }
         } else if let tasks = entities as? [NetworkTaskEntity] {
-            strings = tasks.enumerated().map { (index, task) in
-                renderer.render(task, index: index, isExpanded: expanded.contains(task.objectID))
+            for (index, task) in tasks.enumerated() {
+                strings.append(render(task, at: index, using: renderer))
             }
         } else {
             assertionFailure("Unsupported entities: \(entities)")
@@ -227,13 +198,85 @@ final class ConsoleTextViewModel: ObservableObject {
         self.text.display(string)
     }
 
+    private func render(_ message: LoggerMessageEntity, at index: Int, using renderer: TextRenderer) -> NSAttributedString {
+        if let task = message.task {
+            return render(task, at: index, using: renderer)
+        }
+        return renderer.render(message)
+    }
+
+    private func render(_ task: NetworkTaskEntity, at index: Int, using renderer: TextRenderer) -> NSAttributedString {
+        let isExpanded = isExpanded || expanded.contains(task.objectID)
+        guard !isExpanded else {
+            return renderer.render(task, content: content) // Render everything
+        }
+        let string = NSMutableAttributedString(attributedString: renderer.render(task, content: [.header]))
+        let uuid = UUID()
+        objectIDs[uuid] = task.objectID
+        var attributes = renderer.helper.attributes(role: .body2, weight: .medium)
+        attributes[.foregroundColor] = UXColor.systemBlue
+        attributes[.link] = URL(string: "pulse://expand/\(uuid.uuidString)")
+        attributes[.objectIdKey] = task.objectID
+        attributes[.underlineColor] = UXColor.clear
+        string.append(renderer.spacer())
+        string.append("Show Details\n", attributes)
+        return string
+    }
+
+    private func makeNetworkContent() -> NetworkContent {
+        var content = NetworkContent()
+        func setEnabled(_ isEnabled: Bool, _ value: NetworkContent) {
+            if isEnabled { content.insert(value) } else { content.remove(value) }
+        }
+        content.insert(.errorDetails)
+        setEnabled(settings.showsRequestHeaders, .currentRequestHeaders)
+        setEnabled(settings.showsRequestBody, .requestBody)
+        setEnabled(settings.showsResponseHeaders, .responseHeaders)
+        setEnabled(settings.showsResponseBody, .responseBody)
+        return content
+    }
+
     func onLinkTapped(_ url: URL) -> Bool {
-        guard url.scheme == "pulse", url.host == "expand", let index = Int(url.lastPathComponent) else {
+        guard url.scheme == "pulse",
+              url.host == "expand",
+              let uuid = UUID(uuidString: url.lastPathComponent),
+              let objectID = objectIDs[uuid] else {
             return false
         }
-        expanded.insert(entities.value[index].objectID)
-        refreshText()
+        expand(objectID)
         return true
+    }
+
+    private func expand(_ objectID: NSManagedObjectID) {
+        // TODO: both searchs are O(N) which isn't great
+        guard let task = findTask(withObjectID: objectID) else {
+            return
+        }
+        expanded.insert(objectID)
+
+        var foundRange: NSRange?
+        text.textStorage.enumerateAttribute(.objectIdKey, in: NSRange(location: 0, length: text.textStorage.length)) { value, range, stop in
+            if value as? NSManagedObjectID == objectID {
+                foundRange = range
+                stop.pointee = true
+            }
+        }
+        if let range = foundRange {
+            let details = TextRenderer(options: options).render(task, content: content)
+            text.performUpdates { storage in
+                storage.replaceCharacters(in: range, with: details)
+            }
+        }
+    }
+
+    private func findTask(withObjectID objectID: NSManagedObjectID) -> NetworkTaskEntity? {
+        if let messages = entities.value as? [LoggerMessageEntity] {
+            return messages.first { $0.task?.objectID == objectID }?.task
+        } else if let tasks = entities.value as? [NetworkTaskEntity] {
+            return tasks.first { $0.objectID == objectID }
+        } else {
+            fatalError("Unsupported entities: \(entities)")
+        }
     }
 
     private func hideRefreshButton() {
@@ -245,6 +288,10 @@ final class ConsoleTextViewModel: ObservableObject {
         guard isButtonRefreshHidden else { return }
         isButtonRefreshHidden = false
     }
+}
+
+private extension NSAttributedString.Key {
+    static let objectIdKey = NSAttributedString.Key("pulse-object-id")
 }
 
 #if DEBUG
@@ -262,7 +309,6 @@ struct ConsoleTextView_Previews: PreviewProvider {
             NavigationView {
                 ConsoleTextView(entities: entities) {
                     $0.color = .full
-                    $0.networkContent = .all
                 }
             }
             .previewDisplayName("Full Color")
@@ -270,18 +316,9 @@ struct ConsoleTextView_Previews: PreviewProvider {
             NavigationView {
                 ConsoleTextView(entities: entities) {
                     $0.color = .monochrome
-                    $0.networkContent = .all
                 }
             }
             .previewDisplayName("Monochrome")
-
-            NavigationView {
-                ConsoleTextView(entities: entities) {
-                    $0.networkContent = .all
-                    $0.isBodyExpanded = true
-                }
-            }
-            .previewDisplayName("Network: All")
         }
     }
 }
@@ -290,8 +327,8 @@ private let entities = try! LoggerStore.mock.allMessages()
 
 @available(iOS 14, tvOS 14, *)
 private extension ConsoleTextView {
-    init(entities: [LoggerMessageEntity], _ configure: (inout TextRenderer.Options) -> Void) {
-        var options = TextRenderer.Options()
+    init(entities: [NSManagedObject], _ configure: (inout TextRenderer.Options) -> Void) {
+        var options = TextRenderer.Options(color: .automatic)
         configure(&options)
         self.init(entities: .init(entities.reversed()), options: options, onClose: {})
     }

@@ -8,6 +8,7 @@ import Pulse
 import Combine
 
 #warning("TODO: add View Raw + cURL descriootion")
+#warning("TODO: rework where (Cache) is displayed")
 #warning("TODO: when highlighting textview use prepareUpdate and commitUpdates")
 #warning("TODO: fix state management at least on the top level")
 #warning("TODO: rework metrics")
@@ -22,6 +23,9 @@ import Combine
 #warning("TODO: macos show response body automatically when task finished loading")
 #warning("TODO: add sharing on watchOS")
 
+#warning("TODO: test everything with Self._printChanges() for performance")
+
+#warning("TODO: render request body sring monospaced")
 
 struct NetworkInspectorView: View {
 #if os(watchOS)
@@ -217,7 +221,7 @@ struct NetworkInspectorView: View {
                 details: stringFromCount(viewModel.task.transactions.count)
             )
         }.disabled(!viewModel.task.hasMetrics)
-#endif 
+#endif
         NetworkCURLCell(task: viewModel.task)
     }
 #endif

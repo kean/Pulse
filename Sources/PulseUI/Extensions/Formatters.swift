@@ -30,6 +30,52 @@ enum DurationFormatter {
     }
 }
 
+enum ConsoleFormatter {
+    static let separator = " · "
+
+    static func subheadline(for task: NetworkTaskEntity) -> String {
+        "\(time(for: task.createdAt))\(separator)\(details(for: task))"
+    }
+
+    static func time(for date: Date) -> String {
+        ConsoleMessageViewModel.timeFormatter.string(from: date)
+    }
+
+    static func details(for task: NetworkTaskEntity) -> String {
+        var components = [task.httpMethod ?? "GET"]
+        switch task.state {
+        case .pending:
+            components.append(ProgressViewModel.title(for: task).uppercased())
+        case .success:
+            components.append(StatusCodeFormatter.string(for: Int(task.statusCode)))
+#if !os(watchOS)
+            switch task.type ?? .dataTask {
+            case .uploadTask:
+                if task.requestBodySize > 0 {
+                    let sizeText = ByteCountFormatter.string(fromByteCount: task.requestBodySize)
+                    components.append("Up \(sizeText)")
+                }
+            case .dataTask, .downloadTask:
+                if task.responseBodySize > 0 {
+                    let sizeText = ByteCountFormatter.string(fromByteCount: task.responseBodySize)
+                    components.append(sizeText)
+                }
+            case .streamTask, .webSocketTask:
+                break
+            }
+#endif
+        case .failure:
+            components.append(ErrorFormatter.shortErrorDescription(for: task))
+        }
+
+        if task.duration > 0 {
+            components.append(DurationFormatter.string(from: task.duration, isPrecise: false))
+        }
+
+        return components.joined(separator: separator)
+    }
+}
+
 enum StatusCodeFormatter {
     static func string(for statusCode: Int32) -> String {
         string(for: Int(statusCode))

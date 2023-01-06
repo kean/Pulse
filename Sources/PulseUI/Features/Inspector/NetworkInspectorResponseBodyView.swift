@@ -5,6 +5,7 @@
 import SwiftUI
 import Pulse
 
+#warning("TODO: check if placeholder are correct for all states")
 struct NetworkInspectorResponseBodyView: View {
     let viewModel: NetworkInspectorResponseBodyViewModel
 

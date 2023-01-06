@@ -184,16 +184,6 @@ extension Image {
     }
 }
 #endif
-// MARK: - Misc
-
-extension NSParagraphStyle {
-    static func make(lineHeight: CGFloat) -> NSParagraphStyle {
-        let ps = NSMutableParagraphStyle()
-        ps.maximumLineHeight = lineHeight
-        ps.minimumLineHeight = lineHeight
-        return ps
-    }
-}
 
 #if os(macOS)
 extension NSPasteboard {

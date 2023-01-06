@@ -3,8 +3,6 @@
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 #warning("TODO: add PDF export and test printing")
-#warning("TODO: add metrics and cookies and other missing values from summary")
-#warning("TODO: do other styles work?")
 
 import Foundation
 import Pulse
@@ -16,36 +14,12 @@ import Pulse
 import PDFKit
 #endif
 
-/// Renders console messages as attributed strings.
+/// Low-level attributed string creation API.
 final class TextRenderer {
+#warning("TODO: do we even need these options?")
     struct Options {
-        var networkContent: NetworkContent = [.errorDetails, .requestBody, .responseBody]
+#warning("TODO: thsi should be moved to TextMake")
         var color: ColorMode = .full
-
-#warning("TODO: rework body collapse")
-        var isBodyExpanded = false
-        var bodyCollapseLimit = 20
-    }
-
-    struct NetworkContent: OptionSet {
-        let rawValue: Int16
-        init(rawValue: Int16) { self.rawValue = rawValue }
-
-        static let requestComponents = NetworkContent(rawValue: 1 << 0)
-        static let requestQueryItems = NetworkContent(rawValue: 1 << 1)
-        static let errorDetails = NetworkContent(rawValue: 1 << 2)
-        static let originalRequestHeaders = NetworkContent(rawValue: 1 << 3)
-        static let currentRequestHeaders = NetworkContent(rawValue: 1 << 5)
-        static let requestOptions = NetworkContent(rawValue: 1 << 7)
-        static let requestBody = NetworkContent(rawValue: 1 << 8)
-        static let responseHeaders = NetworkContent(rawValue: 1 << 9)
-        static let responseBody = NetworkContent(rawValue: 1 << 11)
-
-        #warning("TODO: add subset for sharing (not all?)")
-
-        static let all: NetworkContent = [
-            requestComponents, requestQueryItems, errorDetails, originalRequestHeaders, currentRequestHeaders, requestOptions, requestBody, responseHeaders, responseBody
-        ]
     }
 
     enum ColorMode: String, RawRepresentable {
@@ -55,89 +29,70 @@ final class TextRenderer {
     }
 
     private let options: Options
-    private let helpers: TextHelper
+
+    let helper: TextHelper
 
     init(options: Options = .init()) {
         self.options = options
-        self.helpers = TextHelper(options: options)
+        self.helper = TextHelper()
     }
 
     func joined(_ strings: [NSAttributedString]) -> NSAttributedString {
         let output = NSMutableAttributedString()
-        for string in strings {
+        for (index, string) in strings.enumerated() {
             output.append(string)
-            output.append("\n", helpers.spacerAttributes)
+            if index < strings.endIndex - 1 {
+                output.append(spacer())
+            }
         }
         return output
     }
 
-    func render(_ message: LoggerMessageEntity) -> NSAttributedString {
-        render(message, index: nil, isExpanded: true)
+    func spacer() -> NSAttributedString {
+        NSAttributedString(string: "\n", attributes: helper.spacerAttributes)
     }
 
-    func render(_ message: LoggerMessageEntity, index: Int?, isExpanded: Bool) -> NSAttributedString {
-        if let task = message.task {
-            return render(task, index: index, isExpanded: isExpanded)
-        }
-
+    func render(_ message: LoggerMessageEntity) -> NSAttributedString {
         let text = NSMutableAttributedString()
-
-        // Title
         let viewModel = ConsoleMessageViewModel(message: message)
         let level = LoggerStore.Level(rawValue: message.level) ?? .debug
-        text.append(viewModel.titleForTextRepresentation + "\n", helpers.captionAttributes)
-
-        // Text
-        let textAttributes = helpers.textAttributes[level]!
-        text.append(message.text + "\n", textAttributes)
-
+        text.append(viewModel.titleForTextRepresentation + "\n", helper.attributes(role: .subheadline, style: .monospacedDigital, width: .condensed, color: .secondaryLabel))
+        text.append(message.text + "\n", helper.attributes(role: .body2, color: textColor(for: level)))
         return text
     }
 
-    func render(_ task: NetworkTaskEntity) -> NSAttributedString {
-        render(task, index: nil, isExpanded: true)
+    private func textColor(for level: LoggerStore.Level) -> UXColor {
+        if #available(iOS 14, tvOS 14, *), options.color != .monochrome {
+            return level == .trace ? .secondaryLabel : UXColor(ConsoleMessageStyle.textColor(level: level))
+        } else {
+            return .label
+        }
     }
 
-    func render(_ task: NetworkTaskEntity, index: Int?, isExpanded: Bool) -> NSAttributedString {
-#warning("TODO: refactor remainig")
-#warning("TODO: fix fonts on other platforms, e.g. URL on tvOS")
+    func render(_ task: NetworkTaskEntity, content: NetworkContent) -> NSAttributedString {
+        var components: [NSAttributedString] = []
 
-        let string = NSMutableAttributedString()
+        if content.contains(.header) {
+            let isTitleColored = task.state == .failure && options.color != .monochrome
+            let titleColor = isTitleColored ? UXColor.systemRed : UXColor.secondaryLabel
+            let detailsColor = isTitleColored ? UXColor.systemRed : UXColor.label
 
-        let topViewModel = ConsoleNetworkRequestViewModel(task: task)
-        let title = topViewModel.titleForTextRepresentation
-
-        string.append(title + "\n", {
-            var attributes = helpers.captionAttributes
-            if task.state == .failure && options.color != .monochrome {
-                attributes[.foregroundColor] = UXColor.systemRed
-            }
-            return attributes
-        }())
+            let title = ConsoleFormatter.subheadline(for: task)
+            let header = NSMutableAttributedString()
+            header.append(title + "\n", helper.attributes(role: .subheadline, style: .monospacedDigital, width: .condensed, color: titleColor))
+            header.append((task.url ?? "–") + "\n", helper.attributes(role: .body2, weight: .medium, color: detailsColor))
+            components.append(header)
+        }
 
         func append(section: KeyValueSectionViewModel?) {
             guard let section = section else { return }
-            string.append("\n", helpers.spacerAttributes)
-            string.append(render(section))
+            components.append(render(section))
         }
 
-        let url = task.url.flatMap(URL.init) ?? URL(string: "invalid-url")!
-
-        string.append(url.absoluteString + "\n", {
-            var attributes = helpers.textAttributes[.debug]!
-            attributes[.font] = UXFont.systemFont(ofSize: TextSize.body, weight: .medium)
-            if task.state == .failure && options.color != .monochrome {
-                attributes[.foregroundColor] = UXColor.systemRed
-            }
-            return attributes
-        }())
-
-        let content = options.networkContent
-
-        if content.contains(.requestComponents) {
+        if content.contains(.requestComponents), let url = task.url.flatMap(URL.init) {
             append(section: .makeComponents(for: url))
         }
-        if content.contains(.requestQueryItems) {
+        if content.contains(.requestQueryItems), let url = task.url.flatMap(URL.init) {
             append(section: .makeQueryItems(for: url))
         }
         if content.contains(.requestOptions), let request = task.originalRequest {
@@ -147,86 +102,76 @@ final class TextRenderer {
             append(section: .makeErrorDetails(for: task))
         }
         if let originalRequest = task.originalRequest {
-            if content.contains(.originalRequestHeaders) {
+            if content.contains(.originalRequestHeaders) && content.contains(.currentRequestHeaders), let currentRequest = task.currentRequest {
                 append(section: .makeHeaders(title: "Original Request Headers", headers: originalRequest.headers))
+                append(section: .makeHeaders(title: "Current Request Headers", headers: currentRequest.headers))
+            } else if content.contains(.originalRequestHeaders) {
+                append(section: .makeHeaders(title: "Request Headers", headers: originalRequest.headers))
+            } else if content.contains(.currentRequestHeaders), let currentRequest = task.currentRequest {
+                append(section: .makeHeaders(title: "Request Headers", headers: currentRequest.headers))
             }
-            if content.contains(.currentRequestHeaders), let currentRequest = task.currentRequest {
-                if originalRequest.headers == currentRequest.headers {
-                    string.append("Same as Original", [
-                        .font: UXFont.systemFont(ofSize: TextSize.body, weight: .regular),
-                        .foregroundColor: UXColor.secondaryLabel,
-                        .paragraphStyle: helpers.bodyParagraphStyle
-                    ])
-                } else {
-                    append(section: .makeHeaders(title: "Current Request Headers", headers: currentRequest.headers))
-                }
-            }
-            if content.contains(.requestBody), let data = task.requestBody?.data, !data.isEmpty {
-                string.append("\n", helpers.spacerAttributes)
-                string.append("Request Body\n", helpers.captionAttributes)
-                string.append(renderNetworkTaskBody(data, contentType: task.responseContentType.map(NetworkLogger.ContentType.init), error: task.decodingError, index: index, isExpanded: isExpanded))
-                string.append("\n", helpers.detailsAttributes)
+            if content.contains(.requestBody) {
+                let section = NSMutableAttributedString()
+                section.append(render(subheadline: "Request Body"))
+                section.append(renderRequestBody(for: task))
+                section.append("\n")
+                components.append(section)
             }
         }
         if content.contains(.responseHeaders), let response = task.response {
             append(section: .makeHeaders(title: "Response Headers", headers: response.headers))
         }
-        if content.contains(.responseBody), let data = task.responseBody?.data, !data.isEmpty {
-            string.append("\n", helpers.spacerAttributes)
-            string.append("Response Body\n", helpers.captionAttributes)
-            string.append(renderNetworkTaskBody(data, contentType: task.responseContentType.map(NetworkLogger.ContentType.init), error: task.decodingError, index: index, isExpanded: isExpanded))
-            string.append("\n", helpers.detailsAttributes)
+        if content.contains(.responseBody) {
+            let section = NSMutableAttributedString()
+            section.append(render(subheadline: "Response Body"))
+            section.append(renderResponseBody(for: task))
+            section.append("\n")
+            components.append(section)
         }
-        return string
+        return joined(components)
     }
 
-#warning("TODO: rework this")
-    private func renderNetworkTaskBody(_ data: Data, contentType: NetworkLogger.ContentType?, error: NetworkLogger.DecodingError?, index: Int?, isExpanded: Bool) -> NSAttributedString {
-        let text = NSMutableAttributedString(attributedString: _renderNetworkTaskBody(data, contentType: contentType, error: error))
-        if !options.isBodyExpanded && !isExpanded, let index = index {
-            let string = text.string as NSString
-            var counter = 0
-            var stringIndex = 0
-            while stringIndex < string.length, counter < options.bodyCollapseLimit {
-                if string.character(at: stringIndex) == 0x0a {
-                    counter += 1
-                }
-                stringIndex += 1
-            }
-            if stringIndex != string.length {
-                do { // trim newlines
-                    while stringIndex > 1, string.character(at: stringIndex - 1) == 0x0a {
-                        stringIndex -= 1
-                    }
-                }
-                let text = NSMutableAttributedString(attributedString: text.attributedSubstring(from: NSRange(location: 0, length: stringIndex)))
-                var attributes = helpers.detailsAttributes
-                attributes[.foregroundColor] = UXColor.systemBlue
-                attributes[.link] = URL(string: "pulse://expand/\(index)")
-                attributes[.underlineColor] = UXColor.clear
-                text.append("\n", helpers.spacerAttributes)
-                text.append("\nExpand ▷", attributes)
-                return text
-            }
+    func render(subheadline: String) -> NSAttributedString {
+        render(subheadline + "\n", role: .subheadline, color: .secondaryLabel)
+    }
+
+    func renderRequestBody(for task: NetworkTaskEntity) -> NSAttributedString {
+        if let data = task.requestBody?.data, !data.isEmpty {
+            return renderNetworkTaskBody(data, contentType: task.response?.contentType, error: nil)
+        } else if task.state == .success, task.type == .uploadTask, task.requestBodySize > 0 {
+            return render("\(ByteCountFormatter.string(fromByteCount: task.requestBodySize))", role: .body2)
+        } else {
+            return render("–", role: .body2)
         }
-        return text
+    }
+
+    func renderResponseBody(for task: NetworkTaskEntity) -> NSAttributedString {
+        if let data = task.responseBody?.data, !data.isEmpty {
+            return renderNetworkTaskBody(data, contentType: task.response?.contentType, error: task.decodingError)
+        } else if task.type == .downloadTask, task.responseBodySize > 0 {
+            return render("\(ByteCountFormatter.string(fromByteCount: task.responseBodySize))", role: .body2)
+        } else {
+            return render("–", role: .body2)
+        }
+    }
+
+    func render(json: Any, error: NetworkLogger.DecodingError? = nil) -> NSAttributedString {
+        TextRendererJSON(json: json, error: error, options: options).render()
     }
 
 #warning("TODO: reuse this somehow with FileViewerViewModel")
-    private func _renderNetworkTaskBody(_ data: Data, contentType: NetworkLogger.ContentType?, error: NetworkLogger.DecodingError?) -> NSAttributedString {
+    private func renderNetworkTaskBody(_ data: Data, contentType: NetworkLogger.ContentType?, error: NetworkLogger.DecodingError?) -> NSAttributedString {
         if let json = try? JSONSerialization.jsonObject(with: data, options: []) {
-            let renderer = TextRendererJSON(json: json, error: error, options: options)
-            return renderer.render()
+            return render(json: json, error: error)
         } else if let string = String(data: data, encoding: .utf8) {
             if contentType?.isEncodedForm ?? false, let section = decodeQueryParameters(form: string) {
                 return render(section, style: .monospaced)
             } else if contentType?.isHTML ?? false {
                 return TextRendererHTML(html: string, options: options).render()
             }
-            return NSAttributedString(string: string, attributes: helpers.textAttributes[.debug]!)
+            return render(string, role: .body2, style: .monospaced)
         } else {
-            let message = "Data \(ByteCountFormatter.string(fromByteCount: Int64(data.count)))"
-            return NSAttributedString(string: message, attributes: helpers.textAttributes[.debug]!)
+            return render("\(ByteCountFormatter.string(fromByteCount: Int64(data.count)))", role: .body2)
         }
     }
 
@@ -240,27 +185,33 @@ final class TextRenderer {
         return KeyValueSectionViewModel.makeQueryItems(for: queryItems)
     }
 
-    func render(_ section: KeyValueSectionViewModel, style: TextStyle = .monospaced) -> NSAttributedString {
+    func render(_ section: KeyValueSectionViewModel, style: TextFontStyle = .monospaced) -> NSAttributedString {
         let string = NSMutableAttributedString()
-        string.append(section.title + "\n", helpers.captionAttributes)
+        string.append(render(subheadline: section.title))
         string.append(render(section.items, color: section.color, style: style))
         return string
     }
 
-#warning("TODO: add support for other styles")
-    func render(_ values: [(String, String?)]?, color: Color, style: TextStyle = .monospaced) -> NSAttributedString {
+    func render(_ values: [(String, String?)]?, color: Color, style: TextFontStyle = .monospaced) -> NSAttributedString {
         let string = NSMutableAttributedString()
         guard let values = values, !values.isEmpty else {
+            string.append("–\n", helper.attributes(role: .body2, style: style))
             return string
         }
-        var keyAttributes = helpers.attributes(for: style, weight: .semibold)
+        var keyColor: UXColor = .label
+        var keyWeight: UXFont.Weight = .semibold
         if #available(iOS 14, tvOS 14, *), options.color == .full {
-            keyAttributes[.foregroundColor] = UXColor(color)
+            keyColor = UXColor(color)
+            keyWeight = .medium
         }
-        let valueAttributes = helpers.attributes(for: style)
+        let keyAttributes = helper.attributes(role: .body2, style: style, weight: keyWeight, color: keyColor)
+
+        let valueAttributes = helper.attributes(role: .body2, style: style)
+        let separatorAttributes = helper.attributes(role: .body2, style: style, color: .secondaryLabel)
         for (key, value) in values {
             string.append(key, keyAttributes)
-            string.append(": \(value ?? "–")\n", valueAttributes)
+            string.append(": ", separatorAttributes)
+            string.append("\(value ?? "–")\n", valueAttributes)
         }
         return string
     }
@@ -323,155 +274,39 @@ final class TextRenderer {
     }
 #endif
 
-    func render(_ string: String, style: TextStyle, weight: UXFont.Weight = .regular) -> NSAttributedString {
-        NSAttributedString(string: string, attributes: helpers.attributes(for: style, weight: weight))
-    }
-}
-
-#warning("TODO: remove unused values")
-final class TextHelper {
-    let fontHeadline: UXFont
-    let fontBody: UXFont
-    let fontMono: UXFont
-    let fontCaption: UXFont
-
-    let captionAttributes: [NSAttributedString.Key: Any]
-    let spacerAttributes: [NSAttributedString.Key: Any]
-    let monospacedAttributes: [NSAttributedString.Key: Any]
-    let bodyAttributes: [NSAttributedString.Key: Any]
-
-    let monoParagraphStyle: NSParagraphStyle
-
-    let bodyParagraphStyle: NSParagraphStyle
-    private(set) var textAttributes: [LoggerStore.Level: [NSAttributedString.Key: Any]] = [:]
-    var detailsAttributes: [NSAttributedString.Key: Any] { textAttributes[.debug]! }
-
-    init(options: TextRenderer.Options) {
-#warning("TODO: remove these fonts?")
-        self.fontHeadline = .preferredFont(forTextStyle: .headline)
-        self.fontBody = .systemFont(ofSize: TextSize.body, weight: .regular)
-        self.fontCaption = .preferredFont(forTextStyle: .caption1)
-        self.fontMono = .monospacedSystemFont(ofSize: TextSize.mono, weight: .regular)
-
-        self.bodyParagraphStyle = NSParagraphStyle.make(lineHeight: TextSize.body + 6)
-        self.bodyAttributes = [
-            .font: fontBody,
-            .foregroundColor: UXColor.label,
-            .paragraphStyle: bodyParagraphStyle
-        ]
-
-        self.monoParagraphStyle = NSParagraphStyle.make(lineHeight: TextSize.mono + 6)
-        self.monospacedAttributes = [
-            .font: fontMono,
-            .paragraphStyle: monoParagraphStyle,
-            .foregroundColor: UXColor.label
-        ]
-        self.captionAttributes = [
-            .font: fontCaption,
-            .foregroundColor: UXColor.secondaryLabel,
-            .paragraphStyle: bodyParagraphStyle
-        ]
-
-        self.spacerAttributes = [
-            .font: fontCaption,
-            .paragraphStyle: {
-                let style = NSMutableParagraphStyle()
-                style.maximumLineHeight = 10
-                style.minimumLineHeight = 10
-                return style
-            }()
-        ]
-
-        func makeLabelAttributes(level: LoggerStore.Level) -> [NSAttributedString.Key: Any] {
-            let textColor: UXColor
-            if #available(iOS 14, tvOS 14, *), options.color != .monochrome {
-                textColor = level == .trace ? .secondaryLabel : UXColor(ConsoleMessageStyle.textColor(level: level))
-            } else {
-                textColor = .label
-            }
-            return [
-                .font: UXFont.systemFont(ofSize: TextSize.body),
-                .foregroundColor: textColor,
-                .paragraphStyle: bodyParagraphStyle
-            ]
-        }
-
-        for level in LoggerStore.Level.allCases {
-            textAttributes[level] = makeLabelAttributes(level: level)
-        }
-    }
-
-    func attributes(for style: TextStyle, weight: UXFont.Weight = .regular) -> [NSAttributedString.Key: Any] {
-        switch style {
-        case .body:
-            var attributes = bodyAttributes
-            if weight != .regular {
-                attributes[.font] = UXFont.systemFont(ofSize: TextSize.body, weight: weight)
-            }
-            return attributes
-        case .monospaced:
-            var attributes = monospacedAttributes
-            if weight != .regular {
-                attributes[.font] = UXFont.monospacedSystemFont(ofSize: TextSize.mono, weight: weight)
-            }
-            return attributes
-        }
-    }
-
-    #warning("TODO: move body and KeyValueSectoinView rendering here too")
-}
-
-enum TextStyle {
-    case body
-    case monospaced
-}
-
-struct TextSize {
-    static let headline = fontSize(for: .headline)
-    static let body = fontSize(for: .body) - 2
-    static let mono = fontSize(for: .body) - 4
-    static let caption = fontSize(for: .caption1)
-}
-
-private func fontSize(for style: UXFont.TextStyle) -> CGFloat {
-    UXFont.preferredFont(forTextStyle: style).fontDescriptor.pointSize
-}
-
-@available(*, deprecated, message: "Deprecated")
-enum FontSize {
-    static var body: CGFloat {
-        #if os(iOS)
-            return 13
-        #elseif os(macOS)
-            return 12
-        #elseif os(tvOS)
-            return 24
-        #else
-            return 12
-        #endif
+    func render(
+        _ string: String,
+        role: TextRole,
+        style: TextFontStyle = .proportional,
+        weight: UXFont.Weight = .regular,
+        width: TextWidth = .standard,
+        color: UXColor = .label
+    ) -> NSAttributedString {
+        let attributes = helper.attributes(role: role, style: style, weight: weight, width: width, color: color)
+        return NSAttributedString(string: string, attributes: attributes)
     }
 }
 
 // MARK: - Previews
 
-#warning("TODO: enable previews on other platforms")
+#warning("TODO: add other preview using this")
 
 #if DEBUG
 struct ConsoleTextRenderer_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            let string = TextRenderer(options: .init(networkContent: [.all])).render(task)
-            let stringWithColor = TextRenderer(options: .init(networkContent: [.all], color: .full)).render(task)
+            let string = TextRenderer(options: .init(color: .automatic)).render(task, content: .all)
+            let stringWithColor = TextRenderer(options: .init(color: .full)).render(task, content: .all)
             let html = try! TextRenderer.html(from: string)
 
             RichTextView(viewModel: .init(string: string))
-                .previewDisplayName("NSAttributedString")
+                .previewDisplayName("Task")
 
             RichTextView(viewModel: .init(string: stringWithColor))
-                .previewDisplayName("NSAttributedString (Color)")
+                .previewDisplayName("Task (Color)")
 
             RichTextView(viewModel: .init(string: string.string))
-                .previewDisplayName("Plain Text")
+                .previewDisplayName("Task (Plain)")
 
             RichTextView(viewModel: .init(string: TextRendererHTML(html: String(data: html, encoding: .utf8)!).render()))
                 .previewLayout(.fixed(width: 1160, height: 2000)) // Disable interaction to view it

@@ -261,14 +261,6 @@ private struct Label: NSViewRepresentable {
         nsView.attributedStringValue = text
     }
 }
-
-#warning("TODO: remove this")
-private let ps: NSParagraphStyle = {
-    let ps = NSMutableParagraphStyle()
-    ps.minimumLineHeight = 20
-    ps.maximumLineHeight = 20
-    return ps
-}()
 #endif
 
 #warning("TODO: remove this")

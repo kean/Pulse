@@ -7,6 +7,7 @@ import Pulse
 import Combine
 import CoreData
 
+#warning("TODO: rework fullTitle, etc")
 final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
     private(set) lazy var time = ConsoleMessageViewModel.timeFormatter.string(from: task.createdAt)
 #if os(iOS)
@@ -62,47 +63,12 @@ final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
         }
     }
 
+#warning("TODO: add subline with details instead of cramming everything into the header (?)")
+
     private func refresh() {
         let state = task.state
 
-        var title: String = task.httpMethod ?? "GET"
-        switch task.state {
-        case .pending:
-            title += " · "
-            title += progress.title.uppercased()
-        case .success:
-            title += " · "
-            title += StatusCodeFormatter.string(for: Int(task.statusCode))
-#if !os(watchOS)
-            switch task.type ?? .dataTask {
-            case .uploadTask:
-                if task.requestBodySize > 0 {
-                    let sizeText = ByteCountFormatter.string(fromByteCount: task.requestBodySize)
-                    title += " · "
-                    title += task.isFromCache ? "Cache" : sizeText
-                }
-            case .dataTask, .downloadTask:
-                if task.responseBodySize > 0 {
-                    let sizeText = ByteCountFormatter.string(fromByteCount: task.responseBodySize)
-                    title += " · "
-                    title += task.isFromCache ? "Cache" : sizeText
-                }
-            case .streamTask, .webSocketTask:
-                break
-            }
-#endif
-        case .failure:
-            title += " · "
-            title += ErrorFormatter.shortErrorDescription(for: task)
-        }
-
-        if task.duration > 0 {
-            title += " · "
-            title += DurationFormatter.string(from: task.duration, isPrecise: false)
-        }
-
-        self.title = title
-
+        self.title = ConsoleFormatter.details(for: task)
         self.text = task.url ?? "URL Unavailable"
 
 #if os(iOS)

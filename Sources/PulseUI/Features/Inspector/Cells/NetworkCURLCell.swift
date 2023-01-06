@@ -21,9 +21,10 @@ struct NetworkCURLCell: View {
 
     private var destination: some View {
         let curl = task.cURLDescription()
-        let string = TextRenderer().render(curl, style: .monospaced)
-        return RichTextView(viewModel: .init(string: string))
-            .linkDetectionEnabled(false)
+        let string = TextRenderer().render(curl, role: .body2, style: .monospaced)
+        let viewModel = RichTextViewModel(string: string)
+        viewModel.isLinkDetectionEnabled = false
+        return RichTextView(viewModel: viewModel)
             .backport.navigationTitle("cURL Representation")
     }
 }

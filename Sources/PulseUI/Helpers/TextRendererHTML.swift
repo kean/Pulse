@@ -18,16 +18,12 @@ final class TextRendererHTML {
     init(html: String, options: TextRenderer.Options = .init()) {
         self.html = html
         self.options = options
-        self.helper = TextHelper(options: options)
+        self.helper = TextHelper()
     }
 
     func render() -> NSAttributedString {
         let string = NSMutableAttributedString(string: html)
-        string.addAttributes([
-            .font: helper.fontMono,
-            .foregroundColor: UXColor.label,
-            .paragraphStyle: helper.monoParagraphStyle
-        ])
+        string.addAttributes(helper.attributes(role: .body2, style: .monospaced))
         guard options.color != .monochrome else {
             return string
         }

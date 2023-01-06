@@ -7,6 +7,8 @@ import Pulse
 
 #if os(watchOS) || os(tvOS)
 
+#warning("TODO: combine on both platforms")
+
 struct RichTextView: View {
     let viewModel: RichTextViewModel
 
@@ -31,6 +33,8 @@ final class RichTextViewModel: ObservableObject {
 
     private var _attributedString: Any?
 
+    var isLinkDetectionEnabled = true
+
     var isEmpty: Bool { text.isEmpty }
 
     init(string: String) {
@@ -45,10 +49,8 @@ final class RichTextViewModel: ObservableObject {
     }
 
     convenience init(json: Any, error: NetworkLogger.DecodingError?) {
-        let renderer = AttributedStringJSONRenderer(fontSize: FontSize.body, lineHeight: FontSize.body + 5)
-        let printer = TextRendererJSON(renderer: renderer)
-        printer.render(json: json, error: error)
-        self.init(string: renderer.make())
+        let renderer = TextRendererJSON(json: json, error: error)
+        self.init(string: renderer.render(), contentType: "application/json")
     }
 }
 
