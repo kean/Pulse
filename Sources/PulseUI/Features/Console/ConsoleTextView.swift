@@ -223,7 +223,7 @@ final class ConsoleTextViewModel: ObservableObject {
             assertionFailure("Unsupported entities: \(entities)")
             strings = []
         }
-        let string = renderer.join(strings)
+        let string = renderer.joined(strings)
         self.text.display(string)
     }
 

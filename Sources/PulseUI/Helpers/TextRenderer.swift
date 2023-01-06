@@ -20,7 +20,7 @@ import PDFKit
 final class TextRenderer {
     struct Options {
         var networkContent: NetworkContent = [.errorDetails, .requestBody, .responseBody]
-        var color: ColorMode = .automatic
+        var color: ColorMode = .full
 
 #warning("TODO: rework body collapse")
         var isBodyExpanded = false
@@ -62,7 +62,7 @@ final class TextRenderer {
         self.helpers = TextHelper(options: options)
     }
 
-    func join(_ strings: [NSAttributedString]) -> NSAttributedString {
+    func joined(_ strings: [NSAttributedString]) -> NSAttributedString {
         let output = NSMutableAttributedString()
         for string in strings {
             output.append(string)
@@ -240,31 +240,24 @@ final class TextRenderer {
         return KeyValueSectionViewModel.makeQueryItems(for: queryItems)
     }
 
-    func render(_ section: KeyValueSectionViewModel, isMonospaced: Bool = true) -> NSAttributedString {
+    func render(_ section: KeyValueSectionViewModel, style: TextStyle = .monospaced) -> NSAttributedString {
         let string = NSMutableAttributedString()
         string.append(section.title + "\n", helpers.captionAttributes)
-        string.append(render(section.items, color: section.color, isMonospaced: isMonospaced))
+        string.append(render(section.items, color: section.color, style: style))
         return string
     }
 
-    func render(_ values: [(String, String?)]?, color: Color, isMonospaced: Bool = true) -> NSAttributedString {
+#warning("TODO: add support for other styles")
+    func render(_ values: [(String, String?)]?, color: Color, style: TextStyle = .monospaced) -> NSAttributedString {
         let string = NSMutableAttributedString()
         guard let values = values, !values.isEmpty else {
             return string
         }
-        var keyAttributes: [NSAttributedString.Key: Any] = [
-            .font: isMonospaced ? UXFont.monospacedSystemFont(ofSize: TextSize.mono, weight: .semibold) : UXFont.systemFont(ofSize: TextSize.caption, weight: .semibold),
-            .foregroundColor: UXColor.label,
-            .paragraphStyle: helpers.monoParagraphStyle,
-        ]
+        var keyAttributes = helpers.attributes(for: style, weight: .semibold)
         if #available(iOS 14, tvOS 14, *), options.color == .full {
             keyAttributes[.foregroundColor] = UXColor(color)
         }
-        let valueAttributes: [NSAttributedString.Key: Any] = [
-            .font: isMonospaced ? UXFont.monospacedSystemFont(ofSize: TextSize.mono, weight: .regular) : UXFont.systemFont(ofSize: TextSize.caption, weight: .regular),
-            .foregroundColor: UXColor.label,
-            .paragraphStyle: helpers.monoParagraphStyle,
-        ]
+        let valueAttributes = helpers.attributes(for: style)
         for (key, value) in values {
             string.append(key, keyAttributes)
             string.append(": \(value ?? "–")\n", valueAttributes)
@@ -330,7 +323,7 @@ final class TextRenderer {
     }
 #endif
 
-    func render(string: String, style: TextStyle, weight: UXFont.Weight = .regular) -> NSAttributedString {
+    func render(_ string: String, style: TextStyle, weight: UXFont.Weight = .regular) -> NSAttributedString {
         NSAttributedString(string: string, attributes: helpers.attributes(for: style, weight: weight))
     }
 }
@@ -419,7 +412,7 @@ final class TextHelper {
         case .monospaced:
             var attributes = monospacedAttributes
             if weight != .regular {
-                attributes[.font] = UXFont.monospacedSystemFont(ofSize: TextSize.body, weight: weight)
+                attributes[.font] = UXFont.monospacedSystemFont(ofSize: TextSize.mono, weight: weight)
             }
             return attributes
         }

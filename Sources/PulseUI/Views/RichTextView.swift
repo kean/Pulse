@@ -7,6 +7,7 @@ import CoreData
 import Pulse
 import Combine
 
+#warning("TODO: should it have any of these navigation buttons by default? probably not")
 #warning("TODO: add other sharing options, e.g. as HTML/PDF + print")
 #warning("TODO: rework API - this should be used everywhere")
 #warning("TODO: remoe isScrolled?")

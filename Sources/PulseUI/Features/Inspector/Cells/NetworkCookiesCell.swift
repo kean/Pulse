@@ -71,14 +71,10 @@ private func makeAttributedString(for cookies: [HTTPCookie]) -> NSAttributedStri
     let sections = cookies
         .sorted { $0.name.caseInsensitiveCompare($1.name) == .orderedAscending }
         .map { makeKeyValueSectionViewModel(for: $0, color: nextColor) }
-    let text = NSMutableAttributedString()
-    for (index, section) in sections.enumerated() {
-        text.append(section.asAttributedString())
-        if index != sections.endIndex - 1 {
-            text.append("\n\n")
-        }
-    }
-    return text
+    let renderer = TextRenderer()
+    return renderer.joined(sections.map {
+        renderer.render($0.items, color: $0.color, style: .monospaced)
+    })
 }
 
 private func makeKeyValueSectionViewModel(for cookie: HTTPCookie, color: Color) -> KeyValueSectionViewModel {
