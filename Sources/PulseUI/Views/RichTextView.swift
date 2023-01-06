@@ -43,23 +43,9 @@ struct RichTextView: View {
 
     @ViewBuilder
     private var content: some View {
-        if #available(iOS 15.0, *) {
+        if #available(iOS 15, *) {
             mainView
-                .navigationBarItems(trailing: Menu(content: {
-                    Section {
-                        Button(action: { shareItems = .init([viewModel.text.string]) }, label: {
-                            Label("Share", systemImage: "square.and.arrow.up")
-                        })
-                    }
-                    if viewModel.contentType?.isHTML == true {
-                        Button(action: { isWebViewOpen = true }) {
-                            Label("Open in Browser", systemImage: "safari")
-                        }
-                    }
-                    StringSearchOptionsMenu(options: $viewModel.options, isKindNeeded: false)
-                }, label: {
-                    Image(systemName: "ellipsis.circle")
-                }))
+                .navigationBarItems(trailing: navigationBarTrailingItems)
                 .sheet(item: $shareItems, content: ShareView.init)
                 .sheet(isPresented: $isWebViewOpen) {
                     NavigationView {
@@ -75,6 +61,25 @@ struct RichTextView: View {
                 inlineSearchBar
                 mainView
             }
+        }
+    }
+
+    @available(iOS 14, *)
+    private var navigationBarTrailingItems: some View {
+        HStack {
+            Button(action: { shareItems = .init([viewModel.text.string]) }, label: {
+                Label("Share", systemImage: "square.and.arrow.up")
+            })
+            Menu(content: {
+                if viewModel.contentType?.isHTML == true {
+                    Button(action: { isWebViewOpen = true }) {
+                        Label("Open in Browser", systemImage: "safari")
+                    }
+                }
+                StringSearchOptionsMenu(options: $viewModel.options, isKindNeeded: false)
+            }, label: {
+                Image(systemName: "ellipsis.circle")
+            })
         }
     }
 
