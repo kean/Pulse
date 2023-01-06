@@ -35,7 +35,7 @@ struct NetworkMenuCell: View {
             Image(systemName: icon)
                 .foregroundColor(tintColor)
                 .font(.system(size: 20))
-                .frame(width: 27, alignment: .leading)
+                .frame(width: 27, alignment: .center)
             Text(title)
             Spacer()
             Text(details).foregroundColor(.secondary)

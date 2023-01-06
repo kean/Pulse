@@ -11,7 +11,7 @@ struct NetworkCookiesCell: View {
     var body: some View {
         NavigationLink(destination: destination) {
             NetworkMenuCell(
-                icon: "doc.plaintext",
+                icon: "lock.square.stack.fill",
                 tintColor: .secondary,
                 title: viewModel.title,
                 details: viewModel.details

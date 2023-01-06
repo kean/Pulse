@@ -11,7 +11,7 @@ struct NetworkHeadersCell: View {
     var body: some View {
         NavigationLink(destination: destination) {
             NetworkMenuCell(
-                icon: "doc.plaintext",
+                icon: "list.bullet.rectangle.portrait.fill",
                 tintColor: .secondary,
                 title: viewModel.title,
                 details: viewModel.details

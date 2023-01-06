@@ -166,7 +166,7 @@ struct NetworkInspectorView: View {
     private var sectionRequest: some View {
         NavigationLink(destination: destinationRequestBody) {
             NetworkMenuCell(
-                icon: "arrow.up.circle",
+                icon: "arrow.up.circle.fill",
                 tintColor: .blue,
                 title: "Request Body",
                 details: stringFromByteCount(viewModel.task.requestBodySize)
@@ -185,7 +185,7 @@ struct NetworkInspectorView: View {
     private var sectionResponse: some View {
         NavigationLink(isActive: $isResponseBodyLinkActive, destination: { destinationResponseBody }) {
             NetworkMenuCell(
-                icon: "arrow.down.circle",
+                icon: "arrow.down.circle.fill",
                 tintColor: .indigo,
                 title: "Response Body",
                 details: {
