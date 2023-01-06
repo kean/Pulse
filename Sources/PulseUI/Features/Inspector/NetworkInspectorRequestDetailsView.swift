@@ -21,52 +21,21 @@ final class NetworkInspectorRequestDetailsViewModel {
         self.request = request
     }
 
-    #warning("TODO: perform rendering using TextRenderer (?)")
     private func makeDetails() -> NSAttributedString {
         guard let url = URL(string: request.url ?? "") else {
             return NSAttributedString(string: "Invalid URL")
         }
+        let renderer = TextRenderer()
+        let urlString = renderer.render(url.absoluteString + "\n", style: .monospaced)
+        let sections: [NSAttributedString] = [
+            KeyValueSectionViewModel.makeComponents(for: url),
+            KeyValueSectionViewModel.makeQueryItems(for: url),
+            KeyValueSectionViewModel.makeParameters(for: request)
+        ].compactMap { $0 }.map { renderer.render($0, style: .monospaced) }
 
-        let bodyAttributes: [NSAttributedString.Key: Any] = [
-            .foregroundColor: UXColor.label,
-            .font: UXFont.monospacedSystemFont(ofSize: FontSize.body, weight: .regular)
-        ]
-        let titleAttributes: [NSAttributedString.Key: Any] = [
-            .foregroundColor: UXColor.label,
-            .font: UXFont.monospacedSystemFont(ofSize: FontSize.body + 2, weight: .semibold),
-            .paragraphStyle: {
-                let style = NSMutableParagraphStyle()
-                style.paragraphSpacing = 8
-                return style
-            }()
-        ]
-
-        let string = NSMutableAttributedString()
-
-        string.append(url.absoluteString, bodyAttributes)
-
-        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
-            return string
-        }
-
-        string.append("\n", bodyAttributes)
-        if let section = KeyValueSectionViewModel.makeComponents(for: url) {
-            string.append("\nURL Components\n", titleAttributes)
-            string.append(section.asAttributedString())
-        }
-
-        if let queryItems = KeyValueSectionViewModel.makeQueryItems(for: url) {
-            string.append("\nQuery Items\n", titleAttributes)
-            string.append(queryItems.asAttributedString())
-        }
-
-        string.append("\nRequest Parameters\n", titleAttributes)
-
-        let parametersSection = KeyValueSectionViewModel.makeParameters(for: request)
-        string.append(parametersSection.asAttributedString())
-
+        let strings = [urlString] + sections
+        let string = NSMutableAttributedString(attributedString: renderer.joined(strings))
         string.addAttributes([.underlineColor: UXColor.clear])
-
         return string
     }
 }
