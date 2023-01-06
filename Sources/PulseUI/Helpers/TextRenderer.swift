@@ -212,13 +212,14 @@ final class TextRenderer {
         return text
     }
 
+#warning("TODO: reuse this somehow with FileViewerViewModel")
     private func _renderNetworkTaskBody(_ data: Data, contentType: NetworkLogger.ContentType?, error: NetworkLogger.DecodingError?) -> NSAttributedString {
         if let json = try? JSONSerialization.jsonObject(with: data, options: []) {
             let renderer = TextRendererJSON(json: json, error: error, options: options)
             return renderer.render()
         } else if let string = String(data: data, encoding: .utf8) {
-            if contentType?.isEncodedForm ?? false, let components = decodeQueryParameters(form: string) {
-                return components.asAttributedString()
+            if contentType?.isEncodedForm ?? false, let section = decodeQueryParameters(form: string) {
+                return render(section, style: .monospaced)
             } else if contentType?.isHTML ?? false {
                 return TextRendererHTML(html: string, options: options).render()
             }
@@ -229,7 +230,6 @@ final class TextRenderer {
         }
     }
 
-    @available(*, deprecated, message: "Deprecated")
     private func decodeQueryParameters(form string: String) -> KeyValueSectionViewModel? {
         let string = "https://placeholder.com/path?" + string
         guard let components = URLComponents(string: string),
