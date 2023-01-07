@@ -83,7 +83,7 @@ EmptyView()
     #elseif os(tvOS)
     public var body: some View {
         List {
-            NetworkMessagesForEach(entities: viewModel.entities)
+            ConsoleMessagesForEach(messages: viewModel.entities)
         }
         .onAppear(perform: viewModel.onAppear)
         .onDisappear(perform: viewModel.onDisappear)
