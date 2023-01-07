@@ -15,8 +15,6 @@ final class NetworkInspectorViewModel: ObservableObject {
 #warning("TOOD: make private")
     let task: NetworkTaskEntity
 
-    #warning("TODO: explicityl unwrapped?")
-
     private(set) var statusSectionViewModel: NetworkRequestStatusSectionViewModel?
     private(set) var progressViewModel: ProgressViewModel?
 
@@ -43,6 +41,7 @@ final class NetworkInspectorViewModel: ObservableObject {
         self.refresh()
         cancellable = task.objectWillChange.sink { [weak self] in
             self?.refresh()
+            withAnimation { self?.objectWillChange.send() }
         }
     }
 
@@ -63,8 +62,6 @@ final class NetworkInspectorViewModel: ObservableObject {
 
         responseHeadersViewModel = NetworkHeadersCellViewModel(title: "Response Headers", headers: responseHeaders)
         responseCookiesViewModel = NetworkCookiesCellViewModel(title: "Response Cookies", headers: responseHeaders, url: url)
-
-        withAnimation { objectWillChange.send() }
     }
 
 #warning("TODO: how does it look if there is no transfer info? (check on all platforms)")
