@@ -18,8 +18,6 @@ import Combine
 #warning("TODO: find better icons")
 #warning("TODO: simplify response views to not show progress (or remove entirely?")
 
-
-
 #warning("TODO: tvOS enable scroll on left side")
 #warning("TODO: tvOS fix transaction details UI")
 #warning("TODO: rewrite TransactionsDeatilsView without KeyValueView")
@@ -252,25 +250,18 @@ struct NetworkInspectorView: View {
 
     // MARK: - Destinations
 
-#warning("TODO: remove these naviation titles")
-
 #if !os(watchOS)
     private var destinationMetrics: some View {
         NetworkInspectorMetricsViewModel(task: viewModel.task).map {
             NetworkInspectorMetricsView(viewModel: $0)
-                .backport.navigationTitle("Metrics")
         }
     }
 #endif
 
     // MARK: - Helpers
 
-    #warning("TODO: rewrite transaction details page on all platforms")
-    #warning("TODO: instead of NetworkInspectorTransactionsListView, use MenuItem + proper style of macOS")
-    #warning("TODO: if there is only one operation, show it there? or remove NetworkLoad view entirely?")
-    #warning("TODO: rewrite NetworkTransactionDetailsView? show one-two columns based on size + rewrite without KeyValueView")
-    #warning("TODO: macOS use pro version of the text viewer")
-    #warning("TODO: macos remove hor/vert switch")
+#warning("TODO: macOS use pro version of the text viewer")
+#warning("TODO: macos remove hor/vert switch")
 
 #if os(iOS)
     @ViewBuilder
