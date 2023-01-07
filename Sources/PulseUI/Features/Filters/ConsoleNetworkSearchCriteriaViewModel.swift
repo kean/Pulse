@@ -120,4 +120,9 @@ final class ConsoleNetworkSearchCriteriaViewModel: ObservableObject {
     }
 }
 
+#else
+final class ConsoleNetworkSearchCriteriaViewModel: ObservableObject {
+    init(store: LoggerStore) {}
+}
+
 #endif
