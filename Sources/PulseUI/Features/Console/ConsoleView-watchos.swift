@@ -24,10 +24,10 @@ struct ConsoleView: View {
             }
             .listRowBackground(viewModel.isOnlyErrors ? Color.blue.cornerRadius(8) : nil)
 
-            Button(action: { viewModel.isOnlyNetwork.toggle() }) {
+            Button(action: viewModel.toggleMode) {
                 Label("Show Requests", systemImage: "paperplane")
             }
-            .listRowBackground(viewModel.isOnlyNetwork ? Color.blue.cornerRadius(8) : nil)
+            .listRowBackground(viewModel.mode == .network ? Color.blue.cornerRadius(8) : nil)
 
             ConsoleMessagesForEach(messages: viewModel.entities)                
         }

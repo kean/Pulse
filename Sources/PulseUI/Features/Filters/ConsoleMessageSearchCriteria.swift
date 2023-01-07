@@ -181,14 +181,9 @@ extension ConsoleMessageSearchCriteria {
         criteria: ConsoleMessageSearchCriteria,
         filters: [ConsoleSearchFilter],
         sessionId: UUID?,
-        isOnlyErrors: Bool,
-        isOnlyNetwork: Bool
+        isOnlyErrors: Bool
     ) {
         var predicates = [NSPredicate]()
-
-        if isOnlyNetwork {
-            predicates.append(NSPredicate(format: "request != nil"))
-        }
 
         if criteria.dates.isCurrentSessionOnly, let sessionId = sessionId {
             predicates.append(NSPredicate(format: "session == %@", sessionId as NSUUID))

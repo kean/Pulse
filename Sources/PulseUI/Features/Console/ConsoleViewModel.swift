@@ -42,8 +42,6 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     }
 
     @Published var isOnlyErrors: Bool = false
-#warning("TODO: reimplement isOnlyNetwork")
-    @Published var isOnlyNetwork: Bool = false
     @Published var filterTerm: String = ""
 
     var onDismiss: (() -> Void)?
@@ -149,7 +147,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         switch mode {
         case .all:
             let viewModel = searchCriteriaViewModel
-            ConsoleMessageSearchCriteria.update(request: controller.fetchRequest, filterTerm: filterTerm, criteria: viewModel.criteria, filters: viewModel.filters, sessionId: sessionId, isOnlyErrors: isOnlyErrors, isOnlyNetwork: isOnlyNetwork)
+            ConsoleMessageSearchCriteria.update(request: controller.fetchRequest, filterTerm: filterTerm, criteria: viewModel.criteria, filters: viewModel.filters, sessionId: sessionId, isOnlyErrors: isOnlyErrors)
         case .network:
             let viewModel = networkSearchCriteriaViewModel
 #if !os(watchOS)
