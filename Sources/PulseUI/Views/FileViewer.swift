@@ -59,31 +59,40 @@ struct FileViewer: View {
 struct FileViewer_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            NavigationView {
+            PreviewContainer {
                 FileViewer(viewModel: .init(title: "Response", context: .init(contentType: "application/json", originalSize: 1200), data: { MockJSON.allPossibleValues }))
-            }
-                .previewDisplayName("JSON")
+            }.previewDisplayName("JSON")
 
-            NavigationView {
+            PreviewContainer {
                 FileViewer(viewModel: .init(title: "Response", context: .init(contentType: "image/png", originalSize: 219543), data: { MockTask.octocat.responseBody }))
-            }
-                .previewDisplayName("Image")
+            }.previewDisplayName("Image")
 
-            NavigationView {
+            PreviewContainer {
                 FileViewer(viewModel: .init(title: "Response", context: .init(contentType: "application/html", originalSize: 1200), data: { MockTask.profile.responseBody }))
-            }
-                .previewDisplayName("HTML")
+            }.previewDisplayName("HTML")
 
-            NavigationView {
+            PreviewContainer {
                 FileViewer(viewModel: .init(title: "Response", context: .init(contentType: "application/x-www-form-urlencoded", originalSize: 1200), data: { MockTask.patchRepo.originalRequest.httpBody ?? Data() }))
-            }
-                .previewDisplayName("Query Items")
+            }.previewDisplayName("Query Items")
 
-            NavigationView {
+            PreviewContainer {
                 FileViewer(viewModel: .init(title: "Response", context: .init(contentType: "application/pdf", originalSize: 1000), data: { mockPDF }))
-            }
-                .previewDisplayName("PDF")
+            }.previewDisplayName("PDF")
         }
+    }
+}
+
+private struct PreviewContainer<Content: View>: View {
+    @ViewBuilder var contents: () -> Content
+
+    var body: some View {
+#if os(iOS)
+        NavigationView {
+            contents()
+        }
+#else
+        contents()
+#endif
     }
 }
 
