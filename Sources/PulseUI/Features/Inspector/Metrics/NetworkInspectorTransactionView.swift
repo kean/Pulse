@@ -16,11 +16,12 @@ struct NetworkInspectorTransactionView: View {
             viewModel.timingViewModel.map(TimingView.init)
             viewModel.transferSizeViewModel.map {
                 NetworkInspectorTransferInfoView(viewModel: $0)
+                    .hideDivider()
                     .padding(.vertical, 8)
             }
             NetworkRequestInfoCell(viewModel: viewModel.requestViewModel)
             NavigationLink(destination: destintionTransactionDetails) {
-                NetworkMenuCell(icon: "info.circle.fill", tintColor: .blue, title: "Transaction Details")
+                Text("Transaction Details")
             }
         }
     }
@@ -65,15 +66,17 @@ struct NetworkInspectorTransactionView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
             List {
-                NetworkInspectorTransactionView(viewModel: mockModel)
+                ForEach(mockTask.orderedTransactions, id: \.index) {
+                    NetworkInspectorTransactionView(viewModel: .init(transaction: $0, task: mockTask))
+                }
             }
         }
     }
 }
 
-private let mockModel = NetworkInspectorTransactionViewModel(transaction: mockTask.orderedTransactions.last!, task: mockTask)
+//private let mockModel = NetworkInspectorTransactionViewModel(transaction: mockTask.orderedTransactions.last!, task: mockTask)
 
-private let mockTask = LoggerStore.preview.entity(for: .login)
+private let mockTask = LoggerStore.preview.entity(for: .createAPI)
 
 #endif
 

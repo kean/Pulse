@@ -10,6 +10,14 @@ import Pulse
 struct NetworkInspectorTransferInfoView: View {
     let viewModel: NetworkInspectorTransferInfoViewModel
 
+    var isDividerHidden = false
+
+    func hideDivider() -> NetworkInspectorTransferInfoView {
+        var copy = self
+        copy.isDividerHidden = true
+        return copy
+    }
+
 #if os(watchOS)
     var body: some View {
         HStack(alignment: .center) {
@@ -28,7 +36,9 @@ struct NetworkInspectorTransferInfoView: View {
             bytesSent
             Spacer()
 
-            Divider()
+            if !isDividerHidden {
+                Divider()
+            }
 
             Spacer()
             bytesReceived
