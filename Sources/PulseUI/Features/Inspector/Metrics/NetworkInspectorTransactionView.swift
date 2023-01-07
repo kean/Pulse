@@ -5,7 +5,6 @@
 import SwiftUI
 import Pulse
 
-#warning("TODO: display name of operation somewhere")
 #warning("TODO: dont show empty sections (headers/cookies) - not enough space here")
 #warning("TODO: different icons for headers and cookies")
 #warning("TODO: fix background highlight on clicking on cell e.g. response")
@@ -16,18 +15,20 @@ struct NetworkInspectorTransactionView: View {
     @ObservedObject var viewModel: NetworkInspectorTransactionViewModel
 
     var body: some View {
-        NetworkRequestStatusSectionView(viewModel: viewModel.statusSectionViewModel)
-        viewModel.timingViewModel.map(TimingView.init)
-        viewModel.transferSizeViewModel.map {
-            NetworkInspectorTransferInfoView(viewModel: $0)
-                .padding(.vertical, 8)
-        }
-        NetworkHeadersCell(viewModel: viewModel.requestHeadersViewModel)
-        NetworkCookiesCell(viewModel: viewModel.responseCookiesViewModel)
-        NetworkHeadersCell(viewModel: viewModel.responseHeadersViewModel)
-        NetworkCookiesCell(viewModel: viewModel.responseCookiesViewModel)
-        NavigationLink(destination: destinationTiming) {
-            NetworkMenuCell(icon: "clock", tintColor: .orange, title: "Timing Info")
+        Section(header: Text(viewModel.title)) {
+            NetworkRequestStatusSectionView(viewModel: viewModel.statusSectionViewModel)
+            viewModel.timingViewModel.map(TimingView.init)
+            viewModel.transferSizeViewModel.map {
+                NetworkInspectorTransferInfoView(viewModel: $0)
+                    .padding(.vertical, 8)
+            }
+            NetworkHeadersCell(viewModel: viewModel.requestHeadersViewModel)
+            NetworkCookiesCell(viewModel: viewModel.responseCookiesViewModel)
+            NetworkHeadersCell(viewModel: viewModel.responseHeadersViewModel)
+            NetworkCookiesCell(viewModel: viewModel.responseCookiesViewModel)
+            NavigationLink(destination: destinationTiming) {
+                NetworkMenuCell(icon: "clock", tintColor: .orange, title: "Timing Info")
+            }
         }
     }
 
@@ -39,6 +40,7 @@ struct NetworkInspectorTransactionView: View {
 // MARK: - ViewModel
 
 final class NetworkInspectorTransactionViewModel: ObservableObject {
+    let title: String
     let statusSectionViewModel: NetworkRequestStatusSectionViewModel
     let timingViewModel: TimingViewModel?
     let requestHeadersViewModel: NetworkHeadersCellViewModel
@@ -58,6 +60,7 @@ final class NetworkInspectorTransactionViewModel: ObservableObject {
     init(transaction: NetworkTransactionMetricsEntity, task: NetworkTaskEntity) {
         let url = transaction.request.url.flatMap(URL.init)
 
+        self.title = transaction.fetchType.title
         self.statusSectionViewModel = NetworkRequestStatusSectionViewModel(transaction: transaction)
         self.details = NetworkMetricsDetailsViewModel(metrics: transaction)
         self.timingViewModel = TimingViewModel(transaction: transaction, task: task)
@@ -80,11 +83,7 @@ struct NetworkInspectorTransactionView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
             List {
-                Section {
-                    NetworkInspectorTransactionView(viewModel: mockModel)
-                        .background(Color(UXColor.systemBackground))
-                        .backport.navigationTitle("Network Load")
-                }
+                NetworkInspectorTransactionView(viewModel: mockModel)
             }
         }
     }
