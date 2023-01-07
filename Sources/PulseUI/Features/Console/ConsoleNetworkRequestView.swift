@@ -16,14 +16,50 @@ struct ConsoleNetworkRequestView: View {
         self.progressViewModel = viewModel.progress
     }
 
+#if os(watchOS)
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            title
+            Text(viewModel.task.url ?? "–")
+                .font(.system(size: 15))
+                .lineLimit(ConsoleSettings.shared.lineLimit)
+            Text(ConsoleFormatter.details(for: viewModel.task))
+                .lineLimit(2)
+                .font(.system(size: 14))
+                .foregroundColor(.secondary)
+        }
+    }
+
+    private var title: some View {
+        HStack {
+            HStack {
+                Circle()
+                    .frame(width: 10, height: 10)
+                    .foregroundColor(viewModel.badgeColor)
+                Text(viewModel.task.httpMethod ?? "GET")
+                    .font(.system(size: 14))
+                    .foregroundColor(.secondary)
+            }
+            Spacer()
+            let time = Text(viewModel.time)
+                .font(.system(size: 14))
+                .foregroundColor(.secondary)
+            if #available(watchOS 8, *) {
+                time.monospacedDigit()
+            } else {
+                time
+            }
+        }
+    }
+#else
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(alignment: .firstTextBaseline) {
                 header
-                #if os(macOS)
+#if os(macOS)
                 PinView(viewModel: viewModel.pinViewModel, font: fonts.title)
                 Spacer()
-                #endif
+#endif
             }
             text.lineLimit(4)
         }
@@ -32,16 +68,7 @@ struct ConsoleNetworkRequestView: View {
 
     @ViewBuilder
     private var header: some View {
-        #if os(watchOS)
-        VStack(alignment: .leading, spacing: 1) {
-            title
-            Text(viewModel.time)
-                .font(fonts.title)
-                .foregroundColor(.secondary)
-        }
-        #else
         title
-        #endif
     }
 
     private var title: some View {
@@ -72,10 +99,7 @@ struct ConsoleNetworkRequestView: View {
         let body: Font
     }
 
-#if os(watchOS)
-    private let spacing: CGFloat = 4
-    private let fonts = Fonts(title: .system(size: 12), body: .system(size: 15))
-#elseif os(iOS)
+#if os(iOS)
     private let spacing: CGFloat = 8
     private let fonts = Fonts(title: .caption, body: .body)
 #else
@@ -83,12 +107,11 @@ struct ConsoleNetworkRequestView: View {
     private let fonts = Fonts(title: .body, body: .body)
 #endif
 
-#if os(watchOS)
-    private let circleSize: CGFloat = 8
-#elseif os(tvOS)
+#if os(tvOS)
     private let circleSize: CGFloat = 20
 #else
     private let circleSize: CGFloat = 10
+#endif
 #endif
 }
 

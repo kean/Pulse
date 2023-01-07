@@ -44,15 +44,23 @@ enum ConsoleFormatter {
     static let separator = " · "
 
     static func subheadline(for task: NetworkTaskEntity) -> String {
-        "\(time(for: task.createdAt))\(separator)\(details(for: task))"
+        return [
+            time(for: task.createdAt),
+            task.httpMethod ?? "GET",
+            details(for: task)
+        ].joined(separator: separator)
     }
 
     static func time(for date: Date) -> String {
         ConsoleMessageViewModel.timeFormatter.string(from: date)
     }
 
+    /// Example:
+    ///
+    /// "Pending"
+    /// "200 OK · 2.2s"
     static func details(for task: NetworkTaskEntity) -> String {
-        var components = [task.httpMethod ?? "GET"]
+        var components: [String] = []
         switch task.state {
         case .pending:
             components.append(ProgressViewModel.title(for: task))

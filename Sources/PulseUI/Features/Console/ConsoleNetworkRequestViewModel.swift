@@ -40,7 +40,7 @@ final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
 
     private(set) lazy var progress = ProgressViewModel(task: task)
 
-    private let task: NetworkTaskEntity
+    let task: NetworkTaskEntity
     private var cancellable: AnyCancellable?
 
     static let timeFormatter: DateFormatter = {

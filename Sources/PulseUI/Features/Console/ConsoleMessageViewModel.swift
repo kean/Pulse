@@ -7,13 +7,14 @@ import Pulse
 import CoreData
 import Combine
 
+#warning("TODO: refactor")
 final class ConsoleMessageViewModel: Pinnable {
     let title: String
     let text: String
     let textColor: Color
     let level: String
 
-    private let message: LoggerMessageEntity
+    let message: LoggerMessageEntity
     private let searchCriteriaViewModel: ConsoleMessageSearchCriteriaViewModel?
     
     private(set) lazy var time = ConsoleMessageViewModel.timeFormatter.string(from: message.createdAt)
