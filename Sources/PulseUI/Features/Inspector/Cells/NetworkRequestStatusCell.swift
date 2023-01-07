@@ -8,9 +8,22 @@ import Pulse
 struct NetworkRequestStatusCell: View {
     let viewModel: NetworkRequestStatusCellModel
 
+    #if os(watchOS)
     var body: some View {
         HStack(spacing: spacing) {
-#if !os(watchOS)
+            Text(viewModel.title)
+                .lineLimit(3)
+                .foregroundColor(viewModel.tintColor)
+            Spacer()
+            viewModel.duration.map(DurationLabel.init)
+        }
+        .font(.headline)
+        .listRowBackground(Color.clear)
+    }
+
+    #else
+    var body: some View {
+        HStack(spacing: spacing) {
             if #available(iOS 14, tvOS 14, *) {
                 Text(Image(systemName: viewModel.imageName))
                     .foregroundColor(viewModel.tintColor)
@@ -18,18 +31,15 @@ struct NetworkRequestStatusCell: View {
                 Image(systemName: viewModel.imageName)
                     .foregroundColor(viewModel.tintColor)
             }
-#endif
             Text(viewModel.title)
-#if os(watchOS)
-                .lineLimit(3)
-#else
                 .lineLimit(1)
-#endif
                 .foregroundColor(viewModel.tintColor)
             Spacer()
             viewModel.duration.map(DurationLabel.init)
         }.font(.headline)
     }
+
+    #endif
 }
 
 struct NetworkRequestStatusCellModel {

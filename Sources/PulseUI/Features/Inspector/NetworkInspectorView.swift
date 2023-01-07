@@ -92,20 +92,30 @@ struct NetworkInspectorView: View {
     var contents: some View {
         Form {
             Section {
-                transferStatusView
-            }
-            .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
-            .listRowBackground(Color.clear)
-
-            Section {
                 viewModel.statusSectionViewModel.map(NetworkRequestStatusSectionView.init)
             }
             Section {
+                viewModel.transferViewModel.map {
+                    NetworkInspectorTransferInfoView(viewModel: $0)
+                        .hideReceived()
+                        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+                        .listRowBackground(Color.clear)
+                        .padding(.top, 8)
+                        .padding(.bottom, 16)
+                }
                 requestTypePicker
                 sectionRequest
             }
             if viewModel.task.state != .pending {
                 Section {
+                    viewModel.transferViewModel.map {
+                        NetworkInspectorTransferInfoView(viewModel: $0)
+                            .hideSent()
+                            .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+                            .listRowBackground(Color.clear)
+                            .padding(.top, 8)
+                            .padding(.bottom, 16)
+                    }
                     sectionResponse
                 }
             }
@@ -191,6 +201,7 @@ struct NetworkInspectorView: View {
 
     #warning("TODO: this fallback isn't ideal on other paltforms only on ios")
 
+#if os(iOS) || os(macOS) || os(tvOS)
     @ViewBuilder
     private var transferStatusView: some View {
         ZStack {
@@ -209,6 +220,7 @@ struct NetworkInspectorView: View {
             } // Should never happen
         }
     }
+#endif
 
     @ViewBuilder
     private var requestTypePicker: some View {
@@ -293,11 +305,15 @@ struct NetworkInspectorView_Previews: PreviewProvider {
 #else
             NavigationView {
                 NetworkInspectorView(viewModel: .init(task: LoggerStore.preview.entity(for: .login)))
-            }.previewDisplayName("Success")
+            }
+            .navigationViewStyle(.stack)
+            .previewDisplayName("Success")
 
             NavigationView {
                 NetworkInspectorView(viewModel: .init(task: LoggerStore.preview.entity(for: .patchRepo)))
-            }.previewDisplayName("Failure")
+            }
+            .navigationViewStyle(.stack)
+            .previewDisplayName("Failure")
 #endif
         }
     }

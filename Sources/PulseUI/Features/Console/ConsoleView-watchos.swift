@@ -13,9 +13,6 @@ struct ConsoleView: View {
 
     init(viewModel: ConsoleViewModel) {
         self.viewModel = viewModel
-
-#warning("TEMP")
-        viewModel.toggleMode()
     }
 
     var body: some View {

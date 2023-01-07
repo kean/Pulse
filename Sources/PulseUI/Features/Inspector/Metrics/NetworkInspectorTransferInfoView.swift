@@ -10,7 +10,25 @@ import Pulse
 struct NetworkInspectorTransferInfoView: View {
     let viewModel: NetworkInspectorTransferInfoViewModel
 
-    var isDividerHidden = false
+    private var isDividerHidden = false
+    private var isReceivedHidden = false
+    private var isSentHidden = false
+
+    init(viewModel: NetworkInspectorTransferInfoViewModel) {
+        self.viewModel = viewModel
+    }
+
+    func hideReceived() -> Self {
+        var copy = self
+        copy.isReceivedHidden = true
+        return copy
+    }
+
+    func hideSent() -> Self {
+        var copy = self
+        copy.isSentHidden = true
+        return copy
+    }
 
     func hideDivider() -> NetworkInspectorTransferInfoView {
         var copy = self
@@ -21,9 +39,10 @@ struct NetworkInspectorTransferInfoView: View {
 #if os(watchOS)
     var body: some View {
         HStack(alignment: .center) {
-            if viewModel.isUpload {
+            if !isSentHidden {
                 bytesSent
-            } else {
+            }
+            if !isReceivedHidden {
                 bytesReceived
             }
         }
@@ -135,8 +154,6 @@ struct NetworkInspectorTransferInfoViewModel {
     let bodyBytesReceived: String
     let headersBytesReceived: String
 
-    let isUpload: Bool
-
     init(empty: Bool) {
         totalBytesSent = "–"
         bodyBytesSent = "–"
@@ -144,14 +161,13 @@ struct NetworkInspectorTransferInfoViewModel {
         totalBytesReceived = "–"
         bodyBytesReceived = "–"
         headersBytesReceived = "–"
-        isUpload = false
     }
 
     init(task: NetworkTaskEntity, taskType: NetworkLogger.TaskType) {
-        self.init(transferSize: task.totalTransferSize, isUpload: taskType == .uploadTask)
+        self.init(transferSize: task.totalTransferSize)
     }
 
-    init(transferSize: NetworkLogger.TransferSizeInfo, isUpload: Bool = false) {
+    init(transferSize: NetworkLogger.TransferSizeInfo) {
         totalBytesSent = formatBytes(transferSize.totalBytesSent)
         bodyBytesSent = formatBytes(transferSize.requestBodyBytesSent)
         headersBytesSent = formatBytes(transferSize.requestHeaderBytesSent)
@@ -159,8 +175,6 @@ struct NetworkInspectorTransferInfoViewModel {
         totalBytesReceived = formatBytes(transferSize.totalBytesReceived)
         bodyBytesReceived = formatBytes(transferSize.responseBodyBytesReceived)
         headersBytesReceived = formatBytes(transferSize.responseHeaderBytesReceived)
-
-        self.isUpload = isUpload
     }
 }
 
