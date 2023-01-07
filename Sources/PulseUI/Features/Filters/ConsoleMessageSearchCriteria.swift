@@ -7,7 +7,7 @@ import Pulse
 import CoreData
 import SwiftUI
 
-struct ConsoleSearchCriteria: Hashable {
+struct ConsoleMessageSearchCriteria: Hashable {
     var isFiltersEnabled = true
 
     var logLevels = LogLevelsFilter.default
@@ -25,13 +25,7 @@ struct ConsoleSearchCriteria: Hashable {
 
     struct DatesFilter: Hashable {
         var isEnabled = true
-
-        #if os(iOS) || os(watchOS) || os(tvOS)
         var isCurrentSessionOnly = true
-        #else
-        var isCurrentSessionOnly = false
-        #endif
-
         var isStartDateEnabled = false
         var startDate: Date?
         var isEndDateEnabled = false
@@ -60,10 +54,10 @@ struct ConsoleSearchCriteria: Hashable {
         static let `default` = LabelsFilter()
     }
 
-    static let `default` = ConsoleSearchCriteria()
+    static let `default` = ConsoleMessageSearchCriteria()
 
     var isDefault: Bool {
-        self == ConsoleSearchCriteria.default
+        self == ConsoleMessageSearchCriteria.default
     }
 }
 
@@ -179,12 +173,12 @@ final class ConsoleSearchFilter: ObservableObject, Hashable, Identifiable {
     }
 }
 
-extension ConsoleSearchCriteria {
+extension ConsoleMessageSearchCriteria {
 
     static func update(
-        request: NSFetchRequest<LoggerMessageEntity>,
+        request: NSFetchRequest<NSManagedObject>,
         filterTerm: String,
-        criteria: ConsoleSearchCriteria,
+        criteria: ConsoleMessageSearchCriteria,
         filters: [ConsoleSearchFilter],
         sessionId: UUID?,
         isOnlyErrors: Bool,

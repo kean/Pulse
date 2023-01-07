@@ -8,16 +8,14 @@ import SwiftUI
 
 struct ConsoleView: View {
     @ObservedObject var viewModel: ConsoleViewModel
-    let main: MainViewModel
 
-    init(viewModel: MainViewModel) {
-        self.viewModel = viewModel.console
-        self.main = viewModel
+    init(viewModel: ConsoleViewModel) {
+        self.viewModel = viewModel
     }
 
     var body: some View {
         List {
-            NavigationLink(destination: SettingsView(viewModel: main.settings)) {
+            NavigationLink(destination: SettingsView(viewModel: .init(store: viewModel.store))) {
                 Label("Settings", systemImage: "gearshape")
             }
 
@@ -27,11 +25,11 @@ struct ConsoleView: View {
             .listRowBackground(viewModel.isOnlyErrors ? Color.blue.cornerRadius(8) : nil)
 
             Button(action: { viewModel.isOnlyNetwork.toggle() }) {
-                Label("Show Requests", systemImage: "network")
+                Label("Show Requests", systemImage: "paperplane")
             }
             .listRowBackground(viewModel.isOnlyNetwork ? Color.blue.cornerRadius(8) : nil)
 
-            ConsoleMessagesForEach(messages: viewModel.entities)
+            ConsoleMessagesForEach(messages: viewModel.entities)                
         }
         .navigationTitle("Console")
         .onAppear(perform: viewModel.onAppear)
@@ -43,7 +41,7 @@ struct ConsoleView: View {
 struct ConsoleView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
-            ConsoleView(viewModel: .init(store: .mock, onDismiss: nil))
+            ConsoleView(viewModel: .init(store: .mock))
         }
     }
 }

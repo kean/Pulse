@@ -7,7 +7,7 @@ import SwiftUI
 #if os(iOS)
 
 struct ConsoleFiltersLabelsPickerView: View {
-    @ObservedObject var viewModel: ConsoleSearchCriteriaViewModel
+    @ObservedObject var viewModel: ConsoleMessageSearchCriteriaViewModel
 
     @State private var searchText = ""
 

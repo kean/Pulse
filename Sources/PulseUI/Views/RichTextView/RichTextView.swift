@@ -7,6 +7,7 @@ import CoreData
 import Pulse
 import Combine
 
+#warning("TODO: fix selection highlihght on macOS")
 #warning("TODO: handle clicks on decoding error on other platforms")
 #warning("TODO: optimize performance")
 

@@ -7,14 +7,14 @@ import Pulse
 
 #if os(iOS) || os(macOS)
 
-struct ConsoleFiltersView: View {
-    @ObservedObject var viewModel: ConsoleSearchCriteriaViewModel
+struct ConsoleMessageFiltersView: View {
+    @ObservedObject var viewModel: ConsoleMessageSearchCriteriaViewModel
+    @ObservedObject var sharedCriteriaViewModel: ConsoleSharedSearchCriteriaViewModel
 
 #if os(iOS)
     @State var isGeneralSectionExpanded = true
     @State var isLevelsSectionExpanded = true
     @State var isLabelsSectionExpanded = false
-    @State var isTimePeriodSectionExpanded = true
 
     @State var isAllLabelsShown = false
 
@@ -33,7 +33,6 @@ struct ConsoleFiltersView: View {
     @AppStorage("networkFilterIsParametersExpanded") var isGeneralSectionExpanded = true
     @AppStorage("consoleFiltersIsLevelsSectionExpanded") var isLevelsSectionExpanded = true
     @AppStorage("consoleFiltersIsLabelsExpanded") var isLabelsSectionExpanded = false
-    @AppStorage("consoleFiltersIsTimePeriodExpanded") var isTimePeriodSectionExpanded = true
 
     var body: some View {
         ScrollView {
@@ -56,9 +55,9 @@ struct ConsoleFiltersView: View {
 #endif
 }
 
-// MARK: - ConsoleFiltersView (Contents)
+// MARK: - ConsoleMessageFiltersView (Contents)
 
-extension ConsoleFiltersView {
+extension ConsoleMessageFiltersView {
     @ViewBuilder
     var formContents: some View {
         if #available(iOS 14, *) {
@@ -66,19 +65,20 @@ extension ConsoleFiltersView {
         }
         logLevelsSection
         labelsSection
-        timePeriodSection
+        ConsoleSharedFiltersView(viewModel: sharedCriteriaViewModel)
     }
 
     var buttonReset: some View {
-        Button("Reset") { viewModel.resetAll() }
-            .disabled(!viewModel.isButtonResetEnabled)
-
+        Button("Reset") {
+            viewModel.resetAll()
+            sharedCriteriaViewModel.resetAll()
+        }.disabled(!(viewModel.isButtonResetEnabled || sharedCriteriaViewModel.isButtonResetEnabled))
     }
 }
 
-// MARK: - ConsoleFiltersView (Custom Filters)
+// MARK: - ConsoleMessageFiltersView (Custom Filters)
 
-extension ConsoleFiltersView {
+extension ConsoleMessageFiltersView {
     @available(iOS 14, *)
     var generalSection: some View {
         FiltersSection(
@@ -138,9 +138,9 @@ extension ConsoleFiltersView {
 #endif
 }
 
-// MARK: - ConsoleFiltersView (Log Levels)
+// MARK: - ConsoleMessageFiltersView (Log Levels)
 
-extension ConsoleFiltersView {
+extension ConsoleMessageFiltersView {
     var logLevelsSection: some View {
         FiltersSection(
             isExpanded: $isLevelsSectionExpanded,
@@ -208,9 +208,9 @@ extension ConsoleFiltersView {
     }
 }
 
-// MARK: - ConsoleFiltersView (Labels)
+// MARK: - ConsoleMessageFiltersView (Labels)
 
-extension ConsoleFiltersView {
+extension ConsoleMessageFiltersView {
     var labelsSection: some View {
         FiltersSection(
             isExpanded: $isLabelsSectionExpanded,
@@ -274,10 +274,14 @@ extension ConsoleFiltersView {
 #endif
 }
 
-// MARK: - ConsoleFiltersView (Time Period)
+// MARK: - ConsoleMessageFiltersView (Time Period)
 
-extension ConsoleFiltersView {
-    var timePeriodSection: some View {
+struct ConsoleSharedFiltersView: View {
+    @ObservedObject var viewModel: ConsoleSharedSearchCriteriaViewModel
+
+    @State var isTimePeriodSectionExpanded = true
+
+    var body: some View {
         FiltersSection(
             isExpanded: $isTimePeriodSectionExpanded,
             header: { timePeriodHeader },
@@ -289,22 +293,22 @@ extension ConsoleFiltersView {
         FilterSectionHeader(
             icon: "calendar", title: "Time Period",
             color: .yellow,
-            reset: { viewModel.criteria.dates = .default },
-            isDefault: viewModel.criteria.dates == .default,
-            isEnabled: $viewModel.criteria.dates.isEnabled
+            reset: { viewModel.dates = .default },
+            isDefault: viewModel.dates == .default,
+            isEnabled: $viewModel.dates.isEnabled
         )
     }
 
     @ViewBuilder
     private var timePeriodContent: some View {
-        Filters.toggle("Latest Session", isOn: $viewModel.criteria.dates.isCurrentSessionOnly)
+        Filters.toggle("Latest Session", isOn: $viewModel.dates.isCurrentSessionOnly)
 
-        DateRangePicker(title: "Start Date", date: viewModel.bindingStartDate, isEnabled: $viewModel.criteria.dates.isStartDateEnabled)
-        DateRangePicker(title: "End Date", date: viewModel.bindingEndDate, isEnabled: $viewModel.criteria.dates.isEndDateEnabled)
+        DateRangePicker(title: "Start Date", date: viewModel.bindingStartDate, isEnabled: $viewModel.dates.isStartDateEnabled)
+        DateRangePicker(title: "End Date", date: viewModel.bindingEndDate, isEnabled: $viewModel.dates.isEndDateEnabled)
 
         HStack(spacing: 16) {
-            Button("Recent") { viewModel.criteria.dates = .recent }
-            Button("Today") { viewModel.criteria.dates = .today }
+            Button("Recent") { viewModel.dates = .recent }
+            Button("Today") { viewModel.dates = .today }
             Spacer()
         }
 #if os(iOS)
@@ -317,21 +321,21 @@ extension ConsoleFiltersView {
 }
 
 #if DEBUG
-struct ConsoleFiltersView_Previews: PreviewProvider {
+struct ConsoleMessageFiltersView_Previews: PreviewProvider {
     static var previews: some View {
 #if os(iOS)
         NavigationView {
-            ConsoleFiltersView(viewModel: makeMockViewModel(), isPresented: .constant(true))
+            ConsoleMessageFiltersView(viewModel: makeMockViewModel(), sharedCriteriaViewModel: .init(store: .mock), isPresented: .constant(true))
         }
 #else
-        ConsoleFiltersView(viewModel: makeMockViewModel())
+        ConsoleMessageFiltersView(viewModel: makeMockViewModel(), sharedCriteriaViewModel: .init(store: .mock))
             .previewLayout(.fixed(width: Filters.preferredWidth - 15, height: 700))
 #endif
     }
 }
 
-private func makeMockViewModel() -> ConsoleSearchCriteriaViewModel {
-    ConsoleSearchCriteriaViewModel(store: .mock)
+private func makeMockViewModel() -> ConsoleMessageSearchCriteriaViewModel {
+    ConsoleMessageSearchCriteriaViewModel(store: .mock)
 }
 #endif
 

@@ -47,7 +47,7 @@ final class FileViewerViewModel: ObservableObject {
 #endif
     }
 
-#warning("TODO: fix this (doesnt work well on macOS)")
+#warning("TODO: fix this (doesn't work well on macOS)")
     func render() {
 #if os(macOS)
         let data = self.data

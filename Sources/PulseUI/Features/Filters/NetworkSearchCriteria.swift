@@ -11,7 +11,6 @@ import CoreData
 struct NetworkSearchCriteria: Hashable {
     var isFiltersEnabled = true
 
-    var dates = DatesFilter.default
     var response = ResponseFilter.default
     var host = HostFilter.default
     var duration = DurationFilter.default
@@ -70,8 +69,6 @@ struct NetworkSearchCriteria: Hashable {
             }
         }
     }
-
-    typealias DatesFilter = ConsoleSearchCriteria.DatesFilter
 
     struct HostFilter: Hashable {
         var isEnabled = true
@@ -327,22 +324,22 @@ func evaluateProgrammaticFilters(_ filters: [NetworkSearchFilter], entity: Netwo
 }
 
 extension NetworkSearchCriteria {
-    static func update(request: NSFetchRequest<NetworkTaskEntity>, filterTerm: String, criteria: NetworkSearchCriteria, filters: [NetworkSearchFilter], isOnlyErrors: Bool, sessionId: UUID?) {
+    static func update(request: NSFetchRequest<NSManagedObject>, filterTerm: String, dates: ConsoleMessageSearchCriteria.DatesFilter, criteria: NetworkSearchCriteria, filters: [NetworkSearchFilter], isOnlyErrors: Bool, sessionId: UUID?) {
         var predicates = [NSPredicate]()
 
         if isOnlyErrors {
             predicates.append(NSPredicate(format: "requestState == %d", NetworkTaskEntity.State.failure.rawValue))
         }
 
-        if criteria.dates.isCurrentSessionOnly, let sessionId = sessionId {
+        if dates.isCurrentSessionOnly, let sessionId = sessionId {
             predicates.append(NSPredicate(format: "session == %@", sessionId as NSUUID))
         }
 
-        if criteria.dates.isEnabled {
-            if criteria.dates.isStartDateEnabled, let startDate = criteria.dates.startDate {
+        if dates.isEnabled {
+            if dates.isStartDateEnabled, let startDate = dates.startDate {
                 predicates.append(NSPredicate(format: "createdAt >= %@", startDate as NSDate))
             }
-            if criteria.dates.isEndDateEnabled, let endDate = criteria.dates.endDate {
+            if dates.isEndDateEnabled, let endDate = dates.endDate {
                 predicates.append(NSPredicate(format: "createdAt <= %@", endDate as NSDate))
             }
         }

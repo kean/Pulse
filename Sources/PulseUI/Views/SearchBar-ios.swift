@@ -9,16 +9,20 @@ import SwiftUI
 struct SearchBar: UIViewRepresentable {
     let title: String
     @Binding var text: String
+    @Binding var isSearching: Bool
     var onEditingChanged: ((_ isEditing: Bool) -> Void)?
     var inputAccessoryView: UIView?
 
     final class Coordinator: NSObject, UISearchBarDelegate {
         @Binding var text: String
+        @Binding var isSearching: Bool
         let onEditingChanged: ((_ isEditing: Bool) -> Void)?
 
         init(text: Binding<String>,
+             isSearching: Binding<Bool>,
              onEditingChanged: ((_ isEditing: Bool) -> Void)?) {
             self._text = text
+            self._isSearching = isSearching
             self.onEditingChanged = onEditingChanged
         }
 
@@ -27,10 +31,14 @@ struct SearchBar: UIViewRepresentable {
         }
 
         func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
+            self.isSearching = true
             self.onEditingChanged?(true)
         }
 
         func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
+            if self.isSearching != false {
+                self.isSearching = false
+            }
             self.onEditingChanged?(false)
         }
 
@@ -40,7 +48,7 @@ struct SearchBar: UIViewRepresentable {
     }
 
     func makeCoordinator() -> Coordinator {
-        Coordinator(text: $text, onEditingChanged: onEditingChanged)
+        Coordinator(text: $text, isSearching: $isSearching, onEditingChanged: onEditingChanged)
     }
 
     func makeUIView(context: Context) -> UISearchBar {
@@ -55,6 +63,9 @@ struct SearchBar: UIViewRepresentable {
     func updateUIView(_ searchBar: UISearchBar, context: Context) {
         searchBar.placeholder = title
         searchBar.text = text
+        if !isSearching {
+            searchBar.resignFirstResponder()
+        }
     }
 }
 

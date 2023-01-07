@@ -10,7 +10,7 @@ import SwiftUI
 
 #if os(iOS) || os(macOS) || os(tvOS)
 
-final class NetworkSearchCriteriaViewModel: ObservableObject {
+final class ConsoleNetworkSearchCriteriaViewModel: ObservableObject {
     @Published var criteria: NetworkSearchCriteria = .default
     private(set) var defaultCriteria: NetworkSearchCriteria = .default
     @Published var filters: [NetworkSearchFilter] = []
@@ -22,19 +22,14 @@ final class NetworkSearchCriteriaViewModel: ObservableObject {
 
     let dataNeedsReload = PassthroughSubject<Void, Never>()
 
-    private var cancellables: [AnyCancellable] = []
-
     var isDefaultSearchCriteria: Bool {
         criteria == defaultCriteria && (filters.count == 0 || (filters.count == 1 && filters == NetworkSearchFilter.defaultFilters))
     }
 
+    private var cancellables: [AnyCancellable] = []
+
     init(store: LoggerStore) {
         domains = ManagedObjectsObserver(context: store.viewContext, sortDescriptior: NSSortDescriptor(keyPath: \NetworkDomainEntity.count, ascending: false))
-
-        if store !== LoggerStore.shared {
-            criteria.dates.isCurrentSessionOnly = false
-            defaultCriteria.dates.isCurrentSessionOnly = false
-        }
 
         domains.$objects.sink { [weak self] in
             self?.allDomains = $0.map(\.value)
@@ -114,24 +109,6 @@ final class NetworkSearchCriteriaViewModel: ObservableObject {
 
     // MARK: Bindings
 
-    var bindingStartDate: Binding<Date> {
-        Binding(get: {
-            self.criteria.dates.startDate ?? Date().addingTimeInterval(-3600)
-        }, set: { newValue in
-            self.criteria.dates.isStartDateEnabled = true
-            self.criteria.dates.startDate = newValue
-        })
-    }
-
-    var bindingEndDate: Binding<Date> {
-        Binding(get: {
-            self.criteria.dates.endDate ?? Date()
-        }, set: { newValue in
-            self.criteria.dates.isEndDateEnabled = true
-            self.criteria.dates.endDate = newValue
-        })
-    }
-
     func binding(forDomain domain: String) -> Binding<Bool> {
         Binding(get: {
             self.criteria.host.values.contains(domain)
@@ -141,6 +118,14 @@ final class NetworkSearchCriteriaViewModel: ObservableObject {
             }
         })
     }
+}
+
+#else
+final class ConsoleNetworkSearchCriteriaViewModel: ObservableObject {
+    var isDefaultSearchCriteria: Bool { true }
+    let dataNeedsReload = PassthroughSubject<Void, Never>()
+
+    init(store: LoggerStore) {}
 }
 
 #endif

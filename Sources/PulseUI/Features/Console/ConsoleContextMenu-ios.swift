@@ -14,14 +14,17 @@ import UniformTypeIdentifiers
 @available(iOS 14, *)
 struct ConsoleContextMenu: View {
     private let store: LoggerStore
+    private let insights: InsightsViewModel
     private let isShowingAsText: Binding<Bool>?
 
     @State private var isShowingSettings = false
     @State private var isShowingStoreInfo = false
+    @State private var isShowingInsights = false
     @State private var isDocumentBrowserPresented = false
 
-    init(store: LoggerStore, isShowingAsText: Binding<Bool>? = nil) {
+    init(store: LoggerStore, insights: InsightsViewModel, isShowingAsText: Binding<Bool>? = nil) {
         self.store = store
+        self.insights = insights
         self.isShowingAsText = isShowingAsText
     }
 
@@ -43,9 +46,15 @@ struct ConsoleContextMenu: View {
                     Label("Store Info", systemImage: "info.circle")
                 }
                 if !store.isArchive {
+                    Button(action: { isShowingInsights = true }) {
+                        Label("Insights", systemImage: "chart.pie")
+                    }
                     Button(action: { isDocumentBrowserPresented = true }) {
                         Label("Browse Logs", systemImage: "folder")
                     }
+                }
+                Button(action: { isShowingSettings = true }) {
+                    Label("Settings", systemImage: "gear")
                 }
             }
             if !store.isArchive {
@@ -59,11 +68,6 @@ struct ConsoleContextMenu: View {
                             Label("Remove Logs", systemImage: "trash")
                         }
                     }
-                }
-            }
-            Section {
-                Button(action: { isShowingSettings = true }) {
-                    Label("Settings", systemImage: "gear")
                 }
             }
             Section {
@@ -94,6 +98,14 @@ struct ConsoleContextMenu: View {
             NavigationView {
                 StoreDetailsView(source: .store(store))
                     .navigationBarItems(trailing: Button(action: { isShowingStoreInfo = false }) {
+                        Text("Done")
+                    })
+            }
+        }
+        .sheet(isPresented: $isShowingInsights) {
+            NavigationView {
+                InsightsView(viewModel: insights)
+                    .navigationBarItems(trailing: Button(action: { isShowingInsights = false }) {
                         Text("Done")
                     })
             }
@@ -143,7 +155,7 @@ struct ConsoleContextMenu_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
             VStack {
-                ConsoleContextMenu(store: .mock, isShowingAsText: .constant(false))
+                ConsoleContextMenu(store: .mock, insights: .init(store: .mock), isShowingAsText: .constant(false))
                 Spacer()
             }
         }

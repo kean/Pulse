@@ -18,6 +18,11 @@ public struct ConsoleView: View {
         self.viewModel = ConsoleViewModel(store: store)
     }
 
+    /// Creates a view pre-configured to display only network requests
+    public static func network(store: LoggerStore = .shared) -> ConsoleView {
+        ConsoleView(viewModel: .init(store: store, mode: .network))
+    }
+
     init(viewModel: ConsoleViewModel) {
         self.viewModel = viewModel
     }
@@ -27,7 +32,7 @@ public struct ConsoleView: View {
             .onAppear(perform: viewModel.onAppear)
             .onDisappear(perform: viewModel.onDisappear)
             .edgesIgnoringSafeArea(.bottom)
-            .navigationBarTitle(Text("Console"))
+            .backport.navigationTitle(viewModel.title)
             .navigationBarItems(
                 leading: viewModel.onDismiss.map {
                     Button(action: $0) { Image(systemName: "xmark") }
@@ -35,7 +40,7 @@ public struct ConsoleView: View {
                 trailing: HStack {
                     ShareButton { isSharing = true }
                     if #available(iOS 14, *) {
-                        ConsoleContextMenu(store: viewModel.store, isShowingAsText: $isShowingAsText)
+                        ConsoleContextMenu(store: viewModel.store, insights: viewModel.insightsViewModel, isShowingAsText: $isShowingAsText)
                     }
                 }
             )
@@ -75,33 +80,71 @@ public struct ConsoleView: View {
     }
 }
 
+#warning("TODO: display count somewhere else?")
+#warning("TODO: duplicate modes and filters in the context menu + search")
+
 private struct ConsoleToolbarView: View {
     @ObservedObject var viewModel: ConsoleViewModel
     @State private var isShowingFilters = false
     @State private var messageCount = 0
+    @State private var isSearching = false
 
     var body: some View {
         VStack(spacing: 8) {
             HStack(spacing: 0) {
-                SearchBar(title: "Search \(viewModel.entities.count) messages", text: $viewModel.filterTerm)
-                Button(action: { viewModel.isOnlyErrors.toggle() }) {
-                    Image(systemName: viewModel.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon")
-                        .font(.system(size: 20))
-                        .foregroundColor(viewModel.isOnlyErrors ? .red : .accentColor)
-                }.frame(width: 40, height: 44)
-                Button(action: { isShowingFilters = true }) {
-                    Image(systemName: viewModel.searchCriteria.isDefaultSearchCriteria ? "line.horizontal.3.decrease.circle" : "line.3.horizontal.decrease.circle.fill")
-                        .font(.system(size: 20))
-                        .foregroundColor(.accentColor)
-                }.frame(width: 40, height: 44)
+                SearchBar(title: "Search \(viewModel.entities.count) messages", text: $viewModel.filterTerm, isSearching: $isSearching)
+                if !isSearching {
+                    filters
+                } else {
+                    Button("Cancel") {
+                        isSearching = false
+                        viewModel.filterTerm = ""
+                    }
+                    .foregroundColor(.accentColor)
+                    .padding(.horizontal, 14)
+                }
             }.buttonStyle(.plain)
         }
         .padding(EdgeInsets(top: 2, leading: 8, bottom: 2, trailing: 8))
         .sheet(isPresented: $isShowingFilters) {
             NavigationView {
-                ConsoleFiltersView(viewModel: viewModel.searchCriteria, isPresented: $isShowingFilters)
+                switch viewModel.mode {
+                case .all:
+                    ConsoleMessageFiltersView(
+                        viewModel: viewModel.searchCriteriaViewModel,
+                        sharedCriteriaViewModel: viewModel.sharedSearchCriteriaViewModel,
+                        isPresented: $isShowingFilters
+                    )
+                case .network:
+                    NetworkFiltersView(
+                        viewModel: viewModel.networkSearchCriteriaViewModel,
+                        sharedCriteriaViewModel: viewModel.sharedSearchCriteriaViewModel,
+                        isPresented: $isShowingFilters
+                    )
+                }
             }
         }
+    }
+
+    @ViewBuilder
+    private var filters: some View {
+        if !viewModel.isNetworkOnly {
+            Button(action: viewModel.toggleMode) {
+                Image(systemName: viewModel.mode == .network ? "paperplane.fill" : "paperplane")
+                    .font(.system(size: 20))
+                    .foregroundColor(.accentColor)
+            }.frame(width: 40, height: 44)
+        }
+        Button(action: { viewModel.isOnlyErrors.toggle() }) {
+            Image(systemName: viewModel.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon")
+                .font(.system(size: 20))
+                .foregroundColor(viewModel.isOnlyErrors ? .red : .accentColor)
+        }.frame(width: 40, height: 44)
+        Button(action: { isShowingFilters = true }) {
+            Image(systemName: viewModel.isDefaultFilters ? "line.horizontal.3.decrease.circle" : "line.3.horizontal.decrease.circle.fill")
+                .font(.system(size: 20))
+                .foregroundColor(.accentColor)
+        }.frame(width: 40, height: 44)
     }
 }
 

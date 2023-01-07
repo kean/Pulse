@@ -9,33 +9,29 @@ import UIKit
 import Pulse
 import SwiftUI
 
-public final class MainViewController: UITabBarController {
-    private let viewModel: MainViewModel
+public final class MainViewController: UIViewController {
+    private let viewModel: ConsoleViewModel
 
     public static var isAutomaticAppearanceOverrideRemovalEnabled = true
 
     public init(store: LoggerStore = .shared, onDismiss: (() -> Void)? = nil) {
-        self.viewModel = MainViewModel(store: store, onDismiss: onDismiss)
+        self.viewModel = ConsoleViewModel(store: store)
+        self.viewModel.onDismiss = onDismiss
         super.init(nibName: nil, bundle: nil)
 
         if MainViewController.isAutomaticAppearanceOverrideRemovalEnabled {
             removeAppearanceOverrides()
         }
+
+        let console = ConsoleView(viewModel: viewModel)
+        let vc = UIHostingController(rootView: NavigationView { console })
+        addChild(vc)
+        view.addSubview(vc.view)
+        vc.view.pinToSuperview()
     }
 
-    required convenience init?(coder: NSCoder) {
-        self.init()
-    }
-
-    public override func viewDidLoad() {
-        super.viewDidLoad()
-
-        viewControllers = viewModel.items.enumerated().map {
-            let item = $0.element
-            let vc = UINavigationController(rootViewController: UIHostingController(rootView: viewModel.makeView(for: item)))
-            vc.tabBarItem = UITabBarItem(title: item.title, image: UIImage(systemName: item.imageName), tag: $0.offset)
-            return vc
-        }
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }
 
