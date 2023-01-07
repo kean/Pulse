@@ -46,11 +46,11 @@ struct ConsoleContextMenu: View {
                     Label("Store Info", systemImage: "info.circle")
                 }
                 if !store.isArchive {
-                    Button(action: { isDocumentBrowserPresented = true }) {
-                        Label("Browse Logs", systemImage: "folder")
-                    }
                     Button(action: { isShowingInsights = true }) {
                         Label("Insights", systemImage: "chart.pie")
+                    }
+                    Button(action: { isDocumentBrowserPresented = true }) {
+                        Label("Browse Logs", systemImage: "folder")
                     }
                 }
                 Button(action: { isShowingSettings = true }) {

@@ -8,7 +8,7 @@ import Combine
 import SwiftUI
 
 #warning("TODO: add mode for messages only (or add context menu to hide network?)")
-#warning("TODO: switch to network filters and share date fiters")
+#warning("TODO: switch to network filters and share date filters")
 
 final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, ObservableObject {
     let title: String
