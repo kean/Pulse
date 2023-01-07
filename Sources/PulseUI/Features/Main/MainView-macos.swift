@@ -140,21 +140,12 @@ private struct MainPanelView: View {
 
     @ViewBuilder
     private var content: some View {
-        if mode.isNetworkOnly {
-            ConsoleTableView(viewModel: viewModel.network.table, onSelected: {
-                viewModel.details.select($0)
-            })
-            .onAppear(perform: viewModel.network.onAppear)
-            .onDisappear(perform: viewModel.network.onDisappear)
-            .background(NavigationTitleUpdater(title: "Requests", viewModel: viewModel.network.table))
-        } else {
-            ConsoleTableView(viewModel: viewModel.console.table, onSelected: {
-                viewModel.details.select($0)
-            })
-            .onAppear(perform: viewModel.console.onAppear)
-            .onDisappear(perform: viewModel.console.onDisappear)
-            .background(NavigationTitleUpdater(title: "Messages", viewModel: viewModel.console.table))
-        }
+        ConsoleTableView(viewModel: viewModel.console.table, onSelected: {
+            viewModel.details.select($0)
+        })
+        .onAppear(perform: viewModel.console.onAppear)
+        .onDisappear(perform: viewModel.console.onDisappear)
+        .background(NavigationTitleUpdater(title: mode.isNetworkOnly ? "Requests" : "Messages", viewModel: viewModel.console.table))
     }
 }
 
@@ -204,9 +195,9 @@ private struct FilterPopoverToolbarButton: View {
     @ViewBuilder
     private var filters: some View {
         if mode.isNetworkOnly {
-            NetworkFiltersView(viewModel: viewModel.network.searchCriteria)
+            NetworkFiltersView(viewModel: viewModel.console.networkSearchCriteriaViewModel, sharedCriteriaViewModel: viewModel.console.sharedSearchCriteriaViewModel)
         } else {
-            ConsoleMessageFiltersView(viewModel: viewModel.console.searchCriteria)
+            ConsoleMessageFiltersView(viewModel: viewModel.console.searchCriteriaViewModel, sharedCriteriaViewModel: viewModel.console.sharedSearchCriteriaViewModel)
         }
     }
 }

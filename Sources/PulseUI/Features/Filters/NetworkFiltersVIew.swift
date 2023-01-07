@@ -485,7 +485,7 @@ struct NetworkFiltersView_Previews: PreviewProvider {
             NetworkFiltersView(viewModel: makeMockViewModel(), sharedCriteriaViewModel: .init(store: .mock), isPresented: .constant(true))
         }
 #else
-        NetworkFiltersView(viewModel: makeMockViewModel())
+        NetworkFiltersView(viewModel: makeMockViewModel(), sharedCriteriaViewModel: .init(store: .mock))
             .previewLayout(.fixed(width: Filters.preferredWidth - 15, height: 940))
 #endif
     }

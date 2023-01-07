@@ -328,7 +328,7 @@ struct ConsoleMessageFiltersView_Previews: PreviewProvider {
             ConsoleMessageFiltersView(viewModel: makeMockViewModel(), sharedCriteriaViewModel: .init(store: .mock), isPresented: .constant(true))
         }
 #else
-        ConsoleMessageFiltersView(viewModel: makeMockViewModel())
+        ConsoleMessageFiltersView(viewModel: makeMockViewModel(), sharedCriteriaViewModel: .init(store: .mock))
             .previewLayout(.fixed(width: Filters.preferredWidth - 15, height: 700))
 #endif
     }

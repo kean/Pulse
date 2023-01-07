@@ -25,13 +25,7 @@ struct ConsoleMessageSearchCriteria: Hashable {
 
     struct DatesFilter: Hashable {
         var isEnabled = true
-        
-#if os(iOS) || os(watchOS) || os(tvOS)
         var isCurrentSessionOnly = true
-#else
-        var isCurrentSessionOnly = false
-#endif
-
         var isStartDateEnabled = false
         var startDate: Date?
         var isEndDateEnabled = false
