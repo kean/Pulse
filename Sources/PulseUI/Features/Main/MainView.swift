@@ -21,9 +21,9 @@ public struct MainView: View {
 #if os(iOS)
         NavigationView {
             ConsoleView(viewModel: viewModel)
-        }
+        }.navigationViewStyle(.stack)
 #else
-        ConsoleView(viewModel: viewModel)
+            ConsoleView(viewModel: viewModel)
 #endif
     }
 }
