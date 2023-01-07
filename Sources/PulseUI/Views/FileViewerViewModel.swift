@@ -82,7 +82,7 @@ final class FileViewerViewModel: ObservableObject {
                 let renderer = TextRendererHTML(html: string)
                 return .other(RichTextViewModel(string: renderer.render(), contentType: "text/html"))
             }
-            return .other(.init(string: string))
+            return .other(.init(string: TextRenderer().preformatted(string)))
         } else {
             let message = "Data \(ByteCountFormatter.string(fromByteCount: Int64(data.count)))"
             return .other(RichTextViewModel(string: message))

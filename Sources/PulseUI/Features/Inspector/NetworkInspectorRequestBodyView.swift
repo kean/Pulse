@@ -27,7 +27,7 @@ struct NetworkInspectorRequestBodyView: View {
                 return title
             }())
         } else if viewModel.task.requestBodySize > 0 {
-            PlaceholderView(imageName: "exclamationmark.circle", title: "Unavailable", subtitle: "The request body was deleted from the store to reduce its size")
+            PlaceholderView(imageName: "exclamationmark.circle", title: "Unavailable", subtitle: "The request body is no longer available")
         } else {
             PlaceholderView(imageName: "nosign", title: "Empty Request")
         }

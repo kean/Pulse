@@ -18,9 +18,9 @@ final class NetworkInspectorViewModel: ObservableObject {
     private(set) var statusSectionViewModel: NetworkRequestStatusSectionViewModel?
     private(set) var progressViewModel: ProgressViewModel?
 
+    private(set) var requestBodyViewModel: NetworkRequestBodyCellViewModel?
     private(set) var originalRequestHeadersViewModel: NetworkHeadersCellViewModel?
     private(set) var originalRequestCookiesViewModel: NetworkCookiesCellViewModel?
-
     private(set) var currentRequestHeadersViewModel: NetworkHeadersCellViewModel?
     private(set) var currentRequestCookiesViewModel: NetworkCookiesCellViewModel?
 
@@ -54,9 +54,9 @@ final class NetworkInspectorViewModel: ObservableObject {
         statusSectionViewModel = NetworkRequestStatusSectionViewModel(task: task)
         progressViewModel = task.state == .pending ? ProgressViewModel(task: task) : nil
 
+        requestBodyViewModel = NetworkRequestBodyCellViewModel(task: task)
         originalRequestHeadersViewModel = NetworkHeadersCellViewModel(title: "Request Headers", headers: originalRequestHeaders)
         originalRequestCookiesViewModel = NetworkCookiesCellViewModel(title: "Request Cookies", headers: originalRequestHeaders, url: url)
-
         currentRequestHeadersViewModel = NetworkHeadersCellViewModel(title: "Request Headers", headers: currentRequestHeaders)
         currentRequestCookiesViewModel = NetworkCookiesCellViewModel(title: "Request Cookies", headers: currentRequestHeaders, url: url)
 

@@ -168,14 +168,7 @@ struct NetworkInspectorView: View {
 
     @ViewBuilder
     private var sectionRequest: some View {
-        NavigationLink(destination: destinationRequestBody) {
-            NetworkMenuCell(
-                icon: "arrow.up.circle.fill",
-                tintColor: .blue,
-                title: "Request Body",
-                details: stringFromByteCount(viewModel.task.requestBodySize)
-            )
-        }.disabled(viewModel.task.requestBodySize <= 0)
+        viewModel.requestBodyViewModel.map(NetworkRequestBodyCell.init)
         if !isShowingCurrentRequest {
             viewModel.originalRequestHeadersViewModel.map(NetworkHeadersCell.init)
             viewModel.originalRequestCookiesViewModel.map(NetworkCookiesCell.init)
@@ -204,7 +197,8 @@ struct NetworkInspectorView: View {
                     }
                 }()
             )
-        }.disabled(viewModel.task.responseBodySize <= 0)
+        }
+        .disabled(viewModel.task.responseBodySize <= 0)
         viewModel.responseHeadersViewModel.map(NetworkHeadersCell.init)
         viewModel.responseCookiesViewModel.map(NetworkCookiesCell.init)
     }
@@ -218,7 +212,7 @@ struct NetworkInspectorView: View {
                 icon: "clock.fill",
                 tintColor: .orange,
                 title: "Metrics",
-                details: stringFromCount(viewModel.task.transactions.count)
+                details: ""
             )
         }.disabled(!viewModel.task.hasMetrics)
 #endif
@@ -275,10 +269,6 @@ struct NetworkInspectorView: View {
 
 #warning("TODO: remove these naviation titles")
 
-    private var destinationRequestBody: some View {
-        NetworkInspectorRequestBodyView(viewModel: NetworkInspectorRequestBodyViewModel(task: viewModel.task))
-    }
-
     private var destinationResponseBody: some View {
         NetworkInspectorResponseBodyView(viewModel: NetworkInspectorResponseBodyViewModel(task: viewModel.task))
     }
@@ -329,17 +319,9 @@ struct NetworkInspectorView: View {
 
 private func stringFromByteCount(_ count: Int64) -> String {
     guard count > 0 else {
-        return "Empty"
+        return ""
     }
     return ByteCountFormatter.string(fromByteCount: count)
-}
-
-@available(*, deprecated, message: "Deprecated")
-private func stringFromCount(_ count: Int?) -> String {
-    guard let count = count, count > 0 else {
-        return "Empty"
-    }
-    return count.description
 }
 
 #if DEBUG
