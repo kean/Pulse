@@ -43,7 +43,6 @@ final class RichTextViewModel: ObservableObject {
         self.init(string: string, contentType: nil)
     }
 
-#warning("TODO: we shouldn't need content type here")
     init(string: NSAttributedString, contentType: NetworkLogger.ContentType?) {
         self.text = string
         self.contentType = contentType
