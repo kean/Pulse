@@ -34,16 +34,17 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         self.store = store
         self.details = ConsoleDetailsRouterViewModel()
 
-        let request = NSFetchRequest<NetworkTaskEntity>(entityName: "\(NetworkTaskEntity.self)")
-        request.fetchBatchSize = 100
-        request.sortDescriptors = [NSSortDescriptor(keyPath: \NetworkTaskEntity.createdAt, ascending: false)]
+//        let request = NSFetchRequest<NetworkTaskEntity>(entityName: "\(NetworkTaskEntity.self)")
+//        request.fetchBatchSize = 100
+//        request.sortDescriptors = [NSSortDescriptor(keyPath: \NetworkTaskEntity.createdAt, ascending: false)]
 
-        self.controller = NSFetchedResultsController<NetworkTaskEntity>(fetchRequest: request, managedObjectContext: store.viewContext, sectionNameKeyPath: nil, cacheName: nil)
+//        self.controller = NSFetchedResultsController<NetworkTaskEntity>(fetchRequest: request, managedObjectContext: store.viewContext, sectionNameKeyPath: nil, cacheName: nil)
 
         self.searchCriteria = NetworkSearchCriteriaViewModel(store: store)
 #if os(iOS) || os(macOS)
         self.table = ConsoleTableViewModel(searchCriteriaViewModel: nil)
 #endif
+        fatalError()
 
         super.init()
 
@@ -95,7 +96,7 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         let sessionId = store === LoggerStore.shared ? LoggerStore.Session.current.id : latestSessionId
 
         // Search messages
-        NetworkSearchCriteria.update(request: controller.fetchRequest, filterTerm: filterTerm, criteria: searchCriteria.criteria, filters: searchCriteria.filters, isOnlyErrors: isOnlyErrors, sessionId: sessionId)
+//        NetworkSearchCriteria.update(request: controller.fetchRequest, filterTerm: filterTerm, criteria: searchCriteria.criteria, filters: searchCriteria.filters, isOnlyErrors: isOnlyErrors, sessionId: sessionId)
         try? controller.performFetch()
 
         self.didRefreshEntities()

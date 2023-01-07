@@ -182,7 +182,7 @@ final class ConsoleSearchFilter: ObservableObject, Hashable, Identifiable {
 extension ConsoleSearchCriteria {
 
     static func update(
-        request: NSFetchRequest<LoggerMessageEntity>,
+        request: NSFetchRequest<NSManagedObject>,
         filterTerm: String,
         criteria: ConsoleSearchCriteria,
         filters: [ConsoleSearchFilter],

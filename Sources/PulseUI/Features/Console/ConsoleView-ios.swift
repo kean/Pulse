@@ -76,6 +76,7 @@ public struct ConsoleView: View {
 }
 
 #warning("TODO: display count somewhere else?")
+#warning("TODO: duplicate modes and filters in the context menu + search")
 
 private struct ConsoleToolbarView: View {
     @ObservedObject var viewModel: ConsoleViewModel
@@ -109,6 +110,11 @@ private struct ConsoleToolbarView: View {
 
     @ViewBuilder
     private var filters: some View {
+        Button(action: viewModel.toggleMode) {
+            Image(systemName: viewModel.mode == .network ? "paperplane.fill" : "paperplane")
+                .font(.system(size: 20))
+                .foregroundColor(.accentColor)
+        }.frame(width: 40, height: 44)
         Button(action: { viewModel.isOnlyErrors.toggle() }) {
             Image(systemName: viewModel.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon")
                 .font(.system(size: 20))

@@ -7,6 +7,7 @@ import CoreData
 import Pulse
 import Combine
 
+#warning("TODO: remoev MainViewModel and ConsoleContainerView")
 #warning("TODO: experiemnt with different navigation styles on macos")
 #warning("TODO: show message details in the details and metadata in main panel")
 #warning("TDO: move search button somewhere else")
