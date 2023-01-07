@@ -161,9 +161,9 @@ final class TextRenderer {
 
     func renderRequestBody(for task: NetworkTaskEntity) -> NSAttributedString {
         if let data = task.requestBody?.data, !data.isEmpty {
-            return renderNetworkTaskBody(data, contentType: task.response?.contentType, error: nil)
+            return render(data, contentType: task.response?.contentType, error: nil)
         } else if task.state == .success, task.type == .uploadTask, task.requestBodySize > 0 {
-            return render("\(ByteCountFormatter.string(fromByteCount: task.requestBodySize))", role: .body2)
+            return _render(dataSize: task.responseBodySize, contentType: task.originalRequest?.contentType)
         } else {
             return render("–", role: .body2)
         }
@@ -171,9 +171,9 @@ final class TextRenderer {
 
     func renderResponseBody(for task: NetworkTaskEntity) -> NSAttributedString {
         if let data = task.responseBody?.data, !data.isEmpty {
-            return renderNetworkTaskBody(data, contentType: task.response?.contentType, error: task.decodingError)
+            return render(data, contentType: task.response?.contentType, error: task.decodingError)
         } else if task.type == .downloadTask, task.responseBodySize > 0 {
-            return render("\(ByteCountFormatter.string(fromByteCount: task.responseBodySize))", role: .body2)
+            return _render(dataSize: task.responseBodySize, contentType: task.response?.contentType)
         } else {
             return render("–", role: .body2)
         }
@@ -183,20 +183,28 @@ final class TextRenderer {
         TextRendererJSON(json: json, error: error, options: options).render()
     }
 
-#warning("TODO: reuse this somehow with FileViewerViewModel")
-    private func renderNetworkTaskBody(_ data: Data, contentType: NetworkLogger.ContentType?, error: NetworkLogger.DecodingError?) -> NSAttributedString {
+    func render(_ data: Data, contentType: NetworkLogger.ContentType?, error: NetworkLogger.DecodingError?) -> NSAttributedString {
         if let json = try? JSONSerialization.jsonObject(with: data, options: []) {
             return render(json: json, error: error)
-        } else if let string = String(data: data, encoding: .utf8) {
+        }
+        if let string = String(data: data, encoding: .utf8) {
             if contentType?.isEncodedForm ?? false, let section = decodeQueryParameters(form: string) {
                 return render(section, style: .monospaced)
             } else if contentType?.isHTML ?? false {
                 return TextRendererHTML(html: string, options: options).render()
             }
-            return render(string, role: .body2, style: .monospaced)
+            return preformatted(string)
         } else {
-            return render("\(ByteCountFormatter.string(fromByteCount: Int64(data.count)))", role: .body2)
+            return _render(dataSize: Int64(data.count), contentType: contentType)
         }
+    }
+
+    private func _render(dataSize: Int64, contentType: NetworkLogger.ContentType?) -> NSAttributedString {
+        let string = [
+            ByteCountFormatter.string(fromByteCount: dataSize),
+            contentType.map { "(\($0.rawValue))" }
+        ].compactMap { $0 }.joined(separator: " ")
+        return render(string, role: .body2)
     }
 
     private func decodeQueryParameters(form string: String) -> KeyValueSectionViewModel? {

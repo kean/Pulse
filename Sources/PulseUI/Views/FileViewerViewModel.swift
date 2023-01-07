@@ -47,6 +47,7 @@ final class FileViewerViewModel: ObservableObject {
 #endif
     }
 
+#warning("TODO: fix this (doesnt work well on macOS)")
     func render() {
 #if os(macOS)
         let data = self.data
@@ -66,26 +67,13 @@ final class FileViewerViewModel: ObservableObject {
     }
 
     private func render(data: Data) -> Contents {
-        if let json = try? JSONSerialization.jsonObject(with: data, options: []) {
-            let string = TextRenderer().render(json: json, error: context.error)
-            return .json(RichTextViewModel(string: string, contentType: "application/json"))
-        } else if let image = UXImage(data: data) {
+        if contentType?.isImage ?? false, let image = UXImage(data: data) {
             return .image(ImagePreviewViewModel(image: image, data: data, context: context))
-        } else if let pdf = makePDF(data: data) {
+        } else if contentType?.isPDF ?? false, let pdf = makePDF(data: data) {
             return pdf
-        } else if data.isEmpty {
-            return .other(.init(string: "Unavailable"))
-        } else if let string = String(data: data, encoding: .utf8) {
-            if contentType?.isEncodedForm ?? false, let components = decodeQueryParameters(form: string) {
-                return .other(RichTextViewModel(string: TextRenderer().render(components, style: .monospaced)))
-            } else if contentType?.isHTML ?? false {
-                let renderer = TextRendererHTML(html: string)
-                return .other(RichTextViewModel(string: renderer.render(), contentType: "text/html"))
-            }
-            return .other(.init(string: TextRenderer().preformatted(string)))
         } else {
-            let message = "Data \(ByteCountFormatter.string(fromByteCount: Int64(data.count)))"
-            return .other(RichTextViewModel(string: message))
+            let string = TextRenderer().render(data, contentType: contentType, error: context.error)
+            return .other(RichTextViewModel(string: string, contentType: contentType))
         }
     }
 
@@ -96,23 +84,5 @@ final class FileViewerViewModel: ObservableObject {
         }
 #endif
         return nil
-    }
-
-    @available(*, deprecated, message: "Deprecated")
-    private func decodeQueryParameters(form string: String) -> KeyValueSectionViewModel? {
-        let string = "https://placeholder.com/path?" + string
-        guard let components = URLComponents(string: string),
-              let queryItems = components.queryItems,
-              !queryItems.isEmpty else {
-            return nil
-        }
-        return KeyValueSectionViewModel.makeQueryItems(for: queryItems)
-    }
-}
-
-@available(*, deprecated, message: "Deprecated")
-private extension Data {
-    var localizedSize: String {
-        ByteCountFormatter.string(fromByteCount: Int64(count))
     }
 }

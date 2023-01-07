@@ -476,7 +476,8 @@ extension NetworkLogger {
             self = ContentType(rawValue: value) ?? .any
         }
 
-        public var isJSON: Bool { type.contains("/json") }
+        public var isJSON: Bool { type.contains("json") }
+        public var isPDF: Bool { type.contains("pdf") }
         public var isImage: Bool { type.hasPrefix("image/") }
         public var isHTML: Bool { type.contains("html") }
         public var isEncodedForm: Bool { type == "application/x-www-form-urlencoded" }
