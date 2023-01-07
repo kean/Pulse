@@ -2,8 +2,6 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
-#warning("TODO: improve PDF export: expand network (?); use monochrome; use larger fonts")
-
 import Foundation
 
 #if os(iOS)
@@ -47,6 +45,12 @@ enum TextUtilities {
     /// Renders the given attributed string as PDF
 #if os(iOS)
     static func pdf(from string: NSAttributedString) throws -> Data {
+        let string = NSMutableAttributedString(attributedString: string)
+        string.enumerateAttribute(.font, in: NSRange(location: 0, length: string.length)) { font, range, _ in
+            guard let font = font as? UXFont else { return }
+            let scaledFont = UXFont(descriptor: font.fontDescriptor, size: (font.pointSize * 0.7).rounded())
+            string.addAttribute(.font, value: scaledFont, range: range)
+        }
         let formatter = UISimpleTextPrintFormatter(attributedText: string)
         let renderer = UIPrintPageRenderer()
         renderer.addPrintFormatter(formatter, startingAtPageAt: 0)
