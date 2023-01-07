@@ -32,7 +32,7 @@ final class MainViewModel: ObservableObject {
     init(store: LoggerStore, onDismiss: (() -> Void)?) {
         self.store = store
 
-        self.console = ConsoleViewModel(store: store)
+        self.console = ConsoleViewModel(store: store, mode: .network)
         self.console.onDismiss = onDismiss
 
 #if !os(watchOS)

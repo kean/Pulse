@@ -9,6 +9,7 @@ import Pulse
 
 struct NetworkFiltersView: View {
     @ObservedObject var viewModel: ConsoleNetworkSearchCriteriaViewModel
+    @ObservedObject var sharedCriteriaViewModel: ConsoleSharedSearchCriteriaViewModel
 
 #if os(iOS)
 
@@ -79,14 +80,16 @@ extension NetworkFiltersView {
         if #available(iOS 14, *) {
             durationGroup
         }
-        timePeriodGroup
         domainsGroup
         networkingGroup
+        ConsoleSharedFiltersView(viewModel: sharedCriteriaViewModel)
     }
 
     var buttonReset: some View {
-        Button("Reset") { viewModel.resetAll() }
-            .disabled(!viewModel.isButtonResetEnabled)
+        Button("Reset") {
+            viewModel.resetAll()
+            sharedCriteriaViewModel.resetAll()
+        }.disabled(!(viewModel.isButtonResetEnabled || sharedCriteriaViewModel.isButtonResetEnabled))
     }
 }
 
@@ -269,49 +272,6 @@ extension NetworkFiltersView {
 
 #endif
 }
-
-// MARK: - NetworkFiltersView (Time Period)
-
-extension NetworkFiltersView {
-    var timePeriodGroup: some View {
-        FiltersSection(
-            isExpanded: $isTimePeriodExpanded,
-            header: { timePeriodGroupHeader },
-            content: { timePeriodGroupContent }
-        )
-    }
-
-    private var timePeriodGroupHeader: some View {
-        FilterSectionHeader(
-            icon: "calendar", title: "Time Period",
-            color: .yellow,
-            reset: { viewModel.dates = .default },
-            isDefault: viewModel.dates == .default,
-            isEnabled: $viewModel.dates.isEnabled
-        )
-    }
-
-    @ViewBuilder
-    private var timePeriodGroupContent: some View {
-        Filters.toggle("Latest Session", isOn: $viewModel.dates.isCurrentSessionOnly)
-
-        DateRangePicker(title: "Start Date", date: viewModel.bindingStartDate, isEnabled: $viewModel.dates.isStartDateEnabled)
-        DateRangePicker(title: "End Date", date: viewModel.bindingEndDate, isEnabled: $viewModel.dates.isEndDateEnabled)
-
-        HStack(spacing: 16) {
-            Button("Recent") { viewModel.dates = .recent }
-            Button("Today") { viewModel.dates = .today }
-            Spacer()
-        }
-#if os(iOS)
-        .foregroundColor(.accentColor)
-        .buttonStyle(.plain)
-#elseif os(macOS)
-        .padding(.top, 6)
-#endif
-    }
-}
-
 
 // MARK: - NetworkFiltersView (Duration)
 
@@ -522,7 +482,7 @@ struct NetworkFiltersView_Previews: PreviewProvider {
     static var previews: some View {
 #if os(iOS)
         NavigationView {
-            NetworkFiltersView(viewModel: makeMockViewModel(), isPresented: .constant(true))
+            NetworkFiltersView(viewModel: makeMockViewModel(), sharedCriteriaViewModel: .init(store: .mock), isPresented: .constant(true))
         }
 #else
         NetworkFiltersView(viewModel: makeMockViewModel())
@@ -532,7 +492,7 @@ struct NetworkFiltersView_Previews: PreviewProvider {
 }
 
 private func makeMockViewModel() -> ConsoleNetworkSearchCriteriaViewModel {
-    ConsoleNetworkSearchCriteriaViewModel(store: .mock, dates: .constant(.default))
+    ConsoleNetworkSearchCriteriaViewModel(store: .mock)
 
 }
 #endif

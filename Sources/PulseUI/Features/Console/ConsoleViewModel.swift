@@ -25,13 +25,14 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     let details: ConsoleDetailsRouterViewModel
 
     // Search criteria
+    let sharedSearchCriteriaViewModel: ConsoleSharedSearchCriteriaViewModel
     let searchCriteriaViewModel: ConsoleMessageSearchCriteriaViewModel
     let networkSearchCriteriaViewModel: ConsoleNetworkSearchCriteriaViewModel
 
     var isDefaultFilters: Bool {
         switch mode {
-        case .all: return searchCriteriaViewModel.isDefaultSearchCriteria
-        case .network: return networkSearchCriteriaViewModel.isDefaultSearchCriteria
+        case .all: return searchCriteriaViewModel.isDefaultSearchCriteria && sharedSearchCriteriaViewModel.isDefaultSearchCriteria
+        case .network: return networkSearchCriteriaViewModel.isDefaultSearchCriteria && sharedSearchCriteriaViewModel.isDefaultSearchCriteria
         }
     }
 
@@ -53,9 +54,10 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         self.mode = mode
 
         self.details = ConsoleDetailsRouterViewModel()
-        let searchCriteriaViewModel = ConsoleMessageSearchCriteriaViewModel(store: store)
-        self.searchCriteriaViewModel = searchCriteriaViewModel
-        self.networkSearchCriteriaViewModel = ConsoleNetworkSearchCriteriaViewModel(store: store, dates: Binding(get: { searchCriteriaViewModel.criteria.dates }, set: { searchCriteriaViewModel.criteria.dates = $0 }))
+
+        self.sharedSearchCriteriaViewModel = ConsoleSharedSearchCriteriaViewModel(store: store)
+        self.searchCriteriaViewModel = ConsoleMessageSearchCriteriaViewModel(store: store)
+        self.networkSearchCriteriaViewModel = ConsoleNetworkSearchCriteriaViewModel(store: store)
 
 #if os(iOS) || os(macOS)
         self.table = ConsoleTableViewModel(searchCriteriaViewModel: searchCriteriaViewModel)
@@ -140,7 +142,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
             ConsoleMessageSearchCriteria.update(request: controller.fetchRequest, filterTerm: filterTerm, criteria: viewModel.criteria, filters: viewModel.filters, sessionId: sessionId, isOnlyErrors: isOnlyErrors, isOnlyNetwork: isOnlyNetwork)
         case .network:
             let viewModel = networkSearchCriteriaViewModel
-            NetworkSearchCriteria.update(request: controller.fetchRequest, filterTerm: filterTerm, dates: viewModel.dates, criteria: viewModel.criteria, filters: viewModel.filters, isOnlyErrors: isOnlyErrors, sessionId: sessionId)
+            NetworkSearchCriteria.update(request: controller.fetchRequest, filterTerm: filterTerm, dates: sharedSearchCriteriaViewModel.dates, criteria: viewModel.criteria, filters: viewModel.filters, isOnlyErrors: isOnlyErrors, sessionId: sessionId)
             break
         }
         try? controller.performFetch()

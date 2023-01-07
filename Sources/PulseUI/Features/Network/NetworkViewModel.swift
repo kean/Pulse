@@ -39,8 +39,8 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         request.sortDescriptors = [NSSortDescriptor(keyPath: \NetworkTaskEntity.createdAt, ascending: false)]
 
         self.controller = NSFetchedResultsController<NetworkTaskEntity>(fetchRequest: request, managedObjectContext: store.viewContext, sectionNameKeyPath: nil, cacheName: nil)
-
-        self.searchCriteria = ConsoleNetworkSearchCriteriaViewModel(store: store, dates: .constant(.default))
+        
+        self.searchCriteria = ConsoleNetworkSearchCriteriaViewModel(store: store)
 #if os(iOS) || os(macOS)
         self.table = ConsoleTableViewModel(searchCriteriaViewModel: nil)
 #endif

@@ -27,7 +27,7 @@ public struct ConsoleView: View {
             .onAppear(perform: viewModel.onAppear)
             .onDisappear(perform: viewModel.onDisappear)
             .edgesIgnoringSafeArea(.bottom)
-            .navigationBarTitle(Text("Console"))
+            .backport.navigationTitle("Console")
             .navigationBarItems(
                 leading: viewModel.onDismiss.map {
                     Button(action: $0) { Image(systemName: "xmark") }
@@ -105,9 +105,17 @@ private struct ConsoleToolbarView: View {
             NavigationView {
                 switch viewModel.mode {
                 case .all:
-                    ConsoleMessageFiltersView(viewModel: viewModel.searchCriteriaViewModel, isPresented: $isShowingFilters)
+                    ConsoleMessageFiltersView(
+                        viewModel: viewModel.searchCriteriaViewModel,
+                        sharedCriteriaViewModel: viewModel.sharedSearchCriteriaViewModel,
+                        isPresented: $isShowingFilters
+                    )
                 case .network:
-                    NetworkFiltersView(viewModel: viewModel.networkSearchCriteriaViewModel, isPresented: $isShowingFilters)
+                    NetworkFiltersView(
+                        viewModel: viewModel.networkSearchCriteriaViewModel,
+                        sharedCriteriaViewModel: viewModel.sharedSearchCriteriaViewModel,
+                        isPresented: $isShowingFilters
+                    )
                 }
             }
         }

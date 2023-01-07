@@ -11,7 +11,6 @@ import SwiftUI
 #if os(iOS) || os(macOS) || os(tvOS)
 
 final class ConsoleNetworkSearchCriteriaViewModel: ObservableObject {
-    @Binding var dates: ConsoleMessageSearchCriteria.DatesFilter
     @Published var criteria: NetworkSearchCriteria = .default
     private(set) var defaultCriteria: NetworkSearchCriteria = .default
     @Published var filters: [NetworkSearchFilter] = []
@@ -27,19 +26,10 @@ final class ConsoleNetworkSearchCriteriaViewModel: ObservableObject {
         criteria == defaultCriteria && (filters.count == 0 || (filters.count == 1 && filters == NetworkSearchFilter.defaultFilters))
     }
 
-    var isDefaultDatesFilter: Bool {
-        var defaultFilter = ConsoleMessageSearchCriteria.DatesFilter.default
-        defaultFilter.isCurrentSessionOnly = isCurrentStore
-        return dates == defaultFilter
-    }
-
     private var cancellables: [AnyCancellable] = []
-    private let isCurrentStore: Bool
 
-    init(store: LoggerStore, dates: Binding<ConsoleMessageSearchCriteria.DatesFilter>) {
-        _dates = dates
+    init(store: LoggerStore) {
         domains = ManagedObjectsObserver(context: store.viewContext, sortDescriptior: NSSortDescriptor(keyPath: \NetworkDomainEntity.count, ascending: false))
-        isCurrentStore = store === LoggerStore.shared // TODO: refactor
 
         domains.$objects.sink { [weak self] in
             self?.allDomains = $0.map(\.value)
@@ -118,24 +108,6 @@ final class ConsoleNetworkSearchCriteriaViewModel: ObservableObject {
     }
 
     // MARK: Bindings
-
-    var bindingStartDate: Binding<Date> {
-        Binding(get: {
-            self.dates.startDate ?? Date().addingTimeInterval(-3600)
-        }, set: { newValue in
-            self.dates.isStartDateEnabled = true
-            self.dates.startDate = newValue
-        })
-    }
-
-    var bindingEndDate: Binding<Date> {
-        Binding(get: {
-            self.dates.endDate ?? Date()
-        }, set: { newValue in
-            self.dates.isEndDateEnabled = true
-            self.dates.endDate = newValue
-        })
-    }
 
     func binding(forDomain domain: String) -> Binding<Bool> {
         Binding(get: {

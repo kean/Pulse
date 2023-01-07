@@ -9,12 +9,12 @@ import Pulse
 
 struct ConsoleMessageFiltersView: View {
     @ObservedObject var viewModel: ConsoleMessageSearchCriteriaViewModel
+    @ObservedObject var sharedCriteriaViewModel: ConsoleSharedSearchCriteriaViewModel
 
 #if os(iOS)
     @State var isGeneralSectionExpanded = true
     @State var isLevelsSectionExpanded = true
     @State var isLabelsSectionExpanded = false
-    @State var isTimePeriodSectionExpanded = true
 
     @State var isAllLabelsShown = false
 
@@ -33,7 +33,6 @@ struct ConsoleMessageFiltersView: View {
     @AppStorage("networkFilterIsParametersExpanded") var isGeneralSectionExpanded = true
     @AppStorage("consoleFiltersIsLevelsSectionExpanded") var isLevelsSectionExpanded = true
     @AppStorage("consoleFiltersIsLabelsExpanded") var isLabelsSectionExpanded = false
-    @AppStorage("consoleFiltersIsTimePeriodExpanded") var isTimePeriodSectionExpanded = true
 
     var body: some View {
         ScrollView {
@@ -66,13 +65,14 @@ extension ConsoleMessageFiltersView {
         }
         logLevelsSection
         labelsSection
-        timePeriodSection
+        ConsoleSharedFiltersView(viewModel: sharedCriteriaViewModel)
     }
 
     var buttonReset: some View {
-        Button("Reset") { viewModel.resetAll() }
-            .disabled(!viewModel.isButtonResetEnabled)
-
+        Button("Reset") {
+            viewModel.resetAll()
+            sharedCriteriaViewModel.resetAll()
+        }.disabled(!(viewModel.isButtonResetEnabled || sharedCriteriaViewModel.isButtonResetEnabled))
     }
 }
 
@@ -276,8 +276,12 @@ extension ConsoleMessageFiltersView {
 
 // MARK: - ConsoleMessageFiltersView (Time Period)
 
-extension ConsoleMessageFiltersView {
-    var timePeriodSection: some View {
+struct ConsoleSharedFiltersView: View {
+    @ObservedObject var viewModel: ConsoleSharedSearchCriteriaViewModel
+
+    @State var isTimePeriodSectionExpanded = true
+
+    var body: some View {
         FiltersSection(
             isExpanded: $isTimePeriodSectionExpanded,
             header: { timePeriodHeader },
@@ -289,22 +293,22 @@ extension ConsoleMessageFiltersView {
         FilterSectionHeader(
             icon: "calendar", title: "Time Period",
             color: .yellow,
-            reset: { viewModel.criteria.dates = .default },
-            isDefault: viewModel.criteria.dates == .default,
-            isEnabled: $viewModel.criteria.dates.isEnabled
+            reset: { viewModel.dates = .default },
+            isDefault: viewModel.dates == .default,
+            isEnabled: $viewModel.dates.isEnabled
         )
     }
 
     @ViewBuilder
     private var timePeriodContent: some View {
-        Filters.toggle("Latest Session", isOn: $viewModel.criteria.dates.isCurrentSessionOnly)
+        Filters.toggle("Latest Session", isOn: $viewModel.dates.isCurrentSessionOnly)
 
-        DateRangePicker(title: "Start Date", date: viewModel.bindingStartDate, isEnabled: $viewModel.criteria.dates.isStartDateEnabled)
-        DateRangePicker(title: "End Date", date: viewModel.bindingEndDate, isEnabled: $viewModel.criteria.dates.isEndDateEnabled)
+        DateRangePicker(title: "Start Date", date: viewModel.bindingStartDate, isEnabled: $viewModel.dates.isStartDateEnabled)
+        DateRangePicker(title: "End Date", date: viewModel.bindingEndDate, isEnabled: $viewModel.dates.isEndDateEnabled)
 
         HStack(spacing: 16) {
-            Button("Recent") { viewModel.criteria.dates = .recent }
-            Button("Today") { viewModel.criteria.dates = .today }
+            Button("Recent") { viewModel.dates = .recent }
+            Button("Today") { viewModel.dates = .today }
             Spacer()
         }
 #if os(iOS)
@@ -321,7 +325,7 @@ struct ConsoleMessageFiltersView_Previews: PreviewProvider {
     static var previews: some View {
 #if os(iOS)
         NavigationView {
-            ConsoleMessageFiltersView(viewModel: makeMockViewModel(), isPresented: .constant(true))
+            ConsoleMessageFiltersView(viewModel: makeMockViewModel(), sharedCriteriaViewModel: .init(store: .mock), isPresented: .constant(true))
         }
 #else
         ConsoleMessageFiltersView(viewModel: makeMockViewModel())
