@@ -288,7 +288,7 @@ final class TextRenderer {
         renderer.prepare(forDrawingPages: NSMakeRange(0, renderer.numberOfPages))
 
         let bounds = UIGraphicsGetPDFContextBounds()
-        for i in 0  ..< renderer.numberOfPages {
+        for i in 0  ..< renderer.numberOfPages  {
             UIGraphicsBeginPDFPage()
             renderer.drawPage(at: i, in: bounds)
         }

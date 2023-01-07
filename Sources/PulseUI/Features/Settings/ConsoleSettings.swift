@@ -29,7 +29,7 @@ final class ConsoleTextViewSettings: PersistentSettings {
     var colorMode = TextRenderer.ColorMode.automatic
 
     @UserDefault("console-text-view__link-detection")
-    var isLinkDetectionEnabled = true
+    var isLinkDetectionEnabled = false
 
     @UserDefault("console-text-view__request-headers")
     var showsRequestHeaders = false
