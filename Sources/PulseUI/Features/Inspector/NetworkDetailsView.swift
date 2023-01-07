@@ -5,7 +5,7 @@
 import SwiftUI
 import Pulse
 
-#warning("TODO: cant we just use RichTextView or file/content viewer?")
+#warning("TODO: can't we just use RichTextView or file/content viewer?")
 @available(*, deprecated, message: "Deprecated")
 struct NetworkDetailsView: View {
     private var title: String

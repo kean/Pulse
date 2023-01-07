@@ -28,7 +28,7 @@ import Combine
 
 #warning("TODO: test everything with Self._printChanges() for performance")
 
-#warning("TODO: render request body sring monospaced")
+#warning("TODO: render request body string monospaced")
 
 struct NetworkInspectorView: View {
 #if os(watchOS)
@@ -75,7 +75,7 @@ struct NetworkInspectorView: View {
 #if os(macOS)
         List { _contents }
 #else
-        Form { _contents } // Cant't figure out how to disable collapsible sections
+        Form { _contents } // Can't figure out how to disable collapsible sections
 #endif
     }
 
@@ -266,11 +266,11 @@ struct NetworkInspectorView: View {
     // MARK: - Helpers
 
     #warning("TODO: rewrite transaction details page on all platforms")
-    #warning("TODO: instaed of NetworkInspectorTransactionsListView, use MenuItem + proper style of macOS")
+    #warning("TODO: instead of NetworkInspectorTransactionsListView, use MenuItem + proper style of macOS")
     #warning("TODO: if there is only one operation, show it there? or remove NetworkLoad view entirely?")
-    #warning("TOOD: rewrite NetworkTransactionDetailsView? show one-two columns based on size + rewrite without KeyValueView")
+    #warning("TODO: rewrite NetworkTransactionDetailsView? show one-two columns based on size + rewrite without KeyValueView")
     #warning("TODO: macOS use pro version of the text viewer")
-    #warning("TODO: macos remvoe hor/vert switch")
+    #warning("TODO: macos remove hor/vert switch")
 
 #if os(iOS)
     @ViewBuilder

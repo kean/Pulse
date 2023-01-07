@@ -8,7 +8,7 @@ import Pulse
 #warning("TODO: display name of operation somewhere")
 #warning("TODO: dont show empty sections (headers/cookies) - not enough space here")
 #warning("TODO: different icons for headers and cookies")
-#warning("TODO: fix background highligt on clicking on cell e.g. response")
+#warning("TODO: fix background highlight on clicking on cell e.g. response")
 
 #if os(iOS) || os(macOS) || os(tvOS)
 

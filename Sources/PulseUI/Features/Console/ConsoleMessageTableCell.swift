@@ -98,7 +98,7 @@ final class ConsoleMessageTableCell: UITableViewCell, UIContextMenuInteractionDe
 final class ConsoleMessageAccessoryView: UIView {
     let textLabel = UILabel()
 
-    #warning("TODO: udpate font")
+    #warning("TODO: update font")
     private static var chevron = UIImage.make(systemName: "chevron.right", textStyle: .caption1)
         .imageFlippedForRightToLeftLayoutDirection()
 

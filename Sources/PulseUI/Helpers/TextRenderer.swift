@@ -265,7 +265,7 @@ final class TextRenderer {
         return html.data(using: .utf8) ?? data
     }
 
-    /// Renderes the given attributed string as PDF
+    /// Renders the given attributed string as PDF
 #if os(iOS)
     static func pdf(from string: NSAttributedString) throws -> Data {
         let formatter = UISimpleTextPrintFormatter(attributedText: string)

@@ -8,6 +8,8 @@ import Pulse
 import Combine
 
 #warning("TODO: handle clicks on decoding error on other platforms")
+#warning("TODO: link detection disable by default")
+#warning("TODO: optimize performance")
 
 #if os(macOS) || os(iOS)
 

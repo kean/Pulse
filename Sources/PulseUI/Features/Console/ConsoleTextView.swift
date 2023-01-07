@@ -249,7 +249,7 @@ final class ConsoleTextViewModel: ObservableObject {
     }
 
     private func expand(_ objectID: NSManagedObjectID) {
-        // TODO: both searchs are O(N) which isn't great
+        // TODO: both searches are O(N) which isn't great
         guard let task = findTask(withObjectID: objectID) else {
             return
         }

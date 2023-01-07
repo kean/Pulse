@@ -95,7 +95,7 @@ extension NetworkLogger {
                 self.domain = error.domain
             }
             self.underlyingError = UnderlyingError(error)
-            // NetworkLogger.DecodingError has a custom descrption
+            // NetworkLogger.DecodingError has a custom description
             if let error = underlyingError?.error {
                 self.debugDescription = (error as NSError).debugDescription
             } else {
