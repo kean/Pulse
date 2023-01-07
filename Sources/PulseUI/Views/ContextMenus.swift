@@ -22,25 +22,12 @@ struct ButtonCopyMessage: View {
     }
 }
 
-#warning("TODO: add share request")
-#warning("TODO: fix sharing responseBody (share text)?")
-
 struct NetworkMessageContextMenu: View {
     let task: NetworkTaskEntity
 
     @Binding private(set) var sharedItems: ShareItems?
 
     var body: some View {
-        Section {
-            if task.responseBodySize > 0 {
-                Button(action: {
-                    sharedItems = ShareItems([task.responseBody?.data ?? Data()])
-                }) {
-                    Text("Share Response")
-                    Image(systemName: "square.and.arrow.up")
-                }
-            }
-        }
         NetworkMessageContextMenuCopySection(task: task)
         if let message = task.message {
             PinButton(viewModel: .init(message: message))
@@ -53,40 +40,54 @@ struct NetworkMessageContextMenuCopySection: View {
 
     var body: some View {
         Section {
-            if let url = task.url {
-                Button(action: {
-                    UXPasteboard.general.string = url
-                    runHapticFeedback()
-                }) {
-                    Text("Copy URL")
-                    Image(systemName: "doc.on.doc")
-                }
-            }
-            if let host = task.host?.value {
-                Button(action: {
-                    UXPasteboard.general.string = host
-                    runHapticFeedback()
-                }) {
-                    Text("Copy Host")
-                    Image(systemName: "doc.on.doc")
-                }
-            }
-            if task.responseBodySize > 0 {
-                Button(action: {
-                    guard let data = task.responseBody?.data else { return }
-                    UXPasteboard.general.string = String(data: data, encoding: .utf8)
-                    runHapticFeedback()
-                }) {
-                    Text("Copy Response")
-                    Image(systemName: "doc.on.doc")
-                }
+            if #available(iOS 14.0, *) {
+                Menu(content: {
+                    if let url = task.url {
+                        Button(action: {
+                            UXPasteboard.general.string = url
+                            runHapticFeedback()
+                        }) {
+                            Text("Copy URL")
+                            Image(systemName: "doc.on.doc")
+                        }
+                    }
+                    if let host = task.host?.value {
+                        Button(action: {
+                            UXPasteboard.general.string = host
+                            runHapticFeedback()
+                        }) {
+                            Text("Copy Host")
+                            Image(systemName: "doc.on.doc")
+                        }
+                    }
+                    if task.requestBodySize > 0 {
+                        Button(action: {
+                            guard let data = task.requestBody?.data else { return }
+                            UXPasteboard.general.string = String(data: data, encoding: .utf8)
+                            runHapticFeedback()
+                        }) {
+                            Text("Copy Request")
+                            Image(systemName: "arrow.up.circle")
+                        }
+                    }
+                    if task.responseBodySize > 0 {
+                        Button(action: {
+                            guard let data = task.responseBody?.data else { return }
+                            UXPasteboard.general.string = String(data: data, encoding: .utf8)
+                            runHapticFeedback()
+                        }) {
+                            Text("Copy Response")
+                            Image(systemName: "arrow.down.circle")
+                        }
+                    }
+                }, label: {
+                    Label("Copy...", systemImage: "doc.on.doc")
+                })
             }
         }
     }
 }
 #endif
-
-#warning("TODO: combine into one section + allow filering")
 
 #if os(iOS) || os(macOS)
 @available(iOS 14, *)
