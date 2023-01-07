@@ -51,6 +51,7 @@ struct TextView: View {
 }
 #endif
 
+#if os(iOS) || os(macOS) || os(tvOS)
 private func configureTextView(_ textView: UXTextView) {
     textView.isSelectable = true
     textView.backgroundColor = .clear
@@ -71,4 +72,4 @@ private func configureTextView(_ textView: UXTextView) {
     textView.textContainerInset = .zero
 #endif
 }
-
+#endif
