@@ -7,7 +7,6 @@ import CoreData
 import Pulse
 import Combine
 
-#warning("TODO: add other sharing options, e.g. as HTML/PDF + print")
 #warning("TODO: handle clicks on decoding error on other platforms")
 
 #if os(macOS) || os(iOS)
@@ -151,6 +150,7 @@ struct _RichTextView: View {
                 }, label: {
                     Label("Share As", systemImage: "square.and.arrow.up")
                 })
+                // TODO: This should be injected/added outside of the text view
                 if viewModel.contentType?.isHTML ?? false {
                     Menu(content: {
                         Section {
