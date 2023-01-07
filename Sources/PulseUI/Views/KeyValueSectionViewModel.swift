@@ -71,7 +71,10 @@ extension KeyValueSectionViewModel {
         KeyValueSectionViewModel(
             title: title,
             color: .red,
-            items: (headers ?? [:]).sorted { $0.key < $1.key }
+            items: (headers ?? [:]).sorted {
+                // Display cookies last because they typically take too much space
+                $1.key.lowercased().contains("cookies") || $0.key < $1.key
+            }
         )
     }
 
