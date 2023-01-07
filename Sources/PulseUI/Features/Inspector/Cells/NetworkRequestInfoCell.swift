@@ -38,10 +38,10 @@ final class NetworkRequestInfoCellViewModel {
         }
     }
 
-    init(request: NetworkRequestEntity) {
-        self.httpMethod = request.httpMethod ?? "GET"
-        self.url = request.url ?? "–"
-        self.render = { makeDetails(for: request) }
+    init(transaction: NetworkTransactionMetricsEntity) {
+        self.httpMethod = transaction.request.httpMethod ?? "GET"
+        self.url = transaction.request.url ?? "–"
+        self.render = { TextRenderer(options: .sharing).render(transaction) }
     }
 }
 

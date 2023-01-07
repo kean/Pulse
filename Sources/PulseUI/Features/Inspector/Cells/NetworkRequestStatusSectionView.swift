@@ -42,7 +42,7 @@ final class NetworkRequestStatusSectionViewModel {
     init(transaction: NetworkTransactionMetricsEntity) {
         self.status = .init(transaction: transaction)
         self.errorDescription = nil
-        self.requestViewModel = NetworkRequestInfoCellViewModel(request: transaction.request)
+        self.requestViewModel = NetworkRequestInfoCellViewModel(transaction: transaction)
         self.errorDetailsViewModel = nil
 
     }
