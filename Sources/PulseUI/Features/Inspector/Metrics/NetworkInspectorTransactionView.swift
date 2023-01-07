@@ -23,9 +23,7 @@ struct NetworkInspectorTransactionView: View {
                     .padding(.vertical, 8)
             }
             NetworkHeadersCell(viewModel: viewModel.requestHeadersViewModel)
-            NetworkCookiesCell(viewModel: viewModel.responseCookiesViewModel)
             NetworkHeadersCell(viewModel: viewModel.responseHeadersViewModel)
-            NetworkCookiesCell(viewModel: viewModel.responseCookiesViewModel)
             NavigationLink(destination: destinationTiming) {
                 NetworkMenuCell(icon: "clock", tintColor: .orange, title: "Timing Info")
             }
@@ -44,9 +42,7 @@ final class NetworkInspectorTransactionViewModel: ObservableObject {
     let statusSectionViewModel: NetworkRequestStatusSectionViewModel
     let timingViewModel: TimingViewModel?
     let requestHeadersViewModel: NetworkHeadersCellViewModel
-    let requestCookiesViewModel: NetworkCookiesCellViewModel
     let responseHeadersViewModel: NetworkHeadersCellViewModel
-    let responseCookiesViewModel: NetworkCookiesCellViewModel
     lazy var timingSummary = KeyValueSectionViewModel.makeTiming(for: transaction)
 
     @Published var isOriginalRequestHeadersLinkActive = false
@@ -65,9 +61,7 @@ final class NetworkInspectorTransactionViewModel: ObservableObject {
         self.details = NetworkMetricsDetailsViewModel(metrics: transaction)
         self.timingViewModel = TimingViewModel(transaction: transaction, task: task)
         self.requestHeadersViewModel = NetworkHeadersCellViewModel(title: "Request Headers", headers: transaction.request.headers)
-        self.requestCookiesViewModel = NetworkCookiesCellViewModel(title: "Request Cookies", headers: transaction.request.headers, url: url)
         self.responseHeadersViewModel = NetworkHeadersCellViewModel(title: "Response Headers", headers: transaction.response?.headers)
-        self.responseCookiesViewModel = NetworkCookiesCellViewModel(title: "Response Cookies", headers: transaction.response?.headers, url: url)
 
         if transaction.fetchType == .networkLoad {
             self.transferSizeViewModel = NetworkInspectorTransferInfoViewModel(transferSize: transaction.transferSize, isUpload: false)
