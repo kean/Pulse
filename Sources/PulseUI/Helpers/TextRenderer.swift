@@ -70,23 +70,50 @@ final class TextRenderer {
     func render(_ task: NetworkTaskEntity, content: NetworkContent) -> NSAttributedString {
         var components: [NSAttributedString] = []
 
-        if content.contains(.header) {
-            let isTitleColored = task.state == .failure && options.color != .monochrome
-            let titleColor = isTitleColored ? UXColor.systemRed : UXColor.secondaryLabel
-            let detailsColor = isTitleColored ? UXColor.systemRed : UXColor.label
+        let isTitleColored = task.state == .failure && options.color != .monochrome
+        let titleColor = isTitleColored ? UXColor.systemRed : UXColor.secondaryLabel
+        let detailsColor = isTitleColored ? UXColor.systemRed : UXColor.label
 
-            let title = ConsoleFormatter.subheadline(for: task)
+        if content.contains(.largeHeader) {
             let header = NSMutableAttributedString()
-            header.append(title + "\n", helper.attributes(role: .subheadline, style: .monospacedDigital, width: .condensed, color: titleColor))
-            header.append((task.url ?? "–") + "\n", helper.attributes(role: .body2, weight: .medium, color: detailsColor))
+            let status = NetworkRequestStatusCellModel(task: task)
+            let method = task.httpMethod ?? "GET"
+            header.append(render(status.title + "\n", role: .title, weight: .semibold, color: status.uiTintColor))
+            header.append(self.spacer())
+            var urlAttributes = helper.attributes(role: .body2, weight: .regular)
+            urlAttributes[.underlineColor] = UXColor.clear
+            header.append(method + "\n", helper.attributes(role: .body, weight: .semibold))
+            header.append((task.url ?? "–") + "\n", urlAttributes)
             components.append(header)
         }
 
-        func append(section: KeyValueSectionViewModel?) {
-            guard let section = section else { return }
-            components.append(render(section))
+        if content.contains(.taskDetails) {
+            append(section: .makeTaskDetails(for: task))
         }
 
+        if content.contains(.header) {
+            let title = ConsoleFormatter.subheadline(for: task)
+            let header = NSMutableAttributedString()
+            header.append(title + "\n", helper.attributes(role: .subheadline, style: .monospacedDigital, width: .condensed, color: titleColor))
+            var urlAttributes = helper.attributes(role: .body2, weight: .medium, color: detailsColor)
+            urlAttributes[.underlineColor] = UXColor.clear
+            header.append((task.url ?? "–") + "\n", urlAttributes)
+            components.append(header)
+        }
+
+        func append(section: KeyValueSectionViewModel?, count: Bool) {
+            let isCountDisplayed = count && section?.items.isEmpty == false
+            let details = isCountDisplayed ? section?.items.count.description : nil
+            append(section: section, details: details)
+        }
+
+        func append(section: KeyValueSectionViewModel?, details: String? = nil) {
+            guard let section = section else { return }
+            components.append(render(section, details: details))
+        }
+        if content.contains(.errorDetails) {
+            append(section: .makeErrorDetails(for: task))
+        }
         if content.contains(.requestComponents), let url = task.url.flatMap(URL.init) {
             append(section: .makeComponents(for: url))
         }
@@ -96,32 +123,31 @@ final class TextRenderer {
         if content.contains(.requestOptions), let request = task.originalRequest {
             append(section: .makeParameters(for: request))
         }
-        if content.contains(.errorDetails) {
-            append(section: .makeErrorDetails(for: task))
-        }
         if let originalRequest = task.originalRequest {
             if content.contains(.originalRequestHeaders) && content.contains(.currentRequestHeaders), let currentRequest = task.currentRequest {
-                append(section: .makeHeaders(title: "Original Request Headers", headers: originalRequest.headers))
-                append(section: .makeHeaders(title: "Current Request Headers", headers: currentRequest.headers))
+                append(section: .makeHeaders(title: "Original Request Headers", headers: originalRequest.headers), count: true)
+                append(section: .makeHeaders(title: "Current Request Headers", headers: currentRequest.headers), count: true)
             } else if content.contains(.originalRequestHeaders) {
-                append(section: .makeHeaders(title: "Request Headers", headers: originalRequest.headers))
+                append(section: .makeHeaders(title: "Request Headers", headers: originalRequest.headers), count: true)
             } else if content.contains(.currentRequestHeaders), let currentRequest = task.currentRequest {
-                append(section: .makeHeaders(title: "Request Headers", headers: currentRequest.headers))
+                append(section: .makeHeaders(title: "Request Headers", headers: currentRequest.headers), count: true)
             }
             if content.contains(.requestBody) {
                 let section = NSMutableAttributedString()
-                section.append(render(subheadline: "Request Body"))
+                let details = ByteCountFormatter.string(fromBodySize: task.requestBodySize).map { " (\($0))" } ?? ""
+                section.append(render(subheadline: "Request Body" + details))
                 section.append(renderRequestBody(for: task))
                 section.append("\n")
                 components.append(section)
             }
         }
         if content.contains(.responseHeaders), let response = task.response {
-            append(section: .makeHeaders(title: "Response Headers", headers: response.headers))
+            append(section: .makeHeaders(title: "Response Headers", headers: response.headers), count: true)
         }
         if content.contains(.responseBody) {
             let section = NSMutableAttributedString()
-            section.append(render(subheadline: "Response Body"))
+            let details = ByteCountFormatter.string(fromBodySize: task.responseBodySize).map { " (\($0))" } ?? ""
+            section.append(render(subheadline: "Response Body" + details))
             section.append(renderResponseBody(for: task))
             section.append("\n")
             components.append(section)
@@ -183,9 +209,11 @@ final class TextRenderer {
         return KeyValueSectionViewModel.makeQueryItems(for: queryItems)
     }
 
-    func render(_ section: KeyValueSectionViewModel, style: TextFontStyle = .monospaced) -> NSAttributedString {
+    func render(_ section: KeyValueSectionViewModel, details: String? = nil, style: TextFontStyle = .monospaced) -> NSAttributedString {
         let string = NSMutableAttributedString()
-        string.append(render(subheadline: section.title))
+        let details = details.map { "(\($0))" }
+        let title = [section.title, details].compactMap { $0 }.joined(separator: " ")
+        string.append(render(subheadline: title))
         string.append(render(section.items, color: section.color, style: style))
         return string
     }
@@ -306,6 +334,9 @@ struct ConsoleTextRenderer_Previews: PreviewProvider {
             RichTextView(viewModel: .init(string: string))
                 .previewDisplayName("Task")
 
+            RichTextView(viewModel: .init(string: TextRenderer(options: .init(color: .automatic)).render(task, content: .sharing)))
+                .previewDisplayName("Task (Share)")
+
             RichTextView(viewModel: .init(string: stringWithColor))
                 .previewDisplayName("Task (Color)")
 
@@ -329,7 +360,7 @@ struct ConsoleTextRenderer_Previews: PreviewProvider {
     }
 }
 
-private let task = LoggerStore.preview.entity(for: .login)
+private let task = LoggerStore.preview.entity(for: .patchRepo)
 #endif
 
 #warning("TODO: remove this when we are done with HTML output")
@@ -410,20 +441,20 @@ struct NetworkContent: OptionSet {
     init(rawValue: Int16) { self.rawValue = rawValue }
 
     static let header = NetworkContent(rawValue: 1 << 0)
-    static let largeHeader = NetworkContent(rawValue: 1 << 0)
-    static let requestComponents = NetworkContent(rawValue: 1 << 1)
-    static let requestQueryItems = NetworkContent(rawValue: 1 << 2)
-    static let errorDetails = NetworkContent(rawValue: 1 << 3)
-    static let originalRequestHeaders = NetworkContent(rawValue: 1 << 4)
-    static let currentRequestHeaders = NetworkContent(rawValue: 1 << 5)
-    static let requestOptions = NetworkContent(rawValue: 1 << 6)
-    static let requestBody = NetworkContent(rawValue: 1 << 7)
-    static let responseHeaders = NetworkContent(rawValue: 1 << 8)
-    static let responseBody = NetworkContent(rawValue: 1 << 9)
+    static let largeHeader = NetworkContent(rawValue: 1 << 1)
+    static let taskDetails = NetworkContent(rawValue: 1 << 2)
+    static let requestComponents = NetworkContent(rawValue: 1 << 3)
+    static let requestQueryItems = NetworkContent(rawValue: 1 << 4)
+    static let errorDetails = NetworkContent(rawValue: 1 << 5)
+    static let originalRequestHeaders = NetworkContent(rawValue: 1 << 6)
+    static let currentRequestHeaders = NetworkContent(rawValue: 1 << 7)
+    static let requestOptions = NetworkContent(rawValue: 1 << 8)
+    static let requestBody = NetworkContent(rawValue: 1 << 9)
+    static let responseHeaders = NetworkContent(rawValue: 1 << 10)
+    static let responseBody = NetworkContent(rawValue: 1 << 11)
 
-#warning("TODO: add LargeHeader for sharing")
     static let sharing: NetworkContent = [
-        largeHeader, errorDetails, currentRequestHeaders, requestBody, responseHeaders, responseBody
+        largeHeader, taskDetails, errorDetails, currentRequestHeaders, requestBody, responseHeaders, responseBody
     ]
 
     static let all: NetworkContent = [

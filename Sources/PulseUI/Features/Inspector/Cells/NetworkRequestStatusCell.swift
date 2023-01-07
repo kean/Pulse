@@ -74,6 +74,14 @@ struct NetworkRequestStatusCellModel {
         }
         duration = DurationViewModel(transaction: transaction)
     }
+
+    var uiTintColor: UIColor {
+        if #available(iOS 14, tvOS 14, *) {
+            return UXColor(tintColor)
+        } else {
+            return UXColor.label
+        }
+    }
 }
 
 // MARK: - Helpers

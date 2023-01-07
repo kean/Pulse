@@ -48,7 +48,12 @@ final class TextHelper {
         attributes[.font] = font
         attributes[.paragraphStyle] = {
             let paragraphStyle = NSMutableParagraphStyle()
-            paragraphStyle.lineSpacing = 3
+            if style.role == .title {
+                paragraphStyle.lineSpacing = -6
+            } else {
+                paragraphStyle.lineSpacing = 3
+            }
+            paragraphStyle.lineBreakMode = .byTruncatingTail
             return paragraphStyle
         }()
         if style.width == .condensed {
@@ -64,7 +69,8 @@ final class TextHelper {
         var size: CGFloat
         let body2Size = (0.9 * getPreferredFontSize(for: .body)).rounded()
         switch style.role {
-        case .subheadline: size = (0.8 * body2Size).rounded()
+        case .title: size = getPreferredFontSize(for: .title1)
+        case .subheadline: size = (0.84 * body2Size).rounded()
         case .body: size = getPreferredFontSize(for: .body)
         case .body2: size = body2Size
         }
@@ -105,6 +111,8 @@ struct TextStyle: Hashable {
 }
 
 enum TextRole {
+    /// Large title.
+    case title
     /// Section headline (small).
     ///
     /// Font size: iOS 12, macOS 10, tvOS 21, watchOS 11

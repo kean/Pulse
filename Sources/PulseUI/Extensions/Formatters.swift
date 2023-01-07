@@ -45,7 +45,7 @@ enum ConsoleFormatter {
         var components = [task.httpMethod ?? "GET"]
         switch task.state {
         case .pending:
-            components.append(ProgressViewModel.title(for: task).uppercased())
+            components.append(ProgressViewModel.title(for: task))
         case .success:
             components.append(StatusCodeFormatter.string(for: Int(task.statusCode)))
 #if !os(watchOS)
@@ -106,6 +106,13 @@ enum ErrorFormatter {
 }
 
 extension ByteCountFormatter {
+    static func string(fromBodySize count: Int64) -> String? {
+        guard count > 0 else {
+            return nil
+        }
+        return string(fromByteCount: count)
+    }
+
     static func string(fromByteCount count: Int64) -> String {
         ByteCountFormatter.string(fromByteCount: count, countStyle: .file)
     }

@@ -5,6 +5,8 @@
 import SwiftUI
 import Pulse
 
+#warning("TODO: show cookies headers last (tey are usually very large)")
+
 struct NetworkCookiesCell: View {
     let viewModel: NetworkCookiesCellViewModel
 

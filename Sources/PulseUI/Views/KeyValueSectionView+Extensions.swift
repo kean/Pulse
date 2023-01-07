@@ -34,6 +34,18 @@ extension KeyValueSectionViewModel {
         return KeyValueSectionViewModel(title: "Options", color: .indigo, items: items)
     }
 
+    static func makeTaskDetails(for task: NetworkTaskEntity) -> KeyValueSectionViewModel? {
+        func format(size: Int64) -> String {
+            size > 0 ? ByteCountFormatter.string(fromByteCount: size) : "Empty"
+        }
+        let taskType = task.type?.urlSessionTaskClassName ?? "URLSessionDataTask"
+        return KeyValueSectionViewModel(title: taskType, color: .primary, items: [
+            ("Host", task.url.flatMap(URL.init)?.host),
+            ("Date", task.startDate.map(mediumDateFormatter.string)),
+            ("Duration", task.duration > 0 ? DurationFormatter.string(from: task.duration) : nil)
+        ])
+    }
+
     static func makeComponents(for url: URL) -> KeyValueSectionViewModel? {
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
             return nil
@@ -108,18 +120,13 @@ extension KeyValueSectionViewModel {
         timeFormatter.locale = Locale(identifier: "en_US")
         timeFormatter.dateFormat = "HH:mm:ss.SSSSSS"
 
-        let dateFormatter = DateFormatter()
-        dateFormatter.locale = Locale(identifier: "en_US")
-        dateFormatter.dateStyle = .medium
-        dateFormatter.doesRelativeDateFormatting = true
-
         var startDate: Date?
         var items: [(String, String?)] = []
         func addDate(_ date: Date?, title: String) {
             guard let date = date else { return }
             if items.isEmpty {
                 startDate = date
-                items.append(("Date", dateFormatter.string(from: date)))
+                items.append(("Date", mediumDateFormatter.string(from: date)))
             }
             var value = timeFormatter.string(from: date)
             if let startDate = startDate, startDate != date {
@@ -145,3 +152,12 @@ extension KeyValueSectionViewModel {
     }
 #endif
 }
+
+#warning("TODO: where else should we use this? definitely for all exports")
+
+private let mediumDateFormatter: DateFormatter = {
+    let dateFormatter = DateFormatter()
+    dateFormatter.locale = Locale(identifier: "en_US")
+    dateFormatter.dateFormat = "MMM d, yyyy 'at' h:mm:ss a '('z')'"
+    return dateFormatter
+}()
