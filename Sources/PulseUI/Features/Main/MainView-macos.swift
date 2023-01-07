@@ -11,6 +11,9 @@ import Combine
 #warning("TODO: experiemnt with different navigation styles on macos")
 #warning("TODO: show message details in the details and metadata in main panel")
 #warning("TDO: move search button somewhere else")
+#warning("TODO: fill-out filter button when custom selected")
+
+#warning("TODO: can we reuse more with iOS?")
 
 #if os(macOS)
 
@@ -79,7 +82,7 @@ private struct ConsoleContainerView: View {
         NavigationSplitView(
             columnVisibility: $columnVisibility,
             sidebar: {
-                MainPanelView(viewModel: viewModel, mode: viewModel.mode)
+                MainPanelView(viewModel: viewModel)
                     .navigationSplitViewColumnWidth(min: MainView.contentColumnWidth, ideal: 420, max: 640)
             },
             content: {
@@ -99,7 +102,7 @@ private struct LegacyConsoleContainerView: View {
 
     var body: some View {
         NavigationView {
-            MainPanelView(viewModel: viewModel, mode: viewModel.mode)
+            MainPanelView(viewModel: viewModel)
                 .frame(minWidth: 320, idealWidth: 320, maxWidth: 600, minHeight: 120, idealHeight: 480, maxHeight: .infinity)
             ConsoleMessageDetailsRouter(viewModel: details)
                 .frame(minWidth: 430, idealWidth: 500, maxWidth: 600, minHeight: 320, idealHeight: 480, maxHeight: .infinity)
@@ -109,8 +112,7 @@ private struct LegacyConsoleContainerView: View {
 }
 
 private struct MainPanelView: View {
-    var viewModel: MainViewModel
-    @ObservedObject var mode: ConsoleModePickerViewModel
+    let viewModel: MainViewModel
 
     var body: some View {
         VStack(spacing: 0) {
@@ -130,9 +132,9 @@ private struct MainPanelView: View {
                 }.keyboardShortcut("f")
                 ConsoleToolbarToggleOnlyErrorsButton(viewModel: viewModel.toolbar)
                     .keyboardShortcut("e", modifiers: [.command, .shift])
-                ConsoleToolbarModePickerButton(viewModel: viewModel.mode)
+                ConsoleToolbarModePickerButton(viewModel: viewModel.console)
                     .keyboardShortcut("n", modifiers: [.command, .shift])
-                FilterPopoverToolbarButton(viewModel: viewModel, mode: viewModel.mode)
+                FilterPopoverToolbarButton(viewModel: viewModel.console)
                     .keyboardShortcut("f", modifiers: [.command, .option])
             }
         }
@@ -145,7 +147,7 @@ private struct MainPanelView: View {
         })
         .onAppear(perform: viewModel.console.onAppear)
         .onDisappear(perform: viewModel.console.onDisappear)
-        .background(NavigationTitleUpdater(title: mode.isNetworkOnly ? "Requests" : "Messages", viewModel: viewModel.console.table))
+        .background(NavigationTitleUpdater(title: viewModel.console.mode == .network ? "Requests" : "Messages", viewModel: viewModel.console.table))
     }
 }
 
@@ -177,8 +179,7 @@ private struct ConsoleToolbarSearchBar: View {
 }
 
 private struct FilterPopoverToolbarButton: View {
-    let viewModel: MainViewModel
-    @ObservedObject var mode: ConsoleModePickerViewModel
+    let viewModel: ConsoleViewModel
     @State private var isFilterPresented = false
 
     var body: some View {
@@ -194,21 +195,22 @@ private struct FilterPopoverToolbarButton: View {
 
     @ViewBuilder
     private var filters: some View {
-        if mode.isNetworkOnly {
-            NetworkFiltersView(viewModel: viewModel.console.networkSearchCriteriaViewModel, sharedCriteriaViewModel: viewModel.console.sharedSearchCriteriaViewModel)
-        } else {
-            ConsoleMessageFiltersView(viewModel: viewModel.console.searchCriteriaViewModel, sharedCriteriaViewModel: viewModel.console.sharedSearchCriteriaViewModel)
+        switch viewModel.mode {
+        case .all:
+            ConsoleMessageFiltersView(viewModel: viewModel.searchCriteriaViewModel, sharedCriteriaViewModel: viewModel.sharedSearchCriteriaViewModel)
+        case .network:
+            NetworkFiltersView(viewModel: viewModel.networkSearchCriteriaViewModel, sharedCriteriaViewModel: viewModel.sharedSearchCriteriaViewModel)
         }
     }
 }
 
 private struct ConsoleToolbarModePickerButton: View {
-    @ObservedObject var viewModel: ConsoleModePickerViewModel
+    @ObservedObject var viewModel: ConsoleViewModel
 
     var body: some View {
-        Button(action: { viewModel.isNetworkOnly.toggle() }) {
-            Image(systemName: viewModel.isNetworkOnly ? "network" : "network")
-                .foregroundColor(viewModel.isNetworkOnly ? Color.accentColor : Color.secondary)
+        Button(action: viewModel.toggleMode) {
+            Image(systemName: viewModel.mode == .network ? "paperplane.fill" : "paperplane")
+                .foregroundColor(viewModel.mode == .network ? Color.accentColor : Color.secondary)
         }.help("Automatically Scroll to Recent Messages (⇧⌘N)")
     }
 }

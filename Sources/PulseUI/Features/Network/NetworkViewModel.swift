@@ -7,12 +7,9 @@ import Pulse
 import Combine
 import SwiftUI
 
-#if os(macOS) || os(tvOS)
+#if os(tvOS)
 
 final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, ObservableObject {
-#if os(macOS)
-    let table: ConsoleTableViewModel
-#endif
     @Published private(set) var entities: [NetworkTaskEntity] = []
 
     let details: ConsoleDetailsRouterViewModel
@@ -41,9 +38,6 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         self.controller = NSFetchedResultsController<NetworkTaskEntity>(fetchRequest: request, managedObjectContext: store.viewContext, sectionNameKeyPath: nil, cacheName: nil)
 
         self.searchCriteria = ConsoleNetworkSearchCriteriaViewModel(store: store)
-#if os(macOS)
-        self.table = ConsoleTableViewModel(searchCriteriaViewModel: nil)
-#endif
 
         super.init()
 
@@ -122,9 +116,6 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         } else {
             self.entities = controller.fetchedObjects ?? []
         }
-        #if os(macOS)
-        self.table.entities = self.entities
-        #endif
     }
 }
 

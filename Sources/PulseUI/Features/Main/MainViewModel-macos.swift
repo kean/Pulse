@@ -14,7 +14,6 @@ final class MainViewModel: ObservableObject {
     let console: ConsoleViewModel
     var details: ConsoleDetailsRouterViewModel
     let toolbar = ConsoleToolbarViewModel()
-    let mode = ConsoleModePickerViewModel()
     let searchBar = ConsoleSearchBarViewModel()
 
     private var cancellables: [AnyCancellable] = []
@@ -25,10 +24,6 @@ final class MainViewModel: ObservableObject {
 
         toolbar.$isOnlyErrors.sink { [weak self] in
             self?.console.isOnlyErrors = $0
-        }.store(in: &cancellables)
-
-        mode.$isNetworkOnly.sink { [weak self] _ in
-            self?.resetSearchBar()
         }.store(in: &cancellables)
 
         searchBar.$text.sink { [weak self] in
@@ -48,10 +43,6 @@ final class MainViewModel: ObservableObject {
     func freeMemory() {
         store.viewContext.reset()
     }
-}
-
-final class ConsoleModePickerViewModel: ObservableObject {
-    @Published var isNetworkOnly = false
 }
 
 final class ConsoleSearchBarViewModel: ObservableObject {
