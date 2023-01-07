@@ -1,52 +1,23 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import Pulse
 
-#if os(iOS)
-// TODO: Remove this code workaround (control over RichTextView reloads is completely lost)
-struct FileViewer: UIViewControllerRepresentable {
-    let viewModel: FileViewerViewModel
-    var onToggleExpanded: (() -> Void)?
+#warning("TODO: tvos fix hstack")
+#warning("TODO: macos fix reload of NetworkInspectorView (not working)")
 
-    func makeUIViewController(context: Context) -> UIHostingController<_FileViewer> {
-        UIHostingController(rootView: _FileViewer(viewModel: viewModel, onToggleExpanded: onToggleExpanded))
-    }
-
-    func updateUIViewController(_ uiViewController: UIHostingController<_FileViewer>, context: Context) {}
-}
-#else
-typealias FileViewer = _FileViewer
-#endif
-
-struct _FileViewer: View {
+struct FileViewer: View {
     @ObservedObject var viewModel: FileViewerViewModel
-    @State var isWebViewOpen = false
-    var onToggleExpanded: (() -> Void)?
 
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(watchOS)
     var body: some View {
         contents
-            .onAppear { viewModel.render() }
-            .sheet(isPresented: $isWebViewOpen) {
-                NavigationView {
-                    WebView(data: viewModel.data, contentType: "application/html")
-#if os(iOS)
-                        .navigationBarTitle("Browser Preview", displayMode: .inline)
-                        .navigationBarItems(trailing: Button(action: {
-                            isWebViewOpen = false
-                        }) { Image(systemName: "xmark") })
-#else
-                        .navigationTitle("Browser Preview")
-#endif
-                }
-            }
     }
-#elseif os(watchOS)
+#elseif os(macOS)
     var body: some View {
-        ScrollView {
+        VStack {
             contents
         }.onAppear { viewModel.render() }
     }
@@ -55,7 +26,7 @@ struct _FileViewer: View {
         HStack {
             contents
             Spacer()
-        }.onAppear { viewModel.render() }
+        }
     }
 #endif
 
@@ -64,11 +35,7 @@ struct _FileViewer: View {
         if let contents = viewModel.contents {
             switch contents {
             case .json(let viewModel):
-#if os(iOS)
-                RichTextView(viewModel: viewModel, onToggleExpanded: onToggleExpanded)
-#else
                 RichTextView(viewModel: viewModel)
-#endif
             case .image(let viewModel):
                 ScrollView {
                     ImageViewer(viewModel: viewModel)
@@ -78,24 +45,10 @@ struct _FileViewer: View {
                 PDFKitRepresentedView(document: document)
 #endif
             case .other(let viewModel):
-#if os(iOS)
-
-                #warning("TODO: reimplement open in browser")
-
-                RichTextView(viewModel: viewModel, onToggleExpanded: onToggleExpanded)
-//                    if self.viewModel.contentType?.isHTML ?? false {
-//                        Button("Open in Browser") {
-//                            isWebViewOpen = true
-//                        }
-//                    } else {
-//                        EmptyView()
-//                    }
-#else
                 RichTextView(viewModel: viewModel)
-#endif
             }
         } else {
-            SpinnerView(viewModel: .init(title: "Rendering...", details: nil))
+            SpinnerView(viewModel: .init(title: "Preparing...", details: nil))
         }
     }
 }
@@ -103,24 +56,43 @@ struct _FileViewer: View {
 // MARK: - Preview
 
 #if DEBUG
-struct NetworkInspectorResponseView_Previews: PreviewProvider {
+struct FileViewer_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            FileViewer(viewModel: .init(title: "Response", context: .init(contentType: "application/json", originalSize: 1200), data: { MockJSON.allPossibleValues }))
-                .previewDisplayName("JSON")
+            PreviewContainer {
+                FileViewer(viewModel: .init(title: "Response", context: .init(contentType: "application/json", originalSize: 1200), data: { MockJSON.allPossibleValues }))
+            }.previewDisplayName("JSON")
 
-            FileViewer(viewModel: .init(title: "Response", context: .init(contentType: "image/png", originalSize: 219543), data: { MockTask.octocat.responseBody }))
-                .previewDisplayName("Image")
+            PreviewContainer {
+                FileViewer(viewModel: .init(title: "Response", context: .init(contentType: "image/png", originalSize: 219543), data: { MockTask.octocat.responseBody }))
+            }.previewDisplayName("Image")
 
-            FileViewer(viewModel: .init(title: "Response", context: .init(contentType: "application/html", originalSize: 1200), data: { MockTask.profile.responseBody }))
-                .previewDisplayName("HTML")
+            PreviewContainer {
+                FileViewer(viewModel: .init(title: "Response", context: .init(contentType: "application/html", originalSize: 1200), data: { MockTask.profile.responseBody }))
+            }.previewDisplayName("HTML")
 
-            FileViewer(viewModel: .init(title: "Response", context: .init(contentType: "application/x-www-form-urlencoded", originalSize: 1200), data: { MockTask.patchRepo.originalRequest.httpBody ?? Data() }))
-                .previewDisplayName("Query Items")
+            PreviewContainer {
+                FileViewer(viewModel: .init(title: "Response", context: .init(contentType: "application/x-www-form-urlencoded", originalSize: 1200), data: { MockTask.patchRepo.originalRequest.httpBody ?? Data() }))
+            }.previewDisplayName("Query Items")
 
-            FileViewer(viewModel: .init(title: "Response", context: .init(contentType: "application/pdf", originalSize: 1000), data: { mockPDF }))
-                .previewDisplayName("PDF")
+            PreviewContainer {
+                FileViewer(viewModel: .init(title: "Response", context: .init(contentType: "application/pdf", originalSize: 1000), data: { mockPDF }))
+            }.previewDisplayName("PDF")
         }
+    }
+}
+
+private struct PreviewContainer<Content: View>: View {
+    @ViewBuilder var contents: () -> Content
+
+    var body: some View {
+#if os(iOS)
+        NavigationView {
+            contents()
+        }
+#else
+        contents()
+#endif
     }
 }
 

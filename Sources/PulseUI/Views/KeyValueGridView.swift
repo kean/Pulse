@@ -1,11 +1,12 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(macOS) || os(tvOS)
 
+@available(*, deprecated, message: "Deprecated")
 struct KeyValueGridView: View {
 #if os(iOS)
     @Environment(\.horizontalSizeClass) var sizeClass: UserInterfaceSizeClass?

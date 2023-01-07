@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import Pulse
@@ -49,6 +49,7 @@ struct ConsoleMessageMetadataView: View {
         KeyValueSectionView(viewModel: metadataViewModel)
     }
 
+#warning("TODO: use navigation link")
     private var metadataViewModel: KeyValueSectionViewModel {
         KeyValueSectionViewModel(title: "Metadata", color: .indigo, action: ActionViewModel(title: "View") {
             isMetadataRawLinkActive = true
@@ -62,7 +63,7 @@ struct ConsoleMessageMetadataView: View {
     private var links: some View {
         InvisibleNavigationLinks {
             NavigationLink.programmatic(isActive: $isMetadataRawLinkActive) {
-                NetworkDetailsView(viewModel: metadataViewModel)
+                NetworkDetailsView(title: "Metadata", viewModel: { metadataViewModel })
             }
         }
     }

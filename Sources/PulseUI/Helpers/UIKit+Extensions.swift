@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 #if os(iOS)
 
@@ -83,24 +83,6 @@ extension UIViewController {
         })
         topController.present(vc, animated: true, completion: nil)
         return vc
-    }
-}
-
-extension UITabBarController {
-    func setTabBarHidden(_ hidden: Bool, animated: Bool = true, duration: TimeInterval = 0.3) {
-        if animated {
-            if !hidden {
-                self.tabBar.isHidden = false
-                self.tabBar.alpha = 0
-            }
-            UIView.animate(withDuration: duration, animations: {
-                self.tabBar.alpha = hidden ? 0 : 1
-            }, completion: { isCompleted in
-                self.tabBar.isHidden = hidden
-            })
-        } else {
-            self.tabBar.isHidden = hidden
-        }
     }
 }
 

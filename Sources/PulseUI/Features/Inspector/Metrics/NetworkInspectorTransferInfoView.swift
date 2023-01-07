@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import Pulse
@@ -19,6 +19,7 @@ struct NetworkInspectorTransferInfoView: View {
                 bytesReceived
             }
         }
+        .frame(maxWidth: .infinity)
     }
 #else
     var body: some View {

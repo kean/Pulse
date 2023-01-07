@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import CoreData
@@ -9,7 +9,7 @@ import Combine
 
 #if os(iOS) || os(macOS)
 
-@available(iOS 14.0, tvOS 14.0, *)
+@available(iOS 14, tvOS 14, *)
 struct ShareStoreView: View {
     let store: LoggerStore
 
@@ -256,12 +256,15 @@ private final class ShareStoreViewModel: ObservableObject {
                 info = try store.copy(to: logsURL)
             }
         case .text:
-            let request = NSFetchRequest<LoggerMessageEntity>(entityName: "\(LoggerMessageEntity.self)")
-            request.predicate = predicate
-            let messages: [LoggerMessageEntity] = try context.fetch(request)
-            let text = ConsoleShareService.format(messages)
-            logsURL = directory.url.appendingPathComponent("logs-\(makeCurrentDate()).txt")
-            try text.data(using: .utf8)?.write(to: logsURL)
+
+#warning("TODO: rewrite using TextRenderer")
+            fatalError()
+//            let request = NSFetchRequest<LoggerMessageEntity>(entityName: "\(LoggerMessageEntity.self)")
+//            request.predicate = predicate
+//            let messages: [LoggerMessageEntity] = try context.fetch(request)
+//            let text = ShareService.format(messages)
+//            logsURL = directory.url.appendingPathComponent("logs-\(makeCurrentDate()).txt")
+//            try text.data(using: .utf8)?.write(to: logsURL)
         }
         let item = ShareItems([logsURL], cleanup: directory.remove)
         return SharedContents(item: item, size: try logsURL.getFileSize(), info: info)
@@ -286,7 +289,7 @@ private struct SharedContents {
 }
 
 #if DEBUG
-@available(iOS 14.0, tvOS 14.0, *)
+@available(iOS 14, tvOS 14, *)
 struct ShareStoreView_Previews: PreviewProvider {
     static var previews: some View {
 #if os(iOS)

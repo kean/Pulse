@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import Pulse
@@ -28,60 +28,9 @@ struct NetworkMessageContextMenu: View {
     @Binding private(set) var sharedItems: ShareItems?
 
     var body: some View {
-        Section {
-            if #available(iOS 14.0, *) {
-                Menu("Share Request Log") {
-                    shareAsButtons
-                }
-            } else {
-                shareAsButtons
-            }
-            if task.responseBodySize > 0 {
-                Button(action: {
-                    sharedItems = ShareItems([task.responseBody?.data ?? Data()])
-                }) {
-                    Text("Share Response")
-                    Image(systemName: "square.and.arrow.up")
-                }
-            }
-        }
         NetworkMessageContextMenuCopySection(task: task)
         if let message = task.message {
             PinButton(viewModel: .init(message: message))
-        }
-    }
-
-    @ViewBuilder
-    private var shareAsButtons: some View {
-        Button(action: {
-            sharedItems = ShareItems([ConsoleShareService.share(task, output: .plainText)])
-        }) {
-            Text("Share as Plain Text")
-            Image(systemName: "square.and.arrow.up")
-        }
-        Button(action: {
-            let text = ConsoleShareService.share(task, output: .markdown)
-            let directory = TemporaryDirectory()
-            let fileURL = directory.write(text: text, extension: "markdown")
-            sharedItems = ShareItems([fileURL], cleanup: directory.remove)
-        }) {
-            Text("Share as Markdown")
-            Image(systemName: "square.and.arrow.up")
-        }
-        Button(action: {
-            let text = ConsoleShareService.share(task, output: .html)
-            let directory = TemporaryDirectory()
-            let fileURL = directory.write(text: text, extension: "html")
-            sharedItems = ShareItems([fileURL], cleanup: directory.remove)
-        }) {
-            Text("Share as HTML")
-            Image(systemName: "square.and.arrow.up")
-        }
-        Button(action: {
-            sharedItems = ShareItems([task.cURLDescription()])
-        }) {
-            Text("Share as cURL")
-            Image(systemName: "square.and.arrow.up")
         }
     }
 }
@@ -91,33 +40,49 @@ struct NetworkMessageContextMenuCopySection: View {
 
     var body: some View {
         Section {
-            if let url = task.url {
-                Button(action: {
-                    UXPasteboard.general.string = url
-                    runHapticFeedback()
-                }) {
-                    Text("Copy URL")
-                    Image(systemName: "doc.on.doc")
-                }
-            }
-            if let host = task.host?.value {
-                Button(action: {
-                    UXPasteboard.general.string = host
-                    runHapticFeedback()
-                }) {
-                    Text("Copy Host")
-                    Image(systemName: "doc.on.doc")
-                }
-            }
-            if task.responseBodySize > 0 {
-                Button(action: {
-                    guard let data = task.responseBody?.data else { return }
-                    UXPasteboard.general.string = String(data: data, encoding: .utf8)
-                    runHapticFeedback()
-                }) {
-                    Text("Copy Response")
-                    Image(systemName: "doc.on.doc")
-                }
+            if #available(iOS 14.0, *) {
+                Menu(content: {
+                    if let url = task.url {
+                        Button(action: {
+                            UXPasteboard.general.string = url
+                            runHapticFeedback()
+                        }) {
+                            Text("Copy URL")
+                            Image(systemName: "doc.on.doc")
+                        }
+                    }
+                    if let host = task.host?.value {
+                        Button(action: {
+                            UXPasteboard.general.string = host
+                            runHapticFeedback()
+                        }) {
+                            Text("Copy Host")
+                            Image(systemName: "doc.on.doc")
+                        }
+                    }
+                    if task.requestBodySize > 0 {
+                        Button(action: {
+                            guard let data = task.requestBody?.data else { return }
+                            UXPasteboard.general.string = String(data: data, encoding: .utf8)
+                            runHapticFeedback()
+                        }) {
+                            Text("Copy Request")
+                            Image(systemName: "arrow.up.circle")
+                        }
+                    }
+                    if task.responseBodySize > 0 {
+                        Button(action: {
+                            guard let data = task.responseBody?.data else { return }
+                            UXPasteboard.general.string = String(data: data, encoding: .utf8)
+                            runHapticFeedback()
+                        }) {
+                            Text("Copy Response")
+                            Image(systemName: "arrow.down.circle")
+                        }
+                    }
+                }, label: {
+                    Label("Copy...", systemImage: "doc.on.doc")
+                })
             }
         }
     }
@@ -125,7 +90,7 @@ struct NetworkMessageContextMenuCopySection: View {
 #endif
 
 #if os(iOS) || os(macOS)
-@available(iOS 14.0, *)
+@available(iOS 14, *)
 struct StringSearchOptionsMenu: View {
     @Binding private(set) var options: StringSearchOptions
     var isKindNeeded = true
@@ -133,9 +98,7 @@ struct StringSearchOptionsMenu: View {
     #if os(macOS)
     var body: some View {
         Menu(content: {
-            pickerCase
-            pickerKind
-            pickerOptions
+            contents
         }, label: {
             Image(systemName: "ellipsis.circle")
         })
@@ -143,24 +106,15 @@ struct StringSearchOptionsMenu: View {
     }
     #else
     var body: some View {
-        pickerCase
-        pickerKind
-        pickerOptions
+        contents
     }
     #endif
 
-    var pickerCase: some View {
-        Picker(options.isCaseSensitive ? "Case Sensitive" :  "Case Insensitive", selection: $options.isCaseSensitive) {
-            Text("Case Sensitive").tag(true)
-            Text("Case Insensitive").tag(false)
-        }.pickerStyle(.inline)
-    }
-
-    var pickerKind: some View {
-        Picker(options.isRegex ? "Regular Expression" : "Text", selection: $options.isRegex) {
-            Text("Text").tag(false)
-            Text("Regular Expression").tag(true)
-        }.pickerStyle(.inline)
+    @ViewBuilder
+    private var contents: some View {
+        Toggle("Regular Expression", isOn: $options.isRegex)
+        Toggle("Case Sensitive", isOn: $options.isCaseSensitive)
+        pickerOptions
     }
 
     @ViewBuilder
@@ -170,8 +124,67 @@ struct StringSearchOptionsMenu: View {
                 ForEach(StringSearchOptions.Kind.allCases, id: \.self) {
                     Text($0.rawValue).tag($0)
                 }
-            }.pickerStyle(.inline)
+            }
+            .pickerStyle(.menu)
         }
     }
 }
+
+@available(iOS 14, *)
+struct AttributedStringShareMenu: View {
+    @Binding var shareItems: ShareItems?
+    let string: () -> NSAttributedString
+
+    var body: some View {
+        Button(action: { shareItems = ShareService.share(string(), as: .plainText) }) {
+            Label("Share as Text", systemImage: "square.and.arrow.up")
+        }
+        Button(action: { shareItems = ShareService.share(string(), as: .html) }) {
+            Text("Share as HTML")
+            Image(systemName: "square.and.arrow.up")
+        }
+#if os(iOS)
+        Button(action: { shareItems = ShareService.share(string(), as: .pdf) }) {
+            Text("Share as PDF")
+            Image(systemName: "square.and.arrow.up")
+        }
+#endif
+    }
+
+    private func prepare() -> NSAttributedString {
+        let input = string()
+        var ranges: [NSRange] = []
+        input.enumerateAttribute(.isTechnicalKey, in: NSRange(location: 0, length: input.length)) { value, range, _ in
+            if (value as? Bool) == true {
+                ranges.append(range)
+            }
+        }
+        print(ranges)
+
+        let output = NSMutableAttributedString(attributedString: input)
+        for range in ranges.reversed() {
+            output.deleteCharacters(in: range)
+        }
+        return output
+    }
+}
+
+#if DEBUG
+@available(iOS 14, *)
+struct StringSearchOptionsMenu_Previews: PreviewProvider {
+    static var previews: some View {
+        VStack {
+            Spacer()
+            Menu(content: {
+                Section(header: Label("Search Options", systemImage: "magnifyingglass")) {
+                    StringSearchOptionsMenu(options: .constant(.default))
+                }
+            }) {
+                Text("Menu")
+            }
+        }
+    }
+}
+#endif
+
 #endif

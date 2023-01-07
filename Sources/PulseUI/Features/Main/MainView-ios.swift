@@ -1,20 +1,18 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import CoreData
 import Pulse
 import Combine
 
-#if os(iOS) || os(tvOS)
+#if os(iOS)
 
 public struct MainView: View {
     // TODO: replace with StateObject when available
     @State private var viewModel: MainViewModel
-
     @State private var isDefaultTabSelected = true
-    @State private var viewController: UIViewController?
 
     /// - parameter onDismiss: pass onDismiss to add a close button.
     public init(store: LoggerStore = .shared, onDismiss: (() -> Void)? = nil) {
@@ -22,8 +20,7 @@ public struct MainView: View {
     }
 
     public var body: some View {
-        #if os(iOS)
-        if UIDevice.current.userInterfaceIdiom == .pad, #available(iOS 14.0, *) {
+        if UIDevice.current.userInterfaceIdiom == .pad, #available(iOS 14, *) {
             NavigationView {
                 List(viewModel.items) { item in
                     if item.id == viewModel.items[0].id {
@@ -51,26 +48,17 @@ public struct MainView: View {
             }
             .onDisappear { viewModel.freeMemory() }
         } else {
-            tabView
-                .onDisappear { viewModel.freeMemory() }
-        }
-        #else
-        tabView
-            .onDisappear { viewModel.freeMemory() }
-        #endif
-    }
-
-    @ViewBuilder
-    private var tabView: some View {
-        TabView {
-            ForEach(viewModel.items) { item in
-                NavigationView {
-                    viewModel.makeView(for: item)
-                }.tabItem {
-                    Image(systemName: item.imageName)
-                    Text(item.title)
+            TabView {
+                ForEach(viewModel.items) { item in
+                    NavigationView {
+                        viewModel.makeView(for: item)
+                    }.tabItem {
+                        Image(systemName: item.imageName)
+                        Text(item.title)
+                    }
                 }
             }
+            .onDisappear { viewModel.freeMemory() }
         }
     }
 }

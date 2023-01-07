@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import Pulse
@@ -46,13 +46,7 @@ struct LoggerStoreSizeChart: View {
             Category.free: .secondaryFill
         ])
         .chartPlotStyle { $0.cornerRadius(8) }
-#if os(tvOS)
-        .chartLegend(position: .bottom, spacing: -20)
-        .padding(.bottom, 4)
-        .frame(height: 90)
-#else
         .frame(height: 66)
-#endif
     }
 
     private var data: [Series] {

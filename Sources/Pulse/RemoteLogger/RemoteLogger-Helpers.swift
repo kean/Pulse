@@ -1,13 +1,13 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
 import Network
 
 // MARK: - Helpers (Descriptions)
 
-@available(iOS 14.0, tvOS 14.0, *)
+@available(iOS 14, tvOS 14, *)
 extension NWBrowser.State {
     var description: String {
         switch self {
@@ -21,7 +21,7 @@ extension NWBrowser.State {
     }
 }
 
-@available(iOS 14.0, tvOS 14.0, *)
+@available(iOS 14, tvOS 14, *)
 extension NWConnection.State {
     var description: String {
         switch self {

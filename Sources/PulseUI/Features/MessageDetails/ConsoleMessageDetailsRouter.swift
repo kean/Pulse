@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import CoreData
@@ -13,18 +13,14 @@ struct ConsoleMessageDetailsRouter: View {
         if let viewModel = viewModel.viewModel {
             switch viewModel {
             case .message(let viewModel):
-                ConsoleMessageDetailsView(viewModel: viewModel, onClose: onClose)
+                ConsoleMessageDetailsView(viewModel: viewModel)
                     .id(self.viewModel.id)
             case .task(let viewModel):
                 // TODO: rework the inspector to not require id workaround
-                NetworkInspectorView(viewModel: viewModel, onClose: onClose)
+                NetworkInspectorView(viewModel: viewModel)
                     .id(self.viewModel.id)
             }
         }
-    }
-
-    private func onClose() {
-        viewModel.select(nil)
     }
 }
 

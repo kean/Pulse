@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 #if os(macOS)
 import AppKit
@@ -14,7 +14,10 @@ import SwiftUI
 // compatible with each other
 
 struct Palette {
-    #if !os(watchOS)
+    #if os(watchOS)
+    static var red: UXColor { UXColor(Color.red) }
+    static var pink: UXColor { UXColor(Color.pink) }
+    #else
     static var red: UXColor {
         UXColor.dynamic(light: Palette.lightRed, dark: Palette.darkRed)
     }
@@ -28,9 +31,6 @@ struct Palette {
 
     private static let lightPink = UXColor(red: 155.0/255.0, green: 35.0/255.0, blue: 147.00/255.0, alpha: 1.0)
     private static let darkPink = UXColor(red: 252.0/255.0, green: 95.0/255.0, blue: 163.0/255.0, alpha: 1.0)
-    #else
-    static var red: UXColor { UXColor(Color.red) }
-    static var pink: UXColor { UXColor(Color.pink) }
     #endif
 }
 
@@ -70,13 +70,14 @@ extension NSColor {
 #if os(iOS)
 typealias UXView = UIView
 #endif
+
 typealias UXColor = UIColor
 typealias UXFont = UIFont
 typealias UXImage = UIImage
 
-#if !os(watchOS)
 extension UIColor {
     static func dynamic(light: UIColor, dark: UIColor) -> UIColor {
+#if !os(watchOS)
         UIColor {
             switch $0.userInterfaceStyle {
             case .dark:
@@ -85,9 +86,11 @@ extension UIColor {
                 return light
             }
         }
+#else
+        dark
+#endif
     }
 }
-#endif
 
 #endif
 
@@ -108,21 +111,12 @@ extension UIColor {
 }
 #endif
 
-// MARK: - FontSize
-
-enum FontSize {
-    static var body: CGFloat {
-        #if os(iOS)
-            return 12
-        #elseif os(macOS)
-            return 12
-        #elseif os(tvOS)
-            return 24
-        #else
-            return 12
-        #endif
-    }
+#if os(watchOS)
+extension UXColor {
+    static let label = UXColor(Color.primary)
+    static let systemOrange = UXColor(Color.orange)
 }
+#endif
 
 // MARK: - NSTextView
 
@@ -190,17 +184,6 @@ extension Image {
     }
 }
 #endif
-
-// MARK: - Misc
-
-extension NSParagraphStyle {
-    static func make(lineHeight: CGFloat) -> NSParagraphStyle {
-        let ps = NSMutableParagraphStyle()
-        ps.maximumLineHeight = lineHeight
-        ps.minimumLineHeight = lineHeight
-        return ps
-    }
-}
 
 #if os(macOS)
 extension NSPasteboard {

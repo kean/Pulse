@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
 import Network
@@ -12,7 +12,7 @@ import SwiftUI
 ///
 /// The logger is thread-safe. The updates to the `Published` properties will
 /// be delivered on a background queue.
-@available(iOS 14.0, tvOS 14.0, *)
+@available(iOS 14, tvOS 14, *)
 public final class RemoteLogger: RemoteLoggerConnectionDelegate {
     public private(set) var store: LoggerStore?
 
@@ -427,7 +427,7 @@ private extension NWBrowser.Result {
     }
 }
 
-@available(iOS 14.0, tvOS 14.0, *)
+@available(iOS 14, tvOS 14, *)
 extension RemoteLogger.ConnectionState {
     public var description: String {
         switch self {
@@ -438,7 +438,7 @@ extension RemoteLogger.ConnectionState {
     }
 }
 
-@available(iOS 14.0, tvOS 14.0, *)
+@available(iOS 14, tvOS 14, *)
 extension RemoteLogger {
     public static let serviceType = "_pulse._tcp"
 }

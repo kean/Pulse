@@ -1,10 +1,8 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
-
-#if os(iOS) || os(macOS)
 
 extension NetworkTaskEntity {
     public func cURLDescription() -> String {
@@ -34,5 +32,3 @@ extension NetworkTaskEntity {
         return components.joined(separator: " \\\n\t")
     }
 }
-
-#endif

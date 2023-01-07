@@ -1,11 +1,13 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import Pulse
 
-#if os(iOS) || os(macOS)
+#warning("TODO: fix this on macOs")
+
+#if os(iOS) || os(macOS) || os(tvOS)
 
 // MARK: - View
 
@@ -14,28 +16,11 @@ struct NetworkInspectorTransactionsListView: View {
     @State private var presented: NetworkInspectorTransactionsListViewModel.Item?
 
     var body: some View {
-        VStack(spacing: 16) {
-            ForEach(viewModel.items) { item in
-                #if os(macOS)
-                HStack {
-                    Button(action: { presented = item }) {
-                        ItemView(item: item)
-                            .foregroundColor(.accentColor)
-                    }
-                    .buttonStyle(.plain)
-                    .fixedSize()
-                    Spacer()
-                }
-                #else
-                NavigationLink(destination: { destination(for: item) }) {
-                    ItemView(item: item)
-                }
-                #endif
+        ForEach(viewModel.items) { item in
+            NavigationLink(destination: destination(for: item)) {
+                ItemView(item: item)
             }
         }
-        #if os(macOS)
-        .sheet(item: $presented, content: destination)
-         #endif
     }
 
     struct ItemView: View {
@@ -44,36 +29,18 @@ struct NetworkInspectorTransactionsListView: View {
         var body: some View {
             HStack {
                 Text(item.title)
+                Spacer()
                 if let details = item.details {
                     Text(details)
                         .foregroundColor(.secondary)
                 }
-                Image(systemName: "chevron.right")
-                    .foregroundColor(.separator)
-                Spacer()
             }
         }
     }
 
     private func destination(for item: NetworkInspectorTransactionsListViewModel.Item) -> some View {
-#if os(iOS)
         NetworkInspectorTransactionView(viewModel: item.viewModel())
-            .navigationBarTitle(item.title)
-#else
-        VStack(spacing: 0) {
-            HStack {
-                Text("\(item.title) Details")
-                    .font(.headline)
-                    .foregroundColor(.secondary)
-                Spacer()
-                Button("Close") { presented = nil }
-                    .keyboardShortcut(.cancelAction)
-            }.padding()
-            NetworkInspectorTransactionView(viewModel: item.viewModel())
-        }
-        .navigationTitle(item.title)
-        .frame(minWidth: 400, idealWidth: 800, maxWidth: 1000, minHeight: 300, idealHeight: 600)
-#endif
+            .backport.navigationTitle(item.title)
     }
 }
 
@@ -91,14 +58,15 @@ final class NetworkInspectorTransactionsListViewModel {
 
     init(task: NetworkTaskEntity) {
         self.items = task.transactions.map { transaction in
-            let title: String
-            switch transaction.fetchType {
-            case .networkLoad: title = "Network Load"
-            case .localCache: title = "Cache Lookup"
-            case .serverPush: title = "Server Push"
-            case .unknown: title = "Unknown"
-            default: title = "Unknown"
-            }
+            let title: String = {
+                switch transaction.fetchType {
+                case .networkLoad: return "Network Load"
+                case .localCache: return "Cache Lookup"
+                case .serverPush: return "Server Push"
+                case .unknown: return "Unknown"
+                default: return "Unknown"
+                }
+            }()
             var details: String?
             if let startDate = transaction.timing.fetchStartDate,
                let endDate = transaction.timing.responseEndDate ?? task.taskInterval?.end {
@@ -114,11 +82,12 @@ final class NetworkInspectorTransactionsListViewModel {
 // MARK: - Preview
 
 #if DEBUG
-@available(iOS 14.0, *)
+@available(iOS 14, *)
 struct NetworkInspectorTransactionsListView_Previews: PreviewProvider {
     static var previews: some View {
-        NetworkInspectorTransactionsListView(viewModel: mockModel)
-            .previewLayout(.fixed(width: 320, height: 400))
+        List {
+            NetworkInspectorTransactionsListView(viewModel: mockModel)
+        }
     }
 }
 

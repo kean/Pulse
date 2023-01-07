@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 
@@ -41,8 +41,8 @@ private struct TimingSectionView: View {
                 Divider()
             }
             if !viewModel.items.isEmpty {
-                ForEach(viewModel.items) {
-                    TimingRowView(viewModel: $0, parent: parent)
+                ForEach(viewModel.items) { item in
+                    TimingRowView(viewModel: item, parent: parent)
                 }
             }
         }

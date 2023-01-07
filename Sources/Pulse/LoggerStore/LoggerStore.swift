@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
 import CoreData
@@ -63,7 +63,7 @@ public final class LoggerStore: @unchecked Sendable {
     }
 
     private static func register(store: LoggerStore) {
-        if #available(iOS 14.0, tvOS 14.0, *) {
+        if #available(iOS 14, tvOS 14, *) {
             RemoteLogger.shared.initialize(store: store)
         }
         NetworkLoggerInsights.shared.register(store: store)
@@ -331,10 +331,9 @@ extension LoggerStore {
         entity.url = event.originalRequest.url?.absoluteString
         entity.host = event.originalRequest.url?.host.map(makeDomain)
         entity.httpMethod = event.originalRequest.httpMethod
-        let statusCode = Int32(event.response?.statusCode ?? 0)
-        entity.statusCode = statusCode
+        entity.statusCode = Int32(event.response?.statusCode ?? 0)
         entity.responseContentType = event.response?.contentType?.type
-        let isFailure = event.error != nil || (statusCode != 0 && !(200..<400).contains(statusCode))
+        let isFailure = event.error != nil || event.response?.isSuccess == false
         entity.requestState = (isFailure ? NetworkTaskEntity.State.failure : .success).rawValue
 
         // Populate response/request data

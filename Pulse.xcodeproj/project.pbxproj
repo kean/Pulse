@@ -49,7 +49,6 @@
 		0C855DE228A096550007D325 /* Pulse in Frameworks */ = {isa = PBXBuildFile; productRef = 0C855DE128A096550007D325 /* Pulse */; };
 		0C855DE428A096550007D325 /* PulseUI in Frameworks */ = {isa = PBXBuildFile; productRef = 0C855DE328A096550007D325 /* PulseUI */; };
 		0C9F04F92884F34A0035239F /* Pulse_Demo_macOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9F04F82884F34A0035239F /* Pulse_Demo_macOSApp.swift */; };
-		0C9F04FB2884F34A0035239F /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9F04FA2884F34A0035239F /* ContentView.swift */; };
 		0C9F04FD2884F34A0035239F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C9F04FC2884F34A0035239F /* Assets.xcassets */; };
 		0C9F05002884F34A0035239F /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C9F04FF2884F34A0035239F /* Preview Assets.xcassets */; };
 		0C9F050C2884FA7D0035239F /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CFF9BD825D6199A0069DB6A /* repos.json */; };
@@ -122,7 +121,6 @@
 		0C24CC6A289482F7008DD332 /* MockTask.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockTask.swift; sourceTree = "<group>"; };
 		0C24CC792894C134008DD332 /* MockStoreConfiguration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MockStoreConfiguration.swift; path = App/Shared/Mocks/MockStoreConfiguration.swift; sourceTree = SOURCE_ROOT; };
 		0C25FB6E25CDDCAB00A895C2 /* URLSessionManualIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionManualIntegration.swift; sourceTree = "<group>"; };
-		0C510F77295F643D000D80D0 /* NetworkLoggerConfiguration-extension.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = "NetworkLoggerConfiguration-extension.md"; path = "Sources/Pulse/Pulse.docc/Extensions/NetworkLoggerConfiguration-extension.md"; sourceTree = "<group>"; };
 		0C516FBA26015DD2004813B4 /* Pulse Demo iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pulse Demo iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C516FEF26016392004813B4 /* DocumentBrowser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentBrowser.swift; sourceTree = "<group>"; };
 		0C57AD4D245F0EFB005B3400 /* Pulse iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pulse iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -144,7 +142,6 @@
 		0C767816268F88BB0058F69B /* Pulse_Demo_iOSApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Pulse_Demo_iOSApp.swift; sourceTree = "<group>"; };
 		0C9F04F62884F34A0035239F /* Pulse Demo macOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pulse Demo macOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C9F04F82884F34A0035239F /* Pulse_Demo_macOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pulse_Demo_macOSApp.swift; sourceTree = "<group>"; };
-		0C9F04FA2884F34A0035239F /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		0C9F04FC2884F34A0035239F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0C9F04FF2884F34A0035239F /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		0C9F05012884F34A0035239F /* Pulse_Demo_macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Pulse_Demo_macOS.entitlements; sourceTree = "<group>"; };
@@ -283,7 +280,6 @@
 		0C57AD44245F0EFB005B3400 = {
 			isa = PBXGroup;
 			children = (
-				0C510F77295F643D000D80D0 /* NetworkLoggerConfiguration-extension.md */,
 				0C07EDCD25CEF648002DC091 /* README.md */,
 				0C6A22E9280B47D400FC8C96 /* Pulse */,
 				0C57AD64245F0F38005B3400 /* App */,
@@ -380,7 +376,6 @@
 			isa = PBXGroup;
 			children = (
 				0C9F04F82884F34A0035239F /* Pulse_Demo_macOSApp.swift */,
-				0C9F04FA2884F34A0035239F /* ContentView.swift */,
 				0C9F04FC2884F34A0035239F /* Assets.xcassets */,
 				0C9F05012884F34A0035239F /* Pulse_Demo_macOS.entitlements */,
 				0C9F04FE2884F34A0035239F /* Preview Content */,
@@ -775,7 +770,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				0C24CC6F289482F7008DD332 /* MockTask.swift in Sources */,
-				0C9F04FB2884F34A0035239F /* ContentView.swift in Sources */,
 				0C9F04F92884F34A0035239F /* Pulse_Demo_macOSApp.swift in Sources */,
 				0C24CC7B2894C134008DD332 /* MockStoreConfiguration.swift in Sources */,
 				0C24CC6C289482F7008DD332 /* MockStore.swift in Sources */,
@@ -879,7 +873,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 20;
 				DEVELOPMENT_ASSET_PATHS = "\"Demo/iOS/Preview Content\"";
-				DEVELOPMENT_TEAM = NR8DLKJ7E6;
+				DEVELOPMENT_TEAM = 3Z7876S8U2;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = Demo/iOS/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
@@ -888,7 +882,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 2.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.github.kean.PulseDemo;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.test.pulse-d90asjd";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -906,7 +900,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 20;
 				DEVELOPMENT_ASSET_PATHS = "\"Demo/iOS/Preview Content\"";
-				DEVELOPMENT_TEAM = NR8DLKJ7E6;
+				DEVELOPMENT_TEAM = 3Z7876S8U2;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = Demo/iOS/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
@@ -915,7 +909,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 2.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.github.kean.PulseDemo;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.test.pulse-d90asjd";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -1055,6 +1049,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "Demo/tvOS/Preview\\ Content";
+				DEVELOPMENT_TEAM = NR8DLKJ7E6;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = Demo/tvOS/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1077,6 +1072,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "Demo/tvOS/Preview\\ Content";
+				DEVELOPMENT_TEAM = NR8DLKJ7E6;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = Demo/tvOS/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (

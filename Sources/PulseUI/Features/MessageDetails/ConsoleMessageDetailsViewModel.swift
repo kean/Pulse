@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import CoreData
 import Pulse
@@ -28,7 +28,9 @@ final class ConsoleMessageDetailsViewModel {
     }()
 
     init(message: LoggerMessageEntity) {
-        self.textViewModel = RichTextViewModel(string: message.text)
+        let string = TextRenderer().preformatted(message.text)
+        self.textViewModel = RichTextViewModel(string: string)
+
         self.message = message
         self.tags = [
             ConsoleMessageTagViewModel(

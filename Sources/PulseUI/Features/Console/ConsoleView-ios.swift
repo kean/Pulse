@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import CoreData
@@ -34,22 +34,20 @@ public struct ConsoleView: View {
                 },
                 trailing: HStack {
                     ShareButton { isSharing = true }
-                    if #available(iOS 14.0, *) {
+                    if #available(iOS 14, *) {
                         ConsoleContextMenu(store: viewModel.store, isShowingAsText: $isShowingAsText)
                     }
                 }
             )
             .sheet(isPresented: $isSharing) {
-                if #available(iOS 14.0, *) {
+                if #available(iOS 14, *) {
                     NavigationView {
                         ShareStoreView(store: viewModel.store, isPresented: $isSharing)
                     }.backport.presentationDetents([.medium])
-                } else {
-                    ShareView(ShareItems(messages: viewModel.store))
                 }
             }
             .backport.fullScreenCover(isPresented: $isShowingAsText) {
-                if #available(iOS 14.0, *) {
+                if #available(iOS 14, *) {
                     NavigationView {
                         ConsoleTextView(entities: viewModel.getObservableProperties()) {
                             isShowingAsText = false

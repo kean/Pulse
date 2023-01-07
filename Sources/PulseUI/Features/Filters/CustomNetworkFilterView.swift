@@ -1,13 +1,13 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import Pulse
 
 #if os(iOS) || os(macOS)
 
-@available(iOS 14.0, *)
+@available(iOS 14, *)
 struct CustomNetworkFilterView: View {
     @ObservedObject var filter: NetworkSearchFilter
     let onRemove: () -> Void

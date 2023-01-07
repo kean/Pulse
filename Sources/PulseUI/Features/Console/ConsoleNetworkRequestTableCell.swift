@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 #if os(iOS)
 
@@ -21,9 +21,13 @@ final class ConsoleNetworkRequestTableCell: UITableViewCell, UIContextMenuIntera
     private var cancellable1: AnyCancellable?
     private var cancellable2: AnyCancellable?
 
+    private var titleAttributes: [NSAttributedString.Key: Any] = [:]
+
     private var isAnimating = false
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        titleAttributes = TextHelper().attributes(role: .subheadline, style: .monospacedDigital, width: .condensed, color: .secondaryLabel)
+
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         createView()
     }
@@ -43,9 +47,6 @@ final class ConsoleNetworkRequestTableCell: UITableViewCell, UIContextMenuIntera
 
         contentView.addSubview(stack)
         stack.pinToSuperview(insets: .init(top: 10, left: 16, bottom: 10, right: 12))
-
-        title.font = .preferredFont(forTextStyle: .caption1)
-        title.textColor = .secondaryLabel
 
         details.font = .systemFont(ofSize: 15)
 
@@ -93,13 +94,13 @@ final class ConsoleNetworkRequestTableCell: UITableViewCell, UIContextMenuIntera
         }
         self.state = viewModel.state
 
-        title.text = viewModel.fullTitle
+        title.attributedText = NSAttributedString(string: viewModel.fullTitle, attributes: titleAttributes)
 
         if !onlyTitle {
             details.numberOfLines = ConsoleSettings.shared.lineLimit
             badge.fillColor = viewModel.uiBadgeColor
             details.text = viewModel.text
-            accessory.textLabel.text = viewModel.time
+            accessory.textLabel.attributedText = NSAttributedString(string: viewModel.time, attributes: titleAttributes)
             pin.bind(viewModel: viewModel.pinViewModel)
         }
     }
@@ -115,15 +116,15 @@ final class ConsoleNetworkRequestTableCell: UITableViewCell, UIContextMenuIntera
 
     private func makeMenu(for viewModel: ConsoleNetworkRequestViewModel) -> UIMenu {
         let shareAsText = UIAction(title: "Share as Plain Text", image: UIImage(systemName: "square.and.arrow.up")) { _ in
-            UIActivityViewController.show(with: viewModel.shareAsPlainText())
-        }
-
-        let shareAsMarkdown = UIAction(title: "Share as Markdown", image: UIImage(systemName: "square.and.arrow.up")) { _ in
-            UIActivityViewController.show(with: viewModel.shareAsMarkdown())
+            UIActivityViewController.show(with: viewModel.share(as: .plainText))
         }
 
         let shareAsHTML = UIAction(title: "Share as HTML", image: UIImage(systemName: "square.and.arrow.up")) { _ in
-            UIActivityViewController.show(with: viewModel.shareAsHTML())
+            UIActivityViewController.show(with: viewModel.share(as: .html))
+        }
+
+        let shareAsPDF = UIAction(title: "Share as PDF", image: UIImage(systemName: "square.and.arrow.up")) { _ in
+            UIActivityViewController.show(with: viewModel.share(as: .pdf))
         }
 
         let shareAsCURL = UIAction(title: "Share as cURL", image: UIImage(systemName: "square.and.arrow.up")) { _ in
@@ -152,9 +153,9 @@ final class ConsoleNetworkRequestTableCell: UITableViewCell, UIContextMenuIntera
 
         let pin = UIAction.makePinAction(with: viewModel.pinViewModel)
 
-        let shareGroup = UIMenu(title: "Share", options: [.displayInline], children: [shareAsText, shareAsMarkdown, shareAsHTML, shareAsCURL])
+        let shareGroup = UIMenu(title: "Share As", image: UIImage(systemName: "square.and.arrow.up"), options: [], children: [shareAsText, shareAsHTML, shareAsPDF, shareAsCURL])
 
-        let copyGroup = UIMenu(title: "Copy", options: [.displayInline], children: copyItems)
+        let copyGroup = UIMenu(title: "Copy...", image: UIImage(systemName: "doc.on.doc"), options: [], children: copyItems)
 
         return UIMenu(title: "", options: [.displayInline], children: [shareGroup, copyGroup, pin])
     }

@@ -1,11 +1,13 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import Pulse
 import CoreData
 import Combine
+
+#warning("TODO: remove Cache from console")
 
 final class ConsoleMessageViewModel: Pinnable {
     let title: String
@@ -30,13 +32,12 @@ final class ConsoleMessageViewModel: Pinnable {
 
 #if os(iOS)
     lazy var textColor2 = UIColor.textColor(for: LoggerStore.Level(rawValue: message.level) ?? .debug)
-    lazy var attributedTitle: NSAttributedString = {
-        let string = NSMutableAttributedString()
+    lazy var title2: String = {
         let level = LoggerStore.Level(rawValue: message.level) ?? .debug
-        string.append(badge.title, [.foregroundColor: UIColor.badgeColor(for: level)])
+        var string = badge.title
         let label = message.label.name
         if label != "default", !label.isEmpty {
-            string.append(" · \(label.capitalized)", [.foregroundColor: UIColor.secondaryLabel])
+            string.append(" · \(label.capitalized)")
         }
         return string
     }()
@@ -70,7 +71,7 @@ final class ConsoleMessageViewModel: Pinnable {
 
 #if os(iOS) || os(macOS)
     func share() -> ShareItems {
-        ShareItems([ConsoleShareService.share(message)])
+        ShareItems([message.text])
     }
     
     func copy() -> String {

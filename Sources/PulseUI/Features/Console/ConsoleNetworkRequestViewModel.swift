@@ -1,12 +1,13 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import Pulse
 import Combine
 import CoreData
 
+#warning("TODO: rework fullTitle, etc")
 final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
     private(set) lazy var time = ConsoleMessageViewModel.timeFormatter.string(from: task.createdAt)
 #if os(iOS)
@@ -62,57 +63,12 @@ final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
         }
     }
 
+#warning("TODO: add subline with details instead of cramming everything into the header (?)")
+
     private func refresh() {
         let state = task.state
 
-        var title: String = task.httpMethod ?? "GET"
-        switch task.state {
-        case .pending:
-            title += " · "
-            title += progress.title.uppercased()
-        case .success:
-            title += " · "
-            title += StatusCodeFormatter.string(for: Int(task.statusCode))
-#if !os(watchOS)
-            switch task.type ?? .dataTask {
-            case .uploadTask:
-                if task.requestBodySize > 0 {
-                    let sizeText = ByteCountFormatter.string(fromByteCount: task.requestBodySize)
-                    title += " · "
-                    title += task.isFromCache ? "Cache" : sizeText
-                }
-            case .dataTask, .downloadTask:
-                if task.responseBodySize > 0 {
-                    let sizeText = ByteCountFormatter.string(fromByteCount: task.responseBodySize)
-                    title += " · "
-                    title += task.isFromCache ? "Cache" : sizeText
-                }
-            case .streamTask, .webSocketTask:
-                break
-            }
-#endif
-        case .failure:
-            title += " · "
-            if task.errorCode != 0 {
-                if task.errorDomain == URLError.errorDomain {
-                    title += "\(task.errorCode) \(descriptionForURLErrorCode(Int(task.errorCode)))"
-                } else if task.errorDomain == NetworkLogger.DecodingError.domain {
-                    title += "Decoding Failed"
-                } else {
-                    title += "Error"
-                }
-            } else {
-                title += StatusCodeFormatter.string(for: Int(task.statusCode))
-            }
-        }
-
-        if task.duration > 0 {
-            title += " · "
-            title += DurationFormatter.string(from: task.duration, isPrecise: false)
-        }
-
-        self.title = title
-
+        self.title = ConsoleFormatter.details(for: task)
         self.text = task.url ?? "URL Unavailable"
 
 #if os(iOS)
@@ -139,22 +95,8 @@ final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
 
 #if os(iOS) || os(macOS)
 
-    func shareAsPlainText() -> ShareItems {
-        ShareItems([ConsoleShareService.share(task, output: .plainText)])
-    }
-
-    func shareAsMarkdown() -> ShareItems {
-        let text = ConsoleShareService.share(task, output: .markdown)
-        let directory = TemporaryDirectory()
-        let fileURL = directory.write(text: text, extension: "markdown")
-        return ShareItems([fileURL], cleanup: directory.remove)
-    }
-
-    func shareAsHTML() -> ShareItems {
-        let text = ConsoleShareService.share(task, output: .html)
-        let directory = TemporaryDirectory()
-        let fileURL = directory.write(text: text, extension: "html")
-        return ShareItems([fileURL], cleanup: directory.remove)
+    func share(as output: ShareOutput) -> ShareItems {
+        ShareService.share(task, as: output)
     }
 
     func shareAsCURL() -> ShareItems {

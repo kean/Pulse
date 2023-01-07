@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
 import Pulse
@@ -24,22 +24,5 @@ extension NetworkTaskEntity {
             isResponse: true,
             error: decodingError
         )
-    }
-
-    var responseCookies: [HTTPCookie] {
-        guard let headers = response?.headers, !headers.isEmpty,
-              let url = originalRequest?.url.flatMap(URL.init) else {
-            return []
-        }
-        return HTTPCookie.cookies(withResponseHeaderFields: headers, for: url)
-    }
-}
-
-extension NetworkRequestEntity {
-    var cookies: [HTTPCookie] {
-        guard !headers.isEmpty, let url = url.flatMap(URL.init) else {
-            return []
-        }
-        return HTTPCookie.cookies(withResponseHeaderFields: headers, for: url)
     }
 }

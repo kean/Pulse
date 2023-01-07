@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import Pulse
@@ -15,6 +15,9 @@ final class ConsoleSettings: PersistentSettings {
     @UserDefaultRaw("sharing-time-range")
     var sharingTimeRange: SharingTimeRange = .currentSession
 
+    @UserDefault("link-detection")
+    var isLinkDetectionEnabled = false
+
     @UserDefaultRaw("sharing-level")
     var sharingLevel: LoggerStore.Level = .trace
 
@@ -25,26 +28,11 @@ final class ConsoleSettings: PersistentSettings {
 final class ConsoleTextViewSettings: PersistentSettings {
     static let shared = ConsoleTextViewSettings()
 
-    @UserDefault("console-text-view__order-ascending")
-    var orderAscending = false
-
-    @UserDefault("console-text-view__responses-collapsed")
-    var isCollapsingResponses = true
-
-    @UserDefault("console-text-view__monochrome")
-    var isMonochrome = true
-
-    @UserDefault("console-text-view__syntax-highlighting")
-    var isSyntaxHighlightingEnabled = true
-
-    @UserDefault("console-text-view__link-detection")
-    var isLinkDetectionEnabled = true
-
-    @UserDefault("console-text-view__view-font-size")
-    var fontSize = 15
+    @UserDefaultRaw("console-text-view__color-mode")
+    var colorMode = TextRenderer.ColorMode.automatic
 
     @UserDefault("console-text-view__request-headers")
-    var showsTaskRequestHeader = false
+    var showsRequestHeaders = false
 
     @UserDefault("console-text-view__response-body-shown")
     var showsResponseBody = true
@@ -70,7 +58,6 @@ class PersistentSettings: ObservableObject {
     init() {
         let properties = Mirror(reflecting: self).children
             .compactMap { $0.value as? UserDefaultProtocol }
-        print(properties)
         ConsoleSettings.onChange(of: properties).sink { [objectWillChange] in
             objectWillChange.send()
         }.store(in: &cancellables)
@@ -144,8 +131,11 @@ final class UserDefaultRaw<Value: RawRepresentable>: UserDefaultProtocol, Dynami
             if let newValue = newValue as? Optional<Value>, newValue == nil {
                 publisher.send(value) // Send default value
             } else {
-                guard let value = newValue as? Value else {
+                guard let rawValue = newValue as? Value.RawValue else {
                     return assertionFailure()
+                }
+                guard let value = Value(rawValue: rawValue) else {
+                    return
                 }
                 publisher.send(value)
             }

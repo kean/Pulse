@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import Pulse
@@ -21,7 +21,7 @@ public struct SettingsView: View {
 
     public var body: some View {
         Form {
-            if #available(tvOS 14.0, *) {
+            if #available(tvOS 14, *) {
                 sectionStoreDetails
             }
 #if os(watchOS)
@@ -32,7 +32,7 @@ public struct SettingsView: View {
                     ButtonRemoveAll(action: viewModel.buttonRemoveAllMessagesTapped)
                 }
             }
-            if #available(tvOS 14.0, *), viewModel.isRemoteLoggingAvailable {
+            if #available(tvOS 14, *), viewModel.isRemoteLoggingAvailable {
                 Section {
                     RemoteLoggerSettingsView(viewModel: .shared)
                 }
@@ -44,7 +44,7 @@ public struct SettingsView: View {
 #endif
     }
 
-    @available(tvOS 14.0, *)
+    @available(tvOS 14, *)
     private var sectionStoreDetails: some View {
         Section {
             NavigationLink(destination: StoreDetailsView(source: .store(viewModel.store))) {

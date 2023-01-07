@@ -1,73 +1,51 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
+import Pulse
 
+#warning("TODO: can't we just use RichTextView or file/content viewer?")
+@available(*, deprecated, message: "Deprecated")
 struct NetworkDetailsView: View {
     private var title: String
-    private let text: NSAttributedString
+    private let viewModel: NetworkDetailsViewModel?
     @State private var isShowingShareSheet = false
 
-    init(viewModel: KeyValueSectionViewModel) {
-        self.title = viewModel.title
-        self.text = viewModel.asAttributedString()
-    }
-
-    init(title: String, text: NSAttributedString) {
+    init(title: String, viewModel: @escaping () -> KeyValueSectionViewModel?) {
         self.title = title
-        self.text = text
-    }
-
-    func title(_ title: String) -> NetworkDetailsView {
-        var copy = self
-        copy.title = title
-        return copy
-    }
-
-    #if os(iOS)
-    var body: some View {
-        contents
-            .navigationBarTitle(title)
-            .navigationBarItems(trailing: ShareButton {
-                isShowingShareSheet = true
-            })
-            .sheet(isPresented: $isShowingShareSheet) {
-                ShareView(activityItems: [text])
+        self.viewModel = NetworkDetailsViewModel {
+            viewModel().map {
+                TextRenderer().render($0.items, color: $0.color)
             }
+        }
     }
-    #else
+
+    init(title: String, text: @escaping () -> NSAttributedString?) {
+        self.title = title
+        self.viewModel = NetworkDetailsViewModel(text)
+    }
+
     var body: some View {
         contents
+            .backport.navigationTitle(title)
     }
-    #endif
 
     @ViewBuilder
     private var contents: some View {
-        if text.string.isEmpty {
-            PlaceholderView(imageName: "folder", title: "Empty")
+        if let viewModel = viewModel?.text, !viewModel.isEmpty {
+            RichTextView(viewModel: viewModel)
         } else {
-            #if os(watchOS) || os(tvOS)
-            RichTextView(viewModel: .init(string: text.string))
-            #else
-            RichTextView(viewModel: {
-                let viewModel = RichTextViewModel(string: text)
-                viewModel.isAutomaticLinkDetectionEnabled = false
-                return viewModel
-            }())
-            #endif
+            PlaceholderView(imageName: "nosign", title: "Empty")
         }
     }
 }
 
-#if DEBUG
-struct NetworkDetailsView_Previews: PreviewProvider {
-    static var previews: some View {
-#if !os(watchOS)
-        NetworkDetailsView(title: "JWT", text: KeyValueSectionViewModel.makeDetails(for: jwt))
-#endif
+final class NetworkDetailsViewModel {
+    private(set) lazy var text = makeString().map { RichTextViewModel(string: $0) }
+    private let makeString: () -> NSAttributedString?
+
+    init(_ closure: @escaping () -> NSAttributedString?) {
+        self.makeString = closure
     }
 }
-
-private let jwt = try! JWT("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c")
-#endif

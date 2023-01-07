@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import CoreData
@@ -18,7 +18,6 @@ public struct MainView: View {
 
     public var body: some View {
        ConsoleView(viewModel: viewModel)
-            .onDisappear { viewModel.freeMemory() }
     }
 }
 

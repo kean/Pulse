@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import CoreData
@@ -8,6 +8,8 @@ import Pulse
 import Combine
 
 #if os(iOS) || os(tvOS) || os(watchOS)
+
+#warning("TODO: simplify this")
 
 final class MainViewModel: ObservableObject {
     let items: [MainViewModelItem]
@@ -70,7 +72,7 @@ struct MainViewModelItem: Hashable, Identifiable {
 #if os(iOS) || os(tvOS)
     static let console = MainViewModelItem(title: "Console", imageName: isPad ? "message" : "message.fill")
     static let network = MainViewModelItem(title: "Network", imageName: {
-        if #available(iOS 14.0, *) {
+        if #available(iOS 14, *) {
             return "network"
         } else {
             return "icloud.and.arrow.down.fill"
@@ -79,7 +81,7 @@ struct MainViewModelItem: Hashable, Identifiable {
     static let pins = MainViewModelItem(title: "Pins", imageName: isPad ? "pin" : "pin.fill")
     static let insights = MainViewModelItem(title: "Insights", imageName: isPad ? "chart.pie" : "chart.pie.fill")
     static let settings = MainViewModelItem(title: "Settings", imageName: {
-        if #available(iOS 14.0, *) {
+        if #available(iOS 14, *) {
             return "gearshape.fill"
         } else {
             return "ellipsis.circle.fill"

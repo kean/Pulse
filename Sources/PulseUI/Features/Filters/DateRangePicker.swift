@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import CoreData
@@ -16,7 +16,7 @@ struct DateRangePicker: View {
 
     var body: some View {
 #if os(iOS)
-        if #available(iOS 14.0, *) {
+        if #available(iOS 14, *) {
             newBody
         } else {
             oldBody

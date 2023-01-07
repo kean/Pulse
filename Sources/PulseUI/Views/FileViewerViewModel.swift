@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import CoreData
@@ -18,7 +18,11 @@ final class FileViewerViewModel: ObservableObject {
     private(set) lazy var data = getData()
     private let getData: () -> Data
 
+#if os(macOS)
     @Published private(set) var contents: Contents?
+#else
+    private(set) lazy var contents: Contents? = render(data: data)
+#endif
 
     struct Context {
         var contentType: NetworkLogger.ContentType?
@@ -44,6 +48,7 @@ final class FileViewerViewModel: ObservableObject {
     }
 
     func render() {
+#if os(macOS)
         let data = self.data
         if data.count < 30_000 {
             self.contents = render(data: data)
@@ -57,11 +62,13 @@ final class FileViewerViewModel: ObservableObject {
                 }
             }
         }
+#endif
     }
 
     private func render(data: Data) -> Contents {
         if let json = try? JSONSerialization.jsonObject(with: data, options: []) {
-            return .json(.init(json: json, error: context.error))
+            let string = TextRenderer().render(json: json, error: context.error)
+            return .json(RichTextViewModel(string: string, contentType: "application/json"))
         } else if let image = UXImage(data: data) {
             return .image(ImagePreviewViewModel(image: image, data: data, context: context))
         } else if let pdf = makePDF(data: data) {
@@ -69,14 +76,13 @@ final class FileViewerViewModel: ObservableObject {
         } else if data.isEmpty {
             return .other(.init(string: "Unavailable"))
         } else if let string = String(data: data, encoding: .utf8) {
-#if os(iOS) || os(macOS)
             if contentType?.isEncodedForm ?? false, let components = decodeQueryParameters(form: string) {
-                return .other(.init(string: components.asAttributedString()))
+                return .other(RichTextViewModel(string: TextRenderer().render(components, style: .monospaced)))
             } else if contentType?.isHTML ?? false {
-                return .other(.init(string: HTMLPrettyPrint(string: string).render()))
+                let renderer = TextRendererHTML(html: string)
+                return .other(RichTextViewModel(string: renderer.render(), contentType: "text/html"))
             }
-#endif
-            return .other(.init(string: string))
+            return .other(.init(string: TextRenderer().preformatted(string)))
         } else {
             let message = "Data \(ByteCountFormatter.string(fromByteCount: Int64(data.count)))"
             return .other(RichTextViewModel(string: message))
@@ -92,6 +98,7 @@ final class FileViewerViewModel: ObservableObject {
         return nil
     }
 
+    @available(*, deprecated, message: "Deprecated")
     private func decodeQueryParameters(form string: String) -> KeyValueSectionViewModel? {
         let string = "https://placeholder.com/path?" + string
         guard let components = URLComponents(string: string),
@@ -99,10 +106,11 @@ final class FileViewerViewModel: ObservableObject {
               !queryItems.isEmpty else {
             return nil
         }
-        return KeyValueSectionViewModel.makeQueryItems(for: queryItems, action: {})
+        return KeyValueSectionViewModel.makeQueryItems(for: queryItems)
     }
 }
 
+@available(*, deprecated, message: "Deprecated")
 private extension Data {
     var localizedSize: String {
         ByteCountFormatter.string(fromByteCount: Int64(count))

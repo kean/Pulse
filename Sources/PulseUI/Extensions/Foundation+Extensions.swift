@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
 import CommonCrypto
@@ -14,14 +14,22 @@ extension Array {
     }
 }
 
-func prettifyJSON(_ data: Data) -> String {
-    guard let json = try? JSONSerialization.jsonObject(with: data, options: []) else {
-        return String(data: data, encoding: .utf8) ?? ""
+extension NSString {
+    /// Finds all occurrences of the given string
+    func ranges(of substring: String, options: NSString.CompareOptions = []) -> [NSRange] {
+        var index = 0
+        var ranges = [NSRange]()
+        while index < length {
+            let range = range(of: substring, options: options, range: NSRange(location: index, length: length - index), locale: nil)
+            if range.location == NSNotFound {
+                return ranges
+            }
+            ranges.append(range)
+            index = range.upperBound
+        }
+        return ranges
     }
-    guard let pretty = try? JSONSerialization.data(withJSONObject: json, options: [.prettyPrinted]) else {
-        return String(data: data, encoding: .utf8) ?? ""
-    }
-    return String(data: pretty, encoding: .utf8) ?? ""
+
 }
 
 extension String {

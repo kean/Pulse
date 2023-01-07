@@ -1,11 +1,11 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020–2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
 import Pulse
 
-@available(iOS 14.0, tvOS 14.0, *)
+@available(iOS 14, tvOS 14, *)
 public struct StoreDetailsView: View {
     @StateObject private var viewModel = StoreDetailsViewModel()
 
@@ -26,6 +26,9 @@ public struct StoreDetailsView: View {
 
     public var body: some View {
         Contents(viewModel: viewModel)
+#if os(tvOS)
+            .frame(maxWidth: 860)
+#endif
             .onAppear { viewModel.load(from: source) }
 #if os(iOS)
             .navigationBarTitle("Store Details", displayMode: .inline)
@@ -33,7 +36,7 @@ public struct StoreDetailsView: View {
     }
 }
 
-@available(iOS 14.0, tvOS 14.0, *)
+@available(iOS 14, tvOS 14, *)
 private struct Contents: View {
     @ObservedObject var viewModel: StoreDetailsViewModel
 
@@ -74,7 +77,7 @@ private struct Contents: View {
 
 // MARK: - ViewModel
 
-@available(iOS 14.0, tvOS 14.0, *)
+@available(iOS 14, tvOS 14, *)
 final class StoreDetailsViewModel: ObservableObject {
     @Published private(set) var isLoading = false
     @Published private(set) var storeSizeLimit: Int64?
@@ -164,7 +167,7 @@ private let dateFormatter: DateFormatter = {
 }()
 
 #if DEBUG
-@available(iOS 14.0, tvOS 14.0, *)
+@available(iOS 14, tvOS 14, *)
 struct StoreDetailsView_Previews: PreviewProvider {
     static var previews: some View {
         StoreDetailsView(source: .store(.mock))
