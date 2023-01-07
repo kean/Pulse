@@ -8,7 +8,6 @@ import Pulse
 import Combine
 
 #warning("TODO: handle clicks on decoding error on other platforms")
-#warning("TODO: link detection disable by default")
 #warning("TODO: optimize performance")
 
 #if os(macOS) || os(iOS)
@@ -287,8 +286,8 @@ private func configureTextView(_ textView: UXTextView) {
 private func bind(_ viewModel: RichTextViewModel, _ textView: UXTextView) -> [AnyCancellable] {
     var cancellables: [AnyCancellable] = []
 
-    viewModel.$isLinkDetectionEnabled.sink {
-        textView.isAutomaticLinkDetectionEnabled = $0
+    Publishers.CombineLatest(viewModel.$isLinkDetectionEnabled, ConsoleSettings.shared.$isLinkDetectionEnabled).sink {
+        textView.isAutomaticLinkDetectionEnabled = $0 && $1
     }.store(in: &cancellables)
 
     return cancellables

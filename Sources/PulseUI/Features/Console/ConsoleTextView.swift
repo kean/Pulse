@@ -110,7 +110,6 @@ private struct ConsoleTextViewSettingsView: View {
                     Text("Full").tag(TextRenderer.ColorMode.full)
                     Text("Monochrome").tag(TextRenderer.ColorMode.monochrome)
                 }
-                Toggle("Link Detection", isOn: $settings.isLinkDetectionEnabled)
             }
             Section(header: Text("Request Info")) {
                 Toggle("Request Headers", isOn: $settings.showsRequestHeaders)
@@ -170,7 +169,7 @@ final class ConsoleTextViewModel: ObservableObject {
     func reloadOptions() {
         content = makeNetworkContent()
         options.color = settings.colorMode
-        text.isLinkDetectionEnabled = settings.isLinkDetectionEnabled
+        text.isLinkDetectionEnabled = false
     }
 
     func refresh() {

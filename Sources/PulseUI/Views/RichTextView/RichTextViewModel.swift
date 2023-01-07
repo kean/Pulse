@@ -33,6 +33,7 @@ final class RichTextViewModel: ObservableObject {
     private var isSearchingInBackground = false
     private var isSearchNeeded = false
     private let queue = DispatchQueue(label: "com.github.kean.pulse.search")
+    private let settings = ConsoleSettings.shared
     private var bag = [AnyCancellable]()
 
     convenience init(string: String = "") {

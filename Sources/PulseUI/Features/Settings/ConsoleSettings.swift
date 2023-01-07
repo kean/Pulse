@@ -15,6 +15,9 @@ final class ConsoleSettings: PersistentSettings {
     @UserDefaultRaw("sharing-time-range")
     var sharingTimeRange: SharingTimeRange = .currentSession
 
+    @UserDefault("link-detection")
+    var isLinkDetectionEnabled = false
+
     @UserDefaultRaw("sharing-level")
     var sharingLevel: LoggerStore.Level = .trace
 
@@ -27,9 +30,6 @@ final class ConsoleTextViewSettings: PersistentSettings {
 
     @UserDefaultRaw("console-text-view__color-mode")
     var colorMode = TextRenderer.ColorMode.automatic
-
-    @UserDefault("console-text-view__link-detection")
-    var isLinkDetectionEnabled = false
 
     @UserDefault("console-text-view__request-headers")
     var showsRequestHeaders = false

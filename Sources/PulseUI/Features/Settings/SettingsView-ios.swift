@@ -5,6 +5,8 @@
 import SwiftUI
 import Pulse
 
+#warning("TODO: add on other platforms")
+
 #if os(iOS)
 import UniformTypeIdentifiers
 
@@ -24,8 +26,11 @@ public struct SettingsView: View {
 
     public var body: some View {
         Form {
-            Section {
+            Section(header: Text("Appearance")) {
                 Stepper("Line Limit: \(settings.lineLimit)", value: $settings.lineLimit, in: 1...20)
+            }
+            Section(header: Text("General")) {
+                Toggle("Link Detection", isOn: $settings.isLinkDetectionEnabled)
             }
             if viewModel.isRemoteLoggingAvailable {
                 Section {
