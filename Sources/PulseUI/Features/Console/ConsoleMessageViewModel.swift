@@ -7,8 +7,6 @@ import Pulse
 import CoreData
 import Combine
 
-#warning("TODO: remove Cache from console")
-
 final class ConsoleMessageViewModel: Pinnable {
     let title: String
     let text: String

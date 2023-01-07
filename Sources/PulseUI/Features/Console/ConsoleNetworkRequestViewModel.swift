@@ -7,7 +7,8 @@ import Pulse
 import Combine
 import CoreData
 
-#warning("TODO: rework fullTitle, etc")
+#warning("TODO: refactor")
+
 final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
     private(set) lazy var time = ConsoleMessageViewModel.timeFormatter.string(from: task.createdAt)
 #if os(iOS)
@@ -62,8 +63,6 @@ final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
             }
         }
     }
-
-#warning("TODO: add subline with details instead of cramming everything into the header (?)")
 
     private func refresh() {
         let state = task.state
