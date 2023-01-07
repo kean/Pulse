@@ -127,19 +127,7 @@ extension Color {
 }
 
 #if os(iOS)
-extension UIColor {
-    static func badgeColor(for level: LoggerStore.Level) -> UIColor {
-        switch level {
-        case .critical: return .systemRed
-        case .error: return .systemRed
-        case .warning: return .systemOrange
-        case .info: return .systemBlue
-        case .notice: return .systemBlue
-        case .debug: return .secondaryLabel
-        case .trace: return .secondaryLabel
-        }
-    }
-    
+extension UIColor {    
     static func textColor(for level: LoggerStore.Level) -> UIColor {
         switch level {
         case .trace: return .secondaryLabel

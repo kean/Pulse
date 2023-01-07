@@ -21,7 +21,7 @@ struct ConsoleMessageMetadataView: View {
 
     private var sections: [KeyValueSectionViewModel] {
         return [
-            KeyValueSectionViewModel(title: "Summary", color: message.tintColor, items: [
+            KeyValueSectionViewModel(title: "Summary", color: Color.badgeColor(for: message.logLevel), items: [
                 ("Date", DateFormatter.fullDateFormatter.string(from: message.createdAt)),
                 ("Level", LoggerStore.Level(rawValue: message.level)?.name),
                 ("Label", message.label.name.nonEmpty)
@@ -38,12 +38,6 @@ struct ConsoleMessageMetadataView: View {
 
     private var metadataItems: [(String, String?)] {
         message.metadata.sorted(by: { $0.key < $1.key }).map { ($0.key, $0.value )}
-    }
-}
-
-private extension LoggerMessageEntity {
-    var tintColor: Color {
-        Color.badgeColor(for: logLevel)
     }
 }
 
