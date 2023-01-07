@@ -75,7 +75,7 @@ struct NetworkRequestStatusCellModel {
         duration = DurationViewModel(transaction: transaction)
     }
 
-    var uiTintColor: UIColor {
+    var uiTintColor: UXColor {
         if #available(iOS 14, tvOS 14, *) {
             return UXColor(tintColor)
         } else {

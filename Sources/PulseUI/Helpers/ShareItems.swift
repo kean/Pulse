@@ -40,10 +40,14 @@ enum ShareService {
             let fileURL = directory.write(data: html, extension: "html")
             return ShareItems([fileURL], cleanup: directory.remove)
         case .pdf:
+#if os(iOS)
             let pdf = (try? TextRenderer.pdf(from: string)) ?? Data()
             let directory = TemporaryDirectory()
             let fileURL = directory.write(data: pdf, extension: "pdf")
             return ShareItems([fileURL], cleanup: directory.remove)
+#else
+            return ShareItems(["Sharing as PDF is not supported on this platform"])
+#endif
         }
     }
 
