@@ -7,29 +7,41 @@ import CoreData
 import Pulse
 import Combine
 
-#warning("TODO: reimplement")
+#warning("TODO: howto present on tvOS? is there a close button?")
 
 #if os(tvOS)
 
 public struct MainView: View {
     // TODO: replace with StateObject
-    @ObservedObject private var viewModel: MainViewModel
+    let console: ConsoleViewModel
+    let network: ConsoleViewModel
+    let settings: SettingsViewModel
 
     /// - parameter onDismiss: pass onDismiss to add a close button.
     public init(store: LoggerStore = .shared) {
-        viewModel = MainViewModel(store: store, onDismiss: nil)
+        self.console = ConsoleViewModel(store: store)
+        self.network = ConsoleViewModel(store: store, mode: .network)
+        self.settings = SettingsViewModel(store: store)
     }
 
     public var body: some View {
         NavigationView {
             TabView {
-                ForEach(viewModel.items) { item in
-                    viewModel.makeView(for: item)
-                        .tabItem {
-                            Image(systemName: item.imageName)
-                            Text(item.title)
-                        }
-                }
+                ConsoleView(viewModel: console)
+                    .tabItem {
+                        Image(systemName: "message.fill")
+                        Text("Console")
+                    }
+                ConsoleView(viewModel: network)
+                    .tabItem {
+                        Image(systemName: "paperplane.fill")
+                        Text("Network")
+                    }
+                SettingsView(viewModel: settings)
+                    .tabItem {
+                        Image(systemName: "gear")
+                        Text("Settings")
+                    }
             }
         }
     }
@@ -41,7 +53,6 @@ struct MainView_Previews: PreviewProvider {
         MainView(store: .mock)
     }
 }
-
 #endif
 
 #endif
