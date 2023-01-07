@@ -28,6 +28,9 @@ final class RichTextViewModel: ObservableObject {
     weak var textView: UXTextView? // Not proper MVVM
     var textStorage: NSTextStorage { textView?.textStorage ?? NSTextStorage(string: "") }
 
+    private var isSearchingInBackground = false
+    private var isSearchNeeded = false
+    private let queue = DispatchQueue(label: "com.github.kean.pulse.search")
     private var bag = [AnyCancellable]()
 
     convenience init(string: String = "") {
@@ -43,9 +46,12 @@ final class RichTextViewModel: ObservableObject {
         self.text = string
         self.contentType = contentType
 
-        Publishers.CombineLatest($searchTerm, $searchOptions).sink { [weak self] in
-            self?.refresh(searchTerm: $0, options: $1)
-        }.store(in: &bag)
+        Publishers.CombineLatest($searchTerm, $searchOptions)
+            .dropFirst()
+            .receive(on: DispatchQueue.main) // Make sure self returns new values
+            .sink { [weak self] _, _ in
+                self?.setSearchNeeded()
+            }.store(in: &bag)
     }
 
     func display(_ text: NSAttributedString) {
@@ -63,8 +69,28 @@ final class RichTextViewModel: ObservableObject {
         textStorage.endEditing()
     }
 
-    private func refresh(searchTerm: String, options: StringSearchOptions) {
-        let newMatches = search(searchTerm: searchTerm, options: options).filter {
+    private func setSearchNeeded() {
+        isSearchNeeded = true
+        searchIfNeeded()
+    }
+
+    private func searchIfNeeded() {
+        guard isSearchNeeded && !isSearchingInBackground else { return }
+        isSearchingInBackground = true
+        isSearchNeeded = false
+
+        let string = textStorage.string as NSString
+        let (term, options) = (searchTerm, searchOptions)
+        queue.async {
+            let matches = search(searchTerm: term, in: string, options: options)
+            DispatchQueue.main.async {
+                self.didUpdateMatches(matches)
+            }
+        }
+    }
+
+    private func didUpdateMatches(_ newMatches: [NSRange]) {
+        let newMatches = newMatches.filter {
             textStorage.attributes(at: $0.location, effectiveRange: nil)[.objectIdKey] == nil
         }
 
@@ -78,13 +104,9 @@ final class RichTextViewModel: ObservableObject {
 
         selectedMatchIndex = 0
         didUpdateCurrentSelectedMatch()
-    }
 
-    func search(searchTerm: String, options: StringSearchOptions) -> [NSRange] {
-        guard searchTerm.count > 1 else {
-            return []
-        }
-        return (textStorage.string as NSString).ranges(of: searchTerm, options: .init(options))
+        isSearchingInBackground = false
+        searchIfNeeded()
     }
 
     func cancelSearch() {
@@ -143,4 +165,11 @@ final class RichTextViewModel: ObservableObject {
             .foregroundColor: UXColor.white
         ], range: range)
     }
+}
+
+private func search(searchTerm: String, in string: NSString, options: StringSearchOptions) -> [NSRange] {
+    guard searchTerm.count > 1 else {
+        return []
+    }
+    return string.ranges(of: searchTerm, options: .init(options))
 }
