@@ -12,8 +12,6 @@ final class ConsoleMessageDetailsViewModel {
 
     let tags: [ConsoleMessageTagViewModel]
     let text: String
-    let badge: BadgeViewModel?
-
     let message: LoggerMessageEntity
 
     static let dateFormatter: DateFormatter = {
@@ -41,7 +39,6 @@ final class ConsoleMessageDetailsViewModel {
             ConsoleMessageTagViewModel(title: "Label", value: message.label.name)
         ]
         self.text = message.text
-        self.badge = BadgeViewModel(message: message)
     }
 
     func prepareForSharing() -> Any {
