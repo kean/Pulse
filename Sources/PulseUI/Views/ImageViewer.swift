@@ -16,12 +16,9 @@ struct ImageViewer: View {
                 .frame(maxWidth: viewModel.image.size.width, maxHeight: viewModel.image.size.height)
                 .border(Color.separator, width: 0.5)
 
-            if #available(iOS 15, tvOS 15, *) {
-                HStack {
-                    Text(AttributedString(viewModel.info))
-                        .textSelection(.enabled)
-                    Spacer()
-                }
+            HStack {
+                TextView(string: viewModel.info)
+                Spacer()
             }
 
             Spacer()
