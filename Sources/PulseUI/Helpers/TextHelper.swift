@@ -68,7 +68,9 @@ final class TextHelper {
         case .body: size = getPreferredFontSize(for: .body)
         case .body2: size = body2Size
         }
+#if !os(macOS)
         if style.style == .monospaced { size -= 2 } // Appears larger than regular
+#endif
         return scaled(font: {
             switch style.style {
             case .proportional: return .systemFont(ofSize: size, weight: style.weight)
