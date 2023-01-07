@@ -25,7 +25,7 @@ struct ConsoleView: View {
             .listRowBackground(viewModel.isOnlyErrors ? Color.blue.cornerRadius(8) : nil)
 
             Button(action: { viewModel.isOnlyNetwork.toggle() }) {
-                Label("Show Requests", systemImage: "network")
+                Label("Show Requests", systemImage: "paperplane")
             }
             .listRowBackground(viewModel.isOnlyNetwork ? Color.blue.cornerRadius(8) : nil)
 
