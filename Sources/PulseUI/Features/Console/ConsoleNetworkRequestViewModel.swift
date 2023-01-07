@@ -95,15 +95,8 @@ final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
 
 #if os(iOS) || os(macOS)
 
-    func shareAsPlainText() -> ShareItems {
-        ShareItems([ConsoleShareService.share(task, output: .plainText)])
-    }
-
-    func shareAsHTML() -> ShareItems {
-        let text = ConsoleShareService.share(task, output: .html)
-        let directory = TemporaryDirectory()
-        let fileURL = directory.write(text: text, extension: "html")
-        return ShareItems([fileURL], cleanup: directory.remove)
+    func share(as output: ShareOutput) -> ShareItems {
+        ShareService.share(task, as: output)
     }
 
     func shareAsCURL() -> ShareItems {

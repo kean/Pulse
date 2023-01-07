@@ -77,13 +77,5 @@ final class NetworkInspectorViewModel: ObservableObject {
     var pinViewModel: PinButtonViewModel? {
         task.message.map(PinButtonViewModel.init)
     }
-
-    func prepareForSharing() -> String {
-#if !os(watchOS) && !os(tvOS)
-        return ConsoleShareService.share(task, output: .plainText)
-#else
-        return "Sharing not supported on watchOS"
-#endif
-    }
 }
 

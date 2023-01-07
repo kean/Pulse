@@ -40,8 +40,8 @@ public struct NetworkView: View {
         .navigationBarItems(
             leading: navigationBarTrailingItems,
             trailing: HStack {
-                ShareButton { isSharing = true }
                 if #available(iOS 14, *) {
+                    ShareButton { isSharing = true }
                     ConsoleContextMenu(store: viewModel.store, isShowingAsText: $isShowingAsText)
                 }
             }
@@ -51,8 +51,6 @@ public struct NetworkView: View {
                 NavigationView {
                     ShareStoreView(store: viewModel.store, isPresented: $isSharing)
                 }.backport.presentationDetents([.medium])
-            } else {
-                ShareView(ShareItems(messages: viewModel.store))
             }
         }
         .backport.fullScreenCover(isPresented: $isShowingAsText) {

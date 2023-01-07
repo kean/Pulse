@@ -116,11 +116,15 @@ final class ConsoleNetworkRequestTableCell: UITableViewCell, UIContextMenuIntera
 
     private func makeMenu(for viewModel: ConsoleNetworkRequestViewModel) -> UIMenu {
         let shareAsText = UIAction(title: "Share as Plain Text", image: UIImage(systemName: "square.and.arrow.up")) { _ in
-            UIActivityViewController.show(with: viewModel.shareAsPlainText())
+            UIActivityViewController.show(with: viewModel.share(as: .plainText))
         }
 
         let shareAsHTML = UIAction(title: "Share as HTML", image: UIImage(systemName: "square.and.arrow.up")) { _ in
-            UIActivityViewController.show(with: viewModel.shareAsHTML())
+            UIActivityViewController.show(with: viewModel.share(as: .html))
+        }
+
+        let shareAsPDF = UIAction(title: "Share as PDF", image: UIImage(systemName: "square.and.arrow.up")) { _ in
+            UIActivityViewController.show(with: viewModel.share(as: .pdf))
         }
 
         let shareAsCURL = UIAction(title: "Share as cURL", image: UIImage(systemName: "square.and.arrow.up")) { _ in

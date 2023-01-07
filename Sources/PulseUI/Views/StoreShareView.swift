@@ -256,12 +256,15 @@ private final class ShareStoreViewModel: ObservableObject {
                 info = try store.copy(to: logsURL)
             }
         case .text:
-            let request = NSFetchRequest<LoggerMessageEntity>(entityName: "\(LoggerMessageEntity.self)")
-            request.predicate = predicate
-            let messages: [LoggerMessageEntity] = try context.fetch(request)
-            let text = ConsoleShareService.format(messages)
-            logsURL = directory.url.appendingPathComponent("logs-\(makeCurrentDate()).txt")
-            try text.data(using: .utf8)?.write(to: logsURL)
+
+#warning("TODO: rewrite using TextRenderer")
+            fatalError()
+//            let request = NSFetchRequest<LoggerMessageEntity>(entityName: "\(LoggerMessageEntity.self)")
+//            request.predicate = predicate
+//            let messages: [LoggerMessageEntity] = try context.fetch(request)
+//            let text = ShareService.format(messages)
+//            logsURL = directory.url.appendingPathComponent("logs-\(makeCurrentDate()).txt")
+//            try text.data(using: .utf8)?.write(to: logsURL)
         }
         let item = ShareItems([logsURL], cleanup: directory.remove)
         return SharedContents(item: item, size: try logsURL.getFileSize(), info: info)

@@ -44,8 +44,6 @@ public struct ConsoleView: View {
                     NavigationView {
                         ShareStoreView(store: viewModel.store, isPresented: $isSharing)
                     }.backport.presentationDetents([.medium])
-                } else {
-                    ShareView(ShareItems(messages: viewModel.store))
                 }
             }
             .backport.fullScreenCover(isPresented: $isShowingAsText) {

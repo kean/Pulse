@@ -321,10 +321,6 @@ struct NetworkInspectorView: View {
                 }, label: {
                     Image(systemName: "ellipsis.circle")
                 })
-            } else {
-                ShareButton {
-                    shareItems = ShareItems([viewModel.prepareForSharing()])
-                }
             }
         }
     }

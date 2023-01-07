@@ -71,7 +71,7 @@ final class ConsoleMessageViewModel: Pinnable {
 
 #if os(iOS) || os(macOS)
     func share() -> ShareItems {
-        ShareItems([ConsoleShareService.share(message)])
+        ShareItems([message.text])
     }
     
     func copy() -> String {
