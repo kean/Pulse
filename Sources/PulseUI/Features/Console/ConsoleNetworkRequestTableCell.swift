@@ -27,6 +27,11 @@ final class ConsoleNetworkRequestTableCell: UITableViewCell, UIContextMenuIntera
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         titleAttributes = TextHelper().attributes(role: .subheadline, style: .monospacedDigital, width: .condensed, color: .secondaryLabel)
+        titleAttributes[.paragraphStyle] = {
+            let style = NSMutableParagraphStyle()
+            style.lineBreakMode = .byTruncatingTail
+            return style
+        }()
 
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         createView()
