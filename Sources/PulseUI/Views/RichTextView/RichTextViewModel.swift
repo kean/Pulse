@@ -7,6 +7,8 @@ import CoreData
 import Pulse
 import Combine
 
+#if os(iOS) || os(macOS)
+
 final class RichTextViewModel: ObservableObject {
     // Search
     @Published var searchOptions: StringSearchOptions = .default
@@ -173,3 +175,5 @@ private func search(searchTerm: String, in string: NSString, options: StringSear
     }
     return string.ranges(of: searchTerm, options: .init(options))
 }
+
+#endif

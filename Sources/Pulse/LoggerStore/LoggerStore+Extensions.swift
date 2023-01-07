@@ -4,8 +4,6 @@
 
 import Foundation
 
-#if os(iOS) || os(macOS) || os(tvOS)
-
 extension NetworkTaskEntity {
     public func cURLDescription() -> String {
         guard let request = currentRequest ?? originalRequest,
@@ -34,5 +32,3 @@ extension NetworkTaskEntity {
         return components.joined(separator: " \\\n\t")
     }
 }
-
-#endif
