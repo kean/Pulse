@@ -8,64 +8,36 @@ import Pulse
 struct ConsoleMessageMetadataView: View {
     let message: LoggerMessageEntity
 
-    @State private var isMetadataRawLinkActive = false
-
     var body: some View {
-        contents
-            .background(links)
-#if os(iOS)
-            .navigationBarTitle("Details", displayMode: .inline)
-#endif
+        RichTextView(viewModel: .init(string: string))
+            .backport.navigationTitle("Message Details")
     }
 
-    @ViewBuilder
-    private var contents: some View {
-        ScrollView {
-            #if os(iOS) || os(tvOS) || os(macOS)
-            VStack(spacing: 16) {
-                stackContents
-            }.padding()
-            #elseif os(watchOS)
-            VStack(spacing: 16) {
-                stackContents
-            }
-            #endif
-        }
+    private var string: NSAttributedString {
+        let renderer = TextRenderer()
+        let strings = sections.map { renderer.render($0) }
+        return renderer.joined(strings)
     }
 
-    @ViewBuilder
-    private var stackContents: some View {
-        KeyValueSectionView(viewModel: .init(title: "Summary", color: message.tintColor, items: [
-            ("Date", dateFormatter.string(from: message.createdAt)),
-            ("Level", LoggerStore.Level(rawValue: message.level)?.name),
-            ("Label", message.label.name.nonEmpty)
-        ]))
-        KeyValueSectionView(viewModel: .init(title: "Details", color: .secondary, items: [
-            ("Session", message.session.uuidString.nonEmpty),
-            ("File", message.file.nonEmpty),
-            ("Function", message.function.nonEmpty),
-            ("Line", message.line == 0 ? nil : "\(message.line)"),
-        ]))
-        KeyValueSectionView(viewModel: metadataViewModel)
-    }
-
-#warning("TODO: use navigation link")
-    private var metadataViewModel: KeyValueSectionViewModel {
-        KeyValueSectionViewModel(title: "Metadata", color: .indigo, action: ActionViewModel(title: "View") {
-            isMetadataRawLinkActive = true
-        }, items: metadataItems)
+    private var sections: [KeyValueSectionViewModel] {
+        return [
+            KeyValueSectionViewModel(title: "Summary", color: message.tintColor, items: [
+                ("Date", dateFormatter.string(from: message.createdAt)),
+                ("Level", LoggerStore.Level(rawValue: message.level)?.name),
+                ("Label", message.label.name.nonEmpty)
+            ]),
+            KeyValueSectionViewModel(title: "Details", color: .primary, items: [
+                ("Session", message.session.uuidString.nonEmpty),
+                ("File", message.file.nonEmpty),
+                ("Function", message.function.nonEmpty),
+                ("Line", message.line == 0 ? nil : "\(message.line)"),
+            ]),
+            KeyValueSectionViewModel(title: "Metadata", color: .indigo, items: metadataItems)
+        ]
     }
 
     private var metadataItems: [(String, String?)] {
         message.metadata.sorted(by: { $0.key < $1.key }).map { ($0.key, $0.value )}
-    }
-
-    private var links: some View {
-        InvisibleNavigationLinks {
-            NavigationLink.programmatic(isActive: $isMetadataRawLinkActive) {
-                NetworkDetailsView(title: "Metadata", viewModel: { metadataViewModel })
-            }
-        }
     }
 }
 
