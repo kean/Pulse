@@ -2,7 +2,7 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
-#warning("TODO: add PDF export and test printing")
+#warning("TODO: improve PDF export: expand network (?); use monochrome; use larger fonts")
 
 import Foundation
 import Pulse
@@ -237,8 +237,6 @@ final class TextRenderer {
         return html.data(using: .utf8) ?? data
     }
 
-#warning("TODO: imporve and enable sharing (in diff parts of the app) + check printing + monochrome always")
-#warning("TODO: check if we can render as a single page if that even makes sense")
     /// Renderes the given attributed string as PDF
 #if os(iOS)
     static func pdf(from string: NSAttributedString) throws -> Data {
@@ -296,8 +294,6 @@ extension NSAttributedString.Key {
 }
 
 // MARK: - Previews
-
-#warning("TODO: add other preview using this")
 
 #if DEBUG
 struct ConsoleTextRenderer_Previews: PreviewProvider {

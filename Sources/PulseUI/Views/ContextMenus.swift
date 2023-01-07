@@ -161,7 +161,6 @@ struct StringSearchOptionsMenu: View {
     }
 }
 
-#warning("TODO: skip Show Details")
 @available(iOS 14, *)
 struct AttributedStringShareMenu: View {
     @Binding var shareItems: ShareItems?
