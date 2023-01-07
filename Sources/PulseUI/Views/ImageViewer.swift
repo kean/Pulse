@@ -14,10 +14,15 @@ struct ImageViewer: View {
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .frame(maxWidth: viewModel.image.size.width, maxHeight: viewModel.image.size.height)
-                .border(Color.separator, width: 1)
+                .border(Color.separator, width: 0.5)
 
-            KeyValueSectionView(viewModel: viewModel.info)
-                .hiddenTitle()
+            if #available(iOS 15, tvOS 15, *) {
+                HStack {
+                    Text(AttributedString(viewModel.info))
+                        .textSelection(.enabled)
+                    Spacer()
+                }
+            }
 
             Spacer()
         }.padding()
@@ -26,7 +31,7 @@ struct ImageViewer: View {
 
 struct ImagePreviewViewModel {
     let image: UXImage
-    let info: KeyValueSectionViewModel
+    let info: NSAttributedString
 
     init(image: UXImage, data: Data, context: FileViewerViewModel.Context) {
         func intValue(for key: String) -> Int? {
@@ -64,6 +69,7 @@ struct ImagePreviewViewModel {
         }
 
         self.image = image
-        self.info = KeyValueSectionViewModel(title: "Image", color: .pink, items: info)
+        let section = KeyValueSectionViewModel(title: "Image", color: .pink, items: info)
+        self.info = TextRenderer().render(section)
     }
 }
