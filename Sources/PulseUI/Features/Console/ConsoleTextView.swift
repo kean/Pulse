@@ -222,6 +222,7 @@ final class ConsoleTextViewModel: ObservableObject {
         attributes[.foregroundColor] = UXColor.systemBlue
         attributes[.link] = URL(string: "pulse://expand/\(uuid.uuidString)")
         attributes[.objectIdKey] = task.objectID
+        attributes[.isTechnicalKey] = true
         attributes[.underlineColor] = UXColor.clear
         string.append(renderer.spacer())
         string.append("Show Details\n", attributes)
@@ -293,10 +294,6 @@ final class ConsoleTextViewModel: ObservableObject {
         guard isButtonRefreshHidden else { return }
         isButtonRefreshHidden = false
     }
-}
-
-extension NSAttributedString.Key {
-    static let objectIdKey = NSAttributedString.Key("pulse-object-id")
 }
 
 #if DEBUG

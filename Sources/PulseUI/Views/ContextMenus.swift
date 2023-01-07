@@ -169,12 +169,12 @@ struct AttributedStringShareMenu: View {
 
     var body: some View {
         Button(action: {
-            shareItems = ShareItems([string().string])
+            shareItems = ShareItems([prepare().string])
         }) {
             Label("Share as Text", systemImage: "square.and.arrow.up")
         }
         Button(action: {
-            let html = (try? TextRenderer.html(from: string())) ?? Data()
+            let html = (try? TextRenderer.html(from: prepare())) ?? Data()
             let directory = TemporaryDirectory()
             let fileURL = directory.write(data: html, extension: "html")
             shareItems = ShareItems([fileURL], cleanup: directory.remove)
@@ -183,7 +183,7 @@ struct AttributedStringShareMenu: View {
             Image(systemName: "square.and.arrow.up")
         }
         Button(action: {
-            let pdf = (try? TextRenderer.pdf(from: string())) ?? Data()
+            let pdf = (try? TextRenderer.pdf(from: prepare())) ?? Data()
             let directory = TemporaryDirectory()
             let fileURL = directory.write(data: pdf, extension: "pdf")
             shareItems = ShareItems([fileURL], cleanup: directory.remove)
@@ -191,6 +191,23 @@ struct AttributedStringShareMenu: View {
             Text("Share as PDF")
             Image(systemName: "square.and.arrow.up")
         }
+    }
+
+    private func prepare() -> NSAttributedString {
+        let input = string()
+        var ranges: [NSRange] = []
+        input.enumerateAttribute(.isTechnicalKey, in: NSRange(location: 0, length: input.length)) { value, range, _ in
+            if (value as? Bool) == true {
+                ranges.append(range)
+            }
+        }
+        print(ranges)
+
+        let output = NSMutableAttributedString(attributedString: input)
+        for range in ranges.reversed() {
+            output.deleteCharacters(in: range)
+        }
+        return output
     }
 }
 

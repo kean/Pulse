@@ -287,6 +287,12 @@ final class TextRenderer {
     }
 }
 
+
+extension NSAttributedString.Key {
+    static let objectIdKey = NSAttributedString.Key("pulse-object-id-key")
+    static let isTechnicalKey = NSAttributedString.Key("pulse-technical-substring-key")
+}
+
 // MARK: - Previews
 
 #warning("TODO: add other preview using this")
