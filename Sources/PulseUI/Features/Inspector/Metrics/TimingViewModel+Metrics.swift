@@ -146,4 +146,16 @@ private func makeTimingRows(transaction: NetworkTransactionMetricsEntity, taskIn
     return sections
 }
 
+extension URLSessionTaskMetrics.ResourceFetchType {
+    var title: String {
+        switch self {
+        case .networkLoad: return "Network Load"
+        case .localCache: return "Cache Lookup"
+        case .serverPush: return "Server Push"
+        case .unknown: return "Unknown Fetch Type"
+        default: return "Unknown Fetch Type"
+        }
+    }
+}
+
 #endif

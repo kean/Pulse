@@ -7,12 +7,8 @@ import CoreData
 import Pulse
 import Combine
 
-#warning("TODO: use @Published instead of objectWillChange")
-
 final class NetworkInspectorViewModel: ObservableObject {
     let title: String
-
-#warning("TODO: make private")
     let task: NetworkTaskEntity
 
     private(set) var statusSectionViewModel: NetworkRequestStatusSectionViewModel?

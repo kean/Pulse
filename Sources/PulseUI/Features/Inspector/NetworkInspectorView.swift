@@ -7,26 +7,10 @@ import CoreData
 import Pulse
 import Combine
 
-#warning("TODO: display full date somewhere")
-#warning("TODO: add task rype somewhere")
-#warning("TODO: add View Raw + cURL descriootion")
-#warning("TODO: rework where (Cache) is displayed")
-
-#warning("TODO: when highlighting textview use prepareUpdate and commitUpdates")
-#warning("TODO: fix state management at least on the top level")
-#warning("TODO: rework metrics")
-#warning("TODO: find better icons")
-#warning("TODO: simplify response views to not show progress (or remove entirely?")
-
 #warning("TODO: tvOS enable scroll on left side")
 #warning("TODO: tvOS fix transaction details UI")
-#warning("TODO: rewrite TransactionsDeatilsView without KeyValueView")
 #warning("TODO: macos show response body automatically when task finished loading")
 #warning("TODO: add sharing on watchOS")
-
-#warning("TODO: test everything with Self._printChanges() for performance")
-
-#warning("TODO: render request body string monospaced")
 
 struct NetworkInspectorView: View {
 #if os(watchOS)
