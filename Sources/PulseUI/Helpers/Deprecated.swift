@@ -14,6 +14,7 @@ public struct PinsView: View {
     }
 }
 
+#if !os(macOS) && !os(watchOS)
 @available(*, deprecated, message: "PPlease use ConsoleView pre-configured with .network mode")
 public struct NetworkView: View {
     let viewModel: ConsoleViewModel
@@ -30,3 +31,4 @@ public struct NetworkView: View {
         ConsoleView(viewModel: viewModel)
     }
 }
+#endif
