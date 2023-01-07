@@ -32,13 +32,6 @@ struct NetworkMessageContextMenu: View {
 
     var body: some View {
         Section {
-            if #available(iOS 14, *) {
-                Menu("Share Log") {
-                    shareAsButtons
-                }
-            } else {
-                shareAsButtons
-            }
             if task.responseBodySize > 0 {
                 Button(action: {
                     sharedItems = ShareItems([task.responseBody?.data ?? Data()])
@@ -51,31 +44,6 @@ struct NetworkMessageContextMenu: View {
         NetworkMessageContextMenuCopySection(task: task)
         if let message = task.message {
             PinButton(viewModel: .init(message: message))
-        }
-    }
-
-    @ViewBuilder
-    private var shareAsButtons: some View {
-        Button(action: {
-            sharedItems = ShareItems([ConsoleShareService.share(task, output: .plainText)])
-        }) {
-            Text("Share as Plain Text")
-            Image(systemName: "square.and.arrow.up")
-        }
-        Button(action: {
-            let text = ConsoleShareService.share(task, output: .html)
-            let directory = TemporaryDirectory()
-            let fileURL = directory.write(text: text, extension: "html")
-            sharedItems = ShareItems([fileURL], cleanup: directory.remove)
-        }) {
-            Text("Share as HTML")
-            Image(systemName: "square.and.arrow.up")
-        }
-        Button(action: {
-            sharedItems = ShareItems([task.cURLDescription()])
-        }) {
-            Text("Share as cURL")
-            Image(systemName: "square.and.arrow.up")
         }
     }
 }

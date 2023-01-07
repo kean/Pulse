@@ -305,10 +305,14 @@ struct NetworkInspectorView: View {
     @ViewBuilder
     private var trailingNavigationBarItems: some View {
         HStack {
-            if let viewModel = viewModel.pinViewModel {
-                PinButton(viewModel: viewModel, isTextNeeded: false)
-            }
             if #available(iOS 14, *) {
+                Menu(content: {
+                    AttributedStringShareMenu(shareItems: $shareItems) {
+                        TextRenderer().render(viewModel.task, content: .sharing)
+                    }
+                }, label: {
+                    Image(systemName: "square.and.arrow.up")
+                })
                 Menu(content: {
                     NetworkMessageContextMenu(task: viewModel.task, sharedItems: $shareItems)
                 }, label: {

@@ -410,6 +410,7 @@ struct NetworkContent: OptionSet {
     init(rawValue: Int16) { self.rawValue = rawValue }
 
     static let header = NetworkContent(rawValue: 1 << 0)
+    static let largeHeader = NetworkContent(rawValue: 1 << 0)
     static let requestComponents = NetworkContent(rawValue: 1 << 1)
     static let requestQueryItems = NetworkContent(rawValue: 1 << 2)
     static let errorDetails = NetworkContent(rawValue: 1 << 3)
@@ -419,6 +420,11 @@ struct NetworkContent: OptionSet {
     static let requestBody = NetworkContent(rawValue: 1 << 7)
     static let responseHeaders = NetworkContent(rawValue: 1 << 8)
     static let responseBody = NetworkContent(rawValue: 1 << 9)
+
+#warning("TODO: add LargeHeader for sharing")
+    static let sharing: NetworkContent = [
+        largeHeader, errorDetails, currentRequestHeaders, requestBody, responseHeaders, responseBody
+    ]
 
     static let all: NetworkContent = [
         header, requestComponents, requestQueryItems, errorDetails, originalRequestHeaders, currentRequestHeaders, requestOptions, requestBody, responseHeaders, responseBody
