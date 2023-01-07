@@ -4,6 +4,7 @@
 
 import SwiftUI
 import Pulse
+import CoreData
 
 #if os(iOS) || os(macOS) || os(tvOS)
 
@@ -33,7 +34,8 @@ struct NetworkInspectorTransactionView: View {
 
 // MARK: - ViewModel
 
-final class NetworkInspectorTransactionViewModel: ObservableObject {
+final class NetworkInspectorTransactionViewModel: ObservableObject, Identifiable {
+    let id: NSManagedObjectID
     let title: String
     let statusViewModel: NetworkRequestStatusCellModel
     let timingViewModel: TimingViewModel?
@@ -42,6 +44,7 @@ final class NetworkInspectorTransactionViewModel: ObservableObject {
     let details: () -> NSAttributedString
 
     init(transaction: NetworkTransactionMetricsEntity, task: NetworkTaskEntity) {
+        self.id = transaction.objectID
         self.title = transaction.fetchType.title
         self.statusViewModel = NetworkRequestStatusCellModel(transaction: transaction)
         self.requestViewModel = NetworkRequestInfoCellViewModel(transaction: transaction)
