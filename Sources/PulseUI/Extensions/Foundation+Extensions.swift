@@ -14,6 +14,24 @@ extension Array {
     }
 }
 
+extension NSString {
+    /// Finds all occurrences of the given string
+    func ranges(of substring: String, options: NSString.CompareOptions = []) -> [NSRange] {
+        var index = 0
+        var ranges = [NSRange]()
+        while index < length {
+            let range = range(of: substring, options: options, range: NSRange(location: index, length: length - index), locale: nil)
+            if range.location == NSNotFound {
+                return ranges
+            }
+            ranges.append(range)
+            index = range.upperBound
+        }
+        return ranges
+    }
+
+}
+
 extension String {
     /// Finds all occurrences of the given string
     func ranges(of substring: String, options: String.CompareOptions = []) -> [Range<String.Index>] {

@@ -11,7 +11,7 @@ final class RichTextViewModel: ObservableObject {
     // Search
     @Published var searchOptions: StringSearchOptions = .default
     @Published private(set) var selectedMatchIndex: Int = 0
-    @Published private(set) var matches: [Range<String.Index>] = []
+    @Published private(set) var matches: [NSRange] = []
     @Published var isSearching = false
     @Published var searchTerm: String = ""
 
@@ -23,8 +23,7 @@ final class RichTextViewModel: ObservableObject {
     let contentType: NetworkLogger.ContentType?
 
     private(set) var text: NSAttributedString
-    private var string: String
-    var isEmpty: Bool { string.isEmpty }
+    var isEmpty: Bool { text.length == 0 }
 
     weak var textView: UXTextView? // Not proper MVVM
     var textStorage: NSTextStorage { textView?.textStorage ?? NSTextStorage(string: "") }
@@ -42,7 +41,6 @@ final class RichTextViewModel: ObservableObject {
 #warning("TODO: we shouldn't need content type here")
     init(string: NSAttributedString, contentType: NetworkLogger.ContentType?) {
         self.text = string
-        self.string = string.string
         self.contentType = contentType
 
         Publishers.CombineLatest($searchTerm, $searchOptions).sink { [weak self] in
@@ -52,7 +50,6 @@ final class RichTextViewModel: ObservableObject {
 
     func display(_ text: NSAttributedString) {
         self.text = text
-        self.string = text.string
         self.matches.removeAll()
 
         let textStorage: NSTextStorage? = textView?.textStorage
@@ -83,11 +80,11 @@ final class RichTextViewModel: ObservableObject {
         didUpdateCurrentSelectedMatch()
     }
 
-    func search(searchTerm: String, options: StringSearchOptions) -> [Range<String.Index>] {
+    func search(searchTerm: String, options: StringSearchOptions) -> [NSRange] {
         guard searchTerm.count > 1 else {
             return []
         }
-        return string.ranges(of: searchTerm, options: .init(options))
+        return (textStorage.string as NSString).ranges(of: searchTerm, options: .init(options))
     }
 
     func cancelSearch() {
@@ -116,8 +113,8 @@ final class RichTextViewModel: ObservableObject {
         guard !matches.isEmpty else { return }
 
         // Scroll to visible range
-        var range = NSRange(matches[selectedMatchIndex], in: string)
-        if range.length + 50 < string.count {
+        var range = matches[selectedMatchIndex]
+        if range.length + 50 < textStorage.length {
             range.length += 50
         }
         if let textView = textView {
@@ -131,8 +128,7 @@ final class RichTextViewModel: ObservableObject {
     }
 
     private func clearMatches() {
-        for match in matches {
-            let range = NSRange(match, in: string)
+        for range in matches {
             textStorage.removeAttribute(.foregroundColor, range: range)
             if let originalForegroundColor = text.attribute(.foregroundColor, at: range.lowerBound, effectiveRange: nil) {
                 textStorage.addAttribute(.foregroundColor, value: originalForegroundColor, range: range)
@@ -141,8 +137,7 @@ final class RichTextViewModel: ObservableObject {
         }
     }
 
-    private func highlight(range: Range<String.Index>, isFocused: Bool = false) {
-        let range = NSRange(range, in: text.string)
+    private func highlight(range: NSRange, isFocused: Bool = false) {
         textStorage.addAttributes([
             .backgroundColor: UXColor.systemBlue.withAlphaComponent(isFocused ? 0.8 : 0.3),
             .foregroundColor: UXColor.white
