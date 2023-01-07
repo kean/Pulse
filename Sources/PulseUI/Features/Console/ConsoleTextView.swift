@@ -33,9 +33,13 @@ struct ConsoleTextView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     HStack {
-                        Button(action: { shareItems = ShareItems([viewModel.text.text.string]) }) {
-                            Label("Share", systemImage: "square.and.arrow.up")
-                        }
+                        Menu(content: {
+                            AttributedStringShareMenu(shareItems: $shareItems) {
+                                viewModel.text.textStorage
+                            }
+                        }, label: {
+                            Label("Share As", systemImage: "square.and.arrow.up")
+                        })
                         Menu(content: { menu }) {
                             Image(systemName: "ellipsis.circle")
                         }
@@ -53,15 +57,6 @@ struct ConsoleTextView: View {
 
     @ViewBuilder
     private var menu: some View {
-        Section {
-            Menu(content: {
-                AttributedStringShareMenu(shareItems: $shareItems) {
-                    viewModel.text.textStorage
-                }
-            }, label: {
-                Label("Share As", systemImage: "square.and.arrow.up")
-            })
-        }
         Section {
             Button(action: { viewModel.isOrderedAscending.toggle() }) {
                 Label("Order by Date", systemImage: viewModel.isOrderedAscending ? "arrow.up" : "arrow.down")

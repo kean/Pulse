@@ -80,19 +80,14 @@ struct _RichTextView: View {
     private var navigationBarTrailingItems: some View {
         if !isTextViewBarItemsHidden {
             HStack {
-                Button(action: { shareItems = .init([viewModel.text.string]) }, label: {
-                    Label("Share", systemImage: "square.and.arrow.up")
+                Menu(content: {
+                    AttributedStringShareMenu(shareItems: $shareItems) {
+                        viewModel.textStorage
+                    }
+                }, label: {
+                    Label("Share As", systemImage: "square.and.arrow.up")
                 })
                 Menu(content: {
-                    Section {
-                        Menu(content: {
-                            AttributedStringShareMenu(shareItems: $shareItems) {
-                                viewModel.textStorage
-                            }
-                        }, label: {
-                            Label("Share As", systemImage: "square.and.arrow.up")
-                        })
-                    }
                     Section {
                         if viewModel.contentType?.isHTML == true {
                             Button(action: { isWebViewOpen = true }) {
