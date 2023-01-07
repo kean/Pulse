@@ -47,6 +47,9 @@ struct ConsoleContextMenu: View {
                         Label("Browse Logs", systemImage: "folder")
                     }
                 }
+                Button(action: { isShowingSettings = true }) {
+                    Label("Settings", systemImage: "gear")
+                }
             }
             if !store.isArchive {
                 Section {
@@ -59,11 +62,6 @@ struct ConsoleContextMenu: View {
                             Label("Remove Logs", systemImage: "trash")
                         }
                     }
-                }
-            }
-            Section {
-                Button(action: { isShowingSettings = true }) {
-                    Label("Settings", systemImage: "gear")
                 }
             }
             Section {
