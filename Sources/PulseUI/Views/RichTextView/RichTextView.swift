@@ -45,24 +45,12 @@ struct _RichTextView: View {
 
     @State private var shareItems: ShareItems?
     @State private var isWebViewOpen = false
+    @State private var isMenuHidden = true
 
 #if os(iOS)
     var body: some View {
-        textView
-            .edgesIgnoringSafeArea([.bottom])
+        ContentView(viewModel: viewModel)
             .searchable(text: $viewModel.searchTerm)
-            .overlay {
-                if !viewModel.matches.isEmpty {
-                    VStack {
-                        Spacer()
-                        HStack {
-                            Spacer()
-                            matchStepperView
-                                .padding()
-                        }
-                    }
-                }
-            }
             .navigationBarItems(trailing: navigationBarTrailingItems)
             .sheet(item: $shareItems, content: ShareView.init)
             .sheet(isPresented: $isWebViewOpen) {
@@ -76,6 +64,82 @@ struct _RichTextView: View {
             }
     }
 
+    // Has to be like this to make isSearching work
+    private struct ContentView: View {
+        @ObservedObject var viewModel: RichTextViewModel
+        @Environment(\.isSearching) var isSearching
+        @State private var isRealMenuShown = false
+
+        var body: some View {
+            WrappedTextView(viewModel: viewModel)
+                .edgesIgnoringSafeArea([.bottom])
+                .overlay {
+                    if isSearching {
+                        VStack {
+                            Spacer()
+                            HStack {
+                                Spacer()
+                                searchControl
+                                    .padding()
+                            }
+                        }
+                    }
+                }
+                .onReceive(Keyboard.isHidden) { isKeyboardHidden in
+                    // Show a non-interactive placeholeder during animation,
+                    // then show the actual menu when navigation is setled.
+                    withAnimation(nil) {
+                        isRealMenuShown = false
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(750)) {
+                        withAnimation(nil) {
+                            isRealMenuShown = true
+                        }
+                    }
+                }
+        }
+
+
+
+        private var searchControl: some View {
+            HStack(alignment: .center, spacing: 24) {
+                ZStack {
+                    Image(systemName: "ellipsis.circle")
+                        .foregroundColor(.blue)
+                        .font(.system(size: 20))
+                        .opacity(isRealMenuShown ? 0 : 1)
+                    if isRealMenuShown {
+                        Menu(content: {
+                            StringSearchOptionsMenu(options: $viewModel.searchOptions, isKindNeeded: false)
+                        }, label: {
+                            Image(systemName: "ellipsis.circle")
+                                .font(.system(size: 20))
+                        })
+                        .menuStyle(.borderlessButton)
+                        .fixedSize()
+                    }
+                }
+                HStack(spacing: 12) {
+                    Button(action: viewModel.previousMatch) {
+                        Image(systemName: "chevron.left.circle")
+                            .font(.system(size: 20))
+                    }.disabled(viewModel.matches.isEmpty)
+                    Text(viewModel.matches.isEmpty ? "0 of 0" : "\(viewModel.selectedMatchIndex+1) of \(viewModel.matches.count)")
+                        .font(Font.body.monospacedDigit())
+                    Button(action: viewModel.nextMatch) {
+                        Image(systemName: "chevron.right.circle")
+                            .font(.system(size: 20))
+                    }.disabled(viewModel.matches.isEmpty)
+                }
+                .fixedSize()
+
+            }
+            .padding(12)
+            .background(Material.regular)
+            .cornerRadius(8)
+        }
+    }
+
     @ViewBuilder
     private var navigationBarTrailingItems: some View {
         if !isTextViewBarItemsHidden {
@@ -87,47 +151,21 @@ struct _RichTextView: View {
                 }, label: {
                     Label("Share As", systemImage: "square.and.arrow.up")
                 })
-                Menu(content: {
-                    Section {
-                        if viewModel.contentType?.isHTML == true {
-                            Button(action: { isWebViewOpen = true }) {
-                                Label("Open in Browser", systemImage: "safari")
+                if viewModel.contentType?.isHTML ?? false {
+                    Menu(content: {
+                        Section {
+                            if viewModel.contentType?.isHTML == true {
+                                Button(action: { isWebViewOpen = true }) {
+                                    Label("Open in Browser", systemImage: "safari")
+                                }
                             }
                         }
-                    }
-                    Section {
-                        StringSearchOptionsMenu(options: $viewModel.searchOptions, isKindNeeded: false)
-                    }
-                }, label: {
-                    Image(systemName: "ellipsis.circle")
-                })
+                    }, label: {
+                        Image(systemName: "ellipsis.circle")
+                    })
+                }
             }
         }
-    }
-
-    private var matchStepperView: some View {
-        HStack(spacing: 16) {
-            HStack(spacing: 12) {
-                Button(action: viewModel.previousMatch) {
-                    Image(systemName: "chevron.left.circle")
-                        .font(.system(size: 20))
-                }.disabled(viewModel.matches.isEmpty)
-                Text(viewModel.matches.isEmpty ? "0 of 0" : "\(viewModel.selectedMatchIndex+1) of \(viewModel.matches.count)")
-                    .font(Font.body.monospacedDigit())
-                Button(action: viewModel.nextMatch) {
-                    Image(systemName: "chevron.right.circle")
-                        .font(.system(size: 20))
-                }.disabled(viewModel.matches.isEmpty)
-            }
-            .fixedSize()
-        }
-        .padding(12)
-        .background(Material.regular)
-        .cornerRadius(8)
-    }
-
-    private var textView: some View {
-        WrappedTextView(viewModel: viewModel)
     }
 #else
     var body: some View {

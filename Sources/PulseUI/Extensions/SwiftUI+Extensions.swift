@@ -3,6 +3,7 @@
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
+import Combine
 
 #warning("TODO: remove unused extensions and backports + see which views can be moved to iOS 14 fully to remove backports")
 
@@ -64,6 +65,25 @@ extension ContentSizeCategory {
         }
     }
 }
+
+#if os(iOS)
+
+enum Keyboard {
+    static var isHidden: AnyPublisher<Bool, Never> {
+        Publishers.Merge(
+            NotificationCenter.default
+                .publisher(for: UIResponder.keyboardWillShowNotification)
+                .map { _ in false },
+
+            NotificationCenter.default
+                .publisher(for: UIResponder.keyboardWillHideNotification)
+                .map { _ in true }
+        )
+        .eraseToAnyPublisher()
+    }
+}
+
+#endif
 
 // MARK: - Backport
 
