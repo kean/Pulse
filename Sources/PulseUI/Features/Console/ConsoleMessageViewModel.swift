@@ -90,25 +90,6 @@ final class ConsoleMessageViewModel: Pinnable {
 #endif
 }
 
-extension Color {    
-    static func textColor(for level: LoggerStore.Level) -> Color {
-        switch level {
-#if os(macOS)
-        case .error: return Color(Palette.red)
-        case .critical: return Color(Palette.red)
-#else
-        case .critical: return .red
-        case .error: return .red
-#endif
-        case .warning: return .orange
-        case .info: return .blue
-        case .notice: return .blue
-        case .debug: return .primary
-        case .trace: return .primary
-        }
-    }
-}
-
 #if os(iOS)
 extension UIColor {    
     static func textColor(for level: LoggerStore.Level) -> UIColor {
