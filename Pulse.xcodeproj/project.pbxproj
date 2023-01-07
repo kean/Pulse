@@ -873,7 +873,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 20;
 				DEVELOPMENT_ASSET_PATHS = "\"Demo/iOS/Preview Content\"";
-				DEVELOPMENT_TEAM = NR8DLKJ7E6;
+				DEVELOPMENT_TEAM = 3Z7876S8U2;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = Demo/iOS/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
@@ -882,7 +882,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 2.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.github.kean.PulseDemo;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.test.pulse-d90asjd";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -900,7 +900,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 20;
 				DEVELOPMENT_ASSET_PATHS = "\"Demo/iOS/Preview Content\"";
-				DEVELOPMENT_TEAM = NR8DLKJ7E6;
+				DEVELOPMENT_TEAM = 3Z7876S8U2;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = Demo/iOS/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
@@ -909,7 +909,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 2.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.github.kean.PulseDemo;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.test.pulse-d90asjd";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;

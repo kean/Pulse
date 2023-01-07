@@ -28,7 +28,7 @@ final class ConsoleMessageDetailsViewModel {
     }()
 
     init(message: LoggerMessageEntity) {
-        let string = TextMake().pre(message.text).make()
+        let string = TextRenderer().preformatted(message.text)
         self.textViewModel = RichTextViewModel(string: string)
 
         self.message = message

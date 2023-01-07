@@ -16,9 +16,7 @@ import PDFKit
 
 /// Low-level attributed string creation API.
 final class TextRenderer {
-#warning("TODO: do we even need these options?")
     struct Options {
-#warning("TODO: thsi should be moved to TextMake")
         var color: ColorMode = .full
     }
 
@@ -273,6 +271,10 @@ final class TextRenderer {
         return data as Data
     }
 #endif
+
+    func preformatted(_ string: String, color: UXColor? = nil) -> NSAttributedString {
+        render(string, role: .body2, style: .monospaced, color: color ?? .label)
+    }
 
     func render(
         _ string: String,
