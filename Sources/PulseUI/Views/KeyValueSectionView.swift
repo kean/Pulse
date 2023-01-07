@@ -5,49 +5,6 @@
 import SwiftUI
 import Pulse
 
-@available(*, deprecated, message: "Deprecated")
-struct KeyValueSectionView: View {
-    let viewModel: KeyValueSectionViewModel
-    var limit: Int = Int.max
-    private var hideTitle = false
-    private var hideAction = false
-
-    init(viewModel: KeyValueSectionViewModel) {
-        self.viewModel = viewModel
-    }
-
-    init(viewModel: KeyValueSectionViewModel, limit: Int) {
-        self.viewModel = viewModel
-        self.limit = limit
-    }
-
-    func hiddenTitle() -> KeyValueSectionView {
-        var copy = self
-        copy.hideTitle = true
-        return copy
-    }
-
-    func hiddenAction() -> KeyValueSectionView {
-        var copy = self
-        copy.hideAction = true
-        return copy
-    }
-
-    var body: some View {
-        Text("Deprecated")
-    }
-}
-
-@available(*, deprecated, message: "Deprecated")
-private struct KeyValueListView: View {
-    let viewModel: KeyValueSectionViewModel
-    var limit: Int = Int.max
-
-    var body: some View {
-        Text("Deprecated")
-    }
-}
-
 struct KeyValueSectionViewModel {
     var title: String
     var color: Color
