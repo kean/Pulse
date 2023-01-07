@@ -75,25 +75,28 @@ public struct ConsoleView: View {
     }
 }
 
+#warning("TODO: display count somewhere else?")
+
 private struct ConsoleToolbarView: View {
     @ObservedObject var viewModel: ConsoleViewModel
     @State private var isShowingFilters = false
     @State private var messageCount = 0
+    @State private var isSearching = false
 
     var body: some View {
         VStack(spacing: 8) {
             HStack(spacing: 0) {
-                SearchBar(title: "Search \(viewModel.entities.count) messages", text: $viewModel.filterTerm)
-                Button(action: { viewModel.isOnlyErrors.toggle() }) {
-                    Image(systemName: viewModel.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon")
-                        .font(.system(size: 20))
-                        .foregroundColor(viewModel.isOnlyErrors ? .red : .accentColor)
-                }.frame(width: 40, height: 44)
-                Button(action: { isShowingFilters = true }) {
-                    Image(systemName: viewModel.searchCriteria.isDefaultSearchCriteria ? "line.horizontal.3.decrease.circle" : "line.3.horizontal.decrease.circle.fill")
-                        .font(.system(size: 20))
-                        .foregroundColor(.accentColor)
-                }.frame(width: 40, height: 44)
+                SearchBar(title: "Search \(viewModel.entities.count) messages", text: $viewModel.filterTerm, isSearching: $isSearching)
+                if !isSearching {
+                    filters
+                } else {
+                    Button("Cancel") {
+                        isSearching = false
+                        viewModel.filterTerm = ""
+                    }
+                    .foregroundColor(.accentColor)
+                    .padding(.horizontal, 14)
+                }
             }.buttonStyle(.plain)
         }
         .padding(EdgeInsets(top: 2, leading: 8, bottom: 2, trailing: 8))
@@ -102,6 +105,20 @@ private struct ConsoleToolbarView: View {
                 ConsoleFiltersView(viewModel: viewModel.searchCriteria, isPresented: $isShowingFilters)
             }
         }
+    }
+
+    @ViewBuilder
+    private var filters: some View {
+        Button(action: { viewModel.isOnlyErrors.toggle() }) {
+            Image(systemName: viewModel.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon")
+                .font(.system(size: 20))
+                .foregroundColor(viewModel.isOnlyErrors ? .red : .accentColor)
+        }.frame(width: 40, height: 44)
+        Button(action: { isShowingFilters = true }) {
+            Image(systemName: viewModel.searchCriteria.isDefaultSearchCriteria ? "line.horizontal.3.decrease.circle" : "line.3.horizontal.decrease.circle.fill")
+                .font(.system(size: 20))
+                .foregroundColor(.accentColor)
+        }.frame(width: 40, height: 44)
     }
 }
 

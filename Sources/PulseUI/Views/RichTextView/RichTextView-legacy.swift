@@ -28,11 +28,7 @@ struct LegacyRichTextView: View {
     }
 
     private var searchBar: some View {
-        SearchBar(title: "Search", text: $viewModel.searchTerm, onEditingChanged: { isEditing in
-            if isEditing {
-                viewModel.isSearching = isEditing
-            }
-        })
+        SearchBar(title: "Search", text: $viewModel.searchTerm, isSearching: $viewModel.isSearching)
     }
 }
 #endif

@@ -95,21 +95,22 @@ public struct NetworkView: View {
 private struct NetworkToolbarView: View {
     @ObservedObject var viewModel: NetworkViewModel
     @State private var isShowingFilters = false
+    @State private var isSearching = false
 
     var body: some View {
         VStack {
             HStack(spacing: 0) {
-                SearchBar(title: "Search \(viewModel.entities.count) messages", text: $viewModel.filterTerm)
-                Button(action: { viewModel.isOnlyErrors.toggle() }) {
-                    Image(systemName: viewModel.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon")
-                        .font(.system(size: 20))
-                        .foregroundColor(.accentColor)
-                }.frame(width: 40, height: 44)
-                Button(action: { isShowingFilters = true }) {
-                    Image(systemName: viewModel.searchCriteria.isDefaultSearchCriteria ? "line.horizontal.3.decrease.circle" : "line.3.horizontal.decrease.circle.fill")
-                        .font(.system(size: 20))
-                        .foregroundColor(.accentColor)
-                }.frame(width: 40, height: 44)
+                SearchBar(title: "Search \(viewModel.entities.count) messages", text: $viewModel.filterTerm, isSearching: $isSearching)
+                if !isSearching {
+                    filters
+                } else {
+                    Button("Cancel") {
+                        isSearching = false
+                        viewModel.filterTerm = ""
+                    }
+                    .foregroundColor(.accentColor)
+                    .padding(.horizontal, 14)
+                }
             }.buttonStyle(.plain)
         }
         .padding(EdgeInsets(top: 2, leading: 8, bottom: 2, trailing: 8))
@@ -118,6 +119,20 @@ private struct NetworkToolbarView: View {
                 NetworkFiltersView(viewModel: viewModel.searchCriteria, isPresented: $isShowingFilters)
             }
         }
+    }
+
+    @ViewBuilder
+    private var filters: some View {
+        Button(action: { viewModel.isOnlyErrors.toggle() }) {
+            Image(systemName: viewModel.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon")
+                .font(.system(size: 20))
+                .foregroundColor(.accentColor)
+        }.frame(width: 40, height: 44)
+        Button(action: { isShowingFilters = true }) {
+            Image(systemName: viewModel.searchCriteria.isDefaultSearchCriteria ? "line.horizontal.3.decrease.circle" : "line.3.horizontal.decrease.circle.fill")
+                .font(.system(size: 20))
+                .foregroundColor(.accentColor)
+        }.frame(width: 40, height: 44)
     }
 }
 #endif
