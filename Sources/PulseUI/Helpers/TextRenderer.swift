@@ -60,7 +60,7 @@ final class TextRenderer {
 
     private func textColor(for level: LoggerStore.Level) -> UXColor {
         if #available(iOS 14, tvOS 14, *), options.color != .monochrome {
-            return level == .trace ? .secondaryLabel : UXColor(ConsoleMessageStyle.textColor(for: level))
+            return level == .trace ? .secondaryLabel : UXColor(.textColor(for: level))
         } else {
             return .label
         }
