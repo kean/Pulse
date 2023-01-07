@@ -7,8 +7,6 @@ import CoreData
 import Pulse
 import Combine
 
-#warning("TODO: fix where share and close buttons are form FIleView?")
-
 #if os(iOS)
 
 @available(iOS 14, *)
@@ -23,7 +21,8 @@ struct ConsoleTextView: View {
     var onClose: (() -> Void)?
 
     var body: some View {
-        textView
+        RichTextView(viewModel: viewModel.text)
+            .textViewBarItemsHidden(true)
             .navigationBarTitleDisplayMode(.inline)
             .onAppear {
                 if let options = options {
@@ -34,6 +33,9 @@ struct ConsoleTextView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     HStack {
+                        Button(action: { shareItems = ShareItems([viewModel.text.text.string]) }) {
+                            Label("Share", systemImage: "square.and.arrow.up")
+                        }
                         Menu(content: { menu }) {
                             Image(systemName: "ellipsis.circle")
                         }
@@ -49,37 +51,31 @@ struct ConsoleTextView: View {
             .sheet(isPresented: $isShowingSettings) { settingsView }
     }
 
-    private var textView: some View {
-        RichTextView(viewModel: viewModel.text)
-    }
-
     @ViewBuilder
     private var menu: some View {
         Section {
-            Button(action: { shareItems = ShareItems([viewModel.text.text.string]) }) {
-                Label("Share", systemImage: "square.and.arrow.up")
+            Button(action: { viewModel.isOrderedAscending.toggle() }) {
+                Label("Order by Date", systemImage: viewModel.isOrderedAscending ? "arrow.up" : "arrow.down")
             }
-            Section {
-                Button(action: { viewModel.isOrderedAscending.toggle() }) {
-                    Label("Order by Date", systemImage: viewModel.isOrderedAscending ? "arrow.up" : "arrow.down")
-                }
-                Button(action: { viewModel.isExpanded.toggle() }) {
-                    Label(viewModel.isExpanded ? "Collapse Details" : "Expand Details", systemImage: viewModel.isExpanded ? "arrow.down.right.and.arrow.up.left" : "arrow.up.left.and.arrow.down.right")
-                }
-                Button(action: viewModel.refresh) {
-                    Label("Refresh", systemImage: "arrow.clockwise")
-                }.disabled(viewModel.isButtonRefreshHidden)
+            Button(action: { viewModel.isExpanded.toggle() }) {
+                Label(viewModel.isExpanded ? "Collapse Details" : "Expand Details", systemImage: viewModel.isExpanded ? "arrow.down.right.and.arrow.up.left" : "arrow.up.left.and.arrow.down.right")
             }
-            Section {
-                Button(action: { isShowingSettings = true }) {
-                    Label("Settings", systemImage: "gearshape")
-                }
-            }
-//            // Unfortunately, this isn't working properly in UITextView (use WebView!)
-//            Button(action: viewModel.text.scrollToBottom) {
-//                Label("Scroll to Bottom", systemImage: "arrow.down")
-//            }
+            Button(action: viewModel.refresh) {
+                Label("Refresh", systemImage: "arrow.clockwise")
+            }.disabled(viewModel.isButtonRefreshHidden)
         }
+        Section(header: Text("Search Options")) {
+            StringSearchOptionsMenu(options: $viewModel.text.searchOptions)
+        }
+        Section {
+            Button(action: { isShowingSettings = true }) {
+                Label("Settings", systemImage: "gearshape")
+            }
+        }
+        //            // Unfortunately, this isn't working properly in UITextView (use WebView!)
+        //            Button(action: viewModel.text.scrollToBottom) {
+        //                Label("Scroll to Bottom", systemImage: "arrow.down")
+        //            }
     }
 
     private var settingsView: some View {
@@ -130,7 +126,7 @@ private struct ConsoleTextViewSettingsView: View {
 
 @available(iOS 14, *)
 final class ConsoleTextViewModel: ObservableObject {
-    let text = RichTextViewModel()
+    var text = RichTextViewModel()
     var options: TextRenderer.Options = .init()
 
     @Published var isOrderedAscending = false

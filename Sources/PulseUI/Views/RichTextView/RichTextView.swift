@@ -7,21 +7,29 @@ import CoreData
 import Pulse
 import Combine
 
-#warning("TODO: fix state management (by adding a UIViewRepresentable wrapper?)")
-#warning("TODO: add a convenience API for showing static links")
-#warning("TODO: should it have any of these navigation buttons by default? probably not")
 #warning("TODO: add other sharing options, e.g. as HTML/PDF + print")
 #warning("TODO: handle clicks on decoding error on other platforms")
-#warning("TODO: add filter options")
 
 #if os(macOS) || os(iOS)
 
 struct RichTextView: View {
     let viewModel: RichTextViewModel
 
+    private var isTextViewBarItemsHidden = false
+
+    init(viewModel: RichTextViewModel) {
+        self.viewModel = viewModel
+    }
+
+    func textViewBarItemsHidden(_ isHidden: Bool) -> RichTextView {
+        var copy = self
+        copy.isTextViewBarItemsHidden = isHidden
+        return copy
+    }
+
     var body: some View {
         if #available(iOS 15, *) {
-            _RichTextView(viewModel: viewModel)
+            _RichTextView(viewModel: viewModel, isTextViewBarItemsHidden: isTextViewBarItemsHidden)
         } else {
             LegacyRichTextView(viewModel: viewModel)
         }
@@ -33,6 +41,7 @@ struct RichTextView: View {
 @available(iOS 15, *)
 struct _RichTextView: View {
     @ObservedObject var viewModel: RichTextViewModel
+    let isTextViewBarItemsHidden: Bool
 
     @State private var shareItems: ShareItems?
     @State private var isWebViewOpen = false
@@ -67,25 +76,28 @@ struct _RichTextView: View {
             }
     }
 
+    @ViewBuilder
     private var navigationBarTrailingItems: some View {
-        HStack {
-            Button(action: { shareItems = .init([viewModel.text.string]) }, label: {
-                Label("Share", systemImage: "square.and.arrow.up")
-            })
-            Menu(content: {
-                Section {
-                    if viewModel.contentType?.isHTML == true {
-                        Button(action: { isWebViewOpen = true }) {
-                            Label("Open in Browser", systemImage: "safari")
+        if !isTextViewBarItemsHidden {
+            HStack {
+                Button(action: { shareItems = .init([viewModel.text.string]) }, label: {
+                    Label("Share", systemImage: "square.and.arrow.up")
+                })
+                Menu(content: {
+                    Section {
+                        if viewModel.contentType?.isHTML == true {
+                            Button(action: { isWebViewOpen = true }) {
+                                Label("Open in Browser", systemImage: "safari")
+                            }
                         }
                     }
-                }
-                Section {
-                    StringSearchOptionsMenu(options: $viewModel.searchOptions, isKindNeeded: false)
-                }
-            }, label: {
-                Image(systemName: "ellipsis.circle")
-            })
+                    Section {
+                        StringSearchOptionsMenu(options: $viewModel.searchOptions, isKindNeeded: false)
+                    }
+                }, label: {
+                    Image(systemName: "ellipsis.circle")
+                })
+            }
         }
     }
 
