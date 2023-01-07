@@ -7,10 +7,10 @@ import Pulse
 import Combine
 import SwiftUI
 
-#if os(iOS) || os(macOS) || os(tvOS)
+#if os(macOS) || os(tvOS)
 
 final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, ObservableObject {
-#if os(iOS) || os(macOS)
+#if os(macOS)
     let table: ConsoleTableViewModel
 #endif
     @Published private(set) var entities: [NetworkTaskEntity] = []
@@ -39,9 +39,9 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         request.sortDescriptors = [NSSortDescriptor(keyPath: \NetworkTaskEntity.createdAt, ascending: false)]
 
         self.controller = NSFetchedResultsController<NetworkTaskEntity>(fetchRequest: request, managedObjectContext: store.viewContext, sectionNameKeyPath: nil, cacheName: nil)
-        
+
         self.searchCriteria = ConsoleNetworkSearchCriteriaViewModel(store: store)
-#if os(iOS) || os(macOS)
+#if os(macOS)
         self.table = ConsoleTableViewModel(searchCriteriaViewModel: nil)
 #endif
 
@@ -106,7 +106,7 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChangeContentWith diff: CollectionDifference<NSManagedObjectID>) {
         guard isActive else { return }
 
-#if os(iOS) || os(macOS)
+#if os(macOS)
         self.table.diff = diff
 #endif
         withAnimation {
@@ -122,7 +122,7 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         } else {
             self.entities = controller.fetchedObjects ?? []
         }
-        #if os(iOS) || os(macOS)
+        #if os(macOS)
         self.table.entities = self.entities
         #endif
     }
