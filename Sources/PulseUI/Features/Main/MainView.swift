@@ -9,6 +9,9 @@ import Combine
 
 #if os(iOS) || os(watchOS)
 
+/// A MainView that contains the navigation view.
+///
+/// - note: To embed console into your own navigation, use ``ConsoleView`` directly.
 public struct MainView: View {
     let viewModel: ConsoleViewModel
 
@@ -18,17 +21,14 @@ public struct MainView: View {
     }
 
     public var body: some View {
-#if os(iOS)
         NavigationView {
             ConsoleView(viewModel: viewModel)
         }.navigationViewStyle(.stack)
-#else
-            ConsoleView(viewModel: viewModel)
-#endif
     }
 }
 
 #if DEBUG
+@available(*, deprecated, message: "Deprecated")
 struct MainView_Previews: PreviewProvider {
     static var previews: some View {
         MainView(store: .mock)
