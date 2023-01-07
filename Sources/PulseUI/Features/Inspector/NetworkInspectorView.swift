@@ -279,7 +279,7 @@ struct NetworkInspectorView: View {
             if #available(iOS 14, *) {
                 Menu(content: {
                     AttributedStringShareMenu(shareItems: $shareItems) {
-                        TextRenderer().render(viewModel.task, content: .sharing)
+                        TextRenderer(options: .sharing).render(viewModel.task, content: .sharing)
                     }
                     Button(action: { shareItems = ShareItems([viewModel.task.cURLDescription()]) }) {
                         Label("Share as cURL", systemImage: "square.and.arrow.up")

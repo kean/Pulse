@@ -25,7 +25,7 @@ struct ShareItems: Identifiable {
 
 enum ShareService {
     static func share(_ task: NetworkTaskEntity, as output: ShareOutput) -> ShareItems {
-        let string = TextRenderer().render(task, content: .sharing)
+        let string = TextRenderer(options: .sharing).render(task, content: .sharing)
         return share(string, as: output)
     }
 
@@ -35,13 +35,13 @@ enum ShareService {
         case .plainText:
             return ShareItems([string.string])
         case .html:
-            let html = (try? TextRenderer.html(from: string)) ?? Data()
+            let html = (try? TextUtilities.html(from: string)) ?? Data()
             let directory = TemporaryDirectory()
             let fileURL = directory.write(data: html, extension: "html")
             return ShareItems([fileURL], cleanup: directory.remove)
         case .pdf:
 #if os(iOS)
-            let pdf = (try? TextRenderer.pdf(from: string)) ?? Data()
+            let pdf = (try? TextUtilities.pdf(from: string)) ?? Data()
             let directory = TemporaryDirectory()
             let fileURL = directory.write(data: pdf, extension: "pdf")
             return ShareItems([fileURL], cleanup: directory.remove)

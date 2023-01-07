@@ -2,8 +2,6 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
-#warning("TODO: improve PDF export: expand network (?); use monochrome; use larger fonts")
-
 import Foundation
 import Pulse
 import CoreData
@@ -18,6 +16,8 @@ import PDFKit
 final class TextRenderer {
     struct Options {
         var color: ColorMode = .full
+
+        static let sharing = Options(color: .automatic)
     }
 
     enum ColorMode: String, RawRepresentable {
@@ -242,62 +242,6 @@ final class TextRenderer {
         return string
     }
 
-    // MARK: - Convert to HTML/PDF
-
-#warning("TODO: add author, date, and other meta attributes + link to Pulse (?)")
-    static func html(from string: NSAttributedString) throws -> Data {
-        let range = NSRange(location: 0, length: string.length)
-        let data = try string.data(from: range, documentAttributes: [
-            .documentType: NSAttributedString.DocumentType.html
-        ])
-        guard var html = String(data: data, encoding: .utf8) else {
-            return data
-        }
-        func insert(_ string: String, at index: String.Index) {
-            html.insert(contentsOf: "\n\(string)", at: index)
-        }
-        if let range = html.firstRange(of: "<head>") {
-            insert(#"<meta name="viewport" content="width=device-width, initial-scale=1">"#, at: range.upperBound)
-        }
-        if let range = html.firstRange(of: "<style type=\"text/css\">") {
-            insert(#"body { word-wrap: break-word; }"#, at: range.upperBound)
-        }
-        return html.data(using: .utf8) ?? data
-    }
-
-    /// Renders the given attributed string as PDF
-#if os(iOS)
-    static func pdf(from string: NSAttributedString) throws -> Data {
-        let formatter = UISimpleTextPrintFormatter(attributedText: string)
-        let renderer = UIPrintPageRenderer()
-        renderer.addPrintFormatter(formatter, startingAtPageAt: 0)
-
-        let pageSize = CGSize(width: 612, height: 792) // US letter size
-        let pageMargins = UIEdgeInsets(top: 32, left: 32, bottom: 32, right: 32)
-
-        // Calculate the printable rect from the above two
-        let printableRect = CGRect(x: pageMargins.left, y: pageMargins.top, width: pageSize.width - pageMargins.left - pageMargins.right, height: pageSize.height - pageMargins.top - pageMargins.bottom)
-        let paperRect = CGRect(x: 0, y: 0, width: pageSize.width, height: pageSize.height)
-
-        renderer.setValue(NSValue(cgRect: paperRect), forKey: "paperRect")
-        renderer.setValue(NSValue(cgRect: printableRect), forKey: "printableRect")
-
-        let data = NSMutableData()
-
-        UIGraphicsBeginPDFContextToData(data, paperRect, nil)
-        renderer.prepare(forDrawingPages: NSMakeRange(0, renderer.numberOfPages))
-
-        let bounds = UIGraphicsGetPDFContextBounds()
-        for i in 0  ..< renderer.numberOfPages  {
-            UIGraphicsBeginPDFPage()
-            renderer.drawPage(at: i, in: bounds)
-        }
-        UIGraphicsEndPDFContext()
-
-        return data as Data
-    }
-#endif
-
     func preformatted(_ string: String, color: UXColor? = nil) -> NSAttributedString {
         render(string, role: .body2, style: .monospaced, color: color ?? .label)
     }
@@ -327,9 +271,9 @@ extension NSAttributedString.Key {
 struct ConsoleTextRenderer_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            let string = TextRenderer(options: .init(color: .automatic)).render(task, content: .all)
+            let string = TextRenderer(options: .sharing).render(task, content: .all)
             let stringWithColor = TextRenderer(options: .init(color: .full)).render(task, content: .all)
-            let html = try! TextRenderer.html(from: string)
+            let html = try! TextUtilities.html(from: TextRenderer(options: .sharing).render(task, content: .sharing))
 
             RichTextView(viewModel: .init(string: string))
                 .previewDisplayName("Task")
@@ -343,6 +287,7 @@ struct ConsoleTextRenderer_Previews: PreviewProvider {
             RichTextView(viewModel: .init(string: string.string))
                 .previewDisplayName("Task (Plain)")
 
+#warning("TODO: remove temp")
             RichTextView(viewModel: .init(string: TextRendererHTML(html: String(data: html, encoding: .utf8)!).render()))
                 .previewLayout(.fixed(width: 1160, height: 2000)) // Disable interaction to view it
                 .previewDisplayName("HTML (Raw)")
@@ -353,7 +298,7 @@ struct ConsoleTextRenderer_Previews: PreviewProvider {
 #endif
 
 #if os(iOS)
-            PDFKitRepresentedView(document: PDFDocument(data: try! TextRenderer.pdf(from: string))!)
+            PDFKitRepresentedView(document: PDFDocument(data: try! TextUtilities.pdf(from: string))!)
                 .previewDisplayName("PDF")
 #endif
         }
@@ -362,79 +307,6 @@ struct ConsoleTextRenderer_Previews: PreviewProvider {
 
 private let task = LoggerStore.preview.entity(for: .login)
 #endif
-
-#warning("TODO: remove this when we are done with HTML output")
-
-private let style = """
-<style>
-  body {
-    font: 400 16px/1.55 -apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Icons","Helvetica Neue",Helvetica,Arial,sans-serif;
-    background-color: #FDFDFD;
-    color: #353535;
-  }
-  pre {
-    font-family: 'SF Mono', Menlo, monospace, Courier, Consolas, "Liberation Mono", monospace;
-    font-size: 14px;
-    overflow-x: auto;
-  }
-  h2 {
-    margin-top: 30px;
-    padding-bottom: 8px;
-    border-bottom: 2px solid #DDDDDD;
-    font-weight: 600;
-    font-size: 34px;
-  }
-  ul {
-    list-style: none;
-    padding-left: 0;
-  }
-  li {
-    overflow-wrap: break-word;
-  }
-  strong {
-    font-weight: 600;
-    color: #737373;
-  }
-  main {
-    max-width: 900px;
-    padding: 15px;
-  }
-  pre {
-    padding: 8px;
-    border-radius: 8px;
-    background-color: #FDFDFD;
-  }
-  a {
-    color: #0066FF;
-  }
-  .s { color: rgb(255, 45, 85); }
-  .o { color: rgb(0, 122, 255); }
-  .n { color: rgb(191, 90, 242); }
-  .err { background-color: red; }
-  @media (prefers-color-scheme: dark) {
-    body {
-      background-color: #211F1E;
-      color: #DFDFDF;
-    }
-    strong {
-      color: #878787;
-    }
-    h2 {
-      border-bottom: 2px solid #3C3A38;
-    }
-    pre {
-      background-color: #2C2A28;
-    }
-    a {
-      color: #67A6F8;
-    }
-    .s { color: rgb(255, 55, 95); }
-    .o { color: rgb(10, 132, 255); }
-    .n { color: rgb(175, 82, 222); }
-  }
-}
-</style>
-"""
 
 struct NetworkContent: OptionSet {
     let rawValue: Int16
@@ -458,6 +330,6 @@ struct NetworkContent: OptionSet {
     ]
 
     static let all: NetworkContent = [
-        header, requestComponents, requestQueryItems, errorDetails, originalRequestHeaders, currentRequestHeaders, requestOptions, requestBody, responseHeaders, responseBody
+        largeHeader, taskDetails, errorDetails, requestComponents, requestQueryItems, errorDetails, originalRequestHeaders, currentRequestHeaders, requestOptions, requestBody, responseHeaders, responseBody
     ]
 }
