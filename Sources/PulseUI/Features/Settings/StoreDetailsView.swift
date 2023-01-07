@@ -134,14 +134,14 @@ final class StoreDetailsViewModel: ObservableObject {
     private func makeInfoSection(for info: LoggerStore.Info) -> KeyValueSectionViewModel {
         let device = info.deviceInfo
         let app = info.appInfo
-        return KeyValueSectionViewModel(title: "App Info", color: .gray, action: nil, items: [
+        return KeyValueSectionViewModel(title: "App Info", color: .gray, items: [
             ("App", "\(app.name ?? "–") \(app.version ?? "–") (\(app.build ?? "–"))"),
             ("Device", "\(device.name) (\(device.systemName) \(device.systemVersion))")
         ])
     }
 
     private func makeSizeSection(for info: LoggerStore.Info) -> KeyValueSectionViewModel {
-        KeyValueSectionViewModel(title: "Statistics", color: .gray, action: nil, items: [
+        KeyValueSectionViewModel(title: "Statistics", color: .gray, items: [
             ("Created", dateFormatter.string(from: info.creationDate)),
             ("Messages", info.messageCount.description),
             ("Requests", info.taskCount.description),

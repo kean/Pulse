@@ -9,6 +9,12 @@ import Pulse
 #warning("TODO: remoe actions for KeyValueSectionViewModel")
 #warning("TODO: standardize lineHeight")
 
+struct KeyValueSectionViewModel {
+    var title: String
+    var color: Color
+    var items: [(String, String?)] = []
+}
+
 extension KeyValueSectionViewModel {
     static func makeParameters(for request: NetworkRequestEntity) -> KeyValueSectionViewModel {
         var items: [(String, String?)] = [

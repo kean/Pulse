@@ -21,3 +21,11 @@ struct InfoRow: View {
         }
     }
 }
+
+struct KeyValueRow: Identifiable {
+    let id: Int
+    let item: (String, String?)
+
+    var title: String { item.0 }
+    var details: String? { item.1 }
+}
