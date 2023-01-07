@@ -149,9 +149,9 @@ final class ConsoleNetworkRequestTableCell: UITableViewCell, UIContextMenuIntera
 
         let pin = UIAction.makePinAction(with: viewModel.pinViewModel)
 
-        let shareGroup = UIMenu(title: "Share", options: [.displayInline], children: [shareAsText, shareAsHTML, shareAsCURL])
+        let shareGroup = UIMenu(title: "Share As", image: UIImage(systemName: "square.and.arrow.up"), options: [], children: [shareAsText, shareAsHTML, shareAsCURL])
 
-        let copyGroup = UIMenu(title: "Copy", options: [.displayInline], children: copyItems)
+        let copyGroup = UIMenu(title: "Copy...", image: UIImage(systemName: "doc.on.doc"), options: [], children: copyItems)
 
         return UIMenu(title: "", options: [.displayInline], children: [shareGroup, copyGroup, pin])
     }

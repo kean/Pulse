@@ -310,6 +310,9 @@ struct NetworkInspectorView: View {
                     AttributedStringShareMenu(shareItems: $shareItems) {
                         TextRenderer().render(viewModel.task, content: .sharing)
                     }
+                    Button(action: { shareItems = ShareItems([viewModel.task.cURLDescription()]) }) {
+                        Label("Share as cURL", systemImage: "square.and.arrow.up")
+                    }
                 }, label: {
                     Image(systemName: "square.and.arrow.up")
                 })
