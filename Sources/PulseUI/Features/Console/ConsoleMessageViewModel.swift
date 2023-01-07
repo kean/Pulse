@@ -57,7 +57,7 @@ final class ConsoleMessageViewModel: Pinnable {
             self.title = "\(time) · \(message.label.name.capitalized)"
         }
         self.text = message.text
-        self.textColor = ConsoleMessageStyle.textColor(level: message.logLevel)
+        self.textColor = ConsoleMessageStyle.textColor(for: message.logLevel)
         self.message = message
         self.level = message.logLevel.name.uppercased()
         self.searchCriteriaViewModel = searchCriteriaViewModel
@@ -90,24 +90,7 @@ final class ConsoleMessageViewModel: Pinnable {
 #endif
 }
 
-extension Color {
-    static func badgeColor(for level: LoggerStore.Level) -> Color {
-        switch level {
-#if os(macOS)
-        case .error: return Color(Palette.red)
-        case .critical: return Color(Palette.red)
-#else
-        case .critical: return .red
-        case .error: return .red
-#endif
-        case .warning: return .orange
-        case .info: return .blue
-        case .notice: return .indigo
-        case .debug: return .secondary
-        case .trace: return .secondary
-        }
-    }
-    
+extension Color {    
     static func textColor(for level: LoggerStore.Level) -> Color {
         switch level {
 #if os(macOS)
@@ -141,7 +124,7 @@ extension UIColor {
 
 #if os(macOS)
 enum ConsoleMessageStyle {
-    static func textColor(level: LoggerStore.Level) -> Color {
+    static func textColor(for level: LoggerStore.Level) -> Color {
         switch level {
         case .trace: return .secondary
         case .debug: return .primary
@@ -155,7 +138,7 @@ enum ConsoleMessageStyle {
 }
 #else
 enum ConsoleMessageStyle {
-    static func textColor(level: LoggerStore.Level) -> Color {
+    static func textColor(for level: LoggerStore.Level) -> Color {
         switch level {
         case .trace: return .primary
         case .debug: return .primary

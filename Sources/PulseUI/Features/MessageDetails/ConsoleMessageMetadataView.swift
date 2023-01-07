@@ -21,7 +21,7 @@ struct ConsoleMessageMetadataView: View {
 
     private var sections: [KeyValueSectionViewModel] {
         return [
-            KeyValueSectionViewModel(title: "Summary", color: Color.badgeColor(for: message.logLevel), items: [
+            KeyValueSectionViewModel(title: "Summary", color: ConsoleMessageStyle.textColor(for: message.logLevel), items: [
                 ("Date", DateFormatter.fullDateFormatter.string(from: message.createdAt)),
                 ("Level", LoggerStore.Level(rawValue: message.level)?.name),
                 ("Label", message.label.name.nonEmpty)
