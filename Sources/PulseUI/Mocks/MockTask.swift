@@ -144,6 +144,17 @@ extension MockTask {
         delay: 6.5,
         decodingError: mockPatchRepoDecodingError
     )
+
+    static let networkingFailure = MockTask(
+        originalRequest: mockLoginOriginalRequest,
+        response: mockLoginResponse,
+        responseBody: mockLoginResponseBody,
+        transactions: [
+            .init(fetchType: .networkLoad, request: mockLoginCurrentRequest, response: mockLoginResponse, duration: 0.42691)
+        ],
+        delay: 0.4,
+        decodingError: URLError(URLError.Code.notConnectedToInternet)
+    )
 }
 
 // MARK: - Login (POST)

@@ -91,7 +91,7 @@ extension KeyValueSectionViewModel {
         guard domain == NSURLErrorDomain else {
             return "\(code)"
         }
-        return "\(code) (\(descriptionForURLErrorCode(Int(code)))"
+        return "\(code) (\(descriptionForURLErrorCode(Int(code))))"
     }
 
     static func makeQueryItems(for url: URL) -> KeyValueSectionViewModel? {

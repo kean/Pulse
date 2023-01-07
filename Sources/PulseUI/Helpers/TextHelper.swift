@@ -53,7 +53,6 @@ final class TextHelper {
             } else {
                 paragraphStyle.lineSpacing = 3
             }
-            paragraphStyle.lineBreakMode = .byTruncatingTail
             return paragraphStyle
         }()
         if style.width == .condensed {

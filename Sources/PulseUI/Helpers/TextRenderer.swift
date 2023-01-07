@@ -360,7 +360,7 @@ struct ConsoleTextRenderer_Previews: PreviewProvider {
     }
 }
 
-private let task = LoggerStore.preview.entity(for: .patchRepo)
+private let task = LoggerStore.preview.entity(for: .login)
 #endif
 
 #warning("TODO: remove this when we are done with HTML output")

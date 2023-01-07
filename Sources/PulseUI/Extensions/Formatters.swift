@@ -93,7 +93,7 @@ enum ErrorFormatter {
     static func shortErrorDescription(for task: NetworkTaskEntity) -> String {
         if task.errorCode != 0 {
             if task.errorDomain == URLError.errorDomain {
-                return "\(task.errorCode) \(descriptionForURLErrorCode(Int(task.errorCode)))"
+                return descriptionForURLErrorCode(Int(task.errorCode))
             } else if task.errorDomain == NetworkLogger.DecodingError.domain {
                 return "Decoding Failed"
             } else {
