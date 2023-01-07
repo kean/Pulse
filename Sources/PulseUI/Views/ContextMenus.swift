@@ -136,15 +136,15 @@ struct AttributedStringShareMenu: View {
     let string: () -> NSAttributedString
 
     var body: some View {
-        Button(action: { ShareService.share(string(), as: .plainText) }) {
+        Button(action: { shareItems = ShareService.share(string(), as: .plainText) }) {
             Label("Share as Text", systemImage: "square.and.arrow.up")
         }
-        Button(action: { ShareService.share(string(), as: .html) }) {
+        Button(action: { shareItems = ShareService.share(string(), as: .html) }) {
             Text("Share as HTML")
             Image(systemName: "square.and.arrow.up")
         }
 #if os(iOS)
-        Button(action: { ShareService.share(string(), as: .pdf) }) {
+        Button(action: { shareItems = ShareService.share(string(), as: .pdf) }) {
             Text("Share as PDF")
             Image(systemName: "square.and.arrow.up")
         }

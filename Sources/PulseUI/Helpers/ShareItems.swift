@@ -33,7 +33,7 @@ enum ShareService {
         let string = sanitized(string)
         switch output {
         case .plainText:
-            return ShareItems([string])
+            return ShareItems([string.string])
         case .html:
             let html = (try? TextRenderer.html(from: string)) ?? Data()
             let directory = TemporaryDirectory()
