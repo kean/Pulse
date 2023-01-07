@@ -11,16 +11,12 @@ import Pulse
 struct ConsoleMessageDetailsView: View {
     let viewModel: ConsoleMessageDetailsViewModel
     @Environment(\.colorScheme) var colorScheme: ColorScheme
-    @State private var isShowingShareSheet = false
 
     #if os(iOS)
     var body: some View {
         contents
             .navigationBarTitle("", displayMode: .inline)
             .navigationBarItems(trailing: trailingNavigationBarItems)
-            .sheet(isPresented: $isShowingShareSheet) {
-                ShareView(activityItems: [self.viewModel.prepareForSharing()])
-            }
     }
 
     @ViewBuilder
@@ -33,9 +29,6 @@ struct ConsoleMessageDetailsView: View {
                 Image(systemName: "info.circle")
             }
             PinButton(viewModel: viewModel.pin, isTextNeeded: false)
-            ShareButton {
-                self.isShowingShareSheet = true
-            }
         }
     }
     #elseif os(watchOS)
