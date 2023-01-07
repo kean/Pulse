@@ -16,8 +16,6 @@ struct ConsoleMessageFiltersView: View {
     @State var isLevelsSectionExpanded = true
     @State var isLabelsSectionExpanded = false
 
-    @State var isAllLabelsShown = false
-
     @Binding var isPresented: Bool
 
     var body: some View {
@@ -243,17 +241,9 @@ extension ConsoleMessageFiltersView {
                 Toggle(item.capitalized, isOn: viewModel.binding(forLabel: item))
             }
             if labels.count > 4 {
-                Button("View All", action: { isAllLabelsShown = true })
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .background(allLabelsNavigationLink)
-            }
-        }
-    }
-
-    private var allLabelsNavigationLink: some View {
-        InvisibleNavigationLinks {
-            NavigationLink.programmatic(isActive: $isAllLabelsShown) {
-                ConsoleFiltersLabelsPickerView(viewModel: viewModel)
+                NavigationLink(destination: ConsoleFiltersLabelsPickerView(viewModel: viewModel)) {
+                    Text("View All").foregroundColor(.blue)
+                }
             }
         }
     }
