@@ -69,9 +69,6 @@ struct ConsoleMessageDetailsView: View {
     #if os(watchOS) || os(tvOS)
     private var tags: some View {
         VStack(alignment: .leading) {
-            if let badge = viewModel.badge {
-                BadgeView(viewModel: BadgeViewModel(title: badge.title, color: badge.color.opacity(colorScheme == .light ? 0.25 : 0.5)))
-            }
             ForEach(viewModel.tags, id: \.title) { tag in
                 HStack {
                     Text(tag.title)

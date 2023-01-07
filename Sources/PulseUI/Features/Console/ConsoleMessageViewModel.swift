@@ -90,12 +90,6 @@ final class ConsoleMessageViewModel: Pinnable {
 #endif
 }
 
-private extension BadgeViewModel {
-    init(level: LoggerStore.Level) {
-        self.init(title: level.name.uppercased(), color: .badgeColor(for: level))
-    }
-}
-
 extension Color {
     static func badgeColor(for level: LoggerStore.Level) -> Color {
         switch level {
