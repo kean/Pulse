@@ -8,11 +8,9 @@ import CoreData
 import Combine
 import SwiftUI
 
-#warning("TODO: rename")
-
 #if os(iOS) || os(macOS) || os(tvOS)
 
-final class NetworkSearchCriteriaViewModel: ObservableObject {
+final class ConsoleNetworkSearchCriteriaViewModel: ObservableObject {
     @Binding var dates: ConsoleSearchCriteria.DatesFilter
     @Published var criteria: NetworkSearchCriteria = .default
     private(set) var defaultCriteria: NetworkSearchCriteria = .default

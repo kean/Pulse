@@ -107,7 +107,7 @@ private struct ConsoleToolbarView: View {
                 case .all:
                     ConsoleFiltersView(viewModel: viewModel.searchCriteriaViewModel, isPresented: $isShowingFilters)
                 case .network:
-                    NetworkFiltersView(viewModel: viewModel.networkSearchCriteriaViewModel, isPresented: $isShowingFilters)
+                    NetworkFiltersView(viewModel: viewModel.ConsoleNetworkSearchCriteriaViewModel, isPresented: $isShowingFilters)
                 }
             }
         }

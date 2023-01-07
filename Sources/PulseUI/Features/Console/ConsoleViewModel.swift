@@ -26,12 +26,12 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 
     // Search criteria
     let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
-    let networkSearchCriteriaViewModel: NetworkSearchCriteriaViewModel
+    let ConsoleNetworkSearchCriteriaViewModel: ConsoleNetworkSearchCriteriaViewModel
 
     var isDefaultFilters: Bool {
         switch mode {
         case .all: return searchCriteriaViewModel.isDefaultSearchCriteria
-        case .network: return networkSearchCriteriaViewModel.isDefaultSearchCriteria
+        case .network: return ConsoleNetworkSearchCriteriaViewModel.isDefaultSearchCriteria
         }
     }
 
@@ -55,7 +55,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         self.details = ConsoleDetailsRouterViewModel()
         let searchCriteriaViewModel = ConsoleSearchCriteriaViewModel(store: store)
         self.searchCriteriaViewModel = searchCriteriaViewModel
-        self.networkSearchCriteriaViewModel = NetworkSearchCriteriaViewModel(store: store, dates: Binding(get: { searchCriteriaViewModel.criteria.dates }, set: { searchCriteriaViewModel.criteria.dates = $0 }))
+        self.ConsoleNetworkSearchCriteriaViewModel = ConsoleNetworkSearchCriteriaViewModel(store: store, dates: Binding(get: { searchCriteriaViewModel.criteria.dates }, set: { searchCriteriaViewModel.criteria.dates = $0 }))
 
 #if os(iOS) || os(macOS)
         self.table = ConsoleTableViewModel(searchCriteriaViewModel: searchCriteriaViewModel)
@@ -71,7 +71,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
             self?.refreshNow()
         }.store(in: &cancellables)
 
-        networkSearchCriteriaViewModel.dataNeedsReload.throttle(for: 0.5, scheduler: DispatchQueue.main, latest: true).sink { [weak self] in
+        ConsoleNetworkSearchCriteriaViewModel.dataNeedsReload.throttle(for: 0.5, scheduler: DispatchQueue.main, latest: true).sink { [weak self] in
             self?.refreshNow()
         }.store(in: &cancellables)
 
@@ -139,7 +139,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
             let viewModel = searchCriteriaViewModel
             ConsoleSearchCriteria.update(request: controller.fetchRequest, filterTerm: filterTerm, criteria: viewModel.criteria, filters: viewModel.filters, sessionId: sessionId, isOnlyErrors: isOnlyErrors, isOnlyNetwork: isOnlyNetwork)
         case .network:
-            let viewModel = networkSearchCriteriaViewModel
+            let viewModel = ConsoleNetworkSearchCriteriaViewModel
             NetworkSearchCriteria.update(request: controller.fetchRequest, filterTerm: filterTerm, dates: viewModel.dates, criteria: viewModel.criteria, filters: viewModel.filters, isOnlyErrors: isOnlyErrors, sessionId: sessionId)
             break
         }

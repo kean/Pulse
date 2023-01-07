@@ -8,7 +8,7 @@ import Pulse
 #if os(iOS) || os(macOS)
 
 struct NetworkFiltersView: View {
-    @ObservedObject var viewModel: NetworkSearchCriteriaViewModel
+    @ObservedObject var viewModel: ConsoleNetworkSearchCriteriaViewModel
 
 #if os(iOS)
 
@@ -531,8 +531,8 @@ struct NetworkFiltersView_Previews: PreviewProvider {
     }
 }
 
-private func makeMockViewModel() -> NetworkSearchCriteriaViewModel {
-    NetworkSearchCriteriaViewModel(store: .mock, dates: .constant(.default))
+private func makeMockViewModel() -> ConsoleNetworkSearchCriteriaViewModel {
+    ConsoleNetworkSearchCriteriaViewModel(store: .mock, dates: .constant(.default))
 
 }
 #endif

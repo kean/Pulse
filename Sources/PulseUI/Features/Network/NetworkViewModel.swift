@@ -18,7 +18,7 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     let details: ConsoleDetailsRouterViewModel
 
     // Search criteria
-    let searchCriteria: NetworkSearchCriteriaViewModel
+    let searchCriteria: ConsoleNetworkSearchCriteriaViewModel
     @Published var isOnlyErrors: Bool = false
     @Published var filterTerm: String = ""
 
@@ -40,7 +40,7 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 
         self.controller = NSFetchedResultsController<NetworkTaskEntity>(fetchRequest: request, managedObjectContext: store.viewContext, sectionNameKeyPath: nil, cacheName: nil)
 
-        self.searchCriteria = NetworkSearchCriteriaViewModel(store: store, dates: .constant(.default))
+        self.searchCriteria = ConsoleNetworkSearchCriteriaViewModel(store: store, dates: .constant(.default))
 #if os(iOS) || os(macOS)
         self.table = ConsoleTableViewModel(searchCriteriaViewModel: nil)
 #endif
