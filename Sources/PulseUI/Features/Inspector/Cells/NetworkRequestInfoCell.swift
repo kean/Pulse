@@ -21,26 +21,46 @@ struct NetworkRequestInfoCell: View {
     }
 
     private var destinationRequestDetails: some View {
-        viewModel.requestDetailsViewModel.map(NetworkInspectorRequestDetailsView.init)
+        NetworkDetailsView(title: "Request") { viewModel.render() }
     }
 }
 
 final class NetworkRequestInfoCellViewModel {
     let httpMethod: String
     let url: String
-    let requestDetailsViewModel: NetworkInspectorRequestDetailsViewModel?
+    let render: () -> NSAttributedString
 
     init(task: NetworkTaskEntity) {
         self.httpMethod = task.httpMethod ?? "GET"
         self.url = task.url ?? "–"
-        self.requestDetailsViewModel = task.originalRequest.map(NetworkInspectorRequestDetailsViewModel.init)
+        self.render = {
+            TextRenderer(options: .sharing).render(task, content: .all)
+        }
     }
 
     init(request: NetworkRequestEntity) {
         self.httpMethod = request.httpMethod ?? "GET"
         self.url = request.url ?? "–"
-        self.requestDetailsViewModel = NetworkInspectorRequestDetailsViewModel(request: request)
+        self.render = { makeDetails(for: request) }
     }
+}
+
+private func makeDetails(for request: NetworkRequestEntity) -> NSAttributedString {
+    guard let url = URL(string: request.url ?? "") else {
+        return NSAttributedString(string: "Invalid URL")
+    }
+    let renderer = TextRenderer()
+    let urlString = renderer.render(url.absoluteString + "\n", role: .body2, style: .monospaced)
+    let sections: [NSAttributedString] = [
+        KeyValueSectionViewModel.makeComponents(for: url),
+        KeyValueSectionViewModel.makeQueryItems(for: url),
+        KeyValueSectionViewModel.makeParameters(for: request)
+    ].compactMap { $0 }.map { renderer.render($0, style: .monospaced) }
+
+    let strings = [urlString] + sections
+    let string = NSMutableAttributedString(attributedString: renderer.joined(strings))
+    string.addAttributes([.underlineColor: UXColor.clear])
+    return string
 }
 
 #if DEBUG
