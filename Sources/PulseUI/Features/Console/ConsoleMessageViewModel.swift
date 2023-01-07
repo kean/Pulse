@@ -16,7 +16,7 @@ final class ConsoleMessageViewModel: Pinnable {
     let badge: BadgeViewModel
     
     private let message: LoggerMessageEntity
-    private let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel?
+    private let searchCriteriaViewModel: ConsoleMessageSearchCriteriaViewModel?
     
     private(set) lazy var time = ConsoleMessageViewModel.timeFormatter.string(from: message.createdAt)
 
@@ -52,7 +52,7 @@ final class ConsoleMessageViewModel: Pinnable {
     
     private(set) lazy var pinViewModel = PinButtonViewModel(message: message)
     
-    init(message: LoggerMessageEntity, searchCriteriaViewModel: ConsoleSearchCriteriaViewModel? = nil) {
+    init(message: LoggerMessageEntity, searchCriteriaViewModel: ConsoleMessageSearchCriteriaViewModel? = nil) {
         let time = ConsoleMessageViewModel.timeFormatter.string(from: message.createdAt)
         if message.label.name == "default" || message.label.name.isEmpty {
             self.title = time

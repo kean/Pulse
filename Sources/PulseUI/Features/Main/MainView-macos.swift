@@ -206,7 +206,7 @@ private struct FilterPopoverToolbarButton: View {
         if mode.isNetworkOnly {
             NetworkFiltersView(viewModel: viewModel.network.searchCriteria)
         } else {
-            ConsoleFiltersView(viewModel: viewModel.console.searchCriteria)
+            ConsoleMessageFiltersView(viewModel: viewModel.console.searchCriteria)
         }
     }
 }

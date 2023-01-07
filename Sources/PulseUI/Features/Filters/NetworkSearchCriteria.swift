@@ -324,7 +324,7 @@ func evaluateProgrammaticFilters(_ filters: [NetworkSearchFilter], entity: Netwo
 }
 
 extension NetworkSearchCriteria {
-    static func update(request: NSFetchRequest<NSManagedObject>, filterTerm: String, dates: ConsoleSearchCriteria.DatesFilter, criteria: NetworkSearchCriteria, filters: [NetworkSearchFilter], isOnlyErrors: Bool, sessionId: UUID?) {
+    static func update(request: NSFetchRequest<NSManagedObject>, filterTerm: String, dates: ConsoleMessageSearchCriteria.DatesFilter, criteria: NetworkSearchCriteria, filters: [NetworkSearchFilter], isOnlyErrors: Bool, sessionId: UUID?) {
         var predicates = [NSPredicate]()
 
         if isOnlyErrors {

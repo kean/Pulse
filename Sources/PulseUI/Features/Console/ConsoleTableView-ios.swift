@@ -11,11 +11,11 @@ import Combine
 import UIKit
 
 final class ConsoleTableViewModel {
-    let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel?
+    let searchCriteriaViewModel: ConsoleMessageSearchCriteriaViewModel?
     var diff: CollectionDifference<NSManagedObjectID>?
     @Published var entities: [NSManagedObject] = []
 
-    init(searchCriteriaViewModel: ConsoleSearchCriteriaViewModel?) {
+    init(searchCriteriaViewModel: ConsoleMessageSearchCriteriaViewModel?) {
         self.searchCriteriaViewModel = searchCriteriaViewModel
     }
 }

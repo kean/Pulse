@@ -105,9 +105,9 @@ private struct ConsoleToolbarView: View {
             NavigationView {
                 switch viewModel.mode {
                 case .all:
-                    ConsoleFiltersView(viewModel: viewModel.searchCriteriaViewModel, isPresented: $isShowingFilters)
+                    ConsoleMessageFiltersView(viewModel: viewModel.searchCriteriaViewModel, isPresented: $isShowingFilters)
                 case .network:
-                    NetworkFiltersView(viewModel: viewModel.ConsoleNetworkSearchCriteriaViewModel, isPresented: $isShowingFilters)
+                    NetworkFiltersView(viewModel: viewModel.networkSearchCriteriaViewModel, isPresented: $isShowingFilters)
                 }
             }
         }

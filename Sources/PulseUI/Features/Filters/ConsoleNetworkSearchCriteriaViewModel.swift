@@ -11,7 +11,7 @@ import SwiftUI
 #if os(iOS) || os(macOS) || os(tvOS)
 
 final class ConsoleNetworkSearchCriteriaViewModel: ObservableObject {
-    @Binding var dates: ConsoleSearchCriteria.DatesFilter
+    @Binding var dates: ConsoleMessageSearchCriteria.DatesFilter
     @Published var criteria: NetworkSearchCriteria = .default
     private(set) var defaultCriteria: NetworkSearchCriteria = .default
     @Published var filters: [NetworkSearchFilter] = []
@@ -28,7 +28,7 @@ final class ConsoleNetworkSearchCriteriaViewModel: ObservableObject {
     }
 
     var isDefaultDatesFilter: Bool {
-        var defaultFilter = ConsoleSearchCriteria.DatesFilter.default
+        var defaultFilter = ConsoleMessageSearchCriteria.DatesFilter.default
         defaultFilter.isCurrentSessionOnly = isCurrentStore
         return dates == defaultFilter
     }
@@ -36,7 +36,7 @@ final class ConsoleNetworkSearchCriteriaViewModel: ObservableObject {
     private var cancellables: [AnyCancellable] = []
     private let isCurrentStore: Bool
 
-    init(store: LoggerStore, dates: Binding<ConsoleSearchCriteria.DatesFilter>) {
+    init(store: LoggerStore, dates: Binding<ConsoleMessageSearchCriteria.DatesFilter>) {
         _dates = dates
         domains = ManagedObjectsObserver(context: store.viewContext, sortDescriptior: NSSortDescriptor(keyPath: \NetworkDomainEntity.count, ascending: false))
         isCurrentStore = store === LoggerStore.shared // TODO: refactor

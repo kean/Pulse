@@ -7,8 +7,8 @@ import Pulse
 
 #if os(iOS) || os(macOS)
 
-struct ConsoleFiltersView: View {
-    @ObservedObject var viewModel: ConsoleSearchCriteriaViewModel
+struct ConsoleMessageFiltersView: View {
+    @ObservedObject var viewModel: ConsoleMessageSearchCriteriaViewModel
 
 #if os(iOS)
     @State var isGeneralSectionExpanded = true
@@ -56,9 +56,9 @@ struct ConsoleFiltersView: View {
 #endif
 }
 
-// MARK: - ConsoleFiltersView (Contents)
+// MARK: - ConsoleMessageFiltersView (Contents)
 
-extension ConsoleFiltersView {
+extension ConsoleMessageFiltersView {
     @ViewBuilder
     var formContents: some View {
         if #available(iOS 14, *) {
@@ -76,9 +76,9 @@ extension ConsoleFiltersView {
     }
 }
 
-// MARK: - ConsoleFiltersView (Custom Filters)
+// MARK: - ConsoleMessageFiltersView (Custom Filters)
 
-extension ConsoleFiltersView {
+extension ConsoleMessageFiltersView {
     @available(iOS 14, *)
     var generalSection: some View {
         FiltersSection(
@@ -138,9 +138,9 @@ extension ConsoleFiltersView {
 #endif
 }
 
-// MARK: - ConsoleFiltersView (Log Levels)
+// MARK: - ConsoleMessageFiltersView (Log Levels)
 
-extension ConsoleFiltersView {
+extension ConsoleMessageFiltersView {
     var logLevelsSection: some View {
         FiltersSection(
             isExpanded: $isLevelsSectionExpanded,
@@ -208,9 +208,9 @@ extension ConsoleFiltersView {
     }
 }
 
-// MARK: - ConsoleFiltersView (Labels)
+// MARK: - ConsoleMessageFiltersView (Labels)
 
-extension ConsoleFiltersView {
+extension ConsoleMessageFiltersView {
     var labelsSection: some View {
         FiltersSection(
             isExpanded: $isLabelsSectionExpanded,
@@ -274,9 +274,9 @@ extension ConsoleFiltersView {
 #endif
 }
 
-// MARK: - ConsoleFiltersView (Time Period)
+// MARK: - ConsoleMessageFiltersView (Time Period)
 
-extension ConsoleFiltersView {
+extension ConsoleMessageFiltersView {
     var timePeriodSection: some View {
         FiltersSection(
             isExpanded: $isTimePeriodSectionExpanded,
@@ -317,21 +317,21 @@ extension ConsoleFiltersView {
 }
 
 #if DEBUG
-struct ConsoleFiltersView_Previews: PreviewProvider {
+struct ConsoleMessageFiltersView_Previews: PreviewProvider {
     static var previews: some View {
 #if os(iOS)
         NavigationView {
-            ConsoleFiltersView(viewModel: makeMockViewModel(), isPresented: .constant(true))
+            ConsoleMessageFiltersView(viewModel: makeMockViewModel(), isPresented: .constant(true))
         }
 #else
-        ConsoleFiltersView(viewModel: makeMockViewModel())
+        ConsoleMessageFiltersView(viewModel: makeMockViewModel())
             .previewLayout(.fixed(width: Filters.preferredWidth - 15, height: 700))
 #endif
     }
 }
 
-private func makeMockViewModel() -> ConsoleSearchCriteriaViewModel {
-    ConsoleSearchCriteriaViewModel(store: .mock)
+private func makeMockViewModel() -> ConsoleMessageSearchCriteriaViewModel {
+    ConsoleMessageSearchCriteriaViewModel(store: .mock)
 }
 #endif
 

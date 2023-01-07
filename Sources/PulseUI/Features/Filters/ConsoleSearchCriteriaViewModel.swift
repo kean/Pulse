@@ -7,9 +7,9 @@ import Pulse
 import Combine
 import SwiftUI
 
-final class ConsoleSearchCriteriaViewModel: ObservableObject {
-    @Published var criteria: ConsoleSearchCriteria = .default
-    private(set) var defaultCriteria: ConsoleSearchCriteria = .default
+final class ConsoleMessageSearchCriteriaViewModel: ObservableObject {
+    @Published var criteria: ConsoleMessageSearchCriteria = .default
+    private(set) var defaultCriteria: ConsoleMessageSearchCriteria = .default
     @Published var filters: [ConsoleSearchFilter] = []
 
     @Published private(set) var allLabels: [String] = []
