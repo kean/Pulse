@@ -23,6 +23,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     }
 
     let details: ConsoleDetailsRouterViewModel
+    let insightsViewModel: InsightsViewModel
 
     // Search criteria
     let sharedSearchCriteriaViewModel: ConsoleSharedSearchCriteriaViewModel
@@ -54,6 +55,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         self.mode = mode
 
         self.details = ConsoleDetailsRouterViewModel()
+        self.insightsViewModel = InsightsViewModel(store: store)
 
         self.sharedSearchCriteriaViewModel = ConsoleSharedSearchCriteriaViewModel(store: store)
         self.searchCriteriaViewModel = ConsoleMessageSearchCriteriaViewModel(store: store)

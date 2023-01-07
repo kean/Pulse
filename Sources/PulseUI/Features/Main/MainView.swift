@@ -18,7 +18,13 @@ public struct MainView: View {
     }
 
     public var body: some View {
+#if os(iOS)
+        NavigationView {
+            ConsoleView(viewModel: viewModel)
+        }
+#else
         ConsoleView(viewModel: viewModel)
+#endif
     }
 }
 

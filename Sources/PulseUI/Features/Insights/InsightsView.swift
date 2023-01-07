@@ -43,7 +43,7 @@ public struct InsightsView: View {
         }
         .listStyle(.automatic)
         .backport.navigationTitle("Insights")
-        .navigationBarItems(trailing: navigationTrailingBarItems)
+        .navigationBarItems(leading: navigationTrailingBarItems)
     }
 
     private var navigationTrailingBarItems: some View {

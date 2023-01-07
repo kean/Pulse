@@ -14,14 +14,17 @@ import UniformTypeIdentifiers
 @available(iOS 14, *)
 struct ConsoleContextMenu: View {
     private let store: LoggerStore
+    private let insights: InsightsViewModel
     private let isShowingAsText: Binding<Bool>?
 
     @State private var isShowingSettings = false
     @State private var isShowingStoreInfo = false
+    @State private var isShowingInsights = false
     @State private var isDocumentBrowserPresented = false
 
-    init(store: LoggerStore, isShowingAsText: Binding<Bool>? = nil) {
+    init(store: LoggerStore, insights: InsightsViewModel, isShowingAsText: Binding<Bool>? = nil) {
         self.store = store
+        self.insights = insights
         self.isShowingAsText = isShowingAsText
     }
 
@@ -45,6 +48,9 @@ struct ConsoleContextMenu: View {
                 if !store.isArchive {
                     Button(action: { isDocumentBrowserPresented = true }) {
                         Label("Browse Logs", systemImage: "folder")
+                    }
+                    Button(action: { isShowingInsights = true }) {
+                        Label("Insights", systemImage: "chart.pie")
                     }
                 }
                 Button(action: { isShowingSettings = true }) {
@@ -96,6 +102,14 @@ struct ConsoleContextMenu: View {
                     })
             }
         }
+        .sheet(isPresented: $isShowingInsights) {
+            NavigationView {
+                InsightsView(viewModel: insights)
+                    .navigationBarItems(trailing: Button(action: { isShowingInsights = false }) {
+                        Text("Done")
+                    })
+            }
+        }
         .fullScreenCover(isPresented: $isDocumentBrowserPresented) {
             DocumentBrowser()
         }
@@ -141,7 +155,7 @@ struct ConsoleContextMenu_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
             VStack {
-                ConsoleContextMenu(store: .mock, isShowingAsText: .constant(false))
+                ConsoleContextMenu(store: .mock, insights: .init(store: .mock), isShowingAsText: .constant(false))
                 Spacer()
             }
         }

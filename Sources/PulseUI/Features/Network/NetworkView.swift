@@ -40,10 +40,10 @@ public struct NetworkView: View {
         .navigationBarItems(
             leading: navigationBarTrailingItems,
             trailing: HStack {
-                if #available(iOS 14, *) {
-                    ShareButton { isSharing = true }
-                    ConsoleContextMenu(store: viewModel.store, isShowingAsText: $isShowingAsText)
-                }
+//                if #available(iOS 14, *) {
+//                    ShareButton { isSharing = true }
+//                    ConsoleContextMenu(store: viewModel.store, insights: viewModel.insights, isShowingAsText: $isShowingAsText)
+//                }
             }
         )
         .sheet(isPresented: $isSharing) {

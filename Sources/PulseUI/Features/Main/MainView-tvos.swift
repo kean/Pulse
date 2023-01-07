@@ -12,7 +12,8 @@ import Combine
 #if os(tvOS)
 
 public struct MainView: View {
-    @ObservedObject private var viewModel: MainViewModel // TODO: replace with StateObject
+    // TODO: replace with StateObject
+    @ObservedObject private var viewModel: MainViewModel
 
     /// - parameter onDismiss: pass onDismiss to add a close button.
     public init(store: LoggerStore = .shared) {

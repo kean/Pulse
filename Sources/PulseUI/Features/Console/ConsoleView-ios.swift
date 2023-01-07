@@ -35,7 +35,7 @@ public struct ConsoleView: View {
                 trailing: HStack {
                     ShareButton { isSharing = true }
                     if #available(iOS 14, *) {
-                        ConsoleContextMenu(store: viewModel.store, isShowingAsText: $isShowingAsText)
+                        ConsoleContextMenu(store: viewModel.store, insights: viewModel.insightsViewModel, isShowingAsText: $isShowingAsText)
                     }
                 }
             )
