@@ -12,6 +12,7 @@ import Combine
 #warning("TODO: should it have any of these navigation buttons by default? probably not")
 #warning("TODO: add other sharing options, e.g. as HTML/PDF + print")
 #warning("TODO: handle clicks on decoding error on other platforms")
+#warning("TODO: add filter options")
 
 #if os(macOS) || os(iOS)
 
@@ -72,12 +73,16 @@ struct _RichTextView: View {
                 Label("Share", systemImage: "square.and.arrow.up")
             })
             Menu(content: {
-                if viewModel.contentType?.isHTML == true {
-                    Button(action: { isWebViewOpen = true }) {
-                        Label("Open in Browser", systemImage: "safari")
+                Section {
+                    if viewModel.contentType?.isHTML == true {
+                        Button(action: { isWebViewOpen = true }) {
+                            Label("Open in Browser", systemImage: "safari")
+                        }
                     }
                 }
-                StringSearchOptionsMenu(options: $viewModel.searchOptions, isKindNeeded: false)
+                Section {
+                    StringSearchOptionsMenu(options: $viewModel.searchOptions, isKindNeeded: false)
+                }
             }, label: {
                 Image(systemName: "ellipsis.circle")
             })

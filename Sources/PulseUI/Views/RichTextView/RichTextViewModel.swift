@@ -79,9 +79,7 @@ final class RichTextViewModel: ObservableObject {
             }
         }
 
-#warning("TODO: should keep current index if possible")
         selectedMatchIndex = 0
-
         didUpdateCurrentSelectedMatch()
     }
 

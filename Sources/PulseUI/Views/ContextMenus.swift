@@ -129,9 +129,7 @@ struct StringSearchOptionsMenu: View {
     #if os(macOS)
     var body: some View {
         Menu(content: {
-            pickerKind
-            pickerCase
-            pickerOptions
+            contents
         }, label: {
             Image(systemName: "ellipsis.circle")
         })
@@ -139,24 +137,15 @@ struct StringSearchOptionsMenu: View {
     }
     #else
     var body: some View {
-        pickerCase
-        pickerKind
-        pickerOptions
+        contents
     }
     #endif
 
-    var pickerCase: some View {
-        Picker(options.isCaseSensitive ? "Case Sensitive" :  "Case Insensitive", selection: $options.isCaseSensitive) {
-            Label("Case Insensitive", systemImage: "textformat.size").tag(false)
-            Text("Case Sensitive").tag(true)
-        }.pickerStyle(.inline)
-    }
-
-    var pickerKind: some View {
-        Picker(options.isRegex ? "Regular Expression" : "Text", selection: $options.isRegex) {
-            Label("Text", systemImage: "text.magnifyingglass").tag(false)
-            Text("Regular Expression").tag(true)
-        }.pickerStyle(.inline)
+    @ViewBuilder
+    private var contents: some View {
+        Toggle("Regular Expression", isOn: $options.isRegex)
+        Toggle("Case Sensitive", isOn: $options.isCaseSensitive)
+        pickerOptions
     }
 
     @ViewBuilder
@@ -166,8 +155,27 @@ struct StringSearchOptionsMenu: View {
                 ForEach(StringSearchOptions.Kind.allCases, id: \.self) {
                     Text($0.rawValue).tag($0)
                 }
-            }.pickerStyle(.inline)
+            }
+            .pickerStyle(.menu)
         }
     }
 }
+#if DEBUG
+@available(iOS 14, *)
+struct StringSearchOptionsMenu_Previews: PreviewProvider {
+    static var previews: some View {
+        VStack {
+            Spacer()
+            Menu(content: {
+                Section(header: Label("Search Options", systemImage: "magnifyingglass")) {
+                    StringSearchOptionsMenu(options: .constant(.default))
+                }
+            }) {
+                Text("Menu")
+            }
+        }
+    }
+}
+#endif
+
 #endif
