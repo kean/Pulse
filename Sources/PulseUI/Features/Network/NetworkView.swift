@@ -67,7 +67,7 @@ public struct NetworkView: View {
     @ViewBuilder
     private var tableOverlay: some View {
         if viewModel.entities.isEmpty {
-            PlaceholderView.make(viewModel: viewModel)
+EmptyView()
         }
     }
 

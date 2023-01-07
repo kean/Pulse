@@ -285,22 +285,22 @@ extension NetworkFiltersView {
         FilterSectionHeader(
             icon: "calendar", title: "Time Period",
             color: .yellow,
-            reset: { viewModel.criteria.dates = .default },
-            isDefault: viewModel.criteria.dates == .default,
-            isEnabled: $viewModel.criteria.dates.isEnabled
+            reset: { viewModel.dates = .default },
+            isDefault: viewModel.dates == .default,
+            isEnabled: $viewModel.dates.isEnabled
         )
     }
 
     @ViewBuilder
     private var timePeriodGroupContent: some View {
-        Filters.toggle("Latest Session", isOn: $viewModel.criteria.dates.isCurrentSessionOnly)
+        Filters.toggle("Latest Session", isOn: $viewModel.dates.isCurrentSessionOnly)
 
-        DateRangePicker(title: "Start Date", date: viewModel.bindingStartDate, isEnabled: $viewModel.criteria.dates.isStartDateEnabled)
-        DateRangePicker(title: "End Date", date: viewModel.bindingEndDate, isEnabled: $viewModel.criteria.dates.isEndDateEnabled)
+        DateRangePicker(title: "Start Date", date: viewModel.bindingStartDate, isEnabled: $viewModel.dates.isStartDateEnabled)
+        DateRangePicker(title: "End Date", date: viewModel.bindingEndDate, isEnabled: $viewModel.dates.isEndDateEnabled)
 
         HStack(spacing: 16) {
-            Button("Recent") { viewModel.criteria.dates = .recent }
-            Button("Today") { viewModel.criteria.dates = .today }
+            Button("Recent") { viewModel.dates = .recent }
+            Button("Today") { viewModel.dates = .today }
             Spacer()
         }
 #if os(iOS)
@@ -532,7 +532,7 @@ struct NetworkFiltersView_Previews: PreviewProvider {
 }
 
 private func makeMockViewModel() -> NetworkSearchCriteriaViewModel {
-    NetworkSearchCriteriaViewModel(store: .mock)
+    NetworkSearchCriteriaViewModel(store: .mock, dates: .constant(.default))
 
 }
 #endif

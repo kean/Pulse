@@ -103,7 +103,12 @@ private struct ConsoleToolbarView: View {
         .padding(EdgeInsets(top: 2, leading: 8, bottom: 2, trailing: 8))
         .sheet(isPresented: $isShowingFilters) {
             NavigationView {
-                ConsoleFiltersView(viewModel: viewModel.searchCriteria, isPresented: $isShowingFilters)
+                switch viewModel.mode {
+                case .all:
+                    ConsoleFiltersView(viewModel: viewModel.searchCriteriaViewModel, isPresented: $isShowingFilters)
+                case .network:
+                    NetworkFiltersView(viewModel: viewModel.networkSearchCriteriaViewModel, isPresented: $isShowingFilters)
+                }
             }
         }
     }
@@ -121,7 +126,7 @@ private struct ConsoleToolbarView: View {
                 .foregroundColor(viewModel.isOnlyErrors ? .red : .accentColor)
         }.frame(width: 40, height: 44)
         Button(action: { isShowingFilters = true }) {
-            Image(systemName: viewModel.searchCriteria.isDefaultSearchCriteria ? "line.horizontal.3.decrease.circle" : "line.3.horizontal.decrease.circle.fill")
+            Image(systemName: viewModel.isDefaultFilters ? "line.horizontal.3.decrease.circle" : "line.3.horizontal.decrease.circle.fill")
                 .font(.system(size: 20))
                 .foregroundColor(.accentColor)
         }.frame(width: 40, height: 44)

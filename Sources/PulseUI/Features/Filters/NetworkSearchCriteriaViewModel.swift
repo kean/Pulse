@@ -8,9 +8,12 @@ import CoreData
 import Combine
 import SwiftUI
 
+#warning("TODO: rename")
+
 #if os(iOS) || os(macOS) || os(tvOS)
 
 final class NetworkSearchCriteriaViewModel: ObservableObject {
+    @Binding var dates: ConsoleSearchCriteria.DatesFilter
     @Published var criteria: NetworkSearchCriteria = .default
     private(set) var defaultCriteria: NetworkSearchCriteria = .default
     @Published var filters: [NetworkSearchFilter] = []
@@ -22,19 +25,23 @@ final class NetworkSearchCriteriaViewModel: ObservableObject {
 
     let dataNeedsReload = PassthroughSubject<Void, Never>()
 
-    private var cancellables: [AnyCancellable] = []
-
     var isDefaultSearchCriteria: Bool {
         criteria == defaultCriteria && (filters.count == 0 || (filters.count == 1 && filters == NetworkSearchFilter.defaultFilters))
     }
 
-    init(store: LoggerStore) {
-        domains = ManagedObjectsObserver(context: store.viewContext, sortDescriptior: NSSortDescriptor(keyPath: \NetworkDomainEntity.count, ascending: false))
+    var isDefaultDatesFilter: Bool {
+        var defaultFilter = ConsoleSearchCriteria.DatesFilter.default
+        defaultFilter.isCurrentSessionOnly = isCurrentStore
+        return dates == defaultFilter
+    }
 
-        if store !== LoggerStore.shared {
-            criteria.dates.isCurrentSessionOnly = false
-            defaultCriteria.dates.isCurrentSessionOnly = false
-        }
+    private var cancellables: [AnyCancellable] = []
+    private let isCurrentStore: Bool
+
+    init(store: LoggerStore, dates: Binding<ConsoleSearchCriteria.DatesFilter>) {
+        _dates = dates
+        domains = ManagedObjectsObserver(context: store.viewContext, sortDescriptior: NSSortDescriptor(keyPath: \NetworkDomainEntity.count, ascending: false))
+        isCurrentStore = store === LoggerStore.shared // TODO: refactor
 
         domains.$objects.sink { [weak self] in
             self?.allDomains = $0.map(\.value)
@@ -116,19 +123,19 @@ final class NetworkSearchCriteriaViewModel: ObservableObject {
 
     var bindingStartDate: Binding<Date> {
         Binding(get: {
-            self.criteria.dates.startDate ?? Date().addingTimeInterval(-3600)
+            self.dates.startDate ?? Date().addingTimeInterval(-3600)
         }, set: { newValue in
-            self.criteria.dates.isStartDateEnabled = true
-            self.criteria.dates.startDate = newValue
+            self.dates.isStartDateEnabled = true
+            self.dates.startDate = newValue
         })
     }
 
     var bindingEndDate: Binding<Date> {
         Binding(get: {
-            self.criteria.dates.endDate ?? Date()
+            self.dates.endDate ?? Date()
         }, set: { newValue in
-            self.criteria.dates.isEndDateEnabled = true
-            self.criteria.dates.endDate = newValue
+            self.dates.isEndDateEnabled = true
+            self.dates.endDate = newValue
         })
     }
 

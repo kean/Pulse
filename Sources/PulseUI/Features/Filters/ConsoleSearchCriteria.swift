@@ -25,12 +25,12 @@ struct ConsoleSearchCriteria: Hashable {
 
     struct DatesFilter: Hashable {
         var isEnabled = true
-
-        #if os(iOS) || os(watchOS) || os(tvOS)
+        
+#if os(iOS) || os(watchOS) || os(tvOS)
         var isCurrentSessionOnly = true
-        #else
+#else
         var isCurrentSessionOnly = false
-        #endif
+#endif
 
         var isStartDateEnabled = false
         var startDate: Date?

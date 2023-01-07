@@ -34,17 +34,16 @@ final class NetworkViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         self.store = store
         self.details = ConsoleDetailsRouterViewModel()
 
-//        let request = NSFetchRequest<NetworkTaskEntity>(entityName: "\(NetworkTaskEntity.self)")
-//        request.fetchBatchSize = 100
-//        request.sortDescriptors = [NSSortDescriptor(keyPath: \NetworkTaskEntity.createdAt, ascending: false)]
+        let request = NSFetchRequest<NetworkTaskEntity>(entityName: "\(NetworkTaskEntity.self)")
+        request.fetchBatchSize = 100
+        request.sortDescriptors = [NSSortDescriptor(keyPath: \NetworkTaskEntity.createdAt, ascending: false)]
 
-//        self.controller = NSFetchedResultsController<NetworkTaskEntity>(fetchRequest: request, managedObjectContext: store.viewContext, sectionNameKeyPath: nil, cacheName: nil)
+        self.controller = NSFetchedResultsController<NetworkTaskEntity>(fetchRequest: request, managedObjectContext: store.viewContext, sectionNameKeyPath: nil, cacheName: nil)
 
-        self.searchCriteria = NetworkSearchCriteriaViewModel(store: store)
+        self.searchCriteria = NetworkSearchCriteriaViewModel(store: store, dates: .constant(.default))
 #if os(iOS) || os(macOS)
         self.table = ConsoleTableViewModel(searchCriteriaViewModel: nil)
 #endif
-        fatalError()
 
         super.init()
 

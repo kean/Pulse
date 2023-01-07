@@ -48,8 +48,8 @@ struct PlaceholderView: View {
 extension PlaceholderView {
     static func make(viewModel: ConsoleViewModel) -> PlaceholderView {
         let message: String
-        if viewModel.searchCriteria.isDefaultSearchCriteria {
-            if viewModel.searchCriteria.criteria.dates.isCurrentSessionOnly {
+        if viewModel.searchCriteriaViewModel.isDefaultSearchCriteria {
+            if viewModel.searchCriteriaViewModel.criteria.dates.isCurrentSessionOnly {
                 message = "There are no messages in the current session."
             } else {
                 message = "There are no stored messages."
@@ -58,20 +58,6 @@ extension PlaceholderView {
             message = "There are no messages for the selected filters."
         }
         return PlaceholderView(imageName: "message", title: "No Messages", subtitle: message)
-    }
-
-    static func make(viewModel: NetworkViewModel) -> PlaceholderView {
-        let message: String
-        if viewModel.searchCriteria.isDefaultSearchCriteria {
-            if viewModel.searchCriteria.criteria.dates.isCurrentSessionOnly {
-                message = "There are no network requests in the current session."
-            } else {
-                message = "There are no stored network requests."
-            }
-        } else {
-            message = "There are no network requests for the selected filters."
-        }
-        return PlaceholderView(imageName: "network", title: "No Requests", subtitle: message)
     }
 }
 
