@@ -23,7 +23,14 @@ struct NetworkInspectorTransactionView: View {
                     .padding(.vertical, 8)
             }
             NetworkRequestInfoCell(viewModel: viewModel.requestViewModel)
+            NavigationLink(destination: destintionTransactionDetails) {
+                NetworkMenuCell(icon: "info.circle.fill", tintColor: .blue, title: "Transaction Details")
+            }
         }
+    }
+
+    private var destintionTransactionDetails: some View {
+        NetworkDetailsView(title: "Transaction Details") { viewModel.details() }
     }
 }
 
@@ -35,6 +42,7 @@ final class NetworkInspectorTransactionViewModel: ObservableObject {
     let timingViewModel: TimingViewModel?
     let requestViewModel: NetworkRequestInfoCellViewModel
     let transferSizeViewModel: NetworkInspectorTransferInfoViewModel?
+    let details: () -> NSAttributedString
 
     init(transaction: NetworkTransactionMetricsEntity, task: NetworkTaskEntity) {
         self.title = transaction.fetchType.title
@@ -46,6 +54,12 @@ final class NetworkInspectorTransactionViewModel: ObservableObject {
             self.transferSizeViewModel = NetworkInspectorTransferInfoViewModel(transferSize: transaction.transferSize, isUpload: false)
         } else {
             self.transferSizeViewModel = nil
+        }
+
+        self.details = {
+            let renderer = TextRenderer(options: .sharing)
+            let sections = KeyValueSectionViewModel.makeDetails(for: transaction)
+            return renderer.joined(sections.map { renderer.render($0) })
         }
     }
 }

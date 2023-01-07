@@ -171,8 +171,6 @@ final class TextRenderer {
             components.append(header)
         }
 
-        append(section: .makeTiming(for: transaction))
-
         func append(section: KeyValueSectionViewModel?, count: Bool) {
             let isCountDisplayed = count && section?.items.isEmpty == false
             let details = isCountDisplayed ? section?.items.count.description : nil
