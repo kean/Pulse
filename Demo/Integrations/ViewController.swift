@@ -37,12 +37,12 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
                     let vc = UIHostingController(rootView: ConsoleView(store: .mock))
                     self.navigationController?.pushViewController(vc, animated: true)
                 }),
-                MenuItem(title: "NetworkView", action: { [unowned self] in
-                    let vc = UIHostingController(rootView: NetworkView(store: .mock))
+                MenuItem(title: "ConsoleView (Requests)", action: { [unowned self] in
+                    let vc = UIHostingController(rootView: ConsoleView.network(store: .mock))
                     self.navigationController?.pushViewController(vc, animated: true)
                 }),
-                MenuItem(title: "PinsView", action: { [unowned self] in
-                    let vc = UIHostingController(rootView: PinsView(store: .mock))
+                MenuItem(title: "NetworkView (Deprecated)", action: { [unowned self] in
+                    let vc = UIHostingController(rootView: NetworkView(store: .mock))
                     self.navigationController?.pushViewController(vc, animated: true)
                 })
             ]),
