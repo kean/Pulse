@@ -18,6 +18,11 @@ public struct ConsoleView: View {
         self.viewModel = ConsoleViewModel(store: store)
     }
 
+    /// Creates a view pre-configured to display only network requests
+    public static func network(store: LoggerStore = .shared) -> ConsoleView {
+        ConsoleView(viewModel: .init(store: store, mode: .network))
+    }
+
     init(viewModel: ConsoleViewModel) {
         self.viewModel = viewModel
     }
@@ -27,7 +32,7 @@ public struct ConsoleView: View {
             .onAppear(perform: viewModel.onAppear)
             .onDisappear(perform: viewModel.onDisappear)
             .edgesIgnoringSafeArea(.bottom)
-            .backport.navigationTitle("Console")
+            .backport.navigationTitle(viewModel.title)
             .navigationBarItems(
                 leading: viewModel.onDismiss.map {
                     Button(action: $0) { Image(systemName: "xmark") }
@@ -123,11 +128,13 @@ private struct ConsoleToolbarView: View {
 
     @ViewBuilder
     private var filters: some View {
-        Button(action: viewModel.toggleMode) {
-            Image(systemName: viewModel.mode == .network ? "paperplane.fill" : "paperplane")
-                .font(.system(size: 20))
-                .foregroundColor(.accentColor)
-        }.frame(width: 40, height: 44)
+        if !viewModel.isNetworkOnly {
+            Button(action: viewModel.toggleMode) {
+                Image(systemName: viewModel.mode == .network ? "paperplane.fill" : "paperplane")
+                    .font(.system(size: 20))
+                    .foregroundColor(.accentColor)
+            }.frame(width: 40, height: 44)
+        }
         Button(action: { viewModel.isOnlyErrors.toggle() }) {
             Image(systemName: viewModel.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon")
                 .font(.system(size: 20))

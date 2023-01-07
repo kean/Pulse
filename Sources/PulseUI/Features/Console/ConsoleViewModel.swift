@@ -11,11 +11,13 @@ import SwiftUI
 #warning("TODO: switch to network filters and share date fiters")
 
 final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, ObservableObject {
+    let title: String
 #if os(iOS) || os(macOS)
     let table: ConsoleTableViewModel
 #endif
     @Published private(set) var entities: [NSManagedObject] = []
     @Published var mode: Mode
+    let isNetworkOnly: Bool
 
     enum Mode {
         case all
@@ -53,8 +55,10 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     private var cancellables: [AnyCancellable] = []
 
     init(store: LoggerStore, mode: Mode = .all) {
+        self.title = mode == .network ? "Network" : "Console"
         self.store = store
         self.mode = mode
+        self.isNetworkOnly = mode == .network
 
         self.details = ConsoleDetailsRouterViewModel()
 #if os(iOS)

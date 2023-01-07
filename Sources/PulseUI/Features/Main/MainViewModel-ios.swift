@@ -15,7 +15,7 @@ final class MainViewModel: ObservableObject {
     let items: [MainViewModelItem]
 
     let console: ConsoleViewModel
-    let network: NetworkViewModel
+    let network: ConsoleViewModel
     let settings: SettingsViewModel
 
     let store: LoggerStore
@@ -23,10 +23,10 @@ final class MainViewModel: ObservableObject {
     init(store: LoggerStore, onDismiss: (() -> Void)?) {
         self.store = store
 
-        self.console = ConsoleViewModel(store: store, mode: .network)
+        self.console = ConsoleViewModel(store: store)
         self.console.onDismiss = onDismiss
 
-        self.network = NetworkViewModel(store: store)
+        self.network = ConsoleViewModel(store: store, mode: .network)
         self.network.onDismiss = onDismiss
 
         self.settings = SettingsViewModel(store: store)
@@ -68,7 +68,8 @@ extension MainViewModel {
         case .console:
             ConsoleView(viewModel: console)
         case .network:
-            NetworkView(viewModel: network)
+            ConsoleView(viewModel: network)
+        case .settings:
             SettingsView(viewModel: settings)
         default: fatalError()
         }
