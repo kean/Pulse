@@ -80,6 +80,8 @@ public struct ConsoleView: View {
     }
 }
 
+#warning("TODO: can we improve the selection state?")
+#warning("TODO: is paperplane icon OK?")
 #warning("TODO: display count somewhere else?")
 #warning("TODO: duplicate modes and filters in the context menu + search")
 
