@@ -15,7 +15,7 @@ import Combine
 #warning("TODO: find better icons")
 #warning("TODO: simplify response views to not show progress (or remove entirely?")
 
-#warning("TODO: add task rype somewhere ")
+#warning("TODO: add task rype somewhere AND from cache indicator ")
 
 #warning("TODO: tvOS enable scroll on left side")
 #warning("TODO: tvOS fix transaction details UI")
@@ -180,25 +180,7 @@ struct NetworkInspectorView: View {
 
     @ViewBuilder
     private var sectionResponse: some View {
-        NavigationLink(isActive: $isResponseBodyLinkActive, destination: { destinationResponseBody }) {
-            NetworkMenuCell(
-                icon: "arrow.down.circle.fill",
-                tintColor: .indigo,
-                title: "Response Body",
-                details: {
-                    if viewModel.task.responseBodySize > 0 {
-                        var title = stringFromByteCount(viewModel.task.responseBodySize)
-                        if viewModel.task.isFromCache {
-                            title += " (Cache)"
-                        }
-                        return title
-                    } else {
-                        return "Empty"
-                    }
-                }()
-            )
-        }
-        .disabled(viewModel.task.responseBodySize <= 0)
+        viewModel.responseBodyViewModel.map(NetworkResponseBodyCell.init)
         viewModel.responseHeadersViewModel.map(NetworkHeadersCell.init)
         viewModel.responseCookiesViewModel.map(NetworkCookiesCell.init)
     }
@@ -268,10 +250,6 @@ struct NetworkInspectorView: View {
     // MARK: - Destinations
 
 #warning("TODO: remove these naviation titles")
-
-    private var destinationResponseBody: some View {
-        NetworkInspectorResponseBodyView(viewModel: NetworkInspectorResponseBodyViewModel(task: viewModel.task))
-    }
 
 #if !os(watchOS)
     private var destinationMetrics: some View {

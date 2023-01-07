@@ -24,6 +24,7 @@ final class NetworkInspectorViewModel: ObservableObject {
     private(set) var currentRequestHeadersViewModel: NetworkHeadersCellViewModel?
     private(set) var currentRequestCookiesViewModel: NetworkCookiesCellViewModel?
 
+    private(set) var responseBodyViewModel: NetworkResponseBodyCellViewModel?
     private(set) var responseHeadersViewModel: NetworkHeadersCellViewModel?
     private(set) var responseCookiesViewModel: NetworkCookiesCellViewModel?
 
@@ -60,6 +61,7 @@ final class NetworkInspectorViewModel: ObservableObject {
         currentRequestHeadersViewModel = NetworkHeadersCellViewModel(title: "Request Headers", headers: currentRequestHeaders)
         currentRequestCookiesViewModel = NetworkCookiesCellViewModel(title: "Request Cookies", headers: currentRequestHeaders, url: url)
 
+        responseBodyViewModel = NetworkResponseBodyCellViewModel(task: task)
         responseHeadersViewModel = NetworkHeadersCellViewModel(title: "Response Headers", headers: responseHeaders)
         responseCookiesViewModel = NetworkCookiesCellViewModel(title: "Response Cookies", headers: responseHeaders, url: url)
     }
