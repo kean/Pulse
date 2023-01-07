@@ -23,6 +23,7 @@ struct ConsoleTextView: View {
     var body: some View {
         RichTextView(viewModel: viewModel.text)
             .textViewBarItemsHidden(true)
+            .backport.navigationTitle("Console")
             .navigationBarTitleDisplayMode(.inline)
             .onAppear {
                 if let options = options {
