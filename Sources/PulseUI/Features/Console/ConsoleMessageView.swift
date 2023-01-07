@@ -29,9 +29,9 @@ struct ConsoleMessageView: View {
             .foregroundColor(.secondary)
             .font(fonts.title))
     }
-    
+
+#warning("TODO: simplify this on tvos")
     private var badge: Text {
-        let badge = viewModel.badge
         var separator: Text {
 #if os(watchOS)
             return Text("\n")
@@ -41,9 +41,9 @@ struct ConsoleMessageView: View {
                 .foregroundColor(.secondary)
 #endif
         }
-        return Text(badge.title)
+        return Text(viewModel.level)
             .font(fonts.title)
-            .foregroundColor(badge.color)
+            .foregroundColor(.secondary)
         + separator
     }
     

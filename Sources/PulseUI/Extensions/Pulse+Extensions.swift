@@ -26,3 +26,9 @@ extension NetworkTaskEntity {
         )
     }
 }
+
+extension LoggerMessageEntity {
+    var logLevel: LoggerStore.Level {
+        LoggerStore.Level(rawValue: level) ?? .debug
+    }
+}

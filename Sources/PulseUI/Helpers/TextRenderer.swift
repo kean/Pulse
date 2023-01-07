@@ -53,9 +53,8 @@ final class TextRenderer {
     func render(_ message: LoggerMessageEntity) -> NSAttributedString {
         let text = NSMutableAttributedString()
         let viewModel = ConsoleMessageViewModel(message: message)
-        let level = LoggerStore.Level(rawValue: message.level) ?? .debug
         text.append(viewModel.titleForTextRepresentation + "\n", helper.attributes(role: .subheadline, style: .monospacedDigital, width: .condensed, color: .secondaryLabel))
-        text.append(message.text + "\n", helper.attributes(role: .body2, color: textColor(for: level)))
+        text.append(message.text + "\n", helper.attributes(role: .body2, color: textColor(for: message.logLevel)))
         return text
     }
 

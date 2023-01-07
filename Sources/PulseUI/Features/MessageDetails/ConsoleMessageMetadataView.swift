@@ -43,7 +43,7 @@ struct ConsoleMessageMetadataView: View {
 
 private extension LoggerMessageEntity {
     var tintColor: Color {
-        Color.badgeColor(for: .init(rawValue: level) ?? .debug)
+        Color.badgeColor(for: logLevel)
     }
 }
 

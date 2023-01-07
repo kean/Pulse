@@ -11,15 +11,15 @@ final class ConsoleMessageViewModel: Pinnable {
     let title: String
     let text: String
     let textColor: Color
-    let badge: BadgeViewModel
-    
+    let level: String
+
     private let message: LoggerMessageEntity
     private let searchCriteriaViewModel: ConsoleMessageSearchCriteriaViewModel?
     
     private(set) lazy var time = ConsoleMessageViewModel.timeFormatter.string(from: message.createdAt)
 
     var titleForTextRepresentation: String {
-        let level = LoggerStore.Level(rawValue: message.level) ?? .debug
+        let level = message.logLevel
         var title = "\(time) · \(level.name.capitalized)"
         let label = message.label.name
         if label != "default", !label.isEmpty {
@@ -29,10 +29,9 @@ final class ConsoleMessageViewModel: Pinnable {
     }
 
 #if os(iOS)
-    lazy var textColor2 = UIColor.textColor(for: LoggerStore.Level(rawValue: message.level) ?? .debug)
+    lazy var textColor2 = UIColor.textColor(for: message.logLevel)
     lazy var title2: String = {
-        let level = LoggerStore.Level(rawValue: message.level) ?? .debug
-        var string = badge.title
+        var string = message.logLevel.name.uppercased()
         let label = message.label.name
         if label != "default", !label.isEmpty {
             string.append(" · \(label.capitalized)")
@@ -58,10 +57,9 @@ final class ConsoleMessageViewModel: Pinnable {
             self.title = "\(time) · \(message.label.name.capitalized)"
         }
         self.text = message.text
-        self.textColor = ConsoleMessageStyle.textColor(level: LoggerStore.Level(rawValue: message.level) ?? .debug)
-        let level = LoggerStore.Level(rawValue: message.level) ?? .debug
-        self.badge = BadgeViewModel(level: level)
+        self.textColor = ConsoleMessageStyle.textColor(level: message.logLevel)
         self.message = message
+        self.level = message.logLevel.name.uppercased()
         self.searchCriteriaViewModel = searchCriteriaViewModel
     }
     
