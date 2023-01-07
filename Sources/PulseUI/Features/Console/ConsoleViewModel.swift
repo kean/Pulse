@@ -148,7 +148,9 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
             ConsoleMessageSearchCriteria.update(request: controller.fetchRequest, filterTerm: filterTerm, criteria: viewModel.criteria, filters: viewModel.filters, sessionId: sessionId, isOnlyErrors: isOnlyErrors, isOnlyNetwork: isOnlyNetwork)
         case .network:
             let viewModel = networkSearchCriteriaViewModel
+#if !os(watchOS)
             NetworkSearchCriteria.update(request: controller.fetchRequest, filterTerm: filterTerm, dates: sharedSearchCriteriaViewModel.dates, criteria: viewModel.criteria, filters: viewModel.filters, isOnlyErrors: isOnlyErrors, sessionId: sessionId)
+#endif
             break
         }
         try? controller.performFetch()

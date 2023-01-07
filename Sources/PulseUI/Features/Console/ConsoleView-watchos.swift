@@ -15,7 +15,7 @@ struct ConsoleView: View {
 
     var body: some View {
         List {
-            NavigationLink(destination: SettingsView(viewModel: .init(store: viewModel.store)) {
+            NavigationLink(destination: SettingsView(viewModel: .init(store: viewModel.store))) {
                 Label("Settings", systemImage: "gearshape")
             }
 
@@ -29,7 +29,7 @@ struct ConsoleView: View {
             }
             .listRowBackground(viewModel.isOnlyNetwork ? Color.blue.cornerRadius(8) : nil)
 
-            ConsoleMessagesForEach(messages: viewModel.entities)
+            ConsoleMessagesForEach(messages: viewModel.entities)                
         }
         .navigationTitle("Console")
         .onAppear(perform: viewModel.onAppear)
@@ -41,7 +41,7 @@ struct ConsoleView: View {
 struct ConsoleView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
-            ConsoleView(viewModel: .init(store: .mock, onDismiss: nil))
+            ConsoleView(viewModel: .init(store: .mock))
         }
     }
 }

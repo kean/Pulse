@@ -122,6 +122,9 @@ final class ConsoleNetworkSearchCriteriaViewModel: ObservableObject {
 
 #else
 final class ConsoleNetworkSearchCriteriaViewModel: ObservableObject {
+    var isDefaultSearchCriteria: Bool { true }
+    let dataNeedsReload = PassthroughSubject<Void, Never>()
+
     init(store: LoggerStore) {}
 }
 

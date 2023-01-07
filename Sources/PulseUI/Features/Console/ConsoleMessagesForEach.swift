@@ -5,24 +5,31 @@
 import Foundation
 import SwiftUI
 import Pulse
+import CoreData
 
-#if os(watchOS) || os(tvOS) || os(iOS)
+#if os(watchOS) || os(tvOS)
 
 struct ConsoleMessagesForEach: View {
-    let messages: [LoggerMessageEntity]
+    let messages: [NSManagedObject]
 
     var body: some View {
         ForEach(messages, id: \.objectID, content: makeListItem)
     }
 
     @ViewBuilder
-    private func makeListItem(message: LoggerMessageEntity) -> some View {
-        if let task = message.task {
+    private func makeListItem(_ entity: NSManagedObject) -> some View {
+        if let task = entity as? NetworkTaskEntity {
             NetworkRequestRow(task: task)
-        } else {
-            NavigationLink(destination: LazyConsoleDetailsView(message: message)) {
-                ConsoleMessageView(viewModel: .init(message: message))
+        } else if let message = entity as? LoggerMessageEntity {
+            if let task = message.task {
+                NetworkRequestRow(task: task)
+            } else {
+                NavigationLink(destination: LazyConsoleDetailsView(message: message)) {
+                    ConsoleMessageView(viewModel: .init(message: message))
+                }
             }
+        } else {
+            fatalError("Unsupported entity: \(entity)")
         }
     }
 }
@@ -54,18 +61,4 @@ private struct LazyConsoleDetailsView: View {
         ConsoleMessageDetailsView(viewModel: .init(message: message))
     }
 }
-
-struct NetworkMessagesForEach: View {
-    let entities: [NetworkTaskEntity]
-
-    var body: some View {
-        ForEach(entities, id: \.objectID, content: makeListItem)
-    }
-
-    @ViewBuilder
-    private func makeListItem(task: NetworkTaskEntity) -> some View {
-        NetworkRequestRow(task: task)
-    }
-}
-
 #endif
