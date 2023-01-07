@@ -7,6 +7,8 @@ import CoreData
 import Pulse
 import Combine
 
+#warning("TODO: reimplement")
+
 #if os(tvOS)
 
 public struct MainView: View {

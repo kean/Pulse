@@ -7,17 +7,18 @@ import CoreData
 import Pulse
 import Combine
 
-#if os(watchOS)
+#if os(iOS) || os(watchOS)
 
 public struct MainView: View {
-    @StateObject private var viewModel: MainViewModel
+    let viewModel: ConsoleViewModel
 
-    public init(store: LoggerStore = .shared) {
-        self._viewModel = StateObject(wrappedValue: .init(store: store, onDismiss: nil))
+    public init(store: LoggerStore = .shared, onDismiss: (() -> Void)? = nil) {
+        self.viewModel = ConsoleViewModel(store: store)
+        self.viewModel.onDismiss = onDismiss
     }
 
     public var body: some View {
-       ConsoleView(viewModel: viewModel)
+        ConsoleView(viewModel: viewModel)
     }
 }
 
