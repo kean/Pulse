@@ -122,35 +122,9 @@ extension Backport {
     }
 
     @ViewBuilder
-    func borderedButton() -> some View {
-        if #available(iOS 15.0, tvOS 14, watchOS 8.0, *) {
-            self.content.buttonStyle(.bordered)
-        } else {
-            self.content
-        }
-    }
-
-    @ViewBuilder
     func hideAccessibility() -> some View {
         if #available(iOS 14, tvOS 14, *) {
             self.content.accessibilityHidden(true)
-        } else {
-            self.content
-        }
-    }
-
-    @ViewBuilder
-    func backgroundThickMaterial(enabled: Bool = true) -> some View {
-        if #available(iOS 15.0, tvOS 15.0, macOS 15.0, *) {
-            if enabled {
-#if !os(watchOS)
-                self.content.background(.regularMaterial)
-#else
-                self.content
-#endif
-            } else {
-                self.content
-            }
         } else {
             self.content
         }
