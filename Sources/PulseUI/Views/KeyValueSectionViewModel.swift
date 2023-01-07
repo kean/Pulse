@@ -5,10 +5,6 @@
 import SwiftUI
 import Pulse
 
-#warning("TODO: remove unused")
-#warning("TODO: remoe actions for KeyValueSectionViewModel")
-#warning("TODO: standardize lineHeight")
-
 struct KeyValueSectionViewModel {
     var title: String
     var color: Color
@@ -47,7 +43,7 @@ extension KeyValueSectionViewModel {
         let taskType = task.type?.urlSessionTaskClassName ?? "URLSessionDataTask"
         return KeyValueSectionViewModel(title: taskType, color: .primary, items: [
             ("Host", task.url.flatMap(URL.init)?.host),
-            ("Date", task.startDate.map(mediumDateFormatter.string)),
+            ("Date", task.startDate.map(DateFormatter.fullDateFormatter.string)),
             ("Duration", task.duration > 0 ? DurationFormatter.string(from: task.duration) : nil)
         ])
     }
@@ -217,11 +213,3 @@ private func formatBytes(_ count: Int64) -> String {
     ByteCountFormatter.string(fromByteCount: count)
 }
 
-#warning("TODO: where else should we use this? definitely for all exports")
-
-private let mediumDateFormatter: DateFormatter = {
-    let dateFormatter = DateFormatter()
-    dateFormatter.locale = Locale(identifier: "en_US")
-    dateFormatter.dateFormat = "MMM d, yyyy 'at' h:mm:ss a '('z')'"
-    return dateFormatter
-}()

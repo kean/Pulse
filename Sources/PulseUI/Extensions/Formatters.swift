@@ -30,6 +30,16 @@ enum DurationFormatter {
     }
 }
 
+extension DateFormatter {
+    /// With timezone, so that if it's shared, we know the exact time.
+    static let fullDateFormatter: DateFormatter = {
+        let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale(identifier: "en_US")
+        dateFormatter.dateFormat = "MMM d, yyyy 'at' h:mm:ss a '('z')'"
+        return dateFormatter
+    }()
+}
+
 enum ConsoleFormatter {
     static let separator = " · "
 

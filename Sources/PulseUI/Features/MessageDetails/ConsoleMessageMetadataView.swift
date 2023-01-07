@@ -22,7 +22,7 @@ struct ConsoleMessageMetadataView: View {
     private var sections: [KeyValueSectionViewModel] {
         return [
             KeyValueSectionViewModel(title: "Summary", color: message.tintColor, items: [
-                ("Date", dateFormatter.string(from: message.createdAt)),
+                ("Date", DateFormatter.fullDateFormatter.string(from: message.createdAt)),
                 ("Level", LoggerStore.Level(rawValue: message.level)?.name),
                 ("Label", message.label.name.nonEmpty)
             ]),
@@ -52,13 +52,6 @@ private extension String {
         isEmpty ? nil : self
     }
 }
-
-private let dateFormatter: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.locale = Locale(identifier: "en_US")
-    formatter.dateFormat = "HH:mm:ss.SSS, yyyy-MM-dd"
-    return formatter
-}()
 
 #if DEBUG
 struct ConsoleMessageMetadataView_Previews: PreviewProvider {
