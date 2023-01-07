@@ -24,14 +24,7 @@ struct NetworkInspectorTransactionView: View {
             }
             NetworkHeadersCell(viewModel: viewModel.requestHeadersViewModel)
             NetworkHeadersCell(viewModel: viewModel.responseHeadersViewModel)
-            NavigationLink(destination: destinationTiming) {
-                NetworkMenuCell(icon: "clock", tintColor: .orange, title: "Timing Info")
-            }
         }
-    }
-
-    private var destinationTiming: some View {
-        NetworkDetailsView(title: "Timing Details") { viewModel.timingSummary }
     }
 }
 
@@ -43,7 +36,6 @@ final class NetworkInspectorTransactionViewModel: ObservableObject {
     let timingViewModel: TimingViewModel?
     let requestHeadersViewModel: NetworkHeadersCellViewModel
     let responseHeadersViewModel: NetworkHeadersCellViewModel
-    lazy var timingSummary = KeyValueSectionViewModel.makeTiming(for: transaction)
 
     @Published var isOriginalRequestHeadersLinkActive = false
     @Published var isResponseHeadersLinkActive = false
@@ -54,8 +46,6 @@ final class NetworkInspectorTransactionViewModel: ObservableObject {
     private let transaction: NetworkTransactionMetricsEntity
 
     init(transaction: NetworkTransactionMetricsEntity, task: NetworkTaskEntity) {
-        let url = transaction.request.url.flatMap(URL.init)
-
         self.title = transaction.fetchType.title
         self.statusSectionViewModel = NetworkRequestStatusSectionViewModel(transaction: transaction)
         self.details = NetworkMetricsDetailsViewModel(metrics: transaction)
