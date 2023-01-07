@@ -155,6 +155,41 @@ final class TextRenderer {
         return joined(components)
     }
 
+    func render(_ transaction: NetworkTransactionMetricsEntity) -> NSAttributedString {
+        var components: [NSAttributedString] = []
+
+        do {
+            let header = NSMutableAttributedString()
+            let status = NetworkRequestStatusCellModel(transaction: transaction)
+            let method = transaction.request.httpMethod ?? "GET"
+            header.append(render(status.title + "\n", role: .title, weight: .semibold, color: status.uiTintColor))
+            header.append(self.spacer())
+            var urlAttributes = helper.attributes(role: .body2, weight: .regular)
+            urlAttributes[.underlineColor] = UXColor.clear
+            header.append(method + "\n", helper.attributes(role: .body, weight: .semibold))
+            header.append((task.url ?? "–") + "\n", urlAttributes)
+            components.append(header)
+        }
+
+        func append(section: KeyValueSectionViewModel?, count: Bool) {
+            let isCountDisplayed = count && section?.items.isEmpty == false
+            let details = isCountDisplayed ? section?.items.count.description : nil
+            append(section: section, details: details)
+        }
+        func append(section: KeyValueSectionViewModel?, details: String? = nil) {
+            guard let section = section else { return }
+            components.append(render(section, details: details))
+        }
+        if let url = URL(string: transaction.request.url ?? "–") {
+            append(section: .makeComponents(for: url))
+        }
+        append(section: .makeHeaders(title: "Request Headers", headers: transaction.request.headers), count: true)
+        if let response = transaction.response {
+            append(section: .makeHeaders(title: "Response Headers", headers: response.headers), count: true)
+        }
+        return joined(components)
+    }
+
     func render(subheadline: String) -> NSAttributedString {
         render(subheadline + "\n", role: .subheadline, color: .secondaryLabel)
     }
@@ -286,7 +321,7 @@ struct ConsoleTextRenderer_Previews: PreviewProvider {
             RichTextView(viewModel: .init(string: string))
                 .previewDisplayName("Task")
 
-            RichTextView(viewModel: .init(string: TextRenderer(options: .init(color: .automatic)).render(task, content: .sharing)))
+            RichTextView(viewModel: .init(string: TextRenderer(options: .sharing).render(task, content: .sharing)))
                 .previewDisplayName("Task (Share)")
 
             RichTextView(viewModel: .init(string: stringWithColor))
@@ -294,6 +329,9 @@ struct ConsoleTextRenderer_Previews: PreviewProvider {
 
             RichTextView(viewModel: .init(string: string.string))
                 .previewDisplayName("Task (Plain)")
+
+            RichTextView(viewModel: .init(string: TextRenderer(options: .sharing).render(task.orderedTransactions[0])))
+                .previewDisplayName("Transaction")
 
             RichTextView(viewModel: .init(string: TextRendererHTML(html: String(data: html, encoding: .utf8)!).render()))
                 .previewLayout(.fixed(width: 1160, height: 2000)) // Disable interaction to view it

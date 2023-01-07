@@ -38,14 +38,6 @@ final class NetworkRequestStatusSectionViewModel {
         self.requestViewModel = NetworkRequestInfoCellViewModel(task: task)
         self.errorDetailsViewModel = KeyValueSectionViewModel.makeErrorDetails(for: task)
     }
-
-    init(transaction: NetworkTransactionMetricsEntity) {
-        self.status = .init(transaction: transaction)
-        self.errorDescription = nil
-        self.requestViewModel = NetworkRequestInfoCellViewModel(request: transaction.request)
-        self.errorDetailsViewModel = nil
-
-    }
 }
 
 #if DEBUG

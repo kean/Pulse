@@ -5,8 +5,6 @@
 import SwiftUI
 import Pulse
 
-#warning("TODO: simplify")
-
 #if os(iOS) || os(macOS) || os(tvOS)
 
 // MARK: - View
@@ -15,9 +13,10 @@ struct NetworkInspectorMetricsView: View {
     let viewModel: NetworkInspectorMetricsViewModel
 
     var body: some View {
-        ScrollView {
-            TimingView(viewModel: viewModel.timingViewModel)
-                .padding()
+        List {
+            ForEach(viewModel.transactions) {
+                NetworkInspectorTransactionView(viewModel: $0)
+            }
         }
         .backport.navigationTitle("Metrics")
     }
@@ -26,13 +25,15 @@ struct NetworkInspectorMetricsView: View {
 // MARK: - ViewModel
 
 final class NetworkInspectorMetricsViewModel {
-    let task: NetworkTaskEntity
-    let timingViewModel: TimingViewModel
+    private(set) lazy var transactions = task.orderedTransactions.map {
+        NetworkInspectorTransactionViewModel(transaction: $0, task: task)
+    }
+
+    private let task: NetworkTaskEntity
 
     init?(task: NetworkTaskEntity) {
         guard task.hasMetrics else { return nil }
         self.task = task
-        self.timingViewModel = TimingViewModel(task: task)
     }
 }
 
@@ -43,7 +44,7 @@ struct NetworkInspectorMetricsView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
             NetworkInspectorMetricsView(viewModel: .init(
-                task: LoggerStore.preview.entity(for: .octocat)
+                task: LoggerStore.preview.entity(for: .createAPI)
             )!)
         }
     }

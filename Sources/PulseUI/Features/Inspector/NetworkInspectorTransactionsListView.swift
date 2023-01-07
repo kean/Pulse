@@ -58,15 +58,7 @@ final class NetworkInspectorTransactionsListViewModel {
 
     init(task: NetworkTaskEntity) {
         self.items = task.transactions.map { transaction in
-            let title: String = {
-                switch transaction.fetchType {
-                case .networkLoad: return "Network Load"
-                case .localCache: return "Cache Lookup"
-                case .serverPush: return "Server Push"
-                case .unknown: return "Unknown"
-                default: return "Unknown"
-                }
-            }()
+            let title: String = transaction.fetchType.title
             var details: String?
             if let startDate = transaction.timing.fetchStartDate,
                let endDate = transaction.timing.responseEndDate ?? task.taskInterval?.end {
@@ -75,6 +67,18 @@ final class NetworkInspectorTransactionsListViewModel {
             return Item(title: title, details: details, viewModel: {
                 NetworkInspectorTransactionViewModel(transaction: transaction, task: task)
             })
+        }
+    }
+}
+
+extension URLSessionTaskMetrics.ResourceFetchType {
+    var title: String {
+        switch self {
+        case .networkLoad: return "Network Load"
+        case .localCache: return "Cache Lookup"
+        case .serverPush: return "Server Push"
+        case .unknown: return "Unknown Fetch Type"
+        default: return "Unknown Fetch Type"
         }
     }
 }

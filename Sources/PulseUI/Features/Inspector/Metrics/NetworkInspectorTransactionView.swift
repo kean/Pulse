@@ -4,11 +4,7 @@
 
 import SwiftUI
 import Pulse
-
-#warning("TODO: display name of operation somewhere")
-#warning("TODO: dont show empty sections (headers/cookies) - not enough space here")
-#warning("TODO: different icons for headers and cookies")
-#warning("TODO: fix background highlight on clicking on cell e.g. response")
+import CoreData
 
 #if os(iOS) || os(macOS) || os(tvOS)
 
@@ -16,62 +12,55 @@ struct NetworkInspectorTransactionView: View {
     @ObservedObject var viewModel: NetworkInspectorTransactionViewModel
 
     var body: some View {
-        NetworkRequestStatusSectionView(viewModel: viewModel.statusSectionViewModel)
-        viewModel.timingViewModel.map(TimingView.init)
-        viewModel.transferSizeViewModel.map {
-            NetworkInspectorTransferInfoView(viewModel: $0)
-                .padding(.vertical, 8)
-        }
-        NetworkHeadersCell(viewModel: viewModel.requestHeadersViewModel)
-        NetworkCookiesCell(viewModel: viewModel.responseCookiesViewModel)
-        NetworkHeadersCell(viewModel: viewModel.responseHeadersViewModel)
-        NetworkCookiesCell(viewModel: viewModel.responseCookiesViewModel)
-        NavigationLink(destination: destinationTiming) {
-            NetworkMenuCell(icon: "clock", tintColor: .orange, title: "Timing Info")
+        Section(header: Text(viewModel.title)) {
+            NetworkRequestStatusCell(viewModel: viewModel.statusViewModel)
+            viewModel.timingViewModel.map(TimingView.init)
+            viewModel.transferSizeViewModel.map {
+                NetworkInspectorTransferInfoView(viewModel: $0)
+                    .hideDivider()
+                    .padding(.vertical, 8)
+            }
+            NetworkRequestInfoCell(viewModel: viewModel.requestViewModel)
+            NavigationLink(destination: destintionTransactionDetails) {
+                Text("Transaction Details")
+            }
         }
     }
 
-    private var destinationTiming: some View {
-        NetworkDetailsView(title: "Timing Details") { viewModel.timingSummary }
+    private var destintionTransactionDetails: some View {
+        NetworkDetailsView(title: "Transaction Details") { viewModel.details() }
     }
 }
 
 // MARK: - ViewModel
 
-final class NetworkInspectorTransactionViewModel: ObservableObject {
-    let statusSectionViewModel: NetworkRequestStatusSectionViewModel
+final class NetworkInspectorTransactionViewModel: ObservableObject, Identifiable {
+    let id: NSManagedObjectID
+    let title: String
+    let statusViewModel: NetworkRequestStatusCellModel
     let timingViewModel: TimingViewModel?
-    let requestHeadersViewModel: NetworkHeadersCellViewModel
-    let requestCookiesViewModel: NetworkCookiesCellViewModel
-    let responseHeadersViewModel: NetworkHeadersCellViewModel
-    let responseCookiesViewModel: NetworkCookiesCellViewModel
-    lazy var timingSummary = KeyValueSectionViewModel.makeTiming(for: transaction)
-
-    @Published var isOriginalRequestHeadersLinkActive = false
-    @Published var isResponseHeadersLinkActive = false
-
-    let details: NetworkMetricsDetailsViewModel?
+    let requestViewModel: NetworkRequestInfoCellViewModel
     let transferSizeViewModel: NetworkInspectorTransferInfoViewModel?
-
-    private let transaction: NetworkTransactionMetricsEntity
+    let details: () -> NSAttributedString
 
     init(transaction: NetworkTransactionMetricsEntity, task: NetworkTaskEntity) {
-        let url = transaction.request.url.flatMap(URL.init)
-
-        self.statusSectionViewModel = NetworkRequestStatusSectionViewModel(transaction: transaction)
-        self.details = NetworkMetricsDetailsViewModel(metrics: transaction)
+        self.id = transaction.objectID
+        self.title = transaction.fetchType.title
+        self.statusViewModel = NetworkRequestStatusCellModel(transaction: transaction)
+        self.requestViewModel = NetworkRequestInfoCellViewModel(transaction: transaction)
         self.timingViewModel = TimingViewModel(transaction: transaction, task: task)
-        self.requestHeadersViewModel = NetworkHeadersCellViewModel(title: "Request Headers", headers: transaction.request.headers)
-        self.requestCookiesViewModel = NetworkCookiesCellViewModel(title: "Request Cookies", headers: transaction.request.headers, url: url)
-        self.responseHeadersViewModel = NetworkHeadersCellViewModel(title: "Response Headers", headers: transaction.response?.headers)
-        self.responseCookiesViewModel = NetworkCookiesCellViewModel(title: "Response Cookies", headers: transaction.response?.headers, url: url)
 
         if transaction.fetchType == .networkLoad {
             self.transferSizeViewModel = NetworkInspectorTransferInfoViewModel(transferSize: transaction.transferSize, isUpload: false)
         } else {
             self.transferSizeViewModel = nil
         }
-        self.transaction = transaction
+
+        self.details = {
+            let renderer = TextRenderer(options: .sharing)
+            let sections = KeyValueSectionViewModel.makeDetails(for: transaction)
+            return renderer.joined(sections.map { renderer.render($0) })
+        }
     }
 }
 
@@ -80,19 +69,17 @@ struct NetworkInspectorTransactionView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
             List {
-                Section {
-                    NetworkInspectorTransactionView(viewModel: mockModel)
-                        .background(Color(UXColor.systemBackground))
-                        .backport.navigationTitle("Network Load")
+                ForEach(mockTask.orderedTransactions, id: \.index) {
+                    NetworkInspectorTransactionView(viewModel: .init(transaction: $0, task: mockTask))
                 }
             }
         }
     }
 }
 
-private let mockModel = NetworkInspectorTransactionViewModel(transaction: mockTask.orderedTransactions.last!, task: mockTask)
+//private let mockModel = NetworkInspectorTransactionViewModel(transaction: mockTask.orderedTransactions.last!, task: mockTask)
 
-private let mockTask = LoggerStore.preview.entity(for: .login)
+private let mockTask = LoggerStore.preview.entity(for: .createAPI)
 
 #endif
 
