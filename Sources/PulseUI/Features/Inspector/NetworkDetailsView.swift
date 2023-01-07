@@ -49,19 +49,3 @@ final class NetworkDetailsViewModel {
         self.makeString = closure
     }
 }
-
-#if DEBUG
-struct NetworkDetailsView_Previews: PreviewProvider {
-    static var previews: some View {
-        Group {
-            NavigationView {
-                NetworkDetailsView(title: "Section") {
-                    KeyValueSectionViewModel.makeComponents(for: URL(string: LoggerStore.preview.entity(for: .login).url!)!)
-                }
-            }
-        }
-    }
-}
-
-private let jwt = try! JWT("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c")
-#endif

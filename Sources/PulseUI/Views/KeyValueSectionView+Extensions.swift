@@ -99,39 +99,10 @@ extension KeyValueSectionViewModel {
         )
     }
 
-#if !os(watchOS)
-    static func makeDetails(for jwt: JWT) -> NSAttributedString {
-        let renderer = TextRenderer()
-        let sections: [NSAttributedString] = [
-            TextMake(renderer: renderer)
-                .subheadline("Header")
-                .json(jwt.header, color: .systemRed)
-                .newline(),
-            TextMake(renderer: renderer)
-                .subheadline("Payload")
-                .json(jwt.body, color: .systemPurple)
-                .newline(),
-            jwt.signature.map {
-                TextMake(renderer: renderer)
-                    .subheadline("Signature")
-                    .pre($0, color: .systemBlue)
-                    .newline()
-            },
-            TextMake(renderer: renderer)
-                .subheadline("Encoded")
-                .pre(jwt.parts[0], color: .systemRed)
-                .pre(".")
-                .pre(jwt.parts[1], color: .systemPurple)
-                .pre(".")
-                .pre(jwt.parts[2], color: .systemBlue)
-        ].compactMap { $0?.make() }
-        return renderer.joined(sections)
-    }
-#endif
-
 #warning("TODO: remove?")
 
 #if os(iOS) || os(macOS) || os(tvOS)
+    @available(*, deprecated, message: "Deprecated")
     static func makeTiming(for transaction: NetworkTransactionMetricsEntity) -> KeyValueSectionViewModel {
         let timeFormatter = DateFormatter()
         timeFormatter.locale = Locale(identifier: "en_US")
