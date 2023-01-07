@@ -5,8 +5,6 @@
 import SwiftUI
 import Combine
 
-#warning("TODO: remove unused extensions and backports + see which views can be moved to iOS 14 fully to remove backports")
-
 #if os(iOS) || os(macOS)
 extension Color {
     static var separator: Color { Color(UXColor.separator) }
@@ -41,8 +39,7 @@ struct InvisibleNavigationLinks<Content: View>: View {
 
 extension View {
     func invisible() -> some View {
-        self.hidden()
-            .backport.hideAccessibility()
+        self.hidden().backport.hideAccessibility()
     }
 }
 
