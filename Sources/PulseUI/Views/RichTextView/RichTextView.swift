@@ -85,6 +85,15 @@ struct _RichTextView: View {
                 })
                 Menu(content: {
                     Section {
+                        Menu(content: {
+                            AttributedStringShareMenu(shareItems: $shareItems) {
+                                viewModel.textStorage
+                            }
+                        }, label: {
+                            Label("Share As", systemImage: "square.and.arrow.up")
+                        })
+                    }
+                    Section {
                         if viewModel.contentType?.isHTML == true {
                             Button(action: { isWebViewOpen = true }) {
                                 Label("Open in Browser", systemImage: "safari")

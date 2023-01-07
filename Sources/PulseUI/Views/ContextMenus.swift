@@ -160,6 +160,40 @@ struct StringSearchOptionsMenu: View {
         }
     }
 }
+
+#warning("TODO: skip Show Details")
+@available(iOS 14, *)
+struct AttributedStringShareMenu: View {
+    @Binding var shareItems: ShareItems?
+    let string: () -> NSAttributedString
+
+    var body: some View {
+        Button(action: {
+            shareItems = ShareItems([string().string])
+        }) {
+            Label("Share as Text", systemImage: "square.and.arrow.up")
+        }
+        Button(action: {
+            let html = (try? TextRenderer.html(from: string())) ?? Data()
+            let directory = TemporaryDirectory()
+            let fileURL = directory.write(data: html, extension: "html")
+            shareItems = ShareItems([fileURL], cleanup: directory.remove)
+        }) {
+            Text("Share as HTML")
+            Image(systemName: "square.and.arrow.up")
+        }
+        Button(action: {
+            let pdf = (try? TextRenderer.pdf(from: string())) ?? Data()
+            let directory = TemporaryDirectory()
+            let fileURL = directory.write(data: pdf, extension: "pdf")
+            shareItems = ShareItems([fileURL], cleanup: directory.remove)
+        }) {
+            Text("Share as PDF")
+            Image(systemName: "square.and.arrow.up")
+        }
+    }
+}
+
 #if DEBUG
 @available(iOS 14, *)
 struct StringSearchOptionsMenu_Previews: PreviewProvider {

@@ -107,9 +107,13 @@ struct TemporaryDirectory {
 #if os(iOS) || os(macOS)
 extension TemporaryDirectory {
     func write(text: String, extension fileExtension: String) -> URL {
+        write(data: text.data(using: .utf8) ?? Data(), extension: fileExtension)
+    }
+
+    func write(data: Data, extension fileExtension: String) -> URL {
         let date = makeCurrentDate()
         let fileURL = url.appendingPathComponent("logs-\(date).\(fileExtension)", isDirectory: false)
-        try? text.data(using: .utf8)?.write(to: fileURL)
+        try? data.write(to: fileURL)
         return fileURL
     }
 }
