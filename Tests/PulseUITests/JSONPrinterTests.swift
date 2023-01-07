@@ -15,10 +15,8 @@ final class JSONPrinterTests: XCTestCase {
         let error = generateTypeMismatchError()
 
         // WHEN
-        let renderer = AttributedStringJSONRenderer(fontSize: 12, lineHeight: 15)
-        let printer = TextRendererJSON(renderer: renderer)
-        printer.render(json: json, error: error)
-        let string = renderer.make()
+        let renderer = TextRendererJSON()
+        let string = renderer.render(json: json, error: error)
 
         // THEN
         let range = NSRange(try XCTUnwrap(string.string.firstRange(of: "56")), in: string.string)

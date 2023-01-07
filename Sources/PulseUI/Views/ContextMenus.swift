@@ -182,6 +182,7 @@ struct AttributedStringShareMenu: View {
             Text("Share as HTML")
             Image(systemName: "square.and.arrow.up")
         }
+#if os(iOS)
         Button(action: {
             let pdf = (try? TextRenderer.pdf(from: prepare())) ?? Data()
             let directory = TemporaryDirectory()
@@ -191,6 +192,7 @@ struct AttributedStringShareMenu: View {
             Text("Share as PDF")
             Image(systemName: "square.and.arrow.up")
         }
+#endif
     }
 
     private func prepare() -> NSAttributedString {

@@ -7,8 +7,7 @@ import CoreData
 import Pulse
 import Combine
 
-#if os(iOS) || os(macOS)
-
+#if os(iOS)
 struct LegacyRichTextView: View {
     @ObservedObject var viewModel: RichTextViewModel
 
@@ -36,7 +35,9 @@ struct LegacyRichTextView: View {
         })
     }
 }
+#endif
 
+#if os(iOS) || os(macOS)
 struct LegacyRichTextViewSearchToobar: View {
     @ObservedObject var viewModel: RichTextViewModel
 
@@ -86,7 +87,7 @@ struct LegacyRichTextViewSearchToobar: View {
             }, onReturn: viewModel.nextMatch).frame(maxWidth: 240)
 
             Menu(content: {
-                StringSearchOptionsMenu(options: $viewModel.options, isKindNeeded: false)
+                StringSearchOptionsMenu(options: $viewModel.searchOptions, isKindNeeded: false)
             }, label: {
                 Image(systemName: "ellipsis.circle")
                     .font(.system(size: 20))

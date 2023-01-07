@@ -30,7 +30,9 @@ struct RichTextView: View {
         if #available(iOS 15, *) {
             _RichTextView(viewModel: viewModel, isTextViewBarItemsHidden: isTextViewBarItemsHidden)
         } else {
+#if os(iOS)
             LegacyRichTextView(viewModel: viewModel)
+#endif
         }
     }
 }
@@ -171,7 +173,6 @@ struct _RichTextView: View {
     var body: some View {
         VStack(spacing: 0) {
             WrappedTextView(viewModel: viewModel)
-                .onAppear(perform: onAppear)
             Divider()
             LegacyRichTextViewSearchToobar(viewModel: viewModel)
         }
