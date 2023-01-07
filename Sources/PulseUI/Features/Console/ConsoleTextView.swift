@@ -290,7 +290,7 @@ final class ConsoleTextViewModel: ObservableObject {
     }
 }
 
-private extension NSAttributedString.Key {
+extension NSAttributedString.Key {
     static let objectIdKey = NSAttributedString.Key("pulse-object-id")
 }
 

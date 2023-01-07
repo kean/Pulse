@@ -63,10 +63,10 @@ final class RichTextViewModel: ObservableObject {
         textStorage.endEditing()
     }
 
-#warning("TODO: perform search in the background")
     private func refresh(searchTerm: String, options: StringSearchOptions) {
-#warning("TODO: implemet search using NSString API to work with emoji properl")
-        let newMatches = search(searchTerm: searchTerm, options: options)
+        let newMatches = search(searchTerm: searchTerm, options: options).filter {
+            textStorage.attributes(at: $0.location, effectiveRange: nil)[.objectIdKey] == nil
+        }
 
         performUpdates { _ in
             clearMatches()
