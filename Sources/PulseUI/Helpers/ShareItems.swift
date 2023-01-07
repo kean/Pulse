@@ -24,6 +24,11 @@ struct ShareItems: Identifiable {
 }
 
 enum ShareService {
+    static func share(_ message: LoggerMessageEntity, as output: ShareOutput) -> ShareItems {
+        let string = TextRenderer(options: .sharing).render(message)
+        return share(string, as: output)
+    }
+
     static func share(_ task: NetworkTaskEntity, as output: ShareOutput) -> ShareItems {
         let string = TextRenderer(options: .sharing).render(task, content: .sharing)
         return share(string, as: output)
