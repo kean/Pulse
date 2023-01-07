@@ -5,10 +5,13 @@
 import SwiftUI
 import Pulse
 
+#warning("TODO: remoev")
+
 #if os(iOS) || os(macOS) || os(tvOS)
 
 // MARK: - View
 
+@available(*, deprecated, message: "Deprecated")
 struct NetworkInspectorMetricsDetailsView: View {
     let viewModel: NetworkMetricsDetailsViewModel
 

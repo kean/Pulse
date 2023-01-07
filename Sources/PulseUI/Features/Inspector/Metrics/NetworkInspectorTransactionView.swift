@@ -16,14 +16,13 @@ struct NetworkInspectorTransactionView: View {
 
     var body: some View {
         Section(header: Text(viewModel.title)) {
-            NetworkRequestStatusSectionView(viewModel: viewModel.statusSectionViewModel)
+            NetworkRequestStatusCell(viewModel: viewModel.statusViewModel)
             viewModel.timingViewModel.map(TimingView.init)
             viewModel.transferSizeViewModel.map {
                 NetworkInspectorTransferInfoView(viewModel: $0)
                     .padding(.vertical, 8)
             }
-            NetworkHeadersCell(viewModel: viewModel.requestHeadersViewModel)
-            NetworkHeadersCell(viewModel: viewModel.responseHeadersViewModel)
+            NetworkRequestInfoCell(viewModel: viewModel.requestViewModel)
         }
     }
 }
@@ -32,33 +31,22 @@ struct NetworkInspectorTransactionView: View {
 
 final class NetworkInspectorTransactionViewModel: ObservableObject {
     let title: String
-    let statusSectionViewModel: NetworkRequestStatusSectionViewModel
+    let statusViewModel: NetworkRequestStatusCellModel
     let timingViewModel: TimingViewModel?
-    let requestHeadersViewModel: NetworkHeadersCellViewModel
-    let responseHeadersViewModel: NetworkHeadersCellViewModel
-
-    @Published var isOriginalRequestHeadersLinkActive = false
-    @Published var isResponseHeadersLinkActive = false
-
-    let details: NetworkMetricsDetailsViewModel?
+    let requestViewModel: NetworkRequestInfoCellViewModel
     let transferSizeViewModel: NetworkInspectorTransferInfoViewModel?
-
-    private let transaction: NetworkTransactionMetricsEntity
 
     init(transaction: NetworkTransactionMetricsEntity, task: NetworkTaskEntity) {
         self.title = transaction.fetchType.title
-        self.statusSectionViewModel = NetworkRequestStatusSectionViewModel(transaction: transaction)
-        self.details = NetworkMetricsDetailsViewModel(metrics: transaction)
+        self.statusViewModel = NetworkRequestStatusCellModel(transaction: transaction)
+        self.requestViewModel = NetworkRequestInfoCellViewModel(transaction: transaction)
         self.timingViewModel = TimingViewModel(transaction: transaction, task: task)
-        self.requestHeadersViewModel = NetworkHeadersCellViewModel(title: "Request Headers", headers: transaction.request.headers)
-        self.responseHeadersViewModel = NetworkHeadersCellViewModel(title: "Response Headers", headers: transaction.response?.headers)
 
         if transaction.fetchType == .networkLoad {
             self.transferSizeViewModel = NetworkInspectorTransferInfoViewModel(transferSize: transaction.transferSize, isUpload: false)
         } else {
             self.transferSizeViewModel = nil
         }
-        self.transaction = transaction
     }
 }
 
