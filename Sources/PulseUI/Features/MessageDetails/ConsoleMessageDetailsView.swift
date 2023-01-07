@@ -6,11 +6,9 @@ import SwiftUI
 import Pulse
 
 #warning("TODO: macOS reimplement")
-#warning("TODO: move toolbar items to the proper sections")
 
 struct ConsoleMessageDetailsView: View {
     let viewModel: ConsoleMessageDetailsViewModel
-    @Environment(\.colorScheme) var colorScheme: ColorScheme
 
     #if os(iOS)
     var body: some View {
@@ -22,9 +20,6 @@ struct ConsoleMessageDetailsView: View {
     @ViewBuilder
     private var trailingNavigationBarItems: some View {
         HStack(spacing: 10) {
-            if let badge = viewModel.badge {
-                BadgeView(viewModel: BadgeViewModel(title: badge.title, color: badge.color.opacity(colorScheme == .light ? 0.25 : 0.5)))
-            }
             NavigationLink(destination: ConsoleMessageMetadataView(message: viewModel.message)) {
                 Image(systemName: "info.circle")
             }
