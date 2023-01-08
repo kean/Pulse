@@ -92,13 +92,7 @@ struct NetworkInspectorView: View {
     var contents: some View {
         List {
             Section {
-                viewModel.statusSectionViewModel.map { NetworkRequestStatusCell(viewModel: $0.status) }
-                if #available(watchOS 9.0, *), let url = ShareService.share(viewModel.task, as: .html).items.first as? URL {
-                    ShareLink(item: url)
-                }
-                viewModel.statusSectionViewModel.map {
-                    NetworkRequestStatusSectionView(viewModel: $0, showStatus: false)
-                }
+                viewModel.statusSectionViewModel.map(NetworkRequestStatusSectionView.init)
             }
             Section {
                 viewModel.transferViewModel.map {
@@ -129,6 +123,13 @@ struct NetworkInspectorView: View {
                 }
             }
         }
+#if os(watchOS)
+        .toolbar {
+            if #available(watchOS 9.0, *), let url = ShareService.share(viewModel.task, as: .html).items.first as? URL {
+                ShareLink(item: url)
+            }
+        }
+#endif
     }
 #elseif os(tvOS)
     var contents: some View {
