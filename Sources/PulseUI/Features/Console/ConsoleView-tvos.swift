@@ -41,7 +41,7 @@ public struct ConsoleView: View {
                 }
             }
             .listStyle(.grouped)
-            .frame(maxWidth: 500)
+            .frame(maxWidth: 540)
 
             List {
                 ConsoleMessagesForEach(messages: viewModel.entities)
