@@ -73,6 +73,10 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
             self?.refresh(filterTerm: filterTerm)
         }.store(in: &cancellables)
 
+        sharedSearchCriteriaViewModel.dataNeedsReload.throttle(for: 0.5, scheduler: DispatchQueue.main, latest: true).sink { [weak self] in
+            self?.refreshNow()
+        }.store(in: &cancellables)
+
         searchCriteriaViewModel.dataNeedsReload.throttle(for: 0.5, scheduler: DispatchQueue.main, latest: true).sink { [weak self] in
             self?.refreshNow()
         }.store(in: &cancellables)
