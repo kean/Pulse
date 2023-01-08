@@ -68,12 +68,6 @@ final class ConsoleSearchFilter: ObservableObject, Identifiable {
         ConsoleSearchFilter(field: .message, match: .contains, value: "")
     }
 
-    var isDefault: Bool {
-        let lhs = self
-        let rhs = ConsoleSearchFilter.default
-        return (lhs.field, lhs.match, lhs.value) == (rhs.field, rhs.match, rhs.value)
-    }
-
     init(field: Field, match: Match, value: String) {
         self.field = field
         self.match = match

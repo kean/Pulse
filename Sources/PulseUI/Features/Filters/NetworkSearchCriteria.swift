@@ -184,12 +184,6 @@ final class NetworkSearchFilter: ObservableObject, Identifiable {
         NetworkSearchFilter(field: .url, match: .contains, value: "")
     }
 
-    var isDefault: Bool {
-        let lhs = self
-        let rhs = NetworkSearchFilter.default
-        return (lhs.field, lhs.match, lhs.value) == (rhs.field, rhs.match, rhs.value)
-    }
-
     init(field: Field, match: Match, value: String) {
         self.field = field
         self.match = match

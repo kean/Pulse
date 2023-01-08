@@ -27,7 +27,7 @@ final class ConsoleNetworkSearchCriteriaViewModel: ObservableObject {
     }
 
     var isDefaultFilters: Bool {
-        filters.count == 1 && filters[0].isDefault
+        filters.count == 1 && filters[0].value.isEmpty
     }
 
     private var cancellables: [AnyCancellable] = []
