@@ -27,6 +27,11 @@ public struct ConsoleView: View {
         HStack {
             List {
                 Section {
+                    Text("Pulse")
+                        .font(.title)
+                        .foregroundColor(.secondary)
+                        .padding(.top, 46)
+                        .listRowBackground(Color.clear)
                     Toggle(isOn: $viewModel.isOnlyErrors) {
                         LabelBackport("Errors Only", systemImage: "exclamationmark.octagon")
                     }
