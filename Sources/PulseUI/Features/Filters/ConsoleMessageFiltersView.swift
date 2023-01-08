@@ -256,11 +256,29 @@ struct ConsoleSharedFiltersView: View {
     @State var isTimePeriodSectionExpanded = true
 
     var body: some View {
+#if os(iOS)
+        Section(
+            content: { timePeriodContent },
+            header: { timePeriodHeader },
+            footer: {
+                HStack(alignment: .center, spacing: 14) {
+                    Text("Quick Filters")
+                        .lineLimit(1)
+                        .foregroundColor(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    quickFilters
+                }
+                .padding(.top, 4)
+                .foregroundColor(.accentColor)
+            }
+        )
+#else
         FiltersSection(
             isExpanded: $isTimePeriodSectionExpanded,
             header: { timePeriodHeader },
             content: { timePeriodContent }
         )
+#endif
     }
 
     private var timePeriodHeader: some View {
@@ -278,17 +296,7 @@ struct ConsoleSharedFiltersView: View {
         DateRangePicker(title: "Start", date: $viewModel.dates.startDate)
         DateRangePicker(title: "End", date: $viewModel.dates.endDate)
 
-#if os(iOS)
-        HStack(spacing: 14) {
-            Text("Quick Filters")
-                .lineLimit(1)
-                .foregroundColor(.secondary)
-                .frame(maxWidth: .infinity, alignment: .leading)
-            quickFilters
-        }
-        .foregroundColor(.accentColor)
-        .buttonStyle(.plain)
-#elseif os(macOS)
+#if os(macOS)
         VStack(spacing: 4) {
             HStack {
                 Text("Quick Filters").foregroundColor(.secondary)
