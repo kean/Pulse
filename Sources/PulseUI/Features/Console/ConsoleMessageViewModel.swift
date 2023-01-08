@@ -7,18 +7,13 @@ import Pulse
 import CoreData
 import Combine
 
-#warning("TODO: refactor")
 final class ConsoleMessageViewModel: Pinnable {
-    let title: String
-    let text: String
-    let textColor: Color
-    let level: String
-
     let message: LoggerMessageEntity
+
     private let searchCriteriaViewModel: ConsoleMessageSearchCriteriaViewModel?
     
     private(set) lazy var time = ConsoleMessageViewModel.timeFormatter.string(from: message.createdAt)
-    
+
     static let timeFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US")
@@ -29,16 +24,7 @@ final class ConsoleMessageViewModel: Pinnable {
     private(set) lazy var pinViewModel = PinButtonViewModel(message: message)
     
     init(message: LoggerMessageEntity, searchCriteriaViewModel: ConsoleMessageSearchCriteriaViewModel? = nil) {
-        let time = ConsoleMessageViewModel.timeFormatter.string(from: message.createdAt)
-        if message.label.name == "default" || message.label.name.isEmpty {
-            self.title = time
-        } else {
-            self.title = "\(time) · \(message.label.name.capitalized)"
-        }
-        self.text = message.text
-        self.textColor = .textColor(for: message.logLevel)
         self.message = message
-        self.level = message.logLevel.name.uppercased()
         self.searchCriteriaViewModel = searchCriteriaViewModel
     }
     

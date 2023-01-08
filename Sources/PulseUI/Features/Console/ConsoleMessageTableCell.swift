@@ -57,7 +57,7 @@ final class ConsoleMessageTableCell: UITableViewCell, UIContextMenuInteractionDe
 
         details.numberOfLines = ConsoleSettings.shared.lineLimit
         title.attributedText = NSAttributedString(string: ConsoleFormatter.subheadline(for: viewModel.message, hasTime: false), attributes: titleAttributes)
-        details.text = viewModel.text
+        details.text = viewModel.message.text
         details.textColor = .textColor(for: viewModel.message.logLevel)
         accessory.textLabel.attributedText = NSAttributedString(string: viewModel.time, attributes: titleAttributes)
         pin.bind(viewModel: viewModel.pinViewModel)
