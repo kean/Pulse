@@ -68,6 +68,9 @@ final class ConsoleMessageSearchCriteriaViewModel: ObservableObject {
     }
 
     func addFilter() {
+        guard !filters.isEmpty else {
+            return resetFilters()
+        }
         let filter = ConsoleSearchFilter(id: UUID(), field: .message, match: .contains, value: "")
         filters.append(filter)
 

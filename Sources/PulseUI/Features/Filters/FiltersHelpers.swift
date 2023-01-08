@@ -80,17 +80,11 @@ struct FilterPickerButton: View {
     let title: String
 
     var body: some View {
-        HStack {
-            Text(title)
-                .font(.subheadline)
-            Image(systemName: "chevron.right")
-                .font(.system(size: 13))
-                .foregroundColor(.secondary)
-        }
-        .foregroundColor(Color.primary.opacity(0.9))
-        .padding(EdgeInsets(top: 8, leading: 10, bottom: 8, trailing: 10))
-        .background(Color.secondaryFill)
-        .cornerRadius(8)
+        Text(title).font(.subheadline)
+            .foregroundColor(Color.primary.opacity(0.9))
+            .padding(EdgeInsets(top: 8, leading: 10, bottom: 8, trailing: 10))
+            .background(Color.secondaryFill)
+            .cornerRadius(8)
     }
 }
 

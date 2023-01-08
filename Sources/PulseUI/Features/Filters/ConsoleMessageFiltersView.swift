@@ -58,7 +58,7 @@ struct ConsoleMessageFiltersView: View {
 extension ConsoleMessageFiltersView {
     @ViewBuilder
     var formContents: some View {
-        if #available(iOS 14, *) {
+        if #available(iOS 15, *) {
             generalSection
         }
         logLevelsSection
@@ -77,7 +77,7 @@ extension ConsoleMessageFiltersView {
 // MARK: - ConsoleMessageFiltersView (Custom Filters)
 
 extension ConsoleMessageFiltersView {
-    @available(iOS 14, *)
+    @available(iOS 15, *)
     var generalSection: some View {
         FiltersSection(
             isExpanded: $isGeneralSectionExpanded,
@@ -98,7 +98,7 @@ extension ConsoleMessageFiltersView {
     }
 
 #if os(iOS)
-    @available(iOS 14, *)
+    @available(iOS 15, *)
     @ViewBuilder
     private var generalContent: some View {
         ForEach(viewModel.filters) { filter in
