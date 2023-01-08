@@ -8,7 +8,7 @@ import Pulse
 struct NetworkRequestStatusCell: View {
     let viewModel: NetworkRequestStatusCellModel
 
-    #if os(watchOS)
+#if os(watchOS)
     var body: some View {
         HStack(spacing: spacing) {
             Text(viewModel.title)
@@ -21,7 +21,7 @@ struct NetworkRequestStatusCell: View {
         .listRowBackground(Color.clear)
     }
 
-    #else
+#else
     var body: some View {
         HStack(spacing: spacing) {
             if #available(iOS 14, tvOS 14, *) {
@@ -38,7 +38,8 @@ struct NetworkRequestStatusCell: View {
             viewModel.duration.map(DurationLabel.init)
         }
 #if os(tvOS)
-        .font(.system(size: 40, weight: .bold))
+        .font(.system(size: 38, weight: .bold))
+        .padding(.top, 16)
         .padding(.bottom, 16)
         .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
         .listRowBackground(Color.clear)

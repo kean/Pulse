@@ -11,7 +11,9 @@ struct TimingView: View {
 #if os(tvOS)
         ForEach(viewModel.sections) { item in
             Section {
-                TimingSectionView(viewModel: item, parent: viewModel)
+                Button(action: {}) {
+                    TimingSectionView(viewModel: item, parent: viewModel)
+                }
             }
         }
 #else

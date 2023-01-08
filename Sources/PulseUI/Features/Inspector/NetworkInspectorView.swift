@@ -136,20 +136,6 @@ struct NetworkInspectorView: View {
         HStack {
             Form {
                 Section {
-                    transferStatusView
-                        .padding(.bottom, 32)
-                }
-                .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
-                .listRowBackground(Color.clear)
-
-#warning("TODO: what if not available?")
-                Section {
-                    TimingView(viewModel: .init(task: viewModel.task))
-                }
-            }
-            .listStyle(.plain)
-            Form {
-                Section {
                     viewModel.statusSectionViewModel.map(NetworkRequestStatusSectionView.init)
                 }
                 Section(header: Text("Request")) {
@@ -165,7 +151,21 @@ struct NetworkInspectorView: View {
                     }
                 }
             }
-            .frame(width: 700)
+            .frame(width: 740)
+            Form {
+
+                Section {
+                    transferStatusView
+                        .padding(.bottom, 32)
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+                .listRowBackground(Color.clear)
+
+#warning("TODO: tvOS fix layour for text views")
+#warning("TODO: tvOS remove force unwrap")
+                NetworkInspectorMetricsView(viewModel: .init(task: viewModel.task)!)
+            }
+
         }
     }
 #endif

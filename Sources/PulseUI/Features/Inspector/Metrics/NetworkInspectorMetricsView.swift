@@ -11,12 +11,18 @@ struct NetworkInspectorMetricsView: View {
     let viewModel: NetworkInspectorMetricsViewModel
 
     var body: some View {
+#if os(tvOS)
+        ForEach(viewModel.transactions) {
+            NetworkInspectorTransactionView(viewModel: $0)
+        }
+#else
         List {
             ForEach(viewModel.transactions) {
                 NetworkInspectorTransactionView(viewModel: $0)
             }
         }
         .backport.navigationTitle("Metrics")
+#endif
     }
 }
 
@@ -45,9 +51,6 @@ struct NetworkInspectorMetricsView_Previews: PreviewProvider {
                 task: LoggerStore.preview.entity(for: .createAPI)
             )!)
         }
-        #if os(tvOS)
-        .frame(width: 900)
-        #endif
     }
 }
 #endif

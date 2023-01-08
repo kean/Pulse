@@ -13,7 +13,7 @@ struct NetworkInspectorTransactionView: View {
         Section(header: Text(viewModel.title)) {
             NetworkRequestStatusCell(viewModel: viewModel.statusViewModel)
             viewModel.timingViewModel.map(TimingView.init)
-#if !os(watchOS)
+#if os(iOS) || os(macOS)
             viewModel.transferSizeViewModel.map {
                 NetworkInspectorTransferInfoView(viewModel: $0)
                     .hideDivider()
