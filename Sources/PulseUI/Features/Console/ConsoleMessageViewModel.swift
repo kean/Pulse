@@ -18,28 +18,6 @@ final class ConsoleMessageViewModel: Pinnable {
     private let searchCriteriaViewModel: ConsoleMessageSearchCriteriaViewModel?
     
     private(set) lazy var time = ConsoleMessageViewModel.timeFormatter.string(from: message.createdAt)
-
-    var titleForTextRepresentation: String {
-        let level = message.logLevel
-        var title = "\(time) · \(level.name.capitalized)"
-        let label = message.label.name
-        if label != "default", !label.isEmpty {
-            title.append(" · \(label.capitalized)")
-        }
-        return title
-    }
-
-#if os(iOS)
-    lazy var textColor2 = UIColor.textColor(for: message.logLevel)
-    lazy var title2: String = {
-        var string = message.logLevel.name.uppercased()
-        let label = message.label.name
-        if label != "default", !label.isEmpty {
-            string.append(" · \(label.capitalized)")
-        }
-        return string
-    }()
-#endif
     
     static let timeFormatter: DateFormatter = {
         let formatter = DateFormatter()
