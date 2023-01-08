@@ -12,6 +12,16 @@ struct CustomNetworkFilterView: View {
     @ObservedObject var filter: NetworkSearchFilter
     let onRemove: (NetworkSearchFilter) -> Void
     let isRemoveHidden: Bool
+
+    @State private var textFieldValue: String
+
+    init(filter: NetworkSearchFilter, onRemove: @escaping (NetworkSearchFilter) -> Void, isRemoveHidden: Bool) {
+        self.filter = filter
+        self.textFieldValue = filter.value
+        self.onRemove = onRemove
+        self.isRemoveHidden = isRemoveHidden
+    }
+
 #if os(iOS)
     
     @FocusState private var isTextFieldFocused: Bool
@@ -23,7 +33,10 @@ struct CustomNetworkFilterView: View {
                 fieldMenu.lineLimit(1).layoutPriority(1)
                 matchMenu.lineLimit(1).layoutPriority(1)
             }
-            TextField("Value", text: $filter.value)
+            TextField("Value", text: $textFieldValue)
+                .onSubmit {
+                    filter.value = textFieldValue
+                }
                 .focused($isTextFieldFocused)
                 .textFieldStyle(.roundedBorder)
                 .disableAutocorrection(true)
@@ -42,7 +55,10 @@ struct CustomNetworkFilterView: View {
                     .padding(.leading, 6)
                 }
             } else {
-                Button("Done") { isTextFieldFocused = false }.foregroundColor(.blue)
+                Button("Done") {
+                    filter.value = textFieldValue
+                    isTextFieldFocused = false
+                }.foregroundColor(.blue)
             }
         }
         .padding(EdgeInsets(top: 2, leading: -6, bottom: 2, trailing: -8))
