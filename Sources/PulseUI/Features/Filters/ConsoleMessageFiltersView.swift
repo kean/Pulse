@@ -104,12 +104,13 @@ extension ConsoleMessageFiltersView {
     @ViewBuilder
     private var generalContent: some View {
         ForEach(viewModel.filters) { filter in
-            CustomFilterView(filter: filter, onRemove: {
-                viewModel.removeFilter(filter)
-            }).buttonStyle(.plain)
+            CustomFilterView(filter: filter, onRemove: viewModel.removeFilter)
+                .buttonStyle(.plain)
         }
-        Button(action: viewModel.addFilter) {
-            Text("Add Filter").frame(maxWidth: .infinity)
+        if !viewModel.isDefaultFilters {
+            Button(action: viewModel.addFilter) {
+                Text("Add Filter").frame(maxWidth: .infinity)
+            }
         }
     }
 #else

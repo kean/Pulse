@@ -10,8 +10,7 @@ import Pulse
 @available(iOS 15, *)
 struct CustomNetworkFilterView: View {
     @ObservedObject var filter: NetworkSearchFilter
-    let onRemove: () -> Void
-    
+    let onRemove: (NetworkSearchFilter) -> Void
 #if os(iOS)
     
     @FocusState private var isTextFieldFocused: Bool
@@ -32,15 +31,17 @@ struct CustomNetworkFilterView: View {
                     withAnimation { isEditing = isTextFieldFocused }
                 }
             if !isEditing {
-                Button(action: onRemove) {
-                    Image(systemName: "minus.circle.fill")
-                        .font(.system(size: 18))
+                if !filter.value.isEmpty || filter.id != NetworkSearchFilter.defaultFilterId {
+                    Button(action: { onRemove(filter) }) {
+                        Image(systemName: "minus.circle.fill")
+                            .font(.system(size: 18))
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundColor(.red)
+                    .padding(.leading, 6)
                 }
-                .buttonStyle(.plain)
-                .foregroundColor(.red)
-                .padding(.leading, 6)
             } else {
-                Button("Cancel") { isTextFieldFocused = false }.foregroundColor(.blue)
+                Button("Done") { isTextFieldFocused = false }.foregroundColor(.blue)
             }
         }
         .padding(EdgeInsets(top: 2, leading: -4, bottom: 2, trailing: -8))

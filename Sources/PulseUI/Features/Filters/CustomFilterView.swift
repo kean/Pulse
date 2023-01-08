@@ -10,7 +10,7 @@ import Pulse
 @available(iOS 15, *)
 struct CustomFilterView: View {
     @ObservedObject var filter: ConsoleSearchFilter
-    let onRemove: () -> Void
+    let onRemove: (ConsoleSearchFilter) -> Void
 
     #if os(iOS)
 
@@ -32,15 +32,17 @@ struct CustomFilterView: View {
                     withAnimation { isEditing = isTextFieldFocused }
                 }
             if !isEditing {
-                Button(action: onRemove) {
-                    Image(systemName: "minus.circle.fill")
-                        .font(.system(size: 18))
+                if !filter.value.isEmpty || filter.id != ConsoleSearchFilter.defaultFilterId {
+                    Button(action: { onRemove(filter) }) {
+                        Image(systemName: "minus.circle.fill")
+                            .font(.system(size: 18))
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundColor(.red)
+                    .padding(.leading, 6)
                 }
-                .buttonStyle(.plain)
-                .foregroundColor(.red)
-                .padding(.leading, 6)
             } else {
-                Button("Cancel") { isTextFieldFocused = false }.foregroundColor(.blue)
+                Button("Done") { isTextFieldFocused = false }.foregroundColor(.blue)
             }
         }
         .padding(EdgeInsets(top: 2, leading: -4, bottom: 2, trailing: -8))

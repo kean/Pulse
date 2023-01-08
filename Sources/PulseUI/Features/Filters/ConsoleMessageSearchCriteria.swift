@@ -6,6 +6,7 @@ import Foundation
 import Pulse
 import CoreData
 import SwiftUI
+import Combine
 
 struct ConsoleDatesFilter: Hashable {
     var isEnabled = true
@@ -57,14 +58,16 @@ struct ConsoleMessageSearchCriteria: Hashable {
     }
 }
 
-final class ConsoleSearchFilter: ObservableObject, Hashable, Identifiable {
-    let id: UUID
+final class ConsoleSearchFilter: ObservableObject, Identifiable {
+    var id: ObjectIdentifier { ObjectIdentifier(self) }
     @Published var field: Field
     @Published var match: Match
     @Published var value: String
 
     // The actual filters had to be moved to the viewmodel
-    static let defaultFilters = [ConsoleSearchFilter(id: UUID(), field: .message, match: .contains, value: "")]
+    static let defaultFilters = [ConsoleSearchFilter(id: defaultFilterId, field: .message, match: .contains, value: "")]
+
+    static let defaultFilterId = UUID()
 
     var isDefault: Bool {
         field == .message && match == .contains && value == ""
@@ -78,17 +81,11 @@ final class ConsoleSearchFilter: ObservableObject, Hashable, Identifiable {
     }
 
     static func == (lhs: ConsoleSearchFilter, rhs: ConsoleSearchFilter) -> Bool {
-        lhs.id == rhs.id &&
-        lhs.field == rhs.field &&
-        lhs.match == rhs.match &&
-        lhs.value == rhs.value
+        lhs === rhs
     }
 
     func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
-        hasher.combine(field)
-        hasher.combine(match)
-        hasher.combine(value)
+        ObjectIdentifier(self).hash(into: &hasher)
     }
 
     var isReady: Bool {

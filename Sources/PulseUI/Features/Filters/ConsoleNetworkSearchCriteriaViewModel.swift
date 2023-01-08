@@ -91,9 +91,6 @@ final class ConsoleNetworkSearchCriteriaViewModel: ObservableObject {
         filter.objectWillChange.sink { [weak self] in
             self?.objectWillChange.send()
             self?.isButtonResetEnabled = true
-        }.store(in: &cancellables)
-
-        filter.objectWillChange.sink { [weak self] in
             DispatchQueue.main.async { // important!
                 self?.dataNeedsReload.send()
             }
@@ -103,6 +100,9 @@ final class ConsoleNetworkSearchCriteriaViewModel: ObservableObject {
     func removeFilter(_ filter: NetworkSearchFilter) {
         if let index = filters.firstIndex(of: filter) {
             filters.remove(at: index)
+        }
+        if filters.isEmpty {
+            resetFilters()
         }
     }
 

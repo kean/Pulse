@@ -44,7 +44,7 @@ final class ConsoleMessageSearchCriteriaViewModel: ObservableObject {
     }
 
     var isDefaultFilters: Bool {
-        filters.count == 0 || (filters.count == 1 && filters == ConsoleSearchFilter.defaultFilters)
+        filters == ConsoleSearchFilter.defaultFilters
     }
 
     func resetAll() {
@@ -68,19 +68,16 @@ final class ConsoleMessageSearchCriteriaViewModel: ObservableObject {
         }
         let filter = ConsoleSearchFilter(id: UUID(), field: .message, match: .contains, value: "")
         filters.append(filter)
-
         subscribe(to: filter)
     }
 
     private func subscribe(to filter: ConsoleSearchFilter) {
         filter.objectWillChange.sink { [weak self] in
-            self?.objectWillChange.send()
-            self?.isButtonResetEnabled = true
-        }.store(in: &cancellables)
-
-        filter.objectWillChange.sink { [weak self] in
+            guard let self = self else { return }
+            self.objectWillChange.send()
+            self.isButtonResetEnabled = true
             DispatchQueue.main.async { // important!
-                self?.dataNeedsReload.send()
+                self.dataNeedsReload.send()
             }
         }.store(in: &cancellables)
     }
@@ -88,6 +85,9 @@ final class ConsoleMessageSearchCriteriaViewModel: ObservableObject {
     func removeFilter(_ filter: ConsoleSearchFilter) {
         if let index = filters.firstIndex(of: filter) {
             filters.remove(at: index)
+        }
+        if filters.isEmpty {
+            resetFilters()
         }
     }
 

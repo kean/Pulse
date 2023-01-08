@@ -181,8 +181,12 @@ final class NetworkSearchFilter: ObservableObject, Hashable, Identifiable {
     @Published var value: String
 
     // The actual filters had to be moved to the viewmodel
-    static let defaultFilters = [NetworkSearchFilter(id: UUID(), field: .url, match: .contains, value: "")]
+    static let defaultFilters = [NetworkSearchFilter(id: defaultFilterId, field: .url, match: .contains, value: "")]
 
+    static let defaultFilterId = UUID()
+
+    #warning("TODO: remove")
+    @available(*, deprecated, message: "Deprecated")
     var isDefault: Bool {
         field == .url && match == .contains && value == ""
     }
