@@ -45,7 +45,7 @@ struct CustomNetworkFilterView: View {
                 Button("Done") { isTextFieldFocused = false }.foregroundColor(.blue)
             }
         }
-        .padding(EdgeInsets(top: 2, leading: -4, bottom: 2, trailing: -8))
+        .padding(EdgeInsets(top: 2, leading: -6, bottom: 2, trailing: -8))
     }
     
     private var fieldMenu: some View {

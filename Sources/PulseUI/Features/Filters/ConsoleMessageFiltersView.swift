@@ -5,8 +5,6 @@
 import SwiftUI
 import Pulse
 
-#warning("TODO: iOS apply filters when done pressed only")
-
 #if os(iOS) || os(macOS)
 
 struct ConsoleMessageFiltersView: View {

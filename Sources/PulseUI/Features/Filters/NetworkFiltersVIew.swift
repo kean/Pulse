@@ -177,8 +177,8 @@ extension NetworkFiltersView {
     private var responseGroupContent: some View {
         statusCodeRow
         contentTypeRow
-        responseSizeRow
         if #available(iOS 14, *) {
+            responseSizeRow
             durationRow
         }
     }
@@ -197,23 +197,19 @@ extension NetworkFiltersView {
         }
     }
 
+    @available(iOS 14, *)
     @ViewBuilder
     private var responseSizeRow: some View {
         HStack {
             makeRangePicker(title: "Size", from: $viewModel.criteria.response.responseSize.from, to: $viewModel.criteria.response.responseSize.to, isEnabled: $viewModel.criteria.response.isEnabled)
-            if #available(iOS 14, *) {
-                Menu(content: {
-                    Filters.sizeUnitPicker($viewModel.criteria.response.responseSize.unit).labelsHidden()
-                }, label: {
-                    FilterPickerButton(title: viewModel.criteria.response.responseSize.unit.localizedTitle)
-                })
-                .animation(.none)
-                .fixedSize()
-                .frame(minWidth: 46)
-            } else {
-                Text("KB")
-                    .foregroundColor(.secondary)
-            }
+            Menu(content: {
+                Filters.sizeUnitPicker($viewModel.criteria.response.responseSize.unit).labelsHidden()
+            }, label: {
+                FilterPickerButton(title: viewModel.criteria.response.responseSize.unit.localizedTitle)
+            })
+            .animation(.none)
+            .fixedSize()
+            .frame(minWidth: 46)
         }
     }
 
