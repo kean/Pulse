@@ -63,7 +63,9 @@ extension ConsoleMessageFiltersView {
         }
         logLevelsSection
         labelsSection
-        ConsoleSharedFiltersView(viewModel: sharedCriteriaViewModel)
+        if #available(iOS 14, *) {
+            ConsoleSharedFiltersView(viewModel: sharedCriteriaViewModel)
+        }
     }
 
     var buttonReset: some View {
@@ -246,6 +248,7 @@ extension ConsoleMessageFiltersView {
 
 // MARK: - ConsoleMessageFiltersView (Time Period)
 
+@available(iOS 14, *)
 struct ConsoleSharedFiltersView: View {
     @ObservedObject var viewModel: ConsoleSharedSearchCriteriaViewModel
 

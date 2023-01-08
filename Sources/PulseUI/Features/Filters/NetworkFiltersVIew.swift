@@ -82,7 +82,9 @@ extension NetworkFiltersView {
         }
         domainsGroup
         networkingGroup
-        ConsoleSharedFiltersView(viewModel: sharedCriteriaViewModel)
+        if #available(iOS 14, *) {
+            ConsoleSharedFiltersView(viewModel: sharedCriteriaViewModel)
+        }
     }
 
     var buttonReset: some View {
