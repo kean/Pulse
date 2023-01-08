@@ -10,16 +10,16 @@ import Combine
 struct ConsoleMessageView: View {
     let viewModel: ConsoleMessageViewModel
 
-#if os(watchOS)
+#if os(watchOS) || os(tvOS)
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack {
                 Text(viewModel.message.logLevel.name.uppercased())
-                    .font(.system(size: 14))
+                    .font(fontTitle)
                     .foregroundColor(.secondary)
                 Spacer()
                 let time = Text(viewModel.time)
-                    .font(.system(size: 14))
+                    .font(fontTitle)
                     .foregroundColor(.secondary)
                 if #available(tvOS 15, watchOS 8, *) {
                     time.monospacedDigit()
@@ -28,32 +28,19 @@ struct ConsoleMessageView: View {
                 }
             }
             Text(viewModel.message.text)
-                .font(.system(size: 15))
+                .font(fontBody)
                 .foregroundColor(.textColor(for: viewModel.message.logLevel))
                 .lineLimit(ConsoleSettings.shared.lineLimit)
         }
     }
-#elseif os(tvOS)
-    var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack(spacing: 4) {
-                let time = Text(ConsoleFormatter.subheadline(for: viewModel.message))
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                if #available(tvOS 15, watchOS 8, *) {
-                    time.monospacedDigit()
-                } else {
-                    time
-                }
-                Spacer()
 
-            }
-            Text(viewModel.message.text)
-                .font(.caption)
-                .foregroundColor(.textColor(for: viewModel.message.logLevel))
-                .lineLimit(ConsoleSettings.shared.lineLimit)
-        }
-    }
+#if os(watchOS)
+    private let fontTitle = Font.system(size: 14)
+    private let fontBody = Font.system(size: 15)
+#else
+    private let fontTitle = Font.caption
+    private let fontBody = Font.caption
+#endif
 #else
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
