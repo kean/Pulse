@@ -24,8 +24,6 @@ struct NetworkInspectorView: View {
 #endif
     
     @State private var isShowingCurrentRequest = false
-    @State private var isEmptyLinkActive = false
-    @State private var isResponseBodyLinkActive = false
 
     var body: some View {
         contents
@@ -35,20 +33,6 @@ struct NetworkInspectorView: View {
             .sheet(item: $shareItems, content: ShareView.init)
 #else
             .backport.navigationTitle(viewModel.title)
-#endif
-#if os(macOS)
-            .background(InvisibleNavigationLinks {
-                NavigationLink.programmatic(isActive: $isEmptyLinkActive) { EmptyView () }
-            })
-            .onAppear {
-                DispatchQueue.main.async {
-                    if viewModel.task.responseBodySize > 0 {
-                        isResponseBodyLinkActive = true
-                    } else {
-                        isEmptyLinkActive = true
-                    }
-                }
-            }
 #endif
     }
 
