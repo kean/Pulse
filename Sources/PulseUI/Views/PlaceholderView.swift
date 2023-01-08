@@ -49,11 +49,7 @@ extension PlaceholderView {
     static func make(viewModel: ConsoleViewModel) -> PlaceholderView {
         let message: String
         if viewModel.searchCriteriaViewModel.isDefaultSearchCriteria {
-            if viewModel.searchCriteriaViewModel.criteria.dates.isCurrentSessionOnly {
-                message = "There are no messages in the current session."
-            } else {
-                message = "There are no stored messages."
-            }
+            message = "There are no stored messages."
         } else {
             message = "There are no messages for the selected filters."
         }

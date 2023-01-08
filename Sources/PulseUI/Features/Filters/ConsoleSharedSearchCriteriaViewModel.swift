@@ -8,8 +8,8 @@ import Combine
 import SwiftUI
 
 final class ConsoleSharedSearchCriteriaViewModel: ObservableObject {
-    @Published var dates = ConsoleMessageSearchCriteria.DatesFilter.default
-    private(set) var defaultDates: ConsoleMessageSearchCriteria.DatesFilter = .default
+    @Published var dates = ConsoleDatesFilter.default
+    private(set) var defaultDates: ConsoleDatesFilter = .default
 
     let dataNeedsReload = PassthroughSubject<Void, Never>()
 
@@ -18,9 +18,9 @@ final class ConsoleSharedSearchCriteriaViewModel: ObservableObject {
     private var cancellables: [AnyCancellable] = []
 
     init(store: LoggerStore) {
-        if store !== LoggerStore.shared {
-            dates.isCurrentSessionOnly = false
-            defaultDates.isCurrentSessionOnly = false
+        if store === LoggerStore.shared {
+            dates = .session
+            defaultDates = .session
         }
 
         $dates.dropFirst().sink { [weak self] _ in

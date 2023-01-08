@@ -274,17 +274,16 @@ struct ConsoleSharedFiltersView: View {
 
     @ViewBuilder
     private var timePeriodContent: some View {
-        Filters.toggle("Latest Session", isOn: $viewModel.dates.isCurrentSessionOnly)
-
         DateRangePicker(title: "Start", date: $viewModel.dates.startDate)
         DateRangePicker(title: "End", date: $viewModel.dates.endDate)
 
 #if os(iOS)
-        HStack(spacing: 16) {
-            Text("Quick Filters").foregroundColor(.secondary)
-            Button("Recent") { viewModel.dates = .recent }
-            Button("Today") { viewModel.dates = .today }
-            Spacer()
+        HStack(spacing: 8) {
+            Text("Quick Filters")
+                .lineLimit(1)
+                .foregroundColor(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            quickFilters
         }
         .foregroundColor(.accentColor)
         .buttonStyle(.plain)
@@ -295,13 +294,19 @@ struct ConsoleSharedFiltersView: View {
                 Spacer()
             }
             HStack(spacing: 12) {
-                Button("Recent") { viewModel.dates = .recent }
-                Button("Today") { viewModel.dates = .today }
+                quickFilters
                 Spacer()
             }
         }
         .padding(.top, 8)
 #endif
+    }
+
+    @ViewBuilder
+    private var quickFilters: some View {
+        Button("Session") { viewModel.dates = .session }
+        Button("Last Hour") { viewModel.dates = .recent }
+        Button("Today") { viewModel.dates = .today }
     }
 }
 

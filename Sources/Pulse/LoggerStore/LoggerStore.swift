@@ -51,6 +51,9 @@ public final class LoggerStore: @unchecked Sendable {
     private var requestsCache: [NetworkLogger.Request: NetworkRequestEntity] = [:]
     private var responsesCache: [NetworkLogger.Response: NetworkResponseEntity] = [:]
 
+    /// The date one of the loggers was created.
+    public static let launchDate = Date()
+
     // MARK: Shared
 
     /// Returns a shared store.
@@ -164,6 +167,8 @@ public final class LoggerStore: @unchecked Sendable {
     }
 
     private func postInitialization() throws {
+        _ = LoggerStore.launchDate
+
         backgroundContext.performAndWait {
             self.backgroundContext.userInfo[WeakLoggerStore.loggerStoreKey] = WeakLoggerStore(store: self)
         }

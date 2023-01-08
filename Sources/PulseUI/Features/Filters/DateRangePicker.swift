@@ -34,8 +34,6 @@ struct DateRangePicker: View {
             }
             .buttonStyle(.plain)
             .foregroundColor(.red)
-            .padding(.leading, 6)
-            .padding(.trailing, -6)
         }
     }
 

@@ -7,12 +7,31 @@ import Pulse
 import CoreData
 import SwiftUI
 
+struct ConsoleDatesFilter: Hashable {
+    var isEnabled = true
+    var startDate: Date?
+    var endDate: Date?
+
+    static let `default` = ConsoleDatesFilter()
+
+    static var today: ConsoleDatesFilter {
+        ConsoleDatesFilter(startDate: Calendar.current.startOfDay(for: Date()))
+    }
+
+    static var recent: ConsoleDatesFilter {
+        ConsoleDatesFilter(startDate: Date().addingTimeInterval(-3600))
+    }
+
+    static var session: ConsoleDatesFilter {
+        ConsoleDatesFilter(startDate: LoggerStore.launchDate)
+    }
+}
+
 struct ConsoleMessageSearchCriteria: Hashable {
     var isFiltersEnabled = true
 
-    var logLevels = LogLevelsFilter.default
-    var dates = DatesFilter.default
-    var labels = LabelsFilter.default
+    var logLevels: LogLevelsFilter = .default
+    var labels: LabelsFilter = .default
 
     struct LogLevelsFilter: Hashable {
         var isEnabled = true
@@ -21,27 +40,6 @@ struct ConsoleMessageSearchCriteria: Hashable {
         static let defaultLogLevels = Set(LoggerStore.Level.allCases).subtracting([LoggerStore.Level.trace])
 
         static let `default` = LogLevelsFilter()
-    }
-
-    struct DatesFilter: Hashable {
-        var isEnabled = true
-        var isCurrentSessionOnly = true
-        var startDate: Date?
-        var endDate: Date?
-
-        static let `default` = DatesFilter()
-
-        static var today: DatesFilter {
-            make(startDate: Calendar.current.startOfDay(for: Date()), endDate: nil)
-        }
-
-        static var recent: DatesFilter {
-            make(startDate: Date().addingTimeInterval(-1800), endDate: nil)
-        }
-
-        static func make(startDate: Date, endDate: Date? = nil) -> DatesFilter {
-            DatesFilter(isEnabled: true, isCurrentSessionOnly: false, startDate: startDate, endDate: endDate)
-        }
     }
 
     struct LabelsFilter: Hashable {
@@ -176,22 +174,18 @@ extension ConsoleMessageSearchCriteria {
     static func update(
         request: NSFetchRequest<NSManagedObject>,
         filterTerm: String,
+        dates: ConsoleDatesFilter,
         criteria: ConsoleMessageSearchCriteria,
         filters: [ConsoleSearchFilter],
-        sessionId: UUID?,
         isOnlyErrors: Bool
     ) {
         var predicates = [NSPredicate]()
 
-        if criteria.dates.isCurrentSessionOnly, let sessionId = sessionId {
-            predicates.append(NSPredicate(format: "session == %@", sessionId as NSUUID))
-        }
-
-        if criteria.dates.isEnabled {
-            if let startDate = criteria.dates.startDate {
+        if dates.isEnabled {
+            if let startDate = dates.startDate {
                 predicates.append(NSPredicate(format: "createdAt >= %@", startDate as NSDate))
             }
-            if let endDate = criteria.dates.endDate {
+            if let endDate = dates.endDate {
                 predicates.append(NSPredicate(format: "createdAt <= %@", endDate as NSDate))
             }
         }

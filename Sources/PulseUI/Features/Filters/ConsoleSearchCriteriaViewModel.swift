@@ -25,11 +25,6 @@ final class ConsoleMessageSearchCriteriaViewModel: ObservableObject {
     init(store: LoggerStore) {
         labels = ManagedObjectsObserver(context: store.viewContext, sortDescriptior: NSSortDescriptor(keyPath: \LoggerLabelEntity.name, ascending: true))
 
-        if store !== LoggerStore.shared {
-            criteria.dates.isCurrentSessionOnly = false
-            defaultCriteria.dates.isCurrentSessionOnly = false
-        }
-
         labels.$objects.sink { [weak self] in
             self?.displayLabels($0.map(\.name))
         }.store(in: &cancellables)

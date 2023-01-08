@@ -46,7 +46,6 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     private(set) var store: LoggerStore
     private var controller: NSFetchedResultsController<NSManagedObject>?
     private var isActive = false
-    private var latestSessionId: UUID?
     private var cancellables: [AnyCancellable] = []
 
     init(store: LoggerStore, mode: Mode = .all) {
@@ -131,12 +130,6 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     }
 
     private func refresh(filterTerm: String) {
-        // Get sessionId
-        if latestSessionId == nil {
-            latestSessionId = (entities.first as? LoggerMessageEntity)?.session ?? (entities.first as? NetworkTaskEntity)?.session
-        }
-        let sessionId = store === LoggerStore.shared ? LoggerStore.Session.current.id : latestSessionId
-
         // Search messages
         guard let controller = controller else {
             return assertionFailure()
@@ -144,11 +137,25 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         switch mode {
         case .all:
             let viewModel = searchCriteriaViewModel
-            ConsoleMessageSearchCriteria.update(request: controller.fetchRequest, filterTerm: filterTerm, criteria: viewModel.criteria, filters: viewModel.filters, sessionId: sessionId, isOnlyErrors: isOnlyErrors)
+            ConsoleMessageSearchCriteria.update(
+                request: controller.fetchRequest,
+                filterTerm: filterTerm,
+                dates: sharedSearchCriteriaViewModel.dates,
+                criteria: viewModel.criteria,
+                filters: viewModel.filters,
+                isOnlyErrors: isOnlyErrors
+            )
         case .network:
             let viewModel = networkSearchCriteriaViewModel
 #if !os(watchOS)
-            NetworkSearchCriteria.update(request: controller.fetchRequest, filterTerm: filterTerm, dates: sharedSearchCriteriaViewModel.dates, criteria: viewModel.criteria, filters: viewModel.filters, isOnlyErrors: isOnlyErrors, sessionId: sessionId)
+            NetworkSearchCriteria.update(
+                request: controller.fetchRequest,
+                filterTerm: filterTerm,
+                dates: sharedSearchCriteriaViewModel.dates,
+                criteria: viewModel.criteria,
+                filters: viewModel.filters,
+                isOnlyErrors: isOnlyErrors
+            )
 #endif
             break
         }
