@@ -153,7 +153,7 @@ struct _RichTextView: View {
                         viewModel.textStorage
                     }
                 }, label: {
-                    Label("Share As", systemImage: "square.and.arrow.up")
+                    Label("Share...", systemImage: "square.and.arrow.up")
                 })
                 // TODO: This should be injected/added outside of the text view
                 if viewModel.contentType?.isHTML ?? false {

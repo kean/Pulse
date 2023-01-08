@@ -46,7 +46,7 @@ struct ConsoleTextView: View {
                                 viewModel.text.textStorage
                             }
                         }, label: {
-                            Label("Share As", systemImage: "square.and.arrow.up")
+                            Label("Share...", systemImage: "square.and.arrow.up")
                         })
                         Menu(content: { menu }) {
                             Image(systemName: "ellipsis.circle")
@@ -319,7 +319,9 @@ struct ConsoleTextView_Previews: PreviewProvider {
     }
 }
 
-private let entities = try! LoggerStore.mock.allMessages()
+private let entities = try! LoggerStore.mock.allMessages().filter {
+    $0.logLevel != .trace
+}
 
 @available(iOS 14, tvOS 14, *)
 private extension ConsoleTextView {
