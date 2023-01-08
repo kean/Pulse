@@ -126,15 +126,9 @@ extension NetworkFiltersView {
                 viewModel.removeFilter(filter)
             }).buttonStyle(.plain)
         }
-
         Button(action: viewModel.addFilter) {
-            HStack {
-                Image(systemName: "plus.circle")
-                    .font(.system(size: 18))
-                Text("Add Filter")
-            }
+            Text("Add Filter").frame(maxWidth: .infinity)
         }
-        .frame(maxWidth: .infinity, alignment: .center)
     }
 
 #elseif os(macOS)

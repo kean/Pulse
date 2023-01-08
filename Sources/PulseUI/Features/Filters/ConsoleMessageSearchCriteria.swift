@@ -68,11 +68,7 @@ final class ConsoleSearchFilter: ObservableObject, Hashable, Identifiable {
     @Published var value: String
 
     // The actual filters had to be moved to the viewmodel
-#if os(iOS)
-    static let defaultFilters: [ConsoleSearchFilter] = []
-#else
     static let defaultFilters = [ConsoleSearchFilter(id: UUID(), field: .message, match: .contains, value: "")]
-#endif
 
     var isDefault: Bool {
         field == .message && match == .contains && value == ""
