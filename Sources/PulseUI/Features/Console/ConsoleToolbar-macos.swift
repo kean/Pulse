@@ -34,7 +34,6 @@ struct ConsoleToolbarToggleOnlyErrorsButton: View {
 final class ConsoleToolbarViewModel: ObservableObject {
     @Published var isFiltersPaneHidden = true
     @Published var isOnlyErrors = false
-    @Published var isOnlyPins = false
     @Published var isSearchBarActive = false
 }
 

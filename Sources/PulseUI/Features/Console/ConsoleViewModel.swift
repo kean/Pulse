@@ -145,6 +145,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
                 request: controller.fetchRequest,
                 filterTerm: filterTerm,
                 dates: sharedSearchCriteriaViewModel.dates,
+                general: sharedSearchCriteriaViewModel.filters,
                 criteria: viewModel.criteria,
                 filters: viewModel.filters,
                 isOnlyErrors: isOnlyErrors
@@ -156,6 +157,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
                 request: controller.fetchRequest,
                 filterTerm: filterTerm,
                 dates: sharedSearchCriteriaViewModel.dates,
+                general: sharedSearchCriteriaViewModel.filters,
                 criteria: viewModel.criteria,
                 filters: viewModel.filters,
                 isOnlyErrors: isOnlyErrors

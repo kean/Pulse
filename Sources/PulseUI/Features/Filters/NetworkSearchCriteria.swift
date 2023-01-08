@@ -304,6 +304,7 @@ extension NetworkSearchCriteria {
         request: NSFetchRequest<NSManagedObject>,
         filterTerm: String,
         dates: ConsoleDatesFilter,
+        general: ConsoleGeneralFilters,
         criteria: NetworkSearchCriteria,
         filters: [NetworkSearchFilter],
         isOnlyErrors: Bool
@@ -320,6 +321,12 @@ extension NetworkSearchCriteria {
             }
             if let endDate = dates.endDate {
                 predicates.append(NSPredicate(format: "createdAt <= %@", endDate as NSDate))
+            }
+        }
+
+        if general.isEnabled {
+            if general.inOnlyPins {
+                predicates.append(NSPredicate(format: "message.isPinned == YES"))
             }
         }
 

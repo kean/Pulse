@@ -68,7 +68,7 @@ final class ToastManager {
         }
         guard let enqueuedToast = queue.first,
               let window = UIApplication.shared.windows.filter({ $0.isKeyWindow }).first,
-              let container = window.rootViewController else {
+              let container = window.rootViewController?.topMostViewController() else {
             return
         }
 
@@ -117,6 +117,25 @@ final class ToastManager {
                 self.showToastIfNeeded()
             }
         }
+    }
+}
+
+private extension UIViewController {
+    func topMostViewController() -> UIViewController {
+        if self.presentedViewController == nil {
+            return self
+        }
+        if let navigation = self.presentedViewController as? UINavigationController,
+           let visibleViewController = navigation.visibleViewController {
+            return visibleViewController.topMostViewController()
+        }
+        if let tab = self.presentedViewController as? UITabBarController {
+            if let selectedTab = tab.selectedViewController {
+                return selectedTab.topMostViewController()
+            }
+            return tab.topMostViewController()
+        }
+        return self.presentedViewController!.topMostViewController()
     }
 }
 

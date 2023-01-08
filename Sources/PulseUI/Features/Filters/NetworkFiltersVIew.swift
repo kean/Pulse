@@ -107,7 +107,7 @@ extension NetworkFiltersView {
 
     private var generalGroupHeader: some View {
         FilterSectionHeader(
-            icon: "line.horizontal.3.decrease.circle", title: "General",
+            icon: "line.horizontal.3.decrease.circle", title: "Filters",
             color: .yellow,
             reset: { viewModel.resetFilters() },
             isDefault: viewModel.isDefaultFilters,

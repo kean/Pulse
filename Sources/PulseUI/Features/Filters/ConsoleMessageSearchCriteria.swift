@@ -28,6 +28,13 @@ struct ConsoleDatesFilter: Hashable {
     }
 }
 
+struct ConsoleGeneralFilters: Hashable {
+    var isEnabled = true
+    var inOnlyPins = false
+
+    static let `default` = ConsoleGeneralFilters()
+}
+
 struct ConsoleMessageSearchCriteria: Hashable {
     var isFiltersEnabled = true
 
@@ -154,6 +161,7 @@ extension ConsoleMessageSearchCriteria {
         request: NSFetchRequest<NSManagedObject>,
         filterTerm: String,
         dates: ConsoleDatesFilter,
+        general: ConsoleGeneralFilters,
         criteria: ConsoleMessageSearchCriteria,
         filters: [ConsoleSearchFilter],
         isOnlyErrors: Bool
@@ -175,6 +183,12 @@ extension ConsoleMessageSearchCriteria {
         if criteria.logLevels.isEnabled {
             if criteria.logLevels.levels.count != LoggerStore.Level.allCases.count {
                 predicates.append(NSPredicate(format: "level IN %@", Array(criteria.logLevels.levels.map { $0.rawValue })))
+            }
+        }
+
+        if general.isEnabled {
+            if general.inOnlyPins {
+                predicates.append(NSPredicate(format: "isPinned == YES"))
             }
         }
 

@@ -91,7 +91,7 @@ extension ConsoleMessageFiltersView {
 
     private var generalHeader: some View {
         FilterSectionHeader(
-            icon: "line.horizontal.3.decrease.circle", title: "General",
+            icon: "line.horizontal.3.decrease.circle", title: "Filters",
             color: .yellow,
             reset: { viewModel.resetFilters() },
             isDefault: viewModel.isDefaultFilters,
@@ -252,8 +252,14 @@ struct ConsoleSharedFiltersView: View {
     @ObservedObject var viewModel: ConsoleSharedSearchCriteriaViewModel
 
     @State var isTimePeriodSectionExpanded = true
+    @State var isFiltersSectionExpanded = true
 
     var body: some View {
+        sectionTimePeriod
+        sectionFilters
+    }
+
+    private var sectionTimePeriod: some View {
 #if os(iOS)
         Section(
             content: { timePeriodContent },
@@ -316,6 +322,31 @@ struct ConsoleSharedFiltersView: View {
         Button("Session") { viewModel.dates = .session }
         Button("Recent") { viewModel.dates = .session }
         Button("Today") { viewModel.dates = .today }
+    }
+
+    // MARK: Filters
+
+    private var sectionFilters: some View {
+        FiltersSection(
+            isExpanded: $isFiltersSectionExpanded,
+            header: {
+                FilterSectionHeader(
+                    icon: "calendar", title: "General",
+                    color: .blue,
+                    reset: { viewModel.filters = .default },
+                    isDefault: viewModel.filters == .default,
+                    isEnabled: $viewModel.filters.isEnabled
+                )
+            },
+            content: {
+                Toggle("Only Pinned", isOn: $viewModel.filters.inOnlyPins)
+                if #available(iOS 15.0, *) {
+                    Button(role: .destructive, action: viewModel.removeAllPins, label: {
+                        Text("Remove Pins")
+                    })
+                }
+            }
+        )
     }
 }
 

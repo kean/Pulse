@@ -11,19 +11,24 @@ final class ConsoleSharedSearchCriteriaViewModel: ObservableObject {
     @Published var dates = ConsoleDatesFilter.default
     private(set) var defaultDates: ConsoleDatesFilter = .default
 
+    @Published var filters = ConsoleGeneralFilters.default
+
     let dataNeedsReload = PassthroughSubject<Void, Never>()
 
     @Published var isButtonResetEnabled = false
 
+    private let store: LoggerStore
     private var cancellables: [AnyCancellable] = []
 
     init(store: LoggerStore) {
+        self.store = store
+
         if store === LoggerStore.shared {
             dates = .session
             defaultDates = .session
         }
 
-        $dates.dropFirst().sink { [weak self] _ in
+        Publishers.CombineLatest($dates, $filters).dropFirst().sink { [weak self] _ in
             self?.isButtonResetEnabled = true
             DispatchQueue.main.async { // important!
                 self?.dataNeedsReload.send()
@@ -32,11 +37,12 @@ final class ConsoleSharedSearchCriteriaViewModel: ObservableObject {
     }
 
     var isDefaultSearchCriteria: Bool {
-        isDatesDefault
+        isDatesDefault && filters == .default
     }
 
     func resetAll() {
         resetDates()
+        filters = .default
         isButtonResetEnabled = false
     }
 
@@ -46,5 +52,17 @@ final class ConsoleSharedSearchCriteriaViewModel: ObservableObject {
 
     func resetDates() {
         dates = defaultDates
+    }
+
+    func removeAllPins() {
+        store.pins.removeAllPins()
+
+        runHapticFeedback(.success)
+        ToastView {
+            HStack {
+                Image(systemName: "trash")
+                Text("All pins removed")
+            }
+        }.show()
     }
 }
