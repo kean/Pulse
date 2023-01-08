@@ -19,10 +19,6 @@ struct ConsoleDatesFilter: Hashable {
         ConsoleDatesFilter(startDate: Calendar.current.startOfDay(for: Date()))
     }
 
-    static var recent: ConsoleDatesFilter {
-        ConsoleDatesFilter(startDate: Date().addingTimeInterval(-3600))
-    }
-
     static var session: ConsoleDatesFilter {
         ConsoleDatesFilter(startDate: LoggerStore.launchDate)
     }

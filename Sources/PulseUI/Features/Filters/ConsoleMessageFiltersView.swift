@@ -281,7 +281,7 @@ struct ConsoleSharedFiltersView: View {
         DateRangePicker(title: "End", date: $viewModel.dates.endDate)
 
 #if os(iOS)
-        HStack(spacing: 8) {
+        HStack(spacing: 16) {
             Text("Quick Filters")
                 .lineLimit(1)
                 .foregroundColor(.secondary)
@@ -310,7 +310,6 @@ struct ConsoleSharedFiltersView: View {
     @ViewBuilder
     private var quickFilters: some View {
         Button("Session") { viewModel.dates = .session }
-        Button("Last Hour") { viewModel.dates = .recent }
         Button("Today") { viewModel.dates = .today }
     }
 }

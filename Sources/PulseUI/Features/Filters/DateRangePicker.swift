@@ -17,7 +17,13 @@ struct DateRangePicker: View {
         if let date = date {
             editView(date: date)
         } else {
-            addView
+#if os(iOS)
+            setDateView
+#else
+            HStack {
+                setDateView
+            }
+#endif
         }
     }
 
@@ -36,21 +42,16 @@ struct DateRangePicker: View {
             .foregroundColor(.red)
         }
     }
-
+    
     @ViewBuilder
-    private var addView: some View {
-#if os(iOS)
-            Button("Set \(title) Date") {
+    private var setDateView: some View {
+        Button("Set \(title) Date") {
+            if title == "End" {
                 date = Date()
+            } else {
+                date = Date().addingTimeInterval(-1200)
             }
-#else
-            HStack {
-                Button("Set \(title) Date") {
-                    date = Date()
-                }
-                Spacer()
-            }
-#endif
+        }
     }
 }
 #endif
