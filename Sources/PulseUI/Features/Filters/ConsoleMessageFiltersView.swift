@@ -284,7 +284,7 @@ struct ConsoleSharedFiltersView: View {
             icon: "calendar", title: "Time Period",
             color: .yellow,
             reset: { viewModel.dates = .default },
-            isDefault: viewModel.dates == .default,
+            isDefault: viewModel.isDefaultSearchCriteria,
             isEnabled: $viewModel.dates.isEnabled
         )
     }
