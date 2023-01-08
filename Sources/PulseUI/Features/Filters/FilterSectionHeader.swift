@@ -16,12 +16,22 @@ struct FilterSectionHeader: View {
 
 #if os(iOS)
     var body: some View {
-        Button(action: reset) {
+        HStack {
             Text(title)
             if !isDefault {
-                Image(systemName: "arrow.uturn.left")
+                Button(action: reset) {
+                    Image(systemName: "arrow.uturn.left")
+                }
+                .padding(.bottom, 3)
+            } else {
+                Button(action: {}) {
+                    Image(systemName: "arrow.uturn.left")
+                }
+                .padding(.bottom, 3)
+                .hidden()
+                .backport.hideAccessibility()
             }
-        }.disabled(isDefault)
+        }
     }
 #else
     var body: some View {
