@@ -40,12 +40,12 @@ struct DateRangePicker: View {
     @ViewBuilder
     private var addView: some View {
 #if os(iOS)
-            Button("Add \(title) Date") {
+            Button("Set \(title) Date") {
                 date = Date()
             }
 #else
             HStack {
-                Button("Add \(title) Date") {
+                Button("Set \(title) Date") {
                     date = Date()
                 }
                 Spacer()
