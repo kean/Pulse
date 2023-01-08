@@ -58,14 +58,14 @@ struct ConsoleMessageFiltersView: View {
 extension ConsoleMessageFiltersView {
     @ViewBuilder
     var formContents: some View {
+        if #available(iOS 14, *) {
+            ConsoleSharedFiltersView(viewModel: sharedCriteriaViewModel)
+        }
         if #available(iOS 15, *) {
             generalSection
         }
         logLevelsSection
         labelsSection
-        if #available(iOS 14, *) {
-            ConsoleSharedFiltersView(viewModel: sharedCriteriaViewModel)
-        }
     }
 
     var buttonReset: some View {
