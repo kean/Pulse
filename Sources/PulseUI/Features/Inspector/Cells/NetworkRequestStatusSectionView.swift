@@ -7,9 +7,12 @@ import Pulse
 
 struct NetworkRequestStatusSectionView: View {
     let viewModel: NetworkRequestStatusSectionViewModel
+    var showStatus = true
 
     var body: some View {
-        NetworkRequestStatusCell(viewModel: viewModel.status)
+        if showStatus {
+            NetworkRequestStatusCell(viewModel: viewModel.status)
+        }
         if let description = viewModel.errorDescription {
             NavigationLink(destination: destinaitionError) {
                 Text(description)
