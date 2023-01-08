@@ -57,6 +57,7 @@ final class ConsoleSharedSearchCriteriaViewModel: ObservableObject {
     func removeAllPins() {
         store.pins.removeAllPins()
 
+#if os(iOS)
         runHapticFeedback(.success)
         ToastView {
             HStack {
@@ -64,5 +65,6 @@ final class ConsoleSharedSearchCriteriaViewModel: ObservableObject {
                 Text("All pins removed")
             }
         }.show()
+#endif
     }
 }
