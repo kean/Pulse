@@ -47,13 +47,7 @@ struct PlaceholderView: View {
 
 extension PlaceholderView {
     static func make(viewModel: ConsoleViewModel) -> PlaceholderView {
-        let message: String
-        if viewModel.searchCriteriaViewModel.isDefaultSearchCriteria {
-            message = "There are no stored messages."
-        } else {
-            message = "There are no messages for the selected filters."
-        }
-        return PlaceholderView(imageName: "message", title: "No Messages", subtitle: message)
+        PlaceholderView(imageName: "message", title: "No Messages", subtitle: nil)
     }
 }
 
