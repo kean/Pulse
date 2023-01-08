@@ -26,53 +26,54 @@ public struct ConsoleView: View {
     public var body: some View {
         HStack {
             List {
-                Section {
-                    Text("Pulse")
-                        .font(.title)
-                        .foregroundColor(.secondary)
-                        .padding(.top, 46)
-                        .listRowBackground(Color.clear)
-                    Toggle(isOn: $viewModel.isOnlyErrors) {
-                        LabelBackport("Errors Only", systemImage: "exclamationmark.octagon")
-                    }
-                    Toggle(isOn: Binding(get: { viewModel.mode == .network }, set: { viewModel.mode = $0 ? .network : .all })) {
-                        LabelBackport("Network Only", systemImage: "paperplane")
-                    }
-                }
-                Section {
-                    NavigationLink(destination: SettingsView(store: viewModel.store)) {
-                        LabelBackport("Settings", systemImage: "gear")
-                    }
-                    if #available(tvOS 14, *) {
-                        NavigationLink(destination: StoreDetailsView(source: .store(viewModel.store))) {
-                            LabelBackport("Store Info", systemImage: "info.circle")
-                        }
-                    }
-                }
-                if !viewModel.store.isArchive {
-                    Section {
-                        if #available(tvOS 15, *) {
-                            Button(role: .destructive, action: viewModel.store.removeAll) {
-                                Label("Remove Logs", systemImage: "trash")
-                            }
-                        } else {
-                            Button(action: viewModel.store.removeAll) {
-                                LabelBackport("Remove Logs", systemImage: "trash")
-                            }
-                        }
-                    }
-                }
-            }
-            .listStyle(.grouped)
-            .frame(maxWidth: 540)
-
-            List {
                 ConsoleMessagesForEach(messages: viewModel.entities)
             }
+            ConsoleMenuView(viewModel: viewModel)
         }
         .backport.navigationTitle("Console")
         .onAppear(perform: viewModel.onAppear)
         .onDisappear(perform: viewModel.onDisappear)
+    }
+}
+
+private struct ConsoleMenuView: View {
+    @ObservedObject var viewModel: ConsoleViewModel
+
+    var body: some View {
+        Form {
+            Section {
+                Toggle(isOn: $viewModel.isOnlyErrors) {
+                    LabelBackport("Errors Only", systemImage: "exclamationmark.octagon")
+                }
+                Toggle(isOn: Binding(get: { viewModel.mode == .network }, set: { viewModel.mode = $0 ? .network : .all })) {
+                    LabelBackport("Network Only", systemImage: "paperplane")
+                }
+            }
+            Section {
+                NavigationLink(destination: SettingsView(store: viewModel.store)) {
+                    LabelBackport("Settings", systemImage: "gear")
+                }
+                if #available(tvOS 14, *) {
+                    NavigationLink(destination: StoreDetailsView(source: .store(viewModel.store))) {
+                        LabelBackport("Store Info", systemImage: "info.circle")
+                    }
+                }
+            }
+            if !viewModel.store.isArchive {
+                Section {
+                    if #available(tvOS 15, *) {
+                        Button(role: .destructive, action: viewModel.store.removeAll) {
+                            Label("Remove Logs", systemImage: "trash")
+                        }
+                    } else {
+                        Button(action: viewModel.store.removeAll) {
+                            LabelBackport("Remove Logs", systemImage: "trash")
+                        }
+                    }
+                }
+            }
+        }
+        .frame(maxWidth: 540)
     }
 }
 
