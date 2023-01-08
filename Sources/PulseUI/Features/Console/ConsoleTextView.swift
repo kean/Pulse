@@ -71,9 +71,6 @@ struct ConsoleTextView: View {
                 Label("Refresh", systemImage: "arrow.clockwise")
             }.disabled(viewModel.isButtonRefreshHidden)
         }
-        Section(header: Text("Search Options")) {
-            StringSearchOptionsMenu(options: $viewModel.text.searchOptions)
-        }
         Section {
             Button(action: { isShowingSettings = true }) {
                 Label("Settings", systemImage: "gearshape")
