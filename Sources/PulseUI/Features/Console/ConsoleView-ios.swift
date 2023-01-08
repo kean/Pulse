@@ -137,7 +137,7 @@ private struct ConsoleToolbarView: View {
     private var filters: some View {
         if !viewModel.isNetworkOnly {
             Button(action: viewModel.toggleMode) {
-                Image(systemName: viewModel.mode == .network ? "paperplane.fill" : "paperplane")
+                Image(systemName: viewModel.mode == .network ? "arrow.down.circle.fill" : "arrow.down.circle")
                     .font(.system(size: 20))
                     .foregroundColor(.accentColor)
             }.frame(width: 40, height: 44)

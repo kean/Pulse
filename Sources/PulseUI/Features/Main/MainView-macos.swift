@@ -210,7 +210,7 @@ private struct ConsoleToolbarModePickerButton: View {
 
     var body: some View {
         Button(action: viewModel.toggleMode) {
-            Image(systemName: viewModel.mode == .network ? "paperplane.fill" : "paperplane")
+            Image(systemName: viewModel.mode == .network ? "arrow.down.circle.fill" : "arrow.down.circle")
                 .foregroundColor(viewModel.mode == .network ? Color.accentColor : Color.secondary)
         }.help("Automatically Scroll to Recent Messages (⇧⌘N)")
     }

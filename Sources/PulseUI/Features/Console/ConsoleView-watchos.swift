@@ -21,7 +21,7 @@ struct ConsoleView: View {
         List {
             let stack = HStack {
                 Button(action: viewModel.toggleMode) {
-                    Image(systemName: "paperplane").font(.title3)
+                    Image(systemName: "arrow.down.circle").font(.title3)
                 }
                 .background(viewModel.mode == .network ? Rectangle().foregroundColor(.blue).cornerRadius(8) : nil)
                 Button(action: { viewModel.isOnlyErrors.toggle() }) {

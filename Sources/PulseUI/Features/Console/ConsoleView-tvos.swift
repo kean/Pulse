@@ -46,7 +46,7 @@ private struct ConsoleMenuView: View {
                     LabelBackport("Errors Only", systemImage: "exclamationmark.octagon")
                 }
                 Toggle(isOn: Binding(get: { viewModel.mode == .network }, set: { viewModel.mode = $0 ? .network : .all })) {
-                    LabelBackport("Network Only", systemImage: "paperplane")
+                    LabelBackport("Network Only", systemImage: "arrow.down.circle")
                 }
             }
             Section {
