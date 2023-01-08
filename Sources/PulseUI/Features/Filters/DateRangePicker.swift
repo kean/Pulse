@@ -32,25 +32,24 @@ struct DateRangePicker: View {
         HStack {
             let binding = Binding(get: { date }, set: { self.date = $0 })
             DatePicker(title, selection: binding)
+#if os(macOS)
                 .labelsHidden()
+#endif
             Spacer()
             Button(action: { self.date = nil }) {
                 Image(systemName: "minus.circle.fill")
                     .font(.system(size: 18))
             }
+            .padding(.trailing, -8)
             .buttonStyle(.plain)
             .foregroundColor(.red)
         }
     }
-    
+
     @ViewBuilder
     private var setDateView: some View {
         Button("Set \(title) Date") {
-            if title == "End" {
-                date = Date()
-            } else {
-                date = Date().addingTimeInterval(-1200)
-            }
+            date = Date()
         }
     }
 }
