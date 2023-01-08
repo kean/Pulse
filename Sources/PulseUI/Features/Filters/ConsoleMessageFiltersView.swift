@@ -152,7 +152,7 @@ extension ConsoleMessageFiltersView {
             icon: "flag", title: "Levels",
             color: .accentColor,
             reset: { viewModel.criteria.logLevels = .default },
-            isDefault: false,
+            isDefault: viewModel.criteria.logLevels == .default,
             isEnabled: $viewModel.criteria.logLevels.isEnabled
         )
     }

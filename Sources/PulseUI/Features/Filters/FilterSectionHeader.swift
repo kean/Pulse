@@ -16,23 +16,12 @@ struct FilterSectionHeader: View {
 
 #if os(iOS)
     var body: some View {
-        HStack(spacing: 0) {
-            HStack {
-                Image(systemName: icon)
-                    .foregroundColor(.accentColor)
-                Text(title.uppercased())
-            }
-            .font(.body)
-            Spacer()
-
-            Button(action: reset) {
+        Button(action: reset) {
+            Text(title)
+            if !isDefault {
                 Image(systemName: "arrow.uturn.left")
-                    .font(.system(size: 18))
-                    .foregroundColor(.accentColor)
             }
-            .frame(width: 34, height: 34)
-            .disabled(isDefault)
-        }.buttonStyle(.plain)
+        }.disabled(isDefault)
     }
 #else
     var body: some View {
