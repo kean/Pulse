@@ -44,7 +44,7 @@ final class ConsoleMessageSearchCriteriaViewModel: ObservableObject {
     }
 
     var isDefaultFilters: Bool {
-        filters == ConsoleSearchFilter.defaultFilters
+        filters.count == 1 && filters[0].isDefault
     }
 
     func resetAll() {
@@ -56,7 +56,7 @@ final class ConsoleMessageSearchCriteriaViewModel: ObservableObject {
     // MARK: Managing Custom Filters
 
     func resetFilters() {
-        filters = ConsoleSearchFilter.defaultFilters
+        filters = [.default]
         for filter in filters {
             subscribe(to: filter)
         }
@@ -66,7 +66,7 @@ final class ConsoleMessageSearchCriteriaViewModel: ObservableObject {
         guard !filters.isEmpty else {
             return resetFilters()
         }
-        let filter = ConsoleSearchFilter(id: UUID(), field: .message, match: .contains, value: "")
+        let filter = ConsoleSearchFilter.default
         filters.append(filter)
         subscribe(to: filter)
     }
@@ -83,7 +83,7 @@ final class ConsoleMessageSearchCriteriaViewModel: ObservableObject {
     }
 
     func removeFilter(_ filter: ConsoleSearchFilter) {
-        if let index = filters.firstIndex(of: filter) {
+        if let index = filters.firstIndex(where: { $0 === filter }) {
             filters.remove(at: index)
         }
         if filters.isEmpty {

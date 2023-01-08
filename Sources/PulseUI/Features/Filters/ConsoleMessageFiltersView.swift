@@ -5,6 +5,8 @@
 import SwiftUI
 import Pulse
 
+#warning("TODO: iOS apply filters when done pressed only")
+
 #if os(iOS) || os(macOS)
 
 struct ConsoleMessageFiltersView: View {
@@ -104,7 +106,7 @@ extension ConsoleMessageFiltersView {
     @ViewBuilder
     private var generalContent: some View {
         ForEach(viewModel.filters) { filter in
-            CustomFilterView(filter: filter, onRemove: viewModel.removeFilter)
+            CustomFilterView(filter: filter, onRemove: viewModel.removeFilter, isRemoveHidden: viewModel.isDefaultFilters)
                 .buttonStyle(.plain)
         }
         if !viewModel.isDefaultFilters {

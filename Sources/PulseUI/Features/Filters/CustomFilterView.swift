@@ -11,6 +11,7 @@ import Pulse
 struct CustomFilterView: View {
     @ObservedObject var filter: ConsoleSearchFilter
     let onRemove: (ConsoleSearchFilter) -> Void
+    let isRemoveHidden: Bool
 
     #if os(iOS)
 
@@ -32,7 +33,7 @@ struct CustomFilterView: View {
                     withAnimation { isEditing = isTextFieldFocused }
                 }
             if !isEditing {
-                if !filter.value.isEmpty || filter.id != ConsoleSearchFilter.defaultFilterId {
+                if !isRemoveHidden {
                     Button(action: { onRemove(filter) }) {
                         Image(systemName: "minus.circle.fill")
                             .font(.system(size: 18))

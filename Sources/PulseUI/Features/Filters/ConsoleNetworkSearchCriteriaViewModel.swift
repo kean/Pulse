@@ -27,7 +27,7 @@ final class ConsoleNetworkSearchCriteriaViewModel: ObservableObject {
     }
 
     var isDefaultFilters: Bool {
-        filters.count == 0 || (filters.count == 1 && filters == NetworkSearchFilter.defaultFilters)
+        filters.count == 1 && filters[0].isDefault
     }
 
     private var cancellables: [AnyCancellable] = []
@@ -71,7 +71,7 @@ final class ConsoleNetworkSearchCriteriaViewModel: ObservableObject {
     // MARK: Managing Custom Filters
 
     func resetFilters() {
-        filters = NetworkSearchFilter.defaultFilters
+        filters = [.default]
         for filter in filters {
             subscribe(to: filter)
         }
@@ -81,9 +81,8 @@ final class ConsoleNetworkSearchCriteriaViewModel: ObservableObject {
         guard !filters.isEmpty else {
             return resetFilters()
         }
-        let filter = NetworkSearchFilter(id: UUID(), field: .url, match: .contains, value: "")
+        let filter = NetworkSearchFilter.default
         filters.append(filter)
-
         subscribe(to: filter)
     }
 
@@ -98,7 +97,7 @@ final class ConsoleNetworkSearchCriteriaViewModel: ObservableObject {
     }
 
     func removeFilter(_ filter: NetworkSearchFilter) {
-        if let index = filters.firstIndex(of: filter) {
+        if let index = filters.firstIndex(where: { $0 === filter }) {
             filters.remove(at: index)
         }
         if filters.isEmpty {
@@ -107,7 +106,7 @@ final class ConsoleNetworkSearchCriteriaViewModel: ObservableObject {
     }
 
     var programmaticFilters: [NetworkSearchFilter]? {
-        let programmaticFilters = filters.filter { $0.isProgrammatic && $0.isReady }
+        let programmaticFilters = filters.filter { $0.isProgrammatic && !$0.value.isEmpty }
         guard !programmaticFilters.isEmpty && criteria.isFiltersEnabled else {
             return nil
         }

@@ -174,46 +174,26 @@ struct NetworkSearchCriteria: Hashable {
     }
 }
 
-final class NetworkSearchFilter: ObservableObject, Hashable, Identifiable {
-    let id: UUID
+final class NetworkSearchFilter: ObservableObject, Identifiable {
+    var id: ObjectIdentifier { ObjectIdentifier(self) }
     @Published var field: Field
     @Published var match: Match
     @Published var value: String
 
-    // The actual filters had to be moved to the viewmodel
-    static let defaultFilters = [NetworkSearchFilter(id: defaultFilterId, field: .url, match: .contains, value: "")]
-
-    static let defaultFilterId = UUID()
-
-    #warning("TODO: remove")
-    @available(*, deprecated, message: "Deprecated")
-    var isDefault: Bool {
-        field == .url && match == .contains && value == ""
+    static var `default`: NetworkSearchFilter {
+        NetworkSearchFilter(field: .url, match: .contains, value: "")
     }
 
-    init(id: UUID, field: Field, match: Match, value: String) {
-        self.id = id
+    var isDefault: Bool {
+        let lhs = self
+        let rhs = NetworkSearchFilter.default
+        return (lhs.field, lhs.match, lhs.value) == (rhs.field, rhs.match, rhs.value)
+    }
+
+    init(field: Field, match: Match, value: String) {
         self.field = field
         self.match = match
         self.value = value
-    }
-
-    static func == (lhs: NetworkSearchFilter, rhs: NetworkSearchFilter) -> Bool {
-        lhs.id == rhs.id &&
-        lhs.field == rhs.field &&
-        lhs.match == rhs.match &&
-        lhs.value == rhs.value
-    }
-
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
-        hasher.combine(field)
-        hasher.combine(match)
-        hasher.combine(value)
-    }
-
-    var isReady: Bool {
-        !value.isEmpty
     }
 
     enum Field {
@@ -407,7 +387,7 @@ extension NetworkSearchCriteria {
         }
 
         if criteria.isFiltersEnabled {
-            for filter in filters where filter.isReady {
+            for filter in filters where !filter.value.isEmpty {
                 if let predicate = filter.makePredicate() {
                     predicates.append(predicate)
                 } else {

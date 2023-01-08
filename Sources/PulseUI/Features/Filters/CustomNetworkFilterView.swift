@@ -11,6 +11,7 @@ import Pulse
 struct CustomNetworkFilterView: View {
     @ObservedObject var filter: NetworkSearchFilter
     let onRemove: (NetworkSearchFilter) -> Void
+    let isRemoveHidden: Bool
 #if os(iOS)
     
     @FocusState private var isTextFieldFocused: Bool
@@ -31,7 +32,7 @@ struct CustomNetworkFilterView: View {
                     withAnimation { isEditing = isTextFieldFocused }
                 }
             if !isEditing {
-                if !filter.value.isEmpty || filter.id != NetworkSearchFilter.defaultFilterId {
+                if !isRemoveHidden {
                     Button(action: { onRemove(filter) }) {
                         Image(systemName: "minus.circle.fill")
                             .font(.system(size: 18))

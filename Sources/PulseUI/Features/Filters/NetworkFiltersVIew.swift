@@ -124,7 +124,7 @@ extension NetworkFiltersView {
     @ViewBuilder
     private var generalGroupContent: some View {
         ForEach(viewModel.filters) { filter in
-            CustomNetworkFilterView(filter: filter, onRemove: viewModel.removeFilter)
+            CustomNetworkFilterView(filter: filter, onRemove: viewModel.removeFilter, isRemoveHidden: viewModel.isDefaultFilters)
                 .buttonStyle(.plain)
         }
         if !viewModel.isDefaultFilters {

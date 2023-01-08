@@ -64,32 +64,20 @@ final class ConsoleSearchFilter: ObservableObject, Identifiable {
     @Published var match: Match
     @Published var value: String
 
-    // The actual filters had to be moved to the viewmodel
-    static let defaultFilters = [ConsoleSearchFilter(id: defaultFilterId, field: .message, match: .contains, value: "")]
-
-    static let defaultFilterId = UUID()
-
-    var isDefault: Bool {
-        field == .message && match == .contains && value == ""
+    static var `default`: ConsoleSearchFilter {
+        ConsoleSearchFilter(field: .message, match: .contains, value: "")
     }
 
-    init(id: UUID, field: Field, match: Match, value: String) {
-        self.id = id
+    var isDefault: Bool {
+        let lhs = self
+        let rhs = ConsoleSearchFilter.default
+        return (lhs.field, lhs.match, lhs.value) == (rhs.field, rhs.match, rhs.value)
+    }
+
+    init(field: Field, match: Match, value: String) {
         self.field = field
         self.match = match
         self.value = value
-    }
-
-    static func == (lhs: ConsoleSearchFilter, rhs: ConsoleSearchFilter) -> Bool {
-        lhs === rhs
-    }
-
-    func hash(into hasher: inout Hasher) {
-        ObjectIdentifier(self).hash(into: &hasher)
-    }
-
-    var isReady: Bool {
-        !value.isEmpty
     }
 
     enum Field {
@@ -209,7 +197,7 @@ extension ConsoleMessageSearchCriteria {
         }
 
         if criteria.isFiltersEnabled {
-            for filter in filters where filter.isReady {
+            for filter in filters where !filter.value.isEmpty {
                 if let predicate = filter.makePredicate() {
                     predicates.append(predicate)
                 } else {
