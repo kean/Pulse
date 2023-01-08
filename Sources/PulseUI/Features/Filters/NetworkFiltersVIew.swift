@@ -80,9 +80,6 @@ extension NetworkFiltersView {
             generalGroup
         }
         responseGroup
-        if #available(iOS 14, *) {
-            durationGroup
-        }
         domainsGroup
         networkingGroup
     }
@@ -181,6 +178,9 @@ extension NetworkFiltersView {
         statusCodeRow
         contentTypeRow
         responseSizeRow
+        if #available(iOS 14, *) {
+            durationRow
+        }
     }
 
     @ViewBuilder
@@ -273,29 +273,10 @@ extension NetworkFiltersView {
 // MARK: - NetworkFiltersView (Duration)
 
 extension NetworkFiltersView {
-    @available(iOS 14, *)
-    var durationGroup: some View {
-        FiltersSection(
-            isExpanded: $isDurationGroupExpanded,
-            header: { durationGroupHeader },
-            content: { durationGroupContent }
-        )
-    }
-
-    private var durationGroupHeader: some View {
-        FilterSectionHeader(
-            icon: "hourglass", title: "Duration",
-            color: .yellow,
-            reset: { viewModel.criteria.duration = .default },
-            isDefault: viewModel.criteria.duration == .default,
-            isEnabled: $viewModel.criteria.duration.isEnabled
-        )
-    }
-
 #if os(iOS)
     @available(iOS 14, *)
     @ViewBuilder
-    private var durationGroupContent: some View {
+    private var durationRow: some View {
         HStack {
             Text("Duration")
             Spacer()
@@ -309,7 +290,7 @@ extension NetworkFiltersView {
     }
 #elseif os(macOS)
     @ViewBuilder
-    private var durationGroupContent: some View {
+    private var durationRow: some View {
         HStack {
             durationMinField
             durationMaxField
