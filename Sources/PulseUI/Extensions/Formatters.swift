@@ -46,9 +46,9 @@ enum ConsoleFormatter {
     static func subheadline(for message: LoggerMessageEntity, hasTime: Bool = true) -> String {
         return [
             hasTime ? time(for: message.createdAt) : nil,
-            message.logLevel.name,
+            message.logLevel.name.uppercased(),
             label(for: message)
-        ].compactMap { $0 }.joined(separator: separator).uppercased()
+        ].compactMap { $0 }.joined(separator: separator)
     }
 
     static func label(for message: LoggerMessageEntity) -> String? {
@@ -56,7 +56,7 @@ enum ConsoleFormatter {
         guard label != "default", !label.isEmpty else {
             return nil
         }
-        return label.uppercased()
+        return label.capitalized
     }
 
     static func subheadline(for task: NetworkTaskEntity, hasTime: Bool = true) -> String {
