@@ -62,11 +62,24 @@ struct ConsoleNetworkRequestView: View {
     }
 
     private var title: some View {
-        HStack(spacing: 12) {
-            Text(ConsoleFormatter.subheadline(for: viewModel.task))
+        HStack {
+            HStack(spacing: 16) {
+                Circle()
+                    .frame(width: 20, height: 20)
+                    .foregroundColor(viewModel.badgeColor)
+                Text(ConsoleFormatter.subheadline(for: viewModel.task, hasTime: false))
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            Spacer()
+            let time = Text(viewModel.time)
                 .font(.caption)
                 .foregroundColor(.secondary)
-            Spacer()
+            if #available(tvOS 15, watchOS 8, *) {
+                time.monospacedDigit()
+            } else {
+                time
+            }
         }
     }
 #else

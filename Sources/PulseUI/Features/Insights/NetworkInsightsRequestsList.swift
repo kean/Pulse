@@ -7,7 +7,7 @@ import CoreData
 import Pulse
 import Combine
 
-#if os(iOS)
+#if os(iOS) || os(tvOS)
 
 struct NetworkInsightsRequestsList: View {
     @ObservedObject var viewModel: NetworkInsightsRequestsListViewModel

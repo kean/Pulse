@@ -38,6 +38,11 @@ public struct ConsoleView: View {
                     NavigationLink(destination: SettingsView(store: viewModel.store)) {
                         LabelBackport("Settings", systemImage: "gear")
                     }
+                    if #available(tvOS 14, *) {
+                        NavigationLink(destination: StoreDetailsView(source: .store(viewModel.store))) {
+                            LabelBackport("Store Info", systemImage: "info.circle")
+                        }
+                    }
                 }
             }
             .listStyle(.grouped)

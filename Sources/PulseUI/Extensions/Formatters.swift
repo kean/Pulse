@@ -50,12 +50,12 @@ enum ConsoleFormatter {
         ].joined(separator: separator)
     }
 
-    static func subheadline(for task: NetworkTaskEntity) -> String {
+    static func subheadline(for task: NetworkTaskEntity, hasTime: Bool = true) -> String {
         return [
-            time(for: task.createdAt),
+            hasTime ? time(for: task.createdAt) : nil,
             task.httpMethod ?? "GET",
             details(for: task)
-        ].joined(separator: separator)
+        ].compactMap { $0 }.joined(separator: separator)
     }
 
     static func time(for date: Date) -> String {
