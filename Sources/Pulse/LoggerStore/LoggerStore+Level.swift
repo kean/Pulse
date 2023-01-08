@@ -11,14 +11,14 @@ extension LoggerStore {
     public typealias Metadata = [String: MetadataValue]
 
     // Compatible with SwiftLog.Logger.Level
-    @frozen public enum Level: Int16, CaseIterable, Codable, Hashable, Sendable, RawRepresentable {
+    @frozen public enum Level: Int16, CaseIterable, Codable, Hashable, Sendable, RawRepresentable, Comparable {
         case trace = 1
-        case debug
-        case info
-        case notice
-        case warning
-        case error
-        case critical
+        case debug = 2
+        case info = 3
+        case notice = 4
+        case warning = 5
+        case error = 6
+        case critical = 7
 
         public var name: String {
             switch self {
@@ -30,6 +30,10 @@ extension LoggerStore {
             case .error: return "error"
             case .critical: return "critical"
             }
+        }
+
+        public static func < (lhs: LoggerStore.Level, rhs: LoggerStore.Level) -> Bool {
+            lhs.rawValue < rhs.rawValue
         }
     }
 }

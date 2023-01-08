@@ -51,7 +51,7 @@ final class ConsoleMessageTableCell: UITableViewCell, UIContextMenuInteractionDe
 
         var titleAttributes = titleAttributes
         let logLevel = viewModel.message.logLevel
-        if logLevel == .error || logLevel == .critical {
+        if logLevel >= .warning {
             titleAttributes[.foregroundColor] = UXColor.textColor(for: viewModel.message.logLevel)
         }
 
