@@ -279,17 +279,28 @@ struct ConsoleSharedFiltersView: View {
         DateRangePicker(title: "Start", date: $viewModel.dates.startDate)
         DateRangePicker(title: "End", date: $viewModel.dates.endDate)
 
+#if os(iOS)
         HStack(spacing: 16) {
             Text("Quick Filters").foregroundColor(.secondary)
             Button("Recent") { viewModel.dates = .recent }
             Button("Today") { viewModel.dates = .today }
             Spacer()
         }
-#if os(iOS)
         .foregroundColor(.accentColor)
         .buttonStyle(.plain)
 #elseif os(macOS)
-        .padding(.top, 6)
+        VStack(spacing: 8) {
+            HStack {
+                Text("Quick Filters").foregroundColor(.secondary)
+                Spacer()
+            }
+            HStack(spacing: 12) {
+                Button("Recent") { viewModel.dates = .recent }
+                Button("Today") { viewModel.dates = .today }
+                Spacer()
+            }
+        }
+        .padding(.top, 8)
 #endif
     }
 }

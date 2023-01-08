@@ -8,52 +8,51 @@ import Pulse
 import Combine
 
 #if os(iOS) || os(macOS)
-
 @available(iOS 14, *)
 struct DateRangePicker: View {
     let title: String
     @Binding var date: Date?
 
-#if os(iOS)
     var body: some View {
+        if let date = date {
+            editView(date: date)
+        } else {
+            addView
+        }
+    }
+
+    @ViewBuilder
+    private func editView(date: Date) -> some View {
         HStack {
-            if let date = date {
-                Text(title)
-                Spacer()
-                let binding = Binding(get: { date }, set: { self.date = $0 })
-                DatePicker(title, selection: binding)
-                    .labelsHidden()
-                Button(action: { self.date = nil }) {
-                    Image(systemName: "minus.circle.fill")
-                        .font(.system(size: 18))
-                }
-                .buttonStyle(.plain)
-                .foregroundColor(.red)
-                .padding(.leading, 6)
-                .padding(.trailing, -6)
-            } else {
+            let binding = Binding(get: { date }, set: { self.date = $0 })
+            DatePicker(title, selection: binding)
+                .labelsHidden()
+            Spacer()
+            Button(action: { self.date = nil }) {
+                Image(systemName: "minus.circle.fill")
+                    .font(.system(size: 18))
+            }
+            .buttonStyle(.plain)
+            .foregroundColor(.red)
+            .padding(.leading, 6)
+            .padding(.trailing, -6)
+        }
+    }
+
+    @ViewBuilder
+    private var addView: some View {
+#if os(iOS)
+            Button("Add \(title) Date") {
+                date = Date()
+            }
+#else
+            HStack {
                 Button("Add \(title) Date") {
                     date = Date()
                 }
-            }
-        }
-    }
-#endif
-
-#if os(macOS)
-    var body: some View {
-        VStack(spacing: 5) {
-            HStack {
-                Toggle(title, isOn: $isEnabled)
                 Spacer()
             }
-            DatePicker(title, selection: $date)
-                .disabled(!isEnabled)
-                .fixedSize()
-                .labelsHidden()
-        }
-    }
 #endif
+    }
 }
-
 #endif
