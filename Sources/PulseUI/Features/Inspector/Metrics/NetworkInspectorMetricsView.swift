@@ -5,8 +5,6 @@
 import SwiftUI
 import Pulse
 
-#if os(iOS) || os(macOS) || os(tvOS)
-
 // MARK: - View
 
 struct NetworkInspectorMetricsView: View {
@@ -51,4 +49,3 @@ struct NetworkInspectorMetricsView_Previews: PreviewProvider {
 }
 #endif
 
-#endif

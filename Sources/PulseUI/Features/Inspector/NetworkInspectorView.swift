@@ -90,7 +90,7 @@ struct NetworkInspectorView: View {
     }
 #elseif os(watchOS)
     var contents: some View {
-        Form {
+        List {
             Section {
                 viewModel.statusSectionViewModel.map(NetworkRequestStatusSectionView.init)
             }
@@ -117,6 +117,9 @@ struct NetworkInspectorView: View {
                             .padding(.bottom, 16)
                     }
                     sectionResponse
+                }
+                Section {
+                    sectionMetrics
                 }
             }
         }
@@ -180,10 +183,9 @@ struct NetworkInspectorView: View {
         viewModel.responseCookiesViewModel.map(NetworkCookiesCell.init)
     }
 
-#if os(iOS) || os(tvOS) || os(macOS)
     @ViewBuilder
     private var sectionMetrics: some View {
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(macOS) || os(watchOS)
         NavigationLink(destination: destinationMetrics) {
             NetworkMenuCell(
                 icon: "clock.fill",
@@ -195,7 +197,6 @@ struct NetworkInspectorView: View {
 #endif
         NetworkCURLCell(task: viewModel.task)
     }
-#endif
 
     // MARK: - Subviews
 
@@ -246,13 +247,11 @@ struct NetworkInspectorView: View {
 
     // MARK: - Destinations
 
-#if !os(watchOS)
     private var destinationMetrics: some View {
         NetworkInspectorMetricsViewModel(task: viewModel.task).map {
             NetworkInspectorMetricsView(viewModel: $0)
         }
     }
-#endif
 
     // MARK: - Helpers
 

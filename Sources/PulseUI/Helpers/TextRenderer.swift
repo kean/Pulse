@@ -278,7 +278,11 @@ final class TextRenderer {
         let separatorAttributes = helper.attributes(role: .body2, style: style, color: .secondaryLabel)
         for (key, value) in values {
             string.append(key, keyAttributes)
+#if os(watchOS)
+            string.append(":\n", separatorAttributes)
+#else
             string.append(": ", separatorAttributes)
+#endif
             string.append("\(value ?? "–")\n", valueAttributes)
         }
         return string

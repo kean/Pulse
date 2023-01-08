@@ -4,8 +4,6 @@
 
 import SwiftUI
 
-#if os(iOS) || os(macOS) || os(tvOS)
-
 struct TimingView: View {
     let viewModel: TimingViewModel
 
@@ -69,11 +67,13 @@ private struct TimingRowView: View {
             }.layoutPriority(1)
 
             bar
-            
+
+#if !os(watchOS)
             ZStack(alignment: .leading) {
                 makeValue(viewModel.value)
                 makeValue(parent.longestValue).invisible() // Calculates width
             }.layoutPriority(1)
+#endif
         }
     }
 
@@ -162,7 +162,9 @@ final class TimingRowViewModel: Identifiable {
 #if DEBUG
 struct TimingView_Previews: PreviewProvider {
     static var previews: some View {
-        TimingView(viewModel: .init(sections: mockSections))
+        ScrollView {
+            TimingView(viewModel: .init(sections: mockSections))
+        }
             .padding()
 #if !os(tvOS)
             .previewLayout(.sizeThatFits)
@@ -181,6 +183,4 @@ private let mockSections = [
         TimingRowViewModel(title: "Download", value: "30.0ms", color: .systemGreen, start: 0.75, length: 100.0)
     ])
 ]
-#endif
-
 #endif
