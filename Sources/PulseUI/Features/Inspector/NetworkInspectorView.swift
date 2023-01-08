@@ -93,6 +93,9 @@ struct NetworkInspectorView: View {
         List {
             Section {
                 viewModel.statusSectionViewModel.map(NetworkRequestStatusSectionView.init)
+                if #available(watchOS 9.0, *), let url = ShareService.share(viewModel.task, as: .html).items.first as? URL {
+                    ShareLink(item: url)
+                }
             }
             Section {
                 viewModel.transferViewModel.map {
