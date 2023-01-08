@@ -44,6 +44,19 @@ public struct ConsoleView: View {
                         }
                     }
                 }
+                if !viewModel.store.isArchive {
+                    Section {
+                        if #available(tvOS 15, *) {
+                            Button(role: .destructive, action: viewModel.store.removeAll) {
+                                Label("Remove Logs", systemImage: "trash")
+                            }
+                        } else {
+                            Button(action: viewModel.store.removeAll) {
+                                LabelBackport("Remove Logs", systemImage: "trash")
+                            }
+                        }
+                    }
+                }
             }
             .listStyle(.grouped)
             .frame(maxWidth: 540)
