@@ -23,7 +23,11 @@ final class ConsoleNetworkSearchCriteriaViewModel: ObservableObject {
     let dataNeedsReload = PassthroughSubject<Void, Never>()
 
     var isDefaultSearchCriteria: Bool {
-        criteria == defaultCriteria && (filters.count == 0 || (filters.count == 1 && filters == NetworkSearchFilter.defaultFilters))
+        criteria == defaultCriteria && isDefaultFilters
+    }
+
+    var isDefaultFilters: Bool {
+        filters.count == 0 || (filters.count == 1 && filters == NetworkSearchFilter.defaultFilters)
     }
 
     private var cancellables: [AnyCancellable] = []
@@ -74,7 +78,10 @@ final class ConsoleNetworkSearchCriteriaViewModel: ObservableObject {
     }
 
     func addFilter() {
-        let filter = NetworkSearchFilter(id: UUID(), field: .url, match: .equal, value: "")
+        guard !filters.isEmpty else {
+            return resetFilters()
+        }
+        let filter = NetworkSearchFilter(id: UUID(), field: .url, match: .contains, value: "")
         filters.append(filter)
 
         subscribe(to: filter)

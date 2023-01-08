@@ -7,34 +7,43 @@ import Pulse
 
 #if os(iOS) || os(macOS)
 
-@available(iOS 14, *)
+@available(iOS 15, *)
 struct CustomNetworkFilterView: View {
     @ObservedObject var filter: NetworkSearchFilter
     let onRemove: () -> Void
     
 #if os(iOS)
     
+    @FocusState private var isTextFieldFocused: Bool
+    @State private var isEditing = false
+
     var body: some View {
-        VStack(spacing: 10) {
-            HStack(spacing: 0) {
-                fieldMenu
-                Spacer().frame(width: 8)
-                matchMenu
-                Spacer(minLength: 0)
-                Button(action: onRemove) {
-                    Image(systemName: "minus.circle")
-                        .font(.system(size: 18))
-                }
-                .buttonStyle(.plain)
-                .foregroundColor(Color.red)
+        HStack(spacing: 8) {
+            if !isEditing {
+                fieldMenu.lineLimit(1).layoutPriority(1)
+                matchMenu.lineLimit(1).layoutPriority(1)
             }
             TextField("Value", text: $filter.value)
+                .focused($isTextFieldFocused)
                 .textFieldStyle(.roundedBorder)
                 .disableAutocorrection(true)
                 .autocapitalization(.none)
+                .onChange(of: isTextFieldFocused) { isTextFieldFocused in
+                    withAnimation { isEditing = isTextFieldFocused }
+                }
+            if !isEditing {
+                Button(action: onRemove) {
+                    Image(systemName: "minus.circle.fill")
+                        .font(.system(size: 18))
+                }
+                .buttonStyle(.plain)
+                .foregroundColor(.red)
+                .padding(.leading, 6)
+            } else {
+                Button("Cancel") { isTextFieldFocused = false }.foregroundColor(.blue)
+            }
         }
-        .padding(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 4))
-        .cornerRadius(8)
+        .padding(EdgeInsets(top: 2, leading: -4, bottom: 2, trailing: -8))
     }
     
     private var fieldMenu: some View {

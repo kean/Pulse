@@ -73,7 +73,7 @@ struct NetworkFiltersView: View {
 extension NetworkFiltersView {
     @ViewBuilder
     var formContents: some View {
-        if #available(iOS 14, *) {
+        if #available(iOS 15, *) {
             generalGroup
         }
         responseGroup
@@ -96,7 +96,7 @@ extension NetworkFiltersView {
 // MARK: - NetworkFiltersView (General)
 
 extension NetworkFiltersView {
-    @available(iOS 14, *)
+    @available(iOS 15, *)
     var generalGroup: some View {
         FiltersSection(
             isExpanded: $isGeneralGroupExpanded,
@@ -111,14 +111,14 @@ extension NetworkFiltersView {
             icon: "line.horizontal.3.decrease.circle", title: "General",
             color: .yellow,
             reset: { viewModel.resetFilters() },
-            isDefault: viewModel.filters.count == 1 && viewModel.filters[0].isDefault,
+            isDefault: viewModel.isDefaultFilters,
             isEnabled: $viewModel.criteria.isFiltersEnabled
         )
     }
 
 #if os(iOS)
 
-    @available(iOS 14, *)
+    @available(iOS 15, *)
     @ViewBuilder
     private var generalGroupContent: some View {
         ForEach(viewModel.filters) { filter in
