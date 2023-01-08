@@ -92,7 +92,7 @@ final class ConsoleMessageViewModel: Pinnable {
 }
 
 extension UXColor {
-    static func textColor(for level: LoggerStore.Level) -> UIColor {
+    static func textColor(for level: LoggerStore.Level) -> UXColor {
         switch level {
         case .trace: return .secondaryLabel
         case .debug, .info: return .label
