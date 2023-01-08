@@ -148,7 +148,6 @@ struct NetworkInspectorView: View {
                 }
             }
             .listStyle(.plain)
-            .frame(width: 1000)
             Form {
                 Section {
                     viewModel.statusSectionViewModel.map(NetworkRequestStatusSectionView.init)
@@ -166,6 +165,7 @@ struct NetworkInspectorView: View {
                     }
                 }
             }
+            .frame(width: 700)
         }
     }
 #endif

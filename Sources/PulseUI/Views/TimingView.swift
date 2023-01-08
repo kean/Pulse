@@ -9,9 +9,11 @@ struct TimingView: View {
 
     var body: some View {
 #if os(tvOS)
-        List(viewModel.sections) {
-            TimingSectionView(viewModel: $0, parent: viewModel)
-        }.frame(maxWidth: 1000)
+        ForEach(viewModel.sections) { item in
+            Section {
+                TimingSectionView(viewModel: item, parent: viewModel)
+            }
+        }
 #else
         VStack(spacing: 16) {
             ForEach(viewModel.sections) {
@@ -53,14 +55,16 @@ private struct TimingRowView: View {
 
 #if os(tvOS)
     let barHeight: CGFloat = 20
+    let spacing: CGFloat = 48
 #else
     let barHeight: CGFloat = 14
+    let spacing: CGFloat = 12
 #endif
 
     @Environment(\.sizeCategory) var sizeCategory
 
     var body: some View {
-        HStack(alignment: .center, spacing: 12) {
+        HStack(alignment: .center, spacing: spacing) {
             ZStack(alignment: .leading) {
                 makeTitle(viewModel.title)
                 makeTitle(parent.longestTitle).invisible() // Calculates width

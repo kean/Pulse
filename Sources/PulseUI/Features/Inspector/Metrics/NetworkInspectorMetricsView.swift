@@ -45,6 +45,9 @@ struct NetworkInspectorMetricsView_Previews: PreviewProvider {
                 task: LoggerStore.preview.entity(for: .createAPI)
             )!)
         }
+        #if os(tvOS)
+        .frame(width: 900)
+        #endif
     }
 }
 #endif
