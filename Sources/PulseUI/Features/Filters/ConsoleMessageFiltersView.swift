@@ -288,17 +288,19 @@ struct ConsoleSharedFiltersView: View {
         .foregroundColor(.accentColor)
         .buttonStyle(.plain)
 #elseif os(macOS)
-        VStack(spacing: 8) {
+        VStack(spacing: 4) {
             HStack {
                 Text("Quick Filters").foregroundColor(.secondary)
                 Spacer()
             }
-            HStack(spacing: 12) {
+            HStack(spacing: 8) {
                 quickFilters
                 Spacer()
             }
+            .foregroundColor(.accentColor)
+            .buttonStyle(.plain)
         }
-        .padding(.top, 8)
+        .padding(.top, 4)
 #endif
     }
 
