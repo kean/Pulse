@@ -283,8 +283,8 @@ struct ConsoleSharedFiltersView: View {
         FilterSectionHeader(
             icon: "calendar", title: "Time Period",
             color: .yellow,
-            reset: { viewModel.dates = .default },
-            isDefault: viewModel.isDefaultSearchCriteria,
+            reset: viewModel.resetDates,
+            isDefault: viewModel.isDatesDefault,
             isEnabled: $viewModel.dates.isEnabled
         )
     }

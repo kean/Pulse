@@ -32,11 +32,19 @@ final class ConsoleSharedSearchCriteriaViewModel: ObservableObject {
     }
 
     var isDefaultSearchCriteria: Bool {
-        dates == defaultDates
+        isDatesDefault
     }
 
     func resetAll() {
-        dates = defaultDates
+        resetDates()
         isButtonResetEnabled = false
+    }
+
+    var isDatesDefault: Bool {
+        dates == defaultDates
+    }
+
+    func resetDates() {
+        dates = defaultDates
     }
 }
