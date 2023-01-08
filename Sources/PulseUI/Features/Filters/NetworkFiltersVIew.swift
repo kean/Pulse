@@ -107,7 +107,7 @@ extension NetworkFiltersView {
 
     private var generalGroupHeader: some View {
         FilterSectionHeader(
-            icon: "line.horizontal.3.decrease.circle", title: "Filters",
+            icon: "line.horizontal.3.decrease.circle", title: "General",
             color: .yellow,
             reset: { viewModel.resetFilters() },
             isDefault: viewModel.isDefaultFilters,
@@ -278,7 +278,7 @@ extension NetworkFiltersView {
             durationMinField
             durationMaxField
             Menu(content: { durationUnitPicker }, label: {
-                FilterPickerButton(title: viewModel.criteria.duration.unit.localizedTitle)
+                FilterPickerButton(title: viewModel.criteria.response.duration.unit.localizedTitle)
             })
             .animation(.none)
         }
@@ -295,7 +295,7 @@ extension NetworkFiltersView {
 #endif
 
     private var durationMinField: some View {
-        TextField("Min", text: $viewModel.criteria.duration.min)
+        TextField("Min", text: $viewModel.criteria.response.duration.min)
             .textFieldStyle(.roundedBorder)
 #if os(iOS)
             .keyboardType(.decimalPad)
@@ -304,7 +304,7 @@ extension NetworkFiltersView {
     }
 
     private var durationMaxField: some View {
-        TextField("Max", text: $viewModel.criteria.duration.max)
+        TextField("Max", text: $viewModel.criteria.response.duration.max)
             .textFieldStyle(.roundedBorder)
 #if os(iOS)
             .keyboardType(.decimalPad)
@@ -313,7 +313,7 @@ extension NetworkFiltersView {
     }
 
     private var durationUnitPicker: some View {
-        Picker("Unit", selection: $viewModel.criteria.duration.unit) {
+        Picker("Unit", selection: $viewModel.criteria.response.duration.unit) {
             Text("Min").tag(NetworkSearchCriteria.DurationFilter.Unit.minutes)
             Text("Sec").tag(NetworkSearchCriteria.DurationFilter.Unit.seconds)
             Text("Ms").tag(NetworkSearchCriteria.DurationFilter.Unit.milliseconds)

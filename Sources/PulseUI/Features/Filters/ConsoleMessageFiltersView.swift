@@ -91,7 +91,7 @@ extension ConsoleMessageFiltersView {
 
     private var generalHeader: some View {
         FilterSectionHeader(
-            icon: "line.horizontal.3.decrease.circle", title: "Filters",
+            icon: "line.horizontal.3.decrease.circle", title: "General",
             color: .yellow,
             reset: { viewModel.resetFilters() },
             isDefault: viewModel.isDefaultFilters,

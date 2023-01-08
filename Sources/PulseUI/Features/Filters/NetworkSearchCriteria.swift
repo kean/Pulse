@@ -13,7 +13,6 @@ struct NetworkSearchCriteria: Hashable {
 
     var response = ResponseFilter.default
     var host = HostFilter.default
-    var duration = DurationFilter.default
     var networking = NetworkingFilter.default
 
     static let `default` = NetworkSearchCriteria()
@@ -27,6 +26,7 @@ struct NetworkSearchCriteria: Hashable {
         var statusCode = StatusCodeFilter()
         var contentType = ContentTypeFilter()
         var responseSize = ResponseSizeFilter()
+        var duration = DurationFilter()
 
         static let `default` = ResponseFilter()
     }
@@ -112,8 +112,6 @@ struct NetworkSearchCriteria: Hashable {
         var maxSeconds: TimeInterval? {
             TimeInterval(max).map(unit.convert)
         }
-
-        static let `default` = DurationFilter()
     }
 
     struct ContentTypeFilter: Hashable {
@@ -346,11 +344,11 @@ extension NetworkSearchCriteria {
             }
         }
 
-        if criteria.duration.isEnabled {
-            if let value = criteria.duration.minSeconds {
+        if criteria.response.duration.isEnabled {
+            if let value = criteria.response.duration.minSeconds {
                 predicates.append(NSPredicate(format: "duration >= %f", value))
             }
-            if let value = criteria.duration.maxSeconds {
+            if let value = criteria.response.duration.maxSeconds {
                 predicates.append(NSPredicate(format: "duration <= %f", value))
             }
         }
