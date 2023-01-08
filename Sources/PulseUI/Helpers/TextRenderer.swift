@@ -86,10 +86,6 @@ final class TextRenderer {
             components.append(header)
         }
 
-        if content.contains(.taskDetails) {
-            append(section: .makeTaskDetails(for: task))
-        }
-
         if content.contains(.header) {
             let title = ConsoleFormatter.subheadline(for: task)
             let header = NSMutableAttributedString()
@@ -98,6 +94,10 @@ final class TextRenderer {
             urlAttributes[.underlineColor] = UXColor.clear
             header.append((task.url ?? "–") + "\n", urlAttributes)
             components.append(header)
+        }
+
+        if content.contains(.taskDetails) {
+            append(section: .makeTaskDetails(for: task))
         }
 
         func append(section: KeyValueSectionViewModel?, count: Bool) {
@@ -308,12 +308,17 @@ final class TextRenderer {
 
     static func share(_ entities: [NSManagedObject]) -> NSAttributedString {
         let renderer = TextRenderer(options: .sharing)
+        var content = NetworkContent.sharing
+        if entities.count > 1 {
+            content.remove(.largeHeader)
+            content.insert(.header)
+        }
         return renderer.joined(entities.map {
             if let task = $0 as? NetworkTaskEntity {
-                return renderer.render(task, content: .sharing)
+                return renderer.render(task, content: content)
             } else if let message = $0 as? LoggerMessageEntity {
                 if let task = message.task {
-                    return renderer.render(task, content: .sharing)
+                    return renderer.render(task, content: content)
                 } else {
                     return renderer.render(message)
                 }

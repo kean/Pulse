@@ -7,7 +7,15 @@ import Pulse
 import CoreData
 
 enum ShareStoreOutput: String, RawRepresentable {
-    case store, text
+    case store, text, html
+
+    var fileExtension: String {
+        switch self {
+        case .store: return ".pulse"
+        case .text: return ".txt"
+        case .html: return ".html"
+        }
+    }
 }
 
 struct ShareItems: Identifiable {

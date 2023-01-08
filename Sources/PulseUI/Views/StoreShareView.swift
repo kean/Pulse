@@ -62,12 +62,9 @@ struct ShareStoreView: View {
                 Text("Error").tag(LoggerStore.Level.error)
             }
             Picker("Output Format", selection: $viewModel.output) {
-                Text("File (.pulse)")
-                    .lineLimit(1)
-                    .tag(ShareStoreOutput.store)
-                Text("Text (.txt)")
-                    .lineLimit(1)
-                    .tag(ShareStoreOutput.text)
+                Text("Pulse File").tag(ShareStoreOutput.store)
+                Text("Plain Text").tag(ShareStoreOutput.text)
+                Text("HTML").tag(ShareStoreOutput.html)
             }
         }
     }
@@ -191,8 +188,9 @@ private final class ShareStoreViewModel: ObservableObject {
 
         let context = store.backgroundContext
         let predicate = self.predicate
+        let output = self.output
         context.perform {
-            self.prepareForSharing(store: store, context: context, predicate: predicate)
+            self.prepareForSharing(store: store, context: context, predicate: predicate, output: output)
         }
     }
 
@@ -218,10 +216,10 @@ private final class ShareStoreViewModel: ObservableObject {
         return NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
     }
 
-    private func prepareForSharing(store: LoggerStore, context: NSManagedObjectContext, predicate: NSPredicate?) {
+    private func prepareForSharing(store: LoggerStore, context: NSManagedObjectContext, predicate: NSPredicate?, output: ShareStoreOutput) {
         let directory = TemporaryDirectory()
         do {
-            let contents = try prepareForSharing(store: store, context: context, directory: directory, predicate: predicate)
+            let contents = try prepareForSharing(store: store, context: context, directory: directory, predicate: predicate, output: output)
             DispatchQueue.main.async {
                 self.sharedContents = contents
                 self.didFinishPreparingForSharing()
@@ -244,31 +242,28 @@ private final class ShareStoreViewModel: ObservableObject {
         }
     }
 
-    private func prepareForSharing(store: LoggerStore, context: NSManagedObjectContext, directory: TemporaryDirectory, predicate: NSPredicate?) throws -> SharedContents {
-        let logsURL: URL
+    private func prepareForSharing(store: LoggerStore, context: NSManagedObjectContext, directory: TemporaryDirectory, predicate: NSPredicate?, output: ShareStoreOutput) throws -> SharedContents {
+        let logsURL = directory.url.appendingPathComponent("logs-\(makeCurrentDate()).\(output.fileExtension)")
+
+        func makeString() throws -> NSAttributedString {
+            let request = NSFetchRequest<LoggerMessageEntity>(entityName: "\(LoggerMessageEntity.self)")
+            request.predicate = predicate
+            let messages = try context.fetch(request)
+            return TextRenderer.share(messages)
+        }
+
         var info: LoggerStore.Info?
         switch output {
         case .store:
-            logsURL = directory.url.appendingPathComponent("logs-\(makeCurrentDate()).pulse")
             if let predicate = predicate {
                 info = try store.copy(to: logsURL, predicate: predicate)
             } else {
                 info = try store.copy(to: logsURL)
             }
         case .text:
-            let request = NSFetchRequest<LoggerMessageEntity>(entityName: "\(LoggerMessageEntity.self)")
-            request.predicate = predicate
-            let messages: [LoggerMessageEntity] = try context.fetch(request)
-            let renderer = TextRenderer(options: .sharing)
-            let text = renderer.joined(messages.map {
-                if let task = $0.task {
-                    return renderer.render(task, content: .sharing)
-                } else {
-                    return renderer.render($0)
-                }
-            }).string
-            logsURL = directory.url.appendingPathComponent("logs-\(makeCurrentDate()).txt")
-            try text.data(using: .utf8)?.write(to: logsURL)
+            try makeString().string.data(using: .utf8)?.write(to: logsURL)
+        case .html:
+            try TextUtilities.html(from: makeString()).write(to: logsURL)
         }
         let item = ShareItems([logsURL], cleanup: directory.remove)
         return SharedContents(item: item, size: try logsURL.getFileSize(), info: info)
