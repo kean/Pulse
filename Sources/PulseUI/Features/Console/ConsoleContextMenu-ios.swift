@@ -15,29 +15,34 @@ import UniformTypeIdentifiers
 struct ConsoleContextMenu: View {
     private let store: LoggerStore
     private let insights: InsightsViewModel
-    private let isShowingAsText: Binding<Bool>?
+
+    @Binding var isShowingAsText: Bool
 
     @State private var isShowingSettings = false
     @State private var isShowingStoreInfo = false
     @State private var isShowingInsights = false
+    @State private var isShowingShareStore = false
     @State private var isDocumentBrowserPresented = false
 
-    init(store: LoggerStore, insights: InsightsViewModel, isShowingAsText: Binding<Bool>? = nil) {
+    init(store: LoggerStore, insights: InsightsViewModel, isShowingAsText: Binding<Bool>) {
         self.store = store
         self.insights = insights
-        self.isShowingAsText = isShowingAsText
+        self._isShowingAsText = isShowingAsText
     }
 
     var body: some View {
         Menu {
-            if let isShowingAsText = isShowingAsText {
-                Section {
-                    Button(action: { isShowingAsText.wrappedValue.toggle() }) {
-                        if isShowingAsText.wrappedValue {
-                            Label("View as List", systemImage: "list.bullet.rectangle.portrait")
-                        } else {
-                            Label("View as Text", systemImage: "text.quote")
-                        }
+            Section {
+                Button(action: { isShowingAsText.toggle() }) {
+                    if isShowingAsText {
+                        Label("View as List", systemImage: "list.bullet.rectangle.portrait")
+                    } else {
+                        Label("View as Text", systemImage: "text.quote")
+                    }
+                }
+                if !store.isArchive {
+                    Button(action: { isShowingInsights = true }) {
+                        Label("Insights", systemImage: "chart.pie")
                     }
                 }
             }
@@ -45,14 +50,16 @@ struct ConsoleContextMenu: View {
                 Button(action: { isShowingStoreInfo = true }) {
                     Label("Store Info", systemImage: "info.circle")
                 }
+                Button(action: { isShowingShareStore = true }) {
+                    Label("Share Store", systemImage: "square.and.arrow.up")
+                }
                 if !store.isArchive {
-                    Button(action: { isShowingInsights = true }) {
-                        Label("Insights", systemImage: "chart.pie")
-                    }
                     Button(action: { isDocumentBrowserPresented = true }) {
                         Label("Browse Logs", systemImage: "folder")
                     }
                 }
+            }
+            Section {
                 Button(action: { isShowingSettings = true }) {
                     Label("Settings", systemImage: "gear")
                 }
@@ -72,7 +79,6 @@ struct ConsoleContextMenu: View {
             }
             Section {
                 if !UserDefaults.standard.bool(forKey: "pulse-disable-support-prompts") {
-                    Text("Pulse is funded by the community contributions")
                     Button(action: buttonSponsorTapped) {
                         Label("Sponsor", systemImage: "heart")
                     }
@@ -110,6 +116,11 @@ struct ConsoleContextMenu: View {
                     })
             }
         }
+        .sheet(isPresented: $isShowingShareStore) {
+            NavigationView {
+                ShareStoreView(store: store, isPresented: $isShowingShareStore)
+            }.backport.presentationDetents([.medium])
+           }
         .fullScreenCover(isPresented: $isDocumentBrowserPresented) {
             DocumentBrowser()
         }
