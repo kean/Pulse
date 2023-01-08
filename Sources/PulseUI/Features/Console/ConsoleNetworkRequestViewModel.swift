@@ -19,19 +19,6 @@ final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
     private(set) var title: String = ""
     private(set) var text: String = ""
 
-    var fullTitle: String {
-        var title = self.title
-#if !os(watchOS)
-        if state == .pending, let details = progress.details {
-            title += " · \(details)"
-        }
-#endif
-#if os(macOS) || os(tvOS)
-        title += " · \(time)"
-#endif
-        return title
-    }
-
     private(set) var state: NetworkTaskEntity.State = .pending
 
     private(set) lazy var progress = ProgressViewModel(task: task)

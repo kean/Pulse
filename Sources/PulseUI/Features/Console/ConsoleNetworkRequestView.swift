@@ -105,7 +105,7 @@ struct ConsoleNetworkRequestView: View {
     private var title: some View {
         HStack(alignment: .firstTextBaseline, spacing: spacing) {
             statusCircle
-            Text(viewModel.fullTitle)
+            Text(ConsoleFormatter.subheadline(for: viewModel.task, hasTime: false))
                 .lineLimit(1)
                 .font(fonts.title)
                 .foregroundColor(.secondary)

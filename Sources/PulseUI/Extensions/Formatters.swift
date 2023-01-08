@@ -13,20 +13,20 @@ enum DurationFormatter {
     static func string(from timeInterval: TimeInterval, isPrecise: Bool) -> String {
         if timeInterval < 0.95 {
             if isPrecise {
-                return String(format: "%.1f ms", timeInterval * 1000)
+                return String(format: "%.1fms", timeInterval * 1000)
             } else {
-                return String(format: "%.0f ms", timeInterval * 1000)
+                return String(format: "%.0fms", timeInterval * 1000)
             }
         }
         if timeInterval < 200 {
-            return String(format: "%.\(isPrecise ? "3" : "1")f s", timeInterval)
+            return String(format: "%.\(isPrecise ? "3" : "1")fs", timeInterval)
         }
         let minutes = timeInterval / 60
         if minutes < 60 {
-            return String(format: "%.1f min", minutes)
+            return String(format: "%.1fmin", minutes)
         }
         let hours = timeInterval / (60 * 60)
-        return String(format: "%.1f h", hours)
+        return String(format: "%.1fh", hours)
     }
 }
 
@@ -64,7 +64,7 @@ enum ConsoleFormatter {
             hasTime ? time(for: task.createdAt) : nil,
             task.httpMethod ?? "GET",
             details(for: task)
-        ].compactMap { $0 }.joined(separator: separator).uppercased()
+        ].compactMap { $0 }.joined(separator: separator)
     }
 
     static func time(for date: Date) -> String {

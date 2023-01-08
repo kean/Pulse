@@ -49,6 +49,12 @@ final class ConsoleMessageTableCell: UITableViewCell, UIContextMenuInteractionDe
     func display(_ viewModel: ConsoleMessageViewModel) {
         self.viewModel = viewModel
 
+        var titleAttributes = titleAttributes
+        let logLevel = viewModel.message.logLevel
+        if logLevel == .error || logLevel == .critical {
+            titleAttributes[.foregroundColor] = UXColor.textColor(for: viewModel.message.logLevel)
+        }
+
         details.numberOfLines = ConsoleSettings.shared.lineLimit
         title.attributedText = NSAttributedString(string: ConsoleFormatter.subheadline(for: viewModel.message, hasTime: false), attributes: titleAttributes)
         details.text = viewModel.text
@@ -98,7 +104,6 @@ final class ConsoleMessageTableCell: UITableViewCell, UIContextMenuInteractionDe
 final class ConsoleMessageAccessoryView: UIView {
     let textLabel = UILabel()
 
-    #warning("TODO: update font")
     private static var chevron = UIImage.make(systemName: "chevron.right", textStyle: .caption1)
         .imageFlippedForRightToLeftLayoutDirection()
 
