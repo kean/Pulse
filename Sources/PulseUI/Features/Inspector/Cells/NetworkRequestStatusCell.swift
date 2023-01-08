@@ -36,7 +36,15 @@ struct NetworkRequestStatusCell: View {
                 .foregroundColor(viewModel.tintColor)
             Spacer()
             viewModel.duration.map(DurationLabel.init)
-        }.font(.headline)
+        }
+#if os(tvOS)
+        .font(.system(size: 40, weight: .bold))
+        .padding(.bottom, 16)
+        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+        .listRowBackground(Color.clear)
+#else
+        .font(.headline)
+#endif
     }
 
     #endif
