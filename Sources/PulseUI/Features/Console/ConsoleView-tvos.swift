@@ -24,11 +24,53 @@ public struct ConsoleView: View {
     }
 
     public var body: some View {
-        List {
-            ConsoleMessagesForEach(messages: viewModel.entities)
+        HStack {
+            List {
+                Section {
+                    Toggle(isOn: $viewModel.isOnlyErrors) {
+                        LabelBackport("Errors Only", systemImage: "exclamationmark.octagon")
+                    }
+                    Toggle(isOn: Binding(get: { viewModel.mode == .network }, set: { viewModel.mode = $0 ? .network : .all })) {
+                        LabelBackport("Network Only", systemImage: "paperplane")
+                    }
+                }
+                Section {
+                    NavigationLink(destination: SettingsView(store: viewModel.store)) {
+                        LabelBackport("Settings", systemImage: "gear")
+                    }
+                }
+            }
+            .listStyle(.grouped)
+            .frame(maxWidth: 500)
+
+            List {
+                ConsoleMessagesForEach(messages: viewModel.entities)
+            }
         }
+        .backport.navigationTitle("Console")
         .onAppear(perform: viewModel.onAppear)
         .onDisappear(perform: viewModel.onDisappear)
+    }
+}
+
+struct LabelBackport: View {
+    let title: String
+    let systemImage: String
+
+    init(_ title: String, systemImage: String) {
+        self.title = title
+        self.systemImage = systemImage
+    }
+
+    var body: some View {
+        if #available(tvOS 14.0, *) {
+            Label(title, systemImage: systemImage)
+        } else {
+            HStack(spacing: 16) {
+                Image(systemName: "gear")
+                Text("Settings")
+            }
+        }
     }
 }
 
