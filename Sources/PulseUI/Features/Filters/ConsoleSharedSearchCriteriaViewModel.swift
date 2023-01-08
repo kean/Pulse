@@ -39,24 +39,4 @@ final class ConsoleSharedSearchCriteriaViewModel: ObservableObject {
         dates = defaultDates
         isButtonResetEnabled = false
     }
-
-    // MARK: Bindings
-
-    var bindingStartDate: Binding<Date> {
-        Binding(get: {
-            self.dates.startDate ?? Date().addingTimeInterval(-3600)
-        }, set: { newValue in
-            self.dates.isStartDateEnabled = true
-            self.dates.startDate = newValue
-        })
-    }
-
-    var bindingEndDate: Binding<Date> {
-        Binding(get: {
-            self.dates.endDate ?? Date()
-        }, set: { newValue in
-            self.dates.isEndDateEnabled = true
-            self.dates.endDate = newValue
-        })
-    }
 }

@@ -12,20 +12,30 @@ import Combine
 @available(iOS 14, *)
 struct DateRangePicker: View {
     let title: String
-    @Binding var date: Date
-    @Binding var isEnabled: Bool
+    @Binding var date: Date?
 
 #if os(iOS)
     var body: some View {
-        HStack(alignment: .center) {
-            VStack(alignment: .leading, spacing: 8) {
+        HStack {
+            if let date = date {
                 Text(title)
-                DatePicker(title, selection: $date)
+                Spacer()
+                let binding = Binding(get: { date }, set: { self.date = $0 })
+                DatePicker(title, selection: binding)
                     .labelsHidden()
+                Button(action: { self.date = nil }) {
+                    Image(systemName: "minus.circle.fill")
+                        .font(.system(size: 18))
+                }
+                .buttonStyle(.plain)
+                .foregroundColor(.red)
+                .padding(.leading, 6)
+                .padding(.trailing, -6)
+            } else {
+                Button("Add \(title) Date") {
+                    date = Date()
+                }
             }
-            Spacer()
-            Toggle(title, isOn: $isEnabled)
-                .labelsHidden()
         }
     }
 #endif

@@ -26,9 +26,7 @@ struct ConsoleMessageSearchCriteria: Hashable {
     struct DatesFilter: Hashable {
         var isEnabled = true
         var isCurrentSessionOnly = true
-        var isStartDateEnabled = false
         var startDate: Date?
-        var isEndDateEnabled = false
         var endDate: Date?
 
         static let `default` = DatesFilter()
@@ -42,7 +40,7 @@ struct ConsoleMessageSearchCriteria: Hashable {
         }
 
         static func make(startDate: Date, endDate: Date? = nil) -> DatesFilter {
-            DatesFilter(isEnabled: true, isCurrentSessionOnly: false, isStartDateEnabled: true, startDate: startDate, isEndDateEnabled: endDate != nil, endDate: endDate)
+            DatesFilter(isEnabled: true, isCurrentSessionOnly: false, startDate: startDate, endDate: endDate)
         }
     }
 
@@ -190,10 +188,10 @@ extension ConsoleMessageSearchCriteria {
         }
 
         if criteria.dates.isEnabled {
-            if criteria.dates.isStartDateEnabled, let startDate = criteria.dates.startDate {
+            if let startDate = criteria.dates.startDate {
                 predicates.append(NSPredicate(format: "createdAt >= %@", startDate as NSDate))
             }
-            if criteria.dates.isEndDateEnabled, let endDate = criteria.dates.endDate {
+            if let endDate = criteria.dates.endDate {
                 predicates.append(NSPredicate(format: "createdAt <= %@", endDate as NSDate))
             }
         }

@@ -156,22 +156,4 @@ final class ConsoleMessageSearchCriteriaViewModel: ObservableObject {
             }
         })
     }
-
-    var bindingStartDate: Binding<Date> {
-        Binding(get: {
-            self.criteria.dates.startDate ?? Date().addingTimeInterval(-3600)
-        }, set: { newValue in
-            self.criteria.dates.isStartDateEnabled = true
-            self.criteria.dates.startDate = newValue
-        })
-    }
-
-    var bindingEndDate: Binding<Date> {
-        Binding(get: {
-            self.criteria.dates.endDate ?? Date()
-        }, set: { newValue in
-            self.criteria.dates.isEndDateEnabled = true
-            self.criteria.dates.endDate = newValue
-        })
-    }
 }

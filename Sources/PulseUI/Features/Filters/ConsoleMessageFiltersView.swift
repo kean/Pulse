@@ -276,10 +276,11 @@ struct ConsoleSharedFiltersView: View {
     private var timePeriodContent: some View {
         Filters.toggle("Latest Session", isOn: $viewModel.dates.isCurrentSessionOnly)
 
-        DateRangePicker(title: "Start Date", date: viewModel.bindingStartDate, isEnabled: $viewModel.dates.isStartDateEnabled)
-        DateRangePicker(title: "End Date", date: viewModel.bindingEndDate, isEnabled: $viewModel.dates.isEndDateEnabled)
+        DateRangePicker(title: "Start", date: $viewModel.dates.startDate)
+        DateRangePicker(title: "End", date: $viewModel.dates.endDate)
 
         HStack(spacing: 16) {
+            Text("Quick Filters").foregroundColor(.secondary)
             Button("Recent") { viewModel.dates = .recent }
             Button("Today") { viewModel.dates = .today }
             Spacer()

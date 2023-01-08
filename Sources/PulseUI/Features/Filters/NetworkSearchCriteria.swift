@@ -336,10 +336,10 @@ extension NetworkSearchCriteria {
         }
 
         if dates.isEnabled {
-            if dates.isStartDateEnabled, let startDate = dates.startDate {
+            if let startDate = dates.startDate {
                 predicates.append(NSPredicate(format: "createdAt >= %@", startDate as NSDate))
             }
-            if dates.isEndDateEnabled, let endDate = dates.endDate {
+            if let endDate = dates.endDate {
                 predicates.append(NSPredicate(format: "createdAt <= %@", endDate as NSDate))
             }
         }
