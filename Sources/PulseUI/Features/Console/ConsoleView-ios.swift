@@ -99,7 +99,12 @@ private struct ConsoleToolbarView: View {
     var body: some View {
         VStack(spacing: 8) {
             HStack(spacing: 0) {
-                SearchBar(title: "Search \(viewModel.entities.count) messages", text: $viewModel.filterTerm, isSearching: $isSearching)
+                let suffix = viewModel.mode == .network ? "Requests" : "Messages"
+                SearchBar(
+                    title: "\(viewModel.entities.count) \(suffix)",
+                    text: $viewModel.filterTerm,
+                    isSearching: $isSearching
+                )
                 if !isSearching {
                     filters
                 } else {
