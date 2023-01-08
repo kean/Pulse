@@ -13,9 +13,8 @@ import UniformTypeIdentifiers
 
 @available(iOS 14, *)
 struct ConsoleContextMenu: View {
-    private let store: LoggerStore
-    private let insights: InsightsViewModel
-
+    let store: LoggerStore
+    let insights: InsightsViewModel
     @Binding var isShowingAsText: Bool
 
     @State private var isShowingSettings = false
@@ -23,12 +22,6 @@ struct ConsoleContextMenu: View {
     @State private var isShowingInsights = false
     @State private var isShowingShareStore = false
     @State private var isDocumentBrowserPresented = false
-
-    init(store: LoggerStore, insights: InsightsViewModel, isShowingAsText: Binding<Bool>) {
-        self.store = store
-        self.insights = insights
-        self._isShowingAsText = isShowingAsText
-    }
 
     var body: some View {
         Menu {
