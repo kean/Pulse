@@ -11,7 +11,7 @@ import Combine
 
 public struct ConsoleView: View {
     @ObservedObject var viewModel: ConsoleViewModel
-    @State private var isSharing = false
+    @State private var shareItems: ShareItems?
     @State private var isShowingAsText = false
 
     public init(store: LoggerStore = .shared) {
@@ -38,19 +38,24 @@ public struct ConsoleView: View {
                     Button(action: $0) { Image(systemName: "xmark") }
                 },
                 trailing: HStack {
-                    ShareButton { isSharing = true }
+                    if #available(iOS 14, *) {
+                        Menu(content: {
+                            AttributedStringShareMenu(shareItems: $shareItems) {
+                                TextRenderer.share(viewModel.entities)
+                            }
+                        }, label: { Image(systemName: "square.and.arrow.up") })
+                    } else {
+                        ShareButton {
+                            shareItems = ShareItems([ TextRenderer.share(viewModel.entities).string])
+                        }
+                    }
+
                     if #available(iOS 14, *) {
                         ConsoleContextMenu(store: viewModel.store, insights: viewModel.insightsViewModel, isShowingAsText: $isShowingAsText)
                     }
                 }
             )
-            .sheet(isPresented: $isSharing) {
-                if #available(iOS 14, *) {
-                    NavigationView {
-                        ShareStoreView(store: viewModel.store, isPresented: $isSharing)
-                    }.backport.presentationDetents([.medium])
-                }
-            }
+            .sheet(item: $shareItems, content: ShareView.init)
             .sheet(isPresented: $isShowingAsText) {
                 if #available(iOS 14, *) {
                     NavigationView {

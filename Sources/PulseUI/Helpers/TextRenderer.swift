@@ -303,6 +303,25 @@ final class TextRenderer {
         let attributes = helper.attributes(role: role, style: style, weight: weight, width: width, color: color)
         return NSAttributedString(string: string, attributes: attributes)
     }
+
+    // MARK: Sharing
+
+    static func share(_ entities: [NSManagedObject]) -> NSAttributedString {
+        let renderer = TextRenderer(options: .sharing)
+        return renderer.joined(entities.map {
+            if let task = $0 as? NetworkTaskEntity {
+                return renderer.render(task, content: .sharing)
+            } else if let message = $0 as? LoggerMessageEntity {
+                if let task = message.task {
+                    return renderer.render(task, content: .sharing)
+                } else {
+                    return renderer.render(message)
+                }
+            } else {
+                fatalError("Unsuppported entity: \($0)")
+            }
+        })
+    }
 }
 
 
