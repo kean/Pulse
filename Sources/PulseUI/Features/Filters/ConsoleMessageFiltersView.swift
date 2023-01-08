@@ -92,7 +92,7 @@ extension ConsoleMessageFiltersView {
             icon: "line.horizontal.3.decrease.circle", title: "General",
             color: .yellow,
             reset: { viewModel.resetFilters() },
-            isDefault: viewModel.filters.count == 1 && viewModel.filters[0].isDefault,
+            isDefault: viewModel.isDefaultFilters,
             isEnabled: $viewModel.criteria.isFiltersEnabled
         )
     }

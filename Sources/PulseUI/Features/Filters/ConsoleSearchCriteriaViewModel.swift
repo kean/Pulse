@@ -45,7 +45,11 @@ final class ConsoleMessageSearchCriteriaViewModel: ObservableObject {
     }
 
     var isDefaultSearchCriteria: Bool {
-        criteria == defaultCriteria && (filters.count == 0 || (filters.count == 1 && filters == ConsoleSearchFilter.defaultFilters))
+        criteria == defaultCriteria && isDefaultFilters
+    }
+
+    var isDefaultFilters: Bool {
+        filters.count == 0 || (filters.count == 1 && filters == ConsoleSearchFilter.defaultFilters)
     }
 
     func resetAll() {
