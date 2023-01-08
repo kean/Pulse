@@ -71,6 +71,7 @@ public struct MainView: View {
 }
 
 #warning("TODO: this is incomplete")
+#warning("TODO: try to implement using selection https://stackoverflow.com/questions/72778176/swiftui-navigationsplitview-reset-detail-view-when-sidebar-selection-changes")
 
 @available(macOS 13.0, *)
 private struct ConsoleContainerView: View {
