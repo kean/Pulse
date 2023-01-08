@@ -104,19 +104,28 @@ typealias UXPasteboard = UIPasteboard
 #if os(tvOS)
 extension UIColor {
     static var systemBackground: UIColor { .white }
-    static var systemGray4: UIColor { systemGray.withAlphaComponent(0.7) }
-    static var systemGray3: UIColor { systemGray.withAlphaComponent(0.8) }
     static var systemGray2: UIColor { systemGray.withAlphaComponent(0.9) }
+    static var systemGray3: UIColor { systemGray.withAlphaComponent(0.8) }
+    static var systemGray4: UIColor { systemGray.withAlphaComponent(0.7) }
     static var controlBackgroundColor: UIColor { .clear }
 }
 #endif
 
 #if os(watchOS)
 extension UXColor {
-    static let label = UXColor(Color.primary)
-    static let secondaryLabel = UXColor(Color.secondary)
-    static let systemOrange = UXColor(Color.orange)
-    static let systemRed = UXColor(Color.red)
+    static let label = UIColor(Color.primary)
+    static let secondaryLabel = UIColor(Color.secondary)
+    static let systemOrange = UIColor(Color.orange)
+    static let systemRed = UIColor(Color.red)
+    static let systemBlue = UIColor(Color.blue)
+    static let systemYellow = UIColor(Color.yellow)
+    static let systemGreen = UIColor(Color.green)
+    static let systemTeal = UIColor(Color.indigo) // not available
+    static let systemPurple = UIColor(Color.purple)
+    static var systemGray = UIColor(Color.gray)
+    static var systemGray2: UIColor { systemGray.withAlphaComponent(0.9) }
+    static var systemGray3: UIColor { systemGray.withAlphaComponent(0.8) }
+    static var systemGray4: UIColor { systemGray.withAlphaComponent(0.7) }
 }
 #endif
 

@@ -193,15 +193,7 @@ extension ConsoleMessageFiltersView {
             Spacer()
             ForEach(levels, id: \.self) { level in
                 Toggle(level.name.capitalized, isOn: viewModel.binding(forLevel: level))
-                    .accentColor(tintColor(for: level))
             }
-        }
-    }
-
-    private func tintColor(for level: LoggerStore.Level) -> Color {
-        switch level {
-        case .trace, .debug: return Color.primary.opacity(0.66)
-        default: return Color.textColor(for: level)
         }
     }
 }

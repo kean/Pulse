@@ -59,10 +59,10 @@ final class TextRenderer {
     }
 
     private func textColor(for level: LoggerStore.Level) -> UXColor {
-        if #available(iOS 14, tvOS 14, *), options.color != .monochrome {
-            return level == .trace ? .secondaryLabel : UXColor(ConsoleMessageStyle.textColor(level: level))
+        if options.color == .monochrome {
+            return level == .trace ? .secondaryLabel : .label
         } else {
-            return .label
+            return . textColor(for: level)
         }
     }
 
@@ -278,7 +278,11 @@ final class TextRenderer {
         let separatorAttributes = helper.attributes(role: .body2, style: style, color: .secondaryLabel)
         for (key, value) in values {
             string.append(key, keyAttributes)
+#if os(watchOS)
+            string.append(":\n", separatorAttributes)
+#else
             string.append(": ", separatorAttributes)
+#endif
             string.append("\(value ?? "–")\n", valueAttributes)
         }
         return string

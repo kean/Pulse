@@ -10,6 +10,30 @@ import Combine
 struct ConsoleMessageView: View {
     let viewModel: ConsoleMessageViewModel
 
+#if os(watchOS)
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack {
+                Text(viewModel.message.logLevel.name.uppercased())
+                    .font(.system(size: 14))
+                    .foregroundColor(.secondary)
+                Spacer()
+                let time = Text(viewModel.time)
+                    .font(.system(size: 14))
+                    .foregroundColor(.secondary)
+                if #available(watchOS 8, *) {
+                    time.monospacedDigit()
+                } else {
+                    time
+                }
+            }
+            Text(viewModel.message.text)
+                .font(.system(size: 15))
+                .foregroundColor(.textColor(for: viewModel.message.logLevel))
+                .lineLimit(ConsoleSettings.shared.lineLimit)
+        }
+    }
+#else
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(alignment: .firstTextBaseline) {
@@ -23,7 +47,7 @@ struct ConsoleMessageView: View {
         }
         .padding(.vertical, 4)
     }
-    
+
     private var title: some View {
         badge + (Text(viewModel.title)
             .foregroundColor(.secondary)
@@ -33,42 +57,35 @@ struct ConsoleMessageView: View {
 #warning("TODO: simplify this on tvos")
     private var badge: Text {
         var separator: Text {
-#if os(watchOS)
-            return Text("\n")
-#else
             return Text(" · ")
                 .font(fonts.title)
                 .foregroundColor(.secondary)
-#endif
         }
         return Text(viewModel.level)
             .font(fonts.title)
             .foregroundColor(.secondary)
         + separator
     }
-    
+
     private var pin: some View {
         Image(systemName: "pin")
             .font(fonts.title)
             .foregroundColor(.secondary)
     }
-    
+
     private var text: some View {
         Text(viewModel.text)
             .font(fonts.body)
             .foregroundColor(viewModel.textColor)
     }
-    
+
     private struct Fonts {
         let title: Font
         let body: Font
     }
-    
-#if os(watchOS)
-    private let fonts = Fonts(title: .system(size: 12), body: .system(size: 15))
-#else
+
     private let fonts = Fonts(title: .body, body: .body)
-#endif
+    #endif
 }
 
 #if DEBUG

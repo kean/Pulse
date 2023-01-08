@@ -116,7 +116,6 @@ extension KeyValueSectionViewModel {
         )
     }
 
-#if os(iOS) || os(macOS) || os(tvOS)
     static func makeDetails(for transaction: NetworkTransactionMetricsEntity) -> [KeyValueSectionViewModel] {
         return [
             makeTiming(for: transaction),
@@ -158,11 +157,12 @@ extension KeyValueSectionViewModel {
         addDate(timing.requestEndDate, title: "Request End")
         addDate(timing.responseStartDate, title: "Response Start")
         addDate(timing.responseEndDate, title: "Response End")
-
+#if !os(watchOS)
         let longestTitleCount = items.map(\.0.count).max() ?? 0
         items = items.map {
             ($0.0.padding(toLength: longestTitleCount + 1, withPad: " ", startingAt: 0), $0.1)
         }
+#endif
         return KeyValueSectionViewModel(title: "Timing", color: .orange, items: items)
     }
 
@@ -209,7 +209,6 @@ extension KeyValueSectionViewModel {
             ("Multipath", metrics.isMultipath.description)
         ])
     }
-#endif
 }
 
 private func formatBytes(_ count: Int64) -> String {

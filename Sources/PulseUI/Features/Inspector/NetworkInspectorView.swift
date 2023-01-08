@@ -90,26 +90,46 @@ struct NetworkInspectorView: View {
     }
 #elseif os(watchOS)
     var contents: some View {
-        Form {
-            Section {
-                transferStatusView
-            }
-            .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
-            .listRowBackground(Color.clear)
-
+        List {
             Section {
                 viewModel.statusSectionViewModel.map(NetworkRequestStatusSectionView.init)
             }
             Section {
+                viewModel.transferViewModel.map {
+                    NetworkInspectorTransferInfoView(viewModel: $0)
+                        .hideReceived()
+                        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+                        .listRowBackground(Color.clear)
+                        .padding(.top, 8)
+                        .padding(.bottom, 16)
+                }
                 requestTypePicker
                 sectionRequest
             }
             if viewModel.task.state != .pending {
                 Section {
+                    viewModel.transferViewModel.map {
+                        NetworkInspectorTransferInfoView(viewModel: $0)
+                            .hideSent()
+                            .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+                            .listRowBackground(Color.clear)
+                            .padding(.top, 8)
+                            .padding(.bottom, 16)
+                    }
                     sectionResponse
+                }
+                Section {
+                    sectionMetrics
                 }
             }
         }
+#if os(watchOS)
+        .toolbar {
+            if #available(watchOS 9.0, *), let url = ShareService.share(viewModel.task, as: .html).items.first as? URL {
+                ShareLink(item: url)
+            }
+        }
+#endif
     }
 #elseif os(tvOS)
     var contents: some View {
@@ -170,10 +190,9 @@ struct NetworkInspectorView: View {
         viewModel.responseCookiesViewModel.map(NetworkCookiesCell.init)
     }
 
-#if os(iOS) || os(tvOS) || os(macOS)
     @ViewBuilder
     private var sectionMetrics: some View {
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(macOS) || os(watchOS)
         NavigationLink(destination: destinationMetrics) {
             NetworkMenuCell(
                 icon: "clock.fill",
@@ -185,12 +204,12 @@ struct NetworkInspectorView: View {
 #endif
         NetworkCURLCell(task: viewModel.task)
     }
-#endif
 
     // MARK: - Subviews
 
     #warning("TODO: this fallback isn't ideal on other paltforms only on ios")
 
+#if os(iOS) || os(macOS) || os(tvOS)
     @ViewBuilder
     private var transferStatusView: some View {
         ZStack {
@@ -209,6 +228,7 @@ struct NetworkInspectorView: View {
             } // Should never happen
         }
     }
+#endif
 
     @ViewBuilder
     private var requestTypePicker: some View {
@@ -234,13 +254,11 @@ struct NetworkInspectorView: View {
 
     // MARK: - Destinations
 
-#if !os(watchOS)
     private var destinationMetrics: some View {
         NetworkInspectorMetricsViewModel(task: viewModel.task).map {
             NetworkInspectorMetricsView(viewModel: $0)
         }
     }
-#endif
 
     // MARK: - Helpers
 
@@ -293,11 +311,15 @@ struct NetworkInspectorView_Previews: PreviewProvider {
 #else
             NavigationView {
                 NetworkInspectorView(viewModel: .init(task: LoggerStore.preview.entity(for: .login)))
-            }.previewDisplayName("Success")
+            }
+            .navigationViewStyle(.stack)
+            .previewDisplayName("Success")
 
             NavigationView {
                 NetworkInspectorView(viewModel: .init(task: LoggerStore.preview.entity(for: .patchRepo)))
-            }.previewDisplayName("Failure")
+            }
+            .navigationViewStyle(.stack)
+            .previewDisplayName("Failure")
 #endif
         }
     }

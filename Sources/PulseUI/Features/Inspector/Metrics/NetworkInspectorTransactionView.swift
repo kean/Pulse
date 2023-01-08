@@ -6,8 +6,6 @@ import SwiftUI
 import Pulse
 import CoreData
 
-#if os(iOS) || os(macOS) || os(tvOS)
-
 struct NetworkInspectorTransactionView: View {
     @ObservedObject var viewModel: NetworkInspectorTransactionViewModel
 
@@ -15,11 +13,13 @@ struct NetworkInspectorTransactionView: View {
         Section(header: Text(viewModel.title)) {
             NetworkRequestStatusCell(viewModel: viewModel.statusViewModel)
             viewModel.timingViewModel.map(TimingView.init)
+#if !os(watchOS)
             viewModel.transferSizeViewModel.map {
                 NetworkInspectorTransferInfoView(viewModel: $0)
                     .hideDivider()
                     .padding(.vertical, 8)
             }
+#endif
             NetworkRequestInfoCell(viewModel: viewModel.requestViewModel)
             NavigationLink(destination: destintionTransactionDetails) {
                 Text("Transaction Details")
@@ -51,7 +51,7 @@ final class NetworkInspectorTransactionViewModel: ObservableObject, Identifiable
         self.timingViewModel = TimingViewModel(transaction: transaction, task: task)
 
         if transaction.fetchType == .networkLoad {
-            self.transferSizeViewModel = NetworkInspectorTransferInfoViewModel(transferSize: transaction.transferSize, isUpload: false)
+            self.transferSizeViewModel = NetworkInspectorTransferInfoViewModel(transferSize: transaction.transferSize)
         } else {
             self.transferSizeViewModel = nil
         }
@@ -74,13 +74,12 @@ struct NetworkInspectorTransactionView_Previews: PreviewProvider {
                 }
             }
         }
+#if os(watchOS)
+        .navigationViewStyle(.stack)
+#endif
     }
 }
 
-//private let mockModel = NetworkInspectorTransactionViewModel(transaction: mockTask.orderedTransactions.last!, task: mockTask)
-
 private let mockTask = LoggerStore.preview.entity(for: .createAPI)
-
-#endif
 
 #endif

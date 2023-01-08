@@ -32,6 +32,13 @@ struct ConsoleTextView: View {
                 viewModel.bind(entities)
             }
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    if let onClose = onClose {
+                        Button(action: onClose) {
+                            Text("Cancel")
+                        }
+                    }
+                }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     HStack {
                         Menu(content: {
@@ -43,11 +50,6 @@ struct ConsoleTextView: View {
                         })
                         Menu(content: { menu }) {
                             Image(systemName: "ellipsis.circle")
-                        }
-                        if let onClose = onClose {
-                            Button(action: onClose) {
-                                Image(systemName: "xmark")
-                            }
                         }
                     }
                 }

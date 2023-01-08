@@ -68,7 +68,11 @@ final class TextHelper {
         var size: CGFloat
         let body2Size = (0.9 * getPreferredFontSize(for: .body)).rounded()
         switch style.role {
+#if os(watchOS)
+        case .title: size = getPreferredFontSize(for: .title2)
+#else
         case .title: size = getPreferredFontSize(for: .title1)
+#endif
         case .subheadline: size = (0.84 * body2Size).rounded()
         case .body: size = getPreferredFontSize(for: .body)
         case .body2: size = body2Size

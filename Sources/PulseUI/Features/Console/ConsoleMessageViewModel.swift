@@ -7,13 +7,14 @@ import Pulse
 import CoreData
 import Combine
 
+#warning("TODO: refactor")
 final class ConsoleMessageViewModel: Pinnable {
     let title: String
     let text: String
     let textColor: Color
     let level: String
 
-    private let message: LoggerMessageEntity
+    let message: LoggerMessageEntity
     private let searchCriteriaViewModel: ConsoleMessageSearchCriteriaViewModel?
     
     private(set) lazy var time = ConsoleMessageViewModel.timeFormatter.string(from: message.createdAt)
@@ -57,7 +58,7 @@ final class ConsoleMessageViewModel: Pinnable {
             self.title = "\(time) · \(message.label.name.capitalized)"
         }
         self.text = message.text
-        self.textColor = ConsoleMessageStyle.textColor(level: message.logLevel)
+        self.textColor = .textColor(for: message.logLevel)
         self.message = message
         self.level = message.logLevel.name.uppercased()
         self.searchCriteriaViewModel = searchCriteriaViewModel
@@ -90,81 +91,32 @@ final class ConsoleMessageViewModel: Pinnable {
 #endif
 }
 
-extension Color {
-    static func badgeColor(for level: LoggerStore.Level) -> Color {
-        switch level {
-#if os(macOS)
-        case .error: return Color(Palette.red)
-        case .critical: return Color(Palette.red)
-#else
-        case .critical: return .red
-        case .error: return .red
-#endif
-        case .warning: return .orange
-        case .info: return .blue
-        case .notice: return .indigo
-        case .debug: return .secondary
-        case .trace: return .secondary
-        }
-    }
-    
-    static func textColor(for level: LoggerStore.Level) -> Color {
-        switch level {
-#if os(macOS)
-        case .error: return Color(Palette.red)
-        case .critical: return Color(Palette.red)
-#else
-        case .critical: return .red
-        case .error: return .red
-#endif
-        case .warning: return .orange
-        case .info: return .blue
-        case .notice: return .blue
-        case .debug: return .primary
-        case .trace: return .primary
-        }
-    }
-}
-
-#if os(iOS)
-extension UIColor {    
-    static func textColor(for level: LoggerStore.Level) -> UIColor {
+extension UXColor {
+    static func textColor(for level: LoggerStore.Level) -> UXColor {
         switch level {
         case .trace: return .secondaryLabel
         case .debug, .info: return .label
         case .notice, .warning: return .systemOrange
-        case .error, .critical: return .systemRed
+#if os(macOS)
+        case .error, .critical: return Palette.red
+#else
+        case .error, .critical: return .red
+#endif
         }
     }
 }
-#endif
 
-#if os(macOS)
-enum ConsoleMessageStyle {
-    static func textColor(level: LoggerStore.Level) -> Color {
+extension Color {
+    static func textColor(for level: LoggerStore.Level) -> Color {
         switch level {
         case .trace: return .secondary
-        case .debug: return .primary
-        case .info: return .primary
-        case .notice: return .orange
-        case .warning: return .orange
-        case .error: return Color(Palette.red)
-        case .critical: return Color(Palette.red)
-        }
-    }
-}
+        case .debug, .info: return .primary
+        case .notice, .warning: return .orange
+#if os(macOS)
+        case .error, .critical: return Color(Palette.red)
 #else
-enum ConsoleMessageStyle {
-    static func textColor(level: LoggerStore.Level) -> Color {
-        switch level {
-        case .trace: return .primary
-        case .debug: return .primary
-        case .info: return .primary
-        case .notice: return .orange
-        case .warning: return .orange
-        case .error: return .red
-        case .critical: return .red
+        case .error, .critical: return .red
+#endif
         }
     }
 }
-#endif

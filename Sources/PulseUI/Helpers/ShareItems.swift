@@ -10,8 +10,6 @@ enum ShareStoreOutput: String, RawRepresentable {
     case store, text
 }
 
-#if os(iOS) || os(macOS)
-
 struct ShareItems: Identifiable {
     let id = UUID()
     let items: [Any]
@@ -77,8 +75,6 @@ enum ShareOutput {
     case pdf
 }
 
-#endif
-
 struct TemporaryDirectory {
     let url: URL
 
@@ -94,7 +90,6 @@ struct TemporaryDirectory {
     }
 }
 
-#if os(iOS) || os(macOS)
 extension TemporaryDirectory {
     func write(text: String, extension fileExtension: String) -> URL {
         write(data: text.data(using: .utf8) ?? Data(), extension: fileExtension)
@@ -107,7 +102,6 @@ extension TemporaryDirectory {
         return fileURL
     }
 }
-#endif
 
 func makeCurrentDate() -> String {
     let formatter = DateFormatter()

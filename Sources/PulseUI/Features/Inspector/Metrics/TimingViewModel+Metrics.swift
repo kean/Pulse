@@ -5,8 +5,6 @@
 import SwiftUI
 import Pulse
 
-#if os(iOS) || os(macOS) || os(tvOS)
-
 extension TimingViewModel {
     convenience init(task: NetworkTaskEntity) {
         self.init(sections: makeTimingSections(task: task))
@@ -157,5 +155,3 @@ extension URLSessionTaskMetrics.ResourceFetchType {
         }
     }
 }
-
-#endif
