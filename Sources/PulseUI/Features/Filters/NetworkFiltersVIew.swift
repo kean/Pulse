@@ -209,6 +209,7 @@ extension NetworkFiltersView {
                 })
                 .animation(.none)
                 .fixedSize()
+                .frame(minWidth: 46)
             } else {
                 Text("KB")
                     .foregroundColor(.secondary)
