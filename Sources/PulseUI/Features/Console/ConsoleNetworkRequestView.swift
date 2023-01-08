@@ -7,6 +7,8 @@ import Pulse
 import Combine
 import CoreData
 
+#if os(watchOS) || os(tvOS) || os(macOS)
+
 struct ConsoleNetworkRequestView: View {
     @ObservedObject var viewModel: ConsoleNetworkRequestViewModel
     @ObservedObject var progressViewModel: ProgressViewModel
@@ -21,11 +23,11 @@ struct ConsoleNetworkRequestView: View {
         VStack(alignment: .leading, spacing: 4) {
             title
             Text(viewModel.task.url ?? "–")
-                .font(.system(size: 15))
+                .font(ConsoleConstants.fontBody)
                 .lineLimit(ConsoleSettings.shared.lineLimit)
             Text(ConsoleFormatter.details(for: viewModel.task))
                 .lineLimit(2)
-                .font(.system(size: 14))
+                .font(ConsoleConstants.fontTitle)
                 .foregroundColor(.secondary)
         }
     }
@@ -37,112 +39,63 @@ struct ConsoleNetworkRequestView: View {
                     .frame(width: 10, height: 10)
                     .foregroundColor(viewModel.badgeColor)
                 Text(viewModel.task.httpMethod ?? "GET")
-                    .font(.system(size: 14))
+                    .font(ConsoleConstants.fontTitle)
                     .foregroundColor(.secondary)
             }
             Spacer()
             let time = Text(viewModel.time)
-                .font(.system(size: 14))
+                .font(ConsoleConstants.fontTitle)
                 .foregroundColor(.secondary)
-            if #available(tvOS 15, watchOS 8, *) {
+            if #available(watchOS 8, macOS 12, *) {
                 time.monospacedDigit()
             } else {
                 time
             }
         }
     }
-#elseif os(tvOS)
+#elseif os(tvOS) || os(macOS)
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             title
             Text(viewModel.task.url ?? "–")
-                .font(.caption)
+                .font(ConsoleConstants.fontBody)
                 .lineLimit(ConsoleSettings.shared.lineLimit)
         }
     }
 
     private var title: some View {
         HStack {
-            HStack(spacing: 16) {
+            HStack(spacing: spacing) {
                 Circle()
-                    .frame(width: 20, height: 20)
+                    .frame(width: circleSize, height: circleSize)
                     .foregroundColor(viewModel.badgeColor)
                 Text(ConsoleFormatter.subheadline(for: viewModel.task, hasTime: false))
-                    .font(.caption)
+                    .font(ConsoleConstants.fontTitle)
                     .foregroundColor(.secondary)
             }
             Spacer()
+#if os(macOS)
+            PinView(viewModel: viewModel.pinViewModel, font: ConsoleConstants.fontTitle)
+#endif
             let time = Text(viewModel.time)
-                .font(.caption)
+                .font(ConsoleConstants.fontTitle)
                 .foregroundColor(.secondary)
-            if #available(tvOS 15, watchOS 8, *) {
+            if #available(tvOS 15, macOS 12, *) {
                 time.monospacedDigit()
             } else {
                 time
             }
         }
     }
-#else
-    var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack(alignment: .firstTextBaseline) {
-                header
+
 #if os(macOS)
-                PinView(viewModel: viewModel.pinViewModel, font: fonts.title)
-                Spacer()
-#endif
-            }
-            text.lineLimit(4)
-        }
-        .padding(.vertical, 4)
-    }
-
-    @ViewBuilder
-    private var header: some View {
-        title
-    }
-
-    private var title: some View {
-        HStack(alignment: .firstTextBaseline, spacing: spacing) {
-            statusCircle
-            Text(ConsoleFormatter.subheadline(for: viewModel.task, hasTime: false))
-                .lineLimit(1)
-                .font(fonts.title)
-                .foregroundColor(.secondary)
-        }
-    }
-
-    private var statusCircle: some View {
-        Circle()
-            .frame(width: circleSize, height: circleSize)
-            .foregroundColor(viewModel.badgeColor)
-    }
-
-    private var text: some View {
-        Text(viewModel.text)
-            .font(fonts.body)
-            .foregroundColor(.primary)
-            .lineLimit(4)
-    }
-
-    private struct Fonts {
-        let title: Font
-        let body: Font
-    }
-
-#if os(iOS)
     private let spacing: CGFloat = 8
-    private let fonts = Fonts(title: .caption, body: .body)
-#else
-    private let spacing: CGFloat = 8
-    private let fonts = Fonts(title: .body, body: .body)
-#endif
-
-#if os(tvOS)
-    private let circleSize: CGFloat = 20
-#else
     private let circleSize: CGFloat = 10
+#else
+    private let spacing: CGFloat = 16
+    private let circleSize: CGFloat = 20
 #endif
+
 #endif
 }
 
@@ -154,4 +107,6 @@ struct ConsoleNetworkRequestView_Previews: PreviewProvider {
             .previewLayout(.sizeThatFits)
     }
 }
+#endif
+
 #endif

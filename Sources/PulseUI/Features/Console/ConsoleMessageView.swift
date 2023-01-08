@@ -16,14 +16,14 @@ struct ConsoleMessageView: View {
         VStack(alignment: .leading, spacing: 4) {
             HStack {
                 Text(viewModel.message.logLevel.name.uppercased())
-                    .font(fontTitle)
+                    .font(ConsoleConstants.fontTitle)
                     .foregroundColor(.secondary)
                 Spacer()
 #if os(macOS)
-            PinView(viewModel: viewModel.pinViewModel, font: fontTitle)
+                PinView(viewModel: viewModel.pinViewModel, font: ConsoleConstants.fontTitle)
 #endif
                 let time = Text(viewModel.time)
-                    .font(fontTitle)
+                    .font(ConsoleConstants.fontTitle)
                     .foregroundColor(.secondary)
                 if #available(tvOS 15, watchOS 8, macOS 12, *) {
                     time.monospacedDigit()
@@ -32,22 +32,13 @@ struct ConsoleMessageView: View {
                 }
             }
             Text(viewModel.message.text)
-                .font(fontBody)
+                .font(ConsoleConstants.fontBody)
                 .foregroundColor(.textColor(for: viewModel.message.logLevel))
                 .lineLimit(ConsoleSettings.shared.lineLimit)
         }
     }
 
-#if os(watchOS)
-    private let fontTitle = Font.system(size: 14)
-    private let fontBody = Font.system(size: 15)
-#elseif os(macOS)
-    private let fontTitle = Font.body
-    private let fontBody = Font.body
-#else
-    private let fontTitle = Font.caption
-    private let fontBody = Font.caption
-#endif
+
 }
 
 #if DEBUG
@@ -60,5 +51,17 @@ struct ConsoleMessageView_Previews: PreviewProvider {
 }
 #endif
 
+struct ConsoleConstants {
+#if os(watchOS)
+    static let fontTitle = Font.system(size: 14)
+    static let fontBody = Font.system(size: 15)
+#elseif os(macOS)
+    static let fontTitle = Font.body
+    static let fontBody = Font.body
+#else
+    static let fontTitle = Font.caption
+    static let fontBody = Font.caption
+#endif
+}
 
 #endif
