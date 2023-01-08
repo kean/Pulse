@@ -7,20 +7,14 @@ import Pulse
 import Combine
 import CoreData
 
-#warning("TODO: refactor")
-
 final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
     private(set) lazy var time = ConsoleMessageViewModel.timeFormatter.string(from: task.createdAt)
 #if os(iOS)
-    var uiBadgeColor: UIColor = .gray
-#endif
-
+    private(set) var badgeColor: UIColor = .gray
+#else
     private(set) var badgeColor: Color = .gray
-    private(set) var title: String = ""
-    private(set) var text: String = ""
-
+#endif
     private(set) var state: NetworkTaskEntity.State = .pending
-
     private(set) lazy var progress = ProgressViewModel(task: task)
 
     let task: NetworkTaskEntity
@@ -50,21 +44,19 @@ final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
     private func refresh() {
         let state = task.state
 
-        self.title = ConsoleFormatter.details(for: task)
-        self.text = task.url ?? "URL Unavailable"
-
 #if os(iOS)
         switch state {
-        case .pending: self.uiBadgeColor = .systemYellow
-        case .success: self.uiBadgeColor = .systemGreen
-        case .failure: self.uiBadgeColor = .systemRed
+        case .pending: self.badgeColor = .systemYellow
+        case .success: self.badgeColor = .systemGreen
+        case .failure: self.badgeColor = .systemRed
         }
-#endif
+#else
         switch state {
         case .pending: self.badgeColor = .yellow
         case .success: self.badgeColor = .green
         case .failure: self.badgeColor = .red
         }
+#endif
 
         self.state = task.state
     }
