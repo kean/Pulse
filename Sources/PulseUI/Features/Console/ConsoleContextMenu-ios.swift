@@ -7,6 +7,8 @@ import CoreData
 import Pulse
 import Combine
 
+#warning("TODO: move browse store to settings")
+
 #if os(iOS)
 
 import UniformTypeIdentifiers
