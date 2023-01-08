@@ -14,16 +14,22 @@ struct DateRangePicker: View {
     @Binding var date: Date?
 
     var body: some View {
+#if os(iOS)
+        contents
+#else
+        HStack {
+            contents
+            Spacer()
+        }
+#endif
+    }
+
+    @ViewBuilder
+    private var contents: some View {
         if let date = date {
             editView(date: date)
         } else {
-#if os(iOS)
             setDateView
-#else
-            HStack {
-                setDateView
-            }
-#endif
         }
     }
 
