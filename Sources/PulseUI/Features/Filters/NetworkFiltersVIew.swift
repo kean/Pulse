@@ -94,8 +94,8 @@ extension NetworkFiltersView {
 
 // MARK: - NetworkFiltersView (General)
 
+@available(iOS 15, *)
 extension NetworkFiltersView {
-    @available(iOS 15, *)
     var generalGroup: some View {
         FiltersSection(
             isExpanded: $isGeneralGroupExpanded,
@@ -117,13 +117,9 @@ extension NetworkFiltersView {
 
 #if os(iOS)
 
-    @available(iOS 15, *)
     @ViewBuilder
     private var generalGroupContent: some View {
-        ForEach(viewModel.filters) { filter in
-            CustomNetworkFilterView(filter: filter, onRemove: viewModel.removeFilter, isRemoveHidden: viewModel.isDefaultFilters)
-                .buttonStyle(.plain)
-        }
+        customFilersList
         if !viewModel.isDefaultFilters {
             Button(action: viewModel.addFilter) {
                 Text("Add Filter").frame(maxWidth: .infinity)
@@ -136,11 +132,7 @@ extension NetworkFiltersView {
     @ViewBuilder
     private var generalGroupContent: some View {
         VStack {
-            ForEach(viewModel.filters) { filter in
-                CustomNetworkFilterView(filter: filter, onRemove: {
-                    viewModel.removeFilter(filter)
-                })
-            }
+            customFilersList
         }
         .padding(.leading, 4)
         .padding(.top, Filters.contentTopInset)
@@ -150,6 +142,12 @@ extension NetworkFiltersView {
     }
 
 #endif
+
+    @ViewBuilder var customFilersList: some View {
+        ForEach(viewModel.filters) { filter in
+            CustomNetworkFilterView(filter: filter, onRemove: viewModel.removeFilter, isRemoveHidden: viewModel.isDefaultFilters)
+        }
+    }
 }
 
 // MARK: - NetworkFiltersView (Response)

@@ -78,8 +78,8 @@ extension ConsoleMessageFiltersView {
 
 // MARK: - ConsoleMessageFiltersView (Custom Filters)
 
+@available(iOS 15, *)
 extension ConsoleMessageFiltersView {
-    @available(iOS 15, *)
     var generalSection: some View {
         FiltersSection(
             isExpanded: $isGeneralSectionExpanded,
@@ -100,13 +100,9 @@ extension ConsoleMessageFiltersView {
     }
 
 #if os(iOS)
-    @available(iOS 15, *)
     @ViewBuilder
     private var generalContent: some View {
-        ForEach(viewModel.filters) { filter in
-            CustomFilterView(filter: filter, onRemove: viewModel.removeFilter, isRemoveHidden: viewModel.isDefaultFilters)
-                .buttonStyle(.plain)
-        }
+        customFiltersList
         if !viewModel.isDefaultFilters {
             Button(action: viewModel.addFilter) {
                 Text("Add Filter").frame(maxWidth: .infinity)
@@ -117,11 +113,7 @@ extension ConsoleMessageFiltersView {
     @ViewBuilder
     private var generalContent: some View {
         VStack {
-            ForEach(viewModel.filters) { filter in
-                CustomFilterView(filter: filter, onRemove: {
-                    viewModel.removeFilter(filter)
-                })
-            }
+            customFiltersList
         }
         .padding(.leading, 4)
         .padding(.top, Filters.contentTopInset)
@@ -131,6 +123,12 @@ extension ConsoleMessageFiltersView {
         }
     }
 #endif
+
+    private var customFiltersList: some View {
+        ForEach(viewModel.filters) { filter in
+            CustomFilterView(filter: filter, onRemove: viewModel.removeFilter, isRemoveHidden: viewModel.isDefaultFilters)
+        }
+    }
 }
 
 // MARK: - ConsoleMessageFiltersView (Log Levels)

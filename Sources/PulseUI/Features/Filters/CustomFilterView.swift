@@ -89,7 +89,7 @@ struct CustomFilterView: View {
                 fieldPicker
                     .frame(width: 140)
                 Spacer()
-                Button(action: onRemove) {
+                Button(action: { onRemove(filter) }) {
                     Image(systemName: "minus.circle")
                 }
                 .buttonStyle(.plain)
