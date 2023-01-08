@@ -11,15 +11,9 @@ import Pulse
 struct FileViewer: View {
     @ObservedObject var viewModel: FileViewerViewModel
 
-#if os(iOS) || os(watchOS)
+#if os(iOS) || os(watchOS) || os(macOS)
     var body: some View {
         contents
-    }
-#elseif os(macOS)
-    var body: some View {
-        VStack {
-            contents
-        }.onAppear { viewModel.render() }
     }
 #elseif os(tvOS)
     var body: some View {

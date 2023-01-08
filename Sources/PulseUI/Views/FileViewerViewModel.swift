@@ -15,14 +15,9 @@ final class FileViewerViewModel: ObservableObject {
     let title: String
     private let context: Context
     var contentType: NetworkLogger.ContentType? { context.contentType }
-    private(set) lazy var data = getData()
     private let getData: () -> Data
 
-#if os(macOS)
-    @Published private(set) var contents: Contents?
-#else
-    private(set) lazy var contents: Contents? = render(data: data)
-#endif
+    private(set) lazy var contents: Contents? = render(data: getData())
 
     struct Context {
         var contentType: NetworkLogger.ContentType?
@@ -44,25 +39,6 @@ final class FileViewerViewModel: ObservableObject {
         case other(RichTextViewModel)
 #if os(iOS) || os(macOS)
         case pdf(PDFDocument)
-#endif
-    }
-
-#warning("TODO: fix this (doesn't work well on macOS)")
-    func render() {
-#if os(macOS)
-        let data = self.data
-        if data.count < 30_000 {
-            self.contents = render(data: data)
-        } else {
-            Task.detached {
-                let contents = self.render(data: data)
-                Task { @MainActor in
-                    withAnimation {
-                        self.contents = contents
-                    }
-                }
-            }
-        }
 #endif
     }
 
