@@ -160,16 +160,10 @@ extension ConsoleMessageFiltersView {
 #if os(iOS)
     @ViewBuilder
     private var logLevelsContent: some View {
-        HStack(spacing: 16) {
-            makeLevelsSection(levels: [.trace, .debug, .info, .notice])
-            Divider()
-            makeLevelsSection(levels: [.warning, .error, .critical])
+        ForEach(LoggerStore.Level.allCases, id: \.self) { level in
+            Toggle(level.name.capitalized, isOn: viewModel.binding(forLevel: level))
         }
-        .padding(.bottom, 10)
-        .buttonStyle(.plain)
-
         Button(viewModel.bindingForTogglingAllLevels.wrappedValue ? "Disable All" : "Enable All", action: { viewModel.bindingForTogglingAllLevels.wrappedValue.toggle() })
-            .frame(maxWidth: .infinity, alignment: .center)
     }
 #else
     private var logLevelsContent: some View {
