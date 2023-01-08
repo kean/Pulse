@@ -43,6 +43,13 @@ extension DateFormatter {
 enum ConsoleFormatter {
     static let separator = " · "
 
+    static func subheadline(for message: LoggerMessageEntity) -> String {
+        return [
+            time(for: message.createdAt),
+            message.logLevel.name.uppercased()
+        ].joined(separator: separator)
+    }
+
     static func subheadline(for task: NetworkTaskEntity) -> String {
         return [
             time(for: task.createdAt),

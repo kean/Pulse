@@ -44,11 +44,29 @@ struct ConsoleNetworkRequestView: View {
             let time = Text(viewModel.time)
                 .font(.system(size: 14))
                 .foregroundColor(.secondary)
-            if #available(watchOS 8, *) {
+            if #available(tvOS 15, watchOS 8, *) {
                 time.monospacedDigit()
             } else {
                 time
             }
+        }
+    }
+#elseif os(tvOS)
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            title
+            Text(viewModel.task.url ?? "–")
+                .font(.caption)
+                .lineLimit(ConsoleSettings.shared.lineLimit)
+        }
+    }
+
+    private var title: some View {
+        HStack(spacing: 12) {
+            Text(ConsoleFormatter.subheadline(for: viewModel.task))
+                .font(.caption)
+                .foregroundColor(.secondary)
+            Spacer()
         }
     }
 #else

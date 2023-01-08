@@ -21,7 +21,7 @@ struct ConsoleMessageView: View {
                 let time = Text(viewModel.time)
                     .font(.system(size: 14))
                     .foregroundColor(.secondary)
-                if #available(watchOS 8, *) {
+                if #available(tvOS 15, watchOS 8, *) {
                     time.monospacedDigit()
                 } else {
                     time
@@ -33,15 +33,34 @@ struct ConsoleMessageView: View {
                 .lineLimit(ConsoleSettings.shared.lineLimit)
         }
     }
+#elseif os(tvOS)
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(spacing: 4) {
+                let time = Text(ConsoleFormatter.subheadline(for: viewModel.message))
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                if #available(tvOS 15, watchOS 8, *) {
+                    time.monospacedDigit()
+                } else {
+                    time
+                }
+                Spacer()
+
+            }
+            Text(viewModel.message.text)
+                .font(.caption)
+                .foregroundColor(.textColor(for: viewModel.message.logLevel))
+                .lineLimit(ConsoleSettings.shared.lineLimit)
+        }
+    }
 #else
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(alignment: .firstTextBaseline) {
                 title
-#if os(macOS)
                 PinView(viewModel: viewModel.pinViewModel, font: fonts.title)
                 Spacer()
-#endif
             }
             text.lineLimit(4)
         }
@@ -85,7 +104,7 @@ struct ConsoleMessageView: View {
     }
 
     private let fonts = Fonts(title: .body, body: .body)
-    #endif
+#endif
 }
 
 #if DEBUG
