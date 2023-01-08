@@ -99,7 +99,7 @@ final class ConsoleNetworkRequestTableCell: UITableViewCell, UIContextMenuIntera
         }
         self.state = viewModel.state
 
-        title.attributedText = NSAttributedString(string: viewModel.fullTitle, attributes: titleAttributes)
+        title.attributedText = NSAttributedString(string: ConsoleFormatter.subheadline(for: viewModel.task, hasTime: false), attributes: titleAttributes)
 
         if !onlyTitle {
             details.numberOfLines = ConsoleSettings.shared.lineLimit

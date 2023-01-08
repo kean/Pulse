@@ -340,7 +340,7 @@ struct ConsoleSharedFiltersView: View {
             },
             content: {
                 Toggle("Only Pinned", isOn: $viewModel.filters.inOnlyPins)
-                if #available(iOS 15.0, *) {
+                if #available(iOS 15.0, macOS 12, *) {
                     Button(role: .destructive, action: viewModel.removeAllPins, label: {
                         Text("Remove Pins")
                     })

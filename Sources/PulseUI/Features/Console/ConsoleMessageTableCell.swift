@@ -8,8 +8,6 @@ import Pulse
 import Combine
 import UIKit
 
-#warning("TODO: refactor + more prominent failed requests (use red for link text)")
-
 final class ConsoleMessageTableCell: UITableViewCell, UIContextMenuInteractionDelegate {
     private let title = UILabel()
     private let accessory = ConsoleMessageAccessoryView()

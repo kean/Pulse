@@ -13,20 +13,20 @@ enum DurationFormatter {
     static func string(from timeInterval: TimeInterval, isPrecise: Bool) -> String {
         if timeInterval < 0.95 {
             if isPrecise {
-                return String(format: "%.1fms", timeInterval * 1000)
+                return String(format: "%.1f ms", timeInterval * 1000)
             } else {
-                return String(format: "%.0fms", timeInterval * 1000)
+                return String(format: "%.0f ms", timeInterval * 1000)
             }
         }
         if timeInterval < 200 {
-            return String(format: "%.\(isPrecise ? "3" : "1")fs", timeInterval)
+            return String(format: "%.\(isPrecise ? "3" : "1")f s", timeInterval)
         }
         let minutes = timeInterval / 60
         if minutes < 60 {
-            return String(format: "%.1fmin", minutes)
+            return String(format: "%.1f min", minutes)
         }
         let hours = timeInterval / (60 * 60)
-        return String(format: "%.1fh", hours)
+        return String(format: "%.1f h", hours)
     }
 }
 
@@ -46,9 +46,9 @@ enum ConsoleFormatter {
     static func subheadline(for message: LoggerMessageEntity, hasTime: Bool = true) -> String {
         return [
             hasTime ? time(for: message.createdAt) : nil,
-            message.logLevel.name.uppercased(),
+            message.logLevel.name,
             label(for: message)
-        ].compactMap { $0 }.joined(separator: separator)
+        ].compactMap { $0 }.joined(separator: separator).uppercased()
     }
 
     static func label(for message: LoggerMessageEntity) -> String? {
@@ -64,7 +64,7 @@ enum ConsoleFormatter {
             hasTime ? time(for: task.createdAt) : nil,
             task.httpMethod ?? "GET",
             details(for: task)
-        ].compactMap { $0 }.joined(separator: separator)
+        ].compactMap { $0 }.joined(separator: separator).uppercased()
     }
 
     static func time(for date: Date) -> String {
