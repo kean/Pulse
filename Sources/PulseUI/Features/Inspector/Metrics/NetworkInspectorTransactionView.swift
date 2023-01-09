@@ -32,7 +32,7 @@ struct NetworkInspectorTransactionView: View {
         }
     }
 
-    @available(iOS 15, tvOS 15, *)
+    @available(iOS 15, tvOS 15, watchOS 8, *)
     @ViewBuilder
     private func transferSizeView(size: NetworkInspectorTransferInfoViewModel) -> some View {
         HStack {

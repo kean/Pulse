@@ -57,94 +57,83 @@ struct NetworkInspectorView: View {
         .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
         .listRowBackground(Color.clear)
 #endif
-        Section {
-            viewModel.statusSectionViewModel.map(NetworkRequestStatusSectionView.init)
-        }
-        Section(header: requestTypePicker) {
-            sectionRequest
-        }
+        Section { viewModel.statusSectionViewModel.map(NetworkRequestStatusSectionView.init) }
+        Section { sectionRequest } header: { requestTypePicker }
         if viewModel.task.state != .pending {
-            Section {
-                sectionResponse
-            }
-            Section {
-                sectionMetrics
-            }
+            Section { sectionResponse }
+            Section { sectionMetrics }
         }
     }
 #elseif os(watchOS)
     var contents: some View {
         List {
+            Section { viewModel.statusSectionViewModel.map(NetworkRequestStatusSectionView.init) }
             Section {
-                viewModel.statusSectionViewModel.map(NetworkRequestStatusSectionView.init)
-            }
-            Section {
-                viewModel.transferViewModel.map {
-                    NetworkInspectorTransferInfoView(viewModel: $0)
-                        .hideReceived()
-                        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
-                        .listRowBackground(Color.clear)
-                        .padding(.top, 8)
-                        .padding(.bottom, 16)
-                }
+                transerInfoSentView
                 requestTypePicker
                 sectionRequest
             }
             if viewModel.task.state != .pending {
                 Section {
-                    viewModel.transferViewModel.map {
-                        NetworkInspectorTransferInfoView(viewModel: $0)
-                            .hideSent()
-                            .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
-                            .listRowBackground(Color.clear)
-                            .padding(.top, 8)
-                            .padding(.bottom, 16)
-                    }
+                    transerInfoReceivedView
                     sectionResponse
                 }
-                Section {
-                    sectionMetrics
-                }
+                Section { sectionMetrics }
             }
         }
-#if os(watchOS)
         .toolbar {
             if #available(watchOS 9.0, *), let url = ShareService.share(viewModel.task, as: .html).items.first as? URL {
                 ShareLink(item: url)
             }
         }
-#endif
+    }
+
+#warning("TODO: refactor")
+
+    private var transerInfoSentView: some View {
+        viewModel.transferViewModel.map {
+            NetworkInspectorTransferInfoView(viewModel: $0)
+                .hideReceived()
+                .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+                .listRowBackground(Color.clear)
+                .padding(.top, 8)
+                .padding(.bottom, 16)
+        }
+    }
+
+    private var transerInfoReceivedView: some View {
+        viewModel.transferViewModel.map {
+            NetworkInspectorTransferInfoView(viewModel: $0)
+                .hideReceived()
+                .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+                .listRowBackground(Color.clear)
+                .padding(.top, 8)
+                .padding(.bottom, 16)
+        }
     }
 #elseif os(tvOS)
     var contents: some View {
         HStack {
             Form {
+                Section { viewModel.statusSectionViewModel.map(NetworkRequestStatusSectionView.init) }
                 Section {
-                    viewModel.statusSectionViewModel.map(NetworkRequestStatusSectionView.init)
-                }
-                Section(header: Text("Request")) {
                     requestTypePicker
                     sectionRequest
-                }
+                } header: { Text("Request") }
                 if viewModel.task.state != .pending {
-                    Section(header: Text("Response")) {
-                        sectionResponse
+                    Section { sectionResponse } header: { Text("Response") }
+
                     }
-                    Section(header: Text("Transactions")) {
-                        sectionMetrics
-                    }
+                    Section { sectionMetrics } header: { Text("Transactions") }
                 }
             }
             .frame(width: 740)
             Form {
-
                 Section {
-                    transferStatusView
-                        .padding(.bottom, 32)
+                    transferStatusView.padding(.bottom, 32)
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
                 .listRowBackground(Color.clear)
-
 #warning("TODO: tvOS fix layour for text views")
 #warning("TODO: tvOS remove force unwrap")
                 NetworkInspectorMetricsView(viewModel: .init(task: viewModel.task)!)
