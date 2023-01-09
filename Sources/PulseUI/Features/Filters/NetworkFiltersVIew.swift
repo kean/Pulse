@@ -191,8 +191,9 @@ extension NetworkFiltersView {
     @ViewBuilder
     private var statusCodeRow: some View {
         HStack {
+            Text("Status Code")
+            Spacer()
             makeRangePicker(
-                title: "Status Code",
                 from: $viewModel.criteria.response.statusCode.from,
                 to: $viewModel.criteria.response.statusCode.to,
                 isEnabled: $viewModel.criteria.response.isEnabled
@@ -204,44 +205,40 @@ extension NetworkFiltersView {
     @ViewBuilder
     private var responseSizeRow: some View {
         HStack {
-            makeRangePicker(
-                title: "Size",
-                from: $viewModel.criteria.response.responseSize.from,
-                to: $viewModel.criteria.response.responseSize.to,
-                isEnabled: $viewModel.criteria.response.isEnabled
-            )
+            Text("Size")
+            Spacer()
             Menu(content: {
                 Filters.sizeUnitPicker($viewModel.criteria.response.responseSize.unit).labelsHidden()
             }, label: {
                 FilterPickerButton(title: viewModel.criteria.response.responseSize.unit.localizedTitle)
             })
             .animation(.none)
-            .fixedSize()
-            .frame(minWidth: 46)
+            makeRangePicker(
+                from: $viewModel.criteria.response.responseSize.from,
+                to: $viewModel.criteria.response.responseSize.to,
+                isEnabled: $viewModel.criteria.response.isEnabled
+            )
         }
     }
 
     @ViewBuilder
-    private func makeRangePicker(title: String, from: Binding<String>, to: Binding<String>, isEnabled: Binding<Bool>) -> some View {
-        Text(title)
+    private func makeRangePicker(from: Binding<String>, to: Binding<String>, isEnabled: Binding<Bool>) -> some View {
+        HStack {
+            TextField("Min", text: from, onEditingChanged: {
+                if $0 { isEnabled.wrappedValue = true }
+            })
+            .keyboardType(.decimalPad)
+            .textFieldStyle(.roundedBorder)
+            .multilineTextAlignment(.center)
 
-        Spacer()
-
-        TextField("Min", text: from, onEditingChanged: {
-            if $0 { isEnabled.wrappedValue = true }
-        })
-        .keyboardType(.decimalPad)
-        .textFieldStyle(.roundedBorder)
-        .multilineTextAlignment(.center)
-        .frame(width: 80)
-
-        TextField("Max", text: to, onEditingChanged: {
-            if $0 { isEnabled.wrappedValue = true }
-        })
-        .keyboardType(.decimalPad)
-        .textFieldStyle(.roundedBorder)
-        .multilineTextAlignment(.center)
-        .frame(width: 80)
+            TextField("Max", text: to, onEditingChanged: {
+                if $0 { isEnabled.wrappedValue = true }
+            })
+            .keyboardType(.decimalPad)
+            .textFieldStyle(.roundedBorder)
+            .multilineTextAlignment(.center)
+        }
+        .frame(width: 120)
     }
 
 #elseif os(macOS)
@@ -285,16 +282,17 @@ extension NetworkFiltersView {
     @ViewBuilder
     private var durationRow: some View {
         HStack {
-            makeRangePicker(
-                title: "Duration",
-                from: $viewModel.criteria.response.duration.max,
-                to: $viewModel.criteria.response.duration.max,
-                isEnabled: $viewModel.criteria.response.duration.isEnabled
-            )
+            Text("Duration")
+            Spacer()
             Menu(content: { durationUnitPicker }, label: {
                 FilterPickerButton(title: viewModel.criteria.response.duration.unit.localizedTitle)
             })
             .animation(.none)
+            makeRangePicker(
+                from: $viewModel.criteria.response.duration.min,
+                to: $viewModel.criteria.response.duration.max,
+                isEnabled: $viewModel.criteria.response.duration.isEnabled
+            )
         }
     }
 #elseif os(macOS)
