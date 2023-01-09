@@ -15,7 +15,7 @@ struct NetworkRequestInfoCell: View {
     }
 
     private var contents: some View {
-        (Text(viewModel.httpMethod).bold() + Text(" ") + Text(viewModel.url))
+        (Text(viewModel.httpMethod).fontWeight(.semibold) + Text(" ") + Text(viewModel.url))
             .lineLimit(4)
             .font(.callout)
     }

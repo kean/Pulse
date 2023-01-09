@@ -6,6 +6,8 @@ import SwiftUI
 import Pulse
 import CoreData
 
+#warning("TODO: show download size on other platforms")
+
 struct NetworkInspectorTransactionView: View {
     @ObservedObject var viewModel: NetworkInspectorTransactionViewModel
 
@@ -14,15 +16,41 @@ struct NetworkInspectorTransactionView: View {
             NetworkRequestStatusCell(viewModel: viewModel.statusViewModel)
             viewModel.timingViewModel.map(TimingView.init)
 #if os(iOS) || os(macOS)
-            viewModel.transferSizeViewModel.map {
-                NetworkInspectorTransferInfoView(viewModel: $0)
-                    .hideDivider()
-                    .padding(.vertical, 8)
+            NavigationLink(destination: destintionTransactionDetails) {
+                if #available(iOS 15, tvOS 15, *), let size = viewModel.transferSizeViewModel {
+                    transferSizeView(size: size)
+                } else {
+                    Text("Transaction Details")
+                }
+            }
+#else
+            NavigationLink(destination: destintionTransactionDetails) {
+                Text("Transaction Details")
             }
 #endif
             NetworkRequestInfoCell(viewModel: viewModel.requestViewModel)
-            NavigationLink(destination: destintionTransactionDetails) {
-                Text("Transaction Details")
+        }
+    }
+
+    @available(iOS 15, tvOS 15, *)
+    @ViewBuilder
+    private func transferSizeView(size: NetworkInspectorTransferInfoViewModel) -> some View {
+        HStack {
+            VStack(spacing: 8) {
+                HStack {
+                    Text("Details")
+                    Spacer()
+                    (Text(Image(systemName: "arrow.down.circle")) +
+                     Text(" ") +
+                     Text(size.totalBytesSent) +
+                     Text("   ") +
+                     Text(Image(systemName: "arrow.up.circle")) +
+                     Text(" ") +
+                     Text(size.totalBytesReceived))
+                    .font(.callout)
+                    .monospacedDigit()
+                    .foregroundColor(.secondary)
+                }
             }
         }
     }
