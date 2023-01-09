@@ -14,6 +14,7 @@ import Combine
 
 #if os(macOS) || os(iOS)
 
+// TODO: handle "Expand" and other custom actions using gesture recognizer and not URLs which are slow
 struct RichTextView: View {
     let viewModel: RichTextViewModel
 
