@@ -8,6 +8,8 @@ import Pulse
 import SwiftUI
 import CoreData
 
+#warning("TODO: test this on iOS, especially showing request details")
+
 #if !os(macOS) && !targetEnvironment(macCatalyst) && swift(>=5.7)
 import Charts
 #endif
