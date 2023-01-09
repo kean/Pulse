@@ -123,9 +123,9 @@ extension MockTask {
         response: mockCreateaAPIResponse,
         responseBody: mockCreateaAPIBody,
         transactions: [
-            .init(fetchType: .networkLoad, request: mockCreateAPIOriginalRequest, response: mockCreateaAPIRedirectResponse, duration: 0.20283),
-            .init(fetchType: .localCache, request: mockCreateAPICurrentRequest, response: mockCreateaAPIResponse, duration: 0.003),
-            .init(fetchType: .networkLoad, request: mockCreateAPICurrentRequest, response: mockCreateAPIResponseNotChanged, duration: 0.0980, isReusedConnection: true),
+            .init(fetchType: .networkLoad, request: mockCreateAPICurrentRequest, response: mockCreateaAPIRedirectResponse, duration: 0.20283),
+            .init(fetchType: .localCache, request: mockCreateAPIRedirectRequest, response: mockCreateaAPIResponse, duration: 0.003),
+            .init(fetchType: .networkLoad, request: mockCreateAPIRedirectRequest, response: mockCreateAPIResponseNotChanged, duration: 0.0980, isReusedConnection: true),
         ],
         delay: 5.5
     )
@@ -304,6 +304,13 @@ private let mockReposBody = Bundle.main.url(forResource: "repos", withExtension:
 private let mockCreateAPIOriginalRequest = URLRequest(url: "https://github.com/CreateAPI/Get")
 
 private let mockCreateAPICurrentRequest = mockCreateAPIOriginalRequest.adding(headers: [
+    "User-Agent": "Pulse Demo/2.0",
+    "Accept-Encoding": "gzip",
+    "Accept-Language": "en-us",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+])
+
+private let mockCreateAPIRedirectRequest = URLRequest(url: "https://github.com/kean/Get").adding(headers: [
     "User-Agent": "Pulse Demo/2.0",
     "Accept-Encoding": "gzip",
     "Accept-Language": "en-us",
