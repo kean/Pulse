@@ -113,7 +113,7 @@ private struct DurationLabel: View {
             Text(duration)
                 .backport.monospacedDigit()
                 .lineLimit(1)
-                .font(.body)
+                .font(.system(.callout, design: .monospaced))
                 .foregroundColor(.secondary)
         }
     }

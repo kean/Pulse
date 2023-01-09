@@ -75,7 +75,7 @@ private struct TimingRowView: View {
             bar
 
 #if !os(watchOS)
-            ZStack(alignment: .leading) {
+            ZStack(alignment: .trailing) {
                 makeValue(viewModel.value)
                 makeValue(parent.longestValue).invisible() // Calculates width
             }.layoutPriority(1)
