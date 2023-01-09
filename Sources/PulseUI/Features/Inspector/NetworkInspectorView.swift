@@ -11,6 +11,8 @@ import Combine
 #warning("TODO: tvOS fix transaction details UI")
 #warning("TODO: macos show response body automatically when task finished loading")
 #warning("TODO: add sharing on watchOS")
+#warning("TODO: tvOS fix layour for text views")
+#warning("TODO: tvOS remove force unwrap")
 
 struct NetworkInspectorView: View {
 #if os(watchOS)
@@ -122,10 +124,9 @@ struct NetworkInspectorView: View {
                 } header: { Text("Request") }
                 if viewModel.task.state != .pending {
                     Section { sectionResponse } header: { Text("Response") }
-
-                    }
-                    Section { sectionMetrics } header: { Text("Transactions") }
+                    
                 }
+                Section { sectionMetrics } header: { Text("Transactions") }
             }
             .frame(width: 740)
             Form {
@@ -134,11 +135,9 @@ struct NetworkInspectorView: View {
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
                 .listRowBackground(Color.clear)
-#warning("TODO: tvOS fix layour for text views")
-#warning("TODO: tvOS remove force unwrap")
-                NetworkInspectorMetricsView(viewModel: .init(task: viewModel.task)!)
+                NetworkInspectorMetricsViewModel(task: viewModel.task)
+                    .map(NetworkInspectorMetricsView.init)
             }
-
         }
     }
 #endif
