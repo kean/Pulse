@@ -90,8 +90,8 @@ struct NetworkSearchCriteria: Hashable {
 
             var localizedTitle: String {
                 switch self {
-                case .minutes: return "Min"
-                case .seconds: return "Sec"
+                case .minutes: return "min"
+                case .seconds: return "sec"
                 case .milliseconds: return "ms"
                 }
             }

@@ -207,17 +207,17 @@ extension NetworkFiltersView {
         HStack {
             Text("Size")
             Spacer()
-            Menu(content: {
-                Filters.sizeUnitPicker($viewModel.criteria.response.responseSize.unit).labelsHidden()
-            }, label: {
-                FilterPickerButton(title: viewModel.criteria.response.responseSize.unit.localizedTitle)
-            })
-            .animation(.none)
             makeRangePicker(
                 from: $viewModel.criteria.response.responseSize.from,
                 to: $viewModel.criteria.response.responseSize.to,
                 isEnabled: $viewModel.criteria.response.isEnabled
             )
+            Menu(content: {
+                Filters.sizeUnitPicker($viewModel.criteria.response.responseSize.unit).labelsHidden()
+            }, label: {
+                FilterPickerButton(title: viewModel.criteria.response.responseSize.unit.localizedTitle, width: 50)
+            })
+            .animation(.none)
         }
     }
 
@@ -238,7 +238,7 @@ extension NetworkFiltersView {
             .textFieldStyle(.roundedBorder)
             .multilineTextAlignment(.center)
         }
-        .frame(width: 120)
+        .frame(width: 130)
     }
 
 #elseif os(macOS)
@@ -284,15 +284,15 @@ extension NetworkFiltersView {
         HStack {
             Text("Duration")
             Spacer()
-            Menu(content: { durationUnitPicker }, label: {
-                FilterPickerButton(title: viewModel.criteria.response.duration.unit.localizedTitle)
-            })
-            .animation(.none)
             makeRangePicker(
                 from: $viewModel.criteria.response.duration.min,
                 to: $viewModel.criteria.response.duration.max,
                 isEnabled: $viewModel.criteria.response.duration.isEnabled
             )
+            Menu(content: { durationUnitPicker }, label: {
+                FilterPickerButton(title: viewModel.criteria.response.duration.unit.localizedTitle, width: 50)
+            })
+            .animation(.none)
         }
     }
 #elseif os(macOS)
@@ -318,9 +318,9 @@ extension NetworkFiltersView {
 
     private var durationUnitPicker: some View {
         Picker("Unit", selection: $viewModel.criteria.response.duration.unit) {
-            Text("Min").tag(NetworkSearchCriteria.DurationFilter.Unit.minutes)
-            Text("Sec").tag(NetworkSearchCriteria.DurationFilter.Unit.seconds)
-            Text("Ms").tag(NetworkSearchCriteria.DurationFilter.Unit.milliseconds)
+            Text("min").tag(NetworkSearchCriteria.DurationFilter.Unit.minutes)
+            Text("sec").tag(NetworkSearchCriteria.DurationFilter.Unit.seconds)
+            Text("ms").tag(NetworkSearchCriteria.DurationFilter.Unit.milliseconds)
         }
     }
 }

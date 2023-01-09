@@ -70,9 +70,12 @@ enum Filters {
 
 struct FilterPickerButton: View {
     let title: String
+    var width: CGFloat?
 
     var body: some View {
-        Text(title).font(.subheadline)
+        Text(title)
+            .font(.subheadline)
+            .frame(width: width)
             .foregroundColor(Color.primary.opacity(0.9))
             .padding(EdgeInsets(top: 8, leading: 10, bottom: 8, trailing: 10))
             .background(Color.secondaryFill)
