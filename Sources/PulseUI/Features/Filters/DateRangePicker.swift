@@ -38,6 +38,7 @@ struct DateRangePicker: View {
         HStack {
             let binding = Binding(get: { date }, set: { self.date = $0 })
             DatePicker(title, selection: binding)
+                .environment(\.locale, Locale(identifier: "en_US"))
 #if os(macOS)
                 .labelsHidden()
 #endif
