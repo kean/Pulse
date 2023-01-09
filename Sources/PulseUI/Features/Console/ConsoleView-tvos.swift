@@ -24,20 +24,29 @@ public struct ConsoleView: View {
     }
 
     public var body: some View {
-        HStack {
-            List {
-                ConsoleMessagesForEach(messages: viewModel.entities)
+        GeometryReader { proxy in
+            HStack {
+                List {
+                    ConsoleMessagesForEach(messages: viewModel.entities)
+                }.frame(width: proxy.size.width * 0.6)
+                NavigationView {
+                    ConsoleMenuView(viewModel: viewModel)
+                        .padding()
+                }
             }
-            ConsoleMenuView(viewModel: viewModel)
+            .backport.navigationTitle("Console")
+            .onAppear(perform: viewModel.onAppear)
+            .onDisappear(perform: viewModel.onDisappear)
         }
-        .backport.navigationTitle("Console")
-        .onAppear(perform: viewModel.onAppear)
-        .onDisappear(perform: viewModel.onDisappear)
     }
 }
 
+#warning("TODO: udpate filter button deign and show proper fitler based on type + enable quick filters at least")
+#warning("TODO: implement quick filters replacing date filters")
+#warning("TODO: fix naviation to store info (provide focus area)")
 private struct ConsoleMenuView: View {
     @ObservedObject var viewModel: ConsoleViewModel
+    @State private var isPresentingFilters = false
 
     var body: some View {
         Form {
@@ -45,16 +54,20 @@ private struct ConsoleMenuView: View {
                 Toggle(isOn: $viewModel.isOnlyErrors) {
                     LabelBackport("Errors Only", systemImage: "exclamationmark.octagon")
                 }
-                Toggle(isOn: Binding(get: { viewModel.mode == .network }, set: { viewModel.mode = $0 ? .network : .all })) {
+                Toggle(isOn: Binding(get: { viewModel.mode == .network }, set: { _ in viewModel.toggleMode() })) {
                     LabelBackport("Network Only", systemImage: "arrow.down.circle")
+                }
+                NavigationLink(destination: destinationFilters) {
+//                Button(action: { isPresentingFilters = true }) {
+                    LabelBackport("Filters", systemImage: "line.3.horizontal.decrease.circle")
                 }
             }
             Section {
-                NavigationLink(destination: SettingsView(store: viewModel.store)) {
+                NavigationLink(destination: destinationSettings) {
                     LabelBackport("Settings", systemImage: "gear")
                 }
                 if #available(tvOS 14, *) {
-                    NavigationLink(destination: StoreDetailsView(source: .store(viewModel.store))) {
+                    NavigationLink(destination: destinationStoreDetails) {
                         LabelBackport("Store Info", systemImage: "info.circle")
                     }
                 }
@@ -73,7 +86,26 @@ private struct ConsoleMenuView: View {
                 }
             }
         }
-        .frame(maxWidth: 540)
+    }
+
+    private var destinationSettings: some View {
+        SettingsView(store: viewModel.store)
+            .padding()
+    }
+
+    @available(tvOS 14, *)
+    private var destinationStoreDetails: some View {
+        StoreDetailsView(source: .store(viewModel.store))
+            .padding()
+    }
+
+    private var destinationFilters: some View {
+        ConsoleMessageFiltersView(
+            viewModel: viewModel.searchCriteriaViewModel,
+            sharedCriteriaViewModel: viewModel.sharedSearchCriteriaViewModel,
+            isPresented: $isPresentingFilters
+        )
+        .padding()
     }
 }
 

@@ -7,7 +7,7 @@ import CoreData
 import Pulse
 import Combine
 
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(tvOS)  || os(macOS)
 
 enum Filters {
     typealias ContentType = NetworkSearchCriteria.ContentTypeFilter.ContentType
@@ -41,7 +41,7 @@ enum Filters {
     }
 
     static func sizeUnitPicker(_ selection: Binding<NetworkSearchCriteria.ResponseSizeFilter.MeasurementUnit>) -> some View {
-        #if os(iOS)
+        #if os(iOS) || os(tvOS)
         Picker("Size Unit", selection: selection) {
             Text("Bytes").tag(NetworkSearchCriteria.ResponseSizeFilter.MeasurementUnit.bytes)
             Text("Kilobytes").tag(NetworkSearchCriteria.ResponseSizeFilter.MeasurementUnit.kilobytes)
@@ -95,7 +95,7 @@ struct FiltersSection<Header: View, Content: View>: View {
     var isWrapped = true
 
     var body: some View {
-#if os(iOS)
+#if os(iOS) || os(tvOS)
         Section(content: content, header: header)
 #elseif os(macOS)
         DisclosureGroup(
@@ -118,7 +118,7 @@ struct FiltersSection<Header: View, Content: View>: View {
 
 extension Filters {
     static func toggle(_ title: String, isOn: Binding<Bool>) -> some View {
-#if os(iOS)
+#if os(iOS) || os(tvOS)
         Toggle(title, isOn: isOn)
 #elseif os(macOS)
         HStack {

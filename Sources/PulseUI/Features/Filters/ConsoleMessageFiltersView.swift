@@ -5,13 +5,13 @@
 import SwiftUI
 import Pulse
 
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(tvOS) || os(macOS)
 
 struct ConsoleMessageFiltersView: View {
     @ObservedObject var viewModel: ConsoleMessageSearchCriteriaViewModel
     @ObservedObject var sharedCriteriaViewModel: ConsoleSharedSearchCriteriaViewModel
 
-#if os(iOS)
+#if os(iOS) || os(tvOS)
     @State var isGeneralSectionExpanded = true
     @State var isLevelsSectionExpanded = true
     @State var isLabelsSectionExpanded = false
@@ -20,8 +20,12 @@ struct ConsoleMessageFiltersView: View {
 
     var body: some View {
         Form { formContents }
+#if os(iOS)
             .navigationBarTitle("Filters", displayMode: .inline)
             .navigationBarItems(leading: buttonReset, trailing: buttonDone)
+#else
+            .navigationBarTitle("Filters")
+#endif
     }
 
     private var buttonDone: some View {
@@ -58,12 +62,14 @@ struct ConsoleMessageFiltersView: View {
 extension ConsoleMessageFiltersView {
     @ViewBuilder
     var formContents: some View {
+#if os(iOS) || os(macOS)
         if #available(iOS 14, *) {
             ConsoleSharedFiltersView(viewModel: sharedCriteriaViewModel)
         }
         if #available(iOS 15, *) {
             generalSection
         }
+#endif
         logLevelsSection
         labelsSection
     }
@@ -78,6 +84,7 @@ extension ConsoleMessageFiltersView {
 
 // MARK: - ConsoleMessageFiltersView (Custom Filters)
 
+#if os(iOS) || os(macOS)
 @available(iOS 15, *)
 extension ConsoleMessageFiltersView {
     var generalSection: some View {
@@ -99,7 +106,7 @@ extension ConsoleMessageFiltersView {
         )
     }
 
-#if os(iOS)
+#if os(iOS) || os(tvOS)
     @ViewBuilder
     private var generalContent: some View {
         customFiltersList
@@ -130,6 +137,7 @@ extension ConsoleMessageFiltersView {
         }
     }
 }
+#endif
 
 // MARK: - ConsoleMessageFiltersView (Log Levels)
 
@@ -152,7 +160,7 @@ extension ConsoleMessageFiltersView {
         )
     }
 
-#if os(iOS)
+#if os(iOS) || os(tvOS)
     @ViewBuilder
     private var logLevelsContent: some View {
         ForEach(LoggerStore.Level.allCases, id: \.self) { level in
@@ -208,7 +216,7 @@ extension ConsoleMessageFiltersView {
         )
     }
 
-#if os(iOS)
+#if os(iOS) || os(tvOS)
     @ViewBuilder
     private var labelsContent: some View {
         let labels = viewModel.allLabels
@@ -247,6 +255,7 @@ extension ConsoleMessageFiltersView {
 
 // MARK: - ConsoleMessageFiltersView (Time Period)
 
+#if os(iOS) || os(macOS)
 @available(iOS 14, *)
 struct ConsoleSharedFiltersView: View {
     @ObservedObject var viewModel: ConsoleSharedSearchCriteriaViewModel
@@ -349,11 +358,12 @@ struct ConsoleSharedFiltersView: View {
         )
     }
 }
+#endif
 
 #if DEBUG
 struct ConsoleMessageFiltersView_Previews: PreviewProvider {
     static var previews: some View {
-#if os(iOS)
+#if os(iOS) || os(tvOS)
         NavigationView {
             ConsoleMessageFiltersView(viewModel: makeMockViewModel(), sharedCriteriaViewModel: .init(store: .mock), isPresented: .constant(true))
         }

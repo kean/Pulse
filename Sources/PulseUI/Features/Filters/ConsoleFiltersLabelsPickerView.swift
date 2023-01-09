@@ -4,7 +4,7 @@
 
 import SwiftUI
 
-#if os(iOS)
+#if os(iOS) || os(tvOS)
 
 struct ConsoleFiltersLabelsPickerView: View {
     @ObservedObject var viewModel: ConsoleMessageSearchCriteriaViewModel
@@ -12,9 +12,13 @@ struct ConsoleFiltersLabelsPickerView: View {
     @State private var searchText = ""
 
     var body: some View {
-        if #available(iOS 15.0, *) {
+        if #available(iOS 15, tvOS 15, *) {
             form
+#if os(iOS)
                 .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always))
+#else
+                .searchable(text: $searchText)
+#endif
         } else {
             form
         }

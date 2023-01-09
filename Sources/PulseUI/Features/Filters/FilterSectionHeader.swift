@@ -4,7 +4,7 @@
 
 import SwiftUI
 
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(tvOS) || os(macOS)
 
 struct FilterSectionHeader: View {
     let icon: String
@@ -14,7 +14,7 @@ struct FilterSectionHeader: View {
     let isDefault: Bool
     @Binding var isEnabled: Bool
 
-#if os(iOS)
+#if os(iOS) || os(tvOS)
     var body: some View {
         HStack {
             Text(title)
