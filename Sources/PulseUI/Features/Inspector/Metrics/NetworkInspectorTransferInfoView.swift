@@ -91,10 +91,10 @@ struct NetworkInspectorTransferInfoView: View {
             HStack(alignment: .center, spacing: spacing) {
                 Image(systemName: imageName)
                     .font(.largeTitle)
-                Text(title + "\n" + total)
-                    .font(.headline)
-                    .fixedSize()
-                    .lineSpacing(0)
+                VStack(alignment: .leading, spacing: 0) {
+                    Text(title).font(.headline)
+                    Text(total).font(.headline)
+                }
             }
             .fixedSize()
             .padding(2)
