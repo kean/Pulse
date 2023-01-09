@@ -191,7 +191,12 @@ extension NetworkFiltersView {
     @ViewBuilder
     private var statusCodeRow: some View {
         HStack {
-            makeRangePicker(title: "Status Code", from: $viewModel.criteria.response.statusCode.from, to: $viewModel.criteria.response.statusCode.to, isEnabled: $viewModel.criteria.response.isEnabled)
+            makeRangePicker(
+                title: "Status Code",
+                from: $viewModel.criteria.response.statusCode.from,
+                to: $viewModel.criteria.response.statusCode.to,
+                isEnabled: $viewModel.criteria.response.isEnabled
+            )
         }
     }
 
@@ -199,7 +204,12 @@ extension NetworkFiltersView {
     @ViewBuilder
     private var responseSizeRow: some View {
         HStack {
-            makeRangePicker(title: "Size", from: $viewModel.criteria.response.responseSize.from, to: $viewModel.criteria.response.responseSize.to, isEnabled: $viewModel.criteria.response.isEnabled)
+            makeRangePicker(
+                title: "Size",
+                from: $viewModel.criteria.response.responseSize.from,
+                to: $viewModel.criteria.response.responseSize.to,
+                isEnabled: $viewModel.criteria.response.isEnabled
+            )
             Menu(content: {
                 Filters.sizeUnitPicker($viewModel.criteria.response.responseSize.unit).labelsHidden()
             }, label: {
@@ -222,6 +232,7 @@ extension NetworkFiltersView {
         })
         .keyboardType(.decimalPad)
         .textFieldStyle(.roundedBorder)
+        .multilineTextAlignment(.center)
         .frame(width: 80)
 
         TextField("Max", text: to, onEditingChanged: {
@@ -229,6 +240,7 @@ extension NetworkFiltersView {
         })
         .keyboardType(.decimalPad)
         .textFieldStyle(.roundedBorder)
+        .multilineTextAlignment(.center)
         .frame(width: 80)
     }
 
@@ -273,10 +285,12 @@ extension NetworkFiltersView {
     @ViewBuilder
     private var durationRow: some View {
         HStack {
-            Text("Duration")
-            Spacer()
-            durationMinField
-            durationMaxField
+            makeRangePicker(
+                title: "Duration",
+                from: $viewModel.criteria.response.duration.max,
+                to: $viewModel.criteria.response.duration.max,
+                isEnabled: $viewModel.criteria.response.duration.isEnabled
+            )
             Menu(content: { durationUnitPicker }, label: {
                 FilterPickerButton(title: viewModel.criteria.response.duration.unit.localizedTitle)
             })
@@ -292,25 +306,17 @@ extension NetworkFiltersView {
             durationUnitPicker.fixedSize().labelsHidden()
         }
     }
-#endif
 
     private var durationMinField: some View {
         TextField("Min", text: $viewModel.criteria.response.duration.min)
             .textFieldStyle(.roundedBorder)
-#if os(iOS)
-            .keyboardType(.decimalPad)
-            .frame(maxWidth: 80)
-#endif
     }
 
     private var durationMaxField: some View {
         TextField("Max", text: $viewModel.criteria.response.duration.max)
             .textFieldStyle(.roundedBorder)
-#if os(iOS)
-            .keyboardType(.decimalPad)
-            .frame(maxWidth: 80)
-#endif
     }
+#endif
 
     private var durationUnitPicker: some View {
         Picker("Unit", selection: $viewModel.criteria.response.duration.unit) {
