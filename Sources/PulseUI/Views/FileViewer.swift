@@ -2,6 +2,8 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
+#warning("TODO: add edgesForExtended for PDF and HTML brwoser (see mode)")
+
 import SwiftUI
 import Pulse
 

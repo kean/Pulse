@@ -36,16 +36,23 @@ struct DateRangePicker: View {
     @ViewBuilder
     private func editView(date: Date) -> some View {
         HStack {
+#if os(macOS)
+            Text(title)
+            Spacer()
+#endif
             let binding = Binding(get: { date }, set: { self.date = $0 })
             DatePicker(title, selection: binding)
                 .environment(\.locale, Locale(identifier: "en_US"))
 #if os(macOS)
+                .fixedSize()
                 .labelsHidden()
 #endif
+#if os(iOS)
             Spacer()
+#endif
             Button(action: { self.date = nil }) {
                 Image(systemName: "minus.circle.fill")
-                    .font(.system(size: 18))
+                    .font(.body)
             }
             .padding(.trailing, -8)
             .buttonStyle(.plain)

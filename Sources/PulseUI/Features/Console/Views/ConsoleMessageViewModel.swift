@@ -11,6 +11,13 @@ final class ConsoleMessageViewModel: Pinnable {
     let message: LoggerMessageEntity
 
     private let searchCriteriaViewModel: ConsoleMessageSearchCriteriaViewModel?
+
+#warning("TODO: make this an option, support on other platforms too")
+
+    var preprocessedText: String {
+        let text = message.text.trimmingCharacters(in: .whitespaces)
+        return text.replacingOccurrences(of: "\n", with: " ")
+    }
     
     private(set) lazy var time = ConsoleMessageViewModel.timeFormatter.string(from: message.createdAt)
 

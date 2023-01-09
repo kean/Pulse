@@ -87,7 +87,7 @@ enum ConsoleFormatter {
             case .uploadTask:
                 if task.requestBodySize > 0 {
                     let sizeText = ByteCountFormatter.string(fromByteCount: task.requestBodySize)
-                    components.append("Up \(sizeText)")
+                    components.append("\(sizeText)")
                 }
             case .dataTask, .downloadTask:
                 if task.responseBodySize > 0 {

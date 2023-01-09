@@ -194,9 +194,9 @@ final class TextRenderer {
 
     func renderRequestBody(for task: NetworkTaskEntity) -> NSAttributedString {
         if let data = task.requestBody?.data, !data.isEmpty {
-            return render(data, contentType: task.response?.contentType, error: nil)
-        } else if task.state == .success, task.type == .uploadTask, task.requestBodySize > 0 {
-            return _render(dataSize: task.responseBodySize, contentType: task.originalRequest?.contentType)
+            return render(data, contentType: task.originalRequest?.contentType, error: nil)
+        } else if task.type == .uploadTask, task.requestBodySize > 0 {
+            return _render(dataSize: task.requestBodySize, contentType: task.originalRequest?.contentType)
         } else {
             return render("–", role: .body2)
         }
@@ -234,7 +234,7 @@ final class TextRenderer {
 
     private func _render(dataSize: Int64, contentType: NetworkLogger.ContentType?) -> NSAttributedString {
         let string = [
-            ByteCountFormatter.string(fromByteCount: dataSize),
+            ByteCountFormatter.string(fromByteCount: max(0, dataSize)),
             contentType.map { "(\($0.rawValue))" }
         ].compactMap { $0 }.joined(separator: " ")
         return render(string, role: .body2)
@@ -340,7 +340,7 @@ extension NSAttributedString.Key {
 struct ConsoleTextRenderer_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            let string = TextRenderer(options: .sharing).render(task, content: .all)
+            let string = TextRenderer(options: .sharing).render(task, content: .sharing)
             let stringWithColor = TextRenderer(options: .init(color: .full)).render(task, content: .all)
             let html = try! TextUtilities.html(from: TextRenderer(options: .sharing).render(task, content: .sharing))
 
@@ -365,11 +365,13 @@ struct ConsoleTextRenderer_Previews: PreviewProvider {
 
 #if os(iOS) || os(macOS)
             WebView(data: html, contentType: "application/html")
+                .edgesIgnoringSafeArea([.bottom])
                 .previewDisplayName("HTML")
 #endif
 
 #if os(iOS)
             PDFKitRepresentedView(document: PDFDocument(data: try! TextUtilities.pdf(from: string))!)
+                .edgesIgnoringSafeArea([.all])
                 .previewDisplayName("PDF")
 #endif
         }

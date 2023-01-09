@@ -26,12 +26,11 @@ public struct StoreDetailsView: View {
 
     public var body: some View {
         Contents(viewModel: viewModel)
-#if os(tvOS)
-            .frame(maxWidth: 860)
-#endif
             .onAppear { viewModel.load(from: source) }
-#if os(iOS)
-            .navigationBarTitle("Store Details", displayMode: .inline)
+#if os(tvOS)
+            .padding()
+#else
+            .backport.inlineNavigationTitle("Store Details")
 #endif
     }
 }
@@ -59,6 +58,10 @@ private struct Contents: View {
 #if !os(macOS) && !targetEnvironment(macCatalyst) && swift(>=5.7)
             if #available(iOS 16.0, tvOS 16.0, macOS 13.0, watchOS 9.0, *), let info = viewModel.info {
                 LoggerStoreSizeChart(info: info, sizeLimit: viewModel.storeSizeLimit)
+#if os(tvOS)
+                    .padding(.vertical)
+                    .focusable()
+#endif
 #if os(macOS)
                     .padding(.bottom, 16)
 #endif
@@ -68,6 +71,9 @@ private struct Contents: View {
                 Section(header: Text(section.title)) {
                     ForEach(section.items.enumerated().map(KeyValueRow.init)) { item in
                         InfoRow(title: item.title, details: item.details)
+#if os(tvOS)
+                            .focusable()
+#endif
                     }
                 }
             }

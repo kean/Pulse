@@ -93,7 +93,7 @@ final class ConsoleMessageSearchCriteriaViewModel: ObservableObject {
 
     // MARK: Managing Labels
 
-    private func displayLabels(_ labels: [String]) {
+    func displayLabels(_ labels: [String]) {
         allLabelsSet = Set(labels)
         allLabels = labels
     }

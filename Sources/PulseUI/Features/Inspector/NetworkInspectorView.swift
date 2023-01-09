@@ -29,12 +29,10 @@ struct NetworkInspectorView: View {
 
     var body: some View {
         contents
+            .backport.inlineNavigationTitle(viewModel.title)
 #if os(iOS)
             .navigationBarItems(trailing: trailingNavigationBarItems)
-            .navigationBarTitle(Text(viewModel.title), displayMode: .inline)
             .sheet(item: $shareItems, content: ShareView.init)
-#else
-            .backport.navigationTitle(viewModel.title)
 #endif
     }
 
@@ -117,7 +115,9 @@ struct NetworkInspectorView: View {
     var contents: some View {
         HStack {
             Form {
-                Section { viewModel.statusSectionViewModel.map(NetworkRequestStatusSectionView.init) }
+                Section {
+                    viewModel.statusSectionViewModel.map(NetworkRequestStatusSectionView.init)
+                }
                 Section {
                     requestTypePicker
                     sectionRequest
@@ -277,7 +277,7 @@ struct NetworkInspectorView_Previews: PreviewProvider {
             if #available(macOS 13.0, *) {
                 NavigationStack {
                     NetworkInspectorView(viewModel: .init(task: LoggerStore.preview.entity(for: .login)))
-                }.previewLayout(.fixed(width: MainView.contentColumnWidth, height: 800))
+                }.previewLayout(.fixed(width: ConsoleView.contentColumnWidth, height: 800))
             }
 #else
             NavigationView {

@@ -8,14 +8,12 @@ import Combine
 import SwiftUI
 
 final class ConsoleSharedSearchCriteriaViewModel: ObservableObject {
-    @Published var dates = ConsoleDatesFilter.default
+    @Published var criteria = ConsoleSharedSearchCriteria()
+    @Published var isButtonResetEnabled = false
+
     private(set) var defaultDates: ConsoleDatesFilter = .default
 
-    @Published var filters = ConsoleGeneralFilters.default
-
     let dataNeedsReload = PassthroughSubject<Void, Never>()
-
-    @Published var isButtonResetEnabled = false
 
     private let store: LoggerStore
     private var cancellables: [AnyCancellable] = []
@@ -23,12 +21,17 @@ final class ConsoleSharedSearchCriteriaViewModel: ObservableObject {
     init(store: LoggerStore) {
         self.store = store
 
+
         if store === LoggerStore.shared {
-            dates = .session
+#if os(iOS) || os(macOS)
+            criteria.dates = .session
             defaultDates = .session
+#else
+            criteria.quickDatesFilter = .session
+#endif
         }
 
-        Publishers.CombineLatest($dates, $filters).dropFirst().sink { [weak self] _ in
+        $criteria.dropFirst().sink { [weak self] _ in
             self?.isButtonResetEnabled = true
             DispatchQueue.main.async { // important!
                 self?.dataNeedsReload.send()
@@ -37,21 +40,21 @@ final class ConsoleSharedSearchCriteriaViewModel: ObservableObject {
     }
 
     var isDefaultSearchCriteria: Bool {
-        isDatesDefault && filters == .default
+        isDatesDefault && criteria.filters == .default
     }
 
     func resetAll() {
         resetDates()
-        filters = .default
+        criteria.filters = .default
         isButtonResetEnabled = false
     }
 
     var isDatesDefault: Bool {
-        dates == defaultDates
+        criteria.dates == defaultDates
     }
 
     func resetDates() {
-        dates = defaultDates
+        criteria.dates = defaultDates
     }
 
     func removeAllPins() {

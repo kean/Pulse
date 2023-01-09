@@ -17,6 +17,8 @@ struct ConsoleView: View {
         self.viewModel = viewModel
     }
 
+#warning("TODO: add filters")
+
     var body: some View {
         List {
             let stack = HStack {

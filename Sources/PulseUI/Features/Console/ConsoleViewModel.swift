@@ -9,19 +9,15 @@ import SwiftUI
 
 final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, ObservableObject {
     let title: String
-#if os(iOS) || os(macOS)
-    let table: ConsoleTableViewModel
-#endif
-    @Published private(set) var entities: [NSManagedObject] = []
-    @Published var mode: Mode
     let isNetworkOnly: Bool
 
-    enum Mode {
-        case all
-        case network
-    }
-
+#if os(iOS) || os(macOS)
+    let table: ConsoleTableViewModel
     let details: ConsoleDetailsRouterViewModel
+#endif
+
+    @Published private(set) var entities: [NSManagedObject] = []
+
 #if os(iOS)
     let insightsViewModel: InsightsViewModel
 #endif
@@ -38,15 +34,26 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         }
     }
 
+    @Published var mode: Mode
     @Published var isOnlyErrors: Bool = false
     @Published var filterTerm: String = ""
 
     var onDismiss: (() -> Void)?
 
+#if os(macOS)
+    /// TODO: refactor
+    let onFind = PassthroughSubject<Void, Never>()
+#endif
+
     private(set) var store: LoggerStore
     private var controller: NSFetchedResultsController<NSManagedObject>?
     private var isActive = false
     private var cancellables: [AnyCancellable] = []
+
+    enum Mode {
+        case all, network
+    }
+
 
     init(store: LoggerStore, mode: Mode = .all) {
         self.title = mode == .network ? "Network" : "Console"
@@ -54,17 +61,17 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         self.mode = mode
         self.isNetworkOnly = mode == .network
 
-        self.details = ConsoleDetailsRouterViewModel()
-#if os(iOS)
-        self.insightsViewModel = InsightsViewModel(store: store)
-#endif
-
         self.sharedSearchCriteriaViewModel = ConsoleSharedSearchCriteriaViewModel(store: store)
         self.searchCriteriaViewModel = ConsoleMessageSearchCriteriaViewModel(store: store)
         self.networkSearchCriteriaViewModel = ConsoleNetworkSearchCriteriaViewModel(store: store)
 
 #if os(iOS) || os(macOS)
+        self.details = ConsoleDetailsRouterViewModel()
         self.table = ConsoleTableViewModel(searchCriteriaViewModel: searchCriteriaViewModel)
+#endif
+
+#if os(iOS)
+        self.insightsViewModel = InsightsViewModel(store: store)
 #endif
 
         super.init()
@@ -140,26 +147,22 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         }
         switch mode {
         case .all:
-            let viewModel = searchCriteriaViewModel
             ConsoleMessageSearchCriteria.update(
                 request: controller.fetchRequest,
                 filterTerm: filterTerm,
-                dates: sharedSearchCriteriaViewModel.dates,
-                general: sharedSearchCriteriaViewModel.filters,
-                criteria: viewModel.criteria,
-                filters: viewModel.filters,
+                shared: sharedSearchCriteriaViewModel.criteria,
+                criteria: searchCriteriaViewModel.criteria,
+                filters: searchCriteriaViewModel.filters,
                 isOnlyErrors: isOnlyErrors
             )
         case .network:
-            let viewModel = networkSearchCriteriaViewModel
 #if !os(watchOS)
-            NetworkSearchCriteria.update(
+            ConsoleNetworkSearchCriteria.update(
                 request: controller.fetchRequest,
                 filterTerm: filterTerm,
-                dates: sharedSearchCriteriaViewModel.dates,
-                general: sharedSearchCriteriaViewModel.filters,
-                criteria: viewModel.criteria,
-                filters: viewModel.filters,
+                shared: sharedSearchCriteriaViewModel.criteria,
+                criteria: networkSearchCriteriaViewModel.criteria,
+                filters: networkSearchCriteriaViewModel.filters,
                 isOnlyErrors: isOnlyErrors
             )
 #endif

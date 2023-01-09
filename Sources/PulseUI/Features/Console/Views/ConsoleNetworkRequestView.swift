@@ -72,6 +72,7 @@ struct ConsoleNetworkRequestView: View {
                 Text(ConsoleFormatter.subheadline(for: viewModel.task, hasTime: false))
                     .font(ConsoleConstants.fontTitle)
                     .foregroundColor(.secondary)
+                    .lineLimit(1)
             }
             Spacer()
 #if os(macOS)

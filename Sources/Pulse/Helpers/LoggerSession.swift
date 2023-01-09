@@ -2,6 +2,7 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
+#warning("TODO: enable this on macOS")
 #if !os(macOS) && !targetEnvironment(macCatalyst) && swift(>=5.7)
 import Foundation
 #else

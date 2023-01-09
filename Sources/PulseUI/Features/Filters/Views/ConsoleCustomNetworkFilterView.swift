@@ -8,7 +8,7 @@ import Pulse
 #if os(iOS) || os(macOS)
 
 @available(iOS 15, *)
-struct CustomNetworkFilterView: View {
+struct ConsoleCustomNetworkFilterView: View {
     @ObservedObject var filter: NetworkSearchFilter
     let onRemove: (NetworkSearchFilter) -> Void
     let isRemoveHidden: Bool
@@ -67,50 +67,43 @@ struct CustomNetworkFilterView: View {
     }
     
     private var fieldMenu: some View {
-        Menu(content: {
+        FilterPickerMenu(title: filter.field.localizedTitle) {
             Picker("", selection: $filter.field) {
                 fieldPickerBasicSection
                 Divider()
                 fieldPickerAdvancedSection
             }
-        }, label: {
-            FilterPickerButton(title: filter.field.localizedTitle)
-        }).animation(.none)
+        }
     }
     
     private var matchMenu: some View {
-        Menu(content: {
-            matchPicker
-        }, label: {
-            FilterPickerButton(title: filter.match.localizedTitle)
-        }).animation(.none)
+        FilterPickerMenu(title: filter.match.localizedTitle) { matchPicker }
     }
     
 #else
     
     var body: some View {
-        VStack(spacing: 6) {
-            HStack {
-                fieldPicker.frame(width: 140)
-                Spacer()
+        HStack(spacing: 16) {
+            VStack(spacing: 8) {
+                HStack {
+                    fieldPicker
+                    matchPicker
+                }
+                TextField("Value", text: $filter.value)
+                    .textFieldStyle(.roundedBorder)
+            }
+            .padding(8)
+            .background(Color(NSColor.windowBackgroundColor))
+            .cornerRadius(8)
+
+            if !isRemoveHidden {
                 Button(action: { onRemove(filter) }) {
-                    Image(systemName: "minus.circle")
+                    Image(systemName: "minus.circle.fill")
                 }
                 .buttonStyle(.plain)
                 .foregroundColor(Color.red)
             }
-            HStack {
-                matchPicker.frame(width: 140)
-                Spacer()
-            }
-            HStack {
-                TextField("Value", text: $filter.value)
-                    .textFieldStyle(.roundedBorder)
-            }
         }
-        .padding(EdgeInsets(top: 8, leading: 6, bottom: 8, trailing: 6))
-        .background(Color(NSColor.windowBackgroundColor))
-        .cornerRadius(8)
     }
 
 #endif

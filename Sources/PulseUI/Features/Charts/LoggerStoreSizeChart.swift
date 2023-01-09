@@ -46,7 +46,11 @@ struct LoggerStoreSizeChart: View {
             Category.free: .secondaryFill
         ])
         .chartPlotStyle { $0.cornerRadius(8) }
+#if os(tvOS)
+        .frame(height: 100)
+#else
         .frame(height: 66)
+#endif
     }
 
     private var data: [Series] {

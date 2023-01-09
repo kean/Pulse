@@ -152,7 +152,7 @@ private struct TopSlowestRequestsViw: View {
 
     var body: some View {
         NetworkInsightsRequestsList(viewModel: viewModel.topSlowestRequestsViewModel())
-            .navigationBarTitle(Text("Slowest Requests"), displayMode: .inline)
+            .backport.inlineNavigationTitle("Slowest Requests")
     }
 }
 
@@ -161,7 +161,7 @@ private struct RequestsWithRedirectsView: View {
 
     var body: some View {
         NetworkInsightsRequestsList(viewModel: viewModel.requestsWithRedirectsViewModel())
-            .navigationBarTitle(Text("Redirects"), displayMode: .inline)
+            .backport.inlineNavigationTitle("Redirects")
     }
 }
 
@@ -170,7 +170,7 @@ private struct FailingRequestsListView: View {
 
     var body: some View {
         NetworkInsightsRequestsList(viewModel: viewModel.failedRequestsViewModel())
-            .navigationBarTitle(Text("Failed Requests"), displayMode: .inline)
+            .backport.inlineNavigationTitle("Failed Requests")
     }
 }
 

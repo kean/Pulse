@@ -16,6 +16,7 @@ struct ConsoleMessageView: View {
         VStack(alignment: .leading, spacing: 4) {
             HStack {
                 Text(viewModel.message.logLevel.name.uppercased())
+                    .lineLimit(1)
                     .font(ConsoleConstants.fontTitle)
                     .foregroundColor(.secondary)
                 Spacer()
@@ -31,7 +32,7 @@ struct ConsoleMessageView: View {
                     time
                 }
             }
-            Text(viewModel.message.text)
+            Text(viewModel.preprocessedText)
                 .font(ConsoleConstants.fontBody)
                 .foregroundColor(.textColor(for: viewModel.message.logLevel))
                 .lineLimit(ConsoleSettings.shared.lineLimit)

@@ -5,40 +5,25 @@
 import SwiftUI
 import Pulse
 
-#if os(iOS) || os(tvOS) || os(macOS)
-
 struct ConsoleMessageFiltersView: View {
     @ObservedObject var viewModel: ConsoleMessageSearchCriteriaViewModel
     @ObservedObject var sharedCriteriaViewModel: ConsoleSharedSearchCriteriaViewModel
 
-#if os(iOS) || os(tvOS)
-    @State var isGeneralSectionExpanded = true
-    @State var isLevelsSectionExpanded = true
-    @State var isLabelsSectionExpanded = false
+    @State private var isGeneralSectionExpanded = true
+    @State private var isLevelsSectionExpanded = true
+    @State private var isLabelsSectionExpanded = true
 
-    @Binding var isPresented: Bool
-
+#if os(iOS) || os(tvOS) || os(watchOS)
     var body: some View {
         Form { formContents }
 #if os(iOS)
-            .navigationBarTitle("Filters", displayMode: .inline)
-            .navigationBarItems(leading: buttonReset, trailing: buttonDone)
-#else
-            .navigationBarTitle("Filters")
+            .navigationBarItems(leading: buttonReset)
 #endif
     }
-
-    private var buttonDone: some View {
-        Button("Done") { isPresented = false }
-    }
 #else
-    @AppStorage("networkFilterIsParametersExpanded") var isGeneralSectionExpanded = true
-    @AppStorage("consoleFiltersIsLevelsSectionExpanded") var isLevelsSectionExpanded = true
-    @AppStorage("consoleFiltersIsLabelsExpanded") var isLabelsSectionExpanded = false
-
     var body: some View {
         ScrollView {
-            VStack(spacing: Filters.formSpacing) {
+            VStack(spacing: ConsoleFilters.formSpacing) {
                 VStack(spacing: 6) {
                     HStack {
                         Text("FILTERS")
@@ -51,7 +36,7 @@ struct ConsoleMessageFiltersView: View {
                 .padding(.top, 6)
 
                 formContents
-            }.padding(Filters.formPadding)
+            }.padding(ConsoleFilters.formPadding)
         }
     }
 #endif
@@ -62,10 +47,15 @@ struct ConsoleMessageFiltersView: View {
 extension ConsoleMessageFiltersView {
     @ViewBuilder
     var formContents: some View {
-#if os(iOS) || os(macOS)
-        if #available(iOS 14, *) {
+#if os(tvOS) || os(watchOS)
+        Section {
+            buttonReset
+        }
+#endif
+        if #available(iOS 14, tvOS 14, *) {
             ConsoleSharedFiltersView(viewModel: sharedCriteriaViewModel)
         }
+#if os(iOS) || os(macOS)
         if #available(iOS 15, *) {
             generalSection
         }
@@ -88,16 +78,15 @@ extension ConsoleMessageFiltersView {
 @available(iOS 15, *)
 extension ConsoleMessageFiltersView {
     var generalSection: some View {
-        FiltersSection(
+        ConsoleFilterSection(
             isExpanded: $isGeneralSectionExpanded,
             header: { generalHeader },
-            content: { generalContent },
-            isWrapped: false
+            content: { generalContent }
         )
     }
 
     private var generalHeader: some View {
-        FilterSectionHeader(
+        ConsoleFilterSectionHeader(
             icon: "line.horizontal.3.decrease.circle", title: "Filters",
             color: .yellow,
             reset: { viewModel.resetFilters() },
@@ -121,19 +110,19 @@ extension ConsoleMessageFiltersView {
     private var generalContent: some View {
         VStack {
             customFiltersList
-        }
-        .padding(.leading, 4)
-        .padding(.top, Filters.contentTopInset)
+        }.padding(.leading, -8)
 
-        Button(action: viewModel.addFilter) {
-            Image(systemName: "plus.circle")
+        if !viewModel.isDefaultFilters {
+            Button(action: viewModel.addFilter) {
+                Image(systemName: "plus.circle")
+            }.padding(.top, 6)
         }
     }
 #endif
 
     private var customFiltersList: some View {
         ForEach(viewModel.filters) { filter in
-            CustomFilterView(filter: filter, onRemove: viewModel.removeFilter, isRemoveHidden: viewModel.isDefaultFilters)
+            ConsoleCustomMessageFilterView(filter: filter, onRemove: viewModel.removeFilter, isRemoveHidden: viewModel.isDefaultFilters)
         }
     }
 }
@@ -143,7 +132,7 @@ extension ConsoleMessageFiltersView {
 
 extension ConsoleMessageFiltersView {
     var logLevelsSection: some View {
-        FiltersSection(
+        ConsoleFilterSection(
             isExpanded: $isLevelsSectionExpanded,
             header: { logLevelsHeader },
             content: { logLevelsContent }
@@ -151,7 +140,7 @@ extension ConsoleMessageFiltersView {
     }
 
     private var logLevelsHeader: some View {
-        FilterSectionHeader(
+        ConsoleFilterSectionHeader(
             icon: "flag", title: "Levels",
             color: .accentColor,
             reset: { viewModel.criteria.logLevels = .default },
@@ -160,15 +149,7 @@ extension ConsoleMessageFiltersView {
         )
     }
 
-#if os(iOS) || os(tvOS)
-    @ViewBuilder
-    private var logLevelsContent: some View {
-        ForEach(LoggerStore.Level.allCases, id: \.self) { level in
-            Toggle(level.name.capitalized, isOn: viewModel.binding(forLevel: level))
-        }
-        Button(viewModel.bindingForTogglingAllLevels.wrappedValue ? "Disable All" : "Enable All", action: { viewModel.bindingForTogglingAllLevels.wrappedValue.toggle() })
-    }
-#else
+#if os(macOS)
     private var logLevelsContent: some View {
         HStack(spacing:0) {
             VStack(alignment: .leading, spacing: 6) {
@@ -183,7 +164,6 @@ extension ConsoleMessageFiltersView {
             Spacer()
         }
     }
-#endif
 
     private func makeLevelsSection(levels: [LoggerStore.Level]) -> some View {
         VStack(alignment: .leading) {
@@ -193,13 +173,24 @@ extension ConsoleMessageFiltersView {
             }
         }
     }
+#else
+    @ViewBuilder
+    private var logLevelsContent: some View {
+        ForEach(LoggerStore.Level.allCases, id: \.self) { level in
+            Checkbox(level.name.capitalized, isOn: viewModel.binding(forLevel: level))
+        }
+        Button(viewModel.bindingForTogglingAllLevels.wrappedValue ? "Disable All" : "Enable All") {
+            viewModel.bindingForTogglingAllLevels.wrappedValue.toggle()
+        }
+    }
+#endif
 }
 
 // MARK: - ConsoleMessageFiltersView (Labels)
 
 extension ConsoleMessageFiltersView {
     var labelsSection: some View {
-        FiltersSection(
+        ConsoleFilterSection(
             isExpanded: $isLabelsSectionExpanded,
             header: { labelsHeader },
             content: { labelsContent }
@@ -207,7 +198,7 @@ extension ConsoleMessageFiltersView {
     }
 
     private var labelsHeader: some View {
-        FilterSectionHeader(
+        ConsoleFilterSectionHeader(
             icon: "tag", title: "Labels",
             color: .orange,
             reset: { viewModel.criteria.labels = .default },
@@ -216,27 +207,7 @@ extension ConsoleMessageFiltersView {
         )
     }
 
-#if os(iOS) || os(tvOS)
-    @ViewBuilder
-    private var labelsContent: some View {
-        let labels = viewModel.allLabels
-
-        if labels.isEmpty {
-            Text("No Labels")
-                .frame(maxWidth: .infinity, alignment: .center)
-                .foregroundColor(.secondary)
-        } else {
-            ForEach(labels.prefix(4), id: \.self) { item in
-                Toggle(item.capitalized, isOn: viewModel.binding(forLabel: item))
-            }
-            if labels.count > 4 {
-                NavigationLink(destination: ConsoleFiltersLabelsPickerView(viewModel: viewModel)) {
-                    Text("View All").foregroundColor(.blue)
-                }
-            }
-        }
-    }
-#else
+#if os(macOS)
     private var labelsContent: some View {
         HStack {
             VStack(alignment: .leading, spacing: 6) {
@@ -250,133 +221,46 @@ extension ConsoleMessageFiltersView {
             Spacer()
         }
     }
-#endif
-}
-
-// MARK: - ConsoleMessageFiltersView (Time Period)
-
-#if os(iOS) || os(macOS)
-@available(iOS 14, *)
-struct ConsoleSharedFiltersView: View {
-    @ObservedObject var viewModel: ConsoleSharedSearchCriteriaViewModel
-
-    @State var isTimePeriodSectionExpanded = true
-    @State var isFiltersSectionExpanded = true
-
-    var body: some View {
-        sectionTimePeriod
-        sectionFilters
-    }
-
-    private var sectionTimePeriod: some View {
-#if os(iOS)
-        Section(
-            content: { timePeriodContent },
-            header: { timePeriodHeader },
-            footer: {
-                HStack(alignment: .center, spacing: 14) {
-                    Text("Quick Filters")
-                        .lineLimit(1)
-                        .foregroundColor(.secondary)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    quickFilters
-                }
-                .padding(.top, 4)
-                .foregroundColor(.accentColor)
-            }
-        )
 #else
-        FiltersSection(
-            isExpanded: $isTimePeriodSectionExpanded,
-            header: { timePeriodHeader },
-            content: { timePeriodContent }
-        )
-#endif
-    }
-
-    private var timePeriodHeader: some View {
-        FilterSectionHeader(
-            icon: "calendar", title: "Time Period",
-            color: .yellow,
-            reset: viewModel.resetDates,
-            isDefault: viewModel.isDatesDefault,
-            isEnabled: $viewModel.dates.isEnabled
-        )
-    }
-
     @ViewBuilder
-    private var timePeriodContent: some View {
-        DateRangePicker(title: "Start", date: $viewModel.dates.startDate)
-        DateRangePicker(title: "End", date: $viewModel.dates.endDate)
+    private var labelsContent: some View {
+        let labels = viewModel.allLabels
 
-#if os(macOS)
-        VStack(spacing: 4) {
-            HStack {
-                Text("Quick Filters").foregroundColor(.secondary)
-                Spacer()
+        if labels.isEmpty {
+            Text("No Labels")
+                .frame(maxWidth: .infinity, alignment: .center)
+                .foregroundColor(.secondary)
+        } else {
+            ForEach(labels.prefix(4), id: \.self) { item in
+                Checkbox(item.capitalized, isOn: viewModel.binding(forLabel: item))
             }
-            HStack(spacing: 8) {
-                quickFilters
-                Spacer()
-            }
-            .foregroundColor(.accentColor)
-            .buttonStyle(.plain)
-        }
-        .padding(.top, 4)
-#endif
-    }
-
-    @ViewBuilder
-    private var quickFilters: some View {
-        Button("Session") { viewModel.dates = .session }
-        Button("Recent") { viewModel.dates = .session }
-        Button("Today") { viewModel.dates = .today }
-    }
-
-    // MARK: Filters
-
-    private var sectionFilters: some View {
-        FiltersSection(
-            isExpanded: $isFiltersSectionExpanded,
-            header: {
-                FilterSectionHeader(
-                    icon: "calendar", title: "General",
-                    color: .blue,
-                    reset: { viewModel.filters = .default },
-                    isDefault: viewModel.filters == .default,
-                    isEnabled: $viewModel.filters.isEnabled
-                )
-            },
-            content: {
-                Toggle("Only Pinned", isOn: $viewModel.filters.inOnlyPins)
-                if #available(iOS 15.0, macOS 12, *) {
-                    Button(role: .destructive, action: viewModel.removeAllPins, label: {
-                        Text("Remove Pins")
-                    })
+            if labels.count > 4 {
+                NavigationLink(destination: ConsoleFiltersLabelsPickerView(viewModel: viewModel)) {
+                    Text("View All").foregroundColor(.blue)
                 }
             }
-        )
+        }
     }
-}
 #endif
+}
 
 #if DEBUG
 struct ConsoleMessageFiltersView_Previews: PreviewProvider {
     static var previews: some View {
-#if os(iOS) || os(tvOS)
-        NavigationView {
-            ConsoleMessageFiltersView(viewModel: makeMockViewModel(), sharedCriteriaViewModel: .init(store: .mock), isPresented: .constant(true))
-        }
-#else
+#if os(macOS)
         ConsoleMessageFiltersView(viewModel: makeMockViewModel(), sharedCriteriaViewModel: .init(store: .mock))
-            .previewLayout(.fixed(width: Filters.preferredWidth - 15, height: 700))
+            .previewLayout(.fixed(width: ConsoleFilters.preferredWidth - 15, height: 700))
+#else
+        NavigationView {
+            ConsoleMessageFiltersView(viewModel: makeMockViewModel(), sharedCriteriaViewModel: .init(store: .mock))
+        }.navigationViewStyle(.stack)
 #endif
     }
 }
 
 private func makeMockViewModel() -> ConsoleMessageSearchCriteriaViewModel {
-    ConsoleMessageSearchCriteriaViewModel(store: .mock)
+    let viewModel = ConsoleMessageSearchCriteriaViewModel(store: .mock)
+    viewModel.displayLabels(["Auth", "Network", "Analytics", "Home", "Storage"])
+    return viewModel
 }
-#endif
-
 #endif

@@ -7,7 +7,7 @@ import CoreData
 import Pulse
 import Combine
 
-#warning("TODO: remoev MainViewModel and ConsoleContainerView")
+#warning("TODO: remoev ConsoleViewModel and ConsoleContainerView")
 #warning("TODO: experiemnt with different navigation styles on macos")
 #warning("TODO: show message details in the details and metadata in main panel")
 #warning("TDO: move search button somewhere else")
@@ -17,14 +17,18 @@ import Combine
 
 #if os(macOS)
 
-public struct MainView: View {
-    @StateObject private var viewModel: MainViewModel
+public struct ConsoleView: View {
+    @StateObject private var viewModel: ConsoleViewModel
     @State private var isShowingSettings = false
     @State private var isShowingShareSheet = false
     @State private var shareItems: ShareItems?
  
     public init(store: LoggerStore = .shared) {
-        _viewModel = StateObject(wrappedValue: MainViewModel(store: store))
+        self.init(viewModel: .init(store: store))
+    }
+
+    init(viewModel: ConsoleViewModel) {
+        _viewModel = StateObject(wrappedValue: viewModel)
     }
 
     public var body: some View {
@@ -55,7 +59,6 @@ public struct MainView: View {
             .sheet(isPresented: $isShowingSettings) {
                 SettingsView(viewModel: .init(store: viewModel.store))
             }
-            .onDisappear { viewModel.freeMemory() }
     }
 
     @ViewBuilder
@@ -71,11 +74,10 @@ public struct MainView: View {
 }
 
 #warning("TODO: this is incomplete")
-#warning("TODO: try to implement using selection https://stackoverflow.com/questions/72778176/swiftui-navigationsplitview-reset-detail-view-when-sidebar-selection-changes")
 
 @available(macOS 13.0, *)
 private struct ConsoleContainerView: View {
-    var viewModel: MainViewModel
+    var viewModel: ConsoleViewModel
     @ObservedObject var details: ConsoleDetailsRouterViewModel
     @State private var columnVisibility = NavigationSplitViewVisibility.all
 
@@ -83,27 +85,27 @@ private struct ConsoleContainerView: View {
         NavigationSplitView(
             columnVisibility: $columnVisibility,
             sidebar: {
-                MainPanelView(viewModel: viewModel)
-                    .navigationSplitViewColumnWidth(min: MainView.contentColumnWidth, ideal: 420, max: 640)
+                Siderbar(viewModel: viewModel)
+                    .navigationSplitViewColumnWidth(min: ConsoleView.contentColumnWidth, ideal: 420, max: 640)
             },
             content: {
                 ConsoleMessageDetailsRouter(viewModel: details)
-                    .navigationSplitViewColumnWidth(MainView.contentColumnWidth)
+                    .navigationSplitViewColumnWidth(ConsoleView.contentColumnWidth)
             },
             detail: {
-                PlaceholderView(imageName: "questionmark.circle", title: "No Selection")
+                EmptyView()
             }
         )
     }
 }
 
 private struct LegacyConsoleContainerView: View {
-    var viewModel: MainViewModel
+    var viewModel: ConsoleViewModel
     @ObservedObject var details: ConsoleDetailsRouterViewModel
 
     var body: some View {
         NavigationView {
-            MainPanelView(viewModel: viewModel)
+            Siderbar(viewModel: viewModel)
                 .frame(minWidth: 320, idealWidth: 320, maxWidth: 600, minHeight: 120, idealHeight: 480, maxHeight: .infinity)
             ConsoleMessageDetailsRouter(viewModel: details)
                 .frame(minWidth: 430, idealWidth: 500, maxWidth: 600, minHeight: 320, idealHeight: 480, maxHeight: .infinity)
@@ -112,66 +114,66 @@ private struct LegacyConsoleContainerView: View {
     }
 }
 
-private struct MainPanelView: View {
-    let viewModel: MainViewModel
+private struct Siderbar: View {
+    let viewModel: ConsoleViewModel
+
+    @State private var isSearchBarActive = false
 
     var body: some View {
         VStack(spacing: 0) {
-            content
-            ConsoleToolbarSearchBar(viewModel: viewModel)
+            ConsoleTableView(viewModel: viewModel.table, onSelected: {
+                viewModel.details.select($0)
+            })
+            ConsoleToolbarSearchBar(viewModel: viewModel, isSearchBarActive: $isSearchBarActive)
         }
         .toolbar {
             ToolbarItemGroup(placement: .automatic) {
-                Button(action: {
-                    // TODO: Refactor
-                    viewModel.toolbar.isSearchBarActive = true
-                    DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(100)) {
-                        viewModel.searchBar.onFind.send()
-                    }
-                }) {
-                    Image(systemName: "magnifyingglass")
-                }.keyboardShortcut("f")
-                ConsoleToolbarToggleOnlyErrorsButton(viewModel: viewModel.toolbar)
-                    .keyboardShortcut("e", modifiers: [.command, .shift])
-                ConsoleToolbarModePickerButton(viewModel: viewModel.console)
-                    .keyboardShortcut("n", modifiers: [.command, .shift])
-                FilterPopoverToolbarButton(viewModel: viewModel.console)
-                    .keyboardShortcut("f", modifiers: [.command, .option])
+                ConsoleToolbarItems(viewModel: viewModel, isSearchBarActive: $isSearchBarActive)
             }
         }
-    }
-
-    @ViewBuilder
-    private var content: some View {
-        ConsoleTableView(viewModel: viewModel.console.table, onSelected: {
-            viewModel.details.select($0)
-        })
-        .onAppear(perform: viewModel.console.onAppear)
-        .onDisappear(perform: viewModel.console.onDisappear)
-        .background(NavigationTitleUpdater(title: viewModel.console.mode == .network ? "Requests" : "Messages", viewModel: viewModel.console.table))
+        .onAppear(perform: viewModel.onAppear)
+        .onDisappear(perform: viewModel.onDisappear)
+        .background(NavigationTitleUpdater(title: viewModel.title, viewModel: viewModel.table))
     }
 }
 
-private struct ConsoleToolbarSearchBar: View {
-    let viewModel: MainViewModel
-    @ObservedObject var toolbar: ConsoleToolbarViewModel
-    @ObservedObject var searchBar: ConsoleSearchBarViewModel
-
-    init(viewModel: MainViewModel) {
-        self.viewModel = viewModel
-        self.toolbar = viewModel.toolbar
-        self.searchBar = viewModel.searchBar
-    }
+private struct ConsoleToolbarItems: View {
+    @ObservedObject var viewModel: ConsoleViewModel
+    @Binding var isSearchBarActive: Bool
 
     var body: some View {
-        if toolbar.isSearchBarActive {
+        Button(action: {
+            // TODO: Refactor
+            isSearchBarActive = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(100)) {
+                viewModel.onFind.send()
+            }
+        }) {
+            Image(systemName: "magnifyingglass")
+        }.keyboardShortcut("f")
+        ConsoleToolbarToggleOnlyErrorsButton(isOnlyErrors: $viewModel.isOnlyErrors)
+            .keyboardShortcut("e", modifiers: [.command, .shift])
+        ConsoleToolbarModePickerButton(viewModel: viewModel)
+            .keyboardShortcut("n", modifiers: [.command, .shift])
+        FilterPopoverToolbarButton(viewModel: viewModel)
+            .keyboardShortcut("f", modifiers: [.command, .option])
+    }
+}
+
+#warning("TODO: remove search button & always dispaly filter at the top or bottom")
+private struct ConsoleToolbarSearchBar: View {
+    @ObservedObject var viewModel: ConsoleViewModel
+    @Binding var isSearchBarActive: Bool
+
+    var body: some View {
+        if isSearchBarActive {
             VStack(spacing: 0) {
                 Divider()
                 HStack {
-                    SearchBar(title: "Filter", text: $searchBar.text, onFind: searchBar.onFind, onEditingChanged: { isEditing in
-                        toolbar.isSearchBarActive = isEditing
+                    SearchBar(title: "Filter", text: $viewModel.filterTerm, onFind: viewModel.onFind, onEditingChanged: { isEditing in
+                        isSearchBarActive = isEditing
                     }, onReturn: { })
-                    .frame(maxWidth: toolbar.isSearchBarActive ? 320 : 200)
+                    .frame(maxWidth: isSearchBarActive ? 320 : 200)
                     Spacer()
                 }.padding(6)
             }
@@ -181,26 +183,18 @@ private struct ConsoleToolbarSearchBar: View {
 
 private struct FilterPopoverToolbarButton: View {
     let viewModel: ConsoleViewModel
-    @State private var isFilterPresented = false
+    @State private var isPresented = false
 
     var body: some View {
-        Button(action: { isFilterPresented.toggle() }, label: {
-            Image(systemName: isFilterPresented ? "line.horizontal.3.decrease.circle.fill" : "line.horizontal.3.decrease.circle")
-                .foregroundColor(isFilterPresented ? .accentColor : .secondary)
+        Button(action: { isPresented.toggle() }, label: {
+            Image(systemName: isPresented ? "line.horizontal.3.decrease.circle.fill" : "line.horizontal.3.decrease.circle")
+                .foregroundColor(isPresented ? .accentColor : .secondary)
         })
         .help("Toggle Filters Panel (⌥⌘F)")
-        .popover(isPresented: $isFilterPresented, arrowEdge: .top) {
-            filters.frame(width: Filters.preferredWidth).padding(.bottom, 16)
-        }
-    }
-
-    @ViewBuilder
-    private var filters: some View {
-        switch viewModel.mode {
-        case .all:
-            ConsoleMessageFiltersView(viewModel: viewModel.searchCriteriaViewModel, sharedCriteriaViewModel: viewModel.sharedSearchCriteriaViewModel)
-        case .network:
-            NetworkFiltersView(viewModel: viewModel.networkSearchCriteriaViewModel, sharedCriteriaViewModel: viewModel.sharedSearchCriteriaViewModel)
+        .popover(isPresented: $isPresented, arrowEdge: .top) {
+            ConsoleFiltersView(viewModel: viewModel)
+                .frame(width: ConsoleFilters.preferredWidth)
+                .padding(.bottom, 16)
         }
     }
 }
@@ -231,10 +225,21 @@ private struct NavigationTitleUpdater: View {
     }
 }
 
+struct ConsoleToolbarToggleOnlyErrorsButton: View {
+    @Binding var isOnlyErrors: Bool
+
+    var body: some View {
+        Button(action: { isOnlyErrors.toggle() }) {
+            Image(systemName: isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon")
+                .foregroundColor(isOnlyErrors ? .accentColor : .secondary)
+        }.help("Toggle Show Only Errors (⇧⌘E)")
+    }
+}
+
 #if DEBUG
-struct MainView_Previews: PreviewProvider {
+struct ConsoleView_Previews: PreviewProvider {
     static var previews: some View {
-        MainView(store: .mock)
+        ConsoleView(store: .mock)
             .previewLayout(.fixed(width: 1200, height: 800))
     }
 }

@@ -8,11 +8,9 @@ import CoreData
 import Combine
 import SwiftUI
 
-#if os(iOS) || os(macOS) || os(tvOS)
-
 final class ConsoleNetworkSearchCriteriaViewModel: ObservableObject {
-    @Published var criteria: NetworkSearchCriteria = .default
-    private(set) var defaultCriteria: NetworkSearchCriteria = .default
+    @Published var criteria: ConsoleNetworkSearchCriteria = .default
+    private(set) var defaultCriteria: ConsoleNetworkSearchCriteria = .default
     @Published var filters: [NetworkSearchFilter] = []
 
     @Published private(set) var allDomains: [String] = []
@@ -68,6 +66,10 @@ final class ConsoleNetworkSearchCriteriaViewModel: ObservableObject {
         }
     }
 
+    func mock(domains: [String]) {
+        self.allDomains = domains
+    }
+
     // MARK: Managing Custom Filters
 
     func resetFilters() {
@@ -117,21 +119,11 @@ final class ConsoleNetworkSearchCriteriaViewModel: ObservableObject {
 
     func binding(forDomain domain: String) -> Binding<Bool> {
         Binding(get: {
-            self.criteria.host.values.contains(domain)
+            !self.criteria.host.ignoredHosts.contains(domain)
         }, set: { newValue in
-            if self.criteria.host.values.remove(domain) == nil {
-                self.criteria.host.values.insert(domain)
+            if self.criteria.host.ignoredHosts.remove(domain) == nil {
+                self.criteria.host.ignoredHosts.insert(domain)
             }
         })
     }
 }
-
-#else
-final class ConsoleNetworkSearchCriteriaViewModel: ObservableObject {
-    var isDefaultSearchCriteria: Bool { true }
-    let dataNeedsReload = PassthroughSubject<Void, Never>()
-
-    init(store: LoggerStore) {}
-}
-
-#endif

@@ -8,7 +8,7 @@ import Pulse
 #if os(iOS) || os(macOS)
 
 @available(iOS 15, *)
-struct CustomFilterView: View {
+struct ConsoleCustomMessageFilterView: View {
     @ObservedObject var filter: ConsoleSearchFilter
     let onRemove: (ConsoleSearchFilter) -> Void
     let isRemoveHidden: Bool
@@ -22,7 +22,7 @@ struct CustomFilterView: View {
         self.isRemoveHidden = isRemoveHidden
     }
 
-    #if os(iOS)
+#if os(iOS)
 
     @FocusState private var isTextFieldFocused: Bool
     @State private var isEditing = false
@@ -68,51 +68,44 @@ struct CustomFilterView: View {
 
     // TODO: On iOS 16, inline picker looks OK
     private var fieldMenu: some View {
-        Menu(content: {
+        FilterPickerMenu(title: filter.field.localizedTitle) {
             fieldPicker
-        }, label: {
-            FilterPickerButton(title: filter.field.localizedTitle)
-        }).animation(.none)
+        }
     }
 
     private var matchMenu: some View {
-        Menu(content: {
+        FilterPickerMenu(title: filter.match.localizedTitle) {
             matchPicker
-        }, label: {
-            FilterPickerButton(title: filter.match.localizedTitle)
-        }).animation(.none)
+        }
     }
 
-    #else
+#else
 
     var body: some View {
-        VStack(spacing: 6) {
-            HStack {
-                fieldPicker
-                    .frame(width: 140)
-                Spacer()
-                Button(action: { onRemove(filter) }) {
-                    Image(systemName: "minus.circle")
+        HStack(spacing: 16) {
+            VStack(spacing: 8) {
+                HStack {
+                    fieldPicker
+                    matchPicker
                 }
-                .buttonStyle(.plain)
-                .foregroundColor(.red)
-            }
-            HStack {
-                matchPicker
-                    .frame(width: 140)
-                Spacer()
-            }
-            HStack {
                 TextField("Value", text: $filter.value)
                     .textFieldStyle(.roundedBorder)
             }
+            .padding(8)
+            .background(Color(NSColor.windowBackgroundColor))
+            .cornerRadius(8)
+
+            if !isRemoveHidden {
+                Button(action: { onRemove(filter) }) {
+                    Image(systemName: "minus.circle.fill")
+                }
+                .buttonStyle(.plain)
+                .foregroundColor(Color.red)
+            }
         }
-        .padding(EdgeInsets(top: 8, leading: 6, bottom: 8, trailing: 6))
-        .background(Color(NSColor.windowBackgroundColor))
-        .cornerRadius(8)
     }
 
-    #endif
+#endif
 
     private var fieldPicker: some View {
         Picker("Field", selection: $filter.field) {

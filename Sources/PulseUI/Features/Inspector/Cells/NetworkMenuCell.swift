@@ -12,13 +12,19 @@ struct NetworkMenuCell: View {
     var details: String = ""
 
     var body: some View {
-#if os(watchOS) || os(tvOS)
+#if os(watchOS)
         HStack {
             HStack {
                 Text(title)
                 Spacer()
                 Text(details).foregroundColor(.secondary)
             }
+        }
+#elseif os(tvOS)
+        HStack {
+            LabelBackport(title, systemImage: icon)
+            Spacer()
+            Text(details).foregroundColor(.secondary)
         }
 #else
         HStack {

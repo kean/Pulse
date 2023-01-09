@@ -61,7 +61,7 @@ struct _RichTextView: View {
             .sheet(isPresented: $isWebViewOpen) {
                 NavigationView {
                     WebView(data: viewModel.text.string.data(using: .utf8) ?? Data(), contentType: "application/html")
-                        .navigationBarTitle("Browser Preview", displayMode: .inline)
+                        .backport.inlineNavigationTitle("Browser Preview")
                         .navigationBarItems(trailing: Button(action: {
                             isWebViewOpen = false
                         }) { Image(systemName: "xmark") })
@@ -304,9 +304,7 @@ struct RichTextView_Previews: PreviewProvider {
             let json = try! JSONSerialization.jsonObject(with: MockJSON.allPossibleValues)
             let string = TextRenderer().render(json: json)
             RichTextView(viewModel: .init(string: string, contentType: "application/json"))
-#if os(iOS)
-                .navigationBarTitle("RichTextView", displayMode: .inline)
-#endif
+                .backport.inlineNavigationTitle("Rich Text View")
         }
 #if os(macOS)
             .frame(height: 600)

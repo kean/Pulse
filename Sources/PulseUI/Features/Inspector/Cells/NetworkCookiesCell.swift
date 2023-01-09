@@ -106,7 +106,7 @@ struct NetworkCookiesCell_Previews: PreviewProvider {
                 }
             }
 #if os(macOS)
-            .frame(width: MainView.contentColumnWidth)
+            .frame(width: ConsoleView.contentColumnWidth)
 #endif
         }
     }

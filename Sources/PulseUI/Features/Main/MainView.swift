@@ -7,8 +7,6 @@ import CoreData
 import Pulse
 import Combine
 
-#if os(iOS) || os(watchOS) || os(tvOS)
-
 /// A MainView that contains the navigation view.
 ///
 /// - note: To embed console into your own navigation, use ``ConsoleView`` directly.
@@ -21,9 +19,13 @@ public struct MainView: View {
     }
 
     public var body: some View {
+#if os(macOS)
+        ConsoleView(viewModel: viewModel)
+#else
         NavigationView {
             ConsoleView(viewModel: viewModel)
         }.navigationViewStyle(.stack)
+#endif
     }
 }
 
@@ -34,7 +36,5 @@ struct MainView_Previews: PreviewProvider {
         MainView(store: .mock)
     }
 }
-
-#endif
 
 #endif

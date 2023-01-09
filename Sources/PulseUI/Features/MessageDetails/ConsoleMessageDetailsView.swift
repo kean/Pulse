@@ -10,7 +10,7 @@ import Pulse
 struct ConsoleMessageDetailsView: View {
     let viewModel: ConsoleMessageDetailsViewModel
 
-    #if os(iOS)
+#if os(iOS)
     var body: some View {
         contents
             .navigationBarTitle("", displayMode: .inline)
@@ -26,7 +26,7 @@ struct ConsoleMessageDetailsView: View {
             PinButton(viewModel: viewModel.pin, isTextNeeded: false)
         }
     }
-    #elseif os(watchOS)
+#elseif os(watchOS)
     var body: some View {
         ScrollView {
             VStack(spacing: 8) {
@@ -37,24 +37,24 @@ struct ConsoleMessageDetailsView: View {
             }
         }
     }
-    #elseif os(tvOS)
+#elseif os(tvOS)
     var body: some View {
         contents
     }
-    #elseif os(macOS)
+#elseif os(macOS)
     @State private var isDetailsLinkActive = false
 
     var body: some View {
         ConsoleMessageMetadataView(message: viewModel.message)
             .background(InvisibleNavigationLinks {
-                    NavigationLink.programmatic(isActive: $isDetailsLinkActive) {
-                        _MessageTextView(viewModel: viewModel)
-                    }
+                NavigationLink.programmatic(isActive: $isDetailsLinkActive) {
+                    _MessageTextView(viewModel: viewModel)
                 }
+            }
             )
             .onAppear { isDetailsLinkActive = true }
     }
-    #endif
+#endif
 
     private var contents: some View {
         VStack {
@@ -66,7 +66,7 @@ struct ConsoleMessageDetailsView: View {
         RichTextView(viewModel: viewModel.textViewModel)
     }
 
-    #if os(watchOS) || os(tvOS)
+#if os(watchOS) || os(tvOS)
     private var tags: some View {
         VStack(alignment: .leading) {
             ForEach(viewModel.tags, id: \.title) { tag in
@@ -85,7 +85,7 @@ struct ConsoleMessageDetailsView: View {
         .background(Color.gray.opacity(0.15))
         .cornerRadius(8)
     }
-    #endif
+#endif
 }
 
 #if os(macOS)

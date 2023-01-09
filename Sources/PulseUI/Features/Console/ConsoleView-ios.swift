@@ -120,20 +120,9 @@ private struct ConsoleToolbarView: View {
         .padding(EdgeInsets(top: 2, leading: 8, bottom: 2, trailing: 8))
         .sheet(isPresented: $isShowingFilters) {
             NavigationView {
-                switch viewModel.mode {
-                case .all:
-                    ConsoleMessageFiltersView(
-                        viewModel: viewModel.searchCriteriaViewModel,
-                        sharedCriteriaViewModel: viewModel.sharedSearchCriteriaViewModel,
-                        isPresented: $isShowingFilters
-                    )
-                case .network:
-                    NetworkFiltersView(
-                        viewModel: viewModel.networkSearchCriteriaViewModel,
-                        sharedCriteriaViewModel: viewModel.sharedSearchCriteriaViewModel,
-                        isPresented: $isShowingFilters
-                    )
-                }
+                ConsoleFiltersView(viewModel: viewModel)
+                    .backport.inlineNavigationTitle("Filters")
+                    .navigationBarItems(trailing: Button("Done") { isShowingFilters = false })
             }
         }
     }

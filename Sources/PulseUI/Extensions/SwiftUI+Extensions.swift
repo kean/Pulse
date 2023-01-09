@@ -127,17 +127,30 @@ extension Backport {
         }
     }
 
+    func inlineNavigationTitle(_ title: String) -> some View {
+        navigationTitle(title).backport.inlineNavigationTitle()
+    }
+
+    @ViewBuilder
+    func inlineNavigationTitle() -> some View {
+#if os(iOS)
+        if #available(iOS 14.0, *) {
+            self.content.navigationBarTitleDisplayMode(.inline)
+        } else {
+            self.content
+        }
+#else
+        self.content
+#endif
+    }
+
     @ViewBuilder
     func navigationTitle(_ title: String) -> some View {
-        if #available(iOS 14, tvOS 14, *) {
-            self.content.navigationTitle(title)
-        } else {
 #if os(iOS) || os(tvOS)
-            self.content.navigationBarTitle(title)
+        self.content.navigationBarTitle(title)
 #else
-            self.content.navigationTitle(title)
+        self.content.navigationTitle(title)
 #endif
-        }
     }
 
     @ViewBuilder

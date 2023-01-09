@@ -6,19 +6,17 @@ import Foundation
 import Pulse
 import CoreData
 
-#if os(iOS) || os(macOS) || os(tvOS)
-
-struct NetworkSearchCriteria: Hashable {
+struct ConsoleNetworkSearchCriteria: Hashable {
     var isFiltersEnabled = true
 
     var response = ResponseFilter.default
     var host = HostFilter.default
     var networking = NetworkingFilter.default
 
-    static let `default` = NetworkSearchCriteria()
+    static let `default` = ConsoleNetworkSearchCriteria()
 
     var isDefault: Bool {
-        self == NetworkSearchCriteria.default
+        self == ConsoleNetworkSearchCriteria.default
     }
 
     struct ResponseFilter: Hashable {
@@ -32,27 +30,26 @@ struct NetworkSearchCriteria: Hashable {
     }
 
     struct StatusCodeFilter: Hashable {
-        var from: String = ""
-        var to: String = ""
+        var range: ValuesRange<String> = .empty
     }
 
     struct ResponseSizeFilter: Hashable {
-        var from: String = ""
-        var to: String = ""
+        var range: ValuesRange<String> = .empty
         var unit: MeasurementUnit = .kilobytes
 
-        var fromBytes: Int64? {
-            Int64(from).map { $0 * unit.multiplier }
+        var byteCountRange: ValuesRange<Int64?> {
+            ValuesRange(lowerBound: byteCount(from: range.lowerBound),
+                        upperBound: byteCount(from: range.upperBound))
         }
 
-        var toBytes: Int64? {
-            Int64(to).map { $0 * unit.multiplier }
+        private func byteCount(from string: String) -> Int64? {
+            Int64(string).map { $0 * unit.multiplier }
         }
 
-        enum MeasurementUnit: CaseIterable {
+        enum MeasurementUnit: Identifiable, CaseIterable {
             case bytes, kilobytes, megabytes
 
-            var localizedTitle: String {
+            var title: String {
                 switch self {
                 case .bytes: return "Bytes"
                 case .kilobytes: return "KB"
@@ -67,28 +64,26 @@ struct NetworkSearchCriteria: Hashable {
                 case .megabytes: return 1024 * 1024
                 }
             }
+
+            var id: MeasurementUnit { self }
         }
     }
 
-    struct HostFilter: Hashable {
-        var isEnabled = true
-        var values: Set<String> = []
-
-        static let `default` = HostFilter()
-    }
-
     struct DurationFilter: Hashable {
-        var isEnabled = true
-        var min: String = ""
-        var max: String = ""
+        var range: ValuesRange<String> = .empty
         var unit: Unit = .seconds
 
-        enum Unit {
+        var durationRange: ValuesRange<TimeInterval?> {
+            ValuesRange(lowerBound: TimeInterval(range.lowerBound).map(unit.convert),
+                        upperBound: TimeInterval(range.upperBound).map(unit.convert))
+        }
+
+        enum Unit: Identifiable, CaseIterable {
             case minutes
             case seconds
             case milliseconds
 
-            var localizedTitle: String {
+            var title: String {
                 switch self {
                 case .minutes: return "min"
                 case .seconds: return "sec"
@@ -103,15 +98,16 @@ struct NetworkSearchCriteria: Hashable {
                 case .milliseconds: return value / 1000
                 }
             }
-        }
 
-        var minSeconds: TimeInterval? {
-            TimeInterval(min).map(unit.convert)
+            var id: Unit { self }
         }
+    }
 
-        var maxSeconds: TimeInterval? {
-            TimeInterval(max).map(unit.convert)
-        }
+    struct HostFilter: Hashable {
+        var isEnabled = true
+        var ignoredHosts: Set<String> = []
+
+        static let `default` = HostFilter()
     }
 
     struct ContentTypeFilter: Hashable {
@@ -149,12 +145,12 @@ struct NetworkSearchCriteria: Hashable {
         var source: Source = .any
         var taskType: TaskType = .any
 
-        enum Source {
+        enum Source: CaseIterable {
             case any
             case network
             case cache
 
-            var localizedTitle: String {
+            var title: String {
                 switch self {
                 case .any: return "Any"
                 case .cache: return "Cache"
@@ -298,105 +294,3 @@ func evaluateProgrammaticFilters(_ filters: [NetworkSearchFilter], entity: Netwo
     }
     return true
 }
-
-extension NetworkSearchCriteria {
-    static func update(
-        request: NSFetchRequest<NSManagedObject>,
-        filterTerm: String,
-        dates: ConsoleDatesFilter,
-        general: ConsoleGeneralFilters,
-        criteria: NetworkSearchCriteria,
-        filters: [NetworkSearchFilter],
-        isOnlyErrors: Bool
-    ) {
-        var predicates = [NSPredicate]()
-
-        if isOnlyErrors {
-            predicates.append(NSPredicate(format: "requestState == %d", NetworkTaskEntity.State.failure.rawValue))
-        }
-
-        if dates.isEnabled {
-            if let startDate = dates.startDate {
-                predicates.append(NSPredicate(format: "createdAt >= %@", startDate as NSDate))
-            }
-            if let endDate = dates.endDate {
-                predicates.append(NSPredicate(format: "createdAt <= %@", endDate as NSDate))
-            }
-        }
-
-        if general.isEnabled {
-            if general.inOnlyPins {
-                predicates.append(NSPredicate(format: "message.isPinned == YES"))
-            }
-        }
-
-        if criteria.response.isEnabled {
-            if let value = criteria.response.responseSize.fromBytes {
-                predicates.append(NSPredicate(format: "responseBodySize >= %d", value))
-            }
-            if let value = criteria.response.responseSize.toBytes {
-                predicates.append(NSPredicate(format: "responseBodySize <= %d", value))
-            }
-
-            if let value = Int(criteria.response.statusCode.from), value > 0 {
-                predicates.append(NSPredicate(format: "statusCode >= %d", value))
-            }
-            if let value = Int(criteria.response.statusCode.to), value > 0 {
-                predicates.append(NSPredicate(format: "statusCode <= %d", value))
-            }
-
-            switch criteria.response.contentType.contentType {
-            case .any: break
-            default: predicates.append(NSPredicate(format: "responseContentType CONTAINS %@", criteria.response.contentType.contentType.rawValue))
-            }
-        }
-
-        if criteria.response.duration.isEnabled {
-            if let value = criteria.response.duration.minSeconds {
-                predicates.append(NSPredicate(format: "duration >= %f", value))
-            }
-            if let value = criteria.response.duration.maxSeconds {
-                predicates.append(NSPredicate(format: "duration <= %f", value))
-            }
-        }
-
-        if criteria.networking.isEnabled {
-            if criteria.networking.isRedirect {
-                predicates.append(NSPredicate(format: "redirectCount >= 1"))
-            }
-            switch criteria.networking.source {
-            case .any:
-                break
-            case .network:
-                predicates.append(NSPredicate(format: "isFromCache == NO"))
-            case .cache:
-                predicates.append(NSPredicate(format: "isFromCache == YES"))
-            }
-            if case .some(let taskType) = criteria.networking.taskType {
-                predicates.append(NSPredicate(format: "taskType == %i", taskType.rawValue))
-            }
-        }
-
-        if criteria.host.isEnabled, !criteria.host.values.isEmpty {
-            predicates.append(NSPredicate(format: "host IN %@", criteria.host.values))
-        }
-
-        if filterTerm.count > 1 {
-            predicates.append(NSPredicate(format: "url CONTAINS[cd] %@", filterTerm))
-        }
-
-        if criteria.isFiltersEnabled {
-            for filter in filters where !filter.value.isEmpty {
-                if let predicate = filter.makePredicate() {
-                    predicates.append(predicate)
-                } else {
-                    // Have to be done in code
-                }
-            }
-        }
-
-        request.predicate = predicates.isEmpty ? nil : NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
-    }
-}
-
-#endif

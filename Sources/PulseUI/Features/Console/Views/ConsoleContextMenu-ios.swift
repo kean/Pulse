@@ -49,18 +49,6 @@ struct ConsoleContextMenu: View {
                     Label("Share Store", systemImage: "square.and.arrow.up")
                 }
                 if !store.isArchive {
-                    Button(action: { isDocumentBrowserPresented = true }) {
-                        Label("Browse Logs", systemImage: "folder")
-                    }
-                }
-            }
-            Section {
-                Button(action: { isShowingSettings = true }) {
-                    Label("Settings", systemImage: "gear")
-                }
-            }
-            if !store.isArchive {
-                Section {
                     if #available(iOS 15.0, *) {
                         Button(role: .destructive, action: buttonRemoveAllTapped) {
                             Label("Remove Logs", systemImage: "trash")
@@ -70,6 +58,11 @@ struct ConsoleContextMenu: View {
                             Label("Remove Logs", systemImage: "trash")
                         }
                     }
+                }
+            }
+            Section {
+                Button(action: { isShowingSettings = true }) {
+                    Label("Settings", systemImage: "gear")
                 }
             }
             Section {

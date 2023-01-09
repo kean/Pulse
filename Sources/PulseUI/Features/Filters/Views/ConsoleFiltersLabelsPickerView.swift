@@ -4,7 +4,7 @@
 
 import SwiftUI
 
-#if os(iOS) || os(tvOS)
+#if os(iOS) || os(tvOS) || os(watchOS)
 
 struct ConsoleFiltersLabelsPickerView: View {
     @ObservedObject var viewModel: ConsoleMessageSearchCriteriaViewModel
@@ -12,7 +12,7 @@ struct ConsoleFiltersLabelsPickerView: View {
     @State private var searchText = ""
 
     var body: some View {
-        if #available(iOS 15, tvOS 15, *) {
+        if #available(iOS 15, tvOS 15, watchOS 8, *) {
             form
 #if os(iOS)
                 .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always))
@@ -27,12 +27,14 @@ struct ConsoleFiltersLabelsPickerView: View {
     @ViewBuilder
     private var form: some View {
         Form {
-            Button(viewModel.bindingForTogglingAllLabels.wrappedValue ? "Disable All" : "Enable All", action: { viewModel.bindingForTogglingAllLabels.wrappedValue.toggle() })
-                .frame(maxWidth: .infinity, alignment: .center)
-                .foregroundColor(.accentColor)
+            Button(viewModel.bindingForTogglingAllLabels.wrappedValue ? "Disable All" : "Enable All") { viewModel.bindingForTogglingAllLabels.wrappedValue.toggle()
+            }
+#if !os(watchOS)
+            .foregroundColor(.accentColor)
+#endif
 
             ForEach(labels, id: \.self) { item in
-                Toggle(item.capitalized, isOn: viewModel.binding(forLabel: item))
+                Checkbox(item.capitalized, isOn: viewModel.binding(forLabel: item))
             }
         }
         .navigationBarTitle("Labels")

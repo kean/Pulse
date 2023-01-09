@@ -25,15 +25,7 @@ struct NetworkDetailsView: View {
     }
 
     var body: some View {
-#if os(iOS)
-        if #available(iOS 14.0, *) {
-            contents.navigationBarTitle(title, displayMode: .inline)
-        } else {
-            contents.backport.navigationTitle(title)
-        }
-#else
-        contents.backport.navigationTitle(title)
-#endif
+        contents.backport.inlineNavigationTitle(title)
     }
 
     @ViewBuilder
