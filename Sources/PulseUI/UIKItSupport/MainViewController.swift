@@ -22,7 +22,6 @@ public final class MainViewController: UIViewController {
         if MainViewController.isAutomaticAppearanceOverrideRemovalEnabled {
             removeAppearanceOverrides()
         }
-
         let console = ConsoleView(viewModel: viewModel)
         let vc = UIHostingController(rootView: NavigationView { console })
         addChild(vc)
