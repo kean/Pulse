@@ -49,7 +49,6 @@ public struct ConsoleView: View {
                             shareItems = ShareItems([ TextRenderer.share(viewModel.entities).string])
                         }
                     }
-
                     if #available(iOS 14, *) {
                         ConsoleContextMenu(store: viewModel.store, insights: viewModel.insightsViewModel, isShowingAsText: $isShowingAsText)
                     }
