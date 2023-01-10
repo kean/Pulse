@@ -155,7 +155,7 @@ extension Backport {
 
     @ViewBuilder
     func contextMenu<M: View, P: View>(@ViewBuilder menuItems: () -> M, @ViewBuilder preview: () -> P) -> some View {
-#if !os(macOS) && !targetEnvironment(macCatalyst) && swift(>=5.7) && !os(watchOS)
+#if swift(>=5.7) && !os(watchOS)
         if #available(iOS 16.0, tvOS 16.0, macOS 13.0, *) {
             self.content.contextMenu(menuItems: menuItems, preview: preview)
         } else {
