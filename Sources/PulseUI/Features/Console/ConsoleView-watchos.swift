@@ -37,20 +37,24 @@ public struct ConsoleView: View {
             }
         }
         .sheet(isPresented: $isPresentingSettings) {
-            SettingsView(viewModel: .init(store: viewModel.store))
-                .toolbar {
-                    ToolbarItem(placement: .cancellationAction) {
-                        Button("Close") { isPresentingSettings = false }
+            NavigationView {
+                SettingsView(viewModel: .init(store: viewModel.store))
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Close") { isPresentingSettings = false }
+                        }
                     }
-                }
+            }
         }
         .sheet(isPresented: $isPresentingFilters) {
-            ConsoleFiltersView(viewModel: viewModel)
-                .toolbar {
-                    ToolbarItem(placement: .cancellationAction) {
-                        Button("Close") { isPresentingFilters = false }
+            NavigationView {
+                ConsoleFiltersView(viewModel: viewModel)
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Close") { isPresentingFilters = false }
+                        }
                     }
-                }
+            }
         }
     }
 
