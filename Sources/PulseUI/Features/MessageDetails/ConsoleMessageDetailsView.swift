@@ -88,8 +88,6 @@ struct ConsoleMessageDetailsView: View {
 
 #if os(macOS)
 
-#warning("TODO: reimplemmet this")
-
 private struct _MessageTextView: View {
     let viewModel: ConsoleMessageDetailsViewModel
     @Environment(\.colorScheme) var colorScheme: ColorScheme
