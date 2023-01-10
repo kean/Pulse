@@ -12,7 +12,7 @@ import Combine
 struct NetworkInspectorView: View {
     @ObservedObject var viewModel: NetworkInspectorViewModel
 
-    @State private var isShowingCurrentRequest = false
+    @State private var isCurrentRequest = false
 
     var body: some View {
         List {
@@ -37,25 +37,13 @@ struct NetworkInspectorView: View {
             viewModel.statusSectionViewModel.map(NetworkRequestStatusSectionView.init)
         }
         Section {
-            sectionRequest
+            NetworkInspectorSectionRequest(viewModel: viewModel, isCurrentRequest: isCurrentRequest)
         } header: {
             requestTypePicker
         }
         if viewModel.task.state != .pending {
             Section { sectionResponse }
             Section { sectionMetrics }
-        }
-    }
-
-    @ViewBuilder
-    private var sectionRequest: some View {
-        viewModel.requestBodyViewModel.map(NetworkRequestBodyCell.init)
-        if !isShowingCurrentRequest {
-            viewModel.originalRequestHeadersViewModel.map(NetworkHeadersCell.init)
-            viewModel.originalRequestCookiesViewModel.map(NetworkCookiesCell.init)
-        } else {
-            viewModel.currentRequestHeadersViewModel.map(NetworkHeadersCell.init)
-            viewModel.currentRequestCookiesViewModel.map(NetworkCookiesCell.init)
         }
     }
 
@@ -95,7 +83,7 @@ struct NetworkInspectorView: View {
 
     @ViewBuilder
     private var requestTypePicker: some View {
-        Picker("Request Type", selection: $isShowingCurrentRequest) {
+        Picker("Request Type", selection: $isCurrentRequest) {
             Text("Original").tag(false)
             Text("Current").tag(true)
         }

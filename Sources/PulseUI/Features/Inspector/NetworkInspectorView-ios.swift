@@ -13,7 +13,7 @@ struct NetworkInspectorView: View {
     @ObservedObject var viewModel: NetworkInspectorViewModel
 
     @State private var shareItems: ShareItems?
-    @State private var isShowingCurrentRequest = false
+    @State private var isCurrentRequest = false
 
     var body: some View {
         Form {
@@ -36,23 +36,13 @@ struct NetworkInspectorView: View {
             viewModel.statusSectionViewModel.map(NetworkRequestStatusSectionView.init)
         }
 
-        Section { sectionRequest } header: { requestTypePicker }
+        Section {
+            NetworkInspectorSectionRequest(viewModel: viewModel, isCurrentRequest: isCurrentRequest)
+        } header: { requestTypePicker }
 
         if viewModel.task.state != .pending {
             Section { sectionResponse }
             Section { sectionMetrics }
-        }
-    }
-
-    @ViewBuilder
-    private var sectionRequest: some View {
-        viewModel.requestBodyViewModel.map(NetworkRequestBodyCell.init)
-        if !isShowingCurrentRequest {
-            viewModel.originalRequestHeadersViewModel.map(NetworkHeadersCell.init)
-            viewModel.originalRequestCookiesViewModel.map(NetworkCookiesCell.init)
-        } else {
-            viewModel.currentRequestHeadersViewModel.map(NetworkHeadersCell.init)
-            viewModel.currentRequestCookiesViewModel.map(NetworkCookiesCell.init)
         }
     }
 
@@ -92,7 +82,7 @@ struct NetworkInspectorView: View {
 
     @ViewBuilder
     private var requestTypePicker: some View {
-        let picker = Picker("Request Type", selection: $isShowingCurrentRequest) {
+        let picker = Picker("Request Type", selection: $isCurrentRequest) {
             Text("Original").tag(false)
             Text("Current").tag(true)
         }
