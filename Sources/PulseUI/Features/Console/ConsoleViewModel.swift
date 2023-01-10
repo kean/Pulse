@@ -40,11 +40,6 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 
     var onDismiss: (() -> Void)?
 
-#if os(macOS)
-    /// TODO: refactor
-    let onFind = PassthroughSubject<Void, Never>()
-#endif
-
     private(set) var store: LoggerStore
     private var controller: NSFetchedResultsController<NSManagedObject>?
     private var isActive = false
@@ -53,7 +48,6 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     enum Mode {
         case all, network
     }
-
 
     init(store: LoggerStore, mode: Mode = .all) {
         self.title = mode == .network ? "Network" : "Console"

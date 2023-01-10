@@ -8,12 +8,9 @@ import Pulse
 import Combine
 
 #warning("TODO: remoev ConsoleViewModel and ConsoleContainerView")
-#warning("TODO: experiemnt with different navigation styles on macos")
 #warning("TODO: show message details in the details and metadata in main panel")
 #warning("TDO: move search button somewhere else")
 #warning("TODO: fill-out filter button when custom selected")
-
-#warning("TODO: can we reuse more with iOS?")
 
 #if os(macOS)
 
@@ -73,12 +70,10 @@ public struct ConsoleView: View {
     static let contentColumnWidth: CGFloat = 280
 }
 
-#warning("TODO: this is incomplete")
-
 @available(macOS 13.0, *)
 private struct ConsoleContainerView: View {
-    var viewModel: ConsoleViewModel
-    @ObservedObject var details: ConsoleDetailsRouterViewModel
+    @ObservedObject var viewModel: ConsoleViewModel
+    let details: ConsoleDetailsRouterViewModel
     @State private var columnVisibility = NavigationSplitViewVisibility.all
 
     var body: some View {
@@ -86,6 +81,7 @@ private struct ConsoleContainerView: View {
             columnVisibility: $columnVisibility,
             sidebar: {
                 Siderbar(viewModel: viewModel)
+                    .searchable(text: $viewModel.filterTerm)
                     .navigationSplitViewColumnWidth(min: ConsoleView.contentColumnWidth, ideal: 420, max: 640)
             },
             content: {
@@ -115,20 +111,15 @@ private struct LegacyConsoleContainerView: View {
 }
 
 private struct Siderbar: View {
-    let viewModel: ConsoleViewModel
-
-    @State private var isSearchBarActive = false
+    var viewModel: ConsoleViewModel
 
     var body: some View {
-        VStack(spacing: 0) {
-            ConsoleTableView(viewModel: viewModel.table, onSelected: {
-                viewModel.details.select($0)
-            })
-            ConsoleToolbarSearchBar(viewModel: viewModel, isSearchBarActive: $isSearchBarActive)
-        }
+        ConsoleTableView(viewModel: viewModel.table, onSelected: {
+            viewModel.details.select($0)
+        })
         .toolbar {
             ToolbarItemGroup(placement: .automatic) {
-                ConsoleToolbarItems(viewModel: viewModel, isSearchBarActive: $isSearchBarActive)
+                ConsoleToolbarItems(viewModel: viewModel)
             }
         }
         .onAppear(perform: viewModel.onAppear)
@@ -139,45 +130,15 @@ private struct Siderbar: View {
 
 private struct ConsoleToolbarItems: View {
     @ObservedObject var viewModel: ConsoleViewModel
-    @Binding var isSearchBarActive: Bool
 
     var body: some View {
-        Button(action: {
-            // TODO: Refactor
-            isSearchBarActive = true
-            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(100)) {
-                viewModel.onFind.send()
-            }
-        }) {
-            Image(systemName: "magnifyingglass")
-        }.keyboardShortcut("f")
+        Spacer()
         ConsoleToolbarToggleOnlyErrorsButton(isOnlyErrors: $viewModel.isOnlyErrors)
             .keyboardShortcut("e", modifiers: [.command, .shift])
         ConsoleToolbarModePickerButton(viewModel: viewModel)
             .keyboardShortcut("n", modifiers: [.command, .shift])
         FilterPopoverToolbarButton(viewModel: viewModel)
             .keyboardShortcut("f", modifiers: [.command, .option])
-    }
-}
-
-#warning("TODO: remove search button & always dispaly filter at the top or bottom")
-private struct ConsoleToolbarSearchBar: View {
-    @ObservedObject var viewModel: ConsoleViewModel
-    @Binding var isSearchBarActive: Bool
-
-    var body: some View {
-        if isSearchBarActive {
-            VStack(spacing: 0) {
-                Divider()
-                HStack {
-                    SearchBar(title: "Filter", text: $viewModel.filterTerm, onFind: viewModel.onFind, onEditingChanged: { isEditing in
-                        isSearchBarActive = isEditing
-                    }, onReturn: { })
-                    .frame(maxWidth: isSearchBarActive ? 320 : 200)
-                    Spacer()
-                }.padding(6)
-            }
-        }
     }
 }
 
