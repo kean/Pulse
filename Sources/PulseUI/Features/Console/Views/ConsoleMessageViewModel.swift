@@ -12,12 +12,8 @@ final class ConsoleMessageViewModel: Pinnable {
 
     private let searchCriteriaViewModel: ConsoleMessageSearchCriteriaViewModel?
 
-#warning("TODO: make this an option, support on other platforms too")
-
-    var preprocessedText: String {
-        let text = message.text.trimmingCharacters(in: .whitespaces)
-        return text.replacingOccurrences(of: "\n", with: " ")
-    }
+    // TODO: Trim whitespaces and remove newlines?
+    var preprocessedText: String { message.text }
     
     private(set) lazy var time = ConsoleMessageViewModel.timeFormatter.string(from: message.createdAt)
 
