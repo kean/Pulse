@@ -7,6 +7,8 @@ import CoreData
 import Pulse
 import Combine
 
+#if os(iOS) || os(tvOS) || os(watchOS)
+
 struct NetworkInspectorView: View {
 #if os(watchOS)
     @StateObject var viewModel: NetworkInspectorViewModel
@@ -27,7 +29,7 @@ struct NetworkInspectorView: View {
             .navigationBarItems(trailing: trailingNavigationBarItems)
             .sheet(item: $shareItems, content: ShareView.init)
 #endif
-#if os(watchOS) || os(macOS)
+#if os(watchOS)
             .toolbar {
                 if #available(watchOS 9, macOS 13, *),
                    let url = ShareService.share(viewModel.task, as: .html).items.first as? URL {
@@ -37,22 +39,16 @@ struct NetworkInspectorView: View {
 #endif
     }
 
-#if os(iOS) || os(macOS)
+#if os(iOS)
     var contents: some View {
-#if os(macOS)
-        List { _contents }
-#else
         Form { _contents } // Can't figure out how to disable collapsible sections
-#endif
     }
+#endif
 
     @ViewBuilder
     private var _contents: some View {
         Section {
             transferStatusView
-#if os(macOS)
-                .padding(.vertical)
-#endif
         }
 #if os(iOS)
         .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
@@ -65,7 +61,7 @@ struct NetworkInspectorView: View {
             Section { sectionMetrics }
         }
     }
-#elseif os(watchOS)
+#if os(watchOS)
     var contents: some View {
         List {
             Section { viewModel.statusSectionViewModel.map(NetworkRequestStatusSectionView.init) }
@@ -156,22 +152,15 @@ struct NetworkInspectorView: View {
 
     @ViewBuilder
     private var sectionMetrics: some View {
-#if os(iOS) || os(macOS) || os(watchOS)
-        NavigationLink(destination: destinationMetrics) {
-            NetworkMenuCell(
-                icon: "clock.fill",
-                tintColor: .orange,
-                title: "Metrics",
-                details: ""
-            )
-        }.disabled(!viewModel.task.hasMetrics)
+#if os(iOS) || os(watchOS)
+        NetworkMetricsCell(task: viewModel.task)
 #endif
         NetworkCURLCell(task: viewModel.task)
     }
 
     // MARK: - Subviews
 
-#if os(iOS) || os(macOS) || os(tvOS)
+#if os(iOS) || os(tvOS)
     @ViewBuilder
     private var transferStatusView: some View {
         ZStack {
@@ -214,14 +203,6 @@ struct NetworkInspectorView: View {
 #endif
     }
 
-    // MARK: - Destinations
-
-    private var destinationMetrics: some View {
-        NetworkInspectorMetricsViewModel(task: viewModel.task).map {
-            NetworkInspectorMetricsView(viewModel: $0)
-        }
-    }
-
     // MARK: - Helpers
 
 #if os(iOS)
@@ -250,24 +231,10 @@ struct NetworkInspectorView: View {
 #endif
 }
 
-private func stringFromByteCount(_ count: Int64) -> String {
-    guard count > 0 else {
-        return ""
-    }
-    return ByteCountFormatter.string(fromByteCount: count)
-}
-
 #if DEBUG
 struct NetworkInspectorView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-#if os(macOS)
-            if #available(macOS 13.0, *) {
-                NavigationStack {
-                    NetworkInspectorView(viewModel: .init(task: LoggerStore.preview.entity(for: .login)))
-                }.previewLayout(.fixed(width: ConsoleView.contentColumnWidth, height: 800))
-            }
-#else
             NavigationView {
                 NetworkInspectorView(viewModel: .init(task: LoggerStore.preview.entity(for: .login)))
             }
@@ -279,8 +246,9 @@ struct NetworkInspectorView_Previews: PreviewProvider {
             }
             .navigationViewStyle(.stack)
             .previewDisplayName("Failure")
-#endif
         }
     }
 }
+#endif
+
 #endif
