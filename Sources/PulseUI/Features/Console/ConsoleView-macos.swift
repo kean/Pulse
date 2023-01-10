@@ -16,9 +16,6 @@ import Combine
 
 public struct ConsoleView: View {
     @StateObject private var viewModel: ConsoleViewModel
-    @State private var isShowingSettings = false
-    @State private var isShowingShareSheet = false
-    @State private var shareItems: ShareItems?
  
     public init(store: LoggerStore = .shared) {
         self.init(viewModel: .init(store: store))
@@ -29,33 +26,7 @@ public struct ConsoleView: View {
     }
 
     public var body: some View {
-        contents
-            .navigationTitle("Console")
-            .toolbar {
-                ToolbarItemGroup(placement: .navigation) {
-                    Button(action: { isShowingSettings = true }) {
-                        Image(systemName: "gearshape")
-                    }
-                    Button(action: { isShowingShareSheet = true }) {
-                        Image(systemName: "square.and.arrow.up")
-                    }
-                    .popover(isPresented: $isShowingShareSheet, arrowEdge: .top) {
-                        ShareStoreView(store: viewModel.store, isPresented: $isShowingShareSheet) { item in
-                            isShowingShareSheet = false
-                            DispatchQueue.main.async {
-                                shareItems = item
-                            }
-                        }
-                    }
-                    .popover(item: $shareItems) { item in
-                        ShareView(item)
-                            .fixedSize()
-                    }
-                }
-            }
-            .sheet(isPresented: $isShowingSettings) {
-                SettingsView(viewModel: .init(store: viewModel.store))
-            }
+        contents.navigationTitle("Console")
     }
 
     @ViewBuilder
@@ -132,13 +103,29 @@ private struct ConsoleToolbarItems: View {
     @ObservedObject var viewModel: ConsoleViewModel
 
     var body: some View {
+        ConsoleSettingsButton(store: viewModel.store)
         Spacer()
-        ConsoleToolbarToggleOnlyErrorsButton(isOnlyErrors: $viewModel.isOnlyErrors)
-            .keyboardShortcut("e", modifiers: [.command, .shift])
         ConsoleToolbarModePickerButton(viewModel: viewModel)
             .keyboardShortcut("n", modifiers: [.command, .shift])
+        ConsoleToolbarToggleOnlyErrorsButton(isOnlyErrors: $viewModel.isOnlyErrors)
+            .keyboardShortcut("e", modifiers: [.command, .shift])
         FilterPopoverToolbarButton(viewModel: viewModel)
             .keyboardShortcut("f", modifiers: [.command, .option])
+    }
+}
+
+private struct ConsoleSettingsButton: View {
+    let store: LoggerStore
+
+    @State private var isPresentingSettings = false
+
+    var body: some View {
+        Button(action: { isPresentingSettings = true }) {
+            Image(systemName: "gearshape")
+        }
+        .popover(isPresented: $isPresentingSettings, arrowEdge: .bottom) {
+            SettingsView(viewModel: .init(store: store))
+        }
     }
 }
 
@@ -154,7 +141,6 @@ private struct FilterPopoverToolbarButton: View {
         .help("Toggle Filters Panel (⌥⌘F)")
         .popover(isPresented: $isPresented, arrowEdge: .top) {
             ConsoleFiltersView(viewModel: viewModel)
-                .frame(width: ConsoleFilters.preferredWidth)
                 .padding(.bottom, 16)
         }
     }
@@ -192,7 +178,7 @@ struct ConsoleToolbarToggleOnlyErrorsButton: View {
     var body: some View {
         Button(action: { isOnlyErrors.toggle() }) {
             Image(systemName: isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon")
-                .foregroundColor(isOnlyErrors ? .accentColor : .secondary)
+                .foregroundColor(isOnlyErrors ? .red : .secondary)
         }.help("Toggle Show Only Errors (⇧⌘E)")
     }
 }

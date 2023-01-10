@@ -9,16 +9,16 @@ import Pulse
 
 public struct SettingsView: View {
     @ObservedObject var viewModel: SettingsViewModel
-
+    
     public init(store: LoggerStore = .shared) {
         // TODO: Fix ownership
         self.viewModel = SettingsViewModel(store: store)
     }
-
+    
     init(viewModel: SettingsViewModel) {
         self.viewModel = viewModel
     }
-
+    
     public var body: some View {
         Form {
             if #available(tvOS 14, *) {
@@ -43,7 +43,7 @@ public struct SettingsView: View {
         .frame(maxWidth: 800)
 #endif
     }
-
+    
     @available(tvOS 14, *)
     private var sectionStoreDetails: some View {
         Section {
@@ -55,7 +55,7 @@ public struct SettingsView: View {
             }
         }
     }
-
+    
 #if os(watchOS)
     private var sectionTransferStore: some View {
         Button(action: viewModel.tranferStore) {
@@ -86,13 +86,13 @@ struct SettingsView_Previews: PreviewProvider {
 
 struct ButtonRemoveAll: View {
     let action: () -> Void
-
+    
     var body: some View {
-        #if os(watchOS)
+#if os(watchOS)
         let title = "Remove All"
-        #else
+#else
         let title = "Remove Messages"
-        #endif
+#endif
         ButtonRemove(title: title, alert: "Are you sure you want to remove all recorded messages?", action: action)
     }
 }
@@ -101,24 +101,24 @@ struct ButtonRemove: View {
     let title: String
     let alert: String
     let action: () -> Void
-
+    
     var body: some View {
         let button =
-            Button(action: action) {
-                #if os(watchOS)
-                Label(title, systemImage: "trash")
-                #else
-                HStack {
-                    Image(systemName: "trash")
-                    Text(title)
-                }
-                #endif
+        Button(action: action) {
+#if os(watchOS)
+            Label(title, systemImage: "trash")
+#else
+            HStack {
+                Image(systemName: "trash")
+                Text(title)
             }
-
-        #if os(macOS)
+#endif
+        }
+        
+#if os(macOS)
         button
-        #else
+#else
         button.foregroundColor(.red)
-        #endif
+#endif
     }
 }
