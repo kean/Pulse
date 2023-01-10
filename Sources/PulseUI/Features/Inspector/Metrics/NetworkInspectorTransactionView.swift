@@ -12,7 +12,7 @@ struct NetworkInspectorTransactionView: View {
     var body: some View {
         Section(header: Text(viewModel.title)) {
             NetworkRequestStatusCell(viewModel: viewModel.statusViewModel)
-            viewModel.timingViewModel.map(TimingView.init)
+
 #if os(iOS) || os(macOS)
             NavigationLink(destination: destintionTransactionDetails) {
                 if #available(iOS 15, tvOS 15, macOS 12, *), let size = viewModel.transferSizeViewModel {
@@ -26,6 +26,7 @@ struct NetworkInspectorTransactionView: View {
                 Text("Transaction Details")
             }
 #endif
+            viewModel.timingViewModel.map(TimingView.init)
             NetworkRequestInfoCell(viewModel: viewModel.requestViewModel)
         }
     }
@@ -36,8 +37,8 @@ struct NetworkInspectorTransactionView: View {
         HStack {
             VStack(spacing: 8) {
                 HStack {
-                    Text("Details")
 #if !os(macOS)
+                    Text("Details")
                     Spacer()
 #endif
                     (Text(Image(systemName: "arrow.down.circle")) +
@@ -47,7 +48,12 @@ struct NetworkInspectorTransactionView: View {
                      Text(Image(systemName: "arrow.up.circle")) +
                      Text(" ") +
                      Text(size.totalBytesReceived))
+                    .lineLimit(1)
+#if os(macOS)
+                    .font(.caption)
+#else
                     .font(.callout)
+#endif
                     .monospacedDigit()
                     .foregroundColor(.secondary)
                 }

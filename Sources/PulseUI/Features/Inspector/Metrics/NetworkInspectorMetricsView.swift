@@ -50,7 +50,7 @@ struct NetworkInspectorMetricsView_Previews: PreviewProvider {
 #if os(macOS)
         NetworkInspectorMetricsView(viewModel: .init(
             task: LoggerStore.preview.entity(for: .createAPI)
-        )!)
+        )!).previewLayout(.fixed(width: 500, height: 800))
 #else
         NavigationView {
             NetworkInspectorMetricsView(viewModel: .init(
