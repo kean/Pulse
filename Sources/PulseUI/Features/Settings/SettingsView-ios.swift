@@ -5,8 +5,6 @@
 import SwiftUI
 import Pulse
 
-#warning("TODO: add on other platforms")
-
 #if os(iOS)
 import UniformTypeIdentifiers
 

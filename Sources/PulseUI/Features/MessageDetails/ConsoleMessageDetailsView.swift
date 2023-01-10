@@ -5,8 +5,6 @@
 import SwiftUI
 import Pulse
 
-#warning("TODO: macOS reimplement")
-
 struct ConsoleMessageDetailsView: View {
     let viewModel: ConsoleMessageDetailsViewModel
 
