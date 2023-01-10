@@ -34,6 +34,14 @@ struct NetworkInspectorView: View {
             .navigationBarItems(trailing: trailingNavigationBarItems)
             .sheet(item: $shareItems, content: ShareView.init)
 #endif
+#if os(watchOS) || os(macOS)
+            .toolbar {
+                if #available(watchOS 9, macOS 13, *),
+                   let url = ShareService.share(viewModel.task, as: .html).items.first as? URL {
+                    ShareLink(item: url)
+                }
+            }
+#endif
     }
 
 #if os(iOS) || os(macOS)
@@ -81,14 +89,7 @@ struct NetworkInspectorView: View {
                 Section { sectionMetrics }
             }
         }
-        .toolbar {
-            if #available(watchOS 9.0, *), let url = ShareService.share(viewModel.task, as: .html).items.first as? URL {
-                ShareLink(item: url)
-            }
-        }
     }
-
-#warning("TODO: refactor")
 
     private var transerInfoSentView: some View {
         viewModel.transferViewModel.map {
@@ -177,8 +178,6 @@ struct NetworkInspectorView: View {
     }
 
     // MARK: - Subviews
-
-    #warning("TODO: this fallback isn't ideal on other paltforms only on ios")
 
 #if os(iOS) || os(macOS) || os(tvOS)
     @ViewBuilder
