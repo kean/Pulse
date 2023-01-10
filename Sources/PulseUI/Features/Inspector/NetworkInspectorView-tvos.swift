@@ -21,38 +21,41 @@ struct NetworkInspectorView: View {
 
     var contents: some View {
         HStack {
-            Form {
-                Section {
-                    viewModel.statusSectionViewModel.map(NetworkRequestStatusSectionView.init)
-                }
-                Section {
-                    NetworkInspectorRequestTypePicker(isCurrentRequest: $isCurrentRequest)
-                    NetworkInspectorSectionRequest(viewModel: viewModel, isCurrentRequest: isCurrentRequest)
-                } header: { Text("Request") }
-                if viewModel.task.state != .pending {
-                    Section {
-                        NetworkInspectorSectionResponse(viewModel: viewModel)
-                    } header: { Text("Response") }
-
-                }
-                Section { sectionMetrics } header: { Text("Transactions") }
-            }
-            .frame(width: 740)
-            Form {
-                Section {
-                    transferStatusView.padding(.bottom, 32)
-                }
-                .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
-                .listRowBackground(Color.clear)
-                NetworkInspectorMetricsViewModel(task: viewModel.task)
-                    .map(NetworkInspectorMetricsView.init)
-            }
+            Form { lhs }.frame(width: 740)
+            Form { rhs }
         }
     }
 
     @ViewBuilder
-    private var sectionMetrics: some View {
-        NetworkCURLCell(task: viewModel.task)
+    private var lhs: some View {
+        Section {
+            viewModel.statusSectionViewModel.map(NetworkRequestStatusSectionView.init)
+        }
+        Section {
+            NetworkInspectorRequestTypePicker(isCurrentRequest: $isCurrentRequest)
+            NetworkInspectorSectionRequest(viewModel: viewModel, isCurrentRequest: isCurrentRequest)
+        } header: { Text("Request") }
+        if viewModel.task.state != .pending {
+            Section {
+                NetworkInspectorSectionResponse(viewModel: viewModel)
+            } header: { Text("Response") }
+
+        }
+        Section {
+            NetworkCURLCell(task: viewModel.task)
+        } header: { Text("Transactions") }
+    }
+
+    @ViewBuilder
+    private var rhs: some View {
+        Section {
+            NetworkInspectorSectionTransferStatus(viewModel: viewModel)
+                .padding(.bottom, 32)
+        }
+        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+        .listRowBackground(Color.clear)
+        NetworkInspectorMetricsViewModel(task: viewModel.task)
+            .map(NetworkInspectorMetricsView.init)
     }
 }
 

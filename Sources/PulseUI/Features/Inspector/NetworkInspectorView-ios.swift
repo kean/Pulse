@@ -29,15 +29,12 @@ struct NetworkInspectorView: View {
         Section { NetworkInspectorSectionTransferStatus(viewModel: viewModel) }
             .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
             .listRowBackground(Color.clear)
-
         Section {
             viewModel.statusSectionViewModel.map(NetworkRequestStatusSectionView.init)
         }
-
         Section {
             NetworkInspectorSectionRequest(viewModel: viewModel, isCurrentRequest: isCurrentRequest)
         } header: { requestTypePicker }
-
         if viewModel.task.state != .pending {
             Section {
                 NetworkInspectorSectionResponse(viewModel: viewModel)
