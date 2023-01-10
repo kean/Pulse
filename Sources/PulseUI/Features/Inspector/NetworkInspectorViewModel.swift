@@ -62,8 +62,6 @@ final class NetworkInspectorViewModel: ObservableObject {
         responseCookiesViewModel = NetworkCookiesCellViewModel(title: "Response Cookies", headers: responseHeaders, url: url)
     }
 
-#warning("TODO: how does it look if there is no transfer info? (check on all platforms)")
-
     var transferViewModel: NetworkInspectorTransferInfoViewModel? {
         guard task.hasMetrics else { return nil }
         return NetworkInspectorTransferInfoViewModel(task: task, taskType: task.type ?? .dataTask)
@@ -71,6 +69,10 @@ final class NetworkInspectorViewModel: ObservableObject {
 
     var pinViewModel: PinButtonViewModel? {
         task.message.map(PinButtonViewModel.init)
+    }
+
+    func shareTaskAsHTML() -> URL? {
+        ShareService.share(task, as: .html).items.first as? URL
     }
 }
 

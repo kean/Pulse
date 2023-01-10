@@ -20,8 +20,7 @@ struct NetworkInspectorView: View {
         }
         .backport.inlineNavigationTitle(viewModel.title)
         .toolbar {
-            if #available(macOS 13, *),
-               let url = ShareService.share(viewModel.task, as: .html).items.first as? URL {
+            if #available(macOS 13, *), let url = viewModel.shareTaskAsHTML() {
                 ShareLink(item: url)
             }
         }
@@ -41,15 +40,14 @@ struct NetworkInspectorView: View {
             NetworkInspectorRequestTypePicker(isCurrentRequest: $isCurrentRequest)
         }
         if viewModel.task.state != .pending {
-            Section { NetworkInspectorSectionResponse(viewModel: viewModel) }
-            Section { sectionMetrics }
+            Section {
+                NetworkInspectorSectionResponse(viewModel: viewModel)
+            }
+            Section {
+                NetworkMetricsCell(task: viewModel.task)
+                NetworkCURLCell(task: viewModel.task)
+            }
         }
-    }
-
-    @ViewBuilder
-    private var sectionMetrics: some View {
-        NetworkMetricsCell(task: viewModel.task)
-        NetworkCURLCell(task: viewModel.task)
     }
 }
 

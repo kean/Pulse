@@ -39,15 +39,14 @@ struct NetworkInspectorView: View {
         } header: { requestTypePicker }
 
         if viewModel.task.state != .pending {
-            Section { NetworkInspectorSectionResponse(viewModel: viewModel) }
-            Section { sectionMetrics }
+            Section {
+                NetworkInspectorSectionResponse(viewModel: viewModel)
+            }
+            Section {
+                NetworkMetricsCell(task: viewModel.task)
+                NetworkCURLCell(task: viewModel.task)
+            }
         }
-    }
-
-    @ViewBuilder
-    private var sectionMetrics: some View {
-        NetworkMetricsCell(task: viewModel.task)
-        NetworkCURLCell(task: viewModel.task)
     }
 
     @ViewBuilder
