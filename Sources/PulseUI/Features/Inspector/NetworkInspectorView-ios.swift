@@ -26,11 +26,9 @@ struct NetworkInspectorView: View {
 
     @ViewBuilder
     private var contents: some View {
-        Section {
-            transferStatusView
-        }
-        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
-        .listRowBackground(Color.clear)
+        Section { NetworkInspectorSectionTransferStatus(viewModel: viewModel) }
+            .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+            .listRowBackground(Color.clear)
 
         Section {
             viewModel.statusSectionViewModel.map(NetworkRequestStatusSectionView.init)
@@ -53,25 +51,6 @@ struct NetworkInspectorView: View {
     }
 
     // MARK: - Subviews
-
-    @ViewBuilder
-    private var transferStatusView: some View {
-        ZStack {
-            NetworkInspectorTransferInfoView(viewModel: .init(empty: true))
-                .hidden()
-                .backport.hideAccessibility()
-            if let transfer = viewModel.transferViewModel {
-                NetworkInspectorTransferInfoView(viewModel: transfer)
-            } else if let progress = viewModel.progressViewModel {
-                SpinnerView(viewModel: progress)
-            } else if let status = viewModel.statusSectionViewModel?.status {
-                // Fallback in case metrics are disabled
-                Image(systemName: status.imageName)
-                    .foregroundColor(status.tintColor)
-                    .font(.system(size: 64))
-            } // Should never happen
-        }
-    }
 
     @ViewBuilder
     private var requestTypePicker: some View {
