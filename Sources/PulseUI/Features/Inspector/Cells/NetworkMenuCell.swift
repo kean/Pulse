@@ -26,6 +26,12 @@ struct NetworkMenuCell: View {
             Spacer()
             Text(details).foregroundColor(.secondary)
         }
+#elseif os(macOS)
+        HStack {
+            Label(title, systemImage: icon)
+            Spacer()
+            Text(details).foregroundColor(.secondary)
+        }.padding(.vertical, 1)
 #else
         HStack {
             Image(systemName: icon)

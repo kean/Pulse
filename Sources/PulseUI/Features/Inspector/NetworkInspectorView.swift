@@ -7,13 +7,6 @@ import CoreData
 import Pulse
 import Combine
 
-#warning("TODO: tvOS enable scroll on left side")
-#warning("TODO: tvOS fix transaction details UI")
-#warning("TODO: macos show response body automatically when task finished loading")
-#warning("TODO: add sharing on watchOS")
-#warning("TODO: tvOS fix layour for text views")
-#warning("TODO: tvOS remove force unwrap")
-
 struct NetworkInspectorView: View {
 #if os(watchOS)
     @StateObject var viewModel: NetworkInspectorViewModel
@@ -58,7 +51,7 @@ struct NetworkInspectorView: View {
         Section {
             transferStatusView
 #if os(macOS)
-                .padding(.top)
+                .padding(.vertical)
 #endif
         }
 #if os(iOS)
@@ -142,7 +135,6 @@ struct NetworkInspectorView: View {
         }
     }
 #endif
-
     @ViewBuilder
     private var sectionRequest: some View {
         viewModel.requestBodyViewModel.map(NetworkRequestBodyCell.init)
@@ -231,9 +223,6 @@ struct NetworkInspectorView: View {
     }
 
     // MARK: - Helpers
-
-#warning("TODO: macOS use pro version of the text viewer")
-#warning("TODO: macos remove hor/vert switch")
 
 #if os(iOS)
     @ViewBuilder
