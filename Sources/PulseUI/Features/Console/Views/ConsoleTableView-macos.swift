@@ -31,22 +31,8 @@ struct ConsoleTableView: NSViewRepresentable {
     final class Coordinator: NSObject, NSTableViewDelegate, NSTableViewDataSource {
         private let viewModel: ConsoleTableViewModel
 
-        private var colorPrimary = NSColor.labelColor
-        private var colorSecondary = NSColor.secondaryLabelColor
-        private var colorOrange = NSColor.systemOrange
-        private var colorRed = Palette.red
-
         var entities: [NSManagedObject] = []
         var cancellables: [AnyCancellable] = []
-
-        func color(for level: LoggerStore.Level) -> NSColor {
-            switch level {
-            case .trace: return colorSecondary
-            case .debug, .info: return colorPrimary
-            case .notice, .warning: return colorOrange
-            case .error, .critical: return colorRed
-            }
-        }
 
         init(viewModel: ConsoleTableViewModel) {
             self.viewModel = viewModel
