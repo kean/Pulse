@@ -10,31 +10,8 @@ import Pulse
 struct NetworkInspectorTransferInfoView: View {
     let viewModel: NetworkInspectorTransferInfoViewModel
 
-    private var isDividerHidden = false
-    private var isReceivedHidden = false
-    private var isSentHidden = false
-
-    init(viewModel: NetworkInspectorTransferInfoViewModel) {
-        self.viewModel = viewModel
-    }
-
-    func hideReceived() -> Self {
-        var copy = self
-        copy.isReceivedHidden = true
-        return copy
-    }
-
-    func hideSent() -> Self {
-        var copy = self
-        copy.isSentHidden = true
-        return copy
-    }
-
-    func hideDivider() -> NetworkInspectorTransferInfoView {
-        var copy = self
-        copy.isDividerHidden = true
-        return copy
-    }
+    var isReceivedHidden = false
+    var isSentHidden = false
 
 #if os(watchOS)
     var body: some View {
@@ -55,9 +32,7 @@ struct NetworkInspectorTransferInfoView: View {
             bytesSent
             Spacer()
 
-            if !isDividerHidden {
-                Divider()
-            }
+            Divider()
 
             Spacer()
             bytesReceived

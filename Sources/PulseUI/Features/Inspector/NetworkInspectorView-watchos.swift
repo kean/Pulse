@@ -37,15 +37,17 @@ struct NetworkInspectorView: View {
                     transerInfoReceivedView
                     NetworkInspectorSectionResponse(viewModel: viewModel)
                 }
-                Section { sectionMetrics }
+                Section {
+                    NetworkMetricsCell(task: viewModel.task)
+                    NetworkCURLCell(task: viewModel.task)
+                }
             }
         }
     }
 
     private var transerInfoSentView: some View {
         viewModel.transferViewModel.map {
-            NetworkInspectorTransferInfoView(viewModel: $0)
-                .hideReceived()
+            NetworkInspectorTransferInfoView(viewModel: $0, isReceivedHidden: true)
                 .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
                 .listRowBackground(Color.clear)
                 .padding(.top, 8)
@@ -55,19 +57,12 @@ struct NetworkInspectorView: View {
 
     private var transerInfoReceivedView: some View {
         viewModel.transferViewModel.map {
-            NetworkInspectorTransferInfoView(viewModel: $0)
-                .hideReceived()
+            NetworkInspectorTransferInfoView(viewModel: $0, isSentHidden: true)
                 .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
                 .listRowBackground(Color.clear)
                 .padding(.top, 8)
                 .padding(.bottom, 16)
         }
-    }
-
-    @ViewBuilder
-    private var sectionMetrics: some View {
-        NetworkMetricsCell(task: viewModel.task)
-        NetworkCURLCell(task: viewModel.task)
     }
 }
 
