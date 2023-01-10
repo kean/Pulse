@@ -14,7 +14,7 @@ import Charts
 
 #if os(iOS)
 
-public struct InsightsView: View {
+struct InsightsView: View {
     @ObservedObject var viewModel: InsightsViewModel
 
     private var insights: NetworkLoggerInsights { viewModel.insights }
@@ -23,11 +23,11 @@ public struct InsightsView: View {
         self.viewModel = viewModel
     }
 
-    public init(store: LoggerStore) {
+    init(store: LoggerStore) {
         self.viewModel = InsightsViewModel(store: store)
     }
 
-    public var body: some View {
+    var body: some View {
         List {
             Section(header: Text("Transfer Size")) {
                 NetworkInspectorTransferInfoView(viewModel: .init(transferSize: insights.transferSize))
