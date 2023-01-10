@@ -132,6 +132,19 @@ extension Backport {
     }
 
     @ViewBuilder
+    func listInsetGrouped() -> some View {
+#if os(iOS)
+        if #available(iOS 14.0, *) {
+            self.content.listStyle(.insetGrouped)
+        } else {
+            self.content
+        }
+#else
+        self.content
+#endif
+    }
+
+    @ViewBuilder
     func inlineNavigationTitle() -> some View {
 #if os(iOS)
         if #available(iOS 14.0, *) {

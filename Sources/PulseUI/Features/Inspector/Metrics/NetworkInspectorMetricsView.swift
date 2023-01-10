@@ -16,16 +16,13 @@ struct NetworkInspectorMetricsView: View {
             NetworkInspectorTransactionView(viewModel: $0)
         }
 #else
-        let list = List {
+        List {
             ForEach(viewModel.transactions) {
                 NetworkInspectorTransactionView(viewModel: $0)
             }
-        }.backport.navigationTitle("Metrics")
-        if #available(iOS 14, *) {
-            list.listStyle(.insetGrouped)
-        } else {
-            list
         }
+        .backport.listInsetGrouped()
+        .backport.navigationTitle("Metrics")
 #endif
     }
 }
