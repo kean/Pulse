@@ -4,59 +4,83 @@
 
 #if os(watchOS)
 
-#warning("TODO: simplify toolbar (move everyghig to more)")
-
 import SwiftUI
+import Pulse
 
-struct ConsoleView: View {
+public struct ConsoleView: View {
     @ObservedObject var viewModel: ConsoleViewModel
 
-    @State private var isSettingsPresented = false
+    @State private var isPresentingSettings = false
+    @State private var isPresentingFilters = false
+
+    public init(store: LoggerStore) {
+        self.viewModel = ConsoleViewModel(store: store)
+    }
 
     init(viewModel: ConsoleViewModel) {
         self.viewModel = viewModel
     }
 
-#warning("TODO: add filters")
-
-    var body: some View {
+    public var body: some View {
         List {
-            let stack = HStack {
-                Button(action: viewModel.toggleMode) {
-                    Image(systemName: "arrow.down.circle").font(.title3)
-                }
-                .background(viewModel.mode == .network ? Rectangle().foregroundColor(.blue).cornerRadius(8) : nil)
-                Button(action: { viewModel.isOnlyErrors.toggle() }) {
-                    Image(systemName: "exclamationmark.octagon").font(.title3)
-                }
-                .background(viewModel.isOnlyErrors ? Rectangle().foregroundColor(.red).cornerRadius(8) : nil)
-                Button(action: { isSettingsPresented = true }) {
-                    Image(systemName: "gearshape").font(.title3)
-                }
-            }
-                .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
-                .listRowBackground(Color.clear)
-            if #available(watchOS 8.0, *) {
-                stack
-                    .buttonStyle(.bordered)
-                    .buttonBorderShape(.roundedRectangle(radius: 8))
-            } else {
-                stack
-            }
+            toolbar
             ConsoleMessagesForEach(messages: viewModel.entities)
         }
         .navigationTitle("Console")
         .onAppear(perform: viewModel.onAppear)
         .onDisappear(perform: viewModel.onDisappear)
-        .sheet(isPresented: $isSettingsPresented) {
+        .toolbar {
+            ToolbarItem(placement: .confirmationAction) {
+                Button(action: { isPresentingSettings = true }) {
+                    Image(systemName: "gearshape").font(.title3)
+                }
+            }
+        }
+        .sheet(isPresented: $isPresentingSettings) {
             SettingsView(viewModel: .init(store: viewModel.store))
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) {
-                        Button("Close") {
-                            isSettingsPresented = false
-                        }
+                        Button("Close") { isPresentingSettings = false }
                     }
                 }
+        }
+        .sheet(isPresented: $isPresentingFilters) {
+            ConsoleFiltersView(viewModel: viewModel)
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("Close") { isPresentingFilters = false }
+                    }
+                }
+        }
+    }
+
+    @ViewBuilder
+    private var toolbar: some View {
+        let stack = HStack {
+            Button(action: viewModel.toggleMode) {
+                Image(systemName: "arrow.down.circle")
+            }
+            .background(viewModel.mode == .network ? Rectangle().foregroundColor(.blue).cornerRadius(8) : nil)
+
+            Button(action: { viewModel.isOnlyErrors.toggle() }) {
+                Image(systemName: "exclamationmark.octagon")
+            }
+            .background(viewModel.isOnlyErrors ? Rectangle().foregroundColor(.red).cornerRadius(8) : nil)
+
+            Button(action: { isPresentingFilters = true }) {
+                Image(systemName: "line.3.horizontal.decrease.circle")
+            }
+            .background(viewModel.isDefaultFilters ? nil : Rectangle().foregroundColor(.blue).cornerRadius(8))
+        }
+            .font(.title3)
+            .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+            .listRowBackground(Color.clear)
+        if #available(watchOS 8.0, *) {
+            stack
+                .buttonStyle(.bordered)
+                .buttonBorderShape(.roundedRectangle(radius: 8))
+        } else {
+            stack
         }
     }
 }
