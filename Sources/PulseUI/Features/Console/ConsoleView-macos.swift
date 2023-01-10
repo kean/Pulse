@@ -38,7 +38,7 @@ public struct ConsoleView: View {
         }
     }
 
-    static let contentColumnWidth: CGFloat = 280
+    static let contentColumnWidth: CGFloat = 300
 }
 
 @available(macOS 13.0, *)

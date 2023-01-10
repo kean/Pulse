@@ -39,7 +39,9 @@ struct NetworkInspectorTransactionView: View {
             VStack(spacing: 8) {
                 HStack {
                     Text("Details")
+#if !os(macOS)
                     Spacer()
+#endif
                     (Text(Image(systemName: "arrow.down.circle")) +
                      Text(" ") +
                      Text(size.totalBytesSent) +

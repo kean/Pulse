@@ -46,11 +46,17 @@ final class NetworkInspectorMetricsViewModel {
 #if DEBUG
 struct NetworkInspectorMetricsView_Previews: PreviewProvider {
     static var previews: some View {
+#if os(macOS)
+        NetworkInspectorMetricsView(viewModel: .init(
+            task: LoggerStore.preview.entity(for: .createAPI)
+        )!)
+#else
         NavigationView {
             NetworkInspectorMetricsView(viewModel: .init(
                 task: LoggerStore.preview.entity(for: .createAPI)
             )!)
         }
+#endif
     }
 }
 #endif
