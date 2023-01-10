@@ -6,8 +6,6 @@ import SwiftUI
 import Pulse
 import CoreData
 
-#warning("TODO: show download size on other platforms")
-
 struct NetworkInspectorTransactionView: View {
     @ObservedObject var viewModel: NetworkInspectorTransactionViewModel
 

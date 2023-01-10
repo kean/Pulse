@@ -8,8 +8,6 @@ import CoreData
 import Pulse
 import Combine
 
-#warning("TODO: rework pin management")
-
 #if os(iOS) || os(macOS)
 
 struct PinButton: View {

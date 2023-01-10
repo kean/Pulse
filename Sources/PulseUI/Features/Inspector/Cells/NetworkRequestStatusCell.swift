@@ -119,8 +119,6 @@ private struct DurationLabel: View {
     }
 }
 
-#warning("TODO: update in sync with inspector on completion")
-
 private final class DurationViewModel: ObservableObject {
     @Published var duration: String?
 
@@ -129,9 +127,11 @@ private final class DurationViewModel: ObservableObject {
     init(task: NetworkTaskEntity) {
         switch task.state {
         case .pending:
-            timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] _ in
-                self?.refreshPendingDuration(task: task)
-            }
+            // TODO: Update in sync with the object (creation date is not the same as fetch start date)
+//            timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] _ in
+//                self?.refreshPendingDuration(task: task)
+//            }
+            duration = nil
         case .failure, .success:
             duration = DurationFormatter.string(from: task.duration, isPrecise: false)
         }

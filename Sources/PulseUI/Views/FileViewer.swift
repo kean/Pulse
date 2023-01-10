@@ -2,13 +2,8 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
-#warning("TODO: add edgesForExtended for PDF and HTML brwoser (see mode)")
-
 import SwiftUI
 import Pulse
-
-#warning("TODO: tvos fix hstack")
-#warning("TODO: macos fix reload of NetworkInspectorView (not working)")
 
 struct FileViewer: View {
     @ObservedObject var viewModel: FileViewerViewModel
@@ -39,6 +34,7 @@ struct FileViewer: View {
 #if os(iOS) || os(macOS)
             case .pdf(let document):
                 PDFKitRepresentedView(document: document)
+                    .edgesIgnoringSafeArea(.all)
 #endif
             case .other(let viewModel):
                 RichTextView(viewModel: viewModel)
