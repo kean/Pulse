@@ -70,15 +70,16 @@ struct ConsoleNetworkRequestView: View {
                     .frame(width: circleSize, height: circleSize)
                     .foregroundColor(viewModel.badgeColor)
                 Text(ConsoleFormatter.subheadline(for: viewModel.task, hasTime: false))
+                    .lineLimit(1)
                     .font(ConsoleConstants.fontTitle)
                     .foregroundColor(.secondary)
-                    .lineLimit(1)
             }
             Spacer()
 #if os(macOS)
             PinView(viewModel: viewModel.pinViewModel, font: ConsoleConstants.fontTitle)
 #endif
             let time = Text(viewModel.time)
+                .lineLimit(1)
                 .font(ConsoleConstants.fontTitle)
                 .foregroundColor(.secondary)
             if #available(tvOS 15, macOS 12, *) {
