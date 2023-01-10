@@ -7,11 +7,6 @@ import CoreData
 import Pulse
 import Combine
 
-#warning("TODO: remoev ConsoleViewModel and ConsoleContainerView")
-#warning("TODO: show message details in the details and metadata in main panel")
-#warning("TDO: move search button somewhere else")
-#warning("TODO: fill-out filter button when custom selected")
-
 #if os(macOS)
 
 public struct ConsoleView: View {
@@ -95,7 +90,6 @@ private struct Siderbar: View {
         }
         .onAppear(perform: viewModel.onAppear)
         .onDisappear(perform: viewModel.onDisappear)
-        .background(NavigationTitleUpdater(title: viewModel.title, viewModel: viewModel.table))
     }
 }
 
@@ -154,21 +148,6 @@ private struct ConsoleToolbarModePickerButton: View {
             Image(systemName: viewModel.mode == .network ? "arrow.down.circle.fill" : "arrow.down.circle")
                 .foregroundColor(viewModel.mode == .network ? Color.accentColor : Color.secondary)
         }.help("Automatically Scroll to Recent Messages (⇧⌘N)")
-    }
-}
-
-private struct NavigationTitleUpdater: View {
-    let title: String
-    @ObservedObject var viewModel: ConsoleTableViewModel
-
-    var body: some View {
-        EmptyView().navigationSubtitle(message)
-    }
-
-    private var message: String {
-        let count = viewModel.entities.count
-        let title = count % 10 == 1 ? String(title.dropLast()) : title
-        return "\(count) \(title)"
     }
 }
 
