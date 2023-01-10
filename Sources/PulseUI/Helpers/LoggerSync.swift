@@ -70,7 +70,11 @@ private final class SessionDelegate: NSObject, WCSessionDelegate {
                                 return
                             }
                             let vc = UIViewController.present { dismiss in
-                                MainView(store: store, onDismiss: dismiss)
+                                return NavigationView {
+                                    let viewModel = ConsoleViewModel(store: store)
+                                    viewModel.onDismiss = dismiss
+                                    return ConsoleView(viewModel: viewModel)
+                                }
                             }
                             vc?.onDeinit(directory.remove)
                         }).foregroundColor(Color.blue)

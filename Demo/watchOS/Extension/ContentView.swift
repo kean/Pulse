@@ -8,7 +8,9 @@ import PulseUI
 
 struct ContentView: View {
     var body: some View {
-        MainView(store: .mock)
+        NavigationView {
+            ConsoleView(store: .mock)
+        }.navigationViewStyle(.stack)
     }
 }
 

@@ -35,7 +35,7 @@ public struct ConsoleView: View {
             .backport.navigationTitle(viewModel.title)
             .navigationBarItems(
                 leading: viewModel.onDismiss.map {
-                    Button(action: $0) { Image(systemName: "xmark") }
+                    Button(action: $0) { Text("Close") }
                 },
                 trailing: HStack {
                     if #available(iOS 14, *) {
