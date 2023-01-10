@@ -7,8 +7,6 @@ import CoreData
 import Pulse
 import Combine
 
-#warning("TODO: should send the entire store by default")
-
 #if os(iOS) || os(macOS)
 
 @available(iOS 14, tvOS 14, *)

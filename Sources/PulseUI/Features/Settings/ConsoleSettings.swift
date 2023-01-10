@@ -13,7 +13,7 @@ final class ConsoleSettings: PersistentSettings {
     var lineLimit: Int = 4
 
     @UserDefaultRaw("sharing-time-range")
-    var sharingTimeRange: SharingTimeRange = .currentSession
+    var sharingTimeRange: SharingTimeRange = .all
 
     @UserDefault("link-detection")
     var isLinkDetectionEnabled = false
