@@ -36,7 +36,7 @@ struct NetworkInspectorView: View {
             if viewModel.task.state != .pending {
                 Section {
                     transerInfoReceivedView
-                    sectionResponse
+                    NetworkInspectorSectionResponse(viewModel: viewModel)
                 }
                 Section { sectionMetrics }
             }
@@ -63,13 +63,6 @@ struct NetworkInspectorView: View {
                 .padding(.top, 8)
                 .padding(.bottom, 16)
         }
-    }
-
-    @ViewBuilder
-    private var sectionResponse: some View {
-        viewModel.responseBodyViewModel.map(NetworkResponseBodyCell.init)
-        viewModel.responseHeadersViewModel.map(NetworkHeadersCell.init)
-        viewModel.responseCookiesViewModel.map(NetworkCookiesCell.init)
     }
 
     @ViewBuilder

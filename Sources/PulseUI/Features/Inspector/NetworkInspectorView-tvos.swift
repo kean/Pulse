@@ -30,7 +30,9 @@ struct NetworkInspectorView: View {
                     NetworkInspectorSectionRequest(viewModel: viewModel, isCurrentRequest: isCurrentRequest)
                 } header: { Text("Request") }
                 if viewModel.task.state != .pending {
-                    Section { sectionResponse } header: { Text("Response") }
+                    Section {
+                        NetworkInspectorSectionResponse(viewModel: viewModel)
+                    } header: { Text("Response") }
 
                 }
                 Section { sectionMetrics } header: { Text("Transactions") }
@@ -46,13 +48,6 @@ struct NetworkInspectorView: View {
                     .map(NetworkInspectorMetricsView.init)
             }
         }
-    }
-
-    @ViewBuilder
-    private var sectionResponse: some View {
-        viewModel.responseBodyViewModel.map(NetworkResponseBodyCell.init)
-        viewModel.responseHeadersViewModel.map(NetworkHeadersCell.init)
-        viewModel.responseCookiesViewModel.map(NetworkCookiesCell.init)
     }
 
     @ViewBuilder

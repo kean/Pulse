@@ -20,3 +20,13 @@ struct NetworkInspectorSectionRequest: View {
         }
     }
 }
+
+struct NetworkInspectorSectionResponse: View {
+    let viewModel: NetworkInspectorViewModel
+
+    var body: some View {
+        viewModel.responseBodyViewModel.map(NetworkResponseBodyCell.init)
+        viewModel.responseHeadersViewModel.map(NetworkHeadersCell.init)
+        viewModel.responseCookiesViewModel.map(NetworkCookiesCell.init)
+    }
+}

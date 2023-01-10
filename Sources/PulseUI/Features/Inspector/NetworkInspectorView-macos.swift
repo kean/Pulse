@@ -42,16 +42,9 @@ struct NetworkInspectorView: View {
             requestTypePicker
         }
         if viewModel.task.state != .pending {
-            Section { sectionResponse }
+            Section { NetworkInspectorSectionResponse(viewModel: viewModel) }
             Section { sectionMetrics }
         }
-    }
-
-    @ViewBuilder
-    private var sectionResponse: some View {
-        viewModel.responseBodyViewModel.map(NetworkResponseBodyCell.init)
-        viewModel.responseHeadersViewModel.map(NetworkHeadersCell.init)
-        viewModel.responseCookiesViewModel.map(NetworkCookiesCell.init)
     }
 
     @ViewBuilder
