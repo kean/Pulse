@@ -11,14 +11,9 @@ extension TimingViewModel {
     }
 
     convenience init?(transaction: NetworkTransactionMetricsEntity, task: NetworkTaskEntity) {
-        guard let startDate = transaction.timing.fetchStartDate else {
+        guard let interval = task.taskInterval else { // Anchor to task
             return nil
         }
-        guard let endDate = transaction.timing.responseEndDate ?? task.taskInterval?.end,
-              endDate > startDate else {
-            return nil
-        }
-        let interval = DateInterval(start: startDate, end: endDate)
         let sections = makeTimingRows(transaction: transaction, taskInterval: interval)
         guard !sections.isEmpty else {
             return nil
