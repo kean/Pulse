@@ -7,14 +7,10 @@ import CoreData
 import Pulse
 import Combine
 
-#if os(iOS) || os(tvOS) || os(watchOS)
+#if os(iOS) || os(tvOS)
 
 struct NetworkInspectorView: View {
-#if os(watchOS)
-    @StateObject var viewModel: NetworkInspectorViewModel
-#else
     @ObservedObject var viewModel: NetworkInspectorViewModel
-#endif
 
 #if os(iOS)
     @State private var shareItems: ShareItems?
@@ -28,14 +24,6 @@ struct NetworkInspectorView: View {
 #if os(iOS)
             .navigationBarItems(trailing: trailingNavigationBarItems)
             .sheet(item: $shareItems, content: ShareView.init)
-#endif
-#if os(watchOS)
-            .toolbar {
-                if #available(watchOS 9, macOS 13, *),
-                   let url = ShareService.share(viewModel.task, as: .html).items.first as? URL {
-                    ShareLink(item: url)
-                }
-            }
 #endif
     }
 
@@ -61,47 +49,7 @@ struct NetworkInspectorView: View {
             Section { sectionMetrics }
         }
     }
-#if os(watchOS)
-    var contents: some View {
-        List {
-            Section { viewModel.statusSectionViewModel.map(NetworkRequestStatusSectionView.init) }
-            Section {
-                transerInfoSentView
-                requestTypePicker
-                sectionRequest
-            }
-            if viewModel.task.state != .pending {
-                Section {
-                    transerInfoReceivedView
-                    sectionResponse
-                }
-                Section { sectionMetrics }
-            }
-        }
-    }
-
-    private var transerInfoSentView: some View {
-        viewModel.transferViewModel.map {
-            NetworkInspectorTransferInfoView(viewModel: $0)
-                .hideReceived()
-                .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
-                .listRowBackground(Color.clear)
-                .padding(.top, 8)
-                .padding(.bottom, 16)
-        }
-    }
-
-    private var transerInfoReceivedView: some View {
-        viewModel.transferViewModel.map {
-            NetworkInspectorTransferInfoView(viewModel: $0)
-                .hideReceived()
-                .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
-                .listRowBackground(Color.clear)
-                .padding(.top, 8)
-                .padding(.bottom, 16)
-        }
-    }
-#elseif os(tvOS)
+#if os(tvOS)
     var contents: some View {
         HStack {
             Form {
@@ -152,7 +100,7 @@ struct NetworkInspectorView: View {
 
     @ViewBuilder
     private var sectionMetrics: some View {
-#if os(iOS) || os(watchOS)
+#if os(iOS)
         NetworkMetricsCell(task: viewModel.task)
 #endif
         NetworkCURLCell(task: viewModel.task)
