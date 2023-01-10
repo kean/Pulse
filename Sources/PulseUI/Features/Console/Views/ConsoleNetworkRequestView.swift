@@ -55,12 +55,15 @@ struct ConsoleNetworkRequestView: View {
     }
 #elseif os(tvOS) || os(macOS)
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: verticalSpacing) {
             title
             Text(viewModel.task.url ?? "–")
                 .font(ConsoleConstants.fontBody)
                 .lineLimit(ConsoleSettings.shared.lineLimit)
         }
+#if os(macOS)
+        .padding(.vertical, 3)
+#endif
     }
 
     private var title: some View {
@@ -91,9 +94,11 @@ struct ConsoleNetworkRequestView: View {
     }
 
 #if os(macOS)
-    private let spacing: CGFloat = 8
-    private let circleSize: CGFloat = 10
+    private let verticalSpacing: CGFloat = 2
+    private let spacing: CGFloat = 7
+    private let circleSize: CGFloat = 8
 #else
+    private let verticalSpacing: CGFloat = 4
     private let spacing: CGFloat = 16
     private let circleSize: CGFloat = 20
 #endif

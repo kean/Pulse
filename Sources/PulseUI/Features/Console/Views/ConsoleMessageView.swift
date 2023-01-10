@@ -38,9 +38,10 @@ struct ConsoleMessageView: View {
                 .foregroundColor(.textColor(for: viewModel.message.logLevel))
                 .lineLimit(ConsoleSettings.shared.lineLimit)
         }
+#if os(macOS)
+        .padding(.vertical, 3)
+#endif
     }
-
-
 }
 
 #if DEBUG
@@ -58,7 +59,7 @@ struct ConsoleConstants {
     static let fontTitle = Font.system(size: 14)
     static let fontBody = Font.system(size: 15)
 #elseif os(macOS)
-    static let fontTitle = Font.body
+    static let fontTitle = Font.caption
     static let fontBody = Font.body
 #else
     static let fontTitle = Font.caption
