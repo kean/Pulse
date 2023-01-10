@@ -30,8 +30,7 @@ struct NetworkInspectorView: View {
     @ViewBuilder
     private var contents: some View {
         Section {
-            NetworkInspectorSectionTransferStatus(viewModel: viewModel)
-                .padding(.vertical)
+            NetworkInspectorSectionTransferStatus(viewModel: viewModel).padding(.vertical)
         }
         Section {
             viewModel.statusSectionViewModel.map(NetworkRequestStatusSectionView.init)
@@ -39,7 +38,7 @@ struct NetworkInspectorView: View {
         Section {
             NetworkInspectorSectionRequest(viewModel: viewModel, isCurrentRequest: isCurrentRequest)
         } header: {
-            requestTypePicker
+            NetworkInspectorRequestTypePicker(isCurrentRequest: $isCurrentRequest)
         }
         if viewModel.task.state != .pending {
             Section { NetworkInspectorSectionResponse(viewModel: viewModel) }
@@ -51,16 +50,6 @@ struct NetworkInspectorView: View {
     private var sectionMetrics: some View {
         NetworkMetricsCell(task: viewModel.task)
         NetworkCURLCell(task: viewModel.task)
-    }
-
-    // MARK: - Subviews
-
-    @ViewBuilder
-    private var requestTypePicker: some View {
-        Picker("Request Type", selection: $isCurrentRequest) {
-            Text("Original").tag(false)
-            Text("Current").tag(true)
-        }
     }
 }
 

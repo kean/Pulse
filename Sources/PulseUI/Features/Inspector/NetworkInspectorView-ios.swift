@@ -50,18 +50,12 @@ struct NetworkInspectorView: View {
         NetworkCURLCell(task: viewModel.task)
     }
 
-    // MARK: - Subviews
-
     @ViewBuilder
     private var requestTypePicker: some View {
-        let picker = Picker("Request Type", selection: $isCurrentRequest) {
-            Text("Original").tag(false)
-            Text("Current").tag(true)
-        }
         HStack {
             Text("Request Type")
             Spacer()
-            picker
+            NetworkInspectorRequestTypePicker(isCurrentRequest: $isCurrentRequest)
                 .pickerStyle(.segmented)
                 .labelsHidden()
                 .fixedSize()

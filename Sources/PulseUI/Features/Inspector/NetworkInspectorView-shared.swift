@@ -52,3 +52,14 @@ struct NetworkInspectorSectionTransferStatus: View {
         }
     }
 }
+
+struct NetworkInspectorRequestTypePicker: View {
+    @Binding var isCurrentRequest: Bool
+
+    var body: some View {
+        Picker("Request Type", selection: $isCurrentRequest) {
+            Text("Original").tag(false)
+            Text("Current").tag(true)
+        }
+    }
+}

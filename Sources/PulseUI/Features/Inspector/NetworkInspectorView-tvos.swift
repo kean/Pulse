@@ -26,7 +26,7 @@ struct NetworkInspectorView: View {
                     viewModel.statusSectionViewModel.map(NetworkRequestStatusSectionView.init)
                 }
                 Section {
-                    requestTypePicker
+                    NetworkInspectorRequestTypePicker(isCurrentRequest: $isCurrentRequest)
                     NetworkInspectorSectionRequest(viewModel: viewModel, isCurrentRequest: isCurrentRequest)
                 } header: { Text("Request") }
                 if viewModel.task.state != .pending {
@@ -53,16 +53,6 @@ struct NetworkInspectorView: View {
     @ViewBuilder
     private var sectionMetrics: some View {
         NetworkCURLCell(task: viewModel.task)
-    }
-
-    // MARK: - Subviews
-
-    @ViewBuilder
-    private var requestTypePicker: some View {
-        Picker("Request Type", selection: $isShowingCurrentRequest) {
-            Text("Original").tag(false)
-            Text("Current").tag(true)
-        }
     }
 }
 
