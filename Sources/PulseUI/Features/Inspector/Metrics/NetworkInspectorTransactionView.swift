@@ -12,7 +12,7 @@ struct NetworkInspectorTransactionView: View {
     var body: some View {
         Section(header: Text(viewModel.title)) {
             NetworkRequestStatusCell(viewModel: viewModel.statusViewModel)
-
+            viewModel.timingViewModel.map(TimingView.init)
 #if os(iOS) || os(macOS)
             NavigationLink(destination: destintionTransactionDetails) {
                 if #available(iOS 15, tvOS 15, macOS 12, *), let size = viewModel.transferSizeViewModel {
@@ -26,7 +26,6 @@ struct NetworkInspectorTransactionView: View {
                 Text("Transaction Details")
             }
 #endif
-            viewModel.timingViewModel.map(TimingView.init)
             NetworkRequestInfoCell(viewModel: viewModel.requestViewModel)
         }
     }
