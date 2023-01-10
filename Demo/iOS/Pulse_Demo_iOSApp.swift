@@ -11,7 +11,9 @@ struct Pulse_Demo_iOSApp: App {
     var body: some Scene {
 //        let _ = testProxy()
         WindowGroup {
-            MainView(store: .mock)
+            NavigationView {
+                ConsoleView(viewModel: .mock)
+            }.navigationViewStyle(.stack)
         }
     }
 }
