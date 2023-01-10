@@ -156,7 +156,6 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
                 isOnlyErrors: isOnlyErrors
             )
         case .network:
-#if !os(watchOS)
             ConsoleNetworkSearchCriteria.update(
                 request: controller.fetchRequest,
                 filterTerm: filterTerm,
@@ -165,7 +164,6 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
                 filters: networkSearchCriteriaViewModel.filters,
                 isOnlyErrors: isOnlyErrors
             )
-#endif
             break
         }
         try? controller.performFetch()
