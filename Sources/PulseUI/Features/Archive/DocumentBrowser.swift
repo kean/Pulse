@@ -65,9 +65,12 @@ final class DocumentBrowserViewController: UIDocumentPickerViewController, UIDoc
 
         do {
             let store = try LoggerStore(storeURL: documentURL)
-            let vc = UIHostingController(rootView: MainView(store: store, onDismiss: { [weak self] in
-                self?.dismiss(animated: true, completion: nil)
-            }))
+            let view = NavigationView { ConsoleView(store: store) }
+                .navigationViewStyle(.stack)
+                .navigationBarItems(leading: Button("Done", action: { [weak self] in
+                    self?.dismiss(animated: true, completion: nil)
+                }))
+            let vc = UIHostingController(rootView: view)
             vc.onDeinit {
                 documentURL.stopAccessingSecurityScopedResource()
             }
