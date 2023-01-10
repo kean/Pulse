@@ -29,10 +29,11 @@ struct NetworkInspectorView: View {
     @ViewBuilder
     private var contents: some View {
         Section {
-            NetworkInspectorSectionTransferStatus(viewModel: viewModel).padding(.vertical)
+            viewModel.statusSectionViewModel.map(NetworkRequestStatusSectionView.init)
         }
         Section {
-            viewModel.statusSectionViewModel.map(NetworkRequestStatusSectionView.init)
+            NetworkInspectorSectionTransferStatus(viewModel: viewModel)
+                .padding(.bottom, 6)
         }
         Section {
             NetworkInspectorSectionRequest(viewModel: viewModel, isCurrentRequest: isCurrentRequest)

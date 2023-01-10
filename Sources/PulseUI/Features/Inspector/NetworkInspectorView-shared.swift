@@ -32,7 +32,7 @@ struct NetworkInspectorSectionResponse: View {
 }
 
 struct NetworkInspectorSectionTransferStatus: View {
-    let viewModel: NetworkInspectorViewModel
+    @ObservedObject var viewModel: NetworkInspectorViewModel
 
     var body: some View {
         ZStack {
