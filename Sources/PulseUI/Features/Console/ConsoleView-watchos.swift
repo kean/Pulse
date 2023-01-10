@@ -30,7 +30,7 @@ public struct ConsoleView: View {
         .onAppear(perform: viewModel.onAppear)
         .onDisappear(perform: viewModel.onDisappear)
         .toolbar {
-            ToolbarItem(placement: .confirmationAction) {
+            ToolbarItem(placement: .cancellationAction) {
                 Button(action: { isPresentingSettings = true }) {
                     Image(systemName: "gearshape").font(.title3)
                 }
