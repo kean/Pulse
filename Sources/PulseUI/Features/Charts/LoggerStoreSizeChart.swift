@@ -18,7 +18,7 @@ struct LoggerStoreSizeChart: View {
     var body: some View {
         VStack {
             HStack {
-                Text("Logger Store")
+                Text("Logs")
                 Spacer()
                 Text(title).foregroundColor(.secondary)
             }
@@ -30,7 +30,11 @@ struct LoggerStoreSizeChart: View {
         let used = ByteCountFormatter.string(fromByteCount: info.totalStoreSize)
         let limit = sizeLimit.map(ByteCountFormatter.string)
         if let limit = limit {
+#if os(watchOS)
+            return "\(used) / \(limit)"
+#else
             return "\(used) of \(limit) used"
+#endif
         }
         return used
     }
@@ -48,6 +52,8 @@ struct LoggerStoreSizeChart: View {
         .chartPlotStyle { $0.cornerRadius(8) }
 #if os(tvOS)
         .frame(height: 100)
+#elseif os(watchOS)
+        .frame(height: 56)
 #else
         .frame(height: 66)
 #endif
