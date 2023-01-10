@@ -10,8 +10,8 @@ import Pulse
 struct NetworkInspectorTransferInfoView: View {
     let viewModel: NetworkInspectorTransferInfoViewModel
 
-    var isReceivedHidden = false
     var isSentHidden = false
+    var isReceivedHidden = false
 
 #if os(watchOS)
     var body: some View {

@@ -28,13 +28,13 @@ struct NetworkInspectorView: View {
         List {
             Section { viewModel.statusSectionViewModel.map(NetworkRequestStatusSectionView.init) }
             Section {
-                transerInfoSentView
+                makeTransferInfo(isReceivedHidden: true)
                 NetworkInspectorRequestTypePicker(isCurrentRequest: $isCurrentRequest)
                 NetworkInspectorSectionRequest(viewModel: viewModel, isCurrentRequest: isCurrentRequest)
             }
             if viewModel.task.state != .pending {
                 Section {
-                    transerInfoReceivedView
+                    makeTransferInfo(isSentHidden: true)
                     NetworkInspectorSectionResponse(viewModel: viewModel)
                 }
                 Section {
@@ -45,19 +45,9 @@ struct NetworkInspectorView: View {
         }
     }
 
-    private var transerInfoSentView: some View {
+    private func makeTransferInfo(isSentHidden: Bool = false, isReceivedHidden: Bool = false) -> some View {
         viewModel.transferViewModel.map {
-            NetworkInspectorTransferInfoView(viewModel: $0, isReceivedHidden: true)
-                .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
-                .listRowBackground(Color.clear)
-                .padding(.top, 8)
-                .padding(.bottom, 16)
-        }
-    }
-
-    private var transerInfoReceivedView: some View {
-        viewModel.transferViewModel.map {
-            NetworkInspectorTransferInfoView(viewModel: $0, isSentHidden: true)
+            NetworkInspectorTransferInfoView(viewModel: $0, isSentHidden: isSentHidden, isReceivedHidden: isReceivedHidden)
                 .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
                 .listRowBackground(Color.clear)
                 .padding(.top, 8)
