@@ -252,7 +252,6 @@ private struct WrappedTextView: NSViewRepresentable {
         return scrollView
     }
 
-#warning("TODO: this should not be needed")
     func updateNSView(_ nsView: NSScrollView, context: Context) {
         let textView = (nsView.documentView as! NSTextView)
         viewModel.textView = textView
@@ -273,6 +272,7 @@ private func configureTextView(_ textView: UXTextView) {
     textView.backgroundColor = .clear
 
 #if os(iOS)
+    textView.keyboardDismissMode = .interactive
     textView.alwaysBounceVertical = true
     textView.autocorrectionType = .no
     textView.autocapitalizationType = .none

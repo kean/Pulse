@@ -6,8 +6,6 @@ import Foundation
 import Pulse
 import CoreData
 
-#warning("TODO: for plain text export, format titles and keys")
-
 enum ShareStoreOutput: String, RawRepresentable {
     case store, text, html
 
