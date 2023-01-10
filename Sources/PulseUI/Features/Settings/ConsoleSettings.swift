@@ -125,7 +125,7 @@ final class UserDefaultRaw<Value: RawRepresentable>: UserDefaultProtocol, Dynami
     private let observer: AnyObject?
 
     init(wrappedValue value: Value, _ key: String) {
-        self.key = "commonKeyPrefix" + key
+        self.key = commonKeyPrefix + key
         self.defaultValue = value
         self.observer = UserDefaultsObserver(key: self.key, onChange: { [publisher] _, newValue in
             if let newValue = newValue as? Optional<Value>, newValue == nil {
