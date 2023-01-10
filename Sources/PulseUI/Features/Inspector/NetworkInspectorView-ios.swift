@@ -12,73 +12,38 @@ import Combine
 struct NetworkInspectorView: View {
     @ObservedObject var viewModel: NetworkInspectorViewModel
 
-#if os(iOS)
     @State private var shareItems: ShareItems?
-#endif
-    
     @State private var isShowingCurrentRequest = false
 
     var body: some View {
-        contents
-            .backport.inlineNavigationTitle(viewModel.title)
-#if os(iOS)
-            .navigationBarItems(trailing: trailingNavigationBarItems)
-            .sheet(item: $shareItems, content: ShareView.init)
-#endif
+        Form {
+            contents
+        }
+        .backport.inlineNavigationTitle(viewModel.title)
+        .navigationBarItems(trailing: trailingNavigationBarItems)
+        .sheet(item: $shareItems, content: ShareView.init)
     }
-
-#if os(iOS)
-    var contents: some View {
-        Form { _contents } // Can't figure out how to disable collapsible sections
-    }
-#endif
 
     @ViewBuilder
-    private var _contents: some View {
+    private var contents: some View {
         Section {
             transferStatusView
         }
-#if os(iOS)
         .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
         .listRowBackground(Color.clear)
-#endif
-        Section { viewModel.statusSectionViewModel.map(NetworkRequestStatusSectionView.init) }
+
+        Section {
+            viewModel.statusSectionViewModel.map(NetworkRequestStatusSectionView.init)
+        }
+
         Section { sectionRequest } header: { requestTypePicker }
+
         if viewModel.task.state != .pending {
             Section { sectionResponse }
             Section { sectionMetrics }
         }
     }
-#if os(tvOS)
-    var contents: some View {
-        HStack {
-            Form {
-                Section {
-                    viewModel.statusSectionViewModel.map(NetworkRequestStatusSectionView.init)
-                }
-                Section {
-                    requestTypePicker
-                    sectionRequest
-                } header: { Text("Request") }
-                if viewModel.task.state != .pending {
-                    Section { sectionResponse } header: { Text("Response") }
-                    
-                }
-                Section { sectionMetrics } header: { Text("Transactions") }
-            }
-            .frame(width: 740)
-            Form {
-                Section {
-                    transferStatusView.padding(.bottom, 32)
-                }
-                .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
-                .listRowBackground(Color.clear)
-                NetworkInspectorMetricsViewModel(task: viewModel.task)
-                    .map(NetworkInspectorMetricsView.init)
-            }
-        }
-    }
-#endif
+
     @ViewBuilder
     private var sectionRequest: some View {
         viewModel.requestBodyViewModel.map(NetworkRequestBodyCell.init)
@@ -100,15 +65,12 @@ struct NetworkInspectorView: View {
 
     @ViewBuilder
     private var sectionMetrics: some View {
-#if os(iOS)
         NetworkMetricsCell(task: viewModel.task)
-#endif
         NetworkCURLCell(task: viewModel.task)
     }
 
     // MARK: - Subviews
 
-#if os(iOS) || os(tvOS)
     @ViewBuilder
     private var transferStatusView: some View {
         ZStack {
@@ -127,7 +89,6 @@ struct NetworkInspectorView: View {
             } // Should never happen
         }
     }
-#endif
 
     @ViewBuilder
     private var requestTypePicker: some View {
@@ -135,7 +96,6 @@ struct NetworkInspectorView: View {
             Text("Original").tag(false)
             Text("Current").tag(true)
         }
-#if os(iOS)
         HStack {
             Text("Request Type")
             Spacer()
@@ -146,14 +106,8 @@ struct NetworkInspectorView: View {
                 .padding(.bottom, 4)
                 .padding(.top, -10)
         }
-#else
-        picker
-#endif
     }
 
-    // MARK: - Helpers
-
-#if os(iOS)
     @ViewBuilder
     private var trailingNavigationBarItems: some View {
         HStack {
@@ -176,7 +130,6 @@ struct NetworkInspectorView: View {
             }
         }
     }
-#endif
 }
 
 #if DEBUG
@@ -185,15 +138,11 @@ struct NetworkInspectorView_Previews: PreviewProvider {
         Group {
             NavigationView {
                 NetworkInspectorView(viewModel: .init(task: LoggerStore.preview.entity(for: .login)))
-            }
-            .navigationViewStyle(.stack)
-            .previewDisplayName("Success")
+            }.previewDisplayName("Success")
 
             NavigationView {
                 NetworkInspectorView(viewModel: .init(task: LoggerStore.preview.entity(for: .patchRepo)))
-            }
-            .navigationViewStyle(.stack)
-            .previewDisplayName("Failure")
+            }.previewDisplayName("Failure")
         }
     }
 }
