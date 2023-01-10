@@ -165,7 +165,7 @@ final class TextRenderer {
             var urlAttributes = helper.attributes(role: .body2, weight: .regular)
             urlAttributes[.underlineColor] = UXColor.clear
             header.append(method + "\n", helper.attributes(role: .body, weight: .semibold))
-            header.append((task.url ?? "–") + "\n", urlAttributes)
+            header.append((transaction.request.url ?? "–") + "\n", urlAttributes)
             components.append(header)
         }
 
