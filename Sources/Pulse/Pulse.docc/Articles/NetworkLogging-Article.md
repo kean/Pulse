@@ -121,7 +121,7 @@ let logger = NetworkLogger {
 }
 ```
 
-> tip: "Include" and "exclude" patterns support basic wildcards (`*`), but you can also turns them into full-features regex patterns using ``NetworkLogger/Configuration/isRegexEnabled``. 
+> tip: "Include" and "exclude" patterns support basic wildcards (`*`), but you can also turns them into full-featured regex patterns using ``NetworkLogger/Configuration/isRegexEnabled``. 
 
 If the built-in configuration options don't cover all of your use-cases, you can set  ``NetworkLogger/Configuration/willHandleEvent`` closure that provides you complete control for filtering out and updating the events.
 
