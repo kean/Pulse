@@ -6,6 +6,12 @@ import SwiftUI
 import Pulse
 import Combine
 
+private let commonKeyPrefix = "com-github-com-kean-pulse__"
+
+/// These APIs are not exposed publically, but they are backed by UserDefaults,
+/// so you can override them programatically using keys.
+///
+/// Full key format: `com-github-com-kean-pulse__console-line-limit`.
 final class ConsoleSettings: PersistentSettings {
     static let shared = ConsoleSettings()
 
@@ -164,8 +170,6 @@ final class UserDefaultRaw<Value: RawRepresentable>: UserDefaultProtocol, Dynami
 protocol UserDefaultProtocol {
     var didUpdate: AnyPublisher<Void, Never> { get }
 }
-
-private let commonKeyPrefix = "com-github-com-kean-pulse__"
 
 private final class UserDefaultsObserver: NSObject {
     let key: String
