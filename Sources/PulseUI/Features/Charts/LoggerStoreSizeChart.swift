@@ -53,7 +53,7 @@ struct LoggerStoreSizeChart: View {
 #if os(tvOS)
         .frame(height: 100)
 #elseif os(watchOS)
-        .frame(height: 56)
+        .frame(height: 52)
 #else
         .frame(height: 66)
 #endif
