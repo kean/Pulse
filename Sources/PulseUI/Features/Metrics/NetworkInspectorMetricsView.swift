@@ -21,8 +21,10 @@ struct NetworkInspectorMetricsView: View {
                 NetworkInspectorTransactionView(viewModel: $0)
             }
         }
-        .backport.listInsetGrouped()
-        .backport.navigationTitle("Metrics")
+#if os(iOS)
+        .listStyle(.insetGrouped)
+#endif
+        .navigationTitle("Metrics")
 #endif
     }
 }

@@ -12,7 +12,7 @@ struct ConsoleFiltersLabelsPickerView: View {
     @State private var searchText = ""
 
     var body: some View {
-        if #available(iOS 15, tvOS 15, watchOS 8, *) {
+        if #available(iOS 15, tvOS 15, *) {
             form
 #if os(iOS)
                 .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always))

@@ -2,11 +2,7 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
-#if swift(>=5.7)
 import Foundation
-#else
-@preconcurrency import Foundation
-#endif
 
 extension LoggerStore {
     /// The events used for syncing data between stores.

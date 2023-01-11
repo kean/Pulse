@@ -9,12 +9,6 @@ struct ConsoleNetworkFiltersView: View {
     @ObservedObject var viewModel: ConsoleNetworkSearchCriteriaViewModel
     @ObservedObject var sharedCriteriaViewModel: ConsoleSharedSearchCriteriaViewModel
 
-    @State private var isGeneralGroupExpanded = true
-    @State private var isResponseGroupExpanded = true
-    @State private var isTimePeriodExpanded = true
-    @State private var isDomainsGroupExpanded = true
-    @State private var isDurationGroupExpanded = true
-    @State private var isContentTypeGroupExpanded = true
     @State private var isRedirectGroupExpanded = true
     @State private var isDomainsPickerPresented = false
 
@@ -28,19 +22,7 @@ struct ConsoleNetworkFiltersView: View {
 #else
     var body: some View {
         ScrollView {
-            VStack(spacing: ConsoleFilters.formSpacing) {
-                VStack(spacing: 6) {
-                    HStack {
-                        Text("FILTERS")
-                            .foregroundColor(.secondary)
-                        Spacer()
-                        buttonReset
-                    }
-                    Divider()
-                }.padding(.top, 6)
-
-                formContents
-            }.padding(ConsoleFilters.formPadding)
+            formContents.frame(width: 320)
         }
     }
 #endif
@@ -56,9 +38,7 @@ extension ConsoleNetworkFiltersView {
             buttonReset
         }
 #endif
-        if #available(iOS 14, tvOS 14, *) {
-            ConsoleSharedFiltersView(viewModel: sharedCriteriaViewModel)
-        }
+        ConsoleSharedFiltersView(viewModel: sharedCriteriaViewModel)
 #if os(iOS) || os(macOS)
         if #available(iOS 15, *) {
             generalGroup
@@ -85,7 +65,6 @@ extension ConsoleNetworkFiltersView {
 extension ConsoleNetworkFiltersView {
     var generalGroup: some View {
         ConsoleFilterSection(
-            isExpanded: $isGeneralGroupExpanded,
             header: { generalGroupHeader },
             content: { generalGroupContent }
         )
@@ -140,7 +119,6 @@ extension ConsoleNetworkFiltersView {
 extension ConsoleNetworkFiltersView {
     var responseGroup: some View {
         ConsoleFilterSection(
-            isExpanded: $isResponseGroupExpanded,
             header: { responseGroupHeader },
             content: { responseGroupContent }
         )
@@ -161,10 +139,8 @@ extension ConsoleNetworkFiltersView {
 #if os(iOS) || os(macOS)
         statusCodeRow
         contentTypeRow
-        if #available(iOS 14, *) {
-            responseSizeRow
-            durationRow
-        }
+        responseSizeRow
+        durationRow
 #else
         contentTypeRow
 #endif
@@ -191,7 +167,6 @@ extension ConsoleNetworkFiltersView {
         }
     }
 
-    @available(iOS 14, *)
     private var responseSizeRow: some View {
         HStack {
             Text("Size")
@@ -207,7 +182,6 @@ extension ConsoleNetworkFiltersView {
         }
     }
 
-    @available(iOS 14, *)
     private var durationRow: some View {
         HStack {
             Text("Duration")
@@ -229,7 +203,6 @@ extension ConsoleNetworkFiltersView {
 extension ConsoleNetworkFiltersView {
     var domainsGroup: some View {
         ConsoleFilterSection(
-            isExpanded: $isDomainsGroupExpanded,
             header: { domainsGroupHeader },
             content: { domainsGroupContent }
         )
@@ -306,7 +279,7 @@ extension ConsoleNetworkFiltersView {
             }
             makeDomainPicker()
         }
-        .backport.inlineNavigationTitle("Select Hosts")
+        .inlineNavigationTitle("Select Hosts")
     }
 }
 
@@ -315,7 +288,6 @@ extension ConsoleNetworkFiltersView {
 extension ConsoleNetworkFiltersView {
     var networkingGroup: some View {
         ConsoleFilterSection(
-            isExpanded: $isRedirectGroupExpanded,
             header: { networkingGroupHeader },
             content: { networkingGroupContent }
         )
@@ -344,7 +316,7 @@ struct NetworkFiltersView_Previews: PreviewProvider {
     static var previews: some View {
 #if os(macOS)
         ConsoleNetworkFiltersView(viewModel: makeMockViewModel(), sharedCriteriaViewModel: .init(store: .mock))
-            .frame(width: ConsoleFilters.preferredWidth - 15, height: 950) // Minus the scroller
+            .previewLayout(.fixed(width: 320, height: 900))
 #else
         NavigationView {
             ConsoleNetworkFiltersView(viewModel: makeMockViewModel(), sharedCriteriaViewModel: .init(store: .mock))

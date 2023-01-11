@@ -10,13 +10,13 @@ import Combine
 #if os(tvOS)
 
 struct NetworkInspectorView: View {
-    @ObservedObject var viewModel: NetworkInspectorViewModel
+    @StateObject var viewModel: NetworkInspectorViewModel
 
     @State private var isCurrentRequest = false
 
     var body: some View {
         contents
-            .backport.inlineNavigationTitle(viewModel.title)
+            .inlineNavigationTitle(viewModel.title)
     }
 
     var contents: some View {

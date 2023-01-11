@@ -10,7 +10,7 @@ import Combine
 #if os(macOS)
 
 struct NetworkInspectorView: View {
-    @ObservedObject var viewModel: NetworkInspectorViewModel
+    @StateObject var viewModel: NetworkInspectorViewModel
 
     @State private var isCurrentRequest = false
 
@@ -18,7 +18,7 @@ struct NetworkInspectorView: View {
         List {
             contents
         }
-        .backport.inlineNavigationTitle(viewModel.title)
+        .inlineNavigationTitle(viewModel.title)
         .toolbar {
             if #available(macOS 13, *), let url = viewModel.shareTaskAsHTML() {
                 ShareLink(item: url)

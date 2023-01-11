@@ -21,37 +21,33 @@ public struct SettingsView: View {
     
     public var body: some View {
         Form {
-            if #available(tvOS 14, *) {
-                sectionStoreDetails
-            }
+            sectionStoreDetails
 #if os(watchOS)
             sectionTransferStore
 #endif
             if !viewModel.isArchive {
                 Section {
-                    ButtonRemoveAll(action: viewModel.buttonRemoveAllMessagesTapped)
+                    Button.destructive(action: viewModel.buttonRemoveAllMessagesTapped) {
+                        Label("Remove Logs", systemImage: "trash")
+                    }
                 }
             }
-            if #available(tvOS 14, *), viewModel.isRemoteLoggingAvailable {
+            if viewModel.isRemoteLoggingAvailable {
                 Section {
                     RemoteLoggerSettingsView(viewModel: .shared)
                 }
             }
         }
-        .backport.navigationTitle("Settings")
+        .navigationTitle("Settings")
 #if os(tvOS)
         .frame(maxWidth: 800)
 #endif
     }
     
-    @available(tvOS 14, *)
     private var sectionStoreDetails: some View {
         Section {
             NavigationLink(destination: StoreDetailsView(source: .store(viewModel.store))) {
-                HStack {
-                    Image(systemName: "info.circle")
-                    Text("Store Info")
-                }
+                Label("Store Info", systemImage: "info.circle")
             }
         }
     }
@@ -81,44 +77,3 @@ struct SettingsView_Previews: PreviewProvider {
 }
 #endif
 #endif
-
-// MARK: - Helpers
-
-struct ButtonRemoveAll: View {
-    let action: () -> Void
-    
-    var body: some View {
-#if os(watchOS)
-        let title = "Remove All"
-#else
-        let title = "Remove Messages"
-#endif
-        ButtonRemove(title: title, alert: "Are you sure you want to remove all recorded messages?", action: action)
-    }
-}
-
-struct ButtonRemove: View {
-    let title: String
-    let alert: String
-    let action: () -> Void
-    
-    var body: some View {
-        let button =
-        Button(action: action) {
-#if os(watchOS)
-            Label(title, systemImage: "trash")
-#else
-            HStack {
-                Image(systemName: "trash")
-                Text(title)
-            }
-#endif
-        }
-        
-#if os(macOS)
-        button
-#else
-        button.foregroundColor(.red)
-#endif
-    }
-}

@@ -17,7 +17,7 @@ final class FileViewerViewModel: ObservableObject {
     var contentType: NetworkLogger.ContentType? { context.contentType }
     private let getData: () -> Data
 
-    private(set) lazy var contents: Contents? = render(data: getData())
+    private(set) lazy var contents: Contents = render(data: getData())
 
     struct Context {
         var contentType: NetworkLogger.ContentType?

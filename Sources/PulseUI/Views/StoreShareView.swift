@@ -9,7 +9,6 @@ import Combine
 
 #if os(iOS) || os(macOS)
 
-@available(iOS 14, tvOS 14, *)
 struct ShareStoreView: View {
     let store: LoggerStore
 
@@ -288,7 +287,6 @@ private struct SharedContents {
 }
 
 #if DEBUG
-@available(iOS 14, tvOS 14, *)
 struct ShareStoreView_Previews: PreviewProvider {
     static var previews: some View {
 #if os(iOS)

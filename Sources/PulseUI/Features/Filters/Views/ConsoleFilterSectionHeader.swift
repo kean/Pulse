@@ -15,22 +15,24 @@ struct ConsoleFilterSectionHeader: View {
 #if os(macOS)
     var body: some View {
         HStack {
-            HStack {
+            HStack(spacing: 4) {
                 Image(systemName: icon)
-                    .foregroundColor(.accentColor)
+                    .foregroundColor(.secondary)
                 Text(title)
             }
             Spacer()
-            Button(action: reset) {
-                Image(systemName: "arrow.uturn.left")
+            if !isDefault {
+                Button(action: reset) {
+                    Image(systemName: "arrow.uturn.left")
+                }
+                .foregroundColor(.secondary)
+                .disabled(isDefault)
+                Button(action: { isEnabled.toggle() }) {
+                    Image(systemName: isEnabled ? "checkmark.circle.fill" : "circle")
+                        .foregroundColor(isDefault ? .secondary : .accentColor)
+                }
+                .disabled(isDefault)
             }
-            .foregroundColor(.secondary)
-            .disabled(isDefault)
-            Button(action: { isEnabled.toggle() }) {
-                Image(systemName: isEnabled ? "checkmark.circle.fill" : "circle")
-                    .foregroundColor(isDefault ? .secondary : .accentColor)
-            }
-            .disabled(isDefault)
         }.buttonStyle(PlainButtonStyle())
     }
 #elseif os(iOS)
@@ -48,7 +50,7 @@ struct ConsoleFilterSectionHeader: View {
                 }
                 .padding(.bottom, 3)
                 .hidden()
-                .backport.hideAccessibility()
+                .accessibilityHidden(true)
             }
         }
     }

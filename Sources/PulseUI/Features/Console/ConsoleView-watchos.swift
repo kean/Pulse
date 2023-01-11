@@ -8,17 +8,17 @@ import SwiftUI
 import Pulse
 
 public struct ConsoleView: View {
-    @ObservedObject var viewModel: ConsoleViewModel
+    @StateObject private var viewModel: ConsoleViewModel
 
     @State private var isPresentingSettings = false
     @State private var isPresentingFilters = false
 
     public init(store: LoggerStore) {
-        self.viewModel = ConsoleViewModel(store: store)
+        self.init(viewModel: ConsoleViewModel(store: store))
     }
 
     init(viewModel: ConsoleViewModel) {
-        self.viewModel = viewModel
+        _viewModel = StateObject(wrappedValue: viewModel)
     }
 
     public var body: some View {
@@ -60,7 +60,7 @@ public struct ConsoleView: View {
 
     @ViewBuilder
     private var toolbar: some View {
-        let stack = HStack {
+        HStack {
             Button(action: viewModel.toggleMode) {
                 Image(systemName: "arrow.down.circle")
             }
@@ -79,13 +79,8 @@ public struct ConsoleView: View {
             .font(.title3)
             .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
             .listRowBackground(Color.clear)
-        if #available(watchOS 8.0, *) {
-            stack
-                .buttonStyle(.bordered)
-                .buttonBorderShape(.roundedRectangle(radius: 8))
-        } else {
-            stack
-        }
+            .buttonStyle(.bordered)
+            .buttonBorderShape(.roundedRectangle(radius: 8))
     }
 }
 
@@ -93,7 +88,7 @@ public struct ConsoleView: View {
 struct ConsoleView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
-            ConsoleView(viewModel: .init(store: .mock))
+            ConsoleView(store: .mock)
         }
         .navigationTitle("Console")
         .navigationViewStyle(.stack)

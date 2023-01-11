@@ -8,7 +8,6 @@ import Pulse
 import Combine
 
 #if os(iOS) || os(macOS)
-@available(iOS 14, *)
 struct DateRangePicker: View {
     let title: String
     @Binding var date: Date?

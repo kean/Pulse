@@ -22,8 +22,6 @@ struct ConsoleCustomNetworkFilterView: View {
         self.isRemoveHidden = isRemoveHidden
     }
 
-#if os(iOS)
-    
     @FocusState private var isTextFieldFocused: Bool
     @State private var isEditing = false
 
@@ -40,7 +38,12 @@ struct ConsoleCustomNetworkFilterView: View {
                 .focused($isTextFieldFocused)
                 .textFieldStyle(.roundedBorder)
                 .disableAutocorrection(true)
+#if os(iOS)
                 .autocapitalization(.none)
+#endif
+#if os(macOS)
+                .frame(minWidth: 100)
+#endif
                 .onChange(of: isTextFieldFocused) { isTextFieldFocused in
                     withAnimation { isEditing = isTextFieldFocused }
                 }
@@ -63,7 +66,9 @@ struct ConsoleCustomNetworkFilterView: View {
                 .foregroundColor(.blue)
             }
         }
+#if os(iOS)
         .padding(EdgeInsets(top: 2, leading: -6, bottom: 2, trailing: -8))
+#endif
     }
     
     private var fieldMenu: some View {
@@ -79,34 +84,6 @@ struct ConsoleCustomNetworkFilterView: View {
     private var matchMenu: some View {
         FilterPickerMenu(title: filter.match.localizedTitle) { matchPicker }
     }
-    
-#else
-    
-    var body: some View {
-        HStack(spacing: 16) {
-            VStack(spacing: 8) {
-                HStack {
-                    fieldPicker
-                    matchPicker
-                }
-                TextField("Value", text: $filter.value)
-                    .textFieldStyle(.roundedBorder)
-            }
-            .padding(8)
-            .background(Color(NSColor.windowBackgroundColor))
-            .cornerRadius(8)
-
-            if !isRemoveHidden {
-                Button(action: { onRemove(filter) }) {
-                    Image(systemName: "minus.circle.fill")
-                }
-                .buttonStyle(.plain)
-                .foregroundColor(Color.red)
-            }
-        }
-    }
-
-#endif
 
     @ViewBuilder
     private var fieldPicker: some View {

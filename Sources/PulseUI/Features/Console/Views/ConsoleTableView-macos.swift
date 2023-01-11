@@ -124,7 +124,6 @@ struct ConsoleTableView: NSViewRepresentable {
 
 final class HostingTableCell: NSTableCellView {
     let hostingView = NSHostingView(rootView: AnyView(EmptyView()))
-    private let label = NSTextField.label()
 
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
@@ -137,13 +136,6 @@ final class HostingTableCell: NSTableCellView {
             hostingView.topAnchor.constraint(equalTo: topAnchor, constant: 3),
             hostingView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -3)
         ])
-    }
-
-    override func layout() {
-        super.layout()
-
-        label.sizeToFit()
-        label.frame.origin = CGPoint(x: 2, y: 2)
     }
 
     required init?(coder: NSCoder) {

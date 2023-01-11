@@ -31,25 +31,21 @@ public final class URLSessionProxyDelegate: NSObject, URLSessionTaskDelegate, UR
             #selector(URLSessionDownloadDelegate.urlSession(_:downloadTask:didFinishDownloadingTo:)),
             #selector(URLSessionDownloadDelegate.urlSession(_:downloadTask:didWriteData:totalBytesWritten:totalBytesExpectedToWrite:)),
         ]
-#if swift(>=5.7)
         if #available(iOS 16.0, tvOS 16.0, macOS 13.0, watchOS 9.0, *) {
             self.interceptedSelectors.insert(
                 #selector(URLSessionTaskDelegate.urlSession(_:didCreateTask:))
             )
         }
-#endif
     }
 
     // MARK: URLSessionTaskDelegate
 
-#if swift(>=5.7)
     public func urlSession(_ session: URLSession, didCreateTask task: URLSessionTask) {
         logger.logTaskCreated(task)
         if #available(iOS 16.0, tvOS 16.0, macOS 13.0, watchOS 9.0, *) {
             taskDelegate?.urlSession?(session, didCreateTask: task)
         }
     }
-#endif
 
     public func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         logger.logTask(task, didCompleteWithError: error)

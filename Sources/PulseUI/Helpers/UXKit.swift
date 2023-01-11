@@ -14,24 +14,24 @@ import SwiftUI
 // compatible with each other
 
 struct Palette {
-    #if os(watchOS)
+#if os(watchOS)
     static var red: UXColor { UXColor(Color.red) }
     static var pink: UXColor { UXColor(Color.pink) }
-    #else
+#else
     static var red: UXColor {
         UXColor.dynamic(light: Palette.lightRed, dark: Palette.darkRed)
     }
-
+    
     private static let lightRed = UXColor(red: 196.0/255.0, green: 26.0/255.0, blue: 22.0/255.0, alpha: 1.0)
     private static let darkRed = UXColor(red: 252.0/255.0, green: 106.0/255.0, blue: 93.0/255.0, alpha: 1.0)
-
+    
     static var pink: UXColor {
         UXColor.dynamic(light: Palette.lightPink, dark: Palette.darkPink)
     }
-
+    
     private static let lightPink = UXColor(red: 155.0/255.0, green: 35.0/255.0, blue: 147.00/255.0, alpha: 1.0)
     private static let darkPink = UXColor(red: 252.0/255.0, green: 95.0/255.0, blue: 163.0/255.0, alpha: 1.0)
-    #endif
+#endif
 }
 
 #if os(macOS)
@@ -151,9 +151,9 @@ func runHapticFeedback(_ type: UINotificationFeedbackGenerator.FeedbackType = .s
 #endif
 
 func hideKeyboard() {
-    #if os(iOS)
+#if os(iOS)
     UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-    #endif
+#endif
 }
 
 #if os(macOS)
@@ -162,7 +162,7 @@ extension NSTextView {
         get { nil }
         set { textStorage?.setAttributedString(newValue ?? NSAttributedString()) }
     }
-
+    
     var text: String {
         get { string }
         set { string = newValue }
@@ -174,27 +174,21 @@ enum NSHapticFeedabackTypePlaceholder {
 }
 
 func runHapticFeedback(_ type: NSHapticFeedabackTypePlaceholder = .success) {
-    // Do nothing, not
+    // Do nothing
 }
 #endif
 
-// MARK: - UIImageView
-
-#if os(iOS) || os(watchOS) || os(tvOS)
 extension Image {
+#if os(iOS) || os(watchOS) || os(tvOS)
     init(uxImage: UXImage) {
         self.init(uiImage: uxImage)
     }
-}
-#endif
-
-#if os(macOS)
-extension Image {
+#elseif os(macOS)
     init(uxImage: UXImage) {
         self.init(nsImage: uxImage)
     }
-}
 #endif
+}
 
 #if os(macOS)
 extension NSPasteboard {
@@ -214,33 +208,4 @@ extension NSImage {
     }
 }
 
-extension NSTextField {
-    static func label() -> NSTextField {
-        let label = NSTextField()
-        label.isBezeled = false
-        label.drawsBackground = false
-        label.isEditable = false
-        label.isSelectable = false
-        label.lineBreakMode = .byTruncatingTail
-        return label
-    }
-}
-
-extension NSAttributedString {
-    static func makeAttachment(with image: NSImage?, attributes: [NSAttributedString.Key: Any]) -> NSAttributedString {
-        let attachment = NSTextAttachment()
-        attachment.image = image
-        let string = NSMutableAttributedString(attachment: attachment)
-        string.addAttributes(attributes)
-        return NSAttributedString(attributedString: string)
-    }
-}
 #endif
-
-extension NSAttributedString {
-    func with(_ key: NSAttributedString.Key, _ value: Any) -> NSAttributedString {
-        let string = NSMutableAttributedString(attributedString: self)
-        string.addAttributes([key: value])
-        return string
-    }
-}

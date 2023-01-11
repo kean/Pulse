@@ -33,21 +33,6 @@ extension NSString {
 }
 
 extension String {
-    /// Finds all occurrences of the given string
-    func ranges(of substring: String, options: String.CompareOptions = []) -> [Range<String.Index>] {
-        var index = startIndex
-        var ranges = [Range<String.Index>]()
-        while index < endIndex, let range = range(of: substring, options: options, range: index..<endIndex, locale: nil) {
-            ranges.append(range)
-            if index == range.upperBound {
-                index = self.index(after: index) // Regex found empty match, move along
-            } else {
-                index = range.upperBound
-            }
-        }
-        return ranges
-    }
-
     /// Returns first range of substring.
     func firstRange(of substring: String, options: String.CompareOptions = []) -> Range<String.Index>? {
         range(of: substring, options: options, range: startIndex..<endIndex, locale: nil)

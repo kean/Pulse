@@ -10,7 +10,7 @@ struct ConsoleMessageMetadataView: View {
 
     var body: some View {
         RichTextView(viewModel: .init(string: string))
-            .backport.navigationTitle("Message Details")
+            .navigationTitle("Message Details")
     }
 
     private var string: NSAttributedString {

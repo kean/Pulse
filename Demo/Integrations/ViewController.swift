@@ -41,7 +41,7 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
                     let vc = UIHostingController(rootView: ConsoleView.network(store: .mock))
                     self.navigationController?.pushViewController(vc, animated: true)
                 }),
-                MenuItem(title: "NetworkView (Deprecated)", action: { [unowned self] in
+                MenuItem(title: "NetworkView", action: { [unowned self] in
                     let vc = UIHostingController(rootView: NetworkView(store: .mock))
                     self.navigationController?.pushViewController(vc, animated: true)
                 })

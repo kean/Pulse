@@ -16,8 +16,7 @@ struct ButtonCopyMessage: View {
             UXPasteboard.general.string = text
             runHapticFeedback()
         }) {
-            Text("Copy Message")
-            Image(systemName: "doc.on.doc")
+            Label("Copy Message", systemImage: "doc.on.doc")
         }
     }
 }
@@ -40,66 +39,57 @@ struct NetworkMessageContextMenuCopySection: View {
 
     var body: some View {
         Section {
-            if #available(iOS 14.0, *) {
-                Menu(content: {
-                    if let url = task.url {
-                        Button(action: {
-                            UXPasteboard.general.string = url
-                            runHapticFeedback()
-                        }) {
-                            Text("Copy URL")
-                            Image(systemName: "doc.on.doc")
-                        }
+            Menu(content: {
+                if let url = task.url {
+                    Button(action: {
+                        UXPasteboard.general.string = url
+                        runHapticFeedback()
+                    }) {
+                        Label("Copy URL", systemImage: "doc.on.doc")
                     }
-                    if let host = task.host?.value {
-                        Button(action: {
-                            UXPasteboard.general.string = host
-                            runHapticFeedback()
-                        }) {
-                            Text("Copy Host")
-                            Image(systemName: "doc.on.doc")
-                        }
+                }
+                if let host = task.host?.value {
+                    Button(action: {
+                        UXPasteboard.general.string = host
+                        runHapticFeedback()
+                    }) {
+                        Label("Copy Host", systemImage: "doc.on.doc")
                     }
-                    if task.requestBodySize > 0 {
-                        Button(action: {
-                            guard let data = task.requestBody?.data else { return }
-                            UXPasteboard.general.string = String(data: data, encoding: .utf8)
-                            runHapticFeedback()
-                        }) {
-                            Text("Copy Request")
-                            Image(systemName: "arrow.up.circle")
-                        }
+                }
+                if task.requestBodySize > 0 {
+                    Button(action: {
+                        guard let data = task.requestBody?.data else { return }
+                        UXPasteboard.general.string = String(data: data, encoding: .utf8)
+                        runHapticFeedback()
+                    }) {
+                        Label("Copy Request", systemImage:"arrow.up.circle")
                     }
-                    if task.responseBodySize > 0 {
-                        Button(action: {
-                            guard let data = task.responseBody?.data else { return }
-                            UXPasteboard.general.string = String(data: data, encoding: .utf8)
-                            runHapticFeedback()
-                        }) {
-                            Text("Copy Response")
-                            Image(systemName: "arrow.down.circle")
-                        }
+                }
+                if task.responseBodySize > 0 {
+                    Button(action: {
+                        guard let data = task.responseBody?.data else { return }
+                        UXPasteboard.general.string = String(data: data, encoding: .utf8)
+                        runHapticFeedback()
+                    }) {
+                        Label("Copy Response", systemImage: "arrow.down.circle")
                     }
-                }, label: {
-                    Label("Copy...", systemImage: "doc.on.doc")
-                })
-            }
+                }
+            }, label: {
+                Label("Copy...", systemImage: "doc.on.doc")
+            })
         }
     }
 }
 #endif
 
 #if os(iOS) || os(macOS)
-@available(iOS 14, *)
 struct StringSearchOptionsMenu: View {
     @Binding private(set) var options: StringSearchOptions
     var isKindNeeded = true
 
     #if os(macOS)
     var body: some View {
-        Menu(content: {
-            contents
-        }, label: {
+        Menu(content: { contents }, label: {
             Image(systemName: "ellipsis.circle")
         })
         .menuStyle(BorderlessButtonMenuStyle(showsMenuIndicator: false))
@@ -130,7 +120,6 @@ struct StringSearchOptionsMenu: View {
     }
 }
 
-@available(iOS 14, *)
 struct AttributedStringShareMenu: View {
     @Binding var shareItems: ShareItems?
     let string: () -> NSAttributedString
@@ -140,13 +129,11 @@ struct AttributedStringShareMenu: View {
             Label("Share as Text", systemImage: "square.and.arrow.up")
         }
         Button(action: { shareItems = ShareService.share(string(), as: .html) }) {
-            Text("Share as HTML")
-            Image(systemName: "square.and.arrow.up")
+            Label("Share as HTML", systemImage: "square.and.arrow.up")
         }
 #if os(iOS)
         Button(action: { shareItems = ShareService.share(string(), as: .pdf) }) {
-            Text("Share as PDF")
-            Image(systemName: "square.and.arrow.up")
+            Label("Share as PDF", systemImage: "square.and.arrow.up")
         }
 #endif
     }
@@ -170,17 +157,23 @@ struct AttributedStringShareMenu: View {
 }
 
 #if DEBUG
-@available(iOS 14, *)
 struct StringSearchOptionsMenu_Previews: PreviewProvider {
     static var previews: some View {
-        VStack {
+        VStack(spacing: 32) {
             Spacer()
+            Menu(content: {
+                AttributedStringShareMenu(shareItems: .constant(nil)) {
+                    TextRenderer(options: .sharing).render(LoggerStore.preview.entity(for: .login), content: .sharing)
+                }
+            }) {
+                Text("Attributed String Share")
+            }
             Menu(content: {
                 Section(header: Label("Search Options", systemImage: "magnifyingglass")) {
                     StringSearchOptionsMenu(options: .constant(.default))
                 }
             }) {
-                Text("Menu")
+                Text("Search Options")
             }
         }
     }

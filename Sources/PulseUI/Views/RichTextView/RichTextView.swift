@@ -36,8 +36,6 @@ struct RichTextView: View {
     }
 }
 
-/// - warning: state management is broken beyond repair and needs to be
-/// rewritten (using StateObject as soon as SwiftUI is updated)
 @available(iOS 15, *)
 struct _RichTextView: View {
     @ObservedObject var viewModel: RichTextViewModel
@@ -56,7 +54,7 @@ struct _RichTextView: View {
             .sheet(isPresented: $isWebViewOpen) {
                 NavigationView {
                     WebView(data: viewModel.text.string.data(using: .utf8) ?? Data(), contentType: "application/html")
-                        .backport.inlineNavigationTitle("Browser Preview")
+                        .inlineNavigationTitle("Browser Preview")
                         .navigationBarItems(trailing: Button(action: {
                             isWebViewOpen = false
                         }) { Image(systemName: "xmark") })
@@ -299,7 +297,7 @@ struct RichTextView_Previews: PreviewProvider {
             let json = try! JSONSerialization.jsonObject(with: MockJSON.allPossibleValues)
             let string = TextRenderer().render(json: json)
             RichTextView(viewModel: .init(string: string, contentType: "application/json"))
-                .backport.inlineNavigationTitle("Rich Text View")
+                .inlineNavigationTitle("Rich Text View")
         }
 #if os(macOS)
             .frame(height: 600)

@@ -23,24 +23,20 @@ struct FileViewer: View {
 
     @ViewBuilder
     private var contents: some View {
-        if let contents = viewModel.contents {
-            switch contents {
-            case .json(let viewModel):
-                RichTextView(viewModel: viewModel)
-            case .image(let viewModel):
-                ScrollView {
-                    ImageViewer(viewModel: viewModel)
-                }
-#if os(iOS) || os(macOS)
-            case .pdf(let document):
-                PDFKitRepresentedView(document: document)
-                    .edgesIgnoringSafeArea(.all)
-#endif
-            case .other(let viewModel):
-                RichTextView(viewModel: viewModel)
+        switch viewModel.contents {
+        case .json(let viewModel):
+            RichTextView(viewModel: viewModel)
+        case .image(let viewModel):
+            ScrollView {
+                ImageViewer(viewModel: viewModel)
             }
-        } else {
-            SpinnerView(viewModel: .init(title: "Preparing...", details: nil))
+#if os(iOS) || os(macOS)
+        case .pdf(let document):
+            PDFKitRepresentedView(document: document)
+                .edgesIgnoringSafeArea(.all)
+#endif
+        case .other(let viewModel):
+            RichTextView(viewModel: viewModel)
         }
     }
 }

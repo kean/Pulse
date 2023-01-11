@@ -10,6 +10,7 @@ import SwiftUI
 final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, ObservableObject {
     let title: String
     let isNetworkOnly: Bool
+    let store: LoggerStore
 
 #if os(iOS) || os(macOS)
     let table: ConsoleTableViewModel
@@ -35,12 +36,11 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     }
 
     @Published var mode: Mode
-    @Published var isOnlyErrors: Bool = false
+    @Published var isOnlyErrors = false
     @Published var filterTerm: String = ""
 
     var onDismiss: (() -> Void)?
 
-    private(set) var store: LoggerStore
     private var controller: NSFetchedResultsController<NSManagedObject>?
     private var isActive = false
     private var cancellables: [AnyCancellable] = []

@@ -14,11 +14,10 @@ struct SpinnerView: View {
 
     var body: some View {
         VStack {
-            Spinner()
+            ProgressView()
             if let details = viewModel.details {
                 Text(details)
                     .padding(.top, 6)
-                    .animation(nil)
             }
         }
         .foregroundColor(.secondary)

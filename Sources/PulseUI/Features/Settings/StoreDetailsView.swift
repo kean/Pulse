@@ -5,7 +5,6 @@
 import SwiftUI
 import Pulse
 
-@available(iOS 14, tvOS 14, *)
 struct StoreDetailsView: View {
     @StateObject private var viewModel = StoreDetailsViewModel()
 
@@ -30,12 +29,11 @@ struct StoreDetailsView: View {
 #if os(tvOS)
             .padding()
 #else
-            .backport.inlineNavigationTitle("Store Details")
+            .inlineNavigationTitle("Store Details")
 #endif
     }
 }
 
-@available(iOS 14, tvOS 14, *)
 private struct Contents: View {
     @ObservedObject var viewModel: StoreDetailsViewModel
 
@@ -43,7 +41,7 @@ private struct Contents: View {
         // important: zstack fixed infinite onAppear loop on iOS 14
         ZStack {
             if viewModel.isLoading {
-                Spinner().frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                ProgressView().frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
             } else if let error = viewModel.errorMessage {
                 PlaceholderView(imageName: "exclamationmark.circle", title: "Failed to load info", subtitle: error)
             } else {
@@ -55,7 +53,6 @@ private struct Contents: View {
     @ViewBuilder
     private var form: some View {
         Form {
-#if swift(>=5.7)
             if #available(iOS 16.0, tvOS 16.0, macOS 13.0, watchOS 9.0, *), let info = viewModel.info {
                 LoggerStoreSizeChart(info: info, sizeLimit: viewModel.storeSizeLimit)
 #if os(tvOS)
@@ -66,7 +63,6 @@ private struct Contents: View {
                     .padding(.bottom, 16)
 #endif
             }
-#endif
             ForEach(viewModel.sections, id: \.title) { section in
                 Section(header: Text(section.title)) {
                     ForEach(section.items.enumerated().map(KeyValueRow.init)) { item in
@@ -83,7 +79,6 @@ private struct Contents: View {
 
 // MARK: - ViewModel
 
-@available(iOS 14, tvOS 14, *)
 final class StoreDetailsViewModel: ObservableObject {
     @Published private(set) var isLoading = false
     @Published private(set) var storeSizeLimit: Int64?
@@ -173,7 +168,6 @@ private let dateFormatter: DateFormatter = {
 }()
 
 #if DEBUG
-@available(iOS 14, tvOS 14, *)
 struct StoreDetailsView_Previews: PreviewProvider {
     static var previews: some View {
         StoreDetailsView(source: .store(.mock))

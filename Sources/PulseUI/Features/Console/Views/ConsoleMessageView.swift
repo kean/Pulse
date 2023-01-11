@@ -23,15 +23,11 @@ struct ConsoleMessageView: View {
 #if os(macOS)
                 PinView(viewModel: viewModel.pinViewModel, font: ConsoleConstants.fontTitle)
 #endif
-                let time = Text(viewModel.time)
+                Text(viewModel.time)
                     .lineLimit(1)
                     .font(ConsoleConstants.fontTitle)
                     .foregroundColor(.secondary)
-                if #available(tvOS 15, watchOS 8, macOS 12, *) {
-                    time.monospacedDigit()
-                } else {
-                    time
-                }
+                    .monospacedDigit()
             }
             Text(viewModel.preprocessedText)
                 .font(ConsoleConstants.fontBody)

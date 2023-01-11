@@ -11,7 +11,6 @@ import Combine
 
 import UniformTypeIdentifiers
 
-@available(iOS 14, *)
 struct ConsoleContextMenu: View {
     let store: LoggerStore
     let insights: InsightsViewModel
@@ -47,14 +46,8 @@ struct ConsoleContextMenu: View {
                     Label("Share Store", systemImage: "square.and.arrow.up")
                 }
                 if !store.isArchive {
-                    if #available(iOS 15.0, *) {
-                        Button(role: .destructive, action: buttonRemoveAllTapped) {
-                            Label("Remove Logs", systemImage: "trash")
-                        }
-                    } else {
-                        Button(action: buttonRemoveAllTapped) {
-                            Label("Remove Logs", systemImage: "trash")
-                        }
+                    Button.destructive(action: buttonRemoveAllTapped) {
+                        Label("Remove Logs", systemImage: "trash")
                     }
                 }
             }
@@ -135,7 +128,6 @@ struct ConsoleContextMenu: View {
     }
 }
 
-@available(iOS 14, *)
 private struct DocumentBrowser: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> DocumentBrowserViewController {
         DocumentBrowserViewController(forOpeningContentTypes: [UTType(filenameExtension: "pulse")].compactMap { $0 })
@@ -147,7 +139,6 @@ private struct DocumentBrowser: UIViewControllerRepresentable {
 }
 
 #if DEBUG
-@available(iOS 14, *)
 struct ConsoleContextMenu_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {

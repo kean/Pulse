@@ -15,20 +15,12 @@ public struct PinsView: View {
 }
 
 #if !os(macOS) && !os(watchOS)
-@available(*, deprecated, message: "PPlease use ConsoleView pre-configured with .network mode")
+@available(*, deprecated, message: "Please use ConsoleView pre-configured with .network mode")
 public struct NetworkView: View {
-    let viewModel: ConsoleViewModel
-
-    public init(store: LoggerStore = .shared) {
-        self.viewModel = ConsoleViewModel(store: store, mode: .network)
-    }
-
-    init(viewModel: ConsoleViewModel) {
-        self.viewModel = viewModel
-    }
+    private let store: LoggerStore
 
     public var body: some View {
-        ConsoleView(viewModel: viewModel)
+        ConsoleView.network(store: store)
     }
 }
 #endif

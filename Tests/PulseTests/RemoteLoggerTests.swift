@@ -7,7 +7,6 @@ import Foundation
 import CoreData
 @testable import Pulse
 
-@available(iOS 14, tvOS 14, *)
 final class RemoteLoggerTests: XCTestCase {
     func testEncodeNetworkMessage() throws {
         // GIVEN

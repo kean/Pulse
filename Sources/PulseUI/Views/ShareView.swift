@@ -75,16 +75,6 @@ private extension UIApplication {
         return vc
     }
 }
-
-struct ShareButton: View {
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            Image(systemName: "square.and.arrow.up")
-        }
-    }
-}
 #endif
 
 #if os(macOS)

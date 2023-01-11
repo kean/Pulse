@@ -2,11 +2,7 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
-#if swift(>=5.7)
 import Foundation
-#else
-@preconcurrency import Foundation
-#endif
 
 // MARK: - Redacting Sensitive Headers
 
@@ -73,7 +69,7 @@ extension LoggerStore.Event {
 // MARK: - Redacting Headers
 
 extension NetworkLogger.Request {
-    /// Soft-deprecated in Pulse 2.2
+    /// Soft-deprecated in Pulse 3.0
     public func redactingSensitiveHeaders(_ redactedHeaders: Set<String>) -> Self {
         var copy = self
         copy.headers = _redactingSensitiveHeaders(redactedHeaders, from: headers)
@@ -88,7 +84,7 @@ extension NetworkLogger.Request {
 }
 
 extension NetworkLogger.Response {
-    /// Soft-deprecated in Pulse 2.2
+    /// Soft-deprecated in Pulse 3.0
     public func redactingSensitiveHeaders(_ redactedHeaders: Set<String>) -> Self {
         var copy = self
         copy.headers = _redactingSensitiveHeaders(redactedHeaders, from: headers)

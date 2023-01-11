@@ -9,10 +9,6 @@ struct ConsoleMessageFiltersView: View {
     @ObservedObject var viewModel: ConsoleMessageSearchCriteriaViewModel
     @ObservedObject var sharedCriteriaViewModel: ConsoleSharedSearchCriteriaViewModel
 
-    @State private var isGeneralSectionExpanded = true
-    @State private var isLevelsSectionExpanded = true
-    @State private var isLabelsSectionExpanded = true
-
 #if os(iOS) || os(tvOS) || os(watchOS)
     var body: some View {
         Form { formContents }
@@ -23,20 +19,7 @@ struct ConsoleMessageFiltersView: View {
 #else
     var body: some View {
         ScrollView {
-            VStack(spacing: ConsoleFilters.formSpacing) {
-                VStack(spacing: 6) {
-                    HStack {
-                        Text("FILTERS")
-                            .foregroundColor(.secondary)
-                        Spacer()
-                        buttonReset
-                    }
-                    Divider()
-                }
-                .padding(.top, 6)
-
-                formContents
-            }.padding(ConsoleFilters.formPadding)
+            formContents.frame(width: 320)
         }
     }
 #endif
@@ -52,9 +35,7 @@ extension ConsoleMessageFiltersView {
             buttonReset
         }
 #endif
-        if #available(iOS 14, tvOS 14, *) {
-            ConsoleSharedFiltersView(viewModel: sharedCriteriaViewModel)
-        }
+        ConsoleSharedFiltersView(viewModel: sharedCriteriaViewModel)
 #if os(iOS) || os(macOS)
         if #available(iOS 15, *) {
             generalSection
@@ -79,7 +60,6 @@ extension ConsoleMessageFiltersView {
 extension ConsoleMessageFiltersView {
     var generalSection: some View {
         ConsoleFilterSection(
-            isExpanded: $isGeneralSectionExpanded,
             header: { generalHeader },
             content: { generalContent }
         )
@@ -133,7 +113,6 @@ extension ConsoleMessageFiltersView {
 extension ConsoleMessageFiltersView {
     var logLevelsSection: some View {
         ConsoleFilterSection(
-            isExpanded: $isLevelsSectionExpanded,
             header: { logLevelsHeader },
             content: { logLevelsContent }
         )
@@ -191,7 +170,6 @@ extension ConsoleMessageFiltersView {
 extension ConsoleMessageFiltersView {
     var labelsSection: some View {
         ConsoleFilterSection(
-            isExpanded: $isLabelsSectionExpanded,
             header: { labelsHeader },
             content: { labelsContent }
         )

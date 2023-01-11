@@ -5,12 +5,8 @@
 import SwiftUI
 import Pulse
 
-@available(iOS 14, *)
 struct ConsoleSharedFiltersView: View {
     @ObservedObject var viewModel: ConsoleSharedSearchCriteriaViewModel
-
-    @State var isTimePeriodSectionExpanded = true
-    @State var isConsoleFilterSectionExpanded = true
 
     var body: some View {
         sectionTimePeriod
@@ -26,7 +22,6 @@ struct ConsoleSharedFiltersView: View {
         )
 #else
         ConsoleFilterSection(
-            isExpanded: $isTimePeriodSectionExpanded,
             header: { timePeriodHeader },
             content: { timePeriodContent }
         )
@@ -71,7 +66,7 @@ struct ConsoleSharedFiltersView: View {
                 .foregroundColor(.secondary)
                 .frame(maxWidth: .infinity, alignment: .leading)
             Button("Session") { viewModel.criteria.dates = .session }
-            Button("Recent") { viewModel.criteria.dates = .session }
+            Button("Recent") { viewModel.criteria.dates = .recent }
             Button("Today") { viewModel.criteria.dates = .today }
         }
         .buttonStyle(.plain)
@@ -83,7 +78,6 @@ struct ConsoleSharedFiltersView: View {
 
     private var sectionFilters: some View {
         ConsoleFilterSection(
-            isExpanded: $isConsoleFilterSectionExpanded,
             header: {
                 ConsoleFilterSectionHeader(
                     icon: "calendar", title: "General",
@@ -96,10 +90,8 @@ struct ConsoleSharedFiltersView: View {
             content: {
                 ConsoleFilters.toggle("Only Pinned", isOn: $viewModel.criteria.filters.inOnlyPins)
 #if !os(macOS)
-                if #available(iOS 15.0, tvOS 15, macOS 12, watchOS 8, *) {
-                    Button(role: .destructive, action: viewModel.removeAllPins, label: {
-                        Text("Remove Pins")
-                    })
+                Button.destructive(action: viewModel.removeAllPins) {
+                    Text("Remove Pins")
                 }
 #endif
             }

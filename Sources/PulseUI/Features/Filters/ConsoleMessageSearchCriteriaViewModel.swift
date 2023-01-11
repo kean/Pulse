@@ -100,7 +100,6 @@ final class ConsoleMessageSearchCriteriaViewModel: ObservableObject {
 
     // MARK: Helpers
 
-    /// Returns binding to toggling the given toggle level.
     func binding(forLevel level: LoggerStore.Level) -> Binding<Bool> {
         Binding(get: {
             self.criteria.logLevels.levels.contains(level)

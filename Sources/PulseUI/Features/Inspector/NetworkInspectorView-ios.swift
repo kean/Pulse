@@ -10,7 +10,7 @@ import Combine
 #if os(iOS)
 
 struct NetworkInspectorView: View {
-    @ObservedObject var viewModel: NetworkInspectorViewModel
+    @StateObject var viewModel: NetworkInspectorViewModel
 
     @State private var shareItems: ShareItems?
     @State private var isCurrentRequest = false
@@ -19,7 +19,7 @@ struct NetworkInspectorView: View {
         Form {
             contents
         }
-        .backport.inlineNavigationTitle(viewModel.title)
+        .inlineNavigationTitle(viewModel.title)
         .navigationBarItems(trailing: trailingNavigationBarItems)
         .sheet(item: $shareItems, content: ShareView.init)
     }
@@ -63,23 +63,21 @@ struct NetworkInspectorView: View {
     @ViewBuilder
     private var trailingNavigationBarItems: some View {
         HStack {
-            if #available(iOS 14, *) {
-                Menu(content: {
-                    AttributedStringShareMenu(shareItems: $shareItems) {
-                        TextRenderer(options: .sharing).render(viewModel.task, content: .sharing)
-                    }
-                    Button(action: { shareItems = ShareItems([viewModel.task.cURLDescription()]) }) {
-                        Label("Share as cURL", systemImage: "square.and.arrow.up")
-                    }
-                }, label: {
-                    Image(systemName: "square.and.arrow.up")
-                })
-                Menu(content: {
-                    NetworkMessageContextMenu(task: viewModel.task, sharedItems: $shareItems)
-                }, label: {
-                    Image(systemName: "ellipsis.circle")
-                })
-            }
+            Menu(content: {
+                AttributedStringShareMenu(shareItems: $shareItems) {
+                    TextRenderer(options: .sharing).render(viewModel.task, content: .sharing)
+                }
+                Button(action: { shareItems = ShareItems([viewModel.task.cURLDescription()]) }) {
+                    Label("Share as cURL", systemImage: "square.and.arrow.up")
+                }
+            }, label: {
+                Image(systemName: "square.and.arrow.up")
+            })
+            Menu(content: {
+                NetworkMessageContextMenu(task: viewModel.task, sharedItems: $shareItems)
+            }, label: {
+                Image(systemName: "ellipsis.circle")
+            })
         }
     }
 }

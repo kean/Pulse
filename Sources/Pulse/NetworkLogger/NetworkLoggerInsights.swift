@@ -2,12 +2,7 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
-#if swift(>=5.7)
 import Foundation
-#else
-@preconcurrency import Foundation
-#endif
-
 import Combine
 
 /// Collects insights about the current session.

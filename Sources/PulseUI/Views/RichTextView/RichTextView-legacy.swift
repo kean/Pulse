@@ -17,7 +17,6 @@ struct LegacyRichTextView: View {
                 searchBar
             }
             .padding(EdgeInsets(top: -2, leading: 4, bottom: -2, trailing: 6))
-            .border(width: 1, edges: [.bottom], color: Color(UXColor.separator).opacity(0.3))
 
             WrappedTextView(viewModel: viewModel)
                 .edgesIgnoringSafeArea(.bottom)
@@ -40,13 +39,11 @@ struct LegacyRichTextViewSearchToobar: View {
 #if os(iOS)
     var body: some View {
         HStack(alignment: .center) {
-            if #available(iOS 14, *) {
-                Menu(content: {
-                    StringSearchOptionsMenu(options: $viewModel.searchOptions, isKindNeeded: false)
-                }, label: {
-                    Text("Options")
-                }).fixedSize()
-            }
+            Menu(content: {
+                StringSearchOptionsMenu(options: $viewModel.searchOptions, isKindNeeded: false)
+            }, label: {
+                Text("Options")
+            }).fixedSize()
 
             Spacer()
 
@@ -71,7 +68,6 @@ struct LegacyRichTextViewSearchToobar: View {
             }.fixedSize()
         }
         .padding(12)
-        .border(width: 1, edges: [.top], color: Color(UXColor.separator).opacity(0.3))
     }
 #else
     var body: some View {

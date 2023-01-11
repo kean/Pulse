@@ -16,7 +16,7 @@ struct NetworkInspectorView: View {
 
     var body: some View {
         contents
-            .backport.inlineNavigationTitle(viewModel.title)
+            .inlineNavigationTitle(viewModel.title)
             .toolbar {
                 if #available(watchOS 9, *), let url = viewModel.shareTaskAsHTML() {
                     ShareLink(item: url)

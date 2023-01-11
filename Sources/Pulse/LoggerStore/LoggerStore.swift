@@ -30,10 +30,6 @@ public final class LoggerStore: @unchecked Sendable {
     /// Returns the background managed object context used for all write operations.
     public let backgroundContext: NSManagedObjectContext
 
-    // Deprecated in Pulse 2.0.
-    @available(*, deprecated, message: "Renamed to `shared`")
-    public static var `default`: LoggerStore { LoggerStore.shared }
-
     /// Re-transmits events processed by the store.
     public let events = PassthroughSubject<Event, Never>()
 
@@ -66,9 +62,7 @@ public final class LoggerStore: @unchecked Sendable {
     }
 
     private static func register(store: LoggerStore) {
-        if #available(iOS 14, tvOS 14, *) {
-            RemoteLogger.shared.initialize(store: store)
-        }
+        RemoteLogger.shared.initialize(store: store)
         NetworkLoggerInsights.shared.register(store: store)
     }
 

@@ -24,13 +24,8 @@ struct NetworkRequestStatusCell: View {
 #else
     var body: some View {
         HStack(spacing: spacing) {
-            if #available(iOS 14, tvOS 14, *) {
-                Text(Image(systemName: viewModel.imageName))
-                    .foregroundColor(viewModel.tintColor)
-            } else {
-                Image(systemName: viewModel.imageName)
-                    .foregroundColor(viewModel.tintColor)
-            }
+            Text(Image(systemName: viewModel.imageName))
+                .foregroundColor(viewModel.tintColor)
             Text(viewModel.title)
                 .lineLimit(1)
                 .foregroundColor(viewModel.tintColor)
@@ -92,14 +87,6 @@ struct NetworkRequestStatusCellModel {
             tintColor = .secondary
         }
         duration = DurationViewModel(transaction: transaction)
-    }
-
-    var uiTintColor: UXColor {
-        if #available(iOS 14, tvOS 14, *) {
-            return UXColor(tintColor)
-        } else {
-            return UXColor.label
-        }
     }
 }
 

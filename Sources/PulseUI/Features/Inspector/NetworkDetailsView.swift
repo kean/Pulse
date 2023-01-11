@@ -25,7 +25,7 @@ struct NetworkDetailsView: View {
     }
 
     var body: some View {
-        contents.backport.inlineNavigationTitle(title)
+        contents.inlineNavigationTitle(title)
     }
 
     @ViewBuilder

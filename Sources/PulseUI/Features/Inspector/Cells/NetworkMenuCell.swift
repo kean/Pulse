@@ -22,7 +22,7 @@ struct NetworkMenuCell: View {
         }
 #elseif os(tvOS)
         HStack {
-            LabelBackport(title, systemImage: icon)
+            Label(title, systemImage: icon)
             Spacer()
             Text(details).foregroundColor(.secondary)
         }

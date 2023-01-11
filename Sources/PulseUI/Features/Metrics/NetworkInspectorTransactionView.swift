@@ -15,7 +15,7 @@ struct NetworkInspectorTransactionView: View {
             viewModel.timingViewModel.map(TimingView.init)
 #if os(iOS) || os(macOS)
             NavigationLink(destination: destintionTransactionDetails) {
-                if #available(iOS 15, tvOS 15, macOS 12, *), let size = viewModel.transferSizeViewModel {
+                if #available(iOS 15, tvOS 15, *), let size = viewModel.transferSizeViewModel {
                     transferSizeView(size: size)
                 } else {
                     Text("Transaction Details")
@@ -30,7 +30,7 @@ struct NetworkInspectorTransactionView: View {
         }
     }
 
-    @available(iOS 15, tvOS 15, watchOS 8, macOS 12, *)
+    @available(iOS 15, tvOS 15, *)
     @ViewBuilder
     private func transferSizeView(size: NetworkInspectorTransferInfoViewModel) -> some View {
         HStack {

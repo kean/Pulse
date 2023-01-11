@@ -19,7 +19,6 @@ final class SettingsViewModel: ObservableObject {
 
     private var cancellables: [AnyCancellable] = []
 
-    @available(iOS 14, tvOS 14, *)
     var isRemoteLoggingAvailable: Bool {
         store === RemoteLogger.shared.store
     }

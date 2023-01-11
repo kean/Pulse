@@ -64,7 +64,3 @@
 - ``MetadataValue``
 - ``Error``
 - ``Session``
-
-### Deprecated
-
-- ``default``

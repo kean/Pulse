@@ -7,10 +7,7 @@ import Combine
 import Pulse
 import SwiftUI
 import CoreData
-
-#if swift(>=5.7)
 import Charts
-#endif
 
 #if os(iOS)
 
@@ -37,12 +34,12 @@ struct InsightsView: View {
             if insights.failures.count > 0 {
                 failuresSection
             }
-            if insights.redirects.count > 0 {
+//            if insights.redirects.count > 0 {
                 redirectsSection
-            }
+//            }
         }
         .listStyle(.automatic)
-        .backport.navigationTitle("Insights")
+        .navigationTitle("Insights")
         .navigationBarItems(leading: navigationTrailingBarItems)
     }
 
@@ -67,7 +64,6 @@ struct InsightsView: View {
 
     @ViewBuilder
     private var durationChart: some View {
-#if swift(>=5.7)
         if #available(iOS 16.0, *) {
             if insights.duration.values.isEmpty {
                 Text("No network requests yet")
@@ -94,7 +90,6 @@ struct InsightsView: View {
                 .frame(height: 140)
             }
         }
-#endif
     }
 
     private func barMarkColor(for duration: TimeInterval) -> Color {
@@ -112,9 +107,8 @@ struct InsightsView: View {
     @ViewBuilder
     private var redirectsSection: some View {
         Section(header: HStack {
-            Image(systemName: "exclamationmark.triangle.fill")
+            Label("Redirects", systemImage: "exclamationmark.triangle.fill")
                 .foregroundColor(.orange)
-            Text("Redirects")
         }) {
             InfoRow(title: "Redirect Count", details: "\(insights.redirects.count)")
             InfoRow(title: "Total Time Lost", details: DurationFormatter.string(from: insights.redirects.timeLost, isPrecise: false))
@@ -150,7 +144,7 @@ private struct TopSlowestRequestsViw: View {
 
     var body: some View {
         NetworkInsightsRequestsList(viewModel: viewModel.topSlowestRequestsViewModel())
-            .backport.inlineNavigationTitle("Slowest Requests")
+            .inlineNavigationTitle("Slowest Requests")
     }
 }
 
@@ -159,7 +153,7 @@ private struct RequestsWithRedirectsView: View {
 
     var body: some View {
         NetworkInsightsRequestsList(viewModel: viewModel.requestsWithRedirectsViewModel())
-            .backport.inlineNavigationTitle("Redirects")
+            .inlineNavigationTitle("Redirects")
     }
 }
 
@@ -168,7 +162,7 @@ private struct FailingRequestsListView: View {
 
     var body: some View {
         NetworkInsightsRequestsList(viewModel: viewModel.failedRequestsViewModel())
-            .backport.inlineNavigationTitle("Failed Requests")
+            .inlineNavigationTitle("Failed Requests")
     }
 }
 
@@ -194,7 +188,6 @@ final class InsightsViewModel: ObservableObject {
         return "\(DurationFormatter.string(from: min, isPrecise: false)) – \(DurationFormatter.string(from: max, isPrecise: false))"
     }
 
-#if swift(>=5.7)
     @available(iOS 16.0, *)
     struct Bar: Identifiable {
         var id: Int { index }
@@ -213,7 +206,6 @@ final class InsightsViewModel: ObservableObject {
             Bar(index: key, range: bins[key], count: values.count)
         }
     }
-#endif
 
     init(store: LoggerStore, insights: NetworkLoggerInsights = .shared) {
         self.store = store

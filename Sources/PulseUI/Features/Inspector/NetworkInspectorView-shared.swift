@@ -38,7 +38,7 @@ struct NetworkInspectorSectionTransferStatus: View {
         ZStack {
             NetworkInspectorTransferInfoView(viewModel: .init(empty: true))
                 .hidden()
-                .backport.hideAccessibility()
+                .accessibilityHidden(true)
             if let transfer = viewModel.transferViewModel {
                 NetworkInspectorTransferInfoView(viewModel: transfer)
             } else if let progress = viewModel.progressViewModel {

@@ -76,7 +76,7 @@ final class TextRenderer {
             let header = NSMutableAttributedString()
             let status = NetworkRequestStatusCellModel(task: task)
             let method = task.httpMethod ?? "GET"
-            header.append(render(status.title + "\n", role: .title, weight: .semibold, color: status.uiTintColor))
+            header.append(render(status.title + "\n", role: .title, weight: .semibold, color: UXColor(status.tintColor)))
             header.append(self.spacer())
             var urlAttributes = helper.attributes(role: .body2, weight: .regular)
             urlAttributes[.underlineColor] = UXColor.clear
@@ -160,7 +160,7 @@ final class TextRenderer {
             let header = NSMutableAttributedString()
             let status = NetworkRequestStatusCellModel(transaction: transaction)
             let method = transaction.request.httpMethod ?? "GET"
-            header.append(render(status.title + "\n", role: .title, weight: .semibold, color: status.uiTintColor))
+            header.append(render(status.title + "\n", role: .title, weight: .semibold, color: UXColor(status.tintColor)))
             header.append(self.spacer())
             var urlAttributes = helper.attributes(role: .body2, weight: .regular)
             urlAttributes[.underlineColor] = UXColor.clear
@@ -265,12 +265,8 @@ final class TextRenderer {
             string.append("–\n", helper.attributes(role: .body2, style: style))
             return string
         }
-        var keyColor: UXColor = .label
-        var keyWeight: UXFont.Weight = .semibold
-        if #available(iOS 14, tvOS 14, *), options.color == .full {
-            keyColor = UXColor(color)
-            keyWeight = .medium
-        }
+        let keyColor: UXColor = options.color == .full ? UXColor(color) : .label
+        let keyWeight: UXFont.Weight = options.color == .full ? .medium : .semibold
         let keyAttributes = helper.attributes(role: .body2, style: style, weight: keyWeight, color: keyColor)
 
         let valueAttributes = helper.attributes(role: .body2, style: style)

@@ -42,7 +42,7 @@ struct TextView: View {
     let string: NSAttributedString
 
     var body: some View {
-        if #available(watchOS 8, *), let string = try? AttributedString(string, including: \.uiKit) {
+        if let string = try? AttributedString(string, including: \.uiKit) {
             Text(string)
         } else {
             Text(string.string)

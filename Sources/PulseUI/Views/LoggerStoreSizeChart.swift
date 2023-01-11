@@ -4,12 +4,8 @@
 
 import SwiftUI
 import Pulse
-
-#if swift(>=5.7)
 import Charts
-#endif
 
-#if swift(>=5.7)
 @available(iOS 16.0, tvOS 16.0, macOS 13.0, watchOS 9.0, *)
 struct LoggerStoreSizeChart: View {
     let info: LoggerStore.Info
@@ -90,6 +86,4 @@ struct LoggerStoreSizeChart_Previews: PreviewProvider {
             .previewLayout(.sizeThatFits)
     }
 }
-#endif
-
 #endif

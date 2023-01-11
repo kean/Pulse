@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1400"
+   LastUpgradeVersion = "1420"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -14,10 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "PulseUI"
-               BuildableName = "PulseUI"
+               BlueprintIdentifier = "0CF0D56B296F17CB00EED9D4"
+               BuildableName = "PulseUI.framework"
                BlueprintName = "PulseUI"
-               ReferencedContainer = "container:">
+               ReferencedContainer = "container:Pulse.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -32,10 +32,10 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "PulseUITests"
-               BuildableName = "PulseUITests"
+               BlueprintIdentifier = "0CF0D6BB296F18ED00EED9D4"
+               BuildableName = "PulseUITests.xctest"
                BlueprintName = "PulseUITests"
-               ReferencedContainer = "container:">
+               ReferencedContainer = "container:Pulse.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -60,10 +60,10 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "PulseUI"
-            BuildableName = "PulseUI"
+            BlueprintIdentifier = "0CF0D56B296F17CB00EED9D4"
+            BuildableName = "PulseUI.framework"
             BlueprintName = "PulseUI"
-            ReferencedContainer = "container:">
+            ReferencedContainer = "container:Pulse.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </ProfileAction>

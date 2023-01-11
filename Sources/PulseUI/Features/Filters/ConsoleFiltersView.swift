@@ -12,14 +12,8 @@ struct ConsoleFiltersView: View {
         switch viewModel.mode {
         case .all:
             ConsoleMessageFiltersView(viewModel: viewModel.searchCriteriaViewModel, sharedCriteriaViewModel: viewModel.sharedSearchCriteriaViewModel)
-#if os(macOS)
-                .frame(width: ConsoleFilters.preferredWidth - 20)
-#endif
         case .network:
             ConsoleNetworkFiltersView(viewModel: viewModel.networkSearchCriteriaViewModel, sharedCriteriaViewModel: viewModel.sharedSearchCriteriaViewModel)
-#if os(macOS)
-                .frame(width: ConsoleFilters.preferredWidth)
-#endif
         }
     }
 }

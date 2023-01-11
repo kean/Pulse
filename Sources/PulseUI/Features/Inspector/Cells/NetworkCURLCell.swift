@@ -25,6 +25,6 @@ struct NetworkCURLCell: View {
         let viewModel = RichTextViewModel(string: string)
         viewModel.isLinkDetectionEnabled = false
         return RichTextView(viewModel: viewModel)
-            .backport.navigationTitle("cURL Representation")
+            .navigationTitle("cURL Representation")
     }
 }

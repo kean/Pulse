@@ -10,21 +10,16 @@ import Combine
 #if os(iOS)
 
 public struct ConsoleView: View {
-    @ObservedObject var viewModel: ConsoleViewModel
+    @StateObject private var viewModel: ConsoleViewModel
     @State private var shareItems: ShareItems?
     @State private var isShowingAsText = false
 
     public init(store: LoggerStore = .shared) {
-        self.viewModel = ConsoleViewModel(store: store)
-    }
-
-    /// Creates a view pre-configured to display only network requests
-    public static func network(store: LoggerStore = .shared) -> ConsoleView {
-        ConsoleView(viewModel: .init(store: store, mode: .network))
+        self.init(viewModel: ConsoleViewModel(store: store))
     }
 
     init(viewModel: ConsoleViewModel) {
-        self.viewModel = viewModel
+        _viewModel = StateObject(wrappedValue: viewModel)
     }
 
     public var body: some View {
@@ -32,35 +27,25 @@ public struct ConsoleView: View {
             .onAppear(perform: viewModel.onAppear)
             .onDisappear(perform: viewModel.onDisappear)
             .edgesIgnoringSafeArea(.bottom)
-            .backport.navigationTitle(viewModel.title)
+            .navigationTitle(viewModel.title)
             .navigationBarItems(
                 leading: viewModel.onDismiss.map {
                     Button(action: $0) { Text("Close") }
                 },
                 trailing: HStack {
-                    if #available(iOS 14, *) {
-                        Menu(content: {
-                            AttributedStringShareMenu(shareItems: $shareItems) {
-                                TextRenderer.share(viewModel.entities)
-                            }
-                        }, label: { Image(systemName: "square.and.arrow.up") })
-                    } else {
-                        ShareButton {
-                            shareItems = ShareItems([ TextRenderer.share(viewModel.entities).string])
+                    Menu(content: {
+                        AttributedStringShareMenu(shareItems: $shareItems) {
+                            TextRenderer.share(viewModel.entities)
                         }
-                    }
-                    if #available(iOS 14, *) {
-                        ConsoleContextMenu(store: viewModel.store, insights: viewModel.insightsViewModel, isShowingAsText: $isShowingAsText)
-                    }
+                    }, label: { Image(systemName: "square.and.arrow.up") })
+                    ConsoleContextMenu(store: viewModel.store, insights: viewModel.insightsViewModel, isShowingAsText: $isShowingAsText)
                 }
             )
             .sheet(item: $shareItems, content: ShareView.init)
             .sheet(isPresented: $isShowingAsText) {
-                if #available(iOS 14, *) {
-                    NavigationView {
-                        ConsoleTextView(entities: viewModel.getObservableProperties()) {
-                            isShowingAsText = false
-                        }
+                NavigationView {
+                    ConsoleTextView(entities: viewModel.getObservableProperties()) {
+                        isShowingAsText = false
                     }
                 }
             }
@@ -115,7 +100,7 @@ private struct ConsoleToolbarView: View {
         .sheet(isPresented: $isShowingFilters) {
             NavigationView {
                 ConsoleFiltersView(viewModel: viewModel)
-                    .backport.inlineNavigationTitle("Filters")
+                    .inlineNavigationTitle("Filters")
                     .navigationBarItems(trailing: Button("Done") { isShowingFilters = false })
             }
         }
@@ -154,3 +139,10 @@ struct ConsoleView_Previews: PreviewProvider {
 #endif
 
 #endif
+
+extension ConsoleView {
+    /// Creates a view pre-configured to display only network requests
+    public static func network(store: LoggerStore = .shared) -> ConsoleView {
+        ConsoleView(viewModel: .init(store: store, mode: .network))
+    }
+}

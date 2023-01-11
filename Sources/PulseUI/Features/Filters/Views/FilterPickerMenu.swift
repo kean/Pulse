@@ -5,7 +5,6 @@
 import SwiftUI
 import Pulse
 
-@available(iOS 14, *)
 struct FilterPickerMenu<Picker: View>: View {
     let title: String
     var width: CGFloat?

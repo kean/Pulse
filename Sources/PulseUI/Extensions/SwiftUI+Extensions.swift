@@ -39,7 +39,7 @@ struct InvisibleNavigationLinks<Content: View>: View {
 
 extension View {
     func invisible() -> some View {
-        self.hidden().backport.hideAccessibility()
+        self.hidden().accessibilityHidden(true)
     }
 }
 
@@ -96,7 +96,7 @@ extension Backport {
     enum HorizontalEdge {
         case leading, trailing
 
-        @available(iOS 15.0, tvOS 15.0, watchOS 8.0, macOS 12.0, *)
+        @available(iOS 15, tvOS 15, *)
         var edge: SwiftUI.HorizontalEdge {
             switch self {
             case .leading: return .leading
@@ -108,7 +108,7 @@ extension Backport {
     @ViewBuilder
     func swipeActions<T>(edge: HorizontalEdge = .trailing, allowsFullSwipe: Bool = true, @ViewBuilder content: () -> T) -> some View where T: View {
 #if os(iOS) || os(watchOS)
-        if #available(iOS 15.0, watchOS 8.0, *) {
+        if #available(iOS 15, *) {
             self.content.swipeActions(edge: edge.edge, allowsFullSwipe: allowsFullSwipe, content: content)
         } else {
             self.content
@@ -119,64 +119,12 @@ extension Backport {
     }
 
     @ViewBuilder
-    func hideAccessibility() -> some View {
-        if #available(iOS 14, tvOS 14, *) {
-            self.content.accessibilityHidden(true)
-        } else {
-            self.content
-        }
-    }
-
-    func inlineNavigationTitle(_ title: String) -> some View {
-        navigationTitle(title).backport.inlineNavigationTitle()
-    }
-
-    @ViewBuilder
-    func listInsetGrouped() -> some View {
-#if os(iOS)
-        if #available(iOS 14.0, *) {
-            self.content.listStyle(.insetGrouped)
-        } else {
-            self.content
-        }
-#else
-        self.content
-#endif
-    }
-
-    @ViewBuilder
-    func inlineNavigationTitle() -> some View {
-#if os(iOS)
-        if #available(iOS 14.0, *) {
-            self.content.navigationBarTitleDisplayMode(.inline)
-        } else {
-            self.content
-        }
-#else
-        self.content
-#endif
-    }
-
-    @ViewBuilder
-    func navigationTitle(_ title: String) -> some View {
-#if os(iOS) || os(tvOS)
-        self.content.navigationBarTitle(title)
-#else
-        self.content.navigationTitle(title)
-#endif
-    }
-
-    @ViewBuilder
     func contextMenu<M: View, P: View>(@ViewBuilder menuItems: () -> M, @ViewBuilder preview: () -> P) -> some View {
-#if swift(>=5.7) && !os(watchOS)
-        if #available(iOS 16.0, tvOS 16.0, macOS 13.0, *) {
+#if !os(watchOS)
+        if #available(iOS 16, tvOS 16, macOS 13, *) {
             self.content.contextMenu(menuItems: menuItems, preview: preview)
         } else {
-            if #available(iOS 14, tvOS 14, *) {
-                self.content.contextMenu(menuItems: menuItems)
-            } else {
-                self.content
-            }
+            self.content.contextMenu(menuItems: menuItems)
         }
 #else
         self.content
@@ -186,7 +134,7 @@ extension Backport {
     @ViewBuilder
     func presentationDetents(_ detents: Set<PresentationDetent>) -> some View {
 #if os(iOS)
-        if #available(iOS 16.0, *) {
+        if #available(iOS 16, *) {
             let detents = detents.map { (detent)-> SwiftUI.PresentationDetent in
                 switch detent {
                 case .large: return .large
@@ -203,21 +151,8 @@ extension Backport {
     }
 
     @ViewBuilder
-    func fullScreenCover<Content: View>(isPresented: Binding<Bool>, @ViewBuilder _ content: @escaping () -> Content) -> some View {
-#if os(iOS)
-        if #available(iOS 14, *) {
-            self.content.fullScreenCover(isPresented: isPresented, content: content)
-        } else {
-            self.content
-        }
-#else
-        self.content
-#endif
-    }
-
-    @ViewBuilder
     func monospacedDigit() -> some View {
-        if #available(iOS 15.0, tvOS 15.0, macOS 12.0, watchOS 8.0, *) {
+        if #available(iOS 15, tvOS 15, *) {
             self.content.monospacedDigit()
         } else {
             self.content
@@ -227,5 +162,25 @@ extension Backport {
     enum PresentationDetent {
         case large
         case medium
+    }
+}
+
+extension Button {
+    @ViewBuilder
+    static func destructive(action: @escaping () -> Void, label: () -> Label) -> some View {
+        if #available(iOS 15.0, tvOS 15, *) {
+            Button(role: .destructive, action: action, label: label)
+        } else {
+            Button(action: action, label: label)
+        }
+    }
+}
+
+extension View {
+    func inlineNavigationTitle(_ title: String) -> some View {
+        self.navigationTitle(title)
+#if os(iOS)
+            .navigationBarTitleDisplayMode(.inline)
+#endif
     }
 }

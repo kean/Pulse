@@ -1,6 +1,17 @@
 # Pulse 2.x
 
-## Upcoming
+## Pulse 3.0.1
+
+*TBD*
+
+- Update minimum requirements: Swift 5.7 | Xcode 14.0  | iOS 14.0, tvOS 14.0, watchOS 7.0, macOS 12.0
+- Add `ConsoleView.network` to other platforms (originally was added only on iOS)
+- New filters design on macOS
+- Fix an issue where using "Recent" date filter was applying "Session" filter instead
+
+## Pulse 3.0.0
+
+*Jan 10, 2023*
 
 ### Pulse
 
@@ -11,18 +22,7 @@
 
 ### PulseUI
 
-- Add all-new Text Mode - [#127](https://github.com/kean/Pulse/pull/127/)
-- Add new context menu to Console and Network screen with many quick actions that were previously hidden in Settings, e.g. "Remove Logs". Settings were removed from the primary tabs `MainView`. With this change, for apps that don't use `MainView` and integrate individual tabs into their own debug menus, integration became significantly eaier because both Console and Network screens are fully self-sufficient.
-- Add "Report Issue" button.
-- `ShareStoreView` now remembers user settings.
-- Add JWT token decoded and viewer
-- Rework Settings screen on iOS. Add a few new options: `lineLimit`.
-- Add public `StoreDetailsView`
-- Fix an issue where search in text viewer would occasionally stop highlighting the results
-- Fix sharing as text formatting
-- Add a missing public `InsightsView` initializer 
-- Add cookies section and details screens to the request summary - [#124](https://github.com/kean/Pulse/pull/124)
-- A couple of minor UI improvements and bug fixes
+- A complete overhaul. See https://kean.blog/post/pulse-3 for more details.
 
 ## Pulse 2.1.4
 
