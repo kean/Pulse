@@ -138,24 +138,11 @@ extension ConsoleNetworkFiltersView {
     private var responseGroupContent: some View {
 #if os(iOS) || os(macOS)
         statusCodeRow
-        contentTypeRow
+        ConsoleFiltersContentTypeCell(selection: $viewModel.criteria.response.contentType.contentType)
         responseSizeRow
         durationRow
 #else
-        contentTypeRow
-#endif
-    }
-
-    private var contentTypeRow: some View {
-#if os(iOS) || os(macOS)
-        HStack {
-            Text("Content Type")
-            Spacer()
-            ConsoleFilters.contentTypesPicker(selection: $viewModel.criteria.response.contentType.contentType)
-                .labelsHidden()
-        }
-#else
-        ConsoleFilters.contentTypesPicker(selection: $viewModel.criteria.response.contentType.contentType)
+        ConsoleFiltersContentTypeCell(selection: $viewModel.criteria.response.contentType.contentType)
 #endif
     }
 
