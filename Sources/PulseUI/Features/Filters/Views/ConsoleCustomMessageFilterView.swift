@@ -27,7 +27,7 @@ struct ConsoleCustomMessageFilterView: View {
 
     var body: some View {
         HStack(spacing: 8) {
-            if !isEditing {
+            if !isEditing || !isHidingPickersDuring {
                 fieldMenu.lineLimit(1).layoutPriority(1)
                 matchMenu.lineLimit(1).layoutPriority(1)
             }
@@ -46,7 +46,7 @@ struct ConsoleCustomMessageFilterView: View {
                 .onChange(of: isTextFieldFocused) { isTextFieldFocused in
                     withAnimation { isEditing = isTextFieldFocused }
                 }
-            if !isEditing {
+            if !isEditing || !isHidingPickersDuring {
                 if !isRemoveHidden {
                     Button(action: { onRemove(filter) }) {
                         Image(systemName: "minus.circle.fill")
@@ -67,6 +67,14 @@ struct ConsoleCustomMessageFilterView: View {
         }
 #if os(iOS)
         .padding(EdgeInsets(top: 2, leading: -6, bottom: 2, trailing: -8))
+#endif
+    }
+
+    var isHidingPickersDuring: Bool {
+#if os(macOS)
+        return false
+#else
+        return true
 #endif
     }
 
