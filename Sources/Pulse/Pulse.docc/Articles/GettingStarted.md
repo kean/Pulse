@@ -22,7 +22,7 @@ https://github.com/kean/Pulse
 
 ## 2. Integrate Pulse Framework
 
-To start collecting the logs, use [Pulse](https://kean-docs.github.io/pulse/documentation/pulse/) framework.
+To start collecting logs, use [Pulse](https://kean-docs.github.io/pulse/documentation/pulse/) framework.
 
 ### 2.1. Collecting Regular Messages
 
@@ -59,15 +59,13 @@ let session = URLSession(
 
 > Important: This option works only with delegate-based sessions, which includes [Alamofire](https://github.com/Alamofire/Alamofire) and [Get](https://github.com/kean/Get). It will **not** work with `URLSession.shared`. For other options, see the dedicated [guide](https://kean-docs.github.io/pulse/documentation/pulse/networklogging-article).
 
-Logs are stored persistently and the store automatically removes old messages and limits the overall size (configurable). It uses a number of space [optimizations techniques](https://kean.blog/post/pulse-2#space-savings) introduced in Pulse 2.0, including fast [lzfse](https://developer.apple.com/documentation/compression/algorithm/lzfse) compression.
+Logs are stored persistently and the store automatically removes old messages and limits the overall size (configurable). It uses a number of space [optimizations techniques](https://kean.blog/post/pulse-2#space-savings), including fast [lzfse](https://developer.apple.com/documentation/compression/algorithm/lzfse) compression.
 
 > Tip: To get the most out of the network logger, follow the <doc:NetworkLogging-Article> guide. For example, starting with Pulse 2.0, you can record and view [decoding errors](https://kean.blog/post/pulse-2#decoding-errors) which makes it much easier to see why decoding is failing.
 
 ## 3. Integrate PulseUI Framework
 
-To view logs and network requests from your app, use [PulseUI](https://kean-docs.github.io/pulseui/documentation/pulseui/) framework. It provides a set of views that you can use on any Apple platform. The main one is ``ConsoleView`` which contains _all_ screens provided by Pulse.
-
-> Tip: If you want to use individual tabs from the ``ConsoleView``, they are also available (please refer to [documentation](https://kean-docs.github.io/pulseui/documentation/pulseui/)). Pulse also gives you complete access to the underlying data so you can easily build your own views if needed.
+To view logs and network requests from your app, use [PulseUI](https://kean-docs.github.io/pulseui/documentation/pulseui/) framework. The framework is centered around a single screen: `ConsoleView`. On iOS, you can push it into the existing navigation stack or present manually.
 
 ## 4. Configure Remote Logging with Pulse Pro
 
