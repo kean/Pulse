@@ -24,6 +24,7 @@
 		0C24CC7B2894C134008DD332 /* MockStoreConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C24CC792894C134008DD332 /* MockStoreConfiguration.swift */; };
 		0C24CC7C2894C134008DD332 /* MockStoreConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C24CC792894C134008DD332 /* MockStoreConfiguration.swift */; };
 		0C40C094296F7641009ECF16 /* ConsoleFiltersContentTypeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C40C093296F7641009ECF16 /* ConsoleFiltersContentTypeCell.swift */; };
+		0C40C096296F7738009ECF16 /* ConsoleFiltersTaskTypeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C40C095296F7738009ECF16 /* ConsoleFiltersTaskTypeCell.swift */; };
 		0C516FE726015ED3004813B4 /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CFF9BD825D6199A0069DB6A /* repos.json */; };
 		0C516FF026016392004813B4 /* DocumentBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C516FEF26016392004813B4 /* DocumentBrowser.swift */; };
 		0C57AD83245F0F38005B3400 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C57AD74245F0F38005B3400 /* Assets.xcassets */; };
@@ -467,6 +468,7 @@
 		0C24CC792894C134008DD332 /* MockStoreConfiguration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MockStoreConfiguration.swift; path = App/Shared/Mocks/MockStoreConfiguration.swift; sourceTree = SOURCE_ROOT; };
 		0C25FB6E25CDDCAB00A895C2 /* URLSessionManualIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionManualIntegration.swift; sourceTree = "<group>"; };
 		0C40C093296F7641009ECF16 /* ConsoleFiltersContentTypeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleFiltersContentTypeCell.swift; sourceTree = "<group>"; };
+		0C40C095296F7738009ECF16 /* ConsoleFiltersTaskTypeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleFiltersTaskTypeCell.swift; sourceTree = "<group>"; };
 		0C516FBA26015DD2004813B4 /* Pulse Demo iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pulse Demo iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C516FEF26016392004813B4 /* DocumentBrowser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentBrowser.swift; sourceTree = "<group>"; };
 		0C57AD4D245F0EFB005B3400 /* Pulse iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pulse iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -942,6 +944,7 @@
 			isa = PBXGroup;
 			children = (
 				0C40C093296F7641009ECF16 /* ConsoleFiltersContentTypeCell.swift */,
+				0C40C095296F7738009ECF16 /* ConsoleFiltersTaskTypeCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -1952,6 +1955,7 @@
 				0CF0D64A296F189600EED9D4 /* ConsoleFilterSection.swift in Sources */,
 				0CF0D616296F189600EED9D4 /* ManagedObjectTextSearch.swift in Sources */,
 				0CF0D64B296F189600EED9D4 /* RangePicker.swift in Sources */,
+				0C40C096296F7738009ECF16 /* ConsoleFiltersTaskTypeCell.swift in Sources */,
 				0CF0D679296F189600EED9D4 /* ConsoleView-ios.swift in Sources */,
 				0CF0D654296F189600EED9D4 /* NetworkInsightsRequestsList.swift in Sources */,
 				0CF0D661296F189600EED9D4 /* NetworkInspectorTransferInfoView.swift in Sources */,
