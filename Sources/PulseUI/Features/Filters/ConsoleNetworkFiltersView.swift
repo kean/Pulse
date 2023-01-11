@@ -137,19 +137,11 @@ extension ConsoleNetworkFiltersView {
     @ViewBuilder
     private var responseGroupContent: some View {
 #if os(iOS) || os(macOS)
-        statusCodeRow
+        ConsoleFiltersStatusCodeCell(selection: $viewModel.criteria.response.statusCode.range)
         ConsoleFiltersDurationCell(selection: $viewModel.criteria.response.duration)
         ConsoleFiltersResponseSizeCell(selection: $viewModel.criteria.response.responseSize)
 #endif
         ConsoleFiltersContentTypeCell(selection: $viewModel.criteria.response.contentType.contentType)
-    }
-
-    private var statusCodeRow: some View {
-        HStack {
-            Text("Status Code")
-            Spacer()
-            RangePicker(range: $viewModel.criteria.response.statusCode.range)
-        }
     }
 }
 
