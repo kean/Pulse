@@ -227,7 +227,7 @@ struct ConsoleMessageFiltersView_Previews: PreviewProvider {
     static var previews: some View {
 #if os(macOS)
         ConsoleMessageFiltersView(viewModel: makeMockViewModel(), sharedCriteriaViewModel: .init(store: .mock))
-            .previewLayout(.fixed(width: ConsoleFilters.preferredWidth - 15, height: 700))
+            .previewLayout(.fixed(width: 320, height: 900))
 #else
         NavigationView {
             ConsoleMessageFiltersView(viewModel: makeMockViewModel(), sharedCriteriaViewModel: .init(store: .mock))
