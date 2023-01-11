@@ -140,7 +140,7 @@ extension ConsoleNetworkFiltersView {
         statusCodeRow
         ConsoleFiltersContentTypeCell(selection: $viewModel.criteria.response.contentType.contentType)
         responseSizeRow
-        durationRow
+        ConsoleFiltersDurationCell(duration: $viewModel.criteria.response.duration)
 #else
         ConsoleFiltersContentTypeCell(selection: $viewModel.criteria.response.contentType.contentType)
 #endif
@@ -166,21 +166,6 @@ extension ConsoleNetworkFiltersView {
                 }.labelsHidden()
             }
             RangePicker(range: $viewModel.criteria.response.responseSize.range)
-        }
-    }
-
-    private var durationRow: some View {
-        HStack {
-            Text("Duration")
-            Spacer()
-            FilterPickerMenu(title: viewModel.criteria.response.duration.unit.title, width: 50) {
-                Picker("Unit", selection: $viewModel.criteria.response.duration.unit) {
-                    ForEach(ConsoleNetworkSearchCriteria.DurationFilter.Unit.allCases) {
-                        Text($0.title).tag($0)
-                    }
-                }.labelsHidden()
-            }
-            RangePicker(range: $viewModel.criteria.response.duration.range)
         }
     }
 }

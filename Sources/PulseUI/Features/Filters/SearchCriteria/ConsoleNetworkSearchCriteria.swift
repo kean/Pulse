@@ -85,8 +85,8 @@ struct ConsoleNetworkSearchCriteria: Hashable {
 
             var title: String {
                 switch self {
-                case .minutes: return "min"
-                case .seconds: return "sec"
+                case .minutes: return "Min"
+                case .seconds: return "Sec"
                 case .milliseconds: return "ms"
                 }
             }
