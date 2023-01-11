@@ -139,8 +139,8 @@ extension ConsoleNetworkFiltersView {
 #if os(iOS) || os(macOS)
         statusCodeRow
         ConsoleFiltersContentTypeCell(selection: $viewModel.criteria.response.contentType.contentType)
-        responseSizeRow
-        ConsoleFiltersDurationCell(duration: $viewModel.criteria.response.duration)
+        ConsoleFiltersResponseSizeCell(selection: $viewModel.criteria.response.responseSize)
+        ConsoleFiltersDurationCell(selection: $viewModel.criteria.response.duration)
 #else
         ConsoleFiltersContentTypeCell(selection: $viewModel.criteria.response.contentType.contentType)
 #endif
@@ -151,21 +151,6 @@ extension ConsoleNetworkFiltersView {
             Text("Status Code")
             Spacer()
             RangePicker(range: $viewModel.criteria.response.statusCode.range)
-        }
-    }
-
-    private var responseSizeRow: some View {
-        HStack {
-            Text("Size")
-            Spacer()
-            FilterPickerMenu(title: viewModel.criteria.response.responseSize.unit.title, width: 50) {
-                Picker("Size Unit", selection: $viewModel.criteria.response.responseSize.unit) {
-                    ForEach(ConsoleNetworkSearchCriteria.ResponseSizeFilter.MeasurementUnit.allCases) {
-                        Text($0.title).tag($0)
-                    }
-                }.labelsHidden()
-            }
-            RangePicker(range: $viewModel.criteria.response.responseSize.range)
         }
     }
 }

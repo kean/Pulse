@@ -5,16 +5,16 @@
 import SwiftUI
 import Pulse
 
-struct ConsoleFiltersDurationCell: View {
-    @Binding var selection: ConsoleNetworkSearchCriteria.DurationFilter
+struct ConsoleFiltersResponseSizeCell: View {
+    @Binding var selection: ConsoleNetworkSearchCriteria.ResponseSizeFilter
 
     var body: some View {
         HStack {
-            Text("Duration")
+            Text("Size")
             Spacer()
             FilterPickerMenu(title: selection.unit.title, width: 50) {
                 Picker("Unit", selection: $selection.unit) {
-                    ForEach(ConsoleNetworkSearchCriteria.DurationFilter.Unit.allCases) {
+                    ForEach(ConsoleNetworkSearchCriteria.ResponseSizeFilter.MeasurementUnit.allCases) {
                         Text($0.title).tag($0)
                     }
                 }
