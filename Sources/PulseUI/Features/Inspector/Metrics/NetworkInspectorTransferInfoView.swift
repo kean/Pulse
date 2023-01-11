@@ -30,8 +30,6 @@ struct NetworkInspectorTransferInfoView: View {
         HStack {
             bytesSent
             Spacer()
-            Divider()
-            Spacer()
             bytesReceived
         }
     }
