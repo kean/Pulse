@@ -107,7 +107,7 @@ extension ConsoleNetworkFiltersView {
 
     @ViewBuilder var customFilersList: some View {
         ForEach(viewModel.filters) { filter in
-            ConsoleCustomNetworkFilterView(filter: filter, onRemove: viewModel.removeFilter, isRemoveHidden: viewModel.isDefaultFilters)
+            ConsoleCustomNetworkFilterView(filter: filter, onRemove: viewModel.isDefaultFilters ? nil : { viewModel.removeFilter(filter) })
         }
     }
 }

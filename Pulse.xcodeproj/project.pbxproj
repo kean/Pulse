@@ -30,6 +30,7 @@
 		0C40C09C296F78C6009ECF16 /* ConsoleFiltersDurationCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C40C09B296F78C6009ECF16 /* ConsoleFiltersDurationCell.swift */; };
 		0C40C09E296F7B0A009ECF16 /* ConsoleFiltersResponseSizeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C40C09D296F7B0A009ECF16 /* ConsoleFiltersResponseSizeCell.swift */; };
 		0C40C0A0296F7BD3009ECF16 /* ConsoleFiltersStatusCodeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C40C09F296F7BD3009ECF16 /* ConsoleFiltersStatusCodeCell.swift */; };
+		0C40C0A2296F81B0009ECF16 /* ConsoleCustomFilterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C40C0A1296F81B0009ECF16 /* ConsoleCustomFilterView.swift */; };
 		0C516FE726015ED3004813B4 /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CFF9BD825D6199A0069DB6A /* repos.json */; };
 		0C516FF026016392004813B4 /* DocumentBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C516FEF26016392004813B4 /* DocumentBrowser.swift */; };
 		0C57AD83245F0F38005B3400 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C57AD74245F0F38005B3400 /* Assets.xcassets */; };
@@ -478,6 +479,7 @@
 		0C40C09B296F78C6009ECF16 /* ConsoleFiltersDurationCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleFiltersDurationCell.swift; sourceTree = "<group>"; };
 		0C40C09D296F7B0A009ECF16 /* ConsoleFiltersResponseSizeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleFiltersResponseSizeCell.swift; sourceTree = "<group>"; };
 		0C40C09F296F7BD3009ECF16 /* ConsoleFiltersStatusCodeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleFiltersStatusCodeCell.swift; sourceTree = "<group>"; };
+		0C40C0A1296F81B0009ECF16 /* ConsoleCustomFilterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleCustomFilterView.swift; sourceTree = "<group>"; };
 		0C516FBA26015DD2004813B4 /* Pulse Demo iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pulse Demo iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C516FEF26016392004813B4 /* DocumentBrowser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentBrowser.swift; sourceTree = "<group>"; };
 		0C57AD4D245F0EFB005B3400 /* Pulse iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pulse iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1219,6 +1221,7 @@
 				0CF0D5BB296F189500EED9D4 /* FilterPickerMenu.swift */,
 				0CF0D5BC296F189500EED9D4 /* ConsoleFilterSectionHeader.swift */,
 				0CF0D5BD296F189500EED9D4 /* ConsoleFiltersLabelsPickerView.swift */,
+				0C40C0A1296F81B0009ECF16 /* ConsoleCustomFilterView.swift */,
 				0CF0D5BF296F189500EED9D4 /* ConsoleCustomMessageFilterView.swift */,
 				0CF0D5BA296F189500EED9D4 /* ConsoleCustomNetworkFilterView.swift */,
 				0CF0D5C0296F189500EED9D4 /* DateRangePicker.swift */,
@@ -1953,6 +1956,7 @@
 				0CF0D63F296F189600EED9D4 /* ConsoleNetworkFiltersView.swift in Sources */,
 				0CF0D63A296F189600EED9D4 /* ContextMenus.swift in Sources */,
 				0CF0D666296F189600EED9D4 /* NetworkMetricsCell.swift in Sources */,
+				0C40C0A2296F81B0009ECF16 /* ConsoleCustomFilterView.swift in Sources */,
 				0CF0D682296F189600EED9D4 /* ConsoleTextView.swift in Sources */,
 				0CF0D645296F189600EED9D4 /* ConsoleFilterSectionHeader.swift in Sources */,
 				0CF0D62A296F189600EED9D4 /* KeyValueSectionViewModel.swift in Sources */,

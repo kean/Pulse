@@ -10,75 +10,15 @@ import Pulse
 @available(iOS 15, *)
 struct ConsoleCustomNetworkFilterView: View {
     @ObservedObject var filter: NetworkSearchFilter
-    let onRemove: (NetworkSearchFilter) -> Void
-    let isRemoveHidden: Bool
-
-    @State private var textFieldValue: String
-
-    init(filter: NetworkSearchFilter, onRemove: @escaping (NetworkSearchFilter) -> Void, isRemoveHidden: Bool) {
-        self.filter = filter
-        self.textFieldValue = filter.value
-        self.onRemove = onRemove
-        self.isRemoveHidden = isRemoveHidden
-    }
-
-    @FocusState private var isTextFieldFocused: Bool
-    @State private var isEditing = false
+    let onRemove: (() -> Void)?
 
     var body: some View {
-        HStack(spacing: 8) {
-            if !isEditing || !isHidingPickersDuring {
-                fieldMenu.lineLimit(1).layoutPriority(1)
-                matchMenu.lineLimit(1).layoutPriority(1)
-            }
-            TextField("Value", text: $textFieldValue)
-                .onSubmit {
-                    filter.value = textFieldValue
-                }
-                .focused($isTextFieldFocused)
-                .textFieldStyle(.roundedBorder)
-                .disableAutocorrection(true)
-#if os(iOS)
-                .autocapitalization(.none)
-#endif
-#if os(macOS)
-                .frame(minWidth: 100)
-#endif
-                .onChange(of: isTextFieldFocused) { isTextFieldFocused in
-                    withAnimation { isEditing = isTextFieldFocused }
-                }
-            if !isEditing || !isHidingPickersDuring {
-                if !isRemoveHidden {
-                    Button(action: { onRemove(filter) }) {
-                        Image(systemName: "minus.circle.fill")
-                            .font(.system(size: 18))
-                    }
-                    .buttonStyle(.plain)
-                    .foregroundColor(.red)
-                    .padding(.leading, 6)
-                }
-            } else {
-                Button("Done") {
-                    filter.value = textFieldValue
-                    isTextFieldFocused = false
-                }
-                .buttonStyle(.plain)
-                .foregroundColor(.blue)
-            }
-        }
-#if os(iOS)
-        .padding(EdgeInsets(top: 2, leading: -6, bottom: 2, trailing: -8))
-#endif
+        ConsoleCustomFilterView(text: $filter.value, onRemove: onRemove, pickers: {
+            fieldMenu
+            matchMenu
+        })
     }
 
-    var isHidingPickersDuring: Bool {
-#if os(macOS)
-        return false
-#else
-        return true
-#endif
-    }
-    
     private var fieldMenu: some View {
         FilterPickerMenu(title: filter.field.localizedTitle) {
             Picker("", selection: $filter.field) {

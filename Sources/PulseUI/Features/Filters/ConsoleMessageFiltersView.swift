@@ -102,7 +102,7 @@ extension ConsoleMessageFiltersView {
 
     private var customFiltersList: some View {
         ForEach(viewModel.filters) { filter in
-            ConsoleCustomMessageFilterView(filter: filter, onRemove: viewModel.removeFilter, isRemoveHidden: viewModel.isDefaultFilters)
+            ConsoleCustomMessageFilterView(filter: filter, onRemove: viewModel.isDefaultFilters ? nil : { viewModel.removeFilter(filter) })
         }
     }
 }
