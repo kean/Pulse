@@ -138,12 +138,10 @@ extension ConsoleNetworkFiltersView {
     private var responseGroupContent: some View {
 #if os(iOS) || os(macOS)
         statusCodeRow
-        ConsoleFiltersContentTypeCell(selection: $viewModel.criteria.response.contentType.contentType)
-        ConsoleFiltersResponseSizeCell(selection: $viewModel.criteria.response.responseSize)
         ConsoleFiltersDurationCell(selection: $viewModel.criteria.response.duration)
-#else
-        ConsoleFiltersContentTypeCell(selection: $viewModel.criteria.response.contentType.contentType)
+        ConsoleFiltersResponseSizeCell(selection: $viewModel.criteria.response.responseSize)
 #endif
+        ConsoleFiltersContentTypeCell(selection: $viewModel.criteria.response.contentType.contentType)
     }
 
     private var statusCodeRow: some View {
