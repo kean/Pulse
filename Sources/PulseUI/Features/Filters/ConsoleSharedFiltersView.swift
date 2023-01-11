@@ -88,7 +88,7 @@ struct ConsoleSharedFiltersView: View {
                 )
             },
             content: {
-                ConsoleFilters.toggle("Only Pinned", isOn: $viewModel.criteria.filters.inOnlyPins)
+                ConsoleFiltersToggleCell(title: "Only Pinned", isOn: $viewModel.criteria.filters.inOnlyPins)
 #if !os(macOS)
                 Button.destructive(action: viewModel.removeAllPins) {
                     Text("Remove Pins")

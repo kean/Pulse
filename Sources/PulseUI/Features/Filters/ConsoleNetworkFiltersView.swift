@@ -294,7 +294,7 @@ extension ConsoleNetworkFiltersView {
     private var networkingGroupContent: some View {
         ConsoleFiltersTaskTypeCell(selection: $viewModel.criteria.networking.taskType)
         ConsoleFiltersResponseSourceCell(selection: $viewModel.criteria.networking.source)
-        ConsoleFilters.toggle("Redirect", isOn: $viewModel.criteria.networking.isRedirect)
+        ConsoleFiltersToggleCell(title: "Redirect", isOn: $viewModel.criteria.networking.isRedirect)
     }
 }
 

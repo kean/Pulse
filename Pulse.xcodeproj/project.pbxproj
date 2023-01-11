@@ -26,6 +26,7 @@
 		0C40C094296F7641009ECF16 /* ConsoleFiltersContentTypeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C40C093296F7641009ECF16 /* ConsoleFiltersContentTypeCell.swift */; };
 		0C40C096296F7738009ECF16 /* ConsoleFiltersTaskTypeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C40C095296F7738009ECF16 /* ConsoleFiltersTaskTypeCell.swift */; };
 		0C40C098296F777D009ECF16 /* ConsoleFiltersResponseSourceCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C40C097296F777D009ECF16 /* ConsoleFiltersResponseSourceCell.swift */; };
+		0C40C09A296F77F1009ECF16 /* ConsoleFiltersToggleCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C40C099296F77F1009ECF16 /* ConsoleFiltersToggleCell.swift */; };
 		0C516FE726015ED3004813B4 /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CFF9BD825D6199A0069DB6A /* repos.json */; };
 		0C516FF026016392004813B4 /* DocumentBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C516FEF26016392004813B4 /* DocumentBrowser.swift */; };
 		0C57AD83245F0F38005B3400 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C57AD74245F0F38005B3400 /* Assets.xcassets */; };
@@ -138,7 +139,6 @@
 		0CF0D644296F189600EED9D4 /* FilterPickerMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5BB296F189500EED9D4 /* FilterPickerMenu.swift */; };
 		0CF0D645296F189600EED9D4 /* ConsoleFilterSectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5BC296F189500EED9D4 /* ConsoleFilterSectionHeader.swift */; };
 		0CF0D646296F189600EED9D4 /* ConsoleFiltersLabelsPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5BD296F189500EED9D4 /* ConsoleFiltersLabelsPickerView.swift */; };
-		0CF0D647296F189600EED9D4 /* FiltersHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5BE296F189500EED9D4 /* FiltersHelpers.swift */; };
 		0CF0D648296F189600EED9D4 /* ConsoleCustomMessageFilterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5BF296F189500EED9D4 /* ConsoleCustomMessageFilterView.swift */; };
 		0CF0D649296F189600EED9D4 /* DateRangePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5C0296F189500EED9D4 /* DateRangePicker.swift */; };
 		0CF0D64A296F189600EED9D4 /* ConsoleFilterSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5C1296F189500EED9D4 /* ConsoleFilterSection.swift */; };
@@ -471,6 +471,7 @@
 		0C40C093296F7641009ECF16 /* ConsoleFiltersContentTypeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleFiltersContentTypeCell.swift; sourceTree = "<group>"; };
 		0C40C095296F7738009ECF16 /* ConsoleFiltersTaskTypeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleFiltersTaskTypeCell.swift; sourceTree = "<group>"; };
 		0C40C097296F777D009ECF16 /* ConsoleFiltersResponseSourceCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleFiltersResponseSourceCell.swift; sourceTree = "<group>"; };
+		0C40C099296F77F1009ECF16 /* ConsoleFiltersToggleCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleFiltersToggleCell.swift; sourceTree = "<group>"; };
 		0C516FBA26015DD2004813B4 /* Pulse Demo iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pulse Demo iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C516FEF26016392004813B4 /* DocumentBrowser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentBrowser.swift; sourceTree = "<group>"; };
 		0C57AD4D245F0EFB005B3400 /* Pulse iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pulse iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -588,7 +589,6 @@
 		0CF0D5BB296F189500EED9D4 /* FilterPickerMenu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FilterPickerMenu.swift; sourceTree = "<group>"; };
 		0CF0D5BC296F189500EED9D4 /* ConsoleFilterSectionHeader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleFilterSectionHeader.swift; sourceTree = "<group>"; };
 		0CF0D5BD296F189500EED9D4 /* ConsoleFiltersLabelsPickerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleFiltersLabelsPickerView.swift; sourceTree = "<group>"; };
-		0CF0D5BE296F189500EED9D4 /* FiltersHelpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FiltersHelpers.swift; sourceTree = "<group>"; };
 		0CF0D5BF296F189500EED9D4 /* ConsoleCustomMessageFilterView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleCustomMessageFilterView.swift; sourceTree = "<group>"; };
 		0CF0D5C0296F189500EED9D4 /* DateRangePicker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DateRangePicker.swift; sourceTree = "<group>"; };
 		0CF0D5C1296F189500EED9D4 /* ConsoleFilterSection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleFilterSection.swift; sourceTree = "<group>"; };
@@ -948,6 +948,7 @@
 				0C40C093296F7641009ECF16 /* ConsoleFiltersContentTypeCell.swift */,
 				0C40C095296F7738009ECF16 /* ConsoleFiltersTaskTypeCell.swift */,
 				0C40C097296F777D009ECF16 /* ConsoleFiltersResponseSourceCell.swift */,
+				0C40C099296F77F1009ECF16 /* ConsoleFiltersToggleCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -1209,7 +1210,6 @@
 				0CF0D5BB296F189500EED9D4 /* FilterPickerMenu.swift */,
 				0CF0D5BC296F189500EED9D4 /* ConsoleFilterSectionHeader.swift */,
 				0CF0D5BD296F189500EED9D4 /* ConsoleFiltersLabelsPickerView.swift */,
-				0CF0D5BE296F189500EED9D4 /* FiltersHelpers.swift */,
 				0CF0D5BF296F189500EED9D4 /* ConsoleCustomMessageFilterView.swift */,
 				0CF0D5BA296F189500EED9D4 /* ConsoleCustomNetworkFilterView.swift */,
 				0CF0D5C0296F189500EED9D4 /* DateRangePicker.swift */,
@@ -1908,6 +1908,7 @@
 				0CF0D671296F189600EED9D4 /* NetworkInspectorResponseBodyView.swift in Sources */,
 				0CF0D65B296F189600EED9D4 /* SettingsView-macos.swift in Sources */,
 				0CF0D626296F189600EED9D4 /* FileViewer.swift in Sources */,
+				0C40C09A296F77F1009ECF16 /* ConsoleFiltersToggleCell.swift in Sources */,
 				0CF0D656296F189600EED9D4 /* RemoteLoggerSettingsView.swift in Sources */,
 				0CF0D65C296F189600EED9D4 /* ConsoleMessageMetadataView.swift in Sources */,
 				0CF0D615296F189600EED9D4 /* LoggerSync.swift in Sources */,
@@ -1970,7 +1971,6 @@
 				0CF0D665296F189600EED9D4 /* NetworkMenuCell.swift in Sources */,
 				0CF0D659296F189600EED9D4 /* ConsoleSettings.swift in Sources */,
 				0CF0D61B296F189600EED9D4 /* ShareItems.swift in Sources */,
-				0CF0D647296F189600EED9D4 /* FiltersHelpers.swift in Sources */,
 				0CF0D683296F189600EED9D4 /* ConsoleMessageTableCell.swift in Sources */,
 				0CF0D623296F189600EED9D4 /* SearchBar-macos.swift in Sources */,
 				0CF0D652296F189600EED9D4 /* ConsoleMessageSearchCriteria+Predicate.swift in Sources */,
