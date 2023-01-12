@@ -127,7 +127,11 @@ final class ConsoleMessageSearchCriteriaViewModel: ObservableObject {
 
     func binding(forLabel label: String) -> Binding<Bool> {
         Binding(get: {
-            !self.criteria.labels.hidden.contains(label)
+            if let focused = self.criteria.labels.focused {
+                return label == focused
+            } else {
+                return !self.criteria.labels.hidden.contains(label)
+            }
         }, set: { isOn in
             self.criteria.labels.focused = nil
             if isOn {
