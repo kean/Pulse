@@ -6,16 +6,16 @@ import SwiftUI
 import Pulse
 
 struct ConsoleFiltersTaskTypeCell: View {
-    @Binding var selection: ConsoleNetworkSearchCriteria.NetworkingFilter.TaskType
+    @Binding var selection: ConsoleFilters.Networking.TaskType
 
     var body: some View {
         Picker("Task Type", selection: $selection) {
-            Text("Any").tag(ConsoleNetworkSearchCriteria.NetworkingFilter.TaskType.any)
-            Text("Data").tag(ConsoleNetworkSearchCriteria.NetworkingFilter.TaskType.some(.dataTask))
-            Text("Download").tag(ConsoleNetworkSearchCriteria.NetworkingFilter.TaskType.some(.downloadTask))
-            Text("Upload").tag(ConsoleNetworkSearchCriteria.NetworkingFilter.TaskType.some(.uploadTask))
-            Text("Stream").tag(ConsoleNetworkSearchCriteria.NetworkingFilter.TaskType.some(.streamTask))
-            Text("WebSocket").tag(ConsoleNetworkSearchCriteria.NetworkingFilter.TaskType.some(.webSocketTask))
+            Text("Any").tag(ConsoleFilters.Networking.TaskType.any)
+            Text("Data").tag(ConsoleFilters.Networking.TaskType.some(.dataTask))
+            Text("Download").tag(ConsoleFilters.Networking.TaskType.some(.downloadTask))
+            Text("Upload").tag(ConsoleFilters.Networking.TaskType.some(.uploadTask))
+            Text("Stream").tag(ConsoleFilters.Networking.TaskType.some(.streamTask))
+            Text("WebSocket").tag(ConsoleFilters.Networking.TaskType.some(.webSocketTask))
         }
     }
 }

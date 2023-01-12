@@ -17,6 +17,7 @@ final class ConsoleFiltersViewModel: ObservableObject {
     let dataNeedsReload = PassthroughSubject<Void, Never>()
 
     let labels: ManagedObjectsObserver<LoggerLabelEntity>
+    let domains: ManagedObjectsObserver<NetworkDomainEntity>
 
     private let store: LoggerStore
     private var cancellables: [AnyCancellable] = []
@@ -25,6 +26,7 @@ final class ConsoleFiltersViewModel: ObservableObject {
         self.store = store
 
         self.labels = ManagedObjectsObserver(context: store.viewContext, sortDescriptior: NSSortDescriptor(keyPath: \LoggerLabelEntity.name, ascending: true))
+        self.domains = ManagedObjectsObserver(context: store.viewContext, sortDescriptior: NSSortDescriptor(keyPath: \NetworkDomainEntity.count, ascending: false))
 
 #warning("TODO: can this be simplified?")
         if store === LoggerStore.shared {
@@ -42,7 +44,7 @@ final class ConsoleFiltersViewModel: ObservableObject {
         }.store(in: &cancellables)
     }
 
-    var isDefaultSearchCriteria: Bool {
+    var isDefaultAll: Bool {
         criteria == defaultCriteria
     }
 
@@ -142,5 +144,37 @@ final class ConsoleFiltersViewModel: ObservableObject {
         if criteria.custom.filters.isEmpty {
             criteria.custom = .default
         }
+    }
+
+    // MARK: Custom Network Filters
+
+    func removeFilter(_ filter: ConsoleCustomNetworkFilter) {
+        if let index = criteria.customNetworkFilters.filters.firstIndex(where: { $0.id == filter.id }) {
+            criteria.customNetworkFilters.filters.remove(at: index)
+        }
+        if criteria.customNetworkFilters.filters.isEmpty {
+            criteria.customNetworkFilters = .default
+        }
+    }
+
+#warning("TODO: move to ConsoleFilters+extensions")
+    var programmaticFilters: [ConsoleCustomNetworkFilter]? {
+        let programmaticFilters = criteria.customNetworkFilters.filters.filter { $0.isProgrammatic && !$0.value.isEmpty }
+        guard !programmaticFilters.isEmpty && criteria.customNetworkFilters.isEnabled else {
+            return nil
+        }
+        return programmaticFilters
+    }
+
+    // MARK: Bindings
+
+    func binding(forDomain domain: String) -> Binding<Bool> {
+        Binding(get: {
+            !self.criteria.host.ignoredHosts.contains(domain)
+        }, set: { newValue in
+            if self.criteria.host.ignoredHosts.remove(domain) == nil {
+                self.criteria.host.ignoredHosts.insert(domain)
+            }
+        })
     }
 }

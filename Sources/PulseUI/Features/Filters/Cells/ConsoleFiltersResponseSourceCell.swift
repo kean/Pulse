@@ -6,11 +6,11 @@ import SwiftUI
 import Pulse
 
 struct ConsoleFiltersResponseSourceCell: View {
-    @Binding var selection: ConsoleNetworkSearchCriteria.NetworkingFilter.Source
+    @Binding var selection: ConsoleFilters.Networking.Source
 
     var body: some View {
         Picker("Response Source", selection: $selection) {
-            ForEach(ConsoleNetworkSearchCriteria.NetworkingFilter.Source.allCases, id: \.self) {
+            ForEach(ConsoleFilters.Networking.Source.allCases, id: \.self) {
                 Text($0.title).tag($0)
             }
         }

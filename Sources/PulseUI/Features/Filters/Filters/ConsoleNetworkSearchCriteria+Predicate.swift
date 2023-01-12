@@ -10,8 +10,7 @@ extension ConsoleNetworkSearchCriteria {
     static func update(
         request: NSFetchRequest<NSManagedObject>,
         filterTerm: String,
-        shared: ConsoleFilters,
-        criteria: ConsoleNetworkSearchCriteria,
+        criteria: ConsoleFilters,
         isOnlyErrors: Bool
     ) {
         var predicates = [NSPredicate]()
@@ -20,11 +19,11 @@ extension ConsoleNetworkSearchCriteria {
             predicates.append(NSPredicate(format: "requestState == %d", NetworkTaskEntity.State.failure.rawValue))
         }
 
-        if shared.dates.isEnabled {
-            if let startDate = shared.dates.startDate {
+        if criteria.dates.isEnabled {
+            if let startDate = criteria.dates.startDate {
                 predicates.append(NSPredicate(format: "createdAt >= %@", startDate as NSDate))
             }
-            if let endDate = shared.dates.endDate {
+            if let endDate = criteria.dates.endDate {
                 predicates.append(NSPredicate(format: "createdAt <= %@", endDate as NSDate))
             }
         }
@@ -79,8 +78,8 @@ extension ConsoleNetworkSearchCriteria {
             predicates.append(NSPredicate(format: "url CONTAINS[cd] %@", filterTerm))
         }
 
-        if shared.general.isEnabled {
-            if shared.general.inOnlyPins {
+        if criteria.general.isEnabled {
+            if criteria.general.inOnlyPins {
                 predicates.append(NSPredicate(format: "message.isPinned == YES"))
             }
         }

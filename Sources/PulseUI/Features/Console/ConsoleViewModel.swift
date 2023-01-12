@@ -23,16 +23,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     let insightsViewModel: InsightsViewModel
 #endif
 
-    // Search criteria
-    let sharedSearchCriteriaViewModel: ConsoleFiltersViewModel
-    let networkSearchCriteriaViewModel: ConsoleNetworkSearchCriteriaViewModel
-
-    var isDefaultFilters: Bool {
-        switch mode {
-        case .all: return sharedSearchCriteriaViewModel.isDefaultSearchCriteria
-        case .network: return networkSearchCriteriaViewModel.isDefaultSearchCriteria && sharedSearchCriteriaViewModel.isDefaultSearchCriteria
-        }
-    }
+    let filtersViewModel: ConsoleFiltersViewModel
 
     @Published var mode: Mode
     @Published var isOnlyErrors = false
@@ -54,12 +45,11 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         self.mode = mode
         self.isNetworkOnly = mode == .network
 
-        self.sharedSearchCriteriaViewModel = ConsoleFiltersViewModel(store: store)
-        self.networkSearchCriteriaViewModel = ConsoleNetworkSearchCriteriaViewModel(store: store)
+        self.filtersViewModel = ConsoleFiltersViewModel(store: store)
 
 #if os(iOS) || os(macOS)
         self.details = ConsoleDetailsRouterViewModel()
-        self.table = ConsoleTableViewModel(filtersViewModel: sharedSearchCriteriaViewModel)
+        self.table = ConsoleTableViewModel(filtersViewModel: filtersViewModel)
 #endif
 
 #if os(iOS)
@@ -72,11 +62,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
             self?.refresh(filterTerm: filterTerm)
         }.store(in: &cancellables)
 
-        sharedSearchCriteriaViewModel.dataNeedsReload.throttle(for: 0.5, scheduler: DispatchQueue.main, latest: true).sink { [weak self] in
-            self?.refreshNow()
-        }.store(in: &cancellables)
-
-        networkSearchCriteriaViewModel.dataNeedsReload.throttle(for: 0.5, scheduler: DispatchQueue.main, latest: true).sink { [weak self] in
+        filtersViewModel.dataNeedsReload.throttle(for: 0.5, scheduler: DispatchQueue.main, latest: true).sink { [weak self] in
             self?.refreshNow()
         }.store(in: &cancellables)
 
@@ -138,15 +124,14 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
             ConsoleFilters.update(
                 request: controller.fetchRequest,
                 filterTerm: filterTerm,
-                criteria: sharedSearchCriteriaViewModel.criteria,
+                criteria: filtersViewModel.criteria,
                 isOnlyErrors: isOnlyErrors
             )
         case .network:
             ConsoleNetworkSearchCriteria.update(
                 request: controller.fetchRequest,
                 filterTerm: filterTerm,
-                shared: sharedSearchCriteriaViewModel.criteria,
-                criteria: networkSearchCriteriaViewModel.criteria,
+                criteria: filtersViewModel.criteria,
                 isOnlyErrors: isOnlyErrors
             )
             break

@@ -137,7 +137,6 @@
 		0CF0D63B296F189600EED9D4 /* MockTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5AF296F189500EED9D4 /* MockTask.swift */; };
 		0CF0D63C296F189600EED9D4 /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B0296F189500EED9D4 /* MockStore.swift */; };
 		0CF0D63D296F189600EED9D4 /* MockStoreConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B1296F189500EED9D4 /* MockStoreConfiguration.swift */; };
-		0CF0D63E296F189600EED9D4 /* ConsoleNetworkSearchCriteriaViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B4296F189500EED9D4 /* ConsoleNetworkSearchCriteriaViewModel.swift */; };
 		0CF0D63F296F189600EED9D4 /* ConsoleNetworkFiltersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B5296F189500EED9D4 /* ConsoleNetworkFiltersView.swift */; };
 		0CF0D640296F189600EED9D4 /* ConsoleFiltersViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B6296F189500EED9D4 /* ConsoleFiltersViewModel.swift */; };
 		0CF0D641296F189600EED9D4 /* ConsoleMessageFiltersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B7296F189500EED9D4 /* ConsoleMessageFiltersView.swift */; };
@@ -593,7 +592,6 @@
 		0CF0D5AF296F189500EED9D4 /* MockTask.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockTask.swift; sourceTree = "<group>"; };
 		0CF0D5B0296F189500EED9D4 /* MockStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockStore.swift; sourceTree = "<group>"; };
 		0CF0D5B1296F189500EED9D4 /* MockStoreConfiguration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockStoreConfiguration.swift; sourceTree = "<group>"; };
-		0CF0D5B4296F189500EED9D4 /* ConsoleNetworkSearchCriteriaViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleNetworkSearchCriteriaViewModel.swift; sourceTree = "<group>"; };
 		0CF0D5B5296F189500EED9D4 /* ConsoleNetworkFiltersView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleNetworkFiltersView.swift; sourceTree = "<group>"; };
 		0CF0D5B6296F189500EED9D4 /* ConsoleFiltersViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleFiltersViewModel.swift; sourceTree = "<group>"; };
 		0CF0D5B7296F189500EED9D4 /* ConsoleMessageFiltersView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleMessageFiltersView.swift; sourceTree = "<group>"; };
@@ -1210,7 +1208,6 @@
 				0CDFB839296F5B9D0071EF77 /* Cells */,
 				0CF0D5B9296F189500EED9D4 /* Views */,
 				0CF0D5C5296F189500EED9D4 /* Filters */,
-				0CF0D5B4296F189500EED9D4 /* ConsoleNetworkSearchCriteriaViewModel.swift */,
 				0CF0D5B5296F189500EED9D4 /* ConsoleNetworkFiltersView.swift */,
 				0CF0D5B7296F189500EED9D4 /* ConsoleMessageFiltersView.swift */,
 				0CF0D5B8296F189500EED9D4 /* ConsoleSharedFiltersView.swift */,
@@ -1223,14 +1220,14 @@
 		0CF0D5B9296F189500EED9D4 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				0CF0D5BB296F189500EED9D4 /* FilterPickerMenu.swift */,
-				0CF0D5BC296F189500EED9D4 /* ConsoleFilterSectionHeader.swift */,
-				0CF0D5BD296F189500EED9D4 /* ConsoleFiltersLabelsPickerView.swift */,
 				0C40C0A1296F81B0009ECF16 /* ConsoleCustomFilterView.swift */,
 				0CF0D5BF296F189500EED9D4 /* ConsoleCustomMessageFilterView.swift */,
 				0CF0D5BA296F189500EED9D4 /* ConsoleCustomNetworkFilterView.swift */,
-				0CF0D5C0296F189500EED9D4 /* DateRangePicker.swift */,
 				0CF0D5C1296F189500EED9D4 /* ConsoleFilterSection.swift */,
+				0CF0D5BC296F189500EED9D4 /* ConsoleFilterSectionHeader.swift */,
+				0CF0D5BD296F189500EED9D4 /* ConsoleFiltersLabelsPickerView.swift */,
+				0CF0D5C0296F189500EED9D4 /* DateRangePicker.swift */,
+				0CF0D5BB296F189500EED9D4 /* FilterPickerMenu.swift */,
 				0CF0D5C2296F189500EED9D4 /* RangePicker.swift */,
 			);
 			path = Views;
@@ -2052,7 +2049,6 @@
 				0CF0D620296F189600EED9D4 /* Foundation+Extensions.swift in Sources */,
 				0CF0D66C296F189600EED9D4 /* NetworkRequestInfoCell.swift in Sources */,
 				0CF0D632296F189600EED9D4 /* StoreShareView.swift in Sources */,
-				0CF0D63E296F189600EED9D4 /* ConsoleNetworkSearchCriteriaViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

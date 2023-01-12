@@ -6,8 +6,7 @@ import SwiftUI
 import Pulse
 
 struct ConsoleNetworkFiltersView: View {
-    @ObservedObject var viewModel: ConsoleNetworkSearchCriteriaViewModel
-    @ObservedObject var sharedCriteriaViewModel: ConsoleFiltersViewModel
+    @ObservedObject var viewModel: ConsoleFiltersViewModel
 
     @State private var isRedirectGroupExpanded = true
     @State private var isDomainsPickerPresented = false
@@ -38,7 +37,7 @@ extension ConsoleNetworkFiltersView {
             buttonReset
         }
 #endif
-        ConsoleSharedFiltersView(viewModel: sharedCriteriaViewModel)
+        ConsoleSharedFiltersView(viewModel: viewModel)
 #if os(iOS) || os(macOS)
         if #available(iOS 15, *) {
             generalGroup
@@ -52,8 +51,8 @@ extension ConsoleNetworkFiltersView {
     var buttonReset: some View {
         Button("Reset") {
             viewModel.resetAll()
-            sharedCriteriaViewModel.resetAll()
-        }.disabled(!(viewModel.isButtonResetEnabled || sharedCriteriaViewModel.isButtonResetEnabled))
+            viewModel.resetAll()
+        }.disabled(!(viewModel.isButtonResetEnabled || viewModel.isButtonResetEnabled))
     }
 }
 
@@ -165,7 +164,7 @@ extension ConsoleNetworkFiltersView {
     @ViewBuilder
     private var domainsGroupContent: some View {
         makeDomainPicker(limit: 4)
-        if viewModel.allDomains.count > 4 {
+        if viewModel.domains.objects.count > 4 {
             domainsShowAllButton
         }
     }
@@ -204,7 +203,7 @@ extension ConsoleNetworkFiltersView {
     }
 
     private func makeDomainPicker(limit: Int? = nil) -> some View {
-        var domains = viewModel.allDomains
+        var domains = viewModel.domains.objects.map(\.value)
         if let limit = limit {
             domains = Array(domains.prefix(limit))
         }
@@ -219,7 +218,7 @@ extension ConsoleNetworkFiltersView {
     private var domainsPickerView: some View {
         List {
             Button("Deselect All") {
-                viewModel.criteria.host.ignoredHosts = Set(viewModel.allDomains)
+                viewModel.criteria.host.ignoredHosts = Set(viewModel.domains.objects.map(\.value))
             }
             makeDomainPicker()
         }
@@ -258,26 +257,13 @@ extension ConsoleNetworkFiltersView {
 struct NetworkFiltersView_Previews: PreviewProvider {
     static var previews: some View {
 #if os(macOS)
-        ConsoleNetworkFiltersView(viewModel: makeMockViewModel(), sharedCriteriaViewModel: .init(store: .mock))
+        ConsoleNetworkFiltersView(viewModel: .init(store: .mock))
             .previewLayout(.fixed(width: 320, height: 900))
 #else
         NavigationView {
-            ConsoleNetworkFiltersView(viewModel: makeMockViewModel(), sharedCriteriaViewModel: .init(store: .mock))
+            ConsoleNetworkFiltersView(viewModel: .init(store: .mock))
         }.navigationViewStyle(.stack)
 #endif
     }
-}
-
-private func makeMockViewModel() -> ConsoleNetworkSearchCriteriaViewModel {
-    let viewModel = ConsoleNetworkSearchCriteriaViewModel(store: .mock)
-    viewModel.mock(domains: [
-        "github.com",
-        "apple.com",
-        "objects-origin.githubusercontent.com",
-        "api.github.com",
-        "analytics.github.com"
-    ])
-    return viewModel
-
 }
 #endif
