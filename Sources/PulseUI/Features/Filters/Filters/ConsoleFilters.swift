@@ -11,9 +11,7 @@ import Combine
 #warning("TODO: remove all the redundant defaults")
 #warning("TODO: move isOnlyErrors here ?")
 struct ConsoleFilters: Hashable {
-    // Shared
-    var dates = Dates.default
-    var general = General.default
+    var shared = Shared()
 
     // Messages
     var logLevels: LogLevels = .default
@@ -25,6 +23,11 @@ struct ConsoleFilters: Hashable {
     var host = Host.default
     var networking = Networking.default
     var customNetworkFilters = CustomNetworkFilters.default
+
+    struct Shared: Hashable {
+        var dates = Dates.default
+        var general = General.default
+    }
 
     static let `default` = ConsoleFilters()
 }

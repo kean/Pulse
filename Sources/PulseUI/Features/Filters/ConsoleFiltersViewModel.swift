@@ -29,8 +29,8 @@ final class ConsoleFiltersViewModel: ObservableObject {
 
 #warning("TODO: can this be simplified?")
         if store === LoggerStore.shared {
-            criteria.dates = .session
-            defaultCriteria.dates = .session
+            criteria.shared.dates = .session
+            defaultCriteria.shared.dates = .session
         }
 
 #warning("TODO: rework how reset is enabled (we have hashable for this)")
@@ -45,11 +45,6 @@ final class ConsoleFiltersViewModel: ObservableObject {
 #warning("TODO: return different value based on the mod")
     var isDefaultAll: Bool {
         criteria == defaultCriteria
-    }
-
-    var isDefaultForAll: Bool {
-        criteria.dates == defaultCriteria.dates &&
-        criteria.general == defaultCriteria.general
     }
 
     var isDefaultForMessages: Bool {
