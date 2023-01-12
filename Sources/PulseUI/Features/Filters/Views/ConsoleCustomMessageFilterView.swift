@@ -9,7 +9,7 @@ import Pulse
 
 @available(iOS 15, *)
 struct ConsoleCustomMessageFilterView: View {
-    @ObservedObject var filter: ConsoleSearchFilter
+    @ObservedObject var filter: ConsoleCustomMessageFilter
     let onRemove: (() -> Void)?
 
     var body: some View {
@@ -42,28 +42,28 @@ struct ConsoleCustomMessageFilterView: View {
 
     private var fieldPicker: some View {
         Picker("Field", selection: $filter.field) {
-            Text("Level").tag(ConsoleSearchFilter.Field.level)
-            Text("Label").tag(ConsoleSearchFilter.Field.label)
-            Text("Message").tag(ConsoleSearchFilter.Field.message)
+            Text("Level").tag(ConsoleCustomMessageFilter.Field.level)
+            Text("Label").tag(ConsoleCustomMessageFilter.Field.label)
+            Text("Message").tag(ConsoleCustomMessageFilter.Field.message)
             Divider()
-            Text("Metadata").tag(ConsoleSearchFilter.Field.metadata)
+            Text("Metadata").tag(ConsoleCustomMessageFilter.Field.metadata)
             Divider()
-            Text("File").tag(ConsoleSearchFilter.Field.file)
+            Text("File").tag(ConsoleCustomMessageFilter.Field.file)
         }
         .labelsHidden()
     }
 
     private var matchPicker: some View {
         Picker("Match", selection: $filter.match) {
-            Text("Contains").tag(ConsoleSearchFilter.Match.contains)
-            Text("Not Contains").tag(ConsoleSearchFilter.Match.notContains)
+            Text("Contains").tag(ConsoleCustomMessageFilter.Match.contains)
+            Text("Not Contains").tag(ConsoleCustomMessageFilter.Match.notContains)
             Divider()
-            Text("Equals").tag(ConsoleSearchFilter.Match.equal)
-            Text("Not Equals").tag(ConsoleSearchFilter.Match.notEqual)
+            Text("Equals").tag(ConsoleCustomMessageFilter.Match.equal)
+            Text("Not Equals").tag(ConsoleCustomMessageFilter.Match.notEqual)
             Divider()
-            Text("Begins With").tag(ConsoleSearchFilter.Match.beginsWith)
+            Text("Begins With").tag(ConsoleCustomMessageFilter.Match.beginsWith)
             Divider()
-            Text("Regex").tag(ConsoleSearchFilter.Match.regex)
+            Text("Regex").tag(ConsoleCustomMessageFilter.Match.regex)
         }
         .labelsHidden()
     }

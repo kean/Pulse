@@ -18,14 +18,14 @@ struct ConsoleMessageSearchCriteria: Hashable {
     }
 }
 
-final class ConsoleSearchFilter: ObservableObject, Identifiable {
+final class ConsoleCustomMessageFilter: ObservableObject, Identifiable {
     var id: ObjectIdentifier { ObjectIdentifier(self) }
     @Published var field: Field
     @Published var match: Match
     @Published var value: String
 
-    static var `default`: ConsoleSearchFilter {
-        ConsoleSearchFilter(field: .message, match: .contains, value: "")
+    static var `default`: ConsoleCustomMessageFilter {
+        ConsoleCustomMessageFilter(field: .message, match: .contains, value: "")
     }
 
     init(field: Field, match: Match, value: String) {

@@ -13,7 +13,7 @@ extension ConsoleMessageSearchCriteria {
         filterTerm: String,
         shared: ConsoleFilters,
         criteria: ConsoleMessageSearchCriteria,
-        filters: [ConsoleSearchFilter],
+        filters: [ConsoleCustomMessageFilter],
         isOnlyErrors: Bool
     ) {
         var predicates = [NSPredicate]()

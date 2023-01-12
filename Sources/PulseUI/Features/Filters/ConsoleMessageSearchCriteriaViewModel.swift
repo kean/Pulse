@@ -10,7 +10,7 @@ import SwiftUI
 final class ConsoleMessageSearchCriteriaViewModel: ObservableObject {
     @Published var criteria: ConsoleMessageSearchCriteria = .default
     private(set) var defaultCriteria: ConsoleMessageSearchCriteria = .default
-    @Published var filters: [ConsoleSearchFilter] = []
+    @Published var filters: [ConsoleCustomMessageFilter] = []
 
     @Published private(set) var isButtonResetEnabled = false
 
@@ -56,12 +56,12 @@ final class ConsoleMessageSearchCriteriaViewModel: ObservableObject {
         guard !filters.isEmpty else {
             return resetFilters()
         }
-        let filter = ConsoleSearchFilter.default
+        let filter = ConsoleCustomMessageFilter.default
         filters.append(filter)
         subscribe(to: filter)
     }
 
-    private func subscribe(to filter: ConsoleSearchFilter) {
+    private func subscribe(to filter: ConsoleCustomMessageFilter) {
         filter.objectWillChange.sink { [weak self] in
             guard let self = self else { return }
             self.objectWillChange.send()
@@ -72,7 +72,7 @@ final class ConsoleMessageSearchCriteriaViewModel: ObservableObject {
         }.store(in: &cancellables)
     }
 
-    func removeFilter(_ filter: ConsoleSearchFilter) {
+    func removeFilter(_ filter: ConsoleCustomMessageFilter) {
         if let index = filters.firstIndex(where: { $0 === filter }) {
             filters.remove(at: index)
         }
