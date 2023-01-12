@@ -36,7 +36,7 @@ struct ConsoleSharedFiltersView: View {
         ConsoleFilterSection(
             header: {
                 ConsoleFilterSectionHeader(
-                    icon: "calendar", title: "General",
+                    icon: "gear", title: "General",
                     color: .blue,
                     reset: { viewModel.criteria.filters = .default },
                     isDefault: viewModel.criteria.filters == .default,
@@ -44,10 +44,20 @@ struct ConsoleSharedFiltersView: View {
                 )
             },
             content: {
+#if os(macOS)
+                HStack {
+                    ConsoleFiltersToggleCell(title: "Only Pinned", isOn: $viewModel.criteria.filters.inOnlyPins)
+                    Spacer()
+                    Button.destructive(action: viewModel.removeAllPins) {
+                        Text("Remove Pins")
+                    }
+                }
+#else
                 ConsoleFiltersToggleCell(title: "Only Pinned", isOn: $viewModel.criteria.filters.inOnlyPins)
                 Button.destructive(action: viewModel.removeAllPins) {
                     Text("Remove Pins")
                 }
+#endif
             }
         )
     }
