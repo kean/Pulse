@@ -26,6 +26,7 @@ final class ConsoleFiltersViewModel: ObservableObject {
 
         self.labels = ManagedObjectsObserver(context: store.viewContext, sortDescriptior: NSSortDescriptor(keyPath: \LoggerLabelEntity.name, ascending: true))
 
+#warning("TODO: can this be simplified?")
         if store === LoggerStore.shared {
             criteria.dates = .session
             defaultCriteria.dates = .session
