@@ -137,7 +137,7 @@
 		0CF0D63D296F189600EED9D4 /* MockStoreConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B1296F189500EED9D4 /* MockStoreConfiguration.swift */; };
 		0CF0D63E296F189600EED9D4 /* ConsoleNetworkSearchCriteriaViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B4296F189500EED9D4 /* ConsoleNetworkSearchCriteriaViewModel.swift */; };
 		0CF0D63F296F189600EED9D4 /* ConsoleNetworkFiltersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B5296F189500EED9D4 /* ConsoleNetworkFiltersView.swift */; };
-		0CF0D640296F189600EED9D4 /* ConsoleSharedSearchCriteriaViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B6296F189500EED9D4 /* ConsoleSharedSearchCriteriaViewModel.swift */; };
+		0CF0D640296F189600EED9D4 /* ConsoleFiltersViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B6296F189500EED9D4 /* ConsoleFiltersViewModel.swift */; };
 		0CF0D641296F189600EED9D4 /* ConsoleMessageFiltersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B7296F189500EED9D4 /* ConsoleMessageFiltersView.swift */; };
 		0CF0D642296F189600EED9D4 /* ConsoleSharedFiltersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B8296F189500EED9D4 /* ConsoleSharedFiltersView.swift */; };
 		0CF0D643296F189600EED9D4 /* ConsoleCustomNetworkFilterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5BA296F189500EED9D4 /* ConsoleCustomNetworkFilterView.swift */; };
@@ -592,7 +592,7 @@
 		0CF0D5B1296F189500EED9D4 /* MockStoreConfiguration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockStoreConfiguration.swift; sourceTree = "<group>"; };
 		0CF0D5B4296F189500EED9D4 /* ConsoleNetworkSearchCriteriaViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleNetworkSearchCriteriaViewModel.swift; sourceTree = "<group>"; };
 		0CF0D5B5296F189500EED9D4 /* ConsoleNetworkFiltersView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleNetworkFiltersView.swift; sourceTree = "<group>"; };
-		0CF0D5B6296F189500EED9D4 /* ConsoleSharedSearchCriteriaViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleSharedSearchCriteriaViewModel.swift; sourceTree = "<group>"; };
+		0CF0D5B6296F189500EED9D4 /* ConsoleFiltersViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleFiltersViewModel.swift; sourceTree = "<group>"; };
 		0CF0D5B7296F189500EED9D4 /* ConsoleMessageFiltersView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleMessageFiltersView.swift; sourceTree = "<group>"; };
 		0CF0D5B8296F189500EED9D4 /* ConsoleSharedFiltersView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleSharedFiltersView.swift; sourceTree = "<group>"; };
 		0CF0D5BA296F189500EED9D4 /* ConsoleCustomNetworkFilterView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleCustomNetworkFilterView.swift; sourceTree = "<group>"; };
@@ -1209,7 +1209,7 @@
 				0CF0D5C5296F189500EED9D4 /* Filters */,
 				0CF0D5B4296F189500EED9D4 /* ConsoleNetworkSearchCriteriaViewModel.swift */,
 				0CF0D5B5296F189500EED9D4 /* ConsoleNetworkFiltersView.swift */,
-				0CF0D5B6296F189500EED9D4 /* ConsoleSharedSearchCriteriaViewModel.swift */,
+				0CF0D5B6296F189500EED9D4 /* ConsoleFiltersViewModel.swift */,
 				0CF0D5B7296F189500EED9D4 /* ConsoleMessageFiltersView.swift */,
 				0CF0D5B8296F189500EED9D4 /* ConsoleSharedFiltersView.swift */,
 				0CF0D5C3296F189500EED9D4 /* ConsoleMessageSearchCriteriaViewModel.swift */,
@@ -1952,7 +1952,7 @@
 				0CF0D668296F189600EED9D4 /* NetworkRequestStatusCell.swift in Sources */,
 				0CF0D651296F189600EED9D4 /* ConsoleMessageSearchCriteria.swift in Sources */,
 				0CF0D64E296F189600EED9D4 /* ConsoleNetworkSearchCriteria.swift in Sources */,
-				0CF0D640296F189600EED9D4 /* ConsoleSharedSearchCriteriaViewModel.swift in Sources */,
+				0CF0D640296F189600EED9D4 /* ConsoleFiltersViewModel.swift in Sources */,
 				0CF0D65A296F189600EED9D4 /* StoreDetailsView.swift in Sources */,
 				0CF0D648296F189600EED9D4 /* ConsoleCustomMessageFilterView.swift in Sources */,
 				0CF0D67A296F189600EED9D4 /* ConsoleView-watchos.swift in Sources */,
