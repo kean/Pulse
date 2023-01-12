@@ -10,7 +10,7 @@ import Combine
 final class ConsoleMessageViewModel: Pinnable {
     let message: LoggerMessageEntity
 
-    private let searchCriteriaViewModel: ConsoleMessageSearchCriteriaViewModel?
+    private let filtersViewModel: ConsoleFiltersViewModel?
 
     // TODO: Trim whitespaces and remove newlines?
     var preprocessedText: String { message.text }
@@ -26,9 +26,9 @@ final class ConsoleMessageViewModel: Pinnable {
     
     private(set) lazy var pinViewModel = PinButtonViewModel(message: message)
     
-    init(message: LoggerMessageEntity, searchCriteriaViewModel: ConsoleMessageSearchCriteriaViewModel? = nil) {
+    init(message: LoggerMessageEntity, filtersViewModel: ConsoleFiltersViewModel? = nil) {
         self.message = message
-        self.searchCriteriaViewModel = searchCriteriaViewModel
+        self.filtersViewModel = filtersViewModel
     }
     
     // MARK: Context Menu
@@ -47,13 +47,13 @@ final class ConsoleMessageViewModel: Pinnable {
     }
     
     func focus() {
-        searchCriteriaViewModel?.criteria.labels.isEnabled = true
-        searchCriteriaViewModel?.criteria.labels.focused = message.label.name
+        filtersViewModel?.criteria.labels.isEnabled = true
+        filtersViewModel?.criteria.labels.focused = message.label.name
     }
     
     func hide() {
-        searchCriteriaViewModel?.criteria.labels.isEnabled = true
-        searchCriteriaViewModel?.criteria.labels.hidden.insert(message.label.name)
+        filtersViewModel?.criteria.labels.isEnabled = true
+        filtersViewModel?.criteria.labels.hidden.insert(message.label.name)
     }
 #endif
 }

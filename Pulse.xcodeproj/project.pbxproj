@@ -1209,11 +1209,11 @@
 				0CF0D5C5296F189500EED9D4 /* Filters */,
 				0CF0D5B4296F189500EED9D4 /* ConsoleNetworkSearchCriteriaViewModel.swift */,
 				0CF0D5B5296F189500EED9D4 /* ConsoleNetworkFiltersView.swift */,
-				0CF0D5B6296F189500EED9D4 /* ConsoleFiltersViewModel.swift */,
 				0CF0D5B7296F189500EED9D4 /* ConsoleMessageFiltersView.swift */,
 				0CF0D5B8296F189500EED9D4 /* ConsoleSharedFiltersView.swift */,
 				0CF0D5C3296F189500EED9D4 /* ConsoleMessageSearchCriteriaViewModel.swift */,
 				0CF0D5C4296F189500EED9D4 /* ConsoleFiltersView.swift */,
+				0CF0D5B6296F189500EED9D4 /* ConsoleFiltersViewModel.swift */,
 			);
 			path = Filters;
 			sourceTree = "<group>";

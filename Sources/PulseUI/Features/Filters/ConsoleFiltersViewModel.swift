@@ -8,12 +8,15 @@ import Combine
 import SwiftUI
 
 final class ConsoleFiltersViewModel: ObservableObject {
-    @Published var criteria = ConsoleFilters()
+    @Published var criteria: ConsoleFilters = .default
     @Published var isButtonResetEnabled = false
 
+    private var defaultCriteria: ConsoleFilters = .default
     private(set) var defaultDates: ConsoleFilters.Dates = .default
 
     let dataNeedsReload = PassthroughSubject<Void, Never>()
+
+    let labels: ManagedObjectsObserver<LoggerLabelEntity>
 
     private let store: LoggerStore
     private var cancellables: [AnyCancellable] = []
@@ -21,12 +24,15 @@ final class ConsoleFiltersViewModel: ObservableObject {
     init(store: LoggerStore) {
         self.store = store
 
+        self.labels = ManagedObjectsObserver(context: store.viewContext, sortDescriptior: NSSortDescriptor(keyPath: \LoggerLabelEntity.name, ascending: true))
 
         if store === LoggerStore.shared {
             criteria.dates = .session
+            defaultCriteria.dates = .session
             defaultDates = .session
         }
 
+#warning("TODO: rework how reset is enabled (we have hashable for this)")
         $criteria.dropFirst().sink { [weak self] _ in
             self?.isButtonResetEnabled = true
             DispatchQueue.main.async { // important!
@@ -36,7 +42,7 @@ final class ConsoleFiltersViewModel: ObservableObject {
     }
 
     var isDefaultSearchCriteria: Bool {
-        isDatesDefault && criteria.filters == .default
+        criteria == defaultCriteria
     }
 
     func resetAll() {
@@ -94,4 +100,35 @@ final class ConsoleFiltersViewModel: ObservableObject {
         })
     }
 
+    // MARK: Binding (ConsoleFilters.Labels)
+
+    func binding(forLabel label: String) -> Binding<Bool> {
+        Binding(get: {
+            if let focused = self.criteria.labels.focused {
+                return label == focused
+            } else {
+                return !self.criteria.labels.hidden.contains(label)
+            }
+        }, set: { isOn in
+            self.criteria.labels.focused = nil
+            if isOn {
+                self.criteria.labels.hidden.remove(label)
+            } else {
+                self.criteria.labels.hidden.insert(label)
+            }
+        })
+    }
+
+    var bindingForTogglingAllLabels: Binding<Bool> {
+        Binding(get: {
+            self.criteria.labels.hidden.isEmpty
+        }, set: { isOn in
+            self.criteria.labels.focused = nil
+            if isOn {
+                self.criteria.labels.hidden = []
+            } else {
+                self.criteria.labels.hidden = Set(self.labels.objects.map(\.name))
+            }
+        })
+    }
 }

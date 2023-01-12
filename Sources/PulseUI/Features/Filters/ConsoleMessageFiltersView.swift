@@ -176,9 +176,9 @@ extension ConsoleMessageFiltersView {
     private var labelsHeader: some View {
         ConsoleFilterSectionHeader(
             icon: "tag", title: "Labels",
-            reset: { viewModel.criteria.labels = .default },
-            isDefault: viewModel.criteria.labels == .default,
-            isEnabled: $viewModel.criteria.labels.isEnabled
+            reset: { sharedCriteriaViewModel.criteria.labels = .default },
+            isDefault: sharedCriteriaViewModel.criteria.labels == .default,
+            isEnabled: $sharedCriteriaViewModel.criteria.labels.isEnabled
         )
     }
 
@@ -199,7 +199,7 @@ extension ConsoleMessageFiltersView {
 #else
     @ViewBuilder
     private var labelsContent: some View {
-        let labels = viewModel.allLabels
+        let labels = sharedCriteriaViewModel.labels.objects.map(\.name)
 
         if labels.isEmpty {
             Text("No Labels")
@@ -207,10 +207,10 @@ extension ConsoleMessageFiltersView {
                 .foregroundColor(.secondary)
         } else {
             ForEach(labels.prefix(4), id: \.self) { item in
-                Checkbox(item.capitalized, isOn: viewModel.binding(forLabel: item))
+                Checkbox(item.capitalized, isOn: sharedCriteriaViewModel.binding(forLabel: item))
             }
             if labels.count > 4 {
-                NavigationLink(destination: ConsoleFiltersLabelsPickerView(viewModel: viewModel)) {
+                NavigationLink(destination: ConsoleFiltersLabelsPickerView(viewModel: sharedCriteriaViewModel)) {
                     Text("View All").foregroundColor(.blue)
                 }
             }
@@ -234,8 +234,6 @@ struct ConsoleMessageFiltersView_Previews: PreviewProvider {
 }
 
 private func makeMockViewModel() -> ConsoleMessageSearchCriteriaViewModel {
-    let viewModel = ConsoleMessageSearchCriteriaViewModel(store: .mock)
-    viewModel.displayLabels(["Auth", "Network", "Analytics", "Home", "Storage"])
-    return viewModel
+    ConsoleMessageSearchCriteriaViewModel(store: .mock)
 }
 #endif

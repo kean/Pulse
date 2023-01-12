@@ -14,6 +14,9 @@ struct ConsoleFilters: Hashable {
 
     // Messages
     var logLevels: LogLevels = .default
+    var labels: Labels = .default
+
+    static let `default` = ConsoleFilters()
 }
 
 extension ConsoleFilters {
@@ -51,5 +54,13 @@ extension ConsoleFilters {
             .subtracting([LoggerStore.Level.trace])
 
         static let `default` = LogLevels()
+    }
+
+    struct Labels: Hashable {
+        var isEnabled = true
+        var hidden: Set<String> = []
+        var focused: String?
+
+        static let `default` = Labels()
     }
 }

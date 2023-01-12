@@ -11,16 +11,6 @@ import Combine
 struct ConsoleMessageSearchCriteria: Hashable {
     var isFiltersEnabled = true
 
-    var labels: LabelsFilter = .default
-
-    struct LabelsFilter: Hashable {
-        var isEnabled = true
-        var hidden: Set<String> = []
-        var focused: String?
-
-        static let `default` = LabelsFilter()
-    }
-
     static let `default` = ConsoleMessageSearchCriteria()
 
     var isDefault: Bool {

@@ -12,10 +12,6 @@ final class ConsoleMessageSearchCriteriaViewModel: ObservableObject {
     private(set) var defaultCriteria: ConsoleMessageSearchCriteria = .default
     @Published var filters: [ConsoleSearchFilter] = []
 
-    @Published private(set) var allLabels: [String] = []
-    private var allLabelsSet: Set<String> = []
-    private let labels: ManagedObjectsObserver<LoggerLabelEntity>
-
     @Published private(set) var isButtonResetEnabled = false
 
     let dataNeedsReload = PassthroughSubject<Void, Never>()
@@ -23,12 +19,6 @@ final class ConsoleMessageSearchCriteriaViewModel: ObservableObject {
     private var cancellables: [AnyCancellable] = []
 
     init(store: LoggerStore) {
-        labels = ManagedObjectsObserver(context: store.viewContext, sortDescriptior: NSSortDescriptor(keyPath: \LoggerLabelEntity.name, ascending: true))
-
-        labels.$objects.sink { [weak self] in
-            self?.displayLabels($0.map(\.name))
-        }.store(in: &cancellables)
-
         resetFilters()
 
         $criteria.dropFirst().sink { [weak self] _ in
@@ -89,44 +79,5 @@ final class ConsoleMessageSearchCriteriaViewModel: ObservableObject {
         if filters.isEmpty {
             resetFilters()
         }
-    }
-
-    // MARK: Managing Labels
-
-    func displayLabels(_ labels: [String]) {
-        allLabelsSet = Set(labels)
-        allLabels = labels
-    }
-
-    // MARK: Helpers
-
-    func binding(forLabel label: String) -> Binding<Bool> {
-        Binding(get: {
-            if let focused = self.criteria.labels.focused {
-                return label == focused
-            } else {
-                return !self.criteria.labels.hidden.contains(label)
-            }
-        }, set: { isOn in
-            self.criteria.labels.focused = nil
-            if isOn {
-                self.criteria.labels.hidden.remove(label)
-            } else {
-                self.criteria.labels.hidden.insert(label)
-            }
-        })
-    }
-
-    var bindingForTogglingAllLabels: Binding<Bool> {
-        Binding(get: {
-            self.criteria.labels.hidden.isEmpty
-        }, set: { isOn in
-            self.criteria.labels.focused = nil
-            if isOn {
-                self.criteria.labels.hidden = []
-            } else {
-                self.criteria.labels.hidden = Set(self.allLabels)
-            }
-        })
     }
 }

@@ -43,11 +43,11 @@ extension ConsoleMessageSearchCriteria {
             }
         }
 
-        if criteria.labels.isEnabled {
-            if let focusedLabel = criteria.labels.focused {
+        if shared.labels.isEnabled {
+            if let focusedLabel = shared.labels.focused {
                 predicates.append(NSPredicate(format: "label.name == %@", focusedLabel))
-            } else if !criteria.labels.hidden.isEmpty {
-                predicates.append(NSPredicate(format: "NOT label.name IN %@", Array(criteria.labels.hidden)))
+            } else if !shared.labels.hidden.isEmpty {
+                predicates.append(NSPredicate(format: "NOT label.name IN %@", Array(shared.labels.hidden)))
             }
         }
 

@@ -61,7 +61,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 
 #if os(iOS) || os(macOS)
         self.details = ConsoleDetailsRouterViewModel()
-        self.table = ConsoleTableViewModel(searchCriteriaViewModel: searchCriteriaViewModel)
+        self.table = ConsoleTableViewModel(filtersViewModel: sharedSearchCriteriaViewModel)
 #endif
 
 #if os(iOS)
