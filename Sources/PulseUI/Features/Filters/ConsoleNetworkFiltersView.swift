@@ -70,15 +70,15 @@ extension ConsoleNetworkFiltersView {
     }
 
     private var generalGroupHeader: some View {
-        ConsoleFilterSectionHeader(icon: "line.horizontal.3.decrease.circle", title: "Filters", filter: $viewModel.criteria.customNetworkFilters)
+        ConsoleFilterSectionHeader(icon: "line.horizontal.3.decrease.circle", title: "Filters", filter: $viewModel.criteria.network.customNetworkFilters)
     }
 
 #if os(iOS)
     @ViewBuilder
     private var generalGroupContent: some View {
         customFilersList
-        if !(viewModel.criteria.customNetworkFilters == .default) {
-            Button(action: { viewModel.criteria.customNetworkFilters.filters.append(.default) }) {
+        if !(viewModel.criteria.network.customNetworkFilters == .default) {
+            Button(action: { viewModel.criteria.network.customNetworkFilters.filters.append(.default) }) {
                 Text("Add Filter").frame(maxWidth: .infinity)
             }
         }
@@ -99,8 +99,8 @@ extension ConsoleNetworkFiltersView {
 #endif
 
     @ViewBuilder var customFilersList: some View {
-        ForEach($viewModel.criteria.customNetworkFilters.filters) { filter in
-            ConsoleCustomNetworkFilterView(filter: filter, onRemove: viewModel.criteria.customNetworkFilters == .default ? nil : { viewModel.removeFilter(filter.wrappedValue) })
+        ForEach($viewModel.criteria.network.customNetworkFilters.filters) { filter in
+            ConsoleCustomNetworkFilterView(filter: filter, onRemove: viewModel.criteria.network.customNetworkFilters == .default ? nil : { viewModel.removeFilter(filter.wrappedValue) })
         }
     }
 }
@@ -118,17 +118,17 @@ extension ConsoleNetworkFiltersView {
     }
 
     private var responseGroupHeader: some View {
-        ConsoleFilterSectionHeader(icon: "arrow.down.circle", title:  "Response", filter: $viewModel.criteria.response)
+        ConsoleFilterSectionHeader(icon: "arrow.down.circle", title:  "Response", filter: $viewModel.criteria.network.response)
     }
 
     @ViewBuilder
     private var responseGroupContent: some View {
 #if os(iOS) || os(macOS)
-        ConsoleFiltersStatusCodeCell(selection: $viewModel.criteria.response.statusCode.range)
-        ConsoleFiltersDurationCell(selection: $viewModel.criteria.response.duration)
-        ConsoleFiltersResponseSizeCell(selection: $viewModel.criteria.response.responseSize)
+        ConsoleFiltersStatusCodeCell(selection: $viewModel.criteria.network.response.statusCode.range)
+        ConsoleFiltersDurationCell(selection: $viewModel.criteria.network.response.duration)
+        ConsoleFiltersResponseSizeCell(selection: $viewModel.criteria.network.response.responseSize)
 #endif
-        ConsoleFiltersContentTypeCell(selection: $viewModel.criteria.response.contentType.contentType)
+        ConsoleFiltersContentTypeCell(selection: $viewModel.criteria.network.response.contentType.contentType)
     }
 }
 
@@ -143,7 +143,7 @@ extension ConsoleNetworkFiltersView {
     }
 
     private var domainsGroupHeader: some View {
-        ConsoleFilterSectionHeader(icon: "server.rack", title: "Hosts", filter: $viewModel.criteria.host)
+        ConsoleFilterSectionHeader(icon: "server.rack", title: "Hosts", filter: $viewModel.criteria.network.host)
     }
 
     @ViewBuilder
@@ -203,7 +203,7 @@ extension ConsoleNetworkFiltersView {
     private var domainsPickerView: some View {
         List {
             Button("Deselect All") {
-                viewModel.criteria.host.ignoredHosts = Set(viewModel.domains.objects.map(\.value))
+                viewModel.criteria.network.host.ignoredHosts = Set(viewModel.domains.objects.map(\.value))
             }
             makeDomainPicker()
         }
@@ -222,14 +222,14 @@ extension ConsoleNetworkFiltersView {
     }
 
     private var networkingGroupHeader: some View {
-        ConsoleFilterSectionHeader(icon: "arrowshape.zigzag.right", title: "Networking", filter: $viewModel.criteria.networking)
+        ConsoleFilterSectionHeader(icon: "arrowshape.zigzag.right", title: "Networking", filter: $viewModel.criteria.network.networking)
     }
 
     @ViewBuilder
     private var networkingGroupContent: some View {
-        ConsoleFiltersTaskTypeCell(selection: $viewModel.criteria.networking.taskType)
-        ConsoleFiltersResponseSourceCell(selection: $viewModel.criteria.networking.source)
-        ConsoleFiltersToggleCell(title: "Redirect", isOn: $viewModel.criteria.networking.isRedirect)
+        ConsoleFiltersTaskTypeCell(selection: $viewModel.criteria.network.networking.taskType)
+        ConsoleFiltersResponseSourceCell(selection: $viewModel.criteria.network.networking.source)
+        ConsoleFiltersToggleCell(title: "Redirect", isOn: $viewModel.criteria.network.networking.isRedirect)
     }
 }
 

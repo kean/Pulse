@@ -6,6 +6,7 @@ import Foundation
 import Pulse
 import CoreData
 
+#warning("TODO: refactor")
 extension ConsoleFilters {
     static func update(
         request: NSFetchRequest<NSManagedObject>,
@@ -88,51 +89,7 @@ extension ConsoleNetworkSearchCriteria {
             }
         }
 
-        if criteria.response.isEnabled {
-            if let value = criteria.response.responseSize.byteCountRange.lowerBound {
-                predicates.append(NSPredicate(format: "responseBodySize >= %d", value))
-            }
-            if let value = criteria.response.responseSize.byteCountRange.upperBound {
-                predicates.append(NSPredicate(format: "responseBodySize <= %d", value))
-            }
-            if let value = Int(criteria.response.statusCode.range.lowerBound) {
-                predicates.append(NSPredicate(format: "statusCode >= %d", value))
-            }
-            if let value = Int(criteria.response.statusCode.range.upperBound) {
-                predicates.append(NSPredicate(format: "statusCode <= %d", value))
-            }
-            if let value = criteria.response.duration.durationRange.lowerBound {
-                predicates.append(NSPredicate(format: "duration >= %f", value))
-            }
-            if let value = criteria.response.duration.durationRange.upperBound {
-                predicates.append(NSPredicate(format: "duration <= %f", value))
-            }
-            switch criteria.response.contentType.contentType {
-            case .any: break
-            default: predicates.append(NSPredicate(format: "responseContentType CONTAINS %@", criteria.response.contentType.contentType.rawValue))
-            }
-        }
-
-        if criteria.networking.isEnabled {
-            if criteria.networking.isRedirect {
-                predicates.append(NSPredicate(format: "redirectCount >= 1"))
-            }
-            switch criteria.networking.source {
-            case .any:
-                break
-            case .network:
-                predicates.append(NSPredicate(format: "isFromCache == NO"))
-            case .cache:
-                predicates.append(NSPredicate(format: "isFromCache == YES"))
-            }
-            if case .some(let taskType) = criteria.networking.taskType {
-                predicates.append(NSPredicate(format: "taskType == %i", taskType.rawValue))
-            }
-        }
-
-        if criteria.host.isEnabled, !criteria.host.ignoredHosts.isEmpty {
-            predicates.append(NSPredicate(format: "NOT host.value IN %@", criteria.host.ignoredHosts))
-        }
+        predicates += makePredicates(for: criteria.network)
 
         if filterTerm.count > 1 {
             predicates.append(NSPredicate(format: "url CONTAINS[cd] %@", filterTerm))
@@ -144,16 +101,68 @@ extension ConsoleNetworkSearchCriteria {
             }
         }
 
-        if criteria.customNetworkFilters.isEnabled {
-            for filter in criteria.customNetworkFilters.filters where !filter.value.isEmpty {
-                if let predicate = filter.makePredicate() {
-                    predicates.append(predicate)
-                } else {
-                    // Have to be done in code
-                }
-            }
-        }
-
         request.predicate = predicates.isEmpty ? nil : NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
     }
+}
+
+private func makePredicates(for criteria: ConsoleFilters.Network) -> [NSPredicate] {
+    var predicates = [NSPredicate]()
+
+    if criteria.response.isEnabled {
+        if let value = criteria.response.responseSize.byteCountRange.lowerBound {
+            predicates.append(NSPredicate(format: "responseBodySize >= %d", value))
+        }
+        if let value = criteria.response.responseSize.byteCountRange.upperBound {
+            predicates.append(NSPredicate(format: "responseBodySize <= %d", value))
+        }
+        if let value = Int(criteria.response.statusCode.range.lowerBound) {
+            predicates.append(NSPredicate(format: "statusCode >= %d", value))
+        }
+        if let value = Int(criteria.response.statusCode.range.upperBound) {
+            predicates.append(NSPredicate(format: "statusCode <= %d", value))
+        }
+        if let value = criteria.response.duration.durationRange.lowerBound {
+            predicates.append(NSPredicate(format: "duration >= %f", value))
+        }
+        if let value = criteria.response.duration.durationRange.upperBound {
+            predicates.append(NSPredicate(format: "duration <= %f", value))
+        }
+        switch criteria.response.contentType.contentType {
+        case .any: break
+        default: predicates.append(NSPredicate(format: "responseContentType CONTAINS %@", criteria.response.contentType.contentType.rawValue))
+        }
+    }
+
+    if criteria.networking.isEnabled {
+        if criteria.networking.isRedirect {
+            predicates.append(NSPredicate(format: "redirectCount >= 1"))
+        }
+        switch criteria.networking.source {
+        case .any:
+            break
+        case .network:
+            predicates.append(NSPredicate(format: "isFromCache == NO"))
+        case .cache:
+            predicates.append(NSPredicate(format: "isFromCache == YES"))
+        }
+        if case .some(let taskType) = criteria.networking.taskType {
+            predicates.append(NSPredicate(format: "taskType == %i", taskType.rawValue))
+        }
+    }
+
+    if criteria.host.isEnabled, !criteria.host.ignoredHosts.isEmpty {
+        predicates.append(NSPredicate(format: "NOT host.value IN %@", criteria.host.ignoredHosts))
+    }
+
+    if criteria.customNetworkFilters.isEnabled {
+        for filter in criteria.customNetworkFilters.filters where !filter.value.isEmpty {
+            if let predicate = filter.makePredicate() {
+                predicates.append(predicate)
+            } else {
+                // Have to be done in code
+            }
+        }
+    }
+
+    return predicates
 }

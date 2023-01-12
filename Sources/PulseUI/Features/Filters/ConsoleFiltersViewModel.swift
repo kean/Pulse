@@ -53,10 +53,7 @@ final class ConsoleFiltersViewModel: ObservableObject {
     }
 
     var isDefaultForNetwork: Bool {
-        criteria.response == defaultCriteria.response &&
-        criteria.host == defaultCriteria.host &&
-        criteria.networking == defaultCriteria.networking &&
-        criteria.customNetworkFilters == defaultCriteria.customNetworkFilters
+        criteria.network == defaultCriteria.network
     }
 
     func resetAll() {
@@ -152,18 +149,19 @@ final class ConsoleFiltersViewModel: ObservableObject {
     // MARK: Custom Network Filters
 
     func removeFilter(_ filter: ConsoleCustomNetworkFilter) {
-        if let index = criteria.customNetworkFilters.filters.firstIndex(where: { $0.id == filter.id }) {
-            criteria.customNetworkFilters.filters.remove(at: index)
+        if let index = criteria.network.customNetworkFilters.filters.firstIndex(where: { $0.id == filter.id }) {
+            criteria.network.customNetworkFilters.filters.remove(at: index)
         }
-        if criteria.customNetworkFilters.filters.isEmpty {
-            criteria.customNetworkFilters = .default
+#warning("TODO: is this needed? enable remove only when 2+ items")
+        if criteria.network.customNetworkFilters.filters.isEmpty {
+            criteria.network.customNetworkFilters = .default
         }
     }
 
 #warning("TODO: move to ConsoleFilters+extensions")
     var programmaticFilters: [ConsoleCustomNetworkFilter]? {
-        let programmaticFilters = criteria.customNetworkFilters.filters.filter { $0.isProgrammatic && !$0.value.isEmpty }
-        guard !programmaticFilters.isEmpty && criteria.customNetworkFilters.isEnabled else {
+        let programmaticFilters = criteria.network.customNetworkFilters.filters.filter { $0.isProgrammatic && !$0.value.isEmpty }
+        guard !programmaticFilters.isEmpty && criteria.network.customNetworkFilters.isEnabled else {
             return nil
         }
         return programmaticFilters
@@ -173,10 +171,10 @@ final class ConsoleFiltersViewModel: ObservableObject {
 
     func binding(forDomain domain: String) -> Binding<Bool> {
         Binding(get: {
-            !self.criteria.host.ignoredHosts.contains(domain)
+            !self.criteria.network.host.ignoredHosts.contains(domain)
         }, set: { newValue in
-            if self.criteria.host.ignoredHosts.remove(domain) == nil {
-                self.criteria.host.ignoredHosts.insert(domain)
+            if self.criteria.network.host.ignoredHosts.remove(domain) == nil {
+                self.criteria.network.host.ignoredHosts.insert(domain)
             }
         })
     }

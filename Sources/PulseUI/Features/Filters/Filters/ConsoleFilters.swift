@@ -13,12 +13,7 @@ import Combine
 struct ConsoleFilters: Hashable {
     var shared = Shared()
     var messages = Messages()
-
-    // Network
-    var response = Response.default
-    var host = Host.default
-    var networking = Networking.default
-    var customNetworkFilters = CustomNetworkFilters.default
+    var network = Network()
 
     struct Shared: Hashable {
         var dates = Dates.default
@@ -29,6 +24,14 @@ struct ConsoleFilters: Hashable {
         var logLevels: LogLevels = .default
         var labels: Labels = .default
         var custom = CustomMessageFilters.default
+    }
+
+    struct Network: Hashable {
+        var response = Response.default
+        var host = Host.default
+        var networking = Networking.default
+        #warning("TODO: rename")
+        var customNetworkFilters = CustomNetworkFilters.default
     }
 
     static let `default` = ConsoleFilters()
