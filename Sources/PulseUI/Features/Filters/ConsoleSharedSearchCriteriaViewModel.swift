@@ -23,12 +23,8 @@ final class ConsoleSharedSearchCriteriaViewModel: ObservableObject {
 
 
         if store === LoggerStore.shared {
-#if os(iOS) || os(macOS)
             criteria.dates = .session
             defaultDates = .session
-#else
-            criteria.quickDatesFilter = .session
-#endif
         }
 
         $criteria.dropFirst().sink { [weak self] _ in

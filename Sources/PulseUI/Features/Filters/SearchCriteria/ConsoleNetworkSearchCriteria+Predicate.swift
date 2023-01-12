@@ -30,17 +30,6 @@ extension ConsoleNetworkSearchCriteria {
             }
         }
 
-#if os(tvOS) || os(watchOS)
-        if let dates = shared.quickDatesFilter.makeDateFilter() {
-            if let startDate = dates.startDate {
-                predicates.append(NSPredicate(format: "createdAt >= %@", startDate as NSDate))
-            }
-            if let endDate = shared.dates.endDate {
-                predicates.append(NSPredicate(format: "createdAt <= %@", endDate as NSDate))
-            }
-        }
-#endif
-
         if criteria.response.isEnabled {
             if let value = criteria.response.responseSize.byteCountRange.lowerBound {
                 predicates.append(NSPredicate(format: "responseBodySize >= %d", value))

@@ -9,9 +9,6 @@ import Combine
 
 struct ConsoleSharedSearchCriteria: Hashable {
     var dates = ConsoleDatesFilter.default
-#if os(tvOS) || os(watchOS)
-    var quickDatesFilter: ConsoleDatesQuickFilter = .all
-#endif
     var filters = ConsoleGeneralFilters.default
 }
 
@@ -35,26 +32,6 @@ struct ConsoleDatesFilter: Hashable {
         ConsoleDatesFilter(startDate: LoggerStore.launchDate)
     }
 }
-
-#if os(tvOS) || os(watchOS)
-enum ConsoleDatesQuickFilter: String, Hashable, CaseIterable {
-    case session
-    case recent
-    case today
-    case all
-
-    var title: String { rawValue.capitalized }
-
-    func makeDateFilter() -> ConsoleDatesFilter? {
-        switch self {
-        case .session: return .session
-        case .recent: return .recent
-        case .today: return .today
-        case .all: return nil
-        }
-    }
-}
-#endif
 
 struct ConsoleGeneralFilters: Hashable {
     var isEnabled = true
