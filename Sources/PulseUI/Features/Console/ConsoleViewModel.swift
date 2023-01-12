@@ -121,20 +121,9 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         }
         switch mode {
         case .all:
-            ConsoleSearchCriteria.update(
-                request: controller.fetchRequest,
-                filterTerm: filterTerm,
-                criteria: filtersViewModel.criteria,
-                isOnlyErrors: isOnlyErrors
-            )
+            controller.fetchRequest.predicate = ConsoleSearchCriteria.makeMessagePredicates(criteria: filtersViewModel.criteria, isOnlyErrors: isOnlyErrors, filterTerm: filterTerm)
         case .network:
-            ConsoleNetworkSearchCriteria.update(
-                request: controller.fetchRequest,
-                filterTerm: filterTerm,
-                criteria: filtersViewModel.criteria,
-                isOnlyErrors: isOnlyErrors
-            )
-            break
+            controller.fetchRequest.predicate = ConsoleSearchCriteria.makeNetworkPredicates(criteria: filtersViewModel.criteria, isOnlyErrors: isOnlyErrors, filterTerm: filterTerm)
         }
         try? controller.performFetch()
 

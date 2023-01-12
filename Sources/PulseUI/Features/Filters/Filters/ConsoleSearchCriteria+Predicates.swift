@@ -6,52 +6,39 @@ import Foundation
 import Pulse
 import CoreData
 
-#warning("TODO: refactor")
 extension ConsoleSearchCriteria {
-    static func update(
-        request: NSFetchRequest<NSManagedObject>,
-        filterTerm: String,
+    static func makeMessagePredicates(
         criteria: ConsoleSearchCriteria,
-        isOnlyErrors: Bool
-    ) {
+        isOnlyErrors: Bool,
+        filterTerm: String
+    ) -> NSPredicate? {
         var predicates = [NSPredicate]()
-
         if isOnlyErrors {
             predicates.append(NSPredicate(format: "level IN %@", [LoggerStore.Level.critical, .error].map { $0.rawValue }))
         }
-
         predicates += makePredicates(for: criteria.shared)
         predicates += makePredicates(for: criteria.messages)
-
         if filterTerm.count > 1 {
             predicates.append(NSPredicate(format: "text CONTAINS[cd] %@", filterTerm))
         }
-
-        request.predicate = predicates.isEmpty ? nil : NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
+        return predicates.isEmpty ? nil : NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
     }
-}
 
-extension ConsoleNetworkSearchCriteria {
-    static func update(
-        request: NSFetchRequest<NSManagedObject>,
-        filterTerm: String,
+    static func makeNetworkPredicates(
         criteria: ConsoleSearchCriteria,
-        isOnlyErrors: Bool
-    ) {
+        isOnlyErrors: Bool,
+        filterTerm: String
+    ) -> NSPredicate? {
         var predicates = [NSPredicate]()
-
         if isOnlyErrors {
             predicates.append(NSPredicate(format: "requestState == %d", NetworkTaskEntity.State.failure.rawValue))
         }
-
         predicates += makePredicates(for: criteria.shared, isNetwork: true)
         predicates += makePredicates(for: criteria.network)
-
         if filterTerm.count > 1 {
             predicates.append(NSPredicate(format: "url CONTAINS[cd] %@", filterTerm))
         }
-
-        request.predicate = predicates.isEmpty ? nil : NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
+        return predicates.isEmpty ? nil : NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
     }
 }
 
