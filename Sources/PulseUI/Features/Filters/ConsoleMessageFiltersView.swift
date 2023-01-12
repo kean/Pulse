@@ -5,7 +5,6 @@
 import SwiftUI
 import Pulse
 
-#warning("TODO: do we need ViewModel for filters in the first place?")
 struct ConsoleMessageFiltersView: View {
     @ObservedObject var viewModel: ConsoleFiltersViewModel
 

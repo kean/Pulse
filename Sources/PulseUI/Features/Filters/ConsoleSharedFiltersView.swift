@@ -43,20 +43,7 @@ struct ConsoleSharedFiltersView: View {
                 )
             },
             content: {
-#if os(macOS)
-                HStack {
-                    ConsoleFiltersToggleCell(title: "Only Pinned", isOn: $viewModel.criteria.filters.inOnlyPins)
-                    Spacer()
-                    Button.destructive(action: viewModel.removeAllPins) {
-                        Text("Remove Pins")
-                    }
-                }
-#else
-                ConsoleFiltersToggleCell(title: "Only Pinned", isOn: $viewModel.criteria.general.inOnlyPins)
-                Button.destructive(action: viewModel.removeAllPins) {
-                    Text("Remove Pins")
-                }
-#endif
+                ConsoleFiltersPinsCell(selection: $viewModel.criteria.general, removeAll: viewModel.removeAllPins)
             }
         )
     }

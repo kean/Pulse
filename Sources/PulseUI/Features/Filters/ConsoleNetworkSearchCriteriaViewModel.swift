@@ -28,7 +28,7 @@ final class ConsoleNetworkSearchCriteriaViewModel: ObservableObject {
     init(store: LoggerStore) {
         domains = ManagedObjectsObserver(context: store.viewContext, sortDescriptior: NSSortDescriptor(keyPath: \NetworkDomainEntity.count, ascending: false))
 
-        domains.$objects.sink { [weak self] in
+        domains.$objects.sink { [weak  self] in
             self?.allDomains = $0.map(\.value)
         }.store(in: &cancellables)
 
