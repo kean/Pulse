@@ -24,7 +24,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 #endif
 
     // Search criteria
-    let sharedSearchCriteriaViewModel: ConsoleSharedSearchCriteriaViewModel
+    let sharedSearchCriteriaViewModel: ConsoleFiltersViewModel
     let searchCriteriaViewModel: ConsoleMessageSearchCriteriaViewModel
     let networkSearchCriteriaViewModel: ConsoleNetworkSearchCriteriaViewModel
 
@@ -55,7 +55,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         self.mode = mode
         self.isNetworkOnly = mode == .network
 
-        self.sharedSearchCriteriaViewModel = ConsoleSharedSearchCriteriaViewModel(store: store)
+        self.sharedSearchCriteriaViewModel = ConsoleFiltersViewModel(store: store)
         self.searchCriteriaViewModel = ConsoleMessageSearchCriteriaViewModel(store: store)
         self.networkSearchCriteriaViewModel = ConsoleNetworkSearchCriteriaViewModel(store: store)
 

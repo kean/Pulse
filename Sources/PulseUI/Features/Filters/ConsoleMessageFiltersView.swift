@@ -7,7 +7,7 @@ import Pulse
 
 struct ConsoleMessageFiltersView: View {
     @ObservedObject var viewModel: ConsoleMessageSearchCriteriaViewModel
-    @ObservedObject var sharedCriteriaViewModel: ConsoleSharedSearchCriteriaViewModel
+    @ObservedObject var sharedCriteriaViewModel: ConsoleFiltersViewModel
 
 #if os(iOS) || os(tvOS) || os(watchOS)
     var body: some View {
@@ -68,7 +68,6 @@ extension ConsoleMessageFiltersView {
     private var generalHeader: some View {
         ConsoleFilterSectionHeader(
             icon: "line.horizontal.3.decrease.circle", title: "Filters",
-            color: .yellow,
             reset: { viewModel.resetFilters() },
             isDefault: viewModel.isDefaultFilters,
             isEnabled: $viewModel.criteria.isFiltersEnabled
@@ -121,7 +120,6 @@ extension ConsoleMessageFiltersView {
     private var logLevelsHeader: some View {
         ConsoleFilterSectionHeader(
             icon: "flag", title: "Levels",
-            color: .accentColor,
             reset: { viewModel.criteria.logLevels = .default },
             isDefault: viewModel.criteria.logLevels == .default,
             isEnabled: $viewModel.criteria.logLevels.isEnabled
@@ -178,7 +176,6 @@ extension ConsoleMessageFiltersView {
     private var labelsHeader: some View {
         ConsoleFilterSectionHeader(
             icon: "tag", title: "Labels",
-            color: .orange,
             reset: { viewModel.criteria.labels = .default },
             isDefault: viewModel.criteria.labels == .default,
             isEnabled: $viewModel.criteria.labels.isEnabled

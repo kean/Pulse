@@ -7,7 +7,6 @@ import SwiftUI
 struct ConsoleFilterSectionHeader: View {
     let icon: String
     let title: String
-    let color: Color
     let reset: () -> Void
     let isDefault: Bool
     @Binding var isEnabled: Bool

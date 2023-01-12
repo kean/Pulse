@@ -10,7 +10,7 @@ extension ConsoleNetworkSearchCriteria {
     static func update(
         request: NSFetchRequest<NSManagedObject>,
         filterTerm: String,
-        shared: ConsoleSharedSearchCriteria,
+        shared: ConsoleFilters,
         criteria: ConsoleNetworkSearchCriteria,
         filters: [NetworkSearchFilter],
         isOnlyErrors: Bool

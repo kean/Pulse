@@ -7,7 +7,7 @@ import Pulse
 
 struct ConsoleNetworkFiltersView: View {
     @ObservedObject var viewModel: ConsoleNetworkSearchCriteriaViewModel
-    @ObservedObject var sharedCriteriaViewModel: ConsoleSharedSearchCriteriaViewModel
+    @ObservedObject var sharedCriteriaViewModel: ConsoleFiltersViewModel
 
     @State private var isRedirectGroupExpanded = true
     @State private var isDomainsPickerPresented = false
@@ -73,7 +73,6 @@ extension ConsoleNetworkFiltersView {
     private var generalGroupHeader: some View {
         ConsoleFilterSectionHeader(
             icon: "line.horizontal.3.decrease.circle", title: "Filters",
-            color: .yellow,
             reset: { viewModel.resetFilters() },
             isDefault: viewModel.isDefaultFilters,
             isEnabled: $viewModel.criteria.isFiltersEnabled
@@ -127,7 +126,6 @@ extension ConsoleNetworkFiltersView {
     private var responseGroupHeader: some View {
         ConsoleFilterSectionHeader(
             icon: "arrow.down.circle", title: "Response",
-            color: .yellow,
             reset: { viewModel.criteria.response = .default },
             isDefault: viewModel.criteria.response == .default,
             isEnabled: $viewModel.criteria.response.isEnabled
@@ -158,7 +156,6 @@ extension ConsoleNetworkFiltersView {
     private var domainsGroupHeader: some View {
         ConsoleFilterSectionHeader(
             icon: "server.rack", title: "Hosts",
-            color: .yellow,
             reset: { viewModel.criteria.host = .default },
             isDefault: viewModel.criteria.host == .default,
             isEnabled: $viewModel.criteria.host.isEnabled
@@ -243,7 +240,6 @@ extension ConsoleNetworkFiltersView {
     private var networkingGroupHeader: some View {
         ConsoleFilterSectionHeader(
             icon: "arrowshape.zigzag.right", title: "Networking",
-            color: .yellow,
             reset: { viewModel.criteria.networking = .default },
             isDefault: viewModel.criteria.networking == .default,
             isEnabled: $viewModel.criteria.networking.isEnabled

@@ -11,7 +11,7 @@ extension ConsoleMessageSearchCriteria {
     static func update(
         request: NSFetchRequest<NSManagedObject>,
         filterTerm: String,
-        shared: ConsoleSharedSearchCriteria,
+        shared: ConsoleFilters,
         criteria: ConsoleMessageSearchCriteria,
         filters: [ConsoleSearchFilter],
         isOnlyErrors: Bool

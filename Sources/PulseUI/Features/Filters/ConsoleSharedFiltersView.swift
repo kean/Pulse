@@ -6,7 +6,7 @@ import SwiftUI
 import Pulse
 
 struct ConsoleSharedFiltersView: View {
-    @ObservedObject var viewModel: ConsoleSharedSearchCriteriaViewModel
+    @ObservedObject var viewModel: ConsoleFiltersViewModel
 
     var body: some View {
         sectionTimePeriod
@@ -23,7 +23,6 @@ struct ConsoleSharedFiltersView: View {
     private var timePeriodHeader: some View {
         ConsoleFilterSectionHeader(
             icon: "calendar", title: "Time Period",
-            color: .yellow,
             reset: viewModel.resetDates,
             isDefault: viewModel.isDatesDefault,
             isEnabled: $viewModel.criteria.dates.isEnabled
@@ -37,7 +36,6 @@ struct ConsoleSharedFiltersView: View {
             header: {
                 ConsoleFilterSectionHeader(
                     icon: "gear", title: "General",
-                    color: .blue,
                     reset: { viewModel.criteria.filters = .default },
                     isDefault: viewModel.criteria.filters == .default,
                     isEnabled: $viewModel.criteria.filters.isEnabled
