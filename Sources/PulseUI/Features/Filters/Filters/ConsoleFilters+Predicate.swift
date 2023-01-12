@@ -34,17 +34,17 @@ extension ConsoleFilters {
             predicates.append(NSPredicate(format: "level IN %@", [LoggerStore.Level.critical, .error].map { $0.rawValue }))
         }
 
-        if criteria.logLevels.isEnabled {
-            if criteria.logLevels.levels.count != LoggerStore.Level.allCases.count {
-                predicates.append(NSPredicate(format: "level IN %@", Array(criteria.logLevels.levels.map { $0.rawValue })))
+        if criteria.messages.logLevels.isEnabled {
+            if criteria.messages.logLevels.levels.count != LoggerStore.Level.allCases.count {
+                predicates.append(NSPredicate(format: "level IN %@", Array(criteria.messages.logLevels.levels.map { $0.rawValue })))
             }
         }
 
-        if criteria.labels.isEnabled {
-            if let focusedLabel = criteria.labels.focused {
+        if criteria.messages.labels.isEnabled {
+            if let focusedLabel = criteria.messages.labels.focused {
                 predicates.append(NSPredicate(format: "label.name == %@", focusedLabel))
-            } else if !criteria.labels.hidden.isEmpty {
-                predicates.append(NSPredicate(format: "NOT label.name IN %@", Array(criteria.labels.hidden)))
+            } else if !criteria.messages.labels.hidden.isEmpty {
+                predicates.append(NSPredicate(format: "NOT label.name IN %@", Array(criteria.messages.labels.hidden)))
             }
         }
 
@@ -52,8 +52,8 @@ extension ConsoleFilters {
             predicates.append(NSPredicate(format: "text CONTAINS[cd] %@", filterTerm))
         }
 
-        if criteria.custom.isEnabled {
-            for filter in criteria.custom.filters where !filter.value.isEmpty {
+        if criteria.messages.custom.isEnabled {
+            for filter in criteria.messages.custom.filters where !filter.value.isEmpty {
                 if let predicate = filter.makePredicate() {
                     predicates.append(predicate)
                 } else {

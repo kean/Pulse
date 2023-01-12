@@ -47,10 +47,9 @@ final class ConsoleFiltersViewModel: ObservableObject {
         criteria == defaultCriteria
     }
 
+    #warning("TODO: remove this")
     var isDefaultForMessages: Bool {
-        criteria.logLevels == defaultCriteria.logLevels &&
-        criteria.labels == defaultCriteria.labels &&
-        criteria.custom == defaultCriteria.custom
+        criteria.messages == defaultCriteria.messages
     }
 
     var isDefaultForNetwork: Bool {
@@ -83,12 +82,12 @@ final class ConsoleFiltersViewModel: ObservableObject {
 
     func binding(forLevel level: LoggerStore.Level) -> Binding<Bool> {
         Binding(get: {
-            self.criteria.logLevels.levels.contains(level)
+            self.criteria.messages.logLevels.levels.contains(level)
         }, set: { isOn in
             if isOn {
-                self.criteria.logLevels.levels.insert(level)
+                self.criteria.messages.logLevels.levels.insert(level)
             } else {
-                self.criteria.logLevels.levels.remove(level)
+                self.criteria.messages.logLevels.levels.remove(level)
             }
         })
     }
@@ -96,12 +95,12 @@ final class ConsoleFiltersViewModel: ObservableObject {
     /// Returns binding for toggling all log levels.
     var bindingForTogglingAllLevels: Binding<Bool> {
         Binding(get: {
-            self.criteria.logLevels.levels.count == LoggerStore.Level.allCases.count
+            self.criteria.messages.logLevels.levels.count == LoggerStore.Level.allCases.count
         }, set: { isOn in
             if isOn {
-                self.criteria.logLevels.levels = Set(LoggerStore.Level.allCases)
+                self.criteria.messages.logLevels.levels = Set(LoggerStore.Level.allCases)
             } else {
-                self.criteria.logLevels.levels = Set()
+                self.criteria.messages.logLevels.levels = Set()
             }
         })
     }
@@ -110,30 +109,30 @@ final class ConsoleFiltersViewModel: ObservableObject {
 
     func binding(forLabel label: String) -> Binding<Bool> {
         Binding(get: {
-            if let focused = self.criteria.labels.focused {
+            if let focused = self.criteria.messages.labels.focused {
                 return label == focused
             } else {
-                return !self.criteria.labels.hidden.contains(label)
+                return !self.criteria.messages.labels.hidden.contains(label)
             }
         }, set: { isOn in
-            self.criteria.labels.focused = nil
+            self.criteria.messages.labels.focused = nil
             if isOn {
-                self.criteria.labels.hidden.remove(label)
+                self.criteria.messages.labels.hidden.remove(label)
             } else {
-                self.criteria.labels.hidden.insert(label)
+                self.criteria.messages.labels.hidden.insert(label)
             }
         })
     }
 
     var bindingForTogglingAllLabels: Binding<Bool> {
         Binding(get: {
-            self.criteria.labels.hidden.isEmpty
+            self.criteria.messages.labels.hidden.isEmpty
         }, set: { isOn in
-            self.criteria.labels.focused = nil
+            self.criteria.messages.labels.focused = nil
             if isOn {
-                self.criteria.labels.hidden = []
+                self.criteria.messages.labels.hidden = []
             } else {
-                self.criteria.labels.hidden = Set(self.labels.objects.map(\.name))
+                self.criteria.messages.labels.hidden = Set(self.labels.objects.map(\.name))
             }
         })
     }
@@ -142,11 +141,11 @@ final class ConsoleFiltersViewModel: ObservableObject {
 
 #warning("TODO: move to the view & use binding for this")
     func remove(_ filter: ConsoleCustomMessageFilter) {
-        if let index = criteria.custom.filters.firstIndex(where: { $0.id == filter.id }) {
-            criteria.custom.filters.remove(at: index)
+        if let index = criteria.messages.custom.filters.firstIndex(where: { $0.id == filter.id }) {
+            criteria.messages.custom.filters.remove(at: index)
         }
-        if criteria.custom.filters.isEmpty {
-            criteria.custom = .default
+        if criteria.messages.custom.filters.isEmpty {
+            criteria.messages.custom = .default
         }
     }
 

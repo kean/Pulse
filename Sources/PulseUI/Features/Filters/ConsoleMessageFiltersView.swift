@@ -63,7 +63,7 @@ extension ConsoleMessageFiltersView {
     }
 
     private var generalHeader: some View {
-        ConsoleFilterSectionHeader(icon: "line.horizontal.3.decrease.circle", title: "Filters", filter: $viewModel.criteria.custom)
+        ConsoleFilterSectionHeader(icon: "line.horizontal.3.decrease.circle", title: "Filters", filter: $viewModel.criteria.messages.custom)
     }
 
 #if os(iOS) || os(tvOS)
@@ -71,7 +71,7 @@ extension ConsoleMessageFiltersView {
     private var generalContent: some View {
         customFiltersList
         if !isCustomFiltersDefault {
-            Button(action: { viewModel.criteria.custom.filters.append(.default) }) {
+            Button(action: { viewModel.criteria.messages.custom.filters.append(.default) }) {
                 Text("Add Filter").frame(maxWidth: .infinity)
             }
         }
@@ -92,13 +92,13 @@ extension ConsoleMessageFiltersView {
 #endif
 
     private var customFiltersList: some View {
-        ForEach($viewModel.criteria.custom.filters) { filter in
+        ForEach($viewModel.criteria.messages.custom.filters) { filter in
             ConsoleCustomMessageFilterView(filter: filter, onRemove: isCustomFiltersDefault ? nil  : { viewModel.remove(filter.wrappedValue) })
         }
     }
 
     private var isCustomFiltersDefault: Bool {
-        viewModel.criteria.custom == .default
+        viewModel.criteria.messages.custom == .default
     }
 }
 #endif
@@ -114,7 +114,7 @@ extension ConsoleMessageFiltersView {
     }
 
     private var logLevelsHeader: some View {
-        ConsoleFilterSectionHeader(icon: "flag", title: "Levels", filter: $viewModel.criteria.logLevels)
+        ConsoleFilterSectionHeader(icon: "flag", title: "Levels", filter: $viewModel.criteria.messages.logLevels)
     }
 
 #if os(macOS)
@@ -165,7 +165,7 @@ extension ConsoleMessageFiltersView {
     }
 
     private var labelsHeader: some View {
-        ConsoleFilterSectionHeader(icon: "tag", title: "Labels", filter: $viewModel.criteria.labels)
+        ConsoleFilterSectionHeader(icon: "tag", title: "Labels", filter: $viewModel.criteria.messages.labels)
     }
 
 #if os(macOS)

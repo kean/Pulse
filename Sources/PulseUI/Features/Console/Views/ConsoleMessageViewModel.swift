@@ -47,13 +47,13 @@ final class ConsoleMessageViewModel: Pinnable {
     }
     
     func focus() {
-        filtersViewModel?.criteria.labels.isEnabled = true
-        filtersViewModel?.criteria.labels.focused = message.label.name
+        filtersViewModel?.criteria.messages.labels.isEnabled = true
+        filtersViewModel?.criteria.messages.labels.focused = message.label.name
     }
     
     func hide() {
-        filtersViewModel?.criteria.labels.isEnabled = true
-        filtersViewModel?.criteria.labels.hidden.insert(message.label.name)
+        filtersViewModel?.criteria.messages.labels.isEnabled = true
+        filtersViewModel?.criteria.messages.labels.hidden.insert(message.label.name)
     }
 #endif
 }

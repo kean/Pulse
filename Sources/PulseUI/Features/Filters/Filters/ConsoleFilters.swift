@@ -12,11 +12,7 @@ import Combine
 #warning("TODO: move isOnlyErrors here ?")
 struct ConsoleFilters: Hashable {
     var shared = Shared()
-
-    // Messages
-    var logLevels: LogLevels = .default
-    var labels: Labels = .default
-    var custom = CustomMessageFilters.default
+    var messages = Messages()
 
     // Network
     var response = Response.default
@@ -27,6 +23,12 @@ struct ConsoleFilters: Hashable {
     struct Shared: Hashable {
         var dates = Dates.default
         var general = General.default
+    }
+
+    struct Messages: Hashable {
+        var logLevels: LogLevels = .default
+        var labels: Labels = .default
+        var custom = CustomMessageFilters.default
     }
 
     static let `default` = ConsoleFilters()
