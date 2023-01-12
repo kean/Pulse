@@ -36,9 +36,9 @@ struct ConsoleSharedFiltersView: View {
             header: {
                 ConsoleFilterSectionHeader(
                     icon: "gear", title: "General",
-                    reset: { viewModel.criteria.filters = .default },
-                    isDefault: viewModel.criteria.filters == .default,
-                    isEnabled: $viewModel.criteria.filters.isEnabled
+                    reset: { viewModel.criteria.general = .default },
+                    isDefault: viewModel.criteria.general == .default,
+                    isEnabled: $viewModel.criteria.general.isEnabled
                 )
             },
             content: {
@@ -51,7 +51,7 @@ struct ConsoleSharedFiltersView: View {
                     }
                 }
 #else
-                ConsoleFiltersToggleCell(title: "Only Pinned", isOn: $viewModel.criteria.filters.inOnlyPins)
+                ConsoleFiltersToggleCell(title: "Only Pinned", isOn: $viewModel.criteria.general.inOnlyPins)
                 Button.destructive(action: viewModel.removeAllPins) {
                     Text("Remove Pins")
                 }

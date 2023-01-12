@@ -7,8 +7,7 @@ import Pulse
 
 #warning("TODO: do we need ViewModel for filters in the first place?")
 struct ConsoleMessageFiltersView: View {
-    @ObservedObject var viewModel: ConsoleMessageSearchCriteriaViewModel
-    @ObservedObject var sharedCriteriaViewModel: ConsoleFiltersViewModel
+    @ObservedObject var viewModel: ConsoleFiltersViewModel
 
 #if os(iOS) || os(tvOS) || os(watchOS)
     var body: some View {
@@ -36,7 +35,7 @@ extension ConsoleMessageFiltersView {
             buttonReset
         }
 #endif
-        ConsoleSharedFiltersView(viewModel: sharedCriteriaViewModel)
+        ConsoleSharedFiltersView(viewModel: viewModel)
 #if os(iOS) || os(macOS)
         if #available(iOS 15, *) {
             generalSection
@@ -47,10 +46,8 @@ extension ConsoleMessageFiltersView {
     }
 
     var buttonReset: some View {
-        Button("Reset") {
-            viewModel.resetAll()
-            sharedCriteriaViewModel.resetAll()
-        }.disabled(!(viewModel.isButtonResetEnabled || sharedCriteriaViewModel.isButtonResetEnabled))
+        Button("Reset", action: viewModel.resetAll)
+            .disabled(!viewModel.isButtonResetEnabled)
     }
 }
 
@@ -69,9 +66,9 @@ extension ConsoleMessageFiltersView {
     private var generalHeader: some View {
         ConsoleFilterSectionHeader(
             icon: "line.horizontal.3.decrease.circle", title: "Filters",
-            reset: { sharedCriteriaViewModel.criteria.custom = .default },
-            isDefault: sharedCriteriaViewModel.criteria.custom == .default,
-            isEnabled: $sharedCriteriaViewModel.criteria.custom.isEnabled
+            reset: { viewModel.criteria.custom = .default },
+            isDefault: viewModel.criteria.custom == .default,
+            isEnabled: $viewModel.criteria.custom.isEnabled
         )
     }
 
@@ -80,7 +77,7 @@ extension ConsoleMessageFiltersView {
     private var generalContent: some View {
         customFiltersList
         if !isCustomFiltersDefault {
-            Button(action: { sharedCriteriaViewModel.criteria.custom.filters.append(.default) }) {
+            Button(action: { viewModel.criteria.custom.filters.append(.default) }) {
                 Text("Add Filter").frame(maxWidth: .infinity)
             }
         }
@@ -101,13 +98,13 @@ extension ConsoleMessageFiltersView {
 #endif
 
     private var customFiltersList: some View {
-        ForEach($sharedCriteriaViewModel.criteria.custom.filters) { filter in
-            ConsoleCustomMessageFilterView(filter: filter, onRemove: isCustomFiltersDefault ? nil  : { sharedCriteriaViewModel.remove(filter.wrappedValue) })
+        ForEach($viewModel.criteria.custom.filters) { filter in
+            ConsoleCustomMessageFilterView(filter: filter, onRemove: isCustomFiltersDefault ? nil  : { viewModel.remove(filter.wrappedValue) })
         }
     }
 
     private var isCustomFiltersDefault: Bool {
-        sharedCriteriaViewModel.criteria.custom == .default
+        viewModel.criteria.custom == .default
     }
 }
 #endif
@@ -125,9 +122,9 @@ extension ConsoleMessageFiltersView {
     private var logLevelsHeader: some View {
         ConsoleFilterSectionHeader(
             icon: "flag", title: "Levels",
-            reset: { sharedCriteriaViewModel.criteria.logLevels = .default },
-            isDefault: sharedCriteriaViewModel.criteria.logLevels == .default,
-            isEnabled: $sharedCriteriaViewModel.criteria.logLevels.isEnabled
+            reset: { viewModel.criteria.logLevels = .default },
+            isDefault: viewModel.criteria.logLevels == .default,
+            isEnabled: $viewModel.criteria.logLevels.isEnabled
         )
     }
 
@@ -159,10 +156,10 @@ extension ConsoleMessageFiltersView {
     @ViewBuilder
     private var logLevelsContent: some View {
         ForEach(LoggerStore.Level.allCases, id: \.self) { level in
-            Checkbox(level.name.capitalized, isOn: sharedCriteriaViewModel.binding(forLevel: level))
+            Checkbox(level.name.capitalized, isOn: viewModel.binding(forLevel: level))
         }
-        Button(sharedCriteriaViewModel.bindingForTogglingAllLevels.wrappedValue ? "Disable All" : "Enable All") {
-            sharedCriteriaViewModel.bindingForTogglingAllLevels.wrappedValue.toggle()
+        Button(viewModel.bindingForTogglingAllLevels.wrappedValue ? "Disable All" : "Enable All") {
+            viewModel.bindingForTogglingAllLevels.wrappedValue.toggle()
         }
     }
 #endif
@@ -181,9 +178,9 @@ extension ConsoleMessageFiltersView {
     private var labelsHeader: some View {
         ConsoleFilterSectionHeader(
             icon: "tag", title: "Labels",
-            reset: { sharedCriteriaViewModel.criteria.labels = .default },
-            isDefault: sharedCriteriaViewModel.criteria.labels == .default,
-            isEnabled: $sharedCriteriaViewModel.criteria.labels.isEnabled
+            reset: { viewModel.criteria.labels = .default },
+            isDefault: viewModel.criteria.labels == .default,
+            isEnabled: $viewModel.criteria.labels.isEnabled
         )
     }
 
@@ -204,7 +201,7 @@ extension ConsoleMessageFiltersView {
 #else
     @ViewBuilder
     private var labelsContent: some View {
-        let labels = sharedCriteriaViewModel.labels.objects.map(\.name)
+        let labels = viewModel.labels.objects.map(\.name)
 
         if labels.isEmpty {
             Text("No Labels")
@@ -212,10 +209,10 @@ extension ConsoleMessageFiltersView {
                 .foregroundColor(.secondary)
         } else {
             ForEach(labels.prefix(4), id: \.self) { item in
-                Checkbox(item.capitalized, isOn: sharedCriteriaViewModel.binding(forLabel: item))
+                Checkbox(item.capitalized, isOn: viewModel.binding(forLabel: item))
             }
             if labels.count > 4 {
-                NavigationLink(destination: ConsoleFiltersLabelsPickerView(viewModel: sharedCriteriaViewModel)) {
+                NavigationLink(destination: ConsoleFiltersLabelsPickerView(viewModel: viewModel)) {
                     Text("View All").foregroundColor(.blue)
                 }
             }
@@ -228,17 +225,13 @@ extension ConsoleMessageFiltersView {
 struct ConsoleMessageFiltersView_Previews: PreviewProvider {
     static var previews: some View {
 #if os(macOS)
-        ConsoleMessageFiltersView(viewModel: makeMockViewModel(), sharedCriteriaViewModel: .init(store: .mock))
+        ConsoleMessageFiltersView(viewModel: .init(store: .mock))
             .previewLayout(.fixed(width: 320, height: 900))
 #else
         NavigationView {
-            ConsoleMessageFiltersView(viewModel: makeMockViewModel(), sharedCriteriaViewModel: .init(store: .mock))
+            ConsoleMessageFiltersView(viewModel: .init(store: .mock))
         }.navigationViewStyle(.stack)
 #endif
     }
-}
-
-private func makeMockViewModel() -> ConsoleMessageSearchCriteriaViewModel {
-    ConsoleMessageSearchCriteriaViewModel(store: .mock)
 }
 #endif

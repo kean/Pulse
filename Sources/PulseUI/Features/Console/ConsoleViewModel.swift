@@ -25,12 +25,11 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 
     // Search criteria
     let sharedSearchCriteriaViewModel: ConsoleFiltersViewModel
-    let searchCriteriaViewModel: ConsoleMessageSearchCriteriaViewModel
     let networkSearchCriteriaViewModel: ConsoleNetworkSearchCriteriaViewModel
 
     var isDefaultFilters: Bool {
         switch mode {
-        case .all: return searchCriteriaViewModel.isDefaultSearchCriteria && sharedSearchCriteriaViewModel.isDefaultSearchCriteria
+        case .all: return sharedSearchCriteriaViewModel.isDefaultSearchCriteria
         case .network: return networkSearchCriteriaViewModel.isDefaultSearchCriteria && sharedSearchCriteriaViewModel.isDefaultSearchCriteria
         }
     }
@@ -56,7 +55,6 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         self.isNetworkOnly = mode == .network
 
         self.sharedSearchCriteriaViewModel = ConsoleFiltersViewModel(store: store)
-        self.searchCriteriaViewModel = ConsoleMessageSearchCriteriaViewModel(store: store)
         self.networkSearchCriteriaViewModel = ConsoleNetworkSearchCriteriaViewModel(store: store)
 
 #if os(iOS) || os(macOS)
@@ -75,10 +73,6 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         }.store(in: &cancellables)
 
         sharedSearchCriteriaViewModel.dataNeedsReload.throttle(for: 0.5, scheduler: DispatchQueue.main, latest: true).sink { [weak self] in
-            self?.refreshNow()
-        }.store(in: &cancellables)
-
-        searchCriteriaViewModel.dataNeedsReload.throttle(for: 0.5, scheduler: DispatchQueue.main, latest: true).sink { [weak self] in
             self?.refreshNow()
         }.store(in: &cancellables)
 
@@ -144,9 +138,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
             ConsoleMessageSearchCriteria.update(
                 request: controller.fetchRequest,
                 filterTerm: filterTerm,
-                shared: sharedSearchCriteriaViewModel.criteria,
-                criteria: searchCriteriaViewModel.criteria,
-                filters: searchCriteriaViewModel.filters,
+                criteria: sharedSearchCriteriaViewModel.criteria,
                 isOnlyErrors: isOnlyErrors
             )
         case .network:

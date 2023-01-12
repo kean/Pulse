@@ -11,7 +11,7 @@ import Combine
 struct ConsoleFilters: Hashable {
     // Shared
     var dates = Dates.default
-    var filters = General.default
+    var general = General.default
 
     // Messages
     var logLevels: LogLevels = .default

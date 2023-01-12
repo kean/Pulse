@@ -11,7 +11,7 @@ struct ConsoleFiltersView: View {
     var body: some View {
         switch viewModel.mode {
         case .all:
-            ConsoleMessageFiltersView(viewModel: viewModel.searchCriteriaViewModel, sharedCriteriaViewModel: viewModel.sharedSearchCriteriaViewModel)
+            ConsoleMessageFiltersView(viewModel: viewModel.sharedSearchCriteriaViewModel)
         case .network:
             ConsoleNetworkFiltersView(viewModel: viewModel.networkSearchCriteriaViewModel, sharedCriteriaViewModel: viewModel.sharedSearchCriteriaViewModel)
         }

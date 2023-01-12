@@ -11,24 +11,22 @@ extension ConsoleMessageSearchCriteria {
     static func update(
         request: NSFetchRequest<NSManagedObject>,
         filterTerm: String,
-        shared: ConsoleFilters,
-        criteria: ConsoleMessageSearchCriteria,
-        filters: [ConsoleCustomMessageFilter],
+        criteria: ConsoleFilters,
         isOnlyErrors: Bool
     ) {
         var predicates = [NSPredicate]()
 
-        if shared.dates.isEnabled {
-            if let startDate = shared.dates.startDate {
+        if criteria.dates.isEnabled {
+            if let startDate = criteria.dates.startDate {
                 predicates.append(NSPredicate(format: "createdAt >= %@", startDate as NSDate))
             }
-            if let endDate = shared.dates.endDate {
+            if let endDate = criteria.dates.endDate {
                 predicates.append(NSPredicate(format: "createdAt <= %@", endDate as NSDate))
             }
         }
 
-        if shared.filters.isEnabled {
-            if shared.filters.inOnlyPins {
+        if criteria.general.isEnabled {
+            if criteria.general.inOnlyPins {
                 predicates.append(NSPredicate(format: "isPinned == YES"))
             }
         }
@@ -37,17 +35,17 @@ extension ConsoleMessageSearchCriteria {
             predicates.append(NSPredicate(format: "level IN %@", [LoggerStore.Level.critical, .error].map { $0.rawValue }))
         }
 
-        if shared.logLevels.isEnabled {
-            if shared.logLevels.levels.count != LoggerStore.Level.allCases.count {
-                predicates.append(NSPredicate(format: "level IN %@", Array(shared.logLevels.levels.map { $0.rawValue })))
+        if criteria.logLevels.isEnabled {
+            if criteria.logLevels.levels.count != LoggerStore.Level.allCases.count {
+                predicates.append(NSPredicate(format: "level IN %@", Array(criteria.logLevels.levels.map { $0.rawValue })))
             }
         }
 
-        if shared.labels.isEnabled {
-            if let focusedLabel = shared.labels.focused {
+        if criteria.labels.isEnabled {
+            if let focusedLabel = criteria.labels.focused {
                 predicates.append(NSPredicate(format: "label.name == %@", focusedLabel))
-            } else if !shared.labels.hidden.isEmpty {
-                predicates.append(NSPredicate(format: "NOT label.name IN %@", Array(shared.labels.hidden)))
+            } else if !criteria.labels.hidden.isEmpty {
+                predicates.append(NSPredicate(format: "NOT label.name IN %@", Array(criteria.labels.hidden)))
             }
         }
 
@@ -55,8 +53,8 @@ extension ConsoleMessageSearchCriteria {
             predicates.append(NSPredicate(format: "text CONTAINS[cd] %@", filterTerm))
         }
 
-        if criteria.isFiltersEnabled {
-            for filter in filters where !filter.value.isEmpty {
+        if criteria.custom.isEnabled {
+            for filter in criteria.custom.filters where !filter.value.isEmpty {
                 if let predicate = filter.makePredicate() {
                     predicates.append(predicate)
                 } else {

@@ -46,8 +46,7 @@ final class ConsoleFiltersViewModel: ObservableObject {
     }
 
     func resetAll() {
-        resetDates()
-        criteria.filters = .default
+        criteria = defaultCriteria
         isButtonResetEnabled = false
     }
 

@@ -80,8 +80,8 @@ extension ConsoleNetworkSearchCriteria {
             predicates.append(NSPredicate(format: "url CONTAINS[cd] %@", filterTerm))
         }
 
-        if shared.filters.isEnabled {
-            if shared.filters.inOnlyPins {
+        if shared.general.isEnabled {
+            if shared.general.inOnlyPins {
                 predicates.append(NSPredicate(format: "message.isPinned == YES"))
             }
         }

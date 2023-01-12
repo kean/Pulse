@@ -148,7 +148,6 @@
 		0CF0D649296F189600EED9D4 /* DateRangePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5C0296F189500EED9D4 /* DateRangePicker.swift */; };
 		0CF0D64A296F189600EED9D4 /* ConsoleFilterSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5C1296F189500EED9D4 /* ConsoleFilterSection.swift */; };
 		0CF0D64B296F189600EED9D4 /* RangePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5C2296F189500EED9D4 /* RangePicker.swift */; };
-		0CF0D64C296F189600EED9D4 /* ConsoleMessageSearchCriteriaViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5C3296F189500EED9D4 /* ConsoleMessageSearchCriteriaViewModel.swift */; };
 		0CF0D64D296F189600EED9D4 /* ConsoleFiltersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5C4296F189500EED9D4 /* ConsoleFiltersView.swift */; };
 		0CF0D64E296F189600EED9D4 /* ConsoleNetworkSearchCriteria.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5C6296F189500EED9D4 /* ConsoleNetworkSearchCriteria.swift */; };
 		0CF0D64F296F189600EED9D4 /* ConsoleNetworkSearchCriteria+Predicate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5C7296F189500EED9D4 /* ConsoleNetworkSearchCriteria+Predicate.swift */; };
@@ -603,7 +602,6 @@
 		0CF0D5C0296F189500EED9D4 /* DateRangePicker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DateRangePicker.swift; sourceTree = "<group>"; };
 		0CF0D5C1296F189500EED9D4 /* ConsoleFilterSection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleFilterSection.swift; sourceTree = "<group>"; };
 		0CF0D5C2296F189500EED9D4 /* RangePicker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RangePicker.swift; sourceTree = "<group>"; };
-		0CF0D5C3296F189500EED9D4 /* ConsoleMessageSearchCriteriaViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleMessageSearchCriteriaViewModel.swift; sourceTree = "<group>"; };
 		0CF0D5C4296F189500EED9D4 /* ConsoleFiltersView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleFiltersView.swift; sourceTree = "<group>"; };
 		0CF0D5C6296F189500EED9D4 /* ConsoleNetworkSearchCriteria.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleNetworkSearchCriteria.swift; sourceTree = "<group>"; };
 		0CF0D5C7296F189500EED9D4 /* ConsoleNetworkSearchCriteria+Predicate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ConsoleNetworkSearchCriteria+Predicate.swift"; sourceTree = "<group>"; };
@@ -1211,7 +1209,6 @@
 				0CF0D5B5296F189500EED9D4 /* ConsoleNetworkFiltersView.swift */,
 				0CF0D5B7296F189500EED9D4 /* ConsoleMessageFiltersView.swift */,
 				0CF0D5B8296F189500EED9D4 /* ConsoleSharedFiltersView.swift */,
-				0CF0D5C3296F189500EED9D4 /* ConsoleMessageSearchCriteriaViewModel.swift */,
 				0CF0D5C4296F189500EED9D4 /* ConsoleFiltersView.swift */,
 				0CF0D5B6296F189500EED9D4 /* ConsoleFiltersViewModel.swift */,
 			);
@@ -2020,7 +2017,6 @@
 				0CF0D63D296F189600EED9D4 /* MockStoreConfiguration.swift in Sources */,
 				0CF0D621296F189600EED9D4 /* UITableView+Extensions.swift in Sources */,
 				0CF0D655296F189600EED9D4 /* SettingsView.swift in Sources */,
-				0CF0D64C296F189600EED9D4 /* ConsoleMessageSearchCriteriaViewModel.swift in Sources */,
 				0C40C09C296F78C6009ECF16 /* ConsoleFiltersDurationCell.swift in Sources */,
 				0C40C09E296F7B0A009ECF16 /* ConsoleFiltersResponseSizeCell.swift in Sources */,
 				0CF0D667296F189600EED9D4 /* NetworkResponseBodyCell.swift in Sources */,
