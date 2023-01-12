@@ -7,6 +7,7 @@
 - Update minimum requirements: Swift 5.7 | Xcode 14.0  | iOS 14.0, tvOS 14.0, watchOS 7.0, macOS 12.0
 - Add `ConsoleView.network` to other platforms (originally was added only on iOS)
 - New filters design on macOS
+- Add missing "Remove Pins" button on macOS
 - Fix an issue where using "Recent" date filter was applying "Session" filter instead
 
 ## Pulse 3.0.0
