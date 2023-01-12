@@ -37,9 +37,9 @@ extension ConsoleMessageSearchCriteria {
             predicates.append(NSPredicate(format: "level IN %@", [LoggerStore.Level.critical, .error].map { $0.rawValue }))
         }
 
-        if criteria.logLevels.isEnabled {
-            if criteria.logLevels.levels.count != LoggerStore.Level.allCases.count {
-                predicates.append(NSPredicate(format: "level IN %@", Array(criteria.logLevels.levels.map { $0.rawValue })))
+        if shared.logLevels.isEnabled {
+            if shared.logLevels.levels.count != LoggerStore.Level.allCases.count {
+                predicates.append(NSPredicate(format: "level IN %@", Array(shared.logLevels.levels.map { $0.rawValue })))
             }
         }
 

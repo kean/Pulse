@@ -66,4 +66,32 @@ final class ConsoleFiltersViewModel: ObservableObject {
         }.show()
 #endif
     }
+
+    // MARK: Binding (ConsoleFilters.LogLevel)
+
+    func binding(forLevel level: LoggerStore.Level) -> Binding<Bool> {
+        Binding(get: {
+            self.criteria.logLevels.levels.contains(level)
+        }, set: { isOn in
+            if isOn {
+                self.criteria.logLevels.levels.insert(level)
+            } else {
+                self.criteria.logLevels.levels.remove(level)
+            }
+        })
+    }
+
+    /// Returns binding for toggling all log levels.
+    var bindingForTogglingAllLevels: Binding<Bool> {
+        Binding(get: {
+            self.criteria.logLevels.levels.count == LoggerStore.Level.allCases.count
+        }, set: { isOn in
+            if isOn {
+                self.criteria.logLevels.levels = Set(LoggerStore.Level.allCases)
+            } else {
+                self.criteria.logLevels.levels = Set()
+            }
+        })
+    }
+
 }

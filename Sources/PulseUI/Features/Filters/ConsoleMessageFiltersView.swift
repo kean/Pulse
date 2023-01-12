@@ -120,9 +120,9 @@ extension ConsoleMessageFiltersView {
     private var logLevelsHeader: some View {
         ConsoleFilterSectionHeader(
             icon: "flag", title: "Levels",
-            reset: { viewModel.criteria.logLevels = .default },
-            isDefault: viewModel.criteria.logLevels == .default,
-            isEnabled: $viewModel.criteria.logLevels.isEnabled
+            reset: { sharedCriteriaViewModel.criteria.logLevels = .default },
+            isDefault: sharedCriteriaViewModel.criteria.logLevels == .default,
+            isEnabled: $sharedCriteriaViewModel.criteria.logLevels.isEnabled
         )
     }
 
@@ -154,10 +154,10 @@ extension ConsoleMessageFiltersView {
     @ViewBuilder
     private var logLevelsContent: some View {
         ForEach(LoggerStore.Level.allCases, id: \.self) { level in
-            Checkbox(level.name.capitalized, isOn: viewModel.binding(forLevel: level))
+            Checkbox(level.name.capitalized, isOn: sharedCriteriaViewModel.binding(forLevel: level))
         }
-        Button(viewModel.bindingForTogglingAllLevels.wrappedValue ? "Disable All" : "Enable All") {
-            viewModel.bindingForTogglingAllLevels.wrappedValue.toggle()
+        Button(sharedCriteriaViewModel.bindingForTogglingAllLevels.wrappedValue ? "Disable All" : "Enable All") {
+            sharedCriteriaViewModel.bindingForTogglingAllLevels.wrappedValue.toggle()
         }
     }
 #endif

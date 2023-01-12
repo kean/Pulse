@@ -8,8 +8,12 @@ import CoreData
 import Combine
 
 struct ConsoleFilters: Hashable {
+    // Shared
     var dates = Dates.default
     var filters = General.default
+
+    // Messages
+    var logLevels: LogLevels = .default
 }
 
 extension ConsoleFilters {
@@ -39,5 +43,13 @@ extension ConsoleFilters {
         var inOnlyPins = false
 
         static let `default` = General()
+    }
+
+    struct LogLevels: Hashable {
+        var isEnabled = true
+        var levels: Set<LoggerStore.Level> = Set(LoggerStore.Level.allCases)
+            .subtracting([LoggerStore.Level.trace])
+
+        static let `default` = LogLevels()
     }
 }

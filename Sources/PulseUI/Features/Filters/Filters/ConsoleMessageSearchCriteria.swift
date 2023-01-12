@@ -11,17 +11,7 @@ import Combine
 struct ConsoleMessageSearchCriteria: Hashable {
     var isFiltersEnabled = true
 
-    var logLevels: LogLevelsFilter = .default
     var labels: LabelsFilter = .default
-
-    struct LogLevelsFilter: Hashable {
-        var isEnabled = true
-        var levels = LogLevelsFilter.defaultLogLevels
-
-        static let defaultLogLevels = Set(LoggerStore.Level.allCases).subtracting([LoggerStore.Level.trace])
-
-        static let `default` = LogLevelsFilter()
-    }
 
     struct LabelsFilter: Hashable {
         var isEnabled = true
