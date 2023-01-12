@@ -135,7 +135,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         }
         switch mode {
         case .all:
-            ConsoleMessageSearchCriteria.update(
+            ConsoleFilters.update(
                 request: controller.fetchRequest,
                 filterTerm: filterTerm,
                 criteria: sharedSearchCriteriaViewModel.criteria,

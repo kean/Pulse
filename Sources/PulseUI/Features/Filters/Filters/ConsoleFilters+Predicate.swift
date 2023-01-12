@@ -6,7 +6,7 @@ import Foundation
 import Pulse
 import CoreData
 
-extension ConsoleMessageSearchCriteria {
+extension ConsoleFilters {
 
     static func update(
         request: NSFetchRequest<NSManagedObject>,

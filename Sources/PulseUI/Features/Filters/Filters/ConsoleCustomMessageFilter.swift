@@ -6,17 +6,6 @@ import Foundation
 import Pulse
 import CoreData
 import SwiftUI
-import Combine
-
-struct ConsoleMessageSearchCriteria: Hashable {
-    var isFiltersEnabled = true
-
-    static let `default` = ConsoleMessageSearchCriteria()
-
-    var isDefault: Bool {
-        self == ConsoleMessageSearchCriteria.default
-    }
-}
 
 struct ConsoleCustomMessageFilter: Hashable, Identifiable {
     let id = UUID()
