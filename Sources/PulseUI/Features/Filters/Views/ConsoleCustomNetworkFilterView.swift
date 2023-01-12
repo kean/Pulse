@@ -9,7 +9,7 @@ import Pulse
 
 @available(iOS 15, *)
 struct ConsoleCustomNetworkFilterView: View {
-    @ObservedObject var filter: ConsoleCustomNetworkFilter
+    @Binding var filter: ConsoleCustomNetworkFilter
     let onRemove: (() -> Void)?
 
     var body: some View {

@@ -139,5 +139,8 @@ final class ConsoleFiltersViewModel: ObservableObject {
         if let index = criteria.custom.filters.firstIndex(where: { $0.id == filter.id }) {
             criteria.custom.filters.remove(at: index)
         }
+        if criteria.custom.filters.isEmpty {
+            criteria.custom = .default
+        }
     }
 }

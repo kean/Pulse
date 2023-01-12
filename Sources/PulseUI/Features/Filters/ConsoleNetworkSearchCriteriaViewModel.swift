@@ -11,7 +11,6 @@ import SwiftUI
 final class ConsoleNetworkSearchCriteriaViewModel: ObservableObject {
     @Published var criteria: ConsoleNetworkSearchCriteria = .default
     private(set) var defaultCriteria: ConsoleNetworkSearchCriteria = .default
-    @Published var filters: [ConsoleCustomNetworkFilter] = []
 
     @Published private(set) var allDomains: [String] = []
     private let domains: ManagedObjectsObserver<NetworkDomainEntity>
@@ -21,11 +20,7 @@ final class ConsoleNetworkSearchCriteriaViewModel: ObservableObject {
     let dataNeedsReload = PassthroughSubject<Void, Never>()
 
     var isDefaultSearchCriteria: Bool {
-        criteria == defaultCriteria && isDefaultFilters
-    }
-
-    var isDefaultFilters: Bool {
-        filters.count == 1 && filters[0].value.isEmpty
+        criteria == defaultCriteria
     }
 
     private var cancellables: [AnyCancellable] = []
@@ -35,15 +30,6 @@ final class ConsoleNetworkSearchCriteriaViewModel: ObservableObject {
 
         domains.$objects.sink { [weak self] in
             self?.allDomains = $0.map(\.value)
-        }.store(in: &cancellables)
-
-        resetFilters()
-
-        $filters.dropFirst().sink { [weak self] _ in
-            self?.isButtonResetEnabled = true
-            DispatchQueue.main.async { // important!
-                self?.dataNeedsReload.send()
-            }
         }.store(in: &cancellables)
 
         $criteria.dropFirst().sink { [weak self] _ in
@@ -56,7 +42,6 @@ final class ConsoleNetworkSearchCriteriaViewModel: ObservableObject {
 
     func resetAll() {
         criteria = defaultCriteria
-        resetFilters()
         isButtonResetEnabled = false
     }
 
@@ -72,44 +57,19 @@ final class ConsoleNetworkSearchCriteriaViewModel: ObservableObject {
 
     // MARK: Managing Custom Filters
 
-    func resetFilters() {
-        filters = [.default]
-        for filter in filters {
-            subscribe(to: filter)
-        }
-    }
-
-    func addFilter() {
-        guard !filters.isEmpty else {
-            return resetFilters()
-        }
-        let filter = ConsoleCustomNetworkFilter.default
-        filters.append(filter)
-        subscribe(to: filter)
-    }
-
-    private func subscribe(to filter: ConsoleCustomNetworkFilter) {
-        filter.objectWillChange.sink { [weak self] in
-            self?.objectWillChange.send()
-            self?.isButtonResetEnabled = true
-            DispatchQueue.main.async { // important!
-                self?.dataNeedsReload.send()
-            }
-        }.store(in: &cancellables)
-    }
-
     func removeFilter(_ filter: ConsoleCustomNetworkFilter) {
-        if let index = filters.firstIndex(where: { $0 === filter }) {
-            filters.remove(at: index)
+        if let index = criteria.customNetworkFilters.filters.firstIndex(where: { $0.id == filter.id }) {
+            criteria.customNetworkFilters.filters.remove(at: index)
         }
-        if filters.isEmpty {
-            resetFilters()
+        if criteria.customNetworkFilters.filters.isEmpty {
+            criteria.customNetworkFilters = .default
         }
     }
 
+#warning("TODO: move to ConsoleFilters+extensions")
     var programmaticFilters: [ConsoleCustomNetworkFilter]? {
-        let programmaticFilters = filters.filter { $0.isProgrammatic && !$0.value.isEmpty }
-        guard !programmaticFilters.isEmpty && criteria.isFiltersEnabled else {
+        let programmaticFilters = criteria.customNetworkFilters.filters.filter { $0.isProgrammatic && !$0.value.isEmpty }
+        guard !programmaticFilters.isEmpty && criteria.customNetworkFilters.isEnabled else {
             return nil
         }
         return programmaticFilters

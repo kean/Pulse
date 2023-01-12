@@ -12,7 +12,6 @@ extension ConsoleNetworkSearchCriteria {
         filterTerm: String,
         shared: ConsoleFilters,
         criteria: ConsoleNetworkSearchCriteria,
-        filters: [ConsoleCustomNetworkFilter],
         isOnlyErrors: Bool
     ) {
         var predicates = [NSPredicate]()
@@ -86,8 +85,8 @@ extension ConsoleNetworkSearchCriteria {
             }
         }
 
-        if criteria.isFiltersEnabled {
-            for filter in filters where !filter.value.isEmpty {
+        if criteria.customNetworkFilters.isEnabled {
+            for filter in criteria.customNetworkFilters.filters where !filter.value.isEmpty {
                 if let predicate = filter.makePredicate() {
                     predicates.append(predicate)
                 } else {

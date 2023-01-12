@@ -7,16 +7,22 @@ import Pulse
 import CoreData
 
 struct ConsoleNetworkSearchCriteria: Hashable {
-    var isFiltersEnabled = true
-
     var response = ResponseFilter.default
     var host = HostFilter.default
     var networking = NetworkingFilter.default
+    var customNetworkFilters = CutsomNetworkFilters.default
 
     static let `default` = ConsoleNetworkSearchCriteria()
 
     var isDefault: Bool {
         self == ConsoleNetworkSearchCriteria.default
+    }
+
+    struct CutsomNetworkFilters: Hashable {
+        var isEnabled = true
+        var filters: [ConsoleCustomNetworkFilter] = [.default]
+
+        static var `default`: CutsomNetworkFilters { CutsomNetworkFilters() }
     }
 
     struct ResponseFilter: Hashable {

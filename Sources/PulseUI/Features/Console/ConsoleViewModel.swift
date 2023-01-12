@@ -147,7 +147,6 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
                 filterTerm: filterTerm,
                 shared: sharedSearchCriteriaViewModel.criteria,
                 criteria: networkSearchCriteriaViewModel.criteria,
-                filters: networkSearchCriteriaViewModel.filters,
                 isOnlyErrors: isOnlyErrors
             )
             break
