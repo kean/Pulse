@@ -12,6 +12,19 @@ struct ConsoleFilterSectionHeader: View {
     let isDefault: Bool
     @Binding var isEnabled: Bool
 
+    init<Filter: ConsoleFilterProtocol>(
+        icon: String,
+        title: String,
+        filter: Binding<Filter>,
+        default: Filter? = nil
+    ) {
+        self.icon = icon
+        self.title = title
+        self.reset = { filter.wrappedValue = `default` ?? Filter.default }
+        self.isDefault = filter.wrappedValue == `default` ?? Filter.default
+        self._isEnabled = filter.isEnabled
+    }
+
 #if os(macOS)
     var body: some View {
         HStack {

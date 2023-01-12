@@ -11,8 +11,7 @@ final class ConsoleFiltersViewModel: ObservableObject {
     @Published var criteria: ConsoleFilters = .default
     @Published var isButtonResetEnabled = false
 
-    private var defaultCriteria: ConsoleFilters = .default
-    private(set) var defaultDates: ConsoleFilters.Dates = .default
+    private(set) var defaultCriteria: ConsoleFilters = .default
 
     let dataNeedsReload = PassthroughSubject<Void, Never>()
 
@@ -32,7 +31,6 @@ final class ConsoleFiltersViewModel: ObservableObject {
         if store === LoggerStore.shared {
             criteria.dates = .session
             defaultCriteria.dates = .session
-            defaultDates = .session
         }
 
 #warning("TODO: rework how reset is enabled (we have hashable for this)")
@@ -44,21 +42,32 @@ final class ConsoleFiltersViewModel: ObservableObject {
         }.store(in: &cancellables)
     }
 
+#warning("TODO: return different value based on the mod")
     var isDefaultAll: Bool {
         criteria == defaultCriteria
+    }
+
+    var isDefaultForAll: Bool {
+        criteria.dates == defaultCriteria.dates &&
+        criteria.general == defaultCriteria.general
+    }
+
+    var isDefaultForMessages: Bool {
+        criteria.logLevels == defaultCriteria.logLevels &&
+        criteria.labels == defaultCriteria.labels &&
+        criteria.custom == defaultCriteria.custom
+    }
+
+    var isDefaultForNetwork: Bool {
+        criteria.response == defaultCriteria.response &&
+        criteria.host == defaultCriteria.host &&
+        criteria.networking == defaultCriteria.networking &&
+        criteria.customNetworkFilters == defaultCriteria.customNetworkFilters
     }
 
     func resetAll() {
         criteria = defaultCriteria
         isButtonResetEnabled = false
-    }
-
-    var isDatesDefault: Bool {
-        criteria.dates == defaultDates
-    }
-
-    func resetDates() {
-        criteria.dates = defaultDates
     }
 
     func removeAllPins() {

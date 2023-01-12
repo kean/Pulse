@@ -70,12 +70,7 @@ extension ConsoleNetworkFiltersView {
     }
 
     private var generalGroupHeader: some View {
-        ConsoleFilterSectionHeader(
-            icon: "line.horizontal.3.decrease.circle", title: "Filters",
-            reset: { viewModel.criteria.customNetworkFilters = .default },
-            isDefault: viewModel.criteria.customNetworkFilters == .default,
-            isEnabled: $viewModel.criteria.customNetworkFilters.isEnabled
-        )
+        ConsoleFilterSectionHeader(icon: "line.horizontal.3.decrease.circle", title: "Filters", filter: $viewModel.criteria.customNetworkFilters)
     }
 
 #if os(iOS)
@@ -123,12 +118,7 @@ extension ConsoleNetworkFiltersView {
     }
 
     private var responseGroupHeader: some View {
-        ConsoleFilterSectionHeader(
-            icon: "arrow.down.circle", title: "Response",
-            reset: { viewModel.criteria.response = .default },
-            isDefault: viewModel.criteria.response == .default,
-            isEnabled: $viewModel.criteria.response.isEnabled
-        )
+        ConsoleFilterSectionHeader(icon: "arrow.down.circle", title:  "Response", filter: $viewModel.criteria.response)
     }
 
     @ViewBuilder
@@ -153,12 +143,7 @@ extension ConsoleNetworkFiltersView {
     }
 
     private var domainsGroupHeader: some View {
-        ConsoleFilterSectionHeader(
-            icon: "server.rack", title: "Hosts",
-            reset: { viewModel.criteria.host = .default },
-            isDefault: viewModel.criteria.host == .default,
-            isEnabled: $viewModel.criteria.host.isEnabled
-        )
+        ConsoleFilterSectionHeader(icon: "server.rack", title: "Hosts", filter: $viewModel.criteria.host)
     }
 
     @ViewBuilder
@@ -237,12 +222,7 @@ extension ConsoleNetworkFiltersView {
     }
 
     private var networkingGroupHeader: some View {
-        ConsoleFilterSectionHeader(
-            icon: "arrowshape.zigzag.right", title: "Networking",
-            reset: { viewModel.criteria.networking = .default },
-            isDefault: viewModel.criteria.networking == .default,
-            isEnabled: $viewModel.criteria.networking.isEnabled
-        )
+        ConsoleFilterSectionHeader(icon: "arrowshape.zigzag.right", title: "Networking", filter: $viewModel.criteria.networking)
     }
 
     @ViewBuilder

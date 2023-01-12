@@ -22,12 +22,7 @@ struct ConsoleSharedFiltersView: View {
     }
 
     private var timePeriodHeader: some View {
-        ConsoleFilterSectionHeader(
-            icon: "calendar", title: "Time Period",
-            reset: viewModel.resetDates,
-            isDefault: viewModel.isDatesDefault,
-            isEnabled: $viewModel.criteria.dates.isEnabled
-        )
+        ConsoleFilterSectionHeader(icon: "calendar", title: "Time Period", filter: $viewModel.criteria.dates, default: viewModel.defaultCriteria.dates)
     }
 
     // MARK: Filters
@@ -35,12 +30,7 @@ struct ConsoleSharedFiltersView: View {
     private var sectionFilters: some View {
         ConsoleFilterSection(
             header: {
-                ConsoleFilterSectionHeader(
-                    icon: "gear", title: "General",
-                    reset: { viewModel.criteria.general = .default },
-                    isDefault: viewModel.criteria.general == .default,
-                    isEnabled: $viewModel.criteria.general.isEnabled
-                )
+                ConsoleFilterSectionHeader(icon: "gear", title: "General", filter: $viewModel.criteria.general)
             },
             content: {
                 ConsoleFiltersPinsCell(selection: $viewModel.criteria.general, removeAll: viewModel.removeAllPins)

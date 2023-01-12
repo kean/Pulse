@@ -63,12 +63,7 @@ extension ConsoleMessageFiltersView {
     }
 
     private var generalHeader: some View {
-        ConsoleFilterSectionHeader(
-            icon: "line.horizontal.3.decrease.circle", title: "Filters",
-            reset: { viewModel.criteria.custom = .default },
-            isDefault: viewModel.criteria.custom == .default,
-            isEnabled: $viewModel.criteria.custom.isEnabled
-        )
+        ConsoleFilterSectionHeader(icon: "line.horizontal.3.decrease.circle", title: "Filters", filter: $viewModel.criteria.custom)
     }
 
 #if os(iOS) || os(tvOS)
@@ -119,12 +114,7 @@ extension ConsoleMessageFiltersView {
     }
 
     private var logLevelsHeader: some View {
-        ConsoleFilterSectionHeader(
-            icon: "flag", title: "Levels",
-            reset: { viewModel.criteria.logLevels = .default },
-            isDefault: viewModel.criteria.logLevels == .default,
-            isEnabled: $viewModel.criteria.logLevels.isEnabled
-        )
+        ConsoleFilterSectionHeader(icon: "flag", title: "Levels", filter: $viewModel.criteria.logLevels)
     }
 
 #if os(macOS)
@@ -175,12 +165,7 @@ extension ConsoleMessageFiltersView {
     }
 
     private var labelsHeader: some View {
-        ConsoleFilterSectionHeader(
-            icon: "tag", title: "Labels",
-            reset: { viewModel.criteria.labels = .default },
-            isDefault: viewModel.criteria.labels == .default,
-            isEnabled: $viewModel.criteria.labels.isEnabled
-        )
+        ConsoleFilterSectionHeader(icon: "tag", title: "Labels", filter: $viewModel.criteria.labels)
     }
 
 #if os(macOS)

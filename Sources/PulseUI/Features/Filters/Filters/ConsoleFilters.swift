@@ -7,6 +7,7 @@ import Pulse
 import CoreData
 import Combine
 
+#warning("TODO: maybe split this?")
 #warning("TODO: remove all the redundant defaults")
 #warning("TODO: move isOnlyErrors here ?")
 struct ConsoleFilters: Hashable {
@@ -17,7 +18,7 @@ struct ConsoleFilters: Hashable {
     // Messages
     var logLevels: LogLevels = .default
     var labels: Labels = .default
-    var custom = CustomMessageFilters()
+    var custom = CustomMessageFilters.default
 
     // Network
     var response = Response.default
@@ -30,11 +31,11 @@ struct ConsoleFilters: Hashable {
 
 protocol ConsoleFilterProtocol: Hashable {
     var isEnabled: Bool { get set }
-    var `default`: Self { get }
+    static var `default`: Self { get }
 }
 
 extension ConsoleFilters {
-    struct Dates: Hashable {
+    struct Dates: Hashable, ConsoleFilterProtocol {
         var isEnabled = true
 
         var startDate: Date?
@@ -55,14 +56,14 @@ extension ConsoleFilters {
         }
     }
 
-    struct General: Hashable {
+    struct General: ConsoleFilterProtocol {
         var isEnabled = true
         var inOnlyPins = false
 
         static let `default` = General()
     }
 
-    struct LogLevels: Hashable {
+    struct LogLevels: ConsoleFilterProtocol {
         var isEnabled = true
         var levels: Set<LoggerStore.Level> = Set(LoggerStore.Level.allCases)
             .subtracting([LoggerStore.Level.trace])
@@ -70,7 +71,7 @@ extension ConsoleFilters {
         static let `default` = LogLevels()
     }
 
-    struct Labels: Hashable {
+    struct Labels: ConsoleFilterProtocol {
         var isEnabled = true
         var hidden: Set<String> = []
         var focused: String?
@@ -78,14 +79,14 @@ extension ConsoleFilters {
         static let `default` = Labels()
     }
 
-    struct CustomMessageFilters: Hashable {
+    struct CustomMessageFilters: ConsoleFilterProtocol {
         var isEnabled = true
         var filters: [ConsoleCustomMessageFilter] = [.default]
 
         static let `default` = CustomMessageFilters()
     }
 
-    struct Response: Hashable {
+    struct Response: ConsoleFilterProtocol {
         var isEnabled = true
         var statusCode = StatusCode()
         var contentType = ContentType()
@@ -169,7 +170,7 @@ extension ConsoleFilters {
         }
     }
 
-    struct Host: Hashable {
+    struct Host: ConsoleFilterProtocol {
         var isEnabled = true
         var ignoredHosts: Set<String> = []
 
@@ -205,7 +206,7 @@ extension ConsoleFilters {
         }
     }
 
-    struct Networking: Hashable {
+    struct Networking: ConsoleFilterProtocol {
         var isEnabled = true
         var isRedirect = false
         var source: Source = .any
@@ -233,7 +234,7 @@ extension ConsoleFilters {
         static let `default` = Networking()
     }
 
-    struct CustomNetworkFilters: Hashable {
+    struct CustomNetworkFilters: ConsoleFilterProtocol {
         var isEnabled = true
         var filters: [ConsoleCustomNetworkFilter] = [.default]
 
