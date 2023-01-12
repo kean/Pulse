@@ -7,11 +7,11 @@ import Pulse
 import Combine
 import SwiftUI
 
-final class ConsoleFiltersViewModel: ObservableObject {
-    @Published var criteria: ConsoleFilters = .default
+final class ConsoleSearchCriteriaViewModel: ObservableObject {
+    @Published var criteria: ConsoleSearchCriteria = .default
     @Published var isButtonResetEnabled = false
 
-    private(set) var defaultCriteria: ConsoleFilters = .default
+    private(set) var defaultCriteria: ConsoleSearchCriteria = .default
 
     let dataNeedsReload = PassthroughSubject<Void, Never>()
 

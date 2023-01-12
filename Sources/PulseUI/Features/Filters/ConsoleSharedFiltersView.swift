@@ -7,7 +7,7 @@ import Pulse
 
 #warning("TODO: remove this view")
 struct ConsoleSharedFiltersView: View {
-    @ObservedObject var viewModel: ConsoleFiltersViewModel
+    @ObservedObject var viewModel: ConsoleSearchCriteriaViewModel
 
     var body: some View {
         sectionTimePeriod

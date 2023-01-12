@@ -8,11 +8,11 @@ import Pulse
 #if os(iOS) || os(tvOS) || os(watchOS)
 
 struct ConsoleFiltersLabelsPickerView: View {
-    @ObservedObject var viewModel: ConsoleFiltersViewModel
+    @ObservedObject var viewModel: ConsoleSearchCriteriaViewModel
     @ObservedObject var labels: ManagedObjectsObserver<LoggerLabelEntity>
     @State private var searchText = ""
 
-    init(viewModel: ConsoleFiltersViewModel) {
+    init(viewModel: ConsoleSearchCriteriaViewModel) {
         self.viewModel = viewModel
         self.labels = viewModel.labels
     }

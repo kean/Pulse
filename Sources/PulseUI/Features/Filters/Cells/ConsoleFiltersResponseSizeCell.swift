@@ -6,7 +6,7 @@ import SwiftUI
 import Pulse
 
 struct ConsoleFiltersResponseSizeCell: View {
-    @Binding var selection: ConsoleFilters.ResponseSize
+    @Binding var selection: ConsoleSearchCriteria.ResponseSize
 
     var body: some View {
         HStack {
@@ -14,7 +14,7 @@ struct ConsoleFiltersResponseSizeCell: View {
             Spacer()
             FilterPickerMenu(title: selection.unit.title, width: 50) {
                 Picker("Unit", selection: $selection.unit) {
-                    ForEach(ConsoleFilters.ResponseSize.MeasurementUnit.allCases) {
+                    ForEach(ConsoleSearchCriteria.ResponseSize.MeasurementUnit.allCases) {
                         Text($0.title).tag($0)
                     }
                 }

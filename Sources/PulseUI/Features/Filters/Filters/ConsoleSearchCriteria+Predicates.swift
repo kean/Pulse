@@ -7,11 +7,11 @@ import Pulse
 import CoreData
 
 #warning("TODO: refactor")
-extension ConsoleFilters {
+extension ConsoleSearchCriteria {
     static func update(
         request: NSFetchRequest<NSManagedObject>,
         filterTerm: String,
-        criteria: ConsoleFilters,
+        criteria: ConsoleSearchCriteria,
         isOnlyErrors: Bool
     ) {
         var predicates = [NSPredicate]()
@@ -71,7 +71,7 @@ extension ConsoleNetworkSearchCriteria {
     static func update(
         request: NSFetchRequest<NSManagedObject>,
         filterTerm: String,
-        criteria: ConsoleFilters,
+        criteria: ConsoleSearchCriteria,
         isOnlyErrors: Bool
     ) {
         var predicates = [NSPredicate]()
@@ -105,7 +105,7 @@ extension ConsoleNetworkSearchCriteria {
     }
 }
 
-private func makePredicates(for criteria: ConsoleFilters.Network) -> [NSPredicate] {
+private func makePredicates(for criteria: ConsoleSearchCriteria.Network) -> [NSPredicate] {
     var predicates = [NSPredicate]()
 
     if criteria.response.isEnabled {

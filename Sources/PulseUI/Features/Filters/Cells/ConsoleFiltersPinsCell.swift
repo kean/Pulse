@@ -6,7 +6,7 @@ import SwiftUI
 import Pulse
 
 struct ConsoleFiltersPinsCell: View {
-    @Binding var selection: ConsoleFilters.General
+    @Binding var selection: ConsoleSearchCriteria.General
     let removeAll: () -> Void
 
     var body: some View {

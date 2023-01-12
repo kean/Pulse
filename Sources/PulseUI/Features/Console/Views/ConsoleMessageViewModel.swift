@@ -10,7 +10,7 @@ import Combine
 final class ConsoleMessageViewModel: Pinnable {
     let message: LoggerMessageEntity
 
-    private let filtersViewModel: ConsoleFiltersViewModel?
+    private let filtersViewModel: ConsoleSearchCriteriaViewModel?
 
     // TODO: Trim whitespaces and remove newlines?
     var preprocessedText: String { message.text }
@@ -26,7 +26,7 @@ final class ConsoleMessageViewModel: Pinnable {
     
     private(set) lazy var pinViewModel = PinButtonViewModel(message: message)
     
-    init(message: LoggerMessageEntity, filtersViewModel: ConsoleFiltersViewModel? = nil) {
+    init(message: LoggerMessageEntity, filtersViewModel: ConsoleSearchCriteriaViewModel? = nil) {
         self.message = message
         self.filtersViewModel = filtersViewModel
     }
