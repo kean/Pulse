@@ -12,7 +12,7 @@ extension ConsoleNetworkSearchCriteria {
         filterTerm: String,
         shared: ConsoleFilters,
         criteria: ConsoleNetworkSearchCriteria,
-        filters: [NetworkSearchFilter],
+        filters: [ConsoleCustomNetworkFilter],
         isOnlyErrors: Bool
     ) {
         var predicates = [NSPredicate]()

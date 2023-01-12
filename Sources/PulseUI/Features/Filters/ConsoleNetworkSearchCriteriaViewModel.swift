@@ -11,7 +11,7 @@ import SwiftUI
 final class ConsoleNetworkSearchCriteriaViewModel: ObservableObject {
     @Published var criteria: ConsoleNetworkSearchCriteria = .default
     private(set) var defaultCriteria: ConsoleNetworkSearchCriteria = .default
-    @Published var filters: [NetworkSearchFilter] = []
+    @Published var filters: [ConsoleCustomNetworkFilter] = []
 
     @Published private(set) var allDomains: [String] = []
     private let domains: ManagedObjectsObserver<NetworkDomainEntity>
@@ -83,12 +83,12 @@ final class ConsoleNetworkSearchCriteriaViewModel: ObservableObject {
         guard !filters.isEmpty else {
             return resetFilters()
         }
-        let filter = NetworkSearchFilter.default
+        let filter = ConsoleCustomNetworkFilter.default
         filters.append(filter)
         subscribe(to: filter)
     }
 
-    private func subscribe(to filter: NetworkSearchFilter) {
+    private func subscribe(to filter: ConsoleCustomNetworkFilter) {
         filter.objectWillChange.sink { [weak self] in
             self?.objectWillChange.send()
             self?.isButtonResetEnabled = true
@@ -98,7 +98,7 @@ final class ConsoleNetworkSearchCriteriaViewModel: ObservableObject {
         }.store(in: &cancellables)
     }
 
-    func removeFilter(_ filter: NetworkSearchFilter) {
+    func removeFilter(_ filter: ConsoleCustomNetworkFilter) {
         if let index = filters.firstIndex(where: { $0 === filter }) {
             filters.remove(at: index)
         }
@@ -107,7 +107,7 @@ final class ConsoleNetworkSearchCriteriaViewModel: ObservableObject {
         }
     }
 
-    var programmaticFilters: [NetworkSearchFilter]? {
+    var programmaticFilters: [ConsoleCustomNetworkFilter]? {
         let programmaticFilters = filters.filter { $0.isProgrammatic && !$0.value.isEmpty }
         guard !programmaticFilters.isEmpty && criteria.isFiltersEnabled else {
             return nil

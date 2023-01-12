@@ -9,7 +9,7 @@ import Pulse
 
 @available(iOS 15, *)
 struct ConsoleCustomNetworkFilterView: View {
-    @ObservedObject var filter: NetworkSearchFilter
+    @ObservedObject var filter: ConsoleCustomNetworkFilter
     let onRemove: (() -> Void)?
 
     var body: some View {
@@ -44,33 +44,33 @@ struct ConsoleCustomNetworkFilterView: View {
 
     @ViewBuilder
     private var fieldPickerBasicSection: some View {
-        Text("URL").tag(NetworkSearchFilter.Field.url)
-        Text("Host").tag(NetworkSearchFilter.Field.host)
-        Text("Method").tag(NetworkSearchFilter.Field.method)
-        Text("Status Code").tag(NetworkSearchFilter.Field.statusCode)
-        Text("Error Code").tag(NetworkSearchFilter.Field.errorCode)
+        Text("URL").tag(ConsoleCustomNetworkFilter.Field.url)
+        Text("Host").tag(ConsoleCustomNetworkFilter.Field.host)
+        Text("Method").tag(ConsoleCustomNetworkFilter.Field.method)
+        Text("Status Code").tag(ConsoleCustomNetworkFilter.Field.statusCode)
+        Text("Error Code").tag(ConsoleCustomNetworkFilter.Field.errorCode)
     }
 
     @ViewBuilder
     private var fieldPickerAdvancedSection: some View {
-        Text("Request Headers").tag(NetworkSearchFilter.Field.requestHeader)
-        Text("Response Headers").tag(NetworkSearchFilter.Field.responseHeader)
+        Text("Request Headers").tag(ConsoleCustomNetworkFilter.Field.requestHeader)
+        Text("Response Headers").tag(ConsoleCustomNetworkFilter.Field.responseHeader)
         Divider()
-        Text("Request Body").tag(NetworkSearchFilter.Field.requestBody)
-        Text("Response Body").tag(NetworkSearchFilter.Field.responseBody)
+        Text("Request Body").tag(ConsoleCustomNetworkFilter.Field.requestBody)
+        Text("Response Body").tag(ConsoleCustomNetworkFilter.Field.responseBody)
     }
 
     private var matchPicker: some View {
         Picker("Matching", selection: $filter.match) {
-            Text("Contains").tag(NetworkSearchFilter.Match.contains)
-            Text("Not Contains").tag(NetworkSearchFilter.Match.notContains)
+            Text("Contains").tag(ConsoleCustomNetworkFilter.Match.contains)
+            Text("Not Contains").tag(ConsoleCustomNetworkFilter.Match.notContains)
             Divider()
-            Text("Equals").tag(NetworkSearchFilter.Match.equal)
-            Text("Not Equals").tag(NetworkSearchFilter.Match.notEqual)
+            Text("Equals").tag(ConsoleCustomNetworkFilter.Match.equal)
+            Text("Not Equals").tag(ConsoleCustomNetworkFilter.Match.notEqual)
             Divider()
-            Text("Begins With").tag(NetworkSearchFilter.Match.beginsWith)
+            Text("Begins With").tag(ConsoleCustomNetworkFilter.Match.beginsWith)
             Divider()
-            Text("Regex").tag(NetworkSearchFilter.Match.regex)
+            Text("Regex").tag(ConsoleCustomNetworkFilter.Match.regex)
         }.labelsHidden()
     }
 }
