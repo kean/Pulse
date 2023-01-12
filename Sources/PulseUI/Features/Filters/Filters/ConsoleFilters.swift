@@ -7,7 +7,6 @@ import Pulse
 import CoreData
 import Combine
 
-#warning("TODO: maybe split this?")
 #warning("TODO: remove all the redundant defaults")
 #warning("TODO: move isOnlyErrors here ?")
 struct ConsoleFilters: Hashable {
@@ -30,8 +29,7 @@ struct ConsoleFilters: Hashable {
         var response = Response.default
         var host = Host.default
         var networking = Networking.default
-        #warning("TODO: rename")
-        var customNetworkFilters = CustomNetworkFilters.default
+        var custom = CustomNetworkFilters.default
     }
 
     static let `default` = ConsoleFilters()

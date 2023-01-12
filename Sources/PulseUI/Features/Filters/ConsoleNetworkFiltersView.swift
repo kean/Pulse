@@ -70,15 +70,15 @@ extension ConsoleNetworkFiltersView {
     }
 
     private var generalGroupHeader: some View {
-        ConsoleFilterSectionHeader(icon: "line.horizontal.3.decrease.circle", title: "Filters", filter: $viewModel.criteria.network.customNetworkFilters)
+        ConsoleFilterSectionHeader(icon: "line.horizontal.3.decrease.circle", title: "Filters", filter: $viewModel.criteria.network.custom)
     }
 
 #if os(iOS)
     @ViewBuilder
     private var generalGroupContent: some View {
         customFilersList
-        if !(viewModel.criteria.network.customNetworkFilters == .default) {
-            Button(action: { viewModel.criteria.network.customNetworkFilters.filters.append(.default) }) {
+        if !(viewModel.criteria.network.custom == .default) {
+            Button(action: { viewModel.criteria.network.custom.filters.append(.default) }) {
                 Text("Add Filter").frame(maxWidth: .infinity)
             }
         }
@@ -99,8 +99,8 @@ extension ConsoleNetworkFiltersView {
 #endif
 
     @ViewBuilder var customFilersList: some View {
-        ForEach($viewModel.criteria.network.customNetworkFilters.filters) { filter in
-            ConsoleCustomNetworkFilterView(filter: filter, onRemove: viewModel.criteria.network.customNetworkFilters == .default ? nil : { viewModel.removeFilter(filter.wrappedValue) })
+        ForEach($viewModel.criteria.network.custom.filters) { filter in
+            ConsoleCustomNetworkFilterView(filter: filter, onRemove: viewModel.criteria.network.custom == .default ? nil : { viewModel.removeFilter(filter.wrappedValue) })
         }
     }
 }

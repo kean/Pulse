@@ -149,19 +149,19 @@ final class ConsoleFiltersViewModel: ObservableObject {
     // MARK: Custom Network Filters
 
     func removeFilter(_ filter: ConsoleCustomNetworkFilter) {
-        if let index = criteria.network.customNetworkFilters.filters.firstIndex(where: { $0.id == filter.id }) {
-            criteria.network.customNetworkFilters.filters.remove(at: index)
+        if let index = criteria.network.custom.filters.firstIndex(where: { $0.id == filter.id }) {
+            criteria.network.custom.filters.remove(at: index)
         }
 #warning("TODO: is this needed? enable remove only when 2+ items")
-        if criteria.network.customNetworkFilters.filters.isEmpty {
-            criteria.network.customNetworkFilters = .default
+        if criteria.network.custom.filters.isEmpty {
+            criteria.network.custom = .default
         }
     }
 
 #warning("TODO: move to ConsoleFilters+extensions")
     var programmaticFilters: [ConsoleCustomNetworkFilter]? {
-        let programmaticFilters = criteria.network.customNetworkFilters.filters.filter { $0.isProgrammatic && !$0.value.isEmpty }
-        guard !programmaticFilters.isEmpty && criteria.network.customNetworkFilters.isEnabled else {
+        let programmaticFilters = criteria.network.custom.filters.filter { $0.isProgrammatic && !$0.value.isEmpty }
+        guard !programmaticFilters.isEmpty && criteria.network.custom.isEnabled else {
             return nil
         }
         return programmaticFilters

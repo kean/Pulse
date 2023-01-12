@@ -154,8 +154,8 @@ private func makePredicates(for criteria: ConsoleFilters.Network) -> [NSPredicat
         predicates.append(NSPredicate(format: "NOT host.value IN %@", criteria.host.ignoredHosts))
     }
 
-    if criteria.customNetworkFilters.isEnabled {
-        for filter in criteria.customNetworkFilters.filters where !filter.value.isEmpty {
+    if criteria.custom.isEnabled {
+        for filter in criteria.custom.filters where !filter.value.isEmpty {
             if let predicate = filter.makePredicate() {
                 predicates.append(predicate)
             } else {
