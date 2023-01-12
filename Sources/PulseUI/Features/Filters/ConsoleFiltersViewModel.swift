@@ -131,4 +131,13 @@ final class ConsoleFiltersViewModel: ObservableObject {
             }
         })
     }
+
+    // MARK: Custom Filters
+
+#warning("TODO: move to the view & use binding for this")
+    func remove(_ filter: ConsoleCustomMessageFilter) {
+        if let index = criteria.custom.filters.firstIndex(where: { $0.id == filter.id }) {
+            criteria.custom.filters.remove(at: index)
+        }
+    }
 }

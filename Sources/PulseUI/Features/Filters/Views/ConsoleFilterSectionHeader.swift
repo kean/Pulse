@@ -4,6 +4,7 @@
 
 import SwiftUI
 
+#warning("TODO: reuse reset/isdefault/isenabled")
 struct ConsoleFilterSectionHeader: View {
     let icon: String
     let title: String

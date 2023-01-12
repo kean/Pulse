@@ -7,6 +7,7 @@ import Pulse
 import CoreData
 import Combine
 
+#warning("TODO: remove all the redundant defaults")
 struct ConsoleFilters: Hashable {
     // Shared
     var dates = Dates.default
@@ -15,6 +16,7 @@ struct ConsoleFilters: Hashable {
     // Messages
     var logLevels: LogLevels = .default
     var labels: Labels = .default
+    var custom = CustomMessageFilters()
 
     static let `default` = ConsoleFilters()
 }
@@ -62,5 +64,12 @@ extension ConsoleFilters {
         var focused: String?
 
         static let `default` = Labels()
+    }
+
+    struct CustomMessageFilters: Hashable {
+        var isEnabled = true
+        var filters: [ConsoleCustomMessageFilter] = [.default]
+
+        static let `default` = CustomMessageFilters()
     }
 }

@@ -19,7 +19,7 @@ final class ConsoleMessageSearchCriteriaViewModel: ObservableObject {
     private var cancellables: [AnyCancellable] = []
 
     init(store: LoggerStore) {
-        resetFilters()
+//        resetFilters()
 
         $criteria.dropFirst().sink { [weak self] _ in
             self?.isButtonResetEnabled = true
@@ -30,54 +30,18 @@ final class ConsoleMessageSearchCriteriaViewModel: ObservableObject {
     }
 
     var isDefaultSearchCriteria: Bool {
-        criteria == defaultCriteria && isDefaultFilters
+        true
+//        criteria == defaultCriteria && isDefaultFilters
     }
 
     var isDefaultFilters: Bool {
-        filters.count == 1 && filters[0].value.isEmpty
+        true
+//        filters.count == 1 && filters[0].value.isEmpty
     }
 
     func resetAll() {
         criteria = defaultCriteria
-        resetFilters()
+//        resetFilters()
         isButtonResetEnabled = false
-    }
-
-    // MARK: Managing Custom Filters
-
-    func resetFilters() {
-        filters = [.default]
-        for filter in filters {
-            subscribe(to: filter)
-        }
-    }
-
-    func addFilter() {
-        guard !filters.isEmpty else {
-            return resetFilters()
-        }
-        let filter = ConsoleCustomMessageFilter.default
-        filters.append(filter)
-        subscribe(to: filter)
-    }
-
-    private func subscribe(to filter: ConsoleCustomMessageFilter) {
-        filter.objectWillChange.sink { [weak self] in
-            guard let self = self else { return }
-            self.objectWillChange.send()
-            self.isButtonResetEnabled = true
-            DispatchQueue.main.async { // important!
-                self.dataNeedsReload.send()
-            }
-        }.store(in: &cancellables)
-    }
-
-    func removeFilter(_ filter: ConsoleCustomMessageFilter) {
-        if let index = filters.firstIndex(where: { $0 === filter }) {
-            filters.remove(at: index)
-        }
-        if filters.isEmpty {
-            resetFilters()
-        }
     }
 }

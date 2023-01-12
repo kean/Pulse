@@ -9,7 +9,7 @@ import Pulse
 
 @available(iOS 15, *)
 struct ConsoleCustomMessageFilterView: View {
-    @ObservedObject var filter: ConsoleCustomMessageFilter
+    @Binding var filter: ConsoleCustomMessageFilter
     let onRemove: (() -> Void)?
 
     var body: some View {

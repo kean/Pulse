@@ -18,11 +18,11 @@ struct ConsoleMessageSearchCriteria: Hashable {
     }
 }
 
-final class ConsoleCustomMessageFilter: ObservableObject, Identifiable {
-    var id: ObjectIdentifier { ObjectIdentifier(self) }
-    @Published var field: Field
-    @Published var match: Match
-    @Published var value: String
+struct ConsoleCustomMessageFilter: Hashable, Identifiable {
+    let id = UUID()
+    var field: Field
+    var match: Match
+    var value: String
 
     static var `default`: ConsoleCustomMessageFilter {
         ConsoleCustomMessageFilter(field: .message, match: .contains, value: "")
@@ -32,6 +32,16 @@ final class ConsoleCustomMessageFilter: ObservableObject, Identifiable {
         self.field = field
         self.match = match
         self.value = value
+    }
+
+    static func == (lhs: ConsoleCustomMessageFilter, rhs: ConsoleCustomMessageFilter) -> Bool {
+        (lhs.field, lhs.match, lhs.value) == (rhs.field, rhs.match, rhs.value)
+    }
+
+    func hash(into hasher: inout Hasher) {
+        field.hash(into: &hasher)
+        match.hash(into: &hasher)
+        value.hash(into: &hasher)
     }
 
     enum Field {

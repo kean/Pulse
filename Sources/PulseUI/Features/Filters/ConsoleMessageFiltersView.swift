@@ -5,6 +5,7 @@
 import SwiftUI
 import Pulse
 
+#warning("TODO: do we need ViewModel for filters in the first place?")
 struct ConsoleMessageFiltersView: View {
     @ObservedObject var viewModel: ConsoleMessageSearchCriteriaViewModel
     @ObservedObject var sharedCriteriaViewModel: ConsoleFiltersViewModel
@@ -68,9 +69,9 @@ extension ConsoleMessageFiltersView {
     private var generalHeader: some View {
         ConsoleFilterSectionHeader(
             icon: "line.horizontal.3.decrease.circle", title: "Filters",
-            reset: { viewModel.resetFilters() },
-            isDefault: viewModel.isDefaultFilters,
-            isEnabled: $viewModel.criteria.isFiltersEnabled
+            reset: { sharedCriteriaViewModel.criteria.custom = .default },
+            isDefault: sharedCriteriaViewModel.criteria.custom == .default,
+            isEnabled: $sharedCriteriaViewModel.criteria.custom.isEnabled
         )
     }
 
@@ -78,8 +79,8 @@ extension ConsoleMessageFiltersView {
     @ViewBuilder
     private var generalContent: some View {
         customFiltersList
-        if !viewModel.isDefaultFilters {
-            Button(action: viewModel.addFilter) {
+        if !isCustomFiltersDefault {
+            Button(action: { sharedCriteriaViewModel.criteria.custom.filters.append(.default) }) {
                 Text("Add Filter").frame(maxWidth: .infinity)
             }
         }
@@ -91,7 +92,7 @@ extension ConsoleMessageFiltersView {
             customFiltersList
         }.padding(.leading, -8)
 
-        if !viewModel.isDefaultFilters {
+        if !isCustomFiltersDefault {
             Button(action: viewModel.addFilter) {
                 Image(systemName: "plus.circle")
             }.padding(.top, 6)
@@ -100,9 +101,13 @@ extension ConsoleMessageFiltersView {
 #endif
 
     private var customFiltersList: some View {
-        ForEach(viewModel.filters) { filter in
-            ConsoleCustomMessageFilterView(filter: filter, onRemove: viewModel.isDefaultFilters ? nil : { viewModel.removeFilter(filter) })
+        ForEach($sharedCriteriaViewModel.criteria.custom.filters) { filter in
+            ConsoleCustomMessageFilterView(filter: filter, onRemove: isCustomFiltersDefault ? nil  : { sharedCriteriaViewModel.remove(filter.wrappedValue) })
         }
+    }
+
+    private var isCustomFiltersDefault: Bool {
+        sharedCriteriaViewModel.criteria.custom == .default
     }
 }
 #endif
