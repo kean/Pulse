@@ -141,20 +141,13 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
         if let index = criteria.messages.custom.filters.firstIndex(where: { $0.id == filter.id }) {
             criteria.messages.custom.filters.remove(at: index)
         }
-        if criteria.messages.custom.filters.isEmpty {
-            criteria.messages.custom = .init()
-        }
     }
 
     // MARK: Custom Network Filters
 
-    func removeFilter(_ filter: ConsoleCustomNetworkFilter) {
+    func remove(_ filter: ConsoleCustomNetworkFilter) {
         if let index = criteria.network.custom.filters.firstIndex(where: { $0.id == filter.id }) {
             criteria.network.custom.filters.remove(at: index)
-        }
-#warning("TODO: is this needed? enable remove only when 2+ items")
-        if criteria.network.custom.filters.isEmpty {
-            criteria.network.custom = .init()
         }
     }
 

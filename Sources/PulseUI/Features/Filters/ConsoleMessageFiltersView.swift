@@ -93,7 +93,7 @@ extension ConsoleMessageFiltersView {
 
     private var customFiltersList: some View {
         ForEach($viewModel.criteria.messages.custom.filters) { filter in
-            ConsoleCustomMessageFilterView(filter: filter, onRemove: isCustomFiltersDefault ? nil  : { viewModel.remove(filter.wrappedValue) })
+            ConsoleCustomMessageFilterView(filter: filter, onRemove: viewModel.criteria.messages.custom.filters.count > 1  ? { viewModel.remove(filter.wrappedValue) } : nil)
         }
     }
 

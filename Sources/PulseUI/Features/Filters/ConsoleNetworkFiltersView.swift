@@ -100,7 +100,7 @@ extension ConsoleNetworkFiltersView {
 
     @ViewBuilder var customFilersList: some View {
         ForEach($viewModel.criteria.network.custom.filters) { filter in
-            ConsoleCustomNetworkFilterView(filter: filter, onRemove: viewModel.criteria.network.custom == .init() ? nil : { viewModel.removeFilter(filter.wrappedValue) })
+            ConsoleCustomNetworkFilterView(filter: filter, onRemove: viewModel.criteria.network.custom.filters.count > 1  ? { viewModel.remove(filter.wrappedValue) } : nil)
         }
     }
 }
