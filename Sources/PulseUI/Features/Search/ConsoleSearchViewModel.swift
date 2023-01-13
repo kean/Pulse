@@ -7,8 +7,6 @@ import Pulse
 import Combine
 import SwiftUI
 
-#warning("TODO: refactor, remove unused")
-
 final class ConsoleSearchViewModel: ObservableObject {
     var isButtonResetEnabled: Bool { !isCriteriaDefault }
 

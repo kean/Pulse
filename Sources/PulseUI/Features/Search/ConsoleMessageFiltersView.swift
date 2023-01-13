@@ -45,7 +45,7 @@ extension ConsoleMessageFiltersView {
     }
 
     var buttonReset: some View {
-        Button("Reset", action: viewModel.resetAll)
+        Button.destructive(action: viewModel.resetAll) { Text("Reset") }
             .disabled(!viewModel.isButtonResetEnabled)
     }
 }

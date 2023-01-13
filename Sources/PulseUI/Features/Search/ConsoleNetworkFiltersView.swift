@@ -49,10 +49,8 @@ extension ConsoleNetworkFiltersView {
     }
 
     var buttonReset: some View {
-        Button("Reset") {
-            viewModel.resetAll()
-            viewModel.resetAll()
-        }.disabled(!(viewModel.isButtonResetEnabled || viewModel.isButtonResetEnabled))
+        Button.destructive(action: viewModel.resetAll) { Text("Reset") }
+            .disabled(!viewModel.isButtonResetEnabled)
     }
 }
 
