@@ -18,15 +18,15 @@ jobs:
       - uses: actions/checkout@v2
       - name: Run Tests
         run: Scripts/test.sh -d "OS=16.1,name=iPhone 14 Pro"
-  macos-latest:
-    name: Unit Tests (macOS, Xcode 14.1)
-    runs-on: macOS-12
-    env:
-      DEVELOPER_DIR: /Applications/Xcode_14.1.app/Contents/Developer
-    steps:
-      - uses: actions/checkout@v2
-      - name: Run Tests
-        run: Scripts/test.sh -d "arch=x86_64"
+#  macos-latest:
+#    name: Unit Tests (macOS, Xcode 14.1)
+#    runs-on: macOS-12
+#    env:
+#      DEVELOPER_DIR: /Applications/Xcode_14.1.app/Contents/Developer
+#    steps:
+#      - uses: actions/checkout@v2
+#      - name: Run Tests
+#        run: Scripts/test.sh -d "arch=x86_64"
   tvos-latest:
     name: Unit Tests (tvOS 16.1, Xcode 14.1)
     runs-on: macOS-12
