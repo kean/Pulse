@@ -13,7 +13,7 @@ struct ConsoleSearchCriteria: Hashable {
     var network = Network()
 
     struct Shared: Hashable {
-        var dates = Dates()
+        var dates = Dates.session
         var general = General()
     }
 

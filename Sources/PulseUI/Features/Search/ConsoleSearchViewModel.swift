@@ -28,10 +28,9 @@ final class ConsoleSearchViewModel: ObservableObject {
         self.labels = ManagedObjectsObserver(context: store.viewContext, sortDescriptior: NSSortDescriptor(keyPath: \LoggerLabelEntity.name, ascending: true))
         self.domains = ManagedObjectsObserver(context: store.viewContext, sortDescriptior: NSSortDescriptor(keyPath: \NetworkDomainEntity.count, ascending: false))
 
-#warning("TODO: can this be simplified?")
-        if store === LoggerStore.shared {
-            criteria.shared.dates = .session
-            defaultCriteria.shared.dates = .session
+        if store.isArchive {
+            criteria.shared.dates.startDate = nil
+            criteria.shared.dates.endDate = nil
         }
     }
 
