@@ -140,10 +140,17 @@ final class TextRendererJSON {
 
     // MARK: - Modify String
 
+    private var previousElement: JSONElement?
+
     private func append(_ string: String, _ element: JSONElement) {
         let length = string.utf16.count
         self.string += string
-        elements.append((NSRange(location: index, length: length), element))
+        if previousElement == element { // Coalesce the same elements
+            elements[elements.endIndex - 1].0.length += length
+        } else {
+            elements.append((NSRange(location: index, length: length), element))
+        }
+        previousElement = element
         index += length
 
         #warning("TODO: reimplement")
