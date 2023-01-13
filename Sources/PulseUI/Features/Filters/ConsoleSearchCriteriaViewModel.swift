@@ -13,6 +13,8 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
     @Published var criteria = ConsoleSearchCriteria()
     private(set) var defaultCriteria = ConsoleSearchCriteria()
 
+    var mode: ConsoleViewModel.Mode = .all
+
     let dataNeedsReload = PassthroughSubject<Void, Never>()
 
     let labels: ManagedObjectsObserver<LoggerLabelEntity>
@@ -45,15 +47,6 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
 #warning("TODO: return different value based on the mod")
     var isDefaultAll: Bool {
         criteria == defaultCriteria
-    }
-
-    #warning("TODO: remove this")
-    var isDefaultForMessages: Bool {
-        criteria.messages == defaultCriteria.messages
-    }
-
-    var isDefaultForNetwork: Bool {
-        criteria.network == defaultCriteria.network
     }
 
     func resetAll() {
