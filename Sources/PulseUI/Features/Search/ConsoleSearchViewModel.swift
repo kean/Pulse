@@ -131,7 +131,6 @@ final class ConsoleSearchViewModel: ObservableObject {
         }
     }
 
-#warning("TODO: move to ConsoleFilters+extensions")
     var programmaticFilters: [ConsoleCustomNetworkFilter]? {
         let programmaticFilters = criteria.network.custom.filters.filter { $0.isProgrammatic && !$0.value.isEmpty }
         guard !programmaticFilters.isEmpty && criteria.network.custom.isEnabled else {

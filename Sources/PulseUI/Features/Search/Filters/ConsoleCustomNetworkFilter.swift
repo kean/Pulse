@@ -128,12 +128,16 @@ struct ConsoleCustomNetworkFilter: Hashable, Identifiable {
     }
 }
 
-#warning("TODO: fix programmatic filters")
+#warning("TODO: fix programmatic filters, add proper search index")
 func evaluateProgrammaticFilters(_ filters: [ConsoleCustomNetworkFilter], entity: NetworkTaskEntity, store: LoggerStore) -> Bool {
     func isMatch(filter: ConsoleCustomNetworkFilter) -> Bool {
         switch filter.field {
-        case .requestBody: return filter.matches(string: String(data: entity.requestBody?.data ?? Data(), encoding: .utf8) ?? "")
-        case .responseBody: return filter.matches(string: String(data: entity.responseBody?.data ?? Data(), encoding: .utf8) ?? "")
+        case .requestBody:
+            let string = String(data: entity.requestBody?.data ?? Data(), encoding: .utf8)
+            return filter.matches(string: string ?? "")
+        case .responseBody:
+            let string = String(data: entity.responseBody?.data ?? Data(), encoding: .utf8)
+            return filter.matches(string: string ?? "")
         default: assertionFailure(); return false
         }
     }

@@ -5,7 +5,6 @@
 import SwiftUI
 import Pulse
 
-#warning("TODO: remove this view")
 struct ConsoleSharedFiltersView: View {
     @ObservedObject var viewModel: ConsoleSearchViewModel
 
