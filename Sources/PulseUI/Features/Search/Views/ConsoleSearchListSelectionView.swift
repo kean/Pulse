@@ -15,34 +15,56 @@ struct ConsoleSearchListSelectionView<Element: Hashable, Label: View>: View {
     @State private var searchText = ""
     @State private var isExpanded = false
 
+#warning("TODO: refactor (use filteredItems for both lists and apply expand (?)")
+#warning("TODO: improve how show more looks on macos")
+#warning("TODO: macos show search only when expanded? or allow to search without expanding - that would be cool")
+#warning("TODO: is .separator color OK?")
+
     var body: some View {
         if items.isEmpty {
-            Text("Empty")
-                .frame(maxWidth: .infinity, alignment: .center)
-                .foregroundColor(.secondary)
+            emptyView
         } else {
             let prefix = isExpanded ? items : Array(items.prefix(limit))
+#if os(macOS)
+            HStack {
+
+                //                if !isExpanded {
+                SearchBar(title: "Search", text: $searchText)
+//                    .frame(width: 140)
+                //                }
+                Spacer()
+                buttonToggleAll
+            }
+#endif
             ForEach(prefix, id: \.self, content: makeRow)
             if items.count > 4 {
 #if os(macOS)
-                if !isExpanded {
-                    Button(action: { isExpanded = true }) {
-                        Text("Show More") + Text("\(items.count)").foregroundColor(.separator)
+                HStack {
+                    if !isExpanded {
+                        Button(action: { isExpanded = true }) {
+                            Text("Show More ") + Text("(\(items.count))").foregroundColor(.secondary)
+                        }
+                    } else {
+                        Button("Show Less") { isExpanded = false }
                     }
-                } else {
-                    Button("Show Less") { isExpanded = false }
                 }
 #else
                 NavigationLink(destination: fullListBody) {
                     HStack {
                         Text("View All")
                         Spacer()
-                        Text("\(items.count)").foregroundColor(.separator)
+                        Text("\(items.count) ").foregroundColor(.separator)
                     }
                 }
 #endif
             }
         }
+    }
+
+    private var emptyView: some View {
+        Text("Empty")
+            .frame(maxWidth: .infinity, alignment: .center)
+            .foregroundColor(.secondary)
     }
 
     private func makeRow(for item: Element) -> some View {
@@ -78,12 +100,7 @@ struct ConsoleSearchListSelectionView<Element: Hashable, Label: View>: View {
     private var fullListForm: some View {
         EmptyView()
         Form {
-            Button(selection.isEmpty ? "Enable All" : "Disable All") {
-                selection = selection.isEmpty ? Set(items) : []
-            }
-#if !os(watchOS)
-            .foregroundColor(.accentColor)
-#endif
+            buttonToggleAll
             ForEach(filteredItems, id: \.self, content: makeRow)
         }
         .inlineNavigationTitle(title)
@@ -91,6 +108,17 @@ struct ConsoleSearchListSelectionView<Element: Hashable, Label: View>: View {
 
     private var filteredItems: [Element] {
         searchText.isEmpty ? items : items.filter { description($0).localizedCaseInsensitiveContains(searchText) }
+    }
+
+#warning("do we really need this? (accentColor?)")
+    @ViewBuilder
+    private var buttonToggleAll: some View {
+        Button(selection.isEmpty ? "Enable All" : "Disable All") {
+            selection = selection.isEmpty ? Set(items) : []
+        }
+#if !os(watchOS)
+        .foregroundColor(.accentColor)
+#endif
     }
 }
 

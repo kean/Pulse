@@ -44,7 +44,7 @@ struct ConsoleCustomMessageFilterView: View {
         Picker("Field", selection: $filter.field) {
             Text("Level").tag(ConsoleCustomMessageFilter.Field.level)
             Text("Label").tag(ConsoleCustomMessageFilter.Field.label)
-            Text("Message").tag(ConsoleCustomMessageFilter.Field.message)
+            Text("Text").tag(ConsoleCustomMessageFilter.Field.message)
             Divider()
             Text("Metadata").tag(ConsoleCustomMessageFilter.Field.metadata)
             Divider()

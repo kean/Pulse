@@ -343,18 +343,13 @@ extension ConsoleSearchView {
         ConsoleFilterSection(header: {
             ConsoleFilterSectionHeader(icon: "tag", title: "Labels", filter: $viewModel.criteria.messages.labels)
         }, content: {
-            labelsContent
+            ConsoleSearchListSelectionView(
+                title: "Labels",
+                items: viewModel.labels,
+                selection: $viewModel.selectedLabels,
+                label: { Text($0.capitalized).lineLimit(1) }
+            )
         })
-    }
-
-    @ViewBuilder
-    private var labelsContent: some View {
-        ConsoleSearchListSelectionView(
-            title: "Labels",
-            items: viewModel.labels,
-            selection: $viewModel.selectedLabels,
-            label: { Text($0.capitalized) }
-        )
     }
 }
 
