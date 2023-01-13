@@ -10,7 +10,7 @@ import SwiftUI
 #warning("TODO: refactor, remove unused")
 
 final class ConsoleSearchViewModel: ObservableObject {
-    @Published var isButtonResetEnabled = false
+    var isButtonResetEnabled: Bool { !isCriteriaDefault }
 
     @Published var criteria = ConsoleSearchCriteria()
     private(set) var defaultCriteria = ConsoleSearchCriteria()
@@ -20,6 +20,7 @@ final class ConsoleSearchViewModel: ObservableObject {
     let labels: ManagedObjectsObserver<LoggerLabelEntity>
     let domains: ManagedObjectsObserver<NetworkDomainEntity>
 
+    @Published var mode: ConsoleViewModel.Mode = .messages
     private let store: LoggerStore
     private var cancellables: [AnyCancellable] = []
 
@@ -35,16 +36,13 @@ final class ConsoleSearchViewModel: ObservableObject {
             defaultCriteria.shared.dates = .session
         }
 
-#warning("TODO: rework how reset is enabled (we have hashable for this)")
-        $criteria.dropFirst().sink { [weak self] _ in
-            self?.isButtonResetEnabled = true
-            DispatchQueue.main.async { // important!
-                self?.dataNeedsReload.send()
-            }
+#warning("TODO: refactor")
+        $criteria.dropFirst().receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.dataNeedsReload.send()
         }.store(in: &cancellables)
     }
 
-    func isCriteriaDefault(for mode: ConsoleViewModel.Mode) -> Bool {
+    var isCriteriaDefault: Bool {
         guard criteria.shared == defaultCriteria.shared else { return false }
         switch mode {
         case .messages: return criteria.messages == defaultCriteria.messages
@@ -54,7 +52,6 @@ final class ConsoleSearchViewModel: ObservableObject {
 
     func resetAll() {
         criteria = defaultCriteria
-        isButtonResetEnabled = false
     }
 
     func removeAllPins() {

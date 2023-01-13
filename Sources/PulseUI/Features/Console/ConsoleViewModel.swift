@@ -89,11 +89,9 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         prepare(for: mode)
     }
 
-    var isCriteriaDefault: Bool {
-        searchViewModel.isCriteriaDefault(for: mode)
-    }
-
     private func prepare(for mode: Mode) {
+        searchViewModel.mode = mode
+
         let request = makeFetchRequest(for: mode)
         controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: store.viewContext, sectionNameKeyPath: nil, cacheName: nil)
         controller?.delegate = self
