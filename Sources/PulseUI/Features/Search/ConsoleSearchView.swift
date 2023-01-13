@@ -24,11 +24,7 @@ struct ConsoleSearchView: View {
         }
     }
 #endif
-}
 
-// MARK: - ConsoleSearchView (Contents)
-
-extension ConsoleSearchView {
     @ViewBuilder
     var formContents: some View {
 #if os(tvOS) || os(watchOS)
@@ -48,7 +44,7 @@ extension ConsoleSearchView {
     private var messagesCriteriaView: some View {
 #if os(iOS) || os(macOS)
         if #available(iOS 15, *) {
-            generalSection
+            customMessageFiltersSection
         }
 #endif
         logLevelsSection
@@ -59,12 +55,12 @@ extension ConsoleSearchView {
     private var networkCriteriaView: some View {
 #if os(iOS) || os(macOS)
         if #available(iOS 15, *) {
-            generalGroup
+            customNetworkFiltersSection
         }
 #endif
-        responseGroup
-        domainsGroup
-        networkingGroup
+        responseSection
+        domainsSection
+        networkingSection
     }
 
     var buttonReset: some View {
@@ -73,37 +69,22 @@ extension ConsoleSearchView {
     }
 }
 
-// MARK: - Shared
+// MARK: - ConsoleSearchView (Shared)
 
 extension ConsoleSearchView {
     @ViewBuilder
     var sharedCriteriaView: some View {
-        sectionTimePeriod
-        sectionFilters
-    }
+        ConsoleFilterSection(header: {
+            ConsoleFilterSectionHeader(icon: "calendar", title: "Time Period", filter: $viewModel.criteria.shared.dates, default: viewModel.defaultCriteria.shared.dates)
+        }, content: {
+            ConsoleFiltersTimePeriodCell(selection: $viewModel.criteria.shared.dates)
+        })
 
-    private var sectionTimePeriod: some View {
-        ConsoleFilterSection(
-            header: { timePeriodHeader },
-            content: { ConsoleFiltersTimePeriodCell(selection: $viewModel.criteria.shared.dates) }
-        )
-    }
-
-    private var timePeriodHeader: some View {
-        ConsoleFilterSectionHeader(icon: "calendar", title: "Time Period", filter: $viewModel.criteria.shared.dates, default: viewModel.defaultCriteria.shared.dates)
-    }
-
-    // MARK: Filters
-
-    private var sectionFilters: some View {
-        ConsoleFilterSection(
-            header: {
-                ConsoleFilterSectionHeader(icon: "gear", title: "General", filter: $viewModel.criteria.shared.general)
-            },
-            content: {
-                ConsoleFiltersPinsCell(selection: $viewModel.criteria.shared.general, removeAll: viewModel.removeAllPins)
-            }
-        )
+        ConsoleFilterSection(header: {
+            ConsoleFilterSectionHeader(icon: "gear", title: "General", filter: $viewModel.criteria.shared.general)
+        }, content: {
+            ConsoleFiltersPinsCell(selection: $viewModel.criteria.shared.general, removeAll: viewModel.removeAllPins)
+        })
     }
 }
 
@@ -113,21 +94,18 @@ extension ConsoleSearchView {
 
 @available(iOS 15, *)
 extension ConsoleSearchView {
-    var generalGroup: some View {
-        ConsoleFilterSection(
-            header: { generalGroupHeader },
-            content: { generalGroupContent }
-        )
-    }
-
-    private var generalGroupHeader: some View {
-        ConsoleFilterSectionHeader(icon: "line.horizontal.3.decrease.circle", title: "Filters", filter: $viewModel.criteria.network.custom)
+    var customNetworkFiltersSection: some View {
+        ConsoleFilterSection(header: {
+            ConsoleFilterSectionHeader(icon: "line.horizontal.3.decrease.circle", title: "Filters", filter: $viewModel.criteria.network.custom)
+        }, content: {
+            customNetworkFiltersContent
+        })
     }
 
 #if os(iOS)
     @ViewBuilder
-    private var generalGroupContent: some View {
-        customFilersList
+    private var customNetworkFiltersContent: some View {
+        customNetworkFilersList
         if !(viewModel.criteria.network.custom == .init()) {
             Button(action: { viewModel.criteria.network.custom.filters.append(.default) }) {
                 Text("Add Filter").frame(maxWidth: .infinity)
@@ -136,9 +114,9 @@ extension ConsoleSearchView {
     }
 #elseif os(macOS)
     @ViewBuilder
-    private var generalGroupContent: some View {
+    private var customNetworkFiltersContent: some View {
         VStack {
-            customFilersList
+            customNetworkFilersList
         }.padding(.leading, -8)
 
         if !(viewModel.criteria.network.custom == .init()) {
@@ -149,7 +127,7 @@ extension ConsoleSearchView {
     }
 #endif
 
-    @ViewBuilder var customFilersList: some View {
+    @ViewBuilder var customNetworkFilersList: some View {
         ForEach($viewModel.criteria.network.custom.filters) { filter in
             ConsoleCustomNetworkFilterView(filter: filter, onRemove: viewModel.criteria.network.custom.filters.count > 1  ? { viewModel.remove(filter.wrappedValue) } : nil)
         }
@@ -161,48 +139,32 @@ extension ConsoleSearchView {
 // MARK: - ConsoleSearchView (Response)
 
 extension ConsoleSearchView {
-    var responseGroup: some View {
-        ConsoleFilterSection(
-            header: { responseGroupHeader },
-            content: { responseGroupContent }
-        )
-    }
-
-    private var responseGroupHeader: some View {
-        ConsoleFilterSectionHeader(icon: "arrow.down.circle", title:  "Response", filter: $viewModel.criteria.network.response)
-    }
-
-    @ViewBuilder
-    private var responseGroupContent: some View {
+    var responseSection: some View {
+        ConsoleFilterSection(header: {
+            ConsoleFilterSectionHeader(icon: "arrow.down.circle", title:  "Response", filter: $viewModel.criteria.network.response)
+        }, content: {
 #if os(iOS) || os(macOS)
         ConsoleFiltersStatusCodeCell(selection: $viewModel.criteria.network.response.statusCode.range)
         ConsoleFiltersDurationCell(selection: $viewModel.criteria.network.response.duration)
         ConsoleFiltersResponseSizeCell(selection: $viewModel.criteria.network.response.responseSize)
 #endif
         ConsoleFiltersContentTypeCell(selection: $viewModel.criteria.network.response.contentType.contentType)
+        })
     }
 }
 
 // MARK: - ConsoleSearchView (Domains)
 
 extension ConsoleSearchView {
-    var domainsGroup: some View {
-        ConsoleFilterSection(
-            header: { domainsGroupHeader },
-            content: { domainsGroupContent }
-        )
-    }
-
-    private var domainsGroupHeader: some View {
-        ConsoleFilterSectionHeader(icon: "server.rack", title: "Hosts", filter: $viewModel.criteria.network.host)
-    }
-
-    @ViewBuilder
-    private var domainsGroupContent: some View {
-        makeDomainPicker(limit: 4)
-        if viewModel.domains.objects.count > 4 {
-            domainsShowAllButton
-        }
+    var domainsSection: some View {
+        ConsoleFilterSection(header: {
+            ConsoleFilterSectionHeader(icon: "server.rack", title: "Hosts", filter: $viewModel.criteria.network.host)
+        }, content: {
+            makeDomainPicker(limit: 4)
+            if viewModel.domains.objects.count > 4 {
+                domainsShowAllButton
+            }
+        })
     }
 
 #if os(macOS)
@@ -265,22 +227,14 @@ extension ConsoleSearchView {
 // MARK: - ConsoleSearchView (Networking)
 
 extension ConsoleSearchView {
-    var networkingGroup: some View {
-        ConsoleFilterSection(
-            header: { networkingGroupHeader },
-            content: { networkingGroupContent }
-        )
-    }
-
-    private var networkingGroupHeader: some View {
-        ConsoleFilterSectionHeader(icon: "arrowshape.zigzag.right", title: "Networking", filter: $viewModel.criteria.network.networking)
-    }
-
-    @ViewBuilder
-    private var networkingGroupContent: some View {
-        ConsoleFiltersTaskTypeCell(selection: $viewModel.criteria.network.networking.taskType)
-        ConsoleFiltersResponseSourceCell(selection: $viewModel.criteria.network.networking.source)
-        ConsoleFiltersToggleCell(title: "Redirect", isOn: $viewModel.criteria.network.networking.isRedirect)
+    var networkingSection: some View {
+        ConsoleFilterSection(header: {
+            ConsoleFilterSectionHeader(icon: "arrowshape.zigzag.right", title: "Networking", filter: $viewModel.criteria.network.networking)
+        }, content: {
+            ConsoleFiltersTaskTypeCell(selection: $viewModel.criteria.network.networking.taskType)
+            ConsoleFiltersResponseSourceCell(selection: $viewModel.criteria.network.networking.source)
+            ConsoleFiltersToggleCell(title: "Redirect", isOn: $viewModel.criteria.network.networking.isRedirect)
+        })
     }
 }
 
@@ -289,20 +243,17 @@ extension ConsoleSearchView {
 #if os(iOS) || os(macOS)
 @available(iOS 15, *)
 extension ConsoleSearchView {
-    var generalSection: some View {
-        ConsoleFilterSection(
-            header: { generalHeader },
-            content: { generalContent }
-        )
-    }
-
-    private var generalHeader: some View {
-        ConsoleFilterSectionHeader(icon: "line.horizontal.3.decrease.circle", title: "Filters", filter: $viewModel.criteria.messages.custom)
+    var customMessageFiltersSection: some View {
+        ConsoleFilterSection(header: {
+            ConsoleFilterSectionHeader(icon: "line.horizontal.3.decrease.circle", title: "Filters", filter: $viewModel.criteria.messages.custom)
+        }, content: {
+            customMessageFiltersContent
+        })
     }
 
 #if os(iOS) || os(tvOS)
     @ViewBuilder
-    private var generalContent: some View {
+    private var customMessageFiltersContent: some View {
         customFiltersList
         if !isCustomFiltersDefault {
             Button(action: { viewModel.criteria.messages.custom.filters.append(.default) }) {
@@ -312,7 +263,7 @@ extension ConsoleSearchView {
     }
 #else
     @ViewBuilder
-    private var generalContent: some View {
+    private var customMessageFiltersContent: some View {
         VStack {
             customFiltersList
         }.padding(.leading, -8)
@@ -341,14 +292,11 @@ extension ConsoleSearchView {
 
 extension ConsoleSearchView {
     var logLevelsSection: some View {
-        ConsoleFilterSection(
-            header: { logLevelsHeader },
-            content: { logLevelsContent }
-        )
-    }
-
-    private var logLevelsHeader: some View {
-        ConsoleFilterSectionHeader(icon: "flag", title: "Levels", filter: $viewModel.criteria.messages.logLevels)
+        ConsoleFilterSection(header: {
+            ConsoleFilterSectionHeader(icon: "flag", title: "Levels", filter: $viewModel.criteria.messages.logLevels)
+        }, content: {
+            logLevelsContent
+        })
     }
 
 #if os(macOS)
@@ -392,14 +340,11 @@ extension ConsoleSearchView {
 
 extension ConsoleSearchView {
     var labelsSection: some View {
-        ConsoleFilterSection(
-            header: { labelsHeader },
-            content: { labelsContent }
-        )
-    }
-
-    private var labelsHeader: some View {
-        ConsoleFilterSectionHeader(icon: "tag", title: "Labels", filter: $viewModel.criteria.messages.labels)
+        ConsoleFilterSection(header: {
+            ConsoleFilterSectionHeader(icon: "tag", title: "Labels", filter: $viewModel.criteria.messages.labels)
+        }, content: {
+            labelsContent
+        })
     }
 
 #if os(macOS)
