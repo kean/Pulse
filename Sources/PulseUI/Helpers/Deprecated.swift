@@ -19,6 +19,10 @@ public struct PinsView: View {
 public struct NetworkView: View {
     private let store: LoggerStore
 
+    public init(store: LoggerStore) {
+        self.store = store
+    }
+
     public var body: some View {
         ConsoleView.network(store: store)
     }
