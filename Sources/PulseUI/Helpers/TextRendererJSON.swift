@@ -5,7 +5,6 @@
 import Foundation
 import Pulse
 
-#warning("can we optimize it? create a single string first and then add attributes")
 #warning("for monoscrome, we can just use native pretty formatting (but still highlight error?)")
 #warning("disable attributed rendering completely for sharing the entire store?")
 
@@ -36,6 +35,7 @@ final class TextRendererJSON {
         print(json: json, isFree: true)
 
         let output = NSMutableAttributedString(string: string, attributes: helper.attributes(role: .body2, style: .monospaced, color: nil))
+        output.beginEditing()
         for (range, element) in elements {
             output.addAttribute(.foregroundColor, value: color(for: element), range: range)
         }
@@ -95,8 +95,8 @@ final class TextRendererJSON {
             }
             indent()
             append("}", .punctuation)
-        case let object as String:
-            append("\"\(object)\"", .valueString)
+        case let string as String:
+            append("\"\(string)\"", .valueString)
         case let array as [Any]:
             if array.contains(where: { $0 is [String: Any] }) {
                 append("[\n", .punctuation)
