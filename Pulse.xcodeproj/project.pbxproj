@@ -1189,7 +1189,7 @@
 			children = (
 				0CF0D5F9296F189600EED9D4 /* Console */,
 				0CF0D5DD296F189500EED9D4 /* Inspector */,
-				0CF0D5B3296F189500EED9D4 /* Filters */,
+				0CF0D5B3296F189500EED9D4 /* Search */,
 				0CF0D5DE296F189500EED9D4 /* Metrics */,
 				0CF0D5CB296F189500EED9D4 /* Insights */,
 				0CF0D5CE296F189500EED9D4 /* Settings */,
@@ -1198,7 +1198,7 @@
 			path = Features;
 			sourceTree = "<group>";
 		};
-		0CF0D5B3296F189500EED9D4 /* Filters */ = {
+		0CF0D5B3296F189500EED9D4 /* Search */ = {
 			isa = PBXGroup;
 			children = (
 				0CDFB839296F5B9D0071EF77 /* Cells */,
@@ -1210,7 +1210,7 @@
 				0CF0D5C4296F189500EED9D4 /* ConsoleFiltersView.swift */,
 				0CF0D5B6296F189500EED9D4 /* ConsoleSearchViewModel.swift */,
 			);
-			path = Filters;
+			path = Search;
 			sourceTree = "<group>";
 		};
 		0CF0D5B9296F189500EED9D4 /* Views */ = {
