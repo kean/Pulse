@@ -86,7 +86,7 @@ private struct ConsoleMenuView: View {
     }
 
     private var destinationFilters: some View {
-        ConsoleFiltersView(viewModel: viewModel).padding()
+        ConsoleSearchView(viewModel: viewModel.searchViewModel).padding()
     }
 }
 

@@ -48,7 +48,7 @@ public struct ConsoleView: View {
         }
         .sheet(isPresented: $isPresentingFilters) {
             NavigationView {
-                ConsoleFiltersView(viewModel: viewModel)
+                ConsoleSearchView(viewModel: viewModel.searchViewModel)
                     .toolbar {
                         ToolbarItem(placement: .cancellationAction) {
                             Button("Close") { isPresentingFilters = false }
@@ -74,7 +74,7 @@ public struct ConsoleView: View {
             Button(action: { isPresentingFilters = true }) {
                 Image(systemName: "line.3.horizontal.decrease.circle")
             }
-            .background(viewModel.isDefaultFilters ? nil : Rectangle().foregroundColor(.blue).cornerRadius(8))
+            .background(viewModel.searchViewModel.isCriteriaDefault ? nil : Rectangle().foregroundColor(.blue).cornerRadius(8))
         }
             .font(.title3)
             .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
