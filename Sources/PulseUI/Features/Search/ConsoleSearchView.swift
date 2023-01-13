@@ -8,7 +8,6 @@ import Pulse
 struct ConsoleSearchView: View {
     @ObservedObject var viewModel: ConsoleSearchViewModel
 
-    @State private var isRedirectGroupExpanded = true
     @State private var isDomainsPickerPresented = false
 
 #if os(iOS) || os(watchOS) || os(tvOS)
