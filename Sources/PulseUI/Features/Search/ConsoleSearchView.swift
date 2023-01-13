@@ -161,7 +161,7 @@ extension ConsoleSearchView {
             ConsoleFilterSectionHeader(icon: "server.rack", title: "Hosts", filter: $viewModel.criteria.network.host)
         }, content: {
             makeDomainPicker(limit: 4)
-            if viewModel.domains.objects.count > 4 {
+            if viewModel.domains.count > 4 {
                 domainsShowAllButton
             }
         })
@@ -201,7 +201,7 @@ extension ConsoleSearchView {
     }
 
     private func makeDomainPicker(limit: Int? = nil) -> some View {
-        var domains = viewModel.domains.objects.map(\.value)
+        var domains = viewModel.domains
         if let limit = limit {
             domains = Array(domains.prefix(limit))
         }
@@ -216,7 +216,7 @@ extension ConsoleSearchView {
     private var domainsPickerView: some View {
         List {
             Button("Deselect All") {
-                viewModel.criteria.network.host.ignoredHosts = Set(viewModel.domains.objects.map(\.value))
+                viewModel.criteria.network.host.ignoredHosts = Set(viewModel.domains)
             }
             makeDomainPicker()
         }
@@ -366,7 +366,7 @@ extension ConsoleSearchView {
 #else
     @ViewBuilder
     private var labelsContent: some View {
-        let labels = viewModel.labels.objects.map(\.name)
+        let labels = viewModel.labels
 
         if labels.isEmpty {
             Text("No Labels")
@@ -377,9 +377,10 @@ extension ConsoleSearchView {
                 Checkbox(item.capitalized, isOn: viewModel.binding(forLabel: item))
             }
             if labels.count > 4 {
-                NavigationLink(destination: ConsoleFiltersLabelsPickerView(viewModel: viewModel)) {
-                    Text("View All").foregroundColor(.blue)
-                }
+                #warning("TODO: reimplement")
+//                NavigationLink(destination: ConsoleFiltersLabelsPickerView(viewModel: viewModel)) {
+//                    Text("View All").foregroundColor(.blue)
+//                }
             }
         }
     }

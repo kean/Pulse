@@ -7,29 +7,47 @@ import Pulse
 import Combine
 import SwiftUI
 
+#warning("TODO: use the new picker for labels and stuff")
+#warning("TODO: rework how labels and domains aare loaded - use Published?")
+#warning("TODO: are we display lavels from all messages? is this ok?")
+#warning("TODO: display number of items next to each one if possible")
+#warning("TODO: also add short view with a limit how many to display + use on all platforms including macOS")
 final class ConsoleSearchViewModel: ObservableObject {
     var isButtonResetEnabled: Bool { !isCriteriaDefault }
 
     @Published var criteria = ConsoleSearchCriteria()
     @Published var mode: ConsoleViewModel.Mode = .messages
 
-    let labels: ManagedObjectsObserver<LoggerLabelEntity>
-    let domains: ManagedObjectsObserver<NetworkDomainEntity>
+    @Published private(set) var labels: [String] = []
+    @Published private(set) var domains: [String] = []
+
+    private let labelsObserver: ManagedObjectsObserver<LoggerLabelEntity>
+    private let domainsObserver: ManagedObjectsObserver<NetworkDomainEntity>
 
     private(set) var defaultCriteria = ConsoleSearchCriteria()
     private let store: LoggerStore
+    private var cancellables: [AnyCancellable] = []
 
     init(store: LoggerStore) {
         self.store = store
 
-        self.labels = ManagedObjectsObserver(context: store.viewContext, sortDescriptior: NSSortDescriptor(keyPath: \LoggerLabelEntity.name, ascending: true))
-        self.domains = ManagedObjectsObserver(context: store.viewContext, sortDescriptior: NSSortDescriptor(keyPath: \NetworkDomainEntity.count, ascending: false))
+        self.labelsObserver = ManagedObjectsObserver(context: store.viewContext, sortDescriptior: NSSortDescriptor(keyPath: \LoggerLabelEntity.name, ascending: true))
+
+        self.domainsObserver = ManagedObjectsObserver(context: store.viewContext, sortDescriptior: NSSortDescriptor(keyPath: \NetworkDomainEntity.count, ascending: false))
 
         if store.isArchive {
-            criteria.shared.dates.startDate = nil
-            criteria.shared.dates.endDate = nil
+            self.criteria.shared.dates.startDate = nil
+            self.criteria.shared.dates.endDate = nil
         }
-        defaultCriteria = criteria
+        self.defaultCriteria = criteria
+
+        labelsObserver.$objects.sink { [weak self] in
+            self?.labels = $0.map(\.name)
+        }.store(in: &cancellables)
+
+        domainsObserver.$objects.sink { [weak self] in
+            self?.labels = $0.map(\.value)
+        }.store(in: &cancellables)
     }
 
     var isCriteriaDefault: Bool {
@@ -87,6 +105,21 @@ final class ConsoleSearchViewModel: ObservableObject {
 
     // MARK: Binding (ConsoleFilters.Labels)
 
+#warning("TEMP")
+    var labelsSelection: Binding<Set<String>> {
+        fatalError()
+//        Binding(get: {
+//            if let focused = self.criteria.messages.labels.focused {
+//                return [focused]
+//            } else {
+//                return criteria.messages.labels.hidden
+//                !self.criteria.messages.labels.hidden.contains(label)
+//            }
+//        }, set: { labels in
+//
+//        })
+    }
+
     func binding(forLabel label: String) -> Binding<Bool> {
         Binding(get: {
             if let focused = self.criteria.messages.labels.focused {
@@ -112,7 +145,7 @@ final class ConsoleSearchViewModel: ObservableObject {
             if isOn {
                 self.criteria.messages.labels.hidden = []
             } else {
-                self.criteria.messages.labels.hidden = Set(self.labels.objects.map(\.name))
+                self.criteria.messages.labels.hidden = Set(self.labels)
             }
         })
     }
