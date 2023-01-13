@@ -44,7 +44,7 @@ public struct ConsoleView: View {
             .sheet(item: $shareItems, content: ShareView.init)
             .sheet(isPresented: $isShowingAsText) {
                 NavigationView {
-                    ConsoleTextView(entities: viewModel.getObservableProperties()) {
+                    ConsoleTextView(entities: viewModel.entitiesSubject) {
                         isShowingAsText = false
                     }
                 }

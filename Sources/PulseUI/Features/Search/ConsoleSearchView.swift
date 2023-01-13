@@ -8,62 +8,66 @@ import Pulse
 struct ConsoleSearchView: View {
     @ObservedObject var viewModel: ConsoleSearchViewModel
 
-    @State private var isDomainsPickerPresented = false
+    var body: some View {
+        contents
+            .onAppear { viewModel.onAppear() }
+            .onDisappear { viewModel.onDisappear() }
+    }
 
+    var contents: some View {
 #if os(iOS) || os(watchOS) || os(tvOS)
-    var body: some View {
-        Form { formContents }
-#if os(iOS)
-            .navigationBarItems(leading: buttonReset)
-#endif
-    }
-#else
-    var body: some View {
-        ScrollView {
-            formContents.frame(width: 320)
+        Form {
+            form
         }
-    }
+#if os(iOS)
+        .navigationBarItems(leading: buttonReset)
 #endif
+#else
+        ScrollView {
+            form.frame(width: 310)
+        }
+#endif
+    }
 
     @ViewBuilder
-    var formContents: some View {
+    private var form: some View {
 #if os(tvOS) || os(watchOS)
-        Section {
+        buttonReset
+#elseif os(macOS)
+        HStack {
+            Text(viewModel.mode == .network ? "Network Filters" : "Message Filters")
+                .font(.headline)
+            Spacer()
             buttonReset
         }
+        .padding(12)
 #endif
-        sharedCriteriaView
+
+        timePeriodSection
+        generalSection
 
         switch viewModel.mode {
-        case .messages: messagesCriteriaView
-        case .network: networkCriteriaView
-        }
-    }
-
-    @ViewBuilder
-    private var messagesCriteriaView: some View {
+        case .messages:
 #if os(iOS) || os(macOS)
-        if #available(iOS 15, *) {
-            customMessageFiltersSection
-        }
+            if #available(iOS 15, *) {
+                customMessageFiltersSection
+            }
 #endif
-        logLevelsSection
-        labelsSection
-    }
-
-    @ViewBuilder
-    private var networkCriteriaView: some View {
+            logLevelsSection
+            labelsSection
+        case .network:
 #if os(iOS) || os(macOS)
-        if #available(iOS 15, *) {
-            customNetworkFiltersSection
-        }
+            if #available(iOS 15, *) {
+                customNetworkFiltersSection
+            }
 #endif
-        responseSection
-        domainsSection
-        networkingSection
+            responseSection
+            domainsSection
+            networkingSection
+        }
     }
 
-    var buttonReset: some View {
+    private var buttonReset: some View {
         Button.destructive(action: viewModel.resetAll) { Text("Reset") }
             .disabled(!viewModel.isButtonResetEnabled)
     }
@@ -72,331 +76,158 @@ struct ConsoleSearchView: View {
 // MARK: - ConsoleSearchView (Shared)
 
 extension ConsoleSearchView {
-    @ViewBuilder
-    var sharedCriteriaView: some View {
-        ConsoleFilterSection(header: {
-            ConsoleFilterSectionHeader(icon: "calendar", title: "Time Period", filter: $viewModel.criteria.shared.dates, default: viewModel.defaultCriteria.shared.dates)
+    var timePeriodSection: some View {
+        ConsoleSearchSection(header: {
+            ConsoleSearchSectionHeader(icon: "calendar", title: "Time Period", filter: $viewModel.criteria.shared.dates, default: viewModel.defaultCriteria.shared.dates)
         }, content: {
-            ConsoleFiltersTimePeriodCell(selection: $viewModel.criteria.shared.dates)
+            ConsoleSearchTimePeriodCell(selection: $viewModel.criteria.shared.dates)
         })
+    }
 
-        ConsoleFilterSection(header: {
-            ConsoleFilterSectionHeader(icon: "gear", title: "General", filter: $viewModel.criteria.shared.general)
+    var generalSection: some View {
+        ConsoleSearchSection(header: {
+            ConsoleSearchSectionHeader(icon: "gear", title: "General", filter: $viewModel.criteria.shared.general)
         }, content: {
-            ConsoleFiltersPinsCell(selection: $viewModel.criteria.shared.general, removeAll: viewModel.removeAllPins)
+            ConsoleSearchPinsCell(selection: $viewModel.criteria.shared.general, removeAll: viewModel.removeAllPins)
         })
     }
 }
 
-// MARK: - ConsoleSearchView (General)
+// MARK: - ConsoleSearchView (Message)
 
+extension ConsoleSearchView {
 #if os(iOS) || os(macOS)
-
-@available(iOS 15, *)
-extension ConsoleSearchView {
-    var customNetworkFiltersSection: some View {
-        ConsoleFilterSection(header: {
-            ConsoleFilterSectionHeader(icon: "line.horizontal.3.decrease.circle", title: "Filters", filter: $viewModel.criteria.network.custom)
-        }, content: {
-            customNetworkFiltersContent
-        })
-    }
-
-#if os(iOS)
-    @ViewBuilder
-    private var customNetworkFiltersContent: some View {
-        customNetworkFilersList
-        if !(viewModel.criteria.network.custom == .init()) {
-            Button(action: { viewModel.criteria.network.custom.filters.append(.default) }) {
-                Text("Add Filter").frame(maxWidth: .infinity)
-            }
-        }
-    }
-#elseif os(macOS)
-    @ViewBuilder
-    private var customNetworkFiltersContent: some View {
-        VStack {
-            customNetworkFilersList
-        }.padding(.leading, -8)
-
-        if !(viewModel.criteria.network.custom == .init()) {
-            Button(action: { viewModel.criteria.network.custom.filters.append(.default) }) {
-                Image(systemName: "plus.circle")
-            }.padding(.top, 6)
-        }
-    }
-#endif
-
-    @ViewBuilder var customNetworkFilersList: some View {
-        ForEach($viewModel.criteria.network.custom.filters) { filter in
-            ConsoleCustomNetworkFilterView(filter: filter, onRemove: viewModel.criteria.network.custom.filters.count > 1  ? { viewModel.remove(filter.wrappedValue) } : nil)
-        }
-    }
-}
-
-#endif
-
-// MARK: - ConsoleSearchView (Response)
-
-extension ConsoleSearchView {
-    var responseSection: some View {
-        ConsoleFilterSection(header: {
-            ConsoleFilterSectionHeader(icon: "arrow.down.circle", title:  "Response", filter: $viewModel.criteria.network.response)
-        }, content: {
-#if os(iOS) || os(macOS)
-        ConsoleFiltersStatusCodeCell(selection: $viewModel.criteria.network.response.statusCode.range)
-        ConsoleFiltersDurationCell(selection: $viewModel.criteria.network.response.duration)
-        ConsoleFiltersResponseSizeCell(selection: $viewModel.criteria.network.response.responseSize)
-#endif
-        ConsoleFiltersContentTypeCell(selection: $viewModel.criteria.network.response.contentType.contentType)
-        })
-    }
-}
-
-// MARK: - ConsoleSearchView (Domains)
-
-extension ConsoleSearchView {
-    var domainsSection: some View {
-        ConsoleFilterSection(header: {
-            ConsoleFilterSectionHeader(icon: "server.rack", title: "Hosts", filter: $viewModel.criteria.network.host)
-        }, content: {
-            makeDomainPicker(limit: 4)
-            if viewModel.domains.objects.count > 4 {
-                domainsShowAllButton
-            }
-        })
-    }
-
-#if os(macOS)
-    private var domainsShowAllButton: some View {
-        HStack {
-            Spacer()
-            Button(action: { isDomainsPickerPresented = true }) {
-                Text("Show All")
-            }
-            .padding(.top, 6)
-            .popover(isPresented: $isDomainsPickerPresented) {
-                domainsPickerView.frame(width: 380, height: 420)
-            }
-            Spacer()
-        }
-    }
-
-    private func makeDomainPicker(limit: Int? = nil) -> some View {
-        var domains = viewModel.domains.objects.map(\.value)
-        if let limit = limit {
-            domains = Array(domains.prefix(limit))
-        }
-        return ForEach(domains, id: \.self) { domain in
-            Toggle(domain, isOn: viewModel.binding(forDomain: domain))
-                .lineLimit(1)
-                .frame(maxWidth: .infinity, alignment: .leading)
-        }
-    }
-#else
-    private var domainsShowAllButton: some View {
-        NavigationLink(destination: { domainsPickerView }) {
-            Text("Show All")
-        }
-    }
-
-    private func makeDomainPicker(limit: Int? = nil) -> some View {
-        var domains = viewModel.domains.objects.map(\.value)
-        if let limit = limit {
-            domains = Array(domains.prefix(limit))
-        }
-        return ForEach(domains, id: \.self) { domain in
-            Checkbox(domain, isOn: viewModel.binding(forDomain: domain))
-                .lineLimit(4)
-        }
-    }
-#endif
-
-    // TODO: Add search
-    private var domainsPickerView: some View {
-        List {
-            Button("Deselect All") {
-                viewModel.criteria.network.host.ignoredHosts = Set(viewModel.domains.objects.map(\.value))
-            }
-            makeDomainPicker()
-        }
-        .inlineNavigationTitle("Select Hosts")
-    }
-}
-
-// MARK: - ConsoleSearchView (Networking)
-
-extension ConsoleSearchView {
-    var networkingSection: some View {
-        ConsoleFilterSection(header: {
-            ConsoleFilterSectionHeader(icon: "arrowshape.zigzag.right", title: "Networking", filter: $viewModel.criteria.network.networking)
-        }, content: {
-            ConsoleFiltersTaskTypeCell(selection: $viewModel.criteria.network.networking.taskType)
-            ConsoleFiltersResponseSourceCell(selection: $viewModel.criteria.network.networking.source)
-            ConsoleFiltersToggleCell(title: "Redirect", isOn: $viewModel.criteria.network.networking.isRedirect)
-        })
-    }
-}
-
-// MARK: - ConsoleSearchView (Custom Filters)
-
-#if os(iOS) || os(macOS)
-@available(iOS 15, *)
-extension ConsoleSearchView {
+    @available(iOS 15, *)
     var customMessageFiltersSection: some View {
-        ConsoleFilterSection(header: {
-            ConsoleFilterSectionHeader(icon: "line.horizontal.3.decrease.circle", title: "Filters", filter: $viewModel.criteria.messages.custom)
+        ConsoleSearchSection(header: {
+            ConsoleSearchSectionHeader(icon: "line.horizontal.3.decrease.circle", title: "Filters", filter: $viewModel.criteria.messages.custom)
         }, content: {
-            customMessageFiltersContent
+            ConsoleSearchCustomMessageFiltersSection(selection: $viewModel.criteria.messages.custom)
         })
     }
-
-#if os(iOS) || os(tvOS)
-    @ViewBuilder
-    private var customMessageFiltersContent: some View {
-        customFiltersList
-        if !isCustomFiltersDefault {
-            Button(action: { viewModel.criteria.messages.custom.filters.append(.default) }) {
-                Text("Add Filter").frame(maxWidth: .infinity)
-            }
-        }
-    }
-#else
-    @ViewBuilder
-    private var customMessageFiltersContent: some View {
-        VStack {
-            customFiltersList
-        }.padding(.leading, -8)
-
-        if !isCustomFiltersDefault {
-            Button(action: { viewModel.criteria.messages.custom.filters.append(.default) }) {
-                Image(systemName: "plus.circle")
-            }.padding(.top, 6)
-        }
-    }
 #endif
 
-    private var customFiltersList: some View {
-        ForEach($viewModel.criteria.messages.custom.filters) { filter in
-            ConsoleCustomMessageFilterView(filter: filter, onRemove: viewModel.criteria.messages.custom.filters.count > 1  ? { viewModel.remove(filter.wrappedValue) } : nil)
-        }
-    }
-
-    private var isCustomFiltersDefault: Bool {
-        viewModel.criteria.messages.custom == .init()
-    }
-}
-#endif
-
-// MARK: - ConsoleSearchView (Log Levels)
-
-extension ConsoleSearchView {
     var logLevelsSection: some View {
-        ConsoleFilterSection(header: {
-            ConsoleFilterSectionHeader(icon: "flag", title: "Levels", filter: $viewModel.criteria.messages.logLevels)
+        ConsoleSearchSection(header: {
+            ConsoleSearchSectionHeader(icon: "flag", title: "Levels", filter: $viewModel.criteria.messages.logLevels)
         }, content: {
-            logLevelsContent
+            ConsoleSearchLogLevelsCell(viewModel: viewModel)
         })
     }
 
-#if os(macOS)
-    private var logLevelsContent: some View {
-        HStack(spacing:0) {
-            VStack(alignment: .leading, spacing: 6) {
-                Toggle("All", isOn: viewModel.bindingForTogglingAllLevels)
-                    .accentColor(Color.secondary)
-                    .foregroundColor(Color.secondary)
-                HStack(spacing: 32) {
-                    makeLevelsSection(levels: [.trace, .debug, .info, .notice])
-                    makeLevelsSection(levels: [.warning, .error, .critical])
-                }.fixedSize()
-            }
-            Spacer()
-        }
+    var labelsSection: some View {
+        ConsoleSearchSection(header: {
+            ConsoleSearchSectionHeader(icon: "tag", title: "Labels", filter: $viewModel.criteria.messages.labels)
+        }, content: {
+            ConsoleSearchListSelectionView(
+                title: "Labels",
+                items: viewModel.labels,
+                selection: $viewModel.selectedLabels,
+                description: { $0 },
+                label: {
+                    ConsoleSearchListCell(title: $0, details: "\(viewModel.labelsCountedSet.count(for: $0))")
+                }
+            )
+        })
     }
-
-    private func makeLevelsSection(levels: [LoggerStore.Level]) -> some View {
-        VStack(alignment: .leading) {
-            Spacer()
-            ForEach(levels, id: \.self) { level in
-                Toggle(level.name.capitalized, isOn: viewModel.binding(forLevel: level))
-            }
-        }
-    }
-#else
-    @ViewBuilder
-    private var logLevelsContent: some View {
-        ForEach(LoggerStore.Level.allCases, id: \.self) { level in
-            Checkbox(level.name.capitalized, isOn: viewModel.binding(forLevel: level))
-        }
-        Button(viewModel.bindingForTogglingAllLevels.wrappedValue ? "Disable All" : "Enable All") {
-            viewModel.bindingForTogglingAllLevels.wrappedValue.toggle()
-        }
-    }
-#endif
 }
 
-// MARK: - ConsoleSearchView (Labels)
+// MARK: - ConsoleSearchView (Network)
 
 extension ConsoleSearchView {
-    var labelsSection: some View {
-        ConsoleFilterSection(header: {
-            ConsoleFilterSectionHeader(icon: "tag", title: "Labels", filter: $viewModel.criteria.messages.labels)
+#if os(iOS) || os(macOS)
+    @available(iOS 15, *)
+    var customNetworkFiltersSection: some View {
+        ConsoleSearchSection(header: {
+            ConsoleSearchSectionHeader(icon: "line.horizontal.3.decrease.circle", title: "Filters", filter: $viewModel.criteria.network.custom)
         }, content: {
-            labelsContent
+            ConsoleSearchCustomNetworkFiltersSection(selection: $viewModel.criteria.network.custom)
+        })
+    }
+#endif
+
+    var responseSection: some View {
+        ConsoleSearchSection(header: {
+            ConsoleSearchSectionHeader(icon: "arrow.down.circle", title:  "Response", filter: $viewModel.criteria.network.response)
+        }, content: {
+#if os(iOS) || os(macOS)
+            ConsoleSearchStatusCodeCell(selection: $viewModel.criteria.network.response.statusCode.range)
+            ConsoleSearchDurationCell(selection: $viewModel.criteria.network.response.duration)
+            ConsoleSearchResponseSizeCell(selection: $viewModel.criteria.network.response.responseSize)
+#endif
+            ConsoleSearchContentTypeCell(selection: $viewModel.criteria.network.response.contentType.contentType)
         })
     }
 
-#if os(macOS)
-    private var labelsContent: some View {
-        let labels = viewModel.labels.objects.map(\.name)
-        return HStack {
-            VStack(alignment: .leading, spacing: 6) {
-                Toggle("All", isOn: viewModel.bindingForTogglingAllLabels)
-                    .accentColor(Color.secondary)
-                    .foregroundColor(Color.secondary)
-                // TODO: This should display only the prefix
-                ForEach(labels, id: \.self) { item in
-                    Toggle(item.capitalized, isOn: viewModel.binding(forLabel: item))
+    var domainsSection: some View {
+        ConsoleSearchSection(header: {
+            ConsoleSearchSectionHeader(icon: "server.rack", title: "Hosts", filter: $viewModel.criteria.network.host)
+        }, content: {
+            ConsoleSearchListSelectionView(
+                title: "Hosts",
+                items: viewModel.domains,
+                selection: $viewModel.selectedHost,
+                description: { $0 },
+                label: {
+                    ConsoleSearchListCell(title: $0, details: "\(viewModel.domainsCountedSet.count(for: $0))")
                 }
-            }
-            Spacer()
-        }
+            )
+        })
     }
-#else
-    @ViewBuilder
-    private var labelsContent: some View {
-        let labels = viewModel.labels.objects.map(\.name)
 
-        if labels.isEmpty {
-            Text("No Labels")
-                .frame(maxWidth: .infinity, alignment: .center)
-                .foregroundColor(.secondary)
-        } else {
-            ForEach(labels.prefix(4), id: \.self) { item in
-                Checkbox(item.capitalized, isOn: viewModel.binding(forLabel: item))
-            }
-            if labels.count > 4 {
-                NavigationLink(destination: ConsoleFiltersLabelsPickerView(viewModel: viewModel)) {
-                    Text("View All").foregroundColor(.blue)
-                }
-            }
-        }
+    var networkingSection: some View {
+        ConsoleSearchSection(header: {
+            ConsoleSearchSectionHeader(icon: "arrowshape.zigzag.right", title: "Networking", filter: $viewModel.criteria.network.networking)
+        }, content: {
+            ConsoleSearchTaskTypeCell(selection: $viewModel.criteria.network.networking.taskType)
+            ConsoleSearchResponseSourceCell(selection: $viewModel.criteria.network.networking.source)
+            ConsoleSearchToggleCell(title: "Redirect", isOn: $viewModel.criteria.network.networking.isRedirect)
+        })
     }
-#endif
 }
 
 #if DEBUG
+import CoreData
+
 struct ConsoleSearchView_Previews: PreviewProvider {
     static var previews: some View {
 #if os(macOS)
-        ConsoleSearchView(viewModel: .init(store: .mock))
-            .previewLayout(.fixed(width: 320, height: 900))
+        Group {
+            makePreview(mode: .messages)
+                .previewLayout(.fixed(width: 320, height: 900))
+                .previewDisplayName("Messages")
+
+            makePreview(mode: .network)
+                .previewLayout(.fixed(width: 320, height: 900))
+                .previewDisplayName("Network")
+        }
 #else
-        NavigationView {
-            ConsoleSearchView(viewModel: .init(store: .mock))
-        }.navigationViewStyle(.stack)
+        Group {
+            NavigationView {
+                makePreview(mode: .messages)
+            }
+            .navigationViewStyle(.stack)
+            .previewDisplayName("Messages")
+
+            NavigationView {
+                makePreview(mode: .network)
+            }
+            .navigationViewStyle(.stack)
+            .previewDisplayName("Network")
+        }
 #endif
     }
+}
+
+private func makePreview(mode: ConsoleViewModel.Mode) -> some View {
+    let entities: [NSManagedObject]
+    let store = LoggerStore.mock
+    switch mode {
+    case .messages: entities = try! store.allMessages()
+    case .network: entities = try! store.allTasks()
+    }
+    let viewModel = ConsoleSearchViewModel(store: store, entities: .init(entities))
+    viewModel.mode = mode
+    return ConsoleSearchView(viewModel: viewModel)
 }
 #endif

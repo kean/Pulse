@@ -5,7 +5,7 @@
 import SwiftUI
 import Pulse
 
-struct ConsoleFiltersTaskTypeCell: View {
+struct ConsoleSearchTaskTypeCell: View {
     @Binding var selection: ConsoleSearchCriteria.Networking.TaskType
 
     var body: some View {

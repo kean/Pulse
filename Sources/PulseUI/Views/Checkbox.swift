@@ -4,14 +4,9 @@
 
 import SwiftUI
 
-struct Checkbox: View {
-    let title: String
+struct Checkbox<Label: View>: View {
     @Binding var isOn: Bool
-
-    init(_ title: String, isOn: Binding<Bool>) {
-        self.title = title
-        self._isOn = isOn
-    }
+    let label: () -> Label
 
     var body: some View {
 #if os(iOS)
@@ -20,14 +15,20 @@ struct Checkbox: View {
                 Image(systemName: isOn ? "checkmark.circle.fill" : "circle")
                     .font(.body)
                     .foregroundColor(isOn ? .blue : .secondary)
-                Text(title)
+                label()
                 Spacer()
             }
             .contentShape(Rectangle())
         }.buttonStyle(.plain)
 #else
-        Toggle(title, isOn: $isOn)
+        Toggle(isOn: $isOn, label: label)
 #endif
+    }
+}
+
+extension Checkbox where Label == Text {
+    init(_ title: String, isOn: Binding<Bool>) {
+        self.init(isOn: isOn) { Text(title) }
     }
 }
 

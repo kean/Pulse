@@ -87,18 +87,19 @@ struct StringSearchOptionsMenu: View {
     @Binding private(set) var options: StringSearchOptions
     var isKindNeeded = true
 
-    #if os(macOS)
+#if os(macOS)
     var body: some View {
         Menu(content: { contents }, label: {
             Image(systemName: "ellipsis.circle")
         })
-        .menuStyle(BorderlessButtonMenuStyle(showsMenuIndicator: false))
+        .menuStyle(.borderlessButton)
+        .menuIndicator(.hidden)
     }
-    #else
+#else
     var body: some View {
         contents
     }
-    #endif
+#endif
 
     @ViewBuilder
     private var contents: some View {

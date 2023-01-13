@@ -135,7 +135,7 @@ private struct FilterPopoverToolbarButton: View {
         .help("Toggle Filters Panel (⌥⌘F)")
         .popover(isPresented: $isPresented, arrowEdge: .top) {
             ConsoleSearchView(viewModel: viewModel.searchViewModel)
-                .padding(.bottom, 16)
+                .fixedSize()
         }
     }
 }

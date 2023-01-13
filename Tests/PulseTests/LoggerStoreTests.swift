@@ -575,7 +575,7 @@ final class LoggerStoreTests: XCTestCase {
 
         let context = store.viewContext
         XCTAssertEqual(try context.count(for: LoggerMessageEntity.self), 11)
-        XCTAssertEqual(try context.count(for: LoggerLabelEntity.self), 5)
+        XCTAssertEqual(try context.count(for: LoggerLabelEntity.self), 6)
         XCTAssertEqual(try context.count(for: NetworkTaskEntity.self), 3)
         XCTAssertEqual(try context.count(for: NetworkRequestEntity.self), 6)
         XCTAssertEqual(try context.count(for: NetworkResponseEntity.self), 5)

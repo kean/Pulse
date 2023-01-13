@@ -5,6 +5,7 @@
 import Foundation
 import CommonCrypto
 import CoreData
+import Combine
 
 extension Array {
     func chunked(into size: Int) -> [[Element]] {

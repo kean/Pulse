@@ -5,14 +5,18 @@
 import SwiftUI
 import Pulse
 
-struct ConsoleFiltersStatusCodeCell: View {
-    @Binding var selection: ValuesRange<String>
+struct ConsoleSearchToggleCell: View {
+    let title: String
+    @Binding var isOn: Bool
 
     var body: some View {
+#if os(macOS)
         HStack {
-            Text("Status Code")
+            Toggle(title, isOn: $isOn)
             Spacer()
-            RangePicker(range: $selection)
         }
+#else
+        Toggle(title, isOn: $isOn)
+#endif
     }
 }

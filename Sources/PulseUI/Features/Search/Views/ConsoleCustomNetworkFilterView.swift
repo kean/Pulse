@@ -15,22 +15,25 @@ struct ConsoleCustomNetworkFilterView: View {
     var body: some View {
         ConsoleCustomFilterView(text: $filter.value, onRemove: onRemove, pickers: {
             fieldMenu
+#if os(macOS)
+                .frame(width: 60)
+#endif
             matchMenu
         })
     }
 
     private var fieldMenu: some View {
-        FilterPickerMenu(title: filter.field.localizedTitle) {
-            Picker("", selection: $filter.field) {
+        ConsoleSearchInlinePickerMenu(title: filter.field.localizedTitle) {
+            Picker("Field", selection: $filter.field) {
                 fieldPickerBasicSection
                 Divider()
                 fieldPickerAdvancedSection
-            }
+            }.labelsHidden()
         }
     }
     
     private var matchMenu: some View {
-        FilterPickerMenu(title: filter.match.localizedTitle) { matchPicker }
+        ConsoleSearchInlinePickerMenu(title: filter.match.localizedTitle) { matchPicker }
     }
 
     @ViewBuilder

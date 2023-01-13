@@ -5,14 +5,14 @@
 import SwiftUI
 import Pulse
 
-struct ConsoleFiltersDurationCell: View {
+struct ConsoleSearchDurationCell: View {
     @Binding var selection: ConsoleSearchCriteria.Duration
 
     var body: some View {
         HStack {
             Text("Duration")
             Spacer()
-            FilterPickerMenu(title: selection.unit.title, width: 50) {
+            ConsoleSearchInlinePickerMenu(title: selection.unit.title, width: 50) {
                 Picker("Unit", selection: $selection.unit) {
                     ForEach(ConsoleSearchCriteria.Duration.Unit.allCases) {
                         Text($0.title).tag($0)

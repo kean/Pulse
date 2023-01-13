@@ -30,7 +30,7 @@ struct ConsoleCustomFilterView<Pickers: View>: View {
     var body: some View {
         HStack(spacing: 8) {
             if !isFocusedOnEditing {
-                pickers().lineLimit(1).layoutPriority(1)
+                pickers().lineLimit(1)
             }
             TextField("Value", text: $textFieldValue)
                 .onSubmit { text = textFieldValue }
@@ -40,7 +40,7 @@ struct ConsoleCustomFilterView<Pickers: View>: View {
 #if os(iOS)
                 .autocapitalization(.none)
 #else
-                .frame(minWidth: 100)
+                .frame(minWidth: 90)
 #endif
                 .onChange(of: isTextFieldFocused) { isTextFieldFocused in
 #if os(iOS)
@@ -51,11 +51,10 @@ struct ConsoleCustomFilterView<Pickers: View>: View {
                 if let onRemove = self.onRemove {
                     Button(action: onRemove) {
                         Image(systemName: "minus.circle.fill")
-                            .font(.system(size: 18))
+                            .font(.body)
                     }
                     .buttonStyle(.plain)
                     .foregroundColor(.red)
-                    .padding(.leading, 6)
                 }
             } else {
                 Button("Done") {

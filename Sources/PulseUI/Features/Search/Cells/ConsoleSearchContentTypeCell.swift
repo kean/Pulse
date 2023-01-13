@@ -5,7 +5,7 @@
 import SwiftUI
 import Pulse
 
-struct ConsoleFiltersContentTypeCell: View {
+struct ConsoleSearchContentTypeCell: View {
     @Binding var selection: ConsoleSearchCriteria.ContentType.ContentType
 
     var body: some View {
