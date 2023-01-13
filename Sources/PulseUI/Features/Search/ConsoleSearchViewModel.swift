@@ -13,14 +13,12 @@ final class ConsoleSearchViewModel: ObservableObject {
     var isButtonResetEnabled: Bool { !isCriteriaDefault }
 
     @Published var criteria = ConsoleSearchCriteria()
+    @Published var mode: ConsoleViewModel.Mode = .messages
     private(set) var defaultCriteria = ConsoleSearchCriteria()
-
-    let dataNeedsReload = PassthroughSubject<Void, Never>()
 
     let labels: ManagedObjectsObserver<LoggerLabelEntity>
     let domains: ManagedObjectsObserver<NetworkDomainEntity>
 
-    @Published var mode: ConsoleViewModel.Mode = .messages
     private let store: LoggerStore
     private var cancellables: [AnyCancellable] = []
 
@@ -35,11 +33,6 @@ final class ConsoleSearchViewModel: ObservableObject {
             criteria.shared.dates = .session
             defaultCriteria.shared.dates = .session
         }
-
-#warning("TODO: refactor")
-        $criteria.dropFirst().receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.dataNeedsReload.send()
-        }.store(in: &cancellables)
     }
 
     var isCriteriaDefault: Bool {

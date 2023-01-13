@@ -58,13 +58,18 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 
         super.init()
 
-        $filterTerm.throttle(for: 0.25, scheduler: RunLoop.main, latest: true).dropFirst().sink { [weak self] filterTerm in
-            self?.refresh(filterTerm: filterTerm)
-        }.store(in: &cancellables)
+        $filterTerm
+            .dropFirst()
+            .throttle(for: 0.25, scheduler: RunLoop.main, latest: true)
+            .sink { [weak self] filterTerm in
+                self?.refresh(filterTerm: filterTerm)
+            }.store(in: &cancellables)
 
-        searchViewModel.dataNeedsReload.throttle(for: 0.5, scheduler: DispatchQueue.main, latest: true).sink { [weak self] in
-            self?.refreshNow()
-        }.store(in: &cancellables)
+        searchViewModel.$criteria
+            .dropFirst()
+            .throttle(for: 0.5, scheduler: DispatchQueue.main, latest: true)
+            .sink { [weak self] _ in self?.refreshNow() }
+            .store(in: &cancellables)
 
         $isOnlyErrors.receive(on: DispatchQueue.main).dropFirst().sink { [weak self] _ in
             self?.refreshNow()
