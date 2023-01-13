@@ -7,6 +7,8 @@ import Pulse
 import Combine
 import SwiftUI
 
+#warning("TODO: refactor, remove unused")
+
 final class ConsoleSearchCriteriaViewModel: ObservableObject {
     @Published var isButtonResetEnabled = false
 
@@ -42,9 +44,12 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
         }.store(in: &cancellables)
     }
 
-#warning("TODO: return different value based on the mod")
-    var isDefaultAll: Bool {
-        criteria == defaultCriteria
+    func isCriteriaDefault(for mode: ConsoleViewModel.Mode) -> Bool {
+        guard criteria.shared == defaultCriteria.shared else { return false }
+        switch mode {
+        case .messages: return criteria.messages == defaultCriteria.messages
+        case .network: return criteria.network == defaultCriteria.network
+        }
     }
 
     func resetAll() {

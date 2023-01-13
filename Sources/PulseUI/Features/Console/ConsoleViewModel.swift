@@ -89,6 +89,10 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         prepare(for: mode)
     }
 
+    var isCriteriaDefault: Bool {
+        filtersViewModel.isCriteriaDefault(for: mode)
+    }
+
     private func prepare(for mode: Mode) {
         let request = makeFetchRequest(for: mode)
         controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: store.viewContext, sectionNameKeyPath: nil, cacheName: nil)
