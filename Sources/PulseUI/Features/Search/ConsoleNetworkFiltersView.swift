@@ -88,8 +88,8 @@ extension ConsoleNetworkFiltersView {
             customFilersList
         }.padding(.leading, -8)
 
-        if !viewModel.isDefaultFilters {
-            Button(action: viewModel.addFilter) {
+        if !(viewModel.criteria.network.custom == .init()) {
+            Button(action: { viewModel.criteria.network.custom.filters.append(.default) }) {
                 Image(systemName: "plus.circle")
             }.padding(.top, 6)
         }
@@ -168,7 +168,7 @@ extension ConsoleNetworkFiltersView {
     }
 
     private func makeDomainPicker(limit: Int? = nil) -> some View {
-        var domains = viewModel.allDomains
+        var domains = viewModel.domains.objects.map(\.value)
         if let limit = limit {
             domains = Array(domains.prefix(limit))
         }

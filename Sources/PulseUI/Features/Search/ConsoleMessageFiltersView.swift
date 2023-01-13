@@ -84,7 +84,7 @@ extension ConsoleMessageFiltersView {
         }.padding(.leading, -8)
 
         if !isCustomFiltersDefault {
-            Button(action: viewModel.addFilter) {
+            Button(action: { viewModel.criteria.messages.custom.filters.append(.default) }) {
                 Image(systemName: "plus.circle")
             }.padding(.top, 6)
         }
@@ -170,12 +170,14 @@ extension ConsoleMessageFiltersView {
 
 #if os(macOS)
     private var labelsContent: some View {
-        HStack {
+        let labels = viewModel.labels.objects.map(\.name)
+        return HStack {
             VStack(alignment: .leading, spacing: 6) {
                 Toggle("All", isOn: viewModel.bindingForTogglingAllLabels)
                     .accentColor(Color.secondary)
                     .foregroundColor(Color.secondary)
-                ForEach(viewModel.allLabels, id: \.self) { item in
+                // TODO: This should display only the prefix
+                ForEach(labels, id: \.self) { item in
                     Toggle(item.capitalized, isOn: viewModel.binding(forLabel: item))
                 }
             }
