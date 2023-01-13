@@ -347,44 +347,15 @@ extension ConsoleSearchView {
         })
     }
 
-#if os(macOS)
-    private var labelsContent: some View {
-        let labels = viewModel.labels.objects.map(\.name)
-        return HStack {
-            VStack(alignment: .leading, spacing: 6) {
-                Toggle("All", isOn: viewModel.bindingForTogglingAllLabels)
-                    .accentColor(Color.secondary)
-                    .foregroundColor(Color.secondary)
-                // TODO: This should display only the prefix
-                ForEach(labels, id: \.self) { item in
-                    Toggle(item.capitalized, isOn: viewModel.binding(forLabel: item))
-                }
-            }
-            Spacer()
-        }
-    }
-#else
     @ViewBuilder
     private var labelsContent: some View {
-        let labels = viewModel.labels
-
-        if labels.isEmpty {
-            Text("No Labels")
-                .frame(maxWidth: .infinity, alignment: .center)
-                .foregroundColor(.secondary)
-        } else {
-            ForEach(labels.prefix(4), id: \.self) { item in
-                Checkbox(item.capitalized, isOn: viewModel.binding(forLabel: item))
-            }
-            if labels.count > 4 {
-                #warning("TODO: reimplement")
-//                NavigationLink(destination: ConsoleFiltersLabelsPickerView(viewModel: viewModel)) {
-//                    Text("View All").foregroundColor(.blue)
-//                }
-            }
-        }
+        ConsoleSearchListSelectionView(
+            title: "Labels",
+            items: viewModel.labels,
+            selection: $viewModel.selectedLabels,
+            label: { Text($0.capitalized) }
+        )
     }
-#endif
 }
 
 #if DEBUG

@@ -42,11 +42,12 @@ final class ConsoleSearchViewModel: ObservableObject {
         self.defaultCriteria = criteria
 
         labelsObserver.$objects.sink { [weak self] in
-            self?.labels = $0.map(\.name)
+            #warning("TEMP")
+            self?.labels = ["TestA", "TestB"] + $0.map(\.name)
         }.store(in: &cancellables)
 
         domainsObserver.$objects.sink { [weak self] in
-            self?.labels = $0.map(\.value)
+            self?.domains = $0.map(\.value)
         }.store(in: &cancellables)
     }
 
@@ -105,19 +106,24 @@ final class ConsoleSearchViewModel: ObservableObject {
 
     // MARK: Binding (ConsoleFilters.Labels)
 
-#warning("TEMP")
-    var labelsSelection: Binding<Set<String>> {
-        fatalError()
-//        Binding(get: {
-//            if let focused = self.criteria.messages.labels.focused {
-//                return [focused]
-//            } else {
-//                return criteria.messages.labels.hidden
-//                !self.criteria.messages.labels.hidden.contains(label)
-//            }
-//        }, set: { labels in
-//
-//        })
+    var selectedLabels: Set<String> {
+        get {
+            if let focused = self.criteria.messages.labels.focused {
+                return [focused]
+            } else {
+                return Set(self.labels).subtracting(self.criteria.messages.labels.hidden)
+            }
+        }
+        set {
+            self.criteria.messages.labels.focused = nil
+            self.criteria.messages.labels.hidden = []
+            switch newValue.count {
+            case 1:
+                self.criteria.messages.labels.focused = newValue.first!
+            default:
+                self.criteria.messages.labels.hidden = Set(self.labels).subtracting(newValue)
+            }
+        }
     }
 
     func binding(forLabel label: String) -> Binding<Bool> {
