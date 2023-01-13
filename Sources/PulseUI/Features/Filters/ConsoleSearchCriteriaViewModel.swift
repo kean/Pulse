@@ -13,8 +13,6 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
     @Published var criteria = ConsoleSearchCriteria()
     private(set) var defaultCriteria = ConsoleSearchCriteria()
 
-    var mode: ConsoleViewModel.Mode = .all
-
     let dataNeedsReload = PassthroughSubject<Void, Never>()
 
     let labels: ManagedObjectsObserver<LoggerLabelEntity>

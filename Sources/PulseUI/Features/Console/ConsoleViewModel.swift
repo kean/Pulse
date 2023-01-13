@@ -36,10 +36,10 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     private var cancellables: [AnyCancellable] = []
 
     enum Mode {
-        case all, network
+        case messages, network
     }
 
-    init(store: LoggerStore, mode: Mode = .all) {
+    init(store: LoggerStore, mode: Mode = .messages) {
         self.title = mode == .network ? "Network" : "Console"
         self.store = store
         self.mode = mode
@@ -83,8 +83,8 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 
     func toggleMode() {
         switch mode {
-        case .all: mode = .network
-        case .network: mode = .all
+        case .messages: mode = .network
+        case .network: mode = .messages
         }
         prepare(for: mode)
     }
@@ -120,7 +120,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
             return assertionFailure()
         }
         switch mode {
-        case .all:
+        case .messages:
             controller.fetchRequest.predicate = ConsoleSearchCriteria.makeMessagePredicates(criteria: filtersViewModel.criteria, isOnlyErrors: isOnlyErrors, filterTerm: filterTerm)
         case .network:
             controller.fetchRequest.predicate = ConsoleSearchCriteria.makeNetworkPredicates(criteria: filtersViewModel.criteria, isOnlyErrors: isOnlyErrors, filterTerm: filterTerm)
@@ -154,7 +154,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 private func makeFetchRequest(for mode: ConsoleViewModel.Mode) -> NSFetchRequest<NSManagedObject> {
     let request: NSFetchRequest<NSManagedObject>
     switch mode {
-    case .all:
+    case .messages:
         request = .init(entityName: "\(LoggerMessageEntity.self)")
         request.relationshipKeyPathsForPrefetching = ["request"]
         request.sortDescriptors = [NSSortDescriptor(keyPath: \LoggerMessageEntity.createdAt, ascending: false)]
