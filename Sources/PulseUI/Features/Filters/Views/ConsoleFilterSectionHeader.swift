@@ -20,8 +20,8 @@ struct ConsoleFilterSectionHeader: View {
     ) {
         self.icon = icon
         self.title = title
-        self.reset = { filter.wrappedValue = `default` ?? Filter.default }
-        self.isDefault = filter.wrappedValue == `default` ?? Filter.default
+        self.reset = { filter.wrappedValue = `default` ?? Filter() }
+        self.isDefault = filter.wrappedValue == `default` ?? Filter()
         self._isEnabled = filter.isEnabled
     }
 

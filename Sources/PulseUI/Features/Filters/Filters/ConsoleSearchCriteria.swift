@@ -7,47 +7,40 @@ import Pulse
 import CoreData
 import Combine
 
-#warning("TODO: remove all the redundant defaults")
-#warning("TODO: move isOnlyErrors here ?")
 struct ConsoleSearchCriteria: Hashable {
     var shared = Shared()
     var messages = Messages()
     var network = Network()
 
     struct Shared: Hashable {
-        var dates = Dates.default
-        var general = General.default
+        var dates = Dates()
+        var general = General()
     }
 
     struct Messages: Hashable {
-        var logLevels: LogLevels = .default
-        var labels: Labels = .default
-        var custom = CustomMessageFilters.default
+        var logLevels = LogLevels()
+        var labels = Labels()
+        var custom = CustomMessageFilters()
     }
 
     struct Network: Hashable {
-        var response = Response.default
-        var host = Host.default
-        var networking = Networking.default
-        var custom = CustomNetworkFilters.default
+        var response = Response()
+        var host = Host()
+        var networking = Networking()
+        var custom = CustomNetworkFilters()
     }
-
-    static let `default` = ConsoleSearchCriteria()
 }
 
 protocol ConsoleFilterProtocol: Hashable {
     var isEnabled: Bool { get set }
-    static var `default`: Self { get }
+    init() // Initializes with the default values
 }
 
 extension ConsoleSearchCriteria {
     struct Dates: Hashable, ConsoleFilterProtocol {
         var isEnabled = true
-
         var startDate: Date?
         var endDate: Date?
-
-        static let `default` = Dates()
 
         static var today: Dates {
             Dates(startDate: Calendar.current.startOfDay(for: Date()))
@@ -65,31 +58,23 @@ extension ConsoleSearchCriteria {
     struct General: ConsoleFilterProtocol {
         var isEnabled = true
         var inOnlyPins = false
-
-        static let `default` = General()
     }
 
     struct LogLevels: ConsoleFilterProtocol {
         var isEnabled = true
         var levels: Set<LoggerStore.Level> = Set(LoggerStore.Level.allCases)
             .subtracting([LoggerStore.Level.trace])
-
-        static let `default` = LogLevels()
     }
 
     struct Labels: ConsoleFilterProtocol {
         var isEnabled = true
         var hidden: Set<String> = []
         var focused: String?
-
-        static let `default` = Labels()
     }
 
     struct CustomMessageFilters: ConsoleFilterProtocol {
         var isEnabled = true
         var filters: [ConsoleCustomMessageFilter] = [.default]
-
-        static let `default` = CustomMessageFilters()
     }
 
     struct Response: ConsoleFilterProtocol {
@@ -98,8 +83,6 @@ extension ConsoleSearchCriteria {
         var contentType = ContentType()
         var responseSize = ResponseSize()
         var duration = Duration()
-
-        static let `default` = Response()
     }
 
     struct StatusCode: Hashable {
@@ -179,8 +162,6 @@ extension ConsoleSearchCriteria {
     struct Host: ConsoleFilterProtocol {
         var isEnabled = true
         var ignoredHosts: Set<String> = []
-
-        static let `default` = Host()
     }
 
     struct ContentType: Hashable {
@@ -236,14 +217,10 @@ extension ConsoleSearchCriteria {
             case any
             case some(NetworkLogger.TaskType)
         }
-
-        static let `default` = Networking()
     }
 
     struct CustomNetworkFilters: ConsoleFilterProtocol {
         var isEnabled = true
         var filters: [ConsoleCustomNetworkFilter] = [.default]
-
-        static var `default`: CustomNetworkFilters { CustomNetworkFilters() }
     }
 }

@@ -8,10 +8,10 @@ import Combine
 import SwiftUI
 
 final class ConsoleSearchCriteriaViewModel: ObservableObject {
-    @Published var criteria: ConsoleSearchCriteria = .default
     @Published var isButtonResetEnabled = false
 
-    private(set) var defaultCriteria: ConsoleSearchCriteria = .default
+    @Published var criteria = ConsoleSearchCriteria()
+    private(set) var defaultCriteria = ConsoleSearchCriteria()
 
     let dataNeedsReload = PassthroughSubject<Void, Never>()
 
@@ -142,7 +142,7 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
             criteria.messages.custom.filters.remove(at: index)
         }
         if criteria.messages.custom.filters.isEmpty {
-            criteria.messages.custom = .default
+            criteria.messages.custom = .init()
         }
     }
 
@@ -154,7 +154,7 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
         }
 #warning("TODO: is this needed? enable remove only when 2+ items")
         if criteria.network.custom.filters.isEmpty {
-            criteria.network.custom = .default
+            criteria.network.custom = .init()
         }
     }
 

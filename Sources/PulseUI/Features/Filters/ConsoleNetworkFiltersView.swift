@@ -77,7 +77,7 @@ extension ConsoleNetworkFiltersView {
     @ViewBuilder
     private var generalGroupContent: some View {
         customFilersList
-        if !(viewModel.criteria.network.custom == .default) {
+        if !(viewModel.criteria.network.custom == .init()) {
             Button(action: { viewModel.criteria.network.custom.filters.append(.default) }) {
                 Text("Add Filter").frame(maxWidth: .infinity)
             }
@@ -100,7 +100,7 @@ extension ConsoleNetworkFiltersView {
 
     @ViewBuilder var customFilersList: some View {
         ForEach($viewModel.criteria.network.custom.filters) { filter in
-            ConsoleCustomNetworkFilterView(filter: filter, onRemove: viewModel.criteria.network.custom == .default ? nil : { viewModel.removeFilter(filter.wrappedValue) })
+            ConsoleCustomNetworkFilterView(filter: filter, onRemove: viewModel.criteria.network.custom == .init() ? nil : { viewModel.removeFilter(filter.wrappedValue) })
         }
     }
 }

@@ -98,7 +98,7 @@ extension ConsoleMessageFiltersView {
     }
 
     private var isCustomFiltersDefault: Bool {
-        viewModel.criteria.messages.custom == .default
+        viewModel.criteria.messages.custom == .init()
     }
 }
 #endif
