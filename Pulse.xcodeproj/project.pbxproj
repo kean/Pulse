@@ -24,15 +24,29 @@
 		0C11EAB92971DB700059786A /* PerformanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D69F296F18D200EED9D4 /* PerformanceTests.swift */; };
 		0C11EABA2971DB700059786A /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D6A0296F18D200EED9D4 /* MockStore.swift */; };
 		0C11EABB2971DB700059786A /* URLSessionProxyDelegateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D6A2296F18D200EED9D4 /* URLSessionProxyDelegateTests.swift */; };
-		0C24CC6B289482F7008DD332 /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C24CC69289482F7008DD332 /* MockStore.swift */; };
-		0C24CC6C289482F7008DD332 /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C24CC69289482F7008DD332 /* MockStore.swift */; };
-		0C24CC6D289482F7008DD332 /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C24CC69289482F7008DD332 /* MockStore.swift */; };
-		0C24CC6E289482F7008DD332 /* MockTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C24CC6A289482F7008DD332 /* MockTask.swift */; };
-		0C24CC6F289482F7008DD332 /* MockTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C24CC6A289482F7008DD332 /* MockTask.swift */; };
-		0C24CC70289482F7008DD332 /* MockTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C24CC6A289482F7008DD332 /* MockTask.swift */; };
-		0C24CC7A2894C134008DD332 /* MockStoreConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C24CC792894C134008DD332 /* MockStoreConfiguration.swift */; };
-		0C24CC7B2894C134008DD332 /* MockStoreConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C24CC792894C134008DD332 /* MockStoreConfiguration.swift */; };
-		0C24CC7C2894C134008DD332 /* MockStoreConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C24CC792894C134008DD332 /* MockStoreConfiguration.swift */; };
+		0C11EAC52971E9B30059786A /* PulseUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CF0D56C296F17CB00EED9D4 /* PulseUI.framework */; };
+		0C11EACC2971E9CE0059786A /* TextRendererPerformanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C11EACB2971E9CE0059786A /* TextRendererPerformanceTests.swift */; };
+		0C11EACE2971EA3C0059786A /* MockStoreConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B1296F189500EED9D4 /* MockStoreConfiguration.swift */; };
+		0C11EACF2971EA4F0059786A /* MockTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5AF296F189500EED9D4 /* MockTask.swift */; };
+		0C11EAD22971EBC20059786A /* MockStoreConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B1296F189500EED9D4 /* MockStoreConfiguration.swift */; };
+		0C11EAD32971EBC20059786A /* MockStoreConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B1296F189500EED9D4 /* MockStoreConfiguration.swift */; };
+		0C11EAD42971EBC60059786A /* MockStoreConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B1296F189500EED9D4 /* MockStoreConfiguration.swift */; };
+		0C11EAD92971EBE80059786A /* MockStoreConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B1296F189500EED9D4 /* MockStoreConfiguration.swift */; };
+		0C11EADA2971EBE80059786A /* MockTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5AF296F189500EED9D4 /* MockTask.swift */; };
+		0C11EADB2971EBE80059786A /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B0296F189500EED9D4 /* MockStore.swift */; };
+		0C11EADE2971EBE90059786A /* MockStoreConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B1296F189500EED9D4 /* MockStoreConfiguration.swift */; };
+		0C11EADF2971EBE90059786A /* MockTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5AF296F189500EED9D4 /* MockTask.swift */; };
+		0C11EAE02971EBE90059786A /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B0296F189500EED9D4 /* MockStore.swift */; };
+		0C11EAE12971EBEA0059786A /* MockTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5AF296F189500EED9D4 /* MockTask.swift */; };
+		0C11EAE22971EBEA0059786A /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B0296F189500EED9D4 /* MockStore.swift */; };
+		0C11EAE32971EBEB0059786A /* MockTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5AF296F189500EED9D4 /* MockTask.swift */; };
+		0C11EAE42971EBEB0059786A /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B0296F189500EED9D4 /* MockStore.swift */; };
+		0C11EAE52971EBEC0059786A /* MockTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5AF296F189500EED9D4 /* MockTask.swift */; };
+		0C11EAE62971EBEC0059786A /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B0296F189500EED9D4 /* MockStore.swift */; };
+		0C11EAE72971EBED0059786A /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B0296F189500EED9D4 /* MockStore.swift */; };
+		0C11EAE82971EBEE0059786A /* MockStoreConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B1296F189500EED9D4 /* MockStoreConfiguration.swift */; };
+		0C11EAE92971EBEE0059786A /* MockTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5AF296F189500EED9D4 /* MockTask.swift */; };
+		0C11EAEA2971EBEE0059786A /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B0296F189500EED9D4 /* MockStore.swift */; };
 		0C40C094296F7641009ECF16 /* ConsoleSearchContentTypeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C40C093296F7641009ECF16 /* ConsoleSearchContentTypeCell.swift */; };
 		0C40C096296F7738009ECF16 /* ConsoleSearchTaskTypeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C40C095296F7738009ECF16 /* ConsoleSearchTaskTypeCell.swift */; };
 		0C40C098296F777D009ECF16 /* ConsoleSearchResponseSourceCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C40C097296F777D009ECF16 /* ConsoleSearchResponseSourceCell.swift */; };
@@ -145,9 +159,6 @@
 		0CF0D638296F189600EED9D4 /* ImageViewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5AB296F189500EED9D4 /* ImageViewer.swift */; };
 		0CF0D639296F189600EED9D4 /* PinButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5AC296F189500EED9D4 /* PinButton.swift */; };
 		0CF0D63A296F189600EED9D4 /* ContextMenus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5AD296F189500EED9D4 /* ContextMenus.swift */; };
-		0CF0D63B296F189600EED9D4 /* MockTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5AF296F189500EED9D4 /* MockTask.swift */; };
-		0CF0D63C296F189600EED9D4 /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B0296F189500EED9D4 /* MockStore.swift */; };
-		0CF0D63D296F189600EED9D4 /* MockStoreConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B1296F189500EED9D4 /* MockStoreConfiguration.swift */; };
 		0CF0D63F296F189600EED9D4 /* ConsoleSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B5296F189500EED9D4 /* ConsoleSearchView.swift */; };
 		0CF0D640296F189600EED9D4 /* ConsoleSearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B6296F189500EED9D4 /* ConsoleSearchViewModel.swift */; };
 		0CF0D643296F189600EED9D4 /* ConsoleCustomNetworkFilterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5BA296F189500EED9D4 /* ConsoleCustomNetworkFilterView.swift */; };
@@ -218,7 +229,7 @@
 		0CF0D68A296F189600EED9D4 /* PulseUI.docc in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D60D296F189600EED9D4 /* PulseUI.docc */; };
 		0CF0D693296F18BE00EED9D4 /* Pulse.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CF0D542296F14EA00EED9D4 /* Pulse.framework */; };
 		0CF0D6C0296F18ED00EED9D4 /* PulseUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CF0D56C296F17CB00EED9D4 /* PulseUI.framework */; };
-		0CF0D6CA296F18FD00EED9D4 /* JSONPrinterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D6C7296F18FD00EED9D4 /* JSONPrinterTests.swift */; };
+		0CF0D6CA296F18FD00EED9D4 /* TextRendererTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D6C7296F18FD00EED9D4 /* TextRendererTests.swift */; };
 		0CF0D6CB296F18FD00EED9D4 /* ConsoleViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D6C8296F18FD00EED9D4 /* ConsoleViewModelTests.swift */; };
 		0CF0D6CC296F18FD00EED9D4 /* MockTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D6C9296F18FD00EED9D4 /* MockTests.swift */; };
 		0CF0D6CD296F1A6800EED9D4 /* Pulse.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CF0D542296F14EA00EED9D4 /* Pulse.framework */; };
@@ -241,15 +252,6 @@
 		0CF0D6F1296F1AF100EED9D4 /* Pulse.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0CF0D542296F14EA00EED9D4 /* Pulse.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		0CF0D6F4296F1AF100EED9D4 /* PulseUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CF0D56C296F17CB00EED9D4 /* PulseUI.framework */; };
 		0CF0D6F5296F1AF100EED9D4 /* PulseUI.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0CF0D56C296F17CB00EED9D4 /* PulseUI.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		0CF4D86C289629EF0027BB34 /* MockTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C24CC6A289482F7008DD332 /* MockTask.swift */; };
-		0CF4D86D289629EF0027BB34 /* MockStoreConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C24CC792894C134008DD332 /* MockStoreConfiguration.swift */; };
-		0CF4D86E289629EF0027BB34 /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C24CC69289482F7008DD332 /* MockStore.swift */; };
-		0CF4D86F289629F10027BB34 /* MockTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C24CC6A289482F7008DD332 /* MockTask.swift */; };
-		0CF4D870289629F10027BB34 /* MockStoreConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C24CC792894C134008DD332 /* MockStoreConfiguration.swift */; };
-		0CF4D871289629F10027BB34 /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C24CC69289482F7008DD332 /* MockStore.swift */; };
-		0CF4D872289629F20027BB34 /* MockTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C24CC6A289482F7008DD332 /* MockTask.swift */; };
-		0CF4D873289629F20027BB34 /* MockStoreConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C24CC792894C134008DD332 /* MockStoreConfiguration.swift */; };
-		0CF4D874289629F20027BB34 /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C24CC69289482F7008DD332 /* MockStore.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -259,6 +261,27 @@
 			proxyType = 1;
 			remoteGlobalIDString = 0CF0D541296F14EA00EED9D4;
 			remoteInfo = Pulse;
+		};
+		0C11EAC62971E9B30059786A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0C57AD45245F0EFB005B3400 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0CF0D56B296F17CB00EED9D4;
+			remoteInfo = PulseUI;
+		};
+		0C11EAD02971EA640059786A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0C57AD45245F0EFB005B3400 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0C516FB926015DD2004813B4;
+			remoteInfo = "Pulse Demo iOS";
+		};
+		0C11EAEB2971F20D0059786A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0C57AD45245F0EFB005B3400 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0C0B31E926D179A20045C9E1;
+			remoteInfo = "Pulse Integration Examples iOS";
 		};
 		0CEAB3E525FE862E00F09B0F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -463,10 +486,9 @@
 		0C0B31F526D179A70045C9E1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0C0B31F826D179A70045C9E1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		0C0B31FA26D179A70045C9E1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		0C11EAC12971E9B30059786A /* PulsePerformanceTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PulsePerformanceTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		0C11EACB2971E9CE0059786A /* TextRendererPerformanceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextRendererPerformanceTests.swift; sourceTree = "<group>"; };
 		0C1221E525CE09C100B81D7A /* URLSessionAutomatedIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionAutomatedIntegration.swift; sourceTree = "<group>"; };
-		0C24CC69289482F7008DD332 /* MockStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockStore.swift; sourceTree = "<group>"; };
-		0C24CC6A289482F7008DD332 /* MockTask.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockTask.swift; sourceTree = "<group>"; };
-		0C24CC792894C134008DD332 /* MockStoreConfiguration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MockStoreConfiguration.swift; path = App/Shared/Mocks/MockStoreConfiguration.swift; sourceTree = SOURCE_ROOT; };
 		0C25FB6E25CDDCAB00A895C2 /* URLSessionManualIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionManualIntegration.swift; sourceTree = "<group>"; };
 		0C40C093296F7641009ECF16 /* ConsoleSearchContentTypeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchContentTypeCell.swift; sourceTree = "<group>"; };
 		0C40C095296F7738009ECF16 /* ConsoleSearchTaskTypeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchTaskTypeCell.swift; sourceTree = "<group>"; };
@@ -668,7 +690,7 @@
 		0CF0D6A2296F18D200EED9D4 /* URLSessionProxyDelegateTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URLSessionProxyDelegateTests.swift; sourceTree = "<group>"; };
 		0CF0D6A3296F18D200EED9D4 /* MockDataTask.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockDataTask.swift; sourceTree = "<group>"; };
 		0CF0D6BC296F18ED00EED9D4 /* PulseUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PulseUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		0CF0D6C7296F18FD00EED9D4 /* JSONPrinterTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONPrinterTests.swift; sourceTree = "<group>"; };
+		0CF0D6C7296F18FD00EED9D4 /* TextRendererTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextRendererTests.swift; sourceTree = "<group>"; };
 		0CF0D6C8296F18FD00EED9D4 /* ConsoleViewModelTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleViewModelTests.swift; sourceTree = "<group>"; };
 		0CF0D6C9296F18FD00EED9D4 /* MockTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockTests.swift; sourceTree = "<group>"; };
 		0CFF9BD825D6199A0069DB6A /* repos.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = repos.json; sourceTree = "<group>"; };
@@ -683,6 +705,14 @@
 			files = (
 				0CF0D6F4296F1AF100EED9D4 /* PulseUI.framework in Frameworks */,
 				0CF0D6F0296F1AF100EED9D4 /* Pulse.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0C11EABE2971E9B30059786A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0C11EAC52971E9B30059786A /* PulseUI.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -780,16 +810,13 @@
 			path = Integrations;
 			sourceTree = "<group>";
 		};
-		0C24CC68289482F7008DD332 /* Mocks */ = {
+		0C11EABC2971E9920059786A /* PulsePerformanceTests */ = {
 			isa = PBXGroup;
 			children = (
-				0C24CC69289482F7008DD332 /* MockStore.swift */,
-				0C24CC6A289482F7008DD332 /* MockTask.swift */,
-				0C24CC792894C134008DD332 /* MockStoreConfiguration.swift */,
+				0C11EACB2971E9CE0059786A /* TextRendererPerformanceTests.swift */,
 			);
-			name = Mocks;
-			path = Sources/PulseUI/Mocks;
-			sourceTree = SOURCE_ROOT;
+			path = PulsePerformanceTests;
+			sourceTree = "<group>";
 		};
 		0C25FB6725CDDC9700A895C2 /* IntegrationsExamples */ = {
 			isa = PBXGroup;
@@ -806,7 +833,6 @@
 			isa = PBXGroup;
 			children = (
 				0CFF9BD725D619820069DB6A /* Resources */,
-				0C24CC68289482F7008DD332 /* Mocks */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -851,6 +877,7 @@
 				0CF0D56C296F17CB00EED9D4 /* PulseUI.framework */,
 				0CF0D68F296F18BE00EED9D4 /* PulseTests.xctest */,
 				0CF0D6BC296F18ED00EED9D4 /* PulseUITests.xctest */,
+				0C11EAC12971E9B30059786A /* PulsePerformanceTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1003,6 +1030,7 @@
 			children = (
 				0CF0D699296F18D200EED9D4 /* PulseTests */,
 				0CF0D6C6296F18FD00EED9D4 /* PulseUITests */,
+				0C11EABC2971E9920059786A /* PulsePerformanceTests */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -1361,7 +1389,7 @@
 		0CF0D6C6296F18FD00EED9D4 /* PulseUITests */ = {
 			isa = PBXGroup;
 			children = (
-				0CF0D6C7296F18FD00EED9D4 /* JSONPrinterTests.swift */,
+				0CF0D6C7296F18FD00EED9D4 /* TextRendererTests.swift */,
 				0CF0D6C8296F18FD00EED9D4 /* ConsoleViewModelTests.swift */,
 				0CF0D6C9296F18FD00EED9D4 /* MockTests.swift */,
 			);
@@ -1417,6 +1445,26 @@
 			productName = "Pulse Integration Examples iOS";
 			productReference = 0C0B31EA26D179A20045C9E1 /* Pulse Integration Examples iOS.app */;
 			productType = "com.apple.product-type.application";
+		};
+		0C11EAC02971E9B30059786A /* PulsePerformanceTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0C11EAC82971E9B30059786A /* Build configuration list for PBXNativeTarget "PulsePerformanceTests" */;
+			buildPhases = (
+				0C11EABD2971E9B30059786A /* Sources */,
+				0C11EABE2971E9B30059786A /* Frameworks */,
+				0C11EABF2971E9B30059786A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				0C11EAC72971E9B30059786A /* PBXTargetDependency */,
+				0C11EAD12971EA640059786A /* PBXTargetDependency */,
+				0C11EAEC2971F20D0059786A /* PBXTargetDependency */,
+			);
+			name = PulsePerformanceTests;
+			productName = PulsePerformanceTests;
+			productReference = 0C11EAC12971E9B30059786A /* PulsePerformanceTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		0C516FB926015DD2004813B4 /* Pulse Demo iOS */ = {
 			isa = PBXNativeTarget;
@@ -1631,6 +1679,11 @@
 					0C0B31E926D179A20045C9E1 = {
 						CreatedOnToolsVersion = 12.4;
 					};
+					0C11EAC02971E9B30059786A = {
+						CreatedOnToolsVersion = 14.2;
+						LastSwiftMigration = 1420;
+						TestTargetID = 0C0B31E926D179A20045C9E1;
+					};
 					0C516FB926015DD2004813B4 = {
 						CreatedOnToolsVersion = 12.4;
 					};
@@ -1682,6 +1735,7 @@
 				0CF0D68E296F18BE00EED9D4 /* PulseTests */,
 				0CF0D56B296F17CB00EED9D4 /* PulseUI */,
 				0CF0D6BB296F18ED00EED9D4 /* PulseUITests */,
+				0C11EAC02971E9B30059786A /* PulsePerformanceTests */,
 				0C57AD4C245F0EFB005B3400 /* Pulse App iOS */,
 				0C516FB926015DD2004813B4 /* Pulse Demo iOS */,
 				0CEAB3D925FE862D00F09B0F /* Pulse Demo watchOS */,
@@ -1702,6 +1756,13 @@
 				0C0B31F626D179A70045C9E1 /* Assets.xcassets in Resources */,
 				0C0B31F426D179A20045C9E1 /* Main.storyboard in Resources */,
 				0C7A834026D1CA290082634F /* repos.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0C11EABF2971E9B30059786A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1798,11 +1859,22 @@
 			buildActionMask = 2147483647;
 			files = (
 				0C0B31F126D179A20045C9E1 /* ViewController.swift in Sources */,
+				0C11EADA2971EBE80059786A /* MockTask.swift in Sources */,
 				0C0B31ED26D179A20045C9E1 /* AppDelegate.swift in Sources */,
-				0CF4D86C289629EF0027BB34 /* MockTask.swift in Sources */,
-				0CF4D86D289629EF0027BB34 /* MockStoreConfiguration.swift in Sources */,
+				0C11EAD92971EBE80059786A /* MockStoreConfiguration.swift in Sources */,
 				0C0B31EF26D179A20045C9E1 /* SceneDelegate.swift in Sources */,
-				0CF4D86E289629EF0027BB34 /* MockStore.swift in Sources */,
+				0C11EADB2971EBE80059786A /* MockStore.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0C11EABD2971E9B30059786A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0C11EACC2971E9CE0059786A /* TextRendererPerformanceTests.swift in Sources */,
+				0C11EAE72971EBED0059786A /* MockStore.swift in Sources */,
+				0C11EACF2971EA4F0059786A /* MockTask.swift in Sources */,
+				0C11EACE2971EA3C0059786A /* MockStoreConfiguration.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1811,9 +1883,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				0C76781A268F88BB0058F69B /* Pulse_Demo_iOSApp.swift in Sources */,
-				0C24CC6E289482F7008DD332 /* MockTask.swift in Sources */,
-				0C24CC7A2894C134008DD332 /* MockStoreConfiguration.swift in Sources */,
-				0C24CC6B289482F7008DD332 /* MockStore.swift in Sources */,
+				0C11EAE62971EBEC0059786A /* MockStore.swift in Sources */,
+				0C11EAE52971EBEC0059786A /* MockTask.swift in Sources */,
+				0C11EAD22971EBC20059786A /* MockStoreConfiguration.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1823,10 +1895,7 @@
 			files = (
 				0C57AD85245F0F38005B3400 /* AppDelegate.swift in Sources */,
 				0C57AD87245F0F38005B3400 /* SceneDelegate.swift in Sources */,
-				0CF4D86F289629F10027BB34 /* MockTask.swift in Sources */,
-				0CF4D870289629F10027BB34 /* MockStoreConfiguration.swift in Sources */,
 				0C516FF026016392004813B4 /* DocumentBrowser.swift in Sources */,
-				0CF4D871289629F10027BB34 /* MockStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1834,11 +1903,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0C24CC70289482F7008DD332 /* MockTask.swift in Sources */,
 				0C6460DF25F579B8002C55B1 /* ContentView.swift in Sources */,
 				0C6460DC25F579B8002C55B1 /* Pulse_tvOSApp.swift in Sources */,
-				0C24CC7C2894C134008DD332 /* MockStoreConfiguration.swift in Sources */,
-				0C24CC6D289482F7008DD332 /* MockStore.swift in Sources */,
+				0C11EADF2971EBE90059786A /* MockTask.swift in Sources */,
+				0C11EADE2971EBE90059786A /* MockStoreConfiguration.swift in Sources */,
+				0C11EAE02971EBE90059786A /* MockStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1846,10 +1915,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0C24CC6F289482F7008DD332 /* MockTask.swift in Sources */,
 				0C9F04F92884F34A0035239F /* Pulse_Demo_macOSApp.swift in Sources */,
-				0C24CC7B2894C134008DD332 /* MockStoreConfiguration.swift in Sources */,
-				0C24CC6C289482F7008DD332 /* MockStore.swift in Sources */,
+				0C11EAE22971EBEA0059786A /* MockStore.swift in Sources */,
+				0C11EAE12971EBEA0059786A /* MockTask.swift in Sources */,
+				0C11EAD42971EBC60059786A /* MockStoreConfiguration.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1858,10 +1927,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				0CEAB41425FE867E00F09B0F /* PulseAppApp.swift in Sources */,
-				0CF4D872289629F20027BB34 /* MockTask.swift in Sources */,
-				0CF4D873289629F20027BB34 /* MockStoreConfiguration.swift in Sources */,
+				0C11EAD32971EBC20059786A /* MockStoreConfiguration.swift in Sources */,
+				0C11EAE32971EBEB0059786A /* MockTask.swift in Sources */,
 				0CEAB41725FE867E00F09B0F /* ComplicationController.swift in Sources */,
-				0CF4D874289629F20027BB34 /* MockStore.swift in Sources */,
+				0C11EAE42971EBEB0059786A /* MockStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1912,7 +1981,6 @@
 				0CF0D65C296F189600EED9D4 /* ConsoleMessageMetadataView.swift in Sources */,
 				0CF0D615296F189600EED9D4 /* LoggerSync.swift in Sources */,
 				0CF0D62C296F189600EED9D4 /* WebView.swift in Sources */,
-				0CF0D63B296F189600EED9D4 /* MockTask.swift in Sources */,
 				0CF0D635296F189600EED9D4 /* InfoRow.swift in Sources */,
 				0CF0D674296F189600EED9D4 /* NetworkInspectorView-shared.swift in Sources */,
 				0CF0D611296F189600EED9D4 /* Deprecated.swift in Sources */,
@@ -1936,6 +2004,7 @@
 				0CF0D640296F189600EED9D4 /* ConsoleSearchViewModel.swift in Sources */,
 				0CF0D65A296F189600EED9D4 /* StoreDetailsView.swift in Sources */,
 				0CF0D648296F189600EED9D4 /* ConsoleCustomMessageFilterView.swift in Sources */,
+				0C11EAE82971EBEE0059786A /* MockStoreConfiguration.swift in Sources */,
 				0CF0D67A296F189600EED9D4 /* ConsoleView-watchos.swift in Sources */,
 				0CF0D63F296F189600EED9D4 /* ConsoleSearchView.swift in Sources */,
 				0CF0D63A296F189600EED9D4 /* ContextMenus.swift in Sources */,
@@ -1978,6 +2047,7 @@
 				0CF0D613296F189600EED9D4 /* TextRendererHTML.swift in Sources */,
 				0CF0D68A296F189600EED9D4 /* PulseUI.docc in Sources */,
 				0CDC3BEA2970FA47003BD1FF /* ConsoleSearchListSelectionView.swift in Sources */,
+				0C11EAE92971EBEE0059786A /* MockTask.swift in Sources */,
 				0CF0D66E296F189600EED9D4 /* NetworkCURLCell.swift in Sources */,
 				0CF0D625296F189600EED9D4 /* PlaceholderView.swift in Sources */,
 				0CF0D65D296F189600EED9D4 /* ConsoleMessageDetailsView.swift in Sources */,
@@ -1986,7 +2056,6 @@
 				0CF0D676296F189600EED9D4 /* NetworkInspectorViewModel.swift in Sources */,
 				0C40C098296F777D009ECF16 /* ConsoleSearchResponseSourceCell.swift in Sources */,
 				0CF0D689296F189600EED9D4 /* MainViewController.swift in Sources */,
-				0CF0D63C296F189600EED9D4 /* MockStore.swift in Sources */,
 				0CF0D60F296F189600EED9D4 /* UIKit+Extensions.swift in Sources */,
 				0CF0D610296F189600EED9D4 /* SpinnerView.swift in Sources */,
 				0CF0D680296F189600EED9D4 /* ConsoleMessageViewModel.swift in Sources */,
@@ -2001,7 +2070,6 @@
 				0CF0D630296F189600EED9D4 /* RichTextView.swift in Sources */,
 				0CF0D637296F189600EED9D4 /* Checkbox.swift in Sources */,
 				0CF0D672296F189600EED9D4 /* NetworkInspectorRequestBodyView.swift in Sources */,
-				0CF0D63D296F189600EED9D4 /* MockStoreConfiguration.swift in Sources */,
 				0CF0D621296F189600EED9D4 /* UITableView+Extensions.swift in Sources */,
 				0CF0D655296F189600EED9D4 /* SettingsView.swift in Sources */,
 				0C40C09C296F78C6009ECF16 /* ConsoleSearchDurationCell.swift in Sources */,
@@ -2024,6 +2092,7 @@
 				0CF0D61E296F189600EED9D4 /* SwiftUI+Extensions.swift in Sources */,
 				0CF0D684296F189600EED9D4 /* ConsoleTableView-ios.swift in Sources */,
 				0CF0D664296F189600EED9D4 /* NetworkInspectorMetricsView.swift in Sources */,
+				0C11EAEA2971EBEE0059786A /* MockStore.swift in Sources */,
 				0CF0D687296F189600EED9D4 /* ConsoleNetworkRequestView.swift in Sources */,
 				0CDC3BED2971B936003BD1FF /* ConsoleSearchLogLevelsCell.swift in Sources */,
 				0CF0D620296F189600EED9D4 /* Foundation+Extensions.swift in Sources */,
@@ -2054,7 +2123,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0CF0D6CB296F18FD00EED9D4 /* ConsoleViewModelTests.swift in Sources */,
-				0CF0D6CA296F18FD00EED9D4 /* JSONPrinterTests.swift in Sources */,
+				0CF0D6CA296F18FD00EED9D4 /* TextRendererTests.swift in Sources */,
 				0CF0D6CC296F18FD00EED9D4 /* MockTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2066,6 +2135,21 @@
 			isa = PBXTargetDependency;
 			target = 0CF0D541296F14EA00EED9D4 /* Pulse */;
 			targetProxy = 0C033100296F1CD700A0E861 /* PBXContainerItemProxy */;
+		};
+		0C11EAC72971E9B30059786A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0CF0D56B296F17CB00EED9D4 /* PulseUI */;
+			targetProxy = 0C11EAC62971E9B30059786A /* PBXContainerItemProxy */;
+		};
+		0C11EAD12971EA640059786A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0C516FB926015DD2004813B4 /* Pulse Demo iOS */;
+			targetProxy = 0C11EAD02971EA640059786A /* PBXContainerItemProxy */;
+		};
+		0C11EAEC2971F20D0059786A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0C0B31E926D179A20045C9E1 /* Pulse Integration Examples iOS */;
+			targetProxy = 0C11EAEB2971F20D0059786A /* PBXContainerItemProxy */;
 		};
 		0CEAB3E625FE862E00F09B0F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -2207,9 +2291,91 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.github.kean.Pulse-Integration-Examples-iOS";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = PULSE_DEMO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = PULSE_MOCK_INCLUDED;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		0C11EAC92971E9B30059786A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.github.kean.PulsePerformanceTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Pulse Integration Examples iOS.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Pulse Integration Examples iOS";
+			};
+			name = Debug;
+		};
+		0C11EACA2971E9B30059786A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.github.kean.PulsePerformanceTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = PULSE_MOCK_INCLUDED;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Pulse Integration Examples iOS.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Pulse Integration Examples iOS";
 			};
 			name = Release;
 		};
@@ -2260,8 +2426,7 @@
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = PULSE_DEMO;
-				"SWIFT_ACTIVE_COMPILATION_CONDITIONS[arch=*]" = "";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = PULSE_MOCK_INCLUDED;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -2309,7 +2474,7 @@
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "watchsimulator watchos macosx iphonesimulator iphoneos appletvsimulator appletvos";
 				SUPPORTS_MACCATALYST = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG PULSE_DEMO";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TVOS_DEPLOYMENT_TARGET = 14.0;
 				WATCHOS_DEPLOYMENT_TARGET = 8.0;
@@ -2446,7 +2611,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
 				SUPPORTED_PLATFORMS = "appletvsimulator appletvos";
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = PULSE_DEMO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = PULSE_MOCK_INCLUDED;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 3;
 			};
@@ -2532,7 +2697,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SUPPORTED_PLATFORMS = macosx;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = PULSE_DEMO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = PULSE_MOCK_INCLUDED;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -2584,7 +2749,7 @@
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "watchsimulator watchos";
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = PULSE_DEMO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = PULSE_MOCK_INCLUDED;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
 			};
@@ -2627,7 +2792,7 @@
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "watchsimulator watchos";
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = PULSE_DEMO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = PULSE_MOCK_INCLUDED;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
 			};
@@ -2833,6 +2998,15 @@
 			buildConfigurations = (
 				0C0B31FC26D179A70045C9E1 /* Debug */,
 				0C0B31FD26D179A70045C9E1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		0C11EAC82971E9B30059786A /* Build configuration list for PBXNativeTarget "PulsePerformanceTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0C11EAC92971E9B30059786A /* Debug */,
+				0C11EACA2971E9B30059786A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

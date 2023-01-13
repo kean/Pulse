@@ -6,7 +6,9 @@ import Foundation
 import Pulse
 import CoreData
 
-#if DEBUG
+#warning("TODO: remove this and make one instance of it")
+
+#if DEBUG || PULSE_MOCK_INCLUDED
 
 enum MockStoreConfiguration {
     static let isDelayingLogs = false

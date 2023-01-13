@@ -8,7 +8,7 @@ import XCTest
 
 #if DEBUG
 #if !os(watchOS)
-final class JSONPrinterTests: XCTestCase {
+final class TextRendererTestsTests: XCTestCase {
     func testTypMismatchError() throws {
         // GIVEN
         let json = try JSONSerialization.jsonObject(with: MockJSON.allPossibleValues)
@@ -26,7 +26,6 @@ final class JSONPrinterTests: XCTestCase {
         XCTAssertEqual(effectiveRange, NSRange(location: 103, length: 2))
     }
 }
-
 
 private func generateTypeMismatchError() -> NetworkLogger.DecodingError? {
     struct JSON: Decodable {

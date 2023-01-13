@@ -2,7 +2,7 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
-#if DEBUG || PULSE_DEMO
+#if DEBUG
 
 enum MockStoreConfiguration {
     /// Delay logs with random intervals.

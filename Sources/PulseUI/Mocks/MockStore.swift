@@ -6,7 +6,7 @@ import Foundation
 import Pulse
 import CoreData
 
-#if DEBUG || PULSE_DEMO
+#if DEBUG || PULSE_MOCK_INCLUDED
 
 extension LoggerStore {
     static let mock: LoggerStore = {
@@ -39,7 +39,7 @@ private let rootURL = FileManager.default.temporaryDirectory.appendingPathCompon
 
 private let cleanup: Void = {
     try? FileManager.default.removeItem(at: rootURL)
-    try? FileManager.default.createDirectory(at: rootURL, withIntermediateDirectories: true, attributes: nil)
+    try! FileManager.default.createDirectory(at: rootURL, withIntermediateDirectories: true, attributes: nil)
 }()
 
 private func makeMockStore() -> LoggerStore {

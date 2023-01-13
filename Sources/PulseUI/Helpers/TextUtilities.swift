@@ -9,6 +9,10 @@ import PDFKit
 #endif
 
 enum TextUtilities {
+    static func plainText(from string: NSAttributedString) -> String {
+        string.string
+    }
+
     static func html(from string: NSAttributedString) throws -> Data {
         let range = NSRange(location: 0, length: string.length)
         let data = try string.data(from: range, documentAttributes: [

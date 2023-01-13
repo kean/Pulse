@@ -5,6 +5,10 @@
 import Foundation
 import Pulse
 
+#warning("can we optimize it? create a single string first and then add attributes")
+#warning("for monoscrome, we can just use native pretty formatting (but still highlight error?)")
+#warning("disable attributed rendering completely for sharing the entire store?")
+
 final class TextRendererJSON {
     // Input
     private let json: Any
@@ -13,46 +17,49 @@ final class TextRendererJSON {
     // Settings
     private let options: TextRenderer.Options
     private let helper: TextHelper
-    private let attributes: [JSONElement: [NSAttributedString.Key: Any]]
 
     // Temporary state (one-shot, doesn't reset)
     private var indentation = 0
+    private var index = 0
     private var codingPath: [NetworkLogger.DecodingError.CodingKey] = []
-    private var string = NSMutableAttributedString()
+    private var elements: [(NSRange, JSONElement)] = []
+    private var string = ""
 
     init(json: Any, error: NetworkLogger.DecodingError? = nil, options: TextRenderer.Options = .init()) {
         self.options = options
         self.helper = TextHelper()
         self.json = json
         self.error = error
-
-        if options.color == .monochrome {
-            attributes = [
-                .punctuation: [.foregroundColor: UXColor.secondaryLabel],
-                .key: [.foregroundColor: UXColor.label],
-                .valueString: [.foregroundColor: UXColor.label],
-                .valueOther: [.foregroundColor: UXColor.label],
-                .null: [.foregroundColor: UXColor.label]
-            ]
-        } else {
-            attributes = [
-                .punctuation: [.foregroundColor: JSONColors.punctuation],
-                .key: [.foregroundColor: JSONColors.key],
-                .valueString: [.foregroundColor: JSONColors.valueString],
-                .valueOther: [.foregroundColor: JSONColors.valueOther],
-                .null: [.foregroundColor: JSONColors.null]
-            ]
-        }
     }
 
     func render() -> NSAttributedString {
-        guard string.length == 0 else {
-            assertionFailure("TextRendererJSON is a one-shot object")
-            return string
-        }
         print(json: json, isFree: true)
-        string.addAttributes(helper.attributes(role: .body2, style: .monospaced, color: nil))
-        return string
+
+        let output = NSMutableAttributedString(string: string, attributes: helper.attributes(role: .body2, style: .monospaced, color: nil))
+        for (range, element) in elements {
+            output.addAttribute(.foregroundColor, value: color(for: element), range: range)
+        }
+        return output
+    }
+
+    private func color(for element: JSONElement) -> UXColor {
+        if options.color == .monochrome {
+            switch element {
+            case .punctuation: return UXColor.secondaryLabel
+            case .key: return UXColor.label
+            case .valueString: return UXColor.label
+            case .valueOther: return UXColor.label
+            case .null: return UXColor.label
+            }
+        } else {
+            switch element {
+            case .punctuation: return JSONColors.punctuation
+            case .key: return JSONColors.key
+            case .valueString: return JSONColors.valueString
+            case .valueOther: return JSONColors.valueOther
+            case .null: return JSONColors.null
+            }
+        }
     }
 
     // MARK: - Walk JSON
@@ -134,30 +141,36 @@ final class TextRendererJSON {
     // MARK: - Modify String
 
     private func append(_ string: String, _ element: JSONElement) {
-        var error: NetworkLogger.DecodingError?
-        if codingPath == self.error?.context?.codingPath {
-            error = self.error
-            self.error = nil
-        }
+        let length = string.utf16.count
+        self.string += string
+        elements.append((NSRange(location: index, length: length), element))
+        index += length
 
-        var attributes = self.attributes[element]!
-        if let error = error {
-            attributes[.backgroundColor] = options.color == .monochrome ? UXColor.label : UXColor.red
-            attributes[.foregroundColor] = UXColor.white
-            attributes[.decodingError] = error
-            attributes[.link] = {
-                var components = URLComponents()
-                components.scheme = "pulse"
-                components.path = "tooltip"
-                components.queryItems = [
-                    URLQueryItem(name: "title", value: "Decoding Error"),
-                    URLQueryItem(name: "message", value: error.debugDescription)
-                ]
-                return components.url
-            }()
-            attributes[.underlineColor] = UXColor.clear
-        }
-        self.string.append(string, attributes)
+        #warning("TODO: reimplement")
+//        var error: NetworkLogger.DecodingError?
+//        if codingPath == self.error?.context?.codingPath {
+//            error = self.error
+//            self.error = nil
+//        }
+//
+//        var attributes = self.attributes[element]!
+//        if let error = error {
+//            attributes[.backgroundColor] = options.color == .monochrome ? UXColor.label : UXColor.red
+//            attributes[.foregroundColor] = UXColor.white
+//            attributes[.decodingError] = error
+//            attributes[.link] = {
+//                var components = URLComponents()
+//                components.scheme = "pulse"
+//                components.path = "tooltip"
+//                components.queryItems = [
+//                    URLQueryItem(name: "title", value: "Decoding Error"),
+//                    URLQueryItem(name: "message", value: error.debugDescription)
+//                ]
+//                return components.url
+//            }()
+//            attributes[.underlineColor] = UXColor.clear
+//        }
+//        self.string.append(string, attributes)
     }
 
     private func indent() {
@@ -165,7 +178,7 @@ final class TextRendererJSON {
     }
 
     private func newline() {
-        string.append("\n")
+        append("\n", .punctuation)
     }
 }
 
