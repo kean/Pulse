@@ -12,13 +12,12 @@ final class ConsoleSearchViewModel: ObservableObject {
 
     @Published var criteria = ConsoleSearchCriteria()
     @Published var mode: ConsoleViewModel.Mode = .messages
-    private(set) var defaultCriteria = ConsoleSearchCriteria()
 
     let labels: ManagedObjectsObserver<LoggerLabelEntity>
     let domains: ManagedObjectsObserver<NetworkDomainEntity>
 
+    private(set) var defaultCriteria = ConsoleSearchCriteria()
     private let store: LoggerStore
-    private var cancellables: [AnyCancellable] = []
 
     init(store: LoggerStore) {
         self.store = store
@@ -30,6 +29,7 @@ final class ConsoleSearchViewModel: ObservableObject {
             criteria.shared.dates.startDate = nil
             criteria.shared.dates.endDate = nil
         }
+        defaultCriteria = criteria
     }
 
     var isCriteriaDefault: Bool {
@@ -119,14 +119,11 @@ final class ConsoleSearchViewModel: ObservableObject {
 
     // MARK: Custom Filters
 
-#warning("TODO: move to the view & use binding for this")
     func remove(_ filter: ConsoleCustomMessageFilter) {
         if let index = criteria.messages.custom.filters.firstIndex(where: { $0.id == filter.id }) {
             criteria.messages.custom.filters.remove(at: index)
         }
     }
-
-    // MARK: Custom Network Filters
 
     func remove(_ filter: ConsoleCustomNetworkFilter) {
         if let index = criteria.network.custom.filters.firstIndex(where: { $0.id == filter.id }) {
