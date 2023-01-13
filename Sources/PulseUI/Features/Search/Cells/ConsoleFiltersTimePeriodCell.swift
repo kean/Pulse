@@ -58,7 +58,7 @@ private enum ConsoleDatesQuickFilter: String, Hashable, CaseIterable {
 
     var title: String { rawValue.capitalized }
 
-    func makeDateFilter() -> ConsoleDatesFilter? {
+    func makeDateFilter() -> ConsoleSearchCriteria.Dates? {
         switch self {
         case .session: return .session
         case .recent: return .recent
