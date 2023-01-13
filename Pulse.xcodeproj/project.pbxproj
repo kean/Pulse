@@ -138,7 +138,7 @@
 		0CF0D63C296F189600EED9D4 /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B0296F189500EED9D4 /* MockStore.swift */; };
 		0CF0D63D296F189600EED9D4 /* MockStoreConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B1296F189500EED9D4 /* MockStoreConfiguration.swift */; };
 		0CF0D63F296F189600EED9D4 /* ConsoleNetworkFiltersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B5296F189500EED9D4 /* ConsoleNetworkFiltersView.swift */; };
-		0CF0D640296F189600EED9D4 /* ConsoleSearchCriteriaViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B6296F189500EED9D4 /* ConsoleSearchCriteriaViewModel.swift */; };
+		0CF0D640296F189600EED9D4 /* ConsoleSearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B6296F189500EED9D4 /* ConsoleSearchViewModel.swift */; };
 		0CF0D641296F189600EED9D4 /* ConsoleMessageFiltersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B7296F189500EED9D4 /* ConsoleMessageFiltersView.swift */; };
 		0CF0D642296F189600EED9D4 /* ConsoleSharedFiltersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B8296F189500EED9D4 /* ConsoleSharedFiltersView.swift */; };
 		0CF0D643296F189600EED9D4 /* ConsoleCustomNetworkFilterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5BA296F189500EED9D4 /* ConsoleCustomNetworkFilterView.swift */; };
@@ -591,7 +591,7 @@
 		0CF0D5B0296F189500EED9D4 /* MockStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockStore.swift; sourceTree = "<group>"; };
 		0CF0D5B1296F189500EED9D4 /* MockStoreConfiguration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockStoreConfiguration.swift; sourceTree = "<group>"; };
 		0CF0D5B5296F189500EED9D4 /* ConsoleNetworkFiltersView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleNetworkFiltersView.swift; sourceTree = "<group>"; };
-		0CF0D5B6296F189500EED9D4 /* ConsoleSearchCriteriaViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleSearchCriteriaViewModel.swift; sourceTree = "<group>"; };
+		0CF0D5B6296F189500EED9D4 /* ConsoleSearchViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleSearchViewModel.swift; sourceTree = "<group>"; };
 		0CF0D5B7296F189500EED9D4 /* ConsoleMessageFiltersView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleMessageFiltersView.swift; sourceTree = "<group>"; };
 		0CF0D5B8296F189500EED9D4 /* ConsoleSharedFiltersView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleSharedFiltersView.swift; sourceTree = "<group>"; };
 		0CF0D5BA296F189500EED9D4 /* ConsoleCustomNetworkFilterView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleCustomNetworkFilterView.swift; sourceTree = "<group>"; };
@@ -1208,7 +1208,7 @@
 				0CF0D5B7296F189500EED9D4 /* ConsoleMessageFiltersView.swift */,
 				0CF0D5B8296F189500EED9D4 /* ConsoleSharedFiltersView.swift */,
 				0CF0D5C4296F189500EED9D4 /* ConsoleFiltersView.swift */,
-				0CF0D5B6296F189500EED9D4 /* ConsoleSearchCriteriaViewModel.swift */,
+				0CF0D5B6296F189500EED9D4 /* ConsoleSearchViewModel.swift */,
 			);
 			path = Filters;
 			sourceTree = "<group>";
@@ -1945,7 +1945,7 @@
 				0CF0D65F296F189600EED9D4 /* ConsoleMessageDetailsViewModel.swift in Sources */,
 				0CF0D668296F189600EED9D4 /* NetworkRequestStatusCell.swift in Sources */,
 				0CF0D651296F189600EED9D4 /* ConsoleCustomMessageFilter.swift in Sources */,
-				0CF0D640296F189600EED9D4 /* ConsoleSearchCriteriaViewModel.swift in Sources */,
+				0CF0D640296F189600EED9D4 /* ConsoleSearchViewModel.swift in Sources */,
 				0CF0D65A296F189600EED9D4 /* StoreDetailsView.swift in Sources */,
 				0CF0D648296F189600EED9D4 /* ConsoleCustomMessageFilterView.swift in Sources */,
 				0CF0D67A296F189600EED9D4 /* ConsoleView-watchos.swift in Sources */,

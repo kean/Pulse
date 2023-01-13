@@ -26,7 +26,7 @@ final class NetworkInsightsRequestsListViewModel: ObservableObject {
     let details: ConsoleDetailsRouterViewModel
 
     init(tasks: [NetworkTaskEntity]) {
-        self.table = ConsoleTableViewModel(filtersViewModel: nil)
+        self.table = ConsoleTableViewModel(searchViewModel: nil)
         self.table.entities = tasks
         self.details = ConsoleDetailsRouterViewModel()
     }

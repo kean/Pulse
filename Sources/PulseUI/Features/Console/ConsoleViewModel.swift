@@ -23,7 +23,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     let insightsViewModel: InsightsViewModel
 #endif
 
-    let filtersViewModel: ConsoleSearchCriteriaViewModel
+    let searchViewModel: ConsoleSearchViewModel
 
     @Published var mode: Mode
     @Published var isOnlyErrors = false
@@ -45,11 +45,11 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         self.mode = mode
         self.isNetworkOnly = mode == .network
 
-        self.filtersViewModel = ConsoleSearchCriteriaViewModel(store: store)
+        self.searchViewModel = ConsoleSearchViewModel(store: store)
 
 #if os(iOS) || os(macOS)
         self.details = ConsoleDetailsRouterViewModel()
-        self.table = ConsoleTableViewModel(filtersViewModel: filtersViewModel)
+        self.table = ConsoleTableViewModel(searchViewModel: searchViewModel)
 #endif
 
 #if os(iOS)
@@ -62,7 +62,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
             self?.refresh(filterTerm: filterTerm)
         }.store(in: &cancellables)
 
-        filtersViewModel.dataNeedsReload.throttle(for: 0.5, scheduler: DispatchQueue.main, latest: true).sink { [weak self] in
+        searchViewModel.dataNeedsReload.throttle(for: 0.5, scheduler: DispatchQueue.main, latest: true).sink { [weak self] in
             self?.refreshNow()
         }.store(in: &cancellables)
 
@@ -90,7 +90,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     }
 
     var isCriteriaDefault: Bool {
-        filtersViewModel.isCriteriaDefault(for: mode)
+        searchViewModel.isCriteriaDefault(for: mode)
     }
 
     private func prepare(for mode: Mode) {
@@ -125,9 +125,9 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         }
         switch mode {
         case .messages:
-            controller.fetchRequest.predicate = ConsoleSearchCriteria.makeMessagePredicates(criteria: filtersViewModel.criteria, isOnlyErrors: isOnlyErrors, filterTerm: filterTerm)
+            controller.fetchRequest.predicate = ConsoleSearchCriteria.makeMessagePredicates(criteria: searchViewModel.criteria, isOnlyErrors: isOnlyErrors, filterTerm: filterTerm)
         case .network:
-            controller.fetchRequest.predicate = ConsoleSearchCriteria.makeNetworkPredicates(criteria: filtersViewModel.criteria, isOnlyErrors: isOnlyErrors, filterTerm: filterTerm)
+            controller.fetchRequest.predicate = ConsoleSearchCriteria.makeNetworkPredicates(criteria: searchViewModel.criteria, isOnlyErrors: isOnlyErrors, filterTerm: filterTerm)
         }
         try? controller.performFetch()
 

@@ -6,7 +6,7 @@ import SwiftUI
 import Pulse
 
 struct ConsoleMessageFiltersView: View {
-    @ObservedObject var viewModel: ConsoleSearchCriteriaViewModel
+    @ObservedObject var viewModel: ConsoleSearchViewModel
 
 #if os(iOS) || os(tvOS) || os(watchOS)
     var body: some View {

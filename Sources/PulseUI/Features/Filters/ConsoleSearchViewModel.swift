@@ -9,7 +9,7 @@ import SwiftUI
 
 #warning("TODO: refactor, remove unused")
 
-final class ConsoleSearchCriteriaViewModel: ObservableObject {
+final class ConsoleSearchViewModel: ObservableObject {
     @Published var isButtonResetEnabled = false
 
     @Published var criteria = ConsoleSearchCriteria()

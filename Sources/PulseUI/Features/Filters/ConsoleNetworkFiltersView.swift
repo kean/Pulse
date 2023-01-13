@@ -6,7 +6,7 @@ import SwiftUI
 import Pulse
 
 struct ConsoleNetworkFiltersView: View {
-    @ObservedObject var viewModel: ConsoleSearchCriteriaViewModel
+    @ObservedObject var viewModel: ConsoleSearchViewModel
 
     @State private var isRedirectGroupExpanded = true
     @State private var isDomainsPickerPresented = false

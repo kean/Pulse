@@ -11,9 +11,9 @@ struct ConsoleFiltersView: View {
     var body: some View {
         switch viewModel.mode {
         case .messages:
-            ConsoleMessageFiltersView(viewModel: viewModel.filtersViewModel)
+            ConsoleMessageFiltersView(viewModel: viewModel.searchViewModel)
         case .network:
-            ConsoleNetworkFiltersView(viewModel: viewModel.filtersViewModel)
+            ConsoleNetworkFiltersView(viewModel: viewModel.searchViewModel)
         }
     }
 }
