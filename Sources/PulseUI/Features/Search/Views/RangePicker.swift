@@ -23,11 +23,11 @@ struct RangePicker: View {
     private func textField(_ title: String, text: Binding<String>) -> some View {
         TextField(title, text: text)
             .multilineTextAlignment(.center)
-#if os(iOS) || os(macOS)
-            .textFieldStyle(.roundedBorder)
-#endif
 #if os(iOS)
             .keyboardType(.decimalPad)
+            .textFieldStyle(.roundedBorder)
+#elseif os(macOS)
+            .textFieldStyle(.plain)
 #endif
     }
 }

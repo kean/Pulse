@@ -1,14 +1,14 @@
-// swift-tools-version:5.6
+// swift-tools-version:5.7
 
 import PackageDescription
 
 let package = Package(
     name: "Pulse",
     platforms: [
-        .iOS(.v13),
-        .tvOS(.v13),
-        .macOS(.v11),
-        .watchOS(.v7)
+        .iOS(.v14),
+        .tvOS(.v14),
+        .macOS(.v12),
+        .watchOS(.v8)
     ],
     products: [
         .library(name: "Pulse", targets: ["Pulse"]),

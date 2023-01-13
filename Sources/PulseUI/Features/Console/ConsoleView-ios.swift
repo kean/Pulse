@@ -121,7 +121,7 @@ private struct ConsoleToolbarView: View {
                 .foregroundColor(viewModel.isOnlyErrors ? .red : .accentColor)
         }.frame(width: 40, height: 44)
         Button(action: { isShowingFilters = true }) {
-            Image(systemName: viewModel.isDefaultFilters ? "line.horizontal.3.decrease.circle" : "line.3.horizontal.decrease.circle.fill")
+            Image(systemName: viewModel.searchViewModel.isCriteriaDefault ? "line.horizontal.3.decrease.circle" : "line.3.horizontal.decrease.circle.fill")
                 .font(.system(size: 20))
                 .foregroundColor(.accentColor)
         }.frame(width: 40, height: 44)

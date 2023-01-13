@@ -3,13 +3,19 @@
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
+import Pulse
 
 #if os(iOS) || os(tvOS) || os(watchOS)
 
 struct ConsoleFiltersLabelsPickerView: View {
-    @ObservedObject var viewModel: ConsoleMessageSearchCriteriaViewModel
-
+    @ObservedObject var viewModel: ConsoleSearchViewModel
+    @ObservedObject var labels: ManagedObjectsObserver<LoggerLabelEntity>
     @State private var searchText = ""
+
+    init(viewModel: ConsoleSearchViewModel) {
+        self.viewModel = viewModel
+        self.labels = viewModel.labels
+    }
 
     var body: some View {
         if #available(iOS 15, tvOS 15, *) {
@@ -33,19 +39,16 @@ struct ConsoleFiltersLabelsPickerView: View {
             .foregroundColor(.accentColor)
 #endif
 
-            ForEach(labels, id: \.self) { item in
+            ForEach(allLabels, id: \.self) { item in
                 Checkbox(item.capitalized, isOn: viewModel.binding(forLabel: item))
             }
         }
         .navigationBarTitle("Labels")
     }
 
-    private var labels: [String] {
-        if searchText.isEmpty {
-            return viewModel.allLabels
-        } else {
-            return viewModel.allLabels.filter { $0.localizedCaseInsensitiveContains(searchText) }
-        }
+    private var allLabels: [String] {
+        let labels = self.labels.objects.map(\.name)
+        return searchText.isEmpty ? labels : labels.filter { $0.localizedCaseInsensitiveContains(searchText) }
     }
 }
 

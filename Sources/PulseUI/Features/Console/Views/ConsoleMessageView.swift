@@ -27,7 +27,7 @@ struct ConsoleMessageView: View {
                     .lineLimit(1)
                     .font(ConsoleConstants.fontTitle)
                     .foregroundColor(.secondary)
-                    .monospacedDigit()
+                    .backport.monospacedDigit()
             }
             Text(viewModel.preprocessedText)
                 .font(ConsoleConstants.fontBody)

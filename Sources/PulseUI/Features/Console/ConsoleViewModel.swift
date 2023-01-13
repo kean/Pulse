@@ -23,17 +23,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     let insightsViewModel: InsightsViewModel
 #endif
 
-    // Search criteria
-    let sharedSearchCriteriaViewModel: ConsoleSharedSearchCriteriaViewModel
-    let searchCriteriaViewModel: ConsoleMessageSearchCriteriaViewModel
-    let networkSearchCriteriaViewModel: ConsoleNetworkSearchCriteriaViewModel
-
-    var isDefaultFilters: Bool {
-        switch mode {
-        case .all: return searchCriteriaViewModel.isDefaultSearchCriteria && sharedSearchCriteriaViewModel.isDefaultSearchCriteria
-        case .network: return networkSearchCriteriaViewModel.isDefaultSearchCriteria && sharedSearchCriteriaViewModel.isDefaultSearchCriteria
-        }
-    }
+    let searchViewModel: ConsoleSearchViewModel
 
     @Published var mode: Mode
     @Published var isOnlyErrors = false
@@ -46,22 +36,20 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     private var cancellables: [AnyCancellable] = []
 
     enum Mode {
-        case all, network
+        case messages, network
     }
 
-    init(store: LoggerStore, mode: Mode = .all) {
+    init(store: LoggerStore, mode: Mode = .messages) {
         self.title = mode == .network ? "Network" : "Console"
         self.store = store
         self.mode = mode
         self.isNetworkOnly = mode == .network
 
-        self.sharedSearchCriteriaViewModel = ConsoleSharedSearchCriteriaViewModel(store: store)
-        self.searchCriteriaViewModel = ConsoleMessageSearchCriteriaViewModel(store: store)
-        self.networkSearchCriteriaViewModel = ConsoleNetworkSearchCriteriaViewModel(store: store)
+        self.searchViewModel = ConsoleSearchViewModel(store: store)
 
 #if os(iOS) || os(macOS)
         self.details = ConsoleDetailsRouterViewModel()
-        self.table = ConsoleTableViewModel(searchCriteriaViewModel: searchCriteriaViewModel)
+        self.table = ConsoleTableViewModel(searchViewModel: searchViewModel)
 #endif
 
 #if os(iOS)
@@ -70,21 +58,18 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 
         super.init()
 
-        $filterTerm.throttle(for: 0.25, scheduler: RunLoop.main, latest: true).dropFirst().sink { [weak self] filterTerm in
-            self?.refresh(filterTerm: filterTerm)
-        }.store(in: &cancellables)
+        $filterTerm
+            .dropFirst()
+            .throttle(for: 0.25, scheduler: RunLoop.main, latest: true)
+            .sink { [weak self] filterTerm in
+                self?.refresh(filterTerm: filterTerm)
+            }.store(in: &cancellables)
 
-        sharedSearchCriteriaViewModel.dataNeedsReload.throttle(for: 0.5, scheduler: DispatchQueue.main, latest: true).sink { [weak self] in
-            self?.refreshNow()
-        }.store(in: &cancellables)
-
-        searchCriteriaViewModel.dataNeedsReload.throttle(for: 0.5, scheduler: DispatchQueue.main, latest: true).sink { [weak self] in
-            self?.refreshNow()
-        }.store(in: &cancellables)
-
-        networkSearchCriteriaViewModel.dataNeedsReload.throttle(for: 0.5, scheduler: DispatchQueue.main, latest: true).sink { [weak self] in
-            self?.refreshNow()
-        }.store(in: &cancellables)
+        searchViewModel.$criteria
+            .dropFirst()
+            .throttle(for: 0.5, scheduler: DispatchQueue.main, latest: true)
+            .sink { [weak self] _ in self?.refreshNow() }
+            .store(in: &cancellables)
 
         $isOnlyErrors.receive(on: DispatchQueue.main).dropFirst().sink { [weak self] _ in
             self?.refreshNow()
@@ -103,13 +88,15 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 
     func toggleMode() {
         switch mode {
-        case .all: mode = .network
-        case .network: mode = .all
+        case .messages: mode = .network
+        case .network: mode = .messages
         }
         prepare(for: mode)
     }
 
     private func prepare(for mode: Mode) {
+        searchViewModel.mode = mode
+
         let request = makeFetchRequest(for: mode)
         controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: store.viewContext, sectionNameKeyPath: nil, cacheName: nil)
         controller?.delegate = self
@@ -140,25 +127,10 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
             return assertionFailure()
         }
         switch mode {
-        case .all:
-            ConsoleMessageSearchCriteria.update(
-                request: controller.fetchRequest,
-                filterTerm: filterTerm,
-                shared: sharedSearchCriteriaViewModel.criteria,
-                criteria: searchCriteriaViewModel.criteria,
-                filters: searchCriteriaViewModel.filters,
-                isOnlyErrors: isOnlyErrors
-            )
+        case .messages:
+            controller.fetchRequest.predicate = ConsoleSearchCriteria.makeMessagePredicates(criteria: searchViewModel.criteria, isOnlyErrors: isOnlyErrors, filterTerm: filterTerm)
         case .network:
-            ConsoleNetworkSearchCriteria.update(
-                request: controller.fetchRequest,
-                filterTerm: filterTerm,
-                shared: sharedSearchCriteriaViewModel.criteria,
-                criteria: networkSearchCriteriaViewModel.criteria,
-                filters: networkSearchCriteriaViewModel.filters,
-                isOnlyErrors: isOnlyErrors
-            )
-            break
+            controller.fetchRequest.predicate = ConsoleSearchCriteria.makeNetworkPredicates(criteria: searchViewModel.criteria, isOnlyErrors: isOnlyErrors, filterTerm: filterTerm)
         }
         try? controller.performFetch()
 
@@ -189,7 +161,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 private func makeFetchRequest(for mode: ConsoleViewModel.Mode) -> NSFetchRequest<NSManagedObject> {
     let request: NSFetchRequest<NSManagedObject>
     switch mode {
-    case .all:
+    case .messages:
         request = .init(entityName: "\(LoggerMessageEntity.self)")
         request.relationshipKeyPathsForPrefetching = ["request"]
         request.sortDescriptors = [NSSortDescriptor(keyPath: \LoggerMessageEntity.createdAt, ascending: false)]

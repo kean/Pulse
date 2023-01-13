@@ -6,52 +6,31 @@ import Foundation
 import Pulse
 import CoreData
 import SwiftUI
-import Combine
 
-struct ConsoleMessageSearchCriteria: Hashable {
-    var isFiltersEnabled = true
+struct ConsoleCustomMessageFilter: Hashable, Identifiable {
+    let id = UUID()
+    var field: Field
+    var match: Match
+    var value: String
 
-    var logLevels: LogLevelsFilter = .default
-    var labels: LabelsFilter = .default
-
-    struct LogLevelsFilter: Hashable {
-        var isEnabled = true
-        var levels = LogLevelsFilter.defaultLogLevels
-
-        static let defaultLogLevels = Set(LoggerStore.Level.allCases).subtracting([LoggerStore.Level.trace])
-
-        static let `default` = LogLevelsFilter()
-    }
-
-    struct LabelsFilter: Hashable {
-        var isEnabled = true
-        var hidden: Set<String> = []
-        var focused: String?
-
-        static let `default` = LabelsFilter()
-    }
-
-    static let `default` = ConsoleMessageSearchCriteria()
-
-    var isDefault: Bool {
-        self == ConsoleMessageSearchCriteria.default
-    }
-}
-
-final class ConsoleSearchFilter: ObservableObject, Identifiable {
-    var id: ObjectIdentifier { ObjectIdentifier(self) }
-    @Published var field: Field
-    @Published var match: Match
-    @Published var value: String
-
-    static var `default`: ConsoleSearchFilter {
-        ConsoleSearchFilter(field: .message, match: .contains, value: "")
+    static var `default`: ConsoleCustomMessageFilter {
+        ConsoleCustomMessageFilter(field: .message, match: .contains, value: "")
     }
 
     init(field: Field, match: Match, value: String) {
         self.field = field
         self.match = match
         self.value = value
+    }
+
+    static func == (lhs: ConsoleCustomMessageFilter, rhs: ConsoleCustomMessageFilter) -> Bool {
+        (lhs.field, lhs.match, lhs.value) == (rhs.field, rhs.match, rhs.value)
+    }
+
+    func hash(into hasher: inout Hasher) {
+        field.hash(into: &hasher)
+        match.hash(into: &hasher)
+        value.hash(into: &hasher)
     }
 
     enum Field {

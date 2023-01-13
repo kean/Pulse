@@ -6,8 +6,7 @@ import SwiftUI
 import Pulse
 
 struct ConsoleMessageFiltersView: View {
-    @ObservedObject var viewModel: ConsoleMessageSearchCriteriaViewModel
-    @ObservedObject var sharedCriteriaViewModel: ConsoleSharedSearchCriteriaViewModel
+    @ObservedObject var viewModel: ConsoleSearchViewModel
 
 #if os(iOS) || os(tvOS) || os(watchOS)
     var body: some View {
@@ -35,7 +34,7 @@ extension ConsoleMessageFiltersView {
             buttonReset
         }
 #endif
-        ConsoleSharedFiltersView(viewModel: sharedCriteriaViewModel)
+        ConsoleSharedFiltersView(viewModel: viewModel)
 #if os(iOS) || os(macOS)
         if #available(iOS 15, *) {
             generalSection
@@ -46,10 +45,8 @@ extension ConsoleMessageFiltersView {
     }
 
     var buttonReset: some View {
-        Button("Reset") {
-            viewModel.resetAll()
-            sharedCriteriaViewModel.resetAll()
-        }.disabled(!(viewModel.isButtonResetEnabled || sharedCriteriaViewModel.isButtonResetEnabled))
+        Button.destructive(action: viewModel.resetAll) { Text("Reset") }
+            .disabled(!viewModel.isButtonResetEnabled)
     }
 }
 
@@ -66,21 +63,15 @@ extension ConsoleMessageFiltersView {
     }
 
     private var generalHeader: some View {
-        ConsoleFilterSectionHeader(
-            icon: "line.horizontal.3.decrease.circle", title: "Filters",
-            color: .yellow,
-            reset: { viewModel.resetFilters() },
-            isDefault: viewModel.isDefaultFilters,
-            isEnabled: $viewModel.criteria.isFiltersEnabled
-        )
+        ConsoleFilterSectionHeader(icon: "line.horizontal.3.decrease.circle", title: "Filters", filter: $viewModel.criteria.messages.custom)
     }
 
 #if os(iOS) || os(tvOS)
     @ViewBuilder
     private var generalContent: some View {
         customFiltersList
-        if !viewModel.isDefaultFilters {
-            Button(action: viewModel.addFilter) {
+        if !isCustomFiltersDefault {
+            Button(action: { viewModel.criteria.messages.custom.filters.append(.default) }) {
                 Text("Add Filter").frame(maxWidth: .infinity)
             }
         }
@@ -92,8 +83,8 @@ extension ConsoleMessageFiltersView {
             customFiltersList
         }.padding(.leading, -8)
 
-        if !viewModel.isDefaultFilters {
-            Button(action: viewModel.addFilter) {
+        if !isCustomFiltersDefault {
+            Button(action: { viewModel.criteria.messages.custom.filters.append(.default) }) {
                 Image(systemName: "plus.circle")
             }.padding(.top, 6)
         }
@@ -101,9 +92,13 @@ extension ConsoleMessageFiltersView {
 #endif
 
     private var customFiltersList: some View {
-        ForEach(viewModel.filters) { filter in
-            ConsoleCustomMessageFilterView(filter: filter, onRemove: viewModel.removeFilter, isRemoveHidden: viewModel.isDefaultFilters)
+        ForEach($viewModel.criteria.messages.custom.filters) { filter in
+            ConsoleCustomMessageFilterView(filter: filter, onRemove: viewModel.criteria.messages.custom.filters.count > 1  ? { viewModel.remove(filter.wrappedValue) } : nil)
         }
+    }
+
+    private var isCustomFiltersDefault: Bool {
+        viewModel.criteria.messages.custom == .init()
     }
 }
 #endif
@@ -119,13 +114,7 @@ extension ConsoleMessageFiltersView {
     }
 
     private var logLevelsHeader: some View {
-        ConsoleFilterSectionHeader(
-            icon: "flag", title: "Levels",
-            color: .accentColor,
-            reset: { viewModel.criteria.logLevels = .default },
-            isDefault: viewModel.criteria.logLevels == .default,
-            isEnabled: $viewModel.criteria.logLevels.isEnabled
-        )
+        ConsoleFilterSectionHeader(icon: "flag", title: "Levels", filter: $viewModel.criteria.messages.logLevels)
     }
 
 #if os(macOS)
@@ -176,23 +165,19 @@ extension ConsoleMessageFiltersView {
     }
 
     private var labelsHeader: some View {
-        ConsoleFilterSectionHeader(
-            icon: "tag", title: "Labels",
-            color: .orange,
-            reset: { viewModel.criteria.labels = .default },
-            isDefault: viewModel.criteria.labels == .default,
-            isEnabled: $viewModel.criteria.labels.isEnabled
-        )
+        ConsoleFilterSectionHeader(icon: "tag", title: "Labels", filter: $viewModel.criteria.messages.labels)
     }
 
 #if os(macOS)
     private var labelsContent: some View {
-        HStack {
+        let labels = viewModel.labels.objects.map(\.name)
+        return HStack {
             VStack(alignment: .leading, spacing: 6) {
                 Toggle("All", isOn: viewModel.bindingForTogglingAllLabels)
                     .accentColor(Color.secondary)
                     .foregroundColor(Color.secondary)
-                ForEach(viewModel.allLabels, id: \.self) { item in
+                // TODO: This should display only the prefix
+                ForEach(labels, id: \.self) { item in
                     Toggle(item.capitalized, isOn: viewModel.binding(forLabel: item))
                 }
             }
@@ -202,7 +187,7 @@ extension ConsoleMessageFiltersView {
 #else
     @ViewBuilder
     private var labelsContent: some View {
-        let labels = viewModel.allLabels
+        let labels = viewModel.labels.objects.map(\.name)
 
         if labels.isEmpty {
             Text("No Labels")
@@ -226,19 +211,13 @@ extension ConsoleMessageFiltersView {
 struct ConsoleMessageFiltersView_Previews: PreviewProvider {
     static var previews: some View {
 #if os(macOS)
-        ConsoleMessageFiltersView(viewModel: makeMockViewModel(), sharedCriteriaViewModel: .init(store: .mock))
-            .previewLayout(.fixed(width: ConsoleFilters.preferredWidth - 15, height: 700))
+        ConsoleMessageFiltersView(viewModel: .init(store: .mock))
+            .previewLayout(.fixed(width: 320, height: 900))
 #else
         NavigationView {
-            ConsoleMessageFiltersView(viewModel: makeMockViewModel(), sharedCriteriaViewModel: .init(store: .mock))
+            ConsoleMessageFiltersView(viewModel: .init(store: .mock))
         }.navigationViewStyle(.stack)
 #endif
     }
-}
-
-private func makeMockViewModel() -> ConsoleMessageSearchCriteriaViewModel {
-    let viewModel = ConsoleMessageSearchCriteriaViewModel(store: .mock)
-    viewModel.displayLabels(["Auth", "Network", "Analytics", "Home", "Storage"])
-    return viewModel
 }
 #endif

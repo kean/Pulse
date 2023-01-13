@@ -7,10 +7,22 @@ import SwiftUI
 struct ConsoleFilterSectionHeader: View {
     let icon: String
     let title: String
-    let color: Color
     let reset: () -> Void
     let isDefault: Bool
     @Binding var isEnabled: Bool
+
+    init<Filter: ConsoleFilterProtocol>(
+        icon: String,
+        title: String,
+        filter: Binding<Filter>,
+        default: Filter? = nil
+    ) {
+        self.icon = icon
+        self.title = title
+        self.reset = { filter.wrappedValue = `default` ?? Filter() }
+        self.isDefault = filter.wrappedValue == `default` ?? Filter()
+        self._isEnabled = filter.isEnabled
+    }
 
 #if os(macOS)
     var body: some View {
