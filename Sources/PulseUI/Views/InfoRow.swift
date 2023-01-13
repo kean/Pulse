@@ -10,7 +10,8 @@ struct InfoRow: View {
 
     var body: some View {
         HStack {
-            Text(title).lineLimit(1)
+            Text(title)
+                .lineLimit(1)
             Spacer()
             if let details = details {
                 Text(details)

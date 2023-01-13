@@ -5,11 +5,17 @@
 *TBD*
 
 - Update minimum requirements: Swift 5.7 | Xcode 14.0  | iOS 14.0, tvOS 14.0, watchOS 7.0, macOS 12.0
-- Add `ConsoleView.network` to other platforms (originally was added only on iOS)
-- New filters design on macOS
-- Add missing "Remove Pins" button on macOS
-- Fix an issue where using "Recent" date filter was applying "Session" filter instead
+- Add `ConsoleView.network` to other platforms (originally was available only on iOS)
+
+### Filters
+
+- New [message](https://user-images.githubusercontent.com/1567433/212389395-2f60e425-cdc5-47ea-9185-52364ce9120c.png) and [network](https://user-images.githubusercontent.com/1567433/212389402-7c5c8f3e-cde2-4654-95e2-98a2844d7d89.png) filters design on macOS
+- Add search, expand/collapse, enable-all/disable-all buttons to labels and domains filters on all platforms
+- Add a missing "Remove Pins" button on macOS
+- Add a counter next to labels and domains
+- Display labels and domains only visible for the current filter
 - Fix an issue where when you were focusing a log label, it wasn't reflected in the filters
+- Fix an issue where using "Recent" date filter was applying "Session" filter instead
 
 ## Pulse 3.0.0
 

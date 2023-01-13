@@ -53,7 +53,7 @@ extension XCTestCase {
 
         logTask(MockDataTask.login)
 
-        logger(named: "application")
+        logger(named: "analytics")
             .log(level: .debug, "Will navigate to Dashboard")
 
         logTask(MockDataTask.octocat)

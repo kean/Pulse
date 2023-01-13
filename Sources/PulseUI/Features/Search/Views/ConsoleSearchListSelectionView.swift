@@ -8,58 +8,97 @@ import Pulse
 struct ConsoleSearchListSelectionView<Element: Hashable, Label: View>: View {
     let title: String
     let items: [Element]
-    var limit = 4
+#if os(iOS) || os(macOS)
+    var limit = 5
+#else
+    var limit = 3
+#endif
     @Binding var selection: Set<Element>
     let description: (Element) -> String
     @ViewBuilder let label: (Element) -> Label
-    @State private var searchText = ""
-    @State private var isExpanded = false
 
-#warning("TODO: refactor (use filteredItems for both lists and apply expand (?)")
-#warning("TODO: improve how show more looks on macos")
-#warning("TODO: macos show search only when expanded? or allow to search without expanding - that would be cool")
-#warning("TODO: is .separator color OK?")
+    @State private var searchText = ""
+
+#if os(macOS)
+    @State private var isExpanded = false
 
     var body: some View {
         if items.isEmpty {
             emptyView
         } else {
-            let prefix = isExpanded ? items : Array(items.prefix(limit))
-#if os(macOS)
+            let filtered = self.filteredItems
             HStack {
-
-                //                if !isExpanded {
                 SearchBar(title: "Search", text: $searchText)
-//                    .frame(width: 140)
-                //                }
                 Spacer()
                 buttonToggleAll
             }
-#endif
-            ForEach(prefix, id: \.self, content: makeRow)
-            if items.count > 4 {
-#if os(macOS)
+            ForEach(isExpanded ? filtered : Array(filtered.prefix(limit)), id: \.self, content: makeRow)
+            if filtered.count > limit {
                 HStack {
                     if !isExpanded {
                         Button(action: { isExpanded = true }) {
-                            Text("Show More ") + Text("(\(items.count))").foregroundColor(.secondary)
+                            Text("Show All ") + Text("(\(items.count))").foregroundColor(.secondary)
                         }
                     } else {
                         Button("Show Less") { isExpanded = false }
                     }
                 }
+            }
+        }
+    }
 #else
-                NavigationLink(destination: fullListBody) {
-                    HStack {
-                        Text("View All")
-                        Spacer()
-                        Text("\(items.count) ").foregroundColor(.separator)
+    @State private var isExpandedListPresented = false
+    @State private var isSearching = false
+    var body: some View {
+        if items.isEmpty {
+            emptyView
+        } else {
+            ForEach(Array(items.prefix(limit)), id: \.self, content: makeRow)
+                .sheet(isPresented: $isExpandedListPresented) {
+                    NavigationView {
+                        expandedListBody
                     }
                 }
+            if items.count > limit {
+                let viewAllView = HStack {
+                    Text("View All")
+                    Spacer()
+                    Text("\(items.count) ").foregroundColor(.secondary)
+                }
+#if os(tvOS)
+                Button(action: { isExpandedListPresented = true }) { viewAllView }
+#else
+                NavigationLink(destination: expandedListBody) { viewAllView }
 #endif
             }
         }
     }
+
+    @ViewBuilder
+    private var expandedListBody: some View {
+        let list = Form {
+            buttonToggleAll
+            ForEach(filteredItems, id: \.self, content: makeRow)
+        }
+#if os(tvOS)
+            .frame(width: 800)
+#endif
+            .inlineNavigationTitle(title)
+
+        if #available(iOS 15, tvOS 15, *) {
+            list
+#if os(iOS)
+                .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always))
+#else
+                .searchable(text: $searchText)
+#endif
+        } else {
+            list
+        }
+    }
+#endif
+
+    // MARK: - Shared
 
     private var emptyView: some View {
         Text("Empty")
@@ -76,64 +115,35 @@ struct ConsoleSearchListSelectionView<Element: Hashable, Label: View>: View {
             } else {
                 selection.remove(item)
             }
-        }), label: { label(item) })
+        }), label: { label(item).lineLimit(3) })
 #if os(macOS)
         .frame(maxWidth: .infinity, alignment: .leading)
 #endif
-    }
-
-    @ViewBuilder
-    private var fullListBody: some View {
-        if #available(iOS 15, tvOS 15, *) {
-            fullListForm
-#if os(iOS)
-                .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always))
-#else
-                .searchable(text: $searchText)
-#endif
-        } else {
-            fullListForm
-        }
-    }
-
-    @ViewBuilder
-    private var fullListForm: some View {
-        EmptyView()
-        Form {
-            buttonToggleAll
-            ForEach(filteredItems, id: \.self, content: makeRow)
-        }
-        .inlineNavigationTitle(title)
     }
 
     private var filteredItems: [Element] {
         searchText.isEmpty ? items : items.filter { description($0).localizedCaseInsensitiveContains(searchText) }
     }
 
-#warning("do we really need this? (accentColor?)")
     @ViewBuilder
     private var buttonToggleAll: some View {
         Button(selection.isEmpty ? "Enable All" : "Disable All") {
             selection = selection.isEmpty ? Set(items) : []
         }
-#if !os(watchOS)
-        .foregroundColor(.accentColor)
-#endif
+        .foregroundColor(.blue)
     }
 }
 
-extension ConsoleSearchListSelectionView where Element == String, Label == Text {
-    init(title: String,
-         items: [String],
-         limit: Int = 4,
-         selection: Binding<Set<String>>,
-         @ViewBuilder label: @escaping (Element) -> Text = { Text($0) }) {
-        self.title = title
-        self.items = items
-        self.limit = limit
-        self._selection = selection
-        self.description = { $0 }
-        self.label = label
+struct ConsoleSearchListCell: View {
+    let title: String
+    let details: String
+
+    var body: some View {
+        HStack {
+            Text(title)
+            Spacer()
+            Text(details).foregroundColor(.secondary)
+        }
     }
 }
 
@@ -150,7 +160,7 @@ private struct ConsoleSearchListSelectionViewDemo: View {
     @State private var selection: Set<String>  = []
 
     var body: some View {
-        ConsoleSearchListSelectionView(title: "Labels", items: ["Debug", "Warning", "Error"], selection: $selection)
+        ConsoleSearchListSelectionView(title: "Labels", items: ["Debug", "Warning", "Error"], selection: $selection, description: { $0 }, label: { Text($0) })
     }
 }
 #endif

@@ -12,16 +12,23 @@ struct DateRangePicker: View {
     let title: String
     @Binding var date: Date?
 
+#if os(macOS)
     var body: some View {
-#if os(iOS)
-        contents
-#else
         HStack {
-            contents
+            Text(title + " Date")
             Spacer()
-        }
-#endif
+            contents
+        }.frame(height: 24)
     }
+#else
+    var body: some View {
+        HStack {
+            Text(title)
+            Spacer()
+            contents
+        }
+    }
+#endif
 
     @ViewBuilder
     private var contents: some View {
@@ -35,27 +42,20 @@ struct DateRangePicker: View {
     @ViewBuilder
     private func editView(date: Date) -> some View {
         HStack {
-#if os(macOS)
-            Text(title)
-            Spacer()
-#endif
             let binding = Binding(get: { date }, set: { self.date = $0 })
             DatePicker(title, selection: binding)
                 .environment(\.locale, Locale(identifier: "en_US"))
-#if os(macOS)
                 .fixedSize()
                 .labelsHidden()
-#endif
-#if os(iOS)
-            Spacer()
-#endif
             Button(action: { self.date = nil }) {
                 Image(systemName: "minus.circle.fill")
                     .font(.body)
             }
-            .padding(.trailing, -8)
             .buttonStyle(.plain)
             .foregroundColor(.red)
+#if os(iOS)
+            .padding(.trailing, -4)
+#endif
         }
     }
 

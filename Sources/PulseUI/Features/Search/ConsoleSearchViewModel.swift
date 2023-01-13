@@ -7,33 +7,28 @@ import Pulse
 import Combine
 import SwiftUI
 
-#warning("TODO: use the new picker for labels and stuff")
-#warning("TODO: rework how labels and domains aare loaded - use Published?")
-#warning("TODO: are we display lavels from all messages? is this ok?")
-#warning("TODO: display number of items next to each one if possible")
-#warning("TODO: also add short view with a limit how many to display + use on all platforms including macOS")
 final class ConsoleSearchViewModel: ObservableObject {
     var isButtonResetEnabled: Bool { !isCriteriaDefault }
 
     @Published var criteria = ConsoleSearchCriteria()
-    @Published var mode: ConsoleViewModel.Mode = .messages
+    @Published var mode: ConsoleViewModel.Mode = .messages // warning: not source of truth
 
     @Published private(set) var labels: [String] = []
     @Published private(set) var domains: [String] = []
 
-    private let labelsObserver: ManagedObjectsObserver<LoggerLabelEntity>
-    private let domainsObserver: ManagedObjectsObserver<NetworkDomainEntity>
+    private(set) var labelsCountedSet = NSCountedSet()
+    private(set) var domainsCountedSet = NSCountedSet()
 
     private(set) var defaultCriteria = ConsoleSearchCriteria()
+
     private let store: LoggerStore
+    private let entities: CurrentValueSubject<[NSManagedObject], Never>
+    private var isActive = false
     private var cancellables: [AnyCancellable] = []
 
-    init(store: LoggerStore) {
+    init(store: LoggerStore, entities: CurrentValueSubject<[NSManagedObject], Never>) {
         self.store = store
-
-        self.labelsObserver = ManagedObjectsObserver(context: store.viewContext, sortDescriptior: NSSortDescriptor(keyPath: \LoggerLabelEntity.name, ascending: true))
-
-        self.domainsObserver = ManagedObjectsObserver(context: store.viewContext, sortDescriptior: NSSortDescriptor(keyPath: \NetworkDomainEntity.count, ascending: false))
+        self.entities = entities
 
         if store.isArchive {
             self.criteria.shared.dates.startDate = nil
@@ -41,15 +36,23 @@ final class ConsoleSearchViewModel: ObservableObject {
         }
         self.defaultCriteria = criteria
 
-        labelsObserver.$objects.sink { [weak self] in
-            #warning("TEMP")
-            self?.labels = ["TestA", "TestB"] + $0.map(\.name)
-        }.store(in: &cancellables)
-
-        domainsObserver.$objects.sink { [weak self] in
-            self?.domains = $0.map(\.value)
+        entities.receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.reloadCounters()
         }.store(in: &cancellables)
     }
+
+    // MARK: Appearance
+
+    func onAppear() {
+        isActive = true
+        reloadCounters()
+    }
+
+    func onDisappear() {
+        isActive = false
+    }
+
+    // MARK: Helpers
 
     var isCriteriaDefault: Bool {
         guard criteria.shared == defaultCriteria.shared else { return false }
@@ -77,7 +80,28 @@ final class ConsoleSearchViewModel: ObservableObject {
 #endif
     }
 
-    // MARK: Binding (ConsoleFilters.LogLevel)
+    private func reloadCounters() {
+        guard isActive else { return }
+
+        switch mode {
+        case .messages:
+            guard let messages = entities.value as? [LoggerMessageEntity] else {
+                return assertionFailure()
+            }
+            labelsCountedSet = NSCountedSet(array: messages.map(\.label.name))
+            labels = (labelsCountedSet.allObjects as! [String]).sorted()
+        case .network:
+            guard let tasks = entities.value as? [NetworkTaskEntity] else {
+                return assertionFailure()
+            }
+            domainsCountedSet = NSCountedSet(array: tasks.compactMap { $0.host?.value })
+            domains = (domainsCountedSet.allObjects as! [String]).sorted(by: { lhs, rhs in
+                domainsCountedSet.count(for: lhs) > domainsCountedSet.count(for: rhs)
+            })
+        }
+    }
+
+    // MARK: Binding (LogLevels)
 
     func binding(forLevel level: LoggerStore.Level) -> Binding<Bool> {
         Binding(get: {
@@ -91,54 +115,42 @@ final class ConsoleSearchViewModel: ObservableObject {
         })
     }
 
-    /// Returns binding for toggling all log levels.
-    var bindingForTogglingAllLevels: Binding<Bool> {
-        Binding(get: {
-            self.criteria.messages.logLevels.levels.count == LoggerStore.Level.allCases.count
-        }, set: { isOn in
-            if isOn {
-                self.criteria.messages.logLevels.levels = Set(LoggerStore.Level.allCases)
+    var isAllLogLevelsEnabled: Bool {
+        get {
+            criteria.messages.logLevels.levels.count == LoggerStore.Level.allCases.count
+        }
+        set {
+            if newValue {
+                criteria.messages.logLevels.levels = Set(LoggerStore.Level.allCases)
             } else {
-                self.criteria.messages.logLevels.levels = Set()
+                criteria.messages.logLevels.levels = []
             }
-        })
+        }
     }
 
-    // MARK: Binding (ConsoleFilters.Labels)
+    // MARK: Binding (Labels)
 
     var selectedLabels: Set<String> {
         get {
-            if let focused = self.criteria.messages.labels.focused {
+            if let focused = criteria.messages.labels.focused {
                 return [focused]
             } else {
-                return Set(self.labels).subtracting(self.criteria.messages.labels.hidden)
+                return Set(labels).subtracting(criteria.messages.labels.hidden)
             }
         }
         set {
-            self.criteria.messages.labels.focused = nil
-            self.criteria.messages.labels.hidden = []
+            criteria.messages.labels.focused = nil
+            criteria.messages.labels.hidden = []
             switch newValue.count {
             case 1:
-                self.criteria.messages.labels.focused = newValue.first!
+                criteria.messages.labels.focused = newValue.first!
             default:
-                self.criteria.messages.labels.hidden = Set(self.labels).subtracting(newValue)
+                criteria.messages.labels.hidden = Set(labels).subtracting(newValue)
             }
         }
     }
 
     // MARK: Custom Filters
-
-    func remove(_ filter: ConsoleCustomMessageFilter) {
-        if let index = criteria.messages.custom.filters.firstIndex(where: { $0.id == filter.id }) {
-            criteria.messages.custom.filters.remove(at: index)
-        }
-    }
-
-    func remove(_ filter: ConsoleCustomNetworkFilter) {
-        if let index = criteria.network.custom.filters.firstIndex(where: { $0.id == filter.id }) {
-            criteria.network.custom.filters.remove(at: index)
-        }
-    }
 
     var programmaticFilters: [ConsoleCustomNetworkFilter]? {
         let programmaticFilters = criteria.network.custom.filters.filter { $0.isProgrammatic && !$0.value.isEmpty }
@@ -148,15 +160,14 @@ final class ConsoleSearchViewModel: ObservableObject {
         return programmaticFilters
     }
 
-    // MARK: Bindings
+    // MARK: Bindings (Hosts)
 
-    func binding(forDomain domain: String) -> Binding<Bool> {
-        Binding(get: {
-            !self.criteria.network.host.ignoredHosts.contains(domain)
-        }, set: { newValue in
-            if self.criteria.network.host.ignoredHosts.remove(domain) == nil {
-                self.criteria.network.host.ignoredHosts.insert(domain)
-            }
-        })
+    var selectedHost: Set<String> {
+        get {
+            Set(domains).subtracting(criteria.network.host.ignoredHosts)
+        }
+        set {
+            criteria.network.host.ignoredHosts = Set(domains).subtracting(newValue)
+        }
     }
 }

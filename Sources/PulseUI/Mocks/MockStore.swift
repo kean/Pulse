@@ -89,7 +89,7 @@ private func _asyncPopulateStore(_ store: LoggerStore) async {
 
         await Task.sleep(milliseconds: 300)
 
-        logger(named: "auth")
+        logger(named: "session")
             .log(level: .trace, "Instantiated Session")
 
         logger(named: "auth")
@@ -97,7 +97,7 @@ private func _asyncPopulateStore(_ store: LoggerStore) async {
 
         await Task.sleep(milliseconds: 800)
 
-        logger(named: "default")
+        logger(named: "analytics")
                 .log(level: .debug, "Will navigate to Dashboard")
     }
 
@@ -156,13 +156,13 @@ private func _syncPopulateStore(_ store: LoggerStore) {
         logger(named: "application")
             .log(level: .info, "UIApplication.willEnterForeground")
 
-        logger(named: "auth")
+        logger(named: "session")
             .log(level: .trace, "Instantiated Session")
 
         logger(named: "auth")
             .log(level: .trace, "Instantiated the new login request")
 
-        logger(named: "application")
+        logger(named: "analytics")
                 .log(level: .debug, "Will navigate to Dashboard")
     }
 

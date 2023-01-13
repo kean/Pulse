@@ -5,7 +5,7 @@
 import SwiftUI
 import Pulse
 
-struct ConsoleFiltersTimePeriodCell: View {
+struct ConsoleSearchTimePeriodCell: View {
     @Binding var selection: ConsoleSearchCriteria.Dates
 #if os(tvOS) || os(watchOS)
     @State private var quickFilter: ConsoleDatesQuickFilter = .session

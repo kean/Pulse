@@ -4,7 +4,7 @@
 
 import SwiftUI
 
-struct ConsoleFilterSectionHeader: View {
+struct ConsoleSearchSectionHeader: View {
     let icon: String
     let title: String
     let reset: () -> Void

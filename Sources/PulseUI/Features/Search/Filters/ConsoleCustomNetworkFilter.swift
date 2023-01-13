@@ -128,7 +128,6 @@ struct ConsoleCustomNetworkFilter: Hashable, Identifiable {
     }
 }
 
-#warning("TODO: fix programmatic filters, add proper search index")
 func evaluateProgrammaticFilters(_ filters: [ConsoleCustomNetworkFilter], entity: NetworkTaskEntity, store: LoggerStore) -> Bool {
     func isMatch(filter: ConsoleCustomNetworkFilter) -> Bool {
         switch filter.field {

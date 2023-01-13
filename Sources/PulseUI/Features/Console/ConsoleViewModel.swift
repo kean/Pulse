@@ -18,6 +18,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 #endif
 
     @Published private(set) var entities: [NSManagedObject] = []
+    let entitiesSubject = CurrentValueSubject<[NSManagedObject], Never>([])
 
 #if os(iOS)
     let insightsViewModel: InsightsViewModel
@@ -45,7 +46,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         self.mode = mode
         self.isNetworkOnly = mode == .network
 
-        self.searchViewModel = ConsoleSearchViewModel(store: store)
+        self.searchViewModel = ConsoleSearchViewModel(store: store, entities: entitiesSubject)
 
 #if os(iOS) || os(macOS)
         self.details = ConsoleDetailsRouterViewModel()
@@ -57,6 +58,10 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 #endif
 
         super.init()
+
+        $entities.sink { [entitiesSubject] in
+            entitiesSubject.send($0)
+        }.store(in: &cancellables)
 
         $filterTerm
             .dropFirst()
@@ -76,12 +81,6 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         }.store(in: &cancellables)
 
         prepare(for: mode)
-    }
-
-    func getObservableProperties() -> CurrentValueSubject<[NSManagedObject], Never> {
-        let subject = CurrentValueSubject<[NSManagedObject], Never>(entities)
-        $entities.sink { subject.send($0) }.store(in: &cancellables)
-        return subject
     }
 
     // MARK: Mode

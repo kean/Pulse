@@ -5,21 +5,21 @@
 import SwiftUI
 import Pulse
 
-struct ConsoleFiltersPinsCell: View {
+struct ConsoleSearchPinsCell: View {
     @Binding var selection: ConsoleSearchCriteria.General
     let removeAll: () -> Void
 
     var body: some View {
 #if os(macOS)
         HStack {
-            ConsoleFiltersToggleCell(title: "Only Pinned", isOn: $selection.inOnlyPins)
+            ConsoleSearchToggleCell(title: "Only Pinned", isOn: $selection.inOnlyPins)
             Spacer()
             Button.destructive(action: removeAll) {
                 Text("Remove Pins")
             }
         }
 #else
-        ConsoleFiltersToggleCell(title: "Only Pinned", isOn: $selection.inOnlyPins)
+        ConsoleSearchToggleCell(title: "Only Pinned", isOn: $selection.inOnlyPins)
         Button.destructive(action: removeAll) {
             Text("Remove Pins")
         }

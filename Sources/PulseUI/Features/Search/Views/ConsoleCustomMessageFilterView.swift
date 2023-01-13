@@ -15,6 +15,9 @@ struct ConsoleCustomMessageFilterView: View {
     var body: some View {
         ConsoleCustomFilterView(text: $filter.value, onRemove: onRemove, pickers: {
             fieldMenu
+#if os(macOS)
+                .frame(width: 60)
+#endif
             matchMenu
         })
     }
@@ -29,13 +32,13 @@ struct ConsoleCustomMessageFilterView: View {
 
     // TODO: On iOS 16, inline picker looks OK
     private var fieldMenu: some View {
-        FilterPickerMenu(title: filter.field.localizedTitle) {
+        ConsoleSearchInlinePickerMenu(title: filter.field.localizedTitle) {
             fieldPicker
         }
     }
 
     private var matchMenu: some View {
-        FilterPickerMenu(title: filter.match.localizedTitle) {
+        ConsoleSearchInlinePickerMenu(title: filter.match.localizedTitle) {
             matchPicker
         }
     }

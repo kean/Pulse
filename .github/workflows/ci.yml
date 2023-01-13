@@ -10,14 +10,16 @@ on:
 
 jobs:
   ios-latest:
-    name: Unit Tests (iOS 16.1, Xcode 14.1)
+    name: Unit Tests (iOS 16.2, Xcode 14.2)
     runs-on: macOS-12
     env:
-      DEVELOPER_DIR: /Applications/Xcode_14.1.app/Contents/Developer
+      DEVELOPER_DIR: /Applications/Xcode_14.2.app/Contents/Developer
     steps:
       - uses: actions/checkout@v2
       - name: Run Tests
-        run: Scripts/test.sh -d "OS=16.1,name=iPhone 14 Pro"
+        run: |
+          Scripts/test.sh -s "Pulse" -d "OS=16.2,name=iPhone 14 Pro"
+          Scripts/test.sh -s "PulseUI" -d "OS=16.2,name=iPhone 14 Pro"
 #  macos-latest:
 #    name: Unit Tests (macOS, Xcode 14.1)
 #    runs-on: macOS-12
@@ -28,23 +30,27 @@ jobs:
 #      - name: Run Tests
 #        run: Scripts/test.sh -d "arch=x86_64"
   tvos-latest:
-    name: Unit Tests (tvOS 16.1, Xcode 14.1)
+    name: Unit Tests (tvOS 16.1, Xcode 14.2)
     runs-on: macOS-12
     env:
-      DEVELOPER_DIR: /Applications/Xcode_14.1.app/Contents/Developer
+      DEVELOPER_DIR: /Applications/Xcode_14.2.app/Contents/Developer
     steps:
       - uses: actions/checkout@v2
       - name: Run Tests
-        run: Scripts/test.sh -d "OS=16.1,name=Apple TV"
+        run: |
+          Scripts/test.sh -s "Pulse" -d "OS=16.1,name=Apple TV"
+          Scripts/test.sh -s "PulseUI" -d "OS=16.1,name=Apple TV"
   watchos-latest:
-    name: Run Build (watchOS 9.1, Xcode 14.1)
+    name: Run Build (watchOS 9.2, Xcode 14.2)
     runs-on: macOS-12
     env:
-      DEVELOPER_DIR: /Applications/Xcode_14.1.app/Contents/Developer
+      DEVELOPER_DIR: /Applications/Xcode_14.2.app/Contents/Developer
     steps:
       - uses: actions/checkout@v2
       - name: Run Tests
-        run: Scripts/build.sh -d "OS=9.1,name=Apple Watch Series 8 (45mm)"
+        run: |
+          Scripts/build.sh -s "Pulse" -d "OS=9.2,name=Apple Watch Series 8 (45mm)"
+          Scripts/build.sh -s "PulseUI" -d "OS=9.2,name=Apple Watch Series 8 (45mm)"
   ios-xcode-14-0:
     name: Unit Tests (iOS 15.0, Xcode 14.0)
     runs-on: macOS-12
@@ -53,12 +59,14 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Run Tests
-        run: Scripts/test.sh -d "OS=16.0,name=iPhone 13 Pro"
+        run: |
+          Scripts/test.sh -s "Pulse" -d "OS=16.0,name=iPhone 13 Pro"
+          Scripts/test.sh -s "PulseUI" -d "OS=16.0,name=iPhone 13 Pro"
   swift-build:
     name: Swift Build (SPM)
     runs-on: macOS-12
     env:
-      DEVELOPER_DIR: /Applications/Xcode_14.1.app/Contents/Developer
+      DEVELOPER_DIR: /Applications/Xcode_14.2.app/Contents/Developer
     steps:
       - uses: actions/checkout@v2
       - name: Build
@@ -67,7 +75,7 @@ jobs:
     name: Discover Typos
     runs-on: macOS-12
     env:
-      DEVELOPER_DIR: /Applications/Xcode_14.1.app/Contents/Developer
+      DEVELOPER_DIR: /Applications/Xcode_14.2.app/Contents/Developer
     steps:
       - uses: actions/checkout@v2
       - name: Discover typos
@@ -79,18 +87,18 @@ jobs:
     name: Build Demo (iOS)
     runs-on: macOS-12
     env:
-      DEVELOPER_DIR: /Applications/Xcode_14.1.app/Contents/Developer
+      DEVELOPER_DIR: /Applications/Xcode_14.2.app/Contents/Developer
     steps:
       - uses: actions/checkout@v2
       - name: Build Demo
         run: |
           set -o pipefail
-          xcodebuild build -scheme "Pulse Demo iOS" -destination "OS=16.1,name=iPhone 14 Pro" | xcpretty
+          xcodebuild build -scheme "Pulse Demo iOS" -destination "OS=16.2,name=iPhone 14 Pro" | xcpretty
   build-demo-tvos:
     name: Build Demo (tvOS)
     runs-on: macOS-12
     env:
-      DEVELOPER_DIR: /Applications/Xcode_14.1.app/Contents/Developer
+      DEVELOPER_DIR: /Applications/Xcode_14.2.app/Contents/Developer
     steps:
       - uses: actions/checkout@v2
       - name: Build Demo
@@ -101,10 +109,10 @@ jobs:
     name: Build Integration Examples (iOS)
     runs-on: macOS-12
     env:
-      DEVELOPER_DIR: /Applications/Xcode_14.1.app/Contents/Developer
+      DEVELOPER_DIR: /Applications/Xcode_14.2.app/Contents/Developer
     steps:
       - uses: actions/checkout@v2
       - name: Build Integration Tests
         run: |
           set -o pipefail
-          xcodebuild build -scheme "Pulse Integration Examples iOS" -destination "OS=16.1,name=iPhone 14 Pro" | xcpretty
+          xcodebuild build -scheme "Pulse Integration Examples iOS" -destination "OS=16.2,name=iPhone 14 Pro" | xcpretty

@@ -5,7 +5,7 @@
 import SwiftUI
 import Pulse
 
-struct FilterPickerMenu<Picker: View>: View {
+struct ConsoleSearchInlinePickerMenu<Picker: View>: View {
     let title: String
     var width: CGFloat?
     @ViewBuilder var picker: () -> Picker
