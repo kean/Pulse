@@ -33,7 +33,7 @@ Both Pulse and Pulse Pro are fully open-source.
 
 | Pulse      | Swift     | Xcode       | Platforms                                    |
 |------------|-----------|-------------|----------------------------------------------|
-| Pulse 3.0  | Swift 5.7 | Xcode 14.0  | iOS 14.0, tvOS 14.0, watchOS 8.0, macOS 12.0 |
+| Pulse 3.0  | Swift 5.7 | Xcode 14.1  | iOS 14.0, tvOS 14.0, watchOS 8.0, macOS 12.0 |
 | Pulse 2.0  | Swift 5.6 | Xcode 13.3  | iOS 13.0, tvOS 13.0, watchOS 7.0, macOS 11.0 |
 
 ## License
