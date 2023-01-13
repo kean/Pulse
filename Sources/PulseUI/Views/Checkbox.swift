@@ -21,7 +21,7 @@ struct Checkbox<Label: View>: View {
             .contentShape(Rectangle())
         }.buttonStyle(.plain)
 #else
-        Toggle(isOn: isOn, label: label)
+        Toggle(isOn: $isOn, label: label)
 #endif
     }
 }

@@ -126,36 +126,6 @@ final class ConsoleSearchViewModel: ObservableObject {
         }
     }
 
-    func binding(forLabel label: String) -> Binding<Bool> {
-        Binding(get: {
-            if let focused = self.criteria.messages.labels.focused {
-                return label == focused
-            } else {
-                return !self.criteria.messages.labels.hidden.contains(label)
-            }
-        }, set: { isOn in
-            self.criteria.messages.labels.focused = nil
-            if isOn {
-                self.criteria.messages.labels.hidden.remove(label)
-            } else {
-                self.criteria.messages.labels.hidden.insert(label)
-            }
-        })
-    }
-
-    var bindingForTogglingAllLabels: Binding<Bool> {
-        Binding(get: {
-            self.criteria.messages.labels.hidden.isEmpty
-        }, set: { isOn in
-            self.criteria.messages.labels.focused = nil
-            if isOn {
-                self.criteria.messages.labels.hidden = []
-            } else {
-                self.criteria.messages.labels.hidden = Set(self.labels)
-            }
-        })
-    }
-
     // MARK: Custom Filters
 
     func remove(_ filter: ConsoleCustomMessageFilter) {

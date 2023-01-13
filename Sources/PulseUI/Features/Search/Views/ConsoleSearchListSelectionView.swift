@@ -5,16 +5,15 @@
 import SwiftUI
 import Pulse
 
-#if os(iOS) || os(tvOS) || os(watchOS)
-
 struct ConsoleSearchListSelectionView<Element: Hashable, Label: View>: View {
     let title: String
     let items: [Element]
-    var limit: Int = 4
+    var limit = 4
     @Binding var selection: Set<Element>
     let description: (Element) -> String
     @ViewBuilder let label: (Element) -> Label
     @State private var searchText = ""
+    @State private var isExpanded = false
 
     var body: some View {
         if items.isEmpty {
@@ -22,8 +21,18 @@ struct ConsoleSearchListSelectionView<Element: Hashable, Label: View>: View {
                 .frame(maxWidth: .infinity, alignment: .center)
                 .foregroundColor(.secondary)
         } else {
-            ForEach(items.prefix(limit), id: \.self, content: makeRow)
+            let prefix = isExpanded ? items : Array(items.prefix(limit))
+            ForEach(prefix, id: \.self, content: makeRow)
             if items.count > 4 {
+#if os(macOS)
+                if !isExpanded {
+                    Button(action: { isExpanded = true }) {
+                        Text("Show More") + Text("\(items.count)").foregroundColor(.separator)
+                    }
+                } else {
+                    Button("Show Less") { isExpanded = false }
+                }
+#else
                 NavigationLink(destination: fullListBody) {
                     HStack {
                         Text("View All")
@@ -31,11 +40,12 @@ struct ConsoleSearchListSelectionView<Element: Hashable, Label: View>: View {
                         Text("\(items.count)").foregroundColor(.separator)
                     }
                 }
+#endif
             }
         }
     }
 
-    private func makeRow(for item: Element) -> Checkbox<Label> {
+    private func makeRow(for item: Element) -> some View {
         Checkbox(isOn: Binding(get: {
             selection.contains(item)
         }, set: { isOn in
@@ -45,6 +55,9 @@ struct ConsoleSearchListSelectionView<Element: Hashable, Label: View>: View {
                 selection.remove(item)
             }
         }), label: { label(item) })
+#if os(macOS)
+        .frame(maxWidth: .infinity, alignment: .leading)
+#endif
     }
 
     @ViewBuilder
@@ -112,6 +125,4 @@ private struct ConsoleSearchListSelectionViewDemo: View {
         ConsoleSearchListSelectionView(title: "Labels", items: ["Debug", "Warning", "Error"], selection: $selection)
     }
 }
-#endif
-
 #endif

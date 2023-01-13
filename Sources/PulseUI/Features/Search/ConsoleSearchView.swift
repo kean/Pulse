@@ -183,7 +183,7 @@ extension ConsoleSearchView {
     }
 
     private func makeDomainPicker(limit: Int? = nil) -> some View {
-        var domains = viewModel.domains.objects.map(\.value)
+        var domains = viewModel.domains
         if let limit = limit {
             domains = Array(domains.prefix(limit))
         }
@@ -365,9 +365,9 @@ struct ConsoleSearchView_Previews: PreviewProvider {
         ConsoleSearchView(viewModel: .init(store: .mock))
             .previewLayout(.fixed(width: 320, height: 900))
 #else
-        NavigationView {
-            ConsoleSearchView(viewModel: .init(store: .mock))
-        }.navigationViewStyle(.stack)
+            NavigationView {
+                ConsoleSearchView(viewModel: .init(store: .mock))
+            }.navigationViewStyle(.stack)
 #endif
     }
 }
