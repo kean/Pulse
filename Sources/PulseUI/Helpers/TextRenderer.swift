@@ -260,27 +260,48 @@ final class TextRenderer {
     }
 
     func render(_ values: [(String, String?)]?, color: Color, style: TextFontStyle = .monospaced) -> NSAttributedString {
-        let string = NSMutableAttributedString()
         guard let values = values, !values.isEmpty else {
-            string.append("–\n", helper.attributes(role: .body2, style: style))
-            return string
+            return NSAttributedString(string: "–\n", attributes: helper.attributes(role: .body2, style: style))
         }
-        let keyColor: UXColor = options.color == .full ? UXColor(color) : .label
-        let keyWeight: UXFont.Weight = options.color == .full ? .medium : .semibold
-        let keyAttributes = helper.attributes(role: .body2, style: style, weight: keyWeight, color: keyColor)
 
-        let valueAttributes = helper.attributes(role: .body2, style: style)
-        let separatorAttributes = helper.attributes(role: .body2, style: style, color: .secondaryLabel)
-        for (key, value) in values {
-            string.append(key, keyAttributes)
-#if os(watchOS)
-            string.append(":\n", separatorAttributes)
-#else
-            string.append(": ", separatorAttributes)
-#endif
-            string.append("\(value ?? "–")\n", valueAttributes)
+        var index = 0
+        var keys: [NSRange] = []
+        var separators: [NSRange] = []
+        var string = ""
+
+        @discardableResult func append(_ value: String) -> NSRange {
+            let length = value.utf16.count
+            let range = NSRange(location: index, length: length)
+            index += length
+            string.append(value)
+            return range
         }
-        return string
+
+        for (key, value) in values {
+            keys.append(append(key))
+#if os(watchOS)
+            separators.append(append(":\n"))
+#else
+            separators.append(append(": "))
+#endif
+            append("\(value ?? "–")\n")
+        }
+        let output = NSMutableAttributedString(string: string, attributes: helper.attributes(role: .body2, style: style))
+        let keyFont = helper.font(style: .init(
+            role: .body2,
+            style: style,
+            weight: options.color == .full ? .medium : .semibold
+        ))
+        for range in keys {
+            output.addAttribute(.font, value: keyFont, range: range)
+            if options.color == .full {
+                output.addAttribute(.foregroundColor, value: UXColor(color), range: range)
+            }
+        }
+        for range in separators {
+            output.addAttribute(.foregroundColor, value: UXColor.secondaryLabel, range: range)
+        }
+        return output
     }
 
     func preformatted(_ string: String, color: UXColor? = nil) -> NSAttributedString {
