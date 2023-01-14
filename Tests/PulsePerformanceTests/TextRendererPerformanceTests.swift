@@ -41,9 +41,7 @@ final class TextRendererTestsTests: XCTestCase {
         let string = TextRendererTests.share(entities)
         measure {
             for _ in 0..<10 {
-                let html = try! TextRendererTests.html(from: string)
-                try! html.write(to: URL(fileURLWithPath: "/Users/kean/Desktop/store5.html"))
-                print("here")
+                let _ = try! TextRendererTests.html(from: string)
             }
         }
     }
