@@ -89,9 +89,7 @@ final class TextRendererJSON {
                 append("\(String(repeating: " ", count: spaces))\"\(key)\"", .key)
                 append(": ", .punctuation)
                 indentation += 1
-                codingPath.append(.string(key))
                 _print(json: object[key]!, key: .string(key), isFree: false)
-                codingPath.removeLast()
                 indentation -= 1
                 if index < keys.endIndex - 1 {
                     append(",", .punctuation)
