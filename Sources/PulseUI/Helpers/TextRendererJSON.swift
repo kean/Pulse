@@ -36,7 +36,6 @@ final class TextRendererJSON {
         print(json: json, isFree: true)
 
         let output = NSMutableAttributedString(string: string, attributes: helper.attributes(role: .body2, style: .monospaced, color: nil))
-        output.beginEditing()
         for (range, element) in elements {
             output.addAttribute(.foregroundColor, value: color(for: element), range: range)
         }
