@@ -6,6 +6,7 @@ import Foundation
 import Pulse
 
 #warning("for monoscrome, we can just use native pretty formatting (but still highlight error?)")
+#warning("figure out what to do with key order")
 #warning("disable attributed rendering completely for sharing the entire store?")
 
 final class TextRendererJSON {
@@ -101,7 +102,16 @@ final class TextRendererJSON {
         case let string as String:
             append("\"\(string)\"", .valueString)
         case let array as [Any]:
-            if array.contains(where: { $0 is [String: Any] }) {
+            if array is [String] || array is [Int] || array is [NSNumber] {
+                append("[", .punctuation)
+                for index in array.indices {
+                    _print(json: array[index], key: .int(index), isFree: true)
+                    if index < array.endIndex - 1 {
+                        append(", ", .punctuation)
+                    }
+                }
+                append("]", .punctuation)
+            } else {
                 append("[\n", .punctuation)
                 indentation += 1
                 for index in array.indices {
@@ -113,15 +123,6 @@ final class TextRendererJSON {
                 }
                 indentation -= 1
                 indent()
-                append("]", .punctuation)
-            } else {
-                append("[", .punctuation)
-                for index in array.indices {
-                    _print(json: array[index], key: .int(index), isFree: true)
-                    if index < array.endIndex - 1 {
-                        append(", ", .punctuation)
-                    }
-                }
                 append("]", .punctuation)
             }
         case let number as NSNumber:
