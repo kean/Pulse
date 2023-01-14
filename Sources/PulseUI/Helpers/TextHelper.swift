@@ -68,6 +68,9 @@ final class TextHelper {
             attributes[.kern] = -0.3
         }
         attributes[.foregroundColor] = color
+        if style.role == .subheadline {
+            attributes[.subheadline] = true
+        }
         return attributes
     }
 

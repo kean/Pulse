@@ -49,7 +49,7 @@ enum ShareService {
     }
 
     static func share(_ string: NSAttributedString, as output: ShareOutput) -> ShareItems {
-        let string = sanitized(string)
+        let string = sanitized(string, as: output)
         switch output {
         case .plainText:
             let string = TextUtilities.plainText(from: string)
@@ -71,7 +71,7 @@ enum ShareService {
         }
     }
 
-    static func sanitized(_ string: NSAttributedString) -> NSAttributedString {
+    static func sanitized(_ string: NSAttributedString, as shareOutput: ShareOutput) -> NSAttributedString {
         var ranges: [NSRange] = []
         string.enumerateAttribute(.isTechnical, in: NSRange(location: 0, length: string.length)) { value, range, _ in
             if (value as? Bool) == true {
@@ -81,6 +81,9 @@ enum ShareService {
         let output = NSMutableAttributedString(attributedString: string)
         for range in ranges.reversed() {
             output.deleteCharacters(in: range)
+        }
+        if shareOutput == .plainText {
+            
         }
         return output
     }

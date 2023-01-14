@@ -355,6 +355,7 @@ final class TextRenderer {
 extension NSAttributedString.Key {
     static let objectId = NSAttributedString.Key("pulse-object-id-key")
     static let isTechnical = NSAttributedString.Key("pulse-technical-substring-key")
+    static let subheadline = NSAttributedString.Key("pulse-subheadline-key")
 }
 
 // MARK: - Previews
@@ -376,7 +377,7 @@ struct ConsoleTextRenderer_Previews: PreviewProvider {
             RichTextView(viewModel: .init(string: stringWithColor))
                 .previewDisplayName("Task (Color)")
 
-            RichTextView(viewModel: .init(string: string.string))
+            RichTextView(viewModel: .init(string: ShareService.share(task, as: .plainText).items[0] as! String))
                 .previewDisplayName("Task (Plain)")
 
             RichTextView(viewModel: .init(string: TextRenderer(options: .sharing).make { $0.render(task.orderedTransactions[0]) } ))
