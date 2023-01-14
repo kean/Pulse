@@ -11,25 +11,44 @@ struct NetworkInspectorTransactionView: View {
 
     var body: some View {
         Section {
-            NetworkRequestStatusCell(viewModel: viewModel.statusViewModel)
-            viewModel.timingViewModel.map(TimingView.init)
-            NavigationLink(destination: destintionTransactionDetails) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(viewModel.title)
-                    if #available(iOS 15, tvOS 15, *), let size = viewModel.transferSizeViewModel {
-                        transferSizeView(size: size)
-                    }
-                }
-            }
-            NetworkRequestInfoCell(viewModel: viewModel.requestViewModel)
+            contents
         }
     }
-
+    
+    @ViewBuilder
+    private var contents: some View {
+        NetworkRequestStatusCell(viewModel: viewModel.statusViewModel)
+#if os(macOS)
+            .padding(.bottom, 8)
+#endif
+        viewModel.timingViewModel.map(TimingView.init)
+        NavigationLink(destination: destintionTransactionDetails) {
+#if os(macOS)
+            HStack {
+                Text(viewModel.title)
+                Spacer()
+                if #available(iOS 15, tvOS 15, *), let size = viewModel.transferSizeViewModel {
+                    transferSizeView(size: size)
+                }
+            }
+            .padding(.top, 8)
+#else
+            VStack(alignment: .leading, spacing: 4) {
+                Text(viewModel.title)
+                if #available(iOS 15, tvOS 15, *), let size = viewModel.transferSizeViewModel {
+                    transferSizeView(size: size)
+                }
+            }
+#endif
+        }
+        NetworkRequestInfoCell(viewModel: viewModel.requestViewModel)
+    }
+    
     @available(iOS 15, tvOS 15, *)
     private func transferSizeView(size: NetworkInspectorTransferInfoViewModel) -> some View {
         let font = TextHelper().font(style: .init(role: .subheadline, style: .monospacedDigital, width: .condensed))
         return (Text(Image(systemName: "arrow.down.circle")) +
-         Text(" ") +
+                Text(" ") +
          Text(size.totalBytesSent) +
          Text("  ") +
          Text(Image(systemName: "arrow.up.circle")) +
@@ -86,11 +105,11 @@ struct NetworkInspectorTransactionView_Previews: PreviewProvider {
                 ForEach(mockTask.orderedTransactions, id: \.index) {
                     NetworkInspectorTransactionView(viewModel: .init(transaction: $0, task: mockTask))
                 }
-            }
-#if os(macOS)
-            .frame(width: 500)
-#endif
+            }.frame(width: 600)
         }
+#if os(macOS)
+            .frame(width: 1000, height: 1000)
+#endif
 #if os(watchOS)
         .navigationViewStyle(.stack)
 #endif
