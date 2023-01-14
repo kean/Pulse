@@ -10,54 +10,34 @@ struct NetworkInspectorTransactionView: View {
     @ObservedObject var viewModel: NetworkInspectorTransactionViewModel
 
     var body: some View {
-        Section(header: Text(viewModel.title)) {
+        Section {
             NetworkRequestStatusCell(viewModel: viewModel.statusViewModel)
             viewModel.timingViewModel.map(TimingView.init)
-#if os(iOS) || os(macOS)
             NavigationLink(destination: destintionTransactionDetails) {
-                if #available(iOS 15, tvOS 15, *), let size = viewModel.transferSizeViewModel {
-                    transferSizeView(size: size)
-                } else {
-                    Text("Transaction Details")
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(viewModel.title)
+                    if #available(iOS 15, tvOS 15, *), let size = viewModel.transferSizeViewModel {
+                        transferSizeView(size: size)
+                    }
                 }
             }
-#else
-            NavigationLink(destination: destintionTransactionDetails) {
-                Text("Transaction Details")
-            }
-#endif
             NetworkRequestInfoCell(viewModel: viewModel.requestViewModel)
         }
     }
 
     @available(iOS 15, tvOS 15, *)
-    @ViewBuilder
     private func transferSizeView(size: NetworkInspectorTransferInfoViewModel) -> some View {
-        HStack {
-            VStack(spacing: 8) {
-                HStack {
-#if !os(macOS)
-                    Text("Details")
-                    Spacer()
-#endif
-                    (Text(Image(systemName: "arrow.down.circle")) +
-                     Text(" ") +
-                     Text(size.totalBytesSent) +
-                     Text("   ") +
-                     Text(Image(systemName: "arrow.up.circle")) +
-                     Text(" ") +
-                     Text(size.totalBytesReceived))
-                    .lineLimit(1)
-#if os(macOS)
-                    .font(.caption)
-#else
-                    .font(.callout)
-#endif
-                    .monospacedDigit()
-                    .foregroundColor(.secondary)
-                }
-            }
-        }
+        let font = TextHelper().font(style: .init(role: .subheadline, style: .monospacedDigital, width: .condensed))
+        return (Text(Image(systemName: "arrow.down.circle")) +
+         Text(" ") +
+         Text(size.totalBytesSent) +
+         Text("  ") +
+         Text(Image(systemName: "arrow.up.circle")) +
+         Text(" ") +
+         Text(size.totalBytesReceived))
+        .lineLimit(1)
+        .font(Font(font))
+        .foregroundColor(.secondary)
     }
 
     private var destintionTransactionDetails: some View {
@@ -107,6 +87,9 @@ struct NetworkInspectorTransactionView_Previews: PreviewProvider {
                     NetworkInspectorTransactionView(viewModel: .init(transaction: $0, task: mockTask))
                 }
             }
+#if os(macOS)
+            .frame(width: 500)
+#endif
         }
 #if os(watchOS)
         .navigationViewStyle(.stack)

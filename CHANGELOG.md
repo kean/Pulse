@@ -6,6 +6,7 @@
 
 - Update minimum requirements: Swift 5.7 | Xcode 14.0  | iOS 14.0, tvOS 14.0, watchOS 7.0, macOS 12.0
 - Add `ConsoleView.network` to other platforms (originally was available only on iOS)
+- Fix a couple of minor design issues
 
 ### Filters
 
