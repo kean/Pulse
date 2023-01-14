@@ -8,60 +8,50 @@ import CoreData
 import SwiftUI
 import Pulse
 
+#warning("TODO: make store accesor from BlobEntity private")
+
 final class ShareStoreTask: ObservableObject {
     @Published var title: String = "Preparing..."
-    @Published var value: Float = 0
+    @Published var progress: Float = 0
 
-    private let entities: [NSManagedObject]
+    private var isCancelled = false
+    private var objectIDs: [NSManagedObjectID]
     private let renderer = TextRenderer(options: .sharing)
+    private let store: LoggerStore
+    private let output: ShareOutput
+    private let context: NSManagedObjectContext
 
-    init(entities: [NSManagedObject]) {
-        self.entities = entities
+    init(entities: [NSManagedObject], store: LoggerStore, output: ShareOutput) {
+        self.objectIDs = entities.map(\.objectID)
+        self.store = store
+        self.output = output
+        self.context = store.backgroundContext
+    }
+
+    func cancel() {
+        isCancelled = true
     }
 
     func start() {
-        prepareForSharing()
+        context.perform {
+            self.prepareForSharing()
+        }
     }
 
     private func prepareForSharing() {
         prerenderResponseBodies()
+        let string = renderAttributedString()
 
-//        let content = contentForSharing(entities)
-//        for index in entities.indices {
-//            let entity = entities[index]
-//            if let task = entity as? NetworkTaskEntity {
-//                renderer.render(task, content: content)
-//            } else if let message = entity as? LoggerMessageEntity {
-//                if let task = message.task {
-//                    renderer.render(task, content: content)
-//                } else {
-//                    renderer.render(message)
-//                }
-//            } else {
-//                fatalError("Unsuppported entity: \(entity)")
-//            }
-//            if index < entities.endIndex - 1 {
-//                renderer.addSpacer()
-//            }
-//        }
-//        return renderer.make()
+        #warning("TODO: convert to actual output")
+        self.title = "Completed"
     }
 
     // Unlike the rest of the processing it's easy to parallelize and it
     // usually takes up at least 90% of processing.
     private func prerenderResponseBodies() {
-        struct RenderBodyJob {
-            let data: () -> Data?
-            let contentType: NetworkLogger.ContentType?
-            let error: NetworkLogger.DecodingError?
-        }
-
         var jobs: [NSManagedObjectID: RenderBodyJob] = [:]
-        var store: LoggerStore?
 
         func enqueueJob(for blob: LoggerBlobHandleEntity, error: NetworkLogger.DecodingError?) {
-            if store == nil { store = blob.store }
-            guard let store = store else { return } // Should never happen
             jobs[blob.objectID] = RenderBodyJob(
                 data: LoggerBlobHandleEntity.getData(for: blob, store: store),
                 contentType: blob.contentType,
@@ -69,13 +59,14 @@ final class ShareStoreTask: ObservableObject {
             )
         }
 
-        for entity in entities {
-            guard let task = getTask(for: entity) else { continue }
-            if let blob = task.responseBody, jobs[blob.objectID] == nil {
-                enqueueJob(for: blob, error: task.decodingError)
-            }
-            if let blob = task.requestBody, jobs[blob.objectID] == nil {
-                enqueueJob(for: blob, error: nil)
+        for objectID in objectIDs {
+            if let object = try? context.existingObject(with: objectID), let task = getTask(for: object) {
+                if let blob = task.responseBody, jobs[blob.objectID] == nil {
+                    enqueueJob(for: blob, error: task.decodingError)
+                }
+                if let blob = task.requestBody, jobs[blob.objectID] == nil {
+                    enqueueJob(for: blob, error: nil)
+                }
             }
         }
 
@@ -94,25 +85,71 @@ final class ShareStoreTask: ObservableObject {
                 guard let data = job.value.data() else { continue }
                 let string = TextRenderer(options: .sharing).render(data, contentType: job.value.contentType, error: job.value.error)
 
-                #warning("TODO: fix")
                 lock.lock()
-//                self.renderedBodies[job.key] = string
+                renderer.renderedBodies[job.key] = string
+                let completed = renderer.renderedBodies.count
+                DispatchQueue.main.async {
+                    self.progress = (Float(completed) / Float(indices.count)) * (self.output.progressScale / 2.0)
+                }
                 lock.unlock()
             }
         }
     }
 
-    private func getTask(for object: NSManagedObject) -> NetworkTaskEntity? {
-        (object as? NetworkTaskEntity) ?? (object as? LoggerMessageEntity)?.task
+    private func renderAttributedString() -> NSAttributedString {
+        let content = contentForSharing(count: objectIDs.count)
+        for index in objectIDs.indices {
+            guard let entity = try? context.existingObject(with: objectIDs[index]) else {
+                continue
+            }
+
+            if let task = entity as? NetworkTaskEntity {
+                renderer.render(task, content: content)
+            } else if let message = entity as? LoggerMessageEntity {
+                if let task = message.task {
+                    renderer.render(task, content: content)
+                } else {
+                    renderer.render(message)
+                }
+            } else {
+                fatalError("Unsuppported entity: \(entity)")
+            }
+            if index < objectIDs.endIndex - 1 {
+                renderer.addSpacer()
+            }
+            DispatchQueue.main.async {
+                self.progress = (self.output.progressScale / 2.0) + (Float(index) / Float(self.objectIDs.count)) * (self.output.progressScale / 2.0)
+            }
+        }
+        return renderer.make()
     }
 
-    private static func contentForSharing(_ entities: [NSManagedObject]) -> NetworkContent {
-        var content = NetworkContent.sharing
-        if entities.count > 1 {
-            content.remove(.largeHeader)
-            content.insert(.header)
-        }
-        return content
+    private struct RenderBodyJob {
+        let data: () -> Data?
+        let contentType: NetworkLogger.ContentType?
+        let error: NetworkLogger.DecodingError?
     }
 }
 
+private extension ShareOutput {
+    var progressScale: Float {
+        switch self {
+        case .plainText: return 0.9
+        case .html: return 0.5
+        case .pdf: return 0.2
+        }
+    }
+}
+
+private func getTask(for object: NSManagedObject) -> NetworkTaskEntity? {
+    (object as? NetworkTaskEntity) ?? (object as? LoggerMessageEntity)?.task
+}
+
+private func contentForSharing(count: Int) -> NetworkContent {
+    var content = NetworkContent.sharing
+    if count > 1 {
+        content.remove(.largeHeader)
+        content.insert(.header)
+    }
+    return content
+}

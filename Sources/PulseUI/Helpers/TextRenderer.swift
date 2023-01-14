@@ -31,7 +31,7 @@ final class TextRenderer {
     let helper: TextHelper
 
     /// LoggerBlobHandleEntity.objectID: string
-    private var renderedBodies: [NSManagedObjectID: NSAttributedString] = [:]
+    var renderedBodies: [NSManagedObjectID: NSAttributedString] = [:]
     private let string = NSMutableAttributedString()
 
     init(options: Options = .init()) {
