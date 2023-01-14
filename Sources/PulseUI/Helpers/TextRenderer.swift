@@ -44,26 +44,15 @@ final class TextRenderer {
         return make()
     }
 
-    func make() -> NSAttributedString {
+    func make() -> NSMutableAttributedString {
         string
-    }
-
-    func joined(_ strings: [NSAttributedString]) -> NSAttributedString {
-        let output = NSMutableAttributedString()
-        for (index, string) in strings.enumerated() {
-            output.append(string)
-            if index < strings.endIndex - 1 {
-                output.append(spacer())
-            }
-        }
-        return output
     }
 
     func addSpacer() {
         string.append(spacer())
     }
 
-    func spacer() -> NSAttributedString {
+    private func spacer() -> NSAttributedString {
         NSAttributedString(string: "\n", attributes: helper.spacerAttributes)
     }
 
@@ -100,7 +89,7 @@ final class TextRenderer {
         func append(section: KeyValueSectionViewModel?, details: String? = nil) {
             guard let section = section else { return }
             string.append(render(section, details: details))
-            string.append(spacer())
+            addSpacer()
         }
 
         if content.contains(.errorDetails) {
@@ -149,7 +138,6 @@ final class TextRenderer {
             addSpacer()
         }
 
-        #warning("TODO: is this correct?")
         string.deleteCharacters(in: NSRange(location: string.length - 1, length: 1))
     }
 
@@ -198,7 +186,7 @@ final class TextRenderer {
         func append(section: KeyValueSectionViewModel?, details: String? = nil) {
             guard let section = section else { return }
             string.append(render(section, details: details))
-            string.append(spacer())
+            addSpacer()
         }
         if let url = URL(string: transaction.request.url ?? "–") {
             append(section: .makeComponents(for: url))
@@ -208,7 +196,6 @@ final class TextRenderer {
             append(section: .makeHeaders(title: "Response Headers", headers: response.headers), count: true)
         }
 
-#warning("TODO: is this correct?")
         string.deleteCharacters(in: NSRange(location: string.length - 1, length: 1))
     }
 
@@ -280,12 +267,19 @@ final class TextRenderer {
         return KeyValueSectionViewModel.makeQueryItems(for: queryItems)
     }
 
-    #warning("TODO: render in currnet outout")
+    func render(_ sections: [KeyValueSectionViewModel]) {
+        for (index, section) in sections.enumerated() {
+            string.append(render(section))
+            if index != sections.endIndex - 1 {
+                addSpacer()
+            }
+        }
+    }
+
     func render(_ section: KeyValueSectionViewModel, details: String? = nil, style: TextFontStyle = .monospaced) -> NSAttributedString {
-        let string = NSMutableAttributedString()
         let details = details.map { "(\($0))" }
         let title = [section.title, details].compactMap { $0 }.joined(separator: " ")
-        string.append(render(subheadline: title))
+        let string = NSMutableAttributedString(string: title + "\n", attributes: helper.attributes(role: .subheadline, color: .secondaryLabel))
         string.append(render(section.items, color: section.color, style: style))
         return string
     }

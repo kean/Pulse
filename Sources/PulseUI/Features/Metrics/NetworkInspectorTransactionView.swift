@@ -92,7 +92,8 @@ final class NetworkInspectorTransactionViewModel: ObservableObject, Identifiable
         self.details = {
             let renderer = TextRenderer(options: .sharing)
             let sections = KeyValueSectionViewModel.makeDetails(for: transaction)
-            return renderer.joined(sections.map { renderer.render($0) })
+            renderer.render(sections)
+            return renderer.make()
         }
     }
 }

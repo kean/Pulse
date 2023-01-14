@@ -45,24 +45,6 @@ final class NetworkRequestInfoCellViewModel {
     }
 }
 
-private func makeDetails(for request: NetworkRequestEntity) -> NSAttributedString {
-    guard let url = URL(string: request.url ?? "") else {
-        return NSAttributedString(string: "Invalid URL")
-    }
-    let renderer = TextRenderer()
-    let urlString = renderer.render(url.absoluteString + "\n", role: .body2, style: .monospaced)
-    let sections: [NSAttributedString] = [
-        KeyValueSectionViewModel.makeComponents(for: url),
-        KeyValueSectionViewModel.makeQueryItems(for: url),
-        KeyValueSectionViewModel.makeParameters(for: request)
-    ].compactMap { $0 }.map { renderer.render($0, style: .monospaced) }
-
-    let strings = [urlString] + sections
-    let string = NSMutableAttributedString(attributedString: renderer.joined(strings))
-    string.addAttributes([.underlineColor: UXColor.clear])
-    return string
-}
-
 #if DEBUG
 struct NetworkRequestInfoCell_Previews: PreviewProvider {
     static var previews: some View {

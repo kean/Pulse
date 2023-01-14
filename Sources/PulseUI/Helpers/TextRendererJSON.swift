@@ -6,7 +6,6 @@ import Foundation
 import Pulse
 
 #warning("for monoscrome, we can just use native pretty formatting (but still highlight error?)")
-#warning("disable attributed rendering completely for sharing the entire store?")
 
 final class TextRendererJSON {
     // Input
