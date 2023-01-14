@@ -79,6 +79,7 @@
 		0C9F050C2884FA7D0035239F /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CFF9BD825D6199A0069DB6A /* repos.json */; };
 		0CCBDDC02610BDBC00DCB60C /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CFF9BD825D6199A0069DB6A /* repos.json */; };
 		0CD7E0BB297326EC00A255B7 /* ShareEntitiesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD7E0BA297326EC00A255B7 /* ShareEntitiesView.swift */; };
+		0CD7E0BD29732C8E00A255B7 /* ShareStoreTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD7E0BC29732C8E00A255B7 /* ShareStoreTask.swift */; };
 		0CDC3BEA2970FA47003BD1FF /* ConsoleSearchListSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CDC3BE92970FA47003BD1FF /* ConsoleSearchListSelectionView.swift */; };
 		0CDC3BED2971B936003BD1FF /* ConsoleSearchLogLevelsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CDC3BEC2971B936003BD1FF /* ConsoleSearchLogLevelsCell.swift */; };
 		0CE364F72971D1EA0063DFED /* ConsoleSearchCustomFiltersSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE364F62971D1EA0063DFED /* ConsoleSearchCustomFiltersSection.swift */; };
@@ -528,6 +529,7 @@
 		0C9F04FF2884F34A0035239F /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		0C9F05012884F34A0035239F /* Pulse_Demo_macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Pulse_Demo_macOS.entitlements; sourceTree = "<group>"; };
 		0CD7E0BA297326EC00A255B7 /* ShareEntitiesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareEntitiesView.swift; sourceTree = "<group>"; };
+		0CD7E0BC29732C8E00A255B7 /* ShareStoreTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareStoreTask.swift; sourceTree = "<group>"; };
 		0CDC3BE92970FA47003BD1FF /* ConsoleSearchListSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchListSelectionView.swift; sourceTree = "<group>"; };
 		0CDC3BEC2971B936003BD1FF /* ConsoleSearchLogLevelsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchLogLevelsCell.swift; sourceTree = "<group>"; };
 		0CDFB833296F24140071EF77 /* CHANGELOG.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CHANGELOG.md; sourceTree = "<group>"; };
@@ -1139,6 +1141,7 @@
 				0CF0D583296F189500EED9D4 /* TextRendererJSON.swift */,
 				0CF0D586296F189500EED9D4 /* TextUtilities.swift */,
 				0CF0D58A296F189500EED9D4 /* ShareItems.swift */,
+				0CD7E0BC29732C8E00A255B7 /* ShareStoreTask.swift */,
 				0CF0D581296F189500EED9D4 /* Regex.swift */,
 				0CF0D584296F189500EED9D4 /* LoggerSync.swift */,
 				0CF0D585296F189500EED9D4 /* ManagedObjectTextSearch.swift */,
@@ -2100,6 +2103,7 @@
 				0CF0D61E296F189600EED9D4 /* SwiftUI+Extensions.swift in Sources */,
 				0CF0D684296F189600EED9D4 /* ConsoleTableView-ios.swift in Sources */,
 				0CF0D664296F189600EED9D4 /* NetworkInspectorMetricsView.swift in Sources */,
+				0CD7E0BD29732C8E00A255B7 /* ShareStoreTask.swift in Sources */,
 				0C11EAEA2971EBEE0059786A /* MockStore.swift in Sources */,
 				0CF0D687296F189600EED9D4 /* ConsoleNetworkRequestView.swift in Sources */,
 				0CDC3BED2971B936003BD1FF /* ConsoleSearchLogLevelsCell.swift in Sources */,

@@ -35,7 +35,7 @@ private final class ShareEntitiesViewModel: ObservableObject {
     }
 
     func prepare(entities: [NSManagedObject], output: ShareOutput) {
-        //  
+        //
     }
 }
 

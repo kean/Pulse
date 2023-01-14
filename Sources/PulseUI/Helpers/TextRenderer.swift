@@ -203,12 +203,12 @@ final class TextRenderer {
         render(subheadline + "\n", role: .subheadline, color: .secondaryLabel)
     }
 
-    func renderRequestBody(for task: NetworkTaskEntity) -> NSAttributedString {
+    private func renderRequestBody(for task: NetworkTaskEntity) -> NSAttributedString {
         if let body = task.requestBody, let string = renderedBodies[body.objectID] {
             return string
         }
         if let blob = task.requestBody, let data = blob.data, !data.isEmpty {
-            return render(data, contentType: blob.contentType, error: nil)
+            return render(blob, data, contentType: blob.contentType, error: nil)
         } else if task.type == .uploadTask, task.requestBodySize > 0 {
             return _render(dataSize: task.requestBodySize, contentType: task.originalRequest?.contentType)
         } else {
@@ -216,12 +216,12 @@ final class TextRenderer {
         }
     }
 
-    func renderResponseBody(for task: NetworkTaskEntity) -> NSAttributedString {
+    private func renderResponseBody(for task: NetworkTaskEntity) -> NSAttributedString {
         if let body = task.responseBody, let string = renderedBodies[body.objectID] {
             return string
         }
         if let blob = task.responseBody, let data = blob.data, !data.isEmpty {
-            return render(data, contentType: blob.contentType, error: task.decodingError)
+            return render(blob, data, contentType: blob.contentType, error: task.decodingError)
         } else if task.type == .downloadTask, task.responseBodySize > 0 {
             return _render(dataSize: task.responseBodySize, contentType: task.response?.contentType)
         } else {
@@ -231,6 +231,12 @@ final class TextRenderer {
 
     func render(json: Any, error: NetworkLogger.DecodingError? = nil) -> NSAttributedString {
         TextRendererJSON(json: json, error: error, options: options).render()
+    }
+
+    func render(_ blob: LoggerBlobHandleEntity, _ data: Data, contentType: NetworkLogger.ContentType?, error: NetworkLogger.DecodingError?) -> NSAttributedString {
+        let string = render(data, contentType: contentType, error: error)
+        renderedBodies[blob.objectID] = string
+        return string
     }
 
     func render(_ data: Data, contentType: NetworkLogger.ContentType?, error: NetworkLogger.DecodingError?) -> NSAttributedString {
@@ -347,97 +353,11 @@ final class TextRenderer {
 
     // MARK: Sharing
 
+    #warning("TODO: remove")
     static func share(_ entities: [NSManagedObject]) -> NSAttributedString {
-        let renderer = TextRenderer(options: .sharing)
-        renderer.prerenderResponseBodies(for: entities)
-        let content = contentForSharing(entities)
-        for index in entities.indices {
-            let entity = entities[index]
-            if let task = entity as? NetworkTaskEntity {
-                renderer.render(task, content: content)
-            } else if let message = entity as? LoggerMessageEntity {
-                if let task = message.task {
-                    renderer.render(task, content: content)
-                } else {
-                    renderer.render(message)
-                }
-            } else {
-                fatalError("Unsuppported entity: \(entity)")
-            }
-            if index < entities.endIndex - 1 {
-                renderer.addSpacer()
-            }
-        }
-        return renderer.make()
-    }
-
-    // Unlike the rest of the processing it's easy to parallelize and it
-    // usually takes up at least 90% of processing.
-    func prerenderResponseBodies(for entities: [NSManagedObject]) {
-        struct RenderBodyJob {
-            let data: () -> Data?
-            let contentType: NetworkLogger.ContentType?
-            let error: NetworkLogger.DecodingError?
-        }
-
-        var jobs: [NSManagedObjectID: RenderBodyJob] = [:]
-        var store: LoggerStore?
-
-        func enqueueJob(for blob: LoggerBlobHandleEntity, error: NetworkLogger.DecodingError?) {
-            if store == nil { store = blob.store }
-            guard let store = store else { return } // Should never happen
-            jobs[blob.objectID] = RenderBodyJob(
-                data: LoggerBlobHandleEntity.getData(for: blob, store: store),
-                contentType: blob.contentType,
-                error: error
-            )
-        }
-
-        for entity in entities {
-            guard let task = getTask(for: entity) else { continue }
-            if let blob = task.responseBody, jobs[blob.objectID] == nil {
-                enqueueJob(for: blob, error: task.decodingError)
-            }
-            if let blob = task.requestBody, jobs[blob.objectID] == nil {
-                enqueueJob(for: blob, error: nil)
-            }
-        }
-
-        let queue = Array(jobs)
-        let indices = queue.indices
-        // "To get the maximum benefit of this function, configure the number of
-        // iterations to be at least three times the number of available cores."
-        let iterations = indices.count >= 32 ? 32 : (indices.count >= 8 ? 8 : 1)
-        let lock = NSLock()
-        DispatchQueue.concurrentPerform(iterations: iterations) { index in
-            let start = index * indices.count / iterations
-            let end = (index + 1) * indices.count / iterations
-
-            for index in start..<end {
-                let job = queue[index]
-                guard let data = job.value.data() else { continue }
-                let string = TextRenderer(options: .sharing).render(data, contentType: job.value.contentType, error: job.value.error)
-                lock.lock()
-                self.renderedBodies[job.key] = string
-                lock.unlock()
-            }
-        }
-    }
-
-    private func getTask(for object: NSManagedObject) -> NetworkTaskEntity? {
-        (object as? NetworkTaskEntity) ?? (object as? LoggerMessageEntity)?.task
-    }
-
-    private static func contentForSharing(_ entities: [NSManagedObject]) -> NetworkContent {
-        var content = NetworkContent.sharing
-        if entities.count > 1 {
-            content.remove(.largeHeader)
-            content.insert(.header)
-        }
-        return content
+        return NSAttributedString(string: "Deprecated")
     }
 }
-
 
 extension NSAttributedString.Key {
     static let objectIdKey = NSAttributedString.Key("pulse-object-id-key")
