@@ -30,7 +30,8 @@ final class TextRenderer {
 
     let helper: TextHelper
 
-    private var responseBodies: [NSManagedObjectID: NSAttributedString] = [:]
+    /// LoggerBlobHandleEntity.objectID: string
+    private var renderedBodies: [NSManagedObjectID: NSAttributedString] = [:]
 
     init(options: Options = .init()) {
         self.options = options
@@ -218,7 +219,7 @@ final class TextRenderer {
     }
 
     func renderResponseBody(for task: NetworkTaskEntity) -> NSAttributedString {
-        if let string = responseBodies[task.objectID] {
+        if let body = task.responseBody, let string = renderedBodies[body.objectID] {
             return string
         }
         if let data = task.responseBody?.data, !data.isEmpty {
@@ -361,31 +362,31 @@ final class TextRenderer {
     // usually takes up at least 90% of processing.
     func prerenderResponseBodies(for entities: [NSManagedObject]) {
         struct RenderBodyJob {
-            let objectID: NSManagedObjectID
+            let data: () -> Data?
             let contentType: NetworkLogger.ContentType?
             let error: NetworkLogger.DecodingError?
-            let data: () -> Data?
         }
 
-        var jobs: [RenderBodyJob] = []
+        var jobs: [NSManagedObjectID: RenderBodyJob] = [:]
         var store: LoggerStore?
         for entity in entities {
-            if let task = getTask(for: entity), task.responseBodySize > 0, let blob = task.responseBody {
+            guard let task = getTask(for: entity) else { continue }
+            if task.responseBodySize > 0, let blob = task.responseBody, jobs[blob.objectID] == nil {
                 if store == nil {
                     store = blob.store
                 }
                 guard let store = store else {
                     continue // Should never happen
                 }
-                jobs.append(RenderBodyJob(
-                    objectID: task.objectID,
+                jobs[blob.objectID] = RenderBodyJob(
+                    data: LoggerBlobHandleEntity.getData(for: blob, store: store),
                     contentType: task.response?.contentType,
-                    error: task.decodingError,
-                    data: LoggerBlobHandleEntity.getData(for: blob, store: store)
-                ))
+                    error: task.decodingError
+                )
             }
         }
-        let indices = jobs.indices
+        let queue = Array(jobs)
+        let indices = queue.indices
         // "To get the maximum benefit of this function, configure the number of
         // iterations to be at least three times the number of available cores."
         let iterations = indices.count >= 32 ? 32 : 1
@@ -395,11 +396,11 @@ final class TextRenderer {
             let end = (index + 1) * indices.count / iterations
 
             for index in start..<end {
-                let job = jobs[index]
-                guard let data = job.data() else { continue }
-                let string = TextRenderer(options: .sharing).render(data, contentType: job.contentType, error: job.error)
+                let job = queue[index]
+                guard let data = job.value.data() else { continue }
+                let string = TextRenderer(options: .sharing).render(data, contentType: job.value.contentType, error: job.value.error)
                 lock.lock()
-                self.responseBodies[job.objectID] = string
+                self.renderedBodies[job.key] = string
                 lock.unlock()
             }
         }
