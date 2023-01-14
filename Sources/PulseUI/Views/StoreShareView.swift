@@ -244,6 +244,7 @@ private final class ShareStoreViewModel: ObservableObject {
     private func prepareForSharing(store: LoggerStore, context: NSManagedObjectContext, directory: TemporaryDirectory, predicate: NSPredicate?, output: ShareStoreOutput) throws -> SharedContents {
         let logsURL = directory.url.appendingPathComponent("logs-\(makeCurrentDate()).\(output.fileExtension)")
 
+        #warning("TODO: integrte new async APIs")
         func makeString() throws -> NSAttributedString {
             let request = NSFetchRequest<LoggerMessageEntity>(entityName: "\(LoggerMessageEntity.self)")
             request.predicate = predicate

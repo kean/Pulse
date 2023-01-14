@@ -37,11 +37,13 @@ enum ShareService {
     }
 
     static func share(_ message: LoggerMessageEntity, as output: ShareOutput) -> ShareItems {
-        share(TextRenderer.share([message]), as: output)
+        let string = TextRenderer(options: .sharing).make { $0.render(message) }
+        return share(string, as: output)
     }
 
     static func share(_ task: NetworkTaskEntity, as output: ShareOutput) -> ShareItems {
-        share(TextRenderer.share([task]), as: output)
+        let string = TextRenderer(options: .sharing).make { $0.render(task, content: .sharing) }
+        return share(string, as: output)
     }
 
     static func share(_ string: NSAttributedString, as output: ShareOutput) -> ShareItems {
