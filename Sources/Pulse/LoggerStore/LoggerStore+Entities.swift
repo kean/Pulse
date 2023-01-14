@@ -319,7 +319,7 @@ public final class LoggerBlobHandleEntity: NSManagedObject {
     /// Returns a closure to fetch the entitie's data that can be executed
     /// on any thread.
     ///
-    /// - warning: Not meant to be used publically.
+    /// - warning: Not meant to be used outside of the framework.
     public static func getData(for entity: LoggerBlobHandleEntity, store: LoggerStore) -> () -> Data? {
         let inlineData = entity.inlineData
         let key = entity.key
