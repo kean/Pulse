@@ -209,6 +209,9 @@ final class TextRenderer {
     }
 
     func renderRequestBody(for task: NetworkTaskEntity) -> NSAttributedString {
+        if let body = task.requestBody, let string = renderedBodies[body.objectID] {
+            return string
+        }
         if let data = task.requestBody?.data, !data.isEmpty {
             return render(data, contentType: task.originalRequest?.contentType, error: nil)
         } else if task.type == .uploadTask, task.requestBodySize > 0 {
@@ -371,17 +374,22 @@ final class TextRenderer {
         var store: LoggerStore?
         for entity in entities {
             guard let task = getTask(for: entity) else { continue }
-            if task.responseBodySize > 0, let blob = task.responseBody, jobs[blob.objectID] == nil {
-                if store == nil {
-                    store = blob.store
-                }
-                guard let store = store else {
-                    continue // Should never happen
-                }
+            if let blob = task.responseBody, jobs[blob.objectID] == nil {
+                if store == nil { store = blob.store }
+                guard let store = store else { continue } // Should never happen
                 jobs[blob.objectID] = RenderBodyJob(
                     data: LoggerBlobHandleEntity.getData(for: blob, store: store),
                     contentType: task.response?.contentType,
                     error: task.decodingError
+                )
+            }
+            if let blob = task.requestBody, jobs[blob.objectID] == nil {
+                if store == nil { store = blob.store }
+                guard let store = store else { continue } // Should never happen
+                jobs[blob.objectID] = RenderBodyJob(
+                    data: LoggerBlobHandleEntity.getData(for: blob, store: store),
+                    contentType: task.originalRequest?.contentType,
+                    error: nil
                 )
             }
         }
