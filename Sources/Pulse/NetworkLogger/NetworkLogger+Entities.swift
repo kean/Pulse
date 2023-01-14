@@ -39,15 +39,6 @@ extension NetworkLogger {
                 if request.httpShouldHandleCookies { insert(.httpShouldHandleCookies) }
                 if request.httpShouldUsePipelining { insert(.httpShouldUsePipelining) }
             }
-
-            init(_ entity: NetworkRequestEntity) {
-                self = []
-                if entity.allowsCellularAccess { insert(.allowsCellularAccess) }
-                if entity.allowsExpensiveNetworkAccess { insert(.allowsExpensiveNetworkAccess) }
-                if entity.allowsConstrainedNetworkAccess { insert(.allowsConstrainedNetworkAccess) }
-                if entity.httpShouldHandleCookies { insert(.httpShouldHandleCookies) }
-                if entity.httpShouldUsePipelining { insert(.httpShouldUsePipelining) }
-            }
         }
 
         public init(_ urlRequest: URLRequest) {
@@ -57,14 +48,6 @@ extension NetworkLogger {
             self.rawCachePolicy = urlRequest.cachePolicy.rawValue
             self.timeout = urlRequest.timeoutInterval
             self.options = Options(urlRequest)
-        }
-
-        public init(_ entity: NetworkRequestEntity) {
-            self.url = entity.url.flatMap(URL.init)
-            self.headers = entity.headers
-            self.rawCachePolicy = UInt(entity.rawCachePolicy)
-            self.timeout = TimeInterval(entity.timeoutInterval)
-            self.options = Options(entity)
         }
     }
 
@@ -85,11 +68,6 @@ extension NetworkLogger {
             let httpResponse = urlResponse as? HTTPURLResponse
             self.statusCode = httpResponse?.statusCode
             self.headers = httpResponse?.allHeaderFields as? [String: String]
-        }
-
-        public init(_ entity: NetworkResponseEntity) {
-            self.statusCode = Int(entity.statusCode)
-            self.headers = entity.headers
         }
     }
 

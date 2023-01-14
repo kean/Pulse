@@ -65,14 +65,7 @@ final class TextRenderer {
         }
     }
 
-    #warning("TEMP")
     func render(_ task: NetworkTaskEntity, content: NetworkContent) -> NSAttributedString {
-//        render(NetworkTask(task), content: content)
-        _render(task, content: content)
-    }
-
-    // Thead-safe variant.
-    private func _render(_ task: NetworkTaskEntity, content: NetworkContent) -> NSAttributedString {
         var components: [NSAttributedString] = []
 
         if content.contains(.largeHeader) {
