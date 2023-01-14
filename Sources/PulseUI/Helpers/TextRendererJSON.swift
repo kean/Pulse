@@ -6,7 +6,6 @@ import Foundation
 import Pulse
 
 #warning("for monoscrome, we can just use native pretty formatting (but still highlight error?)")
-#warning("figure out what to do with key order")
 #warning("disable attributed rendering completely for sharing the entire store?")
 
 final class TextRendererJSON {
@@ -74,7 +73,7 @@ final class TextRendererJSON {
         func _print(json: Any, key: NetworkLogger.DecodingError.CodingKey, isFree: Bool) {
             codingPath.append(key)
             print(json: json, isFree: isFree)
-            _ = codingPath.popLast()
+            codingPath.removeLast()
         }
 
         switch json {
@@ -85,14 +84,17 @@ final class TextRendererJSON {
             append("{", .punctuation)
             newline()
             let keys = object.keys.sorted()
-            for key in keys {
+            for index in keys.indices {
+                let key = keys[index]
                 indent()
                 append("\(String(repeating: " ", count: spaces))\"\(key)\"", .key)
                 append(": ", .punctuation)
                 indentation += 1
+                codingPath.append(.string(key))
                 _print(json: object[key]!, key: .string(key), isFree: false)
+                codingPath.removeLast()
                 indentation -= 1
-                if key != keys.last {
+                if index < keys.endIndex - 1 {
                     append(",", .punctuation)
                 }
                 newline()
