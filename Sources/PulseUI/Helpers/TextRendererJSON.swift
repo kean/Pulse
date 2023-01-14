@@ -36,8 +36,8 @@ final class TextRendererJSON {
     func render() -> NSAttributedString {
         print(json: json, isFree: true)
 
-        let output = NSMutableAttributedString(string: string, attributes: helper.attributes(role: .body2, style: .monospaced, color: nil))
-        for (range, element) in elements {
+        let output = NSMutableAttributedString(string: string, attributes: helper.attributes(role: .body2, style: .monospaced, color: color(for: .key)))
+        for (range, element) in elements where element != .key {
             output.addAttribute(.foregroundColor, value: color(for: element), range: range)
         }
         if let range = errorRange {
