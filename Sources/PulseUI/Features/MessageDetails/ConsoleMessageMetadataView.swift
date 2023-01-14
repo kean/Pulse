@@ -15,8 +15,8 @@ struct ConsoleMessageMetadataView: View {
 
     private var string: NSAttributedString {
         let renderer = TextRenderer()
-        let strings = sections.map { renderer.render($0) }
-        return renderer.joined(strings)
+        renderer.render(sections)
+        return renderer.make()
     }
 
     private var sections: [KeyValueSectionViewModel] {

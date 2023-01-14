@@ -218,11 +218,23 @@ private final class ShareStoreViewModel: ObservableObject {
     private func prepareForSharing(store: LoggerStore, context: NSManagedObjectContext, predicate: NSPredicate?, output: ShareStoreOutput) {
         let directory = TemporaryDirectory()
         do {
-            let contents = try prepareForSharing(store: store, context: context, directory: directory, predicate: predicate, output: output)
-            DispatchQueue.main.async {
-                self.sharedContents = contents
-                self.didFinishPreparingForSharing()
+            switch output {
+            case .store:
+                let contents = try prepareStoreForSharing(store: store, context: context, directory: directory, predicate: predicate)
+                DispatchQueue.main.async {
+                    self.sharedContents = contents
+                    self.didFinishPreparingForSharing()
+                }
+            case .text, .html:
+                let output: ShareOutput = output == .text ? .plainText : .html
+                prepareForSharing(predicate: predicate, context: context, output: output) { contents in
+                    DispatchQueue.main.async {
+                        self.sharedContents = contents
+                        self.didFinishPreparingForSharing()
+                    }
+                }
             }
+
         } catch {
             directory.remove()
             DispatchQueue.main.async {
@@ -241,31 +253,27 @@ private final class ShareStoreViewModel: ObservableObject {
         }
     }
 
-    private func prepareForSharing(store: LoggerStore, context: NSManagedObjectContext, directory: TemporaryDirectory, predicate: NSPredicate?, output: ShareStoreOutput) throws -> SharedContents {
+    private func prepareStoreForSharing(store: LoggerStore, context: NSManagedObjectContext, directory: TemporaryDirectory, predicate: NSPredicate?) throws -> SharedContents {
         let logsURL = directory.url.appendingPathComponent("logs-\(makeCurrentDate()).\(output.fileExtension)")
-
-        func makeString() throws -> NSAttributedString {
-            let request = NSFetchRequest<LoggerMessageEntity>(entityName: "\(LoggerMessageEntity.self)")
-            request.predicate = predicate
-            let messages = try context.fetch(request)
-            return TextRenderer.share(messages)
-        }
-
-        var info: LoggerStore.Info?
-        switch output {
-        case .store:
-            if let predicate = predicate {
-                info = try store.copy(to: logsURL, predicate: predicate)
-            } else {
-                info = try store.copy(to: logsURL)
-            }
-        case .text:
-            try makeString().string.data(using: .utf8)?.write(to: logsURL)
-        case .html:
-            try TextUtilities.html(from: makeString()).write(to: logsURL)
+        let info: LoggerStore.Info?
+        if let predicate = predicate {
+            info = try store.copy(to: logsURL, predicate: predicate)
+        } else {
+            info = try store.copy(to: logsURL)
         }
         let item = ShareItems([logsURL], cleanup: directory.remove)
         return SharedContents(item: item, size: try logsURL.getFileSize(), info: info)
+    }
+
+    private func prepareForSharing(predicate: NSPredicate?, context: NSManagedObjectContext, output: ShareOutput, _ completion: @escaping (SharedContents) -> Void) {
+        let request = NSFetchRequest<LoggerMessageEntity>(entityName: "\(LoggerMessageEntity.self)")
+        request.predicate = predicate
+        let messages = (try? context.fetch(request)) ?? []
+
+        ShareStoreTask(entities: messages, store: store!, output: output) { item in
+            guard let item = item else { return }
+            completion(SharedContents(item: item, size: item.size))
+        }.start()
     }
 }
 
@@ -278,11 +286,11 @@ private extension URL {
 
 private struct SharedContents {
     var item: ShareItems?
-    var size: Int64 = 0
+    var size: Int64?
     var info: LoggerStore.Info?
 
-    var formattedFileSize: String {
-        ByteCountFormatter.string(fromByteCount: size)
+    var formattedFileSize: String? {
+        size.map(ByteCountFormatter.string)
     }
 }
 

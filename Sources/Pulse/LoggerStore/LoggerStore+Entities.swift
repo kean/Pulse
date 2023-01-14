@@ -17,7 +17,7 @@ public final class LoggerMessageEntity: NSManagedObject {
     @NSManaged public var rawMetadata: String
     @NSManaged public var task: NetworkTaskEntity?
 
-    public lazy var metadata = KeyValueEncoding.decodeKeyValuePairs(rawMetadata)
+    public lazy var metadata = { KeyValueEncoding.decodeKeyValuePairs(rawMetadata) }()
 }
 
 public final class LoggerLabelEntity: NSManagedObject {
@@ -95,7 +95,7 @@ public final class NetworkTaskEntity: NSManagedObject {
 
     // MARK: Helpers
 
-    public lazy var metadata = rawMetadata.map(KeyValueEncoding.decodeKeyValuePairs)
+    public lazy var metadata = { rawMetadata.map(KeyValueEncoding.decodeKeyValuePairs) }()
 
     /// Returns request state.
     public var state: State {
@@ -251,7 +251,7 @@ public final class NetworkRequestEntity: NSManagedObject {
         headers["Content-Type"].flatMap(NetworkLogger.ContentType.init)
     }
 
-    public lazy var headers: [String: String] = KeyValueEncoding.decodeKeyValuePairs(httpHeaders)
+    public lazy var headers: [String: String] = { KeyValueEncoding.decodeKeyValuePairs(httpHeaders) }()
 }
 
 public final class NetworkResponseEntity: NSManagedObject {
@@ -266,7 +266,7 @@ public final class NetworkResponseEntity: NSManagedObject {
         headers["Content-Length"].flatMap { Int64($0) }
     }
 
-    public lazy var headers: [String: String] = KeyValueEncoding.decodeKeyValuePairs(httpHeaders)
+    public lazy var headers: [String: String] = { KeyValueEncoding.decodeKeyValuePairs(httpHeaders) }()
 }
 
 /// Doesn't contain any data, just the key and some additional payload.
@@ -279,6 +279,13 @@ public final class LoggerBlobHandleEntity: NSManagedObject {
 
     /// A decompressed blob size.
     @NSManaged public var decompressedSize: Int32
+
+    @NSManaged var rawContentType: String?
+
+    /// A blob content type.
+    public var contentType: NetworkLogger.ContentType? {
+        rawContentType.flatMap(NetworkLogger.ContentType.init)
+    }
 
     /// A number of requests referencing it.
     @NSManaged var linkCount: Int16
@@ -307,5 +314,17 @@ public final class LoggerBlobHandleEntity: NSManagedObject {
             return nil // Should never happen unless the object was created outside of the LoggerStore moc
         }
         return store.store?.getDecompressedData(for: self)
+    }
+
+    /// Returns a closure to fetch the entitie's data that can be executed
+    /// on any thread.
+    ///
+    /// - warning: Not meant to be used outside of the framework.
+    public static func getData(for entity: LoggerBlobHandleEntity, store: LoggerStore) -> () -> Data? {
+        let inlineData = entity.inlineData
+        let key = entity.key
+        return {
+            store.getDecompressedData(for: inlineData, key: key)
+        }
     }
 }

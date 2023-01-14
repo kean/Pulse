@@ -53,18 +53,16 @@ struct NetworkRequestStatusCellModel {
     fileprivate let duration: DurationViewModel?
 
     init(task: NetworkTaskEntity) {
+        self.title = ConsoleFormatter.status(for: task)
         switch task.state {
         case .pending:
             imageName = "clock.fill"
-            title = ProgressViewModel.title(for: task).capitalized
             tintColor = .orange
         case .success:
             imageName = "checkmark.circle.fill"
-            title = StatusCodeFormatter.string(for: Int(task.statusCode))
             tintColor = .green
         case .failure:
             imageName = "exclamationmark.octagon.fill"
-            title = ErrorFormatter.shortErrorDescription(for: task)
             tintColor = .red
         }
         duration = DurationViewModel(task: task)

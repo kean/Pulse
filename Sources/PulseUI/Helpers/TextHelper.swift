@@ -7,6 +7,9 @@ import SwiftUI
 
 /// Manages text attributes.
 final class TextHelper {
+    private var cachedAttributes: [AttributesKey: [NSAttributedString.Key: Any]] = [:]
+    private var cachedFonts: [TextStyle: UXFont] = [:]
+
     init() {}
 
     func attributes(
@@ -42,19 +45,23 @@ final class TextHelper {
         return font
     }
 
+    private let titleParagraphStyle: NSParagraphStyle = {
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.lineSpacing = -6
+        return paragraphStyle
+    }()
+
+    private let bodyParagraphStyle: NSParagraphStyle = {
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.lineSpacing = 3
+        return paragraphStyle
+    }()
+
     private func makeAttributes(style: TextStyle, color: UXColor?) -> [NSAttributedString.Key: Any] {
         var attributes: [NSAttributedString.Key: Any] = [:]
         let font = self.font(style: style)
         attributes[.font] = font
-        attributes[.paragraphStyle] = {
-            let paragraphStyle = NSMutableParagraphStyle()
-            if style.role == .title {
-                paragraphStyle.lineSpacing = -6
-            } else {
-                paragraphStyle.lineSpacing = 3
-            }
-            return paragraphStyle
-        }()
+        attributes[.paragraphStyle] = style.role == .title ? titleParagraphStyle : bodyParagraphStyle
         if style.width == .condensed {
             attributes[.kern] = -0.4
         } else if style.style == .monospaced {
@@ -101,9 +108,6 @@ final class TextHelper {
         let textStyle: TextStyle
         let color: UXColor?
     }
-
-    private var cachedAttributes: [AttributesKey: [NSAttributedString.Key: Any]] = [:]
-    private var cachedFonts: [TextStyle: UXFont] = [:]
 }
 
 struct TextStyle: Hashable {

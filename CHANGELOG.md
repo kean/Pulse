@@ -15,7 +15,15 @@
 - Add a counter next to labels and domains
 - Display labels and domains only visible for the current filter
 - Fix an issue where when you were focusing a log label, it wasn't reflected in the filters
-- Fix an issue where using "Recent" date filter was applying "Session" filter instead
+- Fix an issue where using the "Recent" date filter was applying the "Session" filter instead
+
+### Sharing
+
+- Improve task to `NSAttributedString` generation speed by up to 7x faster. For multiple tasks, there is up to x3 improvement on top of that. And when converting multiple tasks with the same request or response body, you can see up to 90% faster exports. These optimizations affect everything: rendering response bodies, lists of messages, request headers, sharing (regardless of the output format), and more.
+- Improve HTML generation speed by 40% (not including `NSAttributedString` improvements that directly affect it)
+- Add a spinner while preparing a large file for sharing. You can still interact with the app while it's working. Note: it doesn't work with PDF because it has to be used on the main thread.
+- Fix double dot in shared files extensions
+- Remove share as .pdf from Console and TextView (keep in NetworkInspector) - too slow to be used for any reasonable amount of content
 
 ## Pulse 3.0.0
 

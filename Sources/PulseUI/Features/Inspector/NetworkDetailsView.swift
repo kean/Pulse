@@ -13,8 +13,8 @@ struct NetworkDetailsView: View {
     init(title: String, viewModel: @escaping () -> KeyValueSectionViewModel?) {
         self.title = title
         self.viewModel = NetworkDetailsViewModel {
-            viewModel().map {
-                TextRenderer().render($0.items, color: $0.color)
+            viewModel().map { viewModel in
+                TextRenderer().render(viewModel.items, color: viewModel.color)
             }
         }
     }

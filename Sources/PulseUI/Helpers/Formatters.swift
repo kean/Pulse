@@ -76,12 +76,8 @@ enum ConsoleFormatter {
     /// "Pending"
     /// "200 OK · 2.2s"
     static func details(for task: NetworkTaskEntity) -> String {
-        var components: [String] = []
-        switch task.state {
-        case .pending:
-            components.append(ProgressViewModel.title(for: task))
-        case .success:
-            components.append(StatusCodeFormatter.string(for: Int(task.statusCode)))
+        var components: [String] = [status(for: task)]
+        if task.state == .success {
 #if !os(watchOS)
             switch task.type ?? .dataTask {
             case .uploadTask:
@@ -98,8 +94,6 @@ enum ConsoleFormatter {
                 break
             }
 #endif
-        case .failure:
-            components.append(ErrorFormatter.shortErrorDescription(for: task))
         }
 
         if task.duration > 0 {
@@ -107,6 +101,17 @@ enum ConsoleFormatter {
         }
 
         return components.joined(separator: separator)
+    }
+
+    static func status(for task: NetworkTaskEntity) -> String {
+        switch task.state {
+        case .pending:
+            return ProgressViewModel.title(for: task)
+        case .success:
+            return StatusCodeFormatter.string(for: Int(task.statusCode))
+        case .failure:
+            return ErrorFormatter.shortErrorDescription(for: task)
+        }
     }
 }
 

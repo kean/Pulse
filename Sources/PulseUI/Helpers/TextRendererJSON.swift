@@ -13,57 +13,63 @@ final class TextRendererJSON {
     // Settings
     private let options: TextRenderer.Options
     private let helper: TextHelper
-    private let attributes: [JSONElement: [NSAttributedString.Key: Any]]
+    private let spaces = 2
 
     // Temporary state (one-shot, doesn't reset)
     private var indentation = 0
+    private var index = 0
     private var codingPath: [NetworkLogger.DecodingError.CodingKey] = []
-    private var string = NSMutableAttributedString()
+    private var elements: [(NSRange, JSONElement)] = []
+    private var errorRange: NSRange?
+    private var string = ""
 
     init(json: Any, error: NetworkLogger.DecodingError? = nil, options: TextRenderer.Options = .init()) {
         self.options = options
         self.helper = TextHelper()
         self.json = json
         self.error = error
-
-        if options.color == .monochrome {
-            attributes = [
-                .punctuation: [.foregroundColor: UXColor.secondaryLabel],
-                .key: [.foregroundColor: UXColor.label],
-                .valueString: [.foregroundColor: UXColor.label],
-                .valueOther: [.foregroundColor: UXColor.label],
-                .null: [.foregroundColor: UXColor.label]
-            ]
-        } else {
-            attributes = [
-                .punctuation: [.foregroundColor: JSONColors.punctuation],
-                .key: [.foregroundColor: JSONColors.key],
-                .valueString: [.foregroundColor: JSONColors.valueString],
-                .valueOther: [.foregroundColor: JSONColors.valueOther],
-                .null: [.foregroundColor: JSONColors.null]
-            ]
-        }
     }
 
     func render() -> NSAttributedString {
-        guard string.length == 0 else {
-            assertionFailure("TextRendererJSON is a one-shot object")
-            return string
-        }
         print(json: json, isFree: true)
-        string.addAttributes(helper.attributes(role: .body2, style: .monospaced, color: nil))
-        return string
+
+        let output = NSMutableAttributedString(string: string, attributes: helper.attributes(role: .body2, style: .monospaced, color: color(for: .key)))
+        for (range, element) in elements {
+            output.addAttribute(.foregroundColor, value: color(for: element), range: range)
+        }
+        if let range = errorRange {
+            output.addAttributes(makeErrorAttributes(), range: range)
+        }
+        return output
+    }
+
+    private func color(for element: JSONElement) -> UXColor {
+        if options.color == .monochrome {
+            switch element {
+            case .punctuation: return UXColor.secondaryLabel
+            case .key: return UXColor.label
+            case .valueString: return UXColor.label
+            case .valueOther: return UXColor.label
+            case .null: return UXColor.label
+            }
+        } else {
+            switch element {
+            case .punctuation: return JSONColors.punctuation
+            case .key: return JSONColors.key
+            case .valueString: return JSONColors.valueString
+            case .valueOther: return JSONColors.valueOther
+            case .null: return JSONColors.null
+            }
+        }
     }
 
     // MARK: - Walk JSON
-
-    private let spaces = 2
 
     private func print(json: Any, isFree: Bool) {
         func _print(json: Any, key: NetworkLogger.DecodingError.CodingKey, isFree: Bool) {
             codingPath.append(key)
             print(json: json, isFree: isFree)
-            _ = codingPath.popLast()
+            codingPath.removeLast()
         }
 
         switch json {
@@ -74,24 +80,34 @@ final class TextRendererJSON {
             append("{", .punctuation)
             newline()
             let keys = object.keys.sorted()
-            for key in keys {
+            for index in keys.indices {
+                let key = keys[index]
                 indent()
                 append("\(String(repeating: " ", count: spaces))\"\(key)\"", .key)
                 append(": ", .punctuation)
                 indentation += 1
                 _print(json: object[key]!, key: .string(key), isFree: false)
                 indentation -= 1
-                if key != keys.last {
+                if index < keys.endIndex - 1 {
                     append(",", .punctuation)
                 }
                 newline()
             }
             indent()
             append("}", .punctuation)
-        case let object as String:
-            append("\"\(object)\"", .valueString)
+        case let string as String:
+            append("\"\(string)\"", .valueString)
         case let array as [Any]:
-            if array.contains(where: { $0 is [String: Any] }) {
+            if array is [String] || array is [Int] || array is [NSNumber] {
+                append("[", .punctuation)
+                for index in array.indices {
+                    _print(json: array[index], key: .int(index), isFree: true)
+                    if index < array.endIndex - 1 {
+                        append(", ", .punctuation)
+                    }
+                }
+                append("]", .punctuation)
+            } else {
                 append("[\n", .punctuation)
                 indentation += 1
                 for index in array.indices {
@@ -103,15 +119,6 @@ final class TextRendererJSON {
                 }
                 indentation -= 1
                 indent()
-                append("]", .punctuation)
-            } else {
-                append("[", .punctuation)
-                for index in array.indices {
-                    _print(json: array[index], key: .int(index), isFree: true)
-                    if index < array.endIndex - 1 {
-                        append(", ", .punctuation)
-                    }
-                }
                 append("]", .punctuation)
             }
         case let number as NSNumber:
@@ -133,31 +140,26 @@ final class TextRendererJSON {
 
     // MARK: - Modify String
 
+    private var previousElement: JSONElement?
+
     private func append(_ string: String, _ element: JSONElement) {
-        var error: NetworkLogger.DecodingError?
-        if codingPath == self.error?.context?.codingPath {
-            error = self.error
-            self.error = nil
+        let length = string.utf16.count
+        self.string += string
+
+        if element != .key { // Style for keys is the default one
+            if previousElement == element { // Coalesce the same elements
+                elements[elements.endIndex - 1].0.length += length
+            } else {
+                elements.append((NSRange(location: index, length: length), element))
+            }
+        }
+        previousElement = element
+
+        if let error = self.error, errorRange == nil, codingPath == error.context?.codingPath {
+            errorRange = NSRange(location: index, length: length)
         }
 
-        var attributes = self.attributes[element]!
-        if let error = error {
-            attributes[.backgroundColor] = options.color == .monochrome ? UXColor.label : UXColor.red
-            attributes[.foregroundColor] = UXColor.white
-            attributes[.decodingError] = error
-            attributes[.link] = {
-                var components = URLComponents()
-                components.scheme = "pulse"
-                components.path = "tooltip"
-                components.queryItems = [
-                    URLQueryItem(name: "title", value: "Decoding Error"),
-                    URLQueryItem(name: "message", value: error.debugDescription)
-                ]
-                return components.url
-            }()
-            attributes[.underlineColor] = UXColor.clear
-        }
-        self.string.append(string, attributes)
+        index += length
     }
 
     private func indent() {
@@ -165,7 +167,31 @@ final class TextRendererJSON {
     }
 
     private func newline() {
-        string.append("\n")
+        append("\n", .punctuation)
+    }
+
+    // MARK: Error
+
+    func makeErrorAttributes() -> [NSAttributedString.Key: Any] {
+        guard let error = error else {
+            return [:]
+        }
+        return [
+            .backgroundColor: options.color == .monochrome ? UXColor.label : UXColor.red,
+            .foregroundColor: UXColor.white,
+            .decodingError: error,
+            .link: {
+                var components = URLComponents()
+                components.scheme = "pulse"
+                components.path = "tooltip"
+                components.queryItems = [
+                    URLQueryItem(name: "title", value: "Decoding Error"),
+                    URLQueryItem(name: "message", value: error.debugDescription)
+                ]
+                return components.url as Any
+            }(),
+            .underlineColor: UXColor.clear
+        ]
     }
 }
 

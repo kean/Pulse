@@ -13,6 +13,7 @@ public struct ConsoleView: View {
     @StateObject private var viewModel: ConsoleViewModel
     @State private var shareItems: ShareItems?
     @State private var isShowingAsText = false
+    @State private var selectedShareOutput: ShareOutput?
 
     public init(store: LoggerStore = .shared) {
         self.init(viewModel: ConsoleViewModel(store: store))
@@ -33,11 +34,15 @@ public struct ConsoleView: View {
                     Button(action: $0) { Text("Close") }
                 },
                 trailing: HStack {
-                    Menu(content: {
-                        AttributedStringShareMenu(shareItems: $shareItems) {
-                            TextRenderer.share(viewModel.entities)
+                    if let _ = selectedShareOutput {
+                        ProgressView()
+                            .frame(width: 27, height: 27)
+                    } else {
+                        Menu(content: { shareMenu }) {
+                            Image(systemName: "square.and.arrow.up")
                         }
-                    }, label: { Image(systemName: "square.and.arrow.up") })
+                        .disabled(selectedShareOutput != nil)
+                    }
                     ConsoleContextMenu(store: viewModel.store, insights: viewModel.insightsViewModel, isShowingAsText: $isShowingAsText)
                 }
             )
@@ -49,6 +54,24 @@ public struct ConsoleView: View {
                     }
                 }
             }
+    }
+
+    @ViewBuilder
+    private var shareMenu: some View {
+        Button(action: { share(as: .plainText) }) {
+            Label("Share as Text", systemImage: "square.and.arrow.up")
+        }
+        Button(action: { share(as: .html) }) {
+            Label("Share as HTML", systemImage: "square.and.arrow.up")
+        }
+    }
+
+    private func share(as output: ShareOutput) {
+        selectedShareOutput = output
+        viewModel.prepareForSharing(as: output) { item in
+            selectedShareOutput = nil
+            shareItems = item
+        }
     }
 
     @ViewBuilder

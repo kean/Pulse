@@ -155,6 +155,12 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         table.entities = entities
 #endif
     }
+
+    // MARK: - Sharing
+
+    func prepareForSharing(as output: ShareOutput, _ completion: @escaping (ShareItems?) -> Void) {
+        ShareService.share(entities, store: store, as: output, completion)
+    }
 }
 
 private func makeFetchRequest(for mode: ConsoleViewModel.Mode) -> NSFetchRequest<NSManagedObject> {

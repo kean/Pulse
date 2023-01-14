@@ -30,31 +30,35 @@ final class TextRenderer {
 
     let helper: TextHelper
 
+    /// LoggerBlobHandleEntity.objectID: string
+    var renderedBodies: [NSManagedObjectID: NSAttributedString] = [:]
+    private let string = NSMutableAttributedString()
+
     init(options: Options = .init()) {
         self.options = options
         self.helper = TextHelper()
     }
 
-    func joined(_ strings: [NSAttributedString]) -> NSAttributedString {
-        let output = NSMutableAttributedString()
-        for (index, string) in strings.enumerated() {
-            output.append(string)
-            if index < strings.endIndex - 1 {
-                output.append(spacer())
-            }
-        }
-        return output
+    func make(_ render: (TextRenderer) -> Void) -> NSAttributedString {
+        render(self)
+        return make()
     }
 
-    func spacer() -> NSAttributedString {
+    func make() -> NSMutableAttributedString {
+        string
+    }
+
+    func addSpacer() {
+        string.append(spacer())
+    }
+
+    private func spacer() -> NSAttributedString {
         NSAttributedString(string: "\n", attributes: helper.spacerAttributes)
     }
 
-    func render(_ message: LoggerMessageEntity) -> NSAttributedString {
-        let text = NSMutableAttributedString()
-        text.append(ConsoleFormatter.subheadline(for: message) + "\n", helper.attributes(role: .subheadline, style: .monospacedDigital, width: .condensed, color: .secondaryLabel))
-        text.append(message.text + "\n", helper.attributes(role: .body2, color: textColor(for: message.logLevel)))
-        return text
+    func render(_ message: LoggerMessageEntity) {
+        string.append(ConsoleFormatter.subheadline(for: message) + "\n", helper.attributes(role: .subheadline, style: .monospacedDigital, width: .condensed, color: .secondaryLabel))
+        string.append(message.text + "\n", helper.attributes(role: .body2, color: textColor(for: message.logLevel)))
     }
 
     private func textColor(for level: LoggerStore.Level) -> UXColor {
@@ -65,34 +69,11 @@ final class TextRenderer {
         }
     }
 
-    func render(_ task: NetworkTaskEntity, content: NetworkContent) -> NSAttributedString {
-        var components: [NSAttributedString] = []
-
-        let isTitleColored = task.state == .failure && options.color != .monochrome
-        let titleColor = isTitleColored ? UXColor.systemRed : UXColor.secondaryLabel
-        let detailsColor = isTitleColored ? UXColor.systemRed : UXColor.label
-
+    func render(_ task: NetworkTaskEntity, content: NetworkContent) {
         if content.contains(.largeHeader) {
-            let header = NSMutableAttributedString()
-            let status = NetworkRequestStatusCellModel(task: task)
-            let method = task.httpMethod ?? "GET"
-            header.append(render(status.title + "\n", role: .title, weight: .semibold, color: UXColor(status.tintColor)))
-            header.append(self.spacer())
-            var urlAttributes = helper.attributes(role: .body2, weight: .regular)
-            urlAttributes[.underlineColor] = UXColor.clear
-            header.append(method + "\n", helper.attributes(role: .body, weight: .semibold))
-            header.append((task.url ?? "–") + "\n", urlAttributes)
-            components.append(header)
-        }
-
-        if content.contains(.header) {
-            let title = ConsoleFormatter.subheadline(for: task)
-            let header = NSMutableAttributedString()
-            header.append(title + "\n", helper.attributes(role: .subheadline, style: .monospacedDigital, width: .condensed, color: titleColor))
-            var urlAttributes = helper.attributes(role: .body2, weight: .medium, color: detailsColor)
-            urlAttributes[.underlineColor] = UXColor.clear
-            header.append((task.url ?? "–") + "\n", urlAttributes)
-            components.append(header)
+            renderLargeHeader(for: task)
+        } else if content.contains(.header) {
+            renderHeader(for: task)
         }
 
         if content.contains(.taskDetails) {
@@ -107,66 +88,94 @@ final class TextRenderer {
 
         func append(section: KeyValueSectionViewModel?, details: String? = nil) {
             guard let section = section else { return }
-            components.append(render(section, details: details))
+            string.append(render(section, details: details))
+            addSpacer()
         }
+
         if content.contains(.errorDetails) {
             append(section: .makeErrorDetails(for: task))
         }
+
         if content.contains(.requestComponents), let url = task.url.flatMap(URL.init) {
             append(section: .makeComponents(for: url))
         }
+
         if content.contains(.requestQueryItems), let url = task.url.flatMap(URL.init) {
             append(section: .makeQueryItems(for: url))
         }
+
         if content.contains(.requestOptions), let request = task.originalRequest {
             append(section: .makeParameters(for: request))
         }
-        if let originalRequest = task.originalRequest {
-            if content.contains(.originalRequestHeaders) && content.contains(.currentRequestHeaders), let currentRequest = task.currentRequest {
-                append(section: .makeHeaders(title: "Original Request Headers", headers: originalRequest.headers), count: true)
-                append(section: .makeHeaders(title: "Current Request Headers", headers: currentRequest.headers), count: true)
-            } else if content.contains(.originalRequestHeaders) {
-                append(section: .makeHeaders(title: "Request Headers", headers: originalRequest.headers), count: true)
-            } else if content.contains(.currentRequestHeaders), let currentRequest = task.currentRequest {
-                append(section: .makeHeaders(title: "Request Headers", headers: currentRequest.headers), count: true)
-            }
-            if content.contains(.requestBody) {
-                let section = NSMutableAttributedString()
-                let details = ByteCountFormatter.string(fromBodySize: task.requestBodySize).map { " (\($0))" } ?? ""
-                section.append(render(subheadline: "Request Body" + details))
-                section.append(renderRequestBody(for: task))
-                section.append("\n")
-                components.append(section)
-            }
+
+        if content.contains(.originalRequestHeaders) && content.contains(.currentRequestHeaders),
+           let originalRequest = task.originalRequest, let currentRequest = task.currentRequest {
+            append(section: .makeHeaders(title: "Original Request Headers", headers: originalRequest.headers), count: true)
+            append(section: .makeHeaders(title: "Current Request Headers", headers: currentRequest.headers), count: true)
+        } else if content.contains(.originalRequestHeaders), let originalRequest = task.originalRequest {
+            append(section: .makeHeaders(title: "Request Headers", headers: originalRequest.headers), count: true)
+        } else if content.contains(.currentRequestHeaders), let currentRequest = task.currentRequest {
+            append(section: .makeHeaders(title: "Request Headers", headers: currentRequest.headers), count: true)
         }
+
+        if content.contains(.requestBody) {
+            let details = ByteCountFormatter.string(fromBodySize: task.requestBodySize).map { " (\($0))" } ?? ""
+            string.append(render(subheadline: "Request Body" + details))
+            string.append(renderRequestBody(for: task))
+            string.append("\n")
+            addSpacer()
+        }
+
         if content.contains(.responseHeaders), let response = task.response {
             append(section: .makeHeaders(title: "Response Headers", headers: response.headers), count: true)
         }
+
         if content.contains(.responseBody) {
-            let section = NSMutableAttributedString()
             let details = ByteCountFormatter.string(fromBodySize: task.responseBodySize).map { " (\($0))" } ?? ""
-            section.append(render(subheadline: "Response Body" + details))
-            section.append(renderResponseBody(for: task))
-            section.append("\n")
-            components.append(section)
+            string.append(render(subheadline: "Response Body" + details))
+            string.append(renderResponseBody(for: task))
+            string.append("\n")
+            addSpacer()
         }
-        return joined(components)
+
+        string.deleteCharacters(in: NSRange(location: string.length - 1, length: 1))
     }
 
-    func render(_ transaction: NetworkTransactionMetricsEntity) -> NSAttributedString {
-        var components: [NSAttributedString] = []
+    private func renderLargeHeader(for task: NetworkTaskEntity) {
+        let status =  NetworkRequestStatusCellModel(task: task)
 
+        string.append(render(status.title + "\n", role: .title, weight: .semibold, color: UXColor(status.tintColor)))
+        string.append(self.spacer())
+        var urlAttributes = helper.attributes(role: .body2, weight: .regular)
+        urlAttributes[.underlineColor] = UXColor.clear
+        string.append((task.httpMethod ?? "GET") + "\n", helper.attributes(role: .body, weight: .semibold))
+        string.append((task.url ?? "–") + "\n", urlAttributes)
+        addSpacer()
+    }
+
+    private func renderHeader(for task: NetworkTaskEntity) {
+        let isTitleColored = task.state == .failure && options.color != .monochrome
+        let titleColor = isTitleColored ? UXColor.systemRed : UXColor.secondaryLabel
+        let detailsColor = isTitleColored ? UXColor.systemRed : UXColor.label
+        let title = ConsoleFormatter.subheadline(for: task)
+        string.append(title + "\n", helper.attributes(role: .subheadline, style: .monospacedDigital, width: .condensed, color: titleColor))
+        var urlAttributes = helper.attributes(role: .body2, weight: .medium, color: detailsColor)
+        urlAttributes[.underlineColor] = UXColor.clear
+        string.append((task.url ?? "–") + "\n", urlAttributes)
+        addSpacer()
+    }
+
+    func render(_ transaction: NetworkTransactionMetricsEntity) {
         do {
-            let header = NSMutableAttributedString()
             let status = NetworkRequestStatusCellModel(transaction: transaction)
             let method = transaction.request.httpMethod ?? "GET"
-            header.append(render(status.title + "\n", role: .title, weight: .semibold, color: UXColor(status.tintColor)))
-            header.append(self.spacer())
+            string.append(render(status.title + "\n", role: .title, weight: .semibold, color: UXColor(status.tintColor)))
+            string.append(self.spacer())
             var urlAttributes = helper.attributes(role: .body2, weight: .regular)
             urlAttributes[.underlineColor] = UXColor.clear
-            header.append(method + "\n", helper.attributes(role: .body, weight: .semibold))
-            header.append((transaction.request.url ?? "–") + "\n", urlAttributes)
-            components.append(header)
+            string.append(method + "\n", helper.attributes(role: .body, weight: .semibold))
+            string.append((transaction.request.url ?? "–") + "\n", urlAttributes)
+            string.append(spacer())
         }
 
         func append(section: KeyValueSectionViewModel?, count: Bool) {
@@ -176,7 +185,8 @@ final class TextRenderer {
         }
         func append(section: KeyValueSectionViewModel?, details: String? = nil) {
             guard let section = section else { return }
-            components.append(render(section, details: details))
+            string.append(render(section, details: details))
+            addSpacer()
         }
         if let url = URL(string: transaction.request.url ?? "–") {
             append(section: .makeComponents(for: url))
@@ -185,16 +195,20 @@ final class TextRenderer {
         if let response = transaction.response {
             append(section: .makeHeaders(title: "Response Headers", headers: response.headers), count: true)
         }
-        return joined(components)
+
+        string.deleteCharacters(in: NSRange(location: string.length - 1, length: 1))
     }
 
     func render(subheadline: String) -> NSAttributedString {
         render(subheadline + "\n", role: .subheadline, color: .secondaryLabel)
     }
 
-    func renderRequestBody(for task: NetworkTaskEntity) -> NSAttributedString {
-        if let data = task.requestBody?.data, !data.isEmpty {
-            return render(data, contentType: task.originalRequest?.contentType, error: nil)
+    private func renderRequestBody(for task: NetworkTaskEntity) -> NSAttributedString {
+        if let body = task.requestBody, let string = renderedBodies[body.objectID] {
+            return string
+        }
+        if let blob = task.requestBody, let data = blob.data, !data.isEmpty {
+            return render(blob, data, contentType: blob.contentType, error: nil)
         } else if task.type == .uploadTask, task.requestBodySize > 0 {
             return _render(dataSize: task.requestBodySize, contentType: task.originalRequest?.contentType)
         } else {
@@ -202,9 +216,12 @@ final class TextRenderer {
         }
     }
 
-    func renderResponseBody(for task: NetworkTaskEntity) -> NSAttributedString {
-        if let data = task.responseBody?.data, !data.isEmpty {
-            return render(data, contentType: task.response?.contentType, error: task.decodingError)
+    private func renderResponseBody(for task: NetworkTaskEntity) -> NSAttributedString {
+        if let body = task.responseBody, let string = renderedBodies[body.objectID] {
+            return string
+        }
+        if let blob = task.responseBody, let data = blob.data, !data.isEmpty {
+            return render(blob, data, contentType: blob.contentType, error: task.decodingError)
         } else if task.type == .downloadTask, task.responseBodySize > 0 {
             return _render(dataSize: task.responseBodySize, contentType: task.response?.contentType)
         } else {
@@ -214,6 +231,12 @@ final class TextRenderer {
 
     func render(json: Any, error: NetworkLogger.DecodingError? = nil) -> NSAttributedString {
         TextRendererJSON(json: json, error: error, options: options).render()
+    }
+
+    func render(_ blob: LoggerBlobHandleEntity, _ data: Data, contentType: NetworkLogger.ContentType?, error: NetworkLogger.DecodingError?) -> NSAttributedString {
+        let string = render(data, contentType: contentType, error: error)
+        renderedBodies[blob.objectID] = string
+        return string
     }
 
     func render(_ data: Data, contentType: NetworkLogger.ContentType?, error: NetworkLogger.DecodingError?) -> NSAttributedString {
@@ -250,41 +273,70 @@ final class TextRenderer {
         return KeyValueSectionViewModel.makeQueryItems(for: queryItems)
     }
 
+    func render(_ sections: [KeyValueSectionViewModel]) {
+        for (index, section) in sections.enumerated() {
+            string.append(render(section))
+            if index != sections.endIndex - 1 {
+                addSpacer()
+            }
+        }
+    }
+
     func render(_ section: KeyValueSectionViewModel, details: String? = nil, style: TextFontStyle = .monospaced) -> NSAttributedString {
-        let string = NSMutableAttributedString()
         let details = details.map { "(\($0))" }
         let title = [section.title, details].compactMap { $0 }.joined(separator: " ")
-        string.append(render(subheadline: title))
+        let string = NSMutableAttributedString(string: title + "\n", attributes: helper.attributes(role: .subheadline, color: .secondaryLabel))
         string.append(render(section.items, color: section.color, style: style))
         return string
     }
 
     func render(_ values: [(String, String?)]?, color: Color, style: TextFontStyle = .monospaced) -> NSAttributedString {
-        let string = NSMutableAttributedString()
         guard let values = values, !values.isEmpty else {
-            string.append("–\n", helper.attributes(role: .body2, style: style))
-            return string
+            return NSAttributedString(string: "–\n", attributes: helper.attributes(role: .body2, style: style))
         }
-        let keyColor: UXColor = options.color == .full ? UXColor(color) : .label
-        let keyWeight: UXFont.Weight = options.color == .full ? .medium : .semibold
-        let keyAttributes = helper.attributes(role: .body2, style: style, weight: keyWeight, color: keyColor)
 
-        let valueAttributes = helper.attributes(role: .body2, style: style)
-        let separatorAttributes = helper.attributes(role: .body2, style: style, color: .secondaryLabel)
-        for (key, value) in values {
-            string.append(key, keyAttributes)
-#if os(watchOS)
-            string.append(":\n", separatorAttributes)
-#else
-            string.append(": ", separatorAttributes)
-#endif
-            string.append("\(value ?? "–")\n", valueAttributes)
+        var index = 0
+        var keys: [NSRange] = []
+        var separators: [NSRange] = []
+        var string = ""
+
+        @discardableResult func append(_ value: String) -> NSRange {
+            let length = value.utf16.count
+            let range = NSRange(location: index, length: length)
+            index += length
+            string.append(value)
+            return range
         }
-        return string
+
+        for (key, value) in values {
+            keys.append(append(key))
+#if os(watchOS)
+            separators.append(append(":\n"))
+#else
+            separators.append(append(": "))
+#endif
+            append("\(value ?? "–")\n")
+        }
+        let output = NSMutableAttributedString(string: string, attributes: helper.attributes(role: .body2, style: style))
+        let keyFont = helper.font(style: .init(role: .body2, style: style, weight: options.color == .full ? .medium : .semibold))
+        for range in keys {
+            output.addAttribute(.font, value: keyFont, range: range)
+            if options.color == .full {
+                output.addAttribute(.foregroundColor, value: UXColor(color), range: range)
+            }
+        }
+        for range in separators {
+            output.addAttribute(.foregroundColor, value: UXColor.secondaryLabel, range: range)
+        }
+        return output
     }
 
     func preformatted(_ string: String, color: UXColor? = nil) -> NSAttributedString {
         render(string, role: .body2, style: .monospaced, color: color ?? .label)
+    }
+
+    func append(_ string: NSAttributedString) {
+        self.string.append(string)
     }
 
     func render(
@@ -298,32 +350,7 @@ final class TextRenderer {
         let attributes = helper.attributes(role: role, style: style, weight: weight, width: width, color: color)
         return NSAttributedString(string: string, attributes: attributes)
     }
-
-    // MARK: Sharing
-
-    static func share(_ entities: [NSManagedObject]) -> NSAttributedString {
-        let renderer = TextRenderer(options: .sharing)
-        var content = NetworkContent.sharing
-        if entities.count > 1 {
-            content.remove(.largeHeader)
-            content.insert(.header)
-        }
-        return renderer.joined(entities.map {
-            if let task = $0 as? NetworkTaskEntity {
-                return renderer.render(task, content: content)
-            } else if let message = $0 as? LoggerMessageEntity {
-                if let task = message.task {
-                    return renderer.render(task, content: content)
-                } else {
-                    return renderer.render(message)
-                }
-            } else {
-                fatalError("Unsuppported entity: \($0)")
-            }
-        })
-    }
 }
-
 
 extension NSAttributedString.Key {
     static let objectIdKey = NSAttributedString.Key("pulse-object-id-key")
@@ -336,14 +363,14 @@ extension NSAttributedString.Key {
 struct ConsoleTextRenderer_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            let string = TextRenderer(options: .sharing).render(task, content: .sharing)
-            let stringWithColor = TextRenderer(options: .init(color: .full)).render(task, content: .all)
-            let html = try! TextUtilities.html(from: TextRenderer(options: .sharing).render(task, content: .sharing))
+            let string = TextRenderer(options: .sharing).make { $0.render(task, content: .sharing) }
+            let stringWithColor = TextRenderer(options: .init(color: .full)).make { $0.render(task, content: .all) }
+            let html = try! TextUtilities.html(from: TextRenderer(options: .sharing).make { $0.render(task, content: .sharing) })
 
             RichTextView(viewModel: .init(string: string))
                 .previewDisplayName("Task")
 
-            RichTextView(viewModel: .init(string: TextRenderer(options: .sharing).render(task, content: .sharing)))
+            RichTextView(viewModel: .init(string: TextRenderer(options: .sharing).make { $0.render(task, content: .sharing) }))
                 .previewDisplayName("Task (Share)")
 
             RichTextView(viewModel: .init(string: stringWithColor))
@@ -352,7 +379,7 @@ struct ConsoleTextRenderer_Previews: PreviewProvider {
             RichTextView(viewModel: .init(string: string.string))
                 .previewDisplayName("Task (Plain)")
 
-            RichTextView(viewModel: .init(string: TextRenderer(options: .sharing).render(task.orderedTransactions[0])))
+            RichTextView(viewModel: .init(string: TextRenderer(options: .sharing).make { $0.render(task.orderedTransactions[0]) } ))
                 .previewDisplayName("Transaction")
 
             RichTextView(viewModel: .init(string: TextRendererHTML(html: String(data: html, encoding: .utf8)!).render()))
@@ -401,4 +428,27 @@ struct NetworkContent: OptionSet {
     static let all: NetworkContent = [
         largeHeader, taskDetails, errorDetails, requestComponents, requestQueryItems, errorDetails, originalRequestHeaders, currentRequestHeaders, requestOptions, requestBody, responseHeaders, responseBody
     ]
+}
+
+/// Uncomment to run performance tests in the release mode.
+public enum TextRendererTests {
+    public static func share(_ entities: [NSManagedObject], store: LoggerStore, _ completion: @escaping () -> Void) {
+        ShareStoreTask(entities: entities, store: store, output: .plainText) { _ in
+            completion()
+        }.start()
+    }
+
+    public static func plainText(from string: NSAttributedString) -> String {
+        TextUtilities.plainText(from: string)
+    }
+
+    public static func html(from string: NSAttributedString) throws -> Data {
+        try TextUtilities.html(from: string)
+    }
+
+#if os(iOS)
+    public static func pdf(from string: NSAttributedString) throws -> Data {
+        try TextUtilities.pdf(from: string)
+    }
+#endif
 }

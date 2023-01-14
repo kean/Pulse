@@ -9,37 +9,53 @@ import PDFKit
 #endif
 
 enum TextUtilities {
+    static func plainText(from string: NSAttributedString) -> String {
+        string.string
+    }
+
     static func html(from string: NSAttributedString) throws -> Data {
         let range = NSRange(location: 0, length: string.length)
         let data = try string.data(from: range, documentAttributes: [
             .documentType: NSAttributedString.DocumentType.html
         ])
-        guard var html = String(data: data, encoding: .utf8) else {
+        guard let html = NSMutableString(data: data, encoding: NSUTF8StringEncoding) else {
             return data
         }
-        func insert(_ string: String, at index: String.Index) {
-            html.insert(contentsOf: "\n\(string)", at: index)
+        func getRange(of string: String) -> NSRange? {
+            let range = html.range(of: string)
+            return range.location == NSNotFound ? nil : range
         }
 
-        // TODO: Use JavaScriptCore and DOM to perform these manipulations
+        func insert(_ string: String, at index: Int) {
+            html.insert("\n\(string)", at: index)
+        }
 
-        if let range = html.firstRange(of: "<head>") {
+        if let range = getRange(of: "<head>") {
             insert(#"<meta name="viewport" content="width=device-width, initial-scale=1">"#, at: range.upperBound)
             insert(#"<meta name="generator" content="Pulse">"#, at: range.upperBound)
         }
-        if let range = html.firstRange(of: "<style type=\"text/css\">") {
+        if let range = getRange(of: "<style type=\"text/css\">") {
             insert(#"span { line-height: 1.4; }"#, at: range.upperBound)
             insert(#"body { word-wrap: break-word;  padding: 8px; }"#, at: range.upperBound)
         }
-        let regular = #"font-family: 'SF Pro Text', -apple-system, sans-serif"#
-        let mono = #"font-family: 'SF Mono', SFMono-Regular, ui-monospace, Menlo, monospace;"#
-        html = html.replacingOccurrences(of: #"font-family: '.SFUI-Regular'"#, with: regular)
-        html = html.replacingOccurrences(of: #"font-family: '.SFUI-Medium'"#, with: regular)
-        html = html.replacingOccurrences(of: #"font-family: '.SFUI-Semibold'"#, with: regular)
-        html = html.replacingOccurrences(of: #"font-family: '.AppleSystemUIFontMonospaced-Regular'"#, with: mono)
-        html = html.replacingOccurrences(of: #"font-family: '.AppleSystemUIFontMonospaced-Semibold'"#, with: mono)
-        html = html.replacingOccurrences(of: #"font-family: '.AppleSystemUIFontMonospaced-Medium'"#, with: mono)
-        return html.data(using: .utf8) ?? data
+
+        if let range = getRange(of: "</style>") {
+            let regular = #"font-family: 'SF Pro Text', -apple-system, sans-serif"#
+            let mono = #"font-family: 'SF Mono', SFMono-Regular, ui-monospace, Menlo, monospace;"#
+            do {
+                let regex = try NSRegularExpression(pattern: "font-family: '.SFUI-\\w*'", options: [])
+                regex.replaceMatches(in: html, range: NSRange(location: 0, length: range.upperBound), withTemplate: regular)
+            } catch {
+                // Should never happen
+            }
+            do {
+                let regex = try NSRegularExpression(pattern: "font-family: '.AppleSystemUIFontMonospaced-\\w*'", options: [])
+                regex.replaceMatches(in: html, range: NSRange(location: 0, length: range.upperBound), withTemplate: mono)
+            } catch {
+                // Should never happen
+            }
+        }
+        return html.data(using: NSUTF8StringEncoding) ?? data
     }
 
     /// Renders the given attributed string as PDF

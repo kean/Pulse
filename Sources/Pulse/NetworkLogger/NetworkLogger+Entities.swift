@@ -48,7 +48,6 @@ extension NetworkLogger {
             self.rawCachePolicy = urlRequest.cachePolicy.rawValue
             self.timeout = urlRequest.timeoutInterval
             self.options = Options(urlRequest)
-
         }
     }
 

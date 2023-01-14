@@ -11,9 +11,9 @@ enum ShareStoreOutput: String, RawRepresentable {
 
     var fileExtension: String {
         switch self {
-        case .store: return ".pulse"
-        case .text: return ".txt"
-        case .html: return ".html"
+        case .store: return "pulse"
+        case .text: return "txt"
+        case .html: return "html"
         }
     }
 }
@@ -21,39 +21,50 @@ enum ShareStoreOutput: String, RawRepresentable {
 struct ShareItems: Identifiable {
     let id = UUID()
     let items: [Any]
+    let size: Int64?
     let cleanup: () -> Void
 
-    init(_ items: [Any], cleanup: @escaping () -> Void = { }) {
+    init(_ items: [Any], size: Int64? = nil, cleanup: @escaping () -> Void = { }) {
         self.items = items
+        self.size = size
         self.cleanup = cleanup
     }
 }
 
 enum ShareService {
+    private static var task: ShareStoreTask?
+
+    static func share(_ entities: [NSManagedObject], store: LoggerStore, as output: ShareOutput, _ completion: @escaping (ShareItems?) -> Void) {
+        ShareStoreTask(entities: entities, store: store, output: output, completion: completion).start()
+    }
+
     static func share(_ message: LoggerMessageEntity, as output: ShareOutput) -> ShareItems {
-        share(TextRenderer.share([message]), as: output)
+        let string = TextRenderer(options: .sharing).make { $0.render(message) }
+        return share(string, as: output)
     }
 
     static func share(_ task: NetworkTaskEntity, as output: ShareOutput) -> ShareItems {
-        share(TextRenderer.share([task]), as: output)
+        let string = TextRenderer(options: .sharing).make { $0.render(task, content: .sharing) }
+        return share(string, as: output)
     }
 
     static func share(_ string: NSAttributedString, as output: ShareOutput) -> ShareItems {
         let string = sanitized(string)
         switch output {
         case .plainText:
-            return ShareItems([string.string])
+            let string = TextUtilities.plainText(from: string)
+            return ShareItems([string])
         case .html:
             let html = (try? TextUtilities.html(from: string)) ?? Data()
             let directory = TemporaryDirectory()
             let fileURL = directory.write(data: html, extension: "html")
-            return ShareItems([fileURL], cleanup: directory.remove)
+            return ShareItems([fileURL], size: Int64(html.count), cleanup: directory.remove)
         case .pdf:
 #if os(iOS)
             let pdf = (try? TextUtilities.pdf(from: string)) ?? Data()
             let directory = TemporaryDirectory()
             let fileURL = directory.write(data: pdf, extension: "pdf")
-            return ShareItems([fileURL], cleanup: directory.remove)
+            return ShareItems([fileURL], size: Int64(pdf.count), cleanup: directory.remove)
 #else
             return ShareItems(["Sharing as PDF is not supported on this platform"])
 #endif
@@ -79,6 +90,14 @@ enum ShareOutput {
     case plainText
     case html
     case pdf
+
+    var title: String {
+        switch self {
+        case .plainText: return "Text"
+        case .html: return "HTML"
+        case .pdf: return "PDF"
+        }
+    }
 }
 
 struct TemporaryDirectory {
