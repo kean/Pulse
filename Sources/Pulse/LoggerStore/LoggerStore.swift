@@ -340,10 +340,10 @@ extension LoggerStore {
 
         if let requestBody = event.requestBody {
             let requestContentType = event.originalRequest.contentType
-            entity.requestBody = storeBlob(preprocessData(requestBody, contentType: requestContentType))
+            entity.requestBody = storeBlob(requestBody, contentType: requestContentType)
         }
         if let responseData = event.responseBody {
-            entity.responseBody = storeBlob(preprocessData(responseData, contentType: responseContentType))
+            entity.responseBody = storeBlob(responseData, contentType: responseContentType)
         }
 
         switch event.taskType {
@@ -554,7 +554,9 @@ extension LoggerStore {
 
     // MARK: - Managing Blobs
 
-    private func storeBlob(_ data: Data) -> LoggerBlobHandleEntity? {
+    private func storeBlob(_ data: Data, contentType: NetworkLogger.ContentType?) -> LoggerBlobHandleEntity? {
+        let data = preprocessData(data, contentType: contentType)
+
         guard !data.isEmpty else {
             return nil // Sanity check
         }
@@ -574,6 +576,7 @@ extension LoggerStore {
         let entity = LoggerBlobHandleEntity(context: backgroundContext)
         entity.key = key
         entity.linkCount = 1
+        entity.rawContentType = contentType?.rawValue
         // It's safe to use Int32 because we prevent larger values from being stored
         entity.size = Int32(compressedData.count)
         entity.decompressedSize = Int32(data.count)

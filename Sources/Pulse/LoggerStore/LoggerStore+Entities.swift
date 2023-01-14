@@ -280,6 +280,13 @@ public final class LoggerBlobHandleEntity: NSManagedObject {
     /// A decompressed blob size.
     @NSManaged public var decompressedSize: Int32
 
+    @NSManaged var rawContentType: String?
+
+    /// A blob content type.
+    public var contentType: NetworkLogger.ContentType? {
+        rawContentType.flatMap(NetworkLogger.ContentType.init)
+    }
+
     /// A number of requests referencing it.
     @NSManaged var linkCount: Int16
 
