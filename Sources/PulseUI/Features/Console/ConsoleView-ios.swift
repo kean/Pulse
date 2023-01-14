@@ -64,11 +64,6 @@ public struct ConsoleView: View {
         Button(action: { share(as: .html) }) {
             Label("Share as HTML", systemImage: "square.and.arrow.up")
         }
-#if os(iOS)
-        Button(action: { share(as: .pdf) }) {
-            Label("Share as PDF", systemImage: "square.and.arrow.up")
-        }
-#endif
     }
 
     private func share(as output: ShareOutput) {
