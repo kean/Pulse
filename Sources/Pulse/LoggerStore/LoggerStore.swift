@@ -600,11 +600,12 @@ extension LoggerStore {
     }
 
     func getDecompressedData(for entity: LoggerBlobHandleEntity) -> Data? {
-        getRawData(for: entity).flatMap(decompress)
+        getDecompressedData(for: entity.inlineData, key: entity.key)
     }
 
-    private func getRawData(for entity: LoggerBlobHandleEntity) -> Data? {
-        entity.inlineData ?? getRawData(forKey: entity.key.hexString)
+    func getDecompressedData(for inlineData: Data?, key: Data) -> Data? {
+        guard let data = inlineData ?? getRawData(forKey: key.hexString) else { return nil }
+        return decompress(data)
     }
 
     /// Returns blob data for the given key.

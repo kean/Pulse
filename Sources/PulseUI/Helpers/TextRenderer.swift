@@ -362,15 +362,27 @@ final class TextRenderer {
     func prerenderResponseBodies(for entities: [NSManagedObject]) {
         struct RenderBodyJob {
             let objectID: NSManagedObjectID
-            let data: Data
             let contentType: NetworkLogger.ContentType?
             let error: NetworkLogger.DecodingError?
+            let data: () -> Data?
         }
 
         var jobs: [RenderBodyJob] = []
+        var store: LoggerStore?
         for entity in entities {
-            if let task = getTask(for: entity), task.responseBodySize > 0, let data = task.responseBody?.data {
-                jobs.append(RenderBodyJob(objectID: task.objectID, data: data, contentType: task.response?.contentType, error: task.decodingError))
+            if let task = getTask(for: entity), task.responseBodySize > 0, let blob = task.responseBody {
+                if store == nil {
+                    store = blob.store
+                }
+                guard let store = store else {
+                    continue // Should never happen
+                }
+                jobs.append(RenderBodyJob(
+                    objectID: task.objectID,
+                    contentType: task.response?.contentType,
+                    error: task.decodingError,
+                    data: LoggerBlobHandleEntity.getData(for: blob, store: store)
+                ))
             }
         }
         let indices = jobs.indices
@@ -384,7 +396,8 @@ final class TextRenderer {
 
             for index in start..<end {
                 let job = jobs[index]
-                let string = TextRenderer(options: .sharing).render(job.data, contentType: job.contentType, error: job.error)
+                guard let data = job.data() else { continue }
+                let string = TextRenderer(options: .sharing).render(data, contentType: job.contentType, error: job.error)
                 lock.lock()
                 self.responseBodies[job.objectID] = string
                 lock.unlock()

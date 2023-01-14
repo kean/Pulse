@@ -308,4 +308,24 @@ public final class LoggerBlobHandleEntity: NSManagedObject {
         }
         return store.store?.getDecompressedData(for: self)
     }
+
+    /// Returns store associated with the given entity.
+    ///
+    /// - warning: This property will be `nil` if you are fetching entities
+    /// directly using Core Data.
+    public var store: LoggerStore? {
+        (managedObjectContext?.userInfo[WeakLoggerStore.loggerStoreKey] as? WeakLoggerStore)?.store
+    }
+
+    /// Returns a closure to fetch the entitie's data that can be executed
+    /// on any thread.
+    ///
+    /// - warning: Not meant to be used publically.
+    public static func getData(for entity: LoggerBlobHandleEntity, store: LoggerStore) -> () -> Data? {
+        let inlineData = entity.inlineData
+        let key = entity.key
+        return {
+            store.getDecompressedData(for: inlineData, key: key)
+        }
+    }
 }
