@@ -37,7 +37,7 @@ final class TextRendererJSON {
         print(json: json, isFree: true)
 
         let output = NSMutableAttributedString(string: string, attributes: helper.attributes(role: .body2, style: .monospaced, color: color(for: .key)))
-        for (range, element) in elements where element != .key {
+        for (range, element) in elements {
             output.addAttribute(.foregroundColor, value: color(for: element), range: range)
         }
         if let range = errorRange {
@@ -150,16 +150,20 @@ final class TextRendererJSON {
     private func append(_ string: String, _ element: JSONElement) {
         let length = string.utf16.count
         self.string += string
-        if previousElement == element { // Coalesce the same elements
-            elements[elements.endIndex - 1].0.length += length
-        } else {
-            elements.append((NSRange(location: index, length: length), element))
+
+        if element != .key { // Style for keys is the default one
+            if previousElement == element { // Coalesce the same elements
+                elements[elements.endIndex - 1].0.length += length
+            } else {
+                elements.append((NSRange(location: index, length: length), element))
+            }
+            previousElement = element
         }
-        previousElement = element
 
         if let error = self.error, errorRange == nil, codingPath == error.context?.codingPath {
             errorRange = NSRange(location: index, length: length)
         }
+
         index += length
     }
 
