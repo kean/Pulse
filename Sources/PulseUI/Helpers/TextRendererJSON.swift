@@ -22,6 +22,7 @@ final class TextRendererJSON {
     private var index = 0
     private var codingPath: [NetworkLogger.DecodingError.CodingKey] = []
     private var elements: [(NSRange, JSONElement)] = []
+    private var errorRange: NSRange?
     private var string = ""
 
     init(json: Any, error: NetworkLogger.DecodingError? = nil, options: TextRenderer.Options = .init()) {
@@ -38,6 +39,9 @@ final class TextRendererJSON {
         output.beginEditing()
         for (range, element) in elements {
             output.addAttribute(.foregroundColor, value: color(for: element), range: range)
+        }
+        if let range = errorRange {
+            output.addAttributes(makeErrorAttributes(), range: range)
         }
         return output
     }
@@ -151,33 +155,11 @@ final class TextRendererJSON {
             elements.append((NSRange(location: index, length: length), element))
         }
         previousElement = element
-        index += length
 
-        #warning("TODO: reimplement")
-//        var error: NetworkLogger.DecodingError?
-//        if codingPath == self.error?.context?.codingPath {
-//            error = self.error
-//            self.error = nil
-//        }
-//
-//        var attributes = self.attributes[element]!
-//        if let error = error {
-//            attributes[.backgroundColor] = options.color == .monochrome ? UXColor.label : UXColor.red
-//            attributes[.foregroundColor] = UXColor.white
-//            attributes[.decodingError] = error
-//            attributes[.link] = {
-//                var components = URLComponents()
-//                components.scheme = "pulse"
-//                components.path = "tooltip"
-//                components.queryItems = [
-//                    URLQueryItem(name: "title", value: "Decoding Error"),
-//                    URLQueryItem(name: "message", value: error.debugDescription)
-//                ]
-//                return components.url
-//            }()
-//            attributes[.underlineColor] = UXColor.clear
-//        }
-//        self.string.append(string, attributes)
+        if let error = self.error, errorRange == nil, codingPath == error.context?.codingPath {
+            errorRange = NSRange(location: index, length: length)
+        }
+        index += length
     }
 
     private func indent() {
@@ -186,6 +168,30 @@ final class TextRendererJSON {
 
     private func newline() {
         append("\n", .punctuation)
+    }
+
+    // MARK: Error
+
+    func makeErrorAttributes() -> [NSAttributedString.Key: Any] {
+        guard let error = error else {
+            return [:]
+        }
+        return [
+            .backgroundColor: options.color == .monochrome ? UXColor.label : UXColor.red,
+            .foregroundColor: UXColor.white,
+            .decodingError: error,
+            .link: {
+                var components = URLComponents()
+                components.scheme = "pulse"
+                components.path = "tooltip"
+                components.queryItems = [
+                    URLQueryItem(name: "title", value: "Decoding Error"),
+                    URLQueryItem(name: "message", value: error.debugDescription)
+                ]
+                return components.url as Any
+            }(),
+            .underlineColor: UXColor.clear
+        ]
     }
 }
 
