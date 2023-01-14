@@ -53,7 +53,7 @@ enum ShareService {
         switch output {
         case .plainText:
             let string = TextUtilities.plainText(from: string)
-            return ShareItems([string], size: Int64(string.count)) // Approximate size
+            return ShareItems([string])
         case .html:
             let html = (try? TextUtilities.html(from: string)) ?? Data()
             let directory = TemporaryDirectory()
