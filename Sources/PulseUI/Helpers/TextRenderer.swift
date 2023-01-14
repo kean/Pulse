@@ -372,32 +372,32 @@ final class TextRenderer {
 
         var jobs: [NSManagedObjectID: RenderBodyJob] = [:]
         var store: LoggerStore?
+
+        func enqueueJob(for blob: LoggerBlobHandleEntity, error: NetworkLogger.DecodingError?) {
+            if store == nil { store = blob.store }
+            guard let store = store else { return } // Should never happen
+            jobs[blob.objectID] = RenderBodyJob(
+                data: LoggerBlobHandleEntity.getData(for: blob, store: store),
+                contentType: blob.contentType,
+                error: error
+            )
+        }
+
         for entity in entities {
             guard let task = getTask(for: entity) else { continue }
             if let blob = task.responseBody, jobs[blob.objectID] == nil {
-                if store == nil { store = blob.store }
-                guard let store = store else { continue } // Should never happen
-                jobs[blob.objectID] = RenderBodyJob(
-                    data: LoggerBlobHandleEntity.getData(for: blob, store: store),
-                    contentType: task.response?.contentType,
-                    error: task.decodingError
-                )
+                enqueueJob(for: blob, error: task.decodingError)
             }
             if let blob = task.requestBody, jobs[blob.objectID] == nil {
-                if store == nil { store = blob.store }
-                guard let store = store else { continue } // Should never happen
-                jobs[blob.objectID] = RenderBodyJob(
-                    data: LoggerBlobHandleEntity.getData(for: blob, store: store),
-                    contentType: task.originalRequest?.contentType,
-                    error: nil
-                )
+                enqueueJob(for: blob, error: nil)
             }
         }
+
         let queue = Array(jobs)
         let indices = queue.indices
         // "To get the maximum benefit of this function, configure the number of
         // iterations to be at least three times the number of available cores."
-        let iterations = indices.count >= 32 ? 32 : 1
+        let iterations = indices.count >= 32 ? 32 : (indices.count >= 8 ? 8 : 1)
         let lock = NSLock()
         DispatchQueue.concurrentPerform(iterations: iterations) { index in
             let start = index * indices.count / iterations
