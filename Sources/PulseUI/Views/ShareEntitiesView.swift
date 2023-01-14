@@ -31,11 +31,6 @@ struct ShareEntitiesView: View {
                     .opacity(viewModel.isProcessing ? 0 : 1)
             }
             Text(viewModel.title)
-            if let progress = viewModel.progress {
-                Text(progress)
-                    .backport.monospacedDigit()
-                    .foregroundColor(.secondary)
-            }
             Spacer()
             if viewModel.isProcessing {
                 Button("Cancel") {
@@ -58,18 +53,22 @@ private final class ShareEntitiesViewModel: ObservableObject {
     // TODO: use as binding
     @Published var shareItem: ShareItems?
 
+    private var isStarted = false
     private var task: ShareStoreTask?
     private var cancellables: [AnyCancellable] = []
 
     init() {}
 
     func prepare(entities: [NSManagedObject], store: LoggerStore, output: ShareOutput, completion: @escaping (ShareItems?) -> Void) {
+        guard !isStarted else { return }
+        isStarted = true
+
         let task = ShareStoreTask(entities: entities, store: store, output: output, completion: completion)
         task.$stage.sink { [weak self] in
             guard let self = self else { return }
             switch $0 {
             case .preparing:
-                self.title = "Preparing messages..."
+                self.title = "Preparing Logs..."
             case .rendering:
                 self.progress = nil
                 self.title = "Generating \(output.title)..."
@@ -78,12 +77,6 @@ private final class ShareEntitiesViewModel: ObservableObject {
                 self.title = "Completed"
             }
         }.store(in: &cancellables)
-        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(500)) { [weak self] in
-            guard let self = self else { return }
-            task.$progress.sink { [weak self] in
-                self?.progress = "\(Int($0 * 100))%"
-            }.store(in: &self.cancellables)
-        }
         task.start()
         self.task = task
     }
