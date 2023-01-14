@@ -430,25 +430,23 @@ struct NetworkContent: OptionSet {
     ]
 }
 
-#warning("TODO: comment this out")
-
 /// Uncomment to run performance tests in the release mode.
-public enum TextRendererTests {
-    public static func share(_ entities: [NSManagedObject]) -> NSAttributedString {
-        NSAttributedString(string: "")
-    }
-
-    public static func plainText(from string: NSAttributedString) -> String {
-        TextUtilities.plainText(from: string)
-    }
-
-    public static func html(from string: NSAttributedString) throws -> Data {
-        try TextUtilities.html(from: string)
-    }
-
-#if os(iOS)
-    public static func pdf(from string: NSAttributedString) throws -> Data {
-        try TextUtilities.pdf(from: string)
-    }
-#endif
-}
+//public enum TextRendererTests {
+//    public static func share(_ entities: [NSManagedObject]) -> NSAttributedString {
+//        NSAttributedString(string: "")
+//    }
+//
+//    public static func plainText(from string: NSAttributedString) -> String {
+//        TextUtilities.plainText(from: string)
+//    }
+//
+//    public static func html(from string: NSAttributedString) throws -> Data {
+//        try TextUtilities.html(from: string)
+//    }
+//
+//#if os(iOS)
+//    public static func pdf(from string: NSAttributedString) throws -> Data {
+//        try TextUtilities.pdf(from: string)
+//    }
+//#endif
+//}
