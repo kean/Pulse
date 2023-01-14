@@ -157,8 +157,8 @@ final class TextRendererJSON {
             } else {
                 elements.append((NSRange(location: index, length: length), element))
             }
-            previousElement = element
         }
+        previousElement = element
 
         if let error = self.error, errorRange == nil, codingPath == error.context?.codingPath {
             errorRange = NSRange(location: index, length: length)

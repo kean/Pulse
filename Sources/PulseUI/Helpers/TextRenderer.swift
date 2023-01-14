@@ -403,6 +403,8 @@ struct NetworkContent: OptionSet {
     ]
 }
 
+#warning("TODO: comment this out")
+
 /// Uncomment to run performance tests in the release mode.
 public enum TextRendererTests {
     public static func share(_ entities: [NSManagedObject]) -> NSAttributedString {
