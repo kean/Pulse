@@ -8,16 +8,7 @@ import CoreData
 import SwiftUI
 import Pulse
 
-final class ShareStoreTask: ObservableObject {
-    @Published var stage: Stage = .preparing
-    @Published var progress: Float = 0
-
-    enum Stage {
-        case preparing
-        case rendering
-        case completed
-    }
-
+final class ShareStoreTask {
     private var isCancelled = false
     private var objectIDs: [NSManagedObjectID]
     private let renderer = TextRenderer(options: .sharing)
@@ -51,11 +42,8 @@ final class ShareStoreTask: ObservableObject {
 
         let string = renderAttributedString()
 
-        DispatchQueue.main.async {
-            self.stage = .rendering
-        }
         if output == .pdf { // Can only be used on the main thread
-            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(90)) {
+            DispatchQueue.main.async {
                 let items = ShareService.share(string, as: self.output)
                 self.didComplete(with: items)
             }
@@ -67,7 +55,6 @@ final class ShareStoreTask: ObservableObject {
 
     private func didComplete(with items: ShareItems) {
         DispatchQueue.main.async {
-            self.stage = .completed
             self.completion?(items)
             self.completion = nil
         }
@@ -114,10 +101,6 @@ final class ShareStoreTask: ObservableObject {
 
                 lock.lock()
                 renderer.renderedBodies[job.key] = string
-                let completed = renderer.renderedBodies.count
-                DispatchQueue.main.async {
-                    self.progress = (Float(completed) / Float(indices.count)) * 0.5
-                }
                 lock.unlock()
             }
         }
@@ -143,9 +126,6 @@ final class ShareStoreTask: ObservableObject {
             }
             if index < objectIDs.endIndex - 1 {
                 renderer.addSpacer()
-            }
-            DispatchQueue.main.async {
-                self.progress = 0.5 + (Float(index) / Float(self.objectIDs.count)) * 0.5
             }
         }
         return renderer.make()
