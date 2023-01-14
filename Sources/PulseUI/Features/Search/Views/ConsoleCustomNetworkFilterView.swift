@@ -58,9 +58,11 @@ struct ConsoleCustomNetworkFilterView: View {
     private var fieldPickerAdvancedSection: some View {
         Text("Request Headers").tag(ConsoleCustomNetworkFilter.Field.requestHeader)
         Text("Response Headers").tag(ConsoleCustomNetworkFilter.Field.responseHeader)
-        Divider()
-        Text("Request Body").tag(ConsoleCustomNetworkFilter.Field.requestBody)
-        Text("Response Body").tag(ConsoleCustomNetworkFilter.Field.responseBody)
+
+        // TODO: re-enable when fixed
+//        Divider()
+//        Text("Request Body").tag(ConsoleCustomNetworkFilter.Field.requestBody)
+//        Text("Response Body").tag(ConsoleCustomNetworkFilter.Field.responseBody)
     }
 
     private var matchPicker: some View {
