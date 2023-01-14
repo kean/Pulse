@@ -270,18 +270,9 @@ private final class ShareStoreViewModel: ObservableObject {
         request.predicate = predicate
         let messages = (try? context.fetch(request)) ?? []
 
-        #warning("TODO: add item size directly to ShareItem")
         ShareStoreTask(entities: messages, store: store!, output: output) { item in
             guard let item = item else { return }
-            let size: Int64
-            if let url = item.items.first as? URL {
-                size = (try? url.getFileSize()) ?? 0
-            } else if let string = item.items.first as? String {
-                size = Int64(string.count)
-            } else {
-                size = -1
-            }
-            completion(SharedContents(item: item, size: size))
+            completion(SharedContents(item: item, size: item.size))
         }.start()
     }
 }
@@ -295,11 +286,11 @@ private extension URL {
 
 private struct SharedContents {
     var item: ShareItems?
-    var size: Int64 = 0
+    var size: Int64?
     var info: LoggerStore.Info?
 
-    var formattedFileSize: String {
-        ByteCountFormatter.string(fromByteCount: size)
+    var formattedFileSize: String? {
+        size.map(ByteCountFormatter.string)
     }
 }
 

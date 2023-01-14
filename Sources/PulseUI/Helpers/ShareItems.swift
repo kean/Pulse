@@ -21,10 +21,12 @@ enum ShareStoreOutput: String, RawRepresentable {
 struct ShareItems: Identifiable {
     let id = UUID()
     let items: [Any]
+    let size: Int64?
     let cleanup: () -> Void
 
-    init(_ items: [Any], cleanup: @escaping () -> Void = { }) {
+    init(_ items: [Any], size: Int64? = nil, cleanup: @escaping () -> Void = { }) {
         self.items = items
+        self.size = size
         self.cleanup = cleanup
     }
 }
@@ -50,18 +52,19 @@ enum ShareService {
         let string = sanitized(string)
         switch output {
         case .plainText:
-            return ShareItems([TextUtilities.plainText(from: string)])
+            let string = TextUtilities.plainText(from: string)
+            return ShareItems([string], size: Int64(string.count)) // Approximate size
         case .html:
             let html = (try? TextUtilities.html(from: string)) ?? Data()
             let directory = TemporaryDirectory()
             let fileURL = directory.write(data: html, extension: "html")
-            return ShareItems([fileURL], cleanup: directory.remove)
+            return ShareItems([fileURL], size: Int64(html.count), cleanup: directory.remove)
         case .pdf:
 #if os(iOS)
             let pdf = (try? TextUtilities.pdf(from: string)) ?? Data()
             let directory = TemporaryDirectory()
             let fileURL = directory.write(data: pdf, extension: "pdf")
-            return ShareItems([fileURL], cleanup: directory.remove)
+            return ShareItems([fileURL], size: Int64(pdf.count), cleanup: directory.remove)
 #else
             return ShareItems(["Sharing as PDF is not supported on this platform"])
 #endif
