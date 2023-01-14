@@ -78,6 +78,7 @@
 		0C9F05002884F34A0035239F /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C9F04FF2884F34A0035239F /* Preview Assets.xcassets */; };
 		0C9F050C2884FA7D0035239F /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CFF9BD825D6199A0069DB6A /* repos.json */; };
 		0CCBDDC02610BDBC00DCB60C /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CFF9BD825D6199A0069DB6A /* repos.json */; };
+		0CD7E0BB297326EC00A255B7 /* ShareEntitiesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD7E0BA297326EC00A255B7 /* ShareEntitiesView.swift */; };
 		0CDC3BEA2970FA47003BD1FF /* ConsoleSearchListSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CDC3BE92970FA47003BD1FF /* ConsoleSearchListSelectionView.swift */; };
 		0CDC3BED2971B936003BD1FF /* ConsoleSearchLogLevelsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CDC3BEC2971B936003BD1FF /* ConsoleSearchLogLevelsCell.swift */; };
 		0CE364F72971D1EA0063DFED /* ConsoleSearchCustomFiltersSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE364F62971D1EA0063DFED /* ConsoleSearchCustomFiltersSection.swift */; };
@@ -526,6 +527,7 @@
 		0C9F04FC2884F34A0035239F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0C9F04FF2884F34A0035239F /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		0C9F05012884F34A0035239F /* Pulse_Demo_macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Pulse_Demo_macOS.entitlements; sourceTree = "<group>"; };
+		0CD7E0BA297326EC00A255B7 /* ShareEntitiesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareEntitiesView.swift; sourceTree = "<group>"; };
 		0CDC3BE92970FA47003BD1FF /* ConsoleSearchListSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchListSelectionView.swift; sourceTree = "<group>"; };
 		0CDC3BEC2971B936003BD1FF /* ConsoleSearchLogLevelsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchLogLevelsCell.swift; sourceTree = "<group>"; };
 		0CDFB833296F24140071EF77 /* CHANGELOG.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CHANGELOG.md; sourceTree = "<group>"; };
@@ -1175,6 +1177,7 @@
 				0CF0D59C296F189500EED9D4 /* KeyValueSectionViewModel.swift */,
 				0CF0D59E296F189500EED9D4 /* WebView.swift */,
 				0CF0D5A5296F189500EED9D4 /* StoreShareView.swift */,
+				0CD7E0BA297326EC00A255B7 /* ShareEntitiesView.swift */,
 				0CF0D5A6296F189500EED9D4 /* SearchBar-ios.swift */,
 				0CF0D5A7296F189500EED9D4 /* TimingView.swift */,
 				0CF0D5A8296F189500EED9D4 /* InfoRow.swift */,
@@ -2044,6 +2047,7 @@
 				0CF0D659296F189600EED9D4 /* ConsoleSettings.swift in Sources */,
 				0CF0D61B296F189600EED9D4 /* ShareItems.swift in Sources */,
 				0CF0D683296F189600EED9D4 /* ConsoleMessageTableCell.swift in Sources */,
+				0CD7E0BB297326EC00A255B7 /* ShareEntitiesView.swift in Sources */,
 				0CF0D623296F189600EED9D4 /* SearchBar-macos.swift in Sources */,
 				0CE364F72971D1EA0063DFED /* ConsoleSearchCustomFiltersSection.swift in Sources */,
 				0C40C0A8296F9CBA009ECF16 /* ConsoleSearchPinsCell.swift in Sources */,

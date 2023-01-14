@@ -349,9 +349,7 @@ final class TextRenderer {
 
     static func share(_ entities: [NSManagedObject]) -> NSAttributedString {
         let renderer = TextRenderer(options: .sharing)
-        if entities.count > 100 {
-            renderer.prerenderResponseBodies(for: entities)
-        }
+        renderer.prerenderResponseBodies(for: entities)
         let content = contentForSharing(entities)
         for index in entities.indices {
             let entity = entities[index]
