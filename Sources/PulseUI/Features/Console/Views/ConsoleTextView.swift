@@ -177,36 +177,43 @@ final class ConsoleTextViewModel: ObservableObject {
     private func refreshText() {
         let entities = isOrderedAscending ? entities.value : entities.value.reversed()
         let renderer = TextRenderer(options: options)
-        var strings: [NSAttributedString] = []
-        if let messages = entities as? [LoggerMessageEntity] {
-            for (index, message) in messages.enumerated() {
-                strings.append(render(message, at: index, using: renderer))
+        for index in entities.indices {
+            let entity = entities[index]
+            if let task = entity as? NetworkTaskEntity {
+                renderer.render(task, content: content)
+            } else if let message = entity as? LoggerMessageEntity {
+                if let task = message.task {
+                    renderer.render(task, content: content)
+                } else {
+                    renderer.render(message)
+                }
+            } else {
+                fatalError("Unsuppported entity: \(entity)")
             }
-        } else if let tasks = entities as? [NetworkTaskEntity] {
-            for (index, task) in tasks.enumerated() {
-                strings.append(render(task, at: index, using: renderer))
+            if index < entities.endIndex - 1 {
+                renderer.addSpacer()
             }
-        } else {
-            assertionFailure("Unsupported entities: \(entities)")
-            strings = []
         }
-        let string = renderer.joined(strings)
-        self.text.display(string)
+        self.text.display(renderer.make())
     }
 
-    private func render(_ message: LoggerMessageEntity, at index: Int, using renderer: TextRenderer) -> NSAttributedString {
+    private func render(_ message: LoggerMessageEntity, at index: Int, using renderer: TextRenderer) {
         if let task = message.task {
-            return render(task, at: index, using: renderer)
+            render(task, at: index, using: renderer)
+        } else {
+            renderer.render(message)
         }
-        return renderer.render(message)
     }
 
-    private func render(_ task: NetworkTaskEntity, at index: Int, using renderer: TextRenderer) -> NSAttributedString {
+    private func render(_ task: NetworkTaskEntity, at index: Int, using renderer: TextRenderer) {
         let isExpanded = isExpanded || expanded.contains(task.objectID)
         guard !isExpanded else {
             return renderer.render(task, content: content) // Render everything
         }
-        let string = NSMutableAttributedString(attributedString: renderer.render(task, content: [.header]))
+
+        renderer.render(task, content: [.header])
+        renderer.addSpacer()
+
         let uuid = UUID()
         objectIDs[uuid] = task.objectID
         var attributes = renderer.helper.attributes(role: .body2, weight: .medium)
@@ -215,9 +222,7 @@ final class ConsoleTextViewModel: ObservableObject {
         attributes[.objectIdKey] = task.objectID
         attributes[.isTechnicalKey] = true
         attributes[.underlineColor] = UXColor.clear
-        string.append(renderer.spacer())
-        string.append("Show Details\n", attributes)
-        return string
+        renderer.append(NSAttributedString(string: "Show Details\n", attributes: attributes))
     }
 
     private func makeNetworkContent() -> NetworkContent {
@@ -259,7 +264,7 @@ final class ConsoleTextViewModel: ObservableObject {
             }
         }
         if let range = foundRange {
-            let details = TextRenderer(options: options).render(task, content: content)
+            let details = TextRenderer(options: options).make { $0.render(task, content: content) }
             text.performUpdates { storage in
                 storage.replaceCharacters(in: range, with: details)
             }

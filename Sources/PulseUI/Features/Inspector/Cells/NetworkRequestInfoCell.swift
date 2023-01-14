@@ -34,14 +34,14 @@ final class NetworkRequestInfoCellViewModel {
         self.httpMethod = task.httpMethod ?? "GET"
         self.url = task.url ?? "–"
         self.render = {
-            TextRenderer(options: .sharing).render(task, content: .all)
+            TextRenderer(options: .sharing).make { $0.render(task, content: .all) }
         }
     }
 
     init(transaction: NetworkTransactionMetricsEntity) {
         self.httpMethod = transaction.request.httpMethod ?? "GET"
         self.url = transaction.request.url ?? "–"
-        self.render = { TextRenderer(options: .sharing).render(transaction) }
+        self.render = { TextRenderer(options: .sharing).make { $0.render(transaction) } }
     }
 }
 

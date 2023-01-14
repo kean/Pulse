@@ -164,7 +164,7 @@ struct StringSearchOptionsMenu_Previews: PreviewProvider {
             Spacer()
             Menu(content: {
                 AttributedStringShareMenu(shareItems: .constant(nil)) {
-                    TextRenderer(options: .sharing).render(LoggerStore.preview.entity(for: .login), content: .sharing)
+                    TextRenderer(options: .sharing).make { $0.render(LoggerStore.preview.entity(for: .login), content: .sharing) }
                 }
             }) {
                 Text("Attributed String Share")

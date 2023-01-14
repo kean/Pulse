@@ -65,7 +65,7 @@ struct NetworkInspectorView: View {
         HStack {
             Menu(content: {
                 AttributedStringShareMenu(shareItems: $shareItems) {
-                    TextRenderer(options: .sharing).render(viewModel.task, content: .sharing)
+                    TextRenderer(options: .sharing).make { $0.render(viewModel.task, content: .sharing) }
                 }
                 Button(action: { shareItems = ShareItems([viewModel.task.cURLDescription()]) }) {
                     Label("Share as cURL", systemImage: "square.and.arrow.up")
