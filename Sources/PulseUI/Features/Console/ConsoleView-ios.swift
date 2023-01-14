@@ -13,6 +13,7 @@ public struct ConsoleView: View {
     @StateObject private var viewModel: ConsoleViewModel
     @State private var shareItems: ShareItems?
     @State private var isShowingAsText = false
+    @State private var selectedShareOutput: ShareOutput?
 
     public init(store: LoggerStore = .shared) {
         self.init(viewModel: ConsoleViewModel(store: store))
@@ -33,14 +34,13 @@ public struct ConsoleView: View {
                     Button(action: $0) { Text("Close") }
                 },
                 trailing: HStack {
-                    Menu(content: {
-                        AttributedStringShareMenu(shareItems: $shareItems) {
-                            TextRenderer.share(viewModel.entities)
-                        }
-                    }, label: { Image(systemName: "square.and.arrow.up") })
+                    Menu(content: { shareMenu }) {
+                        Image(systemName: "square.and.arrow.up")
+                    }
                     ConsoleContextMenu(store: viewModel.store, insights: viewModel.insightsViewModel, isShowingAsText: $isShowingAsText)
                 }
             )
+            .overlay(sharingOverlay) // TODO: use safeAreaInset instead on iOS 15
             .sheet(item: $shareItems, content: ShareView.init)
             .sheet(isPresented: $isShowingAsText) {
                 NavigationView {
@@ -49,6 +49,44 @@ public struct ConsoleView: View {
                     }
                 }
             }
+    }
+
+    @ViewBuilder
+    private var shareMenu: some View {
+        Button(action: { withAnimation { selectedShareOutput = .plainText } }) {
+            Label("Share as Text", systemImage: "square.and.arrow.up")
+        }
+        Button(action: { withAnimation { selectedShareOutput = .html } }) {
+            Label("Share as HTML", systemImage: "square.and.arrow.up")
+        }
+#if os(iOS)
+        Button(action: { withAnimation { selectedShareOutput = .pdf} }) {
+            Label("Share as PDF", systemImage: "square.and.arrow.up")
+        }
+#endif
+    }
+
+    @ViewBuilder var sharingOverlay: some View {
+        if let output = selectedShareOutput {
+            VStack(spacing: 0) {
+                Spacer()
+                Divider()
+                let share = ShareEntitiesView(entities: viewModel.entities, store: viewModel.store, output: output) { item in
+                    DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(250)) {
+                        shareItems = item
+                        withAnimation {
+                            selectedShareOutput = nil
+                        }
+                    }
+                }
+                if #available(iOS 15, *) {
+                    share.background(Material.regular)
+                } else {
+                    share.background(Color.white)
+                }
+            }
+            .transition(.move(edge: .bottom))
+        }
     }
 
     @ViewBuilder

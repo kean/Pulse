@@ -63,11 +63,8 @@ private final class ShareEntitiesViewModel: ObservableObject {
 
     init() {}
 
-    #warning("TODO: add output file size")
-
     func prepare(entities: [NSManagedObject], store: LoggerStore, output: ShareOutput, completion: @escaping (ShareItems?) -> Void) {
         let task = ShareStoreTask(entities: entities, store: store, output: output, completion: completion)
-        let count = entities.count
         task.$stage.sink { [weak self] in
             guard let self = self else { return }
             switch $0 {
@@ -78,12 +75,15 @@ private final class ShareEntitiesViewModel: ObservableObject {
                 self.title = "Generating \(output.title)..."
             case .completed:
                 self.isProcessing = false
-                self.title = "Completed (\(count) entries)"
+                self.title = "Completed"
             }
         }.store(in: &cancellables)
-        task.$progress.sink { [weak self] in
-            self?.progress = "\(Int($0 * 100))%"
-        }.store(in: &cancellables)
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(500)) { [weak self] in
+            guard let self = self else { return }
+            task.$progress.sink { [weak self] in
+                self?.progress = "\(Int($0 * 100))%"
+            }.store(in: &self.cancellables)
+        }
         task.start()
         self.task = task
     }
