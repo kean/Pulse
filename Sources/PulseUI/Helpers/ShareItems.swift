@@ -11,9 +11,9 @@ enum ShareStoreOutput: String, RawRepresentable {
 
     var fileExtension: String {
         switch self {
-        case .store: return ".pulse"
-        case .text: return ".txt"
-        case .html: return ".html"
+        case .store: return "pulse"
+        case .text: return "txt"
+        case .html: return "html"
         }
     }
 }
