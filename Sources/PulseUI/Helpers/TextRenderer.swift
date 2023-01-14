@@ -333,11 +333,7 @@ final class TextRenderer {
 
     static func share(_ entities: [NSManagedObject]) -> NSAttributedString {
         let renderer = TextRenderer(options: .sharing)
-        var content = NetworkContent.sharing
-        if entities.count > 1 {
-            content.remove(.largeHeader)
-            content.insert(.header)
-        }
+        let content = contentForSharing(entities)
         return renderer.joined(entities.map {
             if let task = $0 as? NetworkTaskEntity {
                 return renderer.render(task, content: content)
@@ -351,6 +347,15 @@ final class TextRenderer {
                 fatalError("Unsuppported entity: \($0)")
             }
         })
+    }
+
+    private static func contentForSharing(_ entities: [NSManagedObject]) -> NetworkContent {
+        var content = NetworkContent.sharing
+        if entities.count > 1 {
+            content.remove(.largeHeader)
+            content.insert(.header)
+        }
+        return content
     }
 }
 

@@ -14,6 +14,7 @@
 		0C0B31F426D179A20045C9E1 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0C0B31F226D179A20045C9E1 /* Main.storyboard */; };
 		0C0B31F626D179A70045C9E1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C0B31F526D179A70045C9E1 /* Assets.xcassets */; };
 		0C0B31F926D179A70045C9E1 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0C0B31F726D179A70045C9E1 /* LaunchScreen.storyboard */; };
+		0C1000472972EE9E00150E8E /* bigstore.pulse in Resources */ = {isa = PBXBuildFile; fileRef = 0C1000462972EE9E00150E8E /* bigstore.pulse */; };
 		0C11EAB12971DB700059786A /* RemoteLoggerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D69A296F18D200EED9D4 /* RemoteLoggerTests.swift */; };
 		0C11EAB22971DB700059786A /* Resources.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D6A1296F18D200EED9D4 /* Resources.swift */; };
 		0C11EAB32971DB700059786A /* LoggerStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D69C296F18D200EED9D4 /* LoggerStoreTests.swift */; };
@@ -486,6 +487,7 @@
 		0C0B31F526D179A70045C9E1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0C0B31F826D179A70045C9E1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		0C0B31FA26D179A70045C9E1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		0C1000462972EE9E00150E8E /* bigstore.pulse */ = {isa = PBXFileReference; lastKnownFileType = file; path = bigstore.pulse; sourceTree = "<group>"; };
 		0C11EAC12971E9B30059786A /* PulsePerformanceTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PulsePerformanceTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C11EACB2971E9CE0059786A /* TextRendererPerformanceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextRendererPerformanceTests.swift; sourceTree = "<group>"; };
 		0C1221E525CE09C100B81D7A /* URLSessionAutomatedIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionAutomatedIntegration.swift; sourceTree = "<group>"; };
@@ -813,6 +815,7 @@
 		0C11EABC2971E9920059786A /* PulsePerformanceTests */ = {
 			isa = PBXGroup;
 			children = (
+				0C1000462972EE9E00150E8E /* bigstore.pulse */,
 				0C11EACB2971E9CE0059786A /* TextRendererPerformanceTests.swift */,
 			);
 			path = PulsePerformanceTests;
@@ -1763,6 +1766,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0C1000472972EE9E00150E8E /* bigstore.pulse in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2319,7 +2323,6 @@
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2359,7 +2362,6 @@
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

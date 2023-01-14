@@ -16,6 +16,16 @@ final class TextRendererTestsTests: XCTestCase {
         }
     }
 
+    func testAttributedStringBigStore() throws {
+        let url = try XCTUnwrap(Bundle(for: TextRendererTestsTests.self).url(forResource: "bigstore", withExtension: "pulse"))
+        let store = try LoggerStore(storeURL: url)
+        let entities = try store.allMessages()
+
+        benchmark(title: "Entities -> NSAttributedString") {
+            let _ = TextRendererTests.share(entities)
+        }
+    }
+
     func testPlainTextConversion() throws {
         let entities = try LoggerStore.mock.allMessages()
         let string = TextRendererTests.share(entities)
@@ -47,4 +57,13 @@ final class TextRendererTestsTests: XCTestCase {
         }
     }
 #endif
+}
+
+@discardableResult
+private func benchmark<T>(title: String, operation: () throws -> T) rethrows -> T {
+    let startTime = CFAbsoluteTimeGetCurrent()
+    let value = try operation()
+    let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
+    print("Time elapsed for \(title): \(timeElapsed * 1000.0) ms.")
+    return value
 }
