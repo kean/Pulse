@@ -219,8 +219,8 @@ final class ConsoleTextViewModel: ObservableObject {
         var attributes = renderer.helper.attributes(role: .body2, weight: .medium)
         attributes[.foregroundColor] = UXColor.systemBlue
         attributes[.link] = URL(string: "pulse://expand/\(uuid.uuidString)")
-        attributes[.objectIdKey] = task.objectID
-        attributes[.isTechnicalKey] = true
+        attributes[.objectId] = task.objectID
+        attributes[.isTechnical] = true
         attributes[.underlineColor] = UXColor.clear
         renderer.append(NSAttributedString(string: "Show Details\n", attributes: attributes))
     }
@@ -257,7 +257,7 @@ final class ConsoleTextViewModel: ObservableObject {
         expanded.insert(objectID)
 
         var foundRange: NSRange?
-        text.textStorage.enumerateAttribute(.objectIdKey, in: NSRange(location: 0, length: text.textStorage.length)) { value, range, stop in
+        text.textStorage.enumerateAttribute(.objectId, in: NSRange(location: 0, length: text.textStorage.length)) { value, range, stop in
             if value as? NSManagedObjectID == objectID {
                 foundRange = range
                 stop.pointee = true

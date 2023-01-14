@@ -142,7 +142,7 @@ struct AttributedStringShareMenu: View {
     private func prepare() -> NSAttributedString {
         let input = string()
         var ranges: [NSRange] = []
-        input.enumerateAttribute(.isTechnicalKey, in: NSRange(location: 0, length: input.length)) { value, range, _ in
+        input.enumerateAttribute(.isTechnical, in: NSRange(location: 0, length: input.length)) { value, range, _ in
             if (value as? Bool) == true {
                 ranges.append(range)
             }

@@ -73,7 +73,7 @@ enum ShareService {
 
     static func sanitized(_ string: NSAttributedString) -> NSAttributedString {
         var ranges: [NSRange] = []
-        string.enumerateAttribute(.isTechnicalKey, in: NSRange(location: 0, length: string.length)) { value, range, _ in
+        string.enumerateAttribute(.isTechnical, in: NSRange(location: 0, length: string.length)) { value, range, _ in
             if (value as? Bool) == true {
                 ranges.append(range)
             }

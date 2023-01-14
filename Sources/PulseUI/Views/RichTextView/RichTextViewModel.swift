@@ -93,7 +93,7 @@ final class RichTextViewModel: ObservableObject {
 
     private func didUpdateMatches(_ newMatches: [NSRange]) {
         let newMatches = newMatches.filter {
-            textStorage.attributes(at: $0.location, effectiveRange: nil)[.isTechnicalKey] == nil
+            textStorage.attributes(at: $0.location, effectiveRange: nil)[.isTechnical] == nil
         }
 
         performUpdates { _ in

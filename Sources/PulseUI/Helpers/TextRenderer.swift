@@ -353,8 +353,8 @@ final class TextRenderer {
 }
 
 extension NSAttributedString.Key {
-    static let objectIdKey = NSAttributedString.Key("pulse-object-id-key")
-    static let isTechnicalKey = NSAttributedString.Key("pulse-technical-substring-key")
+    static let objectId = NSAttributedString.Key("pulse-object-id-key")
+    static let isTechnical = NSAttributedString.Key("pulse-technical-substring-key")
 }
 
 // MARK: - Previews
