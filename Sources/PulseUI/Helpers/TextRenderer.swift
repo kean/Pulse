@@ -212,8 +212,8 @@ final class TextRenderer {
         if let body = task.requestBody, let string = renderedBodies[body.objectID] {
             return string
         }
-        if let data = task.requestBody?.data, !data.isEmpty {
-            return render(data, contentType: task.originalRequest?.contentType, error: nil)
+        if let blob = task.requestBody, let data = blob.data, !data.isEmpty {
+            return render(data, contentType: blob.contentType, error: nil)
         } else if task.type == .uploadTask, task.requestBodySize > 0 {
             return _render(dataSize: task.requestBodySize, contentType: task.originalRequest?.contentType)
         } else {
@@ -225,8 +225,8 @@ final class TextRenderer {
         if let body = task.responseBody, let string = renderedBodies[body.objectID] {
             return string
         }
-        if let data = task.responseBody?.data, !data.isEmpty {
-            return render(data, contentType: task.response?.contentType, error: task.decodingError)
+        if let blob = task.responseBody, let data = blob.data, !data.isEmpty {
+            return render(data, contentType: blob.contentType, error: task.decodingError)
         } else if task.type == .downloadTask, task.responseBodySize > 0 {
             return _render(dataSize: task.responseBodySize, contentType: task.response?.contentType)
         } else {

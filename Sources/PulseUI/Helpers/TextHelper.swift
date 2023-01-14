@@ -7,6 +7,9 @@ import SwiftUI
 
 /// Manages text attributes.
 final class TextHelper {
+    private var cachedAttributes: [AttributesKey: [NSAttributedString.Key: Any]] = [:]
+    private var cachedFonts: [TextStyle: UXFont] = [:]
+
     init() {}
 
     func attributes(
@@ -24,11 +27,22 @@ final class TextHelper {
     ]
 
     func attributes(style: TextStyle, color: UXColor?) -> [NSAttributedString.Key: Any] {
-        makeAttributes(style: style, color: color)
+        let key = AttributesKey(textStyle: style, color: color)
+        if let attributes = cachedAttributes[key] {
+            return attributes
+        }
+        let attributes = makeAttributes(style: style, color: color)
+        cachedAttributes[key] = attributes
+        return attributes
     }
 
     func font(style: TextStyle) -> UXFont {
-        makeFont(style: style)
+        if let font = cachedFonts[style] {
+            return font
+        }
+        let font = makeFont(style: style)
+        cachedFonts[style] = font
+        return font
     }
 
     private let titleParagraphStyle: NSParagraphStyle = {
@@ -88,6 +102,11 @@ final class TextHelper {
 #else
         return font
 #endif
+    }
+
+    private struct AttributesKey: Hashable {
+        let textStyle: TextStyle
+        let color: UXColor?
     }
 }
 
