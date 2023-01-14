@@ -32,3 +32,43 @@ extension LoggerMessageEntity {
         LoggerStore.Level(rawValue: level) ?? .debug
     }
 }
+
+/// A thread-safe non-CoreData variant of `NetworkTaskEntity`.
+final class NetworkTask {
+    // Summary
+    let url: URL?
+    let rawURL: String?
+    let httpMethod: String
+    let taskType: NetworkLogger.TaskType
+    let state: NetworkTaskEntity.State
+    let createdAt: Date
+
+    // Details
+    let originalRequest: NetworkLogger.Request?
+    let currentRequest: NetworkLogger.Request?
+    let response: NetworkLogger.Response?
+    let error: NetworkLogger.ResponseError?
+    let requestBodySize: Int64
+    let requestBody: Data?
+    let responseBodySize: Int64
+    let responseBody: Data?
+
+#warning("TODO: read lazily")
+#warning("TODO: check if error is read corrency")
+    init(_ entity: NetworkTaskEntity, content: NetworkContent = [.all]) {
+        self.url = entity.url.flatMap(URL.init)
+        self.rawURL = entity.url
+        self.httpMethod = entity.httpMethod ?? "GET"
+        self.taskType = entity.type ?? .dataTask
+        self.createdAt = entity.createdAt
+        self.state = entity.state
+        self.originalRequest = entity.originalRequest.map(NetworkLogger.Request.init)
+        self.currentRequest = entity.currentRequest.map(NetworkLogger.Request.init)
+        self.response = entity.response.map(NetworkLogger.Response.init)
+        self.error = entity.error.map(NetworkLogger.ResponseError.init)
+        self.requestBodySize = entity.requestBodySize
+        self.requestBody = entity.requestBody?.data
+        self.responseBodySize = entity.responseBodySize
+        self.responseBody = entity.responseBody?.data
+    }
+}

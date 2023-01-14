@@ -65,34 +65,20 @@ final class TextRenderer {
         }
     }
 
+    #warning("TEMP")
     func render(_ task: NetworkTaskEntity, content: NetworkContent) -> NSAttributedString {
+//        render(NetworkTask(task), content: content)
+        _render(task, content: content)
+    }
+
+    // Thead-safe variant.
+    private func _render(_ task: NetworkTaskEntity, content: NetworkContent) -> NSAttributedString {
         var components: [NSAttributedString] = []
 
-        let isTitleColored = task.state == .failure && options.color != .monochrome
-        let titleColor = isTitleColored ? UXColor.systemRed : UXColor.secondaryLabel
-        let detailsColor = isTitleColored ? UXColor.systemRed : UXColor.label
-
         if content.contains(.largeHeader) {
-            let header = NSMutableAttributedString()
-            let status = NetworkRequestStatusCellModel(task: task)
-            let method = task.httpMethod ?? "GET"
-            header.append(render(status.title + "\n", role: .title, weight: .semibold, color: UXColor(status.tintColor)))
-            header.append(self.spacer())
-            var urlAttributes = helper.attributes(role: .body2, weight: .regular)
-            urlAttributes[.underlineColor] = UXColor.clear
-            header.append(method + "\n", helper.attributes(role: .body, weight: .semibold))
-            header.append((task.url ?? "–") + "\n", urlAttributes)
-            components.append(header)
-        }
-
-        if content.contains(.header) {
-            let title = ConsoleFormatter.subheadline(for: task)
-            let header = NSMutableAttributedString()
-            header.append(title + "\n", helper.attributes(role: .subheadline, style: .monospacedDigital, width: .condensed, color: titleColor))
-            var urlAttributes = helper.attributes(role: .body2, weight: .medium, color: detailsColor)
-            urlAttributes[.underlineColor] = UXColor.clear
-            header.append((task.url ?? "–") + "\n", urlAttributes)
-            components.append(header)
+            components.append(renderLargeHeader(for: task))
+        } else if content.contains(.header) {
+            components.append(renderHeader(for: task))
         }
 
         if content.contains(.taskDetails) {
@@ -109,39 +95,46 @@ final class TextRenderer {
             guard let section = section else { return }
             components.append(render(section, details: details))
         }
+
         if content.contains(.errorDetails) {
             append(section: .makeErrorDetails(for: task))
         }
+
         if content.contains(.requestComponents), let url = task.url.flatMap(URL.init) {
             append(section: .makeComponents(for: url))
         }
+
         if content.contains(.requestQueryItems), let url = task.url.flatMap(URL.init) {
             append(section: .makeQueryItems(for: url))
         }
+
         if content.contains(.requestOptions), let request = task.originalRequest {
             append(section: .makeParameters(for: request))
         }
-        if let originalRequest = task.originalRequest {
-            if content.contains(.originalRequestHeaders) && content.contains(.currentRequestHeaders), let currentRequest = task.currentRequest {
-                append(section: .makeHeaders(title: "Original Request Headers", headers: originalRequest.headers), count: true)
-                append(section: .makeHeaders(title: "Current Request Headers", headers: currentRequest.headers), count: true)
-            } else if content.contains(.originalRequestHeaders) {
-                append(section: .makeHeaders(title: "Request Headers", headers: originalRequest.headers), count: true)
-            } else if content.contains(.currentRequestHeaders), let currentRequest = task.currentRequest {
-                append(section: .makeHeaders(title: "Request Headers", headers: currentRequest.headers), count: true)
-            }
-            if content.contains(.requestBody) {
-                let section = NSMutableAttributedString()
-                let details = ByteCountFormatter.string(fromBodySize: task.requestBodySize).map { " (\($0))" } ?? ""
-                section.append(render(subheadline: "Request Body" + details))
-                section.append(renderRequestBody(for: task))
-                section.append("\n")
-                components.append(section)
-            }
+
+        if content.contains(.originalRequestHeaders) && content.contains(.currentRequestHeaders),
+           let originalRequest = task.originalRequest, let currentRequest = task.currentRequest {
+            append(section: .makeHeaders(title: "Original Request Headers", headers: originalRequest.headers), count: true)
+            append(section: .makeHeaders(title: "Current Request Headers", headers: currentRequest.headers), count: true)
+        } else if content.contains(.originalRequestHeaders), let originalRequest = task.originalRequest {
+            append(section: .makeHeaders(title: "Request Headers", headers: originalRequest.headers), count: true)
+        } else if content.contains(.currentRequestHeaders), let currentRequest = task.currentRequest {
+            append(section: .makeHeaders(title: "Request Headers", headers: currentRequest.headers), count: true)
         }
+
+        if content.contains(.requestBody) {
+            let section = NSMutableAttributedString()
+            let details = ByteCountFormatter.string(fromBodySize: task.requestBodySize).map { " (\($0))" } ?? ""
+            section.append(render(subheadline: "Request Body" + details))
+            section.append(renderRequestBody(for: task))
+            section.append("\n")
+            components.append(section)
+        }
+
         if content.contains(.responseHeaders), let response = task.response {
             append(section: .makeHeaders(title: "Response Headers", headers: response.headers), count: true)
         }
+
         if content.contains(.responseBody) {
             let section = NSMutableAttributedString()
             let details = ByteCountFormatter.string(fromBodySize: task.responseBodySize).map { " (\($0))" } ?? ""
@@ -150,7 +143,34 @@ final class TextRenderer {
             section.append("\n")
             components.append(section)
         }
+
         return joined(components)
+    }
+
+    private func renderHeader(for task: NetworkTaskEntity) -> NSAttributedString {
+        let string = NSMutableAttributedString()
+        let status =  NetworkRequestStatusCellModel(task: task)
+
+        string.append(render(status.title + "\n", role: .title, weight: .semibold, color: UXColor(status.tintColor)))
+        string.append(self.spacer())
+        var urlAttributes = helper.attributes(role: .body2, weight: .regular)
+        urlAttributes[.underlineColor] = UXColor.clear
+        string.append((task.httpMethod ?? "GET") + "\n", helper.attributes(role: .body, weight: .semibold))
+        string.append((task.url ?? "–") + "\n", urlAttributes)
+        return string
+    }
+
+    private func renderLargeHeader(for task: NetworkTaskEntity) -> NSAttributedString {
+        let string = NSMutableAttributedString()
+        let isTitleColored = task.state == .failure && options.color != .monochrome
+        let titleColor = isTitleColored ? UXColor.systemRed : UXColor.secondaryLabel
+        let detailsColor = isTitleColored ? UXColor.systemRed : UXColor.label
+        let title = ConsoleFormatter.subheadline(for: task)
+        string.append(title + "\n", helper.attributes(role: .subheadline, style: .monospacedDigital, width: .condensed, color: titleColor))
+        var urlAttributes = helper.attributes(role: .body2, weight: .medium, color: detailsColor)
+        urlAttributes[.underlineColor] = UXColor.clear
+        string.append((task.url ?? "–") + "\n", urlAttributes)
+        return string
     }
 
     func render(_ transaction: NetworkTransactionMetricsEntity) -> NSAttributedString {
@@ -287,11 +307,7 @@ final class TextRenderer {
             append("\(value ?? "–")\n")
         }
         let output = NSMutableAttributedString(string: string, attributes: helper.attributes(role: .body2, style: style))
-        let keyFont = helper.font(style: .init(
-            role: .body2,
-            style: style,
-            weight: options.color == .full ? .medium : .semibold
-        ))
+        let keyFont = helper.font(style: .init(role: .body2, style: style, weight: options.color == .full ? .medium : .semibold))
         for range in keys {
             output.addAttribute(.font, value: keyFont, range: range)
             if options.color == .full {
