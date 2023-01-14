@@ -377,7 +377,7 @@ struct ConsoleTextRenderer_Previews: PreviewProvider {
             RichTextView(viewModel: .init(string: stringWithColor))
                 .previewDisplayName("Task (Color)")
 
-            RichTextView(viewModel: .init(string: ShareService.share(task, as: .plainText).items[0] as! String))
+            RichTextView(viewModel: .init(string: ShareStoreTask(entities: try! LoggerStore.mock.allMessages(), store: .mock, output: .plainText, completion: { _ in }).share().items[0] as! String))
                 .previewDisplayName("Task (Plain)")
 
             RichTextView(viewModel: .init(string: TextRenderer(options: .sharing).make { $0.render(task.orderedTransactions[0]) } ))
@@ -434,6 +434,7 @@ struct NetworkContent: OptionSet {
 /// Uncomment to run performance tests in the release mode.
 //public enum TextRendererTests {
 //    public static func share(_ entities: [NSManagedObject], store: LoggerStore, _ completion: @escaping () -> Void) {
+//       // TODO: rewrite using new convenience API for testing
 //        ShareStoreTask(entities: entities, store: store, output: .plainText) { _ in
 //            completion()
 //        }.start()

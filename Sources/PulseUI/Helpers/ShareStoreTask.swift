@@ -37,10 +37,13 @@ final class ShareStoreTask {
         }
     }
 
-    private func prepareForSharing() {
-        prerenderResponseBodies()
+    /// - warning: For testing purposes only.
+    func share() -> ShareItems {
+        ShareService.share(renderAsAttributedString(), as: output)
+    }
 
-        let string = renderAttributedString()
+    private func prepareForSharing() {
+        let string = renderAsAttributedString()
 
         if output == .pdf { // Can only be used on the main thread
             DispatchQueue.main.async {
@@ -58,6 +61,34 @@ final class ShareStoreTask {
             self.completion?(items)
             self.completion = nil
         }
+    }
+
+
+    private func renderAsAttributedString() -> NSAttributedString {
+        prerenderResponseBodies()
+
+        let content = contentForSharing(count: objectIDs.count)
+        for index in objectIDs.indices {
+            guard let entity = try? context.existingObject(with: objectIDs[index]) else {
+                continue
+            }
+
+            if let task = entity as? NetworkTaskEntity {
+                renderer.render(task, content: content)
+            } else if let message = entity as? LoggerMessageEntity {
+                if let task = message.task {
+                    renderer.render(task, content: content)
+                } else {
+                    renderer.render(message)
+                }
+            } else {
+                fatalError("Unsuppported entity: \(entity)")
+            }
+            if index < objectIDs.endIndex - 1 {
+                renderer.addSpacer()
+            }
+        }
+        return renderer.make()
     }
 
     // Unlike the rest of the processing it's easy to parallelize and it
@@ -104,31 +135,6 @@ final class ShareStoreTask {
                 lock.unlock()
             }
         }
-    }
-
-    private func renderAttributedString() -> NSAttributedString {
-        let content = contentForSharing(count: objectIDs.count)
-        for index in objectIDs.indices {
-            guard let entity = try? context.existingObject(with: objectIDs[index]) else {
-                continue
-            }
-
-            if let task = entity as? NetworkTaskEntity {
-                renderer.render(task, content: content)
-            } else if let message = entity as? LoggerMessageEntity {
-                if let task = message.task {
-                    renderer.render(task, content: content)
-                } else {
-                    renderer.render(message)
-                }
-            } else {
-                fatalError("Unsuppported entity: \(entity)")
-            }
-            if index < objectIDs.endIndex - 1 {
-                renderer.addSpacer()
-            }
-        }
-        return renderer.make()
     }
 
     private struct RenderBodyJob {

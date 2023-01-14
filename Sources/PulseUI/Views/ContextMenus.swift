@@ -138,23 +138,6 @@ struct AttributedStringShareMenu: View {
         }
 #endif
     }
-
-    private func prepare() -> NSAttributedString {
-        let input = string()
-        var ranges: [NSRange] = []
-        input.enumerateAttribute(.isTechnical, in: NSRange(location: 0, length: input.length)) { value, range, _ in
-            if (value as? Bool) == true {
-                ranges.append(range)
-            }
-        }
-        print(ranges)
-
-        let output = NSMutableAttributedString(attributedString: input)
-        for range in ranges.reversed() {
-            output.deleteCharacters(in: range)
-        }
-        return output
-    }
 }
 
 #if DEBUG

@@ -23,6 +23,7 @@
 - Improve task to `NSAttributedString` generation speed by up to 7x faster. For multiple tasks, there is up to x3 improvement on top of that. And when converting multiple tasks with the same request or response body, you can see up to 90% faster exports. These optimizations affect everything: rendering response bodies, lists of messages, request headers, sharing (regardless of the output format), and more.
 - Improve HTML generation speed by 40% (not including `NSAttributedString` improvements that directly affect it)
 - Add a spinner while preparing a large file for sharing. You can still interact with the app while it's working. Note: it doesn't work with PDF because it has to be used on the main thread.
+- Add some [basic formatting](https://user-images.githubusercontent.com/1567433/212501275-1dae0ef8-ee4a-4d77-aa55-24b026e5d0cc.png)) for plain text output to make it easier to read
 - Fix double dot in shared files extensions
 - Remove share as .pdf from Console and TextView (keep in NetworkInspector) - too slow to be used for any reasonable amount of content
 

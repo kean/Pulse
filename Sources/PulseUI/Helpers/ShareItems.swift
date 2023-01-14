@@ -83,7 +83,16 @@ enum ShareService {
             output.deleteCharacters(in: range)
         }
         if shareOutput == .plainText {
-            
+            var ranges: [NSRange] = []
+            string.enumerateAttribute(.subheadline, in: NSRange(location: 0, length: string.length)) { value, range, _ in
+                if (value as? Bool) == true {
+                    ranges.append(range)
+                }
+            }
+            for range in ranges.reversed() {
+                output.insert(NSAttributedString(string: "–––––––––––––––––––––––––––––––––––––––\n"), at: range.upperBound)
+                output.insert(NSAttributedString(string: ""), at: range.location)
+            }
         }
         return output
     }
