@@ -350,13 +350,6 @@ final class TextRenderer {
         let attributes = helper.attributes(role: role, style: style, weight: weight, width: width, color: color)
         return NSAttributedString(string: string, attributes: attributes)
     }
-
-    // MARK: Sharing
-
-    #warning("TODO: remove")
-    static func share(_ entities: [NSManagedObject]) -> NSAttributedString {
-        return NSAttributedString(string: "Deprecated")
-    }
 }
 
 extension NSAttributedString.Key {
@@ -442,7 +435,7 @@ struct NetworkContent: OptionSet {
 /// Uncomment to run performance tests in the release mode.
 public enum TextRendererTests {
     public static func share(_ entities: [NSManagedObject]) -> NSAttributedString {
-        TextRenderer.share(entities)
+        NSAttributedString(string: "")
     }
 
     public static func plainText(from string: NSAttributedString) -> String {

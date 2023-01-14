@@ -218,11 +218,23 @@ private final class ShareStoreViewModel: ObservableObject {
     private func prepareForSharing(store: LoggerStore, context: NSManagedObjectContext, predicate: NSPredicate?, output: ShareStoreOutput) {
         let directory = TemporaryDirectory()
         do {
-            let contents = try prepareForSharing(store: store, context: context, directory: directory, predicate: predicate, output: output)
-            DispatchQueue.main.async {
-                self.sharedContents = contents
-                self.didFinishPreparingForSharing()
+            switch output {
+            case .store:
+                let contents = try prepareStoreForSharing(store: store, context: context, directory: directory, predicate: predicate)
+                DispatchQueue.main.async {
+                    self.sharedContents = contents
+                    self.didFinishPreparingForSharing()
+                }
+            case .text, .html:
+                let output: ShareOutput = output == .text ? .plainText : .html
+                prepareForSharing(predicate: predicate, context: context, output: output) { contents in
+                    DispatchQueue.main.async {
+                        self.sharedContents = contents
+                        self.didFinishPreparingForSharing()
+                    }
+                }
             }
+
         } catch {
             directory.remove()
             DispatchQueue.main.async {
@@ -241,32 +253,36 @@ private final class ShareStoreViewModel: ObservableObject {
         }
     }
 
-    private func prepareForSharing(store: LoggerStore, context: NSManagedObjectContext, directory: TemporaryDirectory, predicate: NSPredicate?, output: ShareStoreOutput) throws -> SharedContents {
+    private func prepareStoreForSharing(store: LoggerStore, context: NSManagedObjectContext, directory: TemporaryDirectory, predicate: NSPredicate?) throws -> SharedContents {
         let logsURL = directory.url.appendingPathComponent("logs-\(makeCurrentDate()).\(output.fileExtension)")
-
-        #warning("TODO: integrte new async APIs")
-        func makeString() throws -> NSAttributedString {
-            let request = NSFetchRequest<LoggerMessageEntity>(entityName: "\(LoggerMessageEntity.self)")
-            request.predicate = predicate
-            let messages = try context.fetch(request)
-            return TextRenderer.share(messages)
-        }
-
-        var info: LoggerStore.Info?
-        switch output {
-        case .store:
-            if let predicate = predicate {
-                info = try store.copy(to: logsURL, predicate: predicate)
-            } else {
-                info = try store.copy(to: logsURL)
-            }
-        case .text:
-            try makeString().string.data(using: .utf8)?.write(to: logsURL)
-        case .html:
-            try TextUtilities.html(from: makeString()).write(to: logsURL)
+        let info: LoggerStore.Info?
+        if let predicate = predicate {
+            info = try store.copy(to: logsURL, predicate: predicate)
+        } else {
+            info = try store.copy(to: logsURL)
         }
         let item = ShareItems([logsURL], cleanup: directory.remove)
         return SharedContents(item: item, size: try logsURL.getFileSize(), info: info)
+    }
+
+    private func prepareForSharing(predicate: NSPredicate?, context: NSManagedObjectContext, output: ShareOutput, _ completion: @escaping (SharedContents) -> Void) {
+        let request = NSFetchRequest<LoggerMessageEntity>(entityName: "\(LoggerMessageEntity.self)")
+        request.predicate = predicate
+        let messages = (try? context.fetch(request)) ?? []
+
+        #warning("TODO: add item size directly to ShareItem")
+        ShareStoreTask(entities: messages, store: store!, output: output) { item in
+            guard let item = item else { return }
+            let size: Int64
+            if let url = item.items.first as? URL {
+                size = (try? url.getFileSize()) ?? 0
+            } else if let string = item.items.first as? String {
+                size = Int64(string.count)
+            } else {
+                size = -1
+            }
+            completion(SharedContents(item: item, size: size))
+        }.start()
     }
 }
 

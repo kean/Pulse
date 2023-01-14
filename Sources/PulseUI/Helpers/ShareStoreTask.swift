@@ -48,7 +48,9 @@ final class ShareStoreTask: ObservableObject {
 
     private func prepareForSharing() {
         prerenderResponseBodies()
+
         let string = renderAttributedString()
+
         DispatchQueue.main.async {
             self.stage = .rendering
         }
