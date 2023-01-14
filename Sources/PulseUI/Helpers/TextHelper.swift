@@ -24,37 +24,30 @@ final class TextHelper {
     ]
 
     func attributes(style: TextStyle, color: UXColor?) -> [NSAttributedString.Key: Any] {
-        let key = AttributesKey(textStyle: style, color: color)
-        if let attributes = cachedAttributes[key] {
-            return attributes
-        }
-        let attributes = makeAttributes(style: style, color: color)
-        cachedAttributes[key] = attributes
-        return attributes
+        makeAttributes(style: style, color: color)
     }
 
     func font(style: TextStyle) -> UXFont {
-        if let font = cachedFonts[style] {
-            return font
-        }
-        let font = makeFont(style: style)
-        cachedFonts[style] = font
-        return font
+        makeFont(style: style)
     }
+
+    private let titleParagraphStyle: NSParagraphStyle = {
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.lineSpacing = -6
+        return paragraphStyle
+    }()
+
+    private let bodyParagraphStyle: NSParagraphStyle = {
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.lineSpacing = 3
+        return paragraphStyle
+    }()
 
     private func makeAttributes(style: TextStyle, color: UXColor?) -> [NSAttributedString.Key: Any] {
         var attributes: [NSAttributedString.Key: Any] = [:]
         let font = self.font(style: style)
         attributes[.font] = font
-        attributes[.paragraphStyle] = {
-            let paragraphStyle = NSMutableParagraphStyle()
-            if style.role == .title {
-                paragraphStyle.lineSpacing = -6
-            } else {
-                paragraphStyle.lineSpacing = 3
-            }
-            return paragraphStyle
-        }()
+        attributes[.paragraphStyle] = style.role == .title ? titleParagraphStyle : bodyParagraphStyle
         if style.width == .condensed {
             attributes[.kern] = -0.4
         } else if style.style == .monospaced {
@@ -96,14 +89,6 @@ final class TextHelper {
         return font
 #endif
     }
-
-    private struct AttributesKey: Hashable {
-        let textStyle: TextStyle
-        let color: UXColor?
-    }
-
-    private var cachedAttributes: [AttributesKey: [NSAttributedString.Key: Any]] = [:]
-    private var cachedFonts: [TextStyle: UXFont] = [:]
 }
 
 struct TextStyle: Hashable {

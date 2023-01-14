@@ -30,6 +30,8 @@ final class TextRenderer {
 
     let helper: TextHelper
 
+    private var responseBodies: [NSManagedObjectID: NSAttributedString] = [:]
+
     init(options: Options = .init()) {
         self.options = options
         self.helper = TextHelper()
@@ -216,6 +218,9 @@ final class TextRenderer {
     }
 
     func renderResponseBody(for task: NetworkTaskEntity) -> NSAttributedString {
+        if let string = responseBodies[task.objectID] {
+            return string
+        }
         if let data = task.responseBody?.data, !data.isEmpty {
             return render(data, contentType: task.response?.contentType, error: task.decodingError)
         } else if task.type == .downloadTask, task.responseBodySize > 0 {
@@ -333,6 +338,9 @@ final class TextRenderer {
 
     static func share(_ entities: [NSManagedObject]) -> NSAttributedString {
         let renderer = TextRenderer(options: .sharing)
+        if entities.count > 100 {
+            renderer.prerenderResponseBodies(for: entities)
+        }
         let content = contentForSharing(entities)
         return renderer.joined(entities.map {
             if let task = $0 as? NetworkTaskEntity {
@@ -347,6 +355,45 @@ final class TextRenderer {
                 fatalError("Unsuppported entity: \($0)")
             }
         })
+    }
+
+    // Unlike the rest of the processing it's easy to parallelize and it
+    // usually takes up at least 90% of processing.
+    func prerenderResponseBodies(for entities: [NSManagedObject]) {
+        struct RenderBodyJob {
+            let objectID: NSManagedObjectID
+            let data: Data
+            let contentType: NetworkLogger.ContentType?
+            let error: NetworkLogger.DecodingError?
+        }
+
+        var jobs: [RenderBodyJob] = []
+        for entity in entities {
+            if let task = getTask(for: entity), task.responseBodySize > 0, let data = task.responseBody?.data {
+                jobs.append(RenderBodyJob(objectID: task.objectID, data: data, contentType: task.response?.contentType, error: task.decodingError))
+            }
+        }
+        let indices = jobs.indices
+        // "To get the maximum benefit of this function, configure the number of
+        // iterations to be at least three times the number of available cores."
+        let iterations = indices.count >= 32 ? 32 : 1
+        let lock = NSLock()
+        DispatchQueue.concurrentPerform(iterations: iterations) { index in
+            let start = index * indices.count / iterations
+            let end = (index + 1) * indices.count / iterations
+
+            for index in start..<end {
+                let job = jobs[index]
+                let string = TextRenderer(options: .sharing).render(job.data, contentType: job.contentType, error: job.error)
+                lock.lock()
+                self.responseBodies[job.objectID] = string
+                lock.unlock()
+            }
+        }
+    }
+
+    private func getTask(for object: NSManagedObject) -> NetworkTaskEntity? {
+        (object as? NetworkTaskEntity) ?? (object as? LoggerMessageEntity)?.task
     }
 
     private static func contentForSharing(_ entities: [NSManagedObject]) -> NetworkContent {
