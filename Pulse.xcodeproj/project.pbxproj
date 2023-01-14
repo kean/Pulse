@@ -27,15 +27,9 @@
 		0C11EABB2971DB700059786A /* URLSessionProxyDelegateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D6A2296F18D200EED9D4 /* URLSessionProxyDelegateTests.swift */; };
 		0C11EAC52971E9B30059786A /* PulseUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CF0D56C296F17CB00EED9D4 /* PulseUI.framework */; };
 		0C11EACC2971E9CE0059786A /* TextRendererPerformanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C11EACB2971E9CE0059786A /* TextRendererPerformanceTests.swift */; };
-		0C11EACE2971EA3C0059786A /* MockStoreConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B1296F189500EED9D4 /* MockStoreConfiguration.swift */; };
 		0C11EACF2971EA4F0059786A /* MockTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5AF296F189500EED9D4 /* MockTask.swift */; };
-		0C11EAD22971EBC20059786A /* MockStoreConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B1296F189500EED9D4 /* MockStoreConfiguration.swift */; };
-		0C11EAD32971EBC20059786A /* MockStoreConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B1296F189500EED9D4 /* MockStoreConfiguration.swift */; };
-		0C11EAD42971EBC60059786A /* MockStoreConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B1296F189500EED9D4 /* MockStoreConfiguration.swift */; };
-		0C11EAD92971EBE80059786A /* MockStoreConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B1296F189500EED9D4 /* MockStoreConfiguration.swift */; };
 		0C11EADA2971EBE80059786A /* MockTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5AF296F189500EED9D4 /* MockTask.swift */; };
 		0C11EADB2971EBE80059786A /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B0296F189500EED9D4 /* MockStore.swift */; };
-		0C11EADE2971EBE90059786A /* MockStoreConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B1296F189500EED9D4 /* MockStoreConfiguration.swift */; };
 		0C11EADF2971EBE90059786A /* MockTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5AF296F189500EED9D4 /* MockTask.swift */; };
 		0C11EAE02971EBE90059786A /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B0296F189500EED9D4 /* MockStore.swift */; };
 		0C11EAE12971EBEA0059786A /* MockTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5AF296F189500EED9D4 /* MockTask.swift */; };
@@ -45,7 +39,6 @@
 		0C11EAE52971EBEC0059786A /* MockTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5AF296F189500EED9D4 /* MockTask.swift */; };
 		0C11EAE62971EBEC0059786A /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B0296F189500EED9D4 /* MockStore.swift */; };
 		0C11EAE72971EBED0059786A /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B0296F189500EED9D4 /* MockStore.swift */; };
-		0C11EAE82971EBEE0059786A /* MockStoreConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B1296F189500EED9D4 /* MockStoreConfiguration.swift */; };
 		0C11EAE92971EBEE0059786A /* MockTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5AF296F189500EED9D4 /* MockTask.swift */; };
 		0C11EAEA2971EBEE0059786A /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B0296F189500EED9D4 /* MockStore.swift */; };
 		0C40C094296F7641009ECF16 /* ConsoleSearchContentTypeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C40C093296F7641009ECF16 /* ConsoleSearchContentTypeCell.swift */; };
@@ -613,7 +606,6 @@
 		0CF0D5AD296F189500EED9D4 /* ContextMenus.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContextMenus.swift; sourceTree = "<group>"; };
 		0CF0D5AF296F189500EED9D4 /* MockTask.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockTask.swift; sourceTree = "<group>"; };
 		0CF0D5B0296F189500EED9D4 /* MockStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockStore.swift; sourceTree = "<group>"; };
-		0CF0D5B1296F189500EED9D4 /* MockStoreConfiguration.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockStoreConfiguration.swift; sourceTree = "<group>"; };
 		0CF0D5B5296F189500EED9D4 /* ConsoleSearchView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleSearchView.swift; sourceTree = "<group>"; };
 		0CF0D5B6296F189500EED9D4 /* ConsoleSearchViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleSearchViewModel.swift; sourceTree = "<group>"; };
 		0CF0D5BA296F189500EED9D4 /* ConsoleCustomNetworkFilterView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleCustomNetworkFilterView.swift; sourceTree = "<group>"; };
@@ -1207,7 +1199,6 @@
 			children = (
 				0CF0D5AF296F189500EED9D4 /* MockTask.swift */,
 				0CF0D5B0296F189500EED9D4 /* MockStore.swift */,
-				0CF0D5B1296F189500EED9D4 /* MockStoreConfiguration.swift */,
 			);
 			path = Mocks;
 			sourceTree = "<group>";
@@ -1868,7 +1859,6 @@
 				0C0B31F126D179A20045C9E1 /* ViewController.swift in Sources */,
 				0C11EADA2971EBE80059786A /* MockTask.swift in Sources */,
 				0C0B31ED26D179A20045C9E1 /* AppDelegate.swift in Sources */,
-				0C11EAD92971EBE80059786A /* MockStoreConfiguration.swift in Sources */,
 				0C0B31EF26D179A20045C9E1 /* SceneDelegate.swift in Sources */,
 				0C11EADB2971EBE80059786A /* MockStore.swift in Sources */,
 			);
@@ -1881,7 +1871,6 @@
 				0C11EACC2971E9CE0059786A /* TextRendererPerformanceTests.swift in Sources */,
 				0C11EAE72971EBED0059786A /* MockStore.swift in Sources */,
 				0C11EACF2971EA4F0059786A /* MockTask.swift in Sources */,
-				0C11EACE2971EA3C0059786A /* MockStoreConfiguration.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1892,7 +1881,6 @@
 				0C76781A268F88BB0058F69B /* Pulse_Demo_iOSApp.swift in Sources */,
 				0C11EAE62971EBEC0059786A /* MockStore.swift in Sources */,
 				0C11EAE52971EBEC0059786A /* MockTask.swift in Sources */,
-				0C11EAD22971EBC20059786A /* MockStoreConfiguration.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1913,7 +1901,6 @@
 				0C6460DF25F579B8002C55B1 /* ContentView.swift in Sources */,
 				0C6460DC25F579B8002C55B1 /* Pulse_tvOSApp.swift in Sources */,
 				0C11EADF2971EBE90059786A /* MockTask.swift in Sources */,
-				0C11EADE2971EBE90059786A /* MockStoreConfiguration.swift in Sources */,
 				0C11EAE02971EBE90059786A /* MockStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1925,7 +1912,6 @@
 				0C9F04F92884F34A0035239F /* Pulse_Demo_macOSApp.swift in Sources */,
 				0C11EAE22971EBEA0059786A /* MockStore.swift in Sources */,
 				0C11EAE12971EBEA0059786A /* MockTask.swift in Sources */,
-				0C11EAD42971EBC60059786A /* MockStoreConfiguration.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1934,7 +1920,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				0CEAB41425FE867E00F09B0F /* PulseAppApp.swift in Sources */,
-				0C11EAD32971EBC20059786A /* MockStoreConfiguration.swift in Sources */,
 				0C11EAE32971EBEB0059786A /* MockTask.swift in Sources */,
 				0CEAB41725FE867E00F09B0F /* ComplicationController.swift in Sources */,
 				0C11EAE42971EBEB0059786A /* MockStore.swift in Sources */,
@@ -2011,7 +1996,6 @@
 				0CF0D640296F189600EED9D4 /* ConsoleSearchViewModel.swift in Sources */,
 				0CF0D65A296F189600EED9D4 /* StoreDetailsView.swift in Sources */,
 				0CF0D648296F189600EED9D4 /* ConsoleCustomMessageFilterView.swift in Sources */,
-				0C11EAE82971EBEE0059786A /* MockStoreConfiguration.swift in Sources */,
 				0CF0D67A296F189600EED9D4 /* ConsoleView-watchos.swift in Sources */,
 				0CF0D63F296F189600EED9D4 /* ConsoleSearchView.swift in Sources */,
 				0CF0D63A296F189600EED9D4 /* ContextMenus.swift in Sources */,

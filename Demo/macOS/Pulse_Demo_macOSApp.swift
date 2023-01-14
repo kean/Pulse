@@ -9,7 +9,7 @@ import PulseUI
 struct Pulse_Demo_macOSApp: App {
     var body: some Scene {
         WindowGroup {
-            ConsoleView(store: .mock)
+            ConsoleView(store: .demo)
         }
     }
 }

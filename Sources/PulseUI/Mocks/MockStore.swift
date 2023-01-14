@@ -10,29 +10,34 @@ import CoreData
 
 extension LoggerStore {
     static let mock: LoggerStore = {
-        let store: LoggerStore = MockStoreConfiguration.isUsingDefaultStore ? .shared : makeMockStore()
-
-        if MockStoreConfiguration.isDelayingLogs {
-            func populate() {
-                asyncPopulateStore(store)
-                if MockStoreConfiguration.isIndefinite {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(14)) {
-                        populate()
-                    }
-                }
-            }
-            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(500)) {
-                populate()
-            }
-        } else {
-            _syncPopulateStore(store)
-        }
-
+        let store = makeMockStore()
+        _syncPopulateStore(store)
         return store
     }()
 
-    // Store with
     static let preview = makeMockStore()
+}
+
+extension LoggerStore {
+    static let demo: LoggerStore = {
+        let store = LoggerStore.shared
+        store.startPopulating()
+        return store
+    }()
+
+    func startPopulating(isIndefinite: Bool = true) {
+        func populate() {
+            asyncPopulateStore(self)
+            if isIndefinite {
+                DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(12)) {
+                    populate()
+                }
+            }
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(500)) {
+            populate()
+        }
+    }
 }
 
 private let rootURL = FileManager.default.temporaryDirectory.appendingPathComponent("pulseui-demo")
