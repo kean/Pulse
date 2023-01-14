@@ -11,8 +11,14 @@ import Pulse
 #warning("TODO: make store accesor from BlobEntity private")
 
 final class ShareStoreTask: ObservableObject {
-    @Published var title: String = "Preparing..."
+    @Published var stage: Stage = .preparing
     @Published var progress: Float = 0
+
+    enum Stage {
+        case preparing
+        case rendering
+        case completed
+    }
 
     private var isCancelled = false
     private var objectIDs: [NSManagedObjectID]
@@ -20,16 +26,20 @@ final class ShareStoreTask: ObservableObject {
     private let store: LoggerStore
     private let output: ShareOutput
     private let context: NSManagedObjectContext
+    private var completion: ((ShareItems?) -> Void)?
 
-    init(entities: [NSManagedObject], store: LoggerStore, output: ShareOutput) {
+    init(entities: [NSManagedObject], store: LoggerStore, output: ShareOutput, completion: @escaping (ShareItems?) -> Void) {
         self.objectIDs = entities.map(\.objectID)
         self.store = store
         self.output = output
         self.context = store.backgroundContext
+        self.completion = completion
     }
 
     func cancel() {
         isCancelled = true
+        completion?(nil)
+        completion = nil
     }
 
     func start() {
@@ -41,9 +51,17 @@ final class ShareStoreTask: ObservableObject {
     private func prepareForSharing() {
         prerenderResponseBodies()
         let string = renderAttributedString()
+        DispatchQueue.main.async {
+            self.stage = .rendering
+        }
 
-        #warning("TODO: convert to actual output")
-        self.title = "Completed"
+#warning("TODO: convert to actual output")
+        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(3)) {
+            self.stage = .completed
+
+            self.completion?(ShareItems([string.string]))
+            self.completion = nil
+        }
     }
 
     // Unlike the rest of the processing it's easy to parallelize and it
@@ -80,6 +98,9 @@ final class ShareStoreTask: ObservableObject {
             let start = index * indices.count / iterations
             let end = (index + 1) * indices.count / iterations
 
+            #warning("TEMP")
+            Thread.sleep(forTimeInterval: 0.1)
+
             for index in start..<end {
                 let job = queue[index]
                 guard let data = job.value.data() else { continue }
@@ -89,7 +110,7 @@ final class ShareStoreTask: ObservableObject {
                 renderer.renderedBodies[job.key] = string
                 let completed = renderer.renderedBodies.count
                 DispatchQueue.main.async {
-                    self.progress = (Float(completed) / Float(indices.count)) * (self.output.progressScale / 2.0)
+                    self.progress = (Float(completed) / Float(indices.count)) * 0.5
                 }
                 lock.unlock()
             }
@@ -102,6 +123,9 @@ final class ShareStoreTask: ObservableObject {
             guard let entity = try? context.existingObject(with: objectIDs[index]) else {
                 continue
             }
+
+#warning("TEMP")
+Thread.sleep(forTimeInterval: 0.1)
 
             if let task = entity as? NetworkTaskEntity {
                 renderer.render(task, content: content)
@@ -118,7 +142,7 @@ final class ShareStoreTask: ObservableObject {
                 renderer.addSpacer()
             }
             DispatchQueue.main.async {
-                self.progress = (self.output.progressScale / 2.0) + (Float(index) / Float(self.objectIDs.count)) * (self.output.progressScale / 2.0)
+                self.progress = 0.5 + (Float(index) / Float(self.objectIDs.count)) * 0.5
             }
         }
         return renderer.make()
@@ -128,16 +152,6 @@ final class ShareStoreTask: ObservableObject {
         let data: () -> Data?
         let contentType: NetworkLogger.ContentType?
         let error: NetworkLogger.DecodingError?
-    }
-}
-
-private extension ShareOutput {
-    var progressScale: Float {
-        switch self {
-        case .plainText: return 0.9
-        case .html: return 0.5
-        case .pdf: return 0.2
-        }
     }
 }
 

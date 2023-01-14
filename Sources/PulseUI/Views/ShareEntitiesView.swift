@@ -9,25 +9,51 @@ import Combine
 
 struct ShareEntitiesView: View {
     @StateObject private var viewModel = ShareEntitiesViewModel()
-    let entities: [NSManagedObject]
-    let store: LoggerStore
-    let output: ShareOutput
+    private let entities: [NSManagedObject]
+    private let store: LoggerStore
+    private let output: ShareOutput
+    private let completion: (ShareItems?) -> Void
 
-    @Binding var isPresented: Bool // presentationMode is buggy
+    init(entities: [NSManagedObject], store: LoggerStore, output: ShareOutput, completion: @escaping (ShareItems?) -> Void) {
+        self.entities = entities
+        self.store = store
+        self.output = output
+        self.completion = completion
+    }
 
     var body: some View {
-        HStack {
-            ProgressView(viewModel.title, value: viewModel.progress)
-                .progressViewStyle(.linear)
-                .padding()
+        HStack(spacing: 12) {
+            ZStack {
+                ProgressView()
+                    .opacity(viewModel.isProcessing ? 1 : 0)
+                Image(systemName: "checkmark.circle.fill")
+                    .foregroundColor(.green)
+                    .opacity(viewModel.isProcessing ? 0 : 1)
+            }
+            Text(viewModel.title)
+            if let progress = viewModel.progress {
+                Text(progress)
+                    .backport.monospacedDigit()
+                    .foregroundColor(.secondary)
+            }
+            Spacer()
+            if viewModel.isProcessing {
+                Button("Cancel") {
+                    viewModel.cancel()
+                }
+            }
         }
-        .onAppear { viewModel.prepare(entities: entities, store: store, output: output) }
+        .padding()
+        .onAppear {
+            viewModel.prepare(entities: entities, store: store, output: output, completion: completion)
+        }
     }
 }
 
 private final class ShareEntitiesViewModel: ObservableObject {
     @Published var title: String = ""
-    @Published var progress: Float = 0
+    @Published var progress: String?
+    @Published var isProcessing = true
 
     // TODO: use as binding
     @Published var shareItem: ShareItems?
@@ -35,20 +61,36 @@ private final class ShareEntitiesViewModel: ObservableObject {
     private var task: ShareStoreTask?
     private var cancellables: [AnyCancellable] = []
 
-    init() {
+    init() {}
 
-    }
+    #warning("TODO: add output file size")
 
-    func prepare(entities: [NSManagedObject], store: LoggerStore, output: ShareOutput) {
-        let task = ShareStoreTask(entities: entities, store: store, output: output)
-        task.$title.sink { [weak self] in
-            self?.title = $0
+    func prepare(entities: [NSManagedObject], store: LoggerStore, output: ShareOutput, completion: @escaping (ShareItems?) -> Void) {
+        let task = ShareStoreTask(entities: entities, store: store, output: output, completion: completion)
+        let count = entities.count
+        task.$stage.sink { [weak self] in
+            guard let self = self else { return }
+            switch $0 {
+            case .preparing:
+                self.title = "Preparing messages..."
+            case .rendering:
+                self.progress = nil
+                self.title = "Generating \(output.title)..."
+            case .completed:
+                self.isProcessing = false
+                self.title = "Completed (\(count) entries)"
+            }
         }.store(in: &cancellables)
         task.$progress.sink { [weak self] in
-            self?.progress = $0
+            self?.progress = "\(Int($0 * 100))%"
         }.store(in: &cancellables)
         task.start()
         self.task = task
+    }
+
+    #warning("TODO: implenet cancellation")
+    func cancel() {
+        self.task?.cancel()
     }
 }
 
@@ -56,9 +98,9 @@ private final class ShareEntitiesViewModel: ObservableObject {
 struct ShareEntitiesView_Previews: PreviewProvider {
     static var previews: some View {
 #if os(iOS)
-        ShareEntitiesView(entities: try! LoggerStore.mock.allMessages(), store: .mock, output: .html, isPresented: .constant(true))
+        ShareEntitiesView(entities: try! LoggerStore.mock.allMessages(), store: .mock, output: .html) { _ in }
 #else
-        ShareEntitiesView(entities: try! LoggerStore.mock.allMessages(), store: .mock, output: .html, isPresented: .constant(true))
+        ShareEntitiesView(entities: try! LoggerStore.mock.allMessages(), store: .mock, output: .html) { _ in }
             .frame(width: 300, height: 500)
 #endif
     }

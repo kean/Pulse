@@ -79,6 +79,14 @@ enum ShareOutput {
     case plainText
     case html
     case pdf
+
+    var title: String {
+        switch self {
+        case .plainText: return "Text"
+        case .html: return "HTML"
+        case .pdf: return "PDF"
+        }
+    }
 }
 
 struct TemporaryDirectory {
