@@ -54,12 +54,21 @@ final class ShareStoreTask: ObservableObject {
         DispatchQueue.main.async {
             self.stage = .rendering
         }
+        if output == .pdf { // Can only be used on the main thread
+            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(90)) {
+                let items = ShareService.share(string, as: self.output)
+                self.didComplete(with: items)
+            }
+        } else {
+            let items = ShareService.share(string, as: output)
+            self.didComplete(with: items)
+        }
+    }
 
-#warning("TODO: convert to actual output")
-        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(3)) {
+    private func didComplete(with items: ShareItems) {
+        DispatchQueue.main.async {
             self.stage = .completed
-
-            self.completion?(ShareItems([string.string]))
+            self.completion?(items)
             self.completion = nil
         }
     }

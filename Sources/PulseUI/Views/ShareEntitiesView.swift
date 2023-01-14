@@ -22,9 +22,13 @@ struct ShareEntitiesView: View {
     }
 
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(alignment: .center, spacing: 12) {
             ProgressView()
-            Text(viewModel.title)
+            VStack(alignment: .leading) {
+                Text(viewModel.title)
+                Text(viewModel.details)
+                    .foregroundColor(.secondary)
+            }
             Spacer()
             if viewModel.isProcessing {
                 Button("Cancel") {
@@ -41,7 +45,7 @@ struct ShareEntitiesView: View {
 
 private final class ShareEntitiesViewModel: ObservableObject {
     @Published var title: String = ""
-    @Published var progress: String?
+    @Published var details: String = ""
     @Published var isProcessing = true
 
     // TODO: use as binding
@@ -63,9 +67,13 @@ private final class ShareEntitiesViewModel: ObservableObject {
             switch $0 {
             case .preparing:
                 self.title = "Preparing Logs..."
+                self.details = "This may take some time"
             case .rendering:
-                self.progress = nil
                 self.title = "Generating \(output.title)..."
+                self.details = "This may take some time"
+                if output == .pdf {
+                    self.details = "This operation blocks the app somt time".
+                }
             case .completed:
                 break
             }

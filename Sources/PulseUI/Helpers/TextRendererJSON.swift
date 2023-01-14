@@ -5,8 +5,6 @@
 import Foundation
 import Pulse
 
-#warning("for monoscrome, we can just use native pretty formatting (but still highlight error?)")
-
 final class TextRendererJSON {
     // Input
     private let json: Any
