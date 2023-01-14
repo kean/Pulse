@@ -23,13 +23,7 @@ struct ShareEntitiesView: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            ZStack {
-                ProgressView()
-                    .opacity(viewModel.isProcessing ? 1 : 0)
-                Image(systemName: "checkmark.circle.fill")
-                    .foregroundColor(.green)
-                    .opacity(viewModel.isProcessing ? 0 : 1)
-            }
+            ProgressView()
             Text(viewModel.title)
             Spacer()
             if viewModel.isProcessing {
@@ -73,8 +67,7 @@ private final class ShareEntitiesViewModel: ObservableObject {
                 self.progress = nil
                 self.title = "Generating \(output.title)..."
             case .completed:
-                self.isProcessing = false
-                self.title = "Completed"
+                break
             }
         }.store(in: &cancellables)
         task.start()

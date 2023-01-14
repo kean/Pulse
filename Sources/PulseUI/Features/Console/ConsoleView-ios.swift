@@ -71,12 +71,10 @@ public struct ConsoleView: View {
             VStack(spacing: 0) {
                 Spacer()
                 Divider()
-                let share = ShareEntitiesView(entities: viewModel.entities, store: viewModel.store, output: output) { item in
-                    DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(250)) {
-                        shareItems = item
-                        withAnimation {
-                            selectedShareOutput = nil
-                        }
+                let share = ShareEntitiesView(entities: viewModel.entities, store: viewModel.store, output: output) {
+                    shareItems = $0
+                    withAnimation {
+                        selectedShareOutput = nil
                     }
                 }
                 if #available(iOS 15, *) {
