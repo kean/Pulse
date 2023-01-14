@@ -11,64 +11,12 @@ final class TextRendererTestsTests: XCTestCase {
         let entities = try LoggerStore.mock.allMessages()
         measure {
             for _ in 0..<10 {
-                let _ = TextRendererTests.share(entities)
+                let expecation = self.expectation(description: "dsd")
+                let _ = TextRendererTests.share(entities, store: .mock) {
+                    expecation.fulfill()
+                }
+                wait(for: [expecation], timeout: 2)
             }
-        }
-    }
-
-    func testPlainTextConversion() throws {
-        let entities = try LoggerStore.mock.allMessages()
-        let string = TextRendererTests.share(entities)
-        measure {
-            for _ in 0..<1000 {
-                let _ = TextRendererTests.plainText(from: string)
-            }
-        }
-    }
-
-    func testHTMLConversion() throws {
-        let entities = try LoggerStore.mock.allMessages()
-        let string = TextRendererTests.share(entities)
-        measure {
-            for _ in 0..<10 {
-                let _ = try! TextRendererTests.html(from: string)
-            }
-        }
-    }
-
-#if os(iOS)
-    func testPDFConverstion() throws {
-        let entities = try LoggerStore.mock.allMessages()
-        let string = TextRendererTests.share(entities)
-        measure {
-            for _ in 0..<1 {
-                let _ = try! TextRendererTests.pdf(from: string)
-            }
-        }
-    }
-#endif
-
-    // MARK: Big Store
-
-    func testBigStoreAttributedString() throws {
-        let url = try XCTUnwrap(Bundle(for: TextRendererTestsTests.self).url(forResource: "bigstore", withExtension: "pulse"))
-        let store = try LoggerStore(storeURL: url)
-        let entities = try store.allMessages()
-
-        benchmark(title: "Entities -> NSAttributedString") {
-            let _ = TextRendererTests.share(entities)
-        }
-    }
-
-    func testBigStoreHTML() throws {
-        let url = try XCTUnwrap(Bundle(for: TextRendererTestsTests.self).url(forResource: "bigstore", withExtension: "pulse"))
-        let store = try LoggerStore(storeURL: url)
-        let entities = try store.allMessages()
-
-        let string = TextRendererTests.share(entities)
-
-        benchmark(title: "NSAttributedString -> HTML") {
-            let _ = try! TextRendererTests.html(from: string)
         }
     }
 }

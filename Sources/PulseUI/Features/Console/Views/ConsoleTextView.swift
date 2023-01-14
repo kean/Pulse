@@ -180,12 +180,12 @@ final class ConsoleTextViewModel: ObservableObject {
         for index in entities.indices {
             let entity = entities[index]
             if let task = entity as? NetworkTaskEntity {
-                renderer.render(task, content: content)
+                render(task, at: index, using: renderer)
             } else if let message = entity as? LoggerMessageEntity {
                 if let task = message.task {
-                    renderer.render(task, content: content)
+                    render(task, at: index, using: renderer)
                 } else {
-                    renderer.render(message)
+                    render(message, at: index, using: renderer)
                 }
             } else {
                 fatalError("Unsuppported entity: \(entity)")
