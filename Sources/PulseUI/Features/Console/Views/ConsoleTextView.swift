@@ -177,6 +177,7 @@ final class ConsoleTextViewModel: ObservableObject {
     private func refreshText() {
         let entities = isOrderedAscending ? entities.value : entities.value.reversed()
         let renderer = TextRenderer(options: options)
+        renderer.prerenderResponseBodies(for: entities)
         for index in entities.indices {
             let entity = entities[index]
             if let task = entity as? NetworkTaskEntity {
