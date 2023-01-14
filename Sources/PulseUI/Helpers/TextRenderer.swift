@@ -142,7 +142,7 @@ final class TextRenderer {
         return joined(components)
     }
 
-    private func renderHeader(for task: NetworkTaskEntity) -> NSAttributedString {
+    private func renderLargeHeader(for task: NetworkTaskEntity) -> NSAttributedString {
         let string = NSMutableAttributedString()
         let status =  NetworkRequestStatusCellModel(task: task)
 
@@ -155,7 +155,7 @@ final class TextRenderer {
         return string
     }
 
-    private func renderLargeHeader(for task: NetworkTaskEntity) -> NSAttributedString {
+    private func renderHeader(for task: NetworkTaskEntity) -> NSAttributedString {
         let string = NSMutableAttributedString()
         let isTitleColored = task.state == .failure && options.color != .monochrome
         let titleColor = isTitleColored ? UXColor.systemRed : UXColor.secondaryLabel
