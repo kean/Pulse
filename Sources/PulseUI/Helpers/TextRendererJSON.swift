@@ -16,6 +16,7 @@ final class TextRendererJSON {
     // Settings
     private let options: TextRenderer.Options
     private let helper: TextHelper
+    private let spaces = 2
 
     // Temporary state (one-shot, doesn't reset)
     private var indentation = 0
@@ -66,8 +67,6 @@ final class TextRendererJSON {
     }
 
     // MARK: - Walk JSON
-
-    private let spaces = 2
 
     private func print(json: Any, isFree: Bool) {
         func _print(json: Any, key: NetworkLogger.DecodingError.CodingKey, isFree: Bool) {
