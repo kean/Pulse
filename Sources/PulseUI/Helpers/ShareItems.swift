@@ -30,6 +30,12 @@ struct ShareItems: Identifiable {
 }
 
 enum ShareService {
+    private static var task: ShareStoreTask?
+
+    static func share(_ entities: [NSManagedObject], store: LoggerStore, as output: ShareOutput, _ completion: @escaping (ShareItems?) -> Void) {
+        ShareStoreTask(entities: entities, store: store, output: output, completion: completion).start()
+    }
+
     static func share(_ message: LoggerMessageEntity, as output: ShareOutput) -> ShareItems {
         share(TextRenderer.share([message]), as: output)
     }

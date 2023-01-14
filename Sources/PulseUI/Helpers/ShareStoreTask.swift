@@ -8,8 +8,6 @@ import CoreData
 import SwiftUI
 import Pulse
 
-#warning("TODO: make store accesor from BlobEntity private")
-
 final class ShareStoreTask: ObservableObject {
     @Published var stage: Stage = .preparing
     @Published var progress: Float = 0
@@ -36,7 +34,7 @@ final class ShareStoreTask: ObservableObject {
         self.completion = completion
     }
 
-    func cancel() {
+    func cancel() { // Not yet implemented
         isCancelled = true
         completion?(nil)
         completion = nil
@@ -107,9 +105,6 @@ final class ShareStoreTask: ObservableObject {
             let start = index * indices.count / iterations
             let end = (index + 1) * indices.count / iterations
 
-            #warning("TEMP")
-            Thread.sleep(forTimeInterval: 0.1)
-
             for index in start..<end {
                 let job = queue[index]
                 guard let data = job.value.data() else { continue }
@@ -132,9 +127,6 @@ final class ShareStoreTask: ObservableObject {
             guard let entity = try? context.existingObject(with: objectIDs[index]) else {
                 continue
             }
-
-#warning("TEMP")
-Thread.sleep(forTimeInterval: 0.1)
 
             if let task = entity as? NetworkTaskEntity {
                 renderer.render(task, content: content)
