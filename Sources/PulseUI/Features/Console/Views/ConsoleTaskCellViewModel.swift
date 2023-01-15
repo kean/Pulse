@@ -68,34 +68,8 @@ final class ConsoleTaskCellViewModel: Pinnable, ObservableObject {
     // MARK: Context Menu
 
 #if os(iOS) || os(macOS)
-
     func share(as output: ShareOutput) -> ShareItems {
         ShareService.share(task, as: output)
-    }
-
-    func shareAsCURL() -> ShareItems {
-        ShareItems([task.cURLDescription()])
-    }
-
-    var containsResponseData: Bool {
-        task.responseBodySize > 0
-    }
-
-    // WARNING: This call is relatively expensive.
-    var responseString: String? {
-        task.responseBody?.data.flatMap { String(data: $0, encoding: .utf8) }
-    }
-
-    var url: String? {
-        task.url
-    }
-
-    var host: String? {
-        task.host?.value
-    }
-
-    var cURLDescription: String {
-        task.cURLDescription()
     }
 #endif
 }

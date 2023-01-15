@@ -220,9 +220,7 @@
 		0CF0D680296F189600EED9D4 /* ConsoleMessageCellViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D602296F189600EED9D4 /* ConsoleMessageCellViewModel.swift */; };
 		0CF0D681296F189600EED9D4 /* ConsoleTaskCellViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D603296F189600EED9D4 /* ConsoleTaskCellViewModel.swift */; };
 		0CF0D682296F189600EED9D4 /* ConsoleTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D604296F189600EED9D4 /* ConsoleTextView.swift */; };
-		0CF0D683296F189600EED9D4 /* ConsoleMessageTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D605296F189600EED9D4 /* ConsoleMessageTableCell.swift */; };
 		0CF0D684296F189600EED9D4 /* ConsoleTableView-ios.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D606296F189600EED9D4 /* ConsoleTableView-ios.swift */; };
-		0CF0D685296F189600EED9D4 /* ConsoleNetworkRequestTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D607296F189600EED9D4 /* ConsoleNetworkRequestTableCell.swift */; };
 		0CF0D686296F189600EED9D4 /* ConsoleMessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D608296F189600EED9D4 /* ConsoleMessageCell.swift */; };
 		0CF0D687296F189600EED9D4 /* ConsoleTaskCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D609296F189600EED9D4 /* ConsoleTaskCell.swift */; };
 		0CF0D688296F189600EED9D4 /* ConsoleViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D60A296F189600EED9D4 /* ConsoleViewModel.swift */; };
@@ -678,9 +676,7 @@
 		0CF0D602296F189600EED9D4 /* ConsoleMessageCellViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleMessageCellViewModel.swift; sourceTree = "<group>"; };
 		0CF0D603296F189600EED9D4 /* ConsoleTaskCellViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleTaskCellViewModel.swift; sourceTree = "<group>"; };
 		0CF0D604296F189600EED9D4 /* ConsoleTextView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleTextView.swift; sourceTree = "<group>"; };
-		0CF0D605296F189600EED9D4 /* ConsoleMessageTableCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleMessageTableCell.swift; sourceTree = "<group>"; };
 		0CF0D606296F189600EED9D4 /* ConsoleTableView-ios.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ConsoleTableView-ios.swift"; sourceTree = "<group>"; };
-		0CF0D607296F189600EED9D4 /* ConsoleNetworkRequestTableCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleNetworkRequestTableCell.swift; sourceTree = "<group>"; };
 		0CF0D608296F189600EED9D4 /* ConsoleMessageCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleMessageCell.swift; sourceTree = "<group>"; };
 		0CF0D609296F189600EED9D4 /* ConsoleTaskCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleTaskCell.swift; sourceTree = "<group>"; };
 		0CF0D60A296F189600EED9D4 /* ConsoleViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleViewModel.swift; sourceTree = "<group>"; };
@@ -1396,8 +1392,6 @@
 				0CF0D600296F189600EED9D4 /* ConsoleTableView-macos.swift */,
 				0CF0D601296F189600EED9D4 /* ConsoleContextMenu-ios.swift */,
 				0CF0D606296F189600EED9D4 /* ConsoleTableView-ios.swift */,
-				0CF0D605296F189600EED9D4 /* ConsoleMessageTableCell.swift */,
-				0CF0D607296F189600EED9D4 /* ConsoleNetworkRequestTableCell.swift */,
 				0CF0D5FF296F189600EED9D4 /* ConsoleEntityCell.swift */,
 				0CF0D604296F189600EED9D4 /* ConsoleTextView.swift */,
 				0CF0D608296F189600EED9D4 /* ConsoleMessageCell.swift */,
@@ -2066,7 +2060,6 @@
 				0CF0D654296F189600EED9D4 /* NetworkInsightsRequestsList.swift in Sources */,
 				0CF0D661296F189600EED9D4 /* NetworkInspectorTransferInfoView.swift in Sources */,
 				0CF0D61D296F189600EED9D4 /* NSTableView+Extensions.swift in Sources */,
-				0CF0D685296F189600EED9D4 /* ConsoleNetworkRequestTableCell.swift in Sources */,
 				0CF0D663296F189600EED9D4 /* NetworkInspectorTransactionView.swift in Sources */,
 				0CB63A212974A62700525165 /* ConsoleSearchService.swift in Sources */,
 				0CF0D614296F189600EED9D4 /* TextRendererJSON.swift in Sources */,
@@ -2075,7 +2068,6 @@
 				0CF0D665296F189600EED9D4 /* NetworkMenuCell.swift in Sources */,
 				0CF0D659296F189600EED9D4 /* ConsoleSettings.swift in Sources */,
 				0CF0D61B296F189600EED9D4 /* ShareItems.swift in Sources */,
-				0CF0D683296F189600EED9D4 /* ConsoleMessageTableCell.swift in Sources */,
 				0CF0D623296F189600EED9D4 /* SearchBar-macos.swift in Sources */,
 				0CE364F72971D1EA0063DFED /* ConsoleSearchCustomFiltersSection.swift in Sources */,
 				0C40C0A8296F9CBA009ECF16 /* ConsoleSearchPinsCell.swift in Sources */,

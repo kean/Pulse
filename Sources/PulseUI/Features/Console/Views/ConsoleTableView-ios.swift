@@ -88,7 +88,8 @@ final class ConsoleTableViewController: UITableViewController {
     }
 
     private func createView() {
-        tableView.register(HostingTableCell.self, forCellReuseIdentifier: "HostingTableCell")
+        tableView.register(ConsoleBaseTableCell.self, forCellReuseIdentifier: "message")
+        tableView.register(ConsoleBaseTableCell.self, forCellReuseIdentifier: "task")
 
         ConsoleSettings.shared.$lineLimit.sink { [weak self] _ in
             self?.tableView.reloadData()
@@ -157,22 +158,27 @@ final class ConsoleTableViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "HostingTableCell", for: indexPath) as! HostingTableCell
         switch getEntityViewModel(at: indexPath) {
         case let viewModel as ConsoleMessageCellViewModel:
+            let cell = tableView.dequeueReusableCell(withIdentifier: "message", for: indexPath) as! ConsoleBaseTableCell
             if #available(iOS 16.0, *) {
                 cell.contentConfiguration = UIHostingConfiguration {
                     ConsoleMessageCell(viewModel: viewModel, isShowingDisclosure: true)
+                        .padding(EdgeInsets(top: 8, leading: 20, bottom: 8, trailing: 10))
                 }
+                .margins(.all, 0)
             } else {
                 cell.hostingView.rootView = AnyView(ConsoleMessageCell(viewModel: viewModel, isShowingDisclosure: true))
             }
             return cell
         case let viewModel as ConsoleTaskCellViewModel:
+            let cell = tableView.dequeueReusableCell(withIdentifier: "task", for: indexPath) as! ConsoleBaseTableCell
             if #available(iOS 16.0, *) {
                 cell.contentConfiguration = UIHostingConfiguration {
                     ConsoleTaskCell(viewModel: viewModel, isShowingDisclosure: true)
+                        .padding(EdgeInsets(top: 8, leading: 20, bottom: 8, trailing: 10))
                 }
+                .margins(.all, 0)
             } else {
                 cell.hostingView.rootView = AnyView(ConsoleTaskCell(viewModel: viewModel, isShowingDisclosure: true))
             }
@@ -196,17 +202,53 @@ final class ConsoleTableViewController: UITableViewController {
         actions.performsFirstActionWithFullSwipe = true
         return actions
     }
+
+    override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        switch getEntityViewModel(at: indexPath) {
+        case let viewModel as ConsoleMessageCellViewModel:
+            let focus = UIContextualAction(style: .normal, title: "Focus") { _,_,_  in viewModel.focus()
+            }
+            focus.backgroundColor = .systemGreen
+            focus.image = UIImage(systemName: "eye")
+
+            let hide = UIContextualAction(style: .normal, title: "Hide") { _,_,_  in
+                viewModel.hide()
+            }
+            hide.backgroundColor = .systemOrange
+            hide.image = UIImage(systemName: "eye.slash")
+
+            let share = UIContextualAction(style: .normal, title: "Share") { _,_,_  in
+                UIActivityViewController.show(with: viewModel.share())
+            }
+            share.backgroundColor = .systemBlue
+            share.image = UIImage(systemName: "square.and.arrow.up")
+
+            let actions = UISwipeActionsConfiguration(actions: [share, focus, hide])
+            actions.performsFirstActionWithFullSwipe = true
+            return actions
+        case let viewModel as ConsoleTaskCellViewModel:
+            let share = UIContextualAction(style: .normal, title: "Share") { _,_,_  in
+                UIActivityViewController.show(with: viewModel.share(as: .html))
+            }
+            share.backgroundColor = .systemBlue
+            share.image = UIImage(systemName: "square.and.arrow.up")
+
+            let actions = UISwipeActionsConfiguration(actions: [share])
+            actions.performsFirstActionWithFullSwipe = true
+            return actions
+        default:
+            fatalError("Invalid viewModel: \(viewModel)")
+        }
+    }
 }
 
-#warning("TODO: remove UIKit helpers")
-
-final class HostingTableCell: UITableViewCell {
+private class ConsoleBaseTableCell: UITableViewCell {
     lazy var hostingView: UIHostingController<AnyView> = {
         let controller = UIHostingController(rootView: AnyView(EmptyView()))
         addSubview(controller.view)
+        controller.view.backgroundColor = .clear
         controller.view.pinToSuperview(insets: UIEdgeInsets(top: 6, left: 20, bottom: 6, right: 12))
         return controller
     }()
 }
-
 #endif

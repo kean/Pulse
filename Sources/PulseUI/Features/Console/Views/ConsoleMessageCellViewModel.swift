@@ -37,16 +37,7 @@ final class ConsoleMessageCellViewModel: Pinnable {
     func share() -> ShareItems {
         ShareItems([message.text])
     }
-    
-    func copy() -> String {
-        message.text
-    }
-    
-    var focusLabel: String {
-        message.label.name.capitalized
-    }
 
-    #warning("TODO: do we still need this?")
     func focus() {
         searchCriteriaViewModel?.criteria.messages.labels.isEnabled = true
         searchCriteriaViewModel?.criteria.messages.labels.focused = message.label.name

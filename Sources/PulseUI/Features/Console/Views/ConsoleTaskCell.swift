@@ -56,7 +56,6 @@ struct ConsoleTaskCell: View {
                 Image(systemName: "chevron.right")
                     .font(ConsoleConstants.fontTitle)
                     .foregroundColor(.separator)
-                    .padding(.trailing, -10)
             }
         }
     }

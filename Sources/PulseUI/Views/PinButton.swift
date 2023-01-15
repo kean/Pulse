@@ -38,16 +38,6 @@ struct PinView: View {
 }
 
 #if os(iOS)
-extension UIAction {
-    static func makePinAction(with viewModel: PinButtonViewModel) -> UIAction {
-        UIAction(
-            title: viewModel.isPinned ? "Remove Pin" : "Pin",
-            image: UIImage(systemName: viewModel.isPinned ? "pin.slash" : "pin"),
-            handler: { _ in viewModel.togglePin() }
-        )
-    }
-}
-
 extension UIContextualAction {
     static func makePinAction(with viewModel: PinButtonViewModel) -> UIContextualAction {
         let action = UIContextualAction(
@@ -60,34 +50,6 @@ extension UIContextualAction {
         return action
     }
 }
-
-final class PinIndicatorView: UIImageView {
-    private var viewModel: PinButtonViewModel?
-    private var cancellables: [AnyCancellable] = []
-
-    init() {
-        super.init(image: pinImage)
-        self.tintColor = .systemPink
-    }
-
-    func bind(viewModel: PinButtonViewModel) {
-        self.viewModel = viewModel
-        cancellables = []
-        viewModel.$isPinned.sink { [weak self] isPinned in
-            guard let self = self else { return }
-            self.isHidden = !isPinned
-        }.store(in: &cancellables)
-    }
-
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-}
-
-private let pinImage: UIImage = {
-    let image = UIImage(systemName: "pin")
-    return image?.withConfiguration(UIImage.SymbolConfiguration(textStyle: .caption1)) ?? UIImage()
-}()
 #endif
 
 #endif

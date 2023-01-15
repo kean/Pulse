@@ -77,6 +77,9 @@ struct ConsoleSearchView_Previews: PreviewProvider {
         NavigationView {
             ConsoleSearchView(viewModel: .init(entities: try! LoggerStore.mock.allMessages(), store: .mock))
         }
+#if os(watchOS)
+        .navigationViewStyle(.stack)
+#endif
     }
 }
 #endif
