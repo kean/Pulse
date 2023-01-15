@@ -104,6 +104,7 @@ final class ConsoleSearchService {
                 contextRange.length -= 1
             }
 
+            // TODO: is this OK
             var prefix = ""
             if lineRange.length > 300, range.location - contextRange.location > 16 {
                 contextRange.length -= (range.location - contextRange.location - 16)

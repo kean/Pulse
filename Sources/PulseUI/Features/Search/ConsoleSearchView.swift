@@ -19,13 +19,37 @@ public struct _SearchView: View {
     }
 }
 
+// TODO: stop updating when leaving background
+
+extension String: Identifiable {
+   public var id: String { self }
+}
+
 // TODO: use custom search bar?
 @available(iOS 15, tvOS 15, *)
 struct ConsoleSearchView: View {
     @ObservedObject var viewModel: ConsoleSearchViewModel
 
     var body: some View {
-        List {
+        let list = List {
+            if !suggestedTokens.isEmpty {
+                Section {
+                    ForEach(suggestedTokens) { token in
+                        Button(action: {
+                            viewModel.searchText = ""
+                            tokens.append(token)
+                        }) {
+                            HStack {
+                                Image(systemName: "magnifyingglass")
+                                    .font(ConsoleConstants.fontBody)
+                                Text(token)
+                                    .foregroundColor(.primary)
+                                    .font(ConsoleConstants.fontBody)
+                            }
+                        }
+                    }
+                }
+            }
             ForEach(viewModel.results) { result in
                 Section {
                     ConsoleEntityCell(entity: result.entity)
@@ -54,9 +78,27 @@ struct ConsoleSearchView: View {
                 }
             }
         }
-        .environment(\.defaultMinListRowHeight, 0)
-        .listStyle(.insetGrouped)
-        .searchable(text: $viewModel.searchText)
+            .environment(\.defaultMinListRowHeight, 0)
+            .listStyle(.insetGrouped)
+
+        //  TODO: rewrite using custom search bar
+        if #available(iOS 16, *) {
+            list
+                .searchable(text: $viewModel.searchText, tokens: $tokens, token: { Text($0) })
+        }  else {
+            list.searchable(text: $viewModel.searchText)
+        }
+    }
+
+    @State var tokens: [String] = []
+
+    // TODO: implement suggested tokens
+    // TODO: for status code allow ranges (400<500) etc
+    var suggestedTokens: [String] {
+        if viewModel.searchText == "201" {
+            return ["Status Code 200"]
+        }
+        return ["Status Code 500", "application/json"]
     }
 
     // TODO: add occurence IDs instead of indices
