@@ -120,7 +120,7 @@ final class ConsoleTableViewController: UITableViewController {
 
     func setHeaderView<Header: View>(_ view: Header) {
         let header = UIHostingController(rootView: view).view
-        header?.frame = CGRect(x: 0, y: 0, width: 320, height: 60)
+        header?.frame = CGRect(x: 0, y: 0, width: 320, height: 44)
         tableView.tableHeaderView = header
     }
 

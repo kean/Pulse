@@ -24,7 +24,7 @@ public struct ConsoleView: View {
     }
 
     public var body: some View {
-        contentView
+        let content = contentView
             .onAppear(perform: viewModel.onAppear)
             .onDisappear(perform: viewModel.onDisappear)
             .edgesIgnoringSafeArea(.bottom)
@@ -54,6 +54,12 @@ public struct ConsoleView: View {
                     }
                 }
             }
+        // TOOD: integrate ConsoleSearchView
+        if #available(iOS 15.0, *) {
+            content.searchable(text: $viewModel.filterTerm)
+        } else {
+            content
+        }
     }
 
     @ViewBuilder
@@ -99,27 +105,18 @@ private struct ConsoleToolbarView: View {
     @State private var isSearching = false
 
     var body: some View {
-        VStack(spacing: 8) {
+        VStack {
             HStack(spacing: 0) {
                 let suffix = viewModel.mode == .network ? "Requests" : "Messages"
-                SearchBar(
-                    title: "\(viewModel.entities.count) \(suffix)",
-                    text: $viewModel.filterTerm,
-                    isSearching: $isSearching
-                )
-                if !isSearching {
-                    filters
-                } else {
-                    Button("Cancel") {
-                        isSearching = false
-                        viewModel.filterTerm = ""
-                    }
-                    .foregroundColor(.accentColor)
-                    .padding(.horizontal, 14)
-                }
-            }.buttonStyle(.plain)
-        }
-        .padding(EdgeInsets(top: 2, leading: 8, bottom: 2, trailing: 8))
+                Text("\(viewModel.entities.count) \(suffix)")
+                    .foregroundColor(.secondary)
+                Spacer()
+                filters
+            }
+            .buttonStyle(.plain)
+            .padding(.trailing, 8)
+            Divider()
+        }.padding(.leading, 16)
         .sheet(isPresented: $isShowingFilters) {
             NavigationView {
                 ConsoleSearchCriteriaView(viewModel: viewModel.searchViewModel)
@@ -136,18 +133,18 @@ private struct ConsoleToolbarView: View {
                 Image(systemName: viewModel.mode == .network ? "arrow.down.circle.fill" : "arrow.down.circle")
                     .font(.system(size: 20))
                     .foregroundColor(.accentColor)
-            }.frame(width: 40, height: 44)
+            }.frame(width: 40)
         }
         Button(action: { viewModel.isOnlyErrors.toggle() }) {
             Image(systemName: viewModel.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon")
                 .font(.system(size: 20))
                 .foregroundColor(viewModel.isOnlyErrors ? .red : .accentColor)
-        }.frame(width: 40, height: 44)
+        }.frame(width: 40)
         Button(action: { isShowingFilters = true }) {
             Image(systemName: viewModel.searchViewModel.isCriteriaDefault ? "line.horizontal.3.decrease.circle" : "line.3.horizontal.decrease.circle.fill")
                 .font(.system(size: 20))
                 .foregroundColor(.accentColor)
-        }.frame(width: 40, height: 44)
+        }.frame(width: 40)
     }
 }
 
