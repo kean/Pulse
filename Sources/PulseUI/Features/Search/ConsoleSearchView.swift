@@ -7,17 +7,6 @@ import Pulse
 import CoreData
 import Combine
 
-#warning("TODO: remove public")
-public struct _SearchView: View {
-    public init() {}
-
-    public var body: some View {
-        if #available(iOS 15, *) {
-            ConsoleSearchView(viewModel: .init(entities: try! LoggerStore.mock.allMessages(), store: .mock))
-        }
-    }
-}
-
 // TODO: stop updating when leaving background
 // TODO: instead of tokens, use something similar to custom search filters
 // TODO: do we need searchabl then?

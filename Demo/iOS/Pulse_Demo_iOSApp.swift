@@ -6,15 +6,13 @@ import SwiftUI
 import Pulse
 import PulseUI
 
-#warning("TODO: update")
 @main
 struct Pulse_Demo_iOSApp: App {
     var body: some Scene {
 //        let _ = testProxy()
         WindowGroup {
             NavigationView {
-                _SearchView()
-//                ConsoleView(store: .demo)
+                ConsoleView(store: .demo)
             }
         }
     }

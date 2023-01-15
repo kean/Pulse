@@ -88,10 +88,7 @@ final class ConsoleTableViewController: UITableViewController {
     }
 
     private func createView() {
-        tableView.register(ConsoleMessageTableCell.self, forCellReuseIdentifier: "ConsoleMessageTableCell")
-        tableView.register(ConsoleNetworkRequestTableCell.self, forCellReuseIdentifier: "ConsoleNetworkRequestTableCell")
-
-        tableView.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 0)
+        tableView.register(HostingTableCell.self, forCellReuseIdentifier: "HostingTableCell")
 
         ConsoleSettings.shared.$lineLimit.sink { [weak self] _ in
             self?.tableView.reloadData()
@@ -160,14 +157,25 @@ final class ConsoleTableViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "HostingTableCell", for: indexPath) as! HostingTableCell
         switch getEntityViewModel(at: indexPath) {
         case let viewModel as ConsoleMessageCellViewModel:
-            let cell = tableView.dequeueReusableCell(withIdentifier: "ConsoleMessageTableCell", for: indexPath) as! ConsoleMessageTableCell
-            cell.display(viewModel)
+            if #available(iOS 16.0, *) {
+                cell.contentConfiguration = UIHostingConfiguration {
+                    ConsoleMessageCell(viewModel: viewModel, isShowingDisclosure: true)
+                }
+            } else {
+                cell.hostingView.rootView = AnyView(ConsoleMessageCell(viewModel: viewModel, isShowingDisclosure: true))
+            }
             return cell
         case let viewModel as ConsoleTaskCellViewModel:
-            let cell = tableView.dequeueReusableCell(withIdentifier: "ConsoleNetworkRequestTableCell", for: indexPath) as! ConsoleNetworkRequestTableCell
-            cell.display(viewModel)
+            if #available(iOS 16.0, *) {
+                cell.contentConfiguration = UIHostingConfiguration {
+                    ConsoleTaskCell(viewModel: viewModel, isShowingDisclosure: true)
+                }
+            } else {
+                cell.hostingView.rootView = AnyView(ConsoleTaskCell(viewModel: viewModel, isShowingDisclosure: true))
+            }
             return cell
         default:
             fatalError("Invalid viewModel: \(viewModel)")
@@ -188,6 +196,17 @@ final class ConsoleTableViewController: UITableViewController {
         actions.performsFirstActionWithFullSwipe = true
         return actions
     }
+}
+
+#warning("TODO: remove UIKit helpers")
+
+final class HostingTableCell: UITableViewCell {
+    lazy var hostingView: UIHostingController<AnyView> = {
+        let controller = UIHostingController(rootView: AnyView(EmptyView()))
+        addSubview(controller.view)
+        controller.view.pinToSuperview(insets: UIEdgeInsets(top: 6, left: 20, bottom: 6, right: 12))
+        return controller
+    }()
 }
 
 #endif

@@ -136,14 +136,6 @@ private struct _ConsoleTableView: View {
             viewModel: viewModel.table,
             detailsViewModel: viewModel.details
         )
-        .overlay(tableOverlay)
-    }
-
-    @ViewBuilder
-    private var tableOverlay: some View {
-        if viewModel.entities.isEmpty {
-            PlaceholderView.make(viewModel: viewModel)
-        }
     }
 }
 
@@ -165,7 +157,7 @@ private struct ConsoleToolbarView: View {
             .buttonStyle(.plain)
             .padding(.trailing, 8)
             Divider()
-        }.padding(.leading, 16)
+        }.padding(.leading, 20)
         .sheet(isPresented: $isShowingFilters) {
             NavigationView {
                 ConsoleSearchCriteriaView(viewModel: viewModel.searchCriteriaViewModel)

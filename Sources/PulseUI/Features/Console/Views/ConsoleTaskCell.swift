@@ -11,9 +11,12 @@ struct ConsoleTaskCell: View {
     @ObservedObject var viewModel: ConsoleTaskCellViewModel
     @ObservedObject var progressViewModel: ProgressViewModel
 
-    init(viewModel: ConsoleTaskCellViewModel) {
+    var isShowingDisclosure = false
+
+    init(viewModel: ConsoleTaskCellViewModel, isShowingDisclosure: Bool = false) {
         self.viewModel = viewModel
         self.progressViewModel = viewModel.progress
+        self.isShowingDisclosure = isShowingDisclosure
     }
 
 #if os(watchOS) || os(iOS)
@@ -49,6 +52,12 @@ struct ConsoleTaskCell: View {
                 .font(ConsoleConstants.fontTitle)
                 .foregroundColor(.secondary)
                 .backport.monospacedDigit()
+            if isShowingDisclosure {
+                Image(systemName: "chevron.right")
+                    .font(ConsoleConstants.fontTitle)
+                    .foregroundColor(.separator)
+                    .padding(.trailing, -10)
+            }
         }
     }
 #elseif os(tvOS) || os(macOS)

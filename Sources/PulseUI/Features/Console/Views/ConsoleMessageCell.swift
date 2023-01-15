@@ -9,6 +9,7 @@ import Combine
 
 struct ConsoleMessageCell: View {
     let viewModel: ConsoleMessageCellViewModel
+    var isShowingDisclosure = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -26,6 +27,12 @@ struct ConsoleMessageCell: View {
                     .font(ConsoleConstants.fontTitle)
                     .foregroundColor(.secondary)
                     .backport.monospacedDigit()
+                if isShowingDisclosure {
+                    Image(systemName: "chevron.right")
+                        .font(ConsoleConstants.fontTitle)
+                        .foregroundColor(.separator)
+                        .padding(.trailing, -10)
+                }
             }
             Text(viewModel.preprocessedText)
                 .font(ConsoleConstants.fontBody)
