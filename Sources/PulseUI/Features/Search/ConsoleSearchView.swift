@@ -7,6 +7,19 @@ import Pulse
 import CoreData
 import Combine
 
+#warning("TODO: remove public")
+
+public struct _SearchView: View {
+    public init() {}
+
+    public var body: some View {
+        if #available(iOS 15, *) {
+            ConsoleSearchView(viewModel: .init(entities: try! LoggerStore.mock.allMessages()))
+        }
+    }
+}
+
+// TODO: use custom search bar?
 @available(iOS 15, tvOS 15, *)
 struct ConsoleSearchView: View {
     @ObservedObject var viewModel: ConsoleSearchViewModel
@@ -20,7 +33,7 @@ struct ConsoleSearchView: View {
                     // TODO: when open body, start with a search term immediatelly
                     let occurences = Array(result.occurences.enumerated())
                     ForEach(occurences.prefix(3), id: \.offset) { item in
-                        NavigationLink(destination: makeDestination(for: item.element.kind, entity: result.entity)) {
+                        NavigationLink(destination: makeDestination(for: item.element, entity: result.entity)) {
                             makeCell(for: item.element)
                         }
                     }
@@ -38,23 +51,22 @@ struct ConsoleSearchView: View {
 
     // TODO: add occurence IDs instead of indices
     func makeCell(for occurence: ConsoleSearchOccurence) -> some View {
-        NavigationLink(destination: Text("Placeholder")) {
-            // TODO: handle errors
-            let attr = try! AttributedString(occurence.occurrence, including: \.uiKit)
-            VStack(alignment: .leading, spacing: 4) {
-                Text(occurence.kind.title + " (Line: \(occurence.line):\(occurence.range.lowerBound))")
-                    .font(ConsoleConstants.fontTitle)
-                    .foregroundColor(.secondary)
-                Text(attr)
-                    .lineLimit(3)
-            }
+        // TODO: handle errors
+        let attr = try! AttributedString(occurence.occurrence, including: \.uiKit)
+        return VStack(alignment: .leading, spacing: 4) {
+            Text(occurence.kind.title + " (Line: \(occurence.line):\(occurence.range.lowerBound))")
+                .font(ConsoleConstants.fontTitle)
+                .foregroundColor(.secondary)
+            Text(attr)
+                .lineLimit(3)
         }
     }
 
-    func makeDestination(for kind: ConsoleSearchOccurence.Kind, entity: NSManagedObject) -> some View {
-        switch kind {
+    func makeDestination(for occurence: ConsoleSearchOccurence, entity: NSManagedObject) -> some View {
+        switch occurence.kind {
         case .responseBody:
             return NetworkInspectorResponseBodyView(viewModel: .init(task: entity as! NetworkTaskEntity))
+                .environment(\.textViewSearchContext, occurence.searchContext)
         }
     }
 }
@@ -80,6 +92,11 @@ final class ConsoleSearchViewModel: ObservableObject {
         $searchText.dropFirst().sink { [weak self] in
             self?.search($0)
         }.store(in: &cancellables)
+
+        #warning("TEPM")
+        DispatchQueue.main.async {
+            self.searchText = "Nuke"
+        }
     }
 
     // TODO: perform in background
@@ -110,7 +127,7 @@ final class ConsoleSearchViewModel: ObservableObject {
         var occurences: [ConsoleSearchOccurence] = []
         if let responseBody = task.responseBody?.data, let string = String(data: responseBody, encoding: .utf8) {
             let matches = regex.matches(in: string)
-            for match in matches {
+            for (index, match) in matches.enumerated() {
                 let range = match.fullMatch.startIndex..<match.fullMatch.endIndex
                 // TODO: check range limits
                 // TODO: find next and current line + adjust to fit current line on screen
@@ -124,11 +141,14 @@ final class ConsoleSearchViewModel: ObservableObject {
 
                 // TODO: optimize + show line number
                 let range2 = Int.random(in: 1...50)..<200
+                // TODO: pass options
+                let context = RichTextViewModel.SearchContext(searchTerm: searchText, options: .default, matchIndex: index)
                 let occurence = ConsoleSearchOccurence(
                     kind: .responseBody,
                     line: .random(in: 1...100),
                     range: range2,
-                    occurrence: substring
+                    occurrence: substring,
+                    searchContext: context
                 )
                 occurences.append(occurence)
             }
@@ -157,6 +177,7 @@ struct ConsoleSearchOccurence {
     let line: Int
     let range: Range<Int>
     let occurrence: NSAttributedString
+    let searchContext: RichTextViewModel.SearchContext
 }
 
 struct ConsoleSearchResultViewModel: Identifiable {

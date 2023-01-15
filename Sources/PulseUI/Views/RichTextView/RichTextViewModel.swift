@@ -56,6 +56,22 @@ final class RichTextViewModel: ObservableObject {
             }.store(in: &bag)
     }
 
+    func prepare(_ context: SearchContext?) {
+        guard let context = context else { return }
+
+        // Not updated self.searchTerm because searchable doesn't like that
+        let matches = search(searchTerm: context.searchTerm, in: textStorage.string as NSString, options: context.options)
+        self.didUpdateMatches(matches)
+        if context.matchIndex < matches.count {
+            DispatchQueue.main.async {
+                self.textView?.layoutManager.allowsNonContiguousLayout = false // Remove this workaround
+                UIView.performWithoutAnimation {
+                    self.updateMatchIndex(context.matchIndex)
+                }
+            }
+        }
+    }
+
     func display(_ text: NSAttributedString) {
         self.text = text
         self.matches.removeAll()
@@ -127,7 +143,7 @@ final class RichTextViewModel: ObservableObject {
         updateMatchIndex(selectedMatchIndex - 1 < 0 ? matches.count - 1 : selectedMatchIndex - 1)
     }
 
-    private func updateMatchIndex(_ newIndex: Int) {
+    func updateMatchIndex(_ newIndex: Int) {
         let previousIndex = selectedMatchIndex
         selectedMatchIndex = newIndex
         didUpdateCurrentSelectedMatch(previousMatch: previousIndex)
@@ -137,9 +153,20 @@ final class RichTextViewModel: ObservableObject {
         guard !matches.isEmpty else { return }
 
         // Scroll to visible range
+        // Make sure it's somewhere in the middle (find newlines)
         var range = matches[selectedMatchIndex]
-        if range.length + 50 < textStorage.length {
-            range.length += 50
+        var index = range.upperBound
+        var newlines = 0
+        let string = textStorage.string as NSString
+        while index < textStorage.length {
+            if let character = UnicodeScalar(string.character(at: index)).map(Character.init), character.isNewline {
+                newlines += 1
+                range.length += index - range.upperBound
+                if newlines == 8 {
+                    break
+                }
+            }
+            index += 1
         }
         if let textView = textView {
             textView.scrollRangeToVisible(range)
@@ -166,6 +193,12 @@ final class RichTextViewModel: ObservableObject {
             .backgroundColor: UXColor.systemBlue.withAlphaComponent(isFocused ? 0.8 : 0.3),
             .foregroundColor: UXColor.white
         ], range: range)
+    }
+
+    struct SearchContext {
+        let searchTerm: String
+        let options: StringSearchOptions
+        let matchIndex: Int
     }
 }
 
