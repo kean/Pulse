@@ -311,19 +311,27 @@ struct ConsoleSearchOccurence {
     let searchContext: RichTextViewModel.SearchContext
 }
 
+// TODO: (when entering text)
+// Response Body contains:
+// Request Body contains:
+// show more
+
+@available(iOS 15, tvOS 15, *)
 enum ConsoleSearchToken: Identifiable, Hashable {
     var id: ConsoleSearchToken { self }
 
     case status(range: ClosedRange<Int>, isNot: Bool)
 
-    var title: String {
+    var title: AttributedString {
         switch self {
         case .status(let range, let isNot):
+            let value: String
             if range.count == 1 {
-                return "Status Code: \(isNot ? "NOT " : "")\(range.lowerBound)"
+                value = "\(isNot ? "NOT " : "")\(range.lowerBound)"
             } else {
-                return "Status Code: \(isNot ? "NOT IN " : "")\(range.lowerBound)...\(range.upperBound)"
+                value = "\(isNot ? "NOT IN " : "")\(range.lowerBound)...\(range.upperBound)"
             }
+            return AttributedString("Status Code: ") { $0.foregroundColor = .secondary } + AttributedString(value)
         }
     }
 }

@@ -53,6 +53,15 @@ extension String {
     }
 }
 
+@available(iOS 15, tvOS 15, *)
+extension AttributedString {
+    init(_ string: String, _ configure: (inout AttributeContainer) -> Void) {
+        var attributes = AttributeContainer()
+        configure(&attributes)
+        self.init(string, attributes: attributes)
+    }
+}
+
 struct StringSearchOptions {
     var isRegex: Bool = false
     var isCaseSensitive: Bool = false
