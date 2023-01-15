@@ -15,6 +15,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     @Published private(set) var results: [ConsoleSearchResultViewModel] = []
     @Published var searchText: String = ""
     @Published var isSearching = false
+    @Published var hasMore = false
     private var operation: ConsoleSearchOperation?
 
     @State var tokens: [String] = []
@@ -63,8 +64,13 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
 
         let operation = ConsoleSearchOperation(objectIDs: objectIDs, searchText: searchText, service: service, context: context)
         operation.delegate = self
-        operation.start()
+        operation.resume()
         self.operation = operation
+    }
+
+    func buttonShowMoreResultsTapped() {
+        isSearching = true
+        operation?.resume()
     }
 
     // MARK: ConsoleSearchOperationDelegate
@@ -75,11 +81,12 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         self.results += results
     }
 
-    fileprivate func searchOperationDidFinish(_ operation: ConsoleSearchOperation) {
+    fileprivate func searchOperationDidFinish(_ operation: ConsoleSearchOperation, hasMore: Bool) {
         guard self.operation === operation else { return }
 
         // TODO: check if this is correct
         isSearching = false
+        self.hasMore = hasMore
     }
 }
 
@@ -88,12 +95,14 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
 @available(iOS 15, tvOS 15, *)
 private protocol ConsoleSearchOperationDelegate: AnyObject { // Going old-school
     func searchOperation(_ operation: ConsoleSearchOperation, didAddResults results: [ConsoleSearchResultViewModel])
-    func searchOperationDidFinish(_ operation: ConsoleSearchOperation)
+    func searchOperationDidFinish(_ operation: ConsoleSearchOperation, hasMore: Bool)
 }
 
 @available(iOS 15, tvOS 15, *)
 private final class ConsoleSearchOperation {
     private var objectIDs: [NSManagedObjectID]
+    private var index = 0
+    private var cutoff = 10
     private let searchText: String
     private let service: ConsoleSearchService
     private let context: NSManagedObjectContext
@@ -120,22 +129,34 @@ private final class ConsoleSearchOperation {
         lock.deallocate()
     }
 
-    func start() {
+    func resume() {
         context.perform { self._start() }
     }
 
     private func _start() {
-        for objectID in objectIDs where !isCancelled {
-            if let entity = try? self.context.existingObject(with: objectID),
+        var found = 0
+        var hasMore = false
+        while index < objectIDs.count, !isCancelled, !hasMore {
+            if let entity = try? self.context.existingObject(with: objectIDs[index]),
                let result = self.search(searchText, in: entity) {
-                DispatchQueue.main.async {
-                    // TODO: coalesce results
-                    self.delegate?.searchOperation(self, didAddResults: [result])
+                found += 1
+                if found > cutoff {
+                    hasMore = true
+                    index -= 1
+                } else {
+                    // TODO: coalesce/debounce results
+                    DispatchQueue.main.async {
+                        self.delegate?.searchOperation(self, didAddResults: [result])
+                    }
                 }
             }
+            index += 1
         }
         DispatchQueue.main.async {
-            self.delegate?.searchOperationDidFinish(self)
+            self.delegate?.searchOperationDidFinish(self, hasMore: hasMore)
+            if self.cutoff < 1000 {
+                self.cutoff *= 2
+            }
         }
     }
 
@@ -144,7 +165,7 @@ private final class ConsoleSearchOperation {
         guard let task = (entity as? LoggerMessageEntity)?.task else {
             return nil
         }
-        Thread.sleep(forTimeInterval: 1)
+        Thread.sleep(forTimeInterval: 0.5)
         return search(searchText, in: task)
     }
 

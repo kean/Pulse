@@ -117,6 +117,11 @@ struct ConsoleSearchView: View {
                     .frame(maxWidth: .infinity, alignment: .center)
                     .id(UUID())
             }
+            if !viewModel.isSearching && viewModel.hasMore {
+                Button(action: viewModel.buttonShowMoreResultsTapped) {
+                    Text("Show More Results")
+                }
+            }
         }
             
             .environment(\.defaultMinListRowHeight, 0)
