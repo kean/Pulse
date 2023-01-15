@@ -94,6 +94,8 @@ struct ConsoleSearchView: View {
 
     @State var tokens: [String] = []
 
+    // TODO: Display recent searches sections
+
     // TODO: implement suggested tokens
     // TODO: for status code allow ranges (400<500) etc
     // TODO: use new Regex for this

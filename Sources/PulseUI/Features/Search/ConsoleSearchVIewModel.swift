@@ -75,6 +75,7 @@ final class ConsoleSearchViewModel: ObservableObject {
 final class ConsoleSearchService {
 
     // TODO: prioritize full matches
+    // TODO: cache response bodies in memory
     func search(_ kind: ConsoleSearchOccurence.Kind, in task: NetworkTaskEntity, searchText: String, options: StringSearchOptions) -> [ConsoleSearchOccurence] {
         guard let data = task.responseBody?.data,
               let content = NSString(data: data, encoding: NSUTF8StringEncoding)

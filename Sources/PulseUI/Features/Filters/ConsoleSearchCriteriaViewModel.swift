@@ -150,16 +150,6 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
         }
     }
 
-    // MARK: Custom Filters
-
-    var programmaticFilters: [ConsoleCustomNetworkFilter]? {
-        let programmaticFilters = criteria.network.custom.filters.filter { $0.isProgrammatic && !$0.value.isEmpty }
-        guard !programmaticFilters.isEmpty && criteria.network.custom.isEnabled else {
-            return nil
-        }
-        return programmaticFilters
-    }
-
     // MARK: Bindings (Hosts)
 
     var selectedHost: Set<String> {
