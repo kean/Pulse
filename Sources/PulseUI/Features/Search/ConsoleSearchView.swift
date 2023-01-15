@@ -19,44 +19,12 @@ public struct _SearchView: View {
 }
 
 // TODO: stop updating when leaving background
-
-#warning("TODO: remove")
-extension String: Identifiable {
-   public var id: String { self }
-}
-
 // TODO: instead of tokens, use something similar to custom search filters
 // TODO: do we need searchabl then?
 
 @available(iOS 15, tvOS 15, *)
 struct ConsoleSearchView: View {
     @ObservedObject var viewModel: ConsoleSearchViewModel
-
-    struct SuggestedFiltersSections: View {
-        @ObservedObject var viewModel: ConsoleSearchViewModel
-        @Environment(\.isSearching) private var isSearching // important: scope
-
-        var body: some View {
-            if isSearching && !viewModel.suggestedTokens.isEmpty {
-                Section(header: Text("Suggested Filters")) {
-                    ForEach(viewModel.suggestedTokens) { token in
-                        Button(action: {
-                            viewModel.searchText = ""
-                            viewModel.tokens.append(token)
-                        }) {
-                            HStack {
-                                Image(systemName: "magnifyingglass")
-                                    .font(ConsoleConstants.fontBody)
-                                Text(token)
-                                    .foregroundColor(.primary)
-                                    .font(ConsoleConstants.fontBody)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
 
     // TODO: implement recent searches (and move this)
     // TODO: add a way to clear them
@@ -81,8 +49,7 @@ struct ConsoleSearchView: View {
     var body: some View {
         let list = List {
             RecentSearchesView()
-            SuggestedFiltersSections(viewModel: viewModel)
-
+            ConsoleSearchSuggestedTokensView(viewModel: viewModel)
 
             ForEach(viewModel.results) { result in
                 Section {
@@ -130,7 +97,7 @@ struct ConsoleSearchView: View {
         //  TODO: rewrite using custom search bar
         if #available(iOS 16, *) {
             list
-                .searchable(text: $viewModel.searchText, tokens: $viewModel.tokens, token: { Text($0) })
+                .searchable(text: $viewModel.searchText, tokens: $viewModel.tokens, token: { Text($0.title) })
                 .disableAutocorrection(true)
         }  else {
             list.searchable(text: $viewModel.searchText)
@@ -154,6 +121,34 @@ struct ConsoleSearchView: View {
         case .responseBody:
             return NetworkInspectorResponseBodyView(viewModel: .init(task: entity as! NetworkTaskEntity))
                 .environment(\.textViewSearchContext, occurence.searchContext)
+        }
+    }
+}
+
+@available(iOS 15, tvOS 15, *)
+private struct ConsoleSearchSuggestedTokensView: View {
+    @ObservedObject var viewModel: ConsoleSearchViewModel
+    @Environment(\.isSearching) private var isSearching // important: scope
+
+    // TODO: render values for suggestions using attributed strings
+    var body: some View {
+        if isSearching && !viewModel.suggestedTokens.isEmpty {
+            Section(header: Text("Suggested Filters")) {
+                ForEach(viewModel.suggestedTokens) { token in
+                    Button(action: {
+                        viewModel.searchText = ""
+                        viewModel.tokens.append(token)
+                    }) {
+                        HStack {
+                            Image(systemName: "magnifyingglass")
+                                .font(ConsoleConstants.fontBody)
+                            Text(token.title)
+                                .foregroundColor(.primary)
+                                .font(ConsoleConstants.fontBody)
+                        }
+                    }
+                }
+            }
         }
     }
 }

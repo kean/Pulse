@@ -22,18 +22,8 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     private var dirtyDate: Date?
     private var operation: ConsoleSearchOperation?
 
-    @State var tokens: [String] = []
-
-    // TODO: implement suggested tokens
-    // TODO: for status code allow ranges (400<500) etc
-    // TODO: use new Regex for this
-    // TODO: why I can't search for '"'?
-    var suggestedTokens: [String] {
-        if searchText == "201" {
-            return ["Status Code 200"]
-        }
-        return ["Status Code 500", "application/json"]
-    }
+    @State var tokens: [ConsoleSearchToken] = []
+    @Published var suggestedTokens: [ConsoleSearchToken] = []
 
     private let service = ConsoleSearchService()
 
@@ -45,8 +35,9 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         self.objectIDs = entities.map(\.objectID)
         self.context = store.newBackgroundContext()
 
-        $searchText.dropFirst().sink { [weak self] in
+        $searchText.sink { [weak self] in
             self?.didUpdateSearchCriteria($0)
+            self?.updateSearchTokens(for: $0)
         }.store(in: &cancellables)
 
         $isSearching
@@ -80,6 +71,21 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         operation.delegate = self
         operation.resume()
         self.operation = operation
+    }
+
+
+    private func updateSearchTokens(for searchText: String) {
+        guard #available(iOS 16, tvOS 16, *) else { return }
+
+        var tokens: [ConsoleSearchToken] = []
+
+        // Status Code
+        if let code = Int(searchText), (100...500).contains(code) {
+            tokens.append(.status(range: code...code, isNot: false))
+            tokens.append(.status(range: code...code, isNot: true))
+        }
+
+        self.suggestedTokens = tokens
     }
 
     func buttonShowMoreResultsTapped() {
@@ -303,6 +309,23 @@ struct ConsoleSearchOccurence {
     let range: NSRange
     let text: AttributedString
     let searchContext: RichTextViewModel.SearchContext
+}
+
+enum ConsoleSearchToken: Identifiable, Hashable {
+    var id: ConsoleSearchToken { self }
+
+    case status(range: ClosedRange<Int>, isNot: Bool)
+
+    var title: String {
+        switch self {
+        case .status(let range, let isNot):
+            if range.count == 1 {
+                return "Status Code: \(isNot ? "NOT " : "")\(range.lowerBound)"
+            } else {
+                return "Status Code: \(isNot ? "NOT IN " : "")\(range.lowerBound)...\(range.upperBound)"
+            }
+        }
+    }
 }
 
 @available(iOS 15, tvOS 15, *)
