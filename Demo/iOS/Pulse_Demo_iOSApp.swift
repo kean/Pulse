@@ -13,7 +13,7 @@ struct Pulse_Demo_iOSApp: App {
         WindowGroup {
             NavigationView {
                 ConsoleView(store: .demo)
-            }.navigationViewStyle(.stack)
+            }
         }
     }
 }
