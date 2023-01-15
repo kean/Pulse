@@ -25,6 +25,9 @@ extension String: Identifiable {
    public var id: String { self }
 }
 
+// TODO: instead of tokens, use something similar to custom search filters
+// TODO: do we need searchabl then?
+
 @available(iOS 15, tvOS 15, *)
 struct ConsoleSearchView: View {
     @ObservedObject var viewModel: ConsoleSearchViewModel
@@ -79,6 +82,8 @@ struct ConsoleSearchView: View {
         let list = List {
             RecentSearchesView()
             SuggestedFiltersSections(viewModel: viewModel)
+
+
             ForEach(viewModel.results) { result in
                 Section {
                     ConsoleEntityCell(entity: result.entity)

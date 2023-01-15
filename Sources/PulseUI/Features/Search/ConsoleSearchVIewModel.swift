@@ -8,13 +8,14 @@ import CoreData
 import Combine
 
 @available(iOS 15, tvOS 15, *)
-final class ConsoleSearchViewModel: ObservableObject {
-    // TODO: add actual search
+final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDelegate {
     private let entities: [NSManagedObject]
+    private let objectIDs: [NSManagedObjectID]
 
     @Published private(set) var results: [ConsoleSearchResultViewModel] = []
     @Published var searchText: String = ""
     @Published var isSearching = false
+    private var operation: ConsoleSearchOperation?
 
     @State var tokens: [String] = []
 
@@ -28,26 +29,29 @@ final class ConsoleSearchViewModel: ObservableObject {
         return ["Status Code 500", "application/json"]
     }
 
-    private let search = ConsoleSearchService()
+    private let service = ConsoleSearchService()
 
     private var cancellables: [AnyCancellable] = []
     private let context: NSManagedObjectContext
 
     init(entities: [NSManagedObject], store: LoggerStore) {
         self.entities = entities
+        self.objectIDs = entities.map(\.objectID)
         self.context = store.newBackgroundContext()
 
         // TODO: cancel previous search?
         // TODO: use previous results for more specific searches
         $searchText.dropFirst().sink { [weak self] in
-            self?.search($0)
+            self?.didUpdateSearchCriteria($0)
         }.store(in: &cancellables)
     }
 
-    private func search(_ searchText: String) {
-        guard !isSearching else { return }
+    private func didUpdateSearchCriteria(_ searchText: String) {
+        operation?.cancel()
+        operation = nil
 
         guard searchText.count > 1 else {
+            isSearching = false
             results = []
             return
         }
@@ -57,31 +61,81 @@ final class ConsoleSearchViewModel: ObservableObject {
         // TODO: keep previous matches when more speicifc searc is added
         results = []
 
-        context.perform {
-            self.search(searchText, in: self.entities.map(\.objectID))
-        }
+        let operation = ConsoleSearchOperation(objectIDs: objectIDs, searchText: searchText, service: service, context: context)
+        operation.delegate = self
+        operation.start()
+        self.operation = operation
     }
 
-    // TODO: add a switch in UI to enable regex and other options?
-    private func search(_ searchText: String, in objectIDs: [NSManagedObjectID]) {
-        for objectID in objectIDs {
+    // MARK: ConsoleSearchOperationDelegate
+
+    fileprivate func searchOperation(_ operation: ConsoleSearchOperation, didAddResults results: [ConsoleSearchResultViewModel]) {
+        guard self.operation === operation else { return }
+
+        self.results += results
+    }
+
+    fileprivate func searchOperationDidFinish(_ operation: ConsoleSearchOperation) {
+        guard self.operation === operation else { return }
+
+        // TODO: check if this is correct
+        isSearching = false
+    }
+}
+
+// TODO: throttle results?
+
+@available(iOS 15, tvOS 15, *)
+private protocol ConsoleSearchOperationDelegate: AnyObject { // Going old-school
+    func searchOperation(_ operation: ConsoleSearchOperation, didAddResults results: [ConsoleSearchResultViewModel])
+    func searchOperationDidFinish(_ operation: ConsoleSearchOperation)
+}
+
+@available(iOS 15, tvOS 15, *)
+private final class ConsoleSearchOperation {
+    private var objectIDs: [NSManagedObjectID]
+    private let searchText: String
+    private let service: ConsoleSearchService
+    private let context: NSManagedObjectContext
+    private let lock: os_unfair_lock_t
+    private var _isCancelled = false
+
+    weak var delegate: ConsoleSearchOperationDelegate?
+
+    init(objectIDs: [NSManagedObjectID],
+         searchText: String,
+         service: ConsoleSearchService,
+         context: NSManagedObjectContext) {
+        self.objectIDs = objectIDs
+        self.searchText = searchText
+        self.service = service
+        self.context = context
+
+        self.lock = .allocate(capacity: 1)
+        self.lock.initialize(to: os_unfair_lock())
+    }
+
+    deinit {
+        lock.deinitialize(count: 1)
+        lock.deallocate()
+    }
+
+    func start() {
+        context.perform { self._start() }
+    }
+
+    private func _start() {
+        for objectID in objectIDs where !isCancelled {
             if let entity = try? self.context.existingObject(with: objectID),
                let result = self.search(searchText, in: entity) {
                 DispatchQueue.main.async {
-                    self.results.append(result)
+                    // TODO: coalesce results
+                    self.delegate?.searchOperation(self, didAddResults: [result])
                 }
             }
         }
         DispatchQueue.main.async {
-            self.didFinishSearch(with: searchText)
-        }
-    }
-
-    private func didFinishSearch(with searchText: String) {
-        isSearching = false
-
-        if searchText != self.searchText {
-            search(self.searchText)
+            self.delegate?.searchOperationDidFinish(self)
         }
     }
 
@@ -99,12 +153,25 @@ final class ConsoleSearchViewModel: ObservableObject {
     // TODO: what if URL matches? can we highlight the cell itself?
     private func search(_ searchText: String, in task: NetworkTaskEntity) -> ConsoleSearchResultViewModel? {
         var occurences: [ConsoleSearchOccurence] = []
-        occurences += search.search(.responseBody, in: task, searchText: searchText, options: .default)
+        occurences += service.search(.responseBody, in: task, searchText: searchText, options: .default)
         guard !occurences.isEmpty else {
             return nil
         }
-        // TODO: remove sort (or how do we sort?)
         return ConsoleSearchResultViewModel(entity: task, occurences: occurences)
+    }
+
+    // MARK: Cancellation
+
+    private var isCancelled: Bool {
+        os_unfair_lock_lock(lock)
+        defer { os_unfair_lock_unlock(lock) }
+        return _isCancelled
+    }
+
+    func cancel() {
+        os_unfair_lock_lock(lock)
+        _isCancelled = true
+        os_unfair_lock_unlock(lock)
     }
 }
 
