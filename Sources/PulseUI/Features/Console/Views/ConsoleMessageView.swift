@@ -17,7 +17,9 @@ struct ConsoleMessageView: View {
                     .lineLimit(1)
                     .font(ConsoleConstants.fontTitle)
                     .foregroundColor(.secondary)
+#if !os(iOS)
                 Spacer()
+#endif
 #if os(macOS)
                 PinView(viewModel: viewModel.pinViewModel, font: ConsoleConstants.fontTitle)
 #endif
@@ -55,6 +57,9 @@ struct ConsoleConstants {
 #elseif os(macOS)
     static let fontTitle = Font.caption
     static let fontBody = Font.body
+#elseif os(iOS)
+    static let fontTitle = Font(TextHelper().font(style: .init(role: .subheadline, style: .monospacedDigital)))
+    static let fontBody = Font(TextHelper().font(style: .init(role: .body2)))
 #else
     static let fontTitle = Font.caption
     static let fontBody = Font.caption

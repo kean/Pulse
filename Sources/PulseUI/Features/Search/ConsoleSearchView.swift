@@ -13,7 +13,7 @@ struct ConsoleSearchView: View {
         List {
             ForEach(viewModel.results) { result in
                 Section {
-                    Text(result.entity.objectID.description)
+                    ConsoleEntityCell(entity: result.entity)
                 }
             }
         }.listStyle(.insetGrouped)

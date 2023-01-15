@@ -27,7 +27,7 @@ public struct ConsoleView: View {
         GeometryReader { proxy in
             HStack {
                 List {
-                    ConsoleMessagesForEach(messages: viewModel.entities)
+                    ForEach(viewModel.entities, id: \.objectID, content: ConsoleEntityCell.init)
                 }
 
                 // TODO: Not sure it's valid

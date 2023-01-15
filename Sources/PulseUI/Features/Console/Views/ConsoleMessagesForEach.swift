@@ -7,15 +7,10 @@ import SwiftUI
 import Pulse
 import CoreData
 
-struct ConsoleMessagesForEach: View {
-    let messages: [NSManagedObject]
+struct ConsoleEntityCell: View {
+    let entity: NSManagedObject
 
     var body: some View {
-        ForEach(messages, id: \.objectID, content: makeListItem)
-    }
-
-    @ViewBuilder
-    private func makeListItem(_ entity: NSManagedObject) -> some View {
         if let task = entity as? NetworkTaskEntity {
             NetworkRequestRow(task: task)
         } else if let message = entity as? LoggerMessageEntity {
