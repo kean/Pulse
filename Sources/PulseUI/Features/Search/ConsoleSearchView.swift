@@ -51,30 +51,16 @@ struct ConsoleSearchView: View {
             RecentSearchesView()
             ConsoleSearchSuggestedTokensView(viewModel: viewModel)
 
-            ForEach(viewModel.results) { result in
-                Section {
-                    ConsoleEntityCell(entity: result.entity)
-                    // TODO: limit number of occurences of the same type (or only have one and display how many more?)
-                    // TODO: when open body, start with a search term immediatelly
-                    let occurences = Array(result.occurences.enumerated())
-                    ForEach(occurences.prefix(3), id: \.offset) { item in
-                        NavigationLink(destination: makeDestination(for: item.element, entity: result.entity)) {
-                            makeCell(for: item.element)
-                        }
+            if viewModel.searchText.count > 1 {
+                ForEach(viewModel.results) { result in
+                    Section {
+                        makeSection(for: result)
                     }
-                    if occurences.count > 3 {
-                        // TODO: how to prioritize what makes the cut?
-                        // TODO: implement show-all-occurences
-                        NavigationLink(destination: Text("Show All")) {
-                            HStack {
-                                Text("Show All Occurences")
-                                    .font(ConsoleConstants.fontBody)
-                                    .foregroundColor(.secondary)
-                                Text("\(occurences.count)")
-                                    .font(ConsoleConstants.fontBody)
-                                    .foregroundColor(.secondary)
-                            }
-                        }
+                }
+            } else {
+                Section {
+                    ForEach(viewModel.results) { result in
+                        makeSection(for: result)
                     }
                 }
             }
@@ -104,8 +90,35 @@ struct ConsoleSearchView: View {
         }
     }
 
+    @ViewBuilder
+    private func makeSection(for viewModel: ConsoleSearchResultViewModel) -> some View {
+        ConsoleEntityCell(entity: viewModel.entity)
+        // TODO: limit number of occurences of the same type (or only have one and display how many more?)
+        // TODO: when open body, start with a search term immediatelly
+        let occurences = Array(viewModel.occurences.enumerated())
+        ForEach(occurences.prefix(3), id: \.offset) { item in
+            NavigationLink(destination: makeDestination(for: item.element, entity: viewModel.entity)) {
+                makeCell(for: item.element)
+            }
+        }
+        if occurences.count > 3 {
+            // TODO: how to prioritize what makes the cut?
+            // TODO: implement show-all-occurences
+            NavigationLink(destination: Text("Show All")) {
+                HStack {
+                    Text("Show All Occurences")
+                        .font(ConsoleConstants.fontBody)
+                        .foregroundColor(.secondary)
+                    Text("\(occurences.count)")
+                        .font(ConsoleConstants.fontBody)
+                        .foregroundColor(.secondary)
+                }
+            }
+        }
+    }
+
     // TODO: add occurence IDs instead of indices
-    func makeCell(for occurence: ConsoleSearchOccurence) -> some View {
+    private func makeCell(for occurence: ConsoleSearchOccurence) -> some View {
         return VStack(alignment: .leading, spacing: 4) {
             Text(occurence.kind.title + " (\(occurence.line):\(occurence.range.lowerBound))")
                 .font(ConsoleConstants.fontTitle)
