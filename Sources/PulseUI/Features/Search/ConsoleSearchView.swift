@@ -85,8 +85,10 @@ struct ConsoleSearchView: View {
         if #available(iOS 16, *) {
             list
                 .searchable(text: $viewModel.searchText, tokens: $tokens, token: { Text($0) })
+                .disableAutocorrection(true)
         }  else {
             list.searchable(text: $viewModel.searchText)
+                .disableAutocorrection(true)
         }
     }
 
@@ -94,6 +96,7 @@ struct ConsoleSearchView: View {
 
     // TODO: implement suggested tokens
     // TODO: for status code allow ranges (400<500) etc
+    // TODO: use new Regex for this
     var suggestedTokens: [String] {
         if viewModel.searchText == "201" {
             return ["Status Code 200"]

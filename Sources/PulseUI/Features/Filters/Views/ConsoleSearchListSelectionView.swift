@@ -89,8 +89,10 @@ struct ConsoleSearchListSelectionView<Element: Hashable, Label: View>: View {
             list
 #if os(iOS)
                 .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always))
+                .disableAutocorrection(true)
 #else
                 .searchable(text: $searchText)
+                .disableAutocorrection(true)
 #endif
         } else {
             list

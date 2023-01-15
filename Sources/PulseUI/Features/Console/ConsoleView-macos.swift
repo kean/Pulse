@@ -48,6 +48,7 @@ private struct ConsoleContainerView: View {
             sidebar: {
                 Siderbar(viewModel: viewModel)
                     .searchable(text: $viewModel.filterTerm)
+                    .disableAutocorrection(true)
                     .navigationSplitViewColumnWidth(min: ConsoleView.contentColumnWidth, ideal: 420, max: 640)
             },
             content: {

@@ -56,7 +56,9 @@ public struct ConsoleView: View {
             }
         // TOOD: integrate ConsoleSearchView
         if #available(iOS 15.0, *) {
-            content.searchable(text: $viewModel.filterTerm)
+            content
+                .searchable(text: $viewModel.filterTerm)
+                .disableAutocorrection(true)
         } else {
             content
         }

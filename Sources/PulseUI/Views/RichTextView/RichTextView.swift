@@ -56,6 +56,7 @@ struct _RichTextView: View {
     var body: some View {
         ContentView(viewModel: viewModel)
             .searchable(text: $viewModel.searchTerm)
+            .disableAutocorrection(true)
             .navigationBarItems(trailing: navigationBarTrailingItems)
             .sheet(item: $shareItems, content: ShareView.init)
             .sheet(isPresented: $isWebViewOpen) {
