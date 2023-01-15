@@ -1,0 +1,123 @@
+// The MIT License (MIT)
+//
+// Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
+
+import SwiftUI
+import Pulse
+import CoreData
+import Combine
+
+final class ConsoleSearchViewModel: ObservableObject {
+    // TODO: add actual search
+    private let entities: [NSManagedObject]
+
+    @Published private(set) var results: [ConsoleSearchResultViewModel] = []
+    @Published var searchText: String = ""
+
+    private var cancellables: [AnyCancellable] = []
+
+    init(entities: [NSManagedObject]) {
+        self.entities = entities
+
+        // TODO: should be empty by default + show nice placeholder
+        self.results = entities.map {
+            ConsoleSearchResultViewModel(entity: $0, occurences: [])
+        }
+
+        // TODO: add debouce, etc
+        $searchText.dropFirst().sink { [weak self] in
+            self?.search($0)
+        }.store(in: &cancellables)
+
+        #warning("TEPM")
+        DispatchQueue.main.async {
+            self.searchText = "Nuke"
+        }
+    }
+
+    // TODO: perform in background
+    private func search(_ searchText: String) {
+        guard searchText.count > 1 else {
+            // TODO: prompt and exlain how to search
+            self.results = []
+            return
+        }
+        // TODO: add a switch in UI to enable regex and other options?
+        // TODO: handle errors
+        let regex = try! Regex(searchText)
+        var results: [ConsoleSearchResultViewModel] = []
+        // TODO: proper dynamic cast
+        for entity in entities as! [LoggerMessageEntity] {
+            if let task = entity.task, let result = search(regex, searchText: searchText, in: task) {
+                results.append(result)
+            }
+        }
+        self.results = results
+    }
+
+    // TODO: syntax highliughting?
+    // TODO: use on TextHelper instance
+    // TODO: add remaining fields
+    // TODO: what if URL matches? can we highlight the cell itself?
+    private func search(_ regex: Regex, searchText: String, in task: NetworkTaskEntity) -> ConsoleSearchResultViewModel? {
+        var occurences: [ConsoleSearchOccurence] = []
+        if let responseBody = task.responseBody?.data, let string = String(data: responseBody, encoding: .utf8) {
+            let matches = regex.matches(in: string)
+            for (index, match) in matches.enumerated() {
+                let range = match.fullMatch.startIndex..<match.fullMatch.endIndex
+                // TODO: check range limits
+                // TODO: find next and current line + adjust to fit current line on screen
+                let contextRange = string.index(range.lowerBound, offsetBy: -20)..<string.index(range.upperBound, offsetBy: 30)
+                // TODO: better highlight for found?
+                let substring = NSMutableAttributedString(attributedString:  TextRenderer(options: .sharing).preformatted(string.substring(with: contextRange).trimmingCharacters(in: .whitespacesAndNewlines)))
+
+                if let range = substring.string.firstRange(of: searchText) {
+                    substring.addAttribute(.foregroundColor, value: UXColor.systemOrange, range: NSRange(range, in: substring.string))
+                }
+
+                // TODO: optimize + show line number
+                let range2 = Int.random(in: 1...50)..<200
+                // TODO: pass options
+                let context = RichTextViewModel.SearchContext(searchTerm: searchText, options: .default, matchIndex: index)
+                let occurence = ConsoleSearchOccurence(
+                    kind: .responseBody,
+                    line: .random(in: 1...100),
+                    range: range2,
+                    occurrence: substring,
+                    searchContext: context
+                )
+                occurences.append(occurence)
+            }
+        }
+        guard !occurences.isEmpty else {
+            return nil
+        }
+        // TODO: remove sort (or how do we sort?)
+        return ConsoleSearchResultViewModel(entity: task, occurences: occurences)
+    }
+}
+
+struct ConsoleSearchOccurence {
+    enum Kind {
+        case responseBody
+
+        var title: String {
+            switch self {
+            case .responseBody: return "Response Body"
+            }
+        }
+    }
+
+    let kind: Kind
+    // TODO: display line number + offset
+    let line: Int
+    let range: Range<Int>
+    let occurrence: NSAttributedString
+    let searchContext: RichTextViewModel.SearchContext
+}
+
+struct ConsoleSearchResultViewModel: Identifiable {
+    var id: NSManagedObjectID { entity.objectID }
+    let entity: NSManagedObject
+    let occurences: [ConsoleSearchOccurence]
+}

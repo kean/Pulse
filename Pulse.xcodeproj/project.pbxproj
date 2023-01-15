@@ -71,6 +71,7 @@
 		0C9F05002884F34A0035239F /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C9F04FF2884F34A0035239F /* Preview Assets.xcassets */; };
 		0C9F050C2884FA7D0035239F /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CFF9BD825D6199A0069DB6A /* repos.json */; };
 		0CB63A132973A12300525165 /* ConsoleSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A122973A12300525165 /* ConsoleSearchView.swift */; };
+		0CB63A15297438A600525165 /* ConsoleSearchVIewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A14297438A600525165 /* ConsoleSearchVIewModel.swift */; };
 		0CCBDDC02610BDBC00DCB60C /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CFF9BD825D6199A0069DB6A /* repos.json */; };
 		0CD7E0BD29732C8E00A255B7 /* ShareStoreTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD7E0BC29732C8E00A255B7 /* ShareStoreTask.swift */; };
 		0CDC3BEA2970FA47003BD1FF /* ConsoleSearchListSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CDC3BE92970FA47003BD1FF /* ConsoleSearchListSelectionView.swift */; };
@@ -522,6 +523,7 @@
 		0C9F04FF2884F34A0035239F /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		0C9F05012884F34A0035239F /* Pulse_Demo_macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Pulse_Demo_macOS.entitlements; sourceTree = "<group>"; };
 		0CB63A122973A12300525165 /* ConsoleSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchView.swift; sourceTree = "<group>"; };
+		0CB63A14297438A600525165 /* ConsoleSearchVIewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchVIewModel.swift; sourceTree = "<group>"; };
 		0CD7E0BC29732C8E00A255B7 /* ShareStoreTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareStoreTask.swift; sourceTree = "<group>"; };
 		0CDC3BE92970FA47003BD1FF /* ConsoleSearchListSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchListSelectionView.swift; sourceTree = "<group>"; };
 		0CDC3BEC2971B936003BD1FF /* ConsoleSearchLogLevelsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchLogLevelsCell.swift; sourceTree = "<group>"; };
@@ -972,6 +974,7 @@
 			isa = PBXGroup;
 			children = (
 				0CB63A122973A12300525165 /* ConsoleSearchView.swift */,
+				0CB63A14297438A600525165 /* ConsoleSearchVIewModel.swift */,
 			);
 			path = Search;
 			sourceTree = "<group>";
@@ -2101,6 +2104,7 @@
 				0CDC3BED2971B936003BD1FF /* ConsoleSearchLogLevelsCell.swift in Sources */,
 				0CF0D620296F189600EED9D4 /* Foundation+Extensions.swift in Sources */,
 				0CF0D66C296F189600EED9D4 /* NetworkRequestInfoCell.swift in Sources */,
+				0CB63A15297438A600525165 /* ConsoleSearchVIewModel.swift in Sources */,
 				0CF0D632296F189600EED9D4 /* StoreShareView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
