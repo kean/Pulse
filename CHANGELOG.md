@@ -1,8 +1,8 @@
 # Pulse 2.x
 
-## Pulse 3.0.1
+## Pulse 3.1.0
 
-*TBD*
+*Jan 14, 2023*
 
 - Update minimum requirements: Swift 5.7 | Xcode 14.0  | iOS 14.0, tvOS 14.0, watchOS 7.0, macOS 12.0
 - Add `ConsoleView.network` to other platforms (originally was available only on iOS)
