@@ -252,7 +252,7 @@ private class ConsoleBaseTableCell: UITableViewCell {
         let controller = UIHostingController(rootView: AnyView(EmptyView()))
         addSubview(controller.view)
         controller.view.backgroundColor = .clear
-        controller.view.pinToSuperview(insets: UIEdgeInsets(top: 6, left: 20, bottom: 6, right: 12))
+        controller.view.pinToSuperview(insets: UIEdgeInsets(top: 8, left: 20, bottom: 8, right: 10))
         return controller
     }()
 }
