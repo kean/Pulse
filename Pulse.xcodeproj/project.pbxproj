@@ -72,6 +72,10 @@
 		0C9F050C2884FA7D0035239F /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CFF9BD825D6199A0069DB6A /* repos.json */; };
 		0CB63A132973A12300525165 /* ConsoleSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A122973A12300525165 /* ConsoleSearchView.swift */; };
 		0CB63A15297438A600525165 /* ConsoleSearchVIewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A14297438A600525165 /* ConsoleSearchVIewModel.swift */; };
+		0CB63A1B2974A5D200525165 /* ConsoleSearchResultsSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A1A2974A5D200525165 /* ConsoleSearchResultsSectionView.swift */; };
+		0CB63A1D2974A5EB00525165 /* ConsoleSearchSuggestedTokensView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A1C2974A5EB00525165 /* ConsoleSearchSuggestedTokensView.swift */; };
+		0CB63A212974A62700525165 /* ConsoleSearchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A202974A62700525165 /* ConsoleSearchService.swift */; };
+		0CB63A232974A64500525165 /* ConsoleSearchOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A222974A64500525165 /* ConsoleSearchOperation.swift */; };
 		0CCBDDC02610BDBC00DCB60C /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CFF9BD825D6199A0069DB6A /* repos.json */; };
 		0CD7E0BD29732C8E00A255B7 /* ShareStoreTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD7E0BC29732C8E00A255B7 /* ShareStoreTask.swift */; };
 		0CDC3BEA2970FA47003BD1FF /* ConsoleSearchListSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CDC3BE92970FA47003BD1FF /* ConsoleSearchListSelectionView.swift */; };
@@ -524,6 +528,10 @@
 		0C9F05012884F34A0035239F /* Pulse_Demo_macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Pulse_Demo_macOS.entitlements; sourceTree = "<group>"; };
 		0CB63A122973A12300525165 /* ConsoleSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchView.swift; sourceTree = "<group>"; };
 		0CB63A14297438A600525165 /* ConsoleSearchVIewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchVIewModel.swift; sourceTree = "<group>"; };
+		0CB63A1A2974A5D200525165 /* ConsoleSearchResultsSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchResultsSectionView.swift; sourceTree = "<group>"; };
+		0CB63A1C2974A5EB00525165 /* ConsoleSearchSuggestedTokensView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchSuggestedTokensView.swift; sourceTree = "<group>"; };
+		0CB63A202974A62700525165 /* ConsoleSearchService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchService.swift; sourceTree = "<group>"; };
+		0CB63A222974A64500525165 /* ConsoleSearchOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchOperation.swift; sourceTree = "<group>"; };
 		0CD7E0BC29732C8E00A255B7 /* ShareStoreTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareStoreTask.swift; sourceTree = "<group>"; };
 		0CDC3BE92970FA47003BD1FF /* ConsoleSearchListSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchListSelectionView.swift; sourceTree = "<group>"; };
 		0CDC3BEC2971B936003BD1FF /* ConsoleSearchLogLevelsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchLogLevelsCell.swift; sourceTree = "<group>"; };
@@ -973,10 +981,30 @@
 		0CB63A112973A11400525165 /* Search */ = {
 			isa = PBXGroup;
 			children = (
+				0CB63A1F2974A61A00525165 /* Services */,
+				0CB63A1E2974A61100525165 /* Views */,
 				0CB63A122973A12300525165 /* ConsoleSearchView.swift */,
 				0CB63A14297438A600525165 /* ConsoleSearchVIewModel.swift */,
 			);
 			path = Search;
+			sourceTree = "<group>";
+		};
+		0CB63A1E2974A61100525165 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				0CB63A1A2974A5D200525165 /* ConsoleSearchResultsSectionView.swift */,
+				0CB63A1C2974A5EB00525165 /* ConsoleSearchSuggestedTokensView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		0CB63A1F2974A61A00525165 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				0CB63A202974A62700525165 /* ConsoleSearchService.swift */,
+				0CB63A222974A64500525165 /* ConsoleSearchOperation.swift */,
+			);
+			path = Services;
 			sourceTree = "<group>";
 		};
 		0CDFB839296F5B9D0071EF77 /* Cells */ = {
@@ -2040,7 +2068,9 @@
 				0CF0D61D296F189600EED9D4 /* NSTableView+Extensions.swift in Sources */,
 				0CF0D685296F189600EED9D4 /* ConsoleNetworkRequestTableCell.swift in Sources */,
 				0CF0D663296F189600EED9D4 /* NetworkInspectorTransactionView.swift in Sources */,
+				0CB63A212974A62700525165 /* ConsoleSearchService.swift in Sources */,
 				0CF0D614296F189600EED9D4 /* TextRendererJSON.swift in Sources */,
+				0CB63A232974A64500525165 /* ConsoleSearchOperation.swift in Sources */,
 				0CF0D658296F189600EED9D4 /* SettingsView-ios.swift in Sources */,
 				0CF0D665296F189600EED9D4 /* NetworkMenuCell.swift in Sources */,
 				0CF0D659296F189600EED9D4 /* ConsoleSettings.swift in Sources */,
@@ -2053,6 +2083,7 @@
 				0CF0D613296F189600EED9D4 /* TextRendererHTML.swift in Sources */,
 				0CF0D68A296F189600EED9D4 /* PulseUI.docc in Sources */,
 				0CDC3BEA2970FA47003BD1FF /* ConsoleSearchListSelectionView.swift in Sources */,
+				0CB63A1D2974A5EB00525165 /* ConsoleSearchSuggestedTokensView.swift in Sources */,
 				0C11EAE92971EBEE0059786A /* MockTask.swift in Sources */,
 				0CF0D66E296F189600EED9D4 /* NetworkCURLCell.swift in Sources */,
 				0CF0D625296F189600EED9D4 /* PlaceholderView.swift in Sources */,
@@ -2080,6 +2111,7 @@
 				0CF0D655296F189600EED9D4 /* SettingsView.swift in Sources */,
 				0C40C09C296F78C6009ECF16 /* ConsoleSearchDurationCell.swift in Sources */,
 				0C40C09E296F7B0A009ECF16 /* ConsoleSearchResponseSizeCell.swift in Sources */,
+				0CB63A1B2974A5D200525165 /* ConsoleSearchResultsSectionView.swift in Sources */,
 				0CF0D667296F189600EED9D4 /* NetworkResponseBodyCell.swift in Sources */,
 				0CF0D662296F189600EED9D4 /* TimingViewModel+Metrics.swift in Sources */,
 				0CF0D677296F189600EED9D4 /* NetworkInspectorView-macos.swift in Sources */,
