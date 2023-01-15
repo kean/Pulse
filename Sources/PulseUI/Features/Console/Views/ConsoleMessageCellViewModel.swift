@@ -7,7 +7,7 @@ import Pulse
 import CoreData
 import Combine
 
-final class ConsoleMessageViewModel: Pinnable {
+final class ConsoleMessageCellViewModel: Pinnable {
     let message: LoggerMessageEntity
 
     private let searchViewModel: ConsoleSearchCriteriaViewModel?
@@ -15,7 +15,7 @@ final class ConsoleMessageViewModel: Pinnable {
     // TODO: Trim whitespaces and remove newlines?
     var preprocessedText: String { message.text }
     
-    private(set) lazy var time = ConsoleMessageViewModel.timeFormatter.string(from: message.createdAt)
+    private(set) lazy var time = ConsoleMessageCellViewModel.timeFormatter.string(from: message.createdAt)
 
     static let timeFormatter: DateFormatter = {
         let formatter = DateFormatter()

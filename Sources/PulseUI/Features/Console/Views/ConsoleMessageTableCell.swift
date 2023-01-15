@@ -15,7 +15,7 @@ final class ConsoleMessageTableCell: UITableViewCell, UIContextMenuInteractionDe
     private let pin = PinIndicatorView()
     private var titleAttributes: [NSAttributedString.Key: Any] = [:]
 
-    private var viewModel: ConsoleMessageViewModel?
+    private var viewModel: ConsoleMessageCellViewModel?
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         titleAttributes = TextHelper().attributes(role: .subheadline, style: .monospacedDigital, width: .condensed, color: .secondaryLabel)
@@ -46,7 +46,7 @@ final class ConsoleMessageTableCell: UITableViewCell, UIContextMenuInteractionDe
         self.addInteraction(interaction)
     }
 
-    func display(_ viewModel: ConsoleMessageViewModel) {
+    func display(_ viewModel: ConsoleMessageCellViewModel) {
         self.viewModel = viewModel
 
         var titleAttributes = titleAttributes
@@ -73,7 +73,7 @@ final class ConsoleMessageTableCell: UITableViewCell, UIContextMenuInteractionDe
         })
     }
 
-    private func makeMenu(for viewModel: ConsoleMessageViewModel) -> UIMenu {
+    private func makeMenu(for viewModel: ConsoleMessageCellViewModel) -> UIMenu {
         let share = UIAction(title: "Share Message", image: UIImage(systemName: "square.and.arrow.up")) { _ in
             UIActivityViewController.show(with: viewModel.share())
         }

@@ -7,11 +7,11 @@ import Pulse
 import Combine
 import CoreData
 
-struct ConsoleNetworkRequestView: View {
-    @ObservedObject var viewModel: ConsoleNetworkRequestViewModel
+struct ConsoleTaskCell: View {
+    @ObservedObject var viewModel: ConsoleTaskCellViewModel
     @ObservedObject var progressViewModel: ProgressViewModel
 
-    init(viewModel: ConsoleNetworkRequestViewModel) {
+    init(viewModel: ConsoleTaskCellViewModel) {
         self.viewModel = viewModel
         self.progressViewModel = viewModel.progress
     }
@@ -101,9 +101,9 @@ struct ConsoleNetworkRequestView: View {
 }
 
 #if DEBUG
-struct ConsoleNetworkRequestView_Previews: PreviewProvider {
+struct ConsoleTaskCell_Previews: PreviewProvider {
     static var previews: some View {
-        ConsoleNetworkRequestView(viewModel: .init(task: LoggerStore.preview.entity(for: .login)))
+        ConsoleTaskCell(viewModel: .init(task: LoggerStore.preview.entity(for: .login)))
             .padding()
             .previewLayout(.sizeThatFits)
     }

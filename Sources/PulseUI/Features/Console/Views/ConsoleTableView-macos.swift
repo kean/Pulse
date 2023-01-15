@@ -51,12 +51,12 @@ struct ConsoleTableView: NSViewRepresentable {
             switch entities[row] {
             case let message as LoggerMessageEntity:
                 if let task = message.task {
-                    cell.hostingView.rootView = AnyView(ConsoleNetworkRequestView(viewModel: .init(task: task)))
+                    cell.hostingView.rootView = AnyView(ConsoleTaskCell(viewModel: .init(task: task)))
                 } else {
-                    cell.hostingView.rootView = AnyView(ConsoleMessageView(viewModel: .init(message: message)))
+                    cell.hostingView.rootView = AnyView(ConsoleMessageCell(viewModel: .init(message: message)))
                 }
             case let task as NetworkTaskEntity:
-                cell.hostingView.rootView = AnyView(ConsoleNetworkRequestView(viewModel: .init(task: task)))
+                cell.hostingView.rootView = AnyView(ConsoleTaskCell(viewModel: .init(task: task)))
             default:
                 fatalError("Invalid entity: \(entities[row])")
             }

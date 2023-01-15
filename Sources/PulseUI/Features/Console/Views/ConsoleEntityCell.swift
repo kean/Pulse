@@ -18,7 +18,7 @@ struct ConsoleEntityCell: View {
                 NetworkRequestRow(task: task)
             } else {
                 NavigationLink(destination: LazyConsoleDetailsView(message: message)) {
-                    ConsoleMessageView(viewModel: .init(message: message))
+                    ConsoleMessageCell(viewModel: .init(message: message))
                 }
             }
         } else {
@@ -32,7 +32,7 @@ private struct NetworkRequestRow: View {
 
     var body: some View {
         NavigationLink(destination: LazyNetworkInspectorView(task: task)) {
-            ConsoleNetworkRequestView(viewModel: .init(task: task))
+            ConsoleTaskCell(viewModel: .init(task: task))
         }
     }
 }

@@ -7,8 +7,8 @@ import Pulse
 import CoreData
 import Combine
 
-struct ConsoleMessageView: View {
-    let viewModel: ConsoleMessageViewModel
+struct ConsoleMessageCell: View {
+    let viewModel: ConsoleMessageCellViewModel
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -17,9 +17,7 @@ struct ConsoleMessageView: View {
                     .lineLimit(1)
                     .font(ConsoleConstants.fontTitle)
                     .foregroundColor(.secondary)
-#if !os(iOS)
                 Spacer()
-#endif
 #if os(macOS)
                 PinView(viewModel: viewModel.pinViewModel, font: ConsoleConstants.fontTitle)
 #endif
@@ -41,9 +39,9 @@ struct ConsoleMessageView: View {
 }
 
 #if DEBUG
-struct ConsoleMessageView_Previews: PreviewProvider {
+struct ConsoleMessageCell_Previews: PreviewProvider {
     static var previews: some View {
-        ConsoleMessageView(viewModel: .init(message: (try!  LoggerStore.mock.allMessages())[0]))
+        ConsoleMessageCell(viewModel: .init(message: (try!  LoggerStore.mock.allMessages())[0]))
             .padding()
             .previewLayout(.sizeThatFits)
     }

@@ -7,8 +7,8 @@ import Pulse
 import Combine
 import CoreData
 
-final class ConsoleNetworkRequestViewModel: Pinnable, ObservableObject {
-    private(set) lazy var time = ConsoleMessageViewModel.timeFormatter.string(from: task.createdAt)
+final class ConsoleTaskCellViewModel: Pinnable, ObservableObject {
+    private(set) lazy var time = ConsoleMessageCellViewModel.timeFormatter.string(from: task.createdAt)
 #if os(iOS)
     private(set) var badgeColor: UIColor = .gray
 #else

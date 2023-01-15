@@ -68,7 +68,7 @@ enum ConsoleFormatter {
     }
 
     static func time(for date: Date) -> String {
-        ConsoleMessageViewModel.timeFormatter.string(from: date)
+        ConsoleMessageCellViewModel.timeFormatter.string(from: date)
     }
 
     /// Example:

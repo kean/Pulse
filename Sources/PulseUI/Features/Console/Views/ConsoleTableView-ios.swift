@@ -135,12 +135,12 @@ final class ConsoleTableViewController: UITableViewController {
         switch entity {
         case let message as LoggerMessageEntity:
             if let task = message.task {
-                viewModel = ConsoleNetworkRequestViewModel(task: task)
+                viewModel = ConsoleTaskCellViewModel(task: task)
             } else {
-                viewModel = ConsoleMessageViewModel(message: message, searchViewModel: self.viewModel.searchViewModel)
+                viewModel = ConsoleMessageCellViewModel(message: message, searchViewModel: self.viewModel.searchViewModel)
             }
         case let task as NetworkTaskEntity:
-            viewModel = ConsoleNetworkRequestViewModel(task: task)
+            viewModel = ConsoleTaskCellViewModel(task: task)
         default:
             fatalError("Invalid entity: \(entity)")
         }
@@ -160,11 +160,11 @@ final class ConsoleTableViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         switch getEntityViewModel(at: indexPath) {
-        case let viewModel as ConsoleMessageViewModel:
+        case let viewModel as ConsoleMessageCellViewModel:
             let cell = tableView.dequeueReusableCell(withIdentifier: "ConsoleMessageTableCell", for: indexPath) as! ConsoleMessageTableCell
             cell.display(viewModel)
             return cell
-        case let viewModel as ConsoleNetworkRequestViewModel:
+        case let viewModel as ConsoleTaskCellViewModel:
             let cell = tableView.dequeueReusableCell(withIdentifier: "ConsoleNetworkRequestTableCell", for: indexPath) as! ConsoleNetworkRequestTableCell
             cell.display(viewModel)
             return cell

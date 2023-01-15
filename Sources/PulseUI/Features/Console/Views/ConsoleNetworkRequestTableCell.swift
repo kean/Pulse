@@ -17,7 +17,7 @@ final class ConsoleNetworkRequestTableCell: UITableViewCell, UIContextMenuIntera
     private let pin = PinIndicatorView()
     private var state: NetworkTaskEntity.State?
 
-    private var viewModel: ConsoleNetworkRequestViewModel?
+    private var viewModel: ConsoleTaskCellViewModel?
     private var cancellable1: AnyCancellable?
     private var cancellable2: AnyCancellable?
 
@@ -59,7 +59,7 @@ final class ConsoleNetworkRequestTableCell: UITableViewCell, UIContextMenuIntera
         self.addInteraction(interaction)
     }
 
-    func display(_ viewModel: ConsoleNetworkRequestViewModel) {
+    func display(_ viewModel: ConsoleTaskCellViewModel) {
         self.viewModel = viewModel
         self.state = nil
         self.refresh()
@@ -123,7 +123,7 @@ final class ConsoleNetworkRequestTableCell: UITableViewCell, UIContextMenuIntera
         })
     }
 
-    private func makeMenu(for viewModel: ConsoleNetworkRequestViewModel) -> UIMenu {
+    private func makeMenu(for viewModel: ConsoleTaskCellViewModel) -> UIMenu {
         let shareAsText = UIAction(title: "Share as Plain Text", image: UIImage(systemName: "square.and.arrow.up")) { _ in
             UIActivityViewController.show(with: viewModel.share(as: .plainText))
         }
