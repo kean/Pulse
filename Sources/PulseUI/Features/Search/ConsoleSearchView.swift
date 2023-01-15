@@ -38,8 +38,17 @@ struct ConsoleSearchView: View {
                         }
                     }
                     if occurences.count > 3 {
+                        // TODO: how to prioritize what makes the cut?
+                        // TODO: implement show-all-occurences
                         NavigationLink(destination: Text("Show All")) {
-                            Text("Show All Occurences") + Text(" (\(occurences.count))").foregroundColor(.secondary)
+                            HStack {
+                                Text("Show All Occurences")
+                                    .font(ConsoleConstants.fontBody)
+                                    .foregroundColor(.secondary)
+                                Text("\(occurences.count)")
+                                    .font(ConsoleConstants.fontBody)
+                                    .foregroundColor(.secondary)
+                            }
                         }
                     }
                 }

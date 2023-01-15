@@ -74,6 +74,7 @@ final class ConsoleSearchViewModel: ObservableObject {
 @available(iOS 15, tvOS 15, *)
 final class ConsoleSearchService {
 
+    // TODO: prioritize full matches
     func search(_ kind: ConsoleSearchOccurence.Kind, in task: NetworkTaskEntity, searchText: String, options: StringSearchOptions) -> [ConsoleSearchOccurence] {
         guard let data = task.responseBody?.data,
               let content = NSString(data: data, encoding: NSUTF8StringEncoding)
