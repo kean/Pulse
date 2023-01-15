@@ -8,19 +8,6 @@ import Combine
 
 #if os(iOS) || os(macOS)
 
-struct ButtonCopyMessage: View {
-    let text: String
-
-    var body: some View {
-        Button(action: {
-            UXPasteboard.general.string = text
-            runHapticFeedback()
-        }) {
-            Label("Copy Message", systemImage: "doc.on.doc")
-        }
-    }
-}
-
 struct NetworkMessageContextMenu: View {
     let task: NetworkTaskEntity
 
