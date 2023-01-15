@@ -24,7 +24,7 @@ public struct ConsoleView: View {
     }
 
     public var body: some View {
-        let content = contentView
+        contentView
             .onAppear(perform: viewModel.onAppear)
             .onDisappear(perform: viewModel.onDisappear)
             .edgesIgnoringSafeArea(.bottom)
@@ -54,13 +54,15 @@ public struct ConsoleView: View {
                     }
                 }
             }
-        // TOOD: integrate ConsoleSearchView
-        if #available(iOS 15.0, *) {
-            content
-                .searchable(text: $viewModel.filterTerm)
-                .disableAutocorrection(true)
+
+    }
+
+    @ViewBuilder
+    private var contentView: some View {
+        if #available(iOS 15, *) {
+            _ConsoleContentView(viewModel: viewModel)
         } else {
-            content
+            _ConsoleTableView(viewModel: viewModel)
         }
     }
 
@@ -81,9 +83,54 @@ public struct ConsoleView: View {
             shareItems = item
         }
     }
+}
 
-    @ViewBuilder
-    private var contentView: some View {
+#warning("is setting entities like this OK? should they get updated continuously instead?")
+
+@available(iOS 15.0, *)
+private struct _ConsoleContentView: View {
+    let viewModel: ConsoleViewModel
+    @ObservedObject var searchViewModel: ConsoleSearchViewModel
+
+    init(viewModel: ConsoleViewModel) {
+        self.viewModel = viewModel
+        self.searchViewModel = viewModel.searchViewModel
+    }
+
+    var body: some View {
+        if #available(iOS 16, tvOS 16, *) {
+            ConsoleContentView(viewModel: viewModel)
+                .searchable(text: $searchViewModel.searchText, tokens: $searchViewModel.tokens, token: { Text($0.title) })
+                .disableAutocorrection(true)
+        }  else {
+            ConsoleContentView(viewModel: viewModel)
+                .searchable(text: $searchViewModel.searchText)
+                .disableAutocorrection(true)
+        }
+    }
+}
+
+@available(iOS 15.0, *)
+private struct ConsoleContentView: View {
+    let viewModel: ConsoleViewModel
+    @Environment(\.isSearching) private var isSearching // important: scope
+
+    var body: some View {
+        if isSearching {
+            ConsoleSearchView(viewModel: viewModel.searchViewModel)
+                .onAppear {
+                    viewModel.searchViewModel.setEntities(viewModel.entities)
+                }
+        } else {
+            _ConsoleTableView(viewModel: viewModel)
+        }
+    }
+}
+
+private struct _ConsoleTableView: View {
+    let viewModel: ConsoleViewModel
+
+    var body: some View {
         ConsoleTableView(
             header: { ConsoleToolbarView(viewModel: viewModel) },
             viewModel: viewModel.table,
@@ -121,7 +168,7 @@ private struct ConsoleToolbarView: View {
         }.padding(.leading, 16)
         .sheet(isPresented: $isShowingFilters) {
             NavigationView {
-                ConsoleSearchCriteriaView(viewModel: viewModel.searchViewModel)
+                ConsoleSearchCriteriaView(viewModel: viewModel.searchCriteriaViewModel)
                     .inlineNavigationTitle("Filters")
                     .navigationBarItems(trailing: Button("Done") { isShowingFilters = false })
             }
@@ -143,7 +190,7 @@ private struct ConsoleToolbarView: View {
                 .foregroundColor(viewModel.isOnlyErrors ? .red : .accentColor)
         }.frame(width: 40)
         Button(action: { isShowingFilters = true }) {
-            Image(systemName: viewModel.searchViewModel.isCriteriaDefault ? "line.horizontal.3.decrease.circle" : "line.3.horizontal.decrease.circle.fill")
+            Image(systemName: viewModel.searchCriteriaViewModel.isCriteriaDefault ? "line.horizontal.3.decrease.circle" : "line.3.horizontal.decrease.circle.fill")
                 .font(.system(size: 20))
                 .foregroundColor(.accentColor)
         }.frame(width: 40)

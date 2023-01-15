@@ -9,17 +9,17 @@ import Combine
 
 @available(iOS 15, tvOS 15, *)
 final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDelegate {
-    private let entities: [NSManagedObject]
-    private let objectIDs: [NSManagedObjectID]
+    private var entities: [NSManagedObject]
+    private var objectIDs: [NSManagedObjectID]
 
     @Published private(set) var results: [ConsoleSearchResultViewModel] = []
-    private var buffer: [ConsoleSearchResultViewModel] = []
     @Published var searchText: String = ""
     @Published var isSpinnerNeeded = false
     @Published var isSearching = false
     @Published var hasMore = false
 
     private var dirtyDate: Date?
+    private var buffer: [ConsoleSearchResultViewModel] = []
     private var operation: ConsoleSearchOperation?
 
     @Published var tokens: [ConsoleSearchToken] = []
@@ -45,6 +45,11 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
             .debounce(for: 0.5, scheduler: DispatchQueue.main)
             .sink { [weak self] in self?.isSpinnerNeeded = $0 }
             .store(in: &cancellables)
+    }
+
+    func setEntities(_ entities: [NSManagedObject]) {
+        self.entities = entities
+        self.objectIDs = entities.map(\.objectID)
     }
 
     private func didUpdateSearchCriteria(_ searchText: String, _ tokens: [ConsoleSearchToken]) {

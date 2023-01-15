@@ -11,12 +11,12 @@ import Combine
 import UIKit
 
 final class ConsoleTableViewModel {
-    let searchViewModel: ConsoleSearchCriteriaViewModel?
+    let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel?
     var diff: CollectionDifference<NSManagedObjectID>?
     @Published var entities: [NSManagedObject] = []
 
-    init(searchViewModel: ConsoleSearchCriteriaViewModel?) {
-        self.searchViewModel = searchViewModel
+    init(searchCriteriaViewModel: ConsoleSearchCriteriaViewModel?) {
+        self.searchCriteriaViewModel = searchCriteriaViewModel
     }
 }
 
@@ -137,7 +137,7 @@ final class ConsoleTableViewController: UITableViewController {
             if let task = message.task {
                 viewModel = ConsoleTaskCellViewModel(task: task)
             } else {
-                viewModel = ConsoleMessageCellViewModel(message: message, searchViewModel: self.viewModel.searchViewModel)
+                viewModel = ConsoleMessageCellViewModel(message: message, searchCriteriaViewModel: self.viewModel.searchCriteriaViewModel)
             }
         case let task as NetworkTaskEntity:
             viewModel = ConsoleTaskCellViewModel(task: task)

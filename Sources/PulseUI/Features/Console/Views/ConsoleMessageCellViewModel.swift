@@ -10,7 +10,7 @@ import Combine
 final class ConsoleMessageCellViewModel: Pinnable {
     let message: LoggerMessageEntity
 
-    private let searchViewModel: ConsoleSearchCriteriaViewModel?
+    private let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel?
 
     // TODO: Trim whitespaces and remove newlines?
     var preprocessedText: String { message.text }
@@ -26,9 +26,9 @@ final class ConsoleMessageCellViewModel: Pinnable {
     
     private(set) lazy var pinViewModel = PinButtonViewModel(message: message)
     
-    init(message: LoggerMessageEntity, searchViewModel: ConsoleSearchCriteriaViewModel? = nil) {
+    init(message: LoggerMessageEntity, searchCriteriaViewModel: ConsoleSearchCriteriaViewModel? = nil) {
         self.message = message
-        self.searchViewModel = searchViewModel
+        self.searchCriteriaViewModel = searchCriteriaViewModel
     }
     
     // MARK: Context Menu
@@ -45,15 +45,16 @@ final class ConsoleMessageCellViewModel: Pinnable {
     var focusLabel: String {
         message.label.name.capitalized
     }
-    
+
+    #warning("TODO: do we still need this?")
     func focus() {
-        searchViewModel?.criteria.messages.labels.isEnabled = true
-        searchViewModel?.criteria.messages.labels.focused = message.label.name
+        searchCriteriaViewModel?.criteria.messages.labels.isEnabled = true
+        searchCriteriaViewModel?.criteria.messages.labels.focused = message.label.name
     }
     
     func hide() {
-        searchViewModel?.criteria.messages.labels.isEnabled = true
-        searchViewModel?.criteria.messages.labels.hidden.insert(message.label.name)
+        searchCriteriaViewModel?.criteria.messages.labels.isEnabled = true
+        searchCriteriaViewModel?.criteria.messages.labels.hidden.insert(message.label.name)
     }
 #endif
 }

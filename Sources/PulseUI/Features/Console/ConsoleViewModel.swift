@@ -22,9 +22,14 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 
 #if os(iOS)
     let insightsViewModel: InsightsViewModel
+    @available(iOS 15, tvOS 15, *)
+    var searchViewModel: ConsoleSearchViewModel {
+        _searchViewModel as! ConsoleSearchViewModel
+    }
+    private var _searchViewModel: AnyObject?
 #endif
 
-    let searchViewModel: ConsoleSearchCriteriaViewModel
+    let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
 
     @Published var mode: Mode
     @Published var isOnlyErrors = false
@@ -46,15 +51,18 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         self.mode = mode
         self.isNetworkOnly = mode == .network
 
-        self.searchViewModel = ConsoleSearchCriteriaViewModel(store: store, entities: entitiesSubject)
+        self.searchCriteriaViewModel = ConsoleSearchCriteriaViewModel(store: store, entities: entitiesSubject)
 
 #if os(iOS) || os(macOS)
         self.details = ConsoleDetailsRouterViewModel()
-        self.table = ConsoleTableViewModel(searchViewModel: searchViewModel)
+        self.table = ConsoleTableViewModel(searchCriteriaViewModel: searchCriteriaViewModel)
 #endif
 
 #if os(iOS)
         self.insightsViewModel = InsightsViewModel(store: store)
+        if #available(iOS 15, *) {
+            self._searchViewModel = ConsoleSearchViewModel(entities: [], store: store)
+        }
 #endif
 
         super.init()
@@ -70,7 +78,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
                 self?.refresh(filterTerm: filterTerm)
             }.store(in: &cancellables)
 
-        searchViewModel.$criteria
+        searchCriteriaViewModel.$criteria
             .dropFirst()
             .throttle(for: 0.5, scheduler: DispatchQueue.main, latest: true)
             .sink { [weak self] _ in self?.refreshNow() }
@@ -94,7 +102,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     }
 
     private func prepare(for mode: Mode) {
-        searchViewModel.mode = mode
+        searchCriteriaViewModel.mode = mode
 
         let request = makeFetchRequest(for: mode)
         controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: store.viewContext, sectionNameKeyPath: nil, cacheName: nil)
@@ -127,9 +135,9 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         }
         switch mode {
         case .messages:
-            controller.fetchRequest.predicate = ConsoleSearchCriteria.makeMessagePredicates(criteria: searchViewModel.criteria, isOnlyErrors: isOnlyErrors, filterTerm: filterTerm)
+            controller.fetchRequest.predicate = ConsoleSearchCriteria.makeMessagePredicates(criteria: searchCriteriaViewModel.criteria, isOnlyErrors: isOnlyErrors, filterTerm: filterTerm)
         case .network:
-            controller.fetchRequest.predicate = ConsoleSearchCriteria.makeNetworkPredicates(criteria: searchViewModel.criteria, isOnlyErrors: isOnlyErrors, filterTerm: filterTerm)
+            controller.fetchRequest.predicate = ConsoleSearchCriteria.makeNetworkPredicates(criteria: searchCriteriaViewModel.criteria, isOnlyErrors: isOnlyErrors, filterTerm: filterTerm)
         }
         try? controller.performFetch()
 

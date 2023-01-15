@@ -29,26 +29,24 @@ struct ConsoleSearchView: View {
     // TODO: implement recent searches (and move this)
     // TODO: add a way to clear them
     struct RecentSearchesView: View {
-        @Environment(\.isSearching) private var isSearching // important: scope
-
         var body: some View {
-            if !isSearching {
-                Section(header: Text("Recent Searches")) {
-                    HStack {
-                        Image(systemName: "magnifyingglass")
-                            .font(ConsoleConstants.fontBody)
-                        Text("Status Code 200")
-                            .foregroundColor(.primary)
-                            .font(ConsoleConstants.fontBody)
-                    }
+            Section(header: Text("Recent Searches")) {
+                HStack {
+                    Image(systemName: "magnifyingglass")
+                        .font(ConsoleConstants.fontBody)
+                    Text("Status Code 200")
+                        .foregroundColor(.primary)
+                        .font(ConsoleConstants.fontBody)
                 }
             }
         }
     }
 
     var body: some View {
-        let list = List {
-            RecentSearchesView()
+        List {
+            if viewModel.results.isEmpty {
+                RecentSearchesView()
+            }
             ConsoleSearchSuggestedTokensView(viewModel: viewModel)
 
             if viewModel.searchText.count > 1 {
@@ -78,15 +76,6 @@ struct ConsoleSearchView: View {
         }
             .environment(\.defaultMinListRowHeight, 0)
             .listStyle(.insetGrouped)
-
-        if #available(iOS 16, tvOS 16, *) {
-            list
-                .searchable(text: $viewModel.searchText, tokens: $viewModel.tokens, token: { Text($0.title) })
-                .disableAutocorrection(true)
-        }  else {
-            list.searchable(text: $viewModel.searchText)
-                .disableAutocorrection(true)
-        }
     }
 }
 
