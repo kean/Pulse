@@ -19,8 +19,9 @@ struct ConsoleMessageCell: View {
                     .font(ConsoleConstants.fontTitle)
                     .foregroundColor(.secondary)
                 Spacer()
-#if os(macOS)
+#if os(macOS) || os(iOS)
                 PinView(viewModel: viewModel.pinViewModel, font: ConsoleConstants.fontTitle)
+                    .frame(width: 4, height: 4) // don't affect layout
 #endif
                 Text(viewModel.time)
                     .lineLimit(1)
