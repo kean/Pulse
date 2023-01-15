@@ -8,36 +8,38 @@ import CoreData
 import Combine
 
 #warning("TODO: remove public")
-
 public struct _SearchView: View {
     public init() {}
 
     public var body: some View {
         if #available(iOS 15, *) {
-            ConsoleSearchView(viewModel: .init(entities: try! LoggerStore.mock.allMessages()))
+            ConsoleSearchView(viewModel: .init(entities: try! LoggerStore.mock.allMessages(), store: .mock))
         }
     }
 }
 
 // TODO: stop updating when leaving background
 
+#warning("TODO: remove")
 extension String: Identifiable {
    public var id: String { self }
 }
 
-// TODO: use custom search bar?
 @available(iOS 15, tvOS 15, *)
 struct ConsoleSearchView: View {
     @ObservedObject var viewModel: ConsoleSearchViewModel
 
-    var body: some View {
-        let list = List {
-            if !suggestedTokens.isEmpty {
-                Section {
-                    ForEach(suggestedTokens) { token in
+    struct SuggestedFiltersSections: View {
+        @ObservedObject var viewModel: ConsoleSearchViewModel
+        @Environment(\.isSearching) private var isSearching // important: scope
+
+        var body: some View {
+            if isSearching && !viewModel.suggestedTokens.isEmpty {
+                Section(header: Text("Suggested Filters")) {
+                    ForEach(viewModel.suggestedTokens) { token in
                         Button(action: {
                             viewModel.searchText = ""
-                            tokens.append(token)
+                            viewModel.tokens.append(token)
                         }) {
                             HStack {
                                 Image(systemName: "magnifyingglass")
@@ -50,6 +52,33 @@ struct ConsoleSearchView: View {
                     }
                 }
             }
+        }
+    }
+
+    // TODO: implement recent searches (and move this)
+    // TODO: add a way to clear them
+    struct RecentSearchesView: View {
+        @Environment(\.isSearching) private var isSearching // important: scope
+
+        var body: some View {
+            if !isSearching {
+                Section(header: Text("Recent Searches")) {
+                    HStack {
+                        Image(systemName: "magnifyingglass")
+                            .font(ConsoleConstants.fontBody)
+                        Text("Status Code 200")
+                            .foregroundColor(.primary)
+                            .font(ConsoleConstants.fontBody)
+                    }
+                }
+            }
+        }
+    }
+
+    var body: some View {
+        let list = List {
+            RecentSearchesView()
+            SuggestedFiltersSections(viewModel: viewModel)
             ForEach(viewModel.results) { result in
                 Section {
                     ConsoleEntityCell(entity: result.entity)
@@ -77,33 +106,26 @@ struct ConsoleSearchView: View {
                     }
                 }
             }
+            if viewModel.isSearching {
+                ProgressView("Searching…")
+                    .listRowBackground(Color.clear)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .id(UUID())
+            }
         }
+            
             .environment(\.defaultMinListRowHeight, 0)
             .listStyle(.insetGrouped)
 
         //  TODO: rewrite using custom search bar
         if #available(iOS 16, *) {
             list
-                .searchable(text: $viewModel.searchText, tokens: $tokens, token: { Text($0) })
+                .searchable(text: $viewModel.searchText, tokens: $viewModel.tokens, token: { Text($0) })
                 .disableAutocorrection(true)
         }  else {
             list.searchable(text: $viewModel.searchText)
                 .disableAutocorrection(true)
         }
-    }
-
-    @State var tokens: [String] = []
-
-    // TODO: Display recent searches sections
-
-    // TODO: implement suggested tokens
-    // TODO: for status code allow ranges (400<500) etc
-    // TODO: use new Regex for this
-    var suggestedTokens: [String] {
-        if viewModel.searchText == "201" {
-            return ["Status Code 200"]
-        }
-        return ["Status Code 500", "application/json"]
     }
 
     // TODO: add occurence IDs instead of indices
@@ -131,7 +153,7 @@ struct ConsoleSearchView: View {
 struct ConsoleSearchView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
-            ConsoleSearchView(viewModel: .init(entities: try! LoggerStore.mock.allMessages()))
+            ConsoleSearchView(viewModel: .init(entities: try! LoggerStore.mock.allMessages(), store: .mock))
         }
     }
 }

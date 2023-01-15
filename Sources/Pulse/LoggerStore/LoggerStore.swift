@@ -185,6 +185,15 @@ public final class LoggerStore: @unchecked Sendable {
         }
     }
 
+    /// Creates a new background context.
+    public func newBackgroundContext() -> NSManagedObjectContext {
+        let context = container.newBackgroundContext()
+        context.performAndWait {
+            context.userInfo[WeakLoggerStore.loggerStoreKey] = WeakLoggerStore(store: self)
+        }
+        return context
+    }
+
     /// This is a safe fallback for the initialization of the shared store.
     init(inMemoryStore storeURL: URL) {
         self.storeURL = storeURL

@@ -14,53 +14,90 @@ final class ConsoleSearchViewModel: ObservableObject {
 
     @Published private(set) var results: [ConsoleSearchResultViewModel] = []
     @Published var searchText: String = ""
+    @Published var isSearching = false
+
+    @State var tokens: [String] = []
+
+    // TODO: implement suggested tokens
+    // TODO: for status code allow ranges (400<500) etc
+    // TODO: use new Regex for this
+    var suggestedTokens: [String] {
+        if searchText == "201" {
+            return ["Status Code 200"]
+        }
+        return ["Status Code 500", "application/json"]
+    }
 
     private let search = ConsoleSearchService()
 
     private var cancellables: [AnyCancellable] = []
+    private let context: NSManagedObjectContext
 
-    init(entities: [NSManagedObject]) {
+    init(entities: [NSManagedObject], store: LoggerStore) {
         self.entities = entities
+        self.context = store.newBackgroundContext()
 
-        // TODO: should be empty by default + show nice placeholder
-        self.results = entities.map {
-            ConsoleSearchResultViewModel(entity: $0, occurences: [])
-        }
-
-        // TODO: add debouce, etc
+        // TODO: cancel previous search?
+        // TODO: use previous results for more specific searches
         $searchText.dropFirst().sink { [weak self] in
             self?.search($0)
         }.store(in: &cancellables)
-
-        #warning("TEPM")
-        DispatchQueue.main.async {
-            self.searchText = "Nuke"
-        }
     }
 
-    // TODO: perform in background
     private func search(_ searchText: String) {
+        guard !isSearching else { return }
+
         guard searchText.count > 1 else {
-            // TODO: prompt and exlain how to search
-            self.results = []
+            results = []
             return
         }
-        // TODO: add a switch in UI to enable regex and other options?
-        var results: [ConsoleSearchResultViewModel] = []
-        // TODO: proper dynamic cast
-        for entity in entities as! [LoggerMessageEntity] {
-            if let task = entity.task, let result = search(searchText: searchText, in: task) {
-                results.append(result)
-            }
+
+        isSearching = true
+
+        // TODO: keep previous matches when more speicifc searc is added
+        results = []
+
+        context.perform {
+            self.search(searchText, in: self.entities.map(\.objectID))
         }
-        self.results = results
     }
 
-    // TODO: syntax highliughting?
+    // TODO: add a switch in UI to enable regex and other options?
+    private func search(_ searchText: String, in objectIDs: [NSManagedObjectID]) {
+        for objectID in objectIDs {
+            if let entity = try? self.context.existingObject(with: objectID),
+               let result = self.search(searchText, in: entity) {
+                DispatchQueue.main.async {
+                    self.results.append(result)
+                }
+            }
+        }
+        DispatchQueue.main.async {
+            self.didFinishSearch(with: searchText)
+        }
+    }
+
+    private func didFinishSearch(with searchText: String) {
+        isSearching = false
+
+        if searchText != self.searchText {
+            search(self.searchText)
+        }
+    }
+
+    // TOOD: dynamic cast
+    private func search(_ searchText: String, in entity: NSManagedObject) -> ConsoleSearchResultViewModel? {
+        guard let task = (entity as? LoggerMessageEntity)?.task else {
+            return nil
+        }
+        Thread.sleep(forTimeInterval: 1)
+        return search(searchText, in: task)
+    }
+
     // TODO: use on TextHelper instance
     // TODO: add remaining fields
     // TODO: what if URL matches? can we highlight the cell itself?
-    private func search(searchText: String, in task: NetworkTaskEntity) -> ConsoleSearchResultViewModel? {
+    private func search(_ searchText: String, in task: NetworkTaskEntity) -> ConsoleSearchResultViewModel? {
         var occurences: [ConsoleSearchOccurence] = []
         occurences += search.search(.responseBody, in: task, searchText: searchText, options: .default)
         guard !occurences.isEmpty else {
