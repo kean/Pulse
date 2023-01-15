@@ -13,9 +13,12 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     private let objectIDs: [NSManagedObjectID]
 
     @Published private(set) var results: [ConsoleSearchResultViewModel] = []
+    private var buffer: [ConsoleSearchResultViewModel] = []
     @Published var searchText: String = ""
     @Published var isSearching = false
     @Published var hasMore = false
+
+    private var dirtyDate: Date?
     private var operation: ConsoleSearchOperation?
 
     @State var tokens: [String] = []
@@ -40,8 +43,6 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         self.objectIDs = entities.map(\.objectID)
         self.context = store.newBackgroundContext()
 
-        // TODO: cancel previous search?
-        // TODO: use previous results for more specific searches
         $searchText.dropFirst().sink { [weak self] in
             self?.didUpdateSearchCriteria($0)
         }.store(in: &cancellables)
@@ -58,9 +59,13 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         }
 
         isSearching = true
+        buffer = []
 
-        // TODO: keep previous matches when more speicifc searc is added
-        results = []
+        // We want to continue showing old results for just a little bit longer
+        // to prevent screen flickering in most cases when specializing the search
+        if !results.isEmpty {
+            dirtyDate = Date()
+        }
 
         let operation = ConsoleSearchOperation(objectIDs: objectIDs, searchText: searchText, service: service, context: context)
         operation.delegate = self
@@ -78,14 +83,26 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     fileprivate func searchOperation(_ operation: ConsoleSearchOperation, didAddResults results: [ConsoleSearchResultViewModel]) {
         guard self.operation === operation else { return }
 
-        self.results += results
+        if let dirtyDate = dirtyDate {
+            self.buffer += results
+            if Date().timeIntervalSince(dirtyDate) > 0.05 {
+                self.dirtyDate = nil
+                self.results = buffer
+                self.buffer = []
+            }
+        } else {
+            self.results += results
+        }
     }
 
     fileprivate func searchOperationDidFinish(_ operation: ConsoleSearchOperation, hasMore: Bool) {
         guard self.operation === operation else { return }
 
-        // TODO: check if this is correct
         isSearching = false
+        if dirtyDate != nil {
+            self.dirtyDate = nil
+            self.results = buffer
+        }
         self.hasMore = hasMore
     }
 }
@@ -100,10 +117,10 @@ private protocol ConsoleSearchOperationDelegate: AnyObject { // Going old-school
 
 @available(iOS 15, tvOS 15, *)
 private final class ConsoleSearchOperation {
+    private let searchText: String
     private var objectIDs: [NSManagedObjectID]
     private var index = 0
     private var cutoff = 10
-    private let searchText: String
     private let service: ConsoleSearchService
     private let context: NSManagedObjectContext
     private let lock: os_unfair_lock_t
@@ -144,7 +161,6 @@ private final class ConsoleSearchOperation {
                     hasMore = true
                     index -= 1
                 } else {
-                    // TODO: coalesce/debounce results
                     DispatchQueue.main.async {
                         self.delegate?.searchOperation(self, didAddResults: [result])
                     }
@@ -165,7 +181,7 @@ private final class ConsoleSearchOperation {
         guard let task = (entity as? LoggerMessageEntity)?.task else {
             return nil
         }
-        Thread.sleep(forTimeInterval: 0.5)
+//        Thread.sleep(forTimeInterval: 0.5)
         return search(searchText, in: task)
     }
 
