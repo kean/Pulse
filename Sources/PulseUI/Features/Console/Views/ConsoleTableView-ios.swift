@@ -55,6 +55,7 @@ private struct _ConsoleTableView<Header: View>: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> ConsoleTableViewController {
         let vc = ConsoleTableViewController(viewModel: viewModel)
         let header = self.header()
+#warning("TODO: rewrite how header viwe is displayed to avoid animation glithes")
         if !(header is EmptyView) {
             vc.setHeaderView(header)
         }
