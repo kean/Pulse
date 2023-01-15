@@ -111,7 +111,7 @@ struct ConsoleSearchView: View {
                     }
                 }
             }
-            if viewModel.isSearching {
+            if viewModel.isSpinnerNeeded {
                 ProgressView("Searching…")
                     .listRowBackground(Color.clear)
                     .frame(maxWidth: .infinity, alignment: .center)

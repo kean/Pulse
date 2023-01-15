@@ -15,6 +15,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     @Published private(set) var results: [ConsoleSearchResultViewModel] = []
     private var buffer: [ConsoleSearchResultViewModel] = []
     @Published var searchText: String = ""
+    @Published var isSpinnerNeeded = false
     @Published var isSearching = false
     @Published var hasMore = false
 
@@ -26,6 +27,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     // TODO: implement suggested tokens
     // TODO: for status code allow ranges (400<500) etc
     // TODO: use new Regex for this
+    // TODO: why I can't search for '"'?
     var suggestedTokens: [String] {
         if searchText == "201" {
             return ["Status Code 200"]
@@ -46,6 +48,12 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         $searchText.dropFirst().sink { [weak self] in
             self?.didUpdateSearchCriteria($0)
         }.store(in: &cancellables)
+
+        $isSearching
+            .removeDuplicates()
+            .debounce(for: 0.5, scheduler: DispatchQueue.main)
+            .sink { [weak self] in self?.isSpinnerNeeded = $0 }
+            .store(in: &cancellables)
     }
 
     private func didUpdateSearchCriteria(_ searchText: String) {
@@ -62,7 +70,8 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         buffer = []
 
         // We want to continue showing old results for just a little bit longer
-        // to prevent screen flickering in most cases when specializing the search
+        // to prevent screen from flickering. If the search is slow, we'll just
+        // remove the results eventually.
         if !results.isEmpty {
             dirtyDate = Date()
         }
@@ -106,8 +115,6 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         self.hasMore = hasMore
     }
 }
-
-// TODO: throttle results?
 
 @available(iOS 15, tvOS 15, *)
 private protocol ConsoleSearchOperationDelegate: AnyObject { // Going old-school
