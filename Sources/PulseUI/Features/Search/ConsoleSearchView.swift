@@ -64,7 +64,9 @@ struct ConsoleSearchView: View {
             }
         }
             .environment(\.defaultMinListRowHeight, 0)
+#if os(iOS)
             .listStyle(.insetGrouped)
+#endif
     }
 }
 

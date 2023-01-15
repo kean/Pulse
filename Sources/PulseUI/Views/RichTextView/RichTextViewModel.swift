@@ -194,12 +194,6 @@ final class RichTextViewModel: ObservableObject {
             .foregroundColor: UXColor.white
         ], range: range)
     }
-
-    struct SearchContext {
-        let searchTerm: String
-        let options: StringSearchOptions
-        let matchIndex: Int
-    }
 }
 
 private func search(searchTerm: String, in string: NSString, options: StringSearchOptions) -> [NSRange] {
@@ -210,3 +204,11 @@ private func search(searchTerm: String, in string: NSString, options: StringSear
 }
 
 #endif
+
+extension RichTextViewModel {
+    struct SearchContext {
+        let searchTerm: String
+        let options: StringSearchOptions
+        let matchIndex: Int
+    }
+}
