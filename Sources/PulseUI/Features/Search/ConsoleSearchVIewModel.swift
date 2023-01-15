@@ -188,7 +188,6 @@ private final class ConsoleSearchOperation {
         guard let task = (entity as? LoggerMessageEntity)?.task else {
             return nil
         }
-//        Thread.sleep(forTimeInterval: 0.5)
         return search(searchText, in: task)
     }
 
