@@ -54,13 +54,13 @@ struct ConsoleSearchView: View {
             if viewModel.searchText.count > 1 {
                 ForEach(viewModel.results) { result in
                     Section {
-                        makeSection(for: result)
+                        ConsoleSearchResultView(viewModel: result)
                     }
                 }
             } else {
                 Section {
                     ForEach(viewModel.results) { result in
-                        makeSection(for: result)
+                        ConsoleSearchResultView(viewModel: result)
                     }
                 }
             }
@@ -76,7 +76,6 @@ struct ConsoleSearchView: View {
                 }
             }
         }
-            
             .environment(\.defaultMinListRowHeight, 0)
             .listStyle(.insetGrouped)
 
@@ -89,22 +88,27 @@ struct ConsoleSearchView: View {
                 .disableAutocorrection(true)
         }
     }
+}
 
-    @ViewBuilder
-    private func makeSection(for viewModel: ConsoleSearchResultViewModel) -> some View {
+@available(iOS 15, tvOS 15, *)
+private struct ConsoleSearchResultView: View {
+    let viewModel: ConsoleSearchResultViewModel
+    var limit: Int = 4
+
+    var body: some View {
         ConsoleEntityCell(entity: viewModel.entity)
         // TODO: limit number of occurences of the same type (or only have one and display how many more?)
         // TODO: when open body, start with a search term immediatelly
         let occurences = Array(viewModel.occurences.enumerated())
-        ForEach(occurences.prefix(3), id: \.offset) { item in
+        ForEach(occurences.prefix(limit), id: \.offset) { item in
             NavigationLink(destination: makeDestination(for: item.element, entity: viewModel.entity)) {
                 makeCell(for: item.element)
             }
         }
-        if occurences.count > 3 {
+        if occurences.count > limit {
             // TODO: how to prioritize what makes the cut?
             // TODO: implement show-all-occurences
-            NavigationLink(destination: Text("Show All")) {
+            NavigationLink(destination: ConsoleSearchResultDetailsView(viewModel: viewModel)) {
                 HStack {
                     Text("Show All Occurences")
                         .font(ConsoleConstants.fontBody)
@@ -134,6 +138,20 @@ struct ConsoleSearchView: View {
             return NetworkInspectorResponseBodyView(viewModel: .init(task: entity as! NetworkTaskEntity))
                 .environment(\.textViewSearchContext, occurence.searchContext)
         }
+    }
+}
+
+@available(iOS 15, tvOS 15, *)
+private struct ConsoleSearchResultDetailsView: View {
+    let viewModel: ConsoleSearchResultViewModel
+
+    var body: some View {
+        List {
+            ConsoleSearchResultView(viewModel: viewModel, limit: Int.max)
+        }
+        .listStyle(.plain)
+        .environment(\.defaultMinListRowHeight, 0)
+        .inlineNavigationTitle("Search Results")
     }
 }
 
