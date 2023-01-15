@@ -144,7 +144,7 @@ struct ConsoleSearchView: View {
             Text(occurence.kind.title + " (\(occurence.line):\(occurence.range.lowerBound))")
                 .font(ConsoleConstants.fontTitle)
                 .foregroundColor(.secondary)
-            Text(occurence.occurrence)
+            Text(occurence.text)
                 .lineLimit(3)
         }
     }

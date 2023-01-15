@@ -274,7 +274,7 @@ final class ConsoleSearchService {
                 kind: .responseBody,
                 line: lineNumber,
                 range: range,
-                occurrence: preview,
+                text: preview,
                 searchContext: .init(searchTerm: searchText, options: options, matchIndex: matchIndex)
             )
             occurences.append(occurence)
@@ -299,11 +299,9 @@ struct ConsoleSearchOccurence {
     }
 
     let kind: Kind
-    // TODO: display line number + offset
     let line: Int
     let range: NSRange
-    // TODO: rename?
-    let occurrence: AttributedString
+    let text: AttributedString
     let searchContext: RichTextViewModel.SearchContext
 }
 
