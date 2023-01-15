@@ -70,6 +70,7 @@
 		0C9F04FD2884F34A0035239F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C9F04FC2884F34A0035239F /* Assets.xcassets */; };
 		0C9F05002884F34A0035239F /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C9F04FF2884F34A0035239F /* Preview Assets.xcassets */; };
 		0C9F050C2884FA7D0035239F /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CFF9BD825D6199A0069DB6A /* repos.json */; };
+		0CB63A132973A12300525165 /* ConsoleSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A122973A12300525165 /* ConsoleSearchView.swift */; };
 		0CCBDDC02610BDBC00DCB60C /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CFF9BD825D6199A0069DB6A /* repos.json */; };
 		0CD7E0BD29732C8E00A255B7 /* ShareStoreTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD7E0BC29732C8E00A255B7 /* ShareStoreTask.swift */; };
 		0CDC3BEA2970FA47003BD1FF /* ConsoleSearchListSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CDC3BE92970FA47003BD1FF /* ConsoleSearchListSelectionView.swift */; };
@@ -154,8 +155,8 @@
 		0CF0D638296F189600EED9D4 /* ImageViewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5AB296F189500EED9D4 /* ImageViewer.swift */; };
 		0CF0D639296F189600EED9D4 /* PinButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5AC296F189500EED9D4 /* PinButton.swift */; };
 		0CF0D63A296F189600EED9D4 /* ContextMenus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5AD296F189500EED9D4 /* ContextMenus.swift */; };
-		0CF0D63F296F189600EED9D4 /* ConsoleSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B5296F189500EED9D4 /* ConsoleSearchView.swift */; };
-		0CF0D640296F189600EED9D4 /* ConsoleSearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B6296F189500EED9D4 /* ConsoleSearchViewModel.swift */; };
+		0CF0D63F296F189600EED9D4 /* ConsoleSearchCriteriaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B5296F189500EED9D4 /* ConsoleSearchCriteriaView.swift */; };
+		0CF0D640296F189600EED9D4 /* ConsoleSearchCriteriaViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B6296F189500EED9D4 /* ConsoleSearchCriteriaViewModel.swift */; };
 		0CF0D643296F189600EED9D4 /* ConsoleCustomNetworkFilterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5BA296F189500EED9D4 /* ConsoleCustomNetworkFilterView.swift */; };
 		0CF0D644296F189600EED9D4 /* ConsoleSearchInlinePickerMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5BB296F189500EED9D4 /* ConsoleSearchInlinePickerMenu.swift */; };
 		0CF0D645296F189600EED9D4 /* ConsoleSearchSectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5BC296F189500EED9D4 /* ConsoleSearchSectionHeader.swift */; };
@@ -520,6 +521,7 @@
 		0C9F04FC2884F34A0035239F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0C9F04FF2884F34A0035239F /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		0C9F05012884F34A0035239F /* Pulse_Demo_macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Pulse_Demo_macOS.entitlements; sourceTree = "<group>"; };
+		0CB63A122973A12300525165 /* ConsoleSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchView.swift; sourceTree = "<group>"; };
 		0CD7E0BC29732C8E00A255B7 /* ShareStoreTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareStoreTask.swift; sourceTree = "<group>"; };
 		0CDC3BE92970FA47003BD1FF /* ConsoleSearchListSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchListSelectionView.swift; sourceTree = "<group>"; };
 		0CDC3BEC2971B936003BD1FF /* ConsoleSearchLogLevelsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchLogLevelsCell.swift; sourceTree = "<group>"; };
@@ -606,8 +608,8 @@
 		0CF0D5AD296F189500EED9D4 /* ContextMenus.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContextMenus.swift; sourceTree = "<group>"; };
 		0CF0D5AF296F189500EED9D4 /* MockTask.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockTask.swift; sourceTree = "<group>"; };
 		0CF0D5B0296F189500EED9D4 /* MockStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockStore.swift; sourceTree = "<group>"; };
-		0CF0D5B5296F189500EED9D4 /* ConsoleSearchView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleSearchView.swift; sourceTree = "<group>"; };
-		0CF0D5B6296F189500EED9D4 /* ConsoleSearchViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleSearchViewModel.swift; sourceTree = "<group>"; };
+		0CF0D5B5296F189500EED9D4 /* ConsoleSearchCriteriaView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleSearchCriteriaView.swift; sourceTree = "<group>"; };
+		0CF0D5B6296F189500EED9D4 /* ConsoleSearchCriteriaViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleSearchCriteriaViewModel.swift; sourceTree = "<group>"; };
 		0CF0D5BA296F189500EED9D4 /* ConsoleCustomNetworkFilterView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleCustomNetworkFilterView.swift; sourceTree = "<group>"; };
 		0CF0D5BB296F189500EED9D4 /* ConsoleSearchInlinePickerMenu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleSearchInlinePickerMenu.swift; sourceTree = "<group>"; };
 		0CF0D5BC296F189500EED9D4 /* ConsoleSearchSectionHeader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleSearchSectionHeader.swift; sourceTree = "<group>"; };
@@ -966,6 +968,14 @@
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
+		0CB63A112973A11400525165 /* Search */ = {
+			isa = PBXGroup;
+			children = (
+				0CB63A122973A12300525165 /* ConsoleSearchView.swift */,
+			);
+			path = Search;
+			sourceTree = "<group>";
+		};
 		0CDFB839296F5B9D0071EF77 /* Cells */ = {
 			isa = PBXGroup;
 			children = (
@@ -1206,9 +1216,10 @@
 		0CF0D5B2296F189500EED9D4 /* Features */ = {
 			isa = PBXGroup;
 			children = (
+				0CB63A112973A11400525165 /* Search */,
 				0CF0D5F9296F189600EED9D4 /* Console */,
 				0CF0D5DD296F189500EED9D4 /* Inspector */,
-				0CF0D5B3296F189500EED9D4 /* Search */,
+				0CF0D5B3296F189500EED9D4 /* Filters */,
 				0CF0D5DE296F189500EED9D4 /* Metrics */,
 				0CF0D5CB296F189500EED9D4 /* Insights */,
 				0CF0D5CE296F189500EED9D4 /* Settings */,
@@ -1217,16 +1228,16 @@
 			path = Features;
 			sourceTree = "<group>";
 		};
-		0CF0D5B3296F189500EED9D4 /* Search */ = {
+		0CF0D5B3296F189500EED9D4 /* Filters */ = {
 			isa = PBXGroup;
 			children = (
 				0CDFB839296F5B9D0071EF77 /* Cells */,
 				0CF0D5B9296F189500EED9D4 /* Views */,
 				0CF0D5C5296F189500EED9D4 /* Filters */,
-				0CF0D5B5296F189500EED9D4 /* ConsoleSearchView.swift */,
-				0CF0D5B6296F189500EED9D4 /* ConsoleSearchViewModel.swift */,
+				0CF0D5B5296F189500EED9D4 /* ConsoleSearchCriteriaView.swift */,
+				0CF0D5B6296F189500EED9D4 /* ConsoleSearchCriteriaViewModel.swift */,
 			);
-			path = Search;
+			path = Filters;
 			sourceTree = "<group>";
 		};
 		0CF0D5B9296F189500EED9D4 /* Views */ = {
@@ -1993,11 +2004,11 @@
 				0CF0D65F296F189600EED9D4 /* ConsoleMessageDetailsViewModel.swift in Sources */,
 				0CF0D668296F189600EED9D4 /* NetworkRequestStatusCell.swift in Sources */,
 				0CF0D651296F189600EED9D4 /* ConsoleCustomMessageFilter.swift in Sources */,
-				0CF0D640296F189600EED9D4 /* ConsoleSearchViewModel.swift in Sources */,
+				0CF0D640296F189600EED9D4 /* ConsoleSearchCriteriaViewModel.swift in Sources */,
 				0CF0D65A296F189600EED9D4 /* StoreDetailsView.swift in Sources */,
 				0CF0D648296F189600EED9D4 /* ConsoleCustomMessageFilterView.swift in Sources */,
 				0CF0D67A296F189600EED9D4 /* ConsoleView-watchos.swift in Sources */,
-				0CF0D63F296F189600EED9D4 /* ConsoleSearchView.swift in Sources */,
+				0CF0D63F296F189600EED9D4 /* ConsoleSearchCriteriaView.swift in Sources */,
 				0CF0D63A296F189600EED9D4 /* ContextMenus.swift in Sources */,
 				0C40C0A4296F849E009ECF16 /* ConsoleSearchTimePeriodCell.swift in Sources */,
 				0CF0D666296F189600EED9D4 /* NetworkMetricsCell.swift in Sources */,
@@ -2017,6 +2028,7 @@
 				0CF0D633296F189600EED9D4 /* SearchBar-ios.swift in Sources */,
 				0CF0D64A296F189600EED9D4 /* ConsoleSearchSection.swift in Sources */,
 				0CF0D616296F189600EED9D4 /* ManagedObjectTextSearch.swift in Sources */,
+				0CB63A132973A12300525165 /* ConsoleSearchView.swift in Sources */,
 				0CF0D64B296F189600EED9D4 /* RangePicker.swift in Sources */,
 				0C40C096296F7738009ECF16 /* ConsoleSearchTaskTypeCell.swift in Sources */,
 				0CF0D679296F189600EED9D4 /* ConsoleView-ios.swift in Sources */,

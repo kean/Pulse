@@ -11,11 +11,11 @@ import Combine
 import AppKit
 
 final class ConsoleTableViewModel: ObservableObject {
-    let searchViewModel: ConsoleSearchViewModel?
+    let searchViewModel: ConsoleSearchCriteriaViewModel?
     var diff: CollectionDifference<NSManagedObjectID>?
     @Published var entities: [NSManagedObject] = []
 
-    init(searchViewModel: ConsoleSearchViewModel?) {
+    init(searchViewModel: ConsoleSearchCriteriaViewModel?) {
         self.searchViewModel = searchViewModel
     }
 }

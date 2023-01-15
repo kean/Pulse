@@ -48,7 +48,7 @@ public struct ConsoleView: View {
         }
         .sheet(isPresented: $isPresentingFilters) {
             NavigationView {
-                ConsoleSearchView(viewModel: viewModel.searchViewModel)
+                ConsoleSearchCriteriaView(viewModel: viewModel.searchViewModel)
                     .toolbar {
                         ToolbarItem(placement: .cancellationAction) {
                             Button("Close") { isPresentingFilters = false }

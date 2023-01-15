@@ -7,7 +7,7 @@ import Pulse
 import Combine
 import SwiftUI
 
-final class ConsoleSearchViewModel: ObservableObject {
+final class ConsoleSearchCriteriaViewModel: ObservableObject {
     var isButtonResetEnabled: Bool { !isCriteriaDefault }
 
     @Published var criteria = ConsoleSearchCriteria()

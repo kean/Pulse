@@ -122,7 +122,7 @@ private struct ConsoleToolbarView: View {
         .padding(EdgeInsets(top: 2, leading: 8, bottom: 2, trailing: 8))
         .sheet(isPresented: $isShowingFilters) {
             NavigationView {
-                ConsoleSearchView(viewModel: viewModel.searchViewModel)
+                ConsoleSearchCriteriaView(viewModel: viewModel.searchViewModel)
                     .inlineNavigationTitle("Filters")
                     .navigationBarItems(trailing: Button("Done") { isShowingFilters = false })
             }

@@ -24,7 +24,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     let insightsViewModel: InsightsViewModel
 #endif
 
-    let searchViewModel: ConsoleSearchViewModel
+    let searchViewModel: ConsoleSearchCriteriaViewModel
 
     @Published var mode: Mode
     @Published var isOnlyErrors = false
@@ -46,7 +46,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         self.mode = mode
         self.isNetworkOnly = mode == .network
 
-        self.searchViewModel = ConsoleSearchViewModel(store: store, entities: entitiesSubject)
+        self.searchViewModel = ConsoleSearchCriteriaViewModel(store: store, entities: entitiesSubject)
 
 #if os(iOS) || os(macOS)
         self.details = ConsoleDetailsRouterViewModel()

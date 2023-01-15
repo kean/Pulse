@@ -6,7 +6,7 @@ import SwiftUI
 import Pulse
 
 struct ConsoleSearchLogLevelsCell: View {
-    @ObservedObject var viewModel: ConsoleSearchViewModel
+    @ObservedObject var viewModel: ConsoleSearchCriteriaViewModel
 
 #if os(macOS)
     var body: some View {
