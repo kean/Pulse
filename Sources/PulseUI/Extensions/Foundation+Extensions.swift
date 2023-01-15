@@ -31,6 +31,19 @@ extension NSString {
         return ranges
     }
 
+    func getLineRange(_ lineRange: NSRange) -> NSRange? {
+        let range = self.lineRange(for: lineRange)
+        return range.location != NSNotFound ? range : nil
+    }
+}
+
+extension Character {
+    init?(_ code: unichar) {
+        guard let scalar = UnicodeScalar(code) else {
+            return nil
+        }
+        self = Character(scalar)
+    }
 }
 
 extension String {

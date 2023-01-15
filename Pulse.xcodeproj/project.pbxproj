@@ -1173,6 +1173,7 @@
 				0CF0D595296F189500EED9D4 /* SearchBar-macos.swift */,
 				0CF0D597296F189500EED9D4 /* PlaceholderView.swift */,
 				0CF0D5DC296F189500EED9D4 /* DocumentBrowser.swift */,
+				0CF0D5A2296F189500EED9D4 /* TextView.swift */,
 				0CF0D5F8296F189600EED9D4 /* LoggerStoreSizeChart.swift */,
 				0CF0D598296F189500EED9D4 /* FileViewer.swift */,
 				0CF0D59D296F189500EED9D4 /* FileViewerViewModel.swift */,
@@ -1200,7 +1201,6 @@
 			children = (
 				0CF0D5A0296F189500EED9D4 /* RichTextView-legacy.swift */,
 				0CF0D5A1296F189500EED9D4 /* RichTextView-watchos.swift */,
-				0CF0D5A2296F189500EED9D4 /* TextView.swift */,
 				0CF0D5A3296F189500EED9D4 /* RichTextView.swift */,
 				0CF0D5A4296F189500EED9D4 /* RichTextViewModel.swift */,
 			);

@@ -159,7 +159,7 @@ final class RichTextViewModel: ObservableObject {
         var newlines = 0
         let string = textStorage.string as NSString
         while index < textStorage.length {
-            if let character = UnicodeScalar(string.character(at: index)).map(Character.init), character.isNewline {
+            if let character = Character(string.character(at: index)), character.isNewline {
                 newlines += 1
                 range.length += index - range.upperBound
                 if newlines == 8 {

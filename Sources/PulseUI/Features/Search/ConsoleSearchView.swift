@@ -45,19 +45,18 @@ struct ConsoleSearchView: View {
                 }
             }
         }
+        .environment(\.defaultMinListRowHeight, 0)
         .listStyle(.insetGrouped)
         .searchable(text: $viewModel.searchText)
     }
 
     // TODO: add occurence IDs instead of indices
     func makeCell(for occurence: ConsoleSearchOccurence) -> some View {
-        // TODO: handle errors
-        let attr = try! AttributedString(occurence.occurrence, including: \.uiKit)
         return VStack(alignment: .leading, spacing: 4) {
-            Text(occurence.kind.title + " (Line: \(occurence.line):\(occurence.range.lowerBound))")
+            Text(occurence.kind.title + " (\(occurence.line):\(occurence.range.lowerBound))")
                 .font(ConsoleConstants.fontTitle)
                 .foregroundColor(.secondary)
-            Text(attr)
+            Text(occurence.occurrence)
                 .lineLimit(3)
         }
     }
