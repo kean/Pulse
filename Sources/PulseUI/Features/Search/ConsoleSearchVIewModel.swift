@@ -22,7 +22,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     private var dirtyDate: Date?
     private var operation: ConsoleSearchOperation?
 
-    @State var tokens: [ConsoleSearchToken] = []
+    @Published var tokens: [ConsoleSearchToken] = []
     @Published var suggestedTokens: [ConsoleSearchToken] = []
 
     private let service = ConsoleSearchService()

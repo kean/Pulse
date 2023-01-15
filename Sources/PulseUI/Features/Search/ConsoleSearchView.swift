@@ -94,8 +94,7 @@ struct ConsoleSearchView: View {
             .environment(\.defaultMinListRowHeight, 0)
             .listStyle(.insetGrouped)
 
-        //  TODO: rewrite using custom search bar
-        if #available(iOS 16, *) {
+        if #available(iOS 16, tvOS 16, *) {
             list
                 .searchable(text: $viewModel.searchText, tokens: $viewModel.tokens, token: { Text($0.title) })
                 .disableAutocorrection(true)
@@ -136,8 +135,8 @@ private struct ConsoleSearchSuggestedTokensView: View {
             Section(header: Text("Suggested Filters")) {
                 ForEach(viewModel.suggestedTokens) { token in
                     Button(action: {
-                        viewModel.searchText = ""
                         viewModel.tokens.append(token)
+                        viewModel.searchText = ""
                     }) {
                         HStack {
                             Image(systemName: "magnifyingglass")
