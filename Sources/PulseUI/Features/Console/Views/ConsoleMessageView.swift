@@ -7,8 +7,6 @@ import Pulse
 import CoreData
 import Combine
 
-#if os(watchOS) || os(tvOS) || os(macOS)
-
 struct ConsoleMessageView: View {
     let viewModel: ConsoleMessageViewModel
 
@@ -62,5 +60,3 @@ struct ConsoleConstants {
     static let fontBody = Font.caption
 #endif
 }
-
-#endif

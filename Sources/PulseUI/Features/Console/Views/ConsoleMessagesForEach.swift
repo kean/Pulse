@@ -7,8 +7,6 @@ import SwiftUI
 import Pulse
 import CoreData
 
-#if os(watchOS) || os(tvOS)
-
 struct ConsoleMessagesForEach: View {
     let messages: [NSManagedObject]
 
@@ -61,4 +59,3 @@ private struct LazyConsoleDetailsView: View {
         ConsoleMessageDetailsView(viewModel: .init(message: message))
     }
 }
-#endif

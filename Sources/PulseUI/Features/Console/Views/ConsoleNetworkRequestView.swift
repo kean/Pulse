@@ -7,8 +7,6 @@ import Pulse
 import Combine
 import CoreData
 
-#if os(watchOS) || os(tvOS) || os(macOS)
-
 struct ConsoleNetworkRequestView: View {
     @ObservedObject var viewModel: ConsoleNetworkRequestViewModel
     @ObservedObject var progressViewModel: ProgressViewModel
@@ -18,7 +16,7 @@ struct ConsoleNetworkRequestView: View {
         self.progressViewModel = viewModel.progress
     }
 
-#if os(watchOS)
+#if os(watchOS) || os(iOS)
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             title
@@ -37,7 +35,11 @@ struct ConsoleNetworkRequestView: View {
             HStack {
                 Circle()
                     .frame(width: 10, height: 10)
+#if os(iOS)
+                    .foregroundColor(Color(viewModel.badgeColor))
+#else
                     .foregroundColor(viewModel.badgeColor)
+#endif
                 Text(viewModel.task.httpMethod ?? "GET")
                     .font(ConsoleConstants.fontTitle)
                     .foregroundColor(.secondary)
@@ -46,7 +48,7 @@ struct ConsoleNetworkRequestView: View {
             Text(viewModel.time)
                 .font(ConsoleConstants.fontTitle)
                 .foregroundColor(.secondary)
-                .monospacedDigit()
+                .backport.monospacedDigit()
         }
     }
 #elseif os(tvOS) || os(macOS)
@@ -106,6 +108,4 @@ struct ConsoleNetworkRequestView_Previews: PreviewProvider {
             .previewLayout(.sizeThatFits)
     }
 }
-#endif
-
 #endif

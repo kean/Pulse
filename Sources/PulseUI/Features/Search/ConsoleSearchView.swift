@@ -6,37 +6,50 @@ import SwiftUI
 import Pulse
 import CoreData
 
-//struct ConsoleSearchView: View {
-//    @ObservableObject var viewModel: ConsoleSearchCriteriaViewModel
-//
-//    var body: some View {
-//        List {
-//            ForEach
-//        }.listStyle(.insetGrouped)
-//    }
-//}
-//
-//final class ConsoleSearchCriteriaViewModel: ObservableObject {
-//    // TODO: add actual search
-//    let entities: [NSManagedObject]
-//
-//    @Published private(set) var results: ConsoleSearchResultViewModel
-//
-//    init(entities: [NSManagedObject]) {
-//        self.entities = entities
-//    }
-//}
-//
-//final class ConsoleSearchResultViewModel {
-//    let entity: NSManagedObject
-//}
-//
-//#if DEBUG
-//struct ConsoleSearchView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        NavigationView {
-//            ConsoleSearchView(
-//        }
-//    }
-//}
-//#endif
+struct ConsoleSearchView: View {
+    @ObservedObject var viewModel: ConsoleSearchViewModel
+
+    var body: some View {
+        List {
+            ForEach(viewModel.results) { result in
+                Section {
+                    Text(result.entity.objectID.description)
+                }
+            }
+        }.listStyle(.insetGrouped)
+    }
+}
+
+final class ConsoleSearchViewModel: ObservableObject {
+    // TODO: add actual search
+    let entities: [NSManagedObject]
+
+    @Published private(set) var results: [ConsoleSearchResultViewModel] = []
+
+    init(entities: [NSManagedObject]) {
+        self.entities = entities
+
+        self.results = entities.map {
+            ConsoleSearchResultViewModel(entity: $0)
+        }
+    }
+}
+
+final class ConsoleSearchResultViewModel: Identifiable {
+    var id: NSManagedObjectID { entity.objectID }
+    let entity: NSManagedObject
+
+    init(entity: NSManagedObject) {
+        self.entity = entity
+    }
+}
+
+#if DEBUG
+struct ConsoleSearchView_Previews: PreviewProvider {
+    static var previews: some View {
+        NavigationView {
+            ConsoleSearchView(viewModel: .init(entities: try! LoggerStore.mock.allMessages()))
+        }
+    }
+}
+#endif

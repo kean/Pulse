@@ -189,7 +189,7 @@ extension ConsoleSearchCriteriaView {
 #if DEBUG
 import CoreData
 
-struct ConsoleSearchView_Previews: PreviewProvider {
+struct ConsoleSearchCriteriaView_Previews: PreviewProvider {
     static var previews: some View {
 #if os(macOS)
         Group {
