@@ -206,19 +206,23 @@ final class ConsoleTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         switch getEntityViewModel(at: indexPath) {
         case let viewModel as ConsoleMessageCellViewModel:
-            let focus = UIContextualAction(style: .normal, title: "Focus") { _,_,_  in viewModel.focus()
+            let focus = UIContextualAction(style: .normal, title: "Focus") { _, _, completion in
+                viewModel.focus()
+                completion(true)
             }
             focus.backgroundColor = .systemGreen
             focus.image = UIImage(systemName: "eye")
 
-            let hide = UIContextualAction(style: .normal, title: "Hide") { _,_,_  in
+            let hide = UIContextualAction(style: .normal, title: "Hide") { _, _ , completion in
                 viewModel.hide()
+                completion(true)
             }
             hide.backgroundColor = .systemOrange
             hide.image = UIImage(systemName: "eye.slash")
 
-            let share = UIContextualAction(style: .normal, title: "Share") { _,_,_  in
+            let share = UIContextualAction(style: .normal, title: "Share") { _, _, completion in
                 UIActivityViewController.show(with: viewModel.share())
+                completion(true)
             }
             share.backgroundColor = .systemBlue
             share.image = UIImage(systemName: "square.and.arrow.up")
@@ -227,8 +231,9 @@ final class ConsoleTableViewController: UITableViewController {
             actions.performsFirstActionWithFullSwipe = true
             return actions
         case let viewModel as ConsoleTaskCellViewModel:
-            let share = UIContextualAction(style: .normal, title: "Share") { _,_,_  in
+            let share = UIContextualAction(style: .normal, title: "Share") { _, _ , completion  in
                 UIActivityViewController.show(with: viewModel.share(as: .html))
+                completion(true)
             }
             share.backgroundColor = .systemBlue
             share.image = UIImage(systemName: "square.and.arrow.up")

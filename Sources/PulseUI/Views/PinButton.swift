@@ -40,11 +40,10 @@ struct PinView: View {
 #if os(iOS)
 extension UIContextualAction {
     static func makePinAction(with viewModel: PinButtonViewModel) -> UIContextualAction {
-        let action = UIContextualAction(
-            style: .normal,
-            title: viewModel.isPinned ? "Remove Pin" : "Pin",
-            handler: { _,_,_  in viewModel.togglePin() }
-        )
+        let action = UIContextualAction(style: .normal, title: viewModel.isPinned ? "Remove Pin" : "Pin") { _, _, completion in
+            viewModel.togglePin()
+            completion(true)
+        }
         action.backgroundColor = .systemBlue
         action.image = UIImage(systemName: viewModel.isPinned ? "pin.slash" : "pin")
         return action
