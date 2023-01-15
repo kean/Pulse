@@ -35,8 +35,8 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         self.objectIDs = entities.map(\.objectID)
         self.context = store.newBackgroundContext()
 
-        $searchText.sink { [weak self] in
-            self?.didUpdateSearchCriteria($0)
+        Publishers.CombineLatest($searchText, $tokens).sink { [weak self] in
+            self?.didUpdateSearchCriteria($0, $1)
             self?.updateSearchTokens(for: $0)
         }.store(in: &cancellables)
 
@@ -47,11 +47,11 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
             .store(in: &cancellables)
     }
 
-    private func didUpdateSearchCriteria(_ searchText: String) {
+    private func didUpdateSearchCriteria(_ searchText: String, _ tokens: [ConsoleSearchToken]) {
         operation?.cancel()
         operation = nil
 
-        guard searchText.count > 1 else {
+        guard searchText.count > 1 || !tokens.isEmpty else {
             isSearching = false
             results = []
             return
@@ -67,7 +67,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
             dirtyDate = Date()
         }
 
-        let operation = ConsoleSearchOperation(objectIDs: objectIDs, searchText: searchText, service: service, context: context)
+        let operation = ConsoleSearchOperation(objectIDs: objectIDs, searchText: searchText, tokens: tokens, service: service, context: context)
         operation.delegate = self
         operation.resume()
         self.operation = operation
@@ -131,6 +131,7 @@ private protocol ConsoleSearchOperationDelegate: AnyObject { // Going old-school
 @available(iOS 15, tvOS 15, *)
 private final class ConsoleSearchOperation {
     private let searchText: String
+    private let tokens: [ConsoleSearchToken]
     private var objectIDs: [NSManagedObjectID]
     private var index = 0
     private var cutoff = 10
@@ -143,10 +144,12 @@ private final class ConsoleSearchOperation {
 
     init(objectIDs: [NSManagedObjectID],
          searchText: String,
+         tokens: [ConsoleSearchToken],
          service: ConsoleSearchService,
          context: NSManagedObjectContext) {
         self.objectIDs = objectIDs
         self.searchText = searchText
+        self.tokens = tokens
         self.service = service
         self.context = context
 
@@ -168,7 +171,7 @@ private final class ConsoleSearchOperation {
         var hasMore = false
         while index < objectIDs.count, !isCancelled, !hasMore {
             if let entity = try? self.context.existingObject(with: objectIDs[index]),
-               let result = self.search(searchText, in: entity) {
+               let result = self.search(entity) {
                 found += 1
                 if found > cutoff {
                     hasMore = true
@@ -190,17 +193,24 @@ private final class ConsoleSearchOperation {
     }
 
     // TOOD: dynamic cast
-    private func search(_ searchText: String, in entity: NSManagedObject) -> ConsoleSearchResultViewModel? {
+    private func search(_ entity: NSManagedObject) -> ConsoleSearchResultViewModel? {
         guard let task = (entity as? LoggerMessageEntity)?.task else {
             return nil
         }
-        return search(searchText, in: task)
+        return search(task)
     }
 
     // TODO: use on TextHelper instance
     // TODO: add remaining fields
     // TODO: what if URL matches? can we highlight the cell itself?
-    private func search(_ searchText: String, in task: NetworkTaskEntity) -> ConsoleSearchResultViewModel? {
+    private func search(_ task: NetworkTaskEntity) -> ConsoleSearchResultViewModel? {
+        guard service.filter(task: task, tokens: tokens) else {
+            return nil
+        }
+        // TODO: show occurence for filter still?
+        guard searchText.count > 1 else {
+            return ConsoleSearchResultViewModel(entity: task, occurences: [])
+        }
         var occurences: [ConsoleSearchOccurence] = []
         occurences += service.search(.responseBody, in: task, searchText: searchText, options: .default)
         guard !occurences.isEmpty else {
@@ -226,6 +236,23 @@ private final class ConsoleSearchOperation {
 
 @available(iOS 15, tvOS 15, *)
 final class ConsoleSearchService {
+
+    func filter(task: NetworkTaskEntity, tokens: [ConsoleSearchToken]) -> Bool {
+        for token in tokens {
+            if !filter(task: task, token: token) {
+                return false
+            }
+        }
+        return true
+    }
+
+    func filter(task: NetworkTaskEntity, token: ConsoleSearchToken) -> Bool {
+        switch token {
+        case .status(let range, let isNot):
+            let contains = range.contains(Int(task.statusCode))
+            return isNot ? !contains : contains
+        }
+    }
 
     // TODO: prioritize full matches
     // TODO: cache response bodies in memory
