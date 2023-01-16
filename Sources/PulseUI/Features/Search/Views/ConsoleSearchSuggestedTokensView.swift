@@ -19,7 +19,7 @@ struct ConsoleSearchSuggestedTokensView: View {
                 }
             }
         }
-        if !viewModel.suggestedFilters.isEmpty {
+        if !viewModel.suggestedScopes.isEmpty {
             Section(header: Text("Suggested Scopes")) {
                 ForEach(viewModel.suggestedScopes) {
                     ConsoleSearchSuggestionView(suggestion: $0, isActionable: viewModel.isActionable($0))
