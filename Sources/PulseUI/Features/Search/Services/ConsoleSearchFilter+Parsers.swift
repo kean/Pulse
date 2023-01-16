@@ -11,14 +11,18 @@ extension Parsers {
         filterMethod
     ).zeroOrMore
 
-    static let filterStatusCode = (filterName("status code") *> listOf(rangeOfInts(in: 100...500)))
-        .map(ConsoleSearchFilterStatusCode.init).map(ConsoleSearchFilter.statusCode)
+    static let filterStatusCode = oneOf(
+            filterName("status code") *> listOf(rangeOfInts(in: 100...500)),
+            listOf(rangeOfInts(in: 100...500)).filter { !$0.isEmpty } // These exact values is good enoug
+        ).map(ConsoleSearchFilterStatusCode.init).map(ConsoleSearchFilter.statusCode)
 
     static let filterHost = (filterName("host") *> listOf(host))
         .map(ConsoleSearchFilterHost.init).map(ConsoleSearchFilter.host)
 
-    static let filterMethod = (filterName("method") *> listOf(httpMethod))
-        .map(ConsoleSearchFilterMethod.init).map(ConsoleSearchFilter.method)
+    static let filterMethod = oneOf(
+        filterName("method") *> listOf(httpMethod),
+        listOf(httpMethod).filter { !$0.isEmpty }
+    ).map(ConsoleSearchFilterMethod.init).map(ConsoleSearchFilter.method)
 
     static let host = char(from: .urlHostAllowed.subtracting(.init(charactersIn: ","))).oneOrMore.map { String($0) }
 

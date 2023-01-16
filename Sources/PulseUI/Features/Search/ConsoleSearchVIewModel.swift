@@ -161,7 +161,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
                 }
             }
         }
-
+#warning("dont show full suggestions when have search results ")
 #warning("fix keybord cursor jumping")
 #warning("fix 'res' not returning response scope")
 #warning("easier way to manage these suggestions")
