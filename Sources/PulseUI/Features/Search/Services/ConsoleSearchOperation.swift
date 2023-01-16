@@ -8,7 +8,7 @@ import CoreData
 import Combine
 
 @available(iOS 15, tvOS 15, *)
-protocol ConsoleSearchOperationDelegate: AnyObject { // Going old-school
+protocol ConsoleSearchOperationDelegate: AnyObject {
     func searchOperation(_ operation: ConsoleSearchOperation, didAddResults results: [ConsoleSearchResultViewModel])
     func searchOperationDidFinish(_ operation: ConsoleSearchOperation, hasMore: Bool)
 }
@@ -75,22 +75,30 @@ final class ConsoleSearchOperation {
         }
     }
 
-    // TOOD: dynamic cast
     private func search(_ entity: NSManagedObject) -> ConsoleSearchResultViewModel? {
-        guard let task = (entity as? LoggerMessageEntity)?.task else {
-            return nil
+        if let message = entity as? LoggerMessageEntity {
+            if let task = message.task {
+                return search(task)
+            } else {
+                return search(message)
+            }
+        } else if let task = entity as? NetworkTaskEntity {
+            return search(task)
+        } else {
+            fatalError("Unsupported entity: \(entity)")
         }
-        return search(task)
     }
 
-    // TODO: use on TextHelper instance
-    // TODO: add remaining fields
-    // TODO: what if URL matches? can we highlight the cell itself?
+#warning("implement basic search for messages")
+
+    private func search(_ message: LoggerMessageEntity) -> ConsoleSearchResultViewModel? {
+        return nil
+    }
+
     private func search(_ task: NetworkTaskEntity) -> ConsoleSearchResultViewModel? {
         guard service.filter(task: task, tokens: parameters.tokens) else {
             return nil
         }
-        // TODO: show occurence for filter still?
         guard parameters.searchTerm.count > 1 else {
             return ConsoleSearchResultViewModel(entity: task, occurences: [])
         }
