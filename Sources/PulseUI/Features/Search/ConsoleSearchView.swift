@@ -75,7 +75,11 @@ struct ConsoleSearchView: View {
 struct ConsoleSearchView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
-            ConsoleSearchView(viewModel: .init(entities: try! LoggerStore.mock.allMessages(), store: .mock))
+            ConsoleSearchView(viewModel: {
+                let viewModel = ConsoleSearchViewModel(entities: try! LoggerStore.mock.allMessages(), store: .mock)
+                viewModel.searchText = "Nuke"
+                return viewModel
+            }())
         }
 #if os(watchOS)
         .navigationViewStyle(.stack)
