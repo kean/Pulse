@@ -14,12 +14,16 @@ struct ConsoleSearchSuggestedTokensView: View {
     var body: some View {
         if !viewModel.suggestedFilters.isEmpty {
             Section(header: Text("Suggested Filters")) {
-                ForEach(viewModel.suggestedFilters, content: ConsoleSearchSuggestionView.init)
+                ForEach(viewModel.suggestedFilters) {
+                    ConsoleSearchSuggestionView(suggestion: $0, isActionable: viewModel.isActionable($0))
+                }
             }
         }
         if !viewModel.suggestedFilters.isEmpty {
             Section(header: Text("Suggested Scopes")) {
-                ForEach(viewModel.suggestedScopes, content: ConsoleSearchSuggestionView.init)
+                ForEach(viewModel.suggestedScopes) {
+                    ConsoleSearchSuggestionView(suggestion: $0, isActionable: viewModel.isActionable($0))
+                }
             }
         }
     }
@@ -28,12 +32,17 @@ struct ConsoleSearchSuggestedTokensView: View {
 @available(iOS 15, tvOS 15, *)
 private struct ConsoleSearchSuggestionView: View {
     let suggestion: ConsoleSearchSuggestion
+    var isActionable = false
 
     var body: some View {
         Button(action: suggestion.onTap) {
             HStack {
                 Image(systemName: "magnifyingglass")
                 Text(suggestion.text)
+                if isActionable {
+                    Spacer()
+                    Image(systemName: "return")
+                }
             }
         }
     }

@@ -72,6 +72,10 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         self.objectIDs = entities.map(\.objectID)
     }
 
+    func isActionable(_ suggestion: ConsoleSearchSuggestion) -> Bool {
+        suggestedFilters.count == 1 && suggestion.id == suggestedFilters[0].id
+    }
+
     private func didUpdateSearchCriteria(_ searchText: String, _ tokens: [ConsoleSearchToken]) {
         operation?.cancel()
         operation = nil
@@ -141,7 +145,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
             (try? parser.parse(searchText)).map(add)
         }
 
-        var allScopes = ConsoleSearchScope.allCases.filter { $0 != .originalRequestHeaders }
+        let allScopes = ConsoleSearchScope.allCases.filter { $0 != .originalRequestHeaders }
 
         if searchText.isEmpty {
             add(ConsoleSearchFilter.statusCode(.init(values: [])))
@@ -161,6 +165,8 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
             }
         }
 
+#warning("fix keybord cursor jumping")
+#warning("fix 'res' not returning response scope")
 #warning("easier way to manage these suggestions")
 #warning("add suggestions based on input, e.g. input range")
 #warning("finish this prototype")
@@ -213,6 +219,11 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     // MARK: - Recent Searches
 
     func onSubmitSearch() {
+        if let suggestion = suggestedFilters.first, isActionable(suggestion) {
+            suggestion.onTap()
+            return
+        }
+
         guard !searchBar.text.trimmingCharacters(in: .whitespaces).isEmpty else {
             return
         }
