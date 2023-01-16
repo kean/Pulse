@@ -70,6 +70,9 @@ extension Parsers {
             guard !word.isEmpty else {
                 return nil
             }
+            guard word.first == target.first else {
+                return nil // Fuzzy, but not too fuzzy
+            }
             // Check only the prefix
             let count = min(word.count, target.count)
             let lhs = word.prefix(count).lowercased()

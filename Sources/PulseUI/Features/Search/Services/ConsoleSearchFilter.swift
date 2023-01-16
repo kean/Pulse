@@ -20,7 +20,7 @@ extension Parsers {
     static func filterName(_ name: String) -> Parser<Void> {
         let words = name.split(separator: " ").map { String($0) }
         assert(!words.isEmpty)
-        let anyWords = oneOf(words.map(fuzzy)).zeroOrMore.map { _ in () }
+        let anyWords = oneOf(words.map(fuzzy)).oneOrMore.map { _ in () }
         return anyWords <* optional(":") <* whitespaces
     }
 

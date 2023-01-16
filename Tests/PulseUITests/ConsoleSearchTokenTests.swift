@@ -65,6 +65,9 @@ final class ConsoleSearchTokenTests: XCTestCase {
         XCTAssertEqual(parse("s not200"), StatusCode(isNot: true, values: [.init(200)]))
         XCTAssertEqual(parse("s !200"), StatusCode(isNot: true, values: [.init(200)]))
         XCTAssertEqual(parse("s ! 200"), StatusCode(isNot: true, values: [.init(200)]))
+
+        // False
+        XCTAssertNil(parse("bod 200"))
     }
 
     func testDistance() {
