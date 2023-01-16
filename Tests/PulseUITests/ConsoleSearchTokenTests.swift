@@ -13,6 +13,8 @@ final class ConsoleSearchTokenTests: XCTestCase {
 
         typealias StatusCode = ConsoleSearchFilter.StatusCode
 
+        XCTAssertEqual(parse("sttus"), StatusCode(isNot: false, values: []))
+
         XCTAssertEqual(parse("S"), StatusCode(isNot: false, values: []))
         XCTAssertEqual(parse("s"), StatusCode(isNot: false, values: []))
         XCTAssertEqual(parse("s "), StatusCode(isNot: false, values: []))
@@ -24,7 +26,7 @@ final class ConsoleSearchTokenTests: XCTestCase {
         XCTAssertEqual(parse("stAtus codE:"), StatusCode(isNot: false, values: []))
         XCTAssertEqual(parse("status code: "), StatusCode(isNot: false, values: []))
         XCTAssertEqual(parse("status code:   "), StatusCode(isNot: false, values: []))
-        XCTAssertEqual(parse("   status   code:   "), StatusCode(isNot: false, values: []))
+        XCTAssertEqual(parse("http status code: "), StatusCode(isNot: false, values: []))
 
         // Reordering
         XCTAssertEqual(parse("code"), StatusCode(isNot: false, values: []))

@@ -70,17 +70,16 @@ extension Parsers {
             guard !word.isEmpty else {
                 return nil
             }
-            guard word.first == target.first else {
+            guard word.first?.lowercased() == target.first?.lowercased() else {
                 return nil // Fuzzy, but not too fuzzy
             }
             // Check only the prefix
-            let count = min(word.count, target.count)
-            let lhs = word.prefix(count).lowercased()
-            let rhs = target.prefix(count).lowercased()
+            let lhs = word.lowercased()
+            let rhs = target.lowercased()
 
-            let distance = lhs.distance(to: rhs)
-            if count < 3 && distance > 0 { return nil }
-            if count < 6 && distance > 1 { return nil }
+            let distance = lhs.distance(to: rhs) - abs(word.count - target.count)
+            if word.count < 3 && distance > 0 { return nil }
+            if word.count < 6 && distance > 1 { return nil }
             if distance > 2 { return nil }
 
             var s = s

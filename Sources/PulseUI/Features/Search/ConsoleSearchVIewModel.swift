@@ -42,10 +42,11 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         self.objectIDs = entities.map(\.objectID)
         self.context = store.newBackgroundContext()
 
-        Publishers.CombineLatest(
-            searchBar.$text.removeDuplicates(),
-            searchBar.$tokens.removeDuplicates()
-        ).sink { [weak self] in
+        let text = searchBar.$text
+            .map { $0.trimmingCharacters(in: .whitespaces ) }
+            .removeDuplicates()
+
+        Publishers.CombineLatest(text, searchBar.$tokens.removeDuplicates()).sink { [weak self] in
             self?.didUpdateSearchCriteria($0, $1)
             self?.updateSearchTokens(for: $0)
         }.store(in: &cancellables)
