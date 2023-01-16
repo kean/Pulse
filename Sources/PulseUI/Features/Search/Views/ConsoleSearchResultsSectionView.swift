@@ -7,6 +7,8 @@ import Pulse
 import CoreData
 import Combine
 
+// TODO: fix an issue where text jumps when you type quickly
+
 @available(iOS 15, tvOS 15, *)
 struct ConsoleSearchResultView: View {
     let viewModel: ConsoleSearchResultViewModel
@@ -15,7 +17,6 @@ struct ConsoleSearchResultView: View {
     var body: some View {
         ConsoleEntityCell(entity: viewModel.entity)
         // TODO: limit number of occurences of the same type (or only have one and display how many more?)
-        // TODO: when open body, start with a search term immediatelly
         let occurences = Array(viewModel.occurences.enumerated())
         ForEach(occurences.prefix(limit), id: \.offset) { item in
             NavigationLink(destination: makeDestination(for: item.element, entity: viewModel.entity)) {
@@ -24,7 +25,6 @@ struct ConsoleSearchResultView: View {
         }
         if occurences.count > limit {
             // TODO: how to prioritize what makes the cut?
-            // TODO: implement show-all-occurences
             NavigationLink(destination: ConsoleSearchResultDetailsView(viewModel: viewModel)) {
                 HStack {
                     Text("Show All Occurences")
@@ -51,6 +51,9 @@ struct ConsoleSearchResultView: View {
 
     func makeDestination(for occurence: ConsoleSearchOccurence, entity: NSManagedObject) -> some View {
         switch occurence.kind {
+        case .requestBody:
+            return NetworkInspectorRequestBodyView(viewModel: .init(task: entity as! NetworkTaskEntity))
+                .environment(\.textViewSearchContext, occurence.searchContext)
         case .responseBody:
             return NetworkInspectorResponseBodyView(viewModel: .init(task: entity as! NetworkTaskEntity))
                 .environment(\.textViewSearchContext, occurence.searchContext)

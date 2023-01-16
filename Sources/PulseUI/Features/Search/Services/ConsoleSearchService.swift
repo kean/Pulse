@@ -28,10 +28,27 @@ final class ConsoleSearchService {
     }
 
     // TODO: cache response bodies in memory
-    func search(_ kind: ConsoleSearchOccurence.Kind, in task: NetworkTaskEntity, searchText: String, options: StringSearchOptions) -> [ConsoleSearchOccurence] {
-        guard let data = task.responseBody?.data,
-              let content = NSString(data: data, encoding: NSUTF8StringEncoding)
-        else { return [] }
+    func search(in task: NetworkTaskEntity, searchText: String, options: StringSearchOptions) -> [ConsoleSearchOccurence] {
+        var occurences: [ConsoleSearchOccurence] = []
+        for kind in ConsoleSearchOccurence.Kind.allCases {
+            switch kind {
+            case .requestBody:
+                if let data = task.requestBody?.data {
+                    occurences += search(data: data, searchText: searchText, options: options, kind: .requestBody)
+                }
+            case .responseBody:
+                if let data = task.responseBody?.data {
+                    occurences += search(data: data, searchText: searchText, options: options, kind: .responseBody)
+                }
+            }
+        }
+        return occurences
+    }
+
+    private func search(data: Data, searchText: String, options: StringSearchOptions, kind: ConsoleSearchOccurence.Kind) -> [ConsoleSearchOccurence] {
+        guard let content = NSString(data: data, encoding: NSUTF8StringEncoding) else {
+            return []
+        }
 
         var allMatches: [(line: NSString, lineNumber: Int, range: NSRange)] = []
         var lineCount = 0
@@ -43,7 +60,6 @@ final class ConsoleSearchService {
                 allMatches.append((line, lineCount, range))
             }
         }
-
 
         var occurences: [ConsoleSearchOccurence] = []
         var matchIndex = 0
@@ -76,7 +92,7 @@ final class ConsoleSearchService {
             }
 
             let occurence = ConsoleSearchOccurence(
-                kind: .responseBody,
+                kind: kind,
                 line: lineNumber,
                 range: range,
                 text: preview,
@@ -93,11 +109,13 @@ final class ConsoleSearchService {
 
 @available(iOS 15, tvOS 15, *)
 struct ConsoleSearchOccurence {
-    enum Kind {
+    enum Kind: CaseIterable {
+        case requestBody
         case responseBody
 
         var title: String {
             switch self {
+            case .requestBody: return "Request Body"
             case .responseBody: return "Response Body"
             }
         }

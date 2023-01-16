@@ -96,8 +96,7 @@ final class ConsoleSearchOperation {
         guard searchText.count > 1 else {
             return ConsoleSearchResultViewModel(entity: task, occurences: [])
         }
-        var occurences: [ConsoleSearchOccurence] = []
-        occurences += service.search(.responseBody, in: task, searchText: searchText, options: .default)
+        let occurences = service.search(in: task, searchText: searchText, options: .default)
         guard !occurences.isEmpty else {
             return nil
         }
