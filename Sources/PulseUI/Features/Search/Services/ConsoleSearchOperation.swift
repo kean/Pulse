@@ -89,7 +89,6 @@ final class ConsoleSearchOperation {
     }
 
 #warning("implement basic search for messages")
-#warning("add search prefix for messages and separate for blobs")
 
     private func search(_ message: LoggerMessageEntity) -> ConsoleSearchResultViewModel? {
         return nil
@@ -100,6 +99,9 @@ final class ConsoleSearchOperation {
             return nil
         }
         guard parameters.searchTerm.count > 1 else {
+            guard !parameters.filters.isEmpty else {
+                return nil
+            }
             return ConsoleSearchResultViewModel(entity: task, occurences: [])
         }
         let occurences = service.search(in: task, parameters: parameters)
