@@ -11,6 +11,8 @@ import Combine
 // TODO: instead of tokens, use something similar to custom search filters
 // TODO: do we need searchabl then?
 
+#warning("improve how search status is displayed")
+
 @available(iOS 15, tvOS 15, *)
 struct ConsoleSearchView: View {
     @ObservedObject var viewModel: ConsoleSearchViewModel
@@ -38,6 +40,15 @@ struct ConsoleSearchView: View {
             }
             ConsoleSearchSuggestedTokensView(viewModel: viewModel)
 
+            if viewModel.isSearching || !viewModel.results.isEmpty {
+                HStack {
+                    Text("\(viewModel.results.count) results with \(21) occurences")
+                        .foregroundColor(.secondary)
+                    if viewModel.isSpinnerNeeded {
+                        ProgressView()
+                    }
+                }
+            }
             if viewModel.searchText.count > 1 {
                 ForEach(viewModel.results) { result in
                     Section {

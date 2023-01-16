@@ -7,6 +7,10 @@ import Pulse
 import CoreData
 import Combine
 
+#warning("cache response bodies")
+#warning("save duplicated results for bodies")
+#warning("construct prefix searchtree or proper index (?)")
+
 @available(iOS 15, tvOS 15, *)
 final class ConsoleSearchService {
     private let helper = TextHelper()
@@ -30,6 +34,7 @@ final class ConsoleSearchService {
 
     // TODO: cache response bodies in memory
     func search(in task: NetworkTaskEntity, parameters: ConsoleSearchParameters) -> [ConsoleSearchOccurence] {
+        Thread.sleep(forTimeInterval: 0.1)
         var occurences: [ConsoleSearchOccurence] = []
         for kind in ConsoleSearchOccurence.Kind.allCases {
             switch kind {
