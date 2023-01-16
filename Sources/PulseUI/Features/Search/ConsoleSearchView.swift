@@ -64,15 +64,36 @@ struct ConsoleSearchView: View {
 }
 
 #if DEBUG
-@available(iOS 15, tvOS 15, *)
+@available(iOS 16, tvOS 16, *)
 struct ConsoleSearchView_Previews: PreviewProvider {
     static var previews: some View {
+        ConsoleSearchDemoView()
+    }
+}
+
+@available(iOS 16, tvOS 16, *)
+private struct ConsoleSearchDemoView: View {
+    @StateObject var viewModel: ConsoleSearchViewModel
+    @ObservedObject var searchBarViewModel: ConsoleSearchBarViewModel
+
+    init() {
+        let viewModel = ConsoleSearchViewModel(entities: try! LoggerStore.mock.allMessages(), store: .mock)
+        _viewModel = StateObject(wrappedValue: viewModel)
+        searchBarViewModel = viewModel.searchBar
+    }
+
+    var body: some View {
         NavigationView {
-            ConsoleSearchView(viewModel: {
-                let viewModel = ConsoleSearchViewModel(entities: try! LoggerStore.mock.allMessages(), store: .mock)
-                viewModel.searchBar.text = "Nuke"
-                return viewModel
-            }())
+            ConsoleSearchView(viewModel: viewModel)
+                .searchable(text: $searchBarViewModel.text, tokens: $searchBarViewModel.tokens, token: {
+                    Label($0.title, systemImage: $0.systemImage)
+                })
+                .onSubmit(of: .search) {
+                    viewModel.onSubmitSearch()
+                }
+                .onAppear {
+                    viewModel.searchBar.text = "Nuke"
+                }
         }
 #if os(watchOS)
         .navigationViewStyle(.stack)
