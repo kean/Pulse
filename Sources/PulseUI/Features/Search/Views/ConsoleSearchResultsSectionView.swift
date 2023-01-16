@@ -49,14 +49,34 @@ struct ConsoleSearchResultView: View {
         }
     }
 
+    @ViewBuilder
     func makeDestination(for occurence: ConsoleSearchOccurence, entity: NSManagedObject) -> some View {
-        switch occurence.kind {
-        case .requestBody:
-            return NetworkInspectorRequestBodyView(viewModel: .init(task: entity as! NetworkTaskEntity))
-                .environment(\.textViewSearchContext, occurence.searchContext)
-        case .responseBody:
-            return NetworkInspectorResponseBodyView(viewModel: .init(task: entity as! NetworkTaskEntity))
-                .environment(\.textViewSearchContext, occurence.searchContext)
+        if let task = entity as? NetworkTaskEntity {
+            switch occurence.kind {
+            case .originalRequestHeaders:
+                makeHeadersDetails(title: "Request Headers", headers: task.originalRequest?.headers)
+                    .environment(\.textViewSearchContext, occurence.searchContext)
+            case .currentRequestHeaders:
+                makeHeadersDetails(title: "Request Headers", headers: task.currentRequest?.headers)
+                    .environment(\.textViewSearchContext, occurence.searchContext)
+            case .requestBody:
+                NetworkInspectorRequestBodyView(viewModel: .init(task: task))
+                    .environment(\.textViewSearchContext, occurence.searchContext)
+            case .responseHeaders:
+                makeHeadersDetails(title: "Response Headers", headers: task.response?.headers)
+                    .environment(\.textViewSearchContext, occurence.searchContext)
+            case .responseBody:
+                NetworkInspectorResponseBodyView(viewModel: .init(task: task))
+                    .environment(\.textViewSearchContext, occurence.searchContext)
+            }
+        } else {
+            EmptyView()
+        }
+    }
+
+    private func makeHeadersDetails(title: String, headers: [String: String]?) -> some View {
+        NetworkDetailsView(title: title) {
+            KeyValueSectionViewModel.makeHeaders(title: title, headers: headers)
         }
     }
 }

@@ -28,34 +28,49 @@ final class ConsoleSearchService {
     }
 
     // TODO: cache response bodies in memory
-    func search(in task: NetworkTaskEntity, searchText: String, options: StringSearchOptions) -> [ConsoleSearchOccurence] {
+    func search(in task: NetworkTaskEntity, parameters: ConsoleSearchParameters) -> [ConsoleSearchOccurence] {
         var occurences: [ConsoleSearchOccurence] = []
         for kind in ConsoleSearchOccurence.Kind.allCases {
             switch kind {
+            case .originalRequestHeaders:
+                if let headers = task.originalRequest?.httpHeaders {
+                    occurences += search(headers as NSString, parameters, kind)
+                }
+            case .currentRequestHeaders:
+                if let headers = task.currentRequest?.httpHeaders {
+                    occurences += search(headers as NSString, parameters, kind)
+                }
             case .requestBody:
                 if let data = task.requestBody?.data {
-                    occurences += search(data: data, searchText: searchText, options: options, kind: .requestBody)
+                    occurences += search(data, parameters, kind)
+                }
+            case .responseHeaders:
+                if let headers = task.response?.httpHeaders {
+                    occurences += search(headers as NSString, parameters, kind)
                 }
             case .responseBody:
                 if let data = task.responseBody?.data {
-                    occurences += search(data: data, searchText: searchText, options: options, kind: .responseBody)
+                    occurences += search(data, parameters, kind)
                 }
             }
         }
         return occurences
     }
 
-    private func search(data: Data, searchText: String, options: StringSearchOptions, kind: ConsoleSearchOccurence.Kind) -> [ConsoleSearchOccurence] {
+    private func search(_ data: Data, _ parameters: ConsoleSearchParameters, _ kind: ConsoleSearchOccurence.Kind) -> [ConsoleSearchOccurence] {
         guard let content = NSString(data: data, encoding: NSUTF8StringEncoding) else {
             return []
         }
+        return search(content, parameters, kind)
+    }
 
+    private func search(_ content: NSString, _ parameters: ConsoleSearchParameters, _ kind: ConsoleSearchOccurence.Kind) -> [ConsoleSearchOccurence] {
         var allMatches: [(line: NSString, lineNumber: Int, range: NSRange)] = []
         var lineCount = 0
         content.enumerateLines { line, stop in
             lineCount += 1
             let line = line as NSString
-            let matches = line.ranges(of: searchText, options: .init(options))
+            let matches = line.ranges(of: parameters.searchTerm, options: .init(parameters.options))
             for range in matches {
                 allMatches.append((line, lineCount, range))
             }
@@ -87,16 +102,17 @@ final class ConsoleSearchService {
             let previewText = (prefix + line.substring(with: contextRange))
                 .trimmingCharacters(in: .whitespacesAndNewlines)
             var preview = AttributedString(previewText, attributes: AttributeContainer(TextHelper().attributes(role: .body2, style: .monospaced)))
-            if let range = preview.range(of: searchText, options: .init(options)) {
+            if let range = preview.range(of: parameters.searchTerm, options: .init(parameters.options)) {
                 preview[range].foregroundColor = .orange
             }
 
+            #warning("replace searchContext with ConsoleSearchParameters")
             let occurence = ConsoleSearchOccurence(
                 kind: kind,
                 line: lineNumber,
                 range: range,
                 text: preview,
-                searchContext: .init(searchTerm: searchText, options: options, matchIndex: matchIndex)
+                searchContext: .init(searchTerm: parameters.searchTerm, options: parameters.options, matchIndex: matchIndex)
             )
             occurences.append(occurence)
 
@@ -110,12 +126,18 @@ final class ConsoleSearchService {
 @available(iOS 15, tvOS 15, *)
 struct ConsoleSearchOccurence {
     enum Kind: CaseIterable {
+        case originalRequestHeaders
+        case currentRequestHeaders
         case requestBody
+        case responseHeaders
         case responseBody
 
         var title: String {
             switch self {
+            case .originalRequestHeaders: return "Original Request Headers"
+            case .currentRequestHeaders: return "Current Request Headers"
             case .requestBody: return "Request Body"
+            case .responseHeaders: return "Response Headers"
             case .responseBody: return "Response Body"
             }
         }
@@ -128,17 +150,27 @@ struct ConsoleSearchOccurence {
     let searchContext: RichTextViewModel.SearchContext
 }
 
+final class ConsoleSearchParameters {
+    let searchTerm: String
+    let tokens: [ConsoleSearchToken]
+    let options: StringSearchOptions
+
+    init(searchTerm: String, tokens: [ConsoleSearchToken], options: StringSearchOptions) {
+        self.searchTerm = searchTerm
+        self.tokens = tokens
+        self.options = options
+    }
+}
+
 // TODO: (when entering text)
 // Response Body contains:
 // Request Body contains:
 // show more
-
-@available(iOS 15, tvOS 15, *)
 enum ConsoleSearchToken: Identifiable, Hashable {
     var id: ConsoleSearchToken { self }
 
     case status(range: ClosedRange<Int>, isNot: Bool)
-
+    @available(iOS 15, tvOS 15, *)
     var title: AttributedString {
         switch self {
         case .status(let range, let isNot):

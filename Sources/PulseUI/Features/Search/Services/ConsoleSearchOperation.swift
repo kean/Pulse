@@ -15,8 +15,7 @@ protocol ConsoleSearchOperationDelegate: AnyObject { // Going old-school
 
 @available(iOS 15, tvOS 15, *)
 final class ConsoleSearchOperation {
-    private let searchText: String
-    private let tokens: [ConsoleSearchToken]
+    private let parameters: ConsoleSearchParameters
     private var objectIDs: [NSManagedObjectID]
     private var index = 0
     private var cutoff = 10
@@ -33,8 +32,7 @@ final class ConsoleSearchOperation {
          service: ConsoleSearchService,
          context: NSManagedObjectContext) {
         self.objectIDs = objectIDs
-        self.searchText = searchText
-        self.tokens = tokens
+        self.parameters = ConsoleSearchParameters(searchTerm: searchText, tokens: tokens, options: .default)
         self.service = service
         self.context = context
 
@@ -89,14 +87,14 @@ final class ConsoleSearchOperation {
     // TODO: add remaining fields
     // TODO: what if URL matches? can we highlight the cell itself?
     private func search(_ task: NetworkTaskEntity) -> ConsoleSearchResultViewModel? {
-        guard service.filter(task: task, tokens: tokens) else {
+        guard service.filter(task: task, tokens: parameters.tokens) else {
             return nil
         }
         // TODO: show occurence for filter still?
-        guard searchText.count > 1 else {
+        guard parameters.searchTerm.count > 1 else {
             return ConsoleSearchResultViewModel(entity: task, occurences: [])
         }
-        let occurences = service.search(in: task, searchText: searchText, options: .default)
+        let occurences = service.search(in: task, parameters: parameters)
         guard !occurences.isEmpty else {
             return nil
         }
