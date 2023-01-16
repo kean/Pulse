@@ -34,55 +34,54 @@ final class ConsoleSearchService {
 
     // TODO: cache response bodies in memory
     func search(in task: NetworkTaskEntity, parameters: ConsoleSearchParameters) -> [ConsoleSearchOccurence] {
-        Thread.sleep(forTimeInterval: 0.1)
         var occurences: [ConsoleSearchOccurence] = []
-        for kind in ConsoleSearchOccurence.Kind.allCases {
-            switch kind {
+        for scope in ConsoleSearchScope.allCases {
+            switch scope {
             case .url:
                 if var components = URLComponents(string: task.url ?? "") {
                     components.queryItems = nil
                     if let url = components.url?.absoluteString {
-                        occurences += search(url as NSString, parameters, kind)
+                        occurences += search(url as NSString, parameters, scope)
                     }
                 }
             case .queryItems:
                 if let components = URLComponents(string: task.url ?? ""),
                    let query = components.query, !query.isEmpty {
-                    occurences += search(query as NSString, parameters, kind)
+                    occurences += search(query as NSString, parameters, scope)
                 }
             case .originalRequestHeaders:
                 if let headers = task.originalRequest?.httpHeaders {
-                    occurences += search(headers as NSString, parameters, kind)
+                    occurences += search(headers as NSString, parameters, scope)
                 }
             case .currentRequestHeaders:
                 if let headers = task.currentRequest?.httpHeaders {
-                    occurences += search(headers as NSString, parameters, kind)
+                    occurences += search(headers as NSString, parameters, scope)
                 }
             case .requestBody:
                 if let data = task.requestBody?.data {
-                    occurences += search(data, parameters, kind)
+                    occurences += search(data, parameters, scope)
                 }
             case .responseHeaders:
                 if let headers = task.response?.httpHeaders {
-                    occurences += search(headers as NSString, parameters, kind)
+                    occurences += search(headers as NSString, parameters, scope)
                 }
             case .responseBody:
                 if let data = task.responseBody?.data {
-                    occurences += search(data, parameters, kind)
+                    occurences += search(data, parameters, scope)
                 }
             }
         }
         return occurences
     }
 
-    private func search(_ data: Data, _ parameters: ConsoleSearchParameters, _ kind: ConsoleSearchOccurence.Kind) -> [ConsoleSearchOccurence] {
+    private func search(_ data: Data, _ parameters: ConsoleSearchParameters, _ scope: ConsoleSearchScope) -> [ConsoleSearchOccurence] {
         guard let content = NSString(data: data, encoding: NSUTF8StringEncoding) else {
             return []
         }
-        return search(content, parameters, kind)
+        return search(content, parameters, scope)
     }
 
-    private func search(_ content: NSString, _ parameters: ConsoleSearchParameters, _ kind: ConsoleSearchOccurence.Kind) -> [ConsoleSearchOccurence] {
+    private func search(_ content: NSString, _ parameters: ConsoleSearchParameters, _ scope: ConsoleSearchScope) -> [ConsoleSearchOccurence] {
         var allMatches: [(line: NSString, lineNumber: Int, range: NSRange)] = []
         var lineCount = 0
         content.enumerateLines { line, stop in
@@ -122,7 +121,7 @@ final class ConsoleSearchService {
             }
 
             let occurence = ConsoleSearchOccurence(
-                kind: kind,
+                scope: scope,
                 line: lineNumber,
                 range: range,
                 text: preview,
@@ -139,29 +138,7 @@ final class ConsoleSearchService {
 
 @available(iOS 15, tvOS 15, *)
 struct ConsoleSearchOccurence {
-    enum Kind: CaseIterable {
-        case url
-        case queryItems
-        case originalRequestHeaders
-        case currentRequestHeaders
-        case requestBody
-        case responseHeaders
-        case responseBody
-
-        var title: String {
-            switch self {
-            case .url: return "URL"
-            case .queryItems: return "Query Items"
-            case .originalRequestHeaders: return "Original Request Headers"
-            case .currentRequestHeaders: return "Current Request Headers"
-            case .requestBody: return "Request Body"
-            case .responseHeaders: return "Response Headers"
-            case .responseBody: return "Response Body"
-            }
-        }
-    }
-
-    let kind: Kind
+    let scope: ConsoleSearchScope
     let line: Int
     let range: NSRange
     let text: AttributedString
@@ -218,6 +195,7 @@ enum ConsoleSearchToken: Identifiable, Hashable {
     var id: ConsoleSearchToken { self }
 
     case status(range: ClosedRange<Int>, isNot: Bool)
+
     @available(iOS 15, tvOS 15, *)
     var title: AttributedString {
         switch self {
@@ -229,6 +207,28 @@ enum ConsoleSearchToken: Identifiable, Hashable {
                 value = "\(isNot ? "NOT IN " : "")\(range.lowerBound)...\(range.upperBound)"
             }
             return AttributedString("Status Code: ") { $0.foregroundColor = .secondary } + AttributedString(value)
+        }
+    }
+}
+
+enum ConsoleSearchScope: CaseIterable {
+    case url
+    case queryItems
+    case originalRequestHeaders
+    case currentRequestHeaders
+    case requestBody
+    case responseHeaders
+    case responseBody
+
+    var title: String {
+        switch self {
+        case .url: return "URL"
+        case .queryItems: return "Query Items"
+        case .originalRequestHeaders: return "Original Request Headers"
+        case .currentRequestHeaders: return "Current Request Headers"
+        case .requestBody: return "Request Body"
+        case .responseHeaders: return "Response Headers"
+        case .responseBody: return "Response Body"
         }
     }
 }

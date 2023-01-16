@@ -44,7 +44,7 @@ struct ConsoleSearchResultView: View {
     // TODO: add occurence IDs instead of indices
     private func makeCell(for occurence: ConsoleSearchOccurence) -> some View {
         return VStack(alignment: .leading, spacing: 4) {
-            Text(occurence.kind.title + " (\(occurence.line):\(occurence.range.lowerBound))")
+            Text(occurence.scope.title + " (\(occurence.line):\(occurence.range.lowerBound))")
                 .font(ConsoleConstants.fontTitle)
                 .foregroundColor(.secondary)
             Text(occurence.text)
@@ -61,7 +61,7 @@ struct ConsoleSearchResultView: View {
     @ViewBuilder
     func _makeDestination(for occurence: ConsoleSearchOccurence, entity: NSManagedObject) -> some View {
         if let task = entity as? NetworkTaskEntity {
-            switch occurence.kind {
+            switch occurence.scope {
             case .url:
                 NetworkDetailsView(title: "URL") {
                     TextRenderer(options: .sharing).make {
