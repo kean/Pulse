@@ -258,7 +258,7 @@ private final class HeaderViewViewModel {}
 private class ConsoleBaseTableCell: UITableViewCell {
     lazy var hostingView: UIHostingController<AnyView> = {
         let controller = UIHostingController(rootView: AnyView(EmptyView()))
-        addSubview(controller.view)
+        contentView.addSubview(controller.view)
         controller.view.backgroundColor = .clear
         controller.view.pinToSuperview(insets: UIEdgeInsets(top: 8, left: 20, bottom: 8, right: 10))
         return controller
