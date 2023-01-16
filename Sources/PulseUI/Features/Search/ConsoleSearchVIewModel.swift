@@ -36,7 +36,8 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     private var buffer: [ConsoleSearchResultViewModel] = []
     private var operation: ConsoleSearchOperation?
 
-    @Published var suggestedTokens: [ConsoleSearchSuggestion] = []
+    @Published var suggestedFilters: [ConsoleSearchSuggestion] = []
+    @Published var suggestedScopes: [ConsoleSearchSuggestion] = []
 
     private let service = ConsoleSearchService()
 
@@ -101,7 +102,8 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     private func updateSearchTokens(for searchText: String) {
         guard #available(iOS 16, tvOS 16, *) else { return }
 
-        var suggestions: [ConsoleSearchSuggestion] = []
+        var suggestedFilters: [ConsoleSearchSuggestion] = []
+        var suggestedScopes: [ConsoleSearchSuggestion] = []
 
         func add(_ filter: ConsoleSearchFilter) {
             var string = AttributedString(filter.name + ": ") { $0.foregroundColor = .primary }
@@ -116,7 +118,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
                     }
                 }
             }
-            suggestions.append(.init(text: string) {
+            suggestedFilters.append(.init(text: string) {
                 if values.isEmpty {
                     self.searchBar.text = filter.name + ": "
                 } else {
@@ -129,7 +131,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         func add(_ scope: ConsoleSearchScope) {
             var string = AttributedString("Search in ") { $0.foregroundColor = .primary }
             string.append(scope.title) { $0.foregroundColor = .blue }
-            suggestions.append(.init(text: string) {
+            suggestedScopes.append(.init(text: string) {
                 self.searchBar.text = ""
                 self.searchBar.tokens.append(.scope(scope))
             })
@@ -167,11 +169,10 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
 #warning("if you are only entering values, what to suggest?")
 #warning("filtes and scopes in separate categories")
 
-
-
 #warning("TODO: priorize direct matches")
 
-        self.suggestedTokens = suggestions
+        self.suggestedFilters = suggestedFilters
+        self.suggestedScopes = suggestedScopes
     }
 
     func buttonShowMoreResultsTapped() {

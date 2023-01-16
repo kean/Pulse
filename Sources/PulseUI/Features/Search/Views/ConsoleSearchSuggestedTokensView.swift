@@ -10,20 +10,30 @@ import Combine
 @available(iOS 15, tvOS 15, *)
 struct ConsoleSearchSuggestedTokensView: View {
     @ObservedObject var viewModel: ConsoleSearchViewModel
-    @Environment(\.isSearching) private var isSearching // important: scope
 
-    // TODO: render values for suggestions using attributed strings
     var body: some View {
-        if isSearching && !viewModel.suggestedTokens.isEmpty {
+        if !viewModel.suggestedFilters.isEmpty {
             Section(header: Text("Suggested Filters")) {
-                ForEach(viewModel.suggestedTokens) { token in
-                    Button(action: token.onTap) {
-                        HStack {
-                            Image(systemName: "magnifyingglass")
-                            Text(token.text)
-                        }
-                    }
-                }
+                ForEach(viewModel.suggestedFilters, content: ConsoleSearchSuggestionView.init)
+            }
+        }
+        if !viewModel.suggestedFilters.isEmpty {
+            Section(header: Text("Suggested Scopes")) {
+                ForEach(viewModel.suggestedScopes, content: ConsoleSearchSuggestionView.init)
+            }
+        }
+    }
+}
+
+@available(iOS 15, tvOS 15, *)
+private struct ConsoleSearchSuggestionView: View {
+    let suggestion: ConsoleSearchSuggestion
+
+    var body: some View {
+        Button(action: suggestion.onTap) {
+            HStack {
+                Image(systemName: "magnifyingglass")
+                Text(suggestion.text)
             }
         }
     }
