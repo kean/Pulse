@@ -9,6 +9,7 @@ import Combine
 
 @available(iOS 15, tvOS 15, *)
 final class ConsoleSearchService {
+    private let helper = TextHelper()
 
     func filter(task: NetworkTaskEntity, tokens: [ConsoleSearchToken]) -> Bool {
         for token in tokens {
@@ -100,7 +101,6 @@ final class ConsoleSearchService {
                 contextRange.length -= 1
             }
 
-            // TODO: is this OK
             var prefix = ""
             if lineRange.length > 300, range.location - contextRange.location > 16 {
                 contextRange.length -= (range.location - contextRange.location - 16)
@@ -109,16 +109,13 @@ final class ConsoleSearchService {
             }
             contextRange.length = min(contextRange.length, 500)
 
-            // TODO: reuse renderer
-
             let previewText = (prefix + line.substring(with: contextRange))
                 .trimmingCharacters(in: .whitespacesAndNewlines)
-            var preview = AttributedString(previewText, attributes: AttributeContainer(TextHelper().attributes(role: .body2, style: .monospaced)))
+            var preview = AttributedString(previewText, attributes: AttributeContainer(helper.attributes(role: .body2, style: .monospaced)))
             if let range = preview.range(of: parameters.searchTerm, options: .init(parameters.options)) {
                 preview[range].foregroundColor = .orange
             }
 
-            #warning("replace searchContext with ConsoleSearchParameters")
             let occurence = ConsoleSearchOccurence(
                 kind: kind,
                 line: lineNumber,
