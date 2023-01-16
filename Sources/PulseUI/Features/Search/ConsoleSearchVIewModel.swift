@@ -88,15 +88,22 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         self.operation = operation
     }
 
-
     private func updateSearchTokens(for searchText: String) {
         guard #available(iOS 16, tvOS 16, *) else { return }
 
+#warning("add default suggestions")
         guard !searchText.isEmpty else {
-            // TODO: return default suggestions
             self.suggestedTokens = []
             return
         }
+
+#warning("add suggestions based on input, e.g. input range")
+#warning("finish this prototype")
+#warning("different styles for filters and completions")
+#warning("dont show suggestion when its not specific enough")
+#warning("search like in xcode with first letter only")
+#warning("make it all case insensitive")
+#warning("if you are only entering values, what to suggest?")
 
         var suggestions: [ConsoleSearchSuggestion] = []
 
@@ -129,37 +136,6 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
                     self.searchBar.tokens.append(.filter(.statusCode(filter)))
                 }
             })
-        }
-
-#warning("finish this prototype")
-#warning("different styles for filters and completions")
-#warning("dont show suggestion when its not specific enough")
-#warning("search like in xcode with first letter only")
-#warning("make it all case insensitive")
-#warning("if you are only entering values, what to suggest?")
-        // Response
-        if "Response ".hasPrefix(searchText) {
-            do {
-                var string = AttributedString("Response")
-                string.foregroundColor = .secondary
-                string[string.range(of: searchText)!].foregroundColor = .primary
-
-                suggestions.append(.init(text: string) { self.searchBar.text = "Response " })
-            }
-            do {
-                var string = AttributedString("Response Body")
-                string.foregroundColor = .secondary
-                string[string.range(of: searchText)!].foregroundColor = .primary
-
-                suggestions.append(.init(text: string) { self.searchBar.text = "Response Body " })
-            }
-            do {
-                var string = AttributedString("Response Headers")
-                string.foregroundColor = .secondary
-                string[string.range(of: searchText)!].foregroundColor = .primary
-
-                suggestions.append(.init(text: string) { self.searchBar.text = "Response Headers " })
-            }
         }
 
         self.suggestedTokens = suggestions
