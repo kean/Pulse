@@ -5,6 +5,12 @@
 import Foundation
 
 extension Parsers {
+    static let filters: Parser<[ConsoleSearchFilter]> = oneOf(
+        filterStatusCode,
+        filterHost,
+        filterMethod
+    ).zeroOrMore
+
     static let filterStatusCode = (filterName("status code") *> listOf(rangeOfInts(in: 100...500)))
         .map(ConsoleSearchFilterStatusCode.init).map(ConsoleSearchFilter.statusCode)
 

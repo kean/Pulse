@@ -141,10 +141,6 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
             })
         }
 
-        func parse(_ parser: Parser<ConsoleSearchFilter>) {
-            (try? parser.parse(searchText)).map(add)
-        }
-
         let allScopes = ConsoleSearchScope.allCases.filter { $0 != .originalRequestHeaders }
 
         if searchText.isEmpty {
@@ -156,10 +152,9 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
                 add(scope)
             }
         } else {
-            parse(Parsers.filterStatusCode)
-            parse(Parsers.filterHost)
-            parse(Parsers.filterMethod)
-
+            for filter in (try? Parsers.filters.parse(searchText)) ?? [] {
+                add(filter)
+            }
             for scope in allScopes {
                 if (try? Parsers.filterName(scope.title).parse(searchText)) != nil {
                     add(scope)
