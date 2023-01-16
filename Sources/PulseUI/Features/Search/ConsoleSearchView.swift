@@ -12,6 +12,7 @@ import Combine
 // TODO: do we need searchabl then?
 
 #warning("improve how search status is displayed")
+#warning("remove hardcoded occurenes")
 
 @available(iOS 15, tvOS 15, *)
 struct ConsoleSearchView: View {
@@ -44,10 +45,14 @@ struct ConsoleSearchView: View {
                 HStack {
                     Text("\(viewModel.results.count) results with \(21) occurences")
                         .foregroundColor(.secondary)
+                        .font(ConsoleConstants.fontBody)
+                        .frame(maxWidth: .infinity, alignment: .center)
                     if viewModel.isSpinnerNeeded {
                         ProgressView()
                     }
                 }
+                .listRowBackground(Color.clear)
+                .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 0, trailing: 0))
             }
             if viewModel.searchBar.text.count > 1 {
                 ForEach(viewModel.results) { result in
