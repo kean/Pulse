@@ -5,18 +5,18 @@
 import Foundation
 
 extension Parsers {
-    static let filterStatusCode = (filterName("status code") *> listOf(rangeOfInts))
+    static let filterStatusCode = (filterName("status code") *> listOf(rangeOfInts(in: 100...500)))
         .map(ConsoleSearchFilterStatusCode.init).map(ConsoleSearchFilter.statusCode)
 
     static let filterHost = (filterName("host") *> listOf(host))
         .map(ConsoleSearchFilterHost.init).map(ConsoleSearchFilter.host)
 
-    static let filterMethod = (filterName("method") *> listOf(method))
+    static let filterMethod = (filterName("method") *> listOf(httpMethod))
         .map(ConsoleSearchFilterMethod.init).map(ConsoleSearchFilter.method)
 
     static let host = char(from: .urlHostAllowed.subtracting(.init(charactersIn: ","))).oneOrMore.map { String($0) }
 
-    static let method = oneOf(HTTPMethod.allCases.map { method in
+    static let httpMethod = oneOf(HTTPMethod.allCases.map { method in
         prefixIgnoringCase(method.rawValue).map { method }
     })
 
@@ -25,6 +25,12 @@ extension Parsers {
         assert(!words.isEmpty)
         let anyWords = oneOf(words.map(fuzzy)).oneOrMore.map { _ in () }
         return anyWords <* optional(":") <* whitespaces
+    }
+
+    static func rangeOfInts(in range: ClosedRange<Int>) -> Parser<ConsoleSearchRange<Int>> {
+        rangeOfInts.filter {
+            range.contains($0.lowerBound) && range.contains($0.upperBound)
+        }
     }
 
     static let rangeOfInts: Parser<ConsoleSearchRange<Int>> = oneOf(
