@@ -90,6 +90,7 @@ final class ConsoleSearchOperation {
     }
 
 #warning("implement basic search for messages")
+#warning("add search prefix for messages and separate for blobs")
 
     private func search(_ message: LoggerMessageEntity) -> ConsoleSearchResultViewModel? {
         return nil
