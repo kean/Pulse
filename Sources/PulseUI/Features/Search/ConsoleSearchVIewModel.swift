@@ -38,7 +38,6 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
 
     @Published var suggestedTokens: [ConsoleSearchSuggestion] = []
 
-    private let saveRecentSearchesSignal = PassthroughSubject<Void, Never>()
     private let service = ConsoleSearchService()
 
     private var cancellables: [AnyCancellable] = []
@@ -65,11 +64,6 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
             .store(in: &cancellables)
 
         recentSearches = getRecentSearches()
-
-        saveRecentSearchesSignal
-            .throttle(for: 2, scheduler: DispatchQueue.main, latest: true)
-            .sink { [weak self] in self?.saveRecentSearches() }
-            .store(in: &cancellables)
     }
 
     func setEntities(_ entities: [NSManagedObject]) {
@@ -102,8 +96,6 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         operation.delegate = self
         operation.resume()
         self.operation = operation
-
-        addRecentSearch(parameters)
     }
 
     private func updateSearchTokens(for searchText: String) {
@@ -238,6 +230,14 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
 
     // MARK: - Recent Searches
 
+    func onSubmitSearch() {
+        guard !searchBar.text.trimmingCharacters(in: .whitespaces).isEmpty else {
+            return
+        }
+        addRecentSearch(.init(searchTerm: searchBar.text, tokens: searchBar.tokens, options: .default))
+        saveRecentSearches()
+    }
+
     private func getRecentSearches() -> [ConsoleSearchParameters] {
         ConsoleSettings.shared.recentSearches.data(using: .utf8).flatMap {
             try? JSONDecoder().decode([ConsoleSearchParameters].self, from: $0)
@@ -259,15 +259,14 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
 
     func clearRecentSearchess() {
         recentSearches = []
-        ConsoleSettings.shared.recentSearches = "[]"
+        saveRecentSearches()
     }
 
     private func addRecentSearch(_ parameters: ConsoleSearchParameters) {
-        while let index = recentSearches.firstIndex(where: { parameters.searchTerm.contains($0.searchTerm) }) {
+        while let index = recentSearches.firstIndex(where: { $0.searchTerm == parameters.searchTerm }) {
             recentSearches.remove(at: index)
         }
         recentSearches.append(parameters)
-        saveRecentSearchesSignal.send(())
     }
 }
 

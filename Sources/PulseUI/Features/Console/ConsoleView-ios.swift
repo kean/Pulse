@@ -113,10 +113,16 @@ private struct _ConsoleContentView: View {
                 .searchable(text: $searchBarViewModel.text, tokens: $searchBarViewModel.tokens, token: {
                     Label($0.title, systemImage: $0.systemImage)
                 })
+                .onSubmit(of: .search) {
+                    viewModel.searchViewModel.onSubmitSearch()
+                }
                 .disableAutocorrection(true)
         }  else {
             ConsoleContentView(viewModel: viewModel)
                 .searchable(text: $searchBarViewModel.text)
+                .onSubmit(of: .search) {
+                    viewModel.searchViewModel.onSubmitSearch()
+                }
                 .disableAutocorrection(true)
         }
     }

@@ -13,6 +13,8 @@ import Foundation
 
 // MARK: - Parser
 
+#warning("fix Res should not be suggesting Request body - words too similar yes")
+
 struct Parser<A> {
     /// Parses the given string. Returns the matched element `A` and the
     /// remaining substring if the match is succesful. Returns `nil` otherwise.
