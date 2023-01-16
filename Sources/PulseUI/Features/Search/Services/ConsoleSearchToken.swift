@@ -80,7 +80,7 @@ enum ConsoleSearchFilter: Hashable {
 }
 
 extension Parsers {
-    static let filterStatusCode = (filterName("status code") *> not <*> listOf(searchValueInt))
+    static let filterStatusCode = (filterName("status code") *> not <*> listOf(rangeOfInts))
         .map(ConsoleSearchFilter.StatusCode.init)
 
     static func filterName(_ name: String) -> Parser<Void> {
@@ -93,14 +93,14 @@ extension Parsers {
         return whitespaces <* parser <* optional(":") <* whitespaces
     }
 
-    static let searchValueInt: Parser<ConsoleSearchRange<Int>> = oneOf(
+    static let rangeOfInts: Parser<ConsoleSearchRange<Int>> = oneOf(
         zip(int, rangeModifier, int).map { lowerBound, modifier, upperBound in
             switch modifier {
-            case .open: return .openRange(lowerBound: lowerBound, upperBound: upperBound)
-            case .closed: return .closedRange(lowerBound: lowerBound, upperBound: upperBound)
+            case .open: return .init(.open, lowerBound: lowerBound, upperBound: upperBound)
+            case .closed: return .init(.closed, lowerBound: lowerBound, upperBound: upperBound)
             }
         },
-        int.map(ConsoleSearchRange.exact)
+        int.map(ConsoleSearchRange.init)
     )
 
     static let not: Parser<Bool> = optional(oneOf(prefixIgnoringCase("not"), "!") *> whitespaces)
@@ -111,46 +111,50 @@ extension Parsers {
         (parser <* optional(",") <* whitespaces).zeroOrMore
     }
 
-    static let rangeModifier: Parser<RangeModfier> = whitespaces *> oneOf(
+    static let rangeModifier: Parser<ConsoleSearchRangeModfier> = whitespaces *> oneOf(
         oneOf("-", "–", "<=", "...").map { _ in .closed }, // important: order
         oneOf("<", ".<", "..<").map { _ in .open },
         string("..").map { _ in .closed }
     ) <* whitespaces
 
-    enum RangeModfier {
-        case open, closed
-    }
 }
 
-#warning("TODO: do we need this? can we use ClosedRange instead?")
-enum ConsoleSearchRange<T: Hashable>: Hashable {
-    case exact(_ value: T)
-    case openRange(lowerBound: T, upperBound: T)
-    case closedRange(lowerBound: T, upperBound: T)
+enum ConsoleSearchRangeModfier {
+    case open, closed
+}
+
+struct ConsoleSearchRange<T: Hashable & Comparable>: Hashable {
+    var modifier: ConsoleSearchRangeModfier
+    var lowerBound: T
+    var upperBound: T
+
+    init(_ modifier: ConsoleSearchRangeModfier, lowerBound: T, upperBound: T) {
+        self.modifier = modifier
+        self.lowerBound = lowerBound
+        self.upperBound = upperBound
+    }
+
+    init(_ value: T) {
+        self.modifier = .closed
+        self.lowerBound = value
+        self.upperBound = value
+    }
 
     var title: String {
-        switch self {
-        case .exact(let value):
-            return "\(value)"
-        case .openRange(let lowerBound, let upperBound):
-            return "\(lowerBound)..<\(upperBound)"
-        case .closedRange(let lowerBound, let upperBound):
-            return "\(lowerBound)...\(upperBound)"
+        guard upperBound > lowerBound else { return "\(lowerBound)" }
+        switch modifier {
+        case .open: return "\(lowerBound)..<\(upperBound)"
+        case .closed: return "\(lowerBound)...\(upperBound)"
         }
     }
 }
 
 extension ConsoleSearchRange where T == Int {
     var range: ClosedRange<Int>? {
-        switch self {
-        case .exact(let value):
-            return value...value
-        case .openRange(let lowerBound, let upperBound):
-            guard upperBound > lowerBound else { return nil }
-            return lowerBound...(upperBound-1)
-        case .closedRange(let lowerBound, let upperBound):
-            guard upperBound > lowerBound else { return nil }
-            return lowerBound...upperBound
+        guard upperBound > lowerBound else { return nil }
+        switch modifier {
+        case .open: return ClosedRange(lowerBound..<upperBound)
+        case .closed: return lowerBound...upperBound
         }
     }
 }
