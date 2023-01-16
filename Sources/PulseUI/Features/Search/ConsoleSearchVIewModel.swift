@@ -93,29 +93,50 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         guard #available(iOS 16, tvOS 16, *) else { return }
 
         guard !searchText.isEmpty else {
+            // TODO: return default suggestions
             self.suggestedTokens = []
             return
         }
 
         var suggestions: [ConsoleSearchSuggestion] = []
 
-#warning("more IS NOT options + fix colors")
         // Status Code
-        if let code = Int(searchText), (100...500).contains(code) {
-            suggestions.append(.init(text: AttributedString("Status Code IS ") { $0.foregroundColor = .secondary } + AttributedString(searchText)) {
-                self.searchBar.text = ""
-                self.searchBar.tokens.append(.status(range: code...code, isNot: false))
-            })
-            suggestions.append(.init(text: AttributedString("Status Code IS NOT ") { $0.foregroundColor = .secondary } + AttributedString(searchText)) {
-                self.searchBar.text = ""
-                self.searchBar.tokens.append(.status(range: code...code, isNot: false))
+        if let filter = try? Parsers.filterStatusCode.parse(searchText) {
+            var string = AttributedString("Status Code: ") {
+                $0.foregroundColor = .primary
+            }
+
+            if filter.isNot {
+                string.append("NOT ") { $0.foregroundColor = .red }
+            }
+
+            if filter.values.isEmpty {
+                string.append("200, 400-404") { $0.foregroundColor = .secondary }
+            } else {
+                for (index, value) in filter.values.enumerated() {
+                    string.append(value.title) { $0.foregroundColor = .blue }
+                    if index < filter.values.endIndex - 1 {
+                        string.append(", ") { $0.foregroundColor = .secondary }
+                    }
+                }
+            }
+
+            suggestions.append(.init(text: string) {
+                if filter.values.isEmpty {
+                    self.searchBar.text = "Status Code: "
+                } else {
+                    self.searchBar.text = ""
+                    self.searchBar.tokens.append(.filter(.statusCode(filter)))
+                }
             })
         }
+
 #warning("finish this prototype")
 #warning("different styles for filters and completions")
 #warning("dont show suggestion when its not specific enough")
 #warning("search like in xcode with first letter only")
 #warning("make it all case insensitive")
+#warning("if you are only entering values, what to suggest?")
         // Response
         if "Response ".hasPrefix(searchText) {
             do {

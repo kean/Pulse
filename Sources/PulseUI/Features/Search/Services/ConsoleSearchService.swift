@@ -15,26 +15,27 @@ import Combine
 final class ConsoleSearchService {
     private let helper = TextHelper()
 
-    func filter(task: NetworkTaskEntity, tokens: [ConsoleSearchToken]) -> Bool {
-        for token in tokens {
-            if !filter(task: task, token: token) {
+    func isMatching(_ task: NetworkTaskEntity, filters: [ConsoleSearchFilter]) -> Bool {
+        for filter in filters {
+            if !isMatching(task, filter: filter) {
                 return false
             }
         }
         return true
     }
 
-    func filter(task: NetworkTaskEntity, token: ConsoleSearchToken) -> Bool {
-        switch token {
-        case .status(let range, let isNot):
-            let contains = range.contains(Int(task.statusCode))
-            return isNot ? !contains : contains
+    func isMatching(_ task: NetworkTaskEntity, filter: ConsoleSearchFilter) -> Bool {
+        switch filter {
+        case .statusCode(let filter):
+            let contains = filter.values
+                .compactMap { $0.range }
+                .contains { $0.contains(Int(task.statusCode)) }
+            return filter.isNot ? !contains : contains
         }
     }
 
     // TODO: cache response bodies in memory
     func search(in task: NetworkTaskEntity, parameters: ConsoleSearchParameters) -> [ConsoleSearchOccurence] {
-        Thread.sleep(forTimeInterval: 0.2)
         var occurences: [ConsoleSearchOccurence] = []
         for scope in ConsoleSearchScope.allCases {
             switch scope {
@@ -148,67 +149,20 @@ struct ConsoleSearchOccurence {
 
 final class ConsoleSearchParameters {
     let searchTerm: String
-    let tokens: [ConsoleSearchToken]
+    let filters: [ConsoleSearchFilter]
     let options: StringSearchOptions
 
     init(searchTerm: String, tokens: [ConsoleSearchToken], options: StringSearchOptions) {
         self.searchTerm = searchTerm
-        self.tokens = tokens
-        self.options = options
-    }
-}
-
-#warning("when you are typing search, add -headers contains, -requety body: contains, etc")
-#warning("how to view all suggestions?")
-#warning("how to surface these to the user?")
-#warning("add support for basic wildcards")
-#warning("add a way to enable regex")
-
-// network:
-//
-// - "url" <value>
-// - "host" = <value> (+add commons hosts)
-// - "domain" = <value>
-// - "method" <value>
-// - "path" <value>
-// - "scheme" <value>
-// - "duration" ">=" "<=" <value>
-// - "\(kind)" "contains" <value>
-// - "type" data/download/upload/stream/socket
-// - "cookies" empty/non-empty/contains
-// - "timeout" >= <=
-// - "error"
-// - "size" >= <= <value>
-// - "error code" <value>
-// - "error decoding failed"
-// - "content-type" <value>
-// - "cached"
-// - "redirect"
-// - "pins"
-//
-// message:
-//
-// - "label" <value>
-// - "log level" or "level"
-// - "metadata"
-// - "file" <value>
-enum ConsoleSearchToken: Identifiable, Hashable {
-    var id: ConsoleSearchToken { self }
-
-    case status(range: ClosedRange<Int>, isNot: Bool)
-
-    @available(iOS 15, tvOS 15, *)
-    var title: AttributedString {
-        switch self {
-        case .status(let range, let isNot):
-            let value: String
-            if range.count == 1 {
-                value = "\(isNot ? "NOT " : "")\(range.lowerBound)"
-            } else {
-                value = "\(isNot ? "NOT IN " : "")\(range.lowerBound)...\(range.upperBound)"
+        var filters: [ConsoleSearchFilter] = []
+        for token in tokens {
+            switch token {
+            case .filter(let filter):
+                filters.append(filter)
             }
-            return AttributedString("Status Code: ") { $0.foregroundColor = .secondary } + AttributedString(value)
         }
+        self.filters = filters
+        self.options = options
     }
 }
 

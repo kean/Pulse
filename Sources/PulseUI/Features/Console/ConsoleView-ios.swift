@@ -110,7 +110,9 @@ private struct _ConsoleContentView: View {
     var body: some View {
         if #available(iOS 16, tvOS 16, *) {
             ConsoleContentView(viewModel: viewModel)
-                .searchable(text: $searchBarViewModel.text, tokens: $searchBarViewModel.tokens, token: { Text($0.title) })
+                .searchable(text: $searchBarViewModel.text, tokens: $searchBarViewModel.tokens, token: {
+                    Label($0.title, systemImage: $0.systemImage)
+                })
                 .disableAutocorrection(true)
         }  else {
             ConsoleContentView(viewModel: viewModel)

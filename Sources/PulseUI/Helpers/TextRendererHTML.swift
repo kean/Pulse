@@ -30,8 +30,8 @@ final class TextRendererHTML {
         func makeRange(from substring: Substring) -> NSRange {
             NSRange(substring.startIndex..<substring.endIndex, in: html)
         }
-        guard let tagRegex = try? Regex("<[^>]*>"),
-              let attributesRegex = try? Regex(#"(\w*?)=(\"\w.*?\")"#) else{
+        guard let tagRegex = try? RegExp("<[^>]*>"),
+              let attributesRegex = try? RegExp(#"(\w*?)=(\"\w.*?\")"#) else{
             assertionFailure("Invalid regex") // Should never happen
             return string
         }

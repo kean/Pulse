@@ -96,7 +96,7 @@ final class ConsoleSearchOperation {
     }
 
     private func search(_ task: NetworkTaskEntity) -> ConsoleSearchResultViewModel? {
-        guard service.filter(task: task, tokens: parameters.tokens) else {
+        guard service.isMatching(task, filters: parameters.filters) else {
             return nil
         }
         guard parameters.searchTerm.count > 1 else {

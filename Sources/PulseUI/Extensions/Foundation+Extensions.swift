@@ -60,6 +60,12 @@ extension AttributedString {
         configure(&attributes)
         self.init(string, attributes: attributes)
     }
+
+    mutating func append(_ string: String, _ configure: (inout AttributeContainer) -> Void) {
+        var attributes = AttributeContainer()
+        configure(&attributes)
+        self.append(AttributedString(string, attributes: attributes))
+    }
 }
 
 struct StringSearchOptions {
