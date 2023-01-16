@@ -63,19 +63,8 @@ enum ConsoleSearchToken: Identifiable, Hashable, Codable {
 
     var title: String {
         switch self {
-        case .filter(let filter):
-            switch filter {
-            case .statusCode(let statusCode):
-                guard statusCode.values.count > 0 else {
-                    return "Status Code" // Should never happen
-                }
-                let title = statusCode.values[0].title
-                return statusCode.values.count > 1 ? title + "…" : title
-            case .host(let host):
-                return "Hosts (\(host.values.count))"
-            }
-        case .scope(let scope):
-            return scope.title
+        case .filter(let filter): return filter.token
+        case .scope(let scope): return scope.title
         }
     }
 }

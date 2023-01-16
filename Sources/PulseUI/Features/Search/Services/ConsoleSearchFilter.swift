@@ -9,6 +9,7 @@ protocol ConsoleSearchFilterProtocol: Equatable, Hashable, Codable {
     var name: String { get }
     var valuesDescriptions: [String] { get }
     var valueExample: String { get }
+    var token: String { get }
 
     func isMatch(_ task: NetworkTaskEntity) -> Bool
 }
@@ -28,6 +29,7 @@ enum ConsoleSearchFilter: Equatable, Hashable, Codable {
     var name: String { filter.name }
     var valuesDescriptions: [String] { filter.valuesDescriptions }
     var valueExample: String { filter.valueExample }
+    var token: String { filter.token }
 }
 
 struct ConsoleSearchFilterStatusCode: ConsoleSearchFilterProtocol {
@@ -36,6 +38,11 @@ struct ConsoleSearchFilterStatusCode: ConsoleSearchFilterProtocol {
     var name: String { "Status Code" }
     var valuesDescriptions: [String] { values.map(\.title) }
     var valueExample: String { "200" }
+    var token: String {
+        guard values.count > 0 else { return "Status Code" } // Should never happen
+        let title = values[0].title
+        return values.count > 1 ? title + "…" : title
+    }
 
     func isMatch(_ task: NetworkTaskEntity) -> Bool {
         values.compactMap { $0.range }.contains {
@@ -50,6 +57,7 @@ struct ConsoleSearchFilterHost: ConsoleSearchFilterProtocol {
     var name: String { "Host" }
     var valuesDescriptions: [String] { values }
     var valueExample: String { "example.com" }
+    var token: String { "Host (\(values.count))" }
 
     func isMatch(_ task: NetworkTaskEntity) -> Bool {
         guard let host = task.url.flatMap(URL.init)?.host else {
