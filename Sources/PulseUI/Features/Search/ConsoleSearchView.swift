@@ -49,7 +49,7 @@ struct ConsoleSearchView: View {
                     }
                 }
             }
-            if viewModel.searchText.count > 1 {
+            if viewModel.searchBar.text.count > 1 {
                 ForEach(viewModel.results) { result in
                     Section {
                         ConsoleSearchResultView(viewModel: result)
@@ -88,7 +88,7 @@ struct ConsoleSearchView_Previews: PreviewProvider {
         NavigationView {
             ConsoleSearchView(viewModel: {
                 let viewModel = ConsoleSearchViewModel(entities: try! LoggerStore.mock.allMessages(), store: .mock)
-                viewModel.searchText = "Nuke"
+                viewModel.searchBar.text = "Nuke"
                 return viewModel
             }())
         }

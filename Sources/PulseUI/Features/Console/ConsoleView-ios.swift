@@ -11,19 +11,29 @@ import Combine
 
 public struct ConsoleView: View {
     @StateObject private var viewModel: ConsoleViewModel
-    @State private var shareItems: ShareItems?
-    @State private var isShowingAsText = false
-    @State private var selectedShareOutput: ShareOutput?
 
     public init(store: LoggerStore = .shared) {
-        self.init(viewModel: ConsoleViewModel(store: store))
+        self.init(viewModel: .init(store: store))
     }
 
     init(viewModel: ConsoleViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
 
+
     public var body: some View {
+        _ConsoleView(viewModel: viewModel)
+    }
+}
+
+struct _ConsoleView: View {
+    let viewModel: ConsoleViewModel
+
+    @State private var shareItems: ShareItems?
+    @State private var isShowingAsText = false
+    @State private var selectedShareOutput: ShareOutput?
+
+    var body: some View {
         contentView
             .onAppear(perform: viewModel.onAppear)
             .onDisappear(perform: viewModel.onDisappear)
@@ -90,21 +100,21 @@ public struct ConsoleView: View {
 @available(iOS 15.0, *)
 private struct _ConsoleContentView: View {
     let viewModel: ConsoleViewModel
-    @ObservedObject var searchViewModel: ConsoleSearchViewModel
+    @ObservedObject var searchBarViewModel: ConsoleSearchBarViewModel
 
     init(viewModel: ConsoleViewModel) {
         self.viewModel = viewModel
-        self.searchViewModel = viewModel.searchViewModel
+        self.searchBarViewModel = viewModel.searchViewModel.searchBar
     }
 
     var body: some View {
         if #available(iOS 16, tvOS 16, *) {
             ConsoleContentView(viewModel: viewModel)
-                .searchable(text: $searchViewModel.searchText, tokens: $searchViewModel.tokens, token: { Text($0.title) })
+                .searchable(text: $searchBarViewModel.text, tokens: $searchBarViewModel.tokens, token: { Text($0.title) })
                 .disableAutocorrection(true)
         }  else {
             ConsoleContentView(viewModel: viewModel)
-                .searchable(text: $searchViewModel.searchText)
+                .searchable(text: $searchBarViewModel.text)
                 .disableAutocorrection(true)
         }
     }

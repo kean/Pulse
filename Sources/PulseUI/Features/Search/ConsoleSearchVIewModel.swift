@@ -7,23 +7,29 @@ import Pulse
 import CoreData
 import Combine
 
+final class ConsoleSearchBarViewModel: ObservableObject {
+    @Published var text: String = ""
+    @Published var tokens: [ConsoleSearchToken] = []
+}
+
 @available(iOS 15, tvOS 15, *)
 final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDelegate {
     private var entities: [NSManagedObject]
     private var objectIDs: [NSManagedObjectID]
 
     @Published private(set) var results: [ConsoleSearchResultViewModel] = []
-    @Published var searchText: String = ""
+
     @Published var isSpinnerNeeded = false
     @Published var isSearching = false
     @Published var hasMore = false
+
+    // important: if you reload the view with searchable quickly during typing, it crashes and burns
+    let searchBar = ConsoleSearchBarViewModel()
 
     private var dirtyDate: Date?
     private var buffer: [ConsoleSearchResultViewModel] = []
     private var operation: ConsoleSearchOperation?
 
-    #warning("remove old tokens")
-    @Published var tokens: [ConsoleSearchToken] = []
     @Published var suggestedTokens: [ConsoleSearchSuggestion] = []
 
     private let service = ConsoleSearchService()
@@ -36,7 +42,10 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         self.objectIDs = entities.map(\.objectID)
         self.context = store.newBackgroundContext()
 
-        Publishers.CombineLatest($searchText, $tokens).sink { [weak self] in
+        Publishers.CombineLatest(
+            searchBar.$text.removeDuplicates(),
+            searchBar.$tokens.removeDuplicates()
+        ).sink { [weak self] in
             self?.didUpdateSearchCriteria($0, $1)
             self?.updateSearchTokens(for: $0)
         }.store(in: &cancellables)
@@ -94,12 +103,12 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         // Status Code
         if let code = Int(searchText), (100...500).contains(code) {
             suggestions.append(.init(text: AttributedString("Status Code IS ") { $0.foregroundColor = .secondary } + AttributedString(searchText)) {
-                self.searchText = ""
-                self.tokens.append(.status(range: code...code, isNot: false))
+                self.searchBar.text = ""
+                self.searchBar.tokens.append(.status(range: code...code, isNot: false))
             })
             suggestions.append(.init(text: AttributedString("Status Code IS NOT ") { $0.foregroundColor = .secondary } + AttributedString(searchText)) {
-                self.searchText = ""
-                self.tokens.append(.status(range: code...code, isNot: false))
+                self.searchBar.text = ""
+                self.searchBar.tokens.append(.status(range: code...code, isNot: false))
             })
         }
 #warning("finish this prototype")
@@ -114,21 +123,21 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
                 string.foregroundColor = .secondary
                 string[string.range(of: searchText)!].foregroundColor = .primary
 
-                suggestions.append(.init(text: string) { self.searchText = "Response " })
+                suggestions.append(.init(text: string) { self.searchBar.text = "Response " })
             }
             do {
                 var string = AttributedString("Response Body")
                 string.foregroundColor = .secondary
                 string[string.range(of: searchText)!].foregroundColor = .primary
 
-                suggestions.append(.init(text: string) { self.searchText = "Response Body " })
+                suggestions.append(.init(text: string) { self.searchBar.text = "Response Body " })
             }
             do {
                 var string = AttributedString("Response Headers")
                 string.foregroundColor = .secondary
                 string[string.range(of: searchText)!].foregroundColor = .primary
 
-                suggestions.append(.init(text: string) { self.searchText = "Response Headers " })
+                suggestions.append(.init(text: string) { self.searchBar.text = "Response Headers " })
             }
         }
 
@@ -147,7 +156,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
 
         if let dirtyDate = dirtyDate {
             self.buffer += results
-            if Date().timeIntervalSince(dirtyDate) > 0.1 {
+            if Date().timeIntervalSince(dirtyDate) > 0.2 {
                 self.dirtyDate = nil
                 self.results = buffer
                 self.buffer = []
