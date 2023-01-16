@@ -7,7 +7,11 @@ import Pulse
 import CoreData
 import Combine
 
-// TODO: fix an issue where text jumps when you type quickly
+
+#warning("fix an issue where text cursor jumps when you type quickly")
+#warning("scopes for results?")
+#warning("prioritize what makes the cut")
+#warning("dont show URL occurence")
 
 @available(iOS 15, tvOS 15, *)
 struct ConsoleSearchResultView: View {
@@ -16,7 +20,6 @@ struct ConsoleSearchResultView: View {
 
     var body: some View {
         ConsoleEntityCell(entity: viewModel.entity)
-        // TODO: limit number of occurences of the same type (or only have one and display how many more?)
         let occurences = Array(viewModel.occurences.enumerated())
         ForEach(occurences.prefix(limit), id: \.offset) { item in
             NavigationLink(destination: makeDestination(for: item.element, entity: viewModel.entity)) {
@@ -24,7 +27,6 @@ struct ConsoleSearchResultView: View {
             }
         }
         if occurences.count > limit {
-            // TODO: how to prioritize what makes the cut?
             NavigationLink(destination: ConsoleSearchResultDetailsView(viewModel: viewModel)) {
                 HStack {
                     Text("Show All Results")
