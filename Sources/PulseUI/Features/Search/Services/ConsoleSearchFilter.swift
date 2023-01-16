@@ -14,15 +14,21 @@ protocol ConsoleSearchFilterProtocol: Equatable, Hashable, Codable {
     func isMatch(_ task: NetworkTaskEntity) -> Bool
 }
 
+extension ConsoleSearchFilterProtocol {
+    var token: String { makeToken(with: valuesDescriptions) }
+}
+
 enum ConsoleSearchFilter: Equatable, Hashable, Codable {
     case statusCode(ConsoleSearchFilterStatusCode)
     case host(ConsoleSearchFilterHost)
+    case method(ConsoleSearchFilterMethod)
 
     // TODO: refactor
     var filter: any ConsoleSearchFilterProtocol {
         switch self {
         case .statusCode(let filter): return filter
         case .host(let filter): return filter
+        case .method(let filter): return filter
         }
     }
 
@@ -38,11 +44,6 @@ struct ConsoleSearchFilterStatusCode: ConsoleSearchFilterProtocol {
     var name: String { "Status Code" }
     var valuesDescriptions: [String] { values.map(\.title) }
     var valueExample: String { "200" }
-    var token: String {
-        guard values.count > 0 else { return "Status Code" } // Should never happen
-        let title = values[0].title
-        return values.count > 1 ? title + "…" : title
-    }
 
     func isMatch(_ task: NetworkTaskEntity) -> Bool {
         values.compactMap { $0.range }.contains {
@@ -57,13 +58,25 @@ struct ConsoleSearchFilterHost: ConsoleSearchFilterProtocol {
     var name: String { "Host" }
     var valuesDescriptions: [String] { values }
     var valueExample: String { "example.com" }
-    var token: String { "Host (\(values.count))" }
 
     func isMatch(_ task: NetworkTaskEntity) -> Bool {
         guard let host = task.url.flatMap(URL.init)?.host else {
             return false
         }
         return values.contains { host.contains($0) }
+    }
+}
+
+struct ConsoleSearchFilterMethod: ConsoleSearchFilterProtocol {
+    var values: [HTTPMethod]
+
+    var name: String { "Method" }
+    var valuesDescriptions: [String] { values.map(\.rawValue) }
+    var valueExample: String { "GET" }
+
+    func isMatch(_ task: NetworkTaskEntity) -> Bool {
+        guard let method = HTTPMethod(rawValue: task.httpMethod ?? "") else { return false }
+        return Set(values).contains(method)
     }
 }
 
@@ -105,4 +118,10 @@ extension ConsoleSearchRange where T == Int {
         case .closed: return lowerBound...upperBound
         }
     }
+}
+
+private func makeToken(with values: [String]) -> String {
+    guard values.count > 0 else { return "–" } // Should never happen
+    let title = values[0]
+    return values.count > 1 ? title + "…" : title
 }

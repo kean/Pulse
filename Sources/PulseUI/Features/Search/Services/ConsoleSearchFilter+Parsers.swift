@@ -11,7 +11,14 @@ extension Parsers {
     static let filterHost = (filterName("host") *> listOf(host))
         .map(ConsoleSearchFilterHost.init).map(ConsoleSearchFilter.host)
 
+    static let filterMethod = (filterName("method") *> listOf(method))
+        .map(ConsoleSearchFilterMethod.init).map(ConsoleSearchFilter.method)
+
     static let host = char(from: .urlHostAllowed.subtracting(.init(charactersIn: ","))).oneOrMore.map { String($0) }
+
+    static let method = oneOf(HTTPMethod.allCases.map { method in
+        prefixIgnoringCase(method.rawValue).map { method }
+    })
 
     static func filterName(_ name: String) -> Parser<Void> {
         let words = name.split(separator: " ").map { String($0) }
@@ -43,4 +50,15 @@ extension Parsers {
         oneOf("<", ".<", "..<").map { _ in .open },
         string("..").map { _ in .closed }
     ) <* whitespaces
+}
+
+enum HTTPMethod: String, Hashable, Codable, CaseIterable {
+    case get = "GET"
+    case head = "HEAD"
+    case post = "POST"
+    case put = "PUT"
+    case delete = "DELETE"
+    case connect = "CONNECT"
+    case options = "OPTIONS"
+    case trace = "TRACE"
 }

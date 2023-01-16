@@ -150,6 +150,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         if searchText.isEmpty {
             add(ConsoleSearchFilter.statusCode(.init(values: [])))
             add(ConsoleSearchFilter.host(.init(values: [])))
+            add(ConsoleSearchFilter.method(.init(values: [])))
 
             for scope in allScopes {
                 add(scope)
@@ -157,6 +158,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         } else {
             parse(Parsers.filterStatusCode)
             parse(Parsers.filterHost)
+            parse(Parsers.filterMethod)
 
             for scope in allScopes {
                 if (try? Parsers.filterName(scope.title).parse(searchText)) != nil {
