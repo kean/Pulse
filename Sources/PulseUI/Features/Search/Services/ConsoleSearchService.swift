@@ -32,6 +32,18 @@ final class ConsoleSearchService {
         var occurences: [ConsoleSearchOccurence] = []
         for kind in ConsoleSearchOccurence.Kind.allCases {
             switch kind {
+            case .url:
+                if var components = URLComponents(string: task.url ?? "") {
+                    components.queryItems = nil
+                    if let url = components.url?.absoluteString {
+                        occurences += search(url as NSString, parameters, kind)
+                    }
+                }
+            case .queryItems:
+                if var components = URLComponents(string: task.url ?? ""),
+                   let query = components.query, !query.isEmpty {
+                    occurences += search(query as NSString, parameters, kind)
+                }
             case .originalRequestHeaders:
                 if let headers = task.originalRequest?.httpHeaders {
                     occurences += search(headers as NSString, parameters, kind)
@@ -126,6 +138,8 @@ final class ConsoleSearchService {
 @available(iOS 15, tvOS 15, *)
 struct ConsoleSearchOccurence {
     enum Kind: CaseIterable {
+        case url
+        case queryItems
         case originalRequestHeaders
         case currentRequestHeaders
         case requestBody
@@ -134,6 +148,8 @@ struct ConsoleSearchOccurence {
 
         var title: String {
             switch self {
+            case .url: return "URL"
+            case .queryItems: return "Query Items"
             case .originalRequestHeaders: return "Original Request Headers"
             case .currentRequestHeaders: return "Current Request Headers"
             case .requestBody: return "Request Body"

@@ -50,23 +50,36 @@ struct ConsoleSearchResultView: View {
 
     @ViewBuilder
     func makeDestination(for occurence: ConsoleSearchOccurence, entity: NSManagedObject) -> some View {
+        _makeDestination(for: occurence, entity: entity)
+            .environment(\.textViewSearchContext, occurence.searchContext)
+    }
+
+    @ViewBuilder
+    func _makeDestination(for occurence: ConsoleSearchOccurence, entity: NSManagedObject) -> some View {
         if let task = entity as? NetworkTaskEntity {
             switch occurence.kind {
+            case .url:
+                NetworkDetailsView(title: "URL") {
+                    TextRenderer(options: .sharing).make {
+                        $0.render(task, content: .requestComponents)
+                    }
+                }
+            case .queryItems:
+                NetworkDetailsView(title: "URL") {
+                    TextRenderer(options: .sharing).make {
+                        $0.render(task, content: [.requestComponents, .requestQueryItems])
+                    }
+                }
             case .originalRequestHeaders:
                 makeHeadersDetails(title: "Request Headers", headers: task.originalRequest?.headers)
-                    .environment(\.textViewSearchContext, occurence.searchContext)
             case .currentRequestHeaders:
                 makeHeadersDetails(title: "Request Headers", headers: task.currentRequest?.headers)
-                    .environment(\.textViewSearchContext, occurence.searchContext)
             case .requestBody:
                 NetworkInspectorRequestBodyView(viewModel: .init(task: task))
-                    .environment(\.textViewSearchContext, occurence.searchContext)
             case .responseHeaders:
                 makeHeadersDetails(title: "Response Headers", headers: task.response?.headers)
-                    .environment(\.textViewSearchContext, occurence.searchContext)
             case .responseBody:
                 NetworkInspectorResponseBodyView(viewModel: .init(task: task))
-                    .environment(\.textViewSearchContext, occurence.searchContext)
             }
         } else {
             EmptyView()
