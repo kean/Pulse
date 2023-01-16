@@ -40,7 +40,7 @@ import Foundation
 // - "log level" or "level"
 // - "metadata"
 // - "file" <value>
-enum ConsoleSearchToken: Identifiable, Hashable {
+enum ConsoleSearchToken: Identifiable, Hashable, Codable {
     var id: ConsoleSearchToken { self }
 
     case filter(ConsoleSearchFilter)

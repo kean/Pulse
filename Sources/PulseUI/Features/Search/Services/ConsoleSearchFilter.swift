@@ -4,16 +4,16 @@
 
 import Foundation
 
-enum ConsoleSearchFilter: Hashable {
+enum ConsoleSearchFilter: Hashable, Codable {
     case statusCode(StatusCode)
     case host(Host)
 
-    struct StatusCode: Hashable {
+    struct StatusCode: Hashable, Codable {
         var isNot: Bool
         var values: [ConsoleSearchRange<Int>]
     }
 
-    struct Host: Hashable {
+    struct Host: Hashable, Codable {
         var isNot: Bool
         var values: [String]
     }
@@ -61,11 +61,11 @@ extension Parsers {
 
 }
 
-enum ConsoleSearchRangeModfier {
+enum ConsoleSearchRangeModfier: Codable {
     case open, closed
 }
 
-struct ConsoleSearchRange<T: Hashable & Comparable>: Hashable {
+struct ConsoleSearchRange<T: Hashable & Comparable & Codable>: Hashable, Codable {
     var modifier: ConsoleSearchRangeModfier
     var lowerBound: T
     var upperBound: T
