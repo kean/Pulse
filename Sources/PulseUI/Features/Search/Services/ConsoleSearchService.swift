@@ -37,7 +37,7 @@ final class ConsoleSearchService {
     // TODO: cache response bodies in memory
     func search(in task: NetworkTaskEntity, parameters: ConsoleSearchParameters) -> [ConsoleSearchOccurence] {
         var occurences: [ConsoleSearchOccurence] = []
-        for scope in ConsoleSearchScope.allCases {
+        for scope in parameters.scopes {
             switch scope {
             case .url:
                 if var components = URLComponents(string: task.url ?? "") {
@@ -149,19 +149,21 @@ struct ConsoleSearchOccurence {
 
 final class ConsoleSearchParameters {
     let searchTerm: String
-    let filters: [ConsoleSearchFilter]
+    var filters: [ConsoleSearchFilter] = []
+    var scopes: [ConsoleSearchScope] = []
     let options: StringSearchOptions
 
     init(searchTerm: String, tokens: [ConsoleSearchToken], options: StringSearchOptions) {
         self.searchTerm = searchTerm
-        var filters: [ConsoleSearchFilter] = []
         for token in tokens {
             switch token {
-            case .filter(let filter):
-                filters.append(filter)
+            case .filter(let filter): self.filters.append(filter)
+            case .scope(let scope): self.scopes.append(scope)
             }
         }
-        self.filters = filters
+        if self.scopes.isEmpty {
+            self.scopes = ConsoleSearchScope.allCases
+        }
         self.options = options
     }
 }

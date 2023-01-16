@@ -104,6 +104,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
 #warning("search like in xcode with first letter only")
 #warning("make it all case insensitive")
 #warning("if you are only entering values, what to suggest?")
+#warning("filtes and scopes in separate categories")
 
         var suggestions: [ConsoleSearchSuggestion] = []
 
@@ -136,6 +137,20 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
                     self.searchBar.tokens.append(.filter(.statusCode(filter)))
                 }
             })
+        }
+
+        for scope in ConsoleSearchScope.allCases {
+            if (try? Parsers.prefixIgnoringCase(scope.title).parse(searchText)) != nil {
+                var string = AttributedString("Search in ")
+                string.foregroundColor = .primary
+                string.append(scope.title) {
+                    $0.foregroundColor = .blue
+                }
+                suggestions.append(.init(text: string) {
+                    self.searchBar.text = ""
+                    self.searchBar.tokens.append(.scope(scope))
+                })
+            }
         }
 
         self.suggestedTokens = suggestions
