@@ -4,24 +4,21 @@
 
 import SwiftUI
 
-#warning("improve how recent search are saved and when")
-
 @available(iOS 15, tvOS 15, *)
 struct ConsoleSearchRecentSearchesView: View {
     @ObservedObject var viewModel: ConsoleSearchViewModel
 
     var body: some View {
         Section(header: header) {
-            ForEach(viewModel.recentSearches, id: \.self) { search in
+            ForEach(viewModel.recentSearches.prefix(3), id: \.self) { search in
                 Button(action: { viewModel.selectRecentSearch(search) }) {
                     HStack {
                         Image(systemName: "magnifyingglass")
-                            .font(ConsoleConstants.fontBody)
+                            .foregroundColor(.secondary)
                         Text(search.searchTerm)
                             .foregroundColor(.primary)
-                            .font(ConsoleConstants.fontBody)
                     }
-                }.buttonStyle(.plain)
+                }
             }
         }
     }
@@ -33,7 +30,9 @@ struct ConsoleSearchRecentSearchesView: View {
             Spacer()
             Button(action: viewModel.clearRecentSearchess) {
                 Text("Clear")
-            }.buttonStyle(.plain)
+            }
+            .buttonStyle(.plain)
+            .foregroundColor(.blue)
         }
     }
 }
