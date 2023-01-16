@@ -16,7 +16,7 @@ final class ConsoleSearchService {
     private let helper = TextHelper()
 
     func isMatching(_ task: NetworkTaskEntity, filters: [ConsoleSearchFilter]) -> Bool {
-        filters.allSatisfy { $0.filter.isMatch(task) ?? true }
+        filters.allSatisfy { $0.filter.isMatch(task) }
     }
 
     // TODO: cache response bodies in memory
