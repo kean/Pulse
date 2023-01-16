@@ -24,12 +24,21 @@ final class ConsoleSearchService {
         return true
     }
 
+#warning("TODO: host to support wildcards")
+
     func isMatching(_ task: NetworkTaskEntity, filter: ConsoleSearchFilter) -> Bool {
         switch filter {
         case .statusCode(let filter):
             let contains = filter.values
                 .compactMap { $0.range }
                 .contains { $0.contains(Int(task.statusCode)) }
+            return filter.isNot ? !contains : contains
+        case .host(let filter):
+            guard let host = task.url.flatMap(URL.init)?.host else {
+                return false
+            }
+            let contains = filter.values
+                .contains { host.contains($0) }
             return filter.isNot ? !contains : contains
         }
     }

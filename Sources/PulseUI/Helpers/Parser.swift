@@ -4,6 +4,7 @@
 
 
 import Foundation
+
 // A simple parser combinators implementation. "Combinators" mean higher-order
 // functions that take one or more parsers as input and produce new parsers like
 // output.
@@ -115,6 +116,8 @@ extension Parsers {
     static func string(excluding string: String) -> Parser<String> {
         char(excluding: string).oneOrMore.map { String($0) }
     }
+
+    static let word = char(from: .whitespaces.inverted).oneOrMore.map { String($0) }
 
     /// Parsers a natural number or zero. Valid inputs: "0", "1", "10".
     static let int = digit.oneOrMore.map { Int(String($0)) }

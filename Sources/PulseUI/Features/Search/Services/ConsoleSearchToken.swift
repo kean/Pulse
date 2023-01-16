@@ -6,11 +6,8 @@ import Foundation
 
 #warning("when you are typing search, add -headers contains, -requety body: contains, etc")
 #warning("how to view all suggestions?")
-#warning("how to surface these to the user?")
 #warning("add support for basic wildcards")
 #warning("add a way to enable regex")
-
-#warning("remove ConsoleSearchToken and have separate filters and scope")
 
 #warning("better icons & titles for tokens")
 
@@ -65,6 +62,8 @@ enum ConsoleSearchToken: Identifiable, Hashable {
                 }
                 let title = statusCode.values[0].title
                 return statusCode.values.count > 1 ? title + "…" : title
+            case .host(let host):
+                return "Hosts (\(host.values.count))"
             }
         case .scope(let scope):
             return scope.title

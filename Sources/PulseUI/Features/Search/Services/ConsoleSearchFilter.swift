@@ -6,16 +6,25 @@ import Foundation
 
 enum ConsoleSearchFilter: Hashable {
     case statusCode(StatusCode)
+    case host(Host)
 
     struct StatusCode: Hashable {
         var isNot: Bool
         var values: [ConsoleSearchRange<Int>]
     }
+
+    struct Host: Hashable {
+        var isNot: Bool
+        var values: [String]
+    }
 }
 
 extension Parsers {
-    static let filterStatusCode = (filterName("http status code") *> not <*> listOf(rangeOfInts))
+    static let filterStatusCode = (filterName("status code") *> not <*> listOf(rangeOfInts))
         .map(ConsoleSearchFilter.StatusCode.init)
+
+    static let filterHost = (filterName("host") *> not <*> listOf(word))
+        .map(ConsoleSearchFilter.Host.init)
 
     static func filterName(_ name: String) -> Parser<Void> {
         let words = name.split(separator: " ").map { String($0) }

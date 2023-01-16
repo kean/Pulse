@@ -98,6 +98,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
             return
         }
 
+#warning("easier way to manage these suggestions")
 #warning("add suggestions based on input, e.g. input range")
 #warning("finish this prototype")
 #warning("different styles for filters and completions")
@@ -136,6 +137,34 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
                 } else {
                     self.searchBar.text = ""
                     self.searchBar.tokens.append(.filter(.statusCode(filter)))
+                }
+            })
+        }
+
+        // Host
+        if let filter = try? Parsers.filterHost.parse(searchText) {
+            var string = AttributedString("Host: ") {
+                $0.foregroundColor = .primary
+            }
+            if filter.isNot {
+                string.append("NOT ") { $0.foregroundColor = .red }
+            }
+            if filter.values.isEmpty {
+                string.append("example.com") { $0.foregroundColor = .secondary }
+            } else {
+                for (index, value) in filter.values.enumerated() {
+                    string.append(value) { $0.foregroundColor = .blue }
+                    if index < filter.values.endIndex - 1 {
+                        string.append(", ") { $0.foregroundColor = .secondary }
+                    }
+                }
+            }
+            suggestions.append(.init(text: string) {
+                if filter.values.isEmpty {
+                    self.searchBar.text = "Host: "
+                } else {
+                    self.searchBar.text = ""
+                    self.searchBar.tokens.append(.filter(.host(filter)))
                 }
             })
         }
