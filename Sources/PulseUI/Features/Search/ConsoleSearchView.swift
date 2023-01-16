@@ -9,7 +9,7 @@ import Combine
 
 // TODO: stop updating when leaving background
 // TODO: instead of tokens, use something similar to custom search filters
-// TODO: do we need searchabl then? 
+// TODO: do we need searchabl then?
 
 #warning("improve how search status is displayed")
 
@@ -35,9 +35,9 @@ struct ConsoleSearchView: View {
 
     var body: some View {
         List {
-            if viewModel.results.isEmpty {
-                RecentSearchesView()
-            }
+//            if viewModel.results.isEmpty {
+//                RecentSearchesView()
+//            }
             ConsoleSearchSuggestedTokensView(viewModel: viewModel)
 
             if viewModel.isSearching || !viewModel.results.isEmpty {
