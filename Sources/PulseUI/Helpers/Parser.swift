@@ -58,9 +58,44 @@ extension Parsers {
                 return nil
             }
             var s = s
-            while s.first?.isLetter ?? false {
-                s.removeFirst()
+            s.consume(while: \.isLetter)
+            s.consume(while: \.isWhitespace)
+            return ((), s)
+        }
+    }
+
+    /// Checks if the word has fuzzy prefix with this word.
+    static func fuzzy(_ word: String) -> Parser<Void> {
+        Parser { s in
+            let lhs = Array(s.lowercased())
+            let rhs = Array(word.lowercased())
+            let count = min(lhs.count, rhs.count) // Check only the prefix
+            guard count > 0 else {
+                return nil
             }
+            var map = [[Int]](
+                repeating: [Int](repeating: 0, count: count + 1),
+                count: count + 1
+            )
+            for i in 1...count {
+                for j in 1...count {
+                    map[i][j] = (lhs[i-1] == rhs[j-1] ? 0 : 1) + min(
+                        map[i-1][j], map[i][j-1], map[i-1][j-1]
+                    )
+                }
+            }
+
+            #warning("TODO: this isn't ideal")
+            let distance = map[count][count]
+            print("distance: ", distance, "count: ", count, String(lhs), String(rhs))
+            guard (count < 3 && distance < 1) ||
+                    (count < 6 && distance < 2) ||
+                    distance < 3 else {
+                return nil
+            }
+            var s = s
+            s.consume(while: \.isLetter)
+            s.consume(while: \.isWhitespace)
             return ((), s)
         }
     }
@@ -111,41 +146,43 @@ extension Parser: ExpressibleByStringLiteral, ExpressibleByUnicodeScalarLiteral,
     }
 }
 
-private extension CharacterSet {
-    func contains(_ c: Character) -> Bool {
-        c.unicodeScalars.allSatisfy(contains)
-    }
-}
-
 // MARK: - Parser (Combinators)
 
-/// Matches only if both of the given parsers produced a result.
-func zip<A, B>(_ a: Parser<A>, _ b: Parser<B>) -> Parser<(A, B)> {
-    a.flatMap { matchA in b.map { matchB in (matchA, matchB) } }
-}
+extension Parsers {
 
-func zip<A, B, C>(_ a: Parser<A>, _ b: Parser<B>, _ c: Parser<C>) -> Parser<(A, B, C)> {
-    zip(a, zip(b, c)).map { a, bc in (a, bc.0, bc.1) }
-}
+    /// Matches only if both of the given parsers produced a result.
+    static func zip<A, B>(_ a: Parser<A>, _ b: Parser<B>) -> Parser<(A, B)> {
+        a.flatMap { matchA in b.map { matchB in (matchA, matchB) } }
+    }
 
-func zip<A, B, C, D>(_ a: Parser<A>, _ b: Parser<B>, _ c: Parser<C>, _ d: Parser<D>) -> Parser<(A, B, C, D)> {
-    zip(a, zip(b, c, d)).map { a, bcd in (a, bcd.0, bcd.1, bcd.2) }
-}
+    static func zip<A, B, C>(_ a: Parser<A>, _ b: Parser<B>, _ c: Parser<C>) -> Parser<(A, B, C)> {
+        zip(a, zip(b, c)).map { a, bc in (a, bc.0, bc.1) }
+    }
 
-func zip<A, B, C, D, E>(_ a: Parser<A>, _ b: Parser<B>, _ c: Parser<C>, _ d: Parser<D>, _ e: Parser<E>) -> Parser<(A, B, C, D, E)> {
-    zip(a, zip(b, c, d, e)).map { a, bcde in (a, bcde.0, bcde.1, bcde.2, bcde.3) }
-}
+    static func zip<A, B, C, D>(_ a: Parser<A>, _ b: Parser<B>, _ c: Parser<C>, _ d: Parser<D>) -> Parser<(A, B, C, D)> {
+        zip(a, zip(b, c, d)).map { a, bcd in (a, bcd.0, bcd.1, bcd.2) }
+    }
 
-/// Returns the first match or `nil` if no matches are found.
-func oneOf<A>(_ parsers: Parser<A>...) -> Parser<A> {
-    precondition(!parsers.isEmpty)
-    return Parser<A> { str -> (A, Substring)? in
-        for parser in parsers {
-            if let match = try parser.parse(str) {
-                return match
+    static func zip<A, B, C, D, E>(_ a: Parser<A>, _ b: Parser<B>, _ c: Parser<C>, _ d: Parser<D>, _ e: Parser<E>) -> Parser<(A, B, C, D, E)> {
+        zip(a, zip(b, c, d, e)).map { a, bcde in (a, bcde.0, bcde.1, bcde.2, bcde.3) }
+    }
+
+    /// Returns the first match or `nil` if no matches are found.
+    static func oneOf<A>(_ parsers: Parser<A>...) -> Parser<A> {
+        oneOf(parsers)
+    }
+
+    /// Returns the first match or `nil` if no matches are found.
+    static func oneOf<A>(_ parsers: [Parser<A>]) -> Parser<A> {
+        precondition(!parsers.isEmpty)
+        return Parser<A> { str -> (A, Substring)? in
+            for parser in parsers {
+                if let match = try parser.parse(str) {
+                    return match
+                }
             }
+            return nil
         }
-        return nil
     }
 }
 
@@ -260,19 +297,62 @@ infix operator <* : CombinatorPrecedence
 infix operator <*> : CombinatorPrecedence
 
 func *> <A, B>(_ lhs: Parser<A>, _ rhs: Parser<B>) -> Parser<B> {
-    zip(lhs, rhs).map { $0.1 }
+    Parsers.zip(lhs, rhs).map { $0.1 }
 }
 
 func <* <A, B>(_ lhs: Parser<A>, _ rhs: Parser<B>) -> Parser<A> {
-    zip(lhs, rhs).map { $0.0 }
+    Parsers.zip(lhs, rhs).map { $0.0 }
 }
 
 // Combines two parsers and keep the results of both.
 func <*> <A, B>(_ lhs: Parser<A>, _ rhs: Parser<B>) -> Parser<(A, B)> {
-    zip(lhs, rhs)
+    Parsers.zip(lhs, rhs)
 }
 
 precedencegroup CombinatorPrecedence {
     associativity: left
     higherThan: DefaultPrecedence
+}
+
+// MARK: - Extensions
+
+private extension CharacterSet {
+    func contains(_ c: Character) -> Bool {
+        c.unicodeScalars.allSatisfy(contains)
+    }
+}
+
+private extension Substring {
+    mutating func consume(while closure: (Character) -> Bool) {
+        while let first = first, closure(first) {
+            removeFirst()
+        }
+    }
+}
+
+extension String {
+    func distance(to rhs: String) -> Int {
+        guard !rhs.isEmpty else { return self.count }
+        guard !self.isEmpty else { return rhs.count }
+
+        let lhs = Array(self)
+        let rhs = Array(rhs)
+        var map = [[Int]](
+            repeating: [Int](repeating: 0, count: rhs.count + 1),
+            count: lhs.count + 1
+        )
+        for i in 1...lhs.count {
+            map[i][0] = i
+        }
+        for j in 1...rhs.count {
+            map[0][j] = j
+        }
+        for i in 1...lhs.count {
+            for j in 1...rhs.count {
+                let distance = Swift.min(map[i-1][j], map[i][j-1], map[i-1][j-1])
+                map[i][j] = (lhs[i-1] == rhs[j-1] ? 0 : 1) + distance
+            }
+        }
+        return map[lhs.count][rhs.count]
+    }
 }

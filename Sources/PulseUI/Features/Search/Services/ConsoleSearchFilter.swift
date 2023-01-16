@@ -14,17 +14,19 @@ enum ConsoleSearchFilter: Hashable {
 }
 
 extension Parsers {
-    static let filterStatusCode = (filterName("status code") *> not <*> listOf(rangeOfInts))
+    static let filterStatusCode = (filterName("http status code") *> not <*> listOf(rangeOfInts))
         .map(ConsoleSearchFilter.StatusCode.init)
 
     static func filterName(_ name: String) -> Parser<Void> {
         let words = name.split(separator: " ").map { String($0) }
         assert(!words.isEmpty)
-        var parser = prefixIgnoringCase(words[0])
-        for word in words.dropFirst() {
-            parser = parser <* whitespaces <* optional(prefixIgnoringCase(word))
-        }
-        return whitespaces <* parser <* optional(":") <* whitespaces
+        let anyWords = oneOf(words.map(fuzzy)).zeroOrMore.map { _ in () }
+        return anyWords <* optional(":") <* whitespaces
+//        var parser = prefixIgnoringCase(words[0])
+//        for word in words.dropFirst() {
+//            parser = parser <* whitespaces <* optional(prefixIgnoringCase(word))
+//        }
+//        return whitespaces <* parser <* optional(":") <* whitespaces
     }
 
     static let rangeOfInts: Parser<ConsoleSearchRange<Int>> = oneOf(
