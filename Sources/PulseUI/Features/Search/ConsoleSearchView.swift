@@ -10,6 +10,8 @@ import Combine
 #warning("improve how search status is displayed")
 #warning("improve search status & remove hardcoded occurenes")
 #warning("use return key to apply filter instead of performing search (?) what about recent searches then?")
+#warning("when typning, display only a few top suggested filters")
+#warning("when user is entering more messages, automatically refresh search results")
 
 @available(iOS 15, tvOS 15, *)
 struct ConsoleSearchView: View {

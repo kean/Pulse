@@ -101,30 +101,10 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     private func updateSearchTokens(for searchText: String) {
         guard #available(iOS 16, tvOS 16, *) else { return }
 
-#warning("add default suggestions")
-        guard !searchText.isEmpty else {
-            self.suggestedTokens = []
-            return
-        }
-
-#warning("easier way to manage these suggestions")
-#warning("add suggestions based on input, e.g. input range")
-#warning("finish this prototype")
-#warning("different styles for filters and completions")
-#warning("dont show suggestion when its not specific enough")
-#warning("search like in xcode with first letter only")
-#warning("make it all case insensitive")
-#warning("if you are only entering values, what to suggest?")
-#warning("filtes and scopes in separate categories")
-
         var suggestions: [ConsoleSearchSuggestion] = []
 
-        func parse(_ parser: Parser<ConsoleSearchFilter>) {
-            guard let filter = try? parser.parse(searchText) else { return }
-
-            var string = AttributedString("\(filter.name): ") {
-                $0.foregroundColor = .primary
-            }
+        func add(_ filter: ConsoleSearchFilter) {
+            var string = AttributedString(filter.name + ": ") { $0.foregroundColor = .primary }
             let values = filter.valuesDescriptions
             if values.isEmpty {
                 string.append(filter.valueExample) { $0.foregroundColor = .secondary }
@@ -138,7 +118,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
             }
             suggestions.append(.init(text: string) {
                 if values.isEmpty {
-                    self.searchBar.text = "\(filter.name): "
+                    self.searchBar.text = filter.name + ": "
                 } else {
                     self.searchBar.text = ""
                     self.searchBar.tokens.append(.filter(filter))
@@ -146,22 +126,50 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
             })
         }
 
-        parse(Parsers.filterStatusCode)
-        parse(Parsers.filterHost)
+        func add(_ scope: ConsoleSearchScope) {
+            var string = AttributedString("Search in ") { $0.foregroundColor = .primary }
+            string.append(scope.title) { $0.foregroundColor = .blue }
+            suggestions.append(.init(text: string) {
+                self.searchBar.text = ""
+                self.searchBar.tokens.append(.scope(scope))
+            })
+        }
 
-        for scope in ConsoleSearchScope.allCases {
-            if (try? Parsers.filterName(scope.title).parse(searchText)) != nil {
-                var string = AttributedString("Search in ")
-                string.foregroundColor = .primary
-                string.append(scope.title) {
-                    $0.foregroundColor = .blue
+        func parse(_ parser: Parser<ConsoleSearchFilter>) {
+            (try? parser.parse(searchText)).map(add)
+        }
+
+        if searchText.isEmpty {
+            add(ConsoleSearchFilter.statusCode(.init(values: [])))
+            add(ConsoleSearchFilter.host(.init(values: [])))
+
+            for scope in ConsoleSearchScope.allCases {
+                add(scope)
+            }
+        } else {
+            parse(Parsers.filterStatusCode)
+            parse(Parsers.filterHost)
+
+            for scope in ConsoleSearchScope.allCases {
+                if (try? Parsers.filterName(scope.title).parse(searchText)) != nil {
+                    add(scope)
                 }
-                suggestions.append(.init(text: string) {
-                    self.searchBar.text = ""
-                    self.searchBar.tokens.append(.scope(scope))
-                })
             }
         }
+
+#warning("easier way to manage these suggestions")
+#warning("add suggestions based on input, e.g. input range")
+#warning("finish this prototype")
+#warning("different styles for filters and completions")
+#warning("dont show suggestion when its not specific enough")
+#warning("search like in xcode with first letter only")
+#warning("make it all case insensitive")
+#warning("if you are only entering values, what to suggest?")
+#warning("filtes and scopes in separate categories")
+
+
+
+#warning("TODO: priorize direct matches")
 
         self.suggestedTokens = suggestions
     }
