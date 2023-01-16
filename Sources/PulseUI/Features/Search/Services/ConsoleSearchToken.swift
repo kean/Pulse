@@ -10,6 +10,7 @@ import Foundation
 #warning("add a way to enable regex")
 
 #warning("better icons & titles for tokens")
+#warning("add minus response body to search not in")
 
 // network:
 //
