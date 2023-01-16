@@ -15,6 +15,14 @@ enum ConsoleSearchScope: Equatable, Hashable, Codable, CaseIterable {
 
     var title: String {
         switch self {
+        case .originalRequestHeaders: return "Request Headers"
+        case .currentRequestHeaders: return "Request Headers"
+        default: return fullTitle
+        }
+    }
+
+    var fullTitle: String {
+        switch self {
         case .url: return "URL"
         case .queryItems: return "Query Items"
         case .originalRequestHeaders: return "Original Request Headers"

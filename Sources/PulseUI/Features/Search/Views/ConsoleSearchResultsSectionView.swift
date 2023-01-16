@@ -44,7 +44,7 @@ struct ConsoleSearchResultView: View {
     // TODO: add occurence IDs instead of indices
     private func makeCell(for occurence: ConsoleSearchOccurence) -> some View {
         return VStack(alignment: .leading, spacing: 4) {
-            Text(occurence.scope.title + " (\(occurence.line):\(occurence.range.lowerBound))")
+            Text(occurence.scope.fullTitle + " (\(occurence.line):\(occurence.range.lowerBound))")
                 .font(ConsoleConstants.fontTitle)
                 .foregroundColor(.secondary)
             Text(occurence.text)

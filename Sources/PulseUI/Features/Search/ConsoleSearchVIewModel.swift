@@ -141,18 +141,20 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
             (try? parser.parse(searchText)).map(add)
         }
 
+        var allScopes = ConsoleSearchScope.allCases.filter { $0 != .originalRequestHeaders }
+
         if searchText.isEmpty {
             add(ConsoleSearchFilter.statusCode(.init(values: [])))
             add(ConsoleSearchFilter.host(.init(values: [])))
 
-            for scope in ConsoleSearchScope.allCases {
+            for scope in allScopes {
                 add(scope)
             }
         } else {
             parse(Parsers.filterStatusCode)
             parse(Parsers.filterHost)
 
-            for scope in ConsoleSearchScope.allCases {
+            for scope in allScopes {
                 if (try? Parsers.filterName(scope.title).parse(searchText)) != nil {
                     add(scope)
                 }
