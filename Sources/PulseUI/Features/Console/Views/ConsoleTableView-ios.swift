@@ -54,12 +54,9 @@ private struct _ConsoleTableView<Header: View>: UIViewControllerRepresentable {
 
     func makeUIViewController(context: Context) -> ConsoleTableViewController {
         let vc = ConsoleTableViewController(viewModel: viewModel)
-        let header = self.header()
-#warning("TODO: rewrite how header viwe is displayed to avoid animation glithes")
-        if !(header is EmptyView) {
-            vc.setHeaderView(header)
-        }
         vc.onSelected = onSelected
+        let header = self.header()
+        vc.headerView = header is EmptyView ? nil : AnyView(header)
         return vc
     }
 
@@ -75,6 +72,7 @@ final class ConsoleTableViewController: UITableViewController {
     private var cancellables: [AnyCancellable] = []
 
     var onSelected: ((NSManagedObject) -> Void)?
+    var headerView: AnyView?
 
     init(viewModel: ConsoleTableViewModel) {
         self.viewModel = viewModel
@@ -88,6 +86,7 @@ final class ConsoleTableViewController: UITableViewController {
     }
 
     private func createView() {
+        tableView.register(ConsoleBaseTableCell.self, forCellReuseIdentifier: "header")
         tableView.register(ConsoleBaseTableCell.self, forCellReuseIdentifier: "message")
         tableView.register(ConsoleBaseTableCell.self, forCellReuseIdentifier: "task")
 
@@ -117,15 +116,12 @@ final class ConsoleTableViewController: UITableViewController {
         isFirstDisplay = false
     }
 
-    func setHeaderView<Header: View>(_ view: Header) {
-        let header = UIHostingController(rootView: view).view
-        header?.frame = CGRect(x: 0, y: 0, width: 320, height: 44)
-        tableView.tableHeaderView = header
-    }
-
     // MARK: - ViewModel
 
-    func getEntityViewModel(at indexPath: IndexPath) -> AnyObject {
+    func getViewModel(at indexPath: IndexPath) -> AnyObject {
+        if indexPath.section == 0 {
+            return HeaderViewViewModel()
+        }
         let entity = entities[indexPath.row]
         if let viewModel = entityViewModels[entity.objectID] {
             return viewModel
@@ -150,15 +146,18 @@ final class ConsoleTableViewController: UITableViewController {
     // MARK: - UITableViewDelegate
 
     override func numberOfSections(in tableView: UITableView) -> Int {
-        1
+        2
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        entities.count
+        switch section {
+        case 0: return headerView == nil ? 0 : 1
+        default: return entities.count
+        }
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        switch getEntityViewModel(at: indexPath) {
+        switch getViewModel(at: indexPath) {
         case let viewModel as ConsoleMessageCellViewModel:
             let cell = tableView.dequeueReusableCell(withIdentifier: "message", for: indexPath) as! ConsoleBaseTableCell
             if #available(iOS 16.0, *) {
@@ -184,16 +183,23 @@ final class ConsoleTableViewController: UITableViewController {
             }
             return cell
         default:
-            fatalError("Invalid viewModel: \(viewModel)")
+            let cell = tableView.dequeueReusableCell(withIdentifier: "header", for: indexPath) as! ConsoleBaseTableCell
+            cell.selectionStyle = .none
+            if let headerView = headerView {
+                cell.hostingView.rootView = headerView
+            }
+            return cell
         }
     }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        onSelected?(entities[indexPath.row])
+        if indexPath.section == 1 {
+            onSelected?(entities[indexPath.row])
+        }
     }
 
     override func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        guard let pinViewModel = (getEntityViewModel(at: indexPath) as? Pinnable)?.pinViewModel else {
+        guard let pinViewModel = (getViewModel(at: indexPath) as? Pinnable)?.pinViewModel else {
             return nil
         }
         let actions = UISwipeActionsConfiguration(actions: [
@@ -204,7 +210,7 @@ final class ConsoleTableViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        switch getEntityViewModel(at: indexPath) {
+        switch getViewModel(at: indexPath) {
         case let viewModel as ConsoleMessageCellViewModel:
             let focus = UIContextualAction(style: .normal, title: "Focus") { _, _, completion in
                 viewModel.focus()
@@ -242,10 +248,12 @@ final class ConsoleTableViewController: UITableViewController {
             actions.performsFirstActionWithFullSwipe = true
             return actions
         default:
-            fatalError("Invalid viewModel: \(viewModel)")
+            return nil
         }
     }
 }
+
+private final class HeaderViewViewModel {}
 
 private class ConsoleBaseTableCell: UITableViewCell {
     lazy var hostingView: UIHostingController<AnyView> = {

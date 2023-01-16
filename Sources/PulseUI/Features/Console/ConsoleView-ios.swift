@@ -155,9 +155,8 @@ private struct ConsoleToolbarView: View {
                 filters
             }
             .buttonStyle(.plain)
-            .padding(.trailing, 8)
-            Divider()
-        }.padding(.leading, 20)
+            .padding(.vertical, 4)
+        }
         .sheet(isPresented: $isShowingFilters) {
             NavigationView {
                 ConsoleSearchCriteriaView(viewModel: viewModel.searchCriteriaViewModel)
