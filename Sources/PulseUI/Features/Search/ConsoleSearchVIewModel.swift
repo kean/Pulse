@@ -256,10 +256,14 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     }
 
     private func addRecentSearch(_ parameters: ConsoleSearchParameters) {
+        var recentSearches = self.recentSearches
         while let index = recentSearches.firstIndex(where: { $0.searchTerm == parameters.searchTerm }) {
             recentSearches.remove(at: index)
         }
-        recentSearches.append(parameters)
+        recentSearches.insert(parameters, at: 0)
+        if recentSearches.count > 10 {
+            recentSearches.removeLast(recentSearches.count - 10)
+        }
     }
 }
 
