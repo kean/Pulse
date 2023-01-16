@@ -180,7 +180,38 @@ final class ConsoleSearchParameters {
 
 #warning("when you are typing search, add -headers contains, -requety body: contains, etc")
 #warning("how to view all suggestions?")
+#warning("how to surface these to the user?")
+#warning("add support for basic wildcards")
+#warning("add a way to enable regex")
 
+// network:
+//
+// - "url" <value>
+// - "host" = <value> (+add commons hosts)
+// - "domain" = <value>
+// - "method" <value>
+// - "path" <value>
+// - "scheme" <value>
+// - "duration" ">=" "<=" <value>
+// - "\(kind)" "contains" <value>
+// - "type" data/download/upload/stream/socket
+// - "cookies" empty/non-empty/contains
+// - "timeout" >= <=
+// - "error"
+// - "size" >= <= <value>
+// - "error code" <value>
+// - "error decoding failed"
+// - "content-type" <value>
+// - "cached"
+// - "redirect"
+// - "pins"
+//
+// message:
+//
+// - "label" <value>
+// - "log level" or "level"
+// - "metadata"
+// - "file" <value>
 enum ConsoleSearchToken: Identifiable, Hashable {
     var id: ConsoleSearchToken { self }
 
