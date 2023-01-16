@@ -4,26 +4,28 @@
 
 import Foundation
 
+protocol ConsoleSearchFilterProtocol {
+
+}
+
 enum ConsoleSearchFilter: Equatable, Hashable, Codable {
     case statusCode(StatusCode)
     case host(Host)
 
     struct StatusCode: Equatable, Hashable, Codable {
-        var isNot: Bool
         var values: [ConsoleSearchRange<Int>]
     }
 
     struct Host: Equatable, Hashable, Codable {
-        var isNot: Bool
         var values: [String]
     }
 }
 
 extension Parsers {
-    static let filterStatusCode = (filterName("status code") *> not <*> listOf(rangeOfInts))
+    static let filterStatusCode = (filterName("status code") *> listOf(rangeOfInts))
         .map(ConsoleSearchFilter.StatusCode.init)
 
-    static let filterHost = (filterName("host") *> not <*> listOf(host))
+    static let filterHost = (filterName("host") *> listOf(host))
         .map(ConsoleSearchFilter.Host.init)
 
     static let host = char(from: .urlHostAllowed.subtracting(.init(charactersIn: ","))).oneOrMore.map { String($0) }

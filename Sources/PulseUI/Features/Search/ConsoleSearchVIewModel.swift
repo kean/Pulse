@@ -124,11 +124,6 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
             var string = AttributedString("Status Code: ") {
                 $0.foregroundColor = .primary
             }
-
-            if filter.isNot {
-                string.append("NOT ") { $0.foregroundColor = .red }
-            }
-
             if filter.values.isEmpty {
                 string.append("200, 400-404") { $0.foregroundColor = .secondary }
             } else {
@@ -139,7 +134,6 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
                     }
                 }
             }
-
             suggestions.append(.init(text: string) {
                 if filter.values.isEmpty {
                     self.searchBar.text = "Status Code: "
@@ -154,9 +148,6 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         if let filter = try? Parsers.filterHost.parse(searchText) {
             var string = AttributedString("Host: ") {
                 $0.foregroundColor = .primary
-            }
-            if filter.isNot {
-                string.append("NOT ") { $0.foregroundColor = .red }
             }
             if filter.values.isEmpty {
                 string.append("example.com") { $0.foregroundColor = .secondary }

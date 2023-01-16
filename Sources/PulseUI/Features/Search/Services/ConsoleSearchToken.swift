@@ -12,6 +12,14 @@ import Foundation
 #warning("better icons & titles for tokens")
 #warning("add minus response body to search not in")
 
+// modiifiers:
+
+// - not: "NOT", "!"
+// - contains: "~" (default)
+// - matches "="
+// - not contains: "!~"
+// - not matches: "!="
+
 // network:
 //
 // - "url" <value>

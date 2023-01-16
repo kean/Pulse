@@ -9,7 +9,7 @@ import Combine
 
 #warning("improve how search status is displayed")
 #warning("improve search status & remove hardcoded occurenes")
-#warning("use enter to apply filter instead of performing search (?) what about recent searches then?")
+#warning("use return key to apply filter instead of performing search (?) what about recent searches then?")
 
 @available(iOS 15, tvOS 15, *)
 struct ConsoleSearchView: View {
@@ -92,7 +92,7 @@ private struct ConsoleSearchDemoView: View {
                     viewModel.onSubmitSearch()
                 }
                 .onAppear {
-                    viewModel.searchBar.text = "Nuke"
+//                    viewModel.searchBar.text = "Nuke"
                 }
         }
 #if os(watchOS)
