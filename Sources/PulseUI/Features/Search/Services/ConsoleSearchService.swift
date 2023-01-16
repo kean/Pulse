@@ -40,7 +40,7 @@ final class ConsoleSearchService {
                     }
                 }
             case .queryItems:
-                if var components = URLComponents(string: task.url ?? ""),
+                if let components = URLComponents(string: task.url ?? ""),
                    let query = components.query, !query.isEmpty {
                     occurences += search(query as NSString, parameters, kind)
                 }
@@ -178,10 +178,9 @@ final class ConsoleSearchParameters {
     }
 }
 
-// TODO: (when entering text)
-// Response Body contains:
-// Request Body contains:
-// show more
+#warning("when you are typing search, add -headers contains, -requety body: contains, etc")
+#warning("how to view all suggestions?")
+
 enum ConsoleSearchToken: Identifiable, Hashable {
     var id: ConsoleSearchToken { self }
 
