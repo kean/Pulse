@@ -6,7 +6,7 @@ import Foundation
 
 #warning("when you are typing search, add -headers contains, -requety body: contains, etc")
 #warning("how to view all suggestions?")
-#warning("add support for basic wildcards")
+#warning("add support for basic wildcards and highlight it in text")
 #warning("add a way to enable regex")
 
 #warning("better icons & titles for tokens")

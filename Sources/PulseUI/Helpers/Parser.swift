@@ -117,8 +117,6 @@ extension Parsers {
         char(excluding: string).oneOrMore.map { String($0) }
     }
 
-    static let word = char(from: .whitespaces.inverted).oneOrMore.map { String($0) }
-
     /// Parsers a natural number or zero. Valid inputs: "0", "1", "10".
     static let int = digit.oneOrMore.map { Int(String($0)) }
 

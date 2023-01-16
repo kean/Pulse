@@ -23,8 +23,10 @@ extension Parsers {
     static let filterStatusCode = (filterName("status code") *> not <*> listOf(rangeOfInts))
         .map(ConsoleSearchFilter.StatusCode.init)
 
-    static let filterHost = (filterName("host") *> not <*> listOf(word))
+    static let filterHost = (filterName("host") *> not <*> listOf(host))
         .map(ConsoleSearchFilter.Host.init)
+
+    static let host = char(from: .urlHostAllowed.subtracting(.init(charactersIn: ","))).oneOrMore.map { String($0) }
 
     static func filterName(_ name: String) -> Parser<Void> {
         let words = name.split(separator: " ").map { String($0) }
