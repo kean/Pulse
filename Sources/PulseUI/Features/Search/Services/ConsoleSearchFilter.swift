@@ -4,16 +4,16 @@
 
 import Foundation
 
-enum ConsoleSearchFilter: Hashable, Codable {
+enum ConsoleSearchFilter: Equatable, Hashable, Codable {
     case statusCode(StatusCode)
     case host(Host)
 
-    struct StatusCode: Hashable, Codable {
+    struct StatusCode: Equatable, Hashable, Codable {
         var isNot: Bool
         var values: [ConsoleSearchRange<Int>]
     }
 
-    struct Host: Hashable, Codable {
+    struct Host: Equatable, Hashable, Codable {
         var isNot: Bool
         var values: [String]
     }
@@ -93,7 +93,7 @@ struct ConsoleSearchRange<T: Hashable & Comparable & Codable>: Hashable, Codable
 
 extension ConsoleSearchRange where T == Int {
     var range: ClosedRange<Int>? {
-        guard upperBound > lowerBound else { return nil }
+        guard upperBound >= lowerBound else { return nil }
         switch modifier {
         case .open: return ClosedRange(lowerBound..<upperBound)
         case .closed: return lowerBound...upperBound

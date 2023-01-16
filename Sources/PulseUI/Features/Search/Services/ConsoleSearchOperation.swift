@@ -27,12 +27,11 @@ final class ConsoleSearchOperation {
     weak var delegate: ConsoleSearchOperationDelegate?
 
     init(objectIDs: [NSManagedObjectID],
-         searchText: String,
-         tokens: [ConsoleSearchToken],
+         parameters: ConsoleSearchParameters,
          service: ConsoleSearchService,
          context: NSManagedObjectContext) {
         self.objectIDs = objectIDs
-        self.parameters = ConsoleSearchParameters(searchTerm: searchText, tokens: tokens, options: .default)
+        self.parameters = parameters
         self.service = service
         self.context = context
 

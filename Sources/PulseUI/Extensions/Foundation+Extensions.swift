@@ -68,14 +68,14 @@ extension AttributedString {
     }
 }
 
-struct StringSearchOptions {
-    var isRegex: Bool = false
-    var isCaseSensitive: Bool = false
+struct StringSearchOptions: Equatable, Hashable, Codable {
+    var isRegex = false
+    var isCaseSensitive = false
     var kind: Kind = .contains
 
     static let `default` = StringSearchOptions()
 
-    enum Kind: String, CaseIterable {
+    enum Kind: String, Equatable, Hashable, Codable, CaseIterable {
         case begins = "Begins With"
         case contains = "Contains"
         case ends = "Ends With"

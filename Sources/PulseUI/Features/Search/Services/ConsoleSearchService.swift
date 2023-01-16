@@ -156,23 +156,23 @@ struct ConsoleSearchOccurence {
     let searchContext: RichTextViewModel.SearchContext
 }
 
-final class ConsoleSearchParameters {
+struct ConsoleSearchParameters: Equatable, Hashable, Codable {
     let searchTerm: String
-    var filters: [ConsoleSearchFilter] = []
-    var scopes: [ConsoleSearchScope] = []
+    let tokens: [ConsoleSearchToken]
     let options: StringSearchOptions
 
-    init(searchTerm: String, tokens: [ConsoleSearchToken], options: StringSearchOptions) {
-        self.searchTerm = searchTerm
-        for token in tokens {
-            switch token {
-            case .filter(let filter): self.filters.append(filter)
-            case .scope(let scope): self.scopes.append(scope)
-            }
+    var filters: [ConsoleSearchFilter] {
+        tokens.compactMap {
+            guard case .filter(let filter) = $0 else { return nil }
+            return filter
         }
-        if self.scopes.isEmpty {
-            self.scopes = ConsoleSearchScope.allCases
+    }
+
+    var scopes: [ConsoleSearchScope] {
+        let scopes: [ConsoleSearchScope] = tokens.compactMap {
+            guard case .scope(let scope) = $0 else { return nil }
+            return scope
         }
-        self.options = options
+        return scopes.isEmpty ? ConsoleSearchScope.allCases : scopes
     }
 }

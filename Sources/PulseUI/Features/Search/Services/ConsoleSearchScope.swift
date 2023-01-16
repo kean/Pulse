@@ -4,7 +4,7 @@
 
 import Foundation
 
-enum ConsoleSearchScope: CaseIterable, Codable {
+enum ConsoleSearchScope: Equatable, Hashable, Codable, CaseIterable {
     case url
     case queryItems
     case originalRequestHeaders

@@ -10,6 +10,10 @@ import Combine
 final class ConsoleSearchBarViewModel: ObservableObject {
     @Published var text: String = ""
     @Published var tokens: [ConsoleSearchToken] = []
+
+    var isEmpty: Bool {
+        text.isEmpty && tokens.isEmpty
+    }
 }
 
 @available(iOS 15, tvOS 15, *)
@@ -23,6 +27,8 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     @Published var isSearching = false
     @Published var hasMore = false
 
+    @Published var recentSearches: [ConsoleSearchParameters] = []
+
     // important: if you reload the view with searchable quickly during typing, it crashes and burns
     let searchBar = ConsoleSearchBarViewModel()
 
@@ -32,6 +38,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
 
     @Published var suggestedTokens: [ConsoleSearchSuggestion] = []
 
+    private let saveRecentSearchesSignal = PassthroughSubject<Void, Never>()
     private let service = ConsoleSearchService()
 
     private var cancellables: [AnyCancellable] = []
@@ -55,6 +62,13 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
             .removeDuplicates()
             .debounce(for: 0.5, scheduler: DispatchQueue.main)
             .sink { [weak self] in self?.isSpinnerNeeded = $0 }
+            .store(in: &cancellables)
+
+        recentSearches = getRecentSearches()
+
+        saveRecentSearchesSignal
+            .throttle(for: 2, scheduler: DispatchQueue.main, latest: true)
+            .sink { [weak self] in self?.saveRecentSearches() }
             .store(in: &cancellables)
     }
 
@@ -83,10 +97,13 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
             dirtyDate = Date()
         }
 
-        let operation = ConsoleSearchOperation(objectIDs: objectIDs, searchText: searchText, tokens: tokens, service: service, context: context)
+        let parameters = ConsoleSearchParameters(searchTerm: searchText, tokens: tokens, options: .default)
+        let operation = ConsoleSearchOperation(objectIDs: objectIDs, parameters: parameters, service: service, context: context)
         operation.delegate = self
         operation.resume()
         self.operation = operation
+
+        addRecentSearch(parameters)
     }
 
     private func updateSearchTokens(for searchText: String) {
@@ -217,6 +234,40 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
             self.results = buffer
         }
         self.hasMore = hasMore
+    }
+
+    // MARK: - Recent Searches
+
+    private func getRecentSearches() -> [ConsoleSearchParameters] {
+        ConsoleSettings.shared.recentSearches.data(using: .utf8).flatMap {
+            try? JSONDecoder().decode([ConsoleSearchParameters].self, from: $0)
+        } ?? []
+    }
+
+    private func saveRecentSearches() {
+        guard let data = (try? JSONEncoder().encode(recentSearches)),
+              let string = String(data: data, encoding: .utf8) else {
+            return
+        }
+        ConsoleSettings.shared.recentSearches = string
+    }
+
+    func selectRecentSearch(_ parameters: ConsoleSearchParameters) {
+        searchBar.text = parameters.searchTerm
+        searchBar.tokens = parameters.tokens
+    }
+
+    func clearRecentSearchess() {
+        recentSearches = []
+        ConsoleSettings.shared.recentSearches = "[]"
+    }
+
+    private func addRecentSearch(_ parameters: ConsoleSearchParameters) {
+        while let index = recentSearches.firstIndex(where: { parameters.searchTerm.contains($0.searchTerm) }) {
+            recentSearches.remove(at: index)
+        }
+        recentSearches.append(parameters)
+        saveRecentSearchesSignal.send(())
     }
 }
 

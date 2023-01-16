@@ -7,38 +7,19 @@ import Pulse
 import CoreData
 import Combine
 
-// TODO: stop updating when leaving background
-// TODO: instead of tokens, use something similar to custom search filters
-// TODO: do we need searchabl then?
-
 #warning("improve how search status is displayed")
-#warning("remove hardcoded occurenes")
+#warning("improve search status & remove hardcoded occurenes")
 
 @available(iOS 15, tvOS 15, *)
 struct ConsoleSearchView: View {
     @ObservedObject var viewModel: ConsoleSearchViewModel
 
-    // TODO: implement recent searches (and move this)
-    // TODO: add a way to clear them
-    struct RecentSearchesView: View {
-        var body: some View {
-            Section(header: Text("Recent Searches")) {
-                HStack {
-                    Image(systemName: "magnifyingglass")
-                        .font(ConsoleConstants.fontBody)
-                    Text("Status Code 200")
-                        .foregroundColor(.primary)
-                        .font(ConsoleConstants.fontBody)
-                }
-            }
-        }
-    }
-
     var body: some View {
         List {
-//            if viewModel.results.isEmpty {
-//                RecentSearchesView()
-//            }
+            if viewModel.searchBar.isEmpty, !viewModel.recentSearches.isEmpty {
+                ConsoleSearchRecentSearchesView(viewModel: viewModel)
+            }
+
             ConsoleSearchSuggestedTokensView(viewModel: viewModel)
 
             if viewModel.isSearching || !viewModel.results.isEmpty {
