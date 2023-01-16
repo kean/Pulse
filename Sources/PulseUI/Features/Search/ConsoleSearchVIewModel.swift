@@ -22,8 +22,9 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     private var buffer: [ConsoleSearchResultViewModel] = []
     private var operation: ConsoleSearchOperation?
 
+    #warning("remove old tokens")
     @Published var tokens: [ConsoleSearchToken] = []
-    @Published var suggestedTokens: [ConsoleSearchToken] = []
+    @Published var suggestedTokens: [ConsoleSearchSuggestion] = []
 
     private let service = ConsoleSearchService()
 
@@ -82,15 +83,21 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     private func updateSearchTokens(for searchText: String) {
         guard #available(iOS 16, tvOS 16, *) else { return }
 
-        var tokens: [ConsoleSearchToken] = []
+        var suggestions: [ConsoleSearchSuggestion] = []
 
         // Status Code
         if let code = Int(searchText), (100...500).contains(code) {
-            tokens.append(.status(range: code...code, isNot: false))
-            tokens.append(.status(range: code...code, isNot: true))
+            suggestions.append(.init(text: AttributedString("Status Code IS ") { $0.foregroundColor = .secondary } + AttributedString(searchText)) {
+                self.searchText = ""
+                self.tokens.append(.status(range: code...code, isNot: false))
+            })
+            suggestions.append(.init(text: AttributedString("Status Code IS NOT ") { $0.foregroundColor = .secondary } + AttributedString(searchText)) {
+                self.searchText = ""
+                self.tokens.append(.status(range: code...code, isNot: false))
+            })
         }
 
-        self.suggestedTokens = tokens
+        self.suggestedTokens = suggestions
     }
 
     func buttonShowMoreResultsTapped() {
@@ -125,6 +132,13 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         }
         self.hasMore = hasMore
     }
+}
+
+@available(iOS 15, tvOS 15, *)
+struct ConsoleSearchSuggestion: Identifiable {
+    let id = UUID()
+    let text: AttributedString
+    var onTap: () -> Void
 }
 
 @available(iOS 15, tvOS 15, *)

@@ -17,16 +17,10 @@ struct ConsoleSearchSuggestedTokensView: View {
         if isSearching && !viewModel.suggestedTokens.isEmpty {
             Section(header: Text("Suggested Filters")) {
                 ForEach(viewModel.suggestedTokens) { token in
-                    Button(action: {
-                        viewModel.tokens.append(token)
-                        viewModel.searchText = ""
-                    }) {
+                    Button(action: token.onTap) {
                         HStack {
                             Image(systemName: "magnifyingglass")
-                                .font(ConsoleConstants.fontBody)
-                            Text(token.title)
-                                .foregroundColor(.primary)
-                                .font(ConsoleConstants.fontBody)
+                            Text(token.text)
                         }
                     }
                 }
