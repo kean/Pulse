@@ -15,12 +15,12 @@ extension UITableView {
             switch update {
             case .remove(let offset, _, let move):
                 if move == nil {
-                    deletes.append(IndexPath(row: offset, section: 0))
+                    deletes.append(IndexPath(row: offset, section: 1))
                 }
             case .insert(let offset, _, let move):
                 // If there's no move, it's a true insertion and not the result of a move.
                 if move == nil {
-                    inserts.append(IndexPath(row: offset, section: 0))
+                    inserts.append(IndexPath(row: offset, section: 1))
                 }
             }
         }

@@ -105,7 +105,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
 
         if let dirtyDate = dirtyDate {
             self.buffer += results
-            if Date().timeIntervalSince(dirtyDate) > 0.05 {
+            if Date().timeIntervalSince(dirtyDate) > 0.1 {
                 self.dirtyDate = nil
                 self.results = buffer
                 self.buffer = []

@@ -27,7 +27,7 @@ struct ConsoleSearchResultView: View {
             // TODO: how to prioritize what makes the cut?
             NavigationLink(destination: ConsoleSearchResultDetailsView(viewModel: viewModel)) {
                 HStack {
-                    Text("Show All Occurences")
+                    Text("Show All Results")
                         .font(ConsoleConstants.fontBody)
                     Text("\(occurences.count)")
                         .font(ConsoleConstants.fontBody)
