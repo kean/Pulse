@@ -34,6 +34,7 @@ final class ConsoleSearchService {
 
     // TODO: cache response bodies in memory
     func search(in task: NetworkTaskEntity, parameters: ConsoleSearchParameters) -> [ConsoleSearchOccurence] {
+        Thread.sleep(forTimeInterval: 0.2)
         var occurences: [ConsoleSearchOccurence] = []
         for scope in ConsoleSearchScope.allCases {
             switch scope {

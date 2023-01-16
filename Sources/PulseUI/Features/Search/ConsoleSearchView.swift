@@ -42,13 +42,14 @@ struct ConsoleSearchView: View {
             ConsoleSearchSuggestedTokensView(viewModel: viewModel)
 
             if viewModel.isSearching || !viewModel.results.isEmpty {
-                HStack {
+                ZStack(alignment: .center) {
                     Text("\(viewModel.results.count) results with \(21) occurences")
                         .foregroundColor(.secondary)
                         .font(ConsoleConstants.fontBody)
                         .frame(maxWidth: .infinity, alignment: .center)
                     if viewModel.isSpinnerNeeded {
                         ProgressView()
+                                .frame(maxWidth: .infinity, alignment: .trailing)
                     }
                 }
                 .listRowBackground(Color.clear)
@@ -66,12 +67,6 @@ struct ConsoleSearchView: View {
                         ConsoleSearchResultView(viewModel: result)
                     }
                 }
-            }
-            if viewModel.isSpinnerNeeded {
-                ProgressView("Searching…")
-                    .listRowBackground(Color.clear)
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .id(UUID())
             }
             if !viewModel.isSearching && viewModel.hasMore {
                 Button(action: viewModel.buttonShowMoreResultsTapped) {
