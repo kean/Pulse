@@ -140,7 +140,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         }
 
         for scope in ConsoleSearchScope.allCases {
-            if (try? Parsers.prefixIgnoringCase(scope.title).parse(searchText)) != nil {
+            if (try? Parsers.filterName(scope.title).parse(searchText)) != nil {
                 var string = AttributedString("Search in ")
                 string.foregroundColor = .primary
                 string.append(scope.title) {

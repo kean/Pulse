@@ -6,10 +6,6 @@ import XCTest
 @testable import PulseUI
 
 final class ConsoleSearchTokenTests: XCTestCase {
-    func testIndividual() throws {
-
-    }
-
     func testStatusCodeFilter() throws {
         func parse(_ string: String) -> ConsoleSearchFilter.StatusCode? {
             try? Parsers.filterStatusCode.parse(string)
@@ -30,9 +26,18 @@ final class ConsoleSearchTokenTests: XCTestCase {
         XCTAssertEqual(parse("status code:   "), StatusCode(isNot: false, values: []))
         XCTAssertEqual(parse("   status   code:   "), StatusCode(isNot: false, values: []))
 
+        // Reordering
+        XCTAssertEqual(parse("code"), StatusCode(isNot: false, values: []))
+        XCTAssertEqual(parse("code:"), StatusCode(isNot: false, values: []))
+        XCTAssertEqual(parse("code sta:"), StatusCode(isNot: false, values: []))
+
+        // Typo
+        XCTAssertEqual(parse("sttus"), StatusCode(isNot: false, values: []))
+
         // Exact value
         XCTAssertEqual(parse("s200"), StatusCode(isNot: false, values: [.init(200)]))
         XCTAssertEqual(parse("s 200"), StatusCode(isNot: false, values: [.init(200)]))
+        XCTAssertEqual(parse("code 200"), StatusCode(isNot: false, values: [.init(200)]))
 
         // Closed range
         XCTAssertEqual(parse("s 200-300"), StatusCode(isNot: false, values: [.init(.closed, lowerBound: 200, upperBound: 300)]))

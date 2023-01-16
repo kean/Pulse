@@ -48,7 +48,6 @@ extension Parsers {
         }
     }
 
-#warning("replace with fuzzy search")
 
     /// Consumes the entire word if has the prefix of the given word.
     static func prefixIgnoringCase(_ prefix: String) -> Parser<Void> {
@@ -64,35 +63,23 @@ extension Parsers {
         }
     }
 
-    /// Checks if the word has fuzzy prefix with this word.
-    static func fuzzy(_ word: String) -> Parser<Void> {
+    /// Checks if the word has fuzzy prefix with the given word.
+    static func fuzzy(_ target: String) -> Parser<Void> {
         Parser { s in
-            let lhs = Array(s.lowercased())
-            let rhs = Array(word.lowercased())
-            let count = min(lhs.count, rhs.count) // Check only the prefix
-            guard count > 0 else {
+            let word = s.prefix(while: { $0.isLetter })
+            guard !word.isEmpty else {
                 return nil
             }
-            var map = [[Int]](
-                repeating: [Int](repeating: 0, count: count + 1),
-                count: count + 1
-            )
-            for i in 1...count {
-                for j in 1...count {
-                    map[i][j] = (lhs[i-1] == rhs[j-1] ? 0 : 1) + min(
-                        map[i-1][j], map[i][j-1], map[i-1][j-1]
-                    )
-                }
-            }
+            // Check only the prefix
+            let count = min(word.count, target.count)
+            let lhs = word.prefix(count).lowercased()
+            let rhs = target.prefix(count).lowercased()
 
-            #warning("TODO: this isn't ideal")
-            let distance = map[count][count]
-            print("distance: ", distance, "count: ", count, String(lhs), String(rhs))
-            guard (count < 3 && distance < 1) ||
-                    (count < 6 && distance < 2) ||
-                    distance < 3 else {
-                return nil
-            }
+            let distance = lhs.distance(to: rhs)
+            if count < 3 && distance > 0 { return nil }
+            if count < 6 && distance > 1 { return nil }
+            if distance > 2 { return nil }
+
             var s = s
             s.consume(while: \.isLetter)
             s.consume(while: \.isWhitespace)

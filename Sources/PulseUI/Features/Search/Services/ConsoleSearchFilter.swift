@@ -22,11 +22,6 @@ extension Parsers {
         assert(!words.isEmpty)
         let anyWords = oneOf(words.map(fuzzy)).zeroOrMore.map { _ in () }
         return anyWords <* optional(":") <* whitespaces
-//        var parser = prefixIgnoringCase(words[0])
-//        for word in words.dropFirst() {
-//            parser = parser <* whitespaces <* optional(prefixIgnoringCase(word))
-//        }
-//        return whitespaces <* parser <* optional(":") <* whitespaces
     }
 
     static let rangeOfInts: Parser<ConsoleSearchRange<Int>> = oneOf(
