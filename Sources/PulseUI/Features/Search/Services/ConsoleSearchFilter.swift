@@ -3,64 +3,60 @@
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import Foundation
+import Pulse
 
-protocol ConsoleSearchFilterProtocol {
+protocol ConsoleSearchFilterProtocol: Equatable, Hashable, Codable {
+    var name: String { get }
+    var valuesDescriptions: [String] { get }
+    var valueExample: String { get }
 
+    func isMatch(_ task: NetworkTaskEntity) -> Bool
 }
 
 enum ConsoleSearchFilter: Equatable, Hashable, Codable {
-    case statusCode(StatusCode)
-    case host(Host)
+    case statusCode(ConsoleSearchFilterStatusCode)
+    case host(ConsoleSearchFilterHost)
 
-    struct StatusCode: Equatable, Hashable, Codable {
-        var values: [ConsoleSearchRange<Int>]
+    // TODO: refactor
+    var filter: any ConsoleSearchFilterProtocol {
+        switch self {
+        case .statusCode(let filter): return filter
+        case .host(let filter): return filter
+        }
     }
 
-    struct Host: Equatable, Hashable, Codable {
-        var values: [String]
+    var name: String { filter.name }
+    var valuesDescriptions: [String] { filter.valuesDescriptions }
+    var valueExample: String { filter.valueExample }
+}
+
+struct ConsoleSearchFilterStatusCode: ConsoleSearchFilterProtocol {
+    var values: [ConsoleSearchRange<Int>]
+
+    var name: String { "Status Code" }
+    var valuesDescriptions: [String] { values.map(\.title) }
+    var valueExample: String { "200" }
+
+    func isMatch(_ task: NetworkTaskEntity) -> Bool {
+        values.compactMap { $0.range }.contains {
+            $0.contains(Int(task.statusCode))
+        }
     }
 }
 
-extension Parsers {
-    static let filterStatusCode = (filterName("status code") *> listOf(rangeOfInts))
-        .map(ConsoleSearchFilter.StatusCode.init)
+struct ConsoleSearchFilterHost: ConsoleSearchFilterProtocol {
+    var values: [String]
 
-    static let filterHost = (filterName("host") *> listOf(host))
-        .map(ConsoleSearchFilter.Host.init)
+    var name: String { "Host" }
+    var valuesDescriptions: [String] { values }
+    var valueExample: String { "example.com" }
 
-    static let host = char(from: .urlHostAllowed.subtracting(.init(charactersIn: ","))).oneOrMore.map { String($0) }
-
-    static func filterName(_ name: String) -> Parser<Void> {
-        let words = name.split(separator: " ").map { String($0) }
-        assert(!words.isEmpty)
-        let anyWords = oneOf(words.map(fuzzy)).oneOrMore.map { _ in () }
-        return anyWords <* optional(":") <* whitespaces
+    func isMatch(_ task: NetworkTaskEntity) -> Bool {
+        guard let host = task.url.flatMap(URL.init)?.host else {
+            return false
+        }
+        return values.contains { host.contains($0) }
     }
-
-    static let rangeOfInts: Parser<ConsoleSearchRange<Int>> = oneOf(
-        zip(int, rangeModifier, int).map { lowerBound, modifier, upperBound in
-            switch modifier {
-            case .open: return .init(.open, lowerBound: lowerBound, upperBound: upperBound)
-            case .closed: return .init(.closed, lowerBound: lowerBound, upperBound: upperBound)
-            }
-        },
-        int.map(ConsoleSearchRange.init)
-    )
-
-    static let not: Parser<Bool> = optional(oneOf(prefixIgnoringCase("not"), "!") *> whitespaces)
-        .map { $0 != nil }
-
-    /// A comma or space separated list.
-    static func listOf<T>(_ parser: Parser<T>) -> Parser<[T]> {
-        (parser <* optional(",") <* whitespaces).zeroOrMore
-    }
-
-    static let rangeModifier: Parser<ConsoleSearchRangeModfier> = whitespaces *> oneOf(
-        oneOf("-", "–", "<=", "...").map { _ in .closed }, // important: order
-        oneOf("<", ".<", "..<").map { _ in .open },
-        string("..").map { _ in .closed }
-    ) <* whitespaces
-
 }
 
 enum ConsoleSearchRangeModfier: Codable {

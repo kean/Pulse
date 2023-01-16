@@ -119,55 +119,35 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
 
         var suggestions: [ConsoleSearchSuggestion] = []
 
-        // Status Code
-        if let filter = try? Parsers.filterStatusCode.parse(searchText) {
-            var string = AttributedString("Status Code: ") {
+        func parse(_ parser: Parser<ConsoleSearchFilter>) {
+            guard let filter = try? parser.parse(searchText) else { return }
+
+            var string = AttributedString("\(filter.name): ") {
                 $0.foregroundColor = .primary
             }
-            if filter.values.isEmpty {
-                string.append("200, 400-404") { $0.foregroundColor = .secondary }
+            let values = filter.valuesDescriptions
+            if values.isEmpty {
+                string.append(filter.valueExample) { $0.foregroundColor = .secondary }
             } else {
-                for (index, value) in filter.values.enumerated() {
-                    string.append(value.title) { $0.foregroundColor = .blue }
-                    if index < filter.values.endIndex - 1 {
+                for (index, description) in values.enumerated() {
+                    string.append(description) { $0.foregroundColor = .blue }
+                    if index < values.endIndex - 1 {
                         string.append(", ") { $0.foregroundColor = .secondary }
                     }
                 }
             }
             suggestions.append(.init(text: string) {
-                if filter.values.isEmpty {
-                    self.searchBar.text = "Status Code: "
+                if values.isEmpty {
+                    self.searchBar.text = "\(filter.name): "
                 } else {
                     self.searchBar.text = ""
-                    self.searchBar.tokens.append(.filter(.statusCode(filter)))
+                    self.searchBar.tokens.append(.filter(filter))
                 }
             })
         }
 
-        // Host
-        if let filter = try? Parsers.filterHost.parse(searchText) {
-            var string = AttributedString("Host: ") {
-                $0.foregroundColor = .primary
-            }
-            if filter.values.isEmpty {
-                string.append("example.com") { $0.foregroundColor = .secondary }
-            } else {
-                for (index, value) in filter.values.enumerated() {
-                    string.append(value) { $0.foregroundColor = .blue }
-                    if index < filter.values.endIndex - 1 {
-                        string.append(", ") { $0.foregroundColor = .secondary }
-                    }
-                }
-            }
-            suggestions.append(.init(text: string) {
-                if filter.values.isEmpty {
-                    self.searchBar.text = "Host: "
-                } else {
-                    self.searchBar.text = ""
-                    self.searchBar.tokens.append(.filter(.host(filter)))
-                }
-            })
-        }
+        parse(Parsers.filterStatusCode)
+        parse(Parsers.filterHost)
 
         for scope in ConsoleSearchScope.allCases {
             if (try? Parsers.filterName(scope.title).parse(searchText)) != nil {

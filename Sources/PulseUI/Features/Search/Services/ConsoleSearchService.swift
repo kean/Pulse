@@ -16,28 +16,7 @@ final class ConsoleSearchService {
     private let helper = TextHelper()
 
     func isMatching(_ task: NetworkTaskEntity, filters: [ConsoleSearchFilter]) -> Bool {
-        for filter in filters {
-            if !isMatching(task, filter: filter) {
-                return false
-            }
-        }
-        return true
-    }
-
-#warning("TODO: host to support wildcards")
-
-    func isMatching(_ task: NetworkTaskEntity, filter: ConsoleSearchFilter) -> Bool {
-        switch filter {
-        case .statusCode(let filter):
-            return filter.values
-                .compactMap { $0.range }
-                .contains { $0.contains(Int(task.statusCode)) }
-        case .host(let filter):
-            guard let host = task.url.flatMap(URL.init)?.host else {
-                return false
-            }
-            return filter.values.contains { host.contains($0) }
-        }
+        filters.allSatisfy { $0.filter.isMatch(task) ?? true }
     }
 
     // TODO: cache response bodies in memory
