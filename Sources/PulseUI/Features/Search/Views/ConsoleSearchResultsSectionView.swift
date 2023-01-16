@@ -29,7 +29,6 @@ struct ConsoleSearchResultView: View {
                 HStack {
                     Text("Show All Occurences")
                         .font(ConsoleConstants.fontBody)
-                        .foregroundColor(.secondary)
                     Text("\(occurences.count)")
                         .font(ConsoleConstants.fontBody)
                         .foregroundColor(.secondary)
