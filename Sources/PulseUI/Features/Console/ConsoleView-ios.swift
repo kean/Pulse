@@ -133,14 +133,37 @@ private struct ConsoleContentView: View {
     let viewModel: ConsoleViewModel
     @Environment(\.isSearching) private var isSearching // important: scope
 
+    @State var isSearchViewVisible = false
+    @State var mainSearchViewOpacity = 1.0
+    @State var searchViewOpacity = 0.0
+
     var body: some View {
-        if isSearching {
+        if isSearchViewVisible {
             ConsoleSearchView(viewModel: viewModel.searchViewModel)
+                .opacity(searchViewOpacity)
                 .onAppear {
                     viewModel.searchViewModel.setEntities(viewModel.entities)
                 }
+                .onChange(of: isSearching) { newValue in
+                    isSearchViewVisible = newValue
+                    // Workaround for searchable animation issue
+                    DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(100)) {
+                        withAnimation {
+                            searchViewOpacity = 0
+                            mainSearchViewOpacity = 1
+                        }
+                    }
+                }
         } else {
             _ConsoleTableView(viewModel: viewModel)
+                .opacity(mainSearchViewOpacity)
+                .onChange(of: isSearching) { newValue in
+                    isSearchViewVisible = newValue
+                    withAnimation {
+                        searchViewOpacity = 1
+                        mainSearchViewOpacity = 0
+                    }
+                }
         }
     }
 }
