@@ -7,9 +7,12 @@ import Pulse
 import CoreData
 import Combine
 
+#warning("cache results for prefixes")
+#warning("preheat store with a sample operation")
 #warning("cache response bodies")
 #warning("save duplicated results for bodies")
 #warning("construct prefix searchtree or proper index (?)")
+#warning("add wildcards & regex support")
 
 @available(iOS 15, tvOS 15, *)
 final class ConsoleSearchService {
