@@ -168,7 +168,7 @@ private struct ConsoleContentView: View {
     }
 }
 
-private struct ConsoleToolbarView: View {
+struct ConsoleToolbarView: View {
     @ObservedObject var viewModel: ConsoleViewModel
     @State private var isShowingFilters = false
     @State private var messageCount = 0
