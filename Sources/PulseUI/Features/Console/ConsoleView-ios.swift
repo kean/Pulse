@@ -168,22 +168,6 @@ private struct ConsoleContentView: View {
     }
 }
 
-private struct ConsoleListView: View {
-    @ObservedObject var viewModel: ConsoleViewModel
-
-    var body: some View {
-        List {
-            Section(header: ConsoleToolbarView(viewModel: viewModel)) {
-                ForEach(viewModel.visibleEntities, id: \.objectID) { entity in
-                    ConsoleEntityCell(entity: entity)
-                        .onAppear { viewModel.didScroll(to: entity.objectID) }
-                }
-            }
-        }
-        .listStyle(.grouped)
-    }
-}
-
 private struct ConsoleToolbarView: View {
     @ObservedObject var viewModel: ConsoleViewModel
     @State private var isShowingFilters = false

@@ -81,16 +81,14 @@ private struct Siderbar: View {
     var viewModel: ConsoleViewModel
 
     var body: some View {
-        ConsoleTableView(viewModel: viewModel.table, onSelected: {
-            viewModel.details.select($0)
-        })
-        .toolbar {
-            ToolbarItemGroup(placement: .automatic) {
-                ConsoleToolbarItems(viewModel: viewModel)
+        ConsoleListView(viewModel: viewModel)
+            .toolbar {
+                ToolbarItemGroup(placement: .automatic) {
+                    ConsoleToolbarItems(viewModel: viewModel)
+                }
             }
-        }
-        .onAppear(perform: viewModel.onAppear)
-        .onDisappear(perform: viewModel.onDisappear)
+            .onAppear(perform: viewModel.onAppear)
+            .onDisappear(perform: viewModel.onDisappear)
     }
 }
 

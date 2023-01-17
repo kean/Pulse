@@ -45,8 +45,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     /// This exist strickly to workaround List performance issues
     private var scrollPosition: ScrollPosition = .nearTop
     private var visibleEntityCountLimit = fetchBatchSize
-    private var topObjectIDs: Set<NSManagedObjectID> = []
-    private var bottomObjectIDs: Set<NSManagedObjectID> = []
+    private var visibleObjectIDs: Set<NSManagedObjectID> = []
 
     private var controller: NSFetchedResultsController<NSManagedObject>?
     private var isActive = false
@@ -186,15 +185,23 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 
     private func refreshVisibleEntities() {
         visibleEntities = entities.prefix(visibleEntityCountLimit)
-        topObjectIDs = Set(visibleEntities.map(\.objectID).prefix(5))
-        bottomObjectIDs = Set(visibleEntities.map(\.objectID).suffix(5))
     }
 
-    func didScroll(to objectID: NSManagedObjectID) {
+    func onDisappearCell(with objectID: NSManagedObjectID) {
+        visibleObjectIDs.remove(objectID)
+        refreshScrollPosition()
+    }
+
+    func onAppearCell(with objectID: NSManagedObjectID) {
+        visibleObjectIDs.insert(objectID)
+        refreshScrollPosition()
+    }
+
+    private func refreshScrollPosition() {
         let scrollPosition: ScrollPosition
-        if topObjectIDs.contains(objectID) {
+        if visibleEntities.prefix(5).map(\.objectID).contains(where: visibleObjectIDs.contains) {
             scrollPosition = .nearTop
-        } else if bottomObjectIDs.contains(objectID) {
+        } else if visibleEntities.suffix(5).map(\.objectID).contains(where: visibleObjectIDs.contains) {
             scrollPosition = .nearBottom
         } else {
             scrollPosition = .middle

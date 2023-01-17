@@ -43,7 +43,9 @@ struct ConsoleSearchView: View {
                 }
                 .listRowBackground(Color.clear)
                 .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 0, trailing: 0))
+#if !os(macOS)
                 .listRowSeparator(.hidden)
+#endif
             }
 
             if viewModel.searchBar.text.count > 1 {
@@ -74,14 +76,14 @@ struct ConsoleSearchView: View {
 }
 
 #if DEBUG
-@available(iOS 16, tvOS 16, *)
+@available(iOS 16, tvOS 16, macOS 13, *)
 struct ConsoleSearchView_Previews: PreviewProvider {
     static var previews: some View {
         ConsoleSearchDemoView()
     }
 }
 
-@available(iOS 16, tvOS 16, *)
+@available(iOS 16, tvOS 16, macOS 13, *)
 private struct ConsoleSearchDemoView: View {
     @StateObject var viewModel: ConsoleSearchViewModel
     @ObservedObject var searchBarViewModel: ConsoleSearchBarViewModel

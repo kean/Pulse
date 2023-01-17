@@ -64,10 +64,14 @@ final class RichTextViewModel: ObservableObject {
         self.didUpdateMatches(matches)
         if context.matchIndex < matches.count {
             DispatchQueue.main.async {
+#if os(iOS)
                 self.textView?.layoutManager.allowsNonContiguousLayout = false // Remove this workaround
                 UIView.performWithoutAnimation {
                     self.updateMatchIndex(context.matchIndex)
                 }
+#else
+                self.updateMatchIndex(context.matchIndex)
+#endif
             }
         }
     }
