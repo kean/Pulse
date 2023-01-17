@@ -41,6 +41,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
 
     private let service = ConsoleSearchService()
 
+    private let queue = DispatchQueue(label: "com.github.pulse.console-search-view")
     private var cancellables: [AnyCancellable] = []
     private let context: NSManagedObjectContext
 
@@ -55,8 +56,12 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
 
         Publishers.CombineLatest(text, searchBar.$tokens.removeDuplicates()).sink { [weak self] in
             self?.didUpdateSearchCriteria($0, $1)
-            self?.updateSearchTokens(for: $0)
         }.store(in: &cancellables)
+
+        text
+            .receive(on: queue)
+            .sink { [weak self] in self?.updateSearchTokens(for: $0) }
+            .store(in: &cancellables)
 
         $isSearching
             .removeDuplicates()
@@ -176,8 +181,10 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
 
 #warning("TODO: priorize direct matches")
 
-        self.suggestedFilters = suggestedFilters
-        self.suggestedScopes = suggestedScopes
+        DispatchQueue.main.async {
+            self.suggestedFilters = suggestedFilters
+            self.suggestedScopes = suggestedScopes
+        }
     }
 
     func buttonShowMoreResultsTapped() {
