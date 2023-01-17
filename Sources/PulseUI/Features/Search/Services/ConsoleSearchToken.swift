@@ -4,27 +4,6 @@
 
 import Foundation
 
-// network:
-//
-// - "url" <value>
-// - "host" = <value> (+add commons hosts)
-// - "domain" = <value>
-// - "method" <value>
-// - "path" <value>
-// - "scheme" <value>
-// - "duration" ">=" "<=" <value>
-// - "\(kind)" "contains" <value>
-// - "type" data/download/upload/stream/socket
-// - "cookies" empty/non-empty/contains
-// - "timeout" >= <=
-// - "error"
-// - "size" >= <= <value>
-// - "error code" <value>
-// - "error decoding failed"
-// - "content-type" <value>
-// - "cached"
-// - "redirect"
-// - "pins"
 enum ConsoleSearchToken: Identifiable, Hashable, Codable {
     var id: ConsoleSearchToken { self }
 

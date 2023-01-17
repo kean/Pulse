@@ -17,6 +17,11 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     let details: ConsoleDetailsRouterViewModel
 #endif
 
+#warning("remove as much access for entities as possible")
+#warning("update list usage on macOS")
+#warning("remove custom disclosure icon")
+#warning("add missing swipe actions")
+    @Published private(set) var visibleEntities: ArraySlice<NSManagedObject> = []
     @Published private(set) var entities: [NSManagedObject] = []
     let entitiesSubject = CurrentValueSubject<[NSManagedObject], Never>([])
 
@@ -36,6 +41,12 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     @Published var filterTerm: String = ""
 
     var onDismiss: (() -> Void)?
+
+    /// This exist strickly to workaround List performance issues
+    private var scrollPosition: ScrollPosition = .nearTop
+    private var visibleEntityCountLimit = fetchBatchSize
+    private var topObjectIDs: Set<NSManagedObjectID> = []
+    private var bottomObjectIDs: Set<NSManagedObjectID> = []
 
     private var controller: NSFetchedResultsController<NSManagedObject>?
     private var isActive = false
@@ -153,16 +164,57 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         self.table.diff = diff
 #endif
         withAnimation {
-            reloadMessages()
+            reloadMessages(isMandatory: false)
         }
     }
 
-    private func reloadMessages() {
+    private func reloadMessages(isMandatory: Bool = true) {
         entities = controller?.fetchedObjects ?? []
-#if os(iOS) || os(macOS)
-        table.entities = entities
-#endif
+        if isMandatory || scrollPosition == .nearTop {
+            refreshVisibleEntities()
+        }
     }
+
+    #warning("fix an issue with download progress not being reflected in new cells")
+    #warning("throttle updates to visibleEntities")
+
+    private enum ScrollPosition {
+        case nearTop
+        case middle
+        case nearBottom
+    }
+
+    private func refreshVisibleEntities() {
+        visibleEntities = entities.prefix(visibleEntityCountLimit)
+        topObjectIDs = Set(visibleEntities.map(\.objectID).prefix(5))
+        bottomObjectIDs = Set(visibleEntities.map(\.objectID).suffix(5))
+    }
+
+    func didScroll(to objectID: NSManagedObjectID) {
+        let scrollPosition: ScrollPosition
+        if topObjectIDs.contains(objectID) {
+            scrollPosition = .nearTop
+        } else if bottomObjectIDs.contains(objectID) {
+            scrollPosition = .nearBottom
+        } else {
+            scrollPosition = .middle
+        }
+
+        if scrollPosition != self.scrollPosition {
+            self.scrollPosition = scrollPosition
+            switch scrollPosition {
+            case .nearTop:
+                visibleEntityCountLimit = fetchBatchSize // Reset
+                refreshVisibleEntities()
+            case .middle:
+                break // Don't reload: too expensive and ruins gestures
+            case .nearBottom:
+                visibleEntityCountLimit += fetchBatchSize
+                refreshVisibleEntities()
+            }
+        }
+    }
+
 
     // MARK: - Sharing
 
@@ -182,6 +234,8 @@ private func makeFetchRequest(for mode: ConsoleViewModel.Mode) -> NSFetchRequest
         request = .init(entityName: "\(NetworkTaskEntity.self)")
         request.sortDescriptors = [NSSortDescriptor(keyPath: \NetworkTaskEntity.createdAt, ascending: false)]
     }
-    request.fetchBatchSize = 100
+    request.fetchBatchSize = fetchBatchSize
     return request
 }
+
+private let fetchBatchSize = 100

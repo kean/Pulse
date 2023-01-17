@@ -13,6 +13,8 @@ import Combine
 #warning("when typning, display only a few top suggested filters")
 #warning("when user is entering more messages, automatically refresh search results")
 #warning("possible to switch to List or make sure the content update without jumping using any other approach?")
+#warning("fix an issue where occurence twice in the same line (see imageKit in request body as example)")
+#warning("show palceholer when results are empty")
 
 @available(iOS 15, tvOS 15, *)
 struct ConsoleSearchView: View {
@@ -23,23 +25,27 @@ struct ConsoleSearchView: View {
             if viewModel.searchBar.isEmpty, !viewModel.recentSearches.isEmpty {
                 ConsoleSearchRecentSearchesView(viewModel: viewModel)
             }
-
             ConsoleSearchSuggestedTokensView(viewModel: viewModel)
-
-            if viewModel.isSearching || !viewModel.results.isEmpty {
-                ZStack(alignment: .center) {
-                    Text("\(viewModel.results.count) results with \(21) occurences")
-                        .foregroundColor(.secondary)
-                        .font(ConsoleConstants.fontBody)
-                        .frame(maxWidth: .infinity, alignment: .center)
-                    if viewModel.isSpinnerNeeded {
-                        ProgressView()
-                                .frame(maxWidth: .infinity, alignment: .trailing)
+            if !viewModel.searchBar.isEmpty {
+                HStack {
+                    Spacer()
+                    HStack(spacing: 14) {
+                        ZStack {
+                            if viewModel.isSpinnerNeeded {
+                                ProgressView()
+                            }
+                        }.frame(width: 10, height: 10)
+                        Text("\(viewModel.results.count) results with \(21) occurences")
+                            .foregroundColor(.secondary)
+                            .font(ConsoleConstants.fontBody)
                     }
+                    Spacer()
                 }
                 .listRowBackground(Color.clear)
                 .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 0, trailing: 0))
+                .listRowSeparator(.hidden)
             }
+
             if viewModel.searchBar.text.count > 1 {
                 ForEach(viewModel.results) { result in
                     Section {
@@ -62,7 +68,7 @@ struct ConsoleSearchView: View {
         .animation(nil)
         .environment(\.defaultMinListRowHeight, 0)
 #if os(iOS)
-        .listStyle(.insetGrouped)
+        .listStyle(.grouped)
 #endif
     }
 }

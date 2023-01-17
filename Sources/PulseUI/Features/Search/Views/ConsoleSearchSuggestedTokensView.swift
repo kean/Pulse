@@ -11,18 +11,31 @@ import Combine
 struct ConsoleSearchSuggestedTokensView: View {
     @ObservedObject var viewModel: ConsoleSearchViewModel
 
+    #warning("how do we decide what filters/scopes to suggest? use confidence for both?")
+
     var body: some View {
-        if !viewModel.suggestedFilters.isEmpty {
-            Section(header: Text("Suggested Filters")) {
-                ForEach(viewModel.suggestedFilters) {
-                    ConsoleSearchSuggestionView(suggestion: $0, isActionable: viewModel.isActionable($0))
+        if viewModel.searchBar.isEmpty {
+            if !viewModel.suggestedFilters.isEmpty {
+                Section(header: Text("Suggested Filters")) {
+                    ForEach(viewModel.suggestedFilters) {
+                        ConsoleSearchSuggestionView(suggestion: $0, isActionable: viewModel.isActionable($0))
+                    }
                 }
             }
-        }
-        if !viewModel.suggestedScopes.isEmpty {
-            Section(header: Text("Suggested Scopes")) {
-                ForEach(viewModel.suggestedScopes) {
-                    ConsoleSearchSuggestionView(suggestion: $0, isActionable: viewModel.isActionable($0))
+            if !viewModel.suggestedScopes.isEmpty {
+                Section(header: Text("Suggested Scopes")) {
+                    ForEach(viewModel.suggestedScopes) {
+                        ConsoleSearchSuggestionView(suggestion: $0, isActionable: viewModel.isActionable($0))
+                    }
+                }
+            }
+        } else {
+            // Show suggestions in a single group with no header to save verical space
+            if !viewModel.suggestedFilters.isEmpty || !viewModel.suggestedScopes.isEmpty {
+                Section {
+                    ForEach((viewModel.suggestedFilters + viewModel.suggestedScopes).prefix(3)) {
+                        ConsoleSearchSuggestionView(suggestion: $0, isActionable: viewModel.isActionable($0))
+                    }
                 }
             }
         }

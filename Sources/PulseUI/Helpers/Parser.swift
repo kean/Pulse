@@ -49,6 +49,7 @@ extension Parsers {
         }
     }
 
+    #warning("TODO: remove this")
 
     /// Consumes the entire word if has the prefix of the given word.
     static func prefixIgnoringCase(_ prefix: String) -> Parser<Void> {
@@ -57,32 +58,6 @@ extension Parsers {
             guard !word.isEmpty && prefix.range(of: word, options: [.anchored, .caseInsensitive]) != nil else {
                 return nil
             }
-            var s = s
-            s.consume(while: \.isLetter)
-            s.consume(while: \.isWhitespace)
-            return ((), s)
-        }
-    }
-
-    /// Checks if the word has fuzzy prefix with the given word.
-    static func fuzzy(_ target: String) -> Parser<Void> {
-        Parser { s in
-            let word = s.prefix(while: { $0.isLetter })
-            guard !word.isEmpty else {
-                return nil
-            }
-            guard word.first?.lowercased() == target.first?.lowercased() else {
-                return nil // Fuzzy, but not too fuzzy
-            }
-            // Check only the prefix
-            let lhs = word.lowercased()
-            let rhs = target.lowercased()
-
-            let distance = lhs.distance(to: rhs) - abs(word.count - target.count)
-            if word.count < 3 && distance > 0 { return nil }
-            if word.count < 6 && distance > 1 { return nil }
-            if distance > 2 { return nil }
-
             var s = s
             s.consume(while: \.isLetter)
             s.consume(while: \.isWhitespace)
@@ -320,7 +295,43 @@ private extension Substring {
     }
 }
 
+struct Confidence: Hashable, Comparable, ExpressibleByFloatLiteral {
+    let rawValue: Float
+
+    init(floatLiteral value: FloatLiteralType) {
+        self.rawValue = max(0, min(1, Float(value)))
+    }
+
+    init(_ rawValue: Float) {
+        self.rawValue = max(0, min(1, rawValue))
+    }
+
+    static func < (lhs: Confidence, rhs: Confidence) -> Bool {
+        lhs.rawValue < rhs.rawValue
+    }
+}
+
 extension String {
+    /// A fuzzy check for the given word. Always consumes a word. Returns
+    /// a confidence level in a range of 0...1.
+    func fuzzyMatch(_ target: String) -> Confidence {
+        guard !target.isEmpty else {
+            return 0.0
+        }
+        let lhs = self.lowercased()
+        let rhs = target.lowercased()
+
+        let prefixCount = min(lhs.count, rhs.count)
+
+        let fullDistance = lhs.distance(to: rhs)
+        let prefixDistance = String(lhs.prefix(prefixCount)).distance(to: String(rhs.prefix(prefixCount)))
+
+        let prefixConfidence = 1 - (Float(prefixDistance) / Float(prefixCount))
+        let fullConfidence = 1 - (Float(fullDistance) / Float(max(self.count, target.count)))
+
+        return Confidence((prefixConfidence * 3 + fullConfidence) / 4.0)
+    }
+
     func distance(to rhs: String) -> Int {
         guard !rhs.isEmpty else { return self.count }
         guard !self.isEmpty else { return rhs.count }

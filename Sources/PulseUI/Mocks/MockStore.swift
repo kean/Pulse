@@ -25,7 +25,7 @@ extension LoggerStore {
         return store
     }()
 
-    func startPopulating(isIndefinite: Bool = false) {
+    func startPopulating(isIndefinite: Bool = true) {
         func populate() {
             asyncPopulateStore(self)
             if isIndefinite {

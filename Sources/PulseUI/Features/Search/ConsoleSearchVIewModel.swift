@@ -12,7 +12,7 @@ final class ConsoleSearchBarViewModel: ObservableObject {
     @Published var tokens: [ConsoleSearchToken] = []
 
     var isEmpty: Bool {
-        text.isEmpty && tokens.isEmpty
+        text.trimmingCharacters(in: .whitespaces).isEmpty && tokens.isEmpty
     }
 }
 
@@ -111,8 +111,34 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     private func updateSearchTokens(for searchText: String) {
         guard #available(iOS 16, tvOS 16, *) else { return }
 
+#warning("dont show full suggestions when have search results ")
+#warning("fix keybord cursor jumping")
+#warning("fix 'res' not returning response scope")
+#warning("easier way to manage these suggestions")
+#warning("add suggestions based on input, e.g. input range")
+#warning("finish this prototype")
+#warning("different styles for filters and completions")
+#warning("dont show suggestion when its not specific enough")
+#warning("search like in xcode with first letter only")
+#warning("make it all case insensitive")
+#warning("if you are only entering values, what to suggest?")
+#warning("filtes and scopes in separate categories")
+
+#warning("TODO: priorize direct matches")
+
+        let suggestedFilters = makeSuggestedFilters(for: searchText)
+        let suggestedScopes = makeSuggestedScopes(for: searchText)
+
+        DispatchQueue.main.async {
+            self.suggestedFilters = suggestedFilters
+            self.suggestedScopes = suggestedScopes
+        }
+    }
+
+    func makeSuggestedFilters(for searchText: String) -> [ConsoleSearchSuggestion] {
+        guard #available(iOS 16, tvOS 16, *) else { return [] }
+
         var suggestedFilters: [ConsoleSearchSuggestion] = []
-        var suggestedScopes: [ConsoleSearchSuggestion] = []
 
         func add(_ filter: ConsoleSearchFilter) {
             var string = AttributedString(filter.name + ": ") { $0.foregroundColor = .primary }
@@ -137,6 +163,23 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
             })
         }
 
+        if searchText.isEmpty {
+            add(ConsoleSearchFilter.statusCode(.init(values: [])))
+            add(ConsoleSearchFilter.host(.init(values: [])))
+            add(ConsoleSearchFilter.method(.init(values: [])))
+        } else {
+            Parsers.filters
+                .compactMap { try? $0.parse(searchText) }
+                .sorted(by: { $0.1 > $1.1 }) // Sort by confidence
+                .forEach { add($0.0) }
+        }
+
+        return suggestedFilters
+    }
+
+    func makeSuggestedScopes(for searchText: String) -> [ConsoleSearchSuggestion] {
+        var suggestedScopes: [ConsoleSearchSuggestion] = []
+
         func add(_ scope: ConsoleSearchScope) {
             var string = AttributedString("Search in ") { $0.foregroundColor = .primary }
             string.append(scope.title) { $0.foregroundColor = .blue }
@@ -149,43 +192,21 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         let allScopes = ConsoleSearchScope.allCases.filter { $0 != .originalRequestHeaders }
 
         if searchText.isEmpty {
-            add(ConsoleSearchFilter.statusCode(.init(values: [])))
-            add(ConsoleSearchFilter.host(.init(values: [])))
-            add(ConsoleSearchFilter.method(.init(values: [])))
-
             for scope in allScopes {
                 add(scope)
             }
         } else {
-            for filter in (try? Parsers.filters.parse(searchText)) ?? [] {
-                add(filter)
-            }
             for scope in allScopes {
                 if (try? Parsers.filterName(scope.title).parse(searchText)) != nil {
                     add(scope)
                 }
             }
         }
-#warning("dont show full suggestions when have search results ")
-#warning("fix keybord cursor jumping")
-#warning("fix 'res' not returning response scope")
-#warning("easier way to manage these suggestions")
-#warning("add suggestions based on input, e.g. input range")
-#warning("finish this prototype")
-#warning("different styles for filters and completions")
-#warning("dont show suggestion when its not specific enough")
-#warning("search like in xcode with first letter only")
-#warning("make it all case insensitive")
-#warning("if you are only entering values, what to suggest?")
-#warning("filtes and scopes in separate categories")
 
-#warning("TODO: priorize direct matches")
-
-        DispatchQueue.main.async {
-            self.suggestedFilters = suggestedFilters
-            self.suggestedScopes = suggestedScopes
-        }
+        return suggestedScopes
     }
+
+    // MARK: Misc
 
     func buttonShowMoreResultsTapped() {
         isSearching = true

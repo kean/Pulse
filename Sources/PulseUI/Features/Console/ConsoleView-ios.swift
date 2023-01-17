@@ -72,7 +72,7 @@ struct _ConsoleView: View {
         if #available(iOS 15, *) {
             _ConsoleContentView(viewModel: viewModel)
         } else {
-            _ConsoleTableView(viewModel: viewModel)
+            ConsoleListView(viewModel: viewModel)
         }
     }
 
@@ -155,7 +155,7 @@ private struct ConsoleContentView: View {
                     }
                 }
         } else {
-            _ConsoleTableView(viewModel: viewModel)
+            ConsoleListView(viewModel: viewModel)
                 .opacity(mainSearchViewOpacity)
                 .onChange(of: isSearching) { newValue in
                     isSearchViewVisible = newValue
@@ -168,15 +168,19 @@ private struct ConsoleContentView: View {
     }
 }
 
-private struct _ConsoleTableView: View {
-    let viewModel: ConsoleViewModel
+private struct ConsoleListView: View {
+    @ObservedObject var viewModel: ConsoleViewModel
 
     var body: some View {
-        ConsoleTableView(
-            header: { ConsoleToolbarView(viewModel: viewModel) },
-            viewModel: viewModel.table,
-            detailsViewModel: viewModel.details
-        )
+        List {
+            Section(header: ConsoleToolbarView(viewModel: viewModel)) {
+                ForEach(viewModel.visibleEntities, id: \.objectID) { entity in
+                    ConsoleEntityCell(entity: entity)
+                        .onAppear { viewModel.didScroll(to: entity.objectID) }
+                }
+            }
+        }
+        .listStyle(.grouped)
     }
 }
 
@@ -196,7 +200,8 @@ private struct ConsoleToolbarView: View {
                 filters
             }
             .buttonStyle(.plain)
-            .padding(.vertical, 4)
+            .padding(.bottom, 4)
+            .padding(.top, -10)
         }
         .sheet(isPresented: $isShowingFilters) {
             NavigationView {
