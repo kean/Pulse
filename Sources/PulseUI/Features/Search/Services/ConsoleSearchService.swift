@@ -17,6 +17,7 @@ import Combine
 @available(iOS 15, tvOS 15, *)
 final class ConsoleSearchService {
     private let helper = TextHelper()
+    private let cachedBodies = Cache<NSManagedObjectID, NSString>(costLimit: 16_000_000, countLimit: 1000)
 
     func isMatching(_ task: NetworkTaskEntity, filters: [ConsoleSearchFilter]) -> Bool {
         filters.allSatisfy { $0.filter.isMatch(task) }
@@ -48,16 +49,16 @@ final class ConsoleSearchService {
                     occurences += search(headers as NSString, parameters, scope)
                 }
             case .requestBody:
-                if let data = task.requestBody?.data {
-                    occurences += search(data, parameters, scope)
+                if let string = task.requestBody.flatMap(getBodyString) {
+                    occurences += search(string, parameters, scope)
                 }
             case .responseHeaders:
                 if let headers = task.response?.httpHeaders {
                     occurences += search(headers as NSString, parameters, scope)
                 }
             case .responseBody:
-                if let data = task.responseBody?.data {
-                    occurences += search(data, parameters, scope)
+                if let string = task.responseBody.flatMap(getBodyString) {
+                    occurences += search(string, parameters, scope)
                 }
             }
         }
@@ -70,6 +71,8 @@ final class ConsoleSearchService {
         }
         return search(content, parameters, scope)
     }
+
+#warning("rewrite using Regex and String")
 
     private func search(_ content: NSString, _ parameters: ConsoleSearchParameters, _ scope: ConsoleSearchScope) -> [ConsoleSearchOccurence] {
         var allMatches: [(line: NSString, lineNumber: Int, range: NSRange)] = []
@@ -123,6 +126,19 @@ final class ConsoleSearchService {
         }
 
         return occurences
+    }
+
+    private func getBodyString(for blob: LoggerBlobHandleEntity) -> NSString? {
+        if let string = cachedBodies.value(forKey: blob.objectID)  {
+            return string
+        }
+        guard let data = blob.data,
+              let string = NSString(data: data, encoding: NSUTF8StringEncoding)
+        else {
+            return nil
+        }
+        cachedBodies.set(string, forKey: blob.objectID, cost: data.count)
+        return string
     }
 }
 

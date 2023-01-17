@@ -12,6 +12,7 @@ import Combine
 #warning("use return key to apply filter instead of performing search (?) what about recent searches then?")
 #warning("when typning, display only a few top suggested filters")
 #warning("when user is entering more messages, automatically refresh search results")
+#warning("possible to switch to List or make sure the content update without jumping using any other approach?")
 
 @available(iOS 15, tvOS 15, *)
 struct ConsoleSearchView: View {

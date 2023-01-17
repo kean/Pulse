@@ -83,6 +83,8 @@
 		0CB63A2F2975C43D00525165 /* ConsoleSearchScope.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A2D2975C40F00525165 /* ConsoleSearchScope.swift */; };
 		0CB63A322975E71700525165 /* ConsoleSearchRecentSearchesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A302975E6AF00525165 /* ConsoleSearchRecentSearchesView.swift */; };
 		0CB63A352976028F00525165 /* ConsoleSearchFilter+Parsers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A332976028B00525165 /* ConsoleSearchFilter+Parsers.swift */; };
+		0CB63A382976225400525165 /* Cache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A362976224600525165 /* Cache.swift */; };
+		0CB63A3B2976229200525165 /* LinkedList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A392976227500525165 /* LinkedList.swift */; };
 		0CCBDDC02610BDBC00DCB60C /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CFF9BD825D6199A0069DB6A /* repos.json */; };
 		0CD7E0BD29732C8E00A255B7 /* ShareStoreTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD7E0BC29732C8E00A255B7 /* ShareStoreTask.swift */; };
 		0CDC3BEA2970FA47003BD1FF /* ConsoleSearchListSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CDC3BE92970FA47003BD1FF /* ConsoleSearchListSelectionView.swift */; };
@@ -544,6 +546,8 @@
 		0CB63A2D2975C40F00525165 /* ConsoleSearchScope.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchScope.swift; sourceTree = "<group>"; };
 		0CB63A302975E6AF00525165 /* ConsoleSearchRecentSearchesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchRecentSearchesView.swift; sourceTree = "<group>"; };
 		0CB63A332976028B00525165 /* ConsoleSearchFilter+Parsers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ConsoleSearchFilter+Parsers.swift"; sourceTree = "<group>"; };
+		0CB63A362976224600525165 /* Cache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cache.swift; sourceTree = "<group>"; };
+		0CB63A392976227500525165 /* LinkedList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkedList.swift; sourceTree = "<group>"; };
 		0CD7E0BC29732C8E00A255B7 /* ShareStoreTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareStoreTask.swift; sourceTree = "<group>"; };
 		0CDC3BE92970FA47003BD1FF /* ConsoleSearchListSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchListSelectionView.swift; sourceTree = "<group>"; };
 		0CDC3BEC2971B936003BD1FF /* ConsoleSearchLogLevelsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchLogLevelsCell.swift; sourceTree = "<group>"; };
@@ -1193,6 +1197,8 @@
 				0CF0D584296F189500EED9D4 /* LoggerSync.swift */,
 				0CF0D585296F189500EED9D4 /* ManagedObjectTextSearch.swift */,
 				0CF0D587296F189500EED9D4 /* DecodingErrorsPreviews.swift */,
+				0CB63A362976224600525165 /* Cache.swift */,
+				0CB63A392976227500525165 /* LinkedList.swift */,
 				0CF0D580296F189500EED9D4 /* Deprecated.swift */,
 			);
 			path = Helpers;
@@ -2028,6 +2034,7 @@
 				0C40C09A296F77F1009ECF16 /* ConsoleSearchToggleCell.swift in Sources */,
 				0CF0D656296F189600EED9D4 /* RemoteLoggerSettingsView.swift in Sources */,
 				0CF0D65C296F189600EED9D4 /* ConsoleMessageMetadataView.swift in Sources */,
+				0CB63A3B2976229200525165 /* LinkedList.swift in Sources */,
 				0CF0D615296F189600EED9D4 /* LoggerSync.swift in Sources */,
 				0CF0D62C296F189600EED9D4 /* WebView.swift in Sources */,
 				0CF0D635296F189600EED9D4 /* InfoRow.swift in Sources */,
@@ -2066,6 +2073,7 @@
 				0CF0D638296F189600EED9D4 /* ImageViewer.swift in Sources */,
 				0CF0D67B296F189600EED9D4 /* ConsoleView-tvos.swift in Sources */,
 				0CF0D66B296F189600EED9D4 /* NetworkCookiesCell.swift in Sources */,
+				0CB63A382976225400525165 /* Cache.swift in Sources */,
 				0CF0D631296F189600EED9D4 /* RichTextViewModel.swift in Sources */,
 				0CF0D673296F189600EED9D4 /* NetworkDetailsView.swift in Sources */,
 				0C40C0A0296F7BD3009ECF16 /* ConsoleSearchStatusCodeCell.swift in Sources */,
