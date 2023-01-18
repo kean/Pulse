@@ -182,7 +182,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         if operation === self.operation {
             if let dirtyDate = dirtyDate {
                 self.buffer += results
-                if Date().timeIntervalSince(dirtyDate) > 0.2 {
+                if Date().timeIntervalSince(dirtyDate) > 0.25 {
                     self.dirtyDate = nil
                     self.results = buffer
                     self.buffer = []
@@ -226,7 +226,6 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
             suggestion.onTap()
             return
         }
-        #warning("do we need this?")
         let searchTerm = searchBar.text.trimmingCharacters(in: .whitespaces)
         guard !searchTerm.isEmpty else {
             return
@@ -302,7 +301,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         queue.async {
             let topSuggestions: [ConsoleSearchSuggestion]
             let suggestedScopes: [ConsoleSearchSuggestion]
-            if searchText.isEmpty {
+            if self.searchBar.isEmpty {
                 topSuggestions = self.makeDefaultSuggestedFilters()
                 suggestedScopes = self.makeDefaultSuggestedScopes()
             } else {
@@ -317,6 +316,10 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     }
 
     private func makeTopSuggestions(searchText: String, hosts: [String]) -> [ConsoleSearchSuggestion] {
+        guard !searchText.isEmpty else {
+            return [] // This is an opportunity to return recently used ones
+        }
+
         var filters = Parsers.filters
             .compactMap { try? $0.parse(searchText) }
             .sorted(by: { $0.1 > $1.1 }) // Sort by confidence
@@ -345,13 +348,18 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         let plainSearchSuggestion = ConsoleSearchSuggestion(text: {
             AttributedString("Contains: ") { $0.foregroundColor = .primary } +
             AttributedString(searchText) { $0.foregroundColor = .blue }
-        }(), onTap: {
+        }(), isReady: true, onTap: {
             self.convertCurrentSearchTextToToken()
         })
 
-        return Array(allSuggestions
+        let topSuggestions = Array(allSuggestions
             .sorted(by: { $0.1 > $1.1 }) // Sort by confidence
-            .map { $0.0 }.prefix(3)) + [plainSearchSuggestion]
+            .map { $0.0 }.prefix(3))
+        if topSuggestions.first?.isReady ?? false {
+            return topSuggestions + [plainSearchSuggestion]
+        } else {
+            return [plainSearchSuggestion] + topSuggestions
+        }
     }
 
     // TODO: do it on the Parser level
@@ -406,7 +414,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
                 }
             }
         }
-        return ConsoleSearchSuggestion(text: string) {
+        return ConsoleSearchSuggestion(text: string, isReady: !values.isEmpty) {
             if values.isEmpty {
                 self.searchBar.text = filter.name + ": "
             } else {
@@ -419,15 +427,14 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     private func makeSuggestion(for scope: ConsoleSearchScope) -> ConsoleSearchSuggestion {
         var string = AttributedString("Search in ") { $0.foregroundColor = .primary }
         string.append(scope.title) { $0.foregroundColor = .blue }
-        return ConsoleSearchSuggestion(text: string) {
+        return ConsoleSearchSuggestion(text: string, isReady: true) {
             self.searchBar.text = ""
             self.searchBar.tokens.append(.scope(scope))
         }
     }
 
-    #warning("this should be work only if parameters are there")
     func isActionable(_ suggestion: ConsoleSearchSuggestion) -> Bool {
-        topSuggestions.count == 1 && suggestion.id == topSuggestions[0].id
+        suggestion.id == topSuggestions[0].id && suggestion.isReady
     }
 }
 
@@ -435,6 +442,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
 struct ConsoleSearchSuggestion: Identifiable {
     let id = UUID()
     let text: AttributedString
+    let isReady: Bool
     var onTap: () -> Void
 }
 
