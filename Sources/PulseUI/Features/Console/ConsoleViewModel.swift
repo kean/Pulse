@@ -13,9 +13,6 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     let store: LoggerStore
 
 #warning("remove as much access for entities as possible")
-#warning("update list usage on macOS")
-#warning("remove custom disclosure icon")
-#warning("add missing swipe actions")
     @Published private(set) var visibleEntities: ArraySlice<NSManagedObject> = []
     @Published private(set) var entities: [NSManagedObject] = []
     let entitiesSubject = CurrentValueSubject<[NSManagedObject], Never>([])
