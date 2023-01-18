@@ -12,7 +12,6 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     let isNetworkOnly: Bool
     let store: LoggerStore
 
-#warning("remove as much access for entities as possible")
     @Published private(set) var visibleEntities: ArraySlice<NSManagedObject> = []
     @Published private(set) var entities: [NSManagedObject] = []
     let entitiesSubject = CurrentValueSubject<[NSManagedObject], Never>([])
@@ -166,9 +165,6 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
             refreshVisibleEntities()
         }
     }
-
-    #warning("fix an issue with download progress not being reflected in new cells")
-    #warning("throttle updates to visibleEntities")
 
     private enum ScrollPosition {
         case nearTop

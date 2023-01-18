@@ -49,8 +49,6 @@ extension Parsers {
         }
     }
 
-    #warning("TODO: remove this")
-
     /// Consumes the entire word if has the prefix of the given word.
     static func prefixIgnoringCase(_ prefix: String) -> Parser<Void> {
         Parser { s in
