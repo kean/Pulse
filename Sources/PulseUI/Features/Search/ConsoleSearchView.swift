@@ -16,36 +16,27 @@ import Combine
 #warning("fix an issue where occurence twice in the same line (see imageKit in request body as example)")
 #warning("show palceholer when results are empty")
 
+
+#warning("create ConsoleSearchViewModel here as configure with ConsoleViewModel")
+
 @available(iOS 15, tvOS 15, *)
 struct ConsoleSearchView: View {
     @ObservedObject var viewModel: ConsoleSearchViewModel
+    let consoleViewModel: ConsoleViewModel
+
+    init(viewModel: ConsoleViewModel) {
+        self.consoleViewModel = viewModel
+        self.viewModel = viewModel.searchViewModel
+    }
 
     var body: some View {
+        Section(header: ConsoleToolbarView(title: viewModel.toolbarTitle, viewModel: consoleViewModel)) {
+            Text("In progress")
+        }
         if viewModel.searchBar.isEmpty, !viewModel.recentSearches.isEmpty {
             ConsoleSearchRecentSearchesView(viewModel: viewModel)
         }
         ConsoleSearchSuggestedTokensView(viewModel: viewModel)
-        if !viewModel.searchBar.isEmpty {
-            HStack {
-                Spacer()
-                HStack(spacing: 14) {
-                    ZStack {
-                        if viewModel.isSpinnerNeeded {
-                            ProgressView()
-                        }
-                    }.frame(width: 10, height: 10)
-                    Text("\(viewModel.results.count) results with \(21) occurences")
-                        .foregroundColor(.secondary)
-                        .font(ConsoleConstants.fontBody)
-                }
-                Spacer()
-            }
-            .listRowBackground(Color.clear)
-            .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 0, trailing: 0))
-#if os(iOS)
-            .listRowSeparator(.hidden)
-#endif
-        }
 
         if viewModel.searchBar.text.count > 1 {
             ForEach(viewModel.results) { result in
@@ -67,48 +58,3 @@ struct ConsoleSearchView: View {
         }
     }
 }
-
-#if DEBUG
-@available(iOS 16, tvOS 16, macOS 13, *)
-struct ConsoleSearchView_Previews: PreviewProvider {
-    static var previews: some View {
-        ConsoleSearchDemoView()
-    }
-}
-
-@available(iOS 16, tvOS 16, macOS 13, *)
-private struct ConsoleSearchDemoView: View {
-    @StateObject var viewModel: ConsoleSearchViewModel
-    @ObservedObject var searchBarViewModel: ConsoleSearchBarViewModel
-
-    init() {
-        let viewModel = ConsoleSearchViewModel(entities: try! LoggerStore.mock.allMessages(), store: .mock)
-        _viewModel = StateObject(wrappedValue: viewModel)
-        searchBarViewModel = viewModel.searchBar
-    }
-
-    var body: some View {
-        NavigationView {
-            List {
-                ConsoleSearchView(viewModel: viewModel)
-            }
-#if os(iOS) || os(macOS)
-                .searchable(text: $searchBarViewModel.text, tokens: $searchBarViewModel.tokens, token: {
-                    Label($0.title, systemImage: $0.systemImage)
-                })
-#else
-                .searchable(text: $searchBarViewModel.text)
-#endif
-                .onSubmit(of: .search) {
-                    viewModel.onSubmitSearch()
-                }
-                .onAppear {
-//                    viewModel.searchBar.text = "Nuke"
-                }
-        }
-#if os(watchOS)
-        .navigationViewStyle(.stack)
-#endif
-    }
-}
-#endif

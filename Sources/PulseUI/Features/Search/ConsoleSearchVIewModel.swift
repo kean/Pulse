@@ -32,6 +32,15 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     // important: if you reload the view with searchable quickly during typing, it crashes and burns
     let searchBar = ConsoleSearchBarViewModel()
 
+    #warning("remove hardcoded occurences")
+    var toolbarTitle: String {
+        if searchBar.isEmpty {
+            return "Suggested Filters"
+        } else {
+            return "\(results.count) results with \(21) occurences"
+        }
+    }
+
     private var dirtyDate: Date?
     private var buffer: [ConsoleSearchResultViewModel] = []
     private var operation: ConsoleSearchOperation?

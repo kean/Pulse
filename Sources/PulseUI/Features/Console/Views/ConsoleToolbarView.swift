@@ -17,17 +17,15 @@ struct ConsoleToolbarView: View {
     @State private var isSearching = false
 
     var body: some View {
-        VStack {
-            HStack(spacing: 0) {
-                Text(title)
-                    .foregroundColor(.secondary)
-                Spacer()
-                filters
-            }
-            .buttonStyle(.plain)
-            .padding(.bottom, 4)
-            .padding(.top, -10)
+        HStack(alignment: .bottom, spacing: 0) {
+            Text(title)
+                .foregroundColor(.secondary)
+            Spacer()
+            filters
+                .padding(.bottom, 4)
         }
+        .buttonStyle(.plain)
+        .padding(.top, -10)
         .sheet(isPresented: $isShowingFilters) {
             NavigationView {
                 ConsoleSearchCriteriaView(viewModel: viewModel.searchCriteriaViewModel)

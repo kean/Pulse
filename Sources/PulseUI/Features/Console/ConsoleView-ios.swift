@@ -144,12 +144,15 @@ private struct _ConsoleSearchableContentView: View {
 
     var body: some View {
         if isSearching {
-            _ConsoleSearchContentView(mainViewModel: viewModel, viewModel: viewModel.searchViewModel)
+            ConsoleSearchView(viewModel: viewModel)
         } else {
             _ConsoleRegularContentView(viewModel: viewModel)
         }
     }
 }
+
+#warning("test core data fetches make sure there is only one")
+#warning("extract .entities somewhere else so that we can have fewer view reloads")
 
 private struct _ConsoleRegularContentView: View {
     @ObservedObject var viewModel: ConsoleViewModel
@@ -162,23 +165,6 @@ private struct _ConsoleRegularContentView: View {
 }
 
 #warning("pass entities to ConsoleSearchView properly")
-#warning("refactor how toolbar is added and make it work for search view too")
-@available(iOS 15, *)
-private struct _ConsoleSearchContentView: View {
-    let mainViewModel: ConsoleViewModel
-    @ObservedObject var viewModel: ConsoleSearchViewModel
-
-    var body: some View {
-        Section(header: ConsoleToolbarView(title: "test", viewModel: mainViewModel)) {
-            ForEach(viewModel.suggestedFilters) {
-                ConsoleSearchSuggestionView(suggestion: $0, isActionable: viewModel.isActionable($0))
-            }
-        }
-        ConsoleSearchView(viewModel: viewModel)
-    }
-}
-
-
 
 #if DEBUG
 struct ConsoleView_Previews: PreviewProvider {
