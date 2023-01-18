@@ -7,9 +7,6 @@ import Pulse
 import CoreData
 import Combine
 
-#warning("reimplement filters (ConsoleSearchBarViewModel) should perform filter (or should it?)")
-#warning("fix how isActiveSuggestion works")
-
 final class ConsoleSearchBarViewModel: ObservableObject {
     @Published var text: String = ""
     @Published var tokens: [ConsoleSearchToken] = []
@@ -24,7 +21,6 @@ final class ConsoleSearchBarViewModel: ObservableObject {
 }
 
 #warning("replace isSearching with operation != nil")
-#warning("remove filters and scropes from suggestions that are already used")
 
 @available(iOS 15, tvOS 15, *)
 final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDelegate {
@@ -47,11 +43,6 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     @Published private(set)var isSearching = false
 
     @Published var recentSearches: [ConsoleSearchParameters] = []
-
-    #warning("sort by confidence instead")
-    var allSuggestions: [ConsoleSearchSuggestion] {
-        (topSuggestions + suggestedScopes)
-    }
 
     let searchBar: ConsoleSearchBarViewModel
 
@@ -281,20 +272,6 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
 
     private func updateSearchTokens(for searchText: String) {
         guard #available(iOS 16, tvOS 16, *) else { return }
-
-#warning("dont show full suggestions when have search results ")
-#warning("fix keybord cursor jumping")
-#warning("easier way to manage these suggestions")
-#warning("add suggestions based on input, e.g. input range")
-#warning("finish this prototype")
-#warning("different styles for filters and completions")
-#warning("dont show suggestion when its not specific enough")
-#warning("search like in xcode with first letter only")
-#warning("make it all case insensitive")
-#warning("if you are only entering values, what to suggest?")
-#warning("filtes and scopes in separate categories")
-
-#warning("TODO: priorize direct matches")
 
         let hosts = hosts.objects.map(\.value)
 
