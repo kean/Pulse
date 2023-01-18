@@ -141,6 +141,17 @@ struct ConsoleSearchRange<T: Hashable & Comparable & Codable>: Hashable, Codable
 
     var title: String {
         guard upperBound > lowerBound else { return "\(lowerBound)" }
+        if let lowerBound = lowerBound as? Int, let upperBound = upperBound as? Int {
+            let upperBound = modifier == .closed ? upperBound + 1 : upperBound
+            switch (lowerBound, upperBound) { // Not ideal to put it here
+            case (100, 200): return "1XX"
+            case (200, 300): return "2XX"
+            case (300, 400): return "3XX"
+            case (400, 500): return "4XX"
+            case (500, 600): return "5XX"
+            default: break
+            }
+        }
         switch modifier {
         case .open: return "\(lowerBound)..<\(upperBound)"
         case .closed: return "\(lowerBound)...\(upperBound)"
@@ -150,7 +161,7 @@ struct ConsoleSearchRange<T: Hashable & Comparable & Codable>: Hashable, Codable
 
 extension ConsoleSearchRange where T == Int {
     var range: ClosedRange<Int>? {
-        guard upperBound >= lowerBound else { return nil }
+        guard upperBound >= lowerBound else { return lowerBound...lowerBound }
         switch modifier {
         case .open: return ClosedRange(lowerBound..<upperBound)
         case .closed: return lowerBound...upperBound
