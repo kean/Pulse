@@ -21,14 +21,6 @@ extension Color {
 }
 #endif
 
-extension NavigationLink where Label == EmptyView {
-    #warning("remove")
-    @available(*, deprecated, message: "Deprecated")
-    static func programmatic(isActive: Binding<Bool>, destination: @escaping () -> Destination) -> NavigationLink {
-        NavigationLink(isActive: isActive, destination: destination, label: { EmptyView() })
-    }
-}
-
 struct InvisibleNavigationLinks<Content: View>: View {
     @ViewBuilder let content: Content
 
