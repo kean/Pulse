@@ -65,17 +65,25 @@ final class ConsoleSearchService {
     }
 
     private func search(_ content: NSString, _ parameters: ConsoleSearchParameters, _ scope: ConsoleSearchScope) -> [ConsoleSearchOccurence] {
+        var matchedTerms: Set<String> = []
         var allMatches: [(line: NSString, lineNumber: Int, range: NSRange)] = []
         var lineCount = 0
         content.enumerateLines { line, stop in
             lineCount += 1
             let line = line as NSString
-            let matches = parameters.searchTerms.flatMap {
-                line.ranges(of: $0, options: .init(parameters.options))
+            for searchTerm in parameters.searchTerms {
+                let matches = line.ranges(of: searchTerm, options: .init(parameters.options))
+                for range in matches {
+                    allMatches.append((line, lineCount, range))
+                }
+                if !matches.isEmpty {
+                    matchedTerms.insert(searchTerm)
+                }
             }
-            for range in matches {
-                allMatches.append((line, lineCount, range))
-            }
+        }
+
+        guard matchedTerms.count == parameters.searchTerms.count else {
+            return [] // Has to match all
         }
 
         var occurences: [ConsoleSearchOccurence] = []
@@ -89,9 +97,9 @@ final class ConsoleSearchService {
 
             // Reduce context to a reasonable size
             var needsPrefixEllipsis = false
-            if prefixRange.length > 20 {
-                let distance = prefixRange.length - 20
-                prefixRange.length = 20
+            if prefixRange.length > 30 {
+                let distance = prefixRange.length - 30
+                prefixRange.length = 30
                 prefixRange.location += distance
                 needsPrefixEllipsis = true
             }
@@ -110,7 +118,7 @@ final class ConsoleSearchService {
             while prefixRange.location > 0,
                   let character = Character(line.character(at: prefixRange.location)),
                   !character.isWhitespace,
-                  prefixRange.length < 30 {
+                  prefixRange.length < 50 {
                 prefixRange.location -= 1
                 prefixRange.length += 1
             }
