@@ -137,7 +137,6 @@
 		0CF0D613296F189600EED9D4 /* TextRendererHTML.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D582296F189500EED9D4 /* TextRendererHTML.swift */; };
 		0CF0D614296F189600EED9D4 /* TextRendererJSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D583296F189500EED9D4 /* TextRendererJSON.swift */; };
 		0CF0D615296F189600EED9D4 /* LoggerSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D584296F189500EED9D4 /* LoggerSync.swift */; };
-		0CF0D616296F189600EED9D4 /* ManagedObjectTextSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D585296F189500EED9D4 /* ManagedObjectTextSearch.swift */; };
 		0CF0D617296F189600EED9D4 /* TextUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D586296F189500EED9D4 /* TextUtilities.swift */; };
 		0CF0D618296F189600EED9D4 /* DecodingErrorsPreviews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D587296F189500EED9D4 /* DecodingErrorsPreviews.swift */; };
 		0CF0D61A296F189600EED9D4 /* TextHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D589296F189500EED9D4 /* TextHelper.swift */; };
@@ -597,7 +596,6 @@
 		0CF0D582296F189500EED9D4 /* TextRendererHTML.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextRendererHTML.swift; sourceTree = "<group>"; };
 		0CF0D583296F189500EED9D4 /* TextRendererJSON.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextRendererJSON.swift; sourceTree = "<group>"; };
 		0CF0D584296F189500EED9D4 /* LoggerSync.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoggerSync.swift; sourceTree = "<group>"; };
-		0CF0D585296F189500EED9D4 /* ManagedObjectTextSearch.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ManagedObjectTextSearch.swift; sourceTree = "<group>"; };
 		0CF0D586296F189500EED9D4 /* TextUtilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextUtilities.swift; sourceTree = "<group>"; };
 		0CF0D587296F189500EED9D4 /* DecodingErrorsPreviews.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DecodingErrorsPreviews.swift; sourceTree = "<group>"; };
 		0CF0D589296F189500EED9D4 /* TextHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextHelper.swift; sourceTree = "<group>"; };
@@ -1189,7 +1187,6 @@
 				0CF0D581296F189500EED9D4 /* Regex.swift */,
 				0CB63A24297592D400525165 /* Parser.swift */,
 				0CF0D584296F189500EED9D4 /* LoggerSync.swift */,
-				0CF0D585296F189500EED9D4 /* ManagedObjectTextSearch.swift */,
 				0CF0D587296F189500EED9D4 /* DecodingErrorsPreviews.swift */,
 				0CB63A362976224600525165 /* Cache.swift */,
 				0CB63A392976227500525165 /* LinkedList.swift */,
@@ -2072,7 +2069,6 @@
 				0CF0D675296F189600EED9D4 /* NetworkInspectorView-ios.swift in Sources */,
 				0CF0D633296F189600EED9D4 /* SearchBar-ios.swift in Sources */,
 				0CF0D64A296F189600EED9D4 /* ConsoleSearchSection.swift in Sources */,
-				0CF0D616296F189600EED9D4 /* ManagedObjectTextSearch.swift in Sources */,
 				0CB63A132973A12300525165 /* ConsoleSearchView.swift in Sources */,
 				0CB63A2C2975C40100525165 /* ConsoleSearchFilter.swift in Sources */,
 				0CF0D64B296F189600EED9D4 /* RangePicker.swift in Sources */,
