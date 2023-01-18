@@ -94,8 +94,8 @@ final class PinButtonViewModel: ObservableObject {
 }
 #else
 struct PinButtonViewModel {
-    init(message: LoggerMessageEntity) {}
-    init(task: NetworkTaskEntity) {}
+    init(_ message: LoggerMessageEntity) {}
+    init(_ task: NetworkTaskEntity) {}
 }
 #endif
 

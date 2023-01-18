@@ -43,7 +43,7 @@ struct ConsoleSearchView: View {
                 }
                 .listRowBackground(Color.clear)
                 .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 0, trailing: 0))
-#if !os(macOS)
+#if os(iOS)
                 .listRowSeparator(.hidden)
 #endif
             }
@@ -97,9 +97,13 @@ private struct ConsoleSearchDemoView: View {
     var body: some View {
         NavigationView {
             ConsoleSearchView(viewModel: viewModel)
+#if !os(watchOS)
                 .searchable(text: $searchBarViewModel.text, tokens: $searchBarViewModel.tokens, token: {
                     Label($0.title, systemImage: $0.systemImage)
                 })
+#else
+                .searchable(text: $searchBarViewModel.text)
+#endif
                 .onSubmit(of: .search) {
                     viewModel.onSubmitSearch()
                 }

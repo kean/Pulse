@@ -36,7 +36,8 @@ private struct _ConsoleMessageCell: View {
         let cell = NavigationLink(destination: LazyConsoleDetailsView(message: message).id(message.objectID)) {
             ConsoleMessageCell(viewModel: .init(message: message))
         }
-        if #available(iOS 15, tvOS 15, *) {
+#if os(iOS)
+        if #available(iOS 15, *) {
             cell.swipeActions(edge: .leading, allowsFullSwipe: true) {
                 PinButton(viewModel: .init(message)).tint(.pink)
             }.swipeActions(edge: .trailing, allowsFullSwipe: true) {
@@ -47,6 +48,9 @@ private struct _ConsoleMessageCell: View {
         } else {
             cell
         }
+#else
+        cell
+#endif
     }
 }
 
@@ -58,7 +62,8 @@ private struct _ConsoleTaskCell: View {
         let cell = NavigationLink(destination: LazyNetworkInspectorView(task: task).id(task.objectID)) {
             ConsoleTaskCell(viewModel: .init(task: task))
         }
-        if #available(iOS 15, tvOS 15, *) {
+#if os(iOS)
+        if #available(iOS 15, *) {
             cell.swipeActions(edge: .leading, allowsFullSwipe: true) {
                 PinButton(viewModel: .init(task)).tint(.pink)
             }.swipeActions(edge: .trailing, allowsFullSwipe: true) {
@@ -69,6 +74,9 @@ private struct _ConsoleTaskCell: View {
         } else {
             cell
         }
+#else
+        cell
+#endif
     }
 }
 
