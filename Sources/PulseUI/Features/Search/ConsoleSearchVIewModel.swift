@@ -16,6 +16,8 @@ final class ConsoleSearchBarViewModel: ObservableObject {
     }
 }
 
+#warning("remove filters and scropes from suggestions that are already used")
+
 @available(iOS 15, tvOS 15, *)
 final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDelegate {
     private var entities: [NSManagedObject]
@@ -28,6 +30,11 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     @Published var hasMore = false
 
     @Published var recentSearches: [ConsoleSearchParameters] = []
+
+    #warning("sort by confidence instead")
+    var allSuggestions: [ConsoleSearchSuggestion] {
+        (suggestedFilters + suggestedScopes)
+    }
 
     // important: if you reload the view with searchable quickly during typing, it crashes and burns
     let searchBar = ConsoleSearchBarViewModel()

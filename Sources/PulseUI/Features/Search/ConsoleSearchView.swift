@@ -19,6 +19,9 @@ import Combine
 
 #warning("create ConsoleSearchViewModel here as configure with ConsoleViewModel")
 
+#warning("try and fix searchable animation issue")
+#warning("display spinner in new toolbar")
+
 @available(iOS 15, tvOS 15, *)
 struct ConsoleSearchView: View {
     @ObservedObject var viewModel: ConsoleSearchViewModel
@@ -31,12 +34,22 @@ struct ConsoleSearchView: View {
 
     var body: some View {
         Section(header: toolbar) {
-            Text("In progress")
+            if viewModel.searchBar.isEmpty {
+                makeList(with: viewModel.suggestedFilters)
+            } else {
+                makeList(with: Array(viewModel.allSuggestions.prefix(3)))
+            }
         }
+
+        if viewModel.searchBar.isEmpty {
+            Section(header: Text("Suggested Scopes")) {
+                makeList(with: viewModel.suggestedScopes)
+            }
+        }
+
         if viewModel.searchBar.isEmpty, !viewModel.recentSearches.isEmpty {
             ConsoleSearchRecentSearchesView(viewModel: viewModel)
         }
-        ConsoleSearchSuggestedTokensView(viewModel: viewModel)
 
         if viewModel.searchBar.text.count > 1 {
             ForEach(viewModel.results) { result in
@@ -55,6 +68,12 @@ struct ConsoleSearchView: View {
             Button(action: viewModel.buttonShowMoreResultsTapped) {
                 Text("Show More Results")
             }
+        }
+    }
+
+    private func makeList(with suggestions: [ConsoleSearchSuggestion]) -> some View {
+        ForEach(suggestions) {
+            ConsoleSearchSuggestionView(suggestion: $0, isActionable: viewModel.isActionable($0))
         }
     }
 

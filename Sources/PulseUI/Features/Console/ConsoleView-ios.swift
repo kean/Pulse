@@ -98,8 +98,6 @@ struct _ConsoleView: View {
     }
 }
 
-#warning("is setting entities like this OK? should they get updated continuously instead?")
-
 @available(iOS 15, *)
 private struct _ConsoleContentView: View {
     let viewModel: ConsoleViewModel
@@ -137,6 +135,8 @@ private struct _ConsoleContentView: View {
     }
 }
 
+#warning("is setting entities like this OK? should they get updated continuously instead?")
+
 @available(iOS 15, *)
 private struct _ConsoleSearchableContentView: View {
     let viewModel: ConsoleViewModel
@@ -145,6 +145,7 @@ private struct _ConsoleSearchableContentView: View {
     var body: some View {
         if isSearching {
             ConsoleSearchView(viewModel: viewModel)
+                .onAppear { viewModel.searchViewModel.setEntities(viewModel.entities) }
         } else {
             _ConsoleRegularContentView(viewModel: viewModel)
         }
