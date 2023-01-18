@@ -105,9 +105,6 @@ extension Parsers {
             }
         }
 
-    static let not: Parser<Bool> = optional(oneOf(prefixIgnoringCase("not"), "!") *> whitespaces)
-        .map { $0 != nil }
-
     /// A comma or space separated list.
     static func listOf<T>(_ parser: Parser<T>) -> Parser<[T]> {
         (parser <* optional(",") <* whitespaces).zeroOrMore
