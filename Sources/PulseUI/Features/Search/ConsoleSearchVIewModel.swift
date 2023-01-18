@@ -252,7 +252,6 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         ConsoleSettings.shared.recentSearches = string
     }
 
-    #warning("render tokens in recent searches")
     func selectRecentSearch(_ parameters: ConsoleSearchParameters) {
 //        searchBar.text = parameters.searchTerm
 //        searchBar.tokens = parameters.tokens
@@ -309,7 +308,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     }
 
     private func makeTopSuggestions(searchText: String) -> [ConsoleSearchSuggestion] {
-        let filters = Parsers.filters
+        var filters = Parsers.filters
             .compactMap { try? $0.parse(searchText) }
             .sorted(by: { $0.1 > $1.1 }) // Sort by confidence
 

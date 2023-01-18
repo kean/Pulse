@@ -23,7 +23,7 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
 
     private let store: LoggerStore
     private let entities: CurrentValueSubject<[NSManagedObject], Never>
-    private var isActive = false
+    private var isScreenVisible = false
     private var cancellables: [AnyCancellable] = []
 
     init(store: LoggerStore, entities: CurrentValueSubject<[NSManagedObject], Never>) {
@@ -44,12 +44,12 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
     // MARK: Appearance
 
     func onAppear() {
-        isActive = true
+        isScreenVisible = true
         reloadCounters()
     }
 
     func onDisappear() {
-        isActive = false
+        isScreenVisible = false
     }
 
     // MARK: Helpers
@@ -81,7 +81,7 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
     }
 
     private func reloadCounters() {
-        guard isActive else { return }
+        guard isScreenVisible else { return }
 
         switch mode {
         case .messages:
