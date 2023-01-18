@@ -21,57 +21,50 @@ struct ConsoleSearchView: View {
     @ObservedObject var viewModel: ConsoleSearchViewModel
 
     var body: some View {
-        List {
-            if viewModel.searchBar.isEmpty, !viewModel.recentSearches.isEmpty {
-                ConsoleSearchRecentSearchesView(viewModel: viewModel)
-            }
-            ConsoleSearchSuggestedTokensView(viewModel: viewModel)
-            if !viewModel.searchBar.isEmpty {
-                HStack {
-                    Spacer()
-                    HStack(spacing: 14) {
-                        ZStack {
-                            if viewModel.isSpinnerNeeded {
-                                ProgressView()
-                            }
-                        }.frame(width: 10, height: 10)
-                        Text("\(viewModel.results.count) results with \(21) occurences")
-                            .foregroundColor(.secondary)
-                            .font(ConsoleConstants.fontBody)
-                    }
-                    Spacer()
+        if viewModel.searchBar.isEmpty, !viewModel.recentSearches.isEmpty {
+            ConsoleSearchRecentSearchesView(viewModel: viewModel)
+        }
+        ConsoleSearchSuggestedTokensView(viewModel: viewModel)
+        if !viewModel.searchBar.isEmpty {
+            HStack {
+                Spacer()
+                HStack(spacing: 14) {
+                    ZStack {
+                        if viewModel.isSpinnerNeeded {
+                            ProgressView()
+                        }
+                    }.frame(width: 10, height: 10)
+                    Text("\(viewModel.results.count) results with \(21) occurences")
+                        .foregroundColor(.secondary)
+                        .font(ConsoleConstants.fontBody)
                 }
-                .listRowBackground(Color.clear)
-                .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 0, trailing: 0))
+                Spacer()
+            }
+            .listRowBackground(Color.clear)
+            .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 0, trailing: 0))
 #if os(iOS)
-                .listRowSeparator(.hidden)
+            .listRowSeparator(.hidden)
 #endif
-            }
+        }
 
-            if viewModel.searchBar.text.count > 1 {
-                ForEach(viewModel.results) { result in
-                    Section {
-                        ConsoleSearchResultView(viewModel: result)
-                    }
-                }
-            } else {
+        if viewModel.searchBar.text.count > 1 {
+            ForEach(viewModel.results) { result in
                 Section {
-                    ForEach(viewModel.results) { result in
-                        ConsoleSearchResultView(viewModel: result)
-                    }
+                    ConsoleSearchResultView(viewModel: result)
                 }
             }
-            if !viewModel.isSearching && viewModel.hasMore {
-                Button(action: viewModel.buttonShowMoreResultsTapped) {
-                    Text("Show More Results")
+        } else {
+            Section {
+                ForEach(viewModel.results) { result in
+                    ConsoleSearchResultView(viewModel: result)
                 }
             }
         }
-        .animation(nil)
-        .environment(\.defaultMinListRowHeight, 0)
-#if os(iOS)
-        .listStyle(.grouped)
-#endif
+        if !viewModel.isSearching && viewModel.hasMore {
+            Button(action: viewModel.buttonShowMoreResultsTapped) {
+                Text("Show More Results")
+            }
+        }
     }
 }
 
@@ -96,7 +89,9 @@ private struct ConsoleSearchDemoView: View {
 
     var body: some View {
         NavigationView {
-            ConsoleSearchView(viewModel: viewModel)
+            List {
+                ConsoleSearchView(viewModel: viewModel)
+            }
 #if os(iOS) || os(macOS)
                 .searchable(text: $searchBarViewModel.text, tokens: $searchBarViewModel.tokens, token: {
                     Label($0.title, systemImage: $0.systemImage)

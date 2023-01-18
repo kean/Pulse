@@ -43,7 +43,7 @@ struct ConsoleSearchSuggestedTokensView: View {
 }
 
 @available(iOS 15, tvOS 15, *)
-private struct ConsoleSearchSuggestionView: View {
+struct ConsoleSearchSuggestionView: View {
     let suggestion: ConsoleSearchSuggestion
     var isActionable = false
 

@@ -72,7 +72,10 @@ struct _ConsoleView: View {
         if #available(iOS 15, *) {
             _ConsoleContentView(viewModel: viewModel)
         } else {
-            ConsoleListView(viewModel: viewModel)
+            List {
+                _ConsoleRegularContentView(viewModel: viewModel)
+            }
+            .listStyle(.grouped)
         }
     }
 
@@ -97,7 +100,7 @@ struct _ConsoleView: View {
 
 #warning("is setting entities like this OK? should they get updated continuously instead?")
 
-@available(iOS 15.0, *)
+@available(iOS 15, *)
 private struct _ConsoleContentView: View {
     let viewModel: ConsoleViewModel
     @ObservedObject var searchBarViewModel: ConsoleSearchBarViewModel
@@ -108,8 +111,14 @@ private struct _ConsoleContentView: View {
     }
 
     var body: some View {
-        if #available(iOS 16, tvOS 16, *) {
-            ConsoleContentView(viewModel: viewModel)
+        let list = List {
+            _ConsoleSearchableContentView(viewModel: viewModel)
+        }
+        .listStyle(.grouped)
+        .environment(\.defaultMinListRowHeight, 0)
+
+        if #available(iOS 16, *) {
+            list
                 .searchable(text: $searchBarViewModel.text, tokens: $searchBarViewModel.tokens, token: {
                     Label($0.title, systemImage: $0.systemImage)
                 })
@@ -117,8 +126,8 @@ private struct _ConsoleContentView: View {
                     viewModel.searchViewModel.onSubmitSearch()
                 }
                 .disableAutocorrection(true)
-        }  else {
-            ConsoleContentView(viewModel: viewModel)
+        } else {
+            list
                 .searchable(text: $searchBarViewModel.text)
                 .onSubmit(of: .search) {
                     viewModel.searchViewModel.onSubmitSearch()
@@ -128,56 +137,44 @@ private struct _ConsoleContentView: View {
     }
 }
 
-@available(iOS 15.0, *)
-private struct ConsoleContentView: View {
+@available(iOS 15, *)
+private struct _ConsoleSearchableContentView: View {
     let viewModel: ConsoleViewModel
-    @Environment(\.isSearching) private var isSearching // important: scope
-
-    @State var isSearchViewVisible = false
-    @State var mainSearchViewOpacity = 1.0
-    @State var searchViewOpacity = 0.0
+    @Environment(\.isSearching) private var isSearching
 
     var body: some View {
-        if isSearchViewVisible {
-            ConsoleSearchView(viewModel: viewModel.searchViewModel)
-                .opacity(searchViewOpacity)
-                .onAppear {
-                    viewModel.searchViewModel.setEntities(viewModel.entities)
-                }
-                .onChange(of: isSearching) { newValue in
-                    isSearchViewVisible = newValue
-                    // Workaround for searchable animation issue
-                    DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(100)) {
-                        withAnimation {
-                            searchViewOpacity = 0
-                            mainSearchViewOpacity = 1
-                        }
-                    }
-                }
+        if isSearching {
+            _ConsoleSearchContentView(mainViewModel: viewModel, viewModel: viewModel.searchViewModel)
         } else {
-            ConsoleListView(viewModel: viewModel)
-                .opacity(mainSearchViewOpacity)
-                .onChange(of: isSearching) { newValue in
-                    isSearchViewVisible = newValue
-                    withAnimation {
-                        searchViewOpacity = 1
-                        mainSearchViewOpacity = 0
-                    }
-                }
+            _ConsoleRegularContentView(viewModel: viewModel)
         }
     }
 }
 
-private struct ConsoleListView: View {
+private struct _ConsoleRegularContentView: View {
     @ObservedObject var viewModel: ConsoleViewModel
 
     var body: some View {
-        List {
-            Section(header: ConsoleToolbarView(viewModel: viewModel)) {
-                makeForEach(viewModel: viewModel)
+        Section(header: ConsoleToolbarView(viewModel: viewModel)) {
+            makeForEach(viewModel: viewModel)
+        }
+    }
+}
+
+#warning("pass entities to ConsoleSearchView properly")
+#warning("refactor how toolbar is added and make it work for search view too")
+@available(iOS 15, *)
+private struct _ConsoleSearchContentView: View {
+    let mainViewModel: ConsoleViewModel
+    @ObservedObject var viewModel: ConsoleSearchViewModel
+
+    var body: some View {
+        Section(header: ConsoleToolbarView(viewModel: mainViewModel)) {
+            ForEach(viewModel.suggestedFilters) {
+                ConsoleSearchSuggestionView(suggestion: $0, isActionable: viewModel.isActionable($0))
             }
         }
-        .listStyle(.grouped)
+        ConsoleSearchView(viewModel: viewModel)
     }
 }
 
