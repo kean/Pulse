@@ -8,18 +8,6 @@ import XCTest
 
 @available(iOS 16, tvOS 16, *)
 final class ConsoleSearchTokenTests: XCTestCase {
-    func testSuggestedFilters() {
-        let viewModel = ConsoleSearchViewModel(entities: try! LoggerStore.mock.allMessages(), store: .mock)
-
-//        func suggestions(for string: String) -> [String] {
-//            viewModel.makeSuggestedFilters(for: string)
-//        }
-//
-//        XCTAssertEqual(viewModel.makeSuggestedFilters(for: "Status Code"), [
-//
-//        ])
-    }
-
     func testStatusCodeFilter() throws {
         func parse(_ string: String) -> ConsoleSearchFilterStatusCode? {
             guard let filter = try? Parsers.filterStatusCode.parse(string),
@@ -30,8 +18,6 @@ final class ConsoleSearchTokenTests: XCTestCase {
         }
 
         typealias StatusCode = ConsoleSearchFilterStatusCode
-
-        XCTAssertNil(parse("bod 200"))
 
         XCTAssertEqual(parse("sttus"), StatusCode(values: []))
 
@@ -60,6 +46,10 @@ final class ConsoleSearchTokenTests: XCTestCase {
         XCTAssertEqual(parse("s 200"), StatusCode(values: [.init(200)]))
         XCTAssertEqual(parse("code 200"), StatusCode(values: [.init(200)]))
 
+        // Wildcard
+        XCTAssertEqual(parse("sta 2x"), StatusCode(values: [.init(.open, lowerBound: 200, upperBound: 300)]))
+        XCTAssertEqual(parse("2x"), StatusCode(values: [.init(.open, lowerBound: 200, upperBound: 300)]))
+
         // Closed range
         XCTAssertEqual(parse("s 200-300"), StatusCode(values: [.init(.closed, lowerBound: 200, upperBound: 300)]))
         XCTAssertEqual(parse("s 200<=300"), StatusCode(values: [.init(.closed, lowerBound: 200, upperBound: 300)]))
@@ -79,16 +69,13 @@ final class ConsoleSearchTokenTests: XCTestCase {
         XCTAssertEqual(parse("s 200,  201,"), StatusCode(values: [.init(200), .init(201)]))
         XCTAssertEqual(parse("s 200,  201, "), StatusCode(values: [.init(200), .init(201)]))
         XCTAssertEqual(parse("s 200,  201, 200-300"), StatusCode(values: [.init(200), .init(201), .init(.closed, lowerBound: 200, upperBound: 300)]))
-
-        // False
-        XCTAssertNil(parse("bod 200"))
     }
 
     // MARK: Values
 
-    func testRangeOfInts() {
-        func parse(_ string: String, in range: ClosedRange<Int> = Int.min...Int.max) -> ConsoleSearchRange<Int>? {
-            try? Parsers.rangeOfInts(in: range).parse(string)
+    func testStatusCode() {
+        func parse(_ string: String) -> ConsoleSearchRange<Int>? {
+            try? Parsers.statusCode.parse(string)
         }
 
         // Invididual value
@@ -113,17 +100,17 @@ final class ConsoleSearchTokenTests: XCTestCase {
         XCTAssertEqual(parse("200 ..< 300"), .init(.open, lowerBound: 200, upperBound: 300))
 
         // With valid range
-        XCTAssertEqual(parse("200", in: 100...500), .init(200))
-        XCTAssertEqual(parse("100", in: 100...500), .init(100))
-        XCTAssertEqual(parse("500", in: 100...500), .init(500))
-        XCTAssertEqual(parse("100-500", in: 100...500), .init(.closed, lowerBound: 100, upperBound: 500))
-        XCTAssertEqual(parse("500", in: 100...500), .init(500))
+        XCTAssertEqual(parse("200"), .init(200))
+        XCTAssertEqual(parse("100"), .init(100))
+        XCTAssertEqual(parse("500"), .init(500))
+        XCTAssertEqual(parse("100-500"), .init(.closed, lowerBound: 100, upperBound: 500))
+        XCTAssertEqual(parse("500"), .init(500))
 
-        XCTAssertNil(parse("-100", in: 100...500))
-        XCTAssertNil(parse("0", in: 100...500))
-        XCTAssertNil(parse("99", in: 100...500))
-        XCTAssertNil(parse("501", in: 100...500))
-        XCTAssertNil(parse("0-400", in: 100...500))
+        XCTAssertNil(parse("-100"))
+        XCTAssertNil(parse("0"))
+        XCTAssertNil(parse("99"))
+        XCTAssertNil(parse("600"))
+        XCTAssertNil(parse("0-400"))
 
         // Invalid
         XCTAssertNil(parse("-10"))
@@ -134,13 +121,26 @@ final class ConsoleSearchTokenTests: XCTestCase {
 
     func testListOf() {
         func parse(_ string: String) -> [ConsoleSearchRange<Int>] {
-            (try? Parsers.listOf(Parsers.rangeOfInts).parse(string)) ?? []
+            (try? Parsers.listOf(Parsers.statusCode).parse(string)) ?? []
         }
 
         XCTAssertEqual(parse("200"), [.init(200)])
         XCTAssertEqual(parse("200 300"), [.init(200), .init(300)])
         XCTAssertEqual(parse("200,300"), [.init(200), .init(300)])
         XCTAssertEqual(parse("200, 300"), [.init(200), .init(300)])
+    }
+
+    func testStatusCodeWildcard() {
+        func parse(_ string: String) -> ConsoleSearchRange<Int>? {
+            try? Parsers.statusCodeWilcard.parse(string)
+        }
+        XCTAssertNil(parse("0"))
+        XCTAssertNil(parse("6"))
+        XCTAssertEqual(parse("2"), .init(.open, lowerBound: 200, upperBound: 300))
+        XCTAssertEqual(parse("2x"), .init(.open, lowerBound: 200, upperBound: 300))
+        XCTAssertEqual(parse("2X"), .init(.open, lowerBound: 200, upperBound: 300))
+        XCTAssertEqual(parse("2XX"), .init(.open, lowerBound: 200, upperBound: 300))
+        XCTAssertEqual(parse("2*"), .init(.open, lowerBound: 200, upperBound: 300))
     }
 
     func testHttpMethod() {

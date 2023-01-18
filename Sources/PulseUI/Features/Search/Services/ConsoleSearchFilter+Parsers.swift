@@ -20,9 +20,9 @@ extension Parsers {
     ]
 
     static let filterStatusCode = oneOf(
-            filterName("status code") <*> listOf(rangeOfInts(in: 100...500)),
+            filterName("status code") <*> listOf(statusCode),
             // If we find a value in 100...500 range, assign it 0.7 confidence and suggest it
-            listOf(rangeOfInts(in: 100...500)).filter { !$0.isEmpty }.map { (0.7, $0) }
+            listOf(statusCode).filter { !$0.isEmpty }.map { (0.7, $0) }
     ).map { confidence, values in
         (ConsoleSearchFilter.statusCode(.init(values: values)), confidence)
     }
@@ -74,21 +74,34 @@ extension Parsers {
         return anyWords <* optional(":") <* whitespaces
     }
 
+    static let statusCode: Parser<ConsoleSearchRange<Int>> = oneOf(
+        rangeOfInts(in: 100...599),
+        int(in: 100...599).map { ConsoleSearchRange($0) },
+        statusCodeWilcard // It'll also auto-complete "2" as "2xx" if every other pattern fails
+    )
+
+    static let statusCodeWilcard: Parser<ConsoleSearchRange<Int>> = (char(from: "12345") <* optional(char(from: "xX*")) <* optional(char(from: "xX*"))).map {
+        guard let code = Int(String($0)) else { return nil }
+        return ConsoleSearchRange(.open, lowerBound: code * 100, upperBound: code * 100 + 100)
+    }
+
     static func rangeOfInts(in range: ClosedRange<Int>) -> Parser<ConsoleSearchRange<Int>> {
         rangeOfInts.filter {
             range.contains($0.lowerBound) && range.contains($0.upperBound)
         }
     }
 
-    static let rangeOfInts: Parser<ConsoleSearchRange<Int>> = oneOf(
-        zip(int, rangeModifier, int).map { lowerBound, modifier, upperBound in
+    static func int(in range: ClosedRange<Int>) -> Parser<Int> {
+        int.filter { range.contains($0) }
+    }
+
+    static let rangeOfInts: Parser<ConsoleSearchRange<Int>> = zip(int, rangeModifier, int)
+        .map { lowerBound, modifier, upperBound in
             switch modifier {
             case .open: return .init(.open, lowerBound: lowerBound, upperBound: upperBound)
             case .closed: return .init(.closed, lowerBound: lowerBound, upperBound: upperBound)
             }
-        },
-        int.map(ConsoleSearchRange.init)
-    )
+        }
 
     static let not: Parser<Bool> = optional(oneOf(prefixIgnoringCase("not"), "!") *> whitespaces)
         .map { $0 != nil }
