@@ -97,7 +97,7 @@ private struct ConsoleSearchDemoView: View {
     var body: some View {
         NavigationView {
             ConsoleSearchView(viewModel: viewModel)
-#if !os(watchOS)
+#if os(iOS) || os(macOS)
                 .searchable(text: $searchBarViewModel.text, tokens: $searchBarViewModel.tokens, token: {
                     Label($0.title, systemImage: $0.systemImage)
                 })

@@ -76,10 +76,12 @@ private struct LegacyConsoleContainerView: View {
 }
 
 private struct Siderbar: View {
-    var viewModel: ConsoleViewModel
+    @ObservedObject var viewModel: ConsoleViewModel
 
     var body: some View {
-        ConsoleListView(viewModel: viewModel)
+        List {
+            makeForEach(viewModel: viewModel)
+        }
             .toolbar {
                 ToolbarItemGroup(placement: .automatic) {
                     ConsoleToolbarItems(viewModel: viewModel)

@@ -168,7 +168,20 @@ private struct ConsoleContentView: View {
     }
 }
 
-struct ConsoleToolbarView: View {
+private struct ConsoleListView: View {
+    @ObservedObject var viewModel: ConsoleViewModel
+
+    var body: some View {
+        List {
+            Section(header: ConsoleToolbarView(viewModel: viewModel)) {
+                makeForEach(viewModel: viewModel)
+            }
+        }
+        .listStyle(.grouped)
+    }
+}
+
+private struct ConsoleToolbarView: View {
     @ObservedObject var viewModel: ConsoleViewModel
     @State private var isShowingFilters = false
     @State private var messageCount = 0

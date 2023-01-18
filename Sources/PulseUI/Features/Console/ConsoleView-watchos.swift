@@ -24,7 +24,7 @@ public struct ConsoleView: View {
     public var body: some View {
         List {
             toolbar
-            ForEach(viewModel.entities, id: \.objectID, content: ConsoleEntityCell.init)
+            makeForEach(viewModel: viewModel)
         }
         .navigationTitle("Console")
         .onAppear(perform: viewModel.onAppear)
