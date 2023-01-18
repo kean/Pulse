@@ -11,9 +11,10 @@ import Combine
 struct ConsoleSearchSuggestionView: View {
     let suggestion: ConsoleSearchSuggestion
     var isActionable = false
+    let action: () -> Void
 
     var body: some View {
-        Button(action: suggestion.onTap) {
+        Button(action: action) {
             HStack {
                 Image(systemName: "magnifyingglass")
                 Text(suggestion.text)

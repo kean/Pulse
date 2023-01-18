@@ -94,8 +94,12 @@ struct ConsoleSearchView: View {
     }
 
     private func makeList(with suggestions: [ConsoleSearchSuggestion]) -> some View {
-        ForEach(suggestions) {
-            ConsoleSearchSuggestionView(suggestion: $0, isActionable: viewModel.isActionable($0))
+        ForEach(suggestions) { suggestion in
+            ConsoleSearchSuggestionView(
+                suggestion: suggestion,
+                isActionable: viewModel.isActionable(suggestion),
+                action: { viewModel.perform(suggestion) }
+            )
         }
     }
 

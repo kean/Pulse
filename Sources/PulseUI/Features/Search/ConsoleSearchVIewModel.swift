@@ -21,6 +21,7 @@ final class ConsoleSearchBarViewModel: ObservableObject {
 }
 
 #warning("replace isSearching with operation != nil")
+#warning("fix an issue when you click on suggested empy field, contains: jumps to top (should only with low confidence)")
 
 @available(iOS 15, tvOS 15, *)
 final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDelegate {
@@ -210,28 +211,25 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         }
     }
 
-    // MARK: Recent Searches
+    // MARK: Actions
+
+    func perform(_ suggestion: ConsoleSearchSuggestion) {
+        switch suggestion.action {
+        case .apply(let token):
+            searchBar.text = ""
+            searchBar.tokens.append(token)
+        case .autocomplete(let text):
+            searchBar.text = text
+        }
+    }
 
     func onSubmitSearch() {
         if let suggestion = topSuggestions.first, isActionable(suggestion) {
-            suggestion.onTap()
-            return
+            perform(suggestion)
         }
-        let searchTerm = searchBar.text.trimmingCharacters(in: .whitespaces)
-        guard !searchTerm.isEmpty else {
-            return
-        }
-        convertCurrentSearchTextToToken()
-        addRecentSearch(searchBar.parameters)
-        saveRecentSearches()
     }
 
-    private func convertCurrentSearchTextToToken() {
-        let searchTerm = searchBar.text.trimmingCharacters(in: .whitespaces)
-        guard !searchTerm.isEmpty else { return }
-        searchBar.text = ""
-        searchBar.tokens.append(.text(searchTerm))
-    }
+    // MARK: Recent Searches
 
     private func getRecentSearches() -> [ConsoleSearchParameters] {
         ConsoleSettings.shared.recentSearches.data(using: .utf8).flatMap {
@@ -326,14 +324,12 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         let plainSearchSuggestion = ConsoleSearchSuggestion(text: {
             AttributedString("Contains: ") { $0.foregroundColor = .primary } +
             AttributedString(searchText) { $0.foregroundColor = .blue }
-        }(), isReady: true, onTap: {
-            self.convertCurrentSearchTextToToken()
-        })
+        }(), action: .apply(.text(searchText)))
 
         let topSuggestions = Array(allSuggestions
             .sorted(by: { $0.1 > $1.1 }) // Sort by confidence
             .map { $0.0 }.prefix(3))
-        if topSuggestions.first?.isReady ?? false {
+        if topSuggestions.first?.isToken ?? false {
             return topSuggestions + [plainSearchSuggestion]
         } else {
             return [plainSearchSuggestion] + topSuggestions
@@ -392,27 +388,24 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
                 }
             }
         }
-        return ConsoleSearchSuggestion(text: string, isReady: !values.isEmpty) {
+        return ConsoleSearchSuggestion(text: string, action: {
             if values.isEmpty {
-                self.searchBar.text = filter.name + ": "
+                return .autocomplete(filter.name + ": ")
             } else {
-                self.searchBar.text = ""
-                self.searchBar.tokens.append(.filter(filter))
+                return .apply(.filter(filter))
             }
-        }
+        }())
     }
 
     private func makeSuggestion(for scope: ConsoleSearchScope) -> ConsoleSearchSuggestion {
         var string = AttributedString("Search in ") { $0.foregroundColor = .primary }
         string.append(scope.title) { $0.foregroundColor = .blue }
-        return ConsoleSearchSuggestion(text: string, isReady: true) {
-            self.searchBar.text = ""
-            self.searchBar.tokens.append(.scope(scope))
-        }
+        let token = ConsoleSearchToken.scope(scope)
+        return ConsoleSearchSuggestion(text: string, action: .apply(token))
     }
 
     func isActionable(_ suggestion: ConsoleSearchSuggestion) -> Bool {
-        suggestion.id == topSuggestions[0].id && suggestion.isReady
+        suggestion.id == topSuggestions[0].id && suggestion.isToken
     }
 }
 
@@ -420,8 +413,17 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
 struct ConsoleSearchSuggestion: Identifiable {
     let id = UUID()
     let text: AttributedString
-    let isReady: Bool
-    var onTap: () -> Void
+    let action: Action
+
+    var isToken: Bool {
+        guard case .apply = action else { return false }
+        return true
+    }
+
+    enum Action {
+        case apply(ConsoleSearchToken)
+        case autocomplete(String)
+    }
 }
 
 @available(iOS 15, tvOS 15, *)
