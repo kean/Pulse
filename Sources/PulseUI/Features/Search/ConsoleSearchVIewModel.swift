@@ -7,6 +7,8 @@ import Pulse
 import CoreData
 import Combine
 
+#warning("reimplement filters (ConsoleSearchBarViewModel) should perform filter (or should it?)")
+
 final class ConsoleSearchBarViewModel: ObservableObject {
     @Published var text: String = ""
     @Published var tokens: [ConsoleSearchToken] = []
@@ -20,8 +22,7 @@ final class ConsoleSearchBarViewModel: ObservableObject {
 
 @available(iOS 15, tvOS 15, *)
 final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDelegate {
-    private var entities: [NSManagedObject]
-    private var objectIDs: [NSManagedObjectID]
+    private var entities: CurrentValueSubject<[NSManagedObject], Never>
 
     @Published private(set) var results: [ConsoleSearchResultViewModel] = []
 
@@ -60,9 +61,8 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     private var cancellables: [AnyCancellable] = []
     private let context: NSManagedObjectContext
 
-    init(entities: [NSManagedObject], store: LoggerStore) {
+    init(entities: CurrentValueSubject<[NSManagedObject], Never>, store: LoggerStore) {
         self.entities = entities
-        self.objectIDs = entities.map(\.objectID)
         self.context = store.newBackgroundContext()
 
         let text = searchBar.$text
@@ -85,11 +85,6 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
             .store(in: &cancellables)
 
         recentSearches = getRecentSearches()
-    }
-
-    func setEntities(_ entities: [NSManagedObject]) {
-        self.entities = entities
-        self.objectIDs = entities.map(\.objectID)
     }
 
     func isActionable(_ suggestion: ConsoleSearchSuggestion) -> Bool {
@@ -116,7 +111,10 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
             dirtyDate = Date()
         }
 
+        print("willsearch for: ", entities.value.count)
+
         let parameters = ConsoleSearchParameters(searchTerm: searchText, tokens: tokens, options: .default)
+        let objectIDs = entities.value.map(\.objectID)
         let operation = ConsoleSearchOperation(objectIDs: objectIDs, parameters: parameters, service: service, context: context)
         operation.delegate = self
         operation.resume()

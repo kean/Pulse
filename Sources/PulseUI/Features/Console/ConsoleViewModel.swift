@@ -63,7 +63,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 #if os(iOS)
         self.insightsViewModel = InsightsViewModel(store: store)
         if #available(iOS 15, *) {
-            self._searchViewModel = ConsoleSearchViewModel(entities: [], store: store)
+            self._searchViewModel = ConsoleSearchViewModel(entities: entitiesSubject, store: store)
         }
 #endif
 
@@ -117,7 +117,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 
     func onAppear() {
         isActive = true
-        reloadMessages()
+        reloadMessages(isMandatory: true)
     }
 
     func onDisappear() {
@@ -149,9 +149,12 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     // MARK: - NSFetchedResultsControllerDelegate
 
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChangeContentWith diff: CollectionDifference<NSManagedObjectID>) {
-        guard isActive else { return }
-        withAnimation {
-            reloadMessages(isMandatory: false)
+        if isActive {
+            withAnimation {
+                reloadMessages(isMandatory: false)
+            }
+        } else {
+            entities = self.controller?.fetchedObjects ?? []
         }
     }
 

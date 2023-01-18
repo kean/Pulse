@@ -145,7 +145,6 @@ private struct _ConsoleSearchableContentView: View {
     var body: some View {
         if isSearching {
             ConsoleSearchView(viewModel: viewModel)
-                .onAppear { viewModel.searchViewModel.setEntities(viewModel.entities) }
         } else {
             _ConsoleRegularContentView(viewModel: viewModel)
         }
