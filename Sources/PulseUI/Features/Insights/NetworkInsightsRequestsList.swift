@@ -8,28 +8,13 @@ import Pulse
 import Combine
 
 #if os(iOS)
-
-#warning("reimplement")
 struct NetworkInsightsRequestsList: View {
-    @ObservedObject var viewModel: NetworkInsightsRequestsListViewModel
+    let tasks: [NetworkTaskEntity]
 
     public var body: some View {
-        EmptyView()
-//        ConsoleTableView(
-//            header: { EmptyView() },
-//            viewModel: viewModel.table,
-//            detailsViewModel: viewModel.details
-//        )
+        List {
+            ForEach(tasks, id: \.objectID, content: ConsoleEntityCell.init)
+        }.listStyle(.plain)
     }
 }
-
-final class NetworkInsightsRequestsListViewModel: ObservableObject {
-
-    init(tasks: [NetworkTaskEntity]) {
-//        self.table = ConsoleTableViewModel(searchCriteriaViewModel: nil)
-//        self.table.entities = tasks
-//        self.details = ConsoleDetailsRouterViewModel()
-    }
-}
-
 #endif
