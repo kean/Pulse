@@ -143,7 +143,6 @@
 		0CF0D61A296F189600EED9D4 /* TextHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D589296F189500EED9D4 /* TextHelper.swift */; };
 		0CF0D61B296F189600EED9D4 /* ShareItems.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D58A296F189500EED9D4 /* ShareItems.swift */; };
 		0CF0D61C296F189600EED9D4 /* UXKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D58C296F189500EED9D4 /* UXKit.swift */; };
-		0CF0D61D296F189600EED9D4 /* NSTableView+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D58E296F189500EED9D4 /* NSTableView+Extensions.swift */; };
 		0CF0D61E296F189600EED9D4 /* SwiftUI+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D58F296F189500EED9D4 /* SwiftUI+Extensions.swift */; };
 		0CF0D61F296F189600EED9D4 /* Pulse+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D590296F189500EED9D4 /* Pulse+Extensions.swift */; };
 		0CF0D620296F189600EED9D4 /* Foundation+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D591296F189500EED9D4 /* Foundation+Extensions.swift */; };
@@ -604,7 +603,6 @@
 		0CF0D589296F189500EED9D4 /* TextHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextHelper.swift; sourceTree = "<group>"; };
 		0CF0D58A296F189500EED9D4 /* ShareItems.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShareItems.swift; sourceTree = "<group>"; };
 		0CF0D58C296F189500EED9D4 /* UXKit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UXKit.swift; sourceTree = "<group>"; };
-		0CF0D58E296F189500EED9D4 /* NSTableView+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSTableView+Extensions.swift"; sourceTree = "<group>"; };
 		0CF0D58F296F189500EED9D4 /* SwiftUI+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SwiftUI+Extensions.swift"; sourceTree = "<group>"; };
 		0CF0D590296F189500EED9D4 /* Pulse+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Pulse+Extensions.swift"; sourceTree = "<group>"; };
 		0CF0D591296F189500EED9D4 /* Foundation+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Foundation+Extensions.swift"; sourceTree = "<group>"; };
@@ -1203,7 +1201,6 @@
 		0CF0D58D296F189500EED9D4 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
-				0CF0D58E296F189500EED9D4 /* NSTableView+Extensions.swift */,
 				0CF0D58F296F189500EED9D4 /* SwiftUI+Extensions.swift */,
 				0CF0D590296F189500EED9D4 /* Pulse+Extensions.swift */,
 				0CF0D591296F189500EED9D4 /* Foundation+Extensions.swift */,
@@ -2085,7 +2082,6 @@
 				0CF0D679296F189600EED9D4 /* ConsoleView-ios.swift in Sources */,
 				0CF0D654296F189600EED9D4 /* NetworkInsightsRequestsList.swift in Sources */,
 				0CF0D661296F189600EED9D4 /* NetworkInspectorTransferInfoView.swift in Sources */,
-				0CF0D61D296F189600EED9D4 /* NSTableView+Extensions.swift in Sources */,
 				0CF0D663296F189600EED9D4 /* NetworkInspectorTransactionView.swift in Sources */,
 				0CB63A212974A62700525165 /* ConsoleSearchService.swift in Sources */,
 				0CF0D614296F189600EED9D4 /* TextRendererJSON.swift in Sources */,
