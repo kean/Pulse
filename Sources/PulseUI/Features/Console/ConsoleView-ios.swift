@@ -118,11 +118,13 @@ private struct _ConsoleListView: View {
                 })
                 .onSubmit(of: .search, viewModel.searchViewModel.onSubmitSearch)
                 .disableAutocorrection(true)
+                .textInputAutocapitalization(.never)
         } else if #available(iOS 15, *) {
             list
                 .searchable(text: $searchBarViewModel.text)
                 .onSubmit(of: .search, viewModel.searchViewModel.onSubmitSearch)
                 .disableAutocorrection(true)
+                .textInputAutocapitalization(.never)
         } else {
             list
         }

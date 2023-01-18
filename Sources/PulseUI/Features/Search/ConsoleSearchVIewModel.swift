@@ -321,10 +321,17 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
             .compactMap { try? $0.parse(searchText) }
             .sorted(by: { $0.1 > $1.1 }) // Sort by confidence
 
+        // Auto-complete hosts (TODO: refactor)
+        var hasHostsFilter = false
         filters = filters.flatMap {
             guard case .host(let filter) = $0.0 else { return [$0] }
+            hasHostsFilter = true
             let confidence = $0.1
             return autocompleteHosts(for: filter, hosts: hosts).map { (.host($0), confidence) }
+        }
+        if !hasHostsFilter {
+            let hosts = autocomplete(host: searchText, hosts: hosts)
+            filters += hosts.map { (ConsoleSearchFilter.host(.init(values: [$0])), 0.8) }
         }
 
         let scopes: [(ConsoleSearchScope, Confidence)] = ConsoleSearchScope.allEligibleScopes.compactMap {
