@@ -30,7 +30,7 @@ struct ConsoleSearchView: View {
     }
 
     var body: some View {
-        Section(header: ConsoleToolbarView(title: viewModel.toolbarTitle, viewModel: consoleViewModel)) {
+        Section(header: toolbar) {
             Text("In progress")
         }
         if viewModel.searchBar.isEmpty, !viewModel.recentSearches.isEmpty {
@@ -56,5 +56,17 @@ struct ConsoleSearchView: View {
                 Text("Show More Results")
             }
         }
+    }
+
+    private var toolbar: some View {
+        HStack(alignment: .bottom, spacing: 0) {
+            Text(viewModel.toolbarTitle)
+                .foregroundColor(.secondary)
+            Spacer()
+            ConsoleFiltersView(viewModel: consoleViewModel)
+                .padding(.bottom, 4)
+        }
+        .buttonStyle(.plain)
+        .padding(.top, -14)
     }
 }
