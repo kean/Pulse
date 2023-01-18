@@ -17,6 +17,7 @@ struct ConsoleSearchSuggestionView: View {
             HStack {
                 Image(systemName: "magnifyingglass")
                 Text(suggestion.text)
+                    .lineLimit(1)
                 if isActionable {
                     Spacer()
                     Image(systemName: "return")

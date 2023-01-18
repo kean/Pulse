@@ -73,7 +73,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
 
     private let service = ConsoleSearchService()
 
-    private var hosts: Set<String> = []
+    private let hosts: ManagedObjectsObserver<NetworkDomainEntity>
     private let queue = DispatchQueue(label: "com.github.pulse.console-search-view")
     private var cancellables: [AnyCancellable] = []
     private let context: NSManagedObjectContext
@@ -82,6 +82,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         self.entities = entities
         self.searchBar = searchBar
         self.context = store.newBackgroundContext()
+        self.hosts = ManagedObjectsObserver(context: store.viewContext, sortDescriptior: NSSortDescriptor(keyPath: \NetworkDomainEntity.count, ascending: false))
 
         let text = searchBar.$text
             .map { $0.trimmingCharacters(in: .whitespaces ) }
@@ -91,11 +92,9 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
             self?.didUpdateSearchCriteria($0, $1)
         }.store(in: &cancellables)
 
-        text
-            .dropFirst()
-            .receive(on: queue)
-            .sink { [weak self] in self?.updateSearchTokens(for: $0) }
-            .store(in: &cancellables)
+        text.dropFirst().sink { [weak self] in
+            self?.updateSearchTokens(for: $0)
+        }.store(in: &cancellables)
 
         self.topSuggestions = makeDefaultSuggestedFilters()
         self.suggestedScopes = makeDefaultSuggestedScopes()
@@ -298,36 +297,43 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
 
 #warning("TODO: priorize direct matches")
 
-        let topSuggestions: [ConsoleSearchSuggestion]
-        let suggestedScopes: [ConsoleSearchSuggestion]
-        if searchText.isEmpty {
-            topSuggestions = makeDefaultSuggestedFilters()
-            suggestedScopes = makeDefaultSuggestedScopes()
-        } else {
-            topSuggestions = makeTopSuggestions(searchText: searchText)
-            suggestedScopes = []
-        }
-        DispatchQueue.main.async {
-            self.topSuggestions = topSuggestions
-            self.suggestedScopes = suggestedScopes
+        let hosts = hosts.objects.map(\.value)
+
+        queue.async {
+            let topSuggestions: [ConsoleSearchSuggestion]
+            let suggestedScopes: [ConsoleSearchSuggestion]
+            if searchText.isEmpty {
+                topSuggestions = self.makeDefaultSuggestedFilters()
+                suggestedScopes = self.makeDefaultSuggestedScopes()
+            } else {
+                topSuggestions = self.makeTopSuggestions(searchText: searchText, hosts: hosts)
+                suggestedScopes = []
+            }
+            DispatchQueue.main.async {
+                self.topSuggestions = topSuggestions
+                self.suggestedScopes = suggestedScopes
+            }
         }
     }
 
-    private func makeTopSuggestions(searchText: String) -> [ConsoleSearchSuggestion] {
-        let filters = Parsers.filters
+    private func makeTopSuggestions(searchText: String, hosts: [String]) -> [ConsoleSearchSuggestion] {
+        var filters = Parsers.filters
             .compactMap { try? $0.parse(searchText) }
             .sorted(by: { $0.1 > $1.1 }) // Sort by confidence
+
+        filters = filters.flatMap {
+            guard case .host(let filter) = $0.0 else { return [$0] }
+            let confidence = $0.1
+            return autocompleteHosts(for: filter, hosts: hosts).map { (.host($0), confidence) }
+        }
 
         let scopes: [(ConsoleSearchScope, Confidence)] = ConsoleSearchScope.allEligibleScopes.compactMap {
             guard let confidence = try? Parsers.filterName($0.title).parse(searchText) else { return nil }
             return ($0, confidence)
         }
 
-        let allSuggestions = filters.map {
-            (makeSuggestion(for: $0.0), $0.1)
-        } + scopes.map {
-            (makeSuggestion(for: $0.0), $0.1)
-        }
+        let allSuggestions = filters.map { (makeSuggestion(for: $0.0), $0.1) } +
+        scopes.map { (makeSuggestion(for: $0.0), $0.1) }
 
         let plainSearchSuggestion = ConsoleSearchSuggestion(text: {
             AttributedString("Contains: ") { $0.foregroundColor = .primary } +
@@ -339,6 +345,33 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         return Array(allSuggestions
             .sorted(by: { $0.1 > $1.1 }) // Sort by confidence
             .map { $0.0 }.prefix(3)) + [plainSearchSuggestion]
+    }
+
+    // TODO: do it on the Parser level
+    private func autocompleteHosts(for filter: ConsoleSearchFilterHost, hosts: [String]) -> [ConsoleSearchFilterHost] {
+        guard let value = filter.values.first,
+              filter.values.count == 1 else { return [filter] }
+        let hosts = autocomplete(host: value, hosts: hosts)
+        let filters = hosts.map { ConsoleSearchFilterHost(values: [$0]) }
+        let prefix = Array(filters.prefix(2))
+        if prefix.contains(where: { $0.values == filter.values }) {
+            return prefix // Already has a full match
+        }
+        return prefix + [filter]
+    }
+
+    private func autocomplete(host target: String, hosts: [String]) -> [String] {
+        let target = target.lowercased()
+        var topHosts: [String] = []
+        var otherHosts: [String] = []
+        for host in hosts {
+            if host.hasPrefix(target) {
+                topHosts.append(host)
+            } else if host.contains(target) {
+                otherHosts.append(target)
+            }
+        }
+        return topHosts + otherHosts
     }
 
     private func makeDefaultSuggestedFilters() -> [ConsoleSearchSuggestion] {
