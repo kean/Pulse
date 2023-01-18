@@ -114,6 +114,7 @@ final class ConsoleSearchTokenTests: XCTestCase {
 
         // Invalid
         XCTAssertNil(parse("-10"))
+        XCTAssertNil(parse("2."))
 
         // Auto-completion
         XCTAssertEqual(parse("200*500"), .init(200))

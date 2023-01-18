@@ -80,10 +80,13 @@ extension Parsers {
         statusCodeWilcard // It'll also auto-complete "2" as "2xx" if every other pattern fails
     )
 
-    static let statusCodeWilcard: Parser<ConsoleSearchRange<Int>> = (char(from: "12345") <* optional(char(from: "xX*")) <* optional(char(from: "xX*"))).map {
+    static let statusCodeWilcard: Parser<ConsoleSearchRange<Int>> = (
+        char(from: "12345") <* char(from: "xX*").zeroOrMore <* valueEnd).map {
         guard let code = Int(String($0)) else { return nil }
         return ConsoleSearchRange(.open, lowerBound: code * 100, upperBound: code * 100 + 100)
     }
+
+    static let valueEnd = oneOf(char(from: ", ").map { _ in () }, end)
 
     static func rangeOfInts(in range: ClosedRange<Int>) -> Parser<ConsoleSearchRange<Int>> {
         rangeOfInts.filter {

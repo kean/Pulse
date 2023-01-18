@@ -8,6 +8,7 @@ import CoreData
 import Combine
 
 #warning("reimplement filters (ConsoleSearchBarViewModel) should perform filter (or should it?)")
+#warning("fix how isActiveSuggestion works")
 
 final class ConsoleSearchBarViewModel: ObservableObject {
     @Published var text: String = ""
@@ -72,6 +73,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
 
     private let service = ConsoleSearchService()
 
+    private var hosts: Set<String> = []
     private let queue = DispatchQueue(label: "com.github.pulse.console-search-view")
     private var cancellables: [AnyCancellable] = []
     private let context: NSManagedObjectContext
@@ -102,7 +104,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
 
         entities
             .throttle(for: 3, scheduler: DispatchQueue.main, latest: true)
-            .sink { [weak self] in self?.checkForNewSearchMatches(for: $0) }
+            .sink { [weak self] in self?.didReloadEntities(for: $0) }
             .store(in: &cancellables)
     }
 
@@ -154,6 +156,10 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     }
 
     // MARK: Refresh Results
+
+    private func didReloadEntities(for entities: [NSManagedObject]) {
+        checkForNewSearchMatches(for: entities)
+    }
 
     private func checkForNewSearchMatches(for entities: [NSManagedObject]) {
         guard isViewVisible else {
@@ -308,7 +314,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     }
 
     private func makeTopSuggestions(searchText: String) -> [ConsoleSearchSuggestion] {
-        var filters = Parsers.filters
+        let filters = Parsers.filters
             .compactMap { try? $0.parse(searchText) }
             .sorted(by: { $0.1 > $1.1 }) // Sort by confidence
 
