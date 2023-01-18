@@ -27,9 +27,9 @@ public struct ConsoleView: View {
     @ViewBuilder
     private var contents: some View {
         if #available(macOS 13.0, *) {
-            ConsoleContainerView(viewModel: viewModel, details: viewModel.details)
+            ConsoleContainerView(viewModel: viewModel)
         } else {
-            LegacyConsoleContainerView(viewModel: viewModel, details: viewModel.details)
+            LegacyConsoleContainerView(viewModel: viewModel)
         }
     }
 
@@ -39,7 +39,6 @@ public struct ConsoleView: View {
 @available(macOS 13.0, *)
 private struct ConsoleContainerView: View {
     @ObservedObject var viewModel: ConsoleViewModel
-    let details: ConsoleDetailsRouterViewModel
     @State private var columnVisibility = NavigationSplitViewVisibility.all
 
     var body: some View {
@@ -52,7 +51,7 @@ private struct ConsoleContainerView: View {
                     .navigationSplitViewColumnWidth(min: ConsoleView.contentColumnWidth, ideal: 420, max: 640)
             },
             content: {
-                ConsoleMessageDetailsRouter(viewModel: details)
+                EmptyView()
                     .navigationSplitViewColumnWidth(ConsoleView.contentColumnWidth)
             },
             detail: {
@@ -64,13 +63,12 @@ private struct ConsoleContainerView: View {
 
 private struct LegacyConsoleContainerView: View {
     var viewModel: ConsoleViewModel
-    @ObservedObject var details: ConsoleDetailsRouterViewModel
 
     var body: some View {
         NavigationView {
             Siderbar(viewModel: viewModel)
                 .frame(minWidth: 320, idealWidth: 320, maxWidth: 600, minHeight: 120, idealHeight: 480, maxHeight: .infinity)
-            ConsoleMessageDetailsRouter(viewModel: details)
+            EmptyView()
                 .frame(minWidth: 430, idealWidth: 500, maxWidth: 600, minHeight: 320, idealHeight: 480, maxHeight: .infinity)
             EmptyView()
         }

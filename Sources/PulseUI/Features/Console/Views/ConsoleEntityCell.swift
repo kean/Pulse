@@ -8,6 +8,7 @@ import Pulse
 import CoreData
 
 #warning("add context menus back")
+#warning("inject viewmodels here & impement focus actions for messages")
 
 struct ConsoleEntityCell: View {
     let entity: NSManagedObject
@@ -32,7 +33,7 @@ private struct _ConsoleMessageCell: View {
     @State private var shareItems: ShareItems?
 
     var body: some View {
-        let cell = NavigationLink(destination: LazyConsoleDetailsView(message: message)) {
+        let cell = NavigationLink(destination: LazyConsoleDetailsView(message: message).id(message.objectID)) {
             ConsoleMessageCell(viewModel: .init(message: message))
         }
         if #available(iOS 15, tvOS 15, *) {
@@ -54,7 +55,7 @@ private struct _ConsoleTaskCell: View {
     @State private var shareItems: ShareItems?
 
     var body: some View {
-        let cell = NavigationLink(destination: LazyNetworkInspectorView(task: task)) {
+        let cell = NavigationLink(destination: LazyNetworkInspectorView(task: task).id(task.objectID)) {
             ConsoleTaskCell(viewModel: .init(task: task))
         }
         if #available(iOS 15, tvOS 15, *) {
