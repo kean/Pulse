@@ -6,6 +6,8 @@ import SwiftUI
 import CoreData
 import Pulse
 
+#warning("remove")
+@available(*, deprecated, message: "Deprecated")
 struct ConsoleMessageDetailsRouter: View {
     @ObservedObject var viewModel: ConsoleDetailsRouterViewModel
 
@@ -24,6 +26,8 @@ struct ConsoleMessageDetailsRouter: View {
     }
 }
 
+#warning("remove")
+@available(*, deprecated, message: "Deprecated")
 final class ConsoleDetailsRouterViewModel: ObservableObject {
     @Published private(set) var viewModel: DetailsViewModel?
     var id: NSManagedObjectID?

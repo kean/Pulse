@@ -93,31 +93,6 @@ extension View {
 }
 
 extension Backport {
-    enum HorizontalEdge {
-        case leading, trailing
-
-        @available(iOS 15, tvOS 15, *)
-        var edge: SwiftUI.HorizontalEdge {
-            switch self {
-            case .leading: return .leading
-            case .trailing: return .trailing
-            }
-        }
-    }
-
-    @ViewBuilder
-    func swipeActions<T>(edge: HorizontalEdge = .trailing, allowsFullSwipe: Bool = true, @ViewBuilder content: () -> T) -> some View where T: View {
-#if os(iOS) || os(watchOS)
-        if #available(iOS 15, *) {
-            self.content.swipeActions(edge: edge.edge, allowsFullSwipe: allowsFullSwipe, content: content)
-        } else {
-            self.content
-        }
-#else
-        self.content
-#endif
-    }
-
     @ViewBuilder
     func contextMenu<M: View, P: View>(@ViewBuilder menuItems: () -> M, @ViewBuilder preview: () -> P) -> some View {
 #if !os(watchOS)

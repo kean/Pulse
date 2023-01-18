@@ -17,9 +17,10 @@ struct PinButton: View {
     var body: some View {
         Button(action: viewModel.togglePin) {
             if isTextNeeded {
-                Text(viewModel.isPinned ? "Remove Pin" : "Pin")
+                Label(viewModel.isPinned ? "Remove Pin" : "Pin", systemImage: viewModel.isPinned ? "pin.fill" : "pin")
+            } else {
+                Image(systemName: viewModel.isPinned ? "pin.fill" : "pin")
             }
-            Image(systemName: viewModel.isPinned ? "pin.fill" : "pin")
         }
     }
 }
@@ -66,13 +67,13 @@ final class PinButtonViewModel: ObservableObject {
     private let pins: LoggerStore.Pins?
     private var cancellables: [AnyCancellable] = []
 
-    init(message: LoggerMessageEntity) {
+    init(_ message: LoggerMessageEntity) {
         self.message = message
         self.pins = message.managedObjectContext?.userInfo[pinServiceKey] as? LoggerStore.Pins
         self.subscribe()
     }
 
-    init(task: NetworkTaskEntity) {
+    init(_ task: NetworkTaskEntity) {
         self.message = task.message
         self.pins = task.managedObjectContext?.userInfo[pinServiceKey] as? LoggerStore.Pins
         self.subscribe()

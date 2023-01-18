@@ -16,7 +16,7 @@ struct NetworkMessageContextMenu: View {
     var body: some View {
         NetworkMessageContextMenuCopySection(task: task)
         if let message = task.message {
-            PinButton(viewModel: .init(message: message))
+            PinButton(viewModel: .init(message))
         }
     }
 }

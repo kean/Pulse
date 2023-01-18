@@ -24,7 +24,7 @@ final class ConsoleMessageCellViewModel: Pinnable {
         return formatter
     }()
     
-    private(set) lazy var pinViewModel = PinButtonViewModel(message: message)
+    private(set) lazy var pinViewModel = PinButtonViewModel(message)
     
     init(message: LoggerMessageEntity, searchCriteriaViewModel: ConsoleSearchCriteriaViewModel? = nil) {
         self.message = message

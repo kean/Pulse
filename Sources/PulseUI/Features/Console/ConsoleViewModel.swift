@@ -12,11 +12,6 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     let isNetworkOnly: Bool
     let store: LoggerStore
 
-#if os(iOS) || os(macOS)
-    let table: ConsoleTableViewModel
-    let details: ConsoleDetailsRouterViewModel
-#endif
-
 #warning("remove as much access for entities as possible")
 #warning("update list usage on macOS")
 #warning("remove custom disclosure icon")
@@ -62,11 +57,6 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         self.isNetworkOnly = mode == .network
 
         self.searchCriteriaViewModel = ConsoleSearchCriteriaViewModel(store: store, entities: entitiesSubject)
-
-#if os(iOS) || os(macOS)
-        self.details = ConsoleDetailsRouterViewModel()
-        self.table = ConsoleTableViewModel(searchCriteriaViewModel: searchCriteriaViewModel)
-#endif
 
 #if os(iOS)
         self.insightsViewModel = InsightsViewModel(store: store)
@@ -158,10 +148,6 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChangeContentWith diff: CollectionDifference<NSManagedObjectID>) {
         guard isActive else { return }
-
-#if os(iOS) || os(macOS)
-        self.table.diff = diff
-#endif
         withAnimation {
             reloadMessages(isMandatory: false)
         }

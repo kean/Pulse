@@ -9,26 +9,26 @@ import Combine
 
 #if os(iOS)
 
+#warning("reimplement")
 struct NetworkInsightsRequestsList: View {
     @ObservedObject var viewModel: NetworkInsightsRequestsListViewModel
 
     public var body: some View {
-        ConsoleTableView(
-            header: { EmptyView() },
-            viewModel: viewModel.table,
-            detailsViewModel: viewModel.details
-        )
+        EmptyView()
+//        ConsoleTableView(
+//            header: { EmptyView() },
+//            viewModel: viewModel.table,
+//            detailsViewModel: viewModel.details
+//        )
     }
 }
 
 final class NetworkInsightsRequestsListViewModel: ObservableObject {
-    let table: ConsoleTableViewModel
-    let details: ConsoleDetailsRouterViewModel
 
     init(tasks: [NetworkTaskEntity]) {
-        self.table = ConsoleTableViewModel(searchCriteriaViewModel: nil)
-        self.table.entities = tasks
-        self.details = ConsoleDetailsRouterViewModel()
+//        self.table = ConsoleTableViewModel(searchCriteriaViewModel: nil)
+//        self.table.entities = tasks
+//        self.details = ConsoleDetailsRouterViewModel()
     }
 }
 

@@ -7,19 +7,19 @@ import SwiftUI
 import Pulse
 import CoreData
 
+#warning("add context menus back")
+
 struct ConsoleEntityCell: View {
     let entity: NSManagedObject
 
     var body: some View {
         if let task = entity as? NetworkTaskEntity {
-            NetworkRequestRow(task: task)
+            _ConsoleTaskCell(task: task)
         } else if let message = entity as? LoggerMessageEntity {
             if let task = message.task {
-                NetworkRequestRow(task: task)
+                _ConsoleTaskCell(task: task)
             } else {
-                NavigationLink(destination: LazyConsoleDetailsView(message: message)) {
-                    ConsoleMessageCell(viewModel: .init(message: message))
-                }
+                _ConsoleMessageCell(message: message)
             }
         } else {
             fatalError("Unsupported entity: \(entity)")
@@ -27,12 +27,46 @@ struct ConsoleEntityCell: View {
     }
 }
 
-private struct NetworkRequestRow: View {
-    let task: NetworkTaskEntity
+private struct _ConsoleMessageCell: View {
+    let message: LoggerMessageEntity
+    @State private var shareItems: ShareItems?
 
     var body: some View {
-        NavigationLink(destination: LazyNetworkInspectorView(task: task)) {
+        let cell = NavigationLink(destination: LazyConsoleDetailsView(message: message)) {
+            ConsoleMessageCell(viewModel: .init(message: message))
+        }
+        if #available(iOS 15, tvOS 15, *) {
+            cell.swipeActions(edge: .leading, allowsFullSwipe: true) {
+                PinButton(viewModel: .init(message)).tint(.pink)
+            }.swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                Button(action: { shareItems = ShareService.share(message, as: .html) }) {
+                    Label("Share", systemImage: "square.and.arrow.up.fill")
+                }.tint(.blue)
+            }.sheet(item: $shareItems, content: ShareView.init)
+        } else {
+            cell
+        }
+    }
+}
+
+private struct _ConsoleTaskCell: View {
+    let task: NetworkTaskEntity
+    @State private var shareItems: ShareItems?
+
+    var body: some View {
+        let cell = NavigationLink(destination: LazyNetworkInspectorView(task: task)) {
             ConsoleTaskCell(viewModel: .init(task: task))
+        }
+        if #available(iOS 15, tvOS 15, *) {
+            cell.swipeActions(edge: .leading, allowsFullSwipe: true) {
+                PinButton(viewModel: .init(task)).tint(.pink)
+            }.swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                Button(action: { shareItems = ShareService.share(task, as: .html) }) {
+                    Label("Share", systemImage: "square.and.arrow.up.fill")
+                }.tint(.blue)
+            }.sheet(item: $shareItems, content: ShareView.init)
+        } else {
+            cell
         }
     }
 }

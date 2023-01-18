@@ -63,7 +63,7 @@ final class ConsoleTaskCellViewModel: Pinnable, ObservableObject {
 
     // MARK: Pins
 
-    lazy var pinViewModel = PinButtonViewModel(task: task)
+    lazy var pinViewModel = PinButtonViewModel(task)
 
     // MARK: Context Menu
 
