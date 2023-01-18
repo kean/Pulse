@@ -98,7 +98,7 @@ final class ConsoleSearchOperation {
         guard service.isMatching(task, filters: parameters.filters) else {
             return nil
         }
-        guard parameters.searchTerm.count > 1 else {
+        guard !parameters.searchTerms.isEmpty else {
             guard !parameters.filters.isEmpty else {
                 return nil
             }

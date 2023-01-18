@@ -8,6 +8,7 @@ import SwiftUI
 struct ConsoleSearchRecentSearchesView: View {
     @ObservedObject var viewModel: ConsoleSearchViewModel
 
+    #warning("render tokens")
     var body: some View {
         Section(header: header) {
             ForEach(viewModel.recentSearches.prefix(3), id: \.self) { search in
@@ -15,7 +16,7 @@ struct ConsoleSearchRecentSearchesView: View {
                     HStack {
                         Image(systemName: "magnifyingglass")
                             .foregroundColor(.secondary)
-                        Text(search.searchTerm)
+                        Text(search.searchTerms.joined(separator: ", "))
                             .foregroundColor(.primary)
                     }
                 }

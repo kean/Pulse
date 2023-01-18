@@ -9,6 +9,8 @@ import Combine
 
 #if os(iOS)
 
+#warning("add keyboard shortcuts")
+
 struct ConsoleFiltersView: View {
     @ObservedObject var viewModel: ConsoleViewModel
     @State private var isShowingFilters = false

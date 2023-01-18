@@ -7,6 +7,8 @@ import Pulse
 import CoreData
 import Combine
 
+#warning("fix an issue where pending task state is not getting updated")
+
 #warning("improve how search status is displayed")
 #warning("improve search status & remove hardcoded occurenes")
 #warning("use return key to apply filter instead of performing search (?) what about recent searches then?")
@@ -22,6 +24,8 @@ import Combine
 #warning("try and fix searchable animation issue")
 #warning("display spinner in new toolbar")
 
+#if os(iOS)
+
 @available(iOS 15, tvOS 15, *)
 struct ConsoleSearchView: View {
     @ObservedObject var viewModel: ConsoleSearchViewModel
@@ -34,14 +38,10 @@ struct ConsoleSearchView: View {
 
     var body: some View {
         Section(header: toolbar) {
-            if viewModel.searchBar.isEmpty {
-                makeList(with: viewModel.suggestedFilters)
-            } else {
-                makeList(with: Array(viewModel.allSuggestions.prefix(3)))
-            }
+            makeList(with: viewModel.topSuggestions)
         }
 
-        if viewModel.searchBar.isEmpty {
+        if !viewModel.suggestedScopes.isEmpty {
             Section(header: Text("Suggested Scopes")) {
                 makeList(with: viewModel.suggestedScopes)
             }
@@ -51,7 +51,29 @@ struct ConsoleSearchView: View {
             ConsoleSearchRecentSearchesView(viewModel: viewModel)
         }
 
-        if viewModel.searchBar.text.count > 1 {
+        if viewModel.isNewResultsButtonShown {
+            Section {
+                Button(action: viewModel.buttonShowNewlyAddedSearchResultsTapped) {
+                    HStack {
+                        Text("New Results Available")
+                        Image(systemName: "arrow.clockwise.circle.fill")
+                    }
+                        .font(.headline)
+                        .foregroundColor(.white)
+                        .padding(8)
+                        .background(Color.blue)
+                        .cornerRadius(8)
+                }
+                .listRowSeparator(.hidden)
+                .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+                .padding(.vertical, -8)
+                .frame(maxWidth: .infinity, alignment: .center)
+                .listRowBackground(Color.clear)
+            }
+        }
+
+        #warning("this is inefficient, save parameters or something")
+        if !viewModel.searchBar.parameters.searchTerms.isEmpty {
             ForEach(viewModel.results) { result in
                 Section {
                     ConsoleSearchResultView(viewModel: result)
@@ -93,3 +115,5 @@ struct ConsoleSearchView: View {
         .padding(.top, -14)
     }
 }
+
+#endif

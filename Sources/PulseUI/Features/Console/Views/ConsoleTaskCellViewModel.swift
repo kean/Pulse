@@ -9,12 +9,6 @@ import CoreData
 
 final class ConsoleTaskCellViewModel: Pinnable, ObservableObject {
     private(set) lazy var time = ConsoleMessageCellViewModel.timeFormatter.string(from: task.createdAt)
-#if os(iOS)
-    private(set) var badgeColor: UIColor = .gray
-#else
-    private(set) var badgeColor: Color = .gray
-#endif
-    private(set) var state: NetworkTaskEntity.State = .pending
     private(set) lazy var progress = ProgressViewModel(task: task)
 
     let task: NetworkTaskEntity
@@ -31,34 +25,11 @@ final class ConsoleTaskCellViewModel: Pinnable, ObservableObject {
         self.task = task
         self.progress = ProgressViewModel(task: task)
 
-        self.refresh()
-
         self.cancellable = task.objectWillChange.sink { [weak self] in
-            self?.refresh()
             withAnimation {
                 self?.objectWillChange.send()
             }
         }
-    }
-
-    private func refresh() {
-        let state = task.state
-
-#if os(iOS)
-        switch state {
-        case .pending: self.badgeColor = .systemYellow
-        case .success: self.badgeColor = .systemGreen
-        case .failure: self.badgeColor = .systemRed
-        }
-#else
-        switch state {
-        case .pending: self.badgeColor = .yellow
-        case .success: self.badgeColor = .green
-        case .failure: self.badgeColor = .red
-        }
-#endif
-
-        self.state = task.state
     }
 
     // MARK: Pins

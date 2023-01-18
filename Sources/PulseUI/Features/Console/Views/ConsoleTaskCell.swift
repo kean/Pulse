@@ -7,6 +7,8 @@ import Pulse
 import Combine
 import CoreData
 
+#warning("fix state not updaing in the search screen")
+
 struct ConsoleTaskCell: View {
     @ObservedObject var viewModel: ConsoleTaskCellViewModel
     @ObservedObject var progressViewModel: ProgressViewModel
@@ -16,92 +18,69 @@ struct ConsoleTaskCell: View {
         self.progressViewModel = viewModel.progress
     }
 
-#if os(watchOS) || os(iOS)
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 5) {
             title
-            Text(viewModel.task.url ?? "–")
-                .font(ConsoleConstants.fontBody)
-                .lineLimit(ConsoleSettings.shared.lineLimit)
-            Text(ConsoleFormatter.details(for: viewModel.task))
-                .lineLimit(2)
-                .font(ConsoleConstants.fontTitle)
-                .foregroundColor(.secondary)
+            message
+#if os(iOS) || os(macOS)
+            if viewModel.task.state == .pending {
+                Text(ConsoleFormatter.progress(for: viewModel.task) ?? "...")
+                    .lineLimit(1)
+                    .font(ConsoleConstants.fontTitle)
+                    .foregroundColor(.secondary)
+            } else {
+                details
+            }
+#endif
         }
     }
 
     private var title: some View {
         HStack {
-            HStack {
-                Circle()
-                    .frame(width: 10, height: 10)
-#if os(iOS)
-                    .foregroundColor(Color(viewModel.badgeColor))
-#else
-                    .foregroundColor(viewModel.badgeColor)
-#endif
-                Text(viewModel.task.httpMethod ?? "GET")
-                    .font(ConsoleConstants.fontTitle)
-                    .foregroundColor(.secondary)
-            }
+            (Text(Image(systemName: viewModel.task.state.iconSystemName)) + Text(" " + ConsoleFormatter.status(for: viewModel.task)))
+                .font(ConsoleConstants.fontTitle)
+                .fontWeight(.medium)
+                .foregroundColor(viewModel.task.state.tintColor)
+                .lineLimit(1)
             Spacer()
-#if os(iOS)
+#if os(iOS) || os(macOS)
             PinView(viewModel: viewModel.pinViewModel, font: ConsoleConstants.fontTitle)
                 .frame(width: 4, height: 4) // don't affect layout
 #endif
             Text(viewModel.time)
                 .font(ConsoleConstants.fontTitle)
-                .foregroundColor(.secondary)
-                .backport.monospacedDigit()
-        }
-    }
-#elseif os(tvOS) || os(macOS)
-    var body: some View {
-        VStack(alignment: .leading, spacing: verticalSpacing) {
-            title
-            Text(viewModel.task.url ?? "–")
-                .font(ConsoleConstants.fontBody)
-                .lineLimit(ConsoleSettings.shared.lineLimit)
-        }
-#if os(macOS)
-        .padding(.vertical, 3)
-#endif
-    }
-
-    private var title: some View {
-        HStack {
-            HStack(spacing: spacing) {
-                Circle()
-                    .frame(width: circleSize, height: circleSize)
-                    .foregroundColor(viewModel.badgeColor)
-                Text(ConsoleFormatter.subheadline(for: viewModel.task, hasTime: false))
-                    .lineLimit(1)
-                    .font(ConsoleConstants.fontTitle)
-                    .foregroundColor(.secondary)
-            }
-            Spacer()
-#if os(macOS)
-            PinView(viewModel: viewModel.pinViewModel, font: ConsoleConstants.fontTitle)
-#endif
-            Text(viewModel.time)
+                .foregroundColor(viewModel.task.state == .failure ? .red : .secondary)
                 .lineLimit(1)
-                .font(ConsoleConstants.fontTitle)
-                .foregroundColor(.secondary)
                 .backport.monospacedDigit()
         }
     }
 
-#if os(macOS)
-    private let verticalSpacing: CGFloat = 2
-    private let spacing: CGFloat = 7
-    private let circleSize: CGFloat = 8
-#else
-    private let verticalSpacing: CGFloat = 4
-    private let spacing: CGFloat = 16
-    private let circleSize: CGFloat = 20
-#endif
+    private var message: some View {
+        (Text((viewModel.task.httpMethod ?? "GET") + " ").font(ConsoleConstants.fontBody.smallCaps()).fontWeight(.medium) +
+         Text(viewModel.task.url ?? "–"))
+        .font(ConsoleConstants.fontBody)
+        .foregroundColor(.primary)
+        .lineLimit(ConsoleSettings.shared.lineLimit)
+    }
 
-#endif
+    private var details: some View {
+        (Text(Image(systemName: "arrow.up.circle")).fontWeight(.light) +
+         Text(" " + byteCount(for: viewModel.task.requestBodySize)) +
+         Text("   ") +
+         Text(Image(systemName: "arrow.down.circle")).fontWeight(.light) +
+         Text(" " + byteCount(for: viewModel.task.responseBodySize)) +
+         Text("   ") +
+         Text(Image(systemName: "clock")).fontWeight(.light) +
+         Text(" " + (ConsoleFormatter.duration(for: viewModel.task) ?? "–")))
+            .lineLimit(1)
+            .font(ConsoleConstants.fontTitle)
+            .foregroundColor(.secondary)
+    }
+
+    private func byteCount(for size: Int64) -> String {
+        guard size > 0 else { return "0 KB" }
+        return ByteCountFormatter.string(fromByteCount: size)
+    }
 }
 
 #if DEBUG

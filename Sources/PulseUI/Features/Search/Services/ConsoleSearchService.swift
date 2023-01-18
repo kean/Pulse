@@ -7,13 +7,6 @@ import Pulse
 import CoreData
 import Combine
 
-#warning("cache results for prefixes")
-#warning("preheat store with a sample operation")
-#warning("cache response bodies")
-#warning("save duplicated results for bodies")
-#warning("construct prefix searchtree or proper index (?)")
-#warning("add wildcards & regex support")
-
 @available(iOS 15, tvOS 15, *)
 final class ConsoleSearchService {
     private let helper = TextHelper()
@@ -23,7 +16,6 @@ final class ConsoleSearchService {
         filters.allSatisfy { $0.filter.isMatch(task) }
     }
 
-    // TODO: cache response bodies in memory
     func search(in task: NetworkTaskEntity, parameters: ConsoleSearchParameters) -> [ConsoleSearchOccurence] {
         var occurences: [ConsoleSearchOccurence] = []
         for scope in parameters.scopes {
@@ -72,15 +64,15 @@ final class ConsoleSearchService {
         return search(content, parameters, scope)
     }
 
-#warning("rewrite using Regex and String")
-
     private func search(_ content: NSString, _ parameters: ConsoleSearchParameters, _ scope: ConsoleSearchScope) -> [ConsoleSearchOccurence] {
         var allMatches: [(line: NSString, lineNumber: Int, range: NSRange)] = []
         var lineCount = 0
         content.enumerateLines { line, stop in
             lineCount += 1
             let line = line as NSString
-            let matches = line.ranges(of: parameters.searchTerm, options: .init(parameters.options))
+            let matches = parameters.searchTerms.flatMap {
+                line.ranges(of: $0, options: .init(parameters.options))
+            }
             for range in matches {
                 allMatches.append((line, lineCount, range))
             }
@@ -90,35 +82,52 @@ final class ConsoleSearchService {
         var matchIndex = 0
         for (line, lineNumber, range) in allMatches {
             let lineRange = lineCount == 1 ? NSRange(location: 0, length: content.length) :  (line.getLineRange(range) ?? range) // Optimization for long lines
-            var contextRange = lineRange
-            while contextRange.length > 0 {
-                guard let character = Character(line.character(at: contextRange.upperBound - 1)),
-                      character.isNewline || character.isWhitespace || character == ","
-                else { break }
-                contextRange.length -= 1
+
+            var prefixRange = NSRange(location: lineRange.location, length: range.location - lineRange.location)
+            var suffixRange = NSRange(location: range.upperBound, length: lineRange.upperBound - range.upperBound)
+
+
+            // Reduce context to a reasonable size
+            var needsPrefixEllipsis = false
+            if prefixRange.length > 20 {
+                let distance = prefixRange.length - 20
+                prefixRange.length = 20
+                prefixRange.location += distance
+                needsPrefixEllipsis = true
+            }
+            suffixRange.length = min(120, suffixRange.length)
+
+            // Trim whitespace and some punctuation characters from the end of the string
+            while prefixRange.location < range.location, shouldTrimCharacter(line.character(at: prefixRange.location)) {
+                prefixRange.location += 1
+                prefixRange.length -= 1
+            }
+            while (suffixRange.upperBound - 1) > range.location, shouldTrimCharacter(line.character(at: (suffixRange.upperBound - 1))) {
+                suffixRange.length -= 1
             }
 
-            var prefix = ""
-            if lineRange.length > 300, range.location - contextRange.location > 16 {
-                contextRange.length -= (range.location - contextRange.location - 16)
-                contextRange.location = range.location - 16
-                prefix = "…"
+            // Try to trim the prefix at the start of the word
+            while prefixRange.location > 0,
+                  let character = Character(line.character(at: prefixRange.location)),
+                  !character.isWhitespace,
+                  prefixRange.length < 30 {
+                prefixRange.location -= 1
+                prefixRange.length += 1
             }
-            contextRange.length = min(contextRange.length, 500)
 
-            let previewText = (prefix + line.substring(with: contextRange))
-                .trimmingCharacters(in: .whitespacesAndNewlines)
-            var preview = AttributedString(previewText, attributes: AttributeContainer(helper.attributes(role: .body2, style: .monospaced)))
-            if let range = preview.range(of: parameters.searchTerm, options: .init(parameters.options)) {
-                preview[range].foregroundColor = .orange
-            }
+            let attributes = AttributeContainer(helper.attributes(role: .body2, style: .monospaced))
+            let prefix = AttributedString((needsPrefixEllipsis ? "…" : "") + line.substring(with: prefixRange), attributes: attributes)
+            var match = AttributedString(line.substring(with: range), attributes: attributes)
+            match.foregroundColor = .orange
+            let suffix = AttributedString(line.substring(with: suffixRange), attributes: attributes)
+            let preview = prefix + match + suffix
 
             let occurence = ConsoleSearchOccurence(
                 scope: scope,
                 line: lineNumber,
                 range: range,
                 text: preview,
-                searchContext: .init(searchTerm: parameters.searchTerm, options: parameters.options, matchIndex: matchIndex)
+                searchContext: .init(searchTerm: parameters.searchTerms.first!, options: parameters.options, matchIndex: matchIndex)
             )
             occurences.append(occurence)
 
@@ -151,23 +160,7 @@ struct ConsoleSearchOccurence {
     let searchContext: RichTextViewModel.SearchContext
 }
 
-struct ConsoleSearchParameters: Equatable, Hashable, Codable {
-    let searchTerm: String
-    let tokens: [ConsoleSearchToken]
-    let options: StringSearchOptions
-
-    var filters: [ConsoleSearchFilter] {
-        tokens.compactMap {
-            guard case .filter(let filter) = $0 else { return nil }
-            return filter
-        }
-    }
-
-    var scopes: [ConsoleSearchScope] {
-        let scopes: [ConsoleSearchScope] = tokens.compactMap {
-            guard case .scope(let scope) = $0 else { return nil }
-            return scope
-        }
-        return scopes.isEmpty ? ConsoleSearchScope.allCases : scopes
-    }
+private func shouldTrimCharacter(_ character: unichar) -> Bool {
+    guard let character = Character(character) else { return true }
+    return character.isNewline || character.isWhitespace || character == ","
 }

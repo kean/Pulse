@@ -7,6 +7,8 @@ import Pulse
 import CoreData
 import Combine
 
+#warning("use caps and medium for badge")
+
 struct ConsoleMessageCell: View {
     let viewModel: ConsoleMessageCellViewModel
 
@@ -16,7 +18,7 @@ struct ConsoleMessageCell: View {
                 Text(viewModel.message.logLevel.name.uppercased())
                     .lineLimit(1)
                     .font(ConsoleConstants.fontTitle)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(titleColor)
                 Spacer()
 #if os(macOS) || os(iOS)
                 PinView(viewModel: viewModel.pinViewModel, font: ConsoleConstants.fontTitle)
@@ -25,7 +27,7 @@ struct ConsoleMessageCell: View {
                 Text(viewModel.time)
                     .lineLimit(1)
                     .font(ConsoleConstants.fontTitle)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(titleColor)
                     .backport.monospacedDigit()
             }
             Text(viewModel.preprocessedText)
@@ -36,6 +38,10 @@ struct ConsoleMessageCell: View {
 #if os(macOS)
         .padding(.vertical, 3)
 #endif
+    }
+
+    var titleColor: Color {
+        viewModel.message.logLevel >= .warning ? .textColor(for: viewModel.message.logLevel) : .secondary
     }
 }
 

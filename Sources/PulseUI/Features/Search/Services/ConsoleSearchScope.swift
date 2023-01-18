@@ -13,6 +13,8 @@ enum ConsoleSearchScope: Equatable, Hashable, Codable, CaseIterable {
     case responseHeaders
     case responseBody
 
+    static let allEligibleScopes = ConsoleSearchScope.allCases.filter { $0 != .originalRequestHeaders }
+
     var title: String {
         switch self {
         case .originalRequestHeaders: return "Request Headers"

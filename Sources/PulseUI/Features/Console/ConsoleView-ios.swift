@@ -7,6 +7,9 @@ import CoreData
 import Pulse
 import Combine
 
+#warning("improve style of cells (full red for errors) and better critical design")
+#warning("refactor")
+
 #if os(iOS)
 
 public struct ConsoleView: View {
@@ -34,9 +37,7 @@ struct _ConsoleView: View {
     @State private var selectedShareOutput: ShareOutput?
 
     var body: some View {
-        contentView
-            .onAppear(perform: viewModel.onAppear)
-            .onDisappear(perform: viewModel.onDisappear)
+        _ConsoleListView(viewModel: viewModel)
             .edgesIgnoringSafeArea(.bottom)
             .navigationTitle(viewModel.title)
             .navigationBarItems(
@@ -68,18 +69,6 @@ struct _ConsoleView: View {
     }
 
     @ViewBuilder
-    private var contentView: some View {
-        if #available(iOS 15, *) {
-            _ConsoleContentView(viewModel: viewModel)
-        } else {
-            List {
-                _ConsoleRegularContentView(viewModel: viewModel)
-            }
-            .listStyle(.grouped)
-        }
-    }
-
-    @ViewBuilder
     private var shareMenu: some View {
         Button(action: { share(as: .plainText) }) {
             Label("Share as Text", systemImage: "square.and.arrow.up")
@@ -98,44 +87,47 @@ struct _ConsoleView: View {
     }
 }
 
-@available(iOS 15, *)
-private struct _ConsoleContentView: View {
+private struct _ConsoleListView: View {
     let viewModel: ConsoleViewModel
-    @ObservedObject var searchBarViewModel: ConsoleSearchBarViewModel
+    @ObservedObject private var searchBarViewModel: ConsoleSearchBarViewModel
 
     init(viewModel: ConsoleViewModel) {
         self.viewModel = viewModel
-        self.searchBarViewModel = viewModel.searchViewModel.searchBar
+        self.searchBarViewModel = viewModel.searchBarViewModel
     }
 
     var body: some View {
         let list = List {
-            _ConsoleSearchableContentView(viewModel: viewModel)
+            if #available(iOS 15, *) {
+                _ConsoleSearchableContentView(viewModel: viewModel)
+            } else {
+                _ConsoleRegularContentView(viewModel: viewModel)
+            }
         }
         .listStyle(.grouped)
-        .environment(\.defaultMinListRowHeight, 0)
+        .environment(\.defaultMinListRowHeight, 8)
 
         if #available(iOS 16, *) {
             list
                 .searchable(text: $searchBarViewModel.text, tokens: $searchBarViewModel.tokens, token: {
-                    Label($0.title, systemImage: $0.systemImage)
+                    if let image = $0.systemImage {
+                        Label($0.title, systemImage: image)
+                    } else {
+                        Text($0.title)
+                    }
                 })
-                .onSubmit(of: .search) {
-                    viewModel.searchViewModel.onSubmitSearch()
-                }
+                .onSubmit(of: .search, viewModel.searchViewModel.onSubmitSearch)
+                .disableAutocorrection(true)
+        } else if #available(iOS 15, *) {
+            list
+                .searchable(text: $searchBarViewModel.text)
+                .onSubmit(of: .search, viewModel.searchViewModel.onSubmitSearch)
                 .disableAutocorrection(true)
         } else {
             list
-                .searchable(text: $searchBarViewModel.text)
-                .onSubmit(of: .search) {
-                    viewModel.searchViewModel.onSubmitSearch()
-                }
-                .disableAutocorrection(true)
         }
     }
 }
-
-#warning("is setting entities like this OK? should they get updated continuously instead?")
 
 @available(iOS 15, *)
 private struct _ConsoleSearchableContentView: View {
@@ -143,6 +135,13 @@ private struct _ConsoleSearchableContentView: View {
     @Environment(\.isSearching) private var isSearching
 
     var body: some View {
+        contents.onChange(of: isSearching) {
+            viewModel.searchViewModel.isViewVisible = $0
+        }
+    }
+
+    @ViewBuilder
+    private var contents: some View {
         if isSearching {
             ConsoleSearchView(viewModel: viewModel)
         } else {
@@ -151,9 +150,6 @@ private struct _ConsoleSearchableContentView: View {
     }
 }
 
-#warning("test core data fetches make sure there is only one")
-#warning("extract .entities somewhere else so that we can have fewer view reloads")
-
 private struct _ConsoleRegularContentView: View {
     @ObservedObject var viewModel: ConsoleViewModel
 
@@ -161,10 +157,10 @@ private struct _ConsoleRegularContentView: View {
         Section(header: ConsoleToolbarView(viewModel: viewModel)) {
             makeForEach(viewModel: viewModel)
         }
+        .onAppear(perform: viewModel.onAppear)
+        .onDisappear(perform: viewModel.onDisappear)
     }
 }
-
-#warning("pass entities to ConsoleSearchView properly")
 
 private struct ConsoleToolbarView: View {
     @ObservedObject var viewModel: ConsoleViewModel

@@ -12,7 +12,7 @@ struct Pulse_Demo_iOSApp: App {
 //        let _ = testProxy()
         WindowGroup {
             NavigationView {
-                ConsoleView(store: .demo)
+                ConsoleView(store: .mock)
             }
         }
     }

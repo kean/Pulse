@@ -63,44 +63,28 @@ enum ConsoleFormatter {
         return [
             hasTime ? time(for: task.createdAt) : nil,
             task.httpMethod ?? "GET",
-            details(for: task)
+            status(for: task),
+            transferSize(for: task),
+            duration(for: task)
         ].compactMap { $0 }.joined(separator: separator)
-    }
-
-    static func time(for date: Date) -> String {
-        ConsoleMessageCellViewModel.timeFormatter.string(from: date)
     }
 
     /// Example:
     ///
-    /// "Pending"
-    /// "200 OK · 2.2s"
+    /// "GET · Pending"
+    /// "GET · 21.9 MB · 2.2s"
     static func details(for task: NetworkTaskEntity) -> String {
-        var components: [String] = [status(for: task)]
-        if task.state == .success {
-#if !os(watchOS)
-            switch task.type ?? .dataTask {
-            case .uploadTask:
-                if task.requestBodySize > 0 {
-                    let sizeText = ByteCountFormatter.string(fromByteCount: task.requestBodySize)
-                    components.append("\(sizeText)")
-                }
-            case .dataTask, .downloadTask:
-                if task.responseBodySize > 0 {
-                    let sizeText = ByteCountFormatter.string(fromByteCount: task.responseBodySize)
-                    components.append(sizeText)
-                }
-            case .streamTask, .webSocketTask:
-                break
-            }
-#endif
-        }
+        return [
+            transferSize(for: task),
+            duration(for: task),
+            progress(for: task)
+        ].compactMap { $0 }.joined(separator: separator)
+    }
 
-        if task.duration > 0 {
-            components.append(DurationFormatter.string(from: task.duration, isPrecise: false))
-        }
+    // MARK: Individual Components
 
-        return components.joined(separator: separator)
+    static func time(for date: Date) -> String {
+        ConsoleMessageCellViewModel.timeFormatter.string(from: date)
     }
 
     static func status(for task: NetworkTaskEntity) -> String {
@@ -112,6 +96,34 @@ enum ConsoleFormatter {
         case .failure:
             return ErrorFormatter.shortErrorDescription(for: task)
         }
+    }
+
+    static func transferSize(for task: NetworkTaskEntity) -> String? {
+        guard task.state == .success else {
+            return nil
+        }
+        switch task.type ?? .dataTask {
+        case .uploadTask:
+            if task.requestBodySize > 0 {
+                return ByteCountFormatter.string(fromByteCount: task.requestBodySize)
+            }
+        case .dataTask, .downloadTask:
+            if task.responseBodySize > 0 {
+                return ByteCountFormatter.string(fromByteCount: task.responseBodySize)
+            }
+        case .streamTask, .webSocketTask:
+            break
+        }
+        return nil
+    }
+
+    static func duration(for task: NetworkTaskEntity) -> String? {
+        guard task.duration > 0 else { return nil }
+        return DurationFormatter.string(from: task.duration, isPrecise: false)
+    }
+
+    static func progress(for task: NetworkTaskEntity) -> String? {
+        ProgressViewModel.details(for: task)
     }
 }
 

@@ -26,6 +26,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     private var _searchViewModel: AnyObject?
 #endif
 
+    let searchBarViewModel: ConsoleSearchBarViewModel
     let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
 
     var toolbarTitle: String {
@@ -45,7 +46,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     private var visibleObjectIDs: Set<NSManagedObjectID> = []
 
     private var controller: NSFetchedResultsController<NSManagedObject>?
-    private var isActive = false
+    private var isViewVisible = false
     private var cancellables: [AnyCancellable] = []
 
     enum Mode {
@@ -58,12 +59,13 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         self.mode = mode
         self.isNetworkOnly = mode == .network
 
+        self.searchBarViewModel = ConsoleSearchBarViewModel()
         self.searchCriteriaViewModel = ConsoleSearchCriteriaViewModel(store: store, entities: entitiesSubject)
 
 #if os(iOS)
         self.insightsViewModel = InsightsViewModel(store: store)
         if #available(iOS 15, *) {
-            self._searchViewModel = ConsoleSearchViewModel(entities: entitiesSubject, store: store)
+            self._searchViewModel = ConsoleSearchViewModel(entities: entitiesSubject, store: store, searchBar: searchBarViewModel)
         }
 #endif
 
@@ -116,12 +118,12 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     // MARK: Appearance
 
     func onAppear() {
-        isActive = true
+        isViewVisible = true
         reloadMessages(isMandatory: true)
     }
 
     func onDisappear() {
-        isActive = false
+        isViewVisible = false
     }
 
     // MARK: Refresh
@@ -149,7 +151,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     // MARK: - NSFetchedResultsControllerDelegate
 
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChangeContentWith diff: CollectionDifference<NSManagedObjectID>) {
-        if isActive {
+        if isViewVisible {
             withAnimation {
                 reloadMessages(isMandatory: false)
             }
