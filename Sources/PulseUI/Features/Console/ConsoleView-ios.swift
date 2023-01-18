@@ -155,7 +155,7 @@ private struct _ConsoleRegularContentView: View {
     @ObservedObject var viewModel: ConsoleViewModel
 
     var body: some View {
-        Section(header: ConsoleToolbarView(viewModel: viewModel)) {
+        Section(header: ConsoleToolbarView(title: viewModel.toolbarTitle, viewModel: viewModel)) {
             makeForEach(viewModel: viewModel)
         }
     }
@@ -169,7 +169,7 @@ private struct _ConsoleSearchContentView: View {
     @ObservedObject var viewModel: ConsoleSearchViewModel
 
     var body: some View {
-        Section(header: ConsoleToolbarView(viewModel: mainViewModel)) {
+        Section(header: ConsoleToolbarView(title: "test", viewModel: mainViewModel)) {
             ForEach(viewModel.suggestedFilters) {
                 ConsoleSearchSuggestionView(suggestion: $0, isActionable: viewModel.isActionable($0))
             }
@@ -178,55 +178,7 @@ private struct _ConsoleSearchContentView: View {
     }
 }
 
-private struct ConsoleToolbarView: View {
-    @ObservedObject var viewModel: ConsoleViewModel
-    @State private var isShowingFilters = false
-    @State private var messageCount = 0
-    @State private var isSearching = false
 
-    var body: some View {
-        VStack {
-            HStack(spacing: 0) {
-                let suffix = viewModel.mode == .network ? "Requests" : "Messages"
-                Text("\(viewModel.entities.count) \(suffix)")
-                    .foregroundColor(.secondary)
-                Spacer()
-                filters
-            }
-            .buttonStyle(.plain)
-            .padding(.bottom, 4)
-            .padding(.top, -10)
-        }
-        .sheet(isPresented: $isShowingFilters) {
-            NavigationView {
-                ConsoleSearchCriteriaView(viewModel: viewModel.searchCriteriaViewModel)
-                    .inlineNavigationTitle("Filters")
-                    .navigationBarItems(trailing: Button("Done") { isShowingFilters = false })
-            }
-        }
-    }
-
-    @ViewBuilder
-    private var filters: some View {
-        if !viewModel.isNetworkOnly {
-            Button(action: viewModel.toggleMode) {
-                Image(systemName: viewModel.mode == .network ? "arrow.down.circle.fill" : "arrow.down.circle")
-                    .font(.system(size: 20))
-                    .foregroundColor(.accentColor)
-            }.frame(width: 40)
-        }
-        Button(action: { viewModel.isOnlyErrors.toggle() }) {
-            Image(systemName: viewModel.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon")
-                .font(.system(size: 20))
-                .foregroundColor(viewModel.isOnlyErrors ? .red : .accentColor)
-        }.frame(width: 40)
-        Button(action: { isShowingFilters = true }) {
-            Image(systemName: viewModel.searchCriteriaViewModel.isCriteriaDefault ? "line.horizontal.3.decrease.circle" : "line.3.horizontal.decrease.circle.fill")
-                .font(.system(size: 20))
-                .foregroundColor(.accentColor)
-        }.frame(width: 40)
-    }
-}
 
 #if DEBUG
 struct ConsoleView_Previews: PreviewProvider {

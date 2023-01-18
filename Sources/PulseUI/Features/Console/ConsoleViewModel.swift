@@ -28,6 +28,11 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 
     let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
 
+    var toolbarTitle: String {
+        let suffix = mode == .network ? "Requests" : "Messages"
+        return "\(entities.count) \(suffix)"
+    }
+
     @Published var mode: Mode
     @Published var isOnlyErrors = false
     @Published var filterTerm: String = ""

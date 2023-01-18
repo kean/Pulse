@@ -91,6 +91,7 @@
 		0CDC3BED2971B936003BD1FF /* ConsoleSearchLogLevelsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CDC3BEC2971B936003BD1FF /* ConsoleSearchLogLevelsCell.swift */; };
 		0CE364F72971D1EA0063DFED /* ConsoleSearchCustomFiltersSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE364F62971D1EA0063DFED /* ConsoleSearchCustomFiltersSection.swift */; };
 		0CE45E0A29776BED00249C5D /* ConsoleListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE45E0929776BED00249C5D /* ConsoleListView.swift */; };
+		0CE45E0C2977813400249C5D /* ConsoleToolbarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE45E0B2977813400249C5D /* ConsoleToolbarView.swift */; };
 		0CEAB3E425FE862E00F09B0F /* Pulse Demo watchOS Extension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 0CEAB3E325FE862E00F09B0F /* Pulse Demo watchOS Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		0CEAB41025FE867A00F09B0F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0CEAB40E25FE867300F09B0F /* Assets.xcassets */; };
 		0CEAB41425FE867E00F09B0F /* PulseAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CEAB40A25FE867300F09B0F /* PulseAppApp.swift */; };
@@ -551,6 +552,7 @@
 		0CDFB833296F24140071EF77 /* CHANGELOG.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CHANGELOG.md; sourceTree = "<group>"; };
 		0CE364F62971D1EA0063DFED /* ConsoleSearchCustomFiltersSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchCustomFiltersSection.swift; sourceTree = "<group>"; };
 		0CE45E0929776BED00249C5D /* ConsoleListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleListView.swift; sourceTree = "<group>"; };
+		0CE45E0B2977813400249C5D /* ConsoleToolbarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleToolbarView.swift; sourceTree = "<group>"; };
 		0CEAB3DA25FE862D00F09B0F /* Pulse Demo watchOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pulse Demo watchOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0CEAB3E325FE862E00F09B0F /* Pulse Demo watchOS Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Pulse Demo watchOS Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0CEAB40625FE867300F09B0F /* ComplicationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComplicationController.swift; sourceTree = "<group>"; };
@@ -1415,6 +1417,7 @@
 				0CF0D602296F189600EED9D4 /* ConsoleMessageCellViewModel.swift */,
 				0CF0D609296F189600EED9D4 /* ConsoleTaskCell.swift */,
 				0CF0D603296F189600EED9D4 /* ConsoleTaskCellViewModel.swift */,
+				0CE45E0B2977813400249C5D /* ConsoleToolbarView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -2031,6 +2034,7 @@
 				0CF0D635296F189600EED9D4 /* InfoRow.swift in Sources */,
 				0CF0D674296F189600EED9D4 /* NetworkInspectorView-shared.swift in Sources */,
 				0CF0D611296F189600EED9D4 /* Deprecated.swift in Sources */,
+				0CE45E0C2977813400249C5D /* ConsoleToolbarView.swift in Sources */,
 				0CF0D61F296F189600EED9D4 /* Pulse+Extensions.swift in Sources */,
 				0CF0D61C296F189600EED9D4 /* UXKit.swift in Sources */,
 				0CF0D669296F189600EED9D4 /* NetworkHeadersCell.swift in Sources */,
