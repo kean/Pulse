@@ -274,11 +274,12 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         guard #available(iOS 16, tvOS 16, *) else { return }
 
         let hosts = hosts.objects.map(\.value)
+        let isSearchBarEmpty = searchBar.isEmpty
 
         queue.async {
             let topSuggestions: [ConsoleSearchSuggestion]
             let suggestedScopes: [ConsoleSearchSuggestion]
-            if self.searchBar.isEmpty {
+            if isSearchBarEmpty {
                 topSuggestions = self.makeDefaultSuggestedFilters()
                 suggestedScopes = self.makeDefaultSuggestedScopes()
             } else {
