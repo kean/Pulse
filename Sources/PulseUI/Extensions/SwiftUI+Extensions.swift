@@ -21,16 +21,6 @@ extension Color {
 }
 #endif
 
-struct InvisibleNavigationLinks<Content: View>: View {
-    @ViewBuilder let content: Content
-
-    var body: some View {
-        VStack { content }
-            .frame(width: 0, height: 0)
-            .invisible()
-    }
-}
-
 extension View {
     func invisible() -> some View {
         self.hidden().accessibilityHidden(true)
