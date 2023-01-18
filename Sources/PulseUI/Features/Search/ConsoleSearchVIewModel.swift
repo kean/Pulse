@@ -375,7 +375,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
             if host.hasPrefix(target) {
                 topHosts.append(host)
             } else if host.contains(target) {
-                otherHosts.append(target)
+                otherHosts.append(host)
             }
         }
         return topHosts + otherHosts

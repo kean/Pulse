@@ -27,7 +27,6 @@ extension Parsers {
         (ConsoleSearchFilter.statusCode(.init(values: values)), confidence)
     }
 
-#warning("suggest host enen if there is no match?")
     static let filterHost = (filterName("host") <*> listOf(host)).map { confidence, values in
         (ConsoleSearchFilter.host(.init(values: values)), confidence)
     }
