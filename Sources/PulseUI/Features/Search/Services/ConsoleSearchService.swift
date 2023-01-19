@@ -12,7 +12,7 @@ final class ConsoleSearchService {
     private let helper = TextHelper()
     private let cachedBodies = Cache<NSManagedObjectID, NSString>(costLimit: 16_000_000, countLimit: 1000)
 
-    func search(in message: LoggerMessageEntity, parameters: ConsoleSearchParameters) -> [ConsoleSearchOccurence] {
+    func search(in message: LoggerMessageEntity, parameters: ConsoleSearchParameters) -> [ConsoleSearchOccurrence] {
         search(message.text as NSString, parameters, .message)
     }
 
@@ -20,8 +20,8 @@ final class ConsoleSearchService {
         filters.allSatisfy { $0.filter.isMatch(task) }
     }
 
-    func search(in task: NetworkTaskEntity, parameters: ConsoleSearchParameters) -> [ConsoleSearchOccurence] {
-        var occurrences: [ConsoleSearchOccurence] = []
+    func search(in task: NetworkTaskEntity, parameters: ConsoleSearchParameters) -> [ConsoleSearchOccurrence] {
+        var occurrences: [ConsoleSearchOccurrence] = []
         for scope in parameters.scopes {
             switch scope {
             case .url:
@@ -63,14 +63,14 @@ final class ConsoleSearchService {
         return occurrences
     }
 
-    private func search(_ data: Data, _ parameters: ConsoleSearchParameters, _ scope: ConsoleSearchScope) -> [ConsoleSearchOccurence] {
+    private func search(_ data: Data, _ parameters: ConsoleSearchParameters, _ scope: ConsoleSearchScope) -> [ConsoleSearchOccurrence] {
         guard let content = NSString(data: data, encoding: NSUTF8StringEncoding) else {
             return []
         }
         return search(content, parameters, scope)
     }
 
-    private func search(_ content: NSString, _ parameters: ConsoleSearchParameters, _ scope: ConsoleSearchScope) -> [ConsoleSearchOccurence] {
+    private func search(_ content: NSString, _ parameters: ConsoleSearchParameters, _ scope: ConsoleSearchScope) -> [ConsoleSearchOccurrence] {
         var matchedTerms: Set<String> = []
         var allMatches: [(line: NSString, lineNumber: Int, range: NSRange)] = []
         var lineCount = 0
@@ -92,7 +92,7 @@ final class ConsoleSearchService {
             return [] // Has to match all
         }
 
-        var occurrences: [ConsoleSearchOccurence] = []
+        var occurrences: [ConsoleSearchOccurrence] = []
         var matchIndex = 0
         for (line, lineNumber, range) in allMatches {
             let lineRange = lineCount == 1 ? NSRange(location: 0, length: content.length) :  (line.getLineRange(range) ?? range) // Optimization for long lines
@@ -136,14 +136,14 @@ final class ConsoleSearchService {
             let suffix = AttributedString(line.substring(with: suffixRange), attributes: attributes)
             let preview = prefix + match + suffix
 
-            let occurence = ConsoleSearchOccurence(
+            let occurrence = ConsoleSearchOccurrence(
                 scope: scope,
                 line: lineNumber,
                 range: range,
                 text: preview,
                 searchContext: .init(searchTerm: parameters.searchTerms.first!, options: parameters.options, matchIndex: matchIndex)
             )
-            occurrences.append(occurence)
+            occurrences.append(occurrence)
 
             matchIndex += 1
         }
@@ -166,7 +166,7 @@ final class ConsoleSearchService {
 }
 
 @available(iOS 15, tvOS 15, *)
-struct ConsoleSearchOccurence {
+struct ConsoleSearchOccurrence {
     let scope: ConsoleSearchScope
     let line: Int
     let range: NSRange

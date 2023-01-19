@@ -172,7 +172,7 @@ final class ConsoleSearchTokenTests: XCTestCase {
 
         XCTAssertEqual(parse("request", in: "status code"), 0.0)
 
-        // One occurence instead of two is greater
+        // One occurrence instead of two is greater
         XCTAssertGreaterThan(parse("status code", in: "status code"), parse("status code", in: "status"))
 
         // Consume (important to cosume to figure out where the modifiers and arguments go

@@ -36,27 +36,27 @@ struct ConsoleSearchResultView: View {
         }
     }
 
-    // TODO: add occurence IDs instead of indices
-    private func makeCell(for occurence: ConsoleSearchOccurence) -> some View {
+    // TODO: add occurrence IDs instead of indices
+    private func makeCell(for occurrence: ConsoleSearchOccurrence) -> some View {
         return VStack(alignment: .leading, spacing: 4) {
-            Text(occurence.scope.fullTitle + " (\(occurence.line):\(occurence.range.lowerBound))")
+            Text(occurrence.scope.fullTitle + " (\(occurrence.line):\(occurrence.range.lowerBound))")
                 .font(ConsoleConstants.fontTitle)
                 .foregroundColor(.secondary)
-            Text(occurence.text)
+            Text(occurrence.text)
                 .lineLimit(3)
         }
     }
 
     @ViewBuilder
-    func makeDestination(for occurence: ConsoleSearchOccurence, entity: NSManagedObject) -> some View {
-        _makeDestination(for: occurence, entity: entity)
-            .environment(\.textViewSearchContext, occurence.searchContext)
+    func makeDestination(for occurrence: ConsoleSearchOccurrence, entity: NSManagedObject) -> some View {
+        _makeDestination(for: occurrence, entity: entity)
+            .environment(\.textViewSearchContext, occurrence.searchContext)
     }
 
     @ViewBuilder
-    func _makeDestination(for occurence: ConsoleSearchOccurence, entity: NSManagedObject) -> some View {
+    func _makeDestination(for occurrence: ConsoleSearchOccurrence, entity: NSManagedObject) -> some View {
         if let task = entity as? NetworkTaskEntity {
-            switch occurence.scope {
+            switch occurrence.scope {
             case .url:
                 NetworkDetailsView(title: "URL") {
                     TextRenderer(options: .sharing).make {
