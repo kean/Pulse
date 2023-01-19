@@ -85,16 +85,6 @@ extension Parsers {
         char.filter(characterSet.contains)
     }
 
-    static func nonconsuming(characterIn string: String) -> Parser<Void> {
-        nonconsuming(characterIn: CharacterSet(charactersIn: string))
-    }
-
-    static func nonconsuming(characterIn set: CharacterSet) -> Parser<Void> {
-        Parser { s in
-            s.first.map(set.contains) == true ? ((), s) : nil
-        }
-    }
-
     /// Matches characters while the given string doesn't contain them.
     static func string(excluding string: String) -> Parser<String> {
         char(excluding: string).oneOrMore.map { String($0) }
