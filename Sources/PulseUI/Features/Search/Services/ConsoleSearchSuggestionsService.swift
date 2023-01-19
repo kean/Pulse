@@ -105,7 +105,7 @@ final class ConsoleSearchSuggestionsService {
         }
         return Array(tokens.filter { token in
             !current.contains(where: { $0.isSameType(as: token) })
-        }.map(makeSuggestion).prefix(10))
+        }.map(makeSuggestion).prefix(8))
     }
 
     func makeDefaultSuggestedScopes() -> [ConsoleSearchSuggestion] {
