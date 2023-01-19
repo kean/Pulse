@@ -14,7 +14,10 @@ struct ConsoleSearchResultView: View {
 
     var body: some View {
         ConsoleEntityCell(entity: viewModel.entity)
-        let occurences = Array(viewModel.occurences.enumerated())
+        let occurences = Array(viewModel.occurences.enumerated()).filter {
+            // TODO: these should be displayed inline
+            $0.element.scope != .message && $0.element.scope != .url
+        }
         ForEach(occurences.prefix(limit), id: \.offset) { item in
             NavigationLink(destination: makeDestination(for: item.element, entity: viewModel.entity)) {
                 makeCell(for: item.element)
