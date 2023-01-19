@@ -72,7 +72,6 @@ struct ConsoleSearchView: View {
             }
         }
 
-        #warning("this is inefficient, save parameters or something")
         if !viewModel.searchBar.parameters.searchTerms.isEmpty {
             ForEach(viewModel.results) { result in
                 Section {
