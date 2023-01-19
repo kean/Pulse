@@ -9,21 +9,6 @@ import Combine
 
 #warning("fix an issue where pending task state is not getting updated")
 
-#warning("improve how search status is displayed")
-#warning("improve search status & remove hardcoded occurenes")
-#warning("use return key to apply filter instead of performing search (?) what about recent searches then?")
-#warning("when typning, display only a few top suggested filters")
-#warning("when user is entering more messages, automatically refresh search results")
-#warning("possible to switch to List or make sure the content update without jumping using any other approach?")
-#warning("fix an issue where occurence twice in the same line (see imageKit in request body as example)")
-#warning("show palceholer when results are empty")
-
-
-#warning("create ConsoleSearchViewModel here as configure with ConsoleViewModel")
-
-#warning("try and fix searchable animation issue")
-#warning("display spinner in new toolbar")
-
 #if os(iOS)
 
 @available(iOS 15, tvOS 15, *)
