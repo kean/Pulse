@@ -16,21 +16,6 @@ extension Array {
 }
 
 extension NSString {
-    /// Finds all occurrences of the given string
-    func ranges(of substring: String, options: NSString.CompareOptions = []) -> [NSRange] {
-        var index = 0
-        var ranges = [NSRange]()
-        while index < length {
-            let range = range(of: substring, options: options, range: NSRange(location: index, length: length - index), locale: nil)
-            if range.location == NSNotFound {
-                return ranges
-            }
-            ranges.append(range)
-            index = range.upperBound
-        }
-        return ranges
-    }
-
     func getLineRange(_ lineRange: NSRange) -> NSRange? {
         let range = self.lineRange(for: lineRange)
         return range.location != NSNotFound ? range : nil
@@ -46,12 +31,6 @@ extension Character {
     }
 }
 
-extension String {
-    /// Returns first range of substring.
-    func firstRange(of substring: String, options: String.CompareOptions = []) -> Range<String.Index>? {
-        range(of: substring, options: options, range: startIndex..<endIndex, locale: nil)
-    }
-}
 
 @available(iOS 15, tvOS 15, *)
 extension AttributedString {
@@ -65,55 +44,6 @@ extension AttributedString {
         var attributes = AttributeContainer()
         configure(&attributes)
         self.append(AttributedString(string, attributes: attributes))
-    }
-}
-
-struct StringSearchOptions: Equatable, Hashable, Codable {
-    var isRegex = false
-    var caseSensitivity: CaseSensitivity = .ignoringCase
-    var kind: Kind = .contains
-
-    static let `default` = StringSearchOptions()
-
-    enum CaseSensitivity: String, Hashable, Codable, CaseIterable {
-        case ignoringCase = "Ignoring Case"
-        case matchingCase = "Matching Case"
-    }
-
-    enum Kind: String, Equatable, Hashable, Codable, CaseIterable {
-        case begins = "Begins With"
-        case contains = "Contains"
-        case ends = "Ends With"
-    }
-
-    var title: String {
-        isRegex ? "Regex" : kind.rawValue
-    }
-}
-
-extension String.CompareOptions {
-    init(_ options: StringSearchOptions) {
-        self.init()
-        if options.isRegex {
-            insert(.regularExpression)
-        }
-        switch options.caseSensitivity {
-        case .ignoringCase:
-            insert(.caseInsensitive)
-        case .matchingCase:
-            break
-        }
-        if !options.isRegex {
-            switch options.kind {
-            case .begins:
-                insert(.anchored)
-            case .ends:
-                insert(.anchored)
-                insert(.backwards)
-            case .contains:
-                break
-            }
-        }
     }
 }
 

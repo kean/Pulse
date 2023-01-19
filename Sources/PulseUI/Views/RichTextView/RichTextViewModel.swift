@@ -204,7 +204,7 @@ private func search(searchTerm: String, in string: NSString, options: StringSear
     guard searchTerm.count > 1 else {
         return []
     }
-    return string.ranges(of: searchTerm, options: .init(options))
+    return string.ranges(of: searchTerm, options: options)
 }
 
 #endif

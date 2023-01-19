@@ -78,7 +78,7 @@ final class ConsoleSearchService {
             lineCount += 1
             let line = line as NSString
             for term in parameters.terms {
-                let matches = line.ranges(of: term.text, options: .init(term.options))
+                let matches = line.ranges(of: term.text, options: term.options)
                 for range in matches {
                     allMatches.append((line, lineCount, range, term))
                 }
