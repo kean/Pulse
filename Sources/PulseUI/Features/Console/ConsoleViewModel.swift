@@ -128,7 +128,13 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     // MARK: Refresh
 
     private func refreshNow() {
+        // important: order
         refresh(filterTerm: filterTerm)
+#if os(iOS)
+        if #available(iOS 15, *) {
+            searchViewModel.refreshNow()
+        }
+#endif
     }
 
     private func refresh(filterTerm: String) {

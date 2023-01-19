@@ -105,14 +105,14 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     private func didUpdateSearchCriteria(_ searchText: String, _ tokens: [ConsoleSearchToken]) {
         isNewResultsButtonShown = false
 
-        operation?.cancel()
-        operation = nil
-
         let parameters = ConsoleSearchParameters(searchTerm: searchText, tokens: tokens, options: .default)
         startSearch(parameters: parameters)
     }
 
     private func startSearch(parameters: ConsoleSearchParameters) {
+        operation?.cancel()
+        operation = nil
+
         guard !parameters.isEmpty else {
             isSearching = false
             results = []
@@ -133,18 +133,6 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         operation.delegate = self
         operation.resume()
         self.operation = operation
-    }
-
-    func buttonShowMoreResultsTapped() {
-        isSearching = true
-        operation?.resume()
-    }
-
-    func buttonShowNewlyAddedSearchResultsTapped() {
-        withAnimation {
-            isNewResultsButtonShown = false
-        }
-        startSearch(parameters: searchBar.parameters)
     }
 
     // MARK: Refresh Results
@@ -214,6 +202,15 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
 
     // MARK: Actions
 
+    func refreshNow() {
+        if isNewResultsButtonShown {
+            withAnimation {
+                isNewResultsButtonShown = false
+            }
+        }
+        startSearch(parameters: searchBar.parameters)
+    }
+
     func perform(_ suggestion: ConsoleSearchSuggestion) {
         switch suggestion.action {
         case .apply(let token):
@@ -228,6 +225,15 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         if let suggestion = topSuggestions.first, isActionable(suggestion) {
             perform(suggestion)
         }
+    }
+
+    func buttonShowMoreResultsTapped() {
+        isSearching = true
+        operation?.resume()
+    }
+
+    func buttonShowNewlyAddedSearchResultsTapped() {
+        refreshNow()
     }
 
     // MARK: Recent Searches
