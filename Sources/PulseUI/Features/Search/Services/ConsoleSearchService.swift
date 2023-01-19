@@ -71,30 +71,30 @@ final class ConsoleSearchService {
     }
 
     private func search(_ content: NSString, _ parameters: ConsoleSearchParameters, _ scope: ConsoleSearchScope) -> [ConsoleSearchOccurrence] {
-        var matchedTerms: Set<String> = []
-        var allMatches: [(line: NSString, lineNumber: Int, range: NSRange)] = []
+        var matchedTerms: Set<ConsoleSearchTerm> = []
+        var allMatches: [(line: NSString, lineNumber: Int, range: NSRange, term: ConsoleSearchTerm)] = []
         var lineCount = 0
         content.enumerateLines { line, stop in
             lineCount += 1
             let line = line as NSString
-            for searchTerm in parameters.searchTerms {
-                let matches = line.ranges(of: searchTerm, options: .init(parameters.options))
+            for term in parameters.terms {
+                let matches = line.ranges(of: term.text, options: .init(term.options))
                 for range in matches {
-                    allMatches.append((line, lineCount, range))
+                    allMatches.append((line, lineCount, range, term))
                 }
                 if !matches.isEmpty {
-                    matchedTerms.insert(searchTerm)
+                    matchedTerms.insert(term)
                 }
             }
         }
 
-        guard matchedTerms.count == parameters.searchTerms.count else {
+        guard matchedTerms.count == Set(parameters.terms).count else {
             return [] // Has to match all
         }
 
         var occurrences: [ConsoleSearchOccurrence] = []
         var matchIndex = 0
-        for (line, lineNumber, range) in allMatches {
+        for (line, lineNumber, range, term) in allMatches {
             let lineRange = lineCount == 1 ? NSRange(location: 0, length: content.length) :  (line.getLineRange(range) ?? range) // Optimization for long lines
 
             var prefixRange = NSRange(location: lineRange.location, length: range.location - lineRange.location)
@@ -141,7 +141,7 @@ final class ConsoleSearchService {
                 line: lineNumber,
                 range: range,
                 text: preview,
-                searchContext: .init(searchTerm: parameters.searchTerms.first!, options: parameters.options, matchIndex: matchIndex)
+                searchContext: .init(searchTerm: term, matchIndex: matchIndex)
             )
             occurrences.append(occurrence)
 

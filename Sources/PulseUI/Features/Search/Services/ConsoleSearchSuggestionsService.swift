@@ -51,7 +51,7 @@ final class ConsoleSearchSuggestionsService {
         let plainSearchSuggestion = ConsoleSearchSuggestion(text: {
             AttributedString("Contains: ") { $0.foregroundColor = .primary } +
             AttributedString(searchText) { $0.foregroundColor = .blue }
-        }(), action: .apply(.text(searchText)))
+        }(), action: .apply(.term(.init(text: searchText, options: .default))))
 
         let topSuggestions = Array(allSuggestions
             .sorted(by: { $0.1 > $1.1 }) // Sort by confidence
@@ -116,7 +116,7 @@ final class ConsoleSearchSuggestionsService {
         switch token {
         case .filter(let filter): return makeSuggestion(for: filter)
         case .scope(let scope): return makeSuggestion(for: scope)
-        case .text(let string): return makeSuggestion(for: string)
+        case .term(let term): return makeSuggestion(for: term)
         }
     }
 
@@ -149,11 +149,11 @@ final class ConsoleSearchSuggestionsService {
         return ConsoleSearchSuggestion(text: string, action: .apply(token))
     }
 
-    private func makeSuggestion(for string: String) -> ConsoleSearchSuggestion {
+    private func makeSuggestion(for term: ConsoleSearchTerm) -> ConsoleSearchSuggestion {
         ConsoleSearchSuggestion(text: {
             AttributedString("Contains: ") { $0.foregroundColor = .primary } +
-            AttributedString(string) { $0.foregroundColor = .blue }
-        }(), action: .apply(.text(string)))
+            AttributedString(term.text) { $0.foregroundColor = .blue }
+        }(), action: .apply(.term(term)))
     }
 
 
@@ -208,7 +208,7 @@ final class ConsoleSearchSuggestionsService {
 struct ConsoleSearchSuggestion: Identifiable {
     let id = UUID()
     let text: AttributedString
-    let action: Action
+    var action: Action
 
     var isToken: Bool {
         guard case .apply = action else { return false }

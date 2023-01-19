@@ -60,7 +60,7 @@ final class RichTextViewModel: ObservableObject {
         guard let context = context else { return }
 
         // Not updated self.searchTerm because searchable doesn't like that
-        let matches = search(searchTerm: context.searchTerm, in: textStorage.string as NSString, options: context.options)
+        let matches = search(searchTerm: context.searchTerm.text, in: textStorage.string as NSString, options: context.searchTerm.options)
         self.didUpdateMatches(matches)
         if context.matchIndex < matches.count {
             DispatchQueue.main.async {
@@ -211,8 +211,7 @@ private func search(searchTerm: String, in string: NSString, options: StringSear
 
 extension RichTextViewModel {
     struct SearchContext {
-        let searchTerm: String
-        let options: StringSearchOptions
+        let searchTerm: ConsoleSearchTerm
         let matchIndex: Int
     }
 }

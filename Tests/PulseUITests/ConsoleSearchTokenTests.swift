@@ -129,6 +129,7 @@ final class ConsoleSearchTokenTests: XCTestCase {
         XCTAssertEqual(parse("200 300"), [.init(200), .init(300)])
         XCTAssertEqual(parse("200,300"), [.init(200), .init(300)])
         XCTAssertEqual(parse("200, 300"), [.init(200), .init(300)])
+        XCTAssertEqual(parse("200, ABC, 300"), [.init(200), .init(300)])
     }
 
     func testStatusCodeWildcard() {

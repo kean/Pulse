@@ -10,13 +10,13 @@ enum ConsoleSearchToken: Identifiable, Hashable, Codable {
 
     case filter(ConsoleSearchFilter)
     case scope(ConsoleSearchScope)
-    case text(String)
+    case term(ConsoleSearchTerm)
 
     var systemImage: String? {
         switch self {
         case .filter: return "line.3.horizontal.decrease.circle.fill"
         case .scope: return "magnifyingglass.circle.fill"
-        case .text: return nil
+        case .term: return nil
         }
     }
 
@@ -24,12 +24,12 @@ enum ConsoleSearchToken: Identifiable, Hashable, Codable {
         switch self {
         case .filter(let filter): return filter.token
         case .scope(let scope): return scope.title
-        case .text(let text):
-            guard text.count > 10 else {
-                return text
+        case .term(let term):
+            guard term.text.count > 10 else {
+                return term.text
             }
             var output = ""
-            let words = text.split(separator: " ")
+            let words = term.text.split(separator: " ")
             for word in words where output.count + word.count < 12 {
                 if !output.isEmpty {
                     output.append(" ")
@@ -46,7 +46,7 @@ enum ConsoleSearchToken: Identifiable, Hashable, Codable {
             return type(of: lhs.filter) == type(of: rhs.filter)
         case (.scope, .scope):
             return true
-        case (.text, .text):
+        case (.term, .term):
             return true
         default:
             return false

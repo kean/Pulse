@@ -12,7 +12,7 @@ final class ConsoleSearchBarViewModel: ObservableObject {
     @Published var tokens: [ConsoleSearchToken] = []
 
     var parameters: ConsoleSearchParameters {
-        ConsoleSearchParameters(searchTerm: text.trimmingCharacters(in: .whitespaces), tokens: tokens, options: .default)
+        ConsoleSearchParameters(searchTerm: text.trimmingCharacters(in: .whitespaces), tokens: tokens)
     }
 
     var isEmpty: Bool {
@@ -78,6 +78,14 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
             .map { $0.trimmingCharacters(in: .whitespaces ) }
             .removeDuplicates()
 
+        searchBar.$text.sink {
+            if $0.last == "\t" {
+                DispatchQueue.main.async {
+                    self.onSubmitSearch()
+                }
+            }
+        }.store(in: &cancellables)
+
         Publishers.CombineLatest(text, searchBar.$tokens.removeDuplicates()).sink { [weak self] in
             self?.didUpdateSearchCriteria($0, $1)
         }.store(in: &cancellables)
@@ -99,9 +107,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
 
     private func didUpdateSearchCriteria(_ searchText: String, _ tokens: [ConsoleSearchToken]) {
         isNewResultsButtonShown = false
-
-        let parameters = ConsoleSearchParameters(searchTerm: searchText, tokens: tokens, options: .default)
-        startSearch(parameters: parameters)
+        startSearch(parameters: .init(searchTerm: searchText, tokens: tokens))
     }
 
     private func startSearch(parameters: ConsoleSearchParameters) {
@@ -273,27 +279,25 @@ struct ConsoleSearchResultViewModel: Identifiable {
 struct ConsoleSearchParameters: Equatable, Hashable {
     var filters: [ConsoleSearchFilter] = []
     var scopes: [ConsoleSearchScope] = []
-    var searchTerms: [String] = []
-    let options: StringSearchOptions
+    var terms: [ConsoleSearchTerm] = []
 
-    init(searchTerm: String, tokens: [ConsoleSearchToken], options: StringSearchOptions) {
+    init(searchTerm: String, tokens: [ConsoleSearchToken]) {
         if !searchTerm.trimmingCharacters(in: .whitespaces).isEmpty {
-            self.searchTerms.append(searchTerm)
+            self.terms.append(.init(text: searchTerm, options: .default))
         }
         for token in tokens {
             switch token {
             case .filter(let filter): self.filters.append(filter)
             case .scope(let scope): self.scopes.append(scope)
-            case .text(let string): self.searchTerms.append(string)
+            case .term(let string): self.terms.append(string)
             }
         }
         if self.scopes.isEmpty {
             self.scopes = ConsoleSearchScope.allCases
         }
-        self.options = options
     }
 
     var isEmpty: Bool {
-        filters.isEmpty && searchTerms.isEmpty
+        filters.isEmpty && terms.isEmpty
     }
 }

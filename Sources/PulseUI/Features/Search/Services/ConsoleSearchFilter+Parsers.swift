@@ -47,19 +47,13 @@ extension Parsers {
     static let path = char(from: .urlPathAllowed.subtracting(.init(charactersIn: ","))).oneOrMore.map { String($0) }
 
     static let httpMethod = oneOf(HTTPMethod.allCases.map { method in
-        prefixIgnoringCase(method.rawValue).map { method }
+        fuzzy(method.rawValue, confidence: 0.8).map { _ in method }
     })
 
     /// Consumes a filter with the given name if it has high enough confidence.
     static func filterName(_ name: String) -> Parser<Confidence> {
         let words = name.split(separator: " ").map { String($0) }
         assert(!words.isEmpty)
-
-        func fuzzy(_ word: String) -> Parser<Confidence> {
-            char(from: .letters).oneOrMore
-                .map { String($0).fuzzyMatch(word) }
-                .filter { $0 > 0.6 }
-        }
 
         // Try to match as many words as we can in any order
         let anyWords: Parser<Confidence> = oneOf(words.map { fuzzy($0) <* whitespaces }).oneOrMore.map {
@@ -85,14 +79,12 @@ extension Parsers {
         statusCodeWilcard // It'll also auto-complete "2" as "2xx" if every other pattern fails
     )
 
-    // TODO: refactor
     static let statusCodeWilcard: Parser<ConsoleSearchRange<Int>> = (
-        char(from: "12345") <* char(from: "xX*").zeroOrMore <* valueEnd).map {
+        char(from: "12345") <* char(from: "xX*").zeroOrMore <* end
+    ).map {
         guard let code = Int(String($0)) else { return nil }
         return ConsoleSearchRange(.open, lowerBound: code * 100, upperBound: code * 100 + 100)
     }
-
-    static let valueEnd = oneOf(char(from: ", ").map { _ in () }, end)
 
     static func rangeOfInts(in range: ClosedRange<Int>) -> Parser<ConsoleSearchRange<Int>> {
         rangeOfInts.filter {
@@ -112,9 +104,12 @@ extension Parsers {
             }
         }
 
-    /// A comma or space separated list.
+    /// Parses a comma-separated list of values. The given parser recieves a
+    /// trimmed string with not separators and doesn't need to consume input.
+    /// The `listOf` consumes values even if it fails to parse some of them.
     static func listOf<T>(_ parser: Parser<T>) -> Parser<[T]> {
-        (parser <* optional(",") <* whitespaces).zeroOrMore
+        let value: Parser<T?> = string(excluding: ", ").map { try? parser.parse($0) }
+        return (value <* optional(",") <* whitespaces).zeroOrMore.map { $0.compactMap { $0} }
     }
 
     static let rangeModifier: Parser<ConsoleSearchRangeModfier> = whitespaces *> oneOf(

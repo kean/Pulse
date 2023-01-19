@@ -49,18 +49,10 @@ extension Parsers {
         }
     }
 
-    /// Consumes the entire word if has the prefix of the given word.
-    static func prefixIgnoringCase(_ prefix: String) -> Parser<Void> {
-        Parser { s in
-            let word = s.prefix(while: { $0.isLetter })
-            guard !word.isEmpty && prefix.range(of: word, options: [.anchored, .caseInsensitive]) != nil else {
-                return nil
-            }
-            var s = s
-            s.consume(while: \.isLetter)
-            s.consume(while: \.isWhitespace)
-            return ((), s)
-        }
+    static func fuzzy(_ word: String, confidence: Confidence = 0.6) -> Parser<Confidence> {
+        char(from: .letters).oneOrMore
+            .map { String($0).fuzzyMatch(word) }
+            .filter { $0 > confidence }
     }
 
     /// Consumes any number of whitespaces after the previous match.

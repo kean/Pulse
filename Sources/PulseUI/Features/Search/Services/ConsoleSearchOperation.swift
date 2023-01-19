@@ -97,13 +97,13 @@ final class ConsoleSearchOperation {
     }
 
     private func search(_ task: NetworkTaskEntity) -> ConsoleSearchResultViewModel? {
+        guard !parameters.isEmpty else {
+            return nil
+        }
         guard service.isMatching(task, filters: parameters.filters) else {
             return nil
         }
-        guard !parameters.searchTerms.isEmpty else {
-            guard !parameters.filters.isEmpty else {
-                return nil
-            }
+        guard !parameters.terms.isEmpty else {
             return ConsoleSearchResultViewModel(entity: task, occurrences: [])
         }
         let occurrences = service.search(in: task, parameters: parameters)
