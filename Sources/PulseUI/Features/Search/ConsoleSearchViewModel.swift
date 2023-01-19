@@ -7,8 +7,6 @@ import Pulse
 import CoreData
 import Combine
 
-#warning("does it work on iOS 15 at all?")
-
 final class ConsoleSearchBarViewModel: ObservableObject {
     @Published var text: String = ""
     @Published var tokens: [ConsoleSearchToken] = []

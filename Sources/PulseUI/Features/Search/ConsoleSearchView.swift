@@ -7,9 +7,6 @@ import Pulse
 import CoreData
 import Combine
 
-#warning("fix issue on iOS 15")
-#warning("try disabling animations when presenting search")
-
 #if os(iOS)
 
 @available(iOS 15, tvOS 15, *)
