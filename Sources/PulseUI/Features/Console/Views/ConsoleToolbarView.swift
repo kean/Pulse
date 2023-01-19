@@ -9,11 +9,39 @@ import Combine
 
 #if os(iOS)
 
-#warning("add keyboard shortcuts")
-
-struct ConsoleFiltersView: View {
+struct ConsoleToolbarView: View {
+    let title: String
+    var isSpinnerNeeded = false
     @ObservedObject var viewModel: ConsoleViewModel
-    @State private var isShowingFilters = false
+    @State var isShowingFilters = false
+
+    var body: some View {
+        HStack(alignment: .bottom, spacing: 0) {
+            Text(title)
+                .foregroundColor(.secondary)
+            if isSpinnerNeeded {
+                ProgressView()
+                    .padding(.leading, 8)
+            }
+            Spacer()
+            ConsoleFiltersView(viewModel: viewModel, isShowingFilters: $isShowingFilters)
+                .padding(.bottom, 4)
+        }
+        .buttonStyle(.plain)
+        .padding(.top, -14)
+        .sheet(isPresented: $isShowingFilters) {
+            NavigationView {
+                ConsoleSearchCriteriaView(viewModel: viewModel.searchCriteriaViewModel)
+                    .inlineNavigationTitle("Filters")
+                    .navigationBarItems(trailing: Button("Done") { isShowingFilters = false })
+            }
+        }
+    }
+}
+
+private struct ConsoleFiltersView: View {
+    @ObservedObject var viewModel: ConsoleViewModel
+    @Binding var isShowingFilters: Bool
 
     var body: some View {
         HStack(spacing: 16) {
@@ -33,13 +61,6 @@ struct ConsoleFiltersView: View {
                 Image(systemName: viewModel.searchCriteriaViewModel.isCriteriaDefault ? "line.horizontal.3.decrease.circle" : "line.3.horizontal.decrease.circle.fill")
                     .font(.system(size: 20))
                     .foregroundColor(.accentColor)
-            }
-        }
-        .sheet(isPresented: $isShowingFilters) {
-            NavigationView {
-                ConsoleSearchCriteriaView(viewModel: viewModel.searchCriteriaViewModel)
-                    .inlineNavigationTitle("Filters")
-                    .navigationBarItems(trailing: Button("Done") { isShowingFilters = false })
             }
         }
     }

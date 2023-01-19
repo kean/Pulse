@@ -156,27 +156,11 @@ private struct _ConsoleRegularContentView: View {
     @ObservedObject var viewModel: ConsoleViewModel
 
     var body: some View {
-        Section(header: ConsoleToolbarView(viewModel: viewModel)) {
+        Section(header: ConsoleToolbarView(title: viewModel.toolbarTitle, viewModel: viewModel)) {
             makeForEach(viewModel: viewModel)
         }
         .onAppear(perform: viewModel.onAppear)
         .onDisappear(perform: viewModel.onDisappear)
-    }
-}
-
-private struct ConsoleToolbarView: View {
-    @ObservedObject var viewModel: ConsoleViewModel
-
-    var body: some View {
-        HStack(alignment: .bottom, spacing: 0) {
-            Text(viewModel.toolbarTitle)
-                .foregroundColor(.secondary)
-            Spacer()
-            ConsoleFiltersView(viewModel: viewModel)
-                .padding(.bottom, 4)
-        }
-        .buttonStyle(.plain)
-        .padding(.top, -14)
     }
 }
 

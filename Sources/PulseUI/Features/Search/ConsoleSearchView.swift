@@ -104,19 +104,7 @@ struct ConsoleSearchView: View {
     }
 
     private var toolbar: some View {
-        HStack(alignment: .bottom, spacing: 0) {
-            Text(viewModel.toolbarTitle)
-                .foregroundColor(.secondary)
-            if viewModel.isSpinnerNeeded {
-                ProgressView()
-                    .padding(.leading, 8)
-            }
-            Spacer()
-            ConsoleFiltersView(viewModel: consoleViewModel)
-                .padding(.bottom, 4)
-        }
-        .buttonStyle(.plain)
-        .padding(.top, -14)
+        ConsoleToolbarView(title: viewModel.toolbarTitle, isSpinnerNeeded: viewModel.isSpinnerNeeded, viewModel: consoleViewModel)
     }
 }
 
