@@ -7,8 +7,6 @@ import Pulse
 import CoreData
 import Combine
 
-#warning("fix an issue where pending task state is not getting updated")
-
 #if os(iOS)
 
 @available(iOS 15, tvOS 15, *)

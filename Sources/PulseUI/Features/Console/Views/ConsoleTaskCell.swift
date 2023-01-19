@@ -7,8 +7,6 @@ import Pulse
 import Combine
 import CoreData
 
-#warning("fix state not updaing in the search screen")
-
 struct ConsoleTaskCell: View {
     @ObservedObject var viewModel: ConsoleTaskCellViewModel
     @ObservedObject var progressViewModel: ProgressViewModel
