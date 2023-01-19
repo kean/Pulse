@@ -32,10 +32,6 @@ struct ConsoleSearchView: View {
             }
         }
 
-        if viewModel.searchBar.isEmpty, !viewModel.recentSearches.isEmpty {
-            ConsoleSearchRecentSearchesView(viewModel: viewModel)
-        }
-
         if viewModel.isNewResultsButtonShown {
             Section {
                 Button(action: viewModel.buttonShowNewlyAddedSearchResultsTapped) {

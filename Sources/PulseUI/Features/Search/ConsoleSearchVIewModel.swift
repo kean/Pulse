@@ -84,14 +84,12 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
             self?.didUpdateSearchCriteria($0, $1)
         }.store(in: &cancellables)
 
-        text.dropFirst().sink { [weak self] in
-            self?.updateSearchTokens(for: $0)
+        text.dropFirst().receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.updateSearchTokens()
         }.store(in: &cancellables)
 
-        self.topSuggestions = suggestionsService.makeDefaultSuggestedFilters()
+        self.topSuggestions = suggestionsService.makeDefaultTopSuggestions(current: [])
         self.suggestedScopes = suggestionsService.makeDefaultSuggestedScopes()
-
-        recentSearches = getRecentSearches()
 
         entities
             .throttle(for: 3, scheduler: DispatchQueue.main, latest: true)
@@ -215,9 +213,11 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         case .apply(let token):
             searchBar.text = ""
             searchBar.tokens.append(token)
+            suggestionsService.saveRecentToken(token)
         case .autocomplete(let text):
             searchBar.text = text
         }
+        updateSearchTokens()
     }
 
     func onSubmitSearch() {
@@ -235,59 +235,24 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         refreshNow()
     }
 
-    // MARK: Recent Searches
-
-    private func getRecentSearches() -> [ConsoleSearchParameters] {
-        ConsoleSettings.shared.recentSearches.data(using: .utf8).flatMap {
-            try? JSONDecoder().decode([ConsoleSearchParameters].self, from: $0)
-        } ?? []
-    }
-
-    private func saveRecentSearches() {
-        guard let data = (try? JSONEncoder().encode(recentSearches)),
-              let string = String(data: data, encoding: .utf8) else {
-            return
-        }
-        ConsoleSettings.shared.recentSearches = string
-    }
-
-    func selectRecentSearch(_ parameters: ConsoleSearchParameters) {
-        //        searchBar.text = parameters.searchTerm
-        //        searchBar.tokens = parameters.tokens
-    }
-
-    func clearRecentSearchess() {
-        recentSearches = []
-        saveRecentSearches()
-    }
-
-    private func addRecentSearch(_ parameters: ConsoleSearchParameters) {
-        //        var recentSearches = self.recentSearches
-        //        while let index = recentSearches.firstIndex(where: { $0.searchTerm == parameters.searchTerm }) {
-        //            recentSearches.remove(at: index)
-        //        }
-        //        recentSearches.insert(parameters, at: 0)
-        //        if recentSearches.count > 10 {
-        //            recentSearches.removeLast(recentSearches.count - 10)
-        //        }
-    }
-
     // MARK: Suggested Tokens
 
-    private func updateSearchTokens(for searchText: String) {
+    private func updateSearchTokens() {
         guard #available(iOS 16, tvOS 16, *) else { return }
 
         let hosts = hosts.objects.map(\.value)
-        let isSearchBarEmpty = searchBar.isEmpty
+        let parameters = searchBar.parameters
+        let searchText = searchBar.text.trimmingCharacters(in: .whitespaces)
+        let tokens = searchBar.tokens
 
         queue.async {
             let topSuggestions: [ConsoleSearchSuggestion]
             let suggestedScopes: [ConsoleSearchSuggestion]
-            if isSearchBarEmpty {
-                topSuggestions = self.suggestionsService.makeDefaultSuggestedFilters()
+            if parameters.isEmpty {
+                topSuggestions = self.suggestionsService.makeDefaultTopSuggestions(current: tokens)
                 suggestedScopes = self.suggestionsService.makeDefaultSuggestedScopes()
             } else {
-                topSuggestions = self.suggestionsService.makeTopSuggestions(searchText: searchText, hosts: hosts)
+                topSuggestions = self.suggestionsService.makeTopSuggestions(searchText: searchText, hosts: hosts, current: tokens)
                 suggestedScopes = []
             }
             DispatchQueue.main.async {
@@ -298,7 +263,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     }
 
     func isActionable(_ suggestion: ConsoleSearchSuggestion) -> Bool {
-        suggestion.id == topSuggestions[0].id && suggestion.isToken
+        suggestion.id == topSuggestions.first?.id && suggestion.isToken
     }
 }
 
@@ -309,7 +274,7 @@ struct ConsoleSearchResultViewModel: Identifiable {
     let occurences: [ConsoleSearchOccurence]
 }
 
-struct ConsoleSearchParameters: Equatable, Hashable, Codable {
+struct ConsoleSearchParameters: Equatable, Hashable {
     var filters: [ConsoleSearchFilter] = []
     var scopes: [ConsoleSearchScope] = []
     var searchTerms: [String] = []

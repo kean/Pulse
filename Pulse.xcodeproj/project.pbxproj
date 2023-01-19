@@ -83,7 +83,6 @@
 		0CB63A292975A94D00525165 /* ConsoleSearchTokenTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A282975A94D00525165 /* ConsoleSearchTokenTests.swift */; };
 		0CB63A2C2975C40100525165 /* ConsoleSearchFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A2A2975C3C700525165 /* ConsoleSearchFilter.swift */; };
 		0CB63A2F2975C43D00525165 /* ConsoleSearchScope.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A2D2975C40F00525165 /* ConsoleSearchScope.swift */; };
-		0CB63A322975E71700525165 /* ConsoleSearchRecentSearchesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A302975E6AF00525165 /* ConsoleSearchRecentSearchesView.swift */; };
 		0CB63A352976028F00525165 /* ConsoleSearchFilter+Parsers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A332976028B00525165 /* ConsoleSearchFilter+Parsers.swift */; };
 		0CB63A382976225400525165 /* Cache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A362976224600525165 /* Cache.swift */; };
 		0CB63A3B2976229200525165 /* LinkedList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A392976227500525165 /* LinkedList.swift */; };
@@ -544,7 +543,6 @@
 		0CB63A282975A94D00525165 /* ConsoleSearchTokenTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchTokenTests.swift; sourceTree = "<group>"; };
 		0CB63A2A2975C3C700525165 /* ConsoleSearchFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchFilter.swift; sourceTree = "<group>"; };
 		0CB63A2D2975C40F00525165 /* ConsoleSearchScope.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchScope.swift; sourceTree = "<group>"; };
-		0CB63A302975E6AF00525165 /* ConsoleSearchRecentSearchesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchRecentSearchesView.swift; sourceTree = "<group>"; };
 		0CB63A332976028B00525165 /* ConsoleSearchFilter+Parsers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ConsoleSearchFilter+Parsers.swift"; sourceTree = "<group>"; };
 		0CB63A362976224600525165 /* Cache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cache.swift; sourceTree = "<group>"; };
 		0CB63A392976227500525165 /* LinkedList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkedList.swift; sourceTree = "<group>"; };
@@ -1004,7 +1002,6 @@
 			children = (
 				0CB63A1A2974A5D200525165 /* ConsoleSearchResultsSectionView.swift */,
 				0CB63A1C2974A5EB00525165 /* ConsoleSearchSuggestionView.swift */,
-				0CB63A302975E6AF00525165 /* ConsoleSearchRecentSearchesView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -2144,7 +2141,6 @@
 				0CF0D660296F189600EED9D4 /* DocumentBrowser.swift in Sources */,
 				0CF0D688296F189600EED9D4 /* ConsoleViewModel.swift in Sources */,
 				0CF0D66D296F189600EED9D4 /* NetworkRequestBodyCell.swift in Sources */,
-				0CB63A322975E71700525165 /* ConsoleSearchRecentSearchesView.swift in Sources */,
 				0CF0D629296F189600EED9D4 /* PDFRepresentedView.swift in Sources */,
 				0CF0D61E296F189600EED9D4 /* SwiftUI+Extensions.swift in Sources */,
 				0CF0D664296F189600EED9D4 /* NetworkInspectorMetricsView.swift in Sources */,

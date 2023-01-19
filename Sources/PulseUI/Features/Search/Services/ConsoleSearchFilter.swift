@@ -99,7 +99,7 @@ struct ConsoleSearchFilterHost: ConsoleSearchFilterProtocol {
         guard let host = task.url.flatMap(URL.init)?.host else {
             return false
         }
-        return values.contains { host.contains($0) }
+        return values.contains { host == $0 }
     }
 }
 
@@ -113,6 +113,21 @@ struct ConsoleSearchFilterMethod: ConsoleSearchFilterProtocol {
     func isMatch(_ task: NetworkTaskEntity) -> Bool {
         guard let method = HTTPMethod(rawValue: task.httpMethod ?? "") else { return false }
         return Set(values).contains(method)
+    }
+}
+
+struct ConsoleSearchFilterPath: ConsoleSearchFilterProtocol {
+    var values: [String]
+
+    var name: String { "Path" }
+    var valuesDescriptions: [String] { values }
+    var valueExample: String { "/example" }
+
+    func isMatch(_ task: NetworkTaskEntity) -> Bool {
+        guard let path = task.url.flatMap(URL.init)?.path else {
+            return false
+        }
+        return values.contains { path.contains($0) }
     }
 }
 

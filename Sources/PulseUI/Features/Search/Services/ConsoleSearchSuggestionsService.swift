@@ -9,9 +9,18 @@ import Combine
 
 @available(iOS 15, tvOS 15, *)
 final class ConsoleSearchSuggestionsService {
-    func makeTopSuggestions(searchText: String, hosts: [String]) -> [ConsoleSearchSuggestion] {
+
+    private(set) var recentTokens: [ConsoleSearchToken] = []
+
+    init() {
+        self.recentTokens = getRecentTokens()
+    }
+
+    // MARK: - Top Suggestions
+
+    func makeTopSuggestions(searchText: String, hosts: [String], current: [ConsoleSearchToken]) -> [ConsoleSearchSuggestion] {
         guard !searchText.isEmpty else {
-            return [] // This is an opportunity to return recently used ones
+            return Array(makeDefaultTopSuggestions(current: current).prefix(3))
         }
 
         var filters = Parsers.filters
@@ -81,16 +90,32 @@ final class ConsoleSearchSuggestionsService {
         return topHosts + otherHosts
     }
 
-    func makeDefaultSuggestedFilters() -> [ConsoleSearchSuggestion] {
-        return [
+    // Shows recent tokens and unused default tokens.
+    func makeDefaultTopSuggestions(current: [ConsoleSearchToken]) -> [ConsoleSearchSuggestion] {
+        var tokens = recentTokens
+        let defaultTokens = [
             ConsoleSearchFilter.statusCode(.init(values: [])),
             ConsoleSearchFilter.host(.init(values: [])),
             ConsoleSearchFilter.method(.init(values: []))
-        ].map(makeSuggestion)
+        ].map { ConsoleSearchToken.filter($0) }
+        for token in defaultTokens where !tokens.contains(where: { $0.isSameType(as: token) }) {
+            tokens.append(token)
+        }
+        return Array(tokens.filter { token in
+            !current.contains(where: { $0.isSameType(as: token) })
+        }.map(makeSuggestion).prefix(10))
     }
 
     func makeDefaultSuggestedScopes() -> [ConsoleSearchSuggestion] {
         ConsoleSearchScope.allEligibleScopes.map(makeSuggestion)
+    }
+
+    private func makeSuggestion(for token: ConsoleSearchToken) -> ConsoleSearchSuggestion {
+        switch token {
+        case .filter(let filter): return makeSuggestion(for: filter)
+        case .scope(let scope): return makeSuggestion(for: scope)
+        case .text(let string): return makeSuggestion(for: string)
+        }
     }
 
     private func makeSuggestion(for filter: ConsoleSearchFilter) -> ConsoleSearchSuggestion {
@@ -121,8 +146,61 @@ final class ConsoleSearchSuggestionsService {
         let token = ConsoleSearchToken.scope(scope)
         return ConsoleSearchSuggestion(text: string, action: .apply(token))
     }
-}
 
+    private func makeSuggestion(for string: String) -> ConsoleSearchSuggestion {
+        ConsoleSearchSuggestion(text: {
+            AttributedString("Contains: ") { $0.foregroundColor = .primary } +
+            AttributedString(string) { $0.foregroundColor = .blue }
+        }(), action: .apply(.text(string)))
+    }
+
+
+    // MARK: - Recent Tokens
+
+    private func getRecentTokens() -> [ConsoleSearchToken] {
+        ConsoleSettings.shared.recentSearches.data(using: .utf8).flatMap {
+            try? JSONDecoder().decode([ConsoleSearchToken].self, from: $0)
+        } ?? []
+    }
+
+    func saveRecentToken(_ token: ConsoleSearchToken) {
+        var tokens = self.recentTokens
+        while let index = tokens.firstIndex(where: { $0 == token }) {
+            tokens.remove(at: index)
+        }
+        var count = 0
+        tokens.removeAll(where: {
+            if $0.isSameType(as: token) {
+                count += 1
+                if count == 3 {
+                    return true
+                }
+            }
+            return false
+
+        })
+        if tokens.count > 15 {
+            tokens.removeLast(tokens.count - 15)
+        }
+        tokens.insert(token, at: 0)
+
+        self.recentTokens = tokens
+        saveRecentTokens()
+    }
+
+    func clearRecentTokens() {
+        recentTokens = []
+        saveRecentTokens()
+    }
+
+    private func saveRecentTokens() {
+        guard let data = (try? JSONEncoder().encode(recentTokens)),
+              let string = String(data: data, encoding: .utf8) else {
+            return
+        }
+        ConsoleSettings.shared.recentSearches = string
+    }
+}
 
 @available(iOS 15, tvOS 15, *)
 struct ConsoleSearchSuggestion: Identifiable {
