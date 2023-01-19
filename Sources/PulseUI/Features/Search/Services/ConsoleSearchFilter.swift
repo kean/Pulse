@@ -7,11 +7,6 @@ import Pulse
 
 // network:
 //
-// - "url" <value>
-// - "host" = <value> (+add commons hosts)
-// - "domain" = <value>
-// - "method" <value>
-// - "path" <value>
 // - "scheme" <value>
 // - "duration" ">=" "<=" <value>
 // - "\(kind)" "contains" <value>
@@ -58,6 +53,7 @@ enum ConsoleSearchFilter: Equatable, Hashable, Codable {
     case statusCode(ConsoleSearchFilterStatusCode)
     case host(ConsoleSearchFilterHost)
     case method(ConsoleSearchFilterMethod)
+    case path(ConsoleSearchFilterPath)
 
     // TODO: refactor
     var filter: any ConsoleSearchFilterProtocol {
@@ -65,6 +61,7 @@ enum ConsoleSearchFilter: Equatable, Hashable, Codable {
         case .statusCode(let filter): return filter
         case .host(let filter): return filter
         case .method(let filter): return filter
+        case .path(let filter): return filter
         }
     }
 

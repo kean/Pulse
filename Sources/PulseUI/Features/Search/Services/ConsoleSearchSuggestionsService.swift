@@ -95,8 +95,9 @@ final class ConsoleSearchSuggestionsService {
         var tokens = recentTokens
         let defaultTokens = [
             ConsoleSearchFilter.statusCode(.init(values: [])),
+            ConsoleSearchFilter.method(.init(values: [])),
             ConsoleSearchFilter.host(.init(values: [])),
-            ConsoleSearchFilter.method(.init(values: []))
+            ConsoleSearchFilter.path(.init(values: []))
         ].map { ConsoleSearchToken.filter($0) }
         for token in defaultTokens where !tokens.contains(where: { $0.isSameType(as: token) }) {
             tokens.append(token)

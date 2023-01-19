@@ -13,7 +13,7 @@ import Foundation
 // range, it'll still try to "guess".
 extension Parsers {
     static let filters: [Parser<(ConsoleSearchFilter, Confidence)>] = [
-        filterStatusCode, filterHost, filterMethod
+        filterStatusCode, filterMethod, filterHost, filterPath
     ]
 
     static let filterStatusCode = oneOf(
@@ -35,7 +35,16 @@ extension Parsers {
         (ConsoleSearchFilter.method(.init(values: values)), confidence)
     }
 
+    static let filterPath = oneOf(
+        filterName("path") <*> listOf(path),
+        (nonconsuming(characterIn: "/") *> path).map { (0.7, [$0]) }
+    ).map { confidence, values in
+        (ConsoleSearchFilter.path(.init(values: values)), confidence)
+    }
+
     static let host = char(from: .urlHostAllowed.subtracting(.init(charactersIn: ","))).oneOrMore.map { String($0) }
+
+    static let path = char(from: .urlPathAllowed.subtracting(.init(charactersIn: ","))).oneOrMore.map { String($0) }
 
     static let httpMethod = oneOf(HTTPMethod.allCases.map { method in
         prefixIgnoringCase(method.rawValue).map { method }
