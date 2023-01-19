@@ -56,7 +56,8 @@ final class ConsoleSearchSuggestionsService {
         let topSuggestions = Array(allSuggestions
             .sorted(by: { $0.1 > $1.1 }) // Sort by confidence
             .map { $0.0 }.prefix(3))
-        if topSuggestions.first?.isToken ?? false {
+        if let first = topSuggestions.first,
+           first.isToken || first.text.description.hasPrefix(searchText) {
             return topSuggestions + [plainSearchSuggestion]
         } else {
             return [plainSearchSuggestion] + topSuggestions

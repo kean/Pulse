@@ -5,37 +5,6 @@
 import Foundation
 import Pulse
 
-// network:
-//
-// - "scheme" <value>
-// - "duration" ">=" "<=" <value>
-// - "\(kind)" "contains" <value>
-// - "type" data/download/upload/stream/socket
-// - "cookies" empty/non-empty/contains
-// - "timeout" >= <=
-// - "error"
-// - "size" >= <= <value>
-// - "error code" <value>
-// - "error decoding failed"
-// - "content-type" <value>
-// - "cached"
-// - "redirect"
-// - "pins"
-
-// Status Code IN  [200, 300]
-// Status Code [NOT] IN [200, 300]
-// Status Code [>200]
-// Status Code [!200]
-
-// Host [~] [github.com]
-// Host [=] [github.com]
-// Host [=] [github.com]
-// Host [regex?] IN github.com
-
-// Method [GET]
-
-// Scheme [HTTPS]
-
 protocol ConsoleSearchFilterProtocol: Equatable, Hashable, Codable {
     var name: String { get }
     var valuesDescriptions: [String] { get }

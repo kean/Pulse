@@ -20,8 +20,6 @@ final class ConsoleSearchBarViewModel: ObservableObject {
     }
 }
 
-#warning("fix an issue when you click on suggested empy field, contains: jumps to top (should only with low confidence)")
-
 @available(iOS 15, tvOS 15, *)
 final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDelegate {
     private var entities: CurrentValueSubject<[NSManagedObject], Never>
