@@ -70,23 +70,39 @@ extension AttributedString {
 
 struct StringSearchOptions: Equatable, Hashable, Codable {
     var isRegex = false
-    var isCaseSensitive = false
+    var caseSensitivity: CaseSensitivity = .ignoringCase
     var kind: Kind = .contains
 
     static let `default` = StringSearchOptions()
+
+    enum CaseSensitivity: String, Hashable, Codable, CaseIterable {
+        case ignoringCase = "Ignoring Case"
+        case matchingCase = "Matching Case"
+    }
 
     enum Kind: String, Equatable, Hashable, Codable, CaseIterable {
         case begins = "Begins With"
         case contains = "Contains"
         case ends = "Ends With"
     }
+
+    var title: String {
+        isRegex ? "Regex" : kind.rawValue
+    }
 }
 
 extension String.CompareOptions {
     init(_ options: StringSearchOptions) {
         self.init()
-        if options.isRegex { insert(.regularExpression) }
-        if !options.isCaseSensitive { insert(.caseInsensitive) }
+        if options.isRegex {
+            insert(.regularExpression)
+        }
+        switch options.caseSensitivity {
+        case .ignoringCase:
+            insert(.caseInsensitive)
+        case .matchingCase:
+            break
+        }
         if !options.isRegex {
             switch options.kind {
             case .begins:

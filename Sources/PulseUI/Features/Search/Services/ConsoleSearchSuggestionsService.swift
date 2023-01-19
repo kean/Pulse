@@ -151,7 +151,7 @@ final class ConsoleSearchSuggestionsService {
 
     private func makeSuggestion(for term: ConsoleSearchTerm) -> ConsoleSearchSuggestion {
         ConsoleSearchSuggestion(text: {
-            AttributedString("Contains: ") { $0.foregroundColor = .primary } +
+            AttributedString("\(term.options.title): ") { $0.foregroundColor = .primary } +
             AttributedString(term.text) { $0.foregroundColor = .blue }
         }(), action: .apply(.term(term)))
     }

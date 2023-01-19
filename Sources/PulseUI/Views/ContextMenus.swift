@@ -91,7 +91,11 @@ struct StringSearchOptionsMenu: View {
     @ViewBuilder
     private var contents: some View {
         Toggle("Regular Expression", isOn: $options.isRegex)
-        Toggle("Case Sensitive", isOn: $options.isCaseSensitive)
+        Picker("Case Sensitivity", selection: $options.caseSensitivity) {
+            ForEach(StringSearchOptions.CaseSensitivity.allCases, id: \.self) {
+                Text($0.rawValue).tag($0)
+            }
+        }
         pickerOptions
     }
 
@@ -103,7 +107,6 @@ struct StringSearchOptionsMenu: View {
                     Text($0.rawValue).tag($0)
                 }
             }
-            .pickerStyle(.menu)
         }
     }
 }
