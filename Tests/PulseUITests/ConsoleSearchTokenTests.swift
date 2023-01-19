@@ -78,7 +78,7 @@ final class ConsoleSearchTokenTests: XCTestCase {
             try? Parsers.statusCode.parse(string)
         }
 
-        // Invididual value
+        // Individual value
         XCTAssertEqual(parse("200"), .init(200))
         XCTAssertEqual(parse("200"), .init(.closed, lowerBound: 200, upperBound: 200))
 

@@ -89,11 +89,11 @@ final class ConsoleSearchOperation {
     }
 
     private func search(_ message: LoggerMessageEntity) -> ConsoleSearchResultViewModel? {
-        let occurences = service.search(in: message, parameters: parameters)
-        guard !occurences.isEmpty else {
+        let occurrences = service.search(in: message, parameters: parameters)
+        guard !occurrences.isEmpty else {
             return nil
         }
-        return ConsoleSearchResultViewModel(entity: message, occurences: occurences)
+        return ConsoleSearchResultViewModel(entity: message, occurrences: occurrences)
     }
 
     private func search(_ task: NetworkTaskEntity) -> ConsoleSearchResultViewModel? {
@@ -104,13 +104,13 @@ final class ConsoleSearchOperation {
             guard !parameters.filters.isEmpty else {
                 return nil
             }
-            return ConsoleSearchResultViewModel(entity: task, occurences: [])
+            return ConsoleSearchResultViewModel(entity: task, occurrences: [])
         }
-        let occurences = service.search(in: task, parameters: parameters)
-        guard !occurences.isEmpty else {
+        let occurrences = service.search(in: task, parameters: parameters)
+        guard !occurrences.isEmpty else {
             return nil
         }
-        return ConsoleSearchResultViewModel(entity: task, occurences: occurences)
+        return ConsoleSearchResultViewModel(entity: task, occurrences: occurrences)
     }
 
     // MARK: Cancellation

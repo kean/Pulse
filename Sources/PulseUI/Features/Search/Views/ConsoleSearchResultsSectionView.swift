@@ -14,21 +14,21 @@ struct ConsoleSearchResultView: View {
 
     var body: some View {
         ConsoleEntityCell(entity: viewModel.entity)
-        let occurences = Array(viewModel.occurences.enumerated()).filter {
+        let occurrences = Array(viewModel.occurrences.enumerated()).filter {
             // TODO: these should be displayed inline
             $0.element.scope != .message && $0.element.scope != .url
         }
-        ForEach(occurences.prefix(limit), id: \.offset) { item in
+        ForEach(occurrences.prefix(limit), id: \.offset) { item in
             NavigationLink(destination: makeDestination(for: item.element, entity: viewModel.entity)) {
                 makeCell(for: item.element)
             }
         }
-        if occurences.count > limit {
+        if occurrences.count > limit {
             NavigationLink(destination: ConsoleSearchResultDetailsView(viewModel: viewModel)) {
                 HStack {
                     Text("Show All Results")
                         .font(ConsoleConstants.fontBody)
-                    Text("\(occurences.count)")
+                    Text("\(occurrences.count)")
                         .font(ConsoleConstants.fontBody)
                         .foregroundColor(.secondary)
                 }

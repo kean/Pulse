@@ -269,7 +269,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
 struct ConsoleSearchResultViewModel: Identifiable {
     var id: NSManagedObjectID { entity.objectID }
     let entity: NSManagedObject
-    let occurences: [ConsoleSearchOccurence]
+    let occurrences: [ConsoleSearchOccurence]
 }
 
 struct ConsoleSearchParameters: Equatable, Hashable {

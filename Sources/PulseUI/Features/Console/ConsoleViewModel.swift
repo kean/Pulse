@@ -241,3 +241,4 @@ private func makeFetchRequest(for mode: ConsoleViewModel.Mode) -> NSFetchRequest
 }
 
 private let fetchBatchSize = 100
+

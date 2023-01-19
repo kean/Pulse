@@ -21,46 +21,46 @@ final class ConsoleSearchService {
     }
 
     func search(in task: NetworkTaskEntity, parameters: ConsoleSearchParameters) -> [ConsoleSearchOccurence] {
-        var occurences: [ConsoleSearchOccurence] = []
+        var occurrences: [ConsoleSearchOccurence] = []
         for scope in parameters.scopes {
             switch scope {
             case .url:
                 if var components = URLComponents(string: task.url ?? "") {
                     components.queryItems = nil
                     if let url = components.url?.absoluteString {
-                        occurences += search(url as NSString, parameters, scope)
+                        occurrences += search(url as NSString, parameters, scope)
                     }
                 }
             case .queryItems:
                 if let components = URLComponents(string: task.url ?? ""),
                    let query = components.query, !query.isEmpty {
-                    occurences += search(query as NSString, parameters, scope)
+                    occurrences += search(query as NSString, parameters, scope)
                 }
             case .originalRequestHeaders:
                 if let headers = task.originalRequest?.httpHeaders {
-                    occurences += search(headers as NSString, parameters, scope)
+                    occurrences += search(headers as NSString, parameters, scope)
                 }
             case .currentRequestHeaders:
                 if let headers = task.currentRequest?.httpHeaders {
-                    occurences += search(headers as NSString, parameters, scope)
+                    occurrences += search(headers as NSString, parameters, scope)
                 }
             case .requestBody:
                 if let string = task.requestBody.flatMap(getBodyString) {
-                    occurences += search(string, parameters, scope)
+                    occurrences += search(string, parameters, scope)
                 }
             case .responseHeaders:
                 if let headers = task.response?.httpHeaders {
-                    occurences += search(headers as NSString, parameters, scope)
+                    occurrences += search(headers as NSString, parameters, scope)
                 }
             case .responseBody:
                 if let string = task.responseBody.flatMap(getBodyString) {
-                    occurences += search(string, parameters, scope)
+                    occurrences += search(string, parameters, scope)
                 }
             case .message:
                 break // Applies only to LoggerMessageEntity
             }
         }
-        return occurences
+        return occurrences
     }
 
     private func search(_ data: Data, _ parameters: ConsoleSearchParameters, _ scope: ConsoleSearchScope) -> [ConsoleSearchOccurence] {
@@ -92,7 +92,7 @@ final class ConsoleSearchService {
             return [] // Has to match all
         }
 
-        var occurences: [ConsoleSearchOccurence] = []
+        var occurrences: [ConsoleSearchOccurence] = []
         var matchIndex = 0
         for (line, lineNumber, range) in allMatches {
             let lineRange = lineCount == 1 ? NSRange(location: 0, length: content.length) :  (line.getLineRange(range) ?? range) // Optimization for long lines
@@ -143,12 +143,12 @@ final class ConsoleSearchService {
                 text: preview,
                 searchContext: .init(searchTerm: parameters.searchTerms.first!, options: parameters.options, matchIndex: matchIndex)
             )
-            occurences.append(occurence)
+            occurrences.append(occurence)
 
             matchIndex += 1
         }
 
-        return occurences
+        return occurrences
     }
 
     private func getBodyString(for blob: LoggerBlobHandleEntity) -> NSString? {

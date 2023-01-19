@@ -8,7 +8,7 @@ import CoreData
 import Combine
 
 #warning("fix issue on iOS 15")
-#warning("try disabling animations when presenting seach")
+#warning("try disabling animations when presenting search")
 
 #if os(iOS)
 
