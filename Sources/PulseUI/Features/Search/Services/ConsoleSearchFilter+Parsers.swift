@@ -85,6 +85,7 @@ extension Parsers {
         statusCodeWilcard // It'll also auto-complete "2" as "2xx" if every other pattern fails
     )
 
+    // TODO: refactor
     static let statusCodeWilcard: Parser<ConsoleSearchRange<Int>> = (
         char(from: "12345") <* char(from: "xX*").zeroOrMore <* valueEnd).map {
         guard let code = Int(String($0)) else { return nil }
