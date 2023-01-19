@@ -2,172 +2,298 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
-import CoreData
-import Pulse
-import Combine
 import SwiftUI
+import Pulse
+import CoreData
+import Combine
 
-final class ConsoleSearchViewModel: ObservableObject {
-    var isButtonResetEnabled: Bool { !isCriteriaDefault }
+final class ConsoleSearchBarViewModel: ObservableObject {
+    @Published var text: String = ""
+    @Published var tokens: [ConsoleSearchToken] = []
 
-    @Published var criteria = ConsoleSearchCriteria()
-    @Published var mode: ConsoleViewModel.Mode = .messages // warning: not source of truth
+    var parameters: ConsoleSearchParameters {
+        ConsoleSearchParameters(searchTerm: text.trimmingCharacters(in: .whitespaces), tokens: tokens, options: .default)
+    }
 
-    @Published private(set) var labels: [String] = []
-    @Published private(set) var domains: [String] = []
+    var isEmpty: Bool {
+        parameters.isEmpty
+    }
+}
 
-    private(set) var labelsCountedSet = NSCountedSet()
-    private(set) var domainsCountedSet = NSCountedSet()
+@available(iOS 15, tvOS 15, *)
+final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDelegate {
+    private var entities: CurrentValueSubject<[NSManagedObject], Never>
 
-    private(set) var defaultCriteria = ConsoleSearchCriteria()
+    var isViewVisible = false {
+        didSet {
+            if !isViewVisible {
+                operation?.cancel()
+                operation = nil
+            }
+        }
+    }
 
-    private let store: LoggerStore
-    private let entities: CurrentValueSubject<[NSManagedObject], Never>
-    private var isActive = false
+    @Published private(set) var results: [ConsoleSearchResultViewModel] = []
+    @Published private(set) var hasMore = false
+    @Published private(set) var isNewResultsButtonShown = false
+
+    @Published private(set)var isSpinnerNeeded = false
+    @Published private(set)var isSearching = false
+
+    @Published var recentSearches: [ConsoleSearchParameters] = []
+
+    let searchBar: ConsoleSearchBarViewModel
+
+    var toolbarTitle: String {
+        if searchBar.isEmpty {
+            return "Suggested Filters"
+        } else {
+            return "\(results.count) results"
+        }
+    }
+
+    private var dirtyDate: Date?
+    private var buffer: [ConsoleSearchResultViewModel] = []
+    private var operation: ConsoleSearchOperation?
+    private var refreshResultsOperation: ConsoleSearchOperation?
+
+    @Published var topSuggestions: [ConsoleSearchSuggestion] = []
+    @Published var suggestedScopes: [ConsoleSearchSuggestion] = []
+
+    private let searchService = ConsoleSearchService()
+    private let suggestionsService = ConsoleSearchSuggestionsService()
+
+    private let hosts: ManagedObjectsObserver<NetworkDomainEntity>
+    private let queue = DispatchQueue(label: "com.github.pulse.console-search-view")
     private var cancellables: [AnyCancellable] = []
+    private let context: NSManagedObjectContext
 
-    init(store: LoggerStore, entities: CurrentValueSubject<[NSManagedObject], Never>) {
-        self.store = store
+    init(entities: CurrentValueSubject<[NSManagedObject], Never>, store: LoggerStore, searchBar: ConsoleSearchBarViewModel) {
         self.entities = entities
+        self.searchBar = searchBar
+        self.context = store.newBackgroundContext()
+        self.hosts = ManagedObjectsObserver(context: store.viewContext, sortDescriptior: NSSortDescriptor(keyPath: \NetworkDomainEntity.count, ascending: false))
 
-        if store.isArchive {
-            self.criteria.shared.dates.startDate = nil
-            self.criteria.shared.dates.endDate = nil
-        }
-        self.defaultCriteria = criteria
+        let text = searchBar.$text
+            .map { $0.trimmingCharacters(in: .whitespaces ) }
+            .removeDuplicates()
 
-        entities.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.reloadCounters()
+        Publishers.CombineLatest(text, searchBar.$tokens.removeDuplicates()).sink { [weak self] in
+            self?.didUpdateSearchCriteria($0, $1)
         }.store(in: &cancellables)
+
+        text.dropFirst().receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.updateSearchTokens()
+        }.store(in: &cancellables)
+
+        self.topSuggestions = suggestionsService.makeDefaultTopSuggestions(current: [])
+        self.suggestedScopes = suggestionsService.makeDefaultSuggestedScopes()
+
+        entities
+            .throttle(for: 3, scheduler: DispatchQueue.main, latest: true)
+            .sink { [weak self] in self?.didReloadEntities(for: $0) }
+            .store(in: &cancellables)
     }
 
-    // MARK: Appearance
+    // MARK: Search
 
-    func onAppear() {
-        isActive = true
-        reloadCounters()
+    private func didUpdateSearchCriteria(_ searchText: String, _ tokens: [ConsoleSearchToken]) {
+        isNewResultsButtonShown = false
+
+        let parameters = ConsoleSearchParameters(searchTerm: searchText, tokens: tokens, options: .default)
+        startSearch(parameters: parameters)
     }
 
-    func onDisappear() {
-        isActive = false
-    }
+    private func startSearch(parameters: ConsoleSearchParameters) {
+        operation?.cancel()
+        operation = nil
 
-    // MARK: Helpers
-
-    var isCriteriaDefault: Bool {
-        guard criteria.shared == defaultCriteria.shared else { return false }
-        switch mode {
-        case .messages: return criteria.messages == defaultCriteria.messages
-        case .network: return criteria.network == defaultCriteria.network
+        guard !parameters.isEmpty else {
+            isSearching = false
+            results = []
+            return
         }
-    }
 
-    func resetAll() {
-        criteria = defaultCriteria
-    }
+        isSearching = true
+        buffer = []
 
-    func removeAllPins() {
-        store.pins.removeAllPins()
-
-#if os(iOS)
-        runHapticFeedback(.success)
-        ToastView {
-            HStack {
-                Image(systemName: "trash")
-                Text("All pins removed")
-            }
-        }.show()
-#endif
-    }
-
-    private func reloadCounters() {
-        guard isActive else { return }
-
-        switch mode {
-        case .messages:
-            guard let messages = entities.value as? [LoggerMessageEntity] else {
-                return assertionFailure()
-            }
-            labelsCountedSet = NSCountedSet(array: messages.map(\.label.name))
-            labels = (labelsCountedSet.allObjects as! [String]).sorted()
-        case .network:
-            guard let tasks = entities.value as? [NetworkTaskEntity] else {
-                return assertionFailure()
-            }
-            domainsCountedSet = NSCountedSet(array: tasks.compactMap { $0.host?.value })
-            domains = (domainsCountedSet.allObjects as! [String]).sorted(by: { lhs, rhs in
-                domainsCountedSet.count(for: lhs) > domainsCountedSet.count(for: rhs)
-            })
+        // We want to continue showing old results for just a little bit longer
+        // to prevent screen from flickering. If the search is slow, we'll just
+        // remove the results eventually.
+        if !results.isEmpty {
+            dirtyDate = Date()
         }
+
+        let operation = ConsoleSearchOperation(objectIDs: entities.value.map(\.objectID), parameters: parameters, service: searchService, context: context)
+        operation.delegate = self
+        operation.resume()
+        self.operation = operation
     }
 
-    // MARK: Binding (LogLevels)
+    // MARK: Refresh Results
 
-    func binding(forLevel level: LoggerStore.Level) -> Binding<Bool> {
-        Binding(get: {
-            self.criteria.messages.logLevels.levels.contains(level)
-        }, set: { isOn in
-            if isOn {
-                self.criteria.messages.logLevels.levels.insert(level)
+    private func didReloadEntities(for entities: [NSManagedObject]) {
+        checkForNewSearchMatches(for: entities)
+    }
+
+    private func checkForNewSearchMatches(for entities: [NSManagedObject]) {
+        guard isViewVisible else {
+            return // Off-screen
+        }
+        guard operation == nil && refreshResultsOperation == nil else {
+            return // Let's wait until the next refresh
+        }
+        guard !isNewResultsButtonShown else {
+            return // We already know there are new results
+        }
+        let operation = ConsoleSearchOperation(objectIDs: entities.map(\.objectID), parameters: searchBar.parameters, service: searchService, context: context)
+        operation.delegate = self
+        operation.resume()
+        self.refreshResultsOperation = operation
+    }
+
+    // MARK: ConsoleSearchOperationDelegate
+
+    func searchOperation(_ operation: ConsoleSearchOperation, didAddResults results: [ConsoleSearchResultViewModel]) {
+        if operation === self.operation {
+            if let dirtyDate = dirtyDate {
+                self.buffer += results
+                if Date().timeIntervalSince(dirtyDate) > 0.25 {
+                    self.dirtyDate = nil
+                    self.results = buffer
+                    self.buffer = []
+                }
             } else {
-                self.criteria.messages.logLevels.levels.remove(level)
+                self.results += results
             }
-        })
+        } else if operation === self.refreshResultsOperation {
+            // If the first element changed, that should be enough of the
+            // indicator that there are new search matches. We can assume
+            // that the messages are only ever inserted at the top and skip
+            // a ton of work.
+            if results.first?.entity.objectID !== self.results.first?.entity.objectID {
+                withAnimation {
+                    self.isNewResultsButtonShown = true
+                }
+            }
+            self.refreshResultsOperation?.cancel()
+            self.refreshResultsOperation = nil
+        }
     }
 
-    var isAllLogLevelsEnabled: Bool {
-        get {
-            criteria.messages.logLevels.levels.count == LoggerStore.Level.allCases.count
+    func searchOperationDidFinish(_ operation: ConsoleSearchOperation, hasMore: Bool) {
+        if operation === self.operation {
+            self.operation = nil
+            isSearching = false
+            if dirtyDate != nil {
+                self.dirtyDate = nil
+                self.results = buffer
+            }
+            self.hasMore = hasMore
+        } else if operation === self.refreshResultsOperation {
+            self.refreshResultsOperation = nil
         }
-        set {
-            if newValue {
-                criteria.messages.logLevels.levels = Set(LoggerStore.Level.allCases)
+    }
+
+    // MARK: Actions
+
+    func refreshNow() {
+        if isNewResultsButtonShown {
+            withAnimation {
+                isNewResultsButtonShown = false
+            }
+        }
+        startSearch(parameters: searchBar.parameters)
+    }
+
+    func perform(_ suggestion: ConsoleSearchSuggestion) {
+        switch suggestion.action {
+        case .apply(let token):
+            searchBar.text = ""
+            searchBar.tokens.append(token)
+            suggestionsService.saveRecentToken(token)
+        case .autocomplete(let text):
+            searchBar.text = text
+        }
+        updateSearchTokens()
+    }
+
+    func onSubmitSearch() {
+        if let suggestion = topSuggestions.first, isActionable(suggestion) {
+            perform(suggestion)
+        }
+    }
+
+    func buttonShowMoreResultsTapped() {
+        isSearching = true
+        operation?.resume()
+    }
+
+    func buttonShowNewlyAddedSearchResultsTapped() {
+        refreshNow()
+    }
+
+    // MARK: Suggested Tokens
+
+    private func updateSearchTokens() {
+        let hosts = hosts.objects.map(\.value)
+        let parameters = searchBar.parameters
+        let searchText = searchBar.text.trimmingCharacters(in: .whitespaces)
+        let tokens = searchBar.tokens
+
+        queue.async {
+            let topSuggestions: [ConsoleSearchSuggestion]
+            let suggestedScopes: [ConsoleSearchSuggestion]
+            if parameters.isEmpty {
+                topSuggestions = self.suggestionsService.makeDefaultTopSuggestions(current: tokens)
+                suggestedScopes = self.suggestionsService.makeDefaultSuggestedScopes()
             } else {
-                criteria.messages.logLevels.levels = []
+                topSuggestions = self.suggestionsService.makeTopSuggestions(searchText: searchText, hosts: hosts, current: tokens)
+                suggestedScopes = []
+            }
+            DispatchQueue.main.async {
+                self.topSuggestions = topSuggestions
+                self.suggestedScopes = suggestedScopes
             }
         }
     }
 
-    // MARK: Binding (Labels)
+    func isActionable(_ suggestion: ConsoleSearchSuggestion) -> Bool {
+        suggestion.id == topSuggestions.first?.id && suggestion.isToken
+    }
+}
 
-    var selectedLabels: Set<String> {
-        get {
-            if let focused = criteria.messages.labels.focused {
-                return [focused]
-            } else {
-                return Set(labels).subtracting(criteria.messages.labels.hidden)
+@available(iOS 15, tvOS 15, *)
+struct ConsoleSearchResultViewModel: Identifiable {
+    var id: NSManagedObjectID { entity.objectID }
+    let entity: NSManagedObject
+    let occurrences: [ConsoleSearchOccurrence]
+}
+
+struct ConsoleSearchParameters: Equatable, Hashable {
+    var filters: [ConsoleSearchFilter] = []
+    var scopes: [ConsoleSearchScope] = []
+    var searchTerms: [String] = []
+    let options: StringSearchOptions
+
+    init(searchTerm: String, tokens: [ConsoleSearchToken], options: StringSearchOptions) {
+        if !searchTerm.trimmingCharacters(in: .whitespaces).isEmpty {
+            self.searchTerms.append(searchTerm)
+        }
+        for token in tokens {
+            switch token {
+            case .filter(let filter): self.filters.append(filter)
+            case .scope(let scope): self.scopes.append(scope)
+            case .text(let string): self.searchTerms.append(string)
             }
         }
-        set {
-            criteria.messages.labels.focused = nil
-            criteria.messages.labels.hidden = []
-            switch newValue.count {
-            case 1:
-                criteria.messages.labels.focused = newValue.first!
-            default:
-                criteria.messages.labels.hidden = Set(labels).subtracting(newValue)
-            }
+        if self.scopes.isEmpty {
+            self.scopes = ConsoleSearchScope.allCases
         }
+        self.options = options
     }
 
-    // MARK: Custom Filters
-
-    var programmaticFilters: [ConsoleCustomNetworkFilter]? {
-        let programmaticFilters = criteria.network.custom.filters.filter { $0.isProgrammatic && !$0.value.isEmpty }
-        guard !programmaticFilters.isEmpty && criteria.network.custom.isEnabled else {
-            return nil
-        }
-        return programmaticFilters
-    }
-
-    // MARK: Bindings (Hosts)
-
-    var selectedHost: Set<String> {
-        get {
-            Set(domains).subtracting(criteria.network.host.ignoredHosts)
-        }
-        set {
-            criteria.network.host.ignoredHosts = Set(domains).subtracting(newValue)
-        }
+    var isEmpty: Bool {
+        filters.isEmpty && searchTerms.isEmpty
     }
 }

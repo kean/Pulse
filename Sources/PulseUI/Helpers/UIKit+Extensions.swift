@@ -7,50 +7,6 @@
 import UIKit
 import SwiftUI
 
-extension UIImage {
-    static func make(systemName: String, textStyle: UIFont.TextStyle) -> UIImage {
-        UIImage(systemName: systemName)?
-            .withConfiguration(UIImage.SymbolConfiguration(textStyle: textStyle)) ?? UIImage()
-    }
-}
-
-extension UIView {
-    static func vStack(
-        alignment: UIStackView.Alignment = .fill,
-        distribution: UIStackView.Distribution = .fill,
-        spacing: CGFloat = 0,
-        margins: UIEdgeInsets? = nil,
-        _ views: [UIView]
-    ) -> UIStackView {
-        makeStackView(axis: .vertical, alignment: alignment, distribution: distribution, spacing: spacing, margins: margins, views)
-    }
-
-    static func hStack(
-        alignment: UIStackView.Alignment = .fill,
-        distribution: UIStackView.Distribution = .fill,
-        spacing: CGFloat = 0,
-        margins: UIEdgeInsets? = nil,
-        _ views: [UIView]
-    ) -> UIStackView {
-        makeStackView(axis: .horizontal, alignment: alignment, distribution: distribution, spacing: spacing, margins: margins, views)
-    }
-}
-
-private extension UIView {
-    static func makeStackView(axis: NSLayoutConstraint.Axis, alignment: UIStackView.Alignment, distribution: UIStackView.Distribution, spacing: CGFloat, margins: UIEdgeInsets?, _ views: [UIView]) -> UIStackView {
-        let stack = UIStackView(arrangedSubviews: views)
-        stack.axis = axis
-        stack.alignment = alignment
-        stack.distribution = distribution
-        stack.spacing = spacing
-        if let margins = margins {
-            stack.isLayoutMarginsRelativeArrangement = true
-            stack.layoutMargins = margins
-        }
-        return stack
-    }
-}
-
 extension UIView {
     func pinToSuperview(insets: UIEdgeInsets = .zero) {
         translatesAutoresizingMaskIntoConstraints = false

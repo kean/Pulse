@@ -44,12 +44,9 @@ struct ConsoleMessageDetailsView: View {
 
     var body: some View {
         ConsoleMessageMetadataView(message: viewModel.message)
-            .background(InvisibleNavigationLinks {
-                NavigationLink.programmatic(isActive: $isDetailsLinkActive) {
-                    _MessageTextView(viewModel: viewModel)
-                }
-            }
-            )
+            .background(VStack {
+                NavigationLink(isActive: $isDetailsLinkActive, destination: { _MessageTextView(viewModel: viewModel) }, label: { EmptyView() })
+            }.invisible())
             .onAppear { isDetailsLinkActive = true }
     }
 #endif

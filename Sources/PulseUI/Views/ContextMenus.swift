@@ -8,19 +8,6 @@ import Combine
 
 #if os(iOS) || os(macOS)
 
-struct ButtonCopyMessage: View {
-    let text: String
-
-    var body: some View {
-        Button(action: {
-            UXPasteboard.general.string = text
-            runHapticFeedback()
-        }) {
-            Label("Copy Message", systemImage: "doc.on.doc")
-        }
-    }
-}
-
 struct NetworkMessageContextMenu: View {
     let task: NetworkTaskEntity
 
@@ -29,7 +16,7 @@ struct NetworkMessageContextMenu: View {
     var body: some View {
         NetworkMessageContextMenuCopySection(task: task)
         if let message = task.message {
-            PinButton(viewModel: .init(message: message))
+            PinButton(viewModel: .init(message))
         }
     }
 }

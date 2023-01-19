@@ -27,7 +27,7 @@ public struct ConsoleView: View {
         GeometryReader { proxy in
             HStack {
                 List {
-                    ConsoleMessagesForEach(messages: viewModel.entities)
+                    makeForEach(viewModel: viewModel)
                 }
 
                 // TODO: Not sure it's valid
@@ -86,7 +86,7 @@ private struct ConsoleMenuView: View {
     }
 
     private var destinationFilters: some View {
-        ConsoleSearchView(viewModel: viewModel.searchViewModel).padding()
+        ConsoleSearchCriteriaView(viewModel: viewModel.searchCriteriaViewModel).padding()
     }
 }
 

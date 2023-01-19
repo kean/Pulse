@@ -54,18 +54,9 @@ struct NetworkRequestStatusCellModel {
 
     init(task: NetworkTaskEntity) {
         self.title = ConsoleFormatter.status(for: task)
-        switch task.state {
-        case .pending:
-            imageName = "clock.fill"
-            tintColor = .orange
-        case .success:
-            imageName = "checkmark.circle.fill"
-            tintColor = .green
-        case .failure:
-            imageName = "exclamationmark.octagon.fill"
-            tintColor = .red
-        }
-        duration = DurationViewModel(task: task)
+        self.imageName = task.state.iconSystemName
+        self.tintColor = task.state.tintColor
+        self.duration = DurationViewModel(task: task)
     }
 
     init(transaction: NetworkTransactionMetricsEntity) {

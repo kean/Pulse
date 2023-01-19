@@ -46,7 +46,7 @@ final class ConsoleMessageDetailsViewModel {
     }
 
     var pin: PinButtonViewModel {
-        PinButtonViewModel(message: message)
+        PinButtonViewModel(message)
     }
 }
 

@@ -25,6 +25,9 @@ final class ConsoleSettings: PersistentSettings {
 
     @UserDefaultRaw("sharing-output")
     var sharingOutput: ShareStoreOutput = .store
+
+    @UserDefault("recent-searches")
+    var recentSearches: String = "[]"
 }
 
 final class ConsoleTextViewSettings: PersistentSettings {

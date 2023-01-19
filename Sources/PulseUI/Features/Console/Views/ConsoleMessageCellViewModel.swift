@@ -7,15 +7,15 @@ import Pulse
 import CoreData
 import Combine
 
-final class ConsoleMessageViewModel: Pinnable {
+final class ConsoleMessageCellViewModel: Pinnable {
     let message: LoggerMessageEntity
 
-    private let searchViewModel: ConsoleSearchViewModel?
+    private let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel?
 
     // TODO: Trim whitespaces and remove newlines?
     var preprocessedText: String { message.text }
     
-    private(set) lazy var time = ConsoleMessageViewModel.timeFormatter.string(from: message.createdAt)
+    private(set) lazy var time = ConsoleMessageCellViewModel.timeFormatter.string(from: message.createdAt)
 
     static let timeFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -24,11 +24,11 @@ final class ConsoleMessageViewModel: Pinnable {
         return formatter
     }()
     
-    private(set) lazy var pinViewModel = PinButtonViewModel(message: message)
+    private(set) lazy var pinViewModel = PinButtonViewModel(message)
     
-    init(message: LoggerMessageEntity, searchViewModel: ConsoleSearchViewModel? = nil) {
+    init(message: LoggerMessageEntity, searchCriteriaViewModel: ConsoleSearchCriteriaViewModel? = nil) {
         self.message = message
-        self.searchViewModel = searchViewModel
+        self.searchCriteriaViewModel = searchCriteriaViewModel
     }
     
     // MARK: Context Menu
@@ -37,23 +37,15 @@ final class ConsoleMessageViewModel: Pinnable {
     func share() -> ShareItems {
         ShareItems([message.text])
     }
-    
-    func copy() -> String {
-        message.text
-    }
-    
-    var focusLabel: String {
-        message.label.name.capitalized
-    }
-    
+
     func focus() {
-        searchViewModel?.criteria.messages.labels.isEnabled = true
-        searchViewModel?.criteria.messages.labels.focused = message.label.name
+        searchCriteriaViewModel?.criteria.messages.labels.isEnabled = true
+        searchCriteriaViewModel?.criteria.messages.labels.focused = message.label.name
     }
     
     func hide() {
-        searchViewModel?.criteria.messages.labels.isEnabled = true
-        searchViewModel?.criteria.messages.labels.hidden.insert(message.label.name)
+        searchCriteriaViewModel?.criteria.messages.labels.isEnabled = true
+        searchCriteriaViewModel?.criteria.messages.labels.hidden.insert(message.label.name)
     }
 #endif
 }

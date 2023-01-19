@@ -12,19 +12,26 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     let isNetworkOnly: Bool
     let store: LoggerStore
 
-#if os(iOS) || os(macOS)
-    let table: ConsoleTableViewModel
-    let details: ConsoleDetailsRouterViewModel
-#endif
-
+    @Published private(set) var visibleEntities: ArraySlice<NSManagedObject> = []
     @Published private(set) var entities: [NSManagedObject] = []
     let entitiesSubject = CurrentValueSubject<[NSManagedObject], Never>([])
 
 #if os(iOS)
     let insightsViewModel: InsightsViewModel
+    @available(iOS 15, tvOS 15, *)
+    var searchViewModel: ConsoleSearchViewModel {
+        _searchViewModel as! ConsoleSearchViewModel
+    }
+    private var _searchViewModel: AnyObject?
 #endif
 
-    let searchViewModel: ConsoleSearchViewModel
+    let searchBarViewModel: ConsoleSearchBarViewModel
+    let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
+
+    var toolbarTitle: String {
+        let suffix = mode == .network ? "Requests" : "Messages"
+        return "\(entities.count) \(suffix)"
+    }
 
     @Published var mode: Mode
     @Published var isOnlyErrors = false
@@ -32,8 +39,13 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
 
     var onDismiss: (() -> Void)?
 
+    /// This exist strickly to workaround List performance issues
+    private var scrollPosition: ScrollPosition = .nearTop
+    private var visibleEntityCountLimit = fetchBatchSize
+    private var visibleObjectIDs: Set<NSManagedObjectID> = []
+
     private var controller: NSFetchedResultsController<NSManagedObject>?
-    private var isActive = false
+    private var isViewVisible = false
     private var cancellables: [AnyCancellable] = []
 
     enum Mode {
@@ -46,15 +58,14 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         self.mode = mode
         self.isNetworkOnly = mode == .network
 
-        self.searchViewModel = ConsoleSearchViewModel(store: store, entities: entitiesSubject)
-
-#if os(iOS) || os(macOS)
-        self.details = ConsoleDetailsRouterViewModel()
-        self.table = ConsoleTableViewModel(searchViewModel: searchViewModel)
-#endif
+        self.searchBarViewModel = ConsoleSearchBarViewModel()
+        self.searchCriteriaViewModel = ConsoleSearchCriteriaViewModel(store: store, entities: entitiesSubject)
 
 #if os(iOS)
         self.insightsViewModel = InsightsViewModel(store: store)
+        if #available(iOS 15, *) {
+            self._searchViewModel = ConsoleSearchViewModel(entities: entitiesSubject, store: store, searchBar: searchBarViewModel)
+        }
 #endif
 
         super.init()
@@ -70,7 +81,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
                 self?.refresh(filterTerm: filterTerm)
             }.store(in: &cancellables)
 
-        searchViewModel.$criteria
+        searchCriteriaViewModel.$criteria
             .dropFirst()
             .throttle(for: 0.5, scheduler: DispatchQueue.main, latest: true)
             .sink { [weak self] _ in self?.refreshNow() }
@@ -94,7 +105,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     }
 
     private func prepare(for mode: Mode) {
-        searchViewModel.mode = mode
+        searchCriteriaViewModel.mode = mode
 
         let request = makeFetchRequest(for: mode)
         controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: store.viewContext, sectionNameKeyPath: nil, cacheName: nil)
@@ -106,18 +117,24 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     // MARK: Appearance
 
     func onAppear() {
-        isActive = true
-        reloadMessages()
+        isViewVisible = true
+        reloadMessages(isMandatory: true)
     }
 
     func onDisappear() {
-        isActive = false
+        isViewVisible = false
     }
 
     // MARK: Refresh
 
     private func refreshNow() {
+        // important: order
         refresh(filterTerm: filterTerm)
+#if os(iOS)
+        if #available(iOS 15, *) {
+            searchViewModel.refreshNow()
+        }
+#endif
     }
 
     private func refresh(filterTerm: String) {
@@ -127,9 +144,9 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         }
         switch mode {
         case .messages:
-            controller.fetchRequest.predicate = ConsoleSearchCriteria.makeMessagePredicates(criteria: searchViewModel.criteria, isOnlyErrors: isOnlyErrors, filterTerm: filterTerm)
+            controller.fetchRequest.predicate = ConsoleSearchCriteria.makeMessagePredicates(criteria: searchCriteriaViewModel.criteria, isOnlyErrors: isOnlyErrors, filterTerm: filterTerm)
         case .network:
-            controller.fetchRequest.predicate = ConsoleSearchCriteria.makeNetworkPredicates(criteria: searchViewModel.criteria, isOnlyErrors: isOnlyErrors, filterTerm: filterTerm)
+            controller.fetchRequest.predicate = ConsoleSearchCriteria.makeNetworkPredicates(criteria: searchCriteriaViewModel.criteria, isOnlyErrors: isOnlyErrors, filterTerm: filterTerm)
         }
         try? controller.performFetch()
 
@@ -139,22 +156,67 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     // MARK: - NSFetchedResultsControllerDelegate
 
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChangeContentWith diff: CollectionDifference<NSManagedObjectID>) {
-        guard isActive else { return }
-
-#if os(iOS) || os(macOS)
-        self.table.diff = diff
-#endif
-        withAnimation {
-            reloadMessages()
+        if isViewVisible {
+            withAnimation {
+                reloadMessages(isMandatory: false)
+            }
+        } else {
+            entities = self.controller?.fetchedObjects ?? []
         }
     }
 
-    private func reloadMessages() {
+    private func reloadMessages(isMandatory: Bool = true) {
         entities = controller?.fetchedObjects ?? []
-#if os(iOS) || os(macOS)
-        table.entities = entities
-#endif
+        if isMandatory || scrollPosition == .nearTop {
+            refreshVisibleEntities()
+        }
     }
+
+    private enum ScrollPosition {
+        case nearTop
+        case middle
+        case nearBottom
+    }
+
+    private func refreshVisibleEntities() {
+        visibleEntities = entities.prefix(visibleEntityCountLimit)
+    }
+
+    func onDisappearCell(with objectID: NSManagedObjectID) {
+        visibleObjectIDs.remove(objectID)
+        refreshScrollPosition()
+    }
+
+    func onAppearCell(with objectID: NSManagedObjectID) {
+        visibleObjectIDs.insert(objectID)
+        refreshScrollPosition()
+    }
+
+    private func refreshScrollPosition() {
+        let scrollPosition: ScrollPosition
+        if visibleEntities.prefix(5).map(\.objectID).contains(where: visibleObjectIDs.contains) {
+            scrollPosition = .nearTop
+        } else if visibleEntities.suffix(5).map(\.objectID).contains(where: visibleObjectIDs.contains) {
+            scrollPosition = .nearBottom
+        } else {
+            scrollPosition = .middle
+        }
+
+        if scrollPosition != self.scrollPosition {
+            self.scrollPosition = scrollPosition
+            switch scrollPosition {
+            case .nearTop:
+                visibleEntityCountLimit = fetchBatchSize // Reset
+                refreshVisibleEntities()
+            case .middle:
+                break // Don't reload: too expensive and ruins gestures
+            case .nearBottom:
+                visibleEntityCountLimit += fetchBatchSize
+                refreshVisibleEntities()
+            }
+        }
+    }
+
 
     // MARK: - Sharing
 
@@ -174,6 +236,9 @@ private func makeFetchRequest(for mode: ConsoleViewModel.Mode) -> NSFetchRequest
         request = .init(entityName: "\(NetworkTaskEntity.self)")
         request.sortDescriptors = [NSSortDescriptor(keyPath: \NetworkTaskEntity.createdAt, ascending: false)]
     }
-    request.fetchBatchSize = 100
+    request.fetchBatchSize = fetchBatchSize
     return request
 }
+
+private let fetchBatchSize = 100
+

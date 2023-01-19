@@ -24,7 +24,7 @@ public struct ConsoleView: View {
     public var body: some View {
         List {
             toolbar
-            ConsoleMessagesForEach(messages: viewModel.entities)
+            makeForEach(viewModel: viewModel)
         }
         .navigationTitle("Console")
         .onAppear(perform: viewModel.onAppear)
@@ -48,7 +48,7 @@ public struct ConsoleView: View {
         }
         .sheet(isPresented: $isPresentingFilters) {
             NavigationView {
-                ConsoleSearchView(viewModel: viewModel.searchViewModel)
+                ConsoleSearchCriteriaView(viewModel: viewModel.searchCriteriaViewModel)
                     .toolbar {
                         ToolbarItem(placement: .cancellationAction) {
                             Button("Close") { isPresentingFilters = false }
@@ -74,7 +74,7 @@ public struct ConsoleView: View {
             Button(action: { isPresentingFilters = true }) {
                 Image(systemName: "line.3.horizontal.decrease.circle")
             }
-            .background(viewModel.searchViewModel.isCriteriaDefault ? nil : Rectangle().foregroundColor(.blue).cornerRadius(8))
+            .background(viewModel.searchCriteriaViewModel.isCriteriaDefault ? nil : Rectangle().foregroundColor(.blue).cornerRadius(8))
         }
             .font(.title3)
             .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))

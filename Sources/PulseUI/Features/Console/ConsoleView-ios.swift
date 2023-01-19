@@ -11,22 +11,30 @@ import Combine
 
 public struct ConsoleView: View {
     @StateObject private var viewModel: ConsoleViewModel
-    @State private var shareItems: ShareItems?
-    @State private var isShowingAsText = false
-    @State private var selectedShareOutput: ShareOutput?
 
     public init(store: LoggerStore = .shared) {
-        self.init(viewModel: ConsoleViewModel(store: store))
+        self.init(viewModel: .init(store: store))
     }
 
     init(viewModel: ConsoleViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
 
+
     public var body: some View {
-        contentView
-            .onAppear(perform: viewModel.onAppear)
-            .onDisappear(perform: viewModel.onDisappear)
+        _ConsoleView(viewModel: viewModel)
+    }
+}
+
+struct _ConsoleView: View {
+    let viewModel: ConsoleViewModel
+
+    @State private var shareItems: ShareItems?
+    @State private var isShowingAsText = false
+    @State private var selectedShareOutput: ShareOutput?
+
+    var body: some View {
+        _ConsoleListView(viewModel: viewModel)
             .edgesIgnoringSafeArea(.bottom)
             .navigationTitle(viewModel.title)
             .navigationBarItems(
@@ -54,6 +62,7 @@ public struct ConsoleView: View {
                     }
                 }
             }
+
     }
 
     @ViewBuilder
@@ -73,81 +82,82 @@ public struct ConsoleView: View {
             shareItems = item
         }
     }
+}
 
-    @ViewBuilder
-    private var contentView: some View {
-        ConsoleTableView(
-            header: { ConsoleToolbarView(viewModel: viewModel) },
-            viewModel: viewModel.table,
-            detailsViewModel: viewModel.details
-        )
-        .overlay(tableOverlay)
+private struct _ConsoleListView: View {
+    let viewModel: ConsoleViewModel
+    @ObservedObject private var searchBarViewModel: ConsoleSearchBarViewModel
+
+    init(viewModel: ConsoleViewModel) {
+        self.viewModel = viewModel
+        self.searchBarViewModel = viewModel.searchBarViewModel
     }
 
-    @ViewBuilder
-    private var tableOverlay: some View {
-        if viewModel.entities.isEmpty {
-            PlaceholderView.make(viewModel: viewModel)
+    var body: some View {
+        let list = List {
+            if #available(iOS 15, *) {
+                _ConsoleSearchableContentView(viewModel: viewModel)
+            } else {
+                _ConsoleRegularContentView(viewModel: viewModel)
+            }
+        }
+        .listStyle(.grouped)
+
+        if #available(iOS 16, *) {
+            list
+                .environment(\.defaultMinListRowHeight, 8) // TODO: refactor
+                .searchable(text: $searchBarViewModel.text, tokens: $searchBarViewModel.tokens, token: {
+                    if let image = $0.systemImage {
+                        Label($0.title, systemImage: image)
+                    } else {
+                        Text($0.title)
+                    }
+                })
+                .onSubmit(of: .search, viewModel.searchViewModel.onSubmitSearch)
+                .disableAutocorrection(true)
+                .textInputAutocapitalization(.never)
+        } else if #available(iOS 15, *) {
+            list
+                .searchable(text: $searchBarViewModel.text)
+                .onSubmit(of: .search, viewModel.searchViewModel.onSubmitSearch)
+                .disableAutocorrection(true)
+                .textInputAutocapitalization(.never)
+        } else {
+            list
         }
     }
 }
 
-private struct ConsoleToolbarView: View {
-    @ObservedObject var viewModel: ConsoleViewModel
-    @State private var isShowingFilters = false
-    @State private var messageCount = 0
-    @State private var isSearching = false
+@available(iOS 15, *)
+private struct _ConsoleSearchableContentView: View {
+    let viewModel: ConsoleViewModel
+    @Environment(\.isSearching) private var isSearching
 
     var body: some View {
-        VStack(spacing: 8) {
-            HStack(spacing: 0) {
-                let suffix = viewModel.mode == .network ? "Requests" : "Messages"
-                SearchBar(
-                    title: "\(viewModel.entities.count) \(suffix)",
-                    text: $viewModel.filterTerm,
-                    isSearching: $isSearching
-                )
-                if !isSearching {
-                    filters
-                } else {
-                    Button("Cancel") {
-                        isSearching = false
-                        viewModel.filterTerm = ""
-                    }
-                    .foregroundColor(.accentColor)
-                    .padding(.horizontal, 14)
-                }
-            }.buttonStyle(.plain)
-        }
-        .padding(EdgeInsets(top: 2, leading: 8, bottom: 2, trailing: 8))
-        .sheet(isPresented: $isShowingFilters) {
-            NavigationView {
-                ConsoleSearchView(viewModel: viewModel.searchViewModel)
-                    .inlineNavigationTitle("Filters")
-                    .navigationBarItems(trailing: Button("Done") { isShowingFilters = false })
-            }
+        contents.onChange(of: isSearching) {
+            viewModel.searchViewModel.isViewVisible = $0
         }
     }
 
     @ViewBuilder
-    private var filters: some View {
-        if !viewModel.isNetworkOnly {
-            Button(action: viewModel.toggleMode) {
-                Image(systemName: viewModel.mode == .network ? "arrow.down.circle.fill" : "arrow.down.circle")
-                    .font(.system(size: 20))
-                    .foregroundColor(.accentColor)
-            }.frame(width: 40, height: 44)
+    private var contents: some View {
+        if isSearching {
+            ConsoleSearchView(viewModel: viewModel)
+        } else {
+            _ConsoleRegularContentView(viewModel: viewModel)
         }
-        Button(action: { viewModel.isOnlyErrors.toggle() }) {
-            Image(systemName: viewModel.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon")
-                .font(.system(size: 20))
-                .foregroundColor(viewModel.isOnlyErrors ? .red : .accentColor)
-        }.frame(width: 40, height: 44)
-        Button(action: { isShowingFilters = true }) {
-            Image(systemName: viewModel.searchViewModel.isCriteriaDefault ? "line.horizontal.3.decrease.circle" : "line.3.horizontal.decrease.circle.fill")
-                .font(.system(size: 20))
-                .foregroundColor(.accentColor)
-        }.frame(width: 40, height: 44)
+    }
+}
+
+private struct _ConsoleRegularContentView: View {
+    @ObservedObject var viewModel: ConsoleViewModel
+
+    var body: some View {
+        Section(header: ConsoleToolbarView(title: viewModel.toolbarTitle, viewModel: viewModel)) {
+            makeForEach(viewModel: viewModel)
+        }
+        .onAppear(perform: viewModel.onAppear)
+        .onDisappear(perform: viewModel.onDisappear)
     }
 }
 

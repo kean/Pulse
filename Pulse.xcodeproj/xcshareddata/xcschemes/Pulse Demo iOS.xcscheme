@@ -52,7 +52,11 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "-com.apple.CoreData.ConcurrencyDebug -1"
+            argument = "-com.apple.CoreData.ConcurrencyDebug -3"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-com.apple.CoreData.SQLDebug 2"
             isEnabled = "NO">
          </CommandLineArgument>
       </CommandLineArguments>

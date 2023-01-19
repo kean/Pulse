@@ -34,18 +34,13 @@ struct ConsoleCustomNetworkFilter: Hashable, Identifiable {
     }
 
     enum Field {
-        // Database
         case url
         case host
         case method
         case statusCode
         case errorCode
-
-        // Programmatic
         case requestHeader
         case responseHeader
-        case requestBody
-        case responseBody
 
         var localizedTitle: String {
             switch self {
@@ -56,8 +51,6 @@ struct ConsoleCustomNetworkFilter: Hashable, Identifiable {
             case .errorCode: return "Error Code"
             case .requestHeader: return "Request Headers"
             case .responseHeader: return "Response Headers"
-            case .requestBody: return "Request Body"
-            case .responseBody: return "Response Body"
             }
         }
     }
@@ -79,13 +72,6 @@ struct ConsoleCustomNetworkFilter: Hashable, Identifiable {
             case .regex: return "Regex"
             case .beginsWith: return "Begins With"
             }
-        }
-    }
-
-    var isProgrammatic: Bool {
-        switch field {
-        case .requestBody, .responseBody: return true
-        default: return false
         }
     }
 
@@ -123,27 +109,6 @@ struct ConsoleCustomNetworkFilter: Hashable, Identifiable {
         case .errorCode: return "errorCode"
         case .requestHeader: return "originalRequest.httpHeaders"
         case .responseHeader: return "response.httpHeaders"
-        default: return nil
         }
     }
-}
-
-func evaluateProgrammaticFilters(_ filters: [ConsoleCustomNetworkFilter], entity: NetworkTaskEntity, store: LoggerStore) -> Bool {
-    func isMatch(filter: ConsoleCustomNetworkFilter) -> Bool {
-        switch filter.field {
-        case .requestBody:
-            let string = String(data: entity.requestBody?.data ?? Data(), encoding: .utf8)
-            return filter.matches(string: string ?? "")
-        case .responseBody:
-            let string = String(data: entity.responseBody?.data ?? Data(), encoding: .utf8)
-            return filter.matches(string: string ?? "")
-        default: assertionFailure(); return false
-        }
-    }
-    for filter in filters where filter.isProgrammatic {
-        if !isMatch(filter: filter) {
-            return false
-        }
-    }
-    return true
 }

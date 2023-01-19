@@ -21,22 +21,6 @@ extension Color {
 }
 #endif
 
-extension NavigationLink where Label == EmptyView {
-    static func programmatic(isActive: Binding<Bool>, destination: @escaping () -> Destination) -> NavigationLink {
-        NavigationLink(isActive: isActive, destination: destination, label: { EmptyView() })
-    }
-}
-
-struct InvisibleNavigationLinks<Content: View>: View {
-    @ViewBuilder let content: Content
-
-    var body: some View {
-        VStack { content }
-            .frame(width: 0, height: 0)
-            .invisible()
-    }
-}
-
 extension View {
     func invisible() -> some View {
         self.hidden().accessibilityHidden(true)
@@ -93,44 +77,6 @@ extension View {
 }
 
 extension Backport {
-    enum HorizontalEdge {
-        case leading, trailing
-
-        @available(iOS 15, tvOS 15, *)
-        var edge: SwiftUI.HorizontalEdge {
-            switch self {
-            case .leading: return .leading
-            case .trailing: return .trailing
-            }
-        }
-    }
-
-    @ViewBuilder
-    func swipeActions<T>(edge: HorizontalEdge = .trailing, allowsFullSwipe: Bool = true, @ViewBuilder content: () -> T) -> some View where T: View {
-#if os(iOS) || os(watchOS)
-        if #available(iOS 15, *) {
-            self.content.swipeActions(edge: edge.edge, allowsFullSwipe: allowsFullSwipe, content: content)
-        } else {
-            self.content
-        }
-#else
-        self.content
-#endif
-    }
-
-    @ViewBuilder
-    func contextMenu<M: View, P: View>(@ViewBuilder menuItems: () -> M, @ViewBuilder preview: () -> P) -> some View {
-#if !os(watchOS)
-        if #available(iOS 16, tvOS 16, macOS 13, *) {
-            self.content.contextMenu(menuItems: menuItems, preview: preview)
-        } else {
-            self.content.contextMenu(menuItems: menuItems)
-        }
-#else
-        self.content
-#endif
-    }
-
     @ViewBuilder
     func presentationDetents(_ detents: Set<PresentationDetent>) -> some View {
 #if os(iOS)

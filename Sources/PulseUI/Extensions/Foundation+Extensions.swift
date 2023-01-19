@@ -31,6 +31,19 @@ extension NSString {
         return ranges
     }
 
+    func getLineRange(_ lineRange: NSRange) -> NSRange? {
+        let range = self.lineRange(for: lineRange)
+        return range.location != NSNotFound ? range : nil
+    }
+}
+
+extension Character {
+    init?(_ code: unichar) {
+        guard let scalar = UnicodeScalar(code) else {
+            return nil
+        }
+        self = Character(scalar)
+    }
 }
 
 extension String {
@@ -40,14 +53,29 @@ extension String {
     }
 }
 
-struct StringSearchOptions {
-    var isRegex: Bool = false
-    var isCaseSensitive: Bool = false
+@available(iOS 15, tvOS 15, *)
+extension AttributedString {
+    init(_ string: String, _ configure: (inout AttributeContainer) -> Void) {
+        var attributes = AttributeContainer()
+        configure(&attributes)
+        self.init(string, attributes: attributes)
+    }
+
+    mutating func append(_ string: String, _ configure: (inout AttributeContainer) -> Void) {
+        var attributes = AttributeContainer()
+        configure(&attributes)
+        self.append(AttributedString(string, attributes: attributes))
+    }
+}
+
+struct StringSearchOptions: Equatable, Hashable, Codable {
+    var isRegex = false
+    var isCaseSensitive = false
     var kind: Kind = .contains
 
     static let `default` = StringSearchOptions()
 
-    enum Kind: String, CaseIterable {
+    enum Kind: String, Equatable, Hashable, Codable, CaseIterable {
         case begins = "Begins With"
         case contains = "Contains"
         case ends = "Ends With"

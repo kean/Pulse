@@ -185,6 +185,15 @@ public final class LoggerStore: @unchecked Sendable {
         }
     }
 
+    /// Creates a new background context.
+    public func newBackgroundContext() -> NSManagedObjectContext {
+        let context = container.newBackgroundContext()
+        context.performAndWait {
+            context.userInfo[WeakLoggerStore.loggerStoreKey] = WeakLoggerStore(store: self)
+        }
+        return context
+    }
+
     /// This is a safe fallback for the initialization of the shared store.
     init(inMemoryStore storeURL: URL) {
         self.storeURL = storeURL
@@ -1026,30 +1035,20 @@ extension LoggerStore {
         }
 
         public func togglePin(for message: LoggerMessageEntity) {
-            guard let store = store else { return }
-            store.perform {
-                guard let message = store.backgroundContext.object(with: message.objectID) as? LoggerMessageEntity else { return }
-                self._togglePin(for: message)
-            }
+            message.isPinned.toggle()
         }
 
         public func togglePin(for task: NetworkTaskEntity) {
-            guard let store = store else { return }
-            store.perform {
-                guard let task = store.backgroundContext.object(with: task.objectID) as? NetworkTaskEntity else { return }
-                task.message.map(self._togglePin)
-            }
+            task.message.map(self.togglePin)
         }
 
         public func removeAllPins() {
             guard let store = store else { return }
-            store.perform {
-                let messages = try? store.backgroundContext.fetch(LoggerMessageEntity.self) {
-                    $0.predicate = NSPredicate(format: "isPinned == YES")
-                }
-                for message in messages ?? [] {
-                    self._togglePin(for: message)
-                }
+            let messages = try? store.viewContext.fetch(LoggerMessageEntity.self) {
+                $0.predicate = NSPredicate(format: "isPinned == YES")
+            }
+            for message in messages ?? [] {
+                self._togglePin(for: message)
             }
         }
 
