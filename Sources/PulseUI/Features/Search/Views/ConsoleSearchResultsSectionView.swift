@@ -7,14 +7,6 @@ import Pulse
 import CoreData
 import Combine
 
-
-#warning("fix an issue where text cursor jumps when you type quickly")
-#warning("scopes for results?")
-#warning("prioritize what makes the cut")
-#warning("dont show URL occurence")
-#warning("fix filtres toolbar no longer working")
-#warning("how can use share the results?")
-
 @available(iOS 15, tvOS 15, *)
 struct ConsoleSearchResultView: View {
     let viewModel: ConsoleSearchResultViewModel

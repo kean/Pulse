@@ -7,9 +7,6 @@ import SwiftUI
 import Pulse
 import CoreData
 
-#warning("add context menus back")
-#warning("inject viewmodels here & impement focus actions for messages")
-
 struct ConsoleEntityCell: View {
     let entity: NSManagedObject
 

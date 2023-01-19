@@ -7,9 +7,6 @@ import CoreData
 import Pulse
 import Combine
 
-#warning("improve style of cells (full red for errors) and better critical design")
-#warning("refactor")
-
 #if os(iOS)
 
 public struct ConsoleView: View {

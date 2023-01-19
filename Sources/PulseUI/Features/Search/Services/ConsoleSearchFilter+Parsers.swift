@@ -4,9 +4,6 @@
 
 import Foundation
 
-#warning("add confidence for HTTP method parser")
-#warning("better you for quick suggestions of filters that takes less space")
-
 // Search:
 //
 // - Search with confidence for filter names (and consume it) plus any remaining: symbols

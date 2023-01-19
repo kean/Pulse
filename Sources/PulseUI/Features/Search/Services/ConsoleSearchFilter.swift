@@ -41,8 +41,6 @@ import Pulse
 
 // Scheme [HTTPS]
 
-#warning("add open ranges support")
-
 protocol ConsoleSearchFilterProtocol: Equatable, Hashable, Codable {
     var name: String { get }
     var valuesDescriptions: [String] { get }

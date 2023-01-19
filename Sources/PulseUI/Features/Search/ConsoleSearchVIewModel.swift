@@ -20,7 +20,6 @@ final class ConsoleSearchBarViewModel: ObservableObject {
     }
 }
 
-#warning("replace isSearching with operation != nil")
 #warning("fix an issue when you click on suggested empy field, contains: jumps to top (should only with low confidence)")
 
 @available(iOS 15, tvOS 15, *)
