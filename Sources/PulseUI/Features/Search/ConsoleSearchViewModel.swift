@@ -238,8 +238,6 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     // MARK: Suggested Tokens
 
     private func updateSearchTokens() {
-        guard #available(iOS 16, tvOS 16, *) else { return }
-
         let hosts = hosts.objects.map(\.value)
         let parameters = searchBar.parameters
         let searchText = searchBar.text.trimmingCharacters(in: .whitespaces)
