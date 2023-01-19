@@ -88,10 +88,12 @@ final class ConsoleSearchOperation {
         }
     }
 
-#warning("implement basic search for messages")
-
     private func search(_ message: LoggerMessageEntity) -> ConsoleSearchResultViewModel? {
-        return nil
+        let occurences = service.search(in: message, parameters: parameters)
+        guard !occurences.isEmpty else {
+            return nil
+        }
+        return ConsoleSearchResultViewModel(entity: message, occurences: occurences)
     }
 
     private func search(_ task: NetworkTaskEntity) -> ConsoleSearchResultViewModel? {

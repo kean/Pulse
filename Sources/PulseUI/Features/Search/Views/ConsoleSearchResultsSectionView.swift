@@ -76,9 +76,11 @@ struct ConsoleSearchResultView: View {
                 makeHeadersDetails(title: "Response Headers", headers: task.response?.headers)
             case .responseBody:
                 NetworkInspectorResponseBodyView(viewModel: .init(task: task))
+            case .message:
+                EmptyView()
             }
-        } else {
-            EmptyView()
+        } else if let message = entity as? LoggerMessageEntity {
+            ConsoleMessageDetailsView(viewModel: .init(message: message))
         }
     }
 

@@ -12,6 +12,10 @@ final class ConsoleSearchService {
     private let helper = TextHelper()
     private let cachedBodies = Cache<NSManagedObjectID, NSString>(costLimit: 16_000_000, countLimit: 1000)
 
+    func search(in message: LoggerMessageEntity, parameters: ConsoleSearchParameters) -> [ConsoleSearchOccurence] {
+        search(message.text as NSString, parameters, .message)
+    }
+
     func isMatching(_ task: NetworkTaskEntity, filters: [ConsoleSearchFilter]) -> Bool {
         filters.allSatisfy { $0.filter.isMatch(task) }
     }
@@ -52,6 +56,8 @@ final class ConsoleSearchService {
                 if let string = task.responseBody.flatMap(getBodyString) {
                     occurences += search(string, parameters, scope)
                 }
+            case .message:
+                break // Applies only to LoggerMessageEntity
             }
         }
         return occurences
