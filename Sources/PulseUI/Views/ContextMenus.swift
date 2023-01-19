@@ -102,8 +102,8 @@ struct StringSearchOptionsMenu: View {
     @ViewBuilder
     var pickerOptions: some View {
         if isKindNeeded {
-            Picker(options.kind.rawValue, selection: $options.kind) {
-                ForEach(options.allKindCases(), id: \.self) {
+            Picker(options.rule.rawValue, selection: $options.rule) {
+                ForEach(options.allEligibleMatchingRules(), id: \.self) {
                     Text($0.rawValue).tag($0)
                 }
             }

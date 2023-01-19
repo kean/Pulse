@@ -7,7 +7,7 @@ import Foundation
 struct StringSearchOptions: Equatable, Hashable, Codable {
     var isRegex = false
     var caseSensitivity: CaseSensitivity = .ignoringCase
-    var kind: Kind = .contains
+    var rule: MatchingRule = .contains
 
     static let `default` = StringSearchOptions()
 
@@ -16,21 +16,21 @@ struct StringSearchOptions: Equatable, Hashable, Codable {
         case matchingCase = "Matching Case"
     }
 
-    enum Kind: String, Equatable, Hashable, Codable, CaseIterable {
+    enum MatchingRule: String, Equatable, Hashable, Codable, CaseIterable {
         case begins = "Begins With"
         case contains = "Contains"
         case ends = "Ends With"
     }
 
     var title: String {
-        isRegex ? "Regex" : kind.rawValue
+        isRegex ? "Regex" : rule.rawValue
     }
 
-    func allKindCases() -> [Kind] {
+    func allEligibleMatchingRules() -> [MatchingRule] {
         if isRegex {
             return [.begins, .contains]
         } else {
-            return Kind.allCases
+            return MatchingRule.allCases
         }
     }
 }
@@ -47,7 +47,7 @@ extension String.CompareOptions {
         case .matchingCase:
             break
         }
-        switch options.kind {
+        switch options.rule {
         case .begins:
             insert(.anchored)
         case .ends:
