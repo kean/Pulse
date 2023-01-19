@@ -15,7 +15,7 @@ import Foundation
 
 struct Parser<A> {
     /// Parses the given string. Returns the matched element `A` and the
-    /// remaining substring if the match is succesful. Returns `nil` otherwise.
+    /// remaining substring if the match is successful. Returns `nil` otherwise.
     let parse: (_ string: Substring) throws -> (A, Substring)?
 }
 
@@ -37,7 +37,7 @@ struct ParserError: Error, LocalizedError {
     }
 }
 
-// MARK: - Parser (Predifined)
+// MARK: - Parser (Predefined)
 
 struct Parsers {}
 
