@@ -7,8 +7,6 @@ import Pulse
 import CoreData
 import Combine
 
-#warning("use caps and medium for badge")
-
 struct ConsoleMessageCell: View {
     let viewModel: ConsoleMessageCellViewModel
 
@@ -17,7 +15,7 @@ struct ConsoleMessageCell: View {
             HStack {
                 Text(viewModel.message.logLevel.name.uppercased())
                     .lineLimit(1)
-                    .font(ConsoleConstants.fontTitle)
+                    .font(ConsoleConstants.fontTitle.weight(.medium))
                     .foregroundColor(titleColor)
                 Spacer()
 #if os(macOS) || os(iOS)
