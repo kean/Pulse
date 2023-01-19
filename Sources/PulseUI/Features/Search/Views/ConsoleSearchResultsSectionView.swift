@@ -18,6 +18,7 @@ struct ConsoleSearchResultView: View {
             // TODO: these should be displayed inline
             $0.element.scope != .message && $0.element.scope != .url
         }
+        // TODO: add id instead of offset
         ForEach(occurrences.prefix(limit), id: \.offset) { item in
             NavigationLink(destination: makeDestination(for: item.element, entity: viewModel.entity)) {
                 makeCell(for: item.element)
@@ -36,14 +37,19 @@ struct ConsoleSearchResultView: View {
         }
     }
 
-    // TODO: add occurrence IDs instead of indices
+    @ViewBuilder
     private func makeCell(for occurrence: ConsoleSearchOccurrence) -> some View {
-        return VStack(alignment: .leading, spacing: 4) {
+        let contents = VStack(alignment: .leading, spacing: 4) {
             Text(occurrence.scope.fullTitle + " (\(occurrence.line):\(occurrence.range.lowerBound))")
                 .font(ConsoleConstants.fontTitle)
                 .foregroundColor(.secondary)
             Text(occurrence.text)
                 .lineLimit(3)
+        }
+        if #unavailable(iOS 16) {
+            contents.padding(.vertical, 4)
+        } else {
+            contents
         }
     }
 

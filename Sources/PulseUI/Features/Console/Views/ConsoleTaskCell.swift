@@ -17,7 +17,7 @@ struct ConsoleTaskCell: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 5) {
+        let contents = VStack(alignment: .leading, spacing: 5) {
             title
             message
 #if os(iOS) || os(macOS)
@@ -30,6 +30,11 @@ struct ConsoleTaskCell: View {
                 details
             }
 #endif
+        }
+        if #unavailable(iOS 16) {
+            contents.padding(.vertical, 4)
+        } else {
+            contents
         }
     }
 

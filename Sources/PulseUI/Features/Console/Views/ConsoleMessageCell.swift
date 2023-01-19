@@ -11,7 +11,7 @@ struct ConsoleMessageCell: View {
     let viewModel: ConsoleMessageCellViewModel
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        let contents = VStack(alignment: .leading, spacing: 4) {
             HStack {
                 Text(viewModel.message.logLevel.name.uppercased())
                     .lineLimit(1)
@@ -36,6 +36,11 @@ struct ConsoleMessageCell: View {
 #if os(macOS)
         .padding(.vertical, 3)
 #endif
+        if #unavailable(iOS 16) {
+            contents.padding(.vertical, 4)
+        } else {
+            contents
+        }
     }
 
     var titleColor: Color {
