@@ -36,7 +36,6 @@ struct ConsoleSearchResultView: View {
                 }
             }
         }
-
         if isSeparatorNeeded {
             PlainListGroupSeparator()
         }
@@ -123,9 +122,9 @@ struct ConsoleSearchResultDetailsView: View {
 struct PlainListGroupSeparator: View {
     var body: some View {
         Rectangle().foregroundColor(.clear) // DIY separator
-            .frame(height: 20)
+            .frame(height: 12)
             .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
-            .listRowBackground(Color.separator.opacity(0.2))
+            .listRowBackground(Color.separator.opacity(0.18))
 #if os(iOS)
             .listRowSeparator(.hidden)
 #endif

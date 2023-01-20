@@ -7,6 +7,7 @@ import Pulse
 import CoreData
 import Combine
 
+#warning("remoev this ViewModel")
 final class ConsoleSearchBarViewModel: ObservableObject {
     @Published var text: String = ""
     @Published var tokens: [ConsoleSearchToken] = []
@@ -41,13 +42,13 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
 
     @Published private(set)var isSpinnerNeeded = false
     @Published private(set)var isSearching = false
-    var hasRecentTokens: Bool { !suggestionsService.recentTokens.isEmpty }
+    var hasRecentSearches: Bool { !suggestionsService.recentSearches.isEmpty }
 
     let searchBar: ConsoleSearchBarViewModel
 
     var toolbarTitle: String {
         if parameters.isEmpty {
-            return "Filters"
+            return "Search"
         } else {
             return "\(results.count) results"
         }
@@ -67,8 +68,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     private var operation: ConsoleSearchOperation?
     private var refreshResultsOperation: ConsoleSearchOperation?
 
-    @Published var topSuggestions: [ConsoleSearchSuggestion] = []
-    @Published var suggestedScopes: [ConsoleSearchSuggestion] = []
+    @Published var suggestionsViewModel: ConsoleSearchSuggestionsViewModel!
 
     private let searchService = ConsoleSearchService()
     private let suggestionsService = ConsoleSearchSuggestionsService()
@@ -84,6 +84,8 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         self.searchBar = searchBar
         self.store = store
         self.context = store.newBackgroundContext()
+
+        #warning("perform this in background?")
         self.hosts = ManagedObjectsObserver(context: store.viewContext, sortDescriptior: NSSortDescriptor(keyPath: \NetworkDomainEntity.count, ascending: false))
 
         let text = searchBar.$text
@@ -117,13 +119,12 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
             self?.updateSearchTokens()
         }.store(in: &cancellables)
 
-        self.topSuggestions = suggestionsService.makeDefaultTopSuggestions(current: [])
-        self.suggestedScopes = suggestionsService.makeDefaultSuggestedScopes()
-
         entities
             .throttle(for: 3, scheduler: DispatchQueue.main, latest: true)
             .sink { [weak self] in self?.didReloadEntities(for: $0) }
             .store(in: &cancellables)
+
+        self.suggestionsViewModel = makeSuggestions(for: makeContextForSuggestions())
     }
 
     // MARK: Search
@@ -136,6 +137,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     private func startSearch(parameters: ConsoleSearchParameters) {
         operation?.cancel()
         operation = nil
+        hasMore = false
 
         guard !parameters.isEmpty else {
             isSearching = false
@@ -248,11 +250,15 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     private func apply(_ token: ConsoleSearchToken) {
         searchBar.text = ""
         searchBar.tokens.append(token)
-        suggestionsService.saveRecentToken(token)
+        switch token {
+        case .filter(let filter): suggestionsService.saveRecentFilter(filter)
+        case .term(let term): suggestionsService.saveRecentSearch(term)
+        case .scope: break
+        }
     }
 
     private func applyCurrentFilter() {
-        if let suggestion = topSuggestions.first {
+        if let suggestion = suggestionsViewModel.topSuggestion {
             perform(suggestion)
         }
     }
@@ -273,8 +279,8 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         refreshNow()
     }
 
-    func buttonClearRecentTokensTapped() {
-        suggestionsService.clearRecentTokens()
+    func buttonClearRecentSearchesTapped() {
+        suggestionsService.clearRecentSearches()
         updateSearchTokens()
     }
 
@@ -285,31 +291,44 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     // MARK: Suggested Tokens
 
     private func updateSearchTokens() {
-        let hosts = hosts.objects.map(\.value)
-        let parameters = self.parameters
-        let searchText = searchBar.text.trimmingCharacters(in: .whitespaces)
-        let tokens = searchBar.tokens
-        let options = self.options
-
+        let context = makeContextForSuggestions()
         queue.async {
-            let topSuggestions: [ConsoleSearchSuggestion]
-            let suggestedScopes: [ConsoleSearchSuggestion]
-            if parameters.isEmpty {
-                topSuggestions = self.suggestionsService.makeDefaultTopSuggestions(current: tokens)
-                suggestedScopes = self.suggestionsService.makeDefaultSuggestedScopes()
-            } else {
-                topSuggestions = self.suggestionsService.makeTopSuggestions(searchText: searchText, hosts: hosts, current: tokens, options: options)
-                suggestedScopes = []
-            }
+            let viewModel = self.makeSuggestions(for: context)
             DispatchQueue.main.async {
-                self.topSuggestions = topSuggestions
-                self.suggestedScopes = suggestedScopes
+                self.suggestionsViewModel = viewModel
             }
         }
     }
 
+    private func makeContextForSuggestions() -> ConsoleSearchSuggestionsContext {
+        ConsoleSearchSuggestionsContext(
+            searchText: searchBar.text.trimmingCharacters(in: .whitespaces),
+            hosts: hosts.objects.map(\.value),
+            current: searchBar.tokens,
+            parameters: parameters,
+            options: options
+        )
+    }
+
+    private func makeSuggestions(for context: ConsoleSearchSuggestionsContext) -> ConsoleSearchSuggestionsViewModel {
+        let service = suggestionsService
+        if context.searchText.isEmpty && context.parameters.filters.isEmpty && context.parameters.terms.isEmpty {
+            return ConsoleSearchSuggestionsViewModel(
+                searches: service.makeRecentSearhesSuggestions(),
+                filters: service.makeTopSuggestions(context: context),
+                scopes: service.makeScopesSuggestions()
+            )
+        } else {
+            return ConsoleSearchSuggestionsViewModel(
+                searches: [],
+                filters: service.makeTopSuggestions(context: context),
+                scopes: []
+            )
+        }
+    }
+
     func isActionable(_ suggestion: ConsoleSearchSuggestion) -> Bool {
-        suggestion.id == topSuggestions.first?.id
+        suggestionsViewModel.topSuggestion?.id == suggestion.id
     }
 }
 

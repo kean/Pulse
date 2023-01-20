@@ -21,7 +21,7 @@ struct ConsoleSearchView: View {
 
     var body: some View {
         if viewModel.isShowingContent {
-            tokensView
+            suggestionsView
             if viewModel.isNewResultsButtonShown {
                 showNewResultsPromptView
             }
@@ -29,25 +29,47 @@ struct ConsoleSearchView: View {
         }
     }
 
+#warning("improve design for 'has new messages'")
+#warning("fix filters style (not became plain)")
+
     @ViewBuilder
-    private var tokensView: some View {
+    private var suggestionsView: some View {
         toolbar
             .listRowBackground(Color.clear)
             .listRowSeparator(.hidden, edges: .top)
-        makeList(with: viewModel.topSuggestions)
-        if viewModel.hasRecentTokens && viewModel.parameters.isEmpty {
-            Button(action: viewModel.buttonClearRecentTokensTapped) {
+        let suggestions = viewModel.suggestionsViewModel!
+        if !suggestions.searches.isEmpty {
+            makeList(with: suggestions.searches)
+            buttonClearSearchHistory
+        } else {
+            makeList(with: suggestions.filters)
+        }
+
+        if !suggestions.searches.isEmpty && !suggestions.filters.isEmpty {
+            // Display filters in a separate section
+            PlainListSectionHeaderSeparator(title: "Filters")
+            makeList(with: suggestions.filters)
+        }
+
+        if !suggestions.scopes.isEmpty {
+            PlainListSectionHeaderSeparator(title: "Scopes").padding(.top, 16)
+            makeList(with: suggestions.scopes)
+        }
+    }
+
+    private var buttonClearSearchHistory: some View {
+        HStack {
+            Spacer()
+            Button(action: viewModel.buttonClearRecentSearchesTapped) {
                 HStack {
-                    Image(systemName: "xmark.circle")
                     Text("Clear Search History")
-                }.foregroundColor(.blue)
-            }
+                }
+                .foregroundColor(.blue)
+                .font(.subheadline)
+            }.buttonStyle(.plain)
         }
-        if !viewModel.suggestedScopes.isEmpty {
-            PlainListSectionHeaderSeparator(title: "Scopes")
-                .padding(.top, 16)
-            makeList(with: viewModel.suggestedScopes)
-        }
+        .listRowInsets(EdgeInsets(top: 8, leading: 00, bottom: 0, trailing: 20))
+        .listRowSeparator(.hidden, edges: .bottom)
     }
 
     @ViewBuilder
@@ -64,7 +86,7 @@ struct ConsoleSearchView: View {
             .cornerRadius(8)
         }
         .listRowSeparator(.hidden)
-        .listRowBackground(Color.separator.opacity(0.2))
+        .listRowBackground(Color.separator.opacity(0.18))
         .padding(.vertical, 8)
         .frame(maxWidth: .infinity, alignment: .center)
         .listRowBackground(Color.clear)
@@ -74,10 +96,10 @@ struct ConsoleSearchView: View {
     private var searchResultsView: some View {
         if !viewModel.results.isEmpty {
             PlainListGroupSeparator()
-            PlainListGroupSeparator()
         }
         ForEach(viewModel.results) { result in
-            ConsoleSearchResultView(viewModel: result, isSeparatorNeeded: !viewModel.parameters.terms.isEmpty)
+            let isLast = result.id === viewModel.results.last?.id
+            ConsoleSearchResultView(viewModel: result, isSeparatorNeeded: !viewModel.parameters.terms.isEmpty && !isLast)
         }
         if !viewModel.isSearching && viewModel.hasMore {
             PlainListGroupSeparator()
@@ -103,10 +125,10 @@ struct ConsoleSearchView: View {
 
     @ViewBuilder
     private var footer: some View {
-        if viewModel.parameters.isEmpty, viewModel.hasRecentTokens {
+        if viewModel.parameters.isEmpty, viewModel.hasRecentSearches {
             HStack {
                 Spacer()
-                Button(action: viewModel.buttonClearRecentTokensTapped) {
+                Button(action: viewModel.buttonClearRecentSearchesTapped) {
                     Text("Clear History").font(.callout)
                 }.foregroundColor(.secondary.opacity(0.8))
             }

@@ -28,6 +28,9 @@ final class ConsoleSettings: PersistentSettings {
 
     @UserDefault("recent-searches")
     var recentSearches: String = "[]"
+
+    @UserDefault("recent-filters")
+    var recentFilters: String = "[]"
 }
 
 final class ConsoleTextViewSettings: PersistentSettings {

@@ -40,6 +40,8 @@ enum ConsoleSearchToken: Identifiable, Hashable, Codable {
         }
     }
 
+    #warning("remove")
+    @available(*, deprecated, message: "Deprecated")
     func isSameType(as other: ConsoleSearchToken) -> Bool {
         switch (self, other) {
         case (.filter(let lhs), .filter(let rhs)):

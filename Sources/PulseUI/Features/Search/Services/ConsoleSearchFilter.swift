@@ -34,6 +34,10 @@ enum ConsoleSearchFilter: Equatable, Hashable, Codable {
         }
     }
 
+    func isSameType(as other: ConsoleSearchFilter) -> Bool {
+        type(of: filter) == type(of: other.filter)
+    }
+
     var name: String { filter.name }
     var valuesDescriptions: [String] { filter.valuesDescriptions }
     var valueExample: String { filter.valueExample }

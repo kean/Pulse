@@ -5,6 +5,10 @@ import Combine
 
 #if os(iOS)
 
+#warning("StringSearchOptionsMenu enable matching rule for wildcards")
+#warning("when search scope is applied, remove it from the list")
+#warning("remove scopes from auto-completion")
+
 @available(iOS 15, *)
 struct ConsoleSearchContextMenu: View {
     @ObservedObject var viewModel: ConsoleSearchViewModel
@@ -27,6 +31,16 @@ struct ConsoleSearchContextMenu: View {
                     } else {
                         Label("View as Text", systemImage: "text.quote")
                     }
+                }
+            }
+            Section {
+                Menu(content: {
+                    ForEach(ConsoleSearchScope.allCases, id: \.self) {
+                        Toggle($0.fullTitle, isOn: .constant(true))
+                    }
+
+                }) {
+                    Text("Search Scopes")
                 }
             }
             Section {

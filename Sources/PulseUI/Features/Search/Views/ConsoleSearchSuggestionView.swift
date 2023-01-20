@@ -16,11 +16,20 @@ struct ConsoleSearchSuggestionView: View {
     var body: some View {
         Button(action: action) {
             HStack {
-                if case .apply(let token) = suggestion.action, case .term = token {
-                    Image(systemName: "text.magnifyingglass")
-                        .foregroundColor(.secondary)
+                if case .apply(let token) = suggestion.action {
+                    switch token {
+                    case .filter:
+                        Image(systemName: "line.3.horizontal.decrease.circle")
+                            .foregroundColor(.blue)
+                    case .term:
+                        Image(systemName: "magnifyingglass")
+                            .foregroundColor(.blue)
+                    case .scope:
+                        Image(systemName: "magnifyingglass")
+                            .foregroundColor(.blue)
+                    }
                 } else {
-                    Image(systemName: "magnifyingglass")
+                    Image(systemName: "line.3.horizontal.decrease.circle")
                         .foregroundColor(.secondary)
                 }
                 Text(suggestion.text)
