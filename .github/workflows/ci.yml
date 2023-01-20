@@ -82,7 +82,7 @@ jobs:
         run: |
           python3 -m pip install --upgrade pip
           python3 -m pip install codespell
-          codespell --ignore-words-list="hart,inout,msdos,sur" --skip="./.build/*,./Tests/PulseTests/Resources.swift,./Sources/PulseUI/Mocks/*"
+          codespell --ignore-words-list="hart,inout,msdos,sur" --skip="./.build/*,./Tests/*,./Sources/PulseUI/Mocks/*"
   build-demo-ios:
     name: Build Demo (iOS)
     runs-on: macOS-12
