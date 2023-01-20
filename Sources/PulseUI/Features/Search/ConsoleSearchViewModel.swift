@@ -10,14 +10,6 @@ import Combine
 final class ConsoleSearchBarViewModel: ObservableObject {
     @Published var text: String = ""
     @Published var tokens: [ConsoleSearchToken] = []
-
-    var parameters: ConsoleSearchParameters {
-        ConsoleSearchParameters(searchTerm: text.trimmingCharacters(in: .whitespaces), tokens: tokens)
-    }
-
-    var isEmpty: Bool {
-        parameters.isEmpty
-    }
 }
 
 @available(iOS 15, tvOS 15, *)
@@ -47,11 +39,20 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     let searchBar: ConsoleSearchBarViewModel
 
     var toolbarTitle: String {
-        if searchBar.isEmpty {
+        if parameters.isEmpty {
             return "Suggested Filters"
         } else {
             return "\(results.count) results"
         }
+    }
+
+    var parameters: ConsoleSearchParameters {
+        var tokens = searchBar.tokens
+        let searchTerm = searchBar.text.trimmingCharacters(in: .whitespaces)
+        if !searchTerm.isEmpty {
+            tokens.append(.term(.init(text: searchTerm, options: options)))
+        }
+        return ConsoleSearchParameters(tokens: tokens)
     }
 
     private var dirtyDate: Date?
@@ -116,7 +117,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
 
     private func didUpdateSearchCriteria() {
         isNewResultsButtonShown = false
-        startSearch(parameters: searchBar.parameters)
+        startSearch(parameters: parameters)
     }
 
     private func startSearch(parameters: ConsoleSearchParameters) {
@@ -161,7 +162,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         guard !isNewResultsButtonShown else {
             return // We already know there are new results
         }
-        let operation = ConsoleSearchOperation(objectIDs: entities.map(\.objectID), parameters: searchBar.parameters, service: searchService, context: context)
+        let operation = ConsoleSearchOperation(objectIDs: entities.map(\.objectID), parameters: parameters, service: searchService, context: context)
         operation.delegate = self
         operation.resume()
         self.refreshResultsOperation = operation
@@ -218,7 +219,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
                 isNewResultsButtonShown = false
             }
         }
-        startSearch(parameters: searchBar.parameters)
+        startSearch(parameters: parameters)
     }
 
     func perform(_ suggestion: ConsoleSearchSuggestion) {
@@ -252,7 +253,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
 
     private func updateSearchTokens() {
         let hosts = hosts.objects.map(\.value)
-        let parameters = searchBar.parameters
+        let parameters = self.parameters
         let searchText = searchBar.text.trimmingCharacters(in: .whitespaces)
         let tokens = searchBar.tokens
         let options = self.options
@@ -291,10 +292,7 @@ struct ConsoleSearchParameters: Equatable, Hashable {
     var scopes: [ConsoleSearchScope] = []
     var terms: [ConsoleSearchTerm] = []
 
-    init(searchTerm: String, tokens: [ConsoleSearchToken]) {
-        if !searchTerm.trimmingCharacters(in: .whitespaces).isEmpty {
-            self.terms.append(.init(text: searchTerm, options: .default))
-        }
+    init(tokens: [ConsoleSearchToken]) {
         for token in tokens {
             switch token {
             case .filter(let filter): self.filters.append(filter)

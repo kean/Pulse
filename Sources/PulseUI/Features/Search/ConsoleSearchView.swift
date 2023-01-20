@@ -51,7 +51,7 @@ struct ConsoleSearchView: View {
             }
         }
 
-        if !viewModel.searchBar.parameters.terms.isEmpty {
+        if !viewModel.parameters.terms.isEmpty {
             ForEach(viewModel.results) { result in
                 Section {
                     ConsoleSearchResultView(viewModel: result)
