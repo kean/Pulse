@@ -101,7 +101,7 @@ private struct _ConsoleListView: View {
                 _ConsoleRegularContentView(viewModel: viewModel)
             }
         }
-        .listStyle(.grouped)
+        .listStyle(.plain)
 
         if #available(iOS 16, *) {
             list

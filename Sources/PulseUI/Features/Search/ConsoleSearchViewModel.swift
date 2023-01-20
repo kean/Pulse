@@ -39,7 +39,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
 
     var toolbarTitle: String {
         if parameters.isEmpty {
-            return "Suggested Filters"
+            return "Filters"
         } else {
             return "\(results.count) results"
         }

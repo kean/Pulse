@@ -20,14 +20,15 @@ struct ConsoleSearchView: View {
     }
 
     var body: some View {
-        Section(header: toolbar, footer: footer) {
+        Section(footer: footer) {
+            toolbar
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
             makeList(with: viewModel.topSuggestions)
         }
 
         if !viewModel.suggestedScopes.isEmpty {
-            Section(header: Text("Suggested Scopes")) {
-                makeList(with: viewModel.suggestedScopes)
-            }
+            makeList(with: viewModel.suggestedScopes)
         }
 
         if viewModel.isNewResultsButtonShown {
@@ -82,7 +83,7 @@ struct ConsoleSearchView: View {
     }
 
     private var toolbar: some View {
-        ConsoleToolbarView(title: viewModel.toolbarTitle, isSpinnerNeeded: viewModel.isSpinnerNeeded, viewModel: consoleViewModel)
+        ConsoleSearchToolbar(title: viewModel.toolbarTitle, isSpinnerNeeded: viewModel.isSpinnerNeeded, viewModel: consoleViewModel)
     }
 
     @ViewBuilder
