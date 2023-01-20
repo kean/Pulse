@@ -67,10 +67,10 @@ struct ConsoleTaskCell: View {
     }
 
     private var details: some View {
-        (Text(Image(systemName: "arrow.up.circle")).fontWeight(.light) +
+        (Text(Image(systemName: "arrow.up")).fontWeight(.light) +
          Text(" " + byteCount(for: viewModel.task.requestBodySize)) +
          Text("   ") +
-         Text(Image(systemName: "arrow.down.circle")).fontWeight(.light) +
+         Text(Image(systemName: "arrow.down")).fontWeight(.light) +
          Text(" " + byteCount(for: viewModel.task.responseBodySize)) +
          Text("   ") +
          Text(Image(systemName: "clock")).fontWeight(.light) +
