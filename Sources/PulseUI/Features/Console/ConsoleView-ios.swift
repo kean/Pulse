@@ -99,6 +99,8 @@ private struct _ConsoleListView: View {
                 _ConsoleSearchableContentView(viewModel: viewModel)
             } else {
                 _ConsoleRegularContentView(viewModel: viewModel)
+                    .onAppear(perform: viewModel.onAppear)
+                    .onDisappear(perform: viewModel.onDisappear)
             }
         }
         .listStyle(.plain)
@@ -145,6 +147,8 @@ private struct _ConsoleSearchableContentView: View {
             ConsoleSearchView(viewModel: viewModel)
         } else {
             _ConsoleRegularContentView(viewModel: viewModel)
+                .onAppear(perform: viewModel.onAppear)
+                .onDisappear(perform: viewModel.onDisappear)
         }
     }
 }
@@ -160,8 +164,6 @@ private struct _ConsoleRegularContentView: View {
             toolbar
         }
         makeForEach(viewModel: viewModel)
-            .onAppear(perform: viewModel.onAppear)
-            .onDisappear(perform: viewModel.onDisappear)
     }
 }
 
