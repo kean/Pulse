@@ -11,10 +11,9 @@ import Combine
 struct ConsoleSearchResultView: View {
     let viewModel: ConsoleSearchResultViewModel
     var limit: Int = 4
+    var isSeparatorNeeded = false
 
     var body: some View {
-        PlainListGroupSeparator()
-
         ConsoleEntityCell(entity: viewModel.entity)
         let occurrences = Array(viewModel.occurrences.enumerated()).filter {
             // TODO: these should be displayed inline
@@ -36,6 +35,10 @@ struct ConsoleSearchResultView: View {
                         .foregroundColor(.secondary)
                 }
             }
+        }
+
+        if isSeparatorNeeded {
+            PlainListGroupSeparator()
         }
     }
 

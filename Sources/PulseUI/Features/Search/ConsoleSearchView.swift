@@ -24,7 +24,7 @@ struct ConsoleSearchView: View {
             .listRowBackground(Color.clear)
             .listRowSeparator(.hidden, edges: .top)
         makeList(with: viewModel.topSuggestions)
-        if viewModel.hasRecentTokens {
+        if viewModel.hasRecentTokens && viewModel.parameters.isEmpty {
             Button(action: viewModel.buttonClearRecentTokensTapped) {
                 HStack {
                     Image(systemName: "xmark.circle")
@@ -52,24 +52,22 @@ struct ConsoleSearchView: View {
                 .cornerRadius(8)
             }
             .listRowSeparator(.hidden)
-            .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
-            .padding(.vertical, -8)
+            .listRowBackground(Color.separator.opacity(0.2))
+            .padding(.vertical, 8)
             .frame(maxWidth: .infinity, alignment: .center)
             .listRowBackground(Color.clear)
+
         }
 
-        #warning("remove separators?")
-
-        if !viewModel.parameters.terms.isEmpty {
-            ForEach(viewModel.results) { result in
-                ConsoleSearchResultView(viewModel: result)
-            }
-        } else {
-            ForEach(viewModel.results) { result in
-                ConsoleSearchResultView(viewModel: result)
-            }
+        if !viewModel.results.isEmpty {
+            PlainListGroupSeparator()
+            PlainListGroupSeparator()
+        }
+        ForEach(viewModel.results) { result in
+            ConsoleSearchResultView(viewModel: result, isSeparatorNeeded: !viewModel.parameters.terms.isEmpty)
         }
         if !viewModel.isSearching && viewModel.hasMore {
+            PlainListGroupSeparator()
             Button(action: viewModel.buttonShowMoreResultsTapped) {
                 Text("Show More Results")
             }
