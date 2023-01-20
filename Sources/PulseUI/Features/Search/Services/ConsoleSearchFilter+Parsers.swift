@@ -104,7 +104,7 @@ extension Parsers {
             }
         }
 
-    /// Parses a comma-separated list of values. The given parser recieves a
+    /// Parses a comma-separated list of values. The given parser receives a
     /// trimmed string with not separators and doesn't need to consume input.
     /// The `listOf` consumes values even if it fails to parse some of them.
     static func listOf<T>(_ parser: Parser<T>) -> Parser<[T]> {
