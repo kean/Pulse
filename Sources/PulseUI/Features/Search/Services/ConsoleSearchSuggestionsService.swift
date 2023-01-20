@@ -21,9 +21,6 @@ struct ConsoleSearchSuggestionsViewModel {
 struct ConsoleSearchSuggestionsContext {
     let searchText: String
     let hosts: [String]
-    #warning("remove")
-    @available(*, deprecated, message: "Deprecated")
-    let current: [ConsoleSearchToken]
     let parameters: ConsoleSearchParameters
 }
 
@@ -57,7 +54,6 @@ final class ConsoleSearchSuggestionsService {
             .compactMap { try? $0.parse(context.searchText) }
             .sorted(by: { $0.1 > $1.1 }) // Sort by confidence
 
-#warning("show recent search separately & clear seaprately + dont show after one is applied")
 #warning("tokens should have only one value; listOf should create mjultiple tokens")
     #warning("you can order messages + saved persistently")
 #warning("do we need isSameType?")

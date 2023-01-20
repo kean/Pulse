@@ -304,7 +304,6 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         ConsoleSearchSuggestionsContext(
             searchText: searchBar.text.trimmingCharacters(in: .whitespaces),
             hosts: hosts.objects.map(\.value),
-            current: searchBar.tokens,
             parameters: parameters
         )
     }
