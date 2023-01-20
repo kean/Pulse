@@ -52,10 +52,7 @@ final class ConsoleSearchSuggestionsService {
         let allSuggestions = filters.map { (makeSuggestion(for: $0.0), $0.1) } +
         scopes.map { (makeSuggestion(for: $0.0), $0.1) }
 
-        let plainSearchSuggestion = ConsoleSearchSuggestion(text: {
-            AttributedString("Contains: ") { $0.foregroundColor = .primary } +
-            AttributedString(searchText) { $0.foregroundColor = .blue }
-        }(), action: .apply(.term(.init(text: searchText, options: options))))
+        let plainSearchSuggestion = makeSuggestion(for: .term(.init(text: searchText, options: options)))
 
         let topSuggestions = Array(allSuggestions
             .sorted(by: { $0.1 > $1.1 }) // Sort by confidence

@@ -88,11 +88,18 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
             }
         }.store(in: &cancellables)
 
-        Publishers.CombineLatest(text, searchBar.$tokens.removeDuplicates()).sink { [weak self] in
-            self?.didUpdateSearchCriteria($0, $1)
-        }.store(in: &cancellables)
+        Publishers.CombineLatest3(text, searchBar.$tokens, $options)
+            .dropFirst()
+            .throttle(for: 0.3, scheduler: DispatchQueue.main, latest: true)
+            .sink { [weak self] _, _, _ in
+                self?.didUpdateSearchCriteria()
+            }.store(in: &cancellables)
 
         text.dropFirst().receive(on: DispatchQueue.main).sink { [weak self] _ in
+            self?.updateSearchTokens()
+        }.store(in: &cancellables)
+
+        $options.dropFirst().receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.updateSearchTokens()
         }.store(in: &cancellables)
 
@@ -107,9 +114,9 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
 
     // MARK: Search
 
-    private func didUpdateSearchCriteria(_ searchText: String, _ tokens: [ConsoleSearchToken]) {
+    private func didUpdateSearchCriteria() {
         isNewResultsButtonShown = false
-        startSearch(parameters: .init(searchTerm: searchText, tokens: tokens))
+        startSearch(parameters: searchBar.parameters)
     }
 
     private func startSearch(parameters: ConsoleSearchParameters) {
