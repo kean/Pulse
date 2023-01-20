@@ -29,7 +29,8 @@ struct ConsoleSearchSuggestionView: View {
                     .lineLimit(1)
                 Spacer()
                 if isActionable {
-                    Image(systemName: "return")
+                    Text("\\t")
+                        .foregroundColor(.separator)
                 }
             }
         }
