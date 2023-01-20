@@ -22,8 +22,10 @@ enum ConsoleSearchToken: Identifiable, Hashable, Codable {
 
     var title: String {
         switch self {
-        case .filter(let filter): return filter.token
-        case .scope(let scope): return scope.title
+        case .filter(let filter):
+            return filter.filter.token
+        case .scope(let scope):
+            return scope.title
         case .term(let term):
             guard term.text.count > 10 else {
                 return term.text

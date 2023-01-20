@@ -133,30 +133,20 @@ final class ConsoleSearchSuggestionsService {
         }.map(makeSuggestion).prefix(7))
     }
 
-    private func makeSuggestion(for token: ConsoleSearchToken) -> ConsoleSearchSuggestion {
-        switch token {
-        case .filter(let filter): return makeSuggestion(for: filter)
-        case .scope(let scope): return makeSuggestion(for: scope)
-        case .term(let term): return makeSuggestion(for: term)
-        }
-    }
-
     private func makeSuggestion(for filter: ConsoleSearchFilter) -> ConsoleSearchSuggestion {
-        var string = AttributedString(filter.name + " ") { $0.foregroundColor = .primary }
-        let values = filter.valuesDescriptions
-        if values.isEmpty {
-            string.append(filter.valueExample) { $0.foregroundColor = .secondary }
-        } else {
-            for (index, description) in values.enumerated() {
-                string.append(description) { $0.foregroundColor = .blue }
-                if index < values.endIndex - 1 {
-                    string.append(", ") { $0.foregroundColor = .secondary }
-                }
+        var string = AttributedString(filter.filter.name + " ") { $0.foregroundColor = .primary }
+        let values = filter.filter.values
+        let isExample = values.isEmpty
+        let descriptions = isExample ? values.map(\.description) : filter.filter.valueExamples
+        for (index, description) in descriptions.enumerated() {
+            string.append(description) { $0.foregroundColor = isExample ? .secondary : .blue }
+            if index < values.endIndex - 1 {
+                string.append(", ") { $0.foregroundColor = .secondary }
             }
         }
         return ConsoleSearchSuggestion(text: string, action: {
             if values.isEmpty {
-                return .autocomplete(filter.name + " ")
+                return .autocomplete(filter.filter.name + " ")
             } else {
                 return .apply(.filter(filter))
             }

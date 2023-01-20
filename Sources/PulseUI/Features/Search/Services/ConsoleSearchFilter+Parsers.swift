@@ -119,7 +119,7 @@ extension Parsers {
     ) <* whitespaces
 }
 
-enum HTTPMethod: String, Hashable, Codable, CaseIterable {
+enum HTTPMethod: String, Hashable, Codable, CaseIterable, CustomStringConvertible {
     case get = "GET"
     case head = "HEAD"
     case post = "POST"
@@ -128,4 +128,6 @@ enum HTTPMethod: String, Hashable, Codable, CaseIterable {
     case connect = "CONNECT"
     case options = "OPTIONS"
     case trace = "TRACE"
+
+    var description: String { rawValue }
 }

@@ -5,26 +5,26 @@
 import Foundation
 import Pulse
 
-protocol ConsoleSearchFilterProtocol: Equatable, Hashable, Codable {
+protocol ConsoleSearchFilterProtocol {
+    associatedtype Value: CustomStringConvertible
+
     var name: String { get }
-    var valuesDescriptions: [String] { get }
-    var valueExample: String { get }
-    var token: String { get }
+    var values: [Value] { get }
+    var valueExamples: [String] { get }
 
     func isMatch(_ task: NetworkTaskEntity) -> Bool
 }
 
 extension ConsoleSearchFilterProtocol {
-    var token: String { makeToken(with: valuesDescriptions) }
+    var token: String { makeToken(with: values.map(\.description)) }
 }
 
-enum ConsoleSearchFilter: Equatable, Hashable, Codable {
+enum ConsoleSearchFilter: Hashable, Codable {
     case statusCode(ConsoleSearchFilterStatusCode)
     case host(ConsoleSearchFilterHost)
     case method(ConsoleSearchFilterMethod)
     case path(ConsoleSearchFilterPath)
 
-    // TODO: refactor
     var filter: any ConsoleSearchFilterProtocol {
         switch self {
         case .statusCode(let filter): return filter
@@ -37,19 +37,12 @@ enum ConsoleSearchFilter: Equatable, Hashable, Codable {
     func isSameType(as other: ConsoleSearchFilter) -> Bool {
         type(of: filter) == type(of: other.filter)
     }
-
-    var name: String { filter.name }
-    var valuesDescriptions: [String] { filter.valuesDescriptions }
-    var valueExample: String { filter.valueExample }
-    var token: String { filter.token }
 }
 
-struct ConsoleSearchFilterStatusCode: ConsoleSearchFilterProtocol {
-    var values: [ConsoleSearchRange<Int>]
-
+struct ConsoleSearchFilterStatusCode: ConsoleSearchFilterProtocol, Hashable, Codable {
     var name: String { "Status Code" }
-    var valuesDescriptions: [String] { values.map(\.title) }
-    var valueExample: String { "200" }
+    var values: [ConsoleSearchRange<Int>]
+    var valueExamples: [String] { ["200"] }
 
     func isMatch(_ task: NetworkTaskEntity) -> Bool {
         values.compactMap { $0.range }.contains {
@@ -58,12 +51,10 @@ struct ConsoleSearchFilterStatusCode: ConsoleSearchFilterProtocol {
     }
 }
 
-struct ConsoleSearchFilterHost: ConsoleSearchFilterProtocol {
-    var values: [String]
-
+struct ConsoleSearchFilterHost: ConsoleSearchFilterProtocol, Hashable, Codable {
     var name: String { "Host" }
-    var valuesDescriptions: [String] { values }
-    var valueExample: String { "example.com" }
+    var values: [String]
+    var valueExamples: [String] { ["example.com"] }
 
     func isMatch(_ task: NetworkTaskEntity) -> Bool {
         guard let host = task.url.flatMap(URL.init)?.host else {
@@ -73,12 +64,10 @@ struct ConsoleSearchFilterHost: ConsoleSearchFilterProtocol {
     }
 }
 
-struct ConsoleSearchFilterMethod: ConsoleSearchFilterProtocol {
-    var values: [HTTPMethod]
-
+struct ConsoleSearchFilterMethod: ConsoleSearchFilterProtocol, Hashable, Codable {
     var name: String { "Method" }
-    var valuesDescriptions: [String] { values.map(\.rawValue) }
-    var valueExample: String { "GET" }
+    var values: [HTTPMethod]
+    var valueExamples: [String] { ["GET"] }
 
     func isMatch(_ task: NetworkTaskEntity) -> Bool {
         guard let method = HTTPMethod(rawValue: task.httpMethod ?? "") else { return false }
@@ -86,12 +75,10 @@ struct ConsoleSearchFilterMethod: ConsoleSearchFilterProtocol {
     }
 }
 
-struct ConsoleSearchFilterPath: ConsoleSearchFilterProtocol {
-    var values: [String]
-
+struct ConsoleSearchFilterPath: ConsoleSearchFilterProtocol, Hashable, Codable {
     var name: String { "Path" }
-    var valuesDescriptions: [String] { values }
-    var valueExample: String { "/example" }
+    var values: [String]
+    var valueExamples: [String] { ["/example"] }
 
     func isMatch(_ task: NetworkTaskEntity) -> Bool {
         guard let path = task.url.flatMap(URL.init)?.path else {
@@ -105,7 +92,7 @@ enum ConsoleSearchRangeModfier: Codable {
     case open, closed
 }
 
-struct ConsoleSearchRange<T: Hashable & Comparable & Codable>: Hashable, Codable {
+struct ConsoleSearchRange<T: Hashable & Comparable & Codable>: Hashable, Codable, CustomStringConvertible {
     var modifier: ConsoleSearchRangeModfier
     var lowerBound: T
     var upperBound: T
@@ -122,7 +109,7 @@ struct ConsoleSearchRange<T: Hashable & Comparable & Codable>: Hashable, Codable
         self.upperBound = value
     }
 
-    var title: String {
+    var description: String {
         guard upperBound > lowerBound else { return "\(lowerBound)" }
         if let lowerBound = lowerBound as? Int, let upperBound = upperBound as? Int {
             let upperBound = modifier == .closed ? upperBound + 1 : upperBound
