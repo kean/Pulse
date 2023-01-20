@@ -126,7 +126,9 @@ struct PlainListGroupSeparator: View {
             .frame(height: 20)
             .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
             .listRowBackground(Color.separator.opacity(0.2))
+#if os(iOS)
             .listRowSeparator(.hidden)
+#endif
     }
 }
 
