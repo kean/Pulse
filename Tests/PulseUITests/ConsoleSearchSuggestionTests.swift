@@ -9,6 +9,6 @@ import XCTest
 @available(iOS 16, *)
 final class ConsoleSearchSuggestionTests: XCTestCase {
     func testSavingRecentSearchesReplaces() {
-
+        
     }
 }

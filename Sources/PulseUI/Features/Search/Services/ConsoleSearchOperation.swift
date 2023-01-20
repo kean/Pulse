@@ -53,7 +53,7 @@ final class ConsoleSearchOperation {
         var hasMore = false
         while index < objectIDs.count, !isCancelled, !hasMore {
             if let entity = try? self.context.existingObject(with: objectIDs[index]),
-               let result = self.search(entity) {
+               let result = self.service.search(entity, parameters: parameters) {
                 found += 1
                 if found > cutoff {
                     hasMore = true
@@ -72,45 +72,6 @@ final class ConsoleSearchOperation {
                 self.cutoff *= 2
             }
         }
-    }
-
-    private func search(_ entity: NSManagedObject) -> ConsoleSearchResultViewModel? {
-        if let message = entity as? LoggerMessageEntity {
-            if let task = message.task {
-                return search(task)
-            } else {
-                return search(message)
-            }
-        } else if let task = entity as? NetworkTaskEntity {
-            return search(task)
-        } else {
-            fatalError("Unsupported entity: \(entity)")
-        }
-    }
-
-    private func search(_ message: LoggerMessageEntity) -> ConsoleSearchResultViewModel? {
-        let occurrences = service.search(in: message, parameters: parameters)
-        guard !occurrences.isEmpty else {
-            return nil
-        }
-        return ConsoleSearchResultViewModel(entity: message, occurrences: occurrences)
-    }
-
-    private func search(_ task: NetworkTaskEntity) -> ConsoleSearchResultViewModel? {
-        guard !parameters.isEmpty else {
-            return nil
-        }
-        guard service.isMatching(task, filters: parameters.filters) else {
-            return nil
-        }
-        guard !parameters.terms.isEmpty else {
-            return ConsoleSearchResultViewModel(entity: task, occurrences: [])
-        }
-        let occurrences = service.search(in: task, parameters: parameters)
-        guard !occurrences.isEmpty else {
-            return nil
-        }
-        return ConsoleSearchResultViewModel(entity: task, occurrences: occurrences)
     }
 
     // MARK: Cancellation

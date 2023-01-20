@@ -54,8 +54,7 @@ final class ConsoleSearchSuggestionsService {
             .compactMap { try? $0.parse(context.searchText) }
             .sorted(by: { $0.1 > $1.1 }) // Sort by confidence
 
-#warning("tokens should have only one value; listOf should create mjultiple tokens")
-    #warning("you can order messages + saved persistently")
+#warning("you can order messages + saved persistently")
 #warning("do we need isSameType?")
 
 #warning("when I start typing /, suggest path filter and add auto-completion")
