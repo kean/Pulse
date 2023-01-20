@@ -22,9 +22,17 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
                 operation?.cancel()
                 operation = nil
             }
+            if #available(iOS 16, *) {
+                withAnimation {
+                    self.isShowingContent = self.isViewVisible
+                }
+            } else {
+                self.isShowingContent = self.isViewVisible
+            }
         }
     }
 
+    @Published var isShowingContent = false
     @Published var options: StringSearchOptions = .default
 
     @Published private(set) var results: [ConsoleSearchResultViewModel] = []

@@ -20,6 +20,17 @@ struct ConsoleSearchView: View {
     }
 
     var body: some View {
+        if viewModel.isShowingContent {
+            tokensView
+            if viewModel.isNewResultsButtonShown {
+                showNewResultsPromptView
+            }
+            searchResultsView
+        }
+    }
+
+    @ViewBuilder
+    private var tokensView: some View {
         toolbar
             .listRowBackground(Color.clear)
             .listRowSeparator(.hidden, edges: .top)
@@ -32,33 +43,35 @@ struct ConsoleSearchView: View {
                 }.foregroundColor(.blue)
             }
         }
-
         if !viewModel.suggestedScopes.isEmpty {
             PlainListSectionHeaderSeparator(title: "Scopes")
                 .padding(.top, 16)
             makeList(with: viewModel.suggestedScopes)
         }
+    }
 
-        if viewModel.isNewResultsButtonShown {
-            Button(action: viewModel.buttonShowNewlyAddedSearchResultsTapped) {
-                HStack {
-                    Text("New Results Available")
-                    Image(systemName: "arrow.clockwise.circle.fill")
-                }
-                .font(.headline)
-                .foregroundColor(.white)
-                .padding(8)
-                .background(Color.blue)
-                .cornerRadius(8)
+    @ViewBuilder
+    private var showNewResultsPromptView: some View {
+        Button(action: viewModel.buttonShowNewlyAddedSearchResultsTapped) {
+            HStack {
+                Text("New Results Available")
+                Image(systemName: "arrow.clockwise.circle.fill")
             }
-            .listRowSeparator(.hidden)
-            .listRowBackground(Color.separator.opacity(0.2))
-            .padding(.vertical, 8)
-            .frame(maxWidth: .infinity, alignment: .center)
-            .listRowBackground(Color.clear)
-
+            .font(.headline)
+            .foregroundColor(.white)
+            .padding(8)
+            .background(Color.blue)
+            .cornerRadius(8)
         }
+        .listRowSeparator(.hidden)
+        .listRowBackground(Color.separator.opacity(0.2))
+        .padding(.vertical, 8)
+        .frame(maxWidth: .infinity, alignment: .center)
+        .listRowBackground(Color.clear)
+    }
 
+    @ViewBuilder
+    private var searchResultsView: some View {
         if !viewModel.results.isEmpty {
             PlainListGroupSeparator()
             PlainListGroupSeparator()
