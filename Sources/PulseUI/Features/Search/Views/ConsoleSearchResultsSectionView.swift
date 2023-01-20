@@ -13,6 +13,8 @@ struct ConsoleSearchResultView: View {
     var limit: Int = 4
 
     var body: some View {
+        PlainListGroupSeparator()
+
         ConsoleEntityCell(entity: viewModel.entity)
         let occurrences = Array(viewModel.occurrences.enumerated()).filter {
             // TODO: these should be displayed inline
@@ -111,5 +113,30 @@ struct ConsoleSearchResultDetailsView: View {
         .listStyle(.plain)
         .environment(\.defaultMinListRowHeight, 0)
         .inlineNavigationTitle("Search Results")
+    }
+}
+
+@available(iOS 15, tvOS 15, *)
+struct PlainListGroupSeparator: View {
+    var body: some View {
+        Rectangle().foregroundColor(.clear) // DIY separator
+            .frame(height: 20)
+            .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+            .listRowBackground(Color.separator.opacity(0.2))
+            .listRowSeparator(.hidden)
+    }
+}
+
+@available(iOS 15, tvOS 15, *)
+struct PlainListSectionHeaderSeparator: View {
+    let title: String
+
+    var body: some View {
+        HStack(alignment: .bottom, spacing: 0) {
+            Text(title)
+                .foregroundColor(.secondary)
+                .font(.subheadline.weight(.medium))
+            Spacer()
+        }
     }
 }

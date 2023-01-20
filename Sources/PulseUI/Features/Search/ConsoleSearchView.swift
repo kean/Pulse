@@ -20,49 +20,53 @@ struct ConsoleSearchView: View {
     }
 
     var body: some View {
-        Section(footer: footer) {
-            toolbar
-                .listRowBackground(Color.clear)
-                .listRowSeparator(.hidden)
-            makeList(with: viewModel.topSuggestions)
+        toolbar
+            .listRowBackground(Color.clear)
+            .listRowSeparator(.hidden, edges: .top)
+        makeList(with: viewModel.topSuggestions)
+        if viewModel.hasRecentTokens {
+            Button(action: viewModel.buttonClearRecentTokensTapped) {
+                HStack {
+                    Image(systemName: "xmark.circle")
+                    Text("Clear Search History")
+                }.foregroundColor(.blue)
+            }
         }
 
         if !viewModel.suggestedScopes.isEmpty {
+            PlainListSectionHeaderSeparator(title: "Scopes")
+                .padding(.top, 16)
             makeList(with: viewModel.suggestedScopes)
         }
 
         if viewModel.isNewResultsButtonShown {
-            Section {
-                Button(action: viewModel.buttonShowNewlyAddedSearchResultsTapped) {
-                    HStack {
-                        Text("New Results Available")
-                        Image(systemName: "arrow.clockwise.circle.fill")
-                    }
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .padding(8)
-                        .background(Color.blue)
-                        .cornerRadius(8)
+            Button(action: viewModel.buttonShowNewlyAddedSearchResultsTapped) {
+                HStack {
+                    Text("New Results Available")
+                    Image(systemName: "arrow.clockwise.circle.fill")
                 }
-                .listRowSeparator(.hidden)
-                .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
-                .padding(.vertical, -8)
-                .frame(maxWidth: .infinity, alignment: .center)
-                .listRowBackground(Color.clear)
+                .font(.headline)
+                .foregroundColor(.white)
+                .padding(8)
+                .background(Color.blue)
+                .cornerRadius(8)
             }
+            .listRowSeparator(.hidden)
+            .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+            .padding(.vertical, -8)
+            .frame(maxWidth: .infinity, alignment: .center)
+            .listRowBackground(Color.clear)
         }
+
+        #warning("remove separators?")
 
         if !viewModel.parameters.terms.isEmpty {
             ForEach(viewModel.results) { result in
-                Section {
-                    ConsoleSearchResultView(viewModel: result)
-                }
+                ConsoleSearchResultView(viewModel: result)
             }
         } else {
-            Section {
-                ForEach(viewModel.results) { result in
-                    ConsoleSearchResultView(viewModel: result)
-                }
+            ForEach(viewModel.results) { result in
+                ConsoleSearchResultView(viewModel: result)
             }
         }
         if !viewModel.isSearching && viewModel.hasMore {

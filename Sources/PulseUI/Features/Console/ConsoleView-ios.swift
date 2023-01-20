@@ -153,11 +153,15 @@ private struct _ConsoleRegularContentView: View {
     @ObservedObject var viewModel: ConsoleViewModel
 
     var body: some View {
-        Section(header: ConsoleToolbarView(title: viewModel.toolbarTitle, viewModel: viewModel)) {
-            makeForEach(viewModel: viewModel)
+        let toolbar = ConsoleToolbarView(title: viewModel.toolbarTitle, viewModel: viewModel)
+        if #available(iOS 15.0, *) {
+            toolbar.listRowSeparator(.hidden, edges: .top)
+        } else {
+            toolbar
         }
-        .onAppear(perform: viewModel.onAppear)
-        .onDisappear(perform: viewModel.onDisappear)
+        makeForEach(viewModel: viewModel)
+            .onAppear(perform: viewModel.onAppear)
+            .onDisappear(perform: viewModel.onDisappear)
     }
 }
 

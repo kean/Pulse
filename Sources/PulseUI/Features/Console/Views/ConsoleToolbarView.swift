@@ -18,13 +18,13 @@ struct ConsoleToolbarView: View {
         HStack(alignment: .bottom, spacing: 0) {
             Text(title)
                 .foregroundColor(.secondary)
+                .font(.subheadline.weight(.medium))
             Spacer()
-            HStack(spacing: 16) {
+            HStack(spacing: 14) {
                 ConsoleFiltersView(viewModel: viewModel, isShowingFilters: $isShowingFilters)
-            }.padding(.bottom, 4)
+            }
         }
         .buttonStyle(.plain)
-        .padding(.top, -14)
         .sheet(isPresented: $isShowingFilters) {
             NavigationView {
                 ConsoleSearchCriteriaView(viewModel: viewModel.searchCriteriaViewModel)
