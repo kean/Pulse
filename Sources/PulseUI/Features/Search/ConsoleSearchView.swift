@@ -20,7 +20,7 @@ struct ConsoleSearchView: View {
     }
 
     var body: some View {
-        Section(header: toolbar) {
+        Section(header: toolbar, footer: footer) {
             makeList(with: viewModel.topSuggestions)
         }
 
@@ -84,6 +84,18 @@ struct ConsoleSearchView: View {
 
     private var toolbar: some View {
         ConsoleToolbarView(title: viewModel.toolbarTitle, isSpinnerNeeded: viewModel.isSpinnerNeeded, viewModel: consoleViewModel)
+    }
+
+    @ViewBuilder
+    private var footer: some View {
+        if viewModel.parameters.isEmpty, viewModel.hasRecentTokens {
+            HStack {
+                Spacer()
+                Button(action: viewModel.buttonClearRecentTokensTapped) {
+                    Text("Clear History").font(.callout)
+                }.foregroundColor(.secondary.opacity(0.8))
+            }
+        }
     }
 }
 

@@ -34,8 +34,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
 
     @Published private(set)var isSpinnerNeeded = false
     @Published private(set)var isSearching = false
-
-    @Published var recentSearches: [ConsoleSearchParameters] = []
+    var hasRecentTokens: Bool { !suggestionsService.recentTokens.isEmpty }
 
     let searchBar: ConsoleSearchBarViewModel
 
@@ -235,6 +234,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         updateSearchTokens()
     }
 
+    #warning("rework this")
     func onSubmitSearch() {
         if let suggestion = topSuggestions.first, isActionable(suggestion) {
             perform(suggestion)
@@ -248,6 +248,11 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
 
     func buttonShowNewlyAddedSearchResultsTapped() {
         refreshNow()
+    }
+
+    func buttonClearRecentTokensTapped() {
+        suggestionsService.clearRecentTokens()
+        updateSearchTokens()
     }
 
     // MARK: Suggested Tokens
