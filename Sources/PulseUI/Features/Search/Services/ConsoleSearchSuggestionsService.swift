@@ -66,6 +66,7 @@ final class ConsoleSearchSuggestionsService {
 #warning("do we need to differenciate between suggestions and recent searches with filters?")
 #warning("show more than 3 top if high confidence and still allow to show more?")
 #warning("add scopes to options")
+#warning("20X support")
 
         // Auto-complete hosts (TODO: refactor)
         var hasHostsFilter = false
@@ -137,7 +138,7 @@ final class ConsoleSearchSuggestionsService {
         var string = AttributedString(filter.filter.name + " ") { $0.foregroundColor = .primary }
         let values = filter.filter.values
         let isExample = values.isEmpty
-        let descriptions = isExample ? values.map(\.description) : filter.filter.valueExamples
+        let descriptions = !isExample ? values.map(\.description) : filter.filter.valueExamples
         for (index, description) in descriptions.enumerated() {
             string.append(description) { $0.foregroundColor = isExample ? .secondary : .blue }
             if index < values.endIndex - 1 {

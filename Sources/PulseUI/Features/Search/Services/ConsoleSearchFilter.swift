@@ -141,6 +141,11 @@ extension ConsoleSearchRange where T == Int {
 
 private func makeToken(with values: [String]) -> String {
     guard values.count > 0 else { return "–" } // Should never happen
-    let title = values[0]
-    return values.count > 1 ? title + "…" : title
+    let title = values.joined(separator: ", ")
+    if title.count > 12 {
+        return title.prefix(12)
+            .trimmingCharacters(in: .whitespaces)
+            .trimmingCharacters(in: .punctuationCharacters) + "…"
+    }
+    return title
 }
