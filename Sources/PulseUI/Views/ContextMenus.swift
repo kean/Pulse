@@ -90,20 +90,19 @@ struct StringSearchOptionsMenu: View {
 
     @ViewBuilder
     private var contents: some View {
-        Toggle("Regular Expression", isOn: $options.isRegex)
+        Picker("Kind", selection: $options.kind) {
+            ForEach(StringSearchOptions.Kind.allCases, id: \.self) {
+                Text($0.rawValue).tag($0)
+            }
+        }
         Picker("Case Sensitivity", selection: $options.caseSensitivity) {
             ForEach(StringSearchOptions.CaseSensitivity.allCases, id: \.self) {
                 Text($0.rawValue).tag($0)
             }
         }
-        pickerOptions
-    }
-
-    @ViewBuilder
-    var pickerOptions: some View {
-        if isKindNeeded {
-            Picker(options.rule.rawValue, selection: $options.rule) {
-                ForEach(options.allEligibleMatchingRules(), id: \.self) {
+        if let rules = options.allEligibleMatchingRules(), isKindNeeded {
+            Picker("Matching Rule", selection: $options.rule) {
+                ForEach(rules, id: \.self) {
                     Text($0.rawValue).tag($0)
                 }
             }

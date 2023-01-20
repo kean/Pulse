@@ -321,8 +321,8 @@ private extension URLSessionTask {
 }
 
 private func expandingWildcards(_ pattern: String) -> String {
-    let pattern = pattern
-        .replacingOccurrences(of: ".", with: "\\.")
-        .replacingOccurrences(of: "*", with: ".*?")
+    let pattern = NSRegularExpression.escapedPattern(for: pattern)
+        .replacingOccurrences(of: "\\?", with: ".")
+        .replacingOccurrences(of: "\\*", with: "[^\\s]*")
     return "^\(pattern)$"
 }
