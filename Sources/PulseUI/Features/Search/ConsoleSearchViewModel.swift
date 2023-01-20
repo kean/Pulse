@@ -25,6 +25,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         }
     }
 
+    #warning("these should be set on individual search token because that what gets saved in the history")
     @Published var options: StringSearchOptions = .default
 
     @Published private(set) var results: [ConsoleSearchResultViewModel] = []
