@@ -25,7 +25,6 @@ struct ConsoleSearchSuggestionsContext {
     @available(*, deprecated, message: "Deprecated")
     let current: [ConsoleSearchToken]
     let parameters: ConsoleSearchParameters
-    let options: StringSearchOptions
 }
 
 @available(iOS 15, tvOS 15, *)
@@ -42,8 +41,11 @@ final class ConsoleSearchSuggestionsService {
         recentSearches.map(makeSuggestion)
     }
 
-    func makeScopesSuggestions() -> [ConsoleSearchSuggestion] {
-        ConsoleSearchScope.allEligibleScopes.map(makeSuggestion)
+    func makeScopesSuggestions(context: ConsoleSearchSuggestionsContext) -> [ConsoleSearchSuggestion] {
+        let selectedScopes = Set(context.parameters.scopes)
+        return ConsoleSearchScope.allEligibleScopes
+            .filter { !selectedScopes.contains($0) }
+            .map(makeSuggestion)
     }
 
     func makeTopSuggestions(context: ConsoleSearchSuggestionsContext) -> [ConsoleSearchSuggestion] {
@@ -68,7 +70,6 @@ final class ConsoleSearchSuggestionsService {
 #warning("do we need to differenciate between suggestions and recent searches with filters?")
 #warning("show more than 3 top if high confidence and still allow to show more?")
 #warning("add scopes to options")
-#warning("add errors filter")
 
         // Auto-complete hosts (TODO: refactor)
         var hasHostsFilter = false
@@ -117,7 +118,6 @@ final class ConsoleSearchSuggestionsService {
 
     // Shows recent tokens and unused default tokens.
     func makeDefaultTopSuggestions(context: ConsoleSearchSuggestionsContext) -> [ConsoleSearchSuggestion] {
-        #warning("rewrite")
         var filters = recentFilters
         let defaultFilters = [
             ConsoleSearchFilter.statusCode(.init(values: [])),
@@ -125,7 +125,6 @@ final class ConsoleSearchSuggestionsService {
             ConsoleSearchFilter.host(.init(values: [])),
             ConsoleSearchFilter.path(.init(values: []))
         ]
-        #warning("use removeDuplicates")
         for filter in defaultFilters where !filters.contains(where: {
             $0.isSameType(as: filter)
         }) {

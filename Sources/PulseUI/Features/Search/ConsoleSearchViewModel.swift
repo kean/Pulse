@@ -305,8 +305,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
             searchText: searchBar.text.trimmingCharacters(in: .whitespaces),
             hosts: hosts.objects.map(\.value),
             current: searchBar.tokens,
-            parameters: parameters,
-            options: options
+            parameters: parameters
         )
     }
 
@@ -316,7 +315,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
             return ConsoleSearchSuggestionsViewModel(
                 searches: service.makeRecentSearhesSuggestions(),
                 filters: service.makeTopSuggestions(context: context),
-                scopes: service.makeScopesSuggestions()
+                scopes: service.makeScopesSuggestions(context: context)
             )
         } else {
             return ConsoleSearchSuggestionsViewModel(
@@ -351,9 +350,6 @@ struct ConsoleSearchParameters: Equatable, Hashable {
             case .scope(let scope): self.scopes.append(scope)
             case .term(let string): self.terms.append(string)
             }
-        }
-        if self.scopes.isEmpty {
-            self.scopes = ConsoleSearchScope.allCases
         }
     }
 

@@ -22,7 +22,8 @@ final class ConsoleSearchService {
 
     func search(in task: NetworkTaskEntity, parameters: ConsoleSearchParameters) -> [ConsoleSearchOccurrence] {
         var occurrences: [ConsoleSearchOccurrence] = []
-        for scope in parameters.scopes {
+        let scopes = parameters.scopes.isEmpty ? ConsoleSearchScope.allCases : parameters.scopes
+        for scope in scopes {
             switch scope {
             case .url:
                 if var components = URLComponents(string: task.url ?? "") {
