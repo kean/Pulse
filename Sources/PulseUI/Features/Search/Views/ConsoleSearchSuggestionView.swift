@@ -16,8 +16,13 @@ struct ConsoleSearchSuggestionView: View {
     var body: some View {
         Button(action: action) {
             HStack {
-                Image(systemName: "magnifyingglass")
+                if case .apply(let token) = suggestion.action, case .term = token {
+                    Image(systemName: "text.magnifyingglass")
                         .foregroundColor(.secondary)
+                } else {
+                    Image(systemName: "magnifyingglass")
+                        .foregroundColor(.secondary)
+                }
                 Text(suggestion.text)
                     .lineLimit(1)
                 Spacer()

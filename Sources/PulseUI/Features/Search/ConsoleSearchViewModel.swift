@@ -238,13 +238,17 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     func perform(_ suggestion: ConsoleSearchSuggestion) {
         switch suggestion.action {
         case .apply(let token):
-            searchBar.text = ""
-            searchBar.tokens.append(token)
-            suggestionsService.saveRecentToken(token)
+            apply(token)
         case .autocomplete(let text):
             searchBar.text = text
         }
         updateSearchTokens()
+    }
+
+    private func apply(_ token: ConsoleSearchToken) {
+        searchBar.text = ""
+        searchBar.tokens.append(token)
+        suggestionsService.saveRecentToken(token)
     }
 
     private func applyCurrentFilter() {
@@ -256,8 +260,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     func onSubmitSearch() {
         let searchTerm = searchBar.text.trimmingCharacters(in: .whitespaces)
         if !searchTerm.isEmpty {
-            searchBar.text = ""
-            searchBar.tokens.append(.term(.init(text: searchTerm, options: options)))
+            apply(.term(.init(text: searchTerm, options: options)))
         }
     }
 
