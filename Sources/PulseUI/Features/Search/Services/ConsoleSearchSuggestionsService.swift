@@ -83,17 +83,9 @@ final class ConsoleSearchSuggestionsService {
             filters += hosts.map { (ConsoleSearchFilter.host(.init(values: [$0])), 0.8) }
         }
 
-        let scopes: [(ConsoleSearchScope, Confidence)] = ConsoleSearchScope.allEligibleScopes.compactMap {
-            guard let confidence = try? Parsers.filterName($0.title).parse(context.searchText) else { return nil }
-            return ($0, confidence)
-        }
-
-        let allSuggestions = filters.map { (makeSuggestion(for: $0.0), $0.1) } +
-        scopes.map { (makeSuggestion(for: $0.0), $0.1) }
-
-        return Array(allSuggestions
-            .sorted(by: { $0.1 > $1.1 }) // Sort by confidence
-            .map { $0.0 }.prefix(3))
+        return Array(filters.sorted(by: { $0.1 > $1.1 })
+            .map { makeSuggestion(for: $0.0) }
+            .prefix(3))
     }
 
     // TODO: do it on the Parser level
@@ -189,7 +181,6 @@ final class ConsoleSearchSuggestionsService {
             AttributedString(term.text) { $0.foregroundColor = .blue }
         }(), action: .apply(.term(term)))
     }
-
 
     // MARK: - Recent Searches
 
