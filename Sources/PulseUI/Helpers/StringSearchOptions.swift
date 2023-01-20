@@ -30,8 +30,9 @@ struct StringSearchOptions: Equatable, Hashable, Codable {
 
     var title: String {
         switch kind {
-        case .text, .wildcard: return rule.rawValue
-        case .regex: return rule.rawValue + " Regex"
+        case .text: return rule.rawValue
+        case .wildcard: return "Contains"
+        case .regex: return "Regex"
         }
     }
 

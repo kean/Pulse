@@ -9,25 +9,18 @@ import Combine
 
 @available(iOS 15, tvOS 15, *)
 struct ConsoleSearchSuggestionView: View {
-    @Binding var suggestion: ConsoleSearchSuggestion
+    let suggestion: ConsoleSearchSuggestion
+    @Binding var options: StringSearchOptions
     var isActionable = false
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
             HStack {
-                if case .apply(let token) = suggestion.action, case .term(let term) = token {
-                    Menu(content: {
-                        StringSearchOptionsMenu(options: Binding(get: {
-                            term.options
-                        }, set: {
-                            var term = term
-                            term.options = $0
-                            suggestion.action = .apply(.term(term))
-                        }))
-                    }, label: {
+                if case .apply(let token) = suggestion.action, case .term = token {
+                    Menu(content: { StringSearchOptionsMenu(options: $options) }) {
                         Image(systemName: "ellipsis.circle")
-                    })
+                    }
                 } else {
                     Image(systemName: "magnifyingglass")
                         .foregroundColor(.secondary)

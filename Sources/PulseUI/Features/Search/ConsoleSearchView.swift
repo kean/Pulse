@@ -21,12 +21,12 @@ struct ConsoleSearchView: View {
 
     var body: some View {
         Section(header: toolbar) {
-            makeList(with: $viewModel.topSuggestions)
+            makeList(with: viewModel.topSuggestions)
         }
 
         if !viewModel.suggestedScopes.isEmpty {
             Section(header: Text("Suggested Scopes")) {
-                makeList(with: $viewModel.suggestedScopes)
+                makeList(with: viewModel.suggestedScopes)
             }
         }
 
@@ -71,12 +71,13 @@ struct ConsoleSearchView: View {
         }
     }
 
-    private func makeList(with suggestions: Binding<[ConsoleSearchSuggestion]>) -> some View {
+    private func makeList(with suggestions: [ConsoleSearchSuggestion]) -> some View {
         ForEach(suggestions) { suggestion in
             ConsoleSearchSuggestionView(
                 suggestion: suggestion,
-                isActionable: viewModel.isActionable(suggestion.wrappedValue),
-                action: { viewModel.perform(suggestion.wrappedValue) }
+                options: $viewModel.options,
+                isActionable: viewModel.isActionable(suggestion),
+                action: { viewModel.perform(suggestion) }
             )
         }
     }

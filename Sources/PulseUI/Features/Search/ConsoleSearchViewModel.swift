@@ -33,6 +33,8 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         }
     }
 
+    @Published var options: StringSearchOptions = .default
+
     @Published private(set) var results: [ConsoleSearchResultViewModel] = []
     @Published private(set) var hasMore = false
     @Published private(set) var isNewResultsButtonShown = false
@@ -246,6 +248,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         let parameters = searchBar.parameters
         let searchText = searchBar.text.trimmingCharacters(in: .whitespaces)
         let tokens = searchBar.tokens
+        let options = self.options
 
         queue.async {
             let topSuggestions: [ConsoleSearchSuggestion]
@@ -254,7 +257,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
                 topSuggestions = self.suggestionsService.makeDefaultTopSuggestions(current: tokens)
                 suggestedScopes = self.suggestionsService.makeDefaultSuggestedScopes()
             } else {
-                topSuggestions = self.suggestionsService.makeTopSuggestions(searchText: searchText, hosts: hosts, current: tokens)
+                topSuggestions = self.suggestionsService.makeTopSuggestions(searchText: searchText, hosts: hosts, current: tokens, options: options)
                 suggestedScopes = []
             }
             DispatchQueue.main.async {

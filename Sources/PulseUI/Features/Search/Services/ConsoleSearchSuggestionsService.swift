@@ -9,7 +9,6 @@ import Combine
 
 @available(iOS 15, tvOS 15, *)
 final class ConsoleSearchSuggestionsService {
-
     private(set) var recentTokens: [ConsoleSearchToken] = []
 
     init() {
@@ -18,7 +17,12 @@ final class ConsoleSearchSuggestionsService {
 
     // MARK: - Top Suggestions
 
-    func makeTopSuggestions(searchText: String, hosts: [String], current: [ConsoleSearchToken]) -> [ConsoleSearchSuggestion] {
+    func makeTopSuggestions(
+        searchText: String,
+        hosts: [String],
+        current: [ConsoleSearchToken],
+        options: StringSearchOptions
+    ) -> [ConsoleSearchSuggestion] {
         guard !searchText.isEmpty else {
             return Array(makeDefaultTopSuggestions(current: current).prefix(3))
         }
@@ -51,7 +55,7 @@ final class ConsoleSearchSuggestionsService {
         let plainSearchSuggestion = ConsoleSearchSuggestion(text: {
             AttributedString("Contains: ") { $0.foregroundColor = .primary } +
             AttributedString(searchText) { $0.foregroundColor = .blue }
-        }(), action: .apply(.term(.init(text: searchText, options: .default))))
+        }(), action: .apply(.term(.init(text: searchText, options: options))))
 
         let topSuggestions = Array(allSuggestions
             .sorted(by: { $0.1 > $1.1 }) // Sort by confidence
@@ -216,7 +220,7 @@ struct ConsoleSearchSuggestion: Identifiable {
     }
 
     enum Action {
-        case apply(ConsoleSearchToken)
+        case apply(ConsoleSearchToken) 
         case autocomplete(String)
     }
 }
