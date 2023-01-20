@@ -75,7 +75,6 @@ struct ConsoleSearchView: View {
         ForEach(suggestions) { suggestion in
             ConsoleSearchSuggestionView(
                 suggestion: suggestion,
-                options: $viewModel.options,
                 isActionable: viewModel.isActionable(suggestion),
                 action: { viewModel.perform(suggestion) }
             )

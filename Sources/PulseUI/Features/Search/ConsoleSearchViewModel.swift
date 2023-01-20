@@ -25,7 +25,6 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         }
     }
 
-    #warning("these should be set on individual search token because that what gets saved in the history")
     @Published var options: StringSearchOptions = .default
 
     @Published private(set) var results: [ConsoleSearchResultViewModel] = []
@@ -66,6 +65,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     private let searchService = ConsoleSearchService()
     private let suggestionsService = ConsoleSearchSuggestionsService()
 
+    private let store: LoggerStore
     private let hosts: ManagedObjectsObserver<NetworkDomainEntity>
     private let queue = DispatchQueue(label: "com.github.pulse.console-search-view")
     private var cancellables: [AnyCancellable] = []
@@ -74,6 +74,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     init(entities: CurrentValueSubject<[NSManagedObject], Never>, store: LoggerStore, searchBar: ConsoleSearchBarViewModel) {
         self.entities = entities
         self.searchBar = searchBar
+        self.store = store
         self.context = store.newBackgroundContext()
         self.hosts = ManagedObjectsObserver(context: store.viewContext, sortDescriptior: NSSortDescriptor(keyPath: \NetworkDomainEntity.count, ascending: false))
 
@@ -84,23 +85,27 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         searchBar.$text.sink {
             if $0.last == "\t" {
                 DispatchQueue.main.async {
-                    self.onSubmitSearch()
+                    self.applyCurrentFilter()
                 }
             }
         }.store(in: &cancellables)
 
-        Publishers.CombineLatest3(text, searchBar.$tokens, $options)
+        let didChangeSearchCriteria = Publishers.CombineLatest3(
+            text.removeDuplicates(),
+            searchBar.$tokens.removeDuplicates(),
+            $options.removeDuplicates()
+        )
+            .map { _, _, _ in }
             .dropFirst()
+            .receive(on: DispatchQueue.main)
+
+        didChangeSearchCriteria
             .throttle(for: 0.3, scheduler: DispatchQueue.main, latest: true)
-            .sink { [weak self] _, _, _ in
+            .sink { [weak self] in
                 self?.didUpdateSearchCriteria()
             }.store(in: &cancellables)
 
-        text.dropFirst().receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.updateSearchTokens()
-        }.store(in: &cancellables)
-
-        $options.dropFirst().receive(on: DispatchQueue.main).sink { [weak self] _ in
+        didChangeSearchCriteria.sink { [weak self] in
             self?.updateSearchTokens()
         }.store(in: &cancellables)
 
@@ -234,10 +239,17 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         updateSearchTokens()
     }
 
-    #warning("rework this")
-    func onSubmitSearch() {
-        if let suggestion = topSuggestions.first, isActionable(suggestion) {
+    private func applyCurrentFilter() {
+        if let suggestion = topSuggestions.first {
             perform(suggestion)
+        }
+    }
+
+    func onSubmitSearch() {
+        let searchTerm = searchBar.text.trimmingCharacters(in: .whitespaces)
+        if !searchTerm.isEmpty {
+            searchBar.text = ""
+            searchBar.tokens.append(.term(.init(text: searchTerm, options: options)))
         }
     }
 
@@ -253,6 +265,10 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     func buttonClearRecentTokensTapped() {
         suggestionsService.clearRecentTokens()
         updateSearchTokens()
+    }
+
+    func prepareForSharing(as output: ShareOutput, _ completion: @escaping (ShareItems?) -> Void) {
+        ShareService.share(results.map(\.entity), store: store, as: output, completion)
     }
 
     // MARK: Suggested Tokens
@@ -282,7 +298,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     }
 
     func isActionable(_ suggestion: ConsoleSearchSuggestion) -> Bool {
-        suggestion.id == topSuggestions.first?.id && suggestion.isToken
+        suggestion.id == topSuggestions.first?.id
     }
 }
 

@@ -52,17 +52,9 @@ final class ConsoleSearchSuggestionsService {
         let allSuggestions = filters.map { (makeSuggestion(for: $0.0), $0.1) } +
         scopes.map { (makeSuggestion(for: $0.0), $0.1) }
 
-        let plainSearchSuggestion = makeSuggestion(for: .term(.init(text: searchText, options: options)))
-
-        let topSuggestions = Array(allSuggestions
+        return Array(allSuggestions
             .sorted(by: { $0.1 > $1.1 }) // Sort by confidence
             .map { $0.0 }.prefix(3))
-        if let first = topSuggestions.first,
-           first.isToken || first.text.description.hasPrefix(searchText) {
-            return topSuggestions + [plainSearchSuggestion]
-        } else {
-            return [plainSearchSuggestion] + topSuggestions
-        }
     }
 
     // TODO: do it on the Parser level
@@ -210,11 +202,6 @@ struct ConsoleSearchSuggestion: Identifiable {
     let id = UUID()
     let text: AttributedString
     var action: Action
-
-    var isToken: Bool {
-        guard case .apply = action else { return false }
-        return true
-    }
 
     enum Action {
         case apply(ConsoleSearchToken) 

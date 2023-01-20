@@ -63,6 +63,7 @@
 		0C63A3782979FE3A00F6A6A5 /* ConsoleSearchTerm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C63A3772979FE3A00F6A6A5 /* ConsoleSearchTerm.swift */; };
 		0C63A37A297A01EC00F6A6A5 /* StringSearchOptionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C63A379297A01EC00F6A6A5 /* StringSearchOptionsTests.swift */; };
 		0C63A380297A02D200F6A6A5 /* StringSearchOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C63A37E297A02AD00F6A6A5 /* StringSearchOptions.swift */; };
+		0C63A382297A2BF400F6A6A5 /* ConsoleSearchContextMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C63A381297A2BF400F6A6A5 /* ConsoleSearchContextMenu.swift */; };
 		0C6460DC25F579B8002C55B1 /* Pulse_tvOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C6460D625F579B8002C55B1 /* Pulse_tvOSApp.swift */; };
 		0C6460DD25F579B8002C55B1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C6460D725F579B8002C55B1 /* Assets.xcassets */; };
 		0C6460DE25F579B8002C55B1 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C6460D925F579B8002C55B1 /* Preview Assets.xcassets */; };
@@ -522,6 +523,7 @@
 		0C63A3772979FE3A00F6A6A5 /* ConsoleSearchTerm.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleSearchTerm.swift; sourceTree = "<group>"; };
 		0C63A379297A01EC00F6A6A5 /* StringSearchOptionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = StringSearchOptionsTests.swift; path = "../../../../.Trash/Tests 5.37.58 PM/PulseUITests/StringSearchOptionsTests.swift"; sourceTree = "<group>"; };
 		0C63A37E297A02AD00F6A6A5 /* StringSearchOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringSearchOptions.swift; sourceTree = "<group>"; };
+		0C63A381297A2BF400F6A6A5 /* ConsoleSearchContextMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ConsoleSearchContextMenu.swift; path = "../../../../../../../.Trash/Sources 5.37.56 PM/PulseUI/Features/Search/Views/ConsoleSearchContextMenu.swift"; sourceTree = "<group>"; };
 		0C6460C425F5797B002C55B1 /* Pulse Demo tvOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pulse Demo tvOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C6460D625F579B8002C55B1 /* Pulse_tvOSApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Pulse_tvOSApp.swift; sourceTree = "<group>"; };
 		0C6460D725F579B8002C55B1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -1008,6 +1010,7 @@
 			children = (
 				0CB63A1A2974A5D200525165 /* ConsoleSearchResultsSectionView.swift */,
 				0CB63A1C2974A5EB00525165 /* ConsoleSearchSuggestionView.swift */,
+				0C63A381297A2BF400F6A6A5 /* ConsoleSearchContextMenu.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -2067,6 +2070,7 @@
 				0CF0D63A296F189600EED9D4 /* ContextMenus.swift in Sources */,
 				0C40C0A4296F849E009ECF16 /* ConsoleSearchTimePeriodCell.swift in Sources */,
 				0CF0D666296F189600EED9D4 /* NetworkMetricsCell.swift in Sources */,
+				0C63A382297A2BF400F6A6A5 /* ConsoleSearchContextMenu.swift in Sources */,
 				0C40C0A2296F81B0009ECF16 /* ConsoleCustomFilterView.swift in Sources */,
 				0CF0D682296F189600EED9D4 /* ConsoleTextView.swift in Sources */,
 				0CF0D645296F189600EED9D4 /* ConsoleSearchSectionHeader.swift in Sources */,
