@@ -56,7 +56,13 @@ final class ConsoleSearchService {
     }
 
     private func isMatching(_ task: NetworkTaskEntity, filters: [ConsoleSearchFilter]) -> Bool {
-        filters.allSatisfy { $0.filter.isMatch(task) }
+        let groups = Dictionary(grouping: filters, by: { $0.filter.name })
+        for (_, filters) in groups {
+            if !filters.contains(where: { $0.filter.isMatch(task) }) {
+                return false
+            }
+        }
+        return true
     }
 
     private func search(in task: NetworkTaskEntity, parameters: ConsoleSearchParameters) -> [ConsoleSearchOccurrence] {
