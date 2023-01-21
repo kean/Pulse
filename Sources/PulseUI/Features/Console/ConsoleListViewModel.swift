@@ -14,6 +14,7 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
 
 #warning("remove subject")
     let entitiesSubject = CurrentValueSubject<[NSManagedObject], Never>([])
+    let didRefresh = PassthroughSubject<Void, Never>()
 
 #warning("move these to a struct")
     // Sorting/Grouping
@@ -103,6 +104,7 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
         try? controller.performFetch()
 
         reloadMessages()
+        didRefresh.send(())
     }
 
     // MARK: - NSFetchedResultsControllerDelegate

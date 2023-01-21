@@ -29,6 +29,8 @@ final class ConsoleViewModel: ObservableObject {
     let searchBarViewModel: ConsoleSearchBarViewModel
     let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
 
+    let router = ConsoleRouter()
+
     #warning("reimplement this")
     var toolbarTitle: String {
         let suffix = searchCriteriaViewModel.isOnlyNetwork ? "Requests" : "Messages"
@@ -65,15 +67,16 @@ final class ConsoleViewModel: ObservableObject {
         if #available(iOS 15, *) {
             self._searchViewModel = ConsoleSearchViewModel(entities: list.entitiesSubject, store: store, searchBar: searchBarViewModel)
         }
+
+        list.didRefresh.sink { [weak self] in
+            if #available(iOS 15, *) {
+                self?.searchViewModel.refreshNow()
+            }
+        }.store(in: &cancellables)
 #endif
 
         searchCriteriaViewModel.bind(list.$entities)
-
-        #warning("move filterTerm")
-
     }
-
-    // MARK: Refresh
 
     private func refreshListsVisibility() {
         list.isViewVisible = !isSearching && isViewVisible
@@ -82,25 +85,14 @@ final class ConsoleViewModel: ObservableObject {
         }
     }
 
-#warning("reomplement")
-    private func refreshList() {
-        // important: order
-//        refresh(filterTerm: filterTerm)
-#if os(iOS)
-        if #available(iOS 15, *) {
-            searchViewModel.refreshNow()
-        }
-#endif
-    }
-
-    #warning("remove")
-    private func refresh(filterTerm: String) {
-        list.refresh()
-    }
-
     // MARK: - Sharing
 
     func prepareForSharing(as output: ShareOutput, _ completion: @escaping (ShareItems?) -> Void) {
         ShareService.share(list.entities, store: store, as: output, completion)
     }
+}
+
+final class ConsoleRouter: ObservableObject {
+    @Published var isShowingAsText = false
+    @Published var isShowingFilters = false
 }

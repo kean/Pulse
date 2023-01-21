@@ -23,15 +23,6 @@ public struct ConsoleView: View {
 
     public var body: some View {
         _ConsoleView(viewModel: viewModel)
-            .sheet(isPresented: $viewModel.isShowingFilters) {
-                NavigationView {
-                    ConsoleSearchCriteriaView(viewModel: viewModel.searchCriteriaViewModel)
-                        .inlineNavigationTitle("Filters")
-                        .navigationBarItems(trailing: Button("Done") {
-                            viewModel.isShowingFilters = false
-                        })
-                }
-            }
     }
 }
 
@@ -39,49 +30,47 @@ struct _ConsoleView: View {
     let viewModel: ConsoleViewModel
 
     @State private var shareItems: ShareItems?
-    @State private var isShowingAsText = false
     @State private var selectedShareOutput: ShareOutput?
+
+    @ObservedObject private var router = ConsoleRouter()
 
     var body: some View {
         _ConsoleListView(viewModel: viewModel)
             .onAppear { viewModel.isViewVisible = true }
             .onDisappear { viewModel.isViewVisible = false }
             .navigationTitle(viewModel.title)
-            .navigationBarItems(
-                leading: viewModel.onDismiss.map {
-                    Button(action: $0) { Text("Close") }
-                },
-                trailing: HStack {
-                    if let _ = selectedShareOutput {
-                        ProgressView()
-                            .frame(width: 27, height: 27)
-                    } else {
-                        Menu(content: { shareMenu }) {
-                            Image(systemName: "square.and.arrow.up")
-                        }
-                        .disabled(selectedShareOutput != nil)
-                    }
-                    ConsoleContextMenu(viewModel: viewModel, isShowingAsText: $isShowingAsText)
-                }
-            )
+            .navigationBarItems(leading: leadingNavigationBarItems, trailing: trailingNavigationBarItems)
             .sheet(item: $shareItems, content: ShareView.init)
-            .sheet(isPresented: $isShowingAsText) {
-                NavigationView {
-                    ConsoleTextView(entities: viewModel.list.entitiesSubject) {
-                        isShowingAsText = false
-                    }
-                }
-            }
+            .sheet(isPresented: $router.isShowingAsText) { destinationTextView }
+            .sheet(isPresented: $router.isShowingFilters) { destinationFilters }
 
     }
 
-    @ViewBuilder
-    private var shareMenu: some View {
-        Button(action: { share(as: .plainText) }) {
-            Label("Share as Text", systemImage: "square.and.arrow.up")
+    private var leadingNavigationBarItems: some View {
+        viewModel.onDismiss.map {
+            Button(action: $0) { Text("Close") }
         }
-        Button(action: { share(as: .html) }) {
-            Label("Share as HTML", systemImage: "square.and.arrow.up")
+    }
+
+    private var trailingNavigationBarItems: some View {
+        HStack {
+            if let _ = selectedShareOutput {
+                ProgressView()
+                    .frame(width: 27, height: 27)
+            } else {
+                Menu(content: {
+                    Button(action: { share(as: .plainText) }) {
+                        Label("Share as Text", systemImage: "square.and.arrow.up")
+                    }
+                    Button(action: { share(as: .html) }) {
+                        Label("Share as HTML", systemImage: "square.and.arrow.up")
+                    }
+                }, label: {
+                    Image(systemName: "square.and.arrow.up")
+                })
+                .disabled(selectedShareOutput != nil)
+            }
+            ConsoleContextMenu(viewModel: viewModel)
         }
     }
 
@@ -90,6 +79,24 @@ struct _ConsoleView: View {
         viewModel.prepareForSharing(as: output) { item in
             selectedShareOutput = nil
             shareItems = item
+        }
+    }
+
+    private var destinationTextView: some View {
+        NavigationView {
+            ConsoleTextView(entities: viewModel.list.entitiesSubject) {
+                viewModel.router.isShowingAsText = false
+            }
+        }
+    }
+
+    private var destinationFilters: some View {
+        NavigationView {
+            ConsoleSearchCriteriaView(viewModel: viewModel.searchCriteriaViewModel)
+                .inlineNavigationTitle("Filters")
+                .navigationBarItems(trailing: Button("Done") {
+                    viewModel.router.isShowingFilters = false
+                })
         }
     }
 }
@@ -160,7 +167,7 @@ private struct _ConsoleSearchableContentView: View {
 }
 
 private struct _ConsoleRegularContentView: View {
-    @ObservedObject var viewModel: ConsoleViewModel
+    let viewModel: ConsoleViewModel
 
     var body: some View {
         let toolbar = ConsoleToolbarView(title: viewModel.toolbarTitle, viewModel: viewModel)
@@ -173,7 +180,7 @@ private struct _ConsoleRegularContentView: View {
         footerView
     }
 
-    #warning("rework")
+    #warning("implement on other platforms?")
     @ViewBuilder
     private var footerView: some View {
         if #available(iOS 15, *), viewModel.searchCriteriaViewModel.criteria.shared.dates == .session, viewModel.list.order == .descending {

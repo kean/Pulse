@@ -12,20 +12,25 @@ import Combine
 import UniformTypeIdentifiers
 
 struct ConsoleContextMenu: View {
-    @ObservedObject var viewModel: ConsoleViewModel
-    @Binding var isShowingAsText: Bool
+    let viewModel: ConsoleViewModel
+    @ObservedObject var router: ConsoleRouter
 
     @State private var isShowingSettings = false
     @State private var isShowingStoreInfo = false
     @State private var isShowingInsights = false
     @State private var isShowingShareStore = false
-    @State private var isDocumentBrowserPresented = false
+    @State private var isShowingDocumentBrowser = false
+
+    init(viewModel: ConsoleViewModel) {
+        self.viewModel = viewModel
+        self.router = viewModel.router
+    }
 
     var body: some View {
         Menu {
             Section {
-                Button(action: { isShowingAsText.toggle() }) {
-                    if isShowingAsText {
+                Button(action: { router.isShowingAsText.toggle() }) {
+                    if router.isShowingAsText {
                         Label("View as List", systemImage: "list.bullet.rectangle.portrait")
                     } else {
                         Label("View as Text", systemImage: "text.quote")
@@ -103,7 +108,7 @@ struct ConsoleContextMenu: View {
                 ShareStoreView(store: viewModel.store, isPresented: $isShowingShareStore)
             }.backport.presentationDetents([.medium])
            }
-        .fullScreenCover(isPresented: $isDocumentBrowserPresented) {
+        .fullScreenCover(isPresented: $isShowingDocumentBrowser) {
             DocumentBrowser()
         }
     }

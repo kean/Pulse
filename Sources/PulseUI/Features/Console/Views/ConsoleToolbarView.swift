@@ -11,7 +11,7 @@ import Combine
 
 struct ConsoleToolbarView: View {
     let title: String
-    @ObservedObject var viewModel: ConsoleViewModel
+    let viewModel: ConsoleViewModel
 
     var body: some View {
         HStack(alignment: .bottom, spacing: 0) {
@@ -20,7 +20,11 @@ struct ConsoleToolbarView: View {
                 .font(.subheadline.weight(.medium))
             Spacer()
             HStack(spacing: 14) {
-                ConsoleFiltersView(isNetworkModeEnabled: viewModel.isNetworkModeEnabled, viewModel: viewModel.searchCriteriaViewModel, isShowingFilters: $viewModel.isShowingFilters)
+                ConsoleFiltersView(
+                    isNetworkModeEnabled: viewModel.isNetworkModeEnabled,
+                    viewModel: viewModel.searchCriteriaViewModel,
+                    router: viewModel.router
+                )
             }
         }
         .buttonStyle(.plain)
@@ -30,7 +34,7 @@ struct ConsoleToolbarView: View {
 struct ConsoleFiltersView: View {
     let isNetworkModeEnabled: Bool
     @ObservedObject var viewModel: ConsoleSearchCriteriaViewModel
-    @Binding var isShowingFilters: Bool
+    @ObservedObject var router: ConsoleRouter
 
     var body: some View {
         if !isNetworkModeEnabled {
@@ -45,7 +49,7 @@ struct ConsoleFiltersView: View {
                 .font(.system(size: 20))
                 .foregroundColor(viewModel.isOnlyErrors ? .red : .accentColor)
         }
-        Button(action: { isShowingFilters = true }) {
+        Button(action: { router.isShowingFilters = true }) {
             Image(systemName: viewModel.isCriteriaDefault ? "line.horizontal.3.decrease.circle" : "line.3.horizontal.decrease.circle.fill")
                 .font(.system(size: 20))
                 .foregroundColor(.accentColor)
