@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ConsoleListContentView: View {
     @ObservedObject var viewModel: ConsoleListViewModel
+    @State private var expandedSections: Set<String> = []
 
     #if os(iOS)
 
@@ -24,8 +25,15 @@ struct ConsoleListContentView: View {
     private func makeGroupedView(_ sections: [NSFetchedResultsSectionInfo]) -> some View {
         ForEach(sections, id: \.name) { section in
             PlainListClearSectionHeader(title: "\(makeName(for: section)) (\(section.numberOfObjects))")
-            ForEach((section.objects as? [NSManagedObject]) ?? [], id: \.objectID) { entity in
+            let objects = (section.objects as? [NSManagedObject]) ?? []
+            let prefix = expandedSections.contains(section.name) ? objects : Array(objects.prefix(4))
+            ForEach(prefix, id: \.objectID) { entity in
                 ConsoleEntityCell(entity: entity)
+            }
+            if prefix.count < objects.count {
+                Button(action: { expandedSections.insert(section.name) }) {
+                    Text("Show More") + Text(" (\(objects.count - prefix.count))").foregroundColor(.secondary)
+                }
             }
         }
     }
