@@ -44,7 +44,6 @@ struct _ConsoleView: View {
 
     var body: some View {
         _ConsoleListView(viewModel: viewModel)
-            .edgesIgnoringSafeArea(.bottom)
             .navigationTitle(viewModel.title)
             .navigationBarItems(
                 leading: viewModel.onDismiss.map {
@@ -173,6 +172,20 @@ private struct _ConsoleRegularContentView: View {
             toolbar
         }
         makeForEach(viewModel: viewModel)
+        footerView
+    }
+
+    @ViewBuilder
+    private var footerView: some View {
+        if #available(iOS 15, *), viewModel.searchCriteriaViewModel.criteria.shared.dates == .session {
+            Button(action: { viewModel.searchCriteriaViewModel.criteria.shared.dates.startDate = nil }) {
+                Text("Show Previous Sessions")
+                    .font(.subheadline)
+                    .foregroundColor(Color.blue)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .listRowSeparator(.hidden, edges: .bottom)
+        }
     }
 }
 
