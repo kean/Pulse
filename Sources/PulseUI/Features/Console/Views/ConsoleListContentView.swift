@@ -7,7 +7,7 @@ import Pulse
 import Combine
 import SwiftUI
 
-struct ConsoleListView: View {
+struct ConsoleListContentView: View {
     @ObservedObject var viewModel: ConsoleListViewModel
 
     var body: some View {

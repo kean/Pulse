@@ -10,7 +10,7 @@ import Combine
 #if os(iOS)
 
 public struct ConsoleView: View {
-    @StateObject private var viewModel: ConsoleViewModel
+    @StateObject private var viewModel: ConsoleViewModel // Never reloads
 
     public init(store: LoggerStore = .shared) {
         self.init(viewModel: .init(store: store))
@@ -22,15 +22,7 @@ public struct ConsoleView: View {
 
 
     public var body: some View {
-        _ConsoleView(viewModel: viewModel)
-    }
-}
-
-struct _ConsoleView: View {
-    let viewModel: ConsoleViewModel
-
-    var body: some View {
-        _ConsoleListView(viewModel: viewModel)
+        ConsoleListView(viewModel: viewModel)
             .onAppear { viewModel.isViewVisible = true }
             .onDisappear { viewModel.isViewVisible = false }
             .navigationTitle(viewModel.title)
@@ -52,40 +44,7 @@ struct _ConsoleView: View {
     }
 }
 
-private struct ConsoleShareButton: View {
-    let viewModel: ConsoleViewModel
-
-    @State private var selectedShareOutput: ShareOutput?
-
-    var body: some View {
-        if let _ = selectedShareOutput {
-            ProgressView()
-                .frame(width: 27, height: 27)
-        } else {
-            Menu(content: {
-                Button(action: { share(as: .plainText) }) {
-                    Label("Share as Text", systemImage: "square.and.arrow.up")
-                }
-                Button(action: { share(as: .html) }) {
-                    Label("Share as HTML", systemImage: "square.and.arrow.up")
-                }
-            }, label: {
-                Image(systemName: "square.and.arrow.up")
-            })
-            .disabled(selectedShareOutput != nil)
-        }
-    }
-
-    private func share(as output: ShareOutput) {
-        selectedShareOutput = output
-        viewModel.prepareForSharing(as: output) { item in
-            selectedShareOutput = nil
-            viewModel.router.shareItems = item
-        }
-    }
-}
-
-private struct _ConsoleListView: View {
+private struct ConsoleListView: View {
     let viewModel: ConsoleViewModel
     @ObservedObject private var searchBarViewModel: ConsoleSearchBarViewModel
 
@@ -160,7 +119,7 @@ private struct _ConsoleRegularContentView: View {
         } else {
             toolbar
         }
-        ConsoleListView(viewModel: viewModel.list)
+        ConsoleListContentView(viewModel: viewModel.list)
         footerView
     }
 
