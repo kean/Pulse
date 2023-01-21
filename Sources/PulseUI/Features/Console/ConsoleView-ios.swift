@@ -65,7 +65,7 @@ private struct ConsoleListView: View {
 
         if #available(iOS 16, *) {
             list
-                .environment(\.defaultMinListRowHeight, 8) // TODO: refactor
+                .environment(\.defaultMinListRowHeight, 8)
                 .searchable(text: $searchBarViewModel.text, tokens: $searchBarViewModel.tokens, token: {
                     if let image = $0.systemImage {
                         Label($0.title, systemImage: image)

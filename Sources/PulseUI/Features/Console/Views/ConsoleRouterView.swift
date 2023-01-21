@@ -7,6 +7,17 @@ import CoreData
 import Pulse
 import Combine
 
+final class ConsoleRouter: ObservableObject {
+    @Published var shareItems: ShareItems?
+    @Published var isShowingAsText = false
+    @Published var isShowingFilters = false
+    @Published var isShowingSettings = false
+    @Published var isShowingStoreInfo = false
+    @Published var isShowingInsights = false
+    @Published var isShowingShareStore = false
+    @Published var isShowingDocumentBrowser = false
+}
+
 struct ConsoleRouterView: View {
     let viewModel: ConsoleViewModel
     @ObservedObject var router: ConsoleRouter
