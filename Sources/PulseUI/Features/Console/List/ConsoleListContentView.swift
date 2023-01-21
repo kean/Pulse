@@ -11,7 +11,7 @@ struct ConsoleListContentView: View {
     @ObservedObject var viewModel: ConsoleListViewModel
     @State private var expandedSections: Set<String> = []
 
-    #if os(iOS)
+#if os(iOS)
 
     var body: some View {
         if #available(iOS 15, *), let sections = viewModel.sections, !sections.isEmpty {
@@ -62,7 +62,7 @@ struct ConsoleListContentView: View {
     var body: some View {
         plainView
     }
-    #endif
+#endif
 
     private var plainView: some View {
         ForEach(viewModel.visibleEntities, id: \.objectID) { entity in

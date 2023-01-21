@@ -142,4 +142,12 @@ extension ConsoleRouterView {
     }
 }
 
+#else
+
+extension ConsoleRouterView {
+    var contents: some View {
+        Text("").invisible()
+    }
+}
+
 #endif
