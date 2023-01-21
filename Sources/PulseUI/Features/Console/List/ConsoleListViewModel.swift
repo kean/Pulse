@@ -113,7 +113,6 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
     }
 
     func refresh() {
-        // Search messages
         guard let controller = controller else {
             return assertionFailure()
         }
@@ -121,7 +120,14 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
         if mode == .tasks {
             controller.fetchRequest.predicate = ConsoleSearchCriteria.makeNetworkPredicates(criteria: criteria.criteria, isOnlyErrors: criteria.isOnlyErrors, filterTerm: criteria.filterTerm)
         } else {
-            controller.fetchRequest.predicate = ConsoleSearchCriteria.makeMessagePredicates(criteria: criteria.criteria, isOnlyErrors: criteria.isOnlyErrors, filterTerm: criteria.filterTerm)
+            var predicates: [NSPredicate] = []
+            if mode == .logs {
+                predicates.append(NSPredicate(format: "task == NULL"))
+            }
+            if let predicate = ConsoleSearchCriteria.makeMessagePredicates(criteria: criteria.criteria, isOnlyErrors: criteria.isOnlyErrors, filterTerm: criteria.filterTerm) {
+                predicates.append(predicate)
+            }
+            controller.fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
         }
         try? controller.performFetch()
 
