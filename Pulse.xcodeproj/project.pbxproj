@@ -73,6 +73,7 @@
 		0C767818268F88BB0058F69B /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C767814268F88BB0058F69B /* Preview Assets.xcassets */; };
 		0C7A0DFB297C33F300B4B69D /* ConsoleRouterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7A0DFA297C33F300B4B69D /* ConsoleRouterView.swift */; };
 		0C7A0DFD297C382300B4B69D /* ConsoleShareButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7A0DFC297C382300B4B69D /* ConsoleShareButton.swift */; };
+		0C7A0E00297C51CE00B4B69D /* ConsoleListOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7A0DFF297C51CE00B4B69D /* ConsoleListOptions.swift */; };
 		0C7A834026D1CA290082634F /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CFF9BD825D6199A0069DB6A /* repos.json */; };
 		0C9F04F92884F34A0035239F /* Pulse_Demo_macOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9F04F82884F34A0035239F /* Pulse_Demo_macOSApp.swift */; };
 		0C9F04FD2884F34A0035239F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C9F04FC2884F34A0035239F /* Assets.xcassets */; };
@@ -543,6 +544,7 @@
 		0C767816268F88BB0058F69B /* Pulse_Demo_iOSApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Pulse_Demo_iOSApp.swift; sourceTree = "<group>"; };
 		0C7A0DFA297C33F300B4B69D /* ConsoleRouterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleRouterView.swift; sourceTree = "<group>"; };
 		0C7A0DFC297C382300B4B69D /* ConsoleShareButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleShareButton.swift; sourceTree = "<group>"; };
+		0C7A0DFF297C51CE00B4B69D /* ConsoleListOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleListOptions.swift; sourceTree = "<group>"; };
 		0C9F04F62884F34A0035239F /* Pulse Demo macOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pulse Demo macOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C9F04F82884F34A0035239F /* Pulse_Demo_macOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pulse_Demo_macOSApp.swift; sourceTree = "<group>"; };
 		0C9F04FC2884F34A0035239F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -987,6 +989,16 @@
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
+		0C7A0DFE297C51B900B4B69D /* List */ = {
+			isa = PBXGroup;
+			children = (
+				0CE45E0929776BED00249C5D /* ConsoleListContentView.swift */,
+				0CAF1D7A297C2040002E2722 /* ConsoleListViewModel.swift */,
+				0C7A0DFF297C51CE00B4B69D /* ConsoleListOptions.swift */,
+			);
+			path = List;
+			sourceTree = "<group>";
+		};
 		0C9F04F72884F34A0035239F /* macOS */ = {
 			isa = PBXGroup;
 			children = (
@@ -1417,13 +1429,13 @@
 		0CF0D5F9296F189600EED9D4 /* Console */ = {
 			isa = PBXGroup;
 			children = (
+				0C7A0DFE297C51B900B4B69D /* List */,
 				0CF0D5FE296F189600EED9D4 /* Views */,
 				0CF0D5FA296F189600EED9D4 /* ConsoleView-ios.swift */,
 				0CF0D5FC296F189600EED9D4 /* ConsoleView-tvos.swift */,
 				0CF0D5FD296F189600EED9D4 /* ConsoleView-macos.swift */,
 				0CF0D5FB296F189600EED9D4 /* ConsoleView-watchos.swift */,
 				0CF0D60A296F189600EED9D4 /* ConsoleViewModel.swift */,
-				0CAF1D7A297C2040002E2722 /* ConsoleListViewModel.swift */,
 			);
 			path = Console;
 			sourceTree = "<group>";
@@ -1431,7 +1443,6 @@
 		0CF0D5FE296F189600EED9D4 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				0CE45E0929776BED00249C5D /* ConsoleListContentView.swift */,
 				0C7A0DFA297C33F300B4B69D /* ConsoleRouterView.swift */,
 				0CF0D601296F189600EED9D4 /* ConsoleContextMenu-ios.swift */,
 				0CF0D604296F189600EED9D4 /* ConsoleTextView.swift */,
@@ -2077,6 +2088,7 @@
 				0CF0D62F296F189600EED9D4 /* TextView.swift in Sources */,
 				0CF0D67D296F189600EED9D4 /* ConsoleEntityCell.swift in Sources */,
 				0CF0D649296F189600EED9D4 /* DateRangePicker.swift in Sources */,
+				0C7A0E00297C51CE00B4B69D /* ConsoleListOptions.swift in Sources */,
 				0CF0D65F296F189600EED9D4 /* ConsoleMessageDetailsViewModel.swift in Sources */,
 				0CF0D668296F189600EED9D4 /* NetworkRequestStatusCell.swift in Sources */,
 				0CF0D651296F189600EED9D4 /* ConsoleCustomMessageFilter.swift in Sources */,

@@ -80,20 +80,20 @@ struct ConsoleContextMenu: View {
         Menu(content: {
             if viewModel.searchCriteriaViewModel.isOnlyNetwork {
                 Picker("Sort By", selection: $listViewModel.options.taskSortBy) {
-                    ForEach(ConsoleTaskSortBy.allCases, id: \.self) {
+                    ForEach(ConsoleListOptions.TaskSortBy.allCases, id: \.self) {
                         Text($0.rawValue).tag($0)
                     }
                 }
             } else {
                 Picker("Sort By", selection: $listViewModel.options.messageSortBy) {
-                    ForEach(ConsoleMessageSortBy.allCases, id: \.self) {
+                    ForEach(ConsoleListOptions.MessageSortBy.allCases, id: \.self) {
                         Text($0.rawValue).tag($0)
                     }
                 }
             }
             Picker("Ordering", selection: $listViewModel.options.order) {
-                Text("Descending").tag(ConsoleOrdering.descending)
-                Text("Ascending").tag(ConsoleOrdering.ascending)
+                Text("Descending").tag(ConsoleListOptions.Ordering.descending)
+                Text("Ascending").tag(ConsoleListOptions.Ordering.ascending)
             }
         }, label: {
             Label("Sort By", systemImage: "arrow.up.arrow.down")
@@ -105,13 +105,13 @@ struct ConsoleContextMenu: View {
         Menu(content: {
             if viewModel.searchCriteriaViewModel.isOnlyNetwork {
                 Picker("Group By", selection: $listViewModel.options.taskGroupBy) {
-                    ForEach(ConsoleTaskGroupBy.allCases, id: \.self) {
+                    ForEach(ConsoleListOptions.TaskGroupBy.allCases, id: \.self) {
                         Text($0.rawValue).tag($0)
                     }
                 }
             } else {
                 Picker("Group By", selection: $listViewModel.options.taskGroupBy) {
-                    ForEach(ConsoleMessageGroupBy.allCases, id: \.self) {
+                    ForEach(ConsoleListOptions.MessageGroupBy.allCases, id: \.self) {
                         Text($0.rawValue).tag($0)
                     }
                 }

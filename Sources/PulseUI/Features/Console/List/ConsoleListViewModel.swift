@@ -11,6 +11,7 @@ import SwiftUI
 final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, ObservableObject {
     @Published private(set) var visibleEntities: ArraySlice<NSManagedObject> = []
     @Published private(set) var entities: [NSManagedObject] = []
+    @Published private(set) var sections: [NSFetchedResultsSectionInfo]?
     @Published var options = ConsoleListOptions()
 
     let entitiesSubject = CurrentValueSubject<[NSManagedObject], Never>([])
@@ -75,7 +76,18 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
     }
 
     func refreshController() {
-        let request = makeFetchRequest(isOnlyNetwork: isOnlyNetwork, order: options.order)
+        let request: NSFetchRequest<NSManagedObject>
+        if isOnlyNetwork {
+            request = .init(entityName: "\(NetworkTaskEntity.self)")
+            request.sortDescriptors = [NSSortDescriptor(keyPath: \NetworkTaskEntity.createdAt, ascending: options.order == .ascending)]
+        } else {
+            request = .init(entityName: "\(LoggerMessageEntity.self)")
+            request.relationshipKeyPathsForPrefetching = ["request"]
+            request.sortDescriptors = [
+                NSSortDescriptor(keyPath: \LoggerMessageEntity.createdAt, ascending: options.order == .ascending)
+            ]
+        }
+        request.fetchBatchSize = fetchBatchSize
         controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: store.viewContext, sectionNameKeyPath: nil, cacheName: nil)
         controller?.delegate = self
 
@@ -166,60 +178,4 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
     }
 }
 
-private func makeFetchRequest(isOnlyNetwork: Bool, order: ConsoleOrdering) -> NSFetchRequest<NSManagedObject> {
-    let request: NSFetchRequest<NSManagedObject>
-    if isOnlyNetwork {
-        request = .init(entityName: "\(NetworkTaskEntity.self)")
-        request.sortDescriptors = [NSSortDescriptor(keyPath: \NetworkTaskEntity.createdAt, ascending: order == .ascending)]
-    } else {
-        request = .init(entityName: "\(LoggerMessageEntity.self)")
-        request.relationshipKeyPathsForPrefetching = ["request"]
-        request.sortDescriptors = [NSSortDescriptor(keyPath: \LoggerMessageEntity.createdAt, ascending: order == .ascending)]
-    }
-    request.fetchBatchSize = fetchBatchSize
-    return request
-}
-
 private let fetchBatchSize = 100
-
-struct ConsoleListOptions {
-    var messageSortBy: ConsoleMessageSortBy = .dateCreated
-    var taskSortBy: ConsoleTaskSortBy = .dateCreated
-    var order: ConsoleOrdering = .descending
-    var messageGroupBy: ConsoleMessageGroupBy = .plain
-    var taskGroupBy: ConsoleTaskGroupBy = .plain
-}
-
-enum ConsoleOrdering: String, CaseIterable {
-    case descending = "Descending"
-    case ascending = "Ascending"
-}
-
-enum ConsoleMessageSortBy: String, CaseIterable {
-    case dateCreated = "Date Created"
-}
-
-enum ConsoleTaskSortBy: String, CaseIterable {
-    case dateCreated = "Date Created"
-    case duration = "Duration"
-    case requestSize = "Request Size"
-    case responseSize = "Response Size"
-}
-
-enum ConsoleMessageGroupBy: String, CaseIterable {
-    case plain = "No Grouping"
-    case label = "Label"
-    case level = "Level"
-    case file = "File"
-}
-
-enum ConsoleTaskGroupBy: String, CaseIterable {
-    case plain = "No Grouping"
-    case url = "URL"
-    case host = "Host"
-    case method = "Method"
-    case scheme = "Scheme"
-    case taskType = "Task Type"
-    case statusCode = "Status Code"
-    case errorCode = "Error Code"
-}
