@@ -426,6 +426,10 @@ struct NetworkContent: OptionSet {
         largeHeader, taskDetails, errorDetails, currentRequestHeaders, requestBody, responseHeaders, responseBody
     ]
 
+    static let preview: NetworkContent = [
+        largeHeader, taskDetails, errorDetails, responseBody
+    ]
+
     static let all: NetworkContent = [
         largeHeader, taskDetails, errorDetails, requestComponents, requestQueryItems, errorDetails, originalRequestHeaders, currentRequestHeaders, requestOptions, requestBody, responseHeaders, responseBody
     ]
