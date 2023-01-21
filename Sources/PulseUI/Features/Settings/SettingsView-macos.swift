@@ -13,7 +13,6 @@ public struct SettingsView: View {
 
     var store: LoggerStore { viewModel.store }
 
-    @State private var isShowingDocumentBrowser = false
     @State private var isPresentingShareStoreView = false
     @State private var isPresentingStoreDetails = false
     @State private var shareItems: ShareItems?
