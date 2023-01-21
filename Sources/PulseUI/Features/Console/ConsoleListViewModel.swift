@@ -22,10 +22,8 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
     @Published var messageGroupBy: ConsoleMessageGroupBy = .plain
     @Published var taskGroupBy: ConsoleTaskGroupBy = .plain
 
-    #warning("remoev")
     var isViewVisible = false {
         didSet {
-            print("visible: ", isViewVisible)
             if isViewVisible {
                 reloadMessages(isMandatory: true)
             }

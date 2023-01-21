@@ -44,6 +44,8 @@ struct _ConsoleView: View {
 
     var body: some View {
         _ConsoleListView(viewModel: viewModel)
+            .onAppear { viewModel.isViewVisible = true }
+            .onDisappear { viewModel.isViewVisible = false }
             .navigationTitle(viewModel.title)
             .navigationBarItems(
                 leading: viewModel.onDismiss.map {
@@ -143,7 +145,7 @@ private struct _ConsoleSearchableContentView: View {
 
     var body: some View {
         contents.onChange(of: isSearching) {
-            viewModel.searchViewModel.isViewVisible = $0
+            viewModel.isSearching = $0
         }
     }
 
@@ -168,8 +170,6 @@ private struct _ConsoleRegularContentView: View {
             toolbar
         }
         ConsoleListView(viewModel: viewModel.list)
-            .onAppear { viewModel.list.isViewVisible = true }
-            .onDisappear { viewModel.list.isViewVisible = false }
         footerView
     }
 

@@ -8,11 +8,13 @@ import Combine
 import SwiftUI
 
 #warning("container for ConsoleVieWModl that doesn't refresh itself")
+#warning("rework public API")
 
 final class ConsoleViewModel: ObservableObject {
     let title: String
     let isNetworkOnly: Bool
     let store: LoggerStore
+
     let list: ConsoleListViewModel
 
 #if os(iOS)
@@ -33,6 +35,14 @@ final class ConsoleViewModel: ObservableObject {
         return "\(0) \(suffix)"
     }
 
+    var isViewVisible: Bool = false {
+        didSet { refreshListsVisibility() }
+    }
+
+    var isSearching = false {
+        didSet { refreshListsVisibility() }
+    }
+
     // Filters
     @Published var mode: ConsoleMode
     @Published var isOnlyErrors = false
@@ -41,7 +51,6 @@ final class ConsoleViewModel: ObservableObject {
 
     var onDismiss: (() -> Void)?
 
-    private var isViewVisible = false
     private var cancellables: [AnyCancellable] = []
 
     init(store: LoggerStore, mode: ConsoleMode = .messages) {
@@ -94,6 +103,13 @@ final class ConsoleViewModel: ObservableObject {
     }
 
     // MARK: Refresh
+
+    private func refreshListsVisibility() {
+        list.isViewVisible = !isSearching && isViewVisible
+        if #available(iOS 15, tvOS 15, *) {
+            searchViewModel.isViewVisible = isSearching && isViewVisible
+        }
+    }
 
     private func refreshList() {
         // important: order
