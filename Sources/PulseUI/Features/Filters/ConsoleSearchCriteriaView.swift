@@ -4,6 +4,7 @@
 
 import SwiftUI
 import Pulse
+import Combine
 
 struct ConsoleSearchCriteriaView: View {
     @ObservedObject var viewModel: ConsoleSearchCriteriaViewModel
@@ -219,14 +220,15 @@ struct ConsoleSearchCriteriaView_Previews: PreviewProvider {
     }
 }
 
-private func makePreview(mode: ConsoleViewModel.Mode) -> some View {
+private func makePreview(mode: ConsoleMode) -> some View {
     let entities: [NSManagedObject]
     let store = LoggerStore.mock
     switch mode {
     case .messages: entities = try! store.allMessages()
     case .network: entities = try! store.allTasks()
     }
-    let viewModel = ConsoleSearchCriteriaViewModel(store: store, entities: .init(entities))
+    let viewModel = ConsoleSearchCriteriaViewModel(store: store)
+    viewModel.bind(CurrentValueSubject(entities))
     viewModel.mode = mode
     return ConsoleSearchCriteriaView(viewModel: viewModel)
 }

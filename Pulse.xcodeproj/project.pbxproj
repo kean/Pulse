@@ -78,6 +78,7 @@
 		0C9F050C2884FA7D0035239F /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CFF9BD825D6199A0069DB6A /* repos.json */; };
 		0CAF1D77297B0810002E2722 /* ConsoleSearchSuggestionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CAF1D76297B0810002E2722 /* ConsoleSearchSuggestionTests.swift */; };
 		0CAF1D79297B5FF4002E2722 /* ConsoleSearchServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CAF1D78297B5FF4002E2722 /* ConsoleSearchServiceTests.swift */; };
+		0CAF1D7B297C2040002E2722 /* ConsoleListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CAF1D7A297C2040002E2722 /* ConsoleListViewModel.swift */; };
 		0CB17F1A2978ABBA004E33F4 /* ManagedObjectsObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB17F192978ABBA004E33F4 /* ManagedObjectsObserver.swift */; };
 		0CB63A132973A12300525165 /* ConsoleSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A122973A12300525165 /* ConsoleSearchView.swift */; };
 		0CB63A15297438A600525165 /* ConsoleSearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A14297438A600525165 /* ConsoleSearchViewModel.swift */; };
@@ -545,6 +546,7 @@
 		0C9F05012884F34A0035239F /* Pulse_Demo_macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Pulse_Demo_macOS.entitlements; sourceTree = "<group>"; };
 		0CAF1D76297B0810002E2722 /* ConsoleSearchSuggestionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchSuggestionTests.swift; sourceTree = "<group>"; };
 		0CAF1D78297B5FF4002E2722 /* ConsoleSearchServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchServiceTests.swift; sourceTree = "<group>"; };
+		0CAF1D7A297C2040002E2722 /* ConsoleListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleListViewModel.swift; sourceTree = "<group>"; };
 		0CB17F192978ABBA004E33F4 /* ManagedObjectsObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagedObjectsObserver.swift; sourceTree = "<group>"; };
 		0CB63A122973A12300525165 /* ConsoleSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchView.swift; sourceTree = "<group>"; };
 		0CB63A14297438A600525165 /* ConsoleSearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchViewModel.swift; sourceTree = "<group>"; };
@@ -1417,6 +1419,7 @@
 				0CF0D5FD296F189600EED9D4 /* ConsoleView-macos.swift */,
 				0CF0D5FB296F189600EED9D4 /* ConsoleView-watchos.swift */,
 				0CF0D60A296F189600EED9D4 /* ConsoleViewModel.swift */,
+				0CAF1D7A297C2040002E2722 /* ConsoleListViewModel.swift */,
 			);
 			path = Console;
 			sourceTree = "<group>";
@@ -2053,6 +2056,7 @@
 				0CF0D635296F189600EED9D4 /* InfoRow.swift in Sources */,
 				0C63A3782979FE3A00F6A6A5 /* ConsoleSearchTerm.swift in Sources */,
 				0CF0D674296F189600EED9D4 /* NetworkInspectorView-shared.swift in Sources */,
+				0CAF1D7B297C2040002E2722 /* ConsoleListViewModel.swift in Sources */,
 				0CF0D611296F189600EED9D4 /* Deprecated.swift in Sources */,
 				0CE45E0C2977813400249C5D /* ConsoleToolbarView.swift in Sources */,
 				0CF0D61F296F189600EED9D4 /* Pulse+Extensions.swift in Sources */,

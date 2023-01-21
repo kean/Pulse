@@ -65,7 +65,7 @@ struct _ConsoleView: View {
             .sheet(item: $shareItems, content: ShareView.init)
             .sheet(isPresented: $isShowingAsText) {
                 NavigationView {
-                    ConsoleTextView(entities: viewModel.entitiesSubject) {
+                    ConsoleTextView(entities: viewModel.list.entitiesSubject) {
                         isShowingAsText = false
                     }
                 }
@@ -107,8 +107,6 @@ private struct _ConsoleListView: View {
                 _ConsoleSearchableContentView(viewModel: viewModel)
             } else {
                 _ConsoleRegularContentView(viewModel: viewModel)
-                    .onAppear(perform: viewModel.onAppear)
-                    .onDisappear(perform: viewModel.onDisappear)
             }
         }
         .listStyle(.plain)
@@ -155,8 +153,6 @@ private struct _ConsoleSearchableContentView: View {
             ConsoleSearchView(viewModel: viewModel)
         } else {
             _ConsoleRegularContentView(viewModel: viewModel)
-                .onAppear(perform: viewModel.onAppear)
-                .onDisappear(perform: viewModel.onDisappear)
         }
     }
 }
@@ -171,30 +167,16 @@ private struct _ConsoleRegularContentView: View {
         } else {
             toolbar
         }
-        #warning("sort using currently selected sorting function")
-        if #available(iOS 15, *) {
-            let groupByStatusCode = true
-            if groupByStatusCode && viewModel.mode == .network {
-                let groups = Dictionary(grouping: viewModel.entities as! [NetworkTaskEntity], by: { $0.statusCode })
-                ForEach(Array(groups.keys), id: \.self) {
-                    let tasks = groups[$0]!.sorted(by: { $0.createdAt < $1.createdAt })
-                    PlainListClearSectionHeader(title: "Status Code: \($0)")
-                    ForEach(tasks, id: \.objectID) { entity in
-                        ConsoleEntityCell(entity: entity)
-                            .onAppear { viewModel.onAppearCell(with: entity.objectID) }
-                            .onDisappear { viewModel.onDisappearCell(with: entity.objectID) }
-                    }
-                }
-            }
-        } else {
-            makeForEach(viewModel: viewModel)
-        }
+        ConsoleListView(viewModel: viewModel.list)
+            .onAppear { viewModel.list.isViewVisible = true }
+            .onDisappear { viewModel.list.isViewVisible = false }
         footerView
     }
 
+    #warning("rework")
     @ViewBuilder
     private var footerView: some View {
-        if #available(iOS 15, *), viewModel.searchCriteriaViewModel.criteria.shared.dates == .session, viewModel.order == .descending {
+        if #available(iOS 15, *), viewModel.searchCriteriaViewModel.criteria.shared.dates == .session, viewModel.list.order == .descending {
             Button(action: { viewModel.searchCriteriaViewModel.criteria.shared.dates.startDate = nil }) {
                 Text("Show Previous Sessions")
                     .font(.subheadline)

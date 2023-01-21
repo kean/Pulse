@@ -11,7 +11,7 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
     var isButtonResetEnabled: Bool { !isCriteriaDefault }
 
     @Published var criteria = ConsoleSearchCriteria()
-    @Published var mode: ConsoleViewModel.Mode = .messages // warning: not source of truth
+    @Published var mode: ConsoleMode = .messages // warning: not source of truth
 
     @Published private(set) var labels: [String] = []
     @Published private(set) var domains: [String] = []
@@ -22,22 +22,27 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
     private(set) var defaultCriteria = ConsoleSearchCriteria()
 
     private let store: LoggerStore
-    private let entities: CurrentValueSubject<[NSManagedObject], Never>
     private var isScreenVisible = false
+    private var entities: [NSManagedObject] = []
     private var cancellables: [AnyCancellable] = []
 
-    init(store: LoggerStore, entities: CurrentValueSubject<[NSManagedObject], Never>) {
+    init(store: LoggerStore) {
         self.store = store
-        self.entities = entities
 
         if store.isArchive {
             self.criteria.shared.dates.startDate = nil
             self.criteria.shared.dates.endDate = nil
         }
         self.defaultCriteria = criteria
+    }
 
-        entities.receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.reloadCounters()
+    func bind(_ entities: some Publisher<[NSManagedObject], Never>) {
+        entities.sink { [weak self] in
+            guard let self else { return }
+            self.entities = $0
+            if self.isScreenVisible {
+                self.reloadCounters()
+            }
         }.store(in: &cancellables)
     }
 
@@ -81,17 +86,15 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
     }
 
     private func reloadCounters() {
-        guard isScreenVisible else { return }
-
         switch mode {
         case .messages:
-            guard let messages = entities.value as? [LoggerMessageEntity] else {
+            guard let messages = entities as? [LoggerMessageEntity] else {
                 return assertionFailure()
             }
             labelsCountedSet = NSCountedSet(array: messages.map(\.label.name))
             labels = (labelsCountedSet.allObjects as! [String]).sorted()
         case .network:
-            guard let tasks = entities.value as? [NetworkTaskEntity] else {
+            guard let tasks = entities as? [NetworkTaskEntity] else {
                 return assertionFailure()
             }
             domainsCountedSet = NSCountedSet(array: tasks.compactMap { $0.host?.value })
