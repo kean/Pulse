@@ -16,7 +16,6 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
     @Published private(set) var entities: [NSManagedObject] = []
     @Published private(set) var sections: [NSFetchedResultsSectionInfo]?
     @Published var options = ConsoleListOptions()
-    @Published var mode: ConsoleMode = .all
 
     let entitiesSubject = CurrentValueSubject<[NSManagedObject], Never>([])
     let didRefresh = PassthroughSubject<Void, Never>()
@@ -28,6 +27,8 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
             }
         }
     }
+
+    @Published private(set) var mode: ConsoleMode = .all
 
     /// This exist strickly to workaround List performance issues
     private var scrollPosition: ScrollPosition = .nearTop
@@ -68,23 +69,24 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
             .sink { [weak self] _ in self?.refresh() }
             .store(in: &cancellables)
 
-        // important: no drop first and refreshes immediately
-        searchCriteriaViewModel.$isOnlyNetwork.sink { [weak self] in
-            self?.isOnlyNetwork = $0
-            self?.refreshController()
-        }.store(in: &cancellables)
-
         $options.dropFirst().receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.refreshController()
         }.store(in: &cancellables)
+
+        refreshController()
+    }
+
+    func update(mode: ConsoleMode) {
+        self.mode = mode
+        self.refreshController()
     }
 
     // MARK: - NSFetchedResultsController
 
     func refreshController() {
         let request: NSFetchRequest<NSManagedObject>
-        let sortKey = isOnlyNetwork ? options.taskSortBy.key : options.messageSortBy.key
-        if isOnlyNetwork {
+        let sortKey = mode == .tasks ? options.taskSortBy.key : options.messageSortBy.key
+        if mode == .tasks {
             request = .init(entityName: "\(NetworkTaskEntity.self)")
             request.sortDescriptors = [
                 grouping.key.map { NSSortDescriptor(key: $0, ascending: grouping.isAscending) },
@@ -116,7 +118,7 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
             return assertionFailure()
         }
         let criteria = searchCriteriaViewModel
-        if isOnlyNetwork {
+        if mode == .tasks {
             controller.fetchRequest.predicate = ConsoleSearchCriteria.makeNetworkPredicates(criteria: criteria.criteria, isOnlyErrors: criteria.isOnlyErrors, filterTerm: criteria.filterTerm)
         } else {
             controller.fetchRequest.predicate = ConsoleSearchCriteria.makeMessagePredicates(criteria: criteria.criteria, isOnlyErrors: criteria.isOnlyErrors, filterTerm: criteria.filterTerm)

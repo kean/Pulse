@@ -36,6 +36,13 @@ final class ConsoleViewModel: ObservableObject {
         didSet { refreshListsVisibility() }
     }
 
+    var mode: ConsoleMode = .all {
+        didSet {
+            list.update(mode: mode)
+            searchCriteriaViewModel.mode = mode
+        }
+    }
+
     var onDismiss: (() -> Void)?
 
     private var cancellables: [AnyCancellable] = []

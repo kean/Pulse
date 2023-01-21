@@ -40,10 +40,11 @@ private struct ConsoleToolbarTitle: View {
             .onReceive(titlePublisher) { title = $0 }
     }
 
+    #warning("remove")
     private var titlePublisher: some Publisher<String, Never> {
-        viewModel.list.$entities.combineLatest(viewModel.searchCriteriaViewModel.$isOnlyNetwork)
+        viewModel.list.$entities.combineLatest(viewModel.list.$mode)
             .map { entities, isOnlyNetwork in
-                "\(entities.count) \(isOnlyNetwork ? "Requests" : "Messages")"
+                "\(entities.count) \(viewModel.list.mode == .tasks ? "Requests" : "Messages")"
             }
     }
 }
@@ -54,13 +55,6 @@ struct ConsoleFiltersView: View {
     @ObservedObject var router: ConsoleRouter
 
     var body: some View {
-        if !isNetworkModeEnabled {
-            Button(action: { viewModel.isOnlyNetwork.toggle() }) {
-                Image(systemName: viewModel.isOnlyNetwork ? "arrow.down.circle.fill" : "arrow.down.circle")
-                    .font(.system(size: 20))
-                    .foregroundColor(.accentColor)
-            }
-        }
         Button(action: { viewModel.isOnlyErrors.toggle() }) {
             Image(systemName: viewModel.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon")
                 .font(.system(size: 20))

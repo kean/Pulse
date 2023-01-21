@@ -80,7 +80,7 @@ struct ConsoleContextMenu: View {
     @ViewBuilder
     private var sortByMenu: some View {
         Menu(content: {
-            if viewModel.searchCriteriaViewModel.isOnlyNetwork {
+            if viewModel.mode == .tasks {
                 Picker("Sort By", selection: $listViewModel.options.taskSortBy) {
                     ForEach(ConsoleListOptions.TaskSortBy.allCases, id: \.self) {
                         Text($0.rawValue).tag($0)
@@ -105,7 +105,7 @@ struct ConsoleContextMenu: View {
     @ViewBuilder
     private var groupByMenu: some View {
         Menu(content: {
-            if viewModel.searchCriteriaViewModel.isOnlyNetwork {
+            if viewModel.mode == .tasks {
                 Picker("Group By", selection: $listViewModel.options.taskGroupBy) {
                     ForEach(ConsoleListOptions.TaskGroupBy.allCases, id: \.self) {
                         Text($0.rawValue).tag($0)
