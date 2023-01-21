@@ -93,6 +93,7 @@ final class ConsoleViewModel: ObservableObject {
 }
 
 final class ConsoleRouter: ObservableObject {
+    @Published var shareItems: ShareItems?
     @Published var isShowingAsText = false
     @Published var isShowingFilters = false
 }

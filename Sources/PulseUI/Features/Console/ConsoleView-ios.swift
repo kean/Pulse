@@ -29,10 +29,7 @@ public struct ConsoleView: View {
 struct _ConsoleView: View {
     let viewModel: ConsoleViewModel
 
-    @State private var shareItems: ShareItems?
     @State private var selectedShareOutput: ShareOutput?
-
-    @ObservedObject private var router = ConsoleRouter()
 
     var body: some View {
         _ConsoleListView(viewModel: viewModel)
@@ -40,10 +37,7 @@ struct _ConsoleView: View {
             .onDisappear { viewModel.isViewVisible = false }
             .navigationTitle(viewModel.title)
             .navigationBarItems(leading: leadingNavigationBarItems, trailing: trailingNavigationBarItems)
-            .sheet(item: $shareItems, content: ShareView.init)
-            .sheet(isPresented: $router.isShowingAsText) { destinationTextView }
-            .sheet(isPresented: $router.isShowingFilters) { destinationFilters }
-
+            .background(ConsoleRouterView(viewModel: viewModel, router: viewModel.router))
     }
 
     private var leadingNavigationBarItems: some View {
@@ -78,25 +72,7 @@ struct _ConsoleView: View {
         selectedShareOutput = output
         viewModel.prepareForSharing(as: output) { item in
             selectedShareOutput = nil
-            shareItems = item
-        }
-    }
-
-    private var destinationTextView: some View {
-        NavigationView {
-            ConsoleTextView(entities: viewModel.list.entitiesSubject) {
-                viewModel.router.isShowingAsText = false
-            }
-        }
-    }
-
-    private var destinationFilters: some View {
-        NavigationView {
-            ConsoleSearchCriteriaView(viewModel: viewModel.searchCriteriaViewModel)
-                .inlineNavigationTitle("Filters")
-                .navigationBarItems(trailing: Button("Done") {
-                    viewModel.router.isShowingFilters = false
-                })
+            viewModel.router.shareItems = item
         }
     }
 }
@@ -194,6 +170,8 @@ private struct _ConsoleRegularContentView: View {
         }
     }
 }
+
+// MARK: - Previews
 
 #if DEBUG
 struct ConsoleView_Previews: PreviewProvider {
