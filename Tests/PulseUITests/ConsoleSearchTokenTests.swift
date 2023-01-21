@@ -141,6 +141,8 @@ final class ConsoleSearchTokenTests: XCTestCase {
         XCTAssertEqual(parse("2"), .init(.open, lowerBound: 200, upperBound: 300))
         XCTAssertEqual(parse("2x"), .init(.open, lowerBound: 200, upperBound: 300))
         XCTAssertEqual(parse("2X"), .init(.open, lowerBound: 200, upperBound: 300))
+        XCTAssertEqual(parse("20"), .init(.open, lowerBound: 200, upperBound: 210))
+        XCTAssertEqual(parse("20X"), .init(.open, lowerBound: 200, upperBound: 210))
         XCTAssertEqual(parse("2XX"), .init(.open, lowerBound: 200, upperBound: 300))
         XCTAssertEqual(parse("2*"), .init(.open, lowerBound: 200, upperBound: 300))
     }

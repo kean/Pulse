@@ -42,9 +42,11 @@ extension Parsers {
         (ConsoleSearchFilter.path(.init(values: values)), confidence)
     }
 
-    static let host = char(from: .urlHostAllowed.subtracting(.init(charactersIn: ","))).oneOrMore.map { String($0) }
+    static let host = char(from: .urlHostAllowed.subtracting(.init(charactersIn: ",")))
+        .oneOrMore.map { String($0) }
 
-    static let path = char(from: .urlPathAllowed.subtracting(.init(charactersIn: ","))).oneOrMore.map { String($0) }
+    static let path = char(from: .urlPathAllowed.subtracting(.init(charactersIn: ",")))
+        .oneOrMore.map { String($0) }
 
     static let httpMethod = oneOf(HTTPMethod.allCases.map { method in
         fuzzy(method.rawValue, confidence: 0.8).map { _ in method }
@@ -79,12 +81,16 @@ extension Parsers {
         statusCodeWilcard // It'll also auto-complete "2" as "2xx" if every other pattern fails
     )
 
-    static let statusCodeWilcard: Parser<ConsoleSearchRange<Int>> = (
-        char(from: "12345") <* char(from: "xX*").zeroOrMore <* end
-    ).map {
-        guard let code = Int(String($0)) else { return nil }
-        return ConsoleSearchRange(.open, lowerBound: code * 100, upperBound: code * 100 + 100)
-    }
+    static let statusCodeWilcard: Parser<ConsoleSearchRange<Int>> = oneOf(
+        (char(from: "12345") <*> char(from: "012345") <* optional(char(from: "xX*")) <* end).map {
+            let lowerBound = Int(String($0) + String($1))! * 10
+            return ConsoleSearchRange(.open, lowerBound: lowerBound, upperBound: lowerBound + 10)
+        },
+        (char(from: "12345") <* optional(char(from: "xX*")) <* optional(char(from: "xX*")) <* end).map {
+            let lowerBound = Int(String($0))! * 100
+            return ConsoleSearchRange(.open, lowerBound: lowerBound, upperBound: lowerBound + 100)
+        }
+    )
 
     static func rangeOfInts(in range: ClosedRange<Int>) -> Parser<ConsoleSearchRange<Int>> {
         rangeOfInts.filter {

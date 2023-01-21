@@ -55,7 +55,6 @@ final class ConsoleSearchSuggestionsService {
             .sorted(by: { $0.1 > $1.1 }) // Sort by confidence
 
 #warning("when I start typing /, suggest path filter and add auto-completion")
-#warning("20X support")
 
         // Auto-complete hosts (TODO: refactor)
         var hasHostsFilter = false
