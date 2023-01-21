@@ -30,7 +30,7 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
     private var visibleEntityCountLimit = fetchBatchSize
     private var visibleObjectIDs: Set<NSManagedObjectID> = []
 
-    private var isOnlyNetwork = false
+    private(set) var isOnlyNetwork = false
     private let store: LoggerStore
     private let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
     private var controller: NSFetchedResultsController<NSManagedObject>?
@@ -77,18 +77,23 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
 
     func refreshController() {
         let request: NSFetchRequest<NSManagedObject>
+        let grouping: ConsoleListGroupBy = isOnlyNetwork ? options.taskGroupBy : options.messageGroupBy
         if isOnlyNetwork {
             request = .init(entityName: "\(NetworkTaskEntity.self)")
-            request.sortDescriptors = [NSSortDescriptor(keyPath: \NetworkTaskEntity.createdAt, ascending: options.order == .ascending)]
+            request.sortDescriptors = [
+                grouping.key.map { NSSortDescriptor(key: $0, ascending: grouping.isAscending) },
+                NSSortDescriptor(keyPath: \NetworkTaskEntity.createdAt, ascending: options.order == .ascending)
+            ].compactMap { $0 }
         } else {
             request = .init(entityName: "\(LoggerMessageEntity.self)")
             request.relationshipKeyPathsForPrefetching = ["request"]
             request.sortDescriptors = [
+                grouping.key.map { NSSortDescriptor(key: $0, ascending: grouping.isAscending) },
                 NSSortDescriptor(keyPath: \LoggerMessageEntity.createdAt, ascending: options.order == .ascending)
-            ]
+            ].compactMap { $0 }
         }
         request.fetchBatchSize = fetchBatchSize
-        controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: store.viewContext, sectionNameKeyPath: nil, cacheName: nil)
+        controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: store.viewContext, sectionNameKeyPath: grouping.key, cacheName: nil)
         controller?.delegate = self
 
         refresh()
@@ -125,6 +130,7 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
 
     private func reloadMessages(isMandatory: Bool = true) {
         entities = controller?.fetchedObjects ?? []
+        sections = controller?.sections
         if isMandatory || scrollPosition == .nearTop {
             refreshVisibleEntities()
         }

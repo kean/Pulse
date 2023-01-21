@@ -9,7 +9,8 @@ struct ConsoleListOptions {
     var messageSortBy: MessageSortBy = .dateCreated
     var taskSortBy: TaskSortBy = .dateCreated
     var order: Ordering = .descending
-    var messageGroupBy: MessageGroupBy = .noGrouping
+#warning("temp")
+    var messageGroupBy: MessageGroupBy = .label
     var taskGroupBy: TaskGroupBy = .noGrouping
 
     enum Ordering: String, CaseIterable {
@@ -20,7 +21,7 @@ struct ConsoleListOptions {
     enum MessageSortBy: String, CaseIterable {
         case dateCreated = "Date Created"
 
-        var keyPath: String { "createdAt" }
+        var key: String { "createdAt" }
     }
 
     enum TaskSortBy: String, CaseIterable {
@@ -29,7 +30,7 @@ struct ConsoleListOptions {
         case requestSize = "Request Size"
         case responseSize = "Response Size"
 
-        var keyPath: String {
+        var key: String {
             switch self {
             case .dateCreated: return "createdAt"
             case .duration: return "duration"
@@ -39,23 +40,30 @@ struct ConsoleListOptions {
         }
     }
 
-    enum MessageGroupBy: String, CaseIterable {
+    enum MessageGroupBy: String, CaseIterable, ConsoleListGroupBy {
         case noGrouping = "No Grouping"
         case label = "Label"
         case level = "Level"
         case file = "File"
 
-        var keyPath: String? {
+        var key: String? {
             switch self {
             case .noGrouping: return nil
-            case .label: return "label"
+            case .label: return "label.name"
             case .level: return "level"
             case .file: return "file"
             }
         }
+
+        var isAscending: Bool {
+            switch self {
+            case .noGrouping, .label, .file: return true
+            case .level: return false
+            }
+        }
     }
 
-    enum TaskGroupBy: String, CaseIterable {
+    enum TaskGroupBy: String, CaseIterable, ConsoleListGroupBy {
         case noGrouping = "No Grouping"
         case url = "URL"
         case host = "Host"
@@ -64,16 +72,27 @@ struct ConsoleListOptions {
         case statusCode = "Status Code"
         case errorCode = "Error Code"
 
-        var keyPath: String? {
+        var key: String? {
             switch self {
             case .noGrouping: return nil
             case .url: return "url"
-            case .host: return "host"
+            case .host: return "host.value"
             case .method: return "method"
             case .taskType: return "taskType"
             case .statusCode: return "status"
             case .errorCode: return "errorCode"
             }
         }
+
+        #warning("implement")
+        var isAscending: Bool {
+            return true
+        }
     }
 }
+
+protocol ConsoleListGroupBy {
+    var key: String? { get }
+    var isAscending: Bool { get }
+}
+

@@ -51,9 +51,11 @@ struct ConsoleContextMenu: View {
                     }
                 }
             }
-            Section {
-                sortByMenu
-                groupByMenu
+            if #available(iOS 15, *) {
+                Section {
+                    sortByMenu
+                    groupByMenu
+                }
             }
             Section {
                 Button(action: { router.isShowingSettings = true }) {
@@ -110,7 +112,7 @@ struct ConsoleContextMenu: View {
                     }
                 }
             } else {
-                Picker("Group By", selection: $listViewModel.options.taskGroupBy) {
+                Picker("Group By", selection: $listViewModel.options.messageGroupBy) {
                     ForEach(ConsoleListOptions.MessageGroupBy.allCases, id: \.self) {
                         Text($0.rawValue).tag($0)
                     }
