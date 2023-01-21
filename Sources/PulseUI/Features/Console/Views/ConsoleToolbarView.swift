@@ -14,7 +14,7 @@ struct ConsoleToolbarView: View {
 
     var body: some View {
         HStack(alignment: .bottom, spacing: 0) {
-            ConsoleToolbarTitle(viewModel: viewModel)
+            ConsoleModePicker(viewModel: viewModel)
             Spacer()
             HStack(spacing: 14) {
                 ConsoleFiltersView(
@@ -28,16 +28,25 @@ struct ConsoleToolbarView: View {
     }
 }
 
-private struct ConsoleToolbarTitle: View {
+private struct ConsoleModePicker: View {
     let viewModel: ConsoleViewModel
 
+    @State private var mode: ConsoleMode = .all
     @State private var title: String = ""
 
     var body: some View {
-        Text(title)
-            .foregroundColor(.secondary)
-            .font(.subheadline.weight(.medium))
-            .onReceive(titlePublisher) { title = $0 }
+        HStack(spacing: 12) {
+            ConsoleModeButton(title: "All", isSelected: mode == .all) {
+                viewModel.mode = .all
+            }
+            ConsoleModeButton(title: "Logs", isSelected: mode == .logs) {
+                viewModel.mode = .logs
+            }
+            ConsoleModeButton(title: "Tasks", isSelected: mode == .tasks) {
+                viewModel.mode = .tasks
+            }
+        }
+        .onReceive(viewModel.list.$mode) { mode = $0 }
     }
 
     #warning("remove")
@@ -47,6 +56,24 @@ private struct ConsoleToolbarTitle: View {
                 "\(entities.count) \(viewModel.list.mode == .tasks ? "Requests" : "Messages")"
             }
     }
+}
+
+private struct ConsoleModeButton: View {
+    let title: String
+    let isSelected: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .foregroundColor(isSelected ? Color.blue : Color.secondary)
+                .font(.subheadline.weight(.medium))
+        }
+        .buttonStyle(.plain)
+    }
+
+#warning("add counters")
+    //  + Text(" (4K)").foregroundColor(Color.separator)
 }
 
 struct ConsoleFiltersView: View {
