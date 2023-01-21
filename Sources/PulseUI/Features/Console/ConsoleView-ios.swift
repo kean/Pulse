@@ -63,6 +63,8 @@ private struct ConsoleListView: View {
         }
         .listStyle(.plain)
 
+#warning("update number of messages")
+
         if #available(iOS 16, *) {
             list
                 .environment(\.defaultMinListRowHeight, 8)
@@ -113,17 +115,56 @@ private struct _ConsoleRegularContentView: View {
     let viewModel: ConsoleViewModel
 
     var body: some View {
-        let toolbar = ConsoleToolbarView(viewModel: viewModel)
-        if #available(iOS 15.0, *) {
-            toolbar.listRowSeparator(.hidden, edges: .top)
-        } else {
-            toolbar
+//        let toolbar = ConsoleToolbarView(viewModel: viewModel)
+//        if #available(iOS 15.0, *) {
+//            toolbar.listRowSeparator(.hidden, edges: .top)
+//        } else {
+//            toolbar
+//        }
+
+#warning("try pins as an ico ?")
+#warning("add swipe actions to change what you see")
+#warning("add underline or something - bold?")
+#warning("can these be a three separate screens?")
+
+//        let picker = Picker("Network", selection: .constant("All")) {
+//        HStack(spacing: 12) {
+////            Text("Scopes").foregroundColor(Color.secondary)
+//            ConsoleFiltersView(isNetworkModeEnabled: true, viewModel: viewModel.searchCriteriaViewModel, router: viewModel.router)
+//            Spacer()
+//            Text("All")
+//            Text("Messages").foregroundColor(Color.secondary)
+//            Text("Network").foregroundColor(Color.secondary)
+//            Text("Pins").foregroundColor(Color.secondary)
+//        }
+//            .font(.subheadline.weight(.medium))
+//            .foregroundColor(Color.blue)
+        let stack = HStack(spacing: 12) {
+            Text("All")
+            Text("Logs").foregroundColor(Color.secondary)
+            + Text(" (4K)").foregroundColor(Color.separator)
+            Text("Tasks").foregroundColor(Color.secondary)
+             + Text(" (12)").foregroundColor(Color.separator)
+//            Text("Pins").foregroundColor(Color.secondary)
+//            + Text("(12)").foregroundColor(Color.separator)
+            Spacer()
+            ConsoleFiltersView(isNetworkModeEnabled: true, viewModel: viewModel.searchCriteriaViewModel, router: viewModel.router)
         }
+            .buttonStyle(.plain)
+            .font(.subheadline.weight(.medium))
+            .foregroundColor(Color.blue)
+
+        if #available(iOS 15.0, *) {
+            stack.listRowSeparator(.hidden, edges: .top)
+        } else {
+            stack
+        }
+
         ConsoleListContentView(viewModel: viewModel.list)
         footerView
     }
 
-    #warning("implement on other platforms and move to the list?")
+#warning("implement on other platforms and move to the list?")
     @ViewBuilder
     private var footerView: some View {
         if #available(iOS 15, *), viewModel.searchCriteriaViewModel.criteria.shared.dates == .session, viewModel.list.options.order == .descending {

@@ -8,11 +8,15 @@ import Pulse
 import Combine
 import SwiftUI
 
+#warning("add counters")
+#warning("how to handle groups and sortes for alltab")
+
 final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, ObservableObject {
     @Published private(set) var visibleEntities: ArraySlice<NSManagedObject> = []
     @Published private(set) var entities: [NSManagedObject] = []
     @Published private(set) var sections: [NSFetchedResultsSectionInfo]?
     @Published var options = ConsoleListOptions()
+    @Published var mode: ConsoleMode = .all
 
     let entitiesSubject = CurrentValueSubject<[NSManagedObject], Never>([])
     let didRefresh = PassthroughSubject<Void, Never>()
@@ -30,8 +34,7 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
     private var visibleEntityCountLimit = fetchBatchSize
     private var visibleObjectIDs: Set<NSManagedObjectID> = []
 
-    private(set) var isOnlyNetwork = false
-    var grouping: ConsoleListGroupBy { isOnlyNetwork ? options.taskGroupBy : options.messageGroupBy }
+    var grouping: ConsoleListGroupBy { mode == .tasks ? options.taskGroupBy : options.messageGroupBy }
     private let store: LoggerStore
     private let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
     private var controller: NSFetchedResultsController<NSManagedObject>?
@@ -76,6 +79,8 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
         }.store(in: &cancellables)
     }
 
+    // MARK: - NSFetchedResultsController
+
     func refreshController() {
         let request: NSFetchRequest<NSManagedObject>
         let sortKey = isOnlyNetwork ? options.taskSortBy.key : options.messageSortBy.key
@@ -94,7 +99,12 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
             ].compactMap { $0 }
         }
         request.fetchBatchSize = fetchBatchSize
-        controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: store.viewContext, sectionNameKeyPath: grouping.key, cacheName: nil)
+        controller = NSFetchedResultsController(
+            fetchRequest: request,
+            managedObjectContext: store.viewContext,
+            sectionNameKeyPath: grouping.key,
+            cacheName: nil
+        )
         controller?.delegate = self
 
         refresh()
@@ -186,3 +196,9 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
 }
 
 private let fetchBatchSize = 100
+
+enum ConsoleMode {
+    case all
+    case logs
+    case tasks
+}
