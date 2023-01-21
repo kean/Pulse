@@ -11,9 +11,6 @@ import Combine
 
 public struct ConsoleView: View {
     @StateObject private var viewModel: ConsoleViewModel
-    @State private var isShowingFiltersView = false
-    @State private var isShowingRemoveConfirmationAlert = false
-    @State private var isStoreArchived = false
 
     public init(store: LoggerStore = .shared) {
         self.init(viewModel: ConsoleViewModel(store: store))
@@ -27,7 +24,7 @@ public struct ConsoleView: View {
         GeometryReader { proxy in
             HStack {
                 List {
-                    makeForEach(viewModel: viewModel)
+                    ConsoleListContentView(viewModel: viewModel.list)
                 }
 
                 // TODO: Not sure it's valid
@@ -39,33 +36,41 @@ public struct ConsoleView: View {
                 .frame(width: 700)
             }
             .navigationTitle(viewModel.title)
-            .onAppear(perform: viewModel.onAppear)
-            .onDisappear(perform: viewModel.onDisappear)
+            .onAppear { viewModel.isViewVisible = true }
+            .onDisappear { viewModel.isViewVisible = false }
         }
     }
 }
 
 private struct ConsoleMenuView: View {
-    @ObservedObject var viewModel: ConsoleViewModel
+    let store: LoggerStore
+    @ObservedObject var viewModel: ConsoleSearchCriteriaViewModel
+    @ObservedObject var router: ConsoleRouter
+
+    init(viewModel: ConsoleViewModel) {
+        self.store = viewModel.store
+        self.viewModel = viewModel.searchCriteriaViewModel
+        self.router = viewModel.router
+    }
 
     var body: some View {
         Section {
             Toggle(isOn: $viewModel.isOnlyErrors) {
                 Label("Errors Only", systemImage: "exclamationmark.octagon")
             }
-            Toggle(isOn: Binding(get: { viewModel.mode == .network }, set: { _ in viewModel.toggleMode() })) {
+            Toggle(isOn: $viewModel.isOnlyNetwork) {
                 Label("Network Only", systemImage: "arrow.down.circle")
             }
             NavigationLink(destination: destinationFilters) {
-                Label(viewModel.mode == .network ? "Network Filters" : "Message Filters", systemImage: "line.3.horizontal.decrease.circle")
+                Label(viewModel.isOnlyNetwork ? "Network Filters" : "Message Filters", systemImage: "line.3.horizontal.decrease.circle")
             }
         } header: { Text("Quick Filters") }
-        if !viewModel.store.isArchive {
+        if !store.isArchive {
             Section {
                 NavigationLink(destination: destinationStoreDetails) {
                     Label("Store Info", systemImage: "info.circle")
                 }
-                Button.destructive(action: viewModel.store.removeAll) {
+                Button.destructive(action: store.removeAll) {
                     Label("Remove Logs", systemImage: "trash")
                 }
             } header: { Text("Store") }
@@ -78,15 +83,15 @@ private struct ConsoleMenuView: View {
     }
 
     private var destinationSettings: some View {
-        SettingsView(store: viewModel.store).padding()
+        SettingsView(store: store).padding()
     }
 
     private var destinationStoreDetails: some View {
-        StoreDetailsView(source: .store(viewModel.store)).padding()
+        StoreDetailsView(source: .store(store)).padding()
     }
 
     private var destinationFilters: some View {
-        ConsoleSearchCriteriaView(viewModel: viewModel.searchCriteriaViewModel).padding()
+        ConsoleSearchCriteriaView(viewModel: viewModel).padding()
     }
 }
 

@@ -9,39 +9,40 @@ import Combine
 
 #if os(iOS)
 
-import UniformTypeIdentifiers
-
 struct ConsoleContextMenu: View {
-    @ObservedObject var viewModel: ConsoleViewModel
-    @Binding var isShowingAsText: Bool
+    let viewModel: ConsoleViewModel
+    @ObservedObject var searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
+    @ObservedObject var listViewModel: ConsoleListViewModel
+    @ObservedObject var router: ConsoleRouter
 
-    @State private var isShowingSettings = false
-    @State private var isShowingStoreInfo = false
-    @State private var isShowingInsights = false
-    @State private var isShowingShareStore = false
-    @State private var isDocumentBrowserPresented = false
+    init(viewModel: ConsoleViewModel) {
+        self.viewModel = viewModel
+        self.searchCriteriaViewModel = viewModel.searchCriteriaViewModel
+        self.listViewModel = viewModel.list
+        self.router = viewModel.router
+    }
 
     var body: some View {
         Menu {
             Section {
-                Button(action: { isShowingAsText.toggle() }) {
-                    if isShowingAsText {
+                Button(action: { router.isShowingAsText.toggle() }) {
+                    if router.isShowingAsText {
                         Label("View as List", systemImage: "list.bullet.rectangle.portrait")
                     } else {
                         Label("View as Text", systemImage: "text.quote")
                     }
                 }
                 if !viewModel.store.isArchive {
-                    Button(action: { isShowingInsights = true }) {
+                    Button(action: { router.isShowingInsights = true }) {
                         Label("Insights", systemImage: "chart.pie")
                     }
                 }
             }
             Section {
-                Button(action: { isShowingStoreInfo = true }) {
+                Button(action: { router.isShowingStoreInfo = true }) {
                     Label("Store Info", systemImage: "info.circle")
                 }
-                Button(action: { isShowingShareStore = true }) {
+                Button(action: { router.isShowingShareStore = true }) {
                     Label("Share Store", systemImage: "square.and.arrow.up")
                 }
                 if !viewModel.store.isArchive {
@@ -50,17 +51,14 @@ struct ConsoleContextMenu: View {
                     }
                 }
             }
-            Section {
-                if viewModel.order == .latestFirst {
-                    Button(action: { viewModel.order = .oldestFirst }) {
-                        Label("Newest First", systemImage: "arrow.down")
-                    }
-                } else {
-                    Button(action: { viewModel.order = .latestFirst }) {
-                        Label("Oldest First", systemImage: "arrow.up")
-                    }
+            if #available(iOS 15, *) {
+                Section {
+                    sortByMenu
+                    groupByMenu
                 }
-                Button(action: { isShowingSettings = true }) {
+            }
+            Section {
+                Button(action: { router.isShowingSettings = true }) {
                     Label("Settings", systemImage: "gear")
                 }
             }
@@ -77,40 +75,52 @@ struct ConsoleContextMenu: View {
         } label: {
             Image(systemName: "ellipsis.circle")
         }
-        .sheet(isPresented: $isShowingSettings) {
-            NavigationView {
-                SettingsView(store: viewModel.store)
-                    .navigationTitle("Settings")
-                    .navigationBarTitleDisplayMode(.inline)
-                    .navigationBarItems(trailing: Button(action: { isShowingSettings = false }) {
-                        Text("Done")
-                    })
+    }
+
+    @ViewBuilder
+    private var sortByMenu: some View {
+        Menu(content: {
+            if viewModel.searchCriteriaViewModel.isOnlyNetwork {
+                Picker("Sort By", selection: $listViewModel.options.taskSortBy) {
+                    ForEach(ConsoleListOptions.TaskSortBy.allCases, id: \.self) {
+                        Text($0.rawValue).tag($0)
+                    }
+                }
+            } else {
+                Picker("Sort By", selection: $listViewModel.options.messageSortBy) {
+                    ForEach(ConsoleListOptions.MessageSortBy.allCases, id: \.self) {
+                        Text($0.rawValue).tag($0)
+                    }
+                }
             }
-        }
-        .sheet(isPresented: $isShowingStoreInfo) {
-            NavigationView {
-                StoreDetailsView(source: .store(viewModel.store))
-                    .navigationBarItems(trailing: Button(action: { isShowingStoreInfo = false }) {
-                        Text("Done")
-                    })
+            Picker("Ordering", selection: $listViewModel.options.order) {
+                Text("Descending").tag(ConsoleListOptions.Ordering.descending)
+                Text("Ascending").tag(ConsoleListOptions.Ordering.ascending)
             }
-        }
-        .sheet(isPresented: $isShowingInsights) {
-            NavigationView {
-                InsightsView(viewModel: viewModel.insightsViewModel)
-                    .navigationBarItems(trailing: Button(action: { isShowingInsights = false }) {
-                        Text("Done")
-                    })
+        }, label: {
+            Label("Sort By", systemImage: "arrow.up.arrow.down")
+        })
+    }
+
+    @ViewBuilder
+    private var groupByMenu: some View {
+        Menu(content: {
+            if viewModel.searchCriteriaViewModel.isOnlyNetwork {
+                Picker("Group By", selection: $listViewModel.options.taskGroupBy) {
+                    ForEach(ConsoleListOptions.TaskGroupBy.allCases, id: \.self) {
+                        Text($0.rawValue).tag($0)
+                    }
+                }
+            } else {
+                Picker("Group By", selection: $listViewModel.options.messageGroupBy) {
+                    ForEach(ConsoleListOptions.MessageGroupBy.allCases, id: \.self) {
+                        Text($0.rawValue).tag($0)
+                    }
+                }
             }
-        }
-        .sheet(isPresented: $isShowingShareStore) {
-            NavigationView {
-                ShareStoreView(store: viewModel.store, isPresented: $isShowingShareStore)
-            }.backport.presentationDetents([.medium])
-           }
-        .fullScreenCover(isPresented: $isDocumentBrowserPresented) {
-            DocumentBrowser()
-        }
+        }, label: {
+            Label("Group By", systemImage: "rectangle.3.group")
+        })
     }
 
     private func buttonRemoveAllTapped() {
@@ -133,16 +143,6 @@ struct ConsoleContextMenu: View {
     private func buttonSendFeedbackTapped() {
         guard let url = URL(string: "https://github.com/kean/Pulse/issues") else { return }
         UIApplication.shared.open(url)
-    }
-}
-
-private struct DocumentBrowser: UIViewControllerRepresentable {
-    func makeUIViewController(context: Context) -> DocumentBrowserViewController {
-        DocumentBrowserViewController(forOpeningContentTypes: [UTType(filenameExtension: "pulse")].compactMap { $0 })
-    }
-
-    func updateUIViewController(_ uiViewController: DocumentBrowserViewController, context: Context) {
-
     }
 }
 #endif

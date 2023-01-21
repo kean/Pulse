@@ -27,7 +27,7 @@ struct ConsoleSearchToolbar: View {
             Spacer()
             HStack(spacing: 14) {
                 ConsoleSearchContextMenu(viewModel: viewModel.searchViewModel)
-                ConsoleFiltersView(viewModel: viewModel, isShowingFilters: $viewModel.isShowingFilters)
+                ConsoleFiltersView(isNetworkModeEnabled: viewModel.isNetworkModeEnabled, viewModel: viewModel.searchCriteriaViewModel, router: viewModel.router)
             }
         }
         .buttonStyle(.plain)

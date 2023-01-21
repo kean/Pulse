@@ -10,31 +10,53 @@ import Combine
 #if os(iOS)
 
 struct ConsoleToolbarView: View {
-    let title: String
-    @ObservedObject var viewModel: ConsoleViewModel
+    let viewModel: ConsoleViewModel
 
     var body: some View {
         HStack(alignment: .bottom, spacing: 0) {
-            Text(title)
-                .foregroundColor(.secondary)
-                .font(.subheadline.weight(.medium))
+            ConsoleToolbarTitle(viewModel: viewModel)
             Spacer()
             HStack(spacing: 14) {
-                ConsoleFiltersView(viewModel: viewModel, isShowingFilters: $viewModel.isShowingFilters)
+                ConsoleFiltersView(
+                    isNetworkModeEnabled: viewModel.isNetworkModeEnabled,
+                    viewModel: viewModel.searchCriteriaViewModel,
+                    router: viewModel.router
+                )
             }
         }
         .buttonStyle(.plain)
     }
 }
 
-struct ConsoleFiltersView: View {
-    @ObservedObject var viewModel: ConsoleViewModel
-    @Binding var isShowingFilters: Bool
+private struct ConsoleToolbarTitle: View {
+    let viewModel: ConsoleViewModel
+
+    @State private var title: String = ""
 
     var body: some View {
-        if !viewModel.isNetworkOnly {
-            Button(action: viewModel.toggleMode) {
-                Image(systemName: viewModel.mode == .network ? "arrow.down.circle.fill" : "arrow.down.circle")
+        Text(title)
+            .foregroundColor(.secondary)
+            .font(.subheadline.weight(.medium))
+            .onReceive(titlePublisher) { title = $0 }
+    }
+
+    private var titlePublisher: some Publisher<String, Never> {
+        viewModel.list.$entities.combineLatest(viewModel.searchCriteriaViewModel.$isOnlyNetwork)
+            .map { entities, isOnlyNetwork in
+                "\(entities.count) \(isOnlyNetwork ? "Requests" : "Messages")"
+            }
+    }
+}
+
+struct ConsoleFiltersView: View {
+    let isNetworkModeEnabled: Bool
+    @ObservedObject var viewModel: ConsoleSearchCriteriaViewModel
+    @ObservedObject var router: ConsoleRouter
+
+    var body: some View {
+        if !isNetworkModeEnabled {
+            Button(action: { viewModel.isOnlyNetwork.toggle() }) {
+                Image(systemName: viewModel.isOnlyNetwork ? "arrow.down.circle.fill" : "arrow.down.circle")
                     .font(.system(size: 20))
                     .foregroundColor(.accentColor)
             }
@@ -44,8 +66,8 @@ struct ConsoleFiltersView: View {
                 .font(.system(size: 20))
                 .foregroundColor(viewModel.isOnlyErrors ? .red : .accentColor)
         }
-        Button(action: { isShowingFilters = true }) {
-            Image(systemName: viewModel.searchCriteriaViewModel.isCriteriaDefault ? "line.horizontal.3.decrease.circle" : "line.3.horizontal.decrease.circle.fill")
+        Button(action: { router.isShowingFilters = true }) {
+            Image(systemName: viewModel.isCriteriaDefault ? "line.horizontal.3.decrease.circle" : "line.3.horizontal.decrease.circle.fill")
                 .font(.system(size: 20))
                 .foregroundColor(.accentColor)
         }

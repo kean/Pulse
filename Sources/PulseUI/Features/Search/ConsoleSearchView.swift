@@ -83,7 +83,7 @@ struct ConsoleSearchView: View {
             .cornerRadius(8)
         }
         .listRowSeparator(.hidden)
-        .listRowBackground(Color.separator.opacity(0.18))
+        .listRowBackground(Color.separator.opacity(0.2))
         .frame(maxWidth: .infinity, alignment: .center)
         .listRowBackground(Color.clear)
     }

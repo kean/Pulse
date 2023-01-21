@@ -7,14 +7,12 @@ import Pulse
 import Combine
 import SwiftUI
 
-final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, ObservableObject {
+final class ConsoleViewModel: ObservableObject {
     let title: String
-    let isNetworkOnly: Bool
+    let isNetworkModeEnabled: Bool
     let store: LoggerStore
 
-    @Published private(set) var visibleEntities: ArraySlice<NSManagedObject> = []
-    @Published private(set) var entities: [NSManagedObject] = []
-    let entitiesSubject = CurrentValueSubject<[NSManagedObject], Never>([])
+    let list: ConsoleListViewModel
 
 #if os(iOS)
     let insightsViewModel: InsightsViewModel
@@ -28,230 +26,55 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     let searchBarViewModel: ConsoleSearchBarViewModel
     let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
 
-    var toolbarTitle: String {
-        let suffix = mode == .network ? "Requests" : "Messages"
-        return "\(entities.count) \(suffix)"
+    let router = ConsoleRouter()
+
+    var isViewVisible: Bool = false {
+        didSet { refreshListsVisibility() }
     }
 
-    @Published var order: ConsoleMessagesOrder = .latestFirst
-    @Published var mode: Mode
-    @Published var isOnlyErrors = false
-    @Published var filterTerm: String = ""
-    @Published var isShowingFilters = false
+    var isSearching = false {
+        didSet { refreshListsVisibility() }
+    }
 
     var onDismiss: (() -> Void)?
 
-    /// This exist strickly to workaround List performance issues
-    private var scrollPosition: ScrollPosition = .nearTop
-    private var visibleEntityCountLimit = fetchBatchSize
-    private var visibleObjectIDs: Set<NSManagedObjectID> = []
-
-    private var controller: NSFetchedResultsController<NSManagedObject>?
-    private var isViewVisible = false
     private var cancellables: [AnyCancellable] = []
 
-    enum Mode {
-        case messages, network
-    }
-
-    init(store: LoggerStore, mode: Mode = .messages) {
-        self.title = mode == .network ? "Network" : "Console"
+    init(store: LoggerStore, isOnlyNetwork: Bool = false) {
+        self.title = isOnlyNetwork ? "Network" : "Console"
         self.store = store
-        self.mode = mode
-        self.isNetworkOnly = mode == .network
-        self.order = ConsoleSettings.shared.isLatestMessagesFirstOrder ? .latestFirst : .oldestFirst
+        self.isNetworkModeEnabled = isOnlyNetwork
 
+        self.searchCriteriaViewModel = ConsoleSearchCriteriaViewModel(store: store)
         self.searchBarViewModel = ConsoleSearchBarViewModel()
-        self.searchCriteriaViewModel = ConsoleSearchCriteriaViewModel(store: store, entities: entitiesSubject)
+        self.list = ConsoleListViewModel(store: store, criteria: searchCriteriaViewModel)
 
 #if os(iOS)
         self.insightsViewModel = InsightsViewModel(store: store)
         if #available(iOS 15, *) {
-            self._searchViewModel = ConsoleSearchViewModel(entities: entitiesSubject, store: store, searchBar: searchBarViewModel)
+            self._searchViewModel = ConsoleSearchViewModel(entities: list.entitiesSubject, store: store, searchBar: searchBarViewModel)
         }
+
+        list.didRefresh.sink { [weak self] in
+            if #available(iOS 15, *) {
+                self?.searchViewModel.refreshNow()
+            }
+        }.store(in: &cancellables)
 #endif
 
-        super.init()
-
-        $entities.sink { [entitiesSubject] in
-            entitiesSubject.send($0)
-        }.store(in: &cancellables)
-
-        $filterTerm
-            .dropFirst()
-            .throttle(for: 0.25, scheduler: RunLoop.main, latest: true)
-            .sink { [weak self] filterTerm in
-                self?.refresh(filterTerm: filterTerm)
-            }.store(in: &cancellables)
-
-        searchCriteriaViewModel.$criteria
-            .dropFirst()
-            .throttle(for: 0.5, scheduler: DispatchQueue.main, latest: true)
-            .sink { [weak self] _ in self?.refreshNow() }
-            .store(in: &cancellables)
-
-        $isOnlyErrors.receive(on: DispatchQueue.main).dropFirst().sink { [weak self] _ in
-            self?.refreshNow()
-        }.store(in: &cancellables)
-
-        $order.dropFirst().receive(on: DispatchQueue.main).sink { [weak self] in
-            ConsoleSettings.shared.isLatestMessagesFirstOrder = $0 == .latestFirst
-            self?.prepareFetchController()
-        }.store(in: &cancellables)
-
-        prepareFetchController()
+        searchCriteriaViewModel.bind(list.$entities)
     }
 
-    // MARK: Mode
-
-    func toggleMode() {
-        switch mode {
-        case .messages: mode = .network
-        case .network: mode = .messages
-        }
-        prepareFetchController()
-    }
-
-    private func prepareFetchController() {
-        searchCriteriaViewModel.mode = mode
-
-        let request = makeFetchRequest(for: mode, order: order)
-        controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: store.viewContext, sectionNameKeyPath: nil, cacheName: nil)
-        controller?.delegate = self
-
-        refreshNow()
-    }
-
-    // MARK: Appearance
-
-    func onAppear() {
-        isViewVisible = true
-        reloadMessages(isMandatory: true)
-    }
-
-    func onDisappear() {
-        isViewVisible = false
-    }
-
-    // MARK: Refresh
-
-    private func refreshNow() {
-        // important: order
-        refresh(filterTerm: filterTerm)
+    private func refreshListsVisibility() {
+        list.isViewVisible = !isSearching && isViewVisible
 #if os(iOS)
         if #available(iOS 15, *) {
-            searchViewModel.refreshNow()
+            searchViewModel.isViewVisible = isSearching && isViewVisible
         }
 #endif
     }
 
-    private func refresh(filterTerm: String) {
-        // Search messages
-        guard let controller = controller else {
-            return assertionFailure()
-        }
-        switch mode {
-        case .messages:
-            controller.fetchRequest.predicate = ConsoleSearchCriteria.makeMessagePredicates(criteria: searchCriteriaViewModel.criteria, isOnlyErrors: isOnlyErrors, filterTerm: filterTerm)
-        case .network:
-            controller.fetchRequest.predicate = ConsoleSearchCriteria.makeNetworkPredicates(criteria: searchCriteriaViewModel.criteria, isOnlyErrors: isOnlyErrors, filterTerm: filterTerm)
-        }
-        try? controller.performFetch()
-
-        reloadMessages()
-    }
-
-    // MARK: - NSFetchedResultsControllerDelegate
-
-    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChangeContentWith diff: CollectionDifference<NSManagedObjectID>) {
-        if isViewVisible {
-            withAnimation {
-                reloadMessages(isMandatory: false)
-            }
-        } else {
-            entities = self.controller?.fetchedObjects ?? []
-        }
-    }
-
-    private func reloadMessages(isMandatory: Bool = true) {
-        entities = controller?.fetchedObjects ?? []
-        if isMandatory || scrollPosition == .nearTop {
-            refreshVisibleEntities()
-        }
-    }
-
-    private enum ScrollPosition {
-        case nearTop
-        case middle
-        case nearBottom
-    }
-
-    private func refreshVisibleEntities() {
-        visibleEntities = entities.prefix(visibleEntityCountLimit)
-    }
-
-    func onDisappearCell(with objectID: NSManagedObjectID) {
-        visibleObjectIDs.remove(objectID)
-        refreshScrollPosition()
-    }
-
-    func onAppearCell(with objectID: NSManagedObjectID) {
-        visibleObjectIDs.insert(objectID)
-        refreshScrollPosition()
-    }
-
-    private func refreshScrollPosition() {
-        let scrollPosition: ScrollPosition
-        if visibleEntities.prefix(5).map(\.objectID).contains(where: visibleObjectIDs.contains) {
-            scrollPosition = .nearTop
-        } else if visibleEntities.suffix(5).map(\.objectID).contains(where: visibleObjectIDs.contains) {
-            scrollPosition = .nearBottom
-        } else {
-            scrollPosition = .middle
-        }
-
-        if scrollPosition != self.scrollPosition {
-            self.scrollPosition = scrollPosition
-            switch scrollPosition {
-            case .nearTop:
-                visibleEntityCountLimit = fetchBatchSize // Reset
-                refreshVisibleEntities()
-            case .middle:
-                break // Don't reload: too expensive and ruins gestures
-            case .nearBottom:
-                visibleEntityCountLimit += fetchBatchSize
-                refreshVisibleEntities()
-            }
-        }
-    }
-
-
-    // MARK: - Sharing
-
     func prepareForSharing(as output: ShareOutput, _ completion: @escaping (ShareItems?) -> Void) {
-        ShareService.share(entities, store: store, as: output, completion)
+        ShareService.share(list.entities, store: store, as: output, completion)
     }
-}
-
-private func makeFetchRequest(for mode: ConsoleViewModel.Mode, order: ConsoleMessagesOrder) -> NSFetchRequest<NSManagedObject> {
-    let request: NSFetchRequest<NSManagedObject>
-    let isAscending = order == .oldestFirst
-    switch mode {
-    case .messages:
-        request = .init(entityName: "\(LoggerMessageEntity.self)")
-        request.relationshipKeyPathsForPrefetching = ["request"]
-        request.sortDescriptors = [NSSortDescriptor(keyPath: \LoggerMessageEntity.createdAt, ascending: isAscending)]
-    case .network:
-        request = .init(entityName: "\(NetworkTaskEntity.self)")
-        request.sortDescriptors = [NSSortDescriptor(keyPath: \NetworkTaskEntity.createdAt, ascending: isAscending)]
-    }
-    request.fetchBatchSize = fetchBatchSize
-    return request
-}
-
-private let fetchBatchSize = 100
-
-enum ConsoleMessagesOrder: String {
-    case latestFirst = "Latest First"
-    case oldestFirst = "Oldest First"
 }

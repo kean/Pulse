@@ -118,9 +118,29 @@ struct PlainListGroupSeparator: View {
         Rectangle().foregroundColor(.clear) // DIY separator
             .frame(height: 12)
             .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
-            .listRowBackground(Color.separator.opacity(0.18))
+            .listRowBackground(Color.separator.opacity(0.2))
 #if os(iOS)
             .listRowSeparator(.hidden)
+#endif
+    }
+}
+
+@available(iOS 15, tvOS 15, *)
+struct PlainListClearSectionHeader: View {
+    let title: String
+
+    var body: some View {
+        HStack(alignment: .bottom, spacing: 0) {
+            Text(title)
+                .foregroundColor(.secondary)
+                .lineLimit(3)
+                .font(.subheadline.weight(.medium))
+            Spacer()
+        }
+        .padding(.top, 8)
+        .listRowBackground(Color.separator.opacity(0.2))
+#if os(iOS)
+        .listRowSeparator(.hidden)
 #endif
     }
 }

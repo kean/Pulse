@@ -38,15 +38,21 @@ public struct ConsoleView: View {
 
 @available(macOS 13.0, *)
 private struct ConsoleContainerView: View {
-    @ObservedObject var viewModel: ConsoleViewModel
+    let viewModel: ConsoleViewModel
+    @ObservedObject var searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
     @State private var columnVisibility = NavigationSplitViewVisibility.all
+
+    init(viewModel: ConsoleViewModel) {
+        self.viewModel = viewModel
+        self.searchCriteriaViewModel = viewModel.searchCriteriaViewModel
+    }
 
     var body: some View {
         NavigationSplitView(
             columnVisibility: $columnVisibility,
             sidebar: {
                 Siderbar(viewModel: viewModel)
-                    .searchable(text: $viewModel.filterTerm)
+                    .searchable(text: $searchCriteriaViewModel.filterTerm)
                     .disableAutocorrection(true)
                     .navigationSplitViewColumnWidth(min: ConsoleView.contentColumnWidth, ideal: 420, max: 640)
             },
@@ -80,15 +86,15 @@ private struct Siderbar: View {
 
     var body: some View {
         List {
-            makeForEach(viewModel: viewModel)
+            ConsoleListContentView(viewModel: viewModel.list)
         }
             .toolbar {
                 ToolbarItemGroup(placement: .automatic) {
                     ConsoleToolbarItems(viewModel: viewModel)
                 }
             }
-            .onAppear(perform: viewModel.onAppear)
-            .onDisappear(perform: viewModel.onDisappear)
+            .onAppear { viewModel.isViewVisible = true }
+            .onDisappear { viewModel.isViewVisible = false }
     }
 }
 
@@ -98,9 +104,9 @@ private struct ConsoleToolbarItems: View {
     var body: some View {
         ConsoleSettingsButton(store: viewModel.store)
         Spacer()
-        ConsoleToolbarModePickerButton(viewModel: viewModel)
+        ConsoleToolbarModePickerButton(viewModel: viewModel.searchCriteriaViewModel)
             .keyboardShortcut("n", modifiers: [.command, .shift])
-        ConsoleToolbarToggleOnlyErrorsButton(isOnlyErrors: $viewModel.isOnlyErrors)
+        ConsoleToolbarToggleOnlyErrorsButton(viewModel: viewModel.searchCriteriaViewModel)
             .keyboardShortcut("e", modifiers: [.command, .shift])
         FilterPopoverToolbarButton(viewModel: viewModel)
             .keyboardShortcut("f", modifiers: [.command, .option])
@@ -140,23 +146,23 @@ private struct FilterPopoverToolbarButton: View {
 }
 
 private struct ConsoleToolbarModePickerButton: View {
-    @ObservedObject var viewModel: ConsoleViewModel
+    @ObservedObject var viewModel: ConsoleSearchCriteriaViewModel
 
     var body: some View {
-        Button(action: viewModel.toggleMode) {
-            Image(systemName: viewModel.mode == .network ? "arrow.down.circle.fill" : "arrow.down.circle")
-                .foregroundColor(viewModel.mode == .network ? Color.accentColor : Color.secondary)
+        Button(action: { viewModel.isOnlyNetwork.toggle() }) {
+            Image(systemName: viewModel.isOnlyNetwork ? "arrow.down.circle.fill" : "arrow.down.circle")
+                .foregroundColor(viewModel.isOnlyNetwork ? Color.accentColor : Color.secondary)
         }.help("Automatically Scroll to Recent Messages (⇧⌘N)")
     }
 }
 
 struct ConsoleToolbarToggleOnlyErrorsButton: View {
-    @Binding var isOnlyErrors: Bool
+    @ObservedObject var viewModel: ConsoleSearchCriteriaViewModel
 
     var body: some View {
-        Button(action: { isOnlyErrors.toggle() }) {
-            Image(systemName: isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon")
-                .foregroundColor(isOnlyErrors ? .red : .secondary)
+        Button(action: { viewModel.isOnlyErrors.toggle() }) {
+            Image(systemName: viewModel.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon")
+                .foregroundColor(viewModel.isOnlyErrors ? .red : .secondary)
         }.help("Toggle Show Only Errors (⇧⌘E)")
     }
 }

@@ -10,7 +10,7 @@ import Combine
 #if os(iOS)
 
 public struct ConsoleView: View {
-    @StateObject private var viewModel: ConsoleViewModel
+    @StateObject private var viewModel: ConsoleViewModel // Never reloads
 
     public init(store: LoggerStore = .shared) {
         self.init(viewModel: .init(store: store))
@@ -22,77 +22,29 @@ public struct ConsoleView: View {
 
 
     public var body: some View {
-        _ConsoleView(viewModel: viewModel)
-            .sheet(isPresented: $viewModel.isShowingFilters) {
-                NavigationView {
-                    ConsoleSearchCriteriaView(viewModel: viewModel.searchCriteriaViewModel)
-                        .inlineNavigationTitle("Filters")
-                        .navigationBarItems(trailing: Button("Done") {
-                            viewModel.isShowingFilters = false
-                        })
-                }
-            }
-    }
-}
-
-struct _ConsoleView: View {
-    let viewModel: ConsoleViewModel
-
-    @State private var shareItems: ShareItems?
-    @State private var isShowingAsText = false
-    @State private var selectedShareOutput: ShareOutput?
-
-    var body: some View {
-        _ConsoleListView(viewModel: viewModel)
+        ConsoleListView(viewModel: viewModel)
+            .onAppear { viewModel.isViewVisible = true }
+            .onDisappear { viewModel.isViewVisible = false }
             .navigationTitle(viewModel.title)
-            .navigationBarItems(
-                leading: viewModel.onDismiss.map {
-                    Button(action: $0) { Text("Close") }
-                },
-                trailing: HStack {
-                    if let _ = selectedShareOutput {
-                        ProgressView()
-                            .frame(width: 27, height: 27)
-                    } else {
-                        Menu(content: { shareMenu }) {
-                            Image(systemName: "square.and.arrow.up")
-                        }
-                        .disabled(selectedShareOutput != nil)
-                    }
-                    ConsoleContextMenu(viewModel: viewModel, isShowingAsText: $isShowingAsText)
-                }
-            )
-            .sheet(item: $shareItems, content: ShareView.init)
-            .sheet(isPresented: $isShowingAsText) {
-                NavigationView {
-                    ConsoleTextView(entities: viewModel.entitiesSubject) {
-                        isShowingAsText = false
-                    }
-                }
-            }
-
+            .navigationBarItems(leading: leadingNavigationBarItems, trailing: trailingNavigationBarItems)
+            .background(ConsoleRouterView(viewModel: viewModel))
     }
 
-    @ViewBuilder
-    private var shareMenu: some View {
-        Button(action: { share(as: .plainText) }) {
-            Label("Share as Text", systemImage: "square.and.arrow.up")
-        }
-        Button(action: { share(as: .html) }) {
-            Label("Share as HTML", systemImage: "square.and.arrow.up")
+    private var leadingNavigationBarItems: some View {
+        viewModel.onDismiss.map {
+            Button(action: $0) { Text("Close") }
         }
     }
 
-    private func share(as output: ShareOutput) {
-        selectedShareOutput = output
-        viewModel.prepareForSharing(as: output) { item in
-            selectedShareOutput = nil
-            shareItems = item
+    private var trailingNavigationBarItems: some View {
+        HStack {
+            ConsoleShareButton(viewModel: viewModel)
+            ConsoleContextMenu(viewModel: viewModel)
         }
     }
 }
 
-private struct _ConsoleListView: View {
+private struct ConsoleListView: View {
     let viewModel: ConsoleViewModel
     @ObservedObject private var searchBarViewModel: ConsoleSearchBarViewModel
 
@@ -107,15 +59,13 @@ private struct _ConsoleListView: View {
                 _ConsoleSearchableContentView(viewModel: viewModel)
             } else {
                 _ConsoleRegularContentView(viewModel: viewModel)
-                    .onAppear(perform: viewModel.onAppear)
-                    .onDisappear(perform: viewModel.onDisappear)
             }
         }
         .listStyle(.plain)
 
         if #available(iOS 16, *) {
             list
-                .environment(\.defaultMinListRowHeight, 8) // TODO: refactor
+                .environment(\.defaultMinListRowHeight, 8)
                 .searchable(text: $searchBarViewModel.text, tokens: $searchBarViewModel.tokens, token: {
                     if let image = $0.systemImage {
                         Label($0.title, systemImage: image)
@@ -145,7 +95,7 @@ private struct _ConsoleSearchableContentView: View {
 
     var body: some View {
         contents.onChange(of: isSearching) {
-            viewModel.searchViewModel.isViewVisible = $0
+            viewModel.isSearching = $0
         }
     }
 
@@ -155,29 +105,28 @@ private struct _ConsoleSearchableContentView: View {
             ConsoleSearchView(viewModel: viewModel)
         } else {
             _ConsoleRegularContentView(viewModel: viewModel)
-                .onAppear(perform: viewModel.onAppear)
-                .onDisappear(perform: viewModel.onDisappear)
         }
     }
 }
 
 private struct _ConsoleRegularContentView: View {
-    @ObservedObject var viewModel: ConsoleViewModel
+    let viewModel: ConsoleViewModel
 
     var body: some View {
-        let toolbar = ConsoleToolbarView(title: viewModel.toolbarTitle, viewModel: viewModel)
+        let toolbar = ConsoleToolbarView(viewModel: viewModel)
         if #available(iOS 15.0, *) {
             toolbar.listRowSeparator(.hidden, edges: .top)
         } else {
             toolbar
         }
-        makeForEach(viewModel: viewModel)
+        ConsoleListContentView(viewModel: viewModel.list)
         footerView
     }
 
+    #warning("implement on other platforms and move to the list?")
     @ViewBuilder
     private var footerView: some View {
-        if #available(iOS 15, *), viewModel.searchCriteriaViewModel.criteria.shared.dates == .session, viewModel.order == .latestFirst {
+        if #available(iOS 15, *), viewModel.searchCriteriaViewModel.criteria.shared.dates == .session, viewModel.list.options.order == .descending {
             Button(action: { viewModel.searchCriteriaViewModel.criteria.shared.dates.startDate = nil }) {
                 Text("Show Previous Sessions")
                     .font(.subheadline)
@@ -188,6 +137,8 @@ private struct _ConsoleRegularContentView: View {
         }
     }
 }
+
+// MARK: - Previews
 
 #if DEBUG
 struct ConsoleView_Previews: PreviewProvider {
@@ -204,6 +155,6 @@ struct ConsoleView_Previews: PreviewProvider {
 extension ConsoleView {
     /// Creates a view pre-configured to display only network requests
     public static func network(store: LoggerStore = .shared) -> ConsoleView {
-        ConsoleView(viewModel: .init(store: store, mode: .network))
+        ConsoleView(viewModel: .init(store: store, isOnlyNetwork: true))
     }
 }
