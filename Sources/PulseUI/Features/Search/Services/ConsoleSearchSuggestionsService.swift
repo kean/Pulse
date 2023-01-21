@@ -54,17 +54,7 @@ final class ConsoleSearchSuggestionsService {
             .compactMap { try? $0.parse(context.searchText) }
             .sorted(by: { $0.1 > $1.1 }) // Sort by confidence
 
-#warning("you can order messages + saved persistently")
-#warning("do we need isSameType?")
-
 #warning("when I start typing /, suggest path filter and add auto-completion")
-#warning("should contains/begins with and regex should be filters?")
-#warning("do we need to suggest tokens in filters? probably not")
-#warning("filter recent searches by type")
-#warning("add a way to show entire search histroy")
-#warning("do we need to differenciate between suggestions and recent searches with filters?")
-#warning("show more than 3 top if high confidence and still allow to show more?")
-#warning("add scopes to options")
 #warning("20X support")
 
         // Auto-complete hosts (TODO: refactor)
