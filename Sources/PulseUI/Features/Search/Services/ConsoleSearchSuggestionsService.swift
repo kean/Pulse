@@ -56,6 +56,8 @@ final class ConsoleSearchSuggestionsService {
 
 #warning("when I start typing /, suggest path filter and add auto-completion")
 #warning("should options be applied to host and other text-based searched; how to noify user?")
+#warning("20X to display as 20X and not 200..<210")
+#warning("Add more examples to filters")
 
         // Auto-complete hosts (TODO: refactor)
         var hasHostsFilter = false
