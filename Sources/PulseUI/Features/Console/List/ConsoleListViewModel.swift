@@ -78,18 +78,19 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
 
     func refreshController() {
         let request: NSFetchRequest<NSManagedObject>
+        let sortKey = isOnlyNetwork ? options.taskSortBy.key : options.messageSortBy.key
         if isOnlyNetwork {
             request = .init(entityName: "\(NetworkTaskEntity.self)")
             request.sortDescriptors = [
                 grouping.key.map { NSSortDescriptor(key: $0, ascending: grouping.isAscending) },
-                NSSortDescriptor(keyPath: \NetworkTaskEntity.createdAt, ascending: options.order == .ascending)
+                NSSortDescriptor(key: sortKey, ascending: options.order == .ascending)
             ].compactMap { $0 }
         } else {
             request = .init(entityName: "\(LoggerMessageEntity.self)")
             request.relationshipKeyPathsForPrefetching = ["request"]
             request.sortDescriptors = [
                 grouping.key.map { NSSortDescriptor(key: $0, ascending: grouping.isAscending) },
-                NSSortDescriptor(keyPath: \LoggerMessageEntity.createdAt, ascending: options.order == .ascending)
+                NSSortDescriptor(key: sortKey, ascending: options.order == .ascending)
             ].compactMap { $0 }
         }
         request.fetchBatchSize = fetchBatchSize

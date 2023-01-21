@@ -19,8 +19,14 @@ struct ConsoleListOptions {
 
     enum MessageSortBy: String, CaseIterable {
         case dateCreated = "Date Created"
+        case level = "Level"
 
-        var key: String { "createdAt" }
+        var key: String {
+            switch self {
+            case .dateCreated: return "createdAt"
+            case .level: return "level"
+            }
+        }
     }
 
     enum TaskSortBy: String, CaseIterable {
@@ -33,8 +39,8 @@ struct ConsoleListOptions {
             switch self {
             case .dateCreated: return "createdAt"
             case .duration: return "duration"
-            case .requestSize: return "responseBodySize"
-            case .responseSize: return "requestBodySize"
+            case .requestSize: return "requestBodySize"
+            case .responseSize: return "responseBodySize"
             }
         }
     }
