@@ -22,14 +22,13 @@ struct ConsoleSearchView: View {
     var body: some View {
         if viewModel.isShowingContent {
             suggestionsView
-            if viewModel.isNewResultsButtonShown {
+            if true || viewModel.isNewResultsButtonShown {
                 showNewResultsPromptView
             }
             searchResultsView
         }
     }
 
-#warning("improve design for 'has new messages'")
 #warning("fix filters style (not became plain)")
 
     @ViewBuilder
@@ -68,7 +67,7 @@ struct ConsoleSearchView: View {
                 .font(.subheadline)
             }.buttonStyle(.plain)
         }
-        .listRowInsets(EdgeInsets(top: 8, leading: 00, bottom: 0, trailing: 20))
+        .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 0, trailing: 20))
         .listRowSeparator(.hidden, edges: .bottom)
     }
 
@@ -79,7 +78,7 @@ struct ConsoleSearchView: View {
                 Text("New Results Available")
                 Image(systemName: "arrow.clockwise.circle.fill")
             }
-            .font(.headline)
+            .font(.subheadline)
             .foregroundColor(.white)
             .padding(8)
             .background(Color.blue)
@@ -87,7 +86,6 @@ struct ConsoleSearchView: View {
         }
         .listRowSeparator(.hidden)
         .listRowBackground(Color.separator.opacity(0.18))
-        .padding(.vertical, 8)
         .frame(maxWidth: .infinity, alignment: .center)
         .listRowBackground(Color.clear)
     }
