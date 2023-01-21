@@ -15,6 +15,7 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
 #warning("remove subject")
     let entitiesSubject = CurrentValueSubject<[NSManagedObject], Never>([])
 
+#warning("move these to a struct")
     // Sorting/Grouping
     @Published var messageSortBy: ConsoleMessageSortBy = .dateCreated
     @Published var taskSortBy: ConsoleTaskSortBy = .dateCreated
@@ -30,21 +31,19 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
         }
     }
 
-    var mode: ConsoleMode
-
     /// This exist strickly to workaround List performance issues
     private var scrollPosition: ScrollPosition = .nearTop
     private var visibleEntityCountLimit = fetchBatchSize
     private var visibleObjectIDs: Set<NSManagedObjectID> = []
 
+    private var isOnlyNetwork = false
     private let store: LoggerStore
     private let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
     private var controller: NSFetchedResultsController<NSManagedObject>?
     private var cancellables: [AnyCancellable] = []
 
-    init(store: LoggerStore, mode: ConsoleMode, criteria: ConsoleSearchCriteriaViewModel) {
+    init(store: LoggerStore, criteria: ConsoleSearchCriteriaViewModel) {
         self.store = store
-        self.mode = mode
         self.searchCriteriaViewModel = criteria
 
         super.init()
@@ -53,13 +52,31 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
             entitiesSubject.send($0)
         }.store(in: &cancellables)
 
+        searchCriteriaViewModel.$criteria
+            .dropFirst()
+            .throttle(for: 0.5, scheduler: DispatchQueue.main, latest: true)
+            .sink { [weak self] _ in self?.refresh() }
+            .store(in: &cancellables)
+
+        searchCriteriaViewModel.$isOnlyErrors
+            .dropFirst()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in self?.refresh() }
+            .store(in: &cancellables)
+
+        // important: no drop first and refreshes immediatelly
+        searchCriteriaViewModel.$isOnlyNetwork.sink { [weak self] in
+            self?.isOnlyNetwork = $0
+            self?.refreshController()
+        }.store(in: &cancellables)
+
         $order.dropFirst().receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.refreshController()
         }.store(in: &cancellables)
     }
 
     func refreshController() {
-        let request = makeFetchRequest(for: mode, order: order)
+        let request = makeFetchRequest(isOnlyNetwork: isOnlyNetwork, order: order)
         controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: store.viewContext, sectionNameKeyPath: nil, cacheName: nil)
         controller?.delegate = self
 
@@ -68,18 +85,19 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
     }
 
     #warning("remove filter term parametes?")
+    #warning("is it ok we dispatch-async this?")
     func refresh(isOnlyErrors: Bool = false, filterTerm: String = "") {
         // Search messages
         guard let controller = controller else {
             return assertionFailure()
         }
-        switch mode {
-        case .messages:
-            controller.fetchRequest.predicate = ConsoleSearchCriteria.makeMessagePredicates(criteria: searchCriteriaViewModel.criteria, isOnlyErrors: isOnlyErrors, filterTerm: filterTerm)
-        case .network:
-            controller.fetchRequest.predicate = ConsoleSearchCriteria.makeNetworkPredicates(criteria: searchCriteriaViewModel.criteria, isOnlyErrors: isOnlyErrors, filterTerm: filterTerm)
+        if isOnlyNetwork {
+            controller.fetchRequest.predicate = ConsoleSearchCriteria.makeNetworkPredicates(criteria: searchCriteriaViewModel.criteria, isOnlyErrors: searchCriteriaViewModel.isOnlyErrors, filterTerm: filterTerm)
+        } else {
+            controller.fetchRequest.predicate = ConsoleSearchCriteria.makeMessagePredicates(criteria: searchCriteriaViewModel.criteria, isOnlyErrors: searchCriteriaViewModel.isOnlyErrors, filterTerm: filterTerm)
         }
         try? controller.performFetch()
+
         reloadMessages()
     }
 
@@ -150,16 +168,15 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
     }
 }
 
-private func makeFetchRequest(for mode: ConsoleMode, order: ConsoleOrdering) -> NSFetchRequest<NSManagedObject> {
+private func makeFetchRequest(isOnlyNetwork: Bool, order: ConsoleOrdering) -> NSFetchRequest<NSManagedObject> {
     let request: NSFetchRequest<NSManagedObject>
-    switch mode {
-    case .messages:
+    if isOnlyNetwork {
+        request = .init(entityName: "\(NetworkTaskEntity.self)")
+        request.sortDescriptors = [NSSortDescriptor(keyPath: \NetworkTaskEntity.createdAt, ascending: order == .ascending)]
+    } else {
         request = .init(entityName: "\(LoggerMessageEntity.self)")
         request.relationshipKeyPathsForPrefetching = ["request"]
         request.sortDescriptors = [NSSortDescriptor(keyPath: \LoggerMessageEntity.createdAt, ascending: order == .ascending)]
-    case .network:
-        request = .init(entityName: "\(NetworkTaskEntity.self)")
-        request.sortDescriptors = [NSSortDescriptor(keyPath: \NetworkTaskEntity.createdAt, ascending: order == .ascending)]
     }
     request.fetchBatchSize = fetchBatchSize
     return request

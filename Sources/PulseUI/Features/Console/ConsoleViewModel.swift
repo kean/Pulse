@@ -12,7 +12,7 @@ import SwiftUI
 
 final class ConsoleViewModel: ObservableObject {
     let title: String
-    let isNetworkOnly: Bool
+    let isNetworkModeEnabled: Bool
     let store: LoggerStore
 
     let list: ConsoleListViewModel
@@ -31,7 +31,7 @@ final class ConsoleViewModel: ObservableObject {
 
     #warning("reimplement this")
     var toolbarTitle: String {
-        let suffix = mode == .network ? "Requests" : "Messages"
+        let suffix = searchCriteriaViewModel.isOnlyNetwork ? "Requests" : "Messages"
         return "\(0) \(suffix)"
     }
 
@@ -44,8 +44,6 @@ final class ConsoleViewModel: ObservableObject {
     }
 
     // Filters
-    @Published var mode: ConsoleMode
-    @Published var isOnlyErrors = false
     @Published var filterTerm: String = ""
     @Published var isShowingFilters = false
 
@@ -53,15 +51,14 @@ final class ConsoleViewModel: ObservableObject {
 
     private var cancellables: [AnyCancellable] = []
 
-    init(store: LoggerStore, mode: ConsoleMode = .messages) {
-        self.title = mode == .network ? "Network" : "Console"
+    init(store: LoggerStore, isOnlyNetwork: Bool = false) {
+        self.title = isOnlyNetwork ? "Network" : "Console"
         self.store = store
-        self.mode = mode
-        self.isNetworkOnly = mode == .network
+        self.isNetworkModeEnabled = isOnlyNetwork
 
         self.searchCriteriaViewModel = ConsoleSearchCriteriaViewModel(store: store)
         self.searchBarViewModel = ConsoleSearchBarViewModel()
-        self.list = ConsoleListViewModel(store: store, mode: mode, criteria: searchCriteriaViewModel)
+        self.list = ConsoleListViewModel(store: store, criteria: searchCriteriaViewModel)
 
 #if os(iOS)
         self.insightsViewModel = InsightsViewModel(store: store)
@@ -72,34 +69,13 @@ final class ConsoleViewModel: ObservableObject {
 
         searchCriteriaViewModel.bind(list.$entities)
 
+        #warning("move filterTerm")
         $filterTerm
             .dropFirst()
             .throttle(for: 0.25, scheduler: RunLoop.main, latest: true)
             .sink { [weak self] filterTerm in
                 self?.refresh(filterTerm: filterTerm)
             }.store(in: &cancellables)
-
-        searchCriteriaViewModel.$criteria
-            .dropFirst()
-            .throttle(for: 0.5, scheduler: DispatchQueue.main, latest: true)
-            .sink { [weak self] _ in self?.refreshList() }
-            .store(in: &cancellables)
-
-        $isOnlyErrors.receive(on: DispatchQueue.main).dropFirst().sink { [weak self] _ in
-            self?.refreshList()
-        }.store(in: &cancellables)
-
-        list.refreshController()
-    }
-
-    // MARK: Mode
-
-    func toggleMode() {
-        switch mode {
-        case .messages: mode = .network
-        case .network: mode = .messages
-        }
-        list.refreshController()
     }
 
     // MARK: Refresh
@@ -133,8 +109,4 @@ final class ConsoleViewModel: ObservableObject {
     func prepareForSharing(as output: ShareOutput, _ completion: @escaping (ShareItems?) -> Void) {
         ShareService.share(list.entities, store: store, as: output, completion)
     }
-}
-
-enum ConsoleMode {
-    case messages, network
 }

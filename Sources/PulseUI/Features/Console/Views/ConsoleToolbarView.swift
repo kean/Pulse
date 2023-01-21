@@ -20,7 +20,7 @@ struct ConsoleToolbarView: View {
                 .font(.subheadline.weight(.medium))
             Spacer()
             HStack(spacing: 14) {
-                ConsoleFiltersView(viewModel: viewModel, isShowingFilters: $viewModel.isShowingFilters)
+                ConsoleFiltersView(isNetworkModeEnabled: viewModel.isNetworkModeEnabled, viewModel: viewModel.searchCriteriaViewModel, isShowingFilters: $viewModel.isShowingFilters)
             }
         }
         .buttonStyle(.plain)
@@ -28,13 +28,14 @@ struct ConsoleToolbarView: View {
 }
 
 struct ConsoleFiltersView: View {
-    @ObservedObject var viewModel: ConsoleViewModel
+    let isNetworkModeEnabled: Bool
+    @ObservedObject var viewModel: ConsoleSearchCriteriaViewModel
     @Binding var isShowingFilters: Bool
 
     var body: some View {
-        if !viewModel.isNetworkOnly {
-            Button(action: viewModel.toggleMode) {
-                Image(systemName: viewModel.mode == .network ? "arrow.down.circle.fill" : "arrow.down.circle")
+        if !isNetworkModeEnabled {
+            Button(action: { viewModel.isOnlyNetwork.toggle() }) {
+                Image(systemName: viewModel.isOnlyNetwork ? "arrow.down.circle.fill" : "arrow.down.circle")
                     .font(.system(size: 20))
                     .foregroundColor(.accentColor)
             }
@@ -45,7 +46,7 @@ struct ConsoleFiltersView: View {
                 .foregroundColor(viewModel.isOnlyErrors ? .red : .accentColor)
         }
         Button(action: { isShowingFilters = true }) {
-            Image(systemName: viewModel.searchCriteriaViewModel.isCriteriaDefault ? "line.horizontal.3.decrease.circle" : "line.3.horizontal.decrease.circle.fill")
+            Image(systemName: viewModel.isCriteriaDefault ? "line.horizontal.3.decrease.circle" : "line.3.horizontal.decrease.circle.fill")
                 .font(.system(size: 20))
                 .foregroundColor(.accentColor)
         }

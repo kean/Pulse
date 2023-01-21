@@ -203,6 +203,6 @@ struct ConsoleView_Previews: PreviewProvider {
 extension ConsoleView {
     /// Creates a view pre-configured to display only network requests
     public static func network(store: LoggerStore = .shared) -> ConsoleView {
-        ConsoleView(viewModel: .init(store: store, mode: .network))
+        ConsoleView(viewModel: .init(store: store, isOnlyNetwork: true))
     }
 }

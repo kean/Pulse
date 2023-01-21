@@ -36,7 +36,7 @@ struct ConsoleSearchCriteriaView: View {
         buttonReset
 #elseif os(macOS)
         HStack {
-            Text(viewModel.mode == .network ? "Network Filters" : "Message Filters")
+            Text(viewModel.isOnlyNetwork ? "Network Filters" : "Message Filters")
                 .font(.headline)
             Spacer()
             buttonReset
@@ -47,16 +47,7 @@ struct ConsoleSearchCriteriaView: View {
         timePeriodSection
         generalSection
 
-        switch viewModel.mode {
-        case .messages:
-#if os(iOS) || os(macOS)
-            if #available(iOS 15, *) {
-                customMessageFiltersSection
-            }
-#endif
-            logLevelsSection
-            labelsSection
-        case .network:
+        if viewModel.isOnlyNetwork {
 #if os(iOS) || os(macOS)
             if #available(iOS 15, *) {
                 customNetworkFiltersSection
@@ -65,6 +56,14 @@ struct ConsoleSearchCriteriaView: View {
             responseSection
             domainsSection
             networkingSection
+        } else {
+#if os(iOS) || os(macOS)
+            if #available(iOS 15, *) {
+                customMessageFiltersSection
+            }
+#endif
+            logLevelsSection
+            labelsSection
         }
     }
 
@@ -205,13 +204,13 @@ struct ConsoleSearchCriteriaView_Previews: PreviewProvider {
 #else
         Group {
             NavigationView {
-                makePreview(mode: .messages)
+                makePreview(isOnlyNetwork: false)
             }
             .navigationViewStyle(.stack)
             .previewDisplayName("Messages")
 
             NavigationView {
-                makePreview(mode: .network)
+                makePreview(isOnlyNetwork: true)
             }
             .navigationViewStyle(.stack)
             .previewDisplayName("Network")
@@ -220,16 +219,12 @@ struct ConsoleSearchCriteriaView_Previews: PreviewProvider {
     }
 }
 
-private func makePreview(mode: ConsoleMode) -> some View {
-    let entities: [NSManagedObject]
+private func makePreview(isOnlyNetwork: Bool) -> some View {
     let store = LoggerStore.mock
-    switch mode {
-    case .messages: entities = try! store.allMessages()
-    case .network: entities = try! store.allTasks()
-    }
+    let entities: [NSManagedObject] = try! isOnlyNetwork ? store.allTasks() : store.allMessages()
     let viewModel = ConsoleSearchCriteriaViewModel(store: store)
     viewModel.bind(CurrentValueSubject(entities))
-    viewModel.mode = mode
+    viewModel.isOnlyNetwork = isOnlyNetwork
     return ConsoleSearchCriteriaView(viewModel: viewModel)
 }
 #endif

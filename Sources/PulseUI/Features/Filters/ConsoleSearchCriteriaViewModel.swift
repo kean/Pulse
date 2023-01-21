@@ -10,8 +10,9 @@ import SwiftUI
 final class ConsoleSearchCriteriaViewModel: ObservableObject {
     var isButtonResetEnabled: Bool { !isCriteriaDefault }
 
+    @Published var isOnlyErrors = false
+    @Published var isOnlyNetwork = false
     @Published var criteria = ConsoleSearchCriteria()
-    @Published var mode: ConsoleMode = .messages // warning: not source of truth
 
     @Published private(set) var labels: [String] = []
     @Published private(set) var domains: [String] = []
@@ -61,9 +62,10 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
 
     var isCriteriaDefault: Bool {
         guard criteria.shared == defaultCriteria.shared else { return false }
-        switch mode {
-        case .messages: return criteria.messages == defaultCriteria.messages
-        case .network: return criteria.network == defaultCriteria.network
+        if isOnlyNetwork {
+            return criteria.messages == defaultCriteria.messages
+        } else {
+            return criteria.network == defaultCriteria.network
         }
     }
 
@@ -86,14 +88,7 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
     }
 
     private func reloadCounters() {
-        switch mode {
-        case .messages:
-            guard let messages = entities as? [LoggerMessageEntity] else {
-                return assertionFailure()
-            }
-            labelsCountedSet = NSCountedSet(array: messages.map(\.label.name))
-            labels = (labelsCountedSet.allObjects as! [String]).sorted()
-        case .network:
+        if isOnlyNetwork {
             guard let tasks = entities as? [NetworkTaskEntity] else {
                 return assertionFailure()
             }
@@ -101,6 +96,12 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
             domains = (domainsCountedSet.allObjects as! [String]).sorted(by: { lhs, rhs in
                 domainsCountedSet.count(for: lhs) > domainsCountedSet.count(for: rhs)
             })
+        } else {
+            guard let messages = entities as? [LoggerMessageEntity] else {
+                return assertionFailure()
+            }
+            labelsCountedSet = NSCountedSet(array: messages.map(\.label.name))
+            labels = (labelsCountedSet.allObjects as! [String]).sorted()
         }
     }
 
