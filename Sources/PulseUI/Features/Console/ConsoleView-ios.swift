@@ -59,7 +59,7 @@ struct _ConsoleView: View {
                         }
                         .disabled(selectedShareOutput != nil)
                     }
-                    ConsoleContextMenu(store: viewModel.store, insights: viewModel.insightsViewModel, isShowingAsText: $isShowingAsText)
+                    ConsoleContextMenu(viewModel: viewModel, isShowingAsText: $isShowingAsText)
                 }
             )
             .sheet(item: $shareItems, content: ShareView.init)
@@ -177,7 +177,7 @@ private struct _ConsoleRegularContentView: View {
 
     @ViewBuilder
     private var footerView: some View {
-        if #available(iOS 15, *), viewModel.searchCriteriaViewModel.criteria.shared.dates == .session {
+        if #available(iOS 15, *), viewModel.searchCriteriaViewModel.criteria.shared.dates == .session, viewModel.order == .latestFirst {
             Button(action: { viewModel.searchCriteriaViewModel.criteria.shared.dates.startDate = nil }) {
                 Text("Show Previous Sessions")
                     .font(.subheadline)

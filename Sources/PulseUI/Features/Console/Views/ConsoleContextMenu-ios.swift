@@ -12,8 +12,7 @@ import Combine
 import UniformTypeIdentifiers
 
 struct ConsoleContextMenu: View {
-    let store: LoggerStore
-    let insights: InsightsViewModel
+    @ObservedObject var viewModel: ConsoleViewModel
     @Binding var isShowingAsText: Bool
 
     @State private var isShowingSettings = false
@@ -32,7 +31,7 @@ struct ConsoleContextMenu: View {
                         Label("View as Text", systemImage: "text.quote")
                     }
                 }
-                if !store.isArchive {
+                if !viewModel.store.isArchive {
                     Button(action: { isShowingInsights = true }) {
                         Label("Insights", systemImage: "chart.pie")
                     }
@@ -45,13 +44,22 @@ struct ConsoleContextMenu: View {
                 Button(action: { isShowingShareStore = true }) {
                     Label("Share Store", systemImage: "square.and.arrow.up")
                 }
-                if !store.isArchive {
+                if !viewModel.store.isArchive {
                     Button.destructive(action: buttonRemoveAllTapped) {
                         Label("Remove Logs", systemImage: "trash")
                     }
                 }
             }
             Section {
+                if viewModel.order == .latestFirst {
+                    Button(action: { viewModel.order = .oldestFirst }) {
+                        Label("Newest First", systemImage: "arrow.down")
+                    }
+                } else {
+                    Button(action: { viewModel.order = .latestFirst }) {
+                        Label("Oldest First", systemImage: "arrow.up")
+                    }
+                }
                 Button(action: { isShowingSettings = true }) {
                     Label("Settings", systemImage: "gear")
                 }
@@ -71,7 +79,7 @@ struct ConsoleContextMenu: View {
         }
         .sheet(isPresented: $isShowingSettings) {
             NavigationView {
-                SettingsView(store: store)
+                SettingsView(store: viewModel.store)
                     .navigationTitle("Settings")
                     .navigationBarTitleDisplayMode(.inline)
                     .navigationBarItems(trailing: Button(action: { isShowingSettings = false }) {
@@ -81,7 +89,7 @@ struct ConsoleContextMenu: View {
         }
         .sheet(isPresented: $isShowingStoreInfo) {
             NavigationView {
-                StoreDetailsView(source: .store(store))
+                StoreDetailsView(source: .store(viewModel.store))
                     .navigationBarItems(trailing: Button(action: { isShowingStoreInfo = false }) {
                         Text("Done")
                     })
@@ -89,7 +97,7 @@ struct ConsoleContextMenu: View {
         }
         .sheet(isPresented: $isShowingInsights) {
             NavigationView {
-                InsightsView(viewModel: insights)
+                InsightsView(viewModel: viewModel.insightsViewModel)
                     .navigationBarItems(trailing: Button(action: { isShowingInsights = false }) {
                         Text("Done")
                     })
@@ -97,7 +105,7 @@ struct ConsoleContextMenu: View {
         }
         .sheet(isPresented: $isShowingShareStore) {
             NavigationView {
-                ShareStoreView(store: store, isPresented: $isShowingShareStore)
+                ShareStoreView(store: viewModel.store, isPresented: $isShowingShareStore)
             }.backport.presentationDetents([.medium])
            }
         .fullScreenCover(isPresented: $isDocumentBrowserPresented) {
@@ -106,7 +114,7 @@ struct ConsoleContextMenu: View {
     }
 
     private func buttonRemoveAllTapped() {
-        store.removeAll()
+        viewModel.store.removeAll()
 
         runHapticFeedback(.success)
         ToastView {
@@ -137,18 +145,4 @@ private struct DocumentBrowser: UIViewControllerRepresentable {
 
     }
 }
-
-#if DEBUG
-struct ConsoleContextMenu_Previews: PreviewProvider {
-    static var previews: some View {
-        NavigationView {
-            VStack {
-                ConsoleContextMenu(store: .mock, insights: .init(store: .mock), isShowingAsText: .constant(false))
-                Spacer()
-            }
-        }
-    }
-}
-#endif
-
 #endif

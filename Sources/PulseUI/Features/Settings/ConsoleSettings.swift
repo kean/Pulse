@@ -31,6 +31,9 @@ final class ConsoleSettings: PersistentSettings {
 
     @UserDefault("recent-filters")
     var recentFilters: String = "[]"
+
+    @UserDefault("messages-order-latest-first")
+    var isLatestMessagesFirstOrder = true
 }
 
 final class ConsoleTextViewSettings: PersistentSettings {
