@@ -33,7 +33,14 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         return "\(entities.count) \(suffix)"
     }
 
-    @Published var order: ConsoleMessagesOrder = .latestFirst
+    // Sorting/Grouping
+    @Published var messageSortBy: ConsoleMessageSortBy = .dateCreated
+    @Published var taskSortBy: ConsoleTaskSortBy = .dateCreated
+    @Published var order: ConsoleOrdering = .descending
+    @Published var messageGroupBy: ConsoleMessageGroupBy = .plain
+    @Published var taskGroupBy: ConsoleTaskGroupBy = .plain
+
+    // Filters
     @Published var mode: Mode
     @Published var isOnlyErrors = false
     @Published var filterTerm: String = ""
@@ -59,7 +66,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
         self.store = store
         self.mode = mode
         self.isNetworkOnly = mode == .network
-        self.order = ConsoleSettings.shared.isLatestMessagesFirstOrder ? .latestFirst : .oldestFirst
+        self.order = .descending
 
         self.searchBarViewModel = ConsoleSearchBarViewModel()
         self.searchCriteriaViewModel = ConsoleSearchCriteriaViewModel(store: store, entities: entitiesSubject)
@@ -94,8 +101,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
             self?.refreshNow()
         }.store(in: &cancellables)
 
-        $order.dropFirst().receive(on: DispatchQueue.main).sink { [weak self] in
-            ConsoleSettings.shared.isLatestMessagesFirstOrder = $0 == .latestFirst
+        $order.dropFirst().receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.prepareFetchController()
         }.store(in: &cancellables)
 
@@ -233,9 +239,9 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     }
 }
 
-private func makeFetchRequest(for mode: ConsoleViewModel.Mode, order: ConsoleMessagesOrder) -> NSFetchRequest<NSManagedObject> {
+private func makeFetchRequest(for mode: ConsoleViewModel.Mode, order: ConsoleOrdering) -> NSFetchRequest<NSManagedObject> {
     let request: NSFetchRequest<NSManagedObject>
-    let isAscending = order == .oldestFirst
+    let isAscending = order == .descending
     switch mode {
     case .messages:
         request = .init(entityName: "\(LoggerMessageEntity.self)")
@@ -251,7 +257,36 @@ private func makeFetchRequest(for mode: ConsoleViewModel.Mode, order: ConsoleMes
 
 private let fetchBatchSize = 100
 
-enum ConsoleMessagesOrder: String {
-    case latestFirst = "Latest First"
-    case oldestFirst = "Oldest First"
+enum ConsoleOrdering: String, CaseIterable {
+    case descending = "Descending"
+    case ascending = "Ascending"
+}
+
+enum ConsoleMessageSortBy: String, CaseIterable {
+    case dateCreated = "Date Created"
+}
+
+enum ConsoleTaskSortBy: String, CaseIterable {
+    case dateCreated = "Date Created"
+    case duration = "Duration"
+    case requestSize = "Request Size"
+    case responseSize = "Response Size"
+}
+
+enum ConsoleMessageGroupBy: String, CaseIterable {
+    case plain = "None"
+    case label = "Label"
+    case level = "Level"
+    case file = "File"
+}
+
+enum ConsoleTaskGroupBy: String, CaseIterable {
+    case plain = "None"
+    case url = "URL"
+    case host = "Host"
+    case method = "Method"
+    case scheme = "Scheme"
+    case taskType = "Task Type"
+    case statusCode = "Status Code"
+    case errorCode = "Error Code"
 }

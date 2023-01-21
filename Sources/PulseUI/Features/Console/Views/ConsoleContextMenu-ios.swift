@@ -51,15 +51,10 @@ struct ConsoleContextMenu: View {
                 }
             }
             Section {
-                if viewModel.order == .latestFirst {
-                    Button(action: { viewModel.order = .oldestFirst }) {
-                        Label("Newest First", systemImage: "arrow.down")
-                    }
-                } else {
-                    Button(action: { viewModel.order = .latestFirst }) {
-                        Label("Oldest First", systemImage: "arrow.up")
-                    }
-                }
+                sortByMenu
+                groupByMenu
+            }
+            Section {
                 Button(action: { isShowingSettings = true }) {
                     Label("Settings", systemImage: "gear")
                 }
@@ -111,6 +106,54 @@ struct ConsoleContextMenu: View {
         .fullScreenCover(isPresented: $isDocumentBrowserPresented) {
             DocumentBrowser()
         }
+    }
+
+    @ViewBuilder
+    private var sortByMenu: some View {
+        Menu(content: {
+            switch viewModel.mode {
+            case .messages:
+                Picker("Sort By", selection: $viewModel.messageSortBy) {
+                    ForEach(ConsoleMessageSortBy.allCases, id: \.self) {
+                        Text($0.rawValue).tag($0)
+                    }
+                }
+            case .network:
+                Picker("Sort By", selection: $viewModel.taskSortBy) {
+                    ForEach(ConsoleTaskSortBy.allCases, id: \.self) {
+                        Text($0.rawValue).tag($0)
+                    }
+                }
+            }
+            Picker("Ordering", selection: $viewModel.order) {
+                Text("Descending").tag(ConsoleOrdering.descending)
+                Text("Ascending").tag(ConsoleOrdering.ascending)
+            }
+        }, label: {
+            Label("Sort By", systemImage: "arrow.up.arrow.down")
+        })
+    }
+
+    @ViewBuilder
+    private var groupByMenu: some View {
+        Menu(content: {
+            switch viewModel.mode {
+            case .messages:
+                Picker("Group By", selection: $viewModel.taskGroupBy) {
+                    ForEach(ConsoleMessageGroupBy.allCases, id: \.self) {
+                        Text($0.rawValue).tag($0)
+                    }
+                }
+            case .network:
+                Picker("Group By", selection: $viewModel.taskGroupBy) {
+                    ForEach(ConsoleTaskGroupBy.allCases, id: \.self) {
+                        Text($0.rawValue).tag($0)
+                    }
+                }
+            }
+        }, label: {
+            Label("Group By", systemImage: "rectangle.3.group")
+        })
     }
 
     private func buttonRemoveAllTapped() {

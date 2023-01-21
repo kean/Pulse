@@ -126,6 +126,25 @@ struct PlainListGroupSeparator: View {
 }
 
 @available(iOS 15, tvOS 15, *)
+struct PlainListClearSectionHeader: View {
+    let title: String
+
+    var body: some View {
+        HStack(alignment: .bottom, spacing: 0) {
+            Text(title)
+                .foregroundColor(.secondary)
+                .font(.subheadline.weight(.medium))
+            Spacer()
+        }
+        .padding(.top, 16)
+        .listRowBackground(Color.separator.opacity(0.18))
+#if os(iOS)
+        .listRowSeparator(.hidden)
+#endif
+    }
+}
+
+@available(iOS 15, tvOS 15, *)
 struct PlainListSectionHeaderSeparator: View {
     let title: String
 
