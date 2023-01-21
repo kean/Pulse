@@ -20,7 +20,7 @@ struct ConsoleTaskCell: View {
         let contents = VStack(alignment: .leading, spacing: 5) {
             title
             message
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(macOS) || os(watchOS)
             if viewModel.task.state == .pending {
                 Text(ConsoleFormatter.progress(for: viewModel.task) ?? "...")
                     .lineLimit(1)
@@ -54,11 +54,13 @@ struct ConsoleTaskCell: View {
             PinView(viewModel: viewModel.pinViewModel, font: ConsoleConstants.fontTitle)
                 .frame(width: 4, height: 4) // don't affect layout
 #endif
+#if !os(watchOS)
             Text(viewModel.time)
                 .font(ConsoleConstants.fontTitle)
                 .foregroundColor(viewModel.task.state == .failure ? .red : .secondary)
                 .lineLimit(1)
                 .backport.monospacedDigit()
+#endif
         }
     }
 
@@ -71,17 +73,28 @@ struct ConsoleTaskCell: View {
     }
 
     private var details: some View {
-        (Text(Image(systemName: "arrow.up")).fontWeight(.light) +
-         Text(" " + byteCount(for: viewModel.task.requestBodySize)) +
-         Text("   ") +
-         Text(Image(systemName: "arrow.down")).fontWeight(.light) +
-         Text(" " + byteCount(for: viewModel.task.responseBodySize)) +
-         Text("   ") +
-         Text(Image(systemName: "clock")).fontWeight(.light) +
-         Text(" " + (ConsoleFormatter.duration(for: viewModel.task) ?? "–")))
+        (transferSizeText + durationText)
             .lineLimit(1)
             .font(ConsoleConstants.fontTitle)
             .foregroundColor(.secondary)
+    }
+
+    private var transferSizeText: Text {
+        Text(Image(systemName: "arrow.up")).fontWeight(.light) +
+        Text(" " + byteCount(for: viewModel.task.requestBodySize)) +
+        Text("   ") +
+        Text(Image(systemName: "arrow.down")).fontWeight(.light) +
+        Text(" " + byteCount(for: viewModel.task.responseBodySize))
+    }
+
+    private var durationText: Text {
+#if !os(watchOS)
+        Text("   ") +
+        Text(Image(systemName: "clock")).fontWeight(.light) +
+        Text(" " + (ConsoleFormatter.duration(for: viewModel.task) ?? "–"))
+#else
+        Text("")
+#endif
     }
 
     private func byteCount(for size: Int64) -> String {
