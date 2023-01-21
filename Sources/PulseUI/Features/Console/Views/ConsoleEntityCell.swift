@@ -37,11 +37,32 @@ private struct _ConsoleMessageCell: View {
         if #available(iOS 15, *) {
             cell.swipeActions(edge: .leading, allowsFullSwipe: true) {
                 PinButton(viewModel: .init(message)).tint(.pink)
-            }.swipeActions(edge: .trailing, allowsFullSwipe: true) {
+            }
+            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                 Button(action: { shareItems = ShareService.share(message, as: .html) }) {
                     Label("Share", systemImage: "square.and.arrow.up.fill")
                 }.tint(.blue)
-            }.sheet(item: $shareItems, content: ShareView.init)
+            }
+            .backport.contextMenu(menuItems: {
+                Section {
+                    Button(action: { shareItems = ShareService.share(message, as: .html) }) {
+                        Label("Share", systemImage: "square.and.arrow.up")
+                    }.tint(.blue)
+                    Button(action: { UXPasteboard.general.string = message.text }) {
+                        Label("Copy Message", systemImage: "doc.on.doc")
+                    }.tint(.blue)
+                }
+                Section {
+                    PinButton(viewModel: .init(message)).tint(.pink)
+                }
+            }, preview: {
+                Text(message.text)
+                    .font(ConsoleConstants.fontBody)
+                    .foregroundColor(.textColor(for: message.logLevel))
+                    .frame(idealWidth: 320)
+                    .padding()
+            })
+            .sheet(item: $shareItems, content: ShareView.init)
         } else {
             cell
         }

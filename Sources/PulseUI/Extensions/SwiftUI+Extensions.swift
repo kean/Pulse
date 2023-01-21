@@ -78,6 +78,19 @@ extension View {
 
 extension Backport {
     @ViewBuilder
+    func contextMenu<M: View, P: View>(@ViewBuilder menuItems: () -> M, @ViewBuilder preview: () -> P) -> some View {
+#if !os(watchOS)
+        if #available(iOS 16, tvOS 16, macOS 13, *) {
+            self.content.contextMenu(menuItems: menuItems, preview: preview)
+        } else {
+            self.content.contextMenu(menuItems: menuItems)
+        }
+#else
+        self.content
+#endif
+    }
+
+    @ViewBuilder
     func presentationDetents(_ detents: Set<PresentationDetent>) -> some View {
 #if os(iOS)
         if #available(iOS 16, *) {
