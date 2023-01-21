@@ -207,15 +207,14 @@ enum ConsoleTaskSortBy: String, CaseIterable {
 }
 
 enum ConsoleMessageGroupBy: String, CaseIterable {
-    case plain = "None"
+    case plain = "No Grouping"
     case label = "Label"
     case level = "Level"
     case file = "File"
 }
 
-#warning("remove none")
 enum ConsoleTaskGroupBy: String, CaseIterable {
-    case plain = "None"
+    case plain = "No Grouping"
     case url = "URL"
     case host = "Host"
     case method = "Method"
