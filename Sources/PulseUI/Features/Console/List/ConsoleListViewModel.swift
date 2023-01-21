@@ -65,7 +65,7 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
             .sink { [weak self] _ in self?.refresh() }
             .store(in: &cancellables)
 
-        // important: no drop first and refreshes immediatelly
+        // important: no drop first and refreshes immediately
         searchCriteriaViewModel.$isOnlyNetwork.sink { [weak self] in
             self?.isOnlyNetwork = $0
             self?.refreshController()
