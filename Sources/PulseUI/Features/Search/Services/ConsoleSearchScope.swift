@@ -6,7 +6,6 @@ import Foundation
 
 enum ConsoleSearchScope: Equatable, Hashable, Codable, CaseIterable {
     case url
-    case queryItems
     case originalRequestHeaders
     case currentRequestHeaders
     case requestBody
@@ -29,7 +28,6 @@ enum ConsoleSearchScope: Equatable, Hashable, Codable, CaseIterable {
     var fullTitle: String {
         switch self {
         case .url: return "URL"
-        case .queryItems: return "Query Items"
         case .originalRequestHeaders: return "Original Request Headers"
         case .currentRequestHeaders: return "Current Request Headers"
         case .requestBody: return "Request Body"

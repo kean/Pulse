@@ -77,11 +77,6 @@ final class ConsoleSearchService {
                         occurrences += search(url as NSString, parameters, scope)
                     }
                 }
-            case .queryItems:
-                if let components = URLComponents(string: task.url ?? ""),
-                   let query = components.query, !query.isEmpty {
-                    occurrences += search(query as NSString, parameters, scope)
-                }
             case .originalRequestHeaders:
                 if let headers = task.originalRequest?.httpHeaders {
                     occurrences += search(headers as NSString, parameters, scope)

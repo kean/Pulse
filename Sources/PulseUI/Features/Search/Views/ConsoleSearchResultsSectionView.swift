@@ -73,12 +73,6 @@ struct ConsoleSearchResultView: View {
                         $0.render(task, content: .requestComponents)
                     }
                 }
-            case .queryItems:
-                NetworkDetailsView(title: "URL") {
-                    TextRenderer(options: .sharing).make {
-                        $0.render(task, content: [.requestComponents, .requestQueryItems])
-                    }
-                }
             case .originalRequestHeaders:
                 makeHeadersDetails(title: "Request Headers", headers: task.originalRequest?.headers)
             case .currentRequestHeaders:
