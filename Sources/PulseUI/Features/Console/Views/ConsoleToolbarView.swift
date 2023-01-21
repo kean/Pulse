@@ -10,14 +10,11 @@ import Combine
 #if os(iOS)
 
 struct ConsoleToolbarView: View {
-    let title: String
     let viewModel: ConsoleViewModel
 
     var body: some View {
         HStack(alignment: .bottom, spacing: 0) {
-            Text(title)
-                .foregroundColor(.secondary)
-                .font(.subheadline.weight(.medium))
+            ConsoleToolbarTitle(viewModel: viewModel)
             Spacer()
             HStack(spacing: 14) {
                 ConsoleFiltersView(
@@ -28,6 +25,26 @@ struct ConsoleToolbarView: View {
             }
         }
         .buttonStyle(.plain)
+    }
+}
+
+private struct ConsoleToolbarTitle: View {
+    let viewModel: ConsoleViewModel
+
+    @State private var title: String = ""
+
+    var body: some View {
+        Text(title)
+            .foregroundColor(.secondary)
+            .font(.subheadline.weight(.medium))
+            .onReceive(titlePublisher) { title = $0 }
+    }
+
+    private var titlePublisher: some Publisher<String, Never> {
+        viewModel.list.$entities.combineLatest(viewModel.searchCriteriaViewModel.$isOnlyNetwork)
+            .map { entities, isOnlyNetwork in
+                "\(entities.count) \(isOnlyNetwork ? "Requests" : "Messages")"
+            }
     }
 }
 

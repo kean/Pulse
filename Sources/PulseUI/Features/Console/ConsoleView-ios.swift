@@ -147,7 +147,7 @@ private struct _ConsoleRegularContentView: View {
     let viewModel: ConsoleViewModel
 
     var body: some View {
-        let toolbar = ConsoleToolbarView(title: viewModel.toolbarTitle, viewModel: viewModel)
+        let toolbar = ConsoleToolbarView(viewModel: viewModel)
         if #available(iOS 15.0, *) {
             toolbar.listRowSeparator(.hidden, edges: .top)
         } else {

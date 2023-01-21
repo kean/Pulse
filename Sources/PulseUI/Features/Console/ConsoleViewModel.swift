@@ -7,7 +7,6 @@ import Pulse
 import Combine
 import SwiftUI
 
-#warning("container for ConsoleVieWModl that doesn't refresh itself")
 #warning("rework public API")
 
 final class ConsoleViewModel: ObservableObject {
@@ -31,12 +30,6 @@ final class ConsoleViewModel: ObservableObject {
 
     let router = ConsoleRouter()
 
-    #warning("reimplement this")
-    var toolbarTitle: String {
-        let suffix = searchCriteriaViewModel.isOnlyNetwork ? "Requests" : "Messages"
-        return "\(0) \(suffix)"
-    }
-
     var isViewVisible: Bool = false {
         didSet { refreshListsVisibility() }
     }
@@ -44,10 +37,6 @@ final class ConsoleViewModel: ObservableObject {
     var isSearching = false {
         didSet { refreshListsVisibility() }
     }
-
-    // Filters
-    #warning("remove")
-    @Published var isShowingFilters = false
 
     var onDismiss: (() -> Void)?
 
