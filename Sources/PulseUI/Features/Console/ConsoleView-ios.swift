@@ -29,6 +29,7 @@ public struct ConsoleView: View {
 struct _ConsoleView: View {
     let viewModel: ConsoleViewModel
 
+    #warning("remove")
     @State private var selectedShareOutput: ShareOutput?
 
     var body: some View {

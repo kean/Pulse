@@ -9,17 +9,9 @@ import Combine
 
 #if os(iOS)
 
-import UniformTypeIdentifiers
-
 struct ConsoleContextMenu: View {
     let viewModel: ConsoleViewModel
     @ObservedObject var router: ConsoleRouter
-
-    @State private var isShowingSettings = false
-    @State private var isShowingStoreInfo = false
-    @State private var isShowingInsights = false
-    @State private var isShowingShareStore = false
-    @State private var isShowingDocumentBrowser = false
 
     init(viewModel: ConsoleViewModel) {
         self.viewModel = viewModel
@@ -37,16 +29,16 @@ struct ConsoleContextMenu: View {
                     }
                 }
                 if !viewModel.store.isArchive {
-                    Button(action: { isShowingInsights = true }) {
+                    Button(action: { router.isShowingInsights = true }) {
                         Label("Insights", systemImage: "chart.pie")
                     }
                 }
             }
             Section {
-                Button(action: { isShowingStoreInfo = true }) {
+                Button(action: { router.isShowingStoreInfo = true }) {
                     Label("Store Info", systemImage: "info.circle")
                 }
-                Button(action: { isShowingShareStore = true }) {
+                Button(action: { router.isShowingShareStore = true }) {
                     Label("Share Store", systemImage: "square.and.arrow.up")
                 }
                 if !viewModel.store.isArchive {
@@ -60,7 +52,7 @@ struct ConsoleContextMenu: View {
                 groupByMenu
             }
             Section {
-                Button(action: { isShowingSettings = true }) {
+                Button(action: { router.isShowingSettings = true }) {
                     Label("Settings", systemImage: "gear")
                 }
             }
@@ -76,40 +68,6 @@ struct ConsoleContextMenu: View {
             }
         } label: {
             Image(systemName: "ellipsis.circle")
-        }
-        .sheet(isPresented: $isShowingSettings) {
-            NavigationView {
-                SettingsView(store: viewModel.store)
-                    .navigationTitle("Settings")
-                    .navigationBarTitleDisplayMode(.inline)
-                    .navigationBarItems(trailing: Button(action: { isShowingSettings = false }) {
-                        Text("Done")
-                    })
-            }
-        }
-        .sheet(isPresented: $isShowingStoreInfo) {
-            NavigationView {
-                StoreDetailsView(source: .store(viewModel.store))
-                    .navigationBarItems(trailing: Button(action: { isShowingStoreInfo = false }) {
-                        Text("Done")
-                    })
-            }
-        }
-        .sheet(isPresented: $isShowingInsights) {
-            NavigationView {
-                InsightsView(viewModel: viewModel.insightsViewModel)
-                    .navigationBarItems(trailing: Button(action: { isShowingInsights = false }) {
-                        Text("Done")
-                    })
-            }
-        }
-        .sheet(isPresented: $isShowingShareStore) {
-            NavigationView {
-                ShareStoreView(store: viewModel.store, isPresented: $isShowingShareStore)
-            }.backport.presentationDetents([.medium])
-           }
-        .fullScreenCover(isPresented: $isShowingDocumentBrowser) {
-            DocumentBrowser()
         }
     }
 
@@ -187,16 +145,6 @@ struct ConsoleContextMenu: View {
     private func buttonSendFeedbackTapped() {
         guard let url = URL(string: "https://github.com/kean/Pulse/issues") else { return }
         UIApplication.shared.open(url)
-    }
-}
-
-private struct DocumentBrowser: UIViewControllerRepresentable {
-    func makeUIViewController(context: Context) -> DocumentBrowserViewController {
-        DocumentBrowserViewController(forOpeningContentTypes: [UTType(filenameExtension: "pulse")].compactMap { $0 })
-    }
-
-    func updateUIViewController(_ uiViewController: DocumentBrowserViewController, context: Context) {
-
     }
 }
 #endif

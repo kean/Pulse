@@ -96,4 +96,9 @@ final class ConsoleRouter: ObservableObject {
     @Published var shareItems: ShareItems?
     @Published var isShowingAsText = false
     @Published var isShowingFilters = false
+    @Published var isShowingSettings = false
+    @Published var isShowingStoreInfo = false
+    @Published var isShowingInsights = false
+    @Published var isShowingShareStore = false
+    @Published var isShowingDocumentBrowser = false
 }
