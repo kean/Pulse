@@ -20,7 +20,6 @@ struct ConsoleTaskCell: View {
         let contents = VStack(alignment: .leading, spacing: 5) {
             title
             message
-#if os(iOS) || os(macOS) || os(watchOS)
             if viewModel.task.state == .pending {
                 Text(ConsoleFormatter.progress(for: viewModel.task) ?? "...")
                     .lineLimit(1)
@@ -29,7 +28,6 @@ struct ConsoleTaskCell: View {
             } else {
                 details
             }
-#endif
         }
 #if os(macOS)
         contents.padding(.vertical, 4)

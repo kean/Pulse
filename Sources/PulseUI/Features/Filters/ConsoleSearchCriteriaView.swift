@@ -193,11 +193,11 @@ struct ConsoleSearchCriteriaView_Previews: PreviewProvider {
     static var previews: some View {
 #if os(macOS)
         Group {
-            makePreview(mode: .messages)
+            makePreview(isOnlyNetwork: false)
                 .previewLayout(.fixed(width: 320, height: 900))
                 .previewDisplayName("Messages")
 
-            makePreview(mode: .network)
+            makePreview(isOnlyNetwork: true)
                 .previewLayout(.fixed(width: 320, height: 900))
                 .previewDisplayName("Network")
         }
