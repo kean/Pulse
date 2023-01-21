@@ -31,11 +31,15 @@ struct ConsoleTaskCell: View {
             }
 #endif
         }
+#if os(macOS)
+        contents.padding(.vertical, 4)
+#else
         if #unavailable(iOS 16) {
             contents.padding(.vertical, 4)
         } else {
             contents
         }
+#endif
     }
 
     private var title: some View {
