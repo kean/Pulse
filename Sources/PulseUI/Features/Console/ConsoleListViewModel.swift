@@ -11,18 +11,10 @@ import SwiftUI
 final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, ObservableObject {
     @Published private(set) var visibleEntities: ArraySlice<NSManagedObject> = []
     @Published private(set) var entities: [NSManagedObject] = []
+    @Published var options = ConsoleListOptions()
 
-#warning("remove subject")
     let entitiesSubject = CurrentValueSubject<[NSManagedObject], Never>([])
     let didRefresh = PassthroughSubject<Void, Never>()
-
-#warning("move these to a struct")
-    // Sorting/Grouping
-    @Published var messageSortBy: ConsoleMessageSortBy = .dateCreated
-    @Published var taskSortBy: ConsoleTaskSortBy = .dateCreated
-    @Published var order: ConsoleOrdering = .descending
-    @Published var messageGroupBy: ConsoleMessageGroupBy = .plain
-    @Published var taskGroupBy: ConsoleTaskGroupBy = .plain
 
     var isViewVisible = false {
         didSet {
@@ -77,13 +69,13 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
             self?.refreshController()
         }.store(in: &cancellables)
 
-        $order.dropFirst().receive(on: DispatchQueue.main).sink { [weak self] _ in
+        $options.dropFirst().receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.refreshController()
         }.store(in: &cancellables)
     }
 
     func refreshController() {
-        let request = makeFetchRequest(isOnlyNetwork: isOnlyNetwork, order: order)
+        let request = makeFetchRequest(isOnlyNetwork: isOnlyNetwork, order: options.order)
         controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: store.viewContext, sectionNameKeyPath: nil, cacheName: nil)
         controller?.delegate = self
 
@@ -189,6 +181,14 @@ private func makeFetchRequest(isOnlyNetwork: Bool, order: ConsoleOrdering) -> NS
 }
 
 private let fetchBatchSize = 100
+
+struct ConsoleListOptions {
+    var messageSortBy: ConsoleMessageSortBy = .dateCreated
+    var taskSortBy: ConsoleTaskSortBy = .dateCreated
+    var order: ConsoleOrdering = .descending
+    var messageGroupBy: ConsoleMessageGroupBy = .plain
+    var taskGroupBy: ConsoleTaskGroupBy = .plain
+}
 
 enum ConsoleOrdering: String, CaseIterable {
     case descending = "Descending"

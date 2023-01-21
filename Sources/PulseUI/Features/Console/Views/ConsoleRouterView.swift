@@ -18,13 +18,24 @@ final class ConsoleRouter: ObservableObject {
     @Published var isShowingDocumentBrowser = false
 }
 
-#if os(iOS)
 
 struct ConsoleRouterView: View {
     let viewModel: ConsoleViewModel
     @ObservedObject var router: ConsoleRouter
 
+    init(viewModel: ConsoleViewModel) {
+        self.viewModel = viewModel
+        self.router = viewModel.router
+    }
+
     var body: some View {
+        contents
+    }
+}
+
+#if os(iOS)
+extension ConsoleRouterView {
+    var contents: some View {
         Text("").invisible()
             .sheet(isPresented: $router.isShowingAsText) { destinationTextView }
             .sheet(isPresented: $router.isShowingFilters) { destinationFilters }
@@ -105,16 +116,8 @@ private struct DocumentBrowser: UIViewControllerRepresentable {
 
 #elseif os(watchOS)
 
-struct ConsoleRouterView: View {
-    let viewModel: ConsoleViewModel
-    @ObservedObject private var router: ConsoleRouter
-
-    init(viewModel: ConsoleViewModel) {
-        self.viewModel = viewModel
-        self.router = viewModel.router
-    }
-
-    var body: some View {
+extension ConsoleRouterView {
+    var contents: some View {
         Text("").invisible()
             .sheet(isPresented: $router.isShowingSettings) {
                 NavigationView {

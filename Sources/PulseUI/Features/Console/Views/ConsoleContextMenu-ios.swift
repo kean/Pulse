@@ -11,10 +11,14 @@ import Combine
 
 struct ConsoleContextMenu: View {
     let viewModel: ConsoleViewModel
+    @ObservedObject var searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
+    @ObservedObject var listViewModel: ConsoleListViewModel
     @ObservedObject var router: ConsoleRouter
 
     init(viewModel: ConsoleViewModel) {
         self.viewModel = viewModel
+        self.searchCriteriaViewModel = viewModel.searchCriteriaViewModel
+        self.listViewModel = viewModel.list
         self.router = viewModel.router
     }
 
@@ -71,58 +75,50 @@ struct ConsoleContextMenu: View {
         }
     }
 
-    #warning("reimplement")
-
     @ViewBuilder
     private var sortByMenu: some View {
-        EmptyView()
-
-//        Menu(content: {
-//            switch viewModel.mode {
-//            case .messages:
-//                Picker("Sort By", selection: $viewModel.messageSortBy) {
-//                    ForEach(ConsoleMessageSortBy.allCases, id: \.self) {
-//                        Text($0.rawValue).tag($0)
-//                    }
-//                }
-//            case .network:
-//                Picker("Sort By", selection: $viewModel.taskSortBy) {
-//                    ForEach(ConsoleTaskSortBy.allCases, id: \.self) {
-//                        Text($0.rawValue).tag($0)
-//                    }
-//                }
-//            }
-//            Picker("Ordering", selection: $viewModel.order) {
-//                Text("Descending").tag(ConsoleOrdering.descending)
-//                Text("Ascending").tag(ConsoleOrdering.ascending)
-//            }
-//        }, label: {
-//            Label("Sort By", systemImage: "arrow.up.arrow.down")
-//        })
+        Menu(content: {
+            if viewModel.searchCriteriaViewModel.isOnlyNetwork {
+                Picker("Sort By", selection: $listViewModel.options.taskSortBy) {
+                    ForEach(ConsoleTaskSortBy.allCases, id: \.self) {
+                        Text($0.rawValue).tag($0)
+                    }
+                }
+            } else {
+                Picker("Sort By", selection: $listViewModel.options.messageSortBy) {
+                    ForEach(ConsoleMessageSortBy.allCases, id: \.self) {
+                        Text($0.rawValue).tag($0)
+                    }
+                }
+            }
+            Picker("Ordering", selection: $listViewModel.options.order) {
+                Text("Descending").tag(ConsoleOrdering.descending)
+                Text("Ascending").tag(ConsoleOrdering.ascending)
+            }
+        }, label: {
+            Label("Sort By", systemImage: "arrow.up.arrow.down")
+        })
     }
 
     @ViewBuilder
     private var groupByMenu: some View {
-        EmptyView()
-
-//        Menu(content: {
-//            switch viewModel.mode {
-//            case .messages:
-//                Picker("Group By", selection: $viewModel.taskGroupBy) {
-//                    ForEach(ConsoleMessageGroupBy.allCases, id: \.self) {
-//                        Text($0.rawValue).tag($0)
-//                    }
-//                }
-//            case .network:
-//                Picker("Group By", selection: $viewModel.taskGroupBy) {
-//                    ForEach(ConsoleTaskGroupBy.allCases, id: \.self) {
-//                        Text($0.rawValue).tag($0)
-//                    }
-//                }
-//            }
-//        }, label: {
-//            Label("Group By", systemImage: "rectangle.3.group")
-//        })
+        Menu(content: {
+            if viewModel.searchCriteriaViewModel.isOnlyNetwork {
+                Picker("Group By", selection: $listViewModel.options.taskGroupBy) {
+                    ForEach(ConsoleTaskGroupBy.allCases, id: \.self) {
+                        Text($0.rawValue).tag($0)
+                    }
+                }
+            } else {
+                Picker("Group By", selection: $listViewModel.options.taskGroupBy) {
+                    ForEach(ConsoleMessageGroupBy.allCases, id: \.self) {
+                        Text($0.rawValue).tag($0)
+                    }
+                }
+            }
+        }, label: {
+            Label("Group By", systemImage: "rectangle.3.group")
+        })
     }
 
     private func buttonRemoveAllTapped() {

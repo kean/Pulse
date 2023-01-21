@@ -123,10 +123,10 @@ private struct _ConsoleRegularContentView: View {
         footerView
     }
 
-    #warning("implement on other platforms?")
+    #warning("implement on other platforms and move to the list?")
     @ViewBuilder
     private var footerView: some View {
-        if #available(iOS 15, *), viewModel.searchCriteriaViewModel.criteria.shared.dates == .session, viewModel.list.order == .descending {
+        if #available(iOS 15, *), viewModel.searchCriteriaViewModel.criteria.shared.dates == .session, viewModel.list.options.order == .descending {
             Button(action: { viewModel.searchCriteriaViewModel.criteria.shared.dates.startDate = nil }) {
                 Text("Show Previous Sessions")
                     .font(.subheadline)
