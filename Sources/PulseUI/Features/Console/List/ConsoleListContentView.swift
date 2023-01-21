@@ -23,7 +23,7 @@ struct ConsoleListContentView: View {
     @available(iOS 15.0, *)
     private func makeGroupedView(_ sections: [NSFetchedResultsSectionInfo]) -> some View {
         ForEach(sections, id: \.name) { section in
-            PlainListClearSectionHeader(title: "\(makeName(for: section).capitalized) (\(section.numberOfObjects))")
+            PlainListClearSectionHeader(title: "\(makeName(for: section)) (\(section.numberOfObjects))")
             ForEach((section.objects as? [NSManagedObject]) ?? [], id: \.objectID) { entity in
                 ConsoleEntityCell(entity: entity)
             }
@@ -31,11 +31,23 @@ struct ConsoleListContentView: View {
     }
 
     private func makeName(for section: NSFetchedResultsSectionInfo) -> String {
-        if !viewModel.isOnlyNetwork, viewModel.options.messageGroupBy == .level {
-            let rawValue = Int16(Int(section.name) ?? 0)
-            return (LoggerStore.Level(rawValue: rawValue) ?? .debug).name
+        if !viewModel.isOnlyNetwork {
+            if viewModel.options.messageGroupBy == .level {
+                let rawValue = Int16(Int(section.name) ?? 0)
+                return (LoggerStore.Level(rawValue: rawValue) ?? .debug).name.capitalized
+            }
+        } else {
+            if viewModel.options.taskGroupBy == .taskType {
+                let rawValue = Int16(Int(section.name) ?? 0)
+                return NetworkLogger.TaskType(rawValue: rawValue)?.urlSessionTaskClassName ?? section.name
+            }
+            if viewModel.options.taskGroupBy == .statusCode {
+                let rawValue = Int32(section.name) ?? 0
+                return StatusCodeFormatter.string(for: rawValue)
+            }
         }
-        return section.name
+        let name = section.name
+        return name.isEmpty ? "–" : name
     }
 
 #else

@@ -31,6 +31,7 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
     private var visibleObjectIDs: Set<NSManagedObjectID> = []
 
     private(set) var isOnlyNetwork = false
+    var grouping: ConsoleListGroupBy { isOnlyNetwork ? options.taskGroupBy : options.messageGroupBy }
     private let store: LoggerStore
     private let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
     private var controller: NSFetchedResultsController<NSManagedObject>?
@@ -77,7 +78,6 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
 
     func refreshController() {
         let request: NSFetchRequest<NSManagedObject>
-        let grouping: ConsoleListGroupBy = isOnlyNetwork ? options.taskGroupBy : options.messageGroupBy
         if isOnlyNetwork {
             request = .init(entityName: "\(NetworkTaskEntity.self)")
             request.sortDescriptors = [
@@ -130,7 +130,7 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
 
     private func reloadMessages(isMandatory: Bool = true) {
         entities = controller?.fetchedObjects ?? []
-        sections = controller?.sections
+        sections = controller?.sectionNameKeyPath == nil ?  nil : controller?.sections
         if isMandatory || scrollPosition == .nearTop {
             refreshVisibleEntities()
         }

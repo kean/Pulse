@@ -6,13 +6,6 @@ import Foundation
 import CoreData
 import CommonCrypto
 
-func descriptionForStatusCode(_ statusCode: Int) -> String {
-    switch statusCode {
-    case 200: return "200 (OK)"
-    default: return "\(statusCode) (\( HTTPURLResponse.localizedString(forStatusCode: statusCode).capitalized))"
-    }
-}
-
 var Files: FileManager { FileManager.default }
 
 extension FileManager {

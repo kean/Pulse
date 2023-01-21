@@ -9,8 +9,7 @@ struct ConsoleListOptions {
     var messageSortBy: MessageSortBy = .dateCreated
     var taskSortBy: TaskSortBy = .dateCreated
     var order: Ordering = .descending
-#warning("temp")
-    var messageGroupBy: MessageGroupBy = .label
+    var messageGroupBy: MessageGroupBy = .noGrouping
     var taskGroupBy: TaskGroupBy = .noGrouping
 
     enum Ordering: String, CaseIterable {
@@ -77,16 +76,15 @@ struct ConsoleListOptions {
             case .noGrouping: return nil
             case .url: return "url"
             case .host: return "host.value"
-            case .method: return "method"
+            case .method: return "httpMethod"
             case .taskType: return "taskType"
-            case .statusCode: return "status"
+            case .statusCode: return "statusCode"
             case .errorCode: return "errorCode"
             }
         }
 
-        #warning("implement")
         var isAscending: Bool {
-            return true
+            self != .errorCode
         }
     }
 }

@@ -133,7 +133,7 @@ struct PlainListClearSectionHeader: View {
         HStack(alignment: .bottom, spacing: 0) {
             Text(title)
                 .foregroundColor(.secondary)
-                .lineLimit(1)
+                .lineLimit(3)
                 .font(.subheadline.weight(.medium))
             Spacer()
         }
