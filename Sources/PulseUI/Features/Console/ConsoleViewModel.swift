@@ -44,7 +44,7 @@ final class ConsoleViewModel: ObservableObject {
     }
 
     // Filters
-    @Published var filterTerm: String = ""
+    #warning("remove")
     @Published var isShowingFilters = false
 
     var onDismiss: (() -> Void)?
@@ -70,12 +70,7 @@ final class ConsoleViewModel: ObservableObject {
         searchCriteriaViewModel.bind(list.$entities)
 
         #warning("move filterTerm")
-        $filterTerm
-            .dropFirst()
-            .throttle(for: 0.25, scheduler: RunLoop.main, latest: true)
-            .sink { [weak self] filterTerm in
-                self?.refresh(filterTerm: filterTerm)
-            }.store(in: &cancellables)
+
     }
 
     // MARK: Refresh
@@ -87,11 +82,10 @@ final class ConsoleViewModel: ObservableObject {
         }
     }
 
+#warning("reomplement")
     private func refreshList() {
         // important: order
-        refresh(filterTerm: filterTerm)
-
-#warning("reomplement")
+//        refresh(filterTerm: filterTerm)
 #if os(iOS)
         if #available(iOS 15, *) {
             searchViewModel.refreshNow()

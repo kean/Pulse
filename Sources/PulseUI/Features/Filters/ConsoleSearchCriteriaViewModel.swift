@@ -12,6 +12,7 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
 
     @Published var isOnlyErrors = false
     @Published var isOnlyNetwork = false
+    @Published var filterTerm = "" // Legacy, used on non-iOS platforms
     @Published var criteria = ConsoleSearchCriteria()
 
     @Published private(set) var labels: [String] = []

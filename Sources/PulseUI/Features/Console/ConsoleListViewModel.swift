@@ -64,6 +64,12 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
             .sink { [weak self] _ in self?.refresh() }
             .store(in: &cancellables)
 
+        searchCriteriaViewModel.$filterTerm
+            .dropFirst()
+            .throttle(for: 0.25, scheduler: DispatchQueue.main, latest: true)
+            .sink { [weak self] _ in self?.refresh() }
+            .store(in: &cancellables)
+
         // important: no drop first and refreshes immediatelly
         searchCriteriaViewModel.$isOnlyNetwork.sink { [weak self] in
             self?.isOnlyNetwork = $0
@@ -80,21 +86,19 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
         controller = NSFetchedResultsController(fetchRequest: request, managedObjectContext: store.viewContext, sectionNameKeyPath: nil, cacheName: nil)
         controller?.delegate = self
 
-#warning("where do we get the search criteria from?")
         refresh()
     }
 
-    #warning("remove filter term parametes?")
-    #warning("is it ok we dispatch-async this?")
-    func refresh(isOnlyErrors: Bool = false, filterTerm: String = "") {
+    func refresh() {
         // Search messages
         guard let controller = controller else {
             return assertionFailure()
         }
+        let criteria = searchCriteriaViewModel
         if isOnlyNetwork {
-            controller.fetchRequest.predicate = ConsoleSearchCriteria.makeNetworkPredicates(criteria: searchCriteriaViewModel.criteria, isOnlyErrors: searchCriteriaViewModel.isOnlyErrors, filterTerm: filterTerm)
+            controller.fetchRequest.predicate = ConsoleSearchCriteria.makeNetworkPredicates(criteria: criteria.criteria, isOnlyErrors: criteria.isOnlyErrors, filterTerm: criteria.filterTerm)
         } else {
-            controller.fetchRequest.predicate = ConsoleSearchCriteria.makeMessagePredicates(criteria: searchCriteriaViewModel.criteria, isOnlyErrors: searchCriteriaViewModel.isOnlyErrors, filterTerm: filterTerm)
+            controller.fetchRequest.predicate = ConsoleSearchCriteria.makeMessagePredicates(criteria: criteria.criteria, isOnlyErrors: criteria.isOnlyErrors, filterTerm: criteria.filterTerm)
         }
         try? controller.performFetch()
 
