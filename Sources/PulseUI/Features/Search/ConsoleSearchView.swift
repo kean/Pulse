@@ -22,7 +22,7 @@ struct ConsoleSearchView: View {
     var body: some View {
         if viewModel.isShowingContent {
             suggestionsView
-            if true || viewModel.isNewResultsButtonShown {
+            if viewModel.isNewResultsButtonShown {
                 showNewResultsPromptView
             }
             searchResultsView
