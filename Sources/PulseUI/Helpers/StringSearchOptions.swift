@@ -38,8 +38,8 @@ struct StringSearchOptions: Equatable, Hashable, Codable {
 
     func allEligibleMatchingRules() -> [MatchingRule]? {
         switch kind {
-        case .text: return MatchingRule.allCases
-        case .wildcard, .regex: return nil
+        case .text, .wildcard: return MatchingRule.allCases
+        case .regex: return nil
         }
     }
 }

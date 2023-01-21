@@ -5,10 +5,6 @@ import Combine
 
 #if os(iOS)
 
-#warning("StringSearchOptionsMenu enable matching rule for wildcards")
-#warning("when search scope is applied, remove it from the list")
-#warning("remove scopes from auto-completion")
-
 @available(iOS 15, *)
 struct ConsoleSearchContextMenu: View {
     @ObservedObject var viewModel: ConsoleSearchViewModel
