@@ -113,6 +113,7 @@ private struct _ConsoleTaskCell: View {
     }
 }
 
+#if os(iOS)
 @available(iOS 15, tvOS 15, *)
 private struct ConsoleMessageCellPreview: View {
     let message: LoggerMessageEntity
@@ -146,6 +147,7 @@ private struct TextViewPreview: View {
             .padding(12)
     }
 }
+#endif
 
 // Create the underlying ViewModel lazily.
 private struct LazyNetworkInspectorView: View {
