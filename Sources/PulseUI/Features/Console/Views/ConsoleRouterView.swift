@@ -18,23 +18,22 @@ final class ConsoleRouter: ObservableObject {
     @Published var isShowingDocumentBrowser = false
 }
 
+#if os(iOS)
+
 struct ConsoleRouterView: View {
     let viewModel: ConsoleViewModel
     @ObservedObject var router: ConsoleRouter
 
     var body: some View {
-        Text("")
-            .invisible()
-            .sheet(item: $router.shareItems, content: ShareView.init)
+        Text("").invisible()
             .sheet(isPresented: $router.isShowingAsText) { destinationTextView }
             .sheet(isPresented: $router.isShowingFilters) { destinationFilters }
             .sheet(isPresented: $router.isShowingSettings) { destinationSettings }
             .sheet(isPresented: $router.isShowingStoreInfo) { destinationStoreInfo }
             .sheet(isPresented: $router.isShowingShareStore) { destinationShareStore }
-#if os(iOS)
+            .sheet(item: $router.shareItems, content: ShareView.init)
             .sheet(isPresented: $router.isShowingInsights) { destinationInsights }
             .fullScreenCover(isPresented: $router.isShowingDocumentBrowser) { DocumentBrowser() }
-#endif
     }
 
     private var destinationTextView: some View {
@@ -81,7 +80,6 @@ struct ConsoleRouterView: View {
         }.backport.presentationDetents([.medium])
     }
 
-#if os(iOS)
     @ViewBuilder
     private var destinationInsights: some View {
         NavigationView {
@@ -91,10 +89,8 @@ struct ConsoleRouterView: View {
                 })
         }
     }
-#endif
 }
 
-#if os(iOS)
 import UniformTypeIdentifiers
 
 private struct DocumentBrowser: UIViewControllerRepresentable {
@@ -106,4 +102,41 @@ private struct DocumentBrowser: UIViewControllerRepresentable {
 
     }
 }
+
+#elseif os(watchOS)
+
+struct ConsoleRouterView: View {
+    let viewModel: ConsoleViewModel
+    @ObservedObject private var router: ConsoleRouter
+
+    init(viewModel: ConsoleViewModel) {
+        self.viewModel = viewModel
+        self.router = viewModel.router
+    }
+
+    var body: some View {
+        Text("").invisible()
+            .sheet(isPresented: $router.isShowingSettings) {
+                NavigationView {
+                    SettingsView(viewModel: .init(store: viewModel.store))
+                        .toolbar {
+                            ToolbarItem(placement: .cancellationAction) {
+                                Button("Close") { router.isShowingSettings = false }
+                            }
+                        }
+                }
+            }
+            .sheet(isPresented: $router.isShowingFilters) {
+                NavigationView {
+                    ConsoleSearchCriteriaView(viewModel: viewModel.searchCriteriaViewModel)
+                        .toolbar {
+                            ToolbarItem(placement: .cancellationAction) {
+                                Button("Close") { router.isShowingFilters = false }
+                            }
+                        }
+                }
+            }
+    }
+}
+
 #endif

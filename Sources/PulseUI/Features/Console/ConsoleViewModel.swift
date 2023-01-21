@@ -7,8 +7,6 @@ import Pulse
 import Combine
 import SwiftUI
 
-#warning("rework public API")
-
 final class ConsoleViewModel: ObservableObject {
     let title: String
     let isNetworkModeEnabled: Bool
@@ -69,9 +67,11 @@ final class ConsoleViewModel: ObservableObject {
 
     private func refreshListsVisibility() {
         list.isViewVisible = !isSearching && isViewVisible
-        if #available(iOS 15, tvOS 15, *) {
+#if os(iOS)
+        if #available(iOS 15, *) {
             searchViewModel.isViewVisible = isSearching && isViewVisible
         }
+#endif
     }
 
     func prepareForSharing(as output: ShareOutput, _ completion: @escaping (ShareItems?) -> Void) {

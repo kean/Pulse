@@ -27,7 +27,7 @@ public struct ConsoleView: View {
             .onDisappear { viewModel.isViewVisible = false }
             .navigationTitle(viewModel.title)
             .navigationBarItems(leading: leadingNavigationBarItems, trailing: trailingNavigationBarItems)
-            .background(ConsoleRouterView(viewModel: viewModel, router: viewModel.router))
+            .background(ConsoleRouterView(viewModel: viewModel))
     }
 
     private var leadingNavigationBarItems: some View {
