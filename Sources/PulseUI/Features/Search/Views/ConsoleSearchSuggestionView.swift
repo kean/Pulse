@@ -36,10 +36,20 @@ struct ConsoleSearchSuggestionView: View {
                     .lineLimit(1)
                 Spacer()
                 if isActionable {
-                    Text("\\t")
-                        .foregroundColor(.separator)
+                    ShortcutTooltip(title: "Tab")
                 }
             }
         }
+    }
+}
+
+struct ShortcutTooltip: View {
+    let title: String
+
+    var body: some View {
+        Text(title)
+            .font(.caption)
+            .foregroundColor(.separator)
+            .background(Rectangle().frame(width: 34, height: 28).foregroundColor(Color.separator.opacity(0.2)).cornerRadius(8))
     }
 }
