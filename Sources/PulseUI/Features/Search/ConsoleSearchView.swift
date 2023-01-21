@@ -29,8 +29,6 @@ struct ConsoleSearchView: View {
         }
     }
 
-#warning("fix filters style (not became plain)")
-
     @ViewBuilder
     private var suggestionsView: some View {
         toolbar

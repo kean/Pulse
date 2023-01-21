@@ -23,6 +23,15 @@ public struct ConsoleView: View {
 
     public var body: some View {
         _ConsoleView(viewModel: viewModel)
+            .sheet(isPresented: $viewModel.isShowingFilters) {
+                NavigationView {
+                    ConsoleSearchCriteriaView(viewModel: viewModel.searchCriteriaViewModel)
+                        .inlineNavigationTitle("Filters")
+                        .navigationBarItems(trailing: Button("Done") {
+                            viewModel.isShowingFilters = false
+                        })
+                }
+            }
     }
 }
 

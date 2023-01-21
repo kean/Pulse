@@ -36,6 +36,7 @@ final class ConsoleViewModel: NSObject, NSFetchedResultsControllerDelegate, Obse
     @Published var mode: Mode
     @Published var isOnlyErrors = false
     @Published var filterTerm: String = ""
+    @Published var isShowingFilters = false
 
     var onDismiss: (() -> Void)?
 

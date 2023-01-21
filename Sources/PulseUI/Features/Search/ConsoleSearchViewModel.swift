@@ -7,7 +7,6 @@ import Pulse
 import CoreData
 import Combine
 
-#warning("remoev this ViewModel")
 final class ConsoleSearchBarViewModel: ObservableObject {
     @Published var text: String = ""
     @Published var tokens: [ConsoleSearchToken] = []
@@ -85,7 +84,6 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         self.store = store
         self.context = store.newBackgroundContext()
 
-        #warning("perform this in background?")
         self.hosts = ManagedObjectsObserver(context: store.viewContext, sortDescriptior: NSSortDescriptor(keyPath: \NetworkDomainEntity.count, ascending: false))
 
         let text = searchBar.$text

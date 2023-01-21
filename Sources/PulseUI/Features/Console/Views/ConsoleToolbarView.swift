@@ -12,7 +12,6 @@ import Combine
 struct ConsoleToolbarView: View {
     let title: String
     @ObservedObject var viewModel: ConsoleViewModel
-    @State private var isShowingFilters = false
 
     var body: some View {
         HStack(alignment: .bottom, spacing: 0) {
@@ -21,17 +20,10 @@ struct ConsoleToolbarView: View {
                 .font(.subheadline.weight(.medium))
             Spacer()
             HStack(spacing: 14) {
-                ConsoleFiltersView(viewModel: viewModel, isShowingFilters: $isShowingFilters)
+                ConsoleFiltersView(viewModel: viewModel, isShowingFilters: $viewModel.isShowingFilters)
             }
         }
         .buttonStyle(.plain)
-        .sheet(isPresented: $isShowingFilters) {
-            NavigationView {
-                ConsoleSearchCriteriaView(viewModel: viewModel.searchCriteriaViewModel)
-                    .inlineNavigationTitle("Filters")
-                    .navigationBarItems(trailing: Button("Done") { isShowingFilters = false })
-            }
-        }
     }
 }
 
