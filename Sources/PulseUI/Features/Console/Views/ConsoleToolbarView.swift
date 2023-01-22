@@ -104,29 +104,17 @@ struct ConsoleFiltersView: View {
     let viewModel: ConsoleViewModel
     @ObservedObject var listViewModel: ConsoleListViewModel
     @ObservedObject var searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
-    @ObservedObject var router: ConsoleRouter
-    private let isList: Bool
 
-    init(viewModel: ConsoleViewModel, isList: Bool = true) {
+    init(viewModel: ConsoleViewModel) {
         self.viewModel = viewModel
         self.listViewModel = viewModel.list
         self.searchCriteriaViewModel = viewModel.searchCriteriaViewModel
-        self.router = viewModel.router
-        self.isList = isList
     }
 
     var body: some View {
-        if isList {
-            if #available(iOS 15, *) {
-                sortByMenu.fixedSize()
-                groupByMenu.fixedSize()
-            }
-        } else {
-            Button(action: { router.isShowingFilters = true }) {
-                Image(systemName: searchCriteriaViewModel.isCriteriaDefault ? "line.horizontal.3.decrease.circle" : "line.3.horizontal.decrease.circle.fill")
-                    .font(.system(size: 20))
-                    .foregroundColor(.accentColor)
-            }
+        if #available(iOS 15, *) {
+            sortByMenu.fixedSize()
+            groupByMenu.fixedSize()
         }
         Button(action: { searchCriteriaViewModel.isOnlyErrors.toggle() }) {
             Image(systemName: searchCriteriaViewModel.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon")
