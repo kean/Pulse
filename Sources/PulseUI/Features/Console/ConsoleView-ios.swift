@@ -63,8 +63,6 @@ private struct ConsoleListView: View {
         }
         .listStyle(.plain)
 
-#warning("update number of messages")
-
         if #available(iOS 16, *) {
             list
                 .environment(\.defaultMinListRowHeight, 8)
@@ -123,17 +121,11 @@ private struct _ConsoleRegularContentView: View {
         }
 
 #warning("try pins as an ico ?")
-#warning("add swipe actions to change what you see")
-#warning("add underline or something - bold?")
-#warning("can these be a three separate screens?")
-#warning("remember persistenly?")
-#warning("reload with animation?")
 
         ConsoleListContentView(viewModel: viewModel.list)
         footerView
     }
 
-#warning("implement on other platforms and move to the list?")
     @ViewBuilder
     private var footerView: some View {
         if #available(iOS 15, *), viewModel.searchCriteriaViewModel.criteria.shared.dates == .session, viewModel.list.options.order == .descending {
