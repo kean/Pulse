@@ -167,6 +167,7 @@ struct PlainListExpandableSectionHeader<Destination: View>: View {
     let title: String
     let count: Int
     @ViewBuilder let destination: () -> Destination
+    var isSeeAllHidden = false
 
     var body: some View {
         PlainListSectionHeader {
@@ -177,12 +178,14 @@ struct PlainListExpandableSectionHeader<Destination: View>: View {
                 +
                 Text(" (\(count))")
                    .foregroundColor(.separator)
-                   .font(.subheadline.monospacedDigit())
-                Spacer()
-                Text("See All")
-                    .foregroundColor(.blue)
-                    .font(.subheadline)
-                .background(NavigationLink("", destination: destination).opacity(0))
+                   .font(.subheadline.weight(.medium).monospacedDigit())
+                if !isSeeAllHidden {
+                    Spacer()
+                    Text("See All")
+                        .foregroundColor(.blue)
+                        .font(.subheadline)
+                        .background(NavigationLink("", destination: destination).opacity(0))
+                }
             }
         }
     }

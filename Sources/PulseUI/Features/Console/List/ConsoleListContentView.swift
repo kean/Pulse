@@ -9,8 +9,6 @@ import SwiftUI
 
 struct ConsoleListContentView: View {
     @ObservedObject var viewModel: ConsoleListViewModel
-    @State private var expandedSections: Set<String> = []
-    @State private var isPinnedSectionExpanded = false
 
 #if os(iOS)
 
@@ -25,16 +23,14 @@ struct ConsoleListContentView: View {
     @available(iOS 15.0, *)
     private func makeGroupedView(_ sections: [NSFetchedResultsSectionInfo]) -> some View {
         ForEach(sections, id: \.name) { section in
-            PlainListSectionHeader(title: "\(makeName(for: section)) (\(section.numberOfObjects))")
             let objects = (section.objects as? [NSManagedObject]) ?? []
-            let prefix = expandedSections.contains(section.name) ? objects : Array(objects.prefix(4))
+            let prefix = objects.prefix(4)
+            PlainListExpandableSectionHeader(title: makeName(for: section), count: section.numberOfObjects, destination: {
+                ConsolePlainList(objects)
+                    .inlineNavigationTitle(makeName(for: section))
+            }, isSeeAllHidden: prefix.count == objects.count)
             ForEach(prefix, id: \.objectID) { entity in
                 ConsoleEntityCell(entity: entity)
-            }
-            if prefix.count < objects.count {
-                Button(action: { expandedSections.insert(section.name) }) {
-                    Text("Show More") + Text(" (\(objects.count - prefix.count))").foregroundColor(.secondary)
-                }
             }
         }
     }
@@ -83,18 +79,13 @@ struct ConsoleListContentView: View {
     @available(iOS 15, tvOS 15, *)
     @ViewBuilder
     private var pinsView: some View {
+        let prefix = Array(viewModel.pins.prefix(4))
         PlainListExpandableSectionHeader(title: "Pins", count: viewModel.pins.count, destination: {
             ConsolePlainList(viewModel.pins)
                 .inlineNavigationTitle("Pins")
-        })
-        let prefix = isPinnedSectionExpanded ? viewModel.pins : Array(viewModel.pins.prefix(4))
+        }, isSeeAllHidden: prefix.count == viewModel.pins.count)
         ForEach(prefix, id: \.objectID) { entity in
             ConsoleEntityCell(entity: entity)
-        }
-        if prefix.count < viewModel.pins.count {
-            Button(action: { isPinnedSectionExpanded = true }) {
-                Text("Show More") + Text(" (\(viewModel.pins.count - prefix.count))").foregroundColor(.secondary)
-            }
         }
         if !viewModel.visibleEntities.isEmpty {
             PlainListGroupSeparator()
