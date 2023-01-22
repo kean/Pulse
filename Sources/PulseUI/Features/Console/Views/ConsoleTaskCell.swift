@@ -7,8 +7,6 @@ import Pulse
 import Combine
 import CoreData
 
-#warning("disable reloads for FetchController")
-
 struct ConsoleTaskCell: View {
     @StateObject private var viewModel = ConsoleTaskCellViewModel()
 
