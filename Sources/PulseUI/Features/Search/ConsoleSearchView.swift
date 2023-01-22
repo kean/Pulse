@@ -71,10 +71,10 @@ struct ConsoleSearchView: View {
     private var showNewResultsPromptView: some View {
         Button(action: viewModel.buttonShowNewlyAddedSearchResultsTapped) {
             HStack {
-                Text("New Results Available")
                 Image(systemName: "arrow.clockwise.circle.fill")
+                Text("New Results Added")
             }
-            .font(.subheadline)
+            .font(.subheadline.weight(.medium))
             .foregroundColor(.white)
             .padding(8)
             .background(Color.blue)

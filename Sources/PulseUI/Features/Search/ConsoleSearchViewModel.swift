@@ -167,6 +167,9 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         guard !isNewResultsButtonShown else {
             return // We already know there are new results
         }
+        guard !parameters.isEmpty else {
+            return
+        }
         let operation = ConsoleSearchOperation(entities: entities, parameters: parameters, service: searchService, context: context)
         operation.delegate = self
         operation.resume()

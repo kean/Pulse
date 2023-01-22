@@ -9,8 +9,6 @@ import Combine
 
 #if os(iOS)
 
-#warning("fix new results available")
-
 public struct ConsoleView: View {
     @StateObject private var viewModel: ConsoleViewModel // Never reloads
 
