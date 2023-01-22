@@ -30,7 +30,7 @@ struct ConsoleListContentView: View {
                     .inlineNavigationTitle(makeName(for: section))
             }, isSeeAllHidden: prefix.count == objects.count)
             ForEach(prefix, id: \.objectID) { entity in
-                ConsoleEntityCell(entity: entity)
+                ConsoleEntityCell.make(for: entity)
             }
         }
     }
@@ -69,7 +69,7 @@ struct ConsoleListContentView: View {
             }
         }
         ForEach(viewModel.visibleEntities, id: \.objectID) { entity in
-            ConsoleEntityCell(entity: entity)
+            ConsoleEntityCell.make(for: entity)
                 .onAppear { viewModel.onAppearCell(with: entity.objectID) }
                 .onDisappear { viewModel.onDisappearCell(with: entity.objectID) }
         }
@@ -94,7 +94,7 @@ struct ConsoleListContentView: View {
 #endif
         }, isSeeAllHidden: prefix.count == viewModel.pins.count)
         ForEach(prefix.map(PinCellViewModel.init)) { viewModel in
-            ConsoleEntityCell(entity: viewModel.object)
+            ConsoleEntityCell.make(for: viewModel.object)
         }
         Button(action: viewModel.buttonRemovePinsTapped) {
             Text("Remove Pins")

@@ -23,6 +23,21 @@ struct ConsoleEntityCell: View {
             fatalError("Unsupported entity: \(entity)")
         }
     }
+
+    @ViewBuilder
+    static func make(for entity: NSManagedObject) -> some View {
+        if let task = entity as? NetworkTaskEntity {
+            _ConsoleTaskCell(task: task)
+        } else if let message = entity as? LoggerMessageEntity {
+            if let task = message.task {
+                _ConsoleTaskCell(task: task)
+            } else {
+                _ConsoleMessageCell(message: message)
+            }
+        } else {
+            fatalError("Unsupported entity: \(entity)")
+        }
+    }
 }
 
 private struct _ConsoleMessageCell: View {

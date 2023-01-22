@@ -322,9 +322,13 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
 
 @available(iOS 15, tvOS 15, *)
 struct ConsoleSearchResultViewModel: Identifiable {
-    var id: NSManagedObjectID { entity.objectID }
+    var id: ConsoleSearchResultKey { ConsoleSearchResultKey(id: entity.objectID) }
     let entity: NSManagedObject
     let occurrences: [ConsoleSearchOccurrence]
+}
+
+struct ConsoleSearchResultKey: Hashable{
+    let id: NSManagedObjectID
 }
 
 struct ConsoleSearchParameters: Equatable, Hashable {

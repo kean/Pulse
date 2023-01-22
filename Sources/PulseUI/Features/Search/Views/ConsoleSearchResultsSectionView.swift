@@ -14,7 +14,7 @@ struct ConsoleSearchResultView: View {
     var isSeparatorNeeded = false
 
     var body: some View {
-        ConsoleEntityCell(entity: viewModel.entity)
+        ConsoleEntityCell.make(for: viewModel.entity)
         let occurrences = Array(viewModel.occurrences.enumerated()).filter {
             // TODO: these should be displayed inline
             $0.element.scope != .message && $0.element.scope != .url

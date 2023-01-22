@@ -22,12 +22,14 @@ struct ConsoleTaskCell: View {
         let contents = VStack(alignment: .leading, spacing: 6) {
             title
             message
-            if let progress = viewModel.progress {
-                ConsoleProgressText(title: task.httpMethod ?? "GET", viewModel: progress)
+            if task.state == .pending {
+                ConsoleProgressText(title: task.httpMethod ?? "GET", viewModel: ProgressViewModel(task: task))
             } else {
                 details
             }
-        }.onAppear { viewModel.bind(task) }
+        }
+            .onAppear { viewModel.bind(task)}
+            .onChange(of: task) { viewModel.bind($0) }
 #if os(macOS)
         contents.padding(.vertical, 4)
 #else

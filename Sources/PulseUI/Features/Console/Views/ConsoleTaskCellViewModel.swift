@@ -9,7 +9,6 @@ import CoreData
 
 final class ConsoleTaskCellViewModel: ObservableObject {
     private(set) var pins: PinButtonViewModel?
-    private(set) var progress: ProgressViewModel?
     private var task: NetworkTaskEntity?
 
     private var cancellable: AnyCancellable?
@@ -21,18 +20,19 @@ final class ConsoleTaskCellViewModel: ObservableObject {
 
         self.task = task
 
+        cancellable?.cancel()
         cancellable = nil
-        progress = nil
 
         if task.state == .pending {
-            cancellable = task.publisher(for: \.requestState).sink { [weak self] _ in
+            cancellable = task.publisher(for: \.requestState).dropFirst().sink { [weak self] state in
+                print(state)
                 withAnimation {
                     self?.objectWillChange.send()
                 }
             }
-            self.progress = ProgressViewModel(task: task)
         }
         pins = PinButtonViewModel(task)
+        objectWillChange.send()
     }
 
 #if os(iOS) || os(macOS)

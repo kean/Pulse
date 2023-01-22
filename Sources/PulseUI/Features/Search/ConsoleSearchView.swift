@@ -92,7 +92,7 @@ struct ConsoleSearchView: View {
             PlainListGroupSeparator()
         }
         ForEach(viewModel.results) { result in
-            let isLast = result.id === viewModel.results.last?.id
+            let isLast = result.id == viewModel.results.last?.id
             ConsoleSearchResultView(viewModel: result, isSeparatorNeeded: !viewModel.parameters.terms.isEmpty && !isLast)
         }
         if !viewModel.isSearching && viewModel.hasMore {
