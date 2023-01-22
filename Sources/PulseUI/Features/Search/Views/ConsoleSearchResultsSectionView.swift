@@ -126,24 +126,68 @@ struct PlainListGroupSeparator: View {
 }
 
 @available(iOS 15, tvOS 15, *)
-struct PlainListClearSectionHeader: View {
-    let title: String
+struct PlainListSectionHeader<Content: View>: View {
+    var title: String?
+    @ViewBuilder let content: () -> Content
 
     var body: some View {
-        HStack(alignment: .bottom, spacing: 0) {
-            Text(title)
-                .foregroundColor(.secondary)
-                .lineLimit(3)
-                .font(.subheadline.weight(.medium))
-            Spacer()
-        }
-        .padding(.top, 8)
-        .listRowBackground(Color.separator.opacity(0.2))
+        contents
+            .padding(.top, 8)
+            .listRowBackground(Color.separator.opacity(0.2))
 #if os(iOS)
-        .listRowSeparator(.hidden)
+            .listRowSeparator(.hidden)
 #endif
     }
+
+    @ViewBuilder
+    private var contents: some View {
+        if let title = title {
+            HStack(alignment: .bottom, spacing: 0) {
+                Text(title)
+                    .foregroundColor(.secondary)
+                    .lineLimit(3)
+                    .font(.subheadline.weight(.medium))
+                Spacer()
+            }
+        } else {
+            content()
+        }
+    }
 }
+
+@available(iOS 15, tvOS 15, *)
+extension PlainListSectionHeader where Content == Text {
+    init(title: String) {
+        self.init(title: title, content: { Text(title) })
+    }
+}
+
+@available(iOS 15, tvOS 15, *)
+struct PlainListExpandableSectionHeader<Destination: View>: View {
+    let title: String
+    let count: Int
+    @ViewBuilder let destination: () -> Destination
+
+    var body: some View {
+        PlainListSectionHeader {
+            HStack(alignment: .bottom, spacing: 0) {
+                Text(title)
+                    .foregroundColor(.secondary)
+                    .font(.subheadline.weight(.medium))
+                +
+                Text(" (\(count))")
+                   .foregroundColor(.separator)
+                   .font(.subheadline.monospacedDigit())
+                Spacer()
+                Text("See All")
+                    .foregroundColor(.blue)
+                    .font(.subheadline)
+                .background(NavigationLink("", destination: destination).opacity(0))
+            }
+        }
+    }
+}
+
 
 @available(iOS 15, tvOS 15, *)
 struct PlainListSectionHeaderSeparator: View {

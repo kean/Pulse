@@ -10,6 +10,7 @@ import SwiftUI
 struct ConsoleListContentView: View {
     @ObservedObject var viewModel: ConsoleListViewModel
     @State private var expandedSections: Set<String> = []
+    @State private var isPinnedSectionExpanded = false
 
 #if os(iOS)
 
@@ -24,7 +25,7 @@ struct ConsoleListContentView: View {
     @available(iOS 15.0, *)
     private func makeGroupedView(_ sections: [NSFetchedResultsSectionInfo]) -> some View {
         ForEach(sections, id: \.name) { section in
-            PlainListClearSectionHeader(title: "\(makeName(for: section)) (\(section.numberOfObjects))")
+            PlainListSectionHeader(title: "\(makeName(for: section)) (\(section.numberOfObjects))")
             let objects = (section.objects as? [NSManagedObject]) ?? []
             let prefix = expandedSections.contains(section.name) ? objects : Array(objects.prefix(4))
             ForEach(prefix, id: \.objectID) { entity in
@@ -66,12 +67,39 @@ struct ConsoleListContentView: View {
 
     @ViewBuilder
     private var plainView: some View {
+        if #available(iOS 15, tvOS 15, *) {
+            if !viewModel.pins.isEmpty {
+                pinsView
+            }
+        }
         ForEach(viewModel.visibleEntities, id: \.objectID) { entity in
             ConsoleEntityCell(entity: entity)
                 .onAppear { viewModel.onAppearCell(with: entity.objectID) }
                 .onDisappear { viewModel.onDisappearCell(with: entity.objectID) }
         }
         footerView
+    }
+
+    #warning("add destinations")
+
+    @available(iOS 15, tvOS 15, *)
+    @ViewBuilder
+    private var pinsView: some View {
+        PlainListExpandableSectionHeader(title: "Pins", count: viewModel.pins.count, destination: {
+            Text("test")
+        })
+        let prefix = isPinnedSectionExpanded ? viewModel.pins : Array(viewModel.pins.prefix(4))
+        ForEach(prefix, id: \.objectID) { entity in
+            ConsoleEntityCell(entity: entity)
+        }
+        if prefix.count < viewModel.pins.count {
+            Button(action: { isPinnedSectionExpanded = true }) {
+                Text("Show More") + Text(" (\(viewModel.pins.count - prefix.count))").foregroundColor(.secondary)
+            }
+        }
+        if !viewModel.visibleEntities.isEmpty {
+            PlainListGroupSeparator()
+        }
     }
 
     @ViewBuilder
