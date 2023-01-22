@@ -33,8 +33,6 @@ final class ConsoleTaskCellViewModel: ObservableObject {
             self.progress = ProgressViewModel(task: task)
         }
         pins = PinButtonViewModel(task)
-
-        objectWillChange.send()
     }
 
 #if os(iOS) || os(macOS)
