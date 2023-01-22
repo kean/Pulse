@@ -36,7 +36,7 @@ struct ConsoleSearchCriteriaView: View {
         buttonReset
 #elseif os(macOS)
         HStack {
-            Text(viewModel.isOnlyNetwork ? "Network Filters" : "Message Filters")
+            Text(viewModel.mode == .tasks ? "Network Filters" : "Message Filters")
                 .font(.headline)
             Spacer()
             buttonReset
