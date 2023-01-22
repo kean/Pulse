@@ -10,8 +10,8 @@ import XCTest
 final class ConsoleSearchTokenTests: XCTestCase {
     func testStatusCodeFilter() throws {
         func parse(_ string: String) -> ConsoleSearchFilterStatusCode? {
-            guard let filter = try? Parsers.filterStatusCode.parse(string),
-                  case .statusCode(let filter) = filter.0 else {
+            guard let filters = try? Parsers.filterStatusCode.parse(string),
+                  case .statusCode(let filter) = filters.first?.0 else {
                 return nil
             }
             return filter

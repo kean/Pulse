@@ -19,9 +19,9 @@ final class ConsoleSearchServiceTests: XCTestCase {
         ])
 
         // WHEN
-        let result = try XCTUnwrap(service.search(entity, parameters: parameters))
+        let occurrences = try XCTUnwrap(service.search(entity, parameters: parameters))
 
         // THEN
-        XCTAssertEqual(result.occurrences.count, 0)
+        XCTAssertEqual(occurrences.count, 0)
     }
 }
