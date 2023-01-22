@@ -16,7 +16,6 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
     @Published var options = ConsoleListOptions()
 
     let entitiesSubject = CurrentValueSubject<[NSManagedObject], Never>([])
-    let didRefresh = PassthroughSubject<Void, Never>()
 
     var isViewVisible = false {
         didSet {
@@ -178,7 +177,6 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
         taskCountObserver.setPredicate(makePredicate(for: .tasks))
 
         reloadMessages()
-        didRefresh.send(())
     }
 
     private func makePredicate(for mode: ConsoleMode) -> NSPredicate? {

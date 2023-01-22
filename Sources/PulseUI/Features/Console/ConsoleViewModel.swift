@@ -69,12 +69,6 @@ final class ConsoleViewModel: ObservableObject {
         if #available(iOS 15, *) {
             self._searchViewModel = ConsoleSearchViewModel(entities: list.entitiesSubject, store: store, searchBar: searchBarViewModel)
         }
-
-        list.didRefresh.sink { [weak self] in
-            if #available(iOS 15, *) {
-                self?.searchViewModel.refreshNow()
-            }
-        }.store(in: &cancellables)
 #endif
 
         searchCriteriaViewModel.bind(list.$entities)

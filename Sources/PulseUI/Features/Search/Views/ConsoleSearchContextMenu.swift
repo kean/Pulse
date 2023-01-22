@@ -16,11 +16,6 @@ struct ConsoleSearchContextMenu: View {
     var body: some View {
         Menu {
             Section {
-                Menu(content: { shareMenu }) {
-                    Label("Share", systemImage: "square.and.arrow.up")
-                }
-            }
-            Section {
                 Button(action: { isShowingAsText.toggle() }) {
                     if isShowingAsText {
                         Label("View as List", systemImage: "list.bullet.rectangle.portrait")
@@ -54,22 +49,6 @@ struct ConsoleSearchContextMenu: View {
                     isShowingAsText = false
                 }
             }
-        }
-    }
-
-    @ViewBuilder
-    private var shareMenu: some View {
-        Button(action: { share(as: .plainText) }) {
-            Label("Share as Text", systemImage: "square.and.arrow.up")
-        }
-        Button(action: { share(as: .html) }) {
-            Label("Share as HTML", systemImage: "square.and.arrow.up")
-        }
-    }
-
-    private func share(as output: ShareOutput) {
-        viewModel.prepareForSharing(as: output) { item in
-            shareItems = item
         }
     }
 }

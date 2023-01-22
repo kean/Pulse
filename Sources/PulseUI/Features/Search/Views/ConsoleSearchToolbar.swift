@@ -26,10 +26,31 @@ struct ConsoleSearchToolbar: View {
             }
             Spacer()
             HStack(spacing: 14) {
+                Menu(content: { shareMenu }) {
+                    Image(systemName: "square.and.arrow.up")
+                        .font(.system(size: 20))
+                        .foregroundColor(.blue)
+                }
                 ConsoleSearchContextMenu(viewModel: viewModel.searchViewModel)
             }
         }
         .buttonStyle(.plain)
+    }
+
+    @ViewBuilder
+    private var shareMenu: some View {
+        Button(action: { share(as: .plainText) }) {
+            Label("Share as Text", systemImage: "square.and.arrow.up")
+        }
+        Button(action: { share(as: .html) }) {
+            Label("Share as HTML", systemImage: "square.and.arrow.up")
+        }
+    }
+
+    private func share(as output: ShareOutput) {
+        viewModel.prepareForSharing(as: output) { item in
+            viewModel.router.shareItems = item
+        }
     }
 }
 #endif
