@@ -168,3 +168,18 @@ extension ByteCountFormatter {
         ByteCountFormatter.string(fromByteCount: count, countStyle: .file)
     }
 }
+
+enum CountFormatter {
+    private static let numberFormatter: NumberFormatter = {
+        let formatter = NumberFormatter()
+        formatter.minimumFractionDigits = 0
+        formatter.maximumFractionDigits = 1
+        return formatter
+    }()
+
+    static func string(from count: Int) -> String {
+        if count < 1000 { return "\(count)" }
+        let number = NSNumber(floatLiteral: Double(count) / 1000.0)
+        return (numberFormatter.string(from: number) ?? "–") + "k"
+    }
+}
