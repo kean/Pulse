@@ -38,6 +38,9 @@ enum ConsoleSearchToken: Identifiable, Hashable, Codable {
                 }
                 output += word
             }
+            if output.isEmpty {
+                output = String(term.text.prefix(12))
+            }
             return output + "…"
         }
     }
