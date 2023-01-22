@@ -20,6 +20,8 @@ The easiest way to integrate PulseUI is by using ``ConsoleView``.
 
 Alternatively, you can use native `UIHostingController` to present it in any `UIKit` context.
 
+> tip: If you use Pulse to log only nework requests, and not text messages, use `ConsoleView.network()` to show a view specialized to only display network requests. 
+
 ## Custom Views
 
 PulseUI gives you complete access to the underlying data and its model. You can easily create custom views into your log data by using affordances provided by SwiftUI:
