@@ -47,6 +47,9 @@ final class ConsoleSearchSuggestionsService {
 
     func makeTopSuggestions(context: ConsoleSearchSuggestionsContext) -> [ConsoleSearchSuggestion] {
         guard !context.searchText.isEmpty else {
+            guard context.parameters.isEmpty else {
+                return []
+            }
             return makeDefaultTopSuggestions(context: context)
         }
 

@@ -64,30 +64,41 @@ struct ConsoleSearchResultView: View {
     }
 
     @ViewBuilder
-    func _makeDestination(for occurrence: ConsoleSearchOccurrence, entity: NSManagedObject) -> some View {
-        if let task = entity as? NetworkTaskEntity {
-            switch occurrence.scope {
-            case .url:
-                NetworkDetailsView(title: "URL") {
-                    TextRenderer(options: .sharing).make {
-                        $0.render(task, content: .requestComponents)
-                    }
-                }
-            case .originalRequestHeaders:
-                makeHeadersDetails(title: "Request Headers", headers: task.originalRequest?.headers)
-            case .currentRequestHeaders:
-                makeHeadersDetails(title: "Request Headers", headers: task.currentRequest?.headers)
-            case .requestBody:
-                NetworkInspectorRequestBodyView(viewModel: .init(task: task))
-            case .responseHeaders:
-                makeHeadersDetails(title: "Response Headers", headers: task.response?.headers)
-            case .responseBody:
-                NetworkInspectorResponseBodyView(viewModel: .init(task: task))
-            case .message:
-                EmptyView()
+    private func _makeDestination(for occurrence: ConsoleSearchOccurrence, entity: NSManagedObject) -> some View {
+        if let message = entity as? LoggerMessageEntity {
+            if let task = message.task {
+                _makeDestination(for: occurrence, task: task)
+            } else {
+                ConsoleMessageDetailsView(viewModel: .init(message: message))
             }
-        } else if let message = entity as? LoggerMessageEntity {
-            ConsoleMessageDetailsView(viewModel: .init(message: message))
+        } else if let task = entity as? NetworkTaskEntity {
+            _makeDestination(for: occurrence, task: task)
+        } else {
+            fatalError("Unsupported entity: \(entity)")
+        }
+    }
+
+    @ViewBuilder
+    private func _makeDestination(for occurrence: ConsoleSearchOccurrence, task: NetworkTaskEntity) -> some View {
+        switch occurrence.scope {
+        case .url:
+            NetworkDetailsView(title: "URL") {
+                TextRenderer(options: .sharing).make {
+                    $0.render(task, content: .requestComponents)
+                }
+            }
+        case .originalRequestHeaders:
+            makeHeadersDetails(title: "Request Headers", headers: task.originalRequest?.headers)
+        case .currentRequestHeaders:
+            makeHeadersDetails(title: "Request Headers", headers: task.currentRequest?.headers)
+        case .requestBody:
+            NetworkInspectorRequestBodyView(viewModel: .init(task: task))
+        case .responseHeaders:
+            makeHeadersDetails(title: "Response Headers", headers: task.response?.headers)
+        case .responseBody:
+            NetworkInspectorResponseBodyView(viewModel: .init(task: task))
+        case .message:
+            EmptyView()
         }
     }
 
