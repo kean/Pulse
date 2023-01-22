@@ -80,12 +80,12 @@ private struct _ConsoleTaskCell: View {
     @State private var shareItems: ShareItems?
 
     var body: some View {
-#if !os(iOS)
-        let cell = ConsoleTaskCell(viewModel: .init(task: task), isDisclosureNeeded: true)
+#if os(iOS)
+        let cell = ConsoleTaskCell(task: task, isDisclosureNeeded: true)
             .background(NavigationLink("", destination: LazyNetworkInspectorView(task: task).id(task.objectID)).opacity(0))
 #else
         let cell = NavigationLink(destination: LazyNetworkInspectorView(task: task)) {
-            ConsoleTaskCell(viewModel: .init(task: task))
+            ConsoleTaskCell(task: task)
         }
 #endif
 

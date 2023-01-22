@@ -7,14 +7,16 @@ import Pulse
 import Combine
 import CoreData
 
-struct ConsoleTaskCell: View {
-    @ObservedObject var viewModel: ConsoleTaskCellViewModel
-    @ObservedObject var progressViewModel: ProgressViewModel
-    let isDisclosureNeeded: Bool
+#warning("disable reloads for FetchController")
 
-    init(viewModel: ConsoleTaskCellViewModel, isDisclosureNeeded: Bool = false) {
-        self.viewModel = viewModel
-        self.progressViewModel = viewModel.progress
+struct ConsoleTaskCell: View {
+    @StateObject private var viewModel = ConsoleTaskCellViewModel()
+
+    let task: NetworkTaskEntity
+    var isDisclosureNeeded: Bool
+
+    init(task: NetworkTaskEntity, isDisclosureNeeded: Bool = false) {
+        self.task = task
         self.isDisclosureNeeded = isDisclosureNeeded
     }
 
@@ -22,15 +24,18 @@ struct ConsoleTaskCell: View {
         let contents = VStack(alignment: .leading, spacing: 6) {
             title
             message
-            if viewModel.task.state == .pending {
-                Text(viewModel.task.httpMethod ?? "GET").font(ConsoleConstants.fontBody.smallCaps())
+            if task.state == .pending {
+                (Text(task.httpMethod ?? "GET") +
+                 Text("   ") +
+                 Text(viewModel.progress?.details ?? ""))
+                    .font(ConsoleConstants.fontBody.smallCaps())
                     .lineLimit(1)
-                    .font(ConsoleConstants.fontBody)
                     .foregroundColor(.secondary)
+
             } else {
                 details
             }
-        }
+        }.onAppear { viewModel.bind(task) }
 #if os(macOS)
         contents.padding(.vertical, 4)
 #else
@@ -40,18 +45,19 @@ struct ConsoleTaskCell: View {
             contents
         }
 #endif
+
     }
 
     private var title: some View {
         HStack {
-            (Text(Image(systemName: viewModel.task.state.iconSystemName)) + Text(" " + ConsoleFormatter.status(for: viewModel.task)))
+            (Text(Image(systemName: task.state.iconSystemName)) + Text(" " + ConsoleFormatter.status(for: task)))
                 .font(ConsoleConstants.fontTitle)
                 .fontWeight(.medium)
-                .foregroundColor(viewModel.task.state.tintColor)
+                .foregroundColor(task.state.tintColor)
                 .lineLimit(1)
             Spacer()
 #if os(iOS) || os(macOS)
-            PinView(viewModel: viewModel.pinViewModel, font: ConsoleConstants.fontTitle)
+            viewModel.pins.map { PinView(viewModel: $0, font: ConsoleConstants.fontTitle) }
                 .frame(width: 4, height: 4) // don't affect layout
 #endif
 #if !os(watchOS)
@@ -66,19 +72,19 @@ struct ConsoleTaskCell: View {
     }
 
     private var time: some View {
-        Text(ConsoleMessageCellViewModel.timeFormatter.string(from: viewModel.task.createdAt))
+        Text(ConsoleMessageCellViewModel.timeFormatter.string(from: task.createdAt))
             .font(ConsoleConstants.fontTitle)
 #if os(watchOS)
             .foregroundColor(.secondary)
 #else
-            .foregroundColor(viewModel.task.state == .failure ? .red : .secondary)
+            .foregroundColor(task.state == .failure ? .red : .secondary)
 #endif
             .lineLimit(1)
             .backport.monospacedDigit()
     }
 
     private var message: some View {
-        Text(viewModel.task.url ?? "–")
+        Text(task.url ?? "–")
             .font(ConsoleConstants.fontBody)
             .foregroundColor(.primary)
             .lineLimit(ConsoleSettings.shared.lineLimit)
@@ -87,7 +93,7 @@ struct ConsoleTaskCell: View {
     private var details: some View {
 #if os(watchOS)
         HStack {
-            Text(viewModel.task.httpMethod ?? "GET")
+            Text(task.httpMethod ?? "GET")
                 .font(ConsoleConstants.fontBody)
                 .foregroundColor(.secondary)
             Spacer()
@@ -102,16 +108,16 @@ struct ConsoleTaskCell: View {
     }
 
     private var detailsText: Text {
-        Text(viewModel.task.httpMethod ?? "GET").font(ConsoleConstants.fontBody.smallCaps()) +
+        Text(task.httpMethod ?? "GET").font(ConsoleConstants.fontBody.smallCaps()) +
          Text("   ") +
         Text(Image(systemName: "arrow.up")).fontWeight(.light) +
-        Text(" " + byteCount(for: viewModel.task.requestBodySize)) +
+        Text(" " + byteCount(for: task.requestBodySize)) +
         Text("   ") +
         Text(Image(systemName: "arrow.down")).fontWeight(.light) +
-        Text(" " + byteCount(for: viewModel.task.responseBodySize)) +
+        Text(" " + byteCount(for: task.responseBodySize)) +
         Text("   ") +
         Text(Image(systemName: "clock")).fontWeight(.light) +
-        Text(" " + (ConsoleFormatter.duration(for: viewModel.task) ?? "–"))
+        Text(" " + (ConsoleFormatter.duration(for: task) ?? "–"))
     }
 
     private func byteCount(for size: Int64) -> String {
@@ -135,7 +141,7 @@ private struct ConsoleTimeText: View {
 #if DEBUG
 struct ConsoleTaskCell_Previews: PreviewProvider {
     static var previews: some View {
-        ConsoleTaskCell(viewModel: .init(task: LoggerStore.preview.entity(for: .login)))
+        ConsoleTaskCell(task: LoggerStore.preview.entity(for: .login))
             .padding()
             .previewLayout(.sizeThatFits)
     }

@@ -41,10 +41,6 @@ struct PinView: View {
 
 // MARK: - ViewModel
 
-protocol Pinnable {
-    var pinViewModel: PinButtonViewModel { get }
-}
-
 #if os(iOS) || os(macOS)
 final class PinButtonViewModel: ObservableObject {
     @Published private(set) var isPinned = false

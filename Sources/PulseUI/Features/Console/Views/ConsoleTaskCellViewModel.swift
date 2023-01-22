@@ -7,32 +7,44 @@ import Pulse
 import Combine
 import CoreData
 
-final class ConsoleTaskCellViewModel: Pinnable, ObservableObject {
-    private(set) lazy var progress = ProgressViewModel(task: task)
+final class ConsoleTaskCellViewModel: ObservableObject {
+    private(set) var pins: PinButtonViewModel?
+    private(set) var progress: ProgressViewModel?
+    private var task: NetworkTaskEntity?
 
-    let task: NetworkTaskEntity
-    private var cancellable: AnyCancellable?
+    private var stateCancellable: AnyCancellable?
+    private var progressCancellable: AnyCancellable?
 
-    init(task: NetworkTaskEntity) {
+    func bind(_ task: NetworkTaskEntity) {
+        guard task !== self.task else {
+            return
+        }
+
         self.task = task
-        self.progress = ProgressViewModel(task: task)
 
-        self.cancellable = task.objectWillChange.sink { [weak self] in
-            withAnimation {
+        stateCancellable = nil
+        progress = nil
+
+        if task.state == .pending {
+            stateCancellable = task.publisher(for: \.requestState).sink { [weak self] _ in
+                withAnimation {
+                    self?.objectWillChange.send()
+                }
+            }
+            let progress = ProgressViewModel(task: task)
+            progressCancellable = progress.objectWillChange.sink { [weak self] _ in
                 self?.objectWillChange.send()
             }
+            self.progress = progress
         }
+        pins = PinButtonViewModel(task)
+
+        objectWillChange.send()
     }
-
-    // MARK: Pins
-
-    lazy var pinViewModel = PinButtonViewModel(task)
-
-    // MARK: Context Menu
 
 #if os(iOS) || os(macOS)
     func share(as output: ShareOutput) -> ShareItems {
-        ShareService.share(task, as: output)
+        task.map { ShareService.share($0, as: output) } ?? ShareItems([])
     }
 #endif
 }

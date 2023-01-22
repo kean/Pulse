@@ -7,7 +7,7 @@ import Pulse
 import CoreData
 import Combine
 
-final class ConsoleMessageCellViewModel: Pinnable {
+final class ConsoleMessageCellViewModel {
     let message: LoggerMessageEntity
 
     private let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel?
