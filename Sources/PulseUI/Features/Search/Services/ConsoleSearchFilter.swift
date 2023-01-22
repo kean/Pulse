@@ -42,7 +42,7 @@ enum ConsoleSearchFilter: Hashable, Codable {
 struct ConsoleSearchFilterStatusCode: ConsoleSearchFilterProtocol, Hashable, Codable {
     var name: String { "Status Code" }
     var values: [ConsoleSearchRange<Int>]
-    var valueExamples: [String] { ["200"] }
+    var valueExamples: [String] { ["2XX", "304", "400-404"] }
 
     func isMatch(_ task: NetworkTaskEntity) -> Bool {
         values.compactMap { $0.range }.contains {

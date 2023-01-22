@@ -58,7 +58,6 @@ final class ConsoleSearchSuggestionsService {
 
 #warning("should options be applied to host and other text-based searched; how to noify user?")
 #warning("20X to display as 20X and not 200..<210")
-#warning("Add more examples to filters")
 
         return Array(filters.sorted(by: { $0.1 > $1.1 })
             .map { makeSuggestion(for: $0.0) }
@@ -92,9 +91,9 @@ final class ConsoleSearchSuggestionsService {
         let isExample = values.isEmpty
         let descriptions = !isExample ? values.map(\.description) : filter.filter.valueExamples
         for (index, description) in descriptions.enumerated() {
-            string.append(description) { $0.foregroundColor = isExample ? .secondary : .blue }
-            if index < values.endIndex - 1 {
-                string.append(", ") { $0.foregroundColor = .secondary }
+            string.append(description) { $0.foregroundColor = isExample ? .secondary.opacity(0.8) : .blue }
+            if index < descriptions.endIndex - 1 {
+                string.append(", ") { $0.foregroundColor = isExample ? .separator : .secondary }
             }
         }
         return ConsoleSearchSuggestion(text: string, action: {
