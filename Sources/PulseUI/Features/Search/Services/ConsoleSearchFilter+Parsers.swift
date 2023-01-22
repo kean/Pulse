@@ -16,7 +16,7 @@ extension Parsers {
         return [
             filterStatusCode,
             filterMethod,
-            filterHost,
+            makeFilterHost(hosts: context.hosts),
             filterPath
         ]
     }
@@ -29,8 +29,18 @@ extension Parsers {
         [(ConsoleSearchFilter.statusCode(.init(values: values)), confidence)]
     }
 
-    static let filterHost = (filterName("host") <*> listOf(host)).map { confidence, values in
-        [(ConsoleSearchFilter.host(.init(values: values)), confidence)]
+    static func makeFilterHost(hosts: [String]) -> Parser<[(ConsoleSearchFilter, Confidence)]> {
+        (optional(filterName("host")) <*> listOf(host)).map { confidence, values in
+            let suggested = values.flatMap { value in
+                hosts.map { ($0, $0.fuzzyMatch(value)) }
+            }
+            let filters = suggested.filter { $0.1 > 0.8 }
+                .sorted(by: { $0.1 > $1.1 })
+                .prefix(2)
+                .map { (ConsoleSearchFilter.host(.init(values: [$0.0])), $0.1) }
+            let confidence: Confidence = confidence == nil ? 0.0 : 0.7 // below autocompleted
+            return filters + [(ConsoleSearchFilter.host(.init(values: values)), confidence)]
+        }
     }
 
     static let filterMethod = oneOf(

@@ -50,9 +50,10 @@ final class ConsoleSearchSuggestionsService {
             return makeDefaultTopSuggestions(context: context)
         }
 
-        var filters = Parsers.makeFilters(context: context)
+        let filters = Parsers.makeFilters(context: context)
             .compactMap { try? $0.parse(context.searchText) }
             .flatMap { $0 }
+            .filter { $0.1 > 0.5 }
             .sorted(by: { $0.1 > $1.1 }) // Sort by confidence
 
 #warning("when I start typing /, suggest path filter and add auto-completion")
@@ -60,48 +61,9 @@ final class ConsoleSearchSuggestionsService {
 #warning("20X to display as 20X and not 200..<210")
 #warning("Add more examples to filters")
 
-        var hasHostsFilter = false
-        filters = filters.flatMap {
-            guard case .host(let filter) = $0.0 else { return [$0] }
-            hasHostsFilter = true
-            let confidence = $0.1
-            return autocompleteHosts(for: filter, hosts: context.hosts).map { (.host($0), confidence) }
-        }
-        if !hasHostsFilter {
-            let hosts = autocomplete(host: context.searchText, hosts: context.hosts)
-            filters += hosts.map { (ConsoleSearchFilter.host(.init(values: [$0])), 0.8) }
-        }
-
         return Array(filters.sorted(by: { $0.1 > $1.1 })
             .map { makeSuggestion(for: $0.0) }
             .prefix(3))
-    }
-
-    // TODO: do it on the Parser level
-    private func autocompleteHosts(for filter: ConsoleSearchFilterHost, hosts: [String]) -> [ConsoleSearchFilterHost] {
-        guard let value = filter.values.first,
-              filter.values.count == 1 else { return [filter] }
-        let hosts = autocomplete(host: value, hosts: hosts)
-        let filters = hosts.map { ConsoleSearchFilterHost(values: [$0]) }
-        let prefix = Array(filters.prefix(2))
-        if prefix.contains(where: { $0.values == filter.values }) {
-            return prefix // Already has a full match
-        }
-        return prefix + [filter]
-    }
-
-    private func autocomplete(host target: String, hosts: [String]) -> [String] {
-        let target = target.lowercased()
-        var topHosts: [String] = []
-        var otherHosts: [String] = []
-        for host in hosts {
-            if host.hasPrefix(target) {
-                topHosts.append(host)
-            } else if host.contains(target) {
-                otherHosts.append(host)
-            }
-        }
-        return topHosts + otherHosts
     }
 
     // Shows recent tokens and unused default tokens.
