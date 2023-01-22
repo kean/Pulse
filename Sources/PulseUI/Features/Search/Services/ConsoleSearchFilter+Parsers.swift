@@ -52,7 +52,7 @@ extension Parsers {
 
     static let filterPath = oneOf(
         filterName("path") <*> listOf(path),
-        (char(from: "/") *> path).map { (0.7, ["/" + $0]) }
+        (char(from: "/") *> optional(path)).map { (0.7, ["/" + ($0 ?? "")]) }
     ).map { confidence, values in
         [(ConsoleSearchFilter.path(.init(values: values)), confidence)]
     }

@@ -56,7 +56,6 @@ final class ConsoleSearchSuggestionsService {
             .filter { $0.1 > 0.5 }
             .sorted(by: { $0.1 > $1.1 }) // Sort by confidence
 
-#warning("when I start typing /, suggest path filter and add auto-completion")
 #warning("should options be applied to host and other text-based searched; how to noify user?")
 #warning("20X to display as 20X and not 200..<210")
 #warning("Add more examples to filters")
