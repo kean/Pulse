@@ -33,7 +33,7 @@ struct PinView: View {
         if viewModel.isPinned {
             Image(systemName: "pin")
                 .font(font)
-                .foregroundColor(.secondary)
+                .foregroundColor(.pink)
         }
     }
 }
