@@ -56,57 +56,79 @@ struct ConsoleTaskCell: View {
 #endif
 #if !os(watchOS)
             HStack(spacing: 3) {
-                Text(viewModel.time)
-                    .font(ConsoleConstants.fontTitle)
-                    .foregroundColor(viewModel.task.state == .failure ? .red : .secondary)
-                    .lineLimit(1)
-                    .backport.monospacedDigit()
+                time
                 if isDisclosureNeeded {
-                    if isDisclosureNeeded {
-                        ListDisclosureIndicator()
-                    }
+                    ListDisclosureIndicator()
                 }
             }
 #endif
         }
     }
 
+    private var time: some View {
+        Text(ConsoleMessageCellViewModel.timeFormatter.string(from: viewModel.task.createdAt))
+            .font(ConsoleConstants.fontTitle)
+#if os(watchOS)
+            .foregroundColor(.secondary)
+#else
+            .foregroundColor(viewModel.task.state == .failure ? .red : .secondary)
+#endif
+            .lineLimit(1)
+            .backport.monospacedDigit()
+    }
+
     private var message: some View {
-        (Text((viewModel.task.httpMethod ?? "GET") + " ").font(ConsoleConstants.fontBody.smallCaps()).fontWeight(.medium) +
-         Text(viewModel.task.url ?? "–"))
-        .font(ConsoleConstants.fontBody)
-        .foregroundColor(.primary)
-        .lineLimit(ConsoleSettings.shared.lineLimit)
+        Text(viewModel.task.url ?? "–")
+            .font(ConsoleConstants.fontBody)
+            .foregroundColor(.primary)
+            .lineLimit(ConsoleSettings.shared.lineLimit)
     }
 
     private var details: some View {
-        (transferSizeText + durationText)
+#if os(watchOS)
+        HStack {
+            Text(viewModel.task.httpMethod ?? "GET")
+                .font(ConsoleConstants.fontBody)
+                .foregroundColor(.secondary)
+            Spacer()
+            time
+        }
+#else
+        detailsText
             .lineLimit(1)
             .font(ConsoleConstants.fontTitle)
             .foregroundColor(.secondary)
+#endif
     }
 
-    private var transferSizeText: Text {
+    private var detailsText: Text {
+        Text(viewModel.task.httpMethod ?? "GET").font(ConsoleConstants.fontBody.smallCaps()) +
+         Text("   ") +
         Text(Image(systemName: "arrow.up")).fontWeight(.light) +
         Text(" " + byteCount(for: viewModel.task.requestBodySize)) +
         Text("   ") +
         Text(Image(systemName: "arrow.down")).fontWeight(.light) +
-        Text(" " + byteCount(for: viewModel.task.responseBodySize))
-    }
-
-    private var durationText: Text {
-#if !os(watchOS)
+        Text(" " + byteCount(for: viewModel.task.responseBodySize)) +
         Text("   ") +
         Text(Image(systemName: "clock")).fontWeight(.light) +
         Text(" " + (ConsoleFormatter.duration(for: viewModel.task) ?? "–"))
-#else
-        Text("")
-#endif
     }
 
     private func byteCount(for size: Int64) -> String {
         guard size > 0 else { return "0 KB" }
         return ByteCountFormatter.string(fromByteCount: size)
+    }
+}
+
+private struct ConsoleTimeText: View {
+    let date: Date
+    let color: Color
+
+    var body: some View {
+        Text(ConsoleMessageCellViewModel.timeFormatter.string(from: date))
+            .font(ConsoleConstants.fontTitle)
+            .lineLimit(1)
+            .backport.monospacedDigit()
     }
 }
 

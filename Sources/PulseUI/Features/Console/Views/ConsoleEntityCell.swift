@@ -35,7 +35,7 @@ private struct _ConsoleMessageCell: View {
             .background(NavigationLink("", destination: LazyConsoleDetailsView(message: message).id(message.objectID)).opacity(0))
 #else
         let cell = NavigationLink(destination: LazyConsoleDetailsView(message: message).id(message.objectID)) {
-            ConsoleMessageCell(viewModel: .init(message: message), isDisclosureNeeded: true)
+            ConsoleMessageCell(viewModel: .init(message: message))
         }
 #endif
 
