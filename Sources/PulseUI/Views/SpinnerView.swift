@@ -50,9 +50,11 @@ final class ProgressViewModel: ObservableObject {
 
     init(task: NetworkTaskEntity) {
         self.title = ProgressViewModel.title(for: task)
-        observer1 = task.publisher(for: \.progress, options: [.initial, .new]).sink { [weak self] change in
-            if let progress = task.progress {
-                self?.register(for: progress)
+        if task.state == .pending {
+            observer1 = task.publisher(for: \.progress, options: [.initial, .new]).sink { [weak self] change in
+                if let progress = task.progress {
+                    self?.register(for: progress)
+                }
             }
         }
     }
