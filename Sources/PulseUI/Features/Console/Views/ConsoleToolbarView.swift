@@ -30,19 +30,27 @@ struct ConsoleToolbarView: View {
 
 private struct ConsoleModePicker: View {
     let viewModel: ConsoleViewModel
+    @ObservedObject var logsCounter: ManagedObjectsCountObserver
+    @ObservedObject var tasksCounter: ManagedObjectsCountObserver
 
     @State private var mode: ConsoleMode = .all
     @State private var title: String = ""
+
+    init(viewModel: ConsoleViewModel) {
+        self.viewModel = viewModel
+        self.logsCounter = viewModel.list.logCountObserver
+        self.tasksCounter = viewModel.list.taskCountObserver
+    }
 
     var body: some View {
         HStack(spacing: 12) {
             ConsoleModeButton(title: "All", isSelected: mode == .all) {
                 viewModel.mode = .all
             }
-            ConsoleModeButton(title: "Logs", isSelected: mode == .logs) {
+            ConsoleModeButton(title: "Logs", details: "\(logsCounter.count)", isSelected: mode == .logs) {
                 viewModel.mode = .logs
             }
-            ConsoleModeButton(title: "Tasks", isSelected: mode == .tasks) {
+            ConsoleModeButton(title: "Tasks", details: "\(tasksCounter.count)", isSelected: mode == .tasks) {
                 viewModel.mode = .tasks
             }
         }
@@ -60,21 +68,30 @@ private struct ConsoleModePicker: View {
 
 private struct ConsoleModeButton: View {
     let title: String
+    var details: String?
     let isSelected: Bool
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
-            Text(title)
-                .foregroundColor(isSelected ? Color.blue : Color.secondary)
-                .font(.subheadline.weight(.medium))
+            HStack(spacing: 4) {
+                Text(title)
+                    .foregroundColor(isSelected ? Color.blue : Color.secondary)
+                    .font(.subheadline.weight(.medium))
+                if let details = details {
+                    Text("(\(details))")
+                        .foregroundColor(Color.separator)
+                        .font(.subheadline)
+                }
+            }
         }
         .buttonStyle(.plain)
     }
-
-#warning("add counters")
-    //  + Text(" (4K)").foregroundColor(Color.separator)
 }
+
+#warning("add pin picker?")
+#warning("display pins even from the previous session")
+#warning("remove all pins when pin filter is selected")
 
 struct ConsoleFiltersView: View {
     let isNetworkModeEnabled: Bool
@@ -82,6 +99,11 @@ struct ConsoleFiltersView: View {
     @ObservedObject var router: ConsoleRouter
 
     var body: some View {
+//        Button(action: { viewModel.isOnlyErrors.toggle() }) {
+//            Image(systemName: viewModel.isOnlyErrors ? "pin.square" : "pin.circle")
+//                .font(.system(size: 20))
+//                .foregroundColor(viewModel.isOnlyErrors ? .red : .accentColor)
+//        }
         Button(action: { viewModel.isOnlyErrors.toggle() }) {
             Image(systemName: viewModel.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon")
                 .font(.system(size: 20))

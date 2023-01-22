@@ -126,6 +126,8 @@ private struct _ConsoleRegularContentView: View {
 #warning("add swipe actions to change what you see")
 #warning("add underline or something - bold?")
 #warning("can these be a three separate screens?")
+#warning("remember persistenly?")
+#warning("reload with animation?")
 
         ConsoleListContentView(viewModel: viewModel.list)
         footerView

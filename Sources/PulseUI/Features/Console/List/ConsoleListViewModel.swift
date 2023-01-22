@@ -41,9 +41,15 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
     private var controller: NSFetchedResultsController<NSManagedObject>?
     private var cancellables: [AnyCancellable] = []
 
+    let logCountObserver: ManagedObjectsCountObserver
+    let taskCountObserver: ManagedObjectsCountObserver
+
     init(store: LoggerStore, criteria: ConsoleSearchCriteriaViewModel) {
         self.store = store
         self.searchCriteriaViewModel = criteria
+
+        self.logCountObserver = ManagedObjectsCountObserver(entity: LoggerMessageEntity.self, context: store.viewContext, sortDescriptior: NSSortDescriptor(key: "createdAt", ascending: false))
+        self.taskCountObserver = ManagedObjectsCountObserver(entity: NetworkTaskEntity.self, context: store.viewContext, sortDescriptior: NSSortDescriptor(key: "createdAt", ascending: false))
 
         super.init()
 
@@ -116,23 +122,38 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
         guard let controller = controller else {
             return assertionFailure()
         }
+        controller.fetchRequest.predicate = makePredicate(for: mode)
+        try? controller.performFetch()
+
+        logCountObserver.setPredicate(makePredicate(for: .logs))
+        taskCountObserver.setPredicate(makePredicate(for: .tasks))
+
+        reloadMessages()
+        didRefresh.send(())
+    }
+
+    private func makePredicate(for mode: ConsoleMode) -> NSPredicate? {
         let criteria = searchCriteriaViewModel
-        if mode == .tasks {
-            controller.fetchRequest.predicate = ConsoleSearchCriteria.makeNetworkPredicates(criteria: criteria.criteria, isOnlyErrors: criteria.isOnlyErrors, filterTerm: criteria.filterTerm)
-        } else {
+
+        func makeMessagesPredicate(isMessageOnly: Bool) -> NSPredicate? {
             var predicates: [NSPredicate] = []
-            if mode == .logs {
+            if isMessageOnly {
                 predicates.append(NSPredicate(format: "task == NULL"))
             }
             if let predicate = ConsoleSearchCriteria.makeMessagePredicates(criteria: criteria.criteria, isOnlyErrors: criteria.isOnlyErrors, filterTerm: criteria.filterTerm) {
                 predicates.append(predicate)
             }
-            controller.fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
+            return predicates.isEmpty ? nil : NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
         }
-        try? controller.performFetch()
 
-        reloadMessages()
-        didRefresh.send(())
+        switch mode {
+        case .all:
+            return makeMessagesPredicate(isMessageOnly: false)
+        case .logs:
+            return makeMessagesPredicate(isMessageOnly: true)
+        case .tasks:
+            return ConsoleSearchCriteria.makeNetworkPredicates(criteria: criteria.criteria, isOnlyErrors: criteria.isOnlyErrors, filterTerm: criteria.filterTerm)
+        }
     }
 
     // MARK: - NSFetchedResultsControllerDelegate
