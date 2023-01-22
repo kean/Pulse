@@ -74,20 +74,6 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
         criteria = defaultCriteria
     }
 
-    func removeAllPins() {
-        store.pins.removeAllPins()
-
-#if os(iOS)
-        runHapticFeedback(.success)
-        ToastView {
-            HStack {
-                Image(systemName: "trash")
-                Text("All pins removed")
-            }
-        }.show()
-#endif
-    }
-
     private func reloadCounters() {
         if mode == .tasks {
             guard let tasks = entities as? [NetworkTaskEntity] else {

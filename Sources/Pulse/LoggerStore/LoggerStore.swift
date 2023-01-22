@@ -1035,20 +1035,30 @@ extension LoggerStore {
         }
 
         public func togglePin(for message: LoggerMessageEntity) {
-            message.isPinned.toggle()
+            guard let store = store else { return }
+            store.perform {
+                guard let message = store.backgroundContext.object(with: message.objectID) as? LoggerMessageEntity else { return }
+                self._togglePin(for: message)
+            }
         }
 
         public func togglePin(for task: NetworkTaskEntity) {
-            task.message.map(self.togglePin)
+            guard let store = store else { return }
+            store.perform {
+                guard let task = store.backgroundContext.object(with: task.objectID) as? NetworkTaskEntity else { return }
+                task.message.map(self._togglePin)
+            }
         }
 
         public func removeAllPins() {
             guard let store = store else { return }
-            let messages = try? store.viewContext.fetch(LoggerMessageEntity.self) {
-                $0.predicate = NSPredicate(format: "isPinned == YES")
-            }
-            for message in messages ?? [] {
-                self._togglePin(for: message)
+            store.perform {
+                let messages = try? store.backgroundContext.fetch(LoggerMessageEntity.self) {
+                    $0.predicate = NSPredicate(format: "isPinned == YES")
+                }
+                for message in messages ?? [] {
+                    self._togglePin(for: message)
+                }
             }
         }
 

@@ -9,7 +9,6 @@ import SwiftUI
 
 struct ConsoleListContentView: View {
     @ObservedObject var viewModel: ConsoleListViewModel
-    @State private var expandedSections: Set<String> = []
 
 #if os(iOS)
 
@@ -24,16 +23,14 @@ struct ConsoleListContentView: View {
     @available(iOS 15.0, *)
     private func makeGroupedView(_ sections: [NSFetchedResultsSectionInfo]) -> some View {
         ForEach(sections, id: \.name) { section in
-            PlainListClearSectionHeader(title: "\(makeName(for: section)) (\(section.numberOfObjects))")
             let objects = (section.objects as? [NSManagedObject]) ?? []
-            let prefix = expandedSections.contains(section.name) ? objects : Array(objects.prefix(4))
+            let prefix = objects.prefix(4)
+            PlainListExpandableSectionHeader(title: makeName(for: section), count: section.numberOfObjects, destination: {
+                ConsolePlainList(objects)
+                    .inlineNavigationTitle(makeName(for: section))
+            }, isSeeAllHidden: prefix.count == objects.count)
             ForEach(prefix, id: \.objectID) { entity in
                 ConsoleEntityCell(entity: entity)
-            }
-            if prefix.count < objects.count {
-                Button(action: { expandedSections.insert(section.name) }) {
-                    Text("Show More") + Text(" (\(objects.count - prefix.count))").foregroundColor(.secondary)
-                }
             }
         }
     }
@@ -66,12 +63,54 @@ struct ConsoleListContentView: View {
 
     @ViewBuilder
     private var plainView: some View {
+        if #available(iOS 15, tvOS 15, *) {
+            if !viewModel.pins.isEmpty {
+                pinsView
+            }
+        }
         ForEach(viewModel.visibleEntities, id: \.objectID) { entity in
             ConsoleEntityCell(entity: entity)
                 .onAppear { viewModel.onAppearCell(with: entity.objectID) }
                 .onDisappear { viewModel.onDisappearCell(with: entity.objectID) }
         }
         footerView
+    }
+
+    @available(iOS 15, tvOS 15, *)
+    @ViewBuilder
+    private var pinsView: some View {
+        let prefix = Array(viewModel.pins.prefix(4))
+        PlainListExpandableSectionHeader(title: "Pins", count: viewModel.pins.count, destination: {
+            ConsolePlainList(viewModel.pins)
+                .inlineNavigationTitle("Pins")
+#if os(iOS)
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button(action: viewModel.buttonRemovePinsTapped) {
+                            Image(systemName: "trash")
+                        }
+                    }
+                }
+#endif
+        }, isSeeAllHidden: prefix.count == viewModel.pins.count)
+        ForEach(prefix.map(PinCellViewModel.init)) { viewModel in
+            ConsoleEntityCell(entity: viewModel.object)
+        }
+        Button(action: viewModel.buttonRemovePinsTapped) {
+            Text("Remove Pins")
+                .font(.subheadline)
+                .foregroundColor(Color.blue)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .buttonStyle(.plain)
+#if os(iOS)
+        .listRowBackground(Color.separator.opacity(0.2))
+        .listRowSeparator(.hidden)
+        .listRowSeparator(.hidden, edges: .bottom)
+#endif
+        if !viewModel.visibleEntities.isEmpty {
+            PlainListGroupSeparator()
+        }
     }
 
     @ViewBuilder
@@ -83,9 +122,39 @@ struct ConsoleListContentView: View {
                     .foregroundColor(Color.blue)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
+            .buttonStyle(.plain)
 #if os(iOS)
             .listRowSeparator(.hidden, edges: .bottom)
 #endif
         }
     }
+}
+
+struct ConsolePlainList: View {
+    let entities: [NSManagedObject]
+
+    init(_ entities: [NSManagedObject]) {
+        self.entities = entities
+    }
+
+    public var body: some View {
+        List {
+            ForEach(entities, id: \.objectID, content: ConsoleEntityCell.init)
+        }.listStyle(.plain)
+    }
+}
+
+private struct PinCellViewModel: Hashable, Identifiable {
+    let object: NSManagedObject
+    var id: PinCellId
+
+    init(_ object: NSManagedObject) {
+        self.object = object
+        self.id = PinCellId(id: object.objectID)
+    }
+}
+
+// Make sure the cells 
+private struct PinCellId: Hashable {
+    let id: NSManagedObjectID
 }

@@ -10,6 +10,7 @@ import SwiftUI
 
 final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, ObservableObject {
     @Published private(set) var visibleEntities: ArraySlice<NSManagedObject> = []
+    @Published private(set) var pins: [NSManagedObject] = []
     @Published private(set) var entities: [NSManagedObject] = []
     @Published private(set) var sections: [NSFetchedResultsSectionInfo]?
     @Published var options = ConsoleListOptions()
@@ -39,6 +40,7 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
     var grouping: ConsoleListGroupBy { mode == .tasks ? options.taskGroupBy : options.messageGroupBy }
     private let store: LoggerStore
     private let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
+    private let pinsController: NSFetchedResultsController<NSManagedObject>
     private var controller: NSFetchedResultsController<NSManagedObject>?
     private var cancellables: [AnyCancellable] = []
 
@@ -49,8 +51,28 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
         self.store = store
         self.searchCriteriaViewModel = criteria
 
-        self.logCountObserver = ManagedObjectsCountObserver(entity: LoggerMessageEntity.self, context: store.viewContext, sortDescriptior: NSSortDescriptor(key: "createdAt", ascending: false))
-        self.taskCountObserver = ManagedObjectsCountObserver(entity: NetworkTaskEntity.self, context: store.viewContext, sortDescriptior: NSSortDescriptor(key: "createdAt", ascending: false))
+        self.logCountObserver = ManagedObjectsCountObserver(
+            entity: LoggerMessageEntity.self,
+            context: store.viewContext,
+            sortDescriptior: NSSortDescriptor(key: "createdAt", ascending: false)
+        )
+
+        self.taskCountObserver = ManagedObjectsCountObserver(
+            entity: NetworkTaskEntity.self,
+            context: store.viewContext,
+            sortDescriptior: NSSortDescriptor(key: "createdAt", ascending: false)
+        )
+
+        self.pinsController = NSFetchedResultsController(
+            fetchRequest: {
+                let request = NSFetchRequest<NSManagedObject>(entityName: "\(LoggerMessageEntity.self)")
+                request.sortDescriptors = [NSSortDescriptor(key: "createdAt", ascending: false)]
+                return request
+            }(),
+            managedObjectContext: store.viewContext,
+            sectionNameKeyPath: nil,
+            cacheName: nil
+        )
 
         super.init()
 
@@ -80,16 +102,38 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
             self?.refreshController()
         }.store(in: &cancellables)
 
-        refreshController()
+        pinsController.delegate = self
+
+        update(mode: mode)
     }
 
     func update(mode: ConsoleMode) {
         self.mode = mode
+
         self.refreshController()
+
+        func makePinsFilter() -> NSPredicate? {
+            switch mode {
+            case .all: return nil
+            case .logs: return NSPredicate(format: "task == NULL")
+            case .tasks: return NSPredicate(format: "task != NULL")
+            }
+        }
+
+        pinsController.fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+            NSPredicate(format: "isPinned == YES"),
+            makePinsFilter()
+        ].compactMap { $0 })
+        try? pinsController.performFetch()
+        pins = pinsController.fetchedObjects ?? []
     }
 
     func buttonShowPreviousSessionTapped() {
         searchCriteriaViewModel.criteria.shared.dates.startDate = nil
+    }
+
+    func buttonRemovePinsTapped() {
+        store.pins.removeAllPins()
     }
 
     // MARK: - NSFetchedResultsController
@@ -164,12 +208,18 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
     // MARK: - NSFetchedResultsControllerDelegate
 
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChangeContentWith diff: CollectionDifference<NSManagedObjectID>) {
-        if isViewVisible {
+        if pinsController === controller {
             withAnimation {
-                reloadMessages(isMandatory: false)
+                pins = self.pinsController.fetchedObjects ?? []
             }
         } else {
-            entities = self.controller?.fetchedObjects ?? []
+            if isViewVisible {
+                withAnimation {
+                    reloadMessages(isMandatory: false)
+                }
+            } else {
+                entities = self.controller?.fetchedObjects ?? []
+            }
         }
     }
 

@@ -57,7 +57,6 @@ extension ConsoleSearchCriteria {
 
     struct General: ConsoleFilterProtocol {
         var isEnabled = true
-        var inOnlyPins = false
     }
 
     struct LogLevels: ConsoleFilterProtocol {

@@ -54,13 +54,6 @@ private func makePredicates(for criteria: ConsoleSearchCriteria.Shared, isNetwor
         }
     }
 
-    if criteria.general.isEnabled {
-        if criteria.general.inOnlyPins {
-            let keyPath = isNetwork ? "message.isPinned" : "isPinned"
-            predicates.append(NSPredicate(format: "\(keyPath) == YES"))
-        }
-    }
-
     return predicates
 }
 

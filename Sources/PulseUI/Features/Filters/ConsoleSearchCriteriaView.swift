@@ -45,7 +45,6 @@ struct ConsoleSearchCriteriaView: View {
 #endif
 
         timePeriodSection
-        generalSection
 
         if viewModel.mode == .tasks {
 #if os(iOS) || os(macOS)
@@ -81,14 +80,6 @@ extension ConsoleSearchCriteriaView {
             ConsoleSearchSectionHeader(icon: "calendar", title: "Time Period", filter: $viewModel.criteria.shared.dates, default: viewModel.defaultCriteria.shared.dates)
         }, content: {
             ConsoleSearchTimePeriodCell(selection: $viewModel.criteria.shared.dates)
-        })
-    }
-
-    var generalSection: some View {
-        ConsoleSearchSection(header: {
-            ConsoleSearchSectionHeader(icon: "gear", title: "General", filter: $viewModel.criteria.shared.general)
-        }, content: {
-            ConsoleSearchPinsCell(selection: $viewModel.criteria.shared.general, removeAll: viewModel.removeAllPins)
         })
     }
 }
