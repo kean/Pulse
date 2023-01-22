@@ -44,10 +44,12 @@ public struct ConsoleView: View {
 
 private struct ConsoleMenuView: View {
     let store: LoggerStore
+    let consoleViewModel: ConsoleViewModel
     @ObservedObject var viewModel: ConsoleSearchCriteriaViewModel
     @ObservedObject var router: ConsoleRouter
 
     init(viewModel: ConsoleViewModel) {
+        self.consoleViewModel = viewModel
         self.store = viewModel.store
         self.viewModel = viewModel.searchCriteriaViewModel
         self.router = viewModel.router
@@ -58,11 +60,11 @@ private struct ConsoleMenuView: View {
             Toggle(isOn: $viewModel.isOnlyErrors) {
                 Label("Errors Only", systemImage: "exclamationmark.octagon")
             }
-            Toggle(isOn: $viewModel.isOnlyNetwork) {
+            Toggle(isOn: consoleViewModel.bindingForNetworkMode) {
                 Label("Network Only", systemImage: "arrow.down.circle")
             }
             NavigationLink(destination: destinationFilters) {
-                Label(viewModel.isOnlyNetwork ? "Network Filters" : "Message Filters", systemImage: "line.3.horizontal.decrease.circle")
+                Label(consoleViewModel.bindingForNetworkMode.wrappedValue ? "Network Filters" : "Message Filters", systemImage: "line.3.horizontal.decrease.circle")
             }
         } header: { Text("Quick Filters") }
         if !store.isArchive {
