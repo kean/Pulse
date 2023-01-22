@@ -20,13 +20,11 @@ struct ConsoleSearchView: View {
     }
 
     var body: some View {
-        if viewModel.isShowingContent {
-            suggestionsView
-            if viewModel.isNewResultsButtonShown {
-                showNewResultsPromptView
-            }
-            searchResultsView
+        suggestionsView
+        if viewModel.isNewResultsButtonShown {
+            showNewResultsPromptView
         }
+        searchResultsView
     }
 
     @ViewBuilder

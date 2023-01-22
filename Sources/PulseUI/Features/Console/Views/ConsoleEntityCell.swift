@@ -32,9 +32,9 @@ private struct _ConsoleMessageCell: View {
     var body: some View {
 #if os(iOS)
         let cell = ConsoleMessageCell(viewModel: .init(message: message), isDisclosureNeeded: true)
-            .background(NavigationLink("", destination: LazyConsoleDetailsView(message: message).id(message.objectID)).opacity(0))
+            .background(NavigationLink("", destination: LazyConsoleDetailsView(message: message)).opacity(0))
 #else
-        let cell = NavigationLink(destination: LazyConsoleDetailsView(message: message).id(message.objectID)) {
+        let cell = NavigationLink(destination: LazyConsoleDetailsView(message: message)) {
             ConsoleMessageCell(viewModel: .init(message: message))
         }
 #endif
@@ -80,11 +80,11 @@ private struct _ConsoleTaskCell: View {
     @State private var shareItems: ShareItems?
 
     var body: some View {
-#if os(iOS)
+#if !os(iOS)
         let cell = ConsoleTaskCell(viewModel: .init(task: task), isDisclosureNeeded: true)
             .background(NavigationLink("", destination: LazyNetworkInspectorView(task: task).id(task.objectID)).opacity(0))
 #else
-        let cell = NavigationLink(destination: LazyNetworkInspectorView(task: task).id(task.objectID)) {
+        let cell = NavigationLink(destination: LazyNetworkInspectorView(task: task)) {
             ConsoleTaskCell(viewModel: .init(task: task))
         }
 #endif
