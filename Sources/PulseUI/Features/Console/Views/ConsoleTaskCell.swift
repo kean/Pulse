@@ -23,9 +23,9 @@ struct ConsoleTaskCell: View {
             title
             message
             if viewModel.task.state == .pending {
-                Text(ConsoleFormatter.progress(for: viewModel.task) ?? "...")
+                Text(viewModel.task.httpMethod ?? "GET").font(ConsoleConstants.fontBody.smallCaps())
                     .lineLimit(1)
-                    .font(ConsoleConstants.fontTitle)
+                    .font(ConsoleConstants.fontBody)
                     .foregroundColor(.secondary)
             } else {
                 details

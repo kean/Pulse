@@ -91,7 +91,7 @@ private struct ConsoleModeButton: View {
                     .font(.subheadline.weight(.medium))
                 if let details = details {
                     Text("(\(details))")
-                        .foregroundColor(Color.separator)
+                        .foregroundColor(isSelected ? Color.blue.opacity(0.5) : Color.separator)
                         .font(.subheadline)
                 }
             }
