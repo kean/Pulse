@@ -25,7 +25,6 @@ final class ConsoleTaskCellViewModel: ObservableObject {
 
         if task.state == .pending {
             cancellable = task.publisher(for: \.requestState).dropFirst().sink { [weak self] state in
-                print(state)
                 withAnimation {
                     self?.objectWillChange.send()
                 }

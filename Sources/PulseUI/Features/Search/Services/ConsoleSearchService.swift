@@ -12,33 +12,25 @@ final class ConsoleSearchService {
     private let helper = TextHelper()
     private let cachedBodies = Cache<NSManagedObjectID, NSString>(costLimit: 16_000_000, countLimit: 1000)
 
-    func search(_ entity: NSManagedObject, parameters: ConsoleSearchParameters) -> ConsoleSearchResultViewModel? {
+    func search(_ entity: NSManagedObject, parameters: ConsoleSearchParameters) -> [ConsoleSearchOccurrence]? {
         if let message = entity as? LoggerMessageEntity {
             if let task = message.task {
-                return search(task, parameters: parameters)
+                return _search(task, parameters: parameters)
             } else {
-                return search(message, parameters: parameters)
+                return _search(message, parameters: parameters)
             }
         } else if let task = entity as? NetworkTaskEntity {
-            return search(task, parameters: parameters)
+            return _search(task, parameters: parameters)
         } else {
             fatalError("Unsupported entity: \(entity)")
         }
     }
 
-    private func search(in message: LoggerMessageEntity, parameters: ConsoleSearchParameters) -> [ConsoleSearchOccurrence] {
+    private func _search(_ message: LoggerMessageEntity, parameters: ConsoleSearchParameters) -> [ConsoleSearchOccurrence]? {
         search(message.text as NSString, parameters, .message)
     }
 
-    private func search(_ message: LoggerMessageEntity, parameters: ConsoleSearchParameters) -> ConsoleSearchResultViewModel? {
-        let occurrences = search(in: message, parameters: parameters)
-        guard !occurrences.isEmpty else {
-            return nil
-        }
-        return ConsoleSearchResultViewModel(entity: message, occurrences: occurrences)
-    }
-
-    private func search(_ task: NetworkTaskEntity, parameters: ConsoleSearchParameters) -> ConsoleSearchResultViewModel? {
+    private func _search(_ task: NetworkTaskEntity, parameters: ConsoleSearchParameters) -> [ConsoleSearchOccurrence]? {
         guard !parameters.isEmpty else {
             return nil
         }
@@ -46,13 +38,9 @@ final class ConsoleSearchService {
             return nil
         }
         guard !parameters.terms.isEmpty else {
-            return ConsoleSearchResultViewModel(entity: task, occurrences: [])
+            return []
         }
-        let occurrences = search(in: task, parameters: parameters)
-        guard !occurrences.isEmpty else {
-            return nil
-        }
-        return ConsoleSearchResultViewModel(entity: task, occurrences: occurrences)
+        return search(in: task, parameters: parameters)
     }
 
     private func isMatching(_ task: NetworkTaskEntity, filters: [ConsoleSearchFilter]) -> Bool {
@@ -65,7 +53,7 @@ final class ConsoleSearchService {
         return true
     }
 
-    private func search(in task: NetworkTaskEntity, parameters: ConsoleSearchParameters) -> [ConsoleSearchOccurrence] {
+    private func search(in task: NetworkTaskEntity, parameters: ConsoleSearchParameters) -> [ConsoleSearchOccurrence]? {
         var occurrences: [ConsoleSearchOccurrence] = []
         let scopes = parameters.scopes.isEmpty ? ConsoleSearchScope.allCases : parameters.scopes
         for scope in scopes {
@@ -101,7 +89,7 @@ final class ConsoleSearchService {
                 break // Applies only to LoggerMessageEntity
             }
         }
-        return occurrences
+        return occurrences.isEmpty ? nil : occurrences
     }
 
     private func search(_ data: Data, _ parameters: ConsoleSearchParameters, _ scope: ConsoleSearchScope) -> [ConsoleSearchOccurrence] {

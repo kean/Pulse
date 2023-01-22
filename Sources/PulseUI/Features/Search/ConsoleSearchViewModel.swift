@@ -145,7 +145,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
             dirtyDate = Date()
         }
 
-        let operation = ConsoleSearchOperation(objectIDs: entities.value.map(\.objectID), parameters: parameters, service: searchService, context: context)
+        let operation = ConsoleSearchOperation(entities: entities.value, parameters: parameters, service: searchService, context: context)
         operation.delegate = self
         operation.resume()
         self.operation = operation
@@ -167,7 +167,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         guard !isNewResultsButtonShown else {
             return // We already know there are new results
         }
-        let operation = ConsoleSearchOperation(objectIDs: entities.map(\.objectID), parameters: parameters, service: searchService, context: context)
+        let operation = ConsoleSearchOperation(entities: entities, parameters: parameters, service: searchService, context: context)
         operation.delegate = self
         operation.resume()
         self.refreshResultsOperation = operation

@@ -16,6 +16,7 @@ protocol ConsoleSearchOperationDelegate: AnyObject {
 @available(iOS 15, tvOS 15, *)
 final class ConsoleSearchOperation {
     private let parameters: ConsoleSearchParameters
+    private var entities: [NSManagedObject]
     private var objectIDs: [NSManagedObjectID]
     private var index = 0
     private var cutoff = 10
@@ -26,11 +27,12 @@ final class ConsoleSearchOperation {
 
     weak var delegate: ConsoleSearchOperationDelegate?
 
-    init(objectIDs: [NSManagedObjectID],
+    init(entities: [NSManagedObject],
          parameters: ConsoleSearchParameters,
          service: ConsoleSearchService,
          context: NSManagedObjectContext) {
-        self.objectIDs = objectIDs
+        self.entities = entities
+        self.objectIDs = entities.map(\.objectID)
         self.parameters = parameters
         self.service = service
         self.context = context
@@ -52,15 +54,16 @@ final class ConsoleSearchOperation {
         var found = 0
         var hasMore = false
         while index < objectIDs.count, !isCancelled, !hasMore {
+            let currentMatchIndex = index
             if let entity = try? self.context.existingObject(with: objectIDs[index]),
-               let result = self.service.search(entity, parameters: parameters) {
+               let occurences = self.service.search(entity, parameters: parameters) {
                 found += 1
                 if found > cutoff {
                     hasMore = true
                     index -= 1
                 } else {
                     DispatchQueue.main.async {
-                        self.delegate?.searchOperation(self, didAddResults: [result])
+                        self.delegate?.searchOperation(self, didAddResults: [ConsoleSearchResultViewModel(entity: self.entities[currentMatchIndex], occurrences: occurences)])
                     }
                 }
             }
