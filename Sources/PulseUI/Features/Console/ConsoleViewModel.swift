@@ -9,7 +9,7 @@ import SwiftUI
 
 final class ConsoleViewModel: ObservableObject {
     let title: String
-    let isNetworkModeEnabled: Bool
+    let isNetwork: Bool
     let store: LoggerStore
 
     let list: ConsoleListViewModel
@@ -36,6 +36,21 @@ final class ConsoleViewModel: ObservableObject {
         didSet { refreshListsVisibility() }
     }
 
+    var mode: ConsoleMode = .all {
+        didSet {
+            list.update(mode: mode)
+            searchCriteriaViewModel.mode = mode
+        }
+    }
+
+    var bindingForNetworkMode: Binding<Bool> {
+        Binding(get: {
+            self.mode == .tasks
+        }, set: {
+            self.mode = $0 ? .tasks : .all
+        })
+    }
+
     var onDismiss: (() -> Void)?
 
     private var cancellables: [AnyCancellable] = []
@@ -43,7 +58,7 @@ final class ConsoleViewModel: ObservableObject {
     init(store: LoggerStore, isOnlyNetwork: Bool = false) {
         self.title = isOnlyNetwork ? "Network" : "Console"
         self.store = store
-        self.isNetworkModeEnabled = isOnlyNetwork
+        self.isNetwork = isOnlyNetwork
 
         self.searchCriteriaViewModel = ConsoleSearchCriteriaViewModel(store: store)
         self.searchBarViewModel = ConsoleSearchBarViewModel()

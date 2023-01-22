@@ -11,9 +11,9 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
     var isButtonResetEnabled: Bool { !isCriteriaDefault }
 
     @Published var isOnlyErrors = false
-    @Published var isOnlyNetwork = false
     @Published var filterTerm = "" // Legacy, used on non-iOS platforms
     @Published var criteria = ConsoleSearchCriteria()
+    @Published var mode: ConsoleMode = .all
 
     @Published private(set) var labels: [String] = []
     @Published private(set) var domains: [String] = []
@@ -63,10 +63,10 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
 
     var isCriteriaDefault: Bool {
         guard criteria.shared == defaultCriteria.shared else { return false }
-        if isOnlyNetwork {
-            return criteria.messages == defaultCriteria.messages
-        } else {
+        if mode == .tasks {
             return criteria.network == defaultCriteria.network
+        } else {
+            return criteria.messages == defaultCriteria.messages
         }
     }
 
@@ -89,7 +89,7 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
     }
 
     private func reloadCounters() {
-        if isOnlyNetwork {
+        if mode == .tasks {
             guard let tasks = entities as? [NetworkTaskEntity] else {
                 return assertionFailure()
             }

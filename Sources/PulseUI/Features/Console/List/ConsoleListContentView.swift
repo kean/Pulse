@@ -39,7 +39,7 @@ struct ConsoleListContentView: View {
     }
 
     private func makeName(for section: NSFetchedResultsSectionInfo) -> String {
-        if !viewModel.isOnlyNetwork {
+        if viewModel.mode != .tasks  {
             if viewModel.options.messageGroupBy == .level {
                 let rawValue = Int16(Int(section.name) ?? 0)
                 return (LoggerStore.Level(rawValue: rawValue) ?? .debug).name.capitalized

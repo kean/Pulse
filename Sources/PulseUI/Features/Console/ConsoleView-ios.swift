@@ -123,7 +123,6 @@ private struct _ConsoleRegularContentView: View {
         footerView
     }
 
-    #warning("implement on other platforms and move to the list?")
     @ViewBuilder
     private var footerView: some View {
         if #available(iOS 15, *), viewModel.searchCriteriaViewModel.criteria.shared.dates == .session, viewModel.list.options.order == .descending {
@@ -143,8 +142,13 @@ private struct _ConsoleRegularContentView: View {
 #if DEBUG
 struct ConsoleView_Previews: PreviewProvider {
     static var previews: some View {
-        NavigationView {
-            ConsoleView(viewModel: .init(store: .mock))
+        Group {
+            NavigationView {
+                ConsoleView(viewModel: .init(store: .mock))
+            }.previewDisplayName("Console")
+            NavigationView {
+                ConsoleView.network(store: .mock)
+            }.previewDisplayName("Network")
         }
     }
 }

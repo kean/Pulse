@@ -14,17 +14,47 @@ struct ConsoleToolbarView: View {
 
     var body: some View {
         HStack(alignment: .bottom, spacing: 0) {
-            ConsoleToolbarTitle(viewModel: viewModel)
+            if viewModel.isNetwork {
+                ConsoleToolbarTitle(viewModel: viewModel)
+            } else {
+                ConsoleModePicker(viewModel: viewModel)
+            }
             Spacer()
             HStack(spacing: 14) {
-                ConsoleFiltersView(
-                    isNetworkModeEnabled: viewModel.isNetworkModeEnabled,
-                    viewModel: viewModel.searchCriteriaViewModel,
-                    router: viewModel.router
-                )
+                ConsoleFiltersView(viewModel: viewModel.searchCriteriaViewModel, router: viewModel.router)
             }
         }
         .buttonStyle(.plain)
+    }
+}
+
+private struct ConsoleModePicker: View {
+    let viewModel: ConsoleViewModel
+    @ObservedObject var logsCounter: ManagedObjectsCountObserver
+    @ObservedObject var tasksCounter: ManagedObjectsCountObserver
+
+    @State private var mode: ConsoleMode = .all
+    @State private var title: String = ""
+
+    init(viewModel: ConsoleViewModel) {
+        self.viewModel = viewModel
+        self.logsCounter = viewModel.list.logCountObserver
+        self.tasksCounter = viewModel.list.taskCountObserver
+    }
+
+    var body: some View {
+        HStack(spacing: 12) {
+            ConsoleModeButton(title: "All", isSelected: mode == .all) {
+                viewModel.mode = .all
+            }
+            ConsoleModeButton(title: "Logs", details: "\(logsCounter.count)", isSelected: mode == .logs) {
+                viewModel.mode = .logs
+            }
+            ConsoleModeButton(title: "Tasks", details: "\(tasksCounter.count)", isSelected: mode == .tasks) {
+                viewModel.mode = .tasks
+            }
+        }
+        .onReceive(viewModel.list.$mode) { mode = $0 }
     }
 }
 
@@ -41,26 +71,40 @@ private struct ConsoleToolbarTitle: View {
     }
 
     private var titlePublisher: some Publisher<String, Never> {
-        viewModel.list.$entities.combineLatest(viewModel.searchCriteriaViewModel.$isOnlyNetwork)
-            .map { entities, isOnlyNetwork in
-                "\(entities.count) \(isOnlyNetwork ? "Requests" : "Messages")"
+        viewModel.list.$entities.map { entities in
+            "\(entities.count) Requests"
+        }
+    }
+}
+
+private struct ConsoleModeButton: View {
+    let title: String
+    var details: String?
+    let isSelected: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 4) {
+                Text(title)
+                    .foregroundColor(isSelected ? Color.blue : Color.secondary)
+                    .font(.subheadline.weight(.medium))
+                if let details = details {
+                    Text("(\(details))")
+                        .foregroundColor(Color.separator)
+                        .font(.subheadline)
+                }
             }
+        }
+        .buttonStyle(.plain)
     }
 }
 
 struct ConsoleFiltersView: View {
-    let isNetworkModeEnabled: Bool
     @ObservedObject var viewModel: ConsoleSearchCriteriaViewModel
     @ObservedObject var router: ConsoleRouter
 
     var body: some View {
-        if !isNetworkModeEnabled {
-            Button(action: { viewModel.isOnlyNetwork.toggle() }) {
-                Image(systemName: viewModel.isOnlyNetwork ? "arrow.down.circle.fill" : "arrow.down.circle")
-                    .font(.system(size: 20))
-                    .foregroundColor(.accentColor)
-            }
-        }
         Button(action: { viewModel.isOnlyErrors.toggle() }) {
             Image(systemName: viewModel.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon")
                 .font(.system(size: 20))

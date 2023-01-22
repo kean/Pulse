@@ -10,14 +10,16 @@ import CoreData
 struct ConsoleTaskCell: View {
     @ObservedObject var viewModel: ConsoleTaskCellViewModel
     @ObservedObject var progressViewModel: ProgressViewModel
+    let isDisclosureNeeded: Bool
 
-    init(viewModel: ConsoleTaskCellViewModel) {
+    init(viewModel: ConsoleTaskCellViewModel, isDisclosureNeeded: Bool = false) {
         self.viewModel = viewModel
         self.progressViewModel = viewModel.progress
+        self.isDisclosureNeeded = isDisclosureNeeded
     }
 
     var body: some View {
-        let contents = VStack(alignment: .leading, spacing: 5) {
+        let contents = VStack(alignment: .leading, spacing: 6) {
             title
             message
             if viewModel.task.state == .pending {
@@ -53,11 +55,18 @@ struct ConsoleTaskCell: View {
                 .frame(width: 4, height: 4) // don't affect layout
 #endif
 #if !os(watchOS)
-            Text(viewModel.time)
-                .font(ConsoleConstants.fontTitle)
-                .foregroundColor(viewModel.task.state == .failure ? .red : .secondary)
-                .lineLimit(1)
-                .backport.monospacedDigit()
+            HStack(spacing: 3) {
+                Text(viewModel.time)
+                    .font(ConsoleConstants.fontTitle)
+                    .foregroundColor(viewModel.task.state == .failure ? .red : .secondary)
+                    .lineLimit(1)
+                    .backport.monospacedDigit()
+                if isDisclosureNeeded {
+                    if isDisclosureNeeded {
+                        ListDisclosureIndicator()
+                    }
+                }
+            }
 #endif
         }
     }

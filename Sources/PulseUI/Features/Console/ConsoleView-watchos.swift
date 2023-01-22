@@ -38,20 +38,22 @@ public struct ConsoleView: View {
 }
 
 private struct ConsoleToolbarView: View {
+    var consoleViewModel: ConsoleViewModel
     @ObservedObject var viewModel: ConsoleSearchCriteriaViewModel
     @ObservedObject var router: ConsoleRouter
 
     init(viewModel: ConsoleViewModel) {
+        self.consoleViewModel = viewModel
         self.viewModel = viewModel.searchCriteriaViewModel
         self.router = viewModel.router
     }
 
     var body: some View {
         HStack {
-            Button(action: { viewModel.isOnlyNetwork.toggle() } ) {
+            Button(action: { consoleViewModel.bindingForNetworkMode.wrappedValue.toggle() } ) {
                 Image(systemName: "arrow.down.circle")
             }
-            .background(viewModel.isOnlyNetwork ? Rectangle().foregroundColor(.blue).cornerRadius(8) : nil)
+            .background(consoleViewModel.bindingForNetworkMode.wrappedValue ? Rectangle().foregroundColor(.blue).cornerRadius(8) : nil)
 
             Button(action: { viewModel.isOnlyErrors.toggle() }) {
                 Image(systemName: "exclamationmark.octagon")
