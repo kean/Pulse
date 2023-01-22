@@ -83,10 +83,28 @@ struct ConsoleListContentView: View {
         PlainListExpandableSectionHeader(title: "Pins", count: viewModel.pins.count, destination: {
             ConsolePlainList(viewModel.pins)
                 .inlineNavigationTitle("Pins")
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button(action: viewModel.buttonRemovePinsTapped) {
+                            Image(systemName: "trash")
+                        }
+                    }
+                }
         }, isSeeAllHidden: prefix.count == viewModel.pins.count)
         ForEach(prefix, id: \.objectID) { entity in
             ConsoleEntityCell(entity: entity)
         }
+        Button(action: viewModel.buttonRemovePinsTapped) {
+            Text("Remove Pins")
+                .font(.subheadline)
+                .foregroundColor(Color.blue)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+#if os(iOS)
+        .listRowBackground(Color.separator.opacity(0.2))
+        .listRowSeparator(.hidden)
+        .listRowSeparator(.hidden, edges: .bottom)
+#endif
         if !viewModel.visibleEntities.isEmpty {
             PlainListGroupSeparator()
         }

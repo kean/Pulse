@@ -119,6 +119,10 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
         searchCriteriaViewModel.criteria.shared.dates.startDate = nil
     }
 
+    func buttonRemovePinsTapped() {
+        store.pins.removeAllPins()
+    }
+
     // MARK: - NSFetchedResultsController
 
     func refreshController() {
