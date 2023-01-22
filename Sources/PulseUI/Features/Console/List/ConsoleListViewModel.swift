@@ -66,8 +66,6 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
         self.pinsController = NSFetchedResultsController(
             fetchRequest: {
                 let request = NSFetchRequest<NSManagedObject>(entityName: "\(LoggerMessageEntity.self)")
-                #warning("temp")
-//                request.predicate = NSPredicate(format: "isPinned == YES")
                 request.sortDescriptors = [NSSortDescriptor(key: "createdAt", ascending: false)]
                 return request
             }(),
@@ -105,15 +103,29 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
         }.store(in: &cancellables)
 
         pinsController.delegate = self
-        try? pinsController.performFetch()
-        pins = pinsController.fetchedObjects ?? []
 
-        refreshController()
+        update(mode: mode)
     }
 
     func update(mode: ConsoleMode) {
         self.mode = mode
+
         self.refreshController()
+
+        func makePinsFilter() -> NSPredicate? {
+            switch mode {
+            case .all: return nil
+            case .logs: return NSPredicate(format: "task == NULL")
+            case .tasks: return NSPredicate(format: "task != NULL")
+            }
+        }
+
+        pinsController.fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+            NSPredicate(format: "isPinned == YES"),
+            makePinsFilter()
+        ].compactMap { $0 })
+        try? pinsController.performFetch()
+        pins = pinsController.fetchedObjects ?? []
     }
 
     func buttonShowPreviousSessionTapped() {
