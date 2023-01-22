@@ -14,14 +14,14 @@ struct ConsoleToolbarView: View {
 
     var body: some View {
         HStack(alignment: .bottom, spacing: 0) {
-            ConsoleModePicker(viewModel: viewModel)
+            if viewModel.isNetworkModeEnabled {
+                ConsoleToolbarTitle(viewModel: viewModel)
+            } else {
+                ConsoleModePicker(viewModel: viewModel)
+            }
             Spacer()
             HStack(spacing: 14) {
-                ConsoleFiltersView(
-                    isNetworkModeEnabled: viewModel.isNetworkModeEnabled,
-                    viewModel: viewModel.searchCriteriaViewModel,
-                    router: viewModel.router
-                )
+                ConsoleFiltersView(viewModel: viewModel.searchCriteriaViewModel, router: viewModel.router)
             }
         }
         .buttonStyle(.plain)
@@ -58,6 +58,25 @@ private struct ConsoleModePicker: View {
     }
 }
 
+private struct ConsoleToolbarTitle: View {
+    let viewModel: ConsoleViewModel
+
+    @State private var title: String = ""
+
+    var body: some View {
+        Text(title)
+            .foregroundColor(.secondary)
+            .font(.subheadline.weight(.medium))
+            .onReceive(titlePublisher) { title = $0 }
+    }
+
+    private var titlePublisher: some Publisher<String, Never> {
+        viewModel.list.$entities.map { entities in
+            "\(entities.count) Requests"
+        }
+    }
+}
+
 private struct ConsoleModeButton: View {
     let title: String
     var details: String?
@@ -86,7 +105,6 @@ private struct ConsoleModeButton: View {
 #warning("remove all pins when pin filter is selected")
 
 struct ConsoleFiltersView: View {
-    let isNetworkModeEnabled: Bool
     @ObservedObject var viewModel: ConsoleSearchCriteriaViewModel
     @ObservedObject var router: ConsoleRouter
 

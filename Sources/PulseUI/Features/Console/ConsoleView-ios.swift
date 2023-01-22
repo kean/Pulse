@@ -153,8 +153,13 @@ private struct _ConsoleRegularContentView: View {
 #if DEBUG
 struct ConsoleView_Previews: PreviewProvider {
     static var previews: some View {
-        NavigationView {
-            ConsoleView(viewModel: .init(store: .mock))
+        Group {
+            NavigationView {
+                ConsoleView(viewModel: .init(store: .mock))
+            }.previewDisplayName("Console")
+            NavigationView {
+                ConsoleView.network(store: .mock)
+            }.previewDisplayName("Network")
         }
     }
 }
