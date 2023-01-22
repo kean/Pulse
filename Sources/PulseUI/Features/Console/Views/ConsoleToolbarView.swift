@@ -21,7 +21,7 @@ struct ConsoleToolbarView: View {
             }
             Spacer()
             HStack(spacing: 14) {
-                ConsoleFiltersView(viewModel: viewModel.searchCriteriaViewModel, router: viewModel.router)
+                ConsoleFiltersView(viewModel: viewModel)
             }
         }
         .buttonStyle(.plain)
@@ -101,20 +101,86 @@ private struct ConsoleModeButton: View {
 }
 
 struct ConsoleFiltersView: View {
-    @ObservedObject var viewModel: ConsoleSearchCriteriaViewModel
+    let viewModel: ConsoleViewModel
+    @ObservedObject var listViewModel: ConsoleListViewModel
+    @ObservedObject var searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
     @ObservedObject var router: ConsoleRouter
+    private let isList: Bool
+
+    init(viewModel: ConsoleViewModel, isList: Bool = true) {
+        self.viewModel = viewModel
+        self.listViewModel = viewModel.list
+        self.searchCriteriaViewModel = viewModel.searchCriteriaViewModel
+        self.router = viewModel.router
+        self.isList = isList
+    }
 
     var body: some View {
-        Button(action: { viewModel.isOnlyErrors.toggle() }) {
-            Image(systemName: viewModel.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon")
-                .font(.system(size: 20))
-                .foregroundColor(viewModel.isOnlyErrors ? .red : .accentColor)
+        if isList {
+            if #available(iOS 15, *) {
+                sortByMenu.fixedSize()
+                groupByMenu.fixedSize()
+            }
+        } else {
+            Button(action: { router.isShowingFilters = true }) {
+                Image(systemName: searchCriteriaViewModel.isCriteriaDefault ? "line.horizontal.3.decrease.circle" : "line.3.horizontal.decrease.circle.fill")
+                    .font(.system(size: 20))
+                    .foregroundColor(.accentColor)
+            }
         }
-        Button(action: { router.isShowingFilters = true }) {
-            Image(systemName: viewModel.isCriteriaDefault ? "line.horizontal.3.decrease.circle" : "line.3.horizontal.decrease.circle.fill")
+        Button(action: { searchCriteriaViewModel.isOnlyErrors.toggle() }) {
+            Image(systemName: searchCriteriaViewModel.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon")
                 .font(.system(size: 20))
-                .foregroundColor(.accentColor)
+                .foregroundColor(searchCriteriaViewModel.isOnlyErrors ? .red : .accentColor)
         }
+    }
+
+    @ViewBuilder
+    private var sortByMenu: some View {
+        Menu(content: {
+            if viewModel.mode == .tasks {
+                Picker("Sort By", selection: $listViewModel.options.taskSortBy) {
+                    ForEach(ConsoleListOptions.TaskSortBy.allCases, id: \.self) {
+                        Text($0.rawValue).tag($0)
+                    }
+                }
+            } else {
+                Picker("Sort By", selection: $listViewModel.options.messageSortBy) {
+                    ForEach(ConsoleListOptions.MessageSortBy.allCases, id: \.self) {
+                        Text($0.rawValue).tag($0)
+                    }
+                }
+            }
+            Picker("Ordering", selection: $listViewModel.options.order) {
+                Text("Descending").tag(ConsoleListOptions.Ordering.descending)
+                Text("Ascending").tag(ConsoleListOptions.Ordering.ascending)
+            }
+        }, label: {
+            Image(systemName: "arrow.up.arrow.down")
+                .foregroundColor(.blue)
+        })
+    }
+
+    @ViewBuilder
+    private var groupByMenu: some View {
+        Menu(content: {
+            if viewModel.mode == .tasks {
+                Picker("Group By", selection: $listViewModel.options.taskGroupBy) {
+                    ForEach(ConsoleListOptions.TaskGroupBy.allCases, id: \.self) {
+                        Text($0.rawValue).tag($0)
+                    }
+                }
+            } else {
+                Picker("Group By", selection: $listViewModel.options.messageGroupBy) {
+                    ForEach(ConsoleListOptions.MessageGroupBy.allCases, id: \.self) {
+                        Text($0.rawValue).tag($0)
+                    }
+                }
+            }
+        }, label: {
+            Image(systemName: "rectangle.3.group")
+                .foregroundColor(.blue)
+        })
     }
 }
 

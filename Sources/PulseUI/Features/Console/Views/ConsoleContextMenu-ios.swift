@@ -12,13 +12,12 @@ import Combine
 struct ConsoleContextMenu: View {
     let viewModel: ConsoleViewModel
     @ObservedObject var searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
-    @ObservedObject var listViewModel: ConsoleListViewModel
+
     @ObservedObject var router: ConsoleRouter
 
     init(viewModel: ConsoleViewModel) {
         self.viewModel = viewModel
         self.searchCriteriaViewModel = viewModel.searchCriteriaViewModel
-        self.listViewModel = viewModel.list
         self.router = viewModel.router
     }
 
@@ -51,12 +50,6 @@ struct ConsoleContextMenu: View {
                     }
                 }
             }
-            if #available(iOS 15, *) {
-                Section {
-                    sortByMenu
-                    groupByMenu
-                }
-            }
             Section {
                 Button(action: { router.isShowingSettings = true }) {
                     Label("Settings", systemImage: "gear")
@@ -75,52 +68,6 @@ struct ConsoleContextMenu: View {
         } label: {
             Image(systemName: "ellipsis.circle")
         }
-    }
-
-    @ViewBuilder
-    private var sortByMenu: some View {
-        Menu(content: {
-            if viewModel.mode == .tasks {
-                Picker("Sort By", selection: $listViewModel.options.taskSortBy) {
-                    ForEach(ConsoleListOptions.TaskSortBy.allCases, id: \.self) {
-                        Text($0.rawValue).tag($0)
-                    }
-                }
-            } else {
-                Picker("Sort By", selection: $listViewModel.options.messageSortBy) {
-                    ForEach(ConsoleListOptions.MessageSortBy.allCases, id: \.self) {
-                        Text($0.rawValue).tag($0)
-                    }
-                }
-            }
-            Picker("Ordering", selection: $listViewModel.options.order) {
-                Text("Descending").tag(ConsoleListOptions.Ordering.descending)
-                Text("Ascending").tag(ConsoleListOptions.Ordering.ascending)
-            }
-        }, label: {
-            Label("Sort By", systemImage: "arrow.up.arrow.down")
-        })
-    }
-
-    @ViewBuilder
-    private var groupByMenu: some View {
-        Menu(content: {
-            if viewModel.mode == .tasks {
-                Picker("Group By", selection: $listViewModel.options.taskGroupBy) {
-                    ForEach(ConsoleListOptions.TaskGroupBy.allCases, id: \.self) {
-                        Text($0.rawValue).tag($0)
-                    }
-                }
-            } else {
-                Picker("Group By", selection: $listViewModel.options.messageGroupBy) {
-                    ForEach(ConsoleListOptions.MessageGroupBy.allCases, id: \.self) {
-                        Text($0.rawValue).tag($0)
-                    }
-                }
-            }
-        }, label: {
-            Label("Group By", systemImage: "rectangle.3.group")
-        })
     }
 
     private func buttonRemoveAllTapped() {

@@ -39,6 +39,9 @@ public struct ConsoleView: View {
     private var trailingNavigationBarItems: some View {
         HStack {
             ConsoleShareButton(viewModel: viewModel)
+            Button(action: { viewModel.router.isShowingFilters = true }) {
+                Image(systemName: "line.horizontal.3.decrease.circle")
+            }
             ConsoleContextMenu(viewModel: viewModel)
         }
     }
