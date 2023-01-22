@@ -17,7 +17,7 @@ struct ConsoleMessageDetailsView: View {
 
     @ViewBuilder
     private var trailingNavigationBarItems: some View {
-        HStack(spacing: 10) {
+        HStack {
             NavigationLink(destination: ConsoleMessageMetadataView(message: viewModel.message)) {
                 Image(systemName: "info.circle")
             }
