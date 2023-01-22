@@ -50,7 +50,7 @@ final class ConsoleSearchSuggestionsService {
             return makeDefaultTopSuggestions(context: context)
         }
 
-        var filters = Parsers.filters
+        var filters = Parsers.makeFilters(context: context)
             .compactMap { try? $0.parse(context.searchText) }
             .flatMap { $0 }
             .sorted(by: { $0.1 > $1.1 }) // Sort by confidence
@@ -60,7 +60,6 @@ final class ConsoleSearchSuggestionsService {
 #warning("20X to display as 20X and not 200..<210")
 #warning("Add more examples to filters")
 
-        // Auto-complete hosts (TODO: refactor)
         var hasHostsFilter = false
         filters = filters.flatMap {
             guard case .host(let filter) = $0.0 else { return [$0] }

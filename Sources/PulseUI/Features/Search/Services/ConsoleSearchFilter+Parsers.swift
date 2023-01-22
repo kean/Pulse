@@ -12,9 +12,14 @@ import Foundation
 // The patterns are set up with "guesses" around. So if the user enters incorrect
 // range, it'll still try to "guess".
 extension Parsers {
-    static let filters: [Parser<[(ConsoleSearchFilter, Confidence)]>] = [
-        filterStatusCode, filterMethod, filterHost, filterPath
-    ]
+    static func makeFilters(context: ConsoleSearchSuggestionsContext) -> [Parser<[(ConsoleSearchFilter, Confidence)]>] {
+        return [
+            filterStatusCode,
+            filterMethod,
+            filterHost,
+            filterPath
+        ]
+    }
 
     static let filterStatusCode = oneOf(
             filterName("status code") <*> listOf(statusCode),
