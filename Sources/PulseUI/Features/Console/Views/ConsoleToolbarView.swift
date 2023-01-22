@@ -14,7 +14,7 @@ struct ConsoleToolbarView: View {
 
     var body: some View {
         HStack(alignment: .bottom, spacing: 0) {
-            if viewModel.isNetworkModeEnabled {
+            if viewModel.isNetwork {
                 ConsoleToolbarTitle(viewModel: viewModel)
             } else {
                 ConsoleModePicker(viewModel: viewModel)
