@@ -80,13 +80,12 @@ struct ConsoleListContentView: View {
         footerView
     }
 
-    #warning("add destinations")
-
     @available(iOS 15, tvOS 15, *)
     @ViewBuilder
     private var pinsView: some View {
         PlainListExpandableSectionHeader(title: "Pins", count: viewModel.pins.count, destination: {
-            Text("test")
+            ConsolePlainList(viewModel.pins)
+                .inlineNavigationTitle("Pins")
         })
         let prefix = isPinnedSectionExpanded ? viewModel.pins : Array(viewModel.pins.prefix(4))
         ForEach(prefix, id: \.objectID) { entity in
@@ -115,5 +114,19 @@ struct ConsoleListContentView: View {
             .listRowSeparator(.hidden, edges: .bottom)
 #endif
         }
+    }
+}
+
+struct ConsolePlainList: View {
+    let entities: [NSManagedObject]
+
+    init(_ entities: [NSManagedObject]) {
+        self.entities = entities
+    }
+
+    public var body: some View {
+        List {
+            ForEach(entities, id: \.objectID, content: ConsoleEntityCell.init)
+        }.listStyle(.plain)
     }
 }

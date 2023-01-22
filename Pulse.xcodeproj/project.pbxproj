@@ -194,7 +194,6 @@
 		0CF0D651296F189600EED9D4 /* ConsoleCustomMessageFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5C9296F189500EED9D4 /* ConsoleCustomMessageFilter.swift */; };
 		0CF0D652296F189600EED9D4 /* ConsoleSearchCriteria+Predicates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5CA296F189500EED9D4 /* ConsoleSearchCriteria+Predicates.swift */; };
 		0CF0D653296F189600EED9D4 /* InsightsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5CC296F189500EED9D4 /* InsightsView.swift */; };
-		0CF0D654296F189600EED9D4 /* NetworkInsightsRequestsList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5CD296F189500EED9D4 /* NetworkInsightsRequestsList.swift */; };
 		0CF0D655296F189600EED9D4 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5CF296F189500EED9D4 /* SettingsView.swift */; };
 		0CF0D656296F189600EED9D4 /* RemoteLoggerSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5D0296F189500EED9D4 /* RemoteLoggerSettingsView.swift */; };
 		0CF0D657296F189600EED9D4 /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5D1296F189500EED9D4 /* SettingsViewModel.swift */; };
@@ -668,7 +667,6 @@
 		0CF0D5C9296F189500EED9D4 /* ConsoleCustomMessageFilter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleCustomMessageFilter.swift; sourceTree = "<group>"; };
 		0CF0D5CA296F189500EED9D4 /* ConsoleSearchCriteria+Predicates.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ConsoleSearchCriteria+Predicates.swift"; sourceTree = "<group>"; };
 		0CF0D5CC296F189500EED9D4 /* InsightsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InsightsView.swift; sourceTree = "<group>"; };
-		0CF0D5CD296F189500EED9D4 /* NetworkInsightsRequestsList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkInsightsRequestsList.swift; sourceTree = "<group>"; };
 		0CF0D5CF296F189500EED9D4 /* SettingsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		0CF0D5D0296F189500EED9D4 /* RemoteLoggerSettingsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RemoteLoggerSettingsView.swift; sourceTree = "<group>"; };
 		0CF0D5D1296F189500EED9D4 /* SettingsViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
@@ -1354,7 +1352,6 @@
 			isa = PBXGroup;
 			children = (
 				0CF0D5CC296F189500EED9D4 /* InsightsView.swift */,
-				0CF0D5CD296F189500EED9D4 /* NetworkInsightsRequestsList.swift */,
 			);
 			path = Insights;
 			sourceTree = "<group>";
@@ -2129,7 +2126,6 @@
 				0C7A0DFD297C382300B4B69D /* ConsoleShareButton.swift in Sources */,
 				0CB63A2729759D2E00525165 /* ConsoleSearchToken.swift in Sources */,
 				0CF0D679296F189600EED9D4 /* ConsoleView-ios.swift in Sources */,
-				0CF0D654296F189600EED9D4 /* NetworkInsightsRequestsList.swift in Sources */,
 				0CF0D661296F189600EED9D4 /* NetworkInspectorTransferInfoView.swift in Sources */,
 				0CF0D663296F189600EED9D4 /* NetworkInspectorTransactionView.swift in Sources */,
 				0CB63A212974A62700525165 /* ConsoleSearchService.swift in Sources */,
