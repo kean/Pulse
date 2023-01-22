@@ -305,14 +305,21 @@ extension String {
     /// A fuzzy check for the given word. Always consumes a word. Returns
     /// a confidence level in a range of 0...1.
     func fuzzyMatch(_ target: String) -> Confidence {
-        guard !target.isEmpty else {
+        guard !self.isEmpty && !target.isEmpty else {
             return 0.0
         }
         let lhs = self.lowercased()
         let rhs = target.lowercased()
 
         let prefixCount = min(lhs.count, rhs.count)
-
+        let countDiff = Float(abs(count - target.count))
+        let countWeight = 1.0 - (countDiff / Float(max(count, target.count)))
+        if hasPrefix(target) {
+            return Confidence(0.8 + (countWeight * 0.2))
+        }
+        if  contains(target) {
+            return Confidence(0.7 + (countWeight * 0.2))
+        }
         let fullDistance = lhs.distance(to: rhs)
         let prefixDistance = String(lhs.prefix(prefixCount)).distance(to: String(rhs.prefix(prefixCount)))
 

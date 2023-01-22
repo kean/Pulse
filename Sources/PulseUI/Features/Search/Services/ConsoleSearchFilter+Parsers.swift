@@ -34,7 +34,7 @@ extension Parsers {
             let suggested = values.flatMap { value in
                 hosts.map { ($0, $0.fuzzyMatch(value)) }
             }
-            let filters = suggested.filter { $0.1 > 0.8 }
+            let filters = suggested.filter { $0.1 > 0.2 }
                 .sorted(by: { $0.1 > $1.1 })
                 .prefix(2)
                 .map { (ConsoleSearchFilter.host(.init(values: [$0.0])), $0.1) }
