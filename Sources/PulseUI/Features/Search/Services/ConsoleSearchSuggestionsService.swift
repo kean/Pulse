@@ -135,6 +135,9 @@ final class ConsoleSearchSuggestionsService {
     func clearRecentSearches() {
         recentSearches = []
         saveRecentSearches()
+
+        recentFilters = []
+        saveRecentFilters()
     }
 
     private func saveRecentSearches() {
