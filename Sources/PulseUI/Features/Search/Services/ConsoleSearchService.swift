@@ -27,8 +27,8 @@ final class ConsoleSearchService {
     }
 
     private func _search(_ message: LoggerMessageEntity, parameters: ConsoleSearchParameters) -> [ConsoleSearchOccurrence]? {
-        let occurences = search(message.text as NSString, parameters, .message)
-        return occurences.isEmpty ? nil : occurences
+        let occurrences = search(message.text as NSString, parameters, .message)
+        return occurrences.isEmpty ? nil : occurrences
     }
 
     private func _search(_ task: NetworkTaskEntity, parameters: ConsoleSearchParameters) -> [ConsoleSearchOccurrence]? {

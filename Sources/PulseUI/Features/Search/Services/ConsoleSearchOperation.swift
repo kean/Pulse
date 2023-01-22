@@ -56,14 +56,14 @@ final class ConsoleSearchOperation {
         while index < objectIDs.count, !isCancelled, !hasMore {
             let currentMatchIndex = index
             if let entity = try? self.context.existingObject(with: objectIDs[index]),
-               let occurences = self.service.search(entity, parameters: parameters) {
+               let occurrences = self.service.search(entity, parameters: parameters) {
                 found += 1
                 if found > cutoff {
                     hasMore = true
                     index -= 1
                 } else {
                     DispatchQueue.main.async {
-                        self.delegate?.searchOperation(self, didAddResults: [ConsoleSearchResultViewModel(entity: self.entities[currentMatchIndex], occurrences: occurences)])
+                        self.delegate?.searchOperation(self, didAddResults: [ConsoleSearchResultViewModel(entity: self.entities[currentMatchIndex], occurrences: occurrences)])
                     }
                 }
             }
