@@ -8,9 +8,6 @@ import Pulse
 import Combine
 import SwiftUI
 
-#warning("add counters")
-#warning("how to handle groups and sortes for alltab")
-
 final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, ObservableObject {
     @Published private(set) var visibleEntities: ArraySlice<NSManagedObject> = []
     @Published private(set) var entities: [NSManagedObject] = []

@@ -119,9 +119,6 @@ private struct _ConsoleRegularContentView: View {
         } else {
             toolbar
         }
-
-#warning("try pins as an ico ?")
-
         ConsoleListContentView(viewModel: viewModel.list)
         footerView
     }

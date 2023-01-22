@@ -100,20 +100,11 @@ private struct ConsoleModeButton: View {
     }
 }
 
-#warning("add pin picker?")
-#warning("display pins even from the previous session")
-#warning("remove all pins when pin filter is selected")
-
 struct ConsoleFiltersView: View {
     @ObservedObject var viewModel: ConsoleSearchCriteriaViewModel
     @ObservedObject var router: ConsoleRouter
 
     var body: some View {
-//        Button(action: { viewModel.isOnlyErrors.toggle() }) {
-//            Image(systemName: viewModel.isOnlyErrors ? "pin.square" : "pin.circle")
-//                .font(.system(size: 20))
-//                .foregroundColor(viewModel.isOnlyErrors ? .red : .accentColor)
-//        }
         Button(action: { viewModel.isOnlyErrors.toggle() }) {
             Image(systemName: viewModel.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon")
                 .font(.system(size: 20))
