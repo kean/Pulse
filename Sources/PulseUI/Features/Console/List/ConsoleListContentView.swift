@@ -91,8 +91,8 @@ struct ConsoleListContentView: View {
                     }
                 }
         }, isSeeAllHidden: prefix.count == viewModel.pins.count)
-        ForEach(prefix, id: \.objectID) { entity in
-            ConsoleEntityCell(entity: entity)
+        ForEach(prefix.map(PinCellViewModel.init)) { viewModel in
+            ConsoleEntityCell(entity: viewModel.object)
         }
         Button(action: viewModel.buttonRemovePinsTapped) {
             Text("Remove Pins")
@@ -138,4 +138,19 @@ struct ConsolePlainList: View {
             ForEach(entities, id: \.objectID, content: ConsoleEntityCell.init)
         }.listStyle(.plain)
     }
+}
+
+private struct PinCellViewModel: Hashable, Identifiable {
+    let object: NSManagedObject
+    var id: PinCellId
+
+    init(_ object: NSManagedObject) {
+        self.object = object
+        self.id = PinCellId(id: object.objectID)
+    }
+}
+
+// Make sure the cells 
+private struct PinCellId: Hashable {
+    let id: NSManagedObjectID
 }

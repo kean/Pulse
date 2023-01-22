@@ -66,7 +66,8 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
         self.pinsController = NSFetchedResultsController(
             fetchRequest: {
                 let request = NSFetchRequest<NSManagedObject>(entityName: "\(LoggerMessageEntity.self)")
-                request.predicate = NSPredicate(format: "isPinned == YES")
+                #warning("temp")
+//                request.predicate = NSPredicate(format: "isPinned == YES")
                 request.sortDescriptors = [NSSortDescriptor(key: "createdAt", ascending: false)]
                 return request
             }(),
