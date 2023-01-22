@@ -64,11 +64,28 @@ struct ConsoleListContentView: View {
     }
 #endif
 
+    @ViewBuilder
     private var plainView: some View {
         ForEach(viewModel.visibleEntities, id: \.objectID) { entity in
             ConsoleEntityCell(entity: entity)
                 .onAppear { viewModel.onAppearCell(with: entity.objectID) }
                 .onDisappear { viewModel.onDisappearCell(with: entity.objectID) }
+        }
+        footerView
+    }
+
+    @ViewBuilder
+    private var footerView: some View {
+        if #available(iOS 15, *), viewModel.isShowPreviousSessionButtonShown {
+            Button(action: viewModel.buttonShowPreviousSessionTapped) {
+                Text("Show Previous Sessions")
+                    .font(.subheadline)
+                    .foregroundColor(Color.blue)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+#if os(iOS)
+            .listRowSeparator(.hidden, edges: .bottom)
+#endif
         }
     }
 }

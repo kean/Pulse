@@ -120,20 +120,6 @@ private struct _ConsoleRegularContentView: View {
             toolbar
         }
         ConsoleListContentView(viewModel: viewModel.list)
-        footerView
-    }
-
-    @ViewBuilder
-    private var footerView: some View {
-        if #available(iOS 15, *), viewModel.searchCriteriaViewModel.criteria.shared.dates == .session, viewModel.list.options.order == .descending {
-            Button(action: { viewModel.searchCriteriaViewModel.criteria.shared.dates.startDate = nil }) {
-                Text("Show Previous Sessions")
-                    .font(.subheadline)
-                    .foregroundColor(Color.blue)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            .listRowSeparator(.hidden, edges: .bottom)
-        }
     }
 }
 
