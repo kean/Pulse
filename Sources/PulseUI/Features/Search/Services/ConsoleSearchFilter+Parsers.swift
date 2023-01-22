@@ -12,7 +12,7 @@ import Foundation
 // The patterns are set up with "guesses" around. So if the user enters incorrect
 // range, it'll still try to "guess".
 extension Parsers {
-    static let filters: [Parser<(ConsoleSearchFilter, Confidence)>] = [
+    static let filters: [Parser<[(ConsoleSearchFilter, Confidence)]>] = [
         filterStatusCode, filterMethod, filterHost, filterPath
     ]
 
@@ -21,25 +21,25 @@ extension Parsers {
             // If we find a value in 100...500 range, assign it 0.7 confidence and suggest it
             listOf(statusCode).filter { !$0.isEmpty }.map { (0.7, $0) }
     ).map { confidence, values in
-        (ConsoleSearchFilter.statusCode(.init(values: values)), confidence)
+        [(ConsoleSearchFilter.statusCode(.init(values: values)), confidence)]
     }
 
     static let filterHost = (filterName("host") <*> listOf(host)).map { confidence, values in
-        (ConsoleSearchFilter.host(.init(values: values)), confidence)
+        [(ConsoleSearchFilter.host(.init(values: values)), confidence)]
     }
 
     static let filterMethod = oneOf(
         filterName("method") <*> listOf(httpMethod),
         listOf(httpMethod).filter { !$0.isEmpty }.map { (0.7, $0) }
     ).map { confidence, values in
-        (ConsoleSearchFilter.method(.init(values: values)), confidence)
+        [(ConsoleSearchFilter.method(.init(values: values)), confidence)]
     }
 
     static let filterPath = oneOf(
         filterName("path") <*> listOf(path),
         (char(from: "/") *> path).map { (0.7, ["/" + $0]) }
     ).map { confidence, values in
-        (ConsoleSearchFilter.path(.init(values: values)), confidence)
+        [(ConsoleSearchFilter.path(.init(values: values)), confidence)]
     }
 
     static let host = char(from: .urlHostAllowed.subtracting(.init(charactersIn: ",")))

@@ -52,6 +52,7 @@ final class ConsoleSearchSuggestionsService {
 
         var filters = Parsers.filters
             .compactMap { try? $0.parse(context.searchText) }
+            .flatMap { $0 }
             .sorted(by: { $0.1 > $1.1 }) // Sort by confidence
 
 #warning("when I start typing /, suggest path filter and add auto-completion")
