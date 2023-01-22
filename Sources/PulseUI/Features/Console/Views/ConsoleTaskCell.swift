@@ -24,14 +24,8 @@ struct ConsoleTaskCell: View {
         let contents = VStack(alignment: .leading, spacing: 6) {
             title
             message
-            if task.state == .pending {
-                (Text(task.httpMethod ?? "GET") +
-                 Text("   ") +
-                 Text(viewModel.progress?.details ?? ""))
-                    .font(ConsoleConstants.fontBody.smallCaps())
-                    .lineLimit(1)
-                    .foregroundColor(.secondary)
-
+            if let progress = viewModel.progress {
+                ConsoleProgressText(title: task.httpMethod ?? "GET", viewModel: progress)
             } else {
                 details
             }
@@ -126,15 +120,17 @@ struct ConsoleTaskCell: View {
     }
 }
 
-private struct ConsoleTimeText: View {
-    let date: Date
-    let color: Color
+private struct ConsoleProgressText: View {
+    let title: String
+    @ObservedObject var viewModel: ProgressViewModel
 
     var body: some View {
-        Text(ConsoleMessageCellViewModel.timeFormatter.string(from: date))
-            .font(ConsoleConstants.fontTitle)
+        (Text(title) +
+         Text("   ") +
+         Text(viewModel.details ?? ""))
+            .font(ConsoleConstants.fontBody.smallCaps())
             .lineLimit(1)
-            .backport.monospacedDigit()
+            .foregroundColor(.secondary)
     }
 }
 

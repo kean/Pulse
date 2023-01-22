@@ -12,8 +12,7 @@ final class ConsoleTaskCellViewModel: ObservableObject {
     private(set) var progress: ProgressViewModel?
     private var task: NetworkTaskEntity?
 
-    private var stateCancellable: AnyCancellable?
-    private var progressCancellable: AnyCancellable?
+    private var cancellable: AnyCancellable?
 
     func bind(_ task: NetworkTaskEntity) {
         guard task !== self.task else {
@@ -22,20 +21,16 @@ final class ConsoleTaskCellViewModel: ObservableObject {
 
         self.task = task
 
-        stateCancellable = nil
+        cancellable = nil
         progress = nil
 
         if task.state == .pending {
-            stateCancellable = task.publisher(for: \.requestState).sink { [weak self] _ in
+            cancellable = task.publisher(for: \.requestState).sink { [weak self] _ in
                 withAnimation {
                     self?.objectWillChange.send()
                 }
             }
-            let progress = ProgressViewModel(task: task)
-            progressCancellable = progress.objectWillChange.sink { [weak self] _ in
-                self?.objectWillChange.send()
-            }
-            self.progress = progress
+            self.progress = ProgressViewModel(task: task)
         }
         pins = PinButtonViewModel(task)
 
