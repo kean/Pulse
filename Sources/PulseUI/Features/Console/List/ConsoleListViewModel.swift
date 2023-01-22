@@ -226,7 +226,7 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
 
 private let fetchBatchSize = 100
 
-enum ConsoleMode {
+enum ConsoleMode: String {
     case all
     case logs
     case tasks

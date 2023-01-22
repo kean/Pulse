@@ -56,14 +56,6 @@ private struct ConsoleModePicker: View {
         }
         .onReceive(viewModel.list.$mode) { mode = $0 }
     }
-
-    #warning("remove")
-    private var titlePublisher: some Publisher<String, Never> {
-        viewModel.list.$entities.combineLatest(viewModel.list.$mode)
-            .map { entities, isOnlyNetwork in
-                "\(entities.count) \(viewModel.list.mode == .tasks ? "Requests" : "Messages")"
-            }
-    }
 }
 
 private struct ConsoleModeButton: View {
