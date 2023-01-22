@@ -9,6 +9,7 @@ import Combine
 
 struct ConsoleMessageCell: View {
     let viewModel: ConsoleMessageCellViewModel
+    var isDisclosureNeeded = false
 
     var body: some View {
         let contents = VStack(alignment: .leading, spacing: 4) {
@@ -22,11 +23,16 @@ struct ConsoleMessageCell: View {
                 PinView(viewModel: viewModel.pinViewModel, font: ConsoleConstants.fontTitle)
                     .frame(width: 4, height: 4) // don't affect layout
 #endif
-                Text(viewModel.time)
-                    .lineLimit(1)
-                    .font(ConsoleConstants.fontTitle)
-                    .foregroundColor(titleColor)
-                    .backport.monospacedDigit()
+                HStack(spacing: 3) {
+                    Text(viewModel.time)
+                        .lineLimit(1)
+                        .font(ConsoleConstants.fontTitle)
+                        .foregroundColor(titleColor)
+                        .backport.monospacedDigit()
+                    if isDisclosureNeeded {
+                        ListDisclosureIndicator()
+                    }
+                }
             }
             Text(viewModel.preprocessedText)
                 .font(ConsoleConstants.fontBody)
@@ -45,6 +51,17 @@ struct ConsoleMessageCell: View {
 
     var titleColor: Color {
         viewModel.message.logLevel >= .warning ? .textColor(for: viewModel.message.logLevel) : .secondary
+    }
+}
+
+struct ListDisclosureIndicator: View {
+    var body: some View {
+        Image(systemName: "chevron.right")
+            .foregroundColor(.separator)
+            .lineLimit(1)
+            .font(ConsoleConstants.fontTitle)
+            .foregroundColor(.secondary)
+            .padding(.trailing, -12)
     }
 }
 
