@@ -25,6 +25,10 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
         }
     }
 
+    var isShowPreviousSessionButtonShown: Bool {
+        searchCriteriaViewModel.criteria.shared.dates == .session
+    }
+
     @Published private(set) var mode: ConsoleMode = .all
 
     /// This exist strickly to workaround List performance issues
@@ -82,6 +86,10 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
     func update(mode: ConsoleMode) {
         self.mode = mode
         self.refreshController()
+    }
+
+    func buttonShowPreviousSessionTapped() {
+        searchCriteriaViewModel.criteria.shared.dates.startDate = nil
     }
 
     // MARK: - NSFetchedResultsController

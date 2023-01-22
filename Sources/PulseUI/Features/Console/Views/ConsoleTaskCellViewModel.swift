@@ -8,18 +8,10 @@ import Combine
 import CoreData
 
 final class ConsoleTaskCellViewModel: Pinnable, ObservableObject {
-    private(set) lazy var time = ConsoleMessageCellViewModel.timeFormatter.string(from: task.createdAt)
     private(set) lazy var progress = ProgressViewModel(task: task)
 
     let task: NetworkTaskEntity
     private var cancellable: AnyCancellable?
-
-    static let timeFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "en_US")
-        formatter.dateFormat = "HH:mm:ss.SSS"
-        return formatter
-    }()
 
     init(task: NetworkTaskEntity) {
         self.task = task
