@@ -31,9 +31,6 @@ final class ConsoleSettings: PersistentSettings {
 
     @UserDefault("recent-filters")
     var recentFilters: String = "[]"
-
-    @UserDefault("selected-console-mode")
-    var selectedConsoleMode: String = ConsoleMode.all.rawValue
 }
 
 final class ConsoleTextViewSettings: PersistentSettings {
