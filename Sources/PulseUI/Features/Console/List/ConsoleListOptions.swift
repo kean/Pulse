@@ -18,7 +18,7 @@ struct ConsoleListOptions {
     }
 
     enum MessageSortBy: String, CaseIterable {
-        case dateCreated = "Date Created"
+        case dateCreated = "Date"
         case level = "Level"
 
         var key: String {
@@ -30,7 +30,7 @@ struct ConsoleListOptions {
     }
 
     enum TaskSortBy: String, CaseIterable {
-        case dateCreated = "Date Created"
+        case dateCreated = "Date"
         case duration = "Duration"
         case requestSize = "Request Size"
         case responseSize = "Response Size"
