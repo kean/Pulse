@@ -154,16 +154,21 @@ struct ConsoleFiltersView: View {
         Menu(content: {
             if viewModel.mode == .tasks {
                 Picker("Group By", selection: $listViewModel.options.taskGroupBy) {
-                    Text("Ungrouped").tag(ConsoleListOptions.TaskGroupBy.noGrouping)
-                    Divider()
-                    Text("URL").tag(ConsoleListOptions.TaskGroupBy.url)
-                    Text("Host").tag(ConsoleListOptions.TaskGroupBy.host)
-                    Text("Method").tag(ConsoleListOptions.TaskGroupBy.method)
-                    Divider()
-                    Text("Status Code").tag(ConsoleListOptions.TaskGroupBy.statusCode)
-                    Text("Error Code").tag(ConsoleListOptions.TaskGroupBy.errorCode)
-                    Divider()
-                    Text("Task Type").tag(ConsoleListOptions.TaskGroupBy.taskType)
+                    Group {
+                        Text("Ungrouped").tag(ConsoleListOptions.TaskGroupBy.noGrouping)
+                        Divider()
+                        Text("URL").tag(ConsoleListOptions.TaskGroupBy.url)
+                        Text("Host").tag(ConsoleListOptions.TaskGroupBy.host)
+                        Text("Method").tag(ConsoleListOptions.TaskGroupBy.method)
+                    }
+                    Group {
+                        Divider()
+                        Text("Status Code").tag(ConsoleListOptions.TaskGroupBy.statusCode)
+                        Text("Error Code").tag(ConsoleListOptions.TaskGroupBy.errorCode)
+                        Divider()
+                        Text("Task State").tag(ConsoleListOptions.TaskGroupBy.requestState)
+                        Text("Task Type").tag(ConsoleListOptions.TaskGroupBy.taskType)
+                    }
                 }
             } else {
                 Picker("Group By", selection: $listViewModel.options.messageGroupBy) {

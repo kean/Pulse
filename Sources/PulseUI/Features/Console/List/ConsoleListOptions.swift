@@ -76,6 +76,7 @@ struct ConsoleListOptions {
         case taskType = "Task Type"
         case statusCode = "Status Code"
         case errorCode = "Error Code"
+        case requestState = "State"
 
         var key: String? {
             switch self {
@@ -86,6 +87,7 @@ struct ConsoleListOptions {
             case .taskType: return "taskType"
             case .statusCode: return "statusCode"
             case .errorCode: return "errorCode"
+            case .requestState: return "requestState"
             }
         }
 

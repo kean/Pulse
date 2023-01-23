@@ -50,6 +50,17 @@ struct ConsoleListContentView: View {
                 let rawValue = Int32(section.name) ?? 0
                 return StatusCodeFormatter.string(for: rawValue)
             }
+            if viewModel.options.taskGroupBy == .requestState {
+                let rawValue = Int16(Int(section.name) ?? 0)
+                guard let state = NetworkTaskEntity.State(rawValue: rawValue) else {
+                    return "Unknown State"
+                }
+                switch state {
+                case .pending: return "Pending"
+                case .success: return "Success"
+                case .failure: return "Failure"
+                }
+            }
         }
         let name = section.name
         return name.isEmpty ? "–" : name
