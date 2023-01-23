@@ -205,6 +205,10 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
 
     // MARK: - NSFetchedResultsControllerDelegate
 
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        didRefreshContent()
+    }
+
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChangeContentWith diff: CollectionDifference<NSManagedObjectID>) {
         if diff.insertions.count == 1 && diff.removals.count == 1,
            case let .insert(lhsIndex, lhs, _) = diff.insertions[0],
@@ -218,13 +222,17 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
                 pins = self.pinsController.fetchedObjects ?? []
             }
         } else {
-            if isViewVisible {
-                withAnimation {
-                    reloadMessages(isMandatory: false)
-                }
-            } else {
-                entities = self.controller?.fetchedObjects ?? []
+            didRefreshContent()
+        }
+    }
+
+    private func didRefreshContent() {
+        if isViewVisible {
+            withAnimation {
+                reloadMessages(isMandatory: false)
             }
+        } else {
+            entities = self.controller?.fetchedObjects ?? []
         }
     }
 
