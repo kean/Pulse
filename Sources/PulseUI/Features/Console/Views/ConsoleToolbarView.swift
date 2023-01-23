@@ -20,9 +20,9 @@ struct ConsoleToolbarView: View {
                 ConsoleModePicker(viewModel: viewModel)
             }
             Spacer()
-            HStack(spacing: 14) {
+            HStack(spacing: 12) {
                 ConsoleFiltersView(viewModel: viewModel)
-            }
+            }.padding(.trailing, -2)
         }
         .buttonStyle(.plain)
     }
