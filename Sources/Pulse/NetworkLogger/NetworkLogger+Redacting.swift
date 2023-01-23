@@ -195,7 +195,7 @@ private func redactingSensitiveFields(_ value: Any, _ fields: Set<String>) -> An
         }
         return object
     case let array as [Any]:
-        return array.map { _ in redactingSensitiveFields(array, fields) }
+        return array.map { redactingSensitiveFields($0, fields) }
     default:
         return value
     }
