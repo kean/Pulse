@@ -188,8 +188,8 @@ struct PlainListExpandableSectionHeader<Destination: View>: View {
                     .font(.subheadline.weight(.medium))
                 +
                 Text(" (\(count))")
-                   .foregroundColor(.separator)
-                   .font(.subheadline.weight(.medium).monospacedDigit())
+                    .foregroundColor(.secondary.opacity(0.7))
+                    .font(.subheadline.weight(.medium).monospacedDigit())
                 if !isSeeAllHidden {
                     Spacer()
                     Text("See All")
