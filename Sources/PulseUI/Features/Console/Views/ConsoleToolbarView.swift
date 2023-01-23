@@ -163,6 +163,7 @@ struct ConsoleFiltersView: View {
                     }
                     Group {
                         Divider()
+                        Text("Content Type").tag(ConsoleListOptions.TaskGroupBy.responseContentType)
                         Text("Status Code").tag(ConsoleListOptions.TaskGroupBy.statusCode)
                         Text("Error Code").tag(ConsoleListOptions.TaskGroupBy.errorCode)
                         Divider()

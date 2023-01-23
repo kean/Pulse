@@ -68,15 +68,16 @@ struct ConsoleListOptions {
         }
     }
 
-    enum TaskGroupBy: String, ConsoleListGroupBy {
-        case noGrouping = "No Grouping"
-        case url = "URL"
-        case host = "Host"
-        case method = "Method"
-        case taskType = "Task Type"
-        case statusCode = "Status Code"
-        case errorCode = "Error Code"
-        case requestState = "State"
+    enum TaskGroupBy: ConsoleListGroupBy {
+        case noGrouping
+        case url
+        case host
+        case method
+        case taskType
+        case statusCode
+        case errorCode
+        case requestState
+        case responseContentType
 
         var key: String? {
             switch self {
@@ -88,6 +89,7 @@ struct ConsoleListOptions {
             case .statusCode: return "statusCode"
             case .errorCode: return "errorCode"
             case .requestState: return "requestState"
+            case .responseContentType: return "responseContentType"
             }
         }
 

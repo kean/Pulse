@@ -17,7 +17,7 @@ struct PinButton: View {
     var body: some View {
         Button(action: viewModel.togglePin) {
             if isTextNeeded {
-                Label(viewModel.isPinned ? "Remove Pin" : "Pin", systemImage: viewModel.isPinned ? "pin.fill" : "pin")
+                Label(viewModel.isPinned ? "Unpin" : "Pin", systemImage: viewModel.isPinned ? "pin.fill" : "pin")
             } else {
                 Image(systemName: viewModel.isPinned ? "pin.fill" : "pin")
             }
