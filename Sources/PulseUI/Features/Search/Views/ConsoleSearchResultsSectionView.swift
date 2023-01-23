@@ -207,7 +207,7 @@ struct PlainListSeeAllView: View {
     let count: Int
 
     var body: some View {
-        (Text("See All").foregroundColor(.primary) +
+        (Text("See All").foregroundColor(.blue) +
          Text("  (\(count))"))
         .font(.subheadline)
         .foregroundColor(.secondary)
