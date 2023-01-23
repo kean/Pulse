@@ -52,7 +52,7 @@ enum ConsoleFormatter {
     }
 
     static func label(for message: LoggerMessageEntity) -> String? {
-        let label = message.label.name
+        let label = message.label
         guard label != "default", !label.isEmpty else {
             return nil
         }

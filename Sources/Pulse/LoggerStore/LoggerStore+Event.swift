@@ -18,18 +18,18 @@ extension LoggerStore {
             public var level: LoggerStore.Level
             public var message: String
             public var metadata: [String: String]?
-            public var session: UUID
+            public var sessionID: Int64
             public var file: String
             public var function: String
             public var line: UInt
 
-            public init(createdAt: Date, label: String, level: LoggerStore.Level, message: String, metadata: [String: String]?, session: UUID, file: String, function: String, line: UInt) {
+            public init(createdAt: Date, label: String, level: LoggerStore.Level, message: String, metadata: [String: String]?, sessionID: Int64, file: String, function: String, line: UInt) {
                 self.createdAt = createdAt
                 self.label = label
                 self.level = level
                 self.message = message
                 self.metadata = metadata
-                self.session = session
+                self.sessionID = sessionID
                 self.file = file
                 self.function = function
                 self.line = line
@@ -42,15 +42,15 @@ extension LoggerStore {
             public var createdAt: Date
             public var originalRequest: NetworkLogger.Request
             public var currentRequest: NetworkLogger.Request?
-            public var session: UUID
+            public var sessionID: Int64
 
-            public init(taskId: UUID, taskType: NetworkLogger.TaskType, createdAt: Date, originalRequest: NetworkLogger.Request, currentRequest: NetworkLogger.Request?, session: UUID) {
+            public init(taskId: UUID, taskType: NetworkLogger.TaskType, createdAt: Date, originalRequest: NetworkLogger.Request, currentRequest: NetworkLogger.Request?, sessionID: Int64) {
                 self.taskId = taskId
                 self.taskType = taskType
                 self.createdAt = createdAt
                 self.originalRequest = originalRequest
                 self.currentRequest = currentRequest
-                self.session = session
+                self.sessionID = sessionID
             }
         }
 
@@ -79,9 +79,9 @@ extension LoggerStore {
             public var requestBody: Data?
             public var responseBody: Data?
             public var metrics: NetworkLogger.Metrics?
-            public var session: UUID
+            public var sessionID: Int64
 
-            public init(taskId: UUID, taskType: NetworkLogger.TaskType, createdAt: Date, originalRequest: NetworkLogger.Request, currentRequest: NetworkLogger.Request?, response: NetworkLogger.Response?, error: NetworkLogger.ResponseError?, requestBody: Data?, responseBody: Data?, metrics: NetworkLogger.Metrics?, session: UUID) {
+            public init(taskId: UUID, taskType: NetworkLogger.TaskType, createdAt: Date, originalRequest: NetworkLogger.Request, currentRequest: NetworkLogger.Request?, response: NetworkLogger.Response?, error: NetworkLogger.ResponseError?, requestBody: Data?, responseBody: Data?, metrics: NetworkLogger.Metrics?, sessionID: Int64) {
                 self.taskId = taskId
                 self.taskType = taskType
                 self.createdAt = createdAt
@@ -92,7 +92,7 @@ extension LoggerStore {
                 self.requestBody = requestBody
                 self.responseBody = responseBody
                 self.metrics = metrics
-                self.session = session
+                self.sessionID = sessionID
             }
         }
 

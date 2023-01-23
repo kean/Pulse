@@ -11,11 +11,11 @@ extension LoggerStore {
         typealias Attribute = NSAttributeDescription
         typealias Relationship = NSRelationshipDescription
 
+        let session = Entity(class: LoggerSessionEntity.self)
+
         let message = Entity(class: LoggerMessageEntity.self)
-        let label = Entity(class: LoggerLabelEntity.self)
 
         let task = Entity(class: NetworkTaskEntity.self)
-        let domain = Entity(class: NetworkDomainEntity.self)
         let progress = Entity(class: NetworkTaskProgressEntity.self)
         let request = Entity(class: NetworkRequestEntity.self)
         let response = Entity(class: NetworkResponseEntity.self)
@@ -23,32 +23,32 @@ extension LoggerStore {
 
         let blob = Entity(class: LoggerBlobHandleEntity.self)
 
+        session.properties = [
+            Attribute(name: "sessionID", type: .integer64AttributeType),
+            Attribute(name: "createdAt", type: .dateAttributeType)
+        ]
+
         message.properties = [
             Attribute(name: "createdAt", type: .dateAttributeType),
             Attribute(name: "isPinned", type: .booleanAttributeType),
-            Attribute(name: "session", type: .UUIDAttributeType),
+            Attribute(name: "sessionID", type: .integer64AttributeType),
             Attribute(name: "level", type: .integer16AttributeType),
             Attribute(name: "text", type: .stringAttributeType),
             Attribute(name: "file", type: .stringAttributeType),
             Attribute(name: "function", type: .stringAttributeType),
             Attribute(name: "line", type: .integer32AttributeType),
             Attribute(name: "rawMetadata", type: .stringAttributeType),
-            Relationship(name: "label", type: .oneToOne(), deleteRule: .noActionDeleteRule, entity: label),
+            Attribute(name: "label", type: .stringAttributeType),
             Relationship(name: "task", type: .oneToOne(isOptional: true), entity: task)
-        ]
-
-        label.properties = [
-            Attribute(name: "name", type: .stringAttributeType),
-            Attribute(name: "count", type: .integer64AttributeType),
         ]
 
         task.properties = [
             Attribute(name: "createdAt", type: .dateAttributeType),
-            Attribute(name: "session", type: .UUIDAttributeType),
+            Attribute(name: "sessionID", type: .integer64AttributeType),
             Attribute(name: "taskId", type: .UUIDAttributeType),
             Attribute(name: "taskType", type: .integer16AttributeType),
             Attribute(name: "url", type: .stringAttributeType),
-            Relationship(name: "host", type: .oneToOne(isOptional: true), entity: domain),
+            Attribute(name: "host", type: .stringAttributeType),
             Attribute(name: "httpMethod", type: .stringAttributeType),
             Attribute(name: "statusCode", type: .integer32AttributeType),
             Attribute(name: "errorCode", type: .integer32AttributeType),
@@ -72,11 +72,6 @@ extension LoggerStore {
             Relationship(name: "requestBody", type: .oneToOne(isOptional: true), deleteRule: .noActionDeleteRule, entity: blob),
             Relationship(name: "responseBody", type: .oneToOne(isOptional: true), deleteRule: .noActionDeleteRule, entity: blob),
             Relationship(name: "progress", type: .oneToOne(isOptional: true), entity: progress)
-        ]
-
-        domain.properties = [
-            Attribute(name: "value", type: .stringAttributeType),
-            Attribute(name: "count", type: .integer64AttributeType)
         ]
 
         request.properties = [
@@ -149,7 +144,7 @@ extension LoggerStore {
         ]
 
         let model = NSManagedObjectModel()
-        model.entities = [message, label, task, domain, progress, blob, request, response, transaction]
+        model.entities = [session, message, task, progress, blob, request, response, transaction]
         return model
     }()
 }

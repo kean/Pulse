@@ -68,9 +68,9 @@ private func makePredicates(for criteria: ConsoleSearchCriteria.Messages) -> [NS
 
     if criteria.labels.isEnabled {
         if let focusedLabel = criteria.labels.focused {
-            predicates.append(NSPredicate(format: "label.name == %@", focusedLabel))
+            predicates.append(NSPredicate(format: "label == %@", focusedLabel))
         } else if !criteria.labels.hidden.isEmpty {
-            predicates.append(NSPredicate(format: "NOT label.name IN %@", Array(criteria.labels.hidden)))
+            predicates.append(NSPredicate(format: "NOT label IN %@", Array(criteria.labels.hidden)))
         }
     }
 
@@ -134,7 +134,7 @@ private func makePredicates(for criteria: ConsoleSearchCriteria.Network) -> [NSP
     }
 
     if criteria.host.isEnabled, !criteria.host.ignoredHosts.isEmpty {
-        predicates.append(NSPredicate(format: "NOT host.value IN %@", criteria.host.ignoredHosts))
+        predicates.append(NSPredicate(format: "NOT host IN %@", criteria.host.ignoredHosts))
     }
 
     if criteria.custom.isEnabled {

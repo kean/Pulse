@@ -59,7 +59,7 @@ final class URLSessionProxyTests: XCTestCase {
         XCTAssertEqual(task.requestState, NetworkTaskEntity.State.success.rawValue)
 
         let message = try XCTUnwrap(task.message)
-        XCTAssertEqual(message.label.name, "network")
+        XCTAssertEqual(message.label, "network")
     }
 
     func testRecordError() throws {
@@ -89,6 +89,6 @@ final class URLSessionProxyTests: XCTestCase {
         XCTAssertEqual(task.requestState, NetworkTaskEntity.State.failure.rawValue)
 
         let message = try XCTUnwrap(task.message)
-        XCTAssertEqual(message.label.name, "network")
+        XCTAssertEqual(message.label, "network")
     }
 }

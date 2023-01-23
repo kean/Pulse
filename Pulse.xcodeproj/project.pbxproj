@@ -82,7 +82,7 @@
 		0CAF1D77297B0810002E2722 /* ConsoleSearchSuggestionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CAF1D76297B0810002E2722 /* ConsoleSearchSuggestionTests.swift */; };
 		0CAF1D79297B5FF4002E2722 /* ConsoleSearchServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CAF1D78297B5FF4002E2722 /* ConsoleSearchServiceTests.swift */; };
 		0CAF1D7B297C2040002E2722 /* ConsoleListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CAF1D7A297C2040002E2722 /* ConsoleListViewModel.swift */; };
-		0CB17F1A2978ABBA004E33F4 /* ManagedObjectsObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB17F192978ABBA004E33F4 /* ManagedObjectsObserver.swift */; };
+		0CB17F1A2978ABBA004E33F4 /* ManagedObjectsCountObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB17F192978ABBA004E33F4 /* ManagedObjectsCountObserver.swift */; };
 		0CB63A132973A12300525165 /* ConsoleSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A122973A12300525165 /* ConsoleSearchView.swift */; };
 		0CB63A15297438A600525165 /* ConsoleSearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A14297438A600525165 /* ConsoleSearchViewModel.swift */; };
 		0CB63A1B2974A5D200525165 /* ConsoleSearchResultsSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A1A2974A5D200525165 /* ConsoleSearchResultsSectionView.swift */; };
@@ -552,7 +552,7 @@
 		0CAF1D76297B0810002E2722 /* ConsoleSearchSuggestionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchSuggestionTests.swift; sourceTree = "<group>"; };
 		0CAF1D78297B5FF4002E2722 /* ConsoleSearchServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchServiceTests.swift; sourceTree = "<group>"; };
 		0CAF1D7A297C2040002E2722 /* ConsoleListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleListViewModel.swift; sourceTree = "<group>"; };
-		0CB17F192978ABBA004E33F4 /* ManagedObjectsObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagedObjectsObserver.swift; sourceTree = "<group>"; };
+		0CB17F192978ABBA004E33F4 /* ManagedObjectsCountObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagedObjectsCountObserver.swift; sourceTree = "<group>"; };
 		0CB63A122973A12300525165 /* ConsoleSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchView.swift; sourceTree = "<group>"; };
 		0CB63A14297438A600525165 /* ConsoleSearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchViewModel.swift; sourceTree = "<group>"; };
 		0CB63A1A2974A5D200525165 /* ConsoleSearchResultsSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchResultsSectionView.swift; sourceTree = "<group>"; };
@@ -1223,7 +1223,7 @@
 				0CB63A24297592D400525165 /* Parser.swift */,
 				0CF0D584296F189500EED9D4 /* LoggerSync.swift */,
 				0CF0D587296F189500EED9D4 /* DecodingErrorsPreviews.swift */,
-				0CB17F192978ABBA004E33F4 /* ManagedObjectsObserver.swift */,
+				0CB17F192978ABBA004E33F4 /* ManagedObjectsCountObserver.swift */,
 				0CB63A362976224600525165 /* Cache.swift */,
 				0CB63A392976227500525165 /* LinkedList.swift */,
 				0CF0D580296F189500EED9D4 /* Deprecated.swift */,
@@ -2155,7 +2155,7 @@
 				0CF0D610296F189600EED9D4 /* SpinnerView.swift in Sources */,
 				0CF0D680296F189600EED9D4 /* ConsoleMessageCellViewModel.swift in Sources */,
 				0CF0D639296F189600EED9D4 /* PinButton.swift in Sources */,
-				0CB17F1A2978ABBA004E33F4 /* ManagedObjectsObserver.swift in Sources */,
+				0CB17F1A2978ABBA004E33F4 /* ManagedObjectsCountObserver.swift in Sources */,
 				0CF0D644296F189600EED9D4 /* ConsoleSearchInlinePickerMenu.swift in Sources */,
 				0CF0D60E296F189600EED9D4 /* TextRenderer.swift in Sources */,
 				0CF0D618296F189600EED9D4 /* DecodingErrorsPreviews.swift in Sources */,
@@ -2523,7 +2523,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.github.kean.PulseDemo;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.epam.sample-app-12hdwfj019";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;

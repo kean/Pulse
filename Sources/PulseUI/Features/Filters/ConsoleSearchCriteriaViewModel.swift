@@ -28,10 +28,14 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
     private var entities: [NSManagedObject] = []
     private var cancellables: [AnyCancellable] = []
 
-    init(store: LoggerStore) {
+    init(store: LoggerStore, source: ConsoleSource) {
         self.store = store
 
         if store.isArchive {
+            self.criteria.shared.dates.startDate = nil
+            self.criteria.shared.dates.endDate = nil
+        }
+        if case .entities = source {
             self.criteria.shared.dates.startDate = nil
             self.criteria.shared.dates.endDate = nil
         }
@@ -79,7 +83,7 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
             guard let tasks = entities as? [NetworkTaskEntity] else {
                 return assertionFailure()
             }
-            domainsCountedSet = NSCountedSet(array: tasks.compactMap { $0.host?.value })
+            domainsCountedSet = NSCountedSet(array: tasks.compactMap { $0.host })
             domains = (domainsCountedSet.allObjects as! [String]).sorted(by: { lhs, rhs in
                 domainsCountedSet.count(for: lhs) > domainsCountedSet.count(for: rhs)
             })
@@ -87,7 +91,7 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
             guard let messages = entities as? [LoggerMessageEntity] else {
                 return assertionFailure()
             }
-            labelsCountedSet = NSCountedSet(array: messages.map(\.label.name))
+            labelsCountedSet = NSCountedSet(array: messages.map(\.label))
             labels = (labelsCountedSet.allObjects as! [String]).sorted()
         }
     }

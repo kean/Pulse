@@ -20,7 +20,7 @@ struct ConsoleSearchSuggestionsViewModel {
 
 struct ConsoleSearchSuggestionsContext {
     let searchText: String
-    let hosts: [String]
+    let hosts: Set<String>
     let parameters: ConsoleSearchParameters
 }
 

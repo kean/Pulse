@@ -50,20 +50,22 @@ struct ConsoleListOptions {
         case label = "Label"
         case level = "Level"
         case file = "File"
+        case session = "Session"
 
         var key: String? {
             switch self {
             case .noGrouping: return nil
-            case .label: return "label.name"
+            case .label: return "label"
             case .level: return "level"
             case .file: return "file"
+            case .session: return "sessionID"
             }
         }
 
         var isAscending: Bool {
             switch self {
             case .noGrouping, .label, .file: return true
-            case .level: return false
+            case .level, .session: return false
             }
         }
     }
@@ -78,23 +80,25 @@ struct ConsoleListOptions {
         case errorCode
         case requestState
         case responseContentType
+        case session
 
         var key: String? {
             switch self {
             case .noGrouping: return nil
             case .url: return "url"
-            case .host: return "host.value"
+            case .host: return "host"
             case .method: return "httpMethod"
             case .taskType: return "taskType"
             case .statusCode: return "statusCode"
             case .errorCode: return "errorCode"
             case .requestState: return "requestState"
             case .responseContentType: return "responseContentType"
+            case .session: return "sessionID"
             }
         }
 
         var isAscending: Bool {
-            self != .errorCode
+            self != .errorCode && self != .session
         }
     }
 }

@@ -17,7 +17,12 @@ struct ConsoleToolbarView: View {
             if viewModel.isNetwork {
                 ConsoleToolbarTitle(viewModel: viewModel)
             } else {
-                ConsoleModePicker(viewModel: viewModel)
+                switch viewModel.source {
+                case .store:
+                    ConsoleModePicker(viewModel: viewModel)
+                case .entities(_, let entities):
+                    ConsoleModeButton(title: viewModel.mode == .tasks ? "Tasks" : "Logs", details: "\(entities.count)", isSelected: false) {}
+                }
             }
             Spacer()
             HStack(spacing: 12) {
@@ -169,6 +174,8 @@ struct ConsoleFiltersView: View {
                         Divider()
                         Text("Task State").tag(ConsoleListOptions.TaskGroupBy.requestState)
                         Text("Task Type").tag(ConsoleListOptions.TaskGroupBy.taskType)
+                        Divider()
+                        Text("Session").tag(ConsoleListOptions.TaskGroupBy.session)
                     }
                 }
             } else {

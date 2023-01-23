@@ -26,14 +26,27 @@ struct PinButton: View {
 }
 
 struct PinView: View {
-    @ObservedObject var viewModel: PinButtonViewModel
-    let font: Font
+    private var message: LoggerMessageEntity?
+    @State private var isPinned = false
+
+    init(message: LoggerMessageEntity?) {
+        self.message = message
+    }
+
+    init(task: NetworkTaskEntity) {
+        self.init(message: task.message)
+    }
 
     var body: some View {
-        if viewModel.isPinned {
+        if let message = message {
             Image(systemName: "pin")
-                .font(font)
+                .font(ConsoleConstants.fontTitle)
                 .foregroundColor(.pink)
+                .opacity(isPinned ? 1 : 0)
+                .frame(width: 8, height: 8)
+                .onReceive(message.publisher(for: \.isPinned).removeDuplicates()) {
+                    isPinned = $0
+                }
         }
     }
 }

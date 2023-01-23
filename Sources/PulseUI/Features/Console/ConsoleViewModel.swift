@@ -11,6 +11,7 @@ final class ConsoleViewModel: ObservableObject {
     let title: String
     let isNetwork: Bool
     let store: LoggerStore
+    let source: ConsoleSource
 
     let list: ConsoleListViewModel
 
@@ -36,7 +37,7 @@ final class ConsoleViewModel: ObservableObject {
         didSet { refreshListsVisibility() }
     }
 
-    var mode: ConsoleMode = .all {
+    var mode: ConsoleMode {
         didSet {
             list.update(mode: mode)
             searchCriteriaViewModel.mode = mode
@@ -55,14 +56,23 @@ final class ConsoleViewModel: ObservableObject {
 
     private var cancellables: [AnyCancellable] = []
 
-    init(store: LoggerStore, isOnlyNetwork: Bool = false) {
-        self.title = isOnlyNetwork ? "Network" : "Console"
+    init(store: LoggerStore, source: ConsoleSource = .store, mode: ConsoleMode = .all, isOnlyNetwork: Bool = false) {
+        switch source {
+        case .store:
+            self.title = isOnlyNetwork ? "Network" : "Console"
+        case .entities(let title, _):
+            self.title = title
+        }
+
         self.store = store
+        self.source = source
+        self.mode = mode
         self.isNetwork = isOnlyNetwork
 
-        self.searchCriteriaViewModel = ConsoleSearchCriteriaViewModel(store: store)
+        self.searchCriteriaViewModel = ConsoleSearchCriteriaViewModel(store: store, source: source)
+
         self.searchBarViewModel = ConsoleSearchBarViewModel()
-        self.list = ConsoleListViewModel(store: store, criteria: searchCriteriaViewModel)
+        self.list = ConsoleListViewModel(store: store, source: source, criteria: searchCriteriaViewModel)
 
 #if os(iOS)
         self.insightsViewModel = InsightsViewModel(store: store)
@@ -86,4 +96,9 @@ final class ConsoleViewModel: ObservableObject {
     func prepareForSharing(as output: ShareOutput, _ completion: @escaping (ShareItems?) -> Void) {
         ShareService.share(list.entities, store: store, as: output, completion)
     }
+}
+
+enum ConsoleSource {
+    case store
+    case entities(title: String, entities: [NSManagedObject])
 }

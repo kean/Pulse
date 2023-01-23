@@ -23,9 +23,7 @@ final class ConsoleMessageCellViewModel {
         formatter.dateFormat = "HH:mm:ss.SSS"
         return formatter
     }()
-    
-    private(set) lazy var pinViewModel = PinButtonViewModel(message)
-    
+
     init(message: LoggerMessageEntity, searchCriteriaViewModel: ConsoleSearchCriteriaViewModel? = nil) {
         self.message = message
         self.searchCriteriaViewModel = searchCriteriaViewModel
@@ -40,12 +38,12 @@ final class ConsoleMessageCellViewModel {
 
     func focus() {
         searchCriteriaViewModel?.criteria.messages.labels.isEnabled = true
-        searchCriteriaViewModel?.criteria.messages.labels.focused = message.label.name
+        searchCriteriaViewModel?.criteria.messages.labels.focused = message.label
     }
     
     func hide() {
         searchCriteriaViewModel?.criteria.messages.labels.isEnabled = true
-        searchCriteriaViewModel?.criteria.messages.labels.hidden.insert(message.label.name)
+        searchCriteriaViewModel?.criteria.messages.labels.hidden.insert(message.label)
     }
 #endif
 }

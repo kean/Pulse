@@ -69,7 +69,7 @@ final class URLSessionProxyDelegateTests: XCTestCase {
         XCTAssertEqual(task.requestState, NetworkTaskEntity.State.success.rawValue)
 
         let message = try XCTUnwrap(task.message)
-        XCTAssertEqual(message.label.name, "network")
+        XCTAssertEqual(message.label, "network")
     }
 
     func testForwardingOfUnimplementedMethod() throws {
@@ -148,7 +148,7 @@ final class URLSessionProxyDelegateTests: XCTestCase {
         XCTAssertEqual(task.requestState, NetworkTaskEntity.State.success.rawValue)
 
         let message = try XCTUnwrap(task.message)
-        XCTAssertEqual(message.label.name, "network")
+        XCTAssertEqual(message.label, "network")
     }
 }
 

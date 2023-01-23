@@ -20,8 +20,7 @@ struct ConsoleMessageCell: View {
                     .foregroundColor(titleColor)
                 Spacer()
 #if os(macOS) || os(iOS)
-                PinView(viewModel: viewModel.pinViewModel, font: ConsoleConstants.fontTitle)
-                    .frame(width: 4, height: 4) // don't affect layout
+                PinView(message: viewModel.message)
 #endif
                 HStack(spacing: 3) {
                     Text(viewModel.time)

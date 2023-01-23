@@ -29,7 +29,7 @@ extension Parsers {
         [(ConsoleSearchFilter.statusCode(.init(values: values)), confidence)]
     }
 
-    static func makeFilterHost(hosts: [String]) -> Parser<[(ConsoleSearchFilter, Confidence)]> {
+    static func makeFilterHost(hosts: Set<String>) -> Parser<[(ConsoleSearchFilter, Confidence)]> {
         (optional(filterName("host")) <*> listOf(host)).map { confidence, values in
             let suggested = values.flatMap { value in
                 hosts.map { ($0, $0.fuzzyMatch(value)) }

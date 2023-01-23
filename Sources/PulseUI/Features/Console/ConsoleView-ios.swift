@@ -36,13 +36,19 @@ public struct ConsoleView: View {
         }
     }
 
+    @ViewBuilder
     private var trailingNavigationBarItems: some View {
-        HStack {
-            ConsoleShareButton(viewModel: viewModel)
-            Button(action: { viewModel.router.isShowingFilters = true }) {
-                Image(systemName: "line.horizontal.3.decrease.circle")
+        switch viewModel.source {
+        case .store:
+            HStack {
+                ConsoleShareButton(viewModel: viewModel)
+                Button(action: { viewModel.router.isShowingFilters = true }) {
+                    Image(systemName: "line.horizontal.3.decrease.circle")
+                }
+                ConsoleContextMenu(viewModel: viewModel)
             }
-            ConsoleContextMenu(viewModel: viewModel)
+        case .entities:
+            ConsoleShareButton(viewModel: viewModel)
         }
     }
 }

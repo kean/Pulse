@@ -99,7 +99,7 @@ struct ConsoleCustomMessageFilter: Hashable, Identifiable {
     private var key: String? {
         switch field {
         case .level: return "level"
-        case .label: return "label.name"
+        case .label: return "label"
         case .message: return "text"
         case .metadata: return "rawMetadata"
         case .file: return "file"

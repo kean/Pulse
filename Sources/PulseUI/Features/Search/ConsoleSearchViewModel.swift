@@ -65,7 +65,6 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     private let suggestionsService = ConsoleSearchSuggestionsService()
 
     private let store: LoggerStore
-    private let hosts: ManagedObjectsObserver<NetworkDomainEntity>
     private let queue = DispatchQueue(label: "com.github.pulse.console-search-view")
     private var cancellables: [AnyCancellable] = []
     private let context: NSManagedObjectContext
@@ -75,8 +74,6 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         self.searchBar = searchBar
         self.store = store
         self.context = store.newBackgroundContext()
-
-        self.hosts = ManagedObjectsObserver(context: store.viewContext, sortDescriptior: NSSortDescriptor(keyPath: \NetworkDomainEntity.count, ascending: false))
 
         let text = searchBar.$text
             .map { $0.trimmingCharacters(in: .whitespaces ) }
@@ -296,7 +293,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     private func makeContextForSuggestions() -> ConsoleSearchSuggestionsContext {
         ConsoleSearchSuggestionsContext(
             searchText: searchBar.text.trimmingCharacters(in: .whitespaces),
-            hosts: hosts.objects.map(\.value),
+            hosts: store.index.hosts,
             parameters: parameters
         )
     }

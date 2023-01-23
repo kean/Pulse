@@ -8,9 +8,7 @@ import Combine
 import CoreData
 
 final class ConsoleTaskCellViewModel: ObservableObject {
-    private(set) var pins: PinButtonViewModel?
     private var task: NetworkTaskEntity?
-
     private var cancellable: AnyCancellable?
 
     func bind(_ task: NetworkTaskEntity) {
@@ -30,8 +28,6 @@ final class ConsoleTaskCellViewModel: ObservableObject {
                 }
             }
         }
-        pins = PinButtonViewModel(task)
-        objectWillChange.send()
     }
 
 #if os(iOS) || os(macOS)

@@ -35,9 +35,10 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
     private var scrollPosition: ScrollPosition = .nearTop
     private var visibleEntityCountLimit = fetchBatchSize
     private var visibleObjectIDs: Set<NSManagedObjectID> = []
+    private var grouping: ConsoleListGroupBy { mode == .tasks ? options.taskGroupBy : options.messageGroupBy }
 
-    var grouping: ConsoleListGroupBy { mode == .tasks ? options.taskGroupBy : options.messageGroupBy }
-    private let store: LoggerStore
+    let store: LoggerStore
+    let source: ConsoleSource
     private let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
     private let pinsController: NSFetchedResultsController<NSManagedObject>
     private var controller: NSFetchedResultsController<NSManagedObject>?
@@ -46,8 +47,9 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
     let logCountObserver: ManagedObjectsCountObserver
     let taskCountObserver: ManagedObjectsCountObserver
 
-    init(store: LoggerStore, criteria: ConsoleSearchCriteriaViewModel) {
+    init(store: LoggerStore, source: ConsoleSource, criteria: ConsoleSearchCriteriaViewModel) {
         self.store = store
+        self.source = source
         self.searchCriteriaViewModel = criteria
 
         self.logCountObserver = ManagedObjectsCountObserver(
@@ -180,6 +182,18 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
     }
 
     private func makePredicate(for mode: ConsoleMode) -> NSPredicate? {
+        switch source {
+        case .store:
+            return _makePredicate(for: mode)
+        case .entities(_, let entities):
+            return NSCompoundPredicate(andPredicateWithSubpredicates: [
+                _makePredicate(for: mode),
+                NSPredicate(format: "self IN %@", entities)
+            ].compactMap { $0 })
+        }
+    }
+
+    private func _makePredicate(for mode: ConsoleMode) -> NSPredicate? {
         let criteria = searchCriteriaViewModel
 
         func makeMessagesPredicate(isMessageOnly: Bool) -> NSPredicate? {
@@ -289,6 +303,61 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
                 refreshVisibleEntities()
             }
         }
+    }
+
+    // MARK: - Sections
+
+    private let sessionDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US")
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .medium
+        formatter.doesRelativeDateFormatting = true
+        return formatter
+    }()
+
+    func makeName(for section: NSFetchedResultsSectionInfo) -> String {
+        switch mode {
+        case .all, .logs:
+            switch options.messageGroupBy {
+            case .level:
+                let rawValue = Int16(Int(section.name) ?? 0)
+                return (LoggerStore.Level(rawValue: rawValue) ?? .debug).name.capitalized
+            case .session:
+                let date = (section.objects?.last as? LoggerMessageEntity)?.createdAt
+                let suffix = date.map(sessionDateFormatter.string) ?? "–"
+                return "#\(section.name) \(suffix)"
+            default:
+                break
+            }
+        case .tasks:
+            switch options.taskGroupBy {
+            case .taskType:
+                let rawValue = Int16(Int(section.name) ?? 0)
+                return NetworkLogger.TaskType(rawValue: rawValue)?.urlSessionTaskClassName ?? section.name
+            case .statusCode:
+                let rawValue = Int32(section.name) ?? 0
+                return StatusCodeFormatter.string(for: rawValue)
+            case .requestState:
+                let rawValue = Int16(Int(section.name) ?? 0)
+                guard let state = NetworkTaskEntity.State(rawValue: rawValue) else {
+                    return "Unknown State"
+                }
+                switch state {
+                case .pending: return "Pending"
+                case .success: return "Success"
+                case .failure: return "Failure"
+                }
+            case .session:
+                let date = (section.objects?.last as? NetworkTaskEntity)?.createdAt
+                let suffix = date.map(sessionDateFormatter.string) ?? "–"
+                return "#\(section.name) \(suffix)"
+            default:
+                break
+            }
+        }
+        let name = section.name
+        return name.isEmpty ? "–" : name
     }
 }
 

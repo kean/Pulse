@@ -51,8 +51,7 @@ struct ConsoleTaskCell: View {
                 .lineLimit(1)
             Spacer()
 #if os(iOS) || os(macOS)
-            viewModel.pins.map { PinView(viewModel: $0, font: ConsoleConstants.fontTitle) }
-                .frame(width: 4, height: 4) // don't affect layout
+            PinView(task: task)
 #endif
 #if !os(watchOS)
             HStack(spacing: 3) {

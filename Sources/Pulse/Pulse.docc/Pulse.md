@@ -25,10 +25,9 @@ Logger and network inspector for Apple platforms.
 ### Core Data Entities
 
 - ``LoggerMessageEntity``
-- ``LoggerLabelEntity``
 - ``LoggerBlobHandleEntity``
+- ``LoggerSessionEntity`
 - ``NetworkTaskEntity``
-- ``NetworkDomainEntity``
 - ``NetworkTaskProgressEntity``
 - ``NetworkTransactionMetricsEntity``
 - ``NetworkRequestEntity``

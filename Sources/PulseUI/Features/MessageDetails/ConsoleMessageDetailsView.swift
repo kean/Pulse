@@ -109,13 +109,8 @@ func makeMockMessage() -> LoggerMessageEntity {
     let entity = LoggerMessageEntity(context: LoggerStore.mock.viewContext)
     entity.text = "test"
     entity.createdAt = Date()
-
-    let label = LoggerLabelEntity(context: LoggerStore.mock.viewContext)
-    label.name = "auth"
-    entity.label = label
-
+    entity.label = "auth"
     entity.level = LoggerStore.Level.critical.rawValue
-    entity.session = UUID()
     entity.file = "LoggerStore.swift"
     entity.function = "createMockMessage()"
     entity.line = 12

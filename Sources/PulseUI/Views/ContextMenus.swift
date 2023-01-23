@@ -35,7 +35,7 @@ struct NetworkMessageContextMenuCopySection: View {
                         Label("Copy URL", systemImage: "doc.on.doc")
                     }
                 }
-                if let host = task.host?.value {
+                if let host = task.host {
                     Button(action: {
                         UXPasteboard.general.string = host
                         runHapticFeedback()

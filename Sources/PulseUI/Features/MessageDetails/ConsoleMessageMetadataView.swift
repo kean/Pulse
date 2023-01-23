@@ -24,10 +24,9 @@ struct ConsoleMessageMetadataView: View {
             KeyValueSectionViewModel(title: "Summary", color: .textColor(for: message.logLevel), items: [
                 ("Date", DateFormatter.fullDateFormatter.string(from: message.createdAt)),
                 ("Level", LoggerStore.Level(rawValue: message.level)?.name),
-                ("Label", message.label.name.nonEmpty)
+                ("Label", message.label.nonEmpty)
             ]),
             KeyValueSectionViewModel(title: "Details", color: .primary, items: [
-                ("Session", message.session.uuidString.nonEmpty),
                 ("File", message.file.nonEmpty),
                 ("Function", message.function.nonEmpty),
                 ("Line", message.line == 0 ? nil : "\(message.line)"),

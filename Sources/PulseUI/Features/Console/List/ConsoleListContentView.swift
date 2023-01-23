@@ -13,6 +13,11 @@ struct ConsoleListContentView: View {
 #if os(iOS)
 
     var body: some View {
+        if #available(iOS 15, tvOS 15, *) {
+            if !viewModel.pins.isEmpty, case .store = viewModel.source {
+                pinsView
+            }
+        }
         if #available(iOS 15, *), let sections = viewModel.sections, !sections.isEmpty {
             makeGroupedView(sections)
         } else {
@@ -24,48 +29,23 @@ struct ConsoleListContentView: View {
     private func makeGroupedView(_ sections: [NSFetchedResultsSectionInfo]) -> some View {
         ForEach(sections, id: \.name) { section in
             let objects = (section.objects as? [NSManagedObject]) ?? []
-            let prefix = objects.prefix(4)
-            PlainListExpandableSectionHeader(title: makeName(for: section), count: section.numberOfObjects, destination: {
-                ConsolePlainList(objects)
-                    .inlineNavigationTitle(makeName(for: section))
-            }, isSeeAllHidden: prefix.count == objects.count)
+            let prefix = objects.prefix(3)
+            let sectionName = viewModel.makeName(for: section)
+            PlainListExpandableSectionHeader(title: sectionName, count: section.numberOfObjects, destination: { EmptyView() }, isSeeAllHidden: true)
             ForEach(prefix, id: \.objectID) { entity in
                 ConsoleEntityCell.make(for: entity)
             }
-        }
-    }
-
-    private func makeName(for section: NSFetchedResultsSectionInfo) -> String {
-        if viewModel.mode != .tasks  {
-            if viewModel.options.messageGroupBy == .level {
-                let rawValue = Int16(Int(section.name) ?? 0)
-                return (LoggerStore.Level(rawValue: rawValue) ?? .debug).name.capitalized
-            }
-        } else {
-            if viewModel.options.taskGroupBy == .taskType {
-                let rawValue = Int16(Int(section.name) ?? 0)
-                return NetworkLogger.TaskType(rawValue: rawValue)?.urlSessionTaskClassName ?? section.name
-            }
-            if viewModel.options.taskGroupBy == .statusCode {
-                let rawValue = Int32(section.name) ?? 0
-                return StatusCodeFormatter.string(for: rawValue)
-            }
-            if viewModel.options.taskGroupBy == .requestState {
-                let rawValue = Int16(Int(section.name) ?? 0)
-                guard let state = NetworkTaskEntity.State(rawValue: rawValue) else {
-                    return "Unknown State"
-                }
-                switch state {
-                case .pending: return "Pending"
-                case .success: return "Success"
-                case .failure: return "Failure"
+            if prefix.count < objects.count {
+                NavigationLink(destination: makeDestination(for: sectionName, objects: objects)) {
+                    PlainListSeeAllView(count: objects.count)
                 }
             }
         }
-        let name = section.name
-        return name.isEmpty ? "–" : name
     }
 
+    private func makeDestination(for title: String, objects: [NSManagedObject]) -> some View {
+        LazyConsoleView(title: title, entities: objects, store: viewModel.store, mode: viewModel.mode)
+    }
 #else
     var body: some View {
         plainView
@@ -74,15 +54,16 @@ struct ConsoleListContentView: View {
 
     @ViewBuilder
     private var plainView: some View {
-        if #available(iOS 15, tvOS 15, *) {
-            if !viewModel.pins.isEmpty {
-                pinsView
+        if viewModel.visibleEntities.isEmpty {
+            Text("No Recorded Logs")
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+        } else {
+            ForEach(viewModel.visibleEntities, id: \.objectID) { entity in
+                ConsoleEntityCell.make(for: entity)
+                    .onAppear { viewModel.onAppearCell(with: entity.objectID) }
+                    .onDisappear { viewModel.onDisappearCell(with: entity.objectID) }
             }
-        }
-        ForEach(viewModel.visibleEntities, id: \.objectID) { entity in
-            ConsoleEntityCell.make(for: entity)
-                .onAppear { viewModel.onAppearCell(with: entity.objectID) }
-                .onDisappear { viewModel.onDisappearCell(with: entity.objectID) }
         }
         footerView
     }
@@ -90,7 +71,7 @@ struct ConsoleListContentView: View {
     @available(iOS 15, tvOS 15, *)
     @ViewBuilder
     private var pinsView: some View {
-        let prefix = Array(viewModel.pins.prefix(4))
+        let prefix = Array(viewModel.pins.prefix(3))
         PlainListExpandableSectionHeader(title: "Pins", count: viewModel.pins.count, destination: {
             ConsolePlainList(viewModel.pins)
                 .inlineNavigationTitle("Pins")
@@ -126,7 +107,7 @@ struct ConsoleListContentView: View {
 
     @ViewBuilder
     private var footerView: some View {
-        if #available(iOS 15, *), viewModel.isShowPreviousSessionButtonShown {
+        if #available(iOS 15, *), viewModel.isShowPreviousSessionButtonShown, case .store = viewModel.source {
             Button(action: viewModel.buttonShowPreviousSessionTapped) {
                 Text("Show Previous Sessions")
                     .font(.subheadline)
@@ -169,3 +150,17 @@ private struct PinCellViewModel: Hashable, Identifiable {
 private struct PinCellId: Hashable {
     let id: NSManagedObjectID
 }
+
+#if os(iOS)
+private struct LazyConsoleView: View {
+    let title: String
+    let entities: [NSManagedObject]
+    let store: LoggerStore
+    let mode: ConsoleMode
+
+    var body: some View {
+        ConsoleView(viewModel: .init(store: store, source: .entities(title: title, entities: entities), mode: mode))
+            .navigationBarTitleDisplayMode(.inline)
+    }
+}
+#endif

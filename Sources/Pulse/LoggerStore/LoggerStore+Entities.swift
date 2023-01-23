@@ -4,31 +4,31 @@
 
 import CoreData
 
+public final class LoggerSessionEntity: NSManagedObject {
+    @NSManaged public var createdAt: Date
+    @NSManaged public var sessionID: Int64
+}
+
 public final class LoggerMessageEntity: NSManagedObject {
     @NSManaged public var createdAt: Date
     @NSManaged public var isPinned: Bool
-    @NSManaged public var session: UUID
+    @NSManaged public var sessionID: Int64
     @NSManaged public var level: Int16
     @NSManaged public var text: String
     @NSManaged public var file: String
     @NSManaged public var function: String
     @NSManaged public var line: Int32 // Doubles as request state storage to save space
-    @NSManaged public var label: LoggerLabelEntity
+    @NSManaged public var label: String
     @NSManaged public var rawMetadata: String
     @NSManaged public var task: NetworkTaskEntity?
 
     public lazy var metadata = { KeyValueEncoding.decodeKeyValuePairs(rawMetadata) }()
 }
 
-public final class LoggerLabelEntity: NSManagedObject {
-    @NSManaged public var name: String
-    @NSManaged public var count: Int64
-}
-
 public final class NetworkTaskEntity: NSManagedObject {
     // Primary
     @NSManaged public var createdAt: Date
-    @NSManaged public var session: UUID
+    @NSManaged public var sessionID: Int64
     @NSManaged public var taskId: UUID
 
     /// Returns task type
@@ -40,7 +40,7 @@ public final class NetworkTaskEntity: NSManagedObject {
     // MARK: Request
 
     @NSManaged public var url: String?
-    @NSManaged public var host: NetworkDomainEntity?
+    @NSManaged public var host: String?
     @NSManaged public var httpMethod: String?
 
     // MARK: Response
@@ -135,11 +135,6 @@ public final class NetworkTaskEntity: NSManagedObject {
     public var decodingError: NetworkLogger.DecodingError? {
         error as? NetworkLogger.DecodingError
     }
-}
-
-public final class NetworkDomainEntity: NSManagedObject {
-    @NSManaged public var value: String
-    @NSManaged public var count: Int64
 }
 
 /// Indicates current download or upload progress.

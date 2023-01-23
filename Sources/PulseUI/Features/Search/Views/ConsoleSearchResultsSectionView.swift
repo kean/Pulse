@@ -202,6 +202,18 @@ struct PlainListExpandableSectionHeader<Destination: View>: View {
     }
 }
 
+@available(iOS 15, tvOS 15, *)
+struct PlainListSeeAllView: View {
+    let count: Int
+
+    var body: some View {
+        (Text("See All").foregroundColor(.primary) +
+         Text("  (\(count))"))
+        .font(.subheadline)
+        .foregroundColor(.secondary)
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
 
 @available(iOS 15, tvOS 15, *)
 struct PlainListSectionHeaderSeparator: View {

@@ -36,7 +36,7 @@ final class ConsoleMessageDetailsViewModel {
                 value: ConsoleMessageDetailsViewModel.dateFormatter
                     .string(from: message.createdAt)
             ),
-            ConsoleMessageTagViewModel(title: "Label", value: message.label.name)
+            ConsoleMessageTagViewModel(title: "Label", value: message.label)
         ]
         self.text = message.text
     }

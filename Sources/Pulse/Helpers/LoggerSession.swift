@@ -5,6 +5,7 @@
 import Foundation
 
 extension LoggerStore {
+    @available(*, deprecated, message: "Session are now managed on a database level and has associated metadata, e.g. creation date. See LoggerSessionEntity for more info.")
     public struct Session: Sendable {
         public let id: UUID
 
