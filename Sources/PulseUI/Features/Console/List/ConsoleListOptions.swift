@@ -68,7 +68,7 @@ struct ConsoleListOptions {
         }
     }
 
-    enum TaskGroupBy: String, CaseIterable, ConsoleListGroupBy {
+    enum TaskGroupBy: String, ConsoleListGroupBy {
         case noGrouping = "No Grouping"
         case url = "URL"
         case host = "Host"
