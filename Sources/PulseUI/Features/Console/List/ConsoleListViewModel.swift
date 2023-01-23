@@ -260,7 +260,7 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
 
     private func refreshScrollPosition() {
         let scrollPosition: ScrollPosition
-        if visibleEntities.prefix(5).map(\.objectID).contains(where: visibleObjectIDs.contains) {
+        if visibleObjectIDs.isEmpty || visibleEntities.prefix(5).map(\.objectID).contains(where: visibleObjectIDs.contains) {
             scrollPosition = .nearTop
         } else if visibleEntities.suffix(5).map(\.objectID).contains(where: visibleObjectIDs.contains) {
             scrollPosition = .nearBottom
