@@ -12,6 +12,7 @@ enum ConsoleSearchScope: Equatable, Hashable, Codable, CaseIterable {
     case responseHeaders
     case responseBody
     case message
+    case metadata
 
     static let allEligibleScopes = ConsoleSearchScope.allCases.filter {
         $0 != .originalRequestHeaders && $0 != .message
@@ -34,6 +35,7 @@ enum ConsoleSearchScope: Equatable, Hashable, Codable, CaseIterable {
         case .responseHeaders: return "Response Headers"
         case .responseBody: return "Response Body"
         case .message: return "Message"
+        case .metadata: return "Metadata"
         }
     }
 }
