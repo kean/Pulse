@@ -38,10 +38,7 @@ final class ConsoleViewModel: ObservableObject {
     }
 
     var mode: ConsoleMode {
-        didSet {
-            list.update(mode: mode)
-            searchCriteriaViewModel.mode = mode
-        }
+        didSet { prepare(for: mode) }
     }
 
     var bindingForNetworkMode: Binding<Bool> {
@@ -81,7 +78,13 @@ final class ConsoleViewModel: ObservableObject {
         }
 #endif
 
+        prepare(for: mode)
         searchCriteriaViewModel.bind(list.$entities)
+    }
+
+    private func prepare(for mode: ConsoleMode) {
+        list.update(mode: mode)
+        searchCriteriaViewModel.mode = mode
     }
 
     private func refreshListsVisibility() {
