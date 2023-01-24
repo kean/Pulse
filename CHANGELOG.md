@@ -10,6 +10,7 @@
 - Display pins at the top
 - Add "Show Previous Session" button to search
 - Other minor changes
+- Add metadata search - [#148](https://github.com/kean/Pulse/pull/148) by [@ejensen](https://github.com/ejensen)
 
 ## Pulse 3.1.0
 
