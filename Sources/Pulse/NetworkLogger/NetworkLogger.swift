@@ -90,7 +90,7 @@ public final class NetworkLogger: @unchecked Sendable {
         }
     }
 
-    /// Initialiers the network logger.
+    /// Initializes the network logger.
     ///
     /// - parameters:
     ///   - store: The target store for network requests.
@@ -101,7 +101,7 @@ public final class NetworkLogger: @unchecked Sendable {
         self.processPatterns()
     }
 
-    /// Initialiers and configures the network logger.
+    /// Initializes and configures the network logger.
     public convenience init(store: LoggerStore = .shared, _ configure: (inout Configuration) -> Void) {
         var configuration = Configuration()
         configure(&configuration)

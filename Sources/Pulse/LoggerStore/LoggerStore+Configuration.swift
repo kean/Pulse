@@ -76,7 +76,7 @@ extension LoggerStore {
         /// ``LoggerStore/Options/sweep`` option. The default store supports sweeps.
         public var maxAge: TimeInterval = 14 * 86400
 
-        /// For tesing purposes.
+        /// For testing purposes.
         var makeCurrentDate: () -> Date = { Date() }
 
         /// Gets called when the store receives an event. You can use it to

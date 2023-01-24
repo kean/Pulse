@@ -30,7 +30,7 @@ PulseUI gives you complete access to the underlying data and its model. You can 
 struct AnalyticsLogsView: View {
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \LoggerMessageEntity.createdAt, ascending: true)],
-        predicate: NSPredicate(format: "label == %@", "analyics")
+        predicate: NSPredicate(format: "label == %@", "analytics")
     ) var messages: FetchedResults<LoggerMessageEntity>
     
     var body: some View {

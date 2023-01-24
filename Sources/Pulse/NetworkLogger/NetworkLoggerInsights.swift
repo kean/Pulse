@@ -87,7 +87,7 @@ public final class NetworkLoggerInsights: @unchecked Sendable {
         public var maximum: TimeInterval?
         public var minimum: TimeInterval?
 
-        /// Sorted list of all recoreded durations.
+        /// Sorted list of all recorded durations.
         public var values: [TimeInterval] = []
 
         /// Contains top slowest requests.

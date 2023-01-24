@@ -31,7 +31,7 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
 
     @Published private(set) var mode: ConsoleMode = .all
 
-    /// This exist strickly to workaround List performance issues
+    /// This exist strictly to workaround List performance issues
     private var scrollPosition: ScrollPosition = .nearTop
     private var visibleEntityCountLimit = fetchBatchSize
     private var visibleObjectIDs: Set<NSManagedObjectID> = []

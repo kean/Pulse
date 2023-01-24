@@ -311,7 +311,7 @@ public final class LoggerBlobHandleEntity: NSManagedObject {
         return store.store?.getDecompressedData(for: self)
     }
 
-    /// Returns a closure to fetch the entitie's data that can be executed
+    /// Returns a closure to fetch the entity's data that can be executed
     /// on any thread.
     ///
     /// - warning: Not meant to be used outside of the framework.

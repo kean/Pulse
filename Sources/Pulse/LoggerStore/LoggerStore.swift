@@ -27,7 +27,7 @@ public final class LoggerStore: @unchecked Sendable {
     /// Returns the Core Data container associated with the store.
     public let container: NSPersistentContainer
 
-    /// Returns the view context for accessing entities on the main thead.
+    /// Returns the view context for accessing entities on the main thread.
     public var viewContext: NSManagedObjectContext { container.viewContext }
 
     /// Returns the background managed object context used for all write operations.
@@ -46,7 +46,7 @@ public final class LoggerStore: @unchecked Sendable {
 
     private let blobsURL: URL
     private let manifestURL: URL
-    private let databaseURL: URL // Points to a tempporary location if archive
+    private let databaseURL: URL // Points to a temporary location if archive
     private var requestsCache: [NetworkLogger.Request: NetworkRequestEntity] = [:]
     private var responsesCache: [NetworkLogger.Response: NetworkResponseEntity] = [:]
 
@@ -60,7 +60,7 @@ public final class LoggerStore: @unchecked Sendable {
     @Published public var index = Index()
 
     public struct Index {
-        /// All unique recoreded hosts.
+        /// All unique recorded hosts.
         public var hosts: Set<String> = []
     }
 
@@ -132,7 +132,7 @@ public final class LoggerStore: @unchecked Sendable {
             }
             if var manifest = Manifest(url: manifestURL) {
                 if manifest.version != .currentStoreVersion {
-                    // Upgrading to a new vesrion of Pulse store
+                    // Upgrading to a new version of Pulse store
                     try? LoggerStore.removePreviousStore(at: storeURL)
                     manifest.version = .currentStoreVersion // Update version, but keep the storeId
                 }
