@@ -70,7 +70,7 @@ extension LoggerStore {
         /// Reads info from the given archive.
         ///
         /// - important: This API is designed to be used only with Pulse documents
-        /// exported from the app without unarchaving the document. If you need
+        /// exported from the app without unarchiving the document. If you need
         /// to get info about the current store, use ``LoggerStore/Info``.
         public static func make(storeURL: URL) throws -> Info {
             let document = try PulseDocument(documentURL: storeURL)

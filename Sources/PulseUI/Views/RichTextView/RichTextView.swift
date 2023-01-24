@@ -92,8 +92,8 @@ struct _RichTextView: View {
                     }
                 }
                 .onReceive(Keyboard.isHidden) { isKeyboardHidden in
-                    // Show a non-interactive placeholeder during animation,
-                    // then show the actual menu when navigation is setled.
+                    // Show a non-interactive placeholder during animation,
+                    // then show the actual menu when navigation is settled.
                     withAnimation(nil) {
                         isRealMenuShown = false
                     }
