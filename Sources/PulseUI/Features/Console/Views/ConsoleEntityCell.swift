@@ -49,7 +49,8 @@ private struct _ConsoleMessageCell: View {
         let cell = ConsoleMessageCell(viewModel: .init(message: message), isDisclosureNeeded: true)
             .background(NavigationLink("", destination: LazyConsoleDetailsView(message: message)).opacity(0))
 #else
-        let cell = NavigationLink(destination: LazyConsoleDetailsView(message: message)) {
+        // `id` is a workaround for macOS (needs to be fixed)
+        let cell = NavigationLink(destination: LazyConsoleDetailsView(message: message).id(message.objectID)) {
             ConsoleMessageCell(viewModel: .init(message: message))
         }
 #endif
@@ -99,7 +100,7 @@ private struct _ConsoleTaskCell: View {
         let cell = ConsoleTaskCell(task: task, isDisclosureNeeded: true)
             .background(NavigationLink("", destination: LazyNetworkInspectorView(task: task).id(task.objectID)).opacity(0))
 #else
-        let cell = NavigationLink(destination: LazyNetworkInspectorView(task: task)) {
+        let cell = NavigationLink(destination: LazyNetworkInspectorView(task: task).id(task.objectID)) {
             ConsoleTaskCell(task: task)
         }
 #endif
