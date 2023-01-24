@@ -27,7 +27,9 @@ final class ConsoleSearchService {
     }
 
     private func _search(_ message: LoggerMessageEntity, parameters: ConsoleSearchParameters) -> [ConsoleSearchOccurrence]? {
-        let occurrences = search(message.text as NSString, parameters, .message)
+        var occurrences: [ConsoleSearchOccurrence] = []
+        occurrences += search(message.text as NSString, parameters, .message)
+        occurrences += search(message.rawMetadata as NSString, parameters, .metadata)
         return occurrences.isEmpty ? nil : occurrences
     }
 
@@ -86,7 +88,7 @@ final class ConsoleSearchService {
                 if let string = task.responseBody.flatMap(getBodyString) {
                     occurrences += search(string, parameters, scope)
                 }
-            case .message:
+            case .message, .metadata:
                 break // Applies only to LoggerMessageEntity
             }
         }

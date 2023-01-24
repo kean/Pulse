@@ -97,7 +97,7 @@ struct ConsoleSearchResultView: View {
             makeHeadersDetails(title: "Response Headers", headers: task.response?.headers)
         case .responseBody:
             NetworkInspectorResponseBodyView(viewModel: .init(task: task))
-        case .message:
+        case .message, .metadata:
             EmptyView()
         }
     }
