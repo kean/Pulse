@@ -1,5 +1,16 @@
 # Pulse 2.x
 
+## Pulse 3.2.0
+
+*Jan 24, 2023*
+
+- Add new [powerful search](http://kean.blog/post/pulse-search)
+- Improve console design
+- Add "Sort By" and "Group By" options
+- Display pins at the top
+- Add "Show Previous Session" button to search
+- Other minor changes
+
 ## Pulse 3.1.0
 
 *Jan 14, 2023*
