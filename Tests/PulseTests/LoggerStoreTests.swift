@@ -201,7 +201,7 @@ final class LoggerStoreTests: XCTestCase {
         // WHEN
         let info = try LoggerStore.Info.make(storeURL: copyURL)
 
-        XCTAssertEqual(info.storeVersion, "2.0.3")
+        XCTAssertEqual(info.storeVersion, "3.1.0")
         XCTAssertEqual(info.messageCount, 7)
         XCTAssertEqual(info.taskCount, 3)
         XCTAssertEqual(info.blobCount, 3)
@@ -609,7 +609,6 @@ final class LoggerStoreTests: XCTestCase {
 
         let context = store.viewContext
         XCTAssertEqual(try context.count(for: LoggerMessageEntity.self), 11)
-        XCTAssertEqual(try context.count(for: LoggerLabelEntity.self), 6)
         XCTAssertEqual(try context.count(for: NetworkTaskEntity.self), 3)
         XCTAssertEqual(try context.count(for: NetworkRequestEntity.self), 6)
         XCTAssertEqual(try context.count(for: NetworkResponseEntity.self), 5)
@@ -621,7 +620,6 @@ final class LoggerStoreTests: XCTestCase {
 
         // THEN both message and metadata are removed
         XCTAssertEqual(try context.count(for: LoggerMessageEntity.self), 0)
-        XCTAssertEqual(try context.count(for: LoggerLabelEntity.self), 0)
         XCTAssertEqual(try context.count(for: NetworkTaskEntity.self), 0)
         XCTAssertEqual(try context.count(for: NetworkRequestEntity.self), 0)
         XCTAssertEqual(try context.count(for: NetworkResponseEntity.self), 0)
@@ -671,7 +669,7 @@ final class LoggerStoreTests: XCTestCase {
         })
 
         XCTAssertEqual(request.url, "https://github.com/login")
-        XCTAssertEqual(request.host?.value, "github.com")
+        XCTAssertEqual(request.host, "github.com")
         XCTAssertEqual(request.httpMethod, "GET")
         XCTAssertEqual(request.type, .dataTask)
         XCTAssertEqual(request.statusCode, 200)
@@ -736,7 +734,7 @@ final class LoggerStoreTests: XCTestCase {
         let info = try store.info()
 
         // THEN
-        XCTAssertEqual(info.storeVersion, "2.0.3")
+        XCTAssertEqual(info.storeVersion, "3.1.0")
         XCTAssertEqual(info.messageCount, 7)
         XCTAssertEqual(info.taskCount, 3)
         XCTAssertEqual(info.blobCount, 3)

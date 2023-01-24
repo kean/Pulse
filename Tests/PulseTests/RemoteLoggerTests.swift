@@ -21,7 +21,7 @@ final class RemoteLoggerTests: XCTestCase {
             requestBody: "hello".data(using: .utf8)!,
             responseBody: MockDataTask.login.responseBody,
             metrics: MockDataTask.login.metrics,
-            session: UUID()
+            sessionID: 0
         )
 
         // WHEN
@@ -44,6 +44,6 @@ final class RemoteLoggerTests: XCTestCase {
         XCTAssertEqual(decoded.requestBody, "hello".data(using: .utf8))
         XCTAssertEqual(decoded.responseBody, event.responseBody)
         XCTAssertEqual(decoded.metrics?.totalTransferSize.totalBytesSent, event.metrics?.totalTransferSize.totalBytesSent)
-        XCTAssertEqual(decoded.session, event.session)
+        XCTAssertEqual(decoded.sessionID, event.sessionID)
     }
 }

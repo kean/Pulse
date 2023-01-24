@@ -98,7 +98,7 @@ final class NetworkLoggerTests: XCTestCase {
             requestBody: nil,
             responseBody: nil,
             metrics: task.metrics,
-            session: UUID()
+            sessionID: 1
         ))
 
         XCTAssertEqual(request.count, 325)
