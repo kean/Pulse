@@ -20,7 +20,11 @@ struct NetworkInspectorView: View {
             contents
         }
         .inlineNavigationTitle(viewModel.title)
-        .navigationBarItems(trailing: trailingNavigationBarItems)
+        .toolbar {
+            ToolbarItemGroup(placement: .navigationBarTrailing) {
+                trailingNavigationBarItems
+            }
+        }
         .sheet(item: $shareItems, content: ShareView.init)
     }
 
@@ -62,24 +66,22 @@ struct NetworkInspectorView: View {
 
     @ViewBuilder
     private var trailingNavigationBarItems: some View {
-        HStack {
-            viewModel.pinViewModel.map { PinButton(viewModel: $0, isTextNeeded: false) }
-            Menu(content: {
-                AttributedStringShareMenu(shareItems: $shareItems) {
-                    TextRenderer(options: .sharing).make { $0.render(viewModel.task, content: .sharing) }
-                }
-                Button(action: { shareItems = ShareItems([viewModel.task.cURLDescription()]) }) {
-                    Label("Share as cURL", systemImage: "square.and.arrow.up")
-                }
-            }, label: {
-                Image(systemName: "square.and.arrow.up")
-            })
-            Menu(content: {
-                NetworkMessageContextMenu(task: viewModel.task, sharedItems: $shareItems)
-            }, label: {
-                Image(systemName: "ellipsis.circle")
-            })
-        }
+        viewModel.pinViewModel.map { PinButton(viewModel: $0, isTextNeeded: false) }
+        Menu(content: {
+            AttributedStringShareMenu(shareItems: $shareItems) {
+                TextRenderer(options: .sharing).make { $0.render(viewModel.task, content: .sharing) }
+            }
+            Button(action: { shareItems = ShareItems([viewModel.task.cURLDescription()]) }) {
+                Label("Share as cURL", systemImage: "square.and.arrow.up")
+            }
+        }, label: {
+            Image(systemName: "square.and.arrow.up")
+        })
+        Menu(content: {
+            NetworkMessageContextMenu(task: viewModel.task, sharedItems: $shareItems)
+        }, label: {
+            Image(systemName: "ellipsis.circle")
+        })
     }
 }
 

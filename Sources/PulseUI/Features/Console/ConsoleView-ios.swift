@@ -26,7 +26,14 @@ public struct ConsoleView: View {
             .onAppear { viewModel.isViewVisible = true }
             .onDisappear { viewModel.isViewVisible = false }
             .navigationTitle(viewModel.title)
-            .navigationBarItems(leading: leadingNavigationBarItems, trailing: trailingNavigationBarItems)
+            .toolbar {
+                ToolbarItemGroup(placement: .navigationBarLeading) {
+                    leadingNavigationBarItems
+                }
+                ToolbarItemGroup(placement: .navigationBarTrailing) {
+                    trailingNavigationBarItems
+                }
+            }
             .background(ConsoleRouterView(viewModel: viewModel))
     }
 
@@ -40,13 +47,11 @@ public struct ConsoleView: View {
     private var trailingNavigationBarItems: some View {
         switch viewModel.source {
         case .store:
-            HStack {
-                ConsoleShareButton(viewModel: viewModel)
-                Button(action: { viewModel.router.isShowingFilters = true }) {
-                    Image(systemName: "line.horizontal.3.decrease.circle")
-                }
-                ConsoleContextMenu(viewModel: viewModel)
+            ConsoleShareButton(viewModel: viewModel)
+            Button(action: { viewModel.router.isShowingFilters = true }) {
+                Image(systemName: "line.horizontal.3.decrease.circle")
             }
+            ConsoleContextMenu(viewModel: viewModel)
         case .entities:
             ConsoleShareButton(viewModel: viewModel)
         }

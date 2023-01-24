@@ -25,7 +25,7 @@ struct ConsoleToolbarView: View {
                 }
             }
             Spacer()
-            HStack(spacing: 12) {
+            HStack(spacing: 14) {
                 ConsoleFiltersView(viewModel: viewModel)
             }.padding(.trailing, -2)
         }
