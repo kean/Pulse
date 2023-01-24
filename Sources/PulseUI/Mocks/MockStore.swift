@@ -131,10 +131,10 @@ private func _asyncPopulateStore(_ store: LoggerStore) async {
         )
         """
 
+    await Task.sleep(milliseconds: 10000)
+
     logger(named: "auth")
         .log(level: .warning, .init(stringLiteral: stackTrace))
-
-    await Task.sleep(milliseconds: 10000)
 
     logger(named: "default")
         .log(level: .critical, "💥 0xDEADBEEF")
