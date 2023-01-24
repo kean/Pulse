@@ -83,8 +83,8 @@ final class ProgressViewModel: ObservableObject {
 
     private func register(for progress: NetworkTaskProgressEntity) {
         self.refresh(with: progress)
-        observer2 = progress.objectWillChange.sink { [self] in
-            self.refresh(with: progress)
+        observer2 = progress.objectWillChange.sink { [weak self] in
+            self?.refresh(with: progress)
         }
     }
 
