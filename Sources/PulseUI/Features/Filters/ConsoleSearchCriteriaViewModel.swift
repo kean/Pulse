@@ -26,6 +26,8 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
     private let store: LoggerStore
     private var isScreenVisible = false
     private var entities: [NSManagedObject] = []
+    public var accumulatedLabels: Set<String> = []
+    public var accumulatedHosts: Set<String> = []
     private var cancellables: [AnyCancellable] = []
 
     init(store: LoggerStore, source: ConsoleSource) {
@@ -49,6 +51,20 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
             if self.isScreenVisible {
                 self.reloadCounters()
             }
+        }.store(in: &cancellables)
+    }
+    
+    func bind(accumulatedLabels  : some Publisher<Set<String>, Never>) {
+        accumulatedLabels.sink { [weak self] in
+            guard let self else { return }
+            self.accumulatedLabels = $0
+        }.store(in: &cancellables)
+    }
+
+    func bind(accumulatedHosts  : some Publisher<Set<String>, Never>) {
+        accumulatedHosts.sink { [weak self] in
+            guard let self else { return }
+            self.accumulatedHosts = $0
         }.store(in: &cancellables)
     }
 
@@ -130,7 +146,7 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
             if let focused = criteria.messages.labels.focused {
                 return [focused]
             } else {
-                return Set(labels).subtracting(criteria.messages.labels.hidden)
+                return Set(accumulatedLabels).subtracting(criteria.messages.labels.hidden)
             }
         }
         set {
@@ -140,7 +156,7 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
             case 1:
                 criteria.messages.labels.focused = newValue.first!
             default:
-                criteria.messages.labels.hidden = Set(labels).subtracting(newValue)
+                criteria.messages.labels.hidden = Set(accumulatedLabels).subtracting(newValue)
             }
         }
     }
@@ -149,10 +165,10 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
 
     var selectedHost: Set<String> {
         get {
-            Set(domains).subtracting(criteria.network.host.ignoredHosts)
+            Set(accumulatedHosts).subtracting(criteria.network.host.ignoredHosts)
         }
         set {
-            criteria.network.host.ignoredHosts = Set(domains).subtracting(newValue)
+            criteria.network.host.ignoredHosts = Set(accumulatedHosts).subtracting(newValue)
         }
     }
 }

@@ -72,7 +72,11 @@ private struct ConsoleMenuView: View {
                 NavigationLink(destination: destinationStoreDetails) {
                     Label("Store Info", systemImage: "info.circle")
                 }
-                Button.destructive(action: store.removeAll) {
+                Button.destructive {
+                    viewModel.accumulatedLabels = []
+                    viewModel.accumulatedHosts = []
+                    store.removeAll()
+                } label: {
                     Label("Remove Logs", systemImage: "trash")
                 }
             } header: { Text("Store") }

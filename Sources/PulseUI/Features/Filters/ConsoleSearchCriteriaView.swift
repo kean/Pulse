@@ -112,7 +112,7 @@ extension ConsoleSearchCriteriaView {
         }, content: {
             ConsoleSearchListSelectionView(
                 title: "Labels",
-                items: viewModel.labels,
+                items: Array(viewModel.accumulatedLabels),
                 selection: $viewModel.selectedLabels,
                 description: { $0 },
                 label: {

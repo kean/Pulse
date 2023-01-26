@@ -72,7 +72,10 @@ struct ConsoleContextMenu: View {
 
     private func buttonRemoveAllTapped() {
         viewModel.store.removeAll()
-
+        
+        viewModel.searchCriteriaViewModel.accumulatedLabels = []
+        viewModel.searchCriteriaViewModel.accumulatedHosts = []
+        
         runHapticFeedback(.success)
         ToastView {
             HStack {

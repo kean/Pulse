@@ -80,6 +80,8 @@ final class ConsoleViewModel: ObservableObject {
 
         prepare(for: mode)
         searchCriteriaViewModel.bind(list.$entities)
+        searchCriteriaViewModel.bind(accumulatedLabels: list.$accumulatedLabels)
+        searchCriteriaViewModel.bind(accumulatedHosts: list.$accumulatedHosts)
     }
 
     private func prepare(for mode: ConsoleMode) {
