@@ -41,27 +41,29 @@ private struct ConsoleContainerView: View {
     let viewModel: ConsoleViewModel
     @ObservedObject var searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
     @State private var columnVisibility = NavigationSplitViewVisibility.all
+    @State private var selection: NSManagedObjectID?
 
     init(viewModel: ConsoleViewModel) {
         self.viewModel = viewModel
         self.searchCriteriaViewModel = viewModel.searchCriteriaViewModel
     }
 
+    #warning("temp")
     var body: some View {
         NavigationSplitView(
             columnVisibility: $columnVisibility,
             sidebar: {
-                Siderbar(viewModel: viewModel)
-                    .searchable(text: $searchCriteriaViewModel.filterTerm)
-                    .disableAutocorrection(true)
-                    .navigationSplitViewColumnWidth(min: ConsoleView.contentColumnWidth, ideal: 420, max: 640)
+                Text("Sidebar")
+//                Siderbar(viewModel: viewModel)
+//                    .searchable(text: $searchCriteriaViewModel.filterTerm)
+//                    .disableAutocorrection(true)
+//                    .navigationSplitViewColumnWidth(min: ConsoleView.contentColumnWidth, ideal: 420, max: 640)
             },
             content: {
-                EmptyView()
-                    .navigationSplitViewColumnWidth(ConsoleView.contentColumnWidth)
+                ConsoleTableView(viewModel: viewModel.list, selection: $selection)
             },
             detail: {
-                EmptyView()
+                ConsoleEntityDetailsView(viewModel: viewModel.list, selection: $selection)
             }
         )
     }
@@ -87,17 +89,18 @@ private struct Siderbar: View {
     #warning("temp")
 
     var body: some View {
+        Text("temp")
 //        List {
-            ConsoleTableView(viewModel: viewModel.list)
+//        ConsoleTableView(viewModel: viewModel.list, selection:)
 //            ConsoleListContentView(viewModel: viewModel.list)
-//        }
-            .toolbar {
-                ToolbarItemGroup(placement: .automatic) {
-                    ConsoleToolbarItems(viewModel: viewModel)
-                }
-            }
-            .onAppear { viewModel.isViewVisible = true }
-            .onDisappear { viewModel.isViewVisible = false }
+////        }
+//            .toolbar {
+//                ToolbarItemGroup(placement: .automatic) {
+//                    ConsoleToolbarItems(viewModel: viewModel)
+//                }
+//            }
+//            .onAppear { viewModel.isViewVisible = true }
+//            .onDisappear { viewModel.isViewVisible = false }
     }
 }
 

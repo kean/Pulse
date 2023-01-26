@@ -11,10 +11,11 @@ import Combine
 
 struct ConsoleTableView: View {
     let viewModel: ConsoleListViewModel
+    @Binding var selection: NSManagedObjectID?
 
     var body: some View {
         if viewModel.entities is [LoggerMessageEntity] {
-            ConsoleMessageTableView(viewModel: viewModel)
+            ConsoleMessageTableView(viewModel: viewModel, selection: $selection)
         } else if viewModel.entities is [NetworkTaskEntity] {
             Text("ConsoleNetworkTableView")
         } else {
@@ -28,10 +29,11 @@ struct ConsoleTableView: View {
 
 private struct ConsoleMessageTableView: View {
     @ObservedObject var viewModel: ConsoleListViewModel
+    @Binding var selection: NSManagedObjectID?
     @State private var sortOrder = [SortDescriptor<LoggerMessageEntity>(\.createdAt, order: .reverse)]
 
     var body: some View {
-        Table(viewModel.entities as! [LoggerMessageEntity], sortOrder: $sortOrder) {
+        Table(viewModel.entities as! [LoggerMessageEntity], selection: $selection, sortOrder: $sortOrder) {
             TableColumn("Date & Time", value: \.createdAt) {
                 Text(dateAndTimeFormatter.string(from: $0.createdAt))
             }.width(ideal: 162, max: 162)
@@ -63,7 +65,7 @@ private let dateAndTimeFormatter: DateFormatter = {
 struct ConsoleTableView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            ConsoleTableView(viewModel: ConsoleViewModel(store: .mock).list)
+            ConsoleTableView(viewModel: ConsoleViewModel(store: .mock).list, selection: .constant(nil))
                 .previewLayout(.fixed(width: 1200, height: 800))
         }
     }

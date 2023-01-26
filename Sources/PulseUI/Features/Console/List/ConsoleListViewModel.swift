@@ -147,6 +147,10 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
         store.pins.removeAllPins()
     }
 
+    func entity(withID objectID: NSManagedObjectID) -> NSManagedObject? {
+        try? store.viewContext.existingObject(with: objectID)
+    }
+
     // MARK: - NSFetchedResultsController
 
     func refreshController() {

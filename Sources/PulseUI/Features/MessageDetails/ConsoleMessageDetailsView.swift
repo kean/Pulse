@@ -5,6 +5,8 @@
 import SwiftUI
 import Pulse
 
+#warning("remove ConsoleMessageMetadataView and automatically activated link it is broken")
+
 struct ConsoleMessageDetailsView: View {
     let message: LoggerMessageEntity
 
