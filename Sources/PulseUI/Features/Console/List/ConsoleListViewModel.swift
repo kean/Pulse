@@ -25,6 +25,16 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
         }
     }
 
+#if os(macOS)
+    var sortDescriptors: [NSSortDescriptor] = [NSSortDescriptor(key: "createdAt", ascending: false)] {
+        didSet {
+            controller?.fetchRequest.sortDescriptors = sortDescriptors
+            try? controller?.performFetch()
+            reloadMessages(isMandatory: true)
+        }
+    }
+#endif
+
     var isShowPreviousSessionButtonShown: Bool {
         searchCriteriaViewModel.criteria.shared.dates == .session
     }

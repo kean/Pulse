@@ -9,36 +9,35 @@ import Combine
 
 #if os(macOS)
 
-#warning("remove id: usage")
-
 struct ConsoleTableView: View {
-    let list: ConsoleListViewModel
+    let viewModel: ConsoleListViewModel
 
     var body: some View {
-        if let messages = list.entities as? [LoggerMessageEntity] {
-            ConsoleMessageTableView(entities: messages)
-        } else if let tasks = list.entities as? [LoggerMessageEntity] {
-            Text("Network")
+        if viewModel.entities is [LoggerMessageEntity] {
+            ConsoleMessageTableView(viewModel: viewModel)
+        } else if viewModel.entities is [NetworkTaskEntity] {
+            Text("ConsoleNetworkTableView")
+        } else {
+            fatalError("Unsupported entities: \(viewModel.entities)")
         }
     }
 }
 
-#warning("sort per column API?")
 #warning("add a way to cutomize which rows are sown")
+#warning("add network table view")
 
 private struct ConsoleMessageTableView: View {
-    let entities: [LoggerMessageEntity]
-
-    @State private var sortOrder = [KeyPathComparator(\LoggerMessageEntity.createdAt)]
+    @ObservedObject var viewModel: ConsoleListViewModel
+    @State private var sortOrder = [SortDescriptor<LoggerMessageEntity>(\.createdAt, order: .reverse)]
 
     var body: some View {
-        Table(entities, sortOrder: $sortOrder) {
+        Table(viewModel.entities as! [LoggerMessageEntity], sortOrder: $sortOrder) {
             TableColumn("Date & Time", value: \.createdAt) {
                 Text(dateAndTimeFormatter.string(from: $0.createdAt))
             }.width(ideal: 162, max: 162)
             TableColumn("Level", value: \.level) {
                 Text($0.logLevel.name)
-            }.width(ideal: 46, max: 50)
+            }.width(ideal: 50, max: 54)
             TableColumn("Label", value: \.label) {
                 Text($0.label)
             }.width(ideal: 68)
@@ -50,36 +49,10 @@ private struct ConsoleMessageTableView: View {
                 .width(ideal: 100)
         }
         .onChange(of: sortOrder) {
-            // TODO: commuincate to ViewModel
-            print("did change order ", $0)
-//            people.sort(using: $0)
+            viewModel.sortDescriptors = $0.map(NSSortDescriptor.init)
         }
     }
 }
-
-//case .status: return ""
-//case .index: return ""
-//case .dateAndTime: return "Date & Time"
-//case .date: return "Date"
-//case .time: return "Time"
-//case .interval: return "Interval"
-//case .level: return "Level"
-//case .label: return "Label"
-//case .message: return "Message"
-//case .file: return "File"
-//case .function: return "Function"
-
-private let dateFormatter: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.dateStyle = .medium
-    return formatter
-}()
-
-private let timeFormatter: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.dateFormat = "HH:mm:ss.SSS"
-    return formatter
-}()
 
 private let dateAndTimeFormatter: DateFormatter = {
     let formatter = DateFormatter()
@@ -87,11 +60,10 @@ private let dateAndTimeFormatter: DateFormatter = {
     return formatter
 }()
 
-
 struct ConsoleTableView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            ConsoleTableView(list: ConsoleViewModel(store: .mock).list)
+            ConsoleTableView(viewModel: ConsoleViewModel(store: .mock).list)
                 .previewLayout(.fixed(width: 1200, height: 800))
         }
     }

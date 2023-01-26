@@ -84,10 +84,13 @@ private struct LegacyConsoleContainerView: View {
 private struct Siderbar: View {
     @ObservedObject var viewModel: ConsoleViewModel
 
+    #warning("temp")
+
     var body: some View {
-        List {
-            ConsoleListContentView(viewModel: viewModel.list)
-        }
+//        List {
+            ConsoleTableView(viewModel: viewModel.list)
+//            ConsoleListContentView(viewModel: viewModel.list)
+//        }
             .toolbar {
                 ToolbarItemGroup(placement: .automatic) {
                     ConsoleToolbarItems(viewModel: viewModel)
