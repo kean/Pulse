@@ -25,6 +25,7 @@ struct ConsoleTableView: View {
 }
 
 #warning("add a way to cutomize which rows are sown")
+#warning("add contet menu")
 #warning("add network table view")
 
 private struct ConsoleMessageTableView: View {
