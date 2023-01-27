@@ -1,5 +1,11 @@
 # Pulse 2.x
 
+## Pulse 3.2.1
+
+*Jan 27, 2023*
+
+- Fix backward compatibility with Pulse Pro 2.x
+
 ## Pulse 3.2.0
 
 *Jan 24, 2023*
