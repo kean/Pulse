@@ -26,12 +26,14 @@ struct NetworkHeadersCell: View {
     }
 }
 
-final class NetworkHeadersCellViewModel {
+struct NetworkHeadersCellViewModel {
     let title: String
     let details: String
     let isEnabled: Bool
 
-    lazy var detailsViewModel = KeyValueSectionViewModel.makeHeaders(title: title, headers: headers)
+    var detailsViewModel: KeyValueSectionViewModel {
+        KeyValueSectionViewModel.makeHeaders(title: title, headers: headers)
+    }
 
     private let headers: [String: String]
 

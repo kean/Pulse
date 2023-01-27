@@ -47,10 +47,10 @@ private struct _ConsoleMessageCell: View {
     var body: some View {
 #if os(iOS)
         let cell = ConsoleMessageCell(viewModel: .init(message: message), isDisclosureNeeded: true)
-            .background(NavigationLink("", destination: LazyConsoleDetailsView(message: message)).opacity(0))
+            .background(NavigationLink("", destination: ConsoleMessageDetailsView(message: message)).opacity(0))
 #else
         // `id` is a workaround for macOS (needs to be fixed)
-        let cell = NavigationLink(destination: LazyConsoleDetailsView(message: message).id(message.objectID)) {
+        let cell = NavigationLink(destination: ConsoleMessageDetailsView(message: message)) {
             ConsoleMessageCell(viewModel: .init(message: message))
         }
 #endif
@@ -98,9 +98,9 @@ private struct _ConsoleTaskCell: View {
     var body: some View {
 #if os(iOS)
         let cell = ConsoleTaskCell(task: task, isDisclosureNeeded: true)
-            .background(NavigationLink("", destination: LazyNetworkInspectorView(task: task).id(task.objectID)).opacity(0))
+            .background(NavigationLink("", destination: NetworkInspectorView(task: task)).opacity(0))
 #else
-        let cell = NavigationLink(destination: LazyNetworkInspectorView(task: task).id(task.objectID)) {
+        let cell = NavigationLink(destination: NetworkInspectorView(task: task)) {
             ConsoleTaskCell(task: task)
         }
 #endif
@@ -176,21 +176,3 @@ private struct TextViewPreview: View {
     }
 }
 #endif
-
-// Create the underlying ViewModel lazily.
-private struct LazyNetworkInspectorView: View {
-    let task: NetworkTaskEntity
-
-    var body: some View {
-        NetworkInspectorView(viewModel: .init(task: task))
-    }
-}
-
-// Create the underlying ViewModel lazily.
-private struct LazyConsoleDetailsView: View {
-    let message: LoggerMessageEntity
-
-    var body: some View {
-        ConsoleMessageDetailsView(viewModel: .init(message: message))
-    }
-}

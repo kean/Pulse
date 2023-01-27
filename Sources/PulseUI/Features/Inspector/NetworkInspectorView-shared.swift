@@ -5,50 +5,44 @@
 import SwiftUI
 import Pulse
 
-struct NetworkInspectorSectionRequest: View {
-    let viewModel: NetworkInspectorViewModel
-    let isCurrentRequest: Bool
-
-    var body: some View {
-        viewModel.requestBodyViewModel.map(NetworkRequestBodyCell.init)
+extension NetworkInspectorView {
+    @ViewBuilder
+    static func makeRequestSection(task: NetworkTaskEntity, isCurrentRequest: Bool) -> some View {
+        let url = URL(string: task.url ?? "")
+        NetworkRequestBodyCell(viewModel: .init(task: task))
         if isCurrentRequest {
-            viewModel.currentRequestHeadersViewModel.map(NetworkHeadersCell.init)
-            viewModel.currentRequestCookiesViewModel.map(NetworkCookiesCell.init)
+            NetworkHeadersCell(viewModel: .init(title: "Request Headers", headers: task.currentRequest?.headers))
+            NetworkCookiesCell(viewModel: .init(title: "Request Cookies", headers: task.currentRequest?.headers, url: url))
         } else {
-            viewModel.originalRequestHeadersViewModel.map(NetworkHeadersCell.init)
-            viewModel.originalRequestCookiesViewModel.map(NetworkCookiesCell.init)
+            NetworkHeadersCell(viewModel: .init(title: "Request Headers", headers: task.originalRequest?.headers))
+            NetworkCookiesCell(viewModel: .init(title: "Request Cookies", headers: task.originalRequest?.headers, url: url))
         }
     }
-}
 
-struct NetworkInspectorSectionResponse: View {
-    let viewModel: NetworkInspectorViewModel
-
-    var body: some View {
-        viewModel.responseBodyViewModel.map(NetworkResponseBodyCell.init)
-        viewModel.responseHeadersViewModel.map(NetworkHeadersCell.init)
-        viewModel.responseCookiesViewModel.map(NetworkCookiesCell.init)
+    @ViewBuilder
+    static func makeResponseSection(task: NetworkTaskEntity) -> some View {
+        let url = URL(string: task.url ?? "")
+        NetworkResponseBodyCell(viewModel: .init(task: task))
+        NetworkHeadersCell(viewModel: .init(title: "Response Headers", headers: task.response?.headers))
+        NetworkCookiesCell(viewModel: .init(title: "Response Cookies", headers: task.response?.headers, url: url))
     }
-}
 
-struct NetworkInspectorSectionTransferStatus: View {
-    @ObservedObject var viewModel: NetworkInspectorViewModel
-
-    var body: some View {
+    @ViewBuilder
+    static func makeHeaderView(task: NetworkTaskEntity) -> some View {
         ZStack {
             NetworkInspectorTransferInfoView(viewModel: .init(empty: true))
                 .hidden()
                 .accessibilityHidden(true)
-            if let transfer = viewModel.transferViewModel {
-                NetworkInspectorTransferInfoView(viewModel: transfer)
-            } else if let progress = viewModel.progressViewModel {
-                SpinnerView(viewModel: progress)
-            } else if let status = viewModel.statusSectionViewModel?.status {
+            if task.hasMetrics {
+                NetworkInspectorTransferInfoView(viewModel: .init(task: task))
+            } else if task.state == .pending {
+                SpinnerView(viewModel: ProgressViewModel(task: task))
+            } else if let status = NetworkRequestStatusSectionViewModel(task: task).status {
                 // Fallback in case metrics are disabled
                 Image(systemName: status.imageName)
                     .foregroundColor(status.tintColor)
                     .font(.system(size: 64))
-            } // Should never happen
+            }
         }
     }
 }

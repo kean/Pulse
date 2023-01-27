@@ -121,7 +121,7 @@ struct NetworkInspectorTransferInfoView_Previews: PreviewProvider {
 }
 
 private let mockModel = NetworkInspectorTransferInfoViewModel(
-    task: LoggerStore.preview.entity(for: .login), taskType: .dataTask
+    task: LoggerStore.preview.entity(for: .login)
 )
 
 #endif
@@ -146,7 +146,7 @@ struct NetworkInspectorTransferInfoViewModel {
         headersBytesReceived = "–"
     }
 
-    init(task: NetworkTaskEntity, taskType: NetworkLogger.TaskType) {
+    init(task: NetworkTaskEntity) {
         self.init(transferSize: task.totalTransferSize)
     }
 

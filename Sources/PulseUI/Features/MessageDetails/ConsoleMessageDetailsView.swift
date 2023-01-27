@@ -6,7 +6,7 @@ import SwiftUI
 import Pulse
 
 struct ConsoleMessageDetailsView: View {
-    let viewModel: ConsoleMessageDetailsViewModel
+    let message: LoggerMessageEntity
 
 #if os(iOS)
     var body: some View {
@@ -18,17 +18,17 @@ struct ConsoleMessageDetailsView: View {
     @ViewBuilder
     private var trailingNavigationBarItems: some View {
         HStack {
-            NavigationLink(destination: ConsoleMessageMetadataView(message: viewModel.message)) {
+            NavigationLink(destination: ConsoleMessageMetadataView(message: message)) {
                 Image(systemName: "info.circle")
             }
-            PinButton(viewModel: viewModel.pin, isTextNeeded: false)
+            PinButton(viewModel: .init(message), isTextNeeded: false)
         }
     }
 #elseif os(watchOS)
     var body: some View {
         ScrollView {
             VStack(spacing: 8) {
-                NavigationLink(destination: ConsoleMessageMetadataView(message: viewModel.message)) {
+                NavigationLink(destination: ConsoleMessageMetadataView(message: message)) {
                     Label("Details", systemImage: "info.circle")
                 }
                 contents
@@ -43,9 +43,9 @@ struct ConsoleMessageDetailsView: View {
     @State private var isDetailsLinkActive = false
 
     var body: some View {
-        ConsoleMessageMetadataView(message: viewModel.message)
+        ConsoleMessageMetadataView(message: message)
             .background(VStack {
-                NavigationLink(isActive: $isDetailsLinkActive, destination: { _MessageTextView(viewModel: viewModel) }, label: { EmptyView() })
+                NavigationLink(isActive: $isDetailsLinkActive, destination: { RichTextView(viewModel: makeTextViewModel()) }, label: { EmptyView() })
             }.invisible())
             .onAppear { isDetailsLinkActive = true }
     }
@@ -53,54 +53,20 @@ struct ConsoleMessageDetailsView: View {
 
     private var contents: some View {
         VStack {
-            textView
+            RichTextView(viewModel: makeTextViewModel())
         }.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
 
-    private var textView: some View {
-        RichTextView(viewModel: viewModel.textViewModel)
-    }
-
-#if os(watchOS) || os(tvOS)
-    private var tags: some View {
-        VStack(alignment: .leading) {
-            ForEach(viewModel.tags, id: \.title) { tag in
-                HStack {
-                    Text(tag.title)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    Text(tag.value)
-                        .font(.caption)
-                        .foregroundColor(.primary)
-                }
-            }
-        }
-        .padding()
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color.gray.opacity(0.15))
-        .cornerRadius(8)
-    }
-#endif
-}
-
-#if os(macOS)
-
-private struct _MessageTextView: View {
-    let viewModel: ConsoleMessageDetailsViewModel
-    @Environment(\.colorScheme) var colorScheme: ColorScheme
-    @State private var isShowingShareSheet = false
-
-    var body: some View {
-        RichTextView(viewModel: viewModel.textViewModel)
+    private func makeTextViewModel() -> RichTextViewModel {
+        RichTextViewModel(string: TextRenderer().preformatted(message.text))
     }
 }
-#endif
 
 #if DEBUG
 struct ConsoleMessageDetailsView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
-            ConsoleMessageDetailsView(viewModel: .init(message: makeMockMessage()))
+            ConsoleMessageDetailsView(message: makeMockMessage())
         }
     }
 }

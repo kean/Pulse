@@ -26,7 +26,7 @@ struct NetworkRequestBodyCell: View {
     }
 }
 
-final class NetworkRequestBodyCellViewModel {
+struct NetworkRequestBodyCellViewModel {
     let details: String
     let isEnabled: Bool
     let detailsViewModel: NetworkInspectorRequestBodyViewModel

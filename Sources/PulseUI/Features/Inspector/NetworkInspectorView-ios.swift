@@ -10,42 +10,46 @@ import Combine
 #if os(iOS)
 
 struct NetworkInspectorView: View {
-    @StateObject var viewModel: NetworkInspectorViewModel
+    @ObservedObject var task: NetworkTaskEntity
+
+    private var viewModel: NetworkInspectorViewModel { .init(task: task) }
 
     @State private var shareItems: ShareItems?
     @State private var isCurrentRequest = false
 
     var body: some View {
-        Form {
+        List {
             contents
         }
-        .inlineNavigationTitle(viewModel.title)
+        .animation(.default, value: task.state)
+        .listStyle(.insetGrouped)
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 trailingNavigationBarItems
             }
         }
+        .inlineNavigationTitle(viewModel.title)
         .sheet(item: $shareItems, content: ShareView.init)
     }
 
     @ViewBuilder
     private var contents: some View {
-        Section { NetworkInspectorSectionTransferStatus(viewModel: viewModel) }
+        Section { NetworkInspectorView.makeHeaderView(task: task) }
             .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
             .listRowBackground(Color.clear)
         Section {
-            viewModel.statusSectionViewModel.map(NetworkRequestStatusSectionView.init)
+            NetworkRequestStatusSectionView(viewModel: .init(task: task))
         }
         Section {
-            NetworkInspectorSectionRequest(viewModel: viewModel, isCurrentRequest: isCurrentRequest)
+            NetworkInspectorView.makeRequestSection(task: task, isCurrentRequest: isCurrentRequest)
         } header: { requestTypePicker }
-        if viewModel.task.state != .pending {
+        if task.state != .pending {
             Section {
-                NetworkInspectorSectionResponse(viewModel: viewModel)
+                NetworkInspectorView.makeResponseSection(task: task)
             }
             Section {
-                NetworkMetricsCell(task: viewModel.task)
-                NetworkCURLCell(task: viewModel.task)
+                NetworkMetricsCell(task: task)
+                NetworkCURLCell(task: task)
             }
         }
     }
@@ -69,16 +73,16 @@ struct NetworkInspectorView: View {
         viewModel.pinViewModel.map { PinButton(viewModel: $0, isTextNeeded: false) }
         Menu(content: {
             AttributedStringShareMenu(shareItems: $shareItems) {
-                TextRenderer(options: .sharing).make { $0.render(viewModel.task, content: .sharing) }
+                TextRenderer(options: .sharing).make { $0.render(task, content: .sharing) }
             }
-            Button(action: { shareItems = ShareItems([viewModel.task.cURLDescription()]) }) {
+            Button(action: { shareItems = ShareItems([task.cURLDescription()]) }) {
                 Label("Share as cURL", systemImage: "square.and.arrow.up")
             }
         }, label: {
             Image(systemName: "square.and.arrow.up")
         })
         Menu(content: {
-            NetworkMessageContextMenu(task: viewModel.task, sharedItems: $shareItems)
+            NetworkMessageContextMenu(task: task, sharedItems: $shareItems)
         }, label: {
             Image(systemName: "ellipsis.circle")
         })
@@ -90,11 +94,11 @@ struct NetworkInspectorView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             NavigationView {
-                NetworkInspectorView(viewModel: .init(task: LoggerStore.preview.entity(for: .login)))
+                NetworkInspectorView(task: LoggerStore.preview.entity(for: .login))
             }.previewDisplayName("Success")
 
             NavigationView {
-                NetworkInspectorView(viewModel: .init(task: LoggerStore.preview.entity(for: .patchRepo)))
+                NetworkInspectorView(task: LoggerStore.preview.entity(for: .patchRepo))
             }.previewDisplayName("Failure")
         }
     }

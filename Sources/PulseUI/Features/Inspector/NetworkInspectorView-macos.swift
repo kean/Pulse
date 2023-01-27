@@ -10,7 +10,9 @@ import Combine
 #if os(macOS)
 
 struct NetworkInspectorView: View {
-    @StateObject var viewModel: NetworkInspectorViewModel
+    @ObservedObject var task: NetworkTaskEntity
+
+    private var viewModel: NetworkInspectorViewModel { .init(task: task) }
 
     @State private var isCurrentRequest = false
 
@@ -29,19 +31,19 @@ struct NetworkInspectorView: View {
     @ViewBuilder
     private var contents: some View {
         Section {
-            NetworkInspectorSectionTransferStatus(viewModel: viewModel)
+            NetworkInspectorView.makeHeaderView(task: task)
         }
         Section {
-            viewModel.statusSectionViewModel.map(NetworkRequestStatusSectionView.init)
+            NetworkRequestStatusSectionView(viewModel: .init(task: task))
         }
         Section {
-            NetworkInspectorSectionRequest(viewModel: viewModel, isCurrentRequest: isCurrentRequest)
+            NetworkInspectorView.makeRequestSection(task: task, isCurrentRequest: isCurrentRequest)
         } header: {
             NetworkInspectorRequestTypePicker(isCurrentRequest: $isCurrentRequest)
         }
         if viewModel.task.state != .pending {
             Section {
-                NetworkInspectorSectionResponse(viewModel: viewModel)
+                NetworkInspectorView.makeResponseSection(task: task)
             }
             Section {
                 NetworkMetricsCell(task: viewModel.task)
@@ -56,7 +58,7 @@ struct NetworkInspectorView_Previews: PreviewProvider {
     static var previews: some View {
             if #available(macOS 13.0, *) {
                 NavigationStack {
-                    NetworkInspectorView(viewModel: .init(task: LoggerStore.preview.entity(for: .login)))
+                    NetworkInspectorView(task: LoggerStore.preview.entity(for: .login))
                 }.previewLayout(.fixed(width: ConsoleView.contentColumnWidth, height: 800))
             }
         }

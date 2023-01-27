@@ -28,12 +28,14 @@ struct NetworkCookiesCell: View {
     }
 }
 
-final class NetworkCookiesCellViewModel {
+struct NetworkCookiesCellViewModel {
     let title: String
     let details: String
     let isEnabled: Bool
 
-    lazy var detailsAttributedString = makeAttributedString(for: cookies)
+    var detailsAttributedString: NSAttributedString {
+        makeAttributedString(for: cookies)
+    }
 
     private let cookies: [HTTPCookie]
 

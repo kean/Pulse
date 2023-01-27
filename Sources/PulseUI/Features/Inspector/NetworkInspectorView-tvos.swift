@@ -10,7 +10,9 @@ import Combine
 #if os(tvOS)
 
 struct NetworkInspectorView: View {
-    @StateObject var viewModel: NetworkInspectorViewModel
+    @ObservedObject var task: NetworkTaskEntity
+
+    private var viewModel: NetworkInspectorViewModel { .init(task: task) }
 
     @State private var isCurrentRequest = false
 
@@ -29,15 +31,15 @@ struct NetworkInspectorView: View {
     @ViewBuilder
     private var lhs: some View {
         Section {
-            viewModel.statusSectionViewModel.map(NetworkRequestStatusSectionView.init)
+            NetworkRequestStatusSectionView(viewModel: .init(task: task))
         }
         Section {
             NetworkInspectorRequestTypePicker(isCurrentRequest: $isCurrentRequest)
-            NetworkInspectorSectionRequest(viewModel: viewModel, isCurrentRequest: isCurrentRequest)
+            NetworkInspectorView.makeRequestSection(task: task, isCurrentRequest: isCurrentRequest)
         } header: { Text("Request") }
         if viewModel.task.state != .pending {
             Section {
-                NetworkInspectorSectionResponse(viewModel: viewModel)
+                NetworkInspectorView.makeResponseSection(task: task)
             } header: { Text("Response") }
 
         }
@@ -49,7 +51,7 @@ struct NetworkInspectorView: View {
     @ViewBuilder
     private var rhs: some View {
         Section {
-            NetworkInspectorSectionTransferStatus(viewModel: viewModel)
+            NetworkInspectorView.makeHeaderView(task: task)
                 .padding(.bottom, 32)
         }
         .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
@@ -63,7 +65,7 @@ struct NetworkInspectorView: View {
 struct NetworkInspectorView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
-            NetworkInspectorView(viewModel: .init(task: LoggerStore.preview.entity(for: .login)))
+            NetworkInspectorView(task: LoggerStore.preview.entity(for: .login))
         }
     }
 }

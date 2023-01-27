@@ -10,7 +10,9 @@ import Combine
 #if os(watchOS)
 
 struct NetworkInspectorView: View {
-    @StateObject var viewModel: NetworkInspectorViewModel
+    @ObservedObject var task: NetworkTaskEntity
+
+    private var viewModel: NetworkInspectorViewModel { .init(task: task) }
 
     @State private var isCurrentRequest = false
 
@@ -26,16 +28,18 @@ struct NetworkInspectorView: View {
 
     var contents: some View {
         List {
-            Section { viewModel.statusSectionViewModel.map(NetworkRequestStatusSectionView.init) }
+            Section {
+                NetworkRequestStatusSectionView(viewModel: .init(task: task))
+            }
             Section {
                 makeTransferInfo(isReceivedHidden: true)
                 NetworkInspectorRequestTypePicker(isCurrentRequest: $isCurrentRequest)
-                NetworkInspectorSectionRequest(viewModel: viewModel, isCurrentRequest: isCurrentRequest)
+                NetworkInspectorView.makeRequestSection(task: task, isCurrentRequest: isCurrentRequest)
             }
             if viewModel.task.state != .pending {
                 Section {
                     makeTransferInfo(isSentHidden: true)
-                    NetworkInspectorSectionResponse(viewModel: viewModel)
+                    NetworkInspectorView.makeResponseSection(task: task)
                 }
                 Section {
                     NetworkMetricsCell(task: viewModel.task)
@@ -45,9 +49,10 @@ struct NetworkInspectorView: View {
         }
     }
 
+    @ViewBuilder
     private func makeTransferInfo(isSentHidden: Bool = false, isReceivedHidden: Bool = false) -> some View {
-        viewModel.transferViewModel.map {
-            NetworkInspectorTransferInfoView(viewModel: $0, isSentHidden: isSentHidden, isReceivedHidden: isReceivedHidden)
+        if task.hasMetrics {
+            NetworkInspectorTransferInfoView(viewModel: .init(task: task), isSentHidden: isSentHidden, isReceivedHidden: isReceivedHidden)
                 .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
                 .listRowBackground(Color.clear)
                 .padding(.top, 8)
@@ -60,7 +65,7 @@ struct NetworkInspectorView: View {
 struct NetworkInspectorView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
-            NetworkInspectorView(viewModel: .init(task: LoggerStore.preview.entity(for: .login)))
+            NetworkInspectorView(task: LoggerStore.preview.entity(for: .login))
         }.navigationViewStyle(.stack)
     }
 }
