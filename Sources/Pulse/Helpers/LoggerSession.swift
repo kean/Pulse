@@ -21,4 +21,6 @@ extension LoggerStore {
             LoggerStore.Session.current = Session()
         }
     }
+
+    static var _sessionID = UUID()
 }

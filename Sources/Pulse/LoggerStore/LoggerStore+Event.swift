@@ -23,6 +23,9 @@ extension LoggerStore {
             public var function: String
             public var line: UInt
 
+            // Deprecated (added for backward compatibility)
+            public var session: UUID = LoggerStore._sessionID
+
             public init(createdAt: Date, label: String, level: LoggerStore.Level, message: String, metadata: [String: String]?, sessionID: Int64, file: String, function: String, line: UInt) {
                 self.createdAt = createdAt
                 self.label = label
@@ -43,6 +46,9 @@ extension LoggerStore {
             public var originalRequest: NetworkLogger.Request
             public var currentRequest: NetworkLogger.Request?
             public var sessionID: Int64
+
+            // Deprecated (added for backward compatibility)
+            public var session: UUID = LoggerStore._sessionID
 
             public init(taskId: UUID, taskType: NetworkLogger.TaskType, createdAt: Date, originalRequest: NetworkLogger.Request, currentRequest: NetworkLogger.Request?, sessionID: Int64) {
                 self.taskId = taskId
@@ -80,6 +86,9 @@ extension LoggerStore {
             public var responseBody: Data?
             public var metrics: NetworkLogger.Metrics?
             public var sessionID: Int64
+
+            // Deprecated (added for backward compatibility)
+            public var session: UUID = LoggerStore._sessionID
 
             public init(taskId: UUID, taskType: NetworkLogger.TaskType, createdAt: Date, originalRequest: NetworkLogger.Request, currentRequest: NetworkLogger.Request?, response: NetworkLogger.Response?, error: NetworkLogger.ResponseError?, requestBody: Data?, responseBody: Data?, metrics: NetworkLogger.Metrics?, sessionID: Int64) {
                 self.taskId = taskId
