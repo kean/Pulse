@@ -295,7 +295,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     private func makeContextForSuggestions() -> ConsoleSearchSuggestionsContext {
         ConsoleSearchSuggestionsContext(
             searchText: searchBar.text.trimmingCharacters(in: .whitespaces),
-            hosts: index.hosts,
+            index: index,
             parameters: parameters
         )
     }

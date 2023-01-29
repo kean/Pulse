@@ -16,8 +16,8 @@ extension Parsers {
         return [
             filterStatusCode,
             filterMethod,
-            makeFilterHost(hosts: context.hosts),
-            filterPath
+            makeFilterHost(hosts: context.index.hosts),
+            makeFilterPath(paths: context.index.paths)
         ]
     }
 
@@ -50,11 +50,20 @@ extension Parsers {
         [(ConsoleSearchFilter.method(.init(values: values)), confidence)]
     }
 
-    static let filterPath = oneOf(
-        filterName("path") <*> listOf(path),
-        (char(from: "/") *> optional(path)).map { (0.7, ["/" + ($0 ?? "")]) }
-    ).map { confidence, values in
-        [(ConsoleSearchFilter.path(.init(values: values)), confidence)]
+    static func makeFilterPath(paths: Set<String>) -> Parser<[(ConsoleSearchFilter, Confidence)]> {
+        oneOf(
+            filterName("path") <*> listOf(path),
+            (char(from: "/") *> optional(path)).map { (0.7, ["/" + ($0 ?? "")]) }
+        ).map { confidence, values in
+            let suggested = values.flatMap { value in
+                paths.map { ($0, $0.fuzzyMatch(value)) }
+            }
+            let filters = suggested.filter { $0.1 > 0.2 }
+                .sorted(by: { $0.1 > $1.1 })
+                .prefix(2)
+                .map { (ConsoleSearchFilter.path(.init(values: [$0.0])), $0.1) }
+            return filters + [(ConsoleSearchFilter.path(.init(values: values)), confidence)]
+        }
     }
 
     static let host = char(from: .urlHostAllowed.subtracting(.init(charactersIn: ",")))

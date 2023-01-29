@@ -1,4 +1,6 @@
-# Pulse 2.x
+# Pulse 3.x
+
+- Add aucomplete for paths
 
 ## Pulse 3.2.1
 
@@ -56,6 +58,9 @@
 - Add `sensitiveHeaders`, `sensitiveQueryItems`, `sensitiveDataFields` to `NetworkLogger/Configuration` for redacting sentitive information from logged HTTP headers 
 - Add a new convenience initializer to `NetworkLogger` with `configure` trailing closure
 - Make `LoggerStore.Event` frozen
+
+
+# Pulse 2.x
 
 ### PulseUI
 
