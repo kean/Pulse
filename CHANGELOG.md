@@ -64,12 +64,12 @@
 - Add a new convenience initializer to `NetworkLogger` with `configure` trailing closure
 - Make `LoggerStore.Event` frozen
 
-
-# Pulse 2.x
-
 ### PulseUI
 
 - A complete overhaul. See https://kean.blog/post/pulse-3 for more details.
+
+
+# Pulse 2.x
 
 ## Pulse 2.1.4
 
