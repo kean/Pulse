@@ -10,6 +10,7 @@ import Pulse
 /// Keeps track of hosts, paths, etc.
 final class LoggerStoreIndex {
     var hosts: Set<String> = []
+    var paths: Set<String> = []
 
     private let store: LoggerStore
     private var cancellable: AnyCancellable?
@@ -18,7 +19,7 @@ final class LoggerStoreIndex {
         self.store = store
 
         store.backgroundContext.perform {
-            self.populate()
+            self.prepopulate()
         }
         cancellable = store.events.subscribe(on: DispatchQueue.main).sink { [weak self] in
             self?.handle($0)
@@ -38,22 +39,34 @@ final class LoggerStoreIndex {
         }
     }
 
-    private func populate() {
-        // These calls are fast enough (1-2ms for 5000 messages) so we
-        // could avoid storing this persistently.
-        let hosts: Set<String> = {
+    private func prepopulate() {
+        let urls: Set<String> = {
             let request = NSFetchRequest<NSFetchRequestResult>(entityName: "NetworkTaskEntity")
             request.resultType = .dictionaryResultType
             request.returnsDistinctResults = true
-            request.propertiesToFetch = ["host"]
+            request.propertiesToFetch = ["url"]
             guard let results = try? store.backgroundContext.fetch(request) as? [[String: String]] else {
                 return []
             }
             return Set(results.flatMap { $0.values })
         }()
 
+        var hosts = Set<String>()
+        var paths = Set<String>()
+
+        for url in urls {
+            guard let components = URLComponents(string: url) else {
+                continue
+            }
+            if let host = components.host, !host.isEmpty {
+                hosts.insert(host)
+            }
+            paths.insert(components.path)
+        }
+
         DispatchQueue.main.async {
             self.hosts = hosts
+            self.paths = paths
         }
     }
 }
