@@ -1,5 +1,9 @@
 # Pulse 3.x
 
+## Pulse 3.2.2
+
+*Jan 29, 2023*
+
 - Add aucomplete for paths
 - Fix labels/domains selection in filters - [#152](https://github.com/kean/Pulse/pull/152) by [hayek](https://github.com/hayek)
 
