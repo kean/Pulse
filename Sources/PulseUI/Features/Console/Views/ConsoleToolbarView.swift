@@ -124,7 +124,7 @@ struct ConsoleFiltersView: View {
         Button(action: { searchCriteriaViewModel.isOnlyErrors.toggle() }) {
             Image(systemName: searchCriteriaViewModel.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon")
                 .font(.system(size: 20))
-                .foregroundColor(searchCriteriaViewModel.isOnlyErrors ? .red : .accentColor)
+                .foregroundColor(searchCriteriaViewModel.isOnlyErrors ? .red : .blue)
         }
     }
 

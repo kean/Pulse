@@ -41,7 +41,7 @@ struct ConsoleSearchSectionHeader: View {
                 .disabled(isDefault)
                 Button(action: { isEnabled.toggle() }) {
                     Image(systemName: isEnabled ? "checkmark.circle.fill" : "circle")
-                        .foregroundColor(isDefault ? .secondary : .accentColor)
+                        .foregroundColor(isDefault ? .secondary : .blue)
                 }
                 .disabled(isDefault)
             }

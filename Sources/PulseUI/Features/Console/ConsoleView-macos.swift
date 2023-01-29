@@ -135,7 +135,7 @@ private struct FilterPopoverToolbarButton: View {
     var body: some View {
         Button(action: { isPresented.toggle() }, label: {
             Image(systemName: isPresented ? "line.horizontal.3.decrease.circle.fill" : "line.horizontal.3.decrease.circle")
-                .foregroundColor(isPresented ? .accentColor : .secondary)
+                .foregroundColor(isPresented ? .blue : .secondary)
         })
         .help("Toggle Filters Panel (⌥⌘F)")
         .popover(isPresented: $isPresented, arrowEdge: .top) {
@@ -152,7 +152,7 @@ private struct ConsoleToolbarModePickerButton: View {
     var body: some View {
         Button(action: { mode = (mode == .tasks ? .all : .tasks) }) {
             Image(systemName: mode == .tasks ? "arrow.down.circle.fill" : "arrow.down.circle")
-                .foregroundColor(mode == .tasks ? Color.accentColor : Color.secondary)
+                .foregroundColor(mode == .tasks ? Color.blue : Color.secondary)
         }
         .help("Automatically Scroll to Recent Messages (⇧⌘N)")
         .onChange(of: mode) { viewModel.mode = $0 }
