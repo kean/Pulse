@@ -68,7 +68,7 @@ final class ConsoleViewModel: ObservableObject {
         self.isNetwork = isOnlyNetwork
 
         self.index = LoggerStoreIndex(store: store)
-        self.searchCriteriaViewModel = ConsoleSearchCriteriaViewModel(store: store, source: source)
+        self.searchCriteriaViewModel = ConsoleSearchCriteriaViewModel(store: store, index: index, source: source)
         self.searchBarViewModel = ConsoleSearchBarViewModel()
         self.list = ConsoleListViewModel(store: store, source: source, criteria: searchCriteriaViewModel)
 #if os(iOS)
@@ -81,7 +81,6 @@ final class ConsoleViewModel: ObservableObject {
         prepare(for: mode)
         searchCriteriaViewModel.bind(list.$entities)
         searchCriteriaViewModel.bind(accumulatedLabels: list.$accumulatedLabels)
-        searchCriteriaViewModel.bind(accumulatedHosts: list.$accumulatedHosts)
     }
 
     private func prepare(for mode: ConsoleMode) {

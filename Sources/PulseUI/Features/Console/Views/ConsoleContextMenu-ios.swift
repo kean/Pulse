@@ -74,8 +74,7 @@ struct ConsoleContextMenu: View {
         viewModel.store.removeAll()
         
         viewModel.searchCriteriaViewModel.accumulatedLabels = []
-        viewModel.searchCriteriaViewModel.accumulatedHosts = []
-        
+
         runHapticFeedback(.success)
         ToastView {
             HStack {

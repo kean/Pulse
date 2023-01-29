@@ -24,14 +24,15 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
     private(set) var defaultCriteria = ConsoleSearchCriteria()
 
     private let store: LoggerStore
+    private let index: LoggerStoreIndex
     private var isScreenVisible = false
     private var entities: [NSManagedObject] = []
     public var accumulatedLabels: Set<String> = []
-    public var accumulatedHosts: Set<String> = []
     private var cancellables: [AnyCancellable] = []
 
-    init(store: LoggerStore, source: ConsoleSource) {
+    init(store: LoggerStore, index: LoggerStoreIndex, source: ConsoleSource) {
         self.store = store
+        self.index = index
 
         if store.isArchive {
             self.criteria.shared.dates.startDate = nil
@@ -58,13 +59,6 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
         accumulatedLabels.sink { [weak self] in
             guard let self else { return }
             self.accumulatedLabels = $0
-        }.store(in: &cancellables)
-    }
-
-    func bind(accumulatedHosts  : some Publisher<Set<String>, Never>) {
-        accumulatedHosts.sink { [weak self] in
-            guard let self else { return }
-            self.accumulatedHosts = $0
         }.store(in: &cancellables)
     }
 
@@ -100,9 +94,7 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
                 return assertionFailure()
             }
             domainsCountedSet = NSCountedSet(array: tasks.compactMap { $0.host })
-            domains = (domainsCountedSet.allObjects as! [String]).sorted(by: { lhs, rhs in
-                domainsCountedSet.count(for: lhs) > domainsCountedSet.count(for: rhs)
-            })
+            domains = index.hosts.sorted()
         } else {
             guard let messages = entities as? [LoggerMessageEntity] else {
                 return assertionFailure()
@@ -165,10 +157,10 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
 
     var selectedHost: Set<String> {
         get {
-            Set(accumulatedHosts).subtracting(criteria.network.host.ignoredHosts)
+            Set(index.hosts).subtracting(criteria.network.host.ignoredHosts)
         }
         set {
-            criteria.network.host.ignoredHosts = Set(accumulatedHosts).subtracting(newValue)
+            criteria.network.host.ignoredHosts = Set(index.hosts).subtracting(newValue)
         }
     }
 }

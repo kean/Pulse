@@ -74,7 +74,6 @@ private struct ConsoleMenuView: View {
                 }
                 Button.destructive {
                     viewModel.accumulatedLabels = []
-                    viewModel.accumulatedHosts = []
                     store.removeAll()
                 } label: {
                     Label("Remove Logs", systemImage: "trash")
