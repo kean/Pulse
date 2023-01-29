@@ -1,6 +1,7 @@
 # Pulse 3.x
 
 - Add aucomplete for paths
+- Fix labels/domains selection in filters - [#152](https://github.com/kean/Pulse/pull/152) by [hayek](https://github.com/hayek)
 
 ## Pulse 3.2.1
 
