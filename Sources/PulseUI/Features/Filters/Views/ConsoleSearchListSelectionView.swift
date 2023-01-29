@@ -9,7 +9,7 @@ struct ConsoleSearchListSelectionView<Element: Hashable, Label: View>: View {
     let title: String
     let items: [Element]
 #if os(iOS) || os(macOS)
-    var limit = 5
+    var limit = 6
 #else
     var limit = 3
 #endif
