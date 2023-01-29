@@ -27,7 +27,6 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
     private let index: LoggerStoreIndex
     private var isScreenVisible = false
     private var entities: [NSManagedObject] = []
-    public var accumulatedLabels: Set<String> = []
     private var cancellables: [AnyCancellable] = []
 
     init(store: LoggerStore, index: LoggerStoreIndex, source: ConsoleSource) {
@@ -52,13 +51,6 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
             if self.isScreenVisible {
                 self.reloadCounters()
             }
-        }.store(in: &cancellables)
-    }
-    
-    func bind(accumulatedLabels  : some Publisher<Set<String>, Never>) {
-        accumulatedLabels.sink { [weak self] in
-            guard let self else { return }
-            self.accumulatedLabels = $0
         }.store(in: &cancellables)
     }
 
@@ -100,7 +92,7 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
                 return assertionFailure()
             }
             labelsCountedSet = NSCountedSet(array: messages.map(\.label))
-            labels = (labelsCountedSet.allObjects as! [String]).sorted()
+            labels = index.labels.sorted()
         }
     }
 
@@ -138,7 +130,7 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
             if let focused = criteria.messages.labels.focused {
                 return [focused]
             } else {
-                return Set(accumulatedLabels).subtracting(criteria.messages.labels.hidden)
+                return Set(index.labels).subtracting(criteria.messages.labels.hidden)
             }
         }
         set {
@@ -148,7 +140,7 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
             case 1:
                 criteria.messages.labels.focused = newValue.first!
             default:
-                criteria.messages.labels.hidden = Set(accumulatedLabels).subtracting(newValue)
+                criteria.messages.labels.hidden = Set(index.labels).subtracting(newValue)
             }
         }
     }

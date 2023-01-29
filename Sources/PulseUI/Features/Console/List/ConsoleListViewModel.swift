@@ -13,7 +13,6 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
     @Published private(set) var pins: [NSManagedObject] = []
     @Published private(set) var entities: [NSManagedObject] = []
     @Published private(set) var sections: [NSFetchedResultsSectionInfo]?
-    @Published private(set) var accumulatedLabels: Set<String> = []
     @Published var options = ConsoleListOptions()
 
     let entitiesSubject = CurrentValueSubject<[NSManagedObject], Never>([])
@@ -252,9 +251,6 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
     }
 
     private func reloadMessages(isMandatory: Bool = true) {
-        if let entities = entities as? [LoggerMessageEntity] {
-            accumulatedLabels = accumulatedLabels.union(Set(entities.map(\.label)))
-        }
         entities = controller?.fetchedObjects ?? []
         sections = controller?.sectionNameKeyPath == nil ?  nil : controller?.sections
         if isMandatory || scrollPosition == .nearTop {

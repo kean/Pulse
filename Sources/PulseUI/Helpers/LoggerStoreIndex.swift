@@ -9,8 +9,9 @@ import Pulse
 
 /// Keeps track of hosts, paths, etc.
 final class LoggerStoreIndex {
-    var hosts: Set<String> = []
-    var paths: Set<String> = []
+    private(set) var labels: Set<String> = []
+    private(set) var hosts: Set<String> = []
+    private(set) var paths: Set<String> = []
 
     private let store: LoggerStore
     private var cancellable: AnyCancellable?
@@ -28,6 +29,8 @@ final class LoggerStoreIndex {
 
     private func handle(_ event: LoggerStore.Event) {
         switch event {
+        case .messageStored(let event):
+            self.labels.insert(event.label)
         case .networkTaskCompleted(let event):
             if let host = event.originalRequest.url.flatMap(getHost) {
                 var hosts = self.hosts
@@ -40,6 +43,17 @@ final class LoggerStoreIndex {
     }
 
     private func prepopulate() {
+        let labels: Set<String> = {
+            let request = NSFetchRequest<NSFetchRequestResult>(entityName: "LoggerMessageEntity")
+            request.resultType = .dictionaryResultType
+            request.returnsDistinctResults = true
+            request.propertiesToFetch = ["label"]
+            guard let results = try? store.backgroundContext.fetch(request) as? [[String: String]] else {
+                return []
+            }
+            return Set(results.flatMap { $0.values })
+        }()
+
         let urls: Set<String> = {
             let request = NSFetchRequest<NSFetchRequestResult>(entityName: "NetworkTaskEntity")
             request.resultType = .dictionaryResultType
@@ -65,9 +79,16 @@ final class LoggerStoreIndex {
         }
 
         DispatchQueue.main.async {
+            self.labels = labels
             self.hosts = hosts
             self.paths = paths
         }
+    }
+
+    func clear() {
+        self.labels = []
+        self.paths = []
+        self.hosts = []
     }
 }
 

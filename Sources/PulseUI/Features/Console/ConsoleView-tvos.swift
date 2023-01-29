@@ -73,7 +73,7 @@ private struct ConsoleMenuView: View {
                     Label("Store Info", systemImage: "info.circle")
                 }
                 Button.destructive {
-                    viewModel.accumulatedLabels = []
+                    consoleViewModel.index.clear()
                     store.removeAll()
                 } label: {
                     Label("Remove Logs", systemImage: "trash")
