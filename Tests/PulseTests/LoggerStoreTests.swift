@@ -303,38 +303,6 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertEqual(try storeCopy.allMessages().count, 23)
     }
 
-    // MARK: - Index
-
-    func testThatIndexUpdatesWhenNewMessagsAreAdded() throws {
-        // THEN
-        let expectation = self.expectation(description: "index-updated")
-        store.$index.dropFirst(2).sink { // Drop initial & index load
-            XCTAssertEqual($0.hosts, ["example.com"])
-            expectation.fulfill()
-        }.store(in: &cancellables)
-
-        // WHEN
-        store.storeRequest(URLRequest(url: URL(string: "example.com/login")!), response: nil, error: nil, data: nil)
-        wait(for: [expectation], timeout: 2)
-    }
-
-    func testLoadingExistingIndex() throws {
-        // GIVEN
-        populate(store: store)
-        let copyURL = directory.url.appending(filename: "copy.pulse")
-        try store.copy(to: copyURL)
-        try? store.close()
-
-        // WHEN
-        let copy = try LoggerStore(storeURL: copyURL)
-        let expectation = self.expectation(description: "index-loaded")
-        copy.$index.dropFirst().sink {
-            XCTAssertEqual($0.hosts, ["github.com"])
-            expectation.fulfill()
-        }.store(in: &cancellables)
-        wait(for: [expectation], timeout: 2)
-    }
-
     // MARK: - Expiration
 
     func testSizeLimit() throws {

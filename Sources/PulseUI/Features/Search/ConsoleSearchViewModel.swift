@@ -65,14 +65,16 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     private let suggestionsService = ConsoleSearchSuggestionsService()
 
     private let store: LoggerStore
+    private let index: LoggerStoreIndex
     private let queue = DispatchQueue(label: "com.github.pulse.console-search-view")
     private var cancellables: [AnyCancellable] = []
     private let context: NSManagedObjectContext
 
-    init(entities: CurrentValueSubject<[NSManagedObject], Never>, store: LoggerStore, searchBar: ConsoleSearchBarViewModel) {
+    init(entities: CurrentValueSubject<[NSManagedObject], Never>, store: LoggerStore, index: LoggerStoreIndex, searchBar: ConsoleSearchBarViewModel) {
         self.entities = entities
         self.searchBar = searchBar
         self.store = store
+        self.index = index
         self.context = store.newBackgroundContext()
 
         let text = searchBar.$text
@@ -293,7 +295,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     private func makeContextForSuggestions() -> ConsoleSearchSuggestionsContext {
         ConsoleSearchSuggestionsContext(
             searchText: searchBar.text.trimmingCharacters(in: .whitespaces),
-            hosts: store.index.hosts,
+            hosts: index.hosts,
             parameters: parameters
         )
     }

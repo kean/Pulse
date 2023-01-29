@@ -42,6 +42,7 @@
 		0C11EAE92971EBEE0059786A /* MockTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5AF296F189500EED9D4 /* MockTask.swift */; };
 		0C11EAEA2971EBEE0059786A /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B0296F189500EED9D4 /* MockStore.swift */; };
 		0C2343152978B6B900AE7CE6 /* ConsoleSearchSuggestionsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C2343142978B6B900AE7CE6 /* ConsoleSearchSuggestionsService.swift */; };
+		0C3002B32986CEF30055F6C2 /* LoggerStoreIndex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C3002B22986CEF30055F6C2 /* LoggerStoreIndex.swift */; };
 		0C40C094296F7641009ECF16 /* ConsoleSearchContentTypeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C40C093296F7641009ECF16 /* ConsoleSearchContentTypeCell.swift */; };
 		0C40C096296F7738009ECF16 /* ConsoleSearchTaskTypeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C40C095296F7738009ECF16 /* ConsoleSearchTaskTypeCell.swift */; };
 		0C40C098296F777D009ECF16 /* ConsoleSearchResponseSourceCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C40C097296F777D009ECF16 /* ConsoleSearchResponseSourceCell.swift */; };
@@ -506,6 +507,7 @@
 		0C1221E525CE09C100B81D7A /* URLSessionAutomatedIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionAutomatedIntegration.swift; sourceTree = "<group>"; };
 		0C2343142978B6B900AE7CE6 /* ConsoleSearchSuggestionsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchSuggestionsService.swift; sourceTree = "<group>"; };
 		0C25FB6E25CDDCAB00A895C2 /* URLSessionManualIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionManualIntegration.swift; sourceTree = "<group>"; };
+		0C3002B22986CEF30055F6C2 /* LoggerStoreIndex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggerStoreIndex.swift; sourceTree = "<group>"; };
 		0C40C093296F7641009ECF16 /* ConsoleSearchContentTypeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchContentTypeCell.swift; sourceTree = "<group>"; };
 		0C40C095296F7738009ECF16 /* ConsoleSearchTaskTypeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchTaskTypeCell.swift; sourceTree = "<group>"; };
 		0C40C097296F777D009ECF16 /* ConsoleSearchResponseSourceCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchResponseSourceCell.swift; sourceTree = "<group>"; };
@@ -1222,6 +1224,7 @@
 				0CF0D584296F189500EED9D4 /* LoggerSync.swift */,
 				0CF0D587296F189500EED9D4 /* DecodingErrorsPreviews.swift */,
 				0CB17F192978ABBA004E33F4 /* ManagedObjectsCountObserver.swift */,
+				0C3002B22986CEF30055F6C2 /* LoggerStoreIndex.swift */,
 				0CB63A362976224600525165 /* Cache.swift */,
 				0CB63A392976227500525165 /* LinkedList.swift */,
 				0CF0D580296F189500EED9D4 /* Deprecated.swift */,
@@ -2146,6 +2149,7 @@
 				0CF0D678296F189600EED9D4 /* LoggerStoreSizeChart.swift in Sources */,
 				0CF0D676296F189600EED9D4 /* NetworkInspectorViewModel.swift in Sources */,
 				0C40C098296F777D009ECF16 /* ConsoleSearchResponseSourceCell.swift in Sources */,
+				0C3002B32986CEF30055F6C2 /* LoggerStoreIndex.swift in Sources */,
 				0CF0D689296F189600EED9D4 /* MainViewController.swift in Sources */,
 				0CF0D60F296F189600EED9D4 /* UIKit+Extensions.swift in Sources */,
 				0CF0D610296F189600EED9D4 /* SpinnerView.swift in Sources */,

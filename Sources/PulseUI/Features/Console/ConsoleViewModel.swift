@@ -26,6 +26,7 @@ final class ConsoleViewModel: ObservableObject {
 
     let searchBarViewModel: ConsoleSearchBarViewModel
     let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
+    let index: LoggerStoreIndex
 
     let router = ConsoleRouter()
 
@@ -66,15 +67,14 @@ final class ConsoleViewModel: ObservableObject {
         self.mode = mode
         self.isNetwork = isOnlyNetwork
 
+        self.index = LoggerStoreIndex(store: store)
         self.searchCriteriaViewModel = ConsoleSearchCriteriaViewModel(store: store, source: source)
-
         self.searchBarViewModel = ConsoleSearchBarViewModel()
         self.list = ConsoleListViewModel(store: store, source: source, criteria: searchCriteriaViewModel)
-
 #if os(iOS)
         self.insightsViewModel = InsightsViewModel(store: store)
         if #available(iOS 15, *) {
-            self._searchViewModel = ConsoleSearchViewModel(entities: list.entitiesSubject, store: store, searchBar: searchBarViewModel)
+            self._searchViewModel = ConsoleSearchViewModel(entities: list.entitiesSubject, store: store, index: index, searchBar: searchBarViewModel)
         }
 #endif
 

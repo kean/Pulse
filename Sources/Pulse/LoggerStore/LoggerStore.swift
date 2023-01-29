@@ -53,17 +53,6 @@ public final class LoggerStore: @unchecked Sendable {
     /// The date one of the loggers was created.
     public static let launchDate = Date()
 
-    /// The store metadata automatically updates when new logs are added.
-    ///
-    /// - warning: The index is initially empty and is populated asynchronously
-    /// after the store is created.
-    @Published public var index = Index()
-
-    public struct Index {
-        /// All unique recorded hosts.
-        public var hosts: Set<String> = []
-    }
-
     // MARK: Shared
 
     /// Returns a shared store.
@@ -206,10 +195,6 @@ public final class LoggerStore: @unchecked Sendable {
                     self?.sweep()
                 }
             }
-        }
-
-        backgroundContext.perform {
-            self.populateIndex()
         }
     }
 
@@ -354,8 +339,7 @@ extension LoggerStore {
         let entity = findOrCreateTask(forTaskId: event.taskId, taskType: event.taskType, createdAt: event.createdAt, sessionID: event.sessionID, url: event.originalRequest.url)
 
         entity.url = event.originalRequest.url?.absoluteString
-        let host = event.originalRequest.url.flatMap(getHost)
-        entity.host = host
+        entity.host = event.originalRequest.url.flatMap(getHost)
         entity.httpMethod = event.originalRequest.httpMethod
         entity.statusCode = Int32(event.response?.statusCode ?? 0)
         entity.responseContentType = event.response?.contentType?.type
@@ -432,14 +416,6 @@ extension LoggerStore {
             message.line = Int32(entity.requestState)
             if isFailure {
                 message.level = Level.error.rawValue
-            }
-        }
-
-        if let host = host, !host.isEmpty {
-            viewContext.perform {
-                var hosts = self.index.hosts
-                let (isInserted, _) = hosts.insert(host)
-                if isInserted { self.index.hosts = hosts }
             }
         }
 
@@ -870,29 +846,6 @@ extension LoggerStore {
             try store.removeMessages(with:  NSCompoundPredicate(notPredicateWithSubpredicate: predicate))
             try store.backgroundContext.save()
             return try store._info()
-        }
-    }
-}
-
-// MARK: - LoggerStore (Index)
-
-extension LoggerStore {
-    func populateIndex() {
-        // These calls are fast enough (1-2ms for 5000 messages) so we
-        // could avoid storing this persistently.
-        let hosts: Set<String> = {
-            let request = NSFetchRequest<NSFetchRequestResult>(entityName: "NetworkTaskEntity")
-            request.resultType = .dictionaryResultType
-            request.returnsDistinctResults = true
-            request.propertiesToFetch = ["host"]
-            guard let results = try? backgroundContext.fetch(request) as? [[String: String]] else {
-                return []
-            }
-            return Set(results.flatMap { $0.values })
-        }()
-
-        viewContext.perform {
-            self.index = Index(hosts: hosts)
         }
     }
 }
