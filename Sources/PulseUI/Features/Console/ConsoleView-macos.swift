@@ -50,6 +50,7 @@ public struct ConsoleView: View {
 #warning("add toolbar from the bottom")
 #warning("hide search result in richtextview")
 #warning("implement proper mode switcher")
+#warning("fix share button overriding search bar")
 
     @ViewBuilder
     private var toolbarItems: some View {
@@ -104,7 +105,6 @@ public struct ConsoleView: View {
     }
 }
 
-#warning("impleemnt selection in ConsoleSearchView")
 private struct ConsoleContentView: View {
     let viewModel: ConsoleViewModel
     @ObservedObject var searchBarViewModel: ConsoleSearchBarViewModel
