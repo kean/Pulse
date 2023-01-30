@@ -7,7 +7,7 @@ import Pulse
 import CoreData
 import Combine
 
-#if os(iOS)
+#if os(iOS) || os(macOS)
 
 struct ConsoleToolbarView: View {
     let viewModel: ConsoleViewModel
@@ -33,7 +33,7 @@ struct ConsoleToolbarView: View {
     }
 }
 
-private struct ConsoleModePicker: View {
+struct ConsoleModePicker: View {
     let viewModel: ConsoleViewModel
     @ObservedObject var logsCounter: ManagedObjectsCountObserver
     @ObservedObject var tasksCounter: ManagedObjectsCountObserver
@@ -93,11 +93,19 @@ private struct ConsoleModeButton: View {
             HStack(spacing: 4) {
                 Text(title)
                     .foregroundColor(isSelected ? Color.blue : Color.secondary)
+#if os(macOS)
+                    .font(.system(size: 11, weight: .medium, design: .default))
+#else
                     .font(.subheadline.weight(.medium))
+#endif
                 if let details = details {
                     Text("(\(details))")
                         .foregroundColor(isSelected ? Color.blue.opacity(0.7) : Color.secondary.opacity(0.7))
+#if os(macOS)
+                        .font(.system(size: 11, weight: .regular, design: .default))
+#else
                         .font(.subheadline)
+#endif
                 }
             }
         }

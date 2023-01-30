@@ -32,14 +32,6 @@ public struct ConsoleView: View {
         }
             .toolbar {
                 ToolbarItemGroup(placement: .automatic) {
-                    Picker("Mode", selection: $viewModel.mode) {
-                        Text("All").tag(ConsoleMode.all)
-                        Text("Logs").tag(ConsoleMode.logs)
-                        Text("Tasks").tag(ConsoleMode.tasks)
-                    }.pickerStyle(.inline)
-
-                    Spacer()
-
                     Picker("Mode", selection: $displayMode) {
                         Label("List", systemImage: "list.bullet").tag(ConsoleDisplayMode.list)
                         Label("Table", systemImage: "tablecells").tag(ConsoleDisplayMode.table)
@@ -76,6 +68,7 @@ public struct ConsoleView: View {
 #warning("add context menus")
 #warning("add toolbar from the bottom")
 #warning("hide search result in richtextview")
+#warning("implement proper mode switcher")
 
     private var contents: some View {
         NotSplitView(
@@ -98,6 +91,20 @@ private struct ConsoleContentView: View {
     @Binding var selection: NSManagedObjectID?
 
     var body: some View {
+        VStack(spacing: 0) {
+            content
+            Divider()
+            HStack {
+                ConsoleModePicker(viewModel: viewModel)
+                    .padding(.horizontal, 10)
+                Spacer()
+            }
+            .padding(.vertical, 10)
+        }
+    }
+
+    @ViewBuilder
+    private var content: some View {
         switch displayMode {
         case .table:
             ConsoleTableView(viewModel: viewModel.list, selection: $selection)
