@@ -11,7 +11,10 @@ import Combine
 
 public struct ConsoleView: View {
     @StateObject private var viewModel: ConsoleViewModel
+    @ObservedObject var searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
     @AppStorage("com-github-kean-pulse-display-mode") private var displayMode: ConsoleDisplayMode = .list
+    @AppStorage("com-github-kean-pulse-is-vertical") private var isVertical = false
+    @State private var selection: NSManagedObjectID?
 
     public init(store: LoggerStore = .shared) {
         self.init(viewModel: .init(store: store))
@@ -19,20 +22,14 @@ public struct ConsoleView: View {
 
     init(viewModel: ConsoleViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
+        self.searchCriteriaViewModel = viewModel.searchCriteriaViewModel
     }
+#warning("use label for all pickers")
 
     public var body: some View {
-        contents.navigationTitle("Console")
-    }
-
-
-    #warning("use label for all pickers")
-
-    @ViewBuilder
-    private var contents: some View {
         VStack(spacing: 0) {
             Divider()
-            ConsoleContainerView(viewModel: viewModel, displayMode: $displayMode)
+            contents
         }
             .toolbar {
                 ToolbarItemGroup(placement: .navigation) {
@@ -53,19 +50,7 @@ public struct ConsoleView: View {
             }
             .onAppear { viewModel.isViewVisible = true }
             .onDisappear { viewModel.isViewVisible = false }
-    }
-}
-
-private struct ConsoleContainerView: View {
-    let viewModel: ConsoleViewModel
-    @ObservedObject var searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
-    @State private var selection: NSManagedObjectID?
-    @Binding private var displayMode: ConsoleDisplayMode
-
-    init(viewModel: ConsoleViewModel, displayMode: Binding<ConsoleDisplayMode>) {
-        self.viewModel = viewModel
-        self.searchCriteriaViewModel = viewModel.searchCriteriaViewModel
-        self._displayMode = displayMode
+            .navigationTitle("Console")
     }
 
 #warning("add search support")
@@ -75,20 +60,39 @@ private struct ConsoleContainerView: View {
 #warning("fix reload of the content view")
 #warning("add a way to switch between table, list, and text")
 #warning("fix share button when tetx view is shown")
+#warning("add context menus")
+
+    private var contents: some View {
+        NotSplitView(
+            ConsoleContentView(viewModel: viewModel, displayMode: $displayMode, selection: $selection),
+            detailsView
+                .frame(minWidth: 400, idealWidth: 800, maxWidth: .infinity, minHeight: 120, idealHeight: 480, maxHeight: .infinity, alignment: .center),
+            isPanelTwoCollaped: selection == nil,
+            isVertical: isVertical
+        )
+    }
+
+    private var detailsView: some View {
+        ConsoleEntityDetailsView(viewModel: viewModel.list, selection: $selection)
+            .id(selection)
+    }
+}
+
+private struct ConsoleContentView: View {
+    let viewModel: ConsoleViewModel
+    @Binding var displayMode: ConsoleDisplayMode
+    @Binding var selection: NSManagedObjectID?
+
     var body: some View {
-        HSplitView {
-            switch displayMode {
-            case .table:
-                ConsoleTableView(viewModel: viewModel.list, selection: $selection)
-            case .list:
-                List(selection: $selection) {
-                    ConsoleListContentView(viewModel: viewModel.list)
-                }
-            case .text:
-                Text("Not implemented")
+        switch displayMode {
+        case .table:
+            ConsoleTableView(viewModel: viewModel.list, selection: $selection)
+        case .list:
+            List(selection: $selection) {
+                ConsoleListContentView(viewModel: viewModel.list)
             }
-            ConsoleEntityDetailsView(viewModel: viewModel.list, selection: $selection)
-                .id(selection)
+        case .text:
+            Text("Not implemented")
         }
     }
 }

@@ -54,6 +54,7 @@
 		0C40C0A2296F81B0009ECF16 /* ConsoleCustomFilterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C40C0A1296F81B0009ECF16 /* ConsoleCustomFilterView.swift */; };
 		0C40C0A4296F849E009ECF16 /* ConsoleSearchTimePeriodCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C40C0A3296F849E009ECF16 /* ConsoleSearchTimePeriodCell.swift */; };
 		0C40C0A6296F99D8009ECF16 /* ConsoleCustomNetworkFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C40C0A5296F99D8009ECF16 /* ConsoleCustomNetworkFilter.swift */; };
+		0C4BF92B29875F2B0086A6A7 /* NotSplitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C4BF92A29875F2B0086A6A7 /* NotSplitView.swift */; };
 		0C516FE726015ED3004813B4 /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CFF9BD825D6199A0069DB6A /* repos.json */; };
 		0C516FF026016392004813B4 /* DocumentBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C516FEF26016392004813B4 /* DocumentBrowser.swift */; };
 		0C529EEF29816F51009C5555 /* ConsoleTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C529EEE29816F51009C5555 /* ConsoleTableView.swift */; };
@@ -521,6 +522,7 @@
 		0C40C0A1296F81B0009ECF16 /* ConsoleCustomFilterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleCustomFilterView.swift; sourceTree = "<group>"; };
 		0C40C0A3296F849E009ECF16 /* ConsoleSearchTimePeriodCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchTimePeriodCell.swift; sourceTree = "<group>"; };
 		0C40C0A5296F99D8009ECF16 /* ConsoleCustomNetworkFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleCustomNetworkFilter.swift; sourceTree = "<group>"; };
+		0C4BF92A29875F2B0086A6A7 /* NotSplitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotSplitView.swift; sourceTree = "<group>"; };
 		0C516FBA26015DD2004813B4 /* Pulse Demo iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pulse Demo iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C516FEF26016392004813B4 /* DocumentBrowser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentBrowser.swift; sourceTree = "<group>"; };
 		0C529EEE29816F51009C5555 /* ConsoleTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleTableView.swift; sourceTree = "<group>"; };
@@ -1272,6 +1274,7 @@
 				0CF0D5AC296F189500EED9D4 /* PinButton.swift */,
 				0CF0D60C296F189600EED9D4 /* MainViewController.swift */,
 				0CF0D5AD296F189500EED9D4 /* ContextMenus.swift */,
+				0C4BF92A29875F2B0086A6A7 /* NotSplitView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -2193,6 +2196,7 @@
 				0CF0D660296F189600EED9D4 /* DocumentBrowser.swift in Sources */,
 				0CF0D688296F189600EED9D4 /* ConsoleViewModel.swift in Sources */,
 				0CF0D66D296F189600EED9D4 /* NetworkRequestBodyCell.swift in Sources */,
+				0C4BF92B29875F2B0086A6A7 /* NotSplitView.swift in Sources */,
 				0CF0D629296F189600EED9D4 /* PDFRepresentedView.swift in Sources */,
 				0CF0D61E296F189600EED9D4 /* SwiftUI+Extensions.swift in Sources */,
 				0CF0D664296F189600EED9D4 /* NetworkInspectorMetricsView.swift in Sources */,
