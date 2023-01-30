@@ -11,6 +11,7 @@ import Combine
 
 public struct ConsoleView: View {
     @StateObject private var viewModel: ConsoleViewModel
+    @AppStorage("com-github-kean-pulse-display-mode") private var displayMode: ConsoleDisplayMode = .list
 
     public init(store: LoggerStore = .shared) {
         self.init(viewModel: .init(store: store))
@@ -24,11 +25,14 @@ public struct ConsoleView: View {
         contents.navigationTitle("Console")
     }
 
+
+    #warning("use label for all pickers")
+
     @ViewBuilder
     private var contents: some View {
         VStack(spacing: 0) {
             Divider()
-            ConsoleContainerView(viewModel: viewModel)
+            ConsoleContainerView(viewModel: viewModel, displayMode: $displayMode)
         }
             .toolbar {
                 ToolbarItemGroup(placement: .navigation) {
@@ -39,6 +43,11 @@ public struct ConsoleView: View {
                     }.pickerStyle(.inline)
                 }
                 ToolbarItemGroup(placement: .automatic) {
+                    Picker("Mode", selection: $displayMode) {
+                        Label("List", systemImage: "list.bullet").tag(ConsoleDisplayMode.list)
+                        Label("Table", systemImage: "tablecells").tag(ConsoleDisplayMode.table)
+                        Label("Text", systemImage: "text.quote").tag(ConsoleDisplayMode.text)
+                    }.labelStyle(.iconOnly).fixedSize()
                     ConsoleToolbarItems(viewModel: viewModel)
                 }
             }
@@ -51,25 +60,32 @@ private struct ConsoleContainerView: View {
     let viewModel: ConsoleViewModel
     @ObservedObject var searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
     @State private var selection: NSManagedObjectID?
+    @Binding private var displayMode: ConsoleDisplayMode
 
-    init(viewModel: ConsoleViewModel) {
+    init(viewModel: ConsoleViewModel, displayMode: Binding<ConsoleDisplayMode>) {
         self.viewModel = viewModel
         self.searchCriteriaViewModel = viewModel.searchCriteriaViewModel
+        self._displayMode = displayMode
     }
 
+#warning("add search support")
 #warning("use NotSplitView?")
 #warning("metrics: set max width")
 #warning("fix isViewVisible")
 #warning("fix reload of the content view")
 #warning("add a way to switch between table, list, and text")
+#warning("fix share button when tetx view is shown")
     var body: some View {
         HSplitView {
-            if false {
+            switch displayMode {
+            case .table:
                 ConsoleTableView(viewModel: viewModel.list, selection: $selection)
-            } else {
+            case .list:
                 List(selection: $selection) {
                     ConsoleListContentView(viewModel: viewModel.list)
                 }
+            case .text:
+                Text("Not implemented")
             }
             ConsoleEntityDetailsView(viewModel: viewModel.list, selection: $selection)
         }
@@ -81,7 +97,6 @@ private struct ConsoleToolbarItems: View {
 
     var body: some View {
         ConsoleSettingsButton(store: viewModel.store)
-        Spacer()
         ConsoleToolbarModePickerButton(viewModel: viewModel)
             .keyboardShortcut("n", modifiers: [.command, .shift])
         ConsoleToolbarToggleOnlyErrorsButton(viewModel: viewModel.searchCriteriaViewModel)
@@ -146,6 +161,12 @@ struct ConsoleToolbarToggleOnlyErrorsButton: View {
                 .foregroundColor(viewModel.isOnlyErrors ? .red : .secondary)
         }.help("Toggle Show Only Errors (⇧⌘E)")
     }
+}
+
+private enum ConsoleDisplayMode: String {
+    case table
+    case list
+    case text
 }
 
 #if DEBUG
