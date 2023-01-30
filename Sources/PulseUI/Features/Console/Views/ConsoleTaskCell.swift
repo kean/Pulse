@@ -19,7 +19,13 @@ struct ConsoleTaskCell: View {
     }
 
     var body: some View {
-        let contents = VStack(alignment: .leading, spacing: 6) {
+#if os(macOS)
+        let spacing: CGFloat = 3
+#else
+        let spacing: CGFloat = 6
+#endif
+
+        let contents = VStack(alignment: .leading, spacing: spacing) {
             title
             message
 #if !os(macOS)
@@ -41,7 +47,6 @@ struct ConsoleTaskCell: View {
             contents
         }
 #endif
-
     }
 
     private var title: some View {
