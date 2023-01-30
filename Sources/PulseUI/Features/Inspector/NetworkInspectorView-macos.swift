@@ -81,9 +81,9 @@ struct NetworkInspectorView: View {
 
 private enum NetworkInspectorTab: String, Identifiable, CaseIterable, CustomStringConvertible {
     case summary = "Summary"
-    case headers = "Headers"
     case request = "Request"
     case response = "Response"
+    case headers = "Headers"
     case metrics = "Metrics"
     case curl = "cURL"
 

@@ -58,10 +58,10 @@ public struct ConsoleView: View {
             .navigationTitle("Console")
     }
 
-#warning("add a way to close the details view")
 #warning("fix how messages are displaed - are they?")
 #warning("add cookies section - do we need summary?")
 #warning("disable tabs for empty fields?")
+#warning("fix navigation titles")
 #warning("should new messages appear at the bottom?")
 #warning("fix crash when switching modes")
 #warning("one-line message like on both macOS and tvOS?")
@@ -76,6 +76,7 @@ public struct ConsoleView: View {
 #warning("add a way to switch between table, list, and text")
 #warning("fix share button when tetx view is shown")
 #warning("add context menus")
+#warning("fix string search options in richtextview")
 
     private var contents: some View {
         NotSplitView(
