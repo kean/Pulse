@@ -79,25 +79,28 @@ struct LegacyRichTextViewSearchToobar: View {
             }, onReturn: viewModel.nextMatch).frame(maxWidth: 240)
 
             StringSearchOptionsMenu(options: $viewModel.searchOptions, isKindNeeded: false)
+                .fixedSize()
 
             Spacer()
 
-            HStack(spacing: 12) {
-                Text(viewModel.matches.isEmpty ? "0/0" : "\(viewModel.selectedMatchIndex+1)/\(viewModel.matches.count)")
-                    .font(Font.body.monospacedDigit())
-                    .foregroundColor(.secondary)
-                Button(action: viewModel.previousMatch) {
-                    Image(systemName: "chevron.left")
+            if !viewModel.matches.isEmpty {
+                HStack(spacing: 12) {
+                    Text(viewModel.matches.isEmpty ? "0/0" : "\(viewModel.selectedMatchIndex+1)/\(viewModel.matches.count)")
+                        .font(Font.body.monospacedDigit())
+                        .foregroundColor(.secondary)
+                    Button(action: viewModel.previousMatch) {
+                        Image(systemName: "chevron.left")
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(viewModel.matches.isEmpty)
+                    Button(action: viewModel.nextMatch) {
+                        Image(systemName: "chevron.right")
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(viewModel.matches.isEmpty)
                 }
-                .buttonStyle(.plain)
-                .disabled(viewModel.matches.isEmpty)
-                Button(action: viewModel.nextMatch) {
-                    Image(systemName: "chevron.right")
-                }
-                .buttonStyle(.plain)
-                .disabled(viewModel.matches.isEmpty)
+                .fixedSize()
             }
-            .fixedSize()
         }
         .padding(6)
     }
