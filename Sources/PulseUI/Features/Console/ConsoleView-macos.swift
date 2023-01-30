@@ -54,16 +54,11 @@ public struct ConsoleView: View {
     }
 
 
-#warning("should new messages appear at the bottom?")
+#warning("add search support")
 #warning("fix crash when switching modes")
 #warning("fix list offset from top")
-#warning("add search support")
-#warning("rework summary")
 #warning("fix isViewVisible")
-#warning("fix reload of the content view")
-#warning("add a way to switch between table, list, and text")
 #warning("fix share button when tetx view is shown")
-#warning("add context menus")
 #warning("add toolbar from the bottom")
 #warning("hide search result in richtextview")
 #warning("implement proper mode switcher")
