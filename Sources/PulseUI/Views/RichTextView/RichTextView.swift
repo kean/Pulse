@@ -247,15 +247,16 @@ private struct WrappedTextView: NSViewRepresentable {
         scrollView.hasVerticalScroller = true
         let textView = scrollView.documentView as! NSTextView
         configureTextView(textView)
-        textView.attributedText = viewModel.text
-        context.coordinator.cancellables = bind(viewModel, textView)
-        viewModel.textView = textView
         return scrollView
     }
 
     func updateNSView(_ nsView: NSScrollView, context: Context) {
         let textView = (nsView.documentView as! NSTextView)
-        viewModel.textView = textView
+        if viewModel.textView == nil {
+            context.coordinator.cancellables = bind(viewModel, textView)
+            textView.attributedText = viewModel.text
+            viewModel.textView = textView
+        }
     }
 
     func makeCoordinator() -> Coordinator {

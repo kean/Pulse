@@ -58,6 +58,9 @@ public struct ConsoleView: View {
             .navigationTitle("Console")
     }
 
+#warning("add a way to close the details view")
+#warning("fix how messages are displaed - are they?")
+#warning("disable tabs for empty fields?")
 #warning("add search support")
 #warning("use NotSplitView?")
 #warning("metrics: set max width")
@@ -80,7 +83,6 @@ public struct ConsoleView: View {
 
     private var detailsView: some View {
         ConsoleEntityDetailsView(viewModel: viewModel.list, selection: $selection)
-            .id(selection)
     }
 }
 
