@@ -24,7 +24,6 @@ public struct ConsoleView: View {
         _viewModel = StateObject(wrappedValue: viewModel)
         self.searchCriteriaViewModel = viewModel.searchCriteriaViewModel
     }
-#warning("use label for all pickers")
 
     public var body: some View {
         VStack(spacing: 0) {
@@ -39,13 +38,19 @@ public struct ConsoleView: View {
                         Text("Tasks").tag(ConsoleMode.tasks)
                     }.pickerStyle(.inline)
 
+                    Spacer()
+
                     Picker("Mode", selection: $displayMode) {
                         Label("List", systemImage: "list.bullet").tag(ConsoleDisplayMode.list)
                         Label("Table", systemImage: "tablecells").tag(ConsoleDisplayMode.table)
                         Label("Text", systemImage: "text.quote").tag(ConsoleDisplayMode.text)
                     }.labelStyle(.iconOnly).fixedSize()
 
+                    Spacer()
+
                     ConsoleToolbarItems(viewModel: viewModel)
+
+                    Spacer()
 
                     Button(action: { isVertical.toggle() }, label: {
                         Image(systemName: isVertical ? "square.split.2x1" : "square.split.1x2")
