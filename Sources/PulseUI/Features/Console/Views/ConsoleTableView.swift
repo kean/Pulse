@@ -10,31 +10,26 @@ import Combine
 #if os(macOS)
 
 struct ConsoleTableView: View {
-    let viewModel: ConsoleListViewModel
+    @ObservedObject var viewModel: ConsoleListViewModel
     @Binding var selection: NSManagedObjectID?
 
     var body: some View {
-        if viewModel.entities is [LoggerMessageEntity] {
+        switch viewModel.mode {
+        case .all, .logs:
             ConsoleMessageTableView(viewModel: viewModel, selection: $selection)
-        } else if viewModel.entities is [NetworkTaskEntity] {
-            Text("ConsoleNetworkTableView")
-        } else {
-            fatalError("Unsupported entities: \(viewModel.entities)")
+        case .tasks:
+            ConsoleTaskTableView(viewModel: viewModel, selection: $selection)
         }
     }
 }
 
-#warning("add a way to cutomize which rows are sown")
-#warning("add contet menu")
-#warning("add network table view")
-
 private struct ConsoleMessageTableView: View {
     @ObservedObject var viewModel: ConsoleListViewModel
     @Binding var selection: NSManagedObjectID?
-    @State private var sortOrder = [SortDescriptor<LoggerMessageEntity>(\.createdAt, order: .reverse)]
+    @State private var sortOrder: [SortDescriptor<LoggerMessageEntity>] = []
 
     var body: some View {
-        Table(viewModel.entities as! [LoggerMessageEntity], selection: $selection, sortOrder: $sortOrder) {
+        Table((viewModel.entities as? [LoggerMessageEntity]) ?? [], selection: $selection, sortOrder: $sortOrder) {
             TableColumn("Date & Time", value: \.createdAt) {
                 Text(dateAndTimeFormatter.string(from: $0.createdAt))
             }.width(min: 87, ideal: 162, max: 162)
@@ -45,11 +40,50 @@ private struct ConsoleMessageTableView: View {
                 Text($0.label)
             }.width(min: 54, ideal: 68)
             TableColumn("Message", value: \.text)
-                .width(ideal: 600)
+                .width(min: 40, ideal: 600)
             TableColumn("File", value: \.file)
                 .width(ideal: 80)
             TableColumn("Function", value: \.function)
                 .width(ideal: 100)
+        }
+        .onChange(of: sortOrder) {
+            viewModel.sortDescriptors = $0.map(NSSortDescriptor.init)
+        }
+    }
+}
+
+private struct ConsoleTaskTableView: View {
+    @ObservedObject var viewModel: ConsoleListViewModel
+    @Binding var selection: NSManagedObjectID?
+    @State private var sortOrder: [SortDescriptor<NetworkTaskEntity>] = []
+
+    var body: some View {
+        Table((viewModel.entities as! [NetworkTaskEntity]), selection: $selection, sortOrder: $sortOrder) {
+            TableColumn("Date & Time", value: \.createdAt) {
+                Text(dateAndTimeFormatter.string(from: $0.createdAt))
+            }.width(min: 87, ideal: 162, max: 162)
+            TableColumn("Method", value: \.httpMethod) {
+                Text($0.httpMethod ?? "–")
+            }.width(min: 40, ideal: 40, max: 60)
+            TableColumn("URL", value: \.url) {
+                Text($0.url ?? "–")
+            }.width(min: 40, ideal: 520)
+            TableColumn("Status Code", value: \.statusCode) {
+                if $0.statusCode > 0 {
+                    Text("\($0.statusCode)")
+                } else {
+                    Text("–")
+                }
+            }.width(min: 40, ideal: 40, max: 60)
+            TableColumn("Duration", value: \.duration) {
+                Text(DurationFormatter.string(from: $0.duration, isPrecise: false))
+            }.width(min: 54, ideal: 64, max: 140)
+            TableColumn("Request Size", value: \.requestBodySize) {
+                Text(ByteCountFormatter.string(fromByteCount: $0.requestBodySize))
+            }.width(min: 54, ideal: 64, max: 140)
+            TableColumn("Response Size", value: \.responseBodySize) {
+                Text(ByteCountFormatter.string(fromByteCount: $0.responseBodySize))
+            }.width(min: 54, ideal: 64, max: 140)
         }
         .onChange(of: sortOrder) {
             viewModel.sortDescriptors = $0.map(NSSortDescriptor.init)
@@ -66,7 +100,14 @@ private let dateAndTimeFormatter: DateFormatter = {
 struct ConsoleTableView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            ConsoleTableView(viewModel: ConsoleViewModel(store: .mock).list, selection: .constant(nil))
+            let viewModel = ConsoleViewModel(store: .mock)
+            ConsoleTableView(viewModel: viewModel.list, selection: .constant(nil))
+                .previewLayout(.fixed(width: 1200, height: 800))
+        }
+        Group {
+            let viewModel = ConsoleViewModel(store: .mock)
+            let _ = viewModel.mode = .tasks
+            ConsoleTableView(viewModel: viewModel.list, selection: .constant(nil))
                 .previewLayout(.fixed(width: 1200, height: 800))
         }
     }

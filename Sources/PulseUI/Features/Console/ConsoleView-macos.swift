@@ -73,7 +73,7 @@ public struct ConsoleView: View {
     @ViewBuilder
     private var contents: some View {
         let split = NotSplitView(
-            ConsoleContentView(viewModel: viewModel, searchBarViewModel: viewModel.searchBarViewModel, displayMode: $displayMode, selection: $selection),
+            ConsoleContentView(viewModel: viewModel, displayMode: $displayMode, selection: $selection),
             detailsView
                 .frame(minWidth: 400, idealWidth: 800, maxWidth: .infinity, minHeight: 120, idealHeight: 480, maxHeight: .infinity, alignment: .center),
             isPanelTwoCollaped: selection == nil,
@@ -106,8 +106,7 @@ public struct ConsoleView: View {
 }
 
 private struct ConsoleContentView: View {
-    let viewModel: ConsoleViewModel
-    @ObservedObject var searchBarViewModel: ConsoleSearchBarViewModel
+    var viewModel: ConsoleViewModel
     @Binding var displayMode: ConsoleDisplayMode
     @Binding var selection: NSManagedObjectID?
     @Environment(\.isSearching) private var isSearching
