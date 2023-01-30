@@ -68,7 +68,6 @@ public struct ConsoleView: View {
 #warning("fix list offset from top")
 #warning("add search support")
 #warning("rework summary")
-#warning("fix navigation from metrics view")
 #warning("metrics: set max width")
 #warning("fix isViewVisible")
 #warning("fix reload of the content view")
