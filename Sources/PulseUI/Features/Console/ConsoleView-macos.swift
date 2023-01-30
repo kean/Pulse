@@ -58,7 +58,6 @@ public struct ConsoleView: View {
             .navigationTitle("Console")
     }
 
-#warning("add cookies section - do we need summary?")
 #warning("disable tabs for empty fields?")
 #warning("fix navigation titles")
 #warning("should new messages appear at the bottom?")

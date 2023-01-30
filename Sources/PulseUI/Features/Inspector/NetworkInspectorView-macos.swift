@@ -11,8 +11,8 @@ import Combine
 
 struct NetworkInspectorView: View {
     @ObservedObject var task: NetworkTaskEntity
-    @AppStorage("networkInspectorSelectedTab") private var selectedTab: NetworkInspectorTab = .response
-    @Environment(\.colorScheme) private var colorScheme
+    @AppStorage("com-github-kean-pulse-network-inspector-selected-tab")
+    private var selectedTab: NetworkInspectorTab = .summary
     var onClose: () -> Void
 
     private var viewModel: NetworkInspectorViewModel { .init(task: task) }
@@ -45,7 +45,7 @@ struct NetworkInspectorView: View {
     private var selectedTabView: some View {
         switch selectedTab {
         case .summary:
-            RichTextView(viewModel: .init(string: TextRenderer(options: .sharing).make { $0.render(task, content: .sharing) }))
+            RichTextView(viewModel: .init(string: TextRenderer(options: .sharing).make { $0.render(task, content: .summary) }))
         case .headers:
             RichTextView(viewModel: .init(string: renderHeaders()))
         case .request:

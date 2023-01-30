@@ -430,6 +430,10 @@ struct NetworkContent: OptionSet {
         largeHeader, taskDetails, errorDetails, responseBody
     ]
 
+    static let summary: NetworkContent = [
+        largeHeader, taskDetails, errorDetails, requestComponents, requestQueryItems, errorDetails, originalRequestHeaders, currentRequestHeaders, requestOptions, responseHeaders
+    ]
+
     static let all: NetworkContent = [
         largeHeader, taskDetails, errorDetails, requestComponents, requestQueryItems, errorDetails, originalRequestHeaders, currentRequestHeaders, requestOptions, requestBody, responseHeaders, responseBody
     ]
