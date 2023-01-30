@@ -329,7 +329,7 @@ struct ConsoleSearchResultViewModel: Identifiable {
     let occurrences: [ConsoleSearchOccurrence]
 }
 
-struct ConsoleSearchResultKey: Hashable{
+struct ConsoleSearchResultKey: Hashable {
     let id: NSManagedObjectID
 }
 

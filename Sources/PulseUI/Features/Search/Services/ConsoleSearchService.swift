@@ -198,12 +198,17 @@ final class ConsoleSearchService {
 }
 
 @available(iOS 15, tvOS 15, *)
-struct ConsoleSearchOccurrence {
+struct ConsoleSearchOccurrence: Identifiable {
+    let id = ConsoleSearchOccurenceId()
     let scope: ConsoleSearchScope
     let line: Int
     let range: NSRange
     let text: AttributedString
     let searchContext: RichTextViewModel.SearchContext
+}
+
+struct ConsoleSearchOccurenceId: Hashable {
+    let id = UUID()
 }
 
 private func shouldTrimCharacter(_ character: unichar) -> Bool {

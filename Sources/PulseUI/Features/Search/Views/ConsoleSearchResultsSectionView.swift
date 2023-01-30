@@ -16,14 +16,13 @@ struct ConsoleSearchResultView: View {
     var body: some View {
         ConsoleEntityCell.make(for: viewModel.entity)
             .tag(viewModel.entity.objectID)
-        let occurrences = Array(viewModel.occurrences.enumerated()).filter {
+        let occurrences = Array(viewModel.occurrences).filter {
             // TODO: these should be displayed inline
-            $0.element.scope != .message && $0.element.scope != .url
+            $0.scope != .message && $0.scope != .url
         }
-        // TODO: add id instead of offset
-        ForEach(occurrences.prefix(limit), id: \.offset) { item in
-            NavigationLink(destination: makeDestination(for: item.element, entity: viewModel.entity)) {
-                makeCell(for: item.element)
+        ForEach(occurrences.prefix(limit)) { item in
+            NavigationLink(destination: makeDestination(for: item, entity: viewModel.entity)) {
+                makeCell(for: item)
             }
         }
         if occurrences.count > limit {
