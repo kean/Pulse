@@ -54,11 +54,7 @@ extension UXColor {
         case .trace: return .secondaryLabel
         case .debug, .info: return .label
         case .notice, .warning: return .systemOrange
-#if os(macOS)
-        case .error, .critical: return Palette.red
-#else
         case .error, .critical: return .red
-#endif
         }
     }
 }
@@ -69,11 +65,7 @@ extension Color {
         case .trace: return .secondary
         case .debug, .info: return .primary
         case .notice, .warning: return .orange
-#if os(macOS)
-        case .error, .critical: return Color(Palette.red)
-#else
         case .error, .critical: return .red
-#endif
         }
     }
 }

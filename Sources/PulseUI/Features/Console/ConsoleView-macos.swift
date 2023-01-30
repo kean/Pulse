@@ -42,10 +42,6 @@ public struct ConsoleView: View {
             .navigationTitle("Console")
     }
 
-#warning("fix share button when tetx view is shown")
-#warning("add toolbar from the bottom")
-#warning("use different color for errors")
-
     @ViewBuilder
     private var toolbarItems: some View {
         Picker("Mode", selection: $displayMode) {
