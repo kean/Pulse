@@ -59,22 +59,26 @@ private struct ConsoleTaskTableView: View {
 
     var body: some View {
         Table(((viewModel.entities as? [NetworkTaskEntity]) ?? []), selection: $selection, sortOrder: $sortOrder) {
+            TableColumn("", value: \.requestState) {
+                Image(systemName: $0.state.iconSystemName)
+                    .foregroundColor($0.state.tintColor)
+            }.width(16)
             TableColumn("Date & Time", value: \.createdAt) {
                 Text(dateAndTimeFormatter.string(from: $0.createdAt))
             }.width(min: 87, ideal: 162, max: 162)
-            TableColumn("Method", value: \.httpMethod) {
-                Text($0.httpMethod ?? "–")
-            }.width(min: 40, ideal: 50, max: 60)
-            TableColumn("URL", value: \.url) {
-                Text($0.url ?? "–")
-            }.width(min: 40, ideal: 520)
             TableColumn("Status Code", value: \.statusCode) {
                 if $0.statusCode > 0 {
                     Text("\($0.statusCode)")
                 } else {
                     Text("–")
                 }
-            }.width(min: 40, ideal: 40, max: 60)
+            }.width(30)
+            TableColumn("Method", value: \.httpMethod) {
+                Text($0.httpMethod ?? "–")
+            }.width(min: 40, ideal: 50, max: 60)
+            TableColumn("URL", value: \.url) {
+                Text($0.url ?? "–")
+            }.width(min: 40, ideal: 520)
             TableColumn("Duration", value: \.duration) {
                 Text(DurationFormatter.string(from: $0.duration, isPrecise: false))
             }.width(min: 54, ideal: 64, max: 140)
