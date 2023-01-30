@@ -2,6 +2,8 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
+#if os(macOS)
+
 import Foundation
 import SwiftUI
 import Pulse
@@ -25,3 +27,5 @@ struct ConsoleEntityDetailsView: View {
         }
     }
 }
+
+#endif

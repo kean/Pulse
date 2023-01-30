@@ -95,7 +95,11 @@ struct ConsoleMessageDetailsView: View {
 struct ConsoleMessageDetailsView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
+#if os(macOS)
             ConsoleMessageDetailsView(message: makeMockMessage(), onClose: {})
+#else
+            ConsoleMessageDetailsView(message: makeMockMessage())
+#endif
         }
     }
 }
