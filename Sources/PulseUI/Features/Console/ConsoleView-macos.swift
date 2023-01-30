@@ -73,8 +73,8 @@ public struct ConsoleView: View {
 #warning("add a way to switch between table, list, and text")
 #warning("fix share button when tetx view is shown")
 #warning("add context menus")
-#warning("fix string search options in richtextview")
 #warning("add toolbar from the bottom")
+#warning("hide search result in richtextview")
 
     private var contents: some View {
         NotSplitView(

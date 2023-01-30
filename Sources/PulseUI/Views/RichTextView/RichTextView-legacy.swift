@@ -78,15 +78,7 @@ struct LegacyRichTextViewSearchToobar: View {
                 }
             }, onReturn: viewModel.nextMatch).frame(maxWidth: 240)
 
-            Menu(content: {
-                StringSearchOptionsMenu(options: $viewModel.searchOptions, isKindNeeded: false)
-            }, label: {
-                Image(systemName: "ellipsis.circle")
-                    .font(.system(size: 20))
-                    .frame(width: 40, height: 44)
-            })
-            .menuStyle(.borderlessButton)
-            .fixedSize()
+            StringSearchOptionsMenu(options: $viewModel.searchOptions, isKindNeeded: false)
 
             Spacer()
 
