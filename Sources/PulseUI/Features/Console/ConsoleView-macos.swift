@@ -42,7 +42,6 @@ public struct ConsoleView: View {
             .navigationTitle("Console")
     }
 
-#warning("add search support")
 #warning("fix crash when switching modes")
 #warning("fix list offset from top")
 #warning("fix isViewVisible")
@@ -51,6 +50,7 @@ public struct ConsoleView: View {
 #warning("hide search result in richtextview")
 #warning("implement proper mode switcher")
 #warning("fix share button overriding search bar")
+#warning("use different color for errors")
 
     @ViewBuilder
     private var toolbarItems: some View {

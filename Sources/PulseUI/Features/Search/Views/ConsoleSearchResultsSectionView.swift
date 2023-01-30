@@ -27,19 +27,22 @@ struct ConsoleSearchResultView: View {
                 makeCell(for: item)
             }
         }
-#if os(iOS)
         if occurrences.count > limit {
             NavigationLink(destination: ConsoleSearchResultDetailsView(viewModel: viewModel)) {
                 HStack {
+#if os(macOS)
                     Text("Show All Results")
                         .font(ConsoleConstants.fontBody)
+#else
+                    Text("Total Results: ")
+                        .font(ConsoleConstants.fontBody)
+#endif
                     Text("\(occurrences.count)")
                         .font(ConsoleConstants.fontBody)
                         .foregroundColor(.secondary)
                 }
             }
         }
-#endif
         if isSeparatorNeeded {
             PlainListGroupSeparator()
         }

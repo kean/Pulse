@@ -29,9 +29,9 @@ struct ConsoleSearchView: View {
 
     @ViewBuilder
     private var suggestionsView: some View {
+#if os(iOS)
         toolbar
             .listRowBackground(Color.clear)
-#if os(iOS)
             .listRowSeparator(.hidden, edges: .top)
 #endif
         let suggestions = viewModel.suggestionsViewModel!
@@ -65,8 +65,8 @@ struct ConsoleSearchView: View {
                 .font(.subheadline)
             }.buttonStyle(.plain)
         }
-        .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 0, trailing: 20))
 #if os(iOS)
+        .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 0, trailing: 20))
         .listRowSeparator(.hidden, edges: .bottom)
 #endif
     }
@@ -120,14 +120,11 @@ struct ConsoleSearchView: View {
     }
 
 
-#warning("cleanup")
-    private var toolbar: some View {
 #if os(iOS)
+    private var toolbar: some View {
         ConsoleSearchToolbar(title: viewModel.toolbarTitle, isSpinnerNeeded: viewModel.isSpinnerNeeded, viewModel: consoleViewModel)
-#else
-        EmptyView()
-#endif
     }
+#endif
 
     @ViewBuilder
     private var footer: some View {
