@@ -7,7 +7,7 @@ import CoreData
 import Pulse
 import Combine
 
-#if os(iOS) || os(macOS)
+#if os(iOS)
 
 struct ConsoleTextView: View {
     @StateObject private var viewModel = ConsoleTextViewModel()
@@ -20,26 +20,16 @@ struct ConsoleTextView: View {
     var onClose: (() -> Void)?
 
     var body: some View {
-        contents
+        RichTextView(viewModel: viewModel.text)
+            .textViewBarItemsHidden(true)
+            .navigationTitle("Console")
+            .navigationBarTitleDisplayMode(.inline)
             .onAppear {
                 if let options = options {
                     viewModel.options = options
                 }
                 viewModel.bind(entities)
             }
-    }
-
-#if os(macOS)
-    var contents: some View {
-        RichTextView(viewModel: viewModel.text)
-            .textViewBarItemsHidden(true)
-    }
-#else
-    var contents: some View {
-        RichTextView(viewModel: viewModel.text)
-            .textViewBarItemsHidden(true)
-            .navigationTitle("Console")
-            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     if let onClose = onClose {
@@ -105,8 +95,6 @@ struct ConsoleTextView: View {
                 })
         }
     }
-
-#endif
 }
 
 private struct ConsoleTextViewSettingsView: View {
@@ -141,11 +129,7 @@ final class ConsoleTextViewModel: ObservableObject {
     var text = RichTextViewModel()
     var options: TextRenderer.Options = .init()
 
-#if os(macOS)
-    @Published var isOrderedAscending = true
-#else
     @Published var isOrderedAscending = false
-#endif
     @Published var isExpanded = false
     @Published private(set) var isButtonRefreshHidden = true
 
@@ -153,7 +137,6 @@ final class ConsoleTextViewModel: ObservableObject {
     private var expanded: Set<NSManagedObjectID> = []
     private let settings = ConsoleTextViewSettings.shared
     private var entities: CurrentValueSubject<[NSManagedObject], Never> = .init([])
-    private var displayedEntities: [NSManagedObject] = []
     private var lastTimeRefreshHidden = Date().addingTimeInterval(-3)
     private var objectIDs: [UUID: NSManagedObjectID] = [:]
     private var cancellables: [AnyCancellable] = []
@@ -175,12 +158,9 @@ final class ConsoleTextViewModel: ObservableObject {
     func bind(_ entities: CurrentValueSubject<[NSManagedObject], Never>) {
         self.entities = entities
         entities.dropFirst().sink { [weak self] _ in
-#if os(iOS)
             self?.showRefreshButtonIfNeeded()
-#else
-            self?.refreshText()
-#endif
         }.store(in: &cancellables)
+        self.refresh()
     }
 
     func reloadOptions() {
@@ -197,22 +177,6 @@ final class ConsoleTextViewModel: ObservableObject {
     private func refreshText() {
         let entities = isOrderedAscending ? entities.value : entities.value.reversed()
         let renderer = TextRenderer(options: options)
-
-        // TODO: is this enough?
-        if !displayedEntities.isEmpty && entities.count > displayedEntities.count {
-            renderer.addSpacer()
-            render(entities[displayedEntities.endIndex...], using: renderer)
-            self.text.performUpdates {
-                $0.append(renderer.make())
-            }
-        } else {
-            render(entities[...], using: renderer)
-            self.text.display(renderer.make())
-        }
-        self.displayedEntities = entities
-    }
-
-    private func render(_ entities: ArraySlice<NSManagedObject>, using renderer: TextRenderer) {
         for index in entities.indices {
             let entity = entities[index]
             if let task = entity as? NetworkTaskEntity {
@@ -230,6 +194,7 @@ final class ConsoleTextViewModel: ObservableObject {
                 renderer.addSpacer()
             }
         }
+        self.text.display(renderer.make())
     }
 
     private func render(_ message: LoggerMessageEntity, at index: Int, using renderer: TextRenderer) {

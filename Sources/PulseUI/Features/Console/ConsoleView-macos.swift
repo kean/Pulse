@@ -35,7 +35,6 @@ public struct ConsoleView: View {
                     Picker("Mode", selection: $displayMode) {
                         Label("List", systemImage: "list.bullet").tag(ConsoleDisplayMode.list)
                         Label("Table", systemImage: "tablecells").tag(ConsoleDisplayMode.table)
-                        Label("Text", systemImage: "text.quote").tag(ConsoleDisplayMode.text)
                     }.labelStyle(.iconOnly).fixedSize()
 
                     Spacer()
@@ -112,8 +111,6 @@ private struct ConsoleContentView: View {
             List(selection: $selection) {
                 ConsoleListContentView(viewModel: viewModel.list)
             }
-        case .text:
-            ConsoleTextView(entities: viewModel.list.entitiesSubject)
         }
     }
 }
@@ -193,7 +190,6 @@ struct ConsoleToolbarToggleOnlyErrorsButton: View {
 private enum ConsoleDisplayMode: String {
     case table
     case list
-    case text
 }
 
 #if DEBUG
