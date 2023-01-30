@@ -45,7 +45,12 @@ public struct ConsoleView: View {
                         Label("Table", systemImage: "tablecells").tag(ConsoleDisplayMode.table)
                         Label("Text", systemImage: "text.quote").tag(ConsoleDisplayMode.text)
                     }.labelStyle(.iconOnly).fixedSize()
+
                     ConsoleToolbarItems(viewModel: viewModel)
+
+                    Button(action: { isVertical.toggle() }, label: {
+                        Image(systemName: isVertical ? "square.split.2x1" : "square.split.1x2")
+                    }).help(isVertical ? "Switch to Horizontal Layout" : "Switch to Vertical Layout")
                 }
             }
             .onAppear { viewModel.isViewVisible = true }
@@ -61,6 +66,7 @@ public struct ConsoleView: View {
 #warning("add a way to switch between table, list, and text")
 #warning("fix share button when tetx view is shown")
 #warning("add context menus")
+#warning("the text view is still not reloading")
 
     private var contents: some View {
         NotSplitView(
