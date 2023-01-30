@@ -48,6 +48,8 @@ private struct _ConsoleMessageCell: View {
 #if os(iOS)
         let cell = ConsoleMessageCell(viewModel: .init(message: message), isDisclosureNeeded: true)
             .background(NavigationLink("", destination: ConsoleMessageDetailsView(message: message)).opacity(0))
+#elseif os(macOS)
+        let cell = ConsoleMessageCell(viewModel: .init(message: message))
 #else
         // `id` is a workaround for macOS (needs to be fixed)
         let cell = NavigationLink(destination: ConsoleMessageDetailsView(message: message)) {
@@ -99,6 +101,8 @@ private struct _ConsoleTaskCell: View {
 #if os(iOS)
         let cell = ConsoleTaskCell(task: task, isDisclosureNeeded: true)
             .background(NavigationLink("", destination: NetworkInspectorView(task: task)).opacity(0))
+#elseif os(macOS)
+        let cell = ConsoleTaskCell(task: task)
 #else
         let cell = NavigationLink(destination: NetworkInspectorView(task: task)) {
             ConsoleTaskCell(task: task)

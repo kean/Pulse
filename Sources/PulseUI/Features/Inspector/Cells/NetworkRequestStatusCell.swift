@@ -153,7 +153,7 @@ struct NetworkRequestStatusCell_Previews: PreviewProvider {
                 }
             }
 #if os(macOS)
-            .frame(width: ConsoleView.contentColumnWidth)
+            .frame(width: 280)
 #endif
         }
     }

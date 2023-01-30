@@ -26,21 +26,20 @@ public struct ConsoleView: View {
 
     @ViewBuilder
     private var contents: some View {
-        if #available(macOS 13.0, *) {
-            ConsoleContainerView(viewModel: viewModel)
-        } else {
-            LegacyConsoleContainerView(viewModel: viewModel)
-        }
+        ConsoleContainerView(viewModel: viewModel)
+            .toolbar {
+                ToolbarItemGroup(placement: .automatic) {
+                    ConsoleToolbarItems(viewModel: viewModel)
+                }
+            }
+            .onAppear { viewModel.isViewVisible = true }
+            .onDisappear { viewModel.isViewVisible = false }
     }
-
-    static let contentColumnWidth: CGFloat = 280
 }
 
-@available(macOS 13.0, *)
 private struct ConsoleContainerView: View {
     let viewModel: ConsoleViewModel
     @ObservedObject var searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
-    @State private var columnVisibility = NavigationSplitViewVisibility.all
     @State private var selection: NSManagedObjectID?
 
     init(viewModel: ConsoleViewModel) {
@@ -48,59 +47,22 @@ private struct ConsoleContainerView: View {
         self.searchCriteriaViewModel = viewModel.searchCriteriaViewModel
     }
 
-    #warning("temp")
+#warning("use NotSplitView?")
+#warning("metrics: set max width")
+#warning("fix isViewVisible")
+#warning("fix reload of the content view")
+#warning("add a way to switch between table, list, and text")
     var body: some View {
-        NavigationSplitView(
-            columnVisibility: $columnVisibility,
-            sidebar: {
-                Text("Sidebar")
-//                Siderbar(viewModel: viewModel)
-//                    .searchable(text: $searchCriteriaViewModel.filterTerm)
-//                    .disableAutocorrection(true)
-//                    .navigationSplitViewColumnWidth(min: ConsoleView.contentColumnWidth, ideal: 420, max: 640)
-            },
-            content: {
+        HSplitView {
+            if false {
                 ConsoleTableView(viewModel: viewModel.list, selection: $selection)
-            },
-            detail: {
-                ConsoleEntityDetailsView(viewModel: viewModel.list, selection: $selection)
+            } else {
+                List(selection: $selection) {
+                    ConsoleListContentView(viewModel: viewModel.list)
+                }
             }
-        )
-    }
-}
-
-private struct LegacyConsoleContainerView: View {
-    var viewModel: ConsoleViewModel
-
-    var body: some View {
-        NavigationView {
-            Siderbar(viewModel: viewModel)
-                .frame(minWidth: 320, idealWidth: 320, maxWidth: 600, minHeight: 120, idealHeight: 480, maxHeight: .infinity)
-            EmptyView()
-                .frame(minWidth: 430, idealWidth: 500, maxWidth: 600, minHeight: 320, idealHeight: 480, maxHeight: .infinity)
-            EmptyView()
+            ConsoleEntityDetailsView(viewModel: viewModel.list, selection: $selection)
         }
-    }
-}
-
-private struct Siderbar: View {
-    @ObservedObject var viewModel: ConsoleViewModel
-
-    #warning("temp")
-
-    var body: some View {
-        Text("temp")
-//        List {
-//        ConsoleTableView(viewModel: viewModel.list, selection:)
-//            ConsoleListContentView(viewModel: viewModel.list)
-////        }
-//            .toolbar {
-//                ToolbarItemGroup(placement: .automatic) {
-//                    ConsoleToolbarItems(viewModel: viewModel)
-//                }
-//            }
-//            .onAppear { viewModel.isViewVisible = true }
-//            .onDisappear { viewModel.isViewVisible = false }
     }
 }
 

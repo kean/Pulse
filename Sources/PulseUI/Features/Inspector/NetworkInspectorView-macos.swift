@@ -139,7 +139,7 @@ struct NetworkInspectorView_Previews: PreviewProvider {
             if #available(macOS 13.0, *) {
                 NavigationStack {
                     NetworkInspectorView(task: LoggerStore.preview.entity(for: .login))
-                }.previewLayout(.fixed(width: ConsoleView.contentColumnWidth, height: 800))
+                }.previewLayout(.fixed(width: 280, height: 800))
             }
         }
 }
