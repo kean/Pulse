@@ -238,14 +238,43 @@ struct WrappedTextView: UIViewRepresentable {
 private struct WrappedTextView: NSViewRepresentable {
     let viewModel: RichTextViewModel
 
-    final class Coordinator: NSObject {
+    final class Coordinator: NSObject, NSTextViewDelegate {
+        var onLinkTapped: ((URL) -> Bool)?
         var cancellables: [AnyCancellable] = []
+
+        func textView(_ textView: NSTextView, clickedOnLink link: Any, at charIndex: Int) -> Bool {
+            guard let url = link as? URL else {
+                return false
+            }
+            if let onLinkTapped = onLinkTapped, onLinkTapped(url) {
+                return true
+            }
+            if let components = URLComponents(url: url, resolvingAgainstBaseURL: false) {
+                if components.scheme == "pulse",
+                   components.path == "tooltip",
+                   let queryItems = components.queryItems,
+                   let message = queryItems.first(where: { $0.name == "message" })?.value {
+                    let title = queryItems.first(where: { $0.name == "title" })?.value
+                    let alert = NSAlert()
+                    alert.messageText = title ?? ""
+                    alert.informativeText = message
+                    if let keyWindow = NSApplication.shared.keyWindow {
+                        alert.beginSheetModal(for: keyWindow) { _ in }
+                    } else {
+                        alert.runModal()
+                    }
+                    return true
+                }
+            }
+            return false
+        }
     }
 
     func makeNSView(context: Context) -> NSScrollView {
         let scrollView = NSTextView.scrollableTextView()
         scrollView.hasVerticalScroller = true
         let textView = scrollView.documentView as! NSTextView
+        textView.delegate = context.coordinator
         configureTextView(textView)
         return scrollView
     }
@@ -260,7 +289,9 @@ private struct WrappedTextView: NSViewRepresentable {
     }
 
     func makeCoordinator() -> Coordinator {
-        Coordinator()
+        let coordinator = Coordinator()
+        coordinator.onLinkTapped = viewModel.onLinkTapped
+        return coordinator
     }
 }
 #endif
