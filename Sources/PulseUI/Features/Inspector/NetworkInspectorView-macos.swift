@@ -33,7 +33,7 @@ struct NetworkInspectorView: View {
     @ViewBuilder
     private var toolbar: some View {
         HStack {
-            NetworkToolbar(selectedTab: $selectedTab)
+            InlineTabBar(items: NetworkInspectorTab.allCases, selection: $selectedTab)
             Spacer()
             Button(action: onClose) {
                 Image(systemName: "xmark")
@@ -79,71 +79,16 @@ struct NetworkInspectorView: View {
     }
 }
 
-private struct NetworkToolbar: View {
-    @Binding var selectedTab: NetworkInspectorTab
-
-    var body: some View {
-        HStack(spacing: 0) {
-            HStack {
-                makeItem("Response", tab: .response)
-                Divider()
-                makeItem("Request", tab: .request)
-                Divider()
-                makeItem("Headers", tab: .headers)
-                Divider()
-            }
-            HStack {
-                Spacer().frame(width: 8)
-                makeItem("Summary", tab: .summary)
-                Divider()
-                makeItem("Metrics", tab: .metrics)
-                Divider()
-                makeItem("cURL", tab: .curl)
-            }
-        }.fixedSize()
-    }
-
-    private func makeItem(_ title: String, tab: NetworkInspectorTab) -> some View {
-        InlineTabBarItem(title: title, isSelected: tab == selectedTab) {
-            selectedTab = tab
-        }
-    }
-}
-
-struct InlineTabBarItem: View {
-    let title: String
-    let isSelected: Bool
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            Text(title)
-                .font(.system(size: 11, weight: .medium, design: .default))
-                .foregroundColor(isSelected ? .accentColor : .primary)
-        }.buttonStyle(.plain)
-    }
-}
-
-private enum NetworkInspectorTab: String, Identifiable {
-    case summary
-    case headers
-    case request
-    case response
-    case metrics
-    case curl
+private enum NetworkInspectorTab: String, Identifiable, CaseIterable, CustomStringConvertible {
+    case summary = "Summary"
+    case headers = "Headers"
+    case request = "Request"
+    case response = "Response"
+    case metrics = "Metrics"
+    case curl = "cURL"
 
     var id: NetworkInspectorTab { self }
-
-    var text: String {
-        switch self {
-        case .summary: return "Summary"
-        case .headers: return "Headers"
-        case .request: return "Request"
-        case .response: return "Response"
-        case .metrics: return "Metrics"
-        case .curl: return "cURL"
-        }
-    }
+    var description: String { self.rawValue }
 }
 
 #if DEBUG
