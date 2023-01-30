@@ -120,11 +120,15 @@ extension Backport {
 
     @ViewBuilder
     func hideListContentBackgroumd() -> some View {
-        if #available(iOS 16, tvOS 16, macOS 13, watchOS 9, *) {
+#if os(macOS)
+        if #available(macOS 13, *) {
             self.content.scrollContentBackground(.hidden)
         } else {
             self.content
         }
+#else
+        self.content
+#endif
     }
 
     enum PresentationDetent {
