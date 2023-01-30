@@ -32,14 +32,13 @@ public struct ConsoleView: View {
             contents
         }
             .toolbar {
-                ToolbarItemGroup(placement: .navigation) {
+                ToolbarItemGroup(placement: .automatic) {
                     Picker("Mode", selection: $viewModel.mode) {
                         Text("All").tag(ConsoleMode.all)
                         Text("Logs").tag(ConsoleMode.logs)
                         Text("Tasks").tag(ConsoleMode.tasks)
                     }.pickerStyle(.inline)
-                }
-                ToolbarItemGroup(placement: .automatic) {
+
                     Picker("Mode", selection: $displayMode) {
                         Label("List", systemImage: "list.bullet").tag(ConsoleDisplayMode.list)
                         Label("Table", systemImage: "tablecells").tag(ConsoleDisplayMode.table)
@@ -58,7 +57,8 @@ public struct ConsoleView: View {
             .navigationTitle("Console")
     }
 
-#warning("disable tabs for empty fields?")
+
+#warning("add counters somwwhere")
 #warning("fix navigation titles")
 #warning("should new messages appear at the bottom?")
 #warning("fix crash when switching modes")
@@ -153,6 +153,7 @@ private struct FilterPopoverToolbarButton: View {
     }
 }
 
+#warning("remove")
 private struct ConsoleToolbarModePickerButton: View {
     let viewModel: ConsoleViewModel
     @State private var mode: ConsoleMode = .all
