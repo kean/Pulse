@@ -238,13 +238,6 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
     }
 
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChangeContentWith diff: CollectionDifference<NSManagedObjectID>) {
-        if diff.insertions.count == 1 && diff.removals.count == 1,
-           case let .insert(lhsIndex, lhs, _) = diff.insertions[0],
-           case let .remove(rhsIndex, rhs, _) = diff.removals[0],
-           lhsIndex == rhsIndex, lhs == rhs {
-            return
-        }
-
         if pinsController === controller {
             withAnimation {
                 pins = self.pinsController.fetchedObjects ?? []

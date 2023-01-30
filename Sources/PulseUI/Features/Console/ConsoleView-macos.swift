@@ -72,7 +72,6 @@ public struct ConsoleView: View {
 
         if #available(macOS 13, *) {
             split
-                .environment(\.defaultMinListRowHeight, 8)
                 .searchable(text: $searchBarViewModel.text, tokens: $searchBarViewModel.tokens, token: {
                     if let image = $0.systemImage {
                         Label($0.title, systemImage: image)
