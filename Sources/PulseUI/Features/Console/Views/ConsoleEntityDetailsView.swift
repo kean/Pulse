@@ -7,7 +7,6 @@ import SwiftUI
 import Pulse
 import CoreData
 
-#warning("this is not reloading")
 struct ConsoleEntityDetailsView: View {
     let viewModel: ConsoleListViewModel
     @Binding var selection: NSManagedObjectID?
@@ -15,12 +14,12 @@ struct ConsoleEntityDetailsView: View {
     var body: some View {
         if let entity = selection.map(viewModel.entity(withID:)) {
             if let task = entity as? NetworkTaskEntity {
-                NetworkInspectorView(task: task)
+                NetworkInspectorView(task: task, onClose: { selection = nil })
             } else if let message = entity as? LoggerMessageEntity {
                 if let task = message.task {
-                    NetworkInspectorView(task: task)
+                    NetworkInspectorView(task: task, onClose: { selection = nil })
                 } else {
-                    ConsoleMessageDetailsView(message: message)
+                    ConsoleMessageDetailsView(message: message, onClose: { selection = nil })
                 }
             }
         }

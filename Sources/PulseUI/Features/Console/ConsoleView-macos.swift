@@ -61,6 +61,7 @@ public struct ConsoleView: View {
 #warning("add a way to close the details view")
 #warning("fix how messages are displaed - are they?")
 #warning("disable tabs for empty fields?")
+#warning("fix list offset from top")
 #warning("add search support")
 #warning("use NotSplitView?")
 #warning("metrics: set max width")

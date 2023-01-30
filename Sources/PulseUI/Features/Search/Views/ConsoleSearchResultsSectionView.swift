@@ -69,7 +69,7 @@ struct ConsoleSearchResultView: View {
             if let task = message.task {
                 _makeDestination(for: occurrence, task: task)
             } else {
-                ConsoleMessageDetailsView(message: message)
+                ConsoleMessageDetailsView(message: message, onClose: {})
             }
         } else if let task = entity as? NetworkTaskEntity {
             _makeDestination(for: occurrence, task: task)

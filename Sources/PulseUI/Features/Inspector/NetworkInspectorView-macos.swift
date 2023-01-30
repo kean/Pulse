@@ -13,6 +13,7 @@ struct NetworkInspectorView: View {
     @ObservedObject var task: NetworkTaskEntity
     @AppStorage("networkInspectorSelectedTab") private var selectedTab: NetworkInspectorTab = .response
     @Environment(\.colorScheme) private var colorScheme
+    var onClose: () -> Void
 
     private var viewModel: NetworkInspectorViewModel { .init(task: task) }
 
@@ -32,8 +33,11 @@ struct NetworkInspectorView: View {
     @ViewBuilder
     private var toolbar: some View {
         HStack {
-            NetworkTabView(selectedTab: $selectedTab)
+            NetworkToolbar(selectedTab: $selectedTab)
             Spacer()
+            Button(action: onClose) {
+                Image(systemName: "xmark")
+            }.buttonStyle(.plain)
         }.padding(EdgeInsets(top: 7, leading: 10, bottom: 6, trailing: 10))
     }
 
@@ -75,7 +79,7 @@ struct NetworkInspectorView: View {
     }
 }
 
-private struct NetworkTabView: View {
+private struct NetworkToolbar: View {
     @Binding var selectedTab: NetworkInspectorTab
 
     var body: some View {
@@ -100,14 +104,23 @@ private struct NetworkTabView: View {
     }
 
     private func makeItem(_ title: String, tab: NetworkInspectorTab) -> some View {
-        Button(action: {
+        InlineTabBarItem(title: title, isSelected: tab == selectedTab) {
             selectedTab = tab
-        }) {
+        }
+    }
+}
+
+struct InlineTabBarItem: View {
+    let title: String
+    let isSelected: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
             Text(title)
                 .font(.system(size: 11, weight: .medium, design: .default))
-                .foregroundColor(tab == selectedTab ? .accentColor : .primary)
-        }
-        .buttonStyle(PlainButtonStyle())
+                .foregroundColor(isSelected ? .accentColor : .primary)
+        }.buttonStyle(.plain)
     }
 }
 
@@ -138,7 +151,7 @@ struct NetworkInspectorView_Previews: PreviewProvider {
     static var previews: some View {
             if #available(macOS 13.0, *) {
                 NavigationStack {
-                    NetworkInspectorView(task: LoggerStore.preview.entity(for: .login))
+                    NetworkInspectorView(task: LoggerStore.preview.entity(for: .login), onClose: {})
                 }.previewLayout(.fixed(width: 280, height: 800))
             }
         }
