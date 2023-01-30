@@ -15,6 +15,7 @@ struct ConsoleSearchResultView: View {
 
     var body: some View {
         ConsoleEntityCell.make(for: viewModel.entity)
+            .tag(viewModel.entity.objectID)
         let occurrences = Array(viewModel.occurrences.enumerated()).filter {
             // TODO: these should be displayed inline
             $0.element.scope != .message && $0.element.scope != .url
