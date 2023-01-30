@@ -101,6 +101,7 @@ private let dateAndTimeFormatter: DateFormatter = {
     return formatter
 }()
 
+#if DEBUG
 struct ConsoleTableView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
@@ -116,4 +117,5 @@ struct ConsoleTableView_Previews: PreviewProvider {
         }
     }
 }
+#endif
 #endif
