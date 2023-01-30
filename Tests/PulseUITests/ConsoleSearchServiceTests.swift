@@ -6,6 +6,7 @@ import XCTest
 @testable import Pulse
 @testable import PulseUI
 
+#if os(iOS) || os(macOS)
 @available(iOS 15, tvOS 15, *)
 final class ConsoleSearchServiceTests: XCTestCase {
     let service = ConsoleSearchService()
@@ -25,3 +26,4 @@ final class ConsoleSearchServiceTests: XCTestCase {
         XCTAssertEqual(occurrences.count, 0)
     }
 }
+#endif
