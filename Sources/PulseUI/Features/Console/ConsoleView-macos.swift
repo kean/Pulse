@@ -120,8 +120,6 @@ private struct ConsoleToolbarItems: View {
 
     var body: some View {
         ConsoleSettingsButton(store: viewModel.store)
-        ConsoleToolbarModePickerButton(viewModel: viewModel)
-            .keyboardShortcut("n", modifiers: [.command, .shift])
         ConsoleToolbarToggleOnlyErrorsButton(viewModel: viewModel.searchCriteriaViewModel)
             .keyboardShortcut("e", modifiers: [.command, .shift])
         FilterPopoverToolbarButton(viewModel: viewModel)
@@ -158,21 +156,6 @@ private struct FilterPopoverToolbarButton: View {
             ConsoleSearchCriteriaView(viewModel: viewModel.searchCriteriaViewModel)
                 .fixedSize()
         }
-    }
-}
-
-#warning("remove")
-private struct ConsoleToolbarModePickerButton: View {
-    let viewModel: ConsoleViewModel
-    @State private var mode: ConsoleMode = .all
-
-    var body: some View {
-        Button(action: { mode = (mode == .tasks ? .all : .tasks) }) {
-            Image(systemName: mode == .tasks ? "arrow.down.circle.fill" : "arrow.down.circle")
-                .foregroundColor(mode == .tasks ? Color.blue : Color.secondary)
-        }
-        .help("Automatically Scroll to Recent Messages (⇧⌘N)")
-        .onChange(of: mode) { viewModel.mode = $0 }
     }
 }
 
