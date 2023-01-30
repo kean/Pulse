@@ -53,15 +53,7 @@ struct ConsoleMessageDetailsView: View {
 
     private var toolbar: some View {
         HStack {
-            HStack {
-                InlineTabBarItem(title: "Message", isSelected: selectedTab == .message) {
-                    selectedTab = .message
-                }
-                Divider()
-                InlineTabBarItem(title: "Metadata", isSelected: selectedTab == .metadata) {
-                    selectedTab = .metadata
-                }
-            }.fixedSize()
+            InlineTabBar(items: ConsoleMessageTab.allCases, selection: $selectedTab)
             Spacer()
             Button(action: onClose) {
                 Image(systemName: "xmark")
@@ -79,11 +71,12 @@ struct ConsoleMessageDetailsView: View {
         }
     }
 
-    private enum ConsoleMessageTab: String, Identifiable {
-        case message
-        case metadata
+    private enum ConsoleMessageTab: String, Identifiable, CaseIterable, CustomStringConvertible {
+        case message = "Messages"
+        case metadata = "Metadata"
 
         var id: ConsoleMessageTab { self }
+        var description: String { self.rawValue }
     }
 #endif
 
