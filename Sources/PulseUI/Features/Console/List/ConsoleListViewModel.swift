@@ -373,6 +373,27 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
         let name = section.name
         return name.isEmpty ? "–" : name
     }
+
+    // MARK: - Task Details
+
+    struct TaskDetails {
+        var totalRequestBodySize: Int64 = 0
+        var totalResponseSize: Int64 = 0
+        var totalDuration: TimeInterval = 0
+    }
+
+    var taskDetails: TaskDetails {
+        var details = TaskDetails()
+        for entity in entities {
+            guard let task = mode == .tasks ? (entity as! NetworkTaskEntity) : (entity as! LoggerMessageEntity).task else {
+                continue
+            }
+            details.totalRequestBodySize += task.requestBodySize
+            details.totalResponseSize += task.responseBodySize
+            details.totalDuration += task.duration
+        }
+        return details
+    }
 }
 
 private let fetchBatchSize = 100

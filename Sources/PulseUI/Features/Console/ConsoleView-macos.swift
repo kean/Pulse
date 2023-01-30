@@ -54,7 +54,6 @@ public struct ConsoleView: View {
     }
 
 
-#warning("add counters somwwhere")
 #warning("should new messages appear at the bottom?")
 #warning("fix crash when switching modes")
 #warning("fix list offset from top")
@@ -95,12 +94,14 @@ private struct ConsoleContentView: View {
             Divider()
             HStack {
                 ConsoleModePicker(viewModel: viewModel)
-                    .padding(.horizontal, 10)
                 Spacer()
+                ConsoleDetailsView(viewModel: viewModel.list)
             }
-            .padding(.vertical, 10)
+            .padding(10)
         }
     }
+
+
 
     @ViewBuilder
     private var content: some View {
@@ -124,6 +125,31 @@ private struct ConsoleToolbarItems: View {
             .keyboardShortcut("e", modifiers: [.command, .shift])
         FilterPopoverToolbarButton(viewModel: viewModel)
             .keyboardShortcut("f", modifiers: [.command, .option])
+    }
+}
+
+private struct ConsoleDetailsView: View {
+    @ObservedObject var viewModel: ConsoleListViewModel
+
+    var body: some View {
+        detailsText
+            .lineLimit(1)
+            .font(ConsoleConstants.fontTitle)
+            .foregroundColor(.secondary)
+    }
+
+    private var detailsText: Text {
+        let details = viewModel.taskDetails
+        return Text(Image(systemName: "arrow.up")).fontWeight(.light) +
+        Text(" " + byteCount(for: details.totalRequestBodySize)) +
+        Text("   ") +
+        Text(Image(systemName: "arrow.down")).fontWeight(.light) +
+        Text(" " + byteCount(for: details.totalResponseSize))
+    }
+
+    private func byteCount(for size: Int64) -> String {
+        guard size > 0 else { return "0 KB" }
+        return ByteCountFormatter.string(fromByteCount: size)
     }
 }
 
