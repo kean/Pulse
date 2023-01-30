@@ -7,9 +7,9 @@ import Pulse
 import CoreData
 import Combine
 
-#if os(iOS)
+#if os(iOS) || os(macOS)
 
-@available(iOS 15, tvOS 15, *)
+@available(iOS 15, *)
 struct ConsoleSearchView: View {
     @ObservedObject var viewModel: ConsoleSearchViewModel
     let consoleViewModel: ConsoleViewModel
@@ -31,7 +31,9 @@ struct ConsoleSearchView: View {
     private var suggestionsView: some View {
         toolbar
             .listRowBackground(Color.clear)
+#if os(iOS)
             .listRowSeparator(.hidden, edges: .top)
+#endif
         let suggestions = viewModel.suggestionsViewModel!
         if !suggestions.searches.isEmpty {
             makeList(with: suggestions.searches)
@@ -64,7 +66,9 @@ struct ConsoleSearchView: View {
             }.buttonStyle(.plain)
         }
         .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 0, trailing: 20))
+#if os(iOS)
         .listRowSeparator(.hidden, edges: .bottom)
+#endif
     }
 
     @ViewBuilder
@@ -80,7 +84,9 @@ struct ConsoleSearchView: View {
             .background(Color.blue)
             .cornerRadius(8)
         }
+#if os(iOS)
         .listRowSeparator(.hidden)
+#endif
         .listRowBackground(Color.separator.opacity(0.2))
         .frame(maxWidth: .infinity, alignment: .center)
         .listRowBackground(Color.clear)
@@ -113,8 +119,14 @@ struct ConsoleSearchView: View {
         }
     }
 
+
+#warning("cleanup")
     private var toolbar: some View {
+#if os(iOS)
         ConsoleSearchToolbar(title: viewModel.toolbarTitle, isSpinnerNeeded: viewModel.isSpinnerNeeded, viewModel: consoleViewModel)
+#else
+        EmptyView()
+#endif
     }
 
     @ViewBuilder

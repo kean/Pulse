@@ -17,7 +17,10 @@ final class ConsoleViewModel: ObservableObject {
 
 #if os(iOS)
     let insightsViewModel: InsightsViewModel
-    @available(iOS 15, tvOS 15, *)
+#endif
+
+#if os(iOS) || os(macOS)
+    @available(iOS 15, *)
     var searchViewModel: ConsoleSearchViewModel {
         _searchViewModel as! ConsoleSearchViewModel
     }
@@ -73,6 +76,8 @@ final class ConsoleViewModel: ObservableObject {
         self.list = ConsoleListViewModel(store: store, source: source, criteria: searchCriteriaViewModel)
 #if os(iOS)
         self.insightsViewModel = InsightsViewModel(store: store)
+#endif
+#if os(iOS) || os(macOS)
         if #available(iOS 15, *) {
             self._searchViewModel = ConsoleSearchViewModel(entities: list.entitiesSubject, store: store, index: index, searchBar: searchBarViewModel)
         }

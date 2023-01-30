@@ -12,6 +12,7 @@ import Combine
 public struct ConsoleView: View {
     @StateObject private var viewModel: ConsoleViewModel
     @ObservedObject var searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
+    @ObservedObject var searchBarViewModel: ConsoleSearchBarViewModel
     @AppStorage("com-github-kean-pulse-display-mode") private var displayMode: ConsoleDisplayMode = .list
     @AppStorage("com-github-kean-pulse-is-vertical") private var isVertical = false
     @State private var selection: NSManagedObjectID?
@@ -23,6 +24,7 @@ public struct ConsoleView: View {
     init(viewModel: ConsoleViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
         self.searchCriteriaViewModel = viewModel.searchCriteriaViewModel
+        self.searchBarViewModel = viewModel.searchBarViewModel
     }
 
     public var body: some View {
@@ -32,27 +34,13 @@ public struct ConsoleView: View {
         }
             .toolbar {
                 ToolbarItemGroup(placement: .automatic) {
-                    Picker("Mode", selection: $displayMode) {
-                        Label("List", systemImage: "list.bullet").tag(ConsoleDisplayMode.list)
-                        Label("Table", systemImage: "tablecells").tag(ConsoleDisplayMode.table)
-                    }.labelStyle(.iconOnly).fixedSize()
-
-                    Spacer()
-
-                    ConsoleToolbarItems(viewModel: viewModel)
-
-                    Spacer()
-
-                    Button(action: { isVertical.toggle() }, label: {
-                        Image(systemName: isVertical ? "square.split.2x1" : "square.split.1x2")
-                    }).help(isVertical ? "Switch to Horizontal Layout" : "Switch to Vertical Layout")
+                    toolbarItems
                 }
             }
             .onAppear { viewModel.isViewVisible = true }
             .onDisappear { viewModel.isViewVisible = false }
             .navigationTitle("Console")
     }
-
 
 #warning("add search support")
 #warning("fix crash when switching modes")
@@ -63,14 +51,52 @@ public struct ConsoleView: View {
 #warning("hide search result in richtextview")
 #warning("implement proper mode switcher")
 
+    @ViewBuilder
+    private var toolbarItems: some View {
+        Picker("Mode", selection: $displayMode) {
+            Label("List", systemImage: "list.bullet").tag(ConsoleDisplayMode.list)
+            Label("Table", systemImage: "tablecells").tag(ConsoleDisplayMode.table)
+        }.labelStyle(.iconOnly).fixedSize()
+
+        Spacer()
+
+        ConsoleToolbarItems(viewModel: viewModel)
+
+        Spacer()
+
+        Button(action: { isVertical.toggle() }, label: {
+            Image(systemName: isVertical ? "square.split.2x1" : "square.split.1x2")
+        }).help(isVertical ? "Switch to Horizontal Layout" : "Switch to Vertical Layout")
+    }
+
+    @ViewBuilder
     private var contents: some View {
-        NotSplitView(
-            ConsoleContentView(viewModel: viewModel, displayMode: $displayMode, selection: $selection),
+        let split = NotSplitView(
+            ConsoleContentView(viewModel: viewModel, searchBarViewModel: viewModel.searchBarViewModel, displayMode: $displayMode, selection: $selection),
             detailsView
                 .frame(minWidth: 400, idealWidth: 800, maxWidth: .infinity, minHeight: 120, idealHeight: 480, maxHeight: .infinity, alignment: .center),
             isPanelTwoCollaped: selection == nil,
             isVertical: isVertical
         )
+
+        if #available(macOS 13, *) {
+            split
+                .environment(\.defaultMinListRowHeight, 8)
+                .searchable(text: $searchBarViewModel.text, tokens: $searchBarViewModel.tokens, token: {
+                    if let image = $0.systemImage {
+                        Label($0.title, systemImage: image)
+                    } else {
+                        Text($0.title)
+                    }
+                })
+                .onSubmit(of: .search, viewModel.searchViewModel.onSubmitSearch)
+                .disableAutocorrection(true)
+        } else {
+            split
+                .searchable(text: $searchBarViewModel.text)
+                .onSubmit(of: .search, viewModel.searchViewModel.onSubmitSearch)
+                .disableAutocorrection(true)
+        }
     }
 
     private var detailsView: some View {
@@ -78,10 +104,13 @@ public struct ConsoleView: View {
     }
 }
 
+#warning("impleemnt selection in ConsoleSearchView")
 private struct ConsoleContentView: View {
     let viewModel: ConsoleViewModel
+    @ObservedObject var searchBarViewModel: ConsoleSearchBarViewModel
     @Binding var displayMode: ConsoleDisplayMode
     @Binding var selection: NSManagedObjectID?
+    @Environment(\.isSearching) private var isSearching
 
     var body: some View {
         VStack(spacing: 0) {
@@ -94,18 +123,26 @@ private struct ConsoleContentView: View {
             }
             .padding(10)
         }
+        .onChange(of: isSearching) {
+            viewModel.isSearching = $0
+        }
     }
-
-
 
     @ViewBuilder
     private var content: some View {
-        switch displayMode {
-        case .table:
-            ConsoleTableView(viewModel: viewModel.list, selection: $selection)
-        case .list:
+        if isSearching {
             List(selection: $selection) {
-                ConsoleListContentView(viewModel: viewModel.list)
+                ConsoleSearchView(viewModel: viewModel)
+                    .buttonStyle(.plain)
+            }
+        } else {
+            switch displayMode {
+            case .table:
+                ConsoleTableView(viewModel: viewModel.list, selection: $selection)
+            case .list:
+                List(selection: $selection) {
+                    ConsoleListContentView(viewModel: viewModel.list)
+                }
             }
         }
     }
