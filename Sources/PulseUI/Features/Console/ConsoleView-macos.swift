@@ -11,7 +11,7 @@ import Combine
 
 public struct ConsoleView: View {
     @StateObject private var viewModel: ConsoleViewModel
- 
+
     public init(store: LoggerStore = .shared) {
         self.init(viewModel: .init(store: store))
     }
@@ -26,8 +26,18 @@ public struct ConsoleView: View {
 
     @ViewBuilder
     private var contents: some View {
-        ConsoleContainerView(viewModel: viewModel)
+        VStack(spacing: 0) {
+            Divider()
+            ConsoleContainerView(viewModel: viewModel)
+        }
             .toolbar {
+                ToolbarItemGroup(placement: .navigation) {
+                    Picker("Mode", selection: $viewModel.mode) {
+                        Text("All").tag(ConsoleMode.all)
+                        Text("Logs").tag(ConsoleMode.logs)
+                        Text("Tasks").tag(ConsoleMode.tasks)
+                    }.pickerStyle(.inline)
+                }
                 ToolbarItemGroup(placement: .automatic) {
                     ConsoleToolbarItems(viewModel: viewModel)
                 }
