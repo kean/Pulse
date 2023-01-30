@@ -92,8 +92,6 @@ public struct ConsoleView: View {
     }
 }
 
-#warning("add onappear to ConsoleTextView")
-
 private struct ConsoleContentView: View {
     let viewModel: ConsoleViewModel
     @Binding var displayMode: ConsoleDisplayMode

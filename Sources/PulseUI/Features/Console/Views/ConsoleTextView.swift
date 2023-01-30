@@ -19,27 +19,27 @@ struct ConsoleTextView: View {
     var options: TextRenderer.Options?
     var onClose: (() -> Void)?
 
-#if os(macOS)
     var body: some View {
-        RichTextView(viewModel: viewModel.text)
-            .textViewBarItemsHidden(true)
-            .onAppear {
-                viewModel.bind(entities)
-            }
-    }
-#else
-
-    var body: some View {
-        RichTextView(viewModel: viewModel.text)
-            .textViewBarItemsHidden(true)
-            .navigationTitle("Console")
-            .navigationBarTitleDisplayMode(.inline)
+        contents
             .onAppear {
                 if let options = options {
                     viewModel.options = options
                 }
                 viewModel.bind(entities)
             }
+    }
+
+#if os(macOS)
+    var contents: some View {
+        RichTextView(viewModel: viewModel.text)
+            .textViewBarItemsHidden(true)
+    }
+#else
+    var contents: some View {
+        RichTextView(viewModel: viewModel.text)
+            .textViewBarItemsHidden(true)
+            .navigationTitle("Console")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     if let onClose = onClose {
@@ -181,7 +181,6 @@ final class ConsoleTextViewModel: ObservableObject {
             self?.refreshText()
 #endif
         }.store(in: &cancellables)
-        self.refresh()
     }
 
     func reloadOptions() {
