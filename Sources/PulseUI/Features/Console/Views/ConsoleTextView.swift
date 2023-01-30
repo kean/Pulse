@@ -153,6 +153,7 @@ final class ConsoleTextViewModel: ObservableObject {
     private var expanded: Set<NSManagedObjectID> = []
     private let settings = ConsoleTextViewSettings.shared
     private var entities: CurrentValueSubject<[NSManagedObject], Never> = .init([])
+    private var displayedEntities: [NSManagedObject] = []
     private var lastTimeRefreshHidden = Date().addingTimeInterval(-3)
     private var objectIDs: [UUID: NSManagedObjectID] = [:]
     private var cancellables: [AnyCancellable] = []
@@ -174,7 +175,11 @@ final class ConsoleTextViewModel: ObservableObject {
     func bind(_ entities: CurrentValueSubject<[NSManagedObject], Never>) {
         self.entities = entities
         entities.dropFirst().sink { [weak self] _ in
+#if os(iOS)
             self?.showRefreshButtonIfNeeded()
+#else
+            self?.refreshText()
+#endif
         }.store(in: &cancellables)
         self.refresh()
     }
@@ -193,6 +198,22 @@ final class ConsoleTextViewModel: ObservableObject {
     private func refreshText() {
         let entities = isOrderedAscending ? entities.value : entities.value.reversed()
         let renderer = TextRenderer(options: options)
+
+        // TODO: is this enough?
+        if !displayedEntities.isEmpty && entities.count > displayedEntities.count {
+            renderer.addSpacer()
+            render(entities[displayedEntities.endIndex...], using: renderer)
+            self.text.performUpdates {
+                $0.append(renderer.make())
+            }
+        } else {
+            render(entities[...], using: renderer)
+            self.text.display(renderer.make())
+        }
+        self.displayedEntities = entities
+    }
+
+    private func render(_ entities: ArraySlice<NSManagedObject>, using renderer: TextRenderer) {
         for index in entities.indices {
             let entity = entities[index]
             if let task = entity as? NetworkTaskEntity {
@@ -210,7 +231,6 @@ final class ConsoleTextViewModel: ObservableObject {
                 renderer.addSpacer()
             }
         }
-        self.text.display(renderer.make())
     }
 
     private func render(_ message: LoggerMessageEntity, at index: Int, using renderer: TextRenderer) {
