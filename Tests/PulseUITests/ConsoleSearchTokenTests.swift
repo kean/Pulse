@@ -6,6 +6,8 @@ import XCTest
 @testable import Pulse
 @testable import PulseUI
 
+#if os(iOS) || os(macOS)
+
 @available(iOS 16, tvOS 16, *)
 final class ConsoleSearchTokenTests: XCTestCase {
     func testStatusCodeFilter() throws {
@@ -208,3 +210,5 @@ final class ConsoleSearchTokenTests: XCTestCase {
         XCTAssertEqual("abcd".distance(to: "abd"), 1)
     }
 }
+
+#endif
