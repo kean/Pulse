@@ -5,11 +5,14 @@
 import SwiftUI
 import PulseUI
 
+#warning("update")
+
 @main
 struct Pulse_Demo_macOSApp: App {
     var body: some Scene {
         WindowGroup {
-            ConsoleView(store: .demo)
+            ConsoleView(store: .mock)
+//            ConsoleView(store: .demo)
         }
     }
 }
