@@ -23,23 +23,12 @@ struct NetworkInspectorTransactionView: View {
 #endif
         viewModel.timingViewModel.map(TimingView.init)
         NavigationLink(destination: destintionTransactionDetails) {
-#if os(macOS)
-            HStack {
-                Text(viewModel.title)
-                Spacer()
-                if #available(iOS 15, tvOS 15, *), let size = viewModel.transferSizeViewModel {
-                    transferSizeView(size: size)
-                }
-            }
-            .padding(.top, 8)
-#else
             VStack(alignment: .leading, spacing: 4) {
                 Text(viewModel.title)
                 if #available(iOS 15, tvOS 15, *), let size = viewModel.transferSizeViewModel {
                     transferSizeView(size: size)
                 }
             }
-#endif
         }
         NetworkRequestInfoCell(viewModel: viewModel.requestViewModel)
     }
