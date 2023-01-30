@@ -10,7 +10,9 @@ struct NetworkInspectorRequestBodyView: View {
 
     var body: some View {
         contents
+#if !os(macOS)
             .inlineNavigationTitle("Request Body")
+#endif
     }
 
     @ViewBuilder

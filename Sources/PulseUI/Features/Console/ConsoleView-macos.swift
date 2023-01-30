@@ -64,7 +64,6 @@ public struct ConsoleView: View {
 
 
 #warning("add counters somwwhere")
-#warning("fix navigation titles")
 #warning("should new messages appear at the bottom?")
 #warning("fix crash when switching modes")
 #warning("fix list offset from top")

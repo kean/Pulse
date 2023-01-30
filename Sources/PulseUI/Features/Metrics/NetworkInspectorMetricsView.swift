@@ -27,7 +27,9 @@ struct NetworkInspectorMetricsView: View {
 #if os(macOS)
         .backport.hideListContentBackgroumd()
 #endif
+#if !os(macOS)
         .navigationTitle("Metrics")
+#endif
 #endif
     }
 }

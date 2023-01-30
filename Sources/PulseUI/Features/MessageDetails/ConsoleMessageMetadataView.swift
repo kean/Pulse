@@ -10,7 +10,9 @@ struct ConsoleMessageMetadataView: View {
 
     var body: some View {
         RichTextView(viewModel: .init(string: string))
+#if !os(macOS)
             .navigationTitle("Message Details")
+#endif
     }
 
     private var string: NSAttributedString {
