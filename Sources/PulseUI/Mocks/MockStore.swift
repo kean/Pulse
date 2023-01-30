@@ -18,6 +18,7 @@ extension LoggerStore {
     static let preview = makeMockStore()
 }
 
+#warning("update")
 extension LoggerStore {
     static let demo: LoggerStore = {
         let store = LoggerStore.shared
@@ -25,7 +26,7 @@ extension LoggerStore {
         return store
     }()
 
-    func startPopulating(isIndefinite: Bool = false) {
+    func startPopulating(isIndefinite: Bool = true) {
         func populate() {
             asyncPopulateStore(self)
             if isIndefinite {

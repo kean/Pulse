@@ -26,7 +26,7 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
     }
 
 #if os(macOS)
-    var sortDescriptors: [NSSortDescriptor] = [NSSortDescriptor(key: "createdAt", ascending: false)] {
+    var sortDescriptors: [NSSortDescriptor] = [] {
         didSet {
             controller?.fetchRequest.sortDescriptors = sortDescriptors
             try? controller?.performFetch()
