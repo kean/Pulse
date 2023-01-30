@@ -58,13 +58,11 @@ public struct ConsoleView: View {
             .navigationTitle("Console")
     }
 
-#warning("fix how messages are displaed - are they?")
 #warning("add cookies section - do we need summary?")
 #warning("disable tabs for empty fields?")
 #warning("fix navigation titles")
 #warning("should new messages appear at the bottom?")
 #warning("fix crash when switching modes")
-#warning("one-line message like on both macOS and tvOS?")
 #warning("fix list offset from top")
 #warning("add search support")
 #warning("rework summary")
