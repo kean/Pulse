@@ -92,6 +92,8 @@ public struct ConsoleView: View {
     }
 }
 
+#warning("add onappear to ConsoleTextView")
+
 private struct ConsoleContentView: View {
     let viewModel: ConsoleViewModel
     @Binding var displayMode: ConsoleDisplayMode
@@ -106,7 +108,7 @@ private struct ConsoleContentView: View {
                 ConsoleListContentView(viewModel: viewModel.list)
             }
         case .text:
-            Text("Not implemented")
+            ConsoleTextView(entities: viewModel.list.entitiesSubject)
         }
     }
 }

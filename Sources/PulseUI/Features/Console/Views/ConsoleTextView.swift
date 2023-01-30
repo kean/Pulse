@@ -7,7 +7,7 @@ import CoreData
 import Pulse
 import Combine
 
-#if os(iOS)
+#if os(iOS) || os(macOS)
 
 struct ConsoleTextView: View {
     @StateObject private var viewModel = ConsoleTextViewModel()
@@ -18,6 +18,16 @@ struct ConsoleTextView: View {
     var entities: CurrentValueSubject<[NSManagedObject], Never>
     var options: TextRenderer.Options?
     var onClose: (() -> Void)?
+
+#if os(macOS)
+    var body: some View {
+        RichTextView(viewModel: viewModel.text)
+            .textViewBarItemsHidden(true)
+            .onAppear {
+                viewModel.bind(entities)
+            }
+    }
+#else
 
     var body: some View {
         RichTextView(viewModel: viewModel.text)
@@ -95,6 +105,8 @@ struct ConsoleTextView: View {
                 })
         }
     }
+
+#endif
 }
 
 private struct ConsoleTextViewSettingsView: View {
@@ -129,7 +141,11 @@ final class ConsoleTextViewModel: ObservableObject {
     var text = RichTextViewModel()
     var options: TextRenderer.Options = .init()
 
+#if os(macOS)
+    @Published var isOrderedAscending = true
+#else
     @Published var isOrderedAscending = false
+#endif
     @Published var isExpanded = false
     @Published private(set) var isButtonRefreshHidden = true
 
