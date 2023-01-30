@@ -88,6 +88,7 @@ private struct ConsoleContainerView: View {
                 Text("Not implemented")
             }
             ConsoleEntityDetailsView(viewModel: viewModel.list, selection: $selection)
+                .id(selection)
         }
     }
 }
