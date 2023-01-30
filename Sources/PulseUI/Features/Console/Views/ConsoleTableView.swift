@@ -58,13 +58,13 @@ private struct ConsoleTaskTableView: View {
     @State private var sortOrder: [SortDescriptor<NetworkTaskEntity>] = []
 
     var body: some View {
-        Table((viewModel.entities as! [NetworkTaskEntity]), selection: $selection, sortOrder: $sortOrder) {
+        Table(((viewModel.entities as? [NetworkTaskEntity]) ?? []), selection: $selection, sortOrder: $sortOrder) {
             TableColumn("Date & Time", value: \.createdAt) {
                 Text(dateAndTimeFormatter.string(from: $0.createdAt))
             }.width(min: 87, ideal: 162, max: 162)
             TableColumn("Method", value: \.httpMethod) {
                 Text($0.httpMethod ?? "–")
-            }.width(min: 40, ideal: 40, max: 60)
+            }.width(min: 40, ideal: 50, max: 60)
             TableColumn("URL", value: \.url) {
                 Text($0.url ?? "–")
             }.width(min: 40, ideal: 520)

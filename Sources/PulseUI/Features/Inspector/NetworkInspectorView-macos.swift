@@ -23,11 +23,6 @@ struct NetworkInspectorView: View {
             Divider()
             selectedTabView
         }
-        .toolbar {
-            if #available(macOS 13, *), let url = viewModel.shareTaskAsHTML() {
-                ShareLink(item: url)
-            }
-        }
     }
 
     @ViewBuilder
