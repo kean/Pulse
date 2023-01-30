@@ -42,13 +42,8 @@ public struct ConsoleView: View {
             .navigationTitle("Console")
     }
 
-#warning("fix crash when switching modes")
-#warning("fix list offset from top")
-#warning("fix isViewVisible")
 #warning("fix share button when tetx view is shown")
 #warning("add toolbar from the bottom")
-#warning("hide search result in richtextview")
-#warning("implement proper mode switcher")
 #warning("fix share button overriding search bar")
 #warning("use different color for errors")
 
