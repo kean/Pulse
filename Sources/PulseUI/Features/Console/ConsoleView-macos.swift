@@ -60,17 +60,22 @@ public struct ConsoleView: View {
 
 #warning("add a way to close the details view")
 #warning("fix how messages are displaed - are they?")
+#warning("add cookies section - do we need summary?")
 #warning("disable tabs for empty fields?")
+#warning("should new messages appear at the bottom?")
+#warning("fix crash when switching modes")
+#warning("one-line message like on both macOS and tvOS?")
 #warning("fix list offset from top")
 #warning("add search support")
-#warning("use NotSplitView?")
+#warning("rework summary")
+#warning("fix background in metrics view")
+#warning("fix navigation from metrics view")
 #warning("metrics: set max width")
 #warning("fix isViewVisible")
 #warning("fix reload of the content view")
 #warning("add a way to switch between table, list, and text")
 #warning("fix share button when tetx view is shown")
 #warning("add context menus")
-#warning("the text view is still not reloading")
 
     private var contents: some View {
         NotSplitView(

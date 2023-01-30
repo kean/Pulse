@@ -37,13 +37,13 @@ private struct ConsoleMessageTableView: View {
         Table(viewModel.entities as! [LoggerMessageEntity], selection: $selection, sortOrder: $sortOrder) {
             TableColumn("Date & Time", value: \.createdAt) {
                 Text(dateAndTimeFormatter.string(from: $0.createdAt))
-            }.width(ideal: 162, max: 162)
+            }.width(min: 87, ideal: 162, max: 162)
             TableColumn("Level", value: \.level) {
                 Text($0.logLevel.name)
-            }.width(ideal: 50, max: 54)
+            }.width(min: 54, ideal: 54, max: 54)
             TableColumn("Label", value: \.label) {
                 Text($0.label)
-            }.width(ideal: 68)
+            }.width(min: 54, ideal: 68)
             TableColumn("Message", value: \.text)
                 .width(ideal: 600)
             TableColumn("File", value: \.file)
