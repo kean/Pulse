@@ -191,7 +191,7 @@ private enum ConsoleDisplayMode: String {
 struct ConsoleView_Previews: PreviewProvider {
     static var previews: some View {
         ConsoleView(store: .mock)
-            .previewLayout(.fixed(width: 1200, height: 800))
+            .previewLayout(.fixed(width: 1000, height: 800))
     }
 }
 #endif

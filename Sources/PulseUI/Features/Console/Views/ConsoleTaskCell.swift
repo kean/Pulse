@@ -22,16 +22,18 @@ struct ConsoleTaskCell: View {
         let contents = VStack(alignment: .leading, spacing: 6) {
             title
             message
+#if !os(macOS)
             if task.state == .pending {
                 ConsoleProgressText(title: task.httpMethod ?? "GET", viewModel: ProgressViewModel(task: task))
             } else {
                 details
             }
+#endif
         }
             .onAppear { viewModel.bind(task)}
             .onChange(of: task) { viewModel.bind($0) }
 #if os(macOS)
-        contents.padding(.vertical, 4)
+        contents.padding(.vertical, 2)
 #else
         if #unavailable(iOS 16) {
             contents.padding(.vertical, 4)
@@ -49,6 +51,9 @@ struct ConsoleTaskCell: View {
                 .fontWeight(.medium)
                 .foregroundColor(task.state.tintColor)
                 .lineLimit(1)
+#if os(macOS)
+            details
+#endif
             Spacer()
 #if os(iOS) || os(macOS)
             PinView(task: task)
