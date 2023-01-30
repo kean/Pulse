@@ -25,9 +25,10 @@ final class ConsoleViewModel: ObservableObject {
         _searchViewModel as! ConsoleSearchViewModel
     }
     private var _searchViewModel: AnyObject?
-#endif
 
     let searchBarViewModel: ConsoleSearchBarViewModel
+#endif
+
     let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
     let index: LoggerStoreIndex
 
@@ -72,12 +73,12 @@ final class ConsoleViewModel: ObservableObject {
 
         self.index = LoggerStoreIndex(store: store)
         self.searchCriteriaViewModel = ConsoleSearchCriteriaViewModel(store: store, index: index, source: source)
-        self.searchBarViewModel = ConsoleSearchBarViewModel()
         self.list = ConsoleListViewModel(store: store, source: source, criteria: searchCriteriaViewModel)
 #if os(iOS)
         self.insightsViewModel = InsightsViewModel(store: store)
 #endif
 #if os(iOS) || os(macOS)
+        self.searchBarViewModel = ConsoleSearchBarViewModel()
         if #available(iOS 15, *) {
             self._searchViewModel = ConsoleSearchViewModel(entities: list.entitiesSubject, store: store, index: index, searchBar: searchBarViewModel)
         }

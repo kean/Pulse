@@ -46,6 +46,40 @@ struct ConsoleListContentView: View {
     private func makeDestination(for title: String, objects: [NSManagedObject]) -> some View {
         LazyConsoleView(title: title, entities: objects, store: viewModel.store, mode: viewModel.mode)
     }
+
+    @available(iOS 15, tvOS 15, *)
+    @ViewBuilder
+    private var pinsView: some View {
+        let prefix = Array(viewModel.pins.prefix(3))
+        PlainListExpandableSectionHeader(title: "Pins", count: viewModel.pins.count, destination: {
+            ConsolePlainList(viewModel.pins)
+                .inlineNavigationTitle("Pins")
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button(action: viewModel.buttonRemovePinsTapped) {
+                            Image(systemName: "trash")
+                        }
+                    }
+                }
+        }, isSeeAllHidden: prefix.count == viewModel.pins.count)
+        ForEach(prefix.map(PinCellViewModel.init)) { viewModel in
+            ConsoleEntityCell.make(for: viewModel.object)
+        }
+        Button(action: viewModel.buttonRemovePinsTapped) {
+            Text("Remove Pins")
+                .font(.subheadline)
+                .foregroundColor(Color.blue)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .buttonStyle(.plain)
+        .listRowBackground(Color.separator.opacity(0.2))
+        .listRowSeparator(.hidden)
+        .listRowSeparator(.hidden, edges: .bottom)
+
+        if !viewModel.visibleEntities.isEmpty {
+            PlainListGroupSeparator()
+        }
+    }
 #else
     var body: some View {
         plainView
@@ -66,43 +100,6 @@ struct ConsoleListContentView: View {
             }
         }
         footerView
-    }
-
-    @available(iOS 15, tvOS 15, *)
-    @ViewBuilder
-    private var pinsView: some View {
-        let prefix = Array(viewModel.pins.prefix(3))
-        PlainListExpandableSectionHeader(title: "Pins", count: viewModel.pins.count, destination: {
-            ConsolePlainList(viewModel.pins)
-                .inlineNavigationTitle("Pins")
-#if os(iOS)
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        Button(action: viewModel.buttonRemovePinsTapped) {
-                            Image(systemName: "trash")
-                        }
-                    }
-                }
-#endif
-        }, isSeeAllHidden: prefix.count == viewModel.pins.count)
-        ForEach(prefix.map(PinCellViewModel.init)) { viewModel in
-            ConsoleEntityCell.make(for: viewModel.object)
-        }
-        Button(action: viewModel.buttonRemovePinsTapped) {
-            Text("Remove Pins")
-                .font(.subheadline)
-                .foregroundColor(Color.blue)
-                .frame(maxWidth: .infinity, alignment: .leading)
-        }
-        .buttonStyle(.plain)
-#if os(iOS)
-        .listRowBackground(Color.separator.opacity(0.2))
-        .listRowSeparator(.hidden)
-        .listRowSeparator(.hidden, edges: .bottom)
-#endif
-        if !viewModel.visibleEntities.isEmpty {
-            PlainListGroupSeparator()
-        }
     }
 
     @ViewBuilder
