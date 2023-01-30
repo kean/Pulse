@@ -1,5 +1,12 @@
 # Pulse 3.x
 
+## Pulse 3.3
+
+*Jan 30, 2023*
+
+- Redesign the macOS version of the app and introduce some of the feature from Pulse Pro
+- Add the new search that was introduced on iOS in [version 3.2](https://github.com/kean/Pulse/releases/tag/3.2.0)
+
 ## Pulse 3.2.2
 
 *Jan 29, 2023*
@@ -13,7 +20,7 @@
 
 - Fix backward compatibility with Pulse Pro 2.x
 
-## Pulse 3.2.0
+## Pulse 3.2
 
 *Jan 24, 2023*
 
@@ -25,7 +32,7 @@
 - Other minor changes
 - Add metadata search - [#148](https://github.com/kean/Pulse/pull/148) by [@ejensen](https://github.com/ejensen)
 
-## Pulse 3.1.0
+## Pulse 3.1
 
 *Jan 14, 2023*
 
@@ -53,7 +60,7 @@
 - Fix double dot in shared files extensions
 - Remove share as .pdf from Console and TextView (keep in NetworkInspector) - too slow to be used for any reasonable amount of content
 
-## Pulse 3.0.0
+## Pulse 3.0
 
 *Jan 10, 2023*
 
