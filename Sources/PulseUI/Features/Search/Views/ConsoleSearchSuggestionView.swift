@@ -2,6 +2,8 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
+#if os(iOS) || os(macOS)
+
 import SwiftUI
 import Pulse
 import CoreData
@@ -53,3 +55,5 @@ struct ShortcutTooltip: View {
             .background(Rectangle().frame(width: 34, height: 28).foregroundColor(Color.separator.opacity(0.2)).cornerRadius(8))
     }
 }
+
+#endif

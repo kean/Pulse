@@ -2,6 +2,8 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
+#if os(iOS) || os(macOS)
+
 import SwiftUI
 import Pulse
 import CoreData
@@ -25,6 +27,7 @@ struct ConsoleSearchResultView: View {
                 makeCell(for: item)
             }
         }
+#if os(iOS)
         if occurrences.count > limit {
             NavigationLink(destination: ConsoleSearchResultDetailsView(viewModel: viewModel)) {
                 HStack {
@@ -36,6 +39,7 @@ struct ConsoleSearchResultView: View {
                 }
             }
         }
+#endif
         if isSeparatorNeeded {
             PlainListGroupSeparator()
         }
@@ -232,3 +236,5 @@ struct PlainListSectionHeaderSeparator: View {
         }
     }
 }
+
+#endif

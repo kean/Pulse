@@ -2,6 +2,8 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
+#if os(iOS) || os(macOS)
+
 import Foundation
 
 // Search:
@@ -161,3 +163,5 @@ enum HTTPMethod: String, Hashable, Codable, CaseIterable, CustomStringConvertibl
 
     var description: String { rawValue }
 }
+
+#endif

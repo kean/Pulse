@@ -2,6 +2,8 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
+#if os(iOS) || os(macOS)
+
 import SwiftUI
 import Pulse
 import CoreData
@@ -192,3 +194,5 @@ private func decode<T: Decodable>(_ type: T.Type, from string: String) -> T? {
         try? JSONDecoder().decode(type, from: $0)
     }
 }
+
+#endif

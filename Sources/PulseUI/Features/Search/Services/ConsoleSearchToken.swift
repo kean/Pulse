@@ -2,6 +2,8 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
+#if os(iOS) || os(macOS)
+
 import Foundation
 import SwiftUI
 
@@ -45,3 +47,5 @@ enum ConsoleSearchToken: Identifiable, Hashable, Codable {
         }
     }
 }
+
+#endif
