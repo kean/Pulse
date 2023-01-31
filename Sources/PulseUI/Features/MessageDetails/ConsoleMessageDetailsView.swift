@@ -58,7 +58,7 @@ struct ConsoleMessageDetailsView: View {
             Button(action: onClose) {
                 Image(systemName: "xmark")
             }.buttonStyle(.plain)
-        }.padding(EdgeInsets(top: 7, leading: 10, bottom: 6, trailing: 8))
+        }.padding(EdgeInsets(top: 4, leading: 10, bottom: 5, trailing: 8))
     }
 
     @ViewBuilder

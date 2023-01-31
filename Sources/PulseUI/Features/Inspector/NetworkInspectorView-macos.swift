@@ -33,7 +33,7 @@ struct NetworkInspectorView: View {
             Button(action: onClose) {
                 Image(systemName: "xmark")
             }.buttonStyle(.plain)
-        }.padding(EdgeInsets(top: 7, leading: 10, bottom: 6, trailing: 8))
+        }.padding(EdgeInsets(top: 4, leading: 10, bottom: 5, trailing: 8))
     }
 
     @ViewBuilder
@@ -98,7 +98,7 @@ struct NetworkInspectorView_Previews: PreviewProvider {
             if #available(macOS 13.0, *) {
                 NavigationStack {
                     NetworkInspectorView(task: LoggerStore.preview.entity(for: .login), onClose: {})
-                }.previewLayout(.fixed(width: 280, height: 800))
+                }.previewLayout(.fixed(width: 500, height: 800))
             }
         }
 }
