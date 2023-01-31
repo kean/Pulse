@@ -47,8 +47,14 @@ struct ConsoleModePicker: View {
         self.tasksCounter = viewModel.list.taskCountObserver
     }
 
+#if os(macOS)
+    let spacing: CGFloat = 4
+#else
+    let spacing: CGFloat = 12
+#endif
+
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: spacing) {
             ConsoleModeButton(title: "All", isSelected: mode == .all) {
                 viewModel.mode = .all
             }
@@ -88,29 +94,27 @@ private struct ConsoleModeButton: View {
     let isSelected: Bool
     let action: () -> Void
 
+#if os(macOS)
+    var body: some View {
+        InlineTabBarItem(title: title, details: details, isSelected: isSelected, action: action)
+    }
+#else
     var body: some View {
         Button(action: action) {
             HStack(spacing: 4) {
                 Text(title)
                     .foregroundColor(isSelected ? Color.blue : Color.secondary)
-#if os(macOS)
-                    .font(.system(size: 11, weight: .medium, design: .default))
-#else
                     .font(.subheadline.weight(.medium))
-#endif
                 if let details = details {
                     Text("(\(details))")
                         .foregroundColor(isSelected ? Color.blue.opacity(0.7) : Color.secondary.opacity(0.7))
-#if os(macOS)
-                        .font(.system(size: 11, weight: .regular, design: .default))
-#else
                         .font(.subheadline)
-#endif
                 }
             }
         }
         .buttonStyle(.plain)
     }
+#endif
 }
 
 struct ConsoleFiltersView: View {

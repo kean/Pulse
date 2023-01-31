@@ -109,7 +109,9 @@ private struct ConsoleContentView: View {
                 Spacer()
                 ConsoleDetailsView(viewModel: viewModel.list)
             }
-            .padding(10)
+            .padding(.top, 7)
+            .padding(.bottom, 9)
+            .padding(.horizontal, 10)
         }
         .onChange(of: isSearching) {
             viewModel.isSearching = $0
@@ -225,7 +227,7 @@ private enum ConsoleDisplayMode: String {
 struct ConsoleView_Previews: PreviewProvider {
     static var previews: some View {
         ConsoleView(store: .mock)
-            .previewLayout(.fixed(width: 1000, height: 800))
+            .previewLayout(.fixed(width: 700, height: 400))
     }
 }
 #endif

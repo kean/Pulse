@@ -23,21 +23,33 @@ struct InlineTabBar<T>: View where T: Hashable, T: Identifiable {
 
 struct InlineTabBarItem: View {
     let title: String
+    var details: String?
     let isSelected: Bool
     let action: () -> Void
     @State private var isHovering = false
 
     var body: some View {
         Button(action: action) {
-            Text(title)
-                .font(.system(size: 11, weight: .medium, design: .default))
-                .foregroundColor(isSelected ? .white : .secondary)
+            text
+                .lineLimit(1)
                 .padding(2)
                 .padding(.horizontal, 2)
                 .onHover { isHovering = $0 }
                 .background(isSelected ? Color.blue.opacity(0.8) : (isHovering ? Color.blue.opacity(0.25) : nil))
                 .cornerRadius(4)
         }.buttonStyle(.plain)
+    }
+
+    private var text: some View {
+        var text = Text(title)
+            .font(.system(size: 11, weight: .medium, design: .default))
+            .foregroundColor(isSelected ? .white : .secondary)
+        if let details = details, !details.isEmpty {
+            text = text + Text(" (\(details))")
+                .font(.system(size: 11, weight: .medium, design: .default))
+                .foregroundColor(isSelected ? .secondary : .secondary.opacity(0.6))
+        }
+        return text
     }
 }
 
