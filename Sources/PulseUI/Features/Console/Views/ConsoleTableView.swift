@@ -46,6 +46,7 @@ private struct ConsoleMessageTableView: View {
             TableColumn("Function", value: \.function)
                 .width(ideal: 100)
         }
+        .tableStyle(.inset)
         .onChange(of: sortOrder) {
             viewModel.sortDescriptors = $0.map(NSSortDescriptor.init)
         }
