@@ -83,7 +83,12 @@ final class TextHelper {
 #else
         case .title: size = getPreferredFontSize(for: .title1)
 #endif
-        case .subheadline: size = (0.84 * body2Size).rounded()
+        case .subheadline:
+#if os(macOS)
+            size = (0.9 * body2Size).rounded()
+#else
+            size = (0.84 * body2Size).rounded()
+#endif
         case .body: size = getPreferredFontSize(for: .body)
         case .body2: size = body2Size
         }
