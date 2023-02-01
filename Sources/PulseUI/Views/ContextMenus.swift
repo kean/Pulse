@@ -2,11 +2,11 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
+#if os(iOS) || os(macOS)
+
 import SwiftUI
 import Pulse
 import Combine
-
-#if os(iOS) || os(macOS)
 
 struct NetworkMessageContextMenu: View {
     let task: NetworkTaskEntity

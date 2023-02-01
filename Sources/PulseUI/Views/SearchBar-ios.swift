@@ -2,9 +2,9 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
-import SwiftUI
-
 #if os(iOS)
+
+import SwiftUI
 
 struct SearchBar: UIViewRepresentable {
     let title: String

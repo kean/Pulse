@@ -2,12 +2,12 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
+#if os(macOS)
+
 import SwiftUI
 import CoreData
 import Pulse
 import Combine
-
-#if os(macOS)
 
 struct NotSplitView: View, NSViewControllerRepresentable {
     private let views: [AnyView]

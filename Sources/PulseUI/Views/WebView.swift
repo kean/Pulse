@@ -5,6 +5,7 @@
 import SwiftUI
 
 #if os(iOS)
+
 import WebKit
 import UIKit
 
@@ -25,6 +26,7 @@ struct WebView: UIViewRepresentable {
 #endif
 
 #if os(macOS)
+
 import WebKit
 import AppKit
 
@@ -42,4 +44,5 @@ struct WebView: NSViewRepresentable {
         // Do nothing
     }
 }
+
 #endif
