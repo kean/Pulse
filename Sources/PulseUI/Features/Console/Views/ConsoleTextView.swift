@@ -129,15 +129,8 @@ private struct ConsoleTextViewSettingsView: View {
 #warning("in show-details display size in brackets")
 #warning("when expand, perform a diff insert-remove to make sure ranges are updated")
 
-final class ConsoleTextEntityViewModel: ObservableObject {
-    let entity: NSManagedObject
+struct ConsoleTextItemViewModel {
     var range: NSRange = NSRange(location: NSNotFound, length: 0)
-    var raw: NSAttributedString?
-    var isExpanded = false
-
-    init(entity: NSManagedObject) {
-        self.entity = entity
-    }
 }
 
 final class ConsoleTextViewModel: ObservableObject {
@@ -158,10 +151,8 @@ final class ConsoleTextViewModel: ObservableObject {
 
     #warning("todo")
     // - render in background with batches
-    // - subscribe to changes and automatically replace for pending tasks
-    // - how to handle pending tasks reload?
     // - use a simple monospaced font for all messages?
-    private var items: [ConsoleTextEntityViewModel] = []
+    private var items: [ConsoleTextItemViewModel] = []
 
     init() {
         self.text.onLinkTapped = { [unowned self] in onLinkTapped($0) }
@@ -190,56 +181,41 @@ final class ConsoleTextViewModel: ObservableObject {
                 self?.apply(diff)
             }
         }.store(in: &cancellables)
+
+        self.refresh()
     }
 
     func apply(_ diff: CollectionDifference<NSManagedObjectID>) {
-        print("------------")
         let renderer = TextRenderer(options: options)
         text.performUpdates {
             for change in diff {
                 switch change {
-                case let .insert(offset, element, associatedOffset):
-                    let reversedIndex = items.endIndex - offset
-                    let entity = entities.value[offset]
-                    let viewModel = ConsoleTextEntityViewModel(entity: entity)
+                case let .insert(offset, _, _):
+                    let reversedIndex = self.items.endIndex - offset
+                    let entity = self.entities.value[offset]
+                    var viewModel = ConsoleTextItemViewModel()
 #warning("optimize")
-                    let string = NSMutableAttributedString(attributedString: render(entity, at: reversedIndex, using: renderer))
+                    let string = NSMutableAttributedString(attributedString: self.render(entity, at: reversedIndex, using: renderer))
                     string.append(renderer.spacer())
 
-#warning("instead of append, it should be insert")
                     let insertionStringIndex = reversedIndex > 0 ? items[reversedIndex - 1].range.upperBound : 0
                     viewModel.range = NSRange(location: insertionStringIndex, length: string.length)
 
-                    print("inser-index: \(insertionStringIndex)")
                     $0.insert(string, at: insertionStringIndex)
-
-                    print("insert-range: \(viewModel.range)")
-                    viewModel.raw = string
                     self.items.insert(viewModel, at: reversedIndex)
 
-                    for item in items[(reversedIndex+1)...] {
-                        item.range.location += viewModel.range.length
+                    for index in (reversedIndex + 1)..<items.endIndex {
+                        items[index].range.location += viewModel.range.length
                     }
-
-                    print("insert at: \(offset) \(element)")
-                    break
-                case let .remove(offset, element, associatedOffset):
+                case let .remove(offset, _, _):
                     let reversedIndex = items.endIndex - offset - 1
                     let viewModel = items[reversedIndex]
-                    items.remove(at: reversedIndex)
+                    self.items.remove(at: reversedIndex)
                     $0.deleteCharacters(in: viewModel.range)
 
-                    print("delete-range: \(viewModel.range)")
-                    for item in items[reversedIndex...] {
-                        item.range.location -= viewModel.range.length
+                    for index in reversedIndex..<items.endIndex {
+                        items[index].range.location -= viewModel.range.length
                     }
-
-                    if associatedOffset != nil {
-                        print("(skip) refresh at \(offset) \(element)-\(associatedOffset)")
-                    } else {
-                        print("remove at: \(offset) \(element)")
-                    }
-                    break // There are no removals and they are not supported
                 }
             }
         }
@@ -261,14 +237,12 @@ final class ConsoleTextViewModel: ObservableObject {
         let entities = isOrderedAscending ? entities.value : entities.value.reversed()
         let renderer = TextRenderer(options: options)
         let output = NSMutableAttributedString()
-        var items: [ConsoleTextEntityViewModel] = []
+        var items: [ConsoleTextItemViewModel] = []
         for index in entities.indices {
             let entity = entities[index]
-            let viewModel = ConsoleTextEntityViewModel(entity: entity)
+            var viewModel = ConsoleTextItemViewModel()
             let string = render(entity, at: index, using: renderer)
             viewModel.range = NSRange(location: output.length, length: string.length + 1) // +1 for spacer
-            viewModel.raw = string
-            print("append-range: \(viewModel.range)")
             output.append(string)
 #warning("should spacer be part of the main entity?")
             output.append(renderer.spacer())

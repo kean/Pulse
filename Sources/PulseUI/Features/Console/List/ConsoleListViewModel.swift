@@ -195,6 +195,7 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
         taskCountObserver.setPredicate(makePredicate(for: .tasks))
 
         reloadMessages()
+        events.send(.reload)
     }
 
     private func makePredicate(for mode: ConsoleMode) -> NSPredicate? {
@@ -257,13 +258,11 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
             }
         } else {
             entities = self.controller?.fetchedObjects ?? []
-            events.send(.reload)
         }
     }
 
     private func reloadMessages(isMandatory: Bool = true) {
         entities = controller?.fetchedObjects ?? []
-        events.send(.reload)
         sections = controller?.sectionNameKeyPath == nil ?  nil : controller?.sections
         if isMandatory || scrollPosition == .nearTop {
             refreshVisibleEntities()
