@@ -2,6 +2,8 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
+#if os(iOS) || os(macOS)
+
 import Foundation
 import Pulse
 import CoreData
@@ -106,3 +108,5 @@ struct ConsoleCustomMessageFilter: Hashable, Identifiable {
         }
     }
 }
+
+#endif

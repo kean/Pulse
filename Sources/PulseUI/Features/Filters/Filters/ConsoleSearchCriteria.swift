@@ -20,14 +20,18 @@ struct ConsoleSearchCriteria: Hashable {
     struct Messages: Hashable {
         var logLevels = LogLevels()
         var labels = Labels()
+#if os(iOS) || os(macOS)
         var custom = CustomMessageFilters()
+#endif
     }
 
     struct Network: Hashable {
         var response = Response()
         var host = Host()
         var networking = Networking()
+#if os(iOS) || os(macOS)
         var custom = CustomNetworkFilters()
+#endif
     }
 }
 
@@ -71,10 +75,12 @@ extension ConsoleSearchCriteria {
         var focused: String?
     }
 
+#if os(iOS) || os(macOS)
     struct CustomMessageFilters: ConsoleFilterProtocol {
         var isEnabled = true
         var filters: [ConsoleCustomMessageFilter] = [.default]
     }
+#endif
 
     struct Response: ConsoleFilterProtocol {
         var isEnabled = true
@@ -218,8 +224,10 @@ extension ConsoleSearchCriteria {
         }
     }
 
+#if os(iOS) || os(macOS)
     struct CustomNetworkFilters: ConsoleFilterProtocol {
         var isEnabled = true
         var filters: [ConsoleCustomNetworkFilter] = [.default]
     }
+#endif
 }

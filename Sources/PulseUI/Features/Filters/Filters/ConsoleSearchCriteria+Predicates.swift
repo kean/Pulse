@@ -74,7 +74,7 @@ private func makePredicates(for criteria: ConsoleSearchCriteria.Messages) -> [NS
         }
     }
 
-
+#if os(iOS) || os(macOS)
     if criteria.custom.isEnabled {
         for filter in criteria.custom.filters where !filter.value.isEmpty {
             if let predicate = filter.makePredicate() {
@@ -84,6 +84,7 @@ private func makePredicates(for criteria: ConsoleSearchCriteria.Messages) -> [NS
             }
         }
     }
+#endif
 
     return predicates
 }
@@ -137,6 +138,7 @@ private func makePredicates(for criteria: ConsoleSearchCriteria.Network) -> [NSP
         predicates.append(NSPredicate(format: "NOT host IN %@", criteria.host.ignoredHosts))
     }
 
+#if os(iOS) || os(macOS)
     if criteria.custom.isEnabled {
         for filter in criteria.custom.filters where !filter.value.isEmpty {
             if let predicate = filter.makePredicate() {
@@ -146,6 +148,7 @@ private func makePredicates(for criteria: ConsoleSearchCriteria.Network) -> [NSP
             }
         }
     }
+#endif
 
     return predicates
 }
