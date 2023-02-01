@@ -123,10 +123,8 @@ private struct ConsoleTextViewSettingsView: View {
     }
 }
 
-#warning("when expand, perform a diff insert-remove to make sure ranges are updated")
-
 struct ConsoleTextItemViewModel {
-    var range: NSRange = NSRange(location: NSNotFound, length: 0)
+    var range = NSRange(location: NSNotFound, length: 0)
 }
 
 final class ConsoleTextViewModel: ObservableObject {
@@ -205,6 +203,7 @@ final class ConsoleTextViewModel: ObservableObject {
         }
     }
 
+#warning("remove reversedIndex")
     private func removeEntity(at offset: Int, storage: NSTextStorage) {
         let reversedIndex = items.endIndex - offset - 1
         let viewModel = items[reversedIndex]
@@ -292,6 +291,7 @@ final class ConsoleTextViewModel: ObservableObject {
         func setEnabled(_ isEnabled: Bool, _ value: NetworkContent) {
             if isEnabled { content.insert(value) } else { content.remove(value) }
         }
+        content.insert(.header)
         content.insert(.errorDetails)
         setEnabled(settings.showsRequestHeaders, .currentRequestHeaders)
         setEnabled(settings.showsRequestBody, .requestBody)
@@ -312,35 +312,25 @@ final class ConsoleTextViewModel: ObservableObject {
     }
 
     private func expand(_ objectID: NSManagedObjectID) {
-        // TODO: both searches are O(N) which isn't great
-        guard let task = findTask(withObjectID: objectID) else {
+        // TODO: search is is O(N) which isn't great
+        guard let index = findTaskIndex(withObjectID: objectID) else {
             return
         }
         expanded.insert(objectID)
-
-        var foundRange: NSRange?
-        text.textStorage.enumerateAttribute(.objectId, in: NSRange(location: 0, length: text.textStorage.length)) { value, range, stop in
-            if value as? NSManagedObjectID == objectID {
-                foundRange = range
-                stop.pointee = true
-            }
+        guard let diff = CollectionDifference([
+            .remove(offset: index, element: objectID, associatedWith: nil),
+            .insert(offset: index, element: objectID, associatedWith: nil)
+        ]) else {
+            return
         }
-        if let range = foundRange {
-            let details = TextRenderer(options: options).make {
-                $0.addSpacer()
-                $0.render(task, content: content)
-            }
-            text.performUpdates { storage in
-                storage.replaceCharacters(in: range, with: details)
-            }
-        }
+        apply(diff)
     }
 
-    private func findTask(withObjectID objectID: NSManagedObjectID) -> NetworkTaskEntity? {
+    private func findTaskIndex(withObjectID objectID: NSManagedObjectID) -> Int? {
         if let messages = entities.value as? [LoggerMessageEntity] {
-            return messages.first { $0.task?.objectID == objectID }?.task
+            return messages.firstIndex { $0.task?.objectID == objectID }
         } else if let tasks = entities.value as? [NetworkTaskEntity] {
-            return tasks.first { $0.objectID == objectID }
+            return tasks.firstIndex { $0.objectID == objectID }
         } else {
             fatalError("Unsupported entities: \(entities)")
         }
