@@ -2,12 +2,12 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
+#if os(iOS)
+
 import SwiftUI
 import CoreData
 import Pulse
 import Combine
-
-#if os(iOS)
 
 struct ConsoleContextMenu: View {
     let viewModel: ConsoleViewModel

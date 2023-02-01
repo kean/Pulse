@@ -2,12 +2,12 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
+#if os(iOS)
+
 import SwiftUI
 import Pulse
 import CoreData
 import Combine
-
-#if os(iOS)
 
 @available(iOS 15, *)
 struct ConsoleSearchToolbar: View {
