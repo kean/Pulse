@@ -198,6 +198,18 @@ final class RichTextViewModel: ObservableObject {
             .foregroundColor: UXColor.white
         ], range: range)
     }
+
+    func scrollToBottom() {
+        guard let textView = self.textView, textView.textStorage.length > 0 else { return }
+#if os(iOS)
+        textView.layoutManager.allowsNonContiguousLayout = false // Remove this workaround
+        UIView.performWithoutAnimation {
+            textView.scrollRangeToVisible(NSRange(location: textView.textStorage.length, length: 0))
+        }
+#else
+        textView.scrollRangeToVisible(NSRange(location: textView.textStorage.length, length: 0))
+#endif
+    }
 }
 
 private func search(searchTerm: String, in string: NSString, options: StringSearchOptions) -> [NSRange] {

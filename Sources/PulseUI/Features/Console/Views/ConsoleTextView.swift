@@ -70,10 +70,9 @@ struct ConsoleTextView: View {
                 Label("Settings", systemImage: "gearshape")
             }
         }
-        //            // Unfortunately, this isn't working properly in UITextView (use WebView!)
-        //            Button(action: viewModel.text.scrollToBottom) {
-        //                Label("Scroll to Bottom", systemImage: "arrow.down")
-        //            }
+        Button(action: viewModel.text.scrollToBottom) {
+            Label("Scroll to Bottom", systemImage: "arrow.down")
+        }
     }
 
     private var settingsView: some View {

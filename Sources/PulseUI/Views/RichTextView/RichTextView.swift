@@ -105,8 +105,6 @@ struct _RichTextView: View {
                 }
         }
 
-
-
         private var searchControl: some View {
             HStack(alignment: .center, spacing: 24) {
                 ZStack {
