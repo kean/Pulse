@@ -61,7 +61,7 @@ struct _RichTextView: View {
             .sheet(item: $shareItems, content: ShareView.init)
             .sheet(isPresented: $isWebViewOpen) {
                 NavigationView {
-                    WebView(data: viewModel.text.string.data(using: .utf8) ?? Data(), contentType: "application/html")
+                    WebView(data: viewModel.textStorage.string.data(using: .utf8) ?? Data(), contentType: "application/html")
                         .inlineNavigationTitle("Browser Preview")
                         .navigationBarItems(trailing: Button(action: {
                             isWebViewOpen = false
@@ -216,7 +216,7 @@ struct WrappedTextView: UIViewRepresentable {
         let textView = UITextView()
         configureTextView(textView)
         textView.delegate = context.coordinator
-        textView.attributedText = viewModel.text
+        textView.attributedText = viewModel.originalText
         context.coordinator.cancellables = bind(viewModel, textView)
         viewModel.textView = textView
         return textView
@@ -281,7 +281,7 @@ private struct WrappedTextView: NSViewRepresentable {
         let textView = (nsView.documentView as! NSTextView)
         if viewModel.textView == nil {
             context.coordinator.cancellables = bind(viewModel, textView)
-            textView.attributedText = viewModel.text
+            textView.attributedText = viewModel.originalText
             viewModel.textView = textView
         }
     }

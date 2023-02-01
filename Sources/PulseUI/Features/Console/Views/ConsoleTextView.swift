@@ -9,6 +9,7 @@ import CoreData
 import Pulse
 import Combine
 
+#warning("refactor")
 struct ConsoleTextView: View {
     @StateObject private var viewModel = ConsoleTextViewModel()
     @State private var shareItems: ShareItems?

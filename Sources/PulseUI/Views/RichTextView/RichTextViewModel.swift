@@ -9,23 +9,24 @@ import Combine
 
 #if os(iOS) || os(macOS)
 
+#warning("refactor")
 final class RichTextViewModel: ObservableObject {
     // Search
     @Published var searchOptions: StringSearchOptions = .default
     @Published private(set) var selectedMatchIndex: Int = 0
-    @Published private(set) var matches: [NSRange] = []
+    @Published private(set) var matches: [SearchMatch] = []
     @Published var isSearching = false
     @Published var searchTerm: String = ""
 
-    // Configureion
+    // Configuration
     @Published var isLinkDetectionEnabled = true
 
     var error: NetworkLogger.DecodingError?
     var onLinkTapped: ((URL) -> Bool)?
     let contentType: NetworkLogger.ContentType?
 
-    private(set) var text: NSAttributedString
-    var isEmpty: Bool { text.length == 0 }
+    let originalText: NSAttributedString
+    var isEmpty: Bool { textStorage.length == 0 }
 
     weak var textView: UXTextView? // Not proper MVVM
     var textStorage: NSTextStorage { textView?.textStorage ?? NSTextStorage(string: "") }
@@ -36,6 +37,11 @@ final class RichTextViewModel: ObservableObject {
     private let settings = ConsoleSettings.shared
     private var bag = [AnyCancellable]()
 
+    struct SearchMatch {
+        let range: NSRange
+        let originalForegroundColor: UXColor
+    }
+
     convenience init(string: String = "") {
         self.init(string: TextRenderer().render(string, role: .body2))
     }
@@ -45,7 +51,7 @@ final class RichTextViewModel: ObservableObject {
     }
 
     init(string: NSAttributedString, contentType: NetworkLogger.ContentType?) {
-        self.text = string
+        self.originalText = string
         self.contentType = contentType
 
         Publishers.CombineLatest($searchTerm, $searchOptions)
@@ -77,11 +83,8 @@ final class RichTextViewModel: ObservableObject {
     }
 
     func display(_ text: NSAttributedString) {
-        self.text = text
-        self.matches.removeAll()
-
-        let textStorage: NSTextStorage? = textView?.textStorage
-        textStorage?.setAttributedString(text)
+        matches.removeAll()
+        textStorage.setAttributedString(text)
         searchTerm = ""
     }
 
@@ -111,16 +114,21 @@ final class RichTextViewModel: ObservableObject {
         }
     }
 
-    private func didUpdateMatches(_ newMatches: [NSRange]) {
-        let newMatches = newMatches.filter {
-            textStorage.attributes(at: $0.location, effectiveRange: nil)[.isTechnical] == nil
-        }
+#warning("this still isn't great")
 
+    private func didUpdateMatches(_ newMatches: [NSRange]) {
         performUpdates { _ in
             clearMatches()
-            matches = newMatches
+
+            matches = newMatches.filter {
+                textStorage.attributes(at: $0.location, effectiveRange: nil)[.isTechnical] == nil
+            }.map {
+                let color = textStorage.attribute(.foregroundColor, at: $0.location, effectiveRange: nil) as? UXColor
+                return SearchMatch(range: $0, originalForegroundColor: color ?? .label)
+            }
+
             for match in matches {
-                highlight(range: match)
+                highlight(range: match.range)
             }
         }
 
@@ -158,7 +166,7 @@ final class RichTextViewModel: ObservableObject {
 
         // Scroll to visible range
         // Make sure it's somewhere in the middle (find newlines)
-        var range = matches[selectedMatchIndex]
+        var range = matches[selectedMatchIndex].range
         var index = range.upperBound
         var newlines = 0
         let string = textStorage.string as NSString
@@ -177,17 +185,15 @@ final class RichTextViewModel: ObservableObject {
         }
         // Update highlights
         if let previousMatch = previousMatch {
-            highlight(range: matches[previousMatch])
+            highlight(range: matches[previousMatch].range)
         }
-        highlight(range: matches[selectedMatchIndex], isFocused: true)
+        highlight(range: matches[selectedMatchIndex].range, isFocused: true)
     }
 
     private func clearMatches() {
-        for range in matches {
-            textStorage.removeAttribute(.foregroundColor, range: range)
-            if let originalForegroundColor = text.attribute(.foregroundColor, at: range.lowerBound, effectiveRange: nil) {
-                textStorage.addAttribute(.foregroundColor, value: originalForegroundColor, range: range)
-            }
+        for match in matches {
+            let range = match.range
+            textStorage.addAttribute(.foregroundColor, value: match.originalForegroundColor, range: range)
             textStorage.removeAttribute(.backgroundColor, range: range)
         }
     }
