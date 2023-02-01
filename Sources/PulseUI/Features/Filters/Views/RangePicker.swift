@@ -2,6 +2,7 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
+#if os(iOS) || os(macOS)
 import SwiftUI
 import Pulse
 
@@ -31,6 +32,7 @@ struct RangePicker: View {
 #endif
     }
 }
+#endif
 
 // Can't use `Swift.Range` because values are immutable.
 struct ValuesRange<T> {
