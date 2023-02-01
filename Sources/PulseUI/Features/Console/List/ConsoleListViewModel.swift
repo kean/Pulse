@@ -15,7 +15,9 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
     @Published private(set) var sections: [NSFetchedResultsSectionInfo]?
     @Published var options = ConsoleListOptions()
 
+#warning("remove")
     let entitiesSubject = CurrentValueSubject<[NSManagedObject], Never>([])
+    let events = PassthroughSubject<ConsoleUpdateEvent, Never>()
 
     var isViewVisible = false {
         didSet {
@@ -244,6 +246,7 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
             }
         } else {
             didRefreshContent()
+            events.send(.diff(diff))
         }
     }
 
@@ -254,11 +257,13 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
             }
         } else {
             entities = self.controller?.fetchedObjects ?? []
+            events.send(.reload)
         }
     }
 
     private func reloadMessages(isMandatory: Bool = true) {
         entities = controller?.fetchedObjects ?? []
+        events.send(.reload)
         sections = controller?.sectionNameKeyPath == nil ?  nil : controller?.sections
         if isMandatory || scrollPosition == .nearTop {
             refreshVisibleEntities()
@@ -390,6 +395,13 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
 }
 
 private let fetchBatchSize = 100
+
+enum ConsoleUpdateEvent {
+    /// Full reload.
+    case reload
+    /// An incremental update.
+    case diff(CollectionDifference<NSManagedObjectID>)
+}
 
 enum ConsoleMode: String {
     case all

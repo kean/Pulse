@@ -49,7 +49,7 @@ extension ConsoleRouterView {
 
     private var destinationTextView: some View {
         NavigationView {
-            ConsoleTextView(entities: viewModel.list.entitiesSubject) {
+            ConsoleTextView(entities: viewModel.list.entitiesSubject, events: viewModel.list.events) {
                 viewModel.router.isShowingAsText = false
             }
         }

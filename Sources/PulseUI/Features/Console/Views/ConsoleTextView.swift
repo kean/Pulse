@@ -15,7 +15,8 @@ struct ConsoleTextView: View {
     @State private var isShowingSettings = false
     @ObservedObject private var settings: ConsoleTextViewSettings = .shared
 
-    var entities: CurrentValueSubject<[NSManagedObject], Never>
+    let entities: CurrentValueSubject<[NSManagedObject], Never>
+    let events: PassthroughSubject<ConsoleUpdateEvent, Never>
     var options: TextRenderer.Options?
     var onClose: (() -> Void)?
 
@@ -28,7 +29,7 @@ struct ConsoleTextView: View {
                 if let options = options {
                     viewModel.options = options
                 }
-                viewModel.bind(entities)
+                viewModel.bind(entities: entities, events: events)
             }
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -125,6 +126,20 @@ private struct ConsoleTextViewSettingsView: View {
     }
 }
 
+#warning("in show-details display size in brackets")
+#warning("when expand, perform a diff insert-remove to make sure ranges are updated")
+
+final class ConsoleTextEntityViewModel: ObservableObject {
+    let entity: NSManagedObject
+    var range: NSRange = NSRange(location: NSNotFound, length: 0)
+    var raw: NSAttributedString?
+    var isExpanded = false
+
+    init(entity: NSManagedObject) {
+        self.entity = entity
+    }
+}
+
 final class ConsoleTextViewModel: ObservableObject {
     var text = RichTextViewModel()
     var options: TextRenderer.Options = .init()
@@ -141,6 +156,13 @@ final class ConsoleTextViewModel: ObservableObject {
     private var objectIDs: [UUID: NSManagedObjectID] = [:]
     private var cancellables: [AnyCancellable] = []
 
+    #warning("todo")
+    // - render in background with batches
+    // - subscribe to changes and automatically replace for pending tasks
+    // - how to handle pending tasks reload?
+    // - use a simple monospaced font for all messages?
+    private var items: [ConsoleTextEntityViewModel] = []
+
     init() {
         self.text.onLinkTapped = { [unowned self] in onLinkTapped($0) }
         self.reloadOptions()
@@ -155,12 +177,72 @@ final class ConsoleTextViewModel: ObservableObject {
         }.store(in: &cancellables)
     }
 
-    func bind(_ entities: CurrentValueSubject<[NSManagedObject], Never>) {
+#warning("fix crash during search")
+
+    func bind(entities: CurrentValueSubject<[NSManagedObject], Never>, events: PassthroughSubject<ConsoleUpdateEvent, Never>) {
         self.entities = entities
-        entities.dropFirst().sink { [weak self] _ in
-            self?.showRefreshButtonIfNeeded()
+
+        events.sink { [weak self] in
+            switch $0 {
+            case .reload:
+                self?.refresh()
+            case .diff(let diff):
+                self?.apply(diff)
+            }
         }.store(in: &cancellables)
-        self.refresh()
+    }
+
+    func apply(_ diff: CollectionDifference<NSManagedObjectID>) {
+        print("------------")
+        let renderer = TextRenderer(options: options)
+        text.performUpdates {
+            for change in diff {
+                switch change {
+                case let .insert(offset, element, associatedOffset):
+                    let reversedIndex = items.endIndex - offset
+                    let entity = entities.value[offset]
+                    let viewModel = ConsoleTextEntityViewModel(entity: entity)
+#warning("optimize")
+                    let string = NSMutableAttributedString(attributedString: render(entity, at: reversedIndex, using: renderer))
+                    string.append(renderer.spacer())
+
+#warning("instead of append, it should be insert")
+                    let insertionStringIndex = reversedIndex > 0 ? items[reversedIndex - 1].range.upperBound : 0
+                    viewModel.range = NSRange(location: insertionStringIndex, length: string.length)
+
+                    print("inser-index: \(insertionStringIndex)")
+                    $0.insert(string, at: insertionStringIndex)
+
+                    print("insert-range: \(viewModel.range)")
+                    viewModel.raw = string
+                    self.items.insert(viewModel, at: reversedIndex)
+
+                    for item in items[(reversedIndex+1)...] {
+                        item.range.location += viewModel.range.length
+                    }
+
+                    print("insert at: \(offset) \(element)")
+                    break
+                case let .remove(offset, element, associatedOffset):
+                    let reversedIndex = items.endIndex - offset - 1
+                    let viewModel = items[reversedIndex]
+                    items.remove(at: reversedIndex)
+                    $0.deleteCharacters(in: viewModel.range)
+
+                    print("delete-range: \(viewModel.range)")
+                    for item in items[reversedIndex...] {
+                        item.range.location -= viewModel.range.length
+                    }
+
+                    if associatedOffset != nil {
+                        print("(skip) refresh at \(offset) \(element)-\(associatedOffset)")
+                    } else {
+                        print("remove at: \(offset) \(element)")
+                    }
+                    break // There are no removals and they are not supported
+                }
+            }
+        }
     }
 
     func reloadOptions() {
@@ -174,41 +256,56 @@ final class ConsoleTextViewModel: ObservableObject {
         self.hideRefreshButton()
     }
 
+#warning("when refershing, take advantage of ConsoleTextEntityViewModel cache (use a dictionary?)")
     private func refreshText() {
         let entities = isOrderedAscending ? entities.value : entities.value.reversed()
         let renderer = TextRenderer(options: options)
+        let output = NSMutableAttributedString()
+        var items: [ConsoleTextEntityViewModel] = []
         for index in entities.indices {
             let entity = entities[index]
-            if let task = entity as? NetworkTaskEntity {
-                render(task, at: index, using: renderer)
-            } else if let message = entity as? LoggerMessageEntity {
-                if let task = message.task {
-                    render(task, at: index, using: renderer)
-                } else {
-                    render(message, at: index, using: renderer)
-                }
-            } else {
-                fatalError("Unsuppported entity: \(entity)")
-            }
-            if index < entities.endIndex - 1 {
-                renderer.addSpacer()
-            }
+            let viewModel = ConsoleTextEntityViewModel(entity: entity)
+            let string = render(entity, at: index, using: renderer)
+            viewModel.range = NSRange(location: output.length, length: string.length + 1) // +1 for spacer
+            viewModel.raw = string
+            print("append-range: \(viewModel.range)")
+            output.append(string)
+#warning("should spacer be part of the main entity?")
+            output.append(renderer.spacer())
+            items.append(viewModel)
         }
-        self.text.display(renderer.make())
+        self.items = items
+        self.text.display(output)
     }
 
-    private func render(_ message: LoggerMessageEntity, at index: Int, using renderer: TextRenderer) {
+    private func render(_ entity: NSManagedObject, at index: Int, using renderer: TextRenderer) -> NSAttributedString {
+        if let task = entity as? NetworkTaskEntity {
+            return render(task, at: index, using: renderer)
+        } else if let message = entity as? LoggerMessageEntity {
+            if let task = message.task {
+                return render(task, at: index, using: renderer)
+            } else {
+                return render(message, at: index, using: renderer)
+            }
+        } else {
+            fatalError("Unsuppported entity: \(entity)")
+        }
+    }
+
+    private func render(_ message: LoggerMessageEntity, at index: Int, using renderer: TextRenderer) -> NSAttributedString {
         if let task = message.task {
-            render(task, at: index, using: renderer)
+            return render(task, at: index, using: renderer)
         } else {
             renderer.render(message)
+            return renderer.make()
         }
     }
 
-    private func render(_ task: NetworkTaskEntity, at index: Int, using renderer: TextRenderer) {
+    private func render(_ task: NetworkTaskEntity, at index: Int, using renderer: TextRenderer) -> NSAttributedString {
         let isExpanded = isExpanded || expanded.contains(task.objectID)
         guard !isExpanded else {
-            return renderer.render(task, content: content) // Render everything
+            renderer.render(task, content: content) // Render everything
+            return renderer.make()
         }
 
         renderer.render(task, content: [.header])
@@ -223,6 +320,7 @@ final class ConsoleTextViewModel: ObservableObject {
         attributes[.isTechnical] = true
         attributes[.underlineColor] = UXColor.clear
         renderer.append(NSAttributedString(string: "Show Details\n", attributes: attributes))
+        return renderer.make()
     }
 
     private func makeNetworkContent() -> NetworkContent {
@@ -328,7 +426,7 @@ private extension ConsoleTextView {
     init(entities: [NSManagedObject], _ configure: (inout TextRenderer.Options) -> Void) {
         var options = TextRenderer.Options(color: .automatic)
         configure(&options)
-        self.init(entities: .init(entities.reversed()), options: options, onClose: {})
+        self.init(entities: .init(entities.reversed()), events: .init(), options: options, onClose: {})
     }
 }
 

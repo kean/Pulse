@@ -32,7 +32,7 @@ final class TextRenderer {
 
     /// LoggerBlobHandleEntity.objectID: string
     var renderedBodies: [NSManagedObjectID: NSAttributedString] = [:]
-    private let string = NSMutableAttributedString()
+    private var string = NSMutableAttributedString()
 
     init(options: Options = .init()) {
         self.options = options
@@ -45,14 +45,15 @@ final class TextRenderer {
     }
 
     func make() -> NSMutableAttributedString {
-        string
+        defer { string = NSMutableAttributedString() }
+        return string
     }
 
     func addSpacer() {
         string.append(spacer())
     }
 
-    private func spacer() -> NSAttributedString {
+    func spacer() -> NSAttributedString {
         NSAttributedString(string: "\n", attributes: helper.spacerAttributes)
     }
 
