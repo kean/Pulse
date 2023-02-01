@@ -33,25 +33,23 @@ struct ConsoleTextView: View {
                 viewModel.bind(entities: entities, events: events)
             }
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    if let onClose = onClose {
+                if let onClose = onClose {
+                    ToolbarItem(placement: .navigationBarLeading) {
                         Button(action: onClose) {
                             Text("Cancel")
                         }
                     }
                 }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    HStack {
-                        Menu(content: {
-                            AttributedStringShareMenu(shareItems: $shareItems) {
-                                viewModel.text.textStorage
-                            }
-                        }, label: {
-                            Label("Share...", systemImage: "square.and.arrow.up")
-                        })
-                        Menu(content: { menu }) {
-                            Image(systemName: "ellipsis.circle")
+                ToolbarItemGroup(placement: .navigationBarTrailing) {
+                    Menu(content: {
+                        AttributedStringShareMenu(shareItems: $shareItems) {
+                            viewModel.text.textStorage
                         }
+                    }, label: {
+                        Label("Share...", systemImage: "square.and.arrow.up")
+                    })
+                    Menu(content: { menu }) {
+                        Image(systemName: "ellipsis.circle")
                     }
                 }
             }
