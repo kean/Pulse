@@ -61,9 +61,6 @@ struct ConsoleTextView: View {
     @ViewBuilder
     private var menu: some View {
         Section {
-            Button(action: { viewModel.isOrderedAscending.toggle() }) {
-                Label("Order by Date", systemImage: viewModel.isOrderedAscending ? "arrow.up" : "arrow.down")
-            }
             Button(action: { viewModel.isExpanded.toggle() }) {
                 Label(viewModel.isExpanded ? "Collapse Details" : "Expand Details", systemImage: viewModel.isExpanded ? "arrow.down.right.and.arrow.up.left" : "arrow.up.left.and.arrow.down.right")
             }
@@ -137,7 +134,6 @@ final class ConsoleTextViewModel: ObservableObject {
     var text = RichTextViewModel()
     var options: TextRenderer.Options = .init()
 
-    @Published var isOrderedAscending = false
     @Published var isExpanded = false
     @Published private(set) var isButtonRefreshHidden = true
 
@@ -157,10 +153,6 @@ final class ConsoleTextViewModel: ObservableObject {
     init() {
         self.text.onLinkTapped = { [unowned self] in onLinkTapped($0) }
         self.reloadOptions()
-
-        $isOrderedAscending.dropFirst().receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.refreshText()
-        }.store(in: &cancellables)
 
         $isExpanded.dropFirst().receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.expanded.removeAll()
@@ -233,7 +225,7 @@ final class ConsoleTextViewModel: ObservableObject {
 
 #warning("when refershing, take advantage of ConsoleTextEntityViewModel cache (use a dictionary?)")
     private func refreshText() {
-        let entities = isOrderedAscending ? entities.value : entities.value.reversed()
+        let entities = entities.value.reversed()
         let renderer = TextRenderer(options: options)
         let output = NSMutableAttributedString()
         var items: [ConsoleTextItemViewModel] = []
