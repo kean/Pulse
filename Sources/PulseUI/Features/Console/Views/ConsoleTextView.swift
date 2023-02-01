@@ -149,7 +149,7 @@ final class ConsoleTextViewModel: ObservableObject {
     private var objectIDs: [UUID: NSManagedObjectID] = [:]
     private var cancellables: [AnyCancellable] = []
 
-    #warning("todo")
+#warning("todo")
     // - render in background with batches
     // - use a simple monospaced font for all messages?
     private var items: [ConsoleTextItemViewModel] = []
@@ -194,9 +194,8 @@ final class ConsoleTextViewModel: ObservableObject {
                     let reversedIndex = self.items.endIndex - offset
                     let entity = self.entities.value[offset]
                     var viewModel = ConsoleTextItemViewModel()
-#warning("optimize")
-                    let string = NSMutableAttributedString(attributedString: self.render(entity, at: reversedIndex, using: renderer))
-                    string.append(renderer.spacer())
+
+                    let string = render(entity, using: renderer)
 
                     let insertionStringIndex = reversedIndex > 0 ? items[reversedIndex - 1].range.upperBound : 0
                     viewModel.range = NSRange(location: insertionStringIndex, length: string.length)
@@ -238,48 +237,45 @@ final class ConsoleTextViewModel: ObservableObject {
         let renderer = TextRenderer(options: options)
         let output = NSMutableAttributedString()
         var items: [ConsoleTextItemViewModel] = []
-        for index in entities.indices {
-            let entity = entities[index]
+        for entity in entities {
             var viewModel = ConsoleTextItemViewModel()
-            let string = render(entity, at: index, using: renderer)
-            viewModel.range = NSRange(location: output.length, length: string.length + 1) // +1 for spacer
+            let string = render(entity, using: renderer)
+            viewModel.range = NSRange(location: output.length, length: string.length)
             output.append(string)
-#warning("should spacer be part of the main entity?")
-            output.append(renderer.spacer())
             items.append(viewModel)
         }
         self.items = items
         self.text.display(output)
     }
 
-    private func render(_ entity: NSManagedObject, at index: Int, using renderer: TextRenderer) -> NSAttributedString {
+    private func render(_ entity: NSManagedObject, using renderer: TextRenderer) -> NSAttributedString {
         if let task = entity as? NetworkTaskEntity {
-            return render(task, at: index, using: renderer)
+            render(task, using: renderer)
         } else if let message = entity as? LoggerMessageEntity {
             if let task = message.task {
-                return render(task, at: index, using: renderer)
+                render(task, using: renderer)
             } else {
-                return render(message, at: index, using: renderer)
+                render(message, using: renderer)
             }
         } else {
             fatalError("Unsuppported entity: \(entity)")
         }
+        renderer.addSpacer()
+        return renderer.make()
     }
 
-    private func render(_ message: LoggerMessageEntity, at index: Int, using renderer: TextRenderer) -> NSAttributedString {
+    private func render(_ message: LoggerMessageEntity, using renderer: TextRenderer) {
         if let task = message.task {
-            return render(task, at: index, using: renderer)
+            render(task, using: renderer)
         } else {
             renderer.render(message)
-            return renderer.make()
         }
     }
 
-    private func render(_ task: NetworkTaskEntity, at index: Int, using renderer: TextRenderer) -> NSAttributedString {
+    private func render(_ task: NetworkTaskEntity, using renderer: TextRenderer) {
         let isExpanded = isExpanded || expanded.contains(task.objectID)
         guard !isExpanded else {
-            renderer.render(task, content: content) // Render everything
-            return renderer.make()
+            return renderer.render(task, content: content) // Render everything
         }
 
         renderer.render(task, content: [.header])
@@ -293,7 +289,6 @@ final class ConsoleTextViewModel: ObservableObject {
         attributes[.isTechnical] = true
         attributes[.underlineColor] = UXColor.clear
         renderer.append(NSAttributedString(string: "Show More\n", attributes: attributes))
-        return renderer.make()
     }
 
     private func makeNetworkContent() -> NetworkContent {
