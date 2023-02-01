@@ -10,6 +10,7 @@ import Pulse
 import Combine
 
 #warning("refactor")
+#warning("should view-as-text replace the main view insted?")
 struct ConsoleTextView: View {
     @StateObject private var viewModel = ConsoleTextViewModel()
     @State private var shareItems: ShareItems?
@@ -60,17 +61,20 @@ struct ConsoleTextView: View {
     @ViewBuilder
     private var menu: some View {
         Section {
+            Button(action: { viewModel.isPaused.toggle() }) {
+                Label(viewModel.isPaused ? "Resume" : "Pause", systemImage: viewModel.isPaused ? "play" : "pause")
+            }
             Button(action: { viewModel.isExpanded.toggle() }) {
                 Label(viewModel.isExpanded ? "Collapse Details" : "Expand Details", systemImage: viewModel.isExpanded ? "arrow.down.right.and.arrow.up.left" : "arrow.up.left.and.arrow.down.right")
+            }
+            Button(action: viewModel.text.scrollToBottom) {
+                Label("Scroll to Bottom", systemImage: "arrow.down")
             }
         }
         Section {
             Button(action: { isShowingSettings = true }) {
                 Label("Settings", systemImage: "gearshape")
             }
-        }
-        Button(action: viewModel.text.scrollToBottom) {
-            Label("Scroll to Bottom", systemImage: "arrow.down")
         }
     }
 
