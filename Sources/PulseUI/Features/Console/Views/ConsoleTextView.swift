@@ -64,9 +64,6 @@ struct ConsoleTextView: View {
             Button(action: { viewModel.isExpanded.toggle() }) {
                 Label(viewModel.isExpanded ? "Collapse Details" : "Expand Details", systemImage: viewModel.isExpanded ? "arrow.down.right.and.arrow.up.left" : "arrow.up.left.and.arrow.down.right")
             }
-            Button(action: viewModel.refresh) {
-                Label("Refresh", systemImage: "arrow.clockwise")
-            }.disabled(viewModel.isButtonRefreshHidden)
         }
         Section {
             Button(action: { isShowingSettings = true }) {
