@@ -33,8 +33,8 @@ struct ConsoleTextView: View {
                 viewModel.bind(entities: entities, events: events)
             }
             .toolbar {
-                if let onClose = onClose {
-                    ToolbarItem(placement: .navigationBarLeading) {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    if let onClose = onClose {
                         Button(action: onClose) {
                             Text("Cancel")
                         }

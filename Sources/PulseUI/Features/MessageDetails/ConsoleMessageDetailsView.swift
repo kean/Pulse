@@ -12,17 +12,19 @@ struct ConsoleMessageDetailsView: View {
     var body: some View {
         contents
             .navigationBarTitle("", displayMode: .inline)
-            .navigationBarItems(trailing: trailingNavigationBarItems)
+            .toolbar {
+                ToolbarItemGroup(placement: .navigationBarTrailing) {
+                    trailingNavigationBarItems
+                }
+            }
     }
 
     @ViewBuilder
     private var trailingNavigationBarItems: some View {
-        HStack {
-            NavigationLink(destination: ConsoleMessageMetadataView(message: message)) {
-                Image(systemName: "info.circle")
-            }
-            PinButton(viewModel: .init(message), isTextNeeded: false)
+        NavigationLink(destination: ConsoleMessageMetadataView(message: message)) {
+            Image(systemName: "info.circle")
         }
+        PinButton(viewModel: .init(message), isTextNeeded: false)
     }
 #elseif os(watchOS)
     var body: some View {
