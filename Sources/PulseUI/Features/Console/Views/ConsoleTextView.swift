@@ -283,17 +283,16 @@ final class ConsoleTextViewModel: ObservableObject {
         }
 
         renderer.render(task, content: [.header])
-        renderer.addSpacer()
 
         let uuid = UUID()
         objectIDs[uuid] = task.objectID
-        var attributes = renderer.helper.attributes(role: .body2, weight: .medium)
+        var attributes = renderer.helper.attributes(role: .body2, weight: .regular)
         attributes[.foregroundColor] = UXColor.systemBlue
         attributes[.link] = URL(string: "pulse://expand/\(uuid.uuidString)")
         attributes[.objectId] = task.objectID
         attributes[.isTechnical] = true
         attributes[.underlineColor] = UXColor.clear
-        renderer.append(NSAttributedString(string: "Show Details\n", attributes: attributes))
+        renderer.append(NSAttributedString(string: "Show More\n", attributes: attributes))
         return renderer.make()
     }
 
