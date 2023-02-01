@@ -37,7 +37,7 @@ struct ConsoleTextView: View {
                 ToolbarItem(placement: .navigationBarLeading) {
                     if let onClose = onClose {
                         Button(action: onClose) {
-                            Text("Cancel")
+                            Text("Close")
                         }
                     }
                 }
