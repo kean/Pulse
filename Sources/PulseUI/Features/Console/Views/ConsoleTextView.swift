@@ -322,7 +322,10 @@ final class ConsoleTextViewModel: ObservableObject {
             }
         }
         if let range = foundRange {
-            let details = TextRenderer(options: options).make { $0.render(task, content: content) }
+            let details = TextRenderer(options: options).make {
+                $0.addSpacer()
+                $0.render(task, content: content)
+            }
             text.performUpdates { storage in
                 storage.replaceCharacters(in: range, with: details)
             }
