@@ -89,6 +89,8 @@
 		0CAF1D7B297C2040002E2722 /* ConsoleListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CAF1D7A297C2040002E2722 /* ConsoleListViewModel.swift */; };
 		0CB17F1A2978ABBA004E33F4 /* ManagedObjectsCountObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB17F192978ABBA004E33F4 /* ManagedObjectsCountObserver.swift */; };
 		0CB3458F2989F80E009428B2 /* ConsoleTextViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB3458E2989F80E009428B2 /* ConsoleTextViewModel.swift */; };
+		0CB34591298AA6C6009428B2 /* RichTextViewSearchToobar-ios.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB34590298AA6C6009428B2 /* RichTextViewSearchToobar-ios.swift */; };
+		0CB34593298AA78E009428B2 /* WrappedTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB34592298AA78E009428B2 /* WrappedTextView.swift */; };
 		0CB63A132973A12300525165 /* ConsoleSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A122973A12300525165 /* ConsoleSearchView.swift */; };
 		0CB63A15297438A600525165 /* ConsoleSearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A14297438A600525165 /* ConsoleSearchViewModel.swift */; };
 		0CB63A1B2974A5D200525165 /* ConsoleSearchResultsSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A1A2974A5D200525165 /* ConsoleSearchResultsSectionView.swift */; };
@@ -173,13 +175,12 @@
 		0CF0D62A296F189600EED9D4 /* KeyValueSectionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D59C296F189500EED9D4 /* KeyValueSectionViewModel.swift */; };
 		0CF0D62B296F189600EED9D4 /* FileViewerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D59D296F189500EED9D4 /* FileViewerViewModel.swift */; };
 		0CF0D62C296F189600EED9D4 /* WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D59E296F189500EED9D4 /* WebView.swift */; };
-		0CF0D62D296F189600EED9D4 /* RichTextView-legacy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5A0296F189500EED9D4 /* RichTextView-legacy.swift */; };
+		0CF0D62D296F189600EED9D4 /* RichTextViewSearchToobar-macos.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5A0296F189500EED9D4 /* RichTextViewSearchToobar-macos.swift */; };
 		0CF0D62E296F189600EED9D4 /* RichTextView-watchos.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5A1296F189500EED9D4 /* RichTextView-watchos.swift */; };
 		0CF0D62F296F189600EED9D4 /* TextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5A2296F189500EED9D4 /* TextView.swift */; };
 		0CF0D630296F189600EED9D4 /* RichTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5A3296F189500EED9D4 /* RichTextView.swift */; };
 		0CF0D631296F189600EED9D4 /* RichTextViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5A4296F189500EED9D4 /* RichTextViewModel.swift */; };
 		0CF0D632296F189600EED9D4 /* StoreShareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5A5296F189500EED9D4 /* StoreShareView.swift */; };
-		0CF0D633296F189600EED9D4 /* SearchBar-ios.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5A6296F189500EED9D4 /* SearchBar-ios.swift */; };
 		0CF0D634296F189600EED9D4 /* TimingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5A7296F189500EED9D4 /* TimingView.swift */; };
 		0CF0D635296F189600EED9D4 /* InfoRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5A8296F189500EED9D4 /* InfoRow.swift */; };
 		0CF0D637296F189600EED9D4 /* Checkbox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5AA296F189500EED9D4 /* Checkbox.swift */; };
@@ -564,6 +565,8 @@
 		0CAF1D7A297C2040002E2722 /* ConsoleListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleListViewModel.swift; sourceTree = "<group>"; };
 		0CB17F192978ABBA004E33F4 /* ManagedObjectsCountObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagedObjectsCountObserver.swift; sourceTree = "<group>"; };
 		0CB3458E2989F80E009428B2 /* ConsoleTextViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ConsoleTextViewModel.swift; path = "../../../../../../../.Trash/PulseUI 7.04.49 PM/Features/Console/Views/ConsoleTextViewModel.swift"; sourceTree = "<group>"; };
+		0CB34590298AA6C6009428B2 /* RichTextViewSearchToobar-ios.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RichTextViewSearchToobar-ios.swift"; sourceTree = "<group>"; };
+		0CB34592298AA78E009428B2 /* WrappedTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WrappedTextView.swift; sourceTree = "<group>"; };
 		0CB63A122973A12300525165 /* ConsoleSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchView.swift; sourceTree = "<group>"; };
 		0CB63A14297438A600525165 /* ConsoleSearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchViewModel.swift; sourceTree = "<group>"; };
 		0CB63A1A2974A5D200525165 /* ConsoleSearchResultsSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchResultsSectionView.swift; sourceTree = "<group>"; };
@@ -648,13 +651,12 @@
 		0CF0D59C296F189500EED9D4 /* KeyValueSectionViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyValueSectionViewModel.swift; sourceTree = "<group>"; };
 		0CF0D59D296F189500EED9D4 /* FileViewerViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileViewerViewModel.swift; sourceTree = "<group>"; };
 		0CF0D59E296F189500EED9D4 /* WebView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebView.swift; sourceTree = "<group>"; };
-		0CF0D5A0296F189500EED9D4 /* RichTextView-legacy.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "RichTextView-legacy.swift"; sourceTree = "<group>"; };
+		0CF0D5A0296F189500EED9D4 /* RichTextViewSearchToobar-macos.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "RichTextViewSearchToobar-macos.swift"; sourceTree = "<group>"; };
 		0CF0D5A1296F189500EED9D4 /* RichTextView-watchos.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "RichTextView-watchos.swift"; sourceTree = "<group>"; };
 		0CF0D5A2296F189500EED9D4 /* TextView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextView.swift; sourceTree = "<group>"; };
 		0CF0D5A3296F189500EED9D4 /* RichTextView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RichTextView.swift; sourceTree = "<group>"; };
 		0CF0D5A4296F189500EED9D4 /* RichTextViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RichTextViewModel.swift; sourceTree = "<group>"; };
 		0CF0D5A5296F189500EED9D4 /* StoreShareView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StoreShareView.swift; sourceTree = "<group>"; };
-		0CF0D5A6296F189500EED9D4 /* SearchBar-ios.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SearchBar-ios.swift"; sourceTree = "<group>"; };
 		0CF0D5A7296F189500EED9D4 /* TimingView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimingView.swift; sourceTree = "<group>"; };
 		0CF0D5A8296F189500EED9D4 /* InfoRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InfoRow.swift; sourceTree = "<group>"; };
 		0CF0D5AA296F189500EED9D4 /* Checkbox.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Checkbox.swift; sourceTree = "<group>"; };
@@ -1270,7 +1272,6 @@
 				0CF0D59C296F189500EED9D4 /* KeyValueSectionViewModel.swift */,
 				0CF0D59E296F189500EED9D4 /* WebView.swift */,
 				0CF0D5A5296F189500EED9D4 /* StoreShareView.swift */,
-				0CF0D5A6296F189500EED9D4 /* SearchBar-ios.swift */,
 				0CF0D5A7296F189500EED9D4 /* TimingView.swift */,
 				0CF0D5A8296F189500EED9D4 /* InfoRow.swift */,
 				0CF0D5AA296F189500EED9D4 /* Checkbox.swift */,
@@ -1287,10 +1288,12 @@
 		0CF0D59F296F189500EED9D4 /* RichTextView */ = {
 			isa = PBXGroup;
 			children = (
-				0CF0D5A0296F189500EED9D4 /* RichTextView-legacy.swift */,
-				0CF0D5A1296F189500EED9D4 /* RichTextView-watchos.swift */,
 				0CF0D5A3296F189500EED9D4 /* RichTextView.swift */,
 				0CF0D5A4296F189500EED9D4 /* RichTextViewModel.swift */,
+				0CB34592298AA78E009428B2 /* WrappedTextView.swift */,
+				0CF0D5A0296F189500EED9D4 /* RichTextViewSearchToobar-macos.swift */,
+				0CB34590298AA6C6009428B2 /* RichTextViewSearchToobar-ios.swift */,
+				0CF0D5A1296F189500EED9D4 /* RichTextView-watchos.swift */,
 			);
 			path = RichTextView;
 			sourceTree = "<group>";
@@ -2085,11 +2088,13 @@
 				0CF0D635296F189600EED9D4 /* InfoRow.swift in Sources */,
 				0C63A3782979FE3A00F6A6A5 /* ConsoleSearchTerm.swift in Sources */,
 				0CF0D674296F189600EED9D4 /* NetworkInspectorView-shared.swift in Sources */,
+				0CB34593298AA78E009428B2 /* WrappedTextView.swift in Sources */,
 				0CAF1D7B297C2040002E2722 /* ConsoleListViewModel.swift in Sources */,
 				0CF0D611296F189600EED9D4 /* Deprecated.swift in Sources */,
 				0CE45E0C2977813400249C5D /* ConsoleToolbarView.swift in Sources */,
 				0CF0D61F296F189600EED9D4 /* Pulse+Extensions.swift in Sources */,
 				0CF0D61C296F189600EED9D4 /* UXKit.swift in Sources */,
+				0CB34591298AA6C6009428B2 /* RichTextViewSearchToobar-ios.swift in Sources */,
 				0CF0D669296F189600EED9D4 /* NetworkHeadersCell.swift in Sources */,
 				0CF0D67C296F189600EED9D4 /* ConsoleView-macos.swift in Sources */,
 				0CF0D612296F189600EED9D4 /* Regex.swift in Sources */,
@@ -2128,7 +2133,6 @@
 				0CF0D62B296F189600EED9D4 /* FileViewerViewModel.swift in Sources */,
 				0CF0D67F296F189600EED9D4 /* ConsoleContextMenu-ios.swift in Sources */,
 				0CF0D675296F189600EED9D4 /* NetworkInspectorView-ios.swift in Sources */,
-				0CF0D633296F189600EED9D4 /* SearchBar-ios.swift in Sources */,
 				0CF0D64A296F189600EED9D4 /* ConsoleSearchSection.swift in Sources */,
 				0CB63A132973A12300525165 /* ConsoleSearchView.swift in Sources */,
 				0CB63A2C2975C40100525165 /* ConsoleSearchFilter.swift in Sources */,
@@ -2197,7 +2201,7 @@
 				0CF0D628296F189600EED9D4 /* ShareView.swift in Sources */,
 				0CF0D653296F189600EED9D4 /* InsightsView.swift in Sources */,
 				0C40C094296F7641009ECF16 /* ConsoleSearchContentTypeCell.swift in Sources */,
-				0CF0D62D296F189600EED9D4 /* RichTextView-legacy.swift in Sources */,
+				0CF0D62D296F189600EED9D4 /* RichTextViewSearchToobar-macos.swift in Sources */,
 				0CF0D643296F189600EED9D4 /* ConsoleCustomNetworkFilterView.swift in Sources */,
 				0CF0D681296F189600EED9D4 /* ConsoleTaskCellViewModel.swift in Sources */,
 				0CF0D660296F189600EED9D4 /* DocumentBrowser.swift in Sources */,

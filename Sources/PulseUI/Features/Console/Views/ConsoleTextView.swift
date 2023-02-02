@@ -2,7 +2,7 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
-#if os(iOS)
+#if os(iOS) || os(macOS)
 
 import SwiftUI
 import CoreData
@@ -10,6 +10,8 @@ import Pulse
 import Combine
 
 #warning("refactor")
+#warning("extract the macos version - too different?")
+#warning("do we even need the iOS version?")
 #warning("should view-as-text replace the main view insted?")
 struct ConsoleTextView: View {
     @StateObject private var viewModel = ConsoleTextViewModel()
@@ -22,6 +24,7 @@ struct ConsoleTextView: View {
     var options: TextRenderer.Options?
     var onClose: (() -> Void)?
 
+#if os(iOS)
     var body: some View {
         RichTextView(viewModel: viewModel.text)
             .textViewBarItemsHidden(true)
@@ -57,7 +60,20 @@ struct ConsoleTextView: View {
             .sheet(item: $shareItems, content: ShareView.init)
             .sheet(isPresented: $isShowingSettings) { settingsView }
     }
+#else
+    var body: some View {
+        RichTextView(viewModel: viewModel.text)
+            .textViewBarItemsHidden(true)
+            .onAppear {
+                if let options = options {
+                    viewModel.options = options
+                }
+                viewModel.bind(entities: entities, events: events)
+            }
+    }
+#endif
 
+#if os(iOS)
     @ViewBuilder
     private var menu: some View {
         Section {
@@ -92,6 +108,7 @@ struct ConsoleTextView: View {
                 })
         }
     }
+#endif
 }
 
 private struct ConsoleTextViewSettingsView: View {
@@ -125,6 +142,12 @@ private struct ConsoleTextViewSettingsView: View {
 #if DEBUG
 struct ConsoleTextView_Previews: PreviewProvider {
     static var previews: some View {
+#if os(macOS)
+        ConsoleTextView(entities: entities) { _ in
+            return // Use default settings
+        }
+        .frame(width: 600, height: 1000)
+#else
         Group {
             NavigationView {
                 ConsoleTextView(entities: entities) { _ in
@@ -147,6 +170,7 @@ struct ConsoleTextView_Previews: PreviewProvider {
             }
             .previewDisplayName("Monochrome")
         }
+#endif
     }
 }
 
@@ -157,6 +181,9 @@ private let entities = try! LoggerStore.mock.allMessages().filter {
 private extension ConsoleTextView {
     init(entities: [NSManagedObject], _ configure: (inout TextRenderer.Options) -> Void) {
         var options = TextRenderer.Options(color: .automatic)
+#if os(macOS)
+        options.isCompact = true
+#endif
         configure(&options)
         self.init(entities: .init(entities.reversed()), events: .init(), options: options, onClose: {})
     }

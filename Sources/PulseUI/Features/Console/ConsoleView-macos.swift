@@ -47,7 +47,8 @@ public struct ConsoleView: View {
         Picker("Mode", selection: $displayMode) {
             Label("List", systemImage: "list.bullet").tag(ConsoleDisplayMode.list)
             Label("Table", systemImage: "tablecells").tag(ConsoleDisplayMode.table)
-        }.labelStyle(.iconOnly).fixedSize()
+            Label("Text", systemImage: "text.quote").tag(ConsoleDisplayMode.text)
+        }.pickerStyle(.segmented)
 
         Spacer()
 
@@ -94,6 +95,10 @@ public struct ConsoleView: View {
     }
 }
 
+#warning("fix show-more not working")
+#warning("add info icons on macos to open details in textmode")
+#warning("different search based on what mode your are using?")
+
 private struct ConsoleContentView: View {
     var viewModel: ConsoleViewModel
     @Binding var displayMode: ConsoleDisplayMode
@@ -133,6 +138,8 @@ private struct ConsoleContentView: View {
                 List(selection: $selection) {
                     ConsoleListContentView(viewModel: viewModel.list)
                 }
+            case .text:
+                ConsoleTextView(entities: viewModel.list.entitiesSubject, events: viewModel.list.events)
             }
         }
     }
@@ -221,6 +228,7 @@ struct ConsoleToolbarToggleOnlyErrorsButton: View {
 private enum ConsoleDisplayMode: String {
     case table
     case list
+    case text
 }
 
 #if DEBUG

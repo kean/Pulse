@@ -16,6 +16,7 @@ import PDFKit
 final class TextRenderer {
     struct Options {
         var color: ColorMode = .full
+        var isCompact = false
 
         static let sharing = Options(color: .automatic)
     }
@@ -58,19 +59,41 @@ final class TextRenderer {
     }
 
     func render(_ message: LoggerMessageEntity) {
-        string.append(ConsoleFormatter.subheadline(for: message) + "\n", helper.attributes(role: .subheadline, style: .monospacedDigital, width: .condensed, color: .secondaryLabel))
-        string.append(message.text + "\n", helper.attributes(role: .body2, color: textColor(for: message.logLevel)))
+        if options.isCompact {
+            var details = ConsoleFormatter.time(for: message.createdAt)
+            if let label = ConsoleFormatter.label(for: message) {
+                details += "\(ConsoleFormatter.separator)\(label)\(ConsoleFormatter.separator)"
+            }
+            string.append(details, helper.attributes(role: .body2, style: .monospacedDigital, width: .condensed, color: .secondaryLabel))
+            string.append(message.text + "\n", helper.attributes(role: .body2, color: textColor(for: message.logLevel)))
+        } else {
+            string.append(ConsoleFormatter.subheadline(for: message) + "\n", helper.attributes(role: .subheadline, style: .monospacedDigital, width: .condensed, color: .secondaryLabel))
+            string.append(message.text + "\n", helper.attributes(role: .body2, color: textColor(for: message.logLevel)))
+        }
     }
 
     private func textColor(for level: LoggerStore.Level) -> UXColor {
         if options.color == .monochrome {
             return level == .trace ? .secondaryLabel : .label
         } else {
-            return . textColor(for: level)
+            return .textColor(for: level)
         }
     }
 
     func render(_ task: NetworkTaskEntity, content: NetworkContent) {
+        guard !options.isCompact else {
+            let isTitleColored = task.state == .failure && options.color != .monochrome
+            let titleColor = isTitleColored ? UXColor.systemRed : UXColor.secondaryLabel
+            let detailsColor = isTitleColored ? UXColor.systemRed : UXColor.label
+            let time = ConsoleFormatter.time(for: task.createdAt)
+            let status = ConsoleFormatter.status(for: task)
+            string.append("\(time)\(ConsoleFormatter.separator)\(status)\(ConsoleFormatter.separator)", helper.attributes(role: .body2, style: .monospacedDigital, width: .condensed, color: titleColor))
+            var urlAttributes = helper.attributes(role: .body2, weight: .medium, color: detailsColor)
+            urlAttributes[.underlineColor] = UXColor.clear
+            string.append((task.httpMethod ?? "GET") + " " + (task.url ?? "–") + "\n", urlAttributes)
+            return
+        }
+
         if content.contains(.largeHeader) {
             renderLargeHeader(for: task)
         } else if content.contains(.header) {
@@ -378,7 +401,7 @@ struct ConsoleTextRenderer_Previews: PreviewProvider {
             RichTextView(viewModel: .init(string: stringWithColor))
                 .previewDisplayName("Task (Color)")
 
-            RichTextView(viewModel: .init(string: ShareStoreTask(entities: try! LoggerStore.mock.allMessages(), store: .mock, output: .plainText, completion: { _ in }).share().items[0] as! String))
+            RichTextView(viewModel: .init(string: NSAttributedString(string: ShareStoreTask(entities: try! LoggerStore.mock.allMessages(), store: .mock, output: .plainText, completion: { _ in }).share().items[0] as! String)))
                 .previewDisplayName("Task (Plain)")
 
             RichTextView(viewModel: .init(string: TextRenderer(options: .sharing).make { $0.render(task.orderedTransactions[0]) } ))

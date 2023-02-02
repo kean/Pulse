@@ -5,11 +5,9 @@
 #if os(iOS) || os(macOS)
 
 import SwiftUI
-import CoreData
 import Pulse
 import Combine
 
-#warning("refactor")
 final class RichTextViewModel: ObservableObject {
     // Search
     @Published var searchOptions: StringSearchOptions = .default
@@ -21,13 +19,12 @@ final class RichTextViewModel: ObservableObject {
     // Configuration
     @Published var isLinkDetectionEnabled = true
 
-    var error: NetworkLogger.DecodingError?
-    var onLinkTapped: ((URL) -> Bool)?
     let contentType: NetworkLogger.ContentType?
-
     let originalText: NSAttributedString
-    var isEmpty: Bool { textStorage.length == 0 }
 
+    var onLinkTapped: ((URL) -> Bool)?
+
+    var isEmpty: Bool { textStorage.length == 0 }
     weak var textView: UXTextView? // Not proper MVVM
     var textStorage: NSTextStorage { textView?.textStorage ?? NSTextStorage(string: "") }
 
@@ -35,18 +32,14 @@ final class RichTextViewModel: ObservableObject {
     private var isSearchNeeded = false
     private let queue = DispatchQueue(label: "com.github.kean.pulse.search")
     private let settings = ConsoleSettings.shared
-    private var bag = [AnyCancellable]()
+    private var cancellables = [AnyCancellable]()
 
     struct SearchMatch {
         let range: NSRange
         let originalForegroundColor: UXColor
     }
 
-    convenience init(string: String = "") {
-        self.init(string: TextRenderer().render(string, role: .body2))
-    }
-
-    convenience init(string: NSAttributedString) {
+    convenience init(string: NSAttributedString = NSAttributedString()) {
         self.init(string: string, contentType: nil)
     }
 
@@ -59,7 +52,7 @@ final class RichTextViewModel: ObservableObject {
             .receive(on: DispatchQueue.main) // Make sure self returns new values
             .sink { [weak self] _, _ in
                 self?.setSearchNeeded()
-            }.store(in: &bag)
+            }.store(in: &cancellables)
     }
 
     func prepare(_ context: SearchContext?) {
@@ -114,8 +107,6 @@ final class RichTextViewModel: ObservableObject {
         }
     }
 
-#warning("this still isn't great")
-
     private func didUpdateMatches(_ newMatches: [NSRange]) {
         performUpdates { _ in
             clearMatches()
@@ -137,12 +128,6 @@ final class RichTextViewModel: ObservableObject {
 
         isSearchingInBackground = false
         searchIfNeeded()
-    }
-
-    func cancelSearch() {
-        searchTerm = ""
-        isSearching = false
-        hideKeyboard()
     }
 
     func nextMatch() {
@@ -206,14 +191,14 @@ final class RichTextViewModel: ObservableObject {
     }
 
     func scrollToBottom() {
-        guard let textView = self.textView, textView.textStorage.length > 0 else { return }
+        guard let textView = self.textView, textStorage.length > 0 else { return }
 #if os(iOS)
         textView.layoutManager.allowsNonContiguousLayout = false // Remove this workaround
         UIView.performWithoutAnimation {
-            textView.scrollRangeToVisible(NSRange(location: textView.textStorage.length, length: 0))
+            textView.scrollRangeToVisible(NSRange(location: textStorage.length, length: 0))
         }
 #else
-        textView.scrollRangeToVisible(NSRange(location: textView.textStorage.length, length: 0))
+        textView.scrollRangeToVisible(NSRange(location: textStorage.length, length: 0))
 #endif
     }
 }
