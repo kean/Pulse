@@ -139,7 +139,7 @@ private struct ConsoleContentView: View {
                     ConsoleListContentView(viewModel: viewModel.list)
                 }
             case .text:
-                ConsoleTextView(entities: viewModel.list.entitiesSubject, events: viewModel.list.events)
+                ConsoleTextView(viewModel: viewModel.textViewModel)
             }
         }
     }

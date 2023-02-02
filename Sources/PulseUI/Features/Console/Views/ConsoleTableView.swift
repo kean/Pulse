@@ -43,8 +43,6 @@ private struct ConsoleMessageTableView: View {
                 .width(min: 40, ideal: 600)
             TableColumn("File", value: \.file)
                 .width(ideal: 80)
-            TableColumn("Function", value: \.function)
-                .width(ideal: 100)
         }
         .tableStyle(.inset)
         .onChange(of: sortOrder) {
@@ -90,6 +88,7 @@ private struct ConsoleTaskTableView: View {
                 Text(ByteCountFormatter.string(fromByteCount: $0.responseBodySize))
             }.width(min: 54, ideal: 64, max: 140)
         }
+        .tableStyle(.inset)
         .onChange(of: sortOrder) {
             viewModel.sortDescriptors = $0.map(NSSortDescriptor.init)
         }

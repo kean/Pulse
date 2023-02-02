@@ -8,6 +8,7 @@ import Pulse
 import Combine
 import SwiftUI
 
+#warning("this should not be a ViewModel and it should have a different name")
 final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, ObservableObject {
     @Published private(set) var visibleEntities: ArraySlice<NSManagedObject> = []
     @Published private(set) var pins: [NSManagedObject] = []

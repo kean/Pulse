@@ -81,23 +81,14 @@ final class TextRenderer {
     }
 
     func render(_ task: NetworkTaskEntity, content: NetworkContent) {
-        guard !options.isCompact else {
-            let isTitleColored = task.state == .failure && options.color != .monochrome
-            let titleColor = isTitleColored ? UXColor.systemRed : UXColor.secondaryLabel
-            let detailsColor = isTitleColored ? UXColor.systemRed : UXColor.label
-            let time = ConsoleFormatter.time(for: task.createdAt)
-            let status = ConsoleFormatter.status(for: task)
-            string.append("\(time)\(ConsoleFormatter.separator)\(status)\(ConsoleFormatter.separator)", helper.attributes(role: .body2, style: .monospacedDigital, width: .condensed, color: titleColor))
-            var urlAttributes = helper.attributes(role: .body2, weight: .medium, color: detailsColor)
-            urlAttributes[.underlineColor] = UXColor.clear
-            string.append((task.httpMethod ?? "GET") + " " + (task.url ?? "–") + "\n", urlAttributes)
-            return
-        }
-
         if content.contains(.largeHeader) {
             renderLargeHeader(for: task)
         } else if content.contains(.header) {
-            renderHeader(for: task)
+            if options.isCompact {
+                renderCompactHeader(for: task)
+            } else {
+                renderHeader(for: task)
+            }
         }
 
         if content.contains(.taskDetails) {
@@ -187,6 +178,20 @@ final class TextRenderer {
         urlAttributes[.underlineColor] = UXColor.clear
         string.append((task.url ?? "–") + "\n", urlAttributes)
         addSpacer()
+    }
+
+    private func renderCompactHeader(for task: NetworkTaskEntity) {
+        let isTitleColored = task.state == .failure && options.color != .monochrome
+        let titleColor = isTitleColored ? UXColor.systemRed : UXColor.secondaryLabel
+        let detailsColor = isTitleColored ? UXColor.systemRed : UXColor.label
+        let time = ConsoleFormatter.time(for: task.createdAt)
+        let status = ConsoleFormatter.status(for: task)
+        string.append("\(time)\(ConsoleFormatter.separator)\(status)\(ConsoleFormatter.separator)", helper.attributes(role: .body2, style: .monospacedDigital, width: .condensed, color: titleColor))
+        var urlAttributes = helper.attributes(role: .body2, weight: .medium, color: detailsColor)
+        urlAttributes[.link] = task.objectID.uriRepresentation()
+        urlAttributes[.underlineColor] = titleColor.withAlphaComponent(0.5)
+        urlAttributes[.underlineStyle] = 1
+        string.append((task.httpMethod ?? "GET") + " " + (task.url ?? "–") + "\n", urlAttributes)
     }
 
     func render(_ transaction: NetworkTransactionMetricsEntity) {

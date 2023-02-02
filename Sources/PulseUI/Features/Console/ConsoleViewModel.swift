@@ -27,6 +27,7 @@ final class ConsoleViewModel: ObservableObject {
     private var _searchViewModel: AnyObject?
 
     let searchBarViewModel: ConsoleSearchBarViewModel
+    let textViewModel: ConsoleTextViewModel
 #endif
 
     let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
@@ -82,6 +83,7 @@ final class ConsoleViewModel: ObservableObject {
         if #available(iOS 15, *) {
             self._searchViewModel = ConsoleSearchViewModel(entities: list.entitiesSubject, store: store, index: index, searchBar: searchBarViewModel)
         }
+        self.textViewModel = ConsoleTextViewModel(list: list)
 #endif
 
         prepare(for: mode)

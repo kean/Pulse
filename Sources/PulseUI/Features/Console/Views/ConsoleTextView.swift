@@ -14,15 +14,14 @@ import Combine
 #warning("do we even need the iOS version?")
 #warning("should view-as-text replace the main view insted?")
 struct ConsoleTextView: View {
-    @StateObject private var viewModel = ConsoleTextViewModel()
+    @ObservedObject var viewModel: ConsoleTextViewModel
     @State private var shareItems: ShareItems?
     @State private var isShowingSettings = false
     @ObservedObject private var settings: ConsoleTextViewSettings = .shared
 
-    let entities: CurrentValueSubject<[NSManagedObject], Never>
-    let events: PassthroughSubject<ConsoleUpdateEvent, Never>
-    var options: TextRenderer.Options?
     var onClose: (() -> Void)?
+
+#warning("rework onappear/disappear")
 
 #if os(iOS)
     var body: some View {
@@ -30,12 +29,6 @@ struct ConsoleTextView: View {
             .textViewBarItemsHidden(true)
             .navigationTitle("Console")
             .navigationBarTitleDisplayMode(.inline)
-            .onAppear {
-                if let options = options {
-                    viewModel.options = options
-                }
-                viewModel.bind(entities: entities, events: events)
-            }
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     if let onClose = onClose {
@@ -64,12 +57,6 @@ struct ConsoleTextView: View {
     var body: some View {
         RichTextView(viewModel: viewModel.text)
             .textViewBarItemsHidden(true)
-            .onAppear {
-                if let options = options {
-                    viewModel.options = options
-                }
-                viewModel.bind(entities: entities, events: events)
-            }
     }
 #endif
 
@@ -185,7 +172,7 @@ private extension ConsoleTextView {
         options.isCompact = true
 #endif
         configure(&options)
-        self.init(entities: .init(entities.reversed()), events: .init(), options: options, onClose: {})
+        self.init(viewModel: .init(list: .init(store: .mock, source: .store, criteria: .init(store: .mock, index: .init(store: .mock), source: .store))))
     }
 }
 
