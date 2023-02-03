@@ -83,7 +83,7 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
 
         pinsObserver.$pins.sink { [weak self] pins in
             withAnimation {
-                self?.pins = pins
+                self?.pins = self?.filter(pins: pins) ?? []
             }
         }.store(in: &cancellables)
 
@@ -119,7 +119,17 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
     func update(mode: ConsoleMode) {
         self.mode = mode
         self.refreshController()
-        self.pinsObserver.mode = mode
+        self.pins = filter(pins: pinsObserver.pins)
+    }
+
+    private func filter(pins: [LoggerMessageEntity]) -> [LoggerMessageEntity] {
+        pins.filter {
+            switch mode {
+            case .all: return true
+            case .logs: return $0.task == nil
+            case .tasks: return $0.task != nil
+            }
+        }
     }
 
     func buttonShowPreviousSessionTapped() {

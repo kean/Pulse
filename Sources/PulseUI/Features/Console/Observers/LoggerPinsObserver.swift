@@ -11,14 +11,6 @@ import SwiftUI
 final class LoggerPinsObserver: NSObject, NSFetchedResultsControllerDelegate {
     @Published private(set) var pins: [LoggerMessageEntity] = []
 
-    private(set) var allPins: [LoggerMessageEntity] = [] {
-        didSet { updateFilteredPins() }
-    }
-
-    var mode: ConsoleMode = .all {
-        didSet { updateFilteredPins() }
-    }
-
     private let controller: NSFetchedResultsController<LoggerMessageEntity>
 
     init(store: LoggerStore) {
@@ -37,20 +29,10 @@ final class LoggerPinsObserver: NSObject, NSFetchedResultsControllerDelegate {
 
         controller.delegate = self
         try? controller.performFetch()
-        allPins = controller.fetchedObjects ?? []
+        pins = controller.fetchedObjects ?? []
     }
 
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        allPins = self.controller.fetchedObjects ?? []
-    }
-
-    private func updateFilteredPins() {
-        pins = allPins.filter {
-            switch mode {
-            case .all: return true
-            case .logs: return $0.task == nil
-            case .tasks: return $0.task != nil
-            }
-        }
+        pins = self.controller.fetchedObjects ?? []
     }
 }
