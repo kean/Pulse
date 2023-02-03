@@ -74,7 +74,8 @@ private struct ConsoleListView: View {
             } else {
                 _ConsoleRegularContentView(viewModel: viewModel)
             }
-        }.listStyle(.plain)
+        }
+            .listStyle(.plain)
         if #available(iOS 16, *) {
             list
                 .environment(\.defaultMinListRowHeight, 8)

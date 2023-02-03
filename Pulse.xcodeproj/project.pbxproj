@@ -91,6 +91,7 @@
 		0CB3458F2989F80E009428B2 /* ConsoleTextViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB3458E2989F80E009428B2 /* ConsoleTextViewModel.swift */; };
 		0CB34591298AA6C6009428B2 /* RichTextViewSearchToobar-ios.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB34590298AA6C6009428B2 /* RichTextViewSearchToobar-ios.swift */; };
 		0CB34593298AA78E009428B2 /* WrappedTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB34592298AA78E009428B2 /* WrappedTextView.swift */; };
+		0CB34596298CBC37009428B2 /* LoggerPinsObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB34595298CBC37009428B2 /* LoggerPinsObserver.swift */; };
 		0CB63A132973A12300525165 /* ConsoleSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A122973A12300525165 /* ConsoleSearchView.swift */; };
 		0CB63A15297438A600525165 /* ConsoleSearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A14297438A600525165 /* ConsoleSearchViewModel.swift */; };
 		0CB63A1B2974A5D200525165 /* ConsoleSearchResultsSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A1A2974A5D200525165 /* ConsoleSearchResultsSectionView.swift */; };
@@ -567,6 +568,7 @@
 		0CB3458E2989F80E009428B2 /* ConsoleTextViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ConsoleTextViewModel.swift; path = "../../../../../../../.Trash/PulseUI 7.04.49 PM/Features/Console/Views/ConsoleTextViewModel.swift"; sourceTree = "<group>"; };
 		0CB34590298AA6C6009428B2 /* RichTextViewSearchToobar-ios.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RichTextViewSearchToobar-ios.swift"; sourceTree = "<group>"; };
 		0CB34592298AA78E009428B2 /* WrappedTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WrappedTextView.swift; sourceTree = "<group>"; };
+		0CB34595298CBC37009428B2 /* LoggerPinsObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggerPinsObserver.swift; sourceTree = "<group>"; };
 		0CB63A122973A12300525165 /* ConsoleSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchView.swift; sourceTree = "<group>"; };
 		0CB63A14297438A600525165 /* ConsoleSearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchViewModel.swift; sourceTree = "<group>"; };
 		0CB63A1A2974A5D200525165 /* ConsoleSearchResultsSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchResultsSectionView.swift; sourceTree = "<group>"; };
@@ -1028,6 +1030,14 @@
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
+		0CB34594298CBBE1009428B2 /* Observers */ = {
+			isa = PBXGroup;
+			children = (
+				0CB34595298CBC37009428B2 /* LoggerPinsObserver.swift */,
+			);
+			path = Observers;
+			sourceTree = "<group>";
+		};
 		0CB63A112973A11400525165 /* Search */ = {
 			isa = PBXGroup;
 			children = (
@@ -1440,6 +1450,7 @@
 		0CF0D5F9296F189600EED9D4 /* Console */ = {
 			isa = PBXGroup;
 			children = (
+				0CB34594298CBBE1009428B2 /* Observers */,
 				0C7A0DFE297C51B900B4B69D /* List */,
 				0CF0D5FE296F189600EED9D4 /* Views */,
 				0CF0D5FA296F189600EED9D4 /* ConsoleView-ios.swift */,
@@ -2095,6 +2106,7 @@
 				0CF0D61F296F189600EED9D4 /* Pulse+Extensions.swift in Sources */,
 				0CF0D61C296F189600EED9D4 /* UXKit.swift in Sources */,
 				0CB34591298AA6C6009428B2 /* RichTextViewSearchToobar-ios.swift in Sources */,
+				0CB34596298CBC37009428B2 /* LoggerPinsObserver.swift in Sources */,
 				0CF0D669296F189600EED9D4 /* NetworkHeadersCell.swift in Sources */,
 				0CF0D67C296F189600EED9D4 /* ConsoleView-macos.swift in Sources */,
 				0CF0D612296F189600EED9D4 /* Regex.swift in Sources */,

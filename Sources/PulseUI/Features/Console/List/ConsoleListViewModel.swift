@@ -53,7 +53,7 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
     let store: LoggerStore
     let source: ConsoleSource
     private let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
-    private let pinsController: NSFetchedResultsController<NSManagedObject>
+    private let pinsObserver: LoggerPinsObserver
     private var controller: NSFetchedResultsController<NSManagedObject>?
     private var cancellables: [AnyCancellable] = []
 
@@ -77,18 +77,15 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
             sortDescriptior: NSSortDescriptor(key: "createdAt", ascending: false)
         )
 
-        self.pinsController = NSFetchedResultsController(
-            fetchRequest: {
-                let request = NSFetchRequest<NSManagedObject>(entityName: "\(LoggerMessageEntity.self)")
-                request.sortDescriptors = [NSSortDescriptor(key: "createdAt", ascending: false)]
-                return request
-            }(),
-            managedObjectContext: store.viewContext,
-            sectionNameKeyPath: nil,
-            cacheName: nil
-        )
+        self.pinsObserver = LoggerPinsObserver(store: store)
 
         super.init()
+
+        pinsObserver.$pins.sink { [weak self] pins in
+            withAnimation {
+                self?.pins = pins
+            }
+        }.store(in: &cancellables)
 
         $entities.sink { [entitiesSubject] in
             entitiesSubject.send($0)
@@ -116,30 +113,13 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
             self?.refreshController()
         }.store(in: &cancellables)
 
-        pinsController.delegate = self
-
         update(mode: mode)
     }
 
     func update(mode: ConsoleMode) {
         self.mode = mode
-
         self.refreshController()
-
-        func makePinsFilter() -> NSPredicate? {
-            switch mode {
-            case .all: return nil
-            case .logs: return NSPredicate(format: "task == NULL")
-            case .tasks: return NSPredicate(format: "task != NULL")
-            }
-        }
-
-        pinsController.fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-            NSPredicate(format: "isPinned == YES"),
-            makePinsFilter()
-        ].compactMap { $0 })
-        try? pinsController.performFetch()
-        pins = pinsController.fetchedObjects ?? []
+        self.pinsObserver.mode = mode
     }
 
     func buttonShowPreviousSessionTapped() {
@@ -242,14 +222,8 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
     }
 
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChangeContentWith diff: CollectionDifference<NSManagedObjectID>) {
-        if pinsController === controller {
-            withAnimation {
-                pins = self.pinsController.fetchedObjects ?? []
-            }
-        } else {
-            didRefreshContent()
-            events.send(.diff(diff))
-        }
+        didRefreshContent()
+        events.send(.diff(diff))
     }
 
     private func didRefreshContent() {
