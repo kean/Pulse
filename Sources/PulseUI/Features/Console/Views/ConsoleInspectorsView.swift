@@ -6,7 +6,7 @@ import SwiftUI
 
 struct ConsoleInspectorsView: View {
     let viewModel: ConsoleViewModel
-    @State private var selectedTab: ConsoleInspector = .filters
+    @State private var selectedTab: ConsoleInspector = .storeInfo
 
     var body: some View {
         VStack(spacing: 0) {
@@ -35,6 +35,7 @@ struct ConsoleInspectorsView: View {
             ConsoleSearchCriteriaView(viewModel: viewModel.searchCriteriaViewModel)
         case .storeInfo:
             StoreDetailsView(source: .store(viewModel.store))
+                .padding()
         }
     }
 }
