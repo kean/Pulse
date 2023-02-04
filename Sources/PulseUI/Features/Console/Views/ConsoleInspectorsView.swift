@@ -38,7 +38,15 @@ struct ConsoleInspectorsView: View {
                 StoreDetailsView(source: .store(viewModel.store))
                 Spacer()
             }
-                .padding()
+            .padding()
+        case .insights:
+            if #available(macOS 13.0, *) {
+                NavigationStack {
+                    InsightsView(viewModel: viewModel.insightsViewModel)
+                }
+            } else {
+                InsightsView(viewModel: viewModel.insightsViewModel)
+            }
         case .settings:
             VStack {
                 SettingsView(store: viewModel.store)
@@ -51,6 +59,7 @@ struct ConsoleInspectorsView: View {
 private enum ConsoleInspector: Identifiable, CaseIterable {
     case filters
     case storeInfo
+    case insights
     case settings
 
     var id: ConsoleInspector { self }
@@ -63,6 +72,8 @@ private enum ConsoleInspector: Identifiable, CaseIterable {
             return "info.circle"
         case .settings:
             return "gearshape"
+        case .insights:
+            return "chart.pie"
         }
     }
 }

@@ -2,14 +2,14 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
+#if os(iOS) || os(macOS)
+
 import Foundation
 import Combine
 import Pulse
 import SwiftUI
 import CoreData
 import Charts
-
-#if os(iOS)
 
 struct InsightsView: View {
     @ObservedObject var viewModel: InsightsViewModel
@@ -39,8 +39,10 @@ struct InsightsView: View {
 //            }
         }
         .listStyle(.automatic)
+#if os(iOS)
         .navigationTitle("Insights")
         .navigationBarItems(leading: navigationTrailingBarItems)
+#endif
     }
 
     private var navigationTrailingBarItems: some View {
@@ -64,7 +66,7 @@ struct InsightsView: View {
 
     @ViewBuilder
     private var durationChart: some View {
-        if #available(iOS 16.0, *) {
+        if #available(iOS 16, macOS 13, *) {
             if insights.duration.values.isEmpty {
                 Text("No network requests yet")
                     .foregroundColor(.secondary)
@@ -188,7 +190,7 @@ final class InsightsViewModel: ObservableObject {
         return "\(DurationFormatter.string(from: min, isPrecise: false)) – \(DurationFormatter.string(from: max, isPrecise: false))"
     }
 
-    @available(iOS 16.0, *)
+    @available(iOS 16, macOS 13, *)
     struct Bar: Identifiable {
         var id: Int { index }
 
@@ -197,7 +199,7 @@ final class InsightsViewModel: ObservableObject {
         var count: Int
     }
 
-    @available(iOS 16.0, *)
+    @available(iOS 16, macOS 13, *)
     var durationBars: [Bar] {
         let values = insights.duration.values.map { min(3.4, $0) }
         let bins = NumberBins(data: values, desiredCount: 30)
