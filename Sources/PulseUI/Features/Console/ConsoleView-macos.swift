@@ -160,8 +160,6 @@ private struct ConsoleToolbarItems: View {
     var body: some View {
         ConsoleToolbarToggleOnlyErrorsButton(viewModel: viewModel.searchCriteriaViewModel)
             .keyboardShortcut("e", modifiers: [.command, .shift])
-        FilterPopoverToolbarButton(viewModel: viewModel)
-            .keyboardShortcut("f", modifiers: [.command, .option])
     }
 }
 
@@ -187,23 +185,6 @@ private struct ConsoleDetailsView: View {
     private func byteCount(for size: Int64) -> String {
         guard size > 0 else { return "0 KB" }
         return ByteCountFormatter.string(fromByteCount: size)
-    }
-}
-
-private struct FilterPopoverToolbarButton: View {
-    let viewModel: ConsoleViewModel
-    @State private var isPresented = false
-
-    var body: some View {
-        Button(action: { isPresented.toggle() }, label: {
-            Image(systemName: isPresented ? "line.horizontal.3.decrease.circle.fill" : "line.horizontal.3.decrease.circle")
-                .foregroundColor(isPresented ? .blue : .secondary)
-        })
-        .help("Toggle Filters Panel (⌥⌘F)")
-        .popover(isPresented: $isPresented, arrowEdge: .top) {
-            ConsoleSearchCriteriaView(viewModel: viewModel.searchCriteriaViewModel)
-                .fixedSize()
-        }
     }
 }
 
