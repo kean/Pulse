@@ -18,11 +18,14 @@ struct ConsoleSection<Header: View, Content: View>: View {
             .padding(.horizontal, 12)
             .padding(.vertical, 4)
         },header: {
-            if !isDividerHidden {
-                Divider()
+            VStack(spacing: 0) {
+                if !isDividerHidden {
+                    Divider()
+                }
+                header()
+                    .padding(.top, 8)
+                    .padding(.horizontal, 12)
             }
-            header()
-                .padding(.horizontal, 12)
         })
 #else
         Section(content: content, header: header)
