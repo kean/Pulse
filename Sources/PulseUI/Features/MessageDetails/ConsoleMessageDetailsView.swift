@@ -59,6 +59,7 @@ struct ConsoleMessageDetailsView: View {
             Spacer()
             Button(action: onClose) {
                 Image(systemName: "xmark")
+                    .foregroundColor(.secondary)
             }.buttonStyle(.plain)
         }.padding(EdgeInsets(top: 4, leading: 10, bottom: 5, trailing: 8))
     }
