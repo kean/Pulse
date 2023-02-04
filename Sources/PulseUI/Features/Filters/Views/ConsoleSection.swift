@@ -4,7 +4,8 @@
 
 import SwiftUI
 
-struct ConsoleSearchSection<Header: View, Content: View>: View {
+struct ConsoleSection<Header: View, Content: View>: View {
+    var isDividerHidden = false
     @ViewBuilder var header: () -> Header
     @ViewBuilder var content: () -> Content
 
@@ -14,16 +15,14 @@ struct ConsoleSearchSection<Header: View, Content: View>: View {
             VStack(spacing: 8) {
                 content()
             }
-            .padding(12)
-            .overlay(
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(.separator, lineWidth: 1)
-            )
             .padding(.horizontal, 12)
-            .padding(.bottom, 12)
+            .padding(.vertical, 4)
         },header: {
+            if !isDividerHidden {
+                Divider()
+            }
             header()
-                .padding(.horizontal, 24)
+                .padding(.horizontal, 12)
         })
 #else
         Section(content: content, header: header)

@@ -4,7 +4,7 @@
 
 import SwiftUI
 
-struct ConsoleSearchSectionHeader: View {
+struct ConsoleSectionHeader: View {
     let icon: String
     let title: String
     let reset: () -> Void
@@ -31,6 +31,8 @@ struct ConsoleSearchSectionHeader: View {
                 Image(systemName: icon)
                     .foregroundColor(.secondary)
                 Text(title)
+                    .font(.headline)
+                    .foregroundColor(.secondary)
             }
             Spacer()
             if !isDefault {
@@ -45,7 +47,7 @@ struct ConsoleSearchSectionHeader: View {
                 }
                 .disabled(isDefault)
             }
-        }.buttonStyle(PlainButtonStyle())
+        }.buttonStyle(.plain)
     }
 #elseif os(iOS)
     var body: some View {

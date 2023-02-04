@@ -35,7 +35,7 @@ public struct SettingsView: View {
 
     @ViewBuilder
     private var settings: some View {
-        Section(header: header(title: "Share")) {
+        Section(header: SectionHeaderView(title: "Share")) {
             HStack {
                 Button(action: { isPresentingShareStoreView = true }) {
                     Label("Share Store", systemImage: "square.and.arrow.up")
@@ -62,7 +62,7 @@ public struct SettingsView: View {
             }
         }
         Divider()
-        Section(header: header(title: "Open Store")) {
+        Section(header: SectionHeaderView(title: "Open Store")) {
             Button("Show in Finder") {
                 NSWorkspace.shared.activateFileViewerSelecting([store.storeURL])
             }
@@ -72,7 +72,7 @@ public struct SettingsView: View {
         }
         Divider()
         if !viewModel.isArchive {
-            Section(header: header(title: "Manage Messages")) {
+            Section(header: SectionHeaderView(title: "Manage Messages")) {
                 Button {
                     viewModel.buttonRemoveAllMessagesTapped()
                 } label: {
@@ -81,7 +81,7 @@ public struct SettingsView: View {
             }
         }
         Divider()
-        Section(header: header(title: "Remote Logging")) {
+        Section(header: SectionHeaderView(title: "Remote Logging")) {
             if viewModel.isRemoteLoggingAvailable {
                 RemoteLoggerSettingsView(viewModel: .shared)
             } else {
@@ -90,12 +90,22 @@ public struct SettingsView: View {
             }
         }
     }
+}
 
-    private func header(title: String) -> some View {
-        Text(title)
-            .font(.headline)
-            .foregroundColor(.secondary)
-            .padding(.bottom, 8)
+struct SectionHeaderView: View {
+    var systemImage: String?
+    let title: String
+
+    var body: some View {
+        HStack {
+            if let systemImage = systemImage {
+                Image(systemName: systemImage)
+            }
+            Text(title)
+                .font(.headline)
+                .foregroundColor(.secondary)
+                .padding(.bottom, 8)
+        }
     }
 }
 

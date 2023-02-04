@@ -55,7 +55,7 @@ struct NetworkRequestInfoCell_Previews: PreviewProvider {
                 }
             }
 #if os(macOS)
-            .frame(width: 280)
+            .frame(width: 260)
 #endif
         }
     }

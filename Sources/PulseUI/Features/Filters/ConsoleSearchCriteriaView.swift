@@ -24,8 +24,20 @@ struct ConsoleSearchCriteriaView: View {
         .navigationBarItems(leading: buttonReset)
 #endif
 #else
-        ScrollView {
-            form.frame(width: 280)
+        VStack(spacing: 0) {
+            ScrollView {
+                form
+            }
+            Divider()
+            HStack {
+                Text(viewModel.mode == .tasks ? "Network Filters" : "Message Filters")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                Spacer()
+                buttonReset
+            }
+            .padding(.horizontal, 10)
+            .frame(height: 34, alignment: .center)
         }
 #endif
     }
@@ -34,14 +46,6 @@ struct ConsoleSearchCriteriaView: View {
     private var form: some View {
 #if os(tvOS) || os(watchOS)
         buttonReset
-#elseif os(macOS)
-        HStack {
-            Text(viewModel.mode == .tasks ? "Network Filters" : "Message Filters")
-                .font(.headline)
-            Spacer()
-            buttonReset
-        }
-        .padding(12)
 #endif
 
         timePeriodSection
@@ -76,8 +80,8 @@ struct ConsoleSearchCriteriaView: View {
 
 extension ConsoleSearchCriteriaView {
     var timePeriodSection: some View {
-        ConsoleSearchSection(header: {
-            ConsoleSearchSectionHeader(icon: "calendar", title: "Time Period", filter: $viewModel.criteria.shared.dates, default: viewModel.defaultCriteria.shared.dates)
+        ConsoleSection(isDividerHidden: true, header: {
+            ConsoleSectionHeader(icon: "calendar", title: "Time Period", filter: $viewModel.criteria.shared.dates, default: viewModel.defaultCriteria.shared.dates)
         }, content: {
             ConsoleSearchTimePeriodCell(selection: $viewModel.criteria.shared.dates)
         })
@@ -90,8 +94,8 @@ extension ConsoleSearchCriteriaView {
 #if os(iOS) || os(macOS)
     @available(iOS 15, *)
     var customMessageFiltersSection: some View {
-        ConsoleSearchSection(header: {
-            ConsoleSearchSectionHeader(icon: "line.horizontal.3.decrease.circle", title: "Filters", filter: $viewModel.criteria.messages.custom)
+        ConsoleSection(header: {
+            ConsoleSectionHeader(icon: "line.horizontal.3.decrease.circle", title: "Filters", filter: $viewModel.criteria.messages.custom)
         }, content: {
             ConsoleSearchCustomMessageFiltersSection(selection: $viewModel.criteria.messages.custom)
         })
@@ -99,16 +103,16 @@ extension ConsoleSearchCriteriaView {
 #endif
 
     var logLevelsSection: some View {
-        ConsoleSearchSection(header: {
-            ConsoleSearchSectionHeader(icon: "flag", title: "Levels", filter: $viewModel.criteria.messages.logLevels)
+        ConsoleSection(header: {
+            ConsoleSectionHeader(icon: "flag", title: "Levels", filter: $viewModel.criteria.messages.logLevels)
         }, content: {
             ConsoleSearchLogLevelsCell(viewModel: viewModel)
         })
     }
 
     var labelsSection: some View {
-        ConsoleSearchSection(header: {
-            ConsoleSearchSectionHeader(icon: "tag", title: "Labels", filter: $viewModel.criteria.messages.labels)
+        ConsoleSection(header: {
+            ConsoleSectionHeader(icon: "tag", title: "Labels", filter: $viewModel.criteria.messages.labels)
         }, content: {
             ConsoleSearchListSelectionView(
                 title: "Labels",
@@ -129,8 +133,8 @@ extension ConsoleSearchCriteriaView {
 #if os(iOS) || os(macOS)
     @available(iOS 15, *)
     var customNetworkFiltersSection: some View {
-        ConsoleSearchSection(header: {
-            ConsoleSearchSectionHeader(icon: "line.horizontal.3.decrease.circle", title: "Filters", filter: $viewModel.criteria.network.custom)
+        ConsoleSection(header: {
+            ConsoleSectionHeader(icon: "line.horizontal.3.decrease.circle", title: "Filters", filter: $viewModel.criteria.network.custom)
         }, content: {
             ConsoleSearchCustomNetworkFiltersSection(selection: $viewModel.criteria.network.custom)
         })
@@ -138,8 +142,8 @@ extension ConsoleSearchCriteriaView {
 #endif
 
     var responseSection: some View {
-        ConsoleSearchSection(header: {
-            ConsoleSearchSectionHeader(icon: "arrow.down.circle", title:  "Response", filter: $viewModel.criteria.network.response)
+        ConsoleSection(header: {
+            ConsoleSectionHeader(icon: "arrow.down.circle", title:  "Response", filter: $viewModel.criteria.network.response)
         }, content: {
 #if os(iOS) || os(macOS)
             ConsoleSearchStatusCodeCell(selection: $viewModel.criteria.network.response.statusCode.range)
@@ -151,8 +155,8 @@ extension ConsoleSearchCriteriaView {
     }
 
     var domainsSection: some View {
-        ConsoleSearchSection(header: {
-            ConsoleSearchSectionHeader(icon: "server.rack", title: "Hosts", filter: $viewModel.criteria.network.host)
+        ConsoleSection(header: {
+            ConsoleSectionHeader(icon: "server.rack", title: "Hosts", filter: $viewModel.criteria.network.host)
         }, content: {
             ConsoleSearchListSelectionView(
                 title: "Hosts",
@@ -167,8 +171,8 @@ extension ConsoleSearchCriteriaView {
     }
 
     var networkingSection: some View {
-        ConsoleSearchSection(header: {
-            ConsoleSearchSectionHeader(icon: "arrowshape.zigzag.right", title: "Networking", filter: $viewModel.criteria.network.networking)
+        ConsoleSection(header: {
+            ConsoleSectionHeader(icon: "arrowshape.zigzag.right", title: "Networking", filter: $viewModel.criteria.network.networking)
         }, content: {
             ConsoleSearchTaskTypeCell(selection: $viewModel.criteria.network.networking.taskType)
             ConsoleSearchResponseSourceCell(selection: $viewModel.criteria.network.networking.source)
@@ -185,11 +189,11 @@ struct ConsoleSearchCriteriaView_Previews: PreviewProvider {
 #if os(macOS)
         Group {
             makePreview(isOnlyNetwork: false)
-                .previewLayout(.fixed(width: 320, height: 900))
+                .previewLayout(.fixed(width: 280, height: 900))
                 .previewDisplayName("Messages")
 
             makePreview(isOnlyNetwork: true)
-                .previewLayout(.fixed(width: 320, height: 900))
+                .previewLayout(.fixed(width: 280, height: 900))
                 .previewDisplayName("Network")
         }
 #else

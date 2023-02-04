@@ -6,7 +6,7 @@ import SwiftUI
 
 struct ConsoleInspectorsView: View {
     let viewModel: ConsoleViewModel
-    @State private var selectedTab: ConsoleInspector = .settings
+    @State private var selectedTab: ConsoleInspector = .filters
 
     var body: some View {
         VStack(spacing: 0) {

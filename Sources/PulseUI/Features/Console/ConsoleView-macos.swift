@@ -37,8 +37,8 @@ public struct ConsoleView: View {
                 if !isInspectorHidden {
                     Divider()
                         .background(Color.black)
-                        .frame(width: 2)
-                    ConsoleInspectorsView(viewModel: viewModel).frame(width: 280)
+                    ConsoleInspectorsView(viewModel: viewModel)
+                        .frame(width: 275)
                 }
             }
         }

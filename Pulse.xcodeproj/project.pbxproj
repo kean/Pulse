@@ -196,7 +196,7 @@
 		0CF0D645296F189600EED9D4 /* ConsoleSearchSectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5BC296F189500EED9D4 /* ConsoleSearchSectionHeader.swift */; };
 		0CF0D648296F189600EED9D4 /* ConsoleCustomMessageFilterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5BF296F189500EED9D4 /* ConsoleCustomMessageFilterView.swift */; };
 		0CF0D649296F189600EED9D4 /* DateRangePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5C0296F189500EED9D4 /* DateRangePicker.swift */; };
-		0CF0D64A296F189600EED9D4 /* ConsoleSearchSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5C1296F189500EED9D4 /* ConsoleSearchSection.swift */; };
+		0CF0D64A296F189600EED9D4 /* ConsoleSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5C1296F189500EED9D4 /* ConsoleSection.swift */; };
 		0CF0D64B296F189600EED9D4 /* RangePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5C2296F189500EED9D4 /* RangePicker.swift */; };
 		0CF0D650296F189600EED9D4 /* ConsoleSearchCriteria.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5C8296F189500EED9D4 /* ConsoleSearchCriteria.swift */; };
 		0CF0D651296F189600EED9D4 /* ConsoleCustomMessageFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5C9296F189500EED9D4 /* ConsoleCustomMessageFilter.swift */; };
@@ -676,7 +676,7 @@
 		0CF0D5BC296F189500EED9D4 /* ConsoleSearchSectionHeader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleSearchSectionHeader.swift; sourceTree = "<group>"; };
 		0CF0D5BF296F189500EED9D4 /* ConsoleCustomMessageFilterView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleCustomMessageFilterView.swift; sourceTree = "<group>"; };
 		0CF0D5C0296F189500EED9D4 /* DateRangePicker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DateRangePicker.swift; sourceTree = "<group>"; };
-		0CF0D5C1296F189500EED9D4 /* ConsoleSearchSection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleSearchSection.swift; sourceTree = "<group>"; };
+		0CF0D5C1296F189500EED9D4 /* ConsoleSection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleSection.swift; sourceTree = "<group>"; };
 		0CF0D5C2296F189500EED9D4 /* RangePicker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RangePicker.swift; sourceTree = "<group>"; };
 		0CF0D5C8296F189500EED9D4 /* ConsoleSearchCriteria.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleSearchCriteria.swift; sourceTree = "<group>"; };
 		0CF0D5C9296F189500EED9D4 /* ConsoleCustomMessageFilter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleCustomMessageFilter.swift; sourceTree = "<group>"; };
@@ -1359,7 +1359,7 @@
 		0CF0D5B9296F189500EED9D4 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				0CF0D5C1296F189500EED9D4 /* ConsoleSearchSection.swift */,
+				0CF0D5C1296F189500EED9D4 /* ConsoleSection.swift */,
 				0CF0D5BC296F189500EED9D4 /* ConsoleSearchSectionHeader.swift */,
 				0CDC3BE92970FA47003BD1FF /* ConsoleSearchListSelectionView.swift */,
 				0CF0D5BF296F189500EED9D4 /* ConsoleCustomMessageFilterView.swift */,
@@ -2158,7 +2158,7 @@
 				0CF0D62B296F189600EED9D4 /* FileViewerViewModel.swift in Sources */,
 				0CF0D67F296F189600EED9D4 /* ConsoleContextMenu-ios.swift in Sources */,
 				0CF0D675296F189600EED9D4 /* NetworkInspectorView-ios.swift in Sources */,
-				0CF0D64A296F189600EED9D4 /* ConsoleSearchSection.swift in Sources */,
+				0CF0D64A296F189600EED9D4 /* ConsoleSection.swift in Sources */,
 				0CB63A132973A12300525165 /* ConsoleSearchView.swift in Sources */,
 				0CB63A2C2975C40100525165 /* ConsoleSearchFilter.swift in Sources */,
 				0CF0D64B296F189600EED9D4 /* RangePicker.swift in Sources */,
