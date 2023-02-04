@@ -34,7 +34,7 @@ struct ConsoleSearchTimePeriodCell: View {
 
     @ViewBuilder
     private var quickFilters: some View {
-        HStack(alignment: .center, spacing: 12) {
+        HStack(alignment: .center, spacing: 8) {
             Text("Quick Filters")
                 .lineLimit(1)
                 .foregroundColor(.secondary)

@@ -76,8 +76,6 @@ private struct ConsoleMessageTableView: View {
     }
 }
 
-#warning("add context menu")
-#warning("render secondary columns using senondary color (like Finder)")
 private struct ConsoleTaskTableView: View {
     @ObservedObject var viewModel: ConsoleListViewModel
     @Binding var selection: NSManagedObjectID?

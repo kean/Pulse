@@ -92,6 +92,7 @@
 		0CB34593298AA78E009428B2 /* WrappedTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB34592298AA78E009428B2 /* WrappedTextView.swift */; };
 		0CB34596298CBC37009428B2 /* LoggerPinsObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB34595298CBC37009428B2 /* LoggerPinsObserver.swift */; };
 		0CB3459C298D5018009428B2 /* ConsoleTextViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB3459B298D5018009428B2 /* ConsoleTextViewModel.swift */; };
+		0CB345A6298DEEA6009428B2 /* ConsoleInspectorsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB345A5298DEEA6009428B2 /* ConsoleInspectorsView.swift */; };
 		0CB63A132973A12300525165 /* ConsoleSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A122973A12300525165 /* ConsoleSearchView.swift */; };
 		0CB63A15297438A600525165 /* ConsoleSearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A14297438A600525165 /* ConsoleSearchViewModel.swift */; };
 		0CB63A1B2974A5D200525165 /* ConsoleSearchResultsSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A1A2974A5D200525165 /* ConsoleSearchResultsSectionView.swift */; };
@@ -569,6 +570,7 @@
 		0CB34592298AA78E009428B2 /* WrappedTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WrappedTextView.swift; sourceTree = "<group>"; };
 		0CB34595298CBC37009428B2 /* LoggerPinsObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggerPinsObserver.swift; sourceTree = "<group>"; };
 		0CB3459B298D5018009428B2 /* ConsoleTextViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleTextViewModel.swift; sourceTree = "<group>"; };
+		0CB345A5298DEEA6009428B2 /* ConsoleInspectorsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleInspectorsView.swift; sourceTree = "<group>"; };
 		0CB63A122973A12300525165 /* ConsoleSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchView.swift; sourceTree = "<group>"; };
 		0CB63A14297438A600525165 /* ConsoleSearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchViewModel.swift; sourceTree = "<group>"; };
 		0CB63A1A2974A5D200525165 /* ConsoleSearchResultsSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchResultsSectionView.swift; sourceTree = "<group>"; };
@@ -1486,6 +1488,7 @@
 				0CF0D603296F189600EED9D4 /* ConsoleTaskCellViewModel.swift */,
 				0CE45E0B2977813400249C5D /* ConsoleToolbarView.swift */,
 				0C7A0DFC297C382300B4B69D /* ConsoleShareButton.swift */,
+				0CB345A5298DEEA6009428B2 /* ConsoleInspectorsView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -2116,6 +2119,7 @@
 				0CF0D61C296F189600EED9D4 /* UXKit.swift in Sources */,
 				0CB34591298AA6C6009428B2 /* RichTextViewSearchToobar-ios.swift in Sources */,
 				0CB34596298CBC37009428B2 /* LoggerPinsObserver.swift in Sources */,
+				0CB345A6298DEEA6009428B2 /* ConsoleInspectorsView.swift in Sources */,
 				0CF0D669296F189600EED9D4 /* NetworkHeadersCell.swift in Sources */,
 				0CF0D67C296F189600EED9D4 /* ConsoleView-macos.swift in Sources */,
 				0CF0D612296F189600EED9D4 /* Regex.swift in Sources */,

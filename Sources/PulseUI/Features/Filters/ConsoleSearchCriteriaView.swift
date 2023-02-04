@@ -25,7 +25,7 @@ struct ConsoleSearchCriteriaView: View {
 #endif
 #else
         ScrollView {
-            form.frame(width: 310)
+            form.frame(width: 280)
         }
 #endif
     }

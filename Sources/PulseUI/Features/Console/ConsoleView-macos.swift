@@ -16,6 +16,7 @@ public struct ConsoleView: View {
     @ObservedObject private var router: ConsoleRouter
     @AppStorage("com-github-kean-pulse-display-mode") private var displayMode: ConsoleDisplayMode = .list
     @AppStorage("com-github-kean-pulse-is-vertical") private var isVertical = false
+    @AppStorage("com-github-kean-pulse-is-inspector-hidden") private var isInspectorHidden = true
 
     public init(store: LoggerStore = .shared) {
         self.init(viewModel: .init(store: store))
@@ -31,7 +32,15 @@ public struct ConsoleView: View {
     public var body: some View {
         VStack(spacing: 0) {
             Divider()
-            contents
+            HStack(spacing: 0) {
+                contents
+                if !isInspectorHidden {
+                    Divider()
+                        .background(Color.black)
+                        .frame(width: 2)
+                    ConsoleInspectorsView(viewModel: viewModel).frame(width: 280)
+                }
+            }
         }
             .toolbar {
                 ToolbarItemGroup(placement: .navigation) {
@@ -57,6 +66,9 @@ public struct ConsoleView: View {
         Button(action: { isVertical.toggle() }, label: {
             Image(systemName: isVertical ? "square.split.2x1" : "square.split.1x2")
         }).help(isVertical ? "Switch to Horizontal Layout" : "Switch to Vertical Layout")
+        Button(action: { withAnimation { isInspectorHidden.toggle() } }, label: {
+            Image(systemName: "sidebar.right")
+        })
     }
 
     @ViewBuilder
