@@ -62,6 +62,9 @@ public struct ConsoleView: View {
 
     @ViewBuilder
     private var toolbarItems: some View {
+        Button(action: { viewModel.store.removeAll() }) {
+            Image(systemName: "trash")
+        }
         ConsoleToolbarItems(viewModel: viewModel)
         Button(action: { isVertical.toggle() }, label: {
             Image(systemName: isVertical ? "square.split.2x1" : "square.split.1x2")
