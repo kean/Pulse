@@ -97,8 +97,8 @@ final class ConsoleViewModel: ObservableObject {
     }
 
     private func prepare(for mode: ConsoleMode) {
-        list.update(mode: mode)
         searchCriteriaViewModel.mode = mode
+        list.update(mode: mode)
     }
 
     private func refreshListsVisibility() {
