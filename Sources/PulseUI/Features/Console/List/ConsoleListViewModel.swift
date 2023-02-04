@@ -8,7 +8,8 @@ import Pulse
 import Combine
 import SwiftUI
 
-#warning("this should not be a ViewModel and it should have a different name")
+/// - note: It currently acts as a source of entities for other screen as well
+/// and should probably be extracted to a separate class.
 final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, ObservableObject {
     @Published private(set) var visibleEntities: ArraySlice<NSManagedObject> = []
     @Published private(set) var pins: [NSManagedObject] = []
@@ -16,9 +17,7 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
     @Published private(set) var sections: [NSFetchedResultsSectionInfo]?
     @Published var options = ConsoleListOptions()
 
-#warning("remove")
-    let entitiesSubject = CurrentValueSubject<[NSManagedObject], Never>([])
-    let events = PassthroughSubject<ConsoleUpdateEvent, Never>()
+    let updates = PassthroughSubject<ConsoleUpdateEvent, Never>()
 
     var isViewVisible = false {
         didSet {
@@ -87,10 +86,6 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
             }
         }.store(in: &cancellables)
 
-        $entities.sink { [entitiesSubject] in
-            entitiesSubject.send($0)
-        }.store(in: &cancellables)
-
         searchCriteriaViewModel.$criteria
             .dropFirst()
             .throttle(for: 0.5, scheduler: DispatchQueue.main, latest: true)
@@ -100,12 +95,6 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
         searchCriteriaViewModel.$isOnlyErrors
             .dropFirst()
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in self?.refresh() }
-            .store(in: &cancellables)
-
-        searchCriteriaViewModel.$filterTerm
-            .dropFirst()
-            .throttle(for: 0.25, scheduler: DispatchQueue.main, latest: true)
             .sink { [weak self] _ in self?.refresh() }
             .store(in: &cancellables)
 
@@ -186,7 +175,7 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
         taskCountObserver.setPredicate(makePredicate(for: .tasks))
 
         reloadMessages()
-        events.send(.reload)
+        updates.send(.reload)
     }
 
     private func makePredicate(for mode: ConsoleMode) -> NSPredicate? {
@@ -209,7 +198,7 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
             if isMessageOnly {
                 predicates.append(NSPredicate(format: "task == NULL"))
             }
-            if let predicate = ConsoleSearchCriteria.makeMessagePredicates(criteria: criteria.criteria, isOnlyErrors: criteria.isOnlyErrors, filterTerm: criteria.filterTerm) {
+            if let predicate = ConsoleSearchCriteria.makeMessagePredicates(criteria: criteria.criteria, isOnlyErrors: criteria.isOnlyErrors) {
                 predicates.append(predicate)
             }
             return predicates.isEmpty ? nil : NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
@@ -221,7 +210,7 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
         case .logs:
             return makeMessagesPredicate(isMessageOnly: true)
         case .tasks:
-            return ConsoleSearchCriteria.makeNetworkPredicates(criteria: criteria.criteria, isOnlyErrors: criteria.isOnlyErrors, filterTerm: criteria.filterTerm)
+            return ConsoleSearchCriteria.makeNetworkPredicates(criteria: criteria.criteria, isOnlyErrors: criteria.isOnlyErrors)
         }
     }
 
@@ -233,7 +222,7 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
 
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChangeContentWith diff: CollectionDifference<NSManagedObjectID>) {
         didRefreshContent()
-        events.send(.diff(diff))
+        updates.send(.diff(diff))
     }
 
     private func didRefreshContent() {

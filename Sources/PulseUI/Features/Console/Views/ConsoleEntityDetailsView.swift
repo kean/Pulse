@@ -11,17 +11,27 @@ import CoreData
 
 struct ConsoleEntityDetailsView: View {
     let viewModel: ConsoleListViewModel
-    @Binding var selection: NSManagedObjectID?
+    @ObservedObject var router: ConsoleRouter
 
     var body: some View {
-        if let entity = selection.map(viewModel.entity(withID:)) {
+        if let selection = router.selection {
+            switch selection {
+            case .entity(let objectID):
+                makeDetails(for: objectID)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func makeDetails(for objectID: NSManagedObjectID) -> some View {
+        if let entity = viewModel.entity(withID: objectID) {
             if let task = entity as? NetworkTaskEntity {
-                NetworkInspectorView(task: task, onClose: { selection = nil })
+                NetworkInspectorView(task: task, onClose: { router.selection = nil })
             } else if let message = entity as? LoggerMessageEntity {
                 if let task = message.task {
-                    NetworkInspectorView(task: task, onClose: { selection = nil })
+                    NetworkInspectorView(task: task, onClose: { router.selection = nil })
                 } else {
-                    ConsoleMessageDetailsView(message: message, onClose: { selection = nil })
+                    ConsoleMessageDetailsView(message: message, onClose: { router.selection = nil })
                 }
             }
         }

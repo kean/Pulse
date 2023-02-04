@@ -33,33 +33,6 @@ final class ConsoleSettings: PersistentSettings {
     var recentFilters: String = "[]"
 }
 
-final class ConsoleTextViewSettings: PersistentSettings {
-    static let shared = ConsoleTextViewSettings()
-
-    @UserDefaultRaw("console-text-view__color-mode")
-    var colorMode = TextRenderer.ColorMode.automatic
-
-    @UserDefault("console-text-view__request-headers")
-    var showsRequestHeaders = false
-
-    @UserDefault("console-text-view__response-body-shown")
-    var showsResponseBody = true
-
-    @UserDefault("console-text-view__response-headers")
-    var showsResponseHeaders = false
-
-    @UserDefault("console-text-view__request-body-shown")
-    var showsRequestBody = true
-
-    func reset() {
-        for key in UserDefaults.standard.dictionaryRepresentation().keys {
-            if key.hasPrefix(commonKeyPrefix + "console-text-view__") {
-                UserDefaults.standard.removeObject(forKey: key)
-            }
-        }
-    }
-}
-
 class PersistentSettings: ObservableObject {
     private var cancellables: [AnyCancellable] = []
 

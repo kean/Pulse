@@ -16,8 +16,6 @@ final class ConsoleSearchBarViewModel: ObservableObject {
 
 @available(iOS 15, tvOS 15, *)
 final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDelegate {
-    private var entities: CurrentValueSubject<[NSManagedObject], Never>
-
     var isViewVisible = false {
         didSet {
             if !isViewVisible {
@@ -63,6 +61,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
 
     @Published var suggestionsViewModel: ConsoleSearchSuggestionsViewModel!
 
+    private let list: ConsoleListViewModel
     private let searchService = ConsoleSearchService()
     private let suggestionsService = ConsoleSearchSuggestionsService()
 
@@ -72,10 +71,10 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     private var cancellables: [AnyCancellable] = []
     private let context: NSManagedObjectContext
 
-    init(entities: CurrentValueSubject<[NSManagedObject], Never>, store: LoggerStore, index: LoggerStoreIndex, searchBar: ConsoleSearchBarViewModel) {
-        self.entities = entities
+    init(list: ConsoleListViewModel, index: LoggerStoreIndex, searchBar: ConsoleSearchBarViewModel) {
+        self.list = list
         self.searchBar = searchBar
-        self.store = store
+        self.store = list.store
         self.index = index
         self.context = store.newBackgroundContext()
 
@@ -110,7 +109,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
             self?.updateSearchTokens()
         }.store(in: &cancellables)
 
-        entities
+        list.$entities
             .throttle(for: 3, scheduler: DispatchQueue.main, latest: true)
             .sink { [weak self] in self?.didReloadEntities(for: $0) }
             .store(in: &cancellables)
@@ -146,7 +145,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
             dirtyDate = Date()
         }
 
-        let operation = ConsoleSearchOperation(entities: entities.value, parameters: parameters, service: searchService, context: context)
+        let operation = ConsoleSearchOperation(entities: list.entities, parameters: parameters, service: searchService, context: context)
         operation.delegate = self
         operation.resume()
         self.operation = operation

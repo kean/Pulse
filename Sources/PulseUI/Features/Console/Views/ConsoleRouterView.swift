@@ -8,8 +8,8 @@ import Pulse
 import Combine
 
 final class ConsoleRouter: ObservableObject {
+    @Published var selection: ConsoleSelectedItem?
     @Published var shareItems: ShareItems?
-    @Published var isShowingAsText = false
     @Published var isShowingFilters = false
     @Published var isShowingSettings = false
     @Published var isShowingStoreInfo = false
@@ -18,6 +18,9 @@ final class ConsoleRouter: ObservableObject {
     @Published var isShowingDocumentBrowser = false
 }
 
+enum ConsoleSelectedItem: Hashable {
+    case entity(NSManagedObjectID)
+}
 
 struct ConsoleRouterView: View {
     let viewModel: ConsoleViewModel
@@ -37,7 +40,6 @@ struct ConsoleRouterView: View {
 extension ConsoleRouterView {
     var contents: some View {
         Text("").invisible()
-            .sheet(isPresented: $router.isShowingAsText) { destinationTextView }
             .sheet(isPresented: $router.isShowingFilters) { destinationFilters }
             .sheet(isPresented: $router.isShowingSettings) { destinationSettings }
             .sheet(isPresented: $router.isShowingStoreInfo) { destinationStoreInfo }
@@ -45,14 +47,6 @@ extension ConsoleRouterView {
             .sheet(item: $router.shareItems, content: ShareView.init)
             .sheet(isPresented: $router.isShowingInsights) { destinationInsights }
             .fullScreenCover(isPresented: $router.isShowingDocumentBrowser) { DocumentBrowser() }
-    }
-
-    private var destinationTextView: some View {
-        NavigationView {
-            ConsoleTextView(viewModel: .init(list: viewModel.list)) {
-                viewModel.router.isShowingAsText = false
-            }
-        }
     }
 
     private var destinationFilters: some View {

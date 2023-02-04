@@ -24,13 +24,6 @@ struct ConsoleContextMenu: View {
     var body: some View {
         Menu {
             Section {
-                Button(action: { router.isShowingAsText.toggle() }) {
-                    if router.isShowingAsText {
-                        Label("View as List", systemImage: "list.bullet.rectangle.portrait")
-                    } else {
-                        Label("View as Text", systemImage: "text.quote")
-                    }
-                }
                 if !viewModel.store.isArchive {
                     Button(action: { router.isShowingInsights = true }) {
                         Label("Insights", systemImage: "chart.pie")

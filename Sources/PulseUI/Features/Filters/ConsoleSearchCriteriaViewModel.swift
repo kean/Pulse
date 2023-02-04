@@ -11,7 +11,6 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
     var isButtonResetEnabled: Bool { !isCriteriaDefault }
 
     @Published var isOnlyErrors = false
-    @Published var filterTerm = "" // Legacy, used on non-iOS platforms
     @Published var criteria = ConsoleSearchCriteria()
     @Published var mode: ConsoleMode = .all
 

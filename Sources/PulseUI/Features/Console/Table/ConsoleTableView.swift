@@ -2,12 +2,12 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
+#if os(macOS)
+
 import SwiftUI
 import CoreData
 import Pulse
 import Combine
-
-#if os(macOS)
 
 struct ConsoleTableView: View {
     @ObservedObject var viewModel: ConsoleListViewModel
@@ -30,27 +30,54 @@ private struct ConsoleMessageTableView: View {
 
     var body: some View {
         Table((viewModel.entities as? [LoggerMessageEntity]) ?? [], selection: $selection, sortOrder: $sortOrder) {
-            TableColumn("Date & Time", value: \.createdAt) {
-                Text(dateAndTimeFormatter.string(from: $0.createdAt))
-            }.width(min: 87, ideal: 162, max: 162)
+            TableColumn("", value: \.level) {
+                if let task = $0.task {
+                    Image(systemName: task.state.iconSystemName)
+                        .foregroundColor(task.state.tintColor)
+                }
+            }.width(15)
+
+            TableColumn("Message", value: \.text) {
+                Text($0.text)
+                    .foregroundColor(textColor(for: $0))
+            }.width(min: 40, ideal: 600)
+
             TableColumn("Level", value: \.level) {
                 Text($0.logLevel.name)
+                    .foregroundColor(.secondary)
             }.width(min: 54, ideal: 54, max: 54)
+
             TableColumn("Label", value: \.label) {
                 Text($0.label)
+                    .foregroundColor(.secondary)
             }.width(min: 54, ideal: 68)
-            TableColumn("Message", value: \.text)
-                .width(min: 40, ideal: 600)
-            TableColumn("File", value: \.file)
-                .width(ideal: 80)
+
+            TableColumn("Date & Time", value: \.createdAt) {
+                Text(dateAndTimeFormatter.string(from: $0.createdAt))
+                    .foregroundColor(.secondary)
+            }.width(min: 87, ideal: 162, max: 162)
+
+            TableColumn("File", value: \.file) {
+                Text($0.file)
+                    .foregroundColor(.secondary)
+            }.width(ideal: 80)
         }
         .tableStyle(.inset)
         .onChange(of: sortOrder) {
             viewModel.sortDescriptors = $0.map(NSSortDescriptor.init)
         }
     }
+
+    private func textColor(for message: LoggerMessageEntity) -> Color {
+        if selection == message.objectID {
+            return Color.primary
+        }
+        return Color.textColor(for: message.logLevel)
+    }
 }
 
+#warning("add context menu")
+#warning("render secondary columns using senondary color (like Finder)")
 private struct ConsoleTaskTableView: View {
     @ObservedObject var viewModel: ConsoleListViewModel
     @Binding var selection: NSManagedObjectID?
@@ -61,37 +88,57 @@ private struct ConsoleTaskTableView: View {
             TableColumn("", value: \.requestState) {
                 Image(systemName: $0.state.iconSystemName)
                     .foregroundColor($0.state.tintColor)
-            }.width(16)
-            TableColumn("Date & Time", value: \.createdAt) {
-                Text(dateAndTimeFormatter.string(from: $0.createdAt))
-            }.width(min: 87, ideal: 162, max: 162)
+            }.width(15)
+
             TableColumn("Status Code", value: \.statusCode) {
                 if $0.statusCode > 0 {
-                    Text("\($0.statusCode)")
+                    Text("\($0.statusCode)").foregroundColor(textColor(for: $0))
                 } else {
-                    Text("–")
+                    Text("–").foregroundColor(textColor(for: $0))
                 }
             }.width(30)
+
             TableColumn("Method", value: \.httpMethod) {
                 Text($0.httpMethod ?? "–")
-            }.width(min: 40, ideal: 50, max: 60)
+                    .foregroundColor(textColor(for: $0))
+            }.width(min: 40, ideal: 46, max: 60)
+
             TableColumn("URL", value: \.url) {
                 Text($0.url ?? "–")
-            }.width(min: 40, ideal: 520)
+                    .foregroundColor(textColor(for: $0))
+            }.width(min: 40, ideal: 460)
+
+            TableColumn("Date & Time", value: \.createdAt) {
+                Text(dateAndTimeFormatter.string(from: $0.createdAt))
+                    .foregroundColor(.secondary)
+            }.width(min: 87, ideal: 162, max: 162)
+
             TableColumn("Duration", value: \.duration) {
                 Text(DurationFormatter.string(from: $0.duration, isPrecise: false))
-            }.width(min: 54, ideal: 64, max: 140)
+                    .foregroundColor(.secondary)
+            }.width(min: 50, ideal: 64, max: 80)
+
             TableColumn("Request Size", value: \.requestBodySize) {
                 Text(ByteCountFormatter.string(fromByteCount: $0.requestBodySize))
-            }.width(min: 54, ideal: 64, max: 140)
+                    .foregroundColor(.secondary)
+            }.width(min: 50, ideal: 64, max: 80)
+
             TableColumn("Response Size", value: \.responseBodySize) {
                 Text(ByteCountFormatter.string(fromByteCount: $0.responseBodySize))
-            }.width(min: 54, ideal: 64, max: 140)
+                    .foregroundColor(.secondary)
+            }.width(min: 50, ideal: 64, max: 80)
         }
         .tableStyle(.inset)
         .onChange(of: sortOrder) {
             viewModel.sortDescriptors = $0.map(NSSortDescriptor.init)
         }
+    }
+
+    private func textColor(for task: NetworkTaskEntity) -> Color {
+        if selection == task.objectID {
+            return Color.primary
+        }
+        return task.state == .failure ? Color.red : Color.primary
     }
 }
 
@@ -108,12 +155,14 @@ struct ConsoleTableView_Previews: PreviewProvider {
             let viewModel = ConsoleViewModel(store: .mock)
             ConsoleTableView(viewModel: viewModel.list, selection: .constant(nil))
                 .previewLayout(.fixed(width: 1200, height: 800))
+                .previewDisplayName("Logs")
         }
         Group {
             let viewModel = ConsoleViewModel(store: .mock)
             let _ = viewModel.mode = .tasks
             ConsoleTableView(viewModel: viewModel.list, selection: .constant(nil))
                 .previewLayout(.fixed(width: 1200, height: 800))
+                .previewDisplayName("Tasks")
         }
     }
 }

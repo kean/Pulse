@@ -9,8 +9,7 @@ import CoreData
 extension ConsoleSearchCriteria {
     static func makeMessagePredicates(
         criteria: ConsoleSearchCriteria,
-        isOnlyErrors: Bool,
-        filterTerm: String
+        isOnlyErrors: Bool
     ) -> NSPredicate? {
         var predicates = [NSPredicate]()
         if isOnlyErrors {
@@ -18,16 +17,12 @@ extension ConsoleSearchCriteria {
         }
         predicates += makePredicates(for: criteria.shared)
         predicates += makePredicates(for: criteria.messages)
-        if filterTerm.count > 1 {
-            predicates.append(NSPredicate(format: "text CONTAINS[cd] %@", filterTerm))
-        }
         return predicates.isEmpty ? nil : NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
     }
 
     static func makeNetworkPredicates(
         criteria: ConsoleSearchCriteria,
-        isOnlyErrors: Bool,
-        filterTerm: String
+        isOnlyErrors: Bool
     ) -> NSPredicate? {
         var predicates = [NSPredicate]()
         if isOnlyErrors {
@@ -35,9 +30,6 @@ extension ConsoleSearchCriteria {
         }
         predicates += makePredicates(for: criteria.shared, isNetwork: true)
         predicates += makePredicates(for: criteria.network)
-        if filterTerm.count > 1 {
-            predicates.append(NSPredicate(format: "url CONTAINS[cd] %@", filterTerm))
-        }
         return predicates.isEmpty ? nil : NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
     }
 }

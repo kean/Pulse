@@ -13,9 +13,9 @@ public struct ConsoleView: View {
     @StateObject private var viewModel: ConsoleViewModel
     @ObservedObject var searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
     @ObservedObject var searchBarViewModel: ConsoleSearchBarViewModel
+    @ObservedObject private var router: ConsoleRouter
     @AppStorage("com-github-kean-pulse-display-mode") private var displayMode: ConsoleDisplayMode = .list
     @AppStorage("com-github-kean-pulse-is-vertical") private var isVertical = false
-    @State private var selection: NSManagedObjectID?
 
     public init(store: LoggerStore = .shared) {
         self.init(viewModel: .init(store: store))
@@ -25,6 +25,7 @@ public struct ConsoleView: View {
         _viewModel = StateObject(wrappedValue: viewModel)
         self.searchCriteriaViewModel = viewModel.searchCriteriaViewModel
         self.searchBarViewModel = viewModel.searchBarViewModel
+        self.router = viewModel.router
     }
 
     public var body: some View {
@@ -33,29 +34,26 @@ public struct ConsoleView: View {
             contents
         }
             .toolbar {
+                ToolbarItemGroup(placement: .navigation) {
+                    Picker("Mode", selection: $displayMode) {
+                        Label("List", systemImage: "list.bullet").tag(ConsoleDisplayMode.list)
+                        Label("Table", systemImage: "tablecells").tag(ConsoleDisplayMode.table)
+                        Label("Text", systemImage: "text.quote").tag(ConsoleDisplayMode.text)
+                    }.pickerStyle(.segmented)
+                }
                 ToolbarItemGroup(placement: .automatic) {
+                    Spacer()
                     toolbarItems
                 }
             }
+            .navigationTitle("")
             .onAppear { viewModel.isViewVisible = true }
             .onDisappear { viewModel.isViewVisible = false }
-            .navigationTitle("Console")
     }
 
     @ViewBuilder
     private var toolbarItems: some View {
-        Picker("Mode", selection: $displayMode) {
-            Label("List", systemImage: "list.bullet").tag(ConsoleDisplayMode.list)
-            Label("Table", systemImage: "tablecells").tag(ConsoleDisplayMode.table)
-            Label("Text", systemImage: "text.quote").tag(ConsoleDisplayMode.text)
-        }.pickerStyle(.segmented)
-
-        Spacer()
-
         ConsoleToolbarItems(viewModel: viewModel)
-
-        Spacer()
-
         Button(action: { isVertical.toggle() }, label: {
             Image(systemName: isVertical ? "square.split.2x1" : "square.split.1x2")
         }).help(isVertical ? "Switch to Horizontal Layout" : "Switch to Vertical Layout")
@@ -64,10 +62,10 @@ public struct ConsoleView: View {
     @ViewBuilder
     private var contents: some View {
         let split = NotSplitView(
-            ConsoleContentView(viewModel: viewModel, displayMode: $displayMode, selection: $selection),
+            ConsoleContentView(viewModel: viewModel, displayMode: $displayMode),
             detailsView
                 .frame(minWidth: 400, idealWidth: 800, maxWidth: .infinity, minHeight: 120, idealHeight: 480, maxHeight: .infinity, alignment: .center),
-            isPanelTwoCollaped: selection == nil,
+            isPanelTwoCollaped: router.selection == nil,
             isVertical: isVertical
         )
 
@@ -91,18 +89,14 @@ public struct ConsoleView: View {
     }
 
     private var detailsView: some View {
-        ConsoleEntityDetailsView(viewModel: viewModel.list, selection: $selection)
+        ConsoleEntityDetailsView(viewModel: viewModel.list, router: viewModel.router)
     }
 }
-
-#warning("fix show-more not working")
-#warning("add info icons on macos to open details in textmode")
-#warning("different search based on what mode your are using?")
 
 private struct ConsoleContentView: View {
     var viewModel: ConsoleViewModel
     @Binding var displayMode: ConsoleDisplayMode
-    @Binding var selection: NSManagedObjectID?
+    @State var selection: NSManagedObjectID?
     @Environment(\.isSearching) private var isSearching
 
     var body: some View {
@@ -117,6 +111,9 @@ private struct ConsoleContentView: View {
             .padding(.top, 7)
             .padding(.bottom, 9)
             .padding(.horizontal, 10)
+        }
+        .onChange(of: selection) {
+            viewModel.router.selection = $0.map(ConsoleSelectedItem.entity)
         }
         .onChange(of: isSearching) {
             viewModel.isSearching = $0

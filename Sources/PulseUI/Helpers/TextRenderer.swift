@@ -16,7 +16,6 @@ import PDFKit
 final class TextRenderer {
     struct Options {
         var color: ColorMode = .full
-        var isCompact = false
 
         static let sharing = Options(color: .automatic)
     }
@@ -59,17 +58,24 @@ final class TextRenderer {
     }
 
     func render(_ message: LoggerMessageEntity) {
-        if options.isCompact {
-            var details = ConsoleFormatter.time(for: message.createdAt)
-            if let label = ConsoleFormatter.label(for: message) {
-                details += "\(ConsoleFormatter.separator)\(label)\(ConsoleFormatter.separator)"
-            }
-            string.append(details, helper.attributes(role: .body2, style: .monospacedDigital, width: .condensed, color: .secondaryLabel))
-            string.append(message.text + "\n", helper.attributes(role: .body2, color: textColor(for: message.logLevel)))
-        } else {
-            string.append(ConsoleFormatter.subheadline(for: message) + "\n", helper.attributes(role: .subheadline, style: .monospacedDigital, width: .condensed, color: .secondaryLabel))
-            string.append(message.text + "\n", helper.attributes(role: .body2, color: textColor(for: message.logLevel)))
+        string.append(ConsoleFormatter.subheadline(for: message) + "\n", helper.attributes(role: .subheadline, style: .monospacedDigital, width: .condensed, color: .secondaryLabel))
+        string.append(message.text + "\n", helper.attributes(role: .body2, color: textColor(for: message.logLevel)))
+    }
+
+    func renderCompact(_ message: LoggerMessageEntity) {
+        var details = ConsoleFormatter.time(for: message.createdAt)
+        if let label = ConsoleFormatter.label(for: message) {
+            details += "\(ConsoleFormatter.separator)\(label)\(ConsoleFormatter.separator)"
         }
+        let detailsColor: UXColor
+        switch message.logLevel {
+        case .critical, .error, .warning:
+            detailsColor = textColor(for: message.logLevel)
+        default:
+            detailsColor = .secondaryLabel
+        }
+        string.append(details, helper.attributes(role: .body2, style: .monospacedDigital, width: .condensed, color: detailsColor))
+        string.append(message.text + "\n", helper.attributes(role: .body2, color: textColor(for: message.logLevel)))
     }
 
     private func textColor(for level: LoggerStore.Level) -> UXColor {
@@ -84,11 +90,7 @@ final class TextRenderer {
         if content.contains(.largeHeader) {
             renderLargeHeader(for: task)
         } else if content.contains(.header) {
-            if options.isCompact {
-                renderCompactHeader(for: task)
-            } else {
-                renderHeader(for: task)
-            }
+            renderHeader(for: task)
         }
 
         if content.contains(.taskDetails) {
@@ -180,7 +182,7 @@ final class TextRenderer {
         addSpacer()
     }
 
-    private func renderCompactHeader(for task: NetworkTaskEntity) {
+    func renderCompact(_ task: NetworkTaskEntity) {
         let isTitleColored = task.state == .failure && options.color != .monochrome
         let titleColor = isTitleColored ? UXColor.systemRed : UXColor.secondaryLabel
         let detailsColor = isTitleColored ? UXColor.systemRed : UXColor.label
@@ -191,6 +193,9 @@ final class TextRenderer {
         urlAttributes[.link] = task.objectID.uriRepresentation()
         urlAttributes[.underlineColor] = titleColor.withAlphaComponent(0.5)
         urlAttributes[.underlineStyle] = 1
+#if os(macOS)
+        urlAttributes[.cursor] = NSCursor.pointingHand
+#endif
         string.append((task.httpMethod ?? "GET") + " " + (task.url ?? "–") + "\n", urlAttributes)
     }
 
