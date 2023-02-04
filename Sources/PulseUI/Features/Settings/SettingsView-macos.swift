@@ -2,10 +2,10 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
+#if os(macOS)
+
 import SwiftUI
 import Pulse
-
-#if os(macOS)
 import UniformTypeIdentifiers
 
 public struct SettingsView: View {
@@ -35,23 +35,25 @@ public struct SettingsView: View {
 
     @ViewBuilder
     private var settings: some View {
-        Section {
-            Button(action: { isPresentingShareStoreView = true }) {
-                Label("Share Store", systemImage: "square.and.arrow.up")
-            }
-            .popover(isPresented: $isPresentingShareStoreView) {
-                ShareStoreView(store: viewModel.store, isPresented: $isPresentingShareStoreView) { item in
-                    isPresentingShareStoreView = false
-                    DispatchQueue.main.async {
-                        shareItems = item
+        Section(header: header(title: "Share")) {
+            HStack {
+                Button(action: { isPresentingShareStoreView = true }) {
+                    Label("Share Store", systemImage: "square.and.arrow.up")
+                }
+                .popover(isPresented: $isPresentingShareStoreView) {
+                    ShareStoreView(store: viewModel.store, isPresented: $isPresentingShareStoreView) { item in
+                        isPresentingShareStoreView = false
+                        DispatchQueue.main.async {
+                            shareItems = item
+                        }
                     }
                 }
+                .popover(item: $shareItems) { item in
+                    ShareView(item)
+                        .fixedSize()
+                }
+                Spacer()
             }
-            .popover(item: $shareItems) { item in
-                ShareView(item)
-                    .fixedSize()
-            }
-
             Button(action: { isPresentingStoreDetails = true }) {
                 Label("Store Details", systemImage: "info.circle")
             }
@@ -59,7 +61,8 @@ public struct SettingsView: View {
                 StoreDetailsView(source: .store(viewModel.store))
             }
         }
-        Section(header: Text("Open Store")) {
+        Divider()
+        Section(header: header(title: "Open Store")) {
             Button("Show in Finder") {
                 NSWorkspace.shared.activateFileViewerSelecting([store.storeURL])
             }
@@ -67,8 +70,9 @@ public struct SettingsView: View {
                 NSWorkspace.shared.open(store.storeURL)
             }
         }
+        Divider()
         if !viewModel.isArchive {
-            Section(header: Text("Manage Messages")) {
+            Section(header: header(title: "Manage Messages")) {
                 Button {
                     viewModel.buttonRemoveAllMessagesTapped()
                 } label: {
@@ -76,7 +80,8 @@ public struct SettingsView: View {
                 }
             }
         }
-        Section(header: Text("Remote Logging")) {
+        Divider()
+        Section(header: header(title: "Remote Logging")) {
             if viewModel.isRemoteLoggingAvailable {
                 RemoteLoggerSettingsView(viewModel: .shared)
             } else {
@@ -84,6 +89,13 @@ public struct SettingsView: View {
                     .foregroundColor(.secondary)
             }
         }
+    }
+
+    private func header(title: String) -> some View {
+        Text(title)
+            .font(.headline)
+            .foregroundColor(.secondary)
+            .padding(.bottom, 8)
     }
 }
 

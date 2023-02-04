@@ -6,7 +6,7 @@ import SwiftUI
 
 struct ConsoleInspectorsView: View {
     let viewModel: ConsoleViewModel
-    @State private var selectedTab: ConsoleInspector = .storeInfo
+    @State private var selectedTab: ConsoleInspector = .settings
 
     var body: some View {
         VStack(spacing: 0) {
@@ -34,8 +34,16 @@ struct ConsoleInspectorsView: View {
         case .filters:
             ConsoleSearchCriteriaView(viewModel: viewModel.searchCriteriaViewModel)
         case .storeInfo:
-            StoreDetailsView(source: .store(viewModel.store))
+            VStack {
+                StoreDetailsView(source: .store(viewModel.store))
+                Spacer()
+            }
                 .padding()
+        case .settings:
+            VStack {
+                SettingsView(store: viewModel.store)
+                Spacer()
+            }
         }
     }
 }
@@ -43,6 +51,7 @@ struct ConsoleInspectorsView: View {
 private enum ConsoleInspector: Identifiable, CaseIterable {
     case filters
     case storeInfo
+    case settings
 
     var id: ConsoleInspector { self }
 
@@ -52,6 +61,8 @@ private enum ConsoleInspector: Identifiable, CaseIterable {
             return "line.3.horizontal.decrease.circle"
         case .storeInfo:
             return "info.circle"
+        case .settings:
+            return "gearshape"
         }
     }
 }

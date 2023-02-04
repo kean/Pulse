@@ -158,7 +158,6 @@ private struct ConsoleToolbarItems: View {
     @ObservedObject var viewModel: ConsoleViewModel
 
     var body: some View {
-        ConsoleSettingsButton(store: viewModel.store)
         ConsoleToolbarToggleOnlyErrorsButton(viewModel: viewModel.searchCriteriaViewModel)
             .keyboardShortcut("e", modifiers: [.command, .shift])
         FilterPopoverToolbarButton(viewModel: viewModel)
@@ -188,21 +187,6 @@ private struct ConsoleDetailsView: View {
     private func byteCount(for size: Int64) -> String {
         guard size > 0 else { return "0 KB" }
         return ByteCountFormatter.string(fromByteCount: size)
-    }
-}
-
-private struct ConsoleSettingsButton: View {
-    let store: LoggerStore
-
-    @State private var isPresentingSettings = false
-
-    var body: some View {
-        Button(action: { isPresentingSettings = true }) {
-            Image(systemName: "gearshape")
-        }
-        .popover(isPresented: $isPresentingSettings, arrowEdge: .bottom) {
-            SettingsView(viewModel: .init(store: store))
-        }
     }
 }
 
