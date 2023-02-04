@@ -14,9 +14,6 @@ final class TextRendererTestsTests: XCTestCase {
         let json = try JSONSerialization.jsonObject(with: MockJSON.allPossibleValues)
         let error = generateTypeMismatchError()
 
-        let suite = tls_ciphersuite_t.RSA_WITH_AES_128_CBC_SHA
-        print(suite)
-
         // WHEN
         let renderer = TextRendererJSON(json: json, error: error)
         let string = renderer.render()

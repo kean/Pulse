@@ -2,6 +2,8 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
+#if os(macOS)
+
 import SwiftUI
 
 struct ConsoleInspectorsView: View {
@@ -96,3 +98,5 @@ private struct TabBarItem: View {
         }.buttonStyle(.plain)
     }
 }
+
+#endif
