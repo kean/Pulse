@@ -27,7 +27,7 @@ struct ConsoleInspectorsView: View {
                 }
             }
             Spacer()
-        }.padding(EdgeInsets(top: 4, leading: 10, bottom: 5, trailing: 8))
+        }.padding(EdgeInsets(top: 3, leading: 10, bottom: 4, trailing: 8))
     }
 
     @ViewBuilder
