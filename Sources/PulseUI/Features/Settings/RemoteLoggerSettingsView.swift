@@ -18,6 +18,9 @@ struct RemoteLoggerSettingsView: View {
                 Image(systemName: "network")
 #endif
                 Text("Remote Logging")
+#if os(macOS)
+                Spacer()
+#endif
             }
         })
         if viewModel.isEnabled {
@@ -61,9 +64,16 @@ struct RemoteLoggerSettingsView: View {
                             .font(.system(size: 16, weight: .medium))
                             .frame(width: 21, height: 36, alignment: .center)
                     } else {
+                        #if os(macOS)
+                        ProgressView()
+                            .progressViewStyle(.circular)
+                            .frame(width: 15, height: 44, alignment: .leading)
+                            .scaleEffect(0.5)
+                        #else
                         ProgressView()
                             .progressViewStyle(.circular)
                             .frame(width: 21, height: 36, alignment: .leading)
+                        #endif
                     }
                 } else {
                     Rectangle()

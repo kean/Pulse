@@ -6,11 +6,9 @@
 
 import SwiftUI
 
-#warning("temp selected-tab")
-
 struct ConsoleInspectorsView: View {
     let viewModel: ConsoleViewModel
-    @State private var selectedTab: ConsoleInspector = .storeInfo
+    @State private var selectedTab: ConsoleInspector = .filters
 
     var body: some View {
         VStack(spacing: 0) {

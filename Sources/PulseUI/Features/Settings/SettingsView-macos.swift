@@ -29,13 +29,11 @@ public struct SettingsView: View {
         Form {
             settings
         }
-        .listStyle(.sidebar)
-        .padding()
     }
 
     @ViewBuilder
     private var settings: some View {
-        Section(header: SectionHeaderView(title: "Share")) {
+        ConsoleSection(isDividerHidden: true, header: { SectionHeaderView(title: "Share") }) {
             HStack {
                 Button(action: { isPresentingShareStoreView = true }) {
                     Label("Share Store", systemImage: "square.and.arrow.up")
@@ -54,25 +52,32 @@ public struct SettingsView: View {
                 }
                 Spacer()
             }
-            Button(action: { isPresentingStoreDetails = true }) {
-                Label("Store Details", systemImage: "info.circle")
+            HStack {
+                Button(action: { isPresentingStoreDetails = true }) {
+                    Label("Store Details", systemImage: "info.circle")
+                }
+                Spacer()
             }
             .popover(isPresented: $isPresentingStoreDetails) {
                 StoreDetailsView(source: .store(viewModel.store))
             }
         }
-        Divider()
-        Section(header: SectionHeaderView(title: "Open Store")) {
-            Button("Show in Finder") {
-                NSWorkspace.shared.activateFileViewerSelecting([store.storeURL])
+        ConsoleSection(header: { SectionHeaderView(title: "Open Store") }) {
+            HStack {
+                Button("Show in Finder") {
+                    NSWorkspace.shared.activateFileViewerSelecting([store.storeURL])
+                }
+                Spacer()
             }
-            Button("Open in Pulse Pro") {
-                NSWorkspace.shared.open(store.storeURL)
+            HStack {
+                Button("Open in Pulse Pro") {
+                    NSWorkspace.shared.open(store.storeURL)
+                }
+                Spacer()
             }
         }
-        Divider()
         if !viewModel.isArchive {
-            Section(header: SectionHeaderView(title: "Manage Messages")) {
+            ConsoleSection(header: { SectionHeaderView(title: "Manage Messages") }) {
                 Button {
                     viewModel.buttonRemoveAllMessagesTapped()
                 } label: {
@@ -80,8 +85,7 @@ public struct SettingsView: View {
                 }
             }
         }
-        Divider()
-        Section(header: SectionHeaderView(title: "Remote Logging")) {
+        ConsoleSection(header: { SectionHeaderView(title: "Remote Logging") }) {
             if viewModel.isRemoteLoggingAvailable {
                 RemoteLoggerSettingsView(viewModel: .shared)
             } else {
