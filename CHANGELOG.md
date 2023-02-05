@@ -1,5 +1,11 @@
 # Pulse 3.x
 
+## Pulse 3.4
+
+*Feb 4, 2023*
+
+- Introduce several features from Pulse Pro to the macOS version of the console
+
 ## Pulse 3.3
 
 *Jan 30, 2023*
