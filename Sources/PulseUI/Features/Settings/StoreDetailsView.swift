@@ -60,21 +60,20 @@ private struct Contents: View {
                     .focusable()
 #endif
 #if os(macOS)
-                    .padding(.bottom, 16)
+                    .padding(12)
 #endif
             }
             ForEach(viewModel.sections, id: \.title) { section in
-#if os(macOS)
-                Divider()
-#endif
-                Section(header: Text(section.title)) {
+                ConsoleSection(header: {
+                    SectionHeaderView(title: section.title)
+                }, content: {
                     ForEach(section.items.enumerated().map(KeyValueRow.init)) { item in
                         InfoRow(title: item.title, details: item.details)
 #if os(tvOS)
                             .focusable()
 #endif
                     }
-                }
+                })
             }
         }
     }
@@ -174,6 +173,7 @@ private let dateFormatter: DateFormatter = {
 struct StoreDetailsView_Previews: PreviewProvider {
     static var previews: some View {
         StoreDetailsView(source: .store(.mock))
+            .frame(width: 280)
     }
 }
 #endif

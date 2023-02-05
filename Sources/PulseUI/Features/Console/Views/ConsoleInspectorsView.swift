@@ -6,9 +6,11 @@
 
 import SwiftUI
 
+#warning("temp selected-tab")
+
 struct ConsoleInspectorsView: View {
     let viewModel: ConsoleViewModel
-    @State private var selectedTab: ConsoleInspector = .filters
+    @State private var selectedTab: ConsoleInspector = .storeInfo
 
     var body: some View {
         VStack(spacing: 0) {
@@ -40,7 +42,6 @@ struct ConsoleInspectorsView: View {
                 StoreDetailsView(source: .store(viewModel.store))
                 Spacer()
             }
-            .padding()
         case .insights:
             if #available(macOS 13.0, *) {
                 NavigationStack {

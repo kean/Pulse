@@ -105,6 +105,7 @@ struct SectionHeaderView: View {
                 .font(.headline)
                 .foregroundColor(.secondary)
                 .padding(.bottom, 8)
+            Spacer()
         }
     }
 }
