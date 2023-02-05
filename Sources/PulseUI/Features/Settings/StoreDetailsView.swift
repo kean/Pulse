@@ -65,7 +65,11 @@ private struct Contents: View {
             }
             ForEach(viewModel.sections, id: \.title) { section in
                 ConsoleSection(header: {
+#if os(iOS)
+                    Text(section.title)
+#else
                     SectionHeaderView(title: section.title)
+#endif
                 }, content: {
                     ForEach(section.items.enumerated().map(KeyValueRow.init)) { item in
                         InfoRow(title: item.title, details: item.details)
