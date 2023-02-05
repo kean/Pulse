@@ -65,10 +65,10 @@ private struct Contents: View {
             }
             ForEach(viewModel.sections, id: \.title) { section in
                 ConsoleSection(header: {
-#if os(iOS)
-                    Text(section.title)
-#else
+#if os(macOS)
                     SectionHeaderView(title: section.title)
+#else
+                    Text(section.title)
 #endif
                 }, content: {
                     ForEach(section.items.enumerated().map(KeyValueRow.init)) { item in
