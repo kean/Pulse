@@ -69,7 +69,7 @@ public struct ConsoleView: View {
         Button(action: { isVertical.toggle() }, label: {
             Image(systemName: isVertical ? "square.split.2x1" : "square.split.1x2")
         }).help(isVertical ? "Switch to Horizontal Layout" : "Switch to Vertical Layout")
-        Button(action: { withAnimation { isInspectorHidden.toggle() } }, label: {
+        Button(action: { isInspectorHidden.toggle() }, label: {
             Image(systemName: "sidebar.right")
         })
     }
