@@ -4,8 +4,13 @@
 
 import Foundation
 
-#if os(iOS)
+#if os(macOS)
+import AppKit
+#endif
+
+#if os(iOS) || os(tvOS)
 import PDFKit
+import UIKit
 #endif
 
 enum TextUtilities {
@@ -37,6 +42,12 @@ enum TextUtilities {
         if let range = getRange(of: "<style type=\"text/css\">") {
             insert(#"span { line-height: 1.4; }"#, at: range.upperBound)
             insert(#"body { word-wrap: break-word;  padding: 8px; }"#, at: range.upperBound)
+            // TODO: Rewrite this without sync
+            DispatchQueue.main.sync {
+                if isDarkMode {
+                    insert(#"body { background-color: #2C2A28; }"#, at: range.upperBound)
+                }
+            }
         }
 
         if let range = getRange(of: "</style>") {
@@ -95,5 +106,15 @@ enum TextUtilities {
 
         return data as Data
     }
+#endif
+}
+
+private var isDarkMode: Bool {
+#if os(iOS) || os(tvOS)
+    return UIViewController().traitCollection.userInterfaceStyle == .dark
+#elseif os(watchOS)
+    return true
+#elseif os(macOS)
+    return NSAppearance.currentDrawing().name != .aqua
 #endif
 }
