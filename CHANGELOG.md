@@ -2,6 +2,7 @@
 
 - Fix selection not working in search results view on macOS
 - Fix transaction details opening an empty page
+- Use darker background color for main content on macOS
 
 ## Pulse 3.4
 

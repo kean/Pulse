@@ -77,7 +77,9 @@ public struct ConsoleView: View {
     @ViewBuilder
     private var contents: some View {
         let split = NotSplitView(
-            ConsoleContentView(viewModel: viewModel, displayMode: $displayMode),
+            ConsoleContentView(viewModel: viewModel, displayMode: $displayMode)
+                .background(Color(UXColor.textBackgroundColor))
+                .backport.hideListContentBackgroumd(),
             detailsView
                 .frame(minWidth: 400, idealWidth: 800, maxWidth: .infinity, minHeight: 120, idealHeight: 480, maxHeight: .infinity, alignment: .center),
             isPanelTwoCollaped: router.selection == nil,
@@ -105,6 +107,7 @@ public struct ConsoleView: View {
 
     private var detailsView: some View {
         ConsoleEntityDetailsView(viewModel: viewModel.list, router: viewModel.router)
+            .background(Color(UXColor.textBackgroundColor))
     }
 }
 
