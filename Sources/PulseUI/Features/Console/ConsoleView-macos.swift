@@ -30,25 +30,25 @@ public struct ConsoleView: View {
     }
 
     public var body: some View {
-        HStack(spacing: 0) {
+        HSplitView {
             contents
+                .toolbar {
+                    ToolbarItemGroup(placement: .navigation) {
+                        Picker("Mode", selection: $displayMode) {
+                            Label("List", systemImage: "list.bullet").tag(ConsoleDisplayMode.list)
+                            Label("Table", systemImage: "tablecells").tag(ConsoleDisplayMode.table)
+                            Label("Text", systemImage: "text.quote").tag(ConsoleDisplayMode.text)
+                        }.pickerStyle(.segmented)
+                    }
+                    ToolbarItemGroup(placement: .automatic) {
+                        Spacer()
+                        toolbarItems
+                    }
+                }
             if !isInspectorHidden {
-                ThinkDivider()
+//                ThinkDivider()
                 ConsoleInspectorsView(viewModel: viewModel)
                     .frame(width: 275)
-            }
-        }
-        .toolbar {
-            ToolbarItemGroup(placement: .navigation) {
-                Picker("Mode", selection: $displayMode) {
-                    Label("List", systemImage: "list.bullet").tag(ConsoleDisplayMode.list)
-                    Label("Table", systemImage: "tablecells").tag(ConsoleDisplayMode.table)
-                    Label("Text", systemImage: "text.quote").tag(ConsoleDisplayMode.text)
-                }.pickerStyle(.segmented)
-            }
-            ToolbarItemGroup(placement: .automatic) {
-                Spacer()
-                toolbarItems
             }
         }
         .navigationTitle("")
@@ -72,13 +72,20 @@ public struct ConsoleView: View {
 
     @ViewBuilder
     private var contents: some View {
-        let split = NotSplitView(
-            ConsoleContentView(viewModel: viewModel, displayMode: $displayMode),
-            detailsView
-                .frame(minWidth: 400, idealWidth: 800, maxWidth: .infinity, minHeight: 120, idealHeight: 480, maxHeight: .infinity, alignment: .center),
-            isPanelTwoCollaped: router.selection == nil,
-            isVertical: isVertical
-        )
+        let split = HSplitView {
+            ConsoleContentView(viewModel: viewModel, displayMode: $displayMode)
+            if router.selection != nil {
+                detailsView
+                    .frame(minWidth: 400, idealWidth: 800, maxWidth: .infinity, minHeight: 120, idealHeight: 480, maxHeight: .infinity, alignment: .center)
+            }
+        }
+//        let split = NotSplitView(
+//            ConsoleContentView(viewModel: viewModel, displayMode: $displayMode),
+//            detailsView
+//                .frame(minWidth: 400, idealWidth: 800, maxWidth: .infinity, minHeight: 120, idealHeight: 480, maxHeight: .infinity, alignment: .center),
+//            isPanelTwoCollaped: router.selection == nil,
+//            isVertical: isVertical
+//        )
 
         if #available(macOS 13, *) {
             split

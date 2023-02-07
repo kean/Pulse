@@ -11,5 +11,7 @@ struct Pulse_Demo_macOSApp: App {
         WindowGroup {
             ConsoleView(store: .demo)
         }
+        .windowStyle(.hiddenTitleBar)
+        .windowToolbarStyle(.unified(showsTitle: false))
     }
 }
