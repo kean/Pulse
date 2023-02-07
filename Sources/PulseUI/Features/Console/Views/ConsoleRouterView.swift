@@ -20,6 +20,7 @@ final class ConsoleRouter: ObservableObject {
 
 enum ConsoleSelectedItem: Hashable {
     case entity(NSManagedObjectID)
+    case occurence(NSManagedObjectID, ConsoleSearchOccurrence)
 }
 
 struct ConsoleRouterView: View {

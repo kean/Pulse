@@ -200,13 +200,21 @@ final class ConsoleSearchService {
 }
 
 @available(iOS 15, tvOS 15, *)
-struct ConsoleSearchOccurrence: Identifiable {
+struct ConsoleSearchOccurrence: Identifiable, Equatable, Hashable {
     let id = ConsoleSearchOccurenceId()
     let scope: ConsoleSearchScope
     let line: Int
     let range: NSRange
     let text: AttributedString
     let searchContext: RichTextViewModel.SearchContext
+
+    static func == (lhs: ConsoleSearchOccurrence, rhs: ConsoleSearchOccurrence) -> Bool {
+        lhs.id == rhs.id
+    }
+
+    func hash(into hasher: inout Hasher) {
+        id.hash(into: &hasher)
+    }
 }
 
 struct ConsoleSearchOccurenceId: Hashable {

@@ -1,5 +1,7 @@
 # Pulse 3.x
 
+- Fix selection not working in search results view on macOS 
+
 ## Pulse 3.4
 
 *Feb 4, 2023*

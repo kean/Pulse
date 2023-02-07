@@ -111,7 +111,8 @@ public struct ConsoleView: View {
 private struct ConsoleContentView: View {
     var viewModel: ConsoleViewModel
     @Binding var displayMode: ConsoleDisplayMode
-    @State var selection: NSManagedObjectID?
+    @State private var selectedObjectID: NSManagedObjectID? // Has to use for Table
+    @State private var selection: ConsoleSelectedItem?
     @Environment(\.isSearching) private var isSearching
 
     var body: some View {
@@ -127,8 +128,11 @@ private struct ConsoleContentView: View {
             .padding(.bottom, 9)
             .padding(.horizontal, 10)
         }
-        .onChange(of: selection) {
+        .onChange(of: selectedObjectID) {
             viewModel.router.selection = $0.map(ConsoleSelectedItem.entity)
+        }
+        .onChange(of: selection) {
+            viewModel.router.selection = $0
         }
         .onChange(of: isSearching) {
             viewModel.isSearching = $0
@@ -145,7 +149,7 @@ private struct ConsoleContentView: View {
         } else {
             switch displayMode {
             case .table:
-                ConsoleTableView(viewModel: viewModel.list, selection: $selection)
+                ConsoleTableView(viewModel: viewModel.list, selection: $selectedObjectID)
             case .list:
                 List(selection: $selection) {
                     ConsoleListContentView(viewModel: viewModel.list)
