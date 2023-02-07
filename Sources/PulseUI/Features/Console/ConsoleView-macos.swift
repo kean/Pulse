@@ -101,6 +101,7 @@ public struct ConsoleView: View {
 
     private var detailsView: some View {
         ConsoleEntityDetailsView(viewModel: viewModel.list, router: viewModel.router)
+            .background(Color(UXColor.textBackgroundColor))
     }
 }
 

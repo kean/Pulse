@@ -1,9 +1,13 @@
 # Pulse 3.x
 
+## Pulse 3.4.1
+
+*Feb 6, 2023*
+
 - Fix selection not working in search results view on macOS
 - Fix transaction details opening an empty page
 - Fix a couple of minor issues in light mode on macOS
-- Use darker background color for main content on macOS
+- Use darker background color for details view (mainly text) on macOS
 
 ## Pulse 3.4
 
