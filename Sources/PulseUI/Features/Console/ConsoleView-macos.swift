@@ -42,22 +42,22 @@ public struct ConsoleView: View {
                 }
             }
         }
-            .toolbar {
-                ToolbarItemGroup(placement: .navigation) {
-                    Picker("Mode", selection: $displayMode) {
-                        Label("List", systemImage: "list.bullet").tag(ConsoleDisplayMode.list)
-                        Label("Table", systemImage: "tablecells").tag(ConsoleDisplayMode.table)
-                        Label("Text", systemImage: "text.quote").tag(ConsoleDisplayMode.text)
-                    }.pickerStyle(.segmented)
-                }
-                ToolbarItemGroup(placement: .automatic) {
-                    Spacer()
-                    toolbarItems
-                }
+        .toolbar {
+            ToolbarItemGroup(placement: .navigation) {
+                Picker("Mode", selection: $displayMode) {
+                    Label("List", systemImage: "list.bullet").tag(ConsoleDisplayMode.list)
+                    Label("Table", systemImage: "tablecells").tag(ConsoleDisplayMode.table)
+                    Label("Text", systemImage: "text.quote").tag(ConsoleDisplayMode.text)
+                }.pickerStyle(.segmented)
             }
-            .navigationTitle("")
-            .onAppear { viewModel.isViewVisible = true }
-            .onDisappear { viewModel.isViewVisible = false }
+            ToolbarItemGroup(placement: .automatic) {
+                Spacer()
+                toolbarItems
+            }
+        }
+        .navigationTitle("")
+        .onAppear { viewModel.isViewVisible = true }
+        .onDisappear { viewModel.isViewVisible = false }
     }
 
     @ViewBuilder
