@@ -275,6 +275,7 @@
 		0CF0D6F1296F1AF100EED9D4 /* Pulse.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0CF0D542296F14EA00EED9D4 /* Pulse.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		0CF0D6F4296F1AF100EED9D4 /* PulseUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CF0D56C296F17CB00EED9D4 /* PulseUI.framework */; };
 		0CF0D6F5296F1AF100EED9D4 /* PulseUI.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0CF0D56C296F17CB00EED9D4 /* PulseUI.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		0CFBC5AF2991DCD30038E547 /* ThickDivider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CFBC5AE2991DCD30038E547 /* ThickDivider.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -745,6 +746,7 @@
 		0CF0D6C7296F18FD00EED9D4 /* TextRendererTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextRendererTests.swift; sourceTree = "<group>"; };
 		0CF0D6C8296F18FD00EED9D4 /* ConsoleViewModelTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleViewModelTests.swift; sourceTree = "<group>"; };
 		0CF0D6C9296F18FD00EED9D4 /* MockTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockTests.swift; sourceTree = "<group>"; };
+		0CFBC5AE2991DCD30038E547 /* ThickDivider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThickDivider.swift; sourceTree = "<group>"; };
 		0CFF9BD825D6199A0069DB6A /* repos.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = repos.json; sourceTree = "<group>"; };
 		49E82A8526D107A00070244F /* AlamofireIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlamofireIntegration.swift; sourceTree = "<group>"; };
 		49E82A8826D1083D0070244F /* MoyaIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoyaIntegration.swift; sourceTree = "<group>"; };
@@ -1288,6 +1290,7 @@
 				0CF0D598296F189500EED9D4 /* FileViewer.swift */,
 				0CF0D59D296F189500EED9D4 /* FileViewerViewModel.swift */,
 				0CF0D599296F189500EED9D4 /* ToastView.swift */,
+				0CFBC5AE2991DCD30038E547 /* ThickDivider.swift */,
 				0CF0D57F296F189500EED9D4 /* SpinnerView.swift */,
 				0CF0D59A296F189500EED9D4 /* ShareView.swift */,
 				0CF0D59B296F189500EED9D4 /* PDFRepresentedView.swift */,
@@ -2168,6 +2171,7 @@
 				0CB63A2729759D2E00525165 /* ConsoleSearchToken.swift in Sources */,
 				0CF0D679296F189600EED9D4 /* ConsoleView-ios.swift in Sources */,
 				0CF0D661296F189600EED9D4 /* NetworkInspectorTransferInfoView.swift in Sources */,
+				0CFBC5AF2991DCD30038E547 /* ThickDivider.swift in Sources */,
 				0CF0D663296F189600EED9D4 /* NetworkInspectorTransactionView.swift in Sources */,
 				0CB63A212974A62700525165 /* ConsoleSearchService.swift in Sources */,
 				0CF0D614296F189600EED9D4 /* TextRendererJSON.swift in Sources */,

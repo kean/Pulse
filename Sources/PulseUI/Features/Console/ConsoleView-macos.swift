@@ -2,12 +2,12 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
+#if os(macOS)
+
 import SwiftUI
 import CoreData
 import Pulse
 import Combine
-
-#if os(macOS)
 
 public struct ConsoleView: View {
     @StateObject private var viewModel: ConsoleViewModel
@@ -30,16 +30,12 @@ public struct ConsoleView: View {
     }
 
     public var body: some View {
-        VStack(spacing: 0) {
-            Divider()
-            HStack(spacing: 0) {
-                contents
-                if !isInspectorHidden {
-                    Divider()
-                        .background(Color.black)
-                    ConsoleInspectorsView(viewModel: viewModel)
-                        .frame(width: 275)
-                }
+        HStack(spacing: 0) {
+            contents
+            if !isInspectorHidden {
+                ThinkDivider(width: 2)
+                ConsoleInspectorsView(viewModel: viewModel)
+                    .frame(width: 275)
             }
         }
         .toolbar {

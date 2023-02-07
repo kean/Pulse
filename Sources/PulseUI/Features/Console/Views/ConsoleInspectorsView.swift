@@ -88,7 +88,7 @@ private struct TabBarItem: View {
     var body: some View {
         Button(action: action) {
             image
-                .foregroundColor(isSelected ? .primary : .secondary)
+                .foregroundColor(isSelected ? .white : .secondary)
                 .padding(2)
                 .padding(.horizontal, 2)
                 .onHover { isHovering = $0 }
