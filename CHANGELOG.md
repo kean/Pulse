@@ -1,6 +1,7 @@
 # Pulse 3.x
 
-- Fix selection not working in search results view on macOS 
+- Fix selection not working in search results view on macOS
+- Fix transaction details opening an empty page
 
 ## Pulse 3.4
 
