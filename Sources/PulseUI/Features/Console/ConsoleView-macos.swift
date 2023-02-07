@@ -33,7 +33,7 @@ public struct ConsoleView: View {
         HStack(spacing: 0) {
             contents
             if !isInspectorHidden {
-                ThinkDivider(width: 2)
+                ThinkDivider()
                 ConsoleInspectorsView(viewModel: viewModel)
                     .frame(width: 275)
             }
