@@ -24,6 +24,8 @@ final class RichTextViewModel: ObservableObject {
 
     var onLinkTapped: ((URL) -> Bool)?
 
+    var isEmpty: Bool { originalText.length == 0 }
+
     weak var textView: UXTextView? // Not proper MVVM
     var textStorage: NSTextStorage { textView?.textStorage ?? NSTextStorage(string: "") }
 
