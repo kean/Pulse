@@ -8,7 +8,9 @@ import Pulse
 import Combine
 
 final class ConsoleRouter: ObservableObject {
+#if os(macOS)
     @Published var selection: ConsoleSelectedItem?
+#endif
     @Published var shareItems: ShareItems?
     @Published var isShowingFilters = false
     @Published var isShowingSettings = false
@@ -18,10 +20,12 @@ final class ConsoleRouter: ObservableObject {
     @Published var isShowingDocumentBrowser = false
 }
 
+#if os(macOS)
 enum ConsoleSelectedItem: Hashable {
     case entity(NSManagedObjectID)
     case occurence(NSManagedObjectID, ConsoleSearchOccurrence)
 }
+#endif
 
 struct ConsoleRouterView: View {
     let viewModel: ConsoleViewModel

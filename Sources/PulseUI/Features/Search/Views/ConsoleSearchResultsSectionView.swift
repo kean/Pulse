@@ -17,7 +17,9 @@ struct ConsoleSearchResultView: View {
 
     var body: some View {
         ConsoleEntityCell.make(for: viewModel.entity)
+#if os(macOS)
             .tag(ConsoleSelectedItem.entity(viewModel.entity.objectID))
+#endif
         let occurrences = Array(viewModel.occurrences).filter {
             // TODO: these should be displayed inline
             $0.scope != .message && $0.scope != .url
@@ -27,7 +29,7 @@ struct ConsoleSearchResultView: View {
             makeCell(for: item)
                 .tag(ConsoleSelectedItem.occurence(viewModel.entity.objectID, item))
 #else
-            NavigationLink(destination: ConsoleEntityDetailsView.makeDestination(for: item, entity: viewModel.entity)) {
+            NavigationLink(destination: ConsoleSearchResultView.makeDestination(for: item, entity: viewModel.entity)) {
                 makeCell(for: item)
             }
 #endif
@@ -66,6 +68,61 @@ struct ConsoleSearchResultView: View {
             contents.padding(.vertical, 4)
         } else {
             contents
+        }
+    }
+
+    @ViewBuilder
+    static func makeDestination(for occurrence: ConsoleSearchOccurrence, entity: NSManagedObject) -> some View {
+        _makeDestination(for: occurrence, entity: entity)
+            .environment(\.textViewSearchContext, occurrence.searchContext)
+    }
+
+    @ViewBuilder
+    private static func _makeDestination(for occurrence: ConsoleSearchOccurrence, entity: NSManagedObject) -> some View {
+        if let message = entity as? LoggerMessageEntity {
+            if let task = message.task {
+                _makeDestination(for: occurrence, task: task)
+            } else {
+#if os(macOS)
+                ConsoleMessageDetailsView(message: message, onClose: {})
+#else
+                ConsoleMessageDetailsView(message: message)
+#endif
+            }
+        } else if let task = entity as? NetworkTaskEntity {
+            _makeDestination(for: occurrence, task: task)
+        } else {
+            fatalError("Unsupported entity: \(entity)")
+        }
+    }
+
+    @ViewBuilder
+    private static func _makeDestination(for occurrence: ConsoleSearchOccurrence, task: NetworkTaskEntity) -> some View {
+        switch occurrence.scope {
+        case .url:
+            NetworkDetailsView(title: "URL") {
+                TextRenderer(options: .sharing).make {
+                    $0.render(task, content: .requestComponents)
+                }
+            }
+        case .originalRequestHeaders:
+            makeHeadersDetails(title: "Request Headers", headers: task.originalRequest?.headers)
+        case .currentRequestHeaders:
+            makeHeadersDetails(title: "Request Headers", headers: task.currentRequest?.headers)
+        case .requestBody:
+            NetworkInspectorRequestBodyView(viewModel: .init(task: task))
+        case .responseHeaders:
+            makeHeadersDetails(title: "Response Headers", headers: task.response?.headers)
+        case .responseBody:
+            NetworkInspectorResponseBodyView(viewModel: .init(task: task))
+        case .message, .metadata:
+            EmptyView()
+        }
+    }
+
+    private static func makeHeadersDetails(title: String, headers: [String: String]?) -> some View {
+        NetworkDetailsView(title: title) {
+            KeyValueSectionViewModel.makeHeaders(title: title, headers: headers)
         }
     }
 }
