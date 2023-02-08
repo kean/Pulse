@@ -141,9 +141,7 @@ private struct ConsoleContentView: View {
                 Spacer()
                 ConsoleDetailsView(viewModel: viewModel.list)
             }
-            .padding(.top, 7)
-            .padding(.bottom, 9)
-            .padding(.horizontal, 10)
+            .padding(EdgeInsets(top: 7, leading: 10, bottom: 9, trailing: 10))
         }
         .onChange(of: selectedObjectID) {
             viewModel.router.selection = $0.map(ConsoleSelectedItem.entity)
