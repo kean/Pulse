@@ -16,7 +16,6 @@ public struct ConsoleView: View {
     @ObservedObject private var router: ConsoleRouter
     @AppStorage("com-github-kean-pulse-display-mode") private var displayMode: ConsoleDisplayMode = .list
     @AppStorage("com-github-kean-pulse-is-vertical") private var isVertical = false
-    @AppStorage("com-github-kean-pulse-is-inspector-hidden") private var isInspectorHidden = true
 
     public init(store: LoggerStore = .shared) {
         self.init(viewModel: .init(store: store))
@@ -30,8 +29,44 @@ public struct ConsoleView: View {
     }
 
     public var body: some View {
+        contents
+            .navigationTitle("")
+            .onAppear { viewModel.isViewVisible = true }
+            .onDisappear { viewModel.isViewVisible = false }
+    }
+
+    @ViewBuilder
+    private var contents: some View {
+        if #available(macOS 13.0, *) {
+            NavigationSplitView(sidebar: {
+                ConsoleInspectorsView(viewModel: viewModel)
+            }, detail: {
+                detail
+            })
+        } else {
+            NavigationView {
+                ConsoleInspectorsView(viewModel: viewModel)
+                detail
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var toolbarItems: some View {
+        Button(action: { viewModel.store.removeAll() }) {
+            Image(systemName: "trash")
+        }
+        ConsoleToolbarToggleOnlyErrorsButton(viewModel: viewModel.searchCriteriaViewModel)
+            .keyboardShortcut("e", modifiers: [.command, .shift])
+        Button(action: { isVertical.toggle() }, label: {
+            Image(systemName: isVertical ? "square.split.2x1" : "square.split.1x2")
+        }).help(isVertical ? "Switch to Horizontal Layout" : "Switch to Vertical Layout")
+    }
+
+    @ViewBuilder
+    private var detail: some View {
         HSplitView {
-            contents
+            let content = ConsoleContentView(viewModel: viewModel, displayMode: $displayMode)
                 .toolbar {
                     ToolbarItemGroup(placement: .navigation) {
                         Picker("Mode", selection: $displayMode) {
@@ -45,64 +80,27 @@ public struct ConsoleView: View {
                         toolbarItems
                     }
                 }
-            if !isInspectorHidden {
-//                ThinkDivider()
-                ConsoleInspectorsView(viewModel: viewModel)
-                    .frame(width: 275)
+            if #available(macOS 13, *) {
+                content
+                    .searchable(text: $searchBarViewModel.text, tokens: $searchBarViewModel.tokens, token: {
+                        if let image = $0.systemImage {
+                            Label($0.title, systemImage: image)
+                        } else {
+                            Text($0.title)
+                        }
+                    })
+                    .onSubmit(of: .search, viewModel.searchViewModel.onSubmitSearch)
+                    .disableAutocorrection(true)
+            } else {
+                content
+                    .searchable(text: $searchBarViewModel.text)
+                    .onSubmit(of: .search, viewModel.searchViewModel.onSubmitSearch)
+                    .disableAutocorrection(true)
             }
-        }
-        .navigationTitle("")
-        .onAppear { viewModel.isViewVisible = true }
-        .onDisappear { viewModel.isViewVisible = false }
-    }
-
-    @ViewBuilder
-    private var toolbarItems: some View {
-        Button(action: { viewModel.store.removeAll() }) {
-            Image(systemName: "trash")
-        }
-        ConsoleToolbarItems(viewModel: viewModel)
-        Button(action: { isVertical.toggle() }, label: {
-            Image(systemName: isVertical ? "square.split.2x1" : "square.split.1x2")
-        }).help(isVertical ? "Switch to Horizontal Layout" : "Switch to Vertical Layout")
-        Button(action: { isInspectorHidden.toggle() }, label: {
-            Image(systemName: "sidebar.right")
-        })
-    }
-
-    @ViewBuilder
-    private var contents: some View {
-        let split = HSplitView {
-            ConsoleContentView(viewModel: viewModel, displayMode: $displayMode)
             if router.selection != nil {
                 detailsView
                     .frame(minWidth: 400, idealWidth: 800, maxWidth: .infinity, minHeight: 120, idealHeight: 480, maxHeight: .infinity, alignment: .center)
             }
-        }
-//        let split = NotSplitView(
-//            ConsoleContentView(viewModel: viewModel, displayMode: $displayMode),
-//            detailsView
-//                .frame(minWidth: 400, idealWidth: 800, maxWidth: .infinity, minHeight: 120, idealHeight: 480, maxHeight: .infinity, alignment: .center),
-//            isPanelTwoCollaped: router.selection == nil,
-//            isVertical: isVertical
-//        )
-
-        if #available(macOS 13, *) {
-            split
-                .searchable(text: $searchBarViewModel.text, tokens: $searchBarViewModel.tokens, token: {
-                    if let image = $0.systemImage {
-                        Label($0.title, systemImage: image)
-                    } else {
-                        Text($0.title)
-                    }
-                })
-                .onSubmit(of: .search, viewModel.searchViewModel.onSubmitSearch)
-                .disableAutocorrection(true)
-        } else {
-            split
-                .searchable(text: $searchBarViewModel.text)
-                .onSubmit(of: .search, viewModel.searchViewModel.onSubmitSearch)
-                .disableAutocorrection(true)
         }
     }
 
@@ -162,15 +160,6 @@ private struct ConsoleContentView: View {
                 ConsoleTextView(viewModel: viewModel.textViewModel)
             }
         }
-    }
-}
-
-private struct ConsoleToolbarItems: View {
-    @ObservedObject var viewModel: ConsoleViewModel
-
-    var body: some View {
-        ConsoleToolbarToggleOnlyErrorsButton(viewModel: viewModel.searchCriteriaViewModel)
-            .keyboardShortcut("e", modifiers: [.command, .shift])
     }
 }
 

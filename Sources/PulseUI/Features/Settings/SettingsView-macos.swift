@@ -107,6 +107,7 @@ struct SectionHeaderView: View {
             }
             Text(title)
                 .font(.headline)
+                .lineLimit(1)
                 .foregroundColor(.secondary)
                 .padding(.bottom, 8)
             Spacer()
