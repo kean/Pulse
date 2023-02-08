@@ -13,7 +13,7 @@ struct NetworkInspectorView: View {
     @ObservedObject var task: NetworkTaskEntity
     @AppStorage("com-github-kean-pulse-network-inspector-selected-tab")
     private var selectedTab: NetworkInspectorTab = .summary
-    var onClose: () -> Void
+    var toolbarItems: AnyView = AnyView(EmptyView())
 
     private var viewModel: NetworkInspectorViewModel { .init(task: task) }
 
@@ -30,10 +30,7 @@ struct NetworkInspectorView: View {
         HStack {
             InlineTabBar(items: NetworkInspectorTab.allCases, selection: $selectedTab)
             Spacer()
-            Button(action: onClose) {
-                Image(systemName: "xmark")
-                    .foregroundColor(.secondary)
-            }.buttonStyle(.plain)
+            toolbarItems
         }.padding(EdgeInsets(top: 4, leading: 10, bottom: 5, trailing: 8))
     }
 
@@ -92,7 +89,7 @@ struct NetworkInspectorView_Previews: PreviewProvider {
     static var previews: some View {
             if #available(macOS 13.0, *) {
                 NavigationStack {
-                    NetworkInspectorView(task: LoggerStore.preview.entity(for: .login), onClose: {})
+                    NetworkInspectorView(task: LoggerStore.preview.entity(for: .login))
                 }.previewLayout(.fixed(width: 500, height: 800))
             }
         }

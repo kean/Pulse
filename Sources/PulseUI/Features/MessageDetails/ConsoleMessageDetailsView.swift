@@ -7,6 +7,7 @@ import Pulse
 
 struct ConsoleMessageDetailsView: View {
     let message: LoggerMessageEntity
+    var toolbarItems: AnyView = AnyView(EmptyView())
 
 #if os(iOS)
     var body: some View {
@@ -43,7 +44,6 @@ struct ConsoleMessageDetailsView: View {
     }
 #elseif os(macOS)
     @State private var selectedTab: ConsoleMessageTab = .message
-    var onClose: () -> Void
 
     var body: some View {
         VStack(spacing: 0) {
@@ -57,10 +57,7 @@ struct ConsoleMessageDetailsView: View {
         HStack {
             InlineTabBar(items: ConsoleMessageTab.allCases, selection: $selectedTab)
             Spacer()
-            Button(action: onClose) {
-                Image(systemName: "xmark")
-                    .foregroundColor(.secondary)
-            }.buttonStyle(.plain)
+            toolbarItems
         }.padding(EdgeInsets(top: 4, leading: 10, bottom: 5, trailing: 8))
     }
 
@@ -98,11 +95,7 @@ struct ConsoleMessageDetailsView: View {
 struct ConsoleMessageDetailsView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
-#if os(macOS)
-            ConsoleMessageDetailsView(message: makeMockMessage(), onClose: {})
-#else
             ConsoleMessageDetailsView(message: makeMockMessage())
-#endif
         }
     }
 }

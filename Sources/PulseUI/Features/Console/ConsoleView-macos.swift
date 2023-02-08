@@ -84,9 +84,6 @@ public struct ConsoleView: View {
                     }
                     ConsoleToolbarToggleOnlyErrorsButton(viewModel: viewModel.searchCriteriaViewModel)
                         .keyboardShortcut("e", modifiers: [.command, .shift])
-                    Button(action: { isVertical.toggle() }, label: {
-                        Image(systemName: isVertical ? "square.split.1x2" : "square.split.2x1")
-                    }).help(isVertical ? "Switch to Horizontal Layout" : "Switch to Vertical Layout")
                 }
             }
         if #available(macOS 13, *) {
@@ -122,7 +119,7 @@ public struct ConsoleView: View {
     }
 
     private var rightPanelContents: some View {
-        ConsoleEntityDetailsView(viewModel: viewModel.list, router: viewModel.router)
+        ConsoleEntityDetailsView(viewModel: viewModel.list, router: viewModel.router, isVertical: $isVertical)
             .background(Color(UXColor.textBackgroundColor))
             .frame(minWidth: 400, idealWidth: 600, minHeight: 120, idealHeight: 480)
     }
