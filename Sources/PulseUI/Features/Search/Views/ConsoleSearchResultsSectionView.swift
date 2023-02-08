@@ -35,20 +35,22 @@ struct ConsoleSearchResultView: View {
 #endif
         }
         if occurrences.count > limit {
+#if os(macOS)
+            Text("Total Results: \(occurrences.count)")
+                .font(ConsoleConstants.fontBody)
+                .foregroundColor(.secondary)
+                .padding(.top, 8)
+#else
             NavigationLink(destination: ConsoleSearchResultDetailsView(viewModel: viewModel)) {
                 HStack {
-#if os(macOS)
-                    Text("Show All Results")
-                        .font(ConsoleConstants.fontBody)
-#else
                     Text("Total Results: ")
                         .font(ConsoleConstants.fontBody)
-#endif
                     Text("\(occurrences.count)")
                         .font(ConsoleConstants.fontBody)
                         .foregroundColor(.secondary)
                 }
             }
+#endif
         }
         if isSeparatorNeeded {
             PlainListGroupSeparator()
