@@ -113,6 +113,7 @@ struct RichTextView: View {
             Divider()
             RichTextViewSearchToobar(viewModel: viewModel)
         }
+        .onAppear { viewModel.prepare(searchContext) }
     }
 #endif
 }

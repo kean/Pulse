@@ -22,6 +22,7 @@ struct ConsoleEntityDetailsView: View {
             case .occurence(let objectID, let occurence):
                 if let entity = viewModel.entity(withID: objectID) {
                     ConsoleSearchResultView.makeDestination(for: occurence, entity: entity)
+                        .id(occurence.id)
                 }
             }
         }
