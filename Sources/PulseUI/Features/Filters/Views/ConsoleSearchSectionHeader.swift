@@ -31,6 +31,7 @@ struct ConsoleSectionHeader: View {
                 Image(systemName: icon)
                     .foregroundColor(.secondary)
                 Text(title)
+                    .lineLimit(1)
                     .font(.headline)
                     .foregroundColor(.secondary)
             }
