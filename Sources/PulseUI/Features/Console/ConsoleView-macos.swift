@@ -139,7 +139,7 @@ private struct ConsoleContentView: View {
             HStack {
                 ConsoleModePicker(viewModel: viewModel)
                 Spacer()
-                ConsoleDetailsView(viewModel: viewModel.list)
+                ConsoleLogsDetailsView(viewModel: viewModel.list)
             }
             .padding(EdgeInsets(top: 7, leading: 10, bottom: 9, trailing: 10))
         }
@@ -176,7 +176,7 @@ private struct ConsoleContentView: View {
     }
 }
 
-private struct ConsoleDetailsView: View {
+private struct ConsoleLogsDetailsView: View {
     @ObservedObject var viewModel: ConsoleListViewModel
 
     var body: some View {
