@@ -67,6 +67,7 @@ public struct ConsoleView: View {
     private var detail: some View {
         HSplitView {
             let content = ConsoleContentView(viewModel: viewModel, displayMode: $displayMode)
+                .frame(minWidth: 200, idealWidth: 400, minHeight: 120, idealHeight: 480)
                 .toolbar {
                     ToolbarItemGroup(placement: .navigation) {
                         Picker("Mode", selection: $displayMode) {
@@ -98,8 +99,13 @@ public struct ConsoleView: View {
                     .disableAutocorrection(true)
             }
             if router.selection != nil {
-                detailsView
-                    .frame(minWidth: 400, idealWidth: 800, maxWidth: .infinity, minHeight: 120, idealHeight: 480, maxHeight: .infinity, alignment: .center)
+                if #available(macOS 13.0, *) {
+                    NavigationStack {
+                        detailsView
+                    }
+                } else {
+                    detailsView
+                }
             }
         }
     }
@@ -107,6 +113,7 @@ public struct ConsoleView: View {
     private var detailsView: some View {
         ConsoleEntityDetailsView(viewModel: viewModel.list, router: viewModel.router)
             .background(Color(UXColor.textBackgroundColor))
+            .frame(minWidth: 400, idealWidth: 600, minHeight: 120, idealHeight: 480)
     }
 }
 

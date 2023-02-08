@@ -50,13 +50,7 @@ struct NetworkInspectorView: View {
             NetworkInspectorResponseBodyView(viewModel: .init(task: task))
         case .metrics:
             if let viewModel = NetworkInspectorMetricsViewModel(task: task) {
-                if #available(macOS 13.0, *) {
-                    NavigationStack {
-                        NetworkInspectorMetricsView(viewModel: viewModel)
-                    }
-                } else {
-                    NetworkInspectorMetricsView(viewModel: viewModel)
-                }
+                NetworkInspectorMetricsView(viewModel: viewModel)
             } else {
                 placeholder
             }
