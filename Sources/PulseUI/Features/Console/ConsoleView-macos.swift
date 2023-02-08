@@ -52,65 +52,76 @@ public struct ConsoleView: View {
     }
 
     @ViewBuilder
-    private var toolbarItems: some View {
-        Button(action: { viewModel.store.removeAll() }) {
-            Image(systemName: "trash")
+    private var detail: some View {
+        if isVertical {
+            VSplitView {
+                leftPanel
+                rightPanel
+            }
+        } else {
+            HSplitView {
+                leftPanel
+                rightPanel
+            }
         }
-        ConsoleToolbarToggleOnlyErrorsButton(viewModel: viewModel.searchCriteriaViewModel)
-            .keyboardShortcut("e", modifiers: [.command, .shift])
-        Button(action: { isVertical.toggle() }, label: {
-            Image(systemName: isVertical ? "square.split.2x1" : "square.split.1x2")
-        }).help(isVertical ? "Switch to Horizontal Layout" : "Switch to Vertical Layout")
     }
 
     @ViewBuilder
-    private var detail: some View {
-        HSplitView {
-            let content = ConsoleContentView(viewModel: viewModel, displayMode: $displayMode)
-                .frame(minWidth: 200, idealWidth: 400, minHeight: 120, idealHeight: 480)
-                .toolbar {
-                    ToolbarItemGroup(placement: .navigation) {
-                        Picker("Mode", selection: $displayMode) {
-                            Label("List", systemImage: "list.bullet").tag(ConsoleDisplayMode.list)
-                            Label("Table", systemImage: "tablecells").tag(ConsoleDisplayMode.table)
-                            Label("Text", systemImage: "text.quote").tag(ConsoleDisplayMode.text)
-                        }.pickerStyle(.segmented)
-                    }
-                    ToolbarItemGroup(placement: .automatic) {
-                        Spacer()
-                        toolbarItems
-                    }
+    private var leftPanel: some View {
+        let content = ConsoleContentView(viewModel: viewModel, displayMode: $displayMode)
+            .frame(minWidth: 200, idealWidth: 400, minHeight: 120, idealHeight: 480)
+            .toolbar {
+                ToolbarItemGroup(placement: .navigation) {
+                    Picker("Mode", selection: $displayMode) {
+                        Label("List", systemImage: "list.bullet").tag(ConsoleDisplayMode.list)
+                        Label("Table", systemImage: "tablecells").tag(ConsoleDisplayMode.table)
+                        Label("Text", systemImage: "text.quote").tag(ConsoleDisplayMode.text)
+                    }.pickerStyle(.segmented)
                 }
-            if #available(macOS 13, *) {
-                content
-                    .searchable(text: $searchBarViewModel.text, tokens: $searchBarViewModel.tokens, token: {
-                        if let image = $0.systemImage {
-                            Label($0.title, systemImage: image)
-                        } else {
-                            Text($0.title)
-                        }
-                    })
-                    .onSubmit(of: .search, viewModel.searchViewModel.onSubmitSearch)
-                    .disableAutocorrection(true)
-            } else {
-                content
-                    .searchable(text: $searchBarViewModel.text)
-                    .onSubmit(of: .search, viewModel.searchViewModel.onSubmitSearch)
-                    .disableAutocorrection(true)
+                ToolbarItemGroup(placement: .automatic) {
+                    Button(action: { viewModel.store.removeAll() }) {
+                        Image(systemName: "trash")
+                    }
+                    ConsoleToolbarToggleOnlyErrorsButton(viewModel: viewModel.searchCriteriaViewModel)
+                        .keyboardShortcut("e", modifiers: [.command, .shift])
+                    Button(action: { isVertical.toggle() }, label: {
+                        Image(systemName: isVertical ? "square.split.1x2" : "square.split.2x1")
+                    }).help(isVertical ? "Switch to Horizontal Layout" : "Switch to Vertical Layout")
+                }
             }
-            if router.selection != nil {
-                if #available(macOS 13.0, *) {
-                    NavigationStack {
-                        detailsView
+        if #available(macOS 13, *) {
+            content
+                .searchable(text: $searchBarViewModel.text, tokens: $searchBarViewModel.tokens, token: {
+                    if let image = $0.systemImage {
+                        Label($0.title, systemImage: image)
+                    } else {
+                        Text($0.title)
                     }
-                } else {
-                    detailsView
+                })
+                .onSubmit(of: .search, viewModel.searchViewModel.onSubmitSearch)
+                .disableAutocorrection(true)
+        } else {
+            content
+                .searchable(text: $searchBarViewModel.text)
+                .onSubmit(of: .search, viewModel.searchViewModel.onSubmitSearch)
+                .disableAutocorrection(true)
+        }
+    }
+
+    @ViewBuilder
+    private var rightPanel: some View {
+        if router.selection != nil {
+            if #available(macOS 13.0, *) {
+                NavigationStack {
+                    rightPanelContents
                 }
+            } else {
+                rightPanelContents
             }
         }
     }
 
-    private var detailsView: some View {
+    private var rightPanelContents: some View {
         ConsoleEntityDetailsView(viewModel: viewModel.list, router: viewModel.router)
             .background(Color(UXColor.textBackgroundColor))
             .frame(minWidth: 400, idealWidth: 600, minHeight: 120, idealHeight: 480)
