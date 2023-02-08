@@ -82,8 +82,6 @@ public struct ConsoleView: View {
                     Button(action: { viewModel.store.removeAll() }) {
                         Image(systemName: "trash")
                     }
-                    ConsoleToolbarToggleOnlyErrorsButton(viewModel: viewModel.searchCriteriaViewModel)
-                        .keyboardShortcut("e", modifiers: [.command, .shift])
                 }
             }
         if #available(macOS 13, *) {
@@ -139,7 +137,7 @@ private struct ConsoleContentView: View {
             HStack {
                 ConsoleModePicker(viewModel: viewModel)
                 Spacer()
-                ConsoleLogsDetailsView(viewModel: viewModel.list)
+                ConsoleToolbarToggleOnlyErrorsButton(viewModel: viewModel.searchCriteriaViewModel)
             }
             .padding(EdgeInsets(top: 7, leading: 10, bottom: 9, trailing: 10))
         }
@@ -208,7 +206,10 @@ struct ConsoleToolbarToggleOnlyErrorsButton: View {
         Button(action: { viewModel.isOnlyErrors.toggle() }) {
             Image(systemName: viewModel.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon")
                 .foregroundColor(viewModel.isOnlyErrors ? .red : .secondary)
-        }.help("Toggle Show Only Errors (⇧⌘E)")
+        }
+        .buttonStyle(.plain)
+        .keyboardShortcut("e", modifiers: [.command, .shift])
+        .help("Toggle Show Only Errors (⇧⌘E)")
     }
 }
 
