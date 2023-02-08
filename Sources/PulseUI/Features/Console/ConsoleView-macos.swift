@@ -11,9 +11,7 @@ import Combine
 
 public struct ConsoleView: View {
     @StateObject private var viewModel: ConsoleViewModel
-    @ObservedObject var searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
     @ObservedObject var searchBarViewModel: ConsoleSearchBarViewModel
-    @ObservedObject private var router: ConsoleRouter
     @AppStorage("com-github-kean-pulse-display-mode") private var displayMode: ConsoleDisplayMode = .list
     @AppStorage("com-github-kean-pulse-is-vertical") private var isVertical = false
 
@@ -23,9 +21,7 @@ public struct ConsoleView: View {
 
     init(viewModel: ConsoleViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
-        self.searchCriteriaViewModel = viewModel.searchCriteriaViewModel
         self.searchBarViewModel = viewModel.searchBarViewModel
-        self.router = viewModel.router
     }
 
     public var body: some View {
@@ -105,6 +101,16 @@ public struct ConsoleView: View {
 
     @ViewBuilder
     private var rightPanel: some View {
+        ConsoleRightPanelView(viewModel: viewModel, router: viewModel.router, isVertical: $isVertical)
+    }
+}
+
+private struct ConsoleRightPanelView: View {
+    let viewModel: ConsoleViewModel
+    @ObservedObject var router: ConsoleRouter
+    @Binding var isVertical: Bool
+
+    var body: some View {
         if router.selection != nil {
             if #available(macOS 13.0, *) {
                 NavigationStack {
