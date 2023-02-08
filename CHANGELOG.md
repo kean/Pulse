@@ -1,5 +1,9 @@
 # Pulse 3.x
 
+## Pulse 3.4.2
+
+*Feb 7, 2023*
+
 - [macOS] Update the design to use the transparent toolbar and move the inspectors to the native left sidebar 
 - [macOS] Fix an issue with navigation from the metrics screen not working correctly
 - [macOS] Move the button to switch from the horizontal to vertical layout to the details view 
