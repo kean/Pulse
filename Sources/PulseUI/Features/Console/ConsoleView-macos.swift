@@ -158,15 +158,15 @@ private struct ConsoleContentView: View {
             List(selection: $selection) {
                 ConsoleSearchView(viewModel: viewModel)
                     .buttonStyle(.plain)
-            }
+            }.clipped()
         } else {
             switch displayMode {
-            case .table:
-                ConsoleTableView(viewModel: viewModel.list, selection: $selectedObjectID)
             case .list:
                 List(selection: $selection) {
                     ConsoleListContentView(viewModel: viewModel.list)
-                }
+                }.clipped()
+            case .table:
+                ConsoleTableView(viewModel: viewModel.list, selection: $selectedObjectID)
             case .text:
                 ConsoleTextView(viewModel: viewModel.textViewModel)
             }
