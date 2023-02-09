@@ -180,31 +180,6 @@ private struct ConsoleContentView: View {
     }
 }
 
-private struct ConsoleLogsDetailsView: View {
-    @ObservedObject var viewModel: ConsoleListViewModel
-
-    var body: some View {
-        detailsText
-            .lineLimit(1)
-            .font(ConsoleConstants.fontTitle)
-            .foregroundColor(.secondary)
-    }
-
-    private var detailsText: Text {
-        let details = viewModel.taskDetails
-        return Text(Image(systemName: "arrow.up")).fontWeight(.light) +
-        Text(" " + byteCount(for: details.totalRequestBodySize)) +
-        Text("   ") +
-        Text(Image(systemName: "arrow.down")).fontWeight(.light) +
-        Text(" " + byteCount(for: details.totalResponseSize))
-    }
-
-    private func byteCount(for size: Int64) -> String {
-        guard size > 0 else { return "0 KB" }
-        return ByteCountFormatter.string(fromByteCount: size)
-    }
-}
-
 struct ConsoleToolbarToggleOnlyErrorsButton: View {
     @ObservedObject var viewModel: ConsoleSearchCriteriaViewModel
 
