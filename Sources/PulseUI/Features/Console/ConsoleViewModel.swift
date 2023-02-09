@@ -72,8 +72,19 @@ final class ConsoleViewModel: ObservableObject {
         self.mode = mode
         self.isNetwork = isOnlyNetwork
 
+        func makeDefaultSearchCriteria() -> ConsoleSearchCriteria {
+            var criteria = ConsoleSearchCriteria()
+            if store.isArchive {
+                criteria.shared.dates.startDate = nil
+            }
+            if case .entities = source {
+                criteria.shared.dates.startDate = nil
+            }
+            return criteria
+        }
+
         self.index = LoggerStoreIndex(store: store)
-        self.searchCriteriaViewModel = ConsoleSearchCriteriaViewModel(store: store, index: index, source: source)
+        self.searchCriteriaViewModel = ConsoleSearchCriteriaViewModel(criteria: makeDefaultSearchCriteria(), index: index)
         self.list = ConsoleListViewModel(store: store, source: source, criteria: searchCriteriaViewModel)
 #if os(iOS) || os(macOS)
         self.insightsViewModel = InsightsViewModel(store: store)
@@ -93,7 +104,7 @@ final class ConsoleViewModel: ObservableObject {
 
     private func prepare(for mode: ConsoleMode) {
         searchCriteriaViewModel.mode = mode
-        list.update(mode: mode)
+        list.mode = mode
     }
 
     private func refreshListsVisibility() {

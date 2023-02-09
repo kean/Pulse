@@ -41,13 +41,14 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
         searchCriteriaViewModel.criteria.shared.dates == .session
     }
 
-    @Published private(set) var mode: ConsoleMode = .all
+    @Published var mode: ConsoleMode = .all {
+        didSet { prepare(mode: mode) }
+    }
 
     /// This exist strictly to workaround List performance issues
     private var scrollPosition: ScrollPosition = .nearTop
     private var visibleEntityCountLimit = fetchBatchSize
     private var visibleObjectIDs: Set<NSManagedObjectID> = []
-    private var grouping: ConsoleListGroupBy { mode == .tasks ? options.taskGroupBy : options.messageGroupBy }
 
     let store: LoggerStore
     let source: ConsoleSource
@@ -80,7 +81,7 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
 
         super.init()
 
-        pinsObserver.$pins.sink { [weak self] pins in
+        pinsObserver.$pins.dropFirst().sink { [weak self] pins in
             withAnimation {
                 self?.pins = self?.filter(pins: pins) ?? []
             }
@@ -98,16 +99,15 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
             .sink { [weak self] _ in self?.refresh() }
             .store(in: &cancellables)
 
-        $options.dropFirst().receive(on: DispatchQueue.main).sink { [weak self] _ in
-            self?.refreshController()
+        $options.dropFirst().sink { [weak self] in
+            self?.refreshController(options: $0)
         }.store(in: &cancellables)
 
-        update(mode: mode)
+        prepare(mode: mode)
     }
 
-    func update(mode: ConsoleMode) {
-        self.mode = mode
-        self.refreshController()
+    private func prepare(mode: ConsoleMode) {
+        self.refreshController(options: options)
         self.pins = filter(pins: pinsObserver.pins)
     }
 
@@ -135,9 +135,10 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
 
     // MARK: - NSFetchedResultsController
 
-    func refreshController() {
+    func refreshController(options: ConsoleListOptions) {
         let request: NSFetchRequest<NSManagedObject>
         let sortKey = mode == .tasks ? options.taskSortBy.key : options.messageSortBy.key
+        let grouping: ConsoleListGroupBy = mode == .tasks ? options.taskGroupBy : options.messageGroupBy
         if mode == .tasks {
             request = .init(entityName: "\(NetworkTaskEntity.self)")
             request.sortDescriptors = [

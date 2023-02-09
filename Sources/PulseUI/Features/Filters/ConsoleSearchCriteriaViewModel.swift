@@ -14,32 +14,28 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
     @Published var criteria = ConsoleSearchCriteria()
     @Published var mode: ConsoleMode = .all
 
+    let defaultCriteria: ConsoleSearchCriteria
+
     @Published private(set) var labels: [String] = []
     @Published private(set) var domains: [String] = []
 
     private(set) var labelsCountedSet = NSCountedSet()
     private(set) var domainsCountedSet = NSCountedSet()
 
-    private(set) var defaultCriteria = ConsoleSearchCriteria()
-
-    private let store: LoggerStore
     private let index: LoggerStoreIndex
     private var isScreenVisible = false
     private var entities: [NSManagedObject] = []
     private var cancellables: [AnyCancellable] = []
 
-    init(store: LoggerStore, index: LoggerStoreIndex, source: ConsoleSource) {
-        self.store = store
+    /// Initializes the view model with the initial criteria.
+    ///
+    /// - Parameters:
+    ///   - criteria: The initial search criteria.
+    ///   - index: The store index.
+    init(criteria: ConsoleSearchCriteria, index: LoggerStoreIndex) {
         self.index = index
 
-        if store.isArchive {
-            self.criteria.shared.dates.startDate = nil
-            self.criteria.shared.dates.endDate = nil
-        }
-        if case .entities = source {
-            self.criteria.shared.dates.startDate = nil
-            self.criteria.shared.dates.endDate = nil
-        }
+        self.criteria = criteria
         self.defaultCriteria = criteria
     }
 

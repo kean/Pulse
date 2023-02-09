@@ -217,7 +217,7 @@ struct ConsoleSearchCriteriaView_Previews: PreviewProvider {
 private func makePreview(isOnlyNetwork: Bool) -> some View {
     let store = LoggerStore.mock
     let entities: [NSManagedObject] = try! isOnlyNetwork ? store.allTasks() : store.allMessages()
-    let viewModel = ConsoleSearchCriteriaViewModel(store: store, index: .init(store: store), source: .store)
+    let viewModel = ConsoleSearchCriteriaViewModel(criteria: .init(), index: .init(store: store))
     viewModel.bind(CurrentValueSubject(entities))
     viewModel.mode = isOnlyNetwork ? .tasks : .all
     return ConsoleSearchCriteriaView(viewModel: viewModel)

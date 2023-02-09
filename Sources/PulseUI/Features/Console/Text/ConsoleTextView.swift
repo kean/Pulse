@@ -39,7 +39,7 @@ private extension ConsoleTextView {
     init(entities: [NSManagedObject], _ configure: (inout TextRenderer.Options) -> Void) {
         var options = TextRenderer.Options(color: .automatic)
         configure(&options)
-        self.init(viewModel: .init(list: .init(store: .mock, source: .store, criteria: .init(store: .mock, index: .init(store: .mock), source: .store)), router: .init()))
+        self.init(viewModel: .init(list: .init(store: .mock, source: .store, criteria: .init(criteria: .init(), index: .init(store: .mock))), router: .init()))
     }
 }
 

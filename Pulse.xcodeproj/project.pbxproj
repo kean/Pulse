@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0C0330FE296F1CD700A0E861 /* Pulse.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CF0D542296F14EA00EED9D4 /* Pulse.framework */; };
+		0C0352D929943F86008CDEF8 /* ConsoleListViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0352D829943F86008CDEF8 /* ConsoleListViewModelTests.swift */; };
 		0C0B31ED26D179A20045C9E1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0B31EC26D179A20045C9E1 /* AppDelegate.swift */; };
 		0C0B31EF26D179A20045C9E1 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0B31EE26D179A20045C9E1 /* SceneDelegate.swift */; };
 		0C0B31F126D179A20045C9E1 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0B31F026D179A20045C9E1 /* ViewController.swift */; };
@@ -500,6 +501,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0C0352D829943F86008CDEF8 /* ConsoleListViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleListViewModelTests.swift; sourceTree = "<group>"; };
 		0C07EDCD25CEF648002DC091 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		0C0B31EA26D179A20045C9E1 /* Pulse Integration Examples iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pulse Integration Examples iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C0B31EC26D179A20045C9E1 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -1518,6 +1520,7 @@
 				0CB63A282975A94D00525165 /* ConsoleSearchTokenTests.swift */,
 				0CAF1D78297B5FF4002E2722 /* ConsoleSearchServiceTests.swift */,
 				0CAF1D76297B0810002E2722 /* ConsoleSearchSuggestionTests.swift */,
+				0C0352D829943F86008CDEF8 /* ConsoleListViewModelTests.swift */,
 				0C63A389297A44B300F6A6A5 /* StringSearchOptionsTests.swift */,
 				0C7A0E01297CE71400B4B69D /* FormattersTests.swift */,
 				0CF0D6C9296F18FD00EED9D4 /* MockTests.swift */,
@@ -2272,6 +2275,7 @@
 				0C63A38A297A44B300F6A6A5 /* StringSearchOptionsTests.swift in Sources */,
 				0CAF1D77297B0810002E2722 /* ConsoleSearchSuggestionTests.swift in Sources */,
 				0C7A0E02297CE71400B4B69D /* FormattersTests.swift in Sources */,
+				0C0352D929943F86008CDEF8 /* ConsoleListViewModelTests.swift in Sources */,
 				0CF0D6CB296F18FD00EED9D4 /* ConsoleViewModelTests.swift in Sources */,
 				0CB63A292975A94D00525165 /* ConsoleSearchTokenTests.swift in Sources */,
 				0CAF1D79297B5FF4002E2722 /* ConsoleSearchServiceTests.swift in Sources */,

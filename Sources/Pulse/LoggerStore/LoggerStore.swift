@@ -1015,6 +1015,7 @@ extension LoggerStore {
 extension LoggerStore {
     public var pins: Pins { Pins(store: self) }
 
+    #warning("simplify this")
     public final class Pins {
         static let pinServiceKey = "com.github.kean.pulse.pin-service"
 
