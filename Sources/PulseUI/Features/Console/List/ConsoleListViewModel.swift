@@ -8,6 +8,8 @@ import Pulse
 import Combine
 import SwiftUI
 
+/// Manages the logs list. Supports grouping, ordering, pins.
+///
 /// - note: It currently acts as a source of entities for other screen as well
 /// and should probably be extracted to a separate class.
 final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, ObservableObject {
@@ -27,7 +29,6 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
         }
     }
 
-#if os(macOS)
     var sortDescriptors: [NSSortDescriptor] = [] {
         didSet {
             controller?.fetchRequest.sortDescriptors = sortDescriptors
@@ -35,7 +36,6 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
             reloadMessages(isMandatory: true)
         }
     }
-#endif
 
     var isShowPreviousSessionButtonShown: Bool {
         searchCriteriaViewModel.criteria.shared.dates == .session
