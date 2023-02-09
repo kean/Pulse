@@ -111,6 +111,28 @@ final class ConsoleListViewModelTests: XCTestCase {
         }
     }
 
+    func testGroupingTasksByStatus() {
+        // WHEN
+        sut.mode = .tasks
+        sut.options.taskGroupBy = .requestState
+
+        // THEN entities are still loaded
+        XCTAssertEqual(sut.entities.count, 8)
+
+        // THEN sections are created
+        let sections = sut.sections ?? []
+        XCTAssertEqual(sections.count, 2)
+
+        // THEN groups are sorted by the label
+        XCTAssertEqual(sections.map(sut.makeName(for:)), ["Success", "Failure"])
+
+        // THEN entities within these groups are sorted by creation date
+        for section in sections {
+            let entities = section.objects as! [NSManagedObject]
+            XCTAssertEqual(entities, entities.sorted(by: isOrderedBefore))
+        }
+    }
+
     // MARK: Ordering
 
     func testOrderLogsByLevel() {
