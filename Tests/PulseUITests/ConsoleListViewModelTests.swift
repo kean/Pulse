@@ -32,10 +32,10 @@ final class ConsoleListViewModelTests: XCTestCase {
         directory.remove()
     }
 
-    func setUp(store: LoggerStore) {
+    func setUp(store: LoggerStore, source: ConsoleSource = .store) {
         self.store = store
         self.criteriaViewModel = ConsoleSearchCriteriaViewModel(criteria: .init(), index: .init(store: store))
-        self.sut = ConsoleListViewModel(store: store, source: .store, criteria: criteriaViewModel)
+        self.sut = ConsoleListViewModel(store: store, source: source, criteria: criteriaViewModel)
     }
 
     func testThatAllLogsAreLoadedByDefault() {
@@ -53,10 +53,7 @@ final class ConsoleListViewModelTests: XCTestCase {
         let entities = sut.entities
 
         // THEN
-        XCTAssertEqual(
-            entities.map(\.objectID),
-            entities.sorted(by: isOrderedBefore).map(\.objectID)
-        )
+        XCTAssertEqual(entities, entities.sorted(by: isOrderedBefore))
     }
 
     func testSwitchingToNetworkMode() {
@@ -88,10 +85,7 @@ final class ConsoleListViewModelTests: XCTestCase {
         // THEN entities within these groups are sorted by creation date
         for section in sections {
             let entities = section.objects as! [NSManagedObject]
-            XCTAssertEqual(
-                entities.map(\.objectID),
-                entities.sorted(by: isOrderedBefore).map(\.objectID)
-            )
+            XCTAssertEqual(entities, entities.sorted(by: isOrderedBefore))
         }
     }
 
@@ -113,10 +107,7 @@ final class ConsoleListViewModelTests: XCTestCase {
         // THEN entities within these groups are sorted by creation date
         for section in sections {
             let entities = section.objects as! [NSManagedObject]
-            XCTAssertEqual(
-                entities.map(\.objectID),
-                entities.sorted(by: isOrderedBefore).map(\.objectID)
-            )
+            XCTAssertEqual(entities, entities.sorted(by: isOrderedBefore))
         }
     }
 
@@ -129,8 +120,8 @@ final class ConsoleListViewModelTests: XCTestCase {
 
         // THEN
         XCTAssertEqual(
-            sut.entities.map(\.objectID),
-            (sut.entities as! [LoggerMessageEntity]).sorted(by: { $0.level < $1.level }).map(\.objectID)
+            sut.entities,
+            (sut.entities as! [LoggerMessageEntity]).sorted(by: { $0.level < $1.level })
         )
     }
 
@@ -141,8 +132,8 @@ final class ConsoleListViewModelTests: XCTestCase {
 
         // THEN
         XCTAssertEqual(
-            sut.entities.map(\.objectID),
-            (sut.entities as! [LoggerMessageEntity]).sorted(by: { $0.level > $1.level }).map(\.objectID)
+            sut.entities,
+            (sut.entities as! [LoggerMessageEntity]).sorted(by: { $0.level > $1.level })
         )
     }
 
@@ -195,6 +186,44 @@ final class ConsoleListViewModelTests: XCTestCase {
         wait(for: [expectation], timeout: 2)
         XCTAssertEqual(sut.pins.count, 1)
         XCTAssertEqual(sut.pins.first?.objectID, task.objectID)
+    }
+
+    // MARK: Focus
+
+    func testFocusOnEntities() throws {
+        // GIVEN
+        let entities = Array(sut.entities[...3])
+
+        // WHEN
+        setUp(store: store, source: .entities(title: "Focus", entities: entities))
+
+        // THEN
+        XCTAssertEqual(sut.entities, entities)
+    }
+
+    func testGroupingFocusedEntities() {
+        // GIVEN
+        let entities = Array(sut.entities[...3])
+        setUp(store: store, source: .entities(title: "Focus", entities: entities))
+
+        // WHEN
+        sut.options.messageGroupBy = .level
+
+        // THEN entities are still loaded
+        XCTAssertEqual(sut.entities.count, 4)
+
+        // THEN sections are created
+        let sections = sut.sections ?? []
+        XCTAssertEqual(sections.count, 2)
+
+        // THEN groups are sorted by the label
+        XCTAssertEqual(sections.map(sut.makeName), ["Info", "Debug"])
+
+        // THEN entities within these groups are sorted by creation date
+        for section in sections {
+            let entities = section.objects as! [NSManagedObject]
+            XCTAssertEqual(entities, entities.sorted(by: isOrderedBefore))
+        }
     }
 }
 
