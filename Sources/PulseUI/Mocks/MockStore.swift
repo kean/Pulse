@@ -16,6 +16,10 @@ extension LoggerStore {
     }()
 
     static let preview = makeMockStore()
+
+    func populate() {
+        _syncPopulateStore(self)
+    }
 }
 
 extension LoggerStore {
@@ -150,26 +154,23 @@ private func _syncPopulateStore(_ store: LoggerStore) {
     }
 
     let urlSession = URLSession(configuration: .default)
-
-    if isFirstLog {
-        isFirstLog = false
-        logger(named: "application")
-            .log(level: .info, "UIApplication.didFinishLaunching", metadata: [
-                "custom-metadata-key": .string("value")
-            ])
-
-        logger(named: "application")
-            .log(level: .info, "UIApplication.willEnterForeground")
-
-        logger(named: "session")
-            .log(level: .trace, "Instantiated Session")
-
-        logger(named: "auth")
-            .log(level: .trace, "Instantiated the new login request")
-
-        logger(named: "analytics")
-                .log(level: .debug, "Will navigate to Dashboard")
-    }
+    
+    logger(named: "application")
+        .log(level: .info, "UIApplication.didFinishLaunching", metadata: [
+            "custom-metadata-key": .string("value")
+        ])
+    
+    logger(named: "application")
+        .log(level: .info, "UIApplication.willEnterForeground")
+    
+    logger(named: "session")
+        .log(level: .trace, "Instantiated Session")
+    
+    logger(named: "auth")
+        .log(level: .trace, "Instantiated the new login request")
+    
+    logger(named: "analytics")
+        .log(level: .debug, "Will navigate to Dashboard")
 
     for task in MockTask.allTasks {
         _logTask(task, urlSession: urlSession, logger: networkLogger)

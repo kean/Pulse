@@ -9,6 +9,7 @@ import Combine
 
 @available(iOS 16, *)
 final class ConsoleListViewModelTests: XCTestCase {
+    let directory = TemporaryDirectory()
     var store: LoggerStore!
     var criteriaViewModel: ConsoleSearchCriteriaViewModel!
     var sut: ConsoleListViewModel!
@@ -17,7 +18,18 @@ final class ConsoleListViewModelTests: XCTestCase {
     override func setUp() {
         super.setUp()
 
-        setUp(store: .mock)
+        let storeURL = directory.url.appending(filename: "\(UUID().uuidString).pulse")
+        store = try! LoggerStore(storeURL: storeURL, options: [.create, .synchronous])
+        store.populate()
+
+        setUp(store: store)
+    }
+
+    override func tearDown() {
+        super.tearDown()
+
+        try? store.destroy()
+        directory.remove()
     }
 
     func setUp(store: LoggerStore) {
