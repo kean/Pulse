@@ -33,6 +33,9 @@ final class LoggerPinsObserver: NSObject, NSFetchedResultsControllerDelegate {
     }
 
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        pins = self.controller.fetchedObjects ?? []
+        let pins = self.controller.fetchedObjects ?? []
+        if pins != self.pins {
+            self.pins = pins
+        }
     }
 }

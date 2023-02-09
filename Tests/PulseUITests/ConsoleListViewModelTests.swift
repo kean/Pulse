@@ -3,6 +3,7 @@
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import XCTest
+import Combine
 @testable import Pulse
 @testable import PulseUI
 
@@ -11,6 +12,7 @@ final class ConsoleListViewModelTests: XCTestCase {
     var store: LoggerStore!
     var criteriaViewModel: ConsoleSearchCriteriaViewModel!
     var sut: ConsoleListViewModel!
+    var cancellables: [AnyCancellable] = []
 
     override func setUp() {
         super.setUp()
@@ -135,28 +137,39 @@ final class ConsoleListViewModelTests: XCTestCase {
     // MARK: Pins
 
     func testPinRegularMessage() throws {
+        let expectation = self.expectation(description: "pins-updated")
+        sut.$pins.dropFirst().sink {
+            print($0)
+            expectation.fulfill()
+        }.store(in: &cancellables)
+
         // GIVEN
         let message = try XCTUnwrap(store.allMessages().first(where: { $0.task == nil }))
         store.pins.togglePin(for: message)
 
         // THEN
+        wait(for: [expectation], timeout: 2)
         XCTAssertEqual(sut.pins.count, 1)
     }
 
     func testThatPinsAreUpdatedWhenModeChanges() throws {
+        let expectation = self.expectation(description: "pins-updated")
+        expectation.expectedFulfillmentCount = 3
+        sut.$pins.dropFirst().sink { _ in
+            expectation.fulfill()
+        }.store(in: &cancellables)
+
         // GIVEN
         let message = try XCTUnwrap(store.allMessages().first(where: { $0.task == nil }))
         store.pins.togglePin(for: message)
         let task = try XCTUnwrap(store.allMessages().first(where: { $0.task != nil }))
         store.pins.togglePin(for: task)
 
-        // THEN both pins are displayed
-        XCTAssertEqual(sut.pins.count, 2)
-
         // WHEN
         sut.mode = .tasks
 
         // THEN only tasks is displayed
+        wait(for: [expectation], timeout: 2)
         XCTAssertEqual(sut.pins.count, 1)
         XCTAssertEqual(sut.pins.first?.objectID, task.objectID)
     }
