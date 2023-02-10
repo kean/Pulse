@@ -1,5 +1,11 @@
 # Pulse 3.x
 
+## Pulse 3.4.3
+
+*Feb 9, 2023*
+
+- Fix [#155](https://github.com/kean/Pulse/issues/155): fix an issue with `GTMSessionFetcher` not working correctly with automation `URLSessionProxyDelegate` registration enabled
+
 ## Pulse 3.4.2
 
 *Feb 7, 2023*
