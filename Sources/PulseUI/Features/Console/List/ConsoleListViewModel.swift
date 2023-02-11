@@ -65,29 +65,11 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
     private var dataSource: ConsoleDataSource?
     private var cancellables: [AnyCancellable] = []
 
-#warning("move counters to ConsoleViewModel")
-    let logCountObserver: ManagedObjectsCountObserver
-    let taskCountObserver: ManagedObjectsCountObserver
-
     init(store: LoggerStore, source: ConsoleSource, criteria: ConsoleSearchCriteriaViewModel) {
         self.store = store
         self.source = source
         self.searchCriteriaViewModel = criteria
-
-        self.logCountObserver = ManagedObjectsCountObserver(
-            entity: LoggerMessageEntity.self,
-            context: store.viewContext,
-            sortDescriptior: NSSortDescriptor(key: "createdAt", ascending: false)
-        )
-
-        self.taskCountObserver = ManagedObjectsCountObserver(
-            entity: NetworkTaskEntity.self,
-            context: store.viewContext,
-            sortDescriptior: NSSortDescriptor(key: "createdAt", ascending: false)
-        )
-
         self.pinsObserver = LoggerPinsObserver(store: store)
-
         self.bind()
     }
 
@@ -161,12 +143,10 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
     func refresh() {
         guard let dataSource = dataSource else { return }
 
-        dataSource.setPredicate(wih: searchCriteriaViewModel)
-
-        logCountObserver.setPredicate(dataSource.makePredicate(for: .logs, criteria: searchCriteriaViewModel))
-        taskCountObserver.setPredicate(dataSource.makePredicate(for: .tasks, criteria: searchCriteriaViewModel))
-
+        let criteria = searchCriteriaViewModel
+        dataSource.setPredicate(wih: criteria.criteria, isOnlyErrors: criteria.isOnlyErrors)
         dataSource.refresh()
+
         entities = dataSource.entities
         sections = dataSource.sections
         refreshVisibleEntities()

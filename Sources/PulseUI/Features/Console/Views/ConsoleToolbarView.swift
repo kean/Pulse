@@ -44,8 +44,8 @@ struct ConsoleModePicker: View {
 
     init(viewModel: ConsoleViewModel) {
         self.viewModel = viewModel
-        self.logsCounter = viewModel.list.logCountObserver
-        self.tasksCounter = viewModel.list.taskCountObserver
+        self.logsCounter = viewModel.logCountObserver
+        self.tasksCounter = viewModel.taskCountObserver
     }
 
 #if os(macOS)

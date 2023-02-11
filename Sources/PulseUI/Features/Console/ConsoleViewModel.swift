@@ -33,6 +33,9 @@ final class ConsoleViewModel: ObservableObject {
     let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
     let index: LoggerStoreIndex
 
+    let logCountObserver: ManagedObjectsCountObserver
+    let taskCountObserver: ManagedObjectsCountObserver
+
     let router = ConsoleRouter()
 
     var isViewVisible: Bool = false {
@@ -99,8 +102,40 @@ final class ConsoleViewModel: ObservableObject {
         self.textViewModel = ConsoleTextViewModel(list: list, router: router)
 #endif
 
+        self.logCountObserver = ManagedObjectsCountObserver(
+            entity: LoggerMessageEntity.self,
+            context: store.viewContext,
+            sortDescriptior: NSSortDescriptor(key: "createdAt", ascending: false)
+        )
+
+        self.taskCountObserver = ManagedObjectsCountObserver(
+            entity: NetworkTaskEntity.self,
+            context: store.viewContext,
+            sortDescriptior: NSSortDescriptor(key: "createdAt", ascending: false)
+        )
+
+        bind()
         prepare(for: mode)
+    }
+
+    private func bind() {
         searchCriteriaViewModel.bind(list.$entities)
+
+        searchCriteriaViewModel.$criteria
+            .throttle(for: 1, scheduler: DispatchQueue.main, latest: true)
+            .combineLatest(searchCriteriaViewModel.$isOnlyErrors)
+            .sink { [weak self] in
+                self?.refreshCountObservers(criteria: $0, isOnlyError: $1)
+            }
+            .store(in: &cancellables)
+    }
+
+    private func refreshCountObservers(criteria: ConsoleSearchCriteria, isOnlyError: Bool) {
+        func makePredicate(for mode: ConsoleMode) -> NSPredicate? {
+            ConsoleDataSource.makePredicate(mode: mode, source: source, criteria: criteria, isOnlyErrors: isOnlyError)
+        }
+        logCountObserver.setPredicate(makePredicate(for: .logs))
+        taskCountObserver.setPredicate(makePredicate(for: .tasks))
     }
 
     private func prepare(for mode: ConsoleMode) {
