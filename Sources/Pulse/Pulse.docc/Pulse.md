@@ -13,7 +13,6 @@ Logger and network inspector for Apple platforms.
 
 - <doc:NetworkLogging-Article>
 - ``NetworkLogger``
-- ``NetworkLoggerInsights``
 - ``URLSessionProxyDelegate``
 - ``Experimental``
 

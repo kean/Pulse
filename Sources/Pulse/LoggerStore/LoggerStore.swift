@@ -66,7 +66,6 @@ public final class LoggerStore: @unchecked Sendable {
 
     private static func register(store: LoggerStore) {
         RemoteLogger.shared.initialize(store: store)
-        NetworkLoggerInsights.shared.register(store: store)
     }
 
     private static func makeDefault() -> LoggerStore {
