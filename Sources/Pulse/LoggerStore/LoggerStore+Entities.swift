@@ -9,8 +9,7 @@ public final class LoggerSessionEntity: NSManagedObject {
     @NSManaged public var sessionID: Int64
 }
 
-public final class LoggerMessageEntity: NSManagedObject, Identifiable {
-    public var id: NSManagedObjectID { objectID }
+public final class LoggerMessageEntity: NSManagedObject {
     @NSManaged public var createdAt: Date
     @NSManaged public var isPinned: Bool
     @NSManaged public var sessionID: Int64
@@ -26,9 +25,7 @@ public final class LoggerMessageEntity: NSManagedObject, Identifiable {
     public lazy var metadata = { KeyValueEncoding.decodeKeyValuePairs(rawMetadata) }()
 }
 
-public final class NetworkTaskEntity: NSManagedObject, Identifiable {
-    public var id: NSManagedObjectID { objectID }
-
+public final class NetworkTaskEntity: NSManagedObject {
     // Primary
     @NSManaged public var createdAt: Date
     @NSManaged public var sessionID: Int64

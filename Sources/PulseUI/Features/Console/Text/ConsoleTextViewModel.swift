@@ -40,14 +40,26 @@ final class ConsoleTextViewModel: ObservableObject {
         self.text.onLinkTapped = { [unowned self] in onLinkTapped($0) }
         self.text.isLinkDetectionEnabled = false
 
-        list.updates.sink { [weak self] in
-            guard let self = self, self.isViewVisible else { return }
-            switch $0 {
-            case .reload: self.refresh()
-            case .diff(let diff): self.apply(diff)
-            }
-        }.store(in: &cancellables)
+#warning("reimplement: ConsoleTextViewModel should have its own datasource")
+//        list.updates.sink { [weak self] in
+//            self?.handle(update: $0)
+//        }.store(in: &cancellables)
     }
+
+//    private func handle(update: ConsoleUpdateEvent) {
+//        guard isViewVisible else { return }
+//
+//        switch update {
+//        case .reload:
+//            self.refresh()
+//        case .change(let diff):
+//            if let diff = diff {
+//                self.apply(diff)
+//            } else {
+//                self.refresh()
+//            }
+//        }
+//    }
 
     private func apply(_ diff: CollectionDifference<NSManagedObjectID>) {
         let renderer = TextRenderer(options: options)
@@ -117,16 +129,11 @@ final class ConsoleTextViewModel: ObservableObject {
     }
 
     private func _render(_ entity: NSManagedObject, using renderer: TextRenderer) -> NSAttributedString {
-        if let task = entity as? NetworkTaskEntity {
+        switch LoggerEntity(entity) {
+        case .message(let message):
+            render(message, using: renderer)
+        case .task(let task):
             render(task, using: renderer)
-        } else if let message = entity as? LoggerMessageEntity {
-            if let task = message.task {
-                render(task, using: renderer)
-            } else {
-                render(message, using: renderer)
-            }
-        } else {
-            fatalError("Unsuppported entity: \(entity)")
         }
         return renderer.make()
     }

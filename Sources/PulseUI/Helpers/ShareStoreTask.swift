@@ -72,17 +72,11 @@ final class ShareStoreTask {
             guard let entity = try? context.existingObject(with: objectIDs[index]) else {
                 continue
             }
-
-            if let task = entity as? NetworkTaskEntity {
+            switch LoggerEntity(entity) {
+            case .message(let message):
+                renderer.render(message)
+            case .task(let task):
                 renderer.render(task, content: content)
-            } else if let message = entity as? LoggerMessageEntity {
-                if let task = message.task {
-                    renderer.render(task, content: content)
-                } else {
-                    renderer.render(message)
-                }
-            } else {
-                fatalError("Unsuppported entity: \(entity)")
             }
             if index < objectIDs.endIndex - 1 {
                 renderer.addSpacer()
@@ -105,7 +99,7 @@ final class ShareStoreTask {
         }
 
         for objectID in objectIDs {
-            if let object = try? context.existingObject(with: objectID), let task = getTask(for: object) {
+            if let object = try? context.existingObject(with: objectID),let task = LoggerEntity(object).task {
                 if let blob = task.responseBody, jobs[blob.objectID] == nil {
                     enqueueJob(for: blob, error: task.decodingError)
                 }
@@ -142,10 +136,6 @@ final class ShareStoreTask {
         let contentType: NetworkLogger.ContentType?
         let error: NetworkLogger.DecodingError?
     }
-}
-
-private func getTask(for object: NSManagedObject) -> NetworkTaskEntity? {
-    (object as? NetworkTaskEntity) ?? (object as? LoggerMessageEntity)?.task
 }
 
 private func contentForSharing(count: Int) -> NetworkContent {

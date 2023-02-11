@@ -16,7 +16,7 @@ struct ConsoleSearchResultView: View {
     var isSeparatorNeeded = false
 
     var body: some View {
-        ConsoleEntityCell.make(for: viewModel.entity)
+        ConsoleEntityCell(entity: viewModel.entity)
 #if os(macOS)
             .tag(ConsoleSelectedItem.entity(viewModel.entity.objectID))
 #endif
@@ -81,16 +81,11 @@ struct ConsoleSearchResultView: View {
 
     @ViewBuilder
     private static func _makeDestination(for occurrence: ConsoleSearchOccurrence, entity: NSManagedObject) -> some View {
-        if let message = entity as? LoggerMessageEntity {
-            if let task = message.task {
-                _makeDestination(for: occurrence, task: task)
-            } else {
-                ConsoleMessageDetailsView(message: message)
-            }
-        } else if let task = entity as? NetworkTaskEntity {
+        switch LoggerEntity(entity) {
+        case .message(let message):
+            ConsoleMessageDetailsView(message: message)
+        case .task(let task):
             _makeDestination(for: occurrence, task: task)
-        } else {
-            fatalError("Unsupported entity: \(entity)")
         }
     }
 

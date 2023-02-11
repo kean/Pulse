@@ -15,16 +15,11 @@ final class ConsoleSearchService {
     private let cachedBodies = Cache<NSManagedObjectID, NSString>(costLimit: 16_000_000, countLimit: 1000)
 
     func search(_ entity: NSManagedObject, parameters: ConsoleSearchParameters) -> [ConsoleSearchOccurrence]? {
-        if let message = entity as? LoggerMessageEntity {
-            if let task = message.task {
-                return _search(task, parameters: parameters)
-            } else {
-                return _search(message, parameters: parameters)
-            }
-        } else if let task = entity as? NetworkTaskEntity {
+        switch LoggerEntity(entity) {
+        case .message(let message):
+            return _search(message, parameters: parameters)
+        case .task(let task):
             return _search(task, parameters: parameters)
-        } else {
-            fatalError("Unsupported entity: \(entity)")
         }
     }
 

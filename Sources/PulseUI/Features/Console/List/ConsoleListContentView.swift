@@ -30,10 +30,10 @@ struct ConsoleListContentView: View {
         ForEach(sections, id: \.name) { section in
             let objects = (section.objects as? [NSManagedObject]) ?? []
             let prefix = objects.prefix(3)
-            let sectionName = viewModel.makeName(for: section)
+            let sectionName = viewModel.name(for: section)
             PlainListExpandableSectionHeader(title: sectionName, count: section.numberOfObjects, destination: { EmptyView() }, isSeeAllHidden: true)
             ForEach(prefix, id: \.objectID) { entity in
-                ConsoleEntityCell.make(for: entity)
+                ConsoleEntityCell(entity: entity)
             }
             if prefix.count < objects.count {
                 NavigationLink(destination: makeDestination(for: sectionName, objects: objects)) {
@@ -63,7 +63,7 @@ struct ConsoleListContentView: View {
                 }
         }, isSeeAllHidden: prefix.count == viewModel.pins.count)
         ForEach(prefix.map(PinCellViewModel.init)) { viewModel in
-            ConsoleEntityCell.make(for: viewModel.object)
+            ConsoleEntityCell(entity: viewModel.object)
         }
         Button(action: viewModel.buttonRemovePinsTapped) {
             Text("Remove Pins")
@@ -94,7 +94,7 @@ struct ConsoleListContentView: View {
                 .foregroundColor(.secondary)
         } else {
             ForEach(viewModel.visibleEntities, id: \.objectID) { entity in
-                ConsoleEntityCell.make(for: entity)
+                ConsoleEntityCell(entity: entity)
                     .onAppear { viewModel.onAppearCell(with: entity.objectID) }
                     .onDisappear { viewModel.onDisappearCell(with: entity.objectID) }
             }

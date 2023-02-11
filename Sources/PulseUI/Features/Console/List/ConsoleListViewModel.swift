@@ -8,32 +8,39 @@ import Pulse
 import Combine
 import SwiftUI
 
+#warning("remove unused properties and code")
+
 /// Manages the logs list. Supports grouping, ordering, pins.
 ///
 /// - note: It currently acts as a source of entities for other screen as well
 /// and should probably be extracted to a separate class.
-final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, ObservableObject {
+final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
     @Published private(set) var visibleEntities: ArraySlice<NSManagedObject> = []
     @Published private(set) var pins: [NSManagedObject] = []
+    #warning("do we need to expose entities?")
     @Published private(set) var entities: [NSManagedObject] = []
     @Published private(set) var sections: [NSFetchedResultsSectionInfo]?
     @Published var options = ConsoleListOptions()
 
-    let updates = PassthroughSubject<ConsoleUpdateEvent, Never>()
+    private var _sourceEntities: [NSManagedObject] = []
+    private var _sourceSections: [NSFetchedResultsSectionInfo]?
 
     var isViewVisible = false {
         didSet {
             if isViewVisible {
-                reloadMessages(isMandatory: true)
+                resetDataSource(options: options)
+            } else {
+                dataSource = nil
             }
         }
     }
 
+#warning("reimplement")
     var sortDescriptors: [NSSortDescriptor] = [] {
         didSet {
-            controller?.fetchRequest.sortDescriptors = sortDescriptors
-            try? controller?.performFetch()
-            reloadMessages(isMandatory: true)
+//            controller?.fetchRequest.sortDescriptors = sortDescriptors
+//            try? controller?.performFetch()
+//            reloadMessages()
         }
     }
 
@@ -41,22 +48,24 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
         searchCriteriaViewModel.criteria.shared.dates == .session
     }
 
+#warning("this is incorrect and should not event be here")
     @Published var mode: ConsoleMode = .all {
-        didSet { prepare(mode: mode) }
+        didSet { resetDataSource(options: options) }
     }
 
     /// This exist strictly to workaround List performance issues
     private var scrollPosition: ScrollPosition = .nearTop
-    private var visibleEntityCountLimit = fetchBatchSize
+    private var visibleEntityCountLimit = ConsoleDataSource.fetchBatchSize
     private var visibleObjectIDs: Set<NSManagedObjectID> = []
 
     let store: LoggerStore
     let source: ConsoleSource
     private let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
     private let pinsObserver: LoggerPinsObserver
-    private var controller: NSFetchedResultsController<NSManagedObject>?
+    private var dataSource: ConsoleDataSource?
     private var cancellables: [AnyCancellable] = []
 
+#warning("move counters to ConsoleViewModel")
     let logCountObserver: ManagedObjectsCountObserver
     let taskCountObserver: ManagedObjectsCountObserver
 
@@ -79,8 +88,10 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
 
         self.pinsObserver = LoggerPinsObserver(store: store)
 
-        super.init()
+        self.bind()
+    }
 
+    private func bind() {
         pinsObserver.$pins.dropFirst().sink { [weak self] pins in
             withAnimation {
                 self?.pins = self?.filter(pins: pins) ?? []
@@ -99,16 +110,18 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
             .sink { [weak self] _ in self?.refresh() }
             .store(in: &cancellables)
 
-        $options.dropFirst().sink { [weak self] in
-            self?.refreshController(options: $0)
-        }.store(in: &cancellables)
-
-        prepare(mode: mode)
+        $options.dropFirst()
+            .sink { [weak self] in self?.resetDataSource(options: $0) }
+            .store(in: &cancellables)
     }
 
-    private func prepare(mode: ConsoleMode) {
-        self.refreshController(options: options)
-        self.pins = filter(pins: pinsObserver.pins)
+    private func resetDataSource(options: ConsoleListOptions) {
+        dataSource = ConsoleDataSource(store: store, source: source, mode: mode, options: options)
+        dataSource?.delegate = self
+        refresh()
+
+        #warning("is this the right place to do it")
+        pins = filter(pins: pinsObserver.pins)
     }
 
     private func filter(pins: [LoggerMessageEntity]) -> [LoggerMessageEntity] {
@@ -133,122 +146,33 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
         try? store.viewContext.existingObject(with: objectID)
     }
 
-    // MARK: - NSFetchedResultsController
+    // MARK: ConsoleDataSourceDelegate
 
-    func refreshController(options: ConsoleListOptions) {
-        let request: NSFetchRequest<NSManagedObject>
-        let sortKey = mode == .tasks ? options.taskSortBy.key : options.messageSortBy.key
-        let grouping: ConsoleListGroupBy = mode == .tasks ? options.taskGroupBy : options.messageGroupBy
-        if mode == .tasks {
-            request = .init(entityName: "\(NetworkTaskEntity.self)")
-            request.sortDescriptors = [
-                grouping.key.map { NSSortDescriptor(key: $0, ascending: grouping.isAscending) },
-                NSSortDescriptor(key: sortKey, ascending: options.order == .ascending)
-            ].compactMap { $0 }
-        } else {
-            request = .init(entityName: "\(LoggerMessageEntity.self)")
-            request.relationshipKeyPathsForPrefetching = ["request"]
-            request.sortDescriptors = [
-                grouping.key.map { NSSortDescriptor(key: $0, ascending: grouping.isAscending) },
-                NSSortDescriptor(key: sortKey, ascending: options.order == .ascending)
-            ].compactMap { $0 }
+    func dataSource(_ dataSource: ConsoleDataSource, didUpdateWith diff: CollectionDifference<NSManagedObjectID>?) {
+        withAnimation {
+            entities = dataSource.entities
+            sections = dataSource.sections
+            if scrollPosition == .nearTop {
+                refreshVisibleEntities()
+            }
         }
-        request.fetchBatchSize = fetchBatchSize
-        controller = NSFetchedResultsController(
-            fetchRequest: request,
-            managedObjectContext: store.viewContext,
-            sectionNameKeyPath: grouping.key,
-            cacheName: nil
-        )
-        controller?.delegate = self
-
-        refresh()
     }
 
     func refresh() {
-        guard let controller = controller else {
-            return assertionFailure()
-        }
-        controller.fetchRequest.predicate = makePredicate(for: mode)
-        try? controller.performFetch()
+        guard let dataSource = dataSource else { return }
 
-        logCountObserver.setPredicate(makePredicate(for: .logs))
-        taskCountObserver.setPredicate(makePredicate(for: .tasks))
+        dataSource.setPredicate(wih: searchCriteriaViewModel)
 
-        reloadMessages()
-        updates.send(.reload)
+        logCountObserver.setPredicate(dataSource.makePredicate(for: .logs, criteria: searchCriteriaViewModel))
+        taskCountObserver.setPredicate(dataSource.makePredicate(for: .tasks, criteria: searchCriteriaViewModel))
+
+        dataSource.refresh()
+        entities = dataSource.entities
+        sections = dataSource.sections
+        refreshVisibleEntities()
     }
 
-    private func makePredicate(for mode: ConsoleMode) -> NSPredicate? {
-        switch source {
-        case .store:
-            return _makePredicate(for: mode)
-        case .entities(_, let entities):
-            return NSCompoundPredicate(andPredicateWithSubpredicates: [
-                _makePredicate(for: mode),
-                NSPredicate(format: "self IN %@", entities)
-            ].compactMap { $0 })
-        }
-    }
-
-    private func _makePredicate(for mode: ConsoleMode) -> NSPredicate? {
-        let criteria = searchCriteriaViewModel
-
-        func makeMessagesPredicate(isMessageOnly: Bool) -> NSPredicate? {
-            var predicates: [NSPredicate] = []
-            if isMessageOnly {
-                predicates.append(NSPredicate(format: "task == NULL"))
-            }
-            if let predicate = ConsoleSearchCriteria.makeMessagePredicates(criteria: criteria.criteria, isOnlyErrors: criteria.isOnlyErrors) {
-                predicates.append(predicate)
-            }
-            return predicates.isEmpty ? nil : NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
-        }
-
-        switch mode {
-        case .all:
-            return makeMessagesPredicate(isMessageOnly: false)
-        case .logs:
-            return makeMessagesPredicate(isMessageOnly: true)
-        case .tasks:
-            return ConsoleSearchCriteria.makeNetworkPredicates(criteria: criteria.criteria, isOnlyErrors: criteria.isOnlyErrors)
-        }
-    }
-
-    // MARK: - NSFetchedResultsControllerDelegate
-
-    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        didRefreshContent()
-    }
-
-    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChangeContentWith diff: CollectionDifference<NSManagedObjectID>) {
-        didRefreshContent()
-        updates.send(.diff(diff))
-    }
-
-    private func didRefreshContent() {
-        if isViewVisible {
-            withAnimation {
-                reloadMessages(isMandatory: false)
-            }
-        } else {
-            entities = self.controller?.fetchedObjects ?? []
-        }
-    }
-
-    private func reloadMessages(isMandatory: Bool = true) {
-        entities = controller?.fetchedObjects ?? []
-        sections = controller?.sectionNameKeyPath == nil ?  nil : controller?.sections
-        if isMandatory || scrollPosition == .nearTop {
-            refreshVisibleEntities()
-        }
-    }
-
-    private func refreshVisibleEntities() {
-        visibleEntities = entities.prefix(visibleEntityCountLimit)
-    }
-
-    // MARK: - Scroll Position
+    // MARK: Visible Entities
 
     private enum ScrollPosition {
         case nearTop
@@ -280,80 +204,26 @@ final class ConsoleListViewModel: NSObject, NSFetchedResultsControllerDelegate, 
             self.scrollPosition = scrollPosition
             switch scrollPosition {
             case .nearTop:
-                visibleEntityCountLimit = fetchBatchSize // Reset
+                visibleEntityCountLimit = ConsoleDataSource.fetchBatchSize // Reset
                 refreshVisibleEntities()
             case .middle:
                 break // Don't reload: too expensive and ruins gestures
             case .nearBottom:
-                visibleEntityCountLimit += fetchBatchSize
+                visibleEntityCountLimit += ConsoleDataSource.fetchBatchSize
                 refreshVisibleEntities()
             }
         }
     }
 
-    // MARK: - Sections
-
-    private let sessionDateFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "en_US")
-        formatter.dateStyle = .medium
-        formatter.timeStyle = .medium
-        formatter.doesRelativeDateFormatting = true
-        return formatter
-    }()
-
-    func makeName(for section: NSFetchedResultsSectionInfo) -> String {
-        switch mode {
-        case .all, .logs:
-            switch options.messageGroupBy {
-            case .level:
-                let rawValue = Int16(Int(section.name) ?? 0)
-                return (LoggerStore.Level(rawValue: rawValue) ?? .debug).name.capitalized
-            case .session:
-                let date = (section.objects?.last as? LoggerMessageEntity)?.createdAt
-                let suffix = date.map(sessionDateFormatter.string) ?? "–"
-                return "#\(section.name) \(suffix)"
-            default:
-                break
-            }
-        case .tasks:
-            switch options.taskGroupBy {
-            case .taskType:
-                let rawValue = Int16(Int(section.name) ?? 0)
-                return NetworkLogger.TaskType(rawValue: rawValue)?.urlSessionTaskClassName ?? section.name
-            case .statusCode:
-                let rawValue = Int32(section.name) ?? 0
-                return StatusCodeFormatter.string(for: rawValue)
-            case .requestState:
-                let rawValue = Int16(Int(section.name) ?? 0)
-                guard let state = NetworkTaskEntity.State(rawValue: rawValue) else {
-                    return "Unknown State"
-                }
-                switch state {
-                case .pending: return "Pending"
-                case .success: return "Success"
-                case .failure: return "Failure"
-                }
-            case .session:
-                let date = (section.objects?.last as? NetworkTaskEntity)?.createdAt
-                let suffix = date.map(sessionDateFormatter.string) ?? "–"
-                return "#\(section.name) \(suffix)"
-            default:
-                break
-            }
-        }
-        let name = section.name
-        return name.isEmpty ? "–" : name
+    private func refreshVisibleEntities() {
+        visibleEntities = entities.prefix(visibleEntityCountLimit)
     }
-}
 
-private let fetchBatchSize = 100
+    // MARK: Sections
 
-enum ConsoleUpdateEvent {
-    /// Full reload.
-    case reload
-    /// An incremental update.
-    case diff(CollectionDifference<NSManagedObjectID>)
+    func name(for section: NSFetchedResultsSectionInfo) -> String {
+        dataSource?.name(for: section) ?? ""
+    }
 }
 
 enum ConsoleMode: String {

@@ -33,6 +33,7 @@ struct ConsoleToolbarView: View {
     }
 }
 
+#warning("rework where mode picker is set (what should be a source?)")
 struct ConsoleModePicker: View {
     let viewModel: ConsoleViewModel
     @ObservedObject var logsCounter: ManagedObjectsCountObserver

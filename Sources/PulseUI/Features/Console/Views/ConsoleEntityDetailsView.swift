@@ -31,14 +31,11 @@ struct ConsoleEntityDetailsView: View {
     @ViewBuilder
     private func makeDetails(for objectID: NSManagedObjectID) -> some View {
         if let entity = viewModel.entity(withID: objectID) {
-            if let task = entity as? NetworkTaskEntity {
+            switch LoggerEntity(entity) {
+            case .message(let message):
+                ConsoleMessageDetailsView(message: message, toolbarItems: AnyView(toolbarItems))
+            case .task(let task):
                 NetworkInspectorView(task: task, toolbarItems: AnyView(toolbarItems))
-            } else if let message = entity as? LoggerMessageEntity {
-                if let task = message.task {
-                    NetworkInspectorView(task: task, toolbarItems: AnyView(toolbarItems))
-                } else {
-                    ConsoleMessageDetailsView(message: message, toolbarItems: AnyView(toolbarItems))
-                }
             }
         }
     }

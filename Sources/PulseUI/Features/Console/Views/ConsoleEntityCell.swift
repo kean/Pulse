@@ -11,31 +11,11 @@ struct ConsoleEntityCell: View {
     let entity: NSManagedObject
 
     var body: some View {
-        if let task = entity as? NetworkTaskEntity {
+        switch LoggerEntity(entity) {
+        case .message(let message):
+            _ConsoleMessageCell(message: message)
+        case .task(let task):
             _ConsoleTaskCell(task: task)
-        } else if let message = entity as? LoggerMessageEntity {
-            if let task = message.task {
-                _ConsoleTaskCell(task: task)
-            } else {
-                _ConsoleMessageCell(message: message)
-            }
-        } else {
-            fatalError("Unsupported entity: \(entity)")
-        }
-    }
-
-    @ViewBuilder
-    static func make(for entity: NSManagedObject) -> some View {
-        if let task = entity as? NetworkTaskEntity {
-            _ConsoleTaskCell(task: task)
-        } else if let message = entity as? LoggerMessageEntity {
-            if let task = message.task {
-                _ConsoleTaskCell(task: task)
-            } else {
-                _ConsoleMessageCell(message: message)
-            }
-        } else {
-            fatalError("Unsupported entity: \(entity)")
         }
     }
 }
