@@ -4,6 +4,7 @@
 
 import Foundation
 import Pulse
+@preconcurrency import CoreData
 
 /// Collects insights about the current session.
 struct NetworkLoggerInsights {
@@ -22,6 +23,9 @@ struct NetworkLoggerInsights {
         guard task.state != .pending else { return }
 
         transferSize = transferSize.merging(task.totalTransferSize)
+        if let duration = task.taskInterval?.duration, duration > 0 {
+            self.duration.insert(duration: duration, taskId: task.objectID)
+        }
     }
 
     private func process(event: LoggerStore.Event.NetworkTaskCompleted) {
@@ -51,9 +55,9 @@ struct NetworkLoggerInsights {
         var values: [TimeInterval] = []
 
         /// Contains top slowest requests.
-        var topSlowestRequests: [UUID: TimeInterval] = [:]
+        var topSlowestRequests: [(NSManagedObjectID, TimeInterval)] = []
 
-        mutating func insert(duration: TimeInterval, taskId: UUID) {
+        mutating func insert(duration: TimeInterval, taskId: NSManagedObjectID) {
             values.insert(duration, at: insertionIndex(for: duration))
             median = values[values.count / 2]
             if let maximum = self.maximum {
@@ -66,10 +70,11 @@ struct NetworkLoggerInsights {
             } else {
                 self.minimum = duration
             }
-            topSlowestRequests[taskId] = duration
-            if topSlowestRequests.count > 10 {
-                let max = topSlowestRequests.max(by: { $0.value > $1.value })
-                topSlowestRequests[max!.key] = nil
+
+            let index = topSlowestRequests.insertionIndex(for: (taskId, duration), by: { $0.1 > $1.1 })
+            topSlowestRequests.insert((taskId, duration), at: index)
+            while topSlowestRequests.count > 10 {
+                topSlowestRequests.removeLast()
             }
         }
 
@@ -104,5 +109,21 @@ struct NetworkLoggerInsights {
         var taskIds: [UUID] = []
 
         init() {}
+    }
+}
+
+private extension Array {
+    func insertionIndex(for element: Element, by isOrderedBefore: (Element, Element) -> Bool) -> Int {
+        var lhs = 0
+        var rhs = count
+        while rhs > lhs {
+            let mid = lhs + (rhs - lhs) / 2
+            if isOrderedBefore(self[mid], element) {
+                lhs = mid + 1
+            } else {
+                rhs = mid
+            }
+        }
+        return lhs
     }
 }

@@ -209,8 +209,7 @@ final class InsightsViewModel: ObservableObject {
     // MARK: - Accessing Data
 
     func topSlowestRequests() -> [NetworkTaskEntity] {
-        tasks(with: Array(insights.duration.topSlowestRequests.keys))
-            .sorted(by: { $0.duration > $1.duration })
+        tasks(with: insights.duration.topSlowestRequests.map { $0.0 })
     }
 
     func requestsWithRedirects() -> [NetworkTaskEntity] {
@@ -223,6 +222,11 @@ final class InsightsViewModel: ObservableObject {
             .sorted(by: { $0.createdAt > $1.createdAt })
     }
 
+    private func tasks(with ids: [NSManagedObjectID]) -> [NetworkTaskEntity] {
+        ids.compactMap { (try? store.viewContext.existingObject(with: $0)) as? NetworkTaskEntity }
+    }
+
+#warning("remove")
     private func tasks(with ids: [UUID]) -> [NetworkTaskEntity] {
         let request = NSFetchRequest<NetworkTaskEntity>(entityName: "\(NetworkTaskEntity.self)")
         request.fetchLimit = ids.count
