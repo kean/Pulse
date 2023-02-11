@@ -15,7 +15,7 @@ final class NetworkLoggerInsightsTests: ConsoleTestCase {
         return NetworkLoggerInsights(tasks)
     }
 
-    func testInsightsTransferSize() throws {
+    func testTransferSize() throws {
         // GIVEN
         let insights = try makeInsights()
         let transferSize = insights.transferSize
@@ -32,7 +32,7 @@ final class NetworkLoggerInsightsTests: ConsoleTestCase {
         XCTAssertEqual(transferSize.responseBodyBytesReceived, 6697658)
     }
 
-    func testInsightsDuration() throws {
+    func testDuration() throws {
         // GIVEN
         let insights = try makeInsights()
         let duration = insights.duration
@@ -43,6 +43,17 @@ final class NetworkLoggerInsightsTests: ConsoleTestCase {
         XCTAssertEqual(duration.minimum!, 0.2269, accuracy: 0.01)
         let durations = duration.topSlowestRequests.map { $0.1 }
         XCTAssertEqual(durations.sorted(by: { $0 > $1 }), durations)
+    }
+
+    func testRedirects() throws {
+        // GIVEN
+        let insights = try makeInsights()
+        let redirects = insights.redirects
+
+        // THEN
+        XCTAssertEqual(redirects.count, 1)
+        XCTAssertEqual(redirects.timeLost, 0.21282994747161865, accuracy: 0.01)
+        XCTAssertEqual(redirects.taskIds.count, 1)
     }
 }
 

@@ -28,6 +28,14 @@ struct NetworkLoggerInsights {
         if let duration = task.taskInterval?.duration, duration > 0 {
             self.duration.insert(duration: duration, taskId: task.objectID)
         }
+        if task.redirectCount > 0 {
+            redirects.count += Int(task.redirectCount)
+            redirects.taskIds.append(task.objectID)
+            redirects.timeLost += task.transactions
+                .filter({ $0.response?.statusCode == 302 })
+                .map { $0.timing.duration ?? 0 }
+                .reduce(0, +)
+        }
     }
 
 #warning("add support for redirects and failures")
@@ -102,7 +110,7 @@ struct NetworkLoggerInsights {
         /// A single task can be redirected multiple times.
         var count: Int = 0
         var timeLost: TimeInterval = 0
-        var taskIds: [UUID] = []
+        var taskIds: [NSManagedObjectID] = []
 
         init() {}
     }

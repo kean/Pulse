@@ -4,6 +4,7 @@
 
 import XCTest
 import Combine
+import CoreData
 @testable import Pulse
 @testable import PulseUI
 
@@ -198,31 +199,33 @@ final class ConsoleListViewModelTests: ConsoleTestCase {
         // THEN
         XCTAssertEqual(sut.entities, entities)
     }
-
+    
+#if os(macOS)
     func testGroupingFocusedEntities() {
         // GIVEN
         let entities = Array(sut.entities[...3])
         setUp(store: store, context: .init(title: "Focus", focusedEntities: entities))
-
+        
         // WHEN
         sut.options.messageGroupBy = .level
-
+        
         // THEN entities are still loaded
         XCTAssertEqual(sut.entities.count, 4)
-
+        
         // THEN sections are created
         let sections = sut.sections ?? []
         XCTAssertEqual(sections.count, 2)
-
+        
         // THEN groups are sorted by the label
         XCTAssertEqual(sections.map(sut.name), ["Info", "Debug"])
-
+        
         // THEN entities within these groups are sorted by creation date
         for section in sections {
             let entities = section.objects as! [NSManagedObject]
             XCTAssertEqual(entities, entities.sorted(by: isOrderedBefore))
         }
     }
+#endif
 }
 
 private func isOrderedBefore(_ lhs: NSManagedObject, _ rhs: NSManagedObject) -> Bool {

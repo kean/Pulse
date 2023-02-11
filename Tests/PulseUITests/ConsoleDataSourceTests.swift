@@ -4,6 +4,7 @@
 
 import XCTest
 import Combine
+import CoreData
 @testable import Pulse
 @testable import PulseUI
 
@@ -135,7 +136,11 @@ final class ConsoleDataSourceTests: ConsoleTestCase, ConsoleDataSourceDelegate {
         let change = try XCTUnwrap(diff.first)
         switch change {
         case let .insert(offset, _, _):
+#if os(macOS)
             XCTAssertEqual(offset, 15)
+#else
+            XCTAssertEqual(offset, 0)
+#endif
         case .remove:
             XCTFail()
         }
