@@ -34,8 +34,9 @@ final class ConsoleTextViewModel: ObservableObject, ConsoleDataSourceDelegate {
     private let store: LoggerStore
     private let source: ConsoleSource
     private let router: ConsoleRouter
-    private var dataSource: ConsoleDataSource?
     private let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
+
+    private var dataSource: ConsoleDataSource?
     private var content: NetworkContent = []
     private var entities: [NSManagedObject] { dataSource?.entities ?? [] }
     private var items: [ConsoleTextItemViewModel] = []
