@@ -35,6 +35,5 @@ final class ConsoleSearchViewModelTests: XCTestCase {
     func setUp(store: LoggerStore, source: ConsoleSource = .store) {
         self.store = store
         self.searchBarViewModel = ConsoleSearchBarViewModel()
-//        self.sut = ConsoleSearchViewModel(list: <#T##ConsoleListViewModel#>, index: <#T##LoggerStoreIndex#>, searchBar: <#T##ConsoleSearchBarViewModel#>)
     }
 }

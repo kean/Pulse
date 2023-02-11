@@ -351,7 +351,7 @@ private func makeMetrics(for task: MockTask, taskInterval: DateInterval) -> Netw
                 switch task.kind {
                 case .data, .download:
                     transferSize.requestBodyBytesBeforeEncoding = requestBodySize
-                    transferSize.requestBodyBytesSent = Int64(Double(requestBodySize) * .random(in: 0.6...0.8))
+                    transferSize.requestBodyBytesSent = Int64(Double(requestBodySize) * 0.7)
                 case .upload(let size):
                     transferSize.requestBodyBytesBeforeEncoding = size
                     transferSize.requestBodyBytesSent = size
@@ -359,7 +359,7 @@ private func makeMetrics(for task: MockTask, taskInterval: DateInterval) -> Netw
                 switch task.kind {
                 case .data, .upload:
                     transferSize.responseBodyBytesAfterDecoding = Int64(task.responseBody.count)
-                    transferSize.responseBodyBytesReceived = Int64(Double(task.responseBody.count) * .random(in: 0.6...0.8))
+                    transferSize.responseBodyBytesReceived = Int64(Double(task.responseBody.count) * 0.7)
                 case .download(let size):
                     transferSize.responseBodyBytesAfterDecoding = size
                     transferSize.responseBodyBytesReceived = size

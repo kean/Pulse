@@ -34,21 +34,12 @@ struct InsightsView: View {
             if insights.failures.count > 0 {
                 failuresSection
             }
-//            if insights.redirects.count > 0 {
-                redirectsSection
-//            }
+            redirectsSection
         }
         .listStyle(.automatic)
 #if os(iOS)
         .navigationTitle("Insights")
-        .navigationBarItems(leading: navigationTrailingBarItems)
 #endif
-    }
-
-    private var navigationTrailingBarItems: some View {
-        Button("Reset") {
-            viewModel.insights.reset()
-        }
     }
 
     // MARK: - Duration
@@ -209,14 +200,10 @@ final class InsightsViewModel: ObservableObject {
         }
     }
 
-    init(store: LoggerStore, insights: NetworkLoggerInsights = .shared) {
+#warning("add ConsoleDataStore")
+    init(store: LoggerStore, insights: NetworkLoggerInsights = .init([])) {
         self.store = store
         self.insights = insights
-        cancellable = insights.didUpdate.throttle(for: 1.0, scheduler: DispatchQueue.main, latest: true).sink { [weak self] in
-            withAnimation {
-                self?.objectWillChange.send()
-            }
-        }
     }
 
     // MARK: - Accessing Data
