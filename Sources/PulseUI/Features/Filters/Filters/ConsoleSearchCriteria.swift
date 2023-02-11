@@ -7,6 +7,7 @@ import Pulse
 import CoreData
 import Combine
 
+#warning("add is-only-error")
 struct ConsoleSearchCriteria: Hashable {
     var shared = Shared()
     var messages = Messages()

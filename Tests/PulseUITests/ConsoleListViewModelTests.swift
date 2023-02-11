@@ -8,9 +8,7 @@ import Combine
 @testable import PulseUI
 
 @available(iOS 16, *)
-final class ConsoleListViewModelTests: XCTestCase {
-    let directory = TemporaryDirectory()
-    var store: LoggerStore!
+final class ConsoleListViewModelTests: ConsoleTestCase {
     var criteriaViewModel: ConsoleSearchCriteriaViewModel!
     var sut: ConsoleListViewModel!
     var cancellables: [AnyCancellable] = []
@@ -18,18 +16,7 @@ final class ConsoleListViewModelTests: XCTestCase {
     override func setUp() {
         super.setUp()
 
-        let storeURL = directory.url.appending(filename: "\(UUID().uuidString).pulse")
-        store = try! LoggerStore(storeURL: storeURL, options: [.create, .synchronous])
-        store.populate()
-
         setUp(store: store)
-    }
-
-    override func tearDown() {
-        super.tearDown()
-
-        try? store.destroy()
-        directory.remove()
     }
 
     func setUp(store: LoggerStore, source: ConsoleSource = .store) {

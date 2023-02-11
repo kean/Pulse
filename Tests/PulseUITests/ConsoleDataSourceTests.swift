@@ -7,8 +7,7 @@ import Combine
 @testable import Pulse
 @testable import PulseUI
 
-final class ConsoleDataSourceTests: XCTestCase, ConsoleDataSourceDelegate {
-    var store: LoggerStore!
+final class ConsoleDataSourceTests: ConsoleTestCase, ConsoleDataSourceDelegate {
     var source: ConsoleSource = .store
     var mode: ConsoleMode = .all
     var options = ConsoleListOptions()
@@ -18,26 +17,13 @@ final class ConsoleDataSourceTests: XCTestCase, ConsoleDataSourceDelegate {
     var updates: [CollectionDifference<NSManagedObjectID>?] = []
     var onUpdate: ((CollectionDifference<NSManagedObjectID>?) -> Void)?
 
-    let directory = TemporaryDirectory()
-
     override func setUp() {
         super.setUp()
 
-        let storeURL = directory.url.appending(filename: "\(UUID().uuidString).pulse")
-        store = try! LoggerStore(storeURL: storeURL, options: [.create, .synchronous])
-        store.populate()
-
-        recreate()
+        reset()
     }
 
-    override func tearDown() {
-        super.tearDown()
-
-        try? store.destroy()
-        directory.remove()
-    }
-
-    func recreate() {
+    func reset() {
         self.sut = ConsoleDataSource(store: store, source: source, mode: mode, options: options)
         self.sut.delegate = self
         self.sut.refresh()
@@ -65,7 +51,7 @@ final class ConsoleDataSourceTests: XCTestCase, ConsoleDataSourceDelegate {
     func testSwitchingToNetworkMode() {
         // WHEN
         mode = .tasks
-        recreate()
+        reset()
 
         // THEN
         XCTAssertEqual(sut.entities.count, 8)
@@ -77,7 +63,7 @@ final class ConsoleDataSourceTests: XCTestCase, ConsoleDataSourceDelegate {
     func testGroupingLogsByLabel() {
         // WHEN
         options.messageGroupBy = .label
-        recreate()
+        reset()
 
         // THEN entities are still loaded
         XCTAssertEqual(sut.entities.count, 15)
@@ -110,7 +96,7 @@ final class ConsoleDataSourceTests: XCTestCase, ConsoleDataSourceDelegate {
     func groupTasksBy(_ grouping: ConsoleListOptions.TaskGroupBy) -> [NSFetchedResultsSectionInfo] {
         mode = .tasks
         options.taskGroupBy = grouping
-        recreate()
+        reset()
         return sut.sections ?? []
     }
 
@@ -159,7 +145,7 @@ final class ConsoleDataSourceTests: XCTestCase, ConsoleDataSourceDelegate {
     func testWhenMessageIsInsertedInGroupedDataSourceDelegateIsCalled() throws {
         // GIVEN
         options.messageGroupBy = .level
-        recreate()
+        reset()
 
         let expectation = self.expectation(description: "onUpdate")
         onUpdate = { _ in expectation.fulfill() }

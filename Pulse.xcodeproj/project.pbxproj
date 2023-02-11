@@ -125,6 +125,7 @@
 		0CECF63229968488000F9CCD /* ConsoleSearchViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CECF63129968488000F9CCD /* ConsoleSearchViewModelTests.swift */; };
 		0CECF63D2996BE12000F9CCD /* ConsoleDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CECF63C2996BE12000F9CCD /* ConsoleDataSource.swift */; };
 		0CECF6412996E761000F9CCD /* ConsoleDataSourceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CECF6402996E761000F9CCD /* ConsoleDataSourceTests.swift */; };
+		0CECF64329971D7A000F9CCD /* ConsoleTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CECF64229971D7A000F9CCD /* ConsoleTestCase.swift */; };
 		0CF0D548296F14EA00EED9D4 /* Pulse.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CF0D542296F14EA00EED9D4 /* Pulse.framework */; };
 		0CF0D549296F14EA00EED9D4 /* Pulse.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0CF0D542296F14EA00EED9D4 /* Pulse.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		0CF0D54E296F15F200EED9D4 /* NetworkLogger+Entities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D490296F14CF00EED9D4 /* NetworkLogger+Entities.swift */; };
@@ -610,6 +611,7 @@
 		0CECF63129968488000F9CCD /* ConsoleSearchViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchViewModelTests.swift; sourceTree = "<group>"; };
 		0CECF63C2996BE12000F9CCD /* ConsoleDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleDataSource.swift; sourceTree = "<group>"; };
 		0CECF6402996E761000F9CCD /* ConsoleDataSourceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleDataSourceTests.swift; sourceTree = "<group>"; };
+		0CECF64229971D7A000F9CCD /* ConsoleTestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleTestCase.swift; sourceTree = "<group>"; };
 		0CF0D48D296F14CF00EED9D4 /* NetworkLoggerInsights.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkLoggerInsights.swift; sourceTree = "<group>"; };
 		0CF0D48E296F14CF00EED9D4 /* URLSessionProxyDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionProxyDelegate.swift; sourceTree = "<group>"; };
 		0CF0D48F296F14CF00EED9D4 /* NetworkLogger+Redacting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NetworkLogger+Redacting.swift"; sourceTree = "<group>"; };
@@ -1535,6 +1537,7 @@
 				0C63A389297A44B300F6A6A5 /* StringSearchOptionsTests.swift */,
 				0C7A0E01297CE71400B4B69D /* FormattersTests.swift */,
 				0CF0D6C9296F18FD00EED9D4 /* MockTests.swift */,
+				0CECF64229971D7A000F9CCD /* ConsoleTestCase.swift */,
 				0C0352DB29948290008CDEF8 /* Helpers.swift */,
 			);
 			path = PulseUITests;
@@ -2288,6 +2291,7 @@
 				0C63A38A297A44B300F6A6A5 /* StringSearchOptionsTests.swift in Sources */,
 				0CAF1D77297B0810002E2722 /* ConsoleSearchSuggestionTests.swift in Sources */,
 				0C7A0E02297CE71400B4B69D /* FormattersTests.swift in Sources */,
+				0CECF64329971D7A000F9CCD /* ConsoleTestCase.swift in Sources */,
 				0C0352DC29948290008CDEF8 /* Helpers.swift in Sources */,
 				0C0352D929943F86008CDEF8 /* ConsoleListViewModelTests.swift in Sources */,
 				0CECF63229968488000F9CCD /* ConsoleSearchViewModelTests.swift in Sources */,
