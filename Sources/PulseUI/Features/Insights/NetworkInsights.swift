@@ -6,13 +6,13 @@ import Foundation
 import Combine
 
 /// Collects insights about the current session.
-public final class NetworkLoggerInsights: @unchecked Sendable {
+final class NetworkLoggerInsights: @unchecked Sendable {
     private var cancellable: AnyCancellable?
 
-    public var transferSize: NetworkLogger.TransferSizeInfo { main.transferSize }
-    public var duration: RequestsDurationInfo { main.duration }
-    public var redirects: RedirectsInfo { main.redirects }
-    public var failures: FailuresInfo { main.failures }
+    var transferSize: NetworkLogger.TransferSizeInfo { main.transferSize }
+    var duration: RequestsDurationInfo { main.duration }
+    var redirects: RedirectsInfo { main.redirects }
+    var failures: FailuresInfo { main.failures }
 
     private var main = Contents()
     private var contents = Contents()
@@ -24,14 +24,14 @@ public final class NetworkLoggerInsights: @unchecked Sendable {
         var failures = FailuresInfo()
     }
 
-    public static let shared = NetworkLoggerInsights()
+    static let shared = NetworkLoggerInsights()
 
-    public let didUpdate = PassthroughSubject<Void, Never>()
+    let didUpdate = PassthroughSubject<Void, Never>()
 
     private let queue = DispatchQueue(label: "com.githun.kean.network-logger-insights")
 
     /// Registers a given store. Only one store can be registered.
-    public func register(store: LoggerStore) {
+    func register(store: LoggerStore) {
         cancellable = store.events.receive(on: queue).sink { [weak self] in
             self?.process(event: $0)
         }
@@ -72,7 +72,7 @@ public final class NetworkLoggerInsights: @unchecked Sendable {
         }
     }
 
-    public func reset() {
+    func reset() {
         queue.async {
             self.contents = .init()
             DispatchQueue.main.async {
@@ -82,16 +82,16 @@ public final class NetworkLoggerInsights: @unchecked Sendable {
         }
     }
 
-    public struct RequestsDurationInfo: Sendable {
-        public var median: TimeInterval?
-        public var maximum: TimeInterval?
-        public var minimum: TimeInterval?
+    struct RequestsDurationInfo: Sendable {
+        var median: TimeInterval?
+        var maximum: TimeInterval?
+        var minimum: TimeInterval?
 
         /// Sorted list of all recorded durations.
-        public var values: [TimeInterval] = []
+        var values: [TimeInterval] = []
 
         /// Contains top slowest requests.
-        public var topSlowestRequests: [UUID: TimeInterval] = [:]
+        var topSlowestRequests: [UUID: TimeInterval] = [:]
 
         mutating func insert(duration: TimeInterval, taskId: UUID) {
             values.insert(duration, at: insertionIndex(for: duration))
@@ -130,19 +130,19 @@ public final class NetworkLoggerInsights: @unchecked Sendable {
         }
     }
 
-    public struct RedirectsInfo: Sendable {
+    struct RedirectsInfo: Sendable {
         /// A single task can be redirected multiple times.
-        public var count: Int = 0
-        public var timeLost: TimeInterval = 0
-        public var taskIds: [UUID] = []
+        var count: Int = 0
+        var timeLost: TimeInterval = 0
+        var taskIds: [UUID] = []
 
-        public init() {}
+        init() {}
     }
 
-    public struct FailuresInfo: Sendable {
-        public var count: Int { taskIds.count }
-        public var taskIds: [UUID] = []
+    struct FailuresInfo: Sendable {
+        var count: Int { taskIds.count }
+        var taskIds: [UUID] = []
 
-        public init() {}
+        init() {}
     }
 }
