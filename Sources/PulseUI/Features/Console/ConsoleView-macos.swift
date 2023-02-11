@@ -11,8 +11,6 @@ import Combine
 
 public struct ConsoleView: View {
     @StateObject private var viewModel: ConsoleViewModel
-    @ObservedObject var searchBarViewModel: ConsoleSearchBarViewModel
-    @AppStorage("com-github-kean-pulse-display-mode") private var displayMode: ConsoleDisplayMode = .list
     @AppStorage("com-github-kean-pulse-is-vertical") private var isVertical = false
 
     public init(store: LoggerStore = .shared) {
@@ -21,7 +19,6 @@ public struct ConsoleView: View {
 
     init(viewModel: ConsoleViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
-        self.searchBarViewModel = viewModel.searchBarViewModel
     }
 
     public var body: some View {
@@ -64,6 +61,22 @@ public struct ConsoleView: View {
 
     @ViewBuilder
     private var leftPanel: some View {
+        ConsoleLeftPanelView(viewModel: viewModel, searchBarViewModel: viewModel.searchBarViewModel)
+    }
+
+    @ViewBuilder
+    private var rightPanel: some View {
+        ConsoleRightPanelView(viewModel: viewModel, router: viewModel.router, isVertical: $isVertical)
+    }
+}
+
+private struct ConsoleLeftPanelView: View {
+    let viewModel: ConsoleViewModel
+    @ObservedObject var searchBarViewModel: ConsoleSearchBarViewModel
+
+    @AppStorage("com-github-kean-pulse-display-mode") private var displayMode: ConsoleDisplayMode = .list
+
+    var body: some View {
         let content = ConsoleContentView(viewModel: viewModel, displayMode: displayMode)
             .frame(minWidth: 200, idealWidth: 400, minHeight: 120, idealHeight: 480)
             .toolbar {
@@ -97,11 +110,6 @@ public struct ConsoleView: View {
                 .onSubmit(of: .search, viewModel.searchViewModel.onSubmitSearch)
                 .disableAutocorrection(true)
         }
-    }
-
-    @ViewBuilder
-    private var rightPanel: some View {
-        ConsoleRightPanelView(viewModel: viewModel, router: viewModel.router, isVertical: $isVertical)
     }
 }
 
