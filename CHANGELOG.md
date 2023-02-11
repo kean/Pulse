@@ -9,6 +9,7 @@
 
 ### Pulse
 
+- Address [#162](https://github.com/kean/Pulse/issues/162): `LoggerStore/storeRequest` now accepts a custom label
 - Remove `NetworkLoggerInsights`
 
 ## Pulse 3.4.3

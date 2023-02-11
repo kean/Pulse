@@ -21,7 +21,7 @@
 ### Storing Logs
 
 - ``storeMessage(label:level:message:metadata:file:function:line:)``
-- ``storeRequest(_:response:error:data:metrics:)``
+- ``storeRequest(_:response:error:data:metrics:label:)``
 
 ### Accessing Logs
 

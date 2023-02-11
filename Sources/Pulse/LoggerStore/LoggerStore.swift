@@ -252,7 +252,7 @@ extension LoggerStore {
     ///
     /// - note: If you want to store incremental updates to the task, use
     /// `NetworkLogger` instead.
-    public func storeRequest(_ request: URLRequest, response: URLResponse?, error: Swift.Error?, data: Data?, metrics: URLSessionTaskMetrics? = nil) {
+    public func storeRequest(_ request: URLRequest, response: URLResponse?, error: Swift.Error?, data: Data?, metrics: URLSessionTaskMetrics? = nil, label: String? = nil) {
         handle(.networkTaskCompleted(.init(
             taskId: UUID(),
             taskType: .dataTask,
@@ -264,6 +264,7 @@ extension LoggerStore {
             requestBody: request.httpBody ?? request.httpBodyStreamData(),
             responseBody: data,
             metrics: metrics.map(NetworkLogger.Metrics.init),
+            label: label,
             sessionID: sessionID
         )))
     }
@@ -309,7 +310,7 @@ extension LoggerStore {
     }
 
     private func process(_ event: Event.NetworkTaskCreated) {
-        let entity = findOrCreateTask(forTaskId: event.taskId, taskType: event.taskType, createdAt: event.createdAt, sessionID: event.sessionID, url: event.originalRequest.url)
+        let entity = findOrCreateTask(forTaskId: event.taskId, taskType: event.taskType, createdAt: event.createdAt, label: event.label, sessionID: event.sessionID, url: event.originalRequest.url)
         
         entity.url = event.originalRequest.url?.absoluteString
         entity.host = event.originalRequest.url.flatMap(getHost)
@@ -335,7 +336,7 @@ extension LoggerStore {
     }
 
     private func process(_ event: Event.NetworkTaskCompleted) {
-        let entity = findOrCreateTask(forTaskId: event.taskId, taskType: event.taskType, createdAt: event.createdAt, sessionID: event.sessionID, url: event.originalRequest.url)
+        let entity = findOrCreateTask(forTaskId: event.taskId, taskType: event.taskType, createdAt: event.createdAt, label: event.label, sessionID: event.sessionID, url: event.originalRequest.url)
 
         entity.url = event.originalRequest.url?.absoluteString
         entity.host = event.originalRequest.url.flatMap(getHost)
@@ -462,7 +463,7 @@ extension LoggerStore {
         }
     }
 
-    private func findOrCreateTask(forTaskId taskId: UUID, taskType: NetworkLogger.TaskType, createdAt: Date, sessionID: Int64, url: URL?) -> NetworkTaskEntity {
+    private func findOrCreateTask(forTaskId taskId: UUID, taskType: NetworkLogger.TaskType, createdAt: Date, label: String?, sessionID: Int64, url: URL?) -> NetworkTaskEntity {
         if let entity = findTask(forTaskId: taskId) {
             return entity
         }
@@ -479,7 +480,7 @@ extension LoggerStore {
         let message = LoggerMessageEntity(context: backgroundContext)
         message.createdAt = createdAt
         message.level = Level.debug.rawValue
-        message.label = "network"
+        message.label = label ?? "network"
         message.sessionID = sessionID
         message.file = ""
         message.function = ""

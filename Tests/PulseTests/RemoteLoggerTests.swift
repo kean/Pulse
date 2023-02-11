@@ -21,6 +21,7 @@ final class RemoteLoggerTests: XCTestCase {
             requestBody: "hello".data(using: .utf8)!,
             responseBody: MockDataTask.login.responseBody,
             metrics: MockDataTask.login.metrics,
+            label: nil,
             sessionID: 0
         )
 

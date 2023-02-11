@@ -98,6 +98,7 @@ final class NetworkLoggerTests: XCTestCase {
             requestBody: nil,
             responseBody: nil,
             metrics: task.metrics,
+            label: nil,
             sessionID: 1
         ))
 

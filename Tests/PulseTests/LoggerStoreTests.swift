@@ -166,6 +166,26 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertEqual(try store.viewContext.count(for: LoggerBlobHandleEntity.self), 3)
     }
 
+    // MARK: - Store Request
+
+    func testStoreRequestWithDefaultLabel() throws {
+        // WHEN
+        store.storeRequest(URLRequest(url: URL(string: "https://example.com")!), response: nil, error: nil, data: nil)
+
+        // THEN default "network" label is used
+        let message = try XCTUnwrap(store.allMessages().first)
+        XCTAssertEqual(message.label, "network")
+    }
+
+    func testStoreRequestWithCustomLabel() throws {
+        // WHEN
+        store.storeRequest(URLRequest(url: URL(string: "https://example.com")!), response: nil, error: nil, data: nil, label: "auth")
+
+        // THEN custom label is used
+        let message = try XCTUnwrap(store.allMessages().first)
+        XCTAssertEqual(message.label, "auth")
+    }
+
     // MARK: - Copy (Package)
 
     func testCopyDirectory() throws {
