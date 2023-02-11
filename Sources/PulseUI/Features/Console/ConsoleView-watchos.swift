@@ -21,7 +21,7 @@ public struct ConsoleView: View {
     public var body: some View {
         List {
             ConsoleToolbarView(viewModel: viewModel)
-            ConsoleListContentView(viewModel: viewModel.list)
+            ConsoleListContentView(viewModel: viewModel.listViewModel)
         }
         .background(ConsoleRouterView(viewModel: viewModel))
         .navigationTitle("Console")

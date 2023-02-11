@@ -2,6 +2,8 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
+#if os(iOS) || os(macOS)
+
 import XCTest
 import Combine
 @testable import Pulse
@@ -37,3 +39,5 @@ final class ConsoleSearchViewModelTests: XCTestCase {
         self.searchBarViewModel = ConsoleSearchBarViewModel()
     }
 }
+
+#endif
