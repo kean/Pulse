@@ -41,7 +41,10 @@ struct ConsoleInspectorsView: View {
                 Spacer()
             }
         case .insights:
-            InsightsView(viewModel: viewModel.insightsViewModel)
+            VStack {
+                InsightsView(viewModel: viewModel.insightsViewModel)
+                Spacer()
+            }
         case .settings:
             VStack {
                 SettingsView(store: viewModel.store)

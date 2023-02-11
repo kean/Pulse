@@ -17,18 +17,9 @@ struct InsightsView: View {
     private var insights: NetworkLoggerInsights { viewModel.insights }
 
     var body: some View {
-        List {
-            Section(header: Text("Transfer Size")) {
-                NetworkInspectorTransferInfoView(viewModel: .init(transferSize: insights.transferSize))
-                    .padding(.vertical, 8)
-            }
-            durationSection
-            if insights.failures.count > 0 {
-                failuresSection
-            }
-            redirectsSection
+        Form {
+            contents
         }
-        .listStyle(.automatic)
 #if os(iOS)
         .navigationTitle("Insights")
 #endif
@@ -36,10 +27,23 @@ struct InsightsView: View {
         .onDisappear { viewModel.isViewVisible = false }
     }
 
+    @ViewBuilder
+    private var contents: some View {
+        ConsoleSection(isDividerHidden: true, header: { SectionHeaderView(title: "Transfer Size") }) {
+            NetworkInspectorTransferInfoView(viewModel: .init(transferSize: insights.transferSize))
+                .padding(.vertical, 8)
+        }
+        durationSection
+        if insights.failures.count > 0 {
+            failuresSection
+        }
+        redirectsSection
+    }
+
     // MARK: - Duration
 
     private var durationSection: some View {
-        Section(header: Text("Duration")) {
+        ConsoleSection(header: { SectionHeaderView(title: "Duration") }) {
             InfoRow(title: "Median Duration", details: viewModel.medianDuration)
             InfoRow(title: "Duration Range", details: viewModel.durationRange)
             durationChart
@@ -93,9 +97,8 @@ struct InsightsView: View {
 
     @ViewBuilder
     private var redirectsSection: some View {
-        Section(header: HStack {
-            Label("Redirects", systemImage: "exclamationmark.triangle.fill")
-                .foregroundColor(.orange)
+        ConsoleSection(header: {
+            SectionHeaderView(systemImage: "exclamationmark.triangle.fill", title: "Redirects")
         }) {
             InfoRow(title: "Redirect Count", details: "\(insights.redirects.count)")
             InfoRow(title: "Total Time Lost", details: DurationFormatter.string(from: insights.redirects.timeLost, isPrecise: false))
@@ -109,10 +112,8 @@ struct InsightsView: View {
 
     @ViewBuilder
     private var failuresSection: some View {
-        Section(header: HStack {
-            Image(systemName: "xmark.octagon.fill")
-                .foregroundColor(.red)
-            Text("Failures")
+        ConsoleSection(header: {
+            SectionHeaderView(systemImage: "xmark.octagon.fill", title: "Failures")
         }) {
             NavigationLink(destination: FailingRequestsListView(viewModel: viewModel)) {
                 HStack {
@@ -154,15 +155,14 @@ private struct FailingRequestsListView: View {
 }
 
 #if DEBUG
-
 struct NetworkInsightsView_Previews: PreviewProvider {
     static var previews: some View {
-        NavigationView {
             InsightsView(viewModel: .init(store: .mock, context: .init(), criteria: .init(criteria: .init(), index: .init(store: .mock))))
-        }
+#if os(macOS)
+                .frame(width: 320, height: 800)
+#endif
     }
 }
-
 #endif
 
 #endif

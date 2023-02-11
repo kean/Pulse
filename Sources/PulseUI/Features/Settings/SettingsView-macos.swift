@@ -96,6 +96,21 @@ public struct SettingsView: View {
     }
 }
 
+// MARK: - Preview
+
+#if DEBUG
+struct ConsoleSettingsView_Previews: PreviewProvider {
+    static var previews: some View {
+        SettingsView(viewModel: SettingsViewModel(store: .shared))
+    }
+}
+#endif
+#endif
+
+#if os(iOS) || os(macOS)
+
+import SwiftUI
+
 struct SectionHeaderView: View {
     var systemImage: String?
     let title: String
@@ -109,19 +124,12 @@ struct SectionHeaderView: View {
                 .lineLimit(1)
                 .font(.headline)
                 .foregroundColor(.secondary)
-                .padding(.bottom, 8)
             Spacer()
         }
-    }
-}
-
-// MARK: - Preview
-
-#if DEBUG
-struct ConsoleSettingsView_Previews: PreviewProvider {
-    static var previews: some View {
-        SettingsView(viewModel: SettingsViewModel(store: .shared))
-    }
-}
+#if os(macOS)
+        .padding(.bottom, 8)
 #endif
+    }
+}
+
 #endif
