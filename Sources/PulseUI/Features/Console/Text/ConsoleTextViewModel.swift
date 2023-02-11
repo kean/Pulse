@@ -13,53 +13,69 @@ struct ConsoleTextItemViewModel {
     var range = NSRange(location: NSNotFound, length: 0)
 }
 
-final class ConsoleTextViewModel: ObservableObject {
+final class ConsoleTextViewModel: ObservableObject, ConsoleDataSourceDelegate {
     var text = RichTextViewModel()
     var options: TextRenderer.Options = .init()
 
     var isViewVisible = false {
         didSet {
             if isViewVisible {
-                refresh()
+                resetDataSource()
+            } else {
+                dataSource = nil
             }
         }
     }
 
-    private let list: ConsoleListViewModel
+    var mode: ConsoleMode = .all {
+        didSet {
+            guard isViewVisible else { return }
+            resetDataSource()
+        }
+    }
+
+    private let store: LoggerStore
+    private let source: ConsoleSource
     private let router: ConsoleRouter
+    private var dataSource: ConsoleDataSource?
+    private let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
     private var content: NetworkContent = []
-    private var entities: [NSManagedObject] { list.entities }
+    private var entities: [NSManagedObject] { dataSource?.entities ?? [] }
     private var items: [ConsoleTextItemViewModel] = []
     private var cache: [NSManagedObjectID: NSAttributedString] = [:]
     private var cancellables: [AnyCancellable] = []
 
-    init(list: ConsoleListViewModel, router: ConsoleRouter) {
-        self.list = list
+    init(store: LoggerStore, source: ConsoleSource, criteria: ConsoleSearchCriteriaViewModel, router: ConsoleRouter) {
+        self.store = store
+        self.source = source
+        self.searchCriteriaViewModel = criteria
         self.router = router
 
         self.text.onLinkTapped = { [unowned self] in onLinkTapped($0) }
         self.text.isLinkDetectionEnabled = false
-
-#warning("reimplement: ConsoleTextViewModel should have its own datasource")
-//        list.updates.sink { [weak self] in
-//            self?.handle(update: $0)
-//        }.store(in: &cancellables)
     }
 
-//    private func handle(update: ConsoleUpdateEvent) {
-//        guard isViewVisible else { return }
-//
-//        switch update {
-//        case .reload:
-//            self.refresh()
-//        case .change(let diff):
-//            if let diff = diff {
-//                self.apply(diff)
-//            } else {
-//                self.refresh()
-//            }
-//        }
-//    }
+    private func resetDataSource() {
+        dataSource = ConsoleDataSource(store: store, source: source, mode: mode, options: .init())
+        dataSource?.delegate = self
+        dataSource?.bind(searchCriteriaViewModel)
+    }
+
+    // MARK: ConsoleDataSourceDelegate
+
+    func dataSourceDidRefresh(_ dataSource: ConsoleDataSource) {
+        refresh()
+    }
+
+    func dataSource(_ dataSource: ConsoleDataSource, didUpdateWith diff: CollectionDifference<NSManagedObjectID>?) {
+        if let diff = diff {
+            apply(diff)
+        } else {
+            refresh()
+        }
+    }
+
+    // MARK: Rendering
 
     private func apply(_ diff: CollectionDifference<NSManagedObjectID>) {
         let renderer = TextRenderer(options: options)
@@ -151,7 +167,7 @@ final class ConsoleTextViewModel: ObservableObject {
     }
 
     func onLinkTapped(_ url: URL) -> Bool {
-        if let objectID = list.store.container.persistentStoreCoordinator.managedObjectID(forURIRepresentation: url) {
+        if let objectID = store.container.persistentStoreCoordinator.managedObjectID(forURIRepresentation: url) {
             router.selection = .entity(objectID)
             return true
         }

@@ -13,6 +13,7 @@ final class ConsoleViewModel: ObservableObject {
     let store: LoggerStore
     let source: ConsoleSource
 
+#warning("rename")
     let list: ConsoleListViewModel
 
 #if os(iOS) || os(macOS)
@@ -99,7 +100,7 @@ final class ConsoleViewModel: ObservableObject {
 #endif
 
 #if os(macOS)
-        self.textViewModel = ConsoleTextViewModel(list: list, router: router)
+        self.textViewModel = ConsoleTextViewModel(store: store, source: source, criteria: searchCriteriaViewModel, router: router)
 #endif
 
         self.logCountObserver = ManagedObjectsCountObserver(
@@ -140,6 +141,7 @@ final class ConsoleViewModel: ObservableObject {
     private func prepare(for mode: ConsoleMode) {
         searchCriteriaViewModel.mode = mode
         list.mode = mode
+        textViewModel.mode = mode
     }
 
     private func refreshListsVisibility() {

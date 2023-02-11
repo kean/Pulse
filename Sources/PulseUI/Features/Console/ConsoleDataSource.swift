@@ -18,8 +18,8 @@ protocol ConsoleDataSourceDelegate: AnyObject {
 }
 
 final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
-    @Published private(set) var entities: [NSManagedObject] = []
-    @Published private(set) var sections: [NSFetchedResultsSectionInfo]?
+    private(set) var entities: [NSManagedObject] = []
+    private(set) var sections: [NSFetchedResultsSectionInfo]?
 
     weak var delegate: ConsoleDataSourceDelegate?
 
