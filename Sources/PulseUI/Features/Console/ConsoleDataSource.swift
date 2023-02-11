@@ -9,6 +9,9 @@ import Combine
 import SwiftUI
 
 protocol ConsoleDataSourceDelegate: AnyObject {
+    /// The data source reloaded the entire dataset.
+    func dataSourceDidRefresh(_ dataSource: ConsoleDataSource)
+
     /// An incremental update. If the diff is nil, it means the app is displaying
     /// a grouped view that doesn't support diffing.
     func dataSource(_ dataSource: ConsoleDataSource, didUpdateWith diff: CollectionDifference<NSManagedObjectID>?)
@@ -87,6 +90,7 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
     func refresh() {
         try? controller.performFetch()
         refreshEntities()
+        delegate?.dataSourceDidRefresh(self)
     }
 
     // MARK: NSFetchedResultsControllerDelegate

@@ -114,6 +114,13 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
 
     // MARK: ConsoleDataSourceDelegate
 
+    func dataSourceDidRefresh(_ dataSource: ConsoleDataSource) {
+        entities = dataSource.entities
+        sections = dataSource.sections
+
+        refreshVisibleEntities()
+    }
+
     func dataSource(_ dataSource: ConsoleDataSource, didUpdateWith diff: CollectionDifference<NSManagedObjectID>?) {
         withAnimation {
             entities = dataSource.entities
@@ -130,11 +137,6 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
         let criteria = searchCriteriaViewModel
         dataSource.setPredicate(criteria: criteria.criteria, isOnlyErrors: criteria.isOnlyErrors)
         dataSource.refresh()
-
-        entities = dataSource.entities
-        sections = dataSource.sections
-
-        refreshVisibleEntities()
     }
 
     // MARK: Visible Entities
