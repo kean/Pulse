@@ -88,7 +88,7 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
         controller.delegate = controllerDelegate
     }
 
-    /// Binds the search criteria and immediatelly performs the initial fetch.
+    /// Binds the search criteria and immediately performs the initial fetch.
     func bind(_ criteria: ConsoleSearchCriteriaViewModel) {
         criteria.$criteria.combineLatest(criteria.$isOnlyErrors).sink { [weak self] in
             self?.setPredicate(criteria: $0, isOnlyErrors: $1)

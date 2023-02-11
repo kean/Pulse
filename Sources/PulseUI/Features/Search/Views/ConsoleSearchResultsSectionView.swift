@@ -27,7 +27,7 @@ struct ConsoleSearchResultView: View {
         ForEach(occurrences.prefix(limit)) { item in
 #if os(macOS)
             makeCell(for: item)
-                .tag(ConsoleSelectedItem.occurence(viewModel.entity.objectID, item))
+                .tag(ConsoleSelectedItem.occurrence(viewModel.entity.objectID, item))
 #else
             NavigationLink(destination: ConsoleSearchResultView.makeDestination(for: item, entity: viewModel.entity)) {
                 makeCell(for: item)

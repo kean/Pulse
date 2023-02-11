@@ -19,10 +19,10 @@ struct ConsoleEntityDetailsView: View {
             switch selection {
             case .entity(let objectID):
                 makeDetails(for: objectID)
-            case .occurence(let objectID, let occurence):
+            case .occurrence(let objectID, let occurrence):
                 if let entity = entity(withID: objectID) {
-                    ConsoleSearchResultView.makeDestination(for: occurence, entity: entity)
-                        .id(occurence.id)
+                    ConsoleSearchResultView.makeDestination(for: occurrence, entity: entity)
+                        .id(occurrence.id)
                 }
             }
         }

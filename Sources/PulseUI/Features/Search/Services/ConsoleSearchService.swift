@@ -196,7 +196,7 @@ final class ConsoleSearchService {
 
 @available(iOS 15, tvOS 15, *)
 struct ConsoleSearchOccurrence: Identifiable, Equatable, Hashable {
-    let id = ConsoleSearchOccurenceId()
+    let id = ConsoleSearchOccurrenceId()
     let scope: ConsoleSearchScope
     let line: Int
     let range: NSRange
@@ -212,7 +212,7 @@ struct ConsoleSearchOccurrence: Identifiable, Equatable, Hashable {
     }
 }
 
-struct ConsoleSearchOccurenceId: Hashable {
+struct ConsoleSearchOccurrenceId: Hashable {
     let id = UUID()
 }
 

@@ -23,7 +23,7 @@ final class ConsoleRouter: ObservableObject {
 #if os(macOS)
 enum ConsoleSelectedItem: Hashable {
     case entity(NSManagedObjectID)
-    case occurence(NSManagedObjectID, ConsoleSearchOccurrence)
+    case occurrence(NSManagedObjectID, ConsoleSearchOccurrence)
 }
 #endif
 
