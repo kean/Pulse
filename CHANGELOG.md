@@ -1,5 +1,9 @@
 # Pulse 3.x
 
+## Pulse 3.5.0
+
+*Feb 11, 2023*
+
 ### PulseUI
 
 - Fix [#161](https://github.com/kean/Pulse/issues/161): misleading title for successul local URL requests
