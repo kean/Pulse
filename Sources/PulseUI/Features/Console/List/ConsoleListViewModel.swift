@@ -43,8 +43,7 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
         searchCriteriaViewModel.criteria.shared.dates == .session
     }
 
-#warning("this is incorrect and should not event be here")
-    @Published var mode: ConsoleMode = .all {
+    var mode: ConsoleMode = .all {
         didSet { resetDataSource(options: options) }
     }
 

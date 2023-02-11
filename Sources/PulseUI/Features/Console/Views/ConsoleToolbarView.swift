@@ -33,14 +33,13 @@ struct ConsoleToolbarView: View {
     }
 }
 
-#warning("rework where mode picker is set (what should be a source?)")
 struct ConsoleModePicker: View {
     let viewModel: ConsoleViewModel
-    @ObservedObject var logsCounter: ManagedObjectsCountObserver
-    @ObservedObject var tasksCounter: ManagedObjectsCountObserver
+
+    @ObservedObject private var logsCounter: ManagedObjectsCountObserver
+    @ObservedObject private var tasksCounter: ManagedObjectsCountObserver
 
     @State private var mode: ConsoleMode = .all
-    @State private var title: String = ""
 
     init(viewModel: ConsoleViewModel) {
         self.viewModel = viewModel
@@ -56,17 +55,13 @@ struct ConsoleModePicker: View {
 
     var body: some View {
         HStack(spacing: spacing) {
-            ConsoleModeButton(title: "All", isSelected: mode == .all) {
-                viewModel.mode = .all
-            }
-            ConsoleModeButton(title: "Logs", details: "\(logsCounter.count)", isSelected: mode == .logs) {
-                viewModel.mode = .logs
-            }
-            ConsoleModeButton(title: "Tasks", details: "\(tasksCounter.count)", isSelected: mode == .tasks) {
-                viewModel.mode = .tasks
-            }
+            ConsoleModeButton(title: "All", isSelected: mode == .all) { mode = .all }
+            ConsoleModeButton(title: "Logs", details: "\(logsCounter.count)", isSelected: mode == .logs) { mode = .logs }
+            ConsoleModeButton(title: "Tasks", details: "\(tasksCounter.count)", isSelected: mode == .tasks) { mode = .tasks }
         }
-        .onReceive(viewModel.list.$mode) { mode = $0 }
+        .onChange(of: mode) {
+            viewModel.mode = $0
+        }
     }
 }
 
