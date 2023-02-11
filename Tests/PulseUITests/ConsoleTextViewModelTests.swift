@@ -2,12 +2,13 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
+#if os(macOS)
+
 import XCTest
 import Combine
 @testable import Pulse
 @testable import PulseUI
 
-@available(iOS 14, *)
 final class ConsoleTextViewModelTests: ConsoleTestCase {
     var sut: ConsoleTextViewModel!
 
@@ -28,3 +29,5 @@ final class ConsoleTextViewModelTests: ConsoleTestCase {
         sut.isViewVisible = true
     }
 }
+
+#endif

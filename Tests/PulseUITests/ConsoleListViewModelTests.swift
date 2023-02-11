@@ -146,18 +146,6 @@ final class ConsoleListViewModelTests: ConsoleTestCase {
         )
     }
 
-#warning("rework")
-    func _testCustomSortDescriptor() {
-        // WHEN
-        sut.sortDescriptors = [NSSortDescriptor(keyPath: \LoggerMessageEntity.level, ascending: true)]
-
-        // THEN
-        XCTAssertEqual(
-            sut.entities,
-            (sut.entities as! [LoggerMessageEntity]).sorted(by: { $0.level < $1.level })
-        )
-    }
-
     // MARK: Pins
 
     func testPinRegularMessage() throws {
