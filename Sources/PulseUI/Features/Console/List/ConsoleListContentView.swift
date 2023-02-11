@@ -14,7 +14,7 @@ struct ConsoleListContentView: View {
 
     var body: some View {
         if #available(iOS 15, tvOS 15, *) {
-            if !viewModel.pins.isEmpty, case .store = viewModel.source {
+            if !viewModel.pins.isEmpty, viewModel.context.focusedEntities == nil {
                 pinsView
             }
         }
@@ -104,7 +104,7 @@ struct ConsoleListContentView: View {
 
     @ViewBuilder
     private var footerView: some View {
-        if #available(iOS 15, *), viewModel.isShowPreviousSessionButtonShown, case .store = viewModel.source {
+        if #available(iOS 15, *), viewModel.isShowPreviousSessionButtonShown, viewModel.context.focusedEntities == nil {
             Button(action: viewModel.buttonShowPreviousSessionTapped) {
                 Text("Show Previous Sessions")
                     .font(.subheadline)
@@ -156,7 +156,7 @@ private struct LazyConsoleView: View {
     let mode: ConsoleMode
 
     var body: some View {
-        ConsoleView(viewModel: .init(store: store, source: .entities(title: title, entities: entities), mode: mode))
+        ConsoleView(viewModel: .init(store: store, context: .init(title: title, focusedEntities: entities), mode: mode))
             .navigationBarTitleDisplayMode(.inline)
     }
 }

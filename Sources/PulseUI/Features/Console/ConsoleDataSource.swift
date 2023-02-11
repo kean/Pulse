@@ -31,16 +31,16 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
     static let fetchBatchSize = 100
 
     private let store: LoggerStore
-    private let source: ConsoleSource
+    private let context: ConsoleContext
     private let mode: ConsoleMode
     private let options: ConsoleListOptions
     private let controller: NSFetchedResultsController<NSManagedObject>
     private var controllerDelegate: NSFetchedResultsControllerDelegate?
     private var cancellables: [AnyCancellable] = []
 
-    init(store: LoggerStore, source: ConsoleSource, mode: ConsoleMode, options: ConsoleListOptions = .init()) {
+    init(store: LoggerStore, context: ConsoleContext, mode: ConsoleMode, options: ConsoleListOptions = .init()) {
         self.store = store
-        self.source = source
+        self.context = context
         self.mode = mode
         self.options = options
 
@@ -122,20 +122,19 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
     // MARK: Predicate
 
     private func setPredicate(criteria: ConsoleSearchCriteria, isOnlyErrors: Bool) {
-        let predicate = ConsoleDataSource.makePredicate(mode: mode, source: source, criteria: criteria, isOnlyErrors: isOnlyErrors)
+        let predicate = ConsoleDataSource.makePredicate(mode: mode, context: context, criteria: criteria, isOnlyErrors: isOnlyErrors)
         controller.fetchRequest.predicate = predicate
     }
 
-    static func makePredicate(mode: ConsoleMode, source: ConsoleSource, criteria: ConsoleSearchCriteria, isOnlyErrors: Bool) -> NSPredicate? {
+    static func makePredicate(mode: ConsoleMode, context: ConsoleContext, criteria: ConsoleSearchCriteria, isOnlyErrors: Bool) -> NSPredicate? {
         let mainPredicate = _makePredicate(mode, criteria, isOnlyErrors)
-        switch source {
-        case .store:
-            return mainPredicate
-        case .entities(_, let entities):
+        if let focusedEntities = context.focusedEntities {
             return NSCompoundPredicate(andPredicateWithSubpredicates: [
                 mainPredicate,
-                NSPredicate(format: "self IN %@", entities)
+                NSPredicate(format: "self IN %@", focusedEntities)
             ].compactMap { $0 })
+        } else {
+            return mainPredicate
         }
     }
 

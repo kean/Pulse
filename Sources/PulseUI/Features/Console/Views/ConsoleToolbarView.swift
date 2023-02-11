@@ -17,11 +17,10 @@ struct ConsoleToolbarView: View {
             if viewModel.isNetwork {
                 ConsoleToolbarTitle(viewModel: viewModel)
             } else {
-                switch viewModel.source {
-                case .store:
+                if let focusedEntities = viewModel.context.focusedEntities {
+                    ConsoleModeButton(title: viewModel.mode == .tasks ? "Tasks" : "Logs", details: "\(focusedEntities.count)", isSelected: false) {}
+                } else {
                     ConsoleModePicker(viewModel: viewModel)
-                case .entities(_, let entities):
-                    ConsoleModeButton(title: viewModel.mode == .tasks ? "Tasks" : "Logs", details: "\(entities.count)", isSelected: false) {}
                 }
             }
             Spacer()

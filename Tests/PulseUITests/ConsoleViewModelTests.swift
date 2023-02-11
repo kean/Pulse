@@ -7,7 +7,7 @@ import XCTest
 @testable import PulseUI
 
 final class ConsoleViewModelTests: ConsoleTestCase {
-    var source: ConsoleSource = .store
+    var context = ConsoleContext()
     var mode: ConsoleMode = .all
     var isOnlyNetwork = false
     var options = ConsoleListOptions()
@@ -21,7 +21,7 @@ final class ConsoleViewModelTests: ConsoleTestCase {
     }
 
     private func reset() {
-        sut = ConsoleViewModel(store: store, source: source, mode: mode, isOnlyNetwork: isOnlyNetwork)
+        sut = ConsoleViewModel(store: store, context: context, mode: mode, isOnlyNetwork: isOnlyNetwork)
     }
 
     // MARK: Counters

@@ -11,7 +11,7 @@ final class ConsoleViewModel: ObservableObject {
     let title: String
     let isNetwork: Bool
     let store: LoggerStore
-    let source: ConsoleSource
+    let context: ConsoleContext
 
     let listViewModel: ConsoleListViewModel
 
@@ -64,16 +64,10 @@ final class ConsoleViewModel: ObservableObject {
 
     private var cancellables: [AnyCancellable] = []
 
-    init(store: LoggerStore, source: ConsoleSource = .store, mode: ConsoleMode = .all, isOnlyNetwork: Bool = false) {
-        switch source {
-        case .store:
-            self.title = isOnlyNetwork ? "Network" : "Console"
-        case .entities(let title, _):
-            self.title = title
-        }
-
+    init(store: LoggerStore, context: ConsoleContext = .init(), mode: ConsoleMode = .all, isOnlyNetwork: Bool = false) {
         self.store = store
-        self.source = source
+        self.title = context.title ?? (isOnlyNetwork ? "Network" : "Console")
+        self.context = context
         self.mode = mode
         self.isNetwork = isOnlyNetwork
 
@@ -82,7 +76,7 @@ final class ConsoleViewModel: ObservableObject {
             if store.isArchive {
                 criteria.shared.dates.startDate = nil
             }
-            if case .entities = source {
+            if context.focusedEntities != nil {
                 criteria.shared.dates.startDate = nil
             }
             return criteria
@@ -90,7 +84,7 @@ final class ConsoleViewModel: ObservableObject {
 
         self.index = LoggerStoreIndex(store: store)
         self.searchCriteriaViewModel = ConsoleSearchCriteriaViewModel(criteria: makeDefaultSearchCriteria(), index: index)
-        self.listViewModel = ConsoleListViewModel(store: store, source: source, criteria: searchCriteriaViewModel)
+        self.listViewModel = ConsoleListViewModel(store: store, context: context, criteria: searchCriteriaViewModel)
 #if os(iOS) || os(macOS)
         self.insightsViewModel = InsightsViewModel(store: store)
         self.searchBarViewModel = ConsoleSearchBarViewModel()
@@ -100,8 +94,8 @@ final class ConsoleViewModel: ObservableObject {
 #endif
 
 #if os(macOS)
-        self.tableViewModel = ConsoleTableViewModel(store: store, source: source, criteria: searchCriteriaViewModel)
-        self.textViewModel = ConsoleTextViewModel(store: store, source: source, criteria: searchCriteriaViewModel, router: router)
+        self.tableViewModel = ConsoleTableViewModel(store: store, context: context, criteria: searchCriteriaViewModel)
+        self.textViewModel = ConsoleTextViewModel(store: store, context: context, criteria: searchCriteriaViewModel, router: router)
 #endif
 
         self.logCountObserver = ManagedObjectsCountObserver(
@@ -136,7 +130,7 @@ final class ConsoleViewModel: ObservableObject {
 
     private func refreshCountObservers(criteria: ConsoleSearchCriteria, isOnlyError: Bool) {
         func makePredicate(for mode: ConsoleMode) -> NSPredicate? {
-            ConsoleDataSource.makePredicate(mode: mode, source: source, criteria: criteria, isOnlyErrors: isOnlyError)
+            ConsoleDataSource.makePredicate(mode: mode, context: context, criteria: criteria, isOnlyErrors: isOnlyError)
         }
         logCountObserver.setPredicate(makePredicate(for: .logs))
         taskCountObserver.setPredicate(makePredicate(for: .tasks))
@@ -165,9 +159,9 @@ final class ConsoleViewModel: ObservableObject {
     }
 }
 
-enum ConsoleSource {
-    case store
-    case entities(title: String, entities: [NSManagedObject])
+struct ConsoleContext {
+    var title: String?
+    var focusedEntities: [NSManagedObject]?
 }
 
 enum ConsoleMode: String {

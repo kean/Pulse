@@ -32,7 +32,7 @@ final class ConsoleSearchViewModelTests: XCTestCase {
         directory.remove()
     }
 
-    func setUp(store: LoggerStore, source: ConsoleSource = .store) {
+    func setUp(store: LoggerStore, context: ConsoleContext = ConsoleContext()) {
         self.store = store
         self.searchBarViewModel = ConsoleSearchBarViewModel()
     }

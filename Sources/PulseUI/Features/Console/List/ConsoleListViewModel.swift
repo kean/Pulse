@@ -43,15 +43,15 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
     private var visibleObjectIDs: Set<NSManagedObjectID> = []
 
     let store: LoggerStore
-    let source: ConsoleSource
+    let context: ConsoleContext
     private let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
     private let pinsObserver: LoggerPinsObserver
     private var dataSource: ConsoleDataSource?
     private var cancellables: [AnyCancellable] = []
 
-    init(store: LoggerStore, source: ConsoleSource, criteria: ConsoleSearchCriteriaViewModel) {
+    init(store: LoggerStore, context: ConsoleContext, criteria: ConsoleSearchCriteriaViewModel) {
         self.store = store
-        self.source = source
+        self.context = context
         self.searchCriteriaViewModel = criteria
         self.pinsObserver = LoggerPinsObserver(store: store)
         self.bind()
@@ -71,7 +71,7 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
     }
 
     private func resetDataSource(options: ConsoleListOptions) {
-        dataSource = ConsoleDataSource(store: store, source: source, mode: mode, options: options)
+        dataSource = ConsoleDataSource(store: store, context: context, mode: mode, options: options)
         dataSource?.delegate = self
         dataSource?.bind(searchCriteriaViewModel)
     }
