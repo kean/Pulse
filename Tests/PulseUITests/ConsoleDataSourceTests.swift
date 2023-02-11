@@ -87,7 +87,7 @@ final class ConsoleDataSourceTests: ConsoleTestCase, ConsoleDataSourceDelegate {
     }
 
     func testGroupTasks() {
-        XCTAssertEqual(groupTasksBy(.url).map(sut.name), ["https://github.com/CreateAPI/Get", "https://github.com/kean/Nuke/archive/tags/11.0.0.zip", "https://github.com/login?username=kean&password=sensitive", "https://github.com/octocat.png", "https://github.com/profile/valdo", "https://github.com/repos", "https://github.com/repos/kean/Nuke", "https://objects-origin.githubusercontent.com/github-production-release-asset-2e65be"])
+        XCTAssertEqual(groupTasksBy(.url).map(sut.name), ["https://github.com/CreateAPI/Get", "https://github.com/kean/Nuke/archive/tags/11.0.0.zip", "https://github.com/login?scopes=profile,repos", "https://github.com/octocat.png", "https://github.com/profile/valdo", "https://github.com/repos", "https://github.com/repos/kean/Nuke", "https://objects-origin.githubusercontent.com/github-production-release-asset-2e65be"])
         XCTAssertEqual(groupTasksBy(.host).map(sut.name), ["github.com", "objects-origin.githubusercontent.com"])
         XCTAssertEqual(groupTasksBy(.method).map(sut.name), ["GET", "PATCH", "POST"])
         XCTAssertEqual(groupTasksBy(.statusCode).map(sut.name), ["200 OK", "204 No Content", "404 Not Found"])
