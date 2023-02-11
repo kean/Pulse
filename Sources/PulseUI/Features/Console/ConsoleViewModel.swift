@@ -160,3 +160,9 @@ enum ConsoleSource {
     case store
     case entities(title: String, entities: [NSManagedObject])
 }
+
+enum ConsoleMode: String {
+    case all
+    case logs
+    case tasks
+}

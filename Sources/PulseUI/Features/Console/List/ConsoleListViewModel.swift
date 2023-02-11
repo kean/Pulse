@@ -17,6 +17,7 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
     @Published private(set) var pins: [NSManagedObject] = []
     @Published private(set) var entities: [NSManagedObject] = []
     @Published private(set) var sections: [NSFetchedResultsSectionInfo]?
+
     @Published var options = ConsoleListOptions()
 
     var isViewVisible = false {
@@ -171,14 +172,6 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
         dataSource?.name(for: section) ?? ""
     }
 }
-
-enum ConsoleMode: String {
-    case all
-    case logs
-    case tasks
-}
-
-// MARK: Helpers
 
 private func filter(pins: [LoggerMessageEntity], mode: ConsoleMode) -> [LoggerMessageEntity] {
     pins.filter {
