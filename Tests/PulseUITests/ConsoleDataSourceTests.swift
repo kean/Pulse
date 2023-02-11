@@ -8,12 +8,12 @@ import Combine
 @testable import PulseUI
 
 final class ConsoleDataSourceTests: ConsoleTestCase, ConsoleDataSourceDelegate {
+    var sut: ConsoleDataSource!
+
     var source: ConsoleSource = .store
     var mode: ConsoleMode = .all
     var options = ConsoleListOptions()
     var criteria: ConsoleSearchCriteriaViewModel!
-
-    var sut: ConsoleDataSource!
 
     var updates: [CollectionDifference<NSManagedObjectID>?] = []
     var onRefresh: (() -> Void)?

@@ -7,7 +7,7 @@ import Combine
 @testable import Pulse
 @testable import PulseUI
 
-@available(iOS 16, *)
+@available(iOS 14, *)
 final class ConsoleListViewModelTests: ConsoleTestCase {
     var criteriaViewModel: ConsoleSearchCriteriaViewModel!
     var sut: ConsoleListViewModel!
