@@ -38,7 +38,7 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
     private var controllerDelegate: NSFetchedResultsControllerDelegate?
     private var cancellables: [AnyCancellable] = []
 
-    init(store: LoggerStore, source: ConsoleSource, mode: ConsoleMode, options: ConsoleListOptions) {
+    init(store: LoggerStore, source: ConsoleSource, mode: ConsoleMode, options: ConsoleListOptions = .init()) {
         self.store = store
         self.source = source
         self.mode = mode

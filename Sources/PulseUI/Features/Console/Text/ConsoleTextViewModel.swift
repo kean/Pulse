@@ -56,7 +56,7 @@ final class ConsoleTextViewModel: ObservableObject, ConsoleDataSourceDelegate {
     }
 
     private func resetDataSource() {
-        dataSource = ConsoleDataSource(store: store, source: source, mode: mode, options: .init())
+        dataSource = ConsoleDataSource(store: store, source: source, mode: mode)
         dataSource?.delegate = self
         dataSource?.bind(searchCriteriaViewModel)
     }
