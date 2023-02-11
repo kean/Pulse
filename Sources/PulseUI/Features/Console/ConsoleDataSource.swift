@@ -36,6 +36,7 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
     private let options: ConsoleListOptions
     private let controller: NSFetchedResultsController<NSManagedObject>
     private var controllerDelegate: NSFetchedResultsControllerDelegate?
+    private var cancellables: [AnyCancellable] = []
 
     init(store: LoggerStore, source: ConsoleSource, mode: ConsoleMode, options: ConsoleListOptions) {
         self.store = store
@@ -85,6 +86,14 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
             }
         }()
         controller.delegate = controllerDelegate
+    }
+
+    /// Binds the search criteria and immediatelly performs the initial fetch.
+    func bind(_ criteria: ConsoleSearchCriteriaViewModel) {
+        criteria.$criteria.combineLatest(criteria.$isOnlyErrors).sink { [weak self] in
+            self?.setPredicate(criteria: $0, isOnlyErrors: $1)
+            self?.refresh()
+        }.store(in: &cancellables)
     }
 
     func refresh() {

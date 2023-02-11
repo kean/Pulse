@@ -77,18 +77,6 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
             }
         }.store(in: &cancellables)
 
-        searchCriteriaViewModel.$criteria
-            .dropFirst()
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in self?.refresh() }
-            .store(in: &cancellables)
-
-        searchCriteriaViewModel.$isOnlyErrors
-            .dropFirst()
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in self?.refresh() }
-            .store(in: &cancellables)
-
         $options.dropFirst()
             .sink { [weak self] in self?.resetDataSource(options: $0) }
             .store(in: &cancellables)
@@ -97,7 +85,7 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
     private func resetDataSource(options: ConsoleListOptions) {
         dataSource = ConsoleDataSource(store: store, source: source, mode: mode, options: options)
         dataSource?.delegate = self
-        refresh()
+        dataSource?.bind(searchCriteriaViewModel)
     }
 
     func buttonShowPreviousSessionTapped() {
@@ -117,7 +105,6 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
     func dataSourceDidRefresh(_ dataSource: ConsoleDataSource) {
         entities = dataSource.entities
         sections = dataSource.sections
-
         refreshVisibleEntities()
     }
 
@@ -129,14 +116,6 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
                 refreshVisibleEntities()
             }
         }
-    }
-
-    func refresh() {
-        guard let dataSource = dataSource else { return }
-
-        let criteria = searchCriteriaViewModel
-        dataSource.setPredicate(criteria: criteria.criteria, isOnlyErrors: criteria.isOnlyErrors)
-        dataSource.refresh()
     }
 
     // MARK: Visible Entities
