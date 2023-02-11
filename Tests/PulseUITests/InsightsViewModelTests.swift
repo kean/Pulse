@@ -56,6 +56,7 @@ final class InsightsViewModelTests: ConsoleTestCase {
                 redirectCount: 0,
                 transactions: []
             ),
+            label: nil,
             sessionID: store.sessionID
         )))
 

@@ -43,7 +43,6 @@ final class ConsoleViewModel: ObservableObject {
         didSet { refreshListsVisibility() }
     }
 
-#warning("reimplement this")
     var isSearching = false {
         didSet { refreshListsVisibility() }
     }
