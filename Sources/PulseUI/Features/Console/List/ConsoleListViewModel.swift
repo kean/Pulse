@@ -128,7 +128,7 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
         guard let dataSource = dataSource else { return }
 
         let criteria = searchCriteriaViewModel
-        dataSource.setPredicate(wih: criteria.criteria, isOnlyErrors: criteria.isOnlyErrors)
+        dataSource.setPredicate(criteria: criteria.criteria, isOnlyErrors: criteria.isOnlyErrors)
         dataSource.refresh()
 
         entities = dataSource.entities

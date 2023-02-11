@@ -108,7 +108,7 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
 
     // MARK: Predicate
 
-    func setPredicate(wih criteria: ConsoleSearchCriteria, isOnlyErrors: Bool) {
+    func setPredicate(criteria: ConsoleSearchCriteria, isOnlyErrors: Bool) {
         let predicate = ConsoleDataSource.makePredicate(mode: mode, source: source, criteria: criteria, isOnlyErrors: isOnlyErrors)
         controller.fetchRequest.predicate = predicate
     }
