@@ -23,8 +23,9 @@
 
 - ``willHandleEvent``
 
-### Manage Logger Behavior
+### Misc
 
+- ``label``
 - ``isWaitingForDecoding``
 
 ### Deprecated

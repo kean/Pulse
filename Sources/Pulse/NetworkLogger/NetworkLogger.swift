@@ -25,6 +25,9 @@ public final class NetworkLogger: @unchecked Sendable {
 
     /// The logger configuration.
     public struct Configuration: Sendable {
+        /// A custom label to associated with stored messages.
+        public var label: String?
+
         /// If enabled, the requests are not marked as completed until the decoding
         /// is done (see ``NetworkLogger/logTask(_:didFinishDecodingWithError:)``.
         /// If the request itself fails, the task completes immediately.
@@ -151,7 +154,7 @@ public final class NetworkLogger: @unchecked Sendable {
             createdAt: Date(),
             originalRequest: .init(originalRequest),
             currentRequest: task.currentRequest.map(Request.init),
-            label: nil,
+            label: configuration.label,
             sessionID: store.sessionID
         )))
     }
@@ -226,7 +229,7 @@ public final class NetworkLogger: @unchecked Sendable {
             requestBody: originalRequest.httpBody ?? originalRequest.httpBodyStreamData(),
             responseBody: data,
             metrics: metrics,
-            label: nil,
+            label: configuration.label,
             sessionID: store.sessionID
         )))
     }

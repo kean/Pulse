@@ -319,6 +319,24 @@ final class NetworkLoggerTests: XCTestCase {
         XCTAssertTrue(json.contains("\"refresh-token\":\"<private>\""))
     }
 
+    // MARK: Labels
+
+    func testCustomLabelSaved() throws {
+        // GIVEN
+        logger = NetworkLogger(store: store) {
+            $0.label = "auth"
+        }
+
+        // WHEN
+        let request = URLRequest(url: URL(string: "api.example.com/path?password=123456&mobile=true")!)
+        let dataTask = URLSession.shared.dataTask(with: request)
+        logger.logTask(dataTask, didCompleteWithError: nil)
+
+        // THEN
+        let message = try XCTUnwrap(store.allMessages().first)
+        XCTAssertEqual(message.label, "auth")
+    }
+
     // MARK: Helpers
 
     func logTask(url: String) {
