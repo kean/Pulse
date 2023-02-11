@@ -9,6 +9,7 @@ import CoreData
 import Pulse
 import Combine
 
+#warning("fix an issue where it fails to update when on first launch")
 struct ConsoleTextView: View {
     @ObservedObject var viewModel: ConsoleTextViewModel
 

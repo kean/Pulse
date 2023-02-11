@@ -15,7 +15,7 @@ struct ConsoleTextItemViewModel {
 
 final class ConsoleTextViewModel: ObservableObject, ConsoleDataSourceDelegate {
     var text = RichTextViewModel()
-    var options: TextRenderer.Options = .init()
+    var options = TextRenderer.Options()
 
     var isViewVisible = false {
         didSet {

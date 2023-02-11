@@ -96,9 +96,8 @@ struct WrappedTextView: NSViewRepresentable {
         let textView = (nsView.documentView as! NSTextView)
         if viewModel.textView !== nsView {
             context.coordinator.cancellables = bind(viewModel, textView)
-            textView.attributedText = viewModel.textStorage
+            textView.attributedText = viewModel.originalText
             viewModel.textView = textView
-            viewModel.textStorage = textView.textStorage ?? viewModel.textStorage
         }
     }
 

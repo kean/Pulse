@@ -15,6 +15,7 @@ final class ConsoleTextViewModelTests: ConsoleTestCase {
 
     var criteria: ConsoleSearchCriteriaViewModel!
     var router: ConsoleRouter!
+    var textView: NSTextView!
 
     var string: String { sut.text.textStorage.string }
 
@@ -29,8 +30,10 @@ final class ConsoleTextViewModelTests: ConsoleTestCase {
     func reset() {
         criteria = ConsoleSearchCriteriaViewModel(criteria: .init(), index: .init(store: store))
         router = ConsoleRouter()
+        textView = NSTextView()
 
         sut = ConsoleTextViewModel(store: store, source: .store, criteria: criteria, router: router)
+        sut.text.textView = textView
         sut.isViewVisible = true
     }
 
