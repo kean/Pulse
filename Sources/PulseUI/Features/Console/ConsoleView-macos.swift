@@ -34,7 +34,9 @@ public struct ConsoleView: View {
             NavigationSplitView(sidebar: {
                 ConsoleInspectorsView(viewModel: viewModel)
             }, detail: {
-                detail
+                NavigationStack {
+                    detail
+                }
             })
         } else {
             NavigationView {
@@ -120,20 +122,10 @@ private struct ConsoleRightPanelView: View {
 
     var body: some View {
         if router.selection != nil {
-            if #available(macOS 13.0, *) {
-                NavigationStack {
-                    rightPanelContents
-                }
-            } else {
-                rightPanelContents
-            }
+            ConsoleEntityDetailsView(store: viewModel.store, router: viewModel.router, isVertical: $isVertical)
+                .background(Color(UXColor.textBackgroundColor))
+                .frame(minWidth: 400, idealWidth: 600, minHeight: 120, idealHeight: 480)
         }
-    }
-
-    private var rightPanelContents: some View {
-        ConsoleEntityDetailsView(store: viewModel.store, router: viewModel.router, isVertical: $isVertical)
-            .background(Color(UXColor.textBackgroundColor))
-            .frame(minWidth: 400, idealWidth: 600, minHeight: 120, idealHeight: 480)
     }
 }
 

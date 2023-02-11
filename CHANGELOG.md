@@ -1,6 +1,7 @@
 # Pulse 3.x
 
 - [macOS] Fix an issue where changing sort descriptors in a table view would affect other display modes
+- [macOS] Fix an issue where on first selection in a text view or search results list, the main panel would reload 
 
 ## Pulse 3.4.3
 
