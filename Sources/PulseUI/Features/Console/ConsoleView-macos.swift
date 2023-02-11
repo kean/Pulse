@@ -122,9 +122,8 @@ private struct ConsoleRightPanelView: View {
         }
     }
 
-    #warning("dont pass list to details")
     private var rightPanelContents: some View {
-        ConsoleEntityDetailsView(viewModel: viewModel.listViewModel, router: viewModel.router, isVertical: $isVertical)
+        ConsoleEntityDetailsView(store: viewModel.store, router: viewModel.router, isVertical: $isVertical)
             .background(Color(UXColor.textBackgroundColor))
             .frame(minWidth: 400, idealWidth: 600, minHeight: 120, idealHeight: 480)
     }

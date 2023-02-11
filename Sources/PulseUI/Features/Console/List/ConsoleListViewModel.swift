@@ -84,10 +84,6 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
         store.pins.removeAllPins()
     }
 
-    func entity(withID objectID: NSManagedObjectID) -> NSManagedObject? {
-        try? store.viewContext.existingObject(with: objectID)
-    }
-
     // MARK: ConsoleDataSourceDelegate
 
     func dataSourceDidRefresh(_ dataSource: ConsoleDataSource) {

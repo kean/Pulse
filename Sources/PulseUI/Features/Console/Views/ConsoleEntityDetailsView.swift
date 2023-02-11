@@ -10,7 +10,7 @@ import Pulse
 import CoreData
 
 struct ConsoleEntityDetailsView: View {
-    let viewModel: ConsoleListViewModel
+    let store: LoggerStore
     @ObservedObject var router: ConsoleRouter
     @Binding var isVertical: Bool
 
@@ -20,7 +20,7 @@ struct ConsoleEntityDetailsView: View {
             case .entity(let objectID):
                 makeDetails(for: objectID)
             case .occurence(let objectID, let occurence):
-                if let entity = viewModel.entity(withID: objectID) {
+                if let entity = entity(withID: objectID) {
                     ConsoleSearchResultView.makeDestination(for: occurence, entity: entity)
                         .id(occurence.id)
                 }
@@ -30,7 +30,7 @@ struct ConsoleEntityDetailsView: View {
 
     @ViewBuilder
     private func makeDetails(for objectID: NSManagedObjectID) -> some View {
-        if let entity = viewModel.entity(withID: objectID) {
+        if let entity = entity(withID: objectID) {
             switch LoggerEntity(entity) {
             case .message(let message):
                 ConsoleMessageDetailsView(message: message, toolbarItems: AnyView(toolbarItems))
@@ -54,6 +54,10 @@ struct ConsoleEntityDetailsView: View {
                 .foregroundColor(.secondary)
         }
         .buttonStyle(.plain)
+    }
+
+    private func entity(withID objectID: NSManagedObjectID) -> NSManagedObject? {
+        try? store.viewContext.existingObject(with: objectID)
     }
 }
 
