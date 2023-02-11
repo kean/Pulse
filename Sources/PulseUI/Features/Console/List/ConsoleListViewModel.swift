@@ -104,6 +104,8 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
     // MARK: ConsoleDataSourceDelegate
 
     func dataSourceDidRefresh(_ dataSource: ConsoleDataSource) {
+        guard isViewVisible else { return }
+
         entities = dataSource.entities
         sections = dataSource.sections
         refreshVisibleEntities()

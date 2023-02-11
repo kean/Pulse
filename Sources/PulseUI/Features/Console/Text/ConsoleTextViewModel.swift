@@ -28,10 +28,7 @@ final class ConsoleTextViewModel: ObservableObject, ConsoleDataSourceDelegate {
     }
 
     var mode: ConsoleMode = .all {
-        didSet {
-            guard isViewVisible else { return }
-            resetDataSource()
-        }
+        didSet { resetDataSource() }
     }
 
     private let store: LoggerStore
@@ -55,7 +52,11 @@ final class ConsoleTextViewModel: ObservableObject, ConsoleDataSourceDelegate {
         self.text.isLinkDetectionEnabled = false
     }
 
+    // MARK: DataSource
+
     private func resetDataSource() {
+        guard isViewVisible else { return }
+
         dataSource = ConsoleDataSource(store: store, source: source, mode: mode)
         dataSource?.delegate = self
         dataSource?.bind(searchCriteriaViewModel)
