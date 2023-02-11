@@ -55,6 +55,15 @@ final class NetworkLoggerInsightsTests: ConsoleTestCase {
         XCTAssertEqual(redirects.timeLost, 0.21282994747161865, accuracy: 0.01)
         XCTAssertEqual(redirects.taskIds.count, 1)
     }
+
+    func testFailures() throws {
+        // GIVEN
+        let insights = try makeInsights()
+        let failures = insights.failures
+
+        // THEN
+        XCTAssertEqual(failures.count, 2)
+    }
 }
 
 #endif

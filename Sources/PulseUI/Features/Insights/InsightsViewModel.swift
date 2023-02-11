@@ -91,15 +91,6 @@ final class InsightsViewModel: ObservableObject, ConsoleDataSourceDelegate {
         ids.compactMap { (try? store.viewContext.existingObject(with: $0)) as? NetworkTaskEntity }
     }
 
-#warning("remove")
-    private func tasks(with ids: [UUID]) -> [NetworkTaskEntity] {
-        let request = NSFetchRequest<NetworkTaskEntity>(entityName: "\(NetworkTaskEntity.self)")
-        request.fetchLimit = ids.count
-        request.predicate = NSPredicate(format: "taskId IN %@", ids)
-
-        return (try? store.viewContext.fetch(request)) ?? []
-    }
-
     // MARK: DataSource
 
     private func resetDataSource() {

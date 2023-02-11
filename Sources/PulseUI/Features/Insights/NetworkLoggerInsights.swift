@@ -36,25 +36,9 @@ struct NetworkLoggerInsights {
                 .map { $0.timing.duration ?? 0 }
                 .reduce(0, +)
         }
-    }
-
-#warning("add support for redirects and failures")
-    private func process(event: LoggerStore.Event.NetworkTaskCompleted) {
-        guard let metrics = event.metrics else { return }
-
-//        contents.duration.insert(duration: TimeInterval(metrics.taskInterval.duration), taskId: event.taskId)
-//        if metrics.redirectCount > 0 {
-//            contents.redirects.count += metrics.redirectCount
-//            contents.redirects.taskIds.append(event.taskId)
-//            contents.redirects.timeLost += metrics.transactions
-//                .filter({ $0.response?.statusCode == 302 })
-//                .map { $0.timing.duration ?? 0 }
-//                .reduce(0, +)
-//        }
-//
-//        if event.error != nil {
-//            contents.failures.taskIds.append(event.taskId)
-//        }
+        if task.state == .failure {
+            failures.taskIds.append(task.objectID)
+        }
     }
 
     struct RequestsDurationInfo: Sendable {
@@ -117,7 +101,7 @@ struct NetworkLoggerInsights {
 
     struct FailuresInfo: Sendable {
         var count: Int { taskIds.count }
-        var taskIds: [UUID] = []
+        var taskIds: [NSManagedObjectID] = []
 
         init() {}
     }
