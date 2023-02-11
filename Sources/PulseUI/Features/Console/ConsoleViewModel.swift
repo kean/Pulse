@@ -106,13 +106,13 @@ final class ConsoleViewModel: ObservableObject {
         self.logCountObserver = ManagedObjectsCountObserver(
             entity: LoggerMessageEntity.self,
             context: store.viewContext,
-            sortDescriptior: NSSortDescriptor(key: "createdAt", ascending: false)
+            sortDescriptior: NSSortDescriptor(keyPath: \LoggerMessageEntity.createdAt, ascending: false)
         )
 
         self.taskCountObserver = ManagedObjectsCountObserver(
             entity: NetworkTaskEntity.self,
             context: store.viewContext,
-            sortDescriptior: NSSortDescriptor(key: "createdAt", ascending: false)
+            sortDescriptior: NSSortDescriptor(keyPath: \NetworkTaskEntity.createdAt, ascending: false)
         )
 
         bind()
