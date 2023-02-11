@@ -6,6 +6,7 @@
 - [macOS] Fix an issue where changing sort descriptors in a table view would affect other display modes
 - [macOS] Fix an issue where on first selection in a text view or search results list, the main panel would reload 
 - The insights view now shows info for the currently selected tasks
+- Fix a crash when sharing store and using "This Session" filter
 
 ### Pulse
 
