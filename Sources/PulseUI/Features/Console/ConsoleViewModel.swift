@@ -13,8 +13,7 @@ final class ConsoleViewModel: ObservableObject {
     let store: LoggerStore
     let source: ConsoleSource
 
-#warning("rename")
-    let list: ConsoleListViewModel
+    let listViewModel: ConsoleListViewModel
 
 #if os(iOS) || os(macOS)
     let insightsViewModel: InsightsViewModel
@@ -91,12 +90,12 @@ final class ConsoleViewModel: ObservableObject {
 
         self.index = LoggerStoreIndex(store: store)
         self.searchCriteriaViewModel = ConsoleSearchCriteriaViewModel(criteria: makeDefaultSearchCriteria(), index: index)
-        self.list = ConsoleListViewModel(store: store, source: source, criteria: searchCriteriaViewModel)
+        self.listViewModel = ConsoleListViewModel(store: store, source: source, criteria: searchCriteriaViewModel)
 #if os(iOS) || os(macOS)
         self.insightsViewModel = InsightsViewModel(store: store)
         self.searchBarViewModel = ConsoleSearchBarViewModel()
         if #available(iOS 15, *) {
-            self._searchViewModel = ConsoleSearchViewModel(list: list, index: index, searchBar: searchBarViewModel)
+            self._searchViewModel = ConsoleSearchViewModel(list: listViewModel, index: index, searchBar: searchBarViewModel)
         }
 #endif
 
@@ -125,7 +124,7 @@ final class ConsoleViewModel: ObservableObject {
     }
 
     private func bind() {
-        searchCriteriaViewModel.bind(list.$entities)
+        searchCriteriaViewModel.bind(listViewModel.$entities)
 
         searchCriteriaViewModel.$criteria
             .combineLatest(searchCriteriaViewModel.$isOnlyErrors)
@@ -145,7 +144,7 @@ final class ConsoleViewModel: ObservableObject {
 
     private func prepare(for mode: ConsoleMode) {
         searchCriteriaViewModel.mode = mode
-        list.mode = mode
+        listViewModel.mode = mode
 #if os(macOS)
         tableViewModel.mode = mode
         textViewModel.mode = mode
@@ -153,7 +152,7 @@ final class ConsoleViewModel: ObservableObject {
     }
 
     private func refreshListsVisibility() {
-        list.isViewVisible = !isSearching && isViewVisible
+        listViewModel.isViewVisible = !isSearching && isViewVisible
 #if os(iOS)
         if #available(iOS 15, *) {
             searchViewModel.isViewVisible = isSearching && isViewVisible
@@ -162,7 +161,7 @@ final class ConsoleViewModel: ObservableObject {
     }
 
     func prepareForSharing(as output: ShareOutput, _ completion: @escaping (ShareItems?) -> Void) {
-        ShareService.share(list.entities, store: store, as: output, completion)
+        ShareService.share(listViewModel.entities, store: store, as: output, completion)
     }
 }
 

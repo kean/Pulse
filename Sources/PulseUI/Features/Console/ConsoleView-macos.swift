@@ -122,8 +122,9 @@ private struct ConsoleRightPanelView: View {
         }
     }
 
+    #warning("dont pass list to details")
     private var rightPanelContents: some View {
-        ConsoleEntityDetailsView(viewModel: viewModel.list, router: viewModel.router, isVertical: $isVertical)
+        ConsoleEntityDetailsView(viewModel: viewModel.listViewModel, router: viewModel.router, isVertical: $isVertical)
             .background(Color(UXColor.textBackgroundColor))
             .frame(minWidth: 400, idealWidth: 600, minHeight: 120, idealHeight: 480)
     }
@@ -169,7 +170,7 @@ private struct ConsoleContentView: View {
             switch displayMode {
             case .list:
                 List(selection: $selection) {
-                    ConsoleListContentView(viewModel: viewModel.list)
+                    ConsoleListContentView(viewModel: viewModel.listViewModel)
                 }.clipped()
             case .table:
                 ConsoleTableView(viewModel: viewModel.tableViewModel, selection: $selectedObjectID)

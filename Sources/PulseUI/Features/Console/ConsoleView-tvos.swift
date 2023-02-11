@@ -24,7 +24,7 @@ public struct ConsoleView: View {
         GeometryReader { proxy in
             HStack {
                 List {
-                    ConsoleListContentView(viewModel: viewModel.list)
+                    ConsoleListContentView(viewModel: viewModel.listViewModel)
                 }
 
                 // TODO: Not sure it's valid

@@ -132,7 +132,7 @@ private struct _ConsoleRegularContentView: View {
         } else {
             toolbar
         }
-        ConsoleListContentView(viewModel: viewModel.list)
+        ConsoleListContentView(viewModel: viewModel.listViewModel)
     }
 }
 

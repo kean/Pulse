@@ -78,7 +78,7 @@ private struct ConsoleToolbarTitle: View {
     }
 
     private var titlePublisher: some Publisher<String, Never> {
-        viewModel.list.$entities.map { entities in
+        viewModel.listViewModel.$entities.map { entities in
             "\(entities.count) Requests"
         }
     }
@@ -120,7 +120,7 @@ struct ConsoleFiltersView: View {
 
     init(viewModel: ConsoleViewModel) {
         self.viewModel = viewModel
-        self.listViewModel = viewModel.list
+        self.listViewModel = viewModel.listViewModel
         self.searchCriteriaViewModel = viewModel.searchCriteriaViewModel
     }
 
