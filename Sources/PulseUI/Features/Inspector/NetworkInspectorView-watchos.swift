@@ -19,11 +19,11 @@ struct NetworkInspectorView: View {
     var body: some View {
         contents
             .inlineNavigationTitle(viewModel.title)
-            .toolbar {
-                if #available(watchOS 9, *), let url = viewModel.shareTaskAsHTML() {
-                    ShareLink(item: url)
-                }
-            }
+//            .toolbar {
+//                if #available(watchOS 9, *), let url = viewModel.shareTaskAsHTML() {
+//                    ShareLink(item: url)
+//                }
+//            }
     }
 
     var contents: some View {
