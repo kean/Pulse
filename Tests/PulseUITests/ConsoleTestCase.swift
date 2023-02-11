@@ -3,12 +3,14 @@
 // Copyright (c) 2020-2022 Alexander Grebenyuk (github.com/kean).
 
 import XCTest
+import Combine
 @testable import Pulse
 @testable import PulseUI
 
 class ConsoleTestCase: XCTestCase {
     var store: LoggerStore!
     let directory = TemporaryDirectory()
+    var cancellables: [AnyCancellable] = []
 
     override func setUp() {
         super.setUp()

@@ -23,4 +23,55 @@ final class ConsoleViewModelTests: ConsoleTestCase {
     private func reset() {
         sut = ConsoleViewModel(store: store, source: source, mode: mode, isOnlyNetwork: isOnlyNetwork)
     }
+
+    // MARK: Counters
+
+    func testCountersArePopulatedWithInitialValues() {
+        XCTAssertEqual(sut.logCountObserver.count, 5)
+        XCTAssertEqual(sut.taskCountObserver.count, 8)
+    }
+
+    func testCountersAreUpdatedWhenPredicatesAre() {
+        let expectation = self.expectation(description: "countersUpdated")
+        expectation.expectedFulfillmentCount = 2
+
+        sut.logCountObserver.$count.dropFirst().sink {
+            XCTAssertEqual($0, 1)
+            expectation.fulfill()
+        }.store(in: &cancellables)
+
+        sut.taskCountObserver.$count.dropFirst().sink {
+            XCTAssertEqual($0, 2)
+            expectation.fulfill()
+        }.store(in: &cancellables)
+
+        sut.searchCriteriaViewModel.isOnlyErrors = true
+        wait(for: [expectation], timeout: 2)
+    }
+
+    func testCountersAreUpdatedWhenMessageIsInserted() {
+        let expectation = self.expectation(description: "countersUpdated")
+
+        sut.logCountObserver.$count.dropFirst().sink {
+            XCTAssertEqual($0, 6)
+            expectation.fulfill()
+        }.store(in: &cancellables)
+
+        store.storeMessage(label: "test", level: .debug, message: "test")
+
+        wait(for: [expectation], timeout: 2)
+    }
+
+    func testCountersAreUpdatedWhenTaskIsInserted() {
+        let expectation = self.expectation(description: "countersUpdated")
+
+        sut.taskCountObserver.$count.dropFirst().sink {
+            XCTAssertEqual($0, 9)
+            expectation.fulfill()
+        }.store(in: &cancellables)
+
+        store.storeRequest(URLRequest(url: URL(string: "example.com")!), response: nil, error: nil, data: nil)
+
+        wait(for: [expectation], timeout: 2)
+    }
 }

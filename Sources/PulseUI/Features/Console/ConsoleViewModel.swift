@@ -122,7 +122,6 @@ final class ConsoleViewModel: ObservableObject {
         searchCriteriaViewModel.bind(list.$entities)
 
         searchCriteriaViewModel.$criteria
-            .throttle(for: 1, scheduler: DispatchQueue.main, latest: true)
             .combineLatest(searchCriteriaViewModel.$isOnlyErrors)
             .sink { [weak self] in
                 self?.refreshCountObservers(criteria: $0, isOnlyError: $1)

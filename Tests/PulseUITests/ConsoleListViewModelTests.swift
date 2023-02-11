@@ -11,7 +11,6 @@ import Combine
 final class ConsoleListViewModelTests: ConsoleTestCase {
     var criteriaViewModel: ConsoleSearchCriteriaViewModel!
     var sut: ConsoleListViewModel!
-    var cancellables: [AnyCancellable] = []
 
     override func setUp() {
         super.setUp()
