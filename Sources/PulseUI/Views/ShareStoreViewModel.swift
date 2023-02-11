@@ -180,11 +180,11 @@ struct SharedContents {
     }
 }
 
+#endif
+
 enum SharingTimeRange: String, CaseIterable, RawRepresentable {
     case currentSession = "This Session"
     case lastHour = "Last Hour"
     case today = "Today"
     case all = "All Messages"
 }
-
-#endif
