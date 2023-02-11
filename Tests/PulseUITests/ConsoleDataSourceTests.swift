@@ -11,10 +11,12 @@ final class ConsoleDataSourceTests: ConsoleTestCase, ConsoleDataSourceDelegate {
     var source: ConsoleSource = .store
     var mode: ConsoleMode = .all
     var options = ConsoleListOptions()
+    var criteria: ConsoleSearchCriteriaViewModel!
 
     var sut: ConsoleDataSource!
 
     var updates: [CollectionDifference<NSManagedObjectID>?] = []
+    var onRefresh: (() -> Void)?
     var onUpdate: ((CollectionDifference<NSManagedObjectID>?) -> Void)?
 
     override func setUp() {
@@ -24,6 +26,8 @@ final class ConsoleDataSourceTests: ConsoleTestCase, ConsoleDataSourceDelegate {
     }
 
     func reset() {
+        self.criteria = ConsoleSearchCriteriaViewModel(criteria: .init(), index: .init(store: store))
+
         self.sut = ConsoleDataSource(store: store, source: source, mode: mode, options: options)
         self.sut.delegate = self
         self.sut.refresh()
@@ -174,7 +178,54 @@ final class ConsoleDataSourceTests: ConsoleTestCase, ConsoleDataSourceDelegate {
         }))
     }
 
+    // MARK: ConsoleSearchCriteriaViewModel
+
+    func testDataSourceIsRefreshedWithInitialSearchCriteria() {
+        // GIVEN
+        criteria.isOnlyErrors = true
+
+        var didRefresh = false
+        onRefresh = { didRefresh = true }
+
+        // WHEN
+        sut.bind(criteria)
+
+        // THEN delegate is called
+        XCTAssertTrue(didRefresh)
+
+        // THEN only errors are displayed
+        XCTAssertEqual(sut.entities.count, 3)
+        XCTAssertTrue(sut.entities.allSatisfy({
+            ($0 as! LoggerMessageEntity).logLevel >= .error
+        }))
+    }
+
+    func testWhenCriteriaChangesEntitiesAreRefreshed() {
+        // GIVEN
+        sut.bind(criteria)
+        XCTAssertEqual(sut.entities.count, 13)
+
+        // WHEN
+        var didRefresh = false
+        onRefresh = { didRefresh = true }
+
+        criteria.isOnlyErrors = true
+
+        // THEN delegate is called
+        XCTAssertTrue(didRefresh)
+
+        // THEN only errors are displayed
+        XCTAssertEqual(sut.entities.count, 3)
+        XCTAssertTrue(sut.entities.allSatisfy({
+            ($0 as! LoggerMessageEntity).logLevel >= .error
+        }))
+    }
+
     // MARK: ConsoleDataSourceDelegate
+
+    func dataSourceDidRefresh(_ dataSource: ConsoleDataSource) {
+        onRefresh?()
+    }
 
     func dataSource(_ dataSource: ConsoleDataSource, didUpdateWith diff: CollectionDifference<NSManagedObjectID>?) {
         updates.append(diff)
