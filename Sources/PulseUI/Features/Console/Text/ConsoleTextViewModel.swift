@@ -43,6 +43,8 @@ final class ConsoleTextViewModel: ObservableObject, ConsoleDataSourceDelegate {
     private var cache: [NSManagedObjectID: NSAttributedString] = [:]
     private var cancellables: [AnyCancellable] = []
 
+    var didRefresh: (() -> Void)?
+
     init(store: LoggerStore, source: ConsoleSource, criteria: ConsoleSearchCriteriaViewModel, router: ConsoleRouter) {
         self.store = store
         self.source = source
@@ -67,6 +69,7 @@ final class ConsoleTextViewModel: ObservableObject, ConsoleDataSourceDelegate {
 
     func dataSourceDidRefresh(_ dataSource: ConsoleDataSource) {
         refresh()
+        didRefresh?()
     }
 
     func dataSource(_ dataSource: ConsoleDataSource, didUpdateWith diff: CollectionDifference<NSManagedObjectID>?) {
@@ -75,6 +78,7 @@ final class ConsoleTextViewModel: ObservableObject, ConsoleDataSourceDelegate {
         } else {
             refresh()
         }
+        didRefresh?()
     }
 
     // MARK: Rendering
