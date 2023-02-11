@@ -6,7 +6,7 @@
 
 ### PulseUI
 
-- Fix [#161](https://github.com/kean/Pulse/issues/161): misleading title for successul local URL requests
+- Fix [#161](https://github.com/kean/Pulse/issues/161): misleading title for successful local URL requests
 - [macOS] Fix an issue where changing sort descriptors in a table view would affect other display modes
 - [macOS] Fix an issue where on first selection in a text view or search results list, the main panel would reload 
 - The insights view now shows info for the currently selected tasks
