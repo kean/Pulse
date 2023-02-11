@@ -47,9 +47,11 @@ struct InsightsView: View {
             InfoRow(title: "Median Duration", details: viewModel.medianDuration)
             InfoRow(title: "Duration Range", details: viewModel.durationRange)
             durationChart
+#if os(iOS)
             NavigationLink(destination: TopSlowestRequestsViw(viewModel: viewModel)) {
                 Text("Show Slowest Requests")
             }.disabled(insights.duration.topSlowestRequests.isEmpty)
+#endif
         }
     }
 
@@ -102,9 +104,11 @@ struct InsightsView: View {
         }) {
             InfoRow(title: "Redirect Count", details: "\(insights.redirects.count)")
             InfoRow(title: "Total Time Lost", details: DurationFormatter.string(from: insights.redirects.timeLost, isPrecise: false))
+#if os(iOS)
             NavigationLink(destination: RequestsWithRedirectsView(viewModel: viewModel)) {
                 Text("Show Requests with Redirects")
             }.disabled(insights.duration.topSlowestRequests.isEmpty)
+#endif
         }
     }
 
@@ -115,6 +119,7 @@ struct InsightsView: View {
         ConsoleSection(header: {
             SectionHeaderView(systemImage: "xmark.octagon.fill", title: "Failures")
         }) {
+#if os(iOS)
             NavigationLink(destination: FailingRequestsListView(viewModel: viewModel)) {
                 HStack {
                     Text("Failed Requests")
@@ -123,6 +128,14 @@ struct InsightsView: View {
                         .foregroundColor(.secondary)
                 }
             }.disabled(insights.duration.topSlowestRequests.isEmpty)
+#else
+            HStack {
+                Text("Failed Requests")
+                Spacer()
+                Text("\(insights.failures.count)")
+                    .foregroundColor(.secondary)
+            }
+#endif
         }
     }
 }
