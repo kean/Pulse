@@ -2,6 +2,8 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
+#if os(iOS) || os(macOS)
+
 import XCTest
 @testable import Pulse
 @testable import PulseUI
@@ -37,3 +39,5 @@ final class ShareStoreViewModelTests: ConsoleTestCase {
         XCTAssertNotNil(content.item)
     }
 }
+
+#endif
