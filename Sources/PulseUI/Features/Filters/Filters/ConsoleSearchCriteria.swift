@@ -14,7 +14,6 @@ struct ConsoleSearchCriteria: Hashable {
 
     struct Shared: Hashable {
         var dates = Dates.session
-        var general = General()
     }
 
     struct Messages: Hashable {
@@ -57,10 +56,6 @@ extension ConsoleSearchCriteria {
         static var session: Dates {
             Dates(startDate: LoggerStore.launchDate)
         }
-    }
-
-    struct General: ConsoleFilterProtocol {
-        var isEnabled = true
     }
 
     struct LogLevels: ConsoleFilterProtocol {

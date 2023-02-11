@@ -79,7 +79,7 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
 
         searchCriteriaViewModel.$criteria
             .dropFirst()
-            .throttle(for: 0.5, scheduler: DispatchQueue.main, latest: true)
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in self?.refresh() }
             .store(in: &cancellables)
 
@@ -133,6 +133,7 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
 
         entities = dataSource.entities
         sections = dataSource.sections
+
         refreshVisibleEntities()
     }
 
