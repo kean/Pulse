@@ -16,14 +16,6 @@ struct InsightsView: View {
 
     private var insights: NetworkLoggerInsights { viewModel.insights }
 
-    init(viewModel: InsightsViewModel) {
-        self.viewModel = viewModel
-    }
-
-    init(store: LoggerStore) {
-        self.viewModel = InsightsViewModel(store: store)
-    }
-
     var body: some View {
         List {
             Section(header: Text("Transfer Size")) {
@@ -40,6 +32,8 @@ struct InsightsView: View {
 #if os(iOS)
         .navigationTitle("Insights")
 #endif
+        .onAppear { viewModel.isViewVisible = true }
+        .onDisappear { viewModel.isViewVisible = false }
     }
 
     // MARK: - Duration
@@ -164,7 +158,7 @@ private struct FailingRequestsListView: View {
 struct NetworkInsightsView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
-            InsightsView(viewModel: .init(store: LoggerStore.mock))
+            InsightsView(viewModel: .init(store: .mock, context: .init(), criteria: .init(criteria: .init(), index: .init(store: .mock))))
         }
     }
 }

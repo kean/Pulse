@@ -86,7 +86,7 @@ final class ConsoleViewModel: ObservableObject {
         self.searchCriteriaViewModel = ConsoleSearchCriteriaViewModel(criteria: makeDefaultSearchCriteria(), index: index)
         self.listViewModel = ConsoleListViewModel(store: store, context: context, criteria: searchCriteriaViewModel)
 #if os(iOS) || os(macOS)
-        self.insightsViewModel = InsightsViewModel(store: store)
+        self.insightsViewModel = InsightsViewModel(store: store, context: context, criteria: searchCriteriaViewModel)
         self.searchBarViewModel = ConsoleSearchBarViewModel()
         if #available(iOS 15, *) {
             self._searchViewModel = ConsoleSearchViewModel(list: listViewModel, index: index, searchBar: searchBarViewModel)

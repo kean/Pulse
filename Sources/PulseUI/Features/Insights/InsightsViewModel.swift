@@ -11,11 +11,18 @@ import SwiftUI
 import CoreData
 import Charts
 
-final class InsightsViewModel: ObservableObject {
-    let insights: NetworkLoggerInsights
-    private var cancellable: AnyCancellable?
+final class InsightsViewModel: ObservableObject, ConsoleDataSourceDelegate {
+    @Published private(set) var insights = NetworkLoggerInsights([])
 
-    private let store: LoggerStore
+    var isViewVisible = false {
+        didSet {
+            if isViewVisible {
+                resetDataSource()
+            } else {
+                dataSource = nil
+            }
+        }
+    }
 
     var medianDuration: String {
         guard let median = insights.duration.median else { return "–" }
@@ -52,10 +59,16 @@ final class InsightsViewModel: ObservableObject {
         }
     }
 
-#warning("add ConsoleDataStore")
-    init(store: LoggerStore, insights: NetworkLoggerInsights = .init([])) {
+    private let store: LoggerStore
+    private let context: ConsoleContext
+    private let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
+
+    private var dataSource: ConsoleDataSource?
+
+    init(store: LoggerStore, context: ConsoleContext, criteria: ConsoleSearchCriteriaViewModel) {
         self.store = store
-        self.insights = insights
+        self.context = context
+        self.searchCriteriaViewModel = criteria
     }
 
     // MARK: - Accessing Data
@@ -70,7 +83,7 @@ final class InsightsViewModel: ObservableObject {
     }
 
     func failedRequests() -> [NetworkTaskEntity] {
-         tasks(with: Array(insights.failures.taskIds))
+        tasks(with: Array(insights.failures.taskIds))
             .sorted(by: { $0.createdAt > $1.createdAt })
     }
 
@@ -85,6 +98,45 @@ final class InsightsViewModel: ObservableObject {
         request.predicate = NSPredicate(format: "taskId IN %@", ids)
 
         return (try? store.viewContext.fetch(request)) ?? []
+    }
+
+    // MARK: DataSource
+
+    private func resetDataSource() {
+        guard isViewVisible else { return }
+
+        dataSource = ConsoleDataSource(store: store, context: context, mode: .tasks)
+        dataSource?.delegate = self
+        dataSource?.bind(searchCriteriaViewModel)
+    }
+
+    private var tasks: [NetworkTaskEntity] {
+        (dataSource?.entities as? [NetworkTaskEntity]) ?? []
+    }
+
+    // MARK: ConsoleDataSourceDelegate
+
+    func dataSourceDidRefresh(_ dataSource: ConsoleDataSource) {
+        insights = NetworkLoggerInsights(tasks)
+    }
+
+    func dataSource(_ dataSource: ConsoleDataSource, didUpdateWith diff: CollectionDifference<NSManagedObjectID>?) {
+        withAnimation {
+            if let diff = diff {
+                for change in diff {
+                    switch change {
+                    case .insert(_, let objectID, _):
+                        if let task = (try? store.viewContext.existingObject(with: objectID)) as? NetworkTaskEntity, task.state != .pending {
+                            insights.insert(task)
+                        }
+                    case .remove:
+                        break
+                    }
+                }
+            } else {
+                insights = NetworkLoggerInsights(tasks)
+            }
+        }
     }
 }
 

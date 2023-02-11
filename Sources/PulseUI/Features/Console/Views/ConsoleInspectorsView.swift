@@ -41,13 +41,7 @@ struct ConsoleInspectorsView: View {
                 Spacer()
             }
         case .insights:
-            if #available(macOS 13.0, *) {
-                NavigationStack {
-                    InsightsView(viewModel: viewModel.insightsViewModel)
-                }
-            } else {
-                InsightsView(viewModel: viewModel.insightsViewModel)
-            }
+            InsightsView(viewModel: viewModel.insightsViewModel)
         case .settings:
             VStack {
                 SettingsView(store: viewModel.store)
