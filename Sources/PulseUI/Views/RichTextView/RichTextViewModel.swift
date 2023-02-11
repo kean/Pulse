@@ -20,14 +20,13 @@ final class RichTextViewModel: ObservableObject {
     @Published var isLinkDetectionEnabled = true
 
     let contentType: NetworkLogger.ContentType?
-    let originalText: NSAttributedString
 
     var onLinkTapped: ((URL) -> Bool)?
 
-    var isEmpty: Bool { originalText.length == 0 }
+    var isEmpty: Bool { textStorage.length == 0 }
 
     weak var textView: UXTextView? // Not proper MVVM
-    var textStorage: NSTextStorage { textView?.textStorage ?? NSTextStorage(string: "") }
+    var textStorage: NSTextStorage
 
     private var isSearchingInBackground = false
     private var isSearchNeeded = false
@@ -45,7 +44,7 @@ final class RichTextViewModel: ObservableObject {
     }
 
     init(string: NSAttributedString, contentType: NetworkLogger.ContentType?) {
-        self.originalText = string
+        self.textStorage = NSTextStorage(attributedString: string)
         self.contentType = contentType
 
         Publishers.CombineLatest($searchTerm, $searchOptions)
