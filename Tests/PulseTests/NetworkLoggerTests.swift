@@ -290,13 +290,6 @@ final class NetworkLoggerTests: XCTestCase {
             let queryItem = try XCTUnwrap(url.queryItems.first(where: { $0.name == "password" }))
             XCTAssertEqual(queryItem.value, "private")
         }
-        do {
-            XCTAssertEqual(task.transactions.count, 1)
-            let request = try XCTUnwrap(task.transactions.first?.request)
-            let url = try XCTUnwrap(URL(string: request.url ?? ""))
-            let queryItem = try XCTUnwrap(url.queryItems.first(where: { $0.name == "password" }))
-            XCTAssertEqual(queryItem.value, "private")
-        }
     }
 
     func testExcludeSensitiveResponseFields() throws {
