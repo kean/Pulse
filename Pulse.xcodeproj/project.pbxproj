@@ -284,6 +284,7 @@
 		0CF5E5FA2997DED7009FF7AE /* ConsoleTableViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF5E5F82997DE86009FF7AE /* ConsoleTableViewModelTests.swift */; };
 		0CF5E5FC2997F7DF009FF7AE /* NetworkLoggerInsights.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF5E5FB2997F7DF009FF7AE /* NetworkLoggerInsights.swift */; };
 		0CF5E5FF2997FBC4009FF7AE /* NetworkLoggerInsightsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF5E5FD2997FBC1009FF7AE /* NetworkLoggerInsightsTests.swift */; };
+		0CF5E6012998012B009FF7AE /* InsightsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF5E6002998012B009FF7AE /* InsightsViewModel.swift */; };
 		0CFBC5AF2991DCD30038E547 /* ThickDivider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CFBC5AE2991DCD30038E547 /* ThickDivider.swift */; };
 /* End PBXBuildFile section */
 
@@ -764,6 +765,7 @@
 		0CF5E5F82997DE86009FF7AE /* ConsoleTableViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleTableViewModelTests.swift; sourceTree = "<group>"; };
 		0CF5E5FB2997F7DF009FF7AE /* NetworkLoggerInsights.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkLoggerInsights.swift; sourceTree = "<group>"; };
 		0CF5E5FD2997FBC1009FF7AE /* NetworkLoggerInsightsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkLoggerInsightsTests.swift; sourceTree = "<group>"; };
+		0CF5E6002998012B009FF7AE /* InsightsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsViewModel.swift; sourceTree = "<group>"; };
 		0CFBC5AE2991DCD30038E547 /* ThickDivider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThickDivider.swift; sourceTree = "<group>"; };
 		0CFF9BD825D6199A0069DB6A /* repos.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = repos.json; sourceTree = "<group>"; };
 		49E82A8526D107A00070244F /* AlamofireIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlamofireIntegration.swift; sourceTree = "<group>"; };
@@ -1407,6 +1409,7 @@
 			isa = PBXGroup;
 			children = (
 				0CF0D5CC296F189500EED9D4 /* InsightsView.swift */,
+				0CF5E6002998012B009FF7AE /* InsightsViewModel.swift */,
 				0CF5E5FB2997F7DF009FF7AE /* NetworkLoggerInsights.swift */,
 			);
 			path = Insights;
@@ -2187,6 +2190,7 @@
 				0CF0D631296F189600EED9D4 /* RichTextViewModel.swift in Sources */,
 				0CF0D673296F189600EED9D4 /* NetworkDetailsView.swift in Sources */,
 				0C40C0A0296F7BD3009ECF16 /* ConsoleSearchStatusCodeCell.swift in Sources */,
+				0CF5E6012998012B009FF7AE /* InsightsViewModel.swift in Sources */,
 				0CF0D62B296F189600EED9D4 /* FileViewerViewModel.swift in Sources */,
 				0CF0D67F296F189600EED9D4 /* ConsoleContextMenu-ios.swift in Sources */,
 				0CF0D675296F189600EED9D4 /* NetworkInspectorView-ios.swift in Sources */,

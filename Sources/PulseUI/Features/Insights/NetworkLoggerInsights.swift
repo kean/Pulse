@@ -2,6 +2,8 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
+#if os(iOS) || os(macOS)
+
 import Foundation
 import Pulse
 @preconcurrency import CoreData
@@ -28,6 +30,7 @@ struct NetworkLoggerInsights {
         }
     }
 
+#warning("add support for redirects and failures")
     private func process(event: LoggerStore.Event.NetworkTaskCompleted) {
         guard let metrics = event.metrics else { return }
 
@@ -127,3 +130,5 @@ private extension Array {
         return lhs
     }
 }
+
+#endif

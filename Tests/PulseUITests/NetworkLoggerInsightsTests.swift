@@ -2,6 +2,8 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
+#if os(iOS) || os(macOS)
+
 import XCTest
 import Combine
 @testable import Pulse
@@ -43,3 +45,5 @@ final class NetworkLoggerInsightsTests: ConsoleTestCase {
         XCTAssertEqual(durations.sorted(by: { $0 > $1 }), durations)
     }
 }
+
+#endif
