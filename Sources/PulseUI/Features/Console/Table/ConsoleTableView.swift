@@ -10,7 +10,18 @@ import Pulse
 import Combine
 
 struct ConsoleTableView: View {
-    @ObservedObject var viewModel: ConsoleListViewModel
+    var viewModel: ConsoleTableViewModel
+    @Binding var selection: NSManagedObjectID?
+
+    var body: some View {
+        _ConsoleTableView(viewModel: viewModel, selection: $selection)
+            .onAppear { viewModel.isViewVisible = true }
+            .onDisappear { viewModel.isViewVisible = false }
+    }
+}
+
+private struct _ConsoleTableView: View {
+    @ObservedObject var viewModel: ConsoleTableViewModel
     @Binding var selection: NSManagedObjectID?
 
     var body: some View {
@@ -24,7 +35,7 @@ struct ConsoleTableView: View {
 }
 
 private struct ConsoleMessageTableView: View {
-    @ObservedObject var viewModel: ConsoleListViewModel
+    @ObservedObject var viewModel: ConsoleTableViewModel
     @Binding var selection: NSManagedObjectID?
     @State private var sortOrder: [SortDescriptor<LoggerMessageEntity>] = []
 
@@ -64,7 +75,7 @@ private struct ConsoleMessageTableView: View {
         }
         .tableStyle(.inset)
         .onChange(of: sortOrder) {
-            viewModel.sortDescriptors = $0.map(NSSortDescriptor.init)
+            viewModel.sort(using: $0.map(NSSortDescriptor.init))
         }
     }
 
@@ -77,7 +88,7 @@ private struct ConsoleMessageTableView: View {
 }
 
 private struct ConsoleTaskTableView: View {
-    @ObservedObject var viewModel: ConsoleListViewModel
+    @ObservedObject var viewModel: ConsoleTableViewModel
     @Binding var selection: NSManagedObjectID?
     @State private var sortOrder: [SortDescriptor<NetworkTaskEntity>] = []
 
@@ -128,7 +139,7 @@ private struct ConsoleTaskTableView: View {
         }
         .tableStyle(.inset)
         .onChange(of: sortOrder) {
-            viewModel.sortDescriptors = $0.map(NSSortDescriptor.init)
+            viewModel.sort(using: $0.map(NSSortDescriptor.init))
         }
     }
 
@@ -151,14 +162,14 @@ struct ConsoleTableView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             let viewModel = ConsoleViewModel(store: .mock)
-            ConsoleTableView(viewModel: viewModel.list, selection: .constant(nil))
+            ConsoleTableView(viewModel: viewModel.tableViewModel, selection: .constant(nil))
                 .previewLayout(.fixed(width: 1200, height: 800))
                 .previewDisplayName("Logs")
         }
         Group {
             let viewModel = ConsoleViewModel(store: .mock)
             let _ = viewModel.mode = .tasks
-            ConsoleTableView(viewModel: viewModel.list, selection: .constant(nil))
+            ConsoleTableView(viewModel: viewModel.tableViewModel, selection: .constant(nil))
                 .previewLayout(.fixed(width: 1200, height: 800))
                 .previewDisplayName("Tasks")
         }

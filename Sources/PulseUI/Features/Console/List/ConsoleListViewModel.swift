@@ -8,10 +8,6 @@ import Pulse
 import Combine
 import SwiftUI
 
-/// Manages the logs list. Supports grouping, ordering, pins.
-///
-/// - note: It currently acts as a source of entities for other screen as well
-/// and should probably be extracted to a separate class.
 final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
     @Published private(set) var visibleEntities: ArraySlice<NSManagedObject> = []
     @Published private(set) var pins: [NSManagedObject] = []
@@ -27,15 +23,6 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
             } else {
                 dataSource = nil
             }
-        }
-    }
-
-#warning("reimplement")
-    var sortDescriptors: [NSSortDescriptor] = [] {
-        didSet {
-//            controller?.fetchRequest.sortDescriptors = sortDescriptors
-//            try? controller?.performFetch()
-//            reloadMessages()
         }
     }
 

@@ -172,7 +172,7 @@ private struct ConsoleContentView: View {
                     ConsoleListContentView(viewModel: viewModel.list)
                 }.clipped()
             case .table:
-                ConsoleTableView(viewModel: viewModel.list, selection: $selectedObjectID)
+                ConsoleTableView(viewModel: viewModel.tableViewModel, selection: $selectedObjectID)
             case .text:
                 ConsoleTextView(viewModel: viewModel.textViewModel)
             }

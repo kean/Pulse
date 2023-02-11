@@ -28,6 +28,7 @@ final class ConsoleViewModel: ObservableObject {
 #endif
 
 #if os(macOS)
+    let tableViewModel: ConsoleTableViewModel
     let textViewModel: ConsoleTextViewModel
 #endif
 
@@ -100,6 +101,7 @@ final class ConsoleViewModel: ObservableObject {
 #endif
 
 #if os(macOS)
+        self.tableViewModel = ConsoleTableViewModel(store: store, source: source, criteria: searchCriteriaViewModel)
         self.textViewModel = ConsoleTextViewModel(store: store, source: source, criteria: searchCriteriaViewModel, router: router)
 #endif
 
@@ -116,7 +118,10 @@ final class ConsoleViewModel: ObservableObject {
         )
 
         bind()
-        prepare(for: mode)
+
+        if mode != .all {
+            prepare(for: mode)
+        }
     }
 
     private func bind() {
@@ -141,7 +146,10 @@ final class ConsoleViewModel: ObservableObject {
     private func prepare(for mode: ConsoleMode) {
         searchCriteriaViewModel.mode = mode
         list.mode = mode
+#if os(macOS)
+        tableViewModel.mode = mode
         textViewModel.mode = mode
+#endif
     }
 
     private func refreshListsVisibility() {

@@ -1,5 +1,7 @@
 # Pulse 3.x
 
+- [macOS] Fix an issue where changing sort descriptors in a table view would affect other display modes
+
 ## Pulse 3.4.3
 
 *Feb 9, 2023*
