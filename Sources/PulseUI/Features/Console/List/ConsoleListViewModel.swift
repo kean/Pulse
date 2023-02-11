@@ -15,7 +15,6 @@ import SwiftUI
 final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
     @Published private(set) var visibleEntities: ArraySlice<NSManagedObject> = []
     @Published private(set) var pins: [NSManagedObject] = []
-    #warning("do we need to expose entities?")
     @Published private(set) var entities: [NSManagedObject] = []
     @Published private(set) var sections: [NSFetchedResultsSectionInfo]?
     @Published var options = ConsoleListOptions()
@@ -44,7 +43,10 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
     }
 
     var mode: ConsoleMode = .all {
-        didSet { resetDataSource(options: options) }
+        didSet {
+            pins = filter(pins: pinsObserver.pins, mode: mode)
+            resetDataSource(options: options)
+        }
     }
 
     /// This exist strictly to workaround List performance issues
@@ -69,8 +71,9 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
 
     private func bind() {
         pinsObserver.$pins.dropFirst().sink { [weak self] pins in
+            guard let self = self else { return }
             withAnimation {
-                self?.pins = self?.filter(pins: pins) ?? []
+                self.pins = filter(pins: pins, mode: self.mode)
             }
         }.store(in: &cancellables)
 
@@ -95,19 +98,6 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
         dataSource = ConsoleDataSource(store: store, source: source, mode: mode, options: options)
         dataSource?.delegate = self
         refresh()
-
-        #warning("is this the right place to do it")
-        pins = filter(pins: pinsObserver.pins)
-    }
-
-    private func filter(pins: [LoggerMessageEntity]) -> [LoggerMessageEntity] {
-        pins.filter {
-            switch mode {
-            case .all: return true
-            case .logs: return $0.task == nil
-            case .tasks: return $0.task != nil
-            }
-        }
     }
 
     func buttonShowPreviousSessionTapped() {
@@ -204,4 +194,16 @@ enum ConsoleMode: String {
     case all
     case logs
     case tasks
+}
+
+// MARK: Helpers
+
+private func filter(pins: [LoggerMessageEntity], mode: ConsoleMode) -> [LoggerMessageEntity] {
+    pins.filter {
+        switch mode {
+        case .all: return true
+        case .logs: return $0.task == nil
+        case .tasks: return $0.task != nil
+        }
+    }
 }
