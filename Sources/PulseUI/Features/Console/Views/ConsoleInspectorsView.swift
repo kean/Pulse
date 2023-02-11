@@ -59,8 +59,8 @@ struct ConsoleInspectorsView: View {
 
 private enum ConsoleInspector: Identifiable, CaseIterable {
     case filters
-    case storeInfo
     case insights
+    case storeInfo
     case settings
 
     var id: ConsoleInspector { self }
