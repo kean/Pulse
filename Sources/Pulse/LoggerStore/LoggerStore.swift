@@ -59,7 +59,7 @@ public final class LoggerStore: @unchecked Sendable {
     ///
     /// You can replace the default store with a custom one. If you replace the
     /// shared store, it automatically gets registered as the default store
-    /// for ``RemoteLogger`` and ``NetworkLoggerInsights``.
+    /// for ``RemoteLogger``.
     public static var shared = LoggerStore.makeDefault() {
         didSet { register(store: shared) }
     }

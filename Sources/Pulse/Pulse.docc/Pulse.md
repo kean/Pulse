@@ -25,7 +25,7 @@ Logger and network inspector for Apple platforms.
 
 - ``LoggerMessageEntity``
 - ``LoggerBlobHandleEntity``
-- ``LoggerSessionEntity`
+- ``LoggerSessionEntity``
 - ``NetworkTaskEntity``
 - ``NetworkTaskProgressEntity``
 - ``NetworkTransactionMetricsEntity``
