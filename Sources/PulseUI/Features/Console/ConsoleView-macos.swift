@@ -64,7 +64,7 @@ public struct ConsoleView: View {
 
     @ViewBuilder
     private var leftPanel: some View {
-        let content = ConsoleContentView(viewModel: viewModel, displayMode: $displayMode)
+        let content = ConsoleContentView(viewModel: viewModel, displayMode: displayMode)
             .frame(minWidth: 200, idealWidth: 400, minHeight: 120, idealHeight: 480)
             .toolbar {
                 ToolbarItemGroup(placement: .navigation) {
@@ -130,10 +130,12 @@ private struct ConsoleRightPanelView: View {
 }
 
 private struct ConsoleContentView: View {
-    var viewModel: ConsoleViewModel
-    @Binding var displayMode: ConsoleDisplayMode
+    let viewModel: ConsoleViewModel
+    let displayMode: ConsoleDisplayMode
+
     @State private var selectedObjectID: NSManagedObjectID? // Has to use for Table
     @State private var selection: ConsoleSelectedItem?
+
     @Environment(\.isSearching) private var isSearching
 
     var body: some View {
