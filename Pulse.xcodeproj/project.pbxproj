@@ -285,6 +285,7 @@
 		0CF5E5FC2997F7DF009FF7AE /* NetworkLoggerInsights.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF5E5FB2997F7DF009FF7AE /* NetworkLoggerInsights.swift */; };
 		0CF5E5FF2997FBC4009FF7AE /* NetworkLoggerInsightsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF5E5FD2997FBC1009FF7AE /* NetworkLoggerInsightsTests.swift */; };
 		0CF5E6012998012B009FF7AE /* InsightsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF5E6002998012B009FF7AE /* InsightsViewModel.swift */; };
+		0CF5E6042998086C009FF7AE /* InsightsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF5E60229980867009FF7AE /* InsightsViewModelTests.swift */; };
 		0CFBC5AF2991DCD30038E547 /* ThickDivider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CFBC5AE2991DCD30038E547 /* ThickDivider.swift */; };
 /* End PBXBuildFile section */
 
@@ -766,6 +767,7 @@
 		0CF5E5FB2997F7DF009FF7AE /* NetworkLoggerInsights.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkLoggerInsights.swift; sourceTree = "<group>"; };
 		0CF5E5FD2997FBC1009FF7AE /* NetworkLoggerInsightsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkLoggerInsightsTests.swift; sourceTree = "<group>"; };
 		0CF5E6002998012B009FF7AE /* InsightsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsViewModel.swift; sourceTree = "<group>"; };
+		0CF5E60229980867009FF7AE /* InsightsViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsViewModelTests.swift; sourceTree = "<group>"; };
 		0CFBC5AE2991DCD30038E547 /* ThickDivider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThickDivider.swift; sourceTree = "<group>"; };
 		0CFF9BD825D6199A0069DB6A /* repos.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = repos.json; sourceTree = "<group>"; };
 		49E82A8526D107A00070244F /* AlamofireIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlamofireIntegration.swift; sourceTree = "<group>"; };
@@ -1548,6 +1550,7 @@
 				0CAF1D78297B5FF4002E2722 /* ConsoleSearchServiceTests.swift */,
 				0CAF1D76297B0810002E2722 /* ConsoleSearchSuggestionTests.swift */,
 				0CECF63129968488000F9CCD /* ConsoleSearchViewModelTests.swift */,
+				0CF5E60229980867009FF7AE /* InsightsViewModelTests.swift */,
 				0CF5E5FD2997FBC1009FF7AE /* NetworkLoggerInsightsTests.swift */,
 				0C63A389297A44B300F6A6A5 /* StringSearchOptionsTests.swift */,
 				0C7A0E01297CE71400B4B69D /* FormattersTests.swift */,
@@ -2315,6 +2318,7 @@
 				0CF5E5FA2997DED7009FF7AE /* ConsoleTableViewModelTests.swift in Sources */,
 				0C0352D929943F86008CDEF8 /* ConsoleListViewModelTests.swift in Sources */,
 				0CECF63229968488000F9CCD /* ConsoleSearchViewModelTests.swift in Sources */,
+				0CF5E6042998086C009FF7AE /* InsightsViewModelTests.swift in Sources */,
 				0CF0D6CB296F18FD00EED9D4 /* ConsoleViewModelTests.swift in Sources */,
 				0CB63A292975A94D00525165 /* ConsoleSearchTokenTests.swift in Sources */,
 				0CECF6412996E761000F9CCD /* ConsoleDataSourceTests.swift in Sources */,
