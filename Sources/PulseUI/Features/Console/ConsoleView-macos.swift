@@ -142,12 +142,7 @@ private struct ConsoleContentView: View {
         VStack(spacing: 0) {
             content
             Divider()
-            HStack {
-                ConsoleModePicker(viewModel: viewModel)
-                Spacer()
-                ConsoleToolbarToggleOnlyErrorsButton(viewModel: viewModel.searchCriteriaViewModel)
-            }
-            .padding(EdgeInsets(top: 7, leading: 10, bottom: 9, trailing: 10))
+            ConsoleToolbarView(viewModel: viewModel)
         }
         .onChange(of: selectedObjectID) {
             viewModel.router.selection = $0.map(ConsoleSelectedItem.entity)

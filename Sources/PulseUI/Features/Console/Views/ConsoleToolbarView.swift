@@ -9,6 +9,8 @@ import Pulse
 import CoreData
 import Combine
 
+#if os(iOS)
+#warning("use the same ConsoleModePicker behavior ")
 struct ConsoleToolbarView: View {
     let viewModel: ConsoleViewModel
 
@@ -31,6 +33,46 @@ struct ConsoleToolbarView: View {
         .buttonStyle(.plain)
     }
 }
+#elseif os(macOS)
+struct ConsoleToolbarView: View {
+    let viewModel: ConsoleViewModel
+
+    @ObservedObject private var searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
+
+    init(viewModel: ConsoleViewModel) {
+        self.viewModel = viewModel
+        self.searchCriteriaViewModel = viewModel.searchCriteriaViewModel
+    }
+
+    var body: some View {
+        HStack {
+            if let entities = searchCriteriaViewModel.focusedEntities {
+                makeFocusedView(entities: entities)
+            } else {
+                ConsoleModePicker(viewModel: viewModel)
+            }
+            Spacer()
+            ConsoleToolbarToggleOnlyErrorsButton(viewModel: viewModel.searchCriteriaViewModel)
+        }
+        .padding(.horizontal, 10)
+        .frame(height: 34, alignment: .center)
+    }
+
+    @ViewBuilder
+    private func makeFocusedView(entities: [NSManagedObject]) -> some View {
+        Text("\(entities.count) Focused")
+            .foregroundColor(.secondary)
+            .font(.subheadline.weight(.medium))
+
+        Button(action: { searchCriteriaViewModel.focusedEntities = nil }) {
+            Image(systemName: "xmark")
+        }
+        .foregroundColor(.secondary)
+        .buttonStyle(.plain)
+        .help("Unfocus")
+    }
+}
+#endif
 
 struct ConsoleModePicker: View {
     let viewModel: ConsoleViewModel
@@ -64,6 +106,7 @@ struct ConsoleModePicker: View {
     }
 }
 
+#warning("remove")
 private struct ConsoleToolbarTitle: View {
     let viewModel: ConsoleViewModel
 
