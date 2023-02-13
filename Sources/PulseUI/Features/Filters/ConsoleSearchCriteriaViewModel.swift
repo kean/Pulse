@@ -10,9 +10,10 @@ import SwiftUI
 final class ConsoleSearchCriteriaViewModel: ObservableObject {
     var isButtonResetEnabled: Bool { !isCriteriaDefault }
 
-    @Published var isOnlyErrors = false
-    @Published var criteria = ConsoleSearchCriteria()
     @Published var mode: ConsoleMode = .all
+    @Published var criteria = ConsoleSearchCriteria()
+    @Published var isOnlyErrors = false
+    @Published var focusedEntities: [NSManagedObject]?
 
     let defaultCriteria: ConsoleSearchCriteria
 

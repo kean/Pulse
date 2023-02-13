@@ -83,9 +83,10 @@ final class ConsoleViewModel: ObservableObject {
 
         self.index = LoggerStoreIndex(store: store)
         self.searchCriteriaViewModel = ConsoleSearchCriteriaViewModel(criteria: makeDefaultSearchCriteria(), index: index)
-        self.listViewModel = ConsoleListViewModel(store: store, context: context, criteria: searchCriteriaViewModel)
+        self.searchCriteriaViewModel.focusedEntities = context.focusedEntities
+        self.listViewModel = ConsoleListViewModel(store: store, criteria: searchCriteriaViewModel)
 #if os(iOS) || os(macOS)
-        self.insightsViewModel = InsightsViewModel(store: store, context: context, criteria: searchCriteriaViewModel)
+        self.insightsViewModel = InsightsViewModel(store: store, criteria: searchCriteriaViewModel)
         self.searchBarViewModel = ConsoleSearchBarViewModel()
         if #available(iOS 15, *) {
             self._searchViewModel = ConsoleSearchViewModel(list: listViewModel, index: index, searchBar: searchBarViewModel)
@@ -93,8 +94,8 @@ final class ConsoleViewModel: ObservableObject {
 #endif
 
 #if os(macOS)
-        self.tableViewModel = ConsoleTableViewModel(store: store, context: context, criteria: searchCriteriaViewModel)
-        self.textViewModel = ConsoleTextViewModel(store: store, context: context, criteria: searchCriteriaViewModel, router: router)
+        self.tableViewModel = ConsoleTableViewModel(store: store, criteria: searchCriteriaViewModel)
+        self.textViewModel = ConsoleTextViewModel(store: store, criteria: searchCriteriaViewModel, router: router)
 #endif
 
         self.logCountObserver = ManagedObjectsCountObserver(
@@ -117,19 +118,18 @@ final class ConsoleViewModel: ObservableObject {
     }
 
     private func bind() {
-        searchCriteriaViewModel.bind(listViewModel.$entities)
+        let criteria = searchCriteriaViewModel
 
-        searchCriteriaViewModel.$criteria
-            .combineLatest(searchCriteriaViewModel.$isOnlyErrors)
-            .sink { [weak self] in
-                self?.refreshCountObservers(criteria: $0, isOnlyError: $1)
-            }
-            .store(in: &cancellables)
+        criteria.bind(listViewModel.$entities)
+
+        Publishers.CombineLatest3(criteria.$criteria, criteria.$focusedEntities, criteria.$isOnlyErrors).sink { [weak self] in
+            self?.refreshCountObservers(criteria: $0, focusedEntities: $1, isOnlyError: $2)
+        }.store(in: &cancellables)
     }
 
-    private func refreshCountObservers(criteria: ConsoleSearchCriteria, isOnlyError: Bool) {
+    private func refreshCountObservers(criteria: ConsoleSearchCriteria, focusedEntities: [NSManagedObject]?, isOnlyError: Bool) {
         func makePredicate(for mode: ConsoleMode) -> NSPredicate? {
-            ConsoleDataSource.makePredicate(mode: mode, context: context, criteria: criteria, isOnlyErrors: isOnlyError)
+            ConsoleDataSource.makePredicate(mode: mode, criteria: criteria, focusedEntities: focusedEntities, isOnlyErrors: isOnlyError)
         }
         logCountObserver.setPredicate(makePredicate(for: .logs))
         taskCountObserver.setPredicate(makePredicate(for: .tasks))

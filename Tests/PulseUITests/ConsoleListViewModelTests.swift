@@ -19,10 +19,11 @@ final class ConsoleListViewModelTests: ConsoleTestCase {
         setUp(store: store)
     }
 
-    func setUp(store: LoggerStore, context: ConsoleContext = ConsoleContext()) {
+    func setUp(store: LoggerStore, focusedEntities: [NSManagedObject]? = nil) {
         self.store = store
         self.criteriaViewModel = ConsoleSearchCriteriaViewModel(criteria: .init(), index: .init(store: store))
-        self.sut = ConsoleListViewModel(store: store, context: context, criteria: criteriaViewModel)
+        self.criteriaViewModel.focusedEntities = focusedEntities
+        self.sut = ConsoleListViewModel(store: store, criteria: criteriaViewModel)
         self.sut.isViewVisible = true
     }
 
@@ -194,7 +195,7 @@ final class ConsoleListViewModelTests: ConsoleTestCase {
         let entities = Array(sut.entities[...3])
 
         // WHEN
-        setUp(store: store, context: .init(title: "Focus", focusedEntities: entities))
+        setUp(store: store, focusedEntities: entities)
 
         // THEN
         XCTAssertEqual(sut.entities, entities)
@@ -204,7 +205,7 @@ final class ConsoleListViewModelTests: ConsoleTestCase {
     func testGroupingFocusedEntities() {
         // GIVEN
         let entities = Array(sut.entities[...3])
-        setUp(store: store, context: .init(title: "Focus", focusedEntities: entities))
+        setUp(store: store, focusedEntities: entities)
         
         // WHEN
         sut.options.messageGroupBy = .level

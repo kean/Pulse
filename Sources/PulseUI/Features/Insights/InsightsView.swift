@@ -170,7 +170,7 @@ private struct FailingRequestsListView: View {
 #if DEBUG
 struct NetworkInsightsView_Previews: PreviewProvider {
     static var previews: some View {
-            InsightsView(viewModel: .init(store: .mock, context: .init(), criteria: .init(criteria: .init(), index: .init(store: .mock))))
+            InsightsView(viewModel: .init(store: .mock, criteria: .init(criteria: .init(), index: .init(store: .mock))))
 #if os(macOS)
                 .frame(width: 320, height: 800)
 #endif

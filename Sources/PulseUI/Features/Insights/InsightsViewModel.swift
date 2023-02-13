@@ -60,14 +60,12 @@ final class InsightsViewModel: ObservableObject, ConsoleDataSourceDelegate {
     }
 
     private let store: LoggerStore
-    private let context: ConsoleContext
     private let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
 
     private var dataSource: ConsoleDataSource?
 
-    init(store: LoggerStore, context: ConsoleContext, criteria: ConsoleSearchCriteriaViewModel) {
+    init(store: LoggerStore, criteria: ConsoleSearchCriteriaViewModel) {
         self.store = store
-        self.context = context
         self.searchCriteriaViewModel = criteria
     }
 
@@ -96,7 +94,7 @@ final class InsightsViewModel: ObservableObject, ConsoleDataSourceDelegate {
     private func resetDataSource() {
         guard isViewVisible else { return }
 
-        dataSource = ConsoleDataSource(store: store, context: context, mode: .tasks)
+        dataSource = ConsoleDataSource(store: store, mode: .tasks)
         dataSource?.delegate = self
         dataSource?.bind(searchCriteriaViewModel)
     }

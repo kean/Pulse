@@ -14,7 +14,7 @@ struct ConsoleListContentView: View {
 
     var body: some View {
         if #available(iOS 15, tvOS 15, *) {
-            if !viewModel.pins.isEmpty, viewModel.context.focusedEntities == nil {
+            if !viewModel.pins.isEmpty, !viewModel.isShowingFocusedEntities {
                 pinsView
             }
         }
@@ -104,7 +104,7 @@ struct ConsoleListContentView: View {
 
     @ViewBuilder
     private var footerView: some View {
-        if #available(iOS 15, *), viewModel.isShowPreviousSessionButtonShown, viewModel.context.focusedEntities == nil {
+        if #available(iOS 15, *), viewModel.isShowPreviousSessionButtonShown, !viewModel.isShowingFocusedEntities {
             Button(action: viewModel.buttonShowPreviousSessionTapped) {
                 Text("Show Previous Sessions")
                     .font(.subheadline)

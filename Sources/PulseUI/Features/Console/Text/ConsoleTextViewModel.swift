@@ -32,7 +32,6 @@ final class ConsoleTextViewModel: ObservableObject, ConsoleDataSourceDelegate {
     }
 
     private let store: LoggerStore
-    private let context: ConsoleContext
     private let router: ConsoleRouter
     private let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
 
@@ -45,9 +44,8 @@ final class ConsoleTextViewModel: ObservableObject, ConsoleDataSourceDelegate {
 
     var didRefresh: (() -> Void)?
 
-    init(store: LoggerStore, context: ConsoleContext, criteria: ConsoleSearchCriteriaViewModel, router: ConsoleRouter) {
+    init(store: LoggerStore, criteria: ConsoleSearchCriteriaViewModel, router: ConsoleRouter) {
         self.store = store
-        self.context = context
         self.searchCriteriaViewModel = criteria
         self.router = router
 
@@ -60,7 +58,7 @@ final class ConsoleTextViewModel: ObservableObject, ConsoleDataSourceDelegate {
     private func resetDataSource() {
         guard isViewVisible else { return }
 
-        dataSource = ConsoleDataSource(store: store, context: context, mode: mode)
+        dataSource = ConsoleDataSource(store: store, mode: mode)
         dataSource?.delegate = self
         dataSource?.bind(searchCriteriaViewModel)
     }

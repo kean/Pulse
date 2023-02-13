@@ -23,7 +23,7 @@ final class InsightsViewModelTests: ConsoleTestCase {
     func reset() {
         criteria = ConsoleSearchCriteriaViewModel(criteria: .init(), index: .init(store: store))
 
-        sut = InsightsViewModel(store: store, context: .init(), criteria: criteria)
+        sut = InsightsViewModel(store: store, criteria: criteria)
         sut.isViewVisible = true
     }
 

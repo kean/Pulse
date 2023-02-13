@@ -11,7 +11,6 @@ import CoreData
 final class ConsoleDataSourceTests: ConsoleTestCase, ConsoleDataSourceDelegate {
     var sut: ConsoleDataSource!
 
-    var context = ConsoleContext()
     var mode: ConsoleMode = .all
     var options = ConsoleListOptions()
     var criteria: ConsoleSearchCriteriaViewModel!
@@ -29,7 +28,7 @@ final class ConsoleDataSourceTests: ConsoleTestCase, ConsoleDataSourceDelegate {
     func reset() {
         self.criteria = ConsoleSearchCriteriaViewModel(criteria: .init(), index: .init(store: store))
 
-        self.sut = ConsoleDataSource(store: store, context: context, mode: mode, options: options)
+        self.sut = ConsoleDataSource(store: store, mode: mode, options: options)
         self.sut.delegate = self
         self.sut.refresh()
     }

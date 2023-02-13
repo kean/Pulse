@@ -32,7 +32,7 @@ final class ConsoleTextViewModelTests: ConsoleTestCase {
         router = ConsoleRouter()
         textView = NSTextView()
 
-        sut = ConsoleTextViewModel(store: store, context: .init(), criteria: criteria, router: router)
+        sut = ConsoleTextViewModel(store: store, criteria: criteria, router: router)
         sut.text.textView = textView
         sut.isViewVisible = true
     }

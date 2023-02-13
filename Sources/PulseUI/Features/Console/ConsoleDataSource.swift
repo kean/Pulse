@@ -31,16 +31,14 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
     static let fetchBatchSize = 100
 
     private let store: LoggerStore
-    private let context: ConsoleContext
     private let mode: ConsoleMode
     private let options: ConsoleListOptions
     private let controller: NSFetchedResultsController<NSManagedObject>
     private var controllerDelegate: NSFetchedResultsControllerDelegate?
     private var cancellables: [AnyCancellable] = []
 
-    init(store: LoggerStore, context: ConsoleContext, mode: ConsoleMode, options: ConsoleListOptions = .init()) {
+    init(store: LoggerStore, mode: ConsoleMode, options: ConsoleListOptions = .init()) {
         self.store = store
-        self.context = context
         self.mode = mode
         self.options = options
 
@@ -90,8 +88,8 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
 
     /// Binds the search criteria and immediately performs the initial fetch.
     func bind(_ criteria: ConsoleSearchCriteriaViewModel) {
-        criteria.$criteria.combineLatest(criteria.$isOnlyErrors).sink { [weak self] in
-            self?.setPredicate(criteria: $0, isOnlyErrors: $1)
+        Publishers.CombineLatest3(criteria.$criteria, criteria.$focusedEntities, criteria.$isOnlyErrors).sink { [weak self] in
+            self?.setPredicate(criteria: $0, focusedEntities: $1, isOnlyErrors: $2)
             self?.refresh()
         }.store(in: &cancellables)
     }
@@ -121,14 +119,14 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
 
     // MARK: Predicate
 
-    private func setPredicate(criteria: ConsoleSearchCriteria, isOnlyErrors: Bool) {
-        let predicate = ConsoleDataSource.makePredicate(mode: mode, context: context, criteria: criteria, isOnlyErrors: isOnlyErrors)
+    private func setPredicate(criteria: ConsoleSearchCriteria, focusedEntities: [NSManagedObject]?, isOnlyErrors: Bool) {
+        let predicate = ConsoleDataSource.makePredicate(mode: mode, criteria: criteria, focusedEntities: focusedEntities, isOnlyErrors: isOnlyErrors)
         controller.fetchRequest.predicate = predicate
     }
 
-    static func makePredicate(mode: ConsoleMode, context: ConsoleContext, criteria: ConsoleSearchCriteria, isOnlyErrors: Bool) -> NSPredicate? {
+    static func makePredicate(mode: ConsoleMode, criteria: ConsoleSearchCriteria, focusedEntities: [NSManagedObject]?, isOnlyErrors: Bool) -> NSPredicate? {
         let mainPredicate = _makePredicate(mode, criteria, isOnlyErrors)
-        if let focusedEntities = context.focusedEntities {
+        if let focusedEntities = focusedEntities {
             return NSCompoundPredicate(andPredicateWithSubpredicates: [
                 mainPredicate,
                 NSPredicate(format: "self IN %@", focusedEntities)

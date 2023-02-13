@@ -32,14 +32,12 @@ final class ConsoleTableViewModel: ObservableObject, ConsoleDataSourceDelegate {
     private var sortDescriptors: [NSSortDescriptor] = []
 
     private let store: LoggerStore
-    private let context: ConsoleContext
     private let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
 
     private var dataSource: ConsoleDataSource?
 
-    init(store: LoggerStore, context: ConsoleContext, criteria: ConsoleSearchCriteriaViewModel) {
+    init(store: LoggerStore, criteria: ConsoleSearchCriteriaViewModel) {
         self.store = store
-        self.context = context
         self.searchCriteriaViewModel = criteria
     }
 
@@ -48,7 +46,7 @@ final class ConsoleTableViewModel: ObservableObject, ConsoleDataSourceDelegate {
     private func resetDataSource() {
         guard isViewVisible else { return }
 
-        dataSource = ConsoleDataSource(store: store, context: context, mode: mode)
+        dataSource = ConsoleDataSource(store: store, mode: mode)
         if !sortDescriptors.isEmpty {
             dataSource?.sortDescriptors = sortDescriptors
         }

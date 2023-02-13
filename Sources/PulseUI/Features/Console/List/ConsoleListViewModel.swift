@@ -26,6 +26,10 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
         }
     }
 
+    var isShowingFocusedEntities: Bool {
+        searchCriteriaViewModel.focusedEntities != nil
+    }
+
     var isShowPreviousSessionButtonShown: Bool {
         searchCriteriaViewModel.criteria.shared.dates == .session
     }
@@ -43,15 +47,13 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
     private var visibleObjectIDs: Set<NSManagedObjectID> = []
 
     let store: LoggerStore
-    let context: ConsoleContext
     private let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
     private let pinsObserver: LoggerPinsObserver
     private var dataSource: ConsoleDataSource?
     private var cancellables: [AnyCancellable] = []
 
-    init(store: LoggerStore, context: ConsoleContext, criteria: ConsoleSearchCriteriaViewModel) {
+    init(store: LoggerStore, criteria: ConsoleSearchCriteriaViewModel) {
         self.store = store
-        self.context = context
         self.searchCriteriaViewModel = criteria
         self.pinsObserver = LoggerPinsObserver(store: store)
         self.bind()
@@ -71,7 +73,7 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
     }
 
     private func resetDataSource(options: ConsoleListOptions) {
-        dataSource = ConsoleDataSource(store: store, context: context, mode: mode, options: options)
+        dataSource = ConsoleDataSource(store: store, mode: mode, options: options)
         dataSource?.delegate = self
         dataSource?.bind(searchCriteriaViewModel)
     }
