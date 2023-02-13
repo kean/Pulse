@@ -1,5 +1,7 @@
 # Pulse 3.x
 
+- Add an option to see slowest request, redirects, failures from the insights view
+
 ## Pulse 3.5.0
 
 *Feb 11, 2023*

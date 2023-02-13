@@ -86,7 +86,7 @@ final class ConsoleViewModel: ObservableObject {
         self.searchCriteriaViewModel.focusedEntities = context.focusedEntities
         self.listViewModel = ConsoleListViewModel(store: store, criteria: searchCriteriaViewModel)
 #if os(iOS) || os(macOS)
-        self.insightsViewModel = InsightsViewModel(store: store, criteria: searchCriteriaViewModel)
+        self.insightsViewModel = InsightsViewModel(store: store)
         self.searchBarViewModel = ConsoleSearchBarViewModel()
         if #available(iOS 15, *) {
             self._searchViewModel = ConsoleSearchViewModel(list: listViewModel, index: index, searchBar: searchBarViewModel)
@@ -110,11 +110,22 @@ final class ConsoleViewModel: ObservableObject {
             sortDescriptior: NSSortDescriptor(keyPath: \NetworkTaskEntity.createdAt, ascending: false)
         )
 
+#if os(iOS) || os(macOS)
+        self.insightsViewModel.consoleViewModel = self
+#endif
+
         bind()
 
         if mode != .all {
             prepare(for: mode)
         }
+    }
+
+    func focus(on entities: [NSManagedObject]) {
+        if entities is [NetworkTaskEntity], mode != .tasks {
+            mode = .tasks
+        }
+        searchCriteriaViewModel.focusedEntities = entities
     }
 
     private func bind() {

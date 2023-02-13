@@ -47,10 +47,18 @@ struct InsightsView: View {
             InfoRow(title: "Median Duration", details: viewModel.medianDuration)
             InfoRow(title: "Duration Range", details: viewModel.durationRange)
             durationChart
+#warning("open a console ordered by duration")
+#warning("on macos, switch to list mode?")
 #if os(iOS)
-            NavigationLink(destination: TopSlowestRequestsViw(viewModel: viewModel)) {
+            NavigationLink(destination: TopSlowestRequestsView(viewModel: viewModel)) {
                 Text("Show Slowest Requests")
             }.disabled(insights.duration.topSlowestRequests.isEmpty)
+#else
+            Button(action: {
+                viewModel.focus(on: viewModel.topSlowestRequests())
+            }) {
+                Text("Show Slowest Requests")
+            }
 #endif
         }
     }
@@ -140,11 +148,12 @@ struct InsightsView: View {
     }
 }
 
-private struct TopSlowestRequestsViw: View {
+#if os(iOS)
+private struct TopSlowestRequestsView: View {
     let viewModel: InsightsViewModel
 
     var body: some View {
-        ConsolePlainList( viewModel.topSlowestRequests())
+        ConsolePlainList(viewModel.topSlowestRequests())
             .inlineNavigationTitle("Slowest Requests")
     }
 }
@@ -153,7 +162,7 @@ private struct RequestsWithRedirectsView: View {
     let viewModel: InsightsViewModel
 
     var body: some View {
-        ConsolePlainList( viewModel.requestsWithRedirects())
+        ConsolePlainList(viewModel.requestsWithRedirects())
             .inlineNavigationTitle("Redirects")
     }
 }
@@ -162,15 +171,16 @@ private struct FailingRequestsListView: View {
     let viewModel: InsightsViewModel
 
     var body: some View {
-        ConsolePlainList( viewModel.failedRequests())
+        ConsolePlainList(viewModel.failedRequests())
             .inlineNavigationTitle("Failed Requests")
     }
 }
+#endif
 
 #if DEBUG
 struct NetworkInsightsView_Previews: PreviewProvider {
     static var previews: some View {
-            InsightsView(viewModel: .init(store: .mock, criteria: .init(criteria: .init(), index: .init(store: .mock))))
+            InsightsView(viewModel: .init(store: .mock))
 #if os(macOS)
                 .frame(width: 320, height: 800)
 #endif

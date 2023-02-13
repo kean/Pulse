@@ -59,17 +59,20 @@ final class InsightsViewModel: ObservableObject, ConsoleDataSourceDelegate {
         }
     }
 
-    private let store: LoggerStore
-    private let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
+    weak var consoleViewModel: ConsoleViewModel?
 
+    private let store: LoggerStore
     private var dataSource: ConsoleDataSource?
 
-    init(store: LoggerStore, criteria: ConsoleSearchCriteriaViewModel) {
+    init(store: LoggerStore) {
         self.store = store
-        self.searchCriteriaViewModel = criteria
     }
 
-    // MARK: - Accessing Data
+    // MARK: Accessing Data
+
+    func focus(on entities: [NSManagedObject]) {
+        consoleViewModel?.focus(on: entities)
+    }
 
     func topSlowestRequests() -> [NetworkTaskEntity] {
         tasks(with: insights.duration.topSlowestRequests.map { $0.0 })
@@ -96,7 +99,9 @@ final class InsightsViewModel: ObservableObject, ConsoleDataSourceDelegate {
 
         dataSource = ConsoleDataSource(store: store, mode: .tasks)
         dataSource?.delegate = self
-        dataSource?.bind(searchCriteriaViewModel)
+        if let viewModel = consoleViewModel?.searchCriteriaViewModel {
+            dataSource?.bind(viewModel)
+        }
     }
 
     private var tasks: [NetworkTaskEntity] {
