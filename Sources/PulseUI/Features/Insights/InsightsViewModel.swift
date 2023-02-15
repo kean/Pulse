@@ -101,6 +101,8 @@ final class InsightsViewModel: ObservableObject, ConsoleDataSourceDelegate {
         dataSource?.delegate = self
         if let viewModel = consoleViewModel?.searchCriteriaViewModel {
             dataSource?.bind(viewModel)
+        } else {
+            dataSource?.refresh()
         }
     }
 

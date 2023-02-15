@@ -75,7 +75,7 @@ final class ConsoleViewModel: ObservableObject {
             if store.isArchive {
                 criteria.shared.dates.startDate = nil
             }
-            if context.focusedEntities != nil {
+            if context.focus != nil {
                 criteria.shared.dates.startDate = nil
             }
             return criteria
@@ -83,7 +83,7 @@ final class ConsoleViewModel: ObservableObject {
 
         self.index = LoggerStoreIndex(store: store)
         self.searchCriteriaViewModel = ConsoleSearchCriteriaViewModel(criteria: makeDefaultSearchCriteria(), index: index)
-        self.searchCriteriaViewModel.focusedEntities = context.focusedEntities
+        self.searchCriteriaViewModel.focus = context.focus
         self.listViewModel = ConsoleListViewModel(store: store, criteria: searchCriteriaViewModel)
 #if os(iOS) || os(macOS)
         self.insightsViewModel = InsightsViewModel(store: store)
@@ -125,7 +125,7 @@ final class ConsoleViewModel: ObservableObject {
         if entities is [NetworkTaskEntity], mode != .tasks {
             mode = .tasks
         }
-        searchCriteriaViewModel.focusedEntities = entities
+        searchCriteriaViewModel.focus = NSPredicate(format: "self IN %@", entities)
     }
 
     private func bind() {
@@ -133,14 +133,14 @@ final class ConsoleViewModel: ObservableObject {
 
         criteria.bind(listViewModel.$entities)
 
-        Publishers.CombineLatest3(criteria.$criteria, criteria.$focusedEntities, criteria.$isOnlyErrors).sink { [weak self] in
-            self?.refreshCountObservers(criteria: $0, focusedEntities: $1, isOnlyError: $2)
+        Publishers.CombineLatest3(criteria.$criteria, criteria.$focus, criteria.$isOnlyErrors).sink { [weak self] in
+            self?.refreshCountObservers(criteria: $0, focus: $1, isOnlyError: $2)
         }.store(in: &cancellables)
     }
 
-    private func refreshCountObservers(criteria: ConsoleSearchCriteria, focusedEntities: [NSManagedObject]?, isOnlyError: Bool) {
+    private func refreshCountObservers(criteria: ConsoleSearchCriteria, focus: NSPredicate?, isOnlyError: Bool) {
         func makePredicate(for mode: ConsoleMode) -> NSPredicate? {
-            ConsoleDataSource.makePredicate(mode: mode, criteria: criteria, focusedEntities: focusedEntities, isOnlyErrors: isOnlyError)
+            ConsoleDataSource.makePredicate(mode: mode, criteria: criteria, focus: focus, isOnlyErrors: isOnlyError)
         }
         logCountObserver.setPredicate(makePredicate(for: .logs))
         taskCountObserver.setPredicate(makePredicate(for: .tasks))
@@ -171,7 +171,7 @@ final class ConsoleViewModel: ObservableObject {
 
 struct ConsoleContext {
     var title: String?
-    var focusedEntities: [NSManagedObject]?
+    var focus: NSPredicate?
 }
 
 enum ConsoleMode: String {

@@ -45,7 +45,7 @@ public struct ConsoleView: View {
 
     @ViewBuilder
     private var trailingNavigationBarItems: some View {
-        if viewModel.context.focusedEntities == nil {
+        if viewModel.context.focus == nil {
             ConsoleShareButton(viewModel: viewModel)
             Button(action: { viewModel.router.isShowingFilters = true }) {
                 Image(systemName: "line.horizontal.3.decrease.circle")

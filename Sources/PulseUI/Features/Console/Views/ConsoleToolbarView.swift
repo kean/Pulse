@@ -19,8 +19,8 @@ struct ConsoleToolbarView: View {
             if viewModel.isNetwork {
                 ConsoleToolbarTitle(viewModel: viewModel)
             } else {
-                if let focusedEntities = viewModel.context.focusedEntities {
-                    ConsoleModeButton(title: viewModel.mode == .tasks ? "Tasks" : "Logs", details: "\(focusedEntities.count)", isSelected: false) {}
+                if viewModel.context.focus != nil {
+                    ConsoleModeButton(title: viewModel.mode == .tasks ? "Focused Tasks" : "Focused Logs", isSelected: false) {}
                 } else {
                     ConsoleModePicker(viewModel: viewModel)
                 }
@@ -46,8 +46,8 @@ struct ConsoleToolbarView: View {
 
     var body: some View {
         HStack {
-            if let entities = searchCriteriaViewModel.focusedEntities {
-                makeFocusedView(entities: entities)
+            if searchCriteriaViewModel.focus != nil {
+                makeFocusedView()
             } else {
                 ConsoleModePicker(viewModel: viewModel)
             }
@@ -59,12 +59,12 @@ struct ConsoleToolbarView: View {
     }
 
     @ViewBuilder
-    private func makeFocusedView(entities: [NSManagedObject]) -> some View {
-        Text("\(entities.count) Focused")
+    private func makeFocusedView() -> some View {
+        Text("Focused Logs")
             .foregroundColor(.secondary)
             .font(.subheadline.weight(.medium))
 
-        Button(action: { searchCriteriaViewModel.focusedEntities = nil }) {
+        Button(action: { searchCriteriaViewModel.focus = nil }) {
             Image(systemName: "xmark")
         }
         .foregroundColor(.secondary)

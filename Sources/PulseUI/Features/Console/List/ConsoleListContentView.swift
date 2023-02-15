@@ -156,7 +156,7 @@ private struct LazyConsoleView: View {
     let mode: ConsoleMode
 
     var body: some View {
-        ConsoleView(viewModel: .init(store: store, context: .init(title: title, focusedEntities: entities), mode: mode))
+        ConsoleView(viewModel: .init(store: store, context: .init(title: title, focus: NSPredicate(format: "self IN %@", entities)), mode: mode))
             .navigationBarTitleDisplayMode(.inline)
     }
 }

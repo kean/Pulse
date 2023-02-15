@@ -22,7 +22,9 @@ final class ConsoleListViewModelTests: ConsoleTestCase {
     func setUp(store: LoggerStore, focusedEntities: [NSManagedObject]? = nil) {
         self.store = store
         self.criteriaViewModel = ConsoleSearchCriteriaViewModel(criteria: .init(), index: .init(store: store))
-        self.criteriaViewModel.focusedEntities = focusedEntities
+        if let entities = focusedEntities {
+            self.criteriaViewModel.focus = NSPredicate(format: "self IN %@", entities)
+        }
         self.sut = ConsoleListViewModel(store: store, criteria: criteriaViewModel)
         self.sut.isViewVisible = true
     }

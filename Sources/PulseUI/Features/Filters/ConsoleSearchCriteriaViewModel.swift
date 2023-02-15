@@ -14,7 +14,7 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
     @Published var mode: ConsoleMode = .all
     @Published var criteria = ConsoleSearchCriteria()
     @Published var isOnlyErrors = false
-    @Published var focusedEntities: [NSManagedObject]?
+    @Published var focus: NSPredicate?
 
     let defaultCriteria: ConsoleSearchCriteria
 

@@ -27,7 +27,7 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
     }
 
     var isShowingFocusedEntities: Bool {
-        searchCriteriaViewModel.focusedEntities != nil
+        searchCriteriaViewModel.focus != nil
     }
 
     var isShowPreviousSessionButtonShown: Bool {

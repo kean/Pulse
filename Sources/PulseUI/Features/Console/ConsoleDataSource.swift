@@ -88,8 +88,8 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
 
     /// Binds the search criteria and immediately performs the initial fetch.
     func bind(_ criteria: ConsoleSearchCriteriaViewModel) {
-        Publishers.CombineLatest3(criteria.$criteria, criteria.$focusedEntities, criteria.$isOnlyErrors).sink { [weak self] in
-            self?.setPredicate(criteria: $0, focusedEntities: $1, isOnlyErrors: $2)
+        Publishers.CombineLatest3(criteria.$criteria, criteria.$focus, criteria.$isOnlyErrors).sink { [weak self] in
+            self?.setPredicate(criteria: $0, focus: $1, isOnlyErrors: $2)
             self?.refresh()
         }.store(in: &cancellables)
     }
@@ -119,23 +119,19 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
 
     // MARK: Predicate
 
-#warning("rename focusedEntities to focus and allow passing a custom predicate instead")
 #warning("retain order when showing focused entities")
 #warning("rework how slowest requests, errors, etc are displayed: update console search criteria")
-    private func setPredicate(criteria: ConsoleSearchCriteria, focusedEntities: [NSManagedObject]?, isOnlyErrors: Bool) {
-        let predicate = ConsoleDataSource.makePredicate(mode: mode, criteria: criteria, focusedEntities: focusedEntities, isOnlyErrors: isOnlyErrors)
+    private func setPredicate(criteria: ConsoleSearchCriteria, focus: NSPredicate?, isOnlyErrors: Bool) {
+        let predicate = ConsoleDataSource.makePredicate(mode: mode, criteria: criteria, focus: focus, isOnlyErrors: isOnlyErrors)
         controller.fetchRequest.predicate = predicate
     }
 
-    static func makePredicate(mode: ConsoleMode, criteria: ConsoleSearchCriteria, focusedEntities: [NSManagedObject]?, isOnlyErrors: Bool) -> NSPredicate? {
-        let mainPredicate = _makePredicate(mode, criteria, isOnlyErrors)
-        if let focusedEntities = focusedEntities {
-            return NSCompoundPredicate(andPredicateWithSubpredicates: [
-                mainPredicate,
-                NSPredicate(format: "self IN %@", focusedEntities)
-            ].compactMap { $0 })
-        } else {
-            return mainPredicate
+    static func makePredicate(mode: ConsoleMode, criteria: ConsoleSearchCriteria, focus: NSPredicate?, isOnlyErrors: Bool) -> NSPredicate? {
+        let predicates = [_makePredicate(mode, criteria, isOnlyErrors), focus].compactMap { $0 }
+        switch predicates.count {
+        case 0: return nil
+        case 1: return predicates[0]
+        default: return NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
         }
     }
 
