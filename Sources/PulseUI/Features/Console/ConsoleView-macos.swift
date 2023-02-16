@@ -46,6 +46,9 @@ public struct ConsoleView: View {
         }
     }
 
+#warning("fix an issue with toolbar not reloading when mode changes programatically")
+#warning("extract details view")
+
     @ViewBuilder
     private var detail: some View {
         if isVertical {

@@ -10,6 +10,7 @@ import Combine
 final class ConsoleRouter: ObservableObject {
 #if os(macOS)
     @Published var selection: ConsoleSelectedItem?
+    @Published var focus: ConsoleViewModel?
 #endif
     @Published var shareItems: ShareItems?
     @Published var isShowingFilters = false

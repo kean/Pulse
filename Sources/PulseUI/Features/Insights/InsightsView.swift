@@ -150,12 +150,10 @@ struct InsightsView: View {
 #if os(iOS)
 struct FocusedListView: View {
     let title: String
-    @ObservedObject var viewModel: ConsoleListViewModel
+    let viewModel: ConsoleViewModel
 
     var body: some View {
-        ConsolePlainList(viewModel.entities)
-            .onAppear { viewModel.isViewVisible = true }
-            .onDisappear { viewModel.isViewVisible = false }
+        ConsolePlainList(viewModel: viewModel.listViewModel)
             .inlineNavigationTitle(title)
     }
 }

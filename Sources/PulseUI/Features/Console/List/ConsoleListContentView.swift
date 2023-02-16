@@ -52,7 +52,7 @@ struct ConsoleListContentView: View {
     private var pinsView: some View {
         let prefix = Array(viewModel.pins.prefix(3))
         PlainListExpandableSectionHeader(title: "Pins", count: viewModel.pins.count, destination: {
-            ConsolePlainList(viewModel.pins)
+            ConsoleStaticList(entities: viewModel.pins)
                 .inlineNavigationTitle("Pins")
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
@@ -119,20 +119,6 @@ struct ConsoleListContentView: View {
     }
 }
 
-struct ConsolePlainList: View {
-    let entities: [NSManagedObject]
-
-    init(_ entities: [NSManagedObject]) {
-        self.entities = entities
-    }
-
-    public var body: some View {
-        List {
-            ForEach(entities, id: \.objectID, content: ConsoleEntityCell.init)
-        }.listStyle(.plain)
-    }
-}
-
 private struct PinCellViewModel: Hashable, Identifiable {
     let object: NSManagedObject
     var id: PinCellId
@@ -149,6 +135,29 @@ private struct PinCellId: Hashable {
 }
 
 #if os(iOS)
+struct ConsolePlainList: View {
+    @ObservedObject var viewModel: ConsoleListViewModel
+
+    var body: some View {
+        List {
+            ForEach(viewModel.entities, id: \.objectID, content: ConsoleEntityCell.init)
+        }
+        .onAppear { viewModel.isViewVisible = true }
+        .onDisappear { viewModel.isViewVisible = false }
+        .listStyle(.plain)
+    }
+}
+
+struct ConsoleStaticList: View {
+    let entities: [NSManagedObject]
+
+    var body: some View {
+        List {
+            ForEach(entities, id: \.objectID, content: ConsoleEntityCell.init)
+        }
+    }
+}
+
 private struct LazyConsoleView: View {
     let title: String
     let entities: [NSManagedObject]

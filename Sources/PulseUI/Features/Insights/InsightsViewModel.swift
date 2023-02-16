@@ -71,32 +71,31 @@ final class InsightsViewModel: ObservableObject, ConsoleDataSourceDelegate {
     // MARK: Focused Views
 
 #if os(iOS)
-    func makeSlowestRequestsViewModel() -> ConsoleListViewModel {
-        makeDestinationListViewModel { list, _ in
-            list.options.taskSortBy = .duration
+    func makeSlowestRequestsViewModel() -> ConsoleViewModel {
+        makeDestinationListViewModel {
+            $0.listViewModel.options.taskSortBy = .duration
         }
     }
 
-    func makeRequestsWithDedirectsViewModel() -> ConsoleListViewModel {
-        makeDestinationListViewModel { _, criteria in
-            criteria.criteria.network.networking.isRedirect = true
+    func makeRequestsWithDedirectsViewModel() -> ConsoleViewModel {
+        makeDestinationListViewModel {
+            $0.searchCriteriaViewModel.criteria.network.networking.isRedirect = true
         }
     }
 
-    func makeFailedRequestsViewModel() -> ConsoleListViewModel {
-        makeDestinationListViewModel { _, criteria in
-            criteria.isOnlyErrors = true
+    func makeFailedRequestsViewModel() -> ConsoleViewModel {
+        makeDestinationListViewModel {
+            $0.searchCriteriaViewModel.isOnlyErrors = true
         }
     }
 
-    private func makeDestinationListViewModel(_ configure: (ConsoleListViewModel, ConsoleSearchCriteriaViewModel) -> Void) -> ConsoleListViewModel {
-        guard let consoleViewModel = consoleViewModel else { fatalError() }
-        let criteriaViewModel = ConsoleSearchCriteriaViewModel(criteria: consoleViewModel.searchCriteriaViewModel.criteria, index: consoleViewModel.index)
-        let listViewModel = ConsoleListViewModel(store: consoleViewModel.store, criteria: criteriaViewModel)
-        listViewModel.mode = .tasks
-        criteriaViewModel.mode = .tasks
-        configure(listViewModel, criteriaViewModel)
-        return listViewModel
+    private func makeDestinationListViewModel(_ configure: (ConsoleViewModel) -> Void) -> ConsoleViewModel {
+        guard let sourceViewModel = consoleViewModel else { fatalError() }
+        let viewModel = ConsoleViewModel(store: sourceViewModel.store)
+        viewModel.mode = .tasks
+#warning("pass criteria on macOS?")
+        configure(viewModel)
+        return viewModel
     }
 #else
 #warning("figure out how to remove focus")
