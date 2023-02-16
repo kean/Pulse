@@ -70,10 +70,7 @@ final class InsightsViewModel: ObservableObject, ConsoleDataSourceDelegate {
 
     // MARK: Focused Views
 
-    func focus(on entities: [NSManagedObject]) {
-        consoleViewModel?.focus(on: entities)
-    }
-
+#if os(iOS)
     func makeSlowestRequestsViewModel() -> ConsoleListViewModel {
         makeDestinationListViewModel { list, _ in
             list.options.taskSortBy = .duration
@@ -101,6 +98,13 @@ final class InsightsViewModel: ObservableObject, ConsoleDataSourceDelegate {
         configure(listViewModel, criteriaViewModel)
         return listViewModel
     }
+#else
+#warning("figure out how to remove focus")
+    func focusOnSlowestRequests() {
+        consoleViewModel?.mode = .tasks
+        consoleViewModel?.listViewModel.options.taskSortBy = .duration
+    }
+#endif
 
     // MARK: DataSource
 

@@ -121,13 +121,6 @@ final class ConsoleViewModel: ObservableObject {
         }
     }
 
-    func focus(on entities: [NSManagedObject]) {
-        if entities is [NetworkTaskEntity], mode != .tasks {
-            mode = .tasks
-        }
-        searchCriteriaViewModel.focus = NSPredicate(format: "self IN %@", entities)
-    }
-
     private func bind() {
         let criteria = searchCriteriaViewModel
 

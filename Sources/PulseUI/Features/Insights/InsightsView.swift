@@ -55,9 +55,7 @@ struct InsightsView: View {
                 Text("Show Slowest Requests")
             }
 #else
-            Button(action: {
-                viewModel.focus(on: viewModel.topSlowestRequests())
-            }) {
+            Button(action: { viewModel.focusOnSlowestRequests() }) {
                 Text("Show Slowest Requests")
             }
 #endif
