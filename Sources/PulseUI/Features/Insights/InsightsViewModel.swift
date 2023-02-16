@@ -68,14 +68,20 @@ final class InsightsViewModel: ObservableObject, ConsoleDataSourceDelegate {
         self.store = store
     }
 
-    // MARK: Accessing Data
+    // MARK: Focused Views
 
     func focus(on entities: [NSManagedObject]) {
         consoleViewModel?.focus(on: entities)
     }
 
-    func topSlowestRequests() -> [NetworkTaskEntity] {
-        tasks(with: insights.duration.topSlowestRequests.map { $0.0 })
+    func makeSlowestRequestsViewModel() -> ConsoleListViewModel {
+        guard let consoleViewModel = consoleViewModel else { fatalError() }
+        let criteria = ConsoleSearchCriteriaViewModel(criteria: consoleViewModel.searchCriteriaViewModel.criteria, index: consoleViewModel.index)
+        let listViewModel = ConsoleListViewModel(store: consoleViewModel.store, criteria: criteria)
+        listViewModel.mode = .tasks
+        criteria.mode = .tasks
+        listViewModel.options.taskSortBy = .duration
+        return listViewModel
     }
 
     func requestsWithRedirects() -> [NetworkTaskEntity] {
@@ -99,11 +105,18 @@ final class InsightsViewModel: ObservableObject, ConsoleDataSourceDelegate {
 
         dataSource = ConsoleDataSource(store: store, mode: .tasks)
         dataSource?.delegate = self
+        dataSource?.refresh()
+
+#if os(iOS)
+        dataSource?.setPredicate(criteria: ConsoleSearchCriteria(), focus: nil, isOnlyErrors: false)
+        dataSource?.refresh()
+#else
         if let viewModel = consoleViewModel?.searchCriteriaViewModel {
             dataSource?.bind(viewModel)
         } else {
             dataSource?.refresh()
         }
+#endif
     }
 
     private var tasks: [NetworkTaskEntity] {

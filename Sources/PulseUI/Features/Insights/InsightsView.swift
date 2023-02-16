@@ -47,12 +47,11 @@ struct InsightsView: View {
             InfoRow(title: "Median Duration", details: viewModel.medianDuration)
             InfoRow(title: "Duration Range", details: viewModel.durationRange)
             durationChart
-#warning("open a console ordered by duration")
 #warning("on macos, switch to list mode?")
 #if os(iOS)
-            NavigationLink(destination: TopSlowestRequestsView(viewModel: viewModel)) {
+            NavigationLink(destination: FocusedListView(title: "Slowest Requests", viewModel: viewModel.makeSlowestRequestsViewModel())) {
                 Text("Show Slowest Requests")
-            }.disabled(insights.duration.topSlowestRequests.isEmpty)
+            }
 #else
             Button(action: {
                 viewModel.focus(on: viewModel.topSlowestRequests())
@@ -115,7 +114,7 @@ struct InsightsView: View {
 #if os(iOS)
             NavigationLink(destination: RequestsWithRedirectsView(viewModel: viewModel)) {
                 Text("Show Requests with Redirects")
-            }.disabled(insights.duration.topSlowestRequests.isEmpty)
+            }
 #endif
         }
     }
@@ -135,7 +134,7 @@ struct InsightsView: View {
                     Text("\(insights.failures.count)")
                         .foregroundColor(.secondary)
                 }
-            }.disabled(insights.duration.topSlowestRequests.isEmpty)
+            }
 #else
             HStack {
                 Text("Failed Requests")
@@ -149,12 +148,26 @@ struct InsightsView: View {
 }
 
 #if os(iOS)
+struct FocusedListView: View {
+    let title: String
+    @ObservedObject var viewModel: ConsoleListViewModel
+
+    var body: some View {
+        ConsolePlainList(viewModel.entities)
+            .onAppear { viewModel.isViewVisible = true }
+            .onDisappear { viewModel.isViewVisible = false }
+            .inlineNavigationTitle(title)
+    }
+}
+
+#warning("remove")
 private struct TopSlowestRequestsView: View {
     let viewModel: InsightsViewModel
 
     var body: some View {
-        ConsolePlainList(viewModel.topSlowestRequests())
-            .inlineNavigationTitle("Slowest Requests")
+        fatalError()
+//        ConsolePlainList(viewModel.topSlowestRequests())
+//            .inlineNavigationTitle("Slowest Requests")
     }
 }
 

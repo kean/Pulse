@@ -49,9 +49,6 @@ struct NetworkLoggerInsights {
         /// Sorted list of all recorded durations.
         var values: [TimeInterval] = []
 
-        /// Contains top slowest requests.
-        var topSlowestRequests: [(NSManagedObjectID, TimeInterval)] = []
-
         mutating func insert(duration: TimeInterval, taskId: NSManagedObjectID) {
             values.insert(duration, at: insertionIndex(for: duration))
             median = values[values.count / 2]
@@ -64,12 +61,6 @@ struct NetworkLoggerInsights {
                 self.minimum = min(minimum, duration)
             } else {
                 self.minimum = duration
-            }
-
-            let index = topSlowestRequests.insertionIndex(for: (taskId, duration), by: { $0.1 > $1.1 })
-            topSlowestRequests.insert((taskId, duration), at: index)
-            while topSlowestRequests.count > 10 {
-                topSlowestRequests.removeLast()
             }
         }
 
@@ -104,22 +95,6 @@ struct NetworkLoggerInsights {
         var taskIds: [NSManagedObjectID] = []
 
         init() {}
-    }
-}
-
-private extension Array {
-    func insertionIndex(for element: Element, by isOrderedBefore: (Element, Element) -> Bool) -> Int {
-        var lhs = 0
-        var rhs = count
-        while rhs > lhs {
-            let mid = lhs + (rhs - lhs) / 2
-            if isOrderedBefore(self[mid], element) {
-                lhs = mid + 1
-            } else {
-                rhs = mid
-            }
-        }
-        return lhs
     }
 }
 

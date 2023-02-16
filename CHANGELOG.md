@@ -1,7 +1,9 @@
 # Pulse 3.x
 
 - When you focus on one of the groups, it now preserves the order of the logs
-- Add an option to see slowest request, redirects, failures from the insights view
+- On iOS, Insights screen now shows all requests for the current session
+- When you open slowest requests, redirects, and failures from the Insights screen, the list now updates automatically as new requests are added
+- Add an option to see slowest request, redirects, failures from the Insights view on macOS
 
 ## Pulse 3.5.0
 
