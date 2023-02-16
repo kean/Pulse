@@ -1,5 +1,6 @@
 # Pulse 3.x
 
+- When you focus on one of the groups, it now preserves the order of the logs
 - Add an option to see slowest request, redirects, failures from the insights view
 
 ## Pulse 3.5.0

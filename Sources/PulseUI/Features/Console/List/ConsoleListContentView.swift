@@ -44,7 +44,7 @@ struct ConsoleListContentView: View {
     }
 
     private func makeDestination(for title: String, objects: [NSManagedObject]) -> some View {
-        LazyConsoleView(title: title, entities: objects, store: viewModel.store, mode: viewModel.mode)
+        LazyConsoleView(title: title, entities: objects, source: viewModel)
     }
 
     @available(iOS 15, tvOS 15, *)
@@ -152,12 +152,23 @@ private struct PinCellId: Hashable {
 private struct LazyConsoleView: View {
     let title: String
     let entities: [NSManagedObject]
-    let store: LoggerStore
-    let mode: ConsoleMode
+    let source: ConsoleListViewModel
 
     var body: some View {
-        ConsoleView(viewModel: .init(store: store, context: .init(title: title, focus: NSPredicate(format: "self IN %@", entities)), mode: mode))
+        ConsoleView(viewModel: makeViewModel())
             .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private func makeViewModel() -> ConsoleViewModel {
+        let viewModel = ConsoleViewModel(
+            store: source.store,
+            context: .init(title: title, focus: NSPredicate(format: "self IN %@", entities)),
+            mode: source.mode
+        )
+        viewModel.listViewModel.options.order = source.options.order
+        viewModel.listViewModel.options.messageSortBy = source.options.messageSortBy
+        viewModel.listViewModel.options.taskSortBy = source.options.taskSortBy
+        return viewModel
     }
 }
 #endif
