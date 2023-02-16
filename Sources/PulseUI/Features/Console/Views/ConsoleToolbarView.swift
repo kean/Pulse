@@ -10,7 +10,6 @@ import CoreData
 import Combine
 
 #if os(iOS)
-#warning("use the same ConsoleModePicker behavior ")
 struct ConsoleToolbarView: View {
     let viewModel: ConsoleViewModel
 
@@ -106,7 +105,6 @@ struct ConsoleModePicker: View {
     }
 }
 
-#warning("remove")
 private struct ConsoleToolbarTitle: View {
     let viewModel: ConsoleViewModel
 

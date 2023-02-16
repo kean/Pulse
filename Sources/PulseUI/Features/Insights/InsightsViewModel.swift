@@ -93,15 +93,8 @@ final class InsightsViewModel: ObservableObject, ConsoleDataSourceDelegate {
         guard let sourceViewModel = consoleViewModel else { fatalError() }
         let viewModel = ConsoleViewModel(store: sourceViewModel.store)
         viewModel.mode = .tasks
-#warning("pass criteria on macOS?")
         configure(viewModel)
         return viewModel
-    }
-#else
-#warning("figure out how to remove focus")
-    func focusOnSlowestRequests() {
-        consoleViewModel?.mode = .tasks
-        consoleViewModel?.listViewModel.options.taskSortBy = .duration
     }
 #endif
 

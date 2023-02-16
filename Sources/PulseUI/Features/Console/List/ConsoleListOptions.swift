@@ -8,7 +8,6 @@ import Pulse
 struct ConsoleListOptions {
     var messageSortBy: MessageSortBy = .dateCreated
     var taskSortBy: TaskSortBy = .dateCreated
-#warning("this is incorrect as it also affects duration and other reqeusts")
 #if os(macOS)
     var order: Ordering = .ascending
 #else

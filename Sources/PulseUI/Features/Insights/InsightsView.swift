@@ -49,13 +49,8 @@ struct InsightsView: View {
             InfoRow(title: "Median Duration", details: viewModel.medianDuration)
             InfoRow(title: "Duration Range", details: viewModel.durationRange)
             durationChart
-#warning("on macos, switch to list mode?")
 #if os(iOS)
             NavigationLink(destination: FocusedListView(title: "Slowest Requests", viewModel: viewModel.makeSlowestRequestsViewModel())) {
-                Text("Show Slowest Requests")
-            }
-#else
-            Button(action: { viewModel.focusOnSlowestRequests() }) {
                 Text("Show Slowest Requests")
             }
 #endif
