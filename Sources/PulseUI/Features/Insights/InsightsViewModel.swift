@@ -75,27 +75,31 @@ final class InsightsViewModel: ObservableObject, ConsoleDataSourceDelegate {
     }
 
     func makeSlowestRequestsViewModel() -> ConsoleListViewModel {
+        makeDestinationListViewModel { list, _ in
+            list.options.taskSortBy = .duration
+        }
+    }
+
+    func makeRequestsWithDedirectsViewModel() -> ConsoleListViewModel {
+        makeDestinationListViewModel { _, criteria in
+            criteria.criteria.network.networking.isRedirect = true
+        }
+    }
+
+    func makeFailedRequestsViewModel() -> ConsoleListViewModel {
+        makeDestinationListViewModel { _, criteria in
+            criteria.isOnlyErrors = true
+        }
+    }
+
+    private func makeDestinationListViewModel(_ configure: (ConsoleListViewModel, ConsoleSearchCriteriaViewModel) -> Void) -> ConsoleListViewModel {
         guard let consoleViewModel = consoleViewModel else { fatalError() }
-        let criteria = ConsoleSearchCriteriaViewModel(criteria: consoleViewModel.searchCriteriaViewModel.criteria, index: consoleViewModel.index)
-        let listViewModel = ConsoleListViewModel(store: consoleViewModel.store, criteria: criteria)
+        let criteriaViewModel = ConsoleSearchCriteriaViewModel(criteria: consoleViewModel.searchCriteriaViewModel.criteria, index: consoleViewModel.index)
+        let listViewModel = ConsoleListViewModel(store: consoleViewModel.store, criteria: criteriaViewModel)
         listViewModel.mode = .tasks
-        criteria.mode = .tasks
-        listViewModel.options.taskSortBy = .duration
+        criteriaViewModel.mode = .tasks
+        configure(listViewModel, criteriaViewModel)
         return listViewModel
-    }
-
-    func requestsWithRedirects() -> [NetworkTaskEntity] {
-        tasks(with: Array(insights.redirects.taskIds))
-            .sorted(by: { $0.createdAt > $1.createdAt })
-    }
-
-    func failedRequests() -> [NetworkTaskEntity] {
-        tasks(with: Array(insights.failures.taskIds))
-            .sorted(by: { $0.createdAt > $1.createdAt })
-    }
-
-    private func tasks(with ids: [NSManagedObjectID]) -> [NetworkTaskEntity] {
-        ids.compactMap { (try? store.viewContext.existingObject(with: $0)) as? NetworkTaskEntity }
     }
 
     // MARK: DataSource

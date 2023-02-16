@@ -37,7 +37,9 @@ struct InsightsView: View {
         if insights.failures.count > 0 {
             failuresSection
         }
-        redirectsSection
+        if insights.redirects.count > 0 {
+            redirectsSection
+        }
     }
 
     // MARK: - Duration
@@ -112,7 +114,7 @@ struct InsightsView: View {
             InfoRow(title: "Redirect Count", details: "\(insights.redirects.count)")
             InfoRow(title: "Total Time Lost", details: DurationFormatter.string(from: insights.redirects.timeLost, isPrecise: false))
 #if os(iOS)
-            NavigationLink(destination: RequestsWithRedirectsView(viewModel: viewModel)) {
+            NavigationLink(destination: FocusedListView(title: "Redirects", viewModel: viewModel.makeRequestsWithDedirectsViewModel())) {
                 Text("Show Requests with Redirects")
             }
 #endif
@@ -127,7 +129,7 @@ struct InsightsView: View {
             SectionHeaderView(systemImage: "xmark.octagon.fill", title: "Failures")
         }) {
 #if os(iOS)
-            NavigationLink(destination: FailingRequestsListView(viewModel: viewModel)) {
+            NavigationLink(destination: FocusedListView(title: "Failed Requests", viewModel: viewModel.makeFailedRequestsViewModel())) {
                 HStack {
                     Text("Failed Requests")
                     Spacer()
@@ -157,35 +159,6 @@ struct FocusedListView: View {
             .onAppear { viewModel.isViewVisible = true }
             .onDisappear { viewModel.isViewVisible = false }
             .inlineNavigationTitle(title)
-    }
-}
-
-#warning("remove")
-private struct TopSlowestRequestsView: View {
-    let viewModel: InsightsViewModel
-
-    var body: some View {
-        fatalError()
-//        ConsolePlainList(viewModel.topSlowestRequests())
-//            .inlineNavigationTitle("Slowest Requests")
-    }
-}
-
-private struct RequestsWithRedirectsView: View {
-    let viewModel: InsightsViewModel
-
-    var body: some View {
-        ConsolePlainList(viewModel.requestsWithRedirects())
-            .inlineNavigationTitle("Redirects")
-    }
-}
-
-private struct FailingRequestsListView: View {
-    let viewModel: InsightsViewModel
-
-    var body: some View {
-        ConsolePlainList(viewModel.failedRequests())
-            .inlineNavigationTitle("Failed Requests")
     }
 }
 #endif

@@ -119,8 +119,6 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
 
     // MARK: Predicate
 
-#warning("retain order when showing focused entities")
-#warning("rework how slowest requests, errors, etc are displayed: update console search criteria")
     func setPredicate(criteria: ConsoleSearchCriteria, focus: NSPredicate?, isOnlyErrors: Bool) {
         let predicate = ConsoleDataSource.makePredicate(mode: mode, criteria: criteria, focus: focus, isOnlyErrors: isOnlyErrors)
         controller.fetchRequest.predicate = predicate

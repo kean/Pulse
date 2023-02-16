@@ -41,8 +41,6 @@ final class NetworkLoggerInsightsTests: ConsoleTestCase {
         XCTAssertEqual(duration.median!, 0.52691, accuracy: 0.01)
         XCTAssertEqual(duration.maximum!, 4.46537, accuracy: 0.01)
         XCTAssertEqual(duration.minimum!, 0.2269, accuracy: 0.01)
-        let durations = duration.topSlowestRequests.map { $0.1 }
-        XCTAssertEqual(durations.sorted(by: { $0 > $1 }), durations)
     }
 
     func testRedirects() throws {

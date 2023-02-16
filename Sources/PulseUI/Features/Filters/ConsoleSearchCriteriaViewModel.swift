@@ -7,7 +7,6 @@ import Pulse
 import Combine
 import SwiftUI
 
-#warning("focusedEntities should be ordered")
 final class ConsoleSearchCriteriaViewModel: ObservableObject {
     var isButtonResetEnabled: Bool { !isCriteriaDefault }
 
