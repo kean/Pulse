@@ -37,8 +37,9 @@ extension NetworkInspectorView {
                 NetworkInspectorTransferInfoView(viewModel: .init(task: task))
             } else if task.state == .pending {
                 SpinnerView(viewModel: ProgressViewModel(task: task))
-            } else if let status = NetworkRequestStatusSectionViewModel(task: task).status {
+            } else {
                 // Fallback in case metrics are disabled
+                let status = NetworkRequestStatusSectionViewModel(task: task).status 
                 Image(systemName: status.imageName)
                     .foregroundColor(status.tintColor)
                     .font(.system(size: 64))
