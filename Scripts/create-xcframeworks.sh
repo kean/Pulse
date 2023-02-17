@@ -53,4 +53,4 @@ zip -r -X pulse-xcframeworks-all-platforms.zip *.xcframework
 rm -rf *.xcframework
 cd -
 
-mv "$ROOT/*.zip" ./
+mv $ROOT/*.zip ./
