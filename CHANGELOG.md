@@ -1,5 +1,11 @@
 # Pulse 3.x
 
+## Pulse 3.5.2
+
+*Feb 17, 2023*
+
+- Add Swift 5.8 support – [#164](https://github.com/kean/Pulse/pull/164) by [@thedavidharris](https://github.com/thedavidharris)
+
 ## Pulse 3.5.1
 
 *Feb 16, 2023*
