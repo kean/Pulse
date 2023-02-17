@@ -45,7 +45,7 @@ final class ConsoleTextViewModelTests: ConsoleTestCase {
         reset()
 
         // THEN
-        XCTAssertNotNil(string.wholeMatch(of: /(.*?) · Test-Label · test-text\n/), string)
+        XCTAssertNotNil(string.wholeMatch(of: #/(.*?) · Test-Label · test-text\n/#), string)
     }
 
     func testInsertedMessageRendered() {
@@ -57,7 +57,7 @@ final class ConsoleTextViewModelTests: ConsoleTestCase {
 
         // THEN
         wait(for: [expectation], timeout: 2)
-        XCTAssertNotNil(string.wholeMatch(of: /(.*?) · Test-Label · test-text\n/), string)
+        XCTAssertNotNil(string.wholeMatch(of: #/(.*?) · Test-Label · test-text\n/#), string)
     }
 
     func testInsertedPendingTaskRendered() {
@@ -75,7 +75,7 @@ final class ConsoleTextViewModelTests: ConsoleTestCase {
 
         // THEN
         wait(for: [textInsertedExpectation], timeout: 2)
-        XCTAssertNotNil(string.wholeMatch(of: /(.*?) · Pending · GET https:\/\/example.com\/api\n/), string)
+        XCTAssertNotNil(string.wholeMatch(of: #/(.*?) · Pending · GET https:\/\/example.com\/api\n/#), string)
 
         // GIVEN
         let textUpdatedEpectation = self.expectation(description: "textUpdatedxpectation")
@@ -87,7 +87,7 @@ final class ConsoleTextViewModelTests: ConsoleTestCase {
 
         // THEN
         wait(for: [textUpdatedEpectation], timeout: 2)
-        XCTAssertNotNil(string.wholeMatch(of: /(.*?) · 200 OK · GET https:\/\/example.com\/api\n/), string)
+        XCTAssertNotNil(string.wholeMatch(of: #/(.*?) · 200 OK · GET https:\/\/example.com\/api\n/#), string)
     }
 
     func testDetailsShown() throws {
