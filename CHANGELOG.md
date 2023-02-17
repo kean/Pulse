@@ -4,8 +4,8 @@
 
 *Feb 16, 2023*
 
-- Reduce xcframeworks binary size. For example, Pulse binary size was reduced from 2.1 MB to 823 KB.
-- Reduce PulseUI .swiftmodule size form 4.4 MB to 260 KB.
+- Reduce xcframeworks binary size. Pulse 2.1 MB → 823 KB. PulseUI 7.6 MB → 3.9 MB.
+- Reduce PulseUI .swiftmodule size: 4.4 MB → 260 KB.
 - When you focus on one of the groups, it now preserves the order of the logs
 - On iOS, Insights screen now shows all requests for the current session
 - When you open slowest requests, redirects, and failures from the Insights screen, the list now updates automatically as new requests are added
