@@ -92,8 +92,8 @@ final class ConsoleSearchOperation {
 
     private func _search(_ message: LoggerMessageEntity, parameters: ConsoleSearchParameters) -> [ConsoleSearchOccurrence]? {
         var occurrences: [ConsoleSearchOccurrence] = []
-        occurrences += PulseUI.search(message.text as NSString, parameters, .message)
-        occurrences += PulseUI.search(message.rawMetadata as NSString, parameters, .metadata)
+        occurrences += PulseUI.search(message.text, parameters, .message)
+        occurrences += PulseUI.search(message.rawMetadata, parameters, .metadata)
         return occurrences.isEmpty ? nil : occurrences
     }
 
@@ -129,16 +129,16 @@ final class ConsoleSearchOperation {
                 if var components = URLComponents(string: task.url ?? "") {
                     components.queryItems = nil
                     if let url = components.url?.absoluteString {
-                        occurrences += PulseUI.search(url as NSString, parameters, scope)
+                        occurrences += PulseUI.search(url, parameters, scope)
                     }
                 }
             case .originalRequestHeaders:
                 if let headers = task.originalRequest?.httpHeaders {
-                    occurrences += PulseUI.search(headers as NSString, parameters, scope)
+                    occurrences += PulseUI.search(headers, parameters, scope)
                 }
             case .currentRequestHeaders:
                 if let headers = task.currentRequest?.httpHeaders {
-                    occurrences += PulseUI.search(headers as NSString, parameters, scope)
+                    occurrences += PulseUI.search(headers, parameters, scope)
                 }
             case .requestBody:
                 if let string = task.requestBody.flatMap(service.getBodyString) {
@@ -146,7 +146,7 @@ final class ConsoleSearchOperation {
                 }
             case .responseHeaders:
                 if let headers = task.response?.httpHeaders {
-                    occurrences += PulseUI.search(headers as NSString, parameters, scope)
+                    occurrences += PulseUI.search(headers, parameters, scope)
                 }
             case .responseBody:
                 if let string = task.responseBody.flatMap(service.getBodyString) {
@@ -160,7 +160,7 @@ final class ConsoleSearchOperation {
     }
 
     private func search(_ data: Data, _ parameters: ConsoleSearchParameters, _ scope: ConsoleSearchScope) -> [ConsoleSearchOccurrence] {
-        guard let content = NSString(data: data, encoding: NSUTF8StringEncoding) else {
+        guard let content = String(data: data, encoding: .utf8) else {
             return []
         }
         return PulseUI.search(content, parameters, scope)
@@ -183,29 +183,22 @@ final class ConsoleSearchOperation {
 
 @available(iOS 15, macOS 13, *)
 private func search(
-    _ content: NSString,
+    _ content: String,
     _ parameters: ConsoleSearchParameters,
     _ scope: ConsoleSearchScope
 ) -> [ConsoleSearchOccurrence] {
     let matchAttributes = TextHelper().attributes(role: .body2, style: .monospaced)
     var matchedTerms: Set<ConsoleSearchTerm> = []
-
-    struct Match {
-        let line: NSString
-        let lineNumber: Int
-        let range: NSRange
-        let term: ConsoleSearchTerm
-    }
-
-    var allMatches: [(line: NSString, lineNumber: Int, range: NSRange, term: ConsoleSearchTerm)] = []
+    var allMatches: [ConsoleSearchMatch] = []
     var lineCount = 0
+#warning("TODO: use stop when too many matches")
     content.enumerateLines { line, stop in
         lineCount += 1
-        let line = line as NSString
         for term in parameters.terms {
             let matches = line.ranges(of: term.text, options: term.options)
             for range in matches {
-                allMatches.append((line, lineCount, range, term))
+                let match = ConsoleSearchMatch(line: line, lineNumber: lineCount, range: range, term: term)
+                allMatches.append(match)
             }
             if !matches.isEmpty {
                 matchedTerms.insert(term)
@@ -217,75 +210,70 @@ private func search(
         return [] // Has to match all
     }
 
-    var occurrences: [ConsoleSearchOccurrence] = []
-    var matchIndex = 0
-    for (line, lineNumber, range, term) in allMatches {
-        let lineRange = lineCount == 1 ? NSRange(location: 0, length: content.length) :  (line.getLineRange(range) ?? range) // Optimization for long lines
-
-        var prefixRange = NSRange(location: lineRange.location, length: range.location - lineRange.location)
-        var suffixRange = NSRange(location: range.upperBound, length: lineRange.upperBound - range.upperBound)
-
-
-        // Reduce context to a reasonable size
-        var needsPrefixEllipsis = false
-        if prefixRange.length > 30 {
-            let distance = prefixRange.length - 30
-            prefixRange.length = 30
-            prefixRange.location += distance
-            needsPrefixEllipsis = true
-        }
-        suffixRange.length = min(120, suffixRange.length)
-
-        // Trim whitespace and some punctuation characters from the end of the string
-        while prefixRange.location < range.location, shouldTrimCharacter(line.character(at: prefixRange.location)) {
-            prefixRange.location += 1
-            prefixRange.length -= 1
-        }
-        while (suffixRange.upperBound - 1) > range.location, shouldTrimCharacter(line.character(at: (suffixRange.upperBound - 1))) {
-            suffixRange.length -= 1
-        }
-
-        // Try to trim the prefix at the start of the word
-        while prefixRange.location > 0,
-              let character = Character(line.character(at: prefixRange.location)),
-              !character.isWhitespace,
-              prefixRange.length < 50 {
-            prefixRange.location -= 1
-            prefixRange.length += 1
-        }
-
-        let attributes = AttributeContainer(matchAttributes)
-        let prefix = AttributedString((needsPrefixEllipsis ? "…" : "") + line.substring(with: prefixRange), attributes: attributes)
-        var match = AttributedString(line.substring(with: range), attributes: attributes)
-        match.foregroundColor = .orange
-        let suffix = AttributedString(line.substring(with: suffixRange), attributes: attributes)
-        let preview = prefix + match + suffix
-
-        let occurrence = ConsoleSearchOccurrence(
+    return zip(allMatches.indices, allMatches).map { (index, match) in
+        ConsoleSearchOccurrence(
             scope: scope,
-            line: lineNumber,
-            range: range,
-            text: preview,
-            searchContext: .init(searchTerm: term, matchIndex: matchIndex)
+            line: match.lineNumber,
+            range: NSRange(location: 0, length: 1),
+            text: ConsoleSearchOperation.makePreview(for: match, attributes: matchAttributes),
+            searchContext: .init(searchTerm: match.term, matchIndex: index)
         )
-        occurrences.append(occurrence)
-
-        matchIndex += 1
     }
+}
 
-    return occurrences
+@available(iOS 15, macOS 13, *)
+extension ConsoleSearchOperation {
+#warning("move this to ViewModel?")
+    static func makePreview(for match: ConsoleSearchMatch, attributes customAttributes: [NSAttributedString.Key: Any] = [:]) -> AttributedString {
+
+        let prefixStartIndex = match.line.index(match.range.lowerBound, offsetBy: -50, limitedBy: match.line.startIndex) ?? match.line.startIndex
+        let prefixRange = prefixStartIndex..<match.range.lowerBound
+
+#warning("increase count?")
+        let suffixUpperBound = match.line.index(match.range.upperBound, offsetBy: 120, limitedBy: match.line.endIndex) ?? match.line.endIndex
+        let suffixRange = match.range.upperBound..<suffixUpperBound
+
+        func shouldTrim(_ character: Character) -> Bool {
+            character.isNewline || character.isWhitespace || character == ","
+        }
+
+        var prefix = match.line[prefixRange]
+        let isEllipsisNeeded = prefix.startIndex != match.line.startIndex
+        prefix.trimPrefix(while: shouldTrim)
+
+        var suffix = match.line[suffixRange]
+        suffix.trimSuffix(while: shouldTrim)
+
+        if isEllipsisNeeded {
+            prefix.insert("…", at: prefix.startIndex)
+        }
+
+        let attributes = AttributeContainer(customAttributes)
+        var middle = AttributedString(match.line[match.range], attributes: attributes)
+        middle.foregroundColor = .orange
+        return AttributedString(prefix, attributes: attributes) + middle + AttributedString(suffix, attributes: attributes)
+    }
+}
+
+#warning("TEMP")
+struct ConsoleSearchMatch {
+    let line: String
+    /// Starts with `1.
+    let lineNumber: Int
+    let range: Range<String.Index>
+    let term: ConsoleSearchTerm
 }
 
 @available(iOS 15, tvOS 15, *)
 final class ConsoleSearchService {
-    private let cachedBodies = Cache<NSManagedObjectID, NSString>(costLimit: 16_000_000, countLimit: 1000)
+    private let cachedBodies = Cache<NSManagedObjectID, String>(costLimit: 16_000_000, countLimit: 1000)
 
-    func getBodyString(for blob: LoggerBlobHandleEntity) -> NSString? {
+    func getBodyString(for blob: LoggerBlobHandleEntity) -> String? {
         if let string = cachedBodies.value(forKey: blob.objectID)  {
             return string
         }
         guard let data = blob.data,
-              let string = NSString(data: data, encoding: NSUTF8StringEncoding)
+              let string = String(data: data, encoding: .utf8)
         else {
             return nil
         }
@@ -294,13 +282,18 @@ final class ConsoleSearchService {
     }
 }
 
-private struct ConsoleSearchContext {
+private extension Substring {
+    mutating func trimPrefix(while closure: (Character) -> Bool) {
+        while let character = first, closure(character) {
+            removeFirst()
+        }
+    }
 
-}
-
-private func shouldTrimCharacter(_ character: unichar) -> Bool {
-    guard let character = Character(character) else { return true }
-    return character.isNewline || character.isWhitespace || character == ","
+    mutating func trimSuffix(while closure: (Character) -> Bool) {
+        while let character = last, closure(character) {
+            removeLast()
+        }
+    }
 }
 
 #endif

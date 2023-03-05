@@ -14,6 +14,7 @@ struct ConsoleSearchOccurrence: Identifiable, Equatable, Hashable {
     let id = ConsoleSearchOccurrenceId()
     let scope: ConsoleSearchScope
     let line: Int
+    #warning("fix range")
     let range: NSRange
     let text: AttributedString
     let searchContext: RichTextViewModel.SearchContext
