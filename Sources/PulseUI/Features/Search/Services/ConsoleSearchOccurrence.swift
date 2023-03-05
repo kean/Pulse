@@ -9,7 +9,7 @@ import Pulse
 import CoreData
 import Combine
 
-@available(iOS 15, macOS 13, *)
+@available(iOS 15, *)
 final class ConsoleSearchOccurrence: Identifiable, Equatable, Hashable {
     let id = ConsoleSearchOccurrenceId()
     let scope: ConsoleSearchScope
@@ -38,7 +38,7 @@ final class ConsoleSearchOccurrence: Identifiable, Equatable, Hashable {
 
 private let previewAttibutes = TextHelper().attributes(role: .body2, style: .monospaced)
 
-@available(iOS 15, macOS 13, *)
+@available(iOS 15, *)
 extension ConsoleSearchOccurrence {
     static func makePreview(for match: ConsoleSearchMatch, attributes customAttributes: [NSAttributedString.Key: Any] = [:]) -> AttributedString {
 
