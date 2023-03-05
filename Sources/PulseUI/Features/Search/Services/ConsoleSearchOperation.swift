@@ -92,8 +92,8 @@ final class ConsoleSearchOperation {
 
     private func _search(_ message: LoggerMessageEntity, parameters: ConsoleSearchParameters) -> [ConsoleSearchOccurrence]? {
         var occurrences: [ConsoleSearchOccurrence] = []
-        occurrences += PulseUI.search(message.text, parameters, .message)
-        occurrences += PulseUI.search(message.rawMetadata, parameters, .metadata)
+        occurrences += search(message.text, parameters, .message)
+        occurrences += search(message.rawMetadata, parameters, .metadata)
         return occurrences.isEmpty ? nil : occurrences
     }
 
@@ -129,28 +129,28 @@ final class ConsoleSearchOperation {
                 if var components = URLComponents(string: task.url ?? "") {
                     components.queryItems = nil
                     if let url = components.url?.absoluteString {
-                        occurrences += PulseUI.search(url, parameters, scope)
+                        occurrences += search(url, parameters, scope)
                     }
                 }
             case .originalRequestHeaders:
                 if let headers = task.originalRequest?.httpHeaders {
-                    occurrences += PulseUI.search(headers, parameters, scope)
+                    occurrences += search(headers, parameters, scope)
                 }
             case .currentRequestHeaders:
                 if let headers = task.currentRequest?.httpHeaders {
-                    occurrences += PulseUI.search(headers, parameters, scope)
+                    occurrences += search(headers, parameters, scope)
                 }
             case .requestBody:
                 if let string = task.requestBody.flatMap(service.getBodyString) {
-                    occurrences += PulseUI.search(string, parameters, scope)
+                    occurrences += search(string, parameters, scope)
                 }
             case .responseHeaders:
                 if let headers = task.response?.httpHeaders {
-                    occurrences += PulseUI.search(headers, parameters, scope)
+                    occurrences += search(headers, parameters, scope)
                 }
             case .responseBody:
                 if let string = task.responseBody.flatMap(service.getBodyString) {
-                    occurrences += PulseUI.search(string, parameters, scope)
+                    occurrences += search(string, parameters, scope)
                 }
             case .message, .metadata:
                 break // Applies only to LoggerMessageEntity
@@ -163,7 +163,36 @@ final class ConsoleSearchOperation {
         guard let content = String(data: data, encoding: .utf8) else {
             return []
         }
-        return PulseUI.search(content, parameters, scope)
+        return search(content, parameters, scope)
+    }
+
+    private func search(_ content: String, _ parameters: ConsoleSearchParameters, _ scope: ConsoleSearchScope) -> [ConsoleSearchOccurrence] {
+        var remainingMatchedTerms = Set(parameters.terms)
+        var matches: [ConsoleSearchMatch] = []
+        var lineCount = 0
+        content.enumerateLines { line, stop in
+            lineCount += 1
+            for term in parameters.terms {
+                for range in line.ranges(of: term.text, options: term.options) {
+                    let match = ConsoleSearchMatch(line: line, lineNumber: lineCount, range: range, term: term)
+                    matches.append(match)
+                }
+                if !matches.isEmpty, !remainingMatchedTerms.isEmpty {
+                    remainingMatchedTerms.remove(term)
+                }
+            }
+            if matches.count > ConsoleSearchMatch.limit, remainingMatchedTerms.isEmpty {
+                stop = true
+            }
+        }
+
+        guard remainingMatchedTerms.isEmpty else {
+            return [] // Has to match all
+        }
+
+        return zip(matches.indices, matches).map { (index, match) in
+            ConsoleSearchOccurrence(scope: scope, match: match, searchContext: .init(searchTerm: match.term, matchIndex: index))
+        }
     }
 
     // MARK: Cancellation
@@ -181,45 +210,14 @@ final class ConsoleSearchOperation {
     }
 }
 
-@available(iOS 15, macOS 13, *)
-private func search(
-    _ content: String,
-    _ parameters: ConsoleSearchParameters,
-    _ scope: ConsoleSearchScope
-) -> [ConsoleSearchOccurrence] {
-    var matchedTerms: Set<ConsoleSearchTerm> = []
-    var allMatches: [ConsoleSearchMatch] = []
-    var lineCount = 0
-#warning("TODO: use stop when too many matches")
-    content.enumerateLines { line, stop in
-        lineCount += 1
-        for term in parameters.terms {
-            let matches = line.ranges(of: term.text, options: term.options)
-            for range in matches {
-                let match = ConsoleSearchMatch(line: line, lineNumber: lineCount, range: range, term: term)
-                allMatches.append(match)
-            }
-            if !matches.isEmpty {
-                matchedTerms.insert(term)
-            }
-        }
-    }
-
-    guard matchedTerms.count == Set(parameters.terms).count else {
-        return [] // Has to match all
-    }
-
-    return zip(allMatches.indices, allMatches).map { (index, match) in
-        ConsoleSearchOccurrence(scope: scope, match: match, searchContext: .init(searchTerm: match.term, matchIndex: index))
-    }
-}
-
 struct ConsoleSearchMatch {
     let line: String
     /// Starts with `1.
     let lineNumber: Int
     let range: Range<String.Index>
     let term: ConsoleSearchTerm
+
+    static let limit = 1000
 }
 
 @available(iOS 15, tvOS 15, *)
