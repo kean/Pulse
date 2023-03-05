@@ -63,7 +63,7 @@ struct ConsoleSearchResultView: View {
             Text(occurrence.scope.fullTitle + " (\(occurrence.line):\(occurrence.range.lowerBound))")
                 .font(ConsoleConstants.fontTitle)
                 .foregroundColor(.secondary)
-            Text(occurrence.text)
+            Text(occurrence.preview)
                 .lineLimit(3)
         }
         if #unavailable(iOS 16) {

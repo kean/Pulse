@@ -78,13 +78,13 @@ extension String {
 }
 
 extension String {
-    func ranges(of string: String, options: StringSearchOptions) -> [Range<String.Index>] {
-        var startIndex = string.startIndex
+    func ranges(of target: String, options: StringSearchOptions) -> [Range<String.Index>] {
+        var startIndex = target.startIndex
         var ranges = [Range<String.Index>]()
-        let substring = options.kind == .wildcard ? makeRegexForWildcard(string, rule: options.rule) : string
+        let target = options.kind == .wildcard ? makeRegexForWildcard(target, rule: options.rule) : target
         let options = String.CompareOptions(options)
-        while startIndex < substring.endIndex,
-              let range = range(of: substring, options: options, range: startIndex..<string.endIndex, locale: nil) {
+        while startIndex < endIndex,
+              let range = range(of: target, options: options, range: startIndex..<endIndex, locale: nil) {
             ranges.append(range)
             startIndex = range.upperBound
         }

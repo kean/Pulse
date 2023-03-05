@@ -187,7 +187,6 @@ private func search(
     _ parameters: ConsoleSearchParameters,
     _ scope: ConsoleSearchScope
 ) -> [ConsoleSearchOccurrence] {
-    let matchAttributes = TextHelper().attributes(role: .body2, style: .monospaced)
     var matchedTerms: Set<ConsoleSearchTerm> = []
     var allMatches: [ConsoleSearchMatch] = []
     var lineCount = 0
@@ -211,47 +210,7 @@ private func search(
     }
 
     return zip(allMatches.indices, allMatches).map { (index, match) in
-        ConsoleSearchOccurrence(
-            scope: scope,
-            line: match.lineNumber,
-            range: NSRange(location: 0, length: 1),
-            text: ConsoleSearchOperation.makePreview(for: match, attributes: matchAttributes),
-            searchContext: .init(searchTerm: match.term, matchIndex: index)
-        )
-    }
-}
-
-@available(iOS 15, macOS 13, *)
-extension ConsoleSearchOperation {
-#warning("move this to ViewModel?")
-    static func makePreview(for match: ConsoleSearchMatch, attributes customAttributes: [NSAttributedString.Key: Any] = [:]) -> AttributedString {
-
-        let prefixStartIndex = match.line.index(match.range.lowerBound, offsetBy: -50, limitedBy: match.line.startIndex) ?? match.line.startIndex
-        let prefixRange = prefixStartIndex..<match.range.lowerBound
-
-#warning("increase count?")
-        let suffixUpperBound = match.line.index(match.range.upperBound, offsetBy: 120, limitedBy: match.line.endIndex) ?? match.line.endIndex
-        let suffixRange = match.range.upperBound..<suffixUpperBound
-
-        func shouldTrim(_ character: Character) -> Bool {
-            character.isNewline || character.isWhitespace || character == ","
-        }
-
-        var prefix = match.line[prefixRange]
-        let isEllipsisNeeded = prefix.startIndex != match.line.startIndex
-        prefix.trimPrefix(while: shouldTrim)
-
-        var suffix = match.line[suffixRange]
-        suffix.trimSuffix(while: shouldTrim)
-
-        if isEllipsisNeeded {
-            prefix.insert("…", at: prefix.startIndex)
-        }
-
-        let attributes = AttributeContainer(customAttributes)
-        var middle = AttributedString(match.line[match.range], attributes: attributes)
-        middle.foregroundColor = .orange
-        return AttributedString(prefix, attributes: attributes) + middle + AttributedString(suffix, attributes: attributes)
+        ConsoleSearchOccurrence(scope: scope, match: match, searchContext: .init(searchTerm: match.term, matchIndex: index))
     }
 }
 
@@ -279,20 +238,6 @@ final class ConsoleSearchService {
         }
         cachedBodies.set(string, forKey: blob.objectID, cost: data.count)
         return string
-    }
-}
-
-private extension Substring {
-    mutating func trimPrefix(while closure: (Character) -> Bool) {
-        while let character = first, closure(character) {
-            removeFirst()
-        }
-    }
-
-    mutating func trimSuffix(while closure: (Character) -> Bool) {
-        while let character = last, closure(character) {
-            removeLast()
-        }
     }
 }
 

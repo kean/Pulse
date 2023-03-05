@@ -10,7 +10,7 @@ import Combine
 @testable import PulseUI
 
 @available(iOS 15, macOS 15, *)
-final class ConsoleSearchOperationTests: XCTestCase {
+final class ConsoleSearchOccurrenceTests: XCTestCase {
     func testMakeSimplePreview() throws {
         // GIVEN short string
         let string = #"{"id":"2489678844","type":"IssuesEvent","actor":{"id":9343331,"login":"No-CQRT","avatar_url":"https://avatars.githubusercontent.com/u/9343331?"}}"#
@@ -21,7 +21,7 @@ final class ConsoleSearchOperationTests: XCTestCase {
         let match = ConsoleSearchMatch(line: string, lineNumber: 1, range: range, term: term)
 
         // WHEN
-        let preview = ConsoleSearchOperation.makePreview(for: match)
+        let preview = ConsoleSearchOccurrence.makePreview(for: match)
 
         // THEN the entire string fits in the preview
         XCTAssertEqual(String(preview.characters), string)
@@ -37,7 +37,7 @@ final class ConsoleSearchOperationTests: XCTestCase {
         let match = ConsoleSearchMatch(line: string, lineNumber: 1, range: range, term: term)
 
         // WHEN
-        let preview = ConsoleSearchOperation.makePreview(for: match)
+        let preview = ConsoleSearchOccurrence.makePreview(for: match)
 
         // THEN whitespaces and punctiation characters are trimmmed
         XCTAssertEqual(String(preview.characters), #"{"id":"2489678844","type":"IssuesEvent","actor":{"id":9343331,"login":"No-CQRT","avatar_url":"https://avatars.githubusercontent.com/u/9343331?"}}"#)
@@ -53,7 +53,7 @@ final class ConsoleSearchOperationTests: XCTestCase {
         let match = ConsoleSearchMatch(line: string, lineNumber: 1, range: range, term: term)
 
         // WHEN
-        let preview = ConsoleSearchOperation.makePreview(for: match)
+        let preview = ConsoleSearchOccurrence.makePreview(for: match)
 
         // THEN suffix is trimmed
         XCTAssertEqual(String(preview.characters), #"{"id":"2489678844","type":"IssuesEvent","actor":{"id":9343331,"login":"No-CQRT","avatar_url":"https://avatars.githubuserconte"#)
@@ -69,7 +69,7 @@ final class ConsoleSearchOperationTests: XCTestCase {
         let match = ConsoleSearchMatch(line: string, lineNumber: 1, range: range, term: term)
 
         // WHEN
-        let preview = ConsoleSearchOperation.makePreview(for: match)
+        let preview = ConsoleSearchOccurrence.makePreview(for: match)
 
         // THEN prefix is trimmed
         XCTAssertEqual(String(preview.characters), #"…tar_url":"https://avatars.githubusercontent.com/u/9343331?"}}"#)
