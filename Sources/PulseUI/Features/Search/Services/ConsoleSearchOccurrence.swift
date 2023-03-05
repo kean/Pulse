@@ -40,14 +40,12 @@ private let previewAttibutes = TextHelper().attributes(role: .body2, style: .mon
 
 @available(iOS 15, macOS 13, *)
 extension ConsoleSearchOccurrence {
-#warning("move this to ViewModel?")
     static func makePreview(for match: ConsoleSearchMatch, attributes customAttributes: [NSAttributedString.Key: Any] = [:]) -> AttributedString {
 
         let prefixStartIndex = match.line.index(match.range.lowerBound, offsetBy: -50, limitedBy: match.line.startIndex) ?? match.line.startIndex
         let prefixRange = prefixStartIndex..<match.range.lowerBound
 
-#warning("increase count?")
-        let suffixUpperBound = match.line.index(match.range.upperBound, offsetBy: 120, limitedBy: match.line.endIndex) ?? match.line.endIndex
+        let suffixUpperBound = match.line.index(match.range.upperBound, offsetBy: 200, limitedBy: match.line.endIndex) ?? match.line.endIndex
         let suffixRange = match.range.upperBound..<suffixUpperBound
 
         func shouldTrim(_ character: Character) -> Bool {
