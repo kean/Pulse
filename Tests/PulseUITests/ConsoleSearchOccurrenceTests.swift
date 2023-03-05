@@ -56,7 +56,7 @@ final class ConsoleSearchOccurrenceTests: XCTestCase {
         let preview = ConsoleSearchOccurrence.makePreview(for: match)
 
         // THEN suffix is trimmed
-        XCTAssertEqual(String(preview.characters), #"{"id":"2489678844","type":"IssuesEvent","actor":{"id":9343331,"login":"No-CQRT","avatar_url":"https://avatars.githubuserconte"#)
+        XCTAssertEqual(String(preview.characters), #"{"id":"2489678844","type":"IssuesEvent","actor":{"id":9343331,"login":"No-CQRT","avatar_url":"https://avatars.githubusercontent.com/u/9343331?"}}"#)
     }
 
     func testMatchAtEnd() throws {
