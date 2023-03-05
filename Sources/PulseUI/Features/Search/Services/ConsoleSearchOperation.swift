@@ -92,8 +92,8 @@ final class ConsoleSearchOperation {
 
     private func _search(_ message: LoggerMessageEntity, parameters: ConsoleSearchParameters) -> [ConsoleSearchOccurrence]? {
         var occurrences: [ConsoleSearchOccurrence] = []
-        occurrences += search(message.text, parameters, .message)
-        occurrences += search(message.rawMetadata, parameters, .metadata)
+        occurrences += ConsoleSearchOperation.search(message.text, parameters, .message)
+        occurrences += ConsoleSearchOperation.search(message.rawMetadata, parameters, .metadata)
         return occurrences.isEmpty ? nil : occurrences
     }
 
@@ -129,28 +129,28 @@ final class ConsoleSearchOperation {
                 if var components = URLComponents(string: task.url ?? "") {
                     components.queryItems = nil
                     if let url = components.url?.absoluteString {
-                        occurrences += search(url, parameters, scope)
+                        occurrences += ConsoleSearchOperation.search(url, parameters, scope)
                     }
                 }
             case .originalRequestHeaders:
                 if let headers = task.originalRequest?.httpHeaders {
-                    occurrences += search(headers, parameters, scope)
+                    occurrences += ConsoleSearchOperation.search(headers, parameters, scope)
                 }
             case .currentRequestHeaders:
                 if let headers = task.currentRequest?.httpHeaders {
-                    occurrences += search(headers, parameters, scope)
+                    occurrences += ConsoleSearchOperation.search(headers, parameters, scope)
                 }
             case .requestBody:
                 if let string = task.requestBody.flatMap(service.getBodyString) {
-                    occurrences += search(string, parameters, scope)
+                    occurrences += ConsoleSearchOperation.search(string, parameters, scope)
                 }
             case .responseHeaders:
                 if let headers = task.response?.httpHeaders {
-                    occurrences += search(headers, parameters, scope)
+                    occurrences += ConsoleSearchOperation.search(headers, parameters, scope)
                 }
             case .responseBody:
                 if let string = task.responseBody.flatMap(service.getBodyString) {
-                    occurrences += search(string, parameters, scope)
+                    occurrences += ConsoleSearchOperation.search(string, parameters, scope)
                 }
             case .message, .metadata:
                 break // Applies only to LoggerMessageEntity
@@ -159,14 +159,14 @@ final class ConsoleSearchOperation {
         return occurrences.isEmpty ? nil : occurrences
     }
 
-    private func search(_ data: Data, _ parameters: ConsoleSearchParameters, _ scope: ConsoleSearchScope) -> [ConsoleSearchOccurrence] {
+    private static  func search(_ data: Data, _ parameters: ConsoleSearchParameters, _ scope: ConsoleSearchScope) -> [ConsoleSearchOccurrence] {
         guard let content = String(data: data, encoding: .utf8) else {
             return []
         }
         return search(content, parameters, scope)
     }
 
-    private func search(_ content: String, _ parameters: ConsoleSearchParameters, _ scope: ConsoleSearchScope) -> [ConsoleSearchOccurrence] {
+    private static func search(_ content: String, _ parameters: ConsoleSearchParameters, _ scope: ConsoleSearchScope) -> [ConsoleSearchOccurrence] {
         var remainingMatchedTerms = Set(parameters.terms)
         var matches: [ConsoleSearchMatch] = []
         var lineCount = 0
