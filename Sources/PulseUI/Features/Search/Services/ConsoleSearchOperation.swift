@@ -214,7 +214,6 @@ private func search(
     }
 }
 
-#warning("TEMP")
 struct ConsoleSearchMatch {
     let line: String
     /// Starts with `1.

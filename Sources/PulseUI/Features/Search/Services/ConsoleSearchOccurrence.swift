@@ -15,8 +15,7 @@ final class ConsoleSearchOccurrence: Identifiable, Equatable, Hashable {
     let scope: ConsoleSearchScope
     let match: ConsoleSearchMatch
     var line: Int { match.lineNumber }
-    #warning("fix range")
-    var range: NSRange { NSRange(location: 0, length: 0)}
+    var range: NSRange { NSRange(match.range, in: match.line) }
     lazy var preview = ConsoleSearchOccurrence.makePreview(for: match, attributes: previewAttibutes)
     let searchContext: RichTextViewModel.SearchContext
 
