@@ -1,5 +1,12 @@
 # Pulse 3.x
 
+## Pulse 3.5.3
+
+*Mar 5, 2023*
+
+- Improve search performance, especially when dealing with big responses (20+ MB) and short search terms (1 character) that result in a massive number of matches
+- Fix [#165](https://github.com/kean/Pulse/issues/165): crash in search
+
 ## Pulse 3.5.2
 
 *Feb 17, 2023*
