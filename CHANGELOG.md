@@ -1,5 +1,11 @@
 # Pulse 3.x
 
+## Pulse 3.5.4
+
+*Mar 10, 2023*
+
+- Fix logging on physical tvOS devices – [#173](https://github.com/kean/Pulse/pull/172) by [@mmmcheese](https://github.com/mmmcheese)
+
 ## Pulse 3.5.3
 
 *Mar 5, 2023*
