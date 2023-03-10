@@ -70,11 +70,14 @@ public final class LoggerStore: @unchecked Sendable {
 
     private static func makeDefault() -> LoggerStore {
         let storeURL = URL.logs.appending(directory: "current.pulse")
-        guard let store = try? LoggerStore(storeURL: storeURL, options: [.create, .sweep]) else {
-            return LoggerStore(inMemoryStore: storeURL) // Right side should never happen
+        if let store = try? LoggerStore(storeURL: storeURL, options: [.create, .sweep]) {
+            register(store: store)
+            return store
+        } else {
+            let memoryStore = LoggerStore(inMemoryStore: storeURL) // Right side should never happen
+            register(store: memoryStore)
+            return memoryStore
         }
-        register(store: store)
-        return store
     }
 
     // MARK: Initialization
