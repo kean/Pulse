@@ -34,12 +34,11 @@ extension URL {
     }
 
     static var logs: URL {
-        var searchPath = FileManager.SearchPathDirectory.documentDirectory
-        
-        #if os(tvOS)
-        searchPath = .cachesDirectory
-        #endif
-        
+#if os(tvOS)
+        let searchPath = FileManager.SearchPathDirectory.libraryDirectory
+#else
+        let searchPath = FileManager.SearchPathDirectory.cachesDirectory
+#endif
         var url = Files.urls(for: searchPath, in: .userDomainMask).first?
             .appending(directory: "Logs")
             .appending(directory: "com.github.kean.logger")  ?? URL(fileURLWithPath: "/dev/null")
