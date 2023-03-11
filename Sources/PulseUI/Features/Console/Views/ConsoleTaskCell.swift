@@ -87,10 +87,7 @@ struct ConsoleTaskCell: View {
     }
 
     private var message: some View {
-        Text(task.url ?? "–")
-            .font(ConsoleConstants.fontBody)
-            .foregroundColor(.primary)
-            .lineLimit(ConsoleSettings.shared.lineLimit)
+        ConsoleConfiguration.messageBuilder.buildView(task: task)
     }
 
     private var details: some View {
