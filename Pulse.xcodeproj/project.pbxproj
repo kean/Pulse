@@ -289,6 +289,7 @@
 		0CF5E60629981A94009FF7AE /* ShareStoreViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF5E60529981A94009FF7AE /* ShareStoreViewModelTests.swift */; };
 		0CF5E60929981ADF009FF7AE /* ShareStoreViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF5E60729981ADC009FF7AE /* ShareStoreViewModel.swift */; };
 		0CFBC5AF2991DCD30038E547 /* ThickDivider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CFBC5AE2991DCD30038E547 /* ThickDivider.swift */; };
+		C8B525DA29BE3929008CA993 /* TaskMessageBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8B525D929BE3929008CA993 /* TaskMessageBuilder.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -776,6 +777,7 @@
 		0CFF9BD825D6199A0069DB6A /* repos.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = repos.json; sourceTree = "<group>"; };
 		49E82A8526D107A00070244F /* AlamofireIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlamofireIntegration.swift; sourceTree = "<group>"; };
 		49E82A8826D1083D0070244F /* MoyaIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoyaIntegration.swift; sourceTree = "<group>"; };
+		C8B525D929BE3929008CA993 /* TaskMessageBuilder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TaskMessageBuilder.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1503,6 +1505,7 @@
 				0CF0D5FB296F189600EED9D4 /* ConsoleView-watchos.swift */,
 				0CF0D60A296F189600EED9D4 /* ConsoleViewModel.swift */,
 				0CECF63C2996BE12000F9CCD /* ConsoleDataSource.swift */,
+				C8B525D929BE3929008CA993 /* TaskMessageBuilder.swift */,
 			);
 			path = Console;
 			sourceTree = "<group>";
@@ -2190,6 +2193,7 @@
 				0C4BF92D298817EC0086A6A7 /* IntlineTabBar.swift in Sources */,
 				0C40C0A2296F81B0009ECF16 /* ConsoleCustomFilterView.swift in Sources */,
 				0CF0D682296F189600EED9D4 /* ConsoleTextView.swift in Sources */,
+				C8B525DA29BE3929008CA993 /* TaskMessageBuilder.swift in Sources */,
 				0CF0D645296F189600EED9D4 /* ConsoleSearchSectionHeader.swift in Sources */,
 				0CF0D62A296F189600EED9D4 /* KeyValueSectionViewModel.swift in Sources */,
 				0CF0D638296F189600EED9D4 /* ImageViewer.swift in Sources */,
