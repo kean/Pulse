@@ -31,6 +31,9 @@ struct App: SwiftUI.App {
                         closeWelcomeWindow()
                         client.resume()
                     }
+                    .onDisappear {
+                        client.pause()
+                    }
             }
         }
         .windowStyle(.hiddenTitleBar)
