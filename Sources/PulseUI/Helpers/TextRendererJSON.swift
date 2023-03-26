@@ -195,7 +195,7 @@ final class TextRendererJSON {
     }
 }
 
-private struct JSONColors {
+struct JSONColors {
     static let punctuation = UXColor.dynamic(
         light: .init(red: 113.0/255.0, green: 128.0/255.0, blue: 141.0/255.0, alpha: 1.0),
         dark: .init(red: 108.0/255.0, green: 121.0/255.0, blue: 134.0/255.0, alpha: 1.0)
@@ -213,7 +213,7 @@ extension NSAttributedString.Key {
     static let decodingError = NSAttributedString.Key(rawValue: "com.github.kean.pulse.decoding-error-key")
 }
 
-private enum JSONElement {
+enum JSONElement {
     case punctuation
     case key
     case valueString
