@@ -99,7 +99,9 @@ struct ConsoleListContentView: View {
                     .onDisappear { viewModel.onDisappearCell(with: entity.objectID) }
             }
         }
+#if !os(macOS)
         footerView
+#endif
     }
 
     @ViewBuilder
