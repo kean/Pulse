@@ -8,6 +8,8 @@ import UniformTypeIdentifiers
 struct WelcomeView: View {
     private let recentDocuments = getRecentDocuments()
 
+    @ObservedObject var remoteLoggerViewModel: RemoteLoggerViewModel
+
     var body: some View {
         HSplitView {
             welcomeView
@@ -31,6 +33,7 @@ struct WelcomeView: View {
             quickActionsView
         }
         .padding()
+        .padding(.vertical, 32)
         .frame(width: 320)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
         .layoutPriority(1)
@@ -45,46 +48,33 @@ struct WelcomeView: View {
 
     private var sidebar: some View {
         List {
-            recentDocumentsList
+            recentDocumentsSection
+            remoteDevicesSection
         }
         .frame(minWidth: 320, idealWidth: 320)
         .listStyle(.sidebar)
     }
 
-    private var recentDocumentsList: some View {
+    private var recentDocumentsSection: some View {
         Section(header: Text("Recently Open")) {
             if recentDocuments.isEmpty {
                 Text("No Recent Documents")
                     .foregroundColor(.secondary)
             } else {
-                ForEach(recentDocuments, id: \.self, content: SuggestedDocumentView.init)
+                ForEach(recentDocuments, id: \.self, content: DocumentCell.init)
             }
         }
     }
-}
 
-private struct SuggestedDocumentView: View {
-    let url: URL
-
-    var body: some View {
-        Button(action: { NSWorkspace.shared.open(url) }, label: {
-            let path = url.path.replacingOccurrences(of: "/Users/\(NSUserName())", with: "~", options: .anchored, range: nil)
-            HStack {
-                Image(systemName: "doc")
-                    .font(.system(size: 24))
-                    .foregroundColor(Color.accentColor)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(url.lastPathComponent)
-                        .lineLimit(1)
-                    Text(path)
-                        .font(.footnote)
-                        .foregroundColor(.secondary)
-                        .lineLimit(1)
-                }
+    private var remoteDevicesSection: some View {
+        Section(header: Text("Devices")) {
+            if remoteLoggerViewModel.clients.isEmpty {
+                Text("No Connected Devices")
+                    .foregroundColor(.secondary)
+            } else {
+                ForEach(remoteLoggerViewModel.clients, content: RemoteClientCell.init)
             }
-        })
-        .help(url.path())
-        .buttonStyle(.plain)
+        }
     }
 }
 
@@ -146,7 +136,7 @@ private func openDocument() {
 #if DEBUG
 struct WelcomeView_Previews: PreviewProvider {
     static var previews: some View {
-        WelcomeView()
+        WelcomeView(remoteLoggerViewModel: .shared)
     }
 }
 #endif

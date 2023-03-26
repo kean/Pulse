@@ -30,6 +30,12 @@ final class RemoteLoggerViewModel: ObservableObject {
         server.$clients.dropFirst().receive(on: DispatchQueue.main).sink { [weak self] in
             self?.display(clients: Array($0.values))
         }.store(in: &cancellables)
+
+        if ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == nil {
+            if server.isEnabled {
+                server.enable()
+            }
+        }
     }
     
     private func display(clients: [RemoteLoggerClient]) {

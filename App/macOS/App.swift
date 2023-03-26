@@ -7,11 +7,11 @@ import SwiftUI
 
 @main
 struct App: SwiftUI.App {
-    @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    @StateObject var remoteLoggerViewModel = RemoteLoggerViewModel()
 
     var body: some Scene {
         WindowGroup(id: "WelcomeView") {
-            WelcomeView()
+            WelcomeView(remoteLoggerViewModel: remoteLoggerViewModel)
         }
         .windowStyle(.hiddenTitleBar)
 
