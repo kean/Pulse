@@ -29,7 +29,7 @@ struct WelcomeView: View {
             Text("Version \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "–")")
                 .lineLimit(1)
                 .foregroundColor(.secondary)
-            Spacer().frame(height: 32)
+            Spacer().frame(height: 46)
             quickActionsView
         }
         .padding()
@@ -72,7 +72,9 @@ struct WelcomeView: View {
                 Text("No Connected Devices")
                     .foregroundColor(.secondary)
             } else {
-                ForEach(remoteLoggerViewModel.clients, content: RemoteClientCell.init)
+                ForEach(remoteLoggerViewModel.clients) {
+                    RemoteClientCell(client: $0)
+                }
             }
         }
     }

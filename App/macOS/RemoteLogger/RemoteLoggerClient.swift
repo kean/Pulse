@@ -137,7 +137,7 @@ final class RemoteLoggerClient: ObservableObject, Identifiable {
     }
 }
 
-final class RemoteLoggerClientInfo: Codable {
+final class RemoteLoggerClientInfo: Codable, Hashable, Identifiable {
     let id: RemoteLoggerClientId
     var deviceId: UUID
     let deviceInfo: LoggerStore.Info.DeviceInfo
@@ -148,6 +148,14 @@ final class RemoteLoggerClientInfo: Codable {
         self.deviceId = info.deviceId
         self.deviceInfo = info.deviceInfo
         self.appInfo = info.appInfo
+    }
+
+    static func == (lhs: RemoteLoggerClientInfo, rhs: RemoteLoggerClientInfo) -> Bool {
+        lhs.id == rhs.id
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
     }
 }
 

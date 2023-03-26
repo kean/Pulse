@@ -4,6 +4,7 @@
 
 import AppKit
 import SwiftUI
+import PulseUI
 
 @main
 struct App: SwiftUI.App {
@@ -17,14 +18,28 @@ struct App: SwiftUI.App {
 
         WindowGroup {
             PulseDocumentViewer()
-                .onAppear {
-                    NSApp.windows
-                        .first { $0.identifier?.rawValue.contains("WelcomeView") ?? false }?
-                        .close()
-                }
+                .onAppear(perform: closeWelcomeWindow)
         }
         .windowStyle(.hiddenTitleBar)
         .windowToolbarStyle(.unified(showsTitle: false))
         .handlesExternalEvents(matching: ["file"])
+
+        WindowGroup(id: "RemoteClient", for: RemoteLoggerClientInfo.self) { info in
+            if let client = remoteLoggerViewModel.clients.first(where: { $0.id == info.wrappedValue?.id }) {
+                ConsoleView(store: client.store)
+                    .onAppear {
+                        closeWelcomeWindow()
+                        client.resume()
+                    }
+            }
+        }
+        .windowStyle(.hiddenTitleBar)
+        .windowToolbarStyle(.unified(showsTitle: false))
     }
+}
+
+private func closeWelcomeWindow() {
+    NSApp.windows
+        .first { $0.identifier?.rawValue.contains("WelcomeView") ?? false }?
+        .close()
 }

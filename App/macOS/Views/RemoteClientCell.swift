@@ -6,8 +6,15 @@ import SwiftUI
 
 struct RemoteClientCell: View {
     @ObservedObject var client: RemoteLoggerClient
+    @Environment(\.openWindow) var openWindow
 
     var body: some View {
+        Button(action: { openWindow(id: "RemoteClient", value: client.info) }) {
+            contents
+        }.buttonStyle(.plain)
+    }
+
+    private var contents: some View {
         HStack {
             Image(systemName: getIconName(client: client))
                 .font(.system(size: 20))
