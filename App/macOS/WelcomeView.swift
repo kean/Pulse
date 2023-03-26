@@ -114,7 +114,7 @@ private func getRecentDocuments() -> [URL] {
     Array(NSDocumentController.shared.recentDocumentURLs.prefix(5))
 }
 
-private func openDocument() {
+func openDocument() {
     let dialog = NSOpenPanel()
 
     dialog.title = "Select a Pulse document (has .pulse extension)"

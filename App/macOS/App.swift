@@ -15,6 +15,9 @@ struct App: SwiftUI.App {
             WelcomeView(remoteLoggerViewModel: remoteLoggerViewModel)
         }
         .windowStyle(.hiddenTitleBar)
+        .commands {
+            AppCommands()
+        }
 
         WindowGroup {
             PulseDocumentViewer()
@@ -38,6 +41,21 @@ struct App: SwiftUI.App {
         }
         .windowStyle(.hiddenTitleBar)
         .windowToolbarStyle(.unified(showsTitle: false))
+    }
+}
+
+struct AppCommands: Commands {
+    var body: some Commands {
+        CommandGroup(before: .newItem) {
+            Button("Open", action: openDocument).keyboardShortcut("o")
+            Menu("Open Recent") {
+                ForEach(NSDocumentController.shared.recentDocumentURLs, id: \.self) { url in
+                    Button(action: { NSWorkspace.shared.open(url) }, label: {
+                        Text(url.lastPathComponent)
+                    })
+                }
+            }
+        }
     }
 }
 
