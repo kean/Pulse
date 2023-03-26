@@ -17,6 +17,8 @@ struct App: SwiftUI.App {
         WindowGroup {
             PulseDocumentViewer()
         }
+        .windowStyle(.hiddenTitleBar)
+        .windowToolbarStyle(.unified(showsTitle: false))
         .handlesExternalEvents(matching: ["file"])
     }
 }
