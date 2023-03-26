@@ -48,7 +48,6 @@
 		0C3002B32986CEF30055F6C2 /* LoggerStoreIndex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C3002B22986CEF30055F6C2 /* LoggerStoreIndex.swift */; };
 		0C31FFB9298211AF002A7D64 /* ConsoleEntityDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C31FFB8298211AF002A7D64 /* ConsoleEntityDetailsView.swift */; };
 		0C38795529D08BA7001230DB /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C38795429D08BA7001230DB /* App.swift */; };
-		0C38795729D08BA7001230DB /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C38795629D08BA7001230DB /* ContentView.swift */; };
 		0C38795929D08BA8001230DB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C38795829D08BA8001230DB /* Assets.xcassets */; };
 		0C40C094296F7641009ECF16 /* ConsoleSearchContentTypeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C40C093296F7641009ECF16 /* ConsoleSearchContentTypeCell.swift */; };
 		0C40C096296F7738009ECF16 /* ConsoleSearchTaskTypeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C40C095296F7738009ECF16 /* ConsoleSearchTaskTypeCell.swift */; };
@@ -61,6 +60,13 @@
 		0C40C0A4296F849E009ECF16 /* ConsoleSearchTimePeriodCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C40C0A3296F849E009ECF16 /* ConsoleSearchTimePeriodCell.swift */; };
 		0C40C0A6296F99D8009ECF16 /* ConsoleCustomNetworkFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C40C0A5296F99D8009ECF16 /* ConsoleCustomNetworkFilter.swift */; };
 		0C43A15E29D08FD600EA7AD8 /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C43A15D29D08FD600EA7AD8 /* WelcomeView.swift */; };
+		0C43A16329D091F800EA7AD8 /* Pulse.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CF0D542296F14EA00EED9D4 /* Pulse.framework */; };
+		0C43A16429D091F800EA7AD8 /* Pulse.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0CF0D542296F14EA00EED9D4 /* Pulse.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		0C43A16729D091F800EA7AD8 /* PulseUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CF0D56C296F17CB00EED9D4 /* PulseUI.framework */; };
+		0C43A16829D091F800EA7AD8 /* PulseUI.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0CF0D56C296F17CB00EED9D4 /* PulseUI.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		0C43A16F29D0924000EA7AD8 /* PulseDocumentViewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C43A16129D091D800EA7AD8 /* PulseDocumentViewer.swift */; };
+		0C43A17229D0929000EA7AD8 /* PlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C43A17129D0929000EA7AD8 /* PlaceholderView.swift */; };
+		0C43A17429D092D100EA7AD8 /* AlertViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C43A17329D092D100EA7AD8 /* AlertViewModel.swift */; };
 		0C4BF92D298817EC0086A6A7 /* IntlineTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C4BF92C298817EC0086A6A7 /* IntlineTabBar.swift */; };
 		0C516FE726015ED3004813B4 /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CFF9BD825D6199A0069DB6A /* repos.json */; };
 		0C516FF026016392004813B4 /* DocumentBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C516FEF26016392004813B4 /* DocumentBrowser.swift */; };
@@ -324,6 +330,20 @@
 			remoteGlobalIDString = 0C0B31E926D179A20045C9E1;
 			remoteInfo = "Pulse Integration Examples iOS";
 		};
+		0C43A16529D091F800EA7AD8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0C57AD45245F0EFB005B3400 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0CF0D541296F14EA00EED9D4;
+			remoteInfo = Pulse;
+		};
+		0C43A16929D091F800EA7AD8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0C57AD45245F0EFB005B3400 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0CF0D56B296F17CB00EED9D4;
+			remoteInfo = PulseUI;
+		};
 		0CEAB3E525FE862E00F09B0F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0C57AD45245F0EFB005B3400 /* Project object */;
@@ -432,6 +452,18 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		0C43A16B29D091F800EA7AD8 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				0C43A16829D091F800EA7AD8 /* PulseUI.framework in Embed Frameworks */,
+				0C43A16429D091F800EA7AD8 /* Pulse.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		0C98C6C925C4C08A0086A13E /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -540,7 +572,6 @@
 		0C31FFB8298211AF002A7D64 /* ConsoleEntityDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleEntityDetailsView.swift; sourceTree = "<group>"; };
 		0C38795229D08BA7001230DB /* Pulse.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Pulse.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C38795429D08BA7001230DB /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
-		0C38795629D08BA7001230DB /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		0C38795829D08BA8001230DB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0C38796129D08C3F001230DB /* Pulse-macOS.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = "Pulse-macOS.entitlements"; sourceTree = "<group>"; };
 		0C38796229D08E18001230DB /* Pulse-macOS-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Pulse-macOS-Info.plist"; sourceTree = "<group>"; };
@@ -555,6 +586,9 @@
 		0C40C0A3296F849E009ECF16 /* ConsoleSearchTimePeriodCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchTimePeriodCell.swift; sourceTree = "<group>"; };
 		0C40C0A5296F99D8009ECF16 /* ConsoleCustomNetworkFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleCustomNetworkFilter.swift; sourceTree = "<group>"; };
 		0C43A15D29D08FD600EA7AD8 /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
+		0C43A16129D091D800EA7AD8 /* PulseDocumentViewer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PulseDocumentViewer.swift; sourceTree = "<group>"; };
+		0C43A17129D0929000EA7AD8 /* PlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderView.swift; sourceTree = "<group>"; };
+		0C43A17329D092D100EA7AD8 /* AlertViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertViewModel.swift; sourceTree = "<group>"; };
 		0C4BF92C298817EC0086A6A7 /* IntlineTabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntlineTabBar.swift; sourceTree = "<group>"; };
 		0C516FBA26015DD2004813B4 /* Pulse Demo iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pulse Demo iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C516FEF26016392004813B4 /* DocumentBrowser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentBrowser.swift; sourceTree = "<group>"; };
@@ -811,6 +845,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0C43A16729D091F800EA7AD8 /* PulseUI.framework in Frameworks */,
+				0C43A16329D091F800EA7AD8 /* Pulse.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -941,12 +977,22 @@
 			children = (
 				0C38795429D08BA7001230DB /* App.swift */,
 				0C43A15D29D08FD600EA7AD8 /* WelcomeView.swift */,
-				0C38795629D08BA7001230DB /* ContentView.swift */,
+				0C43A16129D091D800EA7AD8 /* PulseDocumentViewer.swift */,
+				0C43A17029D0928600EA7AD8 /* Helpers */,
 				0C38795829D08BA8001230DB /* Assets.xcassets */,
 				0C38796229D08E18001230DB /* Pulse-macOS-Info.plist */,
 				0C38796129D08C3F001230DB /* Pulse-macOS.entitlements */,
 			);
 			path = macOS;
+			sourceTree = "<group>";
+		};
+		0C43A17029D0928600EA7AD8 /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				0C43A17129D0929000EA7AD8 /* PlaceholderView.swift */,
+				0C43A17329D092D100EA7AD8 /* AlertViewModel.swift */,
+			);
+			path = Helpers;
 			sourceTree = "<group>";
 		};
 		0C516FBB26015DD2004813B4 /* Demo */ = {
@@ -1677,10 +1723,13 @@
 				0C38794E29D08BA7001230DB /* Sources */,
 				0C38794F29D08BA7001230DB /* Frameworks */,
 				0C38795029D08BA7001230DB /* Resources */,
+				0C43A16B29D091F800EA7AD8 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				0C43A16629D091F800EA7AD8 /* PBXTargetDependency */,
+				0C43A16A29D091F800EA7AD8 /* PBXTargetDependency */,
 			);
 			name = "Pulse App macOS";
 			productName = "Pulse App macOS";
@@ -2114,9 +2163,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0C38795729D08BA7001230DB /* ContentView.swift in Sources */,
 				0C43A15E29D08FD600EA7AD8 /* WelcomeView.swift in Sources */,
 				0C38795529D08BA7001230DB /* App.swift in Sources */,
+				0C43A17229D0929000EA7AD8 /* PlaceholderView.swift in Sources */,
+				0C43A17429D092D100EA7AD8 /* AlertViewModel.swift in Sources */,
+				0C43A16F29D0924000EA7AD8 /* PulseDocumentViewer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2431,6 +2482,16 @@
 			target = 0C0B31E926D179A20045C9E1 /* Pulse Integration Examples iOS */;
 			targetProxy = 0C11EAEB2971F20D0059786A /* PBXContainerItemProxy */;
 		};
+		0C43A16629D091F800EA7AD8 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0CF0D541296F14EA00EED9D4 /* Pulse */;
+			targetProxy = 0C43A16529D091F800EA7AD8 /* PBXContainerItemProxy */;
+		};
+		0C43A16A29D091F800EA7AD8 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0CF0D56B296F17CB00EED9D4 /* PulseUI */;
+			targetProxy = 0C43A16929D091F800EA7AD8 /* PBXContainerItemProxy */;
+		};
 		0CEAB3E625FE862E00F09B0F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 0CEAB3E225FE862E00F09B0F /* Pulse Demo watchOS Extension */;
@@ -2694,6 +2755,7 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.github.kean.pulse;
+				PRODUCT_MODULE_NAME = PulseApp;
 				PRODUCT_NAME = Pulse;
 				SDKROOT = macosx;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -2738,6 +2800,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.github.kean.pulse;
+				PRODUCT_MODULE_NAME = PulseApp;
 				PRODUCT_NAME = Pulse;
 				SDKROOT = macosx;
 				SWIFT_EMIT_LOC_STRINGS = YES;
