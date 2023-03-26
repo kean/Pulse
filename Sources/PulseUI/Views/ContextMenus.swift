@@ -79,6 +79,7 @@ struct StringSearchOptionsMenu: View {
         Menu(content: { contents }, label: {
             Image(systemName: "ellipsis.circle")
         })
+        .opacity(0.66)
         .pickerStyle(.inline)
         .menuStyle(.borderlessButton)
         .menuIndicator(.hidden)
