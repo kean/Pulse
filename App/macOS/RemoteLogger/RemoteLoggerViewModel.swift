@@ -47,6 +47,10 @@ final class RemoteLoggerViewModel: ObservableObject {
     private func didUpdateIsEnabled(_ isEnabled: Bool) {
         isEnabled ? server.enable() : server.disable()
     }
+
+    func buttonDeleteClientTapped(for client: RemoteLoggerClient) {
+        server.remove(client: client)
+    }
     
     func buttonStartLoggerTapped() {
         server.enable()

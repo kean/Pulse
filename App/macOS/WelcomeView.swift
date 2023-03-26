@@ -72,8 +72,15 @@ struct WelcomeView: View {
                 Text("No Connected Devices")
                     .foregroundColor(.secondary)
             } else {
-                ForEach(remoteLoggerViewModel.clients) {
-                    RemoteClientCell(client: $0)
+                ForEach(remoteLoggerViewModel.clients) { client in
+                    RemoteClientCell(client: client)
+                        .contextMenu {
+                            Button(role: .destructive, action: {
+                                remoteLoggerViewModel.buttonDeleteClientTapped(for: client)
+                            }, label: {
+                                Text("Remove Device")
+                            })
+                        }
                 }
             }
         }
