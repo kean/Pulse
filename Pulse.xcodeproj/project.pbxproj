@@ -73,6 +73,7 @@
 		0C43A17E29D0AD4500EA7AD8 /* RemoteLoggerClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C43A17929D0AD4500EA7AD8 /* RemoteLoggerClient.swift */; };
 		0C43A17F29D0AD4500EA7AD8 /* RemoteLoggerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C43A17A29D0AD4500EA7AD8 /* RemoteLoggerViewModel.swift */; };
 		0C43A18129D0ADA300EA7AD8 /* Foundation+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C43A18029D0ADA300EA7AD8 /* Foundation+Extensions.swift */; };
+		0C43A18329D0AF0F00EA7AD8 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C43A18229D0AF0F00EA7AD8 /* AppDelegate.swift */; };
 		0C4BF92D298817EC0086A6A7 /* IntlineTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C4BF92C298817EC0086A6A7 /* IntlineTabBar.swift */; };
 		0C516FE726015ED3004813B4 /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CFF9BD825D6199A0069DB6A /* repos.json */; };
 		0C516FF026016392004813B4 /* DocumentBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C516FEF26016392004813B4 /* DocumentBrowser.swift */; };
@@ -601,6 +602,7 @@
 		0C43A17929D0AD4500EA7AD8 /* RemoteLoggerClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RemoteLoggerClient.swift; sourceTree = "<group>"; };
 		0C43A17A29D0AD4500EA7AD8 /* RemoteLoggerViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RemoteLoggerViewModel.swift; sourceTree = "<group>"; };
 		0C43A18029D0ADA300EA7AD8 /* Foundation+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Foundation+Extensions.swift"; sourceTree = "<group>"; };
+		0C43A18229D0AF0F00EA7AD8 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		0C4BF92C298817EC0086A6A7 /* IntlineTabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntlineTabBar.swift; sourceTree = "<group>"; };
 		0C516FBA26015DD2004813B4 /* Pulse Demo iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pulse Demo iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C516FEF26016392004813B4 /* DocumentBrowser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentBrowser.swift; sourceTree = "<group>"; };
@@ -988,6 +990,7 @@
 			isa = PBXGroup;
 			children = (
 				0C38795429D08BA7001230DB /* App.swift */,
+				0C43A18229D0AF0F00EA7AD8 /* AppDelegate.swift */,
 				0C43A15D29D08FD600EA7AD8 /* WelcomeView.swift */,
 				0C43A16129D091D800EA7AD8 /* PulseDocumentViewer.swift */,
 				0C43A17529D0AD4500EA7AD8 /* RemoteLogger */,
@@ -2189,6 +2192,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0C43A18329D0AF0F00EA7AD8 /* AppDelegate.swift in Sources */,
 				0C43A18129D0ADA300EA7AD8 /* Foundation+Extensions.swift in Sources */,
 				0C43A15E29D08FD600EA7AD8 /* WelcomeView.swift in Sources */,
 				0C38795529D08BA7001230DB /* App.swift in Sources */,
