@@ -140,9 +140,9 @@ private struct ConsoleContentView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            content
-            Divider()
             ConsoleToolbarView(viewModel: viewModel)
+            Divider()
+            content
         }
         .onChange(of: selectedObjectID) {
             viewModel.router.selection = $0.map(ConsoleSelectedItem.entity)

@@ -54,7 +54,7 @@ struct ConsoleToolbarView: View {
             ConsoleToolbarToggleOnlyErrorsButton(viewModel: viewModel.searchCriteriaViewModel)
         }
         .padding(.horizontal, 10)
-        .frame(height: 34, alignment: .center)
+        .frame(height: 27, alignment: .center)
     }
 
     @ViewBuilder
