@@ -60,12 +60,6 @@ public struct SettingsView: View {
                 }
                 Spacer()
             }
-            HStack {
-                Button("Open in Pulse Pro") {
-                    NSWorkspace.shared.open(store.storeURL)
-                }
-                Spacer()
-            }
         }
         if !viewModel.isArchive {
             ConsoleSection(header: { SectionHeaderView(title: "Manage Messages") }) {
