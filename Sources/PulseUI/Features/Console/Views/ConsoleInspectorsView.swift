@@ -18,10 +18,18 @@ struct ConsoleInspectorsView: View {
         }
     }
 
+    private var inspectors: [ConsoleInspector] {
+        var inspectors = ConsoleInspector.allCases
+        if isRunningStandaloneApp {
+            inspectors.removeAll(where: { $0 == .settings })
+        }
+        return inspectors
+    }
+
     private var toolbar: some View {
         HStack {
             Spacer()
-            ForEach(ConsoleInspector.allCases) { item in
+            ForEach(inspectors) { item in
                 TabBarItem(image: Image(systemName: item.systemImage), isSelected: item == selectedTab) {
                     selectedTab = item
                 }

@@ -7,6 +7,10 @@ import Pulse
 import SwiftUI
 import CoreData
 
+var isRunningStandaloneApp: Bool {
+    UserDefaults.standard.bool(forKey: "pulse-is-running-standalone-macos-app")
+}
+
 enum LoggerEntity {
     /// Regular log, not task attached.
     case message(LoggerMessageEntity)

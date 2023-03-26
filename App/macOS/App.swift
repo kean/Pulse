@@ -11,6 +11,8 @@ struct App: SwiftUI.App {
     @StateObject var remoteLoggerViewModel = RemoteLoggerViewModel()
 
     var body: some Scene {
+        let _ = UserDefaults.standard.set(true, forKey: "pulse-is-running-standalone-macos-app")
+
         WindowGroup(id: "WelcomeView") {
             WelcomeView(remoteLoggerViewModel: remoteLoggerViewModel)
         }
