@@ -52,8 +52,6 @@ public struct SettingsView: View {
                 }
                 Spacer()
             }
-        }
-        ConsoleSection(header: { SectionHeaderView(title: "Open Store") }) {
             HStack {
                 Button("Show in Finder") {
                     NSWorkspace.shared.activateFileViewerSelecting([store.storeURL])
