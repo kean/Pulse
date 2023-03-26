@@ -16,7 +16,7 @@ struct App: SwiftUI.App {
         }
         .windowStyle(.hiddenTitleBar)
         .commands {
-            AppCommands()
+            AppCommands(remoteLoggerViewModel: remoteLoggerViewModel)
         }
 
         WindowGroup {
@@ -45,6 +45,9 @@ struct App: SwiftUI.App {
 }
 
 struct AppCommands: Commands {
+    @ObservedObject var remoteLoggerViewModel: RemoteLoggerViewModel
+    @Environment(\.openWindow) var openWindow
+
     var body: some Commands {
         CommandGroup(before: .newItem) {
             Button("Open", action: openDocument).keyboardShortcut("o")
@@ -53,6 +56,13 @@ struct AppCommands: Commands {
                     Button(action: { NSWorkspace.shared.open(url) }, label: {
                         Text(url.lastPathComponent)
                     })
+                }
+            }
+            Menu("Open Device Logs") {
+                ForEach(remoteLoggerViewModel.clients) { client in
+                    Button(action: { openWindow(id: "RemoteClient", value: client.info) }) {
+                        Text(client.info.deviceInfo.name) + Text(client.preferredSuffix ?? "")
+                    }.buttonStyle(.plain)
                 }
             }
         }
