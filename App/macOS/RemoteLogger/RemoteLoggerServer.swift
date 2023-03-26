@@ -84,7 +84,7 @@ final class RemoteLoggerServer: RemoteLoggerConnectionDelegate, ObservableObject
         listenerSetupError = nil
 
         let customName = AppSettings.shared.serviceName.trimmingCharacters(in: .whitespaces)
-        let serviceName = customName.isEmpty ? Host.current().localizedName : customName
+        let serviceName = customName.isEmpty ? RemoteLoggerServer.defaultServiceName : customName
         listener.service = NWListener.Service(name: serviceName, type: RemoteLogger.serviceType)
         listener.stateUpdateHandler = { [weak self] state in
             self?.didUpdateState(state)
@@ -97,6 +97,10 @@ final class RemoteLoggerServer: RemoteLoggerConnectionDelegate, ObservableObject
         pulseLog("Did start publishing a service: \(listener) on \(String(describing: listener.port))")
 
         self.listener = listener
+    }
+
+    static var defaultServiceName: String {
+        Host.current().localizedName ?? "Pulse"
     }
     
     private func didUpdateState(_ newState: NWListener.State) {

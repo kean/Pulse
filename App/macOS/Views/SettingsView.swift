@@ -35,9 +35,9 @@ struct RemoteLoggingSettingsView: View {
             })
 
             Section {
-                TextField("Port", text: settings.$port)
+                TextField("Port", text: settings.$port, prompt: Text("Any"))
                     .frame(maxWidth: 200)
-                TextField("Service Name", text: settings.$serviceName)
+                TextField("Service Name", text: settings.$serviceName, prompt: Text(RemoteLoggerServer.defaultServiceName))
             }
 
             Spacer()
