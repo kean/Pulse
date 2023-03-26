@@ -69,11 +69,10 @@ final class RemoteLoggerServer: RemoteLoggerConnectionDelegate, ObservableObject
         
         let listener: NWListener
         do {
-            let port: NWEndpoint.Port = .any
-            // TODO: add support for settings custom port
-//            if let customPort = UInt16(AppSettings.shared.port), customPort > 0 {
-//                port = NWEndpoint.Port(rawValue: customPort) ?? .any
-//            }
+            var port: NWEndpoint.Port = .any
+            if let customPort = UInt16(AppSettings.shared.port), customPort > 0 {
+                port = NWEndpoint.Port(rawValue: customPort) ?? .any
+            }
             listener = try NWListener(using: .tcp, on: port)
         } catch {
             pulseLog("Failed to initialize a listener: \(error)")
@@ -84,9 +83,7 @@ final class RemoteLoggerServer: RemoteLoggerConnectionDelegate, ObservableObject
                         
         listenerSetupError = nil
 
-        // TODO: add support for setting custom service name
-//        let customName = AppSettings.shared.serviceName.trimmingCharacters(in: .whitespaces)
-        let customName = ""
+        let customName = AppSettings.shared.serviceName.trimmingCharacters(in: .whitespaces)
         let serviceName = customName.isEmpty ? Host.current().localizedName : customName
         listener.service = NWListener.Service(name: serviceName, type: RemoteLogger.serviceType)
         listener.stateUpdateHandler = { [weak self] state in

@@ -74,6 +74,8 @@
 		0C43A18129D0ADA300EA7AD8 /* Foundation+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C43A18029D0ADA300EA7AD8 /* Foundation+Extensions.swift */; };
 		0C43A18629D0B1A800EA7AD8 /* RemoteClientCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C43A18529D0B1A800EA7AD8 /* RemoteClientCell.swift */; };
 		0C43A18829D0B23800EA7AD8 /* DocumentCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C43A18729D0B23800EA7AD8 /* DocumentCell.swift */; };
+		0C43A18C29D0D86B00EA7AD8 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C43A18B29D0D86B00EA7AD8 /* AppSettings.swift */; };
+		0C43A18E29D0D8D800EA7AD8 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C43A18D29D0D8D800EA7AD8 /* SettingsView.swift */; };
 		0C4BF92D298817EC0086A6A7 /* IntlineTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C4BF92C298817EC0086A6A7 /* IntlineTabBar.swift */; };
 		0C516FE726015ED3004813B4 /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CFF9BD825D6199A0069DB6A /* repos.json */; };
 		0C516FF026016392004813B4 /* DocumentBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C516FEF26016392004813B4 /* DocumentBrowser.swift */; };
@@ -603,6 +605,8 @@
 		0C43A18029D0ADA300EA7AD8 /* Foundation+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Foundation+Extensions.swift"; sourceTree = "<group>"; };
 		0C43A18529D0B1A800EA7AD8 /* RemoteClientCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteClientCell.swift; sourceTree = "<group>"; };
 		0C43A18729D0B23800EA7AD8 /* DocumentCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentCell.swift; sourceTree = "<group>"; };
+		0C43A18B29D0D86B00EA7AD8 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
+		0C43A18D29D0D8D800EA7AD8 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		0C4BF92C298817EC0086A6A7 /* IntlineTabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntlineTabBar.swift; sourceTree = "<group>"; };
 		0C516FBA26015DD2004813B4 /* Pulse Demo iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pulse Demo iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C516FEF26016392004813B4 /* DocumentBrowser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentBrowser.swift; sourceTree = "<group>"; };
@@ -990,8 +994,7 @@
 			isa = PBXGroup;
 			children = (
 				0C38795429D08BA7001230DB /* App.swift */,
-				0C43A15D29D08FD600EA7AD8 /* WelcomeView.swift */,
-				0C43A16129D091D800EA7AD8 /* PulseDocumentViewer.swift */,
+				0C43A18B29D0D86B00EA7AD8 /* AppSettings.swift */,
 				0C43A18429D0B19B00EA7AD8 /* Views */,
 				0C43A17529D0AD4500EA7AD8 /* RemoteLogger */,
 				0C43A17029D0928600EA7AD8 /* Helpers */,
@@ -1026,8 +1029,11 @@
 		0C43A18429D0B19B00EA7AD8 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				0C43A15D29D08FD600EA7AD8 /* WelcomeView.swift */,
+				0C43A16129D091D800EA7AD8 /* PulseDocumentViewer.swift */,
 				0C43A18529D0B1A800EA7AD8 /* RemoteClientCell.swift */,
 				0C43A18729D0B23800EA7AD8 /* DocumentCell.swift */,
+				0C43A18D29D0D8D800EA7AD8 /* SettingsView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -2200,12 +2206,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0C43A18C29D0D86B00EA7AD8 /* AppSettings.swift in Sources */,
 				0C43A18829D0B23800EA7AD8 /* DocumentCell.swift in Sources */,
 				0C43A18129D0ADA300EA7AD8 /* Foundation+Extensions.swift in Sources */,
 				0C43A15E29D08FD600EA7AD8 /* WelcomeView.swift in Sources */,
 				0C38795529D08BA7001230DB /* App.swift in Sources */,
 				0C43A17F29D0AD4500EA7AD8 /* RemoteLoggerViewModel.swift in Sources */,
 				0C43A18629D0B1A800EA7AD8 /* RemoteClientCell.swift in Sources */,
+				0C43A18E29D0D8D800EA7AD8 /* SettingsView.swift in Sources */,
 				0C43A17229D0929000EA7AD8 /* PlaceholderView.swift in Sources */,
 				0C43A17429D092D100EA7AD8 /* AlertViewModel.swift in Sources */,
 				0C43A16F29D0924000EA7AD8 /* PulseDocumentViewer.swift in Sources */,

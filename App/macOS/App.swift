@@ -43,6 +43,10 @@ struct App: SwiftUI.App {
         }
         .windowStyle(.hiddenTitleBar)
         .windowToolbarStyle(.unified(showsTitle: false))
+
+        Settings {
+            SettingsView()
+        }
     }
 }
 
