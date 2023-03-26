@@ -52,15 +52,6 @@ public struct SettingsView: View {
                 }
                 Spacer()
             }
-            HStack {
-                Button(action: { isPresentingStoreDetails = true }) {
-                    Label("Store Details", systemImage: "info.circle")
-                }
-                Spacer()
-            }
-            .popover(isPresented: $isPresentingStoreDetails) {
-                StoreDetailsView(source: .store(viewModel.store))
-            }
         }
         ConsoleSection(header: { SectionHeaderView(title: "Open Store") }) {
             HStack {
