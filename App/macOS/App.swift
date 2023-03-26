@@ -6,8 +6,6 @@ import SwiftUI
 
 @main
 struct App: SwiftUI.App {
-    @State private var isWelcomeViewHidden = true
-
     var body: some Scene {
         WindowGroup {
             WelcomeView()
