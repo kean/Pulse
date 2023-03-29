@@ -28,7 +28,7 @@ The best way to start using Pulse is with the [**Getting Started**](https://kean
 
 [**Pulse Pro**](https://kean.blog/pulse/pro) is a professional open-source macOS app that allows you to view logs in real-time. The app is designed to be flexible, expansive, and precise while using all the familiar macOS patterns. It makes it easy to navigate large log files with table and text modes, filters, scroller markers, an all-new network inspector, JSON filters, and more.
 
-Both Pulse and Pulse Pro are fully open-source.
+> warning: Pulse Pro will be discontinued soon and replaced with Pulse for macOS. You can find a pre-release build of Pulse for macOS in the [latest releases](https://github.com/kean/Pulse/releases).
 
 ## Minimum Requirements
 
