@@ -23,6 +23,25 @@ struct DateRangePicker: View {
     }
 #else
     var body: some View {
+#if os(iOS)
+        if #available(iOS 16, *) {
+            ViewThatFits {
+                horizontal
+
+                VStack(alignment: .leading) {
+                    Text(title + " Date")
+                    contents
+                }
+            }
+        } else {
+            horizontal
+        }
+#else
+        horizontal
+#endif
+    }
+
+    private var horizontal: some View {
         HStack {
             Text(title)
             Spacer()

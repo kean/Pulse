@@ -57,11 +57,17 @@ extension ConsoleRouterView {
 
     private var destinationFilters: some View {
         NavigationView {
-            ConsoleSearchCriteriaView(viewModel: viewModel.searchCriteriaViewModel)
+            let view = ConsoleSearchCriteriaView(viewModel: viewModel.searchCriteriaViewModel)
                 .inlineNavigationTitle("Filters")
                 .navigationBarItems(trailing: Button("Done") {
                     viewModel.router.isShowingFilters = false
                 })
+
+            if #available(iOS 15, *) {
+                view.dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+            } else {
+                view
+            }
         }
     }
 
