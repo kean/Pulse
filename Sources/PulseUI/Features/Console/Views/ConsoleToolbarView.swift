@@ -14,22 +14,49 @@ struct ConsoleToolbarView: View {
     let viewModel: ConsoleViewModel
 
     var body: some View {
-        HStack(alignment: .bottom, spacing: 0) {
-            if viewModel.isNetwork {
-                ConsoleToolbarTitle(viewModel: viewModel)
-            } else {
-                if viewModel.context.focus != nil {
-                    ConsoleModeButton(title: viewModel.mode == .tasks ? "Focused Tasks" : "Focused Logs", isSelected: false) {}
-                } else {
-                    ConsoleModePicker(viewModel: viewModel)
-                }
+        if #available(iOS 16.0, *) {
+            ViewThatFits {
+                horizontal
+                vertical
             }
-            Spacer()
-            HStack(spacing: 14) {
-                ConsoleFiltersView(viewModel: viewModel)
-            }.padding(.trailing, -2)
+            .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+        } else {
+            horizontal
+        }
+    }
+
+    private var horizontal: some View {
+        HStack(alignment: .bottom, spacing: 0) {
+            contents(isVertical: false)
         }
         .buttonStyle(.plain)
+    }
+
+    // Fallback for larger dynamic font sizes.
+    private var vertical: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            contents(isVertical: true)
+        }
+        .buttonStyle(.plain)
+    }
+
+    @ViewBuilder
+    private func contents(isVertical: Bool) -> some View {
+        if viewModel.isNetwork {
+            ConsoleToolbarTitle(viewModel: viewModel)
+        } else {
+            if viewModel.context.focus != nil {
+                ConsoleModeButton(title: viewModel.mode == .tasks ? "Focused Tasks" : "Focused Logs", isSelected: false) {}
+            } else {
+                ConsoleModePicker(viewModel: viewModel)
+            }
+        }
+        if !isVertical {
+            Spacer()
+        }
+        HStack(spacing: 14) {
+            ConsoleFiltersView(viewModel: viewModel)
+        }.padding(.trailing, isVertical ? 0 : -2)
     }
 }
 #elseif os(macOS)
@@ -141,10 +168,14 @@ private struct ConsoleModeButton: View {
                 Text(title)
                     .foregroundColor(isSelected ? Color.blue : Color.secondary)
                     .font(.subheadline.weight(.medium))
+                    .lineLimit(1)
+                    .allowsTightening(true)
                 if let details = details {
                     Text("(\(details))")
                         .foregroundColor(isSelected ? Color.blue.opacity(0.7) : Color.secondary.opacity(0.7))
                         .font(.subheadline)
+                        .lineLimit(1)
+                        .allowsTightening(true)
                 }
             }
         }
@@ -166,12 +197,21 @@ struct ConsoleFiltersView: View {
 
     var body: some View {
         if #available(iOS 15, *) {
+            contents.dynamicTypeSize(...DynamicTypeSize.accessibility1)
+        } else {
+            contents
+        }
+    }
+
+    @ViewBuilder
+    private var contents: some View {
+        if #available(iOS 15, *) {
             sortByMenu.fixedSize()
             groupByMenu.fixedSize()
         }
         Button(action: { searchCriteriaViewModel.isOnlyErrors.toggle() }) {
-            Image(systemName: searchCriteriaViewModel.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon")
-                .font(.system(size: 20))
+            Text(Image(systemName: searchCriteriaViewModel.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon"))
+                .font(.body)
                 .foregroundColor(searchCriteriaViewModel.isOnlyErrors ? .red : .blue)
         }
     }
@@ -198,6 +238,7 @@ struct ConsoleFiltersView: View {
             }
         }, label: {
             Image(systemName: "arrow.up.arrow.down")
+                .font(.body)
                 .foregroundColor(.blue)
         })
     }
@@ -237,6 +278,7 @@ struct ConsoleFiltersView: View {
             }
         }, label: {
             Image(systemName: "rectangle.3.group")
+                .font(.body)
                 .foregroundColor(.blue)
         })
     }
