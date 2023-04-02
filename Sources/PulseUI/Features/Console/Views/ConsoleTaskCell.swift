@@ -26,7 +26,11 @@ struct ConsoleTaskCell: View {
 #endif
 
         let contents = VStack(alignment: .leading, spacing: spacing) {
-            title
+            if #available(iOS 15, tvOS 15, *) {
+                title.dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+            } else {
+                title
+            }
             message
 #if !os(macOS)
             if task.state == .pending {

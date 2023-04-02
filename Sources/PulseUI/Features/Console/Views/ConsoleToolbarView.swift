@@ -214,6 +214,7 @@ struct ConsoleFiltersView: View {
                 .font(.body)
                 .foregroundColor(searchCriteriaViewModel.isOnlyErrors ? .red : .blue)
         }
+        .padding(.leading, 1)
     }
 
     @ViewBuilder
