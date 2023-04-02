@@ -1,5 +1,12 @@
 # Pulse 3.x
 
+## Pulse 3.5.5
+
+*Apr 2, 2023*
+
+- Fix warnings in Xcode 14.3
+- Improve Dynamic Type support
+
 ## Pulse 3.5.4
 
 *Mar 10, 2023*
