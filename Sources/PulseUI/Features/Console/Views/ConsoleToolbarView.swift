@@ -125,7 +125,7 @@ struct ConsoleModePicker: View {
         HStack(spacing: spacing) {
             ConsoleModeButton(title: "All", isSelected: mode == .all) { mode = .all }
             ConsoleModeButton(title: "Logs", details: "\(logsCounter.count)", isSelected: mode == .logs) { mode = .logs }
-            ConsoleModeButton(title: "Tasks", details: "\(tasksCounter.count)", isSelected: mode == .network) { mode = .network }
+            ConsoleModeButton(title: "Network", details: "\(tasksCounter.count)", isSelected: mode == .network) { mode = .network }
         }
         .onChange(of: mode) {
             viewModel.mode = $0
