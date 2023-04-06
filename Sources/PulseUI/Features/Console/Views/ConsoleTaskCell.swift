@@ -43,7 +43,7 @@ struct ConsoleTaskCell: View {
             .onAppear { viewModel.bind(task)}
             .onChange(of: task) { viewModel.bind($0) }
 #if os(macOS)
-        contents.padding(.vertical, 2)
+        contents.padding(.vertical, 5)
 #else
         if #unavailable(iOS 16) {
             contents.padding(.vertical, 4)
@@ -80,13 +80,9 @@ struct ConsoleTaskCell: View {
 
     private var time: some View {
         Text(ConsoleMessageCellViewModel.timeFormatter.string(from: task.createdAt))
-            .font(ConsoleConstants.fontTitle)
-#if os(watchOS)
-            .foregroundColor(.secondary)
-#else
-            .foregroundColor(task.state == .failure ? .red : .secondary)
-#endif
             .lineLimit(1)
+            .font(ConsoleConstants.fontInfo)
+            .foregroundColor(.secondary)
             .backport.monospacedDigit()
     }
 
@@ -106,25 +102,41 @@ struct ConsoleTaskCell: View {
             Spacer()
             time
         }
+#elseif os(iOS)
+        HStack(spacing: infoSpacing) {
+            Text(task.httpMethod ?? "GET")
+                .fontWeight(.medium)
+                .font(ConsoleConstants.fontInfo)
+
+            Spacer()
+
+            makeInfoView(image: "arrow.up", text: byteCount(for: task.requestBodySize))
+            makeInfoView(image: "arrow.down", text: byteCount(for: task.responseBodySize))
+            makeInfoView(image: "clock", text: ConsoleFormatter.duration(for: task) ?? "–")
+        }
+        .lineLimit(1)
+        .foregroundColor(.secondary)
+        .padding(.top, 4)
 #else
-        detailsText
-            .lineLimit(1)
-            .font(ConsoleConstants.fontTitle)
-            .foregroundColor(.secondary)
+        HStack(spacing: infoSpacing) {
+            Text(task.httpMethod ?? "GET")
+
+            makeInfoView(image: "arrow.up", text: byteCount(for: task.requestBodySize))
+            makeInfoView(image: "arrow.down", text: byteCount(for: task.responseBodySize))
+            makeInfoView(image: "clock", text: ConsoleFormatter.duration(for: task) ?? "–")
+
+            Spacer()
+        }
+        .lineLimit(1)
+        .font(ConsoleConstants.fontTitle)
+        .foregroundColor(.secondary)
 #endif
     }
 
-    private var detailsText: Text {
-        Text(task.httpMethod ?? "GET").font(ConsoleConstants.fontBody.smallCaps()) +
-         Text("   ") +
-        Text(Image(systemName: "arrow.up")).fontWeight(.light) +
-        Text(" " + byteCount(for: task.requestBodySize)) +
-        Text("   ") +
-        Text(Image(systemName: "arrow.down")).fontWeight(.light) +
-        Text(" " + byteCount(for: task.responseBodySize)) +
-        Text("   ") +
-        Text(Image(systemName: "clock")).fontWeight(.light) +
-        Text(" " + (ConsoleFormatter.duration(for: task) ?? "–"))
+    private func makeInfoView(image: String, text: String) -> some View {
+        (Text(Image(systemName: image)).fontWeight(.light) +
+         Text(" " + text))
+        .font(ConsoleConstants.fontInfo)
     }
 
     private func byteCount(for size: Int64) -> String {
@@ -132,6 +144,12 @@ struct ConsoleTaskCell: View {
         return ByteCountFormatter.string(fromByteCount: size)
     }
 }
+
+#if os(macOS)
+private let infoSpacing: CGFloat = 8
+#else
+private let infoSpacing: CGFloat = 14
+#endif
 
 private struct ConsoleProgressText: View {
     let title: String
