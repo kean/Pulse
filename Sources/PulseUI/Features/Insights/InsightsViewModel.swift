@@ -92,7 +92,7 @@ final class InsightsViewModel: ObservableObject, ConsoleDataSourceDelegate {
     private func makeDestinationListViewModel(_ configure: (ConsoleViewModel) -> Void) -> ConsoleViewModel {
         guard let sourceViewModel = consoleViewModel else { fatalError() }
         let viewModel = ConsoleViewModel(store: sourceViewModel.store)
-        viewModel.mode = .tasks
+        viewModel.mode = .network
         configure(viewModel)
         return viewModel
     }
@@ -103,7 +103,7 @@ final class InsightsViewModel: ObservableObject, ConsoleDataSourceDelegate {
     private func resetDataSource() {
         guard isViewVisible else { return }
 
-        dataSource = ConsoleDataSource(store: store, mode: .tasks)
+        dataSource = ConsoleDataSource(store: store, mode: .network)
         dataSource?.delegate = self
         dataSource?.refresh()
 

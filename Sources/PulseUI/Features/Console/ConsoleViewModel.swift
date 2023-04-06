@@ -174,8 +174,12 @@ struct ConsoleContext {
     var focus: NSPredicate?
 }
 
-enum ConsoleMode: String {
+public enum ConsoleMode: String {
+    /// Displays both messages and network tasks with the ability
+    /// to switch between the two modes.
     case all
+    /// Displays only regular messages.
     case logs
+    /// Displays only network tasks.
     case network
 }

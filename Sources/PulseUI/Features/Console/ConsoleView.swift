@@ -8,7 +8,7 @@ import Pulse
 import Combine
 
 extension ConsoleView {
-    public init(store: LoggerStore = .shared) {
-        self.init(viewModel: .init(store: store))
+    public init(store: LoggerStore = .shared, mode: ConsoleMode = .all) {
+        self.init(viewModel: .init(store: store, mode: mode))
     }
 }
