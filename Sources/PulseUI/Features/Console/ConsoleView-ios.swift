@@ -11,6 +11,8 @@ import Combine
 
 public struct ConsoleView: View {
     @StateObject private var viewModel: ConsoleViewModel // Never reloads
+    @Environment(\.presentationMode) private var presentationMode
+    private var isCloseButtonHidden = false
 
     init(viewModel: ConsoleViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
@@ -23,6 +25,13 @@ public struct ConsoleView: View {
             .navigationTitle(viewModel.title)
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarLeading) {
+                    if !isCloseButtonHidden && presentationMode.wrappedValue.isPresented {
+                        Button("Close") {
+                            presentationMode.wrappedValue.dismiss()
+                        }
+                    }
+                }
+                ToolbarItemGroup(placement: .navigationBarLeading) {
                     leadingNavigationBarItems
                 }
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
@@ -30,6 +39,13 @@ public struct ConsoleView: View {
                 }
             }
             .background(ConsoleRouterView(viewModel: viewModel))
+    }
+
+    /// Changes the default close button visibility.
+    public func closeButtonHidden(_ isHidden: Bool = true) -> ConsoleView {
+        var copy = self
+        copy.isCloseButtonHidden = isHidden
+        return copy
     }
 
     private var leadingNavigationBarItems: some View {
