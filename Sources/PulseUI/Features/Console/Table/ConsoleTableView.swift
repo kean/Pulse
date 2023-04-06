@@ -28,7 +28,7 @@ private struct _ConsoleTableView: View {
         switch viewModel.mode {
         case .all, .logs:
             ConsoleMessageTableView(viewModel: viewModel, selection: $selection)
-        case .tasks:
+        case .network:
             ConsoleTaskTableView(viewModel: viewModel, selection: $selection)
         }
     }
@@ -168,7 +168,7 @@ struct ConsoleTableView_Previews: PreviewProvider {
         }
         Group {
             let viewModel = ConsoleViewModel(store: .mock)
-            let _ = viewModel.mode = .tasks
+            let _ = viewModel.mode = .network
             ConsoleTableView(viewModel: viewModel.tableViewModel, selection: .constant(nil))
                 .previewLayout(.fixed(width: 1200, height: 800))
                 .previewDisplayName("Tasks")

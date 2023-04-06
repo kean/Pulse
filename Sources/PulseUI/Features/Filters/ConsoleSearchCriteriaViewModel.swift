@@ -65,7 +65,7 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
 
     var isCriteriaDefault: Bool {
         guard criteria.shared == defaultCriteria.shared else { return false }
-        if mode == .tasks {
+        if mode == .network {
             return criteria.network == defaultCriteria.network
         } else {
             return criteria.messages == defaultCriteria.messages
@@ -77,7 +77,7 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
     }
 
     private func reloadCounters() {
-        if mode == .tasks {
+        if mode == .network {
             guard let tasks = entities as? [NetworkTaskEntity] else {
                 return assertionFailure()
             }

@@ -43,12 +43,12 @@ struct ConsoleToolbarView: View {
     @ViewBuilder
     private func contents(isVertical: Bool) -> some View {
         if viewModel.context.focus != nil {
-            ConsoleModeButton(title: viewModel.mode == .tasks ? "Focused Tasks" : "Focused Logs", isSelected: false) {}
+            ConsoleModeButton(title: viewModel.mode == .network ? "Focused Tasks" : "Focused Logs", isSelected: false) {}
         } else {
             switch viewModel.initialMode {
             case .all:
                 ConsoleModePicker(viewModel: viewModel)
-            case .logs, .tasks:
+            case .logs, .network:
                 ConsoleToolbarTitle(viewModel: viewModel)
             }
         }
@@ -125,7 +125,7 @@ struct ConsoleModePicker: View {
         HStack(spacing: spacing) {
             ConsoleModeButton(title: "All", isSelected: mode == .all) { mode = .all }
             ConsoleModeButton(title: "Logs", details: "\(logsCounter.count)", isSelected: mode == .logs) { mode = .logs }
-            ConsoleModeButton(title: "Tasks", details: "\(tasksCounter.count)", isSelected: mode == .tasks) { mode = .tasks }
+            ConsoleModeButton(title: "Tasks", details: "\(tasksCounter.count)", isSelected: mode == .network) { mode = .network }
         }
         .onChange(of: mode) {
             viewModel.mode = $0
@@ -146,7 +146,7 @@ private struct ConsoleToolbarTitle: View {
     }
 
     private var titlePublisher: some Publisher<String, Never> {
-        let kind = viewModel.initialMode == .tasks ? "Requests" : "Logs"
+        let kind = viewModel.initialMode == .network ? "Requests" : "Logs"
         return viewModel.listViewModel.$entities.map { entities in
             "\(entities.count) \(kind)"
         }
@@ -222,7 +222,7 @@ struct ConsoleFiltersView: View {
     @ViewBuilder
     private var sortByMenu: some View {
         Menu(content: {
-            if viewModel.mode == .tasks {
+            if viewModel.mode == .network {
                 Picker("Sort By", selection: $listViewModel.options.taskSortBy) {
                     ForEach(ConsoleListOptions.TaskSortBy.allCases, id: \.self) {
                         Text($0.rawValue).tag($0)
@@ -249,7 +249,7 @@ struct ConsoleFiltersView: View {
     @ViewBuilder
     private var groupByMenu: some View {
         Menu(content: {
-            if viewModel.mode == .tasks {
+            if viewModel.mode == .network {
                 Picker("Group By", selection: $listViewModel.options.taskGroupBy) {
                     Group {
                         Text("Ungrouped").tag(ConsoleListOptions.TaskGroupBy.noGrouping)

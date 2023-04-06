@@ -54,9 +54,9 @@ final class ConsoleViewModel: ObservableObject {
 
     var bindingForNetworkMode: Binding<Bool> {
         Binding(get: {
-            self.mode == .tasks
+            self.mode == .network
         }, set: {
-            self.mode = $0 ? .tasks : .all
+            self.mode = $0 ? .network : .all
         })
     }
 
@@ -70,7 +70,7 @@ final class ConsoleViewModel: ObservableObject {
             switch mode {
             case .all: return "Console"
             case .logs: return "Logs"
-            case .tasks: return "Network"
+            case .network: return "Network"
             }
         }()
         self.context = context
@@ -143,7 +143,7 @@ final class ConsoleViewModel: ObservableObject {
             ConsoleDataSource.makePredicate(mode: mode, criteria: criteria, focus: focus, isOnlyErrors: isOnlyError)
         }
         logCountObserver.setPredicate(makePredicate(for: .logs))
-        taskCountObserver.setPredicate(makePredicate(for: .tasks))
+        taskCountObserver.setPredicate(makePredicate(for: .network))
     }
 
     private func prepare(for mode: ConsoleMode) {
@@ -177,5 +177,5 @@ struct ConsoleContext {
 enum ConsoleMode: String {
     case all
     case logs
-    case tasks
+    case network
 }

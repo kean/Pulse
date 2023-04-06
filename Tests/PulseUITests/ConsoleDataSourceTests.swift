@@ -54,7 +54,7 @@ final class ConsoleDataSourceTests: ConsoleTestCase, ConsoleDataSourceDelegate {
 
     func testSwitchingToNetworkMode() {
         // WHEN
-        mode = .tasks
+        mode = .network
         reset()
 
         // THEN
@@ -98,7 +98,7 @@ final class ConsoleDataSourceTests: ConsoleTestCase, ConsoleDataSourceDelegate {
     }
 
     func groupTasksBy(_ grouping: ConsoleListOptions.TaskGroupBy) -> [NSFetchedResultsSectionInfo] {
-        mode = .tasks
+        mode = .network
         options.taskGroupBy = grouping
         reset()
         return sut.sections ?? []

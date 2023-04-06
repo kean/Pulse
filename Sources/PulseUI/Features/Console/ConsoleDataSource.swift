@@ -51,7 +51,7 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
             entityName = "\(LoggerMessageEntity.self)"
             sortKey = options.messageSortBy.key
             grouping = options.messageGroupBy
-        case .tasks:
+        case .network:
             entityName = "\(NetworkTaskEntity.self)"
             sortKey = options.taskSortBy.key
             grouping = options.taskGroupBy
@@ -157,7 +157,7 @@ private func _makePredicate(_ mode: ConsoleMode, _ criteria: ConsoleSearchCriter
         return makeMessagesPredicate(isMessageOnly: false)
     case .logs:
         return makeMessagesPredicate(isMessageOnly: true)
-    case .tasks:
+    case .network:
         return ConsoleSearchCriteria.makeNetworkPredicates(criteria: criteria, isOnlyErrors: isOnlyErrors)
     }
 }
@@ -178,7 +178,7 @@ private func makeName(for section: NSFetchedResultsSectionInfo, mode: ConsoleMod
         default:
             break
         }
-    case .tasks:
+    case .network:
         switch options.taskGroupBy {
         case .taskType:
             let rawValue = Int16(Int(section.name) ?? 0)

@@ -30,7 +30,7 @@ struct ConsoleSearchCriteriaView: View {
             }
             Divider()
             HStack {
-                Text(viewModel.mode == .tasks ? "Network Filters" : "Message Filters")
+                Text(viewModel.mode == .network ? "Network Filters" : "Message Filters")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
                 Spacer()
@@ -50,7 +50,7 @@ struct ConsoleSearchCriteriaView: View {
 
         timePeriodSection
 
-        if viewModel.mode == .tasks {
+        if viewModel.mode == .network {
 #if os(iOS) || os(macOS)
             if #available(iOS 15, *) {
                 customNetworkFiltersSection
@@ -219,7 +219,7 @@ private func makePreview(isOnlyNetwork: Bool) -> some View {
     let entities: [NSManagedObject] = try! isOnlyNetwork ? store.allTasks() : store.allMessages()
     let viewModel = ConsoleSearchCriteriaViewModel(criteria: .init(), index: .init(store: store))
     viewModel.bind(CurrentValueSubject(entities))
-    viewModel.mode = isOnlyNetwork ? .tasks : .all
+    viewModel.mode = isOnlyNetwork ? .network : .all
     return ConsoleSearchCriteriaView(viewModel: viewModel)
 }
 #endif

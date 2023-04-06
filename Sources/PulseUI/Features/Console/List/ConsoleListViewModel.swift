@@ -165,7 +165,7 @@ private func filter(pins: [LoggerMessageEntity], mode: ConsoleMode) -> [LoggerMe
         switch mode {
         case .all: return true
         case .logs: return $0.task == nil
-        case .tasks: return $0.task != nil
+        case .network: return $0.task != nil
         }
     }
 }
