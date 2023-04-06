@@ -32,7 +32,13 @@ struct WrappedTextView: UIViewRepresentable {
     }
 
     func makeUIView(context: Context) -> UXTextView {
-        let textView = UITextView()
+        let textView: UITextView
+        if #available(iOS 16, *) {
+            // Disables the new TextKit 2 which is extremely slow on iOS 16
+            textView = UITextView(usingTextLayoutManager: false)
+        } else {
+            textView = UITextView()
+        }
         configureTextView(textView)
         textView.delegate = context.coordinator
         textView.attributedText = viewModel.originalText
