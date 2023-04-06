@@ -109,6 +109,7 @@
 		0CB63A352976028F00525165 /* ConsoleSearchFilter+Parsers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A332976028B00525165 /* ConsoleSearchFilter+Parsers.swift */; };
 		0CB63A382976225400525165 /* Cache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A362976224600525165 /* Cache.swift */; };
 		0CB63A3B2976229200525165 /* LinkedList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A392976227500525165 /* LinkedList.swift */; };
+		0CBEF6A629DF69EB00132FB3 /* ConsoleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CBEF6A429DF69E800132FB3 /* ConsoleView.swift */; };
 		0CCBDDC02610BDBC00DCB60C /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CFF9BD825D6199A0069DB6A /* repos.json */; };
 		0CD7E0BD29732C8E00A255B7 /* ShareStoreTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD7E0BC29732C8E00A255B7 /* ShareStoreTask.swift */; };
 		0CDC3BEA2970FA47003BD1FF /* ConsoleSearchListSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CDC3BE92970FA47003BD1FF /* ConsoleSearchListSelectionView.swift */; };
@@ -601,6 +602,7 @@
 		0CB63A332976028B00525165 /* ConsoleSearchFilter+Parsers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ConsoleSearchFilter+Parsers.swift"; sourceTree = "<group>"; };
 		0CB63A362976224600525165 /* Cache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cache.swift; sourceTree = "<group>"; };
 		0CB63A392976227500525165 /* LinkedList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkedList.swift; sourceTree = "<group>"; };
+		0CBEF6A429DF69E800132FB3 /* ConsoleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleView.swift; sourceTree = "<group>"; };
 		0CD7E0BC29732C8E00A255B7 /* ShareStoreTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareStoreTask.swift; sourceTree = "<group>"; };
 		0CDC3BE92970FA47003BD1FF /* ConsoleSearchListSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchListSelectionView.swift; sourceTree = "<group>"; };
 		0CDC3BEC2971B936003BD1FF /* ConsoleSearchLogLevelsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchLogLevelsCell.swift; sourceTree = "<group>"; };
@@ -1501,6 +1503,7 @@
 				0CF0D5FC296F189600EED9D4 /* ConsoleView-tvos.swift */,
 				0CF0D5FD296F189600EED9D4 /* ConsoleView-macos.swift */,
 				0CF0D5FB296F189600EED9D4 /* ConsoleView-watchos.swift */,
+				0CBEF6A429DF69E800132FB3 /* ConsoleView.swift */,
 				0CF0D60A296F189600EED9D4 /* ConsoleViewModel.swift */,
 				0CECF63C2996BE12000F9CCD /* ConsoleDataSource.swift */,
 			);
@@ -2170,6 +2173,7 @@
 				0CF0D634296F189600EED9D4 /* TimingView.swift in Sources */,
 				0CF0D622296F189600EED9D4 /* Formatters.swift in Sources */,
 				0CF0D62F296F189600EED9D4 /* TextView.swift in Sources */,
+				0CBEF6A629DF69EB00132FB3 /* ConsoleView.swift in Sources */,
 				0CF0D67D296F189600EED9D4 /* ConsoleEntityCell.swift in Sources */,
 				0CF0D649296F189600EED9D4 /* DateRangePicker.swift in Sources */,
 				0C7A0E00297C51CE00B4B69D /* ConsoleListOptions.swift in Sources */,

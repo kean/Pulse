@@ -13,10 +13,6 @@ public struct ConsoleView: View {
     @StateObject private var viewModel: ConsoleViewModel
     @AppStorage("com-github-kean-pulse-is-vertical") private var isVertical = false
 
-    public init(store: LoggerStore = .shared) {
-        self.init(viewModel: .init(store: store))
-    }
-
     init(viewModel: ConsoleViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }

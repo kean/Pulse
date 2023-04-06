@@ -12,10 +12,6 @@ import Combine
 public struct ConsoleView: View {
     @StateObject private var viewModel: ConsoleViewModel
 
-    public init(store: LoggerStore = .shared) {
-        self.init(viewModel: ConsoleViewModel(store: store))
-    }
-
     init(viewModel: ConsoleViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }

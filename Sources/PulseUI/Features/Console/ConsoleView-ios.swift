@@ -12,14 +12,9 @@ import Combine
 public struct ConsoleView: View {
     @StateObject private var viewModel: ConsoleViewModel // Never reloads
 
-    public init(store: LoggerStore = .shared) {
-        self.init(viewModel: .init(store: store))
-    }
-
     init(viewModel: ConsoleViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
-
 
     public var body: some View {
         ConsoleListView(viewModel: viewModel)
