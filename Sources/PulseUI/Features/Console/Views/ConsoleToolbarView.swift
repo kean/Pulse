@@ -42,13 +42,14 @@ struct ConsoleToolbarView: View {
 
     @ViewBuilder
     private func contents(isVertical: Bool) -> some View {
-        if viewModel.isNetwork {
-            ConsoleToolbarTitle(viewModel: viewModel)
+        if viewModel.context.focus != nil {
+            ConsoleModeButton(title: viewModel.mode == .tasks ? "Focused Tasks" : "Focused Logs", isSelected: false) {}
         } else {
-            if viewModel.context.focus != nil {
-                ConsoleModeButton(title: viewModel.mode == .tasks ? "Focused Tasks" : "Focused Logs", isSelected: false) {}
-            } else {
+            switch viewModel.initialMode {
+            case .all:
                 ConsoleModePicker(viewModel: viewModel)
+            case .logs, .tasks:
+                ConsoleToolbarTitle(viewModel: viewModel)
             }
         }
         if !isVertical {
@@ -145,8 +146,9 @@ private struct ConsoleToolbarTitle: View {
     }
 
     private var titlePublisher: some Publisher<String, Never> {
-        viewModel.listViewModel.$entities.map { entities in
-            "\(entities.count) Requests"
+        let kind = viewModel.initialMode == .tasks ? "Requests" : "Logs"
+        return viewModel.listViewModel.$entities.map { entities in
+            "\(entities.count) \(kind)"
         }
     }
 }

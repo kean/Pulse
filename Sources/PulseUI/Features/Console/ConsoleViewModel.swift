@@ -9,7 +9,6 @@ import SwiftUI
 
 final class ConsoleViewModel: ObservableObject {
     let title: String
-    let isNetwork: Bool
     let store: LoggerStore
     let context: ConsoleContext
 
@@ -47,6 +46,8 @@ final class ConsoleViewModel: ObservableObject {
         didSet { refreshListsVisibility() }
     }
 
+    let initialMode: ConsoleMode
+
     var mode: ConsoleMode {
         didSet { prepare(for: mode) }
     }
@@ -63,12 +64,18 @@ final class ConsoleViewModel: ObservableObject {
 
     private var cancellables: [AnyCancellable] = []
 
-    init(store: LoggerStore, context: ConsoleContext = .init(), mode: ConsoleMode = .all, isOnlyNetwork: Bool = false) {
+    init(store: LoggerStore, context: ConsoleContext = .init(), mode: ConsoleMode = .all) {
         self.store = store
-        self.title = context.title ?? (isOnlyNetwork ? "Network" : "Console")
+        self.title = context.title ?? {
+            switch mode {
+            case .all: return "Console"
+            case .logs: return "Logs"
+            case .tasks: return "Network"
+            }
+        }()
         self.context = context
+        self.initialMode = mode
         self.mode = mode
-        self.isNetwork = isOnlyNetwork
 
         func makeDefaultSearchCriteria() -> ConsoleSearchCriteria {
             var criteria = ConsoleSearchCriteria()

@@ -20,7 +20,7 @@ public struct ConsoleView: View {
             ConsoleListContentView(viewModel: viewModel.listViewModel)
         }
         .background(ConsoleRouterView(viewModel: viewModel))
-        .navigationTitle("Console")
+        .navigationTitle(viewModel.title)
         .onAppear { viewModel.isViewVisible = true }
         .onDisappear { viewModel.isViewVisible = false }
         .toolbar {
@@ -46,11 +46,12 @@ private struct ConsoleToolbarView: View {
 
     var body: some View {
         HStack {
-            Button(action: { consoleViewModel.bindingForNetworkMode.wrappedValue.toggle() } ) {
-                Image(systemName: "arrow.down.circle")
+            if consoleViewModel.initialMode == .all {
+                Button(action: { consoleViewModel.bindingForNetworkMode.wrappedValue.toggle() } ) {
+                    Image(systemName: "arrow.down.circle")
+                }
+                .background(consoleViewModel.bindingForNetworkMode.wrappedValue ? Rectangle().foregroundColor(.blue).cornerRadius(8) : nil)
             }
-            .background(consoleViewModel.bindingForNetworkMode.wrappedValue ? Rectangle().foregroundColor(.blue).cornerRadius(8) : nil)
-
             Button(action: { viewModel.isOnlyErrors.toggle() }) {
                 Image(systemName: "exclamationmark.octagon")
             }
@@ -75,7 +76,6 @@ struct ConsoleView_Previews: PreviewProvider {
         NavigationView {
             ConsoleView(store: .mock)
         }
-        .navigationTitle("Console")
         .navigationViewStyle(.stack)
     }
 }
