@@ -30,7 +30,7 @@ extension RemoteLogger {
             case .ping: return "PacketCode.ping"
             case .storeEventMessageStored: return "PacketCode.storeEventMessageStored"
             case .storeEventNetworkTaskCreated: return "PacketCode.storeEventNetworkTaskCreated"
-            case .storeEventNetworkTaskProgressUpdated: return "Packet.storeEventNetworkTaskProgressUpdated"
+            case .storeEventNetworkTaskProgressUpdated: return "PacketCode.storeEventNetworkTaskProgressUpdated"
             case .storeEventNetworkTaskCompleted: return "PacketCode.storeEventNetworkTaskCompleted"
             }
         }
