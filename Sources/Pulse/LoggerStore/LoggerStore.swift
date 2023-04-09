@@ -285,7 +285,7 @@ extension LoggerStore {
         guard let event = configuration.willHandleEvent(event) else {
             return
         }
-        perform {
+        perform { _ in
             self._handle(event)
         }
         events.send(event)
@@ -293,7 +293,7 @@ extension LoggerStore {
 
     /// Handles event emitted by the external store.
     func handleExternalEvent(_ event: Event) {
-        perform { self._handle(event) }
+        perform { _ in self._handle(event) }
     }
 
     private func _handle(_ event: Event) {
@@ -658,17 +658,17 @@ extension LoggerStore {
 
     // MARK: - Performing Changes
 
-    private func perform(_ changes: @escaping () -> Void) {
+    private func perform(_ changes: @escaping (NSManagedObjectContext) -> Void) {
         guard !isArchive else { return }
 
         if options.contains(.synchronous) {
             backgroundContext.performAndWait {
-                changes()
+                changes(backgroundContext)
                 self.saveAndReset()
             }
         } else {
             backgroundContext.perform {
-                changes()
+                changes(self.backgroundContext)
                 self.setNeedsSave()
             }
         }
@@ -717,9 +717,25 @@ extension LoggerStore {
         try viewContext.fetch(NetworkTaskEntity.self, sortedBy: \.createdAt)
     }
 
+    /// Removes sessions with the given IDs.
+    public func removeSessions(withIDs sessionIDs: [UUID]) {
+        perform { _ in
+            try? self.deleteEntities(for: {
+                let request = LoggerSessionEntity.fetchRequest()
+                request.predicate = NSPredicate(format: "id IN %@", sessionIDs)
+                return request
+            }())
+            try? self.deleteEntities(for: {
+                let request = LoggerMessageEntity.fetchRequest()
+                request.predicate = NSPredicate(format: "session IN %@", sessionIDs)
+                return request
+            }())
+        }
+    }
+
     /// Removes all of the previously recorded messages.
     public func removeAll() {
-        perform { self._removeAll() }
+        perform { _ in self._removeAll() }
     }
 
     private func _removeAll() {
@@ -1038,7 +1054,7 @@ extension LoggerStore {
         public func togglePin(for message: LoggerMessageEntity) {
             guard let store = store else { return }
             store.perform {
-                guard let message = store.backgroundContext.object(with: message.objectID) as? LoggerMessageEntity else { return }
+                guard let message = $0.object(with: message.objectID) as? LoggerMessageEntity else { return }
                 self._togglePin(for: message)
             }
         }
@@ -1046,7 +1062,7 @@ extension LoggerStore {
         public func togglePin(for task: NetworkTaskEntity) {
             guard let store = store else { return }
             store.perform {
-                guard let task = store.backgroundContext.object(with: task.objectID) as? NetworkTaskEntity else { return }
+                guard let task = $0.object(with: task.objectID) as? NetworkTaskEntity else { return }
                 task.message.map(self._togglePin)
             }
         }
@@ -1054,7 +1070,7 @@ extension LoggerStore {
         public func removeAllPins() {
             guard let store = store else { return }
             store.perform {
-                let messages = try? store.backgroundContext.fetch(LoggerMessageEntity.self) {
+                let messages = try? $0.fetch(LoggerMessageEntity.self) {
                     $0.predicate = NSPredicate(format: "isPinned == YES")
                 }
                 for message in messages ?? [] {

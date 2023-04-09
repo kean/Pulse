@@ -644,6 +644,22 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertEqual(try store.allMessages().count, 10)
     }
 
+    // MARK: - Remove Session
+
+    func testRemoveSessions() throws {
+        // GIVEN
+        populate(store: store)
+        let sessions = try store.viewContext.fetch(LoggerSessionEntity.self)
+
+        // WHEN
+        store.removeSessions(withIDs: Array(sessions).map(\.id))
+
+        // THEN
+        XCTAssertEqual(try store.viewContext.fetch(LoggerSessionEntity.self).count, 0)
+        XCTAssertEqual(try store.allMessages().count, 0)
+        XCTAssertEqual(try store.allTasks().count, 0)
+    }
+
     // MARK: - Remove All
 
     func testRemoveAll() throws {
