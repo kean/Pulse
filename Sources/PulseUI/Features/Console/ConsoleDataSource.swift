@@ -135,7 +135,7 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
             basePredicate,
             _makePredicate(mode, options.criteria, options.isOnlyErrors),
             options.focus,
-            options.sessions.isEmpty ? nil : NSPredicate(format: "session IN %@", options.sessions.map(\.id))
+            options.sessions.isEmpty ? nil : NSPredicate(format: "session IN %@", options.sessions)
         ].compactMap { $0 }
         switch predicates.count {
         case 0: return nil

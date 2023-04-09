@@ -16,7 +16,7 @@ struct ConsoleSessionsView: View {
     private var sessions: FetchedResults<LoggerSessionEntity>
 
     @Environment(\.store) private var store
-    @State private var selection: Set<LoggerSessionEntity> = []
+    @State private var selection: Set<UUID> = []
     @State private var limit = 20
 
     @EnvironmentObject private var consoleViewModel: ConsoleViewModel
@@ -91,14 +91,14 @@ struct ConsoleSessionsView: View {
 #endif
             }
 #if os(iOS)
-            if selection.contains(session) {
+            if selection.contains(session.id) {
                 Image(systemName: "checkmark.circle.fill")
                     .foregroundColor(.blue)
             }
 #endif
         }
         .listRowBackground(Color.clear)
-        .tag(session)
+        .tag(session.id)
     }
 }
 

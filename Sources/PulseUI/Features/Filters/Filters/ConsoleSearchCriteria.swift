@@ -11,7 +11,7 @@ struct ConsolePredicateOptions {
     var criteria = ConsoleSearchCriteria()
     var isOnlyErrors = false
     var focus: NSPredicate?
-    var sessions: Set<LoggerSessionEntity> = []
+    var sessions: Set<UUID> = []
 }
 
 struct ConsoleSearchCriteria: Hashable {

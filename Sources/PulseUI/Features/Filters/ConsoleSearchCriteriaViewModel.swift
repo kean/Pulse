@@ -74,8 +74,9 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
         }
     }
 
-    func select(sessions: Set<LoggerSessionEntity>) {
+    func select(sessions: Set<UUID>) {
         var options = self.options
+#warning("this is no longer needed")
         options.criteria.shared.dates.startDate = nil
         options.criteria.shared.dates.endDate = nil
         options.sessions = sessions
