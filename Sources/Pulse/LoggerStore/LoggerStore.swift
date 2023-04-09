@@ -21,8 +21,8 @@ public final class LoggerStore: @unchecked Sendable {
     /// The configuration with which the store was initialized with.
     public let configuration: Configuration
 
-    /// Current session ID.
-    private(set) public var sessionID: Int64 = 0
+    /// Current session.
+    private(set) public var session: Session = .current
 
     /// Returns the Core Data container associated with the store.
     public let container: NSPersistentContainer
@@ -35,6 +35,9 @@ public final class LoggerStore: @unchecked Sendable {
 
     /// Re-transmits events processed by the store.
     public let events = PassthroughSubject<Event, Never>()
+
+    /// The store version.
+    public var version: String { manifest.version.description }
 
     private let options: Options
     private let document: PulseDocumentType
@@ -49,9 +52,6 @@ public final class LoggerStore: @unchecked Sendable {
     private let databaseURL: URL // Points to a temporary location if archive
     private var requestsCache: [NetworkLogger.Request: NetworkRequestEntity] = [:]
     private var responsesCache: [NetworkLogger.Response: NetworkResponseEntity] = [:]
-
-    /// The date one of the loggers was created.
-    public static let launchDate = Date()
 
     // MARK: Shared
 
@@ -136,8 +136,8 @@ public final class LoggerStore: @unchecked Sendable {
         } else {
             let document = try PulseDocument(documentURL: storeURL)
             let info = try document.open()
-            guard try Version(string: info.storeVersion) >= .currentStoreVersion else {
-                throw LoggerStore.Error.unsupportedVersion
+            guard try Version(string: info.storeVersion) >= .minimumSupportedVersion else {
+                throw LoggerStore.Error.unsupportedVersion(version: info.storeVersion, minimumSupportedVersion: Version.minimumSupportedVersion.description)
             }
             // Extract and decompress _only_ the database. The blobs can be read
             // directly from the compressed archive on demand.
@@ -163,18 +163,13 @@ public final class LoggerStore: @unchecked Sendable {
     }
 
     private func postInitialization() throws {
-        _ = LoggerStore.launchDate
-
         backgroundContext.performAndWait { [context = backgroundContext] in
             context.userInfo[WeakLoggerStore.loggerStoreKey] = WeakLoggerStore(store: self)
 
-            // Start a new session
-            let session = LoggerSessionEntity(context: context)
-            session.createdAt = LoggerStore.launchDate
-            let sessionID = Int64((try? context.count(for: LoggerSessionEntity.self)) ?? 0)
-            session.sessionID = sessionID
-            try? context.save()
-            self.sessionID = sessionID
+            if options.contains(.create) && !configuration.isRemote {
+                let appInfo = Info.AppInfo.make()
+                saveEntity(for: session, info: appInfo)
+            }
         }
 
         if Thread.isMainThread {
@@ -218,6 +213,7 @@ public final class LoggerStore: @unchecked Sendable {
         self.manifest = .init(storeId: UUID(), version: .currentStoreVersion)
         self.document = .package
         self.options = []
+        self.session = Session.current
         self.configuration = .init()
     }
 
@@ -227,6 +223,23 @@ public final class LoggerStore: @unchecked Sendable {
         store.setValue("DELETE" as NSString, forPragmaNamed: "journal_mode")
         container.persistentStoreDescriptions = [store]
         return container
+    }
+
+    func saveSession(_ session: Session, info: Info.AppInfo) {
+        backgroundContext.performAndWait {
+            self.session = session
+            saveEntity(for: session, info: info)
+        }
+    }
+
+    private func saveEntity(for session: Session, info: Info.AppInfo) {
+        // Start a new session
+        let entity = LoggerSessionEntity(context: backgroundContext)
+        entity.createdAt = session.startDate
+        entity.id = session.id
+        entity.version = info.version
+        entity.build = info.build
+        try? backgroundContext.save()
     }
 }
 
@@ -241,7 +254,6 @@ extension LoggerStore {
             level: level,
             message: message,
             metadata: metadata?.unpack(),
-            sessionID: sessionID,
             file: file,
             function: function,
             line: line
@@ -264,8 +276,7 @@ extension LoggerStore {
             requestBody: request.httpBody ?? request.httpBodyStreamData(),
             responseBody: data,
             metrics: metrics.map(NetworkLogger.Metrics.init),
-            label: label,
-            sessionID: sessionID
+            label: label
         )))
     }
 
@@ -299,7 +310,7 @@ extension LoggerStore {
         message.createdAt = event.createdAt
         message.level = event.level.rawValue
         message.label = event.label
-        message.sessionID = event.sessionID
+        message.session = event.session
         message.text = event.message
         message.file = (event.file as NSString).lastPathComponent
         message.function = event.function
@@ -310,7 +321,7 @@ extension LoggerStore {
     }
 
     private func process(_ event: Event.NetworkTaskCreated) {
-        let entity = findOrCreateTask(forTaskId: event.taskId, taskType: event.taskType, createdAt: event.createdAt, label: event.label, sessionID: event.sessionID, url: event.originalRequest.url)
+        let entity = findOrCreateTask(forTaskId: event.taskId, taskType: event.taskType, createdAt: event.createdAt, label: event.label, url: event.originalRequest.url)
         
         entity.url = event.originalRequest.url?.absoluteString
         entity.host = event.originalRequest.url.flatMap(getHost)
@@ -336,7 +347,7 @@ extension LoggerStore {
     }
 
     private func process(_ event: Event.NetworkTaskCompleted) {
-        let entity = findOrCreateTask(forTaskId: event.taskId, taskType: event.taskType, createdAt: event.createdAt, label: event.label, sessionID: event.sessionID, url: event.originalRequest.url)
+        let entity = findOrCreateTask(forTaskId: event.taskId, taskType: event.taskType, createdAt: event.createdAt, label: event.label, url: event.originalRequest.url)
 
         entity.url = event.originalRequest.url?.absoluteString
         entity.host = event.originalRequest.url.flatMap(getHost)
@@ -463,7 +474,7 @@ extension LoggerStore {
         }
     }
 
-    private func findOrCreateTask(forTaskId taskId: UUID, taskType: NetworkLogger.TaskType, createdAt: Date, label: String?, sessionID: Int64, url: URL?) -> NetworkTaskEntity {
+    private func findOrCreateTask(forTaskId taskId: UUID, taskType: NetworkLogger.TaskType, createdAt: Date, label: String?, url: URL?) -> NetworkTaskEntity {
         if let entity = findTask(forTaskId: taskId) {
             return entity
         }
@@ -475,13 +486,13 @@ extension LoggerStore {
         task.responseBodySize = -1
         task.requestBodySize = -1
         task.isFromCache = false
-        task.sessionID = sessionID
+        task.session = session.id
 
         let message = LoggerMessageEntity(context: backgroundContext)
         message.createdAt = createdAt
         message.level = Level.debug.rawValue
         message.label = label ?? "network"
-        message.sessionID = sessionID
+        message.session = session.id
         message.file = ""
         message.function = ""
         message.line = Int32(NetworkTaskEntity.State.pending.rawValue)
@@ -1086,7 +1097,7 @@ extension LoggerStore {
     public enum Error: Swift.Error, LocalizedError {
         case fileDoesntExist
         case storeInvalid
-        case unsupportedVersion
+        case unsupportedVersion(version: String, minimumSupportedVersion: String)
         case documentIsReadonly
         case fileAleadyExists
         case unknownError
@@ -1096,7 +1107,7 @@ extension LoggerStore {
             case .fileDoesntExist: return "File doesn't exist"
             case .storeInvalid: return "Store format is invalid"
             case .documentIsReadonly: return "Document is readonly"
-            case .unsupportedVersion: return "The store was created by one of the earlier versions of Pulse and is no longer supported"
+            case let .unsupportedVersion(version, minimumSupportedVersion): return "The store was created by with Pulse vesrion \(version). Minimum supported version is \(minimumSupportedVersion)."
             case .fileAleadyExists: return "The file at the given location already exists"
             case .unknownError: return "Unexpected error"
             }
@@ -1128,7 +1139,8 @@ extension LoggerStore {
 }
 
 extension Version {
-    static let currentStoreVersion = Version(3, 1, 0)
+    static let minimumSupportedVersion = Version(3, 1, 0)
+    static let currentStoreVersion = Version(3, 6, 0)
 }
 
 // MARK: - Constants

@@ -6,28 +6,40 @@
 
 import SwiftUI
 
+#warning("add help and shortcuts")
 struct ConsoleInspectorsView: View {
-    let viewModel: ConsoleViewModel
+    @EnvironmentObject private var viewModel: ConsoleViewModel
+
     @State private var selectedTab: ConsoleInspector = .filters
 
     var body: some View {
         VStack(spacing: 0) {
             toolbar
-            Divider()
+            Divider().opacity(0.8)
             selectedTabView
         }
     }
 
+    private var inspectors: [ConsoleInspector] {
+        var inspectors = ConsoleInspector.allCases
+        if viewModel.store.isArchive {
+            inspectors.removeAll(where: { $0 == .settings })
+        }
+        return inspectors
+    }
+
     private var toolbar: some View {
-        HStack {
+        HStack(alignment: .center) {
             Spacer()
-            ForEach(ConsoleInspector.allCases) { item in
+            ForEach(inspectors) { item in
                 TabBarItem(image: Image(systemName: item.systemImage), isSelected: item == selectedTab) {
                     selectedTab = item
                 }
             }
             Spacer()
-        }.padding(EdgeInsets(top: 3, leading: 10, bottom: 4, trailing: 8))
+        }
+        .offset(y: -2)
+        .frame(height: 27, alignment: .center)
     }
 
     @ViewBuilder
@@ -35,6 +47,8 @@ struct ConsoleInspectorsView: View {
         switch selectedTab {
         case .filters:
             ConsoleSearchCriteriaView(viewModel: viewModel.searchCriteriaViewModel)
+        case .debug:
+            ConsoleNoticesView()
         case .storeInfo:
             VStack {
                 StoreDetailsView(source: .store(viewModel.store))
@@ -50,15 +64,19 @@ struct ConsoleInspectorsView: View {
                 SettingsView(store: viewModel.store)
                 Spacer()
             }
+        case .sessions:
+            ConsoleSessionsView()
         }
     }
 }
 
 private enum ConsoleInspector: Identifiable, CaseIterable {
     case filters
+    case debug
     case insights
     case storeInfo
     case settings
+    case sessions
 
     var id: ConsoleInspector { self }
 
@@ -66,12 +84,16 @@ private enum ConsoleInspector: Identifiable, CaseIterable {
         switch self {
         case .filters:
             return "line.3.horizontal.decrease.circle"
+        case .debug:
+            return "exclamationmark.triangle"
         case .storeInfo:
             return "info.circle"
         case .settings:
             return "gearshape"
         case .insights:
             return "chart.pie"
+        case .sessions:
+            return "list.clipboard"
         }
     }
 }

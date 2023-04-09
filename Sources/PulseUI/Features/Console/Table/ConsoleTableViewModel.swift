@@ -12,8 +12,9 @@ import Combine
 final class ConsoleTableViewModel: ObservableObject, ConsoleDataSourceDelegate {
     @Published private(set) var entities: [NSManagedObject] = []
 
-    var isViewVisible = false {
+    @Counter var isViewVisible {
         didSet {
+            guard oldValue != isViewVisible else { return }
             if isViewVisible {
                 resetDataSource()
             } else {

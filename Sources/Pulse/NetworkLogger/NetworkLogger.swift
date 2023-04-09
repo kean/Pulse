@@ -154,8 +154,7 @@ public final class NetworkLogger: @unchecked Sendable {
             createdAt: Date(),
             originalRequest: .init(originalRequest),
             currentRequest: task.currentRequest.map(Request.init),
-            label: configuration.label,
-            sessionID: store.sessionID
+            label: configuration.label
         )))
     }
 
@@ -229,8 +228,7 @@ public final class NetworkLogger: @unchecked Sendable {
             requestBody: originalRequest.httpBody ?? originalRequest.httpBodyStreamData(),
             responseBody: data,
             metrics: metrics,
-            label: configuration.label,
-            sessionID: store.sessionID
+            label: configuration.label
         )))
     }
 

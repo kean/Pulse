@@ -9,15 +9,20 @@ import Combine
 import SwiftUI
 
 final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
+#if !os(macOS)
     @Published private(set) var visibleEntities: ArraySlice<NSManagedObject> = []
+#else
+    var visibleEntities: [NSManagedObject] { entities }
+#endif
     @Published private(set) var pins: [NSManagedObject] = []
     @Published private(set) var entities: [NSManagedObject] = []
     @Published private(set) var sections: [NSFetchedResultsSectionInfo]?
 
     @Published var options = ConsoleListOptions()
 
-    var isViewVisible = false {
+    @Counter var isViewVisible {
         didSet {
+            guard oldValue != isViewVisible else { return }
             if isViewVisible {
                 resetDataSource(options: options)
             } else {
@@ -93,17 +98,25 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
 
         entities = dataSource.entities
         sections = dataSource.sections
+#if !os(macOS)
         refreshVisibleEntities()
+#endif
     }
 
     func dataSource(_ dataSource: ConsoleDataSource, didUpdateWith diff: CollectionDifference<NSManagedObjectID>?) {
+#if os(macOS)
+        entities = dataSource.entities
+        sections = dataSource.sections
+#else
         withAnimation {
             entities = dataSource.entities
             sections = dataSource.sections
+
             if scrollPosition == .nearTop {
                 refreshVisibleEntities()
             }
         }
+#endif
     }
 
     // MARK: Visible Entities
@@ -115,15 +128,20 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
     }
 
     func onDisappearCell(with objectID: NSManagedObjectID) {
+#if !os(macOS)
         visibleObjectIDs.remove(objectID)
         refreshScrollPosition()
+#endif
     }
 
     func onAppearCell(with objectID: NSManagedObjectID) {
+#if !os(macOS)
         visibleObjectIDs.insert(objectID)
         refreshScrollPosition()
+#endif
     }
 
+#if !os(macOS)
     private func refreshScrollPosition() {
         let scrollPosition: ScrollPosition
         if visibleObjectIDs.isEmpty || visibleEntities.prefix(5).map(\.objectID).contains(where: visibleObjectIDs.contains) {
@@ -152,6 +170,7 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
     private func refreshVisibleEntities() {
         visibleEntities = entities.prefix(visibleEntityCountLimit)
     }
+#endif
 
     // MARK: Sections
 
@@ -165,7 +184,7 @@ private func filter(pins: [LoggerMessageEntity], mode: ConsoleMode) -> [LoggerMe
         switch mode {
         case .all: return true
         case .logs: return $0.task == nil
-        case .tasks: return $0.task != nil
+        case .network: return $0.task != nil
         }
     }
 }

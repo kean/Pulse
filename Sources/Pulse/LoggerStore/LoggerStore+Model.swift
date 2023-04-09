@@ -24,14 +24,16 @@ extension LoggerStore {
         let blob = Entity(class: LoggerBlobHandleEntity.self)
 
         session.properties = [
-            Attribute(name: "sessionID", type: .integer64AttributeType),
-            Attribute(name: "createdAt", type: .dateAttributeType)
+            Attribute(name: "id", type: .UUIDAttributeType),
+            Attribute(name: "createdAt", type: .dateAttributeType),
+            Attribute(name: "version", type: .stringAttributeType) { $0.isOptional = true },
+            Attribute(name: "build", type: .stringAttributeType) { $0.isOptional = true }
         ]
 
         message.properties = [
             Attribute(name: "createdAt", type: .dateAttributeType),
             Attribute(name: "isPinned", type: .booleanAttributeType),
-            Attribute(name: "sessionID", type: .integer64AttributeType),
+            Attribute(name: "session", type: .UUIDAttributeType),
             Attribute(name: "level", type: .integer16AttributeType),
             Attribute(name: "text", type: .stringAttributeType),
             Attribute(name: "file", type: .stringAttributeType),
@@ -44,7 +46,7 @@ extension LoggerStore {
 
         task.properties = [
             Attribute(name: "createdAt", type: .dateAttributeType),
-            Attribute(name: "sessionID", type: .integer64AttributeType),
+            Attribute(name: "session", type: .UUIDAttributeType),
             Attribute(name: "taskId", type: .UUIDAttributeType),
             Attribute(name: "taskType", type: .integer16AttributeType),
             Attribute(name: "url", type: .stringAttributeType),

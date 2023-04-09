@@ -16,8 +16,6 @@ struct ConsoleTextView: View {
         RichTextView(viewModel: viewModel.text)
             .textViewBarItemsHidden(true)
             .background(Material.ultraThick)
-            .onAppear { viewModel.isViewVisible = true }
-            .onDisappear { viewModel.isViewVisible = false }
     }
 }
 

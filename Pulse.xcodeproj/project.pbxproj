@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 53;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -18,6 +18,7 @@
 		0C0B31F626D179A70045C9E1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C0B31F526D179A70045C9E1 /* Assets.xcassets */; };
 		0C0B31F926D179A70045C9E1 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0C0B31F726D179A70045C9E1 /* LaunchScreen.storyboard */; };
 		0C1000472972EE9E00150E8E /* bigstore.pulse in Resources */ = {isa = PBXBuildFile; fileRef = 0C1000462972EE9E00150E8E /* bigstore.pulse */; };
+		0C1050E529E1FAC1006AFDAD /* Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C1050E429E1FAC1006AFDAD /* Version.swift */; };
 		0C11EAB12971DB700059786A /* RemoteLoggerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D69A296F18D200EED9D4 /* RemoteLoggerTests.swift */; };
 		0C11EAB22971DB700059786A /* Resources.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D6A1296F18D200EED9D4 /* Resources.swift */; };
 		0C11EAB32971DB700059786A /* LoggerStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D69C296F18D200EED9D4 /* LoggerStoreTests.swift */; };
@@ -44,9 +45,12 @@
 		0C11EAE72971EBED0059786A /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B0296F189500EED9D4 /* MockStore.swift */; };
 		0C11EAE92971EBEE0059786A /* MockTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5AF296F189500EED9D4 /* MockTask.swift */; };
 		0C18A668299749C30041F424 /* ConsoleTextViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C18A667299749C30041F424 /* ConsoleTextViewModelTests.swift */; };
+		0C19AE4C29D4EB4D0078EFB7 /* Counter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C19AE4B29D4EB4D0078EFB7 /* Counter.swift */; };
 		0C2343152978B6B900AE7CE6 /* ConsoleSearchSuggestionsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C2343142978B6B900AE7CE6 /* ConsoleSearchSuggestionsService.swift */; };
 		0C3002B32986CEF30055F6C2 /* LoggerStoreIndex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C3002B22986CEF30055F6C2 /* LoggerStoreIndex.swift */; };
 		0C31FFB9298211AF002A7D64 /* ConsoleEntityDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C31FFB8298211AF002A7D64 /* ConsoleEntityDetailsView.swift */; };
+		0C38795529D08BA7001230DB /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C38795429D08BA7001230DB /* App.swift */; };
+		0C38795929D08BA8001230DB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C38795829D08BA8001230DB /* Assets.xcassets */; };
 		0C40C094296F7641009ECF16 /* ConsoleSearchContentTypeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C40C093296F7641009ECF16 /* ConsoleSearchContentTypeCell.swift */; };
 		0C40C096296F7738009ECF16 /* ConsoleSearchTaskTypeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C40C095296F7738009ECF16 /* ConsoleSearchTaskTypeCell.swift */; };
 		0C40C098296F777D009ECF16 /* ConsoleSearchResponseSourceCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C40C097296F777D009ECF16 /* ConsoleSearchResponseSourceCell.swift */; };
@@ -57,6 +61,10 @@
 		0C40C0A2296F81B0009ECF16 /* ConsoleCustomFilterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C40C0A1296F81B0009ECF16 /* ConsoleCustomFilterView.swift */; };
 		0C40C0A4296F849E009ECF16 /* ConsoleSearchTimePeriodCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C40C0A3296F849E009ECF16 /* ConsoleSearchTimePeriodCell.swift */; };
 		0C40C0A6296F99D8009ECF16 /* ConsoleCustomNetworkFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C40C0A5296F99D8009ECF16 /* ConsoleCustomNetworkFilter.swift */; };
+		0C43A16329D091F800EA7AD8 /* Pulse.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CF0D542296F14EA00EED9D4 /* Pulse.framework */; };
+		0C43A16429D091F800EA7AD8 /* Pulse.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0CF0D542296F14EA00EED9D4 /* Pulse.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		0C43A16729D091F800EA7AD8 /* PulseUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CF0D56C296F17CB00EED9D4 /* PulseUI.framework */; };
+		0C43A16829D091F800EA7AD8 /* PulseUI.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0CF0D56C296F17CB00EED9D4 /* PulseUI.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		0C4BF92D298817EC0086A6A7 /* IntlineTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C4BF92C298817EC0086A6A7 /* IntlineTabBar.swift */; };
 		0C516FE726015ED3004813B4 /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CFF9BD825D6199A0069DB6A /* repos.json */; };
 		0C516FF026016392004813B4 /* DocumentBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C516FEF26016392004813B4 /* DocumentBrowser.swift */; };
@@ -82,12 +90,16 @@
 		0C7A0E00297C51CE00B4B69D /* ConsoleListOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7A0DFF297C51CE00B4B69D /* ConsoleListOptions.swift */; };
 		0C7A0E02297CE71400B4B69D /* FormattersTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7A0E01297CE71400B4B69D /* FormattersTests.swift */; };
 		0C7A834026D1CA290082634F /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CFF9BD825D6199A0069DB6A /* repos.json */; };
+		0C840D4A29E07BE900362214 /* SelectableButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C840D4929E07BE900362214 /* SelectableButton.swift */; };
+		0C840D4C29E0A09B00362214 /* ConsoleSessionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C840D4B29E0A09B00362214 /* ConsoleSessionsView.swift */; };
+		0C84414929E2E72F0015D730 /* ConsoleNoticesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C84414829E2E72F0015D730 /* ConsoleNoticesView.swift */; };
 		0C94239429B4D73E007F2784 /* ConsoleSearchOccurrenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C94239329B4D73E007F2784 /* ConsoleSearchOccurrenceTests.swift */; };
 		0C9F04F92884F34A0035239F /* Pulse_Demo_macOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9F04F82884F34A0035239F /* Pulse_Demo_macOSApp.swift */; };
 		0C9F04FD2884F34A0035239F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C9F04FC2884F34A0035239F /* Assets.xcassets */; };
 		0C9F05002884F34A0035239F /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C9F04FF2884F34A0035239F /* Preview Assets.xcassets */; };
 		0C9F050C2884FA7D0035239F /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CFF9BD825D6199A0069DB6A /* repos.json */; };
-		0CAF1D77297B0810002E2722 /* ConsoleSearchSuggestionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CAF1D76297B0810002E2722 /* ConsoleSearchSuggestionTests.swift */; };
+		0CA1D68029D7CE3B00567CFE /* RemoteClientStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CA1D67F29D7CE3B00567CFE /* RemoteClientStatusView.swift */; };
+		0CA32DE729D5E028001712E8 /* NSAttributedString+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CA32DE629D5E028001712E8 /* NSAttributedString+Extensions.swift */; };
 		0CAF1D7B297C2040002E2722 /* ConsoleListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CAF1D7A297C2040002E2722 /* ConsoleListViewModel.swift */; };
 		0CB17F1A2978ABBA004E33F4 /* ManagedObjectsCountObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB17F192978ABBA004E33F4 /* ManagedObjectsCountObserver.swift */; };
 		0CB34591298AA6C6009428B2 /* RichTextViewSearchToobar-ios.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB34590298AA6C6009428B2 /* RichTextViewSearchToobar-ios.swift */; };
@@ -109,21 +121,23 @@
 		0CB63A352976028F00525165 /* ConsoleSearchFilter+Parsers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A332976028B00525165 /* ConsoleSearchFilter+Parsers.swift */; };
 		0CB63A382976225400525165 /* Cache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A362976224600525165 /* Cache.swift */; };
 		0CB63A3B2976229200525165 /* LinkedList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A392976227500525165 /* LinkedList.swift */; };
+		0CBEF6A329DE6B3200132FB3 /* StoreStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CBEF6A229DE6B3200132FB3 /* StoreStatusView.swift */; };
+		0CBEF6A629DF69EB00132FB3 /* ConsoleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CBEF6A429DF69E800132FB3 /* ConsoleView.swift */; };
 		0CCBDDC02610BDBC00DCB60C /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CFF9BD825D6199A0069DB6A /* repos.json */; };
+		0CD6FD2D29D39B39001D518F /* RichTextViewLayoutManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD6FD2C29D39B39001D518F /* RichTextViewLayoutManager.swift */; };
 		0CD7E0BD29732C8E00A255B7 /* ShareStoreTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD7E0BC29732C8E00A255B7 /* ShareStoreTask.swift */; };
 		0CDC3BEA2970FA47003BD1FF /* ConsoleSearchListSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CDC3BE92970FA47003BD1FF /* ConsoleSearchListSelectionView.swift */; };
 		0CDC3BED2971B936003BD1FF /* ConsoleSearchLogLevelsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CDC3BEC2971B936003BD1FF /* ConsoleSearchLogLevelsCell.swift */; };
 		0CE364F72971D1EA0063DFED /* ConsoleSearchCustomFiltersSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE364F62971D1EA0063DFED /* ConsoleSearchCustomFiltersSection.swift */; };
 		0CE45E0A29776BED00249C5D /* ConsoleListContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE45E0929776BED00249C5D /* ConsoleListContentView.swift */; };
 		0CE45E0C2977813400249C5D /* ConsoleToolbarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE45E0B2977813400249C5D /* ConsoleToolbarView.swift */; };
-		0CEAB3E425FE862E00F09B0F /* Pulse Demo watchOS Extension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 0CEAB3E325FE862E00F09B0F /* Pulse Demo watchOS Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		0CEAB3E425FE862E00F09B0F /* Pulse Demo watchOS Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 0CEAB3E325FE862E00F09B0F /* Pulse Demo watchOS Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		0CEAB41025FE867A00F09B0F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0CEAB40E25FE867300F09B0F /* Assets.xcassets */; };
 		0CEAB41425FE867E00F09B0F /* PulseAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CEAB40A25FE867300F09B0F /* PulseAppApp.swift */; };
 		0CEAB41625FE867E00F09B0F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0CEAB40725FE867300F09B0F /* Assets.xcassets */; };
 		0CEAB41725FE867E00F09B0F /* ComplicationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CEAB40625FE867300F09B0F /* ComplicationController.swift */; };
 		0CEAB41825FE867E00F09B0F /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0CEAB40925FE867300F09B0F /* Preview Assets.xcassets */; };
 		0CEAB42825FE86ED00F09B0F /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CFF9BD825D6199A0069DB6A /* repos.json */; };
-		0CECF63229968488000F9CCD /* ConsoleSearchViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CECF63129968488000F9CCD /* ConsoleSearchViewModelTests.swift */; };
 		0CECF63D2996BE12000F9CCD /* ConsoleDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CECF63C2996BE12000F9CCD /* ConsoleDataSource.swift */; };
 		0CECF6412996E761000F9CCD /* ConsoleDataSourceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CECF6402996E761000F9CCD /* ConsoleDataSourceTests.swift */; };
 		0CECF64329971D7A000F9CCD /* ConsoleTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CECF64229971D7A000F9CCD /* ConsoleTestCase.swift */; };
@@ -320,6 +334,20 @@
 			remoteGlobalIDString = 0C0B31E926D179A20045C9E1;
 			remoteInfo = "Pulse Integration Examples iOS";
 		};
+		0C43A16529D091F800EA7AD8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0C57AD45245F0EFB005B3400 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0CF0D541296F14EA00EED9D4;
+			remoteInfo = Pulse;
+		};
+		0C43A16929D091F800EA7AD8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0C57AD45245F0EFB005B3400 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0CF0D56B296F17CB00EED9D4;
+			remoteInfo = PulseUI;
+		};
 		0CEAB3E525FE862E00F09B0F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0C57AD45245F0EFB005B3400 /* Project object */;
@@ -428,6 +456,18 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		0C43A16B29D091F800EA7AD8 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				0C43A16829D091F800EA7AD8 /* PulseUI.framework in Embed Frameworks */,
+				0C43A16429D091F800EA7AD8 /* Pulse.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		0C98C6C925C4C08A0086A13E /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -440,15 +480,15 @@
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		0CEAB3FA25FE862F00F09B0F /* Embed App Extensions */ = {
+		0CEAB3FA25FE862F00F09B0F /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				0CEAB3E425FE862E00F09B0F /* Pulse Demo watchOS Extension.appex in Embed App Extensions */,
+				0CEAB3E425FE862E00F09B0F /* Pulse Demo watchOS Extension.appex in Embed Foundation Extensions */,
 			);
-			name = "Embed App Extensions";
+			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		0CF0D54D296F14EA00EED9D4 /* Embed Frameworks */ = {
@@ -526,14 +566,21 @@
 		0C0B31F826D179A70045C9E1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		0C0B31FA26D179A70045C9E1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0C1000462972EE9E00150E8E /* bigstore.pulse */ = {isa = PBXFileReference; lastKnownFileType = file; path = bigstore.pulse; sourceTree = "<group>"; };
+		0C1050E429E1FAC1006AFDAD /* Version.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Version.swift; sourceTree = "<group>"; };
 		0C11EAC12971E9B30059786A /* PulsePerformanceTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PulsePerformanceTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C11EACB2971E9CE0059786A /* TextRendererPerformanceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextRendererPerformanceTests.swift; sourceTree = "<group>"; };
 		0C1221E525CE09C100B81D7A /* URLSessionAutomatedIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionAutomatedIntegration.swift; sourceTree = "<group>"; };
 		0C18A667299749C30041F424 /* ConsoleTextViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleTextViewModelTests.swift; sourceTree = "<group>"; };
+		0C19AE4B29D4EB4D0078EFB7 /* Counter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Counter.swift; sourceTree = "<group>"; };
 		0C2343142978B6B900AE7CE6 /* ConsoleSearchSuggestionsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchSuggestionsService.swift; sourceTree = "<group>"; };
 		0C25FB6E25CDDCAB00A895C2 /* URLSessionManualIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionManualIntegration.swift; sourceTree = "<group>"; };
 		0C3002B22986CEF30055F6C2 /* LoggerStoreIndex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggerStoreIndex.swift; sourceTree = "<group>"; };
 		0C31FFB8298211AF002A7D64 /* ConsoleEntityDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleEntityDetailsView.swift; sourceTree = "<group>"; };
+		0C38795229D08BA7001230DB /* Pulse.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Pulse.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		0C38795429D08BA7001230DB /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
+		0C38795829D08BA8001230DB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		0C38796129D08C3F001230DB /* Pulse-macOS.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = "Pulse-macOS.entitlements"; sourceTree = "<group>"; };
+		0C38796229D08E18001230DB /* Pulse-macOS-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Pulse-macOS-Info.plist"; sourceTree = "<group>"; };
 		0C40C093296F7641009ECF16 /* ConsoleSearchContentTypeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchContentTypeCell.swift; sourceTree = "<group>"; };
 		0C40C095296F7738009ECF16 /* ConsoleSearchTaskTypeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchTaskTypeCell.swift; sourceTree = "<group>"; };
 		0C40C097296F777D009ECF16 /* ConsoleSearchResponseSourceCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchResponseSourceCell.swift; sourceTree = "<group>"; };
@@ -573,13 +620,17 @@
 		0C7A0DFC297C382300B4B69D /* ConsoleShareButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleShareButton.swift; sourceTree = "<group>"; };
 		0C7A0DFF297C51CE00B4B69D /* ConsoleListOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleListOptions.swift; sourceTree = "<group>"; };
 		0C7A0E01297CE71400B4B69D /* FormattersTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormattersTests.swift; sourceTree = "<group>"; };
+		0C840D4929E07BE900362214 /* SelectableButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectableButton.swift; sourceTree = "<group>"; };
+		0C840D4B29E0A09B00362214 /* ConsoleSessionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSessionsView.swift; sourceTree = "<group>"; };
+		0C84414829E2E72F0015D730 /* ConsoleNoticesView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ConsoleNoticesView.swift; path = ../../../../../../PulseApp/Pulse/Sources/PulseUI/Features/Console/Views/ConsoleNoticesView.swift; sourceTree = "<group>"; };
 		0C94239329B4D73E007F2784 /* ConsoleSearchOccurrenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchOccurrenceTests.swift; sourceTree = "<group>"; };
 		0C9F04F62884F34A0035239F /* Pulse Demo macOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pulse Demo macOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C9F04F82884F34A0035239F /* Pulse_Demo_macOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pulse_Demo_macOSApp.swift; sourceTree = "<group>"; };
 		0C9F04FC2884F34A0035239F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0C9F04FF2884F34A0035239F /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		0C9F05012884F34A0035239F /* Pulse_Demo_macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Pulse_Demo_macOS.entitlements; sourceTree = "<group>"; };
-		0CAF1D76297B0810002E2722 /* ConsoleSearchSuggestionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchSuggestionTests.swift; sourceTree = "<group>"; };
+		0CA1D67F29D7CE3B00567CFE /* RemoteClientStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteClientStatusView.swift; sourceTree = "<group>"; };
+		0CA32DE629D5E028001712E8 /* NSAttributedString+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSAttributedString+Extensions.swift"; sourceTree = "<group>"; };
 		0CAF1D7A297C2040002E2722 /* ConsoleListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleListViewModel.swift; sourceTree = "<group>"; };
 		0CB17F192978ABBA004E33F4 /* ManagedObjectsCountObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagedObjectsCountObserver.swift; sourceTree = "<group>"; };
 		0CB34590298AA6C6009428B2 /* RichTextViewSearchToobar-ios.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RichTextViewSearchToobar-ios.swift"; sourceTree = "<group>"; };
@@ -601,6 +652,9 @@
 		0CB63A332976028B00525165 /* ConsoleSearchFilter+Parsers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ConsoleSearchFilter+Parsers.swift"; sourceTree = "<group>"; };
 		0CB63A362976224600525165 /* Cache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cache.swift; sourceTree = "<group>"; };
 		0CB63A392976227500525165 /* LinkedList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkedList.swift; sourceTree = "<group>"; };
+		0CBEF6A229DE6B3200132FB3 /* StoreStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreStatusView.swift; sourceTree = "<group>"; };
+		0CBEF6A429DF69E800132FB3 /* ConsoleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleView.swift; sourceTree = "<group>"; };
+		0CD6FD2C29D39B39001D518F /* RichTextViewLayoutManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RichTextViewLayoutManager.swift; sourceTree = "<group>"; };
 		0CD7E0BC29732C8E00A255B7 /* ShareStoreTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareStoreTask.swift; sourceTree = "<group>"; };
 		0CDC3BE92970FA47003BD1FF /* ConsoleSearchListSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchListSelectionView.swift; sourceTree = "<group>"; };
 		0CDC3BEC2971B936003BD1FF /* ConsoleSearchLogLevelsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchLogLevelsCell.swift; sourceTree = "<group>"; };
@@ -617,7 +671,6 @@
 		0CEAB40C25FE867300F09B0F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0CEAB40E25FE867300F09B0F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0CEAB40F25FE867300F09B0F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		0CECF63129968488000F9CCD /* ConsoleSearchViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchViewModelTests.swift; sourceTree = "<group>"; };
 		0CECF63C2996BE12000F9CCD /* ConsoleDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleDataSource.swift; sourceTree = "<group>"; };
 		0CECF6402996E761000F9CCD /* ConsoleDataSourceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleDataSourceTests.swift; sourceTree = "<group>"; };
 		0CECF64229971D7A000F9CCD /* ConsoleTestCase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleTestCase.swift; sourceTree = "<group>"; };
@@ -796,6 +849,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		0C38794F29D08BA7001230DB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0C43A16729D091F800EA7AD8 /* PulseUI.framework in Frameworks */,
+				0C43A16329D091F800EA7AD8 /* Pulse.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		0C516FB726015DD2004813B4 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -918,6 +980,17 @@
 			path = Shared;
 			sourceTree = "<group>";
 		};
+		0C38795329D08BA7001230DB /* macOS */ = {
+			isa = PBXGroup;
+			children = (
+				0C38795429D08BA7001230DB /* App.swift */,
+				0C38795829D08BA8001230DB /* Assets.xcassets */,
+				0C38796229D08E18001230DB /* Pulse-macOS-Info.plist */,
+				0C38796129D08C3F001230DB /* Pulse-macOS.entitlements */,
+			);
+			path = macOS;
+			sourceTree = "<group>";
+		};
 		0C516FBB26015DD2004813B4 /* Demo */ = {
 			isa = PBXGroup;
 			children = (
@@ -959,6 +1032,7 @@
 				0CF0D68F296F18BE00EED9D4 /* PulseTests.xctest */,
 				0CF0D6BC296F18ED00EED9D4 /* PulseUITests.xctest */,
 				0C11EAC12971E9B30059786A /* PulsePerformanceTests.xctest */,
+				0C38795229D08BA7001230DB /* Pulse.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -967,6 +1041,7 @@
 			isa = PBXGroup;
 			children = (
 				0C57AD73245F0F38005B3400 /* iOS */,
+				0C38795329D08BA7001230DB /* macOS */,
 				0C323A7325CEE6F3004067EA /* Shared */,
 			);
 			path = App;
@@ -1290,6 +1365,8 @@
 				0CB63A362976224600525165 /* Cache.swift */,
 				0CB63A392976227500525165 /* LinkedList.swift */,
 				0CF0D580296F189500EED9D4 /* Deprecated.swift */,
+				0C19AE4B29D4EB4D0078EFB7 /* Counter.swift */,
+				0C1050E429E1FAC1006AFDAD /* Version.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -1300,6 +1377,7 @@
 				0CF0D58F296F189500EED9D4 /* SwiftUI+Extensions.swift */,
 				0CF0D590296F189500EED9D4 /* Pulse+Extensions.swift */,
 				0CF0D591296F189500EED9D4 /* Foundation+Extensions.swift */,
+				0CA32DE629D5E028001712E8 /* NSAttributedString+Extensions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -1332,6 +1410,7 @@
 				0CF0D60C296F189600EED9D4 /* MainViewController.swift */,
 				0CF0D5AD296F189500EED9D4 /* ContextMenus.swift */,
 				0C4BF92C298817EC0086A6A7 /* IntlineTabBar.swift */,
+				0C840D4929E07BE900362214 /* SelectableButton.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -1345,6 +1424,7 @@
 				0CF0D5A0296F189500EED9D4 /* RichTextViewSearchToobar-macos.swift */,
 				0CB34590298AA6C6009428B2 /* RichTextViewSearchToobar-ios.swift */,
 				0CF0D5A1296F189500EED9D4 /* RichTextView-watchos.swift */,
+				0CD6FD2C29D39B39001D518F /* RichTextViewLayoutManager.swift */,
 			);
 			path = RichTextView;
 			sourceTree = "<group>";
@@ -1501,6 +1581,7 @@
 				0CF0D5FC296F189600EED9D4 /* ConsoleView-tvos.swift */,
 				0CF0D5FD296F189600EED9D4 /* ConsoleView-macos.swift */,
 				0CF0D5FB296F189600EED9D4 /* ConsoleView-watchos.swift */,
+				0CBEF6A429DF69E800132FB3 /* ConsoleView.swift */,
 				0CF0D60A296F189600EED9D4 /* ConsoleViewModel.swift */,
 				0CECF63C2996BE12000F9CCD /* ConsoleDataSource.swift */,
 			);
@@ -1517,10 +1598,14 @@
 				0CF0D608296F189600EED9D4 /* ConsoleMessageCell.swift */,
 				0CF0D602296F189600EED9D4 /* ConsoleMessageCellViewModel.swift */,
 				0CF0D609296F189600EED9D4 /* ConsoleTaskCell.swift */,
+				0C84414829E2E72F0015D730 /* ConsoleNoticesView.swift */,
 				0CF0D603296F189600EED9D4 /* ConsoleTaskCellViewModel.swift */,
 				0CE45E0B2977813400249C5D /* ConsoleToolbarView.swift */,
 				0C7A0DFC297C382300B4B69D /* ConsoleShareButton.swift */,
 				0CB345A5298DEEA6009428B2 /* ConsoleInspectorsView.swift */,
+				0C840D4B29E0A09B00362214 /* ConsoleSessionsView.swift */,
+				0CA1D67F29D7CE3B00567CFE /* RemoteClientStatusView.swift */,
+				0CBEF6A229DE6B3200132FB3 /* StoreStatusView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -1552,8 +1637,6 @@
 				0CF5E5F82997DE86009FF7AE /* ConsoleTableViewModelTests.swift */,
 				0C18A667299749C30041F424 /* ConsoleTextViewModelTests.swift */,
 				0CB63A282975A94D00525165 /* ConsoleSearchTokenTests.swift */,
-				0CAF1D76297B0810002E2722 /* ConsoleSearchSuggestionTests.swift */,
-				0CECF63129968488000F9CCD /* ConsoleSearchViewModelTests.swift */,
 				0CF5E60229980867009FF7AE /* InsightsViewModelTests.swift */,
 				0CF5E5FD2997FBC1009FF7AE /* NetworkLoggerInsightsTests.swift */,
 				0CF5E60529981A94009FF7AE /* ShareStoreViewModelTests.swift */,
@@ -1636,6 +1719,26 @@
 			productName = PulsePerformanceTests;
 			productReference = 0C11EAC12971E9B30059786A /* PulsePerformanceTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		0C38795129D08BA7001230DB /* Pulse App macOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0C38795E29D08BA8001230DB /* Build configuration list for PBXNativeTarget "Pulse App macOS" */;
+			buildPhases = (
+				0C38794E29D08BA7001230DB /* Sources */,
+				0C38794F29D08BA7001230DB /* Frameworks */,
+				0C38795029D08BA7001230DB /* Resources */,
+				0C43A16B29D091F800EA7AD8 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				0C43A16629D091F800EA7AD8 /* PBXTargetDependency */,
+				0C43A16A29D091F800EA7AD8 /* PBXTargetDependency */,
+			);
+			name = "Pulse App macOS";
+			productName = "Pulse App macOS";
+			productReference = 0C38795229D08BA7001230DB /* Pulse.app */;
+			productType = "com.apple.product-type.application";
 		};
 		0C516FB926015DD2004813B4 /* Pulse Demo iOS */ = {
 			isa = PBXNativeTarget;
@@ -1730,7 +1833,7 @@
 			buildConfigurationList = 0CEAB3FB25FE862F00F09B0F /* Build configuration list for PBXNativeTarget "Pulse Demo watchOS" */;
 			buildPhases = (
 				0CEAB3D825FE862D00F09B0F /* Resources */,
-				0CEAB3FA25FE862F00F09B0F /* Embed App Extensions */,
+				0CEAB3FA25FE862F00F09B0F /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
@@ -1843,8 +1946,9 @@
 		0C57AD45245F0EFB005B3400 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				BuildIndependentTargetsInParallel = YES;
 				LastSwiftUpdateCheck = 1420;
-				LastUpgradeCheck = 1420;
+				LastUpgradeCheck = 1430;
 				ORGANIZATIONNAME = kean;
 				TargetAttributes = {
 					0C0B31E926D179A20045C9E1 = {
@@ -1854,6 +1958,9 @@
 						CreatedOnToolsVersion = 14.2;
 						LastSwiftMigration = 1420;
 						TestTargetID = 0C0B31E926D179A20045C9E1;
+					};
+					0C38795129D08BA7001230DB = {
+						CreatedOnToolsVersion = 14.2;
 					};
 					0C516FB926015DD2004813B4 = {
 						CreatedOnToolsVersion = 12.4;
@@ -1907,6 +2014,7 @@
 				0CF0D56B296F17CB00EED9D4 /* PulseUI */,
 				0CF0D6BB296F18ED00EED9D4 /* PulseUITests */,
 				0C11EAC02971E9B30059786A /* PulsePerformanceTests */,
+				0C38795129D08BA7001230DB /* Pulse App macOS */,
 				0C57AD4C245F0EFB005B3400 /* Pulse App iOS */,
 				0C516FB926015DD2004813B4 /* Pulse Demo iOS */,
 				0CEAB3D925FE862D00F09B0F /* Pulse Demo watchOS */,
@@ -1935,6 +2043,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				0C1000472972EE9E00150E8E /* bigstore.pulse in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0C38795029D08BA7001230DB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0C38795929D08BA8001230DB /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2048,6 +2164,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		0C38794E29D08BA7001230DB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0C38795529D08BA7001230DB /* App.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		0C516FB626015DD2004813B4 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -2147,6 +2271,7 @@
 				0CF0D65C296F189600EED9D4 /* ConsoleMessageMetadataView.swift in Sources */,
 				0CB63A3B2976229200525165 /* LinkedList.swift in Sources */,
 				0CF0D615296F189600EED9D4 /* LoggerSync.swift in Sources */,
+				0CBEF6A329DE6B3200132FB3 /* StoreStatusView.swift in Sources */,
 				0CF0D62C296F189600EED9D4 /* WebView.swift in Sources */,
 				0CF0D635296F189600EED9D4 /* InfoRow.swift in Sources */,
 				0CB3459C298D5018009428B2 /* ConsoleTextViewModel.swift in Sources */,
@@ -2170,6 +2295,7 @@
 				0CF0D634296F189600EED9D4 /* TimingView.swift in Sources */,
 				0CF0D622296F189600EED9D4 /* Formatters.swift in Sources */,
 				0CF0D62F296F189600EED9D4 /* TextView.swift in Sources */,
+				0CBEF6A629DF69EB00132FB3 /* ConsoleView.swift in Sources */,
 				0CF0D67D296F189600EED9D4 /* ConsoleEntityCell.swift in Sources */,
 				0CF0D649296F189600EED9D4 /* DateRangePicker.swift in Sources */,
 				0C7A0E00297C51CE00B4B69D /* ConsoleListOptions.swift in Sources */,
@@ -2194,6 +2320,7 @@
 				0CF0D62A296F189600EED9D4 /* KeyValueSectionViewModel.swift in Sources */,
 				0CF0D638296F189600EED9D4 /* ImageViewer.swift in Sources */,
 				0CF5E60929981ADF009FF7AE /* ShareStoreViewModel.swift in Sources */,
+				0CD6FD2D29D39B39001D518F /* RichTextViewLayoutManager.swift in Sources */,
 				0CF0D67B296F189600EED9D4 /* ConsoleView-tvos.swift in Sources */,
 				0CF0D66B296F189600EED9D4 /* NetworkCookiesCell.swift in Sources */,
 				0CB63A382976225400525165 /* Cache.swift in Sources */,
@@ -2212,6 +2339,7 @@
 				0C40C096296F7738009ECF16 /* ConsoleSearchTaskTypeCell.swift in Sources */,
 				0C7A0DFD297C382300B4B69D /* ConsoleShareButton.swift in Sources */,
 				0CB63A2729759D2E00525165 /* ConsoleSearchToken.swift in Sources */,
+				0C840D4A29E07BE900362214 /* SelectableButton.swift in Sources */,
 				0CF0D679296F189600EED9D4 /* ConsoleView-ios.swift in Sources */,
 				0CF0D661296F189600EED9D4 /* NetworkInspectorTransferInfoView.swift in Sources */,
 				0CFBC5AF2991DCD30038E547 /* ThickDivider.swift in Sources */,
@@ -2224,6 +2352,7 @@
 				0CF0D665296F189600EED9D4 /* NetworkMenuCell.swift in Sources */,
 				0CF0D659296F189600EED9D4 /* ConsoleSettings.swift in Sources */,
 				0C7A0DFB297C33F300B4B69D /* ConsoleRouterView.swift in Sources */,
+				0CA1D68029D7CE3B00567CFE /* RemoteClientStatusView.swift in Sources */,
 				0CF0D61B296F189600EED9D4 /* ShareItems.swift in Sources */,
 				0CB63A352976028F00525165 /* ConsoleSearchFilter+Parsers.swift in Sources */,
 				0CF0D623296F189600EED9D4 /* SearchBar-macos.swift in Sources */,
@@ -2241,11 +2370,15 @@
 				0CF0D625296F189600EED9D4 /* PlaceholderView.swift in Sources */,
 				0CF0D65D296F189600EED9D4 /* ConsoleMessageDetailsView.swift in Sources */,
 				0C40C0A6296F99D8009ECF16 /* ConsoleCustomNetworkFilter.swift in Sources */,
+				0C19AE4C29D4EB4D0078EFB7 /* Counter.swift in Sources */,
 				0CF0D678296F189600EED9D4 /* LoggerStoreSizeChart.swift in Sources */,
 				0CF0D676296F189600EED9D4 /* NetworkInspectorViewModel.swift in Sources */,
+				0C84414929E2E72F0015D730 /* ConsoleNoticesView.swift in Sources */,
 				0C40C098296F777D009ECF16 /* ConsoleSearchResponseSourceCell.swift in Sources */,
 				0C3002B32986CEF30055F6C2 /* LoggerStoreIndex.swift in Sources */,
 				0CF0D689296F189600EED9D4 /* MainViewController.swift in Sources */,
+				0C840D4C29E0A09B00362214 /* ConsoleSessionsView.swift in Sources */,
+				0CA32DE729D5E028001712E8 /* NSAttributedString+Extensions.swift in Sources */,
 				0CF0D60F296F189600EED9D4 /* UIKit+Extensions.swift in Sources */,
 				0CF0D610296F189600EED9D4 /* SpinnerView.swift in Sources */,
 				0CF0D680296F189600EED9D4 /* ConsoleMessageCellViewModel.swift in Sources */,
@@ -2268,6 +2401,7 @@
 				0CB63A1B2974A5D200525165 /* ConsoleSearchResultsSectionView.swift in Sources */,
 				0CF0D667296F189600EED9D4 /* NetworkResponseBodyCell.swift in Sources */,
 				0CF0D662296F189600EED9D4 /* TimingViewModel+Metrics.swift in Sources */,
+				0C1050E529E1FAC1006AFDAD /* Version.swift in Sources */,
 				0CF0D677296F189600EED9D4 /* NetworkInspectorView-macos.swift in Sources */,
 				0CF0D670296F189600EED9D4 /* NetworkInspectorView-tvos.swift in Sources */,
 				0CF0D617296F189600EED9D4 /* TextUtilities.swift in Sources */,
@@ -2318,13 +2452,11 @@
 				0C18A668299749C30041F424 /* ConsoleTextViewModelTests.swift in Sources */,
 				0C63A38A297A44B300F6A6A5 /* StringSearchOptionsTests.swift in Sources */,
 				0CF5E5FF2997FBC4009FF7AE /* NetworkLoggerInsightsTests.swift in Sources */,
-				0CAF1D77297B0810002E2722 /* ConsoleSearchSuggestionTests.swift in Sources */,
 				0C7A0E02297CE71400B4B69D /* FormattersTests.swift in Sources */,
 				0CECF64329971D7A000F9CCD /* ConsoleTestCase.swift in Sources */,
 				0C0352DC29948290008CDEF8 /* Helpers.swift in Sources */,
 				0CF5E5FA2997DED7009FF7AE /* ConsoleTableViewModelTests.swift in Sources */,
 				0C0352D929943F86008CDEF8 /* ConsoleListViewModelTests.swift in Sources */,
-				0CECF63229968488000F9CCD /* ConsoleSearchViewModelTests.swift in Sources */,
 				0CF5E6042998086C009FF7AE /* InsightsViewModelTests.swift in Sources */,
 				0CF0D6CB296F18FD00EED9D4 /* ConsoleViewModelTests.swift in Sources */,
 				0CB63A292975A94D00525165 /* ConsoleSearchTokenTests.swift in Sources */,
@@ -2358,6 +2490,16 @@
 			isa = PBXTargetDependency;
 			target = 0C0B31E926D179A20045C9E1 /* Pulse Integration Examples iOS */;
 			targetProxy = 0C11EAEB2971F20D0059786A /* PBXContainerItemProxy */;
+		};
+		0C43A16629D091F800EA7AD8 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0CF0D541296F14EA00EED9D4 /* Pulse */;
+			targetProxy = 0C43A16529D091F800EA7AD8 /* PBXContainerItemProxy */;
+		};
+		0C43A16A29D091F800EA7AD8 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0CF0D56B296F17CB00EED9D4 /* PulseUI */;
+			targetProxy = 0C43A16929D091F800EA7AD8 /* PBXContainerItemProxy */;
 		};
 		0CEAB3E625FE862E00F09B0F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -2577,11 +2719,103 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.github.kean.PulsePerformanceTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = PULSE_MOCK_INCLUDED;
-				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Pulse Integration Examples iOS.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Pulse Integration Examples iOS";
+			};
+			name = Release;
+		};
+		0C38795F29D08BA8001230DB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_ENTITLEMENTS = "App/macOS/Pulse-macOS.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = NR8DLKJ7E6;
+				ENABLE_PREVIEWS = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "App/macoS/Pulse-macOS-Info.plist";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2023 Alex Grebenyuk. All rights reserved.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = "3.6.0-alpha.2";
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.github.kean.pulse;
+				PRODUCT_MODULE_NAME = PulseApp;
+				PRODUCT_NAME = Pulse;
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		0C38796029D08BA8001230DB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_ENTITLEMENTS = "App/macOS/Pulse-macOS.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = NR8DLKJ7E6;
+				ENABLE_PREVIEWS = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "App/macoS/Pulse-macOS-Info.plist";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2023 Alex Grebenyuk. All rights reserved.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = "3.6.0-alpha.2";
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.github.kean.pulse;
+				PRODUCT_MODULE_NAME = PulseApp;
+				PRODUCT_NAME = Pulse;
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
@@ -2648,16 +2882,22 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -2670,12 +2910,13 @@
 				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				MARKETING_VERSION = 3.5.4;
+				MARKETING_VERSION = "3.6.0-alpha.1";
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "watchsimulator watchos macosx iphonesimulator iphoneos appletvsimulator appletvos";
@@ -2697,16 +2938,22 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
@@ -2714,15 +2961,17 @@
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				MARKETING_VERSION = 3.5.4;
+				MARKETING_VERSION = "3.6.0-alpha.1";
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "watchsimulator watchos macosx iphonesimulator iphoneos appletvsimulator appletvos";
 				SUPPORTS_MACCATALYST = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				TVOS_DEPLOYMENT_TARGET = 14.0;
 				VALIDATE_PRODUCT = YES;
@@ -2845,6 +3094,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Demo/macOS/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -2888,6 +3138,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Demo/macOS/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -3008,9 +3259,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALLOW_TARGET_PLATFORM_SPECIALIZATION = YES;
-				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = "";
 				DOCC_HOSTING_BASE_PATH = /pulse/;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -3042,9 +3294,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALLOW_TARGET_PLATFORM_SPECIALIZATION = YES;
-				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = "";
 				DOCC_HOSTING_BASE_PATH = /pulse/;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -3076,6 +3329,7 @@
 				ALLOW_TARGET_PLATFORM_SPECIALIZATION = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = "";
 				DOCC_HOSTING_BASE_PATH = /pulseui/;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -3110,6 +3364,7 @@
 				ALLOW_TARGET_PLATFORM_SPECIALIZATION = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = "";
 				DOCC_HOSTING_BASE_PATH = /pulseui/;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -3141,6 +3396,7 @@
 			buildSettings = {
 				ALLOW_TARGET_PLATFORM_SPECIALIZATION = YES;
 				CODE_SIGN_STYLE = Automatic;
+				DEAD_CODE_STRIPPING = YES;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.github.kean.PulseTests;
@@ -3157,6 +3413,7 @@
 			buildSettings = {
 				ALLOW_TARGET_PLATFORM_SPECIALIZATION = YES;
 				CODE_SIGN_STYLE = Automatic;
+				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.github.kean.PulseTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -3172,6 +3429,7 @@
 			buildSettings = {
 				ALLOW_TARGET_PLATFORM_SPECIALIZATION = YES;
 				CODE_SIGN_STYLE = Automatic;
+				DEAD_CODE_STRIPPING = YES;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.github.kean.PulseUITests;
@@ -3188,11 +3446,11 @@
 			buildSettings = {
 				ALLOW_TARGET_PLATFORM_SPECIALIZATION = YES;
 				CODE_SIGN_STYLE = Automatic;
+				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.github.kean.PulseUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
-				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 			};
@@ -3215,6 +3473,15 @@
 			buildConfigurations = (
 				0C11EAC92971E9B30059786A /* Debug */,
 				0C11EACA2971E9B30059786A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		0C38795E29D08BA8001230DB /* Build configuration list for PBXNativeTarget "Pulse App macOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0C38795F29D08BA8001230DB /* Debug */,
+				0C38796029D08BA8001230DB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

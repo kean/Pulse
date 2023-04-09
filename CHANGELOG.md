@@ -1,5 +1,22 @@
 # Pulse 3.x
 
+## Pulse 3.5.6
+
+*Apr 6, 2023*
+
+- Fix #167: performance issues with `UITextView` on iOS 16
+- Fix #179: console with network mode not filtering out regular logs
+- Add `mode` parameter to the `ConsoleView` initializer that, in addition to `.network`, now also supports `.logs` mode (display only text messages)
+- ConsoleView now automatically adds a close button when presented (use `closeButtonHidden` if you need to hide it)
+- Minor design improvements for cells in the console
+
+## Pulse 3.5.5
+
+*Apr 2, 2023*
+
+- Fix warnings in Xcode 14.3
+- Improve Dynamic Type support
+
 ## Pulse 3.5.4
 
 *Mar 10, 2023*

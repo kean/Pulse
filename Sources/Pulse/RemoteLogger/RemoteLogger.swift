@@ -264,8 +264,12 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
         log(label: "RemoteLogger", "Will send hello to the server")
 
         // Say "hello" to the server and share information about the client
-        let deviceId = getDeviceId() ?? getFallbackDeviceId()
-        let body = PacketClientHello(deviceId: deviceId, deviceInfo: .make(), appInfo: .make())
+        let body = PacketClientHello(
+            deviceId: getDeviceId() ?? getFallbackDeviceId(),
+            deviceInfo: .make(),
+            appInfo: .make(),
+            session: store?.session
+        )
         connection?.send(code: .clientHello, entity: body)
 
         // Set timeout and retry in case there was no response from the server

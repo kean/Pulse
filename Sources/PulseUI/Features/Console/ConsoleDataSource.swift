@@ -28,6 +28,8 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
         didSet { controller.fetchRequest.sortDescriptors = sortDescriptors }
     }
 
+    var basePredicate: NSPredicate?
+
     static let fetchBatchSize = 100
 
     private let store: LoggerStore
@@ -51,7 +53,7 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
             entityName = "\(LoggerMessageEntity.self)"
             sortKey = options.messageSortBy.key
             grouping = options.messageGroupBy
-        case .tasks:
+        case .network:
             entityName = "\(NetworkTaskEntity.self)"
             sortKey = options.taskSortBy.key
             grouping = options.taskGroupBy
@@ -59,7 +61,7 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
 
         let request = NSFetchRequest<NSManagedObject>(entityName: entityName)
         request.sortDescriptors = [
-            grouping.key.map { NSSortDescriptor(key: $0, ascending: grouping.isAscending) },
+           grouping.key.map { NSSortDescriptor(key: $0, ascending: grouping.isAscending) },
             NSSortDescriptor(key: sortKey, ascending: options.order == .ascending)
         ].compactMap { $0 }
         request.fetchBatchSize = ConsoleDataSource.fetchBatchSize
@@ -88,8 +90,13 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
 
     /// Binds the search criteria and immediately performs the initial fetch.
     func bind(_ criteria: ConsoleSearchCriteriaViewModel) {
-        Publishers.CombineLatest3(criteria.$criteria, criteria.$focus, criteria.$isOnlyErrors).sink { [weak self] in
-            self?.setPredicate(criteria: $0, focus: $1, isOnlyErrors: $2)
+        Publishers.CombineLatest4(
+            criteria.$criteria,
+            criteria.$focus,
+            criteria.$isOnlyErrors,
+            criteria.$sessions
+        ).sink { [weak self] in
+            self?.setPredicate(criteria: $0, focus: $1, isOnlyErrors: $2, sessions: $3)
             self?.refresh()
         }.store(in: &cancellables)
     }
@@ -119,13 +126,25 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
 
     // MARK: Predicate
 
-    func setPredicate(criteria: ConsoleSearchCriteria, focus: NSPredicate?, isOnlyErrors: Bool) {
-        let predicate = ConsoleDataSource.makePredicate(mode: mode, criteria: criteria, focus: focus, isOnlyErrors: isOnlyErrors)
+    func setPredicate(criteria: ConsoleSearchCriteria, focus: NSPredicate?, isOnlyErrors: Bool, sessions: Set<LoggerSessionEntity>) {
+        let predicate = ConsoleDataSource.makePredicate(mode: mode, criteria: criteria, focus: focus, isOnlyErrors: isOnlyErrors, basePredicate: basePredicate, sessions: sessions)
         controller.fetchRequest.predicate = predicate
     }
 
-    static func makePredicate(mode: ConsoleMode, criteria: ConsoleSearchCriteria, focus: NSPredicate?, isOnlyErrors: Bool) -> NSPredicate? {
-        let predicates = [_makePredicate(mode, criteria, isOnlyErrors), focus].compactMap { $0 }
+    static func makePredicate(
+        mode: ConsoleMode,
+        criteria: ConsoleSearchCriteria,
+        focus: NSPredicate?,
+        isOnlyErrors: Bool,
+        basePredicate: NSPredicate? = nil,
+        sessions: Set<LoggerSessionEntity>
+    ) -> NSPredicate? {
+        let predicates = [
+            basePredicate,
+            _makePredicate(mode, criteria, isOnlyErrors),
+            focus,
+            sessions.isEmpty ? nil : NSPredicate(format: "session IN %@", sessions.map(\.id))
+        ].compactMap { $0 }
         switch predicates.count {
         case 0: return nil
         case 1: return predicates[0]
@@ -157,7 +176,7 @@ private func _makePredicate(_ mode: ConsoleMode, _ criteria: ConsoleSearchCriter
         return makeMessagesPredicate(isMessageOnly: false)
     case .logs:
         return makeMessagesPredicate(isMessageOnly: true)
-    case .tasks:
+    case .network:
         return ConsoleSearchCriteria.makeNetworkPredicates(criteria: criteria, isOnlyErrors: isOnlyErrors)
     }
 }
@@ -173,12 +192,11 @@ private func makeName(for section: NSFetchedResultsSectionInfo, mode: ConsoleMod
             return (LoggerStore.Level(rawValue: rawValue) ?? .debug).name.capitalized
         case .session:
             let date = (section.objects?.last as? LoggerMessageEntity)?.createdAt
-            let suffix = date.map(sessionDateFormatter.string) ?? "–"
-            return "#\(section.name) \(suffix)"
+            return date.map(sessionDateFormatter.string) ?? "–"
         default:
             break
         }
-    case .tasks:
+    case .network:
         switch options.taskGroupBy {
         case .taskType:
             let rawValue = Int16(Int(section.name) ?? 0)
@@ -198,8 +216,7 @@ private func makeName(for section: NSFetchedResultsSectionInfo, mode: ConsoleMod
             }
         case .session:
             let date = (section.objects?.last as? NetworkTaskEntity)?.createdAt
-            let suffix = date.map(sessionDateFormatter.string) ?? "–"
-            return "#\(section.name) \(suffix)"
+            return date.map(sessionDateFormatter.string) ?? "–"
         default:
             break
         }

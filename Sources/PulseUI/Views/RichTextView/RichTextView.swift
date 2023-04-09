@@ -110,7 +110,7 @@ struct RichTextView: View {
     var body: some View {
         VStack(spacing: 0) {
             WrappedTextView(viewModel: viewModel)
-            Divider()
+                .id(ObjectIdentifier(viewModel))
             RichTextViewSearchToobar(viewModel: viewModel)
         }
         .onAppear { viewModel.prepare(searchContext) }
@@ -121,17 +121,30 @@ struct RichTextView: View {
 #if DEBUG
 struct RichTextView_Previews: PreviewProvider {
     static var previews: some View {
-        NavigationView {
-            let json = try! JSONSerialization.jsonObject(with: MockJSON.allPossibleValues)
-            let string = TextRenderer().render(json: json)
-            RichTextView(viewModel: .init(string: string, contentType: "application/json"))
-                .inlineNavigationTitle("Rich Text View")
-        }
+        let textView = RichTextView(viewModel: makePreviewViewModel())
 #if os(macOS)
+        textView
+            .background(Color(.textBackgroundColor))
             .frame(height: 600)
             .previewLayout(.sizeThatFits)
-#endif
+#else
+        NavigationView {
+            textView
+                .inlineNavigationTitle("Rich Text View")
+        }
+        #endif
     }
+}
+
+private func makePreviewViewModel() -> RichTextViewModel {
+    let json = try! JSONSerialization.jsonObject(with: MockJSON.allPossibleValues)
+    let string = TextRenderer().render(json: json)
+
+    let viewModel = RichTextViewModel(string: string, contentType: "application/json")
+    viewModel.isLineNumberRulerEnabled = true
+    viewModel.isFilterEnabled = true
+
+    return viewModel
 }
 #endif
 

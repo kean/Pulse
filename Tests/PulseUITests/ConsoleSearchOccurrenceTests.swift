@@ -9,9 +9,10 @@ import Combine
 @testable import Pulse
 @testable import PulseUI
 
-@available(iOS 15, macOS 15, *)
 final class ConsoleSearchOccurrenceTests: XCTestCase {
     func testMakeSimplePreview() throws {
+        guard #available(iOS 15, macOS 13, *) else { return }
+
         // GIVEN short string
         let string = #"{"id":"2489678844","type":"IssuesEvent","actor":{"id":9343331,"login":"No-CQRT","avatar_url":"https://avatars.githubusercontent.com/u/9343331?"}}"#
 
@@ -28,6 +29,8 @@ final class ConsoleSearchOccurrenceTests: XCTestCase {
     }
 
     func testThatWhitespacesAndPunctuationsAreTrimmed() throws {
+        guard #available(iOS 15, macOS 13, *) else { return }
+
         // GIVEN
         let string = #"   {"id":"2489678844","type":"IssuesEvent","actor":{"id":9343331,"login":"No-CQRT","avatar_url":"https://avatars.githubusercontent.com/u/9343331?"}},  "#
 
@@ -44,6 +47,8 @@ final class ConsoleSearchOccurrenceTests: XCTestCase {
     }
 
     func testMatchAtBeginning() throws {
+        guard #available(iOS 15, macOS 13, *) else { return }
+
         // GIVEN
         let string = #"{"id":"2489678844","type":"IssuesEvent","actor":{"id":9343331,"login":"No-CQRT","avatar_url":"https://avatars.githubusercontent.com/u/9343331?"}}"#
 
@@ -60,6 +65,8 @@ final class ConsoleSearchOccurrenceTests: XCTestCase {
     }
 
     func testMatchAtEnd() throws {
+        guard #available(iOS 15, macOS 13, *) else { return }
+
         // GIVEN
         let string = #"{"id":"2489678844","type":"IssuesEvent","actor":{"id":9343331,"login":"No-CQRT","avatar_url":"https://avatars.githubusercontent.com/u/9343331?"}}"#
 

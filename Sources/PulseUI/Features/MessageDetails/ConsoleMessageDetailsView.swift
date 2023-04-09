@@ -58,7 +58,10 @@ struct ConsoleMessageDetailsView: View {
             InlineTabBar(items: ConsoleMessageTab.allCases, selection: $selectedTab)
             Spacer()
             toolbarItems
-        }.padding(EdgeInsets(top: 4, leading: 10, bottom: 5, trailing: 8))
+        }
+        .padding(.horizontal, 10)
+        .offset(y: -2)
+        .frame(height: 27, alignment: .center)
     }
 
     @ViewBuilder
@@ -87,7 +90,9 @@ struct ConsoleMessageDetailsView: View {
     }
 
     private func makeTextViewModel() -> RichTextViewModel {
-        RichTextViewModel(string: TextRenderer().preformatted(message.text))
+        let viewModel = RichTextViewModel(string: TextRenderer().preformatted(message.text))
+        viewModel.isFilterEnabled = true
+        return viewModel
     }
 }
 

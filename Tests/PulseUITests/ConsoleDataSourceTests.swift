@@ -54,7 +54,7 @@ final class ConsoleDataSourceTests: ConsoleTestCase, ConsoleDataSourceDelegate {
 
     func testSwitchingToNetworkMode() {
         // WHEN
-        mode = .tasks
+        mode = .network
         reset()
 
         // THEN
@@ -94,11 +94,11 @@ final class ConsoleDataSourceTests: ConsoleTestCase, ConsoleDataSourceDelegate {
         XCTAssertEqual(groupTasksBy(.errorCode).map(sut.name), ["4864", "–"])
         XCTAssertEqual(groupTasksBy(.requestState).map(sut.name), ["Success", "Failure"])
         XCTAssertEqual(groupTasksBy(.responseContentType).map(sut.name), ["–", "application/html", "application/json", "application/zip", "image/png", "text/html"])
-        XCTAssertTrue(groupTasksBy(.session).map(sut.name).first?.hasPrefix("#1") ?? false)
+        XCTAssertFalse(groupTasksBy(.session).isEmpty)
     }
 
     func groupTasksBy(_ grouping: ConsoleListOptions.TaskGroupBy) -> [NSFetchedResultsSectionInfo] {
-        mode = .tasks
+        mode = .network
         options.taskGroupBy = grouping
         reset()
         return sut.sections ?? []

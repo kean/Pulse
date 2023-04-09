@@ -40,6 +40,7 @@ extension RemoteLogger {
         let deviceId: UUID
         let deviceInfo: LoggerStore.Info.DeviceInfo
         let appInfo: LoggerStore.Info.AppInfo
+        let session: LoggerStore.Session? // Added: 3.5.7
     }
 
     struct Empty: Codable {
@@ -115,7 +116,7 @@ extension RemoteLogger {
                 responseBody = data.from(Manifest.size + Int(manifest.messageSize) + Int(manifest.requestBodySize), size: Int(manifest.responseBodySize))
             }
 
-            return LoggerStore.Event.NetworkTaskCompleted(taskId: event.taskId, taskType: event.taskType, createdAt: event.createdAt, originalRequest: event.originalRequest, currentRequest: event.currentRequest, response: event.response, error: event.error, requestBody: requestBody, responseBody: responseBody, metrics: event.metrics, label: event.label, sessionID: event.sessionID)
+            return LoggerStore.Event.NetworkTaskCompleted(taskId: event.taskId, taskType: event.taskType, createdAt: event.createdAt, originalRequest: event.originalRequest, currentRequest: event.currentRequest, response: event.response, error: event.error, requestBody: requestBody, responseBody: responseBody, metrics: event.metrics, label: event.label)
         }
     }
 

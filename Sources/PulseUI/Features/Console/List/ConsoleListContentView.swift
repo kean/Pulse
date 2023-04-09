@@ -9,19 +9,45 @@ import SwiftUI
 
 struct ConsoleListContentView: View {
     @ObservedObject var viewModel: ConsoleListViewModel
+    @EnvironmentObject private var consoleViewModel: ConsoleViewModel
 
-#if os(iOS)
+#if os(macOS)
+    let proxy: ScrollViewProxy
+    @AppStorage("com-github-kean-pulse-is-now-enabled") private var isNowEnabled = true
+#endif
+
+#if os(iOS) || os(macOS)
 
     var body: some View {
-        if #available(iOS 15, tvOS 15, *) {
+#if os(iOS)
+        if #available(iOS 15, *) {
             if !viewModel.pins.isEmpty, !viewModel.isShowingFocusedEntities {
                 pinsView
             }
         }
+#endif
         if #available(iOS 15, *), let sections = viewModel.sections, !sections.isEmpty {
             makeGroupedView(sections)
         } else {
             plainView
+#if os(macOS)
+                .onChange(of: viewModel.entities) { entities in
+                    guard isNowEnabled else { return }
+
+                    withAnimation {
+                        proxy.scrollTo(BottomViewID(), anchor: .top)
+                    }
+                    // This is a workaround that fixes a scrolling issue when more
+                    // than one row is added at the time.
+                    DispatchQueue.main.async {
+                        proxy.scrollTo(BottomViewID(), anchor: .top)
+                    }
+                }
+                .onChange(of: isNowEnabled) {
+                    guard $0 else { return }
+                    proxy.scrollTo(BottomViewID(), anchor: .top)
+                }
+#endif
         }
     }
 
@@ -36,9 +62,15 @@ struct ConsoleListContentView: View {
                 ConsoleEntityCell(entity: entity)
             }
             if prefix.count < objects.count {
+#if os(iOS)
                 NavigationLink(destination: makeDestination(for: sectionName, objects: objects)) {
                     PlainListSeeAllView(count: objects.count)
                 }
+#else
+                Button(action: { consoleViewModel.focus(on: objects) }) {
+                    PlainListSeeAllView(count: objects.count)
+                }.buttonStyle(.plain)
+#endif
             }
         }
     }
@@ -47,6 +79,7 @@ struct ConsoleListContentView: View {
         LazyConsoleView(title: title, entities: objects, source: viewModel)
     }
 
+#if os(iOS)
     @available(iOS 15, tvOS 15, *)
     @ViewBuilder
     private var pinsView: some View {
@@ -76,10 +109,12 @@ struct ConsoleListContentView: View {
         .listRowSeparator(.hidden)
         .listRowSeparator(.hidden, edges: .bottom)
 
-        if !viewModel.visibleEntities.isEmpty {
+        if !viewModel.entities.isEmpty {
             PlainListGroupSeparator()
         }
     }
+#endif
+
 #else
     var body: some View {
         plainView
@@ -88,18 +123,37 @@ struct ConsoleListContentView: View {
 
     @ViewBuilder
     private var plainView: some View {
-        if viewModel.visibleEntities.isEmpty {
+        if viewModel.entities.isEmpty {
             Text("No Recorded Logs")
                 .font(.subheadline)
                 .foregroundColor(.secondary)
         } else {
             ForEach(viewModel.visibleEntities, id: \.objectID) { entity in
                 ConsoleEntityCell(entity: entity)
+                    .id(entity.objectID)
                     .onAppear { viewModel.onAppearCell(with: entity.objectID) }
                     .onDisappear { viewModel.onDisappearCell(with: entity.objectID) }
             }
         }
+#if os(macOS)
+        HStack { EmptyView() }
+            .frame(height: 1)
+            .id(BottomViewID())
+            .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+            .onAppear {
+                nowModeChange?.cancel()
+            }
+            .onDisappear {
+                // The scrolling with ScrollViewProxy is unreliable, and this cell
+                // occasionally disappears.
+                delayNowModeChange {
+                    guard viewModel.isViewVisible else { return }
+                    isNowEnabled = false
+                }
+            }
+#else
         footerView
+#endif
     }
 
     @ViewBuilder
@@ -119,6 +173,19 @@ struct ConsoleListContentView: View {
     }
 }
 
+private var nowModeChange: DispatchWorkItem?
+
+private func delayNowModeChange(_ closure: @escaping () -> Void) {
+    nowModeChange?.cancel()
+    let item = DispatchWorkItem(block: closure)
+    DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(64), execute: item)
+    nowModeChange = item
+}
+
+struct BottomViewID: Hashable, Identifiable {
+    var id: BottomViewID { self}
+}
+
 private struct PinCellViewModel: Hashable, Identifiable {
     let object: NSManagedObject
     var id: PinCellId
@@ -134,7 +201,7 @@ private struct PinCellId: Hashable {
     let id: NSManagedObjectID
 }
 
-#if os(iOS)
+#if os(iOS) || os(macOS)
 struct ConsolePlainList: View {
     @ObservedObject var viewModel: ConsoleListViewModel
 
@@ -142,8 +209,6 @@ struct ConsolePlainList: View {
         List {
             ForEach(viewModel.entities, id: \.objectID, content: ConsoleEntityCell.init)
         }
-        .onAppear { viewModel.isViewVisible = true }
-        .onDisappear { viewModel.isViewVisible = false }
         .listStyle(.plain)
     }
 }
@@ -165,7 +230,9 @@ private struct LazyConsoleView: View {
 
     var body: some View {
         ConsoleView(viewModel: makeViewModel())
+#if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
+#endif
     }
 
     private func makeViewModel() -> ConsoleViewModel {

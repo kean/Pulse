@@ -16,8 +16,9 @@ final class ConsoleSearchBarViewModel: ObservableObject {
 
 @available(iOS 15, tvOS 15, *)
 final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDelegate {
-    var isViewVisible = false {
+    var isViewVisible: Bool = false {
         didSet {
+            guard oldValue != isViewVisible else { return }
             if !isViewVisible {
                 operation?.cancel()
                 operation = nil
@@ -71,6 +72,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     private var cancellables: [AnyCancellable] = []
     private let context: NSManagedObjectContext
 
+    // TODO: This should not depend on `ConsoleListViewModel`
     init(list: ConsoleListViewModel, index: LoggerStoreIndex, searchBar: ConsoleSearchBarViewModel) {
         self.list = list
         self.searchBar = searchBar
@@ -110,7 +112,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         }.store(in: &cancellables)
 
         list.$entities
-            .throttle(for: 3, scheduler: DispatchQueue.main, latest: true)
+            .throttle(for: 2, scheduler: DispatchQueue.main, latest: true)
             .sink { [weak self] in self?.didReloadEntities(for: $0) }
             .store(in: &cancellables)
 

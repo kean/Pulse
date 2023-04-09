@@ -53,25 +53,8 @@ public struct SettingsView: View {
                 Spacer()
             }
             HStack {
-                Button(action: { isPresentingStoreDetails = true }) {
-                    Label("Store Details", systemImage: "info.circle")
-                }
-                Spacer()
-            }
-            .popover(isPresented: $isPresentingStoreDetails) {
-                StoreDetailsView(source: .store(viewModel.store))
-            }
-        }
-        ConsoleSection(header: { SectionHeaderView(title: "Open Store") }) {
-            HStack {
                 Button("Show in Finder") {
                     NSWorkspace.shared.activateFileViewerSelecting([store.storeURL])
-                }
-                Spacer()
-            }
-            HStack {
-                Button("Open in Pulse Pro") {
-                    NSWorkspace.shared.open(store.storeURL)
                 }
                 Spacer()
             }

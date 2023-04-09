@@ -54,7 +54,7 @@ extension ConsoleSearchCriteria {
         }
 
         static var session: Dates {
-            Dates(startDate: LoggerStore.launchDate)
+            Dates(startDate: LoggerStore.Session.current.startDate)
         }
     }
 

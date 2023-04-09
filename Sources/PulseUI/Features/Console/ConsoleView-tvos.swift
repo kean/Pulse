@@ -12,10 +12,6 @@ import Combine
 public struct ConsoleView: View {
     @StateObject private var viewModel: ConsoleViewModel
 
-    public init(store: LoggerStore = .shared) {
-        self.init(viewModel: ConsoleViewModel(store: store))
-    }
-
     init(viewModel: ConsoleViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
@@ -35,6 +31,7 @@ public struct ConsoleView: View {
                 }
                 .frame(width: 700)
             }
+            .injectingEnvironment(viewModel)
             .navigationTitle(viewModel.title)
             .onAppear { viewModel.isViewVisible = true }
             .onDisappear { viewModel.isViewVisible = false }

@@ -10,17 +10,6 @@ import Pulse
 import Combine
 
 struct ConsoleTableView: View {
-    var viewModel: ConsoleTableViewModel
-    @Binding var selection: NSManagedObjectID?
-
-    var body: some View {
-        _ConsoleTableView(viewModel: viewModel, selection: $selection)
-            .onAppear { viewModel.isViewVisible = true }
-            .onDisappear { viewModel.isViewVisible = false }
-    }
-}
-
-private struct _ConsoleTableView: View {
     @ObservedObject var viewModel: ConsoleTableViewModel
     @Binding var selection: NSManagedObjectID?
 
@@ -28,7 +17,7 @@ private struct _ConsoleTableView: View {
         switch viewModel.mode {
         case .all, .logs:
             ConsoleMessageTableView(viewModel: viewModel, selection: $selection)
-        case .tasks:
+        case .network:
             ConsoleTaskTableView(viewModel: viewModel, selection: $selection)
         }
     }
@@ -47,27 +36,27 @@ private struct ConsoleMessageTableView: View {
                         .foregroundColor(task.state.tintColor)
                 }
             }.width(15)
-
+            
             TableColumn("Message", value: \.text) {
                 Text($0.text)
                     .foregroundColor(textColor(for: $0))
             }.width(min: 40, ideal: 600)
-
+            
             TableColumn("Level", value: \.level) {
                 Text($0.logLevel.name)
                     .foregroundColor(.secondary)
             }.width(min: 54, ideal: 54, max: 54)
-
+            
             TableColumn("Label", value: \.label) {
                 Text($0.label)
                     .foregroundColor(.secondary)
             }.width(min: 54, ideal: 68)
-
+            
             TableColumn("Date & Time", value: \.createdAt) {
                 Text(dateAndTimeFormatter.string(from: $0.createdAt))
                     .foregroundColor(.secondary)
             }.width(min: 87, ideal: 162, max: 162)
-
+            
             TableColumn("File", value: \.file) {
                 Text($0.file)
                     .foregroundColor(.secondary)
@@ -168,7 +157,7 @@ struct ConsoleTableView_Previews: PreviewProvider {
         }
         Group {
             let viewModel = ConsoleViewModel(store: .mock)
-            let _ = viewModel.mode = .tasks
+            let _ = viewModel.mode = .network
             ConsoleTableView(viewModel: viewModel.tableViewModel, selection: .constant(nil))
                 .previewLayout(.fixed(width: 1200, height: 800))
                 .previewDisplayName("Tasks")

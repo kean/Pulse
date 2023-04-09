@@ -166,6 +166,62 @@ final class LoggerStoreTests: XCTestCase {
         XCTAssertEqual(try store.viewContext.count(for: LoggerBlobHandleEntity.self), 3)
     }
 
+    // MARK: - Backward Compatibility
+
+    func testOpenOldStore_v3_1() throws {
+        // GIVEN
+        let storeURL = directory.url.appending(filename: "logs-archive-3-1.pulse")
+        try Resources.pulseArchive_v3_1.write(to: storeURL)
+
+        // WHEN
+        let store = try LoggerStore(storeURL: storeURL)
+
+        // THEN store version is retained
+        XCTAssertEqual(store.version, "3.1.0")
+
+        // THEN message are loaded
+        let messages = try store.allMessages()
+        XCTAssertEqual(messages.count, 15)
+        let message = try XCTUnwrap(messages.first)
+        XCTAssertEqual(message.level, 3)
+        XCTAssertEqual(message.text, "UIApplication.didFinishLaunching")
+        XCTAssertEqual(message.label, "application")
+        XCTAssertEqual(message.rawMetadata, "custom-metadata-key: value")
+
+        // THEN tasks are loaded
+        let tasks = try store.allTasks()
+        XCTAssertEqual(tasks.count, 8)
+        let task = try XCTUnwrap(tasks.first)
+        XCTAssertEqual(task.url, "https://github.com/profile/valdo")
+    }
+
+    func testOpenOldStore_v3_3() throws {
+        // GIVEN
+        let storeURL = directory.url.appending(filename: "logs-archive-3-3.pulse")
+        try Resources.pulseArchive_v3_3.write(to: storeURL)
+
+        // WHEN
+        let store = try LoggerStore(storeURL: storeURL)
+
+        // THEN store version is retained
+        XCTAssertEqual(store.version, "3.1.0") // This change was made without incrementing the version
+
+        // THEN message are loaded
+        let messages = try store.allMessages()
+        XCTAssertEqual(messages.count, 15)
+        let message = try XCTUnwrap(messages.first)
+        XCTAssertEqual(message.level, 3)
+        XCTAssertEqual(message.text, "UIApplication.didFinishLaunching")
+        XCTAssertEqual(message.label, "application")
+        XCTAssertEqual(message.rawMetadata, "custom-metadata-key: value")
+
+        // THEN tasks are loaded
+        let tasks = try store.allTasks()
+        XCTAssertEqual(tasks.count, 8)
+        let task = try XCTUnwrap(tasks.last)
+        XCTAssertEqual(task.url, "https://github.com/repos/kean/Nuke")
+    }
+
     // MARK: - Store Request
 
     func testStoreRequestWithDefaultLabel() throws {
@@ -221,7 +277,7 @@ final class LoggerStoreTests: XCTestCase {
         // WHEN
         let info = try LoggerStore.Info.make(storeURL: copyURL)
 
-        XCTAssertEqual(info.storeVersion, "3.1.0")
+        XCTAssertEqual(info.storeVersion, "3.6.0")
         XCTAssertEqual(info.messageCount, 7)
         XCTAssertEqual(info.taskCount, 3)
         XCTAssertEqual(info.blobCount, 3)
@@ -722,7 +778,7 @@ final class LoggerStoreTests: XCTestCase {
         let info = try store.info()
 
         // THEN
-        XCTAssertEqual(info.storeVersion, "3.1.0")
+        XCTAssertEqual(info.storeVersion, "3.6.0")
         XCTAssertEqual(info.messageCount, 7)
         XCTAssertEqual(info.taskCount, 3)
         XCTAssertEqual(info.blobCount, 3)

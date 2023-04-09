@@ -18,9 +18,28 @@ The easiest way to integrate PulseUI is by using ``ConsoleView``.
 }
 ```
 
-Alternatively, you can use native `UIHostingController` to present it in any `UIKit` context.
-
 > tip: If you use Pulse to log only network requests, and not text messages, use `ConsoleView.network()` to show a view specialized to only display network requests. 
+
+## UIKit
+
+To present the console from `UIKit`, use `UIHostingController`:
+
+```swift
+let view = NavigationView { 
+    ConsoleView()
+}
+present(UIHostingController(rootView: view), animated: true)
+```
+
+If you are using appearance to change the navigation bar `isTranslucent` property to `false`, make sure to set `extendedLayoutIncludesOpaqueBars` to `true`:
+
+```swift
+let vc = UIHostingController(rootView: ConsoleView())
+vc.extendedLayoutIncludesOpaqueBars = true
+let nav = UINavigationController(rootViewController: vc)
+nav.navigationBar.prefersLargeTitles = true
+present(nav, animated: true)
+```
 
 ## Custom Views
 

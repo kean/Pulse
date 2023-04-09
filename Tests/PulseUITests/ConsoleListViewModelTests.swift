@@ -8,7 +8,6 @@ import CoreData
 @testable import Pulse
 @testable import PulseUI
 
-@available(iOS 14, *)
 final class ConsoleListViewModelTests: ConsoleTestCase {
     var criteriaViewModel: ConsoleSearchCriteriaViewModel!
     var sut: ConsoleListViewModel!
@@ -49,10 +48,10 @@ final class ConsoleListViewModelTests: ConsoleTestCase {
 
     func testSwitchingToNetworkMode() {
         // WHEN
-        sut.mode = .tasks
+        sut.mode = .network
 
         // THEN
-        XCTAssertEqual(sut.mode, .tasks)
+        XCTAssertEqual(sut.mode, .network)
         XCTAssertEqual(sut.entities.count, 8)
         XCTAssertTrue(sut.entities is [NetworkTaskEntity])
     }
@@ -82,7 +81,7 @@ final class ConsoleListViewModelTests: ConsoleTestCase {
 
     func testGroupingTasksByTaskType() {
         // WHEN
-        sut.mode = .tasks
+        sut.mode = .network
         sut.options.taskGroupBy = .taskType
 
         // THEN entities are still loaded
@@ -104,7 +103,7 @@ final class ConsoleListViewModelTests: ConsoleTestCase {
 
     func testGroupingTasksByStatus() {
         // WHEN
-        sut.mode = .tasks
+        sut.mode = .network
         sut.options.taskGroupBy = .requestState
 
         // THEN entities are still loaded
@@ -182,7 +181,7 @@ final class ConsoleListViewModelTests: ConsoleTestCase {
         store.pins.togglePin(for: task)
 
         // WHEN
-        sut.mode = .tasks
+        sut.mode = .network
 
         // THEN only tasks is displayed
         wait(for: [expectation], timeout: 2)

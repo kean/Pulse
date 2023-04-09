@@ -9,7 +9,7 @@ import SwiftUI
 import Pulse
 import CoreData
 
-struct ConsoleEntityDetailsView: View {
+struct ConsoleEntityDetailsRouterView: View {
     let store: LoggerStore
     @ObservedObject var router: ConsoleRouter
     @Binding var isVertical: Bool
@@ -58,6 +58,19 @@ struct ConsoleEntityDetailsView: View {
 
     private func entity(withID objectID: NSManagedObjectID) -> NSManagedObject? {
         try? store.viewContext.existingObject(with: objectID)
+    }
+}
+
+struct ConsoleEntityStandaloneDetailsView: View {
+    let entity: NSManagedObject
+
+    var body: some View {
+        switch LoggerEntity(entity) {
+        case .message(let message):
+            ConsoleMessageDetailsView(message: message)
+        case .task(let task):
+            NetworkInspectorView(task: task)
+        }
     }
 }
 

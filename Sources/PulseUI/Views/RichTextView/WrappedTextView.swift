@@ -32,7 +32,13 @@ struct WrappedTextView: UIViewRepresentable {
     }
 
     func makeUIView(context: Context) -> UXTextView {
-        let textView = UITextView()
+        let textView: UITextView
+        if #available(iOS 16, *) {
+            // Disables the new TextKit 2 which is extremely slow on iOS 16
+            textView = UITextView(usingTextLayoutManager: false)
+        } else {
+            textView = UITextView()
+        }
         configureTextView(textView)
         textView.delegate = context.coordinator
         textView.attributedText = viewModel.originalText
@@ -68,37 +74,51 @@ struct WrappedTextView: NSViewRepresentable {
             if let onLinkTapped = onLinkTapped, onLinkTapped(url) {
                 return true
             }
-            if let (title, message) = parseTooltip(url) {
-                let alert = NSAlert()
-                alert.messageText = title ?? ""
-                alert.informativeText = message
-                if let keyWindow = NSApplication.shared.keyWindow {
-                    alert.beginSheetModal(for: keyWindow) { _ in }
-                } else {
-                    alert.runModal()
-                }
-                return true
-            }
             return false
         }
     }
 
     func makeNSView(context: Context) -> NSScrollView {
-        let scrollView = NSTextView.scrollableTextView()
+#if PULSE_STANDALONE_APP
+        let scrollView = RichTextPlatformView.scrollableTextView()
+        let textView = scrollView.documentView as! RichTextPlatformView
+
+        viewModel.$filterTerm.sink {
+            textView.isShowingFilteredResults = !$0.isEmpty
+        }.store(in: &context.coordinator.cancellables)
+
+        if viewModel.isLineNumberRulerEnabled {
+            let rulerView = LineNumberRulerView(textView: textView, fontSize: 11)
+            scrollView.verticalRulerView = rulerView
+            scrollView.hasVerticalRuler = true
+            scrollView.rulersVisible = true
+        }
+#else
+        let scrollView = UXTextView.scrollableTextView()
+        let textView = scrollView.documentView as! UXTextView
+#endif
         scrollView.hasVerticalScroller = true
-        let textView = scrollView.documentView as! NSTextView
-        textView.delegate = context.coordinator
+        scrollView.autohidesScrollers = true
+
         configureTextView(textView)
+        if viewModel.isLineNumberRulerEnabled {
+            scrollView.automaticallyAdjustsContentInsets = false
+            textView.textContainerInset = CGSize(width: 0, height: 10)
+        }
+
+        textView.delegate = context.coordinator
+        textView.textContainer?.replaceLayoutManager(RichTextViewLayoutManager())
+
+        context.coordinator.cancellables = bind(viewModel, textView)
+        textView.attributedText = viewModel.originalText
+
+        viewModel.textView = textView
+
         return scrollView
     }
 
     func updateNSView(_ nsView: NSScrollView, context: Context) {
-        let textView = (nsView.documentView as! NSTextView)
-        if viewModel.textView !== nsView {
-            context.coordinator.cancellables = bind(viewModel, textView)
-            textView.attributedText = viewModel.originalText
-            viewModel.textView = textView
-        }
+        // Do nothing
     }
 
     func makeCoordinator() -> Coordinator {

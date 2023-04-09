@@ -37,9 +37,11 @@ struct ConsoleSearchSuggestionView: View {
                 Text(suggestion.text)
                     .lineLimit(1)
                 Spacer()
+#if os(iOS)
                 if isActionable {
                     ShortcutTooltip(title: "Tab")
                 }
+#endif
             }
         }
     }

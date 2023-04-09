@@ -13,7 +13,7 @@ import Combine
 struct ConsoleSearchToolbar: View {
     let title: String
     var isSpinnerNeeded = false
-    @ObservedObject var viewModel: ConsoleViewModel
+    @EnvironmentObject private var viewModel: ConsoleViewModel
 
     var body: some View {
         HStack(alignment: .bottom, spacing: 0) {

@@ -17,20 +17,25 @@ struct DecodingErrors_Previews: PreviewProvider {
                 .previewDisplayName("Type Mismatch (Object)")
             fileViewer(error: typeMismatchErrorInArray())
                 .previewDisplayName("Type Mismatch (Array)")
-            fileViewer(error: valueNotFoundError())
+            fileViewer(error: valueNotFound())
                 .previewDisplayName("Value Not Found")
             fileViewer(error: keyNotFound())
                 .previewDisplayName("Key Not Found")
             fileViewer(error: dataCorrupted())
                 .previewDisplayName("Data Corrupted")
-
         }
     }
 
+    @ViewBuilder
     private static func fileViewer(error: NetworkLogger.DecodingError) -> some View {
+        let viewer = FileViewer(viewModel: .init(title: "Response", context: .init(contentType: .init(rawValue: "application/json"), originalSize: 1200, error: error), data: { MockJSON.allPossibleValues }))
+#if os(iOS)
         NavigationView {
-            FileViewer(viewModel: .init(title: "Response", context: .init(contentType: .init(rawValue: "application/json"), originalSize: 1200, error: error), data: { MockJSON.allPossibleValues }))
+            viewer
         }
+#else
+        viewer
+#endif
     }
 }
 
@@ -56,7 +61,7 @@ private func typeMismatchErrorInArray() -> NetworkLogger.DecodingError {
     return getError(JSON.self)
 }
 
-private func valueNotFoundError() -> NetworkLogger.DecodingError {
+private func valueNotFound() -> NetworkLogger.DecodingError {
     struct JSON: Decodable {
         let actors: [Actor]
 

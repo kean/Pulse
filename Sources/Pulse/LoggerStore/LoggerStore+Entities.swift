@@ -6,13 +6,15 @@ import CoreData
 
 public final class LoggerSessionEntity: NSManagedObject {
     @NSManaged public var createdAt: Date
-    @NSManaged public var sessionID: Int64
+    @NSManaged public var id: UUID
+    @NSManaged public var version: String?
+    @NSManaged public var build: String?
 }
 
 public final class LoggerMessageEntity: NSManagedObject {
     @NSManaged public var createdAt: Date
     @NSManaged public var isPinned: Bool
-    @NSManaged public var sessionID: Int64
+    @NSManaged public var session: UUID
     @NSManaged public var level: Int16
     @NSManaged public var text: String
     @NSManaged public var file: String
@@ -28,7 +30,7 @@ public final class LoggerMessageEntity: NSManagedObject {
 public final class NetworkTaskEntity: NSManagedObject {
     // Primary
     @NSManaged public var createdAt: Date
-    @NSManaged public var sessionID: Int64
+    @NSManaged public var session: UUID
     @NSManaged public var taskId: UUID
 
     /// Returns task type

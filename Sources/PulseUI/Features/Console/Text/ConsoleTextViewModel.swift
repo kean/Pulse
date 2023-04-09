@@ -17,8 +17,9 @@ final class ConsoleTextViewModel: ObservableObject, ConsoleDataSourceDelegate {
     var text = RichTextViewModel()
     var options = TextRenderer.Options()
 
-    var isViewVisible = false {
+    @Counter var isViewVisible {
         didSet {
+            guard oldValue != isViewVisible else { return }
             if isViewVisible {
                 resetDataSource()
             } else {

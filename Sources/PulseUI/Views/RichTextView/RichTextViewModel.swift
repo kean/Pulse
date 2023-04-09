@@ -13,11 +13,13 @@ final class RichTextViewModel: ObservableObject {
     @Published var searchOptions: StringSearchOptions = .default
     @Published private(set) var selectedMatchIndex: Int = 0
     @Published private(set) var matches: [SearchMatch] = []
-    @Published var isSearching = false
     @Published var searchTerm: String = ""
+    @Published var filterTerm: String = ""
 
     // Configuration
     @Published var isLinkDetectionEnabled = true
+    var isLineNumberRulerEnabled = false
+    var isFilterEnabled = false
 
     let contentType: NetworkLogger.ContentType?
     let originalText: NSAttributedString
@@ -29,6 +31,7 @@ final class RichTextViewModel: ObservableObject {
     weak var textView: UXTextView? // Not proper MVVM
     var textStorage: NSTextStorage { textView?.textStorage ?? NSTextStorage(string: "") }
 
+    private var prefilteredText: NSAttributedString?
     private var isSearchingInBackground = false
     private var isSearchNeeded = false
     private let queue = DispatchQueue(label: "com.github.kean.pulse.search")
@@ -48,10 +51,10 @@ final class RichTextViewModel: ObservableObject {
         self.originalText = string
         self.contentType = contentType
 
-        Publishers.CombineLatest($searchTerm, $searchOptions)
+        Publishers.CombineLatest3($searchTerm, $searchOptions, $filterTerm)
             .dropFirst()
             .receive(on: DispatchQueue.main) // Make sure self returns new values
-            .sink { [weak self] _, _ in
+            .sink { [weak self] _, _, _ in
                 self?.setSearchNeeded()
             }.store(in: &cancellables)
     }
@@ -61,7 +64,7 @@ final class RichTextViewModel: ObservableObject {
 
         // Not updated self.searchTerm because searchable doesn't like that
         let matches = search(searchTerm: context.searchTerm.text, in: textStorage.string as NSString, options: context.searchTerm.options)
-        self.didUpdateMatches(matches)
+        didUpdateMatches(matches, string: textStorage)
         if context.matchIndex < matches.count {
             DispatchQueue.main.async {
 #if os(iOS)
@@ -98,19 +101,47 @@ final class RichTextViewModel: ObservableObject {
         isSearchingInBackground = true
         isSearchNeeded = false
 
-        let string = textStorage.string as NSString
-        let (term, options) = (searchTerm, searchOptions)
+        var string = prefilteredText ?? NSAttributedString(attributedString: textStorage)
+        let (searchTerm, filterTerm, options) = (searchTerm, filterTerm, searchOptions)
+
+        if filterTerm.isEmpty {
+            prefilteredText = nil
+        } else {
+            if prefilteredText == nil {
+                prefilteredText = string
+            }
+        }
+
         queue.async {
-            let matches = search(searchTerm: term, in: string, options: options)
+            if !filterTerm.isEmpty {
+                var hasMatch = false
+                let output = NSMutableAttributedString()
+                for line in string.getLines() {
+                    if line.string.firstRange(of: filterTerm, options: .init(options)) != nil {
+                        if hasMatch {
+                            output.append("\n")
+                        }
+                        hasMatch = true
+                        output.append(line)
+                    }
+                }
+                string = output
+            }
+
+            let matches = search(searchTerm: searchTerm, in: string.string as NSString, options: options)
             DispatchQueue.main.async {
-                self.didUpdateMatches(matches)
+                self.didUpdateMatches(matches, string: string)
             }
         }
     }
 
-    private func didUpdateMatches(_ newMatches: [NSRange]) {
+    private func didUpdateMatches(_ newMatches: [NSRange], string: NSAttributedString) {
         performUpdates { _ in
             clearMatches()
+
+            if string.length != textStorage.length {
+                textStorage.setAttributedString(string)
+            }
 
             matches = newMatches.filter {
                 textStorage.attributes(at: $0.location, effectiveRange: nil)[.isTechnical] == nil
@@ -126,6 +157,9 @@ final class RichTextViewModel: ObservableObject {
 
         selectedMatchIndex = 0
         didUpdateCurrentSelectedMatch()
+#if os(macOS)
+        textView?.enclosingScrollView?.verticalRulerView?.needsDisplay = true
+#endif
 
         isSearchingInBackground = false
         searchIfNeeded()
@@ -174,26 +208,44 @@ final class RichTextViewModel: ObservableObject {
             highlight(range: matches[previousMatch].range)
         }
         highlight(range: matches[selectedMatchIndex].range, isFocused: true)
+
+#if os(macOS)
+        // A workaround for macOS where it doesn't always redraw itself correctly
+        textView?.setNeedsDisplay(textView?.bounds ?? .zero)
+#endif
     }
 
     private func clearMatches() {
         for match in matches {
             let range = match.range
+#if os(macOS)
+            textStorage.addAttribute(.foregroundColor, value: match.originalForegroundColor, range: range)
+            textStorage.removeAttribute(.underlineStyle, range: range)
+#else
             textStorage.addAttribute(.foregroundColor, value: match.originalForegroundColor, range: range)
             textStorage.removeAttribute(.backgroundColor, range: range)
+#endif
         }
     }
 
     private func highlight(range: NSRange, isFocused: Bool = false) {
+#if os(macOS)
+        let style: RichTextViewUnderlyingStyle = isFocused ? .searchResultHighlighted : .searchResult
+        textStorage.addAttributes([
+            .underlineStyle: style.rawValue,
+            .foregroundColor: isFocused ? UXColor.black : UXColor.textColor
+        ], range: range)
+#else
         textStorage.addAttributes([
             .backgroundColor: UXColor.systemBlue.withAlphaComponent(isFocused ? 0.8 : 0.3),
             .foregroundColor: UXColor.white
         ], range: range)
+#endif
     }
 }
 
 private func search(searchTerm: String, in string: NSString, options: StringSearchOptions) -> [NSRange] {
-    guard searchTerm.count > 1 else {
+    guard searchTerm.count >= 1 else {
         return []
     }
     return string.ranges(of: searchTerm, options: options)

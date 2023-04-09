@@ -45,6 +45,7 @@ struct ShareView: UIViewControllerRepresentable {
 
 #if os(macOS)
 import AppKit
+import Pulse
 
 struct ShareView: View {
     let items: ShareItems
@@ -64,17 +65,113 @@ struct ShareView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            ForEach(NSSharingService.sharingServices(forItems: items.items), id: \.title) { item in
-                Button(action: { item.perform(withItems: items.items) }) {
-                    HStack {
-                        Image(nsImage: item.image)
-                        Text(item.title)
-                    }
-                }.buttonStyle(.plain)
+        VStack(alignment: .leading, spacing: 0) {
+            let services = NSSharingService.sharingServices(forItems: items.items)
+            ForEach(services, id: \.title) { service in
+                Item(item: service) {
+                    service.perform(withItems: items.items)
+                }
             }
-        }.padding(8)
+        }.padding(4)
+    }
+
+    private struct Item: View {
+        let item: NSSharingService
+        let action: () -> Void
+        @State private var isHighlighted = false
+
+        var body: some View {
+            Button(action: action) {
+                HStack {
+                    Image(nsImage: item.image)
+                    Text(item.title)
+                    Spacer()
+                }.contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .padding(4)
+            .onHover { isHighlighted = $0 }
+            .background {
+                if isHighlighted {
+                    Color.separator.cornerRadius(4)
+                }
+            }
+        }
     }
 }
+
+#endif
+
+#if os(macOS)
+struct ShareNetworkTaskView: View {
+    @ObservedObject var task: NetworkTaskEntity
+
+    @AppStorage("com-github-kean-selected-task-sharing-option") private var output: Output = .plainText
+
+    @State private var items: ShareItems?
+
+    var body: some View {
+        VStack(spacing: 0) {
+            VStack(spacing: 8) {
+                NetworkRequestStatusCell(viewModel: .init(task: task))
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text(task.httpMethod ?? "GET").fontWeight(.semibold)
+                        Text(task.url ?? "–")
+                            .lineLimit(3)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    Spacer()
+                }
+            }
+            .padding(8)
+            Picker("", selection: $output) {
+                ForEach(Output.allCases, id: \.self) {
+                    Text($0.rawValue).tag($0.rawValue)
+                }
+            }
+            .labelsHidden()
+            .padding(8)
+            Divider()
+            if let items = items {
+                ShareView(items)
+            }
+        }
+        .onChange(of: output, perform: render)
+        .onAppear { render(with: output) }
+        .frame(width: 240)
+    }
+
+    private func render(with output: Output) {
+        var asString: NSAttributedString {
+            TextRenderer(options: .sharing).make {
+                $0.render(task, content: .sharing)
+            }
+        }
+        switch output {
+        case .plainText:
+            items = ShareService.share(asString, as: .plainText)
+        case .html:
+            items = ShareService.share(asString, as: .html)
+        case .curl:
+            items = ShareItems([task.cURLDescription()])
+        }
+    }
+
+    enum Output: String, CaseIterable {
+        case plainText = "Plain Text"
+        case html = "HTML"
+        case curl = "cURL"
+    }
+}
+
+#if DEBUG
+struct Previews_ShareView_Previews: PreviewProvider {
+    static var previews: some View {
+        ShareNetworkTaskView(task: LoggerStore.demo.entity(for: .login))
+            .frame(height: 400)
+    }
+}
+#endif
 
 #endif

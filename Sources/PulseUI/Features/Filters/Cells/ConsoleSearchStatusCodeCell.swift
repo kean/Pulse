@@ -12,7 +12,7 @@ struct ConsoleSearchStatusCodeCell: View {
 
     var body: some View {
         HStack {
-            Text("Status Code")
+            Text("Status Code").lineLimit(1)
             Spacer()
             RangePicker(range: $selection)
         }
