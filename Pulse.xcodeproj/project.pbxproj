@@ -124,7 +124,6 @@
 		0CBEF6A329DE6B3200132FB3 /* StoreStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CBEF6A229DE6B3200132FB3 /* StoreStatusView.swift */; };
 		0CBEF6A629DF69EB00132FB3 /* ConsoleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CBEF6A429DF69E800132FB3 /* ConsoleView.swift */; };
 		0CCBDDC02610BDBC00DCB60C /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CFF9BD825D6199A0069DB6A /* repos.json */; };
-		0CD6FD2D29D39B39001D518F /* RichTextViewLayoutManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD6FD2C29D39B39001D518F /* RichTextViewLayoutManager.swift */; };
 		0CD7E0BD29732C8E00A255B7 /* ShareStoreTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD7E0BC29732C8E00A255B7 /* ShareStoreTask.swift */; };
 		0CDC3BEA2970FA47003BD1FF /* ConsoleSearchListSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CDC3BE92970FA47003BD1FF /* ConsoleSearchListSelectionView.swift */; };
 		0CDC3BED2971B936003BD1FF /* ConsoleSearchLogLevelsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CDC3BEC2971B936003BD1FF /* ConsoleSearchLogLevelsCell.swift */; };
@@ -653,7 +652,6 @@
 		0CB63A392976227500525165 /* LinkedList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkedList.swift; sourceTree = "<group>"; };
 		0CBEF6A229DE6B3200132FB3 /* StoreStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreStatusView.swift; sourceTree = "<group>"; };
 		0CBEF6A429DF69E800132FB3 /* ConsoleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleView.swift; sourceTree = "<group>"; };
-		0CD6FD2C29D39B39001D518F /* RichTextViewLayoutManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RichTextViewLayoutManager.swift; sourceTree = "<group>"; };
 		0CD7E0BC29732C8E00A255B7 /* ShareStoreTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareStoreTask.swift; sourceTree = "<group>"; };
 		0CDC3BE92970FA47003BD1FF /* ConsoleSearchListSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchListSelectionView.swift; sourceTree = "<group>"; };
 		0CDC3BEC2971B936003BD1FF /* ConsoleSearchLogLevelsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchLogLevelsCell.swift; sourceTree = "<group>"; };
@@ -1421,7 +1419,6 @@
 				0CF0D5A0296F189500EED9D4 /* RichTextViewSearchToobar-macos.swift */,
 				0CB34590298AA6C6009428B2 /* RichTextViewSearchToobar-ios.swift */,
 				0CF0D5A1296F189500EED9D4 /* RichTextView-watchos.swift */,
-				0CD6FD2C29D39B39001D518F /* RichTextViewLayoutManager.swift */,
 			);
 			path = RichTextView;
 			sourceTree = "<group>";
@@ -2316,7 +2313,6 @@
 				0CF0D62A296F189600EED9D4 /* KeyValueSectionViewModel.swift in Sources */,
 				0CF0D638296F189600EED9D4 /* ImageViewer.swift in Sources */,
 				0CF5E60929981ADF009FF7AE /* ShareStoreViewModel.swift in Sources */,
-				0CD6FD2D29D39B39001D518F /* RichTextViewLayoutManager.swift in Sources */,
 				0CF0D67B296F189600EED9D4 /* ConsoleView-tvos.swift in Sources */,
 				0CF0D66B296F189600EED9D4 /* NetworkCookiesCell.swift in Sources */,
 				0CB63A382976225400525165 /* Cache.swift in Sources */,

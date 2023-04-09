@@ -93,6 +93,8 @@ struct WrappedTextView: NSViewRepresentable {
             scrollView.hasVerticalRuler = true
             scrollView.rulersVisible = true
         }
+
+        textView.textContainer?.replaceLayoutManager(RichTextViewLayoutManager())
 #else
         let scrollView = UXTextView.scrollableTextView()
         let textView = scrollView.documentView as! UXTextView
@@ -107,7 +109,6 @@ struct WrappedTextView: NSViewRepresentable {
         }
 
         textView.delegate = context.coordinator
-        textView.textContainer?.replaceLayoutManager(RichTextViewLayoutManager())
 
         context.coordinator.cancellables = bind(viewModel, textView)
         textView.attributedText = viewModel.originalText

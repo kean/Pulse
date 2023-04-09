@@ -229,7 +229,7 @@ final class RichTextViewModel: ObservableObject {
     }
 
     private func highlight(range: NSRange, isFocused: Bool = false) {
-#if os(macOS)
+#if PULSE_STANDALONE_APP
         let style: RichTextViewUnderlyingStyle = isFocused ? .searchResultHighlighted : .searchResult
         textStorage.addAttributes([
             .underlineStyle: style.rawValue,

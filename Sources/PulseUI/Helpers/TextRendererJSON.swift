@@ -214,7 +214,7 @@ final class TextRendererJSON {
         guard let error = error else {
             return [:]
         }
-#if os(macOS)
+#if PULSE_STANDALONE_APP
         return [
             .decodingError: error,
             .underlineColor: UXColor.red,
