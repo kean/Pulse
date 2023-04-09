@@ -4,6 +4,9 @@
 
 import Foundation
 import Network
+#if PULSE_STANDALONE_APP
+import Pulse
+#endif
 
 protocol RemoteLoggerConnectionDelegate: AnyObject {
     func connection(_ connection: RemoteLogger.Connection, didChangeState newState: NWConnection.State)
@@ -95,7 +98,7 @@ extension RemoteLogger {
                 if case .notEnoughData? = error as? PacketParsingError {
                     return nil
                 }
-                log("Unexpected error when processing a packet: \(error)")
+                pulseLog("Unexpected error when processing a packet: \(error)")
                 return nil
             }
         }
@@ -109,11 +112,11 @@ extension RemoteLogger {
                 let data = try encode(code: code, body: data)
                 connection.send(content: data, completion: .contentProcessed({ error in
                     if error != nil {
-                        log("\(String(describing: error))")
+                        pulseLog("\(String(describing: error))")
                     }
                 }))
             } catch {
-                log("Failed to encode a packet: \(error)") // Should never happen
+                pulseLog("Failed to encode a packet: \(error)") // Should never happen
             }
         }
 
@@ -122,7 +125,7 @@ extension RemoteLogger {
                 let data = try JSONEncoder().encode(entity)
                 send(code: code, data: data, completion)
             } catch {
-                log("Failed to encode a packet: \(error)") // Should never happen
+                pulseLog("Failed to encode a packet: \(error)") // Should never happen
             }
         }
 
