@@ -10,8 +10,6 @@ import Pulse
 import CoreData
 import Combine
 
-#warning("fix hang when removing session selection")
-
 struct ConsoleSessionsView: View {
     @FetchRequest(sortDescriptors: [SortDescriptor(\.createdAt, order: .reverse)])
     private var sessions: FetchedResults<LoggerSessionEntity>

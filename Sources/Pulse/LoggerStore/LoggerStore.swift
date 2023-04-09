@@ -233,6 +233,11 @@ public final class LoggerStore: @unchecked Sendable {
     }
 
     private func saveEntity(for session: Session, info: Info.AppInfo) {
+        let existing = try? backgroundContext.first(LoggerSessionEntity.self) {
+            $0.predicate = NSPredicate(format: "id == %@", session.id as NSUUID)
+        }
+        guard existing == nil else { return }
+
         // Start a new session
         let entity = LoggerSessionEntity(context: backgroundContext)
         entity.createdAt = session.startDate
