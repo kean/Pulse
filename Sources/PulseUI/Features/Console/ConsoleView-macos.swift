@@ -106,7 +106,7 @@ private struct ConsoleLeftPanelView: View {
     @ViewBuilder
     private var toolbarNavigationItems: some View {
 #if PULSE_STANDALONE_APP
-        ConsoleTilteView(viewModel: viewModel)
+        ConsoleTitleView(viewModel: viewModel)
 #endif
         Picker("Mode", selection: $displayMode) {
             Label("List", systemImage: "list.bullet").tag(ConsoleDisplayMode.list)
