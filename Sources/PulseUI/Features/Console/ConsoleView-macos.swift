@@ -106,12 +106,7 @@ private struct ConsoleLeftPanelView: View {
     @ViewBuilder
     private var toolbarNavigationItems: some View {
 #if PULSE_STANDALONE_APP
-        if let client = viewModel.client {
-            RemoteLoggerClientStatusView(client: client)
-            RemoteLoggerTooglePlayButton(client: client)
-        } else if viewModel.store.isArchive {
-            StoreStatusView(store: viewModel.store)
-        }
+        ConsoleTilteView(viewModel: viewModel)
 #endif
         Picker("Mode", selection: $displayMode) {
             Label("List", systemImage: "list.bullet").tag(ConsoleDisplayMode.list)
