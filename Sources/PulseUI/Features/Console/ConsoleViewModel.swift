@@ -18,7 +18,6 @@ final class ConsoleViewModel: ObservableObject {
     let listViewModel: ConsoleListViewModel
 
 #if os(iOS) || os(macOS)
-    let insightsViewModel: InsightsViewModel
     @available(iOS 15, *)
     var searchViewModel: ConsoleSearchViewModel {
         _searchViewModel as! ConsoleSearchViewModel
@@ -108,7 +107,6 @@ final class ConsoleViewModel: ObservableObject {
         self.searchCriteriaViewModel.focus = context.focus
         self.listViewModel = ConsoleListViewModel(store: store, criteria: searchCriteriaViewModel)
 #if os(iOS) || os(macOS)
-        self.insightsViewModel = InsightsViewModel(store: store)
         self.searchBarViewModel = ConsoleSearchBarViewModel()
         if #available(iOS 15, *) {
             self._searchViewModel = ConsoleSearchViewModel(list: listViewModel, index: index, searchBar: searchBarViewModel)
@@ -131,10 +129,6 @@ final class ConsoleViewModel: ObservableObject {
             context: store.viewContext,
             sortDescriptior: NSSortDescriptor(keyPath: \NetworkTaskEntity.createdAt, ascending: false)
         )
-
-#if os(iOS) || os(macOS)
-        self.insightsViewModel.consoleViewModel = self
-#endif
 
         bind()
 

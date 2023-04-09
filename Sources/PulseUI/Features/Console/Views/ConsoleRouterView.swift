@@ -15,7 +15,6 @@ final class ConsoleRouter: ObservableObject {
     @Published var isShowingFilters = false
     @Published var isShowingSettings = false
     @Published var isShowingStoreInfo = false
-    @Published var isShowingInsights = false
     @Published var isShowingShareStore = false
     @Published var isShowingDocumentBrowser = false
 }
@@ -50,7 +49,6 @@ extension ConsoleRouterView {
             .sheet(isPresented: $router.isShowingStoreInfo) { destinationStoreInfo }
             .sheet(isPresented: $router.isShowingShareStore) { destinationShareStore }
             .sheet(item: $router.shareItems, content: ShareView.init)
-            .sheet(isPresented: $router.isShowingInsights) { destinationInsights }
             .fullScreenCover(isPresented: $router.isShowingDocumentBrowser) { DocumentBrowser() }
     }
 
@@ -94,16 +92,6 @@ extension ConsoleRouterView {
         NavigationView {
             ShareStoreView(store: viewModel.store, isPresented: $router.isShowingShareStore)
         }.backport.presentationDetents([.medium])
-    }
-
-    @ViewBuilder
-    private var destinationInsights: some View {
-        NavigationView {
-            InsightsView(viewModel: viewModel.insightsViewModel)
-                .navigationBarItems(trailing: Button(action: { router.isShowingInsights = false }) {
-                    Text("Done")
-                })
-        }
     }
 }
 

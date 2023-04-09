@@ -24,13 +24,6 @@ struct ConsoleContextMenu: View {
     var body: some View {
         Menu {
             Section {
-                if !viewModel.store.isArchive {
-                    Button(action: { router.isShowingInsights = true }) {
-                        Label("Insights", systemImage: "chart.pie")
-                    }
-                }
-            }
-            Section {
                 Button(action: { router.isShowingStoreInfo = true }) {
                     Label("Store Info", systemImage: "info.circle")
                 }

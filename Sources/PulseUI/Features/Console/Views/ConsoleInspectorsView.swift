@@ -54,11 +54,6 @@ struct ConsoleInspectorsView: View {
                 StoreDetailsView(source: .store(viewModel.store))
                 Spacer()
             }
-        case .insights:
-            VStack {
-                InsightsView(viewModel: viewModel.insightsViewModel)
-                Spacer()
-            }
         case .settings:
             VStack {
                 SettingsView(store: viewModel.store)
@@ -73,7 +68,6 @@ struct ConsoleInspectorsView: View {
 private enum ConsoleInspector: Identifiable, CaseIterable {
     case filters
     case debug
-    case insights
     case storeInfo
     case settings
     case sessions
@@ -90,8 +84,6 @@ private enum ConsoleInspector: Identifiable, CaseIterable {
             return "info.circle"
         case .settings:
             return "gearshape"
-        case .insights:
-            return "chart.pie"
         case .sessions:
             return "list.clipboard"
         }

@@ -202,17 +202,6 @@ private struct PinCellId: Hashable {
 }
 
 #if os(iOS) || os(macOS)
-struct ConsolePlainList: View {
-    @ObservedObject var viewModel: ConsoleListViewModel
-
-    var body: some View {
-        List {
-            ForEach(viewModel.entities, id: \.objectID, content: ConsoleEntityCell.init)
-        }
-        .listStyle(.plain)
-    }
-}
-
 struct ConsoleStaticList: View {
     let entities: [NSManagedObject]
 
