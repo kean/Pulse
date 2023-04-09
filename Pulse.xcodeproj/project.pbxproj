@@ -279,7 +279,6 @@
 		0CF5E6042998086C009FF7AE /* InsightsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF5E60229980867009FF7AE /* InsightsViewModelTests.swift */; };
 		0CF5E60629981A94009FF7AE /* ShareStoreViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF5E60529981A94009FF7AE /* ShareStoreViewModelTests.swift */; };
 		0CF5E60929981ADF009FF7AE /* ShareStoreViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF5E60729981ADC009FF7AE /* ShareStoreViewModel.swift */; };
-		0CFBC5AF2991DCD30038E547 /* ThickDivider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CFBC5AE2991DCD30038E547 /* ThickDivider.swift */; };
 		0CFD1CDB29E2E8FD003872EF /* LoggerStore-Remote.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CFD1CDA29E2E8FD003872EF /* LoggerStore-Remote.swift */; };
 /* End PBXBuildFile section */
 
@@ -736,7 +735,6 @@
 		0CF5E60229980867009FF7AE /* InsightsViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsViewModelTests.swift; sourceTree = "<group>"; };
 		0CF5E60529981A94009FF7AE /* ShareStoreViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareStoreViewModelTests.swift; sourceTree = "<group>"; };
 		0CF5E60729981ADC009FF7AE /* ShareStoreViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareStoreViewModel.swift; sourceTree = "<group>"; };
-		0CFBC5AE2991DCD30038E547 /* ThickDivider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThickDivider.swift; sourceTree = "<group>"; };
 		0CFD1CDA29E2E8FD003872EF /* LoggerStore-Remote.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LoggerStore-Remote.swift"; sourceTree = "<group>"; };
 		49E82A8526D107A00070244F /* AlamofireIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlamofireIntegration.swift; sourceTree = "<group>"; };
 		49E82A8826D1083D0070244F /* MoyaIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoyaIntegration.swift; sourceTree = "<group>"; };
@@ -1241,7 +1239,6 @@
 				0CF0D598296F189500EED9D4 /* FileViewer.swift */,
 				0CF0D59D296F189500EED9D4 /* FileViewerViewModel.swift */,
 				0CF0D599296F189500EED9D4 /* ToastView.swift */,
-				0CFBC5AE2991DCD30038E547 /* ThickDivider.swift */,
 				0CF0D57F296F189500EED9D4 /* SpinnerView.swift */,
 				0CF0D59A296F189500EED9D4 /* ShareView.swift */,
 				0CF0D59B296F189500EED9D4 /* PDFRepresentedView.swift */,
@@ -2088,7 +2085,6 @@
 				0C840D4A29E07BE900362214 /* SelectableButton.swift in Sources */,
 				0CF0D679296F189600EED9D4 /* ConsoleView-ios.swift in Sources */,
 				0CF0D661296F189600EED9D4 /* NetworkInspectorTransferInfoView.swift in Sources */,
-				0CFBC5AF2991DCD30038E547 /* ThickDivider.swift in Sources */,
 				0CF0D663296F189600EED9D4 /* NetworkInspectorTransactionView.swift in Sources */,
 				0CB63A212974A62700525165 /* ConsoleSearchOccurrence.swift in Sources */,
 				0CF0D614296F189600EED9D4 /* TextRendererJSON.swift in Sources */,
