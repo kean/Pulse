@@ -1289,9 +1289,9 @@
 		0CF0D494296F14CF00EED9D4 /* RemoteLogger */ = {
 			isa = PBXGroup;
 			children = (
+				0CF0D499296F14CF00EED9D4 /* RemoteLogger.swift */,
 				0CF0D497296F14CF00EED9D4 /* RemoteLogger-Protocol.swift */,
 				0CF0D498296F14CF00EED9D4 /* RemoteLogger-Connection.swift */,
-				0CF0D499296F14CF00EED9D4 /* RemoteLogger.swift */,
 			);
 			path = RemoteLogger;
 			sourceTree = "<group>";

@@ -220,7 +220,9 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
         self.connection = connection
     }
 
-    public func connection(_ connection: Connection, didChangeState newState: NWConnection.State) {
+    // MARK: RemoteLoggerConnectionDelegate
+
+    func connection(_ connection: Connection, didChangeState newState: NWConnection.State) {
         precondition(DispatchQueue.getSpecific(key: specificKey) != nil)
 
         guard connectionState != .idle else { return }
@@ -237,7 +239,7 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
         }
     }
 
-    public func connection(_ connection: Connection, didReceiveEvent event: Connection.Event) {
+    func connection(_ connection: Connection, didReceiveEvent event: Connection.Event) {
         precondition(DispatchQueue.getSpecific(key: specificKey) != nil)
 
         guard connectionState != .idle else { return }
@@ -255,6 +257,8 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
             break
         }
     }
+
+    // MARK: Communication
 
     private func handshakeWithServer() {
         precondition(DispatchQueue.getSpecific(key: specificKey) != nil)
@@ -431,7 +435,7 @@ private extension NWBrowser.Result {
 }
 
 extension RemoteLogger.ConnectionState {
-    public var description: String {
+    var description: String {
         switch self {
         case .idle: return "ConnectionState.idle"
         case .connecting: return "ConnectionState.connecting"
@@ -445,8 +449,8 @@ extension RemoteLogger {
 }
 
 func log(label: String? = nil, _ message: @autoclosure () -> String) {
-    #if DEBUG && PULSE_DEBUG_LOG_ENABLED
+#if DEBUG && PULSE_DEBUG_LOG_ENABLED
     let prefix = label.map { "[\($0)] " } ?? ""
     NSLog(prefix + message())
-    #endif
+#endif
 }
