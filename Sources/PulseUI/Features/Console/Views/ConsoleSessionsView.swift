@@ -48,7 +48,12 @@ struct ConsoleSessionsView: View {
                 ForEach(sessions, id: \.objectID, content: makeCell)
             }
         }
-#if os(macOS)
+#if os(iOS)
+        .listStyle(.plain   )
+        .onAppear {
+            selection = consoleViewModel.searchCriteriaViewModel.options.sessions
+        }
+#else
         .listStyle(.inset)
         .backport.hideListContentBackground()
         .contextMenu(forSelectionType: LoggerSessionEntity.self, menu: { selection in
@@ -60,12 +65,16 @@ struct ConsoleSessionsView: View {
         })
 #endif
         .onChange(of: selection) {
+            guard consoleViewModel.searchCriteriaViewModel.options.sessions != $0 else { return }
             consoleViewModel.searchCriteriaViewModel.select(sessions: $0)
+#if os(iOS)
+            consoleViewModel.router.isShowingSessions = false
+#endif
         }
     }
 
     private func makeCell(for session: LoggerSessionEntity) -> some View {
-        HStack {
+        HStack(alignment: .center) {
             Text("\(dateFormatter.string(from: session.createdAt))")
                 .lineLimit(1)
                 .layoutPriority(1)
@@ -77,10 +86,18 @@ struct ConsoleSessionsView: View {
 #if os(macOS)
                     .foregroundColor(Color(UXColor.tertiaryLabelColor))
 #else
+                    .font(.caption)
                     .foregroundColor(.secondary)
 #endif
             }
+#if os(iOS)
+            if selection.contains(session) {
+                Image(systemName: "checkmark.circle.fill")
+                    .foregroundColor(.blue)
+            }
+#endif
         }
+        .listRowBackground(Color.clear)
         .tag(session)
     }
 }

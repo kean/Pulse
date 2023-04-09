@@ -78,9 +78,13 @@ extension ConsoleRouterView {
                     .injectingEnvironment(viewModel)
                     .navigationTitle("Session")
                     .navigationBarTitleDisplayMode(.inline)
-                    .navigationBarItems(trailing: Button(action: { router.isShowingSessions = false }) {
-                        Text("Done")
-                    })
+                    .toolbar {
+                        ToolbarItemGroup(placement: .navigationBarLeading) {
+                            Button(action: { router.isShowingSessions = false }) {
+                                Text("Close")
+                            }
+                        }
+                    }
             }
         }
     }
