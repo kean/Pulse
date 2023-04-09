@@ -1,5 +1,13 @@
 # Pulse 3.x
 
+## Pulse 3.5.7
+
+*Apr 9, 2023*
+
+- Fix [#180](https://github.com/kean/Pulse/issues/180): crash when sharing requests
+- Fix layout for pending requests
+- Fix an issue with inconsistent text styles in HTML exports
+    
 ## Pulse 3.5.6
 
 *Apr 6, 2023*
