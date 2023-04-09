@@ -10,9 +10,11 @@ import SwiftUI
 final class ConsoleViewModel: ObservableObject {
     let title: String
     let store: LoggerStore
+
 #if PULSE_STANDALONE_APP
     var client: RemoteLoggerClient?
 #endif
+
     let context: ConsoleContext
 
     let listViewModel: ConsoleListViewModel
@@ -136,14 +138,6 @@ final class ConsoleViewModel: ObservableObject {
             prepare(for: mode)
         }
     }
-
-#if PULSE_STANDALONE_APP
-    convenience init(client: RemoteLoggerClient) throws {
-        let store = try client.open()
-        self.init(store: store)
-        self.client = client
-    }
-#endif
 
 #if os(macOS)
     func focus(on entities: [NSManagedObject]) {
