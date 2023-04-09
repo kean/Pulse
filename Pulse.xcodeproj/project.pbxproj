@@ -84,7 +84,6 @@
 		0C9F04F92884F34A0035239F /* Pulse_Demo_macOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9F04F82884F34A0035239F /* Pulse_Demo_macOSApp.swift */; };
 		0C9F04FD2884F34A0035239F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C9F04FC2884F34A0035239F /* Assets.xcassets */; };
 		0C9F05002884F34A0035239F /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C9F04FF2884F34A0035239F /* Preview Assets.xcassets */; };
-		0CA1D68029D7CE3B00567CFE /* RemoteClientStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CA1D67F29D7CE3B00567CFE /* RemoteClientStatusView.swift */; };
 		0CA32DE729D5E028001712E8 /* NSAttributedString+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CA32DE629D5E028001712E8 /* NSAttributedString+Extensions.swift */; };
 		0CAF1D7B297C2040002E2722 /* ConsoleListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CAF1D7A297C2040002E2722 /* ConsoleListViewModel.swift */; };
 		0CB17F1A2978ABBA004E33F4 /* ManagedObjectsCountObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB17F192978ABBA004E33F4 /* ManagedObjectsCountObserver.swift */; };
@@ -107,7 +106,6 @@
 		0CB63A352976028F00525165 /* ConsoleSearchFilter+Parsers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A332976028B00525165 /* ConsoleSearchFilter+Parsers.swift */; };
 		0CB63A382976225400525165 /* Cache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A362976224600525165 /* Cache.swift */; };
 		0CB63A3B2976229200525165 /* LinkedList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A392976227500525165 /* LinkedList.swift */; };
-		0CBEF6A329DE6B3200132FB3 /* StoreStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CBEF6A229DE6B3200132FB3 /* StoreStatusView.swift */; };
 		0CBEF6A629DF69EB00132FB3 /* ConsoleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CBEF6A429DF69E800132FB3 /* ConsoleView.swift */; };
 		0CD7E0BD29732C8E00A255B7 /* ShareStoreTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD7E0BC29732C8E00A255B7 /* ShareStoreTask.swift */; };
 		0CDC3BEA2970FA47003BD1FF /* ConsoleSearchListSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CDC3BE92970FA47003BD1FF /* ConsoleSearchListSelectionView.swift */; };
@@ -537,7 +535,6 @@
 		0C9F04FC2884F34A0035239F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0C9F04FF2884F34A0035239F /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		0C9F05012884F34A0035239F /* Pulse_Demo_macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Pulse_Demo_macOS.entitlements; sourceTree = "<group>"; };
-		0CA1D67F29D7CE3B00567CFE /* RemoteClientStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteClientStatusView.swift; sourceTree = "<group>"; };
 		0CA32DE629D5E028001712E8 /* NSAttributedString+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSAttributedString+Extensions.swift"; sourceTree = "<group>"; };
 		0CAF1D7A297C2040002E2722 /* ConsoleListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleListViewModel.swift; sourceTree = "<group>"; };
 		0CB17F192978ABBA004E33F4 /* ManagedObjectsCountObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagedObjectsCountObserver.swift; sourceTree = "<group>"; };
@@ -560,7 +557,6 @@
 		0CB63A332976028B00525165 /* ConsoleSearchFilter+Parsers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ConsoleSearchFilter+Parsers.swift"; sourceTree = "<group>"; };
 		0CB63A362976224600525165 /* Cache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cache.swift; sourceTree = "<group>"; };
 		0CB63A392976227500525165 /* LinkedList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkedList.swift; sourceTree = "<group>"; };
-		0CBEF6A229DE6B3200132FB3 /* StoreStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreStatusView.swift; sourceTree = "<group>"; };
 		0CBEF6A429DF69E800132FB3 /* ConsoleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleView.swift; sourceTree = "<group>"; };
 		0CD7E0BC29732C8E00A255B7 /* ShareStoreTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareStoreTask.swift; sourceTree = "<group>"; };
 		0CDC3BE92970FA47003BD1FF /* ConsoleSearchListSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchListSelectionView.swift; sourceTree = "<group>"; };
@@ -1426,8 +1422,6 @@
 				0C7A0DFC297C382300B4B69D /* ConsoleShareButton.swift */,
 				0CB345A5298DEEA6009428B2 /* ConsoleInspectorsView.swift */,
 				0C840D4B29E0A09B00362214 /* ConsoleSessionsView.swift */,
-				0CA1D67F29D7CE3B00567CFE /* RemoteClientStatusView.swift */,
-				0CBEF6A229DE6B3200132FB3 /* StoreStatusView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -1992,7 +1986,6 @@
 				0CF0D65C296F189600EED9D4 /* ConsoleMessageMetadataView.swift in Sources */,
 				0CB63A3B2976229200525165 /* LinkedList.swift in Sources */,
 				0CF0D615296F189600EED9D4 /* LoggerSync.swift in Sources */,
-				0CBEF6A329DE6B3200132FB3 /* StoreStatusView.swift in Sources */,
 				0CF0D62C296F189600EED9D4 /* WebView.swift in Sources */,
 				0CF0D635296F189600EED9D4 /* InfoRow.swift in Sources */,
 				0CB3459C298D5018009428B2 /* ConsoleTextViewModel.swift in Sources */,
@@ -2069,7 +2062,6 @@
 				0CF0D665296F189600EED9D4 /* NetworkMenuCell.swift in Sources */,
 				0CF0D659296F189600EED9D4 /* ConsoleSettings.swift in Sources */,
 				0C7A0DFB297C33F300B4B69D /* ConsoleRouterView.swift in Sources */,
-				0CA1D68029D7CE3B00567CFE /* RemoteClientStatusView.swift in Sources */,
 				0CF0D61B296F189600EED9D4 /* ShareItems.swift in Sources */,
 				0CB63A352976028F00525165 /* ConsoleSearchFilter+Parsers.swift in Sources */,
 				0CF0D623296F189600EED9D4 /* SearchBar-macos.swift in Sources */,
