@@ -60,15 +60,17 @@ enum TextUtilities {
         }
 
         if let range = getRange(of: "</style>") {
-            let regular = #"font-family: 'SF Pro Text', -apple-system, sans-serif"#
-            let mono = #"font-family: 'SF Mono', SFMono-Regular, ui-monospace, Menlo, monospace;"#
             do {
+                let regular = #"font-family: 'SF Pro Text', -apple-system, sans-serif"#
                 let regex = try NSRegularExpression(pattern: "font-family: '.SFUI-\\w*'", options: [])
                 regex.replaceMatches(in: html, range: NSRange(location: 0, length: range.upperBound), withTemplate: regular)
             } catch {
                 // Should never happen
             }
+        }
+        if let range = getRange(of: "</style>") {
             do {
+                let mono = #"font-family: 'SF Mono', SFMono-Regular, ui-monospace, Menlo, monospace;"#
                 let regex = try NSRegularExpression(pattern: "font-family: '.AppleSystemUIFontMonospaced-\\w*'", options: [])
                 regex.replaceMatches(in: html, range: NSRange(location: 0, length: range.upperBound), withTemplate: mono)
             } catch {

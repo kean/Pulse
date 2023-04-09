@@ -33,11 +33,7 @@ struct ConsoleTaskCell: View {
             }
             message
 #if !os(macOS)
-            if task.state == .pending {
-                ConsoleProgressText(title: task.httpMethod ?? "GET", viewModel: ProgressViewModel(task: task))
-            } else {
-                details
-            }
+            details
 #endif
         }
             .onAppear { viewModel.bind(task)}
@@ -110,9 +106,11 @@ struct ConsoleTaskCell: View {
 
             Spacer()
 
-            makeInfoView(image: "arrow.up", text: byteCount(for: task.requestBodySize))
-            makeInfoView(image: "arrow.down", text: byteCount(for: task.responseBodySize))
-            makeInfoView(image: "clock", text: ConsoleFormatter.duration(for: task) ?? "–")
+            if task.state != .pending {
+                makeInfoView(image: "arrow.up", text: byteCount(for: task.requestBodySize))
+                makeInfoView(image: "arrow.down", text: byteCount(for: task.responseBodySize))
+                makeInfoView(image: "clock", text: ConsoleFormatter.duration(for: task) ?? "–")
+            }
         }
         .lineLimit(1)
         .foregroundColor(.secondary)
@@ -121,9 +119,11 @@ struct ConsoleTaskCell: View {
         HStack(spacing: infoSpacing) {
             Text(task.httpMethod ?? "GET")
 
-            makeInfoView(image: "arrow.up", text: byteCount(for: task.requestBodySize))
-            makeInfoView(image: "arrow.down", text: byteCount(for: task.responseBodySize))
-            makeInfoView(image: "clock", text: ConsoleFormatter.duration(for: task) ?? "–")
+            if task.state != .pending {
+                makeInfoView(image: "arrow.up", text: byteCount(for: task.requestBodySize))
+                makeInfoView(image: "arrow.down", text: byteCount(for: task.responseBodySize))
+                makeInfoView(image: "clock", text: ConsoleFormatter.duration(for: task) ?? "–")
+            }
 
             Spacer()
         }
