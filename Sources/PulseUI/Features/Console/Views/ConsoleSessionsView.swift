@@ -11,7 +11,6 @@ import CoreData
 import Combine
 
 #warning("fix hang when removing session selection")
-#warning("add a way to remove session")
 
 struct ConsoleSessionsView: View {
     @FetchRequest(sortDescriptors: [SortDescriptor(\.createdAt, order: .reverse)])
@@ -50,6 +49,13 @@ struct ConsoleSessionsView: View {
         }
         .listStyle(.inset)
         .backport.hideListContentBackground()
+        .contextMenu(forSelectionType: LoggerSessionEntity.self, menu: { selection in
+            if !store.isArchive {
+                Button(role: .destructive, action: {
+                    store.removeSessions(withIDs: selection.map(\.id))
+                }, label: { Text("Remove") })
+            }
+        })
         .onChange(of: selection) {
             consoleViewModel.searchCriteriaViewModel.select(sessions: $0)
         }
