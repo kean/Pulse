@@ -19,11 +19,17 @@ struct ConsoleNoticesView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            List(selection: $selection) {
-                ForEach(viewModel.items, content: makeCell)
+            if viewModel.items.isEmpty {
+                Text("No Errors")
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .foregroundColor(.secondary)
+            } else {
+                List(selection: $selection) {
+                    ForEach(viewModel.items, content: makeCell)
+                }
+                .listStyle(.inset)
+                .backport.hideListContentBackground()
             }
-            .listStyle(.inset)
-            .backport.hideListContentBackground()
 
             toolbar
         }
