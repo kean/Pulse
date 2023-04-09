@@ -2,7 +2,7 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
-#if os(macOS)
+#if os(iOS) || os(macOS)
 
 import Foundation
 import SwiftUI
@@ -10,6 +10,7 @@ import Pulse
 import CoreData
 import Combine
 
+@available(iOS 15.0, *)
 struct ConsoleSessionsView: View {
     @FetchRequest(sortDescriptors: [SortDescriptor(\.createdAt, order: .reverse)])
     private var sessions: FetchedResults<LoggerSessionEntity>
@@ -39,12 +40,15 @@ struct ConsoleSessionsView: View {
                 Button("Show Previous Sessions") {
                     limit = Int.max
                 }
+#if os(macOS)
                 .buttonStyle(.link)
+#endif
                 .padding(.top, 8)
             } else {
                 ForEach(sessions, id: \.objectID, content: makeCell)
             }
         }
+#if os(macOS)
         .listStyle(.inset)
         .backport.hideListContentBackground()
         .contextMenu(forSelectionType: LoggerSessionEntity.self, menu: { selection in
@@ -54,6 +58,7 @@ struct ConsoleSessionsView: View {
                 }, label: { Text("Remove") })
             }
         })
+#endif
         .onChange(of: selection) {
             consoleViewModel.searchCriteriaViewModel.select(sessions: $0)
         }
@@ -69,7 +74,11 @@ struct ConsoleSessionsView: View {
                 Text(version)
                     .lineLimit(1)
                     .frame(minWidth: 40)
+#if os(macOS)
                     .foregroundColor(Color(UXColor.tertiaryLabelColor))
+#else
+                    .foregroundColor(.secondary)
+#endif
             }
         }
         .tag(session)
@@ -97,6 +106,7 @@ private extension LoggerSessionEntity {
 }
 
 #if DEBUG
+@available(iOS 15.0, *)
 struct Previews_ConsoleSessionsView_Previews: PreviewProvider {
     static var previews: some View {
         ConsoleSessionsView()
