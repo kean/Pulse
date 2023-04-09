@@ -80,7 +80,7 @@ struct ConsoleSearchCriteriaView: View {
 extension ConsoleSearchCriteriaView {
     var timePeriodSection: some View {
         ConsoleSection(isDividerHidden: true, header: {
-            ConsoleSectionHeader(icon: "calendar", title: "Time Period", filter: $viewModel.criteria.shared.dates, default: viewModel.defaultCriteria.shared.dates)
+            ConsoleSectionHeader(icon: "calendar", title: "Time Period", filter: $viewModel.criteria.shared.dates)
         }, content: {
             ConsoleSearchTimePeriodCell(selection: $viewModel.criteria.shared.dates)
         })
@@ -216,7 +216,7 @@ struct ConsoleSearchCriteriaView_Previews: PreviewProvider {
 private func makePreview(isOnlyNetwork: Bool) -> some View {
     let store = LoggerStore.mock
     let entities: [NSManagedObject] = try! isOnlyNetwork ? store.allTasks() : store.allMessages()
-    let viewModel = ConsoleSearchCriteriaViewModel(criteria: .init(), index: .init(store: store))
+    let viewModel = ConsoleSearchCriteriaViewModel(options: .init(), index: .init(store: store))
     viewModel.bind(CurrentValueSubject(entities))
     viewModel.mode = isOnlyNetwork ? .network : .all
     return ConsoleSearchCriteriaView(viewModel: viewModel)

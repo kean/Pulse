@@ -18,8 +18,6 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
         set { options.criteria = newValue }
     }
 
-    let defaultCriteria: ConsoleSearchCriteria
-
     @Published private(set) var labels: [String] = []
     @Published private(set) var domains: [String] = []
 
@@ -36,10 +34,9 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
     /// - Parameters:
     ///   - criteria: The initial search criteria.
     ///   - index: The store index.
-    init(criteria: ConsoleSearchCriteria, index: LoggerStoreIndex) {
+    init(options: ConsolePredicateOptions, index: LoggerStoreIndex) {
         self.index = index
-        self.defaultCriteria = criteria
-        self.options.criteria = criteria
+        self.options = options
     }
 
     func bind(_ entities: some Publisher<[NSManagedObject], Never>) {
@@ -66,25 +63,20 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
     // MARK: Helpers
 
     var isCriteriaDefault: Bool {
-        guard criteria.shared == defaultCriteria.shared else { return false }
+        guard criteria.shared == .init() else { return false }
         if mode == .network {
-            return criteria.network == defaultCriteria.network
+            return criteria.network == .init()
         } else {
-            return criteria.messages == defaultCriteria.messages
+            return criteria.messages == .init()
         }
     }
 
     func select(sessions: Set<UUID>) {
-        var options = self.options
-#warning("this is no longer needed")
-        options.criteria.shared.dates.startDate = nil
-        options.criteria.shared.dates.endDate = nil
-        options.sessions = sessions
-        self.options = options
+        self.options.sessions = sessions
     }
 
     func resetAll() {
-        criteria = defaultCriteria
+        criteria = .init()
     }
 
     private func reloadCounters() {

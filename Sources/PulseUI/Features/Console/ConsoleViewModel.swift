@@ -93,20 +93,15 @@ final class ConsoleViewModel: ObservableObject {
         self.initialMode = mode
         self.mode = mode
 
-        func makeDefaultSearchCriteria() -> ConsoleSearchCriteria {
-            var criteria = ConsoleSearchCriteria()
-            if store.isArchive {
-                criteria.shared.dates.startDate = nil
-            }
-            if context.focus != nil {
-                criteria.shared.dates.startDate = nil
-            }
-            return criteria
+        func makeDefaultOptions() -> ConsolePredicateOptions {
+            var options = ConsolePredicateOptions()
+            options.sessions = [store.session.id]
+            options.focus = context.focus
+            return options
         }
 
         self.index = LoggerStoreIndex(store: store)
-        self.searchCriteriaViewModel = ConsoleSearchCriteriaViewModel(criteria: makeDefaultSearchCriteria(), index: index)
-        self.searchCriteriaViewModel.options.focus = context.focus
+        self.searchCriteriaViewModel = ConsoleSearchCriteriaViewModel(options: makeDefaultOptions(), index: index)
         self.listViewModel = ConsoleListViewModel(store: store, criteria: searchCriteriaViewModel)
 #if os(iOS) || os(macOS)
         self.searchBarViewModel = ConsoleSearchBarViewModel()

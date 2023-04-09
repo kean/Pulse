@@ -20,7 +20,7 @@ struct ConsoleSearchCriteria: Hashable {
     var network = Network()
 
     struct Shared: Hashable {
-        var dates = Dates.session
+        var dates = Dates()
     }
 
     struct Messages: Hashable {
