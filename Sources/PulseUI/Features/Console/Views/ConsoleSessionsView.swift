@@ -51,11 +51,7 @@ struct ConsoleSessionsView: View {
         .listStyle(.inset)
         .backport.hideListContentBackground()
         .onChange(of: selection) {
-            var options = consoleViewModel.searchCriteriaViewModel.options
-            options.criteria.shared.dates.startDate = nil
-            options.criteria.shared.dates.endDate = nil
-            options.sessions = $0
-            consoleViewModel.searchCriteriaViewModel.options = options
+            consoleViewModel.searchCriteriaViewModel.select(sessions: $0)
         }
     }
 

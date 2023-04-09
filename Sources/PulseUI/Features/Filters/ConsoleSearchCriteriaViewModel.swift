@@ -74,6 +74,14 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
         }
     }
 
+    func select(sessions: Set<LoggerSessionEntity>) {
+        var options = self.options
+        options.criteria.shared.dates.startDate = nil
+        options.criteria.shared.dates.endDate = nil
+        options.sessions = sessions
+        self.options = options
+    }
+
     func resetAll() {
         criteria = defaultCriteria
     }
