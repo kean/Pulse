@@ -72,8 +72,6 @@ final class ConsoleViewModel: ObservableObject {
         })
     }
 
-    var onDismiss: (() -> Void)?
-
     private var cancellables: [AnyCancellable] = []
 
     init(store: LoggerStore,

@@ -35,7 +35,6 @@ public struct MainView: View {
 
     public init(store: LoggerStore = .shared, onDismiss: (() -> Void)? = nil) {
         self.viewModel = ConsoleViewModel(store: store)
-        self.viewModel.onDismiss = onDismiss
     }
 
     public var body: some View {
