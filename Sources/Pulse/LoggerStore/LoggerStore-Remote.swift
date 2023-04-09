@@ -7,7 +7,7 @@ import Network
 import Combine
 
 extension RemoteLogger {
-    /// Creates store for the given URL.
+    /// - warning: This method is designed to be used only by the remote logger.
     public static func _store(for url: URL) throws -> LoggerStore {
         var configuration = LoggerStore.Configuration()
         configuration.saveInterval = .milliseconds(120)
@@ -20,7 +20,7 @@ extension RemoteLogger {
         store.saveSession(session, info: info)
     }
 
-    /// Applies the given event to the store.
+    /// - warning: This method is designed to be used only by the remote logger.
     public static func _process(_ event: LoggerStore.Event, store: LoggerStore) {
         store.handleExternalEvent(event)
     }

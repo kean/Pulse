@@ -149,7 +149,6 @@
 		0CF0D551296F15F200EED9D4 /* NetworkLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D492296F14CF00EED9D4 /* NetworkLogger.swift */; };
 		0CF0D552296F15F200EED9D4 /* URLSessionProxyDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D48E296F14CF00EED9D4 /* URLSessionProxyDelegate.swift */; };
 		0CF0D554296F15F600EED9D4 /* RemoteLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D499296F14CF00EED9D4 /* RemoteLogger.swift */; };
-		0CF0D555296F15F600EED9D4 /* RemoteLogger-Store.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D496296F14CF00EED9D4 /* RemoteLogger-Store.swift */; };
 		0CF0D556296F15F600EED9D4 /* RemoteLogger-Connection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D498296F14CF00EED9D4 /* RemoteLogger-Connection.swift */; };
 		0CF0D557296F15F600EED9D4 /* RemoteLogger-Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D495296F14CF00EED9D4 /* RemoteLogger-Helpers.swift */; };
 		0CF0D558296F15F600EED9D4 /* RemoteLogger-Protocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D497296F14CF00EED9D4 /* RemoteLogger-Protocol.swift */; };
@@ -303,6 +302,7 @@
 		0CF5E60629981A94009FF7AE /* ShareStoreViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF5E60529981A94009FF7AE /* ShareStoreViewModelTests.swift */; };
 		0CF5E60929981ADF009FF7AE /* ShareStoreViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF5E60729981ADC009FF7AE /* ShareStoreViewModel.swift */; };
 		0CFBC5AF2991DCD30038E547 /* ThickDivider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CFBC5AE2991DCD30038E547 /* ThickDivider.swift */; };
+		0CFD1CDB29E2E8FD003872EF /* LoggerStore-Remote.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CFD1CDA29E2E8FD003872EF /* LoggerStore-Remote.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -681,7 +681,6 @@
 		0CF0D492296F14CF00EED9D4 /* NetworkLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkLogger.swift; sourceTree = "<group>"; };
 		0CF0D493296F14CF00EED9D4 /* Pulse.docc */ = {isa = PBXFileReference; lastKnownFileType = folder.documentationcatalog; path = Pulse.docc; sourceTree = "<group>"; };
 		0CF0D495296F14CF00EED9D4 /* RemoteLogger-Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RemoteLogger-Helpers.swift"; sourceTree = "<group>"; };
-		0CF0D496296F14CF00EED9D4 /* RemoteLogger-Store.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RemoteLogger-Store.swift"; sourceTree = "<group>"; };
 		0CF0D497296F14CF00EED9D4 /* RemoteLogger-Protocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RemoteLogger-Protocol.swift"; sourceTree = "<group>"; };
 		0CF0D498296F14CF00EED9D4 /* RemoteLogger-Connection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RemoteLogger-Connection.swift"; sourceTree = "<group>"; };
 		0CF0D499296F14CF00EED9D4 /* RemoteLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteLogger.swift; sourceTree = "<group>"; };
@@ -826,6 +825,7 @@
 		0CF5E60529981A94009FF7AE /* ShareStoreViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareStoreViewModelTests.swift; sourceTree = "<group>"; };
 		0CF5E60729981ADC009FF7AE /* ShareStoreViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareStoreViewModel.swift; sourceTree = "<group>"; };
 		0CFBC5AE2991DCD30038E547 /* ThickDivider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThickDivider.swift; sourceTree = "<group>"; };
+		0CFD1CDA29E2E8FD003872EF /* LoggerStore-Remote.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LoggerStore-Remote.swift"; sourceTree = "<group>"; };
 		0CFF9BD825D6199A0069DB6A /* repos.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = repos.json; sourceTree = "<group>"; };
 		49E82A8526D107A00070244F /* AlamofireIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlamofireIntegration.swift; sourceTree = "<group>"; };
 		49E82A8826D1083D0070244F /* MoyaIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoyaIntegration.swift; sourceTree = "<group>"; };
@@ -1292,7 +1292,6 @@
 			isa = PBXGroup;
 			children = (
 				0CF0D495296F14CF00EED9D4 /* RemoteLogger-Helpers.swift */,
-				0CF0D496296F14CF00EED9D4 /* RemoteLogger-Store.swift */,
 				0CF0D497296F14CF00EED9D4 /* RemoteLogger-Protocol.swift */,
 				0CF0D498296F14CF00EED9D4 /* RemoteLogger-Connection.swift */,
 				0CF0D499296F14CF00EED9D4 /* RemoteLogger.swift */,
@@ -1309,6 +1308,7 @@
 				0CF0D49E296F14CF00EED9D4 /* LoggerStore+Info.swift */,
 				0CF0D49F296F14CF00EED9D4 /* LoggerStore+Extensions.swift */,
 				0CF0D4A0296F14CF00EED9D4 /* LoggerStore+Event.swift */,
+				0CFD1CDA29E2E8FD003872EF /* LoggerStore-Remote.swift */,
 				0CF0D4A1296F14CF00EED9D4 /* LoggerStore.swift */,
 				0CF0D4A2296F14CF00EED9D4 /* LoggerStore+Model.swift */,
 			);
@@ -2230,11 +2230,11 @@
 			files = (
 				0CF0D551296F15F200EED9D4 /* NetworkLogger.swift in Sources */,
 				0CF0D55E296F15FA00EED9D4 /* LoggerStore.swift in Sources */,
-				0CF0D555296F15F600EED9D4 /* RemoteLogger-Store.swift in Sources */,
 				0CF0D55D296F15FA00EED9D4 /* LoggerStore+Entities.swift in Sources */,
 				0CF0D562296F15FD00EED9D4 /* Version.swift in Sources */,
 				0CF0D552296F15F200EED9D4 /* URLSessionProxyDelegate.swift in Sources */,
 				0CF0D578296F185000EED9D4 /* Pulse.docc in Sources */,
+				0CFD1CDB29E2E8FD003872EF /* LoggerStore-Remote.swift in Sources */,
 				0CF0D554296F15F600EED9D4 /* RemoteLogger.swift in Sources */,
 				0CF0D54F296F15F200EED9D4 /* NetworkLogger+Redacting.swift in Sources */,
 				0CF0D55C296F15FA00EED9D4 /* LoggerStore+Info.swift in Sources */,
