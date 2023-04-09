@@ -80,25 +80,12 @@ struct WrappedTextView: NSViewRepresentable {
 
     func makeNSView(context: Context) -> NSScrollView {
 #if PULSE_STANDALONE_APP
-        let scrollView = RichTextPlatformView.scrollableTextView()
-        let textView = scrollView.documentView as! RichTextPlatformView
-
-        viewModel.$filterTerm.sink {
-            textView.isShowingFilteredResults = !$0.isEmpty
-        }.store(in: &context.coordinator.cancellables)
-
-        if viewModel.isLineNumberRulerEnabled {
-            let rulerView = LineNumberRulerView(textView: textView, fontSize: 11)
-            scrollView.verticalRulerView = rulerView
-            scrollView.hasVerticalRuler = true
-            scrollView.rulersVisible = true
-        }
-
-        textView.textContainer?.replaceLayoutManager(RichTextViewLayoutManager())
+        let scrollView = WrappedTextView.createScrollableTextView(viewModel: viewModel, coordinator: context.coordinator)
 #else
         let scrollView = UXTextView.scrollableTextView()
-        let textView = scrollView.documentView as! UXTextView
 #endif
+        let textView = scrollView.documentView as! UXTextView
+
         scrollView.hasVerticalScroller = true
         scrollView.autohidesScrollers = true
 
