@@ -31,6 +31,10 @@ struct ConsoleSessionsView: View {
     var body: some View {
         if let version = Version(store.version), version < Version(3, 6, 0) {
             PlaceholderView(imageName: "questionmark.app", title: "Unsupported", subtitle: "This feature requires a store created by Pulse version 3.6.0 or higher").padding()
+        } else if sessions.isEmpty {
+            Text("No Recorded Session")
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .foregroundColor(.secondary)
         } else {
             content
         }
