@@ -10,11 +10,6 @@ import Pulse
 import CoreData
 import Combine
 
-#warning("add app version to info? what other info can I add?")
-#warning("improve item design: less spacing, etc")
-#warning("fix how it works with remote logging")
-#warning("highlight current session")
-#warning("add filters")
 #warning("fix hang when removing session selection")
 #warning("add a way to remove session")
 
@@ -24,10 +19,10 @@ struct ConsoleSessionsView: View {
 
     @Environment(\.store) private var store
     @State private var selection: Set<LoggerSessionEntity> = []
+    @State private var limit = 20
 
     @EnvironmentObject private var consoleViewModel: ConsoleViewModel
 
-    #warning("temp")
     var body: some View {
         if let version = Version(store.version), version < Version(3, 6, 0) {
             PlaceholderView(imageName: "questionmark.app", title: "Unsupported", subtitle: "This feature requires a store created by Pulse version 3.6.0 or higher").padding()
@@ -42,7 +37,16 @@ struct ConsoleSessionsView: View {
 
     private var content: some View {
         List(selection: $selection) {
-            ForEach(sessions, id: \.objectID, content: makeCell)
+            if sessions.count > 20 {
+                ForEach(sessions.prefix(limit), id: \.objectID, content: makeCell)
+                Button("Show Previous Sessions") {
+                    limit = Int.max
+                }
+                .buttonStyle(.link)
+                .padding(.top, 8)
+            } else {
+                ForEach(sessions, id: \.objectID, content: makeCell)
+            }
         }
         .listStyle(.inset)
         .backport.hideListContentBackground()
@@ -56,12 +60,8 @@ struct ConsoleSessionsView: View {
         }
     }
 
-    #warning("reimplement how session numbers are displayed")
     private func makeCell(for session: LoggerSessionEntity) -> some View {
         HStack {
-//            Text("\(session.id)")
-//                .foregroundColor(Color.secondary)
-//                .frame(minWidth: 16, alignment: .trailing)
             Text("\(dateFormatter.string(from: session.createdAt))")
                 .lineLimit(1)
                 .layoutPriority(1)
