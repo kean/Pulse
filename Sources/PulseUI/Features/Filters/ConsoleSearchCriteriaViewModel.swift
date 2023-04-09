@@ -11,10 +11,12 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
     var isButtonResetEnabled: Bool { !isCriteriaDefault }
 
     @Published var mode: ConsoleMode = .all
-    @Published var criteria = ConsoleSearchCriteria()
-    @Published var isOnlyErrors = false
-    @Published var focus: NSPredicate?
-    @Published var sessions: Set<LoggerSessionEntity> = []
+    @Published var options = ConsolePredicateOptions()
+
+    var criteria: ConsoleSearchCriteria {
+        get { options.criteria }
+        set { options.criteria = newValue }
+    }
 
     let defaultCriteria: ConsoleSearchCriteria
 
@@ -36,9 +38,8 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
     ///   - index: The store index.
     init(criteria: ConsoleSearchCriteria, index: LoggerStoreIndex) {
         self.index = index
-
-        self.criteria = criteria
         self.defaultCriteria = criteria
+        self.options.criteria = criteria
     }
 
     func bind(_ entities: some Publisher<[NSManagedObject], Never>) {

@@ -90,13 +90,8 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
 
     /// Binds the search criteria and immediately performs the initial fetch.
     func bind(_ criteria: ConsoleSearchCriteriaViewModel) {
-        Publishers.CombineLatest4(
-            criteria.$criteria,
-            criteria.$focus,
-            criteria.$isOnlyErrors,
-            criteria.$sessions
-        ).sink { [weak self] in
-            self?.setPredicate(criteria: $0, focus: $1, isOnlyErrors: $2, sessions: $3)
+        criteria.$options.sink { [weak self] in
+            self?.setPredicate($0)
             self?.refresh()
         }.store(in: &cancellables)
     }
@@ -126,24 +121,21 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
 
     // MARK: Predicate
 
-    func setPredicate(criteria: ConsoleSearchCriteria, focus: NSPredicate?, isOnlyErrors: Bool, sessions: Set<LoggerSessionEntity>) {
-        let predicate = ConsoleDataSource.makePredicate(mode: mode, criteria: criteria, focus: focus, isOnlyErrors: isOnlyErrors, basePredicate: basePredicate, sessions: sessions)
+    func setPredicate(_ options: ConsolePredicateOptions) {
+        let predicate = ConsoleDataSource.makePredicate(mode: mode, options: options, basePredicate: basePredicate)
         controller.fetchRequest.predicate = predicate
     }
 
     static func makePredicate(
         mode: ConsoleMode,
-        criteria: ConsoleSearchCriteria,
-        focus: NSPredicate?,
-        isOnlyErrors: Bool,
-        basePredicate: NSPredicate? = nil,
-        sessions: Set<LoggerSessionEntity>
+        options: ConsolePredicateOptions,
+        basePredicate: NSPredicate? = nil
     ) -> NSPredicate? {
         let predicates = [
             basePredicate,
-            _makePredicate(mode, criteria, isOnlyErrors),
-            focus,
-            sessions.isEmpty ? nil : NSPredicate(format: "session IN %@", sessions.map(\.id))
+            _makePredicate(mode, options.criteria, options.isOnlyErrors),
+            options.focus,
+            options.sessions.isEmpty ? nil : NSPredicate(format: "session IN %@", options.sessions.map(\.id))
         ].compactMap { $0 }
         switch predicates.count {
         case 0: return nil

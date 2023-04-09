@@ -73,7 +73,7 @@ struct ConsoleToolbarView: View {
 
     var body: some View {
         HStack {
-            if searchCriteriaViewModel.focus != nil {
+            if searchCriteriaViewModel.options.focus != nil {
                 makeFocusedView()
             } else {
                 ConsoleModePicker(viewModel: viewModel)
@@ -94,7 +94,7 @@ struct ConsoleToolbarView: View {
             .foregroundColor(.secondary)
             .font(.subheadline.weight(.medium))
 
-        Button(action: { searchCriteriaViewModel.focus = nil }) {
+        Button(action: { searchCriteriaViewModel.options.focus = nil }) {
             Image(systemName: "xmark")
         }
         .foregroundColor(.secondary)
@@ -217,19 +217,21 @@ struct ConsoleFiltersView: View {
             groupByMenu.fixedSize()
         }
 
+        let criteria = searchCriteriaViewModel
+
 #if os(macOS)
-        Button(action: { searchCriteriaViewModel.isOnlyErrors.toggle() }) {
-            Image(systemName: searchCriteriaViewModel.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon")
-                .foregroundColor(searchCriteriaViewModel.isOnlyErrors ? .red : .primary)
+        Button(action: { criteria.options.isOnlyErrors.toggle() }) {
+            Image(systemName: criteria.options.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon")
+                .foregroundColor(criteria.options.isOnlyErrors ? .red : .primary)
         }
         .buttonStyle(.plain)
         .keyboardShortcut("e", modifiers: [.command, .shift])
         .help("Toggle Show Only Errors (⇧⌘E)")
 #else
-        Button(action: { searchCriteriaViewModel.isOnlyErrors.toggle() }) {
-            Text(Image(systemName: searchCriteriaViewModel.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon"))
+        Button(action: { criteria.options.isOnlyErrors.toggle() }) {
+            Text(Image(systemName: criteria.options.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon"))
                 .font(.body)
-                .foregroundColor(searchCriteriaViewModel.isOnlyErrors ? .red : .blue)
+                .foregroundColor(criteria.options.isOnlyErrors ? .red : .blue)
         }
         .padding(.leading, 1)
 #endif

@@ -106,7 +106,7 @@ final class ConsoleViewModel: ObservableObject {
 
         self.index = LoggerStoreIndex(store: store)
         self.searchCriteriaViewModel = ConsoleSearchCriteriaViewModel(criteria: makeDefaultSearchCriteria(), index: index)
-        self.searchCriteriaViewModel.focus = context.focus
+        self.searchCriteriaViewModel.options.focus = context.focus
         self.listViewModel = ConsoleListViewModel(store: store, criteria: searchCriteriaViewModel)
 #if os(iOS) || os(macOS)
         self.searchBarViewModel = ConsoleSearchBarViewModel()
@@ -141,26 +141,22 @@ final class ConsoleViewModel: ObservableObject {
 
 #if os(macOS)
     func focus(on entities: [NSManagedObject]) {
-        searchCriteriaViewModel.focus = NSPredicate(format: "self IN %@", entities)
+        searchCriteriaViewModel.options.focus = NSPredicate(format: "self IN %@", entities)
         listViewModel.options.messageGroupBy = .noGrouping
         listViewModel.options.taskGroupBy = .noGrouping
     }
 #endif
 
     private func bind() {
-        let criteria = searchCriteriaViewModel
-
-        criteria.bind(listViewModel.$entities)
-
-#warning("refactor (combine these parameters in a single properly")
-        Publishers.CombineLatest4(criteria.$criteria, criteria.$focus, criteria.$isOnlyErrors, criteria.$sessions).sink { [weak self] in
-            self?.refreshCountObservers(criteria: $0, focus: $1, isOnlyError: $2, sessions: $3)
+        searchCriteriaViewModel.bind(listViewModel.$entities)
+        searchCriteriaViewModel.$options.sink { [weak self] in
+            self?.refreshCountObservers($0)
         }.store(in: &cancellables)
     }
 
-    private func refreshCountObservers(criteria: ConsoleSearchCriteria, focus: NSPredicate?, isOnlyError: Bool, sessions: Set<LoggerSessionEntity>) {
+    private func refreshCountObservers(_ options: ConsolePredicateOptions) {
         func makePredicate(for mode: ConsoleMode) -> NSPredicate? {
-            ConsoleDataSource.makePredicate(mode: mode, criteria: criteria, focus: focus, isOnlyErrors: isOnlyError, sessions: sessions)
+            ConsoleDataSource.makePredicate(mode: mode, options: options)
         }
         logCountObserver.setPredicate(makePredicate(for: .logs))
         taskCountObserver.setPredicate(makePredicate(for: .network))

@@ -7,6 +7,13 @@ import Pulse
 import CoreData
 import Combine
 
+struct ConsolePredicateOptions {
+    var criteria = ConsoleSearchCriteria()
+    var isOnlyErrors = false
+    var focus: NSPredicate?
+    var sessions: Set<LoggerSessionEntity> = []
+}
+
 struct ConsoleSearchCriteria: Hashable {
     var shared = Shared()
     var messages = Messages()
