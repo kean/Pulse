@@ -14,6 +14,7 @@ final class ConsoleRouter: ObservableObject {
     @Published var shareItems: ShareItems?
     @Published var isShowingFilters = false
     @Published var isShowingSettings = false
+    @Published var isShowingSessions = false
     @Published var isShowingStoreInfo = false
     @Published var isShowingShareStore = false
     @Published var isShowingDocumentBrowser = false
@@ -46,6 +47,7 @@ extension ConsoleRouterView {
         Text("").invisible()
             .sheet(isPresented: $router.isShowingFilters) { destinationFilters }
             .sheet(isPresented: $router.isShowingSettings) { destinationSettings }
+            .sheet(isPresented: $router.isShowingSessions) { destinationSessions }
             .sheet(isPresented: $router.isShowingStoreInfo) { destinationStoreInfo }
             .sheet(isPresented: $router.isShowingShareStore) { destinationShareStore }
             .sheet(item: $router.shareItems, content: ShareView.init)
@@ -64,6 +66,21 @@ extension ConsoleRouterView {
                 view.dynamicTypeSize(...DynamicTypeSize.xxxLarge)
             } else {
                 view
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var destinationSessions: some View {
+        if #available(iOS 15, *) {
+            NavigationView {
+                ConsoleSessionsView()
+                    .injectingEnvironment(viewModel)
+                    .navigationTitle("Session")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .navigationBarItems(trailing: Button(action: { router.isShowingSessions = false }) {
+                        Text("Done")
+                    })
             }
         }
     }
