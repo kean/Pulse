@@ -23,11 +23,9 @@ struct ConsoleContextMenu: View {
 
     var body: some View {
         Menu {
-            if #available(iOS 15, *) {
-                Section {
-                    Button(action: { router.isShowingSessions = true }) {
-                        Label("Sessions", systemImage: "list.bullet.clipboard")
-                    }
+            Section {
+                Button(action: { router.isShowingSessions = true }) {
+                    Label("Sessions", systemImage: "list.bullet.clipboard")
                 }
             }
             Section {

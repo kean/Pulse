@@ -10,8 +10,6 @@ import Pulse
 import CoreData
 import Combine
 
-#warning("add copy shortcut")
-
 struct ConsoleNoticesView: View {
     @StateObject private var viewModel = ConsoleNoticesViewModel()
     @EnvironmentObject private var consoleViewModel: ConsoleViewModel

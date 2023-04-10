@@ -45,7 +45,7 @@ final class ConsoleViewModelTests: ConsoleTestCase {
             expectation.fulfill()
         }.store(in: &cancellables)
 
-        sut.searchCriteriaViewModel.isOnlyErrors = true
+        sut.searchCriteriaViewModel.options.isOnlyErrors = true
         wait(for: [expectation], timeout: 2)
     }
 

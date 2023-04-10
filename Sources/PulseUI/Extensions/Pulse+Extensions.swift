@@ -86,3 +86,27 @@ extension NetworkTaskEntity.State {
         }
     }
 }
+
+extension LoggerSessionEntity {
+    var formattedDate: String {
+        dateFormatter.string(from: createdAt)
+    }
+
+    var fullVersion: String? {
+        guard let version = version else {
+            return nil
+        }
+        if let build = build {
+            return version + " (\(build))"
+        }
+        return version
+    }
+}
+
+private let dateFormatter: DateFormatter = {
+    let formatter = DateFormatter()
+    formatter.dateStyle = .short
+    formatter.timeStyle = .medium
+    formatter.doesRelativeDateFormatting = true
+    return formatter
+}()

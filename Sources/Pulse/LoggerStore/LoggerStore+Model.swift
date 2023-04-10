@@ -12,15 +12,12 @@ extension LoggerStore {
         typealias Relationship = NSRelationshipDescription
 
         let session = Entity(class: LoggerSessionEntity.self)
-
         let message = Entity(class: LoggerMessageEntity.self)
-
         let task = Entity(class: NetworkTaskEntity.self)
         let progress = Entity(class: NetworkTaskProgressEntity.self)
         let request = Entity(class: NetworkRequestEntity.self)
         let response = Entity(class: NetworkResponseEntity.self)
         let transaction = Entity(class: NetworkTransactionMetricsEntity.self)
-
         let blob = Entity(class: LoggerBlobHandleEntity.self)
 
         session.properties = [

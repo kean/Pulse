@@ -72,20 +72,17 @@ extension ConsoleRouterView {
 
     @ViewBuilder
     private var destinationSessions: some View {
-        if #available(iOS 15, *) {
-            NavigationView {
-                ConsoleSessionsView()
-                    .injectingEnvironment(viewModel)
-                    .navigationTitle("Session")
-                    .navigationBarTitleDisplayMode(.inline)
-                    .toolbar {
-                        ToolbarItemGroup(placement: .navigationBarLeading) {
-                            Button(action: { router.isShowingSessions = false }) {
-                                Text("Close")
-                            }
+        NavigationView {
+            ConsoleSessionsView()
+                .navigationTitle("Sessions")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItemGroup(placement: .navigationBarLeading) {
+                        Button(action: { router.isShowingSessions = false }) {
+                            Text("Cancel")
                         }
                     }
-            }
+                }
         }
     }
 

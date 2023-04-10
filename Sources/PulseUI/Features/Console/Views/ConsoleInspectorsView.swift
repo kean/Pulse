@@ -6,7 +6,6 @@
 
 import SwiftUI
 
-#warning("add help and shortcuts")
 struct ConsoleInspectorsView: View {
     @EnvironmentObject private var viewModel: ConsoleViewModel
 
@@ -24,6 +23,9 @@ struct ConsoleInspectorsView: View {
         var inspectors = ConsoleInspector.allCases
         if viewModel.store.isArchive {
             inspectors.removeAll(where: { $0 == .settings })
+        }
+        if #unavailable(macOS 13) {
+            inspectors.removeAll(where: { $0 == .sessions })
         }
         return inspectors
     }
@@ -60,7 +62,9 @@ struct ConsoleInspectorsView: View {
                 Spacer()
             }
         case .sessions:
-            ConsoleSessionsView()
+            if #available(macOS 13, *) {
+                ConsoleSessionsView()
+            }
         }
     }
 }

@@ -53,10 +53,10 @@ private struct ConsoleToolbarView: View {
                 }
                 .background(consoleViewModel.bindingForNetworkMode.wrappedValue ? Rectangle().foregroundColor(.blue).cornerRadius(8) : nil)
             }
-            Button(action: { viewModel.isOnlyErrors.toggle() }) {
+            Button(action: { viewModel.options.isOnlyErrors.toggle() }) {
                 Image(systemName: "exclamationmark.octagon")
             }
-            .background(viewModel.isOnlyErrors ? Rectangle().foregroundColor(.red).cornerRadius(8) : nil)
+            .background(viewModel.options.isOnlyErrors ? Rectangle().foregroundColor(.red).cornerRadius(8) : nil)
 
             Button(action: { router.isShowingFilters = true }) {
                 Image(systemName: "line.3.horizontal.decrease.circle")

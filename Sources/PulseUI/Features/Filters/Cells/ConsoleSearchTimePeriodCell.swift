@@ -39,7 +39,6 @@ struct ConsoleSearchTimePeriodCell: View {
                 .lineLimit(1)
                 .foregroundColor(.secondary)
                 .frame(maxWidth: .infinity, alignment: .leading)
-            Button("Session") { selection = .session }
             Button("Recent") { selection = .recent }
             Button("Today") { selection = .today }
         }

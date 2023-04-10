@@ -40,6 +40,14 @@ final class PerformanceTests: XCTestCase {
         }
     }
 
+    func xtestExport() {
+//        populate(store: store)
+//        Thread.sleep(forTimeInterval: 2)
+        benchmark(title: "export") {
+            try! store.copy(to: tempDirectoryURL.appending(filename: "temp-export"))
+        }
+    }
+
     func xtestQueryByLevel() {
         let request = NSFetchRequest<LoggerMessageEntity>(entityName: "LoggerMessageEntity")
         request.predicate = NSPredicate(format: "level == %i", LoggerStore.Level.info.rawValue)
@@ -53,8 +61,8 @@ final class PerformanceTests: XCTestCase {
     }
 
     func populateStore() {
-        /// Create 60000 messages
-        for _ in 0..<10000 {
+        /// Create 30000 messages
+        for _ in 0..<5000 {
             store.storeMessage(label: "application", level: .info, message:  "UIApplication.didFinishLaunching")
             store.storeMessage(label: "application", level: .info, message:  "UIApplication.willEnterForeground")
             store.storeMessage(label: "auth", level: .debug, message: "🌐 Will authorize user with name \"kean@github.com\"", metadata: [

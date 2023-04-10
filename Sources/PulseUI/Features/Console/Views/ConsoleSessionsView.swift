@@ -2,24 +2,25 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
-#if os(iOS) || os(macOS)
-
 import Foundation
-import SwiftUI
 import Pulse
+import SwiftUI
 import CoreData
 import Combine
 
-@available(iOS 15.0, *)
+#if os(iOS) || os(macOS)
+
+@available(macOS 13, *)
 struct ConsoleSessionsView: View {
-    @FetchRequest(sortDescriptors: [SortDescriptor(\.createdAt, order: .reverse)])
+    @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \LoggerSessionEntity.createdAt, ascending: false)])
     private var sessions: FetchedResults<LoggerSessionEntity>
 
-    @Environment(\.store) private var store
+    @State private var filterTerm = ""
     @State private var selection: Set<UUID> = []
     @State private var limit = 20
 
     @EnvironmentObject private var consoleViewModel: ConsoleViewModel
+    @Environment(\.store) private var store
 
     var body: some View {
         if let version = Version(store.version), version < Version(3, 6, 0) {
@@ -33,49 +34,96 @@ struct ConsoleSessionsView: View {
         }
     }
 
+    @ViewBuilder
     private var content: some View {
-        List(selection: $selection) {
-            if sessions.count > 20 {
-                ForEach(sessions.prefix(limit), id: \.objectID, content: makeCell)
-                Button("Show Previous Sessions") {
-                    limit = Int.max
-                }
 #if os(macOS)
-                .buttonStyle(.link)
+            VStack {
+                list
+                HStack {
+                    Spacer()
+                    SearchBar(title: "Filter", imageName: "line.3.horizontal.decrease.circle", text: $filterTerm)
+                        .frame(maxWidth: 220)
+                }.padding(8)
+            }
+#else
+            list.toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Done") {
+                        consoleViewModel.searchCriteriaViewModel.select(sessions: selection)
+                        consoleViewModel.router.isShowingSessions = false
+                    }
+                }
+                ToolbarItem(placement: .bottomBar) {
+                    HStack {
+                        Button.destructive(action: {
+                            store.removeSessions(withIDs: selection)
+                        }, label: { Text("Remove").foregroundColor(.red) })
+                        .disabled(selection.isEmpty)
+
+                        Spacer()
+                    }
+                }
+            }
 #endif
-                .padding(.top, 8)
+    }
+
+    private var list: some View {
+        List(selection: $selection) {
+            if !filterTerm.isEmpty {
+                ForEach(getFilteredSessions(), id: \.objectID, content: makeCell)
             } else {
-                ForEach(sessions, id: \.objectID, content: makeCell)
+#if os(iOS)
+                buttonToggleSelectAll
+#endif
+                if sessions.count > limit {
+                    ForEach(sessions.prefix(limit), id: \.objectID, content: makeCell)
+                    buttonShowPreviousSessions
+                } else {
+                    ForEach(sessions, id: \.objectID, content: makeCell)
+                }
             }
         }
 #if os(iOS)
-        .listStyle(.plain   )
+        .listStyle(.plain)
+        .environment(\.editMode, .constant(.active))
         .onAppear {
             selection = consoleViewModel.searchCriteriaViewModel.options.sessions
         }
+        .backport.searchable(text: $filterTerm)
 #else
         .listStyle(.inset)
         .backport.hideListContentBackground()
-        .contextMenu(forSelectionType: LoggerSessionEntity.self, menu: { selection in
-            if !store.isArchive {
-                Button(role: .destructive, action: {
-                    store.removeSessions(withIDs: selection.map(\.id))
-                }, label: { Text("Remove") })
-            }
-        })
-#endif
+        .contextMenu(forSelectionType: UUID.self, menu: contextMenu)
         .onChange(of: selection) {
             guard consoleViewModel.searchCriteriaViewModel.options.sessions != $0 else { return }
             consoleViewModel.searchCriteriaViewModel.select(sessions: $0)
-#if os(iOS)
-            consoleViewModel.router.isShowingSessions = false
-#endif
         }
+#endif
     }
 
+#if os(iOS)
+    private var buttonToggleSelectAll: some View {
+        Button(action: {
+            if sessions.count == selection.count {
+                selection = []
+            } else {
+                selection = Set(sessions.map(\.id))
+            }
+        }) {
+            HStack {
+                Text(sessions.count == selection.count ? "Deselect All" : "Select All")
+                Spacer()
+            }
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .foregroundColor(.blue)
+    }
+#endif
+
     private func makeCell(for session: LoggerSessionEntity) -> some View {
-        HStack(alignment: .center) {
-            Text("\(dateFormatter.string(from: session.createdAt))")
+        HStack(alignment: .lastTextBaseline) {
+            Text(session.formattedDate)
                 .lineLimit(1)
                 .layoutPriority(1)
             Spacer()
@@ -90,44 +138,60 @@ struct ConsoleSessionsView: View {
                     .foregroundColor(.secondary)
 #endif
             }
-#if os(iOS)
-            if selection.contains(session.id) {
-                Image(systemName: "checkmark.circle.fill")
-                    .foregroundColor(.blue)
-            }
-#endif
         }
         .listRowBackground(Color.clear)
         .tag(session.id)
     }
-}
 
-private let dateFormatter: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.dateStyle = .medium
-    formatter.timeStyle = .medium
-    formatter.doesRelativeDateFormatting = true
-    return formatter
-}()
+    @ViewBuilder
+    private var buttonShowPreviousSessions: some View {
+        Button("Show Previous Sessions") {
+            limit = Int.max
+        }
+#if os(macOS)
+        .buttonStyle(.link)
+        .padding(.top, 8)
+#else
+        .buttonStyle(.plain)
+        .foregroundColor(.blue)
+#endif
+    }
+    
+#if os(macOS)
+    @ViewBuilder
+    private func contextMenu(for selection: Set<UUID>) -> some View {
+        if !store.isArchive {
+            Button(role: .destructive, action: {
+                store.removeSessions(withIDs: selection)
+            }, label: { Text("Remove") })
+        }
+    }
+#endif
 
-private extension LoggerSessionEntity {
-    var fullVersion: String? {
-        guard let version = version else {
-            return nil
+    private func getFilteredSessions() -> [LoggerSessionEntity] {
+        sessions.filter {
+            $0.formattedDate.localizedCaseInsensitiveContains(filterTerm) ||
+            ($0.fullVersion?.localizedCaseInsensitiveContains(filterTerm) ?? false)
         }
-        if let build = build {
-            return version + " (\(build))"
-        }
-        return version
     }
 }
 
 #if DEBUG
-@available(iOS 15.0, *)
+@available(iOS 15.0, macOS 13, *)
 struct Previews_ConsoleSessionsView_Previews: PreviewProvider {
+    static let viewModel = ConsoleViewModel(store: .mock)
+
     static var previews: some View {
+#if os(iOS)
+        NavigationView {
+            ConsoleSessionsView()
+                .background(ConsoleRouterView(viewModel: viewModel))
+                .injectingEnvironment(viewModel)
+        }
+#else
         ConsoleSessionsView()
-            .injectingEnvironment(ConsoleViewModel(store: .mock))
+            .injectingEnvironment(viewModel)
+#endif
     }
 }
 #endif

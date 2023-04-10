@@ -85,9 +85,7 @@ extension LoggerStore {
         /// is ignored completely.
         public var willHandleEvent: @Sendable (Event) -> Event? = { $0 }
 
-        /// Set to `true` if the store represents logs shared from a separate device.
-        /// By default, `false`.
-        var isRemote = false
+        var isAutoStartingSession = true
 
         /// Initializes the configuration.
         ///

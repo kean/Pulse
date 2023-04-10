@@ -20,7 +20,6 @@ public struct ConsoleView: View {
 
     public var body: some View {
         ConsoleListView(viewModel: viewModel)
-            .injectingEnvironment(viewModel)
             .onAppear  { viewModel.isViewVisible = true }
             .onDisappear { viewModel.isViewVisible = false }
             .navigationTitle(viewModel.title)
@@ -40,6 +39,7 @@ public struct ConsoleView: View {
                 }
             }
             .background(ConsoleRouterView(viewModel: viewModel))
+            .injectingEnvironment(viewModel)
     }
 
     /// Changes the default close button visibility.

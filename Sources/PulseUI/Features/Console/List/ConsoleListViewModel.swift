@@ -35,13 +35,11 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
         searchCriteriaViewModel.options.focus != nil
     }
 
-    var isShowPreviousSessionButtonShown: Bool {
-        searchCriteriaViewModel.criteria.shared.dates == .session
-    }
+    @Published private(set) var previousSession: LoggerSessionEntity?
 
     var mode: ConsoleMode = .all {
         didSet {
-            pins = filter(pins: pinsObserver.pins, mode: mode)
+            pins = filter(pins: pinsObserver.objects, mode: mode)
             resetDataSource(options: options)
         }
     }
@@ -53,19 +51,25 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
 
     let store: LoggerStore
     private let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
-    private let pinsObserver: LoggerPinsObserver
+    private let sessions: ManagedObjectsObserver<LoggerSessionEntity>
+    private let pinsObserver: ManagedObjectsObserver<LoggerMessageEntity>
     private var dataSource: ConsoleDataSource?
     private var cancellables: [AnyCancellable] = []
 
     init(store: LoggerStore, criteria: ConsoleSearchCriteriaViewModel) {
         self.store = store
         self.searchCriteriaViewModel = criteria
-        self.pinsObserver = LoggerPinsObserver(store: store)
+        self.sessions = .sessions(for: store.viewContext)
+        self.pinsObserver = .pins(for: store.viewContext)
         self.bind()
     }
 
     private func bind() {
-        pinsObserver.$pins.dropFirst().sink { [weak self] pins in
+        sessions.$objects.dropFirst().sink { [weak self] in
+            self?.refreshPreviousSessionButton(sessions: $0)
+        }.store(in: &cancellables)
+
+        pinsObserver.$objects.dropFirst().sink { [weak self] pins in
             guard let self = self else { return }
             withAnimation {
                 self.pins = filter(pins: pins, mode: self.mode)
@@ -83,12 +87,26 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
         dataSource?.bind(searchCriteriaViewModel)
     }
 
-    func buttonShowPreviousSessionTapped() {
-        searchCriteriaViewModel.criteria.shared.dates.startDate = nil
+    func buttonShowPreviousSessionTapped(for session: LoggerSessionEntity) {
+        searchCriteriaViewModel.options.sessions.insert(session.id)
+        refreshPreviousSessionButton(sessions: self.sessions.objects)
     }
 
     func buttonRemovePinsTapped() {
         store.pins.removeAllPins()
+    }
+
+    private func refreshPreviousSessionButton(sessions: [LoggerSessionEntity]) {
+        let selection = searchCriteriaViewModel.options.sessions
+        let isDisplayingPrefix = sessions.prefix(selection.count).allSatisfy {
+            selection.contains($0.id)
+        }
+        guard isDisplayingPrefix,
+              sessions.count > selection.count else {
+            previousSession = nil
+            return
+        }
+        previousSession = sessions[selection.count]
     }
 
     // MARK: ConsoleDataSourceDelegate
@@ -104,17 +122,11 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
     }
 
     func dataSource(_ dataSource: ConsoleDataSource, didUpdateWith diff: CollectionDifference<NSManagedObjectID>?) {
-#if os(macOS)
         entities = dataSource.entities
         sections = dataSource.sections
-#else
-        withAnimation {
-            entities = dataSource.entities
-            sections = dataSource.sections
-
-            if scrollPosition == .nearTop {
-                refreshVisibleEntities()
-            }
+#if !os(macOS)
+        if scrollPosition == .nearTop {
+            refreshVisibleEntities()
         }
 #endif
     }
@@ -152,15 +164,24 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
             scrollPosition = .middle
         }
 
-        if scrollPosition != self.scrollPosition {
-            self.scrollPosition = scrollPosition
-            switch scrollPosition {
-            case .nearTop:
-                visibleEntityCountLimit = ConsoleDataSource.fetchBatchSize // Reset
-                refreshVisibleEntities()
-            case .middle:
-                break // Don't reload: too expensive and ruins gestures
-            case .nearBottom:
+        guard scrollPosition != self.scrollPosition else {
+            return
+        }
+        self.scrollPosition = scrollPosition
+        switch scrollPosition {
+        case .nearTop:
+            DispatchQueue.main.async {
+                // Important: when we push a new screens all cells disappear
+                // and the state transitions to .nearTop. We don't want the
+                // view to reload when that happens.
+                if self.isViewVisible {
+                    self.refreshVisibleEntities()
+                }
+            }
+        case .middle:
+            break // Don't reload: too expensive and ruins gestures
+        case .nearBottom:
+            if visibleEntities.count < entities.count {
                 visibleEntityCountLimit += ConsoleDataSource.fetchBatchSize
                 refreshVisibleEntities()
             }

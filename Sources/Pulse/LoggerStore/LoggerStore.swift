@@ -19,7 +19,7 @@ public final class LoggerStore: @unchecked Sendable {
     public let isArchive: Bool
 
     /// The configuration with which the store was initialized with.
-    public let configuration: Configuration
+    private(set) public var configuration: Configuration
 
     /// Current session.
     private(set) public var session: Session = .current
@@ -46,6 +46,7 @@ public final class LoggerStore: @unchecked Sendable {
     private var manifest: Manifest {
         didSet { try? save(manifest) }
     }
+    private var sessionIndex: Int64 = 0
 
     private let blobsURL: URL
     private let manifestURL: URL
@@ -145,6 +146,7 @@ public final class LoggerStore: @unchecked Sendable {
             if !Files.fileExists(atPath: databaseURL.path) {
                 try document.database().decompressed().write(to: databaseURL)
             }
+            self.configuration.isBlobCompressionEnabled = info.isBlobCompressionEnabled ?? true
             self.document = .archive(info, document)
             self.manifest = .init(storeId: info.storeId, version: try Version(string: info.storeVersion))
         }
@@ -152,6 +154,7 @@ public final class LoggerStore: @unchecked Sendable {
         self.container = LoggerStore.makeContainer(databaseURL: databaseURL)
         try container.loadStore()
         self.backgroundContext = container.newBackgroundContext()
+
         try postInitialization()
     }
 
@@ -165,10 +168,12 @@ public final class LoggerStore: @unchecked Sendable {
     private func postInitialization() throws {
         backgroundContext.performAndWait { [context = backgroundContext] in
             context.userInfo[WeakLoggerStore.loggerStoreKey] = WeakLoggerStore(store: self)
+        }
 
-            if options.contains(.create) && !configuration.isRemote {
+        if options.contains(.create) && configuration.isAutoStartingSession {
+            perform { _ in
                 let appInfo = Info.AppInfo.make()
-                saveEntity(for: session, info: appInfo)
+                self.saveEntity(for: self.session, info: appInfo)
             }
         }
 
@@ -225,7 +230,7 @@ public final class LoggerStore: @unchecked Sendable {
         return container
     }
 
-    func saveSession(_ session: Session, info: Info.AppInfo) {
+    func startSession(_ session: Session, info: Info.AppInfo) {
         backgroundContext.performAndWait {
             self.session = session
             saveEntity(for: session, info: info)
@@ -637,7 +642,7 @@ extension LoggerStore {
         return decompress(data)
     }
 
-    /// Returns blob data for the given key.
+    @available(*, deprecated, message: "Deprecated, please use LoggerBlobHandleEntity/data")
     public func getBlobData(forKey key: String) -> Data? {
         getRawData(forKey: key).flatMap(decompress)
     }
@@ -723,7 +728,7 @@ extension LoggerStore {
     }
 
     /// Removes sessions with the given IDs.
-    public func removeSessions(withIDs sessionIDs: [UUID]) {
+    public func removeSessions(withIDs sessionIDs: Set<UUID>) {
         perform { _ in
             try? self.deleteEntities(for: {
                 let request = LoggerSessionEntity.fetchRequest()
@@ -779,7 +784,19 @@ extension LoggerStore {
 
 // MARK: - LoggerStore (Copy)
 
+#warning("add support for exporting as package")
+#warning("add support for exporting specific sessions")
+#warning("optimize size by not copying blobs")
+#warning("add support for predicate export when using archive")
+
 extension LoggerStore {
+    public enum DocumentType {
+        /// A package (directory) with a Pulse database (optimized for writing)
+        case package
+        /// A document (readonly, archive, optimized to storage and sharing)
+        case archive
+    }
+
     /// Creates a copy of the current store at the given URL. The created copy
     /// has `.pulse` extension (the document format is based on SQLite). If the
     /// store is already an archive, creates a copy.
@@ -787,22 +804,60 @@ extension LoggerStore {
     /// - parameters:
     ///   - targetURL: The destination directory must already exist. But if the
     ///   file at the destination URL already exists, throws an error.
+    ///   - documentType: By default, `.archive`.
     ///   - predicate: The predicate describing which messages to keep.
+    ///   - sessions: A list of sessions to share. By default is `nil` (share all sessions).
     ///
     /// - important Thread-safe. But must NOT be called inside the `backgroundContext` queue.
     ///
     /// - returns: The information about the created store.
     @discardableResult
-    public func copy(to targetURL: URL, predicate: NSPredicate? = nil) throws -> Info {
+    public func copy(
+        to targetURL: URL,
+        documentType: DocumentType = .archive,
+        predicate: NSPredicate? = nil,
+        sessions: Set<UUID>? = nil
+    ) throws -> Info {
+        // For pacakge:
+        //
+        // IF target == archive
+        //    IF has predicate
+        //        copy with target = .package and predicate
+        //        copy with target = .archive
+        //    ELSE
+        //        create copy of database and insert existing files into archive
+        // ELSE target == package
+        //    create copy of database and manifest at target URL
+        //    IF has predicate
+        //        remove unwanted messages and sessions (removes inline blobs too)
+        //        copy only required blob files
+        //    ELSE
+        //        copy all blob files (without reading the network tasks)
+        //
+        // For archive:
+        //
+        //    the only difference is how we export blob files (accessing from database)
+        //    use existing API for accessing files should cover it
         guard !FileManager.default.fileExists(atPath: targetURL.path) else {
-            throw LoggerStore.Error.fileAleadyExists
+            throw LoggerStore.Error.fileAlreadyExists
         }
         switch document {
         case .package:
+            // 1.
+
             return try backgroundContext.performAndReturn {
                 try _copy(to: targetURL, predicate: predicate)
             }
         case .archive:
+            // IF no predicate
+            //   1.   copy as is
+            // ELSE
+            //   1. Create copy of the current store persistentStoreCoordinator.createCopyOfStore + manifest
+            //   2. Remove messages not matching the predicate
+            //   3. Remove messages not matching session
+            //   4. For all network tasks, copy only required blobs
+            //   5. Export the copy with no predicate
+
             try Files.copyItem(at: storeURL, to: targetURL)
             return try Info.make(storeURL: targetURL)
         }
@@ -828,6 +883,7 @@ extension LoggerStore {
         let document = try PulseDocument(documentURL: targetURL)
         var totalSize: Int64 = 0
 
+#warning("how do we save only required files?")
         return try document.context.performAndReturn {
             // Add database
             let documentBlob = PulseBlobEntity(context: document.context)
@@ -842,7 +898,10 @@ extension LoggerStore {
                     var objects: [[String: Any]] = []
                     for blobURL in chunk {
                         if let data = try? Data(contentsOf: blobURL) {
-                            objects.append(["data": data])
+                            objects.append([
+                                "key": blobURL.lastPathComponent,
+                                "data": data
+                            ])
                             totalSize += Int64(data.count)
                         }
                     }
@@ -875,7 +934,7 @@ extension LoggerStore {
         let store = try LoggerStore(storeURL: targetURL)
         defer { try? store.close() }
         return try store.backgroundContext.performAndReturn {
-            try store.removeMessages(with:  NSCompoundPredicate(notPredicateWithSubpredicate: predicate))
+            try store.removeMessages(with: NSCompoundPredicate(notPredicateWithSubpredicate: predicate))
             try store.backgroundContext.save()
             return try store._info()
         }
@@ -1036,6 +1095,7 @@ extension LoggerStore {
             totalStoreSize: try storeURL.directoryTotalSize(),
             blobsSize: try getBlobsSize(),
             blobsDecompressedSize: try getBlobsSize(isDecompressed: true),
+            isBlobCompressionEnabled: configuration.isBlobCompressionEnabled,
             appInfo: .make(),
             deviceInfo: .make()
         )
@@ -1120,7 +1180,7 @@ extension LoggerStore {
         case storeInvalid
         case unsupportedVersion(version: String, minimumSupportedVersion: String)
         case documentIsReadonly
-        case fileAleadyExists
+        case fileAlreadyExists
         case unknownError
 
         public var errorDescription: String? {
@@ -1129,7 +1189,7 @@ extension LoggerStore {
             case .storeInvalid: return "Store format is invalid"
             case .documentIsReadonly: return "Document is readonly"
             case let .unsupportedVersion(version, minimumSupportedVersion): return "The store was created by with Pulse vesrion \(version). Minimum supported version is \(minimumSupportedVersion)."
-            case .fileAleadyExists: return "The file at the given location already exists"
+            case .fileAlreadyExists: return "The file at the given location already exists"
             case .unknownError: return "Unexpected error"
             }
         }

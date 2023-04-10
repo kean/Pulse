@@ -103,6 +103,7 @@ final class ConsoleViewModel: ObservableObject {
         self.index = LoggerStoreIndex(store: store)
         self.searchCriteriaViewModel = ConsoleSearchCriteriaViewModel(options: makeDefaultOptions(), index: index)
         self.listViewModel = ConsoleListViewModel(store: store, criteria: searchCriteriaViewModel)
+
 #if os(iOS) || os(macOS)
         self.searchBarViewModel = ConsoleSearchBarViewModel()
         if #available(iOS 15, *) {

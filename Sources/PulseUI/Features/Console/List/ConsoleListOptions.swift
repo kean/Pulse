@@ -13,6 +13,7 @@ struct ConsoleListOptions {
 #else
     var order: Ordering = .descending
 #endif
+
     var messageGroupBy: MessageGroupBy = .noGrouping
     var taskGroupBy: TaskGroupBy = .noGrouping
 

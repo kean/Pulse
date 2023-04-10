@@ -72,18 +72,14 @@ extension NSPersistentStoreCoordinator {
 
         let backupCoordinator = NSPersistentStoreCoordinator(managedObjectModel: managedObjectModel)
 
-        var intermediateStoreOptions = sourceStore.options ?? [:]
-        intermediateStoreOptions[NSReadOnlyPersistentStoreOption] = true
-
         let intermediateStore = try backupCoordinator.addPersistentStore(
             ofType: sourceStore.type,
             configurationName: sourceStore.configurationName,
             at: sourceStore.url,
-            options: intermediateStoreOptions
+            options: sourceStore.options ?? [:]
         )
 
         let backupStoreOptions: [AnyHashable: Any] = [
-            NSReadOnlyPersistentStoreOption: true,
             // Disable write-ahead logging. Benefit: the entire store will be
             // contained in a single file. No need to handle -wal/-shm files.
             // https://developer.apple.com/library/content/qa/qa1809/_index.html

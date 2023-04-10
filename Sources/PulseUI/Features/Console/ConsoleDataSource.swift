@@ -61,7 +61,10 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
 
         let request = NSFetchRequest<NSManagedObject>(entityName: entityName)
         request.sortDescriptors = [
-           grouping.key.map { NSSortDescriptor(key: $0, ascending: grouping.isAscending) },
+            grouping.key.flatMap {
+                guard $0 != "session" else { return nil }
+                return NSSortDescriptor(key: $0, ascending: grouping.isAscending)
+            },
             NSSortDescriptor(key: sortKey, ascending: options.order == .ascending)
         ].compactMap { $0 }
         request.fetchBatchSize = ConsoleDataSource.fetchBatchSize

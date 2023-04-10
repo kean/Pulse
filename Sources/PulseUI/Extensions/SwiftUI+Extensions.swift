@@ -78,6 +78,15 @@ extension View {
 
 extension Backport {
     @ViewBuilder
+    func searchable(text: Binding<String>) -> some View {
+        if #available(iOS 15, tvOS 15, *) {
+            content.searchable(text: text)
+        } else {
+            content
+        }
+    }
+
+    @ViewBuilder
     func contextMenu<M: View, P: View>(@ViewBuilder menuItems: () -> M, @ViewBuilder preview: () -> P) -> some View {
 #if !os(watchOS)
         if #available(iOS 16, tvOS 16, macOS 13, *) {

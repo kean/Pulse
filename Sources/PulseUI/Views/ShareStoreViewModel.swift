@@ -86,7 +86,6 @@ final class ShareStoreViewModel: ObservableObject {
         var predicates: [NSPredicate] = []
         switch timeRange {
         case .currentSession:
-#warning("test this")
             let sessionID = store?.session.id ?? UUID()
             predicates.append(.init(format: "session == %@", sessionID as CVarArg))
         case .lastHour:

@@ -8,9 +8,7 @@ import Combine
 import CoreData
 
 struct ConsoleTaskCell: View {
-    @StateObject private var viewModel = ConsoleTaskCellViewModel()
-
-    let task: NetworkTaskEntity
+    @ObservedObject var task: NetworkTaskEntity
     var isDisclosureNeeded: Bool
 
     init(task: NetworkTaskEntity, isDisclosureNeeded: Bool = false) {
@@ -36,8 +34,7 @@ struct ConsoleTaskCell: View {
             details
 #endif
         }
-            .onAppear { viewModel.bind(task)}
-            .onChange(of: task) { viewModel.bind($0) }
+            .animation(.default, value: task.state)
 #if os(macOS)
         contents.padding(.vertical, 5)
 #else
@@ -114,7 +111,7 @@ struct ConsoleTaskCell: View {
         }
         .lineLimit(1)
         .foregroundColor(.secondary)
-        .padding(.top, 4)
+        .padding(.top, 2)
 #else
         HStack(spacing: infoSpacing) {
             Text(task.httpMethod ?? "GET")

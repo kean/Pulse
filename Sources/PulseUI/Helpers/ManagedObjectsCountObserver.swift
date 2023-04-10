@@ -36,4 +36,3 @@ final class ManagedObjectsCountObserver: NSObject, ObservableObject, NSFetchedRe
         self.count = controller.fetchedObjects?.count ?? 0
     }
 }
-

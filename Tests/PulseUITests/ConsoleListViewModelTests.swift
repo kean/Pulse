@@ -20,9 +20,9 @@ final class ConsoleListViewModelTests: ConsoleTestCase {
 
     func setUp(store: LoggerStore, focusedEntities: [NSManagedObject]? = nil) {
         self.store = store
-        self.criteriaViewModel = ConsoleSearchCriteriaViewModel(criteria: .init(), index: .init(store: store))
+        self.criteriaViewModel = ConsoleSearchCriteriaViewModel(options: .init(), index: .init(store: store))
         if let entities = focusedEntities {
-            self.criteriaViewModel.focus = NSPredicate(format: "self IN %@", entities)
+            self.criteriaViewModel.options.focus = NSPredicate(format: "self IN %@", entities)
         }
         self.sut = ConsoleListViewModel(store: store, criteria: criteriaViewModel)
         self.sut.isViewVisible = true
@@ -153,8 +153,8 @@ final class ConsoleListViewModelTests: ConsoleTestCase {
 
     func testPinRegularMessage() throws {
         let expectation = self.expectation(description: "pins-updated")
-        sut.$pins.dropFirst().sink {
-            print($0)
+        expectation.expectedFulfillmentCount = 2
+        sut.$pins.dropFirst().sink { _ in
             expectation.fulfill()
         }.store(in: &cancellables)
 
@@ -169,7 +169,7 @@ final class ConsoleListViewModelTests: ConsoleTestCase {
 
     func testThatPinsAreUpdatedWhenModeChanges() throws {
         let expectation = self.expectation(description: "pins-updated")
-        expectation.expectedFulfillmentCount = 3
+        expectation.expectedFulfillmentCount = 5
         sut.$pins.dropFirst().sink { _ in
             expectation.fulfill()
         }.store(in: &cancellables)

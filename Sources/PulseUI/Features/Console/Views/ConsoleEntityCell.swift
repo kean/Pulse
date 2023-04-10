@@ -17,13 +17,11 @@ struct ConsoleEntityCell: View {
 #if os(macOS)
                 .backport.showListSeparators()
 #endif
-
         case .task(let task):
             _ConsoleTaskCell(task: task)
 #if os(macOS)
                 .backport.showListSeparators()
 #endif
-
         }
     }
 }
@@ -85,9 +83,6 @@ private struct _ConsoleMessageCell: View {
 #endif
     }
 }
-
-#warning("add the same context menu for table cells")
-#warning("add more actions to the context menu")
 
 private struct _ConsoleTaskCell: View {
     let task: NetworkTaskEntity
