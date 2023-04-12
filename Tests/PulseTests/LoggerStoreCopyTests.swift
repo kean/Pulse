@@ -52,11 +52,13 @@ final class LoggerStoreCopyTests: LoggerStoreBaseTests {
 
     // MARK: Copy (Package -> Archive)
 
+#warning("add metadata tests")
+
     func testCopyPackageToArchive() throws {
         // GIVEN
         populateMix(store: store)
 
-        // WHEN copy with defaull parameter
+        // WHEN copy with default parameters
         try store.copy(to: copyURL)
 
         // THEN
@@ -93,6 +95,180 @@ final class LoggerStoreCopyTests: LoggerStoreBaseTests {
         XCTAssertTrue(blobs.allSatisfy { $0.data != nil })
     }
 
+    func testCopyPackageToArchiveWithPredicate() throws {
+        // GIVEN
+        populateMix(store: store)
+
+        let blobKeys = try store.viewContext.fetch(LoggerBlobHandleEntity.self).map(\.key)
+
+        // WHEN copy with predicate to keep only errors
+        let predicate = NSPredicate(format: "level >= %i", LoggerStore.Level.error.rawValue)
+        try store.copy(to: copyURL, predicate: predicate)
+
+        // THEN
+        let copy = try LoggerStore(storeURL: copyURL)
+        defer { try? copy.destroy() }
+
+        // THEN info is exported
+        let info = try copy.info()
+        XCTAssertNotEqual(info.storeId, try store.info().storeId)
+        XCTAssertEqual(info.messageCount, 1)
+        XCTAssertEqual(info.taskCount, 0)
+        XCTAssertEqual(info.blobCount, 0)
+        XCTAssertEqual(info.blobsSize, 0)
+
+        // THEN entities are exported
+        let context = copy.viewContext
+
+        XCTAssertEqual(
+            Set(try context.fetch(LoggerSessionEntity.self).map(\.id)),
+            Set([ExportableStoreConstants.sessionOne.id, ExportableStoreConstants.sessionTwo.id])
+        )
+
+        XCTAssertEqual(try context.fetch(LoggerSessionEntity.self).count, 2)
+        XCTAssertEqual(try context.fetch(LoggerMessageEntity.self).filter { $0.task == nil }.count, 1)
+        XCTAssertEqual(try context.fetch(NetworkTaskEntity.self).count, 0)
+        XCTAssertEqual(try context.fetch(NetworkTaskProgressEntity.self).count, 0)
+        XCTAssertEqual(try context.fetch(NetworkRequestEntity.self).count, 0)
+        XCTAssertEqual(try context.fetch(NetworkResponseEntity.self).count, 0)
+        XCTAssertEqual(try context.fetch(NetworkTransactionMetricsEntity.self).count, 0)
+
+        let blobs = try context.fetch(LoggerBlobHandleEntity.self)
+        XCTAssertEqual(blobs.count, 0)
+        XCTAssertEqual(blobKeys.compactMap({ copy.getDecompressedData(for: nil, key: $0, isCompressed: false) }).count, 0)
+    }
+
+    func testCopyPackageToArchiveWithSessions() throws {
+        // GIVEN
+        populateMix(store: store)
+
+        // WHEN copy with session scope
+        try store.copy(to: copyURL, sessions: [ExportableStoreConstants.sessionTwo.id])
+
+        // THEN
+        let copy = try LoggerStore(storeURL: copyURL)
+        defer { try? copy.destroy() }
+
+        // THEN info is exported
+        let info = try copy.info()
+        XCTAssertNotEqual(info.storeId, try store.info().storeId)
+        XCTAssertEqual(info.messageCount, 3)
+        XCTAssertEqual(info.taskCount, 3)
+        XCTAssertEqual(info.blobCount, 3)
+        XCTAssertEqual(info.blobsSize, 7350)
+
+        // THEN entities are exported
+        let context = copy.viewContext
+
+        XCTAssertEqual(
+            Set(try context.fetch(LoggerSessionEntity.self).map(\.id)),
+            Set([ExportableStoreConstants.sessionOne.id, ExportableStoreConstants.sessionTwo.id])
+        )
+
+        XCTAssertEqual(try context.fetch(LoggerSessionEntity.self).count, 1)
+        XCTAssertEqual(try context.fetch(LoggerMessageEntity.self).filter { $0.task == nil }.count, 1)
+        XCTAssertEqual(try context.fetch(LoggerMessageEntity.self).count, 6)
+        XCTAssertEqual(try context.fetch(NetworkTaskEntity.self).count, 3)
+        XCTAssertEqual(try context.fetch(NetworkTaskProgressEntity.self).count, 0)
+        XCTAssertEqual(try context.fetch(NetworkRequestEntity.self).count, 3)
+        XCTAssertEqual(try context.fetch(NetworkResponseEntity.self).count, 3)
+        XCTAssertEqual(try context.fetch(NetworkTransactionMetricsEntity.self).count, 3)
+
+        let blobs = try context.fetch(LoggerBlobHandleEntity.self)
+        XCTAssertEqual(blobs.count, 3)
+        XCTAssertEqual(blobs.compactMap(\.inlineData).count, 2)
+        XCTAssertTrue(blobs.allSatisfy { $0.data != nil })
+    }
+
+    // MARK: Copy (Package -> Package)
+
+    func testCopyPackageToPackage() throws {
+        // GIVEN
+        populateMix(store: store)
+
+        // WHEN copy with default parameters
+        try store.copy(to: copyURL, documentType: .package)
+
+        // THEN
+        let copy = try LoggerStore(storeURL: copyURL)
+        defer { try? copy.destroy() }
+
+        // THEN info is exported
+        let info = try copy.info()
+        XCTAssertNotEqual(info.storeId, try store.info().storeId)
+        XCTAssertEqual(info.messageCount, 4)
+        XCTAssertEqual(info.taskCount, 6)
+        XCTAssertEqual(info.blobCount, 4)
+        XCTAssertEqual(info.blobsSize, 12350)
+
+        // THEN entities are exported
+        let context = copy.viewContext
+
+        XCTAssertEqual(
+            Set(try context.fetch(LoggerSessionEntity.self).map(\.id)),
+            Set([ExportableStoreConstants.sessionOne.id, ExportableStoreConstants.sessionTwo.id])
+        )
+
+        XCTAssertEqual(try context.fetch(LoggerSessionEntity.self).count, 2)
+        XCTAssertEqual(try context.fetch(LoggerMessageEntity.self).filter { $0.task == nil }.count, 4)
+        XCTAssertEqual(try context.fetch(NetworkTaskEntity.self).count, 6)
+        XCTAssertEqual(try context.fetch(NetworkTaskProgressEntity.self).count, 0)
+        XCTAssertEqual(try context.fetch(NetworkRequestEntity.self).count, 6)
+        XCTAssertEqual(try context.fetch(NetworkResponseEntity.self).count, 6)
+        XCTAssertEqual(try context.fetch(NetworkTransactionMetricsEntity.self).count, 6)
+
+        let blobs = try context.fetch(LoggerBlobHandleEntity.self)
+        XCTAssertEqual(blobs.count, 4)
+        XCTAssertEqual(blobs.compactMap(\.inlineData).count, 2)
+        XCTAssertTrue(blobs.allSatisfy { $0.data != nil })
+    }
+
+    func testCopyPackageToPackageWithPredicate() throws {
+        // GIVEN
+        populateMix(store: store)
+
+        let blobKeys = try store.viewContext.fetch(LoggerBlobHandleEntity.self).map(\.key)
+
+        // WHEN copy with predicate to keep only errors
+        let predicate = NSPredicate(format: "level >= %i", LoggerStore.Level.error.rawValue)
+        try store.copy(to: copyURL, documentType: .package, predicate: predicate)
+
+        // THEN
+        let copy = try LoggerStore(storeURL: copyURL)
+        defer { try? copy.destroy() }
+
+        // THEN info is exported
+        let info = try copy.info()
+        XCTAssertNotEqual(info.storeId, try store.info().storeId)
+        XCTAssertEqual(info.messageCount, 1)
+        XCTAssertEqual(info.taskCount, 0)
+        XCTAssertEqual(info.blobCount, 0)
+        XCTAssertEqual(info.blobsSize, 0)
+
+        // THEN entities are exported
+        let context = copy.viewContext
+
+        XCTAssertEqual(
+            Set(try context.fetch(LoggerSessionEntity.self).map(\.id)),
+            Set([ExportableStoreConstants.sessionOne.id, ExportableStoreConstants.sessionTwo.id])
+        )
+
+        XCTAssertEqual(try context.fetch(LoggerSessionEntity.self).count, 2)
+        XCTAssertEqual(try context.fetch(LoggerMessageEntity.self).filter { $0.task == nil }.count, 1)
+        XCTAssertEqual(try context.fetch(NetworkTaskEntity.self).count, 0)
+        XCTAssertEqual(try context.fetch(NetworkTaskProgressEntity.self).count, 0)
+        XCTAssertEqual(try context.fetch(NetworkRequestEntity.self).count, 0)
+        XCTAssertEqual(try context.fetch(NetworkResponseEntity.self).count, 0)
+        XCTAssertEqual(try context.fetch(NetworkTransactionMetricsEntity.self).count, 0)
+
+        let blobs = try context.fetch(LoggerBlobHandleEntity.self)
+        XCTAssertEqual(blobs.count, 0)
+        XCTAssertEqual(blobKeys.compactMap({ copy.getDecompressedData(for: nil, key: $0, isCompressed: false) }).count, 0)
+    }
+
+
+
+    #warning("remove")
     func testCopy() throws {
         // GIVEN
         populate(store: store)

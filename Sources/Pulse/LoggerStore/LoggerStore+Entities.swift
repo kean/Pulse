@@ -277,6 +277,8 @@ public final class LoggerBlobHandleEntity: NSManagedObject {
     /// A decompressed blob size.
     @NSManaged public var decompressedSize: Int32
 
+    @NSManaged var isCompressed: Bool
+
     @NSManaged var rawContentType: String?
 
     /// A blob content type.
@@ -320,8 +322,9 @@ public final class LoggerBlobHandleEntity: NSManagedObject {
     public static func getData(for entity: LoggerBlobHandleEntity, store: LoggerStore) -> () -> Data? {
         let inlineData = entity.inlineData
         let key = entity.key
+        let isCompressed = entity.isCompressed
         return {
-            store.getDecompressedData(for: inlineData, key: key)
+            store.getDecompressedData(for: inlineData, key: key, isCompressed: isCompressed)
         }
     }
 }

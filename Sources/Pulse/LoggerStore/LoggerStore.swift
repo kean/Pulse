@@ -19,7 +19,7 @@ public final class LoggerStore: @unchecked Sendable {
     public let isArchive: Bool
 
     /// The configuration with which the store was initialized with.
-    private(set) public var configuration: Configuration
+    public let configuration: Configuration
 
     /// Current session.
     private(set) public var session: Session = .current
@@ -51,6 +51,7 @@ public final class LoggerStore: @unchecked Sendable {
     private let blobsURL: URL
     private let manifestURL: URL
     private let databaseURL: URL // Points to a temporary location if archive
+
     private var requestsCache: [NetworkLogger.Request: NetworkRequestEntity] = [:]
     private var responsesCache: [NetworkLogger.Response: NetworkResponseEntity] = [:]
 
@@ -146,7 +147,6 @@ public final class LoggerStore: @unchecked Sendable {
             if !Files.fileExists(atPath: databaseURL.path) {
                 try document.database().decompressed().write(to: databaseURL)
             }
-            self.configuration.isBlobCompressionEnabled = info.isBlobCompressionEnabled ?? true
             self.document = .archive(info, document)
             self.manifest = .init(storeId: info.storeId, version: try Version(string: info.storeVersion))
         }
@@ -611,6 +611,7 @@ extension LoggerStore {
         // It's safe to use Int32 because we prevent larger values from being stored
         entity.size = Int32(compressedData.count)
         entity.decompressedSize = Int32(data.count)
+        entity.isCompressed = configuration.isBlobCompressionEnabled
         if compressedData.count <= configuration.inlineLimit {
             entity.inlineData = compressedData
         } else {
@@ -634,17 +635,18 @@ extension LoggerStore {
     }
 
     func getDecompressedData(for entity: LoggerBlobHandleEntity) -> Data? {
-        getDecompressedData(for: entity.inlineData, key: entity.key)
+        getDecompressedData(for: entity.inlineData, key: entity.key, isCompressed: entity.isCompressed)
     }
 
-    func getDecompressedData(for inlineData: Data?, key: Data) -> Data? {
+    func getDecompressedData(for inlineData: Data?, key: Data, isCompressed: Bool) -> Data? {
         guard let data = inlineData ?? getRawData(forKey: key.hexString) else { return nil }
-        return decompress(data)
+        return isCompressed ? decompress(data) : data
     }
 
     @available(*, deprecated, message: "Deprecated, please use LoggerBlobHandleEntity/data")
     public func getBlobData(forKey key: String) -> Data? {
-        getRawData(forKey: key).flatMap(decompress)
+        guard let data = getRawData(forKey: key) else { return nil }
+        return configuration.isBlobCompressionEnabled ? decompress(data) : data // This wont work in some scenarios
     }
 
     private func getRawData(forKey key: String) -> Data? {
@@ -662,8 +664,7 @@ extension LoggerStore {
     }
 
     private func decompress(_ data: Data) -> Data? {
-        guard configuration.isBlobCompressionEnabled else { return data }
-        return try? data.decompressed()
+        try? data.decompressed()
     }
 
     // MARK: - Performing Changes
@@ -818,7 +819,7 @@ extension LoggerStore {
         predicate: NSPredicate? = nil,
         sessions: Set<UUID>? = nil
     ) throws -> Info {
-        // For pacakge:
+        // For package:
         //
         // IF target == archive
         //    IF has predicate
@@ -830,9 +831,7 @@ extension LoggerStore {
         //    create copy of database and manifest at target URL
         //    IF has predicate
         //        remove unwanted messages and sessions (removes inline blobs too)
-        //        copy only required blob files
-        //    ELSE
-        //        copy all blob files (without reading the network tasks)
+        //    copy only required blob files
         //
         // For archive:
         //
@@ -841,26 +840,80 @@ extension LoggerStore {
         guard !FileManager.default.fileExists(atPath: targetURL.path) else {
             throw LoggerStore.Error.fileAlreadyExists
         }
-        switch document {
-        case .package:
-            // 1.
-
-            return try backgroundContext.performAndReturn {
-                try _copy(to: targetURL, predicate: predicate)
-            }
+        switch documentType {
         case .archive:
-            // IF no predicate
-            //   1.   copy as is
-            // ELSE
-            //   1. Create copy of the current store persistentStoreCoordinator.createCopyOfStore + manifest
-            //   2. Remove messages not matching the predicate
-            //   3. Remove messages not matching session
-            //   4. For all network tasks, copy only required blobs
-            //   5. Export the copy with no predicate
+            switch document {
+            case .package:
+                // 1.
 
-            try Files.copyItem(at: storeURL, to: targetURL)
-            return try Info.make(storeURL: targetURL)
+                return try backgroundContext.performAndReturn {
+                    try _copy(to: targetURL, predicate: predicate)
+                }
+            case .archive:
+                // IF no predicate
+                //   1.   copy as is
+                // ELSE
+                //   1. Create copy of the current store persistentStoreCoordinator.createCopyOfStore + manifest
+                //   2. Remove messages not matching the predicate
+                //   3. Remove messages not matching session
+                //   4. For all network tasks, copy only required blobs
+                //   5. Export the copy with no predicate
+
+                try Files.copyItem(at: storeURL, to: targetURL)
+                return try Info.make(storeURL: targetURL)
+            }
+        case .package:
+            #warning("temp")
+            return try _copyAsPackage(to: targetURL, predicate: predicate)
         }
+    }
+
+    private func _copyAsPackage(to targetURL: URL, predicate: NSPredicate?) throws -> Info {
+        let temporary = TemporaryDirectory()
+        defer { temporary.remove() }
+
+        // Create the manifest
+        let manifest = Manifest(storeId: UUID(), version: .currentStoreVersion)
+        try JSONEncoder().encode(manifest).write(to: temporary.url.appending(filename: manifestFilename))
+
+        // Copy the database
+        let databaseURL = temporary.url.appending(filename: databaseFilename)
+        try container.persistentStoreCoordinator.createCopyOfStore(at: databaseURL)
+
+        // Temporary open the target store (order is important)
+        var configuration = Configuration()
+        configuration.isBlobCompressionEnabled = self.configuration.isBlobCompressionEnabled
+        configuration.isAutoStartingSession = false
+        let store = try LoggerStore(storeURL: temporary.url, configuration: configuration)
+        defer { try? store.close() }
+
+        // Remove messages based on the predicate
+        if let predicate = predicate {
+            try store.backgroundContext.performAndWait {
+                try store.removeMessages(with: NSCompoundPredicate(notPredicateWithSubpredicate: predicate))
+                try store.backgroundContext.save()
+            }
+        }
+
+        // Move (only needed) blobs to the target package
+        do {
+            let blobs = try store.backgroundContext.performAndReturn {
+                try store.backgroundContext.fetch(LoggerBlobHandleEntity.self) {
+                    $0.predicate = NSPredicate(format: "inlineData = nil")
+                }
+            }
+            Files.createDirectoryIfNeeded(at: store.blobsURL)
+            for key in blobs.map(\.key.hexString) {
+                try Files.copyItem(at: makeBlobURL(for: key), to: store.makeBlobURL(for: key))
+            }
+        } catch {
+            pulseLog("Failed to move blobs: \(error)")
+        }
+
+        // Important to call before `move`.
+        let info = try store.info()
+        try Files.moveItem(at: temporary.url, to: targetURL)
+        return info
     }
 
     // There must be a simpler and more efficient way of doing it
@@ -929,6 +982,7 @@ extension LoggerStore {
         }
     }
 
+    #warning("remove")
     /// Temporary open the store, remove message, and close it.
     private func removeMessages(with predicate: NSPredicate, at targetURL: URL) throws -> Info {
         let store = try LoggerStore(storeURL: targetURL)
@@ -1095,7 +1149,6 @@ extension LoggerStore {
             totalStoreSize: try storeURL.directoryTotalSize(),
             blobsSize: try getBlobsSize(),
             blobsDecompressedSize: try getBlobsSize(isDecompressed: true),
-            isBlobCompressionEnabled: configuration.isBlobCompressionEnabled,
             appInfo: .make(),
             deviceInfo: .make()
         )

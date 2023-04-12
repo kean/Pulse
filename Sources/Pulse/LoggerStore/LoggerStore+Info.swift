@@ -45,8 +45,6 @@ extension LoggerStore {
         /// The blobs are compressed by default.
         public var blobsDecompressedSize: Int64
 
-        var isBlobCompressionEnabled: Bool?
-
         // MARK: App and Device Info
 
         /// Information about the app which created the store.
