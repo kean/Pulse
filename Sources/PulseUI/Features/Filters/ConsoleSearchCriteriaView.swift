@@ -48,7 +48,6 @@ struct ConsoleSearchCriteriaView: View {
 #endif
 
         sessionsSection
-        timePeriodSection
 
         if viewModel.mode == .network {
 #if os(iOS) || os(macOS)
@@ -68,6 +67,8 @@ struct ConsoleSearchCriteriaView: View {
             logLevelsSection
             labelsSection
         }
+
+        timePeriodSection
     }
 
     private var buttonReset: some View {
