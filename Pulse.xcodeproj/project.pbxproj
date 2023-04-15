@@ -115,6 +115,7 @@
 		0CDC3BEA2970FA47003BD1FF /* ConsoleSearchListSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CDC3BE92970FA47003BD1FF /* ConsoleSearchListSelectionView.swift */; };
 		0CDC3BED2971B936003BD1FF /* ConsoleSearchLogLevelsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CDC3BEC2971B936003BD1FF /* ConsoleSearchLogLevelsCell.swift */; };
 		0CE364F72971D1EA0063DFED /* ConsoleSearchCustomFiltersSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE364F62971D1EA0063DFED /* ConsoleSearchCustomFiltersSection.swift */; };
+		0CE3970A29EAD73700FF01C0 /* ConsoleSessionsPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE3970929EAD73700FF01C0 /* ConsoleSessionsPickerView.swift */; };
 		0CE45E0A29776BED00249C5D /* ConsoleListContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE45E0929776BED00249C5D /* ConsoleListContentView.swift */; };
 		0CE45E0C2977813400249C5D /* ConsoleToolbarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CE45E0B2977813400249C5D /* ConsoleToolbarView.swift */; };
 		0CEAB3E425FE862E00F09B0F /* Pulse Demo watchOS Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 0CEAB3E325FE862E00F09B0F /* Pulse Demo watchOS Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -570,6 +571,7 @@
 		0CDC3BEC2971B936003BD1FF /* ConsoleSearchLogLevelsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchLogLevelsCell.swift; sourceTree = "<group>"; };
 		0CDFB833296F24140071EF77 /* CHANGELOG.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = CHANGELOG.md; sourceTree = "<group>"; };
 		0CE364F62971D1EA0063DFED /* ConsoleSearchCustomFiltersSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchCustomFiltersSection.swift; sourceTree = "<group>"; };
+		0CE3970929EAD73700FF01C0 /* ConsoleSessionsPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSessionsPickerView.swift; sourceTree = "<group>"; };
 		0CE45E0929776BED00249C5D /* ConsoleListContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleListContentView.swift; sourceTree = "<group>"; };
 		0CE45E0B2977813400249C5D /* ConsoleToolbarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleToolbarView.swift; sourceTree = "<group>"; };
 		0CEAB3DA25FE862D00F09B0F /* Pulse Demo watchOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pulse Demo watchOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1311,6 +1313,7 @@
 				0CF0D5BA296F189500EED9D4 /* ConsoleCustomNetworkFilterView.swift */,
 				0C40C0A1296F81B0009ECF16 /* ConsoleCustomFilterView.swift */,
 				0CF0D5BB296F189500EED9D4 /* ConsoleSearchInlinePickerMenu.swift */,
+				0CE3970929EAD73700FF01C0 /* ConsoleSessionsPickerView.swift */,
 				0CF0D5C0296F189500EED9D4 /* DateRangePicker.swift */,
 				0CF0D5C2296F189500EED9D4 /* RangePicker.swift */,
 			);
@@ -2109,6 +2112,7 @@
 				0CF0D686296F189600EED9D4 /* ConsoleMessageCell.swift in Sources */,
 				0CF0D66A296F189600EED9D4 /* NetworkRequestStatusSectionView.swift in Sources */,
 				0CF0D650296F189600EED9D4 /* ConsoleSearchCriteria.swift in Sources */,
+				0CE3970A29EAD73700FF01C0 /* ConsoleSessionsPickerView.swift in Sources */,
 				0CF0D627296F189600EED9D4 /* ToastView.swift in Sources */,
 				0CF0D630296F189600EED9D4 /* RichTextView.swift in Sources */,
 				0CF0D637296F189600EED9D4 /* Checkbox.swift in Sources */,
