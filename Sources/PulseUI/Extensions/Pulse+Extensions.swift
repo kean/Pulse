@@ -105,8 +105,12 @@ extension LoggerSessionEntity {
 
 private let dateFormatter: DateFormatter = {
     let formatter = DateFormatter()
+#if os(macOS)
     formatter.dateStyle = .short
     formatter.timeStyle = .medium
     formatter.doesRelativeDateFormatting = true
+#else
+    formatter.timeStyle = .medium
+#endif
     return formatter
 }()

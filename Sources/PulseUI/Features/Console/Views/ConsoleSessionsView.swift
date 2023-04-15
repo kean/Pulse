@@ -20,9 +20,9 @@ struct ConsoleSessionsView: View {
     @State private var filterTerm = ""
     @State private var selection: Set<UUID> = []
     @State private var sharedSessions: SharedSessions?
-    @State private var limit = 12
     @State private var isSharing = false
     @State private var editMode: EditMode = .inactive
+    @State private var groupedSessions: [(Date, [LoggerSessionEntity])] = []
 
     @EnvironmentObject private var consoleViewModel: ConsoleViewModel
     @Environment(\.store) private var store
@@ -36,7 +36,18 @@ struct ConsoleSessionsView: View {
                 .foregroundColor(.secondary)
         } else {
             content
+                .onAppear { refreshGroups() }
+                .onChange(of: sessions.count) { _ in refreshGroups() }
         }
+    }
+
+    private func refreshGroups() {
+        let calendar = Calendar.current
+        let groups = Dictionary(grouping: sessions) {
+            let components = calendar.dateComponents([.day, .year, .month], from: $0.createdAt)
+            return calendar.date(from: components) ?? $0.createdAt
+        }
+        self.groupedSessions = Array(groups.sorted(by: { $0.key > $1.key }))
     }
 
     @ViewBuilder
@@ -78,12 +89,15 @@ struct ConsoleSessionsView: View {
             if !filterTerm.isEmpty {
                 ForEach(getFilteredSessions(), id: \.id, content: makeCell)
             } else {
-                if sessions.count > limit {
-                    ForEach(sessions.prefix(limit), id: \.id, content: makeCell)
-                    buttonShowPreviousSessions
-                } else {
-                    ForEach(sessions, id: \.id, content: makeCell)
+#if os(iOS)
+                ForEach(groupedSessions, id: \.0) { group in
+                    Section(header: makeHeader(for: group.0, sessions: group.1)) {
+                        ForEach(group.1, id: \.id, content: makeCell)
+                    }
                 }
+#else
+                ForEach(sessions, id: \.id, content: makeCell)
+#endif
             }
         }
 #if os(iOS)
@@ -105,18 +119,11 @@ struct ConsoleSessionsView: View {
 #endif
     }
 
-    @ViewBuilder
-    private var buttonShowPreviousSessions: some View {
-        Button("Show Previous Sessions") {
-            limit = Int.max
-        }
-#if os(macOS)
-        .buttonStyle(.link)
-        .padding(.top, 8)
-#else
-        .buttonStyle(.plain)
-        .foregroundColor(.blue)
-#endif
+    private func makeHeader(for startDate: Date, sessions: [LoggerSessionEntity]) -> some View {
+        (Text(sectionTitleFormatter.string(from: startDate)) +
+            Text(" (\(sessions.count))").foregroundColor(.secondary.opacity(0.5)))
+            .font(.headline)
+            .padding(.vertical, 6)
     }
 
     @ViewBuilder
@@ -214,7 +221,6 @@ struct ConsoleSessionCell: View {
 #if os(macOS)
                     .foregroundColor(Color(UXColor.tertiaryLabelColor))
 #else
-                    .font(.subheadline)
                     .foregroundColor(.secondary)
 #endif
             }
@@ -228,6 +234,14 @@ private struct SharedSessions: Hashable, Identifiable {
     var id: SharedSessions { self }
     let ids: Set<UUID>
 }
+
+private let sectionTitleFormatter: DateFormatter = {
+    let formatter = DateFormatter()
+    formatter.dateStyle = .long
+    formatter.timeStyle = .none
+    formatter.doesRelativeDateFormatting = true
+    return formatter
+}()
 
 #if DEBUG
 @available(iOS 15.0, macOS 13, *)
