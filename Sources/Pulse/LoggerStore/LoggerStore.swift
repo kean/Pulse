@@ -607,19 +607,27 @@ extension LoggerStore {
             entity.linkCount += 1
             return entity
         }
-        let compressedData = compress(data)
+
+
         let entity = LoggerBlobHandleEntity(context: backgroundContext)
         entity.key = key
         entity.linkCount = 1
         entity.rawContentType = contentType?.rawValue
-        // It's safe to use Int32 because we prevent larger values from being stored
-        entity.size = Int32(compressedData.count)
         entity.decompressedSize = Int32(data.count)
-        entity.isUncompressed = !configuration.isBlobCompressionEnabled
-        if compressedData.count <= configuration.inlineLimit {
-            entity.inlineData = compressedData
+
+        var compressedData: Data?
+        if configuration.isBlobCompressionEnabled, let compressed = try? data.compressed(), compressed.count < Int(Double(data.count) * 1.1) {
+            compressedData = compressed
+        }
+        let processedData = compressedData ?? data
+
+        // It's safe to use Int32 because we prevent larger values from being stored
+        entity.size = Int32(processedData.count)
+        entity.isUncompressed = compressedData == nil
+        if processedData.count <= configuration.inlineLimit {
+            entity.inlineData = processedData
         } else {
-            try? compressedData.write(to: makeBlobURL(for: key.hexString))
+            try? processedData.write(to: makeBlobURL(for: key.hexString))
         }
         return entity
     }
@@ -659,11 +667,6 @@ extension LoggerStore {
         case let .archive(_, document):
             return document.getBlob(forKey: key)
         }
-    }
-
-    private func compress(_ data: Data) -> Data {
-        guard configuration.isBlobCompressionEnabled else { return data }
-        return (try? data.compressed()) ?? data
     }
 
     private func decompress(_ data: Data) -> Data? {
