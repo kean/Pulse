@@ -180,9 +180,12 @@ struct ConsoleSessionsView: View {
 struct ConsoleSessionCell: View {
     let session: LoggerSessionEntity
 
+    @Environment(\.store) private var store
+
     var body: some View {
         HStack(alignment: .lastTextBaseline) {
             Text(session.formattedDate)
+                .fontWeight(store.session.id == session.id ? .semibold : .regular)
                 .lineLimit(1)
                 .layoutPriority(1)
             Spacer()
