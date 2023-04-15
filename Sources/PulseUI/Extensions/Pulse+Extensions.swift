@@ -89,7 +89,15 @@ extension NetworkTaskEntity.State {
 
 extension LoggerSessionEntity {
     var formattedDate: String {
-        dateFormatter.string(from: createdAt)
+        formattedDate(isCompact: false)
+    }
+
+    func formattedDate(isCompact: Bool = false) -> String {
+        if isCompact {
+            return compactDateFormatter.string(from: createdAt)
+        } else {
+            return fullDateFormatter.string(from: createdAt)
+        }
     }
 
     var fullVersion: String? {
@@ -103,14 +111,16 @@ extension LoggerSessionEntity {
     }
 }
 
-private let dateFormatter: DateFormatter = {
+private let compactDateFormatter: DateFormatter = {
     let formatter = DateFormatter()
-#if os(macOS)
+    formatter.timeStyle = .medium
+    return formatter
+}()
+
+private let fullDateFormatter: DateFormatter = {
+    let formatter = DateFormatter()
     formatter.dateStyle = .short
     formatter.timeStyle = .medium
     formatter.doesRelativeDateFormatting = true
-#else
-    formatter.timeStyle = .medium
-#endif
     return formatter
 }()

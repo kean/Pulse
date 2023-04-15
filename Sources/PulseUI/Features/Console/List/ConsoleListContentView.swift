@@ -73,7 +73,7 @@ struct ConsoleListContentView: View {
                     .font(.subheadline)
                     .foregroundColor(.blue)
                 Spacer()
-                Text(session.formattedDate)
+                Text(session.formattedDate(isCompact: false))
                     .font(.subheadline)
                     .foregroundColor(.secondary)
             }

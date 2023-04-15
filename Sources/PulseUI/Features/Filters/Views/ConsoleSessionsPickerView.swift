@@ -18,7 +18,7 @@ struct ConsoleSessionsPickerView: View {
             id: \.id,
             selection: $selection,
             description: \.formattedDate,
-            label: ConsoleSessionCell.init,
+            label: { ConsoleSessionCell(session: $0, isCompact: false) },
             limit: 3
         )
     }

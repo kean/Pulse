@@ -206,19 +206,20 @@ struct ConsoleSessionsView: View {
 #endif
 
     private func getFilteredSessions() -> [LoggerSessionEntity] {
-        sessions.filter { $0.formattedDate.localizedCaseInsensitiveContains(filterTerm) }
+        sessions.filter { $0.formattedDate(isCompact: false).localizedCaseInsensitiveContains(filterTerm) }
     }
 }
 
 struct ConsoleSessionCell: View {
     let session: LoggerSessionEntity
+    var isCompact = true
 
     @Environment(\.store) private var store
     @Environment(\.editMode) private var editMode
 
     var body: some View {
         HStack(alignment: .lastTextBaseline) {
-            Text(session.formattedDate)
+            Text(session.formattedDate(isCompact: isCompact))
                 .fontWeight(store.session.id == session.id ? .medium : .regular)
                 .lineLimit(1)
                 .layoutPriority(1)
@@ -230,6 +231,7 @@ struct ConsoleSessionCell: View {
 #if os(macOS)
                     .foregroundColor(Color(UXColor.tertiaryLabelColor))
 #else
+                    .font(.subheadline)
                     .foregroundColor(.secondary)
 #endif
             }
