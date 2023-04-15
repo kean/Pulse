@@ -615,7 +615,7 @@ extension LoggerStore {
         // It's safe to use Int32 because we prevent larger values from being stored
         entity.size = Int32(compressedData.count)
         entity.decompressedSize = Int32(data.count)
-        entity.isCompressed = configuration.isBlobCompressionEnabled
+        entity.isUncompressed = !configuration.isBlobCompressionEnabled
         if compressedData.count <= configuration.inlineLimit {
             entity.inlineData = compressedData
         } else {
@@ -639,7 +639,7 @@ extension LoggerStore {
     }
 
     func getDecompressedData(for entity: LoggerBlobHandleEntity) -> Data? {
-        getDecompressedData(for: entity.inlineData, key: entity.key, isCompressed: entity.isCompressed)
+        getDecompressedData(for: entity.inlineData, key: entity.key, isCompressed: !entity.isUncompressed)
     }
 
     func getDecompressedData(for inlineData: Data?, key: Data, isCompressed: Bool) -> Data? {

@@ -140,7 +140,7 @@ extension LoggerStore {
             Attribute(name: "linkCount", type: .integer16AttributeType),
             Attribute(name: "rawContentType", type: .stringAttributeType),
             Attribute(name: "inlineData", type: .binaryDataAttributeType),
-            Attribute(name: "isCompressed", type: .booleanAttributeType)
+            Attribute(name: "isUncompressed", type: .booleanAttributeType)
         ]
 
         let model = NSManagedObjectModel()
