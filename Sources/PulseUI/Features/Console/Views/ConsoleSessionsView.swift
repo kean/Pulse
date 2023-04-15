@@ -10,7 +10,6 @@ import Combine
 
 #if os(iOS) || os(macOS)
 
-#warning("add more button with show in console (and something else?)")
 #warning("preselect session on macOS too")
 #warning("add sharing on macOS too")
 @available(macOS 13, *)
@@ -92,8 +91,7 @@ struct ConsoleSessionsView: View {
         .backport.searchable(text: $filterTerm)
         .onChange(of: selection) {
             guard !editMode.isEditing, !$0.isEmpty else { return }
-            consoleViewModel.searchCriteriaViewModel.select(sessions: $0)
-            consoleViewModel.router.isShowingSessions = false
+            showInConsole(sessions: $0)
         }
 #else
         .listStyle(.inset)
@@ -144,7 +142,20 @@ struct ConsoleSessionsView: View {
                 Image(systemName: "square.and.arrow.up")
             })
             .disabled(selection.isEmpty)
+
+            Menu(content: {
+                Button("Show in Console") {
+                    showInConsole(sessions: selection)
+                }.disabled(selection.isEmpty)
+            }, label: {
+                Image(systemName: "ellipsis.circle")
+            })
         }
+    }
+
+    private func showInConsole(sessions: Set<UUID>) {
+        consoleViewModel.searchCriteriaViewModel.select(sessions: sessions)
+        consoleViewModel.router.isShowingSessions = false
     }
 #endif
     
