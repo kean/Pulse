@@ -120,10 +120,19 @@ struct ConsoleSessionsView: View {
     }
 
     private func makeHeader(for startDate: Date, sessions: [LoggerSessionEntity]) -> some View {
-        (Text(sectionTitleFormatter.string(from: startDate)) +
-            Text(" (\(sessions.count))").foregroundColor(.secondary.opacity(0.5)))
+        HStack {
+            (Text(sectionTitleFormatter.string(from: startDate)) +
+             Text(" (\(sessions.count))").foregroundColor(.secondary.opacity(0.5)))
             .font(.headline)
             .padding(.vertical, 6)
+
+            if editMode.isEditing {
+                Spacer()
+                Button("Select All") {
+                    selection.formUnion(Set(sessions.map(\.id)))
+                }.font(.subheadline)
+            }
+        }
     }
 
     @ViewBuilder
