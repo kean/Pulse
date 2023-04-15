@@ -79,7 +79,7 @@ extension ConsoleRouterView {
                 .toolbar {
                     ToolbarItemGroup(placement: .navigationBarLeading) {
                         Button(action: { router.isShowingSessions = false }) {
-                            Text("Cancel")
+                            Text("Close")
                         }
                     }
                 }

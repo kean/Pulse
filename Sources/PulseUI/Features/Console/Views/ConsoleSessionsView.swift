@@ -10,6 +10,8 @@ import Combine
 
 #if os(iOS) || os(macOS)
 
+#warning("add more button with show in console (and something else?)")
+#warning("on single selection show session in console")
 #warning("preselect session on macOS too")
 #warning("add sharing on macOS too")
 #warning("is select all in the right place?")
@@ -20,8 +22,9 @@ struct ConsoleSessionsView: View {
 
     @State private var filterTerm = ""
     @State private var selection: Set<UUID> = []
-    @State private var limit = 16
+    @State private var limit = 12
     @State private var isSharing = false
+    @State private var editMode: EditMode = .inactive
 
     @EnvironmentObject private var consoleViewModel: ConsoleViewModel
     @Environment(\.store) private var store
@@ -52,12 +55,17 @@ struct ConsoleSessionsView: View {
 #else
             list.toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") {
-                        consoleViewModel.searchCriteriaViewModel.select(sessions: selection)
-                        consoleViewModel.router.isShowingSessions = false
+                    Button(editMode.isEditing ? "Done" : "Edit") {
+                        withAnimation {
+                            editMode = editMode.isEditing ? .inactive : .active
+                        }
                     }
                 }
-                ToolbarItem(placement: .bottomBar) { bottomBar }
+                ToolbarItem(placement: .bottomBar) {
+                    if editMode == .active {
+                        ConsoleSessionBottomBar(selection: $selection, isSharing: $isSharing)
+                    }
+                }
             }
             .sheet(isPresented: $isSharing) {
                 NavigationView {
@@ -70,25 +78,19 @@ struct ConsoleSessionsView: View {
     private var list: some View {
         List(selection: $selection) {
             if !filterTerm.isEmpty {
-                ForEach(getFilteredSessions(), id: \.objectID, content: ConsoleSessionCell.init)
+                ForEach(getFilteredSessions(), id: \.id, content: ConsoleSessionCell.init)
             } else {
-#if os(iOS)
-                buttonToggleSelectAll
-#endif
                 if sessions.count > limit {
-                    ForEach(sessions.prefix(limit), id: \.objectID, content: ConsoleSessionCell.init)
+                    ForEach(sessions.prefix(limit), id: \.id, content: ConsoleSessionCell.init)
                     buttonShowPreviousSessions
                 } else {
-                    ForEach(sessions, id: \.objectID, content: ConsoleSessionCell.init)
+                    ForEach(sessions, id: \.id, content: ConsoleSessionCell.init)
                 }
             }
         }
 #if os(iOS)
         .listStyle(.plain)
-        .environment(\.editMode, .constant(.active))
-        .onAppear {
-            selection = consoleViewModel.searchCriteriaViewModel.criteria.shared.sessions.selection
-        }
+        .environment(\.editMode, $editMode)
         .backport.searchable(text: $filterTerm)
 #else
         .listStyle(.inset)
@@ -100,52 +102,6 @@ struct ConsoleSessionsView: View {
         }
 #endif
     }
-
-#if os(iOS)
-    private var buttonToggleSelectAll: some View {
-        Button(action: {
-            if sessions.count == selection.count {
-                selection = []
-            } else {
-                selection = Set(sessions.map(\.id))
-            }
-        }) {
-            HStack {
-                Text(sessions.count == selection.count ? "Deselect All" : "Select All")
-                Spacer()
-            }
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-        .foregroundColor(.blue)
-    }
-
-    private var bottomBar: some View {
-        HStack {
-            Button.destructive(action: {
-                store.removeSessions(withIDs: selection)
-            }, label: { Image(systemName: "trash").foregroundColor(.red) })
-            .disabled(selection.isEmpty)
-
-            Spacer()
-
-            // It should ideally be done using stringsdict, but Pulse
-            // doesn't support localization.
-            if selection.count % 10 == 1 {
-                Text("\(selection.count) Session Selected")
-            } else {
-                Text("\(selection.count) Sessions Selected")
-            }
-
-            Spacer()
-
-            Button(action: { isSharing = true }, label: {
-                Image(systemName: "square.and.arrow.up")
-            })
-            .disabled(selection.isEmpty)
-        }
-    }
-#endif
 
     @ViewBuilder
     private var buttonShowPreviousSessions: some View {
@@ -177,6 +133,41 @@ struct ConsoleSessionsView: View {
     }
 }
 
+#if os(iOS)
+private struct ConsoleSessionBottomBar: View {
+    @Binding var selection: Set<UUID>
+    @Binding var isSharing: Bool
+
+    @Environment(\.store) private var store
+
+    var body: some View {
+        HStack {
+            Button.destructive(action: {
+                store.removeSessions(withIDs: selection)
+            }, label: { Image(systemName: "trash") })
+            .disabled(selection.isEmpty)
+
+            Spacer()
+
+            // It should ideally be done using stringsdict, but Pulse
+            // doesn't support localization.
+            if selection.count % 10 == 1 {
+                Text("\(selection.count) Session Selected")
+            } else {
+                Text("\(selection.count) Sessions Selected")
+            }
+
+            Spacer()
+
+            Button(action: { isSharing = true }, label: {
+                Image(systemName: "square.and.arrow.up")
+            })
+            .disabled(selection.isEmpty)
+        }
+    }
+}
+#endif
+
 struct ConsoleSessionCell: View {
     let session: LoggerSessionEntity
 
@@ -185,7 +176,7 @@ struct ConsoleSessionCell: View {
     var body: some View {
         HStack(alignment: .lastTextBaseline) {
             Text(session.formattedDate)
-                .fontWeight(store.session.id == session.id ? .semibold : .regular)
+                .fontWeight(store.session.id == session.id ? .medium : .regular)
                 .lineLimit(1)
                 .layoutPriority(1)
             Spacer()
@@ -196,7 +187,7 @@ struct ConsoleSessionCell: View {
 #if os(macOS)
                     .foregroundColor(Color(UXColor.tertiaryLabelColor))
 #else
-                    .font(.caption)
+                    .font(.subheadline)
                     .foregroundColor(.secondary)
 #endif
             }
