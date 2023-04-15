@@ -88,7 +88,7 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
     }
 
     func buttonShowPreviousSessionTapped(for session: LoggerSessionEntity) {
-        searchCriteriaViewModel.criteria.shared.sessions.insert(session.id)
+        searchCriteriaViewModel.criteria.shared.sessions.selection.insert(session.id)
         refreshPreviousSessionButton(sessions: self.sessions.objects)
     }
 
@@ -97,7 +97,7 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
     }
 
     private func refreshPreviousSessionButton(sessions: [LoggerSessionEntity]) {
-        let selection = searchCriteriaViewModel.criteria.shared.sessions
+        let selection = searchCriteriaViewModel.criteria.shared.sessions.selection
         let isDisplayingPrefix = sessions.prefix(selection.count).allSatisfy {
             selection.contains($0.id)
         }

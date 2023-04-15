@@ -24,6 +24,8 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
     private(set) var labelsCountedSet = NSCountedSet()
     private(set) var domainsCountedSet = NSCountedSet()
 
+    let defaultCriteria: ConsoleSearchCriteria
+
     private let index: LoggerStoreIndex
     private var isScreenVisible = false
     private var entities: [NSManagedObject] = []
@@ -37,6 +39,7 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
     init(options: ConsolePredicateOptions, index: LoggerStoreIndex) {
         self.index = index
         self.options = options
+        self.defaultCriteria = options.criteria
     }
 
     func bind(_ entities: some Publisher<[NSManagedObject], Never>) {
@@ -63,20 +66,20 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
     // MARK: Helpers
 
     var isCriteriaDefault: Bool {
-        guard criteria.shared == .init() else { return false }
+        guard criteria.shared == defaultCriteria.shared else { return false }
         if mode == .network {
-            return criteria.network == .init()
+            return criteria.network == defaultCriteria.network
         } else {
-            return criteria.messages == .init()
+            return criteria.messages == defaultCriteria.messages
         }
     }
 
     func select(sessions: Set<UUID>) {
-        self.criteria.shared.sessions = sessions
+        self.criteria.shared.sessions.selection = sessions
     }
 
     func resetAll() {
-        criteria = .init()
+        criteria = defaultCriteria
     }
 
     private func reloadCounters() {

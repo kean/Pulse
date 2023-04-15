@@ -9,7 +9,7 @@ struct ConsoleSessionsPickerView: View {
     @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \LoggerSessionEntity.createdAt, ascending: false)])
     private var sessions: FetchedResults<LoggerSessionEntity>
 
-    @State var selection: Set<UUID> = []
+    @Binding var selection: Set<UUID>
 
     var body: some View {
         ConsoleSearchListSelectionView(
@@ -18,16 +18,8 @@ struct ConsoleSessionsPickerView: View {
             id: \.id,
             selection: $selection,
             description: \.formattedDate,
-            label: { Text($0.formattedDate) }
+            label: ConsoleSessionCell.init,
+            limit: 3
         )
-    }
-}
-
-struct Previews_ConsoleSessionsPickerView_Previews: PreviewProvider {
-    static var previews: some View {
-        List {
-            ConsoleSessionsPickerView()
-        }
-        .injectingEnvironment(.init(store: .mock))
     }
 }

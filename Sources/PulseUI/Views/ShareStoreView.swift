@@ -9,6 +9,7 @@ import CoreData
 import Pulse
 import Combine
 
+@MainActor
 struct ShareStoreView: View {
     /// Preselected sessions.
     var sessions: Set<UUID>?

@@ -70,16 +70,16 @@ struct ConsoleSessionsView: View {
     private var list: some View {
         List(selection: $selection) {
             if !filterTerm.isEmpty {
-                ForEach(getFilteredSessions(), id: \.objectID, content: makeCell)
+                ForEach(getFilteredSessions(), id: \.objectID, content: ConsoleSessionCell.init)
             } else {
 #if os(iOS)
                 buttonToggleSelectAll
 #endif
                 if sessions.count > limit {
-                    ForEach(sessions.prefix(limit), id: \.objectID, content: makeCell)
+                    ForEach(sessions.prefix(limit), id: \.objectID, content: ConsoleSessionCell.init)
                     buttonShowPreviousSessions
                 } else {
-                    ForEach(sessions, id: \.objectID, content: makeCell)
+                    ForEach(sessions, id: \.objectID, content: ConsoleSessionCell.init)
                 }
             }
         }
@@ -87,7 +87,7 @@ struct ConsoleSessionsView: View {
         .listStyle(.plain)
         .environment(\.editMode, .constant(.active))
         .onAppear {
-            selection = consoleViewModel.searchCriteriaViewModel.criteria.shared.sessions
+            selection = consoleViewModel.searchCriteriaViewModel.criteria.shared.sessions.selection
         }
         .backport.searchable(text: $filterTerm)
 #else
@@ -95,7 +95,7 @@ struct ConsoleSessionsView: View {
         .backport.hideListContentBackground()
         .contextMenu(forSelectionType: UUID.self, menu: contextMenu)
         .onChange(of: selection) {
-            guard consoleViewModel.searchCriteriaViewModel.criteria.shared.sessions != $0 else { return }
+            guard consoleViewModel.searchCriteriaViewModel.criteria.shared.sessions.selection != $0 else { return }
             consoleViewModel.searchCriteriaViewModel.select(sessions: $0)
         }
 #endif
@@ -147,28 +147,6 @@ struct ConsoleSessionsView: View {
     }
 #endif
 
-    private func makeCell(for session: LoggerSessionEntity) -> some View {
-        HStack(alignment: .lastTextBaseline) {
-            Text(session.formattedDate)
-                .lineLimit(1)
-                .layoutPriority(1)
-            Spacer()
-            if let version = session.fullVersion {
-                Text(version)
-                    .lineLimit(1)
-                    .frame(minWidth: 40)
-#if os(macOS)
-                    .foregroundColor(Color(UXColor.tertiaryLabelColor))
-#else
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-#endif
-            }
-        }
-        .listRowBackground(Color.clear)
-        .tag(session.id)
-    }
-
     @ViewBuilder
     private var buttonShowPreviousSessions: some View {
         Button("Show Previous Sessions") {
@@ -196,6 +174,32 @@ struct ConsoleSessionsView: View {
 
     private func getFilteredSessions() -> [LoggerSessionEntity] {
         sessions.filter { $0.formattedDate.localizedCaseInsensitiveContains(filterTerm) }
+    }
+}
+
+struct ConsoleSessionCell: View {
+    let session: LoggerSessionEntity
+
+    var body: some View {
+        HStack(alignment: .lastTextBaseline) {
+            Text(session.formattedDate)
+                .lineLimit(1)
+                .layoutPriority(1)
+            Spacer()
+            if let version = session.fullVersion {
+                Text(version)
+                    .lineLimit(1)
+                    .frame(minWidth: 40)
+#if os(macOS)
+                    .foregroundColor(Color(UXColor.tertiaryLabelColor))
+#else
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+#endif
+            }
+        }
+        .listRowBackground(Color.clear)
+        .tag(session.id)
     }
 }
 

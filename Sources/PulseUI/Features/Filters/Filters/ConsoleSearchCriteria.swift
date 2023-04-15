@@ -19,7 +19,7 @@ struct ConsoleSearchCriteria: Hashable {
     var network = Network()
 
     struct Shared: Hashable {
-        var sessions: Set<UUID> = []
+        var sessions = Sessions()
         var dates = Dates()
     }
 
@@ -47,6 +47,11 @@ protocol ConsoleFilterProtocol: Hashable {
 }
 
 extension ConsoleSearchCriteria {
+    struct Sessions: Hashable, ConsoleFilterProtocol {
+        var isEnabled = true
+        var selection: Set<UUID> = []
+    }
+
     struct Dates: Hashable, ConsoleFilterProtocol {
         var isEnabled = true
         var startDate: Date?

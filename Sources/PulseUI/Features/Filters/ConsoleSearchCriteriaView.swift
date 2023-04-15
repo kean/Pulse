@@ -47,6 +47,7 @@ struct ConsoleSearchCriteriaView: View {
         buttonReset
 #endif
 
+        sessionsSection
         timePeriodSection
 
         if viewModel.mode == .network {
@@ -78,6 +79,14 @@ struct ConsoleSearchCriteriaView: View {
 // MARK: - ConsoleSearchView (Shared)
 
 extension ConsoleSearchCriteriaView {
+    var sessionsSection: some View {
+        ConsoleSection(isDividerHidden: true, header: {
+            ConsoleSectionHeader(icon: "list.clipboard", title: "Sessions", filter: $viewModel.criteria.shared.sessions, default: viewModel.defaultCriteria.shared.sessions)
+        }, content: {
+            ConsoleSessionsPickerView(selection: $viewModel.criteria.shared.sessions.selection)
+        })
+    }
+
     var timePeriodSection: some View {
         ConsoleSection(isDividerHidden: true, header: {
             ConsoleSectionHeader(icon: "calendar", title: "Time Period", filter: $viewModel.criteria.shared.dates)
@@ -211,6 +220,7 @@ struct ConsoleSearchCriteriaView_Previews: PreviewProvider {
             .navigationViewStyle(.stack)
             .previewDisplayName("Network")
         }
+        .injectingEnvironment(.init(store: .mock))
 #endif
     }
 }

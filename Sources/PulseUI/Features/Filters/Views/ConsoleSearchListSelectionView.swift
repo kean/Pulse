@@ -9,14 +9,15 @@ struct ConsoleSearchListSelectionView<Data: RandomAccessCollection, ID: Hashable
     let title: String
     let items: Data
     let id: KeyPath<Data.Element, ID>
+    @Binding var selection: Set<ID>
+    let description: (Data.Element) -> String
+    @ViewBuilder let label: (Data.Element) -> Label
+
 #if os(iOS) || os(macOS)
     var limit = 6
 #else
     var limit = 3
 #endif
-    @Binding var selection: Set<ID>
-    let description: (Data.Element) -> String
-    @ViewBuilder let label: (Data.Element) -> Label
 
     @State private var searchText = ""
 
@@ -63,7 +64,7 @@ struct ConsoleSearchListSelectionView<Data: RandomAccessCollection, ID: Hashable
                 }
             if items.count > limit {
                 let viewAllView = HStack {
-                    Text("View All")
+                    Text("View All").foregroundColor(.blue)
                     Spacer()
                     Text("\(items.count) ").foregroundColor(.secondary)
                 }
