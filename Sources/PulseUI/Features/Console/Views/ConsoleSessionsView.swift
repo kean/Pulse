@@ -140,14 +140,14 @@ struct ConsoleSessionsView: View {
         ConsoleSessionCell(session: session)
             .backport.swipeActions {
                 Button(action: {
-                    store.removeSessions(withIDs: [session.id])
+                    if session.id != store.session.id {
+                        store.removeSessions(withIDs: [session.id])
+                    }
                 }, label: {
                     Label("Delete", systemImage: "trash")
                 }).backport.tint(Color.red)
 
-                Button(action: {
-                    sharedSessions = SharedSessions(ids: [session.id])
-                }) {
+                Button(action: { sharedSessions = SharedSessions(ids: [session.id]) }) {
                     Label("Share", systemImage: "square.and.arrow.up.fill")
                 }.backport.tint(.blue)
             }
@@ -159,7 +159,7 @@ struct ConsoleSessionsView: View {
             Button.destructive(action: {
                 store.removeSessions(withIDs: selection)
             }, label: { Image(systemName: "trash") })
-            .disabled(selection.isEmpty)
+            .disabled(selection.isEmpty || selection == [store.session.id])
 
             Spacer()
 
