@@ -61,7 +61,7 @@ struct ConsoleSessionsView: View {
                 }
                 ToolbarItem(placement: .bottomBar) {
                     if editMode == .active {
-                        ConsoleSessionBottomBar(selection: $selection, isSharing: $isSharing)
+                        bottomBar
                     }
                 }
             }
@@ -119,31 +119,9 @@ struct ConsoleSessionsView: View {
         .foregroundColor(.blue)
 #endif
     }
-    
-#if os(macOS)
-    @ViewBuilder
-    private func contextMenu(for selection: Set<UUID>) -> some View {
-        if !store.isArchive {
-            Button(role: .destructive, action: {
-                store.removeSessions(withIDs: selection)
-            }, label: { Text("Remove") })
-        }
-    }
-#endif
-
-    private func getFilteredSessions() -> [LoggerSessionEntity] {
-        sessions.filter { $0.formattedDate.localizedCaseInsensitiveContains(filterTerm) }
-    }
-}
 
 #if os(iOS)
-private struct ConsoleSessionBottomBar: View {
-    @Binding var selection: Set<UUID>
-    @Binding var isSharing: Bool
-
-    @Environment(\.store) private var store
-
-    var body: some View {
+    var bottomBar: some View {
         HStack {
             Button.destructive(action: {
                 store.removeSessions(withIDs: selection)
@@ -168,8 +146,23 @@ private struct ConsoleSessionBottomBar: View {
             .disabled(selection.isEmpty)
         }
     }
-}
 #endif
+    
+#if os(macOS)
+    @ViewBuilder
+    private func contextMenu(for selection: Set<UUID>) -> some View {
+        if !store.isArchive {
+            Button(role: .destructive, action: {
+                store.removeSessions(withIDs: selection)
+            }, label: { Text("Remove") })
+        }
+    }
+#endif
+
+    private func getFilteredSessions() -> [LoggerSessionEntity] {
+        sessions.filter { $0.formattedDate.localizedCaseInsensitiveContains(filterTerm) }
+    }
+}
 
 struct ConsoleSessionCell: View {
     let session: LoggerSessionEntity
