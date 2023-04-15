@@ -32,11 +32,12 @@ final class LoggerSyncSession: ObservableObject {
         let directory = TemporaryDirectory()
         let date = makeCurrentDate()
         let storeURL = directory.url.appendingPathComponent("logs-\(date).pulse", isDirectory: true)
-        _ = try? store.copy(to: storeURL)
-
-        let session = WCSession.default.transferFile(storeURL, metadata: nil)
-        self.fileTransferStatus = .sending(session.progress)
-        self.directory = directory
+        Task {
+            _ = try? await store.export(to: storeURL)
+            let session = WCSession.default.transferFile(storeURL, metadata: nil)
+            self.fileTransferStatus = .sending(session.progress)
+            self.directory = directory
+        }
     }
 }
 
