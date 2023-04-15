@@ -274,7 +274,6 @@
 		0CF0D6F5296F1AF100EED9D4 /* PulseUI.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0CF0D56C296F17CB00EED9D4 /* PulseUI.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		0CF5E5F72997DB95009FF7AE /* ConsoleTableViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF5E5F62997DB95009FF7AE /* ConsoleTableViewModel.swift */; };
 		0CF5E5FA2997DED7009FF7AE /* ConsoleTableViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF5E5F82997DE86009FF7AE /* ConsoleTableViewModelTests.swift */; };
-		0CF5E60629981A94009FF7AE /* ShareStoreViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF5E60529981A94009FF7AE /* ShareStoreViewModelTests.swift */; };
 		0CF5E60929981ADF009FF7AE /* ShareStoreViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF5E60729981ADC009FF7AE /* ShareStoreViewModel.swift */; };
 		0CFD1CDB29E2E8FD003872EF /* LoggerStore+Remote.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CFD1CDA29E2E8FD003872EF /* LoggerStore+Remote.swift */; };
 /* End PBXBuildFile section */
@@ -727,7 +726,6 @@
 		0CF0D6C9296F18FD00EED9D4 /* MockTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockTests.swift; sourceTree = "<group>"; };
 		0CF5E5F62997DB95009FF7AE /* ConsoleTableViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleTableViewModel.swift; sourceTree = "<group>"; };
 		0CF5E5F82997DE86009FF7AE /* ConsoleTableViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleTableViewModelTests.swift; sourceTree = "<group>"; };
-		0CF5E60529981A94009FF7AE /* ShareStoreViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareStoreViewModelTests.swift; sourceTree = "<group>"; };
 		0CF5E60729981ADC009FF7AE /* ShareStoreViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareStoreViewModel.swift; sourceTree = "<group>"; };
 		0CFD1CDA29E2E8FD003872EF /* LoggerStore+Remote.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LoggerStore+Remote.swift"; sourceTree = "<group>"; };
 		49E82A8526D107A00070244F /* AlamofireIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlamofireIntegration.swift; sourceTree = "<group>"; };
@@ -1465,7 +1463,6 @@
 				0CF5E5F82997DE86009FF7AE /* ConsoleTableViewModelTests.swift */,
 				0C18A667299749C30041F424 /* ConsoleTextViewModelTests.swift */,
 				0CB63A282975A94D00525165 /* ConsoleSearchTokenTests.swift */,
-				0CF5E60529981A94009FF7AE /* ShareStoreViewModelTests.swift */,
 				0C63A389297A44B300F6A6A5 /* StringSearchOptionsTests.swift */,
 				0C94239329B4D73E007F2784 /* ConsoleSearchOccurrenceTests.swift */,
 				0C7A0E01297CE71400B4B69D /* FormattersTests.swift */,
@@ -2185,7 +2182,6 @@
 				0C94239429B4D73E007F2784 /* ConsoleSearchOccurrenceTests.swift in Sources */,
 				0CECF6412996E761000F9CCD /* ConsoleDataSourceTests.swift in Sources */,
 				0CF0D6CA296F18FD00EED9D4 /* TextRendererTests.swift in Sources */,
-				0CF5E60629981A94009FF7AE /* ShareStoreViewModelTests.swift in Sources */,
 				0CF0D6CC296F18FD00EED9D4 /* MockTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

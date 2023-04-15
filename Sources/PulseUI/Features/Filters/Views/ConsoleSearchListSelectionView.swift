@@ -33,7 +33,7 @@ struct ConsoleSearchListSelectionView<Data: RandomAccessCollection, ID: Hashable
                 Spacer()
                 buttonToggleAll
             }
-            ForEach(isExpanded ? filtered : Array(filtered.prefix(limit)), id: \.self, content: makeRow)
+            ForEach(isExpanded ? filtered : Array(filtered.prefix(limit)), id: id, content: makeRow)
             if filtered.count > limit {
                 HStack {
                     if !isExpanded {

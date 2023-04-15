@@ -72,7 +72,7 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
     }
 
     func select(sessions: Set<UUID>) {
-        self.options.sessions = sessions
+        self.criteria.shared.sessions = sessions
     }
 
     func resetAll() {

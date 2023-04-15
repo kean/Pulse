@@ -37,6 +37,10 @@ extension ConsoleSearchCriteria {
 private func makePredicates(for criteria: ConsoleSearchCriteria.Shared, isNetwork: Bool = false) -> [NSPredicate] {
     var predicates = [NSPredicate]()
 
+    if !criteria.sessions.isEmpty {
+        predicates.append(NSPredicate(format: "session IN %@", criteria.sessions))
+    }
+
     if criteria.dates.isEnabled {
         if let startDate = criteria.dates.startDate {
             predicates.append(NSPredicate(format: "createdAt >= %@", startDate as NSDate))

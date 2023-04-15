@@ -11,7 +11,6 @@ struct ConsolePredicateOptions {
     var criteria = ConsoleSearchCriteria()
     var isOnlyErrors = false
     var focus: NSPredicate?
-    var sessions: Set<UUID> = []
 }
 
 struct ConsoleSearchCriteria: Hashable {
@@ -20,6 +19,7 @@ struct ConsoleSearchCriteria: Hashable {
     var network = Network()
 
     struct Shared: Hashable {
+        var sessions: Set<UUID> = []
         var dates = Dates()
     }
 

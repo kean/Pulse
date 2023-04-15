@@ -15,7 +15,7 @@ class ConsoleTestCase: XCTestCase {
     override func setUp() {
         super.setUp()
 
-        let storeURL = directory.url.appending(filename: "\(UUID().uuidString).pulse")
+        let storeURL = directory.url.appendingPathComponent("\(UUID().uuidString).pulse")
         store = try! LoggerStore(storeURL: storeURL, options: [.create, .synchronous])
         store.populate()
     }

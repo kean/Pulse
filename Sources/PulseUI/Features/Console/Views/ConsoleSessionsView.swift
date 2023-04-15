@@ -87,7 +87,7 @@ struct ConsoleSessionsView: View {
         .listStyle(.plain)
         .environment(\.editMode, .constant(.active))
         .onAppear {
-            selection = consoleViewModel.searchCriteriaViewModel.options.sessions
+            selection = consoleViewModel.searchCriteriaViewModel.criteria.shared.sessions
         }
         .backport.searchable(text: $filterTerm)
 #else
@@ -95,7 +95,7 @@ struct ConsoleSessionsView: View {
         .backport.hideListContentBackground()
         .contextMenu(forSelectionType: UUID.self, menu: contextMenu)
         .onChange(of: selection) {
-            guard consoleViewModel.searchCriteriaViewModel.options.sessions != $0 else { return }
+            guard consoleViewModel.searchCriteriaViewModel.criteria.shared.sessions != $0 else { return }
             consoleViewModel.searchCriteriaViewModel.select(sessions: $0)
         }
 #endif

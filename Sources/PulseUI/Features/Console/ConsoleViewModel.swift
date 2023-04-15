@@ -95,7 +95,7 @@ final class ConsoleViewModel: ObservableObject {
 
         func makeDefaultOptions() -> ConsolePredicateOptions {
             var options = ConsolePredicateOptions()
-            options.sessions = [store.session.id]
+            options.criteria.shared.sessions = [store.session.id]
             options.focus = context.focus
             return options
         }
