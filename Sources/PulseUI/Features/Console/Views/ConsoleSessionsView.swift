@@ -10,6 +10,9 @@ import Combine
 
 #if os(iOS) || os(macOS)
 
+#warning("preselect session on macOS too")
+#warning("add sharing on macOS too")
+#warning("is select all in the right place?")
 @available(macOS 13, *)
 struct ConsoleSessionsView: View {
     @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \LoggerSessionEntity.createdAt, ascending: false)])
@@ -17,7 +20,8 @@ struct ConsoleSessionsView: View {
 
     @State private var filterTerm = ""
     @State private var selection: Set<UUID> = []
-    @State private var limit = 20
+    @State private var limit = 16
+    @State private var isSharing = false
 
     @EnvironmentObject private var consoleViewModel: ConsoleViewModel
     @Environment(\.store) private var store
@@ -53,16 +57,12 @@ struct ConsoleSessionsView: View {
                         consoleViewModel.router.isShowingSessions = false
                     }
                 }
-                ToolbarItem(placement: .bottomBar) {
-                    HStack {
-                        Button.destructive(action: {
-                            store.removeSessions(withIDs: selection)
-                        }, label: { Text("Remove").foregroundColor(.red) })
-                        .disabled(selection.isEmpty)
-
-                        Spacer()
-                    }
-                }
+                ToolbarItem(placement: .bottomBar) { bottomBar }
+            }
+            .sheet(isPresented: $isSharing) {
+                NavigationView {
+                    ShareStoreView(store: store, sessions: selection, isPresented: $isSharing)
+                }.backport.presentationDetents([.medium])
             }
 #endif
     }
@@ -119,6 +119,32 @@ struct ConsoleSessionsView: View {
         .buttonStyle(.plain)
         .foregroundColor(.blue)
     }
+
+    private var bottomBar: some View {
+        HStack {
+            Button.destructive(action: {
+                store.removeSessions(withIDs: selection)
+            }, label: { Image(systemName: "trash").foregroundColor(.red) })
+            .disabled(selection.isEmpty)
+
+            Spacer()
+
+            // It should ideally be done using stringsdict, but Pulse
+            // doesn't support localization.
+            if selection.count % 10 == 1 {
+                Text("\(selection.count) Session Selected")
+            } else {
+                Text("\(selection.count) Sessions Selected")
+            }
+
+            Spacer()
+
+            Button(action: { isSharing = true }, label: {
+                Image(systemName: "square.and.arrow.up")
+            })
+            .disabled(selection.isEmpty)
+        }
+    }
 #endif
 
     private func makeCell(for session: LoggerSessionEntity) -> some View {
@@ -169,10 +195,7 @@ struct ConsoleSessionsView: View {
 #endif
 
     private func getFilteredSessions() -> [LoggerSessionEntity] {
-        sessions.filter {
-            $0.formattedDate.localizedCaseInsensitiveContains(filterTerm) ||
-            ($0.fullVersion?.localizedCaseInsensitiveContains(filterTerm) ?? false)
-        }
+        sessions.filter { $0.formattedDate.localizedCaseInsensitiveContains(filterTerm) }
     }
 }
 

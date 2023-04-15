@@ -85,7 +85,7 @@
 		0C9F04F92884F34A0035239F /* Pulse_Demo_macOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9F04F82884F34A0035239F /* Pulse_Demo_macOSApp.swift */; };
 		0C9F04FD2884F34A0035239F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C9F04FC2884F34A0035239F /* Assets.xcassets */; };
 		0C9F05002884F34A0035239F /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C9F04FF2884F34A0035239F /* Preview Assets.xcassets */; };
-		0CA20FED29E5976700A59180 /* LoggerStoreCopyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CA20FEC29E5976700A59180 /* LoggerStoreCopyTests.swift */; };
+		0CA20FED29E5976700A59180 /* LoggerStoreExportTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CA20FEC29E5976700A59180 /* LoggerStoreExportTests.swift */; };
 		0CA20FEF29E5999700A59180 /* LoggerStoreBaseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CA20FEE29E5999700A59180 /* LoggerStoreBaseTests.swift */; };
 		0CA32DE729D5E028001712E8 /* NSAttributedString+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CA32DE629D5E028001712E8 /* NSAttributedString+Extensions.swift */; };
 		0CAF1D7B297C2040002E2722 /* ConsoleListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CAF1D7A297C2040002E2722 /* ConsoleListViewModel.swift */; };
@@ -275,7 +275,7 @@
 		0CF5E5FA2997DED7009FF7AE /* ConsoleTableViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF5E5F82997DE86009FF7AE /* ConsoleTableViewModelTests.swift */; };
 		0CF5E60629981A94009FF7AE /* ShareStoreViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF5E60529981A94009FF7AE /* ShareStoreViewModelTests.swift */; };
 		0CF5E60929981ADF009FF7AE /* ShareStoreViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF5E60729981ADC009FF7AE /* ShareStoreViewModel.swift */; };
-		0CFD1CDB29E2E8FD003872EF /* LoggerStore-Remote.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CFD1CDA29E2E8FD003872EF /* LoggerStore-Remote.swift */; };
+		0CFD1CDB29E2E8FD003872EF /* LoggerStore+Remote.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CFD1CDA29E2E8FD003872EF /* LoggerStore+Remote.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -539,7 +539,7 @@
 		0C9F04FC2884F34A0035239F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0C9F04FF2884F34A0035239F /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		0C9F05012884F34A0035239F /* Pulse_Demo_macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Pulse_Demo_macOS.entitlements; sourceTree = "<group>"; };
-		0CA20FEC29E5976700A59180 /* LoggerStoreCopyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggerStoreCopyTests.swift; sourceTree = "<group>"; };
+		0CA20FEC29E5976700A59180 /* LoggerStoreExportTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggerStoreExportTests.swift; sourceTree = "<group>"; };
 		0CA20FEE29E5999700A59180 /* LoggerStoreBaseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggerStoreBaseTests.swift; sourceTree = "<group>"; };
 		0CA32DE629D5E028001712E8 /* NSAttributedString+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSAttributedString+Extensions.swift"; sourceTree = "<group>"; };
 		0CAF1D7A297C2040002E2722 /* ConsoleListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleListViewModel.swift; sourceTree = "<group>"; };
@@ -727,7 +727,7 @@
 		0CF5E5F82997DE86009FF7AE /* ConsoleTableViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleTableViewModelTests.swift; sourceTree = "<group>"; };
 		0CF5E60529981A94009FF7AE /* ShareStoreViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareStoreViewModelTests.swift; sourceTree = "<group>"; };
 		0CF5E60729981ADC009FF7AE /* ShareStoreViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareStoreViewModel.swift; sourceTree = "<group>"; };
-		0CFD1CDA29E2E8FD003872EF /* LoggerStore-Remote.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LoggerStore-Remote.swift"; sourceTree = "<group>"; };
+		0CFD1CDA29E2E8FD003872EF /* LoggerStore+Remote.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LoggerStore+Remote.swift"; sourceTree = "<group>"; };
 		49E82A8526D107A00070244F /* AlamofireIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlamofireIntegration.swift; sourceTree = "<group>"; };
 		49E82A8826D1083D0070244F /* MoyaIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoyaIntegration.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -1141,15 +1141,15 @@
 		0CF0D49A296F14CF00EED9D4 /* LoggerStore */ = {
 			isa = PBXGroup;
 			children = (
-				0CF0D49B296F14CF00EED9D4 /* LoggerStore+Configuration.swift */,
-				0CF0D49C296F14CF00EED9D4 /* LoggerStore+Entities.swift */,
-				0CF0D49D296F14CF00EED9D4 /* LoggerStore+Level.swift */,
-				0CF0D49E296F14CF00EED9D4 /* LoggerStore+Info.swift */,
-				0CF0D49F296F14CF00EED9D4 /* LoggerStore+Extensions.swift */,
-				0CF0D4A0296F14CF00EED9D4 /* LoggerStore+Event.swift */,
-				0CFD1CDA29E2E8FD003872EF /* LoggerStore-Remote.swift */,
 				0CF0D4A1296F14CF00EED9D4 /* LoggerStore.swift */,
+				0CF0D49B296F14CF00EED9D4 /* LoggerStore+Configuration.swift */,
+				0CF0D49E296F14CF00EED9D4 /* LoggerStore+Info.swift */,
+				0CF0D49D296F14CF00EED9D4 /* LoggerStore+Level.swift */,
+				0CF0D4A0296F14CF00EED9D4 /* LoggerStore+Event.swift */,
+				0CF0D49C296F14CF00EED9D4 /* LoggerStore+Entities.swift */,
 				0CF0D4A2296F14CF00EED9D4 /* LoggerStore+Model.swift */,
+				0CFD1CDA29E2E8FD003872EF /* LoggerStore+Remote.swift */,
+				0CF0D49F296F14CF00EED9D4 /* LoggerStore+Extensions.swift */,
 			);
 			path = LoggerStore;
 			sourceTree = "<group>";
@@ -1439,7 +1439,7 @@
 				0CF0D69A296F18D200EED9D4 /* RemoteLoggerTests.swift */,
 				0CF0D69B296F18D200EED9D4 /* Helpers.swift */,
 				0CF0D69C296F18D200EED9D4 /* LoggerStoreTests.swift */,
-				0CA20FEC29E5976700A59180 /* LoggerStoreCopyTests.swift */,
+				0CA20FEC29E5976700A59180 /* LoggerStoreExportTests.swift */,
 				0CA20FEE29E5999700A59180 /* LoggerStoreBaseTests.swift */,
 				0CF0D69D296F18D200EED9D4 /* URLSessionProxyTests.swift */,
 				0CF0D69E296F18D200EED9D4 /* NetworkLoggerTests.swift */,
@@ -1959,7 +1959,7 @@
 				0CF0D562296F15FD00EED9D4 /* Version.swift in Sources */,
 				0CF0D552296F15F200EED9D4 /* URLSessionProxyDelegate.swift in Sources */,
 				0CF0D578296F185000EED9D4 /* Pulse.docc in Sources */,
-				0CFD1CDB29E2E8FD003872EF /* LoggerStore-Remote.swift in Sources */,
+				0CFD1CDB29E2E8FD003872EF /* LoggerStore+Remote.swift in Sources */,
 				0CF0D554296F15F600EED9D4 /* RemoteLogger.swift in Sources */,
 				0CF0D54F296F15F200EED9D4 /* NetworkLogger+Redacting.swift in Sources */,
 				0CF0D55C296F15FA00EED9D4 /* LoggerStore+Info.swift in Sources */,
@@ -2157,7 +2157,7 @@
 				0CA20FEF29E5999700A59180 /* LoggerStoreBaseTests.swift in Sources */,
 				0C11EAB62971DB700059786A /* MockDataTask.swift in Sources */,
 				0C11EAB32971DB700059786A /* LoggerStoreTests.swift in Sources */,
-				0CA20FED29E5976700A59180 /* LoggerStoreCopyTests.swift in Sources */,
+				0CA20FED29E5976700A59180 /* LoggerStoreExportTests.swift in Sources */,
 				0C11EAB72971DB700059786A /* URLSessionProxyTests.swift in Sources */,
 				0C11EABB2971DB700059786A /* URLSessionProxyDelegateTests.swift in Sources */,
 				0C11EAB92971DB700059786A /* PerformanceTests.swift in Sources */,
@@ -2425,7 +2425,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 20;
 				DEVELOPMENT_ASSET_PATHS = "\"Demo/iOS/Preview Content\"";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = NR8DLKJ7E6;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = Demo/iOS/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -2451,7 +2451,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 20;
 				DEVELOPMENT_ASSET_PATHS = "\"Demo/iOS/Preview Content\"";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = NR8DLKJ7E6;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = Demo/iOS/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (

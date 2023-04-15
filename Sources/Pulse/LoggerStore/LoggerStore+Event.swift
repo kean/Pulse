@@ -22,7 +22,7 @@ extension LoggerStore {
             public var function: String
             public var line: UInt
 
-            // Deprecated (added for backward compatibility)
+            @available(*, deprecated, message: "Deprecated (added for backward compatibility)")
             public var session: UUID = Session.current.id
 
             public init(createdAt: Date, label: String, level: LoggerStore.Level, message: String, metadata: [String: String]?, file: String, function: String, line: UInt) {
@@ -45,7 +45,7 @@ extension LoggerStore {
             public var currentRequest: NetworkLogger.Request?
             public var label: String?
 
-            // Deprecated (added for backward compatibility)
+            @available(*, deprecated, message: "Deprecated (added for backward compatibility)")
             public var session: UUID = Session.current.id
 
             public init(taskId: UUID, taskType: NetworkLogger.TaskType, createdAt: Date, originalRequest: NetworkLogger.Request, currentRequest: NetworkLogger.Request?, label: String?) {
@@ -85,7 +85,7 @@ extension LoggerStore {
             public var metrics: NetworkLogger.Metrics?
             public var label: String?
 
-            // Deprecated (added for backward compatibility)
+            @available(*, deprecated, message: "Deprecated (added for backward compatibility)")
             public var session: UUID = Session.current.id
 
             public init(taskId: UUID, taskType: NetworkLogger.TaskType, createdAt: Date, originalRequest: NetworkLogger.Request, currentRequest: NetworkLogger.Request?, response: NetworkLogger.Response?, error: NetworkLogger.ResponseError?, requestBody: Data?, responseBody: Data?, metrics: NetworkLogger.Metrics?, label: String?) {

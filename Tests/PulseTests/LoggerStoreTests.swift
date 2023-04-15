@@ -75,7 +75,7 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
 
     func testInitWithArchiveURL() throws {
         // GIVEN
-        let storeURL = directory.url.appending(filename: "logs-archive-v2.pulse")
+        let storeURL = directory.url.appending(filename: "logs-archive-latest.pulse")
         try Resources.pulseArchive.write(to: storeURL)
 
         // WHEN
@@ -100,7 +100,7 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
 
     func testInitWithArchiveURLNoExtension() throws {
         // GIVEN
-        let storeURL = directory.url.appending(filename: "logs-archive-v2")
+        let storeURL = directory.url.appending(filename: "logs-archive-latest")
         try Resources.pulseArchive.write(to: storeURL)
 
         // WHEN
@@ -150,6 +150,7 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
 
     // MARK: - Backward Compatibility
 
+#warning("add test for accessing blobs and other data")
     func testOpenOldStore_v3_1() throws {
         // GIVEN
         let storeURL = directory.url.appending(filename: "logs-archive-3-1.pulse")
@@ -247,7 +248,7 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
 
     // MARK: - Expiration
 
-    func testSizeLimit() throws {
+    func testSizeLimit() async throws {
         let store = try! LoggerStore(
             storeURL: directory.url.appending(filename: UUID().uuidString),
             options: [.create, .synchronous],
@@ -268,7 +269,7 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
         let copyURL = directory.url
             .appending(filename: UUID().uuidString)
             .appendingPathExtension("pulse")
-        try store.copy(to: copyURL)
+        try await store.export(to: copyURL)
 
         // SANITY
         var messages = try store.allMessages()
@@ -287,7 +288,7 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
         let copyURL2 = directory.url
             .appending(filename: UUID().uuidString)
             .appendingPathExtension("pulse")
-        try store.copy(to: copyURL2)
+        try await store.export(to: copyURL2)
 
         // THEN unwanted messages were removed
         messages = try context.fetch(LoggerMessageEntity.self)
@@ -668,7 +669,7 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
 
     // MARK: - Measure Export Speed & Size
 
-    func testMeasureExportSize() throws {
+    func testMeasureExportSize() async throws {
         // GIVEN
         let storeURL = try makePulsePackage()
 
@@ -677,15 +678,15 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
         defer { try? store.destroy() }
 
         let copyURL = directory.url.appending(filename: "compressed.pulse")
-        try benchmark(title: "Archive") {
-            try store.copy(to: copyURL)
-        }
+        let start = benchmarkStart()
+        try await store.export(to: copyURL)
+        benchmarkEnd(start, title: "archive")
 
         let size = (try Files.attributesOfItem(atPath: copyURL.path)[.size] as? Int64) ?? 0
         print("Package: \(try storeURL.directoryTotalSize()). Archive: \(size)")
     }
 
-    func _testMeasureExportSizeLarge() throws {
+    func _testMeasureExportSizeLarge() async throws {
         // GIVEN
         let store = makeStore {
             // Thumbnail generation significantly impacts the right speed
@@ -700,9 +701,9 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
         }
 
         let copyURL = directory.url.appending(filename: "compressed.pulse")
-        try benchmark(title: "archive") {
-            try store.copy(to: copyURL)
-        }
+        let start = benchmarkStart()
+        try await store.export(to: copyURL)
+        benchmarkEnd(start, title: "archive")
 
         let size = (try Files.attributesOfItem(atPath: copyURL.path)[.size] as? Int64) ?? 0
         let compressed = try Data(contentsOf: copyURL).compressed()

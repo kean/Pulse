@@ -40,14 +40,6 @@ final class PerformanceTests: XCTestCase {
         }
     }
 
-    func xtestExport() {
-//        populate(store: store)
-//        Thread.sleep(forTimeInterval: 2)
-        benchmark(title: "export") {
-            try! store.copy(to: tempDirectoryURL.appending(filename: "temp-export"))
-        }
-    }
-
     func xtestQueryByLevel() {
         let request = NSFetchRequest<LoggerMessageEntity>(entityName: "LoggerMessageEntity")
         request.predicate = NSPredicate(format: "level == %i", LoggerStore.Level.info.rawValue)

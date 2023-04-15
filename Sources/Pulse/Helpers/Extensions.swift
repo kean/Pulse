@@ -179,6 +179,15 @@ func benchmark<T>(title: String, operation: () throws -> T) rethrows -> T {
     return value
 }
 
+func benchmarkStart() -> CFAbsoluteTime {
+    CFAbsoluteTimeGetCurrent()
+}
+
+func benchmarkEnd(_ startTime: CFAbsoluteTime, title: String) {
+    let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
+    print("Time elapsed for \(title): \(timeElapsed * 1000.0) ms.")
+}
+
 final class WeakLoggerStore {
     weak var store: LoggerStore?
 

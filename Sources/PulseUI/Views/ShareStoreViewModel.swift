@@ -9,20 +9,17 @@ import CoreData
 import Pulse
 import Combine
 
-final class ShareStoreViewModel: ObservableObject {
+@MainActor final class ShareStoreViewModel: ObservableObject {
     // Sharing options
     @Published var timeRange: SharingTimeRange
     @Published var level: LoggerStore.Level
     @Published var output: ShareStoreOutput
 
-    // Settings
     @Published private(set) var isPreparingForSharing = false
-    @Published private(set) var sharedContents: SharedContents?
     @Published private(set) var errorMessage: String?
+    @Published var shareItems: ShareItems?
 
-    private var store: LoggerStore?
-    private var isPrepareForSharingNeeded = false
-    private var cancellable: AnyCancellable?
+    var store: LoggerStore?
 
     init() {
         timeRange = ConsoleSettings.shared.sharingTimeRange
@@ -30,32 +27,11 @@ final class ShareStoreViewModel: ObservableObject {
         output = ConsoleSettings.shared.sharingOutput
     }
 
-    func display(_ store: LoggerStore) {
-        guard self.store !== store else {
-            return
-        }
-
-        self.store = store
-
-        if cancellable == nil {
-            cancellable = Publishers.CombineLatest3($timeRange, $output, $level)
-                .dropFirst()
-                .throttle(for: 0.5, scheduler: DispatchQueue.main, latest: true)
-                .sink { [weak self] _, _, _ in
-                    self?.saveSharingOptions()
-                    self?.setNeedsPrepareForSharing()
-                }
-        }
-
-        self.prepareForSharing()
-    }
-
-    private func setNeedsPrepareForSharing() {
-        if isPreparingForSharing {
-            isPrepareForSharingNeeded = true
-        } else {
-            prepareForSharing()
-        }
+    func buttonSharedTapped() {
+        guard !isPreparingForSharing else { return }
+        isPreparingForSharing = true
+        saveSharingOptions()
+        prepareForSharing()
     }
 
     private func saveSharingOptions() {
@@ -68,14 +44,17 @@ final class ShareStoreViewModel: ObservableObject {
         guard let store = store else { return }
 
         isPreparingForSharing = true
-        sharedContents = nil
+        shareItems = nil
         errorMessage = nil
 
-        let context = store.backgroundContext
-        let predicate = self.predicate
-        let output = self.output
-        context.perform {
-            self.prepareForSharing(store: store, context: context, predicate: predicate, output: output)
+        Task {
+            do {
+                self.shareItems = try await prepareForSharing(store: store, predicate: predicate, output: output)
+            } catch {
+                guard !(error is CancellationError) else { return }
+                self.errorMessage = error.localizedDescription
+            }
+            self.isPreparingForSharing = false
         }
     }
 
@@ -102,82 +81,34 @@ final class ShareStoreViewModel: ObservableObject {
         return NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
     }
 
-    private func prepareForSharing(store: LoggerStore, context: NSManagedObjectContext, predicate: NSPredicate?, output: ShareStoreOutput) {
+    private func prepareForSharing(store: LoggerStore, predicate: NSPredicate?, output: ShareStoreOutput) async throws -> ShareItems {
+        switch output {
+        case .store:
+            return try await prepareStoreForSharing(store: store, predicate: predicate)
+        case .text, .html:
+            let output: ShareOutput = output == .text ? .plainText : .html
+            return try await prepareForSharing(store: store, output: output, predicate: predicate)
+        }
+    }
+
+    private func prepareStoreForSharing(store: LoggerStore, predicate: NSPredicate?) async throws -> ShareItems {
         let directory = TemporaryDirectory()
-        do {
-            switch output {
-            case .store:
-                let contents = try prepareStoreForSharing(store: store, context: context, directory: directory, predicate: predicate)
-                DispatchQueue.main.async {
-                    self.sharedContents = contents
-                    self.didFinishPreparingForSharing()
-                }
-            case .text, .html:
-                let output: ShareOutput = output == .text ? .plainText : .html
-                prepareForSharing(predicate: predicate, context: context, output: output) { contents in
-                    DispatchQueue.main.async {
-                        self.sharedContents = contents
-                        self.didFinishPreparingForSharing()
-                    }
-                }
-            }
 
-        } catch {
-            directory.remove()
-            DispatchQueue.main.async {
-                self.errorMessage = error.localizedDescription
-                self.didFinishPreparingForSharing()
-            }
-        }
-    }
-
-    private func didFinishPreparingForSharing() {
-        if isPrepareForSharingNeeded {
-            isPrepareForSharingNeeded = false
-            prepareForSharing()
-        } else {
-            isPreparingForSharing = false
-        }
-    }
-
-    private func prepareStoreForSharing(store: LoggerStore, context: NSManagedObjectContext, directory: TemporaryDirectory, predicate: NSPredicate?) throws -> SharedContents {
         let logsURL = directory.url.appendingPathComponent("logs-\(makeCurrentDate()).\(output.fileExtension)")
-        let info: LoggerStore.Info?
-        if let predicate = predicate {
-            info = try store.copy(to: logsURL, predicate: predicate)
-        } else {
-            info = try store.copy(to: logsURL)
+        try await store.export(to: logsURL, options: .init(predicate: predicate))
+        return ShareItems([logsURL], cleanup: directory.remove)
+    }
+
+    private func prepareForSharing(store: LoggerStore, output: ShareOutput, predicate: NSPredicate?) async throws -> ShareItems {
+        let entities = try await withUnsafeThrowingContinuation { continuation in
+            store.backgroundContext.perform {
+                let request = NSFetchRequest<LoggerMessageEntity>(entityName: "\(LoggerMessageEntity.self)")
+                request.predicate = predicate
+                let result = Result(catching: { try store.backgroundContext.fetch(request) })
+                continuation.resume(with: result)
+            }
         }
-        let item = ShareItems([logsURL], cleanup: directory.remove)
-        return SharedContents(item: item, size: try logsURL.getFileSize(), info: info)
-    }
-
-    private func prepareForSharing(predicate: NSPredicate?, context: NSManagedObjectContext, output: ShareOutput, _ completion: @escaping (SharedContents) -> Void) {
-        let request = NSFetchRequest<LoggerMessageEntity>(entityName: "\(LoggerMessageEntity.self)")
-        request.predicate = predicate
-        let messages = (try? context.fetch(request)) ?? []
-
-        ShareStoreTask(entities: messages, store: store!, output: output) { item in
-            guard let item = item else { return }
-            completion(SharedContents(item: item, size: item.size))
-        }.start()
-    }
-}
-
-private extension URL {
-    func getFileSize() throws -> Int64 {
-        let attributes = try FileManager.default.attributesOfItem(atPath: path)
-        return attributes[.size] as? Int64 ?? 0
-    }
-}
-
-struct SharedContents {
-    var item: ShareItems?
-    var size: Int64?
-    var info: LoggerStore.Info?
-
-    var formattedFileSize: String? {
-        size.map(ByteCountFormatter.string)
+        return try await ShareService.share(entities, store: store, as: output)
     }
 }
 

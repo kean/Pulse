@@ -35,6 +35,10 @@ extension LoggerStore {
         /// immediately retransmitted to the remote logger before any entities
         /// are even created.
         public static let synchronous = Options(rawValue: 1 << 2)
+
+        /// Opens store in a readonly mode. It won't perform sweeps and will
+        /// disallow any other modifications.
+        public static let readonly = Options(rawValue: 1 << 3)
     }
 
     /// The store configuration.

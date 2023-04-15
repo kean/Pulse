@@ -11,11 +11,13 @@ import Combine
 
 struct ShareStoreView: View {
     let store: LoggerStore
+    /// Preselected sessions.
+    var sessions: Set<UUID>?
 
     @StateObject private var viewModel = ShareStoreViewModel()
-    @State private var shareItem: ShareItems?
     @Binding var isPresented: Bool // presentationMode is buggy
 
+    #warning("test this on macos")
 #if os(macOS)
     let onShare: (ShareItems) -> Void
 #endif
@@ -23,16 +25,15 @@ struct ShareStoreView: View {
     var body: some View {
         Form {
             sectionSharingOptions
-            sectionStatus
             sectionShare
         }
-        .onAppear { viewModel.display(store) }
-        .navigationTitle("Sharing Options")
+        .onAppear { viewModel.store = store }
+        .navigationTitle("Share Store")
 #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarItems(leading: leadingBarItems)
 #endif
-        .sheet(item: $shareItem) {
+        .sheet(item: $viewModel.shareItems) {
             ShareView($0).onCompletion {
                 isPresented = false
             }
@@ -68,58 +69,19 @@ struct ShareStoreView: View {
         }
     }
 
-    private var sectionStatus: some View {
-        Section {
-            if viewModel.isPreparingForSharing {
-                HStack(spacing: 8) {
-#if os(iOS)
-                    ProgressView().id(UUID())
-#endif
-                    Text("Preparing for Sharing...")
-                        .foregroundColor(.secondary)
-                }
-            } else if let contents = viewModel.sharedContents {
-                if let info = contents.info {
-#if os(iOS)
-                    NavigationLink(destination: StoreDetailsView(source: .info(info))) {
-                        InfoRow(title: "Shared File Size", details: contents.formattedFileSize)
-                    }
-#else
-                    InfoRow(title: "Shared File Size", details: contents.formattedFileSize)
-#endif
-                } else {
-                    InfoRow(title: "Shared File Size", details: contents.formattedFileSize)
-                }
-            } else {
-                Text(viewModel.errorMessage ?? "Unavailable")
-                    .foregroundColor(.red)
-                    .lineLimit(3)
-            }
-        }
-    }
-
     private var sectionShare: some View {
         Section {
-            Button(action: buttonShareTapped) {
+            Button(action: { viewModel.buttonSharedTapped() }) {
                 HStack {
                     Spacer()
-                    Text("Share").bold()
+                    Text(viewModel.isPreparingForSharing ? "Exporting..." : "Share").bold()
                     Spacer()
                 }
             }
-            .disabled(viewModel.sharedContents == nil)
+            .disabled(viewModel.isPreparingForSharing)
             .foregroundColor(.white)
-            .listRowBackground(viewModel.sharedContents != nil ? Color.blue : Color.blue.opacity(0.33))
+            .listRowBackground(viewModel.isPreparingForSharing ? Color.blue.opacity(0.33) : Color.blue)
         }
-    }
-
-    private func buttonShareTapped() {
-        guard let item = viewModel.sharedContents?.item else { return }
-#if os(macOS)
-        onShare(item)
-#else
-        self.shareItem = item
-#endif
     }
 }
 

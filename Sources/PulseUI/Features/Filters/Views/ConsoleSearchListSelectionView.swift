@@ -49,6 +49,7 @@ struct ConsoleSearchListSelectionView<Element: Hashable, Label: View>: View {
 #else
     @State private var isExpandedListPresented = false
     @State private var isSearching = false
+
     var body: some View {
         if items.isEmpty {
             emptyView
@@ -129,7 +130,7 @@ struct ConsoleSearchListSelectionView<Element: Hashable, Label: View>: View {
 
     @ViewBuilder
     private var buttonToggleAll: some View {
-        Button(selection.isEmpty ? "Enable All" : "Disable All") {
+        Button(selection.isEmpty ? "Select All" : "Deselect All") {
             selection = selection.isEmpty ? Set(items) : []
         }
         .foregroundColor(.blue)
@@ -162,7 +163,9 @@ private struct ConsoleSearchListSelectionViewDemo: View {
     @State private var selection: Set<String>  = []
 
     var body: some View {
-        ConsoleSearchListSelectionView(title: "Labels", items: ["Debug", "Warning", "Error"], selection: $selection, description: { $0 }, label: { Text($0) })
+        List {
+            ConsoleSearchListSelectionView(title: "Labels", items: ["Debug", "Warning", "Error"], selection: $selection, description: { $0 }, label: { Text($0) })
+        }.listStyle(.plain)
     }
 }
 #endif

@@ -14,9 +14,13 @@ public final class LoggerStore: @unchecked Sendable {
     /// The URL the store was initialized with.
     public let storeURL: URL
 
+#warning("check how isArchive is used and switch to readonly instead")
     /// Returns `true` if the store was opened with a Pulse archive (a document
     /// with `.pulse` extension). The archives are readonly.
     public let isArchive: Bool
+
+    /// The options with which the store was opened with.
+    public  let options: Options
 
     /// The configuration with which the store was initialized with.
     public let configuration: Configuration
@@ -39,7 +43,6 @@ public final class LoggerStore: @unchecked Sendable {
     /// The store version.
     public var version: String { manifest.version.description }
 
-    private let options: Options
     private let document: PulseDocumentType
     private var isSaveScheduled = false
     private let queue = DispatchQueue(label: "com.github.kean.pulse.logger-store")
@@ -170,7 +173,7 @@ public final class LoggerStore: @unchecked Sendable {
             context.userInfo[WeakLoggerStore.loggerStoreKey] = WeakLoggerStore(store: self)
         }
 
-        if options.contains(.create) && configuration.isAutoStartingSession {
+        if options.contains(.create) && !options.contains(.readonly) && configuration.isAutoStartingSession {
             perform { _ in
                 let appInfo = Info.AppInfo.make()
                 self.saveEntity(for: self.session, info: appInfo)
@@ -187,7 +190,7 @@ public final class LoggerStore: @unchecked Sendable {
             }
         }
 
-        if !isArchive {
+        if !isArchive && !options.contains(.readonly) {
             try save(manifest)
             if isAutomaticSweepNeeded {
                 DispatchQueue.global().asyncAfter(deadline: .now() + .seconds(10)) { [weak self] in
@@ -218,7 +221,6 @@ public final class LoggerStore: @unchecked Sendable {
         self.manifest = .init(storeId: UUID(), version: .currentStoreVersion)
         self.document = .package
         self.options = []
-        self.session = Session.current
         self.configuration = .init()
     }
 
@@ -320,7 +322,7 @@ extension LoggerStore {
         message.createdAt = event.createdAt
         message.level = event.level.rawValue
         message.label = event.label
-        message.session = event.session
+        message.session = session.id
         message.text = event.message
         message.file = (event.file as NSString).lastPathComponent
         message.function = event.function
@@ -444,6 +446,7 @@ extension LoggerStore {
         responsesCache = [:]
     }
 
+#warning("move this to extensions")
     private func getHost(for url: URL) -> String? {
         if let host = url.host {
             return host
@@ -454,6 +457,7 @@ extension LoggerStore {
         return nil
     }
 
+#warning("move this to a separate struct/func")
     private func preprocessData(_ data: Data, contentType: NetworkLogger.ContentType?) -> Data {
         guard data.count > 5000 else { // 5 KB is ok
             return data
@@ -643,7 +647,6 @@ extension LoggerStore {
         return isCompressed ? decompress(data) : data
     }
 
-    @available(*, deprecated, message: "Deprecated, please use LoggerBlobHandleEntity/data")
     public func getBlobData(forKey key: String) -> Data? {
         guard let data = getRawData(forKey: key) else { return nil }
         return configuration.isBlobCompressionEnabled ? decompress(data) : data // This wont work in some scenarios
@@ -731,17 +734,21 @@ extension LoggerStore {
     /// Removes sessions with the given IDs.
     public func removeSessions(withIDs sessionIDs: Set<UUID>) {
         perform { _ in
-            try? self.deleteEntities(for: {
-                let request = LoggerSessionEntity.fetchRequest()
-                request.predicate = NSPredicate(format: "id IN %@", sessionIDs)
-                return request
-            }())
-            try? self.deleteEntities(for: {
-                let request = LoggerMessageEntity.fetchRequest()
-                request.predicate = NSPredicate(format: "session IN %@", sessionIDs)
-                return request
-            }())
+            try? self._removeSessions(withIDs: sessionIDs)
         }
+    }
+
+    private func _removeSessions(withIDs sessionIDs: Set<UUID>, isInverted: Bool = false) throws {
+        try deleteEntities(for: {
+            let request = LoggerSessionEntity.fetchRequest()
+            let predicate = NSPredicate(format: "id IN %@", sessionIDs)
+            request.predicate = isInverted ? NSCompoundPredicate(notPredicateWithSubpredicate: predicate) : predicate
+            return request
+        }())
+
+        var predicate = NSPredicate(format: "session IN %@", sessionIDs)
+        predicate = isInverted ? NSCompoundPredicate(notPredicateWithSubpredicate: predicate) : predicate
+        try removeMessages(with: predicate)
     }
 
     /// Removes all of the previously recorded messages.
@@ -783,12 +790,7 @@ extension LoggerStore {
     }
 }
 
-// MARK: - LoggerStore (Copy)
-
-#warning("add support for exporting as package")
-#warning("add support for exporting specific sessions")
-#warning("optimize size by not copying blobs")
-#warning("add support for predicate export when using archive")
+// MARK: - LoggerStore (Export)
 
 extension LoggerStore {
     public enum DocumentType {
@@ -798,77 +800,57 @@ extension LoggerStore {
         case archive
     }
 
+    /// Store export options.
+    public struct ExportOptions {
+        /// A predicate describing which messages (``LoggerMessageEntity``) to export.
+        public var predicate: NSPredicate?
+        /// A list of sessions to export.
+        public var sessions: Set<UUID>?
+
+        /// Initializes the store with the given options.
+        public init(predicate: NSPredicate? = nil, sessions: Set<UUID>? = nil) {
+            self.predicate = predicate
+            self.sessions = sessions
+        }
+    }
+
+#warning("add cancellation support")
+#warning("check if priority for Task is OK")
+
     /// Creates a copy of the current store at the given URL. The created copy
-    /// has `.pulse` extension (the document format is based on SQLite). If the
-    /// store is already an archive, creates a copy.
+    /// has `.pulse` extension.
     ///
     /// - parameters:
-    ///   - targetURL: The destination directory must already exist. But if the
+    ///   - targetURL: The destination directory must already exist. If the
     ///   file at the destination URL already exists, throws an error.
-    ///   - documentType: By default, `.archive`.
-    ///   - predicate: The predicate describing which messages to keep.
-    ///   - sessions: A list of sessions to share. By default is `nil` (share all sessions).
-    ///
-    /// - important Thread-safe. But must NOT be called inside the `backgroundContext` queue.
+    ///   - documentType: The document type. By default, `.archive`, which is optimized
+    ///   for size and sharing. See ``LoggerStore/DocumentType`` for more info.
+    ///   - options: The other sharing options.
     ///
     /// - returns: The information about the created store.
     @discardableResult
-    public func copy(
-        to targetURL: URL,
-        documentType: DocumentType = .archive,
-        predicate: NSPredicate? = nil,
-        sessions: Set<UUID>? = nil
-    ) throws -> Info {
-        // For package:
-        //
-        // IF target == archive
-        //    IF has predicate
-        //        copy with target = .package and predicate
-        //        copy with target = .archive
-        //    ELSE
-        //        create copy of database and insert existing files into archive
-        // ELSE target == package
-        //    create copy of database and manifest at target URL
-        //    IF has predicate
-        //        remove unwanted messages and sessions (removes inline blobs too)
-        //    copy only required blob files
-        //
-        // For archive:
-        //
-        //    the only difference is how we export blob files (accessing from database)
-        //    use existing API for accessing files should cover it
+    public func export(to targetURL: URL, as documentType: DocumentType = .archive, options: ExportOptions = .init()) async throws -> Info {
+        try await Task.detached {
+            try self._export(to: targetURL, as: documentType, options: options)
+        }.value
+    }
+
+    @discardableResult
+    private func _export(to targetURL: URL, as documentType: DocumentType, options: ExportOptions) throws -> Info {
         guard !FileManager.default.fileExists(atPath: targetURL.path) else {
             throw LoggerStore.Error.fileAlreadyExists
         }
         switch documentType {
         case .archive:
-            switch document {
-            case .package:
-                // 1.
-
-                return try backgroundContext.performAndReturn {
-                    try _copy(to: targetURL, predicate: predicate)
-                }
-            case .archive:
-                // IF no predicate
-                //   1.   copy as is
-                // ELSE
-                //   1. Create copy of the current store persistentStoreCoordinator.createCopyOfStore + manifest
-                //   2. Remove messages not matching the predicate
-                //   3. Remove messages not matching session
-                //   4. For all network tasks, copy only required blobs
-                //   5. Export the copy with no predicate
-
-                try Files.copyItem(at: storeURL, to: targetURL)
-                return try Info.make(storeURL: targetURL)
-            }
+            return try _exportAsArchive(to: targetURL, options: options)
         case .package:
-            #warning("temp")
-            return try _copyAsPackage(to: targetURL, predicate: predicate)
+            return try _exportAsPackage(to: targetURL, options: options)
         }
     }
 
-    private func _copyAsPackage(to targetURL: URL, predicate: NSPredicate?) throws -> Info {
+    // MARK: Export as Package
+
+    private func _exportAsPackage(to targetURL: URL, options: ExportOptions) throws -> Info {
         let temporary = TemporaryDirectory()
         defer { temporary.remove() }
 
@@ -881,43 +863,92 @@ extension LoggerStore {
         try container.persistentStoreCoordinator.createCopyOfStore(at: databaseURL)
 
         // Temporary open the target store (order is important)
-        var configuration = Configuration()
-        configuration.isBlobCompressionEnabled = self.configuration.isBlobCompressionEnabled
-        configuration.isAutoStartingSession = false
-        let store = try LoggerStore(storeURL: temporary.url, configuration: configuration)
-        defer { try? store.close() }
+        let target = try LoggerStore(storeURL: temporary.url, options: .readonly)
+        defer { try? target.close() }
 
-        // Remove messages based on the predicate
-        if let predicate = predicate {
-            try store.backgroundContext.performAndWait {
-                try store.removeMessages(with: NSCompoundPredicate(notPredicateWithSubpredicate: predicate))
-                try store.backgroundContext.save()
-            }
+        // Remove unwanted messages
+        backgroundContext.performAndWait {
+            try? target._removeUnwantedExportableContent(for: options)
         }
 
-        // Move (only needed) blobs to the target package
-        do {
-            let blobs = try store.backgroundContext.performAndReturn {
-                try store.backgroundContext.fetch(LoggerBlobHandleEntity.self) {
-                    $0.predicate = NSPredicate(format: "inlineData = nil")
-                }
-            }
-            Files.createDirectoryIfNeeded(at: store.blobsURL)
-            for key in blobs.map(\.key.hexString) {
-                try Files.copyItem(at: makeBlobURL(for: key), to: store.makeBlobURL(for: key))
-            }
-        } catch {
-            pulseLog("Failed to move blobs: \(error)")
+        // Copy required blobs
+        backgroundContext.performAndWait {
+            try? _exportBlobs(to: target)
         }
 
-        // Important to call before `move`.
-        let info = try store.info()
+        let info = try target.info()
+        try target.close() // important: has to be called before `move`.
+
         try Files.moveItem(at: temporary.url, to: targetURL)
         return info
     }
 
-    // There must be a simpler and more efficient way of doing it
-    private func _copy(to targetURL: URL, predicate: NSPredicate? = nil) throws -> Info {
+    /// Removes any content that doesn't match the given options.
+    ///
+    /// - note: It was the simpler option to implement than copying entities
+    /// one by one. The performance is acceptable for a rare operation like this,
+    /// but there might be better ways to implement this.
+    private func _removeUnwantedExportableContent(for options: ExportOptions) throws {
+        // Remove sessions based on the options
+        if let sessions = options.sessions {
+            try _removeSessions(withIDs: sessions, isInverted: true)
+        }
+        // Remove messages based on the predicates
+        if let predicate = options.predicate {
+            try removeMessages(with: NSCompoundPredicate(notPredicateWithSubpredicate: predicate))
+        }
+        if backgroundContext.hasChanges {
+            try backgroundContext.save()
+        }
+    }
+
+    /// Moves the blobs from the source store to the `target` store, keeping
+    /// only the entities present in the `target` store.
+    private func _exportBlobs(to target: LoggerStore) throws {
+        let blobs = try target.backgroundContext.fetch(LoggerBlobHandleEntity.self) {
+            $0.predicate = NSPredicate(format: "inlineData = nil")
+        }
+        Files.createDirectoryIfNeeded(at: target.blobsURL)
+        for key in blobs.map(\.key.hexString) {
+            switch document {
+            case .package:
+                try? Files.copyItem(at: makeBlobURL(for: key), to: target.makeBlobURL(for: key))
+            case let .archive(_, document):
+                try? document.getBlob(forKey: key)?.write(to: target.makeBlobURL(for: key))
+            }
+        }
+    }
+
+    // MARK: Export as Archive
+
+    private func _exportAsArchive(to targetURL: URL, options: ExportOptions) throws -> Info {
+        if options.predicate != nil || options.sessions != nil {
+            let temporary = TemporaryDirectory()
+            defer { temporary.remove() }
+
+            let tempStoreURL = temporary.url.appending(filename: "temp.pulse")
+            try _export(to: tempStoreURL, as: .package, options: options)
+
+            let target = try LoggerStore(storeURL: tempStoreURL, options: .readonly)
+            defer { try? target.close() }
+
+            return try target._exportPackageAsArchive(to: targetURL)
+        } else {
+            switch document {
+            case .package:
+                return try _exportPackageAsArchive(to: targetURL)
+            case .archive:
+                try Files.copyItem(at: storeURL, to: targetURL)
+                return try Info.make(storeURL: targetURL)
+            }
+        }
+    }
+
+    private func _exportPackageAsArchive(to targetURL: URL) throws -> Info {
+        if case .archive = document {
+            assertionFailure("Unsupported store type")
+        }
+
         let temporary = TemporaryDirectory()
         defer { temporary.remove() }
 
@@ -925,18 +956,11 @@ extension LoggerStore {
         let databaseURL = temporary.url.appending(filename: databaseFilename)
         try container.persistentStoreCoordinator.createCopyOfStore(at: databaseURL)
 
-        var info = try _info()
-
-        // Remove unwanted messages
-        if let predicate = predicate {
-            try Files.copyItem(at: manifestURL, to: temporary.url.appending(filename: manifestFilename)) // Important
-            info = try removeMessages(with: predicate, at: temporary.url)
-        }
+        var info = try self.info()
 
         let document = try PulseDocument(documentURL: targetURL)
         var totalSize: Int64 = 0
 
-#warning("how do we save only required files?")
         return try document.context.performAndReturn {
             // Add database
             let documentBlob = PulseBlobEntity(context: document.context)
@@ -982,16 +1006,9 @@ extension LoggerStore {
         }
     }
 
-    #warning("remove")
-    /// Temporary open the store, remove message, and close it.
-    private func removeMessages(with predicate: NSPredicate, at targetURL: URL) throws -> Info {
-        let store = try LoggerStore(storeURL: targetURL)
-        defer { try? store.close() }
-        return try store.backgroundContext.performAndReturn {
-            try store.removeMessages(with: NSCompoundPredicate(notPredicateWithSubpredicate: predicate))
-            try store.backgroundContext.save()
-            return try store._info()
-        }
+    @available(*, deprecated, message: "Deprecated") // 3.6
+    public func copy(to targetURL: URL, predicate: NSPredicate? = nil) throws -> Info {
+        try _export(to: targetURL, as: .archive, options: .init(predicate: predicate))
     }
 }
 

@@ -34,6 +34,18 @@ struct ShareItems: Identifiable {
 enum ShareService {
     private static var task: ShareStoreTask?
 
+    static func share(_ entities: [NSManagedObject], store: LoggerStore, as output: ShareOutput) async throws -> ShareItems {
+        try await withUnsafeThrowingContinuation { continuation in
+            ShareService.share(entities, store: store, as: output) {
+                if let value = $0 {
+                    continuation.resume(returning: value)
+                } else {
+                    continuation.resume(throwing: CancellationError())
+                }
+            }
+        }
+    }
+
     static func share(_ entities: [NSManagedObject], store: LoggerStore, as output: ShareOutput, _ completion: @escaping (ShareItems?) -> Void) {
         ShareStoreTask(entities: entities, store: store, output: output, completion: completion).start()
     }
