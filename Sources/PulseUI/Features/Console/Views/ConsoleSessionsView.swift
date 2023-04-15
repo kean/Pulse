@@ -11,10 +11,8 @@ import Combine
 #if os(iOS) || os(macOS)
 
 #warning("add more button with show in console (and something else?)")
-#warning("on single selection show session in console")
 #warning("preselect session on macOS too")
 #warning("add sharing on macOS too")
-#warning("is select all in the right place?")
 @available(macOS 13, *)
 struct ConsoleSessionsView: View {
     @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \LoggerSessionEntity.createdAt, ascending: false)])
@@ -92,6 +90,11 @@ struct ConsoleSessionsView: View {
         .listStyle(.plain)
         .environment(\.editMode, $editMode)
         .backport.searchable(text: $filterTerm)
+        .onChange(of: selection) {
+            guard !editMode.isEditing, !$0.isEmpty else { return }
+            consoleViewModel.searchCriteriaViewModel.select(sessions: $0)
+            consoleViewModel.router.isShowingSessions = false
+        }
 #else
         .listStyle(.inset)
         .backport.hideListContentBackground()
@@ -172,6 +175,7 @@ struct ConsoleSessionCell: View {
     let session: LoggerSessionEntity
 
     @Environment(\.store) private var store
+    @Environment(\.editMode) private var editMode
 
     var body: some View {
         HStack(alignment: .lastTextBaseline) {
@@ -192,7 +196,7 @@ struct ConsoleSessionCell: View {
 #endif
             }
         }
-        .listRowBackground(Color.clear)
+        .listRowBackground((editMode?.wrappedValue.isEditing ?? false) ? Color.clear : nil)
         .tag(session.id)
     }
 }
