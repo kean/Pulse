@@ -10,12 +10,13 @@ import Pulse
 import Combine
 
 struct ShareStoreView: View {
-    let store: LoggerStore
     /// Preselected sessions.
     var sessions: Set<UUID>?
 
     @StateObject private var viewModel = ShareStoreViewModel()
     @Binding var isPresented: Bool // presentationMode is buggy
+
+    @Environment(\.store) private var store: LoggerStore
 
     #warning("test this on macos")
 #if os(macOS)
@@ -90,10 +91,12 @@ struct ShareStoreView_Previews: PreviewProvider {
     static var previews: some View {
 #if os(iOS)
         NavigationView {
-            ShareStoreView(store: .mock, isPresented: .constant(true))
+            ShareStoreView(isPresented: .constant(true))
+                .environment(\.store, .demo)
         }
 #else
-        ShareStoreView(store: .mock, isPresented: .constant(true), onShare: { _ in })
+        ShareStoreView(isPresented: .constant(true), onShare: { _ in })
+            .environment(\.store, .demo)
             .frame(width: 300, height: 500)
 #endif
     }

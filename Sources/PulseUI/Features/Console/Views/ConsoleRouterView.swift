@@ -108,7 +108,7 @@ extension ConsoleRouterView {
 
     private var destinationShareStore: some View {
         NavigationView {
-            ShareStoreView(store: viewModel.store, isPresented: $router.isShowingShareStore)
+            ShareStoreView(isPresented: $router.isShowingShareStore)
         }.backport.presentationDetents([.medium])
     }
 }

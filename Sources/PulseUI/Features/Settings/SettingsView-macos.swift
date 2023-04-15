@@ -39,7 +39,7 @@ public struct SettingsView: View {
                     Label("Share Store", systemImage: "square.and.arrow.up")
                 }
                 .popover(isPresented: $isPresentingShareStoreView) {
-                    ShareStoreView(store: viewModel.store, isPresented: $isPresentingShareStoreView) { item in
+                    ShareStoreView(isPresented: $isPresentingShareStoreView) { item in
                         isPresentingShareStoreView = false
                         DispatchQueue.main.async {
                             shareItems = item

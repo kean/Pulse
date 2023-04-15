@@ -61,7 +61,7 @@ struct ConsoleSessionsView: View {
             }
             .sheet(isPresented: $isSharing) {
                 NavigationView {
-                    ShareStoreView(store: store, sessions: selection, isPresented: $isSharing)
+                    ShareStoreView(sessions: selection, isPresented: $isSharing)
                 }.backport.presentationDetents([.medium])
             }
 #endif
