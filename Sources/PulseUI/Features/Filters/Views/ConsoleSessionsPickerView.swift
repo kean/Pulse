@@ -9,12 +9,17 @@ struct ConsoleSessionsPickerView: View {
     @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \LoggerSessionEntity.createdAt, ascending: false)])
     private var sessions: FetchedResults<LoggerSessionEntity>
 
-    @State var selection: Set<LoggerSessionEntity> = []
+    @State var selection: Set<UUID> = []
 
     var body: some View {
-        ConsoleSearchListSelectionView(title: "Sessions", items: Array(sessions), selection: $selection, description: \.formattedDate, label: {
-            Text($0.formattedDate)
-        })
+        ConsoleSearchListSelectionView(
+            title: "Sessions",
+            items: sessions,
+            id: \.id,
+            selection: $selection,
+            description: \.formattedDate,
+            label: { Text($0.formattedDate) }
+        )
     }
 }
 

@@ -13,7 +13,7 @@ struct ConsoleSearchLogLevelsCell: View {
         VStack(alignment: .leading, spacing: -16) {
             HStack {
                 Spacer()
-                Button(viewModel.isAllLogLevelsEnabled ? "Disable All" : "Enable All") {
+                Button(viewModel.isAllLogLevelsEnabled ? "Deselect All" : "Select All") {
                     viewModel.isAllLogLevelsEnabled.toggle()
                 }
             }
@@ -39,7 +39,7 @@ struct ConsoleSearchLogLevelsCell: View {
         ForEach(LoggerStore.Level.allCases, id: \.self) { level in
             Checkbox(level.name.capitalized, isOn: viewModel.binding(forLevel: level))
         }
-        Button(viewModel.isAllLogLevelsEnabled ? "Disable All" : "Enable All") {
+        Button(viewModel.isAllLogLevelsEnabled ? "Deselect All" : "Select All") {
             viewModel.isAllLogLevelsEnabled.toggle()
         }
     }

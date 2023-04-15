@@ -116,6 +116,7 @@ extension ConsoleSearchCriteriaView {
             ConsoleSearchListSelectionView(
                 title: "Labels",
                 items: viewModel.labels,
+                id: \.self,
                 selection: $viewModel.selectedLabels,
                 description: { $0 },
                 label: {
@@ -160,6 +161,7 @@ extension ConsoleSearchCriteriaView {
             ConsoleSearchListSelectionView(
                 title: "Hosts",
                 items: viewModel.domains,
+                id: \.self,
                 selection: $viewModel.selectedHost,
                 description: { $0 },
                 label: {
