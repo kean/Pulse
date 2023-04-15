@@ -12,9 +12,9 @@ import Combine
 struct ShareStoreView: View {
     /// Preselected sessions.
     var sessions: Set<UUID>?
+    var onDismiss: () -> Void
 
     @StateObject private var viewModel = ShareStoreViewModel()
-    @Binding var isPresented: Bool // presentationMode is buggy
 
     @Environment(\.store) private var store: LoggerStore
 
@@ -35,9 +35,7 @@ struct ShareStoreView: View {
         .navigationBarItems(leading: leadingBarItems)
 #endif
         .sheet(item: $viewModel.shareItems) {
-            ShareView($0).onCompletion {
-                isPresented = false
-            }
+            ShareView($0).onCompletion(onDismiss)
         }
 #if os(macOS)
         .padding()
@@ -45,9 +43,7 @@ struct ShareStoreView: View {
     }
 
     private var leadingBarItems: some View {
-        Button("Cancel") {
-            isPresented = false
-        }
+        Button("Cancel", action: onDismiss)
     }
 
     private var sectionSharingOptions: some View {
@@ -91,7 +87,7 @@ struct ShareStoreView_Previews: PreviewProvider {
     static var previews: some View {
 #if os(iOS)
         NavigationView {
-            ShareStoreView(isPresented: .constant(true))
+            ShareStoreView(onDismiss: {})
                 .environment(\.store, .demo)
         }
 #else

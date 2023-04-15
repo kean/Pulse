@@ -19,6 +19,7 @@ struct ConsoleSessionsView: View {
 
     @State private var filterTerm = ""
     @State private var selection: Set<UUID> = []
+    @State private var sharedSessions: SharedSessions?
     @State private var limit = 12
     @State private var isSharing = false
     @State private var editMode: EditMode = .inactive
@@ -64,9 +65,9 @@ struct ConsoleSessionsView: View {
                     }
                 }
             }
-            .sheet(isPresented: $isSharing) {
+            .sheet(item: $sharedSessions) { sessions in
                 NavigationView {
-                    ShareStoreView(sessions: selection, isPresented: $isSharing)
+                    ShareStoreView(sessions: sessions.ids, onDismiss: { sharedSessions = nil })
                 }.backport.presentationDetents([.medium])
             }
 #endif
@@ -75,13 +76,13 @@ struct ConsoleSessionsView: View {
     private var list: some View {
         List(selection: $selection) {
             if !filterTerm.isEmpty {
-                ForEach(getFilteredSessions(), id: \.id, content: ConsoleSessionCell.init)
+                ForEach(getFilteredSessions(), id: \.id, content: makeCell)
             } else {
                 if sessions.count > limit {
-                    ForEach(sessions.prefix(limit), id: \.id, content: ConsoleSessionCell.init)
+                    ForEach(sessions.prefix(limit), id: \.id, content: makeCell)
                     buttonShowPreviousSessions
                 } else {
-                    ForEach(sessions, id: \.id, content: ConsoleSessionCell.init)
+                    ForEach(sessions, id: \.id, content: makeCell)
                 }
             }
         }
@@ -116,6 +117,24 @@ struct ConsoleSessionsView: View {
         .buttonStyle(.plain)
         .foregroundColor(.blue)
 #endif
+    }
+
+    @ViewBuilder
+    private func makeCell(for session: LoggerSessionEntity) -> some View {
+        ConsoleSessionCell(session: session)
+            .backport.swipeActions {
+                Button(action: {
+                    store.removeSessions(withIDs: [session.id])
+                }, label: {
+                    Label("Delete", systemImage: "trash")
+                }).backport.tint(Color.red)
+
+                Button(action: {
+                    sharedSessions = SharedSessions(ids: [session.id])
+                }) {
+                    Label("Share", systemImage: "square.and.arrow.up.fill")
+                }.backport.tint(.blue)
+            }
     }
 
 #if os(iOS)
@@ -203,6 +222,11 @@ struct ConsoleSessionCell: View {
         .listRowBackground((editMode?.wrappedValue.isEditing ?? false) ? Color.clear : nil)
         .tag(session.id)
     }
+}
+
+private struct SharedSessions: Hashable, Identifiable {
+    var id: SharedSessions { self }
+    let ids: Set<UUID>
 }
 
 #if DEBUG

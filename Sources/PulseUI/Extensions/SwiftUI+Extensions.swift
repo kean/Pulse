@@ -76,7 +76,44 @@ extension View {
     var backport: Backport<Self> { Backport(content: self) }
 }
 
+enum SwipeActionEdge {
+    case leading
+    case trailing
+
+#if os(iOS) || os(tvOS) || os(macOS)
+    @available(iOS 15, tvOS 15, *)
+    var native: HorizontalEdge {
+        switch self {
+        case .leading: return .leading
+        case .trailing: return .trailing
+        }
+    }
+#endif
+}
+
 extension Backport {
+    @ViewBuilder
+    func tint(_ color: Color) -> some View {
+        if #available(iOS 15, tvOS 15, *) {
+            content.tint(color)
+        } else {
+            content.foregroundColor(color)
+        }
+    }
+
+    @ViewBuilder
+    func swipeActions<T: View>(edge: SwipeActionEdge = .trailing, allowsFullSwipe: Bool = true, @ViewBuilder closure: () -> T) -> some View {
+#if os(iOS) || os(tvOS) || os(macOS)
+        if #available(iOS 15, tvOS 15, *) {
+            content.swipeActions(edge: edge.native, allowsFullSwipe: allowsFullSwipe, content: closure)
+        } else {
+            content
+        }
+#else
+        content
+#endif
+    }
+
     @ViewBuilder
     func searchable(text: Binding<String>) -> some View {
         if #available(iOS 15, tvOS 15, *) {
