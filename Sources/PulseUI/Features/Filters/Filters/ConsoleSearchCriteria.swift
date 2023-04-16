@@ -64,10 +64,6 @@ extension ConsoleSearchCriteria {
         static var recent: Dates {
             Dates(startDate: Date().addingTimeInterval(-1200))
         }
-
-        static var session: Dates {
-            Dates(startDate: LoggerStore.Session.current.startDate)
-        }
     }
 
     struct LogLevels: ConsoleFilterProtocol {

@@ -5,33 +5,15 @@
 import SwiftUI
 import Pulse
 
-#if os(iOS) || os(macOS) || os(tvOS)
+#if os(iOS) || os(macOS)
 
 struct ConsoleSearchTimePeriodCell: View {
     @Binding var selection: ConsoleSearchCriteria.Dates
-#if os(tvOS)
-    @State private var quickFilter: ConsoleDatesQuickFilter = .session
-#endif
 
     var body: some View {
-#if os(iOS) || os(macOS)
         DateRangePicker(title: "Start", date: $selection.startDate)
         DateRangePicker(title: "End", date: $selection.endDate)
         quickFilters
-#endif
-
-#if os(tvOS)
-        Picker("Date Range", selection: $quickFilter) {
-            ForEach(ConsoleDatesQuickFilter.allCases, id: \.self) {
-                Text($0.title).tag($0)
-            }
-        }
-        .onChange(of: quickFilter) {
-            if let filter = $0.makeDateFilter() {
-                selection = filter
-            }
-        }
-#endif
     }
 
     @ViewBuilder
@@ -49,25 +31,5 @@ struct ConsoleSearchTimePeriodCell: View {
         .foregroundColor(.blue)
     }
 }
-
-#if os(tvOS)
-private enum ConsoleDatesQuickFilter: String, Hashable, CaseIterable {
-    case session
-    case recent
-    case today
-    case all
-
-    var title: String { rawValue.capitalized }
-
-    func makeDateFilter() -> ConsoleSearchCriteria.Dates? {
-        switch self {
-        case .session: return .session
-        case .recent: return .recent
-        case .today: return .today
-        case .all: return nil
-        }
-    }
-}
-#endif
 
 #endif

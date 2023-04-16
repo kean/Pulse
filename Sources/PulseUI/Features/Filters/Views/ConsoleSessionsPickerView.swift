@@ -6,15 +6,13 @@ import SwiftUI
 import Pulse
 import CoreData
 
-#warning("temp")
-
 struct ConsoleSessionsPickerView: View {
     @Binding var selection: Set<UUID>
     @State private var isShowingPicker = false
 
     @Environment(\.store) private var store: LoggerStore
 
-#if os(watchOS)
+#if os(watchOS) || os(tvOS)
     @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \LoggerSessionEntity.createdAt, ascending: false)])
     private var sessions: FetchedResults<LoggerSessionEntity>
 #endif

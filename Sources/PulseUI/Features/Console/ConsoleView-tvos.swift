@@ -54,7 +54,7 @@ private struct ConsoleMenuView: View {
 
     var body: some View {
         Section {
-            Toggle(isOn: $viewModel.isOnlyErrors) {
+            Toggle(isOn: $viewModel.options.isOnlyErrors) {
                 Label("Errors Only", systemImage: "exclamationmark.octagon")
             }
             Toggle(isOn: consoleViewModel.bindingForNetworkMode) {
