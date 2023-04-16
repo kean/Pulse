@@ -11,7 +11,7 @@ import Combine
 
 @MainActor final class ShareStoreViewModel: ObservableObject {
     // Sharing options
-    @Published var timeRange: SharingTimeRange
+    @Published var sessions: Set<UUID> = []
     @Published var level: LoggerStore.Level
     @Published var output: ShareStoreOutput
 
@@ -22,7 +22,6 @@ import Combine
     var store: LoggerStore?
 
     init() {
-        timeRange = ConsoleSettings.shared.sharingTimeRange
         level = ConsoleSettings.shared.sharingLevel
         output = ConsoleSettings.shared.sharingOutput
     }
@@ -35,7 +34,6 @@ import Combine
     }
 
     private func saveSharingOptions() {
-        ConsoleSettings.shared.sharingTimeRange = timeRange
         ConsoleSettings.shared.sharingLevel = level
         ConsoleSettings.shared.sharingOutput = output
     }
@@ -58,22 +56,11 @@ import Combine
         }
     }
 
+#warning("add sessions predicate")
     private var predicate: NSPredicate? {
-        if timeRange == .all && level == .trace {
-            return nil
-        }
         var predicates: [NSPredicate] = []
-        switch timeRange {
-        case .currentSession:
-            let sessionID = store?.session.id ?? UUID()
-            predicates.append(.init(format: "session == %@", sessionID as CVarArg))
-        case .lastHour:
-            predicates.append(.init(format: "createdAt >= %@", Date().addingTimeInterval(-3600) as NSDate))
-        case .today:
-            let cutoffDate = Calendar.current.startOfDay(for: Date())
-            predicates.append(.init(format: "createdAt >= %@", cutoffDate as NSDate))
-        case .all:
-            break
+        if level == .trace {
+            return nil
         }
         if level != .trace {
             predicates.append(.init(format: "level >= %i", level.rawValue))
@@ -113,10 +100,3 @@ import Combine
 }
 
 #endif
-
-enum SharingTimeRange: String, CaseIterable, RawRepresentable {
-    case currentSession = "This Session"
-    case lastHour = "Last Hour"
-    case today = "Today"
-    case all = "All Messages"
-}

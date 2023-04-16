@@ -11,7 +11,7 @@ import Combine
 
 struct ShareStoreView: View {
     /// Preselected sessions.
-    var sessions: Set<UUID>?
+    @State var sessions: Set<UUID> = []
     var onDismiss: () -> Void
 
     @StateObject private var viewModel = ShareStoreViewModel()
@@ -28,7 +28,12 @@ struct ShareStoreView: View {
             sectionSharingOptions
             sectionShare
         }
-        .onAppear { viewModel.store = store }
+        .onAppear {
+            if sessions.isEmpty {
+                sessions = [store.session.id]
+            }
+            viewModel.store = store
+        }
         .navigationTitle("Share Store")
 #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
@@ -46,11 +51,15 @@ struct ShareStoreView: View {
         Button("Cancel", action: onDismiss)
     }
 
+#warning("select sessions fix AND pass current selection")
     private var sectionSharingOptions: some View {
         Section {
-            Picker("Time Range", selection: $viewModel.timeRange) {
-                ForEach(SharingTimeRange.allCases, id: \.self) {
-                    Text($0.rawValue).tag($0)
+            NavigationLink(destination: ConsoleSessionsView(isPicker: true)) {
+                HStack {
+                    Text("Sessions")
+                    Spacer()
+                    Text("Current")
+                        .foregroundColor(.secondary)
                 }
             }
             Picker("Minimum Log Level", selection: $viewModel.level) {
@@ -88,8 +97,8 @@ struct ShareStoreView_Previews: PreviewProvider {
 #if os(iOS)
         NavigationView {
             ShareStoreView(onDismiss: {})
-                .environment(\.store, .demo)
         }
+        .injectingEnvironment(.init(store: .mock))
 #else
         ShareStoreView(isPresented: .constant(true), onShare: { _ in })
             .environment(\.store, .demo)

@@ -14,9 +14,6 @@ final class ConsoleSettings: PersistentSettings {
     @UserDefault("console-line-limit")
     var lineLimit: Int = 4
 
-    @UserDefaultRaw("sharing-time-range")
-    var sharingTimeRange: SharingTimeRange = .all
-
     @UserDefault("link-detection")
     var isLinkDetectionEnabled = false
 
