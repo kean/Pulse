@@ -92,6 +92,10 @@ extension LoggerSessionEntity {
         formattedDate(isCompact: false)
     }
 
+    var searchTags: [String] {
+        possibleFormatters.map { $0.string(from: createdAt) }
+    }
+
     func formattedDate(isCompact: Bool = false) -> String {
         if isCompact {
             return compactDateFormatter.string(from: createdAt)
@@ -111,16 +115,11 @@ extension LoggerSessionEntity {
     }
 }
 
-private let compactDateFormatter: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.timeStyle = .medium
-    return formatter
-}()
+private let compactDateFormatter = DateFormatter(dateStyle: .none, timeStyle: .medium)
+private let fullDateFormatter = DateFormatter(dateStyle: .medium, timeStyle: .medium, isRelative: true)
 
-private let fullDateFormatter: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.dateStyle = .short
-    formatter.timeStyle = .medium
-    formatter.doesRelativeDateFormatting = true
-    return formatter
-}()
+private let possibleFormatters: [DateFormatter] = [
+    fullDateFormatter,
+    DateFormatter(dateStyle: .long, timeStyle: .none),
+    DateFormatter(dateStyle: .short, timeStyle: .none)
+]

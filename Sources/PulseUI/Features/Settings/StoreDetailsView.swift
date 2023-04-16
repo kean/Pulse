@@ -165,13 +165,7 @@ final class StoreDetailsViewModel: ObservableObject {
     }
 }
 
-private let dateFormatter: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.locale = Locale(identifier: "en_US")
-    formatter.dateStyle = .medium
-    formatter.timeStyle = .medium
-    return formatter
-}()
+private let dateFormatter = DateFormatter(dateStyle: .medium, timeStyle: .medium)
 
 #if DEBUG
 struct StoreDetailsView_Previews: PreviewProvider {

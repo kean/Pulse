@@ -86,8 +86,9 @@ struct SessionListView: View {
         }
     }
 
+    @ViewBuilder
     private func makeCell(for session: LoggerSessionEntity) -> some View {
-        ConsoleSessionCell(session: session)
+        ConsoleSessionCell(session: session, isCompact: isCompactCell)
             .backport.swipeActions {
                 Button(action: {
                     if session.id != store.session.id {
@@ -103,10 +104,20 @@ struct SessionListView: View {
             }
     }
 
-#warning("fix this not working and not displaying data correctly")
+    private var isCompactCell: Bool {
+#if os(macOS)
+        return true
+#else
+        return filterTerm.isEmpty
+#endif
+
+    }
+
     private func getFilteredSessions() -> [LoggerSessionEntity] {
         sessions.filter {
-            $0.formattedDate.firstRange(of: filterTerm, options: [.caseInsensitive]) != nil
+            $0.searchTags.contains(where: {
+                $0.firstRange(of: filterTerm, options: [.caseInsensitive]) != nil
+            })
         }
     }
 }

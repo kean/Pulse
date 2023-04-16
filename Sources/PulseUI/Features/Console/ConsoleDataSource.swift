@@ -219,14 +219,7 @@ private func makeName(for section: NSFetchedResultsSectionInfo, mode: ConsoleMod
     return name.isEmpty ? "–" : name
 }
 
-private let sessionDateFormatter: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.locale = Locale(identifier: "en_US")
-    formatter.dateStyle = .medium
-    formatter.timeStyle = .medium
-    formatter.doesRelativeDateFormatting = true
-    return formatter
-}()
+private let sessionDateFormatter = DateFormatter(dateStyle: .medium, timeStyle: .medium, isRelative: true)
 
 // MARK: - Delegates
 
