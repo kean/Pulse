@@ -94,72 +94,6 @@ extension URLRequest {
     }
 }
 
-#if !os(macOS)
-import UIKit.UIImage
-/// Alias for `UIImage`.
-typealias PlatformImage = UIImage
-#else
-import AppKit.NSImage
-/// Alias for `NSImage`.
-typealias PlatformImage = NSImage
-#endif
-
-#if os(watchOS)
-import ImageIO
-#endif
-
-enum Graphics {
-    /// Creates an image thumbnail. Uses significantly less memory than other options.
-    static func makeThumbnail(from data: Data, targetSize: CGFloat) -> PlatformImage? {
-        guard let source = CGImageSourceCreateWithData(data as CFData, [kCGImageSourceShouldCache: false] as CFDictionary) else {
-            return nil
-        }
-        let options = [
-            kCGImageSourceCreateThumbnailFromImageAlways: true,
-            kCGImageSourceCreateThumbnailFromImageIfAbsent: true,
-            kCGImageSourceCreateThumbnailWithTransform: true,
-            kCGImageSourceThumbnailMaxPixelSize: targetSize] as [CFString: Any]
-        guard let image = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary) else {
-            return nil
-        }
-        return PlatformImage(cgImage: image)
-    }
-
-    static func encode(_ image: PlatformImage) -> Data? {
-        guard let source = image.cgImage else {
-            return nil
-        }
-        let data = NSMutableData()
-#if os(watchOS)
-        let type: String = "public.jpeg"
-#else
-        let type: String = "public.heic"
-#endif
-        guard let destination = CGImageDestinationCreateWithData(data as CFMutableData, type as CFString, 1, nil) else {
-            return nil
-        }
-        let options: NSDictionary = [
-            kCGImageDestinationLossyCompressionQuality: 0.33
-        ]
-        CGImageDestinationAddImage(destination, source, options)
-        CGImageDestinationFinalize(destination)
-        guard !data.isEmpty else { return nil }
-        return data as Data
-    }
-}
-
-#if os(macOS)
-extension NSImage {
-    var cgImage: CGImage? {
-        cgImage(forProposedRect: nil, context: nil, hints: nil)
-    }
-
-    convenience init(cgImage: CGImage) {
-        self.init(cgImage: cgImage, size: .zero)
-    }
-}
-#endif
-
 extension URL {
     func directoryTotalSize() throws -> Int64 {
         guard let urls = Files.enumerator(at: self, includingPropertiesForKeys: nil)?.allObjects as? [URL] else { return 0 }
@@ -167,6 +101,16 @@ extension URL {
             let size = try $1.resourceValues(forKeys: [.fileSizeKey]).fileSize
             return Int64(size ?? 0) + $0
         }
+    }
+
+    func getHost() -> String? {
+        if let host = self.host {
+            return host
+        }
+        if self.scheme == nil, let url = URL(string: "https://" + self.absoluteString) {
+            return url.host ?? "" // URL(string: "example.com")?.host with not scheme returns host: ""
+        }
+        return nil
     }
 }
 

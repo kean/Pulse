@@ -14,7 +14,6 @@ public final class LoggerStore: @unchecked Sendable {
     /// The URL the store was initialized with.
     public let storeURL: URL
 
-#warning("check how isArchive is used and switch to readonly instead")
     /// Returns `true` if the store was opened with a Pulse archive (a document
     /// with `.pulse` extension). The archives are readonly.
     public let isArchive: Bool
@@ -336,7 +335,7 @@ extension LoggerStore {
         let entity = findOrCreateTask(forTaskId: event.taskId, taskType: event.taskType, createdAt: event.createdAt, label: event.label, url: event.originalRequest.url)
         
         entity.url = event.originalRequest.url?.absoluteString
-        entity.host = event.originalRequest.url.flatMap(getHost)
+        entity.host = event.originalRequest.url.flatMap { $0.getHost() }
         entity.httpMethod = event.originalRequest.httpMethod
         entity.requestState = NetworkTaskEntity.State.pending.rawValue
         entity.originalRequest = makeRequest(for: event.originalRequest)
@@ -362,7 +361,7 @@ extension LoggerStore {
         let entity = findOrCreateTask(forTaskId: event.taskId, taskType: event.taskType, createdAt: event.createdAt, label: event.label, url: event.originalRequest.url)
 
         entity.url = event.originalRequest.url?.absoluteString
-        entity.host = event.originalRequest.url.flatMap(getHost)
+        entity.host = event.originalRequest.url.flatMap { $0.getHost() }
         entity.httpMethod = event.originalRequest.httpMethod
         entity.statusCode = Int32(event.response?.statusCode ?? 0)
         entity.responseContentType = event.response?.contentType?.type
@@ -422,7 +421,7 @@ extension LoggerStore {
         entity.rawMetadata = {
             guard let responseBody = event.responseBody,
                (responseContentType?.isImage ?? false),
-                  let metadata = makeImageMetadata(from: responseBody) else {
+                  let metadata = Graphics.makeMetadata(from: responseBody) else {
                 return nil
             }
             return KeyValueEncoding.encodeKeyValuePairs(metadata)
@@ -446,18 +445,6 @@ extension LoggerStore {
         responsesCache = [:]
     }
 
-#warning("move this to extensions")
-    private func getHost(for url: URL) -> String? {
-        if let host = url.host {
-            return host
-        }
-        if url.scheme == nil, let url = URL(string: "https://" + url.absoluteString) {
-            return url.host ?? "" // URL(string: "example.com")?.host with not scheme returns host: ""
-        }
-        return nil
-    }
-
-#warning("move this to a separate struct/func")
     private func preprocessData(_ data: Data, contentType: NetworkLogger.ContentType?) -> Data {
         guard data.count > 5000 else { // 5 KB is ok
             return data
@@ -470,16 +457,6 @@ extension LoggerStore {
             return data
         }
         return data
-    }
-
-    private func makeImageMetadata(from data: Data) -> [String: String]? {
-        guard let image = PlatformImage(data: data) else {
-            return nil
-        }
-        return [
-            "ResponsePixelWidth": String(Int(image.size.width)),
-            "ResponsePixelHeight": String(Int(image.size.height))
-        ]
     }
 
     private func findTask(forTaskId taskId: UUID) -> NetworkTaskEntity? {
