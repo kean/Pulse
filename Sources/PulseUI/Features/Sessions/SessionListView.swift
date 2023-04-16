@@ -79,8 +79,15 @@ struct SessionListView: View {
 
             if editMode?.wrappedValue.isEditing ?? false {
                 Spacer()
-                Button("Select All") {
-                    selection.formUnion(Set(sessions.map(\.id)))
+
+                let ids = Set(sessions.map(\.id))
+                let isAllSelected = selection.intersection(ids).count == ids.count
+                Button(isAllSelected ? "Deselect All" : "Select All") {
+                    if isAllSelected {
+                        selection.subtract(ids)
+                    } else {
+                        selection.formUnion(ids)
+                    }
                 }.font(.subheadline)
             }
         }
