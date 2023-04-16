@@ -89,7 +89,7 @@ extension ConsoleSearchCriteriaView {
     }
 
     var timePeriodSection: some View {
-        ConsoleSection(isDividerHidden: true, header: {
+        ConsoleSection(header: {
             ConsoleSectionHeader(icon: "calendar", title: "Time Period", filter: $viewModel.criteria.shared.dates)
         }, content: {
             ConsoleSearchTimePeriodCell(selection: $viewModel.criteria.shared.dates)

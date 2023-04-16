@@ -10,6 +10,7 @@ import Combine
 
 #if os(iOS) || os(macOS)
 
+#warning("sections on macOS as well?")
 struct SessionListView: View {
     @Binding var selection: Set<UUID>
     @Binding var sharedSessions: SelectedSessionsIDs?
@@ -20,7 +21,9 @@ struct SessionListView: View {
     @State private var filterTerm = ""
     @State private var groupedSessions: [(Date, [LoggerSessionEntity])] = []
 
+#if os(iOS)
     @Environment(\.editMode) private var editMode
+#endif
     @Environment(\.store) private var store
 
     var body: some View {
@@ -29,10 +32,26 @@ struct SessionListView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .foregroundColor(.secondary)
         } else {
-            list
+            content
                 .onAppear { refreshGroups() }
                 .onChange(of: sessions.count) { _ in refreshGroups() }
         }
+    }
+
+    @ViewBuilder
+    private var content: some View {
+#if os(macOS)
+            VStack {
+                list
+                HStack {
+                    SearchBar(title: "Filter", imageName: "line.3.horizontal.decrease.circle", text: $filterTerm)
+                        .frame(maxWidth: 200)
+                    Spacer()
+                }.padding(8)
+            }
+#else
+            list
+#endif
     }
 
     private func refreshGroups() {
@@ -49,24 +68,18 @@ struct SessionListView: View {
             if !filterTerm.isEmpty {
                 ForEach(getFilteredSessions(), id: \.id, content: makeCell)
             } else {
-#if os(iOS)
                 ForEach(groupedSessions, id: \.0) { group in
                     Section(header: makeHeader(for: group.0, sessions: group.1)) {
                         ForEach(group.1, id: \.id, content: makeCell)
                     }
                 }
-#else
-                ForEach(sessions, id: \.id, content: makeCell)
-#endif
             }
         }
 #if os(iOS)
         .listStyle(.plain)
         .backport.searchable(text: $filterTerm)
 #else
-        .listStyle(.inset)
-        .backport.hideListContentBackground()
-        .contextMenu(forSelectionType: UUID.self, menu: contextMenu)
+        .listStyle(.sidebar)
 #endif
     }
 
@@ -77,6 +90,7 @@ struct SessionListView: View {
             .font(.headline)
             .padding(.vertical, 6)
 
+#if os(iOS)
             if editMode?.wrappedValue.isEditing ?? false {
                 Spacer()
 
@@ -90,12 +104,13 @@ struct SessionListView: View {
                     }
                 }.font(.subheadline)
             }
+#endif
         }
     }
 
     @ViewBuilder
     private func makeCell(for session: LoggerSessionEntity) -> some View {
-        ConsoleSessionCell(session: session, isCompact: isCompactCell)
+        ConsoleSessionCell(session: session, isCompact: filterTerm.isEmpty)
             .backport.swipeActions {
                 Button(action: {
                     if session.id != store.session.id {
@@ -109,15 +124,6 @@ struct SessionListView: View {
                     Label("Share", systemImage: "square.and.arrow.up.fill")
                 }.backport.tint(.blue)
             }
-    }
-
-    private var isCompactCell: Bool {
-#if os(macOS)
-        return true
-#else
-        return filterTerm.isEmpty
-#endif
-
     }
 
     private func getFilteredSessions() -> [LoggerSessionEntity] {
@@ -134,7 +140,9 @@ struct ConsoleSessionCell: View {
     var isCompact = true
 
     @Environment(\.store) private var store
+#if os(iOS)
     @Environment(\.editMode) private var editMode
+#endif
 
     var body: some View {
         HStack(alignment: .lastTextBaseline) {
@@ -155,8 +163,10 @@ struct ConsoleSessionCell: View {
 #endif
             }
         }
-        .listRowBackground((editMode?.wrappedValue.isEditing ?? false) ? Color.clear : nil)
         .tag(session.id)
+#if os(iOS)
+        .listRowBackground((editMode?.wrappedValue.isEditing ?? false) ? Color.clear : nil)
+#endif
     }
 }
 

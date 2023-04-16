@@ -10,14 +10,15 @@ import Combine
 
 #if os(iOS) || os(macOS)
 
-@available(macOS 13, *)
 struct SessionPickerView: View {
     @Binding var selection: Set<UUID>
 
     var body: some View {
         SessionListView(selection: $selection, sharedSessions: .constant(nil))
+#if os(iOS)
             .environment(\.editMode, .constant(.active))
             .inlineNavigationTitle("Sessions")
+#endif
     }
 }
 

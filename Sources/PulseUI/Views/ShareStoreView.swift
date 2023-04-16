@@ -14,40 +14,48 @@ struct ShareStoreView: View {
     var sessions: Set<UUID> = []
     var onDismiss: () -> Void
 
+    @State private var isShowingLabelPicker = false
     @StateObject private var viewModel = ShareStoreViewModel()
 
     @Environment(\.store) private var store: LoggerStore
 
-#if os(macOS)
-    let onShare: (ShareItems) -> Void
-#endif
-
     var body: some View {
+        content
+            .onAppear {
+                if !sessions.isEmpty {
+                    viewModel.sessions = sessions
+                } else if viewModel.sessions.isEmpty {
+                    viewModel.sessions = [store.session.id]
+                }
+                viewModel.store = store
+            }
+    }
+
+    @ViewBuilder
+    private var content: some View {
+#if os(iOS)
         Form {
             sectionSharingOptions
             sectionShare
         }
-        .onAppear {
-            if !sessions.isEmpty {
-                viewModel.sessions = sessions
-            } else if viewModel.sessions.isEmpty {
-                viewModel.sessions = [store.session.id]
-            }
-            viewModel.store = store
-        }
-        .navigationTitle("Share Logs")
-#if os(iOS)
-        .navigationBarTitleDisplayMode(.inline)
+        .inlineNavigationTitle("Share Logs")
         .navigationBarItems(leading: Button("Cancel", action: onDismiss))
-#endif
         .sheet(item: $viewModel.shareItems) {
             ShareView($0).onCompletion(onDismiss)
         }
-#if os(macOS)
-        .onChange(of: viewModel.shareItems) {
-            onShare($0)
+#elseif os(macOS)
+        Form {
+            sectionSharingOptions
+            Divider()
+            sectionShare.popover(item: $viewModel.shareItems, arrowEdge: .trailing) {
+                ShareView($0)
+            }
         }
+        .listStyle(.sidebar)
         .padding()
+        .popover(isPresented: $isShowingLabelPicker, arrowEdge: .trailing) {
+            destinationLogLevels.padding()
+        }
 #endif
     }
 
@@ -55,9 +63,19 @@ struct ShareStoreView: View {
     private var sectionSharingOptions: some View {
         Section {
             ConsoleSessionsPickerView(selection: $viewModel.sessions)
+#if os(iOS)
             NavigationLink(destination: destinationLogLevels) {
                 InfoRow(title: "Log Levels", details: viewModel.selectedLevelsTitle)
             }
+#else
+            HStack {
+                Text("Log Levels")
+                Spacer()
+                Button(action: { isShowingLabelPicker = true }) {
+                    Text(viewModel.selectedLevelsTitle + "...")
+                }
+            }
+#endif
         }
         Section {
             Picker("Output", selection: $viewModel.output) {
@@ -67,6 +85,9 @@ struct ShareStoreView: View {
                 Divider()
                 Text("Pulse (Package)").tag(ShareStoreOutput.package)
             }
+#if os(macOS)
+            .labelsHidden()
+#endif
         }
     }
 
@@ -79,15 +100,22 @@ struct ShareStoreView: View {
     private var sectionShare: some View {
         Section {
             Button(action: { viewModel.buttonSharedTapped() }) {
+#if os(iOS)
                 HStack {
                     Spacer()
-                    Text(viewModel.isPreparingForSharing ? "Exporting..." : "Share").bold()
+                    Text(viewModel.isPreparingForSharing ? "Exporting..." : "Share")
+                        .bold()
                     Spacer()
                 }
+#else
+                Text(viewModel.isPreparingForSharing ? "Exporting..." : "Share")
+#endif
             }
             .disabled(viewModel.isPreparingForSharing)
             .foregroundColor(.white)
+#if os(iOS)
             .listRowBackground(viewModel.isPreparingForSharing ? Color.blue.opacity(0.33) : Color.blue)
+#endif
         }
     }
 }
@@ -101,9 +129,9 @@ struct ShareStoreView_Previews: PreviewProvider {
         }
         .injectingEnvironment(.init(store: .mock))
 #else
-        ShareStoreView(isPresented: .constant(true), onShare: { _ in })
-            .environment(\.store, .demo)
-            .frame(width: 300, height: 500)
+        ShareStoreView(onDismiss: {})
+            .injectingEnvironment(.init(store: .mock))
+            .frame(width: 240).fixedSize()
 #endif
     }
 }

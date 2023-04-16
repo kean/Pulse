@@ -10,13 +10,14 @@ import Combine
 
 #if os(iOS) || os(macOS)
 
-#warning("preselect session on macOS too")
-#warning("add sharing on macOS too")
 @available(macOS 13, *)
 struct SessionsView: View {
     @State private var selection: Set<UUID> = []
     @State private var sharedSessions: SelectedSessionsIDs?
+
+#if os(iOS)
     @State private var editMode: EditMode = .inactive
+#endif
 
     @EnvironmentObject private var consoleViewModel: ConsoleViewModel
     @Environment(\.store) private var store
@@ -31,17 +32,9 @@ struct SessionsView: View {
 
     @ViewBuilder
     private var content: some View {
-#if os(macOS)
-            VStack {
-                list
-                HStack {
-                    Spacer()
-                    SearchBar(title: "Filter", imageName: "line.3.horizontal.decrease.circle", text: $filterTerm)
-                        .frame(maxWidth: 220)
-                }.padding(8)
-            }
-#else
-            list.toolbar {
+        list
+#if os(iOS)
+            .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(editMode.isEditing ? "Done" : "Edit") {
                         withAnimation {
@@ -60,6 +53,11 @@ struct SessionsView: View {
                     ShareStoreView(sessions: sessions.ids, onDismiss: { sharedSessions = nil })
                 }.backport.presentationDetents([.medium])
             }
+#else
+            .popover(item: $sharedSessions, arrowEdge: .leading) { sessions in
+                ShareStoreView(sessions: sessions.ids, onDismiss: { sharedSessions = nil })
+                    .frame(width: 240).fixedSize()
+            }
 #endif
     }
 
@@ -72,6 +70,7 @@ struct SessionsView: View {
                 showInConsole(sessions: $0)
             }
 #else
+            .contextMenu(forSelectionType: UUID.self, menu: contextMenu)
             .onChange(of: selection) {
                 guard consoleViewModel.searchCriteriaViewModel.criteria.shared.sessions.selection != $0 else { return }
                 consoleViewModel.searchCriteriaViewModel.select(sessions: $0)
@@ -123,10 +122,15 @@ struct SessionsView: View {
 #if os(macOS)
     @ViewBuilder
     private func contextMenu(for selection: Set<UUID>) -> some View {
+        Button(action: { sharedSessions = SelectedSessionsIDs(ids: selection) }, label: {
+            Label("Share", systemImage: "square.and.arrow.up")
+        })
+        .disabled(selection.isEmpty)
+
         if !store.isArchive {
             Button(role: .destructive, action: {
                 store.removeSessions(withIDs: selection)
-            }, label: { Text("Remove") })
+            }, label: { Label("Remove", systemImage: "trash") })
         }
     }
 #endif

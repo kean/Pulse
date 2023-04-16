@@ -76,6 +76,8 @@ private struct ConsoleLeftPanelView: View {
     @AppStorage("com-github-kean-pulse-display-mode") private var displayMode: ConsoleDisplayMode = .list
     @AppStorage("com-github-kean-pulse-is-now-enabled") private var isNowEnabled = true
 
+    @State private var isSharingStore = false
+
     var body: some View {
         let content = ConsoleContentView(viewModel: viewModel, displayMode: displayMode)
             .frame(minWidth: 200, idealWidth: 400, minHeight: 120, idealHeight: 480)
@@ -116,6 +118,13 @@ private struct ConsoleLeftPanelView: View {
         if !viewModel.store.isArchive {
             Toggle(isOn: $isNowEnabled) {
                 Image(systemName: "clock")
+            }
+            Button(action: { isSharingStore = true }) {
+                Image(systemName: "square.and.arrow.up")
+            }
+            .popover(isPresented: $isSharingStore, arrowEdge: .bottom) {
+                ShareStoreView(onDismiss: {})
+                    .frame(width: 240).fixedSize()
             }
             Button(action: { viewModel.store.removeAll() }) {
                 Image(systemName: "trash")

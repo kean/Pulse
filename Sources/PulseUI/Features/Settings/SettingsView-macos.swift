@@ -14,7 +14,6 @@ public struct SettingsView: View {
     var store: LoggerStore { viewModel.store }
 
     @State private var isPresentingShareStoreView = false
-    @State private var isPresentingStoreDetails = false
     @State private var shareItems: ShareItems?
 
     public init(store: LoggerStore = .shared) {
@@ -34,24 +33,6 @@ public struct SettingsView: View {
     @ViewBuilder
     private var settings: some View {
         ConsoleSection(isDividerHidden: true, header: { SectionHeaderView(title: "Share") }) {
-            HStack {
-                Button(action: { isPresentingShareStoreView = true }) {
-                    Label("Share Store", systemImage: "square.and.arrow.up")
-                }
-                .popover(isPresented: $isPresentingShareStoreView) {
-                    ShareStoreView(isPresented: $isPresentingShareStoreView) { item in
-                        isPresentingShareStoreView = false
-                        DispatchQueue.main.async {
-                            shareItems = item
-                        }
-                    }
-                }
-                .popover(item: $shareItems) { item in
-                    ShareView(item)
-                        .fixedSize()
-                }
-                Spacer()
-            }
             HStack {
                 Button("Show in Finder") {
                     NSWorkspace.shared.activateFileViewerSelecting([store.storeURL])
