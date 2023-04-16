@@ -57,14 +57,14 @@ public struct ConsoleView: View {
 
     @ViewBuilder
     private var trailingNavigationBarItems: some View {
+        Button(action: { viewModel.router.isShowingShareStore = true }) {
+            Label("Share", systemImage: "square.and.arrow.up")
+        }
         if viewModel.context.focus == nil {
-            ConsoleShareButton(viewModel: viewModel)
             Button(action: { viewModel.router.isShowingFilters = true }) {
                 Image(systemName: "line.horizontal.3.decrease.circle")
             }
             ConsoleContextMenu(viewModel: viewModel)
-        } else {
-            ConsoleShareButton(viewModel: viewModel)
         }
     }
 }

@@ -35,7 +35,7 @@ struct ShareStoreView: View {
             }
             viewModel.store = store
         }
-        .navigationTitle("Share Store")
+        .navigationTitle("Share Logs")
 #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarItems(leading: leadingBarItems)
