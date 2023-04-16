@@ -12,7 +12,7 @@ import Combine
 @MainActor final class ShareStoreViewModel: ObservableObject {
     // Sharing options
     @Published var sessions: Set<UUID> = []
-    @Published var level: LoggerStore.Level
+    @Published var logLevels = Set(LoggerStore.Level.allCases)
     @Published var output: ShareStoreOutput
 
     @Published private(set) var isPreparingForSharing = false
@@ -22,7 +22,6 @@ import Combine
     var store: LoggerStore?
 
     init() {
-        level = ConsoleSettings.shared.sharingLevel
         output = ConsoleSettings.shared.sharingOutput
     }
 
@@ -34,7 +33,6 @@ import Combine
     }
 
     private func saveSharingOptions() {
-        ConsoleSettings.shared.sharingLevel = level
         ConsoleSettings.shared.sharingOutput = output
     }
 
@@ -47,7 +45,8 @@ import Combine
 
         Task {
             do {
-                self.shareItems = try await prepareForSharing(store: store, predicate: predicate, output: output)
+                let options = LoggerStore.ExportOptions(predicate: predicate, sessions: sessions)
+                self.shareItems = try await prepareForSharing(store: store, options: options)
             } catch {
                 guard !(error is CancellationError) else { return }
                 self.errorMessage = error.localizedDescription
@@ -78,41 +77,56 @@ import Combine
         return try? store?.viewContext.fetch(request).first
     }
 
-#warning("add sessions predicate")
+    var selectedLevelsTitle: String {
+        if logLevels.count == 1 {
+            return logLevels.first!.name.capitalized
+        } else if logLevels.count == 0 {
+            return "–"
+        } else if logLevels == [.error, .critical] {
+            return "Errors"
+        } else if logLevels == [.warning, .error, .critical] {
+            return "Warnings & Errors"
+        } else if logLevels.count == LoggerStore.Level.allCases.count {
+            return "All"
+        } else {
+            return "\(logLevels.count)"
+        }
+    }
+
     private var predicate: NSPredicate? {
         var predicates: [NSPredicate] = []
-        if level == .trace {
-            return nil
+        if logLevels != Set(LoggerStore.Level.allCases) {
+            predicates.append(.init(format: "level IN %@", logLevels.map(\.rawValue)))
         }
-        if level != .trace {
-            predicates.append(.init(format: "level >= %i", level.rawValue))
+        if !sessions.isEmpty {
+            predicates.append(.init(format: "session IN %@", sessions))
         }
         return NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
     }
 
-    private func prepareForSharing(store: LoggerStore, predicate: NSPredicate?, output: ShareStoreOutput) async throws -> ShareItems {
+    private func prepareForSharing(store: LoggerStore, options: LoggerStore.ExportOptions) async throws -> ShareItems {
         switch output {
         case .store:
-            return try await prepareStoreForSharing(store: store, predicate: predicate)
+            return try await prepareStoreForSharing(store: store, options: options)
         case .text, .html:
             let output: ShareOutput = output == .text ? .plainText : .html
-            return try await prepareForSharing(store: store, output: output, predicate: predicate)
+            return try await prepareForSharing(store: store, output: output, options: options)
         }
     }
 
-    private func prepareStoreForSharing(store: LoggerStore, predicate: NSPredicate?) async throws -> ShareItems {
+    private func prepareStoreForSharing(store: LoggerStore, options: LoggerStore.ExportOptions) async throws -> ShareItems {
         let directory = TemporaryDirectory()
 
         let logsURL = directory.url.appendingPathComponent("logs-\(makeCurrentDate()).\(output.fileExtension)")
-        try await store.export(to: logsURL, options: .init(predicate: predicate))
+        try await store.export(to: logsURL, options: options)
         return ShareItems([logsURL], cleanup: directory.remove)
     }
 
-    private func prepareForSharing(store: LoggerStore, output: ShareOutput, predicate: NSPredicate?) async throws -> ShareItems {
+    private func prepareForSharing(store: LoggerStore, output: ShareOutput, options: LoggerStore.ExportOptions) async throws -> ShareItems {
         let entities = try await withUnsafeThrowingContinuation { continuation in
             store.backgroundContext.perform {
                 let request = NSFetchRequest<LoggerMessageEntity>(entityName: "\(LoggerMessageEntity.self)")
-                request.predicate = predicate
+                request.predicate = options.predicate // improtant: contains sessions
                 let result = Result(catching: { try store.backgroundContext.fetch(request) })
                 continuation.resume(with: result)
             }

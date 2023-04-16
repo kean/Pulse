@@ -103,8 +103,11 @@ struct SessionListView: View {
             }
     }
 
+#warning("fix this not working and not displaying data correctly")
     private func getFilteredSessions() -> [LoggerSessionEntity] {
-        sessions.filter { $0.formattedDate(isCompact: false).localizedCaseInsensitiveContains(filterTerm) }
+        sessions.filter {
+            $0.formattedDate.firstRange(of: filterTerm, options: [.caseInsensitive]) != nil
+        }
     }
 }
 

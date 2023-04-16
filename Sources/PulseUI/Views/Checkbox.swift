@@ -16,6 +16,7 @@ struct Checkbox<Label: View>: View {
                     .font(.title3)
                     .foregroundColor(isOn ? .blue : .separator)
                 label()
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
             .contentShape(Rectangle())
         }.buttonStyle(.plain)

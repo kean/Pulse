@@ -9,7 +9,6 @@ import CoreData
 import Pulse
 import Combine
 
-#warning("handle preselected sessions")
 struct ShareStoreView: View {
     /// Preselected sessions.
     var sessions: Set<UUID> = []
@@ -19,7 +18,6 @@ struct ShareStoreView: View {
 
     @Environment(\.store) private var store: LoggerStore
 
-    #warning("test this on macos")
 #if os(macOS)
     let onShare: (ShareItems) -> Void
 #endif
@@ -30,7 +28,9 @@ struct ShareStoreView: View {
             sectionShare
         }
         .onAppear {
-            if viewModel.sessions.isEmpty {
+            if !sessions.isEmpty {
+                viewModel.sessions = sessions
+            } else if viewModel.sessions.isEmpty {
                 viewModel.sessions = [store.session.id]
             }
             viewModel.store = store
@@ -38,41 +38,42 @@ struct ShareStoreView: View {
         .navigationTitle("Share Logs")
 #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
-        .navigationBarItems(leading: leadingBarItems)
+        .navigationBarItems(leading: Button("Cancel", action: onDismiss))
 #endif
         .sheet(item: $viewModel.shareItems) {
             ShareView($0).onCompletion(onDismiss)
         }
 #if os(macOS)
+        .onChange(of: viewModel.shareItems) {
+            onShare($0)
+        }
         .padding()
 #endif
     }
 
-    private var leadingBarItems: some View {
-        Button("Cancel", action: onDismiss)
-    }
-
+    @ViewBuilder
     private var sectionSharingOptions: some View {
         Section {
             NavigationLink(destination: SessionPickerView(selection: $viewModel.sessions)) {
-                HStack {
-                    Text("Sessions")
-                    Spacer()
-                    Text(viewModel.selectedSessionTitle)
-                        .foregroundColor(.secondary)
-                }
+                InfoRow(title: "Sessions", details: viewModel.selectedSessionTitle)
             }
-            Picker("Minimum Log Level", selection: $viewModel.level) {
-                Text("Trace").tag(LoggerStore.Level.trace)
-                Text("Debug").tag(LoggerStore.Level.debug)
-                Text("Error").tag(LoggerStore.Level.error)
+            NavigationLink(destination: destinationLogLevels) {
+                InfoRow(title: "Log Levels", details: viewModel.selectedLevelsTitle)
             }
+        }
+        Section {
             Picker("Output Format", selection: $viewModel.output) {
-                Text("Pulse File").tag(ShareStoreOutput.store)
+                Text("Pulse").tag(ShareStoreOutput.store)
                 Text("Plain Text").tag(ShareStoreOutput.text)
                 Text("HTML").tag(ShareStoreOutput.html)
             }
         }
+    }
+
+    private var destinationLogLevels: some View {
+        Form {
+            ConsoleSearchLogLevelsCell(selection: $viewModel.logLevels)
+        }.inlineNavigationTitle("Log Levels")
     }
 
     private var sectionShare: some View {

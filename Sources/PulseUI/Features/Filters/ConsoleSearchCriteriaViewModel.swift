@@ -98,33 +98,6 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
         }
     }
 
-    // MARK: Binding (LogLevels)
-
-    func binding(forLevel level: LoggerStore.Level) -> Binding<Bool> {
-        Binding(get: {
-            self.criteria.messages.logLevels.levels.contains(level)
-        }, set: { isOn in
-            if isOn {
-                self.criteria.messages.logLevels.levels.insert(level)
-            } else {
-                self.criteria.messages.logLevels.levels.remove(level)
-            }
-        })
-    }
-
-    var isAllLogLevelsEnabled: Bool {
-        get {
-            criteria.messages.logLevels.levels.count == LoggerStore.Level.allCases.count
-        }
-        set {
-            if newValue {
-                criteria.messages.logLevels.levels = Set(LoggerStore.Level.allCases)
-            } else {
-                criteria.messages.logLevels.levels = []
-            }
-        }
-    }
-
     // MARK: Binding (Labels)
 
     var selectedLabels: Set<String> {

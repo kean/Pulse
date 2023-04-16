@@ -6,16 +6,38 @@ import SwiftUI
 import Pulse
 
 struct ConsoleSearchLogLevelsCell: View {
-    @ObservedObject var viewModel: ConsoleSearchCriteriaViewModel
+    @Binding var selection: Set<LoggerStore.Level>
+
+    var isAllSelected: Bool {
+        selection.count == LoggerStore.Level.allCases.count
+    }
+
+    func toggleSelectAll() {
+        if isAllSelected {
+            selection = []
+        } else {
+            selection = Set(LoggerStore.Level.allCases)
+        }
+    }
+
+    func binding(forLevel level: LoggerStore.Level) -> Binding<Bool> {
+        Binding(get: {
+            self.selection.contains(level)
+        }, set: { isOn in
+            if isOn {
+                self.selection.insert(level)
+            } else {
+                self.selection.remove(level)
+            }
+        })
+    }
 
 #if os(macOS)
     var body: some View {
         VStack(alignment: .leading, spacing: -16) {
             HStack {
                 Spacer()
-                Button(viewModel.isAllLogLevelsEnabled ? "Deselect All" : "Select All") {
-                    viewModel.isAllLogLevelsEnabled.toggle()
-                }
+                Button(isAllSelected ? "Deselect All" : "Select All", action: toggleSelectAll)
             }
             HStack(spacing: 24) {
                 makeLevelsSection(levels: [.trace, .debug, .info])
@@ -30,17 +52,27 @@ struct ConsoleSearchLogLevelsCell: View {
         VStack(alignment: .leading) {
             Spacer()
             ForEach(levels, id: \.self) { level in
-                Toggle(level.name.capitalized, isOn: viewModel.binding(forLevel: level))
+                Toggle(level.name.capitalized, isOn: binding(forLevel: level))
             }
         }
     }
 #else
     var body: some View {
-        ForEach(LoggerStore.Level.allCases, id: \.self) { level in
-            Checkbox(level.name.capitalized, isOn: viewModel.binding(forLevel: level))
+        Section {
+            ForEach(LoggerStore.Level.allCases, id: \.self) { level in
+                HStack {
+                    Checkbox(level.name.capitalized, isOn: binding(forLevel: level))
+                    Circle()
+                        .frame(width: 8, height: 8)
+                        .foregroundColor(Color.textColor(for: level))
+                }
+            }
         }
-        Button(viewModel.isAllLogLevelsEnabled ? "Deselect All" : "Select All") {
-            viewModel.isAllLogLevelsEnabled.toggle()
+        Section {
+            Button("Select Only Errors") {
+                selection = [.error, .critical]
+            }
+            Button(isAllSelected ? "Deselect All" : "Select All", action: toggleSelectAll)
         }
     }
 #endif

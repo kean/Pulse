@@ -17,9 +17,6 @@ final class ConsoleSettings: PersistentSettings {
     @UserDefault("link-detection")
     var isLinkDetectionEnabled = false
 
-    @UserDefaultRaw("sharing-level")
-    var sharingLevel: LoggerStore.Level = .trace
-
     @UserDefaultRaw("sharing-output")
     var sharingOutput: ShareStoreOutput = .store
 

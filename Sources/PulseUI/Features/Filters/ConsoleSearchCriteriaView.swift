@@ -115,7 +115,7 @@ extension ConsoleSearchCriteriaView {
         ConsoleSection(header: {
             ConsoleSectionHeader(icon: "flag", title: "Levels", filter: $viewModel.criteria.messages.logLevels)
         }, content: {
-            ConsoleSearchLogLevelsCell(viewModel: viewModel)
+            ConsoleSearchLogLevelsCell(selection: $viewModel.criteria.messages.logLevels.levels)
         })
     }
 

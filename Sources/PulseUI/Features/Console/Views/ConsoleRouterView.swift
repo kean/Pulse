@@ -109,7 +109,7 @@ extension ConsoleRouterView {
     private var destinationShareStore: some View {
         NavigationView {
             ShareStoreView(onDismiss: { router.isShowingShareStore = false })
-        }.backport.presentationDetents([.medium])
+        }.backport.presentationDetents([.medium, .large])
     }
 }
 

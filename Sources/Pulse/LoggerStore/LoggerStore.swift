@@ -817,9 +817,6 @@ extension LoggerStore {
         }
     }
 
-#warning("add cancellation support")
-#warning("check if priority for Task is OK")
-
     /// Creates a copy of the current store at the given URL. The created copy
     /// has `.pulse` extension.
     ///
@@ -833,7 +830,7 @@ extension LoggerStore {
     /// - returns: The information about the created store.
     @discardableResult
     public func export(to targetURL: URL, as documentType: DocumentType = .archive, options: ExportOptions = .init()) async throws -> Info {
-        try await Task.detached {
+        try await Task.detached(priority: .userInitiated) {
             try self._export(to: targetURL, as: documentType, options: options)
         }.value
     }
