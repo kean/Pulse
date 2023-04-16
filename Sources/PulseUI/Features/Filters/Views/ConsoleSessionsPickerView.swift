@@ -6,18 +6,25 @@ import SwiftUI
 import Pulse
 import CoreData
 
+#warning("temp")
+
 struct ConsoleSessionsPickerView: View {
     @Binding var selection: Set<UUID>
     @State private var isShowingPicker = false
 
     @Environment(\.store) private var store: LoggerStore
 
+#if os(watchOS)
+    @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \LoggerSessionEntity.createdAt, ascending: false)])
+    private var sessions: FetchedResults<LoggerSessionEntity>
+#endif
+
     var body: some View {
 #if os(iOS)
         NavigationLink(destination: SessionPickerView(selection: $selection)) {
             InfoRow(title: "Sessions", details: selectedSessionTitle)
         }
-#else
+#elseif os(macOS)
         HStack {
             Text(selectedSessionTitle)
                 .lineLimit(1)
@@ -25,10 +32,21 @@ struct ConsoleSessionsPickerView: View {
             Spacer()
             Button("Select...") { isShowingPicker = true }
         }
-            .popover(isPresented: $isShowingPicker, arrowEdge: .trailing) {
-                SessionPickerView(selection: $selection)
-                    .frame(width: 260, height: 370)
-            }
+        .popover(isPresented: $isShowingPicker, arrowEdge: .trailing) {
+            SessionPickerView(selection: $selection)
+                .frame(width: 260, height: 370)
+
+        }
+#else
+        ConsoleSearchListSelectionView(
+            title: "Sessions",
+            items: sessions,
+            id: \.id,
+            selection: $selection,
+            description: \.formattedDate,
+            label: { ConsoleSessionCell(session: $0, isCompact: false) },
+            limit: 3
+        )
 #endif
     }
 

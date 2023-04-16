@@ -62,9 +62,11 @@ struct ConsoleSearchLogLevelsCell: View {
             ForEach(LoggerStore.Level.allCases, id: \.self) { level in
                 HStack {
                     Checkbox(level.name.capitalized, isOn: binding(forLevel: level))
+#if os(iOS)
                     Circle()
                         .frame(width: 8, height: 8)
                         .foregroundColor(Color.textColor(for: level))
+#endif
                 }
             }
         }

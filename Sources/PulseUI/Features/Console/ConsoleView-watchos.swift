@@ -19,7 +19,6 @@ public struct ConsoleView: View {
             ConsoleToolbarView(viewModel: viewModel)
             ConsoleListContentView(viewModel: viewModel.listViewModel)
         }
-        .injectingEnvironment(viewModel)
         .background(ConsoleRouterView(viewModel: viewModel))
         .navigationTitle(viewModel.title)
         .onAppear { viewModel.isViewVisible = true }
@@ -31,6 +30,7 @@ public struct ConsoleView: View {
                 }
             }
         }
+        .injectingEnvironment(viewModel)
     }
 }
 

@@ -26,7 +26,7 @@
 		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 	</array>
 	<key>WKCompanionAppBundleIdentifier</key>
-	<string>com.github.kean.PulseDemo</string>
+	<string>com.github.kean.pulse-demo</string>
 	<key>WKWatchKitApp</key>
 	<true/>
 </dict>

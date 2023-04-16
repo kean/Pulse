@@ -5,9 +5,11 @@
 import SwiftUI
 import Pulse
 
+#if os(iOS) || os(macOS) || os(tvOS)
+
 struct ConsoleSearchTimePeriodCell: View {
     @Binding var selection: ConsoleSearchCriteria.Dates
-#if os(tvOS) || os(watchOS)
+#if os(tvOS)
     @State private var quickFilter: ConsoleDatesQuickFilter = .session
 #endif
 
@@ -18,7 +20,7 @@ struct ConsoleSearchTimePeriodCell: View {
         quickFilters
 #endif
 
-#if os(tvOS) || os(watchOS)
+#if os(tvOS)
         Picker("Date Range", selection: $quickFilter) {
             ForEach(ConsoleDatesQuickFilter.allCases, id: \.self) {
                 Text($0.title).tag($0)
@@ -48,7 +50,7 @@ struct ConsoleSearchTimePeriodCell: View {
     }
 }
 
-#if os(tvOS) || os(watchOS)
+#if os(tvOS)
 private enum ConsoleDatesQuickFilter: String, Hashable, CaseIterable {
     case session
     case recent
@@ -66,4 +68,6 @@ private enum ConsoleDatesQuickFilter: String, Hashable, CaseIterable {
         }
     }
 }
+#endif
+
 #endif

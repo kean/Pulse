@@ -68,7 +68,9 @@ struct ConsoleSearchCriteriaView: View {
             labelsSection
         }
 
+#if os(iOS) || os(macOS)
         timePeriodSection
+#endif
     }
 
     private var buttonReset: some View {
@@ -88,6 +90,7 @@ extension ConsoleSearchCriteriaView {
         })
     }
 
+#if os(iOS) || os(macOS)
     var timePeriodSection: some View {
         ConsoleSection(header: {
             ConsoleSectionHeader(icon: "calendar", title: "Time Period", filter: $viewModel.criteria.shared.dates)
@@ -95,6 +98,7 @@ extension ConsoleSearchCriteriaView {
             ConsoleSearchTimePeriodCell(selection: $viewModel.criteria.shared.dates)
         })
     }
+#endif
 }
 
 // MARK: - ConsoleSearchView (Message)

@@ -116,7 +116,12 @@ extension LoggerSessionEntity {
 }
 
 private let compactDateFormatter = DateFormatter(dateStyle: .none, timeStyle: .medium)
+
+#if os(watchOS)
+private let fullDateFormatter = DateFormatter(dateStyle: .short, timeStyle: .short, isRelative: true)
+#else
 private let fullDateFormatter = DateFormatter(dateStyle: .medium, timeStyle: .medium, isRelative: true)
+#endif
 
 private let possibleFormatters: [DateFormatter] = [
     fullDateFormatter,

@@ -134,6 +134,21 @@ struct SessionListView: View {
     }
 }
 
+struct SelectedSessionsIDs: Hashable, Identifiable {
+    var id: SelectedSessionsIDs { self }
+    let ids: Set<UUID>
+}
+
+private let sectionTitleFormatter: DateFormatter = {
+    let formatter = DateFormatter()
+    formatter.dateStyle = .long
+    formatter.timeStyle = .none
+    formatter.doesRelativeDateFormatting = true
+    return formatter
+}()
+
+#endif
+
 struct ConsoleSessionCell: View {
     let session: LoggerSessionEntity
     var isCompact = true
@@ -149,37 +164,29 @@ struct ConsoleSessionCell: View {
                 .fontWeight(store.session.id == session.id ? .medium : .regular)
                 .lineLimit(1)
                 .layoutPriority(1)
-            Spacer()
-            if let version = session.fullVersion {
-                Text(version)
-                    .lineLimit(1)
-                    .frame(minWidth: 40)
-#if os(macOS)
-                    .foregroundColor(Color(UXColor.tertiaryLabelColor))
-#else
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-#endif
-            }
+            details
         }
         .tag(session.id)
 #if os(iOS)
         .listRowBackground((editMode?.wrappedValue.isEditing ?? false) ? Color.clear : nil)
 #endif
     }
-}
-
-struct SelectedSessionsIDs: Hashable, Identifiable {
-    var id: SelectedSessionsIDs { self }
-    let ids: Set<UUID>
-}
-
-private let sectionTitleFormatter: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.dateStyle = .long
-    formatter.timeStyle = .none
-    formatter.doesRelativeDateFormatting = true
-    return formatter
-}()
-
+    
+    @ViewBuilder
+    private var details: some View {
+#if !os(watchOS)
+        Spacer()
+        if let version = session.fullVersion {
+            Text(version)
+                .lineLimit(1)
+                .frame(minWidth: 40)
+#if os(macOS)
+                .foregroundColor(Color(UXColor.tertiaryLabelColor))
+#else
+                .font(.subheadline)
+                .foregroundColor(.secondary)
 #endif
+        }
+#endif
+    }
+}
