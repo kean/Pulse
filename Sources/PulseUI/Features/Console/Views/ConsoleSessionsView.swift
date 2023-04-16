@@ -14,15 +14,9 @@ import Combine
 #warning("add sharing on macOS too")
 @available(macOS 13, *)
 struct ConsoleSessionsView: View {
-    @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \LoggerSessionEntity.createdAt, ascending: false)])
-    private var sessions: FetchedResults<LoggerSessionEntity>
-
-    @State private var filterTerm = ""
     @State private var selection: Set<UUID> = []
     @State private var sharedSessions: SharedSessions?
-    @State private var isSharing = false
     @State private var editMode: EditMode = .inactive
-    @State private var groupedSessions: [(Date, [LoggerSessionEntity])] = []
 
     @EnvironmentObject private var consoleViewModel: ConsoleViewModel
     @Environment(\.store) private var store
@@ -30,24 +24,9 @@ struct ConsoleSessionsView: View {
     var body: some View {
         if let version = Version(store.version), version < Version(3, 6, 0) {
             PlaceholderView(imageName: "questionmark.app", title: "Unsupported", subtitle: "This feature requires a store created by Pulse version 3.6.0 or higher").padding()
-        } else if sessions.isEmpty {
-            Text("No Recorded Session")
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .foregroundColor(.secondary)
         } else {
             content
-                .onAppear { refreshGroups() }
-                .onChange(of: sessions.count) { _ in refreshGroups() }
         }
-    }
-
-    private func refreshGroups() {
-        let calendar = Calendar.current
-        let groups = Dictionary(grouping: sessions) {
-            let components = calendar.dateComponents([.day, .year, .month], from: $0.createdAt)
-            return calendar.date(from: components) ?? $0.createdAt
-        }
-        self.groupedSessions = Array(groups.sorted(by: { $0.key > $1.key }))
     }
 
     @ViewBuilder
@@ -85,72 +64,19 @@ struct ConsoleSessionsView: View {
     }
 
     private var list: some View {
-        List(selection: $selection) {
-            if !filterTerm.isEmpty {
-                ForEach(getFilteredSessions(), id: \.id, content: makeCell)
-            } else {
+        ConsoleSessionListView(selection: $selection, sharedSessions: $sharedSessions)
 #if os(iOS)
-                ForEach(groupedSessions, id: \.0) { group in
-                    Section(header: makeHeader(for: group.0, sessions: group.1)) {
-                        ForEach(group.1, id: \.id, content: makeCell)
-                    }
-                }
+            .environment(\.editMode, $editMode)
+            .onChange(of: selection) {
+                guard !editMode.isEditing, !$0.isEmpty else { return }
+                showInConsole(sessions: $0)
+            }
 #else
-                ForEach(sessions, id: \.id, content: makeCell)
+            .onChange(of: selection) {
+                guard consoleViewModel.searchCriteriaViewModel.criteria.shared.sessions.selection != $0 else { return }
+                consoleViewModel.searchCriteriaViewModel.select(sessions: $0)
+            }
 #endif
-            }
-        }
-#if os(iOS)
-        .listStyle(.plain)
-        .environment(\.editMode, $editMode)
-        .backport.searchable(text: $filterTerm)
-        .onChange(of: selection) {
-            guard !editMode.isEditing, !$0.isEmpty else { return }
-            showInConsole(sessions: $0)
-        }
-#else
-        .listStyle(.inset)
-        .backport.hideListContentBackground()
-        .contextMenu(forSelectionType: UUID.self, menu: contextMenu)
-        .onChange(of: selection) {
-            guard consoleViewModel.searchCriteriaViewModel.criteria.shared.sessions.selection != $0 else { return }
-            consoleViewModel.searchCriteriaViewModel.select(sessions: $0)
-        }
-#endif
-    }
-
-    private func makeHeader(for startDate: Date, sessions: [LoggerSessionEntity]) -> some View {
-        HStack {
-            (Text(sectionTitleFormatter.string(from: startDate)) +
-             Text(" (\(sessions.count))").foregroundColor(.secondary.opacity(0.5)))
-            .font(.headline)
-            .padding(.vertical, 6)
-
-            if editMode.isEditing {
-                Spacer()
-                Button("Select All") {
-                    selection.formUnion(Set(sessions.map(\.id)))
-                }.font(.subheadline)
-            }
-        }
-    }
-
-    @ViewBuilder
-    private func makeCell(for session: LoggerSessionEntity) -> some View {
-        ConsoleSessionCell(session: session)
-            .backport.swipeActions {
-                Button(action: {
-                    if session.id != store.session.id {
-                        store.removeSessions(withIDs: [session.id])
-                    }
-                }, label: {
-                    Label("Delete", systemImage: "trash")
-                }).backport.tint(Color.red)
-
-                Button(action: { sharedSessions = SharedSessions(ids: [session.id]) }) {
-                    Label("Share", systemImage: "square.and.arrow.up.fill")
-                }.backport.tint(.blue)
-            }
     }
 
 #if os(iOS)
@@ -173,7 +99,7 @@ struct ConsoleSessionsView: View {
 
             Spacer()
 
-            Button(action: { isSharing = true }, label: {
+            Button(action: { sharedSessions = SharedSessions(ids: selection) }, label: {
                 Image(systemName: "square.and.arrow.up")
             })
             .disabled(selection.isEmpty)
@@ -204,6 +130,100 @@ struct ConsoleSessionsView: View {
         }
     }
 #endif
+}
+
+private struct ConsoleSessionListView: View {
+    @Binding var selection: Set<UUID>
+    @Binding var sharedSessions: SharedSessions?
+
+    @FetchRequest(sortDescriptors: [NSSortDescriptor(keyPath: \LoggerSessionEntity.createdAt, ascending: false)])
+    private var sessions: FetchedResults<LoggerSessionEntity>
+
+    @State private var filterTerm = ""
+    @State private var groupedSessions: [(Date, [LoggerSessionEntity])] = []
+
+    @Environment(\.editMode) private var editMode
+    @Environment(\.store) private var store
+
+    var body: some View {
+        if sessions.isEmpty {
+            Text("No Recorded Session")
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .foregroundColor(.secondary)
+        } else {
+            list
+                .onAppear { refreshGroups() }
+                .onChange(of: sessions.count) { _ in refreshGroups() }
+        }
+    }
+
+    private func refreshGroups() {
+        let calendar = Calendar.current
+        let groups = Dictionary(grouping: sessions) {
+            let components = calendar.dateComponents([.day, .year, .month], from: $0.createdAt)
+            return calendar.date(from: components) ?? $0.createdAt
+        }
+        self.groupedSessions = Array(groups.sorted(by: { $0.key > $1.key }))
+    }
+
+    private var list: some View {
+        List(selection: $selection) {
+            if !filterTerm.isEmpty {
+                ForEach(getFilteredSessions(), id: \.id, content: makeCell)
+            } else {
+#if os(iOS)
+                ForEach(groupedSessions, id: \.0) { group in
+                    Section(header: makeHeader(for: group.0, sessions: group.1)) {
+                        ForEach(group.1, id: \.id, content: makeCell)
+                    }
+                }
+#else
+                ForEach(sessions, id: \.id, content: makeCell)
+#endif
+            }
+        }
+#if os(iOS)
+        .listStyle(.plain)
+        .backport.searchable(text: $filterTerm)
+#else
+        .listStyle(.inset)
+        .backport.hideListContentBackground()
+        .contextMenu(forSelectionType: UUID.self, menu: contextMenu)
+#endif
+    }
+
+    private func makeHeader(for startDate: Date, sessions: [LoggerSessionEntity]) -> some View {
+        HStack {
+            (Text(sectionTitleFormatter.string(from: startDate)) +
+             Text(" (\(sessions.count))").foregroundColor(.secondary.opacity(0.5)))
+            .font(.headline)
+            .padding(.vertical, 6)
+
+            if editMode?.wrappedValue.isEditing ?? false {
+                Spacer()
+                Button("Select All") {
+                    selection.formUnion(Set(sessions.map(\.id)))
+                }.font(.subheadline)
+            }
+        }
+    }
+
+    private func makeCell(for session: LoggerSessionEntity) -> some View {
+        ConsoleSessionCell(session: session)
+            .backport.swipeActions {
+                Button(action: {
+                    if session.id != store.session.id {
+                        store.removeSessions(withIDs: [session.id])
+                    }
+                }, label: {
+                    Label("Delete", systemImage: "trash")
+                }).backport.tint(Color.red)
+
+                Button(action: { sharedSessions = SharedSessions(ids: [session.id]) }) {
+                    Label("Share", systemImage: "square.and.arrow.up.fill")
+                }.backport.tint(.blue)
+            }
+    }
 
     private func getFilteredSessions() -> [LoggerSessionEntity] {
         sessions.filter { $0.formattedDate(isCompact: false).localizedCaseInsensitiveContains(filterTerm) }
