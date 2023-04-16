@@ -508,7 +508,7 @@ extension LoggerStore {
         entity.allowsConstrainedNetworkAccess = request.options.contains(.allowsConstrainedNetworkAccess)
         entity.httpShouldHandleCookies = request.options.contains(.httpShouldHandleCookies)
         entity.httpShouldUsePipelining = request.options.contains(.httpShouldUsePipelining)
-        entity.timeoutInterval = Int32(request.timeout)
+        entity.timeoutInterval = Int32(clamping: Int.max)
         entity.rawCachePolicy = UInt16(request.cachePolicy.rawValue)
         requestsCache[request] = entity
         return entity
