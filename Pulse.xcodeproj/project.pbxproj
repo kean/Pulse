@@ -80,7 +80,7 @@
 		0C7A0E00297C51CE00B4B69D /* ConsoleListOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7A0DFF297C51CE00B4B69D /* ConsoleListOptions.swift */; };
 		0C7A0E02297CE71400B4B69D /* FormattersTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7A0E01297CE71400B4B69D /* FormattersTests.swift */; };
 		0C840D4A29E07BE900362214 /* SelectableButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C840D4929E07BE900362214 /* SelectableButton.swift */; };
-		0C840D4C29E0A09B00362214 /* ConsoleSessionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C840D4B29E0A09B00362214 /* ConsoleSessionsView.swift */; };
+		0C840D4C29E0A09B00362214 /* SessionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C840D4B29E0A09B00362214 /* SessionsView.swift */; };
 		0C94239429B4D73E007F2784 /* ConsoleSearchOccurrenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C94239329B4D73E007F2784 /* ConsoleSearchOccurrenceTests.swift */; };
 		0C9F04F92884F34A0035239F /* Pulse_Demo_macOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9F04F82884F34A0035239F /* Pulse_Demo_macOSApp.swift */; };
 		0C9F04FD2884F34A0035239F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C9F04FC2884F34A0035239F /* Assets.xcassets */; };
@@ -276,6 +276,7 @@
 		0CF5E5FA2997DED7009FF7AE /* ConsoleTableViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF5E5F82997DE86009FF7AE /* ConsoleTableViewModelTests.swift */; };
 		0CF5E60929981ADF009FF7AE /* ShareStoreViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF5E60729981ADC009FF7AE /* ShareStoreViewModel.swift */; };
 		0CFD1CDB29E2E8FD003872EF /* LoggerStore+Remote.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CFD1CDA29E2E8FD003872EF /* LoggerStore+Remote.swift */; };
+		0CFF79DD29EB7A8E00BE767B /* SessionListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CFF79DB29EB7A8B00BE767B /* SessionListView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -532,7 +533,7 @@
 		0C7A0DFF297C51CE00B4B69D /* ConsoleListOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleListOptions.swift; sourceTree = "<group>"; };
 		0C7A0E01297CE71400B4B69D /* FormattersTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormattersTests.swift; sourceTree = "<group>"; };
 		0C840D4929E07BE900362214 /* SelectableButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectableButton.swift; sourceTree = "<group>"; };
-		0C840D4B29E0A09B00362214 /* ConsoleSessionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSessionsView.swift; sourceTree = "<group>"; };
+		0C840D4B29E0A09B00362214 /* SessionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionsView.swift; sourceTree = "<group>"; };
 		0C94239329B4D73E007F2784 /* ConsoleSearchOccurrenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchOccurrenceTests.swift; sourceTree = "<group>"; };
 		0C9F04F62884F34A0035239F /* Pulse Demo macOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pulse Demo macOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C9F04F82884F34A0035239F /* Pulse_Demo_macOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pulse_Demo_macOSApp.swift; sourceTree = "<group>"; };
@@ -728,6 +729,7 @@
 		0CF5E5F82997DE86009FF7AE /* ConsoleTableViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleTableViewModelTests.swift; sourceTree = "<group>"; };
 		0CF5E60729981ADC009FF7AE /* ShareStoreViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareStoreViewModel.swift; sourceTree = "<group>"; };
 		0CFD1CDA29E2E8FD003872EF /* LoggerStore+Remote.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LoggerStore+Remote.swift"; sourceTree = "<group>"; };
+		0CFF79DB29EB7A8B00BE767B /* SessionListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionListView.swift; sourceTree = "<group>"; };
 		49E82A8526D107A00070244F /* AlamofireIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlamofireIntegration.swift; sourceTree = "<group>"; };
 		49E82A8826D1083D0070244F /* MoyaIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoyaIntegration.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -1283,6 +1285,7 @@
 				0CF0D5DD296F189500EED9D4 /* Inspector */,
 				0CF0D5B3296F189500EED9D4 /* Filters */,
 				0CF0D5DE296F189500EED9D4 /* Metrics */,
+				0CFF79DA29EB7A8000BE767B /* Sessions */,
 				0CF0D5CE296F189500EED9D4 /* Settings */,
 				0CF0D5D6296F189500EED9D4 /* MessageDetails */,
 			);
@@ -1429,7 +1432,6 @@
 				0CE45E0B2977813400249C5D /* ConsoleToolbarView.swift */,
 				0C7A0DFC297C382300B4B69D /* ConsoleShareButton.swift */,
 				0CB345A5298DEEA6009428B2 /* ConsoleInspectorsView.swift */,
-				0C840D4B29E0A09B00362214 /* ConsoleSessionsView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -1471,6 +1473,15 @@
 				0C0352DB29948290008CDEF8 /* Helpers.swift */,
 			);
 			path = PulseUITests;
+			sourceTree = "<group>";
+		};
+		0CFF79DA29EB7A8000BE767B /* Sessions */ = {
+			isa = PBXGroup;
+			children = (
+				0C840D4B29E0A09B00362214 /* SessionsView.swift */,
+				0CFF79DB29EB7A8B00BE767B /* SessionListView.swift */,
+			);
+			path = Sessions;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -1988,6 +1999,7 @@
 				0CF0D66F296F189600EED9D4 /* NetworkInspectorView-watchos.swift in Sources */,
 				0CF0D671296F189600EED9D4 /* NetworkInspectorResponseBodyView.swift in Sources */,
 				0CF0D65B296F189600EED9D4 /* SettingsView-macos.swift in Sources */,
+				0CFF79DD29EB7A8E00BE767B /* SessionListView.swift in Sources */,
 				0CF0D626296F189600EED9D4 /* FileViewer.swift in Sources */,
 				0C40C09A296F77F1009ECF16 /* ConsoleSearchToggleCell.swift in Sources */,
 				0C63A380297A02D200F6A6A5 /* StringSearchOptions.swift in Sources */,
@@ -2096,7 +2108,7 @@
 				0C40C098296F777D009ECF16 /* ConsoleSearchResponseSourceCell.swift in Sources */,
 				0C3002B32986CEF30055F6C2 /* LoggerStoreIndex.swift in Sources */,
 				0CF0D689296F189600EED9D4 /* MainViewController.swift in Sources */,
-				0C840D4C29E0A09B00362214 /* ConsoleSessionsView.swift in Sources */,
+				0C840D4C29E0A09B00362214 /* SessionsView.swift in Sources */,
 				0CA32DE729D5E028001712E8 /* NSAttributedString+Extensions.swift in Sources */,
 				0CF0D60F296F189600EED9D4 /* UIKit+Extensions.swift in Sources */,
 				0CF0D610296F189600EED9D4 /* SpinnerView.swift in Sources */,

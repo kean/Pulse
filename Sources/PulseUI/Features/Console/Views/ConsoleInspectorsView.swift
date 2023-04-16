@@ -63,7 +63,7 @@ struct ConsoleInspectorsView: View {
             }
         case .sessions:
             if #available(macOS 13, *) {
-                ConsoleSessionsView()
+                SessionsView()
             }
         }
     }

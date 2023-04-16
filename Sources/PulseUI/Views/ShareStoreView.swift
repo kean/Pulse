@@ -54,7 +54,7 @@ struct ShareStoreView: View {
 #warning("select sessions fix AND pass current selection")
     private var sectionSharingOptions: some View {
         Section {
-            NavigationLink(destination: ConsoleSessionsView(isPicker: true)) {
+            NavigationLink(destination: SessionsView()) {
                 HStack {
                     Text("Sessions")
                     Spacer()

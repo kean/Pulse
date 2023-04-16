@@ -73,7 +73,7 @@ extension ConsoleRouterView {
     @ViewBuilder
     private var destinationSessions: some View {
         NavigationView {
-            ConsoleSessionsView()
+            SessionsView()
                 .navigationTitle("Sessions")
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
