@@ -54,9 +54,7 @@ struct ShareStoreView: View {
     @ViewBuilder
     private var sectionSharingOptions: some View {
         Section {
-            NavigationLink(destination: SessionPickerView(selection: $viewModel.sessions)) {
-                InfoRow(title: "Sessions", details: viewModel.selectedSessionTitle)
-            }
+            ConsoleSessionsPickerView(selection: $viewModel.sessions)
             NavigationLink(destination: destinationLogLevels) {
                 InfoRow(title: "Log Levels", details: viewModel.selectedLevelsTitle)
             }
