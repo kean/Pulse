@@ -56,6 +56,28 @@ import Combine
         }
     }
 
+    var selectedSessionTitle: String {
+        guard let store = store else {
+            return "\(sessions.count)"
+        }
+        if sessions.isEmpty {
+            return "–"
+        } else if sessions == [store.session.id] {
+            return "Current"
+        } else if sessions.count == 1, let session = session(withID: sessions.first!) {
+            return session.formattedDate
+        } else {
+            return "\(sessions.count)"
+        }
+    }
+
+    private func session(withID id: UUID) -> LoggerSessionEntity? {
+        let request = NSFetchRequest<LoggerSessionEntity>(entityName: String(describing: LoggerSessionEntity.self))
+        request.predicate = NSPredicate(format: "id == %@", id as NSUUID)
+        request.fetchLimit = 1
+        return try? store?.viewContext.fetch(request).first
+    }
+
 #warning("add sessions predicate")
     private var predicate: NSPredicate? {
         var predicates: [NSPredicate] = []

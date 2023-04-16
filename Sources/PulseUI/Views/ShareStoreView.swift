@@ -9,9 +9,10 @@ import CoreData
 import Pulse
 import Combine
 
+#warning("handle preselected sessions")
 struct ShareStoreView: View {
     /// Preselected sessions.
-    @State var sessions: Set<UUID> = []
+    var sessions: Set<UUID> = []
     var onDismiss: () -> Void
 
     @StateObject private var viewModel = ShareStoreViewModel()
@@ -29,8 +30,8 @@ struct ShareStoreView: View {
             sectionShare
         }
         .onAppear {
-            if sessions.isEmpty {
-                sessions = [store.session.id]
+            if viewModel.sessions.isEmpty {
+                viewModel.sessions = [store.session.id]
             }
             viewModel.store = store
         }
@@ -51,14 +52,13 @@ struct ShareStoreView: View {
         Button("Cancel", action: onDismiss)
     }
 
-#warning("select sessions fix AND pass current selection")
     private var sectionSharingOptions: some View {
         Section {
-            NavigationLink(destination: SessionsView()) {
+            NavigationLink(destination: SessionPickerView(selection: $viewModel.sessions)) {
                 HStack {
                     Text("Sessions")
                     Spacer()
-                    Text("Current")
+                    Text(viewModel.selectedSessionTitle)
                         .foregroundColor(.secondary)
                 }
             }

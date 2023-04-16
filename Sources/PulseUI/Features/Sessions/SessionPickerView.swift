@@ -17,6 +17,7 @@ struct SessionPickerView: View {
     var body: some View {
         SessionListView(selection: $selection, sharedSessions: .constant(nil))
             .environment(\.editMode, .constant(.active))
+            .inlineNavigationTitle("Sessions")
     }
 }
 
