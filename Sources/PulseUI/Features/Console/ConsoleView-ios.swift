@@ -31,9 +31,6 @@ public struct ConsoleView: View {
                         }
                     }
                 }
-                ToolbarItemGroup(placement: .navigationBarLeading) {
-                    leadingNavigationBarItems
-                }
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
                     trailingNavigationBarItems
                 }
@@ -47,12 +44,6 @@ public struct ConsoleView: View {
         var copy = self
         copy.isCloseButtonHidden = isHidden
         return copy
-    }
-
-    private var leadingNavigationBarItems: some View {
-        viewModel.onDismiss.map {
-            Button(action: $0) { Text("Close") }
-        }
     }
 
     @ViewBuilder

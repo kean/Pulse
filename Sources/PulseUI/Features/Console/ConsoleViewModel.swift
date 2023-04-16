@@ -61,8 +61,6 @@ final class ConsoleViewModel: ObservableObject {
 
     let initialMode: ConsoleMode
 
-    var onDismiss: (() -> Void)?
-
     var mode: ConsoleMode {
         didSet { prepare(for: mode) }
     }

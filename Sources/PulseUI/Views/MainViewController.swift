@@ -14,9 +14,8 @@ public final class MainViewController: UIViewController {
 
     public static var isAutomaticAppearanceOverrideRemovalEnabled = true
 
-    public init(store: LoggerStore = .shared, onDismiss: (() -> Void)? = nil) {
+    public init(store: LoggerStore = .shared) {
         self.viewModel = ConsoleViewModel(store: store)
-        self.viewModel.onDismiss = onDismiss
         super.init(nibName: nil, bundle: nil)
 
         if MainViewController.isAutomaticAppearanceOverrideRemovalEnabled {
@@ -27,6 +26,11 @@ public final class MainViewController: UIViewController {
         addChild(vc)
         view.addSubview(vc.view)
         vc.view.pinToSuperview()
+    }
+
+    @available(*, deprecated, message: "onDismiss parameter is deprecated")
+    public convenience init(store: LoggerStore = .shared, onDismiss: @escaping () -> Void) {
+        self.init(store: store)
     }
 
     required init?(coder: NSCoder) {

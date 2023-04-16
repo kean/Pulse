@@ -70,11 +70,9 @@ private final class SessionDelegate: NSObject, WCSessionDelegate {
                             guard let store = try? LoggerStore(storeURL: storeURL) else {
                                 return
                             }
-                            let vc = UIViewController.present { dismiss in
-                                return NavigationView {
-                                    let viewModel = ConsoleViewModel(store: store)
-                                    viewModel.onDismiss = dismiss
-                                    return ConsoleView(viewModel: viewModel)
+                            let vc = UIViewController.present { _ in
+                                NavigationView {
+                                    ConsoleView(store: store)
                                 }
                             }
                             vc?.onDeinit(directory.remove)
