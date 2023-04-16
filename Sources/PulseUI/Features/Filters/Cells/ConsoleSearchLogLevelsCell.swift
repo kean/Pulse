@@ -69,9 +69,6 @@ struct ConsoleSearchLogLevelsCell: View {
             }
         }
         Section {
-            Button("Select Only Errors") {
-                selection = [.error, .critical]
-            }
             Button(isAllSelected ? "Deselect All" : "Select All", action: toggleSelectAll)
         }
     }
