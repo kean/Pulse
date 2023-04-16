@@ -633,7 +633,7 @@ extension LoggerStore {
 
     public func getBlobData(forKey key: String) -> Data? {
         guard let data = getRawData(forKey: key) else { return nil }
-        return configuration.isBlobCompressionEnabled ? decompress(data) : data // This wont work in some scenarios
+        return configuration.isBlobCompressionEnabled ? decompress(data) : data // This won't work in some scenarios
     }
 
     private func getRawData(forKey key: String) -> Data? {

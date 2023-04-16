@@ -106,7 +106,7 @@ import Combine
         let entities = try await withUnsafeThrowingContinuation { continuation in
             store.backgroundContext.perform {
                 let request = NSFetchRequest<LoggerMessageEntity>(entityName: "\(LoggerMessageEntity.self)")
-                request.predicate = options.predicate // improtant: contains sessions
+                request.predicate = options.predicate // important: contains sessions
                 let result = Result(catching: { try store.backgroundContext.fetch(request) })
                 continuation.resume(with: result)
             }
