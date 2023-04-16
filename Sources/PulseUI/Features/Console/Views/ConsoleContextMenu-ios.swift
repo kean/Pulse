@@ -32,9 +32,6 @@ struct ConsoleContextMenu: View {
                 Button(action: { router.isShowingStoreInfo = true }) {
                     Label("Store Info", systemImage: "info.circle")
                 }
-                Button(action: { router.isShowingShareStore = true }) {
-                    Label("Share Store", systemImage: "square.and.arrow.up")
-                }
                 if !viewModel.store.isArchive {
                     Button.destructive(action: buttonRemoveAllTapped) {
                         Label("Remove Logs", systemImage: "trash")
