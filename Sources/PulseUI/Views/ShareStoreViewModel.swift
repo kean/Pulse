@@ -107,18 +107,20 @@ import Combine
     private func prepareForSharing(store: LoggerStore, options: LoggerStore.ExportOptions) async throws -> ShareItems {
         switch output {
         case .store:
-            return try await prepareStoreForSharing(store: store, options: options)
+            return try await prepareStoreForSharing(store: store, as: .archive, options: options)
+        case .package:
+            return try await prepareStoreForSharing(store: store, as: .package, options: options)
         case .text, .html:
             let output: ShareOutput = output == .text ? .plainText : .html
             return try await prepareForSharing(store: store, output: output, options: options)
         }
     }
 
-    private func prepareStoreForSharing(store: LoggerStore, options: LoggerStore.ExportOptions) async throws -> ShareItems {
+    private func prepareStoreForSharing(store: LoggerStore, as docType: LoggerStore.DocumentType, options: LoggerStore.ExportOptions) async throws -> ShareItems {
         let directory = TemporaryDirectory()
 
         let logsURL = directory.url.appendingPathComponent("logs-\(makeCurrentDate()).\(output.fileExtension)")
-        try await store.export(to: logsURL, options: options)
+        try await store.export(to: logsURL, as: docType, options: options)
         return ShareItems([logsURL], cleanup: directory.remove)
     }
 

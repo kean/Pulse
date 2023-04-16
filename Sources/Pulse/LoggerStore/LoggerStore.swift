@@ -829,18 +829,18 @@ extension LoggerStore {
     ///
     /// - returns: The information about the created store.
     @discardableResult
-    public func export(to targetURL: URL, as documentType: DocumentType = .archive, options: ExportOptions = .init()) async throws -> Info {
+    public func export(to targetURL: URL, as docType: DocumentType = .archive, options: ExportOptions = .init()) async throws -> Info {
         try await Task.detached(priority: .userInitiated) {
-            try self._export(to: targetURL, as: documentType, options: options)
+            try self._export(to: targetURL, as: docType, options: options)
         }.value
     }
 
     @discardableResult
-    private func _export(to targetURL: URL, as documentType: DocumentType, options: ExportOptions) throws -> Info {
+    private func _export(to targetURL: URL, as docType: DocumentType, options: ExportOptions) throws -> Info {
         guard !FileManager.default.fileExists(atPath: targetURL.path) else {
             throw LoggerStore.Error.fileAlreadyExists
         }
-        switch documentType {
+        switch docType {
         case .archive:
             return try _exportAsArchive(to: targetURL, options: options)
         case .package:

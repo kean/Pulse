@@ -62,10 +62,12 @@ struct ShareStoreView: View {
             }
         }
         Section {
-            Picker("Output Format", selection: $viewModel.output) {
+            Picker("Output", selection: $viewModel.output) {
                 Text("Pulse").tag(ShareStoreOutput.store)
                 Text("Plain Text").tag(ShareStoreOutput.text)
                 Text("HTML").tag(ShareStoreOutput.html)
+                Divider()
+                Text("Pulse (Package)").tag(ShareStoreOutput.package)
             }
         }
     }
