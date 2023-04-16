@@ -150,7 +150,6 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
 
     // MARK: - Backward Compatibility
 
-#warning("add test for accessing blobs and other data")
     func testOpenOldStore_v3_1() throws {
         // GIVEN
         let storeURL = directory.url.appending(filename: "logs-archive-3-1.pulse")
@@ -176,6 +175,12 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
         XCTAssertEqual(tasks.count, 8)
         let task = try XCTUnwrap(tasks.first)
         XCTAssertEqual(task.url, "https://github.com/profile/valdo")
+
+        // THEN blobs are readable
+        for blob in try store.viewContext.fetch(LoggerBlobHandleEntity.self) {
+            let blob = try XCTUnwrap(blob.data)
+            XCTAssertFalse(blob.isEmpty)
+        }
     }
 
     func testOpenOldStore_v3_3() throws {
@@ -203,6 +208,12 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
         XCTAssertEqual(tasks.count, 8)
         let task = try XCTUnwrap(tasks.last)
         XCTAssertEqual(task.url, "https://github.com/repos/kean/Nuke")
+
+        // THEN blobs are readable
+        for blob in try store.viewContext.fetch(LoggerBlobHandleEntity.self) {
+            let blob = try XCTUnwrap(blob.data)
+            XCTAssertFalse(blob.isEmpty)
+        }
     }
 
     // MARK: - Store Request
@@ -305,16 +316,22 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
         // GIVEN the store with 5 minute max age
         let store = makeStore {
             $0.maxAge = 300
+            $0.isAutoStartingSession = false
         }
         defer { try? store.destroy() }
 
+        let sessionOneID = UUID()
+        let sessionTwoID = UUID()
+
         // GIVEN some messages stored before the cutoff date
         date = Date().addingTimeInterval(-1000)
+        store.startSession(.init(id: sessionOneID, startDate: date), info: .make())
         store.storeMessage(label: "deleted", level: .debug, message: "test")
         store.storeRequest(URLRequest(url: URL(string: "example.com/deleted")!), response: nil, error: nil, data: nil)
 
         // GIVEN some messages stored after
         date = Date()
+        store.startSession(.init(id: sessionTwoID, startDate: date), info: .make())
         store.storeMessage(label: "kept", level: .debug, message: "test")
         store.storeRequest(URLRequest(url: URL(string: "example.com/kept")!), response: nil, error: nil, data: nil)
 
@@ -328,7 +345,8 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
         // WHEN
         store.syncSweep()
 
-        // THEN
+        // THEN session one is deleted
+        XCTAssertEqual(try context.fetch(LoggerSessionEntity.self).map(\.id), [sessionTwoID])
         XCTAssertEqual(try context.count(for: LoggerMessageEntity.self), 2)
         XCTAssertEqual(try context.count(for: NetworkTaskEntity.self), 1)
         XCTAssertEqual(try context.count(for: NetworkTaskProgressEntity.self), 0)
@@ -342,12 +360,14 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
         // GIVEN the store with 5 minute max age
         let store = makeStore {
             $0.maxAge = 300
+            $0.isAutoStartingSession = false
         }
         defer { try? store.destroy() }
 
         // GIVEN a request with response body stored
         date = Date().addingTimeInterval(-1000)
         let responseData = "body".data(using: .utf8)!
+        store.startSession(.init(id: UUID(), startDate: date), info: .make())
         store.storeRequest(URLRequest(url: URL(string: "example.com/deleted")!), response: nil, error: nil, data: responseData)
 
         // ASSERT
@@ -369,12 +389,14 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
         // GIVEN the store with 5 minute max age
         let store = makeStore {
             $0.maxAge = 300
+            $0.isAutoStartingSession = false
         }
         defer { try? store.destroy() }
 
         // GIVEN a request with response body stored
         date = Date().addingTimeInterval(-1000)
         let responseData = "body".data(using: .utf8)!
+        store.startSession(.init(id: UUID(), startDate: date), info: .make())
         store.storeRequest(URLRequest(url: URL(string: "example.com/deleted1")!), response: nil, error: nil, data: responseData)
         store.storeRequest(URLRequest(url: URL(string: "example.com/deleted2")!), response: nil, error: nil, data: responseData)
 
@@ -394,16 +416,19 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
         // GIVEN the store with 5 minute max age
         let store = makeStore {
             $0.maxAge = 300
+            $0.isAutoStartingSession = false
         }
         defer { try? store.destroy() }
 
         // GIVEN a request with response body stored
         date = Date().addingTimeInterval(-1000)
         let responseData = "body".data(using: .utf8)!
+        store.startSession(.init(id: UUID(), startDate: date), info: .make())
         store.storeRequest(URLRequest(url: URL(string: "example.com/deleted")!), response: nil, error: nil, data: responseData)
 
         // GIVEN a request that's not deleted
         date = Date()
+        store.startSession(.init(id: UUID(), startDate: date), info: .make())
         store.storeRequest(URLRequest(url: URL(string: "example.com/kept")!), response: nil, error: nil, data: responseData)
 
         // ASSERT

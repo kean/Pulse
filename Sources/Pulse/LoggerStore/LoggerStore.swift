@@ -585,7 +585,6 @@ extension LoggerStore {
             return entity
         }
 
-
         let entity = LoggerBlobHandleEntity(context: backgroundContext)
         entity.key = key
         entity.linkCount = 1
@@ -1022,7 +1021,12 @@ extension LoggerStore {
 
     private func removeExpiredMessages() throws {
         let cutoffDate = configuration.makeCurrentDate().addingTimeInterval(-configuration.maxAge)
-        try removeMessages(before: cutoffDate)
+        let sessionIDs = try backgroundContext.fetch(LoggerSessionEntity.self) {
+            $0.predicate = NSPredicate(format: "createdAt < %@", cutoffDate as NSDate)
+        }.map(\.id)
+        if !sessionIDs.isEmpty {
+            try _removeSessions(withIDs: Set(sessionIDs))
+        }
     }
 
     private func reduceDatabaseSize() throws {
