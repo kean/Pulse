@@ -17,7 +17,6 @@ final class ConsoleRouter: ObservableObject {
     @Published var isShowingSessions = false
     @Published var isShowingStoreInfo = false
     @Published var isShowingShareStore = false
-    @Published var isShowingDocumentBrowser = false
 }
 
 #if os(macOS)
@@ -51,7 +50,6 @@ extension ConsoleRouterView {
             .sheet(isPresented: $router.isShowingStoreInfo) { destinationStoreInfo }
             .sheet(isPresented: $router.isShowingShareStore) { destinationShareStore }
             .sheet(item: $router.shareItems, content: ShareView.init)
-            .fullScreenCover(isPresented: $router.isShowingDocumentBrowser) { DocumentBrowser() }
     }
 
     private var destinationFilters: some View {
@@ -110,18 +108,6 @@ extension ConsoleRouterView {
         NavigationView {
             ShareStoreView(onDismiss: { router.isShowingShareStore = false })
         }.backport.presentationDetents([.medium, .large])
-    }
-}
-
-import UniformTypeIdentifiers
-
-private struct DocumentBrowser: UIViewControllerRepresentable {
-    func makeUIViewController(context: Context) -> DocumentBrowserViewController {
-        DocumentBrowserViewController(forOpeningContentTypes: [UTType(filenameExtension: "pulse")].compactMap { $0 })
-    }
-
-    func updateUIViewController(_ uiViewController: DocumentBrowserViewController, context: Context) {
-
     }
 }
 

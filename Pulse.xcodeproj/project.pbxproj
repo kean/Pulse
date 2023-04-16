@@ -209,7 +209,6 @@
 		0CF0D65B296F189600EED9D4 /* SettingsView-macos.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5D5296F189500EED9D4 /* SettingsView-macos.swift */; };
 		0CF0D65C296F189600EED9D4 /* ConsoleMessageMetadataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5D7296F189500EED9D4 /* ConsoleMessageMetadataView.swift */; };
 		0CF0D65D296F189600EED9D4 /* ConsoleMessageDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5D8296F189500EED9D4 /* ConsoleMessageDetailsView.swift */; };
-		0CF0D660296F189600EED9D4 /* DocumentBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5DC296F189500EED9D4 /* DocumentBrowser.swift */; };
 		0CF0D661296F189600EED9D4 /* NetworkInspectorTransferInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5DF296F189500EED9D4 /* NetworkInspectorTransferInfoView.swift */; };
 		0CF0D662296F189600EED9D4 /* TimingViewModel+Metrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5E0296F189500EED9D4 /* TimingViewModel+Metrics.swift */; };
 		0CF0D663296F189600EED9D4 /* NetworkInspectorTransactionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5E1296F189500EED9D4 /* NetworkInspectorTransactionView.swift */; };
@@ -670,7 +669,6 @@
 		0CF0D5D5296F189500EED9D4 /* SettingsView-macos.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SettingsView-macos.swift"; sourceTree = "<group>"; };
 		0CF0D5D7296F189500EED9D4 /* ConsoleMessageMetadataView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleMessageMetadataView.swift; sourceTree = "<group>"; };
 		0CF0D5D8296F189500EED9D4 /* ConsoleMessageDetailsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleMessageDetailsView.swift; sourceTree = "<group>"; };
-		0CF0D5DC296F189500EED9D4 /* DocumentBrowser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DocumentBrowser.swift; sourceTree = "<group>"; };
 		0CF0D5DF296F189500EED9D4 /* NetworkInspectorTransferInfoView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkInspectorTransferInfoView.swift; sourceTree = "<group>"; };
 		0CF0D5E0296F189500EED9D4 /* TimingViewModel+Metrics.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TimingViewModel+Metrics.swift"; sourceTree = "<group>"; };
 		0CF0D5E1296F189500EED9D4 /* NetworkInspectorTransactionView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkInspectorTransactionView.swift; sourceTree = "<group>"; };
@@ -1230,7 +1228,6 @@
 				0CF0D59F296F189500EED9D4 /* RichTextView */,
 				0CF0D595296F189500EED9D4 /* SearchBar-macos.swift */,
 				0CF0D597296F189500EED9D4 /* PlaceholderView.swift */,
-				0CF0D5DC296F189500EED9D4 /* DocumentBrowser.swift */,
 				0CF0D5A2296F189500EED9D4 /* TextView.swift */,
 				0CF0D5F8296F189600EED9D4 /* LoggerStoreSizeChart.swift */,
 				0CF0D598296F189500EED9D4 /* FileViewer.swift */,
@@ -2142,7 +2139,6 @@
 				0C40C094296F7641009ECF16 /* ConsoleSearchContentTypeCell.swift in Sources */,
 				0CF0D62D296F189600EED9D4 /* RichTextViewSearchToobar-macos.swift in Sources */,
 				0CF0D643296F189600EED9D4 /* ConsoleCustomNetworkFilterView.swift in Sources */,
-				0CF0D660296F189600EED9D4 /* DocumentBrowser.swift in Sources */,
 				0CF0D688296F189600EED9D4 /* ConsoleViewModel.swift in Sources */,
 				0CF0D66D296F189600EED9D4 /* NetworkRequestBodyCell.swift in Sources */,
 				0CF0D629296F189600EED9D4 /* PDFRepresentedView.swift in Sources */,
