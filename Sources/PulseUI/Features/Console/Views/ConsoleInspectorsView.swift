@@ -49,8 +49,6 @@ struct ConsoleInspectorsView: View {
         switch selectedTab {
         case .filters:
             ConsoleSearchCriteriaView(viewModel: viewModel.searchCriteriaViewModel)
-        case .debug:
-            ConsoleNoticesView()
         case .storeInfo:
             VStack {
                 StoreDetailsView(source: .store(viewModel.store))
@@ -71,7 +69,6 @@ struct ConsoleInspectorsView: View {
 
 private enum ConsoleInspector: Identifiable, CaseIterable {
     case filters
-    case debug
     case storeInfo
     case settings
     case sessions
@@ -82,8 +79,6 @@ private enum ConsoleInspector: Identifiable, CaseIterable {
         switch self {
         case .filters:
             return "line.3.horizontal.decrease.circle"
-        case .debug:
-            return "exclamationmark.triangle"
         case .storeInfo:
             return "info.circle"
         case .settings:

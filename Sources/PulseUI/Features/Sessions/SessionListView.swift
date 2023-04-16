@@ -10,7 +10,6 @@ import Combine
 
 #if os(iOS) || os(macOS)
 
-#warning("sections on macOS as well?")
 struct SessionListView: View {
     @Binding var selection: Set<UUID>
     @Binding var sharedSessions: SelectedSessionsIDs?
