@@ -4,7 +4,7 @@
 
 [**Pulse**](https://kean.blog/pulse/home) is a powerful logging system for Apple Platforms. Native. Built with SwiftUI.
 
-Record and inspect logs and `URLSession` network requests right from your iOS app. Shared logs and view them in [Pulse Pro](https://kean.blog/pulse/pro) or use remote logging to see them in real-time. Logs are stored locally and never leave your devices.
+Record and inspect logs and `URLSession` network requests right from your iOS app. Share logs and view them in [Pulse Pro](https://kean.blog/pulse/pro) or use remote logging to see them in real-time. Logs are stored locally and never leave your devices.
 
 ## About
 
