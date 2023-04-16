@@ -277,6 +277,7 @@
 		0CF5E60929981ADF009FF7AE /* ShareStoreViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF5E60729981ADC009FF7AE /* ShareStoreViewModel.swift */; };
 		0CFD1CDB29E2E8FD003872EF /* LoggerStore+Remote.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CFD1CDA29E2E8FD003872EF /* LoggerStore+Remote.swift */; };
 		0CFF79DD29EB7A8E00BE767B /* SessionListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CFF79DB29EB7A8B00BE767B /* SessionListView.swift */; };
+		0CFF79DF29EB7B4300BE767B /* SessionPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CFF79DE29EB7B4300BE767B /* SessionPickerView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -730,6 +731,7 @@
 		0CF5E60729981ADC009FF7AE /* ShareStoreViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareStoreViewModel.swift; sourceTree = "<group>"; };
 		0CFD1CDA29E2E8FD003872EF /* LoggerStore+Remote.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LoggerStore+Remote.swift"; sourceTree = "<group>"; };
 		0CFF79DB29EB7A8B00BE767B /* SessionListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionListView.swift; sourceTree = "<group>"; };
+		0CFF79DE29EB7B4300BE767B /* SessionPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionPickerView.swift; sourceTree = "<group>"; };
 		49E82A8526D107A00070244F /* AlamofireIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlamofireIntegration.swift; sourceTree = "<group>"; };
 		49E82A8826D1083D0070244F /* MoyaIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoyaIntegration.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -1479,6 +1481,7 @@
 			isa = PBXGroup;
 			children = (
 				0C840D4B29E0A09B00362214 /* SessionsView.swift */,
+				0CFF79DE29EB7B4300BE767B /* SessionPickerView.swift */,
 				0CFF79DB29EB7A8B00BE767B /* SessionListView.swift */,
 			);
 			path = Sessions;
@@ -2100,6 +2103,7 @@
 				0CF0D66E296F189600EED9D4 /* NetworkCURLCell.swift in Sources */,
 				0C31FFB9298211AF002A7D64 /* ConsoleEntityDetailsView.swift in Sources */,
 				0CF0D625296F189600EED9D4 /* PlaceholderView.swift in Sources */,
+				0CFF79DF29EB7B4300BE767B /* SessionPickerView.swift in Sources */,
 				0CF0D65D296F189600EED9D4 /* ConsoleMessageDetailsView.swift in Sources */,
 				0C40C0A6296F99D8009ECF16 /* ConsoleCustomNetworkFilter.swift in Sources */,
 				0C19AE4C29D4EB4D0078EFB7 /* Counter.swift in Sources */,
