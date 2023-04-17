@@ -194,17 +194,6 @@ private struct ConsoleContentView: View {
     }
 
     @ViewBuilder
-    private func addTableContextMenu<T: View>(_ view: T) -> some View {
-        if #available(macOS 13, *) {
-            view.contextMenu(forSelectionType: NSManagedObjectID.self, menu: { _ in }) {
-                $0.first.map(ConsoleSelectedItem.entity).map(makeDetailsView)?.showInWindow()
-            }
-        } else {
-            view
-        }
-    }
-
-    @ViewBuilder
     private func addListContextMenu<T: View>(_ view: T) -> some View {
         if #available(macOS 13, *) {
             view.contextMenu(forSelectionType: ConsoleSelectedItem.self, menu: { _ in }) {
