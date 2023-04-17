@@ -29,11 +29,6 @@ final class ConsoleViewModel: ObservableObject {
     let searchBarViewModel: ConsoleSearchBarViewModel
 #endif
 
-#if os(macOS)
-    let tableViewModel: ConsoleTableViewModel
-    let textViewModel: ConsoleTextViewModel
-#endif
-
     let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
     let index: LoggerStoreIndex
 
@@ -109,11 +104,6 @@ final class ConsoleViewModel: ObservableObject {
         }
 #endif
 
-#if os(macOS)
-        self.tableViewModel = ConsoleTableViewModel(store: store, criteria: searchCriteriaViewModel)
-        self.textViewModel = ConsoleTextViewModel(store: store, criteria: searchCriteriaViewModel, router: router)
-#endif
-
         self.logCountObserver = ManagedObjectsCountObserver(
             entity: LoggerMessageEntity.self,
             context: store.viewContext,
@@ -159,10 +149,6 @@ final class ConsoleViewModel: ObservableObject {
     private func prepare(for mode: ConsoleMode) {
         searchCriteriaViewModel.mode = mode
         listViewModel.mode = mode
-#if os(macOS)
-        tableViewModel.mode = mode
-        textViewModel.mode = mode
-#endif
     }
 
     func prepareForSharing(as output: ShareOutput, _ completion: @escaping (ShareItems?) -> Void) {

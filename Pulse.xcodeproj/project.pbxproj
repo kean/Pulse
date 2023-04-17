@@ -60,7 +60,6 @@
 		0C40C0A4296F849E009ECF16 /* ConsoleSearchTimePeriodCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C40C0A3296F849E009ECF16 /* ConsoleSearchTimePeriodCell.swift */; };
 		0C40C0A6296F99D8009ECF16 /* ConsoleCustomNetworkFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C40C0A5296F99D8009ECF16 /* ConsoleCustomNetworkFilter.swift */; };
 		0C4BF92D298817EC0086A6A7 /* IntlineTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C4BF92C298817EC0086A6A7 /* IntlineTabBar.swift */; };
-		0C529EEF29816F51009C5555 /* ConsoleTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C529EEE29816F51009C5555 /* ConsoleTableView.swift */; };
 		0C5A278C29737C1E00D44C6B /* Pulse_Demo_iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C767816268F88BB0058F69B /* Pulse_Demo_iOSApp.swift */; };
 		0C603BD829E45A3C004FD4ED /* ConsoleListPinsSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C603BD729E45A3C004FD4ED /* ConsoleListPinsSectionView.swift */; };
 		0C603BDA29E45DCC004FD4ED /* ConsoleListGroupedSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C603BD929E45DCC004FD4ED /* ConsoleListGroupedSectionView.swift */; };
@@ -92,7 +91,6 @@
 		0CB34591298AA6C6009428B2 /* RichTextViewSearchToobar-ios.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB34590298AA6C6009428B2 /* RichTextViewSearchToobar-ios.swift */; };
 		0CB34593298AA78E009428B2 /* WrappedTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB34592298AA78E009428B2 /* WrappedTextView.swift */; };
 		0CB34596298CBC37009428B2 /* ManagedObjectsObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB34595298CBC37009428B2 /* ManagedObjectsObserver.swift */; };
-		0CB3459C298D5018009428B2 /* ConsoleTextViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB3459B298D5018009428B2 /* ConsoleTextViewModel.swift */; };
 		0CB345A6298DEEA6009428B2 /* ConsoleInspectorsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB345A5298DEEA6009428B2 /* ConsoleInspectorsView.swift */; };
 		0CB63A132973A12300525165 /* ConsoleSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A122973A12300525165 /* ConsoleSearchView.swift */; };
 		0CB63A15297438A600525165 /* ConsoleSearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A14297438A600525165 /* ConsoleSearchViewModel.swift */; };
@@ -245,7 +243,6 @@
 		0CF0D67D296F189600EED9D4 /* ConsoleEntityCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5FF296F189600EED9D4 /* ConsoleEntityCell.swift */; };
 		0CF0D67F296F189600EED9D4 /* ConsoleContextMenu-ios.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D601296F189600EED9D4 /* ConsoleContextMenu-ios.swift */; };
 		0CF0D680296F189600EED9D4 /* ConsoleMessageCellViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D602296F189600EED9D4 /* ConsoleMessageCellViewModel.swift */; };
-		0CF0D682296F189600EED9D4 /* ConsoleTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D604296F189600EED9D4 /* ConsoleTextView.swift */; };
 		0CF0D686296F189600EED9D4 /* ConsoleMessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D608296F189600EED9D4 /* ConsoleMessageCell.swift */; };
 		0CF0D687296F189600EED9D4 /* ConsoleTaskCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D609296F189600EED9D4 /* ConsoleTaskCell.swift */; };
 		0CF0D688296F189600EED9D4 /* ConsoleViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D60A296F189600EED9D4 /* ConsoleViewModel.swift */; };
@@ -274,7 +271,6 @@
 		0CF0D6F1296F1AF100EED9D4 /* Pulse.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0CF0D542296F14EA00EED9D4 /* Pulse.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		0CF0D6F4296F1AF100EED9D4 /* PulseUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CF0D56C296F17CB00EED9D4 /* PulseUI.framework */; };
 		0CF0D6F5296F1AF100EED9D4 /* PulseUI.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0CF0D56C296F17CB00EED9D4 /* PulseUI.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		0CF5E5F72997DB95009FF7AE /* ConsoleTableViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF5E5F62997DB95009FF7AE /* ConsoleTableViewModel.swift */; };
 		0CF5E5FA2997DED7009FF7AE /* ConsoleTableViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF5E5F82997DE86009FF7AE /* ConsoleTableViewModelTests.swift */; };
 		0CF5E60929981ADF009FF7AE /* ShareStoreViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF5E60729981ADC009FF7AE /* ShareStoreViewModel.swift */; };
 		0CFD1CDB29E2E8FD003872EF /* LoggerStore+Remote.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CFD1CDA29E2E8FD003872EF /* LoggerStore+Remote.swift */; };
@@ -514,7 +510,6 @@
 		0C40C0A5296F99D8009ECF16 /* ConsoleCustomNetworkFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleCustomNetworkFilter.swift; sourceTree = "<group>"; };
 		0C4BF92C298817EC0086A6A7 /* IntlineTabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntlineTabBar.swift; sourceTree = "<group>"; };
 		0C516FBA26015DD2004813B4 /* Pulse Demo iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pulse Demo iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		0C529EEE29816F51009C5555 /* ConsoleTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleTableView.swift; sourceTree = "<group>"; };
 		0C603BD729E45A3C004FD4ED /* ConsoleListPinsSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleListPinsSectionView.swift; sourceTree = "<group>"; };
 		0C603BD929E45DCC004FD4ED /* ConsoleListGroupedSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleListGroupedSectionView.swift; sourceTree = "<group>"; };
 		0C63A3772979FE3A00F6A6A5 /* ConsoleSearchTerm.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleSearchTerm.swift; sourceTree = "<group>"; };
@@ -551,7 +546,6 @@
 		0CB34590298AA6C6009428B2 /* RichTextViewSearchToobar-ios.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RichTextViewSearchToobar-ios.swift"; sourceTree = "<group>"; };
 		0CB34592298AA78E009428B2 /* WrappedTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WrappedTextView.swift; sourceTree = "<group>"; };
 		0CB34595298CBC37009428B2 /* ManagedObjectsObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagedObjectsObserver.swift; sourceTree = "<group>"; };
-		0CB3459B298D5018009428B2 /* ConsoleTextViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleTextViewModel.swift; sourceTree = "<group>"; };
 		0CB345A5298DEEA6009428B2 /* ConsoleInspectorsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleInspectorsView.swift; sourceTree = "<group>"; };
 		0CB63A122973A12300525165 /* ConsoleSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchView.swift; sourceTree = "<group>"; };
 		0CB63A14297438A600525165 /* ConsoleSearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchViewModel.swift; sourceTree = "<group>"; };
@@ -706,7 +700,6 @@
 		0CF0D5FF296F189600EED9D4 /* ConsoleEntityCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleEntityCell.swift; sourceTree = "<group>"; };
 		0CF0D601296F189600EED9D4 /* ConsoleContextMenu-ios.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ConsoleContextMenu-ios.swift"; sourceTree = "<group>"; };
 		0CF0D602296F189600EED9D4 /* ConsoleMessageCellViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleMessageCellViewModel.swift; sourceTree = "<group>"; };
-		0CF0D604296F189600EED9D4 /* ConsoleTextView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleTextView.swift; sourceTree = "<group>"; };
 		0CF0D608296F189600EED9D4 /* ConsoleMessageCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleMessageCell.swift; sourceTree = "<group>"; };
 		0CF0D609296F189600EED9D4 /* ConsoleTaskCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleTaskCell.swift; sourceTree = "<group>"; };
 		0CF0D60A296F189600EED9D4 /* ConsoleViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleViewModel.swift; sourceTree = "<group>"; };
@@ -727,7 +720,6 @@
 		0CF0D6C7296F18FD00EED9D4 /* TextRendererTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextRendererTests.swift; sourceTree = "<group>"; };
 		0CF0D6C8296F18FD00EED9D4 /* ConsoleViewModelTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleViewModelTests.swift; sourceTree = "<group>"; };
 		0CF0D6C9296F18FD00EED9D4 /* MockTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockTests.swift; sourceTree = "<group>"; };
-		0CF5E5F62997DB95009FF7AE /* ConsoleTableViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleTableViewModel.swift; sourceTree = "<group>"; };
 		0CF5E5F82997DE86009FF7AE /* ConsoleTableViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleTableViewModelTests.swift; sourceTree = "<group>"; };
 		0CF5E60729981ADC009FF7AE /* ShareStoreViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareStoreViewModel.swift; sourceTree = "<group>"; };
 		0CFD1CDA29E2E8FD003872EF /* LoggerStore+Remote.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LoggerStore+Remote.swift"; sourceTree = "<group>"; };
@@ -980,24 +972,6 @@
 				0C9F04FF2884F34A0035239F /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
-			sourceTree = "<group>";
-		};
-		0CB345A3298D85BA009428B2 /* Text */ = {
-			isa = PBXGroup;
-			children = (
-				0CF0D604296F189600EED9D4 /* ConsoleTextView.swift */,
-				0CB3459B298D5018009428B2 /* ConsoleTextViewModel.swift */,
-			);
-			path = Text;
-			sourceTree = "<group>";
-		};
-		0CB345A4298D85C1009428B2 /* Table */ = {
-			isa = PBXGroup;
-			children = (
-				0C529EEE29816F51009C5555 /* ConsoleTableView.swift */,
-				0CF5E5F62997DB95009FF7AE /* ConsoleTableViewModel.swift */,
-			);
-			path = Table;
 			sourceTree = "<group>";
 		};
 		0CB63A112973A11400525165 /* Search */ = {
@@ -1417,8 +1391,6 @@
 			isa = PBXGroup;
 			children = (
 				0C7A0DFE297C51B900B4B69D /* List */,
-				0CB345A4298D85C1009428B2 /* Table */,
-				0CB345A3298D85BA009428B2 /* Text */,
 				0CF0D5FE296F189600EED9D4 /* Views */,
 				0CF0D5FA296F189600EED9D4 /* ConsoleView-ios.swift */,
 				0CF0D5FC296F189600EED9D4 /* ConsoleView-tvos.swift */,
@@ -2027,7 +1999,6 @@
 				0CF0D615296F189600EED9D4 /* LoggerSync.swift in Sources */,
 				0CF0D62C296F189600EED9D4 /* WebView.swift in Sources */,
 				0CF0D635296F189600EED9D4 /* InfoRow.swift in Sources */,
-				0CB3459C298D5018009428B2 /* ConsoleTextViewModel.swift in Sources */,
 				0C63A3782979FE3A00F6A6A5 /* ConsoleSearchTerm.swift in Sources */,
 				0CF0D674296F189600EED9D4 /* NetworkInspectorView-shared.swift in Sources */,
 				0CB34593298AA78E009428B2 /* WrappedTextView.swift in Sources */,
@@ -2061,14 +2032,12 @@
 				0CF0D648296F189600EED9D4 /* ConsoleCustomMessageFilterView.swift in Sources */,
 				0CF0D67A296F189600EED9D4 /* ConsoleView-watchos.swift in Sources */,
 				0CF0D63F296F189600EED9D4 /* ConsoleSearchCriteriaView.swift in Sources */,
-				0CF5E5F72997DB95009FF7AE /* ConsoleTableViewModel.swift in Sources */,
 				0CF0D63A296F189600EED9D4 /* ContextMenus.swift in Sources */,
 				0C40C0A4296F849E009ECF16 /* ConsoleSearchTimePeriodCell.swift in Sources */,
 				0CF0D666296F189600EED9D4 /* NetworkMetricsCell.swift in Sources */,
 				0C63A387297A432500F6A6A5 /* ConsoleSearchContextMenu.swift in Sources */,
 				0C4BF92D298817EC0086A6A7 /* IntlineTabBar.swift in Sources */,
 				0C40C0A2296F81B0009ECF16 /* ConsoleCustomFilterView.swift in Sources */,
-				0CF0D682296F189600EED9D4 /* ConsoleTextView.swift in Sources */,
 				0CF0D645296F189600EED9D4 /* ConsoleSearchSectionHeader.swift in Sources */,
 				0CF0D62A296F189600EED9D4 /* KeyValueSectionViewModel.swift in Sources */,
 				0CF0D638296F189600EED9D4 /* ImageViewer.swift in Sources */,
@@ -2096,7 +2065,6 @@
 				0CB63A212974A62700525165 /* ConsoleSearchOccurrence.swift in Sources */,
 				0CF0D614296F189600EED9D4 /* TextRendererJSON.swift in Sources */,
 				0CB63A232974A64500525165 /* ConsoleSearchOperation.swift in Sources */,
-				0C529EEF29816F51009C5555 /* ConsoleTableView.swift in Sources */,
 				0CF0D658296F189600EED9D4 /* SettingsView-ios.swift in Sources */,
 				0CF0D665296F189600EED9D4 /* NetworkMenuCell.swift in Sources */,
 				0CF0D659296F189600EED9D4 /* ConsoleSettings.swift in Sources */,

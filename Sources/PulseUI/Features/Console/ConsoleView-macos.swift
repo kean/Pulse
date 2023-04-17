@@ -73,13 +73,12 @@ private struct ConsoleLeftPanelView: View {
     let viewModel: ConsoleViewModel
     @ObservedObject var searchBarViewModel: ConsoleSearchBarViewModel
 
-    @AppStorage("com-github-kean-pulse-display-mode") private var displayMode: ConsoleDisplayMode = .list
     @AppStorage("com-github-kean-pulse-is-now-enabled") private var isNowEnabled = true
 
     @State private var isSharingStore = false
 
     var body: some View {
-        let content = ConsoleContentView(viewModel: viewModel, displayMode: displayMode)
+        let content = ConsoleContentView(viewModel: viewModel)
             .frame(minWidth: 200, idealWidth: 400, minHeight: 120, idealHeight: 480)
             .toolbar {
                 ToolbarItemGroup(placement: .navigation) {
@@ -107,14 +106,6 @@ private struct ConsoleLeftPanelView: View {
 
     @ViewBuilder
     private var toolbarNavigationItems: some View {
-#if PULSE_STANDALONE_APP
-        ConsoleTitleView(viewModel: viewModel)
-#endif
-        Picker("Mode", selection: $displayMode) {
-            Label("List", systemImage: "list.bullet").tag(ConsoleDisplayMode.list)
-            Label("Table", systemImage: "tablecells").tag(ConsoleDisplayMode.table)
-            Label("Text", systemImage: "text.quote").tag(ConsoleDisplayMode.text)
-        }.pickerStyle(.segmented)
         if !viewModel.store.isArchive {
             Toggle(isOn: $isNowEnabled) {
                 Image(systemName: "clock")
@@ -149,7 +140,6 @@ private struct ConsoleRightPanelView: View {
 
 private struct ConsoleContentView: View {
     let viewModel: ConsoleViewModel
-    let displayMode: ConsoleDisplayMode
 
     @State private var selectedObjectID: NSManagedObjectID? // Has to use for Table
     @State private var selection: ConsoleSelectedItem?
@@ -191,27 +181,15 @@ private struct ConsoleContentView: View {
                 viewModel.searchViewModel.isViewVisible = false
             }
         } else {
-            switch displayMode {
-            case .list:
-                ScrollViewReader { proxy in
-                    List(selection: $selection) {
-                        ConsoleListContentView(viewModel: viewModel.listViewModel, proxy: proxy)
-                    }
-                    .environment(\.defaultMinListRowHeight, 1)
-                    .apply(addListContextMenu)
+            ScrollViewReader { proxy in
+                List(selection: $selection) {
+                    ConsoleListContentView(viewModel: viewModel.listViewModel, proxy: proxy)
                 }
-                .onAppear { viewModel.listViewModel.isViewVisible = true }
-                .onDisappear { viewModel.listViewModel.isViewVisible = false }
-            case .table:
-                ConsoleTableView(viewModel: viewModel.tableViewModel, selection: $selectedObjectID)
-                    .apply(addTableContextMenu)
-                    .onAppear { viewModel.tableViewModel.isViewVisible = true }
-                    .onDisappear { viewModel.tableViewModel.isViewVisible = false }
-            case .text:
-                ConsoleTextView(viewModel: viewModel.textViewModel)
-                    .onAppear { viewModel.textViewModel.isViewVisible = true }
-                    .onDisappear { viewModel.textViewModel.isViewVisible = false }
+                .environment(\.defaultMinListRowHeight, 1)
+                .apply(addListContextMenu)
             }
+            .onAppear { viewModel.listViewModel.isViewVisible = true }
+            .onDisappear { viewModel.listViewModel.isViewVisible = false }
         }
     }
 
@@ -252,12 +230,6 @@ private struct ConsoleContentView: View {
             }
         }
     }
-}
-
-private enum ConsoleDisplayMode: String {
-    case table
-    case list
-    case text
 }
 
 #if DEBUG
