@@ -225,7 +225,7 @@ struct ConsoleSearchCriteriaView_Previews: PreviewProvider {
             .navigationViewStyle(.stack)
             .previewDisplayName("Network")
         }
-        .injectingEnvironment(.init(store: .mock))
+        .injecting(.init(store: .mock))
 #endif
     }
 }

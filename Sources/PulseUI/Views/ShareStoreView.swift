@@ -127,10 +127,10 @@ struct ShareStoreView_Previews: PreviewProvider {
         NavigationView {
             ShareStoreView(onDismiss: {})
         }
-        .injectingEnvironment(.init(store: .mock))
+        .injecting(.init(store: .mock))
 #else
         ShareStoreView(onDismiss: {})
-            .injectingEnvironment(.init(store: .mock))
+            .injecting(.init(store: .mock))
             .frame(width: 240).fixedSize()
 #endif
     }

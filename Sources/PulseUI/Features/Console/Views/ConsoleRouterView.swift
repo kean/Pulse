@@ -27,13 +27,8 @@ enum ConsoleSelectedItem: Hashable {
 #endif
 
 struct ConsoleRouterView: View {
-    let viewModel: ConsoleViewModel
-    @ObservedObject var router: ConsoleRouter
-
-    init(viewModel: ConsoleViewModel) {
-        self.viewModel = viewModel
-        self.router = viewModel.router
-    }
+    @EnvironmentObject var environment: ConsoleEnvironment
+    @EnvironmentObject var router: ConsoleRouter
 
     var body: some View {
         contents
@@ -54,10 +49,10 @@ extension ConsoleRouterView {
 
     private var destinationFilters: some View {
         NavigationView {
-            let view = ConsoleSearchCriteriaView(viewModel: viewModel.searchCriteriaViewModel)
+            let view = ConsoleSearchCriteriaView(viewModel: environment.searchCriteriaViewModel)
                 .inlineNavigationTitle("Filters")
                 .navigationBarItems(trailing: Button("Done") {
-                    viewModel.router.isShowingFilters = false
+                    router.isShowingFilters = false
                 })
 
             if #available(iOS 15, *) {
@@ -86,7 +81,7 @@ extension ConsoleRouterView {
 
     private var destinationSettings: some View {
         NavigationView {
-            SettingsView(store: viewModel.store)
+            SettingsView(store: environment.store)
                 .navigationTitle("Settings")
                 .navigationBarTitleDisplayMode(.inline)
                 .navigationBarItems(trailing: Button(action: { router.isShowingSettings = false }) {
@@ -97,7 +92,7 @@ extension ConsoleRouterView {
 
     private var destinationStoreInfo: some View {
         NavigationView {
-            StoreDetailsView(source: .store(viewModel.store))
+            StoreDetailsView(source: .store(environment.store))
                 .navigationBarItems(trailing: Button(action: { router.isShowingStoreInfo = false }) {
                     Text("Done")
                 })

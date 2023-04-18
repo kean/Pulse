@@ -45,12 +45,6 @@ struct PlaceholderView: View {
 
 #if os(iOS) || os(macOS) || os(tvOS)
 
-extension PlaceholderView {
-    static func make(viewModel: ConsoleViewModel) -> PlaceholderView {
-        PlaceholderView(imageName: "message", title: "No Messages", subtitle: nil)
-    }
-}
-
 #if DEBUG
 struct PlaceholderView_Previews: PreviewProvider {
     static var previews: some View {

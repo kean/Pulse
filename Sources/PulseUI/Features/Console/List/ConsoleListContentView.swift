@@ -9,7 +9,6 @@ import SwiftUI
 
 struct ConsoleListContentView: View {
     @ObservedObject var viewModel: ConsoleListViewModel
-    @EnvironmentObject private var consoleViewModel: ConsoleViewModel
 
 #if os(macOS)
     let proxy: ScrollViewProxy

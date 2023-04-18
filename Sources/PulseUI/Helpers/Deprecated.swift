@@ -31,18 +31,18 @@ public struct NetworkView: View {
 
 @available(*, deprecated, message: "Please use ConsoleView directly instead") // 3.0
 public struct MainView: View {
-    let viewModel: ConsoleViewModel
+    let environment: ConsoleEnvironment
 
     public init(store: LoggerStore = .shared, onDismiss: (() -> Void)? = nil) {
-        self.viewModel = ConsoleViewModel(store: store)
+        self.environment = ConsoleEnvironment(store: store)
     }
 
     public var body: some View {
 #if os(macOS)
-        ConsoleView(viewModel: viewModel)
+        ConsoleView(environment: environment)
 #else
         NavigationView {
-            ConsoleView(viewModel: viewModel)
+            ConsoleView(environment: environment)
         }.navigationViewStyle(.stack)
 #endif
     }

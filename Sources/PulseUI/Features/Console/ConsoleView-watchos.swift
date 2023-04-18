@@ -8,50 +8,48 @@ import SwiftUI
 import Pulse
 
 public struct ConsoleView: View {
-    @StateObject private var viewModel: ConsoleViewModel
+    @StateObject private var environment: ConsoleEnvironment
 
-    init(viewModel: ConsoleViewModel) {
-        _viewModel = StateObject(wrappedValue: viewModel)
+    init(environment: ConsoleEnvironment) {
+        _environment = StateObject(wrappedValue: environment)
     }
 
     public var body: some View {
         List {
-            ConsoleToolbarView(viewModel: viewModel)
-            ConsoleListContentView(viewModel: viewModel.listViewModel)
+            ConsoleToolbarView(environment: environment)
+            ConsoleListContentView(viewModel: environment.listViewModel)
         }
-        .background(ConsoleRouterView(viewModel: viewModel))
-        .navigationTitle(viewModel.title)
-        .onAppear { viewModel.isViewVisible = true }
-        .onDisappear { viewModel.isViewVisible = false }
+        .navigationTitle(environment.title)
+        .onAppear { environment.isViewVisible = true }
+        .onDisappear { environment.isViewVisible = false }
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
-                Button(action: { viewModel.router.isShowingSettings = true }) {
+                Button(action: { environment.router.isShowingSettings = true }) {
                     Image(systemName: "gearshape").font(.title3)
                 }
             }
         }
-        .injectingEnvironment(viewModel)
+        .injecting(environment)
     }
 }
 
 private struct ConsoleToolbarView: View {
-    var consoleViewModel: ConsoleViewModel
-    @ObservedObject var viewModel: ConsoleSearchCriteriaViewModel
-    @ObservedObject var router: ConsoleRouter
+    var environment: ConsoleEnvironment
+    @ObservedObject private var viewModel: ConsoleSearchCriteriaViewModel
+    @Environment(\.router) private var router
 
-    init(viewModel: ConsoleViewModel) {
-        self.consoleViewModel = viewModel
-        self.viewModel = viewModel.searchCriteriaViewModel
-        self.router = viewModel.router
+    init(environment: ConsoleEnvironment) {
+        self.environment = environment
+        self.viewModel = environment.searchCriteriaViewModel
     }
 
     var body: some View {
         HStack {
-            if consoleViewModel.initialMode == .all {
-                Button(action: { consoleViewModel.bindingForNetworkMode.wrappedValue.toggle() } ) {
+            if environment.initialMode == .all {
+                Button(action: { environment.bindingForNetworkMode.wrappedValue.toggle() } ) {
                     Image(systemName: "arrow.down.circle")
                 }
-                .background(consoleViewModel.bindingForNetworkMode.wrappedValue ? Rectangle().foregroundColor(.blue).cornerRadius(8) : nil)
+                .background(environment.bindingForNetworkMode.wrappedValue ? Rectangle().foregroundColor(.blue).cornerRadius(8) : nil)
             }
             Button(action: { viewModel.options.isOnlyErrors.toggle() }) {
                 Image(systemName: "exclamationmark.octagon")

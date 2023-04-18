@@ -9,27 +9,39 @@ import Combine
 
 extension ConsoleView {
     public init(store: LoggerStore = .shared, mode: ConsoleMode = .all) {
-        self.init(viewModel: .init(store: store, mode: mode))
+        self.init(environment: .init(store: store, mode: mode))
     }
 }
 
 extension View {
-    func injectingEnvironment(_ viewModel: ConsoleViewModel) -> some View {
-        self.environmentObject(viewModel)
-            .environment(\.store, viewModel.store)
-            .environment(\.managedObjectContext, viewModel.store.viewContext)
+    func injecting(_ environment: ConsoleEnvironment) -> some View {
+        self.background(ConsoleRouterView()) // important: order
+            .environmentObject(environment)
+            .environmentObject(environment.router)
+            .environment(\.router, environment.router)
+            .environment(\.store, environment.store)
+            .environment(\.managedObjectContext, environment.store.viewContext)
     }
 }
 
-// Create an environment key
+// MARK: Environment
+
 private struct LoggerStoreKey: EnvironmentKey {
     static let defaultValue: LoggerStore = .shared
 }
 
-// ## Introduce new value to EnvironmentValues
+private struct ConsoleRouterKey: EnvironmentKey {
+    static let defaultValue: ConsoleRouter = .init()
+}
+
 extension EnvironmentValues {
     var store: LoggerStore {
         get { self[LoggerStoreKey.self] }
         set { self[LoggerStoreKey.self] = newValue }
+    }
+
+    var router: ConsoleRouter {
+        get { self[ConsoleRouterKey.self] }
+        set { self[ConsoleRouterKey.self] = newValue }
     }
 }

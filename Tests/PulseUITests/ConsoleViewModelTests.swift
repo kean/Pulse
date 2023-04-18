@@ -6,13 +6,13 @@ import XCTest
 @testable import Pulse
 @testable import PulseUI
 
-final class ConsoleViewModelTests: ConsoleTestCase {
+final class ConsoleEnvironmentTests: ConsoleTestCase {
     var context = ConsoleContext()
     var mode: ConsoleMode = .all
     var isOnlyNetwork = false
     var options = ConsoleListOptions()
 
-    var sut: ConsoleViewModel!
+    var sut: ConsoleEnvironment!
 
     override func setUp() {
         super.setUp()
@@ -21,7 +21,7 @@ final class ConsoleViewModelTests: ConsoleTestCase {
     }
 
     private func reset() {
-        sut = ConsoleViewModel(store: store, context: context, mode: mode)
+        sut = ConsoleEnvironment(store: store, context: context, mode: mode)
     }
 
     // MARK: Counters

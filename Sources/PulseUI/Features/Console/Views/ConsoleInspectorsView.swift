@@ -7,7 +7,7 @@
 import SwiftUI
 
 struct ConsoleInspectorsView: View {
-    @EnvironmentObject private var viewModel: ConsoleViewModel
+    @EnvironmentObject private var viewModel: ConsoleEnvironment
 
     @State private var selectedTab: ConsoleInspector = .filters
 

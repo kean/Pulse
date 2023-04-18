@@ -12,7 +12,6 @@ import Combine
 @available(iOS 15, *)
 struct ConsoleSearchView: View {
     @ObservedObject var viewModel: ConsoleSearchViewModel
-    @EnvironmentObject private var consoleViewModel: ConsoleViewModel
 
     var body: some View {
         suggestionsView

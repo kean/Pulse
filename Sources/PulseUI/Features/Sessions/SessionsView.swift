@@ -19,8 +19,9 @@ struct SessionsView: View {
     @State private var editMode: EditMode = .inactive
 #endif
 
-    @EnvironmentObject private var consoleViewModel: ConsoleViewModel
+    @EnvironmentObject private var environment: ConsoleEnvironment
     @Environment(\.store) private var store
+    @Environment(\.router) private var router
 
     var body: some View {
         if let version = Version(store.version), version < Version(3, 6, 0) {
@@ -72,8 +73,8 @@ struct SessionsView: View {
 #else
             .contextMenu(forSelectionType: UUID.self, menu: contextMenu)
             .onChange(of: selection) {
-                guard consoleViewModel.searchCriteriaViewModel.criteria.shared.sessions.selection != $0 else { return }
-                consoleViewModel.searchCriteriaViewModel.select(sessions: $0)
+                guard environment.searchCriteriaViewModel.criteria.shared.sessions.selection != $0 else { return }
+                environment.searchCriteriaViewModel.select(sessions: $0)
             }
 #endif
     }
@@ -114,8 +115,8 @@ struct SessionsView: View {
     }
 
     private func showInConsole(sessions: Set<UUID>) {
-        consoleViewModel.searchCriteriaViewModel.select(sessions: sessions)
-        consoleViewModel.router.isShowingSessions = false
+        environment.searchCriteriaViewModel.select(sessions: sessions)
+        router.isShowingSessions = false
     }
 #endif
     
@@ -139,18 +140,17 @@ struct SessionsView: View {
 #if DEBUG
 @available(iOS 15.0, macOS 13, *)
 struct Previews_SessionsView_Previews: PreviewProvider {
-    static let viewModel = ConsoleViewModel(store: .mock)
+    static let environment = ConsoleEnvironment(store: .mock)
 
     static var previews: some View {
 #if os(iOS)
         NavigationView {
             SessionsView()
-                .background(ConsoleRouterView(viewModel: viewModel))
-                .injectingEnvironment(viewModel)
+                .injecting(environment)
         }
 #else
         SessionsView()
-            .injectingEnvironment(viewModel)
+            .injecting(environment)
 #endif
     }
 }

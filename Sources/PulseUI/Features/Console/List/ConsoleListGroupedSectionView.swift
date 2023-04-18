@@ -13,7 +13,7 @@ import SwiftUI
 struct ConsoleListGroupedSectionView: View {
     let section: NSFetchedResultsSectionInfo
     @ObservedObject var viewModel: ConsoleListViewModel
-    @EnvironmentObject private var consoleViewModel: ConsoleViewModel
+    @EnvironmentObject private var environment: ConsoleEnvironment
 
     var body: some View {
         let objects = (section.objects as? [NSManagedObject]) ?? []
@@ -30,7 +30,7 @@ struct ConsoleListGroupedSectionView: View {
                 PlainListSeeAllView(count: objects.count)
             }
 #else
-            Button(action: { consoleViewModel.focus(on: objects) }) {
+            Button(action: { environment.focus(on: objects) }) {
                 PlainListSeeAllView(count: objects.count)
             }.buttonStyle(.plain)
 #endif
@@ -48,20 +48,21 @@ private struct LazyConsoleView: View {
     let source: ConsoleListViewModel
 
     var body: some View {
-        ConsoleView(viewModel: makeViewModel())
+        ConsoleView(environment: makeEnvironment())
             .navigationBarTitleDisplayMode(.inline)
     }
 
-    private func makeViewModel() -> ConsoleViewModel {
-        let viewModel = ConsoleViewModel(
+    #warning("this should be done differently without a separate ConsoleView")
+    private func makeEnvironment() -> ConsoleEnvironment {
+        let environment = ConsoleEnvironment(
             store: source.store,
             context: .init(title: title, focus: NSPredicate(format: "self IN %@", entities)),
             mode: source.mode
         )
-        viewModel.listViewModel.options.order = source.options.order
-        viewModel.listViewModel.options.messageSortBy = source.options.messageSortBy
-        viewModel.listViewModel.options.taskSortBy = source.options.taskSortBy
-        return viewModel
+        environment.listViewModel.options.order = source.options.order
+        environment.listViewModel.options.messageSortBy = source.options.messageSortBy
+        environment.listViewModel.options.taskSortBy = source.options.taskSortBy
+        return environment
     }
 }
 

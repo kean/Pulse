@@ -7,14 +7,13 @@ import Pulse
 import Combine
 import SwiftUI
 
-final class ConsoleViewModel: ObservableObject {
+/// Constains every dependency that the console views have.
+///
+/// - warning: It's marked with `ObservableObject` to make it possible to be used
+/// with `@StateObject` and `@EnvironmentObject`, but it never changes.
+final class ConsoleEnvironment: ObservableObject {
     let title: String
     let store: LoggerStore
-
-#if PULSE_STANDALONE_APP
-    var client: RemoteLoggerClient?
-#endif
-
     let context: ConsoleContext
 
     let listViewModel: ConsoleListViewModel
@@ -38,6 +37,7 @@ final class ConsoleViewModel: ObservableObject {
     let router = ConsoleRouter()
 
 #if !os(macOS)
+    // TODO: refactor, this shouldn't be here
     // On macOS, these views are independent
     var isViewVisible: Bool = false {
         didSet { listViewModel.isViewVisible = isViewVisible }
@@ -151,8 +151,20 @@ final class ConsoleViewModel: ObservableObject {
         listViewModel.mode = mode
     }
 
-    func prepareForSharing(as output: ShareOutput, _ completion: @escaping (ShareItems?) -> Void) {
-        ShareService.share(listViewModel.entities, store: store, as: output, completion)
+    func removeAllLogs() {
+        store.removeAll()
+        index.clear()
+
+
+#if os(iOS)
+        runHapticFeedback(.success)
+        ToastView {
+            HStack {
+                Image(systemName: "trash")
+                Text("All messages removed")
+            }
+        }.show()
+#endif
     }
 }
 

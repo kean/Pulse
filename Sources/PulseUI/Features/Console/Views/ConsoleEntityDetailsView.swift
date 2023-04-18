@@ -10,20 +10,20 @@ import Pulse
 import CoreData
 
 struct ConsoleEntityDetailsRouterView: View {
-    let store: LoggerStore
-    @ObservedObject var router: ConsoleRouter
+    let selection: ConsoleSelectedItem
     @Binding var isVertical: Bool
 
+    @Environment(\.router) private var router
+    @Environment(\.store) private var store
+
     var body: some View {
-        if let selection = router.selection {
-            switch selection {
-            case .entity(let objectID):
-                makeDetails(for: objectID)
-            case .occurrence(let objectID, let occurrence):
-                if let entity = entity(withID: objectID) {
-                    ConsoleSearchResultView.makeDestination(for: occurrence, entity: entity)
-                        .id(occurrence.id)
-                }
+        switch selection {
+        case .entity(let objectID):
+            makeDetails(for: objectID)
+        case .occurrence(let objectID, let occurrence):
+            if let entity = entity(withID: objectID) {
+                ConsoleSearchResultView.makeDestination(for: occurrence, entity: entity)
+                    .id(occurrence.id)
             }
         }
     }

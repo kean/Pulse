@@ -10,15 +10,15 @@ import Pulse
 import Combine
 
 public struct ConsoleView: View {
-    @StateObject private var viewModel: ConsoleViewModel
+    @StateObject private var environment: ConsoleEnvironment
 
-    init(viewModel: ConsoleViewModel) {
-        _viewModel = StateObject(wrappedValue: viewModel)
+    init(environment: ConsoleEnvironment) {
+        _environment = StateObject(wrappedValue: environment)
     }
 
     public var body: some View {
         contents
-            .injectingEnvironment(viewModel)
+            .injecting(environment)
             .navigationTitle("")
     }
 
@@ -29,13 +29,13 @@ public struct ConsoleView: View {
                 ConsoleInspectorsView()
             }, detail: {
                 NavigationStack {
-                    ConsoleMainView(viewModel: viewModel)
+                    ConsoleMainView(environment: environment)
                 }
             })
         } else {
             NavigationView {
                 ConsoleInspectorsView()
-                ConsoleMainView(viewModel: viewModel)
+                ConsoleMainView(environment: environment)
             }
         }
     }
@@ -43,7 +43,7 @@ public struct ConsoleView: View {
 
 /// This view contains the console itself along with the details (no sidebar).
 struct ConsoleMainView: View {
-    @ObservedObject var viewModel: ConsoleViewModel
+    let environment: ConsoleEnvironment
     @AppStorage("com-github-kean-pulse-is-vertical") private var isVertical = false
 
     var body: some View {
@@ -61,16 +61,16 @@ struct ConsoleMainView: View {
     }
 
     private var contentView: some View {
-        ConsoleLeftPanelView(viewModel: viewModel, searchBarViewModel: viewModel.searchBarViewModel)
+        ConsoleLeftPanelView(environment: environment, searchBarViewModel: environment.searchBarViewModel)
     }
 
     private var detailsView: some View {
-        ConsoleRightPanelView(viewModel: viewModel, router: viewModel.router, isVertical: $isVertical)
+        ConsoleRightPanelView(isVertical: $isVertical)
     }
 }
 
 private struct ConsoleLeftPanelView: View {
-    let viewModel: ConsoleViewModel
+    let environment: ConsoleEnvironment
     @ObservedObject var searchBarViewModel: ConsoleSearchBarViewModel
 
     @AppStorage("com-github-kean-pulse-is-now-enabled") private var isNowEnabled = true
@@ -78,7 +78,7 @@ private struct ConsoleLeftPanelView: View {
     @State private var isSharingStore = false
 
     var body: some View {
-        let content = ConsoleContentView(viewModel: viewModel)
+        let content = ConsoleContentView(environment: environment)
             .frame(minWidth: 200, idealWidth: 400, minHeight: 120, idealHeight: 480)
             .toolbar {
                 ToolbarItemGroup(placement: .navigation) {
@@ -94,19 +94,19 @@ private struct ConsoleLeftPanelView: View {
                         Text($0.title)
                     }
                 })
-                .onSubmit(of: .search, viewModel.searchViewModel.onSubmitSearch)
+                .onSubmit(of: .search, environment.searchViewModel.onSubmitSearch)
                 .disableAutocorrection(true)
         } else {
             content
                 .searchable(text: $searchBarViewModel.text)
-                .onSubmit(of: .search, viewModel.searchViewModel.onSubmitSearch)
+                .onSubmit(of: .search, environment.searchViewModel.onSubmitSearch)
                 .disableAutocorrection(true)
         }
     }
 
     @ViewBuilder
     private var toolbarNavigationItems: some View {
-        if !viewModel.store.isArchive {
+        if !environment.store.isArchive {
             Toggle(isOn: $isNowEnabled) {
                 Image(systemName: "clock")
             }
@@ -117,7 +117,7 @@ private struct ConsoleLeftPanelView: View {
                 ShareStoreView(onDismiss: {})
                     .frame(width: 240).fixedSize()
             }
-            Button(action: { viewModel.store.removeAll() }) {
+            Button(action: { environment.store.removeAll() }) {
                 Image(systemName: "trash")
             }
         }
@@ -125,13 +125,13 @@ private struct ConsoleLeftPanelView: View {
 }
 
 private struct ConsoleRightPanelView: View {
-    let viewModel: ConsoleViewModel
-    @ObservedObject var router: ConsoleRouter
     @Binding var isVertical: Bool
 
+    @EnvironmentObject private var router: ConsoleRouter
+
     var body: some View {
-        if router.selection != nil {
-            ConsoleEntityDetailsRouterView(store: viewModel.store, router: viewModel.router, isVertical: $isVertical)
+        if let selection = router.selection {
+            ConsoleEntityDetailsRouterView(selection: selection, isVertical: $isVertical)
                 .background(Color(UXColor.textBackgroundColor))
                 .frame(minWidth: 400, idealWidth: 700, minHeight: 120, idealHeight: 480)
         }
@@ -139,7 +139,7 @@ private struct ConsoleRightPanelView: View {
 }
 
 private struct ConsoleContentView: View {
-    let viewModel: ConsoleViewModel
+    let environment: ConsoleEnvironment
 
     @State private var selectedObjectID: NSManagedObjectID? // Has to use for Table
     @State private var selection: ConsoleSelectedItem?
@@ -150,16 +150,16 @@ private struct ConsoleContentView: View {
     var body: some View {
         VStack(spacing: 0) {
             if !isSearching {
-                ConsoleToolbarView(viewModel: viewModel)
+                ConsoleToolbarView(environment: environment)
                 Divider()
             }
             content
         }
         .onChange(of: selectedObjectID) {
-            viewModel.router.selection = $0.map(ConsoleSelectedItem.entity)
+            environment.router.selection = $0.map(ConsoleSelectedItem.entity)
         }
         .onChange(of: selection) {
-            viewModel.router.selection = $0
+            environment.router.selection = $0
         }
     }
 
@@ -167,29 +167,29 @@ private struct ConsoleContentView: View {
     private var content: some View {
         if isSearching {
             List(selection: $selection) {
-                ConsoleSearchView(viewModel: viewModel.searchViewModel)
+                ConsoleSearchView(viewModel: environment.searchViewModel)
                     .buttonStyle(.plain)
             }
             .apply(addListContextMenu)
             .onAppear {
                 // TODO: search should not depend on list
-                viewModel.listViewModel.isViewVisible = true
-                viewModel.searchViewModel.isViewVisible = true
+                environment.listViewModel.isViewVisible = true
+                environment.searchViewModel.isViewVisible = true
             }
             .onDisappear {
-                viewModel.listViewModel.isViewVisible = false
-                viewModel.searchViewModel.isViewVisible = false
+                environment.listViewModel.isViewVisible = false
+                environment.searchViewModel.isViewVisible = false
             }
         } else {
             ScrollViewReader { proxy in
                 List(selection: $selection) {
-                    ConsoleListContentView(viewModel: viewModel.listViewModel, proxy: proxy)
+                    ConsoleListContentView(viewModel: environment.listViewModel, proxy: proxy)
                 }
                 .environment(\.defaultMinListRowHeight, 1)
                 .apply(addListContextMenu)
             }
-            .onAppear { viewModel.listViewModel.isViewVisible = true }
-            .onDisappear { viewModel.listViewModel.isViewVisible = false }
+            .onAppear { environment.listViewModel.isViewVisible = true }
+            .onDisappear { environment.listViewModel.isViewVisible = false }
         }
     }
 
@@ -208,12 +208,12 @@ private struct ConsoleContentView: View {
     private func makeDetailsView(for item: ConsoleSelectedItem) -> some View {
         switch item {
         case .entity(let objectID):
-            if let entity = try? viewModel.store.viewContext.existingObject(with: objectID) {
+            if let entity = try? environment.store.viewContext.existingObject(with: objectID) {
                 ConsoleEntityStandaloneDetailsView(entity: entity)
                     .frame(minWidth: 400, idealWidth: 700, minHeight: 400, idealHeight: 480)
             }
         case .occurrence(let objectID, let occurrence):
-            if let entity = try? viewModel.store.viewContext.existingObject(with: objectID) {
+            if let entity = try? environment.store.viewContext.existingObject(with: objectID) {
                 ConsoleSearchResultView.makeDestination(for: occurrence, entity: entity)
                     .frame(minWidth: 400, idealWidth: 700, minHeight: 400, idealHeight: 480)
             }

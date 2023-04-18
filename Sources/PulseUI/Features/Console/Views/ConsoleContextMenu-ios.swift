@@ -10,16 +10,8 @@ import Pulse
 import Combine
 
 struct ConsoleContextMenu: View {
-    let viewModel: ConsoleViewModel
-    @ObservedObject var searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
-
-    @ObservedObject var router: ConsoleRouter
-
-    init(viewModel: ConsoleViewModel) {
-        self.viewModel = viewModel
-        self.searchCriteriaViewModel = viewModel.searchCriteriaViewModel
-        self.router = viewModel.router
-    }
+    @EnvironmentObject private var environment: ConsoleEnvironment
+    @Environment(\.router) private var router
 
     var body: some View {
         Menu {
@@ -32,8 +24,8 @@ struct ConsoleContextMenu: View {
                 Button(action: { router.isShowingStoreInfo = true }) {
                     Label("Store Info", systemImage: "info.circle")
                 }
-                if !viewModel.store.isArchive {
-                    Button.destructive(action: buttonRemoveAllTapped) {
+                if !environment.store.isArchive {
+                    Button.destructive(action: environment.removeAllLogs) {
                         Label("Remove Logs", systemImage: "trash")
                     }
                 }
@@ -56,19 +48,6 @@ struct ConsoleContextMenu: View {
         } label: {
             Image(systemName: "ellipsis.circle")
         }
-    }
-
-    private func buttonRemoveAllTapped() {
-        viewModel.store.removeAll()
-        viewModel.index.clear()
-
-        runHapticFeedback(.success)
-        ToastView {
-            HStack {
-                Image(systemName: "trash")
-                Text("All messages removed")
-            }
-        }.show()
     }
 
     private func buttonSponsorTapped() {
