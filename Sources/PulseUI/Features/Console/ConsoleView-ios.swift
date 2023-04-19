@@ -10,19 +10,19 @@ import Combine
 #if os(iOS)
 
 public struct ConsoleView: View {
-    @StateObject private var viewModel: ConsoleViewModel // Never reloads
+    @StateObject private var environment: ConsoleEnvironment // Never reloads
     @Environment(\.presentationMode) private var presentationMode
     private var isCloseButtonHidden = false
 
-    init(viewModel: ConsoleViewModel) {
-        _viewModel = StateObject(wrappedValue: viewModel)
+    init(environment: ConsoleEnvironment) {
+        _environment = StateObject(wrappedValue: environment)
     }
 
     public var body: some View {
-        ConsoleListView(viewModel: viewModel)
-            .onAppear { viewModel.isViewVisible = true }
-            .onDisappear { viewModel.isViewVisible = false }
-            .navigationTitle(viewModel.title)
+        ConsoleListView(environment: environment)
+            .onAppear  { environment.listViewModel.isViewVisible = true }
+            .onDisappear { environment.listViewModel.isViewVisible = false }
+            .navigationTitle(environment.title)
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarLeading) {
                     if !isCloseButtonHidden && presentationMode.wrappedValue.isPresented {
@@ -31,14 +31,11 @@ public struct ConsoleView: View {
                         }
                     }
                 }
-                ToolbarItemGroup(placement: .navigationBarLeading) {
-                    leadingNavigationBarItems
-                }
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
                     trailingNavigationBarItems
                 }
             }
-            .background(ConsoleRouterView(viewModel: viewModel))
+            .injecting(environment)
     }
 
     /// Changes the default close button visibility.
@@ -48,41 +45,33 @@ public struct ConsoleView: View {
         return copy
     }
 
-    private var leadingNavigationBarItems: some View {
-        viewModel.onDismiss.map {
-            Button(action: $0) { Text("Close") }
-        }
-    }
-
     @ViewBuilder
     private var trailingNavigationBarItems: some View {
-        if viewModel.context.focus == nil {
-            ConsoleShareButton(viewModel: viewModel)
-            Button(action: { viewModel.router.isShowingFilters = true }) {
-                Image(systemName: "line.horizontal.3.decrease.circle")
-            }
-            ConsoleContextMenu(viewModel: viewModel)
-        } else {
-            ConsoleShareButton(viewModel: viewModel)
+        Button(action: { environment.router.isShowingShareStore = true }) {
+            Label("Share", systemImage: "square.and.arrow.up")
         }
+        Button(action: { environment.router.isShowingFilters = true }) {
+            Image(systemName: "line.horizontal.3.decrease.circle")
+        }
+        ConsoleContextMenu()
     }
 }
 
 private struct ConsoleListView: View {
-    let viewModel: ConsoleViewModel
+    let environment: ConsoleEnvironment
     @ObservedObject private var searchBarViewModel: ConsoleSearchBarViewModel
 
-    init(viewModel: ConsoleViewModel) {
-        self.viewModel = viewModel
-        self.searchBarViewModel = viewModel.searchBarViewModel
+    init(environment: ConsoleEnvironment) {
+        self.environment = environment
+        self.searchBarViewModel = environment.searchBarViewModel
     }
 
     var body: some View {
         let list = List {
             if #available(iOS 15, *) {
-                _ConsoleSearchableContentView(viewModel: viewModel)
+                _ConsoleSearchableContentView(environment: environment)
             } else {
-                _ConsoleRegularContentView(viewModel: viewModel)
+                _ConsoleRegularContentView(environment: environment)
             }
         }
             .listStyle(.plain)
@@ -96,13 +85,13 @@ private struct ConsoleListView: View {
                         Text($0.title)
                     }
                 })
-                .onSubmit(of: .search, viewModel.searchViewModel.onSubmitSearch)
+                .onSubmit(of: .search, environment.searchViewModel.onSubmitSearch)
                 .disableAutocorrection(true)
                 .textInputAutocapitalization(.never)
         } else if #available(iOS 15, *) {
             list
                 .searchable(text: $searchBarViewModel.text)
-                .onSubmit(of: .search, viewModel.searchViewModel.onSubmitSearch)
+                .onSubmit(of: .search, environment.searchViewModel.onSubmitSearch)
                 .disableAutocorrection(true)
                 .textInputAutocapitalization(.never)
         } else {
@@ -113,36 +102,35 @@ private struct ConsoleListView: View {
 
 @available(iOS 15, *)
 private struct _ConsoleSearchableContentView: View {
-    let viewModel: ConsoleViewModel
+    let environment: ConsoleEnvironment
     @Environment(\.isSearching) private var isSearching
 
     var body: some View {
-        contents.onChange(of: isSearching) {
-            viewModel.isSearching = $0
-        }
-    }
-
-    @ViewBuilder
-    private var contents: some View {
         if isSearching {
-            ConsoleSearchView(viewModel: viewModel)
+            ConsoleSearchView(viewModel: environment.searchViewModel)
+                .onAppear {
+                    environment.searchViewModel.isViewVisible = true
+                }
+                .onDisappear {
+                    environment.searchViewModel.isViewVisible = false
+                }
         } else {
-            _ConsoleRegularContentView(viewModel: viewModel)
+            _ConsoleRegularContentView(environment: environment)
         }
     }
 }
 
 private struct _ConsoleRegularContentView: View {
-    let viewModel: ConsoleViewModel
+    let environment: ConsoleEnvironment
 
     var body: some View {
-        let toolbar = ConsoleToolbarView(viewModel: viewModel)
+        let toolbar = ConsoleToolbarView()
         if #available(iOS 15.0, *) {
             toolbar.listRowSeparator(.hidden, edges: .top)
         } else {
             toolbar
         }
-        ConsoleListContentView(viewModel: viewModel.listViewModel)
+        ConsoleListContentView(viewModel: environment.listViewModel)
     }
 }
 
@@ -153,7 +141,7 @@ struct ConsoleView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             NavigationView {
-                ConsoleView(viewModel: .init(store: .mock))
+                ConsoleView(environment: .init(store: .mock))
             }.previewDisplayName("Console")
             NavigationView {
                 ConsoleView.network(store: .mock)
@@ -168,6 +156,6 @@ struct ConsoleView_Previews: PreviewProvider {
 extension ConsoleView {
     /// Creates a view pre-configured to display only network requests
     public static func network(store: LoggerStore = .shared) -> ConsoleView {
-        ConsoleView(viewModel: .init(store: store, mode: .network))
+        ConsoleView(environment: .init(store: store, mode: .network))
     }
 }

@@ -63,7 +63,6 @@ final class ShareStoreTask {
         }
     }
 
-
     private func renderAsAttributedString() -> NSAttributedString {
         prerenderResponseBodies()
 

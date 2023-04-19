@@ -9,21 +9,21 @@ import SwiftUI
 import Pulse
 import CoreData
 
-struct ConsoleEntityDetailsView: View {
-    let store: LoggerStore
-    @ObservedObject var router: ConsoleRouter
+struct ConsoleEntityDetailsRouterView: View {
+    let selection: ConsoleSelectedItem
     @Binding var isVertical: Bool
 
+    @Environment(\.router) private var router
+    @Environment(\.store) private var store
+
     var body: some View {
-        if let selection = router.selection {
-            switch selection {
-            case .entity(let objectID):
-                makeDetails(for: objectID)
-            case .occurrence(let objectID, let occurrence):
-                if let entity = entity(withID: objectID) {
-                    ConsoleSearchResultView.makeDestination(for: occurrence, entity: entity)
-                        .id(occurrence.id)
-                }
+        switch selection {
+        case .entity(let objectID):
+            makeDetails(for: objectID)
+        case .occurrence(let objectID, let occurrence):
+            if let entity = entity(withID: objectID) {
+                ConsoleSearchResultView.makeDestination(for: occurrence, entity: entity)
+                    .id(occurrence.id)
             }
         }
     }
@@ -58,6 +58,19 @@ struct ConsoleEntityDetailsView: View {
 
     private func entity(withID objectID: NSManagedObjectID) -> NSManagedObject? {
         try? store.viewContext.existingObject(with: objectID)
+    }
+}
+
+struct ConsoleEntityStandaloneDetailsView: View {
+    let entity: NSManagedObject
+
+    var body: some View {
+        switch LoggerEntity(entity) {
+        case .message(let message):
+            ConsoleMessageDetailsView(message: message)
+        case .task(let task):
+            NetworkInspectorView(task: task)
+        }
     }
 }
 

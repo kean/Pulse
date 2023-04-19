@@ -5,6 +5,10 @@
 import Foundation
 import Pulse
 
+#if os(macOS)
+import AppKit
+#endif
+
 final class TextRendererJSON {
     // Input
     private let json: Any
@@ -19,7 +23,7 @@ final class TextRendererJSON {
     private var indentation = 0
     private var index = 0
     private var codingPath: [NetworkLogger.DecodingError.CodingKey] = []
-    private var elements: [(NSRange, JSONElement)] = []
+    private var elements: [(NSRange, JSONElement, JSONContainerNode?)] = []
     private var errorRange: NSRange?
     private var string = ""
 
@@ -31,11 +35,17 @@ final class TextRendererJSON {
     }
 
     func render() -> NSAttributedString {
-        print(json: json, isFree: true)
+        render(json: json, isFree: true)
 
         let output = NSMutableAttributedString(string: string, attributes: helper.attributes(role: .body2, style: .monospaced, color: color(for: .key)))
-        for (range, element) in elements {
+        for (range, element, node) in elements {
             output.addAttribute(.foregroundColor, value: color(for: element), range: range)
+#if os(macOS)
+            if let node = node {
+                output.addAttribute(.node, value: node, range: range)
+                output.addAttribute(.cursor, value: NSCursor.pointingHand, range: range)
+            }
+#endif
         }
         if let range = errorRange {
             output.addAttributes(makeErrorAttributes(), range: range)
@@ -65,70 +75,19 @@ final class TextRendererJSON {
 
     // MARK: - Walk JSON
 
-    private func print(json: Any, isFree: Bool) {
-        func _print(json: Any, key: NetworkLogger.DecodingError.CodingKey, isFree: Bool) {
-            codingPath.append(key)
-            print(json: json, isFree: isFree)
-            codingPath.removeLast()
-        }
-
+    private func render(json: Any, isFree: Bool) {
         switch json {
         case let object as [String: Any]:
             if isFree {
                 indent()
             }
-            append("{", .punctuation)
-            newline()
-            let keys = object.keys.sorted()
-            for index in keys.indices {
-                let key = keys[index]
-                indent()
-                append("\(String(repeating: " ", count: spaces))\"\(key)\"", .key)
-                append(": ", .punctuation)
-                indentation += 1
-                _print(json: object[key]!, key: .string(key), isFree: false)
-                indentation -= 1
-                if index < keys.endIndex - 1 {
-                    append(",", .punctuation)
-                }
-                newline()
-            }
-            indent()
-            append("}", .punctuation)
+            renderObject(object)
         case let string as String:
-            append("\"\(string)\"", .valueString)
+            renderString(string)
         case let array as [Any]:
-            if array is [String] || array is [Int] || array is [NSNumber] {
-                append("[", .punctuation)
-                for index in array.indices {
-                    _print(json: array[index], key: .int(index), isFree: true)
-                    if index < array.endIndex - 1 {
-                        append(", ", .punctuation)
-                    }
-                }
-                append("]", .punctuation)
-            } else {
-                append("[\n", .punctuation)
-                indentation += 1
-                for index in array.indices {
-                    _print(json: array[index], key: .int(index), isFree: true)
-                    if index < array.endIndex - 1 {
-                        append(",", .punctuation)
-                    }
-                    newline()
-                }
-                indentation -= 1
-                indent()
-                append("]", .punctuation)
-            }
+            renderArray(array)
         case let number as NSNumber:
-            if number === kCFBooleanTrue {
-                append("true", .valueOther)
-            } else if number === kCFBooleanFalse {
-                append("false", .valueOther)
-            } else {
-                append("\(number)", .valueOther)
-            }
+            renderNumber(number)
         default:
             if json is NSNull {
                 append("null", .null)
@@ -138,25 +97,104 @@ final class TextRendererJSON {
         }
     }
 
+    private func render(json: Any, key: NetworkLogger.DecodingError.CodingKey, isFree: Bool) {
+        codingPath.append(key)
+        render(json: json, isFree: isFree)
+        codingPath.removeLast()
+    }
+
+    private func renderObject(_ object: [String: Any]) {
+        let node = JSONContainerNode(kind: .object, json: json)
+        append("{", .punctuation, node)
+        newline()
+        let keys = object.keys.sorted()
+        for index in keys.indices {
+            let key = keys[index]
+            indent()
+            append(String(repeating: " ", count: spaces), .punctuation)
+            append("\"\(key)\"", .key)
+            append(": ", .punctuation)
+            indentation += 1
+            render(json: object[key]!, key: .string(key), isFree: false)
+            indentation -= 1
+            if index < keys.endIndex - 1 {
+                append(",", .punctuation)
+            }
+            newline()
+        }
+        indent()
+        append("}", .punctuation, node)
+    }
+
+    private func renderArray(_ array: [Any]) {
+        let node = JSONContainerNode(kind: .array, json: json)
+        if array is [String] || array is [Int] || array is [NSNumber] {
+            append("[", .punctuation, node)
+            for index in array.indices {
+                render(json: array[index], key: .int(index), isFree: true)
+                if index < array.endIndex - 1 {
+                    append(", ", .punctuation)
+                }
+            }
+            append("]", .punctuation, node)
+        } else {
+            append("[", .punctuation, node)
+            append("\n", .punctuation)
+            indentation += 1
+            for index in array.indices {
+                render(json: array[index], key: .int(index), isFree: true)
+                if index < array.endIndex - 1 {
+                    append(",", .punctuation)
+                }
+                newline()
+            }
+            indentation -= 1
+            indent()
+            append("]", .punctuation, node)
+        }
+    }
+
+    private func renderString(_ string: String) {
+        append("\"\(string)\"", .valueString)
+    }
+
+    private func renderNumber(_ number: NSNumber) {
+        if number === kCFBooleanTrue {
+            append("true", .valueOther)
+        } else if number === kCFBooleanFalse {
+            append("false", .valueOther)
+        } else {
+            append("\(number)", .valueOther)
+        }
+    }
+
     // MARK: - Modify String
 
     private var previousElement: JSONElement?
 
-    private func append(_ string: String, _ element: JSONElement) {
+    private func append(_ string: String, _ element: JSONElement, _ node: JSONContainerNode? = nil) {
         let length = string.utf16.count
         self.string += string
 
         if element != .key { // Style for keys is the default one
-            if previousElement == element { // Coalesce the same elements
+            if previousElement == element, element != .punctuation { // Coalesce the same elements
                 elements[elements.endIndex - 1].0.length += length
             } else {
-                elements.append((NSRange(location: index, length: length), element))
+                elements.append((NSRange(location: index, length: length), element, node))
             }
         }
         previousElement = element
 
         if let error = self.error, errorRange == nil, codingPath == error.context?.codingPath {
-            errorRange = NSRange(location: index, length: length)
+            switch error {
+            case .keyNotFound:
+                // Display error on the first key in the object regardless of what it is
+                if element == .key {
+                    errorRange = NSRange(location: index, length: length)
+                }
+            default:
+                errorRange = NSRange(location: index, length: length)
+            }
         }
 
         index += length
@@ -176,6 +214,14 @@ final class TextRendererJSON {
         guard let error = error else {
             return [:]
         }
+#if PULSE_STANDALONE_APP
+        return [
+            .decodingError: error,
+            .underlineColor: UXColor.red,
+            .underlineStyle: RichTextViewUnderlyingStyle.error.rawValue,
+            .cursor: NSCursor.pointingHand
+        ]
+#else
         return [
             .backgroundColor: options.color == .monochrome ? UXColor.label : UXColor.red,
             .foregroundColor: UXColor.white,
@@ -192,6 +238,7 @@ final class TextRendererJSON {
             }(),
             .underlineColor: UXColor.clear
         ]
+#endif
     }
 }
 
@@ -211,6 +258,7 @@ struct JSONColors {
 
 extension NSAttributedString.Key {
     static let decodingError = NSAttributedString.Key(rawValue: "com.github.kean.pulse.decoding-error-key")
+    static let node = NSAttributedString.Key(rawValue: "com.github.kean.pulse.json-container-node")
 }
 
 enum JSONElement {
@@ -219,4 +267,35 @@ enum JSONElement {
     case valueString
     case valueOther
     case null
+}
+
+final class JSONContainerNode {
+    enum Kind {
+        case object
+        case array
+    }
+
+    let kind: Kind
+    let json: Any
+    var isExpanded = true
+    var expanded: NSAttributedString?
+
+    init(kind: Kind, json: Any) {
+        self.kind = kind
+        self.json = json
+    }
+
+    var openingCharacter: String {
+        switch kind {
+        case .object: return "{"
+        case .array: return "["
+        }
+    }
+
+    var closingCharacter: String {
+        switch kind {
+        case .object: return "}"
+        case .array: return "]"
+        }
+    }
 }

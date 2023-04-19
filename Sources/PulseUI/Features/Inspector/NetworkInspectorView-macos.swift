@@ -31,7 +31,10 @@ struct NetworkInspectorView: View {
             InlineTabBar(items: NetworkInspectorTab.allCases, selection: $selectedTab)
             Spacer()
             toolbarItems
-        }.padding(EdgeInsets(top: 4, leading: 10, bottom: 5, trailing: 8))
+        }
+        .padding(.horizontal, 10)
+        .offset(y: -2)
+        .frame(height: 27, alignment: .center)
     }
 
     @ViewBuilder
@@ -57,7 +60,7 @@ struct NetworkInspectorView: View {
     }
 
     private func renderHeaders() -> NSAttributedString {
-        TextRenderer().make {
+        TextRenderer(options: .init(color: .monochrome)).make {
             $0.render([
                 KeyValueSectionViewModel.makeHeaders(title: "Original Request Headers", headers: task.originalRequest?.headers),
                 KeyValueSectionViewModel.makeHeaders(title: "Current Request Headers", headers: task.currentRequest?.headers),

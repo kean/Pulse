@@ -5,17 +5,19 @@
 import SwiftUI
 import Pulse
 
-struct ConsoleSearchListSelectionView<Element: Hashable, Label: View>: View {
+struct ConsoleSearchListSelectionView<Data: RandomAccessCollection, ID: Hashable, Label: View>: View {
     let title: String
-    let items: [Element]
+    let items: Data
+    let id: KeyPath<Data.Element, ID>
+    @Binding var selection: Set<ID>
+    let description: (Data.Element) -> String
+    @ViewBuilder let label: (Data.Element) -> Label
+
 #if os(iOS) || os(macOS)
     var limit = 6
 #else
     var limit = 3
 #endif
-    @Binding var selection: Set<Element>
-    let description: (Element) -> String
-    @ViewBuilder let label: (Element) -> Label
 
     @State private var searchText = ""
 
@@ -32,7 +34,7 @@ struct ConsoleSearchListSelectionView<Element: Hashable, Label: View>: View {
                 Spacer()
                 buttonToggleAll
             }
-            ForEach(isExpanded ? filtered : Array(filtered.prefix(limit)), id: \.self, content: makeRow)
+            ForEach(isExpanded ? filtered : Array(filtered.prefix(limit)), id: id, content: makeRow)
             if filtered.count > limit {
                 HStack {
                     if !isExpanded {
@@ -49,11 +51,12 @@ struct ConsoleSearchListSelectionView<Element: Hashable, Label: View>: View {
 #else
     @State private var isExpandedListPresented = false
     @State private var isSearching = false
+
     var body: some View {
         if items.isEmpty {
             emptyView
         } else {
-            ForEach(Array(items.prefix(limit)), id: \.self, content: makeRow)
+            ForEach(items.prefix(limit), id: id, content: makeRow)
                 .sheet(isPresented: $isExpandedListPresented) {
                     NavigationView {
                         expandedListBody
@@ -61,7 +64,7 @@ struct ConsoleSearchListSelectionView<Element: Hashable, Label: View>: View {
                 }
             if items.count > limit {
                 let viewAllView = HStack {
-                    Text("View All")
+                    Text("View All").foregroundColor(.blue)
                     Spacer()
                     Text("\(items.count) ").foregroundColor(.secondary)
                 }
@@ -78,7 +81,7 @@ struct ConsoleSearchListSelectionView<Element: Hashable, Label: View>: View {
     private var expandedListBody: some View {
         let list = Form {
             buttonToggleAll
-            ForEach(filteredItems, id: \.self, content: makeRow)
+            ForEach(filteredItems, id: id, content: makeRow)
         }
 #if os(tvOS)
             .frame(width: 800)
@@ -108,14 +111,14 @@ struct ConsoleSearchListSelectionView<Element: Hashable, Label: View>: View {
             .foregroundColor(.secondary)
     }
 
-    private func makeRow(for item: Element) -> some View {
+    private func makeRow(for item: Data.Element) -> some View {
         Checkbox(isOn: Binding(get: {
-            selection.contains(item)
+            selection.contains(item[keyPath: id])
         }, set: { isOn in
             if isOn {
-                selection.insert(item)
+                selection.insert(item[keyPath: id])
             } else {
-                selection.remove(item)
+                selection.remove(item[keyPath: id])
             }
         }), label: { label(item).lineLimit(3) })
 #if os(macOS)
@@ -123,14 +126,14 @@ struct ConsoleSearchListSelectionView<Element: Hashable, Label: View>: View {
 #endif
     }
 
-    private var filteredItems: [Element] {
-        searchText.isEmpty ? items : items.filter { description($0).localizedCaseInsensitiveContains(searchText) }
+    private var filteredItems: [Data.Element] {
+        searchText.isEmpty ? Array(items) : Array(items.filter { description($0).localizedCaseInsensitiveContains(searchText) })
     }
 
     @ViewBuilder
     private var buttonToggleAll: some View {
-        Button(selection.isEmpty ? "Enable All" : "Disable All") {
-            selection = selection.isEmpty ? Set(items) : []
+        Button(selection.isEmpty ? "Select All" : "Deselect All") {
+            selection = selection.isEmpty ? Set(items.map { $0[keyPath: id] }) : []
         }
         .foregroundColor(.blue)
     }
@@ -162,7 +165,16 @@ private struct ConsoleSearchListSelectionViewDemo: View {
     @State private var selection: Set<String>  = []
 
     var body: some View {
-        ConsoleSearchListSelectionView(title: "Labels", items: ["Debug", "Warning", "Error"], selection: $selection, description: { $0 }, label: { Text($0) })
+        List {
+            ConsoleSearchListSelectionView(
+                title: "Labels",
+                items: ["Debug", "Warning", "Error"],
+                id: \.self,
+                selection: $selection,
+                description: { $0 },
+                label: { Text($0) }
+            )
+        }.listStyle(.plain)
     }
 }
 #endif

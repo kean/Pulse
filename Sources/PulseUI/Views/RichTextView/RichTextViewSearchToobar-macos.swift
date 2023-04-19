@@ -11,35 +11,37 @@ struct RichTextViewSearchToobar: View {
 
     var body: some View {
         HStack {
-            SearchBar(title: "Search", text: $viewModel.searchTerm, onEditingChanged: { isEditing in
-                if isEditing {
-                    viewModel.isSearching = isEditing
-                }
-            }, onReturn: viewModel.nextMatch).frame(maxWidth: 240)
+            if !viewModel.matches.isEmpty {
+                HStack(spacing: 8) {
+                    Button(action: viewModel.previousMatch) {
+                        Image(systemName: "chevron.left.circle")
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(viewModel.matches.isEmpty)
 
-            StringSearchOptionsMenu(options: $viewModel.searchOptions, isKindNeeded: false)
-                .fixedSize()
+                    Text(viewModel.matches.isEmpty ? "0 / 0" : "\(viewModel.selectedMatchIndex+1) / \(viewModel.matches.count)")
+                        .font(Font.body.monospacedDigit())
+                        .foregroundColor(.secondary)
+
+                    Button(action: viewModel.nextMatch) {
+                        Image(systemName: "chevron.right.circle")
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(viewModel.matches.isEmpty)
+                }
+                .padding(.leading, 3)
+            }
 
             Spacer()
 
-            if !viewModel.matches.isEmpty {
-                HStack(spacing: 12) {
-                    Text(viewModel.matches.isEmpty ? "0/0" : "\(viewModel.selectedMatchIndex+1)/\(viewModel.matches.count)")
-                        .font(Font.body.monospacedDigit())
-                        .foregroundColor(.secondary)
-                    Button(action: viewModel.previousMatch) {
-                        Image(systemName: "chevron.left")
-                    }
-                    .buttonStyle(.plain)
-                    .disabled(viewModel.matches.isEmpty)
-                    Button(action: viewModel.nextMatch) {
-                        Image(systemName: "chevron.right")
-                    }
-                    .buttonStyle(.plain)
-                    .disabled(viewModel.matches.isEmpty)
-                }
-                .fixedSize()
+            if viewModel.isFilterEnabled {
+                SearchBar(title: "Filter", imageName: "line.3.horizontal.decrease.circle", text: $viewModel.filterTerm).frame(maxWidth: 130)
             }
+
+            SearchBar(title: "Search", text: $viewModel.searchTerm).frame(maxWidth: 130)
+
+            StringSearchOptionsMenu(options: $viewModel.searchOptions, isKindNeeded: false)
+                .fixedSize()
         }
         .padding(6)
     }

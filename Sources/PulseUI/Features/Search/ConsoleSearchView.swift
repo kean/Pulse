@@ -12,12 +12,6 @@ import Combine
 @available(iOS 15, *)
 struct ConsoleSearchView: View {
     @ObservedObject var viewModel: ConsoleSearchViewModel
-    let consoleViewModel: ConsoleViewModel
-
-    init(viewModel: ConsoleViewModel) {
-        self.consoleViewModel = viewModel
-        self.viewModel = viewModel.searchViewModel
-    }
 
     var body: some View {
         suggestionsView
@@ -122,7 +116,7 @@ struct ConsoleSearchView: View {
 
 #if os(iOS)
     private var toolbar: some View {
-        ConsoleSearchToolbar(title: viewModel.toolbarTitle, isSpinnerNeeded: viewModel.isSpinnerNeeded, viewModel: consoleViewModel)
+        ConsoleSearchToolbar(title: viewModel.toolbarTitle, isSpinnerNeeded: viewModel.isSpinnerNeeded)
     }
 #endif
 

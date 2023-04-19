@@ -25,7 +25,7 @@ struct NetworkInspectorMetricsView: View {
         .listStyle(.insetGrouped)
 #endif
 #if os(macOS)
-        .backport.hideListContentBackgroumd()
+        .backport.hideListContentBackground()
 #endif
 #if !os(macOS)
         .navigationTitle("Metrics")

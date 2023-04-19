@@ -25,7 +25,7 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
     private var connection: Connection?
     private var connectedServer: NWBrowser.Result?
     @Published public private(set) var connectionState: ConnectionState = .idle {
-        didSet { log(label: "RemoteLogger", "Did change connection state to: \(connectionState.description)")}
+        didSet { pulseLog(label: "RemoteLogger", "Did change connection state to: \(connectionState.description)")}
     }
     private var connectionRetryItem: DispatchWorkItem?
     private var timeoutDisconnectItem: DispatchWorkItem?
@@ -112,14 +112,14 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
         guard !isStarted else { return }
         isStarted = true
 
-        log(label: "RemoteLogger", "Will start browser")
+        pulseLog(label: "RemoteLogger", "Will start browser")
 
         let browser = NWBrowser(for: .bonjour(type: RemoteLogger.serviceType, domain: "local"), using: .tcp)
 
         browser.stateUpdateHandler = { [weak self] newState in
             guard let self = self, self.isEnabled else { return }
 
-            log(label: "RemoteLogger", "Browser did update state: \(newState)")
+            pulseLog(label: "RemoteLogger", "Browser did update state: \(newState)")
             if case .failed = newState {
                 self.scheduleBrowserRetry()
             }
@@ -128,7 +128,7 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
         browser.browseResultsChangedHandler = { [weak self] results, _ in
             guard let self = self, self.isEnabled else { return }
 
-            log(label: "RemoteLogger", "Found services \(results.map { $0.endpoint.debugDescription })")
+            pulseLog(label: "RemoteLogger", "Found services \(results.map { $0.endpoint.debugDescription })")
 
             self.servers = results
             self.connectAutomaticallyIfNeeded()
@@ -161,7 +161,7 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
             return
         }
 
-        log(label: "RemoteLogger", "Will connect automatically to \(server.endpoint)")
+        pulseLog(label: "RemoteLogger", "Will connect automatically to \(server.endpoint)")
 
         connect(to: server)
     }
@@ -182,7 +182,7 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
     /// the existing connection.
     public func connect(to server: NWBrowser.Result) {
         guard let name = server.name else {
-            return log(label: "RemoteLogger", "Server name is missing")
+            return pulseLog(label: "RemoteLogger", "Server name is missing")
         }
 
         // Save selection for the future
@@ -210,7 +210,7 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
         connectedServer = server
         connectionState = .connecting
 
-        log(label: "RemoteLogger", "Will start a connection to server with endpoint \(server.endpoint)")
+        pulseLog(label: "RemoteLogger", "Will start a connection to server with endpoint \(server.endpoint)")
 
         let server = servers.first(where: { $0.name == server.name }) ?? server
 
@@ -220,12 +220,14 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
         self.connection = connection
     }
 
-    public func connection(_ connection: Connection, didChangeState newState: NWConnection.State) {
+    // MARK: RemoteLoggerConnectionDelegate
+
+    func connection(_ connection: Connection, didChangeState newState: NWConnection.State) {
         precondition(DispatchQueue.getSpecific(key: specificKey) != nil)
 
         guard connectionState != .idle else { return }
 
-        log(label: "RemoteLogger", "Connection did update state: \(newState)")
+        pulseLog(label: "RemoteLogger", "Connection did update state: \(newState)")
 
         switch newState {
         case .ready:
@@ -237,7 +239,7 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
         }
     }
 
-    public func connection(_ connection: Connection, didReceiveEvent event: Connection.Event) {
+    func connection(_ connection: Connection, didReceiveEvent event: Connection.Event) {
         precondition(DispatchQueue.getSpecific(key: specificKey) != nil)
 
         guard connectionState != .idle else { return }
@@ -247,7 +249,7 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
             do {
                 try didReceiveMessage(packet: packet)
             } catch {
-                log(label: "RemoteLogger", "Invalid message from the server: \(error)")
+                pulseLog(label: "RemoteLogger", "Invalid message from the server: \(error)")
             }
         case .error:
             scheduleConnectionRetry()
@@ -256,16 +258,22 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
         }
     }
 
+    // MARK: Communication
+
     private func handshakeWithServer() {
         precondition(DispatchQueue.getSpecific(key: specificKey) != nil)
 
         assert(connection != nil)
 
-        log(label: "RemoteLogger", "Will send hello to the server")
+        pulseLog(label: "RemoteLogger", "Will send hello to the server")
 
         // Say "hello" to the server and share information about the client
-        let deviceId = getDeviceId() ?? getFallbackDeviceId()
-        let body = PacketClientHello(deviceId: deviceId, deviceInfo: .make(), appInfo: .make())
+        let body = PacketClientHello(
+            deviceId: getDeviceId() ?? getFallbackDeviceId(),
+            deviceInfo: .make(),
+            appInfo: .make(),
+            session: store?.session
+        )
         connection?.send(code: .clientHello, entity: body)
 
         // Set timeout and retry in case there was no response from the server
@@ -273,7 +281,7 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
             guard let self = self else { return } // Failed to connect in 10 sec
 
             guard self.connectionState == .connecting else { return }
-            log(label: "RemoteLogger", "The handshake with the server timed out")
+            pulseLog(label: "RemoteLogger", "The handshake with the server timed out")
             self.scheduleConnectionRetry()
         }
     }
@@ -281,7 +289,7 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
     private func didReceiveMessage(packet: Connection.Packet) throws {
         let code = RemoteLogger.PacketCode(rawValue: packet.code)
 
-        log(label: "RemoteLogger", "Did receive packet with code: \(code?.description ?? "invalid")")
+        pulseLog(label: "RemoteLogger", "Did receive packet with code: \(code?.description ?? "invalid")")
 
         switch code {
         case .serverHello:
@@ -330,7 +338,7 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
         let item = DispatchWorkItem { [weak self] in
             guard let self = self else { return }
             guard self.connectionState == .connected else { return }
-            log(label: "RemoteLogger", "Haven't received pings from a server in a while, disconnecting")
+            pulseLog(label: "RemoteLogger", "Haven't received pings from a server in a while, disconnecting")
             self.scheduleConnectionRetry()
         }
         queue.asyncAfter(deadline: .now() + .seconds(4), execute: item)
@@ -397,7 +405,7 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
                 let data = try RemoteLogger.PacketNetworkMessage.encode(message)
                 connection?.send(code: .storeEventNetworkTaskCompleted, data: data)
             } catch {
-                log(label: "RemoteLogger", "Failed to encode network message \(error)")
+                pulseLog(label: "RemoteLogger", "Failed to encode network message \(error)")
             }
         }
     }
@@ -427,7 +435,7 @@ private extension NWBrowser.Result {
 }
 
 extension RemoteLogger.ConnectionState {
-    public var description: String {
+    var description: String {
         switch self {
         case .idle: return "ConnectionState.idle"
         case .connecting: return "ConnectionState.connecting"
@@ -440,9 +448,9 @@ extension RemoteLogger {
     public static let serviceType = "_pulse._tcp"
 }
 
-func log(label: String? = nil, _ message: @autoclosure () -> String) {
-    #if DEBUG && PULSE_DEBUG_LOG_ENABLED
+func pulseLog(label: String? = nil, _ message: @autoclosure () -> String) {
+#if DEBUG && PULSE_DEBUG_LOG_ENABLED
     let prefix = label.map { "[\($0)] " } ?? ""
     NSLog(prefix + message())
-    #endif
+#endif
 }

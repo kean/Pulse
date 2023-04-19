@@ -10,106 +10,71 @@ import SwiftUI
 struct ConsoleListContentView: View {
     @ObservedObject var viewModel: ConsoleListViewModel
 
-#if os(iOS)
+#if os(macOS)
+    let proxy: ScrollViewProxy
+    @AppStorage("com-github-kean-pulse-is-now-enabled") private var isNowEnabled = true
+#endif
 
     var body: some View {
-        if #available(iOS 15, tvOS 15, *) {
+#if os(iOS)
+        if #available(iOS 15, *) {
             if !viewModel.pins.isEmpty, !viewModel.isShowingFocusedEntities {
-                pinsView
+                ConsoleListPinsSectionView(viewModel: viewModel)
+                if !viewModel.entities.isEmpty {
+                    PlainListGroupSeparator()
+                }
             }
         }
+#endif
+
+#if os(iOS) || os(macOS)
         if #available(iOS 15, *), let sections = viewModel.sections, !sections.isEmpty {
-            makeGroupedView(sections)
+            ForEach(sections, id: \.name) {
+                ConsoleListGroupedSectionView(section: $0, viewModel: viewModel)
+            }
         } else {
             plainView
-        }
-    }
-
-    @available(iOS 15.0, *)
-    private func makeGroupedView(_ sections: [NSFetchedResultsSectionInfo]) -> some View {
-        ForEach(sections, id: \.name) { section in
-            let objects = (section.objects as? [NSManagedObject]) ?? []
-            let prefix = objects.prefix(3)
-            let sectionName = viewModel.name(for: section)
-            PlainListExpandableSectionHeader(title: sectionName, count: section.numberOfObjects, destination: { EmptyView() }, isSeeAllHidden: true)
-            ForEach(prefix, id: \.objectID) { entity in
-                ConsoleEntityCell(entity: entity)
-            }
-            if prefix.count < objects.count {
-                NavigationLink(destination: makeDestination(for: sectionName, objects: objects)) {
-                    PlainListSeeAllView(count: objects.count)
-                }
-            }
-        }
-    }
-
-    private func makeDestination(for title: String, objects: [NSManagedObject]) -> some View {
-        LazyConsoleView(title: title, entities: objects, source: viewModel)
-    }
-
-    @available(iOS 15, tvOS 15, *)
-    @ViewBuilder
-    private var pinsView: some View {
-        let prefix = Array(viewModel.pins.prefix(3))
-        PlainListExpandableSectionHeader(title: "Pins", count: viewModel.pins.count, destination: {
-            ConsoleStaticList(entities: viewModel.pins)
-                .inlineNavigationTitle("Pins")
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        Button(action: viewModel.buttonRemovePinsTapped) {
-                            Image(systemName: "trash")
-                        }
-                    }
-                }
-        }, isSeeAllHidden: prefix.count == viewModel.pins.count)
-        ForEach(prefix.map(PinCellViewModel.init)) { viewModel in
-            ConsoleEntityCell(entity: viewModel.object)
-        }
-        Button(action: viewModel.buttonRemovePinsTapped) {
-            Text("Remove Pins")
-                .font(.subheadline)
-                .foregroundColor(Color.blue)
-                .frame(maxWidth: .infinity, alignment: .leading)
-        }
-        .buttonStyle(.plain)
-        .listRowBackground(Color.separator.opacity(0.2))
-        .listRowSeparator(.hidden)
-        .listRowSeparator(.hidden, edges: .bottom)
-
-        if !viewModel.visibleEntities.isEmpty {
-            PlainListGroupSeparator()
-        }
-    }
-#else
-    var body: some View {
-        plainView
-    }
+#if os(macOS)
+                .apply(registerNowMode)
 #endif
+        }
+#else
+        plainView
+#endif
+    }
 
     @ViewBuilder
     private var plainView: some View {
-        if viewModel.visibleEntities.isEmpty {
+        if viewModel.entities.isEmpty {
             Text("No Recorded Logs")
                 .font(.subheadline)
                 .foregroundColor(.secondary)
         } else {
             ForEach(viewModel.visibleEntities, id: \.objectID) { entity in
                 ConsoleEntityCell(entity: entity)
+                    .id(entity.objectID)
                     .onAppear { viewModel.onAppearCell(with: entity.objectID) }
                     .onDisappear { viewModel.onDisappearCell(with: entity.objectID) }
             }
         }
+#if os(macOS)
+        bottomAnchorView
+#else
         footerView
+#endif
     }
 
     @ViewBuilder
     private var footerView: some View {
-        if #available(iOS 15, *), viewModel.isShowPreviousSessionButtonShown, !viewModel.isShowingFocusedEntities {
-            Button(action: viewModel.buttonShowPreviousSessionTapped) {
-                Text("Show Previous Sessions")
+        if #available(iOS 15, *), let session = viewModel.previousSession, !viewModel.isShowingFocusedEntities {
+            Button(action: { viewModel.buttonShowPreviousSessionTapped(for: session) }) {
+                Text("Show Previous Session")
                     .font(.subheadline)
-                    .foregroundColor(Color.blue)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .foregroundColor(.blue)
+                Spacer()
+                Text(session.formattedDate(isCompact: false))
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
             }
             .buttonStyle(.plain)
 #if os(iOS)
@@ -117,37 +82,63 @@ struct ConsoleListContentView: View {
 #endif
         }
     }
-}
 
-private struct PinCellViewModel: Hashable, Identifiable {
-    let object: NSManagedObject
-    var id: PinCellId
+#if os(macOS)
+    private func registerNowMode<T: View>(for list: T) -> some View {
+        list.onChange(of: viewModel.entities) { entities in
+            guard isNowEnabled else { return }
 
-    init(_ object: NSManagedObject) {
-        self.object = object
-        self.id = PinCellId(id: object.objectID)
-    }
-}
-
-// Make sure the cells 
-private struct PinCellId: Hashable {
-    let id: NSManagedObjectID
-}
-
-#if os(iOS)
-struct ConsolePlainList: View {
-    @ObservedObject var viewModel: ConsoleListViewModel
-
-    var body: some View {
-        List {
-            ForEach(viewModel.entities, id: \.objectID, content: ConsoleEntityCell.init)
+            withAnimation {
+                proxy.scrollTo(BottomViewID(), anchor: .top)
+            }
+            // This is a workaround that fixes a scrolling issue when more
+            // than one row is added at the time.
+            DispatchQueue.main.async {
+                proxy.scrollTo(BottomViewID(), anchor: .top)
+            }
         }
-        .onAppear { viewModel.isViewVisible = true }
-        .onDisappear { viewModel.isViewVisible = false }
-        .listStyle(.plain)
+        .onChange(of: isNowEnabled) {
+            guard $0 else { return }
+            proxy.scrollTo(BottomViewID(), anchor: .top)
+        }
     }
+
+    // This view is used to keep scroll to the bottom and keep track of the
+    // scroll position (near bottom or not).
+    private var bottomAnchorView: some View {
+        HStack { EmptyView() }
+            .frame(height: 1)
+            .id(BottomViewID())
+            .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+            .onAppear {
+                nowModeChange?.cancel()
+            }
+            .onDisappear {
+                // The scrolling with ScrollViewProxy is unreliable, and this cell
+                // occasionally disappears.
+                delayNowModeChange {
+                    guard viewModel.isViewVisible else { return }
+                    isNowEnabled = false
+                }
+            }
+    }
+#endif
 }
 
+private var nowModeChange: DispatchWorkItem?
+
+private func delayNowModeChange(_ closure: @escaping () -> Void) {
+    nowModeChange?.cancel()
+    let item = DispatchWorkItem(block: closure)
+    DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(64), execute: item)
+    nowModeChange = item
+}
+
+struct BottomViewID: Hashable, Identifiable {
+    var id: BottomViewID { self}
+}
+
+#if os(iOS) || os(macOS)
 struct ConsoleStaticList: View {
     let entities: [NSManagedObject]
 
@@ -155,29 +146,10 @@ struct ConsoleStaticList: View {
         List {
             ForEach(entities, id: \.objectID, content: ConsoleEntityCell.init)
         }
-    }
-}
-
-private struct LazyConsoleView: View {
-    let title: String
-    let entities: [NSManagedObject]
-    let source: ConsoleListViewModel
-
-    var body: some View {
-        ConsoleView(viewModel: makeViewModel())
-            .navigationBarTitleDisplayMode(.inline)
-    }
-
-    private func makeViewModel() -> ConsoleViewModel {
-        let viewModel = ConsoleViewModel(
-            store: source.store,
-            context: .init(title: title, focus: NSPredicate(format: "self IN %@", entities)),
-            mode: source.mode
-        )
-        viewModel.listViewModel.options.order = source.options.order
-        viewModel.listViewModel.options.messageSortBy = source.options.messageSortBy
-        viewModel.listViewModel.options.taskSortBy = source.options.taskSortBy
-        return viewModel
+        .listStyle(.plain)
+#if os(iOS)
+        .environment(\.defaultMinListRowHeight, 8)
+#endif
     }
 }
 #endif

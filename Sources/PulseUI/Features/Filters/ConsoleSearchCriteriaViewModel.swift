@@ -11,17 +11,20 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
     var isButtonResetEnabled: Bool { !isCriteriaDefault }
 
     @Published var mode: ConsoleMode = .all
-    @Published var criteria = ConsoleSearchCriteria()
-    @Published var isOnlyErrors = false
-    @Published var focus: NSPredicate?
+    @Published var options = ConsolePredicateOptions()
 
-    let defaultCriteria: ConsoleSearchCriteria
+    var criteria: ConsoleSearchCriteria {
+        get { options.criteria }
+        set { options.criteria = newValue }
+    }
 
     @Published private(set) var labels: [String] = []
     @Published private(set) var domains: [String] = []
 
     private(set) var labelsCountedSet = NSCountedSet()
     private(set) var domainsCountedSet = NSCountedSet()
+
+    let defaultCriteria: ConsoleSearchCriteria
 
     private let index: LoggerStoreIndex
     private var isScreenVisible = false
@@ -33,11 +36,10 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
     /// - Parameters:
     ///   - criteria: The initial search criteria.
     ///   - index: The store index.
-    init(criteria: ConsoleSearchCriteria, index: LoggerStoreIndex) {
+    init(options: ConsolePredicateOptions, index: LoggerStoreIndex) {
         self.index = index
-
-        self.criteria = criteria
-        self.defaultCriteria = criteria
+        self.options = options
+        self.defaultCriteria = options.criteria
     }
 
     func bind(_ entities: some Publisher<[NSManagedObject], Never>) {
@@ -72,6 +74,10 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
         }
     }
 
+    func select(sessions: Set<UUID>) {
+        self.criteria.shared.sessions.selection = sessions
+    }
+
     func resetAll() {
         criteria = defaultCriteria
     }
@@ -89,33 +95,6 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
             }
             labelsCountedSet = NSCountedSet(array: messages.map(\.label))
             labels = index.labels.sorted()
-        }
-    }
-
-    // MARK: Binding (LogLevels)
-
-    func binding(forLevel level: LoggerStore.Level) -> Binding<Bool> {
-        Binding(get: {
-            self.criteria.messages.logLevels.levels.contains(level)
-        }, set: { isOn in
-            if isOn {
-                self.criteria.messages.logLevels.levels.insert(level)
-            } else {
-                self.criteria.messages.logLevels.levels.remove(level)
-            }
-        })
-    }
-
-    var isAllLogLevelsEnabled: Bool {
-        get {
-            criteria.messages.logLevels.levels.count == LoggerStore.Level.allCases.count
-        }
-        set {
-            if newValue {
-                criteria.messages.logLevels.levels = Set(LoggerStore.Level.allCases)
-            } else {
-                criteria.messages.logLevels.levels = []
-            }
         }
     }
 

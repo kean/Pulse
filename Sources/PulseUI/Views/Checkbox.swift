@@ -11,12 +11,12 @@ struct Checkbox<Label: View>: View {
     var body: some View {
 #if os(iOS)
         Button(action: { isOn.toggle() }) {
-            HStack {
+            HStack(spacing: 16) {
                 Image(systemName: isOn ? "checkmark.circle.fill" : "circle")
-                    .font(.body)
-                    .foregroundColor(isOn ? .blue : .secondary)
+                    .font(.title3)
+                    .foregroundColor(isOn ? .blue : .separator)
                 label()
-                Spacer()
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
             .contentShape(Rectangle())
         }.buttonStyle(.plain)
@@ -34,7 +34,7 @@ extension Checkbox where Label == Text {
 
 struct CheckboxView_Previews: PreviewProvider {
     static var previews: some View {
-        VStack(spacing: 32) {
+        List {
             Checkbox("Checkbox", isOn: .constant(true)).disabled(false)
             Checkbox("Checkbox", isOn: .constant(false)).disabled(false)
             Checkbox("Checkbox", isOn: .constant(true)).disabled(true)

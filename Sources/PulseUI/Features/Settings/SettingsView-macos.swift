@@ -14,7 +14,6 @@ public struct SettingsView: View {
     var store: LoggerStore { viewModel.store }
 
     @State private var isPresentingShareStoreView = false
-    @State private var isPresentingStoreDetails = false
     @State private var shareItems: ShareItems?
 
     public init(store: LoggerStore = .shared) {
@@ -35,43 +34,8 @@ public struct SettingsView: View {
     private var settings: some View {
         ConsoleSection(isDividerHidden: true, header: { SectionHeaderView(title: "Share") }) {
             HStack {
-                Button(action: { isPresentingShareStoreView = true }) {
-                    Label("Share Store", systemImage: "square.and.arrow.up")
-                }
-                .popover(isPresented: $isPresentingShareStoreView) {
-                    ShareStoreView(store: viewModel.store, isPresented: $isPresentingShareStoreView) { item in
-                        isPresentingShareStoreView = false
-                        DispatchQueue.main.async {
-                            shareItems = item
-                        }
-                    }
-                }
-                .popover(item: $shareItems) { item in
-                    ShareView(item)
-                        .fixedSize()
-                }
-                Spacer()
-            }
-            HStack {
-                Button(action: { isPresentingStoreDetails = true }) {
-                    Label("Store Details", systemImage: "info.circle")
-                }
-                Spacer()
-            }
-            .popover(isPresented: $isPresentingStoreDetails) {
-                StoreDetailsView(source: .store(viewModel.store))
-            }
-        }
-        ConsoleSection(header: { SectionHeaderView(title: "Open Store") }) {
-            HStack {
                 Button("Show in Finder") {
                     NSWorkspace.shared.activateFileViewerSelecting([store.storeURL])
-                }
-                Spacer()
-            }
-            HStack {
-                Button("Open in Pulse Pro") {
-                    NSWorkspace.shared.open(store.storeURL)
                 }
                 Spacer()
             }

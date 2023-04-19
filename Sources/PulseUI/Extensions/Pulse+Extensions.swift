@@ -86,3 +86,45 @@ extension NetworkTaskEntity.State {
         }
     }
 }
+
+extension LoggerSessionEntity {
+    var formattedDate: String {
+        formattedDate(isCompact: false)
+    }
+
+    var searchTags: [String] {
+        possibleFormatters.map { $0.string(from: createdAt) }
+    }
+
+    func formattedDate(isCompact: Bool = false) -> String {
+        if isCompact {
+            return compactDateFormatter.string(from: createdAt)
+        } else {
+            return fullDateFormatter.string(from: createdAt)
+        }
+    }
+
+    var fullVersion: String? {
+        guard let version = version else {
+            return nil
+        }
+        if let build = build {
+            return version + " (\(build))"
+        }
+        return version
+    }
+}
+
+private let compactDateFormatter = DateFormatter(dateStyle: .none, timeStyle: .medium)
+
+#if os(watchOS)
+private let fullDateFormatter = DateFormatter(dateStyle: .short, timeStyle: .short, isRelative: true)
+#else
+private let fullDateFormatter = DateFormatter(dateStyle: .medium, timeStyle: .medium, isRelative: true)
+#endif
+
+private let possibleFormatters: [DateFormatter] = [
+    fullDateFormatter,
+    DateFormatter(dateStyle: .long, timeStyle: .none),
+    DateFormatter(dateStyle: .short, timeStyle: .none)
+]

@@ -13,6 +13,7 @@ struct ConsoleListOptions {
 #else
     var order: Ordering = .descending
 #endif
+
     var messageGroupBy: MessageGroupBy = .noGrouping
     var taskGroupBy: TaskGroupBy = .noGrouping
 
@@ -62,7 +63,7 @@ struct ConsoleListOptions {
             case .label: return "label"
             case .level: return "level"
             case .file: return "file"
-            case .session: return "sessionID"
+            case .session: return "session"
             }
         }
 
@@ -97,7 +98,7 @@ struct ConsoleListOptions {
             case .errorCode: return "errorCode"
             case .requestState: return "requestState"
             case .responseContentType: return "responseContentType"
-            case .session: return "sessionID"
+            case .session: return "session"
             }
         }
 

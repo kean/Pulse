@@ -76,7 +76,53 @@ extension View {
     var backport: Backport<Self> { Backport(content: self) }
 }
 
+enum SwipeActionEdge {
+    case leading
+    case trailing
+
+#if os(iOS) || os(macOS)
+    @available(iOS 15, tvOS 15, *)
+    var native: HorizontalEdge {
+        switch self {
+        case .leading: return .leading
+        case .trailing: return .trailing
+        }
+    }
+#endif
+}
+
 extension Backport {
+    @ViewBuilder
+    func tint(_ color: Color) -> some View {
+        if #available(iOS 15, tvOS 15, *) {
+            content.tint(color)
+        } else {
+            content.foregroundColor(color)
+        }
+    }
+
+    @ViewBuilder
+    func swipeActions<T: View>(edge: SwipeActionEdge = .trailing, allowsFullSwipe: Bool = true, @ViewBuilder closure: () -> T) -> some View {
+#if os(iOS) || os(macOS)
+        if #available(iOS 15, tvOS 15, *) {
+            content.swipeActions(edge: edge.native, allowsFullSwipe: allowsFullSwipe, content: closure)
+        } else {
+            content
+        }
+#else
+        content
+#endif
+    }
+
+    @ViewBuilder
+    func searchable(text: Binding<String>) -> some View {
+        if #available(iOS 15, tvOS 15, *) {
+            content.searchable(text: text)
+        } else {
+            content
+        }
+    }
+
     @ViewBuilder
     func contextMenu<M: View, P: View>(@ViewBuilder menuItems: () -> M, @ViewBuilder preview: () -> P) -> some View {
 #if !os(watchOS)
@@ -119,7 +165,7 @@ extension Backport {
     }
 
     @ViewBuilder
-    func hideListContentBackgroumd() -> some View {
+    func hideListContentBackground() -> some View {
 #if os(macOS)
         if #available(macOS 13, *) {
             self.content.scrollContentBackground(.hidden)
@@ -130,6 +176,17 @@ extension Backport {
         self.content
 #endif
     }
+
+#if os(macOS)
+    @ViewBuilder
+    func showListSeparators() -> some View {
+        if #available(macOS 13, *) {
+            self.content.listRowSeparator(.visible)
+        } else {
+            self.content
+        }
+    }
+#endif
 
     enum PresentationDetent {
         case large
@@ -154,5 +211,27 @@ extension View {
 #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
 #endif
+    }
+
+#if os(macOS)
+    func showInWindow() {
+        let window = NSWindow()
+        window.isOpaque = false
+        window.center()
+        window.isReleasedWhenClosed = false
+        window.hidesOnDeactivate = true
+        window.styleMask = window.styleMask.union([.resizable, .closable, .miniaturizable])
+        window.toolbarStyle = .unified
+        window.titleVisibility = .hidden
+        window.titlebarSeparatorStyle = .none
+        window.titlebarAppearsTransparent = true
+
+        window.contentViewController = NSHostingController(rootView: self)
+        window.makeKeyAndOrderFront(nil)
+    }
+#endif
+
+    func apply<T>(_ closure: (Self) -> T) -> T {
+        closure(self)
     }
 }

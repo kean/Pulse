@@ -24,8 +24,6 @@ struct FileViewer: View {
     @ViewBuilder
     private var contents: some View {
         switch viewModel.contents {
-        case .json(let viewModel):
-            RichTextView(viewModel: viewModel)
         case .image(let viewModel):
             ScrollView {
                 ImageViewer(viewModel: viewModel)

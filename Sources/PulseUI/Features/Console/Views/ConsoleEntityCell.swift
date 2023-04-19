@@ -14,8 +14,14 @@ struct ConsoleEntityCell: View {
         switch LoggerEntity(entity) {
         case .message(let message):
             _ConsoleMessageCell(message: message)
+#if os(macOS)
+                .backport.showListSeparators()
+#endif
         case .task(let task):
             _ConsoleTaskCell(task: task)
+#if os(macOS)
+                .backport.showListSeparators()
+#endif
         }
     }
 }
@@ -38,7 +44,7 @@ private struct _ConsoleMessageCell: View {
         }
 #endif
 
-#if os(iOS)
+#if os(iOS) || os(macOS)
         if #available(iOS 15, *) {
             cell.swipeActions(edge: .leading, allowsFullSwipe: true) {
                 PinButton(viewModel: .init(message)).tint(.pink)
@@ -50,7 +56,7 @@ private struct _ConsoleMessageCell: View {
             }
             .backport.contextMenu(menuItems: {
                 Section {
-                    Button(action: { shareItems = ShareService.share(message, as: .html) }) {
+                    Button(action: { shareItems = ShareService.share(message, as: .plainText) }) {
                         Label("Share", systemImage: "square.and.arrow.up")
                     }.tint(.blue)
                     Button(action: { UXPasteboard.general.string = message.text }) {
@@ -64,7 +70,11 @@ private struct _ConsoleMessageCell: View {
                 ConsoleMessageCellPreview(message: message)
                     .frame(idealWidth: 320, maxHeight: 600)
             })
+#if os(iOS)
             .sheet(item: $shareItems, content: ShareView.init)
+#else
+            .popover(item: $shareItems, attachmentAnchor: .point(.leading), arrowEdge: .leading) { ShareView($0) }
+#endif
         } else {
             cell
         }
@@ -77,6 +87,7 @@ private struct _ConsoleMessageCell: View {
 private struct _ConsoleTaskCell: View {
     let task: NetworkTaskEntity
     @State private var shareItems: ShareItems?
+    @State private var isSharing = false
 
     var body: some View {
 #if os(iOS)
@@ -91,33 +102,37 @@ private struct _ConsoleTaskCell: View {
         }
 #endif
 
-#if os(iOS)
+#if os(iOS) || os(macOS)
         if #available(iOS 15, *) {
             cell.swipeActions(edge: .leading, allowsFullSwipe: true) {
                 PinButton(viewModel: .init(task)).tint(.pink)
             }
             .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                Button(action: { shareItems = ShareService.share(task, as: .html) }) {
+                Button(action: {
+#if os(iOS)
+                    shareItems = ShareService.share(task, as: .html)
+#else
+                    isSharing = true
+#endif
+                }) {
                     Label("Share", systemImage: "square.and.arrow.up.fill")
                 }.tint(.blue)
             }
             .backport.contextMenu(menuItems: {
-                Menu(content: {
-                    AttributedStringShareMenu(shareItems: $shareItems) {
-                        TextRenderer(options: .sharing).make { $0.render(task, content: .sharing) }
-                    }
-                    Button(action: { shareItems = ShareItems([task.cURLDescription()]) }) {
-                        Label("Share as cURL", systemImage: "square.and.arrow.up")
-                    }
-                }, label: {
-                    Label("Share...", systemImage: "square.and.arrow.up")
-                })
-                NetworkMessageContextMenu(task: task, sharedItems: $shareItems)
+#if os(iOS)
+                ContextMenu.NetworkTaskContextMenuItems(task: task, sharedItems: $shareItems)
+#else
+                ContextMenu.NetworkTaskContextMenuItems(task: task, isSharing: $isSharing)
+#endif
             }, preview: {
                 ConsoleTaskCellPreview(task: task)
                     .frame(idealWidth: 320, maxHeight: 600)
             })
+#if os(iOS)
             .sheet(item: $shareItems, content: ShareView.init)
+#else
+            .popover(isPresented: $isSharing, attachmentAnchor: .point(.leading), arrowEdge: .leading) { ShareNetworkTaskView(task: task) }
+#endif
         } else {
             cell
         }
@@ -127,7 +142,7 @@ private struct _ConsoleTaskCell: View {
     }
 }
 
-#if os(iOS)
+#if os(iOS) || os(macOS)
 @available(iOS 15, tvOS 15, *)
 private struct ConsoleMessageCellPreview: View {
     let message: LoggerMessageEntity
@@ -156,8 +171,12 @@ private struct TextViewPreview: View {
 
     var body: some View {
         let range = NSRange(location: 0, length: min(2000, string.length))
+#if os(iOS)
         let attributedString = try? AttributedString(string.attributedSubstring(from: range), including: \.uiKit)
-            Text(attributedString ?? AttributedString("–"))
+#else
+        let attributedString = try? AttributedString(string.attributedSubstring(from: range), including: \.appKit)
+#endif
+        Text(attributedString ?? AttributedString("–"))
             .padding(12)
     }
 }

@@ -11,7 +11,7 @@ import Combine
 
 #if os(iOS)
 struct ConsoleToolbarView: View {
-    let viewModel: ConsoleViewModel
+    @EnvironmentObject private var environment: ConsoleEnvironment
 
     var body: some View {
         if #available(iOS 16.0, *) {
@@ -42,47 +42,46 @@ struct ConsoleToolbarView: View {
 
     @ViewBuilder
     private func contents(isVertical: Bool) -> some View {
-        if viewModel.context.focus != nil {
-            ConsoleModeButton(title: viewModel.mode == .network ? "Focused Tasks" : "Focused Logs", isSelected: false) {}
-        } else {
-            switch viewModel.initialMode {
-            case .all:
-                ConsoleModePicker(viewModel: viewModel)
-            case .logs, .network:
-                ConsoleToolbarTitle(viewModel: viewModel)
-            }
+        switch environment.initialMode {
+        case .all:
+            ConsoleModePicker(environment: environment)
+        case .logs, .network:
+            ConsoleToolbarTitle()
         }
         if !isVertical {
             Spacer()
         }
         HStack(spacing: 14) {
-            ConsoleFiltersView(viewModel: viewModel)
+            ConsoleFiltersView(environment: environment)
         }.padding(.trailing, isVertical ? 0 : -2)
     }
 }
 #elseif os(macOS)
 struct ConsoleToolbarView: View {
-    let viewModel: ConsoleViewModel
+    let environment: ConsoleEnvironment
 
     @ObservedObject private var searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
 
-    init(viewModel: ConsoleViewModel) {
-        self.viewModel = viewModel
-        self.searchCriteriaViewModel = viewModel.searchCriteriaViewModel
+    init(environment: ConsoleEnvironment) {
+        self.environment = environment
+        self.searchCriteriaViewModel = environment.searchCriteriaViewModel
     }
 
     var body: some View {
         HStack {
-            if searchCriteriaViewModel.focus != nil {
+            if searchCriteriaViewModel.options.focus != nil {
                 makeFocusedView()
             } else {
-                ConsoleModePicker(viewModel: viewModel)
+                ConsoleModePicker(environment: environment)
             }
             Spacer()
-            ConsoleToolbarToggleOnlyErrorsButton(viewModel: viewModel.searchCriteriaViewModel)
+            ConsoleFiltersView(environment: environment)
+                .menuStyle(.borderlessButton)
+                .menuIndicator(.hidden)
+                .pickerStyle(.inline)
         }
         .padding(.horizontal, 10)
-        .frame(height: 34, alignment: .center)
+        .frame(height: 27, alignment: .center)
     }
 
     @ViewBuilder
@@ -91,7 +90,7 @@ struct ConsoleToolbarView: View {
             .foregroundColor(.secondary)
             .font(.subheadline.weight(.medium))
 
-        Button(action: { searchCriteriaViewModel.focus = nil }) {
+        Button(action: { searchCriteriaViewModel.options.focus = nil }) {
             Image(systemName: "xmark")
         }
         .foregroundColor(.secondary)
@@ -102,17 +101,17 @@ struct ConsoleToolbarView: View {
 #endif
 
 struct ConsoleModePicker: View {
-    let viewModel: ConsoleViewModel
+    private let environment: ConsoleEnvironment
 
     @ObservedObject private var logsCounter: ManagedObjectsCountObserver
     @ObservedObject private var tasksCounter: ManagedObjectsCountObserver
 
     @State private var mode: ConsoleMode = .all
 
-    init(viewModel: ConsoleViewModel) {
-        self.viewModel = viewModel
-        self.logsCounter = viewModel.logCountObserver
-        self.tasksCounter = viewModel.taskCountObserver
+    init(environment: ConsoleEnvironment) {
+        self.environment = environment
+        self.logsCounter = environment.logCountObserver
+        self.tasksCounter = environment.taskCountObserver
     }
 
 #if os(macOS)
@@ -128,15 +127,14 @@ struct ConsoleModePicker: View {
             ConsoleModeButton(title: "Network", details: CountFormatter.string(from: tasksCounter.count), isSelected: mode == .network) { mode = .network }
         }
         .onChange(of: mode) {
-            viewModel.mode = $0
+            environment.mode = $0
         }
     }
 }
 
 private struct ConsoleToolbarTitle: View {
-    let viewModel: ConsoleViewModel
-
     @State private var title: String = ""
+    @EnvironmentObject private var environment: ConsoleEnvironment
 
     var body: some View {
         Text(title)
@@ -146,8 +144,8 @@ private struct ConsoleToolbarTitle: View {
     }
 
     private var titlePublisher: some Publisher<String, Never> {
-        let kind = viewModel.initialMode == .network ? "Requests" : "Logs"
-        return viewModel.listViewModel.$entities.map { entities in
+        let kind = environment.initialMode == .network ? "Requests" : "Logs"
+        return environment.listViewModel.$entities.map { entities in
             "\(entities.count) \(kind)"
         }
     }
@@ -187,14 +185,15 @@ private struct ConsoleModeButton: View {
 }
 
 struct ConsoleFiltersView: View {
-    let viewModel: ConsoleViewModel
-    @ObservedObject var listViewModel: ConsoleListViewModel
-    @ObservedObject var searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
+    let environment: ConsoleEnvironment
 
-    init(viewModel: ConsoleViewModel) {
-        self.viewModel = viewModel
-        self.listViewModel = viewModel.listViewModel
-        self.searchCriteriaViewModel = viewModel.searchCriteriaViewModel
+    @ObservedObject private var listViewModel: ConsoleListViewModel
+    @ObservedObject private var searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
+
+    init(environment: ConsoleEnvironment) {
+        self.environment = environment
+        self.listViewModel = environment.listViewModel
+        self.searchCriteriaViewModel = environment.searchCriteriaViewModel
     }
 
     var body: some View {
@@ -208,21 +207,36 @@ struct ConsoleFiltersView: View {
     @ViewBuilder
     private var contents: some View {
         if #available(iOS 15, *) {
+#if os(iOS)
             sortByMenu.fixedSize()
+#endif
             groupByMenu.fixedSize()
         }
-        Button(action: { searchCriteriaViewModel.isOnlyErrors.toggle() }) {
-            Text(Image(systemName: searchCriteriaViewModel.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon"))
+
+        let criteria = searchCriteriaViewModel
+
+#if os(macOS)
+        Button(action: { criteria.options.isOnlyErrors.toggle() }) {
+            Image(systemName: criteria.options.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon")
+                .foregroundColor(criteria.options.isOnlyErrors ? .red : .primary)
+        }
+        .buttonStyle(.plain)
+        .keyboardShortcut("e", modifiers: [.command, .shift])
+        .help("Toggle Show Only Errors (⇧⌘E)")
+#else
+        Button(action: { criteria.options.isOnlyErrors.toggle() }) {
+            Text(Image(systemName: criteria.options.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon"))
                 .font(.body)
-                .foregroundColor(searchCriteriaViewModel.isOnlyErrors ? .red : .blue)
+                .foregroundColor(criteria.options.isOnlyErrors ? .red : .blue)
         }
         .padding(.leading, 1)
+#endif
     }
 
     @ViewBuilder
     private var sortByMenu: some View {
         Menu(content: {
-            if viewModel.mode == .network {
+            if environment.mode == .network {
                 Picker("Sort By", selection: $listViewModel.options.taskSortBy) {
                     ForEach(ConsoleListOptions.TaskSortBy.allCases, id: \.self) {
                         Text($0.rawValue).tag($0)
@@ -249,7 +263,7 @@ struct ConsoleFiltersView: View {
     @ViewBuilder
     private var groupByMenu: some View {
         Menu(content: {
-            if viewModel.mode == .network {
+            if environment.mode == .network {
                 Picker("Group By", selection: $listViewModel.options.taskGroupBy) {
                     Group {
                         Text("Ungrouped").tag(ConsoleListOptions.TaskGroupBy.noGrouping)

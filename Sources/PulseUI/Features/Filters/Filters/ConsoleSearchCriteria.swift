@@ -7,13 +7,20 @@ import Pulse
 import CoreData
 import Combine
 
+struct ConsolePredicateOptions {
+    var criteria = ConsoleSearchCriteria()
+    var isOnlyErrors = false
+    var focus: NSPredicate?
+}
+
 struct ConsoleSearchCriteria: Hashable {
     var shared = Shared()
     var messages = Messages()
     var network = Network()
 
     struct Shared: Hashable {
-        var dates = Dates.session
+        var sessions = Sessions()
+        var dates = Dates()
     }
 
     struct Messages: Hashable {
@@ -40,6 +47,11 @@ protocol ConsoleFilterProtocol: Hashable {
 }
 
 extension ConsoleSearchCriteria {
+    struct Sessions: Hashable, ConsoleFilterProtocol {
+        var isEnabled = true
+        var selection: Set<UUID> = []
+    }
+
     struct Dates: Hashable, ConsoleFilterProtocol {
         var isEnabled = true
         var startDate: Date?
@@ -51,10 +63,6 @@ extension ConsoleSearchCriteria {
 
         static var recent: Dates {
             Dates(startDate: Date().addingTimeInterval(-1200))
-        }
-
-        static var session: Dates {
-            Dates(startDate: LoggerStore.launchDate)
         }
     }
 

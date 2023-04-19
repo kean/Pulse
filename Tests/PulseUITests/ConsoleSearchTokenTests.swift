@@ -8,7 +8,6 @@ import XCTest
 
 #if os(iOS) || os(macOS)
 
-@available(iOS 16, tvOS 16, *)
 final class ConsoleSearchTokenTests: XCTestCase {
     func testStatusCodeFilter() throws {
         func parse(_ string: String) -> ConsoleSearchFilterStatusCode? {

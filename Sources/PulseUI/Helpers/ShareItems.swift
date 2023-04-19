@@ -7,11 +7,11 @@ import Pulse
 import CoreData
 
 enum ShareStoreOutput: String, RawRepresentable {
-    case store, text, html
+    case store, package, text, html
 
     var fileExtension: String {
         switch self {
-        case .store: return "pulse"
+        case .store, .package: return "pulse"
         case .text: return "txt"
         case .html: return "html"
         }
@@ -33,6 +33,18 @@ struct ShareItems: Identifiable {
 
 enum ShareService {
     private static var task: ShareStoreTask?
+
+    static func share(_ entities: [NSManagedObject], store: LoggerStore, as output: ShareOutput) async throws -> ShareItems {
+        try await withUnsafeThrowingContinuation { continuation in
+            ShareService.share(entities, store: store, as: output) {
+                if let value = $0 {
+                    continuation.resume(returning: value)
+                } else {
+                    continuation.resume(throwing: CancellationError())
+                }
+            }
+        }
+    }
 
     static func share(_ entities: [NSManagedObject], store: LoggerStore, as output: ShareOutput, _ completion: @escaping (ShareItems?) -> Void) {
         ShareStoreTask(entities: entities, store: store, output: output, completion: completion).start()

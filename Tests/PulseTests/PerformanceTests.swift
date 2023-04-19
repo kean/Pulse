@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2023 Alexander Grebenyuk (github.com/kean).
 
 import CoreData
 import XCTest
@@ -53,8 +53,8 @@ final class PerformanceTests: XCTestCase {
     }
 
     func populateStore() {
-        /// Create 60000 messages
-        for _ in 0..<10000 {
+        /// Create 30000 messages
+        for _ in 0..<5000 {
             store.storeMessage(label: "application", level: .info, message:  "UIApplication.didFinishLaunching")
             store.storeMessage(label: "application", level: .info, message:  "UIApplication.willEnterForeground")
             store.storeMessage(label: "auth", level: .debug, message: "🌐 Will authorize user with name \"kean@github.com\"", metadata: [

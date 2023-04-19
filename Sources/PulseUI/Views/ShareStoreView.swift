@@ -10,116 +10,113 @@ import Pulse
 import Combine
 
 struct ShareStoreView: View {
-    let store: LoggerStore
+    /// Preselected sessions.
+    var sessions: Set<UUID> = []
+    var onDismiss: () -> Void
 
+    @State private var isShowingLabelPicker = false
     @StateObject private var viewModel = ShareStoreViewModel()
-    @State private var shareItem: ShareItems?
-    @Binding var isPresented: Bool // presentationMode is buggy
 
-#if os(macOS)
-    let onShare: (ShareItems) -> Void
-#endif
+    @Environment(\.store) private var store: LoggerStore
 
     var body: some View {
+        content
+            .onAppear {
+                if !sessions.isEmpty {
+                    viewModel.sessions = sessions
+                } else if viewModel.sessions.isEmpty {
+                    viewModel.sessions = [store.session.id]
+                }
+                viewModel.store = store
+            }
+    }
+
+    @ViewBuilder
+    private var content: some View {
+#if os(iOS)
         Form {
             sectionSharingOptions
-            sectionStatus
             sectionShare
         }
-        .onAppear { viewModel.display(store) }
-        .navigationTitle("Sharing Options")
-#if os(iOS)
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationBarItems(leading: leadingBarItems)
-#endif
-        .sheet(item: $shareItem) {
-            ShareView($0).onCompletion {
-                isPresented = false
+        .inlineNavigationTitle("Share Logs")
+        .navigationBarItems(leading: Button("Cancel", action: onDismiss))
+        .sheet(item: $viewModel.shareItems) {
+            ShareView($0).onCompletion(onDismiss)
+        }
+#elseif os(macOS)
+        Form {
+            sectionSharingOptions
+            Divider()
+            sectionShare.popover(item: $viewModel.shareItems, arrowEdge: .trailing) {
+                ShareView($0)
             }
         }
-#if os(macOS)
+        .listStyle(.sidebar)
         .padding()
+        .popover(isPresented: $isShowingLabelPicker, arrowEdge: .trailing) {
+            destinationLogLevels.padding()
+        }
 #endif
     }
 
-    private var leadingBarItems: some View {
-        Button("Cancel") {
-            isPresented = false
-        }
-    }
-
+    @ViewBuilder
     private var sectionSharingOptions: some View {
         Section {
-            Picker("Time Range", selection: $viewModel.timeRange) {
-                ForEach(SharingTimeRange.allCases, id: \.self) {
-                    Text($0.rawValue).tag($0)
+            ConsoleSessionsPickerView(selection: $viewModel.sessions)
+#if os(iOS)
+            NavigationLink(destination: destinationLogLevels) {
+                InfoRow(title: "Log Levels", details: viewModel.selectedLevelsTitle)
+            }
+#else
+            HStack {
+                Text("Log Levels")
+                Spacer()
+                Button(action: { isShowingLabelPicker = true }) {
+                    Text(viewModel.selectedLevelsTitle + "...")
                 }
             }
-            Picker("Minimum Log Level", selection: $viewModel.level) {
-                Text("Trace").tag(LoggerStore.Level.trace)
-                Text("Debug").tag(LoggerStore.Level.debug)
-                Text("Error").tag(LoggerStore.Level.error)
-            }
-            Picker("Output Format", selection: $viewModel.output) {
-                Text("Pulse File").tag(ShareStoreOutput.store)
+#endif
+        }
+        Section {
+            Picker("Output", selection: $viewModel.output) {
+                Text("Pulse").tag(ShareStoreOutput.store)
                 Text("Plain Text").tag(ShareStoreOutput.text)
                 Text("HTML").tag(ShareStoreOutput.html)
+                Divider()
+                Text("Pulse (Package)").tag(ShareStoreOutput.package)
             }
+#if os(macOS)
+            .labelsHidden()
+#endif
         }
     }
 
-    private var sectionStatus: some View {
-        Section {
-            if viewModel.isPreparingForSharing {
-                HStack(spacing: 8) {
-#if os(iOS)
-                    ProgressView().id(UUID())
-#endif
-                    Text("Preparing for Sharing...")
-                        .foregroundColor(.secondary)
-                }
-            } else if let contents = viewModel.sharedContents {
-                if let info = contents.info {
-#if os(iOS)
-                    NavigationLink(destination: StoreDetailsView(source: .info(info))) {
-                        InfoRow(title: "Shared File Size", details: contents.formattedFileSize)
-                    }
-#else
-                    InfoRow(title: "Shared File Size", details: contents.formattedFileSize)
-#endif
-                } else {
-                    InfoRow(title: "Shared File Size", details: contents.formattedFileSize)
-                }
-            } else {
-                Text(viewModel.errorMessage ?? "Unavailable")
-                    .foregroundColor(.red)
-                    .lineLimit(3)
-            }
-        }
+    private var destinationLogLevels: some View {
+        Form {
+            ConsoleSearchLogLevelsCell(selection: $viewModel.logLevels)
+        }.inlineNavigationTitle("Log Levels")
     }
 
     private var sectionShare: some View {
         Section {
-            Button(action: buttonShareTapped) {
+            Button(action: { viewModel.buttonSharedTapped() }) {
+#if os(iOS)
                 HStack {
                     Spacer()
-                    Text("Share").bold()
+                    Text(viewModel.isPreparingForSharing ? "Exporting..." : "Share")
+                        .bold()
                     Spacer()
                 }
-            }
-            .disabled(viewModel.sharedContents == nil)
-            .foregroundColor(.white)
-            .listRowBackground(viewModel.sharedContents != nil ? Color.blue : Color.blue.opacity(0.33))
-        }
-    }
-
-    private func buttonShareTapped() {
-        guard let item = viewModel.sharedContents?.item else { return }
-#if os(macOS)
-        onShare(item)
 #else
-        self.shareItem = item
+                Text(viewModel.isPreparingForSharing ? "Exporting..." : "Share")
 #endif
+            }
+            .disabled(viewModel.isPreparingForSharing)
+            .foregroundColor(.white)
+#if os(iOS)
+            .listRowBackground(viewModel.isPreparingForSharing ? Color.blue.opacity(0.33) : Color.blue)
+#endif
+        }
     }
 }
 
@@ -128,11 +125,13 @@ struct ShareStoreView_Previews: PreviewProvider {
     static var previews: some View {
 #if os(iOS)
         NavigationView {
-            ShareStoreView(store: .mock, isPresented: .constant(true))
+            ShareStoreView(onDismiss: {})
         }
+        .injecting(.init(store: .mock))
 #else
-        ShareStoreView(store: .mock, isPresented: .constant(true), onShare: { _ in })
-            .frame(width: 300, height: 500)
+        ShareStoreView(onDismiss: {})
+            .injecting(.init(store: .mock))
+            .frame(width: 240).fixedSize()
 #endif
     }
 }

@@ -12,26 +12,25 @@ extension LoggerStore {
         typealias Relationship = NSRelationshipDescription
 
         let session = Entity(class: LoggerSessionEntity.self)
-
         let message = Entity(class: LoggerMessageEntity.self)
-
         let task = Entity(class: NetworkTaskEntity.self)
         let progress = Entity(class: NetworkTaskProgressEntity.self)
         let request = Entity(class: NetworkRequestEntity.self)
         let response = Entity(class: NetworkResponseEntity.self)
         let transaction = Entity(class: NetworkTransactionMetricsEntity.self)
-
         let blob = Entity(class: LoggerBlobHandleEntity.self)
 
         session.properties = [
-            Attribute(name: "sessionID", type: .integer64AttributeType),
-            Attribute(name: "createdAt", type: .dateAttributeType)
+            Attribute(name: "id", type: .UUIDAttributeType),
+            Attribute(name: "createdAt", type: .dateAttributeType),
+            Attribute(name: "version", type: .stringAttributeType) { $0.isOptional = true },
+            Attribute(name: "build", type: .stringAttributeType) { $0.isOptional = true }
         ]
 
         message.properties = [
             Attribute(name: "createdAt", type: .dateAttributeType),
             Attribute(name: "isPinned", type: .booleanAttributeType),
-            Attribute(name: "sessionID", type: .integer64AttributeType),
+            Attribute(name: "session", type: .UUIDAttributeType),
             Attribute(name: "level", type: .integer16AttributeType),
             Attribute(name: "text", type: .stringAttributeType),
             Attribute(name: "file", type: .stringAttributeType),
@@ -44,7 +43,7 @@ extension LoggerStore {
 
         task.properties = [
             Attribute(name: "createdAt", type: .dateAttributeType),
-            Attribute(name: "sessionID", type: .integer64AttributeType),
+            Attribute(name: "session", type: .UUIDAttributeType),
             Attribute(name: "taskId", type: .UUIDAttributeType),
             Attribute(name: "taskType", type: .integer16AttributeType),
             Attribute(name: "url", type: .stringAttributeType),
@@ -140,7 +139,8 @@ extension LoggerStore {
             Attribute(name: "decompressedSize", type: .integer32AttributeType),
             Attribute(name: "linkCount", type: .integer16AttributeType),
             Attribute(name: "rawContentType", type: .stringAttributeType),
-            Attribute(name: "inlineData", type: .binaryDataAttributeType)
+            Attribute(name: "inlineData", type: .binaryDataAttributeType),
+            Attribute(name: "isUncompressed", type: .booleanAttributeType)
         ]
 
         let model = NSManagedObjectModel()

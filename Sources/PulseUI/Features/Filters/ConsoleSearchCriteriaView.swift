@@ -28,7 +28,6 @@ struct ConsoleSearchCriteriaView: View {
             ScrollView {
                 form
             }
-            Divider()
             HStack {
                 Text(viewModel.mode == .network ? "Network Filters" : "Message Filters")
                     .font(.subheadline)
@@ -48,7 +47,7 @@ struct ConsoleSearchCriteriaView: View {
         buttonReset
 #endif
 
-        timePeriodSection
+        sessionsSection
 
         if viewModel.mode == .network {
 #if os(iOS) || os(macOS)
@@ -68,6 +67,10 @@ struct ConsoleSearchCriteriaView: View {
             logLevelsSection
             labelsSection
         }
+
+#if os(iOS) || os(macOS)
+        timePeriodSection
+#endif
     }
 
     private var buttonReset: some View {
@@ -79,13 +82,23 @@ struct ConsoleSearchCriteriaView: View {
 // MARK: - ConsoleSearchView (Shared)
 
 extension ConsoleSearchCriteriaView {
-    var timePeriodSection: some View {
+    var sessionsSection: some View {
         ConsoleSection(isDividerHidden: true, header: {
-            ConsoleSectionHeader(icon: "calendar", title: "Time Period", filter: $viewModel.criteria.shared.dates, default: viewModel.defaultCriteria.shared.dates)
+            ConsoleSectionHeader(icon: "list.clipboard", title: "Sessions", filter: $viewModel.criteria.shared.sessions, default: viewModel.defaultCriteria.shared.sessions)
+        }, content: {
+            ConsoleSessionsPickerView(selection: $viewModel.criteria.shared.sessions.selection)
+        })
+    }
+
+#if os(iOS) || os(macOS)
+    var timePeriodSection: some View {
+        ConsoleSection(header: {
+            ConsoleSectionHeader(icon: "calendar", title: "Time Period", filter: $viewModel.criteria.shared.dates)
         }, content: {
             ConsoleSearchTimePeriodCell(selection: $viewModel.criteria.shared.dates)
         })
     }
+#endif
 }
 
 // MARK: - ConsoleSearchView (Message)
@@ -106,7 +119,7 @@ extension ConsoleSearchCriteriaView {
         ConsoleSection(header: {
             ConsoleSectionHeader(icon: "flag", title: "Levels", filter: $viewModel.criteria.messages.logLevels)
         }, content: {
-            ConsoleSearchLogLevelsCell(viewModel: viewModel)
+            ConsoleSearchLogLevelsCell(selection: $viewModel.criteria.messages.logLevels.levels)
         })
     }
 
@@ -117,6 +130,7 @@ extension ConsoleSearchCriteriaView {
             ConsoleSearchListSelectionView(
                 title: "Labels",
                 items: viewModel.labels,
+                id: \.self,
                 selection: $viewModel.selectedLabels,
                 description: { $0 },
                 label: {
@@ -161,6 +175,7 @@ extension ConsoleSearchCriteriaView {
             ConsoleSearchListSelectionView(
                 title: "Hosts",
                 items: viewModel.domains,
+                id: \.self,
                 selection: $viewModel.selectedHost,
                 description: { $0 },
                 label: {
@@ -210,6 +225,7 @@ struct ConsoleSearchCriteriaView_Previews: PreviewProvider {
             .navigationViewStyle(.stack)
             .previewDisplayName("Network")
         }
+        .injecting(.init(store: .mock))
 #endif
     }
 }
@@ -217,7 +233,7 @@ struct ConsoleSearchCriteriaView_Previews: PreviewProvider {
 private func makePreview(isOnlyNetwork: Bool) -> some View {
     let store = LoggerStore.mock
     let entities: [NSManagedObject] = try! isOnlyNetwork ? store.allTasks() : store.allMessages()
-    let viewModel = ConsoleSearchCriteriaViewModel(criteria: .init(), index: .init(store: store))
+    let viewModel = ConsoleSearchCriteriaViewModel(options: .init(), index: .init(store: store))
     viewModel.bind(CurrentValueSubject(entities))
     viewModel.mode = isOnlyNetwork ? .network : .all
     return ConsoleSearchCriteriaView(viewModel: viewModel)

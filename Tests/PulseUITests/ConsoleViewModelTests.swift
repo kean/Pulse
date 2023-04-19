@@ -1,18 +1,17 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2023 Alexander Grebenyuk (github.com/kean).
 
 import XCTest
 @testable import Pulse
 @testable import PulseUI
 
-final class ConsoleViewModelTests: ConsoleTestCase {
-    var context = ConsoleContext()
+final class ConsoleEnvironmentTests: ConsoleTestCase {
     var mode: ConsoleMode = .all
     var isOnlyNetwork = false
     var options = ConsoleListOptions()
 
-    var sut: ConsoleViewModel!
+    var sut: ConsoleEnvironment!
 
     override func setUp() {
         super.setUp()
@@ -21,7 +20,7 @@ final class ConsoleViewModelTests: ConsoleTestCase {
     }
 
     private func reset() {
-        sut = ConsoleViewModel(store: store, context: context, mode: mode)
+        sut = ConsoleEnvironment(store: store, mode: mode)
     }
 
     // MARK: Counters
@@ -45,7 +44,7 @@ final class ConsoleViewModelTests: ConsoleTestCase {
             expectation.fulfill()
         }.store(in: &cancellables)
 
-        sut.searchCriteriaViewModel.isOnlyErrors = true
+        sut.searchCriteriaViewModel.options.isOnlyErrors = true
         wait(for: [expectation], timeout: 2)
     }
 

@@ -18,20 +18,19 @@ extension LoggerStore {
             public var level: LoggerStore.Level
             public var message: String
             public var metadata: [String: String]?
-            public var sessionID: Int64
             public var file: String
             public var function: String
             public var line: UInt
-            // Deprecated (added for backward compatibility)
-            public var session: UUID = LoggerStore._sessionID
 
-            public init(createdAt: Date, label: String, level: LoggerStore.Level, message: String, metadata: [String: String]?, sessionID: Int64, file: String, function: String, line: UInt) {
+            @available(*, deprecated, message: "Deprecated (added for backward compatibility)")
+            public var session: UUID? = Session.current.id
+
+            public init(createdAt: Date, label: String, level: LoggerStore.Level, message: String, metadata: [String: String]?, file: String, function: String, line: UInt) {
                 self.createdAt = createdAt
                 self.label = label
                 self.level = level
                 self.message = message
                 self.metadata = metadata
-                self.sessionID = sessionID
                 self.file = file
                 self.function = function
                 self.line = line
@@ -45,19 +44,17 @@ extension LoggerStore {
             public var originalRequest: NetworkLogger.Request
             public var currentRequest: NetworkLogger.Request?
             public var label: String?
-            public var sessionID: Int64
 
-            // Deprecated (added for backward compatibility)
-            public var session: UUID = LoggerStore._sessionID
+            @available(*, deprecated, message: "Deprecated (added for backward compatibility)")
+            public var session: UUID? = Session.current.id
 
-            public init(taskId: UUID, taskType: NetworkLogger.TaskType, createdAt: Date, originalRequest: NetworkLogger.Request, currentRequest: NetworkLogger.Request?, label: String?, sessionID: Int64) {
+            public init(taskId: UUID, taskType: NetworkLogger.TaskType, createdAt: Date, originalRequest: NetworkLogger.Request, currentRequest: NetworkLogger.Request?, label: String?) {
                 self.taskId = taskId
                 self.taskType = taskType
                 self.createdAt = createdAt
                 self.originalRequest = originalRequest
                 self.currentRequest = currentRequest
                 self.label = label
-                self.sessionID = sessionID
             }
         }
 
@@ -87,12 +84,11 @@ extension LoggerStore {
             public var responseBody: Data?
             public var metrics: NetworkLogger.Metrics?
             public var label: String?
-            public var sessionID: Int64
 
-            // Deprecated (added for backward compatibility)
-            public var session: UUID = LoggerStore._sessionID
+            @available(*, deprecated, message: "Deprecated (added for backward compatibility)")
+            public var session: UUID? = Session.current.id
 
-            public init(taskId: UUID, taskType: NetworkLogger.TaskType, createdAt: Date, originalRequest: NetworkLogger.Request, currentRequest: NetworkLogger.Request?, response: NetworkLogger.Response?, error: NetworkLogger.ResponseError?, requestBody: Data?, responseBody: Data?, metrics: NetworkLogger.Metrics?, label: String?, sessionID: Int64) {
+            public init(taskId: UUID, taskType: NetworkLogger.TaskType, createdAt: Date, originalRequest: NetworkLogger.Request, currentRequest: NetworkLogger.Request?, response: NetworkLogger.Response?, error: NetworkLogger.ResponseError?, requestBody: Data?, responseBody: Data?, metrics: NetworkLogger.Metrics?, label: String?) {
                 self.taskId = taskId
                 self.taskType = taskType
                 self.createdAt = createdAt
@@ -104,7 +100,6 @@ extension LoggerStore {
                 self.responseBody = responseBody
                 self.metrics = metrics
                 self.label = label
-                self.sessionID = sessionID
             }
         }
 

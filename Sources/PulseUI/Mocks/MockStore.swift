@@ -165,7 +165,7 @@ private func _syncPopulateStore(_ store: LoggerStore) {
     
     logger(named: "session")
         .log(level: .trace, "Instantiated Session")
-    
+
     logger(named: "auth")
         .log(level: .trace, "Instantiated the new login request")
     

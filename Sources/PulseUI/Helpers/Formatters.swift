@@ -38,6 +38,14 @@ extension DateFormatter {
         dateFormatter.dateFormat = "MMM d, yyyy 'at' h:mm:ss a '('z')'"
         return dateFormatter
     }()
+
+    convenience init(dateStyle: DateFormatter.Style, timeStyle: DateFormatter.Style, isRelative: Bool = false) {
+        self.init()
+        self.dateStyle = dateStyle
+        self.timeStyle = timeStyle
+        self.doesRelativeDateFormatting = isRelative
+        self.locale = Locale(identifier: "en_US")
+    }
 }
 
 enum ConsoleFormatter {

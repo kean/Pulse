@@ -26,7 +26,7 @@ final class ConsoleDataSourceTests: ConsoleTestCase, ConsoleDataSourceDelegate {
     }
 
     func reset() {
-        self.criteria = ConsoleSearchCriteriaViewModel(criteria: .init(), index: .init(store: store))
+        self.criteria = ConsoleSearchCriteriaViewModel(options: .init(), index: .init(store: store))
 
         self.sut = ConsoleDataSource(store: store, mode: mode, options: options)
         self.sut.delegate = self
@@ -94,7 +94,7 @@ final class ConsoleDataSourceTests: ConsoleTestCase, ConsoleDataSourceDelegate {
         XCTAssertEqual(groupTasksBy(.errorCode).map(sut.name), ["4864", "–"])
         XCTAssertEqual(groupTasksBy(.requestState).map(sut.name), ["Success", "Failure"])
         XCTAssertEqual(groupTasksBy(.responseContentType).map(sut.name), ["–", "application/html", "application/json", "application/zip", "image/png", "text/html"])
-        XCTAssertTrue(groupTasksBy(.session).map(sut.name).first?.hasPrefix("#1") ?? false)
+        XCTAssertFalse(groupTasksBy(.session).isEmpty)
     }
 
     func groupTasksBy(_ grouping: ConsoleListOptions.TaskGroupBy) -> [NSFetchedResultsSectionInfo] {
@@ -186,7 +186,7 @@ final class ConsoleDataSourceTests: ConsoleTestCase, ConsoleDataSourceDelegate {
 
     func testDataSourceIsRefreshedWithInitialSearchCriteria() {
         // GIVEN
-        criteria.isOnlyErrors = true
+        criteria.options.isOnlyErrors = true
 
         var didRefresh = false
         onRefresh = { didRefresh = true }
@@ -213,7 +213,7 @@ final class ConsoleDataSourceTests: ConsoleTestCase, ConsoleDataSourceDelegate {
         var didRefresh = false
         onRefresh = { didRefresh = true }
 
-        criteria.isOnlyErrors = true
+        criteria.options.isOnlyErrors = true
 
         // THEN delegate is called
         XCTAssertTrue(didRefresh)

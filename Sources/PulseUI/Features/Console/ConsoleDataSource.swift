@@ -28,6 +28,8 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
         didSet { controller.fetchRequest.sortDescriptors = sortDescriptors }
     }
 
+    var basePredicate: NSPredicate?
+
     static let fetchBatchSize = 100
 
     private let store: LoggerStore
@@ -59,7 +61,10 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
 
         let request = NSFetchRequest<NSManagedObject>(entityName: entityName)
         request.sortDescriptors = [
-            grouping.key.map { NSSortDescriptor(key: $0, ascending: grouping.isAscending) },
+            grouping.key.flatMap {
+                guard $0 != "session" else { return nil }
+                return NSSortDescriptor(key: $0, ascending: grouping.isAscending)
+            },
             NSSortDescriptor(key: sortKey, ascending: options.order == .ascending)
         ].compactMap { $0 }
         request.fetchBatchSize = ConsoleDataSource.fetchBatchSize
@@ -88,8 +93,8 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
 
     /// Binds the search criteria and immediately performs the initial fetch.
     func bind(_ criteria: ConsoleSearchCriteriaViewModel) {
-        Publishers.CombineLatest3(criteria.$criteria, criteria.$focus, criteria.$isOnlyErrors).sink { [weak self] in
-            self?.setPredicate(criteria: $0, focus: $1, isOnlyErrors: $2)
+        criteria.$options.sink { [weak self] in
+            self?.setPredicate($0)
             self?.refresh()
         }.store(in: &cancellables)
     }
@@ -119,13 +124,21 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
 
     // MARK: Predicate
 
-    func setPredicate(criteria: ConsoleSearchCriteria, focus: NSPredicate?, isOnlyErrors: Bool) {
-        let predicate = ConsoleDataSource.makePredicate(mode: mode, criteria: criteria, focus: focus, isOnlyErrors: isOnlyErrors)
+    func setPredicate(_ options: ConsolePredicateOptions) {
+        let predicate = ConsoleDataSource.makePredicate(mode: mode, options: options, basePredicate: basePredicate)
         controller.fetchRequest.predicate = predicate
     }
 
-    static func makePredicate(mode: ConsoleMode, criteria: ConsoleSearchCriteria, focus: NSPredicate?, isOnlyErrors: Bool) -> NSPredicate? {
-        let predicates = [_makePredicate(mode, criteria, isOnlyErrors), focus].compactMap { $0 }
+    static func makePredicate(
+        mode: ConsoleMode,
+        options: ConsolePredicateOptions,
+        basePredicate: NSPredicate? = nil
+    ) -> NSPredicate? {
+        let predicates = [
+            basePredicate,
+            _makePredicate(mode, options.criteria, options.isOnlyErrors),
+            options.focus
+        ].compactMap { $0 }
         switch predicates.count {
         case 0: return nil
         case 1: return predicates[0]
@@ -173,8 +186,7 @@ private func makeName(for section: NSFetchedResultsSectionInfo, mode: ConsoleMod
             return (LoggerStore.Level(rawValue: rawValue) ?? .debug).name.capitalized
         case .session:
             let date = (section.objects?.last as? LoggerMessageEntity)?.createdAt
-            let suffix = date.map(sessionDateFormatter.string) ?? "–"
-            return "#\(section.name) \(suffix)"
+            return date.map(sessionDateFormatter.string) ?? "–"
         default:
             break
         }
@@ -198,8 +210,7 @@ private func makeName(for section: NSFetchedResultsSectionInfo, mode: ConsoleMod
             }
         case .session:
             let date = (section.objects?.last as? NetworkTaskEntity)?.createdAt
-            let suffix = date.map(sessionDateFormatter.string) ?? "–"
-            return "#\(section.name) \(suffix)"
+            return date.map(sessionDateFormatter.string) ?? "–"
         default:
             break
         }
@@ -208,14 +219,7 @@ private func makeName(for section: NSFetchedResultsSectionInfo, mode: ConsoleMod
     return name.isEmpty ? "–" : name
 }
 
-private let sessionDateFormatter: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.locale = Locale(identifier: "en_US")
-    formatter.dateStyle = .medium
-    formatter.timeStyle = .medium
-    formatter.doesRelativeDateFormatting = true
-    return formatter
-}()
+private let sessionDateFormatter = DateFormatter(dateStyle: .medium, timeStyle: .medium, isRelative: true)
 
 // MARK: - Delegates
 

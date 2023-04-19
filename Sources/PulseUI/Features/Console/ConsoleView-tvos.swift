@@ -10,57 +10,56 @@ import Combine
 #if os(tvOS)
 
 public struct ConsoleView: View {
-    @StateObject private var viewModel: ConsoleViewModel
+    @StateObject private var environment: ConsoleEnvironment
 
-    init(viewModel: ConsoleViewModel) {
-        _viewModel = StateObject(wrappedValue: viewModel)
+    init(environment: ConsoleEnvironment) {
+        _environment = StateObject(wrappedValue: environment)
     }
 
     public var body: some View {
         GeometryReader { proxy in
             HStack {
                 List {
-                    ConsoleListContentView(viewModel: viewModel.listViewModel)
+                    ConsoleListContentView(viewModel: environment.listViewModel)
                 }
 
                 // TODO: Not sure it's valid
                 NavigationView {
                     Form {
-                        ConsoleMenuView(viewModel: viewModel)
+                        ConsoleMenuView(environment: environment)
                     }.padding()
                 }
                 .frame(width: 700)
             }
-            .navigationTitle(viewModel.title)
-            .onAppear { viewModel.isViewVisible = true }
-            .onDisappear { viewModel.isViewVisible = false }
+            .injecting(environment)
+            .navigationTitle(environment.title)
+            .onAppear { environment.listViewModel.isViewVisible = true }
+            .onDisappear { environment.listViewModel.isViewVisible = false }
         }
     }
 }
 
 private struct ConsoleMenuView: View {
     let store: LoggerStore
-    let consoleViewModel: ConsoleViewModel
+    let environment: ConsoleEnvironment
     @ObservedObject var viewModel: ConsoleSearchCriteriaViewModel
-    @ObservedObject var router: ConsoleRouter
 
-    init(viewModel: ConsoleViewModel) {
-        self.consoleViewModel = viewModel
-        self.store = viewModel.store
-        self.viewModel = viewModel.searchCriteriaViewModel
-        self.router = viewModel.router
+    init(environment: ConsoleEnvironment) {
+        self.environment = environment
+        self.store = environment.store
+        self.viewModel = environment.searchCriteriaViewModel
     }
 
     var body: some View {
         Section {
-            Toggle(isOn: $viewModel.isOnlyErrors) {
+            Toggle(isOn: $viewModel.options.isOnlyErrors) {
                 Label("Errors Only", systemImage: "exclamationmark.octagon")
             }
-            Toggle(isOn: consoleViewModel.bindingForNetworkMode) {
+            Toggle(isOn: environment.bindingForNetworkMode) {
                 Label("Network Only", systemImage: "arrow.down.circle")
             }
             NavigationLink(destination: destinationFilters) {
-                Label(consoleViewModel.bindingForNetworkMode.wrappedValue ? "Network Filters" : "Message Filters", systemImage: "line.3.horizontal.decrease.circle")
+                Label(environment.bindingForNetworkMode.wrappedValue ? "Network Filters" : "Message Filters", systemImage: "line.3.horizontal.decrease.circle")
             }
         } header: { Text("Quick Filters") }
         if !store.isArchive {
@@ -69,7 +68,7 @@ private struct ConsoleMenuView: View {
                     Label("Store Info", systemImage: "info.circle")
                 }
                 Button.destructive {
-                    consoleViewModel.index.clear()
+                    environment.index.clear()
                     store.removeAll()
                 } label: {
                     Label("Remove Logs", systemImage: "trash")

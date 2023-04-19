@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2023 Alexander Grebenyuk (github.com/kean).
 
 import CoreData
 import XCTest
@@ -98,8 +98,7 @@ final class NetworkLoggerTests: XCTestCase {
             requestBody: nil,
             responseBody: nil,
             metrics: task.metrics,
-            label: nil,
-            sessionID: 1
+            label: nil
         ))
 
         XCTAssertEqual(request.count, 325)

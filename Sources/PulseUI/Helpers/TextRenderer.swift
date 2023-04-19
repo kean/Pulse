@@ -159,7 +159,7 @@ final class TextRenderer {
     }
 
     private func renderLargeHeader(for task: NetworkTaskEntity) {
-        let status =  NetworkRequestStatusCellModel(task: task)
+        let status = NetworkRequestStatusCellModel(task: task)
 
         string.append(render(status.title + "\n", role: .title, weight: .semibold, color: UXColor(status.tintColor)))
         string.append(self.spacer())
@@ -319,7 +319,15 @@ final class TextRenderer {
     func render(_ section: KeyValueSectionViewModel, details: String? = nil, style: TextFontStyle = .monospaced) -> NSAttributedString {
         let details = details.map { "(\($0))" }
         let title = [section.title, details].compactMap { $0 }.joined(separator: " ")
-        let string = NSMutableAttributedString(string: title + "\n", attributes: helper.attributes(role: .subheadline, color: .secondaryLabel))
+
+        let titleColor: UXColor
+#if os(macOS)
+        titleColor = .label
+#else
+        titleColor = .secondaryLabel
+#endif
+
+        let string = NSMutableAttributedString(string: title + "\n", attributes: helper.attributes(role: .subheadline, color: titleColor))
         string.append(render(section.items, color: section.color, style: style))
         return string
     }
@@ -352,12 +360,24 @@ final class TextRenderer {
             append("\(value ?? "–")\n")
         }
         let output = NSMutableAttributedString(string: string, attributes: helper.attributes(role: .body2, style: style))
-        let keyFont = helper.font(style: .init(role: .body2, style: style, weight: options.color == .full ? .medium : .semibold))
+
+        let keyWeight: UXFont.Weight
+#if os(macOS)
+        keyWeight = .regular
+#else
+        keyWeight = options.color == .full ? .medium : .semibold
+#endif
+
+        let keyFont = helper.font(style: .init(role: .body2, style: style, weight: keyWeight))
         for range in keys {
             output.addAttribute(.font, value: keyFont, range: range)
+#if os(macOS)
+            output.addAttribute(.foregroundColor, value: UXColor.secondaryLabel, range: range)
+#else
             if options.color == .full {
                 output.addAttribute(.foregroundColor, value: UXColor(color), range: range)
             }
+#endif
         }
         for range in separators {
             output.addAttribute(.foregroundColor, value: UXColor.secondaryLabel, range: range)

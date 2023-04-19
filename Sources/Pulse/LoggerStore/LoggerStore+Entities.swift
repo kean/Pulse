@@ -6,13 +6,15 @@ import CoreData
 
 public final class LoggerSessionEntity: NSManagedObject {
     @NSManaged public var createdAt: Date
-    @NSManaged public var sessionID: Int64
+    @NSManaged public var id: UUID
+    @NSManaged public var version: String?
+    @NSManaged public var build: String?
 }
 
 public final class LoggerMessageEntity: NSManagedObject {
     @NSManaged public var createdAt: Date
     @NSManaged public var isPinned: Bool
-    @NSManaged public var sessionID: Int64
+    @NSManaged public var session: UUID
     @NSManaged public var level: Int16
     @NSManaged public var text: String
     @NSManaged public var file: String
@@ -28,7 +30,7 @@ public final class LoggerMessageEntity: NSManagedObject {
 public final class NetworkTaskEntity: NSManagedObject {
     // Primary
     @NSManaged public var createdAt: Date
-    @NSManaged public var sessionID: Int64
+    @NSManaged public var session: UUID
     @NSManaged public var taskId: UUID
 
     /// Returns task type
@@ -275,6 +277,8 @@ public final class LoggerBlobHandleEntity: NSManagedObject {
     /// A decompressed blob size.
     @NSManaged public var decompressedSize: Int32
 
+    @NSManaged var isUncompressed: Bool
+
     @NSManaged var rawContentType: String?
 
     /// A blob content type.
@@ -318,8 +322,9 @@ public final class LoggerBlobHandleEntity: NSManagedObject {
     public static func getData(for entity: LoggerBlobHandleEntity, store: LoggerStore) -> () -> Data? {
         let inlineData = entity.inlineData
         let key = entity.key
+        let isCompressed = !entity.isUncompressed
         return {
-            store.getDecompressedData(for: inlineData, key: key)
+            store.getDecompressedData(for: inlineData, key: key, isCompressed: isCompressed)
         }
     }
 }

@@ -1,6 +1,6 @@
 // The MIT License (MIT)
 //
-// Copyright (c) 2020-2022 Alexander Grebenyuk (github.com/kean).
+// Copyright (c) 2020-2023 Alexander Grebenyuk (github.com/kean).
 
 import XCTest
 import Foundation
@@ -21,8 +21,7 @@ final class RemoteLoggerTests: XCTestCase {
             requestBody: "hello".data(using: .utf8)!,
             responseBody: MockDataTask.login.responseBody,
             metrics: MockDataTask.login.metrics,
-            label: nil,
-            sessionID: 0
+            label: nil
         )
 
         // WHEN
@@ -45,6 +44,5 @@ final class RemoteLoggerTests: XCTestCase {
         XCTAssertEqual(decoded.requestBody, "hello".data(using: .utf8))
         XCTAssertEqual(decoded.responseBody, event.responseBody)
         XCTAssertEqual(decoded.metrics?.totalTransferSize.totalBytesSent, event.metrics?.totalTransferSize.totalBytesSent)
-        XCTAssertEqual(decoded.sessionID, event.sessionID)
     }
 }

@@ -7,6 +7,36 @@ import CommonCrypto
 import CoreData
 import Combine
 
+#if os(macOS)
+extension URL {
+    static var library: URL {
+        let url = Files.urls(for: .libraryDirectory, in: .userDomainMask).first ?? URL(fileURLWithPath: "/dev/null")
+        Files.createDirectoryIfNeeded(at: url)
+        return url
+    }
+}
+
+extension URL {
+    func appending(filename: String) -> URL {
+        appendingPathComponent(filename, isDirectory: false)
+    }
+
+    func appending(directory: String) -> URL {
+        appendingPathComponent(directory, isDirectory: true)
+    }
+}
+var Files: FileManager { FileManager.default }
+
+extension FileManager {
+    @discardableResult
+    func createDirectoryIfNeeded(at url: URL) -> Bool {
+        guard !fileExists(atPath: url.path) else { return false }
+        try? createDirectory(at: url, withIntermediateDirectories: true, attributes: [:])
+        return true
+    }
+}
+#endif
+
 extension Character {
     init?(_ code: unichar) {
         guard let scalar = UnicodeScalar(code) else {
@@ -15,7 +45,6 @@ extension Character {
         self = Character(scalar)
     }
 }
-
 
 @available(iOS 15, tvOS 15, *)
 extension AttributedString {
@@ -35,16 +64,6 @@ extension AttributedString {
 extension NSManagedObject {
     func reset() {
         managedObjectContext?.refresh(self, mergeChanges: false)
-    }
-}
-
-extension NSMutableAttributedString {
-    func append(_ string: String, _ attributes: [NSAttributedString.Key: Any] = [:]) {
-        append(NSAttributedString(string: string, attributes: attributes))
-    }
-
-    func addAttributes(_ attributes: [NSAttributedString.Key: Any]) {
-        addAttributes(attributes, range: NSRange(location: 0, length: string.count))
     }
 }
 

@@ -10,23 +10,27 @@ import Pulse
 import SwiftUI
 
 public final class MainViewController: UIViewController {
-    private let viewModel: ConsoleViewModel
+    private let environment: ConsoleEnvironment
 
     public static var isAutomaticAppearanceOverrideRemovalEnabled = true
 
-    public init(store: LoggerStore = .shared, onDismiss: (() -> Void)? = nil) {
-        self.viewModel = ConsoleViewModel(store: store)
-        self.viewModel.onDismiss = onDismiss
+    public init(store: LoggerStore = .shared) {
+        self.environment = ConsoleEnvironment(store: store)
         super.init(nibName: nil, bundle: nil)
 
         if MainViewController.isAutomaticAppearanceOverrideRemovalEnabled {
             removeAppearanceOverrides()
         }
-        let console = ConsoleView(viewModel: viewModel)
+        let console = ConsoleView(environment: environment)
         let vc = UIHostingController(rootView: NavigationView { console })
         addChild(vc)
         view.addSubview(vc.view)
         vc.view.pinToSuperview()
+    }
+
+    @available(*, deprecated, message: "onDismiss parameter is deprecated")
+    public convenience init(store: LoggerStore = .shared, onDismiss: @escaping () -> Void) {
+        self.init(store: store)
     }
 
     required init?(coder: NSCoder) {

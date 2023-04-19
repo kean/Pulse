@@ -74,37 +74,39 @@ struct WrappedTextView: NSViewRepresentable {
             if let onLinkTapped = onLinkTapped, onLinkTapped(url) {
                 return true
             }
-            if let (title, message) = parseTooltip(url) {
-                let alert = NSAlert()
-                alert.messageText = title ?? ""
-                alert.informativeText = message
-                if let keyWindow = NSApplication.shared.keyWindow {
-                    alert.beginSheetModal(for: keyWindow) { _ in }
-                } else {
-                    alert.runModal()
-                }
-                return true
-            }
             return false
         }
     }
 
     func makeNSView(context: Context) -> NSScrollView {
-        let scrollView = NSTextView.scrollableTextView()
+#if PULSE_STANDALONE_APP
+        let scrollView = WrappedTextView.createScrollableTextView(viewModel: viewModel, coordinator: context.coordinator)
+#else
+        let scrollView = UXTextView.scrollableTextView()
+#endif
+        let textView = scrollView.documentView as! UXTextView
+
         scrollView.hasVerticalScroller = true
-        let textView = scrollView.documentView as! NSTextView
-        textView.delegate = context.coordinator
+        scrollView.autohidesScrollers = true
+
         configureTextView(textView)
+        if viewModel.isLineNumberRulerEnabled {
+            scrollView.automaticallyAdjustsContentInsets = false
+            textView.textContainerInset = CGSize(width: 0, height: 10)
+        }
+
+        textView.delegate = context.coordinator
+
+        context.coordinator.cancellables = bind(viewModel, textView)
+        textView.attributedText = viewModel.originalText
+
+        viewModel.textView = textView
+
         return scrollView
     }
 
     func updateNSView(_ nsView: NSScrollView, context: Context) {
-        let textView = (nsView.documentView as! NSTextView)
-        if viewModel.textView !== nsView {
-            context.coordinator.cancellables = bind(viewModel, textView)
-            textView.attributedText = viewModel.originalText
-            viewModel.textView = textView
-        }
+        // Do nothing
     }
 
     func makeCoordinator() -> Coordinator {

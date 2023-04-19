@@ -34,7 +34,6 @@ final class FileViewerViewModel: ObservableObject {
     }
 
     enum Contents {
-        case json(RichTextViewModel)
         case image(ImagePreviewViewModel)
         case other(RichTextViewModel)
 #if os(iOS) || os(macOS)
@@ -49,7 +48,10 @@ final class FileViewerViewModel: ObservableObject {
             return pdf
         } else {
             let string = TextRenderer().render(data, contentType: contentType, error: context.error)
-            return .other(RichTextViewModel(string: string, contentType: contentType))
+            let viewModel = RichTextViewModel(string: string, contentType: contentType)
+            viewModel.isLineNumberRulerEnabled = true
+            viewModel.isFilterEnabled = true
+            return .other(viewModel)
         }
     }
 

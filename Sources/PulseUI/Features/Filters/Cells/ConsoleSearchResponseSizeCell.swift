@@ -12,7 +12,7 @@ struct ConsoleSearchResponseSizeCell: View {
 
     var body: some View {
         HStack {
-            Text("Size")
+            Text("Size").lineLimit(1)
             Spacer()
             ConsoleSearchInlinePickerMenu(title: selection.unit.title, width: 50) {
                 Picker("Unit", selection: $selection.unit) {

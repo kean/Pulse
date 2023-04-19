@@ -21,7 +21,7 @@ final class ConsoleTableViewModelTests: ConsoleTestCase {
     }
 
     func reset() {
-        criteria = ConsoleSearchCriteriaViewModel(criteria: .init(), index: .init(store: store))
+        criteria = ConsoleSearchCriteriaViewModel(options: .init(), index: .init(store: store))
 
         sut = ConsoleTableViewModel(store: store, criteria: criteria)
         sut.isViewVisible = true
