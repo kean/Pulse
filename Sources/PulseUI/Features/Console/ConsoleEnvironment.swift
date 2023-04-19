@@ -7,7 +7,7 @@ import Pulse
 import Combine
 import SwiftUI
 
-/// Constains every dependency that the console views have.
+/// Contains every dependency that the console views have.
 ///
 /// - warning: It's marked with `ObservableObject` to make it possible to be used
 /// with `@StateObject` and `@EnvironmentObject`, but it never changes.
