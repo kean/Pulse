@@ -33,8 +33,8 @@ public struct ConsoleView: View {
             }
             .injecting(environment)
             .navigationTitle(environment.title)
-            .onAppear { environment.isViewVisible = true }
-            .onDisappear { environment.isViewVisible = false }
+            .onAppear { environment.listViewModel.isViewVisible = true }
+            .onDisappear { environment.listViewModel.isViewVisible = false }
         }
     }
 }

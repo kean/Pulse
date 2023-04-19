@@ -20,8 +20,8 @@ public struct ConsoleView: View {
             ConsoleListContentView(viewModel: environment.listViewModel)
         }
         .navigationTitle(environment.title)
-        .onAppear { environment.isViewVisible = true }
-        .onDisappear { environment.isViewVisible = false }
+        .onAppear { environment.listViewModel.isViewVisible = true }
+        .onDisappear { environment.listViewModel.isViewVisible = false }
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
                 Button(action: { environment.router.isShowingSettings = true }) {

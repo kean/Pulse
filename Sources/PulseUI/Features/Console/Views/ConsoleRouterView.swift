@@ -113,7 +113,7 @@ extension ConsoleRouterView {
         Text("").invisible()
             .sheet(isPresented: $router.isShowingSettings) {
                 NavigationView {
-                    SettingsView(viewModel: .init(store: viewModel.store))
+                    SettingsView(viewModel: .init(store: environment.store))
                         .toolbar {
                             ToolbarItem(placement: .cancellationAction) {
                                 Button("Close") { router.isShowingSettings = false }
@@ -123,7 +123,7 @@ extension ConsoleRouterView {
             }
             .sheet(isPresented: $router.isShowingFilters) {
                 NavigationView {
-                    ConsoleSearchCriteriaView(viewModel: viewModel.searchCriteriaViewModel)
+                    ConsoleSearchCriteriaView(viewModel: environment.searchCriteriaViewModel)
                         .toolbar {
                             ToolbarItem(placement: .cancellationAction) {
                                 Button("Close") { router.isShowingFilters = false }
