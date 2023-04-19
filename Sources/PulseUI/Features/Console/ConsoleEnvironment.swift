@@ -35,24 +35,6 @@ final class ConsoleEnvironment: ObservableObject {
 
     let router = ConsoleRouter()
 
-#if !os(macOS)
-    // TODO: refactor, this shouldn't be here
-    // On macOS, these views are independent
-    var isViewVisible: Bool = false {
-        didSet { listViewModel.isViewVisible = isViewVisible }
-    }
-
-    var isSearching = false {
-        didSet {
-#if os(iOS)
-            if #available(iOS 15, *) {
-                searchViewModel.isViewVisible = isSearching
-            }
-#endif
-        }
-    }
-#endif
-
     let initialMode: ConsoleMode
 
     var mode: ConsoleMode {

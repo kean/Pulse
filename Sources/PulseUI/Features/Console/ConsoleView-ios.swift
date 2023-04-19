@@ -20,8 +20,8 @@ public struct ConsoleView: View {
 
     public var body: some View {
         ConsoleListView(environment: environment)
-            .onAppear  { environment.isViewVisible = true }
-            .onDisappear { environment.isViewVisible = false }
+            .onAppear  { environment.listViewModel.isViewVisible = true }
+            .onDisappear { environment.listViewModel.isViewVisible = false }
             .navigationTitle(environment.title)
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarLeading) {
@@ -106,15 +106,14 @@ private struct _ConsoleSearchableContentView: View {
     @Environment(\.isSearching) private var isSearching
 
     var body: some View {
-        contents.onChange(of: isSearching) {
-            environment.isSearching = $0
-        }
-    }
-
-    @ViewBuilder
-    private var contents: some View {
         if isSearching {
             ConsoleSearchView(viewModel: environment.searchViewModel)
+                .onAppear {
+                    environment.searchViewModel.isViewVisible = true
+                }
+                .onDisappear {
+                    environment.searchViewModel.isViewVisible = false
+                }
         } else {
             _ConsoleRegularContentView(environment: environment)
         }
