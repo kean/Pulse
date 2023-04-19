@@ -146,6 +146,10 @@ struct ConsoleStaticList: View {
         List {
             ForEach(entities, id: \.objectID, content: ConsoleEntityCell.init)
         }
+        .listStyle(.plain)
+#if os(iOS)
+        .environment(\.defaultMinListRowHeight, 8)
+#endif
     }
 }
 #endif

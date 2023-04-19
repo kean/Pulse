@@ -50,12 +50,10 @@ public struct ConsoleView: View {
         Button(action: { environment.router.isShowingShareStore = true }) {
             Label("Share", systemImage: "square.and.arrow.up")
         }
-        if environment.context.focus == nil {
-            Button(action: { environment.router.isShowingFilters = true }) {
-                Image(systemName: "line.horizontal.3.decrease.circle")
-            }
-            ConsoleContextMenu()
+        Button(action: { environment.router.isShowingFilters = true }) {
+            Image(systemName: "line.horizontal.3.decrease.circle")
         }
+        ConsoleContextMenu()
     }
 }
 

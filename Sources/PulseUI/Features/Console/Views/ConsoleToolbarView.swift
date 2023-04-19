@@ -42,15 +42,11 @@ struct ConsoleToolbarView: View {
 
     @ViewBuilder
     private func contents(isVertical: Bool) -> some View {
-        if environment.context.focus != nil {
-            ConsoleModeButton(title: environment.mode == .network ? "Focused Tasks" : "Focused Logs", isSelected: false) {}
-        } else {
-            switch environment.initialMode {
-            case .all:
-                ConsoleModePicker(environment: environment)
-            case .logs, .network:
-                ConsoleToolbarTitle()
-            }
+        switch environment.initialMode {
+        case .all:
+            ConsoleModePicker(environment: environment)
+        case .logs, .network:
+            ConsoleToolbarTitle()
         }
         if !isVertical {
             Spacer()

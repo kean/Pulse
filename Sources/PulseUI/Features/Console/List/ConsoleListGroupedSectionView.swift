@@ -26,7 +26,7 @@ struct ConsoleListGroupedSectionView: View {
 
         if prefix.count < objects.count {
 #if os(iOS)
-            NavigationLink(destination: LazyConsoleView(title: title, entities: objects, source: viewModel)) {
+            NavigationLink(destination: ConsoleStaticList(entities: objects).inlineNavigationTitle(title)) {
                 PlainListSeeAllView(count: objects.count)
             }
 #else
@@ -35,34 +35,6 @@ struct ConsoleListGroupedSectionView: View {
             }.buttonStyle(.plain)
 #endif
         }
-    }
-}
-
-#endif
-
-#if os(iOS)
-
-private struct LazyConsoleView: View {
-    let title: String
-    let entities: [NSManagedObject]
-    let source: ConsoleListViewModel
-
-    var body: some View {
-        ConsoleView(environment: makeEnvironment())
-            .navigationBarTitleDisplayMode(.inline)
-    }
-
-    #warning("this should be done differently without a separate ConsoleView")
-    private func makeEnvironment() -> ConsoleEnvironment {
-        let environment = ConsoleEnvironment(
-            store: source.store,
-            context: .init(title: title, focus: NSPredicate(format: "self IN %@", entities)),
-            mode: source.mode
-        )
-        environment.listViewModel.options.order = source.options.order
-        environment.listViewModel.options.messageSortBy = source.options.messageSortBy
-        environment.listViewModel.options.taskSortBy = source.options.taskSortBy
-        return environment
     }
 }
 

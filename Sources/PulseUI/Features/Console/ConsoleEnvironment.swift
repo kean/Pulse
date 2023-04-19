@@ -14,7 +14,6 @@ import SwiftUI
 final class ConsoleEnvironment: ObservableObject {
     let title: String
     let store: LoggerStore
-    let context: ConsoleContext
 
     let listViewModel: ConsoleListViewModel
 
@@ -70,26 +69,19 @@ final class ConsoleEnvironment: ObservableObject {
 
     private var cancellables: [AnyCancellable] = []
 
-    init(store: LoggerStore,
-         context: ConsoleContext = .init(),
-         mode: ConsoleMode = .all
-    ) {
+    init(store: LoggerStore, mode: ConsoleMode = .all) {
         self.store = store
-        self.title = context.title ?? {
-            switch mode {
-            case .all: return "Console"
-            case .logs: return "Logs"
-            case .network: return "Network"
-            }
-        }()
-        self.context = context
+        switch mode {
+        case .all: self.title = "Console"
+        case .logs: self.title = "Logs"
+        case .network: self.title = "Network"
+        }
         self.initialMode = mode
         self.mode = mode
 
         func makeDefaultOptions() -> ConsolePredicateOptions {
             var options = ConsolePredicateOptions()
             options.criteria.shared.sessions.selection = [store.session.id]
-            options.focus = context.focus
             return options
         }
 
@@ -166,11 +158,6 @@ final class ConsoleEnvironment: ObservableObject {
         }.show()
 #endif
     }
-}
-
-struct ConsoleContext {
-    var title: String?
-    var focus: NSPredicate?
 }
 
 public enum ConsoleMode: String {
