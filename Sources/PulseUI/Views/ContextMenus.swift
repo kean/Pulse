@@ -15,6 +15,11 @@ enum ContextMenu {
 
         @Binding private(set) var shareItems: ShareItems?
 
+        // TODO: Rework this without the environmnet
+        @EnvironmentObject private var environment: ConsoleEnvironment
+
+        private var criteria: ConsoleSearchCriteriaViewModel { environment.searchCriteriaViewModel }
+
         var body: some View {
             Section {
                 Button(action: { shareItems = ShareService.share(message, as: .plainText) }) {
@@ -23,6 +28,28 @@ enum ContextMenu {
                 Button(action: { UXPasteboard.general.string = message.text }) {
                     Label("Copy Message", systemImage: "doc.on.doc")
                 }.tint(.blue)
+            }
+            Section {
+                Menu(content: {
+                    Button("Hide Label '\(message.label)'") {
+                        criteria.criteria.messages.labels.hidden.insert(message.label)
+                    }
+                    Button("Hide Level '\(message.logLevel.name)'") {
+                        criteria.criteria.messages.logLevels.levels.remove(message.logLevel)
+                    }
+                }, label: {
+                    Label("Hide...", systemImage: "eye.slash")
+                })
+                Menu(content: {
+                    Button("Show Label '\(message.label)'") {
+                        criteria.criteria.messages.labels.focused = message.label
+                    }
+                    Button("Show Level '\(message.logLevel.name)'") {
+                        criteria.criteria.messages.logLevels.levels = [message.logLevel]
+                    }
+                }, label: {
+                    Label("Show...", systemImage: "eye")
+                })
             }
             Section {
                 PinButton(viewModel: .init(message)).tint(.pink)
