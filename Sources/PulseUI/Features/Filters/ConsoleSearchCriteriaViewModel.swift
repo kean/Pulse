@@ -52,6 +52,12 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
         }.store(in: &cancellables)
     }
 
+#if os(macOS)
+    func focus(on entities: [NSManagedObject]) {
+        options.focus = NSPredicate(format: "self IN %@", entities)
+    }
+#endif
+
     // MARK: Appearance
 
     func onAppear() {
@@ -83,16 +89,10 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
     }
 
     private func reloadCounters() {
-        if mode == .network {
-            guard let tasks = entities as? [NetworkTaskEntity] else {
-                return assertionFailure()
-            }
+        if let tasks = entities as? [NetworkTaskEntity] {
             domainsCountedSet = NSCountedSet(array: tasks.compactMap { $0.host })
             domains = index.hosts.sorted()
-        } else {
-            guard let messages = entities as? [LoggerMessageEntity] else {
-                return assertionFailure()
-            }
+        } else if let messages = entities as? [LoggerMessageEntity] {
             labelsCountedSet = NSCountedSet(array: messages.map(\.label))
             labels = index.labels.sorted()
         }

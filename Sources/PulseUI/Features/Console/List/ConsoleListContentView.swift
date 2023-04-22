@@ -12,6 +12,7 @@ struct ConsoleListContentView: View {
 
 #if os(macOS)
     let proxy: ScrollViewProxy
+
     @AppStorage("com-github-kean-pulse-is-now-enabled") private var isNowEnabled = true
 #endif
 
@@ -46,7 +47,7 @@ struct ConsoleListContentView: View {
     @ViewBuilder
     private var plainView: some View {
         if viewModel.entities.isEmpty {
-            Text("No Recorded Logs")
+            Text("Empty")
                 .font(.subheadline)
                 .foregroundColor(.secondary)
         } else {

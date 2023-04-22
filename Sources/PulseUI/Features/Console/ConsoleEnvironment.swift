@@ -14,22 +14,9 @@ import SwiftUI
 final class ConsoleEnvironment: ObservableObject {
     let title: String
     let store: LoggerStore
-
-    let listViewModel: ConsoleListViewModel
-
-#if os(iOS) || os(macOS)
-    @available(iOS 15, *)
-    var searchViewModel: ConsoleSearchViewModel {
-        _searchViewModel as! ConsoleSearchViewModel
-    }
-    private var _searchViewModel: AnyObject?
-
-    let searchBarViewModel: ConsoleSearchBarViewModel
-#endif
-
-    let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
     let index: LoggerStoreIndex
 
+    let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
     let logCountObserver: ManagedObjectsCountObserver
     let taskCountObserver: ManagedObjectsCountObserver
 
@@ -37,9 +24,7 @@ final class ConsoleEnvironment: ObservableObject {
 
     let initialMode: ConsoleMode
 
-    var mode: ConsoleMode {
-        didSet { prepare(for: mode) }
-    }
+    @Published var mode: ConsoleMode
 
     var bindingForNetworkMode: Binding<Bool> {
         Binding(get: {
@@ -69,14 +54,6 @@ final class ConsoleEnvironment: ObservableObject {
 
         self.index = LoggerStoreIndex(store: store)
         self.searchCriteriaViewModel = ConsoleSearchCriteriaViewModel(options: makeDefaultOptions(), index: index)
-        self.listViewModel = ConsoleListViewModel(store: store, criteria: searchCriteriaViewModel)
-
-#if os(iOS) || os(macOS)
-        self.searchBarViewModel = ConsoleSearchBarViewModel()
-        if #available(iOS 15, *) {
-            self._searchViewModel = ConsoleSearchViewModel(list: listViewModel, index: index, searchBar: searchBarViewModel)
-        }
-#endif
 
         self.logCountObserver = ManagedObjectsCountObserver(
             entity: LoggerMessageEntity.self,
@@ -91,22 +68,13 @@ final class ConsoleEnvironment: ObservableObject {
         )
 
         bind()
-
-        if mode != .all {
-            prepare(for: mode)
-        }
     }
-
-#if os(macOS)
-    func focus(on entities: [NSManagedObject]) {
-        searchCriteriaViewModel.options.focus = NSPredicate(format: "self IN %@", entities)
-        listViewModel.options.messageGroupBy = .noGrouping
-        listViewModel.options.taskGroupBy = .noGrouping
-    }
-#endif
 
     private func bind() {
-        searchCriteriaViewModel.bind(listViewModel.$entities)
+        $mode.sink { [weak self] in
+            self?.searchCriteriaViewModel.mode = $0
+        }.store(in: &cancellables)
+
         searchCriteriaViewModel.$options.sink { [weak self] in
             self?.refreshCountObservers($0)
         }.store(in: &cancellables)
@@ -118,11 +86,6 @@ final class ConsoleEnvironment: ObservableObject {
         }
         logCountObserver.setPredicate(makePredicate(for: .logs))
         taskCountObserver.setPredicate(makePredicate(for: .network))
-    }
-
-    private func prepare(for mode: ConsoleMode) {
-        searchCriteriaViewModel.mode = mode
-        listViewModel.mode = mode
     }
 
     func removeAllLogs() {
@@ -150,4 +113,37 @@ public enum ConsoleMode: String {
     case logs
     /// Displays only network tasks.
     case network
+}
+
+// MARK: Environment
+
+private struct LoggerStoreKey: EnvironmentKey {
+    static let defaultValue: LoggerStore = .shared
+}
+
+private struct ConsoleRouterKey: EnvironmentKey {
+    static let defaultValue: ConsoleRouter = .init()
+}
+
+extension EnvironmentValues {
+    var store: LoggerStore {
+        get { self[LoggerStoreKey.self] }
+        set { self[LoggerStoreKey.self] = newValue }
+    }
+
+    var router: ConsoleRouter {
+        get { self[ConsoleRouterKey.self] }
+        set { self[ConsoleRouterKey.self] = newValue }
+    }
+}
+
+extension View {
+    func injecting(_ environment: ConsoleEnvironment) -> some View {
+        self.background(ConsoleRouterView()) // important: order
+            .environmentObject(environment)
+            .environmentObject(environment.router)
+            .environment(\.router, environment.router)
+            .environment(\.store, environment.store)
+            .environment(\.managedObjectContext, environment.store.viewContext)
+    }
 }

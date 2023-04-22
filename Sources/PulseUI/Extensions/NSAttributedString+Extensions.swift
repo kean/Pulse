@@ -4,6 +4,8 @@
 
 import Foundation
 
+#if os(iOS) || os(macOS)
+
 extension NSAttributedString {
     func getLines() -> [NSAttributedString] {
         let matches = newLineRegex.matches(in: string, options: [], range: NSRange(location: 0, length: length))
@@ -26,6 +28,8 @@ extension NSAttributedString {
 }
 
 private let newLineRegex = try! NSRegularExpression(pattern: "\n", options: [])
+
+#endif
 
 extension NSMutableAttributedString {
     func append(_ string: String, _ attributes: [NSAttributedString.Key: Any] = [:]) {

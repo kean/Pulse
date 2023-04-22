@@ -15,12 +15,12 @@ struct ConsoleEntityCell: View {
         case .message(let message):
             _ConsoleMessageCell(message: message)
 #if os(macOS)
-                .backport.showListSeparators()
+                .backport.listRowSeparators(isHidden: false)
 #endif
         case .task(let task):
             _ConsoleTaskCell(task: task)
 #if os(macOS)
-                .backport.showListSeparators()
+                .backport.listRowSeparators(isHidden: false)
 #endif
         }
     }

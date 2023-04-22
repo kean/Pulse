@@ -14,10 +14,6 @@ struct NetworkInspectorViewModel {
         task.url.flatMap(URL.init(string:))?.lastPathComponent ?? "Request"
     }
 
-    var pinViewModel: PinButtonViewModel? {
-        PinButtonViewModel(task)
-    }
-
     func shareTaskAsHTML() -> URL? {
         ShareService.share(task, as: .html).items.first as? URL
     }

@@ -179,9 +179,9 @@ extension Backport {
 
 #if os(macOS)
     @ViewBuilder
-    func showListSeparators() -> some View {
+    func listRowSeparators(isHidden: Bool) -> some View {
         if #available(macOS 13, *) {
-            self.content.listRowSeparator(.visible)
+            self.content.listRowSeparator(isHidden ? .hidden : .visible)
         } else {
             self.content
         }
@@ -234,4 +234,10 @@ extension View {
     func apply<T>(_ closure: (Self) -> T) -> T {
         closure(self)
     }
+}
+
+/// Allows you to use `@StateObject` only for memory management (without observing).
+final class ObservableBag<T>: ObservableObject {
+    let value: T
+    init(_ value: T) { self.value = value }
 }

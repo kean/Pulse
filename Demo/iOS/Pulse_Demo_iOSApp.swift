@@ -10,9 +10,12 @@ import PulseUI
 struct Pulse_Demo_iOSApp: App {
     var body: some Scene {
 //        let _ = testProxy()
-        WindowGroup {
-            NavigationView {
-                ConsoleView(store: .demo)
+
+        if #available(iOS 15.0, *) {
+            WindowGroup {
+                NavigationView {
+                    ConsoleView(store: .demo)
+                }
             }
         }
     }

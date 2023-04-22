@@ -13,35 +13,9 @@ extension ConsoleView {
     }
 }
 
-extension View {
-    func injecting(_ environment: ConsoleEnvironment) -> some View {
-        self.background(ConsoleRouterView()) // important: order
-            .environmentObject(environment)
-            .environmentObject(environment.router)
-            .environment(\.router, environment.router)
-            .environment(\.store, environment.store)
-            .environment(\.managedObjectContext, environment.store.viewContext)
-    }
-}
-
-// MARK: Environment
-
-private struct LoggerStoreKey: EnvironmentKey {
-    static let defaultValue: LoggerStore = .shared
-}
-
-private struct ConsoleRouterKey: EnvironmentKey {
-    static let defaultValue: ConsoleRouter = .init()
-}
-
-extension EnvironmentValues {
-    var store: LoggerStore {
-        get { self[LoggerStoreKey.self] }
-        set { self[LoggerStoreKey.self] = newValue }
-    }
-
-    var router: ConsoleRouter {
-        get { self[ConsoleRouterKey.self] }
-        set { self[ConsoleRouterKey.self] = newValue }
+extension ConsoleView {
+    @available(*, deprecated, message: "Please use the default initializer and pass the mode instead")
+    public static func network(store: LoggerStore = .shared) -> ConsoleView {
+        ConsoleView(environment: .init(store: store, mode: .network))
     }
 }

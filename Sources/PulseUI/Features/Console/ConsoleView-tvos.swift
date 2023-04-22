@@ -11,16 +11,18 @@ import Combine
 
 public struct ConsoleView: View {
     @StateObject private var environment: ConsoleEnvironment
+    @StateObject private var listViewModel: ConsoleListViewModel
 
     init(environment: ConsoleEnvironment) {
         _environment = StateObject(wrappedValue: environment)
+        _listViewModel = StateObject(wrappedValue: .init(environment: environment))
     }
 
     public var body: some View {
         GeometryReader { proxy in
             HStack {
                 List {
-                    ConsoleListContentView(viewModel: environment.listViewModel)
+                    ConsoleListContentView(viewModel: listViewModel)
                 }
 
                 // TODO: Not sure it's valid
@@ -33,8 +35,8 @@ public struct ConsoleView: View {
             }
             .injecting(environment)
             .navigationTitle(environment.title)
-            .onAppear { environment.listViewModel.isViewVisible = true }
-            .onDisappear { environment.listViewModel.isViewVisible = false }
+            .onAppear { listViewModel.isViewVisible = true }
+            .onDisappear { listViewModel.isViewVisible = false }
         }
     }
 }

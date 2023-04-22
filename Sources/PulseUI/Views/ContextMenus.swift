@@ -105,9 +105,7 @@ enum ContextMenu {
         }
     }
 }
-#endif
 
-#if os(iOS) || os(macOS)
 struct StringSearchOptionsMenu: View {
     @Binding private(set) var options: StringSearchOptions
     var isKindNeeded = true

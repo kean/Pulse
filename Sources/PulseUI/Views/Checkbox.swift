@@ -32,7 +32,8 @@ extension Checkbox where Label == Text {
     }
 }
 
-struct CheckboxView_Previews: PreviewProvider {
+#if DEBUG
+struct Previews_CheckboxView_Previews: PreviewProvider {
     static var previews: some View {
         List {
             Checkbox("Checkbox", isOn: .constant(true)).disabled(false)
@@ -42,3 +43,4 @@ struct CheckboxView_Previews: PreviewProvider {
         }
     }
 }
+#endif

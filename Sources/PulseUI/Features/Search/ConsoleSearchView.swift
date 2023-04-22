@@ -11,9 +11,15 @@ import Combine
 
 @available(iOS 15, *)
 struct ConsoleSearchView: View {
-    @ObservedObject var viewModel: ConsoleSearchViewModel
+    @EnvironmentObject private var viewModel: ConsoleSearchViewModel
 
     var body: some View {
+        content
+            .onAppear { viewModel.isViewVisible = true }
+            .onDisappear { viewModel.isViewVisible = false }
+    }
+
+    @ViewBuilder var content: some View {
         suggestionsView
         if viewModel.isNewResultsButtonShown {
             showNewResultsPromptView
@@ -21,8 +27,7 @@ struct ConsoleSearchView: View {
         searchResultsView
     }
 
-    @ViewBuilder
-    private var suggestionsView: some View {
+    @ViewBuilder private var suggestionsView: some View {
 #if os(iOS)
         toolbar
             .listRowBackground(Color.clear)

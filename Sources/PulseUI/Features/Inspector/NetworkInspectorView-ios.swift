@@ -70,7 +70,7 @@ struct NetworkInspectorView: View {
 
     @ViewBuilder
     private var trailingNavigationBarItems: some View {
-        viewModel.pinViewModel.map { PinButton(viewModel: $0, isTextNeeded: false) }
+        PinButton(viewModel: PinButtonViewModel(task), isTextNeeded: false)
         Menu(content: {
             AttributedStringShareMenu(shareItems: $shareItems) {
                 TextRenderer(options: .sharing).make { $0.render(task, content: .sharing) }

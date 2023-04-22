@@ -9,19 +9,21 @@ import Pulse
 
 public struct ConsoleView: View {
     @StateObject private var environment: ConsoleEnvironment
+    @StateObject private var listViewModel: ConsoleListViewModel
 
     init(environment: ConsoleEnvironment) {
         _environment = StateObject(wrappedValue: environment)
+        _listViewModel = StateObject(wrappedValue: .init(environment: environment))
     }
 
     public var body: some View {
         List {
             ConsoleToolbarView(environment: environment)
-            ConsoleListContentView(viewModel: environment.listViewModel)
+            ConsoleListContentView(viewModel: listViewModel)
         }
         .navigationTitle(environment.title)
-        .onAppear { environment.listViewModel.isViewVisible = true }
-        .onDisappear { environment.listViewModel.isViewVisible = false }
+        .onAppear { listViewModel.isViewVisible = true }
+        .onDisappear { listViewModel.isViewVisible = false }
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
                 Button(action: { environment.router.isShowingSettings = true }) {

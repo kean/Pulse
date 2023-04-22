@@ -7,36 +7,6 @@ import CommonCrypto
 import CoreData
 import Combine
 
-#if os(macOS)
-extension URL {
-    static var library: URL {
-        let url = Files.urls(for: .libraryDirectory, in: .userDomainMask).first ?? URL(fileURLWithPath: "/dev/null")
-        Files.createDirectoryIfNeeded(at: url)
-        return url
-    }
-}
-
-extension URL {
-    func appending(filename: String) -> URL {
-        appendingPathComponent(filename, isDirectory: false)
-    }
-
-    func appending(directory: String) -> URL {
-        appendingPathComponent(directory, isDirectory: true)
-    }
-}
-var Files: FileManager { FileManager.default }
-
-extension FileManager {
-    @discardableResult
-    func createDirectoryIfNeeded(at url: URL) -> Bool {
-        guard !fileExists(atPath: url.path) else { return false }
-        try? createDirectory(at: url, withIntermediateDirectories: true, attributes: [:])
-        return true
-    }
-}
-#endif
-
 extension Character {
     init?(_ code: unichar) {
         guard let scalar = UnicodeScalar(code) else {
@@ -64,6 +34,19 @@ extension AttributedString {
 extension NSManagedObject {
     func reset() {
         managedObjectContext?.refresh(self, mergeChanges: false)
+    }
+}
+
+extension NSManagedObjectContext {
+    func getDistinctValues(entityName: String, property: String) -> Set<String> {
+        let request = NSFetchRequest<NSFetchRequestResult>(entityName: entityName)
+        request.resultType = .dictionaryResultType
+        request.returnsDistinctResults = true
+        request.propertiesToFetch = [property]
+        guard let results = try? fetch(request) as? [[String: String]] else {
+            return []
+        }
+        return Set(results.flatMap { $0.values })
     }
 }
 

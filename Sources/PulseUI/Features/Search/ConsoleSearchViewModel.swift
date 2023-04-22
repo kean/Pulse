@@ -14,12 +14,13 @@ final class ConsoleSearchBarViewModel: ObservableObject {
     @Published var tokens: [ConsoleSearchToken] = []
 }
 
-@available(iOS 15, tvOS 15, *)
+@available(iOS 15, *)
 final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDelegate {
     var isViewVisible: Bool = false {
         didSet {
             guard oldValue != isViewVisible else { return }
             if !isViewVisible {
+                searchService.clearCache()
                 operation?.cancel()
                 operation = nil
             }
@@ -73,10 +74,10 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     private let context: NSManagedObjectContext
 
     // TODO: This should not depend on `ConsoleListViewModel`
-    init(list: ConsoleListViewModel, index: LoggerStoreIndex, searchBar: ConsoleSearchBarViewModel) {
+    init(store: LoggerStore, list: ConsoleListViewModel, index: LoggerStoreIndex, searchBar: ConsoleSearchBarViewModel) {
+        self.store = store
         self.list = list
         self.searchBar = searchBar
-        self.store = list.store
         self.index = index
         self.context = store.newBackgroundContext()
 

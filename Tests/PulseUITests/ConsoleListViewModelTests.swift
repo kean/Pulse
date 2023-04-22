@@ -9,7 +9,7 @@ import CoreData
 @testable import PulseUI
 
 final class ConsoleListViewModelTests: ConsoleTestCase {
-    var criteriaViewModel: ConsoleSearchCriteriaViewModel!
+    var environment: ConsoleEnvironment!
     var sut: ConsoleListViewModel!
 
     override func setUp() {
@@ -20,11 +20,11 @@ final class ConsoleListViewModelTests: ConsoleTestCase {
 
     func setUp(store: LoggerStore, focusedEntities: [NSManagedObject]? = nil) {
         self.store = store
-        self.criteriaViewModel = ConsoleSearchCriteriaViewModel(options: .init(), index: .init(store: store))
+        self.environment = ConsoleEnvironment(store: store)
         if let entities = focusedEntities {
-            self.criteriaViewModel.options.focus = NSPredicate(format: "self IN %@", entities)
+            environment.searchCriteriaViewModel.options.focus = NSPredicate(format: "self IN %@", entities)
         }
-        self.sut = ConsoleListViewModel(store: store, criteria: criteriaViewModel)
+        self.sut = ConsoleListViewModel(environment: environment)
         self.sut.isViewVisible = true
     }
 
@@ -35,7 +35,6 @@ final class ConsoleListViewModelTests: ConsoleTestCase {
         // THEN
         XCTAssertEqual(entities.count, 13)
         XCTAssertTrue(entities is [LoggerMessageEntity])
-        XCTAssertEqual(sut.mode, .all)
     }
 
     func testThatEntitiesAreOrderedByCreationDate() {
@@ -48,10 +47,10 @@ final class ConsoleListViewModelTests: ConsoleTestCase {
 
     func testSwitchingToNetworkMode() {
         // WHEN
-        sut.mode = .network
+        environment.mode = .network
 
         // THEN
-        XCTAssertEqual(sut.mode, .network)
+        XCTAssertEqual(environment.mode, .network)
         XCTAssertEqual(sut.entities.count, 8)
         XCTAssertTrue(sut.entities is [NetworkTaskEntity])
     }
@@ -81,7 +80,7 @@ final class ConsoleListViewModelTests: ConsoleTestCase {
 
     func testGroupingTasksByTaskType() {
         // WHEN
-        sut.mode = .network
+        environment.mode = .network
         sut.options.taskGroupBy = .taskType
 
         // THEN entities are still loaded
@@ -103,7 +102,7 @@ final class ConsoleListViewModelTests: ConsoleTestCase {
 
     func testGroupingTasksByStatus() {
         // WHEN
-        sut.mode = .network
+        environment.mode = .network
         sut.options.taskGroupBy = .requestState
 
         // THEN entities are still loaded
@@ -181,7 +180,7 @@ final class ConsoleListViewModelTests: ConsoleTestCase {
         store.pins.togglePin(for: task)
 
         // WHEN
-        sut.mode = .network
+        environment.mode = .network
 
         // THEN only tasks is displayed
         wait(for: [expectation], timeout: 2)

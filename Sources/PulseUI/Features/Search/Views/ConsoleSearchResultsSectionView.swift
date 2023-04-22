@@ -40,7 +40,6 @@ struct ConsoleSearchResultView: View {
             Text("Total Results: \(total)")
                 .font(ConsoleConstants.fontBody)
                 .foregroundColor(.secondary)
-                .padding(.top, 8)
 #else
             NavigationLink(destination: ConsoleSearchResultDetailsView(viewModel: viewModel)) {
                 Text("Total Results: ")
@@ -65,10 +64,17 @@ struct ConsoleSearchResultView: View {
             Text(occurrence.preview)
                 .lineLimit(3)
         }
+#if os(macOS)
+            .backport.listRowSeparators(isHidden: false)
+#endif
         if #unavailable(iOS 16) {
             contents.padding(.vertical, 4)
         } else {
+#if os(macOS)
+            contents.padding(.vertical, 4)
+#else
             contents
+#endif
         }
     }
 
@@ -139,9 +145,12 @@ struct PlainListGroupSeparator: View {
         Rectangle().foregroundColor(.clear) // DIY separator
             .frame(height: 12)
             .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
-            .listRowBackground(Color.separator.opacity(0.2))
 #if os(iOS)
+            .listRowBackground(Color.separator.opacity(0.2))
             .listRowSeparator(.hidden)
+#else
+            .backport.listRowSeparators(isHidden: true)
+            .listRowBackground(Color.separator)
 #endif
     }
 }

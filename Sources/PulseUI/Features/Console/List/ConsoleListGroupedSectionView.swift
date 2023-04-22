@@ -30,7 +30,11 @@ struct ConsoleListGroupedSectionView: View {
                 PlainListSeeAllView(count: objects.count)
             }
 #else
-            Button(action: { environment.focus(on: objects) }) {
+            Button(action: {
+                environment.searchCriteriaViewModel.focus(on: objects)
+                viewModel.options.messageGroupBy = .noGrouping
+                viewModel.options.taskGroupBy = .noGrouping
+            }) {
                 PlainListSeeAllView(count: objects.count)
             }.buttonStyle(.plain)
 #endif

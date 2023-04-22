@@ -20,7 +20,7 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
 
     @Published var options = ConsoleListOptions()
 
-    @Counter var isViewVisible {
+    var isViewVisible = false {
         didSet {
             guard oldValue != isViewVisible else { return }
             if isViewVisible {
@@ -37,34 +37,28 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
 
     @Published private(set) var previousSession: LoggerSessionEntity?
 
-    var mode: ConsoleMode = .all {
-        didSet {
-            pins = filter(pins: pinsObserver.objects, mode: mode)
-            resetDataSource(options: options)
-        }
-    }
-
     /// This exist strictly to workaround List performance issues
     private var scrollPosition: ScrollPosition = .nearTop
     private var visibleEntityCountLimit = ConsoleDataSource.fetchBatchSize
     private var visibleObjectIDs: Set<NSManagedObjectID> = []
 
-    let store: LoggerStore
+    private let store: LoggerStore
+    private var mode: ConsoleMode
     private let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
     private let sessions: ManagedObjectsObserver<LoggerSessionEntity>
     private let pinsObserver: ManagedObjectsObserver<LoggerMessageEntity>
     private var dataSource: ConsoleDataSource?
     private var cancellables: [AnyCancellable] = []
 
-    init(store: LoggerStore, criteria: ConsoleSearchCriteriaViewModel) {
-        self.store = store
-        self.searchCriteriaViewModel = criteria
+    init(environment: ConsoleEnvironment) {
+        self.store = environment.store
+        self.mode = environment.mode
+        self.searchCriteriaViewModel = environment.searchCriteriaViewModel
         self.sessions = .sessions(for: store.viewContext)
         self.pinsObserver = .pins(for: store.viewContext)
-        self.bind()
-    }
 
-    private func bind() {
+        searchCriteriaViewModel.bind($entities)
+
         sessions.$objects.dropFirst().sink { [weak self] in
             self?.refreshPreviousSessionButton(sessions: $0)
         }.store(in: &cancellables)
@@ -76,9 +70,19 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
             }
         }.store(in: &cancellables)
 
-        $options.dropFirst()
-            .sink { [weak self] in self?.resetDataSource(options: $0) }
-            .store(in: &cancellables)
+        $options.dropFirst().sink { [weak self] in
+            self?.resetDataSource(options: $0)
+        }.store(in: &cancellables)
+
+        environment.$mode.sink { [weak self] in
+            self?.didUpdateMode($0)
+        }.store(in: &cancellables)
+    }
+
+    private func didUpdateMode(_ mode: ConsoleMode) {
+        self.mode = mode
+        pins = filter(pins: pinsObserver.objects, mode: mode)
+        resetDataSource(options: options)
     }
 
     private func resetDataSource(options: ConsoleListOptions) {

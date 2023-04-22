@@ -222,20 +222,33 @@ struct ConsoleSearchMatch {
 
 @available(iOS 15, tvOS 15, *)
 final class ConsoleSearchService {
-    private let cachedBodies = Cache<NSManagedObjectID, String>(costLimit: 16_000_000, countLimit: 1000)
+    private let cache = NSCache<NSManagedObjectID, CachedString>()
+
+    init() {
+        cache.totalCostLimit = 16_000_000
+        cache.countLimit = 1000
+    }
+
+    func clearCache() {
+        cache.removeAllObjects()
+    }
 
     func getBodyString(for blob: LoggerBlobHandleEntity) -> String? {
-        if let string = cachedBodies.value(forKey: blob.objectID)  {
+        if let string = cache.object(forKey: blob.objectID)?.value {
             return string
         }
-        guard let data = blob.data,
-              let string = String(data: data, encoding: .utf8)
-        else {
+        guard let data = blob.data, let string = String(data: data, encoding: .utf8) else {
             return nil
         }
-        cachedBodies.set(string, forKey: blob.objectID, cost: data.count)
+        cache.setObject(.init(value: string), forKey: blob.objectID, cost: data.count)
         return string
     }
+}
+
+/// Wrapping it in a class to make it compatible with `NSCache`.
+private final class CachedString {
+    let value: String
+    init(value: String) { self.value = value }
 }
 
 #endif

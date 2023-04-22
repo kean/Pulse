@@ -7,7 +7,7 @@ struct Version: Comparable, LosslessStringConvertible, Codable, Sendable {
     let minor: Int
     let patch: Int
 
-    init(_ major: Int, _ minor: Int, _ patch: Int, prereleaseIdentifiers: [String] = []) {
+    init(_ major: Int, _ minor: Int, _ patch: Int) {
         precondition(major >= 0 && minor >= 0 && patch >= 0, "Negative versioning is invalid.")
         self.major = major
         self.minor = minor

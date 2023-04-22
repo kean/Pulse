@@ -14,8 +14,6 @@ struct ConsoleSearchToolbar: View {
     let title: String
     var isSpinnerNeeded = false
 
-    @EnvironmentObject private var environment: ConsoleEnvironment
-
     var body: some View {
         HStack(alignment: .bottom, spacing: 0) {
             Text(title)
@@ -27,7 +25,7 @@ struct ConsoleSearchToolbar: View {
             }
             Spacer()
             HStack(spacing: 14) {
-                ConsoleSearchContextMenu(viewModel: environment.searchViewModel)
+                ConsoleSearchContextMenu()
             }
         }
         .buttonStyle(.plain)

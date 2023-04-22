@@ -43,27 +43,8 @@ final class LoggerStoreIndex {
     }
 
     private func prepopulate() {
-        let labels: Set<String> = {
-            let request = NSFetchRequest<NSFetchRequestResult>(entityName: "LoggerMessageEntity")
-            request.resultType = .dictionaryResultType
-            request.returnsDistinctResults = true
-            request.propertiesToFetch = ["label"]
-            guard let results = try? store.backgroundContext.fetch(request) as? [[String: String]] else {
-                return []
-            }
-            return Set(results.flatMap { $0.values })
-        }()
-
-        let urls: Set<String> = {
-            let request = NSFetchRequest<NSFetchRequestResult>(entityName: "NetworkTaskEntity")
-            request.resultType = .dictionaryResultType
-            request.returnsDistinctResults = true
-            request.propertiesToFetch = ["url"]
-            guard let results = try? store.backgroundContext.fetch(request) as? [[String: String]] else {
-                return []
-            }
-            return Set(results.flatMap { $0.values })
-        }()
+        let labels = store.backgroundContext.getDistinctValues(entityName: "LoggerMessageEntity", property: "label")
+        let urls = store.backgroundContext.getDistinctValues(entityName: "NetworkTaskEntity", property: "url")
 
         var hosts = Set<String>()
         var paths = Set<String>()

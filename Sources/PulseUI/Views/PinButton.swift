@@ -50,11 +50,7 @@ struct PinView: View {
         }
     }
 }
-#endif
 
-// MARK: - ViewModel
-
-#if os(iOS) || os(macOS)
 final class PinButtonViewModel: ObservableObject {
     @Published private(set) var isPinned = false
     private let message: LoggerMessageEntity?
@@ -85,11 +81,6 @@ final class PinButtonViewModel: ObservableObject {
         guard let message = message else { return } // Should never happen
         pins?.togglePin(for: message)
     }
-}
-#else
-struct PinButtonViewModel {
-    init(_ message: LoggerMessageEntity) {}
-    init(_ task: NetworkTaskEntity) {}
 }
 #endif
 

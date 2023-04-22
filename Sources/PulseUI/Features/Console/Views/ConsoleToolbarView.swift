@@ -11,7 +11,7 @@ import Combine
 
 #if os(iOS)
 struct ConsoleToolbarView: View {
-    @EnvironmentObject private var environment: ConsoleEnvironment
+    let environment: ConsoleEnvironment
 
     var body: some View {
         if #available(iOS 16.0, *) {
@@ -133,21 +133,18 @@ struct ConsoleModePicker: View {
 }
 
 private struct ConsoleToolbarTitle: View {
-    @State private var title: String = ""
     @EnvironmentObject private var environment: ConsoleEnvironment
+    @EnvironmentObject private var listViewModel: ConsoleListViewModel
 
     var body: some View {
         Text(title)
             .foregroundColor(.secondary)
             .font(.subheadline.weight(.medium))
-            .onReceive(titlePublisher) { title = $0 }
     }
 
-    private var titlePublisher: some Publisher<String, Never> {
+    private var title: String {
         let kind = environment.initialMode == .network ? "Requests" : "Logs"
-        return environment.listViewModel.$entities.map { entities in
-            "\(entities.count) \(kind)"
-        }
+        return "\(listViewModel.entities.count) \(kind)"
     }
 }
 
@@ -187,12 +184,11 @@ private struct ConsoleModeButton: View {
 struct ConsoleFiltersView: View {
     let environment: ConsoleEnvironment
 
-    @ObservedObject private var listViewModel: ConsoleListViewModel
+    @EnvironmentObject private var listViewModel: ConsoleListViewModel
     @ObservedObject private var searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
 
     init(environment: ConsoleEnvironment) {
         self.environment = environment
-        self.listViewModel = environment.listViewModel
         self.searchCriteriaViewModel = environment.searchCriteriaViewModel
     }
 

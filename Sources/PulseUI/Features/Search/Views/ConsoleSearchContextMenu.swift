@@ -11,7 +11,7 @@ import Combine
 
 @available(iOS 15, *)
 struct ConsoleSearchContextMenu: View {
-    @ObservedObject var viewModel: ConsoleSearchViewModel
+    @EnvironmentObject private var viewModel: ConsoleSearchViewModel
 
     var body: some View {
         Menu {

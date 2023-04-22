@@ -52,7 +52,7 @@ struct SessionsView: View {
             .sheet(item: $sharedSessions) { sessions in
                 NavigationView {
                     ShareStoreView(sessions: sessions.ids, onDismiss: { sharedSessions = nil })
-                }.backport.presentationDetents([.medium])
+                }.backport.presentationDetents([.medium, .large])
             }
 #else
             .popover(item: $sharedSessions, arrowEdge: .leading) { sessions in
@@ -84,6 +84,7 @@ struct SessionsView: View {
         HStack {
             Button.destructive(action: {
                 store.removeSessions(withIDs: selection)
+                selection = []
             }, label: { Image(systemName: "trash") })
             .disabled(selection.isEmpty || selection == [store.session.id])
 
@@ -131,6 +132,7 @@ struct SessionsView: View {
         if !store.isArchive {
             Button(role: .destructive, action: {
                 store.removeSessions(withIDs: selection)
+                self.selection = []
             }, label: { Label("Remove", systemImage: "trash") })
         }
     }

@@ -5,12 +5,12 @@
 import Foundation
 import Pulse
 
-struct Version: Comparable, LosslessStringConvertible, Sendable {
+struct Version: Comparable, Sendable {
     let major: Int
     let minor: Int
     let patch: Int
 
-    init(_ major: Int, _ minor: Int, _ patch: Int, prereleaseIdentifiers: [String] = []) {
+    init(_ major: Int, _ minor: Int, _ patch: Int) {
         precondition(major >= 0 && minor >= 0 && patch >= 0, "Negative versioning is invalid.")
         self.major = major
         self.minor = minor
@@ -27,8 +27,6 @@ struct Version: Comparable, LosslessStringConvertible, Sendable {
         (lhs.major, lhs.minor, lhs.patch) < (rhs.major, rhs.minor, rhs.patch)
     }
 
-    // MARK: LosslessStringConvertible
-
     init?(_ string: String) {
         guard string.allSatisfy(\.isASCII) else { return nil }
         let components = string.split(separator: ".", omittingEmptySubsequences: false)
@@ -41,9 +39,5 @@ struct Version: Comparable, LosslessStringConvertible, Sendable {
         self.major = major
         self.minor = minor
         self.patch = patch
-    }
-
-    var description: String {
-        "\(major).\(minor).\(patch)"
     }
 }
