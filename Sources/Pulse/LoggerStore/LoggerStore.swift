@@ -19,7 +19,7 @@ public final class LoggerStore: @unchecked Sendable {
     public let isArchive: Bool
 
     /// The options with which the store was opened with.
-    public  let options: Options
+    public let options: Options
 
     /// The configuration with which the store was initialized with.
     public let configuration: Configuration
@@ -95,7 +95,7 @@ public final class LoggerStore: @unchecked Sendable {
     ///
     /// - parameters:
     ///   - storeURL: The store URL.
-    ///   - options: By default, empty. To create a store, use ``Options/create``.
+    ///   - options: By default, empty. To create a store, use ``Options-swift.struct/create``.
     ///   - configuration: The store configuration specifying size limit, etc.
     public init(storeURL: URL, options: Options = [], configuration: Configuration = .init()) throws {
         var isDirectory: ObjCBool = ObjCBool(false)

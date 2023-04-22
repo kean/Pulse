@@ -77,7 +77,7 @@ extension LoggerStore {
         /// two weeks will get automatically deleted.
         ///
         /// - note: This option request the store to be instantiated with a
-        /// ``LoggerStore/Options/sweep`` option. The default store supports sweeps.
+        /// ``LoggerStore/Options-swift.struct/sweep`` option. The default store supports sweeps.
         public var maxAge: TimeInterval = 14 * 86400
 
         /// For testing purposes.

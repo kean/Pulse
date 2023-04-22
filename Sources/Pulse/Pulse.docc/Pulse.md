@@ -19,7 +19,6 @@ Logger and network inspector for Apple platforms.
 ### Remote Logging
 
 - ``RemoteLogger``
-- ``RemoteLoggerConnectionDelegate``
 
 ### Core Data Entities
 

@@ -9,12 +9,15 @@
 ### Initializers
 
 - ``init(storeURL:options:configuration:)``
-- ``Options``
+- ``Options-swift.struct``
 - ``Configuration-swift.struct``
 
 ### Instance Properties
 
 - ``storeURL``
+- ``version``
+- ``options-swift.property``
+- ``session-swift.property``
 - ``isArchive``
 - ``configuration-swift.property``
 
@@ -29,10 +32,16 @@
 - ``allTasks()``
 - ``getBlobData(forKey:)``
 
+### Export
+
+- ``export(to:as:options:)``
+- ``ExportOptions``
+- ``DocumentType``
+- ``copy(to:predicate:)``
+
 ### Managing the Store
 
 - ``removeAll()``
-- ``copy(to:predicate:)``
 - ``close()``
 - ``destroy()``
 
@@ -63,4 +72,4 @@
 - ``Metadata``
 - ``MetadataValue``
 - ``Error``
-- ``Session``
+- ``Session-swift.struct``
