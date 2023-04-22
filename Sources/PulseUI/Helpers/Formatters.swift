@@ -92,7 +92,7 @@ enum ConsoleFormatter {
     // MARK: Individual Components
 
     static func time(for date: Date) -> String {
-        ConsoleMessageCellViewModel.timeFormatter.string(from: date)
+        ConsoleMessageCell.timeFormatter.string(from: date)
     }
 
     static func status(for task: NetworkTaskEntity) -> String {

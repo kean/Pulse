@@ -33,15 +33,15 @@ private struct _ConsoleMessageCell: View {
 
     var body: some View {
 #if os(iOS)
-        let cell = ConsoleMessageCell(viewModel: .init(message: message), isDisclosureNeeded: true)
+        let cell = ConsoleMessageCell(message: message, isDisclosureNeeded: true)
             .background(NavigationLink("", destination: ConsoleMessageDetailsView(message: message)).opacity(0))
 #elseif os(macOS)
-        let cell = ConsoleMessageCell(viewModel: .init(message: message))
+        let cell = ConsoleMessageCell(message: message)
             .tag(ConsoleSelectedItem.entity(message.objectID))
 #else
         // `id` is a workaround for macOS (needs to be fixed)
         let cell = NavigationLink(destination: ConsoleMessageDetailsView(message: message)) {
-            ConsoleMessageCell(viewModel: .init(message: message))
+            ConsoleMessageCell(message: message)
         }
 #endif
 

@@ -8,7 +8,7 @@ import CoreData
 import Combine
 
 struct ConsoleMessageCell: View {
-    let viewModel: ConsoleMessageCellViewModel
+    let message: LoggerMessageEntity
     var isDisclosureNeeded = false
 
     var body: some View {
@@ -18,9 +18,9 @@ struct ConsoleMessageCell: View {
             } else {
                 header
             }
-            Text(viewModel.preprocessedText)
+            Text(message.text)
                 .font(ConsoleConstants.fontBody)
-                .foregroundColor(.textColor(for: viewModel.message.logLevel))
+                .foregroundColor(.textColor(for: message.logLevel))
                 .lineLimit(ConsoleSettings.shared.lineLimit)
         }
 #if os(macOS)
@@ -37,7 +37,7 @@ struct ConsoleMessageCell: View {
     @ViewBuilder
     private var header: some View {
         HStack {
-            Text(viewModel.message.logLevel.name.uppercased())
+            Text(message.logLevel.name.uppercased())
                 .lineLimit(1)
 #if os(iOS)
                 .font(ConsoleConstants.fontInfo.weight(.medium))
@@ -47,10 +47,10 @@ struct ConsoleMessageCell: View {
                 .foregroundColor(titleColor)
             Spacer()
 #if os(macOS) || os(iOS)
-            PinView(message: viewModel.message)
+            PinView(message: message)
 #endif
             HStack(spacing: 3) {
-                Text(viewModel.time)
+                Text(ConsoleMessageCell.timeFormatter.string(from: message.createdAt))
                     .lineLimit(1)
                     .font(ConsoleConstants.fontInfo)
                     .foregroundColor(.secondary)
@@ -63,8 +63,15 @@ struct ConsoleMessageCell: View {
     }
 
     var titleColor: Color {
-        viewModel.message.logLevel >= .warning ? .textColor(for: viewModel.message.logLevel) : .secondary
+        message.logLevel >= .warning ? .textColor(for: message.logLevel) : .secondary
     }
+
+    static let timeFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US")
+        formatter.dateFormat = "HH:mm:ss.SSS"
+        return formatter
+    }()
 }
 
 struct ListDisclosureIndicator: View {
@@ -78,10 +85,32 @@ struct ListDisclosureIndicator: View {
     }
 }
 
+extension UXColor {
+    static func textColor(for level: LoggerStore.Level) -> UXColor {
+        switch level {
+        case .trace: return .secondaryLabel
+        case .debug, .info: return .label
+        case .notice, .warning: return .systemOrange
+        case .error, .critical: return .red
+        }
+    }
+}
+
+extension Color {
+    static func textColor(for level: LoggerStore.Level) -> Color {
+        switch level {
+        case .trace: return .secondary
+        case .debug, .info: return .primary
+        case .notice, .warning: return .orange
+        case .error, .critical: return .red
+        }
+    }
+}
+
 #if DEBUG
 struct ConsoleMessageCell_Previews: PreviewProvider {
     static var previews: some View {
-        ConsoleMessageCell(viewModel: .init(message: (try!  LoggerStore.mock.allMessages())[0]))
+        ConsoleMessageCell(message: try! LoggerStore.mock.allMessages()[0])
             .padding()
             .previewLayout(.sizeThatFits)
     }

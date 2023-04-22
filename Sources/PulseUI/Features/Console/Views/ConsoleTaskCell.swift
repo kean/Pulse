@@ -72,7 +72,7 @@ struct ConsoleTaskCell: View {
     }
 
     private var time: some View {
-        Text(ConsoleMessageCellViewModel.timeFormatter.string(from: task.createdAt))
+        Text(ConsoleMessageCell.timeFormatter.string(from: task.createdAt))
             .lineLimit(1)
             .font(ConsoleConstants.fontInfo)
             .foregroundColor(.secondary)
