@@ -57,7 +57,9 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
         self.sessions = .sessions(for: store.viewContext)
         self.pinsObserver = .pins(for: store.viewContext)
 
-        searchCriteriaViewModel.bind($entities)
+        $entities.sink { [weak self] in
+            self?.searchCriteriaViewModel.entities.send($0)
+        }.store(in: &cancellables)
 
         sessions.$objects.dropFirst().sink { [weak self] in
             self?.refreshPreviousSessionButton(sessions: $0)

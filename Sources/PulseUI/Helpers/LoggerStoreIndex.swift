@@ -8,10 +8,10 @@ import Combine
 import Pulse
 
 /// Keeps track of hosts, paths, etc.
-final class LoggerStoreIndex {
-    private(set) var labels: Set<String> = []
-    private(set) var hosts: Set<String> = []
-    private(set) var paths: Set<String> = []
+final class LoggerStoreIndex: ObservableObject {
+    @Published private(set) var labels: Set<String> = []
+    @Published private(set) var hosts: Set<String> = []
+    @Published private(set) var paths: Set<String> = []
 
     private let store: LoggerStore
     private var cancellable: AnyCancellable?

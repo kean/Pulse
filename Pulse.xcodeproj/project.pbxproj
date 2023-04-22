@@ -104,6 +104,8 @@
 		0CB63A2F2975C43D00525165 /* ConsoleSearchScope.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A2D2975C40F00525165 /* ConsoleSearchScope.swift */; };
 		0CB63A352976028F00525165 /* ConsoleSearchFilter+Parsers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB63A332976028B00525165 /* ConsoleSearchFilter+Parsers.swift */; };
 		0CBEF6A629DF69EB00132FB3 /* ConsoleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CBEF6A429DF69E800132FB3 /* ConsoleView.swift */; };
+		0CC3808329F419C700EF22EE /* ConsoleLabelsSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CC3808229F419C700EF22EE /* ConsoleLabelsSelectionView.swift */; };
+		0CC3808529F41CF600EF22EE /* ConsoleDomainsSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CC3808429F41CF600EF22EE /* ConsoleDomainsSelectionView.swift */; };
 		0CD7E0BD29732C8E00A255B7 /* ShareStoreTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD7E0BC29732C8E00A255B7 /* ShareStoreTask.swift */; };
 		0CDACDE229EC6607007C15CD /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CDACDE129EC6607007C15CD /* repos.json */; };
 		0CDACDE329EC6607007C15CD /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CDACDE129EC6607007C15CD /* repos.json */; };
@@ -555,6 +557,8 @@
 		0CB63A2D2975C40F00525165 /* ConsoleSearchScope.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchScope.swift; sourceTree = "<group>"; };
 		0CB63A332976028B00525165 /* ConsoleSearchFilter+Parsers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ConsoleSearchFilter+Parsers.swift"; sourceTree = "<group>"; };
 		0CBEF6A429DF69E800132FB3 /* ConsoleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleView.swift; sourceTree = "<group>"; };
+		0CC3808229F419C700EF22EE /* ConsoleLabelsSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleLabelsSelectionView.swift; sourceTree = "<group>"; };
+		0CC3808429F41CF600EF22EE /* ConsoleDomainsSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleDomainsSelectionView.swift; sourceTree = "<group>"; };
 		0CD7E0BC29732C8E00A255B7 /* ShareStoreTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareStoreTask.swift; sourceTree = "<group>"; };
 		0CDACDE129EC6607007C15CD /* repos.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = repos.json; sourceTree = "<group>"; };
 		0CDC3BE92970FA47003BD1FF /* ConsoleSearchListSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchListSelectionView.swift; sourceTree = "<group>"; };
@@ -1285,6 +1289,8 @@
 			children = (
 				0CF0D5C1296F189500EED9D4 /* ConsoleSection.swift */,
 				0CF0D5BC296F189500EED9D4 /* ConsoleSearchSectionHeader.swift */,
+				0CC3808229F419C700EF22EE /* ConsoleLabelsSelectionView.swift */,
+				0CC3808429F41CF600EF22EE /* ConsoleDomainsSelectionView.swift */,
 				0CDC3BE92970FA47003BD1FF /* ConsoleSearchListSelectionView.swift */,
 				0CF0D5BF296F189500EED9D4 /* ConsoleCustomMessageFilterView.swift */,
 				0CF0D5BA296F189500EED9D4 /* ConsoleCustomNetworkFilterView.swift */,
@@ -2017,6 +2023,7 @@
 				0CF0D640296F189600EED9D4 /* ConsoleSearchCriteriaViewModel.swift in Sources */,
 				0CF0D65A296F189600EED9D4 /* StoreDetailsView.swift in Sources */,
 				0CF0D648296F189600EED9D4 /* ConsoleCustomMessageFilterView.swift in Sources */,
+				0CC3808329F419C700EF22EE /* ConsoleLabelsSelectionView.swift in Sources */,
 				0CF0D67A296F189600EED9D4 /* ConsoleView-watchos.swift in Sources */,
 				0CF0D63F296F189600EED9D4 /* ConsoleSearchCriteriaView.swift in Sources */,
 				0CF0D63A296F189600EED9D4 /* ContextMenus.swift in Sources */,
@@ -2062,6 +2069,7 @@
 				0CF0D613296F189600EED9D4 /* TextRendererHTML.swift in Sources */,
 				0CF0D68A296F189600EED9D4 /* PulseUI.docc in Sources */,
 				0CDC3BEA2970FA47003BD1FF /* ConsoleSearchListSelectionView.swift in Sources */,
+				0CC3808529F41CF600EF22EE /* ConsoleDomainsSelectionView.swift in Sources */,
 				0CB63A1D2974A5EB00525165 /* ConsoleSearchSuggestionView.swift in Sources */,
 				0CECF63D2996BE12000F9CCD /* ConsoleDataSource.swift in Sources */,
 				0C11EAE92971EBEE0059786A /* MockTask.swift in Sources */,

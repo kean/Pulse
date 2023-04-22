@@ -142,6 +142,7 @@ extension View {
         self.background(ConsoleRouterView()) // important: order
             .environmentObject(environment)
             .environmentObject(environment.router)
+            .environmentObject(environment.index)
             .environment(\.router, environment.router)
             .environment(\.store, environment.store)
             .environment(\.managedObjectContext, environment.store.viewContext)

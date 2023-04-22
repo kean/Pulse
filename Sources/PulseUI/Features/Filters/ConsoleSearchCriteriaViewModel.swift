@@ -18,18 +18,16 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
         set { options.criteria = newValue }
     }
 
-    @Published private(set) var labels: [String] = []
     @Published private(set) var domains: [String] = []
 
-    private(set) var labelsCountedSet = NSCountedSet()
     private(set) var domainsCountedSet = NSCountedSet()
 
     let defaultCriteria: ConsoleSearchCriteria
 
+    // TODO: Refactor
+    let entities = CurrentValueSubject<[NSManagedObject], Never>([])
+
     private let index: LoggerStoreIndex
-    private var isScreenVisible = false
-    private var entities: [NSManagedObject] = []
-    private var cancellables: [AnyCancellable] = []
 
     /// Initializes the view model with the initial criteria.
     ///
@@ -42,32 +40,11 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
         self.defaultCriteria = options.criteria
     }
 
-    func bind(_ entities: some Publisher<[NSManagedObject], Never>) {
-        entities.sink { [weak self] in
-            guard let self else { return }
-            self.entities = $0
-            if self.isScreenVisible {
-                self.reloadCounters()
-            }
-        }.store(in: &cancellables)
-    }
-
 #if os(macOS)
     func focus(on entities: [NSManagedObject]) {
         options.focus = NSPredicate(format: "self IN %@", entities)
     }
 #endif
-
-    // MARK: Appearance
-
-    func onAppear() {
-        isScreenVisible = true
-        reloadCounters()
-    }
-
-    func onDisappear() {
-        isScreenVisible = false
-    }
 
     // MARK: Helpers
 
@@ -86,16 +63,6 @@ final class ConsoleSearchCriteriaViewModel: ObservableObject {
 
     func resetAll() {
         criteria = defaultCriteria
-    }
-
-    private func reloadCounters() {
-        if let tasks = entities as? [NetworkTaskEntity] {
-            domainsCountedSet = NSCountedSet(array: tasks.compactMap { $0.host })
-            domains = index.hosts.sorted()
-        } else if let messages = entities as? [LoggerMessageEntity] {
-            labelsCountedSet = NSCountedSet(array: messages.map(\.label))
-            labels = index.labels.sorted()
-        }
     }
 
     // MARK: Binding (Labels)

@@ -10,12 +10,6 @@ struct ConsoleSearchCriteriaView: View {
     @ObservedObject var viewModel: ConsoleSearchCriteriaViewModel
 
     var body: some View {
-        contents
-            .onAppear { viewModel.onAppear() }
-            .onDisappear { viewModel.onDisappear() }
-    }
-
-    var contents: some View {
 #if os(iOS) || os(watchOS) || os(tvOS)
         Form {
             form
@@ -127,16 +121,7 @@ extension ConsoleSearchCriteriaView {
         ConsoleSection(header: {
             ConsoleSectionHeader(icon: "tag", title: "Labels", filter: $viewModel.criteria.messages.labels)
         }, content: {
-            ConsoleSearchListSelectionView(
-                title: "Labels",
-                items: viewModel.labels,
-                id: \.self,
-                selection: $viewModel.selectedLabels,
-                description: { $0 },
-                label: {
-                    ConsoleSearchListCell(title: $0, details: "\(viewModel.labelsCountedSet.count(for: $0))")
-                }
-            )
+            ConsoleLabelsSelectionView(viewModel: viewModel)
         })
     }
 }
@@ -172,16 +157,7 @@ extension ConsoleSearchCriteriaView {
         ConsoleSection(header: {
             ConsoleSectionHeader(icon: "server.rack", title: "Hosts", filter: $viewModel.criteria.network.host)
         }, content: {
-            ConsoleSearchListSelectionView(
-                title: "Hosts",
-                items: viewModel.domains,
-                id: \.self,
-                selection: $viewModel.selectedHost,
-                description: { $0 },
-                label: {
-                    ConsoleSearchListCell(title: $0, details: "\(viewModel.domainsCountedSet.count(for: $0))")
-                }
-            )
+            ConsoleDomainsSelectionView(viewModel: viewModel)
         })
     }
 
@@ -234,7 +210,7 @@ private func makePreview(isOnlyNetwork: Bool) -> some View {
     let store = LoggerStore.mock
     let entities: [NSManagedObject] = try! isOnlyNetwork ? store.allTasks() : store.allMessages()
     let viewModel = ConsoleSearchCriteriaViewModel(options: .init(), index: .init(store: store))
-    viewModel.bind(CurrentValueSubject(entities))
+    viewModel.entities.send(entities)
     viewModel.mode = isOnlyNetwork ? .network : .all
     return ConsoleSearchCriteriaView(viewModel: viewModel)
 }
