@@ -15,7 +15,7 @@ enum ContextMenu {
 
         @Binding private(set) var shareItems: ShareItems?
 
-        // TODO: Rework this without the environmnet
+        // TODO: Rework this without the environment
         @EnvironmentObject private var environment: ConsoleEnvironment
 
         private var criteria: ConsoleSearchCriteriaViewModel { environment.searchCriteriaViewModel }

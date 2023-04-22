@@ -1,5 +1,33 @@
 # Pulse 3.x
 
+## Pulse 3.6.0
+
+### PulseUI
+
+- Add new ["Sessions" screen](https://user-images.githubusercontent.com/1567433/233789699-08700704-0414-4a54-80af-c4c489d8c1d9.png)) where you can see all the previously recorded runs of the app. Tap on a session to see it in the "Console". Tap "Edit" to select one or more sessions, and then share only the selected sessions, delete them, or open them in the "Console".
+- By clicking "Show Previous Session" in the "Console" it now adds only the previous session and not all previous messages like before
+- Update the database schema and the remote logger protocol to support the new session management. The changes are still backward compatible with Pulse Pro 2.x, and the the new Pulse for Mac app is coming to TestFlight soon.
+- Remove the separate "Share Store" button from "Console" menu. This menu is now available when you press the default "Share" in the console. The time range selection is now based on sessions, not time intervals.
+- Add an option to export a store as a macOS package (instead of the archive, which is a default). The package consists of multiple files and makes it easier to view the logger database, but it takes a bit more space and is harder to share as it's essentially a folder.
+- Add "Hide..." and "Show..." menus to messages cells to access quick filters
+
+### Pulse
+
+- Deprecate `LoggerStore/copy` method and introduce a new, more powerful `LoggerStore/export` method that allows to specify the document type (`.archive` or `.package`) and filter the output by sessions. This method is async and also no longer blocks the store's background context.
+- Add `LoggerStore/removeSessions` method for removing session
+- Optimize compression. Now if files don't compress well, `LoggerStore` saves uncompressed data.
+- Make `RemoteLogger.Connection` internal (was public)
+
+### Fixes
+
+- Fix [#183](https://github.com/kean/Pulse/issues/183): two close button in `MainViewController`
+- Fix an issue with store export where blobs larger than inline were encoded in the final file but were never actually accessible after opening the store
+- Fix crash when storing requests with very large timeout interval
+- Fix an issue with `.keyNotFound` decoding errors not being displayed
+- Fix an issue with pending tasks sometimes not updating to completed
+- Fix an issue with the scroll position being reset after scrolling to the bottom and selecting one of the items at the bottom
+- Fix an issue with the details view sometimes popping when going to the bottom of the list
+
 ## Pulse 3.5.7
 
 *Apr 9, 2023*
