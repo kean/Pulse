@@ -126,6 +126,7 @@ struct ConsoleListContentView: View {
 #endif
 }
 
+#if os(macOS)
 private var nowModeChange: DispatchWorkItem?
 
 private func delayNowModeChange(_ closure: @escaping () -> Void) {
@@ -138,6 +139,7 @@ private func delayNowModeChange(_ closure: @escaping () -> Void) {
 struct BottomViewID: Hashable, Identifiable {
     var id: BottomViewID { self}
 }
+#endif
 
 #if os(iOS) || os(macOS)
 struct ConsoleStaticList: View {

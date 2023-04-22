@@ -36,18 +36,14 @@ enum ShareService {
 
     static func share(_ entities: [NSManagedObject], store: LoggerStore, as output: ShareOutput) async throws -> ShareItems {
         try await withUnsafeThrowingContinuation { continuation in
-            ShareService.share(entities, store: store, as: output) {
+            ShareStoreTask(entities: entities, store: store, output: output) {
                 if let value = $0 {
                     continuation.resume(returning: value)
                 } else {
                     continuation.resume(throwing: CancellationError())
                 }
-            }
+            }.start()
         }
-    }
-
-    static func share(_ entities: [NSManagedObject], store: LoggerStore, as output: ShareOutput, _ completion: @escaping (ShareItems?) -> Void) {
-        ShareStoreTask(entities: entities, store: store, output: output, completion: completion).start()
     }
 
     static func share(_ message: LoggerMessageEntity, as output: ShareOutput) -> ShareItems {
@@ -140,10 +136,6 @@ struct TemporaryDirectory {
 }
 
 extension TemporaryDirectory {
-    func write(text: String, extension fileExtension: String) -> URL {
-        write(data: text.data(using: .utf8) ?? Data(), extension: fileExtension)
-    }
-
     func write(data: Data, extension fileExtension: String) -> URL {
         let date = makeCurrentDate()
         let fileURL = url.appendingPathComponent("logs-\(date).\(fileExtension)", isDirectory: false)
@@ -157,18 +149,4 @@ func makeCurrentDate() -> String {
     formatter.locale = Locale(identifier: "en_US")
     formatter.dateFormat = "yyyy-MM-dd-HH-mm"
     return formatter.string(from: Date())
-}
-
-private extension LoggerStore.Level {
-    var title: String {
-        switch self {
-        case .trace: return "trace"
-        case .debug: return "debug"
-        case .info: return "info"
-        case .notice: return "notice"
-        case .warning: return "warning"
-        case .error: return "error"
-        case .critical: return "critical"
-        }
-    }
 }

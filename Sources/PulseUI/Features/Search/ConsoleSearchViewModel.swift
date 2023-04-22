@@ -73,7 +73,6 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     private var cancellables: [AnyCancellable] = []
     private let context: NSManagedObjectContext
 
-    // TODO: This should not depend on `ConsoleListViewModel`
     init(store: LoggerStore, list: ConsoleListViewModel, index: LoggerStoreIndex, searchBar: ConsoleSearchBarViewModel) {
         self.store = store
         self.list = list
@@ -278,10 +277,6 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     func buttonClearRecentSearchesTapped() {
         suggestionsService.clearRecentSearches()
         updateSearchTokens()
-    }
-
-    func prepareForSharing(as output: ShareOutput, _ completion: @escaping (ShareItems?) -> Void) {
-        ShareService.share(results.map(\.entity), store: store, as: output, completion)
     }
 
     // MARK: Suggested Tokens

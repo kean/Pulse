@@ -70,8 +70,7 @@ struct ConsoleSearchView: View {
 #endif
     }
 
-    @ViewBuilder
-    private var showNewResultsPromptView: some View {
+    @ViewBuilder private var showNewResultsPromptView: some View {
         Button(action: viewModel.buttonShowNewlyAddedSearchResultsTapped) {
             HStack {
                 Image(systemName: "arrow.clockwise.circle.fill")
@@ -91,8 +90,7 @@ struct ConsoleSearchView: View {
         .listRowBackground(Color.clear)
     }
 
-    @ViewBuilder
-    private var searchResultsView: some View {
+    @ViewBuilder private var searchResultsView: some View {
         if !viewModel.results.isEmpty {
             PlainListGroupSeparator()
         }
@@ -125,8 +123,7 @@ struct ConsoleSearchView: View {
     }
 #endif
 
-    @ViewBuilder
-    private var footer: some View {
+    @ViewBuilder private var footer: some View {
         if viewModel.parameters.isEmpty, viewModel.hasRecentSearches {
             HStack {
                 Spacer()

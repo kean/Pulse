@@ -20,8 +20,7 @@ struct ConsoleListView: View {
     }
 
     var body: some View {
-        contents
-            .environmentObject(listViewModel)
+        contents.environmentObject(listViewModel)
     }
 
     @ViewBuilder private var contents: some View {
