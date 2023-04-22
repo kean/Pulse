@@ -28,24 +28,6 @@ final class ConsoleMessageCellViewModel {
         self.message = message
         self.searchCriteriaViewModel = searchCriteriaViewModel
     }
-    
-    // MARK: Context Menu
-
-#if os(iOS) || os(macOS)
-    func share() -> ShareItems {
-        ShareItems([message.text])
-    }
-
-    func focus() {
-        searchCriteriaViewModel?.criteria.messages.labels.isEnabled = true
-        searchCriteriaViewModel?.criteria.messages.labels.focused = message.label
-    }
-    
-    func hide() {
-        searchCriteriaViewModel?.criteria.messages.labels.isEnabled = true
-        searchCriteriaViewModel?.criteria.messages.labels.hidden.insert(message.label)
-    }
-#endif
 }
 
 extension UXColor {

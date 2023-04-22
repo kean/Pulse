@@ -9,6 +9,27 @@ import Pulse
 import Combine
 
 enum ContextMenu {
+    @available(iOS 15, *)
+    struct MessageContextMenu: View {
+        let message: LoggerMessageEntity
+
+        @Binding private(set) var shareItems: ShareItems?
+
+        var body: some View {
+            Section {
+                Button(action: { shareItems = ShareService.share(message, as: .plainText) }) {
+                    Label("Share", systemImage: "square.and.arrow.up")
+                }.tint(.blue)
+                Button(action: { UXPasteboard.general.string = message.text }) {
+                    Label("Copy Message", systemImage: "doc.on.doc")
+                }.tint(.blue)
+            }
+            Section {
+                PinButton(viewModel: .init(message)).tint(.pink)
+            }
+        }
+    }
+
     struct NetworkTaskContextMenuItems: View {
         let task: NetworkTaskEntity
 #if os(iOS)

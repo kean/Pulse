@@ -28,6 +28,7 @@ struct ConsoleEntityCell: View {
 
 private struct _ConsoleMessageCell: View {
     let message: LoggerMessageEntity
+
     @State private var shareItems: ShareItems?
 
     var body: some View {
@@ -55,17 +56,7 @@ private struct _ConsoleMessageCell: View {
                 }.tint(.blue)
             }
             .backport.contextMenu(menuItems: {
-                Section {
-                    Button(action: { shareItems = ShareService.share(message, as: .plainText) }) {
-                        Label("Share", systemImage: "square.and.arrow.up")
-                    }.tint(.blue)
-                    Button(action: { UXPasteboard.general.string = message.text }) {
-                        Label("Copy Message", systemImage: "doc.on.doc")
-                    }.tint(.blue)
-                }
-                Section {
-                    PinButton(viewModel: .init(message)).tint(.pink)
-                }
+                ContextMenu.MessageContextMenu(message: message, shareItems: $shareItems)
             }, preview: {
                 ConsoleMessageCellPreview(message: message)
                     .frame(idealWidth: 320, maxHeight: 600)
