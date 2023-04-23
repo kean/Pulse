@@ -10,7 +10,8 @@ import UniformTypeIdentifiers
 
 public struct SettingsView: View {
     @ObservedObject var viewModel: SettingsViewModel
-    @ObservedObject var settings: ConsoleSettings = .shared
+
+    @EnvironmentObject private var settings: UserSettings
 
     public init(store: LoggerStore = .shared) {
         // TODO: Fix ownership

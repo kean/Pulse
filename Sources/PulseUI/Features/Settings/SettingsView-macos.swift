@@ -63,7 +63,7 @@ public struct SettingsView: View {
 // MARK: - Preview
 
 #if DEBUG
-struct ConsoleSettingsView_Previews: PreviewProvider {
+struct UserSettingsView_Previews: PreviewProvider {
     static var previews: some View {
         SettingsView(viewModel: SettingsViewModel(store: .shared))
     }

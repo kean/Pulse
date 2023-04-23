@@ -49,6 +49,7 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
     private let pinsObserver: ManagedObjectsObserver<LoggerMessageEntity>
     private var dataSource: ConsoleDataSource?
     private var cancellables: [AnyCancellable] = []
+    private var filtersCancellable: AnyCancellable?
 
     init(environment: ConsoleEnvironment, filters: ConsoleFiltersViewModel) {
         self.store = environment.store
@@ -90,9 +91,9 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
     private func resetDataSource(options: ConsoleListOptions) {
         dataSource = ConsoleDataSource(store: store, mode: mode, options: options)
         dataSource?.delegate = self
-        filters.$options.sink { [weak self] in
+        filtersCancellable = filters.$options.sink { [weak self] in
             self?.dataSource?.predicate = $0
-        }.store(in: &cancellables)
+        }
     }
 
     func focus(on entities: [NSManagedObject]) {

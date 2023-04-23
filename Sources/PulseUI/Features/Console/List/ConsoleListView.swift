@@ -29,7 +29,10 @@ private struct _InternalConsoleListView: View {
     }
 
     var body: some View {
-        contents.environmentObject(listViewModel)
+        contents
+            .environmentObject(listViewModel)
+            .onAppear { listViewModel.isViewVisible = true }
+            .onDisappear { listViewModel.isViewVisible = false }
     }
 
     @ViewBuilder private var contents: some View {
@@ -65,8 +68,6 @@ private struct _ConsoleNewListView: View {
         list
             .environmentObject(searchBarViewModel)
             .environmentObject(searchViewModel.value)
-            .onAppear { listViewModel.isViewVisible = true }
-            .onDisappear { listViewModel.isViewVisible = false }
     }
 
     @ViewBuilder private var list: some View {

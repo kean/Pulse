@@ -32,8 +32,8 @@ final class ConsoleSearchSuggestionsService {
     private(set) var recentFilters: [ConsoleSearchFilter]
 
     init() {
-        self.recentSearches = decode([ConsoleSearchTerm].self, from: ConsoleSettings.shared.recentSearches) ?? []
-        self.recentFilters = decode([ConsoleSearchFilter].self, from: ConsoleSettings.shared.recentFilters) ?? []
+        self.recentSearches = decode([ConsoleSearchTerm].self, from: UserSettings.shared.recentSearches) ?? []
+        self.recentFilters = decode([ConsoleSearchFilter].self, from: UserSettings.shared.recentFilters) ?? []
     }
 
     func makeRecentSearhesSuggestions() -> [ConsoleSearchSuggestion] {
@@ -143,7 +143,7 @@ final class ConsoleSearchSuggestionsService {
     }
 
     private func saveRecentSearches() {
-        ConsoleSettings.shared.recentSearches = encode(recentSearches) ?? "[]"
+        UserSettings.shared.recentSearches = encode(recentSearches) ?? "[]"
     }
 
     // MARK: - Recent Filters
@@ -167,7 +167,7 @@ final class ConsoleSearchSuggestionsService {
     }
 
     private func saveRecentFilters() {
-        ConsoleSettings.shared.recentFilters = encode(recentFilters) ?? "[]"
+        UserSettings.shared.recentFilters = encode(recentFilters) ?? "[]"
     }
 }
 

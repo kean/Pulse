@@ -12,6 +12,8 @@ import Combine
 struct WrappedTextView: UIViewRepresentable {
     let viewModel: RichTextViewModel
 
+    @ObservedObject private var settings = UserSettings.shared
+
     final class Coordinator: NSObject, UITextViewDelegate {
         var onLinkTapped: ((URL) -> Bool)?
         var cancellables: [AnyCancellable] = []
@@ -42,13 +44,12 @@ struct WrappedTextView: UIViewRepresentable {
         configureTextView(textView)
         textView.delegate = context.coordinator
         textView.attributedText = viewModel.originalText
-        context.coordinator.cancellables = bind(viewModel, textView)
         viewModel.textView = textView
         return textView
     }
 
-    func updateUIView(_ uiView: UXTextView, context: Context) {
-        // Do nothing
+    func updateUIView(_ textView: UXTextView, context: Context) {
+        textView.isAutomaticLinkDetectionEnabled = settings.isLinkDetectionEnabled && viewModel.isLinkDetectionEnabled
     }
 
     func makeCoordinator() -> Coordinator {
@@ -62,6 +63,8 @@ struct WrappedTextView: UIViewRepresentable {
 
 struct WrappedTextView: NSViewRepresentable {
     let viewModel: RichTextViewModel
+
+    @ObservedObject private var settings = UserSettings.shared
 
     final class Coordinator: NSObject, NSTextViewDelegate {
         var onLinkTapped: ((URL) -> Bool)?
@@ -105,8 +108,9 @@ struct WrappedTextView: NSViewRepresentable {
         return scrollView
     }
 
-    func updateNSView(_ nsView: NSScrollView, context: Context) {
-        // Do nothing
+    func updateNSView(_ scrollView: NSScrollView, context: Context) {
+        let textView = scrollView.documentView as! NSTextView
+        textView.isAutomaticLinkDetectionEnabled = settings.isLinkDetectionEnabled && viewModel.isLinkDetectionEnabled
     }
 
     func makeCoordinator() -> Coordinator {
@@ -150,16 +154,6 @@ private func parseTooltip(_ url: URL) -> (title: String?, message: String)? {
     }
     let title = queryItems.first(where: { $0.name == "title" })?.value
     return (title: title, message: message)
-}
-
-private func bind(_ viewModel: RichTextViewModel, _ textView: UXTextView) -> [AnyCancellable] {
-    var cancellables: [AnyCancellable] = []
-
-    Publishers.CombineLatest(viewModel.$isLinkDetectionEnabled, ConsoleSettings.shared.$isLinkDetectionEnabled).sink {
-        textView.isAutomaticLinkDetectionEnabled = $0 && $1
-    }.store(in: &cancellables)
-
-    return cancellables
 }
 
 #endif

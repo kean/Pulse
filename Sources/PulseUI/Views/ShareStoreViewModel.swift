@@ -22,7 +22,7 @@ import Combine
     var store: LoggerStore?
 
     init() {
-        output = ConsoleSettings.shared.sharingOutput
+        output = UserSettings.shared.sharingOutput
     }
 
     func buttonSharedTapped() {
@@ -33,7 +33,7 @@ import Combine
     }
 
     private func saveSharingOptions() {
-        ConsoleSettings.shared.sharingOutput = output
+        UserSettings.shared.sharingOutput = output
     }
 
     func prepareForSharing() {

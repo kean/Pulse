@@ -11,6 +11,8 @@ struct ConsoleTaskCell: View {
     @ObservedObject var task: NetworkTaskEntity
     var isDisclosureNeeded: Bool
 
+    @EnvironmentObject private var settings: UserSettings
+
     init(task: NetworkTaskEntity, isDisclosureNeeded: Bool = false) {
         self.task = task
         self.isDisclosureNeeded = isDisclosureNeeded
@@ -83,7 +85,7 @@ struct ConsoleTaskCell: View {
         Text(task.url ?? "–")
             .font(ConsoleConstants.fontBody)
             .foregroundColor(.primary)
-            .lineLimit(ConsoleSettings.shared.lineLimit)
+            .lineLimit(settings.lineLimit)
     }
 
     private var details: some View {

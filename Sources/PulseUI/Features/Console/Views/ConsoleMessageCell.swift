@@ -11,6 +11,8 @@ struct ConsoleMessageCell: View {
     let message: LoggerMessageEntity
     var isDisclosureNeeded = false
 
+    @EnvironmentObject private var settings: UserSettings
+
     var body: some View {
         let contents = VStack(alignment: .leading, spacing: 4) {
             if #available(iOS 15, tvOS 15, *) {
@@ -21,7 +23,7 @@ struct ConsoleMessageCell: View {
             Text(message.text)
                 .font(ConsoleConstants.fontBody)
                 .foregroundColor(.textColor(for: message.logLevel))
-                .lineLimit(ConsoleSettings.shared.lineLimit)
+                .lineLimit(settings.lineLimit)
         }
 #if os(macOS)
         contents.padding(.vertical, 5)
