@@ -11,7 +11,7 @@ import Combine
 
 #if os(iOS)
 struct ConsoleToolbarView: View {
-    let environment: ConsoleEnvironment
+    @EnvironmentObject private var environment: ConsoleEnvironment
 
     var body: some View {
         if #available(iOS 16.0, *) {
@@ -52,30 +52,24 @@ struct ConsoleToolbarView: View {
             Spacer()
         }
         HStack(spacing: 14) {
-            ConsoleFiltersView(environment: environment)
+            ConsoleListOptionsView()
         }.padding(.trailing, isVertical ? 0 : -2)
     }
 }
 #elseif os(macOS)
 struct ConsoleToolbarView: View {
-    let environment: ConsoleEnvironment
-
-    @ObservedObject private var searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
-
-    init(environment: ConsoleEnvironment) {
-        self.environment = environment
-        self.searchCriteriaViewModel = environment.searchCriteriaViewModel
-    }
+    @EnvironmentObject private var environment: ConsoleEnvironment
+    @EnvironmentObject private var filters: ConsoleFiltersViewModel
 
     var body: some View {
         HStack {
-            if searchCriteriaViewModel.options.focus != nil {
+            if filters.options.focus != nil {
                 makeFocusedView()
             } else {
                 ConsoleModePicker(environment: environment)
             }
             Spacer()
-            ConsoleFiltersView(environment: environment)
+            ConsoleListOptionsView()
                 .menuStyle(.borderlessButton)
                 .menuIndicator(.hidden)
                 .pickerStyle(.inline)
@@ -90,7 +84,7 @@ struct ConsoleToolbarView: View {
             .foregroundColor(.secondary)
             .font(.subheadline.weight(.medium))
 
-        Button(action: { searchCriteriaViewModel.options.focus = nil }) {
+        Button(action: { filters.options.focus = nil }) {
             Image(systemName: "xmark")
         }
         .foregroundColor(.secondary)
@@ -181,16 +175,10 @@ private struct ConsoleModeButton: View {
 #endif
 }
 
-struct ConsoleFiltersView: View {
-    let environment: ConsoleEnvironment
-
+struct ConsoleListOptionsView: View {
+    @EnvironmentObject private var environment: ConsoleEnvironment // important: reloads mode
     @EnvironmentObject private var listViewModel: ConsoleListViewModel
-    @ObservedObject private var searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
-
-    init(environment: ConsoleEnvironment) {
-        self.environment = environment
-        self.searchCriteriaViewModel = environment.searchCriteriaViewModel
-    }
+    @EnvironmentObject private var filters: ConsoleFiltersViewModel
 
     var body: some View {
         if #available(iOS 15, *) {
@@ -209,21 +197,19 @@ struct ConsoleFiltersView: View {
             groupByMenu.fixedSize()
         }
 
-        let criteria = searchCriteriaViewModel
-
 #if os(macOS)
-        Button(action: { criteria.options.isOnlyErrors.toggle() }) {
-            Image(systemName: criteria.options.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon")
-                .foregroundColor(criteria.options.isOnlyErrors ? .red : .primary)
+        Button(action: { filters.options.isOnlyErrors.toggle() }) {
+            Image(systemName: filters.options.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon")
+                .foregroundColor(filters.options.isOnlyErrors ? .red : .primary)
         }
         .buttonStyle(.plain)
         .keyboardShortcut("e", modifiers: [.command, .shift])
         .help("Toggle Show Only Errors (⇧⌘E)")
 #else
-        Button(action: { criteria.options.isOnlyErrors.toggle() }) {
-            Text(Image(systemName: criteria.options.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon"))
+        Button(action: { filters.options.isOnlyErrors.toggle() }) {
+            Text(Image(systemName: filters.options.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon"))
                 .font(.body)
-                .foregroundColor(criteria.options.isOnlyErrors ? .red : .blue)
+                .foregroundColor(filters.options.isOnlyErrors ? .red : .blue)
         }
         .padding(.leading, 1)
 #endif

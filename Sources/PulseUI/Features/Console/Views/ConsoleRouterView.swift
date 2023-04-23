@@ -49,7 +49,7 @@ extension ConsoleRouterView {
 
     private var destinationFilters: some View {
         NavigationView {
-            let view = ConsoleSearchCriteriaView(viewModel: environment.searchCriteriaViewModel)
+            let view = ConsoleFiltersView()
                 .inlineNavigationTitle("Filters")
                 .navigationBarItems(trailing: Button("Done") {
                     router.isShowingFilters = false
@@ -123,7 +123,7 @@ extension ConsoleRouterView {
             }
             .sheet(isPresented: $router.isShowingFilters) {
                 NavigationView {
-                    ConsoleSearchCriteriaView(viewModel: environment.searchCriteriaViewModel)
+                    ConsoleFiltersView()
                         .toolbar {
                             ToolbarItem(placement: .cancellationAction) {
                                 Button("Close") { router.isShowingFilters = false }

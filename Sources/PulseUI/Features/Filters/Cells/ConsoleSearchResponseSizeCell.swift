@@ -8,7 +8,7 @@ import SwiftUI
 import Pulse
 
 struct ConsoleSearchResponseSizeCell: View {
-    @Binding var selection: ConsoleSearchCriteria.ResponseSize
+    @Binding var selection: ConsoleFilers.ResponseSize
 
     var body: some View {
         HStack {
@@ -16,7 +16,7 @@ struct ConsoleSearchResponseSizeCell: View {
             Spacer()
             ConsoleSearchInlinePickerMenu(title: selection.unit.title, width: 50) {
                 Picker("Unit", selection: $selection.unit) {
-                    ForEach(ConsoleSearchCriteria.ResponseSize.MeasurementUnit.allCases) {
+                    ForEach(ConsoleFilers.ResponseSize.MeasurementUnit.allCases) {
                         Text($0.title).tag($0)
                     }
                 }

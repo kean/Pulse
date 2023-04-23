@@ -7,7 +7,7 @@ import Pulse
 import Combine
 
 struct ConsoleDomainsSelectionView: View {
-    @ObservedObject var viewModel: ConsoleSearchCriteriaViewModel
+    @ObservedObject var viewModel: ConsoleFiltersViewModel
     @EnvironmentObject private var index: LoggerStoreIndex
 
     @State private var domains = NSCountedSet()
@@ -17,7 +17,7 @@ struct ConsoleDomainsSelectionView: View {
             title: "Hosts",
             items: index.hosts.sorted(),
             id: \.self,
-            selection: $viewModel.selectedHost,
+            selection: viewModel.bindingForHosts(index: index),
             description: { $0 },
             label: {
                 ConsoleSearchListCell(title: $0, details: "\(domains.count(for: $0))")
@@ -27,5 +27,15 @@ struct ConsoleDomainsSelectionView: View {
             let tasks = $0 as? [NetworkTaskEntity] ?? []
             self.domains = NSCountedSet(array: tasks.compactMap(\.host))
         }
+    }
+}
+
+private extension ConsoleFiltersViewModel {
+    func bindingForHosts(index: LoggerStoreIndex) -> Binding<Set<String>> {
+        Binding(get: {
+            Set(index.hosts).subtracting(self.criteria.network.host.ignoredHosts)
+        }, set: { newValue in
+            self.criteria.network.host.ignoredHosts = Set(index.hosts).subtracting(newValue)
+        })
     }
 }

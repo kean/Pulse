@@ -6,9 +6,9 @@ import Foundation
 import Pulse
 import CoreData
 
-extension ConsoleSearchCriteria {
+extension ConsoleFilers {
     static func makeMessagePredicates(
-        criteria: ConsoleSearchCriteria,
+        criteria: ConsoleFilers,
         isOnlyErrors: Bool
     ) -> NSPredicate? {
         var predicates = [NSPredicate]()
@@ -21,7 +21,7 @@ extension ConsoleSearchCriteria {
     }
 
     static func makeNetworkPredicates(
-        criteria: ConsoleSearchCriteria,
+        criteria: ConsoleFilers,
         isOnlyErrors: Bool
     ) -> NSPredicate? {
         var predicates = [NSPredicate]()
@@ -34,7 +34,7 @@ extension ConsoleSearchCriteria {
     }
 }
 
-private func makePredicates(for criteria: ConsoleSearchCriteria.Shared, isNetwork: Bool = false) -> [NSPredicate] {
+private func makePredicates(for criteria: ConsoleFilers.Shared, isNetwork: Bool = false) -> [NSPredicate] {
     var predicates = [NSPredicate]()
 
     if criteria.sessions.isEnabled && !criteria.sessions.selection.isEmpty {
@@ -53,7 +53,7 @@ private func makePredicates(for criteria: ConsoleSearchCriteria.Shared, isNetwor
     return predicates
 }
 
-private func makePredicates(for criteria: ConsoleSearchCriteria.Messages) -> [NSPredicate] {
+private func makePredicates(for criteria: ConsoleFilers.Messages) -> [NSPredicate] {
     var predicates = [NSPredicate]()
 
     if criteria.logLevels.isEnabled {
@@ -85,7 +85,7 @@ private func makePredicates(for criteria: ConsoleSearchCriteria.Messages) -> [NS
     return predicates
 }
 
-private func makePredicates(for criteria: ConsoleSearchCriteria.Network) -> [NSPredicate] {
+private func makePredicates(for criteria: ConsoleFilers.Network) -> [NSPredicate] {
     var predicates = [NSPredicate]()
 
     if criteria.response.isEnabled {

@@ -48,7 +48,7 @@ struct ConsoleInspectorsView: View {
     private var selectedTabView: some View {
         switch selectedTab {
         case .filters:
-            ConsoleSearchCriteriaView(viewModel: viewModel.searchCriteriaViewModel)
+            ConsoleFiltersView()
         case .storeInfo:
             VStack {
                 StoreDetailsView(source: .store(viewModel.store))

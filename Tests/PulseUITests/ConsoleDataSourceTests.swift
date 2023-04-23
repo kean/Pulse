@@ -12,8 +12,8 @@ final class ConsoleDataSourceTests: ConsoleTestCase, ConsoleDataSourceDelegate {
     var sut: ConsoleDataSource!
 
     var mode: ConsoleMode = .all
-    var options = ConsoleListOptions()
-    var criteria: ConsoleSearchCriteriaViewModel!
+    var listOptions = ConsoleListOptions()
+    var predicate = ConsoleDataSource.PredicateOptions()
 
     var updates: [CollectionDifference<NSManagedObjectID>?] = []
     var onRefresh: (() -> Void)?
@@ -26,9 +26,7 @@ final class ConsoleDataSourceTests: ConsoleTestCase, ConsoleDataSourceDelegate {
     }
 
     func reset() {
-        self.criteria = ConsoleSearchCriteriaViewModel(options: .init(), index: .init(store: store))
-
-        self.sut = ConsoleDataSource(store: store, mode: mode, options: options)
+        self.sut = ConsoleDataSource(store: store, mode: mode, options: listOptions)
         self.sut.delegate = self
         self.sut.refresh()
     }
@@ -66,7 +64,7 @@ final class ConsoleDataSourceTests: ConsoleTestCase, ConsoleDataSourceDelegate {
 
     func testGroupingLogsByLabel() {
         // WHEN
-        options.messageGroupBy = .label
+        listOptions.messageGroupBy = .label
         reset()
 
         // THEN entities are still loaded
@@ -99,7 +97,7 @@ final class ConsoleDataSourceTests: ConsoleTestCase, ConsoleDataSourceDelegate {
 
     func groupTasksBy(_ grouping: ConsoleListOptions.TaskGroupBy) -> [NSFetchedResultsSectionInfo] {
         mode = .network
-        options.taskGroupBy = grouping
+        listOptions.taskGroupBy = grouping
         reset()
         return sut.sections ?? []
     }
@@ -152,7 +150,7 @@ final class ConsoleDataSourceTests: ConsoleTestCase, ConsoleDataSourceDelegate {
 
     func testWhenMessageIsInsertedInGroupedDataSourceDelegateIsCalled() throws {
         // GIVEN
-        options.messageGroupBy = .level
+        listOptions.messageGroupBy = .level
         reset()
 
         let expectation = self.expectation(description: "onUpdate")
@@ -182,17 +180,14 @@ final class ConsoleDataSourceTests: ConsoleTestCase, ConsoleDataSourceDelegate {
         }))
     }
 
-    // MARK: ConsoleSearchCriteriaViewModel
+    // MARK: ConsoleFiltersViewModel
 
     func testDataSourceIsRefreshedWithInitialSearchCriteria() {
-        // GIVEN
-        criteria.options.isOnlyErrors = true
-
         var didRefresh = false
         onRefresh = { didRefresh = true }
 
         // WHEN
-        sut.bind(criteria)
+        sut.predicate.isOnlyErrors = true
 
         // THEN delegate is called
         XCTAssertTrue(didRefresh)
@@ -206,14 +201,14 @@ final class ConsoleDataSourceTests: ConsoleTestCase, ConsoleDataSourceDelegate {
 
     func testWhenCriteriaChangesEntitiesAreRefreshed() {
         // GIVEN
-        sut.bind(criteria)
-        XCTAssertEqual(sut.entities.count, 13)
+        sut.refresh()
+        XCTAssertEqual(sut.entities.count, 15)
 
         // WHEN
         var didRefresh = false
         onRefresh = { didRefresh = true }
 
-        criteria.options.isOnlyErrors = true
+        sut.predicate.isOnlyErrors = true
 
         // THEN delegate is called
         XCTAssertTrue(didRefresh)

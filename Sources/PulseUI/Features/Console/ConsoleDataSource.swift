@@ -28,7 +28,16 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
         didSet { controller.fetchRequest.sortDescriptors = sortDescriptors }
     }
 
-    var basePredicate: NSPredicate?
+    struct PredicateOptions {
+        var filters = ConsoleFilers()
+        var isOnlyErrors = false
+        var predicate: NSPredicate?
+        var focus: NSPredicate?
+    }
+
+    var predicate: PredicateOptions = .init() {
+        didSet { setPredicate(predicate) }
+    }
 
     static let fetchBatchSize = 100
 
@@ -37,7 +46,6 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
     private let options: ConsoleListOptions
     private let controller: NSFetchedResultsController<NSManagedObject>
     private var controllerDelegate: NSFetchedResultsControllerDelegate?
-    private var cancellables: [AnyCancellable] = []
 
     init(store: LoggerStore, mode: ConsoleMode, options: ConsoleListOptions = .init()) {
         self.store = store
@@ -91,14 +99,6 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
         controller.delegate = controllerDelegate
     }
 
-    /// Binds the search criteria and immediately performs the initial fetch.
-    func bind(_ criteria: ConsoleSearchCriteriaViewModel) {
-        criteria.$options.sink { [weak self] in
-            self?.setPredicate($0)
-            self?.refresh()
-        }.store(in: &cancellables)
-    }
-
     func refresh() {
         try? controller.performFetch()
         refreshEntities()
@@ -124,19 +124,16 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
 
     // MARK: Predicate
 
-    func setPredicate(_ options: ConsolePredicateOptions) {
-        let predicate = ConsoleDataSource.makePredicate(mode: mode, options: options, basePredicate: basePredicate)
+    private func setPredicate(_ options: PredicateOptions) {
+        let predicate = ConsoleDataSource.makePredicate(mode: mode, options: options)
         controller.fetchRequest.predicate = predicate
+        refresh()
     }
 
-    static func makePredicate(
-        mode: ConsoleMode,
-        options: ConsolePredicateOptions,
-        basePredicate: NSPredicate? = nil
-    ) -> NSPredicate? {
+    static func makePredicate(mode: ConsoleMode, options: PredicateOptions) -> NSPredicate? {
         let predicates = [
-            basePredicate,
-            _makePredicate(mode, options.criteria, options.isOnlyErrors),
+            _makePredicate(mode, options.filters, options.isOnlyErrors),
+            options.predicate,
             options.focus
         ].compactMap { $0 }
         switch predicates.count {
@@ -153,13 +150,13 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
 
 // MARK: - Predicates
 
-private func _makePredicate(_ mode: ConsoleMode, _ criteria: ConsoleSearchCriteria, _ isOnlyErrors: Bool) -> NSPredicate? {
+private func _makePredicate(_ mode: ConsoleMode, _ filters: ConsoleFilers, _ isOnlyErrors: Bool) -> NSPredicate? {
     func makeMessagesPredicate(isMessageOnly: Bool) -> NSPredicate? {
         var predicates: [NSPredicate] = []
         if isMessageOnly {
             predicates.append(NSPredicate(format: "task == NULL"))
         }
-        if let predicate = ConsoleSearchCriteria.makeMessagePredicates(criteria: criteria, isOnlyErrors: isOnlyErrors) {
+        if let predicate = ConsoleFilers.makeMessagePredicates(criteria: filters, isOnlyErrors: isOnlyErrors) {
             predicates.append(predicate)
         }
         return predicates.isEmpty ? nil : NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
@@ -171,7 +168,7 @@ private func _makePredicate(_ mode: ConsoleMode, _ criteria: ConsoleSearchCriter
     case .logs:
         return makeMessagesPredicate(isMessageOnly: true)
     case .network:
-        return ConsoleSearchCriteria.makeNetworkPredicates(criteria: criteria, isOnlyErrors: isOnlyErrors)
+        return ConsoleFilers.makeNetworkPredicates(criteria: filters, isOnlyErrors: isOnlyErrors)
     }
 }
 

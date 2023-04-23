@@ -7,13 +7,8 @@ import Pulse
 import CoreData
 import Combine
 
-struct ConsolePredicateOptions {
-    var criteria = ConsoleSearchCriteria()
-    var isOnlyErrors = false
-    var focus: NSPredicate?
-}
-
-struct ConsoleSearchCriteria: Hashable {
+/// Filter the logs displayed in the console.
+struct ConsoleFilers: Hashable {
     var shared = Shared()
     var messages = Messages()
     var network = Network()
@@ -46,7 +41,7 @@ protocol ConsoleFilterProtocol: Hashable {
     init() // Initializes with the default values
 }
 
-extension ConsoleSearchCriteria {
+extension ConsoleFilers {
     struct Sessions: Hashable, ConsoleFilterProtocol {
         var isEnabled = true
         var selection: Set<UUID> = []

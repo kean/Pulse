@@ -32,7 +32,7 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
     }
 
     var isShowingFocusedEntities: Bool {
-        searchCriteriaViewModel.options.focus != nil
+        filters.options.focus != nil
     }
 
     @Published private(set) var previousSession: LoggerSessionEntity?
@@ -44,21 +44,21 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
 
     private let store: LoggerStore
     private var mode: ConsoleMode
-    private let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
+    private let filters: ConsoleFiltersViewModel
     private let sessions: ManagedObjectsObserver<LoggerSessionEntity>
     private let pinsObserver: ManagedObjectsObserver<LoggerMessageEntity>
     private var dataSource: ConsoleDataSource?
     private var cancellables: [AnyCancellable] = []
 
-    init(environment: ConsoleEnvironment) {
+    init(environment: ConsoleEnvironment, filters: ConsoleFiltersViewModel) {
         self.store = environment.store
         self.mode = environment.mode
-        self.searchCriteriaViewModel = environment.searchCriteriaViewModel
+        self.filters = filters
         self.sessions = .sessions(for: store.viewContext)
         self.pinsObserver = .pins(for: store.viewContext)
 
         $entities.sink { [weak self] in
-            self?.searchCriteriaViewModel.entities.send($0)
+            self?.filters.entities.send($0)
         }.store(in: &cancellables)
 
         sessions.$objects.dropFirst().sink { [weak self] in
@@ -90,11 +90,19 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
     private func resetDataSource(options: ConsoleListOptions) {
         dataSource = ConsoleDataSource(store: store, mode: mode, options: options)
         dataSource?.delegate = self
-        dataSource?.bind(searchCriteriaViewModel)
+        filters.$options.sink { [weak self] in
+            self?.dataSource?.predicate = $0
+        }.store(in: &cancellables)
+    }
+
+    func focus(on entities: [NSManagedObject]) {
+        options.messageGroupBy = .noGrouping
+        options.taskGroupBy = .noGrouping
+        filters.options.focus = NSPredicate(format: "self IN %@", entities)
     }
 
     func buttonShowPreviousSessionTapped(for session: LoggerSessionEntity) {
-        searchCriteriaViewModel.criteria.shared.sessions.selection.insert(session.id)
+        filters.criteria.shared.sessions.selection.insert(session.id)
         refreshPreviousSessionButton(sessions: self.sessions.objects)
     }
 
@@ -103,7 +111,7 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
     }
 
     private func refreshPreviousSessionButton(sessions: [LoggerSessionEntity]) {
-        let selection = searchCriteriaViewModel.criteria.shared.sessions.selection
+        let selection = filters.criteria.shared.sessions.selection
         let isDisplayingPrefix = sessions.prefix(selection.count).allSatisfy {
             selection.contains($0.id)
         }

@@ -16,7 +16,7 @@ final class ConsoleEnvironment: ObservableObject {
     let store: LoggerStore
     let index: LoggerStoreIndex
 
-    let searchCriteriaViewModel: ConsoleSearchCriteriaViewModel
+    let filters: ConsoleFiltersViewModel
     let logCountObserver: ManagedObjectsCountObserver
     let taskCountObserver: ManagedObjectsCountObserver
 
@@ -46,14 +46,14 @@ final class ConsoleEnvironment: ObservableObject {
         self.initialMode = mode
         self.mode = mode
 
-        func makeDefaultOptions() -> ConsolePredicateOptions {
-            var options = ConsolePredicateOptions()
-            options.criteria.shared.sessions.selection = [store.session.id]
+        func makeDefaultOptions() -> ConsoleDataSource.PredicateOptions {
+            var options = ConsoleDataSource.PredicateOptions()
+            options.filters.shared.sessions.selection = [store.session.id]
             return options
         }
 
         self.index = LoggerStoreIndex(store: store)
-        self.searchCriteriaViewModel = ConsoleSearchCriteriaViewModel(options: makeDefaultOptions(), index: index)
+        self.filters = ConsoleFiltersViewModel(options: makeDefaultOptions())
 
         self.logCountObserver = ManagedObjectsCountObserver(
             entity: LoggerMessageEntity.self,
@@ -72,15 +72,15 @@ final class ConsoleEnvironment: ObservableObject {
 
     private func bind() {
         $mode.sink { [weak self] in
-            self?.searchCriteriaViewModel.mode = $0
+            self?.filters.mode = $0
         }.store(in: &cancellables)
 
-        searchCriteriaViewModel.$options.sink { [weak self] in
+        filters.$options.sink { [weak self] in
             self?.refreshCountObservers($0)
         }.store(in: &cancellables)
     }
 
-    private func refreshCountObservers(_ options: ConsolePredicateOptions) {
+    private func refreshCountObservers(_ options: ConsoleDataSource.PredicateOptions) {
         func makePredicate(for mode: ConsoleMode) -> NSPredicate? {
             ConsoleDataSource.makePredicate(mode: mode, options: options)
         }
@@ -143,6 +143,7 @@ extension View {
             .environmentObject(environment)
             .environmentObject(environment.router)
             .environmentObject(environment.index)
+            .environmentObject(environment.filters)
             .environment(\.router, environment.router)
             .environment(\.store, environment.store)
             .environment(\.managedObjectContext, environment.store.viewContext)

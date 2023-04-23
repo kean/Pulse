@@ -8,7 +8,7 @@ import Pulse
 #if os(iOS) || os(macOS)
 
 struct ConsoleSearchTimePeriodCell: View {
-    @Binding var selection: ConsoleSearchCriteria.Dates
+    @Binding var selection: ConsoleFilers.Dates
 
     var body: some View {
         DateRangePicker(title: "Start", date: $selection.startDate)

@@ -15,10 +15,7 @@ enum ContextMenu {
 
         @Binding private(set) var shareItems: ShareItems?
 
-        // TODO: Rework this without the environment
-        @EnvironmentObject private var environment: ConsoleEnvironment
-
-        private var criteria: ConsoleSearchCriteriaViewModel { environment.searchCriteriaViewModel }
+        @EnvironmentObject private var filters: ConsoleFiltersViewModel
 
         var body: some View {
             Section {
@@ -32,20 +29,20 @@ enum ContextMenu {
             Section {
                 Menu(content: {
                     Button("Hide Label '\(message.label)'") {
-                        criteria.criteria.messages.labels.hidden.insert(message.label)
+                        filters.criteria.messages.labels.hidden.insert(message.label)
                     }
                     Button("Hide Level '\(message.logLevel.name)'") {
-                        criteria.criteria.messages.logLevels.levels.remove(message.logLevel)
+                        filters.criteria.messages.logLevels.levels.remove(message.logLevel)
                     }
                 }, label: {
                     Label("Hide...", systemImage: "eye.slash")
                 })
                 Menu(content: {
                     Button("Show Label '\(message.label)'") {
-                        criteria.criteria.messages.labels.focused = message.label
+                        filters.criteria.messages.labels.focused = message.label
                     }
                     Button("Show Level '\(message.logLevel.name)'") {
-                        criteria.criteria.messages.logLevels.levels = [message.logLevel]
+                        filters.criteria.messages.logLevels.levels = [message.logLevel]
                     }
                 }, label: {
                     Label("Show...", systemImage: "eye")

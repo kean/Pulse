@@ -20,6 +20,7 @@ struct SessionsView: View {
 #endif
 
     @EnvironmentObject private var environment: ConsoleEnvironment
+    @EnvironmentObject private var filters: ConsoleFiltersViewModel
     @Environment(\.store) private var store
     @Environment(\.router) private var router
 
@@ -73,8 +74,8 @@ struct SessionsView: View {
 #else
             .contextMenu(forSelectionType: UUID.self, menu: contextMenu)
             .onChange(of: selection) {
-                guard environment.searchCriteriaViewModel.criteria.shared.sessions.selection != $0 else { return }
-                environment.searchCriteriaViewModel.select(sessions: $0)
+                guard filters.criteria.shared.sessions.selection != $0 else { return }
+                filters.select(sessions: $0)
             }
 #endif
     }
@@ -116,7 +117,7 @@ struct SessionsView: View {
     }
 
     private func showInConsole(sessions: Set<UUID>) {
-        environment.searchCriteriaViewModel.select(sessions: sessions)
+        filters.select(sessions: sessions)
         router.isShowingSessions = false
     }
 #endif

@@ -8,7 +8,7 @@ import SwiftUI
 import Pulse
 
 struct ConsoleSearchDurationCell: View {
-    @Binding var selection: ConsoleSearchCriteria.Duration
+    @Binding var selection: ConsoleFilers.Duration
 
     var body: some View {
         HStack {
@@ -16,7 +16,7 @@ struct ConsoleSearchDurationCell: View {
             Spacer()
             ConsoleSearchInlinePickerMenu(title: selection.unit.title, width: 50) {
                 Picker("Unit", selection: $selection.unit) {
-                    ForEach(ConsoleSearchCriteria.Duration.Unit.allCases) {
+                    ForEach(ConsoleFilers.Duration.Unit.allCases) {
                         Text($0.title).tag($0)
                     }
                 }

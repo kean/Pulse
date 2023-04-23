@@ -15,7 +15,7 @@ public struct ConsoleView: View {
 
     init(environment: ConsoleEnvironment) {
         _environment = StateObject(wrappedValue: environment)
-        _listViewModel = StateObject(wrappedValue: .init(environment: environment))
+        _listViewModel = StateObject(wrappedValue: .init(environment: environment, filters: environment.filters))
     }
 
     public var body: some View {
@@ -28,29 +28,23 @@ public struct ConsoleView: View {
                 // TODO: Not sure it's valid
                 NavigationView {
                     Form {
-                        ConsoleMenuView(environment: environment)
+                        ConsoleMenuView()
                     }.padding()
                 }
                 .frame(width: 700)
             }
-            .injecting(environment)
             .navigationTitle(environment.title)
             .onAppear { listViewModel.isViewVisible = true }
             .onDisappear { listViewModel.isViewVisible = false }
         }
+        .injecting(environment)
     }
 }
 
 private struct ConsoleMenuView: View {
-    let store: LoggerStore
-    let environment: ConsoleEnvironment
-    @ObservedObject var viewModel: ConsoleSearchCriteriaViewModel
-
-    init(environment: ConsoleEnvironment) {
-        self.environment = environment
-        self.store = environment.store
-        self.viewModel = environment.searchCriteriaViewModel
-    }
+    @EnvironmentObject private var viewModel: ConsoleFiltersViewModel
+    @EnvironmentObject private var environment: ConsoleEnvironment
+    @Environment(\.store) private var store
 
     var body: some View {
         Section {
@@ -93,7 +87,7 @@ private struct ConsoleMenuView: View {
     }
 
     private var destinationFilters: some View {
-        ConsoleSearchCriteriaView(viewModel: viewModel).padding()
+        ConsoleFiltersView().padding()
     }
 }
 

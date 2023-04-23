@@ -6,8 +6,9 @@ import SwiftUI
 import Pulse
 import Combine
 
-struct ConsoleSearchCriteriaView: View {
-    @ObservedObject var viewModel: ConsoleSearchCriteriaViewModel
+struct ConsoleFiltersView: View {
+    @EnvironmentObject var environment: ConsoleEnvironment // important: reloads mode
+    @EnvironmentObject var viewModel: ConsoleFiltersViewModel
 
     var body: some View {
 #if os(iOS) || os(watchOS) || os(tvOS)
@@ -23,7 +24,7 @@ struct ConsoleSearchCriteriaView: View {
                 form
             }
             HStack {
-                Text(viewModel.mode == .network ? "Network Filters" : "Message Filters")
+                Text(environment.mode == .network ? "Network Filters" : "Message Filters")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
                 Spacer()
@@ -43,7 +44,7 @@ struct ConsoleSearchCriteriaView: View {
 
         sessionsSection
 
-        if viewModel.mode == .network {
+        if environment.mode == .network {
 #if os(iOS) || os(macOS)
             if #available(iOS 15, *) {
                 customNetworkFiltersSection
@@ -69,13 +70,13 @@ struct ConsoleSearchCriteriaView: View {
 
     private var buttonReset: some View {
         Button.destructive(action: viewModel.resetAll) { Text("Reset") }
-            .disabled(!viewModel.isButtonResetEnabled)
+            .disabled(viewModel.isDefaultFilters(for: environment.mode))
     }
 }
 
 // MARK: - ConsoleSearchView (Shared)
 
-extension ConsoleSearchCriteriaView {
+extension ConsoleFiltersView {
     var sessionsSection: some View {
         ConsoleSection(isDividerHidden: true, header: {
             ConsoleSectionHeader(icon: "list.clipboard", title: "Sessions", filter: $viewModel.criteria.shared.sessions, default: viewModel.defaultCriteria.shared.sessions)
@@ -97,7 +98,7 @@ extension ConsoleSearchCriteriaView {
 
 // MARK: - ConsoleSearchView (Message)
 
-extension ConsoleSearchCriteriaView {
+extension ConsoleFiltersView {
 #if os(iOS) || os(macOS)
     @available(iOS 15, *)
     var customMessageFiltersSection: some View {
@@ -128,7 +129,7 @@ extension ConsoleSearchCriteriaView {
 
 // MARK: - ConsoleSearchView (Network)
 
-extension ConsoleSearchCriteriaView {
+extension ConsoleFiltersView {
 #if os(iOS) || os(macOS)
     @available(iOS 15, *)
     var customNetworkFiltersSection: some View {
@@ -175,7 +176,7 @@ extension ConsoleSearchCriteriaView {
 #if DEBUG
 import CoreData
 
-struct ConsoleSearchCriteriaView_Previews: PreviewProvider {
+struct ConsoleFiltersView_Previews: PreviewProvider {
     static var previews: some View {
 #if os(macOS)
         Group {
@@ -209,9 +210,11 @@ struct ConsoleSearchCriteriaView_Previews: PreviewProvider {
 private func makePreview(isOnlyNetwork: Bool) -> some View {
     let store = LoggerStore.mock
     let entities: [NSManagedObject] = try! isOnlyNetwork ? store.allTasks() : store.allMessages()
-    let viewModel = ConsoleSearchCriteriaViewModel(options: .init(), index: .init(store: store))
+    let viewModel = ConsoleFiltersViewModel(options: .init())
     viewModel.entities.send(entities)
     viewModel.mode = isOnlyNetwork ? .network : .all
-    return ConsoleSearchCriteriaView(viewModel: viewModel)
+    return ConsoleFiltersView()
+        .environmentObject(ConsoleEnvironment(store: store))
+        .environmentObject(viewModel)
 }
 #endif

@@ -9,7 +9,7 @@ import Pulse
 
 @available(iOS 15, *)
 struct ConsoleSearchCustomNetworkFiltersSection: View {
-    @Binding var selection: ConsoleSearchCriteria.CustomNetworkFilters
+    @Binding var selection: ConsoleFilers.CustomNetworkFilters
 
     var body: some View {
         ForEach($selection.filters) { filter in
@@ -31,7 +31,7 @@ struct ConsoleSearchCustomNetworkFiltersSection: View {
 
 @available(iOS 15, *)
 struct ConsoleSearchCustomMessageFiltersSection: View {
-    @Binding var selection: ConsoleSearchCriteria.CustomMessageFilters
+    @Binding var selection: ConsoleFilers.CustomMessageFilters
 
     var body: some View {
         ForEach($selection.filters) { filter in

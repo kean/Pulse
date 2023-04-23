@@ -6,7 +6,7 @@ import SwiftUI
 import Pulse
 
 struct ConsoleSearchContentTypeCell: View {
-    @Binding var selection: ConsoleSearchCriteria.ContentType.ContentType
+    @Binding var selection: ConsoleFilers.ContentType.ContentType
 
     var body: some View {
         Picker("Content Type", selection: $selection) {
@@ -36,5 +36,5 @@ struct ConsoleSearchContentTypeCell: View {
         }
     }
 
-    private typealias ContentType = ConsoleSearchCriteria.ContentType.ContentType
+    private typealias ContentType = ConsoleFilers.ContentType.ContentType
 }

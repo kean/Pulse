@@ -13,7 +13,7 @@ public struct ConsoleView: View {
 
     init(environment: ConsoleEnvironment) {
         _environment = StateObject(wrappedValue: environment)
-        _listViewModel = StateObject(wrappedValue: .init(environment: environment))
+        _listViewModel = StateObject(wrappedValue: .init(environment: environment, filters: environment.filters))
     }
 
     public var body: some View {
@@ -36,13 +36,13 @@ public struct ConsoleView: View {
 }
 
 private struct ConsoleToolbarView: View {
-    var environment: ConsoleEnvironment
-    @ObservedObject private var viewModel: ConsoleSearchCriteriaViewModel
+    @ObservedObject private var environment: ConsoleEnvironment
+    @ObservedObject private var viewModel: ConsoleFiltersViewModel
     @Environment(\.router) private var router
 
     init(environment: ConsoleEnvironment) {
         self.environment = environment
-        self.viewModel = environment.searchCriteriaViewModel
+        self.viewModel = environment.filters
     }
 
     var body: some View {
@@ -61,7 +61,7 @@ private struct ConsoleToolbarView: View {
             Button(action: { router.isShowingFilters = true }) {
                 Image(systemName: "line.3.horizontal.decrease.circle")
             }
-            .background(viewModel.isCriteriaDefault ? nil : Rectangle().foregroundColor(.blue).cornerRadius(8))
+            .background(viewModel.isDefaultFilters(for: environment.mode) ? nil : Rectangle().foregroundColor(.blue).cornerRadius(8))
         }
             .font(.title3)
             .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))

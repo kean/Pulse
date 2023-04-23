@@ -10,13 +10,22 @@ import Pulse
 import Combine
 
 struct ConsoleListView: View {
-    let environment: ConsoleEnvironment
+    @EnvironmentObject var environment: ConsoleEnvironment
+    @EnvironmentObject var filters: ConsoleFiltersViewModel
+
+    var body: some View {
+        _InternalConsoleListView(environment: environment, filters: filters)
+    }
+}
+
+private struct _InternalConsoleListView: View {
+    private let environment: ConsoleEnvironment
 
     @StateObject private var listViewModel: ConsoleListViewModel
 
-    init(environment: ConsoleEnvironment) {
+    init(environment: ConsoleEnvironment, filters: ConsoleFiltersViewModel) {
         self.environment = environment
-        _listViewModel = StateObject(wrappedValue: .init(environment: environment))
+        _listViewModel = StateObject(wrappedValue: .init(environment: environment, filters: filters))
     }
 
     var body: some View {
@@ -119,10 +128,9 @@ private struct _ConsoleSearchableListView: View {
 
 private struct _ConsoleRegularListView: View {
     @EnvironmentObject private var listViewModel: ConsoleListViewModel
-    @EnvironmentObject private var environment: ConsoleEnvironment
 
     var body: some View {
-        let toolbar = ConsoleToolbarView(environment: environment)
+        let toolbar = ConsoleToolbarView()
         if #available(iOS 15, macOS 13, *) {
             toolbar.listRowSeparator(.hidden, edges: .top)
         } else {
@@ -147,7 +155,7 @@ private struct _ConsoleListView: View {
     var body: some View {
         VStack(spacing: 0) {
             if !isSearching {
-                ConsoleToolbarView(environment: environment)
+                ConsoleToolbarView()
                 Divider()
             }
             content

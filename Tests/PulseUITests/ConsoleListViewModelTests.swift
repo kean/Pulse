@@ -9,6 +9,7 @@ import CoreData
 @testable import PulseUI
 
 final class ConsoleListViewModelTests: ConsoleTestCase {
+    let filters = ConsoleFiltersViewModel(options: .init())
     var environment: ConsoleEnvironment!
     var sut: ConsoleListViewModel!
 
@@ -22,9 +23,9 @@ final class ConsoleListViewModelTests: ConsoleTestCase {
         self.store = store
         self.environment = ConsoleEnvironment(store: store)
         if let entities = focusedEntities {
-            environment.searchCriteriaViewModel.options.focus = NSPredicate(format: "self IN %@", entities)
+            filters.options.focus = NSPredicate(format: "self IN %@", entities)
         }
-        self.sut = ConsoleListViewModel(environment: environment)
+        self.sut = ConsoleListViewModel(environment: environment, filters: filters)
         self.sut.isViewVisible = true
     }
 

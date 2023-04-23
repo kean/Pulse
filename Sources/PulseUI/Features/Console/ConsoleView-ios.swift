@@ -19,7 +19,7 @@ public struct ConsoleView: View {
     }
 
     public var body: some View {
-        ConsoleListView(environment: environment)
+        ConsoleListView()
             .navigationTitle(environment.title)
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarLeading) {
