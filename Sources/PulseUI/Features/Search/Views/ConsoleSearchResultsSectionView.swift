@@ -20,10 +20,7 @@ struct ConsoleSearchResultView: View {
 #if os(macOS)
             .tag(ConsoleSelectedItem.entity(viewModel.entity.objectID))
 #endif
-        let occurrences = Array(viewModel.occurrences).filter {
-            // TODO: these should be displayed inline
-            $0.scope != .message && $0.scope != .url
-        }
+        let occurrences = Array(viewModel.occurrences).filter { $0.scope.isDisplayedInResults }
         ForEach(occurrences.prefix(limit)) { item in
 #if os(macOS)
             makeCell(for: item)
@@ -38,8 +35,10 @@ struct ConsoleSearchResultView: View {
             let total = occurrences.count > ConsoleSearchMatch.limit ? "\(ConsoleSearchMatch.limit)+" : "\(occurrences.count)"
 #if os(macOS)
             Text("Total Results: \(total)")
-                .font(ConsoleConstants.fontBody)
+                .font(.subheadline)
                 .foregroundColor(.secondary)
+                .padding(.leading, 16)
+                .padding(.bottom, 8)
 #else
             NavigationLink(destination: ConsoleSearchResultDetailsView(viewModel: viewModel)) {
                 Text("Total Results: ")
@@ -50,22 +49,25 @@ struct ConsoleSearchResultView: View {
             }
 #endif
         }
+#if os(iOS)
         if isSeparatorNeeded {
             PlainListGroupSeparator()
         }
+#endif
     }
 
     @ViewBuilder
     private func makeCell(for occurrence: ConsoleSearchOccurrence) -> some View {
         let contents = VStack(alignment: .leading, spacing: 4) {
-            Text(occurrence.scope.fullTitle + " (\(occurrence.line):\(occurrence.range.lowerBound + 1))")
-                .font(ConsoleConstants.fontTitle)
-                .foregroundColor(.secondary)
             Text(occurrence.preview)
                 .lineLimit(3)
+            Text(occurrence.scope.title + " (\(occurrence.line):\(occurrence.range.lowerBound + 1))")
+                .font(ConsoleConstants.fontInfo)
+                .foregroundColor(.secondary)
         }
 #if os(macOS)
             .backport.listRowSeparators(isHidden: false)
+            .padding(.leading, 16)
 #endif
         if #unavailable(iOS 16) {
             contents.padding(.vertical, 4)
@@ -94,6 +96,7 @@ struct ConsoleSearchResultView: View {
         }
     }
 
+#if os(iOS)
     @ViewBuilder
     private static func _makeDestination(for occurrence: ConsoleSearchOccurrence, task: NetworkTaskEntity) -> some View {
         switch occurrence.scope {
@@ -117,6 +120,27 @@ struct ConsoleSearchResultView: View {
             EmptyView()
         }
     }
+#else
+    @ViewBuilder
+    private static func _makeDestination(for occurrence: ConsoleSearchOccurrence, task: NetworkTaskEntity) -> some View {
+        switch occurrence.scope {
+        case .originalRequestHeaders:
+            NetworkInspectorView(task: task, tab: .headers)
+//            makeHeadersDetails(title: "Request Headers", headers: task.originalRequest?.headers)
+        case .currentRequestHeaders:
+            NetworkInspectorView(task: task, tab: .headers)
+//            makeHeadersDetails(title: "Request Headers", headers: task.currentRequest?.headers)
+        case .requestBody:
+            NetworkInspectorView(task: task, tab: .request)
+        case .responseHeaders:
+            NetworkInspectorView(task: task, tab: .headers)
+        case .responseBody:
+            NetworkInspectorView(task: task, tab: .response)
+        case .url, .message, .metadata:
+            EmptyView()
+        }
+    }
+#endif
 
     private static func makeHeadersDetails(title: String, headers: [String: String]?) -> some View {
         NetworkDetailsView(title: title) {
@@ -139,21 +163,18 @@ struct ConsoleSearchResultDetailsView: View {
     }
 }
 
+#if os(iOS)
 @available(iOS 15, tvOS 15, *)
 struct PlainListGroupSeparator: View {
     var body: some View {
         Rectangle().foregroundColor(.clear) // DIY separator
-            .frame(height: 12)
             .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
-#if os(iOS)
             .listRowBackground(Color.separator.opacity(0.2))
             .listRowSeparator(.hidden)
-#else
-            .backport.listRowSeparators(isHidden: true)
-            .listRowBackground(Color.separator)
-#endif
+            .frame(height: 12)
     }
 }
+#endif
 
 @available(iOS 15, tvOS 15, *)
 struct PlainListSectionHeader<Content: View>: View {

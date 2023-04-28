@@ -100,7 +100,6 @@ struct WrappedTextView: NSViewRepresentable {
 
         textView.delegate = context.coordinator
 
-        context.coordinator.cancellables = bind(viewModel, textView)
         textView.attributedText = viewModel.originalText
 
         viewModel.textView = textView

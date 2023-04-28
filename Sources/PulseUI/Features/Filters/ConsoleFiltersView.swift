@@ -214,7 +214,7 @@ private func makePreview(isOnlyNetwork: Bool) -> some View {
     viewModel.entities.send(entities)
     viewModel.mode = isOnlyNetwork ? .network : .all
     return ConsoleFiltersView()
-        .environmentObject(ConsoleEnvironment(store: store))
+        .injecting(ConsoleEnvironment(store: store))
         .environmentObject(viewModel)
 }
 #endif

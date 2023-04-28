@@ -27,6 +27,9 @@ final class ConsoleSearchOperation {
     private let lock: os_unfair_lock_t
     private var _isCancelled = false
 
+    private let hasLogFilters: Bool
+    private let hasNetworkFilers: Bool
+
     weak var delegate: ConsoleSearchOperationDelegate?
 
     init(entities: [NSManagedObject],
@@ -38,6 +41,9 @@ final class ConsoleSearchOperation {
         self.parameters = parameters
         self.service = service
         self.context = context
+
+        self.hasLogFilters = parameters.filters.contains { $0.filter is (any ConsoleSearchLogFilterProtocol) }
+        self.hasNetworkFilers = parameters.filters.contains { $0.filter is (any ConsoleSearchNetworkFilterProtocol) }
 
         self.lock = .allocate(capacity: 1)
         self.lock.initialize(to: os_unfair_lock())
@@ -82,25 +88,58 @@ final class ConsoleSearchOperation {
     // MARK: Search
 
     func search(_ entity: NSManagedObject, parameters: ConsoleSearchParameters) -> [ConsoleSearchOccurrence]? {
+        guard !parameters.isEmpty else {
+            return nil
+        }
         switch LoggerEntity(entity) {
         case .message(let message):
+            guard !hasNetworkFilers else { return nil }
             return _search(message, parameters: parameters)
         case .task(let task):
+            guard !hasLogFilters else { return nil }
             return _search(task, parameters: parameters)
         }
     }
 
+    // MARK: Search (LoggerMessageEntity)
+
     private func _search(_ message: LoggerMessageEntity, parameters: ConsoleSearchParameters) -> [ConsoleSearchOccurrence]? {
+        guard isMatching(message, filters: parameters.filters) else {
+            return nil
+        }
+        guard !parameters.terms.isEmpty else {
+            return []
+        }
+        return search(in: message, parameters: parameters)
+    }
+
+    private func isMatching(_ message: LoggerMessageEntity, filters: [ConsoleSearchFilter]) -> Bool {
+        Dictionary(grouping: filters.map(\.filter), by: \.name)
+            .compactMap { $0.value as? ([any ConsoleSearchLogFilterProtocol]) }
+            .allSatisfy { filters in
+                filters.contains { $0.isMatch(message) }
+            }
+    }
+
+    private func search(in message: LoggerMessageEntity, parameters: ConsoleSearchParameters) -> [ConsoleSearchOccurrence]? {
         var occurrences: [ConsoleSearchOccurrence] = []
-        occurrences += ConsoleSearchOperation.search(message.text, parameters, .message)
-        occurrences += ConsoleSearchOperation.search(message.rawMetadata, parameters, .metadata)
+        let scopes = parameters.scopes.isEmpty ? ConsoleSearchScope.allCases : parameters.scopes
+        for scope in scopes {
+            switch scope {
+            case .message:
+                occurrences += ConsoleSearchOperation.search(message.text, parameters, .message)
+            case .metadata:
+                occurrences += ConsoleSearchOperation.search(message.rawMetadata, parameters, .metadata)
+            default:
+                break
+            }
+        }
         return occurrences.isEmpty ? nil : occurrences
     }
 
+    // MARK: Search (NetworkTaskEntity)
+
     private func _search(_ task: NetworkTaskEntity, parameters: ConsoleSearchParameters) -> [ConsoleSearchOccurrence]? {
-        guard !parameters.isEmpty else {
-            return nil
-        }
         guard isMatching(task, filters: parameters.filters) else {
             return nil
         }
@@ -111,13 +150,11 @@ final class ConsoleSearchOperation {
     }
 
     private func isMatching(_ task: NetworkTaskEntity, filters: [ConsoleSearchFilter]) -> Bool {
-        let groups = Dictionary(grouping: filters, by: { $0.filter.name })
-        for (_, filters) in groups {
-            if !filters.contains(where: { $0.filter.isMatch(task) }) {
-                return false
+        Dictionary(grouping: filters.map(\.filter), by: \.name)
+            .compactMap { $0.value as? ([any ConsoleSearchNetworkFilterProtocol]) }
+            .allSatisfy { filters in
+                filters.contains { $0.isMatch(task) }
             }
-        }
-        return true
     }
 
     private func search(in task: NetworkTaskEntity, parameters: ConsoleSearchParameters) -> [ConsoleSearchOccurrence]? {

@@ -13,7 +13,13 @@ protocol ConsoleSearchFilterProtocol {
     var name: String { get }
     var values: [Value] { get }
     var valueExamples: [String] { get }
+}
 
+protocol ConsoleSearchLogFilterProtocol: ConsoleSearchFilterProtocol {
+    func isMatch(_ task: LoggerMessageEntity) -> Bool
+}
+
+protocol ConsoleSearchNetworkFilterProtocol: ConsoleSearchFilterProtocol {
     func isMatch(_ task: NetworkTaskEntity) -> Bool
 }
 
@@ -22,6 +28,12 @@ extension ConsoleSearchFilterProtocol {
 }
 
 enum ConsoleSearchFilter: Hashable, Codable {
+    // MARK: Logs
+    case label(ConsoleSearchFilterLabel)
+    case level(ConsoleSearchFilterLevel)
+    case file(ConsoleSearchFilterFile)
+
+    // MARK: Network
     case statusCode(ConsoleSearchFilterStatusCode)
     case host(ConsoleSearchFilterHost)
     case method(ConsoleSearchFilterMethod)
@@ -29,6 +41,9 @@ enum ConsoleSearchFilter: Hashable, Codable {
 
     var filter: any ConsoleSearchFilterProtocol {
         switch self {
+        case .label(let filter): return filter
+        case .level(let filter): return filter
+        case .file(let filter): return filter
         case .statusCode(let filter): return filter
         case .host(let filter): return filter
         case .method(let filter): return filter
@@ -41,7 +56,41 @@ enum ConsoleSearchFilter: Hashable, Codable {
     }
 }
 
-struct ConsoleSearchFilterStatusCode: ConsoleSearchFilterProtocol, Hashable, Codable {
+// MARK: ConsoleSearchLogFilterProtocol
+
+struct ConsoleSearchFilterLevel: ConsoleSearchLogFilterProtocol, Hashable, Codable {
+    var name: String { "Level" }
+    var values: [LoggerStore.Level]
+    var valueExamples: [String] { ["debug"] }
+
+    func isMatch(_ message: LoggerMessageEntity) -> Bool {
+        values.contains { message.logLevel == $0 }
+    }
+}
+
+struct ConsoleSearchFilterLabel: ConsoleSearchLogFilterProtocol, Hashable, Codable {
+    var name: String { "Label" }
+    var values: [String]
+    var valueExamples: [String] { ["label"] }
+
+    func isMatch(_ message: LoggerMessageEntity) -> Bool {
+        values.contains { message.label == $0 }
+    }
+}
+
+struct ConsoleSearchFilterFile: ConsoleSearchLogFilterProtocol, Hashable, Codable {
+    var name: String { "File" }
+    var values: [String]
+    var valueExamples: [String] { ["filename"] }
+
+    func isMatch(_ message: LoggerMessageEntity) -> Bool {
+        values.contains { message.file == $0 }
+    }
+}
+
+// MARK: ConsoleSearchNetworkFilterProtocol
+
+struct ConsoleSearchFilterStatusCode: ConsoleSearchNetworkFilterProtocol, Hashable, Codable {
     var name: String { "Status Code" }
     var values: [ConsoleSearchRange<Int>]
     var valueExamples: [String] { ["2XX", "304", "400-404"] }
@@ -53,7 +102,7 @@ struct ConsoleSearchFilterStatusCode: ConsoleSearchFilterProtocol, Hashable, Cod
     }
 }
 
-struct ConsoleSearchFilterHost: ConsoleSearchFilterProtocol, Hashable, Codable {
+struct ConsoleSearchFilterHost: ConsoleSearchNetworkFilterProtocol, Hashable, Codable {
     var name: String { "Host" }
     var values: [String]
     var valueExamples: [String] { ["example.com"] }
@@ -66,7 +115,7 @@ struct ConsoleSearchFilterHost: ConsoleSearchFilterProtocol, Hashable, Codable {
     }
 }
 
-struct ConsoleSearchFilterMethod: ConsoleSearchFilterProtocol, Hashable, Codable {
+struct ConsoleSearchFilterMethod: ConsoleSearchNetworkFilterProtocol, Hashable, Codable {
     var name: String { "Method" }
     var values: [HTTPMethod]
     var valueExamples: [String] { ["GET"] }
@@ -77,7 +126,7 @@ struct ConsoleSearchFilterMethod: ConsoleSearchFilterProtocol, Hashable, Codable
     }
 }
 
-struct ConsoleSearchFilterPath: ConsoleSearchFilterProtocol, Hashable, Codable {
+struct ConsoleSearchFilterPath: ConsoleSearchNetworkFilterProtocol, Hashable, Codable {
     var name: String { "Path" }
     var values: [String]
     var valueExamples: [String] { ["/example"] }

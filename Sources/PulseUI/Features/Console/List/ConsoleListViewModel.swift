@@ -18,6 +18,7 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
     @Published private(set) var entities: [NSManagedObject] = []
     @Published private(set) var sections: [NSFetchedResultsSectionInfo]?
 
+    @Published private(set) var mode: ConsoleMode
     @Published var options = ConsoleListOptions()
 
     var isViewVisible = false {
@@ -37,13 +38,19 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
 
     @Published private(set) var previousSession: LoggerSessionEntity?
 
+    enum Event {
+        case refresh
+        case update
+    }
+
+    let events = PassthroughSubject<Event, Never>()
+
     /// This exist strictly to workaround List performance issues
     private var scrollPosition: ScrollPosition = .nearTop
     private var visibleEntityCountLimit = ConsoleDataSource.fetchBatchSize
     private var visibleObjectIDs: Set<NSManagedObjectID> = []
 
     private let store: LoggerStore
-    private var mode: ConsoleMode
     private let filters: ConsoleFiltersViewModel
     private let sessions: ManagedObjectsObserver<LoggerSessionEntity>
     private let pinsObserver: ManagedObjectsObserver<LoggerMessageEntity>
@@ -134,6 +141,7 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
 #if !os(macOS)
         refreshVisibleEntities()
 #endif
+        events.send(.refresh)
     }
 
     func dataSource(_ dataSource: ConsoleDataSource, didUpdateWith diff: CollectionDifference<NSManagedObjectID>?) {
@@ -144,6 +152,7 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
             refreshVisibleEntities()
         }
 #endif
+        events.send(.update)
     }
 
     // MARK: Visible Entities

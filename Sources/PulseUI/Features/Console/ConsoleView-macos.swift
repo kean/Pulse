@@ -47,8 +47,8 @@ private struct ConsoleMainView: View {
 
     @State private var isSharingStore = false
 
-    @AppStorage("com-github-kean-pulse-is-vertical") private var isVertical = false
-    @AppStorage("com-github-kean-pulse-is-now-enabled") private var isNowEnabled = true
+    @SceneStorage("is-details-vertical") private var isVertical = false
+    @SceneStorage("com-github-kean-pulse-is-now-enabled") private var isNowEnabled = true
 
     var body: some View {
         if isVertical {
@@ -75,12 +75,12 @@ private struct ConsoleMainView: View {
     }
 
     private var detailsView: some View {
-        _ConsoleDetailsView(isVertical: $isVertical)
+        _ConsoleDetailsView()
     }
 
     @ViewBuilder
     private var contentToolbarNavigationItems: some View {
-        if !environment.store.isArchive {
+        if !(environment.store.options.contains(.readonly)) {
             Toggle(isOn: $isNowEnabled) {
                 Image(systemName: "clock")
             }
@@ -99,13 +99,11 @@ private struct ConsoleMainView: View {
 }
 
 private struct _ConsoleDetailsView: View {
-    @Binding var isVertical: Bool
-
     @EnvironmentObject private var router: ConsoleRouter
 
     var body: some View {
         if let selection = router.selection {
-            ConsoleEntityDetailsRouterView(selection: selection, isVertical: $isVertical)
+            ConsoleEntityDetailsRouterView(selection: selection)
                 .background(Color(UXColor.textBackgroundColor))
                 .frame(minWidth: 400, idealWidth: 700, minHeight: 120, idealHeight: 480)
         }

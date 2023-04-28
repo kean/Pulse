@@ -58,7 +58,7 @@ private struct _ConsoleNewListView: View {
         self.listViewModel = listViewModel
 
         let searchBarViewModel = ConsoleSearchBarViewModel()
-        let searchViewModel = ConsoleSearchViewModel(store: environment.store, list: listViewModel, index: environment.index, searchBar: searchBarViewModel)
+        let searchViewModel = ConsoleSearchViewModel(environment: environment, list: listViewModel, searchBar: searchBarViewModel)
 
         _searchBarViewModel = StateObject(wrappedValue: searchBarViewModel)
         _searchViewModel = StateObject(wrappedValue: ObservableBag(searchViewModel))
@@ -81,6 +81,11 @@ private struct _ConsoleNewListView: View {
                         Text($0.title)
                     }
                 })
+#if os(macOS)
+                .searchSuggestions {
+                    ConsoleSearchSuggestionsView()
+                }
+#endif
                 .onSubmit(of: .search, searchViewModel.value.onSubmitSearch)
                 .disableAutocorrection(true)
 #if os(iOS)
@@ -120,7 +125,7 @@ private struct _ConsoleSearchableListView: View {
 
     var body: some View {
         if isSearching {
-            ConsoleSearchView()
+            ConsoleSearchListContentView()
         } else {
             _ConsoleRegularListView()
         }
@@ -143,9 +148,11 @@ private struct _ConsoleRegularListView: View {
 #endif
 
 #if os(macOS)
+
 private struct _ConsoleListView: View {
     @EnvironmentObject private var environment: ConsoleEnvironment
     @EnvironmentObject private var listViewModel: ConsoleListViewModel
+    @EnvironmentObject private var searchViewModel: ConsoleSearchViewModel
 
     @State private var selectedObjectID: NSManagedObjectID? // Has to use for Table
     @State private var selection: ConsoleSelectedItem?
@@ -154,37 +161,38 @@ private struct _ConsoleListView: View {
     @Environment(\.isSearching) private var isSearching
 
     var body: some View {
-        VStack(spacing: 0) {
-            if !isSearching {
-                ConsoleToolbarView()
-                Divider()
+        content
+            .onChange(of: selectedObjectID) {
+                environment.router.selection = $0.map(ConsoleSelectedItem.entity)
             }
-            content
-        }
-        .onChange(of: selectedObjectID) {
-            environment.router.selection = $0.map(ConsoleSelectedItem.entity)
-        }
-        .onChange(of: selection) {
-            environment.router.selection = $0
-        }
+            .onChange(of: selection) {
+                environment.router.selection = $0
+            }
+            .onChange(of: isSearching) {
+                searchViewModel.isSearchActive = $0
+            }
     }
 
     @ViewBuilder
     private var content: some View {
-        if isSearching {
-            List(selection: $selection) {
-                ConsoleSearchView()
-                    .buttonStyle(.plain)
+        VStack(spacing: 0) {
+            if isSearching && !searchViewModel.parameters.isEmpty {
+                ConsoleSearchToolbar()
+            } else {
+                ConsoleToolbarView()
             }
-            .apply(addListContextMenu)
-        } else {
+            Divider()
             ScrollViewReader { proxy in
                 List(selection: $selection) {
-                    ConsoleListContentView(viewModel: listViewModel, proxy: proxy)
+                    if isSearching && !searchViewModel.parameters.isEmpty {
+                        ConsoleSearchResultsListContentView()
+                    } else {
+                        ConsoleListContentView(viewModel: listViewModel, proxy: proxy)
+                    }
                 }
-                .environment(\.defaultMinListRowHeight, 1)
-                .apply(addListContextMenu)
             }
+            .environment(\.defaultMinListRowHeight, 1)
+            .apply(addListContextMenu)
         }
     }
 

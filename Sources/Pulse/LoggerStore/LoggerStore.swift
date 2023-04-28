@@ -24,7 +24,7 @@ public final class LoggerStore: @unchecked Sendable {
     /// The configuration with which the store was initialized with.
     public let configuration: Configuration
 
-    /// Current session.
+    /// Current session or the latest session in case of an archive.
     private(set) public var session: Session = .current
 
     /// Returns the Core Data container associated with the store.
@@ -176,6 +176,15 @@ public final class LoggerStore: @unchecked Sendable {
             perform { _ in
                 let appInfo = Info.AppInfo.make()
                 self.saveEntity(for: self.session, info: appInfo)
+            }
+        } else {
+            viewContext.performAndWait {
+                let latestSession = try? self.viewContext.first(LoggerSessionEntity.self) {
+                    $0.sortDescriptors = [NSSortDescriptor(keyPath: \LoggerSessionEntity.createdAt, ascending: false)]
+                }
+                if let session = latestSession {
+                    self.session = .init(id: session.id, startDate: session.createdAt)
+                }
             }
         }
 

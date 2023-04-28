@@ -11,7 +11,7 @@ struct Checkbox<Label: View>: View {
     var body: some View {
 #if os(iOS)
         Button(action: { isOn.toggle() }) {
-            HStack(spacing: 16) {
+            HStack {
                 Image(systemName: isOn ? "checkmark.circle.fill" : "circle")
                     .font(.title3)
                     .foregroundColor(isOn ? .blue : .separator)

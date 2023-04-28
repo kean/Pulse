@@ -155,9 +155,8 @@ struct ConsoleSearchListCell: View {
 #if DEBUG
 struct ConsoleSearchListSelectionView_Previews: PreviewProvider {
     static var previews: some View {
-        NavigationView {
-            ConsoleSearchListSelectionViewDemo()
-        }
+        ConsoleSearchListSelectionViewDemo()
+            .frame(width: 320)
     }
 }
 

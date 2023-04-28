@@ -7,7 +7,6 @@ import Pulse
 
 struct ConsoleMessageDetailsView: View {
     let message: LoggerMessageEntity
-    var toolbarItems: AnyView = AnyView(EmptyView())
 
 #if os(iOS)
     var body: some View {
@@ -57,7 +56,8 @@ struct ConsoleMessageDetailsView: View {
         HStack {
             InlineTabBar(items: ConsoleMessageTab.allCases, selection: $selectedTab)
             Spacer()
-            toolbarItems
+            ButtonChangeContentModeLayout()
+            ButtonCloseDetailsView()
         }
         .padding(.horizontal, 10)
         .offset(y: -2)

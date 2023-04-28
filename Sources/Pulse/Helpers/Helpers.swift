@@ -35,9 +35,9 @@ extension URL {
 
     static var logs: URL {
 #if os(tvOS)
-        let searchPath = FileManager.SearchPathDirectory.libraryDirectory
-#else
         let searchPath = FileManager.SearchPathDirectory.cachesDirectory
+#else
+        let searchPath = FileManager.SearchPathDirectory.libraryDirectory
 #endif
         var url = Files.urls(for: searchPath, in: .userDomainMask).first?
             .appending(directory: "Logs")

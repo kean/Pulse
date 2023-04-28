@@ -5,6 +5,7 @@
 #if os(iOS) || os(macOS)
 
 import Foundation
+import Pulse
 
 // Search:
 //
@@ -14,7 +15,52 @@ import Foundation
 // The patterns are set up with "guesses" around. So if the user enters incorrect
 // range, it'll still try to "guess".
 extension Parsers {
-    static func makeFilters(context: ConsoleSearchSuggestionsContext) -> [Parser<[(ConsoleSearchFilter, Confidence)]>] {
+
+    // MARK: Logs
+
+    static func makeLogsFilters(context: ConsoleSearchSuggestionsContext) -> [Parser<[(ConsoleSearchFilter, Confidence)]>] {
+        return [
+            filterLevels,
+            makeFilterLabels(labels: context.index.labels),
+            makeFilterFiles(files: context.index.files)
+        ]
+    }
+
+    static func makeFilterLabels(labels: Set<String>) -> Parser<[(ConsoleSearchFilter, Confidence)]> {
+        (optional(filterName("label")) <*> listOf(word)).map { confidence, values in
+            let filters = String.fuzzyMatch(values: values, from: labels)
+                .map { (ConsoleSearchFilter.label(.init(values: [$0.0])), $0.1) }
+            let confidence: Confidence = confidence == nil ? 0.0 : 0.7 // below autocompleted
+            return filters + [(ConsoleSearchFilter.label(.init(values: values)), confidence)]
+        }
+    }
+
+    static let filterLevels: Parser<[(ConsoleSearchFilter, Confidence)]> = {
+        let map = Dictionary(uniqueKeysWithValues: LoggerStore.Level.allCases.map { ($0.name, $0) })
+        let levels = Set(LoggerStore.Level.allCases.map(\.name))
+        return (optional(filterName("level")) <*> listOf(word)).map { confidence, values in
+            let filters = String.fuzzyMatch(values: values, from: levels)
+                .map { (ConsoleSearchFilter.level(.init(values: [map[$0.0]!])), $0.1) }
+            let confidence: Confidence = confidence == nil ? 0.0 : 0.7 // below autocompleted
+            return filters + [(ConsoleSearchFilter.level(.init(values: values.compactMap { map[$0] })), confidence)]
+        }
+    }()
+
+    static func makeFilterFiles(files: Set<String>) -> Parser<[(ConsoleSearchFilter, Confidence)]> {
+        (optional(filterName("file")) <*> listOf(word)).map { confidence, values in
+            let filters = String.fuzzyMatch(values: values, from: files)
+                .map { (ConsoleSearchFilter.file(.init(values: [$0.0])), $0.1) }
+            let confidence: Confidence = confidence == nil ? 0.0 : 0.7 // below autocompleted
+            return filters + [(ConsoleSearchFilter.file(.init(values: values)), confidence)]
+        }
+    }
+
+    private static let word = char(from: CharacterSet.alphanumerics.union(.punctuationCharacters))
+        .oneOrMore.map { String($0 )}
+
+    // MARK: Network
+
+    static func makeNetworkFilters(context: ConsoleSearchSuggestionsContext) -> [Parser<[(ConsoleSearchFilter, Confidence)]>] {
         return [
             filterStatusCode,
             filterMethod,
@@ -33,12 +79,7 @@ extension Parsers {
 
     static func makeFilterHost(hosts: Set<String>) -> Parser<[(ConsoleSearchFilter, Confidence)]> {
         (optional(filterName("host")) <*> listOf(host)).map { confidence, values in
-            let suggested = values.flatMap { value in
-                hosts.map { ($0, $0.fuzzyMatch(value)) }
-            }
-            let filters = suggested.filter { $0.1 > 0.2 }
-                .sorted(by: { $0.1 > $1.1 })
-                .prefix(2)
+            let filters = String.fuzzyMatch(values: values, from: hosts)
                 .map { (ConsoleSearchFilter.host(.init(values: [$0.0])), $0.1) }
             let confidence: Confidence = confidence == nil ? 0.0 : 0.7 // below autocompleted
             return filters + [(ConsoleSearchFilter.host(.init(values: values)), confidence)]
@@ -57,12 +98,7 @@ extension Parsers {
             filterName("path") <*> listOf(path),
             (char(from: "/") *> optional(path)).map { (0.7, ["/" + ($0 ?? "")]) }
         ).map { confidence, values in
-            let suggested = values.flatMap { value in
-                paths.map { ($0, $0.fuzzyMatch(value)) }
-            }
-            let filters = suggested.filter { $0.1 > 0.2 }
-                .sorted(by: { $0.1 > $1.1 })
-                .prefix(2)
+            let filters = String.fuzzyMatch(values: values, from: paths)
                 .map { (ConsoleSearchFilter.path(.init(values: [$0.0])), $0.1) }
             return filters + [(ConsoleSearchFilter.path(.init(values: values)), confidence)]
         }

@@ -36,7 +36,11 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
     }
 
     var predicate: PredicateOptions = .init() {
-        didSet { setPredicate(predicate) }
+        didSet { refreshPredicate() }
+    }
+
+    var filter: NSPredicate? {
+        didSet { refreshPredicate() }
     }
 
     static let fetchBatchSize = 100
@@ -46,6 +50,7 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
     private let options: ConsoleListOptions
     private let controller: NSFetchedResultsController<NSManagedObject>
     private var controllerDelegate: NSFetchedResultsControllerDelegate?
+    private var cancellables: [AnyCancellable] = []
 
     init(store: LoggerStore, mode: ConsoleMode, options: ConsoleListOptions = .init()) {
         self.store = store
@@ -99,6 +104,13 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
         controller.delegate = controllerDelegate
     }
 
+    func bind(_ filters: ConsoleFiltersViewModel) {
+        cancellables = []
+        filters.$options.sink { [weak self] in
+            self?.predicate = $0
+        }.store(in: &cancellables)
+    }
+
     func refresh() {
         try? controller.performFetch()
         refreshEntities()
@@ -124,17 +136,18 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
 
     // MARK: Predicate
 
-    private func setPredicate(_ options: PredicateOptions) {
-        let predicate = ConsoleDataSource.makePredicate(mode: mode, options: options)
+    private func refreshPredicate() {
+        let predicate = ConsoleDataSource.makePredicate(mode: mode, options: predicate, filter: filter)
         controller.fetchRequest.predicate = predicate
         refresh()
     }
 
-    static func makePredicate(mode: ConsoleMode, options: PredicateOptions) -> NSPredicate? {
+    static func makePredicate(mode: ConsoleMode, options: PredicateOptions, filter: NSPredicate? = nil) -> NSPredicate? {
         let predicates = [
             _makePredicate(mode, options.filters, options.isOnlyErrors),
             options.predicate,
-            options.focus
+            options.focus,
+            filter
         ].compactMap { $0 }
         switch predicates.count {
         case 0: return nil

@@ -113,6 +113,9 @@ public enum ConsoleMode: String {
     case logs
     /// Displays only network tasks.
     case network
+
+    var hasLogs: Bool { self == .all || self == .logs }
+    var hasNetwork: Bool { self == .all || self == .network }
 }
 
 // MARK: Environment

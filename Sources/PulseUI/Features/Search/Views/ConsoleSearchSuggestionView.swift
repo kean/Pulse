@@ -12,7 +12,6 @@ import Combine
 @available(iOS 15, tvOS 15, *)
 struct ConsoleSearchSuggestionView: View {
     let suggestion: ConsoleSearchSuggestion
-    var isActionable = false
     let action: () -> Void
 
     var body: some View {
@@ -26,9 +25,6 @@ struct ConsoleSearchSuggestionView: View {
                     case .term:
                         Image(systemName: "magnifyingglass")
                             .foregroundColor(.blue)
-                    case .scope:
-                        Image(systemName: "magnifyingglass")
-                            .foregroundColor(.blue)
                     }
                 } else {
                     Image(systemName: "line.3.horizontal.decrease.circle")
@@ -37,11 +33,6 @@ struct ConsoleSearchSuggestionView: View {
                 Text(suggestion.text)
                     .lineLimit(1)
                 Spacer()
-#if os(iOS)
-                if isActionable {
-                    ShortcutTooltip(title: "Tab")
-                }
-#endif
             }
         }
     }

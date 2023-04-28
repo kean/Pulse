@@ -63,7 +63,7 @@ private struct Logger {
     let store: LoggerStore
 
     func log(level: LoggerStore.Level, _ message: String, metadata: LoggerStore.Metadata? = nil) {
-        self.store.storeMessage(label: label, level: level, message: message, metadata: metadata, file: "", function: "", line: 0)
+        self.store.storeMessage(label: label, level: level, message: message, metadata: metadata, file: #file, function: #function, line: #line)
     }
 }
 

@@ -13,7 +13,7 @@ struct ConsoleListContentView: View {
 #if os(macOS)
     let proxy: ScrollViewProxy
 
-    @AppStorage("com-github-kean-pulse-is-now-enabled") private var isNowEnabled = true
+    @SceneStorage("com-github-kean-pulse-is-now-enabled") private var isNowEnabled = true
 #endif
 
     var body: some View {

@@ -7,28 +7,42 @@
 import Foundation
 
 enum ConsoleSearchScope: Equatable, Hashable, Codable, CaseIterable {
+    // MARK: Logs
+    case message
+    case metadata
+
+    // MARK: Network
     case url
     case originalRequestHeaders
     case currentRequestHeaders
     case requestBody
     case responseHeaders
     case responseBody
-    case message
-    case metadata
 
-    static let allEligibleScopes = ConsoleSearchScope.allCases.filter {
-        $0 != .originalRequestHeaders && $0 != .message
-    }
-
-    var title: String {
+    var isDisplayedInResults: Bool {
         switch self {
-        case .originalRequestHeaders: return "Request Headers"
-        case .currentRequestHeaders: return "Request Headers"
-        default: return fullTitle
+        case .message, .url:
+            return false
+        case .metadata, .originalRequestHeaders, .currentRequestHeaders, .requestBody, .responseHeaders, .responseBody:
+            return true
         }
     }
 
-    var fullTitle: String {
+    static let messageScopes: [ConsoleSearchScope] = [
+        .message,
+        .metadata
+    ]
+
+    static let networkScopes: [ConsoleSearchScope] = [
+        .url,
+        .originalRequestHeaders,
+        .currentRequestHeaders,
+        .requestBody,
+        .responseHeaders,
+        .responseBody
+    ]
+
+    var title: String {
         switch self {
         case .url: return "URL"
         case .originalRequestHeaders: return "Original Request Headers"

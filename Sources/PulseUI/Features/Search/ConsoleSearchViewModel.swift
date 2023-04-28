@@ -16,10 +16,10 @@ final class ConsoleSearchBarViewModel: ObservableObject {
 
 @available(iOS 15, *)
 final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDelegate {
-    var isViewVisible: Bool = false {
+    var isSearchActive: Bool = false {
         didSet {
-            guard oldValue != isViewVisible else { return }
-            if !isViewVisible {
+            guard oldValue != isSearchActive else { return }
+            if !isSearchActive {
                 searchService.clearCache()
                 operation?.cancel()
                 operation = nil
@@ -28,14 +28,16 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     }
 
     @Published var options: StringSearchOptions = .default
+    @Published var scopes: Set<ConsoleSearchScope> = []
 
     @Published private(set) var results: [ConsoleSearchResultViewModel] = []
     @Published private(set) var hasMore = false
     @Published private(set) var isNewResultsButtonShown = false
 
-    @Published private(set)var isSpinnerNeeded = false
-    @Published private(set)var isSearching = false
-    var hasRecentSearches: Bool { !suggestionsService.recentSearches.isEmpty }
+    @Published private(set) var isSpinnerNeeded = false
+    @Published private(set) var isSearching = false
+
+    var hasRecentSearches: Bool { !recents.searches.isEmpty }
 
     let searchBar: ConsoleSearchBarViewModel
 
@@ -53,7 +55,12 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         if !searchTerm.isEmpty {
             tokens.append(.term(.init(text: searchTerm, options: options)))
         }
-        return ConsoleSearchParameters(tokens: tokens)
+        return ConsoleSearchParameters(tokens: tokens, scopes: scopes)
+    }
+
+    var allScopes: [ConsoleSearchScope] {
+        (list.mode.hasLogs ? ConsoleSearchScope.messageScopes : []) +
+        (list.mode.hasNetwork ? ConsoleSearchScope.networkScopes : [])
     }
 
     private var dirtyDate: Date?
@@ -61,11 +68,12 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     private var operation: ConsoleSearchOperation?
     private var refreshResultsOperation: ConsoleSearchOperation?
 
-    @Published var suggestionsViewModel: ConsoleSearchSuggestionsViewModel!
+    private var recents: ConsoleSearchRecentSearchesStore { suggestionsService.recents }
+    private var suggestionsService: ConsoleNetworkSearchSuggestionsService!
+    @Published private(set) var suggestionsViewModel: ConsoleSearchSuggestionsViewModel!
 
     private let list: ConsoleListViewModel
     private let searchService = ConsoleSearchService()
-    private let suggestionsService = ConsoleSearchSuggestionsService()
 
     private let store: LoggerStore
     private let index: LoggerStoreIndex
@@ -73,31 +81,25 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     private var cancellables: [AnyCancellable] = []
     private let context: NSManagedObjectContext
 
-    init(store: LoggerStore, list: ConsoleListViewModel, index: LoggerStoreIndex, searchBar: ConsoleSearchBarViewModel) {
-        self.store = store
+    init(environment: ConsoleEnvironment, list: ConsoleListViewModel, searchBar: ConsoleSearchBarViewModel) {
+        self.store = environment.store
+        self.index = environment.index
         self.list = list
         self.searchBar = searchBar
-        self.index = index
+
         self.context = store.newBackgroundContext()
 
         let text = searchBar.$text
             .map { $0.trimmingCharacters(in: .whitespaces ) }
             .removeDuplicates()
 
-        searchBar.$text.sink {
-            if $0.last == "\t" {
-                DispatchQueue.main.async {
-                    self.applyCurrentFilter()
-                }
-            }
-        }.store(in: &cancellables)
-
-        let didChangeSearchCriteria = Publishers.CombineLatest3(
+        let didChangeSearchCriteria = Publishers.CombineLatest4(
             text.removeDuplicates(),
             searchBar.$tokens.removeDuplicates(),
-            $options.removeDuplicates()
+            $options.removeDuplicates(),
+            $scopes
         )
-            .map { _, _, _ in }
+            .map { _, _, _, _ in }
             .dropFirst()
             .receive(on: DispatchQueue.main)
 
@@ -111,12 +113,30 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
             self?.updateSearchTokens()
         }.store(in: &cancellables)
 
-        list.$entities
-            .throttle(for: 2, scheduler: DispatchQueue.main, latest: true)
-            .sink { [weak self] in self?.didReloadEntities(for: $0) }
-            .store(in: &cancellables)
+        list.events.sink { [weak self] in
+            self?.didReceive($0)
+        }.store(in: &cancellables)
 
-        self.suggestionsViewModel = makeSuggestions(for: makeContextForSuggestions())
+        environment.$mode.sink { [weak self] in
+            self?.configure(mode: $0)
+        }.store(in: &cancellables)
+    }
+
+    private func configure(mode: ConsoleMode) {
+        self.suggestionsService = ConsoleNetworkSearchSuggestionsService(mode: mode)
+        self.suggestionsViewModel = suggestionsService.makeSuggestions(for: makeContextForSuggestions())
+        DispatchQueue.main.async {
+            self.refreshNow()
+        }
+    }
+
+    private func didReceive(_ event: ConsoleListViewModel.Event) {
+        switch event {
+        case .refresh:
+            refreshNow()
+        case .update:
+            checkForNewSearchMatches(for: list.entities)
+        }
     }
 
     // MARK: Search
@@ -160,7 +180,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     }
 
     private func checkForNewSearchMatches(for entities: [NSManagedObject]) {
-        guard isViewVisible else {
+        guard isSearchActive else {
             return // Off-screen
         }
         guard operation == nil && refreshResultsOperation == nil else {
@@ -243,25 +263,29 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     }
 
     private func apply(_ token: ConsoleSearchToken) {
-        searchBar.text = ""
-        searchBar.tokens.append(token)
         switch token {
-        case .filter(let filter): suggestionsService.saveRecentFilter(filter)
-        case .term(let term): suggestionsService.saveRecentSearch(term)
-        case .scope: break
-        }
-    }
-
-    private func applyCurrentFilter() {
-        if let suggestion = suggestionsViewModel.topSuggestion {
-            perform(suggestion)
+        case .filter(let filter):
+            searchBar.text = ""
+            searchBar.tokens.append(token)
+            recents.saveFilter(filter)
+        case .term(let term):
+            searchBar.text = term.text
+            options = term.options
+            recents.saveSearch(term)
         }
     }
 
     func onSubmitSearch() {
+#if os(macOS)
+        if let suggestionID = UUID(uuidString: searchBar.text),
+           let suggestion = suggestionsViewModel.getSuggestion(withID: suggestionID) {
+            perform(suggestion)
+            return
+        }
+#endif
         let searchTerm = searchBar.text.trimmingCharacters(in: .whitespaces)
         if !searchTerm.isEmpty {
-            apply(.term(.init(text: searchTerm, options: options)))
+            recents.saveSearch(.init(text: searchTerm, options: options))
         }
     }
 
@@ -275,7 +299,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     }
 
     func buttonClearRecentSearchesTapped() {
-        suggestionsService.clearRecentSearches()
+        recents.clearRecentSearches()
         updateSearchTokens()
     }
 
@@ -284,7 +308,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     private func updateSearchTokens() {
         let context = makeContextForSuggestions()
         queue.async {
-            let viewModel = self.makeSuggestions(for: context)
+            let viewModel = self.suggestionsService.makeSuggestions(for: context)
             DispatchQueue.main.async {
                 self.suggestionsViewModel = viewModel
             }
@@ -297,27 +321,6 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
             index: index,
             parameters: parameters
         )
-    }
-
-    private func makeSuggestions(for context: ConsoleSearchSuggestionsContext) -> ConsoleSearchSuggestionsViewModel {
-        let service = suggestionsService
-        if context.searchText.isEmpty && context.parameters.filters.isEmpty && context.parameters.terms.isEmpty {
-            return ConsoleSearchSuggestionsViewModel(
-                searches: service.makeRecentSearhesSuggestions(),
-                filters: service.makeTopSuggestions(context: context),
-                scopes: service.makeScopesSuggestions(context: context)
-            )
-        } else {
-            return ConsoleSearchSuggestionsViewModel(
-                searches: [],
-                filters: service.makeTopSuggestions(context: context),
-                scopes: []
-            )
-        }
-    }
-
-    func isActionable(_ suggestion: ConsoleSearchSuggestion) -> Bool {
-        suggestionsViewModel.topSuggestion?.id == suggestion.id
     }
 }
 
@@ -337,14 +340,14 @@ struct ConsoleSearchParameters: Equatable, Hashable {
     var scopes: [ConsoleSearchScope] = []
     var terms: [ConsoleSearchTerm] = []
 
-    init(tokens: [ConsoleSearchToken]) {
+    init(tokens: [ConsoleSearchToken], scopes: Set<ConsoleSearchScope>) {
         for token in tokens {
             switch token {
             case .filter(let filter): self.filters.append(filter)
-            case .scope(let scope): self.scopes.append(scope)
             case .term(let string): self.terms.append(string)
             }
         }
+        self.scopes = Array(scopes)
     }
 
     var isEmpty: Bool {

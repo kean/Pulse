@@ -40,7 +40,7 @@ public struct SettingsView: View {
                 Spacer()
             }
         }
-        if !viewModel.isArchive {
+        if !(store.options.contains(.readonly)) {
             ConsoleSection(header: { SectionHeaderView(title: "Manage Messages") }) {
                 Button {
                     viewModel.buttonRemoveAllMessagesTapped()

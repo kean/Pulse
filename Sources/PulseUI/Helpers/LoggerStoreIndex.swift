@@ -10,6 +10,7 @@ import Pulse
 /// Keeps track of hosts, paths, etc.
 final class LoggerStoreIndex: ObservableObject {
     @Published private(set) var labels: Set<String> = []
+    @Published private(set) var files: Set<String> = []
     @Published private(set) var hosts: Set<String> = []
     @Published private(set) var paths: Set<String> = []
 
@@ -22,7 +23,7 @@ final class LoggerStoreIndex: ObservableObject {
         store.backgroundContext.perform {
             self.prepopulate()
         }
-        cancellable = store.events.subscribe(on: DispatchQueue.main).sink { [weak self] in
+        cancellable = store.events.receive(on: DispatchQueue.main).sink { [weak self] in
             self?.handle($0)
         }
     }
@@ -30,6 +31,7 @@ final class LoggerStoreIndex: ObservableObject {
     private func handle(_ event: LoggerStore.Event) {
         switch event {
         case .messageStored(let event):
+            self.files.insert(event.file)
             self.labels.insert(event.label)
         case .networkTaskCompleted(let event):
             if let host = event.originalRequest.url.flatMap(getHost) {
@@ -43,6 +45,7 @@ final class LoggerStoreIndex: ObservableObject {
     }
 
     private func prepopulate() {
+        let files = store.backgroundContext.getDistinctValues(entityName: "LoggerMessageEntity", property: "file")
         let labels = store.backgroundContext.getDistinctValues(entityName: "LoggerMessageEntity", property: "label")
         let urls = store.backgroundContext.getDistinctValues(entityName: "NetworkTaskEntity", property: "url")
 
@@ -61,6 +64,7 @@ final class LoggerStoreIndex: ObservableObject {
 
         DispatchQueue.main.async {
             self.labels = labels
+            self.files = files
             self.hosts = hosts
             self.paths = paths
         }
@@ -68,6 +72,7 @@ final class LoggerStoreIndex: ObservableObject {
 
     func clear() {
         self.labels = []
+        self.files = []
         self.paths = []
         self.hosts = []
     }

@@ -17,10 +17,4 @@ final class UserSettings: ObservableObject {
 
     @AppStorage("sharing-output")
     var sharingOutput: ShareStoreOutput = .store
-
-    @AppStorage("recent-searches")
-    var recentSearches: String = "[]"
-
-    @AppStorage("recent-filters")
-    var recentFilters: String = "[]"
 }

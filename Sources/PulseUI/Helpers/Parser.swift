@@ -210,40 +210,12 @@ func optional(_ parser: Parser<Void>) -> Parser<Bool> {
     }
 }
 
-// MARK: - Parser (Error Reporting)
-
-extension Parser {
-
-    /// Throws an error with the given message if the parser fails to produce a match.
-    func orThrow(_ message: String) -> Parser {
-        Parser { str -> (A, Substring)? in
-            guard let match = try self.parse(str) else {
-                throw ParserError(message)
-            }
-            return match
-        }
-    }
-
-    /// Matches if the parser produces no matches. Throws an error otherwise.
-    func zeroOrThrow<B>(_ message: String) -> Parser<B> {  // automatically cast
-        map { _ in throw ParserError(message) }
-    }
-}
-
 // MARK: - Parser (Misc)
 
 extension Parsers {
 
     /// Succeeds when input is empty.
     static let end = Parser<Void> { str in str.isEmpty ? ((), str) : nil }
-
-    /// Delays the creation of parser. Use it to break dependency cycles when
-    /// creating recursive parsers.
-    static func lazy<A>(_ closure: @autoclosure @escaping () -> Parser<A>) -> Parser<A> {
-        Parser { str in
-            try closure().parse(str)
-        }
-    }
 }
 
 // MARK: - Parser (Operators)
@@ -303,6 +275,15 @@ struct Confidence: Hashable, Comparable, ExpressibleByFloatLiteral {
 }
 
 extension String {
+    static func fuzzyMatch(values: [String], from source: Set<String>) -> [(String, Confidence)] {
+        let suggested = values.flatMap { value in
+            source.map { ($0, $0.fuzzyMatch(value)) }
+        }
+        return Array(suggested.filter({ $0.1 > 0.2 })
+            .sorted(by: { $0.1 > $1.1 })
+            .prefix(2))
+    }
+
     /// A fuzzy check for the given word. Always consumes a word. Returns
     /// a confidence level in a range of 0...1.
     func fuzzyMatch(_ target: String) -> Confidence {

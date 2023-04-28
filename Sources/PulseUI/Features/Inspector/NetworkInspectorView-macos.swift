@@ -11,17 +11,24 @@ import Combine
 
 struct NetworkInspectorView: View {
     @ObservedObject var task: NetworkTaskEntity
-    @AppStorage("com-github-kean-pulse-network-inspector-selected-tab")
-    private var selectedTab: NetworkInspectorTab = .summary
-    var toolbarItems: AnyView = AnyView(EmptyView())
+    @State var selectedTab: NetworkInspectorTab
 
     private var viewModel: NetworkInspectorViewModel { .init(task: task) }
+
+    init(task: NetworkTaskEntity,
+         tab: NetworkInspectorTab = NetworkInspectorPreferences().selectedTab) {
+        self.task = task
+        self._selectedTab = State(initialValue: tab)
+    }
 
     var body: some View {
         VStack(spacing: 0) {
             toolbar
             Divider()
             selectedTabView
+        }
+        .onChange(of: selectedTab) {
+            NetworkInspectorPreferences().selectedTab = $0
         }
     }
 
@@ -30,7 +37,9 @@ struct NetworkInspectorView: View {
         HStack {
             InlineTabBar(items: NetworkInspectorTab.allCases, selection: $selectedTab)
             Spacer()
-            toolbarItems
+
+            ButtonChangeContentModeLayout()
+            ButtonCloseDetailsView()
         }
         .padding(.horizontal, 10)
         .offset(y: -2)
@@ -75,7 +84,14 @@ struct NetworkInspectorView: View {
     }
 }
 
-private enum NetworkInspectorTab: String, Identifiable, CaseIterable, CustomStringConvertible {
+private struct NetworkInspectorPreferences {
+    // We want to save the latest preferences, but not update all open windows
+    // on the change in selection.
+    @AppStorage("network-inspector-selected-tab")
+    var selectedTab: NetworkInspectorTab = .summary
+}
+
+enum NetworkInspectorTab: String, Identifiable, CaseIterable, CustomStringConvertible {
     case summary = "Summary"
     case request = "Request"
     case response = "Response"

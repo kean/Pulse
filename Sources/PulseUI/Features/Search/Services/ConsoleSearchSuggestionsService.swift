@@ -13,10 +13,9 @@ import Combine
 struct ConsoleSearchSuggestionsViewModel {
     let searches: [ConsoleSearchSuggestion]
     let filters: [ConsoleSearchSuggestion]
-    let scopes: [ConsoleSearchSuggestion]
 
-    var topSuggestion: ConsoleSearchSuggestion? {
-        searches.first ?? filters.first
+    func getSuggestion(withID id: UUID) -> ConsoleSearchSuggestion? {
+        (searches + filters).first { $0.id == id }
     }
 }
 
@@ -24,68 +23,97 @@ struct ConsoleSearchSuggestionsContext {
     let searchText: String
     let index: LoggerStoreIndex
     let parameters: ConsoleSearchParameters
+
+    var isEmpty: Bool {
+        searchText.isEmpty && parameters.filters.isEmpty && parameters.terms.isEmpty
+    }
+
+    var hasLogFilters: Bool {
+        parameters.filters.contains { $0.filter is (any ConsoleSearchLogFilterProtocol) }
+    }
+
+    var hasNetworkFilters: Bool {
+        parameters.filters.contains { $0.filter is (any ConsoleSearchNetworkFilterProtocol) }
+    }
 }
 
 @available(iOS 15, tvOS 15, *)
-final class ConsoleSearchSuggestionsService {
-    private(set) var recentSearches: [ConsoleSearchTerm]
-    private(set) var recentFilters: [ConsoleSearchFilter]
+final class ConsoleNetworkSearchSuggestionsService {
+    let recents: ConsoleSearchRecentSearchesStore
+    let mode: ConsoleMode
 
-    init() {
-        self.recentSearches = decode([ConsoleSearchTerm].self, from: UserSettings.shared.recentSearches) ?? []
-        self.recentFilters = decode([ConsoleSearchFilter].self, from: UserSettings.shared.recentFilters) ?? []
+    init(mode: ConsoleMode) {
+        self.mode = mode
+        self.recents = ConsoleSearchRecentSearchesStore(mode: mode)
     }
 
-    func makeRecentSearhesSuggestions() -> [ConsoleSearchSuggestion] {
-        recentSearches.map(makeSuggestion)
+    func makeSuggestions(for context: ConsoleSearchSuggestionsContext) -> ConsoleSearchSuggestionsViewModel {
+        ConsoleSearchSuggestionsViewModel(searches: makeRecentSearches(context), filters: makeFilters(context))
     }
 
-    func makeScopesSuggestions(context: ConsoleSearchSuggestionsContext) -> [ConsoleSearchSuggestion] {
-        let selectedScopes = Set(context.parameters.scopes)
-        return ConsoleSearchScope.allEligibleScopes
-            .filter { !selectedScopes.contains($0) }
-            .map(makeSuggestion)
+    // MARK: Searches
+
+    // Show recent searches only if nothing is selected.
+    private func makeRecentSearches(_ context: ConsoleSearchSuggestionsContext) -> [ConsoleSearchSuggestion] {
+        guard context.isEmpty else { return [] }
+        let searches = recents.searches.prefix(2).map(makeSuggestion)
+        let filters = recents.filters.prefix(4).map(makeSuggestion)
+        return Array((searches + filters).prefix(4))
     }
 
-    func makeTopSuggestions(context: ConsoleSearchSuggestionsContext) -> [ConsoleSearchSuggestion] {
-        guard !context.searchText.isEmpty else {
-            guard context.parameters.isEmpty else {
-                return []
-            }
-            return makeDefaultTopSuggestions(context: context)
+    // MARK: Filters
+
+    private func makeFilters(_ context: ConsoleSearchSuggestionsContext) -> [ConsoleSearchSuggestion] {
+        if context.isEmpty {
+            return makeDefaultFilters(context)
+        } else {
+            return parse(makeFilterParsers(context), context)
         }
+    }
 
-        let filters = Parsers.makeFilters(context: context)
-            .compactMap { try? $0.parse(context.searchText) }
+    private func makeFilterParsers(_ context: ConsoleSearchSuggestionsContext) -> [Parser<[(ConsoleSearchFilter, Confidence)]>] {
+        ((mode.hasLogs && !context.hasNetworkFilters) ? Parsers.makeLogsFilters(context: context) : []) +
+        ((mode.hasNetwork && !context.hasLogFilters) ? Parsers.makeNetworkFilters(context: context) : [])
+    }
+
+    private func parse(_ filters: [Parser<[(ConsoleSearchFilter, Confidence)]>], _ context: ConsoleSearchSuggestionsContext) -> [ConsoleSearchSuggestion] {
+        var filters = filters.compactMap { try? $0.parse(context.searchText) }
             .flatMap { $0 }
             .filter { $0.1 > 0.5 }
             .sorted(by: { $0.1 > $1.1 }) // Sort by confidence
-
-        return Array(filters.sorted(by: { $0.1 > $1.1 })
-            .map { makeSuggestion(for: $0.0) }
-            .prefix(3))
+            .map(\.0)
+        var encountered = Set<ConsoleSearchFilter>()
+        filters = filters.filter {
+            guard !encountered.contains($0) else { return false }
+            encountered.insert($0)
+            return true
+        }
+        return Array(filters.map(makeSuggestion).prefix(3))
     }
 
-    // Shows recent tokens and unused default tokens.
-    func makeDefaultTopSuggestions(context: ConsoleSearchSuggestionsContext) -> [ConsoleSearchSuggestion] {
-        var filters = recentFilters
-        let defaultFilters = [
+    private func makeDefaultFilters(_ context: ConsoleSearchSuggestionsContext) -> [ConsoleSearchSuggestion] {
+        (mode.hasLogs ? makeDefaultLogsFilters(context) : []) +
+        (mode.hasNetwork ? makeDefaultNetworkFilters(context) : [])
+    }
+
+    private func makeDefaultLogsFilters(_ context: ConsoleSearchSuggestionsContext) -> [ConsoleSearchSuggestion] {
+        return [
+            ConsoleSearchFilter.level(.init(values: [])),
+            ConsoleSearchFilter.label(.init(values: [])),
+            ConsoleSearchFilter.file(.init(values: [])),
+        ].map(makeSuggestion)
+    }
+
+    private func makeDefaultNetworkFilters(_ context: ConsoleSearchSuggestionsContext) -> [ConsoleSearchSuggestion] {
+        return [
             ConsoleSearchFilter.statusCode(.init(values: [])),
             ConsoleSearchFilter.method(.init(values: [])),
             ConsoleSearchFilter.host(.init(values: [])),
             ConsoleSearchFilter.path(.init(values: []))
-        ]
-        for filter in defaultFilters where !filters.contains(where: {
-            $0.isSameType(as: filter)
-        }) {
-            filters.append(filter)
-        }
-        return Array(filters.filter { filter in
-            !context.parameters.filters.contains(where: {
-                $0.isSameType(as: filter)
-            })
-        }.map(makeSuggestion).prefix(7))
+        ].map(makeSuggestion)
     }
+
+    // MARK: Helpers
 
     private func makeSuggestion(for filter: ConsoleSearchFilter) -> ConsoleSearchSuggestion {
         var string = AttributedString(filter.filter.name + " ") { $0.foregroundColor = .primary }
@@ -107,67 +135,11 @@ final class ConsoleSearchSuggestionsService {
         }())
     }
 
-    private func makeSuggestion(for scope: ConsoleSearchScope) -> ConsoleSearchSuggestion {
-        var string = AttributedString("Search in ") { $0.foregroundColor = .primary }
-        string.append(scope.title) { $0.foregroundColor = .blue }
-        let token = ConsoleSearchToken.scope(scope)
-        return ConsoleSearchSuggestion(text: string, action: .apply(token))
-    }
-
     private func makeSuggestion(for term: ConsoleSearchTerm) -> ConsoleSearchSuggestion {
         ConsoleSearchSuggestion(text: {
             AttributedString("\(term.options.title) ") { $0.foregroundColor = .primary } +
             AttributedString(term.text) { $0.foregroundColor = .blue }
         }(), action: .apply(.term(term)))
-    }
-
-    // MARK: - Recent Searches
-
-    func saveRecentSearch(_ search: ConsoleSearchTerm) {
-        // If the user changes the type o the search, remove the old ones:
-        // we only care about the term.
-        recentSearches.removeAll { $0.text == search.text }
-        recentSearches.insert(search, at: 0)
-        while recentSearches.count > 20 {
-            recentSearches.removeLast()
-        }
-        saveRecentSearches()
-    }
-
-    func clearRecentSearches() {
-        recentSearches = []
-        saveRecentSearches()
-
-        recentFilters = []
-        saveRecentFilters()
-    }
-
-    private func saveRecentSearches() {
-        UserSettings.shared.recentSearches = encode(recentSearches) ?? "[]"
-    }
-
-    // MARK: - Recent Filters
-
-    func saveRecentFilter(_ filter: ConsoleSearchFilter) {
-        recentFilters.removeAll { $0 == filter }
-        var count = 0
-        recentFilters.removeAll(where: {
-            if type(of: $0.filter) == type(of: filter) {
-                count += 1
-                if count == 3 {
-                    return true
-                }
-            }
-            return false
-        })
-        while recentFilters.count > 20 {
-            recentFilters.removeLast()
-        }
-        recentFilters.insert(filter, at: 0)
-    }
-
-    private func saveRecentFilters() {
-        UserSettings.shared.recentFilters = encode(recentFilters) ?? "[]"
     }
 }
 
@@ -180,18 +152,6 @@ struct ConsoleSearchSuggestion: Identifiable {
     enum Action {
         case apply(ConsoleSearchToken)
         case autocomplete(String)
-    }
-}
-
-private func encode<T: Encodable>(_ value: T) -> String? {
-    (try? JSONEncoder().encode(value)).flatMap {
-        String(data: $0, encoding: .utf8)
-    }
-}
-
-private func decode<T: Decodable>(_ type: T.Type, from string: String) -> T? {
-    string.data(using: .utf8).flatMap {
-        try? JSONDecoder().decode(type, from: $0)
     }
 }
 

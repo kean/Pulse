@@ -11,7 +11,6 @@ import CoreData
 
 struct ConsoleEntityDetailsRouterView: View {
     let selection: ConsoleSelectedItem
-    @Binding var isVertical: Bool
 
     @Environment(\.router) private var router
     @Environment(\.store) private var store
@@ -33,31 +32,39 @@ struct ConsoleEntityDetailsRouterView: View {
         if let entity = entity(withID: objectID) {
             switch LoggerEntity(entity) {
             case .message(let message):
-                ConsoleMessageDetailsView(message: message, toolbarItems: AnyView(toolbarItems))
+                ConsoleMessageDetailsView(message: message)
             case .task(let task):
-                NetworkInspectorView(task: task, toolbarItems: AnyView(toolbarItems))
+                NetworkInspectorView(task: task)
             }
         }
     }
 
-    @ViewBuilder
-    var toolbarItems: some View {
+    private func entity(withID objectID: NSManagedObjectID) -> NSManagedObject? {
+        try? store.viewContext.existingObject(with: objectID)
+    }
+}
+
+struct ButtonChangeContentModeLayout: View {
+    @SceneStorage("is-details-vertical") private var isVertical = false
+
+    var body: some View {
         Button(action: { isVertical.toggle() }, label: {
             Image(systemName: isVertical ? "square.split.2x1" : "square.split.1x2")
                 .foregroundColor(.secondary)
         })
         .help(isVertical ? "Switch to Horizontal Layout" : "Switch to Vertical Layout")
         .buttonStyle(.plain)
+    }
+}
 
+struct ButtonCloseDetailsView: View {
+    @Environment(\.router) private var router
+
+    var body: some View {
         Button(action: { router.selection = nil }) {
             Image(systemName: "xmark")
                 .foregroundColor(.secondary)
-        }
-        .buttonStyle(.plain)
-    }
-
-    private func entity(withID objectID: NSManagedObjectID) -> NSManagedObject? {
-        try? store.viewContext.existingObject(with: objectID)
+        }.buttonStyle(.plain)
     }
 }
 

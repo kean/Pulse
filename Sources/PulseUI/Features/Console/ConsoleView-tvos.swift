@@ -58,7 +58,7 @@ private struct ConsoleMenuView: View {
                 Label(environment.bindingForNetworkMode.wrappedValue ? "Network Filters" : "Message Filters", systemImage: "line.3.horizontal.decrease.circle")
             }
         } header: { Text("Quick Filters") }
-        if !store.isArchive {
+        if !(store.options.contains(.readonly)) {
             Section {
                 NavigationLink(destination: destinationStoreDetails) {
                     Label("Store Info", systemImage: "info.circle")

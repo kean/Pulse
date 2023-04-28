@@ -25,7 +25,7 @@ public struct SettingsView: View {
 #if os(watchOS)
             sectionTransferStore
 #endif
-            if !viewModel.isArchive {
+            if !(store.options.contains(.readonly)) {
                 Section {
                     Button.destructive(action: viewModel.buttonRemoveAllMessagesTapped) {
                         Label("Remove Logs", systemImage: "trash")

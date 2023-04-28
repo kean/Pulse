@@ -95,12 +95,10 @@ struct ConsoleToolbarView: View {
 #endif
 
 struct ConsoleModePicker: View {
-    private let environment: ConsoleEnvironment
+    @ObservedObject private var environment: ConsoleEnvironment
 
     @ObservedObject private var logsCounter: ManagedObjectsCountObserver
     @ObservedObject private var tasksCounter: ManagedObjectsCountObserver
-
-    @State private var mode: ConsoleMode = .all
 
     init(environment: ConsoleEnvironment) {
         self.environment = environment
@@ -116,12 +114,15 @@ struct ConsoleModePicker: View {
 
     var body: some View {
         HStack(spacing: spacing) {
-            ConsoleModeButton(title: "All", isSelected: mode == .all) { mode = .all }
-            ConsoleModeButton(title: "Logs", details: CountFormatter.string(from: logsCounter.count), isSelected: mode == .logs) { mode = .logs }
-            ConsoleModeButton(title: "Network", details: CountFormatter.string(from: tasksCounter.count), isSelected: mode == .network) { mode = .network }
-        }
-        .onChange(of: mode) {
-            environment.mode = $0
+            ConsoleModeButton(title: "All", isSelected: environment.mode == .all) {
+                environment.mode = .all
+            }
+            ConsoleModeButton(title: "Logs", details: CountFormatter.string(from: logsCounter.count), isSelected: environment.mode == .logs) {
+                environment.mode = .logs
+            }
+            ConsoleModeButton(title: "Network", details: CountFormatter.string(from: tasksCounter.count), isSelected: environment.mode == .network) {
+                environment.mode = .network
+            }
         }
     }
 }

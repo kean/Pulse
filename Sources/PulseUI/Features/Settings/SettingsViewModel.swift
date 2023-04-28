@@ -9,8 +9,6 @@ import Combine
 final class SettingsViewModel: ObservableObject {
     let store: LoggerStore
 
-    var isArchive: Bool { store.isArchive }
-
     // Apple Watch file transfers
 #if os(watchOS) || os(iOS)
     @Published private(set) var fileTransferStatus: FileTransferStatus = .initial

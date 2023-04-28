@@ -130,7 +130,7 @@ struct SessionsView: View {
         })
         .disabled(selection.isEmpty)
 
-        if !store.isArchive {
+        if !(store.options.contains(.readonly)) {
             Button(role: .destructive, action: {
                 store.removeSessions(withIDs: selection)
                 self.selection = []
