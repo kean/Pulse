@@ -182,7 +182,7 @@ public final class LoggerStore: @unchecked Sendable {
                 let latestSession = try? self.viewContext.first(LoggerSessionEntity.self) {
                     $0.sortDescriptors = [NSSortDescriptor(keyPath: \LoggerSessionEntity.createdAt, ascending: false)]
                 }
-                if let session = latestSession {
+                if let session = latestSession, manifest.version > Version(3, 3, 0) {
                     self.session = .init(id: session.id, startDate: session.createdAt)
                 }
             }
