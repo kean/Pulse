@@ -39,7 +39,7 @@ struct ConsoleMessageCell: View {
     @ViewBuilder
     private var header: some View {
         HStack {
-            Text(message.logLevel.name.uppercased())
+            Text(title)
                 .lineLimit(1)
 #if os(iOS)
                 .font(ConsoleConstants.fontInfo.weight(.medium))
@@ -62,6 +62,14 @@ struct ConsoleMessageCell: View {
                 }
             }
         }
+    }
+
+    private var title: String {
+        var title = message.logLevel.name.capitalized
+        if message.label != "default" {
+            title += "・\(message.label.capitalized)"
+        }
+        return title
     }
 
     var titleColor: Color {
@@ -113,6 +121,7 @@ extension Color {
 struct ConsoleMessageCell_Previews: PreviewProvider {
     static var previews: some View {
         ConsoleMessageCell(message: try! LoggerStore.mock.allMessages()[0])
+            .injecting(ConsoleEnvironment(store: .mock))
             .padding()
             .previewLayout(.sizeThatFits)
     }
