@@ -1,5 +1,25 @@
 # Pulse 3.x
 
+## Pulse 3.7.0
+
+- Improve search suggestions on macOS that are now [displayed inline](https://user-images.githubusercontent.com/1567433/235319231-caaabe2f-d173-4dca-b585-203c36ee70cc.png) and support the same search options as on iOS
+- Improve how search results are displayed on macOS
+- Improve search scope picker and allow searching for in more scopes
+- Add support for "Logs" filters: File, Label, Level
+- Add strings search options to search on macOS
+- The console now defaults to the "Network" mode and remembers your choice persistently
+- Move "Sort By" and "Group" by options to the context menu
+- Remove custom Message and Network filters that were replaced by the search introduced in [Pulse 3.2](https://kean.blog/post/pulse-search). These custom filters will continue to be available in Pulse for Mac (coming soon)
+- Fix an issue where filters were applies automatically to the search results on macOS
+- Fix an issue with `metadata` search being available for network tasks
+- Fix proactive search result lookup on macOS
+- Fix warnings when updating some observable objects from the background
+- Fix an issue with recent search filters not being saved
+- Fix an issue with logging on physical tvOS devices
+- Fix missing labels in logs
+- Fix the navigation bar item design on iOS 14
+- Fix the missing back button in the response body on iOS 14
+
 ## Pulse 3.6.0
 
 ### PulseUI
