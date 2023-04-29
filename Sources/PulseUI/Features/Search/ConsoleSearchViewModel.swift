@@ -89,6 +89,16 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
 
         self.context = store.newBackgroundContext()
 
+#if os(iOS)
+        searchBar.$text.sink {
+            if $0.last == "\t" {
+                DispatchQueue.main.async {
+                    self.autocompleteCurrentFilter()
+                }
+            }
+        }.store(in: &cancellables)
+#endif
+
         let text = searchBar.$text
             .map { $0.trimmingCharacters(in: .whitespaces ) }
             .removeDuplicates()
@@ -136,6 +146,13 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
             refreshNow()
         case .update:
             checkForNewSearchMatches(for: list.entities)
+        }
+    }
+
+    private func autocompleteCurrentFilter() {
+        if let filter = suggestionsViewModel.filters.first,
+           case .autocomplete(let text) = filter.action {
+            searchBar.text = text
         }
     }
 
