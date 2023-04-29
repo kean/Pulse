@@ -11,7 +11,7 @@ struct ConsoleMessageCell: View {
     let message: LoggerMessageEntity
     var isDisclosureNeeded = false
 
-    @EnvironmentObject private var settings: UserSettings
+    @ObservedObject private var settings: UserSettings = .shared
 
     var body: some View {
         let contents = VStack(alignment: .leading, spacing: 4) {

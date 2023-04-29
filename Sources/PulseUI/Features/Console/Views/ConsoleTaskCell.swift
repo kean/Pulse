@@ -11,7 +11,7 @@ struct ConsoleTaskCell: View {
     @ObservedObject var task: NetworkTaskEntity
     var isDisclosureNeeded: Bool
 
-    @EnvironmentObject private var settings: UserSettings
+    @ObservedObject private var settings: UserSettings = .shared
 
     init(task: NetworkTaskEntity, isDisclosureNeeded: Bool = false) {
         self.task = task

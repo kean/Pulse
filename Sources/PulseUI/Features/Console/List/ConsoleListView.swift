@@ -21,23 +21,24 @@ struct ConsoleListView: View {
 private struct _InternalConsoleListView: View {
     private let environment: ConsoleEnvironment
 
-    @StateObject private var listViewModel: ConsoleListViewModel
+    @StateObject private var listViewModel: IgnoringUpdates<ConsoleListViewModel>
 
     init(environment: ConsoleEnvironment, filters: ConsoleFiltersViewModel) {
         self.environment = environment
-        _listViewModel = StateObject(wrappedValue: .init(environment: environment, filters: filters))
+        let listViewModel = ConsoleListViewModel(environment: environment, filters: filters)
+        _listViewModel = StateObject(wrappedValue: IgnoringUpdates(listViewModel))
     }
 
     var body: some View {
         contents
-            .environmentObject(listViewModel)
-            .onAppear { listViewModel.isViewVisible = true }
-            .onDisappear { listViewModel.isViewVisible = false }
+            .environmentObject(listViewModel.value)
+            .onAppear { listViewModel.value.isViewVisible = true }
+            .onDisappear { listViewModel.value.isViewVisible = false }
     }
 
     @ViewBuilder private var contents: some View {
         if #available(iOS 15, *) {
-            _ConsoleNewListView(listViewModel: listViewModel, environment: environment)
+            _ConsoleNewListView(listViewModel: listViewModel.value, environment: environment)
         } else {
             _ConsoleListView()
         }
@@ -51,7 +52,7 @@ private struct _ConsoleNewListView: View {
     @ObservedObject private var listViewModel: ConsoleListViewModel
 
     @StateObject private var searchBarViewModel: ConsoleSearchBarViewModel
-    @StateObject private var searchViewModel: ObservableBag<ConsoleSearchViewModel>
+    @StateObject private var searchViewModel: IgnoringUpdates<ConsoleSearchViewModel>
 
     init(listViewModel: ConsoleListViewModel, environment: ConsoleEnvironment) {
         self.environment = environment
@@ -61,7 +62,7 @@ private struct _ConsoleNewListView: View {
         let searchViewModel = ConsoleSearchViewModel(environment: environment, list: listViewModel, searchBar: searchBarViewModel)
 
         _searchBarViewModel = StateObject(wrappedValue: searchBarViewModel)
-        _searchViewModel = StateObject(wrappedValue: ObservableBag(searchViewModel))
+        _searchViewModel = StateObject(wrappedValue: IgnoringUpdates(searchViewModel))
     }
 
     var body: some View {

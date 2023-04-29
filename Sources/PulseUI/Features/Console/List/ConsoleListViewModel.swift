@@ -19,13 +19,12 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
     @Published private(set) var sections: [NSFetchedResultsSectionInfo]?
 
     @Published private(set) var mode: ConsoleMode
-    @Published var options = ConsoleListOptions()
 
     var isViewVisible = false {
         didSet {
             guard oldValue != isViewVisible else { return }
             if isViewVisible {
-                resetDataSource(options: options)
+                resetDataSource(options: environment.listOptions)
             } else {
                 dataSource = nil
             }
@@ -51,6 +50,7 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
     private var visibleObjectIDs: Set<NSManagedObjectID> = []
 
     private let store: LoggerStore
+    private let environment: ConsoleEnvironment
     private let filters: ConsoleFiltersViewModel
     private let sessions: ManagedObjectsObserver<LoggerSessionEntity>
     private let pinsObserver: ManagedObjectsObserver<LoggerMessageEntity>
@@ -60,6 +60,7 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
 
     init(environment: ConsoleEnvironment, filters: ConsoleFiltersViewModel) {
         self.store = environment.store
+        self.environment = environment
         self.mode = environment.mode
         self.filters = filters
         self.sessions = .sessions(for: store.viewContext)
@@ -80,7 +81,7 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
             }
         }.store(in: &cancellables)
 
-        $options.dropFirst().sink { [weak self] in
+        environment.$listOptions.dropFirst().sink { [weak self] in
             self?.resetDataSource(options: $0)
         }.store(in: &cancellables)
 
@@ -92,7 +93,7 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
     private func didUpdateMode(_ mode: ConsoleMode) {
         self.mode = mode
         pins = filter(pins: pinsObserver.objects, mode: mode)
-        resetDataSource(options: options)
+        resetDataSource(options: environment.listOptions)
     }
 
     private func resetDataSource(options: ConsoleListOptions) {
@@ -104,8 +105,8 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
     }
 
     func focus(on entities: [NSManagedObject]) {
-        options.messageGroupBy = .noGrouping
-        options.taskGroupBy = .noGrouping
+        environment.listOptions.messageGroupBy = .noGrouping
+        environment.listOptions.taskGroupBy = .noGrouping
         filters.options.focus = NSPredicate(format: "self IN %@", entities)
     }
 

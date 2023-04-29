@@ -237,7 +237,7 @@ extension View {
 }
 
 /// Allows you to use `@StateObject` only for memory management (without observing).
-final class ObservableBag<T>: ObservableObject {
-    let value: T
+final class IgnoringUpdates<T>: ObservableObject {
+    var value: T
     init(_ value: T) { self.value = value }
 }

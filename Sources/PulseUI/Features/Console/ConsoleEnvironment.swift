@@ -25,6 +25,7 @@ final class ConsoleEnvironment: ObservableObject {
     let initialMode: ConsoleMode
 
     @Published var mode: ConsoleMode
+    @Published var listOptions: ConsoleListOptions = .init()
 
     var bindingForNetworkMode: Binding<Bool> {
         Binding(get: {

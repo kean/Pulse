@@ -177,8 +177,6 @@ private struct ConsoleModeButton: View {
 }
 
 struct ConsoleListOptionsView: View {
-    @EnvironmentObject private var environment: ConsoleEnvironment // important: reloads mode
-    @EnvironmentObject private var listViewModel: ConsoleListViewModel
     @EnvironmentObject private var filters: ConsoleFiltersViewModel
 
     var body: some View {
@@ -191,13 +189,6 @@ struct ConsoleListOptionsView: View {
 
     @ViewBuilder
     private var contents: some View {
-        if #available(iOS 15, *) {
-#if os(iOS)
-            sortByMenu.fixedSize()
-#endif
-            groupByMenu.fixedSize()
-        }
-
 #if os(macOS)
         Button(action: { filters.options.isOnlyErrors.toggle() }) {
             Image(systemName: filters.options.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon")
@@ -214,73 +205,6 @@ struct ConsoleListOptionsView: View {
         }
         .padding(.leading, 1)
 #endif
-    }
-
-    @ViewBuilder
-    private var sortByMenu: some View {
-        Menu(content: {
-            if environment.mode == .network {
-                Picker("Sort By", selection: $listViewModel.options.taskSortBy) {
-                    ForEach(ConsoleListOptions.TaskSortBy.allCases, id: \.self) {
-                        Text($0.rawValue).tag($0)
-                    }
-                }
-            } else {
-                Picker("Sort By", selection: $listViewModel.options.messageSortBy) {
-                    ForEach(ConsoleListOptions.MessageSortBy.allCases, id: \.self) {
-                        Text($0.rawValue).tag($0)
-                    }
-                }
-            }
-            Picker("Ordering", selection: $listViewModel.options.order) {
-                Text("Descending").tag(ConsoleListOptions.Ordering.descending)
-                Text("Ascending").tag(ConsoleListOptions.Ordering.ascending)
-            }
-        }, label: {
-            Image(systemName: "arrow.up.arrow.down")
-                .font(.body)
-                .foregroundColor(.blue)
-        })
-    }
-
-    @ViewBuilder
-    private var groupByMenu: some View {
-        Menu(content: {
-            if environment.mode == .network {
-                Picker("Group By", selection: $listViewModel.options.taskGroupBy) {
-                    Group {
-                        Text("Ungrouped").tag(ConsoleListOptions.TaskGroupBy.noGrouping)
-                        Divider()
-                        Text("URL").tag(ConsoleListOptions.TaskGroupBy.url)
-                        Text("Host").tag(ConsoleListOptions.TaskGroupBy.host)
-                        Text("Method").tag(ConsoleListOptions.TaskGroupBy.method)
-                    }
-                    Group {
-                        Divider()
-                        Text("Content Type").tag(ConsoleListOptions.TaskGroupBy.responseContentType)
-                        Text("Status Code").tag(ConsoleListOptions.TaskGroupBy.statusCode)
-                        Text("Error Code").tag(ConsoleListOptions.TaskGroupBy.errorCode)
-                        Divider()
-                        Text("Task State").tag(ConsoleListOptions.TaskGroupBy.requestState)
-                        Text("Task Type").tag(ConsoleListOptions.TaskGroupBy.taskType)
-                        Divider()
-                        Text("Session").tag(ConsoleListOptions.TaskGroupBy.session)
-                    }
-                }
-            } else {
-                Picker("Group By", selection: $listViewModel.options.messageGroupBy) {
-                    Text("Ungrouped").tag(ConsoleListOptions.MessageGroupBy.noGrouping)
-                    Divider()
-                    ForEach(ConsoleListOptions.MessageGroupBy.allCases.filter { $0 != .noGrouping }, id: \.self) {
-                        Text($0.rawValue).tag($0)
-                    }
-                }
-            }
-        }, label: {
-            Image(systemName: "rectangle.3.group")
-                .font(.body)
-                .foregroundColor(.blue)
-        })
     }
 }
 
