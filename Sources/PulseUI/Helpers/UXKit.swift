@@ -35,7 +35,6 @@ struct Palette {
 }
 
 #if os(macOS)
-typealias UXView = NSView
 typealias UXColor = NSColor
 typealias UXFont = NSFont
 typealias UXTextView = NSTextView
@@ -67,10 +66,6 @@ extension NSColor {
 }
 
 #else
-#if os(iOS)
-typealias UXView = UIView
-#endif
-
 typealias UXColor = UIColor
 typealias UXFont = UIFont
 typealias UXImage = UIImage
@@ -149,12 +144,6 @@ func runHapticFeedback(_ type: UINotificationFeedbackGenerator.FeedbackType = .s
     UINotificationFeedbackGenerator().notificationOccurred(type)
 }
 #endif
-
-func hideKeyboard() {
-#if os(iOS)
-    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-#endif
-}
 
 #if os(macOS)
 extension NSTextView {

@@ -74,7 +74,7 @@ struct ConsoleFiltersView: View {
     }
 }
 
-// MARK: - ConsoleSearchView (Shared)
+// MARK: - ConsoleFiltersView (Sections)
 
 @available(iOS 15, *)
 extension ConsoleFiltersView {
@@ -95,12 +95,7 @@ extension ConsoleFiltersView {
         })
     }
 #endif
-}
 
-// MARK: - ConsoleSearchView (Message)
-
-@available(iOS 15, *)
-extension ConsoleFiltersView {
     var logLevelsSection: some View {
         ConsoleSection(header: {
             ConsoleSectionHeader(icon: "flag", title: "Levels", filter: $viewModel.criteria.messages.logLevels)
@@ -116,12 +111,7 @@ extension ConsoleFiltersView {
             ConsoleLabelsSelectionView(viewModel: viewModel)
         })
     }
-}
 
-// MARK: - ConsoleSearchView (Network)
-
-@available(iOS 15, *)
-extension ConsoleFiltersView {
     var domainsSection: some View {
         ConsoleSection(header: {
             ConsoleSectionHeader(icon: "server.rack", title: "Hosts", filter: $viewModel.criteria.network.host)

@@ -2,17 +2,15 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
+#if os(iOS)
+
 import SwiftUI
 import CoreData
 import Pulse
 import Combine
 
-#if os(iOS)
-
 struct NetworkInspectorView: View {
     @ObservedObject var task: NetworkTaskEntity
-
-    private var viewModel: NetworkInspectorViewModel { .init(task: task) }
 
     @State private var shareItems: ShareItems?
     @State private var isCurrentRequest = false
@@ -28,7 +26,7 @@ struct NetworkInspectorView: View {
                 trailingNavigationBarItems
             }
         }
-        .inlineNavigationTitle(viewModel.title)
+        .inlineNavigationTitle(task.title)
         .sheet(item: $shareItems, content: ShareView.init)
     }
 

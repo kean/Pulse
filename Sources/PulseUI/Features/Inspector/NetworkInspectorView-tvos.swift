@@ -2,23 +2,21 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
+#if os(tvOS)
+
 import SwiftUI
 import CoreData
 import Pulse
 import Combine
 
-#if os(tvOS)
-
 struct NetworkInspectorView: View {
     @ObservedObject var task: NetworkTaskEntity
-
-    private var viewModel: NetworkInspectorViewModel { .init(task: task) }
 
     @State private var isCurrentRequest = false
 
     var body: some View {
         contents
-            .inlineNavigationTitle(viewModel.title)
+            .inlineNavigationTitle(task.title)
     }
 
     var contents: some View {

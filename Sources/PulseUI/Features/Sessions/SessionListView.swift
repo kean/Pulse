@@ -28,7 +28,7 @@ struct SessionListView: View {
 
     var body: some View {
         if sessions.isEmpty {
-            Text("No Recorded Session")
+            Text("No Recorded Sessions")
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .foregroundColor(.secondary)
         } else {
@@ -37,20 +37,20 @@ struct SessionListView: View {
                 .onChange(of: sessions.count) { _ in refreshGroups() }
         }
     }
-
+    
     @ViewBuilder
     private var content: some View {
 #if os(macOS)
-            VStack {
-                list
-                HStack {
-                    SearchBar(title: "Filter", imageName: "line.3.horizontal.decrease.circle", text: $filterTerm)
-                        .frame(maxWidth: 200)
-                    Spacer()
-                }.padding(8)
-            }
-#else
+        VStack {
             list
+            HStack {
+                SearchBar(title: "Filter", imageName: "line.3.horizontal.decrease.circle", text: $filterTerm)
+                    .frame(maxWidth: 200)
+                Spacer()
+            }.padding(8)
+        }
+#else
+        list
 #endif
     }
 

@@ -26,18 +26,6 @@ extension Parser {
     }
 }
 
-struct ParserError: Error, LocalizedError {
-    let message: String
-
-    init(_ message: String) {
-        self.message = message
-    }
-
-    public var errorDescription: String? {
-        "\(message)"
-    }
-}
-
 // MARK: - Parser (Predefined)
 
 struct Parsers {}
@@ -113,14 +101,6 @@ extension Parsers {
 
     static func zip<A, B, C>(_ a: Parser<A>, _ b: Parser<B>, _ c: Parser<C>) -> Parser<(A, B, C)> {
         zip(a, zip(b, c)).map { a, bc in (a, bc.0, bc.1) }
-    }
-
-    static func zip<A, B, C, D>(_ a: Parser<A>, _ b: Parser<B>, _ c: Parser<C>, _ d: Parser<D>) -> Parser<(A, B, C, D)> {
-        zip(a, zip(b, c, d)).map { a, bcd in (a, bcd.0, bcd.1, bcd.2) }
-    }
-
-    static func zip<A, B, C, D, E>(_ a: Parser<A>, _ b: Parser<B>, _ c: Parser<C>, _ d: Parser<D>, _ e: Parser<E>) -> Parser<(A, B, C, D, E)> {
-        zip(a, zip(b, c, d, e)).map { a, bcde in (a, bcde.0, bcde.1, bcde.2, bcde.3) }
     }
 
     /// Returns the first match or `nil` if no matches are found.

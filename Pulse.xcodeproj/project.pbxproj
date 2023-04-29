@@ -218,7 +218,6 @@
 		0CF0D673296F189600EED9D4 /* NetworkDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5F2296F189600EED9D4 /* NetworkDetailsView.swift */; };
 		0CF0D674296F189600EED9D4 /* NetworkInspectorView-shared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5F3296F189600EED9D4 /* NetworkInspectorView-shared.swift */; };
 		0CF0D675296F189600EED9D4 /* NetworkInspectorView-ios.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5F4296F189600EED9D4 /* NetworkInspectorView-ios.swift */; };
-		0CF0D676296F189600EED9D4 /* NetworkInspectorViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5F5296F189600EED9D4 /* NetworkInspectorViewModel.swift */; };
 		0CF0D677296F189600EED9D4 /* NetworkInspectorView-macos.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5F6296F189600EED9D4 /* NetworkInspectorView-macos.swift */; };
 		0CF0D678296F189600EED9D4 /* LoggerStoreSizeChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5F8296F189600EED9D4 /* LoggerStoreSizeChart.swift */; };
 		0CF0D679296F189600EED9D4 /* ConsoleView-ios.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5FA296F189600EED9D4 /* ConsoleView-ios.swift */; };
@@ -658,7 +657,6 @@
 		0CF0D5F2296F189600EED9D4 /* NetworkDetailsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkDetailsView.swift; sourceTree = "<group>"; };
 		0CF0D5F3296F189600EED9D4 /* NetworkInspectorView-shared.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NetworkInspectorView-shared.swift"; sourceTree = "<group>"; };
 		0CF0D5F4296F189600EED9D4 /* NetworkInspectorView-ios.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NetworkInspectorView-ios.swift"; sourceTree = "<group>"; };
-		0CF0D5F5296F189600EED9D4 /* NetworkInspectorViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkInspectorViewModel.swift; sourceTree = "<group>"; };
 		0CF0D5F6296F189600EED9D4 /* NetworkInspectorView-macos.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NetworkInspectorView-macos.swift"; sourceTree = "<group>"; };
 		0CF0D5F8296F189600EED9D4 /* LoggerStoreSizeChart.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoggerStoreSizeChart.swift; sourceTree = "<group>"; };
 		0CF0D5FA296F189600EED9D4 /* ConsoleView-ios.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ConsoleView-ios.swift"; sourceTree = "<group>"; };
@@ -1306,7 +1304,6 @@
 				0CF0D5F1296F189600EED9D4 /* NetworkInspectorRequestBodyView.swift */,
 				0CF0D5F2296F189600EED9D4 /* NetworkDetailsView.swift */,
 				0CF0D5F3296F189600EED9D4 /* NetworkInspectorView-shared.swift */,
-				0CF0D5F5296F189600EED9D4 /* NetworkInspectorViewModel.swift */,
 			);
 			path = Inspector;
 			sourceTree = "<group>";
@@ -2029,7 +2026,6 @@
 				0CF0D65D296F189600EED9D4 /* ConsoleMessageDetailsView.swift in Sources */,
 				0C9C465929F00272007897E8 /* ConsoleListView.swift in Sources */,
 				0CF0D678296F189600EED9D4 /* LoggerStoreSizeChart.swift in Sources */,
-				0CF0D676296F189600EED9D4 /* NetworkInspectorViewModel.swift in Sources */,
 				0C3002B32986CEF30055F6C2 /* LoggerStoreIndex.swift in Sources */,
 				0CF0D689296F189600EED9D4 /* MainViewController.swift in Sources */,
 				0C840D4C29E0A09B00362214 /* SessionsView.swift in Sources */,

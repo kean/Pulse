@@ -2,18 +2,16 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
+#if os(macOS)
+
 import SwiftUI
 import CoreData
 import Pulse
 import Combine
 
-#if os(macOS)
-
 struct NetworkInspectorView: View {
     @ObservedObject var task: NetworkTaskEntity
     @State var selectedTab: NetworkInspectorTab
-
-    private var viewModel: NetworkInspectorViewModel { .init(task: task) }
 
     init(task: NetworkTaskEntity,
          tab: NetworkInspectorTab = NetworkInspectorPreferences().selectedTab) {
