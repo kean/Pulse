@@ -27,6 +27,10 @@ struct ConsoleDomainsSelectionView: View {
             let tasks = $0 as? [NetworkTaskEntity] ?? []
             self.domains = NSCountedSet(array: tasks.compactMap(\.host))
         }
+        .onAppear {
+            let tasks = viewModel.entities.value as? [NetworkTaskEntity] ?? []
+            self.domains = NSCountedSet(array: tasks.compactMap(\.host))
+        }
     }
 }
 

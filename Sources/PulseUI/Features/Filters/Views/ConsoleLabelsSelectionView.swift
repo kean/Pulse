@@ -27,6 +27,10 @@ struct ConsoleLabelsSelectionView: View {
             let messages = $0 as? [LoggerMessageEntity] ?? []
             self.labels = NSCountedSet(array: messages.map(\.label))
         }
+        .onAppear {
+            let messages = viewModel.entities.value as? [LoggerMessageEntity] ?? []
+            self.labels = NSCountedSet(array: messages.map(\.label))
+        }
     }
 }
 
