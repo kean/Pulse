@@ -6,6 +6,7 @@ import SwiftUI
 import Pulse
 import Combine
 
+@available(iOS 15, *)
 struct ConsoleFiltersView: View {
     @EnvironmentObject var environment: ConsoleEnvironment // important: reloads mode
     @EnvironmentObject var viewModel: ConsoleFiltersViewModel
@@ -49,18 +50,14 @@ struct ConsoleFiltersView: View {
             customNetworkFiltersSection
 #endif
             responseSection
-            if #available(iOS 15, *) {
-                domainsSection
-            }
+            domainsSection
             networkingSection
         } else {
 #if PULSE_STANDALONE_APP
             customMessageFiltersSection
 #endif
             logLevelsSection
-            if #available(iOS 15, *) {
-                labelsSection
-            }
+            labelsSection
         }
 
 #if os(iOS) || os(macOS)
@@ -69,13 +66,14 @@ struct ConsoleFiltersView: View {
     }
 
     private var buttonReset: some View {
-        Button.destructive(action: viewModel.resetAll) { Text("Reset") }
+        Button(role: .destructive, action: viewModel.resetAll) { Text("Reset") }
             .disabled(viewModel.isDefaultFilters(for: environment.mode))
     }
 }
 
 // MARK: - ConsoleSearchView (Shared)
 
+@available(iOS 15, *)
 extension ConsoleFiltersView {
     var sessionsSection: some View {
         ConsoleSection(isDividerHidden: true, header: {
@@ -98,6 +96,7 @@ extension ConsoleFiltersView {
 
 // MARK: - ConsoleSearchView (Message)
 
+@available(iOS 15, *)
 extension ConsoleFiltersView {
     var logLevelsSection: some View {
         ConsoleSection(header: {
@@ -118,6 +117,7 @@ extension ConsoleFiltersView {
 
 // MARK: - ConsoleSearchView (Network)
 
+@available(iOS 15, *)
 extension ConsoleFiltersView {
     var responseSection: some View {
         ConsoleSection(header: {
@@ -154,6 +154,7 @@ extension ConsoleFiltersView {
 #if DEBUG
 import CoreData
 
+@available(iOS 15, *)
 struct ConsoleFiltersView_Previews: PreviewProvider {
     static var previews: some View {
 #if os(macOS)
@@ -185,6 +186,7 @@ struct ConsoleFiltersView_Previews: PreviewProvider {
     }
 }
 
+@available(iOS 15, *)
 private func makePreview(isOnlyNetwork: Bool) -> some View {
     let store = LoggerStore.mock
     let entities: [NSManagedObject] = try! isOnlyNetwork ? store.allTasks() : store.allMessages()

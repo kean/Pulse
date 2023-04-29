@@ -9,6 +9,7 @@ import CoreData
 import Pulse
 import Combine
 
+@available(iOS 15, *)
 struct ConsoleContextMenu: View {
     @EnvironmentObject private var environment: ConsoleEnvironment
     @Environment(\.router) private var router
@@ -29,7 +30,7 @@ struct ConsoleContextMenu: View {
                     Label("Store Info", systemImage: "info.circle")
                 }
                 if !environment.store.isArchive {
-                    Button.destructive(action: environment.removeAllLogs) {
+                    Button(role: .destructive, action: environment.removeAllLogs) {
                         Label("Remove Logs", systemImage: "trash")
                     }
                 }
@@ -50,13 +51,7 @@ struct ConsoleContextMenu: View {
                 }
             }
         } label: {
-            if #available(iOS 15, *) {
-                Image(systemName: "ellipsis.circle")
-            } else {
-                Image(systemName: "ellipsis.circle")
-                    .font(.title2)
-                    .padding(.leading, 8)
-            }
+            Image(systemName: "ellipsis.circle")
         }
     }
 

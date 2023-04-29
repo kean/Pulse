@@ -7,6 +7,7 @@ import Pulse
 import Combine
 import CoreData
 
+@available(iOS 15, tvOS 15, *)
 struct ConsoleTaskCell: View {
     @ObservedObject var task: NetworkTaskEntity
     var isDisclosureNeeded: Bool
@@ -26,11 +27,7 @@ struct ConsoleTaskCell: View {
 #endif
 
         let contents = VStack(alignment: .leading, spacing: spacing) {
-            if #available(iOS 15, tvOS 15, *) {
-                title.dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-            } else {
-                title
-            }
+            title.dynamicTypeSize(...DynamicTypeSize.xxxLarge)
             message
 #if !os(macOS)
             details
@@ -78,7 +75,7 @@ struct ConsoleTaskCell: View {
             .lineLimit(1)
             .font(ConsoleConstants.fontInfo)
             .foregroundColor(.secondary)
-            .backport.monospacedDigit()
+            .monospacedDigit()
     }
 
     private var message: some View {
@@ -165,6 +162,7 @@ private struct ConsoleProgressText: View {
 }
 
 #if DEBUG
+@available(iOS 15, tvOS 15, *)
 struct ConsoleTaskCell_Previews: PreviewProvider {
     static var previews: some View {
         ConsoleTaskCell(task: LoggerStore.preview.entity(for: .login))

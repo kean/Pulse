@@ -29,7 +29,7 @@ public struct SettingsView: View {
 #endif
             if !(store.options.contains(.readonly)) {
                 Section {
-                    Button.destructive(action: viewModel.buttonRemoveAllMessagesTapped) {
+                    Button(role: .destructive, action: viewModel.buttonRemoveAllMessagesTapped) {
                         Label("Remove Logs", systemImage: "trash")
                     }
                 }

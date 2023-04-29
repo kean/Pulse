@@ -87,9 +87,8 @@ private struct DurationLabel: View {
     var body: some View {
         if let duration = viewModel.duration {
             Text(duration)
-                .backport.monospacedDigit()
                 .lineLimit(1)
-                .font(.system(.callout, design: .monospaced))
+                .font(.system(.callout, design: .monospaced).monospacedDigit())
                 .foregroundColor(.secondary)
         }
     }

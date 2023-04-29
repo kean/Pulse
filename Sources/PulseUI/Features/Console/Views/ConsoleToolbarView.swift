@@ -10,6 +10,7 @@ import CoreData
 import Combine
 
 #if os(iOS)
+@available(iOS 15, *)
 struct ConsoleToolbarView: View {
     @EnvironmentObject private var environment: ConsoleEnvironment
 
@@ -176,19 +177,11 @@ private struct ConsoleModeButton: View {
 #endif
 }
 
+@available(iOS 15, *)
 struct ConsoleListOptionsView: View {
     @EnvironmentObject private var filters: ConsoleFiltersViewModel
 
     var body: some View {
-        if #available(iOS 15, *) {
-            contents.dynamicTypeSize(...DynamicTypeSize.accessibility1)
-        } else {
-            contents
-        }
-    }
-
-    @ViewBuilder
-    private var contents: some View {
 #if os(macOS)
         Button(action: { filters.options.isOnlyErrors.toggle() }) {
             Image(systemName: filters.options.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon")
@@ -204,6 +197,7 @@ struct ConsoleListOptionsView: View {
                 .foregroundColor(filters.options.isOnlyErrors ? .red : .blue)
         }
         .padding(.leading, 1)
+        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
 #endif
     }
 }

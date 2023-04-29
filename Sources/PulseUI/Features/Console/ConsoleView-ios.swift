@@ -19,6 +19,15 @@ public struct ConsoleView: View {
     }
 
     public var body: some View {
+        if #available(iOS 15, *) {
+            contents
+        } else {
+            PlaceholderView(imageName: "xmark.octagon", title: "Unsupported", subtitle: "Pulse requires iOS 15 or higher").padding()
+        }
+    }
+
+    @available(iOS 15, *)
+    private var contents: some View {
         ConsoleListView()
             .navigationTitle(environment.title)
             .toolbar {
@@ -43,6 +52,7 @@ public struct ConsoleView: View {
         return copy
     }
 
+    @available(iOS 15, *)
     @ViewBuilder private var trailingNavigationBarItems: some View {
         Button(action: { environment.router.isShowingShareStore = true }) {
             Label("Share", systemImage: "square.and.arrow.up")

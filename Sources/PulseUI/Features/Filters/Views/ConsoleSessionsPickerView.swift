@@ -6,6 +6,7 @@ import SwiftUI
 import Pulse
 import CoreData
 
+@available(iOS 15, *)
 struct ConsoleSessionsPickerView: View {
     @Binding var selection: Set<UUID>
     @State private var isShowingPicker = false

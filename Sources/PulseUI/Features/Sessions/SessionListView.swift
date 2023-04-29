@@ -10,6 +10,7 @@ import Combine
 
 #if os(iOS) || os(macOS)
 
+@available(iOS 15, *)
 struct SessionListView: View {
     @Binding var selection: Set<UUID>
     @Binding var sharedSessions: SelectedSessionsIDs?
@@ -76,7 +77,7 @@ struct SessionListView: View {
         }
 #if os(iOS)
         .listStyle(.plain)
-        .backport.searchable(text: $filterTerm)
+        .searchable(text: $filterTerm)
 #else
         .listStyle(.sidebar)
 #endif
@@ -110,18 +111,18 @@ struct SessionListView: View {
     @ViewBuilder
     private func makeCell(for session: LoggerSessionEntity) -> some View {
         ConsoleSessionCell(session: session, isCompact: filterTerm.isEmpty)
-            .backport.swipeActions {
+            .swipeActions {
                 Button(action: {
                     if session.id != store.session.id {
                         store.removeSessions(withIDs: [session.id])
                     }
                 }, label: {
                     Label("Delete", systemImage: "trash")
-                }).backport.tint(Color.red)
+                }).tint(Color.red)
 
                 Button(action: { sharedSessions = .init(ids: [session.id]) }) {
                     Label("Share", systemImage: "square.and.arrow.up.fill")
-                }.backport.tint(.blue)
+                }.tint(.blue)
             }
     }
 

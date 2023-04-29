@@ -63,12 +63,12 @@ private struct ConsoleMenuView: View {
                 NavigationLink(destination: destinationStoreDetails) {
                     Label("Store Info", systemImage: "info.circle")
                 }
-                Button.destructive {
+                Button(role: .destructive, action: {
                     environment.index.clear()
                     store.removeAll()
-                } label: {
+                }, label: {
                     Label("Remove Logs", systemImage: "trash")
-                }
+                })
             } header: { Text("Store") }
         }
         Section {

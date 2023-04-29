@@ -9,6 +9,7 @@ import CoreData
 import Pulse
 import Combine
 
+@available(iOS 15, *)
 struct ConsoleListView: View {
     @EnvironmentObject var environment: ConsoleEnvironment
     @EnvironmentObject var filters: ConsoleFiltersViewModel
@@ -18,60 +19,36 @@ struct ConsoleListView: View {
     }
 }
 
+@available(iOS 15, *)
 private struct _InternalConsoleListView: View {
     private let environment: ConsoleEnvironment
 
     @StateObject private var listViewModel: IgnoringUpdates<ConsoleListViewModel>
-
-    init(environment: ConsoleEnvironment, filters: ConsoleFiltersViewModel) {
-        self.environment = environment
-        let listViewModel = ConsoleListViewModel(environment: environment, filters: filters)
-        _listViewModel = StateObject(wrappedValue: IgnoringUpdates(listViewModel))
-    }
-
-    var body: some View {
-        contents
-            .environmentObject(listViewModel.value)
-            .onAppear { listViewModel.value.isViewVisible = true }
-            .onDisappear { listViewModel.value.isViewVisible = false }
-    }
-
-    @ViewBuilder private var contents: some View {
-        if #available(iOS 15, *) {
-            _ConsoleNewListView(listViewModel: listViewModel.value, environment: environment)
-        } else {
-            _ConsoleListView()
-        }
-    }
-}
-
-@available(iOS 15, *)
-private struct _ConsoleNewListView: View {
-    let environment: ConsoleEnvironment
-
-    @ObservedObject private var listViewModel: ConsoleListViewModel
-
     @StateObject private var searchBarViewModel: ConsoleSearchBarViewModel
     @StateObject private var searchViewModel: IgnoringUpdates<ConsoleSearchViewModel>
 
-    init(listViewModel: ConsoleListViewModel, environment: ConsoleEnvironment) {
+    init(environment: ConsoleEnvironment, filters: ConsoleFiltersViewModel) {
         self.environment = environment
-        self.listViewModel = listViewModel
 
+        let listViewModel = ConsoleListViewModel(environment: environment, filters: filters)
         let searchBarViewModel = ConsoleSearchBarViewModel()
         let searchViewModel = ConsoleSearchViewModel(environment: environment, list: listViewModel, searchBar: searchBarViewModel)
 
+        _listViewModel = StateObject(wrappedValue: IgnoringUpdates(listViewModel))
         _searchBarViewModel = StateObject(wrappedValue: searchBarViewModel)
         _searchViewModel = StateObject(wrappedValue: IgnoringUpdates(searchViewModel))
     }
 
     var body: some View {
-        list
-            .environmentObject(searchBarViewModel)
+        contents
+            .environmentObject(listViewModel.value)
             .environmentObject(searchViewModel.value)
+            .environmentObject(searchBarViewModel)
+            .onAppear { listViewModel.value.isViewVisible = true }
+            .onDisappear { listViewModel.value.isViewVisible = false }
     }
 
-    @ViewBuilder private var list: some View {
+    @ViewBuilder private var contents: some View {
         if #available(iOS 16, macOS 13, *) {
             _ConsoleListView()
                 .environment(\.defaultMinListRowHeight, 8)
@@ -107,49 +84,26 @@ private struct _ConsoleNewListView: View {
 #endif
 
 #if os(iOS)
+@available(iOS 15, *)
 private struct _ConsoleListView: View {
+    @Environment(\.isSearching) private var isSearching
+
     var body: some View {
         List {
-            if #available(iOS 15, *) {
-                _ConsoleSearchableListView()
+            if isSearching {
+                ConsoleSearchListContentView()
             } else {
-                _ConsoleRegularListView()
+                ConsoleToolbarView()
+                    .listRowSeparator(.hidden, edges: .top)
+                ConsoleListContentView()
             }
         }
         .listStyle(.plain)
     }
 }
-
-@available(iOS 15, *)
-private struct _ConsoleSearchableListView: View {
-    @Environment(\.isSearching) private var isSearching
-
-    var body: some View {
-        if isSearching {
-            ConsoleSearchListContentView()
-        } else {
-            _ConsoleRegularListView()
-        }
-    }
-}
-
-private struct _ConsoleRegularListView: View {
-    @EnvironmentObject private var listViewModel: ConsoleListViewModel
-
-    var body: some View {
-        let toolbar = ConsoleToolbarView()
-        if #available(iOS 15, macOS 13, *) {
-            toolbar.listRowSeparator(.hidden, edges: .top)
-        } else {
-            toolbar
-        }
-        ConsoleListContentView(viewModel: listViewModel)
-    }
-}
 #endif
 
 #if os(macOS)
-
 private struct _ConsoleListView: View {
     @EnvironmentObject private var environment: ConsoleEnvironment
     @EnvironmentObject private var listViewModel: ConsoleListViewModel

@@ -10,7 +10,7 @@ import Combine
 
 #if os(iOS) || os(macOS)
 
-@available(macOS 13, *)
+@available(iOS 15, macOS 13, *)
 struct SessionsView: View {
     @State private var selection: Set<UUID> = []
     @State private var sharedSessions: SelectedSessionsIDs?
@@ -83,7 +83,7 @@ struct SessionsView: View {
 #if os(iOS)
     var bottomBar: some View {
         HStack {
-            Button.destructive(action: {
+            Button(role: .destructive, action: {
                 store.removeSessions(withIDs: selection)
                 selection = []
             }, label: { Image(systemName: "trash") })

@@ -5,6 +5,7 @@
 import SwiftUI
 import Pulse
 
+@available(iOS 15, tvOS 15, *)
 struct ConsoleSearchListSelectionView<Data: RandomAccessCollection, ID: Hashable, Label: View>: View {
     let title: String
     let items: Data
@@ -79,27 +80,21 @@ struct ConsoleSearchListSelectionView<Data: RandomAccessCollection, ID: Hashable
 
     @ViewBuilder
     private var expandedListBody: some View {
-        let list = Form {
+        Form {
             buttonToggleAll
             ForEach(filteredItems, id: id, content: makeRow)
         }
+        .inlineNavigationTitle(title)
 #if os(tvOS)
-            .frame(width: 800)
+        .frame(width: 800)
 #endif
-            .inlineNavigationTitle(title)
-
-        if #available(iOS 15, tvOS 15, *) {
-            list
 #if os(iOS)
-                .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always))
-                .disableAutocorrection(true)
+        .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always))
+        .disableAutocorrection(true)
 #else
-                .searchable(text: $searchText)
-                .disableAutocorrection(true)
+        .searchable(text: $searchText)
+        .disableAutocorrection(true)
 #endif
-        } else {
-            list
-        }
     }
 #endif
 
@@ -153,6 +148,7 @@ struct ConsoleSearchListCell: View {
 }
 
 #if DEBUG
+@available(iOS 15, tvOS 15, *)
 struct ConsoleSearchListSelectionView_Previews: PreviewProvider {
     static var previews: some View {
         ConsoleSearchListSelectionViewDemo()
@@ -160,6 +156,7 @@ struct ConsoleSearchListSelectionView_Previews: PreviewProvider {
     }
 }
 
+@available(iOS 15, tvOS 15, *)
 private struct ConsoleSearchListSelectionViewDemo: View {
     @State private var selection: Set<String>  = []
 

@@ -31,11 +31,14 @@ struct ConsoleRouterView: View {
     @EnvironmentObject var router: ConsoleRouter
 
     var body: some View {
-        contents
+        if #available(iOS 15, *) {
+            contents
+        }
     }
 }
 
 #if os(iOS)
+@available(iOS 15, *)
 extension ConsoleRouterView {
     var contents: some View {
         Text("").invisible()
@@ -46,20 +49,15 @@ extension ConsoleRouterView {
             .sheet(isPresented: $router.isShowingShareStore) { destinationShareStore }
             .sheet(item: $router.shareItems, content: ShareView.init)
     }
-
+    
     private var destinationFilters: some View {
         NavigationView {
-            let view = ConsoleFiltersView()
+            ConsoleFiltersView()
                 .inlineNavigationTitle("Filters")
                 .navigationBarItems(trailing: Button("Done") {
                     router.isShowingFilters = false
                 })
-
-            if #available(iOS 15, *) {
-                view.dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-            } else {
-                view
-            }
+                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
         }
     }
 

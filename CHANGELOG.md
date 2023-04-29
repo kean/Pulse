@@ -1,5 +1,9 @@
 # Pulse 3.x
 
+## WIP
+
+- `ConsoleView` no longer supports iOS 14, but the packge can still be installed in projects that require iOS 14
+
 ## Pulse 3.7.0
 
 - Improve search suggestions on macOS that are now [displayed inline](https://user-images.githubusercontent.com/1567433/235319231-caaabe2f-d173-4dca-b585-203c36ee70cc.png) and support the same search options as on iOS

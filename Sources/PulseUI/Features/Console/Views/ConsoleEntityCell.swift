@@ -7,6 +7,7 @@ import SwiftUI
 import Pulse
 import CoreData
 
+@available(iOS 15, *)
 struct ConsoleEntityCell: View {
     let entity: NSManagedObject
 
@@ -26,6 +27,7 @@ struct ConsoleEntityCell: View {
     }
 }
 
+@available(iOS 15, *)
 private struct _ConsoleMessageCell: View {
     let message: LoggerMessageEntity
 
@@ -46,35 +48,32 @@ private struct _ConsoleMessageCell: View {
 #endif
 
 #if os(iOS) || os(macOS)
-        if #available(iOS 15, *) {
-            cell.swipeActions(edge: .leading, allowsFullSwipe: true) {
-                PinButton(viewModel: .init(message)).tint(.pink)
-            }
-            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                Button(action: { shareItems = ShareService.share(message, as: .html) }) {
-                    Label("Share", systemImage: "square.and.arrow.up.fill")
-                }.tint(.blue)
-            }
-            .backport.contextMenu(menuItems: {
-                ContextMenu.MessageContextMenu(message: message, shareItems: $shareItems)
-            }, preview: {
-                ConsoleMessageCellPreview(message: message)
-                    .frame(idealWidth: 320, maxHeight: 600)
-            })
-#if os(iOS)
-            .sheet(item: $shareItems, content: ShareView.init)
-#else
-            .popover(item: $shareItems, attachmentAnchor: .point(.leading), arrowEdge: .leading) { ShareView($0) }
-#endif
-        } else {
-            cell
+        cell.swipeActions(edge: .leading, allowsFullSwipe: true) {
+            PinButton(viewModel: .init(message)).tint(.pink)
         }
+        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+            Button(action: { shareItems = ShareService.share(message, as: .html) }) {
+                Label("Share", systemImage: "square.and.arrow.up.fill")
+            }.tint(.blue)
+        }
+        .backport.contextMenu(menuItems: {
+            ContextMenu.MessageContextMenu(message: message, shareItems: $shareItems)
+        }, preview: {
+            ConsoleMessageCellPreview(message: message)
+                .frame(idealWidth: 320, maxHeight: 600)
+        })
+#if os(iOS)
+        .sheet(item: $shareItems, content: ShareView.init)
+#else
+        .popover(item: $shareItems, attachmentAnchor: .point(.leading), arrowEdge: .leading) { ShareView($0) }
+#endif
 #else
         cell
 #endif
     }
 }
 
+@available(iOS 15, *)
 private struct _ConsoleTaskCell: View {
     let task: NetworkTaskEntity
     @State private var shareItems: ShareItems?
@@ -94,39 +93,35 @@ private struct _ConsoleTaskCell: View {
 #endif
 
 #if os(iOS) || os(macOS)
-        if #available(iOS 15, *) {
-            cell.swipeActions(edge: .leading, allowsFullSwipe: true) {
-                PinButton(viewModel: .init(task)).tint(.pink)
-            }
-            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                Button(action: {
-#if os(iOS)
-                    shareItems = ShareService.share(task, as: .html)
-#else
-                    isSharing = true
-#endif
-                }) {
-                    Label("Share", systemImage: "square.and.arrow.up.fill")
-                }.tint(.blue)
-            }
-            .backport.contextMenu(menuItems: {
-#if os(iOS)
-                ContextMenu.NetworkTaskContextMenuItems(task: task, sharedItems: $shareItems)
-#else
-                ContextMenu.NetworkTaskContextMenuItems(task: task, isSharing: $isSharing)
-#endif
-            }, preview: {
-                ConsoleTaskCellPreview(task: task)
-                    .frame(idealWidth: 320, maxHeight: 600)
-            })
-#if os(iOS)
-            .sheet(item: $shareItems, content: ShareView.init)
-#else
-            .popover(isPresented: $isSharing, attachmentAnchor: .point(.leading), arrowEdge: .leading) { ShareNetworkTaskView(task: task) }
-#endif
-        } else {
-            cell
+        cell.swipeActions(edge: .leading, allowsFullSwipe: true) {
+            PinButton(viewModel: .init(task)).tint(.pink)
         }
+        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+            Button(action: {
+#if os(iOS)
+                shareItems = ShareService.share(task, as: .html)
+#else
+                isSharing = true
+#endif
+            }) {
+                Label("Share", systemImage: "square.and.arrow.up.fill")
+            }.tint(.blue)
+        }
+        .backport.contextMenu(menuItems: {
+#if os(iOS)
+            ContextMenu.NetworkTaskContextMenuItems(task: task, sharedItems: $shareItems)
+#else
+            ContextMenu.NetworkTaskContextMenuItems(task: task, isSharing: $isSharing)
+#endif
+        }, preview: {
+            ConsoleTaskCellPreview(task: task)
+                .frame(idealWidth: 320, maxHeight: 600)
+        })
+#if os(iOS)
+        .sheet(item: $shareItems, content: ShareView.init)
+#else
+        .popover(isPresented: $isSharing, attachmentAnchor: .point(.leading), arrowEdge: .leading) { ShareNetworkTaskView(task: task) }
+#endif
 #else
         cell
 #endif

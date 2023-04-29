@@ -76,53 +76,7 @@ extension View {
     var backport: Backport<Self> { Backport(content: self) }
 }
 
-enum SwipeActionEdge {
-    case leading
-    case trailing
-
-#if os(iOS) || os(macOS)
-    @available(iOS 15, tvOS 15, *)
-    var native: HorizontalEdge {
-        switch self {
-        case .leading: return .leading
-        case .trailing: return .trailing
-        }
-    }
-#endif
-}
-
 extension Backport {
-    @ViewBuilder
-    func tint(_ color: Color) -> some View {
-        if #available(iOS 15, tvOS 15, *) {
-            content.tint(color)
-        } else {
-            content.foregroundColor(color)
-        }
-    }
-
-    @ViewBuilder
-    func swipeActions<T: View>(edge: SwipeActionEdge = .trailing, allowsFullSwipe: Bool = true, @ViewBuilder closure: () -> T) -> some View {
-#if os(iOS) || os(macOS)
-        if #available(iOS 15, tvOS 15, *) {
-            content.swipeActions(edge: edge.native, allowsFullSwipe: allowsFullSwipe, content: closure)
-        } else {
-            content
-        }
-#else
-        content
-#endif
-    }
-
-    @ViewBuilder
-    func searchable(text: Binding<String>) -> some View {
-        if #available(iOS 15, tvOS 15, *) {
-            content.searchable(text: text)
-        } else {
-            content
-        }
-    }
-
     @ViewBuilder
     func contextMenu<M: View, P: View>(@ViewBuilder menuItems: () -> M, @ViewBuilder preview: () -> P) -> some View {
 #if !os(watchOS)
@@ -155,29 +109,16 @@ extension Backport {
 #endif
     }
 
-    @ViewBuilder
-    func monospacedDigit() -> some View {
-        if #available(iOS 15, tvOS 15, *) {
-            self.content.monospacedDigit()
-        } else {
-            self.content
-        }
-    }
-
+#if os(macOS)
     @ViewBuilder
     func hideListContentBackground() -> some View {
-#if os(macOS)
         if #available(macOS 13, *) {
             self.content.scrollContentBackground(.hidden)
         } else {
             self.content
         }
-#else
-        self.content
-#endif
     }
 
-#if os(macOS)
     @ViewBuilder
     func listRowSeparators(isHidden: Bool) -> some View {
         if #available(macOS 13, *) {
@@ -191,17 +132,6 @@ extension Backport {
     enum PresentationDetent {
         case large
         case medium
-    }
-}
-
-extension Button {
-    @ViewBuilder
-    static func destructive(action: @escaping () -> Void, label: () -> Label) -> some View {
-        if #available(iOS 15.0, tvOS 15, *) {
-            Button(role: .destructive, action: action, label: label)
-        } else {
-            Button(action: action, label: label)
-        }
     }
 }
 

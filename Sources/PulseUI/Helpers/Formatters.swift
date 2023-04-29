@@ -92,7 +92,11 @@ enum ConsoleFormatter {
     // MARK: Individual Components
 
     static func time(for date: Date) -> String {
-        ConsoleMessageCell.timeFormatter.string(from: date)
+        if #available(iOS 15, tvOS 15, *) {
+            return ConsoleMessageCell.timeFormatter.string(from: date)
+        } else {
+            return ""
+        }
     }
 
     static func status(for task: NetworkTaskEntity) -> String {

@@ -7,6 +7,7 @@ import Pulse
 import CoreData
 import Combine
 
+@available(iOS 15, tvOS 15, *)
 struct ConsoleMessageCell: View {
     let message: LoggerMessageEntity
     var isDisclosureNeeded = false
@@ -15,11 +16,7 @@ struct ConsoleMessageCell: View {
 
     var body: some View {
         let contents = VStack(alignment: .leading, spacing: 4) {
-            if #available(iOS 15, tvOS 15, *) {
-                header.dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-            } else {
-                header
-            }
+            header.dynamicTypeSize(...DynamicTypeSize.xxxLarge)
             Text(message.text)
                 .font(ConsoleConstants.fontBody)
                 .foregroundColor(.textColor(for: message.logLevel))
@@ -55,8 +52,8 @@ struct ConsoleMessageCell: View {
                 Text(ConsoleMessageCell.timeFormatter.string(from: message.createdAt))
                     .lineLimit(1)
                     .font(ConsoleConstants.fontInfo)
+                    .monospacedDigit()
                     .foregroundColor(.secondary)
-                    .backport.monospacedDigit()
                 if isDisclosureNeeded {
                     ListDisclosureIndicator()
                 }
@@ -118,6 +115,7 @@ extension Color {
 }
 
 #if DEBUG
+@available(iOS 15, tvOS 15, *)
 struct ConsoleMessageCell_Previews: PreviewProvider {
     static var previews: some View {
         ConsoleMessageCell(message: try! LoggerStore.mock.allMessages()[0])

@@ -7,8 +7,9 @@ import Pulse
 import Combine
 import SwiftUI
 
+@available(iOS 15, *)
 struct ConsoleListContentView: View {
-    @ObservedObject var viewModel: ConsoleListViewModel
+    @EnvironmentObject var viewModel: ConsoleListViewModel
 
 #if os(macOS)
     let proxy: ScrollViewProxy
@@ -18,18 +19,16 @@ struct ConsoleListContentView: View {
 
     var body: some View {
 #if os(iOS)
-        if #available(iOS 15, *) {
-            if !viewModel.pins.isEmpty, !viewModel.isShowingFocusedEntities {
-                ConsoleListPinsSectionView(viewModel: viewModel)
-                if !viewModel.entities.isEmpty {
-                    PlainListGroupSeparator()
-                }
+        if !viewModel.pins.isEmpty, !viewModel.isShowingFocusedEntities {
+            ConsoleListPinsSectionView(viewModel: viewModel)
+            if !viewModel.entities.isEmpty {
+                PlainListGroupSeparator()
             }
         }
 #endif
 
 #if os(iOS) || os(macOS)
-        if #available(iOS 15, *), let sections = viewModel.sections, !sections.isEmpty {
+        if let sections = viewModel.sections, !sections.isEmpty {
             ForEach(sections, id: \.name) {
                 ConsoleListGroupedSectionView(section: $0, viewModel: viewModel)
             }
@@ -67,7 +66,7 @@ struct ConsoleListContentView: View {
 
     @ViewBuilder
     private var footerView: some View {
-        if #available(iOS 15, *), let session = viewModel.previousSession, !viewModel.isShowingFocusedEntities {
+        if let session = viewModel.previousSession, !viewModel.isShowingFocusedEntities {
             Button(action: { viewModel.buttonShowPreviousSessionTapped(for: session) }) {
                 Text("Show Previous Session")
                     .font(.subheadline)
@@ -142,6 +141,7 @@ struct BottomViewID: Hashable, Identifiable {
 #endif
 
 #if os(iOS) || os(macOS)
+@available(iOS 15, *)
 struct ConsoleStaticList: View {
     let entities: [NSManagedObject]
 
