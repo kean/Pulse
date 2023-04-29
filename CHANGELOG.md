@@ -7,7 +7,6 @@
 - Improve search scope picker and allow searching for in more scopes
 - Add support for "Logs" filters: File, Label, Level
 - Add strings search options to search on macOS
-- The console now defaults to the "Network" mode and remembers your choice persistently
 - Move "Sort By" and "Group" by options to the context menu
 - Remove custom Message and Network filters that were replaced by the search introduced in [Pulse 3.2](https://kean.blog/post/pulse-search). These custom filters will continue to be available in Pulse for Mac (coming soon)
 - Fix an issue where filters were applies automatically to the search results on macOS

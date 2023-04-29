@@ -45,7 +45,7 @@ final class ConsoleEnvironment: ObservableObject {
         case .network: self.title = "Network"
         }
         self.initialMode = mode
-        self.mode = mode == .all ? ConsolePreferences().selectedMode : mode // refactor
+        self.mode = mode
 
         func makeDefaultOptions() -> ConsoleDataSource.PredicateOptions {
             var options = ConsoleDataSource.PredicateOptions()
@@ -73,7 +73,6 @@ final class ConsoleEnvironment: ObservableObject {
 
     private func bind() {
         $mode.sink { [weak self] in
-            ConsolePreferences().selectedMode = $0
             self?.filters.mode = $0
         }.store(in: &cancellables)
 
@@ -105,13 +104,6 @@ final class ConsoleEnvironment: ObservableObject {
         }.show()
 #endif
     }
-}
-
-private struct ConsolePreferences {
-    // We want to save the latest preferences, but not update all open windows
-    // on the change in selection.
-    @AppStorage("console-selected-mode")
-    var selectedMode: ConsoleMode = .network
 }
 
 public enum ConsoleMode: String {

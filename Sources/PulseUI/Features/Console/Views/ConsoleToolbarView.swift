@@ -114,9 +114,15 @@ struct ConsoleModePicker: View {
 
     var body: some View {
         HStack(spacing: spacing) {
-            ConsoleModeButton(title: "Network", details: CountFormatter.string(from: tasksCounter.count), isSelected: environment.mode == .network) { environment.mode = .network }
-            ConsoleModeButton(title: "Logs", details: CountFormatter.string(from: logsCounter.count), isSelected: environment.mode == .logs) { environment.mode = .logs }
-            ConsoleModeButton(title: "All", details: CountFormatter.string(from: logsCounter.count + tasksCounter.count), isSelected: environment.mode == .all) { environment.mode = .all }
+            ConsoleModeButton(title: "All", isSelected: environment.mode == .all) {
+                environment.mode = .all
+            }
+            ConsoleModeButton(title: "Logs", details: CountFormatter.string(from: logsCounter.count), isSelected: environment.mode == .logs) {
+                environment.mode = .logs
+            }
+            ConsoleModeButton(title: "Network", details: CountFormatter.string(from: tasksCounter.count), isSelected: environment.mode == .network) {
+                environment.mode = .network
+            }
         }
     }
 }
