@@ -70,16 +70,8 @@ private func makePredicates(for criteria: ConsoleFilers.Messages) -> [NSPredicat
         }
     }
 
-#if os(iOS) || os(macOS)
-    if criteria.custom.isEnabled {
-        for filter in criteria.custom.filters where !filter.value.isEmpty {
-            if let predicate = filter.makePredicate() {
-                predicates.append(predicate)
-            } else {
-                // Have to be done in code
-            }
-        }
-    }
+#if PULSE_STANDALONE_APP
+    predicates += makeStandalonePredicates(for: criteria)
 #endif
 
     return predicates
@@ -134,16 +126,8 @@ private func makePredicates(for criteria: ConsoleFilers.Network) -> [NSPredicate
         predicates.append(NSPredicate(format: "NOT host IN %@", criteria.host.ignoredHosts))
     }
 
-#if os(iOS) || os(macOS)
-    if criteria.custom.isEnabled {
-        for filter in criteria.custom.filters where !filter.value.isEmpty {
-            if let predicate = filter.makePredicate() {
-                predicates.append(predicate)
-            } else {
-                // Have to be done in code
-            }
-        }
-    }
+#if PULSE_STANDALONE_APP
+    predicates += makeStandalonePredicates(for: criteria)
 #endif
 
     return predicates

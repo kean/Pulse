@@ -21,7 +21,7 @@ struct ConsoleFilers: Hashable {
     struct Messages: Hashable {
         var logLevels = LogLevels()
         var labels = Labels()
-#if os(iOS) || os(macOS)
+#if PULSE_STANDALONE_APP
         var custom = CustomMessageFilters()
 #endif
     }
@@ -30,7 +30,7 @@ struct ConsoleFilers: Hashable {
         var response = Response()
         var host = Host()
         var networking = Networking()
-#if os(iOS) || os(macOS)
+#if PULSE_STANDALONE_APP
         var custom = CustomNetworkFilters()
 #endif
     }
@@ -72,13 +72,6 @@ extension ConsoleFilers {
         var hidden: Set<String> = []
         var focused: String?
     }
-
-#if os(iOS) || os(macOS)
-    struct CustomMessageFilters: ConsoleFilterProtocol {
-        var isEnabled = true
-        var filters: [ConsoleCustomMessageFilter] = [.default]
-    }
-#endif
 
     struct Response: ConsoleFilterProtocol {
         var isEnabled = true
@@ -221,11 +214,4 @@ extension ConsoleFilers {
             case some(NetworkLogger.TaskType)
         }
     }
-
-#if os(iOS) || os(macOS)
-    struct CustomNetworkFilters: ConsoleFilterProtocol {
-        var isEnabled = true
-        var filters: [ConsoleCustomNetworkFilter] = [.default]
-    }
-#endif
 }

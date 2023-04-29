@@ -45,19 +45,15 @@ struct ConsoleFiltersView: View {
         sessionsSection
 
         if environment.mode == .network {
-#if os(iOS) || os(macOS)
-            if #available(iOS 15, *) {
-                customNetworkFiltersSection
-            }
+#if PULSE_STANDALONE_APP
+            customNetworkFiltersSection
 #endif
             responseSection
             domainsSection
             networkingSection
         } else {
-#if os(iOS) || os(macOS)
-            if #available(iOS 15, *) {
-                customMessageFiltersSection
-            }
+#if PULSE_STANDALONE_APP
+            customMessageFiltersSection
 #endif
             logLevelsSection
             labelsSection
@@ -99,17 +95,6 @@ extension ConsoleFiltersView {
 // MARK: - ConsoleSearchView (Message)
 
 extension ConsoleFiltersView {
-#if os(iOS) || os(macOS)
-    @available(iOS 15, *)
-    var customMessageFiltersSection: some View {
-        ConsoleSection(header: {
-            ConsoleSectionHeader(icon: "line.horizontal.3.decrease.circle", title: "Filters", filter: $viewModel.criteria.messages.custom)
-        }, content: {
-            ConsoleSearchCustomMessageFiltersSection(selection: $viewModel.criteria.messages.custom)
-        })
-    }
-#endif
-
     var logLevelsSection: some View {
         ConsoleSection(header: {
             ConsoleSectionHeader(icon: "flag", title: "Levels", filter: $viewModel.criteria.messages.logLevels)
@@ -130,17 +115,6 @@ extension ConsoleFiltersView {
 // MARK: - ConsoleSearchView (Network)
 
 extension ConsoleFiltersView {
-#if os(iOS) || os(macOS)
-    @available(iOS 15, *)
-    var customNetworkFiltersSection: some View {
-        ConsoleSection(header: {
-            ConsoleSectionHeader(icon: "line.horizontal.3.decrease.circle", title: "Filters", filter: $viewModel.criteria.network.custom)
-        }, content: {
-            ConsoleSearchCustomNetworkFiltersSection(selection: $viewModel.criteria.network.custom)
-        })
-    }
-#endif
-
     var responseSection: some View {
         ConsoleSection(header: {
             ConsoleSectionHeader(icon: "arrow.down.circle", title:  "Response", filter: $viewModel.criteria.network.response)
