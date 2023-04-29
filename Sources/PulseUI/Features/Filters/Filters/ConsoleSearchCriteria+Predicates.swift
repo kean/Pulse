@@ -80,48 +80,6 @@ private func makePredicates(for criteria: ConsoleFilers.Messages) -> [NSPredicat
 private func makePredicates(for criteria: ConsoleFilers.Network) -> [NSPredicate] {
     var predicates = [NSPredicate]()
 
-    if criteria.response.isEnabled {
-        if let value = criteria.response.responseSize.byteCountRange.lowerBound {
-            predicates.append(NSPredicate(format: "responseBodySize >= %d", value))
-        }
-        if let value = criteria.response.responseSize.byteCountRange.upperBound {
-            predicates.append(NSPredicate(format: "responseBodySize <= %d", value))
-        }
-        if let value = Int(criteria.response.statusCode.range.lowerBound) {
-            predicates.append(NSPredicate(format: "statusCode >= %d", value))
-        }
-        if let value = Int(criteria.response.statusCode.range.upperBound) {
-            predicates.append(NSPredicate(format: "statusCode <= %d", value))
-        }
-        if let value = criteria.response.duration.durationRange.lowerBound {
-            predicates.append(NSPredicate(format: "duration >= %f", value))
-        }
-        if let value = criteria.response.duration.durationRange.upperBound {
-            predicates.append(NSPredicate(format: "duration <= %f", value))
-        }
-        switch criteria.response.contentType.contentType {
-        case .any: break
-        default: predicates.append(NSPredicate(format: "responseContentType CONTAINS %@", criteria.response.contentType.contentType.rawValue))
-        }
-    }
-
-    if criteria.networking.isEnabled {
-        if criteria.networking.isRedirect {
-            predicates.append(NSPredicate(format: "redirectCount >= 1"))
-        }
-        switch criteria.networking.source {
-        case .any:
-            break
-        case .network:
-            predicates.append(NSPredicate(format: "isFromCache == NO"))
-        case .cache:
-            predicates.append(NSPredicate(format: "isFromCache == YES"))
-        }
-        if case .some(let taskType) = criteria.networking.taskType {
-            predicates.append(NSPredicate(format: "taskType == %i", taskType.rawValue))
-        }
-    }
-
     if criteria.host.isEnabled, !criteria.host.ignoredHosts.isEmpty {
         predicates.append(NSPredicate(format: "NOT host IN %@", criteria.host.ignoredHosts))
     }

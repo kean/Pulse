@@ -142,7 +142,7 @@ private struct _ConsoleListView: View {
                     if isSearching && !searchViewModel.parameters.isEmpty {
                         ConsoleSearchResultsListContentView()
                     } else {
-                        ConsoleListContentView(viewModel: listViewModel, proxy: proxy)
+                        ConsoleListContentView(proxy: proxy)
                     }
                 }
             }

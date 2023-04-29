@@ -49,9 +49,12 @@ struct ConsoleFiltersView: View {
 #if PULSE_STANDALONE_APP
             customNetworkFiltersSection
 #endif
-            responseSection
             domainsSection
+
+#if PULSE_STANDALONE_APP
+            responseSection
             networkingSection
+#endif
         } else {
 #if PULSE_STANDALONE_APP
             customMessageFiltersSection
@@ -119,34 +122,11 @@ extension ConsoleFiltersView {
 
 @available(iOS 15, *)
 extension ConsoleFiltersView {
-    var responseSection: some View {
-        ConsoleSection(header: {
-            ConsoleSectionHeader(icon: "arrow.down.circle", title:  "Response", filter: $viewModel.criteria.network.response)
-        }, content: {
-#if os(iOS) || os(macOS)
-            ConsoleSearchStatusCodeCell(selection: $viewModel.criteria.network.response.statusCode.range)
-            ConsoleSearchDurationCell(selection: $viewModel.criteria.network.response.duration)
-            ConsoleSearchResponseSizeCell(selection: $viewModel.criteria.network.response.responseSize)
-#endif
-            ConsoleSearchContentTypeCell(selection: $viewModel.criteria.network.response.contentType.contentType)
-        })
-    }
-
     var domainsSection: some View {
         ConsoleSection(header: {
             ConsoleSectionHeader(icon: "server.rack", title: "Hosts", filter: $viewModel.criteria.network.host)
         }, content: {
             ConsoleDomainsSelectionView(viewModel: viewModel)
-        })
-    }
-
-    var networkingSection: some View {
-        ConsoleSection(header: {
-            ConsoleSectionHeader(icon: "arrowshape.zigzag.right", title: "Networking", filter: $viewModel.criteria.network.networking)
-        }, content: {
-            ConsoleSearchTaskTypeCell(selection: $viewModel.criteria.network.networking.taskType)
-            ConsoleSearchResponseSourceCell(selection: $viewModel.criteria.network.networking.source)
-            ConsoleSearchToggleCell(title: "Redirect", isOn: $viewModel.criteria.network.networking.isRedirect)
         })
     }
 }

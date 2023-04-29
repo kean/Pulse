@@ -48,13 +48,7 @@
 		0C3002B32986CEF30055F6C2 /* LoggerStoreIndex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C3002B22986CEF30055F6C2 /* LoggerStoreIndex.swift */; };
 		0C31FFB9298211AF002A7D64 /* ConsoleEntityDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C31FFB8298211AF002A7D64 /* ConsoleEntityDetailsView.swift */; };
 		0C37046329FA08B800BA51B8 /* ConsoleSearchRecentSearchesStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C37046229FA08B800BA51B8 /* ConsoleSearchRecentSearchesStore.swift */; };
-		0C40C094296F7641009ECF16 /* ConsoleSearchContentTypeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C40C093296F7641009ECF16 /* ConsoleSearchContentTypeCell.swift */; };
-		0C40C096296F7738009ECF16 /* ConsoleSearchTaskTypeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C40C095296F7738009ECF16 /* ConsoleSearchTaskTypeCell.swift */; };
-		0C40C098296F777D009ECF16 /* ConsoleSearchResponseSourceCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C40C097296F777D009ECF16 /* ConsoleSearchResponseSourceCell.swift */; };
 		0C40C09A296F77F1009ECF16 /* ConsoleSearchToggleCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C40C099296F77F1009ECF16 /* ConsoleSearchToggleCell.swift */; };
-		0C40C09C296F78C6009ECF16 /* ConsoleSearchDurationCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C40C09B296F78C6009ECF16 /* ConsoleSearchDurationCell.swift */; };
-		0C40C09E296F7B0A009ECF16 /* ConsoleSearchResponseSizeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C40C09D296F7B0A009ECF16 /* ConsoleSearchResponseSizeCell.swift */; };
-		0C40C0A0296F7BD3009ECF16 /* ConsoleSearchStatusCodeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C40C09F296F7BD3009ECF16 /* ConsoleSearchStatusCodeCell.swift */; };
 		0C40C0A4296F849E009ECF16 /* ConsoleSearchTimePeriodCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C40C0A3296F849E009ECF16 /* ConsoleSearchTimePeriodCell.swift */; };
 		0C4BF92D298817EC0086A6A7 /* IntlineTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C4BF92C298817EC0086A6A7 /* IntlineTabBar.swift */; };
 		0C5A278C29737C1E00D44C6B /* Pulse_Demo_iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C767816268F88BB0058F69B /* Pulse_Demo_iOSApp.swift */; };
@@ -190,11 +184,9 @@
 		0CF0D63A296F189600EED9D4 /* ContextMenus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5AD296F189500EED9D4 /* ContextMenus.swift */; };
 		0CF0D63F296F189600EED9D4 /* ConsoleFiltersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B5296F189500EED9D4 /* ConsoleFiltersView.swift */; };
 		0CF0D640296F189600EED9D4 /* ConsoleFilterViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B6296F189500EED9D4 /* ConsoleFilterViewModel.swift */; };
-		0CF0D644296F189600EED9D4 /* ConsoleSearchInlinePickerMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5BB296F189500EED9D4 /* ConsoleSearchInlinePickerMenu.swift */; };
 		0CF0D645296F189600EED9D4 /* ConsoleSearchSectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5BC296F189500EED9D4 /* ConsoleSearchSectionHeader.swift */; };
 		0CF0D649296F189600EED9D4 /* DateRangePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5C0296F189500EED9D4 /* DateRangePicker.swift */; };
 		0CF0D64A296F189600EED9D4 /* ConsoleSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5C1296F189500EED9D4 /* ConsoleSection.swift */; };
-		0CF0D64B296F189600EED9D4 /* RangePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5C2296F189500EED9D4 /* RangePicker.swift */; };
 		0CF0D650296F189600EED9D4 /* ConsoleFilers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5C8296F189500EED9D4 /* ConsoleFilers.swift */; };
 		0CF0D652296F189600EED9D4 /* ConsoleSearchCriteria+Predicates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5CA296F189500EED9D4 /* ConsoleSearchCriteria+Predicates.swift */; };
 		0CF0D655296F189600EED9D4 /* SettingsView-watchos-tvos.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5CF296F189500EED9D4 /* SettingsView-watchos-tvos.swift */; };
@@ -489,13 +481,7 @@
 		0C3002B22986CEF30055F6C2 /* LoggerStoreIndex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggerStoreIndex.swift; sourceTree = "<group>"; };
 		0C31FFB8298211AF002A7D64 /* ConsoleEntityDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleEntityDetailsView.swift; sourceTree = "<group>"; };
 		0C37046229FA08B800BA51B8 /* ConsoleSearchRecentSearchesStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchRecentSearchesStore.swift; sourceTree = "<group>"; };
-		0C40C093296F7641009ECF16 /* ConsoleSearchContentTypeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchContentTypeCell.swift; sourceTree = "<group>"; };
-		0C40C095296F7738009ECF16 /* ConsoleSearchTaskTypeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchTaskTypeCell.swift; sourceTree = "<group>"; };
-		0C40C097296F777D009ECF16 /* ConsoleSearchResponseSourceCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchResponseSourceCell.swift; sourceTree = "<group>"; };
 		0C40C099296F77F1009ECF16 /* ConsoleSearchToggleCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchToggleCell.swift; sourceTree = "<group>"; };
-		0C40C09B296F78C6009ECF16 /* ConsoleSearchDurationCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchDurationCell.swift; sourceTree = "<group>"; };
-		0C40C09D296F7B0A009ECF16 /* ConsoleSearchResponseSizeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchResponseSizeCell.swift; sourceTree = "<group>"; };
-		0C40C09F296F7BD3009ECF16 /* ConsoleSearchStatusCodeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchStatusCodeCell.swift; sourceTree = "<group>"; };
 		0C40C0A3296F849E009ECF16 /* ConsoleSearchTimePeriodCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchTimePeriodCell.swift; sourceTree = "<group>"; };
 		0C4BF92C298817EC0086A6A7 /* IntlineTabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntlineTabBar.swift; sourceTree = "<group>"; };
 		0C516FBA26015DD2004813B4 /* Pulse Demo iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pulse Demo iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -639,11 +625,9 @@
 		0CF0D5B0296F189500EED9D4 /* MockStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockStore.swift; sourceTree = "<group>"; };
 		0CF0D5B5296F189500EED9D4 /* ConsoleFiltersView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleFiltersView.swift; sourceTree = "<group>"; };
 		0CF0D5B6296F189500EED9D4 /* ConsoleFilterViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleFilterViewModel.swift; sourceTree = "<group>"; };
-		0CF0D5BB296F189500EED9D4 /* ConsoleSearchInlinePickerMenu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleSearchInlinePickerMenu.swift; sourceTree = "<group>"; };
 		0CF0D5BC296F189500EED9D4 /* ConsoleSearchSectionHeader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleSearchSectionHeader.swift; sourceTree = "<group>"; };
 		0CF0D5C0296F189500EED9D4 /* DateRangePicker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DateRangePicker.swift; sourceTree = "<group>"; };
 		0CF0D5C1296F189500EED9D4 /* ConsoleSection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleSection.swift; sourceTree = "<group>"; };
-		0CF0D5C2296F189500EED9D4 /* RangePicker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RangePicker.swift; sourceTree = "<group>"; };
 		0CF0D5C8296F189500EED9D4 /* ConsoleFilers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleFilers.swift; sourceTree = "<group>"; };
 		0CF0D5CA296F189500EED9D4 /* ConsoleSearchCriteria+Predicates.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ConsoleSearchCriteria+Predicates.swift"; sourceTree = "<group>"; };
 		0CF0D5CF296F189500EED9D4 /* SettingsView-watchos-tvos.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SettingsView-watchos-tvos.swift"; sourceTree = "<group>"; };
@@ -1009,13 +993,7 @@
 		0CDFB839296F5B9D0071EF77 /* Cells */ = {
 			isa = PBXGroup;
 			children = (
-				0C40C093296F7641009ECF16 /* ConsoleSearchContentTypeCell.swift */,
-				0C40C095296F7738009ECF16 /* ConsoleSearchTaskTypeCell.swift */,
-				0C40C097296F777D009ECF16 /* ConsoleSearchResponseSourceCell.swift */,
 				0C40C099296F77F1009ECF16 /* ConsoleSearchToggleCell.swift */,
-				0C40C09B296F78C6009ECF16 /* ConsoleSearchDurationCell.swift */,
-				0C40C09D296F7B0A009ECF16 /* ConsoleSearchResponseSizeCell.swift */,
-				0C40C09F296F7BD3009ECF16 /* ConsoleSearchStatusCodeCell.swift */,
 				0C40C0A3296F849E009ECF16 /* ConsoleSearchTimePeriodCell.swift */,
 				0CDC3BEC2971B936003BD1FF /* ConsoleSearchLogLevelsCell.swift */,
 			);
@@ -1281,10 +1259,8 @@
 				0CC3808229F419C700EF22EE /* ConsoleLabelsSelectionView.swift */,
 				0CC3808429F41CF600EF22EE /* ConsoleDomainsSelectionView.swift */,
 				0CDC3BE92970FA47003BD1FF /* ConsoleSearchListSelectionView.swift */,
-				0CF0D5BB296F189500EED9D4 /* ConsoleSearchInlinePickerMenu.swift */,
 				0CE3970929EAD73700FF01C0 /* ConsoleSessionsPickerView.swift */,
 				0CF0D5C0296F189500EED9D4 /* DateRangePicker.swift */,
-				0CF0D5C2296F189500EED9D4 /* RangePicker.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -2019,16 +1995,13 @@
 				0CF0D66B296F189600EED9D4 /* NetworkCookiesCell.swift in Sources */,
 				0CF0D631296F189600EED9D4 /* RichTextViewModel.swift in Sources */,
 				0CF0D673296F189600EED9D4 /* NetworkDetailsView.swift in Sources */,
-				0C40C0A0296F7BD3009ECF16 /* ConsoleSearchStatusCodeCell.swift in Sources */,
 				0CF0D62B296F189600EED9D4 /* FileViewerViewModel.swift in Sources */,
 				0CF0D67F296F189600EED9D4 /* ConsoleContextMenu-ios.swift in Sources */,
 				0CF0D675296F189600EED9D4 /* NetworkInspectorView-ios.swift in Sources */,
 				0CF0D64A296F189600EED9D4 /* ConsoleSection.swift in Sources */,
 				0CB63A132973A12300525165 /* ConsoleSearchListContentView.swift in Sources */,
 				0CB63A2C2975C40100525165 /* ConsoleSearchFilter.swift in Sources */,
-				0CF0D64B296F189600EED9D4 /* RangePicker.swift in Sources */,
 				0CB63A25297592D400525165 /* Parser.swift in Sources */,
-				0C40C096296F7738009ECF16 /* ConsoleSearchTaskTypeCell.swift in Sources */,
 				0CB63A2729759D2E00525165 /* ConsoleSearchToken.swift in Sources */,
 				0CF0D679296F189600EED9D4 /* ConsoleView-ios.swift in Sources */,
 				0CF0D661296F189600EED9D4 /* NetworkInspectorTransferInfoView.swift in Sources */,
@@ -2061,7 +2034,6 @@
 				0C9C465929F00272007897E8 /* ConsoleListView.swift in Sources */,
 				0CF0D678296F189600EED9D4 /* LoggerStoreSizeChart.swift in Sources */,
 				0CF0D676296F189600EED9D4 /* NetworkInspectorViewModel.swift in Sources */,
-				0C40C098296F777D009ECF16 /* ConsoleSearchResponseSourceCell.swift in Sources */,
 				0C3002B32986CEF30055F6C2 /* LoggerStoreIndex.swift in Sources */,
 				0CF0D689296F189600EED9D4 /* MainViewController.swift in Sources */,
 				0C840D4C29E0A09B00362214 /* SessionsView.swift in Sources */,
@@ -2070,7 +2042,6 @@
 				0CF0D610296F189600EED9D4 /* SpinnerView.swift in Sources */,
 				0CF0D639296F189600EED9D4 /* PinButton.swift in Sources */,
 				0CB17F1A2978ABBA004E33F4 /* ManagedObjectsCountObserver.swift in Sources */,
-				0CF0D644296F189600EED9D4 /* ConsoleSearchInlinePickerMenu.swift in Sources */,
 				0CF0D60E296F189600EED9D4 /* TextRenderer.swift in Sources */,
 				0CF0D618296F189600EED9D4 /* DecodingErrorsPreviews.swift in Sources */,
 				0CF0D686296F189600EED9D4 /* ConsoleMessageCell.swift in Sources */,
@@ -2084,8 +2055,6 @@
 				0C603BDA29E45DCC004FD4ED /* ConsoleListGroupedSectionView.swift in Sources */,
 				0CF0D672296F189600EED9D4 /* NetworkInspectorRequestBodyView.swift in Sources */,
 				0CF0D655296F189600EED9D4 /* SettingsView-watchos-tvos.swift in Sources */,
-				0C40C09C296F78C6009ECF16 /* ConsoleSearchDurationCell.swift in Sources */,
-				0C40C09E296F7B0A009ECF16 /* ConsoleSearchResponseSizeCell.swift in Sources */,
 				0CB63A1B2974A5D200525165 /* ConsoleSearchResultsSectionView.swift in Sources */,
 				0CF0D667296F189600EED9D4 /* NetworkResponseBodyCell.swift in Sources */,
 				0CF0D662296F189600EED9D4 /* TimingViewModel+Metrics.swift in Sources */,
@@ -2094,7 +2063,6 @@
 				0CF0D670296F189600EED9D4 /* NetworkInspectorView-tvos.swift in Sources */,
 				0CF0D617296F189600EED9D4 /* TextUtilities.swift in Sources */,
 				0CF0D628296F189600EED9D4 /* ShareView.swift in Sources */,
-				0C40C094296F7641009ECF16 /* ConsoleSearchContentTypeCell.swift in Sources */,
 				0CF0D62D296F189600EED9D4 /* RichTextViewSearchToobar-macos.swift in Sources */,
 				0CF0D688296F189600EED9D4 /* ConsoleEnvironment.swift in Sources */,
 				0CF0D66D296F189600EED9D4 /* NetworkRequestBodyCell.swift in Sources */,
