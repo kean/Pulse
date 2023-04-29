@@ -5,7 +5,7 @@
 import SwiftUI
 import Pulse
 
-@available(iOS 15, tvOS 15, *)
+@available(iOS 15, *)
 struct ConsoleSearchListSelectionView<Data: RandomAccessCollection, ID: Hashable, Label: View>: View {
     let title: String
     let items: Data
@@ -148,7 +148,7 @@ struct ConsoleSearchListCell: View {
 }
 
 #if DEBUG
-@available(iOS 15, tvOS 15, *)
+@available(iOS 15, *)
 struct ConsoleSearchListSelectionView_Previews: PreviewProvider {
     static var previews: some View {
         ConsoleSearchListSelectionViewDemo()
@@ -156,7 +156,7 @@ struct ConsoleSearchListSelectionView_Previews: PreviewProvider {
     }
 }
 
-@available(iOS 15, tvOS 15, *)
+@available(iOS 15, *)
 private struct ConsoleSearchListSelectionViewDemo: View {
     @State private var selection: Set<String>  = []
 

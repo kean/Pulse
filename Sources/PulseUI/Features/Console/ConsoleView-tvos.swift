@@ -2,12 +2,12 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
+#if os(tvOS)
+
 import SwiftUI
 import CoreData
 import Pulse
 import Combine
-
-#if os(tvOS)
 
 public struct ConsoleView: View {
     @StateObject private var environment: ConsoleEnvironment
@@ -22,7 +22,7 @@ public struct ConsoleView: View {
         GeometryReader { proxy in
             HStack {
                 List {
-                    ConsoleListContentView(viewModel: listViewModel)
+                    ConsoleListContentView()
                 }
 
                 // TODO: Not sure it's valid
@@ -38,6 +38,7 @@ public struct ConsoleView: View {
             .onDisappear { listViewModel.isViewVisible = false }
         }
         .injecting(environment)
+        .environmentObject(listViewModel)
     }
 }
 

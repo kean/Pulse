@@ -9,7 +9,7 @@ import Pulse
 import CoreData
 import Combine
 
-@available(iOS 15, tvOS 15, *)
+@available(iOS 15, *)
 struct ConsoleSearchResultView: View {
     let viewModel: ConsoleSearchResultViewModel
     var limit: Int = 4
@@ -149,7 +149,7 @@ struct ConsoleSearchResultView: View {
     }
 }
 
-@available(iOS 15, tvOS 15, *)
+@available(iOS 15, *)
 struct ConsoleSearchResultDetailsView: View {
     let viewModel: ConsoleSearchResultViewModel
 
@@ -164,7 +164,7 @@ struct ConsoleSearchResultDetailsView: View {
 }
 
 #if os(iOS)
-@available(iOS 15, tvOS 15, *)
+@available(iOS 15, *)
 struct PlainListGroupSeparator: View {
     var body: some View {
         Rectangle().foregroundColor(.clear) // DIY separator
@@ -176,7 +176,7 @@ struct PlainListGroupSeparator: View {
 }
 #endif
 
-@available(iOS 15, tvOS 15, *)
+@available(iOS 15, *)
 struct PlainListSectionHeader<Content: View>: View {
     var title: String?
     @ViewBuilder let content: () -> Content
@@ -206,14 +206,14 @@ struct PlainListSectionHeader<Content: View>: View {
     }
 }
 
-@available(iOS 15, tvOS 15, *)
+@available(iOS 15, *)
 extension PlainListSectionHeader where Content == Text {
     init(title: String) {
         self.init(title: title, content: { Text(title) })
     }
 }
 
-@available(iOS 15, tvOS 15, *)
+@available(iOS 15, *)
 struct PlainListExpandableSectionHeader<Destination: View>: View {
     let title: String
     let count: Int
@@ -242,7 +242,7 @@ struct PlainListExpandableSectionHeader<Destination: View>: View {
     }
 }
 
-@available(iOS 15, tvOS 15, *)
+@available(iOS 15, *)
 struct PlainListSeeAllView: View {
     let count: Int
 
@@ -255,7 +255,7 @@ struct PlainListSeeAllView: View {
     }
 }
 
-@available(iOS 15, tvOS 15, *)
+@available(iOS 15, *)
 struct PlainListSectionHeaderSeparator: View {
     let title: String
 

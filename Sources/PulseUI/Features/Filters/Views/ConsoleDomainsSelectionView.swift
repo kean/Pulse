@@ -6,7 +6,7 @@ import SwiftUI
 import Pulse
 import Combine
 
-@available(iOS 15, tvOS 15, *)
+@available(iOS 15, *)
 struct ConsoleDomainsSelectionView: View {
     @ObservedObject var viewModel: ConsoleFiltersViewModel
     @EnvironmentObject private var index: LoggerStoreIndex

@@ -16,7 +16,7 @@ extension Character {
     }
 }
 
-@available(iOS 15, tvOS 15, *)
+@available(iOS 15, *)
 extension AttributedString {
     init(_ string: String, _ configure: (inout AttributeContainer) -> Void) {
         var attributes = AttributeContainer()

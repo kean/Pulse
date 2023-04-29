@@ -25,7 +25,7 @@ struct NetworkInspectorTransactionView: View {
         NavigationLink(destination: destintionTransactionDetails) {
             VStack(alignment: .leading, spacing: 4) {
                 Text(viewModel.title)
-                if #available(iOS 15, tvOS 15, *), let size = viewModel.transferSizeViewModel {
+                if #available(iOS 15, *), let size = viewModel.transferSizeViewModel {
                     transferSizeView(size: size)
                 }
             }
@@ -33,7 +33,7 @@ struct NetworkInspectorTransactionView: View {
         NetworkRequestInfoCell(viewModel: viewModel.requestViewModel)
     }
     
-    @available(iOS 15, tvOS 15, *)
+    @available(iOS 15, *)
     private func transferSizeView(size: NetworkInspectorTransferInfoViewModel) -> some View {
         let font = TextHelper().font(style: .init(role: .subheadline, style: .monospacedDigital, width: .condensed))
         return (Text(Image(systemName: "arrow.down.circle")) +

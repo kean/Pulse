@@ -9,7 +9,7 @@ import Pulse
 import CoreData
 import Combine
 
-@available(iOS 15, tvOS 15, *)
+@available(iOS 15, *)
 struct ConsoleSearchSuggestionsViewModel {
     let searches: [ConsoleSearchSuggestion]
     let filters: [ConsoleSearchSuggestion]
@@ -37,7 +37,7 @@ struct ConsoleSearchSuggestionsContext {
     }
 }
 
-@available(iOS 15, tvOS 15, *)
+@available(iOS 15, *)
 final class ConsoleNetworkSearchSuggestionsService {
     let recents: ConsoleSearchRecentSearchesStore
     let mode: ConsoleMode
@@ -143,7 +143,7 @@ final class ConsoleNetworkSearchSuggestionsService {
     }
 }
 
-@available(iOS 15, tvOS 15, *)
+@available(iOS 15, *)
 struct ConsoleSearchSuggestion: Identifiable {
     let id = UUID()
     let text: AttributedString

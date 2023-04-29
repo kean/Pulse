@@ -129,7 +129,7 @@ private struct _ConsoleTaskCell: View {
 }
 
 #if os(iOS) || os(macOS)
-@available(iOS 15, tvOS 15, *)
+@available(iOS 15, *)
 private struct ConsoleMessageCellPreview: View {
     let message: LoggerMessageEntity
 
@@ -140,7 +140,7 @@ private struct ConsoleMessageCellPreview: View {
     }
 }
 
-@available(iOS 15, tvOS 15, *)
+@available(iOS 15, *)
 private struct ConsoleTaskCellPreview: View {
     let task: NetworkTaskEntity
 
@@ -151,7 +151,7 @@ private struct ConsoleTaskCellPreview: View {
     }
 }
 
-@available(iOS 15, tvOS 15, *)
+@available(iOS 15, *)
 private struct TextViewPreview: View {
     let string: NSAttributedString
 

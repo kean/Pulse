@@ -12,7 +12,7 @@ struct RichTextView: View {
 
     var body: some View {
         ScrollView {
-            if #available(tvOS 15.0, *), let string = viewModel.attributedString {
+            if let string = viewModel.attributedString {
                 Text(string)
             } else {
                 Text(viewModel.text)
@@ -20,9 +20,7 @@ struct RichTextView: View {
         }
 #if os(watchOS)
         .toolbar {
-            if #available(watchOS 9.0, *) {
-                ShareLink(item: viewModel.text)
-            }
+            ShareLink(item: viewModel.text)
         }
 #endif
     }
@@ -30,13 +28,7 @@ struct RichTextView: View {
 
 final class RichTextViewModel: ObservableObject {
     let text: String
-
-    @available(tvOS 15.0, *)
-    var attributedString: AttributedString? {
-        _attributedString as? AttributedString
-    }
-
-    private var _attributedString: Any?
+    let attributedString: AttributedString?
 
     var isLinkDetectionEnabled = true
     var isLineNumberRulerEnabled = false
@@ -46,12 +38,11 @@ final class RichTextViewModel: ObservableObject {
 
     init(string: String) {
         self.text = string
+        self.attributedString = nil
     }
 
     init(string: NSAttributedString, contentType: NetworkLogger.ContentType? = nil) {
-        if #available(tvOS 15.0, *) {
-            self._attributedString = try? AttributedString(string, including: \.uiKit)
-        }
+        self.attributedString = try? AttributedString(string, including: \.uiKit)
         self.text = string.string
     }
 }

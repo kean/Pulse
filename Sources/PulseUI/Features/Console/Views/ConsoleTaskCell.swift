@@ -7,7 +7,7 @@ import Pulse
 import Combine
 import CoreData
 
-@available(iOS 15, tvOS 15, *)
+@available(iOS 15, *)
 struct ConsoleTaskCell: View {
     @ObservedObject var task: NetworkTaskEntity
     var isDisclosureNeeded: Bool
@@ -162,7 +162,7 @@ private struct ConsoleProgressText: View {
 }
 
 #if DEBUG
-@available(iOS 15, tvOS 15, *)
+@available(iOS 15, *)
 struct ConsoleTaskCell_Previews: PreviewProvider {
     static var previews: some View {
         ConsoleTaskCell(task: LoggerStore.preview.entity(for: .login))

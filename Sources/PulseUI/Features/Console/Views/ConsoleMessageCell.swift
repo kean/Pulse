@@ -7,7 +7,7 @@ import Pulse
 import CoreData
 import Combine
 
-@available(iOS 15, tvOS 15, *)
+@available(iOS 15, *)
 struct ConsoleMessageCell: View {
     let message: LoggerMessageEntity
     var isDisclosureNeeded = false
@@ -115,7 +115,7 @@ extension Color {
 }
 
 #if DEBUG
-@available(iOS 15, tvOS 15, *)
+@available(iOS 15, *)
 struct ConsoleMessageCell_Previews: PreviewProvider {
     static var previews: some View {
         ConsoleMessageCell(message: try! LoggerStore.mock.allMessages()[0])

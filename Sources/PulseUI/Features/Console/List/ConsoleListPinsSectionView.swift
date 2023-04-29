@@ -9,7 +9,7 @@ import Pulse
 import Combine
 import SwiftUI
 
-@available(iOS 15, tvOS 15, *)
+@available(iOS 15, *)
 struct ConsoleListPinsSectionView: View {
     @ObservedObject var viewModel: ConsoleListViewModel
 

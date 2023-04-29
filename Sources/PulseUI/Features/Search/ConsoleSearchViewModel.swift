@@ -341,7 +341,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     }
 }
 
-@available(iOS 15, tvOS 15, *)
+@available(iOS 15, *)
 struct ConsoleSearchResultViewModel: Identifiable {
     var id: ConsoleSearchResultKey { ConsoleSearchResultKey(id: entity.objectID) }
     let entity: NSManagedObject

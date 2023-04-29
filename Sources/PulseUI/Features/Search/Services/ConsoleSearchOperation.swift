@@ -9,13 +9,13 @@ import Pulse
 import CoreData
 import Combine
 
-@available(iOS 15, tvOS 15, *)
+@available(iOS 15, *)
 protocol ConsoleSearchOperationDelegate: AnyObject {
     func searchOperation(_ operation: ConsoleSearchOperation, didAddResults results: [ConsoleSearchResultViewModel])
     func searchOperationDidFinish(_ operation: ConsoleSearchOperation, hasMore: Bool)
 }
 
-@available(iOS 15, tvOS 15, *)
+@available(iOS 15, *)
 final class ConsoleSearchOperation {
     private let parameters: ConsoleSearchParameters
     private var entities: [NSManagedObject]
@@ -257,7 +257,7 @@ struct ConsoleSearchMatch {
     static let limit = 1000
 }
 
-@available(iOS 15, tvOS 15, *)
+@available(iOS 15, *)
 final class ConsoleSearchService {
     private let cache = NSCache<NSManagedObjectID, CachedString>()
 

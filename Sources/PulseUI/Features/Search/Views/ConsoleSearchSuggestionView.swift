@@ -9,7 +9,7 @@ import Pulse
 import CoreData
 import Combine
 
-@available(iOS 15, tvOS 15, *)
+@available(iOS 15, *)
 struct ConsoleSearchSuggestionView: View {
     let suggestion: ConsoleSearchSuggestion
     let action: () -> Void

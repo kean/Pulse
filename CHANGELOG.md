@@ -3,6 +3,7 @@
 ## WIP
 
 - `ConsoleView` no longer supports iOS 14, but the packge can still be installed in projects that require iOS 14
+- Increase minimum deployment target on tvOS 14.0 → 15.0
 
 ## Pulse 3.7.0
 
