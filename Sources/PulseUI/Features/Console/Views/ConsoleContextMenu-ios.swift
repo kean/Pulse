@@ -50,7 +50,13 @@ struct ConsoleContextMenu: View {
                 }
             }
         } label: {
-            Image(systemName: "ellipsis.circle")
+            if #available(iOS 15, *) {
+                Image(systemName: "ellipsis.circle")
+            } else {
+                Image(systemName: "ellipsis.circle")
+                    .font(.title2)
+                    .padding(.leading, 8)
+            }
         }
     }
 

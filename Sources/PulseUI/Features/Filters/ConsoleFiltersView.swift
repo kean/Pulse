@@ -49,14 +49,18 @@ struct ConsoleFiltersView: View {
             customNetworkFiltersSection
 #endif
             responseSection
-            domainsSection
+            if #available(iOS 15, *) {
+                domainsSection
+            }
             networkingSection
         } else {
 #if PULSE_STANDALONE_APP
             customMessageFiltersSection
 #endif
             logLevelsSection
-            labelsSection
+            if #available(iOS 15, *) {
+                labelsSection
+            }
         }
 
 #if os(iOS) || os(macOS)

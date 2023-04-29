@@ -28,11 +28,7 @@ struct RichTextView: View {
     var body: some View {
         contents
             .onAppear { viewModel.prepare(searchContext) }
-            .toolbar {
-                ToolbarItemGroup(placement: .navigationBarTrailing) {
-                    navigationBarTrailingItems
-                }
-            }
+            .navigationBarItems(trailing: navigationBarTrailingItems)
             .sheet(item: $shareItems, content: ShareView.init)
             .sheet(isPresented: $isWebViewOpen) {
                 NavigationView {
@@ -88,7 +84,7 @@ struct RichTextView: View {
                     viewModel.textStorage
                 }
             }, label: {
-                Label("Share...", systemImage: "square.and.arrow.up")
+                Image(systemName: "square.and.arrow.up")
             })
             // TODO: This should be injected/added outside of the text view
             if viewModel.contentType?.isHTML ?? false {
