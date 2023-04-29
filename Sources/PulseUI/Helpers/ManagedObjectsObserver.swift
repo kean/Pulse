@@ -45,6 +45,6 @@ extension ManagedObjectsObserver where T == LoggerSessionEntity {
         let request = NSFetchRequest<LoggerSessionEntity>(entityName: "\(LoggerSessionEntity.self)")
         request.sortDescriptors = [NSSortDescriptor(keyPath: \LoggerSessionEntity.createdAt, ascending: false)]
 
-        return ManagedObjectsObserver(request: request, context: context, cacheName: "com.github.pulse.pins-cache")
+        return ManagedObjectsObserver(request: request, context: context, cacheName: "com.github.pulse.sessions-cache")
     }
 }
