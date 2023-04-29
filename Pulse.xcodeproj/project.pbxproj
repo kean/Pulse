@@ -147,7 +147,6 @@
 		0CF0D60E296F189600EED9D4 /* TextRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D57D296F189500EED9D4 /* TextRenderer.swift */; };
 		0CF0D60F296F189600EED9D4 /* UIKit+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D57E296F189500EED9D4 /* UIKit+Extensions.swift */; };
 		0CF0D610296F189600EED9D4 /* SpinnerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D57F296F189500EED9D4 /* SpinnerView.swift */; };
-		0CF0D611296F189600EED9D4 /* Deprecated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D580296F189500EED9D4 /* Deprecated.swift */; };
 		0CF0D612296F189600EED9D4 /* Regex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D581296F189500EED9D4 /* Regex.swift */; };
 		0CF0D613296F189600EED9D4 /* TextRendererHTML.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D582296F189500EED9D4 /* TextRendererHTML.swift */; };
 		0CF0D614296F189600EED9D4 /* TextRendererJSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D583296F189500EED9D4 /* TextRendererJSON.swift */; };
@@ -586,7 +585,6 @@
 		0CF0D57D296F189500EED9D4 /* TextRenderer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextRenderer.swift; sourceTree = "<group>"; };
 		0CF0D57E296F189500EED9D4 /* UIKit+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIKit+Extensions.swift"; sourceTree = "<group>"; };
 		0CF0D57F296F189500EED9D4 /* SpinnerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SpinnerView.swift; sourceTree = "<group>"; };
-		0CF0D580296F189500EED9D4 /* Deprecated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Deprecated.swift; sourceTree = "<group>"; };
 		0CF0D581296F189500EED9D4 /* Regex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Regex.swift; sourceTree = "<group>"; };
 		0CF0D582296F189500EED9D4 /* TextRendererHTML.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextRendererHTML.swift; sourceTree = "<group>"; };
 		0CF0D583296F189500EED9D4 /* TextRendererJSON.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextRendererJSON.swift; sourceTree = "<group>"; };
@@ -1155,7 +1153,6 @@
 				0CB34595298CBC37009428B2 /* ManagedObjectsObserver.swift */,
 				0CB17F192978ABBA004E33F4 /* ManagedObjectsCountObserver.swift */,
 				0C3002B22986CEF30055F6C2 /* LoggerStoreIndex.swift */,
-				0CF0D580296F189500EED9D4 /* Deprecated.swift */,
 				0C1050E429E1FAC1006AFDAD /* Version.swift */,
 			);
 			path = Helpers;
@@ -1954,7 +1951,6 @@
 				0CF0D674296F189600EED9D4 /* NetworkInspectorView-shared.swift in Sources */,
 				0CB34593298AA78E009428B2 /* WrappedTextView.swift in Sources */,
 				0CAF1D7B297C2040002E2722 /* ConsoleListViewModel.swift in Sources */,
-				0CF0D611296F189600EED9D4 /* Deprecated.swift in Sources */,
 				0CE45E0C2977813400249C5D /* ConsoleToolbarView.swift in Sources */,
 				0CF0D61F296F189600EED9D4 /* Pulse+Extensions.swift in Sources */,
 				0CF0D61C296F189600EED9D4 /* UXKit.swift in Sources */,

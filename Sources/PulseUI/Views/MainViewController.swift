@@ -28,11 +28,6 @@ public final class MainViewController: UIViewController {
         vc.view.pinToSuperview()
     }
 
-    @available(*, deprecated, message: "onDismiss parameter is deprecated")
-    public convenience init(store: LoggerStore = .shared, onDismiss: @escaping () -> Void) {
-        self.init(store: store)
-    }
-
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

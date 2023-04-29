@@ -2,13 +2,13 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
-import Foundation
-import SwiftUI
-import Pulse
-
 #if os(iOS) || os(macOS)
 
 #if DEBUG
+
+import Foundation
+import SwiftUI
+import Pulse
 
 struct DecodingErrors_Previews: PreviewProvider {
     static var previews: some View {

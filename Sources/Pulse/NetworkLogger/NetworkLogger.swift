@@ -85,12 +85,6 @@ public final class NetworkLogger: @unchecked Sendable {
 
         /// Initializes the default configuration.
         public init() {}
-
-        // Deprecated in Pulse 3.0
-        @available(*, deprecated, message: "The isWaitingForDecoding parameter was removed")
-        public init(isWaitingForDecoding: Bool = false) {
-            self.isWaitingForDecoding = isWaitingForDecoding
-        }
     }
 
     /// Initializes the network logger.
