@@ -9,7 +9,9 @@ import Pulse
 
 public struct SettingsView: View {
     @ObservedObject var viewModel: SettingsViewModel
-    
+
+    var store: LoggerStore { viewModel.store }
+
     public init(store: LoggerStore = .shared) {
         // TODO: Fix ownership
         self.viewModel = SettingsViewModel(store: store)
