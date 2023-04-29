@@ -213,24 +213,6 @@ extension View {
 #endif
     }
 
-#if os(macOS)
-    func showInWindow() {
-        let window = NSWindow()
-        window.isOpaque = false
-        window.center()
-        window.isReleasedWhenClosed = false
-        window.hidesOnDeactivate = true
-        window.styleMask = window.styleMask.union([.resizable, .closable, .miniaturizable])
-        window.toolbarStyle = .unified
-        window.titleVisibility = .hidden
-        window.titlebarSeparatorStyle = .none
-        window.titlebarAppearsTransparent = true
-
-        window.contentViewController = NSHostingController(rootView: self)
-        window.makeKeyAndOrderFront(nil)
-    }
-#endif
-
     func apply<T>(_ closure: (Self) -> T) -> T {
         closure(self)
     }

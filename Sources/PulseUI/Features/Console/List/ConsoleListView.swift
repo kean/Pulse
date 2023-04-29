@@ -193,34 +193,6 @@ private struct _ConsoleListView: View {
                 }
             }
             .environment(\.defaultMinListRowHeight, 1)
-            .apply(addListContextMenu)
-        }
-    }
-
-    @ViewBuilder
-    private func addListContextMenu<T: View>(_ view: T) -> some View {
-        if #available(macOS 13, *) {
-            view.contextMenu(forSelectionType: ConsoleSelectedItem.self, menu: { _ in }) {
-                $0.first.map(makeDetailsView)?.showInWindow()
-            }
-        } else {
-            view
-        }
-    }
-
-    @ViewBuilder
-    private func makeDetailsView(for item: ConsoleSelectedItem) -> some View {
-        switch item {
-        case .entity(let objectID):
-            if let entity = try? environment.store.viewContext.existingObject(with: objectID) {
-                ConsoleEntityStandaloneDetailsView(entity: entity)
-                    .frame(minWidth: 400, idealWidth: 700, minHeight: 400, idealHeight: 480)
-            }
-        case .occurrence(let objectID, let occurrence):
-            if let entity = try? environment.store.viewContext.existingObject(with: objectID) {
-                ConsoleSearchResultView.makeDestination(for: occurrence, entity: entity)
-                    .frame(minWidth: 400, idealWidth: 700, minHeight: 400, idealHeight: 480)
-            }
         }
     }
 }
