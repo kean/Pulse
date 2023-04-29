@@ -60,7 +60,7 @@ final class ConsoleListViewModelTests: ConsoleTestCase {
 
     func testGroupingLogsByLabel() {
         // WHEN
-        sut.options.messageGroupBy = .label
+        environment.listOptions.messageGroupBy = .label
 
         // THEN entities are still loaded
         XCTAssertEqual(sut.entities.count, 13)
@@ -82,7 +82,7 @@ final class ConsoleListViewModelTests: ConsoleTestCase {
     func testGroupingTasksByTaskType() {
         // WHEN
         environment.mode = .network
-        sut.options.taskGroupBy = .taskType
+        environment.listOptions.taskGroupBy = .taskType
 
         // THEN entities are still loaded
         XCTAssertEqual(sut.entities.count, 8)
@@ -104,7 +104,7 @@ final class ConsoleListViewModelTests: ConsoleTestCase {
     func testGroupingTasksByStatus() {
         // WHEN
         environment.mode = .network
-        sut.options.taskGroupBy = .requestState
+        environment.listOptions.taskGroupBy = .requestState
 
         // THEN entities are still loaded
         XCTAssertEqual(sut.entities.count, 8)
@@ -127,8 +127,8 @@ final class ConsoleListViewModelTests: ConsoleTestCase {
 
     func testOrderLogsByLevel() {
         // WHEN
-        sut.options.messageSortBy = .level
-        sut.options.order = .ascending
+        environment.listOptions.messageSortBy = .level
+        environment.listOptions.order = .ascending
 
         // THEN
         XCTAssertEqual(
@@ -139,8 +139,8 @@ final class ConsoleListViewModelTests: ConsoleTestCase {
 
     func testOrderLogsByLevelDescending() {
         // WHEN
-        sut.options.messageSortBy = .level
-        sut.options.order = .descending
+        environment.listOptions.messageSortBy = .level
+        environment.listOptions.order = .descending
 
         // THEN
         XCTAssertEqual(
@@ -209,7 +209,7 @@ final class ConsoleListViewModelTests: ConsoleTestCase {
         setUp(store: store, focusedEntities: entities)
         
         // WHEN
-        sut.options.messageGroupBy = .level
+        environment.listOptions.messageGroupBy = .level
         
         // THEN entities are still loaded
         XCTAssertEqual(sut.entities.count, 4)
