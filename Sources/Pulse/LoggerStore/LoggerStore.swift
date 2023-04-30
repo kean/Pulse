@@ -174,8 +174,7 @@ public final class LoggerStore: @unchecked Sendable {
 
         if options.contains(.create) && !options.contains(.readonly) && configuration.isAutoStartingSession {
             perform { _ in
-                let appInfo = Info.AppInfo.make()
-                self.saveEntity(for: self.session, info: appInfo)
+                self.saveEntity(for: self.session, info: .make())
             }
         } else {
             viewContext.performAndWait {
@@ -750,6 +749,8 @@ extension LoggerStore {
             try? deleteEntities(for: LoggerMessageEntity.fetchRequest())
             try? deleteEntities(for: LoggerBlobHandleEntity.fetchRequest())
             try? deleteEntities(for: LoggerSessionEntity.fetchRequest())
+            saveEntity(for: session, info: .make())
+
             try? Files.removeItem(at: blobsURL)
             Files.createDirectoryIfNeeded(at: blobsURL)
         case .archive:
