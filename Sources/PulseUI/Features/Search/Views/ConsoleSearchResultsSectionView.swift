@@ -9,7 +9,7 @@ import Pulse
 import CoreData
 import Combine
 
-@available(iOS 15, *)
+@available(iOS 15, macOS 13, *)
 struct ConsoleSearchResultView: View {
     let viewModel: ConsoleSearchResultViewModel
     var limit: Int = 4
@@ -66,7 +66,7 @@ struct ConsoleSearchResultView: View {
                 .foregroundColor(.secondary)
         }
 #if os(macOS)
-            .backport.listRowSeparators(isHidden: false)
+            .listRowSeparator(.visible)
             .padding(.leading, 16)
 #endif
         if #unavailable(iOS 16) {
@@ -100,12 +100,6 @@ struct ConsoleSearchResultView: View {
     @ViewBuilder
     private static func _makeDestination(for occurrence: ConsoleSearchOccurrence, task: NetworkTaskEntity) -> some View {
         switch occurrence.scope {
-        case .url:
-            NetworkDetailsView(title: "URL") {
-                TextRenderer(options: .sharing).make {
-                    $0.render(task, content: .requestComponents)
-                }
-            }
         case .originalRequestHeaders:
             makeHeadersDetails(title: "Request Headers", headers: task.originalRequest?.headers)
         case .currentRequestHeaders:
@@ -116,7 +110,7 @@ struct ConsoleSearchResultView: View {
             makeHeadersDetails(title: "Response Headers", headers: task.response?.headers)
         case .responseBody:
             NetworkInspectorResponseBodyView(viewModel: .init(task: task))
-        case .message, .metadata:
+        case .url, .message, .metadata:
             EmptyView()
         }
     }
@@ -126,10 +120,8 @@ struct ConsoleSearchResultView: View {
         switch occurrence.scope {
         case .originalRequestHeaders:
             NetworkInspectorView(task: task, tab: .headers)
-//            makeHeadersDetails(title: "Request Headers", headers: task.originalRequest?.headers)
         case .currentRequestHeaders:
             NetworkInspectorView(task: task, tab: .headers)
-//            makeHeadersDetails(title: "Request Headers", headers: task.currentRequest?.headers)
         case .requestBody:
             NetworkInspectorView(task: task, tab: .request)
         case .responseHeaders:
@@ -149,7 +141,7 @@ struct ConsoleSearchResultView: View {
     }
 }
 
-@available(iOS 15, *)
+@available(iOS 15, macOS 13, *)
 struct ConsoleSearchResultDetailsView: View {
     let viewModel: ConsoleSearchResultViewModel
 

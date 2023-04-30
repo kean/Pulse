@@ -105,15 +105,6 @@ extension Backport {
             self.content
         }
     }
-
-    @ViewBuilder
-    func listRowSeparators(isHidden: Bool) -> some View {
-        if #available(macOS 13, *) {
-            self.content.listRowSeparator(isHidden ? .hidden : .visible)
-        } else {
-            self.content
-        }
-    }
 #endif
 
     enum PresentationDetent {

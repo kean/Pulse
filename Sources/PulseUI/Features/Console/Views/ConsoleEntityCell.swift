@@ -7,7 +7,7 @@ import SwiftUI
 import Pulse
 import CoreData
 
-@available(iOS 15, *)
+@available(iOS 15, macOS 13, *)
 struct ConsoleEntityCell: View {
     let entity: NSManagedObject
 
@@ -16,18 +16,18 @@ struct ConsoleEntityCell: View {
         case .message(let message):
             _ConsoleMessageCell(message: message)
 #if os(macOS)
-                .backport.listRowSeparators(isHidden: false)
+                .listRowSeparator(.visible)
 #endif
         case .task(let task):
             _ConsoleTaskCell(task: task)
 #if os(macOS)
-                .backport.listRowSeparators(isHidden: false)
+                .listRowSeparator(.visible)
 #endif
         }
     }
 }
 
-@available(iOS 15, *)
+@available(iOS 15, macOS 13, *)
 private struct _ConsoleMessageCell: View {
     let message: LoggerMessageEntity
 
@@ -70,7 +70,7 @@ private struct _ConsoleMessageCell: View {
     }
 }
 
-@available(iOS 15, *)
+@available(iOS 15, macOS 13, *)
 private struct _ConsoleTaskCell: View {
     let task: NetworkTaskEntity
     @State private var shareItems: ShareItems?

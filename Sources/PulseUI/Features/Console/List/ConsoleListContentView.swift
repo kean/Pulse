@@ -7,7 +7,7 @@ import Pulse
 import Combine
 import SwiftUI
 
-@available(iOS 15, *)
+@available(iOS 15, macOS 13, *)
 struct ConsoleListContentView: View {
     @EnvironmentObject var viewModel: ConsoleListViewModel
 
@@ -141,7 +141,7 @@ struct BottomViewID: Hashable, Identifiable {
 #endif
 
 #if os(iOS) || os(macOS)
-@available(iOS 15, *)
+@available(iOS 15, macOS 13, *)
 struct ConsoleStaticList: View {
     let entities: [NSManagedObject]
 

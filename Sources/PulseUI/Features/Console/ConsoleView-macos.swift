@@ -110,6 +110,7 @@ private struct ConsoleMainView: View {
     }
 }
 
+@available(iOS 15, macOS 13, *)
 private struct _ConsoleDetailsView: View {
     @EnvironmentObject private var router: ConsoleRouter
 

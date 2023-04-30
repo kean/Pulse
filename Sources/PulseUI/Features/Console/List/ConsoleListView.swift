@@ -9,7 +9,7 @@ import CoreData
 import Pulse
 import Combine
 
-@available(iOS 15, *)
+@available(iOS 15, macOS 13, *)
 struct ConsoleListView: View {
     @EnvironmentObject var environment: ConsoleEnvironment
     @EnvironmentObject var filters: ConsoleFiltersViewModel
@@ -19,7 +19,7 @@ struct ConsoleListView: View {
     }
 }
 
-@available(iOS 15, *)
+@available(iOS 15, macOS 13, *)
 private struct _InternalConsoleListView: View {
     private let environment: ConsoleEnvironment
 
@@ -49,7 +49,7 @@ private struct _InternalConsoleListView: View {
     }
 
     @ViewBuilder private var contents: some View {
-        if #available(iOS 16, macOS 13, *) {
+        if #available(iOS 16, *) {
             _ConsoleListView()
                 .environment(\.defaultMinListRowHeight, 8)
                 .searchable(text: $searchBarViewModel.text, tokens: $searchBarViewModel.tokens, token: {
@@ -133,6 +133,7 @@ private struct _ConsoleListView: View {
 #endif
 
 #if os(macOS)
+@available(iOS 15, macOS 13, *)
 private struct _ConsoleListView: View {
     @EnvironmentObject private var environment: ConsoleEnvironment
     @EnvironmentObject private var listViewModel: ConsoleListViewModel

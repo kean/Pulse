@@ -9,7 +9,7 @@ import Pulse
 import Combine
 import SwiftUI
 
-@available(iOS 15.0, *)
+@available(iOS 15, macOS 13, *)
 struct ConsoleListGroupedSectionView: View {
     let section: NSFetchedResultsSectionInfo
     @ObservedObject var viewModel: ConsoleListViewModel
