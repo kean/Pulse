@@ -163,8 +163,8 @@ struct ConsoleSessionCell: View {
     var body: some View {
         HStack(alignment: .lastTextBaseline) {
             Text(session.formattedDate(isCompact: isCompact))
-                .lineLimit(1)
                 .fontWeight(store.session.id == session.id ? .medium : .regular)
+                .lineLimit(1)
                 .foregroundColor(.primary)
                 .layoutPriority(1)
             details

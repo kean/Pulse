@@ -50,26 +50,6 @@ extension NSManagedObjectContext {
     }
 }
 
-extension NSObject {
-    static var deinitKey = "Pulse.NSObject.deinitKey"
-
-    class Container {
-        let closure: () -> Void
-
-        init(_ closure: @escaping () -> Void) {
-            self.closure = closure
-        }
-
-        deinit {
-            closure()
-        }
-    }
-
-    func onDeinit(_ closure: @escaping () -> Void) {
-        objc_setAssociatedObject(self, &NSObject.deinitKey, Container(closure), .OBJC_ASSOCIATION_RETAIN)
-    }
-}
-
 extension tls_ciphersuite_t {
     var description: String {
         switch self {

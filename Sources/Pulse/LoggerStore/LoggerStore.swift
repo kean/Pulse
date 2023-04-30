@@ -10,7 +10,9 @@ import Combine
 ///
 /// But SwiftLog is not required and ``LoggerStore`` can also just as easily be used
 /// directly. You can either create a custom store or use ``LoggerStore/shared`` one.
-public final class LoggerStore: @unchecked Sendable {
+public final class LoggerStore: @unchecked Sendable, Identifiable {
+    public var id: ObjectIdentifier { ObjectIdentifier(self) }
+
     /// The URL the store was initialized with.
     public let storeURL: URL
 
@@ -49,6 +51,9 @@ public final class LoggerStore: @unchecked Sendable {
         didSet { try? save(manifest) }
     }
     private var sessionIndex: Int64 = 0
+
+    /// The folder where Pulse stores its documents.
+    public static var logsURL: URL { URL.logs }
 
     private let blobsURL: URL
     private let manifestURL: URL

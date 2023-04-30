@@ -93,15 +93,8 @@ final class ConsoleEnvironment: ObservableObject {
         store.removeAll()
         index.clear()
 
-
 #if os(iOS)
         runHapticFeedback(.success)
-        ToastView {
-            HStack {
-                Image(systemName: "trash")
-                Text("All messages removed")
-            }
-        }.show()
 #endif
     }
 }

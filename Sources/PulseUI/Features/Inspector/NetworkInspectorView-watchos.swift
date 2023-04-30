@@ -34,14 +34,14 @@ struct NetworkInspectorView: View {
                 NetworkInspectorRequestTypePicker(isCurrentRequest: $isCurrentRequest)
                 NetworkInspectorView.makeRequestSection(task: task, isCurrentRequest: isCurrentRequest)
             }
-            if viewModel.task.state != .pending {
+            if task.state != .pending {
                 Section {
                     makeTransferInfo(isSentHidden: true)
                     NetworkInspectorView.makeResponseSection(task: task)
                 }
                 Section {
-                    NetworkMetricsCell(task: viewModel.task)
-                    NetworkCURLCell(task: viewModel.task)
+                    NetworkMetricsCell(task: task)
+                    NetworkCURLCell(task: task)
                 }
             }
         }

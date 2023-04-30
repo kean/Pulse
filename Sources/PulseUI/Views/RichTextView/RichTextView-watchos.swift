@@ -20,7 +20,9 @@ struct RichTextView: View {
         }
 #if os(watchOS)
         .toolbar {
-            ShareLink(item: viewModel.text)
+            if #available(watchOS 9.0, *) {
+                ShareLink(item: viewModel.text)
+            }
         }
 #endif
     }

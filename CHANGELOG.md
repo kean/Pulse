@@ -7,6 +7,7 @@
 - Move some network filters to Pulse for Mac
 - Remove APIs deprecated in Pulse 3.x
 - Move inspectors to the navigation bar on macOS
+- When you import store from watchOS, it now shows an "Open Store" button directly in the Console
 
 ## Pulse 3.7.0
 

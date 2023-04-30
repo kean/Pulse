@@ -12,7 +12,7 @@ final class SettingsViewModel: ObservableObject {
     let store: LoggerStore
 
     // Apple Watch file transfers
-#if os(watchOS) || os(iOS)
+#if os(watchOS)
     @Published private(set) var fileTransferStatus: FileTransferStatus = .initial
     @Published var fileTransferError: FileTransferError?
 #endif
@@ -26,7 +26,7 @@ final class SettingsViewModel: ObservableObject {
     init(store: LoggerStore) {
         self.store = store
 
-#if os(watchOS) || os(iOS)
+#if os(watchOS)
         LoggerSyncSession.shared.$fileTransferStatus.sink(receiveValue: { [weak self] in
             self?.fileTransferStatus = $0
             if case let .failure(error) = $0 {
@@ -41,12 +41,6 @@ final class SettingsViewModel: ObservableObject {
 
 #if os(iOS)
         runHapticFeedback(.success)
-        ToastView {
-            HStack {
-                Image(systemName: "trash")
-                Text("All messages removed")
-            }
-        }.show()
 #endif
     }
 

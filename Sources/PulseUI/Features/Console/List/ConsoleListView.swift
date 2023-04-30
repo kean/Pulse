@@ -87,6 +87,10 @@ private struct _InternalConsoleListView: View {
 @available(iOS 15, *)
 private struct _ConsoleListView: View {
     @Environment(\.isSearching) private var isSearching
+    @Environment(\.store) private var store
+
+    @ObservedObject private var syncSession = LoggerSyncSession.shared
+    @State private var presentedStore: LoggerStore?
 
     var body: some View {
         List {
@@ -95,10 +99,35 @@ private struct _ConsoleListView: View {
             } else {
                 ConsoleToolbarView()
                     .listRowSeparator(.hidden, edges: .top)
+                if store === LoggerStore.shared, let storeURL = syncSession.importedStoreURL {
+                    buttonShowImportedStore(storeURL: storeURL)
+                }
                 ConsoleListContentView()
             }
         }
         .listStyle(.plain)
+        .sheet(item: $presentedStore) { store in
+            NavigationView {
+                ConsoleView(store: store)
+            }
+        }
+    }
+
+    private func buttonShowImportedStore(storeURL: URL) -> some View {
+        HStack {
+            Button(action: {
+                presentedStore = try? LoggerStore(storeURL: storeURL, options: [.readonly])
+            }) {
+                HStack {
+                    Text(Image(systemName: "applewatch"))
+                    Text("Show Imported Store")
+                }.foregroundColor(.blue)
+            }.buttonStyle(.plain)
+            Spacer()
+            Button(role: .destructive, action: syncSession.removeImportedDocument) {
+                Image(systemName: "trash")
+            }
+        }
     }
 }
 #endif
