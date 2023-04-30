@@ -95,44 +95,32 @@ struct ConsoleTaskCell: View {
             time
         }
 #elseif os(iOS)
-        HStack(spacing: infoSpacing) {
-            Text(task.httpMethod ?? "GET")
-                .fontWeight(.medium)
-                .font(ConsoleConstants.fontInfo)
-
-            Spacer()
-
-            if task.state != .pending {
-                makeInfoView(image: "arrow.up", text: byteCount(for: task.requestBodySize))
-                makeInfoView(image: "arrow.down", text: byteCount(for: task.responseBodySize))
-                makeInfoView(image: "clock", text: ConsoleFormatter.duration(for: task) ?? "–")
-            }
-        }
-        .lineLimit(1)
-        .foregroundColor(.secondary)
-        .padding(.top, 2)
+        infoText
+            .lineLimit(1)
+            .font(ConsoleConstants.fontInfo)
+            .foregroundColor(.secondary)
+            .padding(.top, 2)
 #else
-        HStack(spacing: infoSpacing) {
-            Text(task.httpMethod ?? "GET")
-
-            if task.state != .pending {
-                makeInfoView(image: "arrow.up", text: byteCount(for: task.requestBodySize))
-                makeInfoView(image: "arrow.down", text: byteCount(for: task.responseBodySize))
-                makeInfoView(image: "clock", text: ConsoleFormatter.duration(for: task) ?? "–")
-            }
-
-            Spacer()
-        }
-        .lineLimit(1)
-        .font(ConsoleConstants.fontTitle)
-        .foregroundColor(.secondary)
+        infoText
+            .lineLimit(1)
+            .font(ConsoleConstants.fontTitle)
+            .foregroundColor(.secondary)
 #endif
     }
 
-    private func makeInfoView(image: String, text: String) -> some View {
-        (Text(Image(systemName: image)).fontWeight(.light) +
-         Text(" " + text))
-        .font(ConsoleConstants.fontInfo)
+    private var infoText: Text {
+        var text = Text(task.httpMethod ?? "GET")
+        if task.state != .pending {
+            text = text + Text("    ") +
+            makeInfoText("arrow.up", byteCount(for: task.requestBodySize)) + Text("    ") +
+            makeInfoText("arrow.down", byteCount(for: task.responseBodySize)) + Text("     ") +
+            makeInfoText("clock", ConsoleFormatter.duration(for: task) ?? "–")
+        }
+        return text
+    }
+
+    private func makeInfoText(_ image: String, _ text: String) -> Text {
+        Text(Image(systemName: image)).fontWeight(.light) + Text(" " + text)
     }
 
     private func byteCount(for size: Int64) -> String {

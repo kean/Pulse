@@ -9,6 +9,10 @@
 - Move inspectors to the navigation bar on macOS
 - When you import store from watchOS, it now shows an "Open Store" button directly in the Console
 
+### Fixes
+
+- Fix how network tasks details get collapsed in the console on macOS
+
 ## Pulse 3.7.1
 
 *Apr 30, 2023*
