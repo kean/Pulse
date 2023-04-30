@@ -9,7 +9,15 @@
 - Move inspectors to the navigation bar on macOS
 - When you import store from watchOS, it now shows an "Open Store" button directly in the Console
 
+## Pulse 3.7.1
+
+*Apr 30, 2023*
+
+- Fix an issue with `LoggerStore/removeAll` removing current session
+
 ## Pulse 3.7.0
+
+*Apr 29, 2023*
 
 - Improve search suggestions on macOS that are now [displayed inline](https://user-images.githubusercontent.com/1567433/235319231-caaabe2f-d173-4dca-b585-203c36ee70cc.png) and support the same search options as on iOS
 - Improve how search results are displayed on macOS
@@ -29,6 +37,8 @@
 - Fix the missing back button in the response body on iOS 14
 
 ## Pulse 3.6.0
+
+*Apr 22, 2023*
 
 ### PulseUI
 
