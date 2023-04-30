@@ -6,7 +6,7 @@ import SwiftUI
 import Pulse
 import Combine
 
-@available(iOS 15, *)
+@available(iOS 15, macOS 13, *)
 struct ConsoleFiltersView: View {
     @EnvironmentObject var environment: ConsoleEnvironment // important: reloads mode
     @EnvironmentObject var viewModel: ConsoleFiltersViewModel
@@ -76,7 +76,7 @@ struct ConsoleFiltersView: View {
 
 // MARK: - ConsoleFiltersView (Sections)
 
-@available(iOS 15, *)
+@available(iOS 15, macOS 13, *)
 extension ConsoleFiltersView {
     var sessionsSection: some View {
         ConsoleSection(isDividerHidden: true, header: {
@@ -124,7 +124,7 @@ extension ConsoleFiltersView {
 #if DEBUG
 import CoreData
 
-@available(iOS 15, *)
+@available(iOS 15, macOS 13, *)
 struct ConsoleFiltersView_Previews: PreviewProvider {
     static var previews: some View {
 #if os(macOS)
@@ -156,7 +156,7 @@ struct ConsoleFiltersView_Previews: PreviewProvider {
     }
 }
 
-@available(iOS 15, *)
+@available(iOS 15, macOS 13, *)
 private func makePreview(isOnlyNetwork: Bool) -> some View {
     let store = LoggerStore.mock
     let entities: [NSManagedObject] = try! isOnlyNetwork ? store.allTasks() : store.allMessages()

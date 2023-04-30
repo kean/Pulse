@@ -10,7 +10,7 @@ import Combine
 
 #if os(iOS) || os(macOS)
 
-@available(iOS 15, *)
+@available(iOS 15, macOS 13, *)
 struct SessionListView: View {
     @Binding var selection: Set<UUID>
     @Binding var sharedSessions: SelectedSessionsIDs?
@@ -37,7 +37,7 @@ struct SessionListView: View {
                 .onChange(of: sessions.count) { _ in refreshGroups() }
         }
     }
-    
+
     @ViewBuilder
     private var content: some View {
 #if os(macOS)
@@ -150,6 +150,7 @@ private let sectionTitleFormatter: DateFormatter = {
 
 #endif
 
+@available(macOS 13, *)
 struct ConsoleSessionCell: View {
     let session: LoggerSessionEntity
     var isCompact = true
@@ -162,8 +163,9 @@ struct ConsoleSessionCell: View {
     var body: some View {
         HStack(alignment: .lastTextBaseline) {
             Text(session.formattedDate(isCompact: isCompact))
-                .fontWeight(store.session.id == session.id ? .medium : .regular)
                 .lineLimit(1)
+                .fontWeight(store.session.id == session.id ? .medium : .regular)
+                .foregroundColor(.primary)
                 .layoutPriority(1)
             details
         }

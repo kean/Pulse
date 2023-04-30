@@ -6,6 +6,7 @@
 - Increase minimum deployment target on tvOS 14.0 → 15.0
 - Move some network filters to Pulse for Mac
 - Remove APIs deprecated in Pulse 3.x
+- Move inspectors to the navigation bar on macOS
 
 ## Pulse 3.7.0
 

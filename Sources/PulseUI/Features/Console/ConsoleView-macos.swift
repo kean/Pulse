@@ -17,35 +17,27 @@ public struct ConsoleView: View {
     }
 
     public var body: some View {
-        contents
-            .injecting(environment)
-            .navigationTitle("")
-    }
-
-    @ViewBuilder
-    private var contents: some View {
-        if #available(macOS 13.0, *) {
-            NavigationSplitView(sidebar: {
-                ConsoleInspectorsView()
-            }, detail: {
-                NavigationStack {
-                    ConsoleMainView(environment: environment)
-                }
-            })
-        } else {
-            NavigationView {
-                ConsoleInspectorsView()
+        if #available(macOS 13, *) {
+            NavigationStack {
                 ConsoleMainView(environment: environment)
             }
+            .injecting(environment)
+            .navigationTitle("")
+        } else {
+            PlaceholderView(imageName: "xmark.octagon", title: "Unsupported", subtitle: "Pulse requires iOS 15 or higher").padding()
         }
     }
 }
 
 /// This view contains the console itself along with the details (no sidebar).
+@available(macOS 13, *)
 private struct ConsoleMainView: View {
     let environment: ConsoleEnvironment
 
     @State private var isSharingStore = false
+    @State private var isShowingFilters = false
+    @State private var isShowingSessions = false
+    @State private var isShowingSettings = false
 
     @SceneStorage("is-details-vertical") private var isVertical = false
     @SceneStorage("com-github-kean-pulse-is-now-enabled") private var isNowEnabled = true
@@ -70,6 +62,26 @@ private struct ConsoleMainView: View {
             .toolbar {
                 ToolbarItemGroup(placement: .navigation) {
                     contentToolbarNavigationItems
+                }
+                ToolbarItemGroup(placement: .automatic) {
+                    Button(action: { isShowingFilters = true }) {
+                        Label("Show Filters", systemImage: "line.3.horizontal.decrease.circle")
+                    }
+                    .popover(isPresented: $isShowingFilters) {
+                        ConsoleFiltersView().frame(width: 300).fixedSize()
+                    }
+                    Button(action: { isShowingSessions = true }) {
+                        Label("Show Sessions", systemImage: "list.clipboard")
+                    }
+                    .popover(isPresented: $isShowingSessions) {
+                        SessionsView().frame(width: 300, height: 420)
+                    }
+                    Button(action: { isShowingSettings = true }) {
+                        Label("Show Settings", systemImage: "gearshape")
+                    }
+                    .popover(isPresented: $isShowingSettings) {
+                        SettingsView().frame(width: 300, height: 600)
+                    }
                 }
             }
     }

@@ -102,14 +102,13 @@ enum NetworkInspectorTab: String, Identifiable, CaseIterable, CustomStringConver
 }
 
 #if DEBUG
-struct NetworkInspectorView_Previews: PreviewProvider {
+@available(macOS 13, *)
+struct Previews_NetworkInspectorView_Previews: PreviewProvider {
     static var previews: some View {
-            if #available(macOS 13.0, *) {
-                NavigationStack {
-                    NetworkInspectorView(task: LoggerStore.preview.entity(for: .login))
-                }.previewLayout(.fixed(width: 500, height: 800))
-            }
-        }
+        NavigationStack {
+            NetworkInspectorView(task: LoggerStore.preview.entity(for: .login))
+        }.previewLayout(.fixed(width: 500, height: 800))
+    }
 }
 #endif
 

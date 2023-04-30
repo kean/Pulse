@@ -6,55 +6,26 @@
 
 import SwiftUI
 import Pulse
-import UniformTypeIdentifiers
 
-public struct SettingsView: View {
-    @ObservedObject var viewModel: SettingsViewModel
-
-    var store: LoggerStore { viewModel.store }
-
+struct SettingsView: View {
     @State private var isPresentingShareStoreView = false
     @State private var shareItems: ShareItems?
 
-    public init(store: LoggerStore = .shared) {
-        self.viewModel = SettingsViewModel(store: store)
-    }
+    @Environment(\.store) private var store
 
-    init(viewModel: SettingsViewModel) {
-        self.viewModel = viewModel
-    }
-
-    public var body: some View {
-        Form {
-            settings
-        }
-    }
-
-    @ViewBuilder
-    private var settings: some View {
-        ConsoleSection(isDividerHidden: true, header: { SectionHeaderView(title: "Share") }) {
-            HStack {
-                Button("Show in Finder") {
-                    NSWorkspace.shared.activateFileViewerSelecting([store.storeURL])
+    var body: some View {
+        ScrollView {
+            Form {
+                ConsoleSection(header: { SectionHeaderView(title: "Remote Logging") }) {
+                    if store === RemoteLogger.shared.store {
+                        RemoteLoggerSettingsView(viewModel: .shared)
+                    } else {
+                        Text("Not available")
+                            .foregroundColor(.secondary)
+                    }
                 }
-                Spacer()
-            }
-        }
-        if !(store.options.contains(.readonly)) {
-            ConsoleSection(header: { SectionHeaderView(title: "Manage Messages") }) {
-                Button {
-                    viewModel.buttonRemoveAllMessagesTapped()
-                } label: {
-                    Label("Remove Logs", systemImage: "trash")
-                }
-            }
-        }
-        ConsoleSection(header: { SectionHeaderView(title: "Remote Logging") }) {
-            if viewModel.isRemoteLoggingAvailable {
-                RemoteLoggerSettingsView(viewModel: .shared)
-            } else {
-                Text("Not available")
-                    .foregroundColor(.secondary)
+                Divider()
+                StoreDetailsView(source: .store(store))
             }
         }
     }
@@ -65,7 +36,7 @@ public struct SettingsView: View {
 #if DEBUG
 struct UserSettingsView_Previews: PreviewProvider {
     static var previews: some View {
-        SettingsView(viewModel: SettingsViewModel(store: .shared))
+        SettingsView()
     }
 }
 #endif

@@ -19,10 +19,6 @@ struct StoreDetailsView: View {
         case info(LoggerStore.Info)
     }
 
-    init(source: Source) {
-        self.source = source
-    }
-
     var body: some View {
         Contents(viewModel: viewModel)
             .onAppear { viewModel.load(from: source) }
@@ -36,13 +32,12 @@ struct StoreDetailsView: View {
 
 private struct Contents: View {
     @ObservedObject var viewModel: StoreDetailsViewModel
+    @Environment(\.store) var store
 
     var body: some View {
         // important: zstack fixed infinite onAppear loop on iOS 14
         ZStack {
-            if viewModel.isLoading {
-                ProgressView().frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-            } else if let error = viewModel.errorMessage {
+            if let error = viewModel.errorMessage {
                 PlaceholderView(imageName: "exclamationmark.circle", title: "Failed to load info", subtitle: error)
             } else {
                 form
@@ -79,6 +74,22 @@ private struct Contents: View {
                     }
                 })
             }
+#if os(macOS)
+            ConsoleSection(header: { EmptyView() }, content: {
+                HStack {
+                    Button("Show in Finder") {
+                        NSWorkspace.shared.activateFileViewerSelecting([store.storeURL])
+                    }
+                    if !(store.options.contains(.readonly)) {
+                        Button {
+                            store.removeAll()
+                        } label: {
+                            Label("Remove Logs", systemImage: "trash")
+                        }
+                    }
+                }
+            })
+#endif
         }
     }
 }
@@ -86,28 +97,22 @@ private struct Contents: View {
 // MARK: - ViewModel
 
 final class StoreDetailsViewModel: ObservableObject {
-    @Published private(set) var isLoading = false
     @Published private(set) var storeSizeLimit: Int64?
     @Published private(set) var sections: [KeyValueSectionViewModel] = []
     @Published private(set) var info: LoggerStore.Info?
     @Published private(set) var errorMessage: String?
 
     func load(from source: StoreDetailsView.Source) {
-        isLoading = true
-
         do {
             switch source {
             case .store(let store):
-                DispatchQueue.global().async {
-                    self.loadInfo(for: store)
-                }
+                loadInfo(for: store)
             case .archive(let storeURL):
                 display(try LoggerStore.Info.make(storeURL: storeURL))
             case .info(let value):
                 display(value)
             }
         } catch {
-            isLoading = false
             errorMessage = error.localizedDescription
         }
     }
@@ -115,22 +120,16 @@ final class StoreDetailsViewModel: ObservableObject {
     private func loadInfo(for store: LoggerStore) {
         do {
             let info = try store.info()
-            DispatchQueue.main.async {
-                if store === LoggerStore.shared {
-                    self.storeSizeLimit = store.configuration.sizeLimit
-                }
-                self.display(info)
+            if store === LoggerStore.shared {
+                self.storeSizeLimit = store.configuration.sizeLimit
             }
+            self.display(info)
         } catch {
-            DispatchQueue.main.async {
-                self.isLoading = false
-                self.errorMessage = error.localizedDescription
-            }
+            self.errorMessage = error.localizedDescription
         }
     }
 
     private func display(_ info: LoggerStore.Info) {
-        isLoading = false
         self.info = info
         self.sections = [
             makeSizeSection(for: info),

@@ -2,6 +2,8 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
+#if os(iOS) || os(watchOS) || os(tvOS)
+
 import SwiftUI
 import Pulse
 import Combine
@@ -54,3 +56,5 @@ final class SettingsViewModel: ObservableObject {
     }
 #endif
 }
+
+#endif

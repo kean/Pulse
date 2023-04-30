@@ -9,7 +9,7 @@ import CoreData
 import Pulse
 import Combine
 
-@available(iOS 15, *)
+@available(iOS 15, macOS 13, *)
 struct ShareStoreView: View {
     /// Preselected sessions.
     var sessions: Set<UUID> = []
@@ -122,7 +122,7 @@ struct ShareStoreView: View {
 }
 
 #if DEBUG
-@available(iOS 15, *)
+@available(iOS 15, macOS 13, *)
 struct ShareStoreView_Previews: PreviewProvider {
     static var previews: some View {
 #if os(iOS)
