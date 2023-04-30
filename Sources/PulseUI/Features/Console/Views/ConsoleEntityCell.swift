@@ -56,12 +56,9 @@ private struct _ConsoleMessageCell: View {
                 Label("Share", systemImage: "square.and.arrow.up.fill")
             }.tint(.blue)
         }
-        .backport.contextMenu(menuItems: {
+        .contextMenu {
             ContextMenu.MessageContextMenu(message: message, shareItems: $shareItems)
-        }, preview: {
-            ConsoleMessageCellPreview(message: message)
-                .frame(idealWidth: 320, maxHeight: 600)
-        })
+        }
 #if os(iOS)
         .sheet(item: $shareItems, content: ShareView.init)
 #else
@@ -107,16 +104,13 @@ private struct _ConsoleTaskCell: View {
                 Label("Share", systemImage: "square.and.arrow.up.fill")
             }.tint(.blue)
         }
-        .backport.contextMenu(menuItems: {
+        .contextMenu {
 #if os(iOS)
             ContextMenu.NetworkTaskContextMenuItems(task: task, sharedItems: $shareItems)
 #else
             ContextMenu.NetworkTaskContextMenuItems(task: task, isSharing: $isSharing)
 #endif
-        }, preview: {
-            ConsoleTaskCellPreview(task: task)
-                .frame(idealWidth: 320, maxHeight: 600)
-        })
+        }
 #if os(iOS)
         .sheet(item: $shareItems, content: ShareView.init)
 #else
@@ -127,43 +121,3 @@ private struct _ConsoleTaskCell: View {
 #endif
     }
 }
-
-#if os(iOS) || os(macOS)
-@available(iOS 15, *)
-private struct ConsoleMessageCellPreview: View {
-    let message: LoggerMessageEntity
-
-    var body: some View {
-        TextViewPreview(string: TextRenderer(options: .sharing).make {
-            $0.render(message)
-        })
-    }
-}
-
-@available(iOS 15, *)
-private struct ConsoleTaskCellPreview: View {
-    let task: NetworkTaskEntity
-
-    var body: some View {
-        TextViewPreview(string: TextRenderer(options: .sharing).make {
-            $0.render(task, content: .preview)
-        })
-    }
-}
-
-@available(iOS 15, *)
-private struct TextViewPreview: View {
-    let string: NSAttributedString
-
-    var body: some View {
-        let range = NSRange(location: 0, length: min(2000, string.length))
-#if os(iOS)
-        let attributedString = try? AttributedString(string.attributedSubstring(from: range), including: \.uiKit)
-#else
-        let attributedString = try? AttributedString(string.attributedSubstring(from: range), including: \.appKit)
-#endif
-        Text(attributedString ?? AttributedString("–"))
-            .padding(12)
-    }
-}
-#endif

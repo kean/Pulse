@@ -10,14 +10,9 @@ import CoreData
 @available(iOS 15, *)
 struct ConsoleTaskCell: View {
     @ObservedObject var task: NetworkTaskEntity
-    var isDisclosureNeeded: Bool
+    var isDisclosureNeeded = false
 
     @ObservedObject private var settings: UserSettings = .shared
-
-    init(task: NetworkTaskEntity, isDisclosureNeeded: Bool = false) {
-        self.task = task
-        self.isDisclosureNeeded = isDisclosureNeeded
-    }
 
     var body: some View {
 #if os(macOS)
