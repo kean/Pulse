@@ -254,6 +254,7 @@
 		0CF0D6F4296F1AF100EED9D4 /* PulseUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CF0D56C296F17CB00EED9D4 /* PulseUI.framework */; };
 		0CF0D6F5296F1AF100EED9D4 /* PulseUI.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0CF0D56C296F17CB00EED9D4 /* PulseUI.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		0CF5E60929981ADF009FF7AE /* ShareStoreViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF5E60729981ADC009FF7AE /* ShareStoreViewModel.swift */; };
+		0CF5E9CD2A0138BD00E68548 /* URLSessionMockManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF5E9CC2A0138BD00E68548 /* URLSessionMockManager.swift */; };
 		0CFD1CDB29E2E8FD003872EF /* LoggerStore+Remote.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CFD1CDA29E2E8FD003872EF /* LoggerStore+Remote.swift */; };
 		0CFF79DD29EB7A8E00BE767B /* SessionListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CFF79DB29EB7A8B00BE767B /* SessionListView.swift */; };
 		0CFF79DF29EB7B4300BE767B /* SessionPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CFF79DE29EB7B4300BE767B /* SessionPickerView.swift */; };
@@ -684,6 +685,7 @@
 		0CF0D6C8296F18FD00EED9D4 /* ConsoleViewModelTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleViewModelTests.swift; sourceTree = "<group>"; };
 		0CF0D6C9296F18FD00EED9D4 /* MockTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockTests.swift; sourceTree = "<group>"; };
 		0CF5E60729981ADC009FF7AE /* ShareStoreViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareStoreViewModel.swift; sourceTree = "<group>"; };
+		0CF5E9CC2A0138BD00E68548 /* URLSessionMockManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionMockManager.swift; sourceTree = "<group>"; };
 		0CFD1CDA29E2E8FD003872EF /* LoggerStore+Remote.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LoggerStore+Remote.swift"; sourceTree = "<group>"; };
 		0CFF79DB29EB7A8B00BE767B /* SessionListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionListView.swift; sourceTree = "<group>"; };
 		0CFF79DE29EB7B4300BE767B /* SessionPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionPickerView.swift; sourceTree = "<group>"; };
@@ -1070,6 +1072,7 @@
 				0CF0D48F296F14CF00EED9D4 /* NetworkLogger+Redacting.swift */,
 				0CF0D490296F14CF00EED9D4 /* NetworkLogger+Entities.swift */,
 				0CF0D491296F14CF00EED9D4 /* URLSessionProxy.swift */,
+				0CF5E9CC2A0138BD00E68548 /* URLSessionMockManager.swift */,
 				0CF0D492296F14CF00EED9D4 /* NetworkLogger.swift */,
 			);
 			path = NetworkLogger;
@@ -1920,6 +1923,7 @@
 				0CF0D566296F15FD00EED9D4 /* Helpers.swift in Sources */,
 				0CF0D564296F15FD00EED9D4 /* CoreData+Extensions.swift in Sources */,
 				0CF0D565296F15FD00EED9D4 /* PulseDocument.swift in Sources */,
+				0CF5E9CD2A0138BD00E68548 /* URLSessionMockManager.swift in Sources */,
 				0CF0D563296F15FD00EED9D4 /* Regex.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

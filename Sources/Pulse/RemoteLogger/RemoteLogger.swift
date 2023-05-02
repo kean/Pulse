@@ -49,6 +49,8 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
     private let specificKey = DispatchSpecificKey<String>()
     private var cancellable: AnyCancellable?
 
+    private var getResponseCompletions: [UUID: (URLSessionMockedResponse?) -> Void] = [:]
+
     private var isInitialized = false
 
     public static let shared = RemoteLogger()
@@ -134,7 +136,7 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
             self.connectAutomaticallyIfNeeded()
         }
 
-        // Start browsing and ask for updates on the main queue.
+        // Start browsing and ask for updates.
         browser.start(queue: queue)
 
         self.browser = browser
@@ -269,6 +271,7 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
 
         // Say "hello" to the server and share information about the client
         let body = PacketClientHello(
+            version: Version.currentProtocolVersion.description,
             deviceId: getDeviceId() ?? getFallbackDeviceId(),
             deviceInfo: .make(),
             appInfo: .make(),
@@ -289,7 +292,7 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
     private func didReceiveMessage(packet: Connection.Packet) throws {
         let code = RemoteLogger.PacketCode(rawValue: packet.code)
 
-        pulseLog(label: "RemoteLogger", "Did receive packet with code: \(code?.description ?? "invalid")")
+        pulseLog(label: "RemoteLogger", "Did receive packet with code: \(String(describing: code))")
 
         switch code {
         case .serverHello:
@@ -303,6 +306,15 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
             buffer?.forEach(send)
         case .ping:
             scheduleAutomaticDisconnect()
+        case .updateMocks:
+            let request = try JSONDecoder().decode(URLSessionMockUpdateRequest.self, from: packet.body)
+            URLSessionMockManager.shared.update(request)
+        case .getMockedResponse:
+            let response = try JSONDecoder().decode(GetMockResponse.self, from: packet.body)
+            if let completion = getResponseCompletions.removeValue(forKey: response.requestID) {
+                completion(response.mock)
+            }
+            break
         default:
             assertionFailure("A packet with an invalid code received from the server: \(packet.code.description)")
         }
@@ -407,6 +419,19 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
             } catch {
                 pulseLog(label: "RemoteLogger", "Failed to encode network message \(error)")
             }
+        }
+    }
+
+    // MARK: Mocks
+
+    func getMockedResponse(for mock: URLSessionMock, _ completion: @escaping (URLSessionMockedResponse?) -> Void) {
+        queue.sync {
+            guard let connection = connection else {
+                return completion(nil)
+            }
+            let request = GetMockRequest(requestID: UUID(), mockID: mock.mockID)
+            getResponseCompletions[request.requestID] = completion
+            connection.send(code: .getMockedResponse, entity: request)
         }
     }
 }

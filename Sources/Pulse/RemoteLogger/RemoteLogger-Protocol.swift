@@ -8,6 +8,35 @@ import Network
 import Pulse
 #endif
 
+struct URLSessionMockUpdateRequest: Codable {
+    var update: [URLSessionMock]
+    var delete: [UUID]
+}
+
+#warning("simplify how data is passed with fewer packet codes")
+// - code (Int8)
+// - header size (UInt32)
+// - body size (UInt32)
+
+#warning("add version of the protocol; should Pulse for Mac support previous version of the protocol (presumably yes)?")
+
+
+// I see two options:
+// a) the source of truth for mocks are on the client
+//      pros: can in the future manage from clinet
+// b) the source of truth for mocks is on the server
+//      pros: supports two macs - one client scenario better; makes more sense
+//      cons: how to implement this?
+
+// When client connects to the remote server, the server sends the inital mock configuration to know what mocks to send and when. The same mock thing can be used for breakpoints.
+// Don't call this breakpoint, but allow server to
+
+
+// Gets headers/body for the given ID
+struct MockGetRequest {
+    let id: UUID
+}
+
 extension RemoteLogger {
     enum PacketCode: UInt8, Equatable {
         // Handshake
@@ -24,22 +53,13 @@ extension RemoteLogger {
         case storeEventNetworkTaskProgressUpdated = 9
         case storeEventNetworkTaskCompleted = 10
 
-        var description: String {
-            switch self {
-            case .clientHello: return "PacketCode.clientHello"
-            case .serverHello: return "PacketCode.serverHello"
-            case .pause: return "PacketCode.pause"
-            case .resume: return "PacketCode.resume"
-            case .ping: return "PacketCode.ping"
-            case .storeEventMessageStored: return "PacketCode.storeEventMessageStored"
-            case .storeEventNetworkTaskCreated: return "PacketCode.storeEventNetworkTaskCreated"
-            case .storeEventNetworkTaskProgressUpdated: return "PacketCode.storeEventNetworkTaskProgressUpdated"
-            case .storeEventNetworkTaskCompleted: return "PacketCode.storeEventNetworkTaskCompleted"
-            }
-        }
+        // MARK: Mocks
+        case updateMocks = 11 // URLSessionMockUpdateRequest
+        case getMockedResponse = 12 // GetMockRequest / GetMockResponse
     }
 
     struct PacketClientHello: Codable {
+        let version: String?
         let deviceId: UUID
         let deviceInfo: LoggerStore.Info.DeviceInfo
         let appInfo: LoggerStore.Info.AppInfo
@@ -123,6 +143,16 @@ extension RemoteLogger {
         }
     }
 
+    struct GetMockRequest: Codable {
+        let requestID: UUID
+        let mockID: UUID
+    }
+
+    struct GetMockResponse: Codable {
+        let requestID: UUID
+        let mock: URLSessionMockedResponse
+    }
+
     enum PacketParsingError: Error {
         case notEnoughData
         case unsupportedContentSize
@@ -130,16 +160,16 @@ extension RemoteLogger {
 }
 
 extension RemoteLogger.Connection {
-    func send(code: RemoteLogger.PacketCode, data: Data, _ completion: ((NWError?) -> Void)? = nil) {
-        send(code: code.rawValue, data: data, completion)
+    func send(code: RemoteLogger.PacketCode, data: Data) {
+        send(code: code.rawValue, data: data)
     }
 
-    func send<T: Encodable>(code: RemoteLogger.PacketCode, entity: T, _ completion: ((NWError?) -> Void)? = nil) {
-        send(code: code.rawValue, entity: entity, completion)
+    func send<T: Encodable>(code: RemoteLogger.PacketCode, entity: T) {
+        send(code: code.rawValue, entity: entity)
     }
 
-    func send(code: RemoteLogger.PacketCode, _ completion: ((NWError?) -> Void)? = nil) {
-        send(code: code.rawValue, entity: RemoteLogger.Empty(), completion)
+    func send(code: RemoteLogger.PacketCode) {
+        send(code: code.rawValue, entity: RemoteLogger.Empty())
     }
 }
 

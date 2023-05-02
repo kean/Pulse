@@ -107,7 +107,7 @@ extension RemoteLogger {
             delegate?.connection(self, didReceiveEvent: event)
         }
 
-        func send(code: UInt8, data: Data, _ completion: ((NWError?) -> Void)? = nil) {
+        func send(code: UInt8, data: Data) {
             do {
                 let data = try encode(code: code, body: data)
                 connection.send(content: data, completion: .contentProcessed({ error in
@@ -120,10 +120,10 @@ extension RemoteLogger {
             }
         }
 
-        func send<T: Encodable>(code: UInt8, entity: T, _ completion: ((NWError?) -> Void)? = nil) {
+        func send<T: Encodable>(code: UInt8, entity: T) {
             do {
                 let data = try JSONEncoder().encode(entity)
-                send(code: code, data: data, completion)
+                send(code: code, data: data)
             } catch {
                 pulseLog("Failed to encode a packet: \(error)") // Should never happen
             }

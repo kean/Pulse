@@ -1288,6 +1288,7 @@ extension LoggerStore {
 extension Version {
     static let minimumSupportedVersion = Version(3, 1, 0)
     static let currentStoreVersion = Version(3, 6, 0)
+    static let currentProtocolVersion = Version(4, 0, 0)
 }
 
 // MARK: - Constants
