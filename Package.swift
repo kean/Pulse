@@ -11,8 +11,8 @@ let package = Package(
         .watchOS(.v8)
     ],
     products: [
-        .library(name: "Pulse", targets: ["Pulse"]),
-        .library(name: "PulseUI", targets: ["PulseUI"])
+        .library(name: "Pulse", type: .dynamic, targets: ["Pulse"]),
+        .library(name: "PulseUI", type: .dynamic, targets: ["PulseUI"])
     ],
     targets: [
         .target(name: "Pulse"),
