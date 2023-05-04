@@ -112,7 +112,7 @@ enum ContextMenu {
         }
 
         @ViewBuilder
-        private func content() -> some View {
+        func content() -> some View {
             if let url = task.url {
                 Button(action: {
                     UXPasteboard.general.string = url

@@ -8,35 +8,6 @@ import Network
 import Pulse
 #endif
 
-struct URLSessionMockUpdateRequest: Codable {
-    var update: [URLSessionMock]
-    var delete: [UUID]
-}
-
-#warning("simplify how data is passed with fewer packet codes")
-// - code (Int8)
-// - header size (UInt32)
-// - body size (UInt32)
-
-#warning("add version of the protocol; should Pulse for Mac support previous version of the protocol (presumably yes)?")
-
-
-// I see two options:
-// a) the source of truth for mocks are on the client
-//      pros: can in the future manage from clinet
-// b) the source of truth for mocks is on the server
-//      pros: supports two macs - one client scenario better; makes more sense
-//      cons: how to implement this?
-
-// When client connects to the remote server, the server sends the inital mock configuration to know what mocks to send and when. The same mock thing can be used for breakpoints.
-// Don't call this breakpoint, but allow server to
-
-
-// Gets headers/body for the given ID
-struct MockGetRequest {
-    let id: UUID
-}
-
 extension RemoteLogger {
     enum PacketCode: UInt8, Equatable {
         // Handshake
@@ -54,7 +25,7 @@ extension RemoteLogger {
         case storeEventNetworkTaskCompleted = 10
 
         // MARK: Mocks
-        case updateMocks = 11 // URLSessionMockUpdateRequest
+        case updateMocks = 11 // [URLSessionMock]
         case getMockedResponse = 12 // GetMockRequest / GetMockResponse
     }
 
@@ -171,6 +142,23 @@ extension RemoteLogger.Connection {
     func send(code: RemoteLogger.PacketCode) {
         send(code: code.rawValue, entity: RemoteLogger.Empty())
     }
+}
+
+struct MockGetRequest {
+    let id: UUID
+}
+
+struct URLSessionMock: Hashable, Codable {
+    let mockID: UUID
+    var pattern: String
+    var method: String?
+}
+
+struct URLSessionMockedResponse: Codable {
+    let errorCode: Int?
+    let statusCode: Int?
+    let headers: [String: String]?
+    var body: String?
 }
 
 // MARK: - Helpers (Binary Protocol)

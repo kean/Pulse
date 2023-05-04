@@ -103,6 +103,7 @@ private extension URLSession {
         guard !String(describing: delegate).contains("GTMSessionFetcher") else {
             return self.pulse_init(configuration: configuration, delegate: delegate, delegateQueue: delegateQueue)
         }
+        configuration.protocolClasses = [URLSessionMockingProtocol.self] + (configuration.protocolClasses ?? [])
         let delegate = URLSessionProxyDelegate(logger: sharedLogger, delegate: delegate)
         return self.pulse_init(configuration: configuration, delegate: delegate, delegateQueue: delegateQueue)
     }

@@ -2,6 +2,8 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
+#if !PULSE_STANDALONE_APP
+
 import SwiftUI
 import Pulse
 
@@ -117,4 +119,6 @@ func makeMockMessage() -> LoggerMessageEntity {
     entity.rawMetadata = "customKey: customValue"
     return entity
 }
+#endif
+
 #endif

@@ -9,12 +9,15 @@ import SwiftUI
 struct RichTextViewSearchToobar: View {
     @ObservedObject var viewModel: RichTextViewModel
 
+    var isSearchOptionsHidden = false
+
     var body: some View {
         HStack {
             if !viewModel.matches.isEmpty {
                 HStack(spacing: 8) {
                     Button(action: viewModel.previousMatch) {
                         Image(systemName: "chevron.left.circle")
+                            .foregroundColor(.secondary)
                     }
                     .buttonStyle(.plain)
                     .disabled(viewModel.matches.isEmpty)
@@ -25,6 +28,7 @@ struct RichTextViewSearchToobar: View {
 
                     Button(action: viewModel.nextMatch) {
                         Image(systemName: "chevron.right.circle")
+                            .foregroundColor(.secondary)
                     }
                     .buttonStyle(.plain)
                     .disabled(viewModel.matches.isEmpty)
@@ -41,7 +45,7 @@ struct RichTextViewSearchToobar: View {
             SearchBar(title: "Search", text: $viewModel.searchTerm).frame(maxWidth: 130)
 
             StringSearchOptionsMenu(options: $viewModel.searchOptions, isKindNeeded: false)
-                .fixedSize()
+                    .fixedSize()
         }
         .padding(6)
     }

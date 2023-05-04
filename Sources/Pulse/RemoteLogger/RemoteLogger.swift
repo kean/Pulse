@@ -49,7 +49,7 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
     private let specificKey = DispatchSpecificKey<String>()
     private var cancellable: AnyCancellable?
 
-    private var getResponseCompletions: [UUID: (URLSessionMockedResponse?) -> Void] = [:]
+    private var getMockedResponseCompletions: [UUID: (URLSessionMockedResponse?) -> Void] = [:]
 
     private var isInitialized = false
 
@@ -80,7 +80,6 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
         }
     }
 
-    /// - parameter store: By default, is initialized with a `default` store.
     private init() {
         queue.setSpecific(key: specificKey, value: "yes")
     }
@@ -307,11 +306,11 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
         case .ping:
             scheduleAutomaticDisconnect()
         case .updateMocks:
-            let request = try JSONDecoder().decode(URLSessionMockUpdateRequest.self, from: packet.body)
-            URLSessionMockManager.shared.update(request)
+            let mocks = try JSONDecoder().decode([URLSessionMock].self, from: packet.body)
+            URLSessionMockManager.shared.update(mocks)
         case .getMockedResponse:
             let response = try JSONDecoder().decode(GetMockResponse.self, from: packet.body)
-            if let completion = getResponseCompletions.removeValue(forKey: response.requestID) {
+            if let completion = getMockedResponseCompletions.removeValue(forKey: response.requestID) {
                 completion(response.mock)
             }
             break
@@ -430,7 +429,7 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
                 return completion(nil)
             }
             let request = GetMockRequest(requestID: UUID(), mockID: mock.mockID)
-            getResponseCompletions[request.requestID] = completion
+            getMockedResponseCompletions[request.requestID] = completion
             connection.send(code: .getMockedResponse, entity: request)
         }
     }

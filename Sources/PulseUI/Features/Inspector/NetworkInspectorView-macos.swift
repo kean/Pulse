@@ -2,7 +2,7 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
-#if os(macOS)
+#if os(macOS) && !PULSE_STANDALONE_APP
 
 import SwiftUI
 import CoreData

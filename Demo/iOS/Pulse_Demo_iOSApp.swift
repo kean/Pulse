@@ -6,10 +6,11 @@ import SwiftUI
 import Pulse
 import PulseUI
 
+#warning("TEMP")
 @main
 struct Pulse_Demo_iOSApp: App {
     var body: some Scene {
-        //        let _ = testProxy()
+        let _ = testProxy()
         
         WindowGroup {
             NavigationView {
@@ -27,9 +28,11 @@ private func testProxy() {
 
     let session = URLSession(configuration: .default, delegate: MockSessionDelegate(), delegateQueue: nil)
 
-    let task = session.downloadTask(with: URLRequest(url: URL(string: "https://github.com/kean/Nuke/archive/refs/tags/11.0.0.zip")!))
-//    task = session.dataTask(with: URL(string: "https://github.com/CreateAPI/Get")!)
-    task.resume()
+    DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(3)) {
+        let task = session.dataTask(with: URLRequest(url: URL(string: "https://github.com/kean/Nuke/archive/refs/tags/11.0.0.zip")!))
+        //    task = session.dataTask(with: URL(string: "https://github.com/CreateAPI/Get")!)
+        task.resume()
+    }
 }
 
 private final class MockSessionDelegate: NSObject, URLSessionDelegate, URLSessionTaskDelegate, URLSessionDownloadDelegate {

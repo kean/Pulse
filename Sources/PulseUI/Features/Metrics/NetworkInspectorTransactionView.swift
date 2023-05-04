@@ -58,6 +58,7 @@ struct NetworkInspectorTransactionView: View {
 final class NetworkInspectorTransactionViewModel: ObservableObject, Identifiable {
     let id: NSManagedObjectID
     let title: String
+    let transaction: NetworkTransactionMetricsEntity
     let statusViewModel: NetworkRequestStatusCellModel
     let timingViewModel: TimingViewModel?
     let requestViewModel: NetworkRequestInfoCellViewModel
@@ -67,6 +68,7 @@ final class NetworkInspectorTransactionViewModel: ObservableObject, Identifiable
     init(transaction: NetworkTransactionMetricsEntity, task: NetworkTaskEntity) {
         self.id = transaction.objectID
         self.title = transaction.fetchType.title
+        self.transaction = transaction
         self.statusViewModel = NetworkRequestStatusCellModel(transaction: transaction)
         self.requestViewModel = NetworkRequestInfoCellViewModel(transaction: transaction)
         self.timingViewModel = TimingViewModel(transaction: transaction, task: task)

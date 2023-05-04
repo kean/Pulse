@@ -36,7 +36,7 @@ extension KeyValueSectionViewModel {
         return KeyValueSectionViewModel(title: "Options", color: .indigo, items: items)
     }
 
-    static func makeTaskDetails(for task: NetworkTaskEntity) -> KeyValueSectionViewModel? {
+    static func makeTaskDetails(for task: NetworkTaskEntity) -> KeyValueSectionViewModel {
         func format(size: Int64) -> String {
             size > 0 ? ByteCountFormatter.string(fromByteCount: size) : "Empty"
         }
@@ -110,7 +110,7 @@ extension KeyValueSectionViewModel {
 
     static func makeQueryItems(for queryItems: [URLQueryItem]) -> KeyValueSectionViewModel? {
         KeyValueSectionViewModel(
-            title: "Query Items",
+            title: "Query",
             color: .purple,
             items: queryItems.map { ($0.name, $0.value) }
         )
@@ -207,6 +207,19 @@ extension KeyValueSectionViewModel {
             ("Proxy Connection", metrics.isProxyConnection.description),
             ("Reused Connection", metrics.isReusedConnection.description),
             ("Multipath", metrics.isMultipath.description)
+        ])
+    }
+
+    static func makeDetails(for cookie: HTTPCookie, color: Color) -> KeyValueSectionViewModel {
+        KeyValueSectionViewModel(title: cookie.name, color: color, items: [
+            ("Name", cookie.name),
+            ("Value", cookie.value),
+            ("Domain", cookie.domain),
+            ("Path", cookie.path),
+            ("Expires", cookie.expiresDate?.description(with: Locale(identifier: "en_US"))),
+            ("Secure", "\(cookie.isSecure)"),
+            ("HTTP Only", "\(cookie.isHTTPOnly)"),
+            ("Session Only", "\(cookie.isSessionOnly)")
         ])
     }
 }

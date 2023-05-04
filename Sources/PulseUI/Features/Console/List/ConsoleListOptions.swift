@@ -5,7 +5,7 @@
 import Foundation
 import Pulse
 
-struct ConsoleListOptions {
+struct ConsoleListOptions: Equatable {
     var messageSortBy: MessageSortBy = .dateCreated
     var taskSortBy: TaskSortBy = .dateCreated
 #if os(macOS)

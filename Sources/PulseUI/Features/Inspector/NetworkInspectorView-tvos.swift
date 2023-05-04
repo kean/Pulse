@@ -35,14 +35,14 @@ struct NetworkInspectorView: View {
             NetworkInspectorRequestTypePicker(isCurrentRequest: $isCurrentRequest)
             NetworkInspectorView.makeRequestSection(task: task, isCurrentRequest: isCurrentRequest)
         } header: { Text("Request") }
-        if viewModel.task.state != .pending {
+        if task.state != .pending {
             Section {
                 NetworkInspectorView.makeResponseSection(task: task)
             } header: { Text("Response") }
 
         }
         Section {
-            NetworkCURLCell(task: viewModel.task)
+            NetworkCURLCell(task: task)
         } header: { Text("Transactions") }
     }
 
@@ -54,7 +54,7 @@ struct NetworkInspectorView: View {
         }
         .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
         .listRowBackground(Color.clear)
-        NetworkInspectorMetricsViewModel(task: viewModel.task)
+        NetworkInspectorMetricsViewModel(task: task)
             .map(NetworkInspectorMetricsView.init)
     }
 }

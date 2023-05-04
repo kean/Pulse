@@ -93,8 +93,12 @@ private struct ConsoleSortByMenu: View {
         })
     }
 }
+#endif
 
-private struct ConsoleGroupByMenu: View {
+#if os(iOS) || os(macOS)
+import SwiftUI
+
+struct ConsoleGroupByMenu: View {
     @EnvironmentObject private var environment: ConsoleEnvironment
 
     var body: some View {

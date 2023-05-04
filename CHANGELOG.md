@@ -1,4 +1,4 @@
-# Pulse 3.x
+# Pulse 4.x
 
 ## WIP
 
@@ -12,6 +12,19 @@
 ### Fixes
 
 - Fix how network tasks details get collapsed in the console on macOS
+
+
+### Pulse for Mac
+
+- Add a simple way to mock network requests
+- New network inspector: new summary, metrics view, cookies viewer, etc
+- Add new headers table-based viewer
+- Add JWT viewer (right click on an HTTP header containing the JWT token to view it)
+- Add new search that now shows suggestions inline, has support for "Logs" filters, and other features introduces in Pulse 3.7.0
+- Add "Group By" support to table view
+- Add double-click to open row in a new window and the respective context menu action
+
+# Pulse 3.x
 
 ## Pulse 3.7.1
 

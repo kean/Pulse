@@ -72,26 +72,13 @@ private func makeAttributedString(for cookies: [HTTPCookie]) -> NSAttributedStri
 
     let sections = cookies
         .sorted { $0.name.caseInsensitiveCompare($1.name) == .orderedAscending }
-        .map { makeKeyValueSectionViewModel(for: $0, color: nextColor) }
+        .map { KeyValueSectionViewModel.makeDetails(for: $0, color: nextColor) }
     let renderer = TextRenderer()
     for section in sections {
         renderer.append(renderer.render(section.items, color: section.color, style: .monospaced))
         renderer.addSpacer()
     }
     return renderer.make()
-}
-
-private func makeKeyValueSectionViewModel(for cookie: HTTPCookie, color: Color) -> KeyValueSectionViewModel {
-    KeyValueSectionViewModel(title: "Cookies", color: color, items: [
-        ("Name", cookie.name),
-        ("Value", cookie.value),
-        ("Domain", cookie.domain),
-        ("Path", cookie.path),
-        ("Expires", cookie.expiresDate?.description(with: Locale(identifier: "en_US"))),
-        ("Secure", "\(cookie.isSecure)"),
-        ("HTTP Only", "\(cookie.isHTTPOnly)"),
-        ("Session Only", "\(cookie.isSessionOnly)")
-    ])
 }
 
 #if DEBUG

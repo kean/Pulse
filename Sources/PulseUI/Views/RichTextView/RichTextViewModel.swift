@@ -20,6 +20,8 @@ final class RichTextViewModel: ObservableObject {
     @Published var isLinkDetectionEnabled = true
     var isLineNumberRulerEnabled = false
     var isFilterEnabled = false
+    var isToolbarHidden = false
+    var isEditable = false
 
     let contentType: NetworkLogger.ContentType?
     let originalText: NSAttributedString

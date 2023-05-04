@@ -4,7 +4,8 @@
 
 import Foundation
 
-#warning("how is this going to work for initial requests before the remote logger connects?")
+// One more option is to add a delay on connection to make sure logger
+// is connected before the app runs.
 final class URLSessionMockManager {
     private var mocks: [UUID: URLSessionMock] = [:]
 
@@ -16,38 +17,14 @@ final class URLSessionMockManager {
         }
     }
 
-    func update(_ request: URLSessionMockUpdateRequest) {
-        for mockID in request.delete {
-            mocks[mockID] = nil
-        }
-        for mock in request.update {
-            mocks[mock.mockID] = mock
+    func update(_ mocks: [URLSessionMock]) {
+        self.mocks.removeAll()
+        for mock in mocks {
+            self.mocks[mock.mockID] = mock
         }
     }
 }
 
-struct URLSessionMock: Codable {
-    let mockID: UUID
-    let url: String
-    let isCaseSensitive: Bool
-    let isRegex: Bool
-    let method: String
-
-    #warning("TODO: implement proper matching")
-    func isMatch(for request: URLRequest) -> Bool {
-        request.url?.absoluteString == url
-    }
-}
-
-#warning("allow mocking errors? error code?")
-struct URLSessionMockedResponse: Codable {
-    let errorCode: Int?
-    let statusCode: Int?
-    let headers: [String: String]?
-    var body: String?
-}
-
-#warning("test that errors are displayed corectly")
 final class URLSessionMockingProtocol: URLProtocol {
     override func startLoading() {
         guard let mock = URLSessionMockManager.shared.getMock(for: request) else {
@@ -59,7 +36,6 @@ final class URLSessionMockingProtocol: URLProtocol {
         }
     }
 
-    #warning("test that error is displayed correctly")
     private func didReceiveResponse(_ response: URLSessionMockedResponse?) {
         guard let response = response else {
             client?.urlProtocol(self, didFailWithError: URLError(.unknown, userInfo: [
@@ -88,5 +64,18 @@ final class URLSessionMockingProtocol: URLProtocol {
 
     override class func canInit(with request: URLRequest) -> Bool {
         URLSessionMockManager.shared.getMock(for: request) != nil
+    }
+}
+
+extension URLSessionMock {
+    func isMatch(for request: URLRequest) -> Bool {
+        guard request.httpMethod?.uppercased() == method ?? "GET" else {
+            return false
+        }
+        guard let url = request.url?.absoluteString,
+              let regex = try? Regex(pattern, [.caseInsensitive]) else {
+            return false
+        }
+        return regex.isMatch(url)
     }
 }
