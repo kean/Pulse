@@ -20,7 +20,7 @@ struct StoreDetailsView: View {
     }
 
     var body: some View {
-        Contents(viewModel: viewModel)
+        StoreDetailsContentsView(viewModel: viewModel)
             .onAppear { viewModel.load(from: source) }
 #if os(tvOS)
             .padding()
@@ -30,69 +30,70 @@ struct StoreDetailsView: View {
     }
 }
 
-private struct Contents: View {
-    @ObservedObject var viewModel: StoreDetailsViewModel
-    @Environment(\.store) var store
+ struct StoreDetailsContentsView: View {
+     @ObservedObject var viewModel: StoreDetailsViewModel
+     @Environment(\.store) var store
+     var isShowingActions = true
 
-    var body: some View {
-        // important: zstack fixed infinite onAppear loop on iOS 14
-        ZStack {
-            if let error = viewModel.errorMessage {
-                PlaceholderView(imageName: "exclamationmark.circle", title: "Failed to load info", subtitle: error)
-            } else {
-                form
-            }
-        }
-    }
+     var body: some View {
+         // important: zstack fixed infinite onAppear loop on iOS 14
+         ZStack {
+             if let error = viewModel.errorMessage {
+                 PlaceholderView(imageName: "exclamationmark.circle", title: "Failed to load info", subtitle: error)
+             } else {
+                 form
+             }
+         }
+     }
 
-    @ViewBuilder
-    private var form: some View {
-        Form {
-            if #available(iOS 16.0, tvOS 16.0, macOS 13.0, watchOS 9.0, *), let info = viewModel.info {
-                LoggerStoreSizeChart(info: info, sizeLimit: viewModel.storeSizeLimit)
+     @ViewBuilder
+     private var form: some View {
+         Form {
+             if #available(iOS 16.0, tvOS 16.0, macOS 13.0, watchOS 9.0, *), let info = viewModel.info {
+                 LoggerStoreSizeChart(info: info, sizeLimit: viewModel.storeSizeLimit)
 #if os(tvOS)
-                    .padding(.vertical)
-                    .focusable()
+                     .padding(.vertical)
+                     .focusable()
 #endif
 #if os(macOS)
-                    .padding(12)
+                     .padding(12)
 #endif
-            }
-            ForEach(viewModel.sections, id: \.title) { section in
-                ConsoleSection(header: {
+             }
+             ForEach(viewModel.sections, id: \.title) { section in
+                 ConsoleSection(header: {
 #if os(macOS)
-                    SectionHeaderView(title: section.title)
+                     SectionHeaderView(title: section.title)
 #else
-                    Text(section.title)
+                     Text(section.title)
 #endif
-                }, content: {
-                    ForEach(section.items.enumerated().map(KeyValueRow.init)) { item in
-                        InfoRow(title: item.title, details: item.details)
+                 }, content: {
+                     ForEach(section.items.enumerated().map(KeyValueRow.init)) { item in
+                         InfoRow(title: item.title, details: item.details)
 #if os(tvOS)
-                            .focusable()
+                             .focusable()
 #endif
-                    }
-                })
-            }
+                     }
+                 })
+             }
 #if os(macOS)
-            ConsoleSection(header: { EmptyView() }, content: {
-                HStack {
-                    Button("Show in Finder") {
-                        NSWorkspace.shared.activateFileViewerSelecting([store.storeURL])
-                    }
-                    if !(store.options.contains(.readonly)) {
-                        Button {
-                            store.removeAll()
-                        } label: {
-                            Label("Remove Logs", systemImage: "trash")
-                        }
-                    }
-                }
-            })
+             if isShowingActions {
+                 ConsoleSection(header: { EmptyView() }, content: {
+                     HStack {
+                         Button("Show in Finder") {
+                             NSWorkspace.shared.activateFileViewerSelecting([store.storeURL])
+                         }
+                         if !(store.options.contains(.readonly)) {
+                             Button("Remove Logs") {
+                                 store.removeAll()
+                             }
+                         }
+                     }
+                 })
+             }
 #endif
-        }
-    }
-}
+         }
+     }
+ }
 
 // MARK: - ViewModel
 

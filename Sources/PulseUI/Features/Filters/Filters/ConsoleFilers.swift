@@ -75,6 +75,7 @@ extension ConsoleFilers {
 
     struct Host: ConsoleFilterProtocol {
         var isEnabled = true
-        var ignoredHosts: Set<String> = []
+        var hidden: Set<String> = []
+        var focused: String?
     }
 }

@@ -182,7 +182,11 @@ struct ConsoleListOptionsView: View {
     @EnvironmentObject private var filters: ConsoleFiltersViewModel
 
     var body: some View {
-#if os(macOS)
+#if PULSE_STANDALONE_APP
+        SelectableButton(image: Image(systemName: "exclamationmark.octagon"), isSelected: $filters.options.isOnlyErrors)
+            .keyboardShortcut("e", modifiers: [.command, .shift])
+            .help("Toggle Show Only Errors (⇧⌘E)")
+#elseif os(macOS)
         Button(action: { filters.options.isOnlyErrors.toggle() }) {
             Image(systemName: filters.options.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon")
                 .foregroundColor(filters.options.isOnlyErrors ? .red : .primary)

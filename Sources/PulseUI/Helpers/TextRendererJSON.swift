@@ -104,7 +104,7 @@ final class TextRendererJSON {
     }
 
     private func renderObject(_ object: [String: Any]) {
-        let node = JSONContainerNode(kind: .object, json: json)
+        let node = JSONContainerNode(kind: .object, json: object)
         append("{", .punctuation, node)
         newline()
         let keys = object.keys.sorted()
@@ -127,7 +127,7 @@ final class TextRendererJSON {
     }
 
     private func renderArray(_ array: [Any]) {
-        let node = JSONContainerNode(kind: .array, json: json)
+        let node = JSONContainerNode(kind: .array, json: array)
         if array is [String] || array is [Int] || array is [NSNumber] {
             append("[", .punctuation, node)
             for index in array.indices {

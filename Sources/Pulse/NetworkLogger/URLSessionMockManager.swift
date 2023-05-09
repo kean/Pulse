@@ -63,7 +63,7 @@ final class URLSessionMockingProtocol: URLProtocol {
     }
 
     override class func canInit(with request: URLRequest) -> Bool {
-        URLSessionMockManager.shared.getMock(for: request) != nil
+        URLSessionMockManager.shared.getMock(for: request) != nil && RemoteLogger.shared.connectionState == .connected
     }
 }
 

@@ -45,11 +45,11 @@ struct InlineTabBarItem: View {
             .font(.system(size: 11, weight: .medium, design: .default))
             .foregroundColor(isSelected ? .white : .secondary)
         if let details = details, !details.isEmpty {
-            text = text + Text(" (\(details))")
+            text = (text + Text(" (\(details))"))
                 .font(.system(size: 11, weight: .medium, design: .default))
                 .foregroundColor(isSelected ? .white.opacity(0.6) : .secondary.opacity(0.6))
         }
-        return text
+        return text.lineLimit(1)
     }
 }
 

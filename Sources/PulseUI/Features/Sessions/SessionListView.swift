@@ -44,8 +44,15 @@ struct SessionListView: View {
         VStack {
             list
             HStack {
+#if PULSE_STANDALONE_APP
+                NavigatorFilterBar(text: $filterTerm)
+                    .frame(maxWidth: 200)
+                    .help("Show sessions with matching name")
+#else
                 SearchBar(title: "Filter", imageName: "line.3.horizontal.decrease.circle", text: $filterTerm)
                     .frame(maxWidth: 200)
+                    .help("Show sessions with matching name")
+#endif
                 Spacer()
             }.padding(8)
         }

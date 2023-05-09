@@ -33,14 +33,25 @@ struct ConsoleDomainsSelectionView: View {
             self.domains = NSCountedSet(array: tasks.compactMap(\.host))
         }
     }
-}
+}   
 
 private extension ConsoleFiltersViewModel {
     func bindingForHosts(index: LoggerStoreIndex) -> Binding<Set<String>> {
         Binding(get: {
-            Set(index.hosts).subtracting(self.criteria.network.host.ignoredHosts)
+            if let focused = self.criteria.network.host.focused {
+                return [focused]
+            } else {
+                return Set(index.hosts).subtracting(self.criteria.network.host.hidden)
+            }
         }, set: { newValue in
-            self.criteria.network.host.ignoredHosts = Set(index.hosts).subtracting(newValue)
+            self.criteria.network.host.focused = nil
+            self.criteria.network.host.hidden = []
+            switch newValue.count {
+            case 1:
+                self.criteria.network.host.focused = newValue.first!
+            default:
+                self.criteria.network.host.hidden = Set(index.hosts).subtracting(newValue)
+            }
         })
     }
 }

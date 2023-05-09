@@ -74,7 +74,7 @@ private struct _ConsoleMessageCell: View {
 private struct _ConsoleTaskCell: View {
     let task: NetworkTaskEntity
     @State private var shareItems: ShareItems?
-    @State private var isSharing = false
+    @State private var sharedTask: NetworkTaskEntity?
 
     var body: some View {
 #if os(iOS)
@@ -98,7 +98,7 @@ private struct _ConsoleTaskCell: View {
 #if os(iOS)
                 shareItems = ShareService.share(task, as: .html)
 #else
-                isSharing = true
+                sharedTask = task
 #endif
             }) {
                 Label("Share", systemImage: "square.and.arrow.up.fill")
@@ -108,13 +108,13 @@ private struct _ConsoleTaskCell: View {
 #if os(iOS)
             ContextMenu.NetworkTaskContextMenuItems(task: task, sharedItems: $shareItems)
 #else
-            ContextMenu.NetworkTaskContextMenuItems(task: task, isSharing: $isSharing)
+            ContextMenu.NetworkTaskContextMenuItems(task: task, sharedTask: $sharedTask)
 #endif
         }
 #if os(iOS)
         .sheet(item: $shareItems, content: ShareView.init)
 #else
-        .popover(isPresented: $isSharing, attachmentAnchor: .point(.leading), arrowEdge: .leading) { ShareNetworkTaskView(task: task) }
+        .popover(item: $sharedTask, attachmentAnchor: .point(.leading), arrowEdge: .leading) { ShareNetworkTaskView(task: $0) }
 #endif
 #else
         cell

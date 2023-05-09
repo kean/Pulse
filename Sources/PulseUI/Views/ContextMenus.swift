@@ -35,7 +35,7 @@ enum ContextMenu {
                         filters.criteria.messages.logLevels.levels.remove(message.logLevel)
                     }
                 }, label: {
-                    Label("Hide...", systemImage: "eye.slash")
+                    Label("Hide", systemImage: "eye.slash")
                 })
                 Menu(content: {
                     Button("Show Label '\(message.label)'") {
@@ -45,7 +45,7 @@ enum ContextMenu {
                         filters.criteria.messages.logLevels.levels = [message.logLevel]
                     }
                 }, label: {
-                    Label("Show...", systemImage: "eye")
+                    Label("Show", systemImage: "eye")
                 })
             }
             Section {
@@ -59,23 +59,62 @@ enum ContextMenu {
 #if os(iOS)
         @Binding private(set) var sharedItems: ShareItems?
 #else
-        @Binding private(set) var isSharing: Bool
+        @Binding private(set) var sharedTask: NetworkTaskEntity?
 #endif
+
+        @EnvironmentObject private var environment: ConsoleEnvironment
 
         var body: some View {
             Section {
 #if os(iOS)
                 ContextMenu.NetworkTaskShareMenu(task: task, shareItems: $sharedItems)
 #else
-                Button(action: { isSharing = true }) {
+                Button(action: { sharedTask = task }) {
                     Label("Share...", systemImage: "square.and.arrow.up")
                 }
 #endif
                 ContextMenu.NetworkTaskCopyMenu(task: task)
             }
+//            if environment.mode == .network {
+//                Section {
+//                    NetworkTaskFilterMenu(task: task)
+//                }
+//            }
+#if PULSE_STANDALONE_APP
+            StandaloneNetworkTaskContextMenu(task: task)
+#endif
             if let message = task.message {
-                PinButton(viewModel: .init(message))
+                Section {
+                    PinButton(viewModel: .init(message))
+                }
             }
+        }
+    }
+
+    struct NetworkTaskFilterMenu: View {
+        let task: NetworkTaskEntity
+
+        @EnvironmentObject private var filters: ConsoleFiltersViewModel
+
+        var body: some View {
+            Menu(content: {
+                if let host = task.host {
+                    Button("Hide Host '\(host)'") {
+                        filters.criteria.network.host.hidden.insert(host)
+                    }
+                }
+            }, label: {
+                Label("Hide", systemImage: "eye.slash")
+            })
+            Menu(content: {
+                if let host = task.host {
+                    Button("Show Host '\(host)'") {
+                        filters.criteria.network.host.focused = host
+                    }
+                }
+            }, label: {
+                Label("Show", systemImage: "eye")
+            })
         }
     }
 
@@ -107,7 +146,7 @@ enum ContextMenu {
 
         var body: some View {
             Menu(content: content) {
-                Label("Copy...", systemImage: "doc.on.doc")
+                Label("Copy", systemImage: "doc.on.doc")
             }
         }
 

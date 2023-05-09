@@ -80,8 +80,12 @@ private func makePredicates(for criteria: ConsoleFilers.Messages) -> [NSPredicat
 private func makePredicates(for criteria: ConsoleFilers.Network) -> [NSPredicate] {
     var predicates = [NSPredicate]()
 
-    if criteria.host.isEnabled, !criteria.host.ignoredHosts.isEmpty {
-        predicates.append(NSPredicate(format: "NOT host IN %@", criteria.host.ignoredHosts))
+    if criteria.host.isEnabled {
+        if let focusedHost = criteria.host.focused {
+            predicates.append(NSPredicate(format: "host == %@", focusedHost))
+        } else if !criteria.host.hidden.isEmpty {
+            predicates.append(NSPredicate(format: "NOT host IN %@", Array(criteria.host.hidden)))
+        }
     }
 
 #if PULSE_STANDALONE_APP
