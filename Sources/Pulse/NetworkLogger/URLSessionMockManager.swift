@@ -39,7 +39,7 @@ final class URLSessionMockingProtocol: URLProtocol {
     private func didReceiveResponse(_ response: URLSessionMockedResponse?) {
         guard let response = response else {
             client?.urlProtocol(self, didFailWithError: URLError(.unknown, userInfo: [
-                NSLocalizedDescriptionKey: "Failed to retreive the mocked response"
+                NSLocalizedDescriptionKey: "Failed to retrieve the mocked response"
             ]))
             return
         }
