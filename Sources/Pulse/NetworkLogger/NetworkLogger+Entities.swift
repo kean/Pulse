@@ -61,7 +61,7 @@ extension NetworkLogger {
 
         var isSuccess: Bool {
             // By default, use 200 for non-HTTP responses
-            (200..<400).contains(statusCode ?? 200)
+            (100..<400).contains(statusCode ?? 200)
         }
 
         public init(_ urlResponse: URLResponse) {
