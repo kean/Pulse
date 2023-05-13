@@ -58,15 +58,24 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
     /// - parameter store: The store to be synced with the server. By default,
     /// ``LoggerStore/shared``. Only one store can be synced at at time.
     public func initialize(store: LoggerStore = .shared) {
+        guard self.store !== store else {
+            return
+        }
+        self.store = store
+
+        queue.async {
+            self._initialize(store: store)
+        }
+    }
+
+    private func _initialize(store: LoggerStore) {
         if isInitialized {
             cancel()
         }
         isInitialized = true
 
-        self.store = store
-
         if isEnabled {
-            queue.async(execute: startBrowser)
+            startBrowser()
         }
 
         cancellable = store.events.receive(on: queue).sink { [weak self] in
