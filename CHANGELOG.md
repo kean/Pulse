@@ -23,6 +23,7 @@
 - Add new search that now shows suggestions inline, has support for "Logs" filters, and other features introduces in Pulse 3.7.0
 - Add "Group By" support to table view
 - Add double-click to open row in a new window and the respective context menu action
+- Add "Now" mode
 
 # Pulse 3.x
 

@@ -20,6 +20,8 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
 
     @Published private(set) var mode: ConsoleMode
 
+    var didLiveScrollCancellable: AnyCancellable?
+
     var isViewVisible = false {
         didSet {
             guard oldValue != isViewVisible else { return }
