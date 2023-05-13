@@ -138,7 +138,7 @@ private let spacing: CGFloat? = nil
 
 private extension NetworkResponseEntity {
     var isSuccess: Bool {
-        (200..<400).contains(statusCode)
+        (100..<400).contains(statusCode)
     }
 }
 
