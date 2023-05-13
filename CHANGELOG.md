@@ -1,5 +1,12 @@
 # Pulse 3.x
 
+## Pulse 3.7.2
+
+*May 12, 2023*
+
+- Fix #192: status codes in 1XX range were considered failures  
+- Fix #193: synchronization issue during remote logger initialization
+
 ## Pulse 3.7.1
 
 *Apr 30, 2023*
