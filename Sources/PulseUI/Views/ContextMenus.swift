@@ -80,9 +80,6 @@ enum ContextMenu {
 //                    NetworkTaskFilterMenu(task: task)
 //                }
 //            }
-#if PULSE_STANDALONE_APP
-            StandaloneNetworkTaskContextMenu(task: task)
-#endif
             if let message = task.message {
                 Section {
                     PinButton(viewModel: .init(message))

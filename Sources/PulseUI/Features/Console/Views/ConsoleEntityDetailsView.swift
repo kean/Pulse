@@ -46,7 +46,7 @@ struct ConsoleEntityDetailsRouterView: View {
 }
 
 struct ButtonChangeContentModeLayout: View {
-    @SceneStorage("is-details-vertical") private var isVertical = false
+    @SceneStorage("scene-is-details-vertical") private var isVertical = AppSettings.shared.isVertical
 
     var body: some View {
         Button(action: { isVertical.toggle() }, label: {
@@ -55,6 +55,9 @@ struct ButtonChangeContentModeLayout: View {
         })
         .help(isVertical ? "Switch to Horizontal Layout" : "Switch to Vertical Layout")
         .buttonStyle(.plain)
+        .onChange(of: isVertical) {
+            AppSettings.shared.isVertical = $0
+        }
     }
 }
 
