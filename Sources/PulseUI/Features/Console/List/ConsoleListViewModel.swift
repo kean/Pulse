@@ -8,7 +8,7 @@ import Pulse
 import Combine
 import SwiftUI
 
-final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
+final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject, ConsoleEntitiesSource {
 #if !os(macOS)
     @Published private(set) var visibleEntities: ArraySlice<NSManagedObject> = []
 #else
@@ -39,12 +39,7 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
 
     @Published private(set) var previousSession: LoggerSessionEntity?
 
-    enum Event {
-        case refresh
-        case update
-    }
-
-    let events = PassthroughSubject<Event, Never>()
+    let events = PassthroughSubject<ConsoleUpdateEvent, Never>()
 
     /// This exist strictly to workaround List performance issues
     private var scrollPosition: ScrollPosition = .nearTop
@@ -155,7 +150,7 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject {
             refreshVisibleEntities()
         }
 #endif
-        events.send(.update)
+        events.send(.update(diff))
     }
 
     // MARK: Visible Entities

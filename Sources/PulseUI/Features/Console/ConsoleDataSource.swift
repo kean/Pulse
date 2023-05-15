@@ -18,9 +18,6 @@ protocol ConsoleDataSourceDelegate: AnyObject {
 }
 
 final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
-    private(set) var entities: [NSManagedObject] = []
-    private(set) var sections: [NSFetchedResultsSectionInfo]?
-
     weak var delegate: ConsoleDataSourceDelegate?
 
     /// - warning: Incompatible with the "group by" option.
@@ -81,6 +78,7 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
             NSSortDescriptor(key: sortKey, ascending: options.order == .ascending)
         ].compactMap { $0 }
         request.fetchBatchSize = ConsoleDataSource.fetchBatchSize
+        request.relationshipKeyPathsForPrefetching = ["request"]
         controller = NSFetchedResultsController(
             fetchRequest: request,
             managedObjectContext: store.viewContext,
@@ -113,25 +111,35 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
 
     func refresh() {
         try? controller.performFetch()
-        refreshEntities()
         delegate?.dataSourceDidRefresh(self)
     }
-
+    
+    // MARK: Accessing Entities
+    
+    var numberOfObjects: Int {
+        controller.fetchedObjects?.count ?? 0
+    }
+    
+    func object(at indexPath: IndexPath) -> NSManagedObject {
+        controller.object(at: indexPath)
+    }
+    
+    var entities: [NSManagedObject] {
+        controller.fetchedObjects ?? []
+    }
+    
+    var sections: [NSFetchedResultsSectionInfo]? {
+        controller.sectionNameKeyPath == nil ? nil : controller.sections
+    }
+    
     // MARK: NSFetchedResultsControllerDelegate
 
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        refreshEntities()
         delegate?.dataSource(self, didUpdateWith: nil)
     }
 
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChangeContentWith diff: CollectionDifference<NSManagedObjectID>) {
-        refreshEntities()
         delegate?.dataSource(self, didUpdateWith: diff)
-    }
-
-    private func refreshEntities() {
-        entities = controller.fetchedObjects ?? []
-        sections = controller.sectionNameKeyPath == nil ?  nil : controller.sections
     }
 
     // MARK: Predicate
@@ -251,4 +259,11 @@ private final class ConsoleGroupedFetchDelegate: NSObject, NSFetchedResultsContr
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         delegate?.controllerDidChangeContent?(controller)
     }
+}
+
+enum ConsoleUpdateEvent {
+    /// Full refresh of data.
+    case refresh
+    /// Incremental update.
+    case update(CollectionDifference<NSManagedObjectID>?)
 }

@@ -11,8 +11,6 @@ struct ConsoleLabelsSelectionView: View {
     @ObservedObject var viewModel: ConsoleFiltersViewModel
     @EnvironmentObject private var index: LoggerStoreIndex
 
-    @State private var labels = NSCountedSet()
-
     var body: some View {
         ConsoleSearchListSelectionView(
             title: "Labels",
@@ -20,18 +18,8 @@ struct ConsoleLabelsSelectionView: View {
             id: \.self,
             selection: viewModel.bindingForSelectedLabels(index: index),
             description: { $0 },
-            label: {
-                ConsoleSearchListCell(title: $0, details: "\(labels.count(for: $0))")
-            }
+            label: { Text($0) }
         )
-        .onReceive(viewModel.entities) {
-            let messages = $0 as? [LoggerMessageEntity] ?? []
-            self.labels = NSCountedSet(array: messages.map(\.label))
-        }
-        .onAppear {
-            let messages = viewModel.entities.value as? [LoggerMessageEntity] ?? []
-            self.labels = NSCountedSet(array: messages.map(\.label))
-        }
     }
 }
 

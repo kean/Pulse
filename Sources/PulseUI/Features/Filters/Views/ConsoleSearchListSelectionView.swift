@@ -115,8 +115,9 @@ struct ConsoleSearchListSelectionView<Data: RandomAccessCollection, ID: Hashable
             } else {
                 selection.remove(item[keyPath: id])
             }
-        }), label: { label(item).lineLimit(3) })
+        }), label: { label(item).lineLimit(1) })
 #if os(macOS)
+        .help(description(item))
         .frame(maxWidth: .infinity, alignment: .leading)
 #endif
     }
@@ -131,19 +132,6 @@ struct ConsoleSearchListSelectionView<Data: RandomAccessCollection, ID: Hashable
             selection = selection.isEmpty ? Set(items.map { $0[keyPath: id] }) : []
         }
         .foregroundColor(.blue)
-    }
-}
-
-struct ConsoleSearchListCell: View {
-    let title: String
-    let details: String
-
-    var body: some View {
-        HStack {
-            Text(title)
-            Spacer()
-            Text(details).foregroundColor(.secondary)
-        }
     }
 }
 

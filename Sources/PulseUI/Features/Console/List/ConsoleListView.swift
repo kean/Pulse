@@ -32,7 +32,7 @@ private struct _InternalConsoleListView: View {
 
         let listViewModel = ConsoleListViewModel(environment: environment, filters: filters)
         let searchBarViewModel = ConsoleSearchBarViewModel()
-        let searchViewModel = ConsoleSearchViewModel(environment: environment, list: listViewModel, searchBar: searchBarViewModel)
+        let searchViewModel = ConsoleSearchViewModel(environment: environment, source: listViewModel, searchBar: searchBarViewModel)
 
         _listViewModel = StateObject(wrappedValue: IgnoringUpdates(listViewModel))
         _searchBarViewModel = StateObject(wrappedValue: searchBarViewModel)
@@ -172,7 +172,7 @@ private struct _ConsoleListView: View {
                     if isSearching && !searchViewModel.parameters.isEmpty {
                         ConsoleSearchResultsListContentView()
                     } else {
-                        StandaloneConsoleListContentView()
+                        ConsoleListContentView(proxy: proxy)
                     }
                 }
             }

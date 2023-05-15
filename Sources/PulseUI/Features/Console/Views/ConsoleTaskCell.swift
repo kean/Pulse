@@ -28,7 +28,9 @@ struct ConsoleTaskCell: View {
             details
 #endif
         }
+#if !PULSE_STANDALONE_APP
             .animation(.default, value: task.state)
+#endif
 #if os(macOS)
         contents.padding(.vertical, 5)
 #else

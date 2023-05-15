@@ -99,7 +99,7 @@ struct Previews_ConsoleSearchSuggestionsView_Previews: PreviewProvider {
         }
         .listStyle(.plain)
         .injecting(environment)
-        .environmentObject(ConsoleSearchViewModel(environment: environment, list: ConsoleListViewModel(environment: environment, filters: .init(options: .init())), searchBar: .init()))
+        .environmentObject(ConsoleSearchViewModel(environment: environment, source: ConsoleListViewModel(environment: environment, filters: .init(options: .init())), searchBar: .init()))
         .frame(width: 340)
     }
 }

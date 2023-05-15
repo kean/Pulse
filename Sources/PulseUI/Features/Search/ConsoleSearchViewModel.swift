@@ -9,6 +9,11 @@ import Pulse
 import CoreData
 import Combine
 
+protocol ConsoleEntitiesSource {
+    var events: PassthroughSubject<ConsoleUpdateEvent, Never> { get }
+    var entities: [NSManagedObject] { get }
+}
+
 final class ConsoleSearchBarViewModel: ObservableObject {
     @Published var text: String = ""
     @Published var tokens: [ConsoleSearchToken] = []
@@ -59,8 +64,8 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     }
 
     var allScopes: [ConsoleSearchScope] {
-        (list.mode.hasLogs ? ConsoleSearchScope.messageScopes : []) +
-        (list.mode.hasNetwork ? ConsoleSearchScope.networkScopes : [])
+        (environment.mode.hasLogs ? ConsoleSearchScope.messageScopes : []) +
+        (environment.mode.hasNetwork ? ConsoleSearchScope.networkScopes : [])
     }
 
     private var dirtyDate: Date?
@@ -72,19 +77,21 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     private var suggestionsService: ConsoleNetworkSearchSuggestionsService!
     @Published private(set) var suggestionsViewModel: ConsoleSearchSuggestionsViewModel!
 
-    private let list: ConsoleListViewModel
+    private let source: ConsoleEntitiesSource
     private let searchService = ConsoleSearchService()
 
+    private let environment: ConsoleEnvironment
     private let store: LoggerStore
     private let index: LoggerStoreIndex
     private let queue = DispatchQueue(label: "com.github.pulse.console-search-view")
     private var cancellables: [AnyCancellable] = []
     private let context: NSManagedObjectContext
 
-    init(environment: ConsoleEnvironment, list: ConsoleListViewModel, searchBar: ConsoleSearchBarViewModel) {
+    init(environment: ConsoleEnvironment, source: ConsoleEntitiesSource, searchBar: ConsoleSearchBarViewModel) {
+        self.environment = environment
         self.store = environment.store
         self.index = environment.index
-        self.list = list
+        self.source = source
         self.searchBar = searchBar
 
         self.context = store.newBackgroundContext()
@@ -123,7 +130,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
             self?.updateSearchTokens()
         }.store(in: &cancellables)
 
-        list.events.sink { [weak self] in
+        source.events.sink { [weak self] in
             self?.didReceive($0)
         }.store(in: &cancellables)
 
@@ -140,12 +147,12 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         }
     }
 
-    private func didReceive(_ event: ConsoleListViewModel.Event) {
+    private func didReceive(_ event: ConsoleUpdateEvent) {
         switch event {
         case .refresh:
             refreshNow()
         case .update:
-            checkForNewSearchMatches(for: list.entities)
+            checkForNewSearchMatches(for: source.entities)
         }
     }
 
@@ -184,7 +191,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
             dirtyDate = Date()
         }
 
-        let operation = ConsoleSearchOperation(entities: list.entities, parameters: parameters, service: searchService, context: context)
+        let operation = ConsoleSearchOperation(entities: source.entities, parameters: parameters, service: searchService, context: context)
         operation.delegate = self
         operation.resume()
         self.operation = operation

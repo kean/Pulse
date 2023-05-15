@@ -2,8 +2,6 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
-#if !PULSE_STANDALONE_APP
-
 import CoreData
 import Pulse
 import Combine
@@ -157,6 +155,4 @@ struct ConsoleStaticList: View {
 #endif
     }
 }
-#endif
-
 #endif
