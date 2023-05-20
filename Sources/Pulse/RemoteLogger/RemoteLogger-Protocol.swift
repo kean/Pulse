@@ -23,10 +23,16 @@ extension RemoteLogger {
         case storeEventNetworkTaskCreated = 8
         case storeEventNetworkTaskProgressUpdated = 9
         case storeEventNetworkTaskCompleted = 10
-
-        // MARK: Mocks
+        // Mocks
         case updateMocks = 11 // [URLSessionMock]
         case getMockedResponse = 12 // GetMockRequest / GetMockResponse
+        // A custom message with the following format:
+        //
+        // path (String)
+        // body (Data)
+        //
+        // Moving forward, all non-control packets will be send using this format.
+        case message = 13
     }
 
     struct PacketClientHello: Codable {
@@ -82,7 +88,7 @@ extension RemoteLogger {
 
         static func decode(_ data: Data) throws -> LoggerStore.Event.NetworkTaskCompleted {
             guard data.count >= Manifest.size else {
-                throw PacketParsingError.notEnoughData
+                throw PacketParsingError.notEnoughData // Should never happen
             }
 
             let manifest = Manifest(
@@ -92,7 +98,7 @@ extension RemoteLogger {
             )
 
             guard data.count >= manifest.totalSize else {
-                throw PacketParsingError.notEnoughData
+                throw PacketParsingError.notEnoughData // This should never happen
             }
 
             let event = try JSONDecoder().decode(
@@ -111,6 +117,53 @@ extension RemoteLogger {
             }
 
             return LoggerStore.Event.NetworkTaskCompleted(taskId: event.taskId, taskType: event.taskType, createdAt: event.createdAt, originalRequest: event.originalRequest, currentRequest: event.currentRequest, response: event.response, error: event.error, requestBody: requestBody, responseBody: responseBody, metrics: event.metrics, label: event.label)
+        }
+    }
+    
+    struct Message {
+        let url: URL
+        let data: Data
+        
+        private struct Manifest: Codable {
+            let urlSize: UInt32
+            let dataSize: UInt32
+
+            static let size = 8
+
+            var totalSize: Int {
+                Manifest.size + Int(urlSize) + Int(dataSize)
+            }
+        }
+
+        static func encode(_ request: Message) throws -> Data {
+            guard let url = request.url.absoluteString.data(using: .utf8) else {
+                throw URLError(.unknown, userInfo: [:]) // Should never happen
+            }
+            var data = Data()
+            data.append(Data(UInt32(url.count)))
+            data.append(Data(UInt32(request.data.count)))
+            data.append(url)
+            data.append(request.data)
+            return data
+        }
+        
+        static func decode(_ data: Data) throws -> Message {
+            guard data.count >= Manifest.size else {
+                throw PacketParsingError.notEnoughData // Should never happen
+            }
+            let manifest = Manifest(
+                urlSize: UInt32(data.from(0, size: 4)),
+                dataSize: UInt32(data.from(4, size: 4))
+            )
+            guard data.count >= manifest.totalSize else {
+                throw PacketParsingError.notEnoughData // This should never happen
+            }
+            guard let urlString = String(data: data.from(Manifest.size, size: Int(manifest.urlSize)), encoding: .utf8),
+                  let url = URL(string: urlString) else {
+                throw URLError(.badURL, userInfo: [:]) // This should never happen
+            }
+            let body = data.from(Manifest.size + Int(manifest.urlSize), size: Int(manifest.dataSize))
+            return Message(url: url, data: body)
         }
     }
 
