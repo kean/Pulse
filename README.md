@@ -6,6 +6,8 @@
 
 Record and inspect logs and `URLSession` network requests right from your iOS app. Share logs and view them in [Pulse Pro](https://kean.blog/pulse/pro) or use remote logging to see them in real-time. Logs are stored locally and never leave your devices.
 
+> 🆕 Pulse Pro is soon getting replaced by a new Pulse for Mac app. [Join the public beta](https://testflight.apple.com/join/1jcanE3q)!
+
 ## About
 
 `Pulse` is not just a tool, it's a framework. It records events from `URLSession` or from frameworks that use it, such as [Alamofire](https://github.com/Alamofire/Alamofire) or [Get](https://github.com/kean/Get), and displays them using `PulseUI` views that you integrate directly into your app. This way Pulse console is available for everyone who has your test builds. You or your QA team can view the logs on the device and easily share them to attach to bug reports.
