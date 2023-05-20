@@ -329,6 +329,9 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
                 completion(response.mock)
             }
             break
+        case .message:
+            let _ = try? Message.decode(packet.body)
+            // TODO: process message
         default:
             assertionFailure("A packet with an invalid code received from the server: \(packet.code.description)")
         }

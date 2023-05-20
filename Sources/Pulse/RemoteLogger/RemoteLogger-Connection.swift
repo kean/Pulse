@@ -18,7 +18,9 @@ extension RemoteLogger {
         var endpoint: NWEndpoint { connection.endpoint }
         private let connection: NWConnection
         private var buffer = Data()
-
+        private var id: UInt32 = 0
+        private var handlers: [UInt32: (Data) -> Void] = [:]
+        
         weak var delegate: RemoteLoggerConnectionDelegate?
 
         convenience init(endpoint: NWEndpoint) {
@@ -104,9 +106,19 @@ extension RemoteLogger {
         }
 
         private func send(event: Event) {
-            delegate?.connection(self, didReceiveEvent: event)
+            // If it's a response for a message, pass it to the registered handler.
+            // Otherwise, send it to the delegate as a new message.
+            if case .packet(let packet) = event,
+               packet.code == RemoteLogger.PacketCode.message.rawValue,
+               let id = Message.getID(for: packet.body),
+               let handler = handlers[id],
+               let message = try? Message.decode(packet.body) {
+                handler(message.data)
+            } else {
+                delegate?.connection(self, didReceiveEvent: event)
+            }
         }
-
+        
         func send(code: UInt8, data: Data) {
             do {
                 let data = try encode(code: code, body: data)
@@ -126,6 +138,27 @@ extension RemoteLogger {
                 send(code: code, data: data)
             } catch {
                 pulseLog("Failed to encode a packet: \(error)") // Should never happen
+            }
+        }
+    
+        func sendMessage(url: URL, data: Data?, _ completion: ((Data) -> Void)? = nil) {
+            let message = Message(id: id, url: url, data: data ?? Data())
+            
+            if id == UInt32.max {
+                id = 0
+            } else {
+                id += 1
+            }
+            
+            if let completion = completion {
+                handlers[message.id] = completion
+            }
+            
+            do {
+                let data = try Message.encode(message)
+                send(code: .message, data: data)
+            } catch {
+                pulseLog("Failed to encode message: \(error)") // Should never happen
             }
         }
 

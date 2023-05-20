@@ -122,49 +122,54 @@ extension RemoteLogger {
     }
     
     struct Message {
+        let id: UInt32
         let url: URL
         let data: Data
         
-        private struct Manifest: Codable {
-            let urlSize: UInt32
-            let dataSize: UInt32
+        // - id (UInt32)
+        // - url size (UInt32)
+        // - data size (UIInt32)
+        private static let headerSize = 12
 
-            static let size = 8
-
-            var totalSize: Int {
-                Manifest.size + Int(urlSize) + Int(dataSize)
-            }
-        }
-
-        static func encode(_ request: Message) throws -> Data {
-            guard let url = request.url.absoluteString.data(using: .utf8) else {
+        static func encode(_ message: Message) throws -> Data {
+            guard let url = message.url.absoluteString.data(using: .utf8) else {
                 throw URLError(.unknown, userInfo: [:]) // Should never happen
             }
             var data = Data()
+            // Header
+            data.append(Data(message.id))
             data.append(Data(UInt32(url.count)))
-            data.append(Data(UInt32(request.data.count)))
+            data.append(Data(UInt32(message.data.count)))
+            // URL
             data.append(url)
-            data.append(request.data)
+            // Payload
+            data.append(message.data)
             return data
         }
         
+        static func getID(for data: Data) -> UInt32? {
+            guard data.count >= 4 else {
+                return nil
+            }
+            return UInt32(data.from(0, size: 4))
+        }
+        
         static func decode(_ data: Data) throws -> Message {
-            guard data.count >= Manifest.size else {
+            guard data.count >= headerSize else {
                 throw PacketParsingError.notEnoughData // Should never happen
             }
-            let manifest = Manifest(
-                urlSize: UInt32(data.from(0, size: 4)),
-                dataSize: UInt32(data.from(4, size: 4))
-            )
-            guard data.count >= manifest.totalSize else {
+            let id = UInt32(data.from(0, size: 4))
+            let urlSize = UInt32(data.from(4, size: 4))
+            let dataSize = UInt32(data.from(8, size: 4))
+            guard data.count >= (headerSize + Int(urlSize) + Int(dataSize)) else {
                 throw PacketParsingError.notEnoughData // This should never happen
             }
-            guard let urlString = String(data: data.from(Manifest.size, size: Int(manifest.urlSize)), encoding: .utf8),
+            guard let urlString = String(data: data.from(headerSize, size: Int(urlSize)), encoding: .utf8),
                   let url = URL(string: urlString) else {
                 throw URLError(.badURL, userInfo: [:]) // This should never happen
             }
-            let body = data.from(Manifest.size + Int(manifest.urlSize), size: Int(manifest.dataSize))
-            return Message(url: url, data: body)
+            let body = data.from(headerSize + Int(urlSize), size: Int(dataSize))
+            return Message(id: id, url: url, data: body)
         }
     }
 
