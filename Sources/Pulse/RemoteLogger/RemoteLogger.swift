@@ -24,6 +24,7 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
     // Connections
     private var connection: Connection?
     private var connectedServer: NWBrowser.Result?
+    private var serverVersion: Version?
     @Published public private(set) var connectionState: ConnectionState = .idle {
         didSet { pulseLog(label: "RemoteLogger", "Did change connection state to: \(connectionState.description)")}
     }
@@ -306,6 +307,11 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
         case .serverHello:
             guard connectionState != .connected else { return }
             connectionState = .connected
+            if let response = try? JSONDecoder().decode(RemoteLoggerAPI.ServerHelloResponse.self, from: packet.body) {
+                serverVersion = try Version(string: response.version) // Throw should never happen
+            } else {
+                serverVersion = nil
+            }
             schedulePing()
         case .pause:
             isLoggingPaused = true

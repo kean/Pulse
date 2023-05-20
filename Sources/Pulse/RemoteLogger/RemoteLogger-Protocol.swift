@@ -12,7 +12,7 @@ extension RemoteLogger {
     enum PacketCode: UInt8, Equatable {
         // Handshake
         case clientHello = 0 // PacketClientHello
-        case serverHello = 1
+        case serverHello = 1 // RemoteLoggerAPI.ServerHelloResponse
         // Controls
         case pause = 2
         case resume = 3
@@ -24,6 +24,7 @@ extension RemoteLogger {
         case storeEventNetworkTaskProgressUpdated = 9
         case storeEventNetworkTaskCompleted = 10
         // Mocks
+        // TODO: remove these soon after 4.0 roll out
         case updateMocks = 11 // [URLSessionMock]
         case getMockedResponse = 12 // GetMockRequest / GetMockResponse
         // A custom message with the following format:
@@ -42,7 +43,7 @@ extension RemoteLogger {
         let appInfo: LoggerStore.Info.AppInfo
         let session: LoggerStore.Session? // Added: 3.5.7
     }
-
+    
     struct Empty: Codable {
         public init() {}
     }
@@ -180,6 +181,12 @@ extension RemoteLogger {
     enum PacketParsingError: Error {
         case notEnoughData
         case unsupportedContentSize
+    }
+}
+
+enum RemoteLoggerAPI {
+    struct ServerHelloResponse: Codable {
+        let version: String
     }
 }
 
