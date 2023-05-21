@@ -19,7 +19,7 @@ extension RemoteLogger {
         private let connection: NWConnection
         private var buffer = Data()
         private var id: UInt32 = 0
-        private var handlers: [UInt32: (Data) -> Void] = [:]
+        private var handlers: [UInt32: (Data?, Error?) -> Void] = [:]
         
         weak var delegate: RemoteLoggerConnectionDelegate?
 
@@ -110,10 +110,10 @@ extension RemoteLogger {
             // Otherwise, send it to the delegate as a new message.
             if case .packet(let packet) = event,
                packet.code == RemoteLogger.PacketCode.message.rawValue,
-               let id = Message.getID(for: packet.body),
-               let handler = handlers[id],
-               let message = try? Message.decode(packet.body) {
-                handler(message.data)
+               let header = Message.Header(packet.body),
+               header.options.contains(.response),
+               let handler = handlers.removeValue(forKey: header.id) {
+                handler(try? Message.decode(packet.body).data, nil)
             } else {
                 delegate?.connection(self, didReceiveEvent: event)
             }
@@ -141,8 +141,16 @@ extension RemoteLogger {
             }
         }
     
-        func sendMessage(url: URL, data: Data?, _ completion: ((Data) -> Void)? = nil) {
-            let message = Message(id: id, url: url, data: data ?? Data())
+        func sendMessage<T: Encodable>(path: Path, entity: T, _ completion: ((Data?, Error?) -> Void)? = nil) {
+            do {
+                sendMessage(path: path, data: try JSONEncoder().encode(entity), completion)
+            } catch {
+                pulseLog("Failed to encode a packet: \(error)") // Should never happen
+            }
+        }
+        
+        func sendMessage(path: Path, data: Data? = nil, _ completion: ((Data?, Error?) -> Void)? = nil) {
+            let message = Message(id: id, options: [], path: path, data: data ?? Data())
             
             if id == UInt32.max {
                 id = 0
@@ -151,7 +159,13 @@ extension RemoteLogger {
             }
             
             if let completion = completion {
+                let id = message.id
                 handlers[message.id] = completion
+                connection.queue?.asyncAfter(deadline: .now() + .seconds(20)) { [weak self] in
+                    if let handler = self?.handlers.removeValue(forKey: id) {
+                        handler(nil, URLError(.timedOut))
+                    }
+                }
             }
             
             do {
@@ -162,6 +176,24 @@ extension RemoteLogger {
             }
         }
 
+        func sendResponse<T: Encodable>(for message: Message, entity: T) {
+            do {
+                sendResponse(for: message, data: try JSONEncoder().encode(entity))
+            } catch {
+                pulseLog("Failed to encode a packet: \(error)") // Should never happen
+            }
+        }
+        
+        func sendResponse(for message: Message, data: Data) {
+            let message = Message(id: message.id, options: [.response], path: message.path, data: data)
+            do {
+                let data = try Message.encode(message)
+                send(code: .message, data: data)
+            } catch {
+                pulseLog("Failed to encode message: \(error)") // Should never happen
+            }
+        }
+        
         func cancel() {
             connection.cancel()
         }

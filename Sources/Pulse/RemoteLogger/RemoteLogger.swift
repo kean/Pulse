@@ -307,7 +307,7 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
         case .serverHello:
             guard connectionState != .connected else { return }
             connectionState = .connected
-            if let response = try? JSONDecoder().decode(RemoteLoggerAPI.ServerHelloResponse.self, from: packet.body) {
+            if let response = try? JSONDecoder().decode(ServerHelloResponse.self, from: packet.body) {
                 serverVersion = try Version(string: response.version) // Throw should never happen
             } else {
                 serverVersion = nil
@@ -330,10 +330,18 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
             }
             break
         case .message:
-            let _ = try? Message.decode(packet.body)
-            // TODO: process message
+            guard let message = try? Message.decode(packet.body) else {
+                return // New unsupported message
+            }
+            switch message.path {
+            case .updateMocks:
+                let mocks = try JSONDecoder().decode([URLSessionMock].self, from: message.data)
+                URLSessionMockManager.shared.update(mocks)
+            case .getMockedResponse:
+                break // Server specific (should never happen)
+            }
         default:
-            assertionFailure("A packet with an invalid code received from the server: \(packet.code.description)")
+            break // Do nothing
         }
     }
 
@@ -446,9 +454,19 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
             guard let connection = connection else {
                 return completion(nil)
             }
-            let request = GetMockRequest(requestID: UUID(), mockID: mock.mockID)
-            getMockedResponseCompletions[request.requestID] = completion
-            connection.send(code: .getMockedResponse, entity: request)
+            if let version = serverVersion, version >= Version(4, 0, 1) {
+                connection.sendMessage(path: .getMockedResponse(mockID: mock.mockID)) { data, _ in
+                    if let data = data, let response = try? JSONDecoder().decode(URLSessionMockedResponse.self, from: data) {
+                        completion(response)
+                    } else {
+                        completion(nil)
+                    }
+                }
+            } else {
+                let request = GetMockRequest(requestID: UUID(), mockID: mock.mockID)
+                getMockedResponseCompletions[request.requestID] = completion
+                connection.send(code: .getMockedResponse, entity: request)
+            }
         }
     }
 }
