@@ -36,7 +36,6 @@ struct NetworkInspectorView: View {
             InlineTabBar(items: NetworkInspectorTab.allCases, selection: $selectedTab)
             Spacer()
 
-            ButtonChangeContentModeLayout()
             ButtonCloseDetailsView()
         }
         .padding(.horizontal, 10)

@@ -9,6 +9,7 @@ import CoreData
 import Pulse
 import Combine
 
+@available(iOS 15, *)
 struct NetworkInspectorView: View {
     @ObservedObject var task: NetworkTaskEntity
 
@@ -23,13 +24,17 @@ struct NetworkInspectorView: View {
         .listStyle(.insetGrouped)
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
+                ButtonOpenOnMac(entity: task)
                 trailingNavigationBarItems
             }
+        }
+        .safeAreaInset(edge: .bottom) {
+            OpenOnMacOverlay(entity: task)
         }
         .inlineNavigationTitle(task.title)
         .sheet(item: $shareItems, content: ShareView.init)
     }
-
+    
     @ViewBuilder
     private var contents: some View {
         Section { NetworkInspectorView.makeHeaderView(task: task) }
@@ -88,6 +93,7 @@ struct NetworkInspectorView: View {
 }
 
 #if DEBUG
+@available(iOS 15, *)
 struct NetworkInspectorView_Previews: PreviewProvider {
     static var previews: some View {
         Group {

@@ -152,7 +152,7 @@ extension RemoteLogger {
         // - id (UInt32)
         // - options (UInt8)
         // - path size (UInt32)
-        // - data size (UIInt32)
+        // - data size (UInt32)
         private static let headerSize = 13
         
         static func encode(_ message: Message) throws -> Data {
@@ -184,7 +184,7 @@ extension RemoteLogger {
             return Message(id: header.id, options: header.options, path: path, data: body)
         }
     }
-    
+
     struct GetMockRequest: Codable {
         let requestID: UUID
         let mockID: UUID
@@ -203,6 +203,10 @@ extension RemoteLogger {
     enum Path: Codable {
         case updateMocks
         case getMockedResponse(mockID: UUID)
+        /// Payload: ``LoggerStore/Event/MessageCreated``.
+        case openMessageDetails
+        /// Payload: ``LoggerStore/Event/NetworkTaskCompleted``.
+        case openTaskDetails
     }
 
     struct ServerHelloResponse: Codable {

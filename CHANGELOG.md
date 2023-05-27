@@ -9,6 +9,10 @@
 - Move inspectors to the navigation bar on macOS
 - When you import store from watchOS, it now shows an "Open Store" button directly in the Console
 
+### Features
+
+- Add "Open on Mac" button to messages and tasks that allow you to quickly open the selected item on a connected Mac, even if the remote logging was disabled when the logs were recorded 
+
 ### Fixes
 
 - Fix how network tasks details get collapsed in the console on macOS

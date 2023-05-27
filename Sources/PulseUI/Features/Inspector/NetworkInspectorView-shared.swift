@@ -5,6 +5,7 @@
 import SwiftUI
 import Pulse
 
+@available(iOS 15, *)
 extension NetworkInspectorView {
     @ViewBuilder
     static func makeRequestSection(task: NetworkTaskEntity, isCurrentRequest: Bool) -> some View {

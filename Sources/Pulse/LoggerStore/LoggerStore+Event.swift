@@ -35,6 +35,17 @@ extension LoggerStore {
                 self.function = function
                 self.line = line
             }
+            
+            init(_ entity: LoggerMessageEntity) {
+                self.createdAt = entity.createdAt
+                self.label = entity.label
+                self.level = LoggerStore.Level(rawValue: entity.level) ?? .debug
+                self.message = entity.text
+                self.metadata = entity.metadata
+                self.file = entity.file
+                self.function = entity.function
+                self.line = UInt(entity.line)
+            }
         }
 
         public struct NetworkTaskCreated: Codable, Sendable {
@@ -100,6 +111,25 @@ extension LoggerStore {
                 self.responseBody = responseBody
                 self.metrics = metrics
                 self.label = label
+            }
+            
+            init(_ entity: NetworkTaskEntity) {
+                self.taskId = entity.taskId
+                self.taskType = NetworkLogger.TaskType(rawValue: entity.taskType) ?? .dataTask
+                self.createdAt = entity.createdAt
+                self.originalRequest = (entity.currentRequest.map(NetworkLogger.Request.init)) ?? .init(.init())
+                self.currentRequest = entity.currentRequest.map(NetworkLogger.Request.init)
+                self.response = entity.response.map(NetworkLogger.Response.init)
+                self.error = entity.error.map(NetworkLogger.ResponseError.init)
+                self.requestBody = entity.requestBody?.data
+                self.responseBody = entity.responseBody?.data
+                if entity.hasMetrics, let interval = entity.taskInterval {
+                    let transactions = entity.orderedTransactions.map {
+                        NetworkLogger.TransactionMetrics($0)
+                    }
+                    self.metrics = NetworkLogger.Metrics(taskInterval: interval, redirectCount: Int(entity.redirectCount), transactions: transactions)
+                }
+                self.label = entity.message?.label
             }
         }
 

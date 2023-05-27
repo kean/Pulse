@@ -39,20 +39,12 @@ private struct ConsoleMainView: View {
     @State private var isShowingSessions = false
     @State private var isShowingSettings = false
 
-    @SceneStorage("is-details-vertical") private var isVertical = false
     @SceneStorage("com-github-kean-pulse-is-now-enabled") private var isNowEnabled = true
 
     var body: some View {
-        if isVertical {
-            VSplitView {
-                contentView
-                detailsView.layoutPriority(1)
-            }
-        } else {
-            HSplitView {
-                contentView
-                detailsView.layoutPriority(1)
-            }
+        HSplitView {
+            contentView
+            detailsView.layoutPriority(1)
         }
     }
 

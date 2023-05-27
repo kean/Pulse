@@ -39,6 +39,15 @@ extension NetworkLogger {
                 if request.httpShouldHandleCookies { insert(.httpShouldHandleCookies) }
                 if request.httpShouldUsePipelining { insert(.httpShouldUsePipelining) }
             }
+            
+            init(_ entity: NetworkRequestEntity) {
+                self = []
+                if entity.allowsCellularAccess { insert(.allowsCellularAccess) }
+                if entity.allowsExpensiveNetworkAccess { insert(.allowsExpensiveNetworkAccess) }
+                if entity.allowsConstrainedNetworkAccess { insert(.allowsConstrainedNetworkAccess) }
+                if entity.httpShouldHandleCookies { insert(.httpShouldHandleCookies) }
+                if entity.httpShouldUsePipelining { insert(.httpShouldUsePipelining) }
+            }
         }
 
         public init(_ urlRequest: URLRequest) {
@@ -48,6 +57,15 @@ extension NetworkLogger {
             self.rawCachePolicy = urlRequest.cachePolicy.rawValue
             self.timeout = urlRequest.timeoutInterval
             self.options = Options(urlRequest)
+        }
+        
+        init(_ entity: NetworkRequestEntity) {
+            self.url = entity.url.flatMap(URL.init)
+            self.httpMethod = entity.httpMethod
+            self.headers = entity.headers
+            self.rawCachePolicy = UInt(entity.rawCachePolicy)
+            self.timeout = TimeInterval(entity.timeoutInterval)
+            self.options = Options(entity)
         }
     }
 
@@ -68,6 +86,11 @@ extension NetworkLogger {
             let httpResponse = urlResponse as? HTTPURLResponse
             self.statusCode = httpResponse?.statusCode
             self.headers = httpResponse?.allHeaderFields as? [String: String]
+        }
+        
+        init(_ entity: NetworkResponseEntity) {
+            self.statusCode = Int(entity.statusCode)
+            self.headers = entity.headers
         }
     }
 
@@ -268,6 +291,32 @@ extension NetworkLogger {
                 if metrics.isConstrained { insert(.isConstrained) }
                 if metrics.isMultipath { insert(.isMultipath) }
             }
+            
+            init(_ entity: NetworkTransactionMetricsEntity) {
+                self = []
+                if entity.isProxyConnection { insert(.isProxyConnection) }
+                if entity.isReusedConnection { insert(.isReusedConnection) }
+                if entity.isCellular { insert(.isCellular) }
+                if entity.isExpensive { insert(.isExpensive) }
+                if entity.isConstrained { insert(.isConstrained) }
+                if entity.isMultipath { insert(.isMultipath) }
+            }
+        }
+        
+        init(_ entity: NetworkTransactionMetricsEntity) {
+            self.request = NetworkLogger.Request(entity.request)
+            self.response = entity.response.map(NetworkLogger.Response.init)
+            self.timing = entity.timing
+            self.networkProtocol = entity.networkProtocol
+            self.transferSize = entity.transferSize
+            self.conditions = Conditions(entity)
+            self.localAddress = entity.localAddress
+            self.localPort = Int(entity.localPort)
+            self.remoteAddress = entity.remoteAddress
+            self.remotePort = Int(entity.remotePort)
+            self.tlsVersion = UInt16(entity.rawNegotiatedTLSProtocolVersion)
+            self.tlsSuite = UInt16(entity.rawNegotiatedTLSCipherSuite)
+            self.type = Int(entity.rawFetchType)
         }
     }
 

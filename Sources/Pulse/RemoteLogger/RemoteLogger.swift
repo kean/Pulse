@@ -12,7 +12,7 @@ import SwiftUI
 ///
 /// The logger is thread-safe. The updates to the `Published` properties will
 /// be delivered on a background queue.
-public final class RemoteLogger: RemoteLoggerConnectionDelegate {
+public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegate {
     public private(set) var store: LoggerStore?
 
     @Published public private(set) var servers: Set<NWBrowser.Result> = []
@@ -34,6 +34,11 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
 
     public enum ConnectionState {
         case idle, connecting, connected
+    }
+    
+    public var isOpenOnMacSupported: Bool {
+        guard let serverVersion = serverVersion else { return false }
+        return serverVersion >= Version(4, 0, 0)
     }
 
     // Logging
@@ -337,7 +342,7 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
             case .updateMocks:
                 let mocks = try JSONDecoder().decode([URLSessionMock].self, from: message.data)
                 URLSessionMockManager.shared.update(mocks)
-            case .getMockedResponse:
+            case .getMockedResponse, .openMessageDetails, .openTaskDetails:
                 break // Server specific (should never happen)
             }
         default:
@@ -454,7 +459,7 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
             guard let connection = connection else {
                 return completion(nil)
             }
-            if let version = serverVersion, version >= Version(4, 0, 1) {
+            if let version = serverVersion, version >= Version(4, 0, 0) {
                 connection.sendMessage(path: .getMockedResponse(mockID: mock.mockID)) { data, _ in
                     if let data = data, let response = try? JSONDecoder().decode(URLSessionMockedResponse.self, from: data) {
                         completion(response)
@@ -467,6 +472,22 @@ public final class RemoteLogger: RemoteLoggerConnectionDelegate {
                 getMockedResponseCompletions[request.requestID] = completion
                 connection.send(code: .getMockedResponse, entity: request)
             }
+        }
+    }
+    
+    // MARK: Details
+    
+    public func showDetails(for message: LoggerMessageEntity) {
+        queue.sync {
+            guard let connection = connection else { return }
+            connection.sendMessage(path: .openMessageDetails, entity: LoggerStore.Event.MessageCreated(message))
+        }
+    }
+    
+    public func showDetails(for task: NetworkTaskEntity) {
+        queue.sync {
+            guard let connection = connection else { return }
+            connection.sendMessage(path: .openTaskDetails, entity: LoggerStore.Event.NetworkTaskCompleted(task))
         }
     }
 }

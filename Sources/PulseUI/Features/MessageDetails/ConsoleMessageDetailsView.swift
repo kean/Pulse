@@ -7,6 +7,7 @@
 import SwiftUI
 import Pulse
 
+@available(iOS 15, *)
 struct ConsoleMessageDetailsView: View {
     let message: LoggerMessageEntity
 
@@ -58,7 +59,6 @@ struct ConsoleMessageDetailsView: View {
         HStack {
             InlineTabBar(items: ConsoleMessageTab.allCases, selection: $selectedTab)
             Spacer()
-            ButtonChangeContentModeLayout()
             ButtonCloseDetailsView()
         }
         .padding(.horizontal, 10)
@@ -99,6 +99,7 @@ struct ConsoleMessageDetailsView: View {
 }
 
 #if DEBUG
+@available(iOS 15, *)
 struct ConsoleMessageDetailsView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {

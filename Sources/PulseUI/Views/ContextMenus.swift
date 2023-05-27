@@ -7,6 +7,7 @@
 import SwiftUI
 import Pulse
 import Combine
+import CoreData
 
 enum ContextMenu {
     @available(iOS 15, *)
@@ -51,6 +52,9 @@ enum ContextMenu {
             Section {
                 PinButton(viewModel: .init(message)).tint(.pink)
             }
+#if os(iOS)
+            ButtonOpenOnMac(entity: message)
+#endif
         }
     }
 
@@ -85,6 +89,9 @@ enum ContextMenu {
                     PinButton(viewModel: .init(message))
                 }
             }
+#if os(iOS)
+            ButtonOpenOnMac(entity: task)
+#endif
         }
     }
 
@@ -228,6 +235,57 @@ struct StringSearchOptionsMenu: View {
         }
     }
 }
+
+#if os(iOS)
+@available(iOS 15, *)
+struct OpenOnMacOverlay: View {
+    let entity: NSManagedObject
+    @ObservedObject var logger: RemoteLogger = .shared
+    
+    var body: some View {
+        if logger.isOpenOnMacSupported {
+            HStack {
+                Spacer()
+                Button(action: { openOnMac(entity) }) {
+                    Image(systemName: "macbook.and.iphone")
+                }.disabled(logger.connectionState != .connected)
+                    .frame(width: 44, height: 44)
+                    .background(Material.regular)
+                    .cornerRadius(22)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 22)
+                            .stroke(Color.separator.opacity(0.5), lineWidth: 0.5)
+                    )
+                    .padding(.trailing, 12)
+            }
+        }
+    }
+}
+
+struct ButtonOpenOnMac: View {
+    let entity: NSManagedObject
+    @ObservedObject var logger: RemoteLogger = .shared
+    
+    var body: some View {
+        if logger.isOpenOnMacSupported {
+            Section {
+                Button(action: { openOnMac(entity) }) {
+                    Label("Open on Mac", systemImage: "macbook.and.iphone")
+                }.disabled(logger.connectionState != .connected)
+            }
+        }
+    }
+}
+
+private func openOnMac(_ entity: NSManagedObject) {
+    switch LoggerEntity(entity) {
+    case .message(let message):
+        RemoteLogger.shared.showDetails(for: message)
+    case .task(let task):
+        RemoteLogger.shared.showDetails(for: task)
+    }
+}
+#endif
 
 struct AttributedStringShareMenu: View {
     @Binding var shareItems: ShareItems?
