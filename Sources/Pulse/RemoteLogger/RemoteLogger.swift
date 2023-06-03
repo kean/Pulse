@@ -10,8 +10,7 @@ import SwiftUI
 /// Connects to the remote server and sends logs remotely. In the current version,
 /// a server is a Pulse Pro app for macOS).
 ///
-/// The logger is thread-safe. The updates to the `Published` properties will
-/// be delivered on a background queue.
+/// - warning: Has to be used from the main thread.
 public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegate {
     public private(set) var store: LoggerStore?
 
@@ -41,20 +40,17 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
         return serverVersion >= Version(4, 0, 0)
     }
 
-    // Logging
-    private var isLoggingPaused = true
-    private var buffer: [LoggerStore.Event]? = []
-
-    // Persistence
     @AppStorage("com-github-kean-pulse-is-remote-logger-enabled")
     public private(set) var isEnabled = false
+
     @AppStorage("com-github-kean-pulse-selected-server")
     public private(set) var selectedServer = ""
 
-    private let queue = DispatchQueue(label: "com.github.kean.remote-logger")
-    private let specificKey = DispatchSpecificKey<String>()
-    private var cancellable: AnyCancellable?
 
+    // Logging
+    private var isLoggingPaused = true
+    private var buffer: [LoggerStore.Event]? = []
+    private var cancellable: AnyCancellable?
     private var getMockedResponseCompletions: [UUID: (URLSessionMockedResponse?) -> Void] = [:]
 
     private var isInitialized = false
@@ -68,13 +64,6 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
             return
         }
         self.store = store
-
-        queue.async {
-            self._initialize(store: store)
-        }
-    }
-
-    private func _initialize(store: LoggerStore) {
         if isInitialized {
             cancel()
         }
@@ -84,32 +73,31 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
             startBrowser()
         }
 
-        cancellable = store.events.receive(on: queue).sink { [weak self] in
+        #warning("ok thread?")
+        cancellable = store.events.receive(on: DispatchQueue.main).sink { [weak self] in
             self?.didReceive(event: $0)
         }
 
         // The buffer is used to cover the time between the app launch and the
         // initial (automatic) connection to the server.
-        queue.asyncAfter(deadline: .now() + .seconds(3)) { [weak self] in
+        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(3)) { [weak self] in
             self?.buffer = nil
         }
     }
 
-    private init() {
-        queue.setSpecific(key: specificKey, value: "yes")
-    }
+    private init() {}
 
     /// Enables remote logging. The logger will start searching for available
     /// servers.
     public func enable() {
         isEnabled = true
-        queue.async(execute: startBrowser)
+        startBrowser()
     }
 
     /// Disables remote logging and disconnects from the server.
     public func disable() {
         isEnabled = false
-        queue.async(execute: cancel)
+        cancel()
     }
 
     private func cancel() {
@@ -123,8 +111,6 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
     // MARK: Browsing
 
     private func startBrowser() {
-        precondition(DispatchQueue.getSpecific(key: specificKey) != nil)
-
         guard !isStarted else { return }
         isStarted = true
 
@@ -151,25 +137,21 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
         }
 
         // Start browsing and ask for updates.
-        browser.start(queue: queue)
+        browser.start(queue: .main)
 
         self.browser = browser
     }
 
     private func scheduleBrowserRetry() {
-        precondition(DispatchQueue.getSpecific(key: specificKey) != nil)
-
         guard isStarted else { return }
 
         // Automatically retry until the user cancels
-        queue.asyncAfter(deadline: .now() + .seconds(3)) { [weak self] in
+        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(3)) { [weak self] in
             self?.startBrowser()
         }
     }
 
     private func connectAutomaticallyIfNeeded() {
-        precondition(DispatchQueue.getSpecific(key: specificKey) != nil)
-
         guard isStarted else { return }
 
         guard !selectedServer.isEmpty, connectedServer == nil,
@@ -203,13 +185,10 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
 
         // Save selection for the future
         selectedServer = name
-
-        queue.async { self._connect(to: server) }
+        _connect(to: server)
     }
 
     private func _connect(to server: NWBrowser.Result) {
-        precondition(DispatchQueue.getSpecific(key: specificKey) != nil)
-
         switch connectionState {
         case .idle:
             openConnection(to: server)
@@ -221,8 +200,6 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
     }
 
     private func openConnection(to server: NWBrowser.Result) {
-        precondition(DispatchQueue.getSpecific(key: specificKey) != nil)
-
         connectedServer = server
         connectionState = .connecting
 
@@ -232,15 +209,13 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
 
         let connection = Connection(endpoint: server.endpoint)
         connection.delegate = self
-        connection.start(on: queue)
+        connection.start(on: DispatchQueue.main)
         self.connection = connection
     }
 
     // MARK: RemoteLoggerConnectionDelegate
 
     func connection(_ connection: Connection, didChangeState newState: NWConnection.State) {
-        precondition(DispatchQueue.getSpecific(key: specificKey) != nil)
-
         guard connectionState != .idle else { return }
 
         pulseLog(label: "RemoteLogger", "Connection did update state: \(newState)")
@@ -256,8 +231,6 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
     }
 
     func connection(_ connection: Connection, didReceiveEvent event: Connection.Event) {
-        precondition(DispatchQueue.getSpecific(key: specificKey) != nil)
-
         guard connectionState != .idle else { return }
 
         switch event {
@@ -277,8 +250,6 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
     // MARK: Communication
 
     private func handshakeWithServer() {
-        precondition(DispatchQueue.getSpecific(key: specificKey) != nil)
-
         assert(connection != nil)
 
         pulseLog(label: "RemoteLogger", "Will send hello to the server")
@@ -294,7 +265,7 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
         connection?.send(code: .clientHello, entity: body)
 
         // Set timeout and retry in case there was no response from the server
-        queue.asyncAfter(deadline: .now() + .seconds(10)) { [weak self] in
+        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(10)) { [weak self] in
             guard let self = self else { return } // Failed to connect in 10 sec
 
             guard self.connectionState == .connecting else { return }
@@ -351,8 +322,6 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
     }
 
     private func scheduleConnectionRetry() {
-        precondition(DispatchQueue.getSpecific(key: specificKey) != nil)
-
         guard connectionState != .idle, connectionRetryItem == nil else { return }
 
         cancelPingPong()
@@ -366,13 +335,11 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
                   let server = self.connectedServer else { return }
             self.openConnection(to: server)
         }
-        queue.asyncAfter(deadline: .now() + .seconds(2), execute: item)
+        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: item)
         connectionRetryItem = item
     }
 
     private func scheduleAutomaticDisconnect() {
-        precondition(DispatchQueue.getSpecific(key: specificKey) != nil)
-
         timeoutDisconnectItem?.cancel()
 
         guard connectionState == .connected else { return }
@@ -383,7 +350,7 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
             pulseLog(label: "RemoteLogger", "Haven't received pings from a server in a while, disconnecting")
             self.scheduleConnectionRetry()
         }
-        queue.asyncAfter(deadline: .now() + .seconds(4), execute: item)
+        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(4), execute: item)
         timeoutDisconnectItem = item
     }
 
@@ -395,13 +362,11 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
             guard self.connectionState == .connected else { return }
             self.schedulePing()
         }
-        queue.asyncAfter(deadline: .now() + .seconds(2), execute: item)
+        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: item)
         pingItem = item
     }
 
     private func cancelConnection() {
-        precondition(DispatchQueue.getSpecific(key: specificKey) != nil)
-
         connectionState = .idle // The order is important
         connectedServer = nil
 
@@ -425,8 +390,6 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
     // MARK: Logging
 
     private func didReceive(event: LoggerStore.Event) {
-        precondition(DispatchQueue.getSpecific(key: specificKey) != nil)
-
         if isLoggingPaused {
             buffer?.append(event)
         } else {
@@ -455,40 +418,32 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
     // MARK: Mocks
 
     func getMockedResponse(for mock: URLSessionMock, _ completion: @escaping (URLSessionMockedResponse?) -> Void) {
-        queue.sync {
-            guard let connection = connection else {
-                return completion(nil)
-            }
-            if let version = serverVersion, version >= Version(4, 0, 0) {
-                connection.sendMessage(path: .getMockedResponse(mockID: mock.mockID)) { data, _ in
-                    if let data = data, let response = try? JSONDecoder().decode(URLSessionMockedResponse.self, from: data) {
-                        completion(response)
-                    } else {
-                        completion(nil)
-                    }
+        guard let connection = connection else {
+            return completion(nil)
+        }
+        if let version = serverVersion, version >= Version(4, 0, 0) {
+            connection.sendMessage(path: .getMockedResponse(mockID: mock.mockID)) { data, _ in
+                if let data = data, let response = try? JSONDecoder().decode(URLSessionMockedResponse.self, from: data) {
+                    completion(response)
+                } else {
+                    completion(nil)
                 }
-            } else {
-                let request = GetMockRequest(requestID: UUID(), mockID: mock.mockID)
-                getMockedResponseCompletions[request.requestID] = completion
-                connection.send(code: .getMockedResponse, entity: request)
             }
+        } else {
+            let request = GetMockRequest(requestID: UUID(), mockID: mock.mockID)
+            getMockedResponseCompletions[request.requestID] = completion
+            connection.send(code: .getMockedResponse, entity: request)
         }
     }
     
     // MARK: Details
     
     public func showDetails(for message: LoggerMessageEntity) {
-        queue.sync {
-            guard let connection = connection else { return }
-            connection.sendMessage(path: .openMessageDetails, entity: LoggerStore.Event.MessageCreated(message))
-        }
+        connection?.sendMessage(path: .openMessageDetails, entity: LoggerStore.Event.MessageCreated(message))
     }
     
     public func showDetails(for task: NetworkTaskEntity) {
-        queue.sync {
-            guard let connection = connection else { return }
-            connection.sendMessage(path: .openTaskDetails, entity: LoggerStore.Event.NetworkTaskCompleted(task))
-        }
+        connection?.sendMessage(path: .openTaskDetails, entity: LoggerStore.Event.NetworkTaskCompleted(task))
     }
 }
 
