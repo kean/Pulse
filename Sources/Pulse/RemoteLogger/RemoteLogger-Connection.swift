@@ -32,9 +32,11 @@ extension RemoteLogger {
         }
 
         func start(on queue: DispatchQueue) {
-            connection.stateUpdateHandler = { [weak self] in
+            connection.stateUpdateHandler = { [weak self] state in
                 guard let self = self else { return }
-                self.delegate?.connection(self, didChangeState: $0)
+                DispatchQueue.main.async {
+                    self.delegate?.connection(self, didChangeState: state)
+                }
             }
             receive()
             connection.start(queue: queue)
@@ -115,7 +117,9 @@ extension RemoteLogger {
                let handler = handlers.removeValue(forKey: header.id) {
                 handler(try? Message.decode(packet.body).data, nil)
             } else {
-                delegate?.connection(self, didReceiveEvent: event)
+                DispatchQueue.main.async {
+                    self.delegate?.connection(self, didReceiveEvent: event)
+                }
             }
         }
         

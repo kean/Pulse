@@ -35,7 +35,7 @@ extension RemoteLogger {
         // Moving forward, all non-control packets will be send using this format.
         case message = 13
     }
-    
+
     struct PacketClientHello: Codable {
         let version: String?
         let deviceId: UUID

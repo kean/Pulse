@@ -30,6 +30,7 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
     private var connectionRetryItem: DispatchWorkItem?
     private var timeoutDisconnectItem: DispatchWorkItem?
     private var pingItem: DispatchWorkItem?
+    private let connectionQueue = DispatchQueue(label: "com.github.kean.pulse.remote-logger")
 
     public enum ConnectionState {
         case idle, connecting, connected
@@ -73,8 +74,7 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
             startBrowser()
         }
 
-        #warning("ok thread?")
-        cancellable = store.events.receive(on: DispatchQueue.main).sink { [weak self] in
+        cancellable = store.events.receive(on: connectionQueue).sink { [weak self] in
             self?.didReceive(event: $0)
         }
 
