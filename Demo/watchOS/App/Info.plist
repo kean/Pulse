@@ -29,5 +29,11 @@
 	<string>com.github.kean.pulse-demo</string>
 	<key>WKWatchKitApp</key>
 	<true/>
+    <key>NSLocalNetworkUsageDescription</key>
+    <string>Network usage required for debugging purposes </string>
+    <key>NSBonjourServices</key>
+    <array>
+      <string>_pulse._tcp</string>
+    </array>
 </dict>
 </plist>
