@@ -4,6 +4,8 @@
 
 import Foundation
 import Network
+import CryptoKit
+
 #if PULSE_STANDALONE_APP
 import Pulse
 #endif
@@ -23,8 +25,10 @@ extension RemoteLogger {
         
         weak var delegate: RemoteLoggerConnectionDelegate?
 
+        #warning("TEMP")
         convenience init(endpoint: NWEndpoint) {
-            self.init(NWConnection(to: endpoint, using: .tcp))
+            self.init(NWConnection(to: endpoint, using: .init(passcode: "123")))
+//            self.init(NWConnection(to: endpoint, using: .tcp))
         }
 
         init(_ connection: NWConnection) {
@@ -251,6 +255,48 @@ extension RemoteLogger {
             }
             self.code = data[data.startIndex]
             self.contentSize = UInt32(data.from(1, size: 4))
+        }
+    }
+}
+
+extension NWParameters {
+    convenience init(passcode: String) {
+        let tcpOptions = NWProtocolTCP.Options()
+        tcpOptions.enableKeepalive = true
+        tcpOptions.keepaliveIdle = 4
+
+        self.init(tls: NWParameters.tlsOptions(passcode: passcode), tcp: tcpOptions)
+
+        self.includePeerToPeer = true
+    }
+
+    // Create TLS options using a passcode to derive a preshared key.
+    private static func tlsOptions(passcode: String) -> NWProtocolTLS.Options {
+        let tlsOptions = NWProtocolTLS.Options()
+
+        let authenticationKey = SymmetricKey(data: passcode.data(using: .utf8)!)
+        var authenticationCode = HMAC<SHA256>.authenticationCode(for: "PulseLoggerProtocol".data(using: .utf8)!, using: authenticationKey)
+        let authenticationDispatchData = withUnsafeBytes(of: &authenticationCode) { (pointer: UnsafeRawBufferPointer) in
+            DispatchData(bytes: pointer)
+        }
+        sec_protocol_options_add_pre_shared_key(
+            tlsOptions.securityProtocolOptions,
+            authenticationDispatchData as __DispatchData,
+            DispatchData.make(string: "PulseLoggerProtocol") as __DispatchData
+        )
+        sec_protocol_options_append_tls_ciphersuite(
+            tlsOptions.securityProtocolOptions,
+            tls_ciphersuite_t(rawValue: TLS_PSK_WITH_AES_128_GCM_SHA256)!
+        )
+        return tlsOptions
+    }
+}
+
+extension DispatchData {
+    static func make(string: String) -> DispatchData {
+        let data = string.data(using: .unicode) ?? Data()
+        return Swift.withUnsafeBytes(of: data) { (pointer: UnsafeRawBufferPointer) in
+            DispatchData(bytes: UnsafeRawBufferPointer(start: pointer.baseAddress, count: data.count))
         }
     }
 }

@@ -116,7 +116,10 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
 
         pulseLog(label: "RemoteLogger", "Will start browser")
 
-        let browser = NWBrowser(for: .bonjour(type: RemoteLogger.serviceType, domain: "local"), using: .tcp)
+        let parameters = NWParameters()
+        parameters.includePeerToPeer = true
+
+        let browser = NWBrowser(for: .bonjour(type: RemoteLogger.serviceType, domain: nil), using: parameters)
 
         browser.stateUpdateHandler = { [weak self] newState in
             guard let self = self, self.isEnabled else { return }
