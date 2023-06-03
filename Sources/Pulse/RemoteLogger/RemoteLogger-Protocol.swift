@@ -12,7 +12,7 @@ extension RemoteLogger {
     enum PacketCode: UInt8, Equatable {
         // Handshake
         case clientHello = 0 // PacketClientHello
-        case serverHello = 1 // RemoteLoggerAPI.ServerHelloResponse
+        case serverHello = 1 // ServerHelloResponse
         // Controls
         case pause = 2
         case resume = 3
@@ -43,9 +43,9 @@ extension RemoteLogger {
         let appInfo: LoggerStore.Info.AppInfo
         let session: LoggerStore.Session? // Added: 3.5.7
     }
-    
+
     struct Empty: Codable {
-        public init() {}
+        init() {}
     }
     
     struct PacketNetworkMessage {
