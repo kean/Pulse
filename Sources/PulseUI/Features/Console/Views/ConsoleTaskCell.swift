@@ -90,7 +90,7 @@ struct ConsoleTaskCell: View {
 
             ForEach(headerValueMap.keys.sorted(), id: \.self) { key in
                 HStack {
-                    Text(key.uppercased())
+                    Text(key)
                         .font(.caption)
                         .foregroundColor(.secondary)
 
