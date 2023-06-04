@@ -35,9 +35,7 @@ public struct SettingsView: View {
                 }
             }
             if viewModel.isRemoteLoggingAvailable {
-                Section {
-                    RemoteLoggerSettingsView(viewModel: .shared)
-                }
+                RemoteLoggerSettingsView(viewModel: .shared)
             }
         }
         .navigationTitle("Settings")

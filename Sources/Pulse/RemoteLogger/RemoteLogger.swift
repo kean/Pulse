@@ -16,6 +16,13 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
 
     @Published public private(set) var servers: Set<NWBrowser.Result> = []
 
+    @Published public private(set) var connectionState: ConnectionState = .idle {
+        didSet { pulseLog(label: "RemoteLogger", "Did change connection state to: \(connectionState.description)")}
+    }
+
+    @Published public private(set) var connectionError: ConnectionError?
+    @Published public private(set) var browserError: ConnectionError?
+
     // Browsing
     private var isStarted = false
     private var browser: NWBrowser?
@@ -24,12 +31,10 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
     private var connection: Connection?
     private var connectedServer: NWBrowser.Result?
     private var serverVersion: Version?
-    @Published public private(set) var connectionState: ConnectionState = .idle {
-        didSet { pulseLog(label: "RemoteLogger", "Did change connection state to: \(connectionState.description)")}
-    }
     private var connectionRetryItem: DispatchWorkItem?
     private var timeoutDisconnectItem: DispatchWorkItem?
     private var pingItem: DispatchWorkItem?
+    private let keychain = Keychain(service: "com.github.kean.pulse")
     private let connectionQueue = DispatchQueue(label: "com.github.kean.pulse.remote-logger")
 
     public enum ConnectionState {
@@ -47,6 +52,9 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
     @AppStorage("com-github-kean-pulse-selected-server")
     public private(set) var selectedServer = ""
 
+    public enum ConnectionError: Error {
+        case network(NWError)
+    }
 
     // Logging
     private var isLoggingPaused = true
@@ -119,14 +127,17 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
         let parameters = NWParameters()
         parameters.includePeerToPeer = true
 
-        let browser = NWBrowser(for: .bonjour(type: RemoteLogger.serviceType, domain: nil), using: parameters)
+        let browser = NWBrowser(for: .bonjourWithTXTRecord(type: RemoteLogger.serviceType, domain: nil), using: parameters)
 
         browser.stateUpdateHandler = { [weak self] newState in
             guard let self = self, self.isEnabled else { return }
 
             pulseLog(label: "RemoteLogger", "Browser did update state: \(newState)")
-            if case .failed = newState {
+            if case .failed(let error) = newState {
+                browserError = .network(error)
                 self.scheduleBrowserRetry()
+            } else {
+                browserError = nil
             }
         }
 
@@ -164,7 +175,7 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
 
         pulseLog(label: "RemoteLogger", "Will connect automatically to \(server.endpoint)")
 
-        connect(to: server)
+        connect(to: server, passcode: getPasscode(for: server))
     }
 
     private func cancelBrowser() {
@@ -174,6 +185,19 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
 
     // MARK: Connection
 
+    public func getPasscode(for server: NWBrowser.Result) -> String? {
+        server.name.flatMap(keychain.string)
+    }
+
+    public func setPasscode(_ passcode: String?, for server: NWBrowser.Result) {
+        guard let name = server.name else { return }
+        if let passcode {
+            try? keychain.set(passcode, forKey: name)
+        } else {
+            try? keychain.deleteItem(forKey: name)
+        }
+    }
+
     /// Returns `true` if the server is selected.
     public func isSelected(_ server: NWBrowser.Result) -> Bool {
         server.name == selectedServer
@@ -181,28 +205,25 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
 
     /// Connects to the given server and saves the selection persistently. Cancels
     /// the existing connection.
-    public func connect(to server: NWBrowser.Result) {
+    public func connect(to server: NWBrowser.Result, passcode: String? = nil) {
         guard let name = server.name else {
             return pulseLog(label: "RemoteLogger", "Server name is missing")
         }
 
         // Save selection for the future
         selectedServer = name
-        _connect(to: server)
-    }
 
-    private func _connect(to server: NWBrowser.Result) {
         switch connectionState {
         case .idle:
-            openConnection(to: server)
+            openConnection(to: server, passcode: passcode)
         case .connecting, .connected:
             guard connectedServer != server else { return }
             cancelConnection()
-            openConnection(to: server)
+            openConnection(to: server, passcode: passcode)
         }
     }
 
-    private func openConnection(to server: NWBrowser.Result) {
+    private func openConnection(to server: NWBrowser.Result, passcode: String?) {
         connectedServer = server
         connectionState = .connecting
 
@@ -210,7 +231,13 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
 
         let server = servers.first(where: { $0.name == server.name }) ?? server
 
-        let connection = Connection(endpoint: server.endpoint)
+        #warning("remove passcode on connection error if connection fails on manual connect")
+        let connection: Connection
+        if server.isProtected, let passcode {
+            connection = Connection(endpoint: server.endpoint, using: .init(passcode: passcode))
+        } else {
+            connection = Connection(endpoint: server.endpoint, using: .tcp)
+        }
         connection.delegate = self
         connection.start(on: DispatchQueue.main)
         self.connection = connection
@@ -222,11 +249,13 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
         guard connectionState != .idle else { return }
 
         pulseLog(label: "RemoteLogger", "Connection did update state: \(newState)")
+        connectionError = nil
 
         switch newState {
         case .ready:
             handshakeWithServer()
-        case .failed:
+        case .failed(let error):
+            connectionError = .network(error)
             scheduleConnectionRetry()
         default:
             break
@@ -336,7 +365,7 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
             self.connectionRetryItem = nil
             guard self.connectionState == .connecting,
                   let server = self.connectedServer else { return }
-            self.openConnection(to: server)
+            self.openConnection(to: server, passcode: getPasscode(for: server))
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2), execute: item)
         connectionRetryItem = item
@@ -469,6 +498,17 @@ private extension NWBrowser.Result {
             return name
         default:
             return nil
+        }
+    }
+
+    var isProtected: Bool {
+        switch metadata {
+        case .bonjour(let record):
+            return record["protected"].map { Bool($0) } == true
+        case .none:
+            return false
+        @unknown default:
+            return false
         }
     }
 }

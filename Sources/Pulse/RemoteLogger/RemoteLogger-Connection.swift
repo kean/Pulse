@@ -25,10 +25,8 @@ extension RemoteLogger {
         
         weak var delegate: RemoteLoggerConnectionDelegate?
 
-        #warning("TEMP")
-        convenience init(endpoint: NWEndpoint) {
-            self.init(NWConnection(to: endpoint, using: .init(passcode: "123")))
-//            self.init(NWConnection(to: endpoint, using: .tcp))
+        convenience init(endpoint: NWEndpoint, using parameters: NWParameters) {
+            self.init(NWConnection(to: endpoint, using: parameters))
         }
 
         init(_ connection: NWConnection) {

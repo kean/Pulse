@@ -8,32 +8,69 @@ import Combine
 import Pulse
 import Network
 
+#warning("use custom sheet to requset passcode like WiFi view")
+#warning("add animation when connectings")
+#warning("add details screen")
+#warning("display error message (full?)")
+#warning("add special message if NoAuth is set")
+#warning("remove selected device from list of devices")
+#warning("remove spinner and offset ffrom devices list")
+#warning("(?) add constant spinner for devices")
+
+@available(iOS 15, *)
 struct RemoteLoggerSettingsView: View {
+    @ObservedObject private var logger: RemoteLogger = .shared
     @ObservedObject var viewModel: RemoteLoggerSettingsViewModel
     
     var body: some View {
-        Toggle(isOn: $viewModel.isEnabled, label: {
-            HStack {
+        Section {
+            Toggle(isOn: $viewModel.isEnabled, label: {
+                HStack {
 #if !os(watchOS)
-                Image(systemName: "network")
+                    Image(systemName: "network")
 #endif
-                Text("Remote Logging")
+                    Text("Remote Logging")
 #if os(macOS)
-                Spacer()
+                    Spacer()
 #endif
-            }
-        })
-        if viewModel.isEnabled {
-            if !viewModel.servers.isEmpty {
-#if os(macOS)
-                ForEach(viewModel.servers, content: makeServerView)
-#else
-                List(viewModel.servers, rowContent: makeServerView)
-#endif
-            } else {
-                progressView
+                }
+            })
+            if let server = logger.servers.first(where: logger.isSelected) {
+                RemoteLoggerSelectedDeviceView(server: server)
             }
         }
+        .alert("Connect", isPresented: $viewModel.isEnteringPasscode, actions: {
+            SecureField("Passcode", text: $viewModel.passcode)
+            Button("Connect", action: { viewModel.connect?() })
+            Button("Cancel", role: .cancel, action: {})
+        }, message: {
+            Text("Please enter the passcode")
+        })
+        if viewModel.isEnabled {
+            Section(header: Text("Devices")) {
+                if isNoAuth {
+                    RemotLoggerNoAuthView()
+                } else {
+                    if !viewModel.servers.isEmpty {
+#if os(macOS) || os(iOS)
+                        ForEach(viewModel.servers, content: makeServerView)
+#else
+                        List(viewModel.servers, rowContent: makeServerView)
+#endif
+                    } else {
+                        progressView
+                    }
+                }
+            }
+        }
+    }
+
+    var isNoAuth: Bool {
+        if case .network(let error) = logger.browserError,
+           case .dns(let dnsError) = error {
+            return dnsError == -65555
+        }
+        return false
     }
     
     private var progressView: some View {
@@ -64,16 +101,16 @@ struct RemoteLoggerSettingsView: View {
                             .font(.system(size: 16, weight: .medium))
                             .frame(width: 21, height: 36, alignment: .center)
                     } else {
-                        #if os(macOS)
+#if os(macOS)
                         ProgressView()
                             .progressViewStyle(.circular)
                             .frame(width: 15, height: 44, alignment: .leading)
                             .scaleEffect(0.5)
-                        #else
+#else
                         ProgressView()
                             .progressViewStyle(.circular)
                             .frame(width: 21, height: 36, alignment: .leading)
-                        #endif
+#endif
                     }
                 } else {
                     Rectangle()
@@ -84,20 +121,62 @@ struct RemoteLoggerSettingsView: View {
                     .lineLimit(1)
                 Spacer()
             }
-        }.foregroundColor(Color.primary)
-            .frame(maxWidth: .infinity)
+        }
+        .foregroundColor(Color.primary)
+        .frame(maxWidth: .infinity)
+    }
+}
+
+struct RemoteLoggerSelectedDeviceView: View {
+    @ObservedObject var logger: RemoteLogger = .shared
+    let server: NWBrowser.Result
+
+    var body: some View {
+        VStack(alignment: .leading) {
+            Text(server.name ?? "–")
+            makeStatusView(for: logger.connectionState)
+        }
+    }
+
+    private func makeStatusView(for state: RemoteLogger.ConnectionState) -> some View {
+        HStack {
+            Circle()
+                .frame(width: 8, height: 8)
+                .foregroundColor({
+                    switch logger.connectionState {
+                    case .connected: return Color.green
+                    case .connecting: return Color.yellow
+                    case .idle: return Color.gray
+                    }
+                }())
+        }
+    }
+}
+
+#warning("implemenet this")
+struct RemogeLoggerServerDetailsView: View {
+    let server: NWBrowser.Result
+
+    var body: some View {
+        Form {
+            Text(server.name ?? "–")
+        }
     }
 }
 
 final class RemoteLoggerSettingsViewModel: ObservableObject {
-    @Published var isEnabled: Bool = false
+    @Published var isEnabled = false
     @Published var servers: [RemoteLoggerServerViewModel] = []
-    @Published var isConnected: Bool = false
+    @Published var isConnected = false
+    @Published var isEnteringPasscode = false
+    @Published var passcode = ""
     
     private let logger: RemoteLogger
     private var cancellables: [AnyCancellable] = []
-    
-    public static var shared = RemoteLoggerSettingsViewModel()
+
+    var connect: (() -> Void)?
+
+    static var shared = RemoteLoggerSettingsViewModel()
     
     init(logger: RemoteLogger = .shared) {
         self.logger = logger
@@ -137,8 +216,20 @@ final class RemoteLoggerSettingsViewModel: ObservableObject {
     }
     
     private func connect(to server: NWBrowser.Result) {
-        logger.connect(to: server)
-        refresh(servers: logger.servers)
+        if server.isProtected {
+            if let passcode = logger.getPasscode(for: server) {
+                logger.connect(to: server, passcode: passcode)
+            } else {
+                passcode = ""
+                isEnteringPasscode = true
+                connect = { [unowned self] in
+                    logger.setPasscode(passcode, for: server)
+                    logger.connect(to: server, passcode: passcode)
+                }
+            }
+        } else {
+            logger.connect(to: server)
+        }
     }
 }
 
@@ -158,13 +249,26 @@ private extension NWBrowser.Result {
             return nil
         }
     }
+
+    var isProtected: Bool {
+        switch metadata {
+        case .bonjour(let record):
+            return record["protected"].map { Bool($0) } == true
+        case .none:
+            return false
+        @unknown default:
+            return false
+        }
+    }
 }
 
 #if DEBUG
+@available(iOS 15, *)
 struct RemoteLoggerSettingsView_Previews: PreviewProvider {
     static var previews: some View {
-        RemoteLoggerSettingsView(viewModel: .shared)
-            .previewLayout(.sizeThatFits)
+        List {
+            RemoteLoggerSettingsView(viewModel: .shared)
+        }
     }
 }
 #endif

@@ -8,6 +8,7 @@ import Pulse
 #if os(iOS)
 import UniformTypeIdentifiers
 
+@available(iOS 15, *)
 public struct SettingsView: View {
     @ObservedObject var viewModel: SettingsViewModel
 
@@ -31,15 +32,14 @@ public struct SettingsView: View {
                 Toggle("Link Detection", isOn: $settings.isLinkDetectionEnabled)
             }
             if viewModel.isRemoteLoggingAvailable {
-                Section {
-                    RemoteLoggerSettingsView(viewModel: .shared)
-                }
+                RemoteLoggerSettingsView(viewModel: .shared)
             }
         }
     }
 }
 
 #if DEBUG
+@available(iOS 15, *)
 struct SettingsView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
