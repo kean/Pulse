@@ -76,10 +76,33 @@ struct ConsoleTaskCell: View {
     }
 
     private var message: some View {
-        Text(task.url ?? "–")
-            .font(ConsoleConstants.fontBody)
-            .foregroundColor(.primary)
-            .lineLimit(settings.lineLimit)
+        VStack(spacing: 3) {
+            HStack {
+                Text(task.url ?? "–")
+                    .font(ConsoleConstants.fontBody)
+                    .foregroundColor(.primary)
+                    .lineLimit(settings.lineLimit)
+
+                Spacer()
+            }
+
+            let headerValueMap = settings.displayHeaders.reduce(into: [String: String]()) { partialResult, header in
+                partialResult[header] = task.originalRequest?.headers[header]
+            }
+
+            ForEach(headerValueMap.keys.sorted(), id: \.self) { key in
+                HStack {
+                    Text(key)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+
+                    Text(headerValueMap[key] ?? "-")
+                        .font(.callout)
+                        .bold()
+                    Spacer()
+                }
+            }
+        }
     }
 
     private var details: some View {
