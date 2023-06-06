@@ -182,12 +182,12 @@ private extension Data {
         guard let json = try? JSONSerialization.jsonObject(with: self)  else {
             return self
         }
-        let redacted = Pulse.redactingSensitiveFields(json, fields)
+        let redacted = _redactingSensitiveFields(json, fields)
         return (try? JSONSerialization.data(withJSONObject: redacted)) ?? self
     }
 }
 
-private func redactingSensitiveFields(_ value: Any, _ fields: Set<String>) -> Any {
+private func _redactingSensitiveFields(_ value: Any, _ fields: Set<String>) -> Any {
     switch value {
     case var object as [String: Any]:
         for key in object.keys.filter(fields.contains) {
@@ -195,7 +195,7 @@ private func redactingSensitiveFields(_ value: Any, _ fields: Set<String>) -> An
         }
         return object
     case let array as [Any]:
-        return array.map { redactingSensitiveFields($0, fields) }
+        return array.map { _redactingSensitiveFields($0, fields) }
     default:
         return value
     }
