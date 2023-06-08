@@ -16,12 +16,14 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
 
     @Published public private(set) var servers: Set<NWBrowser.Result> = []
 
+    @Published public private(set) var browserState: NWBrowser.State = .setup
+
     @Published public private(set) var connectionState: ConnectionState = .idle {
         didSet { pulseLog(label: "RemoteLogger", "Did change connection state to: \(connectionState.description)")}
     }
 
     @Published public private(set) var connectionError: ConnectionError?
-    @Published public private(set) var browserError: ConnectionError?
+    @Published public private(set) var browserError: NWError?
 
     // Browsing
     private var isStarted = false
@@ -133,10 +135,15 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
             guard let self = self, self.isEnabled else { return }
 
             pulseLog(label: "RemoteLogger", "Browser did update state: \(newState)")
-            if case .failed(let error) = newState {
-                browserError = .network(error)
+            self.browserState = newState
+
+            switch newState {
+            case .waiting(let error):
+                browserError = error
+            case .failed(let error):
+                browserError = error
                 self.scheduleBrowserRetry()
-            } else {
+            default:
                 browserError = nil
             }
         }
@@ -144,7 +151,7 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
         browser.browseResultsChangedHandler = { [weak self] results, _ in
             guard let self = self, self.isEnabled else { return }
 
-            pulseLog(label: "RemoteLogger", "Found services \(results.map { $0.endpoint.debugDescription })")
+            pulseLog(label: "RemoteLogger", "Found servers \(results.map { $0.endpoint.debugDescription })")
 
             self.servers = results
             self.connectAutomaticallyIfNeeded()
@@ -160,8 +167,10 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
         guard isStarted else { return }
 
         // Automatically retry until the user cancels
-        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(3)) { [weak self] in
-            self?.startBrowser()
+        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(5)) { [weak self] in
+            guard let self = self, self.isStarted else { return }
+            self.cancel()
+            self.startBrowser()
         }
     }
 

@@ -11,8 +11,6 @@ import Network
 #warning("use custom sheet to requset passcode like WiFi view")
 #warning("add animation when connectings")
 #warning("add details screen")
-#warning("display error message (full?)")
-#warning("add special message if NoAuth is set")
 #warning("remove selected device from list of devices")
 #warning("remove spinner and offset ffrom devices list")
 #warning("(?) add constant spinner for devices")
@@ -48,8 +46,8 @@ struct RemoteLoggerSettingsView: View {
         })
         if viewModel.isEnabled {
             Section(header: Text("Devices")) {
-                if isNoAuth {
-                    RemotLoggerNoAuthView()
+                if let error = logger.browserError {
+                    RemoteLoggerErrorView(error: error)
                 } else {
                     if !viewModel.servers.isEmpty {
 #if os(macOS) || os(iOS)
@@ -65,14 +63,6 @@ struct RemoteLoggerSettingsView: View {
         }
     }
 
-    var isNoAuth: Bool {
-        if case .network(let error) = logger.browserError,
-           case .dns(let dnsError) = error {
-            return dnsError == -65555
-        }
-        return false
-    }
-    
     private var progressView: some View {
 #if os(watchOS)
         ProgressView()
