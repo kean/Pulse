@@ -14,6 +14,7 @@ import Network
 #warning("remove selected device from list of devices")
 #warning("remove spinner and offset ffrom devices list")
 #warning("(?) add constant spinner for devices")
+#warning("display server icons (can we do that? what can we display?)")
 
 @available(iOS 15, *)
 struct RemoteLoggerSettingsView: View {

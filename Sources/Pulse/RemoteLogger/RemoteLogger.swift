@@ -14,16 +14,22 @@ import SwiftUI
 public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegate {
     public private(set) var store: LoggerStore?
 
-    @Published public private(set) var servers: Set<NWBrowser.Result> = []
+    @Published
+    public private(set) var browserState: NWBrowser.State = .setup
 
-    @Published public private(set) var browserState: NWBrowser.State = .setup
+    @Published
+    public private(set) var browserError: NWError?
 
-    @Published public private(set) var connectionState: ConnectionState = .idle {
+    @Published
+    public private(set) var servers: Set<NWBrowser.Result> = []
+
+    @Published
+    public private(set) var connectionState: ConnectionState = .idle {
         didSet { pulseLog(label: "RemoteLogger", "Did change connection state to: \(connectionState.description)")}
     }
 
-    @Published public private(set) var connectionError: ConnectionError?
-    @Published public private(set) var browserError: NWError?
+    @Published
+    public private(set) var connectionError: ConnectionError?
 
     // Browsing
     private var isStarted = false
@@ -52,7 +58,16 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
     public private(set) var isEnabled = false
 
     @AppStorage("com-github-kean-pulse-selected-server")
-    public private(set) var selectedServer = ""
+    private var preferredServer = ""
+
+    /// The servers that you previously connected to. The logger will prioritize
+    /// connecting to the ``RemoteLogger/selectedServer``, but if it's not found
+    /// it'll pick the first server from the ``RemoteLogger/knownServers``.
+    @Published
+    public private(set) var knownServers: [String] = []
+
+    @AppStorage("com-github-kean-pulse-known-servers")
+    private var savedKnownServers = "[]"
 
     public enum ConnectionError: Error {
         case network(NWError)
@@ -95,7 +110,16 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
         }
     }
 
-    private init() {}
+    private init() {
+        self.knownServers = getKnownServers()
+
+        // Migrate to version 4
+        if !preferredServer.isEmpty, knownServers.isEmpty {
+            self.knownServers = [preferredServer]
+            self.saveKnownServers()
+            self.preferredServer = ""
+        }
+    }
 
     /// Enables remote logging. The logger will start searching for available
     /// servers.
@@ -175,10 +199,15 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
     }
 
     private func connectAutomaticallyIfNeeded() {
-        guard isStarted else { return }
+        guard isStarted, connectedServer == nil else { return }
 
-        guard !selectedServer.isEmpty, connectedServer == nil,
-              let server = self.servers.first(where: { $0.name == selectedServer }) else {
+        var servers: [String: NWBrowser.Result] = [:]
+        for server in self.servers where server.name != nil {
+            servers[server.name!] = server
+        }
+
+        guard let name = self.knownServers.first(where: { servers[$0] != nil }),
+              let server = servers[name] else {
             return
         }
 
@@ -209,7 +238,7 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
 
     /// Returns `true` if the server is selected.
     public func isSelected(_ server: NWBrowser.Result) -> Bool {
-        server.name == selectedServer
+        server == connectedServer
     }
 
     /// Connects to the given server and saves the selection persistently. Cancels
@@ -220,7 +249,7 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
         }
 
         // Save selection for the future
-        selectedServer = name
+        saveServer(named: name)
 
         switch connectionState {
         case .idle:
@@ -230,6 +259,12 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
             cancelConnection()
             openConnection(to: server, passcode: passcode)
         }
+    }
+
+    private func saveServer(named name: String) {
+        knownServers.removeAll(where: { $0 == name })
+        knownServers.append(name)
+        saveKnownServers()
     }
 
     private func openConnection(to server: NWBrowser.Result, passcode: String?) {
@@ -486,6 +521,20 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
     public func showDetails(for task: NetworkTaskEntity) {
         connection?.sendMessage(path: .openTaskDetails, entity: LoggerStore.Event.NetworkTaskCompleted(task))
     }
+
+
+    // MARK: Persistence
+
+    private func getKnownServers() -> [String] {
+        let data = self.savedKnownServers.data(using: .utf8) ?? Data()
+        return (try? JSONDecoder().decode([String].self, from: data)) ?? []
+    }
+
+    private func saveKnownServers() {
+        guard let data = try? JSONEncoder().encode(knownServers) else { return }
+        self.savedKnownServers = String(data: data, encoding: .utf8) ?? "[]"
+    }
+
 }
 
 // MARK: - Helpers
