@@ -10,17 +10,12 @@ import UniformTypeIdentifiers
 
 @available(iOS 15, *)
 public struct SettingsView: View {
-    @ObservedObject var viewModel: SettingsViewModel
+    @StateObject var viewModel: SettingsViewModel
     @State private var newHeaderName = ""
     @EnvironmentObject private var settings: UserSettings
 
     public init(store: LoggerStore = .shared) {
-        // TODO: Fix ownership
-        self.viewModel = SettingsViewModel(store: store)
-    }
-
-    init(viewModel: SettingsViewModel) {
-        self.viewModel = viewModel
+        _viewModel = StateObject(wrappedValue: SettingsViewModel(store: store))
     }
 
     public var body: some View {
@@ -62,7 +57,7 @@ public struct SettingsView: View {
 struct SettingsView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
-            SettingsView(viewModel: .init(store: .demo))
+            SettingsView(store: .demo)
                 .injecting(ConsoleEnvironment(store: .demo))
         }
     }

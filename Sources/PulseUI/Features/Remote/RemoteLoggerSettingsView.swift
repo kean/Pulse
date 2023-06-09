@@ -225,7 +225,7 @@ struct RemoteLoggerSettingsView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
             List {
-                RemoteLoggerSettingsView(viewModel: .shared)
+                RemoteLoggerSettingsView(viewModel: .init())
             }
             .navigationTitle("Settings")
         }
