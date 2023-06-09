@@ -72,7 +72,6 @@
 		0C7A0E02297CE71400B4B69D /* FormattersTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7A0E01297CE71400B4B69D /* FormattersTests.swift */; };
 		0C840D4C29E0A09B00362214 /* SessionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C840D4B29E0A09B00362214 /* SessionsView.swift */; };
 		0C94239429B4D73E007F2784 /* ConsoleSearchOccurrenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C94239329B4D73E007F2784 /* ConsoleSearchOccurrenceTests.swift */; };
-		0C9751542A32CBCE00DC46FF /* RemoteLoggerServerDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9751532A32CBCE00DC46FF /* RemoteLoggerServerDetailsView.swift */; };
 		0C9751562A32CBFB00DC46FF /* RemoteLoggerSelectedDeviceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9751552A32CBFB00DC46FF /* RemoteLoggerSelectedDeviceView.swift */; };
 		0C9751582A32CCC400DC46FF /* RemoteLoggerEnterPasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9751572A32CCC400DC46FF /* RemoteLoggerEnterPasswordView.swift */; };
 		0C9C465929F00272007897E8 /* ConsoleListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9C465829F00272007897E8 /* ConsoleListView.swift */; };
@@ -512,7 +511,6 @@
 		0C7A0E01297CE71400B4B69D /* FormattersTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormattersTests.swift; sourceTree = "<group>"; };
 		0C840D4B29E0A09B00362214 /* SessionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionsView.swift; sourceTree = "<group>"; };
 		0C94239329B4D73E007F2784 /* ConsoleSearchOccurrenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchOccurrenceTests.swift; sourceTree = "<group>"; };
-		0C9751532A32CBCE00DC46FF /* RemoteLoggerServerDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteLoggerServerDetailsView.swift; sourceTree = "<group>"; };
 		0C9751552A32CBFB00DC46FF /* RemoteLoggerSelectedDeviceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteLoggerSelectedDeviceView.swift; sourceTree = "<group>"; };
 		0C9751572A32CCC400DC46FF /* RemoteLoggerEnterPasswordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteLoggerEnterPasswordView.swift; sourceTree = "<group>"; };
 		0C9C465829F00272007897E8 /* ConsoleListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleListView.swift; sourceTree = "<group>"; };
@@ -936,7 +934,6 @@
 				0CF0D5D0296F189500EED9D4 /* RemoteLoggerSettingsView.swift */,
 				0C9751552A32CBFB00DC46FF /* RemoteLoggerSelectedDeviceView.swift */,
 				0C9751572A32CCC400DC46FF /* RemoteLoggerEnterPasswordView.swift */,
-				0C9751532A32CBCE00DC46FF /* RemoteLoggerServerDetailsView.swift */,
 				0CC0130D2A2D26BA00A6DF0B /* RemoteLoggerErrorView.swift */,
 			);
 			path = Remote;
@@ -1969,7 +1966,6 @@
 				0CF0D615296F189600EED9D4 /* LoggerSync-ios.swift in Sources */,
 				0C29F39729FE7F97006CC996 /* LoggerSync-watchos.swift in Sources */,
 				0CF0D62C296F189600EED9D4 /* WebView.swift in Sources */,
-				0C9751542A32CBCE00DC46FF /* RemoteLoggerServerDetailsView.swift in Sources */,
 				0CF0D635296F189600EED9D4 /* InfoRow.swift in Sources */,
 				0C63A3782979FE3A00F6A6A5 /* ConsoleSearchTerm.swift in Sources */,
 				0CF0D674296F189600EED9D4 /* NetworkInspectorView-shared.swift in Sources */,

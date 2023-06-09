@@ -25,15 +25,9 @@ import Network
 struct RemoteLoggerSettingsView: View {
     @ObservedObject private var logger: RemoteLogger = .shared
     @ObservedObject var viewModel: RemoteLoggerSettingsViewModel
-    @State private var selectedServer: RemoteLoggerServerViewModel?
 
     var body: some View {
         contents
-            .sheet(item: $selectedServer) { server in
-                NavigationView {
-                    RemoteLoggerServerDetailsView(server: server.server)
-                }
-            }
             .sheet(item: $viewModel.pendingPasscodeProtectedServer) { item in
                 NavigationView {
                     RemoteLoggerEnterPasswordView(viewModel: viewModel, server: item)
@@ -76,7 +70,7 @@ struct RemoteLoggerSettingsView: View {
             .padding(.vertical, 2)
 #endif
             if let server = logger.selectedServerName {
-                RemoteLoggerSelectedDeviceView(selectedServer: $selectedServer, name: server, server: servers.first(where: { $0.isSelected }))
+                RemoteLoggerSelectedDeviceView(name: server, server: servers.first(where: { $0.isSelected }))
             }
         })
 
@@ -145,13 +139,6 @@ struct RemoteLoggerSettingsView: View {
                     Image(systemName: "lock.fill")
                         .foregroundColor(.separator)
                 }
-                Button(action: {
-                    self.selectedServer = server
-                }, label: {
-                    Image(systemName: "info.circle")
-                        .foregroundColor(.accentColor)
-                })
-                .buttonStyle(.plain)
             }
         }
         .foregroundColor(Color.primary)

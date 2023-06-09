@@ -9,7 +9,6 @@ import Pulse
 @available(iOS 15, *)
 struct RemoteLoggerSelectedDeviceView: View {
     @ObservedObject var logger: RemoteLogger = .shared
-    @Binding var selectedServer: RemoteLoggerServerViewModel?
 
     let name: String
     let server: RemoteLoggerServerViewModel?
@@ -26,12 +25,6 @@ struct RemoteLoggerSelectedDeviceView: View {
                     .foregroundColor(.separator)
             }
             Menu(content: {
-                if let server {
-                    Button("Show Details") {
-                        self.selectedServer = server
-                    }
-                    Divider()
-                }
                 Button("Forget this Device", role: .destructive) {
                     logger.forgetServer(named: name)
                 }
