@@ -44,7 +44,7 @@ struct RemoteLoggerSettingsView: View {
 #endif
                     VStack(alignment: .leading, spacing: 2) {
                         Text("Remote Logging")
-                        Text("Requires Pulse for Mac")
+                        Text("Requires [Pulse for Mac](https://testflight.apple.com/join/1jcanE3q)")
                             .font(.caption2)
                             .foregroundColor(.secondary)
                     }
