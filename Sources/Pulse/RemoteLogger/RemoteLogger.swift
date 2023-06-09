@@ -231,7 +231,7 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
 
         pulseLog(label: "RemoteLogger", "Will connect automatically to \(server.endpoint)")
 
-        connect(to: server, passcode: getPasscode(for: server))
+        connect(to: server, passcode: server.name.flatMap(getPasscode))
     }
 
     private func cancelBrowser() {
@@ -245,16 +245,11 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
 
     // MARK: Connection
 
-    public func getPasscode(for server: NWBrowser.Result) -> String? {
-        server.name.flatMap(keychain.string)
+    public func getPasscode(forServerNamed name: String) -> String? {
+        keychain.string(forKey: name)
     }
 
-    public func setPasscode(_ passcode: String?, for server: NWBrowser.Result) {
-        guard let name = server.name else { return }
-        setPasscode(passcode, forName: name)
-    }
-
-    private func setPasscode(_ passcode: String?, forName name: String) {
+    public func setPasscode(_ passcode: String?, forServerNamed name: String) {
         if let passcode {
             try? keychain.set(passcode, forKey: name)
         } else {
@@ -301,7 +296,7 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
     public func forgetServer(named name: String) {
         knownServers.removeAll(where: { $0 == name })
         saveKnownServers()
-        setPasscode(nil, forName: name)
+        setPasscode(nil, forServerNamed: name)
         disconnect()
     }
 
@@ -448,7 +443,7 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
         if let server = selectedServerName {
             saveServer(named: server)
             if let passcode = selectedServerPasscode {
-                setPasscode(passcode, forName: server)
+                setPasscode(passcode, forServerNamed: server)
             }
         }
 
@@ -479,7 +474,7 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
 
         if let server = self.selectedServerName,
            let server = self.servers.first(where: { $0.name == server }) {
-            self.openConnection(to: server, passcode: getPasscode(for: server))
+            self.openConnection(to: server, passcode: self.selectedServerName.flatMap(getPasscode))
         } else {
             self.connectionState = .disconnected
             self.scheduleConnectionRetry()

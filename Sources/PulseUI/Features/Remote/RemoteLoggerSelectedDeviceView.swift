@@ -15,7 +15,7 @@ struct RemoteLoggerSelectedDeviceView: View {
 
     var body: some View {
         HStack {
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: 2) {
                 Text(name)
                 makeStatusView(for: logger.connectionState)
             }

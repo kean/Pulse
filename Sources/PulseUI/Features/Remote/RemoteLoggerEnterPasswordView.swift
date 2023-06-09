@@ -7,8 +7,6 @@ import Network
 import Pulse
 import Combine
 
-#warning("implement error handling")
-#warning("on cancel forget the server (same on errro)")
 @available(iOS 15, *)
 struct RemoteLoggerEnterPasswordView: View {
     @ObservedObject var viewModel: RemoteLoggerSettingsViewModel

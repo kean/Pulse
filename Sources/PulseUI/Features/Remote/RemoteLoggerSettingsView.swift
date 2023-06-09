@@ -8,19 +8,6 @@ import Combine
 import Pulse
 import Network
 
-#warning("fix known server (dispay selectedServer insted)")
-
-#warning("use custom sheet to requset passcode like WiFi view")
-#warning("remove selected device from list of devices")
-#warning("remove spinner and offset ffrom devices list")
-#warning("(?) add constant spinner for devices")
-#warning("display server icons (can we do that? what can we display?)")
-#warning("check on other platforms")
-#warning("these is still some issue with connect/disconnect - sometimes the deviec cant connect; sometime sit keeps saying connecting for too long")
-#warning("fix not displaying full device info")
-#warning("make sure top cells have the same height")
-#warning("add a nicer way to see and resest passcode")
-
 @available(iOS 15, *)
 struct RemoteLoggerSettingsView: View {
     @ObservedObject private var logger: RemoteLogger = .shared
@@ -176,7 +163,7 @@ final class RemoteLoggerSettingsViewModel: ObservableObject {
     func connect(to viewModel: RemoteLoggerServerViewModel) {
         let server = viewModel.server
         if server.isProtected {
-            if let passcode = logger.getPasscode(for: server) {
+            if let passcode = server.name.flatMap(logger.getPasscode) {
                 _connect(to: server, passcode: passcode)
             } else {
                 pendingPasscodeProtectedServer = viewModel
