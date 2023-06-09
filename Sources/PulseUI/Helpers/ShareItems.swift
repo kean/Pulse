@@ -6,7 +6,7 @@ import Foundation
 import Pulse
 import CoreData
 
-enum ShareStoreOutput: String, RawRepresentable {
+public enum ShareStoreOutput: String, RawRepresentable {
     case store, package, text, html
 
     var fileExtension: String {

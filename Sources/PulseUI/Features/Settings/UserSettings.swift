@@ -6,20 +6,21 @@ import SwiftUI
 import Pulse
 import Combine
 
-final class UserSettings: ObservableObject {
-    static let shared = UserSettings()
+/// Allows you to control Pulse appearance and other settings programatically.
+public final class UserSettings: ObservableObject {
+    public static let shared = UserSettings()
 
-    @AppStorage("console-cell-line-limit")
-    var lineLimit: Int = 4
+    @AppStorage("com-github-kean-pulse-console-cell-line-limit")
+    public var lineLimit: Int = 4
 
-    @AppStorage("link-detection")
-    var isLinkDetectionEnabled = false
+    @AppStorage("com-github-kean-pulse-link-detection")
+    public var isLinkDetectionEnabled = false
 
-    @AppStorage("sharing-output")
-    var sharingOutput: ShareStoreOutput = .store
+    @AppStorage("com-github-kean-pulse-sharing-output")
+    public var sharingOutput: ShareStoreOutput = .store
 
-    @AppStorage("display-headers")
-    var displayHeaders: [String] = []
+    @AppStorage("com-github-kean-pulse-display-headers")
+    public var displayHeaders: [String] = []
 }
 
 // MARK: - Array + RawREpresentable

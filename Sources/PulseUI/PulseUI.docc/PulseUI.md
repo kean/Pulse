@@ -74,6 +74,7 @@ private let timeFormatter = DateFormatter(format: "HH:mm:ss.SSS")
 
 - ``ConsoleView``
 - ``SettingsView``
+- ``UserSettings``
 
 ### Deprecated
 

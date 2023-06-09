@@ -25,16 +25,13 @@ public struct SettingsView: View {
 
     public var body: some View {
         Form {
-            Section(header: Text("Appearance")) {
-                Stepper("Line Limit: \(settings.lineLimit)", value: $settings.lineLimit, in: 1...20)
-            }
-            Section(header: Text("General")) {
-                Toggle("Link Detection", isOn: $settings.isLinkDetectionEnabled)
-            }
             if viewModel.isRemoteLoggingAvailable {
                 RemoteLoggerSettingsView(viewModel: .shared)
             }
-
+            Section(header: Text("Appearance")) {
+                Stepper("Line Limit: \(settings.lineLimit)", value: $settings.lineLimit, in: 1...20)
+                Toggle("Link Detection", isOn: $settings.isLinkDetectionEnabled)
+            }
             Section(header: Text("List headers"), footer: Text("These headers will be included in the list view")) {
                 ForEach(settings.displayHeaders, id: \.self) {
                     Text($0)
@@ -65,7 +62,8 @@ public struct SettingsView: View {
 struct SettingsView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
-            SettingsView(viewModel: .init(store: .mock))
+            SettingsView(viewModel: .init(store: .demo))
+                .injecting(ConsoleEnvironment(store: .demo))
         }
     }
 }
