@@ -311,17 +311,20 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
             // There seems to be no good way to catch the incorrect TLS
             // encryption key error, so the connection has a 5 second timeout.
             let work = DispatchWorkItem { [weak self] in
-                guard let self else { return }
-                os_log("Connection did timeout", log: log)
-                completion(.failure(self.connectionError ?? .unknown(isProtected: passcode != nil)))
-                self.connectionCompletion = nil
-                self.disconnect()
+                self?.connectionDidTimeout(isProtected: passcode != nil)
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(5), execute: work)
             connectionTimeoutItem = work
         }
 
         openConnection(to: server, passcode: passcode)
+    }
+
+    private func connectionDidTimeout(isProtected: Bool) {
+        os_log("Connection did timeout", log: log)
+        connectionCompletion?(.failure(self.connectionError ?? .unknown(isProtected: isProtected)))
+        connectionCompletion = nil
+        disconnect()
     }
 
     /// Forget the server with the given name, disconnecting it, removing the
