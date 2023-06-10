@@ -48,9 +48,9 @@ struct RemoteLoggerSelectedDeviceView: View {
     }
 
     private func makeStatusView(for state: RemoteLogger.ConnectionState) -> some View {
-        HStack {
+        HStack(spacing: 8) {
             Circle()
-                .frame(width: 8, height: 8)
+                .frame(width: circleSize, height: circleSize)
                 .foregroundColor(statusColor)
             Text(statusTitle)
                 .lineLimit(1)
@@ -75,3 +75,9 @@ struct RemoteLoggerSelectedDeviceView: View {
         }
     }
 }
+
+#if os(tvOS)
+private let circleSize: CGFloat = 16
+#else
+private let circleSize: CGFloat = 8
+#endif

@@ -5,6 +5,7 @@
 import Foundation
 import Network
 import CryptoKit
+import OSLog
 
 #if PULSE_STANDALONE_APP
 import Pulse
@@ -22,7 +23,8 @@ extension RemoteLogger {
         private var buffer = Data()
         private var id: UInt32 = 0
         private var handlers: [UInt32: (Data?, Error?) -> Void] = [:]
-        
+        private let log: OSLog
+
         weak var delegate: RemoteLoggerConnectionDelegate?
 
         convenience init(endpoint: NWEndpoint, using parameters: NWParameters) {
@@ -31,6 +33,9 @@ extension RemoteLogger {
 
         init(_ connection: NWConnection) {
             self.connection = connection
+
+            let isLogEnabled = UserDefaults.standard.bool(forKey: "com.github.kean.pulse.debug")
+            self.log = isLogEnabled ? OSLog(subsystem: "com.github.kean.pulse", category: "RemoteLogger") : .disabled
         }
 
         func start(on queue: DispatchQueue) {
@@ -104,7 +109,7 @@ extension RemoteLogger {
                 if case .notEnoughData? = error as? PacketParsingError {
                     return nil
                 }
-                pulseLog("Unexpected error when processing a packet: \(error)")
+                os_log("Unexpected error when processing a packet: %{public}@", log: log, type: .error, "\(error)")
                 return nil
             }
         }
@@ -128,13 +133,14 @@ extension RemoteLogger {
         func send(code: UInt8, data: Data) {
             do {
                 let data = try encode(code: code, body: data)
+                let log = self.log
                 connection.send(content: data, completion: .contentProcessed({ error in
-                    if error != nil {
-                        pulseLog("\(String(describing: error))")
+                    if let error {
+                        os_log("Failed to send data: %{public}@", log: log, type: .error, "\(error)")
                     }
                 }))
             } catch {
-                pulseLog("Failed to encode a packet: \(error)") // Should never happen
+                os_log("Failed to encode a packet: %{public}@", log: log, type: .error, "\(error)")
             }
         }
 
@@ -143,7 +149,7 @@ extension RemoteLogger {
                 let data = try JSONEncoder().encode(entity)
                 send(code: code, data: data)
             } catch {
-                pulseLog("Failed to encode a packet: \(error)") // Should never happen
+                os_log("Failed to encode a packet: %{public}@", log: log, type: .error, "\(error)")
             }
         }
     
@@ -151,7 +157,7 @@ extension RemoteLogger {
             do {
                 sendMessage(path: path, data: try JSONEncoder().encode(entity), completion)
             } catch {
-                pulseLog("Failed to encode a packet: \(error)") // Should never happen
+                os_log("Failed to send a message: %{public}@", log: log, type: .error, "\(error)")
             }
         }
         
@@ -178,7 +184,7 @@ extension RemoteLogger {
                 let data = try Message.encode(message)
                 send(code: .message, data: data)
             } catch {
-                pulseLog("Failed to encode message: \(error)") // Should never happen
+                os_log("Failed to send a message: %{public}@", log: log, type: .error, "\(error)")
             }
         }
 
@@ -186,7 +192,7 @@ extension RemoteLogger {
             do {
                 sendResponse(for: message, data: try JSONEncoder().encode(entity))
             } catch {
-                pulseLog("Failed to encode a packet: \(error)") // Should never happen
+                os_log("Failed to encode a response: %{public}@", log: log, type: .error, "\(error)")
             }
         }
         
@@ -196,7 +202,7 @@ extension RemoteLogger {
                 let data = try Message.encode(message)
                 send(code: .message, data: data)
             } catch {
-                pulseLog("Failed to encode message: \(error)") // Should never happen
+                os_log("Failed to encode a response: %{public}@", log: log, type: .error, "\(error)")
             }
         }
         

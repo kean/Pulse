@@ -30,11 +30,7 @@ struct RemoteLoggerSettingsView: View {
                     RemoteLoggerErrorView(error: error)
                 } else {
                     if !servers.isEmpty {
-#if os(macOS) || os(iOS) || os(watchOS)
                         ForEach(servers, content: makeServerView)
-#else
-                        List(servers, rowContent: makeServerView)
-#endif
                     } else {
                         progressView
                     }
