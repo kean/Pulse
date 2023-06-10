@@ -34,6 +34,7 @@ struct RemoteLoggerEnterPasswordView: View {
             })
         }
         .inlineNavigationTitle("Enter Password")
+#if os(iOS)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button("Cancel", role: .cancel) {
@@ -46,6 +47,7 @@ struct RemoteLoggerEnterPasswordView: View {
                 }
             }
         }
+#endif
         .onAppear {
             isTextFieldFocused = true
         }
