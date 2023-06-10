@@ -104,6 +104,7 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
     /// - parameter store: The store to be synced with the server. By default,
     /// ``LoggerStore/shared``. Only one store can be synced at at time.
     public func initialize(store: LoggerStore = .shared) {
+        assert(Thread.isMainThread)
         os_log("Initialize with store at %{private}@", log: log, "\(store.storeURL)")
 
         guard self.store !== store else {
@@ -229,6 +230,8 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
             scheduleBrowserRetry()
         case .ready:
             servers = browser?.browseResults ?? []
+        case .cancelled:
+            servers = []
         default:
             break
         }
@@ -279,6 +282,7 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
         browser = nil
         browserError = nil
         browserState = .cancelled
+        servers = []
 
         os_log("Did stop browser", log: log, type: .info)
     }

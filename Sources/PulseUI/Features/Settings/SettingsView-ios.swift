@@ -13,6 +13,7 @@ public struct SettingsView: View {
     @StateObject var viewModel: SettingsViewModel
     @State private var newHeaderName = ""
     @EnvironmentObject private var settings: UserSettings
+    @ObservedObject private var logger: RemoteLogger = .shared
 
     public init(store: LoggerStore = .shared) {
         _viewModel = StateObject(wrappedValue: SettingsViewModel(store: store))
@@ -49,6 +50,8 @@ public struct SettingsView: View {
                 }
             }
         }
+        .animation(.default, value: logger.selectedServerName)
+        .animation(.default, value: logger.servers)
     }
 }
 
