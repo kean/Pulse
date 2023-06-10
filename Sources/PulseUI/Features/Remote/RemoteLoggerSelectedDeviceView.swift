@@ -49,12 +49,7 @@ struct RemoteLoggerSelectedDeviceView: View {
     private var statusColor: Color {
         switch logger.connectionState {
         case .connected: return Color.green
-        case .connecting:
-            if logger.connectionError != nil {
-                return Color.red
-            } else {
-                return Color.yellow
-            }
+        case .connecting: return Color.yellow
         case .disconnected: return Color.gray
         }
     }
@@ -62,12 +57,7 @@ struct RemoteLoggerSelectedDeviceView: View {
     private var statusTitle: String {
         switch logger.connectionState {
         case .connected: return "Connected"
-        case .connecting:
-            if let error = logger.connectionError {
-                return "Failed: \(error.localizedDescription)"
-            } else {
-                return "Connecting..."
-            }
+        case .connecting: return "Connecting..."
         case .disconnected: return "Disconnected"
         }
     }

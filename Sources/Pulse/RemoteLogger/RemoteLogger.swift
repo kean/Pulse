@@ -31,9 +31,6 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
         didSet { pulseLog(label: "RemoteLogger", "Did change connection state to: \(connectionState.description)")}
     }
 
-    @Published
-    public private(set) var connectionError: ConnectionError?
-
     // Browsing
     private var isStarted = false
     private var browser: NWBrowser?
@@ -43,6 +40,7 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
     private var connectionCompletion: ((Result<Void, ConnectionError>) -> Void)?
     private var connection: Connection?
     private var connectionTimeoutItem: DispatchWorkItem?
+    private var connectionError: ConnectionError?
     private var serverVersion: Version?
     private var connectionRetryItem: DispatchWorkItem?
     private var timeoutDisconnectItem: DispatchWorkItem?
@@ -509,7 +507,6 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
         pingItem = item
     }
 
-    #warning("check that we manage connectedServer correctly")
     public func disconnect() {
         selectedServerName = nil
         selectedServerPasscode = nil
