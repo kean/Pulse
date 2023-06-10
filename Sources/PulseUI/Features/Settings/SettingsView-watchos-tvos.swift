@@ -8,19 +8,14 @@ import Pulse
 #if os(watchOS) || os(tvOS)
 
 public struct SettingsView: View {
-    @ObservedObject var viewModel: SettingsViewModel
+    @StateObject private var viewModel: SettingsViewModel
 
     var store: LoggerStore { viewModel.store }
 
     public init(store: LoggerStore = .shared) {
-        // TODO: Fix ownership
-        self.viewModel = SettingsViewModel(store: store)
+        _viewModel = StateObject(wrappedValue: SettingsViewModel(store: store))
     }
-    
-    init(viewModel: SettingsViewModel) {
-        self.viewModel = viewModel
-    }
-    
+
     public var body: some View {
         Form {
             sectionStoreDetails
@@ -71,7 +66,7 @@ public struct SettingsView: View {
 struct SettingsView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
-            SettingsView(viewModel: .init(store: .mock))
+            SettingsView(store: .mock)
         }
     }
 }

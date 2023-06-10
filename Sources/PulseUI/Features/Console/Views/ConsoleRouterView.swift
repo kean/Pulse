@@ -111,7 +111,7 @@ extension ConsoleRouterView {
         Text("").invisible()
             .sheet(isPresented: $router.isShowingSettings) {
                 NavigationView {
-                    SettingsView(viewModel: .init(store: environment.store))
+                    SettingsView(store: environment.store)
                         .toolbar {
                             ToolbarItem(placement: .cancellationAction) {
                                 Button("Close") { router.isShowingSettings = false }

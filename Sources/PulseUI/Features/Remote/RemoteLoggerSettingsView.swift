@@ -30,7 +30,7 @@ struct RemoteLoggerSettingsView: View {
                     RemoteLoggerErrorView(error: error)
                 } else {
                     if !servers.isEmpty {
-#if os(macOS) || os(iOS)
+#if os(macOS) || os(iOS) || os(watchOS)
                         ForEach(servers, content: makeServerView)
 #else
                         List(servers, rowContent: makeServerView)
@@ -47,22 +47,21 @@ struct RemoteLoggerSettingsView: View {
     private var toggleView: some View {
         Toggle(isOn: $viewModel.isEnabled, label: {
             HStack(spacing: 12) {
-#if !os(watchOS)
+#if os(watchOS)
+                Text("Remote Logging")
+#else
                 Text(Image(systemName: "wifi"))
                     .font(.headline)
                     .foregroundColor(.white)
                     .padding(4)
                     .background(Color.blue)
                     .cornerRadius(6)
-#endif
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Remote Logging")
                     Text("Requires [Pulse for Mac](https://testflight.apple.com/join/1jcanE3q)")
                         .font(.caption2)
                         .foregroundColor(.secondary)
                 }
-#if os(macOS)
-//                Spacer()
 #endif
             }
         })
