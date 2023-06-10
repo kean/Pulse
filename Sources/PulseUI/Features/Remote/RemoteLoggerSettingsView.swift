@@ -149,7 +149,7 @@ final class RemoteLoggerSettingsViewModel: ObservableObject {
         
         isEnabled = logger.isEnabled
         
-        $isEnabled.removeDuplicates().receive(on: DispatchQueue.main)
+        $isEnabled.dropFirst().removeDuplicates().receive(on: DispatchQueue.main)
             .throttle(for: .milliseconds(500), scheduler: DispatchQueue.main, latest: true)
             .sink { [weak self] in
                 self?.didUpdateIsEnabled($0)

@@ -56,6 +56,10 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
+            argument = "-com.github.kean.pulse.debug 1"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
             argument = "-com.apple.CoreData.SQLDebug 2"
             isEnabled = "NO">
          </CommandLineArgument>

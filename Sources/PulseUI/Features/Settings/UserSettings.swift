@@ -10,16 +10,16 @@ import Combine
 public final class UserSettings: ObservableObject {
     public static let shared = UserSettings()
 
-    @AppStorage("com-github-kean-pulse-console-cell-line-limit")
+    @AppStorage("com.github.kean.pulse.console.cell.line.limit")
     public var lineLimit: Int = 4
 
-    @AppStorage("com-github-kean-pulse-link-detection")
+    @AppStorage("com.github.kean.pulse.link.detection")
     public var isLinkDetectionEnabled = false
 
-    @AppStorage("com-github-kean-pulse-sharing-output")
+    @AppStorage("com.github.kean.pulse.sharing.output")
     public var sharingOutput: ShareStoreOutput = .store
 
-    @AppStorage("com-github-kean-pulse-display-headers")
+    @AppStorage("com.github.kean.pulse.display.headers")
     public var displayHeaders: [String] = []
 }
 
