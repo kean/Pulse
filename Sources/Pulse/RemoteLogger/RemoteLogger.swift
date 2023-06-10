@@ -494,7 +494,7 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
     }
 
     private func didConnectToServer(response: ServerHelloResponse?) {
-        os_log("Did receive hello from server (verison: %{public}@)", log: log, response?.version ?? "–")
+        os_log("Did receive hello from server (version: %{public}@)", log: log, response?.version ?? "–")
 
         guard connectionState != .connected else { return }
         connectionState = .connected
