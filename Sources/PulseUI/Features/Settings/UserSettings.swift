@@ -6,7 +6,7 @@ import SwiftUI
 import Pulse
 import Combine
 
-/// Allows you to control Pulse appearance and other settings programatically.
+/// Allows you to control Pulse appearance and other settings programmatically.
 public final class UserSettings: ObservableObject {
     public static let shared = UserSettings()
 
