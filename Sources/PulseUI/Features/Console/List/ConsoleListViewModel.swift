@@ -90,7 +90,9 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject, C
     private func didUpdateMode(_ mode: ConsoleMode) {
         self.mode = mode
         pins = filter(pins: pinsObserver.objects, mode: mode)
-        resetDataSource(options: environment.listOptions)
+        if isViewVisible {
+            resetDataSource(options: environment.listOptions)
+        }
     }
 
     private func resetDataSource(options: ConsoleListOptions) {

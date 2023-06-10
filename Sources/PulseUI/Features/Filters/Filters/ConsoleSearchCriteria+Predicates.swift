@@ -37,7 +37,7 @@ extension ConsoleFilers {
 private func makePredicates(for criteria: ConsoleFilers.Shared, isNetwork: Bool = false) -> [NSPredicate] {
     var predicates = [NSPredicate]()
 
-    if criteria.sessions.isEnabled {
+    if criteria.sessions.isEnabled, !criteria.sessions.selection.isEmpty {
         predicates.append(NSPredicate(format: "session IN %@", criteria.sessions.selection))
     }
 
