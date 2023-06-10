@@ -31,6 +31,10 @@ struct RemoteLoggerSelectedDeviceView: View {
             }, label: {
                 Image(systemName: "ellipsis.circle")
             })
+#if os(macOS)
+            .menuStyle(.borderlessButton)
+            .fixedSize()
+#endif
         }
     }
 

@@ -14,18 +14,29 @@ struct SettingsView: View {
     @Environment(\.store) private var store
 
     var body: some View {
-        ScrollView {
-            Form {
-                ConsoleSection(header: { SectionHeaderView(title: "Remote Logging") }) {
-                    if store === RemoteLogger.shared.store {
-                        RemoteLoggerSettingsView(viewModel: .shared)
-                    } else {
-                        Text("Not available")
-                            .foregroundColor(.secondary)
+        List {
+            if store === RemoteLogger.shared.store {
+                RemoteLoggerSettingsView(viewModel: .shared)
+            } else {
+                Text("Not available")
+                    .foregroundColor(.secondary)
+            }
+            Section(header: Text("Store")) {
+                if #available(macOS 13, *), let info = try? store.info() {
+                    LoggerStoreSizeChart(info: info, sizeLimit: store.configuration.sizeLimit)
+                }
+            }
+            Section {
+                HStack {
+                    Button("Show in Finder") {
+                        NSWorkspace.shared.activateFileViewerSelecting([store.storeURL])
+                    }
+                    if !(store.options.contains(.readonly)) {
+                        Button("Remove Logs") {
+                            store.removeAll()
+                        }
                     }
                 }
-                Divider()
-                StoreDetailsView(source: .store(store))
             }
         }
     }

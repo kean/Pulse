@@ -556,6 +556,7 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
     public func disconnect() {
         selectedServerName = nil
         selectedServerPasscode = nil
+        serverVersion = nil
 
         connectionState = .disconnected // The order is important
         selectedServerName = nil

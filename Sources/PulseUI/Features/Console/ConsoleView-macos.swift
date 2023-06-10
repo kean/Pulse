@@ -72,7 +72,7 @@ private struct ConsoleMainView: View {
                         Label("Show Settings", systemImage: "gearshape")
                     }
                     .popover(isPresented: $isShowingSettings) {
-                        SettingsView().frame(width: 300, height: 600)
+                        SettingsView().frame(width: 300, height: 420)
                     }
                 }
             }
