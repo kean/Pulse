@@ -2,8 +2,6 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
-#if os(iOS) || os(macOS)
-
 import SwiftUI
 import Pulse
 import CoreData
@@ -13,6 +11,8 @@ protocol ConsoleEntitiesSource {
     var events: PassthroughSubject<ConsoleUpdateEvent, Never> { get }
     var entities: [NSManagedObject] { get }
 }
+
+#if os(iOS) || os(macOS)
 
 final class ConsoleSearchBarViewModel: ObservableObject {
     @Published var text: String = ""

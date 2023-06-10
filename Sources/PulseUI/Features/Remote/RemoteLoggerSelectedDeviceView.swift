@@ -6,6 +6,7 @@ import SwiftUI
 import Network
 import Pulse
 
+#warning("reimplement forget-this-device on watchos")
 @available(iOS 15, *)
 struct RemoteLoggerSelectedDeviceView: View {
     @ObservedObject var logger: RemoteLogger = .shared
@@ -24,6 +25,7 @@ struct RemoteLoggerSelectedDeviceView: View {
                 Image(systemName: "lock.fill")
                     .foregroundColor(.separator)
             }
+#if !os(watchOS)
             Menu(content: {
                 Button("Forget this Device", role: .destructive) {
                     logger.forgetServer(named: name)
@@ -34,6 +36,7 @@ struct RemoteLoggerSelectedDeviceView: View {
 #if os(macOS)
             .menuStyle(.borderlessButton)
             .fixedSize()
+#endif
 #endif
         }
     }
