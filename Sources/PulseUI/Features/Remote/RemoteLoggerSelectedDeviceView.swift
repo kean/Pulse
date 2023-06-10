@@ -24,7 +24,7 @@ struct RemoteLoggerSelectedDeviceView: View {
                 Image(systemName: "lock.fill")
                     .foregroundColor(.separator)
             }
-#if !os(watchOS)
+#if !os(watchOS) && !os(tvOS)
             Menu(content: {
                 Button("Forget this Device", role: .destructive) {
                     logger.forgetServer(named: name)
