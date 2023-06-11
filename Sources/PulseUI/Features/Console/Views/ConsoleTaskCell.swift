@@ -27,6 +27,9 @@ struct ConsoleTaskCell: View {
 #if !os(macOS)
             details
 #endif
+#if os(iOS)
+            requestHeaders
+#endif
         }
 #if !PULSE_STANDALONE_APP
             .animation(.default, value: task.state)
@@ -85,23 +88,6 @@ struct ConsoleTaskCell: View {
 
                 Spacer()
             }
-
-            let headerValueMap = settings.displayHeaders.reduce(into: [String: String]()) { partialResult, header in
-                partialResult[header] = task.originalRequest?.headers[header]
-            }
-
-            ForEach(headerValueMap.keys.sorted(), id: \.self) { key in
-                HStack {
-                    Text(key)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-
-                    Text(headerValueMap[key] ?? "-")
-                        .font(.callout)
-                        .bold()
-                    Spacer()
-                }
-            }
         }
     }
 
@@ -146,6 +132,27 @@ struct ConsoleTaskCell: View {
     private func byteCount(for size: Int64) -> String {
         guard size > 0 else { return "0 KB" }
         return ByteCountFormatter.string(fromByteCount: size)
+    }
+
+    @ViewBuilder
+    private var requestHeaders: some View {
+        let headerValueMap = settings.displayHeaders.reduce(into: [String: String]()) { partialResult, header in
+            partialResult[header] = task.originalRequest?.headers[header]
+        }
+        ForEach(headerValueMap.keys.sorted(), id: \.self) { key in
+            HStack {
+                (Text(key + ": ")
+                    .foregroundColor(.secondary) +
+                 Text(headerValueMap[key] ?? "-"))
+                .font(.footnote)
+                .allowsTightening(true)
+                .lineLimit(3)
+
+                Spacer()
+            }
+            .padding(.top, 6)
+            .padding(.trailing, -7)
+        }
     }
 }
 
