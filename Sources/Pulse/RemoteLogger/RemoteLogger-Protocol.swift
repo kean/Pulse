@@ -23,10 +23,6 @@ extension RemoteLogger {
         case storeEventNetworkTaskCreated = 8
         case storeEventNetworkTaskProgressUpdated = 9
         case storeEventNetworkTaskCompleted = 10
-        // Mocks
-        // TODO: remove these soon after 4.0 roll out
-        case updateMocks = 11 // [URLSessionMock]
-        case getMockedResponse = 12 // GetMockRequest / GetMockResponse
         // A custom message with the following format:
         //
         // path (String)
@@ -185,16 +181,6 @@ extension RemoteLogger {
         }
     }
 
-    struct GetMockRequest: Codable {
-        let requestID: UUID
-        let mockID: UUID
-    }
-    
-    struct GetMockResponse: Codable {
-        let requestID: UUID
-        let mock: URLSessionMockedResponse
-    }
-    
     enum PacketParsingError: Error {
         case notEnoughData
         case unsupportedContentSize
@@ -226,10 +212,6 @@ extension RemoteLogger.Connection {
     func send(code: RemoteLogger.PacketCode) {
         send(code: code.rawValue, entity: RemoteLogger.Empty())
     }
-}
-
-struct MockGetRequest {
-    let id: UUID
 }
 
 struct URLSessionMock: Hashable, Codable {

@@ -468,15 +468,6 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
             buffer?.forEach(send)
         case .ping:
             scheduleAutomaticDisconnect()
-        case .updateMocks:
-            let mocks = try JSONDecoder().decode([URLSessionMock].self, from: packet.body)
-            URLSessionMockManager.shared.update(mocks)
-        case .getMockedResponse:
-            let response = try JSONDecoder().decode(GetMockResponse.self, from: packet.body)
-            if let completion = getMockedResponseCompletions.removeValue(forKey: response.requestID) {
-                completion(response.mock)
-            }
-            break
         case .message:
             guard let message = try? Message.decode(packet.body) else {
                 return // New unsupported message
@@ -652,18 +643,12 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
         guard let connection = connection else {
             return completion(nil)
         }
-        if let version = serverVersion, version >= Version(4, 0, 0) {
-            connection.sendMessage(path: .getMockedResponse(mockID: mock.mockID)) { data, _ in
-                if let data = data, let response = try? JSONDecoder().decode(URLSessionMockedResponse.self, from: data) {
-                    completion(response)
-                } else {
-                    completion(nil)
-                }
+        connection.sendMessage(path: .getMockedResponse(mockID: mock.mockID)) { data, _ in
+            if let data = data, let response = try? JSONDecoder().decode(URLSessionMockedResponse.self, from: data) {
+                completion(response)
+            } else {
+                completion(nil)
             }
-        } else {
-            let request = GetMockRequest(requestID: UUID(), mockID: mock.mockID)
-            getMockedResponseCompletions[request.requestID] = completion
-            connection.send(code: .getMockedResponse, entity: request)
         }
     }
     
