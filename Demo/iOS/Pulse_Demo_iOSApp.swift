@@ -5,12 +5,14 @@
 import SwiftUI
 import Pulse
 import PulseUI
+import WatchConnectivity
+import OSLog
 
 @main
 struct Pulse_Demo_iOSApp: App {
+    @StateObject private var viewModel = AppViewModel()
+
     var body: some Scene {
-//        let _ = testProxy()
-        
         WindowGroup {
             NavigationView {
                 ConsoleView(store: .demo)
@@ -19,7 +21,54 @@ struct Pulse_Demo_iOSApp: App {
     }
 }
 
-var task: URLSessionDataTask?
+// MARK: - WatchOS Integration
+
+private final class AppViewModel: NSObject, ObservableObject, WCSessionDelegate {
+    let log = OSLog(subsystem: "app", category: "AppViewModel")
+
+    override init() {
+        super.init()
+
+        if WCSession.isSupported() {
+            WCSession.default.delegate = self
+            WCSession.default.activate()
+        }
+
+        // Uncomment to test `URLSessionProxyDelegate`:
+        // testProxy()
+    }
+
+    func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
+        os_log("WCSession.activationDidCompleteWith(state: %{public}@, error: %{public}@)", log: log, "\(activationState)", String(describing: error))
+    }
+
+    func sessionDidBecomeInactive(_ session: WCSession) {
+        os_log("WCSession.sessionDidBecomeInactive()", log: log)
+    }
+
+    func sessionDidDeactivate(_ session: WCSession) {
+        os_log("WCSession.sessionDidDeactivate()", log: log)
+    }
+
+    func session(_ session: WCSession, didReceive file: WCSessionFile) {
+        os_log("WCSession.didReceiveFile(url: %{public}@, metadata: %{public}@", log: log, String(describing: file.fileURL), String(describing:  file.metadata?.description))
+
+        LoggerStore.session(session, didReceive: file)
+    }
+}
+
+extension WCSessionActivationState: CustomStringConvertible {
+    public var description: String {
+        switch self {
+        case .notActivated: return ".notActivated"
+        case .inactive: return ".inactive"
+        case .activated: return ".activated"
+        @unknown default: return "unknown"
+        }
+    }
+}
+
+// MARK: - URLSessionProxyDelegate Example
 
 private func testProxy() {
 //    Experimental.URLSessionProxy.shared.isEnabled = true
@@ -29,7 +78,6 @@ private func testProxy() {
 
     DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(5)) {
         let task = session.dataTask(with: URLRequest(url: URL(string: "https://github.com/kean/Nuke/archive/refs/tags/11.0.0.zip")!))
-        //    task = session.dataTask(with: URL(string: "https://github.com/CreateAPI/Get")!)
         task.resume()
     }
 }

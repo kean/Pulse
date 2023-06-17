@@ -30,7 +30,7 @@ final class LoggerSyncSession: NSObject, ObservableObject {
     }
 
     func session(_ session: WCSession, didReceive file: WCSessionFile) {
-        guard file.metadata?[LoggerSyncSession.pulseDocumentMarkerKey] != nil else {
+        guard file.metadata?[pulseDocumentMarkerKey] != nil else {
             return
         }
         let storeURL = makeImportedStoreURL()
@@ -49,7 +49,5 @@ private func makeImportedStoreURL() -> URL {
 #endif
 
 #if os(iOS) || os(watchOS)
-extension LoggerSyncSession {
-    static let pulseDocumentMarkerKey = "com.github.kean.pulse.imported-store-marker"
-}
+let pulseDocumentMarkerKey = "com.github.kean.pulse.imported-store-marker"
 #endif

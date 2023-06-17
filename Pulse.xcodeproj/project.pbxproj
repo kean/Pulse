@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 54;
+	objectVersion = 53;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -46,7 +46,7 @@
 		0C11EAE92971EBEE0059786A /* MockTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5AF296F189500EED9D4 /* MockTask.swift */; };
 		0C20F3E42A2CE9D900F2F67D /* Keychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C20F3E32A2CE9D900F2F67D /* Keychain.swift */; };
 		0C2343152978B6B900AE7CE6 /* ConsoleSearchSuggestionsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C2343142978B6B900AE7CE6 /* ConsoleSearchSuggestionsService.swift */; };
-		0C29F39729FE7F97006CC996 /* LoggerSync-watchos.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C29F39629FE7F97006CC996 /* LoggerSync-watchos.swift */; };
+		0C29F39729FE7F97006CC996 /* FileTransferViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C29F39629FE7F97006CC996 /* FileTransferViewModel.swift */; };
 		0C3002B32986CEF30055F6C2 /* LoggerStoreIndex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C3002B22986CEF30055F6C2 /* LoggerStoreIndex.swift */; };
 		0C31FFB9298211AF002A7D64 /* ConsoleEntityDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C31FFB8298211AF002A7D64 /* ConsoleEntityDetailsView.swift */; };
 		0C37046329FA08B800BA51B8 /* ConsoleSearchRecentSearchesStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C37046229FA08B800BA51B8 /* ConsoleSearchRecentSearchesStore.swift */; };
@@ -482,7 +482,7 @@
 		0C20F3E32A2CE9D900F2F67D /* Keychain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keychain.swift; sourceTree = "<group>"; };
 		0C2343142978B6B900AE7CE6 /* ConsoleSearchSuggestionsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchSuggestionsService.swift; sourceTree = "<group>"; };
 		0C25FB6E25CDDCAB00A895C2 /* URLSessionManualIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionManualIntegration.swift; sourceTree = "<group>"; };
-		0C29F39629FE7F97006CC996 /* LoggerSync-watchos.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LoggerSync-watchos.swift"; sourceTree = "<group>"; };
+		0C29F39629FE7F97006CC996 /* FileTransferViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileTransferViewModel.swift; sourceTree = "<group>"; };
 		0C3002B22986CEF30055F6C2 /* LoggerStoreIndex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggerStoreIndex.swift; sourceTree = "<group>"; };
 		0C31FFB8298211AF002A7D64 /* ConsoleEntityDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleEntityDetailsView.swift; sourceTree = "<group>"; };
 		0C37046229FA08B800BA51B8 /* ConsoleSearchRecentSearchesStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchRecentSearchesStore.swift; sourceTree = "<group>"; };
@@ -1171,7 +1171,7 @@
 				0CF0D581296F189500EED9D4 /* Regex.swift */,
 				0CB63A24297592D400525165 /* Parser.swift */,
 				0CF0D584296F189500EED9D4 /* LoggerSync-ios.swift */,
-				0C29F39629FE7F97006CC996 /* LoggerSync-watchos.swift */,
+				0C29F39629FE7F97006CC996 /* FileTransferViewModel.swift */,
 				0CF0D587296F189500EED9D4 /* DecodingErrorsPreviews.swift */,
 				0CB34595298CBC37009428B2 /* ManagedObjectsObserver.swift */,
 				0CB17F192978ABBA004E33F4 /* ManagedObjectsCountObserver.swift */,
@@ -1967,7 +1967,7 @@
 				0CF0D656296F189600EED9D4 /* RemoteLoggerSettingsView.swift in Sources */,
 				0CF0D65C296F189600EED9D4 /* ConsoleMessageMetadataView.swift in Sources */,
 				0CF0D615296F189600EED9D4 /* LoggerSync-ios.swift in Sources */,
-				0C29F39729FE7F97006CC996 /* LoggerSync-watchos.swift in Sources */,
+				0C29F39729FE7F97006CC996 /* FileTransferViewModel.swift in Sources */,
 				0CF0D62C296F189600EED9D4 /* WebView.swift in Sources */,
 				0CF0D635296F189600EED9D4 /* InfoRow.swift in Sources */,
 				0C63A3782979FE3A00F6A6A5 /* ConsoleSearchTerm.swift in Sources */,

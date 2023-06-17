@@ -13,7 +13,8 @@ public struct SettingsView: View {
     var store: LoggerStore { viewModel.store }
 
 #if os(watchOS)
-    @State private var isSharingStore = false
+    @StateObject private var transferViewModel = FileTransferViewModel()
+    @State private var isShowingShareView = false
 #endif
 
     public init(store: LoggerStore = .shared) {
@@ -27,9 +28,7 @@ public struct SettingsView: View {
             Section {
                 sectionTransferStore
                 if #available(watchOS 9, *) {
-                    Button("Share Store") {
-                        isSharingStore = true
-                    }
+                    Button("Share Store") { isShowingShareView = true }
                 }
             }
 #endif
@@ -49,11 +48,11 @@ public struct SettingsView: View {
         .frame(maxWidth: 800)
 #endif
 #if os(watchOS)
-        .sheet(isPresented: $isSharingStore) {
+        .sheet(isPresented: $isShowingShareView) {
             if #available(watchOS 9, *) {
                 NavigationView {
                     ShareStoreView() {
-                        isSharingStore = false
+                        isShowingShareView = false
                     }
                 }
             }
@@ -71,12 +70,12 @@ public struct SettingsView: View {
     
 #if os(watchOS)
     private var sectionTransferStore: some View {
-        Button(action: viewModel.tranferStore) {
-            Label(viewModel.fileTransferStatus.title, systemImage: "square.and.arrow.up")
+        Button(action: { transferViewModel.share(store: store) }) {
+            Label(transferViewModel.state.title, systemImage: "square.and.arrow.up")
         }
-        .disabled(viewModel.fileTransferStatus.isButtonDisabled)
-        .alert(item: $viewModel.fileTransferError) { error in
-            Alert(title: Text("Transfer Failed"), message: Text(error.message), dismissButton: .cancel(Text("Ok")))
+        .disabled(transferViewModel.isButtonDisabled)
+        .alert(item: $transferViewModel.error) { error in
+            Alert(title: Text("Transfer Failed"), message: Text(error.error.localizedDescription), dismissButton: .cancel(Text("Ok")))
         }
     }
 #endif

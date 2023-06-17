@@ -63,7 +63,9 @@ public struct ConsoleView: View {
         }
         ConsoleContextMenu()
     }
+}
 
+extension LoggerStore {
     /// Processes the file received from the companion watchOS apps, ignoring
     /// any files sent not by the Pulse framework.
     public static func session(_ session: WCSession, didReceive file: WCSessionFile) {
