@@ -33,7 +33,9 @@ final class LoggerSyncSession: ObservableObject {
         let storeURL = directory.url.appendingPathComponent("logs-\(date).pulse", isDirectory: true)
         Task {
             _ = try? await store.export(to: storeURL)
-            let session = WCSession.default.transferFile(storeURL, metadata: nil)
+            let session = WCSession.default.transferFile(storeURL, metadata: [
+                LoggerSyncSession.pulseDocumentMarkerKey: true
+            ])
             DispatchQueue.main.async {
                 self.fileTransferStatus = .sending(session.progress)
                 self.directory = directory

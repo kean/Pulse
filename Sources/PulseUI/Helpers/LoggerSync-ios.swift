@@ -40,12 +40,16 @@ final class LoggerSyncSession: NSObject, ObservableObject {
             self.importedStoreURL = storeURL
         }
     }
-
-    static let pulseDocumentMarkerKey = "com.github.kean.pulse.imported-store-marker"
 }
 
 private func makeImportedStoreURL() -> URL {
     LoggerStore.logsURL.appendingPathComponent("import.pulse")
 }
 
+#endif
+
+#if os(iOS) || os(watchOS)
+extension LoggerSyncSession {
+    static let pulseDocumentMarkerKey = "com.github.kean.pulse.imported-store-marker"
+}
 #endif
