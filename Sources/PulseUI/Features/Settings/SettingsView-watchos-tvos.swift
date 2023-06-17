@@ -12,6 +12,10 @@ public struct SettingsView: View {
 
     var store: LoggerStore { viewModel.store }
 
+#if os(watchOS)
+    @State private var isSharingStore = false
+#endif
+
     public init(store: LoggerStore = .shared) {
         _viewModel = StateObject(wrappedValue: SettingsViewModel(store: store))
     }
@@ -20,7 +24,14 @@ public struct SettingsView: View {
         Form {
             sectionStoreDetails
 #if os(watchOS)
-            sectionTransferStore
+            Section {
+                sectionTransferStore
+                if #available(watchOS 9, *) {
+                    Button("Share Store") {
+                        isSharingStore = true
+                    }
+                }
+            }
 #endif
             if !(store.options.contains(.readonly)) {
                 Section {
@@ -36,6 +47,17 @@ public struct SettingsView: View {
         .navigationTitle("Settings")
 #if os(tvOS)
         .frame(maxWidth: 800)
+#endif
+#if os(watchOS)
+        .sheet(isPresented: $isSharingStore) {
+            if #available(watchOS 9, *) {
+                NavigationView {
+                    ShareStoreView() {
+                        isSharingStore = false
+                    }
+                }
+            }
+        }
 #endif
     }
     

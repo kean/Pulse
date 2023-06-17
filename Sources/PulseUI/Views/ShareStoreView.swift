@@ -2,20 +2,21 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(macOS) || os(watchOS)
 
 import SwiftUI
 import CoreData
 import Pulse
 import Combine
 
-@available(iOS 15, macOS 13, *)
+@available(iOS 15, macOS 13, watchOS 9, *)
 struct ShareStoreView: View {
     /// Preselected sessions.
     var sessions: Set<UUID> = []
     var onDismiss: () -> Void
 
     @State private var isShowingLabelPicker = false
+    @State private var isShowingPreparingForShareView = false
     @StateObject private var viewModel = ShareStoreViewModel()
 
     @Environment(\.store) private var store: LoggerStore
@@ -34,16 +35,30 @@ struct ShareStoreView: View {
 
     @ViewBuilder
     private var content: some View {
-#if os(iOS)
+#if os(iOS) || os(watchOS)
         Form {
             sectionSharingOptions
             sectionShare
         }
         .inlineNavigationTitle("Share Logs")
-        .navigationBarItems(leading: Button("Cancel", action: onDismiss))
+        .toolbar {
+#if os(watchOS)
+            ToolbarItem(placement: .cancellationAction) {
+                Button(action: onDismiss) {
+                    Image(systemName: "xmark")
+                }
+            }
+#else
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button("Cancel", action: onDismiss)
+            }
+#endif
+        }
+#if os(iOS) || os(macOS)
         .sheet(item: $viewModel.shareItems) {
             ShareView($0).onCompletion(onDismiss)
         }
+#endif
 #elseif os(macOS)
         Form {
             sectionSharingOptions
@@ -98,6 +113,7 @@ struct ShareStoreView: View {
         }.inlineNavigationTitle("Log Levels")
     }
 
+#if os(iOS) || os(macOS)
     private var sectionShare: some View {
         Section {
             Button(action: { viewModel.buttonSharedTapped() }) {
@@ -119,10 +135,29 @@ struct ShareStoreView: View {
 #endif
         }
     }
+#else
+    private var sectionShare: some View {
+        Section {
+            NavigationLink(destination: VStack {
+                if let shareItems = viewModel.shareItems {
+                    ShareLink(items: shareItems.items as! [URL])
+                } else {
+                    ProgressView(label: {
+                        Text("Exporting...")
+                    }).onAppear {
+                        viewModel.prepareForSharing()
+                    }
+                }
+            }, label: {
+                Text("Share...")
+            })
+        }
+    }
+#endif
 }
 
 #if DEBUG
-@available(iOS 15, macOS 13, *)
+@available(iOS 15, macOS 13, watchOS 9, *)
 struct ShareStoreView_Previews: PreviewProvider {
     static var previews: some View {
 #if os(iOS)
