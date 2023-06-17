@@ -65,7 +65,15 @@ Logs are stored persistently and the store automatically removes old messages an
 
 ## 3. Integrate PulseUI Framework
 
-To view logs and network requests from your app, use [PulseUI](https://kean-docs.github.io/pulseui/documentation/pulseui/) framework. The framework is centered around a single screen: `ConsoleView`. On iOS, you can push it into the existing navigation stack or present manually.
+To view logs and network requests from your app, use [PulseUI](https://kean-docs.github.io/pulseui/documentation/pulseui/) framework. The framework is centered around a single screen: `ConsoleView`. On iOS, you can push it into the existing navigation stack or present it modally.
+
+```swift
+NavigationLink(destination: ConsoleView()) {
+    Text("Console")
+}
+```
+
+> Note: There are some additional steps required for some platforms. For more information see the PulseUI [documentation](https://kean-docs.github.io/pulseui/documentation/pulseui/).
 
 ## 4. Configure Remote Logging with Pulse Pro
 

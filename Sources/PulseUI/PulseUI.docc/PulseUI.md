@@ -7,18 +7,22 @@ A set of components that you can integrate into your app to view the logs.
 The easiest way to integrate PulseUI is by using ``ConsoleView``.
 
 ```swift
-// On iOS
-.sheet(isPresented: $isConsolePresented) {
+// Present modally
+Text("Console").sheet(isPresented: $isConsolePresented) {
     NavigationView {
         ConsoleView()
-            .navigationBarItems(leading: Button("Close") {
-                isConsolePresented = false
-            })
     }
 }
 ```
 
-> tip: If you use Pulse to log only network requests, and not text messages, use `ConsoleView.network()` to show a view specialized to only display network requests. 
+```swift
+// Push into the navigation stack.
+NavigationLink(destination: ConsoleView()) {
+    Text("Console")
+}
+```
+
+> tip: If you use Pulse to log only network requests, and not text messages, use `ConsoleView(mode: .network)` to show a view specialized to only display network requests.
 
 ## UIKit
 
@@ -67,6 +71,8 @@ struct AnalyticsLogsView: View {
 
 private let timeFormatter = DateFormatter(format: "HH:mm:ss.SSS")
 ```
+
+## PulseUI on watchOS
 
 ## Topics
 

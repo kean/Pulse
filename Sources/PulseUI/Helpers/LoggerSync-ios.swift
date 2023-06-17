@@ -10,7 +10,7 @@ import Pulse
 import WatchConnectivity
 import SwiftUI
 
-final class LoggerSyncSession: NSObject, ObservableObject, WCSessionDelegate {
+final class LoggerSyncSession: NSObject, ObservableObject {
     static let shared = LoggerSyncSession()
 
     @Published private(set) var importedStoreURL: URL?
@@ -18,12 +18,7 @@ final class LoggerSyncSession: NSObject, ObservableObject, WCSessionDelegate {
     override init() {
         super.init()
 
-        if WCSession.isSupported() {
-            WCSession.default.delegate = self
-            WCSession.default.activate()
-        }
-
-        let storeURL = getImportedStoreURL()
+        let storeURL = makeImportedStoreURL()
         if FileManager.default.fileExists(atPath: storeURL.absoluteString) {
             self.importedStoreURL = storeURL
         }
@@ -34,23 +29,22 @@ final class LoggerSyncSession: NSObject, ObservableObject, WCSessionDelegate {
         importedStoreURL = nil
     }
 
-    // MARK: WCSessionDelegate
-
-    func sessionDidBecomeInactive(_ session: WCSession) {}
-    func sessionDidDeactivate(_ session: WCSession) {}
-    func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {}
-
     func session(_ session: WCSession, didReceive file: WCSessionFile) {
-        let storeURL = getImportedStoreURL()
+        guard file.metadata?[LoggerSyncSession.pulseDocumentMarkerKey] != nil else {
+            return
+        }
+        let storeURL = makeImportedStoreURL()
         try? FileManager.default.removeItem(at: storeURL)
         try? FileManager.default.moveItem(at: file.fileURL, to: storeURL)
         DispatchQueue.main.async {
             self.importedStoreURL = storeURL
         }
     }
+
+    static let pulseDocumentMarkerKey = "com.github.kean.pulse.imported-store-marker"
 }
 
-private func getImportedStoreURL() -> URL {
+private func makeImportedStoreURL() -> URL {
     LoggerStore.logsURL.appendingPathComponent("import.pulse")
 }
 

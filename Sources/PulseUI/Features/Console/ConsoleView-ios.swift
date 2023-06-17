@@ -6,6 +6,7 @@ import SwiftUI
 import CoreData
 import Pulse
 import Combine
+import WatchConnectivity
 
 #if os(iOS)
 
@@ -61,6 +62,12 @@ public struct ConsoleView: View {
             Image(systemName: "line.horizontal.3.decrease.circle")
         }
         ConsoleContextMenu()
+    }
+
+    /// Processes the file received from the companion watchOS apps, ignoring
+    /// any files sent not by the Pulse framework.
+    public static func session(_ session: WCSession, didReceive file: WCSessionFile) {
+        LoggerSyncSession.shared.session(session, didReceive: file)
     }
 }
 
