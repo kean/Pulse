@@ -42,7 +42,7 @@
 		0C11EAE92971EBEE0059786A /* MockTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5AF296F189500EED9D4 /* MockTask.swift */; };
 		0C20F3E42A2CE9D900F2F67D /* Keychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C20F3E32A2CE9D900F2F67D /* Keychain.swift */; };
 		0C2343152978B6B900AE7CE6 /* ConsoleSearchSuggestionsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C2343142978B6B900AE7CE6 /* ConsoleSearchSuggestionsService.swift */; };
-		0C29F39729FE7F97006CC996 /* FileTransferViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C29F39629FE7F97006CC996 /* FileTransferViewModel.swift */; };
+		0C29F39729FE7F97006CC996 /* WatchSyncService-watchos.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C29F39629FE7F97006CC996 /* WatchSyncService-watchos.swift */; };
 		0C3002B32986CEF30055F6C2 /* LoggerStoreIndex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C3002B22986CEF30055F6C2 /* LoggerStoreIndex.swift */; };
 		0C30B2F62A3F375400D65F8F /* Pulse_DemoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C30B2F52A3F375400D65F8F /* Pulse_DemoApp.swift */; };
 		0C30B2FA2A3F375500D65F8F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C30B2F92A3F375500D65F8F /* Assets.xcassets */; };
@@ -157,7 +157,7 @@
 		0CF0D612296F189600EED9D4 /* Regex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D581296F189500EED9D4 /* Regex.swift */; };
 		0CF0D613296F189600EED9D4 /* TextRendererHTML.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D582296F189500EED9D4 /* TextRendererHTML.swift */; };
 		0CF0D614296F189600EED9D4 /* TextRendererJSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D583296F189500EED9D4 /* TextRendererJSON.swift */; };
-		0CF0D615296F189600EED9D4 /* LoggerSync-ios.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D584296F189500EED9D4 /* LoggerSync-ios.swift */; };
+		0CF0D615296F189600EED9D4 /* WatchSyncService-ios.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D584296F189500EED9D4 /* WatchSyncService-ios.swift */; };
 		0CF0D617296F189600EED9D4 /* TextUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D586296F189500EED9D4 /* TextUtilities.swift */; };
 		0CF0D618296F189600EED9D4 /* DecodingErrorsPreviews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D587296F189500EED9D4 /* DecodingErrorsPreviews.swift */; };
 		0CF0D61A296F189600EED9D4 /* TextHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D589296F189500EED9D4 /* TextHelper.swift */; };
@@ -471,7 +471,7 @@
 		0C20F3E32A2CE9D900F2F67D /* Keychain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keychain.swift; sourceTree = "<group>"; };
 		0C2343142978B6B900AE7CE6 /* ConsoleSearchSuggestionsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchSuggestionsService.swift; sourceTree = "<group>"; };
 		0C25FB6E25CDDCAB00A895C2 /* URLSessionManualIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionManualIntegration.swift; sourceTree = "<group>"; };
-		0C29F39629FE7F97006CC996 /* FileTransferViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileTransferViewModel.swift; sourceTree = "<group>"; };
+		0C29F39629FE7F97006CC996 /* WatchSyncService-watchos.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WatchSyncService-watchos.swift"; sourceTree = "<group>"; };
 		0C3002B22986CEF30055F6C2 /* LoggerStoreIndex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggerStoreIndex.swift; sourceTree = "<group>"; };
 		0C30B2F32A3F375400D65F8F /* Pulse Demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pulse Demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C30B2F52A3F375400D65F8F /* Pulse_DemoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pulse_DemoApp.swift; sourceTree = "<group>"; };
@@ -578,7 +578,7 @@
 		0CF0D581296F189500EED9D4 /* Regex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Regex.swift; sourceTree = "<group>"; };
 		0CF0D582296F189500EED9D4 /* TextRendererHTML.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextRendererHTML.swift; sourceTree = "<group>"; };
 		0CF0D583296F189500EED9D4 /* TextRendererJSON.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextRendererJSON.swift; sourceTree = "<group>"; };
-		0CF0D584296F189500EED9D4 /* LoggerSync-ios.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "LoggerSync-ios.swift"; sourceTree = "<group>"; };
+		0CF0D584296F189500EED9D4 /* WatchSyncService-ios.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "WatchSyncService-ios.swift"; sourceTree = "<group>"; };
 		0CF0D586296F189500EED9D4 /* TextUtilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextUtilities.swift; sourceTree = "<group>"; };
 		0CF0D587296F189500EED9D4 /* DecodingErrorsPreviews.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DecodingErrorsPreviews.swift; sourceTree = "<group>"; };
 		0CF0D589296F189500EED9D4 /* TextHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextHelper.swift; sourceTree = "<group>"; };
@@ -1111,8 +1111,8 @@
 				0C63A37E297A02AD00F6A6A5 /* StringSearchOptions.swift */,
 				0CF0D581296F189500EED9D4 /* Regex.swift */,
 				0CB63A24297592D400525165 /* Parser.swift */,
-				0CF0D584296F189500EED9D4 /* LoggerSync-ios.swift */,
-				0C29F39629FE7F97006CC996 /* FileTransferViewModel.swift */,
+				0CF0D584296F189500EED9D4 /* WatchSyncService-ios.swift */,
+				0C29F39629FE7F97006CC996 /* WatchSyncService-watchos.swift */,
 				0CF0D587296F189500EED9D4 /* DecodingErrorsPreviews.swift */,
 				0CB34595298CBC37009428B2 /* ManagedObjectsObserver.swift */,
 				0CB17F192978ABBA004E33F4 /* ManagedObjectsCountObserver.swift */,
@@ -1872,8 +1872,8 @@
 				0C63A380297A02D200F6A6A5 /* StringSearchOptions.swift in Sources */,
 				0CF0D656296F189600EED9D4 /* RemoteLoggerSettingsView.swift in Sources */,
 				0CF0D65C296F189600EED9D4 /* ConsoleMessageMetadataView.swift in Sources */,
-				0CF0D615296F189600EED9D4 /* LoggerSync-ios.swift in Sources */,
-				0C29F39729FE7F97006CC996 /* FileTransferViewModel.swift in Sources */,
+				0CF0D615296F189600EED9D4 /* WatchSyncService-ios.swift in Sources */,
+				0C29F39729FE7F97006CC996 /* WatchSyncService-watchos.swift in Sources */,
 				0CF0D62C296F189600EED9D4 /* WebView.swift in Sources */,
 				0CF0D635296F189600EED9D4 /* InfoRow.swift in Sources */,
 				0C63A3782979FE3A00F6A6A5 /* ConsoleSearchTerm.swift in Sources */,

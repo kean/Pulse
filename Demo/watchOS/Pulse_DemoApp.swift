@@ -3,6 +3,7 @@
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
+import Pulse
 import PulseUI
 import WatchConnectivity
 import OSLog
@@ -32,9 +33,6 @@ private final class AppViewModel: NSObject, ObservableObject, WCSessionDelegate 
             WCSession.default.delegate = self
             WCSession.default.activate()
         }
-
-        // Uncomment to test `URLSessionProxyDelegate`:
-        // testProxy()
     }
 
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
@@ -42,7 +40,9 @@ private final class AppViewModel: NSObject, ObservableObject, WCSessionDelegate 
     }
 
     func session(_ session: WCSession, didFinish fileTransfer: WCSessionFileTransfer, error: Error?) {
-        os_log("WCSession.didFiinshFileTransfer(error: %{public}@", log: log, String(describing:  error))
+        os_log("WCSession.didFinishFileTransfer(error: %{public}@)", log: log, String(describing:  error))
+
+        LoggerStore.session(session, didFinish: fileTransfer, error: error)
     }
 }
 

@@ -13,7 +13,7 @@ public struct SettingsView: View {
     var store: LoggerStore { viewModel.store }
 
 #if os(watchOS)
-    @StateObject private var transferViewModel = FileTransferViewModel()
+    @StateObject private var syncService: WatchSyncService = .shared
     @State private var isShowingShareView = false
 #endif
 
@@ -70,11 +70,11 @@ public struct SettingsView: View {
     
 #if os(watchOS)
     private var sectionTransferStore: some View {
-        Button(action: { transferViewModel.share(store: store) }) {
-            Label(transferViewModel.state.title, systemImage: "square.and.arrow.up")
+        Button(action: { syncService.share(store: store) }) {
+            Label(syncService.state.title, systemImage: "square.and.arrow.up")
         }
-        .disabled(transferViewModel.isButtonDisabled)
-        .alert(item: $transferViewModel.error) { error in
+        .disabled(syncService.isButtonDisabled)
+        .alert(item: $syncService.error) { error in
             Alert(title: Text("Transfer Failed"), message: Text(error.error.localizedDescription), dismissButton: .cancel(Text("Ok")))
         }
     }

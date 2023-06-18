@@ -58,7 +58,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "0C30B3012A3F375500D65F8F"
-            BuildableName = "Pulse Demo watchOS.app"
+            BuildableName = "Pulse Demo.app"
             BlueprintName = "Pulse Demo watchOS"
             ReferencedContainer = "container:Pulse.xcodeproj">
          </BuildableReference>
@@ -75,7 +75,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "0C30B3012A3F375500D65F8F"
-            BuildableName = "Pulse Demo watchOS.app"
+            BuildableName = "Pulse Demo.app"
             BlueprintName = "Pulse Demo watchOS"
             ReferencedContainer = "container:Pulse.xcodeproj">
          </BuildableReference>
