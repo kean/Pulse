@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "0C30B2F22A3F375400D65F8F"
-               BuildableName = "Pulse Demo iOS.app"
+               BuildableName = "Pulse Demo.app"
                BlueprintName = "Pulse Demo iOS"
                ReferencedContainer = "container:Pulse.xcodeproj">
             </BuildableReference>
@@ -44,7 +44,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "0C30B2F22A3F375400D65F8F"
-            BuildableName = "Pulse Demo iOS.app"
+            BuildableName = "Pulse Demo.app"
             BlueprintName = "Pulse Demo iOS"
             ReferencedContainer = "container:Pulse.xcodeproj">
          </BuildableReference>
@@ -61,7 +61,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "0C30B2F22A3F375400D65F8F"
-            BuildableName = "Pulse Demo iOS.app"
+            BuildableName = "Pulse Demo.app"
             BlueprintName = "Pulse Demo iOS"
             ReferencedContainer = "container:Pulse.xcodeproj">
          </BuildableReference>

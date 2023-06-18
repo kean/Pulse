@@ -46,7 +46,7 @@
 		0C3002B32986CEF30055F6C2 /* LoggerStoreIndex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C3002B22986CEF30055F6C2 /* LoggerStoreIndex.swift */; };
 		0C30B2F62A3F375400D65F8F /* Pulse_DemoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C30B2F52A3F375400D65F8F /* Pulse_DemoApp.swift */; };
 		0C30B2FA2A3F375500D65F8F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C30B2F92A3F375500D65F8F /* Assets.xcassets */; };
-		0C30B3032A3F375500D65F8F /* Pulse Demo.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 0C30B3022A3F375500D65F8F /* Pulse Demo.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		0C30B3032A3F375500D65F8F /* Pulse Demo Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 0C30B3022A3F375500D65F8F /* Pulse Demo Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		0C30B3082A3F375500D65F8F /* Pulse_DemoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C30B3072A3F375500D65F8F /* Pulse_DemoApp.swift */; };
 		0C30B30C2A3F375500D65F8F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C30B30B2A3F375500D65F8F /* Assets.xcassets */; };
 		0C30B3172A3F37F800D65F8F /* Pulse.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CF0D542296F14EA00EED9D4 /* Pulse.framework */; };
@@ -384,7 +384,7 @@
 			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
 			dstSubfolderSpec = 16;
 			files = (
-				0C30B3032A3F375500D65F8F /* Pulse Demo.app in Embed Watch Content */,
+				0C30B3032A3F375500D65F8F /* Pulse Demo Watch App.app in Embed Watch Content */,
 			);
 			name = "Embed Watch Content";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -476,7 +476,7 @@
 		0C30B2F32A3F375400D65F8F /* Pulse Demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pulse Demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C30B2F52A3F375400D65F8F /* Pulse_DemoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pulse_DemoApp.swift; sourceTree = "<group>"; };
 		0C30B2F92A3F375500D65F8F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		0C30B3022A3F375500D65F8F /* Pulse Demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pulse Demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		0C30B3022A3F375500D65F8F /* Pulse Demo Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pulse Demo Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0C30B3072A3F375500D65F8F /* Pulse_DemoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pulse_DemoApp.swift; sourceTree = "<group>"; };
 		0C30B30B2A3F375500D65F8F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0C31FFB8298211AF002A7D64 /* ConsoleEntityDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleEntityDetailsView.swift; sourceTree = "<group>"; };
@@ -864,7 +864,7 @@
 				0CF0D6BC296F18ED00EED9D4 /* PulseUITests.xctest */,
 				0C11EAC12971E9B30059786A /* PulsePerformanceTests.xctest */,
 				0C30B2F32A3F375400D65F8F /* Pulse Demo.app */,
-				0C30B3022A3F375500D65F8F /* Pulse Demo.app */,
+				0C30B3022A3F375500D65F8F /* Pulse Demo Watch App.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1478,7 +1478,7 @@
 			);
 			name = "Pulse Demo watchOS";
 			productName = "Pulse Demo Watch App";
-			productReference = 0C30B3022A3F375500D65F8F /* Pulse Demo.app */;
+			productReference = 0C30B3022A3F375500D65F8F /* Pulse Demo Watch App.app */;
 			productType = "com.apple.product-type.application";
 		};
 		0C6460C325F5797B002C55B1 /* Pulse Demo tvOS */ = {
@@ -2298,7 +2298,7 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.github.kean.pulse-demo.watchkitapp";
-				PRODUCT_NAME = "Pulse Demo";
+				PRODUCT_NAME = "Pulse Demo Watch App";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "watchsimulator watchos";
@@ -2337,7 +2337,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.github.kean.pulse-demo.watchkitapp";
-				PRODUCT_NAME = "Pulse Demo";
+				PRODUCT_NAME = "Pulse Demo Watch App";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "watchsimulator watchos";
@@ -2385,12 +2385,12 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.github.kean.pulse-demo";
 				PRODUCT_NAME = "Pulse Demo";
-				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,3";
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -2429,13 +2429,13 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.github.kean.pulse-demo";
 				PRODUCT_NAME = "Pulse Demo";
-				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = PULSE_MOCK_INCLUDED;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,3";
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
