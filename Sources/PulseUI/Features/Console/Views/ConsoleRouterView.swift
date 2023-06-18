@@ -114,7 +114,11 @@ extension ConsoleRouterView {
                     SettingsView(store: environment.store)
                         .toolbar {
                             ToolbarItem(placement: .cancellationAction) {
-                                Button("Close") { router.isShowingSettings = false }
+                                Button(action: {
+                                    router.isShowingSettings = false
+                                }, label: {
+                                    Image(systemName: "xmark")
+                                })
                             }
                         }
                 }
@@ -124,7 +128,11 @@ extension ConsoleRouterView {
                     ConsoleFiltersView()
                         .toolbar {
                             ToolbarItem(placement: .cancellationAction) {
-                                Button("Close") { router.isShowingFilters = false }
+                                Button(action: {
+                                    router.isShowingFilters = false
+                                }, label: {
+                                    Image(systemName: "xmark")
+                                })
                             }
                         }
                 }
