@@ -108,7 +108,7 @@ enum FileTransferStatus {
 
     var title: String {
         switch self {
-        case .ready: return "Send to iOS App"
+        case .ready: return "Send to Paired App"
         case .exporting: return "Exporting..."
         case .sending: return "Sending..."
         case .failure: return "Transfer Failed"

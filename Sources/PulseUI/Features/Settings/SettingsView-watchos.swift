@@ -22,7 +22,7 @@ public struct SettingsView: View {
     public var body: some View {
         Form {
             Section {
-                if true || store === RemoteLogger.shared.store {
+                if store === RemoteLogger.shared.store {
 #if targetEnvironment(simulator)
                     RemoteLoggerSettingsView(viewModel: .shared)
 #else
@@ -35,13 +35,20 @@ public struct SettingsView: View {
                 }
             }
             Section {
-                sectionTransferStore
+                Button(action: { syncService.share(store: store) }) {
+                    Text(syncService.state.title)
+                }
+                .disabled(syncService.isButtonDisabled)
+                .alert(item: $syncService.error) { error in
+                    Alert(title: Text("Transfer Failed"), message: Text(error.error.localizedDescription), dismissButton: .cancel(Text("Ok")))
+                }
+                
                 if #available(watchOS 9, *) {
                     Button("Share Store") { isShowingShareView = true }
                 }
             }
             Section {
-                NavigationLink(destination: StoreDetailsView(source: .store(viewModel.store))) {
+                NavigationLink(destination: StoreDetailsView(source: .store(store))) {
                     Text("Store Info")
                 }
                 if !(store.options.contains(.readonly)) {
@@ -60,16 +67,6 @@ public struct SettingsView: View {
                     }
                 }
             }
-        }
-    }
-
-    private var sectionTransferStore: some View {
-        Button(action: { syncService.share(store: store) }) {
-            Text(syncService.state.title)
-        }
-        .disabled(syncService.isButtonDisabled)
-        .alert(item: $syncService.error) { error in
-            Alert(title: Text("Transfer Failed"), message: Text(error.error.localizedDescription), dismissButton: .cancel(Text("Ok")))
         }
     }
 }

@@ -2,13 +2,13 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
+#if os(iOS)
+
 import SwiftUI
 import CoreData
 import Pulse
 import Combine
 import WatchConnectivity
-
-#if os(iOS)
 
 public struct ConsoleView: View {
     @StateObject private var environment: ConsoleEnvironment // Never reloads
@@ -64,8 +64,6 @@ public struct ConsoleView: View {
         ConsoleContextMenu()
     }
 }
-
-// MARK: - Previews
 
 #if DEBUG
 struct ConsoleView_Previews: PreviewProvider {
