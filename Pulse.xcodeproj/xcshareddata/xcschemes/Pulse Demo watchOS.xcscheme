@@ -14,6 +14,20 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
+               BlueprintIdentifier = "0C30B3012A3F375500D65F8F"
+               BuildableName = "Pulse Demo watchOS.app"
+               BlueprintName = "Pulse Demo watchOS"
+               ReferencedContainer = "container:Pulse.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
                BlueprintIdentifier = "0C30B2F22A3F375400D65F8F"
                BuildableName = "Pulse Demo iOS.app"
                BlueprintName = "Pulse Demo iOS"
@@ -43,9 +57,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "0C30B2F22A3F375400D65F8F"
-            BuildableName = "Pulse Demo iOS.app"
-            BlueprintName = "Pulse Demo iOS"
+            BlueprintIdentifier = "0C30B3012A3F375500D65F8F"
+            BuildableName = "Pulse Demo watchOS.app"
+            BlueprintName = "Pulse Demo watchOS"
             ReferencedContainer = "container:Pulse.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -60,9 +74,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "0C30B2F22A3F375400D65F8F"
-            BuildableName = "Pulse Demo iOS.app"
-            BlueprintName = "Pulse Demo iOS"
+            BlueprintIdentifier = "0C30B3012A3F375500D65F8F"
+            BuildableName = "Pulse Demo watchOS.app"
+            BlueprintName = "Pulse Demo watchOS"
             ReferencedContainer = "container:Pulse.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

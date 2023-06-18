@@ -44,6 +44,25 @@
 		0C2343152978B6B900AE7CE6 /* ConsoleSearchSuggestionsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C2343142978B6B900AE7CE6 /* ConsoleSearchSuggestionsService.swift */; };
 		0C29F39729FE7F97006CC996 /* FileTransferViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C29F39629FE7F97006CC996 /* FileTransferViewModel.swift */; };
 		0C3002B32986CEF30055F6C2 /* LoggerStoreIndex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C3002B22986CEF30055F6C2 /* LoggerStoreIndex.swift */; };
+		0C30B2F62A3F375400D65F8F /* Pulse_DemoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C30B2F52A3F375400D65F8F /* Pulse_DemoApp.swift */; };
+		0C30B2FA2A3F375500D65F8F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C30B2F92A3F375500D65F8F /* Assets.xcassets */; };
+		0C30B3032A3F375500D65F8F /* Pulse Demo.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 0C30B3022A3F375500D65F8F /* Pulse Demo.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		0C30B3082A3F375500D65F8F /* Pulse_DemoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C30B3072A3F375500D65F8F /* Pulse_DemoApp.swift */; };
+		0C30B30C2A3F375500D65F8F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C30B30B2A3F375500D65F8F /* Assets.xcassets */; };
+		0C30B3172A3F37F800D65F8F /* Pulse.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CF0D542296F14EA00EED9D4 /* Pulse.framework */; };
+		0C30B3182A3F37F800D65F8F /* Pulse.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0CF0D542296F14EA00EED9D4 /* Pulse.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		0C30B31B2A3F37F800D65F8F /* PulseUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CF0D56C296F17CB00EED9D4 /* PulseUI.framework */; };
+		0C30B31C2A3F37F800D65F8F /* PulseUI.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0CF0D56C296F17CB00EED9D4 /* PulseUI.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		0C30B3202A3F383900D65F8F /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CDACDE129EC6607007C15CD /* repos.json */; };
+		0C30B3212A3F383A00D65F8F /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CDACDE129EC6607007C15CD /* repos.json */; };
+		0C30B3222A3F384200D65F8F /* MockTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5AF296F189500EED9D4 /* MockTask.swift */; };
+		0C30B3232A3F384200D65F8F /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B0296F189500EED9D4 /* MockStore.swift */; };
+		0C30B3242A3F384200D65F8F /* MockTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5AF296F189500EED9D4 /* MockTask.swift */; };
+		0C30B3252A3F384200D65F8F /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B0296F189500EED9D4 /* MockStore.swift */; };
+		0C30B3262A3F3A5600D65F8F /* Pulse.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CF0D542296F14EA00EED9D4 /* Pulse.framework */; };
+		0C30B3272A3F3A5600D65F8F /* Pulse.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0CF0D542296F14EA00EED9D4 /* Pulse.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		0C30B32A2A3F3A5600D65F8F /* PulseUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CF0D56C296F17CB00EED9D4 /* PulseUI.framework */; };
+		0C30B32B2A3F3A5600D65F8F /* PulseUI.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0CF0D56C296F17CB00EED9D4 /* PulseUI.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		0C31FFB9298211AF002A7D64 /* ConsoleEntityDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C31FFB8298211AF002A7D64 /* ConsoleEntityDetailsView.swift */; };
 		0C37046329FA08B800BA51B8 /* ConsoleSearchRecentSearchesStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C37046229FA08B800BA51B8 /* ConsoleSearchRecentSearchesStore.swift */; };
 		0C38F57B2A34BFA0001E19C0 /* RemoteLoggerSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C38F57A2A34BFA0001E19C0 /* RemoteLoggerSettingsViewModel.swift */; };
@@ -265,6 +284,41 @@
 			remoteGlobalIDString = 0C0B31E926D179A20045C9E1;
 			remoteInfo = "Pulse Integration Examples iOS";
 		};
+		0C30B3042A3F375500D65F8F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0C57AD45245F0EFB005B3400 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0C30B3012A3F375500D65F8F;
+			remoteInfo = "Pulse Demo Watch App";
+		};
+		0C30B3192A3F37F800D65F8F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0C57AD45245F0EFB005B3400 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0CF0D541296F14EA00EED9D4;
+			remoteInfo = Pulse;
+		};
+		0C30B31D2A3F37F800D65F8F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0C57AD45245F0EFB005B3400 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0CF0D56B296F17CB00EED9D4;
+			remoteInfo = PulseUI;
+		};
+		0C30B3282A3F3A5600D65F8F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0C57AD45245F0EFB005B3400 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0CF0D541296F14EA00EED9D4;
+			remoteInfo = Pulse;
+		};
+		0C30B32C2A3F3A5600D65F8F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0C57AD45245F0EFB005B3400 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0CF0D56B296F17CB00EED9D4;
+			remoteInfo = PulseUI;
+		};
 		0CF0D694296F18BE00EED9D4 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0C57AD45245F0EFB005B3400 /* Project object */;
@@ -324,6 +378,41 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		0C30B3132A3F375500D65F8F /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				0C30B3032A3F375500D65F8F /* Pulse Demo.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0C30B31F2A3F37F800D65F8F /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				0C30B31C2A3F37F800D65F8F /* PulseUI.framework in Embed Frameworks */,
+				0C30B3182A3F37F800D65F8F /* Pulse.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0C30B32E2A3F3A5600D65F8F /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				0C30B32B2A3F3A5600D65F8F /* PulseUI.framework in Embed Frameworks */,
+				0C30B3272A3F3A5600D65F8F /* Pulse.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		0CF0D6E6296F1AE800EED9D4 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -384,6 +473,12 @@
 		0C25FB6E25CDDCAB00A895C2 /* URLSessionManualIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionManualIntegration.swift; sourceTree = "<group>"; };
 		0C29F39629FE7F97006CC996 /* FileTransferViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileTransferViewModel.swift; sourceTree = "<group>"; };
 		0C3002B22986CEF30055F6C2 /* LoggerStoreIndex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggerStoreIndex.swift; sourceTree = "<group>"; };
+		0C30B2F32A3F375400D65F8F /* Pulse Demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pulse Demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		0C30B2F52A3F375400D65F8F /* Pulse_DemoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pulse_DemoApp.swift; sourceTree = "<group>"; };
+		0C30B2F92A3F375500D65F8F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		0C30B3022A3F375500D65F8F /* Pulse Demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pulse Demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		0C30B3072A3F375500D65F8F /* Pulse_DemoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pulse_DemoApp.swift; sourceTree = "<group>"; };
+		0C30B30B2A3F375500D65F8F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0C31FFB8298211AF002A7D64 /* ConsoleEntityDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleEntityDetailsView.swift; sourceTree = "<group>"; };
 		0C37046229FA08B800BA51B8 /* ConsoleSearchRecentSearchesStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchRecentSearchesStore.swift; sourceTree = "<group>"; };
 		0C38F57A2A34BFA0001E19C0 /* RemoteLoggerSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteLoggerSettingsViewModel.swift; sourceTree = "<group>"; };
@@ -608,6 +703,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		0C30B2F02A3F375400D65F8F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0C30B31B2A3F37F800D65F8F /* PulseUI.framework in Frameworks */,
+				0C30B3172A3F37F800D65F8F /* Pulse.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0C30B2FF2A3F375500D65F8F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0C30B32A2A3F3A5600D65F8F /* PulseUI.framework in Frameworks */,
+				0C30B3262A3F3A5600D65F8F /* Pulse.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		0C6460C125F5797B002C55B1 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -695,10 +808,30 @@
 			path = IntegrationsExamples;
 			sourceTree = "<group>";
 		};
+		0C30B2F42A3F375400D65F8F /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				0C30B2F52A3F375400D65F8F /* Pulse_DemoApp.swift */,
+				0C30B2F92A3F375500D65F8F /* Assets.xcassets */,
+			);
+			path = iOS;
+			sourceTree = "<group>";
+		};
+		0C30B3062A3F375500D65F8F /* watchOS */ = {
+			isa = PBXGroup;
+			children = (
+				0C30B3072A3F375500D65F8F /* Pulse_DemoApp.swift */,
+				0C30B30B2A3F375500D65F8F /* Assets.xcassets */,
+			);
+			path = watchOS;
+			sourceTree = "<group>";
+		};
 		0C516FBB26015DD2004813B4 /* Demo */ = {
 			isa = PBXGroup;
 			children = (
 				0CDACDE029EC65F4007C15CD /* Resources */,
+				0C30B2F42A3F375400D65F8F /* iOS */,
+				0C30B3062A3F375500D65F8F /* watchOS */,
 				0C9F04F72884F34A0035239F /* macOS */,
 				0C6460D525F579B8002C55B1 /* tvOS */,
 				0C0B31EB26D179A20045C9E1 /* Integrations */,
@@ -730,6 +863,8 @@
 				0CF0D68F296F18BE00EED9D4 /* PulseTests.xctest */,
 				0CF0D6BC296F18ED00EED9D4 /* PulseUITests.xctest */,
 				0C11EAC12971E9B30059786A /* PulsePerformanceTests.xctest */,
+				0C30B2F32A3F375400D65F8F /* Pulse Demo.app */,
+				0C30B3022A3F375500D65F8F /* Pulse Demo.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1304,6 +1439,48 @@
 			productReference = 0C11EAC12971E9B30059786A /* PulsePerformanceTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		0C30B2F22A3F375400D65F8F /* Pulse Demo iOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0C30B3142A3F375500D65F8F /* Build configuration list for PBXNativeTarget "Pulse Demo iOS" */;
+			buildPhases = (
+				0C30B2EF2A3F375400D65F8F /* Sources */,
+				0C30B2F02A3F375400D65F8F /* Frameworks */,
+				0C30B2F12A3F375400D65F8F /* Resources */,
+				0C30B3132A3F375500D65F8F /* Embed Watch Content */,
+				0C30B31F2A3F37F800D65F8F /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				0C30B3052A3F375500D65F8F /* PBXTargetDependency */,
+				0C30B31A2A3F37F800D65F8F /* PBXTargetDependency */,
+				0C30B31E2A3F37F800D65F8F /* PBXTargetDependency */,
+			);
+			name = "Pulse Demo iOS";
+			productName = "Pulse Demo";
+			productReference = 0C30B2F32A3F375400D65F8F /* Pulse Demo.app */;
+			productType = "com.apple.product-type.application";
+		};
+		0C30B3012A3F375500D65F8F /* Pulse Demo watchOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0C30B3102A3F375500D65F8F /* Build configuration list for PBXNativeTarget "Pulse Demo watchOS" */;
+			buildPhases = (
+				0C30B2FE2A3F375500D65F8F /* Sources */,
+				0C30B2FF2A3F375500D65F8F /* Frameworks */,
+				0C30B3002A3F375500D65F8F /* Resources */,
+				0C30B32E2A3F3A5600D65F8F /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				0C30B3292A3F3A5600D65F8F /* PBXTargetDependency */,
+				0C30B32D2A3F3A5600D65F8F /* PBXTargetDependency */,
+			);
+			name = "Pulse Demo watchOS";
+			productName = "Pulse Demo Watch App";
+			productReference = 0C30B3022A3F375500D65F8F /* Pulse Demo.app */;
+			productType = "com.apple.product-type.application";
+		};
 		0C6460C325F5797B002C55B1 /* Pulse Demo tvOS */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 0C6460D225F5797C002C55B1 /* Build configuration list for PBXNativeTarget "Pulse Demo tvOS" */;
@@ -1440,6 +1617,12 @@
 						LastSwiftMigration = 1420;
 						TestTargetID = 0C0B31E926D179A20045C9E1;
 					};
+					0C30B2F22A3F375400D65F8F = {
+						CreatedOnToolsVersion = 14.3;
+					};
+					0C30B3012A3F375500D65F8F = {
+						CreatedOnToolsVersion = 14.3;
+					};
 					0C6460C325F5797B002C55B1 = {
 						CreatedOnToolsVersion = 12.4;
 					};
@@ -1480,6 +1663,8 @@
 				0CF0D56B296F17CB00EED9D4 /* PulseUI */,
 				0CF0D6BB296F18ED00EED9D4 /* PulseUITests */,
 				0C11EAC02971E9B30059786A /* PulsePerformanceTests */,
+				0C30B2F22A3F375400D65F8F /* Pulse Demo iOS */,
+				0C30B3012A3F375500D65F8F /* Pulse Demo watchOS */,
 				0C9F04F52884F34A0035239F /* Pulse Demo macOS */,
 				0C6460C325F5797B002C55B1 /* Pulse Demo tvOS */,
 				0C0B31E926D179A20045C9E1 /* Pulse Integration Examples iOS */,
@@ -1503,6 +1688,24 @@
 			buildActionMask = 2147483647;
 			files = (
 				0C1000472972EE9E00150E8E /* bigstore.pulse in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0C30B2F12A3F375400D65F8F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0C30B2FA2A3F375500D65F8F /* Assets.xcassets in Resources */,
+				0C30B3202A3F383900D65F8F /* repos.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0C30B3002A3F375500D65F8F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0C30B30C2A3F375500D65F8F /* Assets.xcassets in Resources */,
+				0C30B3212A3F383A00D65F8F /* repos.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1577,6 +1780,26 @@
 				0C11EACC2971E9CE0059786A /* TextRendererPerformanceTests.swift in Sources */,
 				0C11EAE72971EBED0059786A /* MockStore.swift in Sources */,
 				0C11EACF2971EA4F0059786A /* MockTask.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0C30B2EF2A3F375400D65F8F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0C30B3232A3F384200D65F8F /* MockStore.swift in Sources */,
+				0C30B3222A3F384200D65F8F /* MockTask.swift in Sources */,
+				0C30B2F62A3F375400D65F8F /* Pulse_DemoApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0C30B2FE2A3F375500D65F8F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0C30B3252A3F384200D65F8F /* MockStore.swift in Sources */,
+				0C30B3242A3F384200D65F8F /* MockTask.swift in Sources */,
+				0C30B3082A3F375500D65F8F /* Pulse_DemoApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1839,6 +2062,31 @@
 			target = 0C0B31E926D179A20045C9E1 /* Pulse Integration Examples iOS */;
 			targetProxy = 0C11EAEB2971F20D0059786A /* PBXContainerItemProxy */;
 		};
+		0C30B3052A3F375500D65F8F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0C30B3012A3F375500D65F8F /* Pulse Demo watchOS */;
+			targetProxy = 0C30B3042A3F375500D65F8F /* PBXContainerItemProxy */;
+		};
+		0C30B31A2A3F37F800D65F8F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0CF0D541296F14EA00EED9D4 /* Pulse */;
+			targetProxy = 0C30B3192A3F37F800D65F8F /* PBXContainerItemProxy */;
+		};
+		0C30B31E2A3F37F800D65F8F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0CF0D56B296F17CB00EED9D4 /* PulseUI */;
+			targetProxy = 0C30B31D2A3F37F800D65F8F /* PBXContainerItemProxy */;
+		};
+		0C30B3292A3F3A5600D65F8F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0CF0D541296F14EA00EED9D4 /* Pulse */;
+			targetProxy = 0C30B3282A3F3A5600D65F8F /* PBXContainerItemProxy */;
+		};
+		0C30B32D2A3F3A5600D65F8F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0CF0D56B296F17CB00EED9D4 /* PulseUI */;
+			targetProxy = 0C30B32C2A3F3A5600D65F8F /* PBXContainerItemProxy */;
+		};
 		0CF0D695296F18BE00EED9D4 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 0CF0D541296F14EA00EED9D4 /* Pulse */;
@@ -2018,6 +2266,176 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Pulse Integration Examples iOS.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Pulse Integration Examples iOS";
+			};
+			name = Release;
+		};
+		0C30B3112A3F375500D65F8F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = NR8DLKJ7E6;
+				ENABLE_PREVIEWS = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Pulse Demo";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "com.github.kean.pulse-demo";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.github.kean.pulse-demo.watchkitapp";
+				PRODUCT_NAME = "Pulse Demo";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "watchsimulator watchos";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 8.0;
+			};
+			name = Debug;
+		};
+		0C30B3122A3F375500D65F8F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = NR8DLKJ7E6;
+				ENABLE_PREVIEWS = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Pulse Demo";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "com.github.kean.pulse-demo";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.github.kean.pulse-demo.watchkitapp";
+				PRODUCT_NAME = "Pulse Demo";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "watchsimulator watchos";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = PULSE_MOCK_INCLUDED;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 8.0;
+			};
+			name = Release;
+		};
+		0C30B3152A3F375500D65F8F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = NR8DLKJ7E6;
+				ENABLE_PREVIEWS = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Pulse Demo";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.github.kean.pulse-demo";
+				PRODUCT_NAME = "Pulse Demo";
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,3";
+			};
+			name = Debug;
+		};
+		0C30B3162A3F375500D65F8F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = NR8DLKJ7E6;
+				ENABLE_PREVIEWS = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Pulse Demo";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.github.kean.pulse-demo";
+				PRODUCT_NAME = "Pulse Demo";
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = PULSE_MOCK_INCLUDED;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,3";
 			};
 			name = Release;
 		};
@@ -2486,6 +2904,24 @@
 			buildConfigurations = (
 				0C11EAC92971E9B30059786A /* Debug */,
 				0C11EACA2971E9B30059786A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		0C30B3102A3F375500D65F8F /* Build configuration list for PBXNativeTarget "Pulse Demo watchOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0C30B3112A3F375500D65F8F /* Debug */,
+				0C30B3122A3F375500D65F8F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		0C30B3142A3F375500D65F8F /* Build configuration list for PBXNativeTarget "Pulse Demo iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0C30B3152A3F375500D65F8F /* Debug */,
+				0C30B3162A3F375500D65F8F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

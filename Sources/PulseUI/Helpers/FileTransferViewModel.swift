@@ -47,7 +47,7 @@ final class FileTransferViewModel: ObservableObject {
             observer = session.progress.observe(\.fractionCompleted) { [weak self] progress, _ in
                 DispatchQueue.main.async {
                     print("Progress: \(progress.fractionCompleted)")
-                    self?.didUpdateProgress(progress)
+//                    self?.didUpdateProgress(progress)
                 }
             }
         }
