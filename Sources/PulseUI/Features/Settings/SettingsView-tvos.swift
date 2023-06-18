@@ -5,15 +5,17 @@
 import SwiftUI
 import Pulse
 
-#if os(watchOS)
+#if os(tvOS)
 
 public struct SettingsView: View {
     @StateObject private var viewModel: SettingsViewModel
 
     var store: LoggerStore { viewModel.store }
 
+#if os(watchOS)
     @StateObject private var syncService: WatchConnectivityService = .shared
     @State private var isShowingShareView = false
+#endif
 
     public init(store: LoggerStore = .shared) {
         _viewModel = StateObject(wrappedValue: SettingsViewModel(store: store))
@@ -23,6 +25,7 @@ public struct SettingsView: View {
         Form {
             Section {
                 if true || store === RemoteLogger.shared.store {
+#if os(watchOS)
 #if targetEnvironment(simulator)
                     RemoteLoggerSettingsView(viewModel: .shared)
 #else
@@ -32,14 +35,20 @@ public struct SettingsView: View {
                     Text("Not available on watchOS devices")
                         .foregroundColor(.secondary)
 #endif
+#endif
+#if os(tvOS)
+                    RemoteLoggerSettingsView(viewModel: .shared)
+#endif
                 }
             }
+#if os(watchOS)
             Section {
                 sectionTransferStore
                 if #available(watchOS 9, *) {
                     Button("Share Store") { isShowingShareView = true }
                 }
             }
+#endif
             Section {
                 NavigationLink(destination: StoreDetailsView(source: .store(viewModel.store))) {
                     Text("Store Info")
@@ -52,6 +61,10 @@ public struct SettingsView: View {
             }
         }
         .navigationTitle("Settings")
+#if os(tvOS)
+        .frame(maxWidth: 800)
+#endif
+#if os(watchOS)
         .sheet(isPresented: $isShowingShareView) {
             if #available(watchOS 9, *) {
                 NavigationView {
@@ -61,8 +74,10 @@ public struct SettingsView: View {
                 }
             }
         }
+#endif
     }
 
+#if os(watchOS)
     private var sectionTransferStore: some View {
         Button(action: { syncService.share(store: store) }) {
             Text(syncService.state.title)
@@ -72,6 +87,7 @@ public struct SettingsView: View {
             Alert(title: Text("Transfer Failed"), message: Text(error.error.localizedDescription), dismissButton: .cancel(Text("Ok")))
         }
     }
+#endif
 }
 
 // MARK: - Preview
