@@ -2,26 +2,26 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
+#if os(iOS)
+
 import SwiftUI
 import Pulse
-
-#if os(iOS)
 import UniformTypeIdentifiers
 
 @available(iOS 15, *)
 public struct SettingsView: View {
-    @StateObject var viewModel: SettingsViewModel
+    private let store: LoggerStore
     @State private var newHeaderName = ""
     @EnvironmentObject private var settings: UserSettings
     @ObservedObject private var logger: RemoteLogger = .shared
 
     public init(store: LoggerStore = .shared) {
-        _viewModel = StateObject(wrappedValue: SettingsViewModel(store: store))
+        self.store = store
     }
 
     public var body: some View {
         Form {
-            if viewModel.isRemoteLoggingAvailable {
+            if store === RemoteLogger.shared.store {
                 RemoteLoggerSettingsView(viewModel: .shared)
             }
             Section(header: Text("Appearance")) {

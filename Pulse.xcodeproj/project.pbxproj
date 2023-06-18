@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 54;
+	objectVersion = 53;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -205,7 +205,6 @@
 		0CF0D652296F189600EED9D4 /* ConsoleSearchCriteria+Predicates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5CA296F189500EED9D4 /* ConsoleSearchCriteria+Predicates.swift */; };
 		0CF0D655296F189600EED9D4 /* SettingsView-watchos.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5CF296F189500EED9D4 /* SettingsView-watchos.swift */; };
 		0CF0D656296F189600EED9D4 /* RemoteLoggerSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5D0296F189500EED9D4 /* RemoteLoggerSettingsView.swift */; };
-		0CF0D657296F189600EED9D4 /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5D1296F189500EED9D4 /* SettingsViewModel.swift */; };
 		0CF0D658296F189600EED9D4 /* SettingsView-ios.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5D2296F189500EED9D4 /* SettingsView-ios.swift */; };
 		0CF0D659296F189600EED9D4 /* UserSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5D3296F189500EED9D4 /* UserSettings.swift */; };
 		0CF0D65A296F189600EED9D4 /* StoreDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5D4296F189500EED9D4 /* StoreDetailsView.swift */; };
@@ -658,7 +657,6 @@
 		0CF0D5CA296F189500EED9D4 /* ConsoleSearchCriteria+Predicates.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ConsoleSearchCriteria+Predicates.swift"; sourceTree = "<group>"; };
 		0CF0D5CF296F189500EED9D4 /* SettingsView-watchos.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SettingsView-watchos.swift"; sourceTree = "<group>"; };
 		0CF0D5D0296F189500EED9D4 /* RemoteLoggerSettingsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RemoteLoggerSettingsView.swift; sourceTree = "<group>"; };
-		0CF0D5D1296F189500EED9D4 /* SettingsViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
 		0CF0D5D2296F189500EED9D4 /* SettingsView-ios.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SettingsView-ios.swift"; sourceTree = "<group>"; };
 		0CF0D5D3296F189500EED9D4 /* UserSettings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserSettings.swift; sourceTree = "<group>"; };
 		0CF0D5D4296F189500EED9D4 /* StoreDetailsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StoreDetailsView.swift; sourceTree = "<group>"; };
@@ -1302,7 +1300,6 @@
 				0CF0D5D5296F189500EED9D4 /* SettingsView-macos.swift */,
 				0CF0D5CF296F189500EED9D4 /* SettingsView-watchos.swift */,
 				0CFB0CA32A3F662300221FEA /* SettingsView-tvos.swift */,
-				0CF0D5D1296F189500EED9D4 /* SettingsViewModel.swift */,
 				0CF0D5D3296F189500EED9D4 /* UserSettings.swift */,
 				0CF0D5D4296F189500EED9D4 /* StoreDetailsView.swift */,
 			);
@@ -1992,7 +1989,6 @@
 				0CF0D669296F189600EED9D4 /* NetworkHeadersCell.swift in Sources */,
 				0CF0D67C296F189600EED9D4 /* ConsoleView-macos.swift in Sources */,
 				0CF0D612296F189600EED9D4 /* Regex.swift in Sources */,
-				0CF0D657296F189600EED9D4 /* SettingsViewModel.swift in Sources */,
 				0C0352DE299482F3008CDEF8 /* MockStore.swift in Sources */,
 				0CF0D62E296F189600EED9D4 /* RichTextView-watchos.swift in Sources */,
 				0CF0D634296F189600EED9D4 /* TimingView.swift in Sources */,

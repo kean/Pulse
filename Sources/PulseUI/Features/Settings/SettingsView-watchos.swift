@@ -2,21 +2,19 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
+#if os(watchOS)
+
 import SwiftUI
 import Pulse
 
-#if os(watchOS)
-
 public struct SettingsView: View {
-    @StateObject private var viewModel: SettingsViewModel
-
-    var store: LoggerStore { viewModel.store }
+    private let store: LoggerStore
 
     @StateObject private var syncService: WatchConnectivityService = .shared
     @State private var isShowingShareView = false
 
     public init(store: LoggerStore = .shared) {
-        _viewModel = StateObject(wrappedValue: SettingsViewModel(store: store))
+        self.store = store
     }
 
     public var body: some View {
@@ -52,7 +50,7 @@ public struct SettingsView: View {
                     Text("Store Info")
                 }
                 if !(store.options.contains(.readonly)) {
-                    Button(role: .destructive, action: viewModel.buttonRemoveAllMessagesTapped) {
+                    Button(role: .destructive, action: { store.removeAll() }) {
                         Text("Remove Logs")
                     }
                 }
@@ -70,8 +68,6 @@ public struct SettingsView: View {
         }
     }
 }
-
-// MARK: - Preview
 
 #if DEBUG
 struct SettingsView_Previews: PreviewProvider {

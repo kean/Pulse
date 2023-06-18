@@ -8,12 +8,10 @@ import SwiftUI
 import Pulse
 
 public struct SettingsView: View {
-    @StateObject private var viewModel: SettingsViewModel
-
-    var store: LoggerStore { viewModel.store }
+    private let store: LoggerStore
 
     public init(store: LoggerStore = .shared) {
-        _viewModel = StateObject(wrappedValue: SettingsViewModel(store: store))
+        self.store = store
     }
 
     public var body: some View {
@@ -22,11 +20,11 @@ public struct SettingsView: View {
                 RemoteLoggerSettingsView(viewModel: .shared)
             }
             Section {
-                NavigationLink(destination: StoreDetailsView(source: .store(viewModel.store))) {
+                NavigationLink(destination: StoreDetailsView(source: .store(store))) {
                     Text("Store Info")
                 }
-                if !(store.options.contains(.readonly)) {
-                    Button(role: .destructive, action: viewModel.buttonRemoveAllMessagesTapped) {
+                if !store.options.contains(.readonly) {
+                    Button(role: .destructive, action: { store.removeAll() }) {
                         Text("Remove Logs")
                     }
                 }
