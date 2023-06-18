@@ -16,7 +16,7 @@
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "0C30B3012A3F375500D65F8F"
                BuildableName = "Pulse Demo Watch App.app"
-               BlueprintName = "Pulse Demo Companion watchOS App"
+               BlueprintName = "Pulse Demo Paired watchOS App"
                ReferencedContainer = "container:Pulse.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -30,7 +30,7 @@
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "0C30B2F22A3F375400D65F8F"
                BuildableName = "Pulse Demo.app"
-               BlueprintName = "Pulse Demo Companion iOS App"
+               BlueprintName = "Pulse Demo Paired iOS App"
                ReferencedContainer = "container:Pulse.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -59,7 +59,7 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "0C30B3012A3F375500D65F8F"
             BuildableName = "Pulse Demo Watch App.app"
-            BlueprintName = "Pulse Demo Companion watchOS App"
+            BlueprintName = "Pulse Demo Paired watchOS App"
             ReferencedContainer = "container:Pulse.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -76,7 +76,7 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "0C30B3012A3F375500D65F8F"
             BuildableName = "Pulse Demo Watch App.app"
-            BlueprintName = "Pulse Demo Companion watchOS App"
+            BlueprintName = "Pulse Demo Paired watchOS App"
             ReferencedContainer = "container:Pulse.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
