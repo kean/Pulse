@@ -1439,9 +1439,9 @@
 			productReference = 0C11EAC12971E9B30059786A /* PulsePerformanceTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		0C30B2F22A3F375400D65F8F /* Pulse Demo iOS */ = {
+		0C30B2F22A3F375400D65F8F /* Pulse Demo Companion iOS App */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 0C30B3142A3F375500D65F8F /* Build configuration list for PBXNativeTarget "Pulse Demo iOS" */;
+			buildConfigurationList = 0C30B3142A3F375500D65F8F /* Build configuration list for PBXNativeTarget "Pulse Demo Companion iOS App" */;
 			buildPhases = (
 				0C30B2EF2A3F375400D65F8F /* Sources */,
 				0C30B2F02A3F375400D65F8F /* Frameworks */,
@@ -1456,14 +1456,14 @@
 				0C30B31A2A3F37F800D65F8F /* PBXTargetDependency */,
 				0C30B31E2A3F37F800D65F8F /* PBXTargetDependency */,
 			);
-			name = "Pulse Demo iOS";
+			name = "Pulse Demo Companion iOS App";
 			productName = "Pulse Demo";
 			productReference = 0C30B2F32A3F375400D65F8F /* Pulse Demo.app */;
 			productType = "com.apple.product-type.application";
 		};
-		0C30B3012A3F375500D65F8F /* Pulse Demo watchOS */ = {
+		0C30B3012A3F375500D65F8F /* Pulse Demo Companion watchOS App */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 0C30B3102A3F375500D65F8F /* Build configuration list for PBXNativeTarget "Pulse Demo watchOS" */;
+			buildConfigurationList = 0C30B3102A3F375500D65F8F /* Build configuration list for PBXNativeTarget "Pulse Demo Companion watchOS App" */;
 			buildPhases = (
 				0C30B2FE2A3F375500D65F8F /* Sources */,
 				0C30B2FF2A3F375500D65F8F /* Frameworks */,
@@ -1476,7 +1476,7 @@
 				0C30B3292A3F3A5600D65F8F /* PBXTargetDependency */,
 				0C30B32D2A3F3A5600D65F8F /* PBXTargetDependency */,
 			);
-			name = "Pulse Demo watchOS";
+			name = "Pulse Demo Companion watchOS App";
 			productName = "Pulse Demo Watch App";
 			productReference = 0C30B3022A3F375500D65F8F /* Pulse Demo Watch App.app */;
 			productType = "com.apple.product-type.application";
@@ -1663,8 +1663,8 @@
 				0CF0D56B296F17CB00EED9D4 /* PulseUI */,
 				0CF0D6BB296F18ED00EED9D4 /* PulseUITests */,
 				0C11EAC02971E9B30059786A /* PulsePerformanceTests */,
-				0C30B2F22A3F375400D65F8F /* Pulse Demo iOS */,
-				0C30B3012A3F375500D65F8F /* Pulse Demo watchOS */,
+				0C30B2F22A3F375400D65F8F /* Pulse Demo Companion iOS App */,
+				0C30B3012A3F375500D65F8F /* Pulse Demo Companion watchOS App */,
 				0C9F04F52884F34A0035239F /* Pulse Demo macOS */,
 				0C6460C325F5797B002C55B1 /* Pulse Demo tvOS */,
 				0C0B31E926D179A20045C9E1 /* Pulse Integration Examples iOS */,
@@ -2064,7 +2064,7 @@
 		};
 		0C30B3052A3F375500D65F8F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 0C30B3012A3F375500D65F8F /* Pulse Demo watchOS */;
+			target = 0C30B3012A3F375500D65F8F /* Pulse Demo Companion watchOS App */;
 			targetProxy = 0C30B3042A3F375500D65F8F /* PBXContainerItemProxy */;
 		};
 		0C30B31A2A3F37F800D65F8F /* PBXTargetDependency */ = {
@@ -2289,7 +2289,7 @@
 				GCC_DYNAMIC_NO_PIC = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Pulse Demo";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "com.github.kean.pulse-demo";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "com.github.kean.pulse-demo.companion";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2297,7 +2297,7 @@
 				MARKETING_VERSION = 1.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.github.kean.pulse-demo.watchkitapp";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.github.kean.pulse-demo.companion.watchkitapp";
 				PRODUCT_NAME = "Pulse Demo Watch App";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -2328,7 +2328,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Pulse Demo";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "com.github.kean.pulse-demo";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "com.github.kean.pulse-demo.companion";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2336,7 +2336,7 @@
 				MARKETING_VERSION = 1.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.github.kean.pulse-demo.watchkitapp";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.github.kean.pulse-demo.companion.watchkitapp";
 				PRODUCT_NAME = "Pulse Demo Watch App";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -2383,7 +2383,7 @@
 				MARKETING_VERSION = 1.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.github.kean.pulse-demo";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.github.kean.pulse-demo.companion";
 				PRODUCT_NAME = "Pulse Demo";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -2427,7 +2427,7 @@
 				MARKETING_VERSION = 1.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.github.kean.pulse-demo";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.github.kean.pulse-demo.companion";
 				PRODUCT_NAME = "Pulse Demo";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -2908,7 +2908,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		0C30B3102A3F375500D65F8F /* Build configuration list for PBXNativeTarget "Pulse Demo watchOS" */ = {
+		0C30B3102A3F375500D65F8F /* Build configuration list for PBXNativeTarget "Pulse Demo Companion watchOS App" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				0C30B3112A3F375500D65F8F /* Debug */,
@@ -2917,7 +2917,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		0C30B3142A3F375500D65F8F /* Build configuration list for PBXNativeTarget "Pulse Demo iOS" */ = {
+		0C30B3142A3F375500D65F8F /* Build configuration list for PBXNativeTarget "Pulse Demo Companion iOS App" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				0C30B3152A3F375500D65F8F /* Debug */,
