@@ -67,7 +67,6 @@ private final class CustomHTTPProtocol: URLProtocol {
         guard CustomHTTPProtocol.shouldHandleRequest(request) else {
             return false
         }
-        #warning("check if this works")
         if CustomHTTPProtocol.property(forKey: Constants.RequestHandledKey, in: request) != nil {
             return false
         }

@@ -10,7 +10,6 @@ import Pulse
 import WatchConnectivity
 import SwiftUI
 
-#warning("check if enabled")
 final class WatchConnectivityService: ObservableObject {
     static let shared = WatchConnectivityService()
 
