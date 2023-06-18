@@ -89,7 +89,7 @@ private struct _ConsoleListView: View {
     @Environment(\.isSearching) private var isSearching
     @Environment(\.store) private var store
 
-    @ObservedObject private var syncSession = WatchSyncService.shared
+    @ObservedObject private var syncSession = WatchConnectivityService.shared
     @State private var presentedStore: LoggerStore?
 
     var body: some View {

@@ -11,8 +11,8 @@ import WatchConnectivity
 import SwiftUI
 
 #warning("check if enabled")
-final class WatchSyncService: ObservableObject {
-    static let shared = WatchSyncService()
+final class WatchConnectivityService: ObservableObject {
+    static let shared = WatchConnectivityService()
 
     @Published private(set) var state: FileTransferStatus = .ready
     @Published var error: FileTransferError?
@@ -28,6 +28,7 @@ final class WatchSyncService: ObservableObject {
 
     func share(store: LoggerStore) {
         guard case .ready = state else { return }
+
         state = .exporting
 
         let storeURL = makeExportedStoreURL()
@@ -43,7 +44,7 @@ final class WatchSyncService: ObservableObject {
             return didComplete(with: error)
         }
         let session = WCSession.default.transferFile(storeURL, metadata: [
-            WatchSyncService.pulseDocumentMarkerKey: true
+            WatchConnectivityService.pulseDocumentMarkerKey: true
         ])
         self.state = .sending(session)
     }
@@ -119,7 +120,7 @@ enum FileTransferStatus {
 extension LoggerStore {
     /// Updates the status of the file transfer.
     public static func session(_ session: WCSession, didFinish fileTransfer: WCSessionFileTransfer, error: Swift.Error?) {
-        WatchSyncService.shared.session(session, didFinish: fileTransfer, error: error)
+        WatchConnectivityService.shared.session(session, didFinish: fileTransfer, error: error)
     }
 }
 

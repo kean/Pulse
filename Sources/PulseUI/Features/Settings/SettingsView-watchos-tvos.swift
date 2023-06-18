@@ -13,7 +13,7 @@ public struct SettingsView: View {
     var store: LoggerStore { viewModel.store }
 
 #if os(watchOS)
-    @StateObject private var syncService: WatchSyncService = .shared
+    @StateObject private var syncService: WatchConnectivityService = .shared
     @State private var isShowingShareView = false
 #endif
 

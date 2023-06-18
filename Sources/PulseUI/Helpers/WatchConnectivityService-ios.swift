@@ -10,8 +10,8 @@ import Pulse
 import WatchConnectivity
 import SwiftUI
 
-final class WatchSyncService: NSObject, ObservableObject {
-    static let shared = WatchSyncService()
+final class WatchConnectivityService: NSObject, ObservableObject {
+    static let shared = WatchConnectivityService()
 
     @Published private(set) var importedStoreURL: URL?
 
@@ -30,7 +30,7 @@ final class WatchSyncService: NSObject, ObservableObject {
     }
 
     func session(_ session: WCSession, didReceive file: WCSessionFile) {
-        guard file.metadata?[WatchSyncService.pulseDocumentMarkerKey] != nil else {
+        guard file.metadata?[WatchConnectivityService.pulseDocumentMarkerKey] != nil else {
             return
         }
         let storeURL = makeImportedStoreURL()
@@ -50,14 +50,14 @@ extension LoggerStore {
     /// Processes the file received from the companion watchOS apps, ignoring
     /// any files sent not by the Pulse framework.
     public static func session(_ session: WCSession, didReceive file: WCSessionFile) {
-        WatchSyncService.shared.session(session, didReceive: file)
+        WatchConnectivityService.shared.session(session, didReceive: file)
     }
 }
 
 #endif
 
 #if os(iOS) || os(watchOS)
-extension WatchSyncService {
+extension WatchConnectivityService {
     static let pulseDocumentMarkerKey = "com.github.kean.pulse.imported-store-marker"
 }
 #endif
