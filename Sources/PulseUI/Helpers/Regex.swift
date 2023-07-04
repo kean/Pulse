@@ -4,7 +4,7 @@
 
 import Foundation
 
-final class RegExp {
+final class Regex {
     private let regex: NSRegularExpression
 
     struct Options: OptionSet {
@@ -51,7 +51,7 @@ final class RegExp {
     }
 }
 
-extension RegExp {
+extension Regex {
     struct Match {
         let fullMatch: Substring
         let groups: [Substring]

@@ -72,8 +72,14 @@ extension URLSessionMock {
         guard request.httpMethod?.uppercased() == method ?? "GET" else {
             return false
         }
-        guard let url = request.url?.absoluteString,
-              let regex = try? Regex(pattern, [.caseInsensitive]) else {
+        guard let url = request.url?.absoluteString else {
+            return false
+        }
+        return isMatch(for: url)
+    }
+
+    func isMatch(for url: String) -> Bool {
+        guard let regex = try? Regex(pattern, [.caseInsensitive]) else {
             return false
         }
         return regex.isMatch(url)
