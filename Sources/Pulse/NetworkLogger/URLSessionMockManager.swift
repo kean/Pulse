@@ -13,7 +13,7 @@ final class URLSessionMockManager {
 
     func getMock(for request: URLRequest) -> URLSessionMock? {
         mocks.lazy.map(\.value).first {
-            $0.isMatch(for: request)
+            $0.isMatch(request)
         }
     }
 
@@ -64,24 +64,5 @@ final class URLSessionMockingProtocol: URLProtocol {
 
     override class func canInit(with request: URLRequest) -> Bool {
         URLSessionMockManager.shared.getMock(for: request) != nil && RemoteLogger.shared.connectionState == .connected
-    }
-}
-
-extension URLSessionMock {
-    func isMatch(for request: URLRequest) -> Bool {
-        guard request.httpMethod?.uppercased() == method ?? "GET" else {
-            return false
-        }
-        guard let url = request.url?.absoluteString else {
-            return false
-        }
-        return isMatch(for: url)
-    }
-
-    func isMatch(for url: String) -> Bool {
-        guard let regex = try? Regex(pattern, [.caseInsensitive]) else {
-            return false
-        }
-        return regex.isMatch(url)
     }
 }
