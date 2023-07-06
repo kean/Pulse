@@ -192,6 +192,7 @@ enum HTTPMethod: String, Hashable, Codable, CaseIterable, CustomStringConvertibl
     case head = "HEAD"
     case post = "POST"
     case put = "PUT"
+    case patch = "PATCH"
     case delete = "DELETE"
     case connect = "CONNECT"
     case options = "OPTIONS"

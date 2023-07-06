@@ -148,6 +148,9 @@ enum StatusCodeFormatter {
         switch statusCode {
         case 0: return "Success"
         case 200: return "200 OK"
+        case 418: return "418 Teapot"
+        case 429: return "429 Too many requests"
+        case 451: return "451 Unavailable for Legal Reasons"
         default: return "\(statusCode) \( HTTPURLResponse.localizedString(forStatusCode: statusCode).capitalized)"
         }
     }
