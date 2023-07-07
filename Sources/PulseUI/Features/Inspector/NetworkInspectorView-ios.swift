@@ -24,7 +24,6 @@ struct NetworkInspectorView: View {
         .listStyle(.insetGrouped)
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
-                ButtonOpenOnMac(entity: task)
                 trailingNavigationBarItems
             }
         }
