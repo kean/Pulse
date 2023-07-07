@@ -27,12 +27,17 @@ final class URLSessionMockManager {
 
 final class URLSessionMockingProtocol: URLProtocol {
     override func startLoading() {
+        lock.lock()
+        defer { lock.unlock() }
+
         guard let mock = URLSessionMockManager.shared.getMock(for: request) else {
             client?.urlProtocol(self, didFailWithError: URLError(.unknown)) // Should never happen
             return
         }
-        RemoteLogger.shared.getMockedResponse(for: mock) { [weak self] in
-            self?.didReceiveResponse($0)
+        DispatchQueue.main.async {
+            RemoteLogger.shared.getMockedResponse(for: mock) { [weak self] in
+                self?.didReceiveResponse($0)
+            }
         }
     }
 
@@ -63,6 +68,20 @@ final class URLSessionMockingProtocol: URLProtocol {
     }
 
     override class func canInit(with request: URLRequest) -> Bool {
-        URLSessionMockManager.shared.getMock(for: request) != nil && RemoteLogger.shared.connectionState == .connected
+        lock.lock()
+        defer { lock.unlock() }
+
+        guard let mock = URLSessionMockManager.shared.getMock(for: request) else {
+            return false
+        }
+        defer { numberOfHandledRequests[mock.mockID, default: 0] += 1 }
+        if numberOfHandledRequests[mock.mockID, default: 0] < (mock.skip ?? 0) {
+            return false
+        }
+        return RemoteLogger.shared.connectionState == .connected
     }
 }
+
+// Number of handled requests per mock.
+private var numberOfHandledRequests: [UUID: Int] = [:]
+private let lock = NSLock()
