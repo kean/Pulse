@@ -220,7 +220,8 @@ struct URLSessionMock: Hashable, Codable {
     var method: String?
 
     func isMatch(_ request: URLRequest) -> Bool {
-        guard request.httpMethod?.uppercased() == method ?? "GET" else {
+        if let lhs = request.httpMethod, let rhs = method,
+           lhs.uppercased() != rhs.uppercased() {
             return false
         }
         guard let url = request.url?.absoluteString else {
@@ -236,8 +237,6 @@ struct URLSessionMock: Hashable, Codable {
         return regex.isMatch(url)
     }
 }
-
-private let schemeRegex = try! Regex(#"^([a-z][a-z0-9+\-.]*)://"#)
 
 struct URLSessionMockedResponse: Codable {
     let errorCode: Int?

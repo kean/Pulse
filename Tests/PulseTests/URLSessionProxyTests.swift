@@ -91,4 +91,13 @@ final class URLSessionProxyTests: XCTestCase {
         let message = try XCTUnwrap(task.message)
         XCTAssertEqual(message.label, "network")
     }
+
+    func testURLSessionMockMatching() {
+        var request = URLRequest(url: URL(string: "example.com")!)
+        request.httpMethod = "GET"
+
+        XCTAssertTrue(URLSessionMock(mockID: UUID(), pattern: "example.com", method: "GET").isMatch(request))
+        XCTAssertTrue(URLSessionMock(mockID: UUID(), pattern: "example.com", method: nil).isMatch(request))
+        XCTAssertFalse(URLSessionMock(mockID: UUID(), pattern: "example.com", method: "POST").isMatch(request))
+    }
 }
