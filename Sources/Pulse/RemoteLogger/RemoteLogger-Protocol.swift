@@ -219,6 +219,7 @@ struct URLSessionMock: Hashable, Codable {
     var pattern: String
     var method: String?
     var skip: Int?
+    var count: Int?
 
     func isMatch(_ request: URLRequest) -> Bool {
         if let lhs = request.httpMethod, let rhs = method,

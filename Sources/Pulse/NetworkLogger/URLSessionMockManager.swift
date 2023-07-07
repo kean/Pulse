@@ -75,8 +75,12 @@ final class URLSessionMockingProtocol: URLProtocol {
             return false
         }
         defer { numberOfHandledRequests[mock.mockID, default: 0] += 1 }
-        if numberOfHandledRequests[mock.mockID, default: 0] < (mock.skip ?? 0) {
-            return false
+        let count = numberOfHandledRequests[mock.mockID, default: 0]
+        if count < (mock.skip ?? 0) {
+            return false // Skip the first N requests
+        }
+        if let maxCount = mock.count, count - (mock.skip ?? 0) >= maxCount {
+            return false // Mock for N number of times
         }
         return RemoteLogger.shared.connectionState == .connected
     }
