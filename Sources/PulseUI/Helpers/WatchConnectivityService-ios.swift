@@ -51,6 +51,7 @@ extension LoggerStore {
     /// Processes the file received from the companion watchOS apps, ignoring
     /// any files sent not by the Pulse framework.
     /// Returns true if the provided file was a Pulse document
+    @discardableResult
     public static func session(_ session: WCSession, didReceive file: WCSessionFile) -> Bool {
         return WatchConnectivityService.shared.session(session, didReceive: file)
     }
