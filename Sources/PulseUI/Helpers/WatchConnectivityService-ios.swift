@@ -29,9 +29,9 @@ final class WatchConnectivityService: NSObject, ObservableObject {
         importedStoreURL = nil
     }
 
-    func session(_ session: WCSession, didReceive file: WCSessionFile) {
+    func session(_ session: WCSession, didReceive file: WCSessionFile) -> Bool {
         guard file.metadata?[WatchConnectivityService.pulseDocumentMarkerKey] != nil else {
-            return
+            return false
         }
         let storeURL = makeImportedStoreURL()
         try? FileManager.default.removeItem(at: storeURL)
@@ -39,6 +39,7 @@ final class WatchConnectivityService: NSObject, ObservableObject {
         DispatchQueue.main.async {
             self.importedStoreURL = storeURL
         }
+        return true
     }
 }
 
@@ -49,8 +50,9 @@ private func makeImportedStoreURL() -> URL {
 extension LoggerStore {
     /// Processes the file received from the companion watchOS apps, ignoring
     /// any files sent not by the Pulse framework.
-    public static func session(_ session: WCSession, didReceive file: WCSessionFile) {
-        WatchConnectivityService.shared.session(session, didReceive: file)
+    /// Returns true if the provided file was a Pulse document
+    public static func session(_ session: WCSession, didReceive file: WCSessionFile) -> Bool {
+        return WatchConnectivityService.shared.session(session, didReceive: file)
     }
 }
 
