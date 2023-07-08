@@ -35,6 +35,9 @@ struct FileViewer: View {
 #endif
         case .other(let viewModel):
             RichTextView(viewModel: viewModel)
+#if PULSE_STANDALONE_APP
+                .background(Color(UXColor.textBackgroundColor))
+#endif
         }
     }
 }
