@@ -99,7 +99,6 @@ struct WrappedTextView: NSViewRepresentable {
         }
 
         textView.delegate = context.coordinator
-        textView.isEditable = viewModel.isEditable
 
         textView.attributedText = viewModel.originalText
 
