@@ -19,28 +19,18 @@ public final class UserSettings: ObservableObject {
     @AppStorage("com.github.kean.pulse.sharing.output")
     public var sharingOutput: ShareStoreOutput = .store
 
+    /// HTTP headers to display in a Console.
+    public var displayHeaders: [String] {
+        get {
+            let data = rawDisplayHeaders.data(using: .utf8) ?? Data()
+            return (try? JSONDecoder().decode([String].self, from: data)) ?? []
+        }
+        set {
+            guard let data = try? JSONEncoder().encode(newValue) else { return }
+            rawDisplayHeaders = String(data: data, encoding: .utf8) ?? "[]"
+        }
+    }
+
     @AppStorage("com.github.kean.pulse.display.headers")
-    public var displayHeaders: [String] = []
-}
-
-// MARK: - Array + RawREpresentable
-
-extension Array: RawRepresentable where Element: Codable {
-    public init?(rawValue: String) {
-        guard let data = rawValue.data(using: .utf8),
-              let result = try? JSONDecoder().decode([Element].self, from: data)
-        else {
-            return nil
-        }
-        self = result
-    }
-
-    public var rawValue: String {
-        guard let data = try? JSONEncoder().encode(self),
-              let result = String(data: data, encoding: .utf8)
-        else {
-            return "[]"
-        }
-        return result
-    }
+    var rawDisplayHeaders: String = "[]"
 }
