@@ -52,6 +52,8 @@ public final class NetworkTaskEntity: NSManagedObject {
     @NSManaged public var responseContentType: String?
     /// Returns `true` if the response was returned from the local cache.
     @NSManaged public var isFromCache: Bool
+    /// Returns `true` if the request is mocked
+    @NSManaged public var isMocked: Bool
 
     // MARK: Error
 

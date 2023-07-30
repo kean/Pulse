@@ -64,7 +64,9 @@ final class URLSessionMockingProtocol: URLProtocol {
     override func stopLoading() {}
 
     override class func canonicalRequest(for request: URLRequest) -> URLRequest {
-        request
+        var request = request
+        request.addValue("true", forHTTPHeaderField: URLSessionMockingProtocol.requestMockedHeaderName)
+        return request
     }
 
     override class func canInit(with request: URLRequest) -> Bool {
@@ -84,8 +86,11 @@ final class URLSessionMockingProtocol: URLProtocol {
         }
         return RemoteLogger.shared.connectionState == .connected
     }
+
+    static let requestMockedHeaderName = "X-PulseRequestMocked"
 }
 
 // Number of handled requests per mock.
 private var numberOfHandledRequests: [UUID: Int] = [:]
+private var mockedTaskIDs: Set<Int> = []
 private let lock = NSLock()

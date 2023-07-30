@@ -430,11 +430,19 @@ extension LoggerStore {
             entity.underlyingError = error.underlyingError.flatMap { try? JSONEncoder().encode($0) }
         }
 
+        var currentRequest = event.currentRequest
+        if currentRequest?.headers?[URLSessionMockingProtocol.requestMockedHeaderName] != nil {
+            entity.isMocked = true
+            currentRequest?.headers?[URLSessionMockingProtocol.requestMockedHeaderName] = nil
+        } else {
+            entity.isMocked = false
+        }
+
         entity.originalRequest.map(backgroundContext.delete)
         entity.currentRequest.map(backgroundContext.delete)
 
         entity.originalRequest = makeRequest(for: event.originalRequest)
-        entity.currentRequest = event.currentRequest.map(makeRequest)
+        entity.currentRequest = currentRequest.map(makeRequest)
         entity.response = event.response.map(makeResponse)
         entity.rawMetadata = {
             guard let responseBody = event.responseBody,
