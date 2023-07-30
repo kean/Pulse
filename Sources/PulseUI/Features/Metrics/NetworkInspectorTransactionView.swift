@@ -6,6 +6,7 @@ import SwiftUI
 import Pulse
 import CoreData
 
+@available(iOS 15, *)
 struct NetworkInspectorTransactionView: View {
     @ObservedObject var viewModel: NetworkInspectorTransactionViewModel
 
@@ -25,7 +26,7 @@ struct NetworkInspectorTransactionView: View {
         NavigationLink(destination: destintionTransactionDetails) {
             VStack(alignment: .leading, spacing: 4) {
                 Text(viewModel.title)
-                if #available(iOS 15, *), let size = viewModel.transferSizeViewModel {
+                if let size = viewModel.transferSizeViewModel {
                     transferSizeView(size: size)
                 }
             }
@@ -89,6 +90,7 @@ final class NetworkInspectorTransactionViewModel: ObservableObject, Identifiable
 }
 
 #if DEBUG
+@available(iOS 15, *)
 struct NetworkInspectorTransactionView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {

@@ -5,6 +5,7 @@
 import SwiftUI
 import Pulse
 
+@available(iOS 15, *)
 struct NetworkRequestStatusSectionView: View {
     let viewModel: NetworkRequestStatusSectionViewModel
 
@@ -41,6 +42,7 @@ final class NetworkRequestStatusSectionViewModel {
 }
 
 #if DEBUG
+@available(iOS 15, *)
 struct NetworkRequestStatusSectionView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {

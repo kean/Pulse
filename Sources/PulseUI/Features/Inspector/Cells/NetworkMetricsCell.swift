@@ -5,6 +5,7 @@
 import SwiftUI
 import Pulse
 
+@available(iOS 15, *)
 struct NetworkMetricsCell: View {
     let task: NetworkTaskEntity
 

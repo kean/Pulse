@@ -5,6 +5,7 @@
 import SwiftUI
 import Pulse
 
+@available(iOS 15, *)
 struct NetworkRequestStatusCell: View {
     let viewModel: NetworkRequestStatusCellModel
 
@@ -15,7 +16,7 @@ struct NetworkRequestStatusCell: View {
                 .lineLimit(3)
                 .foregroundColor(viewModel.tintColor)
             Spacer()
-            viewModel.duration.map(DurationLabel.init)
+            detailsView
         }
         .font(.headline)
         .listRowBackground(Color.clear)
@@ -30,7 +31,7 @@ struct NetworkRequestStatusCell: View {
                 .lineLimit(1)
                 .foregroundColor(viewModel.tintColor)
             Spacer()
-            viewModel.duration.map(DurationLabel.init)
+            detailsView
         }
 #if os(tvOS)
         .font(.system(size: 38, weight: .bold))
@@ -44,12 +45,22 @@ struct NetworkRequestStatusCell: View {
     }
 
     #endif
+
+    @ViewBuilder
+    private var detailsView: some View {
+        if viewModel.isMock {
+            MockBadgeView()
+        } else {
+            viewModel.duration.map(DurationLabel.init)
+        }
+    }
 }
 
 struct NetworkRequestStatusCellModel {
     let imageName: String
     let title: String
     let tintColor: Color
+    let isMock: Bool
     fileprivate let duration: DurationViewModel?
 
     init(task: NetworkTaskEntity) {
@@ -57,6 +68,7 @@ struct NetworkRequestStatusCellModel {
         self.imageName = task.state.iconSystemName
         self.tintColor = task.state.tintColor
         self.duration = DurationViewModel(task: task)
+        self.isMock = task.isMocked
     }
 
     init(transaction: NetworkTransactionMetricsEntity) {
@@ -76,6 +88,7 @@ struct NetworkRequestStatusCellModel {
             tintColor = .secondary
         }
         duration = DurationViewModel(transaction: transaction)
+        isMock = false
     }
 }
 
@@ -143,6 +156,7 @@ private extension NetworkResponseEntity {
 }
 
 #if DEBUG
+@available(iOS 15, *)
 struct NetworkRequestStatusCell_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
