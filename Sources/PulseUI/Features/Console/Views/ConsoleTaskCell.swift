@@ -46,7 +46,11 @@ struct ConsoleTaskCell: View {
     }
 
     private var title: some View {
-        HStack {
+        HStack(spacing: titleSpacing) {
+            if task.isMocked {
+                MockBadgeView()
+                    .padding(.trailing, 2)
+            }
             (Text(Image(systemName: task.state.iconSystemName)) + Text(" " + ConsoleFormatter.status(for: task)))
                 .font(ConsoleConstants.fontTitle)
                 .fontWeight(.medium)
@@ -91,6 +95,7 @@ struct ConsoleTaskCell: View {
         }
     }
 
+    @ViewBuilder
     private var details: some View {
 #if os(watchOS)
         HStack {
@@ -161,6 +166,39 @@ private let infoSpacing: CGFloat = 8
 #else
 private let infoSpacing: CGFloat = 14
 #endif
+
+#if os(tvOS)
+private let titleSpacing: CGFloat = 20
+#else
+private let titleSpacing: CGFloat? = nil
+#endif
+
+@available(iOS 15, *)
+struct MockBadgeView: View {
+    var body: some View {
+        Text("MOCK")
+        #if os(watchOS)
+            .font(.footnote)
+        #elseif os(tvOS)
+            .font(.caption2)
+        #else
+            .font(ConsoleConstants.fontInfo)
+            .fontWeight(.medium)
+        #endif
+            .foregroundStyle(Color.white)
+            .background(background)
+    }
+
+    private var background: some View {
+        Capsule()
+            .foregroundStyle(Color.indigo)
+            .padding(-2)
+            .padding(.horizontal, -3)
+#if os(tvOS)
+            .padding(-2)
+#endif
+    }
+}
 
 private struct ConsoleProgressText: View {
     let title: String

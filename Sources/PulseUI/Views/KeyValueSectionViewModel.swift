@@ -33,7 +33,11 @@ extension KeyValueSectionViewModel {
         if request.httpShouldUsePipelining {
             items.append(("HTTP Should Use Pipelining", request.httpShouldUsePipelining.description))
         }
-        return KeyValueSectionViewModel(title: "Options", color: .indigo, items: items)
+        if #available(iOS 15, *) {
+            return KeyValueSectionViewModel(title: "Options", color: .indigo, items: items)
+        } else {
+            return KeyValueSectionViewModel(title: "Options", color: .purple, items: items)
+        }
     }
 
     static func makeTaskDetails(for task: NetworkTaskEntity) -> KeyValueSectionViewModel {

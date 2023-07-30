@@ -8,14 +8,12 @@ import Combine
 #if os(iOS) || os(macOS)
 extension Color {
     static var separator: Color { Color(UXColor.separator) }
-    static var indigo: Color { Color(UXColor.systemIndigo) }
     static var secondaryFill: Color { Color(UXColor.secondarySystemFill) }
 }
 #endif
 
 #if os(watchOS) || os(tvOS)
 extension Color {
-    static var indigo: Color { .purple }
     static var separator: Color { Color.secondary.opacity(0.3) }
     static var secondaryFill: Color { Color.secondary.opacity(0.3) }
 }

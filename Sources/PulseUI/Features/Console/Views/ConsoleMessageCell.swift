@@ -84,7 +84,7 @@ struct ConsoleMessageCell: View {
 struct ListDisclosureIndicator: View {
     var body: some View {
         Image(systemName: "chevron.right")
-            .foregroundColor(.separator)
+            .foregroundColor(Color.separator)
             .lineLimit(1)
             .font(ConsoleConstants.fontTitle)
             .foregroundColor(.secondary)
