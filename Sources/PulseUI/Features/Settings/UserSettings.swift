@@ -10,16 +10,23 @@ import Combine
 public final class UserSettings: ObservableObject {
     public static let shared = UserSettings()
 
+    /// The console default mode.
+    @AppStorage("com.github.kean.pulse.console.mode")
+    public var mode: ConsoleMode = .network
+
+    /// The line limit for messages in the console. By default, `4`.
     @AppStorage("com.github.kean.pulse.console.cell.line.limit")
     public var lineLimit: Int = 4
 
+    /// Enables link detection in the response viewier. By default, `false`.
     @AppStorage("com.github.kean.pulse.link.detection")
     public var isLinkDetectionEnabled = false
 
+    /// The default sharing output type. By default, ``ShareStoreOutput/store``.
     @AppStorage("com.github.kean.pulse.sharing.output")
     public var sharingOutput: ShareStoreOutput = .store
 
-    /// HTTP headers to display in a Console.
+    /// HTTP headers to display in a Console. By default, empty.
     public var displayHeaders: [String] {
         get {
             let data = rawDisplayHeaders.data(using: .utf8) ?? Data()

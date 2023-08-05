@@ -1,5 +1,7 @@
 # Pulse 4.x
 
+- The "network" tab is now the first item in the menu and is selected by default. The selection is now also sticky.
+
 ## WIP
 
 - `ConsoleView` no longer supports iOS 14, but the package can still be installed in projects that require iOS 14
@@ -8,10 +10,8 @@
 - Remove APIs deprecated in Pulse 3.x
 - Move inspectors to the navigation bar on macOS
 - When you import store from watchOS, it now shows an "Open Store" button directly in the Console
-
-### Features
-
-- Add "Open on Mac" button to messages and tasks that allow you to quickly open the selected item on a connected Mac, even if the remote logging was disabled when the logs were recorded 
+- Add "Open on Mac" button to messages and tasks that allow you to quickly open the selected item on a connected Mac, even if the remote logging was disabled when the logs were recorded (iOS)
+- Add quick filters by `host`, `url` to the network task context menus 
 
 ### Fixes
 

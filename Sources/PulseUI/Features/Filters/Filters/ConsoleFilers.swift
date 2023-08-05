@@ -28,6 +28,7 @@ struct ConsoleFilers: Hashable {
 
     struct Network: Hashable {
         var host = Host()
+        var url = URL()
 #if PULSE_STANDALONE_APP
         var custom = CustomNetworkFilters()
         var response = Response()
@@ -74,6 +75,12 @@ extension ConsoleFilers {
     }
 
     struct Host: ConsoleFilterProtocol {
+        var isEnabled = true
+        var hidden: Set<String> = []
+        var focused: String?
+    }
+
+    struct URL: ConsoleFilterProtocol {
         var isEnabled = true
         var hidden: Set<String> = []
         var focused: String?

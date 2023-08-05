@@ -45,7 +45,12 @@ final class ConsoleEnvironment: ObservableObject {
         case .network: self.title = "Network"
         }
         self.initialMode = mode
-        self.mode = mode
+
+        switch mode {
+        case .all: self.mode = UserSettings.shared.mode
+        case .logs: self.mode = .logs
+        case .network: self.mode = .network
+        }
 
         func makeDefaultOptions() -> ConsoleDataSource.PredicateOptions {
             var options = ConsoleDataSource.PredicateOptions()
@@ -74,6 +79,10 @@ final class ConsoleEnvironment: ObservableObject {
     private func bind() {
         $mode.sink { [weak self] in
             self?.filters.mode = $0
+        }.store(in: &cancellables)
+
+        $mode.dropFirst().sink {
+            UserSettings.shared.mode = $0
         }.store(in: &cancellables)
 
         filters.$options.sink { [weak self] in

@@ -88,6 +88,15 @@ private func makePredicates(for criteria: ConsoleFilers.Network) -> [NSPredicate
         }
     }
 
+    if criteria.url.isEnabled {
+        if let focusedURL = criteria.url.focused {
+            predicates.append(NSPredicate(format: "url == %@", focusedURL))
+        } else if !criteria.url.hidden.isEmpty {
+            predicates.append(NSPredicate(format: "NOT url IN %@", Array(criteria.url.hidden)))
+        }
+    }
+
+
 #if PULSE_STANDALONE_APP
     predicates += makeStandalonePredicates(for: criteria)
 #endif

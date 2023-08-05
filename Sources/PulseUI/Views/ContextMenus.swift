@@ -29,16 +29,6 @@ enum ContextMenu {
             }
             Section {
                 Menu(content: {
-                    Button("Hide Label '\(message.label)'") {
-                        filters.criteria.messages.labels.hidden.insert(message.label)
-                    }
-                    Button("Hide Level '\(message.logLevel.name)'") {
-                        filters.criteria.messages.logLevels.levels.remove(message.logLevel)
-                    }
-                }, label: {
-                    Label("Hide", systemImage: "eye.slash")
-                })
-                Menu(content: {
                     Button("Show Label '\(message.label)'") {
                         filters.criteria.messages.labels.focused = message.label
                     }
@@ -47,6 +37,16 @@ enum ContextMenu {
                     }
                 }, label: {
                     Label("Show", systemImage: "eye")
+                })
+                Menu(content: {
+                    Button("Hide Label '\(message.label)'") {
+                        filters.criteria.messages.labels.hidden.insert(message.label)
+                    }
+                    Button("Hide Level '\(message.logLevel.name)'") {
+                        filters.criteria.messages.logLevels.levels.remove(message.logLevel)
+                    }
+                }, label: {
+                    Label("Hide", systemImage: "eye.slash")
                 })
             }
             Section {
@@ -79,11 +79,11 @@ enum ContextMenu {
 #endif
                 ContextMenu.NetworkTaskCopyMenu(task: task)
             }
-//            if environment.mode == .network {
-//                Section {
-//                    NetworkTaskFilterMenu(task: task)
-//                }
-//            }
+            if environment.mode == .network {
+                Section {
+                    NetworkTaskFilterMenu(task: task)
+                }
+            }
             if let message = task.message {
                 Section {
                     PinButton(viewModel: .init(message))
@@ -103,21 +103,31 @@ enum ContextMenu {
         var body: some View {
             Menu(content: {
                 if let host = task.host {
-                    Button("Hide Host '\(host)'") {
-                        filters.criteria.network.host.hidden.insert(host)
+                    Button("Host '\(host)'") {
+                        filters.criteria.network.host.focused = host
                     }
                 }
-            }, label: {
-                Label("Hide", systemImage: "eye.slash")
-            })
-            Menu(content: {
-                if let host = task.host {
-                    Button("Show Host '\(host)'") {
-                        filters.criteria.network.host.focused = host
+                if let url = task.url {
+                    Button("URL '\(url)'") {
+                        filters.criteria.network.url.focused = url
                     }
                 }
             }, label: {
                 Label("Show", systemImage: "eye")
+            })
+            Menu(content: {
+                if let host = task.host {
+                    Button("Host '\(host)'") {
+                        filters.criteria.network.host.hidden.insert(host)
+                    }
+                }
+                if let url = task.url {
+                    Button("URL '\(url)'") {
+                        filters.criteria.network.url.focused = url
+                    }
+                }
+            }, label: {
+                Label("Hide", systemImage: "eye.slash")
             })
         }
     }
