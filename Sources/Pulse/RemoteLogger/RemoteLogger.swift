@@ -36,7 +36,7 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
     private var preferredServer = ""
 
     /// The servers that you previously connected to. The logger will prioritize
-    /// connecting to the ``RemoteLogger/selectedServer``, but if it's not found
+    /// connecting to the ``RemoteLogger/selectedServerName``, but if it's not found
     /// it'll pick the first server from the ``RemoteLogger/knownServers``.
     @Published
     public private(set) var knownServers: [String] = []

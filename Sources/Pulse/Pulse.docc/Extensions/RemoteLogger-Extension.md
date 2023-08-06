@@ -18,11 +18,11 @@
 ### Managing Available Servers
 
 - ``servers``
-- ``selectedServer``
+- ``selectedServerName``
 - ``isSelected(_:)``
 
 ### Connection
 
 - ``connectionState-swift.property``
 - ``ConnectionState-swift.enum``
-- ``connect(to:)``
+- ``connect(to:passcode:_:)``

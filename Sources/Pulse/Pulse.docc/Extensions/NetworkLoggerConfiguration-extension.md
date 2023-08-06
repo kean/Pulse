@@ -27,7 +27,3 @@
 
 - ``label``
 - ``isWaitingForDecoding``
-
-### Deprecated
-
-- ``init(isWaitingForDecoding:)``

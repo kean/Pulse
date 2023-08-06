@@ -9,9 +9,8 @@
 
 ### Creation and Update Dates
 
-- ``createdDate``
+- ``creationDate``
 - ``modifiedDate``
-- ``archivedDate``
 
 ### Usage Statistics
 
