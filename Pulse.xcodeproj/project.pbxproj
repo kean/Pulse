@@ -2271,6 +2271,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 4.0.0;
 				OTHER_SWIFT_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.github.kean.pulse-integration-examples";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -2291,6 +2292,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 4.0.0;
 				OTHER_SWIFT_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.github.kean.pulse-integration-examples";
 				PRODUCT_NAME = "$(TARGET_NAME)";

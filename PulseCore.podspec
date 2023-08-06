@@ -2,9 +2,9 @@ Pod::Spec.new do |s|
 
 s.name = "PulseCore"
 s.module_name = "Pulse"
-s.version = "3.7.3"
+s.version = "4.0.0"
 s.summary = "Logging system for Apple platforms"
-s.swift_version = "5.6"
+s.swift_version = "5.7"
 
 s.description  = <<-DESC
 Pulse is a powerful logging system for Apple Platforms. Native. Built with SwiftUI.
