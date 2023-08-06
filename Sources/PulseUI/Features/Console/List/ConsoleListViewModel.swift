@@ -9,7 +9,7 @@ import Combine
 import SwiftUI
 
 final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject, ConsoleEntitiesSource {
-#if !os(macOS)
+#if os(iOS)
     @Published private(set) var visibleEntities: ArraySlice<NSManagedObject> = []
 #else
     var visibleEntities: [NSManagedObject] { entities }
@@ -41,10 +41,12 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject, C
 
     let events = PassthroughSubject<ConsoleUpdateEvent, Never>()
 
+#if os(iOS)
     /// This exist strictly to workaround List performance issues
     private var scrollPosition: ScrollPosition = .nearTop
     private var visibleEntityCountLimit = ConsoleDataSource.fetchBatchSize
     private var visibleObjectIDs: Set<NSManagedObjectID> = []
+#endif
 
     private let store: LoggerStore
     private let environment: ConsoleEnvironment
@@ -138,7 +140,7 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject, C
 
         entities = dataSource.entities
         sections = dataSource.sections
-#if !os(macOS)
+#if os(iOS)
         refreshVisibleEntities()
 #endif
         events.send(.refresh)
@@ -147,7 +149,7 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject, C
     func dataSource(_ dataSource: ConsoleDataSource, didUpdateWith diff: CollectionDifference<NSManagedObjectID>?) {
         entities = dataSource.entities
         sections = dataSource.sections
-#if !os(macOS)
+#if os(iOS)
         if scrollPosition == .nearTop {
             refreshVisibleEntities()
         }
@@ -157,6 +159,7 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject, C
 
     // MARK: Visible Entities
 
+#if os(iOS)
     private enum ScrollPosition {
         case nearTop
         case middle
@@ -164,20 +167,15 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject, C
     }
 
     func onDisappearCell(with objectID: NSManagedObjectID) {
-#if !os(macOS)
         visibleObjectIDs.remove(objectID)
         refreshScrollPosition()
-#endif
     }
 
     func onAppearCell(with objectID: NSManagedObjectID) {
-#if !os(macOS)
         visibleObjectIDs.insert(objectID)
         refreshScrollPosition()
-#endif
     }
 
-#if !os(macOS)
     private func refreshScrollPosition() {
         let scrollPosition: ScrollPosition
         if visibleObjectIDs.isEmpty || visibleEntities.prefix(5).map(\.objectID).contains(where: visibleObjectIDs.contains) {

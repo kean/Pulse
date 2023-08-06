@@ -9,21 +9,23 @@ import Pulse
 
 public struct ConsoleView: View {
     @StateObject private var environment: ConsoleEnvironment
-    @StateObject private var listViewModel: ConsoleListViewModel
+    @StateObject private var listViewModel: IgnoringUpdates<ConsoleListViewModel>
 
     init(environment: ConsoleEnvironment) {
         _environment = StateObject(wrappedValue: environment)
-        _listViewModel = StateObject(wrappedValue: .init(environment: environment, filters: environment.filters))
+        let listViewModel = ConsoleListViewModel(environment: environment, filters: environment.filters)
+        _listViewModel = StateObject(wrappedValue: .init(listViewModel))
     }
 
     public var body: some View {
         List {
             ConsoleToolbarView(environment: environment)
             ConsoleListContentView()
+                .environmentObject(listViewModel.value)
         }
         .navigationTitle(environment.title)
-        .onAppear { listViewModel.isViewVisible = true }
-        .onDisappear { listViewModel.isViewVisible = false }
+        .onAppear { listViewModel.value.isViewVisible = true }
+        .onDisappear { listViewModel.value.isViewVisible = false }
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
                 Button(action: { environment.router.isShowingSettings = true }) {
@@ -32,7 +34,6 @@ public struct ConsoleView: View {
             }
         }
         .injecting(environment)
-        .environmentObject(listViewModel)
     }
 }
 

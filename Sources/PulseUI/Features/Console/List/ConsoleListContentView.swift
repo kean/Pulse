@@ -53,8 +53,6 @@ struct ConsoleListContentView: View {
             ForEach(viewModel.visibleEntities, id: \.objectID) { entity in
                 ConsoleEntityCell(entity: entity)
                     .id(entity.objectID)
-                    .onAppear { viewModel.onAppearCell(with: entity.objectID) }
-                    .onDisappear { viewModel.onDisappearCell(with: entity.objectID) }
             }
         }
 #if os(macOS)
