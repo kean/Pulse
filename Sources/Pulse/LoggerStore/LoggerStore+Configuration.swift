@@ -53,8 +53,8 @@ extension LoggerStore {
         var expectedBlobRatio = 0.7
         var trimRatio = 0.7
 
-        /// Every 20 minutes.
-        var sweepInterval: TimeInterval = 1200
+        /// Every 1 hour.
+        var sweepInterval: TimeInterval = 3600
 
         /// If enabled, all blobs will be stored in a compressed format and
         /// decompressed on the fly, significantly reducing the space usage.
