@@ -1,33 +1,42 @@
 # Pulse 4.x
 
-- The "network" tab is now the first item in the menu and is selected by default. The selection is now also sticky.
+## Pulse 4.0
 
-## WIP
+*Aug 6, 2023*
 
-- `ConsoleView` no longer supports iOS 14, but the package can still be installed in projects that require iOS 14
-- Increase minimum deployment target on tvOS 14.0 → 15.0
-- Move some network filters to Pulse for Mac
+### Requirements
+
+- Set the minimum platform requirements to iOS 14.0, tvOS 15.0, watchOS 8.0, macOS 12.0. `ConsoleView` is available on iOS 15, but you can still integrate the framework in apps that support earlier iOS versions.
+- Increase the minimum supported Xcode version to Xcode 14.1
+- Add Xcode 15 support 
+- Add iOS 17, tvOS 17, watchOS 10, macOS 14 support
 - Remove APIs deprecated in Pulse 3.x
-- Move inspectors to the navigation bar on macOS
-- When you import store from watchOS, it now shows an "Open Store" button directly in the Console
-- Add "Open on Mac" button to messages and tasks that allow you to quickly open the selected item on a connected Mac, even if the remote logging was disabled when the logs were recorded (iOS)
-- Add quick filters by `host`, `url` to the network task context menus 
 
-### Fixes
+### Remote Logging
 
-- Fix how network tasks details get collapsed in the console on macOS
+- Add support for the new Pulse for Mac app coming to App Store this month. You can try it now by [joining](https://testflight.apple.com/join/1jcanE3q) the public beta. More information on the app will be available soon.
+- [Redesign](https://github-production-user-asset-6210df.s3.amazonaws.com/1567433/244578507-99e03a6a-c830-4174-add5-9b68d3c96c47.png) the remote settings screen making it easier to connect to Pulse for Mac. The new screen has improved error handling and shows instructions on configuring the app to use it. It now also remembers all recently connected devices, so if you use more than one Mac for development, it will remember both.
+- Add support for password-protected and encrypted connections to Pulse for Mac
+- Add a way to "Forget the Device" without disabling the remote logger
+- Fix synchronization issues in the remote logger
+- Add "Show on Mac" feature that allows you to quickly open a log details page selected in the iOS app on a Mac without even starting the remote logging (iOS only)
+- Add missing NSBonjourServices plist setting to the demo project that was preventing the demo app from connecting on a local network
 
+### Features
 
-### Pulse for Mac
-
-- Add a simple way to mock network requests
-- New network inspector: new summary, metrics view, cookies viewer, etc
-- Add new headers table-based viewer
-- Add JWT viewer (right click on an HTTP header containing the JWT token to view it)
-- Add new search that now shows suggestions inline, has support for "Logs" filters, and other features introduces in Pulse 3.7.0
-- Add "Group By" support to table view
-- Add double-click to open row in a new window and the respective context menu action
-- Add "Now" mode
+- [iOS] The "network" tab is now the first item in the menu and is selected by default. The selection is now also sticky.
+- [iOS] Add a way to display custom HTTP headers directly in the Console - [#196](https://github.com/kean/Pulse/pull/196) by @tahirmt
+- [iOS] Add quick filters by `host`, and `url` to the network task context menus
+- [iOS] When you import store from watchOS, it now shows an "Open Store" button directly in the Console
+- Add a public `UserSettings` class that allows you to programmatically change some of the console settings or pass them using launch arguments 
+- [watchOS] Update the design for watchOS 10
+- [watchOS] Fix [#201](https://github.com/kean/Pulse/issues/201) by removing the code that sets WCSession delegate from the framework. It's now up to the user to forward the required delegate calls to the framework: only two are needed. Please see the included demo projects for an example.
+- [watchOS] Fix [#200](https://github.com/kean/Pulse/issues/200) by disabling the Remote Logging toggle when running on a physical watchOS device.
+- [watchOS] Add a "Share Store" button to the Settings screen that uses the new native [ShareLink](https://developer.apple.com/documentation/SwiftUI/ShareLink) API to add more ways to share logs from your logs: email, messages, and more.
+- [watchOS] Add demo with paired iOS and watchOS apps
+- [macOS] Move some network filters to Pulse for Mac
+- [macOS] Move inspectors to the navigation bar on macOS
+- [macOS] Add "Now" mode
 
 # Pulse 3.x
 
