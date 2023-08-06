@@ -22,6 +22,7 @@ final class ConsoleListViewModelTests: ConsoleTestCase {
     func setUp(store: LoggerStore, focusedEntities: [NSManagedObject]? = nil) {
         self.store = store
         self.environment = ConsoleEnvironment(store: store)
+        self.environment.mode = .all
         if let entities = focusedEntities {
             filters.options.focus = NSPredicate(format: "self IN %@", entities)
         }
@@ -127,6 +128,7 @@ final class ConsoleListViewModelTests: ConsoleTestCase {
 
     func testOrderLogsByLevel() {
         // WHEN
+        environment.mode = .all
         environment.listOptions.messageSortBy = .level
         environment.listOptions.order = .ascending
 
@@ -139,6 +141,7 @@ final class ConsoleListViewModelTests: ConsoleTestCase {
 
     func testOrderLogsByLevelDescending() {
         // WHEN
+        environment.mode = .all
         environment.listOptions.messageSortBy = .level
         environment.listOptions.order = .descending
 
