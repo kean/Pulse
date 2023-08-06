@@ -42,6 +42,7 @@ final class RichTextViewModel: ObservableObject {
     struct SearchMatch {
         let range: NSRange
         let originalForegroundColor: UXColor
+        let originalBackgroundColor: UXColor?
     }
 
     convenience init(string: NSAttributedString = NSAttributedString()) {
@@ -148,7 +149,9 @@ final class RichTextViewModel: ObservableObject {
                 textStorage.attributes(at: $0.location, effectiveRange: nil)[.isTechnical] == nil
             }.map {
                 let color = textStorage.attribute(.foregroundColor, at: $0.location, effectiveRange: nil) as? UXColor
-                return SearchMatch(range: $0, originalForegroundColor: color ?? .label)
+                let backgroundColor = textStorage.attribute(.backgroundColor, at: $0.location, effectiveRange: nil) as? UXColor
+
+                return SearchMatch(range: $0, originalForegroundColor: color ?? .label, originalBackgroundColor: backgroundColor)
             }
 
             for match in matches {
@@ -225,6 +228,9 @@ final class RichTextViewModel: ObservableObject {
 #else
             textStorage.addAttribute(.foregroundColor, value: match.originalForegroundColor, range: range)
             textStorage.removeAttribute(.backgroundColor, range: range)
+            if let backgroundColor = match.originalBackgroundColor {
+                textStorage.addAttribute(.backgroundColor, value: backgroundColor, range: range)
+            }
 #endif
         }
     }
