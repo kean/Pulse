@@ -84,7 +84,7 @@ struct NetworkInspectorView: View {
             Image(systemName: "square.and.arrow.up")
         })
         Menu(content: {
-            ContextMenu.NetworkTaskContextMenuItems(task: task, sharedItems: $shareItems)
+            ContextMenu.NetworkTaskContextMenuItems(task: task, sharedItems: $shareItems, isDetailsView: true)
         }, label: {
             Image(systemName: "ellipsis.circle")
         })

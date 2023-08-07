@@ -66,7 +66,7 @@ enum ContextMenu {
         @Binding private(set) var sharedTask: NetworkTaskEntity?
 #endif
 
-        @EnvironmentObject private var environment: ConsoleEnvironment
+        var isDetailsView = false
 
         var body: some View {
             Section {
@@ -79,11 +79,11 @@ enum ContextMenu {
 #endif
                 ContextMenu.NetworkTaskCopyMenu(task: task)
             }
-            if environment.mode == .network {
-                Section {
-                    NetworkTaskFilterMenu(task: task)
-                }
+#if os(iOS)
+            if !isDetailsView {
+                NetworkTaskFilterMenu(task: task)
             }
+#endif
             if let message = task.message {
                 Section {
                     PinButton(viewModel: .init(message))
@@ -98,9 +98,19 @@ enum ContextMenu {
     struct NetworkTaskFilterMenu: View {
         let task: NetworkTaskEntity
 
+        @EnvironmentObject private var environment: ConsoleEnvironment
         @EnvironmentObject private var filters: ConsoleFiltersViewModel
 
         var body: some View {
+            if environment.mode == .network {
+                Section {
+                    menus
+                }
+            }
+        }
+
+        @ViewBuilder
+        private var menus: some View {
             Menu(content: {
                 if let host = task.host {
                     Button("Host '\(host)'") {
