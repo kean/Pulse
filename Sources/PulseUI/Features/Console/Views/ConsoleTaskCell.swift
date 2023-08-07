@@ -177,14 +177,14 @@ private let titleSpacing: CGFloat? = nil
 struct MockBadgeView: View {
     var body: some View {
         Text("MOCK")
-        #if os(watchOS)
+#if os(watchOS)
             .font(.footnote)
-        #elseif os(tvOS)
+#elseif os(tvOS)
             .font(.caption2)
-        #else
+#else
             .font(ConsoleConstants.fontInfo)
             .fontWeight(.medium)
-        #endif
+#endif
             .foregroundStyle(Color.white)
             .background(background)
     }
