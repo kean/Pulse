@@ -1,5 +1,12 @@
 # Pulse 4.x
 
+## Pulse 4.0.1
+
+*Aug 7, 2023*
+
+- Fix [#211](https://github.com/kean/Pulse/issues/211): crash when opening network details on iOS
+- Fix [#208](https://github.com/kean/Pulse/issues/208): searching removes the backgroundColor of decoding error highlighted text – [#210](https://github.com/kean/Pulse/pull/210) by @Ahattalla 
+
 ## Pulse 4.0
 
 *Aug 6, 2023*
