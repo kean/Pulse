@@ -20,6 +20,12 @@
 	<string>1</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_pulse._tcp</string>
+	</array>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Network usage required for debugging purposes </string>
 	<key>UILaunchScreen</key>
 	<dict/>
 	<key>UIRequiredDeviceCapabilities</key>
@@ -28,11 +34,5 @@
 	</array>
 	<key>UIUserInterfaceStyle</key>
 	<string>Automatic</string>
-    <key>NSLocalNetworkUsageDescription</key>
-    <string>Network usage required for debugging purposes </string>
-    <key>NSBonjourServices</key>
-    <array>
-      <string>_pulse._tcp</string>
-    </array>
 </dict>
 </plist>
