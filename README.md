@@ -1,5 +1,5 @@
 <br/>
-<img width="2100" alt="promo-main" src="https://github.com/kean/Pulse/assets/1567433/83826534-51a3-45b2-8fd2-df70a2744421">
+<img width="2100" alt="promo-main" src="https://github.com/kean/Pulse/assets/1567433/d8d588db-e165-4beb-9aec-c4a93e59ba29">
 
 [**Pulse**](https://kean.blog/pulse/home) is a powerful logging system for Apple Platforms. Native. Built with SwiftUI.
 
