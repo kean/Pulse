@@ -1,5 +1,9 @@
 # Pulse 4.x
 
+## Upcoming
+
+- Update JSON color theme on watchOS
+
 ## Pulse 4.0.1
 
 *Aug 7, 2023*
