@@ -24,6 +24,11 @@ public struct SettingsView: View {
             if store === RemoteLogger.shared.store {
                 RemoteLoggerSettingsView(viewModel: .shared)
             }
+            Section {
+                NavigationLink(destination: StoreDetailsView(source: .store(store)), label: {
+                    Text("Store Info")
+                })
+            }
             Section(header: Text("Appearance")) {
                 Stepper("Line Limit: \(settings.lineLimit)", value: $settings.lineLimit, in: 1...20)
                 Toggle("Link Detection", isOn: $settings.isLinkDetectionEnabled)

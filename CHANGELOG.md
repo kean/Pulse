@@ -2,8 +2,9 @@
 
 ## Upcoming
 
-- Update JSON color theme on watchOS
-- The console now fully adopts to your app's tint color
+- Update JSON color theme (watchOS)
+- The console now fully adopts to your app's tint color (iOS, watchOS, macOS, tvOS)
+- Move "Store Info" button to Settings (iOS)
 
 ## Pulse 4.0.1
 

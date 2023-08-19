@@ -15,7 +15,6 @@ final class ConsoleRouter: ObservableObject {
     @Published var isShowingFilters = false
     @Published var isShowingSettings = false
     @Published var isShowingSessions = false
-    @Published var isShowingStoreInfo = false
     @Published var isShowingShareStore = false
 }
 
@@ -45,7 +44,6 @@ extension ConsoleRouterView {
             .sheet(isPresented: $router.isShowingFilters) { destinationFilters }
             .sheet(isPresented: $router.isShowingSettings) { destinationSettings }
             .sheet(isPresented: $router.isShowingSessions) { destinationSessions }
-            .sheet(isPresented: $router.isShowingStoreInfo) { destinationStoreInfo }
             .sheet(isPresented: $router.isShowingShareStore) { destinationShareStore }
             .sheet(item: $router.shareItems, content: ShareView.init)
     }
@@ -83,15 +81,6 @@ extension ConsoleRouterView {
                 .navigationTitle("Settings")
                 .navigationBarTitleDisplayMode(.inline)
                 .navigationBarItems(trailing: Button(action: { router.isShowingSettings = false }) {
-                    Text("Done")
-                })
-        }
-    }
-
-    private var destinationStoreInfo: some View {
-        NavigationView {
-            StoreDetailsView(source: .store(environment.store))
-                .navigationBarItems(trailing: Button(action: { router.isShowingStoreInfo = false }) {
                     Text("Done")
                 })
         }

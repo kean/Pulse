@@ -26,18 +26,13 @@ struct ConsoleContextMenu: View {
                 ConsoleGroupByMenu()
             }
             Section {
-                Button(action: { router.isShowingStoreInfo = true }) {
-                    Label("Store Info", systemImage: "info.circle")
+                Button(action: { router.isShowingSettings = true }) {
+                    Label("Settings", systemImage: "gear")
                 }
                 if !environment.store.isArchive {
                     Button(role: .destructive, action: environment.removeAllLogs) {
                         Label("Remove Logs", systemImage: "trash")
                     }
-                }
-            }
-            Section {
-                Button(action: { router.isShowingSettings = true }) {
-                    Label("Settings", systemImage: "gear")
                 }
             }
             Section {
