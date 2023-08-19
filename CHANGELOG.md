@@ -2,6 +2,7 @@
 
 ## Upcoming
 
+- Fix an issue with list not displaying older messages (iOS)
 - Update JSON color theme (watchOS)
 - The console now fully adopts to your app's tint color (iOS, watchOS, macOS, tvOS)
 - Move "Store Info" button to Settings (iOS)

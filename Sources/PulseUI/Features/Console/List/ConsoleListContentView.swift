@@ -51,8 +51,13 @@ struct ConsoleListContentView: View {
                 .foregroundColor(.secondary)
         } else {
             ForEach(viewModel.visibleEntities, id: \.objectID) { entity in
+                let objectID = entity.objectID
                 ConsoleEntityCell(entity: entity)
-                    .id(entity.objectID)
+                    .id(objectID)
+#if os(iOS)
+                    .onAppear { viewModel.onAppearCell(with: objectID) }
+                    .onDisappear { viewModel.onDisappearCell(with: objectID) }
+#endif
             }
         }
 #if os(macOS)
