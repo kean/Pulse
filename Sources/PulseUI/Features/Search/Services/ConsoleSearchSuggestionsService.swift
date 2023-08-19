@@ -121,7 +121,7 @@ final class ConsoleNetworkSearchSuggestionsService {
         let isExample = values.isEmpty
         let descriptions = !isExample ? values.map(\.description) : filter.filter.valueExamples
         for (index, description) in descriptions.enumerated() {
-            string.append(description) { $0.foregroundColor = isExample ? .secondary.opacity(0.8) : .blue }
+            string.append(description) { $0.foregroundColor = isExample ? .secondary.opacity(0.8) : .accentColor }
             if index < descriptions.endIndex - 1 {
                 string.append(", ") { $0.foregroundColor = isExample ? .separator : .secondary }
             }
@@ -138,7 +138,7 @@ final class ConsoleNetworkSearchSuggestionsService {
     private func makeSuggestion(for term: ConsoleSearchTerm) -> ConsoleSearchSuggestion {
         ConsoleSearchSuggestion(text: {
             AttributedString("\(term.options.title) ") { $0.foregroundColor = .primary } +
-            AttributedString(term.text) { $0.foregroundColor = .blue }
+            AttributedString(term.text) { $0.foregroundColor = .accentColor }
         }(), action: .apply(.term(term)))
     }
 }

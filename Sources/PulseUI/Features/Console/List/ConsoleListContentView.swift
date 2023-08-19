@@ -68,7 +68,7 @@ struct ConsoleListContentView: View {
             Button(action: { viewModel.buttonShowPreviousSessionTapped(for: session) }) {
                 Text("Show Previous Session")
                     .font(.subheadline)
-                    .foregroundColor(.blue)
+                    .foregroundColor(.accentColor)
                 Spacer()
                 Text(session.formattedDate(isCompact: false))
                     .font(.subheadline)

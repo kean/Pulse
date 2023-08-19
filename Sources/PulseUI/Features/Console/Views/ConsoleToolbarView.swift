@@ -159,13 +159,13 @@ private struct ConsoleModeButton: View {
         Button(action: action) {
             HStack(spacing: 4) {
                 Text(title)
-                    .foregroundColor(isSelected ? Color.blue : Color.secondary)
+                    .foregroundColor(isSelected ? Color.accentColor : Color.secondary)
                     .font(.subheadline.weight(.medium))
                     .lineLimit(1)
                     .allowsTightening(true)
                 if let details = details {
                     Text("(\(details))")
-                        .foregroundColor(isSelected ? Color.blue.opacity(0.7) : Color.secondary.opacity(0.7))
+                        .foregroundColor(isSelected ? Color.accentColor.opacity(0.7) : Color.secondary.opacity(0.7))
                         .font(.subheadline)
                         .lineLimit(1)
                         .allowsTightening(true)
@@ -198,8 +198,9 @@ struct ConsoleListOptionsView: View {
         Button(action: { filters.options.isOnlyErrors.toggle() }) {
             Text(Image(systemName: filters.options.isOnlyErrors ? "exclamationmark.octagon.fill" : "exclamationmark.octagon"))
                 .font(.body)
-                .foregroundColor(filters.options.isOnlyErrors ? .red : .blue)
+                .foregroundColor(.accentColor)
         }
+        .cornerRadius(4)
         .padding(.leading, 1)
         .dynamicTypeSize(...DynamicTypeSize.accessibility1)
 #endif

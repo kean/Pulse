@@ -131,7 +131,7 @@ struct ShareStoreView: View {
             .disabled(viewModel.isPreparingForSharing)
             .foregroundColor(.white)
 #if os(iOS)
-            .listRowBackground(viewModel.isPreparingForSharing ? Color.blue.opacity(0.33) : Color.blue)
+            .listRowBackground(viewModel.isPreparingForSharing ? Color.accentColor.opacity(0.33) : Color.accentColor)
 #endif
         }
     }

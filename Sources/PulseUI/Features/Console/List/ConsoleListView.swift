@@ -121,7 +121,7 @@ private struct _ConsoleListView: View {
                 HStack {
                     Text(Image(systemName: "applewatch"))
                     Text("Show Imported Store")
-                }.foregroundColor(.blue)
+                }.foregroundColor(.accentColor)
             }.buttonStyle(.plain)
             Spacer()
             Button(role: .destructive, action: syncSession.removeImportedDocument) {

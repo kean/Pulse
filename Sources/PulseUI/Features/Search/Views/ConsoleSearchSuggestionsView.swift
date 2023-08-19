@@ -66,7 +66,7 @@ struct ConsoleSearchSuggestionsView: View {
                 HStack {
                     Text("Clear Search History")
                 }
-                .foregroundColor(.blue)
+                .foregroundColor(.accentColor)
                 .font(.subheadline)
             }.buttonStyle(.plain)
         }

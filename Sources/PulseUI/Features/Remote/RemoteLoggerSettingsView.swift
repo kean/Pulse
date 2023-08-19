@@ -106,7 +106,7 @@ struct RemoteLoggerSettingsView: View {
                     .lineLimit(1)
                 if server.isSelected {
                     Image(systemName: "checkmark")
-                        .foregroundColor(.blue)
+                        .foregroundColor(.accentColor)
                         .font(.system(size: 15, weight: .medium))
 #if os(iOS)
                         .frame(width: 21, height: 36, alignment: .center)

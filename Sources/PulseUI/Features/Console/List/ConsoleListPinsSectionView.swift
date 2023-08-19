@@ -33,7 +33,7 @@ struct ConsoleListPinsSectionView: View {
         Button(action: viewModel.buttonRemovePinsTapped) {
             Text("Remove Pins")
                 .font(.subheadline)
-                .foregroundColor(Color.blue)
+                .foregroundColor(.accentColor)
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
         .buttonStyle(.plain)

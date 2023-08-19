@@ -37,7 +37,7 @@ struct RichTextViewSearchToobar: View {
     private var options: some View {
         ZStack {
             Image(systemName: "ellipsis.circle")
-                .foregroundColor(.blue)
+                .foregroundColor(.accentColor)
                 .font(.system(size: 20))
                 .opacity(isRealMenuShown ? 0 : 1)
             if isRealMenuShown {

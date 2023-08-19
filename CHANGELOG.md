@@ -3,6 +3,7 @@
 ## Upcoming
 
 - Update JSON color theme on watchOS
+- The console now fully adopts to your app's tint color
 
 ## Pulse 4.0.1
 

@@ -225,7 +225,7 @@ struct PlainListExpandableSectionHeader<Destination: View>: View {
                 if !isSeeAllHidden {
                     Spacer()
                     Text("See All")
-                        .foregroundColor(.blue)
+                        .foregroundColor(.accentColor)
                         .font(.subheadline)
                         .background(NavigationLink("", destination: destination).opacity(0))
                 }
@@ -239,7 +239,7 @@ struct PlainListSeeAllView: View {
     let count: Int
 
     var body: some View {
-        (Text("See All").foregroundColor(.blue) +
+        (Text("See All").foregroundColor(.accentColor) +
          Text("  (\(count))"))
         .font(.subheadline)
         .foregroundColor(.secondary)

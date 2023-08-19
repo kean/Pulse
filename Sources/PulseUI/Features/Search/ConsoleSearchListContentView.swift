@@ -35,7 +35,7 @@ struct ConsoleSearchListContentView: View {
             .font(.subheadline.weight(.medium))
             .foregroundColor(.white)
             .padding(8)
-            .background(Color.blue)
+            .background(Color.accentColor)
             .cornerRadius(8)
         }
 #if os(iOS)

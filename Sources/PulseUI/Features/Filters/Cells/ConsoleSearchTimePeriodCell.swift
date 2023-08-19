@@ -28,7 +28,7 @@ struct ConsoleSearchTimePeriodCell: View {
         }
         .buttonStyle(.plain)
         .padding(.top, 4)
-        .foregroundColor(.blue)
+        .foregroundColor(.accentColor)
     }
 }
 

@@ -21,10 +21,10 @@ struct ConsoleSearchSuggestionView: View {
                     switch token {
                     case .filter:
                         Image(systemName: "line.3.horizontal.decrease.circle")
-                            .foregroundColor(.blue)
+                            .foregroundColor(.accentColor)
                     case .term:
                         Image(systemName: "magnifyingglass")
-                            .foregroundColor(.blue)
+                            .foregroundColor(.accentColor)
                     }
                 } else {
                     Image(systemName: "line.3.horizontal.decrease.circle")
