@@ -42,8 +42,8 @@ struct ConsoleContextMenu: View {
             }
             Section {
                 if !UserDefaults.standard.bool(forKey: "pulse-disable-support-prompts") {
-                    Button(action: buttonSponsorTapped) {
-                        Label("Sponsor", systemImage: "heart")
+                    Button(action: buttonGetPulseProTapped) {
+                        Label("Get Pulse Pro", systemImage: "link")
                     }
                 }
                 Button(action: buttonSendFeedbackTapped) {
@@ -55,8 +55,8 @@ struct ConsoleContextMenu: View {
         }
     }
 
-    private func buttonSponsorTapped() {
-        guard let url = URL(string: "https://github.com/sponsors/kean") else { return }
+    private func buttonGetPulseProTapped() {
+        guard let url = URL(string: "https://pulselogger.com") else { return }
         UIApplication.shared.open(url)
     }
 
