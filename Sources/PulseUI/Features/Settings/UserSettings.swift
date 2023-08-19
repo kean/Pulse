@@ -40,4 +40,9 @@ public final class UserSettings: ObservableObject {
 
     @AppStorage("com.github.kean.pulse.display.headers")
     var rawDisplayHeaders: String = "[]"
+
+    /// If `true`, the network inspector will show the current request by default.
+    /// If `false`, show the original request.
+    @AppStorage("com.github.kean.pulse.show-current-request")
+    public var isShowingCurrentRequest = true
 }

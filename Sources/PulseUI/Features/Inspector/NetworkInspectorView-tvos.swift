@@ -12,7 +12,7 @@ import Combine
 struct NetworkInspectorView: View {
     @ObservedObject var task: NetworkTaskEntity
 
-    @State private var isCurrentRequest = false
+    @ObservedObject private var settings: UserSettings = .shared
 
     var body: some View {
         contents
@@ -32,8 +32,8 @@ struct NetworkInspectorView: View {
             NetworkRequestStatusSectionView(viewModel: .init(task: task))
         }
         Section {
-            NetworkInspectorRequestTypePicker(isCurrentRequest: $isCurrentRequest)
-            NetworkInspectorView.makeRequestSection(task: task, isCurrentRequest: isCurrentRequest)
+            NetworkInspectorRequestTypePicker(isCurrentRequest: $settings.isShowingCurrentRequest)
+            NetworkInspectorView.makeRequestSection(task: task, isCurrentRequest: settings.isShowingCurrentRequest)
         } header: { Text("Request") }
         if task.state != .pending {
             Section {

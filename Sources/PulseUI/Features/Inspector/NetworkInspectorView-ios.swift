@@ -14,7 +14,7 @@ struct NetworkInspectorView: View {
     @ObservedObject var task: NetworkTaskEntity
 
     @State private var shareItems: ShareItems?
-    @State private var isCurrentRequest = false
+    @ObservedObject private var settings: UserSettings = .shared
 
     var body: some View {
         List {
@@ -43,7 +43,7 @@ struct NetworkInspectorView: View {
             NetworkRequestStatusSectionView(viewModel: .init(task: task))
         }
         Section {
-            NetworkInspectorView.makeRequestSection(task: task, isCurrentRequest: isCurrentRequest)
+            NetworkInspectorView.makeRequestSection(task: task, isCurrentRequest: settings.isShowingCurrentRequest)
         } header: { requestTypePicker }
         if task.state != .pending {
             Section {
@@ -61,7 +61,7 @@ struct NetworkInspectorView: View {
         HStack {
             Text("Request Type")
             Spacer()
-            NetworkInspectorRequestTypePicker(isCurrentRequest: $isCurrentRequest)
+            NetworkInspectorRequestTypePicker(isCurrentRequest: $settings.isShowingCurrentRequest)
                 .pickerStyle(.segmented)
                 .labelsHidden()
                 .fixedSize()

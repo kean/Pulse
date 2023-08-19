@@ -5,6 +5,7 @@
 - Update JSON color theme (watchOS)
 - The console now fully adopts to your app's tint color (iOS, watchOS, macOS, tvOS)
 - Move "Store Info" button to Settings (iOS)
+- Network inspector will now show "current" request by default and rememeber your selection (see `UserSettings.shared.isShowingCurrentRequest`)
 
 ## Pulse 4.0.1
 
