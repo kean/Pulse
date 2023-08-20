@@ -1,12 +1,14 @@
 # Pulse 4.x
 
-## Upcoming
+## Pulse 4.0.2
+
+*Aug 19, 2023*
 
 - Fix an issue with list not displaying older messages (iOS)
 - Update JSON color theme (watchOS)
-- The console now fully adopts to your app's tint color (iOS, watchOS, macOS, tvOS)
+- The console now fully adopts your app's tint color (iOS, watchOS, macOS, tvOS)
 - Move "Store Info" button to Settings (iOS)
-- Network inspector will now show "current" request by default and remember your selection (see `UserSettings.shared.isShowingCurrentRequest`)
+- Network inspector will now show a "current" request by default and remember your selection (see `UserSettings.shared.isShowingCurrentRequest`)
 
 ## Pulse 4.0.1
 
