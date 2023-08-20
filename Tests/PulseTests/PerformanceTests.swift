@@ -19,9 +19,7 @@ final class PerformanceTests: XCTestCase {
         try? FileManager.default.createDirectory(at: tempDirectoryURL, withIntermediateDirectories: true, attributes: [:])
         storeURL = tempDirectoryURL.appending(filename: "performance-tests.pulse")
 
-        store = try! LoggerStore(storeURL: storeURL, options: [.create, .synchronous])
-
-        populateStore()
+        store = try! LoggerStore(storeURL: storeURL, options: [.create])
     }
 
     override func tearDown() {
@@ -31,12 +29,14 @@ final class PerformanceTests: XCTestCase {
         try? FileManager.default.removeItem(at: tempDirectoryURL)
     }
 
-    func _testInsert() {
+    func testInsert() {
         measure {
             for _ in 0...5 {
                 populate(store: store)
             }
-            store.backgroundContext.performAndWait {}
+            store.backgroundContext.performAndWait {
+                try? store.backgroundContext.save()
+            }
         }
     }
 
@@ -82,6 +82,32 @@ final class PerformanceTests: XCTestCase {
                 )
             """)
             store.storeMessage(label: "default", level: .critical, message: "💥 0xDEADBEEF")
+        }
+    }
+
+    func testStoreNetworkRequests() throws {
+        try store.destroy()
+        store = try LoggerStore(storeURL: storeURL, options: [.create])
+
+        let mockTask = MockDataTask.login
+        let urlSession = URLSession(configuration: .default)
+        let logger = NetworkLogger(store: store)
+
+        measure {
+            for _ in 0...5 {
+                let dataTask = urlSession.dataTask(with: mockTask.request)
+                dataTask.setValue(mockTask.response, forKey: "response")
+                logger.logTaskCreated(dataTask)
+                for i in 1...100 {
+                    logger.logTask(dataTask, didUpdateProgress: (Int64(i), 100))
+                }
+                logger.logDataTask(dataTask, didReceive: mockTask.responseBody)
+                logger.logTask(dataTask, didFinishCollecting: mockTask.metrics)
+                logger.logTask(dataTask, didCompleteWithError: nil)
+            }
+            store.backgroundContext.performAndWait {
+                try? store.backgroundContext.save()
+            }
         }
     }
 }

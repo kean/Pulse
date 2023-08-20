@@ -351,7 +351,7 @@ extension LoggerStore {
 
     private func process(_ event: Event.NetworkTaskCreated) {
         let entity = findOrCreateTask(forTaskId: event.taskId, taskType: event.taskType, createdAt: event.createdAt, label: event.label, url: event.originalRequest.url)
-        
+
         entity.url = event.originalRequest.url?.absoluteString
         entity.host = event.originalRequest.url.flatMap { $0.getHost() }
         entity.httpMethod = event.originalRequest.httpMethod
