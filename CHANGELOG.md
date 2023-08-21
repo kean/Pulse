@@ -1,5 +1,7 @@
 # Pulse 4.x
 
+- Improve performance of recording network tasks
+
 ## Pulse 4.0.2
 
 *Aug 19, 2023*

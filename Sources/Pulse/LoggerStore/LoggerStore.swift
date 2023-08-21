@@ -59,6 +59,10 @@ public final class LoggerStore: @unchecked Sendable, Identifiable {
     private let manifestURL: URL
     private let databaseURL: URL // Points to a temporary location if archive
 
+    // A single task can generate multiple events. This cache dramatically reduces
+    // the number of database fetches.
+    private var tasksCache: [UUID: NetworkTaskEntity] = [:]
+    // There are cached on a per-task level
     private var requestsCache: [NetworkLogger.Request: NetworkRequestEntity] = [:]
     private var responsesCache: [NetworkLogger.Response: NetworkResponseEntity] = [:]
 
@@ -350,7 +354,7 @@ extension LoggerStore {
     }
 
     private func process(_ event: Event.NetworkTaskCreated) {
-        let entity = findOrCreateTask(forTaskId: event.taskId, taskType: event.taskType, createdAt: event.createdAt, label: event.label, url: event.originalRequest.url)
+        let entity = createTask(forTaskId: event.taskId, taskType: event.taskType, createdAt: event.createdAt, label: event.label, url: event.originalRequest.url)
 
         entity.url = event.originalRequest.url?.absoluteString
         entity.host = event.originalRequest.url.flatMap { $0.getHost() }
@@ -469,6 +473,7 @@ extension LoggerStore {
 
         requestsCache = [:]
         responsesCache = [:]
+        tasksCache[event.taskId] = nil
     }
 
     private func preprocessData(_ data: Data, contentType: NetworkLogger.ContentType?) -> Data {
@@ -486,7 +491,10 @@ extension LoggerStore {
     }
 
     private func findTask(forTaskId taskId: UUID) -> NetworkTaskEntity? {
-        try? backgroundContext.first(NetworkTaskEntity.self) {
+        if let task = tasksCache[taskId] {
+            return task
+        }
+        return try? backgroundContext.first(NetworkTaskEntity.self) {
             $0.predicate = NSPredicate(format: "taskId == %@", taskId as NSUUID)
         }
     }
@@ -495,7 +503,13 @@ extension LoggerStore {
         if let entity = findTask(forTaskId: taskId) {
             return entity
         }
+        return createTask(forTaskId: taskId, taskType: taskType, createdAt: createdAt, label: label, url: url)
+    }
 
+    private func createTask(forTaskId taskId: UUID, taskType: NetworkLogger.TaskType, createdAt: Date, label: String?, url: URL?) -> NetworkTaskEntity {
+        if let entity = tasksCache[taskId] {
+            return entity // Defensive code in case createTask gets called more than once
+        }
         let task = NetworkTaskEntity(context: backgroundContext)
         task.taskId = taskId
         task.taskType = taskType.rawValue
@@ -517,6 +531,8 @@ extension LoggerStore {
 
         message.task = task
         task.message = message
+
+        tasksCache[taskId] = task
 
         return task
     }
@@ -719,7 +735,6 @@ extension LoggerStore {
             debugPrint(error)
 #endif
         }
-        backgroundContext.reset()
     }
 }
 
