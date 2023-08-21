@@ -100,7 +100,7 @@ final class PerformanceTests: XCTestCase {
         let logger = NetworkLogger(store: store)
 
         measure {
-            for _ in 0...5 {
+            for _ in 0...25 {
                 let dataTask = urlSession.dataTask(with: mockTask.request)
                 dataTask.setValue(mockTask.response, forKey: "response")
                 logger.logTaskCreated(dataTask)
