@@ -21,6 +21,7 @@ public final class NetworkLogger: @unchecked Sendable {
     private var sensitiveQueryItems: Set<String> = []
     private var sensitiveDataFields: Set<String> = []
 
+    private var isFilteringNeeded = false
     private let lock = NSLock()
 
     /// The logger configuration.
@@ -131,6 +132,8 @@ public final class NetworkLogger: @unchecked Sendable {
         }
         self.sensitiveQueryItems = configuration.sensitiveQueryItems
         self.sensitiveDataFields = configuration.sensitiveDataFields
+
+        self.isFilteringNeeded = !includedHosts.isEmpty || !excludedHosts.isEmpty || !includedURLs.isEmpty || !excludedURLs.isEmpty
     }
 
     // MARK: Logging
@@ -227,7 +230,7 @@ public final class NetworkLogger: @unchecked Sendable {
     }
 
     private func send(_ event: LoggerStore.Event) {
-        guard filter(event) else {
+        guard !isFilteringNeeded || filter(event) else {
             return
         }
         guard let event = configuration.willHandleEvent(preprocess(event)) else {

@@ -1,6 +1,7 @@
 # Pulse 4.x
 
-- Improve performance of recording network tasks
+- Improve performance of recording network tasks (significant improvement)
+- Improve `NetworkLogger` performance
 
 ## Pulse 4.0.2
 
