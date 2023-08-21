@@ -19,7 +19,13 @@ final class PerformanceTests: XCTestCase {
         try? FileManager.default.createDirectory(at: tempDirectoryURL, withIntermediateDirectories: true, attributes: [:])
         storeURL = tempDirectoryURL.appending(filename: "performance-tests.pulse")
 
-        store = try! LoggerStore(storeURL: storeURL, options: [.create])
+        store = try! LoggerStore(storeURL: storeURL, options: [.create], configuration: makeConfiguration())
+    }
+
+    private func makeConfiguration() -> LoggerStore.Configuration {
+        var configuration = LoggerStore.Configuration()
+        configuration.isAutoStartingSession = false
+        return configuration
     }
 
     override func tearDown() {
@@ -87,7 +93,7 @@ final class PerformanceTests: XCTestCase {
 
     func testStoreNetworkRequests() throws {
         try store.destroy()
-        store = try LoggerStore(storeURL: storeURL, options: [.create])
+        store = try LoggerStore(storeURL: storeURL, options: [.create], configuration: makeConfiguration())
 
         let mockTask = MockDataTask.login
         let urlSession = URLSession(configuration: .default)
