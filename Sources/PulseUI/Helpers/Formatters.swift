@@ -67,11 +67,11 @@ enum ConsoleFormatter {
         return label.capitalized
     }
 
-    static func subheadline(for task: NetworkTaskEntity, hasTime: Bool = true) -> String {
+    static func subheadline(for task: NetworkTaskEntity, hasTime: Bool = true, store: LoggerStore) -> String {
         return [
             hasTime ? time(for: task.createdAt) : nil,
             task.httpMethod ?? "GET",
-            status(for: task),
+            status(for: task, store: store),
             transferSize(for: task),
             duration(for: task)
         ].compactMap { $0 }.joined(separator: separator)
@@ -99,9 +99,11 @@ enum ConsoleFormatter {
         }
     }
 
-    @available(*, deprecated, renamed: "Ds", message: "ds")
-    static func status(for task: NetworkTaskEntity) -> String {
-        switch task.state {
+    static func status(for task: NetworkTaskEntity, store: LoggerStore) -> String {
+        guard let state = task.state(in: store) else {
+            return "Unknown"
+        }
+        switch state {
         case .pending:
             return ProgressViewModel.title(for: task)
         case .success:

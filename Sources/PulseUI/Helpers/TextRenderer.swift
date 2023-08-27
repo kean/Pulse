@@ -90,7 +90,7 @@ final class TextRenderer {
         if content.contains(.largeHeader) {
             renderLargeHeader(for: task, store: store)
         } else if content.contains(.header) {
-            renderHeader(for: task)
+            renderHeader(for: task, store: store)
         }
 
         if content.contains(.taskDetails) {
@@ -171,11 +171,11 @@ final class TextRenderer {
         addSpacer()
     }
 
-    private func renderHeader(for task: NetworkTaskEntity) {
+    private func renderHeader(for task: NetworkTaskEntity, store: LoggerStore) {
         let isTitleColored = task.state == .failure && options.color != .monochrome
         let titleColor = isTitleColored ? UXColor.systemRed : UXColor.secondaryLabel
         let detailsColor = isTitleColored ? UXColor.systemRed : UXColor.label
-        let title = ConsoleFormatter.subheadline(for: task)
+        let title = ConsoleFormatter.subheadline(for: task, store: store)
         string.append(title + "\n", helper.attributes(role: .subheadline, style: .monospacedDigital, width: .condensed, color: titleColor))
         var urlAttributes = helper.attributes(role: .body2, weight: .medium, color: detailsColor)
         urlAttributes[.underlineColor] = UXColor.clear
