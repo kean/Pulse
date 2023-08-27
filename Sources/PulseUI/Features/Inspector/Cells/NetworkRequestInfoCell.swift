@@ -30,11 +30,13 @@ final class NetworkRequestInfoCellViewModel {
     let url: String
     let render: () -> NSAttributedString
 
-    init(task: NetworkTaskEntity) {
+    init(task: NetworkTaskEntity, store: LoggerStore) {
         self.httpMethod = task.httpMethod ?? "GET"
         self.url = task.url ?? "–"
         self.render = {
-            TextRenderer(options: .sharing).make { $0.render(task, content: .all) }
+            TextRenderer(options: .sharing).make {
+                $0.render(task, content: .all, store: store)
+            }
         }
     }
 
@@ -51,7 +53,7 @@ struct NetworkRequestInfoCell_Previews: PreviewProvider {
         NavigationView {
             List {
                 ForEach(MockTask.allEntities, id: \.objectID) { task in
-                    NetworkRequestInfoCell(viewModel: .init(task: task))
+                    NetworkRequestInfoCell(viewModel: .init(task: task, store: .mock))
                 }
             }
 #if os(macOS)

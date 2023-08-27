@@ -29,7 +29,7 @@ extension NetworkInspectorView {
     }
 
     @ViewBuilder
-    static func makeHeaderView(task: NetworkTaskEntity) -> some View {
+    static func makeHeaderView(task: NetworkTaskEntity, store: LoggerStore) -> some View {
         ZStack {
             NetworkInspectorTransferInfoView(viewModel: .init(empty: true))
                 .hidden()
@@ -40,9 +40,9 @@ extension NetworkInspectorView {
                 SpinnerView(viewModel: ProgressViewModel(task: task))
             } else {
                 // Fallback in case metrics are disabled
-                let status = NetworkRequestStatusSectionViewModel(task: task).status 
-                Image(systemName: status.imageName)
-                    .foregroundColor(status.tintColor)
+                let status = NetworkRequestStatusSectionViewModel(task: task, store: store).status
+                Image(systemName: status.status.systemImage)
+                    .foregroundColor(status.status.tint)
                     .font(.system(size: 64))
             }
         }

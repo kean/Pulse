@@ -51,8 +51,8 @@ enum ShareService {
         return share(string, as: output)
     }
 
-    static func share(_ task: NetworkTaskEntity, as output: ShareOutput) -> ShareItems {
-        let string = TextRenderer(options: .sharing).make { $0.render(task, content: .sharing) }
+    static func share(_ task: NetworkTaskEntity, as output: ShareOutput, store: LoggerStore) -> ShareItems {
+        let string = TextRenderer(options: .sharing).make { $0.render(task, content: .sharing, store: store) }
         return share(string, as: output)
     }
 

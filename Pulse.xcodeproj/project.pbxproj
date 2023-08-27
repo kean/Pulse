@@ -68,6 +68,7 @@
 		0C38F57B2A34BFA0001E19C0 /* RemoteLoggerSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C38F57A2A34BFA0001E19C0 /* RemoteLoggerSettingsViewModel.swift */; };
 		0C40C09A296F77F1009ECF16 /* ConsoleSearchToggleCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C40C099296F77F1009ECF16 /* ConsoleSearchToggleCell.swift */; };
 		0C40C0A4296F849E009ECF16 /* ConsoleSearchTimePeriodCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C40C0A3296F849E009ECF16 /* ConsoleSearchTimePeriodCell.swift */; };
+		0C48F75B2A9BB5D300848B2E /* StatusLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C48F75A2A9BB5D300848B2E /* StatusLabel.swift */; };
 		0C4BF92D298817EC0086A6A7 /* IntlineTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C4BF92C298817EC0086A6A7 /* IntlineTabBar.swift */; };
 		0C603BD829E45A3C004FD4ED /* ConsoleListPinsSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C603BD729E45A3C004FD4ED /* ConsoleListPinsSectionView.swift */; };
 		0C603BDA29E45DCC004FD4ED /* ConsoleListGroupedSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C603BD929E45DCC004FD4ED /* ConsoleListGroupedSectionView.swift */; };
@@ -519,6 +520,7 @@
 		0C38F57A2A34BFA0001E19C0 /* RemoteLoggerSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteLoggerSettingsViewModel.swift; sourceTree = "<group>"; };
 		0C40C099296F77F1009ECF16 /* ConsoleSearchToggleCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchToggleCell.swift; sourceTree = "<group>"; };
 		0C40C0A3296F849E009ECF16 /* ConsoleSearchTimePeriodCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchTimePeriodCell.swift; sourceTree = "<group>"; };
+		0C48F75A2A9BB5D300848B2E /* StatusLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusLabel.swift; sourceTree = "<group>"; };
 		0C4BF92C298817EC0086A6A7 /* IntlineTabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntlineTabBar.swift; sourceTree = "<group>"; };
 		0C603BD729E45A3C004FD4ED /* ConsoleListPinsSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleListPinsSectionView.swift; sourceTree = "<group>"; };
 		0C603BD929E45DCC004FD4ED /* ConsoleListGroupedSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleListGroupedSectionView.swift; sourceTree = "<group>"; };
@@ -1163,6 +1165,7 @@
 				0CF0D58C296F189500EED9D4 /* UXKit.swift */,
 				0CF0D57E296F189500EED9D4 /* UIKit+Extensions.swift */,
 				0CF0D593296F189500EED9D4 /* Formatters.swift */,
+				0C48F75A2A9BB5D300848B2E /* StatusLabel.swift */,
 				0CF0D57D296F189500EED9D4 /* TextRenderer.swift */,
 				0CF0D589296F189500EED9D4 /* TextHelper.swift */,
 				0CF0D582296F189500EED9D4 /* TextRendererHTML.swift */,
@@ -2017,6 +2020,7 @@
 				0C63A387297A432500F6A6A5 /* ConsoleSearchContextMenu.swift in Sources */,
 				0C4BF92D298817EC0086A6A7 /* IntlineTabBar.swift in Sources */,
 				0CF0D645296F189600EED9D4 /* ConsoleSearchSectionHeader.swift in Sources */,
+				0C48F75B2A9BB5D300848B2E /* StatusLabel.swift in Sources */,
 				0CF0D62A296F189600EED9D4 /* KeyValueSectionViewModel.swift in Sources */,
 				0CF0D638296F189600EED9D4 /* ImageViewer.swift in Sources */,
 				0CF5E60929981ADF009FF7AE /* ShareStoreViewModel.swift in Sources */,

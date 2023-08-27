@@ -146,6 +146,8 @@ enum ContextMenu {
         let task: NetworkTaskEntity
         @Binding var shareItems: ShareItems?
 
+        @Environment(\.store) private var store
+
         var body: some View {
             Menu(content: content) {
                 Label("Share...", systemImage: "square.and.arrow.up")
@@ -156,7 +158,7 @@ enum ContextMenu {
         private func content() -> some View {
             AttributedStringShareMenu(shareItems: $shareItems) {
                 TextRenderer(options: .sharing).make {
-                    $0.render(task, content: .sharing)
+                    $0.render(task, content: .sharing, store: store)
                 }
             }
             Button(action: { shareItems = ShareItems([task.cURLDescription()]) }) {
@@ -333,7 +335,7 @@ struct StringSearchOptionsMenu_Previews: PreviewProvider {
             Spacer()
             Menu(content: {
                 AttributedStringShareMenu(shareItems: .constant(nil)) {
-                    TextRenderer(options: .sharing).make { $0.render(LoggerStore.preview.entity(for: .login), content: .sharing) }
+                    TextRenderer(options: .sharing).make { $0.render(LoggerStore.preview.entity(for: .login), content: .sharing, store: .mock) }
                 }
             }) {
                 Text("Attributed String Share")

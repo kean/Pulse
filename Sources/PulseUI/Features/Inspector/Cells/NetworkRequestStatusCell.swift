@@ -25,11 +25,8 @@ struct NetworkRequestStatusCell: View {
 #else
     var body: some View {
         HStack(spacing: spacing) {
-            Text(Image(systemName: viewModel.imageName))
-                .foregroundColor(viewModel.tintColor)
-            Text(viewModel.title)
+            viewModel.status.text
                 .lineLimit(1)
-                .foregroundColor(viewModel.tintColor)
             Spacer()
             detailsView
         }
@@ -57,36 +54,18 @@ struct NetworkRequestStatusCell: View {
 }
 
 struct NetworkRequestStatusCellModel {
-    let imageName: String
-    let title: String
-    let tintColor: Color
+    let status: StatusLabelViewModel
     let isMock: Bool
     fileprivate let duration: DurationViewModel?
 
-    init(task: NetworkTaskEntity) {
-        self.title = ConsoleFormatter.status(for: task)
-        self.imageName = task.state.iconSystemName
-        self.tintColor = task.state.tintColor
+    init(task: NetworkTaskEntity, store: LoggerStore) {
+        self.status = StatusLabelViewModel(task: task, store: store)
         self.duration = DurationViewModel(task: task)
         self.isMock = task.isMocked
     }
 
     init(transaction: NetworkTransactionMetricsEntity) {
-        if let response = transaction.response {
-            if response.isSuccess {
-                imageName = "checkmark.circle.fill"
-                title = StatusCodeFormatter.string(for: Int(response.statusCode))
-                tintColor = .green
-            } else {
-                imageName = "exclamationmark.octagon.fill"
-                title = StatusCodeFormatter.string(for: Int(response.statusCode))
-                tintColor = .red
-            }
-        } else {
-            imageName = "exclamationmark.octagon.fill"
-            title = "No Response"
-            tintColor = .secondary
-        }
+        status = StatusLabelViewModel(transaction: transaction)
         duration = DurationViewModel(transaction: transaction)
         isMock = false
     }
@@ -149,12 +128,6 @@ private let spacing: CGFloat = 20
 private let spacing: CGFloat? = nil
 #endif
 
-private extension NetworkResponseEntity {
-    var isSuccess: Bool {
-        (100..<400).contains(statusCode)
-    }
-}
-
 #if DEBUG
 @available(iOS 15, *)
 struct NetworkRequestStatusCell_Previews: PreviewProvider {
@@ -162,7 +135,7 @@ struct NetworkRequestStatusCell_Previews: PreviewProvider {
         NavigationView {
             List {
                 ForEach(MockTask.allEntities, id: \.objectID) { task in
-                    NetworkRequestStatusCell(viewModel: .init(task: task))
+                    NetworkRequestStatusCell(viewModel: .init(task: task, store: .mock))
                 }
             }
 #if os(macOS)

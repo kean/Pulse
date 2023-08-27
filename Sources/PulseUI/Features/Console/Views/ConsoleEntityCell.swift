@@ -75,6 +75,7 @@ private struct _ConsoleTaskCell: View {
     let task: NetworkTaskEntity
     @State private var shareItems: ShareItems?
     @State private var sharedTask: NetworkTaskEntity?
+    @Environment(\.store) private var store
 
     var body: some View {
 #if os(iOS)
@@ -96,7 +97,7 @@ private struct _ConsoleTaskCell: View {
         .swipeActions(edge: .trailing, allowsFullSwipe: true) {
             Button(action: {
 #if os(iOS)
-                shareItems = ShareService.share(task, as: .html)
+                shareItems = ShareService.share(task, as: .html, store: store)
 #else
                 sharedTask = task
 #endif

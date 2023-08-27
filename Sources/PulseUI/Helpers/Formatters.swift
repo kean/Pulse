@@ -99,6 +99,7 @@ enum ConsoleFormatter {
         }
     }
 
+    @available(*, deprecated, renamed: "Ds", message: "ds")
     static func status(for task: NetworkTaskEntity) -> String {
         switch task.state {
         case .pending:

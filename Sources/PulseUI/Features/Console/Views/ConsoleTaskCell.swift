@@ -13,6 +13,7 @@ struct ConsoleTaskCell: View {
     var isDisclosureNeeded = false
 
     @ObservedObject private var settings: UserSettings = .shared
+    @Environment(\.store) private var store: LoggerStore
 
     var body: some View {
 #if os(macOS)
@@ -51,7 +52,7 @@ struct ConsoleTaskCell: View {
                 MockBadgeView()
                     .padding(.trailing, 2)
             }
-            (Text(Image(systemName: task.state.iconSystemName)) + Text(" " + ConsoleFormatter.status(for: task)))
+            StatusLabelViewModel(task: task, store: store).text
                 .font(ConsoleConstants.fontTitle)
                 .fontWeight(.medium)
                 .foregroundColor(task.state.tintColor)

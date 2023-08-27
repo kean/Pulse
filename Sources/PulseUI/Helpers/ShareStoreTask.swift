@@ -75,7 +75,7 @@ final class ShareStoreTask {
             case .message(let message):
                 renderer.render(message)
             case .task(let task):
-                renderer.render(task, content: content)
+                renderer.render(task, content: content, store: store)
             }
             if index < objectIDs.endIndex - 1 {
                 renderer.addSpacer()

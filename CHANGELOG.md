@@ -2,6 +2,8 @@
 
 - Improve performance of recording network tasks (significant improvement)
 - Improve `NetworkLogger` performance
+- Fix an issue with requests from the previous app run being displayed as pending
+- Add "Mock" badge when exporting store using one of the text formats
 
 ## Pulse 4.0.2
 

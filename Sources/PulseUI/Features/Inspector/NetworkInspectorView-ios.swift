@@ -15,6 +15,7 @@ struct NetworkInspectorView: View {
 
     @State private var shareItems: ShareItems?
     @ObservedObject private var settings: UserSettings = .shared
+    @Environment(\.store) private var store
 
     var body: some View {
         List {
@@ -36,11 +37,11 @@ struct NetworkInspectorView: View {
     
     @ViewBuilder
     private var contents: some View {
-        Section { NetworkInspectorView.makeHeaderView(task: task) }
+        Section { NetworkInspectorView.makeHeaderView(task: task, store: store) }
             .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
             .listRowBackground(Color.clear)
         Section {
-            NetworkRequestStatusSectionView(viewModel: .init(task: task))
+            NetworkRequestStatusSectionView(viewModel: .init(task: task, store: store))
         }
         Section {
             NetworkInspectorView.makeRequestSection(task: task, isCurrentRequest: settings.isShowingCurrentRequest)
@@ -75,7 +76,9 @@ struct NetworkInspectorView: View {
         PinButton(viewModel: PinButtonViewModel(task), isTextNeeded: false)
         Menu(content: {
             AttributedStringShareMenu(shareItems: $shareItems) {
-                TextRenderer(options: .sharing).make { $0.render(task, content: .sharing) }
+                TextRenderer(options: .sharing).make {
+                    $0.render(task, content: .sharing, store: store)
+                }
             }
             Button(action: { shareItems = ShareItems([task.cURLDescription()]) }) {
                 Label("Share as cURL", systemImage: "square.and.arrow.up")
