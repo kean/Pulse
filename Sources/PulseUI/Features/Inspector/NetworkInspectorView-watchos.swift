@@ -13,6 +13,7 @@ struct NetworkInspectorView: View {
     @ObservedObject var task: NetworkTaskEntity
 
     @ObservedObject private var settings: UserSettings = .shared
+    @Environment(\.store) private var store
 
     var body: some View {
         contents
@@ -27,7 +28,7 @@ struct NetworkInspectorView: View {
     var contents: some View {
         List {
             Section {
-                NetworkRequestStatusSectionView(viewModel: .init(task: task))
+                NetworkRequestStatusSectionView(viewModel: .init(task: task, store: store))
             }
             Section {
                 makeTransferInfo(isReceivedHidden: true)

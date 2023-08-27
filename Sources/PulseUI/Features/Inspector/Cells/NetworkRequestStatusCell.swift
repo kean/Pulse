@@ -12,9 +12,9 @@ struct NetworkRequestStatusCell: View {
 #if os(watchOS)
     var body: some View {
         HStack(spacing: spacing) {
-            Text(viewModel.title)
+            Text(viewModel.status.title)
                 .lineLimit(3)
-                .foregroundColor(viewModel.tintColor)
+                .foregroundColor(viewModel.status.tint)
             Spacer()
             detailsView
         }
