@@ -12,6 +12,7 @@ import Combine
 struct NetworkInspectorView: View {
     @ObservedObject var task: NetworkTaskEntity
     @State var selectedTab: NetworkInspectorTab
+    @Environment(\.store) private var store
 
     init(task: NetworkTaskEntity,
          tab: NetworkInspectorTab = NetworkInspectorPreferences().selectedTab) {
@@ -47,7 +48,7 @@ struct NetworkInspectorView: View {
     private var selectedTabView: some View {
         switch selectedTab {
         case .summary:
-            RichTextView(viewModel: .init(string: TextRenderer(options: .sharing).make { $0.render(task, content: .summary) }))
+            RichTextView(viewModel: .init(string: TextRenderer(options: .sharing).make { $0.render(task, content: .summary, store: store) }))
         case .headers:
             RichTextView(viewModel: .init(string: renderHeaders()))
         case .request:

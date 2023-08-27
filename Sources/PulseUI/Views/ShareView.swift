@@ -109,11 +109,12 @@ struct ShareNetworkTaskView: View {
     @AppStorage("com-github-kean-selected-task-sharing-option") private var output: Output = .plainText
 
     @State private var items: ShareItems?
+    @Environment(\.store) private var store
 
     var body: some View {
         VStack(spacing: 0) {
             VStack(spacing: 8) {
-                NetworkRequestStatusCell(viewModel: .init(task: task))
+                NetworkRequestStatusCell(viewModel: .init(task: task, store: store))
                 HStack {
                     VStack(alignment: .leading) {
                         Text(task.httpMethod ?? "GET").fontWeight(.semibold)
@@ -145,7 +146,7 @@ struct ShareNetworkTaskView: View {
     private func render(with output: Output) {
         var asString: NSAttributedString {
             TextRenderer(options: .sharing).make {
-                $0.render(task, content: .sharing)
+                $0.render(task, content: .sharing, store: store)
             }
         }
         switch output {
