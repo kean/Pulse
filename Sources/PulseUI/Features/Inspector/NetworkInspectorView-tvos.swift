@@ -13,6 +13,7 @@ struct NetworkInspectorView: View {
     @ObservedObject var task: NetworkTaskEntity
 
     @ObservedObject private var settings: UserSettings = .shared
+    @Environment(\.store) private var store
 
     var body: some View {
         contents
@@ -29,7 +30,7 @@ struct NetworkInspectorView: View {
     @ViewBuilder
     private var lhs: some View {
         Section {
-            NetworkRequestStatusSectionView(viewModel: .init(task: task))
+            NetworkRequestStatusSectionView(viewModel: .init(task: task, store: store))
         }
         Section {
             NetworkInspectorRequestTypePicker(isCurrentRequest: $settings.isShowingCurrentRequest)
@@ -49,7 +50,7 @@ struct NetworkInspectorView: View {
     @ViewBuilder
     private var rhs: some View {
         Section {
-            NetworkInspectorView.makeHeaderView(task: task)
+            NetworkInspectorView.makeHeaderView(task: task, store: store)
                 .padding(.bottom, 32)
         }
         .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
