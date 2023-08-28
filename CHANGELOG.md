@@ -1,9 +1,13 @@
 # Pulse 4.x
 
-- Improve performance of recording network tasks (significant improvement)
+## Pulse 4.0.3
+
+*Aug 27, 2023*
+
+- Improve performance of recording network tasks
 - Improve `NetworkLogger` performance
 - Fix an issue with requests from the previous app run being displayed as pending
-- Add "Mock" badge when exporting store using one of the text formats
+- Add a "Mock" badge when exporting the store using one of the text formats
 
 ## Pulse 4.0.2
 
