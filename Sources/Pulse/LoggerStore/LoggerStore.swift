@@ -624,6 +624,11 @@ extension LoggerStore {
         }
         if let entity = existingEntity {
             entity.linkCount += 1
+            do {
+                   try backgroundContext.save()
+               } catch {
+                   print("Error saving managed object context: \(error)")
+               }
             return entity
         }
 

@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 54;
+	objectVersion = 53;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -1085,8 +1085,8 @@
 			children = (
 				0CF0D48C296F14CF00EED9D4 /* NetworkLogger */,
 				0CF0D494296F14CF00EED9D4 /* RemoteLogger */,
-				0CF0D49A296F14CF00EED9D4 /* LoggerStore */,
 				0CF0D4A3296F14CF00EED9D4 /* Helpers */,
+				0CF0D49A296F14CF00EED9D4 /* LoggerStore */,
 				0CF0D493296F14CF00EED9D4 /* Pulse.docc */,
 			);
 			path = Pulse;
