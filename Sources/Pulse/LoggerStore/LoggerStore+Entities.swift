@@ -289,7 +289,7 @@ public final class LoggerBlobHandleEntity: NSManagedObject {
     }
 
     /// A number of requests referencing it.
-    @NSManaged var linkCount: Int16
+    @NSManaged var linkCount: Int32
 
     /// The logger inlines small blobs in a separate table in the database which
     /// significantly [reduces](https://www.sqlite.org/intern-v-extern-blob.html)

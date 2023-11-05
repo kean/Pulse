@@ -1,5 +1,9 @@
 # Pulse 4.x
 
+## Pulse 4.0.4
+
+- Fix [#217](https://github.com/kean/Pulse/issues/217): arithmetic overflow when the the number of deduplicated data links exceed the size limit 
+
 ## Pulse 4.0.3
 
 *Aug 27, 2023*

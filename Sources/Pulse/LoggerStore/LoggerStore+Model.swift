@@ -138,7 +138,7 @@ extension LoggerStore {
             Attribute(name: "key", type: .binaryDataAttributeType),
             Attribute(name: "size", type: .integer32AttributeType),
             Attribute(name: "decompressedSize", type: .integer32AttributeType),
-            Attribute(name: "linkCount", type: .integer16AttributeType),
+            Attribute(name: "linkCount", type: .integer32AttributeType),
             Attribute(name: "rawContentType", type: .stringAttributeType),
             Attribute(name: "inlineData", type: .binaryDataAttributeType),
             Attribute(name: "isUncompressed", type: .booleanAttributeType)
