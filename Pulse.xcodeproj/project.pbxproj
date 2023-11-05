@@ -42,6 +42,7 @@
 		0C11EAE92971EBEE0059786A /* MockTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5AF296F189500EED9D4 /* MockTask.swift */; };
 		0C20F3E42A2CE9D900F2F67D /* Keychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C20F3E32A2CE9D900F2F67D /* Keychain.swift */; };
 		0C2343152978B6B900AE7CE6 /* ConsoleSearchSuggestionsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C2343142978B6B900AE7CE6 /* ConsoleSearchSuggestionsService.swift */; };
+		0C2720892AF832C6005DDB1C /* StatusLabelViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C2720882AF832C6005DDB1C /* StatusLabelViewModel.swift */; };
 		0C29F39729FE7F97006CC996 /* WatchConnectivityService-watchOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C29F39629FE7F97006CC996 /* WatchConnectivityService-watchOS.swift */; };
 		0C3002B32986CEF30055F6C2 /* LoggerStoreIndex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C3002B22986CEF30055F6C2 /* LoggerStoreIndex.swift */; };
 		0C30B2F62A3F375400D65F8F /* Pulse_DemoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C30B2F52A3F375400D65F8F /* Pulse_DemoApp.swift */; };
@@ -68,7 +69,6 @@
 		0C38F57B2A34BFA0001E19C0 /* RemoteLoggerSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C38F57A2A34BFA0001E19C0 /* RemoteLoggerSettingsViewModel.swift */; };
 		0C40C09A296F77F1009ECF16 /* ConsoleSearchToggleCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C40C099296F77F1009ECF16 /* ConsoleSearchToggleCell.swift */; };
 		0C40C0A4296F849E009ECF16 /* ConsoleSearchTimePeriodCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C40C0A3296F849E009ECF16 /* ConsoleSearchTimePeriodCell.swift */; };
-		0C48F75B2A9BB5D300848B2E /* StatusLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C48F75A2A9BB5D300848B2E /* StatusLabel.swift */; };
 		0C4BF92D298817EC0086A6A7 /* IntlineTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C4BF92C298817EC0086A6A7 /* IntlineTabBar.swift */; };
 		0C603BD829E45A3C004FD4ED /* ConsoleListPinsSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C603BD729E45A3C004FD4ED /* ConsoleListPinsSectionView.swift */; };
 		0C603BDA29E45DCC004FD4ED /* ConsoleListGroupedSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C603BD929E45DCC004FD4ED /* ConsoleListGroupedSectionView.swift */; };
@@ -507,6 +507,7 @@
 		0C20F3E32A2CE9D900F2F67D /* Keychain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keychain.swift; sourceTree = "<group>"; };
 		0C2343142978B6B900AE7CE6 /* ConsoleSearchSuggestionsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchSuggestionsService.swift; sourceTree = "<group>"; };
 		0C25FB6E25CDDCAB00A895C2 /* URLSessionManualIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionManualIntegration.swift; sourceTree = "<group>"; };
+		0C2720882AF832C6005DDB1C /* StatusLabelViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatusLabelViewModel.swift; sourceTree = "<group>"; };
 		0C29F39629FE7F97006CC996 /* WatchConnectivityService-watchOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WatchConnectivityService-watchOS.swift"; sourceTree = "<group>"; };
 		0C3002B22986CEF30055F6C2 /* LoggerStoreIndex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggerStoreIndex.swift; sourceTree = "<group>"; };
 		0C30B2F32A3F375400D65F8F /* Pulse Demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pulse Demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -520,7 +521,6 @@
 		0C38F57A2A34BFA0001E19C0 /* RemoteLoggerSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteLoggerSettingsViewModel.swift; sourceTree = "<group>"; };
 		0C40C099296F77F1009ECF16 /* ConsoleSearchToggleCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchToggleCell.swift; sourceTree = "<group>"; };
 		0C40C0A3296F849E009ECF16 /* ConsoleSearchTimePeriodCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchTimePeriodCell.swift; sourceTree = "<group>"; };
-		0C48F75A2A9BB5D300848B2E /* StatusLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusLabel.swift; sourceTree = "<group>"; };
 		0C4BF92C298817EC0086A6A7 /* IntlineTabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntlineTabBar.swift; sourceTree = "<group>"; };
 		0C603BD729E45A3C004FD4ED /* ConsoleListPinsSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleListPinsSectionView.swift; sourceTree = "<group>"; };
 		0C603BD929E45DCC004FD4ED /* ConsoleListGroupedSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleListGroupedSectionView.swift; sourceTree = "<group>"; };
@@ -1165,9 +1165,9 @@
 				0CF0D58C296F189500EED9D4 /* UXKit.swift */,
 				0CF0D57E296F189500EED9D4 /* UIKit+Extensions.swift */,
 				0CF0D593296F189500EED9D4 /* Formatters.swift */,
-				0C48F75A2A9BB5D300848B2E /* StatusLabel.swift */,
 				0CF0D57D296F189500EED9D4 /* TextRenderer.swift */,
 				0CF0D589296F189500EED9D4 /* TextHelper.swift */,
+				0C2720882AF832C6005DDB1C /* StatusLabelViewModel.swift */,
 				0CF0D582296F189500EED9D4 /* TextRendererHTML.swift */,
 				0CF0D583296F189500EED9D4 /* TextRendererJSON.swift */,
 				0CF0D586296F189500EED9D4 /* TextUtilities.swift */,
@@ -2020,12 +2020,12 @@
 				0C63A387297A432500F6A6A5 /* ConsoleSearchContextMenu.swift in Sources */,
 				0C4BF92D298817EC0086A6A7 /* IntlineTabBar.swift in Sources */,
 				0CF0D645296F189600EED9D4 /* ConsoleSearchSectionHeader.swift in Sources */,
-				0C48F75B2A9BB5D300848B2E /* StatusLabel.swift in Sources */,
 				0CF0D62A296F189600EED9D4 /* KeyValueSectionViewModel.swift in Sources */,
 				0CF0D638296F189600EED9D4 /* ImageViewer.swift in Sources */,
 				0CF5E60929981ADF009FF7AE /* ShareStoreViewModel.swift in Sources */,
 				0CF0D67B296F189600EED9D4 /* ConsoleView-tvos.swift in Sources */,
 				0CF0D66B296F189600EED9D4 /* NetworkCookiesCell.swift in Sources */,
+				0C2720892AF832C6005DDB1C /* StatusLabelViewModel.swift in Sources */,
 				0CF0D631296F189600EED9D4 /* RichTextViewModel.swift in Sources */,
 				0CF0D673296F189600EED9D4 /* NetworkDetailsView.swift in Sources */,
 				0CF0D62B296F189600EED9D4 /* FileViewerViewModel.swift in Sources */,
