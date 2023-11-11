@@ -1,6 +1,10 @@
 {
   "colors" : [
     {
+      "color" : {
+        "platform" : "universal",
+        "reference" : "systemIndigoColor"
+      },
       "idiom" : "universal"
     }
   ],
