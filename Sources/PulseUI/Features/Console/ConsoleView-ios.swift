@@ -56,7 +56,7 @@ public struct ConsoleView: View {
     @available(iOS 15, *)
     @ViewBuilder private var trailingNavigationBarItems: some View {
         Button(action: { environment.router.isShowingShareStore = true }) {
-            Label("Share", systemImage: "square.and.arrow.up")
+            Image(systemName: "square.and.arrow.up")
         }
         Button(action: { environment.router.isShowingFilters = true }) {
             Image(systemName: "line.horizontal.3.decrease.circle")
