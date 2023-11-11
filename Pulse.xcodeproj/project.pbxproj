@@ -244,7 +244,7 @@
 		0CF0D686296F189600EED9D4 /* ConsoleMessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D608296F189600EED9D4 /* ConsoleMessageCell.swift */; };
 		0CF0D687296F189600EED9D4 /* ConsoleTaskCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D609296F189600EED9D4 /* ConsoleTaskCell.swift */; };
 		0CF0D688296F189600EED9D4 /* ConsoleEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D60A296F189600EED9D4 /* ConsoleEnvironment.swift */; };
-		0CF0D689296F189600EED9D4 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D60C296F189600EED9D4 /* MainViewController.swift */; };
+		0CF0D689296F189600EED9D4 /* PulseUI+UIKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D60C296F189600EED9D4 /* PulseUI+UIKit.swift */; };
 		0CF0D68A296F189600EED9D4 /* PulseUI.docc in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D60D296F189600EED9D4 /* PulseUI.docc */; };
 		0CF0D693296F18BE00EED9D4 /* Pulse.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CF0D542296F14EA00EED9D4 /* Pulse.framework */; };
 		0CF0D6C0296F18ED00EED9D4 /* PulseUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CF0D56C296F17CB00EED9D4 /* PulseUI.framework */; };
@@ -699,7 +699,7 @@
 		0CF0D608296F189600EED9D4 /* ConsoleMessageCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleMessageCell.swift; sourceTree = "<group>"; };
 		0CF0D609296F189600EED9D4 /* ConsoleTaskCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleTaskCell.swift; sourceTree = "<group>"; };
 		0CF0D60A296F189600EED9D4 /* ConsoleEnvironment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleEnvironment.swift; sourceTree = "<group>"; };
-		0CF0D60C296F189600EED9D4 /* MainViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
+		0CF0D60C296F189600EED9D4 /* PulseUI+UIKit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "PulseUI+UIKit.swift"; sourceTree = "<group>"; };
 		0CF0D60D296F189600EED9D4 /* PulseUI.docc */ = {isa = PBXFileReference; lastKnownFileType = folder.documentationcatalog; path = PulseUI.docc; sourceTree = "<group>"; };
 		0CF0D68F296F18BE00EED9D4 /* PulseTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PulseTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		0CF0D69A296F18D200EED9D4 /* RemoteLoggerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RemoteLoggerTests.swift; sourceTree = "<group>"; };
@@ -1220,7 +1220,7 @@
 				0CF0D5AA296F189500EED9D4 /* Checkbox.swift */,
 				0CF0D5AB296F189500EED9D4 /* ImageViewer.swift */,
 				0CF0D5AC296F189500EED9D4 /* PinButton.swift */,
-				0CF0D60C296F189600EED9D4 /* MainViewController.swift */,
+				0CF0D60C296F189600EED9D4 /* PulseUI+UIKit.swift */,
 				0CF0D5AD296F189500EED9D4 /* ContextMenus.swift */,
 				0C4BF92C298817EC0086A6A7 /* IntlineTabBar.swift */,
 			);
@@ -2069,7 +2069,7 @@
 				0C9C465929F00272007897E8 /* ConsoleListView.swift in Sources */,
 				0CF0D678296F189600EED9D4 /* LoggerStoreSizeChart.swift in Sources */,
 				0C3002B32986CEF30055F6C2 /* LoggerStoreIndex.swift in Sources */,
-				0CF0D689296F189600EED9D4 /* MainViewController.swift in Sources */,
+				0CF0D689296F189600EED9D4 /* PulseUI+UIKit.swift in Sources */,
 				0C840D4C29E0A09B00362214 /* SessionsView.swift in Sources */,
 				0CA32DE729D5E028001712E8 /* NSAttributedString+Extensions.swift in Sources */,
 				0CF0D60F296F189600EED9D4 /* UIKit+Extensions.swift in Sources */,

@@ -9,6 +9,10 @@ import UIKit
 import Pulse
 import SwiftUI
 
+/// Shows the console inside the navigation controller.
+///
+/// - note: Use ``ConsoleView`` directly to show it in the existing navigation
+/// controller or other container controller.
 public final class MainViewController: UIViewController {
     private let environment: ConsoleEnvironment
 
