@@ -14,9 +14,9 @@ public final class UserSettings: ObservableObject {
     @AppStorage("com.github.kean.pulse.console.mode")
     public var mode: ConsoleMode = .network
 
-    /// The line limit for messages in the console. By default, `4`.
+    /// The line limit for messages in the console. By default, `3`.
     @AppStorage("com.github.kean.pulse.console.cell.line.limit")
-    public var lineLimit: Int = 4
+    public var lineLimit: Int = 3
 
     /// Enables link detection in the response viewier. By default, `false`.
     @AppStorage("com.github.kean.pulse.link.detection")
