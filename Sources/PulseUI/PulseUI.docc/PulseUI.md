@@ -58,19 +58,30 @@ struct AnalyticsLogsView: View {
     
     var body: some View {
         List(messages, id: \.objectID) { message in
-            VStack(alignment: .leading) {
-                Text(timeFormatter.string(from: message.createdAt))
-                    .font(.footnote)
-                    .foregroundColor(.secondary)
-                Text(message.text)
-                    .lineLimit(2)
+            NavigationLink {
+                Text("TOOD: your details view here")
+            } label: {
+                VStack(alignment: .leading) {
+                    HStack {
+                        Text(timeFormatter.string(from: message.createdAt))
+                            .font(.footnote)
+                            .foregroundColor(.secondary)
+                        Spacer()
+                        ListDisclosureIndicator()
+                    }
+                    Text(message.text)
+                        .lineLimit(2)
+                }
             }
         }
+        .listStyle(.plain)
     }
 }
 
 private let timeFormatter = DateFormatter(format: "HH:mm:ss.SSS")
 ```
+
+> tip: For a complete example, see the [Integrations](https://github.com/kean/Pulse/tree/main/Demo/Integrations) demo.
 
 ## PulseUI on watchOS
 
