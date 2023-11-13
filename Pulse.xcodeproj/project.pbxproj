@@ -70,6 +70,7 @@
 		0C40C09A296F77F1009ECF16 /* ConsoleSearchToggleCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C40C099296F77F1009ECF16 /* ConsoleSearchToggleCell.swift */; };
 		0C40C0A4296F849E009ECF16 /* ConsoleSearchTimePeriodCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C40C0A3296F849E009ECF16 /* ConsoleSearchTimePeriodCell.swift */; };
 		0C4BF92D298817EC0086A6A7 /* IntlineTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C4BF92C298817EC0086A6A7 /* IntlineTabBar.swift */; };
+		0C57511A2B01BA40001074E5 /* DebugAnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C5751182B01BA2B001074E5 /* DebugAnalyticsView.swift */; };
 		0C603BD829E45A3C004FD4ED /* ConsoleListPinsSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C603BD729E45A3C004FD4ED /* ConsoleListPinsSectionView.swift */; };
 		0C603BDA29E45DCC004FD4ED /* ConsoleListGroupedSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C603BD929E45DCC004FD4ED /* ConsoleListGroupedSectionView.swift */; };
 		0C63A3782979FE3A00F6A6A5 /* ConsoleSearchTerm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C63A3772979FE3A00F6A6A5 /* ConsoleSearchTerm.swift */; };
@@ -522,6 +523,7 @@
 		0C40C099296F77F1009ECF16 /* ConsoleSearchToggleCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchToggleCell.swift; sourceTree = "<group>"; };
 		0C40C0A3296F849E009ECF16 /* ConsoleSearchTimePeriodCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchTimePeriodCell.swift; sourceTree = "<group>"; };
 		0C4BF92C298817EC0086A6A7 /* IntlineTabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntlineTabBar.swift; sourceTree = "<group>"; };
+		0C5751182B01BA2B001074E5 /* DebugAnalyticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugAnalyticsView.swift; sourceTree = "<group>"; };
 		0C603BD729E45A3C004FD4ED /* ConsoleListPinsSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleListPinsSectionView.swift; sourceTree = "<group>"; };
 		0C603BD929E45DCC004FD4ED /* ConsoleListGroupedSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleListGroupedSectionView.swift; sourceTree = "<group>"; };
 		0C63A3772979FE3A00F6A6A5 /* ConsoleSearchTerm.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleSearchTerm.swift; sourceTree = "<group>"; };
@@ -851,6 +853,7 @@
 		0C25FB6725CDDC9700A895C2 /* IntegrationsExamples */ = {
 			isa = PBXGroup;
 			children = (
+				0C5751182B01BA2B001074E5 /* DebugAnalyticsView.swift */,
 				0C25FB6E25CDDCAB00A895C2 /* URLSessionManualIntegration.swift */,
 				0C1221E525CE09C100B81D7A /* URLSessionAutomatedIntegration.swift */,
 				49E82A8526D107A00070244F /* AlamofireIntegration.swift */,
@@ -1868,6 +1871,7 @@
 				0C0B31ED26D179A20045C9E1 /* AppDelegate.swift in Sources */,
 				0C0B31EF26D179A20045C9E1 /* SceneDelegate.swift in Sources */,
 				0C11EADB2971EBE80059786A /* MockStore.swift in Sources */,
+				0C57511A2B01BA40001074E5 /* DebugAnalyticsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2275,6 +2279,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = Demo/Integrations/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2296,6 +2301,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = Demo/Integrations/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
