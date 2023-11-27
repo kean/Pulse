@@ -1,5 +1,12 @@
 # Pulse 4.x
 
+## Pulse 4.0.5
+
+*Nov 27, 2023*
+
+- Update documentation on custom views
+- Minor fixes and improvements in the UI
+
 ## Pulse 4.0.4
 
 *Nov 5, 2023*
