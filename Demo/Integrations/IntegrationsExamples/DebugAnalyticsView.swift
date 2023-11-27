@@ -85,8 +85,8 @@ private struct DebugAnalyticsDetailsView: View {
 
     private func makeRow(title: String, value: String) -> some View {
         VStack(alignment: .leading) {
-            Text(higlighted(title, searchText: searchText))
-            Text(higlighted(value, searchText: searchText))
+            Text(highlighted(title, searchText: searchText))
+            Text(highlighted(value, searchText: searchText))
                 .foregroundStyle(.secondary)
         }
     }
@@ -103,7 +103,7 @@ private struct ListDisclosureIndicator: View {
     }
 }
 
-private func higlighted(_ string: String, searchText: String) -> AttributedString {
+private func highlighted(_ string: String, searchText: String) -> AttributedString {
     var output = AttributedString(string)
     if !searchText.isEmpty, let range = output.range(of: searchText, options: [.caseInsensitive, .diacriticInsensitive]) {
         output[range].backgroundColor = .yellow.opacity(0.33)

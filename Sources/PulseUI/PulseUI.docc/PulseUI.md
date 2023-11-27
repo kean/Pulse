@@ -59,7 +59,7 @@ struct AnalyticsLogsView: View {
     var body: some View {
         List(messages, id: \.objectID) { message in
             NavigationLink {
-                Text("TOOD: your details view here")
+                Text("TODO: your details view here")
             } label: {
                 VStack(alignment: .leading) {
                     HStack {
