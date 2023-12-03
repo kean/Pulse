@@ -186,7 +186,30 @@ public final class NetworkLogger: @unchecked Sendable {
     public func logTask(_ task: URLSessionTask, didFinishCollecting metrics: URLSessionTaskMetrics) {
         lock.lock()
         context(for: task).metrics = NetworkLogger.Metrics(metrics: metrics)
+
+        guard let originalRequest = task.originalRequest else {
+            lock.unlock()
+            return // This should never happen
+        }
+
+        let context = context(for: task)
+        let metrics = context.metrics
+        let data = context.data
         lock.unlock()
+
+        send(.networkTaskCompleted(.init(
+            taskId: context.taskId,
+            taskType: NetworkLogger.TaskType(task: task),
+            createdAt: Date(),
+            originalRequest: Request(originalRequest),
+            currentRequest: task.currentRequest.map(Request.init),
+            response: task.response.map(Response.init),
+            error: task.error.map(ResponseError.init),
+            requestBody: originalRequest.httpBody ?? originalRequest.httpBodyStreamData(),
+            responseBody: data,
+            metrics: metrics,
+            label: configuration.label
+        )))
     }
 
     /// Logs the task metrics (optional).
