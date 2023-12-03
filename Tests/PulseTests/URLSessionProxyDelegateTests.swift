@@ -113,6 +113,45 @@ final class URLSessionProxyDelegateTests: XCTestCase {
         let message = try XCTUnwrap(task.message)
         XCTAssertEqual(message.label, "network")
     }
+    
+    func testProxyDelegateWithCompletionHandlerAsync() async throws {
+        // GIVEN
+        var myDelegate: MockSessionDelegate? = MockSessionDelegate()
+        let delegate = URLSessionProxyDelegate(logger: logger, delegate: myDelegate)
+        let session = URLSession(configuration: .default, delegate: delegate, delegateQueue: nil)
+
+        // WHEN
+        let dataURL = directory.url.appending(filename: "logs-archive-v2.pulse")
+        try Resources.pulseArchive.write(to: dataURL)
+        let didComplete = expectation(description: "TaskCompleted")
+
+        let (_, _) = try await session.data(from: dataURL)
+        
+        didComplete.fulfill()
+        
+        autoreleasepool {
+            myDelegate = nil // Make sure that proxy delegate retain the real one (like URLSession does)
+        }
+
+        await fulfillment(of: [didComplete], timeout: 5)
+
+        // RECORD
+        let tasks = try store.allTasks()
+        let task = try XCTUnwrap(tasks.first)
+
+        // THEN
+        XCTAssertEqual(tasks.count, 1)
+
+        XCTAssertEqual(task.url, dataURL.absoluteString)
+        XCTAssertEqual(task.host, nil)
+        XCTAssertEqual(task.httpMethod, "GET")
+        XCTAssertNil(task.errorDomain)
+        XCTAssertEqual(task.errorCode, 0)
+        XCTAssertEqual(task.requestState, NetworkTaskEntity.State.success.rawValue)
+
+        let message = try XCTUnwrap(task.message)
+        XCTAssertEqual(message.label, "network")
+    }
 
     func testForwardingOfUnimplementedMethod() throws {
         // GIVEN
