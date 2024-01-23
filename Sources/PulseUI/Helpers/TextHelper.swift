@@ -48,12 +48,14 @@ final class TextHelper {
     private let titleParagraphStyle: NSParagraphStyle = {
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.lineSpacing = -6
+        paragraphStyle.baseWritingDirection = .leftToRight
         return paragraphStyle
     }()
 
     private let bodyParagraphStyle: NSParagraphStyle = {
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.lineSpacing = 3
+        paragraphStyle.baseWritingDirection = .leftToRight
         return paragraphStyle
     }()
 
