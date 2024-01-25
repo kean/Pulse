@@ -1,0 +1,14 @@
+name: "Pulse Cocoapods support"
+
+on:
+  release:
+    types: [published, edited, released]
+
+jobs:
+  cocoapods-push:
+    name: Push cocoapods spec
+    runs-on: macOS-12
+    steps:
+      - uses: michaelhenry/deploy-to-cocoapods-github-action@1.0.10
+        with:
+          COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
