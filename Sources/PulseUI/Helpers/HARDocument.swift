@@ -9,7 +9,7 @@
 import Foundation
 import Pulse
 
-fileprivate enum HARFileDateFormatter {
+fileprivate enum HARDateFormatter {
     static var formatter: ISO8601DateFormatter = {
         let formatter = ISO8601DateFormatter()
         formatter.formatOptions = [.withFullDate, .withFullTime]
@@ -27,7 +27,7 @@ struct HARDocument: Encodable {
             pages.append(
                 .init(
                     id: pageId,
-                    startedDateTime: HARFileDateFormatter.formatter.string(from: networkTasks[.zero].createdAt),
+                    startedDateTime: HARDateFormatter.formatter.string(from: networkTasks[.zero].createdAt),
                     title: networkTasks[.zero].url ?? ""
                 )
             )
@@ -101,7 +101,7 @@ extension HARDocument {
             response = .init(entity)
             
             serverIPAddress = entity.orderedTransactions.first?.remoteAddress ?? ""
-            startedDateTime = HARFileDateFormatter.formatter.string(from: entity.createdAt)
+            startedDateTime = HARDateFormatter.formatter.string(from: entity.createdAt)
             time = entity.duration * 1000
             timings = .init(entity.orderedTransactions.last?.timing)
         }
