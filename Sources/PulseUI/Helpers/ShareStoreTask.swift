@@ -68,10 +68,10 @@ final class ShareStoreTask {
         case .har:
             guard let file = try? HARDocument(store: store),
                   let encoded = try? JSONEncoder().encode(file),
-                  let string = String(data: encoded, encoding: .utf8) else {
+                  let string = try? NSAttributedString(data: encoded, documentAttributes: nil) else {
                 return NSAttributedString(string: "")
             }
-            return NSAttributedString(string: string)
+            return string
         default:
             prerenderResponseBodies()
 
