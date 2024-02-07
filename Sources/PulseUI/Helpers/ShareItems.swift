@@ -7,13 +7,14 @@ import Pulse
 import CoreData
 
 public enum ShareStoreOutput: String, RawRepresentable {
-    case store, package, text, html
+    case store, package, text, html, har
 
     var fileExtension: String {
         switch self {
         case .store, .package: return "pulse"
         case .text: return "txt"
         case .html: return "html"
+        case .har: return "har"
         }
     }
 }
@@ -76,6 +77,11 @@ enum ShareService {
 #else
             return ShareItems(["Sharing as PDF is not supported on this platform"])
 #endif
+        case .har:
+            let har = TextUtilities.har(from: string)
+            let directory = TemporaryDirectory()
+            let fileURL = directory.write(data: har, extension: "har")
+            return ShareItems([fileURL], size: Int64(har.count), cleanup: directory.remove)
         }
     }
 
@@ -110,12 +116,14 @@ enum ShareOutput {
     case plainText
     case html
     case pdf
+    case har
 
     var title: String {
         switch self {
         case .plainText: return "Text"
         case .html: return "HTML"
         case .pdf: return "PDF"
+        case .har: return "HAR"
         }
     }
 }

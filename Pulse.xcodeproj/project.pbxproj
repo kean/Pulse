@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 53;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -271,6 +271,7 @@
 		0CFF79DD29EB7A8E00BE767B /* SessionListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CFF79DB29EB7A8B00BE767B /* SessionListView.swift */; };
 		0CFF79DF29EB7B4300BE767B /* SessionPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CFF79DE29EB7B4300BE767B /* SessionPickerView.swift */; };
 		0CFF79E229EC1FA200BE767B /* ImageProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CFF79E029EC1F7800BE767B /* ImageProcessor.swift */; };
+		E95D6C562B7314E6004D28E4 /* HARDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95D6C552B7314E6004D28E4 /* HARDocument.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -727,6 +728,7 @@
 		0CFF79E029EC1F7800BE767B /* ImageProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageProcessor.swift; sourceTree = "<group>"; };
 		49E82A8526D107A00070244F /* AlamofireIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlamofireIntegration.swift; sourceTree = "<group>"; };
 		49E82A8826D1083D0070244F /* MoyaIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoyaIntegration.swift; sourceTree = "<group>"; };
+		E95D6C552B7314E6004D28E4 /* HARDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HARDocument.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1186,6 +1188,7 @@
 				0CB17F192978ABBA004E33F4 /* ManagedObjectsCountObserver.swift */,
 				0C3002B22986CEF30055F6C2 /* LoggerStoreIndex.swift */,
 				0C1050E429E1FAC1006AFDAD /* Version.swift */,
+				E95D6C552B7314E6004D28E4 /* HARDocument.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -2012,6 +2015,7 @@
 				0C7A0E00297C51CE00B4B69D /* ConsoleListOptions.swift in Sources */,
 				0CF0D668296F189600EED9D4 /* NetworkRequestStatusCell.swift in Sources */,
 				0C9751562A32CBFB00DC46FF /* RemoteLoggerSelectedDeviceView.swift in Sources */,
+				E95D6C562B7314E6004D28E4 /* HARDocument.swift in Sources */,
 				0CB63A2F2975C43D00525165 /* ConsoleSearchScope.swift in Sources */,
 				0CF0D640296F189600EED9D4 /* ConsoleFilterViewModel.swift in Sources */,
 				0CF0D65A296F189600EED9D4 /* StoreDetailsView.swift in Sources */,
