@@ -25,14 +25,14 @@ extension LoggerStore {
             @available(*, deprecated, message: "Deprecated (added for backward compatibility)")
             public var session: UUID? = Session.current.id
 
-            public init(createdAt: Date, label: String, level: LoggerStore.Level, message: String, metadata: [String: String]?, file: String, function: String, line: UInt) {
+            public init(createdAt: Date, label: String, level: LoggerStore.Level, message: String, metadata: [String: String]?, file: StaticString, function: StaticString, line: UInt) {
                 self.createdAt = createdAt
                 self.label = label
                 self.level = level
                 self.message = message
                 self.metadata = metadata
-                self.file = file
-                self.function = function
+                self.file = String(describing: file)
+                self.function = String(describing: function)
                 self.line = line
             }
             
