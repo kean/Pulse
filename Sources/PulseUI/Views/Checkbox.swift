@@ -9,7 +9,7 @@ struct Checkbox<Label: View>: View {
     let label: () -> Label
 
     var body: some View {
-#if os(iOS)
+#if os(iOS) || os(visionOS)
         Button(action: { isOn.toggle() }) {
             HStack {
                 Image(systemName: isOn ? "checkmark.circle.fill" : "circle")

@@ -5,7 +5,7 @@
 import SwiftUI
 import Combine
 
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(macOS) || os(visionOS)
 extension Color {
     static var separator: Color { Color(UXColor.separator) }
     static var secondaryFill: Color { Color(UXColor.secondarySystemFill) }
@@ -45,7 +45,7 @@ extension ContentSizeCategory {
     }
 }
 
-#if os(iOS)
+#if os(iOS) || os(visionOS)
 
 enum Keyboard {
     static var isHidden: AnyPublisher<Bool, Never> {
@@ -77,7 +77,7 @@ extension View {
 extension Backport {
     @ViewBuilder
     func presentationDetents(_ detents: Set<PresentationDetent>) -> some View {
-#if os(iOS)
+#if os(iOS) || os(visionOS)
         if #available(iOS 16, *) {
             let detents = detents.map { (detent)-> SwiftUI.PresentationDetent in
                 switch detent {
@@ -114,7 +114,7 @@ extension Backport {
 extension View {
     func inlineNavigationTitle(_ title: String) -> some View {
         self.navigationTitle(title)
-#if os(iOS)
+#if os(iOS) || os(visionOS)
             .navigationBarTitleDisplayMode(.inline)
 #endif
     }

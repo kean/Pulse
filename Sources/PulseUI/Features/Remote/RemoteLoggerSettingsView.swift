@@ -8,7 +8,7 @@ import Combine
 import Pulse
 import Network
 
-@available(iOS 15, *)
+@available(iOS 15, visionOS 1.0, *)
 struct RemoteLoggerSettingsView: View {
     @ObservedObject private var logger: RemoteLogger = .shared
     @ObservedObject var viewModel: RemoteLoggerSettingsViewModel
@@ -64,7 +64,7 @@ struct RemoteLoggerSettingsView: View {
 #if os(macOS)
         .toggleStyle(.switch)
 #endif
-#if os(iOS)
+#if os(iOS) || os(visionOS)
         .padding(.vertical, 2)
 #endif
     }
@@ -108,7 +108,7 @@ struct RemoteLoggerSettingsView: View {
                     Image(systemName: "checkmark")
                         .foregroundColor(.accentColor)
                         .font(.system(size: 15, weight: .medium))
-#if os(iOS)
+#if os(iOS) || os(visionOS)
                         .frame(width: 21, height: 36, alignment: .center)
 #endif
                 }
@@ -130,7 +130,7 @@ struct RemoteLoggerSettingsView: View {
     }
 }
 
-@available(iOS 15, *)
+@available(iOS 15, visionOS 1.0, *)
 struct RemoteLoggerSettingsRouterView: View {
     @ObservedObject private var logger: RemoteLogger = .shared
     @ObservedObject var viewModel: RemoteLoggerSettingsViewModel
@@ -164,7 +164,7 @@ struct RemoteLoggerSettingsRouterView: View {
 }
 
 #if DEBUG
-@available(iOS 15, *)
+@available(iOS 15, visionOS 1.0, *)
 struct RemoteLoggerSettingsView_Previews: PreviewProvider {
     static var previews: some View {
 #if os(macOS)

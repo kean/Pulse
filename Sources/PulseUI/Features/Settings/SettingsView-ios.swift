@@ -2,13 +2,13 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
-#if os(iOS)
+#if os(iOS) || os(visionOS)
 
 import SwiftUI
 import Pulse
 import UniformTypeIdentifiers
 
-@available(iOS 15, *)
+@available(iOS 15, visionOS 1.0, *)
 public struct SettingsView: View {
     private let store: LoggerStore
     @State private var newHeaderName = ""
@@ -61,7 +61,7 @@ public struct SettingsView: View {
 }
 
 #if DEBUG
-@available(iOS 15, *)
+@available(iOS 15, visionOS 1.0, *)
 struct SettingsView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {

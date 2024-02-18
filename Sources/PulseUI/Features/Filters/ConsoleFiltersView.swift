@@ -6,17 +6,17 @@ import SwiftUI
 import Pulse
 import Combine
 
-@available(iOS 15, macOS 13, *)
+@available(iOS 15, macOS 13, visionOS 1.0, *)
 struct ConsoleFiltersView: View {
     @EnvironmentObject var environment: ConsoleEnvironment // important: reloads mode
     @EnvironmentObject var viewModel: ConsoleFiltersViewModel
 
     var body: some View {
-#if os(iOS) || os(watchOS) || os(tvOS)
+#if os(iOS) || os(watchOS) || os(tvOS) || os(visionOS)
         Form {
             form
         }
-#if os(iOS)
+#if os(iOS) || os(visionOS)
         .navigationBarItems(leading: buttonReset)
 #endif
 #else
@@ -63,7 +63,7 @@ struct ConsoleFiltersView: View {
             labelsSection
         }
 
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(macOS) || os(visionOS)
         timePeriodSection
 #endif
     }
@@ -76,7 +76,7 @@ struct ConsoleFiltersView: View {
 
 // MARK: - ConsoleFiltersView (Sections)
 
-@available(iOS 15, macOS 13, *)
+@available(iOS 15, macOS 13, visionOS 1.0, *)
 extension ConsoleFiltersView {
     var sessionsSection: some View {
         ConsoleSection(isDividerHidden: true, header: {
@@ -86,7 +86,7 @@ extension ConsoleFiltersView {
         })
     }
 
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(macOS) || os(visionOS)
     var timePeriodSection: some View {
         ConsoleSection(header: {
             ConsoleSectionHeader(icon: "calendar", title: "Time Period", filter: $viewModel.criteria.shared.dates)
@@ -124,7 +124,7 @@ extension ConsoleFiltersView {
 #if DEBUG
 import CoreData
 
-@available(iOS 15, macOS 13, *)
+@available(iOS 15, macOS 13, visionOS 1.0, *)
 struct ConsoleFiltersView_Previews: PreviewProvider {
     static var previews: some View {
 #if os(macOS)
@@ -156,7 +156,7 @@ struct ConsoleFiltersView_Previews: PreviewProvider {
     }
 }
 
-@available(iOS 15, macOS 13, *)
+@available(iOS 15, macOS 13, visionOS 1.0, *)
 private func makePreview(isOnlyNetwork: Bool) -> some View {
     let store = LoggerStore.mock
     let entities: [NSManagedObject] = try! isOnlyNetwork ? store.allTasks() : store.allMessages()

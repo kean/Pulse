@@ -7,7 +7,7 @@ import SwiftUI
 import Pulse
 import CoreData
 
-@available(iOS 15, macOS 13, *)
+@available(iOS 15, macOS 13, visionOS 1.0, *)
 struct ConsoleEntityCell: View {
     let entity: NSManagedObject
 
@@ -27,14 +27,14 @@ struct ConsoleEntityCell: View {
     }
 }
 
-@available(iOS 15, macOS 13, *)
+@available(iOS 15, macOS 13, visionOS 1.0, *)
 private struct _ConsoleMessageCell: View {
     let message: LoggerMessageEntity
 
     @State private var shareItems: ShareItems?
 
     var body: some View {
-#if os(iOS)
+#if os(iOS) || os(visionOS)
         let cell = ConsoleMessageCell(message: message, isDisclosureNeeded: true)
             .background(NavigationLink("", destination: ConsoleMessageDetailsView(message: message)).opacity(0))
 #elseif os(macOS)
@@ -47,7 +47,7 @@ private struct _ConsoleMessageCell: View {
         }
 #endif
 
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(macOS) || os(visionOS)
         cell.swipeActions(edge: .leading, allowsFullSwipe: true) {
             PinButton(viewModel: .init(message)).tint(.pink)
         }
@@ -59,7 +59,7 @@ private struct _ConsoleMessageCell: View {
         .contextMenu {
             ContextMenu.MessageContextMenu(message: message, shareItems: $shareItems)
         }
-#if os(iOS)
+#if os(iOS) || os(visionOS)
         .sheet(item: $shareItems, content: ShareView.init)
 #else
         .popover(item: $shareItems, attachmentAnchor: .point(.leading), arrowEdge: .leading) { ShareView($0) }
@@ -70,7 +70,7 @@ private struct _ConsoleMessageCell: View {
     }
 }
 
-@available(iOS 15, macOS 13, *)
+@available(iOS 15, macOS 13, visionOS 1.0, *)
 private struct _ConsoleTaskCell: View {
     let task: NetworkTaskEntity
     @State private var shareItems: ShareItems?
@@ -78,7 +78,7 @@ private struct _ConsoleTaskCell: View {
     @Environment(\.store) private var store
 
     var body: some View {
-#if os(iOS)
+#if os(iOS) || os(visionOS)
         let cell = ConsoleTaskCell(task: task, isDisclosureNeeded: true)
             .background(NavigationLink("", destination: NetworkInspectorView(task: task)).opacity(0))
 #elseif os(macOS)
@@ -90,13 +90,13 @@ private struct _ConsoleTaskCell: View {
         }
 #endif
 
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(macOS) || os(visionOS)
         cell.swipeActions(edge: .leading, allowsFullSwipe: true) {
             PinButton(viewModel: .init(task)).tint(.pink)
         }
         .swipeActions(edge: .trailing, allowsFullSwipe: true) {
             Button(action: {
-#if os(iOS)
+#if os(iOS) || os(visionOS)
                 shareItems = ShareService.share(task, as: .html, store: store)
 #else
                 sharedTask = task
@@ -106,13 +106,13 @@ private struct _ConsoleTaskCell: View {
             }.tint(.blue)
         }
         .contextMenu {
-#if os(iOS)
+#if os(iOS) || os(visionOS)
             ContextMenu.NetworkTaskContextMenuItems(task: task, sharedItems: $shareItems)
 #else
             ContextMenu.NetworkTaskContextMenuItems(task: task, sharedTask: $sharedTask)
 #endif
         }
-#if os(iOS)
+#if os(iOS) || os(visionOS)
         .sheet(item: $shareItems, content: ShareView.init)
 #else
         .popover(item: $sharedTask, attachmentAnchor: .point(.leading), arrowEdge: .leading) { ShareNetworkTaskView(task: $0) }

@@ -2,14 +2,14 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(macOS) || os(visionOS)
 
 import CoreData
 import Pulse
 import Combine
 import SwiftUI
 
-@available(iOS 15, macOS 13, *)
+@available(iOS 15, macOS 13, visionOS 1.0, *)
 struct ConsoleListGroupedSectionView: View {
     let section: NSFetchedResultsSectionInfo
     @ObservedObject var viewModel: ConsoleListViewModel
@@ -25,7 +25,7 @@ struct ConsoleListGroupedSectionView: View {
         ForEach(prefix, id: \.objectID, content: ConsoleEntityCell.init)
 
         if prefix.count < objects.count {
-#if os(iOS)
+#if os(iOS) || os(visionOS)
             NavigationLink(destination: ConsoleStaticList(entities: objects).inlineNavigationTitle(title)) {
                 PlainListSeeAllView(count: objects.count)
             }

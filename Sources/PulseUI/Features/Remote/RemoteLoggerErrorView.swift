@@ -5,7 +5,7 @@
 import SwiftUI
 import Network
 
-@available(iOS 15, *)
+@available(iOS 15, visionOS 1.0, *)
 struct RemoteLoggerErrorView: View {
     let error: NWError
 
@@ -47,7 +47,7 @@ private struct RemoteLoggerPolicyDeniedView: View {
             Text("Open **Settings** / **Privacy** / **Local Network** and check that the app is listed and the toggle is enabled")
                 .font(.subheadline)
         }
-#if os(iOS)
+#if os(iOS) || os(visionOS)
         Button("Open Settings") {
             UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
         }
@@ -55,7 +55,7 @@ private struct RemoteLoggerPolicyDeniedView: View {
     }
 }
 
-@available(iOS 15, *)
+@available(iOS 15, visionOS 1.0, *)
 private struct RemoteLoggerNoAuthView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -75,7 +75,7 @@ private struct RemoteLoggerNoAuthView: View {
                 )
                 .padding(.top, 8)
         }
-#if os(iOS)
+#if os(iOS) || os(visionOS)
         Button("Copy Contents") {
             UXPasteboard.general.string = plistContents
         }
@@ -93,7 +93,7 @@ private let plistContents = """
 """
 
 #if DEBUG
-@available(iOS 15, *)
+@available(iOS 15, visionOS 1.0, *)
 struct Previews_RemoteLoggerNoAuthView_Previews: PreviewProvider {
     static var previews: some View {
         Form {

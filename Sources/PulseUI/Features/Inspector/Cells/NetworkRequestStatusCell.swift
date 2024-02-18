@@ -5,7 +5,7 @@
 import SwiftUI
 import Pulse
 
-@available(iOS 15, *)
+@available(iOS 15, visionOS 1.0, *)
 struct NetworkRequestStatusCell: View {
     let viewModel: NetworkRequestStatusCellModel
 
@@ -129,7 +129,7 @@ private let spacing: CGFloat? = nil
 #endif
 
 #if DEBUG
-@available(iOS 15, *)
+@available(iOS 15, visionOS 1.0, *)
 struct NetworkRequestStatusCell_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {

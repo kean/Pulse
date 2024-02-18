@@ -7,7 +7,7 @@ import CoreData
 import Pulse
 import Combine
 
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(macOS) || os(visionOS)
 import PDFKit
 #endif
 
@@ -36,7 +36,7 @@ final class FileViewerViewModel: ObservableObject {
     enum Contents {
         case image(ImagePreviewViewModel)
         case other(RichTextViewModel)
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(macOS) || os(visionOS)
         case pdf(PDFDocument)
 #endif
     }
@@ -56,7 +56,7 @@ final class FileViewerViewModel: ObservableObject {
     }
 
     private func makePDF(data: Data) -> Contents? {
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(macOS) || os(visionOS)
         if let pdf = PDFDocument(data: data) {
             return .pdf(pdf)
         }

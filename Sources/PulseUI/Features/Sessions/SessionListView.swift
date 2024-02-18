@@ -8,9 +8,9 @@ import SwiftUI
 import CoreData
 import Combine
 
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(macOS) || os(visionOS)
 
-@available(iOS 15, macOS 13, *)
+@available(iOS 15, macOS 13, visionOS 1.0, *)
 struct SessionListView: View {
     @Binding var selection: Set<UUID>
     @Binding var sharedSessions: SelectedSessionsIDs?
@@ -21,7 +21,7 @@ struct SessionListView: View {
     @State private var filterTerm = ""
     @State private var groupedSessions: [(Date, [LoggerSessionEntity])] = []
 
-#if os(iOS)
+#if os(iOS) || os(visionOS)
     @Environment(\.editMode) private var editMode
 #endif
     @Environment(\.store) private var store
@@ -82,7 +82,7 @@ struct SessionListView: View {
                 }
             }
         }
-#if os(iOS)
+#if os(iOS) || os(visionOS)
         .listStyle(.plain)
         .searchable(text: $filterTerm)
 #else
@@ -97,7 +97,7 @@ struct SessionListView: View {
             .font(.headline)
             .padding(.vertical, 6)
 
-#if os(iOS)
+#if os(iOS) || os(visionOS)
             if editMode?.wrappedValue.isEditing ?? false {
                 Spacer()
 
@@ -163,7 +163,7 @@ struct ConsoleSessionCell: View {
     var isCompact = true
 
     @Environment(\.store) private var store
-#if os(iOS)
+#if os(iOS) || os(visionOS)
     @Environment(\.editMode) private var editMode
 #endif
 
@@ -177,7 +177,7 @@ struct ConsoleSessionCell: View {
             details
         }
         .tag(session.id)
-#if os(iOS)
+#if os(iOS) || os(visionOS)
         .listRowBackground((editMode?.wrappedValue.isEditing ?? false) ? Color.clear : nil)
 #endif
     }

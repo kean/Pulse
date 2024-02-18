@@ -5,7 +5,7 @@
 import SwiftUI
 import Pulse
 
-@available(iOS 15, *)
+@available(iOS 15, visionOS 1.0, *)
 struct ConsoleSearchListSelectionView<Data: RandomAccessCollection, ID: Hashable, Label: View>: View {
     let title: String
     let items: Data
@@ -14,7 +14,7 @@ struct ConsoleSearchListSelectionView<Data: RandomAccessCollection, ID: Hashable
     let description: (Data.Element) -> String
     @ViewBuilder let label: (Data.Element) -> Label
 
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(macOS) || os(visionOS)
     var limit = 6
 #else
     var limit = 3
@@ -88,7 +88,7 @@ struct ConsoleSearchListSelectionView<Data: RandomAccessCollection, ID: Hashable
 #if os(tvOS)
         .frame(width: 800)
 #endif
-#if os(iOS)
+#if os(iOS) || os(visionOS)
         .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always))
         .disableAutocorrection(true)
 #else
@@ -136,7 +136,7 @@ struct ConsoleSearchListSelectionView<Data: RandomAccessCollection, ID: Hashable
 }
 
 #if DEBUG
-@available(iOS 15, *)
+@available(iOS 15, visionOS 1.0, *)
 struct ConsoleSearchListSelectionView_Previews: PreviewProvider {
     static var previews: some View {
         ConsoleSearchListSelectionViewDemo()
@@ -144,7 +144,7 @@ struct ConsoleSearchListSelectionView_Previews: PreviewProvider {
     }
 }
 
-@available(iOS 15, *)
+@available(iOS 15, visionOS 1.0, *)
 private struct ConsoleSearchListSelectionViewDemo: View {
     @State private var selection: Set<String>  = []
 

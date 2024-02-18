@@ -4,7 +4,7 @@
 
 import SwiftUI
 
-#if os(iOS)
+#if os(iOS) || os(visionOS)
 
 import WebKit
 import UIKit

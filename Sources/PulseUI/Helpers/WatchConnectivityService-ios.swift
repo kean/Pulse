@@ -2,7 +2,7 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
-#if os(iOS)
+#if os(iOS) || os(visionOS)
 
 import CoreData
 import Combine
@@ -59,7 +59,7 @@ extension LoggerStore {
 
 #endif
 
-#if os(iOS) || os(watchOS)
+#if os(iOS) || os(watchOS) || os(visionOS)
 extension WatchConnectivityService {
     static let pulseDocumentMarkerKey = "com.github.kean.pulse.imported-store-marker"
 }

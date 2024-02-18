@@ -7,7 +7,7 @@ import Pulse
 import Combine
 import SwiftUI
 
-@available(iOS 15, macOS 13, *)
+@available(iOS 15, macOS 13, visionOS 1.0, *)
 struct ConsoleListContentView: View {
     @EnvironmentObject var viewModel: ConsoleListViewModel
 
@@ -18,7 +18,7 @@ struct ConsoleListContentView: View {
 #endif
 
     var body: some View {
-#if os(iOS)
+#if os(iOS) || os(visionOS)
         if !viewModel.pins.isEmpty, !viewModel.isShowingFocusedEntities {
             ConsoleListPinsSectionView(viewModel: viewModel)
             if !viewModel.entities.isEmpty {
@@ -27,7 +27,7 @@ struct ConsoleListContentView: View {
         }
 #endif
 
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(macOS) || os(visionOS)
         if let sections = viewModel.sections, !sections.isEmpty {
             ForEach(sections, id: \.name) {
                 ConsoleListGroupedSectionView(section: $0, viewModel: viewModel)
@@ -54,7 +54,7 @@ struct ConsoleListContentView: View {
                 let objectID = entity.objectID
                 ConsoleEntityCell(entity: entity)
                     .id(objectID)
-#if os(iOS)
+#if os(iOS) || os(visionOS)
                     .onAppear { viewModel.onAppearCell(with: objectID) }
                     .onDisappear { viewModel.onDisappearCell(with: objectID) }
 #endif
@@ -80,7 +80,7 @@ struct ConsoleListContentView: View {
                     .foregroundColor(.secondary)
             }
             .buttonStyle(.plain)
-#if os(iOS)
+#if os(iOS) || os(visionOS)
             .listRowSeparator(.hidden, edges: .bottom)
 #endif
         }
@@ -143,8 +143,8 @@ struct BottomViewID: Hashable, Identifiable {
 }
 #endif
 
-#if os(iOS) || os(macOS)
-@available(iOS 15, macOS 13, *)
+#if os(iOS) || os(macOS) || os(visionOS)
+@available(iOS 15, macOS 13, visionOS 1.0, *)
 struct ConsoleStaticList: View {
     let entities: [NSManagedObject]
 
@@ -153,7 +153,7 @@ struct ConsoleStaticList: View {
             ForEach(entities, id: \.objectID, content: ConsoleEntityCell.init)
         }
         .listStyle(.plain)
-#if os(iOS)
+#if os(iOS) || os(visionOS)
         .environment(\.defaultMinListRowHeight, 8)
 #endif
     }

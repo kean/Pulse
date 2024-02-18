@@ -7,7 +7,7 @@ import Pulse
 
 // MARK: - View
 
-@available(iOS 15, *)
+@available(iOS 15, visionOS 1.0, *)
 struct NetworkInspectorMetricsView: View {
     let viewModel: NetworkInspectorMetricsViewModel
 
@@ -22,7 +22,7 @@ struct NetworkInspectorMetricsView: View {
                 NetworkInspectorTransactionView(viewModel: $0)
             }
         }
-#if os(iOS)
+#if os(iOS) || os(visionOS)
         .listStyle(.insetGrouped)
 #endif
 #if os(macOS)
@@ -53,7 +53,7 @@ final class NetworkInspectorMetricsViewModel {
 // MARK: - Preview
 
 #if DEBUG
-@available(iOS 15, *)
+@available(iOS 15, visionOS 1.0, *)
 struct NetworkInspectorMetricsView_Previews: PreviewProvider {
     static var previews: some View {
 #if os(macOS)

@@ -6,7 +6,7 @@ import SwiftUI
 import Pulse
 import Charts
 
-@available(iOS 16.0, tvOS 16.0, macOS 13.0, watchOS 9.0, *)
+@available(iOS 16.0, tvOS 16.0, macOS 13.0, watchOS 9.0, visionOS 1.0, *)
 struct LoggerStoreSizeChart: View {
     let info: LoggerStore.Info
     let sizeLimit: Int64?
@@ -63,14 +63,14 @@ struct LoggerStoreSizeChart: View {
     }
 }
 
-@available(iOS 16.0, tvOS 16.0, macOS 13.0, watchOS 9.0, *)
+@available(iOS 16.0, tvOS 16.0, macOS 13.0, watchOS 9.0, visionOS 1.0, *)
 private enum Category: String, Hashable, Plottable {
     case messages = "Logs"
     case responses = "Blobs"
     case free = "Free"
 }
 
-@available(iOS 16.0, tvOS 16.0, macOS 13.0, watchOS 9.0, *)
+@available(iOS 16.0, tvOS 16.0, macOS 13.0, watchOS 9.0, visionOS 1.0, *)
 private struct Series: Identifiable {
     let category: Category
     let bytes: Int64
@@ -78,7 +78,7 @@ private struct Series: Identifiable {
 }
 
 #if DEBUG
-@available(iOS 16.0, tvOS 16.0, macOS 13.0, watchOS 9.0, *)
+@available(iOS 16.0, tvOS 16.0, macOS 13.0, watchOS 9.0, visionOS 1.0, *)
 struct LoggerStoreSizeChart_Previews: PreviewProvider {
     static var previews: some View {
         LoggerStoreSizeChart(info: try! LoggerStore.mock.info(), sizeLimit: 512 * 1024)

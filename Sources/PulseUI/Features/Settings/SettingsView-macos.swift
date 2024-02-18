@@ -53,7 +53,7 @@ struct UserSettingsView_Previews: PreviewProvider {
 #endif
 #endif
 
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(macOS) || os(visionOS)
 
 import SwiftUI
 
