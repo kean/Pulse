@@ -118,6 +118,10 @@ enum TextUtilities {
         return data as Data
     }
 #endif
+    
+    static func har(from string: NSAttributedString) -> Data {
+        string.string.data(using: .utf8) ?? Data()
+    }
 }
 
 private var isDarkMode: Bool {

@@ -64,24 +64,34 @@ final class ShareStoreTask {
     }
 
     private func renderAsAttributedString() -> NSAttributedString {
-        prerenderResponseBodies()
+        switch output {
+        case .har:
+            guard let file = try? HARDocument(store: store),
+                  let encoded = try? JSONEncoder().encode(file),
+                  let string = try? NSAttributedString(data: encoded, documentAttributes: nil) else {
+                return NSAttributedString(string: "")
+            }
+            return string
+        default:
+            prerenderResponseBodies()
 
-        let content = contentForSharing(count: objectIDs.count)
-        for index in objectIDs.indices {
-            guard let entity = try? context.existingObject(with: objectIDs[index]) else {
-                continue
+            let content = contentForSharing(count: objectIDs.count)
+            for index in objectIDs.indices {
+                guard let entity = try? context.existingObject(with: objectIDs[index]) else {
+                    continue
+                }
+                switch LoggerEntity(entity) {
+                case .message(let message):
+                    renderer.render(message)
+                case .task(let task):
+                    renderer.render(task, content: content, store: store)
+                }
+                if index < objectIDs.endIndex - 1 {
+                    renderer.addSpacer()
+                }
             }
-            switch LoggerEntity(entity) {
-            case .message(let message):
-                renderer.render(message)
-            case .task(let task):
-                renderer.render(task, content: content, store: store)
-            }
-            if index < objectIDs.endIndex - 1 {
-                renderer.addSpacer()
-            }
+            return renderer.make()
         }
-        return renderer.make()
     }
 
     // Unlike the rest of the processing it's easy to parallelize and it

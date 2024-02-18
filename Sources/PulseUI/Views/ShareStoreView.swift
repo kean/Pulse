@@ -98,6 +98,7 @@ struct ShareStoreView: View {
                 Text("Pulse").tag(ShareStoreOutput.store)
                 Text("Plain Text").tag(ShareStoreOutput.text)
                 Text("HTML").tag(ShareStoreOutput.html)
+                Text("HAR").tag(ShareStoreOutput.har)
                 Divider()
                 Text("Pulse (Package)").tag(ShareStoreOutput.package)
             }
