@@ -7,7 +7,7 @@ import Pulse
 import Combine
 import CoreData
 
-@available(iOS 15, *)
+@available(iOS 15, visionOS 1.0, *)
 struct ConsoleTaskCell: View {
     @ObservedObject var task: NetworkTaskEntity
     var isDisclosureNeeded = false
@@ -28,7 +28,7 @@ struct ConsoleTaskCell: View {
 #if !os(macOS)
             details
 #endif
-#if os(iOS)
+#if os(iOS) || os(visionOS)
             requestHeaders
 #endif
         }
@@ -61,7 +61,7 @@ struct ConsoleTaskCell: View {
             details
 #endif
             Spacer()
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(macOS) || os(visionOS)
             PinView(task: task)
 #endif
 #if !os(watchOS)
@@ -106,7 +106,7 @@ struct ConsoleTaskCell: View {
             Spacer()
             time
         }
-#elseif os(iOS)
+#elseif os(iOS) || os(visionOS)
         infoText
             .lineLimit(1)
             .font(ConsoleConstants.fontInfo)
@@ -174,7 +174,7 @@ private let titleSpacing: CGFloat = 20
 private let titleSpacing: CGFloat? = nil
 #endif
 
-@available(iOS 15, *)
+@available(iOS 15, visionOS 1.0, *)
 struct MockBadgeView: View {
     var body: some View {
         Text("MOCK")
@@ -216,7 +216,7 @@ private struct ConsoleProgressText: View {
 }
 
 #if DEBUG
-@available(iOS 15, *)
+@available(iOS 15, visionOS 1.0, *)
 struct ConsoleTaskCell_Previews: PreviewProvider {
     static var previews: some View {
         ConsoleTaskCell(task: LoggerStore.preview.entity(for: .login))

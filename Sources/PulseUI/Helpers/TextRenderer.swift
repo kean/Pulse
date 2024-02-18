@@ -8,7 +8,7 @@ import CoreData
 import SwiftUI
 import Pulse
 
-#if os(iOS)
+#if os(iOS) || os(visionOS)
 import PDFKit
 #endif
 
@@ -448,13 +448,13 @@ struct ConsoleTextRenderer_Previews: PreviewProvider {
                 .previewLayout(.fixed(width: 1160, height: 2000)) // Disable interaction to view it
                 .previewDisplayName("HTML (Raw)")
 
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(macOS) || os(visionOS)
             WebView(data: html, contentType: "application/html")
                 .edgesIgnoringSafeArea([.bottom])
                 .previewDisplayName("HTML")
 #endif
 
-#if os(iOS)
+#if os(iOS) || os(visionOS)
             PDFKitRepresentedView(document: PDFDocument(data: try! TextUtilities.pdf(from: string))!)
                 .edgesIgnoringSafeArea([.all])
                 .previewDisplayName("PDF")

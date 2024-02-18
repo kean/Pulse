@@ -102,7 +102,7 @@ final class ConsoleEnvironment: ObservableObject {
         store.removeAll()
         index.clear()
 
-#if os(iOS)
+#if os(iOS) || os(visionOS)
         runHapticFeedback(.success)
 #endif
     }

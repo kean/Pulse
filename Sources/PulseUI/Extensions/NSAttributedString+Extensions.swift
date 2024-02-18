@@ -4,7 +4,7 @@
 
 import Foundation
 
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(macOS) || os(visionOS)
 
 extension NSAttributedString {
     func getLines() -> [NSAttributedString] {

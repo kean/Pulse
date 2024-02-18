@@ -36,8 +36,8 @@ struct ConsoleRouterView: View {
     }
 }
 
-#if os(iOS)
-@available(iOS 15, *)
+#if os(iOS) || os(visionOS)
+@available(iOS 15, visionOS 1.0, *)
 extension ConsoleRouterView {
     var contents: some View {
         Text("").invisible()

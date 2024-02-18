@@ -12,14 +12,14 @@ protocol ConsoleEntitiesSource {
     var entities: [NSManagedObject] { get }
 }
 
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(macOS) || os(visionOS)
 
 final class ConsoleSearchBarViewModel: ObservableObject {
     @Published var text: String = ""
     @Published var tokens: [ConsoleSearchToken] = []
 }
 
-@available(iOS 15, *)
+@available(iOS 15, visionOS 1.0, *)
 final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDelegate {
     var isSearchActive: Bool = false {
         didSet {
@@ -96,7 +96,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
 
         self.context = store.newBackgroundContext()
 
-#if os(iOS)
+#if os(iOS) || os(visionOS)
         searchBar.$text.sink {
             if $0.last == "\t" {
                 DispatchQueue.main.async {
@@ -348,7 +348,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     }
 }
 
-@available(iOS 15, *)
+@available(iOS 15, visionOS 1.0, *)
 struct ConsoleSearchResultViewModel: Identifiable {
     var id: ConsoleSearchResultKey { ConsoleSearchResultKey(id: entity.objectID) }
     let entity: NSManagedObject

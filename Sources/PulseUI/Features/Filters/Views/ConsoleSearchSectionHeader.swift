@@ -50,7 +50,7 @@ struct ConsoleSectionHeader: View {
             }
         }.buttonStyle(.plain)
     }
-#elseif os(iOS)
+#elseif os(iOS) || os(visionOS)
     var body: some View {
         HStack {
             Text(title)

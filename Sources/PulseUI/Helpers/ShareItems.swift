@@ -68,7 +68,7 @@ enum ShareService {
             let fileURL = directory.write(data: html, extension: "html")
             return ShareItems([fileURL], size: Int64(html.count), cleanup: directory.remove)
         case .pdf:
-#if os(iOS)
+#if os(iOS) || os(visionOS)
             let pdf = (try? TextUtilities.pdf(from: string)) ?? Data()
             let directory = TemporaryDirectory()
             let fileURL = directory.write(data: pdf, extension: "pdf")

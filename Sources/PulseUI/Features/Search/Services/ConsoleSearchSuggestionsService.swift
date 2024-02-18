@@ -2,14 +2,14 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(macOS) || os(visionOS)
 
 import SwiftUI
 import Pulse
 import CoreData
 import Combine
 
-@available(iOS 15, *)
+@available(iOS 15, visionOS 1.0, *)
 struct ConsoleSearchSuggestionsViewModel {
     let searches: [ConsoleSearchSuggestion]
     let filters: [ConsoleSearchSuggestion]
@@ -37,7 +37,7 @@ struct ConsoleSearchSuggestionsContext {
     }
 }
 
-@available(iOS 15, *)
+@available(iOS 15, visionOS 1.0, *)
 final class ConsoleNetworkSearchSuggestionsService {
     let recents: ConsoleSearchRecentSearchesStore
     let mode: ConsoleMode
@@ -143,7 +143,7 @@ final class ConsoleNetworkSearchSuggestionsService {
     }
 }
 
-@available(iOS 15, *)
+@available(iOS 15, visionOS 1.0, *)
 struct ConsoleSearchSuggestion: Identifiable {
     let id = UUID()
     let text: AttributedString

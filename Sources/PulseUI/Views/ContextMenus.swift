@@ -2,7 +2,7 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(macOS) || os(visionOS)
 
 import SwiftUI
 import Pulse
@@ -10,7 +10,7 @@ import Combine
 import CoreData
 
 enum ContextMenu {
-    @available(iOS 15, *)
+    @available(iOS 15, visionOS 1.0, *)
     struct MessageContextMenu: View {
         let message: LoggerMessageEntity
 
@@ -52,7 +52,7 @@ enum ContextMenu {
             Section {
                 PinButton(viewModel: .init(message)).tint(.pink)
             }
-#if os(iOS)
+#if os(iOS) || os(visionOS)
             ButtonOpenOnMac(entity: message)
 #endif
         }
@@ -60,7 +60,7 @@ enum ContextMenu {
 
     struct NetworkTaskContextMenuItems: View {
         let task: NetworkTaskEntity
-#if os(iOS)
+#if os(iOS) || os(visionOS)
         @Binding private(set) var sharedItems: ShareItems?
 #else
         @Binding private(set) var sharedTask: NetworkTaskEntity?
@@ -70,7 +70,7 @@ enum ContextMenu {
 
         var body: some View {
             Section {
-#if os(iOS)
+#if os(iOS) || os(visionOS)
                 ContextMenu.NetworkTaskShareMenu(task: task, shareItems: $sharedItems)
 #else
                 Button(action: { sharedTask = task }) {
@@ -79,7 +79,7 @@ enum ContextMenu {
 #endif
                 ContextMenu.NetworkTaskCopyMenu(task: task)
             }
-#if os(iOS)
+#if os(iOS) || os(visionOS)
             if !isDetailsView {
                 NetworkTaskFilterMenu(task: task)
             }
@@ -89,7 +89,7 @@ enum ContextMenu {
                     PinButton(viewModel: .init(message))
                 }
             }
-#if os(iOS)
+#if os(iOS) || os(visionOS)
             ButtonOpenOnMac(entity: task)
 #endif
         }
@@ -258,8 +258,8 @@ struct StringSearchOptionsMenu: View {
     }
 }
 
-#if os(iOS)
-@available(iOS 15, *)
+#if os(iOS) || os(visionOS)
+@available(iOS 15, visionOS 1.0, *)
 struct OpenOnMacOverlay: View {
     let entity: NSManagedObject
     @ObservedObject var logger: RemoteLogger = .shared
@@ -320,7 +320,7 @@ struct AttributedStringShareMenu: View {
         Button(action: { shareItems = ShareService.share(string(), as: .html) }) {
             Label("Share as HTML", systemImage: "square.and.arrow.up")
         }
-#if os(iOS)
+#if os(iOS) || os(visionOS)
         Button(action: { shareItems = ShareService.share(string(), as: .pdf) }) {
             Label("Share as PDF", systemImage: "square.and.arrow.up")
         }

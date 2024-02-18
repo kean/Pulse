@@ -8,11 +8,11 @@ import Foundation
 import AppKit
 #endif
 
-#if os(iOS)
+#if os(iOS) || os(visionOS)
 import PDFKit
 #endif
 
-#if os(iOS) || os(tvOS)
+#if os(iOS) || os(tvOS) || os(visionOS)
 import UIKit
 #endif
 
@@ -81,7 +81,7 @@ enum TextUtilities {
     }
 
     /// Renders the given attributed string as PDF
-#if os(iOS)
+#if os(iOS) || os(visionOS)
     static func pdf(from string: NSAttributedString) throws -> Data {
         let string = NSMutableAttributedString(attributedString: string)
         string.enumerateAttribute(.font, in: NSRange(location: 0, length: string.length)) { font, range, _ in
@@ -121,7 +121,7 @@ enum TextUtilities {
 }
 
 private var isDarkMode: Bool {
-#if os(iOS) || os(tvOS)
+#if os(iOS) || os(tvOS) || os(visionOS)
     return UIViewController().traitCollection.userInterfaceStyle == .dark
 #elseif os(watchOS)
     return true

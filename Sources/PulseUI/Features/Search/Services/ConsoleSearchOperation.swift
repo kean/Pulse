@@ -2,20 +2,20 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(macOS) || os(visionOS)
 
 import SwiftUI
 import Pulse
 import CoreData
 import Combine
 
-@available(iOS 15, *)
+@available(iOS 15, visionOS 1.0, *)
 protocol ConsoleSearchOperationDelegate: AnyObject {
     func searchOperation(_ operation: ConsoleSearchOperation, didAddResults results: [ConsoleSearchResultViewModel])
     func searchOperationDidFinish(_ operation: ConsoleSearchOperation, hasMore: Bool)
 }
 
-@available(iOS 15, *)
+@available(iOS 15, visionOS 1.0, *)
 final class ConsoleSearchOperation {
     private let parameters: ConsoleSearchParameters
     private var entities: [NSManagedObject]
@@ -257,7 +257,7 @@ struct ConsoleSearchMatch {
     static let limit = 1000
 }
 
-@available(iOS 15, *)
+@available(iOS 15, visionOS 1.0, *)
 final class ConsoleSearchService {
     private let cache = NSCache<NSManagedObjectID, CachedString>()
 

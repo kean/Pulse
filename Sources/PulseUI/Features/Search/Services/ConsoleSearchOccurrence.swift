@@ -2,14 +2,14 @@
 //
 // Copyright (c) 2020–2023 Alexander Grebenyuk (github.com/kean).
 
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(macOS) || os(visionOS)
 
 import SwiftUI
 import Pulse
 import CoreData
 import Combine
 
-@available(iOS 15, *)
+@available(iOS 15, visionOS 1.0, *)
 final class ConsoleSearchOccurrence: Identifiable, Equatable, Hashable {
     let id = ConsoleSearchOccurrenceId()
     let scope: ConsoleSearchScope
@@ -38,7 +38,7 @@ final class ConsoleSearchOccurrence: Identifiable, Equatable, Hashable {
 
 private let previewAttibutes = TextHelper().attributes(role: .body2, style: .monospaced)
 
-@available(iOS 15, *)
+@available(iOS 15, visionOS 1.0, *)
 extension ConsoleSearchOccurrence {
     static func makePreview(for match: ConsoleSearchMatch, attributes customAttributes: [NSAttributedString.Key: Any] = [:]) -> AttributedString {
 
