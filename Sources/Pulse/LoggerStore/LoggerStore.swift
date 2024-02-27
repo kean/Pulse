@@ -280,7 +280,7 @@ public final class LoggerStore: @unchecked Sendable, Identifiable {
 
 extension LoggerStore {
     /// Stores the given message.
-    public func storeMessage(createdAt: Date? = nil, label: String, level: Level, message: String, metadata: [String: MetadataValue]? = nil, file: String = #file, function: String = #function, line: UInt = #line) {
+    public func storeMessage(createdAt: Date? = nil, label: String, level: Level, message: String, metadata: [String: MetadataValue]? = nil, file: StaticString = #file, function: StaticString = #function, line: UInt = #line) {
         handle(.messageStored(.init(
             createdAt: createdAt ?? configuration.makeCurrentDate(),
             label: label,
