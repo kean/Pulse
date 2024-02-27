@@ -24,6 +24,7 @@ public func UIConsoleViewController(store: LoggerStore = .shared, mode: ConsoleM
 
 extension UIHostingController<ConsoleView> {
 #if os(iOS)
+    /// Changes the default close button visibility.
     public func closeButtonHidden(_ isHidden: Bool = true) {
         self.rootView = self.rootView.closeButtonHidden(isHidden)
     }
