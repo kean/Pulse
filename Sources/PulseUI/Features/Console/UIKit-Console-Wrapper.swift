@@ -23,12 +23,15 @@ public func UIConsoleViewController(store: LoggerStore = .shared, mode: ConsoleM
 }
 
 extension UIHostingController<ConsoleView> {
+#if os(iOS)
     public func closeButtonHidden(_ isHidden: Bool = true) {
         self.rootView = self.rootView.closeButtonHidden(isHidden)
     }
+#endif
 }
 
 @available(iOS 16.0, *)
+@available(tvOS 16.0, *)
 /// Initializes the console view controller with swiftui navigation built in
 ///
 /// - parameters:
