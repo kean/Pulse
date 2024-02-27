@@ -24,7 +24,7 @@ public struct ConsoleView: View {
             .injecting(environment)
             .navigationTitle("")
         } else {
-            PlaceholderView(imageName: "xmark.octagon", title: "Unsupported", subtitle: "Pulse requires iOS 15 or higher").padding()
+            PlaceholderView(imageName: "xmark.octagon", title: "Unsupported", subtitle: "Pulse requires macOS 13 or later").padding()
         }
     }
 }

@@ -23,7 +23,7 @@ public struct ConsoleView: View {
         if #available(iOS 15, *) {
             contents
         } else {
-            PlaceholderView(imageName: "xmark.octagon", title: "Unsupported", subtitle: "Pulse requires iOS 15 or higher").padding()
+            PlaceholderView(imageName: "xmark.octagon", title: "Unsupported", subtitle: "Pulse requires iOS 15 or later").padding()
         }
     }
 
