@@ -19,26 +19,32 @@ final class ViewController: UIViewController, UITableViewDataSource, UITableView
         sections = [
             MenuSection(title: "Main", footer: "Demonstartes how to show the entire PulseUI interface (all four tabs)", items: [
                 MenuItem(title: "MainViewController", isPush: false, action: { [unowned self] in
-                    let vc = MainViewController(store: .mock)
+                    let vc = UIConsoleNavigationViewController(store: .mock)
                     self.present(vc, animated: true, completion: nil)
                 }),
                 MenuItem(title: "MainViewController (Fullscreen)", isPush: false, action: { [unowned self] in
-                    let vc = MainViewController(store: .mock)
+                    let vc = UIConsoleNavigationViewController(store: .mock)
                     vc.modalPresentationStyle = .fullScreen
                     self.present(vc, animated: true, completion: nil)
                 })
             ]),
             MenuSection(title: "Components", footer: "Demonstrates how you can push individual PulseUI screens into an existing navigation (UINavigationController or NavigationView)", items: [
                 MenuItem(title: "ConsoleView", action: { [unowned self] in
-                    let vc = UIHostingController(rootView: ConsoleView(store: .mock).closeButtonHidden())
+                    let vc = UIConsoleViewController(store: .mock)
+                    vc.closeButtonHidden()
+                    
                     self.navigationController?.pushViewController(vc, animated: true)
                 }),
                 MenuItem(title: "ConsoleView (Logs)", action: { [unowned self] in
-                    let vc = UIHostingController(rootView: ConsoleView(store: .mock, mode: .logs).closeButtonHidden())
+                    let vc = UIConsoleViewController(store: .mock, mode: .logs)
+                    vc.closeButtonHidden()
+                    
                     self.navigationController?.pushViewController(vc, animated: true)
                 }),
                 MenuItem(title: "ConsoleView (Network)", action: { [unowned self] in
-                    let vc = UIHostingController(rootView: ConsoleView(store: .mock, mode: .network).closeButtonHidden())
+                    let vc = UIConsoleViewController(store: .mock, mode: .network)
+                    vc.closeButtonHidden()
+                    
                     self.navigationController?.pushViewController(vc, animated: true)
                 })
             ]),

@@ -271,6 +271,7 @@
 		0CFF79DD29EB7A8E00BE767B /* SessionListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CFF79DB29EB7A8B00BE767B /* SessionListView.swift */; };
 		0CFF79DF29EB7B4300BE767B /* SessionPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CFF79DE29EB7B4300BE767B /* SessionPickerView.swift */; };
 		0CFF79E229EC1FA200BE767B /* ImageProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CFF79E029EC1F7800BE767B /* ImageProcessor.swift */; };
+		22A72D0F2B8C5E980037B730 /* UIKit-Console-Wrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22A72D0E2B8C5E980037B730 /* UIKit-Console-Wrapper.swift */; };
 		E95D6C562B7314E6004D28E4 /* HARDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95D6C552B7314E6004D28E4 /* HARDocument.swift */; };
 /* End PBXBuildFile section */
 
@@ -726,6 +727,7 @@
 		0CFF79DB29EB7A8B00BE767B /* SessionListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionListView.swift; sourceTree = "<group>"; };
 		0CFF79DE29EB7B4300BE767B /* SessionPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionPickerView.swift; sourceTree = "<group>"; };
 		0CFF79E029EC1F7800BE767B /* ImageProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageProcessor.swift; sourceTree = "<group>"; };
+		22A72D0E2B8C5E980037B730 /* UIKit-Console-Wrapper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIKit-Console-Wrapper.swift"; sourceTree = "<group>"; };
 		49E82A8526D107A00070244F /* AlamofireIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlamofireIntegration.swift; sourceTree = "<group>"; };
 		49E82A8826D1083D0070244F /* MoyaIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoyaIntegration.swift; sourceTree = "<group>"; };
 		E95D6C552B7314E6004D28E4 /* HARDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HARDocument.swift; sourceTree = "<group>"; };
@@ -1384,6 +1386,7 @@
 				0CBEF6A429DF69E800132FB3 /* ConsoleView.swift */,
 				0CF0D60A296F189600EED9D4 /* ConsoleEnvironment.swift */,
 				0CECF63C2996BE12000F9CCD /* ConsoleDataSource.swift */,
+				22A72D0E2B8C5E980037B730 /* UIKit-Console-Wrapper.swift */,
 			);
 			path = Console;
 			sourceTree = "<group>";
@@ -2070,6 +2073,7 @@
 				0C11EAE92971EBEE0059786A /* MockTask.swift in Sources */,
 				0C63A388297A432500F6A6A5 /* ConsoleSearchToolbar.swift in Sources */,
 				0CF0D66E296F189600EED9D4 /* NetworkCURLCell.swift in Sources */,
+				22A72D0F2B8C5E980037B730 /* UIKit-Console-Wrapper.swift in Sources */,
 				0C31FFB9298211AF002A7D64 /* ConsoleEntityDetailsView.swift in Sources */,
 				0CF0D625296F189600EED9D4 /* PlaceholderView.swift in Sources */,
 				0CFF79DF29EB7B4300BE767B /* SessionPickerView.swift in Sources */,
