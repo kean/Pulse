@@ -12,7 +12,6 @@ import CoreData
 import Pulse
 import Combine
 
-
 /// Initializes the console view controller
 ///
 /// - parameters:
