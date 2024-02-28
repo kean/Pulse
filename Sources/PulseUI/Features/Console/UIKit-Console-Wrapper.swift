@@ -5,6 +5,7 @@
 //  Created by Morris Richman on 2/25/24.
 //
 
+#if canImport(UIKit)
 import UIKit
 import SwiftUI
 import CoreData
@@ -62,3 +63,5 @@ public func UIConsoleNavigationViewController(store: LoggerStore = .shared, mode
     
     return UIHostingController(rootView: view)
 }
+
+#endif
