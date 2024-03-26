@@ -44,6 +44,23 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
         try? secondStore.destroy()
     }
 
+    func testInitCreateInMemoryStore() throws {
+        // GIVEN
+        let storeURL = directory.url.appending(filename: UUID().uuidString)
+        let options: LoggerStore.Options = [.create, .synchronous, .inMemory]
+
+        // WHEN
+        let store = try LoggerStore(storeURL: storeURL, options: options)
+        populate(store: store)
+
+        // THEN data is NOT persisted
+        let databaseURL = storeURL.appending(filename: "logs.sqlite")
+        XCTAssertFalse(FileManager.default.fileExists(atPath: databaseURL.path))
+
+        // CLEANUP
+        try? store.destroy()
+    }
+
     func testInitCreateStoreIntermediateDirectoryMissing() throws {
         // GIVEN
         let storeURL = directory.url
