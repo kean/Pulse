@@ -6,7 +6,7 @@ import SwiftUI
 import Pulse
 import CoreData
 
-@available(iOS 15, macOS 13, *)
+@available(iOS 15, macOS 13, visionOS 1.0, *)
 struct ConsoleSessionsPickerView: View {
     @Binding var selection: Set<UUID>
     @State private var isShowingPicker = false
@@ -19,7 +19,7 @@ struct ConsoleSessionsPickerView: View {
 #endif
 
     var body: some View {
-#if os(iOS)
+#if os(iOS) || os(visionOS)
         NavigationLink(destination: SessionPickerView(selection: $selection)) {
             InfoRow(title: "Sessions", details: selectedSessionTitle)
         }

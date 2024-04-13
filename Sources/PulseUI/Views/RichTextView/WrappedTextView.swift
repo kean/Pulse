@@ -2,12 +2,12 @@
 //
 // Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
 
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(macOS) || os(visionOS)
 
 import SwiftUI
 import Combine
 
-#if os(iOS)
+#if os(iOS) || os(visionOS)
 
 struct WrappedTextView: UIViewRepresentable {
     let viewModel: RichTextViewModel
@@ -128,13 +128,15 @@ private func configureTextView(_ textView: UXTextView) {
     ]
     textView.backgroundColor = .clear
 
-#if os(iOS)
-    textView.keyboardDismissMode = .interactive
+#if os(iOS) || os(visionOS)
     textView.alwaysBounceVertical = true
     textView.autocorrectionType = .no
     textView.autocapitalizationType = .none
     textView.adjustsFontForContentSizeCategory = true
     textView.textContainerInset = UIEdgeInsets(top: 8, left: 10, bottom: 8, right: 10)
+#endif
+#if os(iOS)
+    textView.keyboardDismissMode = .interactive
 #endif
 
 #if os(macOS)

@@ -652,7 +652,7 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
 
     // MARK: - Image Support
 
-#if os(iOS)
+#if os(iOS) || os(visionOS)
     func testImageThumbnailsAreStored() throws {
         // GIVEN
         let image = try makeMockImage()

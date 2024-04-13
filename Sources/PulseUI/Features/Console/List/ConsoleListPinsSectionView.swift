@@ -2,14 +2,14 @@
 //
 // Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
 
-#if os(iOS)
+#if os(iOS) || os(visionOS)
 
 import CoreData
 import Pulse
 import Combine
 import SwiftUI
 
-@available(iOS 15, *)
+@available(iOS 15, visionOS 1.0, *)
 struct ConsoleListPinsSectionView: View {
     @ObservedObject var viewModel: ConsoleListViewModel
 

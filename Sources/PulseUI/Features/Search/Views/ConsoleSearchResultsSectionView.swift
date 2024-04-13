@@ -2,14 +2,14 @@
 //
 // Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
 
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(macOS) || os(visionOS)
 
 import SwiftUI
 import Pulse
 import CoreData
 import Combine
 
-@available(iOS 15, macOS 13, *)
+@available(iOS 15, visionOS 1.0, macOS 13, *)
 struct ConsoleSearchResultView: View {
     let viewModel: ConsoleSearchResultViewModel
     var limit: Int = 4
@@ -49,7 +49,7 @@ struct ConsoleSearchResultView: View {
             }
 #endif
         }
-#if os(iOS)
+#if os(iOS) || os(visionOS)
         if isSeparatorNeeded {
             PlainListGroupSeparator()
         }
@@ -96,7 +96,7 @@ struct ConsoleSearchResultView: View {
         }
     }
 
-#if os(iOS)
+#if os(iOS) || os(visionOS)
     @ViewBuilder
     private static func _makeDestination(for occurrence: ConsoleSearchOccurrence, task: NetworkTaskEntity) -> some View {
         switch occurrence.scope {
@@ -141,7 +141,7 @@ struct ConsoleSearchResultView: View {
     }
 }
 
-@available(iOS 15, macOS 13, *)
+@available(iOS 15, visionOS 1.0, macOS 13, *)
 struct ConsoleSearchResultDetailsView: View {
     let viewModel: ConsoleSearchResultViewModel
 
@@ -155,8 +155,8 @@ struct ConsoleSearchResultDetailsView: View {
     }
 }
 
-#if os(iOS)
-@available(iOS 15, *)
+#if os(iOS) || os(visionOS)
+@available(iOS 15, visionOS 1.0, *)
 struct PlainListGroupSeparator: View {
     var body: some View {
         Rectangle().foregroundColor(.clear) // DIY separator
@@ -168,7 +168,7 @@ struct PlainListGroupSeparator: View {
 }
 #endif
 
-@available(iOS 15, *)
+@available(iOS 15, visionOS 1.0, *)
 struct PlainListSectionHeader<Content: View>: View {
     var title: String?
     @ViewBuilder let content: () -> Content
@@ -177,7 +177,7 @@ struct PlainListSectionHeader<Content: View>: View {
         contents
             .padding(.top, 8)
             .listRowBackground(Color.separator.opacity(0.2))
-#if os(iOS)
+#if os(iOS) || os(visionOS)
             .listRowSeparator(.hidden)
 #endif
     }
@@ -198,14 +198,14 @@ struct PlainListSectionHeader<Content: View>: View {
     }
 }
 
-@available(iOS 15, *)
+@available(iOS 15, visionOS 1.0, *)
 extension PlainListSectionHeader where Content == Text {
     init(title: String) {
         self.init(title: title, content: { Text(title) })
     }
 }
 
-@available(iOS 15, *)
+@available(iOS 15, visionOS 1.0, *)
 struct PlainListExpandableSectionHeader<Destination: View>: View {
     let title: String
     let count: Int
@@ -234,7 +234,7 @@ struct PlainListExpandableSectionHeader<Destination: View>: View {
     }
 }
 
-@available(iOS 15, *)
+@available(iOS 15, visionOS 1.0, *)
 struct PlainListSeeAllView: View {
     let count: Int
 
@@ -247,7 +247,7 @@ struct PlainListSeeAllView: View {
     }
 }
 
-@available(iOS 15, *)
+@available(iOS 15, visionOS 1.0, *)
 struct PlainListSectionHeaderSeparator: View {
     let title: String
 

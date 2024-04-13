@@ -2,7 +2,7 @@
 //
 // Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
 
-#if os(iOS)
+#if os(iOS) || os(visionOS)
 
 import UIKit
 

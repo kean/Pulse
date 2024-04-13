@@ -2,19 +2,19 @@
 //
 // Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
 
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(macOS) || os(visionOS)
 
 import SwiftUI
 import Pulse
 import CoreData
 import Combine
 
-@available(iOS 15, macOS 13, *)
+@available(iOS 15, macOS 13, visionOS 1.0, *)
 struct ConsoleSearchListContentView: View {
     @EnvironmentObject private var viewModel: ConsoleSearchViewModel
 
     var body: some View {
-#if os(iOS)
+#if os(iOS) || os(visionOS)
         ConsoleSearchToolbar()
             .listRowBackground(Color.clear)
             .listRowSeparator(.hidden, edges: .top)
@@ -38,7 +38,7 @@ struct ConsoleSearchListContentView: View {
             .background(Color.accentColor)
             .cornerRadius(8)
         }
-#if os(iOS)
+#if os(iOS) || os(visionOS)
         .listRowSeparator(.hidden)
 #endif
         .listRowBackground(Color.separator.opacity(0.2))
@@ -47,12 +47,12 @@ struct ConsoleSearchListContentView: View {
     }
 }
 
-@available(iOS 15, macOS 13, *)
+@available(iOS 15, macOS 13, visionOS 1.0, *)
 struct ConsoleSearchResultsListContentView: View {
     @EnvironmentObject private var viewModel: ConsoleSearchViewModel
 
     var body: some View {
-#if os(iOS)
+#if os(iOS) || os(visionOS)
         if !viewModel.results.isEmpty {
             PlainListGroupSeparator()
         }
@@ -62,7 +62,7 @@ struct ConsoleSearchResultsListContentView: View {
             ConsoleSearchResultView(viewModel: result, isSeparatorNeeded: !viewModel.parameters.terms.isEmpty && !isLast)
         }
         if !viewModel.isSearching && viewModel.hasMore {
-#if os(iOS)
+#if os(iOS) || os(visionOS)
             PlainListGroupSeparator()
 #endif
             Button(action: viewModel.buttonShowMoreResultsTapped) {

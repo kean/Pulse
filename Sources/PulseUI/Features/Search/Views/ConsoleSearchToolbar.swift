@@ -2,14 +2,14 @@
 //
 // Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
 
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(macOS) || os(visionOS)
 
 import SwiftUI
 import Pulse
 import CoreData
 import Combine
 
-@available(iOS 15, *)
+@available(iOS 15, visionOS 1.0, *)
 struct ConsoleSearchToolbar: View {
     @EnvironmentObject private var viewModel: ConsoleSearchViewModel
     @State private var isShowingScopesPicker = false
@@ -46,7 +46,7 @@ struct ConsoleSearchToolbar: View {
     }
 
     private var searchOptionsView: some View {
-#if os(iOS)
+#if os(iOS) || os(visionOS)
             HStack(spacing: 14) {
                 ConsoleSearchContextMenu()
             }
@@ -98,7 +98,7 @@ struct ConsoleSearchStringOptionsView: View {
 }
 #endif
 
-@available(iOS 15, *)
+@available(iOS 15, visionOS 1.0, *)
 struct ConsoleSearchScopesPicker: View {
     @ObservedObject var viewModel: ConsoleSearchViewModel
 
@@ -120,7 +120,7 @@ struct ConsoleSearchScopesPicker: View {
     }
 }
 
-@available(iOS 15, *)
+@available(iOS 15, visionOS 1.0, *)
 struct ConsoleSearchPickScopesButton: View {
     @EnvironmentObject var viewModel: ConsoleSearchViewModel
 

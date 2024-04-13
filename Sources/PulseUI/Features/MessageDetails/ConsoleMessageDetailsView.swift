@@ -7,11 +7,11 @@
 import SwiftUI
 import Pulse
 
-@available(iOS 15, *)
+@available(iOS 15, visionOS 1.0, *)
 struct ConsoleMessageDetailsView: View {
     let message: LoggerMessageEntity
 
-#if os(iOS)
+#if os(iOS) || os(visionOS)
     var body: some View {
         contents
             .navigationBarTitle("", displayMode: .inline)
@@ -99,7 +99,7 @@ struct ConsoleMessageDetailsView: View {
 }
 
 #if DEBUG
-@available(iOS 15, *)
+@available(iOS 15, visionOS 1.0, *)
 struct ConsoleMessageDetailsView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {

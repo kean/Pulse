@@ -8,14 +8,14 @@ import SwiftUI
 import CoreData
 import Combine
 
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(macOS) || os(visionOS)
 
-@available(iOS 15, macOS 13, *)
+@available(iOS 15, macOS 13, visionOS 1.0, *)
 struct SessionsView: View {
     @State private var selection: Set<UUID> = []
     @State private var sharedSessions: SelectedSessionsIDs?
 
-#if os(iOS)
+#if os(iOS) || os(visionOS)
     @State private var editMode: EditMode = .inactive
 #endif
 
@@ -35,7 +35,7 @@ struct SessionsView: View {
     @ViewBuilder
     private var content: some View {
         list
-#if os(iOS)
+#if os(iOS) || os(visionOS)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(editMode.isEditing ? "Done" : "Edit") {
@@ -65,7 +65,7 @@ struct SessionsView: View {
 
     private var list: some View {
         SessionListView(selection: $selection, sharedSessions: $sharedSessions)
-#if os(iOS)
+#if os(iOS) || os(visionOS)
             .environment(\.editMode, $editMode)
             .onChange(of: selection) {
                 guard !editMode.isEditing, !$0.isEmpty else { return }
@@ -80,7 +80,7 @@ struct SessionsView: View {
 #endif
     }
 
-#if os(iOS)
+#if os(iOS) || os(visionOS)
     var bottomBar: some View {
         HStack {
             Button(role: .destructive, action: {
@@ -141,12 +141,12 @@ struct SessionsView: View {
 }
 
 #if DEBUG
-@available(iOS 15.0, macOS 13, *)
+@available(iOS 15.0, macOS 13, visionOS 1.0, *)
 struct Previews_SessionsView_Previews: PreviewProvider {
     static let environment = ConsoleEnvironment(store: .mock)
 
     static var previews: some View {
-#if os(iOS)
+#if os(iOS) || os(visionOS)
         NavigationView {
             SessionsView()
                 .injecting(environment)

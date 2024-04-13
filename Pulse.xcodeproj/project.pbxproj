@@ -87,10 +87,10 @@
 		0C70EA812A3F6190000B1071 /* repos.json in Resources */ = {isa = PBXBuildFile; fileRef = 0CDACDE129EC6607007C15CD /* repos.json */; };
 		0C70EA822A3F619A000B1071 /* MockStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5B0296F189500EED9D4 /* MockStore.swift */; };
 		0C70EA832A3F619A000B1071 /* MockTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5AF296F189500EED9D4 /* MockTask.swift */; };
-		0C70EA842A3F61F9000B1071 /* Pulse.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CF0D542296F14EA00EED9D4 /* Pulse.framework */; };
-		0C70EA852A3F61F9000B1071 /* Pulse.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0CF0D542296F14EA00EED9D4 /* Pulse.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		0C70EA882A3F61F9000B1071 /* PulseUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CF0D56C296F17CB00EED9D4 /* PulseUI.framework */; };
-		0C70EA892A3F61F9000B1071 /* PulseUI.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0CF0D56C296F17CB00EED9D4 /* PulseUI.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		0C70EA842A3F61F9000B1071 /* Pulse.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CF0D542296F14EA00EED9D4 /* Pulse.framework */; platformFilters = (ios, tvos, watchos, xros, ); };
+		0C70EA852A3F61F9000B1071 /* Pulse.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0CF0D542296F14EA00EED9D4 /* Pulse.framework */; platformFilters = (ios, tvos, watchos, xros, ); settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		0C70EA882A3F61F9000B1071 /* PulseUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CF0D56C296F17CB00EED9D4 /* PulseUI.framework */; platformFilters = (ios, tvos, watchos, xros, ); };
+		0C70EA892A3F61F9000B1071 /* PulseUI.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0CF0D56C296F17CB00EED9D4 /* PulseUI.framework */; platformFilters = (ios, tvos, watchos, xros, ); settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		0C7A0DFB297C33F300B4B69D /* ConsoleRouterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7A0DFA297C33F300B4B69D /* ConsoleRouterView.swift */; };
 		0C7A0E00297C51CE00B4B69D /* ConsoleListOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7A0DFF297C51CE00B4B69D /* ConsoleListOptions.swift */; };
 		0C7A0E02297CE71400B4B69D /* FormattersTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7A0E01297CE71400B4B69D /* FormattersTests.swift */; };
@@ -2206,11 +2206,23 @@
 		};
 		0C70EA872A3F61F9000B1071 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
+			platformFilters = (
+				ios,
+				tvos,
+				watchos,
+				xros,
+			);
 			target = 0CF0D541296F14EA00EED9D4 /* Pulse */;
 			targetProxy = 0C70EA862A3F61F9000B1071 /* PBXContainerItemProxy */;
 		};
 		0C70EA8B2A3F61F9000B1071 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
+			platformFilters = (
+				ios,
+				tvos,
+				watchos,
+				xros,
+			);
 			target = 0CF0D56B296F17CB00EED9D4 /* PulseUI */;
 			targetProxy = 0C70EA8A2A3F61F9000B1071 /* PBXContainerItemProxy */;
 		};
@@ -2764,12 +2776,12 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.github.kean.pulse-demo";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator watchos watchsimulator";
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator watchos watchsimulator xros xrsimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = "1,2,7";
 			};
 			name = Debug;
 		};
@@ -2808,13 +2820,13 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.github.kean.pulse-demo";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator watchos watchsimulator";
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator watchos watchsimulator xros xrsimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = PULSE_MOCK_INCLUDED;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = "1,2,7";
 			};
 			name = Release;
 		};
@@ -2941,8 +2953,11 @@
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = auto;
 				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator macosx watchos watchsimulator xros xrsimulator";
+				SUPPORTS_MACCATALYST = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 7;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -2975,7 +2990,10 @@
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = auto;
 				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator macosx watchos watchsimulator xros xrsimulator";
+				SUPPORTS_MACCATALYST = YES;
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 7;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -3008,9 +3026,12 @@
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = auto;
 				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator macosx watchos watchsimulator xros xrsimulator";
+				SUPPORTS_MACCATALYST = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 7;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
@@ -3042,8 +3063,11 @@
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = auto;
 				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "appletvos appletvsimulator iphoneos iphonesimulator macosx watchos watchsimulator xros xrsimulator";
+				SUPPORTS_MACCATALYST = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 7;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
