@@ -2,7 +2,7 @@
 //
 // Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
 
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(macOS) || os(visionOS)
 
 #if DEBUG
 
@@ -29,7 +29,7 @@ struct DecodingErrors_Previews: PreviewProvider {
     @ViewBuilder
     private static func fileViewer(error: NetworkLogger.DecodingError) -> some View {
         let viewer = FileViewer(viewModel: .init(title: "Response", context: .init(contentType: .init(rawValue: "application/json"), originalSize: 1200, error: error), data: { MockJSON.allPossibleValues }))
-#if os(iOS)
+#if os(iOS) || os(visionOS)
         NavigationView {
             viewer
         }

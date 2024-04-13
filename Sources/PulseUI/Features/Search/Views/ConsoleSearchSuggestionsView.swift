@@ -2,14 +2,14 @@
 //
 // Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
 
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(macOS) || os(visionOS)
 
 import SwiftUI
 import Pulse
 import CoreData
 import Combine
 
-@available(iOS 15, *)
+@available(iOS 15, visionOS 1.0, *)
 struct ConsoleSearchSuggestionsView: View {
     @EnvironmentObject private var viewModel: ConsoleSearchViewModel
 
@@ -51,7 +51,7 @@ struct ConsoleSearchSuggestionsView: View {
             makeList(with: suggestions.filters)
         }
 
-#if os(iOS)
+#if os(iOS) || os(visionOS)
         if viewModel.parameters.isEmpty {
             PlainListSectionHeaderSeparator(title: "Scopes").padding(.top, 16)
             ConsoleSearchScopesPicker(viewModel: viewModel)
@@ -70,7 +70,7 @@ struct ConsoleSearchSuggestionsView: View {
                 .font(.subheadline)
             }.buttonStyle(.plain)
         }
-#if os(iOS)
+#if os(iOS) || os(visionOS)
         .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 0, trailing: 20))
         .listRowSeparator(.hidden, edges: .bottom)
 #endif
@@ -89,7 +89,7 @@ struct ConsoleSearchSuggestionsView: View {
 }
 
 #if DEBUG
-@available(iOS 15, *)
+@available(iOS 15, visionOS 1.0, *)
 struct Previews_ConsoleSearchSuggestionsView_Previews: PreviewProvider {
     static let environment = ConsoleEnvironment(store: .mock)
 

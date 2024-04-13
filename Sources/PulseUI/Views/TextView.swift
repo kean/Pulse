@@ -4,7 +4,7 @@
 
 import SwiftUI
 
-#if os(iOS) || os(tvOS)
+#if os(iOS) || os(tvOS) || os(visionOS)
 /// A simple text view for rendering attributed strings.
 struct TextView: UIViewRepresentable {
     let string: NSAttributedString
@@ -51,17 +51,17 @@ struct TextView: View {
 }
 #endif
 
-#if os(iOS) || os(macOS) || os(tvOS)
+#if os(iOS) || os(macOS) || os(tvOS) || os(visionOS)
 private func configureTextView(_ textView: UXTextView) {
     textView.isSelectable = true
     textView.backgroundColor = .clear
 
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(macOS) || os(visionOS)
     textView.isEditable = false
     textView.isAutomaticLinkDetectionEnabled = false
 #endif
 
-#if os(iOS)
+#if os(iOS) || os(visionOS)
     textView.isScrollEnabled = false
     textView.adjustsFontForContentSizeCategory = true
     textView.textContainerInset = .zero

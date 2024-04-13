@@ -2,7 +2,7 @@
 //
 // Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
 
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(macOS) || os(visionOS)
 
 import SwiftUI
 import CoreData
@@ -23,7 +23,7 @@ struct DateRangePicker: View {
     }
 #else
     var body: some View {
-#if os(iOS)
+#if os(iOS) || os(visionOS)
         if #available(iOS 16, *) {
             ViewThatFits {
                 horizontal
@@ -73,7 +73,7 @@ struct DateRangePicker: View {
             }
             .buttonStyle(.plain)
             .foregroundColor(.red)
-#if os(iOS)
+#if os(iOS) || os(visionOS)
             .padding(.trailing, -4)
 #endif
         }

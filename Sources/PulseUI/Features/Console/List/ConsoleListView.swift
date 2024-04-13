@@ -2,14 +2,14 @@
 //
 // Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
 
-#if os(iOS) || os(macOS)
+#if os(iOS) || os(macOS) || os(visionOS)
 
 import SwiftUI
 import CoreData
 import Pulse
 import Combine
 
-@available(iOS 15, macOS 13, *)
+@available(iOS 15, macOS 13, visionOS 1.0, *)
 struct ConsoleListView: View {
     @EnvironmentObject var environment: ConsoleEnvironment
     @EnvironmentObject var filters: ConsoleFiltersViewModel
@@ -19,7 +19,7 @@ struct ConsoleListView: View {
     }
 }
 
-@available(iOS 15, macOS 13, *)
+@available(iOS 15, macOS 13, visionOS 1.0, *)
 private struct _InternalConsoleListView: View {
     private let environment: ConsoleEnvironment
 
@@ -66,7 +66,7 @@ private struct _InternalConsoleListView: View {
 #endif
                 .onSubmit(of: .search, searchViewModel.value.onSubmitSearch)
                 .disableAutocorrection(true)
-#if os(iOS)
+#if os(iOS) || os(visionOS)
                 .textInputAutocapitalization(.never)
 #endif
         } else {
@@ -74,7 +74,7 @@ private struct _InternalConsoleListView: View {
                 .searchable(text: $searchBarViewModel.text)
                 .onSubmit(of: .search, searchViewModel.value.onSubmitSearch)
                 .disableAutocorrection(true)
-#if os(iOS)
+#if os(iOS) || os(visionOS)
                 .textInputAutocapitalization(.never)
 #endif
         }
@@ -83,8 +83,8 @@ private struct _InternalConsoleListView: View {
 
 #endif
 
-#if os(iOS)
-@available(iOS 15, *)
+#if os(iOS) || os(visionOS)
+@available(iOS 15, visionOS 1.0, *)
 private struct _ConsoleListView: View {
     @Environment(\.isSearching) private var isSearching
     @Environment(\.store) private var store
@@ -133,7 +133,7 @@ private struct _ConsoleListView: View {
 #endif
 
 #if os(macOS)
-@available(iOS 15, macOS 13, *)
+@available(iOS 15, macOS 13, visionOS 1.0, *)
 private struct _ConsoleListView: View {
     @EnvironmentObject private var environment: ConsoleEnvironment
     @EnvironmentObject private var listViewModel: ConsoleListViewModel

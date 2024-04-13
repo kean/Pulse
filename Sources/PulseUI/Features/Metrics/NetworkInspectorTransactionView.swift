@@ -6,7 +6,7 @@ import SwiftUI
 import Pulse
 import CoreData
 
-@available(iOS 15, *)
+@available(iOS 15, visionOS 1.0, *)
 struct NetworkInspectorTransactionView: View {
     @ObservedObject var viewModel: NetworkInspectorTransactionViewModel
 
@@ -34,7 +34,7 @@ struct NetworkInspectorTransactionView: View {
         NetworkRequestInfoCell(viewModel: viewModel.requestViewModel)
     }
     
-    @available(iOS 15, *)
+    @available(iOS 15, visionOS 1.0, *)
     private func transferSizeView(size: NetworkInspectorTransferInfoViewModel) -> some View {
         let font = TextHelper().font(style: .init(role: .subheadline, style: .monospacedDigital, width: .condensed))
         return (Text(Image(systemName: "arrow.down.circle")) +
@@ -90,7 +90,7 @@ final class NetworkInspectorTransactionViewModel: ObservableObject, Identifiable
 }
 
 #if DEBUG
-@available(iOS 15, *)
+@available(iOS 15, visionOS 1.0, *)
 struct NetworkInspectorTransactionView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {

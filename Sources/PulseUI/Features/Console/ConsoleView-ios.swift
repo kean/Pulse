@@ -2,7 +2,7 @@
 //
 // Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
 
-#if os(iOS)
+#if os(iOS) || os(visionOS)
 
 import SwiftUI
 import CoreData
@@ -27,7 +27,7 @@ public struct ConsoleView: View {
         }
     }
 
-    @available(iOS 15, *)
+    @available(iOS 15, visionOS 1.0, *)
     private var contents: some View {
         ConsoleListView()
             .navigationTitle(environment.title)
@@ -53,7 +53,7 @@ public struct ConsoleView: View {
         return copy
     }
 
-    @available(iOS 15, *)
+    @available(iOS 15, visionOS 1.0, *)
     @ViewBuilder private var trailingNavigationBarItems: some View {
         Button(action: { environment.router.isShowingShareStore = true }) {
             Image(systemName: "square.and.arrow.up")
