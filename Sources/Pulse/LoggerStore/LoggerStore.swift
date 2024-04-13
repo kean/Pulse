@@ -167,7 +167,7 @@ public final class LoggerStore: @unchecked Sendable, Identifiable {
             self.manifest = .init(storeId: info.storeId, version: try Version(string: info.storeVersion))
         }
 
-        self.container = LoggerStore.makeContainer(databaseURL: databaseURL)
+        self.container = LoggerStore.makeContainer(databaseURL: databaseURL, options: options)
         try container.loadStore()
         self.backgroundContext = container.newBackgroundContext()
 
@@ -245,10 +245,11 @@ public final class LoggerStore: @unchecked Sendable, Identifiable {
         self.configuration = .init()
     }
 
-    private static func makeContainer(databaseURL: URL) -> NSPersistentContainer {
+    private static func makeContainer(databaseURL: URL, options: Options) -> NSPersistentContainer {
         let container = NSPersistentContainer(name: databaseURL.lastPathComponent, managedObjectModel: Self.model)
         let store = NSPersistentStoreDescription(url: databaseURL)
         store.setValue("DELETE" as NSString, forPragmaNamed: "journal_mode")
+        store.type = options.contains(.inMemory) ? NSInMemoryStoreType : NSSQLiteStoreType
         container.persistentStoreDescriptions = [store]
         return container
     }
