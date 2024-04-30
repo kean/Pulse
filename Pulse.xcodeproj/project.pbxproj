@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 54;
+	objectVersion = 55;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -271,6 +271,8 @@
 		0CFF79DD29EB7A8E00BE767B /* SessionListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CFF79DB29EB7A8B00BE767B /* SessionListView.swift */; };
 		0CFF79DF29EB7B4300BE767B /* SessionPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CFF79DE29EB7B4300BE767B /* SessionPickerView.swift */; };
 		0CFF79E229EC1FA200BE767B /* ImageProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CFF79E029EC1F7800BE767B /* ImageProcessor.swift */; };
+		25E740012BE0FA58008C6DC3 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 25E740002BE0FA58008C6DC3 /* PrivacyInfo.xcprivacy */; };
+		25E740072BE10B4C008C6DC3 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 25E740062BE10B4C008C6DC3 /* PrivacyInfo.xcprivacy */; };
 		E95D6C562B7314E6004D28E4 /* HARDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95D6C552B7314E6004D28E4 /* HARDocument.swift */; };
 /* End PBXBuildFile section */
 
@@ -726,6 +728,9 @@
 		0CFF79DB29EB7A8B00BE767B /* SessionListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionListView.swift; sourceTree = "<group>"; };
 		0CFF79DE29EB7B4300BE767B /* SessionPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionPickerView.swift; sourceTree = "<group>"; };
 		0CFF79E029EC1F7800BE767B /* ImageProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageProcessor.swift; sourceTree = "<group>"; };
+		25E740002BE0FA58008C6DC3 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		25E740052BE10AC7008C6DC3 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		25E740062BE10B4C008C6DC3 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		49E82A8526D107A00070244F /* AlamofireIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlamofireIntegration.swift; sourceTree = "<group>"; };
 		49E82A8826D1083D0070244F /* MoyaIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoyaIntegration.swift; sourceTree = "<group>"; };
 		E95D6C552B7314E6004D28E4 /* HARDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HARDocument.swift; sourceTree = "<group>"; };
@@ -1093,6 +1098,7 @@
 				0CF0D49A296F14CF00EED9D4 /* LoggerStore */,
 				0CF0D4A3296F14CF00EED9D4 /* Helpers */,
 				0CF0D493296F14CF00EED9D4 /* Pulse.docc */,
+				25E740002BE0FA58008C6DC3 /* PrivacyInfo.xcprivacy */,
 			);
 			path = Pulse;
 			sourceTree = "<group>";
@@ -1160,6 +1166,7 @@
 				0CF0D58D296F189500EED9D4 /* Extensions */,
 				0CF0D594296F189500EED9D4 /* Views */,
 				0CF0D60D296F189600EED9D4 /* PulseUI.docc */,
+				25E740062BE10B4C008C6DC3 /* PrivacyInfo.xcprivacy */,
 			);
 			path = PulseUI;
 			sourceTree = "<group>";
@@ -1207,6 +1214,7 @@
 		0CF0D594296F189500EED9D4 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				25E740052BE10AC7008C6DC3 /* PrivacyInfo.xcprivacy */,
 				0CF0D59F296F189500EED9D4 /* RichTextView */,
 				0CF0D595296F189500EED9D4 /* SearchBar-macos.swift */,
 				0CF0D597296F189500EED9D4 /* PlaceholderView.swift */,
@@ -1837,6 +1845,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				25E740012BE0FA58008C6DC3 /* PrivacyInfo.xcprivacy in Resources */,
 				0CDACDE229EC6607007C15CD /* repos.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1845,6 +1854,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				25E740072BE10B4C008C6DC3 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
