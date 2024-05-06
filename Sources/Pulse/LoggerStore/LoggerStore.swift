@@ -822,7 +822,7 @@ extension LoggerStore {
 // MARK: - LoggerStore (Export)
 
 extension LoggerStore {
-    public enum DocumentType {
+    public enum DocumentType: Sendable {
         /// A package (directory) with a Pulse database (optimized for writing)
         case package
         /// A document (readonly, archive, optimized to storage and sharing)
@@ -830,7 +830,7 @@ extension LoggerStore {
     }
 
     /// Store export options.
-    public struct ExportOptions {
+    public struct ExportOptions: @unchecked Sendable {
         /// A predicate describing which messages (``LoggerMessageEntity``) to export.
         public var predicate: NSPredicate?
         /// A list of sessions to export.
