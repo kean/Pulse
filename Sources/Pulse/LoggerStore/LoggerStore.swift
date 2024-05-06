@@ -73,9 +73,15 @@ public final class LoggerStore: @unchecked Sendable, Identifiable {
     /// You can replace the default store with a custom one. If you replace the
     /// shared store, it automatically gets registered as the default store
     /// for ``RemoteLogger``.
-    public static var shared = LoggerStore.makeDefault() {
-        didSet { register(store: shared) }
+    public static var shared: LoggerStore {
+        get { _shared.value }
+        set {
+            _shared.value = newValue
+            register(store: newValue)
+        }
     }
+
+    private static let _shared = Atomic(value: LoggerStore.makeDefault())
 
     private static func register(store: LoggerStore) {
         guard Thread.isMainThread else {
