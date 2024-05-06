@@ -192,28 +192,19 @@ public final class LoggerStore: @unchecked Sendable, Identifiable {
             context.userInfo[WeakLoggerStore.loggerStoreKey] = WeakLoggerStore(store: self)
         }
 
+        var createSession = false
         if options.contains(.create) && !options.contains(.readonly) && configuration.isAutoStartingSession {
             perform { _ in
                 self.saveEntity(for: self.session, info: .make())
             }
-        } else {
-            viewContext.performAndWait {
-                let latestSession = try? self.viewContext.first(LoggerSessionEntity.self) {
-                    $0.sortDescriptors = [NSSortDescriptor(keyPath: \LoggerSessionEntity.createdAt, ascending: false)]
-                }
-                if let session = latestSession, manifest.version > Version(3, 3, 0) {
-                    self.session = .init(id: session.id, startDate: session.createdAt)
-                }
-            }
+            createSession = true
         }
 
         if Thread.isMainThread {
-            self.viewContext.userInfo[Pins.pinServiceKey] = Pins(store: self)
-            self.viewContext.userInfo[WeakLoggerStore.loggerStoreKey] = WeakLoggerStore(store: self)
+            initializeViewContext(createSession: createSession)
         } else {
-            viewContext.performAndWait {
-                self.viewContext.userInfo[Pins.pinServiceKey] = Pins(store: self)
-                self.viewContext.userInfo[WeakLoggerStore.loggerStoreKey] = WeakLoggerStore(store: self)
+            viewContext.perform {
+                self.initializeViewContext(createSession: createSession)
             }
         }
 
@@ -223,6 +214,23 @@ public final class LoggerStore: @unchecked Sendable, Identifiable {
                 DispatchQueue.global().asyncAfter(deadline: .now() + .seconds(10)) { [weak self] in
                     self?.sweep()
                 }
+            }
+        }
+    }
+
+    /// - warning: Make sure it doesn't block the main thread
+    private func initializeViewContext(createSession: Bool) {
+        viewContext.automaticallyMergesChangesFromParent = true
+        viewContext.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
+        viewContext.userInfo[Pins.pinServiceKey] = Pins(store: self)
+        viewContext.userInfo[WeakLoggerStore.loggerStoreKey] = WeakLoggerStore(store: self)
+
+        if createSession {
+            let latestSession = try? viewContext.first(LoggerSessionEntity.self) {
+                $0.sortDescriptors = [NSSortDescriptor(keyPath: \LoggerSessionEntity.createdAt, ascending: false)]
+            }
+            if let session = latestSession, manifest.version > Version(3, 3, 0) {
+                self.session = .init(id: session.id, startDate: session.createdAt)
             }
         }
     }

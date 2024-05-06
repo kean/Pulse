@@ -25,6 +25,21 @@ final class LoggerStoreTests: LoggerStoreBaseTests {
         XCTAssertThrowsError(try LoggerStore(storeURL: storeURL))
     }
 
+    // Run this N times.
+    func testConcurrentStoreInit() throws {
+        let expectation = self.expectation(description: "init")
+        expectation.expectedFulfillmentCount = 2
+        DispatchQueue.main.async {
+            let _ = LoggerStore.shared
+            expectation.fulfill()
+        }
+        DispatchQueue.global().async {
+            let _ = LoggerStore.shared
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 2.0)
+    }
+
     func testInitCreateStoreURL() throws {
         // GIVEN
         let storeURL = directory.url.appending(filename: UUID().uuidString)

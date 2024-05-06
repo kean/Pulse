@@ -59,8 +59,6 @@ extension NSPersistentContainer {
         if let error = loadError {
             throw error
         }
-        viewContext.automaticallyMergesChangesFromParent = true
-        viewContext.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
     }
 }
 
