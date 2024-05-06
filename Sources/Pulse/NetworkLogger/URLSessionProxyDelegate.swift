@@ -104,12 +104,20 @@ private extension URLSession {
             return self.pulse_init(configuration: configuration, delegate: delegate, delegateQueue: delegateQueue)
         }
         configuration.protocolClasses = [URLSessionMockingProtocol.self] + (configuration.protocolClasses ?? [])
+        guard let sharedLogger else {
+            assertionFailure("Shared logger is missing")
+            return self.pulse_init(configuration: configuration, delegate: delegate, delegateQueue: delegateQueue)
+        }
         let delegate = URLSessionProxyDelegate(logger: sharedLogger, delegate: delegate)
         return self.pulse_init(configuration: configuration, delegate: delegate, delegateQueue: delegateQueue)
     }
 }
 
-private var sharedLogger: NetworkLogger!
+private var sharedLogger: NetworkLogger? {
+    get { _sharedLogger.value }
+    set { _sharedLogger.value = newValue }
+}
+private let _sharedLogger = Atomic<NetworkLogger?>(value: nil)
 
 public extension URLSessionProxyDelegate {
     /// Enables automatic registration of `URLSessionProxyDelegate`. After calling this method, every time
