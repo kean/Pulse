@@ -2,7 +2,7 @@ Pod::Spec.new do |s|
 
 s.name = "PulseCore"
 s.module_name = "Pulse"
-s.version = "4.1.0"
+s.version = "4.1.1"
 s.summary = "Logging system for Apple platforms"
 s.swift_version = "5.7"
 
