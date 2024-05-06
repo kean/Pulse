@@ -4,7 +4,7 @@
 
 *May 6, 2024*
 
-- Fix https://github.com/kean/Pulse/issues/246 – an issue with concurrenct initialization of `LoggerStore` from multiple threads (workaround: initialize it in app delegate before other code runs)
+- Fix https://github.com/kean/Pulse/issues/246 – an issue with concurrent initialization of `LoggerStore` from multiple threads (workaround: initialize it in app delegate before other code runs)
 - Add `@MainActor` attribute to `RemoteLogger`  
 - Address Swift 6 warnings
 
