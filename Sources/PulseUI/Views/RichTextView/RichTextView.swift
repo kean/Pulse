@@ -15,6 +15,7 @@ struct RichTextView: View {
 
     @State private var shareItems: ShareItems?
     @State private var isWebViewOpen = false
+    @State private var isJSONViewOpen = false
 
     @Environment(\.textViewSearchContext) private var searchContext
 
@@ -36,6 +37,15 @@ struct RichTextView: View {
                         .inlineNavigationTitle("Browser Preview")
                         .navigationBarItems(trailing: Button(action: {
                             isWebViewOpen = false
+                        }) { Image(systemName: "xmark") })
+                }
+            }
+            .sheet(isPresented: $isJSONViewOpen) {
+                NavigationView {
+                    JSONView(data: viewModel.textStorage.string.data(using: .utf8) ?? Data())
+                        .inlineNavigationTitle("JSONView")
+                        .navigationBarItems(trailing: Button(action: {
+                            isJSONViewOpen = false
                         }) { Image(systemName: "xmark") })
                 }
             }
@@ -79,13 +89,22 @@ struct RichTextView: View {
     @ViewBuilder
     private var navigationBarTrailingItems: some View {
         if !isTextViewBarItemsHidden {
-            Menu(content: {
-                AttributedStringShareMenu(shareItems: $shareItems) {
-                    viewModel.textStorage
+            HStack{
+                if viewModel.contentType?.isJSON == true {
+                    Button(action: {
+                        isJSONViewOpen.toggle()
+                    }, label: {
+                        Image(systemName: "list.bullet.rectangle.fill")
+                    })
                 }
-            }, label: {
-                Image(systemName: "square.and.arrow.up")
-            })
+                Menu(content: {
+                    AttributedStringShareMenu(shareItems: $shareItems) {
+                        viewModel.textStorage
+                    }
+                }, label: {
+                    Image(systemName: "square.and.arrow.up")
+                })
+            }
             // TODO: This should be injected/added outside of the text view
             if viewModel.contentType?.isHTML ?? false {
                 Menu(content: {
