@@ -584,7 +584,7 @@ extension LoggerStore {
         entity.allowsConstrainedNetworkAccess = request.options.contains(.allowsConstrainedNetworkAccess)
         entity.httpShouldHandleCookies = request.options.contains(.httpShouldHandleCookies)
         entity.httpShouldUsePipelining = request.options.contains(.httpShouldUsePipelining)
-        entity.timeoutInterval = Int32(clamping: Int.max)
+        entity.timeoutInterval = NSNumber(value: request.timeout).int32Value
         entity.rawCachePolicy = UInt16(request.cachePolicy.rawValue)
         requestsCache[request] = entity
         return entity

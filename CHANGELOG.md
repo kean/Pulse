@@ -5,6 +5,7 @@
 *May 19, 2024*
 
 - Add `URLSession.taskDescription` support (closes https://github.com/kean/Pulse/issues/251). The console will now use `.taskDescription` instead of the original request URL. This behavior can be customized using the new `ConsoleViewDelegate`.
+- Fix https://github.com/kean/Pulse/issues/244, an issue with timeout interval not being recorded.
 
 
 ## Pulse 4.1.1
