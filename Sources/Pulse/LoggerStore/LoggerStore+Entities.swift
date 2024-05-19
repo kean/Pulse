@@ -94,6 +94,8 @@ public final class NetworkTaskEntity: NSManagedObject {
     @NSManaged public var requestBodySize: Int64
     /// The size of the response body.
     @NSManaged public var responseBodySize: Int64
+    /// The `taskDescription` value of `URLSessionTask`.
+    @NSManaged public var taskDescription: String?
     /// Associated (technical) message.
     @NSManaged public var message: LoggerMessageEntity?
 
