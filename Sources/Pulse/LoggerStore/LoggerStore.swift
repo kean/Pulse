@@ -803,6 +803,8 @@ extension LoggerStore {
         var predicate = NSPredicate(format: "session IN %@", sessionIDs)
         predicate = isInverted ? NSCompoundPredicate(notPredicateWithSubpredicate: predicate) : predicate
         try removeMessages(with: predicate)
+
+        clearMemoryCaches()
     }
 
     /// Removes all of the previously recorded messages.
@@ -820,9 +822,17 @@ extension LoggerStore {
 
             try? Files.removeItem(at: blobsURL)
             Files.createDirectoryIfNeeded(at: blobsURL)
+
+            clearMemoryCaches()
         case .archive:
             break // Do nothing, readonly
         }
+    }
+
+    private func clearMemoryCaches() {
+        tasksCache.removeAll()
+        requestsCache.removeAll()
+        responsesCache.removeAll()
     }
 
     /// Safely closes the database and removes all information from the store.
