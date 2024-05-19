@@ -105,6 +105,7 @@
 		0C9F05002884F34A0035239F /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C9F04FF2884F34A0035239F /* Preview Assets.xcassets */; };
 		0CA20FED29E5976700A59180 /* LoggerStoreExportTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CA20FEC29E5976700A59180 /* LoggerStoreExportTests.swift */; };
 		0CA20FEF29E5999700A59180 /* LoggerStoreBaseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CA20FEE29E5999700A59180 /* LoggerStoreBaseTests.swift */; };
+		0CA2632E2BFA3855003C8E97 /* ConsoleDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CA2632D2BFA3855003C8E97 /* ConsoleDelegate.swift */; };
 		0CA32DE729D5E028001712E8 /* NSAttributedString+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CA32DE629D5E028001712E8 /* NSAttributedString+Extensions.swift */; };
 		0CAF1D7B297C2040002E2722 /* ConsoleListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CAF1D7A297C2040002E2722 /* ConsoleListViewModel.swift */; };
 		0CB17F1A2978ABBA004E33F4 /* ManagedObjectsCountObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB17F192978ABBA004E33F4 /* ManagedObjectsCountObserver.swift */; };
@@ -562,6 +563,7 @@
 		0C9F05012884F34A0035239F /* Pulse_Demo_macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Pulse_Demo_macOS.entitlements; sourceTree = "<group>"; };
 		0CA20FEC29E5976700A59180 /* LoggerStoreExportTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggerStoreExportTests.swift; sourceTree = "<group>"; };
 		0CA20FEE29E5999700A59180 /* LoggerStoreBaseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggerStoreBaseTests.swift; sourceTree = "<group>"; };
+		0CA2632D2BFA3855003C8E97 /* ConsoleDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleDelegate.swift; sourceTree = "<group>"; };
 		0CA32DE629D5E028001712E8 /* NSAttributedString+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSAttributedString+Extensions.swift"; sourceTree = "<group>"; };
 		0CAF1D7A297C2040002E2722 /* ConsoleListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleListViewModel.swift; sourceTree = "<group>"; };
 		0CB17F192978ABBA004E33F4 /* ManagedObjectsCountObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagedObjectsCountObserver.swift; sourceTree = "<group>"; };
@@ -1393,6 +1395,7 @@
 				0CF0D5FD296F189600EED9D4 /* ConsoleView-macos.swift */,
 				0CF0D5FB296F189600EED9D4 /* ConsoleView-watchos.swift */,
 				0CBEF6A429DF69E800132FB3 /* ConsoleView.swift */,
+				0CA2632D2BFA3855003C8E97 /* ConsoleDelegate.swift */,
 				0CF0D60A296F189600EED9D4 /* ConsoleEnvironment.swift */,
 				0CECF63C2996BE12000F9CCD /* ConsoleDataSource.swift */,
 			);
@@ -2065,6 +2068,7 @@
 				0CF0D614296F189600EED9D4 /* TextRendererJSON.swift in Sources */,
 				0C38F57B2A34BFA0001E19C0 /* RemoteLoggerSettingsViewModel.swift in Sources */,
 				0CFB0CA42A3F662300221FEA /* SettingsView-tvos.swift in Sources */,
+				0CA2632E2BFA3855003C8E97 /* ConsoleDelegate.swift in Sources */,
 				0CB63A232974A64500525165 /* ConsoleSearchOperation.swift in Sources */,
 				0CF0D658296F189600EED9D4 /* SettingsView-ios.swift in Sources */,
 				0CF0D665296F189600EED9D4 /* NetworkMenuCell.swift in Sources */,

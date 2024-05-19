@@ -16,6 +16,7 @@ struct MockTask {
     let transactions: [Transaction]
     let delay: TimeInterval
     var decodingError: Error?
+    var taskDescription: String?
 
     enum Kind {
         case data
@@ -115,7 +116,8 @@ extension MockTask {
         transactions: [
             .init(fetchType: .networkLoad, request: mockUploadPulseCurrentRequest, response: mockUploadPulseResponse, duration: 2.21283, isReusedConnection: true),
         ],
-        delay: 6.5
+        delay: 6.5,
+        taskDescription: "upload-pulse-archive"
     )
 
     static let createAPI = MockTask(

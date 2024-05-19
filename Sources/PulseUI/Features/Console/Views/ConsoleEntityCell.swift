@@ -76,16 +76,17 @@ private struct _ConsoleTaskCell: View {
     @State private var shareItems: ShareItems?
     @State private var sharedTask: NetworkTaskEntity?
     @Environment(\.store) private var store
+    @EnvironmentObject private var environment: ConsoleEnvironment
 
     var body: some View {
 #if os(iOS) || os(visionOS)
         let cell = ConsoleTaskCell(task: task, isDisclosureNeeded: true)
-            .background(NavigationLink("", destination: NetworkInspectorView(task: task)).opacity(0))
+            .background(NavigationLink("", destination: inspector).opacity(0))
 #elseif os(macOS)
         let cell = ConsoleTaskCell(task: task)
             .tag(ConsoleSelectedItem.entity(task.objectID))
 #else
-        let cell = NavigationLink(destination: NetworkInspectorView(task: task)) {
+        let cell = NavigationLink(destination: inspector) {
             ConsoleTaskCell(task: task)
         }
 #endif
@@ -120,5 +121,11 @@ private struct _ConsoleTaskCell: View {
 #else
         cell
 #endif
+    }
+
+    private var inspector: some View {
+        // We don't own NavigationView, so we have to inject the dependencies
+        NetworkInspectorView(task: task)
+            .injecting(environment)
     }
 }

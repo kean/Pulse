@@ -70,7 +70,7 @@ struct ConsoleView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
             NavigationView {
-                ConsoleView(environment: .init(store: .mock))
+                ConsoleView(environment: .init(store: .mock, delegate: DefaultConsoleViewDelegate()))
             }.previewDisplayName("Console")
             NavigationView {
                 ConsoleView(store: .mock, mode: .network)

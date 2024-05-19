@@ -14,6 +14,7 @@ struct ConsoleTaskCell: View {
 
     @ObservedObject private var settings: UserSettings = .shared
     @Environment(\.store) private var store: LoggerStore
+    @EnvironmentObject var environment: ConsoleEnvironment
 
     var body: some View {
 #if os(macOS)
@@ -86,7 +87,7 @@ struct ConsoleTaskCell: View {
     private var message: some View {
         VStack(spacing: 3) {
             HStack {
-                Text(task.url ?? "–")
+                Text(environment.delegate.getTitle(for: task) ?? "–")
                     .font(ConsoleConstants.fontBody)
                     .foregroundColor(.primary)
                     .lineLimit(settings.lineLimit)

@@ -24,6 +24,8 @@ NavigationLink(destination: ConsoleView()) {
 
 > tip: If you use Pulse to log only network requests, and not text messages, use `ConsoleView(mode: .network)` to show a view specialized to only display network requests.
 
+The console can be customized using ``ConsoleViewDelegate`` and ``UserSettings``.
+
 ## UIKit
 
 To present the console from `UIKit`, use `UIHostingController`:

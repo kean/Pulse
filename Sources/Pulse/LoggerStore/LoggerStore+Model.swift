@@ -64,6 +64,7 @@ extension LoggerStore {
             Attribute(name: "isFromCache", type: .booleanAttributeType),
             Attribute(name: "isMocked", type: .booleanAttributeType),
             Attribute(name: "rawMetadata", type: .stringAttributeType),
+            Attribute(name: "taskDescription", type: .stringAttributeType),
             Relationship(name: "originalRequest", type: .oneToOne(), entity: request),
             Relationship(name: "currentRequest", type: .oneToOne(isOptional: true), entity: request),
             Relationship(name: "response", type: .oneToOne(isOptional: true), entity: response),

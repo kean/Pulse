@@ -23,6 +23,7 @@ final class ConsoleEnvironment: ObservableObject {
     let router = ConsoleRouter()
 
     let initialMode: ConsoleMode
+    let delegate: ConsoleViewDelegate
 
     @Published var mode: ConsoleMode
     @Published var listOptions: ConsoleListOptions = .init()
@@ -37,7 +38,7 @@ final class ConsoleEnvironment: ObservableObject {
 
     private var cancellables: [AnyCancellable] = []
 
-    init(store: LoggerStore, mode: ConsoleMode = .all) {
+    init(store: LoggerStore, mode: ConsoleMode = .all, delegate: ConsoleViewDelegate = DefaultConsoleViewDelegate()) {
         self.store = store
         switch mode {
         case .all: self.title = "Console"
@@ -51,6 +52,8 @@ final class ConsoleEnvironment: ObservableObject {
         case .logs: self.mode = .logs
         case .network: self.mode = .network
         }
+
+        self.delegate = delegate
 
         func makeDefaultOptions() -> ConsoleDataSource.PredicateOptions {
             var options = ConsoleDataSource.PredicateOptions()

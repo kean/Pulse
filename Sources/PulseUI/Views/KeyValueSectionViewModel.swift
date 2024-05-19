@@ -45,11 +45,17 @@ extension KeyValueSectionViewModel {
             size > 0 ? ByteCountFormatter.string(fromByteCount: size) : "Empty"
         }
         let taskType = task.type?.urlSessionTaskClassName ?? "URLSessionDataTask"
-        return KeyValueSectionViewModel(title: taskType, color: .primary, items: [
+        var items: [(String, String?)] = [
             ("Host", task.url.flatMap(URL.init)?.host),
-            ("Date", task.startDate.map(DateFormatter.fullDateFormatter.string)),
-            ("Duration", task.duration > 0 ? DurationFormatter.string(from: task.duration) : nil)
-        ])
+            ("Date", task.startDate.map(DateFormatter.fullDateFormatter.string))
+        ]
+        if task.duration > 0 {
+            items.append(("Duration", DurationFormatter.string(from: task.duration)))
+        }
+        if let description = task.taskDescription, !description.isEmpty {
+            items.append(("Description", description))
+        }
+        return KeyValueSectionViewModel(title: taskType, color: .primary, items: items)
     }
 
     static func makeComponents(for url: URL) -> KeyValueSectionViewModel? {

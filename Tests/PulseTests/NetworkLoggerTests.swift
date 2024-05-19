@@ -98,7 +98,8 @@ final class NetworkLoggerTests: XCTestCase {
             requestBody: nil,
             responseBody: nil,
             metrics: task.metrics,
-            label: nil
+            label: nil,
+            taskDescription: nil
         ))
 
         XCTAssertEqual(request.count, 325)

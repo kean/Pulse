@@ -48,24 +48,26 @@ extension LoggerStore {
             }
         }
 
-        public struct NetworkTaskCreated: Codable, Sendable {
+        public struct NetworkTaskCreated: Codable, Sendable, NetworkTaskEvent {
             public var taskId: UUID
             public var taskType: NetworkLogger.TaskType
             public var createdAt: Date
             public var originalRequest: NetworkLogger.Request
             public var currentRequest: NetworkLogger.Request?
             public var label: String?
+            public var taskDescription: String?
 
             @available(*, deprecated, message: "Deprecated (added for backward compatibility)")
             public var session: UUID? = Session.current.id
 
-            public init(taskId: UUID, taskType: NetworkLogger.TaskType, createdAt: Date, originalRequest: NetworkLogger.Request, currentRequest: NetworkLogger.Request?, label: String?) {
+            public init(taskId: UUID, taskType: NetworkLogger.TaskType, createdAt: Date, originalRequest: NetworkLogger.Request, currentRequest: NetworkLogger.Request?, label: String?, taskDescription: String?) {
                 self.taskId = taskId
                 self.taskType = taskType
                 self.createdAt = createdAt
                 self.originalRequest = originalRequest
                 self.currentRequest = currentRequest
                 self.label = label
+                self.taskDescription = taskDescription
             }
         }
 
@@ -83,7 +85,7 @@ extension LoggerStore {
             }
         }
 
-        public struct NetworkTaskCompleted: Codable, Sendable {
+        public struct NetworkTaskCompleted: Codable, Sendable, NetworkTaskEvent {
             public var taskId: UUID
             public var taskType: NetworkLogger.TaskType
             public var createdAt: Date
@@ -95,11 +97,12 @@ extension LoggerStore {
             public var responseBody: Data?
             public var metrics: NetworkLogger.Metrics?
             public var label: String?
+            public var taskDescription: String?
 
             @available(*, deprecated, message: "Deprecated (added for backward compatibility)")
             public var session: UUID? = Session.current.id
 
-            public init(taskId: UUID, taskType: NetworkLogger.TaskType, createdAt: Date, originalRequest: NetworkLogger.Request, currentRequest: NetworkLogger.Request?, response: NetworkLogger.Response?, error: NetworkLogger.ResponseError?, requestBody: Data?, responseBody: Data?, metrics: NetworkLogger.Metrics?, label: String?) {
+            public init(taskId: UUID, taskType: NetworkLogger.TaskType, createdAt: Date, originalRequest: NetworkLogger.Request, currentRequest: NetworkLogger.Request?, response: NetworkLogger.Response?, error: NetworkLogger.ResponseError?, requestBody: Data?, responseBody: Data?, metrics: NetworkLogger.Metrics?, label: String?, taskDescription: String?) {
                 self.taskId = taskId
                 self.taskType = taskType
                 self.createdAt = createdAt
@@ -111,6 +114,7 @@ extension LoggerStore {
                 self.responseBody = responseBody
                 self.metrics = metrics
                 self.label = label
+                self.taskDescription = taskDescription
             }
             
             init(_ entity: NetworkTaskEntity) {
@@ -130,6 +134,7 @@ extension LoggerStore {
                     self.metrics = NetworkLogger.Metrics(taskInterval: interval, redirectCount: Int(entity.redirectCount), transactions: transactions)
                 }
                 self.label = entity.message?.label
+                self.taskDescription = entity.taskDescription
             }
         }
 
@@ -146,4 +151,13 @@ extension LoggerStore {
             }
         }
     }
+}
+
+protocol NetworkTaskEvent {
+    var taskId: UUID { get }
+    var taskType: NetworkLogger.TaskType { get }
+    var createdAt: Date { get }
+    var label: String? { get }
+    var originalRequest: NetworkLogger.Request { get }
+    var taskDescription: String? { get }
 }
