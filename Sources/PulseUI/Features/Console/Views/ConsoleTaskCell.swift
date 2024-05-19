@@ -86,7 +86,7 @@ struct ConsoleTaskCell: View {
     private var message: some View {
         VStack(spacing: 3) {
             HStack {
-                Text(task.taskDescription ?? (task.url ?? "–"))
+                Text(task.primaryIdentifier ?? "–")
                     .font(ConsoleConstants.fontBody)
                     .foregroundColor(.primary)
                     .lineLimit(settings.lineLimit)

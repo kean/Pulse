@@ -42,8 +42,18 @@ extension NetworkTaskEntity: Identifiable {
 }
 
 extension NetworkTaskEntity {
+    var primaryIdentifier: String? {
+        if let taskDescription, !taskDescription.isEmpty {
+            return taskDescription
+        }
+        return url
+    }
+
     var title: String {
-        url.flatMap(URL.init(string:))?.lastPathComponent ?? "Request"
+        if let taskDescription, !taskDescription.isEmpty {
+            return taskDescription
+        }
+        return url.flatMap(URL.init(string:))?.lastPathComponent ?? "Request"
     }
 
     var requestFileViewerContext: FileViewerViewModel.Context {
