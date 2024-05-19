@@ -32,15 +32,8 @@ struct NetworkInspectorView: View {
         .safeAreaInset(edge: .bottom) {
             OpenOnMacOverlay(entity: task)
         }
-        .inlineNavigationTitle(title ?? "")
+        .inlineNavigationTitle(environment.delegate.getShortTitle(for: task))
         .sheet(item: $shareItems, content: ShareView.init)
-    }
-
-    private var title: String? {
-        guard let title = environment.delegate.getTitle(for: task) else {
-            return nil
-        }
-        return URL(string: title)?.lastPathComponent ?? title
     }
 
     @ViewBuilder

@@ -14,10 +14,11 @@ struct NetworkInspectorView: View {
 
     @ObservedObject private var settings: UserSettings = .shared
     @Environment(\.store) private var store
+    @EnvironmentObject private var environment: ConsoleEnvironment
 
     var body: some View {
         contents
-            .inlineNavigationTitle(task.title)
+            .inlineNavigationTitle(environment.delegate.getShortTitle(for: task))
 //            .toolbar {
 //                if #available(watchOS 9, *), let url = viewModel.shareTaskAsHTML() {
 //                    ShareLink(item: url)

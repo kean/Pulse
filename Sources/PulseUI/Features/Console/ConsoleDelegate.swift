@@ -18,6 +18,13 @@ extension ConsoleViewDelegate {
         }
         return task.url
     }
+
+    func getShortTitle(for task: NetworkTaskEntity) -> String {
+        guard let title = getTitle(for: task) else {
+            return ""
+        }
+        return URL(string: title)?.lastPathComponent ?? title
+    }
 }
 
 struct DefaultConsoleViewDelegate: ConsoleViewDelegate {}
