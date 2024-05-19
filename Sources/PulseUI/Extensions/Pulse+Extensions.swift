@@ -42,13 +42,6 @@ extension NetworkTaskEntity: Identifiable {
 }
 
 extension NetworkTaskEntity {
-    var primaryIdentifier: String? {
-        if let taskDescription, !taskDescription.isEmpty {
-            return taskDescription
-        }
-        return url
-    }
-
     var title: String {
         if let taskDescription, !taskDescription.isEmpty {
             return taskDescription
