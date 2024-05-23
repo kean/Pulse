@@ -422,6 +422,7 @@ extension LoggerStore {
         entity.responseContentType = event.response?.contentType?.type
         let isFailure = event.error != nil || event.response?.isSuccess == false
         entity.requestState = (isFailure ? NetworkTaskEntity.State.failure : .success).rawValue
+        entity.taskDescription = event.taskDescription
 
         // Populate response/request data
         let responseContentType = event.response?.contentType
