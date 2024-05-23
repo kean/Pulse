@@ -1,5 +1,11 @@
 # Pulse 4.x
 
+## Pulse 4.2.1
+
+*May 23, 2024*
+
+- Fix task description not being used with URLSessionProxyDelegate by @alexjameslittle in https://github.com/kean/Pulse/pull/255
+
 ## Pulse 4.2.0
 
 *May 19, 2024*
