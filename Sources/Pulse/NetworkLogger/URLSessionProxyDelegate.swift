@@ -101,15 +101,19 @@ public final class URLSessionProxyDelegate: NSObject, URLSessionTaskDelegate, UR
 private extension URLSession {
     @objc class func pulse_init(configuration: URLSessionConfiguration, delegate: URLSessionDelegate?, delegateQueue: OperationQueue?) -> URLSession {
         guard !String(describing: delegate).contains("GTMSessionFetcher") else {
-            return self.pulse_init(configuration: configuration, delegate: delegate, delegateQueue: delegateQueue)
+             return original_init(configuration: configuration, delegate: delegate, delegateQueue: delegateQueue)
         }
         configuration.protocolClasses = [URLSessionMockingProtocol.self] + (configuration.protocolClasses ?? [])
         guard let sharedLogger else {
             assertionFailure("Shared logger is missing")
-            return self.pulse_init(configuration: configuration, delegate: delegate, delegateQueue: delegateQueue)
+            return original_init(configuration: configuration, delegate: delegate, delegateQueue: delegateQueue)
         }
         let delegate = URLSessionProxyDelegate(logger: sharedLogger, delegate: delegate)
-        return self.pulse_init(configuration: configuration, delegate: delegate, delegateQueue: delegateQueue)
+        return original_init(configuration: configuration, delegate: delegate, delegateQueue: delegateQueue)
+    }
+
+    @objc class func original_init(configuration: URLSessionConfiguration, delegate: URLSessionDelegate?, delegateQueue: OperationQueue?) -> URLSession {
+        fatalError("not implemented")
     }
 }
 
@@ -126,9 +130,21 @@ public extension URLSessionProxyDelegate {
     /// needed events and forwards the methods to your original delegate.
     static func enableAutomaticRegistration(logger: NetworkLogger = .init()) {
         sharedLogger = logger
-        if let lhs = class_getClassMethod(URLSession.self, #selector(URLSession.init(configuration:delegate:delegateQueue:))),
-           let rhs = class_getClassMethod(URLSession.self, #selector(URLSession.pulse_init(configuration:delegate:delegateQueue:))) {
-            method_exchangeImplementations(lhs, rhs)
+
+        guard let originalMethod = class_getClassMethod(URLSession.self, #selector(URLSession.init(configuration:delegate:delegateQueue:))),
+              let swizzledMethod = class_getClassMethod(URLSession.self, #selector(URLSession.pulse_init(configuration:delegate:delegateQueue:))),
+              let originalPlaceholder = class_getClassMethod(URLSession.self, #selector(URLSession.original_init(configuration:delegate:delegateQueue:)))
+        else {
+            return
         }
+
+        /// save original `URLSession.init(configuration:delegate:delegateQueue:)` implementation
+        /// inside `original_init` method
+        method_exchangeImplementations(originalMethod, originalPlaceholder)
+
+        /// replace mocked `origina_init` implementation with `pulse_init` implementation for
+        /// `URLSession.init(configuration:delegate:delegateQueue:)`
+        method_setImplementation(originalMethod, method_getImplementation(swizzledMethod))
     }
 }
+
