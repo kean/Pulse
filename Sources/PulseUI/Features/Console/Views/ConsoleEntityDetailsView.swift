@@ -10,6 +10,7 @@ import Pulse
 import CoreData
 
 @available(macOS 13, *)
+@MainActor
 struct ConsoleEntityDetailsRouterView: View {
     let selection: ConsoleSelectedItem
 
