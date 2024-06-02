@@ -1,5 +1,11 @@
 # Pulse 4.x
 
+## Pulse 4.2.2
+
+*Jun 2, 2024*
+
+- Fix https://github.com/kean/Pulse/issues/257, an issue with search only showing top 10 results. If there are more results, it will now indicate that in the UI and will load them automatically when you scroll to the bottom of the list.
+
 ## Pulse 4.2.1
 
 *May 23, 2024*
