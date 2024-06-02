@@ -21,7 +21,7 @@ final class ConsoleSearchOperation {
     private var entities: [NSManagedObject]
     private var objectIDs: [NSManagedObjectID]
     private var index = 0
-    private var cutoff = 10
+    private var cutoff = 12
     private let service: ConsoleSearchService
     private let context: NSManagedObjectContext
     private let lock: os_unfair_lock_t

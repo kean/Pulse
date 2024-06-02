@@ -50,7 +50,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         if parameters.isEmpty {
             return "Search"
         } else {
-            return "\(results.count) results"
+            return "\(results.count)\(hasMore ? "+" : "") results"
         }
     }
 
@@ -253,7 +253,6 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
 
     func searchOperationDidFinish(_ operation: ConsoleSearchOperation, hasMore: Bool) {
         if operation === self.operation {
-            self.operation = nil
             isSearching = false
             if dirtyDate != nil {
                 self.dirtyDate = nil
@@ -313,11 +312,6 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         }
     }
 
-    func buttonShowMoreResultsTapped() {
-        isSearching = true
-        operation?.resume()
-    }
-
     func buttonShowNewlyAddedSearchResultsTapped() {
         refreshNow()
     }
@@ -325,6 +319,17 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     func buttonClearRecentSearchesTapped() {
         recents.clearRecentSearches()
         updateSearchTokens()
+    }
+
+    func didScroll(to result: ConsoleSearchResultViewModel) {
+        guard results.count > 3 && results[results.endIndex - 2].entity.objectID == result.entity.objectID else {
+            return
+        }
+        guard !isSearching && hasMore else {
+            return
+        }
+        isSearching = true
+        operation?.resume() // Load more
     }
 
     // MARK: Suggested Tokens
