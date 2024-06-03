@@ -931,12 +931,12 @@ extension LoggerStore {
         defer { try? target.close() }
 
         // Remove unwanted messages
-        backgroundContext.performAndWait {
+        target.backgroundContext.performAndWait {
             try? target._removeUnwantedExportableContent(for: options)
         }
 
         // Copy required blobs
-        backgroundContext.performAndWait {
+        target.backgroundContext.performAndWait {
             try? _exportBlobs(to: target)
         }
 
