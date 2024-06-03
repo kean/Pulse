@@ -1,5 +1,11 @@
 # Pulse 4.x
 
+## Pulse 4.2.3
+
+*Jun 3, 2024*
+
+- Fix: wrong background context for filtering entities during export by @jasesuperhero in https://github.com/kean/Pulse/pull/259
+
 ## Pulse 4.2.2
 
 *Jun 2, 2024*
