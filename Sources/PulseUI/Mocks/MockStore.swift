@@ -267,6 +267,7 @@ private func makeSessionTask(for mockTask: MockTask, urlSession: URLSession) -> 
     }
     task.setValue(mockTask.currentRequest, forKey: "currentRequest")
     task.setValue(mockTask.response, forKey: "response")
+    task.taskDescription = mockTask.taskDescription
     return task
 }
 

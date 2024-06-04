@@ -2,7 +2,7 @@ Pod::Spec.new do |s|
 
 s.name = "PulseUI"
 s.module_name = "PulseUI"
-s.version = "4.1.1"
+s.version = "4.2.3"
 s.summary = "Logging system for Apple platforms"
 s.swift_version = "5.7"
 
@@ -18,7 +18,7 @@ s.source = { :git => "https://github.com/kean/Pulse.git", :tag => "#{s.version}"
 s.social_media_url = "https://kean.blog/"
 
 s.ios.deployment_target = "14.0"
-s.dependency "PulseCore", '~> 4.0'
+s.dependency "PulseCore", '~> 4.2'
 s.source_files = "Sources/PulseUI/**/*.swift"
 
 end

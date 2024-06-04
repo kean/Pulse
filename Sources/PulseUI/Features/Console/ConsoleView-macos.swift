@@ -31,6 +31,7 @@ public struct ConsoleView: View {
 
 /// This view contains the console itself along with the details (no sidebar).
 @available(macOS 13, *)
+@MainActor
 private struct ConsoleMainView: View {
     let environment: ConsoleEnvironment
 

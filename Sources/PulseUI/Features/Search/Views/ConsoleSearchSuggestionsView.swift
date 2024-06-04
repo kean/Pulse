@@ -91,7 +91,7 @@ struct ConsoleSearchSuggestionsView: View {
 #if DEBUG
 @available(iOS 15, visionOS 1.0, *)
 struct Previews_ConsoleSearchSuggestionsView_Previews: PreviewProvider {
-    static let environment = ConsoleEnvironment(store: .mock)
+    static let environment = ConsoleEnvironment(store: .mock, delegate: DefaultConsoleViewDelegate())
 
     static var previews: some View {
         List {

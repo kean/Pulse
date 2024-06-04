@@ -14,10 +14,11 @@ struct NetworkInspectorView: View {
 
     @ObservedObject private var settings: UserSettings = .shared
     @Environment(\.store) private var store
+    @EnvironmentObject private var environment: ConsoleEnvironment
 
     var body: some View {
         contents
-            .inlineNavigationTitle(task.title)
+            .inlineNavigationTitle(environment.delegate.getShortTitle(for: task))
     }
 
     var contents: some View {
@@ -66,6 +67,7 @@ struct NetworkInspectorView_Previews: PreviewProvider {
         NavigationView {
             NetworkInspectorView(task: LoggerStore.preview.entity(for: .login))
         }
+        .injecting(ConsoleEnvironment(store: .preview))
     }
 }
 #endif

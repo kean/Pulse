@@ -1,5 +1,31 @@
 # Pulse 4.x
 
+## Pulse 4.2.3
+
+*Jun 3, 2024*
+
+- Fix: wrong background context for filtering entities during export by @jasesuperhero in https://github.com/kean/Pulse/pull/259
+
+## Pulse 4.2.2
+
+*Jun 2, 2024*
+
+- Fix https://github.com/kean/Pulse/issues/257, an issue with search only showing top 10 results. If there are more results, it will now indicate that in the UI and will load them automatically when you scroll to the bottom of the list.
+
+## Pulse 4.2.1
+
+*May 23, 2024*
+
+- Fix task description not being used with URLSessionProxyDelegate by @alexjameslittle in https://github.com/kean/Pulse/pull/255
+
+## Pulse 4.2.0
+
+*May 19, 2024*
+
+- Add `URLSession.taskDescription` support (closes https://github.com/kean/Pulse/issues/251). The console will now use `.taskDescription` instead of the original request URL. This behavior can be customized using the new `ConsoleViewDelegate`.
+- Fix https://github.com/kean/Pulse/issues/244, an issue with timeout interval not being recorded.
+- Fix https://github.com/kean/Pulse/issues/230, occasional crash in remote logger
+
 ## Pulse 4.1.1
 
 *May 6, 2024*

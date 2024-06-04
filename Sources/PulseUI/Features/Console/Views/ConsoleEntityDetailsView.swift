@@ -9,7 +9,8 @@ import SwiftUI
 import Pulse
 import CoreData
 
-@available(iOS 15, macOS 13, *)
+@available(macOS 13, *)
+@MainActor
 struct ConsoleEntityDetailsRouterView: View {
     let selection: ConsoleSelectedItem
 

@@ -60,14 +60,16 @@ struct ConsoleSearchResultsListContentView: View {
         ForEach(viewModel.results) { result in
             let isLast = result.id == viewModel.results.last?.id
             ConsoleSearchResultView(viewModel: result, isSeparatorNeeded: !viewModel.parameters.terms.isEmpty && !isLast)
+                .onAppear {
+                    viewModel.didScroll(to: result)
+                }
         }
-        if !viewModel.isSearching && viewModel.hasMore {
-#if os(iOS) || os(visionOS)
-            PlainListGroupSeparator()
-#endif
-            Button(action: viewModel.buttonShowMoreResultsTapped) {
-                Text("Show More Results")
-            }
+        if !viewModel.isSearching && !viewModel.hasMore && !viewModel.results.isEmpty {
+            Text("No more results")
+                .frame(maxWidth: .infinity, minHeight: 24, alignment: .center)
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .listRowSeparator(.hidden, edges: .bottom)
         }
     }
 }

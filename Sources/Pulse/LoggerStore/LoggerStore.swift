@@ -295,7 +295,16 @@ public final class LoggerStore: @unchecked Sendable, Identifiable {
 
 extension LoggerStore {
     /// Stores the given message.
-    public func storeMessage(createdAt: Date? = nil, label: String, level: Level, message: String, metadata: [String: MetadataValue]? = nil, file: String = #file, function: String = #function, line: UInt = #line) {
+    public func storeMessage(
+        createdAt: Date? = nil,
+        label: String,
+        level: Level,
+        message: String,
+        metadata: [String: MetadataValue]? = nil,
+        file: String = #file,
+        function: String = #function,
+        line: UInt = #line
+    ) {
         handle(.messageStored(.init(
             createdAt: createdAt ?? configuration.makeCurrentDate(),
             label: label,
@@ -312,7 +321,15 @@ extension LoggerStore {
     ///
     /// - note: If you want to store incremental updates to the task, use
     /// `NetworkLogger` instead.
-    public func storeRequest(_ request: URLRequest, response: URLResponse?, error: Swift.Error?, data: Data?, metrics: URLSessionTaskMetrics? = nil, label: String? = nil) {
+    public func storeRequest(
+        _ request: URLRequest,
+        response: URLResponse?,
+        error: Swift.Error?,
+        data: Data?,
+        metrics: URLSessionTaskMetrics? = nil,
+        label: String? = nil,
+        taskDescription: String? = nil
+    ) {
         handle(.networkTaskCompleted(.init(
             taskId: UUID(),
             taskType: .dataTask,
@@ -324,7 +341,8 @@ extension LoggerStore {
             requestBody: request.httpBody ?? request.httpBodyStreamData(),
             responseBody: data,
             metrics: metrics.map(NetworkLogger.Metrics.init),
-            label: label
+            label: label,
+            taskDescription: taskDescription
         )))
     }
 
@@ -369,7 +387,7 @@ extension LoggerStore {
     }
 
     private func process(_ event: Event.NetworkTaskCreated) {
-        let entity = createTask(forTaskId: event.taskId, taskType: event.taskType, createdAt: event.createdAt, label: event.label, url: event.originalRequest.url)
+        let entity = createTask(for: event)
 
         entity.url = event.originalRequest.url?.absoluteString
         entity.host = event.originalRequest.url.flatMap { $0.getHost() }
@@ -395,7 +413,7 @@ extension LoggerStore {
     }
 
     private func process(_ event: Event.NetworkTaskCompleted) {
-        let entity = findOrCreateTask(forTaskId: event.taskId, taskType: event.taskType, createdAt: event.createdAt, label: event.label, url: event.originalRequest.url)
+        let entity = findOrCreateTask(for: event)
 
         entity.url = event.originalRequest.url?.absoluteString
         entity.host = event.originalRequest.url.flatMap { $0.getHost() }
@@ -404,6 +422,7 @@ extension LoggerStore {
         entity.responseContentType = event.response?.contentType?.type
         let isFailure = event.error != nil || event.response?.isSuccess == false
         entity.requestState = (isFailure ? NetworkTaskEntity.State.failure : .success).rawValue
+        entity.taskDescription = event.taskDescription
 
         // Populate response/request data
         let responseContentType = event.response?.contentType
@@ -514,40 +533,41 @@ extension LoggerStore {
         }
     }
 
-    private func findOrCreateTask(forTaskId taskId: UUID, taskType: NetworkLogger.TaskType, createdAt: Date, label: String?, url: URL?) -> NetworkTaskEntity {
-        if let entity = findTask(forTaskId: taskId) {
+    private func findOrCreateTask(for event: NetworkTaskEvent) -> NetworkTaskEntity {
+        if let entity = findTask(forTaskId: event.taskId) {
             return entity
         }
-        return createTask(forTaskId: taskId, taskType: taskType, createdAt: createdAt, label: label, url: url)
+        return createTask(for: event)
     }
 
-    private func createTask(forTaskId taskId: UUID, taskType: NetworkLogger.TaskType, createdAt: Date, label: String?, url: URL?) -> NetworkTaskEntity {
-        if let entity = tasksCache[taskId] {
+    private func createTask(for event: NetworkTaskEvent) -> NetworkTaskEntity {
+        if let entity = tasksCache[event.taskId] {
             return entity // Defensive code in case createTask gets called more than once
         }
         let task = NetworkTaskEntity(context: backgroundContext)
-        task.taskId = taskId
-        task.taskType = taskType.rawValue
-        task.createdAt = createdAt
+        task.taskId = event.taskId
+        task.taskType = event.taskType.rawValue
+        task.createdAt = event.createdAt
         task.responseBodySize = -1
         task.requestBodySize = -1
         task.isFromCache = false
         task.session = session.id
+        task.taskDescription = event.taskDescription
 
         let message = LoggerMessageEntity(context: backgroundContext)
-        message.createdAt = createdAt
+        message.createdAt = event.createdAt
         message.level = Level.debug.rawValue
-        message.label = label ?? "network"
+        message.label = event.label ?? "network"
         message.session = session.id
         message.file = ""
         message.function = ""
         message.line = Int32(NetworkTaskEntity.State.pending.rawValue)
-        message.text = url?.absoluteString ?? ""
+        message.text = event.originalRequest.url?.absoluteString ?? ""
 
         message.task = task
         task.message = message
 
-        tasksCache[taskId] = task
+        tasksCache[event.taskId] = task
 
         return task
     }
@@ -565,7 +585,7 @@ extension LoggerStore {
         entity.allowsConstrainedNetworkAccess = request.options.contains(.allowsConstrainedNetworkAccess)
         entity.httpShouldHandleCookies = request.options.contains(.httpShouldHandleCookies)
         entity.httpShouldUsePipelining = request.options.contains(.httpShouldUsePipelining)
-        entity.timeoutInterval = Int32(clamping: Int.max)
+        entity.timeoutInterval = NSNumber(value: request.timeout).int32Value
         entity.rawCachePolicy = UInt16(request.cachePolicy.rawValue)
         requestsCache[request] = entity
         return entity
@@ -784,6 +804,8 @@ extension LoggerStore {
         var predicate = NSPredicate(format: "session IN %@", sessionIDs)
         predicate = isInverted ? NSCompoundPredicate(notPredicateWithSubpredicate: predicate) : predicate
         try removeMessages(with: predicate)
+
+        clearMemoryCaches()
     }
 
     /// Removes all of the previously recorded messages.
@@ -801,9 +823,17 @@ extension LoggerStore {
 
             try? Files.removeItem(at: blobsURL)
             Files.createDirectoryIfNeeded(at: blobsURL)
+
+            clearMemoryCaches()
         case .archive:
             break // Do nothing, readonly
         }
+    }
+
+    private func clearMemoryCaches() {
+        tasksCache.removeAll()
+        requestsCache.removeAll()
+        responsesCache.removeAll()
     }
 
     /// Safely closes the database and removes all information from the store.
@@ -901,12 +931,12 @@ extension LoggerStore {
         defer { try? target.close() }
 
         // Remove unwanted messages
-        backgroundContext.performAndWait {
+        target.backgroundContext.performAndWait {
             try? target._removeUnwantedExportableContent(for: options)
         }
 
         // Copy required blobs
-        backgroundContext.performAndWait {
+        target.backgroundContext.performAndWait {
             try? _exportBlobs(to: target)
         }
 

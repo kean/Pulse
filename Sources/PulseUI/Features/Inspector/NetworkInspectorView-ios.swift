@@ -15,6 +15,7 @@ struct NetworkInspectorView: View {
 
     @State private var shareItems: ShareItems?
     @ObservedObject private var settings: UserSettings = .shared
+    @EnvironmentObject private var environment: ConsoleEnvironment
     @Environment(\.store) private var store
 
     var body: some View {
@@ -31,10 +32,10 @@ struct NetworkInspectorView: View {
         .safeAreaInset(edge: .bottom) {
             OpenOnMacOverlay(entity: task)
         }
-        .inlineNavigationTitle(task.title)
+        .inlineNavigationTitle(environment.delegate.getShortTitle(for: task))
         .sheet(item: $shareItems, content: ShareView.init)
     }
-    
+
     @ViewBuilder
     private var contents: some View {
         Section { NetworkInspectorView.makeHeaderView(task: task, store: store) }

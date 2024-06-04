@@ -15,6 +15,8 @@ struct ConsoleSearchResultView: View {
     var limit: Int = 4
     var isSeparatorNeeded = false
 
+    @EnvironmentObject private var environment: ConsoleEnvironment
+
     var body: some View {
         ConsoleEntityCell(entity: viewModel.entity)
 #if os(macOS)
@@ -26,7 +28,7 @@ struct ConsoleSearchResultView: View {
             makeCell(for: item)
                 .tag(ConsoleSelectedItem.occurrence(viewModel.entity.objectID, item))
 #else
-            NavigationLink(destination: ConsoleSearchResultView.makeDestination(for: item, entity: viewModel.entity)) {
+            NavigationLink(destination: ConsoleSearchResultView.makeDestination(for: item, entity: viewModel.entity).injecting(environment)) {
                 makeCell(for: item)
             }
 #endif
@@ -40,7 +42,7 @@ struct ConsoleSearchResultView: View {
                 .padding(.leading, 16)
                 .padding(.bottom, 8)
 #else
-            NavigationLink(destination: ConsoleSearchResultDetailsView(viewModel: viewModel)) {
+            NavigationLink(destination: ConsoleSearchResultDetailsView(viewModel: viewModel).injecting(environment)) {
                 Text("Total Results: ")
                     .font(ConsoleConstants.fontBody) +
                 Text(total)

@@ -73,7 +73,6 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
     // Private
     private var isInitialized = false
     private let keychain = Keychain(service: "com.github.kean.pulse")
-    private let connectionQueue = DispatchQueue(label: "com.github.kean.pulse.remote-logger")
     private let log: OSLog
 
     public enum ConnectionState {
@@ -123,7 +122,7 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
             startBrowser()
         }
 
-        cancellable = store.events.receive(on: connectionQueue).sink { [weak self] in
+        cancellable = store.events.receive(on: DispatchQueue.main).sink { [weak self] in
             self?.didReceive(event: $0)
         }
 
