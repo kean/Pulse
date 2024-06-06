@@ -109,6 +109,10 @@ import Combine
             store.backgroundContext.perform {
                 let request = NSFetchRequest<LoggerMessageEntity>(entityName: "\(LoggerMessageEntity.self)")
                 request.predicate = options.predicate // important: contains sessions
+
+                let sortDescriptor = NSSortDescriptor(key: "createdAt", ascending: true)
+                request.sortDescriptors = [sortDescriptor]
+
                 let result = Result(catching: { try store.backgroundContext.fetch(request) })
                 continuation.resume(with: result)
             }
