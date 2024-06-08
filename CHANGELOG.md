@@ -1,5 +1,11 @@
 # Pulse 4.x
 
+## Pulse 4.2.4
+
+*Jun 8, 2024*
+
+- Fix an order of exported items by @goranbrl in https://github.com/kean/Pulse/pull/261
+
 ## Pulse 4.2.3
 
 *Jun 3, 2024*
