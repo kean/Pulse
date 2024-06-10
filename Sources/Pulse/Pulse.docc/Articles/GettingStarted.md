@@ -37,7 +37,7 @@ LoggerStore.shared.storeMessage(
 )
 ```
 
-> info: As an alternative to using `LoggerStore` directly, you can use Pulse as a SwiftLog backend using [PersistentLogHandler](https://kean-docs.github.io/pulseloghandler/documentation/pulseloghandler/persistentloghandler) struct from [PulseLogHandler](https://kean-docs.github.io/pulseloghandler/documentation/pulseloghandler) which is a Swift package distributed separately.  This way you can have more than one logger at once.
+> info: As an alternative to using `LoggerStore` directly, you can use Pulse as a SwiftLog backend using [PersistentLogHandler](https://kean-docs.github.io/pulseloghandler/documentation/pulseloghandler/persistentloghandler) struct from [PulseLogHandler](https://kean-docs.github.io/pulseloghandler/documentation/pulseloghandler) which is a [Swift package distributed separately](https://github.com/kean/PulseLogHandler).  This way you can have more than one logger at once.
 
 ### 2.2. Collecting Network Requests
 
