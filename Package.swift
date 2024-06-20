@@ -19,5 +19,8 @@ let package = Package(
         .target(name: "PulseUI", dependencies: ["Pulse"]),
         .testTarget(name: "PulseTests", dependencies: ["Pulse"]),
         .testTarget(name: "PulseUITests", dependencies: ["PulseUI"])
+    ],
+    swiftLanguageVersions: [
+      .v5
     ]
 )
