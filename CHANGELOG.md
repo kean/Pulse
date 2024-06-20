@@ -1,5 +1,11 @@
 # Pulse 4.x
 
+## Pulse 4.2.5
+
+*Jun 19, 2024*
+
+- Fix https://github.com/kean/Pulse/issues/263 – crash when tapping "Show All" in a grouped list of logs
+
 ## Pulse 4.2.4
 
 *Jun 8, 2024*
