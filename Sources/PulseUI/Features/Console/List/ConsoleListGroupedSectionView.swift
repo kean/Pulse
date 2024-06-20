@@ -26,7 +26,7 @@ struct ConsoleListGroupedSectionView: View {
 
         if prefix.count < objects.count {
 #if os(iOS) || os(visionOS)
-            NavigationLink(destination: ConsoleStaticList(entities: objects).inlineNavigationTitle(title)) {
+            NavigationLink(destination: ConsoleStaticList(entities: objects).injecting(environment).inlineNavigationTitle(title)) {
                 PlainListSeeAllView(count: objects.count)
             }
 #else
