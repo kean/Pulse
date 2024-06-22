@@ -61,7 +61,7 @@ struct ConsoleSearchResultView: View {
     @ViewBuilder
     private func makeCell(for occurrence: ConsoleSearchOccurrence) -> some View {
         let contents = VStack(alignment: .leading, spacing: 4) {
-            Text(occurrence.preview)
+            Text(occurrence.preview.preview)
                 .lineLimit(3)
             Text(occurrence.scope.title + " (\(occurrence.line):\(occurrence.range.lowerBound + 1))")
                 .font(ConsoleConstants.fontInfo)

@@ -10,13 +10,13 @@ import CoreData
 import Combine
 
 @available(iOS 15, visionOS 1.0, *)
-protocol ConsoleSearchOperationDelegate: AnyObject {
+@MainActor protocol ConsoleSearchOperationDelegate: AnyObject {
     func searchOperation(_ operation: ConsoleSearchOperation, didAddResults results: [ConsoleSearchResultViewModel])
     func searchOperationDidFinish(_ operation: ConsoleSearchOperation, hasMore: Bool)
 }
 
 @available(iOS 15, visionOS 1.0, *)
-final class ConsoleSearchOperation {
+final class ConsoleSearchOperation: @unchecked Sendable {
     private let parameters: ConsoleSearchParameters
     private var entities: [NSManagedObject]
     private var objectIDs: [NSManagedObjectID]
@@ -30,6 +30,7 @@ final class ConsoleSearchOperation {
     private let hasLogFilters: Bool
     private let hasNetworkFilers: Bool
 
+    @MainActor
     weak var delegate: ConsoleSearchOperationDelegate?
 
     init(entities: [NSManagedObject],
@@ -77,7 +78,7 @@ final class ConsoleSearchOperation {
             }
             index += 1
         }
-        DispatchQueue.main.async {
+        DispatchQueue.main.async { [hasMore] in
             self.delegate?.searchOperationDidFinish(self, hasMore: hasMore)
             if self.cutoff < 1000 {
                 self.cutoff *= 2

@@ -10,20 +10,32 @@ import CoreData
 import Combine
 
 @available(iOS 15, visionOS 1.0, *)
-final class ConsoleSearchOccurrence: Identifiable, Equatable, Hashable {
+final class ConsoleSearchOccurrence: Identifiable, Equatable, Hashable, Sendable {
     let id = ConsoleSearchOccurrenceId()
     let scope: ConsoleSearchScope
     let match: ConsoleSearchMatch
     var line: Int { match.lineNumber }
     var range: NSRange { NSRange(match.range, in: match.line) }
-    @MainActor lazy var preview = ConsoleSearchOccurrence.makePreview(for: match, attributes: previewAttibutes)
+    let preview: OccurencePreview
     let searchContext: RichTextViewModel.SearchContext
+
+    final class OccurencePreview: @unchecked Sendable {
+        let match: ConsoleSearchMatch
+
+        init(match: ConsoleSearchMatch) {
+            self.match = match
+        }
+
+        @MainActor
+        lazy var preview = ConsoleSearchOccurrence.makePreview(for: match, attributes: previewAttibutes)
+    }
 
     init(scope: ConsoleSearchScope,
          match: ConsoleSearchMatch,
          searchContext: RichTextViewModel.SearchContext) {
         self.scope = scope
         self.match = match
+        self.preview = OccurencePreview(match: match)
         self.searchContext = searchContext
     }
 
