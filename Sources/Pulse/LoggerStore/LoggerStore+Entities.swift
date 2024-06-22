@@ -332,3 +332,11 @@ public final class LoggerBlobHandleEntity: NSManagedObject {
         }
     }
 }
+
+extension LoggerMessageEntity: Identifiable {
+    public var id: NSManagedObjectID { objectID }
+}
+
+extension NetworkTaskEntity: Identifiable {
+    public var id: NSManagedObjectID { objectID }
+}

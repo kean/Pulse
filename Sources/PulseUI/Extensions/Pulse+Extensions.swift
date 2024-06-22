@@ -33,14 +33,6 @@ enum LoggerEntity {
     }
 }
 
-extension LoggerMessageEntity: Identifiable {
-    public var id: NSManagedObjectID { objectID }
-}
-
-extension NetworkTaskEntity: Identifiable {
-    public var id: NSManagedObjectID { objectID }
-}
-
 extension NetworkTaskEntity {
     var requestFileViewerContext: FileViewerViewModel.Context {
         FileViewerViewModel.Context(

@@ -1,5 +1,7 @@
 # Pulse 4.x
 
+- (Internal) Move `Identifable` conformances to `Pulse` to remove the "retroactive" conformance warnings in Swift 6 
+
 ## Pulse 4.2.5
 
 *Jun 19, 2024*
