@@ -10,7 +10,11 @@ public enum Experimental {
 public extension Experimental {
     /// WARNING: Experimental.
     final class URLSessionProxy {
+        #if compiler(>=6.0)
+        public nonisolated(unsafe) static let shared = URLSessionProxy()
+        #else
         public static let shared = URLSessionProxy()
+        #endif
 
         private init() {
             session = URLSession(configuration: .default, delegate: URLSessionProxyDelegate(logger: logger, delegate: CustomProtocolSessionDelegate.shared), delegateQueue: CustomProtocolSessionDelegate.shared.queue)
