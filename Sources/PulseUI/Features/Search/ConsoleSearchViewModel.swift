@@ -7,6 +7,7 @@ import Pulse
 import CoreData
 import Combine
 
+@MainActor
 protocol ConsoleEntitiesSource {
     var events: PassthroughSubject<ConsoleUpdateEvent, Never> { get }
     var entities: [NSManagedObject] { get }
@@ -20,6 +21,7 @@ final class ConsoleSearchBarViewModel: ObservableObject {
 }
 
 @available(iOS 15, visionOS 1.0, *)
+@MainActor
 final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDelegate {
     var isSearchActive: Bool = false {
         didSet {

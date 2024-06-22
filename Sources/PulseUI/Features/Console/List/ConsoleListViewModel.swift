@@ -8,6 +8,7 @@ import Pulse
 import Combine
 import SwiftUI
 
+@MainActor
 final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject, ConsoleEntitiesSource {
 #if os(iOS) || os(visionOS)
     @Published private(set) var visibleEntities: ArraySlice<NSManagedObject> = []
