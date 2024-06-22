@@ -6,7 +6,7 @@
 
 - Disable Swift 6 compatibility in Swift package to ensure Pulse compiles if added as a dependency under Xcode 16 by @NachoSoto in https://github.com/kean/Pulse/pull/264
 - Fix some of the Swift 6 errors
-- (Internal) Move `Identifable` conformances to `Pulse` to remove the "retroactive" conformance warnings in Swift 6 
+- (Internal) Move `Identifiable` conformances to `Pulse` to remove the "retroactive" conformance warnings in Swift 6 
 
 ## Pulse 4.2.5
 
