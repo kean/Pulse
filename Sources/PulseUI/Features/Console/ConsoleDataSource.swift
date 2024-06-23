@@ -17,7 +17,6 @@ protocol ConsoleDataSourceDelegate: AnyObject {
     func dataSource(_ dataSource: ConsoleDataSource, didUpdateWith diff: CollectionDifference<NSManagedObjectID>?)
 }
 
-@MainActor
 final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
     weak var delegate: ConsoleDataSourceDelegate?
 
@@ -103,7 +102,7 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
         controller.delegate = controllerDelegate
     }
 
-    func bind(_ filters: ConsoleFiltersViewModel) {
+    @MainActor func bind(_ filters: ConsoleFiltersViewModel) {
         cancellables = []
         filters.$options.sink { [weak self] in
             self?.predicate = $0
@@ -135,16 +134,12 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
     
     // MARK: NSFetchedResultsControllerDelegate
 
-    nonisolated func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        MainActor.assumeIsolated {
-            delegate?.dataSource(self, didUpdateWith: nil)
-        }
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        delegate?.dataSource(self, didUpdateWith: nil)
     }
 
-    nonisolated func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChangeContentWith diff: CollectionDifference<NSManagedObjectID>) {
-        MainActor.assumeIsolated {
-            delegate?.dataSource(self, didUpdateWith: diff)
-        }
+    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChangeContentWith diff: CollectionDifference<NSManagedObjectID>) {
+        delegate?.dataSource(self, didUpdateWith: diff)
     }
 
     // MARK: Predicate
