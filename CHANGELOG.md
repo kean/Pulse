@@ -1,5 +1,11 @@
 # Pulse 4.x
 
+## Pulse 4.2.7
+
+*Jun 23, 2024*
+
+- Remove usage of APIs requiring iOS 17 at runtime by @hallee in https://github.com/kean/Pulse/pull/265
+
 ## Pulse 4.2.6
 
 *Jun 22, 2024*
