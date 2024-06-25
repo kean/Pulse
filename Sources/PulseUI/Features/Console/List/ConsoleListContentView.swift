@@ -89,7 +89,9 @@ struct ConsoleListContentView: View {
 #if os(macOS)
     private func registerNowMode<T: View>(for list: T) -> some View {
         list.onChange(of: viewModel.entities) { entities in
-            guard isNowEnabled else { return }
+            /// From empty to 1 causes a bug on macOS where the first cell falls behind the overflow.
+            /// Check for count == 1 to always animate to the first inserted item.
+            guard isNowEnabled || entities.count == 1 else { return }
 
             withAnimation {
                 proxy.scrollTo(BottomViewID(), anchor: .top)
