@@ -8,8 +8,8 @@ import Network
 import Pulse
 #endif
 
-extension RemoteLogger {
-    enum PacketCode: UInt8, Equatable {
+public extension RemoteLogger {
+    public enum PacketCode: UInt8, Equatable {
         // Handshake
         case clientHello = 0 // PacketClientHello
         case serverHello = 1 // ServerHelloResponse
@@ -44,7 +44,7 @@ extension RemoteLogger {
         init() {}
     }
     
-    struct PacketNetworkMessage {
+    public struct PacketNetworkMessage {
         private struct Manifest: Codable {
             let messageSize: UInt32
             let requestBodySize: UInt32
@@ -83,7 +83,7 @@ extension RemoteLogger {
             return data
         }
         
-        static func decode(_ data: Data) throws -> LoggerStore.Event.NetworkTaskCompleted {
+        public static func decode(_ data: Data) throws -> LoggerStore.Event.NetworkTaskCompleted {
             guard data.count >= Manifest.size else {
                 throw PacketParsingError.notEnoughData // Should never happen
             }
@@ -195,8 +195,12 @@ extension RemoteLogger {
         case openTaskDetails
     }
 
-    struct ServerHelloResponse: Codable {
+    public struct ServerHelloResponse: Codable {
         let version: String
+        
+        public init(version: String) {
+            self.version = version
+        }
     }
 }
 
