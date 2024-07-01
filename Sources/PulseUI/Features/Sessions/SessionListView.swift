@@ -27,34 +27,40 @@ struct SessionListView: View {
     @Environment(\.store) private var store
 
     var body: some View {
-        if sessions.isEmpty {
-            Text("No Recorded Sessions")
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .foregroundColor(.secondary)
-        } else {
-            content
-                .onAppear { refreshGroups() }
-                .onChange(of: sessions.count) { _ in refreshGroups() }
+        VStack(spacing: 0) {
+            Text("Recorded sessions")
+                .padding(.vertical, 10)
+            Divider()
+            if sessions.isEmpty {
+                Text("No Recorded Sessions")
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .foregroundColor(.secondary)
+            } else {
+                content
+                    .onAppear { refreshGroups() }
+                    .onChange(of: sessions.count) { _ in refreshGroups() }
+            }
         }
     }
 
     @ViewBuilder
     private var content: some View {
 #if os(macOS)
-        VStack {
+        VStack(spacing: 0) {
             list
-            HStack {
+            
 #if PULSE_STANDALONE_APP
+            HStack {
                 NavigatorFilterBar(text: $filterTerm)
                     .frame(maxWidth: 200)
                     .help("Show sessions with matching name")
+            }
 #else
-                SearchBar(title: "Filter", imageName: "line.3.horizontal.decrease.circle", text: $filterTerm)
-                    .frame(maxWidth: 200)
-                    .help("Show sessions with matching name")
+            Divider()
+            SearchBar(title: "Filter", imageName: "line.3.horizontal.decrease.circle", text: $filterTerm)
+                .help("Show sessions with matching name")
+                .padding(8)
 #endif
-                Spacer()
-            }.padding(8)
         }
 #else
         list
@@ -92,10 +98,14 @@ struct SessionListView: View {
 
     private func makeHeader(for startDate: Date, sessions: [LoggerSessionEntity]) -> some View {
         HStack {
+            #if os(macOS)
+            PlainListSectionHeaderSeparator(title: sectionTitleFormatter.string(from: startDate) + " (\(sessions.count))")
+            #else
             (Text(sectionTitleFormatter.string(from: startDate)) +
              Text(" (\(sessions.count))").foregroundColor(.secondary.opacity(0.5)))
             .font(.headline)
             .padding(.vertical, 6)
+            #endif
 
 #if os(iOS) || os(visionOS)
             if editMode?.wrappedValue.isEditing ?? false {
