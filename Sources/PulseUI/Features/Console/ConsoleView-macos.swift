@@ -51,7 +51,7 @@ private struct ConsoleMainView: View {
 
     private var contentView: some View {
         ConsoleListView()
-            .frame(minWidth: 200, idealWidth: 400, minHeight: 120, idealHeight: 480)
+            .frame(minWidth: 400, idealWidth: 500, minHeight: 120, idealHeight: 480)
             .toolbar {
                 ToolbarItemGroup(placement: .navigation) {
                     contentToolbarNavigationItems
