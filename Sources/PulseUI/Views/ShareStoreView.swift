@@ -20,6 +20,7 @@ struct ShareStoreView: View {
     @StateObject private var viewModel = ShareStoreViewModel()
 
     @Environment(\.store) private var store: LoggerStore
+    @EnvironmentObject private var environment: ConsoleEnvironment
 
     var body: some View {
         content
@@ -30,6 +31,7 @@ struct ShareStoreView: View {
                     viewModel.sessions = [store.session.id]
                 }
                 viewModel.store = store
+                viewModel.environment = environment
             }
     }
 
@@ -95,12 +97,12 @@ struct ShareStoreView: View {
         }
         Section {
             Picker("Output", selection: $viewModel.output) {
-                Text("Pulse").tag(ShareStoreOutput.store)
-                Text("Plain Text").tag(ShareStoreOutput.text)
-                Text("HTML").tag(ShareStoreOutput.html)
-                Text("HAR").tag(ShareStoreOutput.har)
-                Divider()
-                Text("Pulse (Package)").tag(ShareStoreOutput.package)
+                ForEach(viewModel.shareStoreOutputs, id: \.rawValue) { shareOutput in
+                    if shareOutput == .package {
+                        Divider()
+                    }
+                    Text(shareOutput.interfaceTitle).tag(shareOutput)
+                }
             }
 #if os(macOS)
             .labelsHidden()
