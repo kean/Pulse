@@ -13,6 +13,7 @@ import Combine
     // Sharing options
     @Published var sessions: Set<UUID> = []
     @Published var logLevels = Set(LoggerStore.Level.allCases)
+    @Published var shareStoreOutputs: [ShareStoreOutput] = ShareStoreOutput.allCases
     @Published var output: ShareStoreOutput
 
     @Published private(set) var isPreparingForSharing = false
@@ -20,6 +21,11 @@ import Combine
     @Published var shareItems: ShareItems?
 
     var store: LoggerStore?
+    var environment: ConsoleEnvironment? {
+        didSet {
+            updateForCurrentEnvironment()
+        }
+    }
 
     init() {
         output = UserSettings.shared.sharingOutput
@@ -30,6 +36,26 @@ import Combine
         isPreparingForSharing = true
         saveSharingOptions()
         prepareForSharing()
+    }
+    
+    private func updateForCurrentEnvironment() {
+        guard let environment else { return }
+        shareStoreOutputs = environment.configuration.shareStoreOutputs.sorted(by: { lhs, rhs in
+            /// Make sure the .package is always last since we show a Divider() in front of it.
+            switch (lhs, rhs) {
+            case (.package, _):
+                return false
+            case (_, .package):
+                return true
+            default:
+                return lhs.rawValue < rhs.rawValue
+            }
+        })
+        
+        if !shareStoreOutputs.contains(output), let shareStoreOutput = shareStoreOutputs.first {
+            /// Update the selected output to one of the available options.
+            output = shareStoreOutput
+        }
     }
 
     private func saveSharingOptions() {

@@ -275,6 +275,7 @@
 		0CFF79E229EC1FA200BE767B /* ImageProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CFF79E029EC1F7800BE767B /* ImageProcessor.swift */; };
 		25E740012BE0FA58008C6DC3 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 25E740002BE0FA58008C6DC3 /* PrivacyInfo.xcprivacy */; };
 		25E740072BE10B4C008C6DC3 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 25E740062BE10B4C008C6DC3 /* PrivacyInfo.xcprivacy */; };
+		849DD7D92C32A9CE002D6787 /* ConsoleConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 849DD7D82C32A9CE002D6787 /* ConsoleConfiguration.swift */; };
 		E95D6C562B7314E6004D28E4 /* HARDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95D6C552B7314E6004D28E4 /* HARDocument.swift */; };
 /* End PBXBuildFile section */
 
@@ -737,6 +738,7 @@
 		25E740062BE10B4C008C6DC3 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		49E82A8526D107A00070244F /* AlamofireIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlamofireIntegration.swift; sourceTree = "<group>"; };
 		49E82A8826D1083D0070244F /* MoyaIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoyaIntegration.swift; sourceTree = "<group>"; };
+		849DD7D82C32A9CE002D6787 /* ConsoleConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleConfiguration.swift; sourceTree = "<group>"; };
 		E95D6C552B7314E6004D28E4 /* HARDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HARDocument.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -1398,6 +1400,7 @@
 				0CA2632D2BFA3855003C8E97 /* ConsoleDelegate.swift */,
 				0CF0D60A296F189600EED9D4 /* ConsoleEnvironment.swift */,
 				0CECF63C2996BE12000F9CCD /* ConsoleDataSource.swift */,
+				849DD7D82C32A9CE002D6787 /* ConsoleConfiguration.swift */,
 			);
 			path = Console;
 			sourceTree = "<group>";
@@ -2136,6 +2139,7 @@
 				0CDC3BED2971B936003BD1FF /* ConsoleSearchLogLevelsCell.swift in Sources */,
 				0CF0D620296F189600EED9D4 /* Foundation+Extensions.swift in Sources */,
 				0CF0D66C296F189600EED9D4 /* NetworkRequestInfoCell.swift in Sources */,
+				849DD7D92C32A9CE002D6787 /* ConsoleConfiguration.swift in Sources */,
 				0CB63A15297438A600525165 /* ConsoleSearchViewModel.swift in Sources */,
 				0CF0D632296F189600EED9D4 /* ShareStoreView.swift in Sources */,
 				0C9751582A32CCC400DC46FF /* RemoteLoggerEnterPasswordView.swift in Sources */,
