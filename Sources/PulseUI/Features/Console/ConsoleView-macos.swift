@@ -75,8 +75,8 @@ private struct ConsoleMainView: View {
                         Label("Show Settings", systemImage: "gearshape")
                     }
                     .help("Show Settings")
-                    .popover(isPresented: $isShowingSettings) {
-                        SettingsView().frame(width: 300, height: 420)
+                    .popover(isPresented: $isShowingSettings, arrowEdge: .bottom) {
+                        SettingsView().frame(width: 300, height: environment.configuration.allowRemoteLogging ? 420 : 175)
                     }
                 }
             }
