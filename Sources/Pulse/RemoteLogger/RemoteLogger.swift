@@ -322,7 +322,7 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
 
         openConnection(to: server, passcode: passcode)
     }
-
+    
     private func connectionDidTimeout(isProtected: Bool) {
         os_log("Connection did timeout", log: log)
         connectionCompletion?(.failure(self.connectionError ?? .unknown(isProtected: isProtected)))
@@ -341,7 +341,7 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
     }
 
     private func saveServer(named name: String) {
-        os_log("Save server  %{private}@", log: log, name)
+        os_log("Save server %{private}@", log: log, name)
         knownServers.removeAll(where: { $0 == name })
         knownServers.append(name)
         saveKnownServers()
@@ -371,7 +371,7 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
 
     // MARK: RemoteLoggerConnectionDelegate
 
-    func connection(_ connection: Connection, didChangeState newState: NWConnection.State) {
+    public func connection(_ connection: Connection, didChangeState newState: NWConnection.State) {
         os_log("Connection did change state to %{public}@", log: log, "\(newState)")
 
         switch newState {
@@ -390,7 +390,7 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
         }
     }
 
-    func connection(_ connection: Connection, didReceiveEvent event: Connection.Event) {
+    public func connection(_ connection: Connection, didReceiveEvent event: Connection.Event) {
         switch event {
         case .packet(let packet):
             do {
@@ -730,5 +730,5 @@ extension RemoteLogger.ConnectionState {
 }
 
 extension RemoteLogger {
-    public static let serviceType = "_pulse._tcp"
+    public static var serviceType = "_pulse._tcp"
 }

@@ -347,7 +347,7 @@ extension LoggerStore {
     }
 
     /// Handles event created by the current store and dispatches it to observers.
-    func handle(_ event: Event) {
+    public func handle(_ event: Event) {
         guard let event = configuration.willHandleEvent(event) else {
             return
         }

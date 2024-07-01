@@ -174,7 +174,7 @@ private struct _ConsoleListView: View {
                     } else {
                         ConsoleListContentView(proxy: proxy)
                     }
-                }
+                }.scrollContentBackground(.hidden)
             }
             .environment(\.defaultMinListRowHeight, 1)
         }
