@@ -17,7 +17,7 @@ public protocol RemoteLoggerConnectionDelegate: AnyObject {
 }
 
 public extension RemoteLogger {
-    public final class Connection {
+    final class Connection {
         var endpoint: NWEndpoint { connection.endpoint }
         private let connection: NWConnection
         private var buffer = Data()
