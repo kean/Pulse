@@ -7,6 +7,7 @@
 import SwiftUI
 import Pulse
 
+@available(macOS 13, *)
 struct SettingsView: View {
     @State private var isPresentingShareStoreView = false
     @State private var shareItems: ShareItems?
@@ -24,11 +25,14 @@ struct SettingsView: View {
                         .foregroundColor(.secondary)
                 }
             }
-            Section(header: Text("Store")) {
+            Section {
                 if #available(macOS 13, *), let info = try? store.info() {
                     LoggerStoreSizeChart(info: info, sizeLimit: store.configuration.sizeLimit)
                 }
+            } header: {
+                PlainListSectionHeaderSeparator(title: "Store")
             }
+            
             Section {
                 HStack {
                     Button("Show in Finder") {
@@ -41,13 +45,14 @@ struct SettingsView: View {
                     }
                 }
             }
-        }
+        }.listStyle(.sidebar).scrollContentBackground(.hidden)
     }
 }
 
 // MARK: - Preview
 
 #if DEBUG
+@available(macOS 13, *)
 struct UserSettingsView_Previews: PreviewProvider {
     static var previews: some View {
         SettingsView()
