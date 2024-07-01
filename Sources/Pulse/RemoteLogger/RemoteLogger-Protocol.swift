@@ -9,7 +9,7 @@ import Pulse
 #endif
 
 public extension RemoteLogger {
-    public enum PacketCode: UInt8, Equatable {
+    enum PacketCode: UInt8, Equatable {
         // Handshake
         case clientHello = 0 // PacketClientHello
         case serverHello = 1 // ServerHelloResponse
@@ -44,7 +44,7 @@ public extension RemoteLogger {
         init() {}
     }
     
-    public struct PacketNetworkMessage {
+    struct PacketNetworkMessage {
         private struct Manifest: Codable {
             let messageSize: UInt32
             let requestBodySize: UInt32
@@ -195,7 +195,7 @@ public extension RemoteLogger {
         case openTaskDetails
     }
 
-    public struct ServerHelloResponse: Codable {
+    struct ServerHelloResponse: Codable {
         let version: String
         
         public init(version: String) {
