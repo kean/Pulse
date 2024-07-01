@@ -60,18 +60,21 @@ private struct ConsoleMainView: View {
                     Button(action: { isShowingFilters = true }) {
                         Label("Show Filters", systemImage: "line.3.horizontal.decrease.circle")
                     }
+                    .help("Show Filters")
                     .popover(isPresented: $isShowingFilters) {
                         ConsoleFiltersView().frame(width: 300).fixedSize()
                     }
                     Button(action: { isShowingSessions = true }) {
                         Label("Show Sessions", systemImage: "list.clipboard")
                     }
+                    .help("Show Sessions")
                     .popover(isPresented: $isShowingSessions) {
                         SessionsView().frame(width: 300, height: 420)
                     }
                     Button(action: { isShowingSettings = true }) {
                         Label("Show Settings", systemImage: "gearshape")
                     }
+                    .help("Show Settings")
                     .popover(isPresented: $isShowingSettings) {
                         SettingsView().frame(width: 300, height: 420)
                     }
@@ -88,10 +91,11 @@ private struct ConsoleMainView: View {
         if !(environment.store.options.contains(.readonly)) {
             Toggle(isOn: $isNowEnabled) {
                 Image(systemName: "clock")
-            }
+            }.help("Now Mode: Automatically scrolls to the top of the view to display newly incoming network requests.")
             Button(action: { isSharingStore = true }) {
                 Image(systemName: "square.and.arrow.up")
             }
+            .help("Share a session")
             .popover(isPresented: $isSharingStore, arrowEdge: .bottom) {
                 ShareStoreView(onDismiss: {})
                     .frame(width: 240).fixedSize()
@@ -99,6 +103,7 @@ private struct ConsoleMainView: View {
             Button(action: { environment.store.removeAll() }) {
                 Image(systemName: "trash")
             }
+            .help("Clear current session")
         }
     }
 }
