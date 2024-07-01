@@ -12,14 +12,17 @@ struct SettingsView: View {
     @State private var shareItems: ShareItems?
 
     @Environment(\.store) private var store
+    @EnvironmentObject private var environment: ConsoleEnvironment
 
     var body: some View {
         List {
-            if store === RemoteLogger.shared.store {
-                RemoteLoggerSettingsView(viewModel: .shared)
-            } else {
-                Text("Not available")
-                    .foregroundColor(.secondary)
+            if environment.configuration.allowRemoteLogging {
+                if store === RemoteLogger.shared.store {
+                    RemoteLoggerSettingsView(viewModel: .shared)
+                } else {
+                    Text("Not available")
+                        .foregroundColor(.secondary)
+                }
             }
             Section(header: Text("Store")) {
                 if #available(macOS 13, *), let info = try? store.info() {

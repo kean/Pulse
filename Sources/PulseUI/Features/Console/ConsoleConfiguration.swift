@@ -11,10 +11,16 @@ public struct ConsoleConfiguration {
     public static let `default` = ConsoleConfiguration()
     
     let shareStoreOutputs: [ShareStoreOutput]
+    let allowRemoteLogging: Bool
     
     /// Creates a new `ConsoleConfiguration`
     /// - Parameter shareStoreOutputs: The available store share outputs. Defaults to `allCases`.
-    public init(shareStoreOutputs: [ShareStoreOutput] = ShareStoreOutput.allCases) {
+    /// - Parameter allowRemoteLogging: Enable/disable the remote logging option.
+    public init(
+        shareStoreOutputs: [ShareStoreOutput] = ShareStoreOutput.allCases,
+        allowRemoteLogging: Bool = true
+    ) {
         self.shareStoreOutputs = shareStoreOutputs
+        self.allowRemoteLogging = allowRemoteLogging
     }
 }
