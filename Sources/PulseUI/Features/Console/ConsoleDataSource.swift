@@ -8,7 +8,7 @@ import Pulse
 import Combine
 import SwiftUI
 
-protocol ConsoleDataSourceDelegate: AnyObject {
+public protocol ConsoleDataSourceDelegate: AnyObject {
     /// The data source reloaded the entire dataset.
     func dataSourceDidRefresh(_ dataSource: ConsoleDataSource)
 
@@ -17,22 +17,24 @@ protocol ConsoleDataSourceDelegate: AnyObject {
     func dataSource(_ dataSource: ConsoleDataSource, didUpdateWith diff: CollectionDifference<NSManagedObjectID>?)
 }
 
-final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
-    weak var delegate: ConsoleDataSourceDelegate?
+public final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
+    public weak var delegate: ConsoleDataSourceDelegate?
 
     /// - warning: Incompatible with the "group by" option.
     var sortDescriptors: [NSSortDescriptor] = [] {
         didSet { controller.fetchRequest.sortDescriptors = sortDescriptors }
     }
 
-    struct PredicateOptions {
-        var filters = ConsoleFilers()
-        var isOnlyErrors = false
-        var predicate: NSPredicate?
-        var focus: NSPredicate?
+    public struct PredicateOptions {
+        public var filters = ConsoleFilers()
+        public var isOnlyErrors = false
+        public var predicate: NSPredicate?
+        public var focus: NSPredicate?
+        
+        public init() { }
     }
 
-    var predicate: PredicateOptions = .init() {
+    public var predicate: PredicateOptions = .init() {
         didSet { refreshPredicate() }
     }
 
@@ -49,7 +51,7 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
     private var controllerDelegate: NSFetchedResultsControllerDelegate?
     private var cancellables: [AnyCancellable] = []
 
-    init(store: LoggerStore, mode: ConsoleMode, options: ConsoleListOptions = .init()) {
+    public init(store: LoggerStore, mode: ConsoleMode, options: ConsoleListOptions = .init()) {
         self.store = store
         self.mode = mode
         self.options = options
@@ -109,7 +111,7 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
         }.store(in: &cancellables)
     }
 
-    func refresh() {
+    public func refresh() {
         try? controller.performFetch()
         delegate?.dataSourceDidRefresh(self)
     }
@@ -124,21 +126,21 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
         controller.object(at: indexPath)
     }
     
-    var entities: [NSManagedObject] {
+    public var entities: [NSManagedObject] {
         controller.fetchedObjects ?? []
     }
     
-    var sections: [NSFetchedResultsSectionInfo]? {
+    public var sections: [NSFetchedResultsSectionInfo]? {
         controller.sectionNameKeyPath == nil ? nil : controller.sections
     }
     
     // MARK: NSFetchedResultsControllerDelegate
 
-    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+    public func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         delegate?.dataSource(self, didUpdateWith: nil)
     }
 
-    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChangeContentWith diff: CollectionDifference<NSManagedObjectID>) {
+    public func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChangeContentWith diff: CollectionDifference<NSManagedObjectID>) {
         delegate?.dataSource(self, didUpdateWith: diff)
     }
 

@@ -7,13 +7,13 @@ import Pulse
 import SwiftUI
 import CoreData
 
-enum LoggerEntity {
+public enum LoggerEntity {
     /// Regular log, not task attached.
     case message(LoggerMessageEntity)
     /// Either a log with an attached task, or a task itself.
     case task(NetworkTaskEntity)
 
-    init(_ entity: NSManagedObject) {
+    public init(_ entity: NSManagedObject) {
         if let message = entity as? LoggerMessageEntity {
             if let task = message.task {
                 self = .task(task)
@@ -27,7 +27,7 @@ enum LoggerEntity {
         }
     }
 
-    var task: NetworkTaskEntity? {
+    public var task: NetworkTaskEntity? {
         if case .task(let task) = self { return task }
         return nil
     }
@@ -80,7 +80,7 @@ extension LoggerMessageEntity {
 }
 
 extension NetworkTaskEntity.State {
-    var tintColor: Color {
+    public var tintColor: Color {
         switch self {
         case .pending: return .orange
         case .success: return .green

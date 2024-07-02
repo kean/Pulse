@@ -5,24 +5,41 @@
 import Foundation
 import Pulse
 
-struct ConsoleListOptions: Equatable {
-    var messageSortBy: MessageSortBy = .dateCreated
-    var taskSortBy: TaskSortBy = .dateCreated
-#if os(macOS)
-    var order: Ordering = .ascending
-#else
-    var order: Ordering = .descending
-#endif
-
+public struct ConsoleListOptions: Equatable {
+    var messageSortBy: MessageSortBy
+    var taskSortBy: TaskSortBy
+    var order: Ordering
     var messageGroupBy: MessageGroupBy = .noGrouping
     var taskGroupBy: TaskGroupBy = .noGrouping
 
-    enum Ordering: String, CaseIterable {
+    public init(
+        messageSortBy: MessageSortBy = .dateCreated,
+        taskSortBy: TaskSortBy = .dateCreated,
+        order: Ordering = .default,
+        messageGroupBy: MessageGroupBy = .noGrouping,
+        taskGroupBy: TaskGroupBy = .noGrouping
+    ) {
+        self.messageSortBy = messageSortBy
+        self.taskSortBy = taskSortBy
+        self.order = order
+        self.messageGroupBy = messageGroupBy
+        self.taskGroupBy = taskGroupBy
+    }
+    
+    public enum Ordering: String, CaseIterable {
         case descending = "Descending"
         case ascending = "Ascending"
+        
+        public static var `default`: Ordering {
+        #if os(macOS)
+            .ascending
+        #else
+            .descending
+        #endif
+        }
     }
 
-    enum MessageSortBy: String, CaseIterable {
+    public enum MessageSortBy: String, CaseIterable {
         case dateCreated = "Date"
         case level = "Level"
 
@@ -34,7 +51,7 @@ struct ConsoleListOptions: Equatable {
         }
     }
 
-    enum TaskSortBy: String, CaseIterable {
+    public enum TaskSortBy: String, CaseIterable {
         case dateCreated = "Date"
         case duration = "Duration"
         case requestSize = "Request Size"
@@ -50,7 +67,7 @@ struct ConsoleListOptions: Equatable {
         }
     }
 
-    enum MessageGroupBy: String, CaseIterable, ConsoleListGroupBy {
+    public enum MessageGroupBy: String, CaseIterable, ConsoleListGroupBy {
         case noGrouping = "No Grouping"
         case label = "Label"
         case level = "Level"
@@ -75,7 +92,7 @@ struct ConsoleListOptions: Equatable {
         }
     }
 
-    enum TaskGroupBy: ConsoleListGroupBy {
+    public enum TaskGroupBy: ConsoleListGroupBy {
         case noGrouping
         case url
         case host
