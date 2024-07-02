@@ -8,27 +8,27 @@ import CoreData
 import Combine
 
 /// Filter the logs displayed in the console.
-struct ConsoleFilers: Hashable {
-    var shared = Shared()
-    var messages = Messages()
-    var network = Network()
+public struct ConsoleFilers: Hashable {
+    public var shared = Shared()
+    public var messages = Messages()
+    public var network = Network()
 
-    struct Shared: Hashable {
-        var sessions = Sessions()
-        var dates = Dates()
+    public struct Shared: Hashable {
+        public var sessions = Sessions()
+        public var dates = Dates()
     }
 
-    struct Messages: Hashable {
-        var logLevels = LogLevels()
-        var labels = Labels()
+    public struct Messages: Hashable {
+        public var logLevels = LogLevels()
+        public var labels = Labels()
 #if PULSE_STANDALONE_APP
         var custom = CustomMessageFilters()
 #endif
     }
 
-    struct Network: Hashable {
-        var host = Host()
-        var url = URL()
+    public struct Network: Hashable {
+        public var host = Host()
+        public var url = URL()
 #if PULSE_STANDALONE_APP
         var custom = CustomNetworkFilters()
         var response = Response()
@@ -42,47 +42,47 @@ protocol ConsoleFilterProtocol: Hashable {
     init() // Initializes with the default values
 }
 
-extension ConsoleFilers {
+public extension ConsoleFilers {
     struct Sessions: Hashable, ConsoleFilterProtocol {
-        var isEnabled = true
-        var selection: Set<UUID> = []
+        public var isEnabled = true
+        public var selection: Set<UUID> = []
     }
 
     struct Dates: Hashable, ConsoleFilterProtocol {
-        var isEnabled = true
-        var startDate: Date?
-        var endDate: Date?
+        public var isEnabled = true
+        public var startDate: Date?
+        public var endDate: Date?
 
-        static var today: Dates {
+        public static var today: Dates {
             Dates(startDate: Calendar.current.startOfDay(for: Date()))
         }
 
-        static var recent: Dates {
+        public static var recent: Dates {
             Dates(startDate: Date().addingTimeInterval(-1200))
         }
     }
 
     struct LogLevels: ConsoleFilterProtocol {
-        var isEnabled = true
-        var levels: Set<LoggerStore.Level> = Set(LoggerStore.Level.allCases)
+        public var isEnabled = true
+        public var levels: Set<LoggerStore.Level> = Set(LoggerStore.Level.allCases)
             .subtracting([LoggerStore.Level.trace])
     }
 
     struct Labels: ConsoleFilterProtocol {
-        var isEnabled = true
-        var hidden: Set<String> = []
-        var focused: String?
+        public var isEnabled = true
+        public var hidden: Set<String> = []
+        public var focused: String?
     }
 
     struct Host: ConsoleFilterProtocol {
-        var isEnabled = true
-        var hidden: Set<String> = []
-        var focused: String?
+        public var isEnabled = true
+        public var hidden: Set<String> = []
+        public var focused: String?
     }
 
     struct URL: ConsoleFilterProtocol {
-        var isEnabled = true
-        var hidden: Set<String> = []
-        var focused: String?
+        public var isEnabled = true
+        public var hidden: Set<String> = []
+        public var focused: String?
     }
 }
