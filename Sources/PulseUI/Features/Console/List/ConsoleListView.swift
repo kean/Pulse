@@ -135,24 +135,13 @@ private struct _ConsoleListView: View {
 #if os(macOS)
 @available(iOS 15, macOS 13, visionOS 1.0, *)
 private struct _ConsoleListView: View {
-    @EnvironmentObject private var environment: ConsoleEnvironment
-    @EnvironmentObject private var listViewModel: ConsoleListViewModel
     @EnvironmentObject private var searchViewModel: ConsoleSearchViewModel
-
-    @State private var selectedObjectID: NSManagedObjectID? // Has to use for Table
-    @State private var selection: ConsoleSelectedItem?
-    @State private var shareItems: ShareItems?
+    @EnvironmentObject private var router: ConsoleRouter
 
     @Environment(\.isSearching) private var isSearching
 
     var body: some View {
         content
-            .onChange(of: selectedObjectID) {
-                environment.router.selection = $0.map(ConsoleSelectedItem.entity)
-            }
-            .onChange(of: selection) {
-                environment.router.selection = $0
-            }
             .onChange(of: isSearching) {
                 searchViewModel.isSearchActive = $0
             }
@@ -168,7 +157,7 @@ private struct _ConsoleListView: View {
             }
             Divider()
             ScrollViewReader { proxy in
-                List(selection: $selection) {
+                List(selection: $router.selection) {
                     if isSearching && !searchViewModel.parameters.isEmpty {
                         ConsoleSearchResultsListContentView()
                     } else {
