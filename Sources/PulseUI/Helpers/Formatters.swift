@@ -4,6 +4,7 @@
 
 import Foundation
 import Pulse
+import PulseComponents
 
 enum DurationFormatter {
     static func string(from timeInterval: TimeInterval) -> String {
@@ -142,22 +143,7 @@ enum ConsoleFormatter {
     }
 }
 
-enum StatusCodeFormatter {
-    static func string(for statusCode: Int32) -> String {
-        string(for: Int(statusCode))
-    }
-
-    static func string(for statusCode: Int) -> String {
-        switch statusCode {
-        case 0: return "Success"
-        case 200: return "200 OK"
-        case 418: return "418 Teapot"
-        case 429: return "429 Too many requests"
-        case 451: return "451 Unavailable for Legal Reasons"
-        default: return "\(statusCode) \( HTTPURLResponse.localizedString(forStatusCode: statusCode).capitalized)"
-        }
-    }
-}
+typealias StatusCodeFormatter = PulseComponents.ConsoleFormatter.StatusCodeFormatter
 
 enum ErrorFormatter {
     static func shortErrorDescription(for task: NetworkTaskEntity) -> String {

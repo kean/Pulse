@@ -8,7 +8,7 @@ import Pulse
 import Combine
 import SwiftUI
 
-protocol ConsoleDataSourceDelegate: AnyObject {
+public protocol ConsoleDataSourceDelegate: AnyObject {
     /// The data source reloaded the entire dataset.
     func dataSourceDidRefresh(_ dataSource: ConsoleDataSource)
 
@@ -17,39 +17,41 @@ protocol ConsoleDataSourceDelegate: AnyObject {
     func dataSource(_ dataSource: ConsoleDataSource, didUpdateWith diff: CollectionDifference<NSManagedObjectID>?)
 }
 
-final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
-    weak var delegate: ConsoleDataSourceDelegate?
+public final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
+    public weak var delegate: ConsoleDataSourceDelegate?
 
     /// - warning: Incompatible with the "group by" option.
     var sortDescriptors: [NSSortDescriptor] = [] {
         didSet { controller.fetchRequest.sortDescriptors = sortDescriptors }
     }
 
-    struct PredicateOptions {
-        var filters = ConsoleFilers()
-        var isOnlyErrors = false
-        var predicate: NSPredicate?
-        var focus: NSPredicate?
+    public struct PredicateOptions {
+        public var filters = ConsoleFilers()
+        public var isOnlyErrors = false
+        public var predicate: NSPredicate?
+        public var focus: NSPredicate?
+
+        public init() {}
     }
 
-    var predicate: PredicateOptions = .init() {
+    public var predicate: PredicateOptions = .init() {
         didSet { refreshPredicate() }
     }
 
-    var filter: NSPredicate? {
+    public var filter: NSPredicate? {
         didSet { refreshPredicate() }
     }
 
-    static let fetchBatchSize = 100
+    public static let fetchBatchSize = 100
 
     private let store: LoggerStore
     private let mode: ConsoleMode
     private let options: ConsoleListOptions
     private let controller: NSFetchedResultsController<NSManagedObject>
     private var controllerDelegate: NSFetchedResultsControllerDelegate?
-    private var cancellables: [AnyCancellable] = []
+    public var cancellables: [AnyCancellable] = []
 
-    init(store: LoggerStore, mode: ConsoleMode, options: ConsoleListOptions = .init()) {
+    public init(store: LoggerStore, mode: ConsoleMode, options: ConsoleListOptions = .init()) {
         self.store = store
         self.mode = mode
         self.options = options
@@ -102,13 +104,6 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
         controller.delegate = controllerDelegate
     }
 
-    @MainActor func bind(_ filters: ConsoleFiltersViewModel) {
-        cancellables = []
-        filters.$options.sink { [weak self] in
-            self?.predicate = $0
-        }.store(in: &cancellables)
-    }
-
     func refresh() {
         try? controller.performFetch()
         delegate?.dataSourceDidRefresh(self)
@@ -116,29 +111,29 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
     
     // MARK: Accessing Entities
     
-    var numberOfObjects: Int {
+    public var numberOfObjects: Int {
         controller.fetchedObjects?.count ?? 0
     }
     
-    func object(at indexPath: IndexPath) -> NSManagedObject {
+    public func object(at indexPath: IndexPath) -> NSManagedObject {
         controller.object(at: indexPath)
     }
     
-    var entities: [NSManagedObject] {
+    public var entities: [NSManagedObject] {
         controller.fetchedObjects ?? []
     }
     
-    var sections: [NSFetchedResultsSectionInfo]? {
+    public var sections: [NSFetchedResultsSectionInfo]? {
         controller.sectionNameKeyPath == nil ? nil : controller.sections
     }
     
     // MARK: NSFetchedResultsControllerDelegate
 
-    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+    public func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         delegate?.dataSource(self, didUpdateWith: nil)
     }
 
-    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChangeContentWith diff: CollectionDifference<NSManagedObjectID>) {
+    public func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChangeContentWith diff: CollectionDifference<NSManagedObjectID>) {
         delegate?.dataSource(self, didUpdateWith: diff)
     }
 
@@ -150,7 +145,7 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
         refresh()
     }
 
-    static func makePredicate(mode: ConsoleMode, options: PredicateOptions, filter: NSPredicate? = nil) -> NSPredicate? {
+    public static func makePredicate(mode: ConsoleMode, options: PredicateOptions, filter: NSPredicate? = nil) -> NSPredicate? {
         let predicates = [
             _makePredicate(mode, options.filters, options.isOnlyErrors),
             options.predicate,
@@ -164,7 +159,7 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
         }
     }
 
-    func name(for section: NSFetchedResultsSectionInfo) -> String {
+    public func name(for section: NSFetchedResultsSectionInfo) -> String {
         makeName(for: section, mode: mode, options: options)
     }
 }
@@ -215,7 +210,7 @@ private func makeName(for section: NSFetchedResultsSectionInfo, mode: ConsoleMod
             return NetworkLogger.TaskType(rawValue: rawValue)?.urlSessionTaskClassName ?? section.name
         case .statusCode:
             let rawValue = Int32(section.name) ?? 0
-            return StatusCodeFormatter.string(for: rawValue)
+            return ConsoleFormatter.StatusCodeFormatter.string(for: rawValue)
         case .requestState:
             let rawValue = Int16(Int(section.name) ?? 0)
             guard let state = NetworkTaskEntity.State(rawValue: rawValue) else {
@@ -237,7 +232,13 @@ private func makeName(for section: NSFetchedResultsSectionInfo, mode: ConsoleMod
     return name.isEmpty ? "–" : name
 }
 
-private let sessionDateFormatter = DateFormatter(dateStyle: .medium, timeStyle: .medium, isRelative: true)
+private let sessionDateFormatter: DateFormatter = {
+    let formatter = DateFormatter()
+    formatter.dateStyle = .medium
+    formatter.timeStyle = .medium
+    formatter.doesRelativeDateFormatting = true
+    return formatter
+}()
 
 // MARK: - Delegates
 
@@ -261,7 +262,7 @@ private final class ConsoleGroupedFetchDelegate: NSObject, NSFetchedResultsContr
     }
 }
 
-enum ConsoleUpdateEvent {
+public enum ConsoleUpdateEvent {
     /// Full refresh of data.
     case refresh
     /// Incremental update.

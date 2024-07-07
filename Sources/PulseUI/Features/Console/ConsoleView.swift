@@ -5,7 +5,7 @@
 import SwiftUI
 import CoreData
 import Pulse
-import Combine
+import PulseComponents
 
 extension ConsoleView {
     /// Initializes the console view.

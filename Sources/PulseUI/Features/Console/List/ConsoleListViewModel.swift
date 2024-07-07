@@ -4,9 +4,10 @@
 
 import Foundation
 import CoreData
-import Pulse
 import Combine
 import SwiftUI
+import Pulse
+import PulseComponents
 
 @MainActor
 final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject, ConsoleEntitiesSource {

@@ -3,8 +3,9 @@
 // Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
-import Pulse
 import Combine
+import Pulse
+import PulseComponents
 
 /// Allows you to control Pulse appearance and other settings programmatically.
 public final class UserSettings: ObservableObject {

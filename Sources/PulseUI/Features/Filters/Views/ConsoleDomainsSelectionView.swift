@@ -3,8 +3,9 @@
 // Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
-import Pulse
 import Combine
+import Pulse
+import PulseComponents
 
 @available(iOS 15, visionOS 1.0, *)
 struct ConsoleDomainsSelectionView: View {

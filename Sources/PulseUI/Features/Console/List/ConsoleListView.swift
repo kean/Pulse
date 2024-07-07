@@ -6,8 +6,9 @@
 
 import SwiftUI
 import CoreData
-import Pulse
 import Combine
+import Pulse
+import PulseComponents
 
 @available(iOS 15, macOS 13, visionOS 1.0, *)
 struct ConsoleListView: View {

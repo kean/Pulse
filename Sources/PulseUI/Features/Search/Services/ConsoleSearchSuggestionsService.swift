@@ -5,9 +5,10 @@
 #if os(iOS) || os(macOS) || os(visionOS)
 
 import SwiftUI
-import Pulse
 import CoreData
 import Combine
+import Pulse
+import PulseComponents
 
 @available(iOS 15, visionOS 1.0, *)
 @MainActor

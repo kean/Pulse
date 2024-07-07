@@ -3,6 +3,7 @@
 // Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
 
 import SwiftUI
+import PulseComponents
 
 struct ConsoleSectionHeader: View {
     let icon: String

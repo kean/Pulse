@@ -6,6 +6,7 @@
 
 import Foundation
 import SwiftUI
+import PulseComponents
 
 final class ConsoleSearchRecentSearchesStore {
     private let mode: ConsoleMode

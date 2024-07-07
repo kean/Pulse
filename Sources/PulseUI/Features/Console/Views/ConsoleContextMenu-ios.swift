@@ -6,8 +6,9 @@
 
 import SwiftUI
 import CoreData
-import Pulse
 import Combine
+import Pulse
+import PulseComponents
 
 @available(iOS 15, visionOS 1.0, *)
 struct ConsoleContextMenu: View {

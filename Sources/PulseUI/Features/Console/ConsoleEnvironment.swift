@@ -3,9 +3,10 @@
 // Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
 
 import CoreData
-import Pulse
 import Combine
 import SwiftUI
+import Pulse
+import PulseComponents
 
 /// Contains every dependency that the console views have.
 ///
@@ -112,19 +113,6 @@ final class ConsoleEnvironment: ObservableObject {
         runHapticFeedback(.success)
 #endif
     }
-}
-
-public enum ConsoleMode: String {
-    /// Displays both messages and network tasks with the ability
-    /// to switch between the two modes.
-    case all
-    /// Displays only regular messages.
-    case logs
-    /// Displays only network tasks.
-    case network
-
-    var hasLogs: Bool { self == .all || self == .logs }
-    var hasNetwork: Bool { self == .all || self == .network }
 }
 
 // MARK: Environment

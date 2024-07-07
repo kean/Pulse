@@ -6,6 +6,7 @@
 
 import SwiftUI
 import Pulse
+import PulseComponents
 
 struct ConsoleSearchTimePeriodCell: View {
     @Binding var selection: ConsoleFilers.Dates

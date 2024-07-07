@@ -5,24 +5,24 @@
 import Foundation
 import Pulse
 
-struct ConsoleListOptions: Equatable {
-    var messageSortBy: MessageSortBy = .dateCreated
-    var taskSortBy: TaskSortBy = .dateCreated
+public struct ConsoleListOptions: Equatable {
+    public var messageSortBy: MessageSortBy = .dateCreated
+    public var taskSortBy: TaskSortBy = .dateCreated
 #if os(macOS)
-    var order: Ordering = .ascending
+    public var order: Ordering = .ascending
 #else
-    var order: Ordering = .descending
+    public var order: Ordering = .descending
 #endif
 
-    var messageGroupBy: MessageGroupBy = .noGrouping
-    var taskGroupBy: TaskGroupBy = .noGrouping
+    public var messageGroupBy: MessageGroupBy = .noGrouping
+    public var taskGroupBy: TaskGroupBy = .noGrouping
 
-    enum Ordering: String, CaseIterable {
+    public enum Ordering: String, CaseIterable {
         case descending = "Descending"
         case ascending = "Ascending"
     }
 
-    enum MessageSortBy: String, CaseIterable {
+    public enum MessageSortBy: String, CaseIterable {
         case dateCreated = "Date"
         case level = "Level"
 
@@ -34,7 +34,7 @@ struct ConsoleListOptions: Equatable {
         }
     }
 
-    enum TaskSortBy: String, CaseIterable {
+    public enum TaskSortBy: String, CaseIterable {
         case dateCreated = "Date"
         case duration = "Duration"
         case requestSize = "Request Size"
@@ -50,7 +50,7 @@ struct ConsoleListOptions: Equatable {
         }
     }
 
-    enum MessageGroupBy: String, CaseIterable, ConsoleListGroupBy {
+    public enum MessageGroupBy: String, CaseIterable, ConsoleListGroupBy {
         case noGrouping = "No Grouping"
         case label = "Label"
         case level = "Level"
@@ -75,7 +75,7 @@ struct ConsoleListOptions: Equatable {
         }
     }
 
-    enum TaskGroupBy: ConsoleListGroupBy {
+    public enum TaskGroupBy: ConsoleListGroupBy {
         case noGrouping
         case url
         case host
@@ -106,6 +106,8 @@ struct ConsoleListOptions: Equatable {
             self != .errorCode && self != .session
         }
     }
+
+    public init() {}
 }
 
 protocol ConsoleListGroupBy {

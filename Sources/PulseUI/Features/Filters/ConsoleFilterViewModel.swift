@@ -4,6 +4,7 @@
 
 import CoreData
 import Pulse
+import PulseComponents
 import Combine
 import SwiftUI
 
@@ -44,5 +45,14 @@ final class ConsoleFiltersViewModel: ObservableObject {
 
     func resetAll() {
         criteria = defaultCriteria
+    }
+}
+
+extension ConsoleDataSource {
+    @MainActor func bind(_ filters: ConsoleFiltersViewModel) {
+        cancellables = []
+        filters.$options.sink { [weak self] in
+            self?.predicate = $0
+        }.store(in: &cancellables)
     }
 }
