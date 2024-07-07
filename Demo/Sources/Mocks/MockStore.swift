@@ -1,0 +1,1 @@
+/Users/kean/Developer/Pulse/Sources/PulseUI/Mocks/MockStore.swift

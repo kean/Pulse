@@ -1,25 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1500"
+   LastUpgradeVersion = "1540"
    version = "1.7">
    <BuildAction
       parallelizeBuildables = "YES"
       buildImplicitDependencies = "YES">
       <BuildActionEntries>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "0C30B3012A3F375500D65F8F"
-               BuildableName = "Pulse Demo Watch App.app"
-               BlueprintName = "Pulse Demo Paired watchOS App"
-               ReferencedContainer = "container:Pulse.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
          <BuildActionEntry
             buildForTesting = "YES"
             buildForRunning = "YES"
@@ -57,9 +43,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "0C30B3012A3F375500D65F8F"
-            BuildableName = "Pulse Demo Watch App.app"
-            BlueprintName = "Pulse Demo Paired watchOS App"
+            BlueprintIdentifier = "0C30B2F22A3F375400D65F8F"
+            BuildableName = "Pulse Demo.app"
+            BlueprintName = "Pulse Demo Paired iOS App"
             ReferencedContainer = "container:Pulse.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -80,9 +66,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "0C30B3012A3F375500D65F8F"
-            BuildableName = "Pulse Demo Watch App.app"
-            BlueprintName = "Pulse Demo Paired watchOS App"
+            BlueprintIdentifier = "0C30B2F22A3F375400D65F8F"
+            BuildableName = "Pulse Demo.app"
+            BlueprintName = "Pulse Demo Paired iOS App"
             ReferencedContainer = "container:Pulse.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
