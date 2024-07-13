@@ -7,6 +7,12 @@ import CoreData
 import Pulse
 import Combine
 
+#if os(macOS)
+public extension Notification.Name {
+    static let selectNetworkConsoleEntity = Notification.Name("PulseUI.Console.Router.Select.Item")
+}
+#endif
+
 final class ConsoleRouter: ObservableObject {
 #if os(macOS)
     @Published var selection: ConsoleSelectedItem?
@@ -16,6 +22,18 @@ final class ConsoleRouter: ObservableObject {
     @Published var isShowingSettings = false
     @Published var isShowingSessions = false
     @Published var isShowingShareStore = false
+    
+#if os(macOS)
+    init() {
+        NotificationCenter.default.addObserver(self, selector: #selector(didReceiveSelectItemNotification), name: .selectNetworkConsoleEntity, object: nil)
+    }
+    
+    @objc private func didReceiveSelectItemNotification(_ notification: Notification) {
+        guard let managedObjectID = notification.object as? NSManagedObjectID else { return }
+        selection = ConsoleSelectedItem.entity(managedObjectID)
+    }
+#endif
+    
 }
 
 #if os(macOS)

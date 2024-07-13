@@ -6,12 +6,12 @@ import Foundation
 import SwiftUI
 import Pulse
 
-struct StatusLabelViewModel {
+public struct StatusLabelViewModel {
     let systemImage: String
     let tint: Color
     let title: String
 
-    init(task: NetworkTaskEntity, store: LoggerStore) {
+    public init(task: NetworkTaskEntity, store: LoggerStore) {
         guard let state = task.state(in: store) else {
             self.systemImage = "questionmark.diamond.fill"
             self.tint = .secondary
@@ -52,7 +52,7 @@ struct StatusLabelViewModel {
         }
     }
 
-    var text: Text {
+    public var text: Text {
         (Text(Image(systemName: systemImage)) + Text(" " + title))
             .foregroundColor(tint)
     }
