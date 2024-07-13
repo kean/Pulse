@@ -58,8 +58,6 @@ struct ConsoleMessageDetailsView: View {
     private var toolbar: some View {
         HStack {
             InlineTabBar(items: ConsoleMessageTab.allCases, selection: $selectedTab)
-            Spacer()
-            ButtonCloseDetailsView()
         }
         .padding(.horizontal, 10)
         .offset(y: -2)

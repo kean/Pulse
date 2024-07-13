@@ -43,13 +43,6 @@ private struct ConsoleMainView: View {
     @SceneStorage("com-github-kean-pulse-is-now-enabled") private var isNowEnabled = true
 
     var body: some View {
-        HSplitView {
-            contentView
-            detailsView.layoutPriority(1)
-        }
-    }
-
-    private var contentView: some View {
         ConsoleListView()
             .frame(minWidth: 400, idealWidth: 500, minHeight: 120, idealHeight: 480)
             .toolbar {
@@ -82,10 +75,6 @@ private struct ConsoleMainView: View {
             }
     }
 
-    private var detailsView: some View {
-        _ConsoleDetailsView()
-    }
-
     @ViewBuilder
     private var contentToolbarNavigationItems: some View {
         if !(environment.store.options.contains(.readonly)) {
@@ -104,19 +93,6 @@ private struct ConsoleMainView: View {
                 Image(systemName: "trash")
             }
             .help("Clear current session")
-        }
-    }
-}
-
-@available(iOS 15, macOS 13, *)
-private struct _ConsoleDetailsView: View {
-    @EnvironmentObject private var router: ConsoleRouter
-
-    var body: some View {
-        if let selection = router.selection {
-            ConsoleEntityDetailsRouterView(selection: selection)
-                .background(Color(UXColor.textBackgroundColor))
-                .frame(minWidth: 400, idealWidth: 700, minHeight: 120, idealHeight: 480)
         }
     }
 }

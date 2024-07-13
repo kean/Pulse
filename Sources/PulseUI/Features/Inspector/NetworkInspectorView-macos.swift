@@ -35,9 +35,6 @@ struct NetworkInspectorView: View {
     private var toolbar: some View {
         HStack {
             InlineTabBar(items: NetworkInspectorTab.allCases, selection: $selectedTab)
-            Spacer()
-
-            ButtonCloseDetailsView()
         }
         .padding(.horizontal, 10)
         .offset(y: -2)
