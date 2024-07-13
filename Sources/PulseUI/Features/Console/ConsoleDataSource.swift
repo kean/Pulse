@@ -102,7 +102,7 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
         controller.delegate = controllerDelegate
     }
 
-    @MainActor func bind(_ filters: ConsoleFiltersViewModel) {
+    func bind(_ filters: ConsoleFiltersViewModel) {
         cancellables = []
         filters.$options.sink { [weak self] in
             self?.predicate = $0
