@@ -371,7 +371,7 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
 
     // MARK: RemoteLoggerConnectionDelegate
 
-    public func connection(_ connection: Connection, didChangeState newState: NWConnection.State) {
+    func connection(_ connection: Connection, didChangeState newState: NWConnection.State) {
         os_log("Connection did change state to %{public}@", log: log, "\(newState)")
 
         switch newState {
@@ -390,7 +390,7 @@ public final class RemoteLogger: ObservableObject, RemoteLoggerConnectionDelegat
         }
     }
 
-    public func connection(_ connection: Connection, didReceiveEvent event: Connection.Event) {
+    func connection(_ connection: Connection, didReceiveEvent event: Connection.Event) {
         switch event {
         case .packet(let packet):
             do {

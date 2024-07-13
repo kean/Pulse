@@ -11,12 +11,12 @@ import OSLog
 import Pulse
 #endif
 
-public protocol RemoteLoggerConnectionDelegate: AnyObject {
+protocol RemoteLoggerConnectionDelegate: AnyObject {
     func connection(_ connection: RemoteLogger.Connection, didChangeState newState: NWConnection.State)
     func connection(_ connection: RemoteLogger.Connection, didReceiveEvent event: RemoteLogger.Connection.Event)
 }
 
-public extension RemoteLogger {
+extension RemoteLogger {
     final class Connection {
         var endpoint: NWEndpoint { connection.endpoint }
         private let connection: NWConnection
@@ -31,7 +31,7 @@ public extension RemoteLogger {
             self.init(NWConnection(to: endpoint, using: parameters))
         }
 
-        public init(_ connection: NWConnection, delegate: RemoteLoggerConnectionDelegate? = nil) {
+        init(_ connection: NWConnection, delegate: RemoteLoggerConnectionDelegate? = nil) {
             self.connection = connection
             self.delegate = delegate
 
@@ -39,7 +39,7 @@ public extension RemoteLogger {
             self.log = isLogEnabled ? OSLog(subsystem: "com.github.kean.pulse", category: "RemoteLogger") : .disabled
         }
         
-        public func start(on queue: DispatchQueue) {
+        func start(on queue: DispatchQueue) {
             connection.stateUpdateHandler = { [weak self] state in
                 guard let self = self else { return }
                 DispatchQueue.main.async {
@@ -50,15 +50,15 @@ public extension RemoteLogger {
             connection.start(queue: queue)
         }
 
-        public enum Event {
+        enum Event {
             case packet(Packet)
             case error(Error)
             case completed
         }
 
-        public struct Packet {
-            public let code: UInt8
-            public let body: Data
+        struct Packet {
+            let code: UInt8
+            let body: Data
         }
 
         private func receive() {
@@ -131,7 +131,7 @@ public extension RemoteLogger {
             }
         }
         
-        public func send(code: UInt8, data: Data) {
+        func send(code: UInt8, data: Data) {
             do {
                 let data = try encode(code: code, body: data)
                 let log = self.log
@@ -145,7 +145,7 @@ public extension RemoteLogger {
             }
         }
 
-        public func send<T: Encodable>(code: UInt8, entity: T) {
+        func send<T: Encodable>(code: UInt8, entity: T) {
             do {
                 let data = try JSONEncoder().encode(entity)
                 send(code: code, data: data)
@@ -207,7 +207,7 @@ public extension RemoteLogger {
             }
         }
         
-        public func cancel() {
+        func cancel() {
             connection.cancel()
         }
     }
