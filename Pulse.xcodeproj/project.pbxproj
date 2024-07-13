@@ -234,8 +234,7 @@
 		0CF0D672296F189600EED9D4 /* NetworkInspectorRequestBodyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5F1296F189600EED9D4 /* NetworkInspectorRequestBodyView.swift */; };
 		0CF0D673296F189600EED9D4 /* NetworkDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5F2296F189600EED9D4 /* NetworkDetailsView.swift */; };
 		0CF0D674296F189600EED9D4 /* NetworkInspectorView-shared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5F3296F189600EED9D4 /* NetworkInspectorView-shared.swift */; };
-		0CF0D675296F189600EED9D4 /* NetworkInspectorView-ios.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5F4296F189600EED9D4 /* NetworkInspectorView-ios.swift */; };
-		0CF0D677296F189600EED9D4 /* NetworkInspectorView-macos.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5F6296F189600EED9D4 /* NetworkInspectorView-macos.swift */; };
+		0CF0D675296F189600EED9D4 /* NetworkInspectorView-ios-visionos-macos.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5F4296F189600EED9D4 /* NetworkInspectorView-ios-visionos-macos.swift */; };
 		0CF0D678296F189600EED9D4 /* LoggerStoreSizeChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5F8296F189600EED9D4 /* LoggerStoreSizeChart.swift */; };
 		0CF0D679296F189600EED9D4 /* ConsoleView-ios.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5FA296F189600EED9D4 /* ConsoleView-ios.swift */; };
 		0CF0D67A296F189600EED9D4 /* ConsoleView-watchos.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5FB296F189600EED9D4 /* ConsoleView-watchos.swift */; };
@@ -695,8 +694,7 @@
 		0CF0D5F1296F189600EED9D4 /* NetworkInspectorRequestBodyView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkInspectorRequestBodyView.swift; sourceTree = "<group>"; };
 		0CF0D5F2296F189600EED9D4 /* NetworkDetailsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkDetailsView.swift; sourceTree = "<group>"; };
 		0CF0D5F3296F189600EED9D4 /* NetworkInspectorView-shared.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NetworkInspectorView-shared.swift"; sourceTree = "<group>"; };
-		0CF0D5F4296F189600EED9D4 /* NetworkInspectorView-ios.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NetworkInspectorView-ios.swift"; sourceTree = "<group>"; };
-		0CF0D5F6296F189600EED9D4 /* NetworkInspectorView-macos.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NetworkInspectorView-macos.swift"; sourceTree = "<group>"; };
+		0CF0D5F4296F189600EED9D4 /* NetworkInspectorView-ios-visionos-macos.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NetworkInspectorView-ios-visionos-macos.swift"; sourceTree = "<group>"; };
 		0CF0D5F8296F189600EED9D4 /* LoggerStoreSizeChart.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoggerStoreSizeChart.swift; sourceTree = "<group>"; };
 		0CF0D5FA296F189600EED9D4 /* ConsoleView-ios.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ConsoleView-ios.swift"; sourceTree = "<group>"; };
 		0CF0D5FB296F189600EED9D4 /* ConsoleView-watchos.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ConsoleView-watchos.swift"; sourceTree = "<group>"; };
@@ -1345,9 +1343,8 @@
 			isa = PBXGroup;
 			children = (
 				0CF0D5E3296F189500EED9D4 /* Cells */,
-				0CF0D5F4296F189600EED9D4 /* NetworkInspectorView-ios.swift */,
+				0CF0D5F4296F189600EED9D4 /* NetworkInspectorView-ios-visionos-macos.swift */,
 				0CF0D5EF296F189500EED9D4 /* NetworkInspectorView-tvos.swift */,
-				0CF0D5F6296F189600EED9D4 /* NetworkInspectorView-macos.swift */,
 				0CF0D5EE296F189500EED9D4 /* NetworkInspectorView-watchos.swift */,
 				0CF0D5F0296F189600EED9D4 /* NetworkInspectorResponseBodyView.swift */,
 				0CF0D5F1296F189600EED9D4 /* NetworkInspectorRequestBodyView.swift */,
@@ -2055,7 +2052,7 @@
 				0CF0D673296F189600EED9D4 /* NetworkDetailsView.swift in Sources */,
 				0CF0D62B296F189600EED9D4 /* FileViewerViewModel.swift in Sources */,
 				0CF0D67F296F189600EED9D4 /* ConsoleContextMenu-ios.swift in Sources */,
-				0CF0D675296F189600EED9D4 /* NetworkInspectorView-ios.swift in Sources */,
+				0CF0D675296F189600EED9D4 /* NetworkInspectorView-ios-visionos-macos.swift in Sources */,
 				0CF0D64A296F189600EED9D4 /* ConsoleSection.swift in Sources */,
 				0CB63A132973A12300525165 /* ConsoleSearchListContentView.swift in Sources */,
 				0CB63A2C2975C40100525165 /* ConsoleSearchFilter.swift in Sources */,
@@ -2117,7 +2114,6 @@
 				0CF0D667296F189600EED9D4 /* NetworkResponseBodyCell.swift in Sources */,
 				0CF0D662296F189600EED9D4 /* TimingViewModel+Metrics.swift in Sources */,
 				0C1050E529E1FAC1006AFDAD /* Version.swift in Sources */,
-				0CF0D677296F189600EED9D4 /* NetworkInspectorView-macos.swift in Sources */,
 				0CF0D670296F189600EED9D4 /* NetworkInspectorView-tvos.swift in Sources */,
 				0CF0D617296F189600EED9D4 /* TextUtilities.swift in Sources */,
 				0CF0D628296F189600EED9D4 /* ShareView.swift in Sources */,

@@ -98,7 +98,6 @@ struct ConsoleSearchResultView: View {
         }
     }
 
-#if os(iOS) || os(visionOS)
     @ViewBuilder
     private static func _makeDestination(for occurrence: ConsoleSearchOccurrence, task: NetworkTaskEntity) -> some View {
         switch occurrence.scope {
@@ -116,25 +115,6 @@ struct ConsoleSearchResultView: View {
             EmptyView()
         }
     }
-#else
-    @ViewBuilder
-    private static func _makeDestination(for occurrence: ConsoleSearchOccurrence, task: NetworkTaskEntity) -> some View {
-        switch occurrence.scope {
-        case .originalRequestHeaders:
-            NetworkInspectorView(task: task, tab: .headers)
-        case .currentRequestHeaders:
-            NetworkInspectorView(task: task, tab: .headers)
-        case .requestBody:
-            NetworkInspectorView(task: task, tab: .request)
-        case .responseHeaders:
-            NetworkInspectorView(task: task, tab: .headers)
-        case .responseBody:
-            NetworkInspectorView(task: task, tab: .response)
-        case .url, .message, .metadata:
-            EmptyView()
-        }
-    }
-#endif
 
     private static func makeHeadersDetails(title: String, headers: [String: String]?) -> some View {
         NetworkDetailsView(title: title) {

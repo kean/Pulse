@@ -2,7 +2,7 @@
 //
 // Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
 
-#if os(iOS) || os(visionOS)
+#if os(iOS) || os(visionOS) || os(macOS)
 
 import SwiftUI
 import CoreData
@@ -23,6 +23,7 @@ struct NetworkInspectorView: View {
             contents
         }
         .animation(.default, value: task.state)
+#if os(iOS) || os(visionOS)
         .listStyle(.insetGrouped)
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
@@ -33,6 +34,9 @@ struct NetworkInspectorView: View {
             OpenOnMacOverlay(entity: task)
         }
         .inlineNavigationTitle(environment.delegate.getShortTitle(for: task))
+#else
+        .listStyle(.sidebar)
+#endif
         .sheet(item: $shareItems, content: ShareView.init)
     }
 
@@ -71,7 +75,7 @@ struct NetworkInspectorView: View {
                 .padding(.top, -10)
         }
     }
-
+#if os(iOS) || os(visionOS)
     @ViewBuilder
     private var trailingNavigationBarItems: some View {
         PinButton(viewModel: PinButtonViewModel(task), isTextNeeded: false)
@@ -93,6 +97,7 @@ struct NetworkInspectorView: View {
             Image(systemName: "ellipsis.circle")
         })
     }
+#endif
 }
 
 #if DEBUG
