@@ -7,7 +7,7 @@
 import Foundation
 import Pulse
 
-protocol ConsoleSearchFilterProtocol: Sendable {
+protocol ConsoleSearchFilterProtocol {
     associatedtype Value: CustomStringConvertible
 
     var name: String { get }
@@ -27,7 +27,7 @@ extension ConsoleSearchFilterProtocol {
     var token: String { makeToken(with: values.map(\.description)) }
 }
 
-enum ConsoleSearchFilter: Hashable, Codable, Sendable {
+enum ConsoleSearchFilter: Hashable, Codable {
     // MARK: Logs
     case label(ConsoleSearchFilterLabel)
     case level(ConsoleSearchFilterLevel)
@@ -90,7 +90,7 @@ struct ConsoleSearchFilterFile: ConsoleSearchLogFilterProtocol, Hashable, Codabl
 
 // MARK: ConsoleSearchNetworkFilterProtocol
 
-struct ConsoleSearchFilterStatusCode: ConsoleSearchNetworkFilterProtocol, Hashable, Codable, Sendable {
+struct ConsoleSearchFilterStatusCode: ConsoleSearchNetworkFilterProtocol, Hashable, Codable {
     var name: String { "Status Code" }
     var values: [ConsoleSearchRange<Int>]
     var valueExamples: [String] { ["2XX", "304", "400-404"] }
@@ -143,7 +143,7 @@ enum ConsoleSearchRangeModfier: Codable {
     case open, closed
 }
 
-struct ConsoleSearchRange<T: Hashable & Comparable & Codable & Sendable>: Hashable, Codable, CustomStringConvertible, Sendable {
+struct ConsoleSearchRange<T: Hashable & Comparable & Codable>: Hashable, Codable, CustomStringConvertible {
     var modifier: ConsoleSearchRangeModfier
     var lowerBound: T
     var upperBound: T
