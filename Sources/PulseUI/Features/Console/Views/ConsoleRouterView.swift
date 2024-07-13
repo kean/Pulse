@@ -7,6 +7,7 @@ import CoreData
 import Pulse
 import Combine
 
+@MainActor
 final class ConsoleRouter: ObservableObject {
 #if os(macOS)
     @Published var selection: ConsoleSelectedItem?
