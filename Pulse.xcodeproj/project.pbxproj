@@ -728,7 +728,6 @@
 		0CFF79DE29EB7B4300BE767B /* SessionPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionPickerView.swift; sourceTree = "<group>"; };
 		0CFF79E029EC1F7800BE767B /* ImageProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageProcessor.swift; sourceTree = "<group>"; };
 		25E740002BE0FA58008C6DC3 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		25E740052BE10AC7008C6DC3 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		25E740062BE10B4C008C6DC3 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		49E82A8526D107A00070244F /* AlamofireIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlamofireIntegration.swift; sourceTree = "<group>"; };
 		49E82A8826D1083D0070244F /* MoyaIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoyaIntegration.swift; sourceTree = "<group>"; };
@@ -1215,7 +1214,6 @@
 		0CF0D594296F189500EED9D4 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				25E740052BE10AC7008C6DC3 /* PrivacyInfo.xcprivacy */,
 				0CF0D59F296F189500EED9D4 /* RichTextView */,
 				0CF0D595296F189500EED9D4 /* SearchBar-macos.swift */,
 				0CF0D597296F189500EED9D4 /* PlaceholderView.swift */,
