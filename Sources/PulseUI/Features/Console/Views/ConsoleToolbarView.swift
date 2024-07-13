@@ -9,12 +9,17 @@ import Pulse
 import CoreData
 import Combine
 
-#if os(iOS) || os(visionOS)
 @available(iOS 15, visionOS 1.0, *)
 struct ConsoleToolbarView: View {
     @EnvironmentObject private var environment: ConsoleEnvironment
 
     var body: some View {
+#if os(macOS)
+        horizontal
+            .padding(.horizontal)
+            .padding(.top, 12)
+            .padding(.bottom, 8)
+#else
         if #available(iOS 16.0, *) {
             ViewThatFits {
                 horizontal
@@ -24,6 +29,7 @@ struct ConsoleToolbarView: View {
         } else {
             horizontal
         }
+#endif
     }
 
     private var horizontal: some View {
@@ -57,43 +63,6 @@ struct ConsoleToolbarView: View {
         }.padding(.trailing, isVertical ? 0 : -2)
     }
 }
-#elseif os(macOS)
-struct ConsoleToolbarView: View {
-    @EnvironmentObject private var environment: ConsoleEnvironment
-    @EnvironmentObject private var filters: ConsoleFiltersViewModel
-
-    var body: some View {
-        HStack {
-            if filters.options.focus != nil {
-                makeFocusedView()
-            } else {
-                ConsoleModePicker(environment: environment)
-            }
-            Spacer()
-            ConsoleListOptionsView()
-                .menuStyle(.borderlessButton)
-                .menuIndicator(.hidden)
-                .pickerStyle(.inline)
-        }
-        .padding(.horizontal, 10)
-        .frame(height: 27, alignment: .center)
-    }
-
-    @ViewBuilder
-    private func makeFocusedView() -> some View {
-        Text("Focused Logs")
-            .foregroundColor(.secondary)
-            .font(.subheadline.weight(.medium))
-
-        Button(action: { filters.options.focus = nil }) {
-            Image(systemName: "xmark")
-        }
-        .foregroundColor(.secondary)
-        .buttonStyle(.plain)
-        .help("Unfocus")
-    }
-}
-#endif
 
 struct ConsoleModePicker: View {
     @ObservedObject private var environment: ConsoleEnvironment
@@ -143,7 +112,7 @@ private struct ConsoleModeButton: View {
     var details: String?
     let isSelected: Bool
     let action: () -> Void
-    
+
     var body: some View {
         Button(action: action) {
             HStack(spacing: 4) {
