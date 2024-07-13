@@ -30,6 +30,7 @@ final class ConsoleSearchOperation: @unchecked Sendable {
     private let hasLogFilters: Bool
     private let hasNetworkFilers: Bool
 
+    @MainActor
     weak var delegate: ConsoleSearchOperationDelegate?
 
     init(entities: [NSManagedObject],

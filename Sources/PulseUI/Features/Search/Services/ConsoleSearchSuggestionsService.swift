@@ -10,7 +10,6 @@ import CoreData
 import Combine
 
 @available(iOS 15, visionOS 1.0, *)
-@MainActor
 struct ConsoleSearchSuggestionsViewModel {
     let searches: [ConsoleSearchSuggestion]
     let filters: [ConsoleSearchSuggestion]
@@ -20,7 +19,7 @@ struct ConsoleSearchSuggestionsViewModel {
     }
 }
 
-struct ConsoleSearchSuggestionsContext: Sendable {
+struct ConsoleSearchSuggestionsContext {
     let searchText: String
     let index: LoggerStoreIndex
     let parameters: ConsoleSearchParameters

@@ -11,7 +11,6 @@ import SwiftUI
 ///
 /// - warning: It's marked with `ObservableObject` to make it possible to be used
 /// with `@StateObject` and `@EnvironmentObject`, but it never changes.
-@MainActor
 final class ConsoleEnvironment: ObservableObject {
     let title: String
     let store: LoggerStore

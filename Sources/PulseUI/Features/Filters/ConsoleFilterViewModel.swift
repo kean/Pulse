@@ -7,7 +7,6 @@ import Pulse
 import Combine
 import SwiftUI
 
-@MainActor
 final class ConsoleFiltersViewModel: ObservableObject {
     @Published var mode: ConsoleMode = .all
     @Published var options = ConsoleDataSource.PredicateOptions()
