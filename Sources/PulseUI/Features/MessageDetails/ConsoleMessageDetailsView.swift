@@ -45,41 +45,8 @@ struct ConsoleMessageDetailsView: View {
         contents
     }
 #elseif os(macOS)
-    @State private var selectedTab: ConsoleMessageTab = .message
-
     var body: some View {
-        VStack(spacing: 0) {
-            toolbar
-            Divider()
-            selectedTabView
-        }
-    }
-
-    private var toolbar: some View {
-        HStack {
-            InlineTabBar(items: ConsoleMessageTab.allCases, selection: $selectedTab)
-        }
-        .padding(.horizontal, 10)
-        .offset(y: -2)
-        .frame(height: 27, alignment: .center)
-    }
-
-    @ViewBuilder
-    private var selectedTabView: some View {
-        switch selectedTab {
-        case .message:
-            RichTextView(viewModel: makeTextViewModel())
-        case .metadata:
-            ConsoleMessageMetadataView(message: message)
-        }
-    }
-
-    private enum ConsoleMessageTab: String, Identifiable, CaseIterable, CustomStringConvertible {
-        case message = "Messages"
-        case metadata = "Metadata"
-
-        var id: ConsoleMessageTab { self }
-        var description: String { self.rawValue }
+        RichTextView(viewModel: makeTextViewModel())
     }
 #endif
 
