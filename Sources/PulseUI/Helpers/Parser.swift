@@ -14,10 +14,10 @@ import Foundation
 
 // MARK: - Parser
 
-struct Parser<A: Sendable>: Sendable {
+struct Parser<A> {
     /// Parses the given string. Returns the matched element `A` and the
     /// remaining substring if the match is successful. Returns `nil` otherwise.
-    let parse: @Sendable (_ string: Substring) throws -> (A, Substring)?
+    let parse: (_ string: Substring) throws -> (A, Substring)?
 }
 
 extension Parser {
@@ -59,11 +59,11 @@ extension Parsers {
 
     /// Matches any character contained in the given string.
     static func char(from string: String) -> Parser<Character> {
-        char.filter { string.contains($0) }
+        char.filter(string.contains)
     }
 
     static func char(from characterSet: CharacterSet) -> Parser<Character> {
-        char.filter { characterSet.contains($0) }
+        char.filter(characterSet.contains)
     }
 
     /// Matches characters while the given string doesn't contain them.
@@ -75,7 +75,7 @@ extension Parsers {
     static let int = digit.oneOrMore.map { Int(String($0)) }
 
     /// Matches a single digit.
-    static let digit = char.filter { CharacterSet.decimalDigits.contains($0) }
+    static let digit = char.filter(CharacterSet.decimalDigits.contains)
 }
 
 extension Parser: ExpressibleByStringLiteral, ExpressibleByUnicodeScalarLiteral, ExpressibleByExtendedGraphemeClusterLiteral where A == Void {
@@ -123,7 +123,7 @@ extension Parsers {
 }
 
 extension Parser {
-    func map<B: Sendable>(_ transform: @Sendable @escaping (A) throws -> B?) -> Parser<B> {
+    func map<B>(_ transform: @escaping (A) throws -> B?) -> Parser<B> {
         flatMap { match in
             Parser<B> { str in
                 (try transform(match)).map { ($0, str) }
@@ -131,14 +131,14 @@ extension Parser {
         }
     }
 
-    func flatMap<B>(_ transform: @Sendable @escaping (A) throws -> Parser<B>) -> Parser<B> {
+    func flatMap<B>(_ transform: @escaping (A) throws -> Parser<B>) -> Parser<B> {
         Parser<B> { str in
             guard let (a, str) = try self.parse(str) else { return nil }
             return try transform(a).parse(str)
         }
     }
 
-    func filter(_ predicate: @Sendable @escaping (A) -> Bool) -> Parser<A> {
+    func filter(_ predicate: @escaping (A) -> Bool) -> Parser<A> {
         map { predicate($0) ? $0 : nil }
     }
 }
