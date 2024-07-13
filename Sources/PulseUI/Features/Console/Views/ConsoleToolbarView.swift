@@ -107,14 +107,8 @@ struct ConsoleModePicker: View {
         self.tasksCounter = environment.taskCountObserver
     }
 
-#if os(macOS)
-    let spacing: CGFloat = 4
-#else
-    let spacing: CGFloat = 12
-#endif
-
     var body: some View {
-        HStack(spacing: spacing) {
+        HStack(spacing: 12) {
             ConsoleModeButton(title: "Network", details: CountFormatter.string(from: tasksCounter.count), isSelected: environment.mode == .network) {
                 environment.mode = .network
             }
@@ -149,12 +143,7 @@ private struct ConsoleModeButton: View {
     var details: String?
     let isSelected: Bool
     let action: () -> Void
-
-#if os(macOS)
-    var body: some View {
-        InlineTabBarItem(title: title, details: details, isSelected: isSelected, action: action)
-    }
-#else
+    
     var body: some View {
         Button(action: action) {
             HStack(spacing: 4) {
@@ -174,7 +163,6 @@ private struct ConsoleModeButton: View {
         }
         .buttonStyle(.plain)
     }
-#endif
 }
 
 @available(iOS 15, visionOS 1.0, *)
