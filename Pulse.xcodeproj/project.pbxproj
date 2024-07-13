@@ -551,8 +551,8 @@
 		0C7A0DFF297C51CE00B4B69D /* ConsoleListOptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleListOptions.swift; sourceTree = "<group>"; };
 		0C7A0E01297CE71400B4B69D /* FormattersTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormattersTests.swift; sourceTree = "<group>"; };
 		0C840D4B29E0A09B00362214 /* SessionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionsView.swift; sourceTree = "<group>"; };
-		0C8CD5922A86F527003D116E /* Pulse-Demo-iOS-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Pulse-Demo-iOS-Info.plist"; sourceTree = "<group>"; };
-		0C8CD5932A86F581003D116E /* Pulse-Demo-macOS-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Pulse-Demo-macOS-Info.plist"; sourceTree = "<group>"; };
+		0C8CD5922A86F527003D116E /* Pulse-Demo-iOS-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Pulse-Demo-iOS-Info.plist"; sourceTree = "<group>"; };
+		0C8CD5932A86F581003D116E /* Pulse-Demo-macOS-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Pulse-Demo-macOS-Info.plist"; sourceTree = "<group>"; };
 		0C94239329B4D73E007F2784 /* ConsoleSearchOccurrenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchOccurrenceTests.swift; sourceTree = "<group>"; };
 		0C9751552A32CBFB00DC46FF /* RemoteLoggerSelectedDeviceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteLoggerSelectedDeviceView.swift; sourceTree = "<group>"; };
 		0C9751572A32CCC400DC46FF /* RemoteLoggerEnterPasswordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteLoggerEnterPasswordView.swift; sourceTree = "<group>"; };
@@ -896,6 +896,8 @@
 		0C516FBB26015DD2004813B4 /* Demo */ = {
 			isa = PBXGroup;
 			children = (
+				0C8CD5922A86F527003D116E /* Pulse-Demo-iOS-Info.plist */,
+				0C8CD5932A86F581003D116E /* Pulse-Demo-macOS-Info.plist */,
 				0CDACDE029EC65F4007C15CD /* Resources */,
 				0C70EA742A3F611B000B1071 /* iOS */,
 				0C30B2F42A3F375400D65F8F /* iOS-paired */,
@@ -910,8 +912,6 @@
 		0C57AD44245F0EFB005B3400 = {
 			isa = PBXGroup;
 			children = (
-				0C8CD5932A86F581003D116E /* Pulse-Demo-macOS-Info.plist */,
-				0C8CD5922A86F527003D116E /* Pulse-Demo-iOS-Info.plist */,
 				0C07EDCD25CEF648002DC091 /* README.md */,
 				0CDFB833296F24140071EF77 /* CHANGELOG.md */,
 				0CF0D48A296F14CF00EED9D4 /* Sources */,
@@ -2781,7 +2781,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "Pulse-Demo-iOS-Info.plist";
+				INFOPLIST_FILE = "Demo/Pulse-Demo-iOS-Info.plist";
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Debugging Purposes";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -2825,7 +2825,7 @@
 				ENABLE_PREVIEWS = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "Pulse-Demo-iOS-Info.plist";
+				INFOPLIST_FILE = "Demo/Pulse-Demo-iOS-Info.plist";
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Debugging Purposes";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -2882,7 +2882,7 @@
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "Pulse-Demo-macOS-Info.plist";
+				INFOPLIST_FILE = "Demo/Pulse-Demo-macOS-Info.plist";
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Debugging Purposes";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2928,7 +2928,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "Pulse-Demo-macOS-Info.plist";
+				INFOPLIST_FILE = "Demo/Pulse-Demo-macOS-Info.plist";
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Debugging Purposes";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
