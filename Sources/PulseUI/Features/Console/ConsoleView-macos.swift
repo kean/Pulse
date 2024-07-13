@@ -18,9 +18,13 @@ public struct ConsoleView: View {
 
     public var body: some View {
         if #available(macOS 13, *) {
-            NavigationStack {
+            NavigationSplitView(sidebar: {
                 ConsoleMainView(environment: environment)
-            }
+            }, detail: {
+                NavigationStack {
+                    Text("No Selection")
+                }
+            })
             .injecting(environment)
             .navigationTitle("")
         } else {
