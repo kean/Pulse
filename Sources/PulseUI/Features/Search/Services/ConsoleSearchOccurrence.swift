@@ -16,7 +16,7 @@ final class ConsoleSearchOccurrence: Identifiable, Equatable, Hashable {
     let match: ConsoleSearchMatch
     var line: Int { match.lineNumber }
     var range: NSRange { NSRange(match.range, in: match.line) }
-    @MainActor lazy var preview = ConsoleSearchOccurrence.makePreview(for: match, attributes: previewAttibutes)
+    lazy var preview = ConsoleSearchOccurrence.makePreview(for: match, attributes: previewAttibutes)
     let searchContext: RichTextViewModel.SearchContext
 
     init(scope: ConsoleSearchScope,
@@ -36,7 +36,7 @@ final class ConsoleSearchOccurrence: Identifiable, Equatable, Hashable {
     }
 }
 
-@MainActor private let previewAttibutes = TextHelper().attributes(role: .body2, style: .monospaced)
+private let previewAttibutes = TextHelper().attributes(role: .body2, style: .monospaced)
 
 @available(iOS 15, visionOS 1.0, *)
 extension ConsoleSearchOccurrence {
