@@ -30,7 +30,7 @@ struct ConsoleRouterView: View {
     @EnvironmentObject var router: ConsoleRouter
 
     var body: some View {
-        if #available(iOS 15, *) {
+        if #available(iOS 15, macOS 13, *) {
             contents
         }
     }
@@ -131,9 +131,24 @@ extension ConsoleRouterView {
 
 #else
 
+@available(macOS 13, *)
 extension ConsoleRouterView {
     var contents: some View {
         Text("").invisible()
+            .sheet(isPresented: $router.isShowingSettings) { destinationSettings }
+    }
+
+    private var destinationSettings: some View {
+        SettingsView()
+            .frame(width: 320, height: environment.configuration.allowRemoteLogging ? 420 : 175)
+            .navigationTitle("Settings")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(action: { router.isShowingSettings = false }) {
+                        Text("Close")
+                    }
+                }
+            }
     }
 }
 

@@ -2,7 +2,7 @@
 //
 // Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
 
-#if os(iOS) || os(visionOS)
+#if os(iOS) || os(visionOS) || os(macOS)
 
 import SwiftUI
 import CoreData
@@ -21,10 +21,12 @@ struct ConsoleContextMenu: View {
                     Label("Sessions", systemImage: "list.bullet.clipboard")
                 }
             }
+#if os(iOS) || os(visionOS)
             Section {
                 ConsoleSortByMenu()
                 ConsoleGroupByMenu()
             }
+#endif
             Section {
                 Button(action: { router.isShowingSettings = true }) {
                     Label("Settings", systemImage: "gear")
@@ -51,13 +53,19 @@ struct ConsoleContextMenu: View {
     }
 
     private func buttonGetPulseProTapped() {
-        guard let url = URL(string: "https://pulselogger.com") else { return }
-        UIApplication.shared.open(url)
+        URL(string: "https://pulselogger.com").map(openURL)
     }
 
     private func buttonSendFeedbackTapped() {
-        guard let url = URL(string: "https://github.com/kean/Pulse/issues") else { return }
+        URL(string: "https://github.com/kean/Pulse/issues").map(openURL)
+    }
+
+    private func openURL(_ url: URL) {
+#if os(macOS)
+        NSWorkspace.shared.open(url)
+#else
         UIApplication.shared.open(url)
+#endif
     }
 }
 

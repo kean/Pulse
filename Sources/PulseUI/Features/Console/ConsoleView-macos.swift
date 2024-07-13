@@ -37,19 +37,29 @@ private struct ConsoleMainView: View {
 
     @State private var isSharingStore = false
     @State private var isShowingFilters = false
-    @State private var isShowingSessions = false
-    @State private var isShowingSettings = false
 
     @SceneStorage("com-github-kean-pulse-is-now-enabled") private var isNowEnabled = true
+
+    @EnvironmentObject var router: ConsoleRouter
 
     var body: some View {
         ConsoleListView()
             .frame(minWidth: 400, idealWidth: 500, minHeight: 120, idealHeight: 480)
             .toolbar {
-                ToolbarItemGroup(placement: .navigation) {
-                    contentToolbarNavigationItems
-                }
                 ToolbarItemGroup(placement: .automatic) {
+                    Toggle(isOn: $isNowEnabled) {
+                        Image(systemName: "clock")
+                    }.help("Now Mode: Automatically scrolls to the top of the view to display newly incoming network requests.")
+
+                    Button(action: { isSharingStore = true }) {
+                        Image(systemName: "square.and.arrow.up")
+                    }
+                    .help("Share a session")
+                    .popover(isPresented: $isSharingStore, arrowEdge: .bottom) {
+                        ShareStoreView(onDismiss: {})
+                            .frame(width: 240).fixedSize()
+                    }
+
                     Button(action: { isShowingFilters = true }) {
                         Label("Show Filters", systemImage: "line.3.horizontal.decrease.circle")
                     }
@@ -57,43 +67,13 @@ private struct ConsoleMainView: View {
                     .popover(isPresented: $isShowingFilters) {
                         ConsoleFiltersView().frame(width: 300).fixedSize()
                     }
-                    Button(action: { isShowingSessions = true }) {
-                        Label("Show Sessions", systemImage: "list.clipboard")
-                    }
-                    .help("Show Sessions")
-                    .popover(isPresented: $isShowingSessions) {
-                        SessionsView().frame(width: 300, height: 420)
-                    }
-                    Button(action: { isShowingSettings = true }) {
-                        Label("Show Settings", systemImage: "gearshape")
-                    }
-                    .help("Show Settings")
-                    .popover(isPresented: $isShowingSettings, arrowEdge: .bottom) {
-                        SettingsView().frame(width: 300, height: environment.configuration.allowRemoteLogging ? 420 : 175)
-                    }
+
+                    ConsoleContextMenu()
+                        .popover(isPresented: $router.isShowingSessions) {
+                            SessionsView().frame(width: 300, height: 420)
+                        }
                 }
             }
-    }
-
-    @ViewBuilder
-    private var contentToolbarNavigationItems: some View {
-        if !(environment.store.options.contains(.readonly)) {
-            Toggle(isOn: $isNowEnabled) {
-                Image(systemName: "clock")
-            }.help("Now Mode: Automatically scrolls to the top of the view to display newly incoming network requests.")
-            Button(action: { isSharingStore = true }) {
-                Image(systemName: "square.and.arrow.up")
-            }
-            .help("Share a session")
-            .popover(isPresented: $isSharingStore, arrowEdge: .bottom) {
-                ShareStoreView(onDismiss: {})
-                    .frame(width: 240).fixedSize()
-            }
-            Button(action: { environment.store.removeAll() }) {
-                Image(systemName: "trash")
-            }
-            .help("Clear current session")
-        }
     }
 }
 

@@ -28,11 +28,6 @@ struct SessionListView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            #if os(macOS)
-            Text("Recorded sessions")
-                .padding(.vertical, 10)
-            Divider()
-            #endif
             if sessions.isEmpty {
                 Text("No Recorded Sessions")
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
