@@ -9,7 +9,6 @@ struct ConsoleSectionHeader: View {
     let title: String
     let reset: () -> Void
     let isDefault: Bool
-    @Binding var isEnabled: Bool
 
     init<Filter: ConsoleFilterProtocol>(
         icon: String,
@@ -21,7 +20,6 @@ struct ConsoleSectionHeader: View {
         self.title = title
         self.reset = { filter.wrappedValue = `default` ?? Filter() }
         self.isDefault = filter.wrappedValue == `default` ?? Filter()
-        self._isEnabled = filter.isEnabled
     }
 
 #if os(macOS)
