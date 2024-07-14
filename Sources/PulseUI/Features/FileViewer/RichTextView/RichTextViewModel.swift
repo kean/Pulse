@@ -236,18 +236,10 @@ final class RichTextViewModel: ObservableObject {
     }
 
     private func highlight(range: NSRange, isFocused: Bool = false) {
-#if PULSE_STANDALONE_APP
-        let style: RichTextViewUnderlyingStyle = isFocused ? .searchResultHighlighted : .searchResult
-        textStorage.addAttributes([
-            .underlineStyle: style.rawValue,
-            .foregroundColor: isFocused ? UXColor.black : UXColor.textColor
-        ], range: range)
-#else
         textStorage.addAttributes([
             .backgroundColor: UXColor.systemBlue.withAlphaComponent(isFocused ? 0.8 : 0.3),
             .foregroundColor: UXColor.white
         ], range: range)
-#endif
     }
 }
 

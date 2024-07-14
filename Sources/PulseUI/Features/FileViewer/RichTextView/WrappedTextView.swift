@@ -82,11 +82,7 @@ struct WrappedTextView: NSViewRepresentable {
     }
 
     func makeNSView(context: Context) -> NSScrollView {
-#if PULSE_STANDALONE_APP
-        let scrollView = WrappedTextView.createScrollableTextView(viewModel: viewModel, coordinator: context.coordinator)
-#else
         let scrollView = UXTextView.scrollableTextView()
-#endif
         let textView = scrollView.documentView as! UXTextView
 
         scrollView.hasVerticalScroller = true

@@ -969,6 +969,16 @@
 			path = List;
 			sourceTree = "<group>";
 		};
+		0C8D3A402C443DB100B8DAC3 /* FileViewer */ = {
+			isa = PBXGroup;
+			children = (
+				0CF0D598296F189500EED9D4 /* FileViewer.swift */,
+				0CF0D59D296F189500EED9D4 /* FileViewerViewModel.swift */,
+				0CF0D59F296F189500EED9D4 /* RichTextView */,
+			);
+			path = FileViewer;
+			sourceTree = "<group>";
+		};
 		0C9751522A32CBAB00DC46FF /* Remote */ = {
 			isa = PBXGroup;
 			children = (
@@ -1196,13 +1206,10 @@
 		0CF0D594296F189500EED9D4 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				0CF0D59F296F189500EED9D4 /* RichTextView */,
 				0CF0D595296F189500EED9D4 /* SearchBar-macos.swift */,
 				0CF0D597296F189500EED9D4 /* PlaceholderView.swift */,
 				0CF0D5A2296F189500EED9D4 /* TextView.swift */,
 				0CF0D5F8296F189600EED9D4 /* LoggerStoreSizeChart.swift */,
-				0CF0D598296F189500EED9D4 /* FileViewer.swift */,
-				0CF0D59D296F189500EED9D4 /* FileViewerViewModel.swift */,
 				0CF0D57F296F189500EED9D4 /* SpinnerView.swift */,
 				0CF0D59A296F189500EED9D4 /* ShareView.swift */,
 				0CF0D59B296F189500EED9D4 /* PDFRepresentedView.swift */,
@@ -1257,6 +1264,7 @@
 				0CF0D5CE296F189500EED9D4 /* Settings */,
 				0C9751522A32CBAB00DC46FF /* Remote */,
 				0CF0D5D6296F189500EED9D4 /* MessageDetails */,
+				0C8D3A402C443DB100B8DAC3 /* FileViewer */,
 			);
 			path = Features;
 			sourceTree = "<group>";
