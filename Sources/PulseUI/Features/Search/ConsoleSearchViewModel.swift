@@ -16,7 +16,6 @@ protocol ConsoleEntitiesSource {
 
 final class ConsoleSearchBarViewModel: ObservableObject {
     @Published var text: String = ""
-    @Published var tokens: [ConsoleSearchTerm] = []
 }
 
 @available(iOS 15, visionOS 1.0, *)
@@ -55,7 +54,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     }
 
     var parameters: ConsoleSearchParameters {
-        var tokens = searchBar.tokens
+        var tokens: [ConsoleSearchTerm] = []
         let searchTerm = searchBar.text.trimmingCharacters(in: .whitespaces)
         if !searchTerm.isEmpty {
             tokens.append(.init(text: searchTerm, options: options))
@@ -100,13 +99,12 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
             .map { $0.trimmingCharacters(in: .whitespaces ) }
             .removeDuplicates()
 
-        let didChangeSearchCriteria = Publishers.CombineLatest4(
+        let didChangeSearchCriteria = Publishers.CombineLatest3(
             text.removeDuplicates(),
-            searchBar.$tokens.removeDuplicates(),
             $options.removeDuplicates(),
             $scopes
         )
-            .map { _, _, _, _ in }
+            .map { _, _, _ in }
             .dropFirst()
             .receive(on: DispatchQueue.main)
 

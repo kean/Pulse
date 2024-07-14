@@ -52,9 +52,7 @@ private struct _InternalConsoleListView: View {
         if #available(iOS 16, *) {
             _ConsoleListView()
                 .environment(\.defaultMinListRowHeight, 8)
-                .searchable(text: $searchBarViewModel.text, tokens: $searchBarViewModel.tokens, token: {
-                    Text($0.text)
-                })
+                .searchable(text: $searchBarViewModel.text)
 #if os(macOS)
                 .searchSuggestions {
                     ConsoleSearchSuggestionsView()
