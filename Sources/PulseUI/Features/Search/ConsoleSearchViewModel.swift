@@ -272,13 +272,6 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     }
 
     func onSubmitSearch() {
-#if os(macOS)
-        if let suggestionID = UUID(uuidString: searchBar.text),
-           let suggestion = suggestionsViewModel.getSuggestion(withID: suggestionID) {
-            perform(suggestion)
-            return
-        }
-#endif
         let searchTerm = searchBar.text.trimmingCharacters(in: .whitespaces)
         if !searchTerm.isEmpty {
             recents.saveSearch(.init(text: searchTerm, options: options))
@@ -355,10 +348,6 @@ struct ConsoleSearchParameters: Equatable, Hashable {
 @available(iOS 15, visionOS 1.0, *)
 struct ConsoleSearchSuggestionsViewModel {
     let searches: [ConsoleSearchSuggestion]
-
-    func getSuggestion(withID id: UUID) -> ConsoleSearchSuggestion? {
-        (searches).first { $0.id == id }
-    }
 }
 
 @available(iOS 15, visionOS 1.0, *)
