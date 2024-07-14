@@ -138,10 +138,7 @@ private func makePreviewViewModel() -> RichTextViewModel {
     let json = try! JSONSerialization.jsonObject(with: MockJSON.allPossibleValues)
     let string = TextRenderer().render(json: json)
 
-    let viewModel = RichTextViewModel(string: string, contentType: "application/json")
-    viewModel.isFilterEnabled = true
-
-    return viewModel
+    return RichTextViewModel(string: string, contentType: "application/json")
 }
 #endif
 

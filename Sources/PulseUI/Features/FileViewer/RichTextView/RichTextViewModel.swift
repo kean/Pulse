@@ -14,11 +14,9 @@ final class RichTextViewModel: ObservableObject {
     @Published private(set) var selectedMatchIndex: Int = 0
     @Published private(set) var matches: [SearchMatch] = []
     @Published var searchTerm: String = ""
-    @Published var filterTerm: String = ""
 
     // Configuration
     @Published var isLinkDetectionEnabled = true
-    var isFilterEnabled = false
     var isToolbarHidden = false
 
     let contentType: NetworkLogger.ContentType?
@@ -31,7 +29,6 @@ final class RichTextViewModel: ObservableObject {
     weak var textView: UXTextView? // Not proper MVVM
     var textStorage: NSTextStorage { textView?.textStorage ?? NSTextStorage(string: "") }
 
-    private var prefilteredText: NSAttributedString?
     private var isSearchingInBackground = false
     private var isSearchNeeded = false
     private let queue = DispatchQueue(label: "com.github.kean.pulse.search")
@@ -52,10 +49,10 @@ final class RichTextViewModel: ObservableObject {
         self.originalText = string
         self.contentType = contentType
 
-        Publishers.CombineLatest3($searchTerm, $searchOptions, $filterTerm)
+        Publishers.CombineLatest($searchTerm, $searchOptions)
             .dropFirst()
             .receive(on: DispatchQueue.main) // Make sure self returns new values
-            .sink { [weak self] _, _, _ in
+            .sink { [weak self] _, _ in
                 self?.setSearchNeeded()
             }.store(in: &cancellables)
     }
@@ -102,33 +99,10 @@ final class RichTextViewModel: ObservableObject {
         isSearchingInBackground = true
         isSearchNeeded = false
 
-        var string = prefilteredText ?? NSAttributedString(attributedString: textStorage)
-        let (searchTerm, filterTerm, options) = (searchTerm, filterTerm, searchOptions)
-
-        if filterTerm.isEmpty {
-            prefilteredText = nil
-        } else {
-            if prefilteredText == nil {
-                prefilteredText = string
-            }
-        }
+        let string = textStorage
+        let (searchTerm, options) = (searchTerm, searchOptions)
 
         queue.async {
-            if !filterTerm.isEmpty {
-                var hasMatch = false
-                let output = NSMutableAttributedString()
-                for line in string.getLines() {
-                    if line.string.firstRange(of: filterTerm, options: .init(options)) != nil {
-                        if hasMatch {
-                            output.append("\n")
-                        }
-                        hasMatch = true
-                        output.append(line)
-                    }
-                }
-                string = output
-            }
-
             let matches = search(searchTerm: searchTerm, in: string.string as NSString, options: options)
             DispatchQueue.main.async {
                 self.didUpdateMatches(matches, string: string)

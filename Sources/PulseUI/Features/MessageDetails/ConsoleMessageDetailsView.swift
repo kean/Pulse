@@ -55,9 +55,7 @@ struct ConsoleMessageDetailsView: View {
     }
 
     private func makeTextViewModel() -> RichTextViewModel {
-        let viewModel = RichTextViewModel(string: TextRenderer().preformatted(message.text))
-        viewModel.isFilterEnabled = true
-        return viewModel
+        RichTextViewModel(string: TextRenderer().preformatted(message.text))
     }
 }
 

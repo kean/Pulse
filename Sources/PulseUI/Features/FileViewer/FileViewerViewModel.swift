@@ -48,9 +48,7 @@ final class FileViewerViewModel: ObservableObject {
             return pdf
         } else {
             let string = TextRenderer().render(data, contentType: contentType, error: context.error)
-            let viewModel = RichTextViewModel(string: string, contentType: contentType)
-            viewModel.isFilterEnabled = true
-            return .other(viewModel)
+            return .other(RichTextViewModel(string: string, contentType: contentType))
         }
     }
 

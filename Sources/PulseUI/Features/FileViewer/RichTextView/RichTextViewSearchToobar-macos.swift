@@ -38,10 +38,6 @@ struct RichTextViewSearchToobar: View {
 
             Spacer()
 
-            if viewModel.isFilterEnabled {
-                SearchBar(title: "Filter", imageName: "line.3.horizontal.decrease.circle", text: $viewModel.filterTerm).frame(maxWidth: 130)
-            }
-
             SearchBar(title: "Search", text: $viewModel.searchTerm).frame(maxWidth: 130)
 
             StringSearchOptionsMenu(options: $viewModel.searchOptions, isKindNeeded: false)
