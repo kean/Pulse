@@ -1238,6 +1238,7 @@
 				0CF0D60C296F189600EED9D4 /* PulseUI+UIKit.swift */,
 				0CF0D5AD296F189500EED9D4 /* ContextMenus.swift */,
 				0CFA8CD62C4401FB001A1DCC /* SectionHeaderView.swift */,
+				0CF0D5D4296F189500EED9D4 /* StoreDetailsView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -1323,7 +1324,6 @@
 				0CF0D5CF296F189500EED9D4 /* SettingsView-watchos.swift */,
 				0CFB0CA32A3F662300221FEA /* SettingsView-tvos.swift */,
 				0CF0D5D3296F189500EED9D4 /* UserSettings.swift */,
-				0CF0D5D4296F189500EED9D4 /* StoreDetailsView.swift */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
