@@ -33,9 +33,7 @@ struct ConsoleTaskCell: View {
             requestHeaders
 #endif
         }
-#if !PULSE_STANDALONE_APP
-            .animation(.default, value: task.state)
-#endif
+        .animation(.default, value: task.state)
 #if os(macOS)
         contents.padding(.vertical, 5)
 #else

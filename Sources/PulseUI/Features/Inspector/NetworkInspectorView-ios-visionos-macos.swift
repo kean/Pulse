@@ -2,8 +2,6 @@
 //
 // Copyright (c) 2020-2024 Alexander Grebenyuk (github.com/kean).
 
-#if !PULSE_STANDALONE_APP
-
 #if os(iOS) || os(visionOS) || os(macOS)
 
 import SwiftUI
@@ -117,8 +115,6 @@ struct NetworkInspectorView_Previews: PreviewProvider {
         }
     }
 }
-#endif
-
 #endif
 
 #endif
