@@ -142,12 +142,6 @@ private struct _ConsoleListView: View {
     @ViewBuilder
     private var content: some View {
         VStack(spacing: 0) {
-            if isSearching {
-                ConsoleSearchToolbar()
-            } else {
-                ConsoleToolbarView()
-            }
-            Divider()
             ScrollViewReader { proxy in
                 List(selection: $selection) {
                     if isSearching {
@@ -158,6 +152,14 @@ private struct _ConsoleListView: View {
                 }.scrollContentBackground(.hidden)
             }
             .environment(\.defaultMinListRowHeight, 1)
+
+            Divider()
+
+            if isSearching {
+                ConsoleSearchToolbar()
+            } else {
+                ConsoleToolbarView()
+            }
         }
     }
 }

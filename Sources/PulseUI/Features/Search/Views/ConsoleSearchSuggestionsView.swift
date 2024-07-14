@@ -14,14 +14,6 @@ struct ConsoleSearchSuggestionsView: View {
     @EnvironmentObject private var viewModel: ConsoleSearchViewModel
 
     var body: some View {
-#if os(macOS)
-        if viewModel.parameters.isEmpty {
-            HStack {
-                ConsoleSearchStringOptionsView(viewModel: viewModel)
-                Spacer()
-            }
-        }
-#endif
         let suggestions = viewModel.suggestionsViewModel!
         if !suggestions.searches.isEmpty {
 #if os(macOS)
