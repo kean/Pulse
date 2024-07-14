@@ -73,7 +73,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     private var operation: ConsoleSearchOperation?
     private var refreshResultsOperation: ConsoleSearchOperation?
 
-    private var recents: ConsoleSearchRecentSearchesStore { suggestionsService.recents }
+    private let recents: ConsoleSearchRecentSearchesStore
     @Published private(set) var suggestionsViewModel: ConsoleSearchSuggestionsViewModel!
 
     private let source: ConsoleEntitiesSource
@@ -89,6 +89,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         self.environment = environment
         self.store = environment.store
         self.index = environment.index
+        self.recents = ConsoleSearchRecentSearchesStore(mode: environment.mode)
         self.source = source
         self.searchBar = searchBar
 
