@@ -8,7 +8,7 @@ import CoreData
 import Combine
 
 /// Filter the logs displayed in the console.
-struct ConsoleFilers: Hashable {
+struct ConsoleFilters: Hashable {
     var shared = Shared()
     var messages = Messages()
     var network = Network()
@@ -42,7 +42,7 @@ protocol ConsoleFilterProtocol: Hashable {
     init() // Initializes with the default values
 }
 
-extension ConsoleFilers {
+extension ConsoleFilters {
     struct Sessions: Hashable, ConsoleFilterProtocol {
         var isEnabled = true
         var selection: Set<UUID> = []

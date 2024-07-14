@@ -26,7 +26,7 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
     }
 
     struct PredicateOptions {
-        var filters = ConsoleFilers()
+        var filters = ConsoleFilters()
         var isOnlyErrors = false
         var predicate: NSPredicate?
         var focus: NSPredicate?
@@ -171,13 +171,13 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
 
 // MARK: - Predicates
 
-private func _makePredicate(_ mode: ConsoleMode, _ filters: ConsoleFilers, _ isOnlyErrors: Bool) -> NSPredicate? {
+private func _makePredicate(_ mode: ConsoleMode, _ filters: ConsoleFilters, _ isOnlyErrors: Bool) -> NSPredicate? {
     func makeMessagesPredicate(isMessageOnly: Bool) -> NSPredicate? {
         var predicates: [NSPredicate] = []
         if isMessageOnly {
             predicates.append(NSPredicate(format: "task == NULL"))
         }
-        if let predicate = ConsoleFilers.makeMessagePredicates(criteria: filters, isOnlyErrors: isOnlyErrors) {
+        if let predicate = ConsoleFilters.makeMessagePredicates(criteria: filters, isOnlyErrors: isOnlyErrors) {
             predicates.append(predicate)
         }
         return predicates.isEmpty ? nil : NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
@@ -189,7 +189,7 @@ private func _makePredicate(_ mode: ConsoleMode, _ filters: ConsoleFilers, _ isO
     case .logs:
         return makeMessagesPredicate(isMessageOnly: true)
     case .network:
-        return ConsoleFilers.makeNetworkPredicates(criteria: filters, isOnlyErrors: isOnlyErrors)
+        return ConsoleFilters.makeNetworkPredicates(criteria: filters, isOnlyErrors: isOnlyErrors)
     }
 }
 

@@ -8,7 +8,7 @@ import SwiftUI
 import Pulse
 
 struct ConsoleSearchTimePeriodCell: View {
-    @Binding var selection: ConsoleFilers.Dates
+    @Binding var selection: ConsoleFilters.Dates
 
     var body: some View {
         DateRangePicker(title: "Start", date: $selection.startDate)

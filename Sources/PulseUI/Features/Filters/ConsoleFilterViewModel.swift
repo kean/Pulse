@@ -11,12 +11,12 @@ final class ConsoleFiltersViewModel: ObservableObject {
     @Published var mode: ConsoleMode = .all
     @Published var options = ConsoleDataSource.PredicateOptions()
 
-    var criteria: ConsoleFilers {
+    var criteria: ConsoleFilters {
         get { options.filters }
         set { options.filters = newValue }
     }
 
-    let defaultCriteria: ConsoleFilers
+    let defaultCriteria: ConsoleFilters
 
     // TODO: Refactor
     let entities = CurrentValueSubject<[NSManagedObject], Never>([])
