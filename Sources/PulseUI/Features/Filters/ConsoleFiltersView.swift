@@ -46,19 +46,8 @@ struct ConsoleFiltersView: View {
         sessionsSection
 
         if environment.mode == .network {
-#if PULSE_STANDALONE_APP
-            customNetworkFiltersSection
-#endif
             domainsSection
-
-#if PULSE_STANDALONE_APP
-            responseSection
-            networkingSection
-#endif
         } else {
-#if PULSE_STANDALONE_APP
-            customMessageFiltersSection
-#endif
             logLevelsSection
             labelsSection
         }

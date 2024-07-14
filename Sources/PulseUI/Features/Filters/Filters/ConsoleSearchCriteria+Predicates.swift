@@ -70,10 +70,6 @@ private func makePredicates(for criteria: ConsoleFilers.Messages) -> [NSPredicat
         }
     }
 
-#if PULSE_STANDALONE_APP
-    predicates += makeStandalonePredicates(for: criteria)
-#endif
-
     return predicates
 }
 
@@ -95,11 +91,6 @@ private func makePredicates(for criteria: ConsoleFilers.Network) -> [NSPredicate
             predicates.append(NSPredicate(format: "NOT url IN %@", Array(criteria.url.hidden)))
         }
     }
-
-
-#if PULSE_STANDALONE_APP
-    predicates += makeStandalonePredicates(for: criteria)
-#endif
 
     return predicates
 }
