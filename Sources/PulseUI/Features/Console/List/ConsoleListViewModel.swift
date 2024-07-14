@@ -9,7 +9,7 @@ import Combine
 import SwiftUI
 
 final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject, ConsoleEntitiesSource {
-#if os(iOS) || os(visionOS)
+#if os(iOS) || os(visionOS) || os(macOS)
     @Published private(set) var visibleEntities: ArraySlice<NSManagedObject> = []
 #else
     var visibleEntities: [NSManagedObject] { entities }
@@ -19,8 +19,6 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject, C
     @Published private(set) var sections: [NSFetchedResultsSectionInfo]?
 
     @Published private(set) var mode: ConsoleMode
-
-    var didLiveScrollCancellable: AnyCancellable?
 
     var isViewVisible = false {
         didSet {
@@ -41,7 +39,7 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject, C
 
     let events = PassthroughSubject<ConsoleUpdateEvent, Never>()
 
-#if os(iOS) || os(visionOS)
+#if os(iOS) || os(visionOS) || os(macOS)
     /// This exist strictly to workaround List performance issues
     private var scrollPosition: ScrollPosition = .nearTop
     private var visibleEntityCountLimit = ConsoleDataSource.fetchBatchSize
@@ -140,7 +138,7 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject, C
 
         entities = dataSource.entities
         sections = dataSource.sections
-#if os(iOS) || os(visionOS)
+#if os(iOS) || os(visionOS) || os(macOS)
         refreshVisibleEntities()
 #endif
         events.send(.refresh)
@@ -149,7 +147,7 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject, C
     func dataSource(_ dataSource: ConsoleDataSource, didUpdateWith diff: CollectionDifference<NSManagedObjectID>?) {
         entities = dataSource.entities
         sections = dataSource.sections
-#if os(iOS) || os(visionOS)
+#if os(iOS) || os(visionOS) || os(macOS)
         if scrollPosition == .nearTop {
             refreshVisibleEntities()
         }
@@ -159,7 +157,7 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject, C
 
     // MARK: Visible Entities
 
-#if os(iOS) || os(visionOS)
+#if os(iOS) || os(visionOS) || os(macOS)
     private enum ScrollPosition {
         case nearTop
         case middle

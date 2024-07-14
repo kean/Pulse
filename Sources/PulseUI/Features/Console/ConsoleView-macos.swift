@@ -42,8 +42,6 @@ private struct ConsoleMainView: View {
     @State private var isSharingStore = false
     @State private var isShowingFilters = false
 
-    @SceneStorage("com-github-kean-pulse-is-now-enabled") private var isNowEnabled = true
-
     @EnvironmentObject var router: ConsoleRouter
 
     var body: some View {
@@ -51,10 +49,6 @@ private struct ConsoleMainView: View {
             .frame(minWidth: 400, idealWidth: 500, minHeight: 120, idealHeight: 480)
             .toolbar {
                 ToolbarItemGroup(placement: .automatic) {
-                    Toggle(isOn: $isNowEnabled) {
-                        Image(systemName: "clock")
-                    }.help("Now Mode: Automatically scrolls to the top of the view to display newly incoming network requests.")
-
                     Button(action: { isSharingStore = true }) {
                         Image(systemName: "square.and.arrow.up")
                     }
