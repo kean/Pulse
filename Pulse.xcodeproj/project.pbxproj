@@ -42,7 +42,6 @@
 		0C11EAE92971EBEE0059786A /* MockTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CF0D5AF296F189500EED9D4 /* MockTask.swift */; };
 		0C1D52412BE99169006A0EB7 /* Atomic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C1D52402BE99169006A0EB7 /* Atomic.swift */; };
 		0C20F3E42A2CE9D900F2F67D /* Keychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C20F3E32A2CE9D900F2F67D /* Keychain.swift */; };
-		0C2343152978B6B900AE7CE6 /* ConsoleSearchSuggestionsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C2343142978B6B900AE7CE6 /* ConsoleSearchSuggestionsService.swift */; };
 		0C2720892AF832C6005DDB1C /* StatusLabelViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C2720882AF832C6005DDB1C /* StatusLabelViewModel.swift */; };
 		0C29F39729FE7F97006CC996 /* WatchConnectivityService-watchOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C29F39629FE7F97006CC996 /* WatchConnectivityService-watchOS.swift */; };
 		0C3002B32986CEF30055F6C2 /* LoggerStoreIndex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C3002B22986CEF30055F6C2 /* LoggerStoreIndex.swift */; };
@@ -506,7 +505,6 @@
 		0C1221E525CE09C100B81D7A /* URLSessionAutomatedIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionAutomatedIntegration.swift; sourceTree = "<group>"; };
 		0C1D52402BE99169006A0EB7 /* Atomic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Atomic.swift; sourceTree = "<group>"; };
 		0C20F3E32A2CE9D900F2F67D /* Keychain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keychain.swift; sourceTree = "<group>"; };
-		0C2343142978B6B900AE7CE6 /* ConsoleSearchSuggestionsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsoleSearchSuggestionsService.swift; sourceTree = "<group>"; };
 		0C25FB6E25CDDCAB00A895C2 /* URLSessionManualIntegration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionManualIntegration.swift; sourceTree = "<group>"; };
 		0C2720882AF832C6005DDB1C /* StatusLabelViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatusLabelViewModel.swift; sourceTree = "<group>"; };
 		0C29F39629FE7F97006CC996 /* WatchConnectivityService-watchOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "WatchConnectivityService-watchOS.swift"; sourceTree = "<group>"; };
@@ -1032,7 +1030,6 @@
 			isa = PBXGroup;
 			children = (
 				0CB63A202974A62700525165 /* ConsoleSearchOccurrence.swift */,
-				0C2343142978B6B900AE7CE6 /* ConsoleSearchSuggestionsService.swift */,
 				0CB63A2D2975C40F00525165 /* ConsoleSearchScope.swift */,
 				0C63A3772979FE3A00F6A6A5 /* ConsoleSearchTerm.swift */,
 				0CB63A222974A64500525165 /* ConsoleSearchOperation.swift */,
@@ -2103,7 +2100,6 @@
 				0CC0130E2A2D26BA00A6DF0B /* RemoteLoggerErrorView.swift in Sources */,
 				0C37046329FA08B800BA51B8 /* ConsoleSearchRecentSearchesStore.swift in Sources */,
 				0CF0D664296F189600EED9D4 /* NetworkInspectorMetricsView.swift in Sources */,
-				0C2343152978B6B900AE7CE6 /* ConsoleSearchSuggestionsService.swift in Sources */,
 				0CD7E0BD29732C8E00A255B7 /* ShareStoreTask.swift in Sources */,
 				0CF0D687296F189600EED9D4 /* ConsoleTaskCell.swift in Sources */,
 				0CDC3BED2971B936003BD1FF /* ConsoleSearchLogLevelsCell.swift in Sources */,

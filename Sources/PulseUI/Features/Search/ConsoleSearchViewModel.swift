@@ -74,7 +74,6 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     private var refreshResultsOperation: ConsoleSearchOperation?
 
     private var recents: ConsoleSearchRecentSearchesStore { suggestionsService.recents }
-    private var suggestionsService: ConsoleNetworkSearchSuggestionsService!
     @Published private(set) var suggestionsViewModel: ConsoleSearchSuggestionsViewModel!
 
     private let source: ConsoleEntitiesSource
@@ -130,8 +129,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     }
 
     private func configure(mode: ConsoleMode) {
-        self.suggestionsService = ConsoleNetworkSearchSuggestionsService(mode: mode)
-        self.suggestionsViewModel = suggestionsService.makeSuggestions(for: makeContextForSuggestions())
+        self.suggestionsViewModel = getRecentSearches()
         DispatchQueue.main.async {
             self.refreshNow()
         }
@@ -313,24 +311,20 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     private func updateSearchTokens() {
         let searchText = searchBar.text.trimmingCharacters(in: .whitespaces)
         if searchText.isEmpty {
-            let recentSearches = recents.searches.prefix(3).map { term in
-                ConsoleSearchSuggestion(text: {
-                    AttributedString("\(term.options.title) ") { $0.foregroundColor = .primary } +
-                    AttributedString(term.text) { $0.foregroundColor = .accentColor }
-                }(), action: .apply(term))
-            }
-            self.suggestionsViewModel = ConsoleSearchSuggestionsViewModel(searches: recentSearches)
+            self.suggestionsViewModel = getRecentSearches()
         } else {
             self.suggestionsViewModel = ConsoleSearchSuggestionsViewModel(searches: [])
         }
     }
 
-    private func makeContextForSuggestions() -> ConsoleSearchSuggestionsContext {
-        ConsoleSearchSuggestionsContext(
-            searchText: searchBar.text.trimmingCharacters(in: .whitespaces),
-            index: index,
-            parameters: parameters
-        )
+    private func getRecentSearches() -> ConsoleSearchSuggestionsViewModel {
+        let recentSearches = recents.searches.prefix(3).map { term in
+            ConsoleSearchSuggestion(text: {
+                AttributedString("\(term.options.title) ") { $0.foregroundColor = .primary } +
+                AttributedString(term.text) { $0.foregroundColor = .accentColor }
+            }(), action: .apply(term))
+        }
+        return ConsoleSearchSuggestionsViewModel(searches: recentSearches)
     }
 }
 
@@ -356,6 +350,27 @@ struct ConsoleSearchParameters: Equatable, Hashable {
 
     var isEmpty: Bool {
         terms.isEmpty
+    }
+}
+
+@available(iOS 15, visionOS 1.0, *)
+struct ConsoleSearchSuggestionsViewModel {
+    let searches: [ConsoleSearchSuggestion]
+
+    func getSuggestion(withID id: UUID) -> ConsoleSearchSuggestion? {
+        (searches).first { $0.id == id }
+    }
+}
+
+@available(iOS 15, visionOS 1.0, *)
+struct ConsoleSearchSuggestion: Identifiable {
+    let id = UUID()
+    let text: AttributedString
+    var action: Action
+
+    enum Action {
+        case apply(ConsoleSearchTerm)
+        case autocomplete(String)
     }
 }
 
