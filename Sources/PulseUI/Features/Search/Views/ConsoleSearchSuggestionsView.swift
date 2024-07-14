@@ -41,14 +41,11 @@ struct ConsoleSearchSuggestionsView: View {
 #endif
             makeList(with: Array(suggestions.searches.prefix(3)))
             buttonClearSearchHistory
-        } else {
-            makeList(with: suggestions.filters)
         }
 
-        if !suggestions.searches.isEmpty && !suggestions.filters.isEmpty {
+        if !suggestions.searches.isEmpty {
             // Display filters in a separate section
             PlainListSectionHeaderSeparator(title: "Filters")
-            makeList(with: suggestions.filters)
         }
 
 #if os(iOS) || os(visionOS)

@@ -96,16 +96,6 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
 
         self.context = store.newBackgroundContext()
 
-#if os(iOS) || os(visionOS)
-        searchBar.$text.sink {
-            if $0.last == "\t" {
-                DispatchQueue.main.async {
-                    self.autocompleteCurrentFilter()
-                }
-            }
-        }.store(in: &cancellables)
-#endif
-
         let text = searchBar.$text
             .map { $0.trimmingCharacters(in: .whitespaces ) }
             .removeDuplicates()
@@ -153,13 +143,6 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
             refreshNow()
         case .update:
             checkForNewSearchMatches(for: source.entities)
-        }
-    }
-
-    private func autocompleteCurrentFilter() {
-        if let filter = suggestionsViewModel.filters.first,
-           case .autocomplete(let text) = filter.action {
-            searchBar.text = text
         }
     }
 
@@ -287,10 +270,6 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
 
     private func apply(_ token: ConsoleSearchToken) {
         switch token {
-        case .filter(let filter):
-            searchBar.text = ""
-            searchBar.tokens.append(token)
-            recents.saveFilter(filter)
         case .term(let term):
             searchBar.text = term.text
             options = term.options
@@ -365,14 +344,12 @@ struct ConsoleSearchResultKey: Hashable {
 }
 
 struct ConsoleSearchParameters: Equatable, Hashable {
-    var filters: [ConsoleSearchFilter] = []
     var scopes: [ConsoleSearchScope] = []
     var terms: [ConsoleSearchTerm] = []
 
     init(tokens: [ConsoleSearchToken], scopes: Set<ConsoleSearchScope>) {
         for token in tokens {
             switch token {
-            case .filter(let filter): self.filters.append(filter)
             case .term(let string): self.terms.append(string)
             }
         }
@@ -380,7 +357,7 @@ struct ConsoleSearchParameters: Equatable, Hashable {
     }
 
     var isEmpty: Bool {
-        filters.isEmpty && terms.isEmpty
+        terms.isEmpty
     }
 }
 
