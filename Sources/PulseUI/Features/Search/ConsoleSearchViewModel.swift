@@ -312,12 +312,17 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     // MARK: Suggested Tokens
 
     private func updateSearchTokens() {
-        let context = makeContextForSuggestions()
-        queue.async {
-            let viewModel = self.suggestionsService.makeSuggestions(for: context)
-            DispatchQueue.main.async {
-                self.suggestionsViewModel = viewModel
+        let searchText = searchBar.text.trimmingCharacters(in: .whitespaces)
+        if searchText.isEmpty {
+            let recentSearches = recents.searches.prefix(3).map { term in
+                ConsoleSearchSuggestion(text: {
+                    AttributedString("\(term.options.title) ") { $0.foregroundColor = .primary } +
+                    AttributedString(term.text) { $0.foregroundColor = .accentColor }
+                }(), action: .apply(term))
             }
+            self.suggestionsViewModel = ConsoleSearchSuggestionsViewModel(searches: recentSearches)
+        } else {
+            self.suggestionsViewModel = ConsoleSearchSuggestionsViewModel(searches: [])
         }
     }
 
