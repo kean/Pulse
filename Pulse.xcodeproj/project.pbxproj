@@ -1209,6 +1209,7 @@
 				0CF0D5DE296F189500EED9D4 /* Metrics */,
 				0CF0D595296F189500EED9D4 /* SearchBar-macos.swift */,
 				0CF0D597296F189500EED9D4 /* PlaceholderView.swift */,
+				0CF0D5C0296F189500EED9D4 /* DateRangePicker.swift */,
 				0CF0D5A2296F189500EED9D4 /* TextView.swift */,
 				0CF0D5F8296F189600EED9D4 /* LoggerStoreSizeChart.swift */,
 				0CF0D57F296F189500EED9D4 /* SpinnerView.swift */,
@@ -1290,7 +1291,6 @@
 				0CC3808429F41CF600EF22EE /* ConsoleDomainsSelectionView.swift */,
 				0CDC3BE92970FA47003BD1FF /* ConsoleSearchListSelectionView.swift */,
 				0CE3970929EAD73700FF01C0 /* ConsoleSessionsPickerView.swift */,
-				0CF0D5C0296F189500EED9D4 /* DateRangePicker.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
