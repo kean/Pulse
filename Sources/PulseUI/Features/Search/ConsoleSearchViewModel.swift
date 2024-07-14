@@ -54,12 +54,12 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
     }
 
     var parameters: ConsoleSearchParameters {
-        var tokens: [ConsoleSearchTerm] = []
+        var term: ConsoleSearchTerm?
         let searchTerm = searchBar.text.trimmingCharacters(in: .whitespaces)
         if !searchTerm.isEmpty {
-            tokens.append(.init(text: searchTerm, options: options))
+            term = ConsoleSearchTerm(text: searchTerm, options: options)
         }
-        return ConsoleSearchParameters(tokens: tokens, scopes: scopes)
+        return ConsoleSearchParameters(term: term, scopes: scopes)
     }
 
     var allScopes: [ConsoleSearchScope] {
@@ -340,15 +340,15 @@ struct ConsoleSearchResultKey: Hashable {
 
 struct ConsoleSearchParameters: Equatable, Hashable {
     var scopes: [ConsoleSearchScope] = []
-    var terms: [ConsoleSearchTerm] = []
+    var term: ConsoleSearchTerm?
 
-    init(tokens: [ConsoleSearchTerm], scopes: Set<ConsoleSearchScope>) {
-        self.terms = tokens
+    init(term: ConsoleSearchTerm?, scopes: Set<ConsoleSearchScope>) {
+        self.term = term
         self.scopes = Array(scopes)
     }
 
     var isEmpty: Bool {
-        terms.isEmpty
+        term == nil
     }
 }
 

@@ -59,7 +59,7 @@ struct ConsoleSearchResultsListContentView: View {
 #endif
         ForEach(viewModel.results) { result in
             let isLast = result.id == viewModel.results.last?.id
-            ConsoleSearchResultView(viewModel: result, isSeparatorNeeded: !viewModel.parameters.terms.isEmpty && !isLast)
+            ConsoleSearchResultView(viewModel: result, isSeparatorNeeded: viewModel.parameters.term != nil && !isLast)
                 .onAppear {
                     viewModel.didScroll(to: result)
                 }

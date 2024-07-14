@@ -96,21 +96,17 @@ final class ConsoleSearchOperation {
     // MARK: Search (LoggerMessageEntity)
 
     private func _search(_ message: LoggerMessageEntity, parameters: ConsoleSearchParameters) -> [ConsoleSearchOccurrence]? {
-        guard !parameters.terms.isEmpty else {
+        guard let term = parameters.term else {
             return []
         }
-        return search(in: message, parameters: parameters)
-    }
-
-    private func search(in message: LoggerMessageEntity, parameters: ConsoleSearchParameters) -> [ConsoleSearchOccurrence]? {
         var occurrences: [ConsoleSearchOccurrence] = []
         let scopes = parameters.scopes.isEmpty ? ConsoleSearchScope.allCases : parameters.scopes
         for scope in scopes {
             switch scope {
             case .message:
-                occurrences += ConsoleSearchOperation.search(message.text, parameters, .message)
+                occurrences += ConsoleSearchOperation.search(message.text, term, .message)
             case .metadata:
-                occurrences += ConsoleSearchOperation.search(message.rawMetadata, parameters, .metadata)
+                occurrences += ConsoleSearchOperation.search(message.rawMetadata, term, .metadata)
             default:
                 break
             }
@@ -121,13 +117,9 @@ final class ConsoleSearchOperation {
     // MARK: Search (NetworkTaskEntity)
 
     private func _search(_ task: NetworkTaskEntity, parameters: ConsoleSearchParameters) -> [ConsoleSearchOccurrence]? {
-        guard !parameters.terms.isEmpty else {
+        guard let term = parameters.term else {
             return []
         }
-        return search(in: task, parameters: parameters)
-    }
-
-    private func search(in task: NetworkTaskEntity, parameters: ConsoleSearchParameters) -> [ConsoleSearchOccurrence]? {
         var occurrences: [ConsoleSearchOccurrence] = []
         let scopes = parameters.scopes.isEmpty ? ConsoleSearchScope.allCases : parameters.scopes
         for scope in scopes {
@@ -136,16 +128,16 @@ final class ConsoleSearchOperation {
                 if var components = URLComponents(string: task.url ?? "") {
                     components.queryItems = nil
                     if let url = components.url?.absoluteString {
-                        occurrences += ConsoleSearchOperation.search(url, parameters, scope)
+                        occurrences += ConsoleSearchOperation.search(url, term, scope)
                     }
                 }
             case .requestBody:
                 if let string = task.requestBody.flatMap(service.getBodyString) {
-                    occurrences += ConsoleSearchOperation.search(string, parameters, scope)
+                    occurrences += ConsoleSearchOperation.search(string, term, scope)
                 }
             case .responseBody:
                 if let string = task.responseBody.flatMap(service.getBodyString) {
-                    occurrences += ConsoleSearchOperation.search(string, parameters, scope)
+                    occurrences += ConsoleSearchOperation.search(string, term, scope)
                 }
             case .message, .metadata:
                 break // Applies only to LoggerMessageEntity
@@ -154,37 +146,26 @@ final class ConsoleSearchOperation {
         return occurrences.isEmpty ? nil : occurrences
     }
 
-    private static  func search(_ data: Data, _ parameters: ConsoleSearchParameters, _ scope: ConsoleSearchScope) -> [ConsoleSearchOccurrence] {
+    private static  func search(_ data: Data, _ term: ConsoleSearchTerm, _ scope: ConsoleSearchScope) -> [ConsoleSearchOccurrence] {
         guard let content = String(data: data, encoding: .utf8) else {
             return []
         }
-        return search(content, parameters, scope)
+        return search(content, term, scope)
     }
 
-    private static func search(_ content: String, _ parameters: ConsoleSearchParameters, _ scope: ConsoleSearchScope) -> [ConsoleSearchOccurrence] {
-        var remainingMatchedTerms = Set(parameters.terms)
+    private static func search(_ content: String, _ term: ConsoleSearchTerm, _ scope: ConsoleSearchScope) -> [ConsoleSearchOccurrence] {
         var matches: [ConsoleSearchMatch] = []
         var lineCount = 0
         content.enumerateLines { line, stop in
             lineCount += 1
-            for term in parameters.terms {
-                for range in line.ranges(of: term.text, options: term.options) {
-                    let match = ConsoleSearchMatch(line: line, lineNumber: lineCount, range: range, term: term)
-                    matches.append(match)
-                }
-                if !matches.isEmpty, !remainingMatchedTerms.isEmpty {
-                    remainingMatchedTerms.remove(term)
-                }
+            for range in line.ranges(of: term.text, options: term.options) {
+                let match = ConsoleSearchMatch(line: line, lineNumber: lineCount, range: range, term: term)
+                matches.append(match)
             }
-            if matches.count > ConsoleSearchMatch.limit, remainingMatchedTerms.isEmpty {
+            if matches.count > ConsoleSearchMatch.limit {
                 stop = true
             }
         }
-
-        guard remainingMatchedTerms.isEmpty else {
-            return [] // Has to match all
-        }
-
         return zip(matches.indices, matches).map { (index, match) in
             ConsoleSearchOccurrence(scope: scope, match: match, searchContext: .init(searchTerm: match.term, matchIndex: index))
         }
