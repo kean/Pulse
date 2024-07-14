@@ -56,25 +56,18 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
 
         let entityName: String
         let sortKey: String
-        let grouping: ConsoleListGroupBy
 
         switch mode {
         case .all, .logs:
             entityName = "\(LoggerMessageEntity.self)"
             sortKey = options.messageSortBy.key
-            grouping = options.messageGroupBy
         case .network:
             entityName = "\(NetworkTaskEntity.self)"
             sortKey = options.taskSortBy.key
-            grouping = options.taskGroupBy
         }
 
         let request = NSFetchRequest<NSManagedObject>(entityName: entityName)
         request.sortDescriptors = [
-            grouping.key.flatMap {
-                guard $0 != "session" else { return nil }
-                return NSSortDescriptor(key: $0, ascending: grouping.isAscending)
-            },
             NSSortDescriptor(key: sortKey, ascending: options.order == .ascending)
         ].compactMap { $0 }
         request.fetchBatchSize = ConsoleDataSource.fetchBatchSize
@@ -82,23 +75,16 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
         controller = NSFetchedResultsController(
             fetchRequest: request,
             managedObjectContext: store.viewContext,
-            sectionNameKeyPath: grouping.key,
+            sectionNameKeyPath: nil,
             cacheName: nil
         )
 
         super.init()
 
-        controllerDelegate = {
-            if grouping.key == nil {
-                let delegate = ConsoleFetchDelegate()
-                delegate.delegate = self
-                return delegate
-            } else {
-                let delegate = ConsoleGroupedFetchDelegate()
-                delegate.delegate = self
-                return delegate
-            }
-        }()
+        let delegate = ConsoleFetchDelegate()
+        delegate.delegate = self
+        controllerDelegate = delegate
+
         controller.delegate = controllerDelegate
     }
 
@@ -163,10 +149,6 @@ final class ConsoleDataSource: NSObject, NSFetchedResultsControllerDelegate {
         default: return NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
         }
     }
-
-    func name(for section: NSFetchedResultsSectionInfo) -> String {
-        makeName(for: section, mode: mode, options: options)
-    }
 }
 
 // MARK: - Predicates
@@ -193,52 +175,6 @@ private func _makePredicate(_ mode: ConsoleMode, _ filters: ConsoleFilters, _ is
     }
 }
 
-// MARK: - Section Names
-
-private func makeName(for section: NSFetchedResultsSectionInfo, mode: ConsoleMode, options: ConsoleListOptions) -> String {
-    switch mode {
-    case .all, .logs:
-        switch options.messageGroupBy {
-        case .level:
-            let rawValue = Int16(Int(section.name) ?? 0)
-            return (LoggerStore.Level(rawValue: rawValue) ?? .debug).name.capitalized
-        case .session:
-            let date = (section.objects?.last as? LoggerMessageEntity)?.createdAt
-            return date.map(sessionDateFormatter.string) ?? "–"
-        default:
-            break
-        }
-    case .network:
-        switch options.taskGroupBy {
-        case .taskType:
-            let rawValue = Int16(Int(section.name) ?? 0)
-            return NetworkLogger.TaskType(rawValue: rawValue)?.urlSessionTaskClassName ?? section.name
-        case .statusCode:
-            let rawValue = Int32(section.name) ?? 0
-            return StatusCodeFormatter.string(for: rawValue)
-        case .requestState:
-            let rawValue = Int16(Int(section.name) ?? 0)
-            guard let state = NetworkTaskEntity.State(rawValue: rawValue) else {
-                return "Unknown State"
-            }
-            switch state {
-            case .pending: return "Pending"
-            case .success: return "Success"
-            case .failure: return "Failure"
-            }
-        case .session:
-            let date = (section.objects?.last as? NetworkTaskEntity)?.createdAt
-            return date.map(sessionDateFormatter.string) ?? "–"
-        default:
-            break
-        }
-    }
-    let name = section.name
-    return name.isEmpty ? "–" : name
-}
-
-private let sessionDateFormatter = DateFormatter(dateStyle: .medium, timeStyle: .medium, isRelative: true)
-
 // MARK: - Delegates
 
 // Using a separate class because the diff API is not supported for a fetch
@@ -250,14 +186,6 @@ private final class ConsoleFetchDelegate: NSObject, NSFetchedResultsControllerDe
 
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChangeContentWith diff: CollectionDifference<NSManagedObjectID>) {
         delegate?.controller?(controller, didChangeContentWith: diff)
-    }
-}
-
-private final class ConsoleGroupedFetchDelegate: NSObject, NSFetchedResultsControllerDelegate {
-    weak var delegate: NSFetchedResultsControllerDelegate?
-
-    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        delegate?.controllerDidChangeContent?(controller)
     }
 }
 

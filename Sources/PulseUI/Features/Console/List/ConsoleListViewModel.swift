@@ -104,8 +104,6 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject, C
     }
 
     func focus(on entities: [NSManagedObject]) {
-        environment.listOptions.messageGroupBy = .noGrouping
-        environment.listOptions.taskGroupBy = .noGrouping
         filters.options.focus = NSPredicate(format: "self IN %@", entities)
     }
 
@@ -212,12 +210,6 @@ final class ConsoleListViewModel: ConsoleDataSourceDelegate, ObservableObject, C
         visibleEntities = entities.prefix(visibleEntityCountLimit)
     }
 #endif
-
-    // MARK: Sections
-
-    func name(for section: NSFetchedResultsSectionInfo) -> String {
-        dataSource?.name(for: section) ?? ""
-    }
 }
 
 private func filter(pins: [LoggerMessageEntity], mode: ConsoleMode) -> [LoggerMessageEntity] {
