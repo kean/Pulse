@@ -18,11 +18,11 @@ struct ConsoleSearchListContentView: View {
         ConsoleSearchToolbar()
             .listRowBackground(Color.clear)
             .listRowSeparator(.hidden, edges: .top)
+#endif
         ConsoleSearchSuggestionsView()
         if viewModel.isNewResultsButtonShown {
             showNewResultsPromptView
         }
-#endif
         ConsoleSearchResultsListContentView()
     }
 

@@ -49,29 +49,16 @@ private struct _InternalConsoleListView: View {
     }
 
     @ViewBuilder private var contents: some View {
-        if #available(iOS 16, *) {
-            _ConsoleListView()
-                .environment(\.defaultMinListRowHeight, 8)
-                .searchable(text: $searchBarViewModel.text)
+        _ConsoleListView()
+            .environment(\.defaultMinListRowHeight, 8)
 #if os(macOS)
-                .searchSuggestions {
-                    ConsoleSearchSuggestionsView()
-                }
+            .searchable(text: $searchBarViewModel.text, placement: .sidebar)
+#else
+            .searchable(text: $searchBarViewModel.text)
+            .textInputAutocapitalization(.never)
 #endif
-                .onSubmit(of: .search, searchViewModel.value.onSubmitSearch)
-                .disableAutocorrection(true)
-#if os(iOS) || os(visionOS)
-                .textInputAutocapitalization(.never)
-#endif
-        } else {
-            _ConsoleListView()
-                .searchable(text: $searchBarViewModel.text)
-                .onSubmit(of: .search, searchViewModel.value.onSubmitSearch)
-                .disableAutocorrection(true)
-#if os(iOS) || os(visionOS)
-                .textInputAutocapitalization(.never)
-#endif
-        }
+            .onSubmit(of: .search, searchViewModel.value.onSubmitSearch)
+            .disableAutocorrection(true)
     }
 }
 
@@ -155,7 +142,7 @@ private struct _ConsoleListView: View {
     @ViewBuilder
     private var content: some View {
         VStack(spacing: 0) {
-            if isSearching && !searchViewModel.parameters.isEmpty {
+            if isSearching {
                 ConsoleSearchToolbar()
             } else {
                 ConsoleToolbarView()
@@ -163,7 +150,7 @@ private struct _ConsoleListView: View {
             Divider()
             ScrollViewReader { proxy in
                 List(selection: $selection) {
-                    if isSearching && !searchViewModel.parameters.isEmpty {
+                    if isSearching {
                         ConsoleSearchResultsListContentView()
                     } else {
                         ConsoleListContentView(proxy: proxy)
