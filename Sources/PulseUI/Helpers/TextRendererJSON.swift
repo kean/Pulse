@@ -41,7 +41,7 @@ final class TextRendererJSON {
         for (range, element, node) in elements {
             output.addAttribute(.foregroundColor, value: color(for: element), range: range)
 #if os(macOS)
-            if let node = node {
+            if let node = node, TextRendererJSON.makeErrorAttributes != nil {
                 output.addAttribute(.node, value: node, range: range)
                 output.addAttribute(.cursor, value: NSCursor.pointingHand, range: range)
             }
@@ -280,19 +280,5 @@ final class JSONContainerNode {
     init(kind: Kind, json: Any) {
         self.kind = kind
         self.json = json
-    }
-
-    var openingCharacter: String {
-        switch kind {
-        case .object: return "{"
-        case .array: return "["
-        }
-    }
-
-    var closingCharacter: String {
-        switch kind {
-        case .object: return "}"
-        case .array: return "]"
-        }
     }
 }
