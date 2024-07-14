@@ -40,11 +40,6 @@ struct ConsoleSectionHeader: View {
                 }
                 .foregroundColor(.secondary)
                 .disabled(isDefault)
-                Button(action: { isEnabled.toggle() }) {
-                    Image(systemName: isEnabled ? "checkmark.circle.fill" : "circle")
-                        .foregroundColor(isDefault ? .secondary : .blue)
-                }
-                .disabled(isDefault)
             }
         }.buttonStyle(.plain)
     }
