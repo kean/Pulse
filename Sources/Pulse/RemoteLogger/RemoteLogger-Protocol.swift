@@ -4,9 +4,6 @@
 
 import Foundation
 import Network
-#if PULSE_STANDALONE_APP
-import Pulse
-#endif
 
 extension RemoteLogger {
     enum PacketCode: UInt8, Equatable {

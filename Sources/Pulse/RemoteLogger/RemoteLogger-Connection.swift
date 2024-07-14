@@ -7,10 +7,6 @@ import Network
 import CryptoKit
 import OSLog
 
-#if PULSE_STANDALONE_APP
-import Pulse
-#endif
-
 protocol RemoteLoggerConnectionDelegate: AnyObject {
     func connection(_ connection: RemoteLogger.Connection, didChangeState newState: NWConnection.State)
     func connection(_ connection: RemoteLogger.Connection, didReceiveEvent event: RemoteLogger.Connection.Event)
