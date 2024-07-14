@@ -21,35 +21,24 @@ struct ConsoleFilters: Hashable {
     struct Messages: Hashable {
         var logLevels = LogLevels()
         var labels = Labels()
-#if PULSE_STANDALONE_APP
-        var custom = CustomMessageFilters()
-#endif
     }
 
     struct Network: Hashable {
         var host = Host()
         var url = URL()
-#if PULSE_STANDALONE_APP
-        var custom = CustomNetworkFilters()
-        var response = Response()
-        var networking = Networking()
-#endif
     }
 }
 
 protocol ConsoleFilterProtocol: Hashable {
-    var isEnabled: Bool { get set }
     init() // Initializes with the default values
 }
 
 extension ConsoleFilters {
     struct Sessions: Hashable, ConsoleFilterProtocol {
-        var isEnabled = true
         var selection: Set<UUID> = []
     }
 
     struct Dates: Hashable, ConsoleFilterProtocol {
-        var isEnabled = true
         var startDate: Date?
         var endDate: Date?
 
@@ -63,25 +52,21 @@ extension ConsoleFilters {
     }
 
     struct LogLevels: ConsoleFilterProtocol {
-        var isEnabled = true
         var levels: Set<LoggerStore.Level> = Set(LoggerStore.Level.allCases)
             .subtracting([LoggerStore.Level.trace])
     }
 
     struct Labels: ConsoleFilterProtocol {
-        var isEnabled = true
         var hidden: Set<String> = []
         var focused: String?
     }
 
     struct Host: ConsoleFilterProtocol {
-        var isEnabled = true
         var hidden: Set<String> = []
         var focused: String?
     }
 
     struct URL: ConsoleFilterProtocol {
-        var isEnabled = true
         var hidden: Set<String> = []
         var focused: String?
     }
