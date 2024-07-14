@@ -95,6 +95,7 @@ final class ConsoleSearchViewModel: ObservableObject, ConsoleSearchOperationDele
         self.searchBar = searchBar
 
         self.context = store.newBackgroundContext()
+        self.scopes = Set(allScopes)
 
         let text = searchBar.$text
             .map { $0.trimmingCharacters(in: .whitespaces ) }
