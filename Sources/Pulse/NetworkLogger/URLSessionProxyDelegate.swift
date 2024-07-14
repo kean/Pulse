@@ -14,7 +14,7 @@ import Foundation
 public final class URLSessionProxyDelegate: NSObject, URLSessionTaskDelegate, URLSessionDataDelegate, URLSessionDownloadDelegate {
     private let actualDelegate: URLSessionDelegate?
     private let taskDelegate: URLSessionTaskDelegate?
-    private var interceptedSelectors: Set<Selector>
+    private let interceptedSelectors: Set<Selector>
     private let logger: NetworkLogger
 
     /// - parameter logger: By default, creates a logger with `LoggerStore.shared`.
@@ -23,7 +23,7 @@ public final class URLSessionProxyDelegate: NSObject, URLSessionTaskDelegate, UR
         self.actualDelegate = delegate
         self.taskDelegate = delegate as? URLSessionTaskDelegate
         self.logger = logger
-        self.interceptedSelectors = [
+        var interceptedSelectors: Set = [
             #selector(URLSessionDataDelegate.urlSession(_:dataTask:didReceive:)),
             #selector(URLSessionTaskDelegate.urlSession(_:task:didCompleteWithError:)),
             #selector(URLSessionTaskDelegate.urlSession(_:task:didFinishCollecting:)),
@@ -32,10 +32,9 @@ public final class URLSessionProxyDelegate: NSObject, URLSessionTaskDelegate, UR
             #selector(URLSessionDownloadDelegate.urlSession(_:downloadTask:didWriteData:totalBytesWritten:totalBytesExpectedToWrite:))
         ]
         if #available(iOS 16.0, tvOS 16.0, macOS 13.0, watchOS 9.0, *) {
-            self.interceptedSelectors.insert(
-                #selector(URLSessionTaskDelegate.urlSession(_:didCreateTask:))
-            )
+            interceptedSelectors.insert(#selector(URLSessionTaskDelegate.urlSession(_:didCreateTask:)))
         }
+        self.interceptedSelectors = interceptedSelectors
     }
 
     // MARK: URLSessionTaskDelegate
