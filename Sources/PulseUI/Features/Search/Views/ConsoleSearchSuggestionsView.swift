@@ -27,7 +27,7 @@ struct ConsoleSearchSuggestionsView: View {
             }
         }
         if isShowingScopePicker {
-                PlainListSectionHeaderSeparator(title: "Scopes").padding(.top, 16)
+            PlainListSectionHeaderSeparator(title: "Scopes").padding(.top, 16)
             VStack {
                 ConsoleSearchScopesPicker(viewModel: viewModel)
             }
