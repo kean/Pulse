@@ -151,7 +151,7 @@ private struct _ConsoleListView: View {
             ScrollViewReader { proxy in
                 List(selection: $selection) {
                     if isSearching {
-                        ConsoleSearchResultsListContentView()
+                        ConsoleSearchListContentView()
                     } else {
                         ConsoleListContentView(proxy: proxy)
                     }

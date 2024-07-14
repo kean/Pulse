@@ -13,27 +13,15 @@ import Combine
 struct ConsoleSearchSuggestionsView: View {
     @EnvironmentObject private var viewModel: ConsoleSearchViewModel
 
-    @State private var isShowingScopePicker = false
-
     var body: some View {
 #if os(macOS)
         if viewModel.parameters.isEmpty {
             HStack {
                 ConsoleSearchStringOptionsView(viewModel: viewModel)
                 Spacer()
-                ConsoleSearchPickScopesButton {
-                    isShowingScopePicker.toggle()
-                }
-            }
-        }
-        if isShowingScopePicker {
-            PlainListSectionHeaderSeparator(title: "Scopes").padding(.top, 16)
-            VStack {
-                ConsoleSearchScopesPicker(viewModel: viewModel)
             }
         }
 #endif
-
         let suggestions = viewModel.suggestionsViewModel!
         if !suggestions.searches.isEmpty {
 #if os(macOS)
@@ -43,11 +31,12 @@ struct ConsoleSearchSuggestionsView: View {
             buttonClearSearchHistory
         }
 
-#if os(iOS) || os(visionOS)
         if viewModel.parameters.isEmpty {
+#if os(macOS)
+            PlainListSectionHeaderSeparator(title: "Scopes").padding(.top, 16)
+#endif
             ConsoleSearchScopesPicker(viewModel: viewModel)
         }
-#endif
     }
 
     private var buttonClearSearchHistory: some View {
@@ -74,6 +63,7 @@ struct ConsoleSearchSuggestionsView: View {
             }
 #if os(macOS)
             .searchCompletion(suggestion.id.uuidString)
+            .buttonStyle(.plain)
 #endif
         }
     }

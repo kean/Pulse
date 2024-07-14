@@ -9,10 +9,10 @@ import Pulse
 import CoreData
 import Combine
 
+#warning("simplify on macOS")
 @available(iOS 15, visionOS 1.0, *)
 struct ConsoleSearchToolbar: View {
     @EnvironmentObject private var viewModel: ConsoleSearchViewModel
-    @State private var isShowingScopesPicker = false
 
     var body: some View {
         HStack(alignment: .bottom, spacing: 0) {
@@ -53,12 +53,6 @@ struct ConsoleSearchToolbar: View {
 #else
             HStack {
                 ConsoleSearchStringOptionsView(viewModel: viewModel)
-                ConsoleSearchPickScopesButton {
-                    isShowingScopesPicker.toggle()
-                }.popover(isPresented: $isShowingScopesPicker, arrowEdge: .top) {
-                    ConsoleSearchScopesPicker(viewModel: viewModel)
-                        .padding()
-                }
             }
 #endif
     }
@@ -117,23 +111,6 @@ struct ConsoleSearchScopesPicker: View {
             .frame(maxWidth: .infinity, alignment: .leading)
     #endif
         }
-    }
-}
-
-@available(iOS 15, visionOS 1.0, *)
-struct ConsoleSearchPickScopesButton: View {
-    @EnvironmentObject var viewModel: ConsoleSearchViewModel
-
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            HStack(spacing: 4) {
-                Image(systemName: "target")
-                Text("\(viewModel.scopes.count == 0 ? viewModel.allScopes.count : viewModel.scopes.count)")
-                    .font(.body.monospacedDigit())
-            }.foregroundColor(.secondary)
-        }.buttonStyle(.plain)
     }
 }
 #endif
