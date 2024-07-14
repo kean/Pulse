@@ -1206,6 +1206,7 @@
 		0CF0D594296F189500EED9D4 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				0CF0D5DE296F189500EED9D4 /* Metrics */,
 				0CF0D595296F189500EED9D4 /* SearchBar-macos.swift */,
 				0CF0D597296F189500EED9D4 /* PlaceholderView.swift */,
 				0CF0D5A2296F189500EED9D4 /* TextView.swift */,
@@ -1259,7 +1260,6 @@
 				0CF0D5F9296F189600EED9D4 /* Console */,
 				0CF0D5DD296F189500EED9D4 /* Inspector */,
 				0CF0D5B3296F189500EED9D4 /* Filters */,
-				0CF0D5DE296F189500EED9D4 /* Metrics */,
 				0CFF79DA29EB7A8000BE767B /* Sessions */,
 				0CF0D5CE296F189500EED9D4 /* Settings */,
 				0C9751522A32CBAB00DC46FF /* Remote */,
